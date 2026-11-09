@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { blockWeek, weekStart } from "@/lib/block";
@@ -17,7 +18,7 @@ export function Recovery() {
   const list = [...MUSCLES].sort((a, b) => rec[a] - rec[b]);
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Recovery</h1>
+      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Recovery<Info term="recovery" /></h1>
       <p className="mt-1 text-muted">Colours show how recovered each muscle is from your recent sets.</p>
       <div className="card mt-4 p-4">
         <BodyMap rec={rec} />

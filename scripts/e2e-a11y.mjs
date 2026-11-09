@@ -49,7 +49,7 @@ try {
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
-    await page.getByRole("button", { name: tab }).click();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);
   }
   // Delightful extras: recap and body/photos.

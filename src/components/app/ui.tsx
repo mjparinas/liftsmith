@@ -1,4 +1,6 @@
 "use client";
+import { Info } from "@/components/Info";
+import type { Term } from "@/lib/glossary";
 import { haptic, sound } from "@/lib/juice";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
 import { Icon, type IconName } from "./icons";
@@ -73,13 +75,14 @@ export function Stepper({ value, onDown, onUp, label, suffix }: { value: string;
   );
 }
 
-export function Section({ title, children, right, icon }: { title: string; children: ReactNode; right?: ReactNode; icon?: IconName }) {
+export function Section({ title, children, right, icon, info }: { title: string; children: ReactNode; right?: ReactNode; icon?: IconName; info?: Term }) {
   return (
     <section className="mt-7">
       <div className="mb-2.5 flex items-end justify-between px-1">
         <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
           {icon && <Icon name={icon} size={14} className="text-accent" />}
           {title}
+          {info && <Info term={info} />}
         </h2>
         {right}
       </div>
@@ -160,11 +163,11 @@ export function Badge({ icon, tint = "var(--color-accent)", size = 36 }: { icon:
 }
 
 /** A metric tile: label, big number, optional icon and hue. */
-export function StatTile({ label, value, icon, tint = "var(--color-accent)", className = "" }: { label: string; value: ReactNode; icon?: IconName; tint?: string; className?: string }) {
+export function StatTile({ label, value, icon, tint = "var(--color-accent)", className = "", info }: { label: string; value: ReactNode; icon?: IconName; tint?: string; className?: string; info?: Term }) {
   return (
     <div className={`card-tint p-4 ${className}`} style={{ "--tint": tint } as CSSProperties}>
       <div className="flex items-center justify-between">
-        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{label}</div>
+        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{label}{info && <Info term={info} />}</div>
         {icon && <span style={{ color: tint }}><Icon name={icon} size={16} /></span>}
       </div>
       <div className="display mt-2 text-[28px]">{value}</div>

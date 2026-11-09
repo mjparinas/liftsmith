@@ -1,6 +1,7 @@
 "use client";
 import { useApp } from "@/lib/store";
 import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
+import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
@@ -16,9 +17,9 @@ import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { go, useRoute } from "./router";
 import { Button, Chip, Section } from "./ui";
 
-function Row<T extends string | number>({ label, value, options, onPick }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void }) {
+function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
-    <Section title={label}>
+    <Section title={label} info={info}>
       <div className="flex flex-wrap gap-2">
         {options.map(([v, l]) => <Chip key={String(v)} active={v === value} onClick={() => onPick(v)}>{l}</Chip>)}
       </div>
@@ -47,8 +48,8 @@ export function Settings() {
       <Row<Goal> label="Goal" value={profile.goal} onPick={(goal) => setProfile({ goal })} options={[["muscle", "Build muscle"], ["strength", "Get stronger"], ["general", "Stay fit"]]} />
       <Row<Experience> label="Experience" value={profile.experience} onPick={(experience) => setProfile({ experience })} options={[["new", "New"], ["intermediate", "Some"], ["advanced", "Experienced"]]} />
       <Row<number> label="Days a week" value={profile.daysPerWeek} onPick={(daysPerWeek) => setProfile({ daysPerWeek })} options={[1, 2, 3, 4, 5, 6].map((d) => [d, String(d)])} />
-      <Row<Variability> label="Exercise variety" value={profile.variability} onPick={(variability) => setProfile({ variability })} options={[["consistent", "More consistent"], ["balanced", "Balanced"], ["variable", "More variety"]]} />
-      <Row<number> label="Build weeks before a deload" value={profile.blockWeeks} onPick={(blockWeeks) => setProfile({ blockWeeks })} options={[3, 4, 5, 6].map((d) => [d, `${d} weeks`])} />
+      <Row<Variability> info="variety" label="Exercise variety" value={profile.variability} onPick={(variability) => setProfile({ variability })} options={[["consistent", "More consistent"], ["balanced", "Balanced"], ["variable", "More variety"]]} />
+      <Row<number> info="deloadWeeks" label="Build weeks before a deload" value={profile.blockWeeks} onPick={(blockWeeks) => setProfile({ blockWeeks })} options={[3, 4, 5, 6].map((d) => [d, `${d} weeks`])} />
       <Row<"dark" | "light" | "system"> label="Appearance" value={profile.theme ?? "dark"} onPick={(theme) => setProfile({ theme })} options={[["dark", "Dark"], ["light", "Light"], ["system", "Match system"]]} />
       <Row<"kg" | "lb"> label="Units" value={profile.unit} onPick={(unit) => setProfile({ unit })} options={[["kg", "Kilograms"], ["lb", "Pounds"]]} />
       <Section title={`Body weight (${profile.unit})`}>
@@ -76,7 +77,7 @@ export function Settings() {
         </div>
         <p className="mt-2 text-xs text-faint">Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data. <a className="underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">Privacy</a>{stats ? ` · Install id ${installId().slice(0, 8)}` : ""}</p>
       </Section>
-      <Section title="Training block">
+      <Section title="Training block" info="blockWeek">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>
       <Section title="Data">
