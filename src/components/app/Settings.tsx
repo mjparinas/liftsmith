@@ -3,14 +3,16 @@ import { useApp } from "@/lib/store";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
+import { DelightSettings } from "./DelightSettings";
+import { erasePhotos } from "@/lib/photos";
 import { MessageSettings } from "./MessageSettings";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
-import { go } from "./router";
+import { go, useRoute } from "./router";
 import { Button, Chip, Section } from "./ui";
 
 function Row<T extends string | number>({ label, value, options, onPick }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void }) {
@@ -27,6 +29,10 @@ export function Settings() {
   const { profile, setProfile, reset } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
+  const { arg } = useRoute();
+  useEffect(() => {
+    if (arg) document.getElementById(arg)?.scrollIntoView({ block: "start" });
+  }, [arg]);
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
@@ -57,6 +63,7 @@ export function Settings() {
         <p className="mt-2 text-xs text-faint">Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.</p>
         <Button kind="ghost" className="mt-3 w-full" onClick={() => go("achievements")}>Achievements and locker</Button>
       </Section>
+      <DelightSettings />
       <CalendarSettings />
       <MessageSettings />
       <CycleSettings />
@@ -74,7 +81,7 @@ export function Settings() {
         {confirm ? (
           <div className="space-y-2">
             <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
-            <Button kind="danger" className="w-full" onClick={() => void deleteEmail().finally(() => void reset())}>Erase everything</Button>
+            <Button kind="danger" className="w-full" onClick={() => void deleteEmail().finally(() => { void erasePhotos(); void reset(); })}>Erase everything</Button>
             <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>Cancel</Button>
           </div>
         ) : (

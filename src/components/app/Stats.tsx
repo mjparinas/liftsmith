@@ -11,6 +11,7 @@ import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
 import { Button, EmptyState, Section, StatTile } from "./ui";
+import { StrengthCard, TonnageCard } from "./Extras";
 
 function Spark({ points }: { points: number[] }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">Needs two sessions</div>;
@@ -65,6 +66,8 @@ export function Stats() {
       <div className="mt-3 grid grid-cols-2 gap-3">
         {tiles.map(([k, v, icon, hue]) => <StatTile key={k} label={k} value={v} icon={icon} tint={hue} />)}
       </div>
+      <TonnageCard />
+      <StrengthCard />
 
       <Section title="Sets per muscle this week" icon="target">
         <div className="card p-4">

@@ -16,6 +16,7 @@ import { go } from "./router";
 import { Icon } from "./icons";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { Button, EmptyState, Ring, Section } from "./ui";
+import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
 
@@ -104,6 +105,8 @@ export function Today() {
 
       {profile.quotes !== false && <DailyQuote now={now} />}
 
+      <TodayMoments />
+
       {readiness && preview && call && !active && (
         <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
           <div className="flex items-center gap-4">
@@ -180,6 +183,7 @@ export function Today() {
         <div className="mt-1.5 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
       </div>
+      <PlanExtras />
 
       {preview && preview.items.length > 0 ? (
         <>
