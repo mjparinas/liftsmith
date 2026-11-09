@@ -26,7 +26,7 @@
     "@libsql/client": "^0.18.0",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
-    "next": "16.4.3",
+    "next": "16.4.5",
     "react": "19.3.1",
     "react-dom": "19.3.1",
     "zustand": "^5.0.16"
@@ -46,10 +46,10 @@
     "@types/react-dom": "^19",
     "@vitest/coverage-v8": "^5.1.0",
     "eslint": "^10",
-    "eslint-config-next": "16.4.3",
+    "eslint-config-next": "16.4.5",
     "fake-indexeddb": "^6.2.8",
     "jsdom": "^30.1.3",
-    "playwright": "^1.63.0",
+    "playwright": "^1.65.0",
     "tailwindcss": "^4",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vitest": "^5.0.3"
