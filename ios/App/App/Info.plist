@@ -71,7 +71,9 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Take progress photos. They stay on this phone and are never uploaded.</string>
+	<string>Liftsmith uses the camera to take progress photos and, if you try it, to count your reps. Photos stay on this phone and are never uploaded; rep counting analyses video on this iPhone and never records or sends it.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Liftsmith can count your reps from this iPhone's motion sensors while you lift.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

@@ -5,7 +5,8 @@ import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fromKg, plainNum, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flag } from "@/lib/flags";
 import { LANG_NAME, LANGS, num, t, type LangPref } from "@/lib/i18n";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { CalendarSettings } from "./CalendarSettings";
@@ -40,10 +41,25 @@ export function Settings() {
   useEffect(() => {
     if (arg) document.getElementById(arg)?.scrollIntoView({ block: "start" });
   }, [arg]);
+  const taps = useRef<number[]>([]);
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ {t("nav.back.today")}</button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("settings.title")}</h1>
+      {/* Five quick taps on the title open the experiments lab (Easter egg; AGENTS.md "Rep counter lab"). */}
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">
+        <button
+          type="button"
+          className="cursor-default"
+          onClick={() => {
+            const now = Date.now();
+            taps.current = [...taps.current.filter((x) => now - x < 2000), now];
+            if (taps.current.length >= 5) go("lab");
+          }}
+        >
+          {t("settings.title")}
+        </button>
+      </h1>
+      {flag("repLab") && <Button kind="ghost" className="mt-4 w-full" onClick={() => go("lab")}>{t("settings.lab")}</Button>}
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>{t("settings.injuries")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("tools")}>{t("settings.tools")}</Button>

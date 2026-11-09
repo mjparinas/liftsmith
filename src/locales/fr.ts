@@ -207,6 +207,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   "setup.save": "Enregistrer",
 
   "settings.title": "Réglages",
+  "settings.lab": "Labo du compteur de répétitions (expérience)",
   "settings.rerun": "Refaire la configuration",
   "settings.injuries": "Blessures et douleurs",
   "settings.tools": "Outils : calculateur de TDEE",
