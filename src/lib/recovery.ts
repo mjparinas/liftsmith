@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { EXERCISE_BY_ID } from "./exercises";
 import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Muscle } from "./types";
 
@@ -11,10 +12,10 @@ const HOURS_90 = { small: 48, large: 72 };
 export type Band = "fresh" | "ready" | "recovering" | "fatigued";
 
 export const BANDS: { band: Band; label: string; min: number; colour: string; hint: string }[] = [
-  { band: "fresh", label: "Fresh", min: 90, colour: "var(--band-fresh)", hint: "Fully recovered" },
-  { band: "ready", label: "Ready", min: 70, colour: "var(--band-ready)", hint: "Good to train" },
-  { band: "recovering", label: "Recovering", min: 40, colour: "var(--band-recovering)", hint: "Light work only" },
-  { band: "fatigued", label: "Fatigued", min: 0, colour: "var(--band-fatigued)", hint: "Needs rest" },
+  { band: "fresh", get label() { return t("band.fresh"); }, min: 90, colour: "var(--band-fresh)", get hint() { return t("band.fresh.hint"); } },
+  { band: "ready", get label() { return t("band.ready"); }, min: 70, colour: "var(--band-ready)", get hint() { return t("band.ready.hint"); } },
+  { band: "recovering", get label() { return t("band.recovering"); }, min: 40, colour: "var(--band-recovering)", get hint() { return t("band.recovering.hint"); } },
+  { band: "fatigued", get label() { return t("band.fatigued"); }, min: 0, colour: "var(--band-fatigued)", get hint() { return t("band.fatigued.hint"); } },
 ];
 
 export function bandOf(recovery: number): (typeof BANDS)[number] {
