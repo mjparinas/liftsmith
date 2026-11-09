@@ -32,6 +32,8 @@ const PATHS = {
   flag: "M5 21V4M5 4h12l-2 4 2 4H5",
   lock: "M6 11h12v10H6zM8.5 11V7.5a3.5 3.5 0 0 1 7 0V11",
   gift: "M4 10h16v4H4zM5.5 14h13v7h-13zM12 10v11M12 10c-1.5-3.5-6-4-6-1.5S12 10 12 10zM12 10c1.5-3.5 6-4 6-1.5S12 10 12 10z",
+  camera: "M3 8h4l2-3h6l2 3h4v11H3zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z",
+  flip: "M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M20 12a8 8 0 0 1-14 5.3M6 21v-4h4",
 } as const;
 
 export type IconName = keyof typeof PATHS;

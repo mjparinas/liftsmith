@@ -1,11 +1,11 @@
-// Live inputs for the rep counter lab: the camera through MediaPipe Pose Landmarker (WASM + WebGL in the
+// Live inputs for rep counting: the camera through MediaPipe Pose Landmarker (WASM + WebGL in the
 // web view on Android, iOS and desktop browsers), and the phone's own motion sensors through
 // DeviceMotionEvent. Frames are analysed in memory and dropped; nothing is recorded or uploaded.
 // Only the model and its runtime are downloaded, once, then cached by the browser.
 
 import type { Keypoint } from "./pose";
 
-/** Pinned so the runtime matches the npm types. Self-host both before this leaves the lab. */
+/** Pinned so the runtime matches the npm types. Self-host both (Open items). */
 const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.2/wasm";
 const MODEL = {
   lite: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task",

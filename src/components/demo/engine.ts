@@ -37,7 +37,7 @@ export interface DemoSettings {
   calm?: boolean;
   /**
    * Follow the lifter: read every frame, it returns how far through the rep they are (0 the start
-   * position, 1 the far end), or null to fall back to the demo's own timing. Used by the rep counter lab.
+   * position, 1 the far end), or null to fall back to the demo's own timing. Used by camera rep counting.
    */
   follow?: (() => number | null) | null;
 }

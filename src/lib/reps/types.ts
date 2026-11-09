@@ -1,4 +1,4 @@
-// Automatic rep counting (experiment, behind the `repLab` flag). Shared types for the camera (pose) and
+// Automatic rep counting (camera on the workout screen; phone motion behind the `repMotion` flag). Shared types for the camera (pose) and
 // motion (watch or phone IMU) trackers. Everything here runs on the device; no video or motion data
 // leaves it.
 

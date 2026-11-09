@@ -7,8 +7,8 @@ import { hash } from "./random";
 export const FLAGS = {
   /** Length of the Pro trial offered at the end of setup (Melvin, 2026-11-09: 14 days; A/B 7 vs 14 later). */
   trialDays: { default: 14, options: [7, 14] as const },
-  /** Rep counter lab: camera and motion rep counting experiment (Settings: tap the title five times). */
-  repLab: { default: false, options: [false, true] as const },
+  /** Counting reps from the phone's motion sensors on the workout screen (off: it was unreliable in tests). */
+  repMotion: { default: false, options: [false, true] as const },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

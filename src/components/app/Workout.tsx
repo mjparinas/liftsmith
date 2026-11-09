@@ -39,6 +39,7 @@ import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
 import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { AlmostThere, PrMoment } from "./WorkoutJuice";
+import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 
 let hrConn: HrConnection | null = null;
 
@@ -56,6 +57,12 @@ export function Workout() {
   const [hrBusy, setHrBusy] = useState(false);
   const [hrError, setHrError] = useState<string | null>(null);
   const [popKey, setPopKey] = useState(0);
+  // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
+  const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
+  const changeCount = (p: CountPrefs) => {
+    setCountPrefs(p);
+    saveCountPrefs(p);
+  };
   const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
   const lastBeep = useRef(0);
@@ -203,6 +210,8 @@ export function Workout() {
   };
 
   const unit = gym.unit;
+  const canCount = !!ex && countable(ex.id, ex.pattern, countPrefs.source);
+  const counting = canCount && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
@@ -298,13 +307,33 @@ export function Workout() {
             </div>
           </section>
 
+          {counting ? (
+            <div className="relative mt-4 h-72">
+              <AutoCount
+                key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
+                exerciseId={ex.id}
+                pattern={ex.pattern}
+                body={bodyFor(profile.sex)}
+                bpm={bpm}
+                prefs={countPrefs}
+                onPrefs={changeCount}
+                counting={!resting}
+                setKey={`${active.index}:${doneSets}:${warmDone}`}
+                onCount={(n) => { const a = useApp.getState().active; if (a) s.adjust(a.weight, n); }}
+                onClose={() => changeCount({ ...countPrefs, on: false })}
+                paused={infoOpen || swapOpen || endOpen}
+              />
+            </div>
+          ) : (
           <div className="relative mt-4 h-52">
             <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} className="h-full" />
             {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}
             <button type="button" onClick={() => setInfoOpen(true)} className="press absolute inset-0 rounded-2xl">
               <span className="absolute bottom-2 right-2 inline-flex min-h-11 items-center rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</span>
             </button>
+            {canCount && <AutoCountButton on={false} onToggle={() => changeCount({ ...countPrefs, on: true })} className="absolute bottom-2 left-2" />}
           </div>
+          )}
 
           {/* Screen readers hear the rest start, ten seconds left and rest over, not every second. */}
           <p className="sr-only" aria-live="polite">{resting ? (left <= 10 ? t("workout.sr.tenLeft") : t("workout.sr.rest", { time: clock(active.restTotal) })) : events.some((e) => e.type === "set" && e.sessionId === active.sessionId) ? t("workout.sr.over", { load: loadText(ex, active.weight, profile.unit), reps: repsText(ex, active.reps) }) : ""}</p>
