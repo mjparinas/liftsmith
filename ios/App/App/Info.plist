@@ -81,7 +81,7 @@
 	<key>NSLocationDefaultAccuracyReduced</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Liftsmith reads your weight, height, resting heart rate and heart rate to set up your training and show effort during workouts.</string>
+	<string>Liftsmith reads your weight, height, body fat and resting heart rate to set up your training and keep your weigh-ins and daily calories current.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Liftsmith saves your finished workouts, calories and heart rate to Apple Health.</string>
 	<key>UIBackgroundModes</key>
