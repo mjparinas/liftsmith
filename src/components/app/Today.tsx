@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Section } from "./ui";
+import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
 
@@ -76,6 +77,8 @@ export function Today() {
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
 
+      <TodayMoments />
+
       {readiness && preview && !active && (
         <section className="card mt-4 p-4" aria-labelledby="call-title">
           <div className="flex items-baseline justify-between gap-3">
@@ -130,6 +133,7 @@ export function Today() {
         <div className="mt-1 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
       </div>
+      <PlanExtras />
 
       {preview && preview.items.length > 0 ? (
         <>

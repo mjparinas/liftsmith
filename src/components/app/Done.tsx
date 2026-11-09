@@ -15,6 +15,9 @@ import { Badge, LeagueCard, StreakCard, TIER_COLOUR, useGame } from "./Achieveme
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
+import { DoneMoments, lean } from "./Extras";
+import { PrReplayButton } from "./PrReplay";
+import { doneCue, say, voice } from "@/lib/voice";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -108,6 +111,7 @@ export function Done() {
     if (levelUp) sound.levelUp();
     else sound.fanfare();
     if (badges.length) setTimeout(() => sound.badge(), 1100);
+    if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!s) return <div className="pt-10 text-center"><Button onClick={() => go("today")}>Back to today</Button></div>;
@@ -163,6 +167,8 @@ export function Done() {
           ))}
         </ul>
       )}
+      <PrReplayButton prs={prs} />
+      {!lean(profile) && <DoneMoments />}
 
       {badges.length > 0 && (
         <section className="mt-4 text-left" aria-label="Badges unlocked">
