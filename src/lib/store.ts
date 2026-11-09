@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
+import { weekStart } from "./block";
+import { readBody } from "./health";
 import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
@@ -139,7 +141,11 @@ interface State {
   /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
   setPlan(plan: Plan | null): void;
   /** Log a weigh-in and make it the profile's body weight. */
-  logBodyweight(kg: number): void;
+  logBodyweight(kg: number, bodyFat?: number): void;
+  /** Weigh-ins and body fat from Health Connect or Apple Health (native, when allowed), deduplicated by day. */
+  importHealthBody(): Promise<number>;
+  /** Make the current week the deload week (a coach's note action). The next block starts after it. */
+  startDeload(): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
   /** Record a gym buddy check-in. */
@@ -352,6 +358,7 @@ export const useApp = create<State>((set, get) => {
       } catch {}
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
       if (!get().autoEnd()) get().replan();
+      void get().importHealthBody().catch(() => 0);
     },
 
     setProfile(p) {
@@ -691,10 +698,31 @@ export const useApp = create<State>((set, get) => {
       else get().replan();
     },
 
-    logBodyweight(kg) {
+    logBodyweight(kg, bodyFat) {
       if (!(kg > 0)) return;
-      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg, ...(bodyFat && bodyFat > 0 ? { bodyFat } : {}) }]);
       get().setProfile({ bodyweight: kg });
+    },
+
+    async importHealthBody() {
+      const readings = await readBody(120);
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = readings.map((r) => ({ type: "bodyweight" as const, id: `health-bw-${r.day}`, at: r.at, kg: r.kg, ...(r.bodyFat ? { bodyFat: r.bodyFat } : {}) })).filter((e) => !have.has(e.id));
+      if (fresh.length) {
+        commit(fresh);
+        const newest = fresh.reduce((a, b) => (b.at > a.at ? b : a));
+        const last = get().events.filter((e) => e.type === "bodyweight").reduce((t, e) => Math.max(t, e.at), 0);
+        if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
+      }
+      return fresh.length;
+    },
+
+    startDeload() {
+      const p = get().profile;
+      const now = Date.now();
+      const build = Math.min(6, Math.max(3, p.blockWeeks));
+      get().setProfile({ blockStart: weekStart(p, now) - build * 7 * 86_400_000 });
+      get().replan();
     },
 
     importWorkouts(evs) {

@@ -11,6 +11,7 @@ import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury
 import { PainSelect } from "./Injuries";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
+import { workoutWhy } from "@/lib/why";
 import { haptic, keepAwake, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
@@ -301,7 +302,7 @@ export function Workout() {
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {item.target.note}</p>
+                <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)}</p>
               )}
               <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (
