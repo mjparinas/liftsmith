@@ -9,6 +9,7 @@ class MainViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(WorkoutSessionPlugin())
         bridge?.registerPluginInstance(CalendarPlugin())
+        bridge?.registerPluginInstance(InstallInfoPlugin())
     }
 }
 

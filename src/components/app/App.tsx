@@ -5,6 +5,7 @@ import { useApp } from "@/lib/store";
 import { useEffect } from "react";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
+import { startAnalytics, track } from "@/lib/analytics";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
@@ -28,6 +29,7 @@ export function App() {
   const { route } = useRoute();
   useEffect(() => {
     installDiag();
+    startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();
     const online = () => void flushFeedback();
@@ -36,6 +38,10 @@ export function App() {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
     return () => window.removeEventListener("online", online);
   }, [init]);
+  // Which screens get used (the route name only, nothing on it).
+  useEffect(() => {
+    if (ready) track("screen_view", { screen: profile.onboarded ? route : "onboarding" });
+  }, [ready, route, profile.onboarded]);
   // A workout left running ends itself a few hours after the last set (checked each minute and on open).
   useEffect(() => {
     if (!ready) return;
