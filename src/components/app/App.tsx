@@ -20,6 +20,7 @@ import { Gym } from "./Gym";
 import { Onboarding } from "./Onboarding";
 import { Recovery } from "./Recovery";
 import { RepLab } from "./RepLab";
+import { Remix } from "./Remix";
 import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
 import { Settings } from "./Settings";
@@ -34,7 +35,7 @@ import { Recap } from "./Recap";
 import { goalStreak } from "@/lib/game";
 import { useNow } from "@/lib/useNow";
 import { activeTheme, applyTheme } from "@/lib/themes";
-import { readBody } from "@/lib/health";
+import { readHeight } from "@/lib/health";
 import { Tools } from "./Tools";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
@@ -181,12 +182,13 @@ export function App() {
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);
-  // TDEE tracking (tdee.ts): weight, height and body fat from Health Connect or Apple Health on open, then
+  // TDEE tracking (tdee.ts): height from Health Connect or Apple Health on open (weigh-ins and body fat come
+  // in through the store's importHealthBody), then
   // a snapshot whenever weight, age, height or training days change. Debounced, so typing a weight in
   // Settings records the final value, not every keystroke.
   useEffect(() => {
     if (!ready) return;
-    void readBody().then((r) => useApp.getState().applyHealthBody(r));
+    void readHeight().then((r) => useApp.getState().applyHealthBody(r));
     let t: ReturnType<typeof setTimeout> | undefined;
     const unsub = useApp.subscribe((s, prev) => {
       if (s.events === prev.events && s.profile === prev.profile) return;
@@ -213,7 +215,7 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, lab: <RepLab /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, remix: <Remix code={arg} />, lab: <RepLab /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback" && route !== "lab";
   if (route === "setup") return screen;
   return (

@@ -2,9 +2,9 @@
 // Tools: calculators that use what the app already knows. First up, TDEE (tdee.ts), kept current from
 // weigh-ins, birthday, height, body fat and training days, with a history graph.
 import { TdeeChart, TdeeResults } from "@/components/Tdee";
-import { connectHealth, healthAvailable, readBody } from "@/lib/health";
+import { connectHealth, healthAvailable, readHeight } from "@/lib/health";
 import { useApp } from "@/lib/store";
-import { ACTIVITIES, ACTIVITY, currentKg, currentTdee, tdeeHistory, tdeeLog, type Activity } from "@/lib/tdee";
+import { ACTIVITIES, ACTIVITY, currentBodyFat, currentKg, currentTdee, tdeeHistory, tdeeLog, type Activity } from "@/lib/tdee";
 import type { TdeeEvent, Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -99,7 +99,7 @@ function TdeeScreen() {
   const [age, setAge] = useState(cur.inputs.age !== undefined ? String(cur.inputs.age) : "");
   const [height, setHeight] = useState(profile.heightCm ? String(imperial ? Math.round(profile.heightCm / 2.54) : Math.round(profile.heightCm)) : "");
   const [weight, setWeight] = useState(fmtNum(Math.round(fromKg(cur.inputs.kg ?? profile.bodyweight, unit) * 10) / 10));
-  const fat = profile.bodyFat?.pct;
+  const fat = currentBodyFat(events, profile);
   const [fatText, setFatText] = useState(fat !== undefined ? fmtNum(fat) : "");
   const save = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(save.current), []);
@@ -114,12 +114,14 @@ function TdeeScreen() {
 
   const fillFromHealth = async () => {
     if (!(await connectHealth())) return setHealthNote(T.healthNone);
-    const r = await readBody();
-    useApp.getState().applyHealthBody(r);
-    const p = useApp.getState().profile;
-    if (r.weight) setWeight(fmtNum(Math.round(fromKg(r.weight.value, unit) * 10) / 10));
+    await useApp.getState().importHealthBody();
+    useApp.getState().applyHealthBody(await readHeight());
+    const { profile: p, events: ev } = useApp.getState();
+    const kg = currentKg(ev, p);
+    if (kg) setWeight(fmtNum(Math.round(fromKg(kg, unit) * 10) / 10));
     if (p.heightCm) setHeight(String(imperial ? Math.round(p.heightCm / 2.54) : Math.round(p.heightCm)));
-    if (p.bodyFat) setFatText(fmtNum(p.bodyFat.pct));
+    const fat = currentBodyFat(ev, p);
+    if (fat !== undefined) setFatText(fmtNum(fat));
     setHealthNote(T.healthDone);
   };
 

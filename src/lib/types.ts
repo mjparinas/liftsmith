@@ -152,6 +152,8 @@ export interface Gym {
    * device (and in the user's own sync). Rounded to about 100 m when saved.
    */
   place?: { lat: number; lon: number; radiusM: number };
+  /** Machine settings per exercise ("Seat 4", "Back pad 2"), machineSettings.ts. */
+  settings?: Record<string, { label: string; value: string }[]>;
   updatedAt: number;
 }
 
@@ -232,6 +234,10 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /** One-rep max goals with a date (goals.ts). */
+  goals?: import("./goals").LiftGoal[];
+  /** Three-week fixes started from the plateau detective (plateau.ts). */
+  plateauFixes?: import("./plateau").PlateauFix[];
   /**
    * Where Today's plan comes from (programs.ts). Missing means the adaptive generator. A program keeps
    * the starting weights frozen when it was picked (kg, keyed by program slot), so replaying the
@@ -461,6 +467,8 @@ export interface CycleEvent extends EventBase {
 export interface BodyweightEvent extends EventBase {
   type: "bodyweight";
   kg: number;
+  /** Body fat percentage, when a scale or Health Connect / Apple Health gave one (insights.ts). */
+  bodyFat?: number;
 }
 
 /**

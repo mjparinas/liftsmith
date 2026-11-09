@@ -17,6 +17,7 @@ import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } fr
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
+import { ShareWorkout } from "./Remix";
 import { DoneMoments, lean } from "./Extras";
 import { PrReplayButton } from "./PrReplay";
 import { doneCue, say, voice } from "@/lib/voice";
@@ -215,6 +216,7 @@ export function Done() {
       <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>{t("done.share")}</Button>
       {shared && <p className="mt-2 text-sm text-muted" role="status">{shared}</p>}
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
+      <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>{t("done.done")}</Button>
       <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">{t("done.allAchievements")}</button>
     </div>

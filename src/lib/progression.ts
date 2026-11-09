@@ -145,7 +145,7 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
     if (fb < 0) reps = Math.max(lo, reps - 2);
     reps = Math.min(Math.max(lo, reps), Math.max(hi, best + 1));
     if (wk.deload) return { weight: 0, reps: lo, rir, note: "Deload: easy reps" };
-    return { weight: 0, reps, rir, note: hit ? "Hit every set last time: one more rep" : "Same as last time" };
+    return { weight: 0, reps, rir, note: hit ? "Hit every set last time: one more rep" : "A set came up short last time: same again until they all hit" };
   }
 
   if (!last) {
@@ -175,23 +175,23 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
 
   if (wk.deload) {
     const w = roundLoad(lastWeight * 0.9, ex, gym).kg;
-    return { weight: w, reps: lo, rir, note: "Deload: lighter, fewer sets" };
+    return { weight: w, reps: lo, rir, note: "Deload week: 10% lighter so you recover" };
   }
 
   let weight = lastWeight;
   let reps = Math.min(hi, Math.max(lo, lastTarget));
-  let note = "Same as last time";
+  let note = "A set came up short last time: same again until they all hit";
   if (bigMiss || fb < 0) {
     weight = stepLoad(lastWeight, -1, ex, gym);
     reps = lo;
-    note = fb < 0 ? "Felt too hard: a step lighter" : "Missed reps: a step lighter";
+    note = fb < 0 ? "You said it felt too hard: a step lighter" : "Missed 2+ reps last time: a step lighter";
   } else if (allHit && (lastTarget >= hi || fb > 0)) {
     weight = stepLoad(lastWeight, 1, ex, gym);
     reps = lo;
-    note = fb > 0 && lastTarget < hi ? "Felt easy: weight up" : "Top of the range: weight up";
+    note = fb > 0 && lastTarget < hi ? "You said it felt easy: weight up" : "Hit the top of your rep range: weight up";
   } else if (allHit) {
     reps = Math.min(hi, lastTarget + 1);
-    note = "Hit every set: one more rep";
+    note = "Hit every set last time: one more rep";
   }
   return { weight: roundLoad(weight, ex, gym).kg, reps, rir, note };
 }

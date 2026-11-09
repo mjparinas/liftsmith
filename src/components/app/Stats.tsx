@@ -1,4 +1,5 @@
 "use client";
+import { CoachNotes } from "./Insights";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { AchievementRow, useGame } from "./Achievements";
@@ -12,6 +13,7 @@ import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
 import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { GoalsCard, PlateausCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
 import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 
@@ -55,6 +57,7 @@ export function Stats() {
   return (
     <div className="pb-24">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Progress</h1>
+      <CoachNotes title="What to do next" />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
           <span className="font-bold">Level {lvl.level} · <span className="text-gradient">{lvl.title}</span></span>
@@ -70,6 +73,9 @@ export function Stats() {
       </div>
       <TonnageCard />
       <StrengthCard />
+
+      <GoalsCard />
+      <PlateausCard />
 
       <Section title="Sets per muscle this week" icon="target" info="weeklySets">
         <div className="card p-4">
