@@ -34,6 +34,7 @@ export const en = {
   "workout.skipRest": "Skip rest",
   "workout.skipWarmup": "Skip warm-up",
   "workout.nextUp": "Next up:",
+  "workout.ssThen": "Then {name}",
   "workout.comingUp": "Coming up",
   "workout.startRest": "Start rest · {time}",
   "workout.howTo": "How to ›",

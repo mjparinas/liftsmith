@@ -32,7 +32,7 @@ import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
 import { burst } from "./burst";
 import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
-import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { afterSet, groupRange, linkedToNext, supersetLabel } from "@/lib/superset";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
@@ -86,6 +86,15 @@ export function Workout() {
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
   const ssLabel = active && item ? supersetLabel(active.plan.items, active.index) : null;
+  // In a superset, which exercise comes after this set (the next one of the round, or back to the first).
+  const ssNext = (() => {
+    if (!ssLabel || !active || !item) return null;
+    const items = active.plan.items;
+    const done = (i: number) => events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId).length + (i === active.index ? 1 : 0);
+    const step = afterSet(items, active.index, done);
+    const [s0, e0] = groupRange(items, active.index);
+    return step.index !== active.index && step.index >= s0 && step.index <= e0 ? exercise(items[step.index].exerciseId).name : null;
+  })();
   const setLabel = warming ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal }) : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
@@ -261,6 +270,7 @@ export function Workout() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
+                {ssNext && <p className="mb-1 ml-1.5 inline-flex max-w-full items-center truncate text-xs font-medium text-muted" data-testid="superset-next">{t("workout.ssThen", { name: ssNext })}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
                 {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}

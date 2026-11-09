@@ -31,6 +31,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   "workout.skipRest": "Saltar descanso",
   "workout.skipWarmup": "Saltar calentamiento",
   "workout.nextUp": "Siguiente:",
+  "workout.ssThen": "Luego {name}",
   "workout.comingUp": "A continuación",
   "workout.startRest": "Iniciar descanso · {time}",
   "workout.howTo": "Cómo se hace ›",
