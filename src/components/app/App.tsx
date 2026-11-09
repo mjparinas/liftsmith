@@ -29,6 +29,7 @@ import { Stats } from "./Stats";
 import { Today } from "./Today";
 import { Workout } from "./Workout";
 import { Icon, type IconName } from "./icons";
+import { TodaySkeleton } from "./ui";
 import { Photos } from "./Photos";
 import { Recap } from "./Recap";
 import { goalStreak } from "@/lib/game";
@@ -84,6 +85,12 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [a11y]);
+  useEffect(() => {
+    // iOS WebKit only shows :active (the instant pressed state) when a touch listener exists.
+    const noop = () => {};
+    document.addEventListener("touchstart", noop, { passive: true });
+    return () => document.removeEventListener("touchstart", noop);
+  }, []);
   useEffect(() => {
     applyAppearance(savedAppearance());
     applyA11y(savedA11y());
@@ -208,9 +215,7 @@ export function App() {
 
   if (!ready)
     return (
-      <div className="grid min-h-dvh place-items-center" role="status" aria-label="Loading">
-        <div className="btn-primary grid h-14 w-14 animate-pulse place-items-center rounded-2xl"><Icon name="dumbbell" size={28} strokeWidth={2.4} /></div>
-      </div>
+      <TodaySkeleton />
     );
   if (!profile.onboarded) return <Onboarding />;
 

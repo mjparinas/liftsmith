@@ -30,6 +30,7 @@ import { t } from "@/lib/i18n";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
+import { burst } from "./burst";
 import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
@@ -52,6 +53,7 @@ export function Workout() {
   const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
   const [popKey, setPopKey] = useState(0);
+  const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
   const lastBeep = useRef(0);
 
@@ -131,7 +133,7 @@ export function Workout() {
   if (!active || !gym) {
     return (
       <div className="card mt-10">
-        <EmptyState icon="dumbbell" title="No workout running" body="Start one from Today. It's planned around your gym and recovery." action={<Button onClick={() => go("today")}>Back to today</Button>} />
+        <EmptyState icon="dumbbell" mascot="curious" title="No workout running" body="Start one from Today. It's planned around your gym and recovery." action={<Button onClick={() => go("today")}>Back to today</Button>} />
       </div>
     );
   }
@@ -148,6 +150,9 @@ export function Workout() {
       if (best > 0 && epley(active.weight, active.reps) > best + 0.01) say(prCue(ex.name));
     }
     setPopKey((k) => k + 1);
+    // From the top edge of Log set, so the check rises clear of the button's label.
+    const r = logRef.current?.getBoundingClientRect();
+    if (r) burst({ x: r.left + r.width / 2, y: r.top }, { check: true, count: 12, reach: 80 });
     s.logSet();
   };
 
@@ -366,7 +371,7 @@ export function Workout() {
                   <Stepper compact {...repStep} />
                 </div>
               )}
-              <div className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>
+              <div ref={logRef} className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>
                 {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
                 <Button className={`relative w-full text-xl ${docked ? "h-full min-h-28 flex-col" : "py-5"}`} onClick={log}>
                   {warming ? t("workout.logWarmup") : t("workout.logSet")} <Icon name="check" size={24} strokeWidth={2.8} />

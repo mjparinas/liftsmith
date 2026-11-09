@@ -52,6 +52,7 @@ export function greeting(hour: number, name: string): string {
 
 export function Today() {
   const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation, toggleSuperset } = useApp();
+  const [lenKey, setLenKey] = useState(0);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
@@ -191,7 +192,7 @@ export function Today() {
       {!fixed && <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted"><Icon name="clock" size={16} className="text-cyan" />Workout length</label>
-          <span className="display text-[1.875rem]">{profile.minutes}<span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
+          <span className="display text-[1.875rem]"><span key={lenKey} className={`inline-block ${lenKey ? "animate-nudge" : ""}`}>{profile.minutes}</span><span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
         </div>
         <input
           id="len"
@@ -202,6 +203,8 @@ export function Today() {
           value={profile.minutes}
           onChange={(e) => {
             haptic("select");
+            sound.tick();
+            setLenKey((k) => k + 1);
             setProfile({ minutes: Number(e.target.value), minutesDay: dayKey(Date.now()) });
           }}
           className="slider mt-4 w-full"
@@ -215,7 +218,7 @@ export function Today() {
       {preview && preview.items.length > 0 ? (
         <>
           <Section title={`${preview.items.length} exercises · about ${preview.estMinutes} min`} icon="dumbbell">
-            <ol className="card divide-y divide-line/70 overflow-hidden">
+            <ol className="stagger card divide-y divide-line/70 overflow-hidden">
               {preview.items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
                 const hue = muscleHue(it.focus);
@@ -256,7 +259,7 @@ export function Today() {
         </>
       ) : (
         <div className="card mt-6">
-          <EmptyState icon="moon" tint="var(--color-cyan)" title="Rest day" body="Everything is still recovering. Take the day, or shorten the session for some light work." />
+          <EmptyState icon="moon" mascot="sleepy" tint="var(--color-cyan)" title="Rest day" body="Everything is still recovering. Take the day, or shorten the session for some light work." />
         </div>
       )}
 

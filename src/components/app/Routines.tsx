@@ -67,7 +67,7 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
           })}
         </ul>
       ) : (
-        <EmptyState icon="layers" title="No routines yet" body="Save today's plan, a finished workout, or build your own. Weights still move up as you get stronger." />
+        <EmptyState icon="layers" mascot="curious" title="No routines yet" body="Save today's plan, a finished workout, or build your own. Weights still move up as you get stronger." />
       )}
       <div className="mt-4 grid gap-2">
         {preview && preview.items.length > 0 && (

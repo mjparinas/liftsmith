@@ -19,7 +19,8 @@ import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
-import { BumpField, Button, Chip, Section } from "./ui";
+import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
+import { feel } from "@/lib/juice";
 
 function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
@@ -76,9 +77,9 @@ export function Settings() {
       <Section title={t("settings.bodyweight", { unit: profile.unit })}>
         <BumpField label={t("settings.bodyweight.label")} value={plainNum(fromKg(profile.bodyweight, profile.unit))} onChange={(v) => setProfile({ bodyweight: toKg(Number(v) || 0, profile.unit) })} step={profile.unit === "lb" ? 1 : 0.5} start={fromKg(profile.bodyweight, profile.unit)} min={1} />
       </Section>
-      <Row<string> label={t("settings.sounds")} value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", t("settings.on")], ["off", t("settings.off")]]} />
-      <Row<string> label={t("settings.vibration")} value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", t("settings.on")], ["off", t("settings.off")]]} />
-      <Row<string> label={t("settings.quote")} value={profile.quotes === false ? "off" : "on"} onPick={(v) => setProfile({ quotes: v === "on" })} options={[["on", t("settings.on")], ["off", t("settings.off")]]} />
+      <SwitchRow label={t("settings.sounds")} on={!!profile.restSounds} onChange={(v) => { feel.sound = v; setProfile({ restSounds: v }); }} />
+      <SwitchRow label={t("settings.vibration")} on={profile.haptics !== false} onChange={(v) => { feel.haptics = v; setProfile({ haptics: v }); }} />
+      <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
       <Section title={t("settings.celebrations")}>
         <div className="flex flex-wrap gap-2">
           <Chip active={!profile.lean} onClick={() => setProfile({ lean: false })}>{t("settings.full")}</Chip>

@@ -30,6 +30,8 @@ const PATHS = {
   moon: "M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z",
   sparkle: "M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6",
   flag: "M5 21V4M5 4h12l-2 4 2 4H5",
+  lock: "M6 11h12v10H6zM8.5 11V7.5a3.5 3.5 0 0 1 7 0V11",
+  gift: "M4 10h16v4H4zM5.5 14h13v7h-13zM12 10v11M12 10c-1.5-3.5-6-4-6-1.5S12 10 12 10zM12 10c1.5-3.5 6-4 6-1.5S12 10 12 10z",
 } as const;
 
 export type IconName = keyof typeof PATHS;

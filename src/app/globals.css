@@ -42,6 +42,42 @@
   --animate-shimmer: shimmer 2.8s linear infinite;
   --animate-shake: shake 520ms ease-in-out infinite;
   --animate-bump: bump 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* A real spring (overshoot, then settle) where linear() is supported; a back-ease elsewhere. */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-spring-in: spring-in 620ms var(--ease-bounce) both;
+  --animate-bob: bob 3.2s ease-in-out infinite;
+  --animate-blink: blink 5s ease-in-out infinite;
+  --animate-twinkle: twinkle 1.6s ease-in-out infinite;
+  --animate-float-z: float-z 2.6s ease-out infinite;
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-bounce: linear(0, 0.13 4%, 0.5 10%, 0.92 17%, 1.1 23%, 1.14 27%, 1.11 32%, 1.02 41%, 0.98 48%, 0.975 53%, 0.99 62%, 1.005 72%, 1);
+  }
+}
+
+@keyframes spring-in {
+  0% { transform: scale(0.7) translateY(8px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+/* The mascot's idle loop: a slow bob and a blink every few seconds. */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes float-z {
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.7); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(6px, -12px) scale(1.05); }
 }
 
 @keyframes pop {
@@ -332,9 +368,32 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 /* Display numbers: tight, heavy, tabular. */
 .display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
 
-/* Squash on press, like Gradelings' buttons. */
-.press { transition: transform 140ms var(--ease-spring), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease, box-shadow 200ms ease; }
-.press:active { transform: scale(0.96); }
+/* Squash on press, spring back on release (juice pass, 2026-11-09). The press is instant (70 ms) so a
+   tap always shows it landed; the release is a spring with a little overshoot. The primary action
+   squashes and stretches; tappable cards dip less. */
+.press {
+  transition: transform 460ms var(--ease-bounce), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease, box-shadow 200ms ease;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.press:active:not(:disabled) { transform: scale(0.95); transition-duration: 70ms, 150ms, 150ms, 150ms, 200ms; transition-timing-function: ease-out; }
+.btn-primary.press:active:not(:disabled), .squash.press:active:not(:disabled) { transform: scale(1.02, 0.9); }
+.card.press:active:not(:disabled), .card-tint.press:active:not(:disabled) { transform: scale(0.98); }
+
+/* Lists that arrive with a short stagger (screens, never during a set). */
+.stagger > * { animation: var(--animate-rise); }
+.stagger > :nth-child(2) { animation-delay: 40ms; }
+.stagger > :nth-child(3) { animation-delay: 80ms; }
+.stagger > :nth-child(4) { animation-delay: 120ms; }
+.stagger > :nth-child(5) { animation-delay: 160ms; }
+.stagger > :nth-child(6) { animation-delay: 200ms; }
+.stagger > :nth-child(n + 7) { animation-delay: 240ms; }
+
+/* The mascot's eyes blink about their own centre. */
+.blink { transform-box: fill-box; transform-origin: center; animation: var(--animate-blink); }
+.twinkle { transform-box: fill-box; transform-origin: center; animation: var(--animate-twinkle); }
+.float-z { transform-box: fill-box; animation: var(--animate-float-z); }
 
 /* Cards: a hairline border with a faint top light, so they read as raised glass. */
 .card {

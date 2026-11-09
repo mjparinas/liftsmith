@@ -7,7 +7,7 @@ import { exercise } from "@/lib/exercises";
 import { TIER_LABEL, unlocked } from "@/lib/achievements";
 import { derive } from "@/lib/derive";
 import { COSMETICS, RARITY_LABEL, crates, game, type Cosmetic } from "@/lib/game";
-import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
 import { shareCard } from "@/lib/shareImage";
 import { track } from "@/lib/analytics";
 import { useApp } from "@/lib/store";
@@ -17,6 +17,9 @@ import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } fr
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
+import { Icon } from "./icons";
+import { Mascot } from "./Mascot";
+import { burst } from "./burst";
 import { ShareWorkout } from "./Remix";
 import { DoneMoments, lean } from "./Extras";
 import { PrReplayButton } from "./PrReplay";
@@ -49,7 +52,8 @@ function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
   const [open, setOpen] = useState(juice.lean);
   const rare = item.rarity === "epic" || item.rarity === "legendary";
   const equipped = profile.cosmetics?.[item.kind] === item.id;
-  const reveal = () => {
+  const reveal = (e: { currentTarget: Element }) => {
+    burst(e.currentTarget, { count: rare ? 22 : 14, reach: rare ? 120 : 90 });
     setOpen(true);
     haptic(rare ? "celebrate" : "tap");
     sound.crate(rare);
@@ -59,7 +63,7 @@ function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
   if (!open) {
     return (
       <button type="button" onClick={reveal} className="press card mt-4 flex w-full items-center gap-4 p-4 text-left">
-        <span aria-hidden className="animate-shake text-5xl">🎁</span>
+        <span aria-hidden className="animate-shake grid h-14 w-14 shrink-0 place-items-center rounded-2xl" style={{ background: "color-mix(in srgb, var(--color-violet) 18%, transparent)", color: "var(--color-violet)" }}><Icon name="gift" size={30} /></span>
         <span>
           <span className="block font-semibold">{t("done.crate")}</span>
           <span className="text-sm text-muted">{t("done.crateTap")}</span>
@@ -116,6 +120,7 @@ export function Done() {
     if (levelUp) sound.levelUp();
     else sound.fanfare();
     if (badges.length) setTimeout(() => sound.badge(), 1100);
+    else if (questsDone.length) setTimeout(() => sound.done(), 1100);
     if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -135,12 +140,20 @@ export function Done() {
       accent,
     }, `liftsmith-${new Date(s.start).toISOString().slice(0, 10)}`);
     track("feature", { name: "share_card", detail: how });
+    if (how === "failed") oops();
     setShared(how === "download" ? t("done.saved") : how === "failed" ? t("done.shareFailed") : null);
   };
 
   return (
     <div className="pb-24 pt-6 text-center">
-      <div className="animate-pop text-6xl" aria-hidden>{prs.length ? "🏆" : "💪"}</div>
+      <div className="relative mx-auto w-fit">
+        <Mascot mood="cheer" size={112} className="animate-spring-in" />
+        {prs.length > 0 && (
+          <span className="animate-pop absolute -right-2 bottom-2 grid h-10 w-10 place-items-center rounded-full border-2 border-bg" style={{ background: "var(--color-gold)", color: "var(--color-bg)", animationDelay: "350ms", animationFillMode: "both" }} aria-hidden>
+            <Icon name="trophy" size={20} strokeWidth={2.4} />
+          </span>
+        )}
+      </div>
       <h1 className="mt-3 text-3xl font-bold">{prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}</h1>
       <p className="num mt-2 text-4xl font-bold text-accent" aria-label={t("done.xp", { xp: gained })}>+{xp} XP</p>
       <p className="mt-1 text-sm text-muted">{t("done.level", { level: after.level.level, title: after.level.title })}</p>

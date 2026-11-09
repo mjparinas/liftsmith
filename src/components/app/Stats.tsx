@@ -131,7 +131,7 @@ export function Stats() {
               <div className="mt-0.5 truncate text-sm text-muted">{s.exercises.map((e) => exercise(e).name).join(", ")}</div>
             </li>
           ))}
-          {!stats.sessions.length && <li><EmptyState icon="calendar" title="No workouts yet" body="Finish your first workout and it starts your history." action={<Button icon="play" onClick={() => go("today")}>Plan today&apos;s workout</Button>} /></li>}
+          {!stats.sessions.length && <li><EmptyState icon="calendar" mascot="happy" title="No workouts yet" body="Finish your first workout and it starts your history." action={<Button icon="play" onClick={() => go("today")}>Plan today&apos;s workout</Button>} /></li>}
         </ul>
       </Section>
     </div>
