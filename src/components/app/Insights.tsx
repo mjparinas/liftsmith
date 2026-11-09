@@ -1,5 +1,6 @@
 "use client";
 import { insights, type Insight } from "@/lib/insights";
+import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { dayKey } from "@/lib/random";
 import { useApp } from "@/lib/store";
@@ -40,7 +41,8 @@ export function useInsights(): Insight[] {
   return useMemo(() => insights({ events, profile, now, streak: g.streak }), [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks]);
 }
 
-export function CoachNotes({ limit, title = "Coach's notes" }: { limit?: number; title?: string }) {
+export function CoachNotes({ limit, title: given }: { limit?: number; title?: string }) {
+  const title = given ?? t("notes.title");
   const all = useInsights();
   const [dismissed, setDismissed] = useState<string[]>(readDismissed);
   const shown = all.filter((i) => !dismissed.includes(i.id)).slice(0, limit);
@@ -67,7 +69,7 @@ export function CoachNotes({ limit, title = "Coach's notes" }: { limit?: number;
 function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: () => void }) {
   const { setProfile, startDeload, fixPlateau, profile } = useApp();
   const [done, setDone] = useState(false);
-  const t = TONE[i.tone];
+  const tone = TONE[i.tone];
   const act = () => {
     const a = i.action;
     if (!a) return;
@@ -80,10 +82,10 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
     setDone(true);
   };
   return (
-    <li className="card-tint p-4" style={{ "--tint": t.hue } as CSSProperties}>
+    <li className="card-tint p-4" style={{ "--tint": tone.hue } as CSSProperties}>
       <div className="flex items-start gap-3">
-        <span className="mt-0.5 shrink-0" style={{ color: t.hue }} aria-hidden>
-          <Icon name={t.icon} size={18} strokeWidth={2.2} />
+        <span className="mt-0.5 shrink-0" style={{ color: tone.hue }} aria-hidden>
+          <Icon name={tone.icon} size={18} strokeWidth={2.2} />
         </span>
         <div className="min-w-0 flex-1">
           <h3 className="font-semibold">{i.title}</h3>
@@ -91,12 +93,12 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
           <p className="mt-1 text-sm text-ink/90">{i.advice}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {i.action && !done && (
-              <button type="button" onClick={act} className="press min-h-11 rounded-xl px-3.5 text-sm font-semibold" style={{ background: `color-mix(in srgb, ${t.hue} 20%, var(--color-surface))`, color: "var(--color-ink)" }}>
+              <button type="button" onClick={act} className="press min-h-11 rounded-xl px-3.5 text-sm font-semibold" style={{ background: `color-mix(in srgb, ${tone.hue} 20%, var(--color-surface))`, color: "var(--color-ink)" }}>
                 {i.action.label}
               </button>
             )}
-            {done && <span className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-mint"><Icon name="check" size={16} strokeWidth={2.6} />Done. Today&apos;s plan is updated</span>}
-            <button type="button" onClick={onDismiss} className="press min-h-11 rounded-xl px-3 text-sm font-medium text-muted hover:text-ink">Got it</button>
+            {done && <span className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-mint"><Icon name="check" size={16} strokeWidth={2.6} />{t("notes.done")}</span>}
+            <button type="button" onClick={onDismiss} className="press min-h-11 rounded-xl px-3 text-sm font-medium text-muted hover:text-ink">{t("coach.gotIt")}</button>
           </div>
         </div>
       </div>

@@ -18,46 +18,15 @@ import {
 } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type RestAlert, type TrainingPrefs } from "@/lib/types";
 import { useMemo, useState } from "react";
+import { t, weekday } from "@/lib/i18n";
 import { go } from "./router";
 import { Chip, Section } from "./ui";
 
 // Settings › Workout preferences (Melvin, 2026-11-09): rest times, rep ranges and set counts, RIR or
 // RPE, the rest timer, favourite exercises, muscle priorities, the default workout length and the
 // first day of the week. Everything is chips and taps, no typing, so it works one-handed. "Auto" always means the app's own choice, so nothing changes until the
-// lifter picks something. UI text for this screen lives in this file.
+// lifter picks something. Text lives in the catalogues (train.*).
 
-const T = {
-  title: "Workout preferences",
-  back: "‹ Settings",
-  intro: "Auto means the app picks for you from your goal and training block. Changes apply to the next plan.",
-  rest: "Rest between sets",
-  restCompound: "Big lifts (squats, presses, rows)",
-  restIsolation: "Smaller lifts (curls, raises, extensions)",
-  reps: "Rep ranges",
-  repsNote: "Weights go up when you reach the top of the range on every set, then reps start again from the bottom. Bodyweight exercises keep adding reps.",
-  sets: "Sets per exercise",
-  setsNote: "Auto plans 3, or 4 on the first big lifts, and adds a set when there's time. Deload weeks and easy days still use fewer.",
-  effort: "Effort scale",
-  effortNote: "RPE 8 is the same as 2 reps in reserve. The plan works the same either way.",
-  timer: "Rest timer",
-  autoRest: "Start the rest timer by itself after Log set",
-  alert: "When rest ends",
-  alertNote: "On iPhone the lock-screen alert can't vibrate without its sound, so Vibration only shows a silent banner there and buzzes when the app is open.",
-  awake: "Keep the screen on during a workout",
-  length: "Default workout length",
-  lengthNote: "The slider on Today goes back to this each day. Last used keeps it wherever you left it.",
-  week: "Week starts on",
-  weekNote: "For streaks, weekly quests, recaps and weekly stats.",
-  priorities: "Muscle priorities",
-  prioritiesNote: `Up to ${MAX_PRIORITIES}. They get about a third more sets each week and are planned first when they're recovered.`,
-  favourites: "Favourite exercises",
-  favouritesNote: "Picked first when they suit the day and your gym has what they need.",
-  overrides: "Rest, reps and sets for one exercise",
-  overridesNote: "These win over everything above. You can also set them from the exercise's How to sheet during a workout.",
-  find: "Add an exercise: pick a muscle",
-  findFav: "Add a favourite: pick a muscle",
-  none: "None yet.",
-};
 
 function ChipRow<V extends string | number>({ label, value, options, onPick }: { label?: string; value: V; options: [V, string][]; onPick: (v: V) => void }) {
   return (
@@ -76,84 +45,84 @@ const onOff = (v: boolean) => (v ? "on" : "off");
 
 export function TrainingSettings() {
   const { profile, setProfile } = useApp();
-  const t = profile.training ?? {};
+  const tp = profile.training ?? {};
   const put = (patch: Partial<TrainingPrefs>) => setProfile({ training: { ...profile.training, ...patch } });
-  const overrides = Object.keys(t.exercises ?? {}).filter((id) => EXERCISE_BY_ID.has(id));
+  const overrides = Object.keys(tp.exercises ?? {}).filter((id) => EXERCISE_BY_ID.has(id));
   const [open, setOpen] = useState<string | null>(null);
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">{T.back}</button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">{T.title}</h1>
-      <p className="mt-1 text-sm text-muted">{T.intro}</p>
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">{t("train.back")}</button>
+      <h1 className="text-[28px] font-extrabold tracking-tight">{t("train.title")}</h1>
+      <p className="mt-1 text-sm text-muted">{t("train.intro")}</p>
 
-      <Section title={T.rest}>
-        <ChipRow<number> label={T.restCompound} value={t.rest?.compound ?? 0} onPick={(v) => put({ rest: { ...t.rest, compound: v || undefined } })} options={[[0, "Auto"], ...REST_OPTIONS.filter((x) => x >= 60).map((x) => [x, restLabel(x)] as [number, string])]} />
-        <ChipRow<number> label={T.restIsolation} value={t.rest?.isolation ?? 0} onPick={(v) => put({ rest: { ...t.rest, isolation: v || undefined } })} options={[[0, "Auto"], ...REST_OPTIONS.filter((x) => x <= 150).map((x) => [x, restLabel(x)] as [number, string])]} />
+      <Section title={t("train.rest")}>
+        <ChipRow<number> label={t("train.compound")} value={tp.rest?.compound ?? 0} onPick={(v) => put({ rest: { ...tp.rest, compound: v || undefined } })} options={[[0, t("train.auto")], ...REST_OPTIONS.filter((x) => x >= 60).map((x) => [x, restLabel(x)] as [number, string])]} />
+        <ChipRow<number> label={t("train.isolation")} value={tp.rest?.isolation ?? 0} onPick={(v) => put({ rest: { ...tp.rest, isolation: v || undefined } })} options={[[0, t("train.auto")], ...REST_OPTIONS.filter((x) => x <= 150).map((x) => [x, restLabel(x)] as [number, string])]} />
       </Section>
 
-      <Section title={T.reps}>
-        <ChipRow<string> label={T.restCompound} value={rangeKey(t.reps?.compound)} onPick={(v) => put({ reps: { ...t.reps, compound: parseRange(v) } })} options={[["auto", "Auto"], ...REP_RANGES.slice(0, 6).map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
-        <ChipRow<string> label={T.restIsolation} value={rangeKey(t.reps?.isolation)} onPick={(v) => put({ reps: { ...t.reps, isolation: parseRange(v) } })} options={[["auto", "Auto"], ...REP_RANGES.slice(2).map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.repsNote}</p>
+      <Section title={t("train.reps")}>
+        <ChipRow<string> label={t("train.compound")} value={rangeKey(tp.reps?.compound)} onPick={(v) => put({ reps: { ...tp.reps, compound: parseRange(v) } })} options={[["auto", t("train.auto")], ...REP_RANGES.slice(0, 6).map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
+        <ChipRow<string> label={t("train.isolation")} value={rangeKey(tp.reps?.isolation)} onPick={(v) => put({ reps: { ...tp.reps, isolation: parseRange(v) } })} options={[["auto", t("train.auto")], ...REP_RANGES.slice(2).map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.repsNote")}</p>
       </Section>
 
-      <Section title={T.sets}>
-        <ChipRow<number> value={t.sets ?? 0} onPick={(v) => put({ sets: v || undefined })} options={[[0, "Auto"], ...SET_OPTIONS.map((n) => [n, String(n)] as [number, string])]} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.setsNote}</p>
+      <Section title={t("train.sets")}>
+        <ChipRow<number> value={tp.sets ?? 0} onPick={(v) => put({ sets: v || undefined })} options={[[0, t("train.auto")], ...SET_OPTIONS.map((n) => [n, String(n)] as [number, string])]} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.setsNote")}</p>
       </Section>
 
-      <Section title={T.effort} info={t.effort === "rpe" ? "rpe" : "rir"}>
-        <ChipRow<string> value={t.effort ?? "rir"} onPick={(v) => put({ effort: v === "rpe" ? "rpe" : undefined })} options={[["rir", "RIR: reps in reserve"], ["rpe", "RPE: 1 to 10"]]} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.effortNote}</p>
+      <Section title={t("train.effort")} info={tp.effort === "rpe" ? "rpe" : "rir"}>
+        <ChipRow<string> value={tp.effort ?? "rir"} onPick={(v) => put({ effort: v === "rpe" ? "rpe" : undefined })} options={[["rir", t("train.effort.rir")], ["rpe", t("train.effort.rpe")]]} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.effortNote")}</p>
       </Section>
 
-      <Section title={T.timer}>
-        <ChipRow<string> label={T.autoRest} value={onOff(t.autoRest !== false)} onPick={(v) => put({ autoRest: v === "on" ? undefined : false })} options={[["on", "On"], ["off", "Off: I'll tap Start rest"]]} />
-        <ChipRow<RestAlert | "app"> label={T.alert} value={t.restAlert ?? "app"} onPick={(v) => put({ restAlert: v === "app" ? undefined : v })} options={[["app", "Follow Sounds and Vibration"], ["both", "Sound and vibration"], ["sound", "Sound only"], ["vibrate", "Vibration only"], ["silent", "Silent"]]} />
-        <ChipRow<string> label={T.awake} value={onOff(t.keepAwake !== false)} onPick={(v) => put({ keepAwake: v === "on" ? undefined : false })} options={[["on", "On"], ["off", "Off"]]} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.alertNote}</p>
+      <Section title={t("train.timer")}>
+        <ChipRow<string> label={t("train.autoRest")} value={onOff(tp.autoRest !== false)} onPick={(v) => put({ autoRest: v === "on" ? undefined : false })} options={[["on", t("train.on")], ["off", t("train.offManual")]]} />
+        <ChipRow<RestAlert | "app"> label={t("train.alert")} value={tp.restAlert ?? "app"} onPick={(v) => put({ restAlert: v === "app" ? undefined : v })} options={[["app", t("train.alert.app")], ["both", t("train.alert.both")], ["sound", t("train.alert.sound")], ["vibrate", t("train.alert.vibrate")], ["silent", t("train.alert.silent")]]} />
+        <ChipRow<string> label={t("train.awake")} value={onOff(tp.keepAwake !== false)} onPick={(v) => put({ keepAwake: v === "on" ? undefined : false })} options={[["on", t("train.on")], ["off", t("train.off")]]} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.alertNote")}</p>
       </Section>
 
-      <Section title={T.length}>
+      <Section title={t("train.length")}>
         <ChipRow<number>
-          value={t.minutes ?? 0}
+          value={tp.minutes ?? 0}
           onPick={(v) => {
             put({ minutes: v || undefined });
             if (v) setProfile({ minutes: v });
           }}
-          options={[[0, "Last used"], ...LENGTH_OPTIONS.map((m) => [m, `${m} min`] as [number, string])]}
+          options={[[0, t("train.lastUsed")], ...LENGTH_OPTIONS.map((m) => [m, t("train.minutes", { n: m })] as [number, string])]}
         />
-        <p className="mt-2 px-1 text-xs text-faint">{T.lengthNote}</p>
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.lengthNote")}</p>
       </Section>
 
-      <Section title={T.week}>
-        <ChipRow<number> value={t.weekStart ?? 1} onPick={(v) => put({ weekStart: v === 0 ? 0 : undefined })} options={[[1, "Monday"], [0, "Sunday"]]} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.weekNote}</p>
+      <Section title={t("train.week")}>
+        <ChipRow<number> value={tp.weekStart ?? 1} onPick={(v) => put({ weekStart: v === 0 ? 0 : undefined })} options={[[1, weekday(1, "long")], [0, weekday(0, "long")]]} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.weekNote")}</p>
       </Section>
 
-      <Section title={T.priorities}>
-        <div className="flex flex-wrap gap-2" role="group" aria-label={T.priorities}>
-          {MUSCLES.map((m) => <Chip key={m} active={!!t.priorities?.includes(m)} onClick={() => setProfile({ training: togglePriority(profile.training, m) })}>{MUSCLE_LABEL[m]}</Chip>)}
+      <Section title={t("train.priorities")}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("train.priorities")}>
+          {MUSCLES.map((m) => <Chip key={m} active={!!tp.priorities?.includes(m)} onClick={() => setProfile({ training: togglePriority(profile.training, m) })}>{MUSCLE_LABEL[m]}</Chip>)}
         </div>
-        <p className="mt-2 px-1 text-xs text-faint">{T.prioritiesNote}</p>
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.prioritiesNote", { max: MAX_PRIORITIES })}</p>
       </Section>
 
-      <Section title={T.favourites}>
+      <Section title={t("train.favourites")}>
         <ul className="card divide-y divide-line/70">
-          {(t.favourites ?? []).filter((id) => EXERCISE_BY_ID.has(id)).map((id) => (
+          {(tp.favourites ?? []).filter((id) => EXERCISE_BY_ID.has(id)).map((id) => (
             <li key={id} className="flex items-center justify-between gap-3 px-4 py-2">
               <span className="min-w-0 truncate">{exercise(id).name}</span>
-              <button type="button" onClick={() => setProfile({ training: toggleFavourite(profile.training, id) })} className="press min-h-11 shrink-0 px-2 text-sm text-muted" aria-label={`Remove ${exercise(id).name} from favourites`}>Remove</button>
+              <button type="button" onClick={() => setProfile({ training: toggleFavourite(profile.training, id) })} className="press min-h-11 shrink-0 px-2 text-sm text-muted" aria-label={t("train.removeFav", { name: exercise(id).name })}>{t("train.remove")}</button>
             </li>
           ))}
-          {!t.favourites?.length && <li className="px-4 py-3 text-sm text-muted">{T.none}</li>}
+          {!tp.favourites?.length && <li className="px-4 py-3 text-sm text-muted">{t("train.none")}</li>}
         </ul>
-        <ExercisePicker label={T.findFav} skip={t.favourites ?? []} onPick={(id) => setProfile({ training: toggleFavourite(profile.training, id) })} />
-        <p className="mt-2 px-1 text-xs text-faint">{T.favouritesNote}</p>
+        <ExercisePicker label={t("train.findFav")} skip={tp.favourites ?? []} onPick={(id) => setProfile({ training: toggleFavourite(profile.training, id) })} />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.favouritesNote")}</p>
       </Section>
 
-      <Section title={T.overrides}>
+      <Section title={t("train.overrides")}>
         <ul className="card divide-y divide-line/70">
           {overrides.map((id) => (
             <li key={id} className="px-4 py-2">
@@ -164,23 +133,23 @@ export function TrainingSettings() {
               {open === id && <ExercisePrefsEditor exerciseId={id} />}
             </li>
           ))}
-          {!overrides.length && <li className="px-4 py-3 text-sm text-muted">{T.none}</li>}
+          {!overrides.length && <li className="px-4 py-3 text-sm text-muted">{t("train.none")}</li>}
         </ul>
-        <ExercisePicker label={T.find} skip={overrides} onPick={(id) => setOpen(id)} />
+        <ExercisePicker label={t("train.find")} skip={overrides} onPick={(id) => setOpen(id)} />
         {open && !overrides.includes(open) && (
           <div className="card mt-2 px-4 py-2">
             <p className="pt-1 font-medium">{exercise(open).name}</p>
             <ExercisePrefsEditor exerciseId={open} />
           </div>
         )}
-        <p className="mt-2 px-1 text-xs text-faint">{T.overridesNote}</p>
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.overridesNote")}</p>
       </Section>
     </div>
   );
 }
 
 function summary(p: { rest?: number; reps?: [number, number]; sets?: number }): string {
-  return [p.sets ? `${p.sets} sets` : "", p.reps ? `${p.reps[0]}–${p.reps[1]} reps` : "", p.rest ? `${restLabel(p.rest)} rest` : ""].filter(Boolean).join(" · ");
+  return [p.sets ? t("train.sum.sets", { count: p.sets }) : "", p.reps ? t("train.sum.reps", { lo: p.reps[0], hi: p.reps[1] }) : "", p.rest ? t("train.sum.rest", { rest: restLabel(p.rest) }) : ""].filter(Boolean).join(" · ");
 }
 
 /**
@@ -227,11 +196,11 @@ export function ExercisePrefsEditor({ exerciseId, note }: { exerciseId: string; 
   const defReps = repRange(ex, profile.goal, general);
   return (
     <div className="pb-2">
-      <ChipRow<number> label="Rest" value={own.rest ?? 0} onPick={(v) => put({ rest: v || undefined })} options={[[0, `Default (${restLabel(defRest)})`], ...REST_OPTIONS.map((x) => [x, restLabel(x)] as [number, string])]} />
+      <ChipRow<number> label={t("train.ex.rest")} value={own.rest ?? 0} onPick={(v) => put({ rest: v || undefined })} options={[[0, t("train.ex.default", { value: restLabel(defRest) })], ...REST_OPTIONS.map((x) => [x, restLabel(x)] as [number, string])]} />
       {!TIMED.has(exerciseId) && (
-        <ChipRow<string> label="Rep range" value={rangeKey(own.reps)} onPick={(v) => put({ reps: parseRange(v) })} options={[["auto", `Default (${defReps[0]}–${defReps[1]})`], ...REP_RANGES.map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
+        <ChipRow<string> label={t("train.ex.reps")} value={rangeKey(own.reps)} onPick={(v) => put({ reps: parseRange(v) })} options={[["auto", t("train.ex.default", { value: `${defReps[0]}–${defReps[1]}` })], ...REP_RANGES.map((r) => [rangeKey(r), `${r[0]}–${r[1]}`] as [string, string])]} />
       )}
-      <ChipRow<number> label="Working sets" value={own.sets ?? 0} onPick={(v) => put({ sets: v || undefined })} options={[[0, profile.training?.sets ? `Default (${profile.training.sets})` : "Default (auto)"], ...SET_OPTIONS.map((n) => [n, String(n)] as [number, string])]} />
+      <ChipRow<number> label={t("train.ex.sets")} value={own.sets ?? 0} onPick={(v) => put({ sets: v || undefined })} options={[[0, profile.training?.sets ? t("train.ex.default", { value: profile.training.sets }) : t("train.ex.defaultAuto")], ...SET_OPTIONS.map((n) => [n, String(n)] as [number, string])]} />
       {note && <p className="mt-2 text-xs text-faint">{note}</p>}
     </div>
   );
@@ -244,7 +213,7 @@ export function FavouriteButton({ exerciseId }: { exerciseId: string }) {
   return (
     <button type="button" aria-pressed={on} onClick={() => setProfile({ training: toggleFavourite(profile.training, exerciseId) })} className={`press inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-sm ${on ? "border-accent/60 bg-accent/15 text-ink" : "border-line bg-surface text-muted"}`}>
       <span aria-hidden className={on ? "text-accent" : ""}>{on ? "★" : "☆"}</span>
-      {on ? "Favourite: planned first when it fits" : "Add to favourites"}
+      {on ? t("train.fav.on") : t("train.fav.off")}
     </button>
   );
 }
