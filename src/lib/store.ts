@@ -18,6 +18,7 @@ import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 import { programPlan } from "./programs";
+import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 
@@ -140,6 +141,10 @@ interface State {
   setPlan(plan: Plan | null): void;
   /** Log a weigh-in and make it the profile's body weight. */
   logBodyweight(kg: number): void;
+  /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
+  refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
+  /** Applies weight, height and body fat read from Health Connect or Apple Health, then refreshes TDEE. */
+  applyHealthBody(r: BodyReadings): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
   /** Record a gym buddy check-in. */
@@ -695,6 +700,20 @@ export const useApp = create<State>((set, get) => {
       if (!(kg > 0)) return;
       commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
       get().setProfile({ bodyweight: kg });
+    },
+
+    refreshTdee(trigger = "auto", now = Date.now()) {
+      const { events, stats, profile } = get();
+      const ev = snapshotDue(currentTdee(events, stats.sessions, profile, now), events, now, uid(), trigger);
+      if (ev) commit([ev]);
+      return ev;
+    },
+
+    applyHealthBody(r) {
+      const u = bodyUpdates(r, get().events, get().profile);
+      if (u.events.length) commit(u.events);
+      if (Object.keys(u.profile).length) get().setProfile(u.profile);
+      get().refreshTdee();
     },
 
     importWorkouts(evs) {
