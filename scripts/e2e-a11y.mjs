@@ -24,9 +24,12 @@ try {
   await onboard(page);
   await scan("today");
   await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("workout");
-  await page.getByRole("button", { name: /Log set/ }).click();
+  // Skip the warm-ups so the saved workout has a working set.
+  const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+  if (await skipWarm.isVisible()) await skipWarm.click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   await scan("rest");
   await page.getByRole("button", { name: "End" }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();

@@ -29,10 +29,10 @@ try {
   await page.locator("#len").fill("30");
 
   await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await shot("workout");
 
-  await page.getByRole("button", { name: /Log set/ }).click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   check(await page.getByText("Rest", { exact: true }).isVisible(), "Rest timer starts after logging a set", fail);
   await page.getByRole("button", { name: "+30 s" }).click();
   await shot("rest");
@@ -40,7 +40,7 @@ try {
 
   await page.getByRole("button", { name: "Swap exercise" }).click();
   await page.getByRole("dialog").getByRole("button", { name: /Swap$/ }).first().click();
-  check(await page.getByRole("button", { name: /Log set/ }).isVisible(), "Workout continues after a swap", fail);
+  check(await page.getByRole("button", { name: /Log (set|warm-up)/ }).isVisible(), "Workout continues after a swap", fail);
 
   // Log every remaining set.
   for (let i = 0; i < 40; i++) {
@@ -49,7 +49,7 @@ try {
     if (await fb.isVisible()) await fb.click();
     const skip = page.getByRole("button", { name: "Skip rest" });
     if (await skip.isVisible()) await skip.click();
-    await page.getByRole("button", { name: /Log set/ }).click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   }
   check(await page.getByRole("button", { name: "Finish workout" }).isVisible(), "All sets can be logged", fail);
   await page.getByRole("button", { name: "Finish workout" }).click();
@@ -72,7 +72,7 @@ try {
 
   // Shortcuts: the web manifest's "Start workout" link starts today's workout, and "Log set" logs one.
   await page.goto(`${server.url}/app/?do=start`);
-  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   check(!page.url().includes("do="), "The shortcut link is cleared after it runs", fail);
   await page.goto(`${server.url}/app/?do=log`);
   await page.getByRole("button", { name: /Skip/ }).waitFor();

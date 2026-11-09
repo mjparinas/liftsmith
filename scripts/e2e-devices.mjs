@@ -37,9 +37,9 @@ for (const name of DEVICES) {
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
     check(start && start.y + start.height <= opts.viewport.height, `${name}: Start workout is below the fold`, fail);
     await page.getByRole("button", { name: "Start workout" }).click();
-    await page.getByRole("button", { name: /Log set/ }).waitFor();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
     await noSideScroll("workout");
-    const log = await page.getByRole("button", { name: /Log set/ }).boundingBox();
+    const log = await page.getByRole("button", { name: /Log (set|warm-up)/ }).boundingBox();
     check(log && log.y >= 0 && log.y + log.height <= opts.viewport.height, `${name}: Log set is not fully on screen`, fail);
     check(log && log.height >= 48, `${name}: Log set is under 48 px tall`, fail);
     for (const label of ["More reps", "Less reps", "Swap exercise", "End"]) {
@@ -47,7 +47,10 @@ for (const name of DEVICES) {
       check(b && b.height >= TARGET - 8 && b.width >= TARGET - 8, `${name}: "${label}" is too small to tap (${b?.width}×${b?.height})`, fail);
     }
     await page.screenshot({ path: `${OUT}/${tag}-workout.png` });
-    await page.getByRole("button", { name: /Log set/ }).click();
+    // Skip the warm-ups so the saved workout has a working set.
+    const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+    if (await skipWarm.isVisible()) await skipWarm.click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
     await noSideScroll("rest");
     await page.getByRole("button", { name: "End" }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();

@@ -7,6 +7,7 @@ import { flag } from "@/lib/flags";
 import { declineTrial, PRICES, startTrial, type Plan } from "@/lib/trial";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
+import { epley, KNOWN_LIFTS } from "@/lib/progression";
 import { useEffect, useState } from "react";
 import { connectHeartRate, hrSupported } from "@/lib/heartRate";
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
@@ -35,6 +36,24 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
 ];
 
 
+const KNOWN = [
+  { id: KNOWN_LIFTS.squat, name: "Back squat" },
+  { id: KNOWN_LIFTS.hpush, name: "Bench press" },
+  { id: KNOWN_LIFTS.hinge, name: "Deadlift" },
+  { id: KNOWN_LIFTS.vpush, name: "Overhead press" },
+];
+
+/** Turns "weight × reps" entries into estimated one-rep maxes in kg. Blank entries keep what was saved. */
+export function knownMaxes(entries: Record<string, { w: string; r: string }>, unit: Unit, prev?: Profile["knownMaxes"]): Profile["knownMaxes"] {
+  const out = { ...(prev ?? {}) };
+  for (const [id, { w, r }] of Object.entries(entries)) {
+    const weight = Number(w);
+    const reps = Math.min(15, Math.max(1, Number(r) || 1));
+    if (weight > 0) out[id] = Math.round((reps === 1 ? toKg(weight, unit) : epley(toKg(weight, unit), reps)) * 10) / 10;
+  }
+  return Object.keys(out).length ? out : undefined;
+}
+
 /** The setup wizard: first run, and again from Settings ("Run setup again"). */
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const { profile, setProfile, addGym, gyms } = useApp();
@@ -51,6 +70,13 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [unit, setUnit] = useState<Unit>(profile.unit);
   const [days, setDays] = useState(profile.daysPerWeek);
   const [bw, setBw] = useState(Math.round(fromKg(profile.bodyweight, profile.unit)));
+  const [age, setAge] = useState(profile.birthYear ? String(new Date().getFullYear() - profile.birthYear) : "");
+  const [sex, setSex] = useState<Profile["sex"]>(profile.sex);
+  const [maxesOpen, setMaxesOpen] = useState(false);
+  // Known lifts as weight × reps, in the lifter's unit.
+  const [maxes, setMaxes] = useState<Record<string, { w: string; r: string }>>(() =>
+    Object.fromEntries(KNOWN.map((k) => [k.id, { w: profile.knownMaxes?.[k.id] ? String(Math.round(fromKg(profile.knownMaxes[k.id]!, profile.unit))) : "", r: "1" }])),
+  );
   const [canHealth, setCanHealth] = useState(false);
   const [healthNote, setHealthNote] = useState<string | null>(null);
   useEffect(() => void healthAvailable().then(setCanHealth), []);
@@ -65,7 +91,20 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const finish = (pro?: Profile["pro"]) => {
     setProfile({ unit });
     const id = keepGyms ? profile.activeGymId : addGym(preset);
-    setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true, ...(pro ? { pro } : {}) });
+    const years = Number(age);
+    setProfile({
+      goal,
+      experience: exp,
+      unit,
+      daysPerWeek: days,
+      bodyweight: toKg(bw, unit),
+      birthYear: years >= 10 && years <= 100 ? new Date().getFullYear() - years : profile.birthYear,
+      sex,
+      knownMaxes: knownMaxes(maxes, unit, profile.knownMaxes),
+      activeGymId: id,
+      onboarded: true,
+      ...(pro ? { pro } : {}),
+    });
     haptic("success");
     if (rerun) go("today");
   };
@@ -122,6 +161,36 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               <input inputMode="numeric" value={bw} onChange={(e) => setBw(Number(e.target.value.replace(/\D/g, "")) || 0)} className="num w-32 rounded-2xl border border-line bg-surface px-4 py-3 text-2xl font-semibold" aria-label="Body weight" />
               <span className="text-muted">{unit}</span>
             </div>
+            <div className="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3">
+              <label htmlFor="setup-age" className="font-semibold">Age</label>
+              <input id="setup-age" inputMode="numeric" placeholder="Optional" value={age} onChange={(e) => setAge(e.target.value.replace(/\D/g, "").slice(0, 3))} className="num w-32 rounded-2xl border border-line bg-surface px-4 py-3 text-lg" />
+              <span className="font-semibold" id="setup-sex">Sex</span>
+              <div className="flex gap-2" role="group" aria-labelledby="setup-sex">
+                {(["female", "male"] as const).map((x) => (
+                  <button key={x} type="button" aria-pressed={sex === x} onClick={() => { haptic("tick"); setSex(sex === x ? undefined : x); }} className={`press min-h-11 rounded-2xl border px-4 text-sm font-semibold ${sex === x ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>
+                    {x === "female" ? "Female" : "Male"}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <p className="mt-2 text-sm text-muted">Both optional. Starting weights are lighter when we don&apos;t know.</p>
+            <button type="button" aria-expanded={maxesOpen} onClick={() => setMaxesOpen(!maxesOpen)} className="press mt-5 min-h-11 text-sm font-semibold text-accent">
+              {maxesOpen ? "Hide my numbers" : "I know my numbers (optional)"}
+            </button>
+            {maxesOpen && (
+              <div className="mt-2 space-y-2">
+                <p className="text-sm text-muted">Your best recent set of each, and we&apos;ll start from there.</p>
+                {KNOWN.map((k) => (
+                  <div key={k.id} className="flex items-center gap-2">
+                    <span className="w-32 text-sm">{k.name}</span>
+                    <input inputMode="decimal" placeholder={unit} aria-label={`${k.name} weight`} value={maxes[k.id].w} onChange={(e) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w: e.target.value.replace(/[^\d.]/g, "") } })} className="num w-24 rounded-xl border border-line bg-surface px-3 py-2" />
+                    <span className="text-muted">×</span>
+                    <input inputMode="numeric" aria-label={`${k.name} reps`} value={maxes[k.id].r} onChange={(e) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: e.target.value.replace(/\D/g, "").slice(0, 2) } })} className="num w-16 rounded-xl border border-line bg-surface px-3 py-2" />
+                    <span className="text-sm text-muted">reps</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </>
         )}
         {step === 3 && (

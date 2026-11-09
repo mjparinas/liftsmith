@@ -6,6 +6,7 @@ import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
 // recovered and furthest below this week's set target, sized to fit the minutes asked for.
@@ -20,6 +21,8 @@ export interface PlanItem {
   target: Target;
   /** Challenge: the last set is as many good reps as possible at the target weight. */
   challenge?: boolean;
+  /** Lighter sets before the working sets (warmup.ts). */
+  warmup?: WarmupSet[];
 }
 
 export interface Plan {
@@ -47,7 +50,6 @@ export interface GenerateInput {
 }
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
-const WARMUP_SEC = 240;
 
 export function restFor(ex: Exercise, goal: Profile["goal"]): number {
   if (ex.load === "bodyweight" && !ex.compound) return 45;
@@ -60,9 +62,16 @@ export function setSeconds(ex: Exercise, reps: number): number {
   return TIMED.has(ex.id) ? reps + 15 : 25 + reps * 3.5;
 }
 
-export function itemSeconds(item: Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target">): number {
+/** How long one exercise takes: setup, warm-up sets and their rests, working sets and the rests between them. */
+export function itemSeconds(item: Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup">): number {
   const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
-  return item.sets * setSeconds(ex, item.target.reps) + (item.sets - 1) * item.restSec + 60; // 60 s to set up
+  const warm = (item.warmup ?? []).reduce((s, w) => s + setSeconds(ex, w.reps) + WARMUP_REST, 0);
+  return 60 + warm + item.sets * setSeconds(ex, item.target.reps) + (item.sets - 1) * item.restSec; // 60 s to set up
+}
+
+/** The whole plan: every exercise plus the rest before each one after the first. */
+export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup">[]): number {
+  return items.reduce((s, i, n) => s + itemSeconds(i) + (n ? i.restSec : 0), 0);
 }
 
 /** Hard sets per muscle since the start of this block week (secondary muscles count half). */
@@ -134,7 +143,7 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   const items: PlanItem[] = [];
   const used = new Set<string>();
   let total = 0;
-  let firstBarbell = true;
+  const warmed = new Set<Muscle>();
 
   const pick = (m: Muscle, compoundFirst: boolean): Exercise | undefined => {
     const cands = pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40));
@@ -152,12 +161,12 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     const t = target(ex, events, profile, gym, now);
     const baseSets = ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3;
     const sets = week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets;
-    const item: PlanItem = { exerciseId: ex.id, sets, restSec: restFor(ex, profile.goal), focus: m, target: t };
-    const warm = ex.load === "barbell" && firstBarbell ? WARMUP_SEC : 0;
-    const cost = itemSeconds(item) + warm + (items.length ? item.restSec : 0);
+    const warmup = warmupFor(ex, t.weight, gym, warmed);
+    const item: PlanItem = { exerciseId: ex.id, sets, restSec: restFor(ex, profile.goal), focus: m, target: t, warmup: warmup.length ? warmup : undefined };
+    const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
     if (total + cost > budget) return false;
     total += cost;
-    if (warm) firstBarbell = false;
+    for (const p of ex.primary) warmed.add(p);
     used.add(ex.id);
     items.push(item);
     return true;
@@ -185,8 +194,16 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
 
   items.sort((a, b) => order(EXERCISE_BY_ID.get(a.exerciseId)!, EXERCISE_BY_ID.get(b.exerciseId)!));
   applyCall(items, call, challenge && call === "push" && !week.deload, gym);
-  const est = items.reduce((s, i, n) => s + itemSeconds(i) + (n ? i.restSec : 0), 0) + (items.some((i) => EXERCISE_BY_ID.get(i.exerciseId)!.load === "barbell") ? WARMUP_SEC : 0);
-  return { gymId: gym.id, minutes, estMinutes: Math.round(est / 60), week, call, challenge: items.some((i) => i.challenge), items };
+  // Sorting and the day's call change which lift comes first and its weight, so the warm-ups are
+  // worked out again in the final order. If that tips the plan over the time asked for, extra
+  // sets come off the end first.
+  const final = withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!);
+  for (let i = final.length - 1; i >= 0 && planSeconds(final) > budget; ) {
+    if (final[i].sets > 2) final[i] = { ...final[i], sets: final[i].sets - 1 };
+    else i--;
+  }
+  const est = planSeconds(final);
+  return { gymId: gym.id, minutes, estMinutes: Math.round(est / 60), week, call, challenge: final.some((i) => i.challenge), items: final };
 }
 
 /** Turns the day's call into the plan: easy days drop a set and a step of load, push days go one rep closer to failure on the first lift. */

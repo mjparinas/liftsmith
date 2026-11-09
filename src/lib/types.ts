@@ -214,6 +214,14 @@ export interface Profile {
   pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
   calendar?: CalendarPrefs;
+  /**
+   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
+   * Health Connect has neither, so the app asks on every platform.
+   */
+  birthYear?: number;
+  sex?: "male" | "female";
+  /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
+  knownMaxes?: Partial<Record<string, number>>;
   onboarded: boolean;
   updatedAt: number;
 }
@@ -319,4 +327,14 @@ export interface CycleEvent extends EventBase {
   day: number;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent;
+/** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
+export interface WarmupEvent extends EventBase {
+  type: "warmup";
+  sessionId: string;
+  exerciseId: string;
+  /** Kilograms, per hand for dumbbells. */
+  weight: number;
+  reps: number;
+}
+
+export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent;
