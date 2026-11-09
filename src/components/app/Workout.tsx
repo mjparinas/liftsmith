@@ -296,7 +296,7 @@ export function Workout() {
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
               {active.restReady ? (
-                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>Start rest · {restLabel(active.restReady)}</Button>
+                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>{t("workout.startRest", { time: restLabel(active.restReady) })}</Button>
               ) : null}
               <div className="flex flex-col items-center gap-5">
                 {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
@@ -398,7 +398,7 @@ export function Workout() {
               ))}
             </ol>
             <NoteEditor key={ex.id + note} initial={note} onSave={(t) => { s.addNote(ex.id, t); setInfoOpen(false); }} />
-            <ExercisePrefsEditor exerciseId={ex.id} note="Changes apply from the next workout." />
+            <ExercisePrefsEditor exerciseId={ex.id} note={t("train.ex.nextWorkout")} />
           </div>
         )}
       </Sheet>
