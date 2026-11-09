@@ -187,25 +187,31 @@ function angIn(deg: number, a0: number, a1: number) {
   return Math.min(x - span, 360 - x);
 }
 
-/** Per-vertex muscle weight (0..1) for a part; static per exercise because t and angle never change. */
-export function partWeights(P: Part, meta: Float32Array, targets: Partial<Record<Muscle, number>>, out: Float32Array) {
+/**
+ * Per-vertex muscle weight (0..1) for a part; static per exercise because t and angle never change.
+ * When `which` is given it gets the index (in REGIONS) of the muscle that won each vertex, or -1.
+ */
+export function partWeights(P: Part, meta: Float32Array, targets: Partial<Record<Muscle, number>>, out: Float32Array, which?: Int8Array) {
   out.fill(0);
+  which?.fill(-1);
   const base = P.base ?? P.name;
   if (!["torso", "thigh", "shin", "upper", "fore"].includes(base)) return;
   const regions = REGIONS.filter((r) => r.part === base && targets[r.id]);
   if (!regions.length) return;
   for (let k = 0; k < out.length; k++) {
     const t = meta[k * 2], deg = (meta[k * 2 + 1] * 180) / Math.PI;
-    let w = 0;
+    let w = 0, win = -1;
     for (const r of regions) {
       const u = (t - r.t[0]) / (r.t[1] - r.t[0]);
       if (u < 0 || u > 1) continue;
       const along = Math.pow(Math.sin(Math.PI * u), 0.5);
       let off = angIn(deg, r.a[0], r.a[1]);
       if (r.mirror) off = Math.min(off, angIn(-deg, r.a[0], r.a[1]));
-      w = Math.max(w, targets[r.id]! * along * clamp(1 - off / 22, 0, 1));
+      const v = targets[r.id]! * along * clamp(1 - off / 22, 0, 1);
+      if (v > w) { w = v; win = REGIONS.indexOf(r); }
     }
     out[k] = w;
+    if (which) which[k] = win;
   }
 }
 
