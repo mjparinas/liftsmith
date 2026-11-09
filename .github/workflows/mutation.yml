@@ -1,23 +1,12 @@
 name: Mutation tests
 
-# Stryker on the engine (plates, progression, recovery, blocks, generator, stats, game). Too slow for every
-# pull request, so it runs weekly, on demand, and on pull requests that touch the engine. The incremental
-# file is cached so a rerun only redoes what changed. Fails below the `break` score in stryker.config.mjs.
+# Stryker on the engine (plates, progression, recovery, readiness, blocks, generator, stats, game).
+# Run by hand only (Actions > Mutation tests > Run workflow): it is long and expensive, so it is not a
+# pull request or merge gate (Melvin, 2026-11-09). The incremental file is cached so a rerun only redoes
+# what changed. Fails below the `break` score in stryker.config.mjs.
 
 on:
-  schedule:
-    - cron: "0 10 * * 1"
   workflow_dispatch:
-  pull_request:
-    paths:
-      - "src/lib/plates.ts"
-      - "src/lib/progression.ts"
-      - "src/lib/recovery.ts"
-      - "src/lib/block.ts"
-      - "src/lib/generator.ts"
-      - "src/lib/derive.ts"
-      - "src/lib/game.ts"
-      - "src/lib/loads.ts"
 
 permissions:
   contents: read
