@@ -407,6 +407,15 @@ Small things that make the app a pleasure, all derived from events (never stored
   - **Dark only.** The home page stays on the dark tokens whatever the app's Appearance setting, because the hologram only reads on a dark ground (like the share image). Its few fixed hologram colours (ember labels, heart red) match the demo engine's.
 - **Comparison pages** (`/compare/fitbod/`, `/compare/hevy/`, `/compare/strong/`, `/compare/gymverse/`, `/alternatives/fitbod/`): every competitor fact lives in one data file with its source URL and the date checked, and the build fails when any row is more than 90 days old. Competitors are named in text only (no logos or screenshots), with a trademark line. Claims are factual and dated, never disparaging.
 
+### Marketing and growth (Melvin, 2026-11-09; plan: https://claude.ai/artifact/HaXeCsBXt37yWQH9ptm3ub)
+- **No paid advertising for now.** Growth is organic only: short faceless videos (TikTok, Reels, Shorts), honest founder answers on Reddit, the SEO and comparison pages, store listing work, and a creator program. Launch week adds Product Hunt and Show HN.
+- **Faceless.** Clips show hands, plates, the phone screen, the 3D wireframe demos and on-screen text; no face or voice.
+- **Handles:** `@liftsmith` everywhere, `@liftsmithapp` where `@liftsmith` is taken.
+- **1 to 2 hours a week at most** of Melvin's time. Claude drafts scripts, posts, replies, outreach and emails; filming is one batch a month.
+- **No open numbers.** Users and revenue are never shared publicly.
+- **Creator program (approved, not built yet):** creators get Pro free and 30% of net revenue (after the store's cut) from each subscriber who used their code, for that subscriber's first 12 months, paid monthly over $25 after the refund window. Their followers get a 30-day Pro trial instead of 14 days. Posts must be labelled as sponsored; we never ask for store reviews or scripted praise. To build on Android and iOS together: a code per creator and a link (`/c/<name>`) carried into the app on first open, entry in Settings and on the trial step, the 30-day trial through a RevenueCat offering backed by a Play offer and an App Store offer code, and a per-creator table in the admin panel (sign-ups, trials, paid, refunds, commission owed, payout export).
+- **The rules we hold in marketing:** no fake or incentivised reviews, no sock-puppet accounts, Melvin says he built the app whenever he mentions it, competitor claims only from the dated comparison data, and no fake countdowns or scarcity.
+
 ## Architecture decisions
 
 - **Stack copied from Gradelings** (`mjparinas/gradelings`): Next.js 16 static export, React 19, TypeScript, Tailwind 4, Zustand, Vitest.
