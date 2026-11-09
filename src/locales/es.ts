@@ -141,6 +141,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   "done.painNote": "Opcional. Alimenta la tendencia del dolor y la vuelta gradual en la pantalla de lesiones.",
 
   "settings.title": "Ajustes",
+  "settings.lab": "Laboratorio del contador de reps (experimento)",
   "settings.rerun": "Repetir la configuración",
   "settings.injuries": "Lesiones y molestias",
   "settings.tools": "Herramientas: calculadora de TDEE",

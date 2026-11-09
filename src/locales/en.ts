@@ -148,6 +148,7 @@ export const en = {
 
   // Settings
   "settings.title": "Settings",
+  "settings.lab": "Rep counter lab (experiment)",
   "settings.rerun": "Run setup again",
   "settings.injuries": "Injuries and sore spots",
   "settings.tools": "Tools: TDEE calculator",
