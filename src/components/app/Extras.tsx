@@ -299,7 +299,7 @@ export function StrengthCard() {
           </div>
           <div>
             <p className="font-semibold">{scoreBand(r.overall)}</p>
-            <p className="text-sm text-muted">Your best lifts of the last 6 months against a typical intermediate lifter of your body weight{r.adjusted.age ? ", adjusted for your age" : ""}. 50 is typical.</p>
+            <p className="text-sm text-muted">Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight{r.adjusted.age ? ", adjusted for your age" : ""}. 50 is typical.</p>
           </div>
         </div>
         <ul className="mt-4 space-y-2">
@@ -329,7 +329,7 @@ export function StrengthCard() {
               <li key={l.exerciseId} className="flex items-center justify-between py-2.5">
                 <span>
                   <span className="block font-medium">{l.name}</span>
-                  <span className="num text-xs text-muted">Best estimated max {fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} {profile.unit}</span>
+                  <span className="num text-xs text-muted">Estimated max {fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} {profile.unit}</span>
                 </span>
                 <span className="num text-right text-sm">Stronger than<br /><span className="text-lg font-bold text-accent">{l.percentile}%</span></span>
               </li>

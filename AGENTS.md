@@ -282,7 +282,14 @@ From a ranked list of features Fitbod, Hevy, Strong and StrongLifts don't have. 
 
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
-- Stats: weekly sets per muscle against the target, estimated one-rep max trends (Epley), PRs, volume, session history, streaks and trophies.
+- Stats: weekly sets per muscle against the target, estimated one-rep max trends, PRs, volume, session history, streaks and trophies.
+- **One-rep max calculator** (Melvin, 2026-11-09: "use the latest research and algorithms, use as much existing data as possible"; `src/lib/onerm.ts`, `OneRepMax.tsx`). Every exercise with data is on Progress; tapping one opens its estimate, likely range and confidence, the set it leans on, a reps-to-weight table and a "try a set" calculator with every formula's answer.
+  - Reps to failure = reps + RIR. The RIR is the lifter's reported effort, else 0 for AMRAP, challenge and missed sets, else the plan's RIR less any extra reps, else 2 for web-logged and imported sets (counted for less).
+  - Formula by rep range: up to 10 reps to failure, the mean of Brzycki, Epley and Marzagao's 2026 weight-dependent equation (arXiv 2603.17495, fitted on 303,494 near-failure sets); above 10, Mayhew, Wathan and Marzagao. Sets past 20 reps to failure are ignored; high-rep, far-from-failure and guessed-RIR sets count for less.
+  - Each session's best set is one point. Today's max is the quality- and recency-weighted mean (6-week half-life) of the best three points from the last 6 months, after a detraining mark-down (none for 3 weeks, then about 1% a month). The setup max is used only until a lift has logged sets.
+  - The strength score and strength twins use the same estimate (`strength.ts` calls `oneRm`), so the cards on Progress agree. PRs and XP stay on plain Epley (`derive.ts`, `game.ts`) because they are recomputed from all history and a new formula would quietly add or remove earned PRs, XP and badges (Melvin agreed, 2026-11-09).
+- **DOTS score** (Melvin, 2026-11-09) from the estimated back squat, bench press and deadlift maxes and the latest weigh-in, with the published DOTS coefficients (men's or women's, defaulting to the profile's sex). Needs all three lifts; the lifter can bump any number with steppers to see "what if". Rough bands: 200 novice, 300 intermediate, 400 advanced, 500 elite.
+- **Calculators take no typing** (Melvin, 2026-11-09): steppers with − and + buttons, chips for reps in reserve, a picker for the exercise.
 
 ### Web dashboard (Melvin, 2026-11-09: "a website for users as well, similar to Hevy")
 - Hevy's site is a big-screen view (routines, exercise progress, friends' workouts), and its feature guide says workouts can be logged from a browser; past workouts can be added by hand. Ours matches that: the full app already runs in a browser at `/app/` (live logging), and `/me/` is a desktop dashboard (`src/components/dashboard/`, views in `src/lib/dashboard.ts`).
