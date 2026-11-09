@@ -65,7 +65,7 @@ export function CoachNotes({ limit, title = "Coach's notes" }: { limit?: number;
 }
 
 function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: () => void }) {
-  const { setProfile, startDeload, profile } = useApp();
+  const { setProfile, startDeload, fixPlateau, profile } = useApp();
   const [done, setDone] = useState(false);
   const t = TONE[i.tone];
   const act = () => {
@@ -74,6 +74,7 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
     haptic("tap");
     if (a.kind === "deload") startDeload();
     else if (a.kind === "priority") setProfile({ training: togglePriority(profile.training, a.muscle) });
+    else if (a.kind === "plateau") fixPlateau(a.plateau, a.fix);
     else if (a.kind === "minutes") setProfile({ minutes: a.minutes, minutesDay: dayKey(Date.now()) });
     else if (a.kind === "go") return go(a.route as Route);
     setDone(true);

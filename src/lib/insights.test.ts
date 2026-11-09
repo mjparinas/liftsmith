@@ -80,11 +80,18 @@ describe("insights: coach's notes", () => {
     // Three rising weeks, then four flat ones.
     const flat = [...weekly(7, (i) => (i < 3 ? 90 + i * 5 : 100))];
     expect(stalls(flat, NOW).map((s) => s.exerciseId)).toEqual(["back-squat"]);
+    // With Pro, a single stall goes to the plateau detective: cause, three-week fix, one tap to start it.
     const notes = insights({ events: flat, profile: base, now: NOW });
-    const s = notes.find((x) => x.id.startsWith("stall-"))!;
+    const s = notes.find((x) => x.id.startsWith("plateau-"))!;
     expect(s.title).toBe("Back squat has stalled");
-    expect(s.why).toMatch(/No new best in \d weeks over \d sessions/);
-    expect(s.action?.kind).toBe("go");
+    expect(s.why).toMatch(/No new best in \d weeks \(best estimated one-rep max [\d.]+ kg\)\. /);
+    expect(s.advice).toMatch(/^Three-week fix: /);
+    expect(s.action?.kind).toBe("plateau");
+    // A running fix replaces the stall note with a note that it's in the plan.
+    const p = (s.action as { plateau: import("./plateau").Plateau }).plateau;
+    const running = insights({ events: flat, profile: { ...base, plateauFixes: [{ exerciseId: p.exerciseId, kind: p.fix, startedAt: NOW - D, until: NOW + 20 * D, from: p.best }] }, now: NOW });
+    expect(running.some((x) => x.id.startsWith("plateau-"))).toBe(false);
+    expect(running.find((x) => x.id.startsWith("fix-live-"))?.advice).toMatch(/already includes it/);
   });
 
   it("doesn't call a climbing lift stalled, and says it's working", () => {
