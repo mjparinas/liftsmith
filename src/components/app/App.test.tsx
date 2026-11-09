@@ -59,6 +59,10 @@ describe("first run to finished workout", () => {
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
+    // every exercise shows its demo, and tapping it opens the how-to with full demo controls
+    await user.click(screen.getByRole("button", { name: "How to ›" }));
+    expect(await screen.findByRole("button", { name: "Skeleton" })).toBeInTheDocument();
+    await user.click(screen.getByRole("dialog").parentElement!); // tap outside the sheet
 
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     expect(await screen.findByText("Rest")).toBeInTheDocument();
