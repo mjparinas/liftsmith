@@ -11,11 +11,13 @@ import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury
 import { PainSelect } from "./Injuries";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
+import { workoutWhy } from "@/lib/why";
 import { haptic, keepAwake, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { can } from "@/lib/entitlements";
 import { useApp, warmingUp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -31,6 +33,7 @@ import { HUE, muscleHue } from "./theme";
 import { burst } from "./burst";
 import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
 import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
@@ -46,6 +49,8 @@ export function Workout() {
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
+  const [whyOpen, setWhyOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
   const [popKey, setPopKey] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
@@ -241,10 +246,12 @@ export function Workout() {
                 {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
+                {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("coach.changePlan")}><Icon name="clock" size={20} /></button>}
                 <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.howToLabel")}><Icon name="info" size={20} /></button>
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.swap")}><Icon name="swap" size={20} /></button>
               </div>
             </div>
+            <MachineSettings exerciseId={ex.id} gym={gym} />
             <div className="mt-2.5 flex items-center gap-1.5" aria-hidden>
               {Array.from({ length: warmTotal }, (_, i) => (
                 <span key={`w${i}`} className={`h-1.5 w-4 rounded-full transition-all duration-300 ${i < warmDone ? "bg-mint/60" : warming && i === warmDone ? "bg-accent/70" : "bg-line"}`} />
@@ -311,7 +318,7 @@ export function Workout() {
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {item.target.note}</p>
+                <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)} <button type="button" onClick={() => setWhyOpen(true)} className="press inline-flex min-h-11 items-center px-1 text-accent underline underline-offset-2">{t("coach.why")}</button></p>
               )}
               <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (
@@ -395,6 +402,8 @@ export function Workout() {
           </div>
         )}
       </Sheet>
+      <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
+      <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
       <Sheet open={endOpen} onClose={() => setEndOpen(false)} title="End workout?">
         <div className="space-y-3">
           <Button icon="check" className="w-full" onClick={end}>Finish and save</Button>

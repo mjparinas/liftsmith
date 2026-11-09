@@ -133,6 +133,8 @@ describe("first run to finished workout", () => {
     await user.click(await screen.findByRole("button", { name: "Español" }));
     expect(await screen.findByRole("button", { name: "Hoy" })).toBeInTheDocument();
     expect(document.documentElement.lang).toMatch(/^es/);
+    expect(screen.getByRole("heading", { level: 1, name: "Ajustes" })).toBeInTheDocument();
+    expect(screen.getByRole("group", { name: "Tamaño del texto" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Français" }));
     expect(await screen.findByRole("button", { name: "Aujourd’hui" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "English" }));

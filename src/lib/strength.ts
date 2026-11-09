@@ -1,9 +1,8 @@
-import { dedupe } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
-import { epley } from "./progression";
-import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Exercise, type Muscle, type Profile, type SetEvent } from "./types";
+import { estimate, oneRm } from "./onerm";
+import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Exercise, type Muscle, type Profile } from "./types";
 
-// Strength score and "strength twins". Each exercise's best recent estimated one-rep max is compared
+// Strength score and "strength twins". Each exercise's current estimated one-rep max (onerm.ts) is compared
 // with what a typical intermediate lifter of the same body weight manages (Exercise.start is that
 // lifter's working load as a share of body weight), optionally adjusted for age and sex. It's an
 // estimate from typical standards, not a ranking of real users: that needs accounts and sync, and the
@@ -75,20 +74,24 @@ export function strength(events: readonly AppEvent[], profile: Pick<Profile, "bo
   const bw = Math.max(30, profile.bodyweight || 75);
   const age = opts.adjustAge === false ? null : ageOf(profile, now);
   const af = ageFactor(age);
+  // Today's estimated max per lift, from the same estimator as the one-rep max calculator (onerm.ts), so
+  // the two cards on Progress never disagree.
   const best = new Map<string, number>();
-  for (const e of dedupe(events)) {
+  const ids = new Set<string>();
+  for (const e of events) {
     if (e.type !== "set" || e.at < now - WINDOW_DAYS * DAY) continue;
-    const s = e as SetEvent;
-    const ex = EXERCISE_BY_ID.get(s.exerciseId);
-    if (!ex || ex.load === "bodyweight" || ex.start <= 0 || s.weight <= 0 || s.reps < 1 || s.reps > 15) continue;
-    const e1 = epley(s.weight, s.reps);
-    if (e1 > (best.get(ex.id) ?? 0)) best.set(ex.id, e1);
+    const ex = EXERCISE_BY_ID.get(e.exerciseId);
+    if (ex && ex.load !== "bodyweight" && ex.start > 0) ids.add(ex.id);
+  }
+  for (const id of ids) {
+    const r = oneRm(events, id, now);
+    if (r && r.source === "logged") best.set(id, r.e1rm);
   }
   const lifts: LiftScore[] = [];
   for (const [id, e1] of best) {
     const ex = EXERCISE_BY_ID.get(id)!;
     // An intermediate's working load is `start` × body weight for about 10 reps with 2 in reserve.
-    const standard = epley(ex.start * bw, 12);
+    const standard = estimate(ex.start * bw, 12);
     const ratio = (e1 * af * sexFactor(ex, profile.sex)) / standard;
     lifts.push({ exerciseId: id, name: ex.name, e1rm: e1, ratio, score: scoreOf(ratio), percentile: percentileOf(ratio) });
   }

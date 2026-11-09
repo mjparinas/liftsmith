@@ -3,6 +3,8 @@ import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
+import { weekStart } from "./block";
+import { readBody } from "./health";
 import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
@@ -17,6 +19,9 @@ import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
+import { applyFixes, startFix, type FixKind, type Plateau } from "./plateau";
+import { doLater, fitToTime } from "./replan";
+import { withSettings, type Setting } from "./machineSettings";
 import { programPlan } from "./programs";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
 
@@ -120,7 +125,16 @@ interface State {
   addGym(preset: GymPreset): string;
   removeGym(id: string): void;
   replan(): void;
-  start(): void;
+  /** Starts today's plan, or the plan given (a shared workout). */
+  start(plan?: Plan): void;
+  /** Fits the rest of the workout into this many minutes; returns what changed. */
+  shortOnTime(minutes: number): string[];
+  /** Moves the current exercise after the next one (equipment busy). */
+  later(): void;
+  /** Saves machine settings for an exercise at the active workout's (or active) gym. */
+  setMachineSettings(exerciseId: string, list: Setting[], gymId?: string): void;
+  /** Starts a three-week plateau fix (plateau.ts). */
+  fixPlateau(p: Plateau, kind: FixKind): void;
   logSet(): void;
   adjust(weight: number, reps: number): void;
   addRest(sec: number): void;
@@ -140,10 +154,14 @@ interface State {
   /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
   setPlan(plan: Plan | null): void;
   /** Log a weigh-in and make it the profile's body weight. */
-  logBodyweight(kg: number): void;
+  logBodyweight(kg: number, bodyFat?: number): void;
+  /** Weigh-ins and body fat from Health Connect or Apple Health (native, when allowed), deduplicated by day. */
+  importHealthBody(): Promise<number>;
+  /** Make the current week the deload week (a coach's note action). The next block starts after it. */
+  startDeload(): void;
   /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
   refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
-  /** Applies weight, height and body fat read from Health Connect or Apple Health, then refreshes TDEE. */
+  /** Applies height read from Health Connect or Apple Health, then refreshes TDEE. */
   applyHealthBody(r: BodyReadings): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
@@ -357,6 +375,7 @@ export const useApp = create<State>((set, get) => {
       } catch {}
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
       if (!get().autoEnd()) get().replan();
+      void get().importHealthBody().catch(() => 0);
     },
 
     setProfile(p) {
@@ -408,6 +427,8 @@ export const useApp = create<State>((set, get) => {
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
       if (fromRoutine) plan = { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
+      // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
+      if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
       set({ readiness: r, preview: relink(plan, get().links) });
     },
 
@@ -424,8 +445,51 @@ export const useApp = create<State>((set, get) => {
       return true;
     },
 
-    start() {
-      const plan = get().preview;
+    shortOnTime(minutes) {
+      const a = get().active;
+      if (!a) return [];
+      const item = a.plan.items[a.index];
+      const done = item ? setsDone(get().events, a.sessionId, item.exerciseId) : 0;
+      const fit = fitToTime(a.plan.items, a.index, done, minutes);
+      const next = { ...a, plan: { ...a.plan, items: fit.items }, lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+      track("feature", { name: "replan", detail: "time" });
+      return fit.changes;
+    },
+
+    later() {
+      const a = get().active;
+      if (!a) return;
+      const item = a.plan.items[a.index];
+      // Only before its first set: once started, finishing it is quicker than coming back.
+      if (!item || setsDone(get().events, a.sessionId, item.exerciseId) > 0) return;
+      const next = loadItem({ ...a, plan: { ...a.plan, items: doLater(a.plan.items, a.index) }, lastAt: Date.now() }, a.index);
+      set({ active: next });
+      persistActive(next);
+      track("feature", { name: "replan", detail: "later" });
+    },
+
+    setMachineSettings(exerciseId, list, gymId) {
+      const id = gymId ?? get().active?.plan.gymId ?? get().profile.activeGymId;
+      const g = get().gyms.find((x) => x.id === id);
+      if (!g) return;
+      const next = withSettings(g, exerciseId, list);
+      const gyms = get().gyms.map((x) => (x.id === g.id ? { ...next, updatedAt: Date.now() } : x));
+      set({ gyms });
+      void saveRecord("gyms", gyms);
+    },
+
+    fixPlateau(p, kind) {
+      const now = Date.now();
+      const fixes = (get().profile.plateauFixes ?? []).filter((f) => f.exerciseId !== p.exerciseId || f.until < now - 90 * 86400_000);
+      get().setProfile({ plateauFixes: [...fixes, startFix(p, kind, gym() ?? null, now)] });
+      track("feature", { name: "plateau_fix", detail: kind });
+      get().replan();
+    },
+
+    start(given) {
+      const plan = given ?? get().preview;
       const g = gym();
       if (!plan || !g || !plan.items.length) return;
       const sessionId = uid();
@@ -696,10 +760,32 @@ export const useApp = create<State>((set, get) => {
       else get().replan();
     },
 
-    logBodyweight(kg) {
+    logBodyweight(kg, bodyFat) {
       if (!(kg > 0)) return;
-      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg, ...(bodyFat && bodyFat > 0 ? { bodyFat } : {}) }]);
       get().setProfile({ bodyweight: kg });
+    },
+
+    async importHealthBody() {
+      const readings = await readBody(120);
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = readings.map((r) => ({ type: "bodyweight" as const, id: `health-bw-${r.day}`, at: r.at, kg: r.kg, ...(r.bodyFat ? { bodyFat: r.bodyFat } : {}) })).filter((e) => !have.has(e.id));
+      if (fresh.length) {
+        commit(fresh);
+        const newest = fresh.reduce((a, b) => (b.at > a.at ? b : a));
+        const last = get().events.filter((e) => e.type === "bodyweight").reduce((t, e) => Math.max(t, e.at), 0);
+        if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
+      }
+      if (fresh.length) get().refreshTdee();
+      return fresh.length;
+    },
+
+    startDeload() {
+      const p = get().profile;
+      const now = Date.now();
+      const build = Math.min(6, Math.max(3, p.blockWeeks));
+      get().setProfile({ blockStart: weekStart(p, now) - build * 7 * 86_400_000 });
+      get().replan();
     },
 
     refreshTdee(trigger = "auto", now = Date.now()) {
@@ -710,9 +796,8 @@ export const useApp = create<State>((set, get) => {
     },
 
     applyHealthBody(r) {
-      const u = bodyUpdates(r, get().events, get().profile);
-      if (u.events.length) commit(u.events);
-      if (Object.keys(u.profile).length) get().setProfile(u.profile);
+      const p = bodyUpdates(r, get().profile);
+      if (Object.keys(p).length) get().setProfile(p);
       get().refreshTdee();
     },
 
