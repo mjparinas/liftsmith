@@ -1,7 +1,7 @@
 import { blockWeek, weekStart, type BlockWeek } from "./block";
 import { stepLoad } from "./loads";
 import type { Call } from "./readiness";
-import { available, EXERCISE_BY_ID } from "./exercises";
+import { available, EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
@@ -24,8 +24,26 @@ export interface PlanItem {
   challenge?: boolean;
   /** Lighter sets before the working sets (warmup.ts). */
   warmup?: WarmupSet[];
+  // ---- Set by a program (programs.ts); the adaptive plan leaves them out.
+  /** The program lift these sets count for, saved on each set so a swap keeps its progress. */
+  slot?: string;
+  /** A target for each working set, when they differ (ramps, percentages, a last set for max reps). */
+  setTargets?: SetTarget[];
+  /** Short scheme for lists, such as "5 × 5" or "5, 5, 5+". */
+  scheme?: string;
+  /** Tier or role, such as "T1" or "Main lift". */
+  label?: string;
   /** Superset: neighbours with the same group are done back to back (superset.ts). */
   group?: string;
+}
+
+export interface SetTarget {
+  /** Kilograms (per hand for dumbbells). */
+  weight: number;
+  /** Reps, or the minimum when `amrap`. Seconds for holds. */
+  reps: number;
+  /** As many good reps as possible. */
+  amrap?: boolean;
 }
 
 export interface Plan {
@@ -37,6 +55,8 @@ export interface Plan {
   call: Call;
   challenge: boolean;
   items: PlanItem[];
+  /** Set when a program built the plan: which program, which day of it, and a line for Today. */
+  program?: { id: string; day: number; dayName: string; note: string; fixed: boolean };
   /** Set when the plan is a saved routine instead of the adaptive plan (routines.ts). */
   routineId?: string;
 }
@@ -52,6 +72,8 @@ export interface GenerateInput {
   /** Today's push / normal / recover call, after any override by the lifter. */
   call?: Call;
   challenge?: boolean;
+  /** A split day (programs.ts): only these muscles, and only exercises whose main muscles are all in it. */
+  muscles?: readonly Muscle[];
 }
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
@@ -125,18 +147,20 @@ function order(a: Exercise, b: Exercise): number {
   return rank(a) - rank(b);
 }
 
-export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false }: GenerateInput): Plan {
+export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false, muscles }: GenerateInput): Plan {
+  const day = muscles ? new Set(muscles) : null;
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const skip = new Set([...exclude, ...avoided(events, gym.id, now)]);
-  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom);
+  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
   const random = rng(hash(dayKey(now) + gym.id));
   const recent = recentFor(events);
   const budget = minutes * 60;
 
   // Muscles ranked by how ready they are and how much of this week's target is left.
-  const ranked = MUSCLES.filter((m) => rec[m] >= 55)
+  // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
+  const ranked = MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
     .map((m) => {
       const left = Math.max(0, week.setsPerMuscle - done[m]) / week.setsPerMuscle;
       const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;

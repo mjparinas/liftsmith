@@ -30,6 +30,9 @@ const ROWS: Row[] = [
   ["push-up", "Push-up", ["chest"], ["triceps", "frontDelts", "abs"], [], "bodyweight", "hpush", 0, "Hands just outside the shoulders, body in one straight line.", ["Brace your abs and glutes", "Chest to a fist's height off the floor", "Push the floor away"]],
   ["incline-push-up", "Incline push-up", ["chest"], ["triceps", "frontDelts"], ["box"], "bodyweight", "hpush", 0, "Hands on a box or bench, body straight.", ["Lower the chest to the edge", "Elbows at about 45°", "Lock out each rep"]],
   ["decline-push-up", "Feet-up push-up", ["chest", "frontDelts"], ["triceps"], ["box"], "bodyweight", "hpush", 0, "Feet on a box, hands on the floor.", ["Keep hips level", "Head neutral", "Full range"]],
+  ["wall-push-up", "Wall push-up", ["chest"], ["triceps", "frontDelts"], [], "bodyweight", "hpush", 0, "Hands on a wall at shoulder height, feet a step back.", ["Body in one straight line", "Chest to the wall", "Push back to straight arms"]],
+  ["pseudo-planche-push-up", "Lean-forward push-up", ["chest", "frontDelts"], ["triceps", "abs"], [], "bodyweight", "hpush", 0, "Push-up position with the hands turned out and set by the waist, shoulders leaning past the hands.", ["Keep the lean the whole time", "Elbows close to the body", "Lock out with the shoulders pushed forward"]],
+  ["negative-dip", "Slow dip lowering", ["chest", "triceps"], ["frontDelts"], ["dipBars"], "bodyweight", "vpush", 0, "Jump to the top of the dip bars with straight arms.", ["Lower as slowly as you can, about 5 seconds", "Lean slightly forward", "Step back up to the top"]],
   ["dip", "Dip", ["chest", "triceps"], ["frontDelts"], ["dipBars"], "bodyweight", "vpush", 0, "Start at the top with straight arms.", ["Lean slightly forward", "Lower until shoulders are just below elbows", "Press back to lockout"]],
   ["ring-push-up", "Ring push-up", ["chest"], ["triceps", "frontDelts", "abs"], ["rings"], "bodyweight", "hpush", 0, "Rings a few centimetres off the floor.", ["Keep the rings close to the body", "Turn the rings out at the top", "Slow lowering"]],
   // ---- Shoulders
@@ -60,6 +63,10 @@ const ROWS: Row[] = [
   ["ring-row", "Ring row", ["upperBack", "lats"], ["biceps", "rearDelts"], ["rings"], "bodyweight", "hpull", 0, "Rings at waist height, lean back with straight body.", ["Pull the rings to the ribs", "Turn the palms in", "Walk feet forward to make it harder"]],
   ["towel-row", "Doorway towel row", ["upperBack", "lats"], ["biceps"], [], "bodyweight", "hpull", 0, "Loop a towel round a sturdy door handle, close the door, lean back.", ["Feet close to the door", "Pull the chest towards the handle", "Squeeze at the top"]],
   ["kb-row", "Kettlebell row", ["lats", "upperBack"], ["biceps", "rearDelts"], ["kettlebells"], "kettlebell", "hpull", 0.25, "Staggered stance, hinge forward, kettlebell under the shoulder.", ["Pull to the hip", "Keep the back flat", "Full stretch"]],
+  ["power-clean", "Power clean", ["glutes", "hamstrings", "traps"], ["quads", "upperBack", "lowerBack", "calves"], ["barbell"], "barbell", "hinge", 0.55, "Bar over the middle of your foot, grip just outside the legs, shoulders slightly in front of the bar.", ["Push the floor away until the bar passes the knees", "Jump and shrug hard", "Drop under and catch it on the front of the shoulders"]],
+  ["barbell-shrug", "Barbell shrug", ["traps"], ["forearms"], ["barbell"], "barbell", "isolation", 0.8, "Stand tall holding the bar at arm's length, hands just outside the thighs.", ["Lift the shoulders to the ears", "Pause for a second", "Lower all the way"]],
+  ["scapular-pull", "Scapular pull", ["lats"], ["upperBack", "forearms"], ["pullupBar"], "bodyweight", "vpull", 0, "Hang from the bar with straight arms.", ["Pull the shoulders down away from the ears", "Arms stay straight", "Relax back to a full hang"]],
+  ["negative-pull-up", "Slow pull-up lowering", ["lats"], ["biceps", "upperBack", "forearms"], ["pullupBar"], "bodyweight", "vpull", 0, "Jump or step up so your chin is over the bar.", ["Lower as slowly as you can, about 5 seconds", "Shoulders stay down", "Reset at the bottom and climb up again"]],
   ["shrug", "Dumbbell shrug", ["traps"], ["forearms"], ["dumbbells"], "dumbbell", "isolation", 0.35, "Stand tall with heavy dumbbells by your sides.", ["Lift the shoulders to the ears", "Pause for a second", "No rolling"]],
   ["back-extension", "Back extension", ["lowerBack", "glutes"], ["hamstrings"], ["bench"], "bodyweight", "hinge", 0, "Lie face down along a bench with hips at the edge and a partner or strap holding the legs, or use a hyperextension bench.", ["Hinge at the hips", "Rise until the body is straight", "Don't over-arch"]],
   ["superman", "Superman hold", ["lowerBack"], ["glutes", "upperBack"], [], "bodyweight", "core", 0, "Lie face down, arms overhead.", ["Lift arms and legs together", "Hold for a breath", "Lower slowly"]],
@@ -95,6 +102,9 @@ const ROWS: Row[] = [
   ["walking-lunge", "Dumbbell walking lunge", ["quads", "glutes"], ["hamstrings", "adductors"], ["dumbbells"], "dumbbell", "lunge", 0.2, "Dumbbells by your sides.", ["Long steps", "Back knee kisses the floor", "Stay tall"]],
   ["reverse-lunge", "Reverse lunge", ["quads", "glutes"], ["hamstrings"], [], "bodyweight", "lunge", 0, "Stand tall, hands on hips.", ["Step back", "Lower until both knees are at 90°", "Return through the front heel"]],
   ["step-up", "Step-up", ["quads", "glutes"], ["hamstrings"], ["box"], "bodyweight", "lunge", 0, "Box at knee height.", ["Whole foot on the box", "Drive through the top leg", "Lower slowly"]],
+  ["split-squat", "Split squat", ["quads", "glutes"], ["adductors"], [], "bodyweight", "lunge", 0, "One foot a long stride in front of the other, back heel up.", ["Torso tall", "Back knee nearly to the floor", "Push up through the front foot"]],
+  ["shrimp-squat", "Shrimp squat", ["quads", "glutes"], ["adductors", "hamstrings"], [], "bodyweight", "squat", 0, "Stand on one leg and hold the other foot behind you.", ["Lower until the back knee touches the floor", "Lean forward a little to balance", "Stand up on the front leg"]],
+  ["pistol-squat", "One-leg squat", ["quads", "glutes"], ["adductors", "abs"], [], "bodyweight", "squat", 0, "Stand on one leg with the other leg straight out in front.", ["Arms forward to balance", "Sit all the way down on one leg", "Stand without the other foot touching"]],
   ["leg-extension", "Leg extension", ["quads"], [], ["legExtension"], "machine", "isolation", 0.45, "Pad on the lower shin, knee lined up with the pivot.", ["Extend fully", "Pause", "Lower slowly"]],
   ["romanian-deadlift", "Romanian deadlift", ["hamstrings", "glutes"], ["lowerBack", "forearms"], ["barbell"], "barbell", "hinge", 0.75, "Stand holding the bar at the hips, knees soft.", ["Push the hips back", "Bar slides down the thighs", "Stop at a strong hamstring stretch"]],
   ["db-rdl", "Dumbbell Romanian deadlift", ["hamstrings", "glutes"], ["lowerBack", "forearms"], ["dumbbells"], "dumbbell", "hinge", 0.3, "Dumbbells in front of the thighs.", ["Hips back", "Back flat", "Squeeze the glutes to stand"]],
@@ -165,6 +175,11 @@ export function registerCustom(events: readonly AppEvent[]): void {
     BY_ID.set(ex.id, ex);
   }
 }
+/**
+ * Steps of the calisthenics skill ladders (programs.ts). They make sense as a step on the way to a
+ * harder movement, not as a pick of their own, so the adaptive generator leaves them out.
+ */
+export const LADDER_ONLY: ReadonlySet<string> = new Set(["scapular-pull", "negative-pull-up", "negative-dip", "wall-push-up", "pseudo-planche-push-up", "shrimp-squat", "pistol-squat"]);
 
 export function exercise(id: string): Exercise {
   const e = EXERCISE_BY_ID.get(id);

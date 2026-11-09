@@ -243,6 +243,13 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /**
+   * Where Today's plan comes from (programs.ts). Missing means the adaptive generator. A program keeps
+   * the starting weights frozen when it was picked (kg, keyed by program slot), so replaying the
+   * history always gives the same weights; everything after that is derived from the logged sets.
+   * Saved routines plug in as their own kind.
+   */
+  planSource?: PlanSource;
   /** Appearance: dark (default), light, or follow the system (theme.ts). */
   theme?: "dark" | "light" | "system";
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
@@ -253,6 +260,10 @@ export interface Profile {
   updatedAt: number;
 }
 
+export type PlanSource =
+  | { kind: "adaptive" }
+  | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
+  | { kind: "routine"; id: string };
 /** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
 export interface RoutineItem {
   exerciseId: string;
@@ -325,6 +336,10 @@ export interface SetEvent extends EventBase {
   hrEnd?: number;
   /** Part of a challenge (e.g. as many reps as possible on the last set). */
   challenge?: boolean;
+  /** A program's "as many reps as you can" set: targetReps is the minimum. */
+  amrap?: boolean;
+  /** The program lift this set counts for (programs.ts), kept through swaps. */
+  slot?: string;
   /** Superset group, shared by the exercises done back to back with this one. */
   superset?: string;
 }
@@ -342,6 +357,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** The program and day the plan came from (programs.ts). */
+  program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */
   routine?: string;
 }

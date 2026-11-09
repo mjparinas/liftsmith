@@ -277,6 +277,10 @@ export function Workout() {
                   <p>Warm-up: easy, smooth reps<Info term="warmup" />. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
                   <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
                 </div>
+              ) : item.setTargets?.[doneSets]?.amrap ? (
+                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Last set: as many good reps as you can, at least {item.setTargets[doneSets].reps}. Log what you got</p>
+              ) : item.slot ? (
+                <p className="mt-3 text-center text-sm text-muted">{item.label ? `${item.label} · ` : ""}{item.target.note}</p>
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
@@ -309,7 +313,7 @@ export function Workout() {
                       {ss && <span className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
                       <span className="flex min-w-0 items-center gap-2.5 font-medium"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden /><span className="truncate">{e.name}</span></span>
                     </span>
-                    <span className="num shrink-0 text-sm text-muted">{it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}</span>
+                    <span className="num shrink-0 text-sm text-muted">{it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}</span>
                   </button>
                   <LinkToggle on={linkedToNext(active.plan.items, at - 1)} first={exercise(active.plan.items[at - 1].exerciseId).name} second={e.name} onToggle={() => s.toggleSuperset(at - 1)} />
                 </li>

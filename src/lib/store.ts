@@ -2,7 +2,7 @@
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, type Stats } from "./derive";
-import { generate, type Plan, type PlanItem } from "./generator";
+import { generate, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
@@ -15,6 +15,7 @@ import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
+import { programPlan } from "./programs";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 
@@ -165,10 +166,12 @@ export const useApp = create<State>((set, get) => {
     const item = a.plan.items[index];
     if (!item) return { ...a, index, warm: 0 };
     // Coming back to an exercise that's already started skips its warm-ups.
-    const started = setsDone(get().events, a.sessionId, item.exerciseId) > 0;
+    const done = setsDone(get().events, a.sessionId, item.exerciseId);
+    const started = done > 0;
     const warm = started ? (item.warmup?.length ?? 0) : 0;
     const first = !started && item.warmup?.[0];
-    return { ...a, index, warm, weight: first ? first.weight : item.target.weight, reps: first ? first.reps : item.target.reps };
+    const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
+    return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps };
   };
 
   return {
@@ -266,7 +269,7 @@ export const useApp = create<State>((set, get) => {
       const profile = { ...get().profile, ...p, updatedAt: Date.now() };
       set({ profile });
       void saveRecord("profile", profile);
-      if ("minutes" in p || "activeGymId" in p || "variability" in p || "goal" in p || "experience" in p) get().replan();
+      if ("minutes" in p || "planSource" in p || "activeGymId" in p || "variability" in p || "goal" in p || "experience" in p) get().replan();
     },
 
     saveGym(g) {
@@ -298,10 +301,14 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled });
       const call = callOverride ?? r.call;
-      let plan = generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
-      // A saved routine replaces the adaptive plan for today, where this gym can do it.
+      const src = profile.planSource;
+      const fromProgram = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
+      let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
+      // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
       const routine = profile.routines?.find((x) => x.id === get().routineId);
-      if (routine) plan = planFromRoutine(plan, routine, events, profile, g, now)?.plan ?? plan;
+      // It isn't a program day, so the program's next day stays next.
+      const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
+      if (fromRoutine) plan = { ...fromRoutine, program: undefined };
       set({ readiness: r, preview: relink(plan, get().links) });
     },
 
@@ -327,7 +334,7 @@ export const useApp = create<State>((set, get) => {
       const r = get().readiness;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
-      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge, routine: plan.routineId }]);
+      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge, program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined, routine: plan.routineId }]);
       set({ callOverride: null, links: [], routineId: null });
       set({ active: a });
       persistActive(a);
@@ -363,6 +370,7 @@ export const useApp = create<State>((set, get) => {
         return;
       }
       const already = setsDone(get().events, a.sessionId, item.exerciseId);
+      const planned: SetTarget = item.setTargets?.[Math.min(already, item.setTargets.length - 1)] ?? item.target;
       // A set takes seconds to a couple of minutes; a longer gap means the lifter rested past the
       // timer, so the duration is left out rather than guessed.
       const duration = (now - a.setStart) / 1000;
@@ -378,9 +386,11 @@ export const useApp = create<State>((set, get) => {
           exerciseId: item.exerciseId,
           weight: a.weight,
           reps: a.reps,
-          targetReps: item.target.reps,
-          rir: item.target.rir,
-          targetWeight: item.target.weight,
+          targetReps: planned.reps,
+          rir: planned.amrap ? 0 : item.target.rir,
+          targetWeight: planned.weight,
+          amrap: planned.amrap,
+          slot: item.slot,
           startedAt: a.setStart,
           durationSec: plausible ? Math.round(duration) : undefined,
           restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
@@ -394,6 +404,11 @@ export const useApp = create<State>((set, get) => {
       const items = a.plan.items;
       const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
       let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now };
+      // Programs with a different target for each set (ramps, percentages) load the next one; straight
+      // sets keep whatever the lifter dialled in.
+      const nextT = item.setTargets?.[already + 1];
+      const prevT = item.setTargets?.[already];
+      if (step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps)) next = { ...next, weight: nextT.weight, reps: nextT.reps };
       if (step.finished) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
       if (step.index !== a.index) next = loadItem(next, Math.min(step.index, items.length));
       const last = next.index >= items.length;
@@ -455,6 +470,14 @@ export const useApp = create<State>((set, get) => {
       const t = target(exercise(toId), get().events, get().profile, g, Date.now());
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
       const newItem: PlanItem = { ...item, exerciseId: toId, target: t, sets: Math.max(1, item.sets - done) };
+      // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
+      // to what the new exercise usually takes. A ladder step keeps bodyweight.
+      if (item.setTargets) {
+        const rest = item.setTargets.slice(Math.min(done, item.setTargets.length - 1));
+        newItem.setTargets = rest.map((x) => ({ ...x, weight: t.weight }));
+        newItem.target = { ...t, reps: rest[0].reps, note: item.target.note };
+        newItem.sets = rest.length;
+      }
       // The new exercise gets its own warm-ups, unless working sets were already done.
       const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
       const wu = done ? [] : warmupFor(exercise(toId), t.weight, g, warmed);

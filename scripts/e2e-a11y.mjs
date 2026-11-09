@@ -70,6 +70,15 @@ try {
   await page.goto(link);
   await page.getByRole("article", { name: "Shared training summary" }).waitFor();
   await scan("shared summary");
+  await page.goto(`${server.url}/app/#/programs`);
+  await page.getByRole("heading", { name: "Programs" }).waitFor();
+  await scan("programs");
+  await page.getByRole("button", { name: /Tiered progression/ }).click();
+  await page.getByRole("dialog").waitFor();
+  await scan("program detail");
+  await page.getByRole("button", { name: "Start this program" }).click();
+  await page.getByText(/Tiered progression · Day 1/).waitFor();
+  await scan("today on a program");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();
