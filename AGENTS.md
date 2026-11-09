@@ -28,7 +28,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
 - Platform equivalents: Health Connect ↔ HealthKit (Apple Health); foreground-service notification ↔ Live Activity (lock screen and Dynamic Island); Play Billing ↔ StoreKit; Sign in with Google ↔ Sign in with Apple (both offered on iOS); Wear OS ↔ Apple Watch.
 - CI builds both apps on every pull request (`android` and `ios` jobs in `ci.yml`).
-- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) schedules a time-sensitive rest-over notification with the same two buttons. The iOS lock-screen countdown needs a Live Activity (a widget extension target), which is the next parity item. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
+- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) runs a **Live Activity** (lock screen and Dynamic Island: rest countdown, next set and plates, heart rate, Log set / +30 s links; drawn by the `LiftsmithWidgets` extension) and schedules a time-sensitive rest-over notification with the same two buttons. Heart-rate-only changes reach the Live Activity at most every 15 s, because iOS budgets updates. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
 - Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins).
 - Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
 
@@ -63,7 +63,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ### Workout screen
 - Big target weight and reps with steppers, the barbell plate graphic for every barbell set, a big Log set button, an automatic rest timer with +30 s and Skip, and the next set's plates shown during rest so the lifter can load while resting.
-- **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`). On iOS this will be a Live Activity.
+- **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. On iOS the same content is a Live Activity on the lock screen and in the Dynamic Island. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`).
 - The screen stays on during a workout (wake lock).
 
 ### Workout data and coaching (Melvin, 2026-11-09: "win on data")
@@ -117,12 +117,14 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Turn off and delete** removes every cycle event and the consent. Reading menstrual data from Health Connect and HealthKit waits for health plugin support (the current plugin has no menstruation type); logging works the same on both platforms (parity).
 
 
-### Voice and system shortcuts (Melvin, 2026-11-09; part 1 built)
+### Voice and system shortcuts (Melvin, 2026-11-09; built)
 - **Three actions everywhere:** start workout (starts today's plan, or reopens the one running), log set (as planned), and +30 s rest. Log set and +30 s do nothing without a workout, so a stray tap never logs a set nobody did. All entry points run `src/lib/shortcuts.ts`, through the WorkoutSession plugin's `action` event (the same event as the notification buttons), so they behave the same on every platform.
 - **iOS** (`ios/App/App/ShortcutIntents.swift`): App Intents plus App Shortcuts, so Siri ("Start a workout in Liftsmith"), Spotlight and the Shortcuts app work with no setup, and the lifter can put any of them on the Action button or in Control Center (iOS 18) as a Shortcut control. The intents open the app (`openAppWhenRun`), because the workout state lives in the web layer.
 - **Android:** launcher shortcuts and an App Actions `START_EXERCISE` capability (`res/xml/shortcuts.xml`), and a Quick Settings tile (`WorkoutTileService.java`) that reads "Start workout", or "Log set" while a workout runs. All open `liftsmith://start|log|add30`. Custom App Actions intents for log set were left out, because they need Google's review and the tile and notification already cover it.
 - **Web:** the manifest's shortcuts open `/app/?do=start` and `/app/?do=log`.
-- **Next (part 2), with one iOS widget extension target:** home-screen widgets on both platforms, a native Control Center control on iOS 18, and the Live Activity lock-screen countdown (the open parity item).
+- **Widgets and controls:** Android has a home-screen widget (`WorkoutWidget.java`, Start workout and Log set). iOS has one widget extension target, `ios/App/LiftsmithWidgets` (iOS 16.2+): a home-screen and lock-screen widget (small: start; medium: start and log set), the workout Live Activity, and an iOS 18 Control Center control that runs `StartWorkoutIntent`. Widget and Live Activity buttons open `liftsmith://` links, which `SceneDelegate` hands to `ShortcutInbox`.
+- Code shared by the app and the extension lives in `ios/App/Shared/` (`WorkoutIntents.swift`: the intents and `ShortcutInbox`; `WorkoutActivity.swift`: the Live Activity attributes). The extension's bundle id is `com.liftsmith.app.widgets`; release signing creates its profile automatically.
+- Widgets don't show whether a workout is running, because that needs an App Group shared with the app (an Apple portal step). Log set does nothing without a workout, so the widgets stay correct without it.
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
 - Stats: weekly sets per muscle against the target, estimated one-rep max trends (Epley), PRs, volume, session history, streaks and trophies.
@@ -204,4 +206,3 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 ## Open items
 - Confirm the Android package id and register a domain.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
-- iOS Live Activity for the lock-screen rest countdown (widget extension), to match Android.

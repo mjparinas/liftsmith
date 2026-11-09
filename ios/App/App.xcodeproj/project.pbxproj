@@ -7,7 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0D4BB06D18775241DBEEDCE3 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10E55AD838EAA29A42924E6E /* SwiftUI.framework */; };
+		0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */; };
 		2FAD9763203C412B000D30F8 /* config.xml in Resources */ = {isa = PBXBuildFile; fileRef = 2FAD9762203C412B000D30F8 /* config.xml */; };
+		39E8E5E8FBE92B529AF54203 /* WorkoutActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */; };
+		47972A53B79335DC8081E419 /* QuickStartWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */; };
+		48DDA7D2D0A965653FC060C3 /* LiftsmithWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */ = {isa = PBXBuildFile; productRef = 4D22ABE82AF431CB00220026 /* CapApp-SPM */; };
 		50379B232058CBB4000EE86E /* capacitor.config.json in Resources */ = {isa = PBXBuildFile; fileRef = 50379B222058CBB4000EE86E /* capacitor.config.json */; };
 		504EC3081FED79650016851F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504EC3071FED79650016851F /* AppDelegate.swift */; };
@@ -15,13 +20,46 @@
 		504EC30F1FED79650016851F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 504EC30E1FED79650016851F /* Assets.xcassets */; };
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
+		75CB0BBFB6B818C08383E48F /* StartWorkoutControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */; };
+		829F6A5C68EBF342A756962A /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9A9D3BE0F811A0BD44BB0D9F /* WidgetKit.framework */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		9632D695CCD0A9D1A115E9B6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
 		A1F5E0010000000000000001 /* WorkoutSessionPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */; };
 		A1F5E0010000000000000004 /* ShortcutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000005 /* ShortcutIntents.swift */; };
+		AF6645131DB97D20C8BEEA68 /* WorkoutLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */; };
+		CCAC65A6C31069F3AFFA6ACC /* LiftsmithWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */; };
+		D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
+		DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC786AFE3663E4C12B2D909 /* Foundation.framework */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		A6451DD0D29A90A7F045B5C5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F7B0C469AAFC410AA368939D;
+			remoteInfo = LiftsmithWidgets;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		16B0440713ADED6A0D70B4B7 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				48DDA7D2D0A965653FC060C3 /* LiftsmithWidgets.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		10E55AD838EAA29A42924E6E /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
+		4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = QuickStartWidget.swift; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		504EC3071FED79650016851F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -30,11 +68,20 @@
 		504EC3111FED79650016851F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
+		6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutIntents.swift; sourceTree = "<group>"; };
+		6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutLiveActivity.swift; sourceTree = "<group>"; };
+		70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = LiftsmithWidgets.swift; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
+		9A9D3BE0F811A0BD44BB0D9F /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionPlugin.swift; sourceTree = "<group>"; };
-		A1F5E0010000000000000005 /* ShortcutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutIntents.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000003 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		A1F5E0010000000000000005 /* ShortcutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutIntents.swift; sourceTree = "<group>"; };
+		BB05485F3EDA6B8DD896565A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiftsmithWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutActivity.swift; sourceTree = "<group>"; };
+		CEC786AFE3663E4C12B2D909 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StartWorkoutControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,6 +90,16 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FDBAF57B203158D719D2D793 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */,
+				829F6A5C68EBF342A756962A /* WidgetKit.framework in Frameworks */,
+				0D4BB06D18775241DBEEDCE3 /* SwiftUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -55,6 +112,9 @@
 				958DCC722DB07C7200EA8C5F /* debug.xcconfig */,
 				504EC3061FED79650016851F /* App */,
 				504EC3051FED79650016851F /* Products */,
+				FCC80A55E1B46D7DCA985C0B /* Shared */,
+				F6C7983D12D78D132ECAD923 /* Frameworks */,
+				ABD8D1072A0CEFB112237523 /* LiftsmithWidgets */,
 			);
 			sourceTree = "<group>";
 		};
@@ -62,6 +122,7 @@
 			isa = PBXGroup;
 			children = (
 				504EC3041FED79650016851F /* App.app */,
+				BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -85,6 +146,47 @@
 			path = App;
 			sourceTree = "<group>";
 		};
+		ABD8D1072A0CEFB112237523 /* LiftsmithWidgets */ = {
+			isa = PBXGroup;
+			children = (
+				70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */,
+				4DB70B2D7282FE8799D61E99 /* QuickStartWidget.swift */,
+				6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */,
+				EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */,
+				BB05485F3EDA6B8DD896565A /* Info.plist */,
+			);
+			name = LiftsmithWidgets;
+			path = LiftsmithWidgets;
+			sourceTree = "<group>";
+		};
+		B71447296C42E026B3FAD9B1 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				CEC786AFE3663E4C12B2D909 /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		F6C7983D12D78D132ECAD923 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B71447296C42E026B3FAD9B1 /* iOS */,
+				9A9D3BE0F811A0BD44BB0D9F /* WidgetKit.framework */,
+				10E55AD838EAA29A42924E6E /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		FCC80A55E1B46D7DCA985C0B /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */,
+				C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */,
+			);
+			name = Shared;
+			path = Shared;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -95,10 +197,12 @@
 				504EC3001FED79650016851F /* Sources */,
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
+				16B0440713ADED6A0D70B4B7 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				91A96D79EC9B11E86182E14D /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -107,6 +211,23 @@
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
 			productType = "com.apple.product-type.application";
+		};
+		F7B0C469AAFC410AA368939D /* LiftsmithWidgets */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9B794E38901194AAB3D483F1 /* Build configuration list for PBXNativeTarget "LiftsmithWidgets" */;
+			buildPhases = (
+				1D20608DC5FCBD43943BA4D7 /* Sources */,
+				FDBAF57B203158D719D2D793 /* Frameworks */,
+				D88E6DEFE975632DFA73EE6A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LiftsmithWidgets;
+			productName = LiftsmithWidgets;
+			productReference = BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -141,6 +262,7 @@
 			projectRoot = "";
 			targets = (
 				504EC3031FED79650016851F /* App */,
+				F7B0C469AAFC410AA368939D /* LiftsmithWidgets */,
 			);
 		};
 /* End PBXProject section */
@@ -159,9 +281,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		D88E6DEFE975632DFA73EE6A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		1D20608DC5FCBD43943BA4D7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CCAC65A6C31069F3AFFA6ACC /* LiftsmithWidgets.swift in Sources */,
+				47972A53B79335DC8081E419 /* QuickStartWidget.swift in Sources */,
+				AF6645131DB97D20C8BEEA68 /* WorkoutLiveActivity.swift in Sources */,
+				75CB0BBFB6B818C08383E48F /* StartWorkoutControl.swift in Sources */,
+				D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */,
+				39E8E5E8FBE92B529AF54203 /* WorkoutActivity.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		504EC3001FED79650016851F /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -170,10 +312,21 @@
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				A1F5E0010000000000000001 /* WorkoutSessionPlugin.swift in Sources */,
 				A1F5E0010000000000000004 /* ShortcutIntents.swift in Sources */,
+				9632D695CCD0A9D1A115E9B6 /* WorkoutIntents.swift in Sources */,
+				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		91A96D79EC9B11E86182E14D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiftsmithWidgets;
+			target = F7B0C469AAFC410AA368939D /* LiftsmithWidgets */;
+			targetProxy = A6451DD0D29A90A7F045B5C5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
 		504EC30B1FED79650016851F /* Main.storyboard */ = {
@@ -195,6 +348,30 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		15D1518BE6F8EC4236E10A58 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
 		504EC3141FED79650016851F /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
@@ -350,6 +527,31 @@
 			};
 			name = Release;
 		};
+		CB444DE546580AF723EA3B7B /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = "";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWidgets/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app.widgets;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -367,6 +569,15 @@
 			buildConfigurations = (
 				504EC3171FED79650016851F /* Debug */,
 				504EC3181FED79650016851F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9B794E38901194AAB3D483F1 /* Build configuration list for PBXNativeTarget "LiftsmithWidgets" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CB444DE546580AF723EA3B7B /* Release */,
+				15D1518BE6F8EC4236E10A58 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

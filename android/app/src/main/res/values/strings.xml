@@ -10,4 +10,5 @@
     <string name="shortcut_log_long">Log the current set as planned</string>
     <string name="shortcut_rest_short">+30 s rest</string>
     <string name="shortcut_rest_long">Add 30 seconds to the rest timer</string>
+    <string name="widget_description">Start today\'s workout or log a set in one tap</string>
 </resources>

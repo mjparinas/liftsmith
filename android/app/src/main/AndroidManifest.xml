@@ -55,6 +55,17 @@
             </intent-filter>
         </service>
 
+        <!-- Home-screen widget: Start workout and Log set (WorkoutWidget.java). -->
+        <receiver
+            android:name=".WorkoutWidget"
+            android:exported="false"
+            android:label="@string/shortcut_start_short">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_workout_info" />
+        </receiver>
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"
