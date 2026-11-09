@@ -49,6 +49,8 @@ export interface SetTarget {
   reps: number;
   /** As many good reps as possible. */
   amrap?: boolean;
+  /** Lighter for the first session back after a break (layoff.ts); the program rebuilds from it. */
+  comeback?: boolean;
 }
 
 export interface Plan {

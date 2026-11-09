@@ -2,6 +2,8 @@ import { blockWeek } from "./block";
 import { available, exercise, EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import { alternatives, generate, planSeconds, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { roundLoad, stepLoad } from "./loads";
+import { layoff } from "./layoff";
+import { t } from "./i18n";
 import { epley, sessionsOf, startE1rm, TIMED, weightFor } from "./progression";
 import type { Call } from "./readiness";
 import { MUSCLES, type AppEvent, type Equipment, type Gym, type Muscle, type PlanSource, type Profile, type SetEvent } from "./types";
@@ -315,6 +317,8 @@ function baseOf(l: Lift, sets: readonly SetEvent[], slotEx: string, gym: Gym): n
   const same = sets.every((s) => s.exerciseId === slotEx);
   const changed = sets.some((s) => s.targetWeight !== undefined && Math.abs(s.weight - s.targetWeight) > 0.05);
   if (same && changed) return Math.min(...sets.map((s) => s.weight));
+  // The first session back after a break was planned lighter on purpose: rebuild from there.
+  if (same && sets.some((s) => s.comeback)) return Math.min(...sets.map((s) => s.targetWeight ?? s.weight));
   // The plan went well above the exact weight (an empty bar heavier than the start, or the lightest
   // dumbbell): build on what was really lifted, or the lift never moves.
   const planned = Math.min(...sets.map((s) => s.targetWeight ?? l.w));
@@ -886,7 +890,7 @@ export function programPlan({ src, profile, gym, events, now, call = "normal", c
   const day = s.next;
   const lift = (k: string) => s.lifts[k];
   const d = engine.build(s, day, lift, ctx);
-  const items = toItems(d, gym);
+  const items = toItems(d, gym).map((it) => comebackItem(it, events, gym, now));
   return {
     gymId: gym.id,
     minutes: Math.round(planSeconds(items) / 60),
@@ -897,6 +901,20 @@ export function programPlan({ src, profile, gym, events, now, call = "normal", c
     items,
     program: { id: src.id, day, dayName: d.name, note: d.note, fixed: true },
   };
+}
+
+/**
+ * The first session back after a break (layoff.ts) is lighter on a fixed program too, like the
+ * well-known 5x5 apps do. From there the program's own jumps rebuild it, because the next weight
+ * builds on what was planned and lifted; there is no extra ramp on top.
+ */
+function comebackItem(item: PlanItem, events: readonly AppEvent[], gym: Gym, now: number): PlanItem {
+  const ex = exercise(item.exerciseId);
+  if (ex.load === "bodyweight" || !item.setTargets) return item;
+  const lay = layoff(ex, events, now);
+  if (!lay || lay.done > 0) return item;
+  const setTargets = item.setTargets.map((st) => ({ ...st, weight: roundLoad(st.weight * (1 - lay.cut), ex, gym).kg, comeback: true }));
+  return { ...item, setTargets, target: { ...item.target, weight: setTargets[0].weight, note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }) } };
 }
 
 /** Hard sets per muscle in a typical week of the program (secondary muscles count half), for the picker. */

@@ -1,3 +1,4 @@
+import { setVolume } from "./sides";
 import { dedupe } from "./derive";
 import type { AppEvent, SetEvent } from "./types";
 
@@ -51,7 +52,7 @@ function progressOf(def: SeasonalDef, events: readonly AppEvent[], start: number
     case "sets":
       return sets.length;
     case "kg":
-      return Math.round(sets.reduce((v, s) => v + s.weight * s.reps, 0));
+      return Math.round(sets.reduce((v, s) => v + setVolume(s), 0));
     case "days":
       return new Set(sets.map((s) => new Date(s.at).toDateString())).size;
     case "workouts":
