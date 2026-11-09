@@ -590,4 +590,25 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
-export type AppEvent = BodyweightEvent | HealthEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
+// Every event kind, one per line so two changes adding an event don't touch the same line.
+export type AppEvent =
+  | BodyweightEvent
+  | HealthEvent
+  | TdeeEvent
+  | CheckinEvent
+  | SetEvent
+  | SessionStartEvent
+  | SessionEndEvent
+  | FeedbackEvent
+  | SwapEvent
+  | HrSeriesEvent
+  | CycleEvent
+  | WarmupEvent
+  | NoteEvent
+  | EffortEvent
+  | CustomExerciseEvent
+  | InjuryEvent
+  | InjuryRuleEvent
+  | InjuryHealedEvent
+  | PainEvent
+  | InjuryReturnEvent;
