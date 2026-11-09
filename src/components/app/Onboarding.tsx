@@ -1,4 +1,5 @@
 "use client";
+import { Mascot } from "./Mascot";
 import { Info } from "@/components/Info";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
@@ -139,8 +140,13 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       <div key={step} className="animate-rise flex-1 py-8">
         {step === 0 && (
           <>
-            <p className="text-gradient text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
-            <h1 className="mt-1 text-3xl font-extrabold tracking-tight">What are you training for?</h1>
+            <div className="flex items-center gap-3">
+              <Mascot mood="happy" size={64} className="animate-spring-in shrink-0" />
+              <div>
+                <p className="text-gradient text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
+                <h1 className="mt-1 text-3xl font-extrabold tracking-tight">What are you training for?</h1>
+              </div>
+            </div>
             <div className="mt-6 space-y-3">{GOALS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />)}</div>
             <h2 className="mt-8 text-lg font-semibold">How long have you been lifting?</h2>
             <div className="mt-3 space-y-3">{LEVELS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={exp === g.id} onClick={() => setExp(g.id)} />)}</div>

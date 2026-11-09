@@ -1,7 +1,6 @@
 "use client";
 import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { forecast, testDay, type LiftGoal } from "@/lib/goals";
-import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "@/lib/plateau";
 import { can } from "@/lib/entitlements";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
@@ -9,7 +8,8 @@ import { useNow } from "@/lib/useNow";
 import { useState } from "react";
 import { Button, Section, Sheet } from "./ui";
 
-// Coaching cards on the Progress screen: lift goals with an honest forecast, and the plateau detective.
+// Coaching cards on the Progress screen: lift goals with an honest forecast. The plateau detective's
+// stalls and fixes show as coach's notes (insights.ts).
 
 const uid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
@@ -110,64 +110,5 @@ function AddGoal({ open, onClose, onAdd }: { open: boolean; onClose: () => void;
         </div>
       )}
     </Sheet>
-  );
-}
-
-export function PlateausCard() {
-  const { profile, events, fixPlateau } = useApp();
-  const [open, setOpen] = useState<Plateau | null>(null);
-  const now = useNow();
-  const unit = profile.unit;
-  const fixes = profile.plateauFixes ?? [];
-  const live = activeFixes(fixes, now);
-  const finished = fixes.filter((f) => f.until <= now && now - f.until < 21 * 86400_000);
-  const stalls = findPlateaus(events, profile, now, fixes);
-  if (!can("plateauDetective")) return null;
-  if (!stalls.length && !live.length && !finished.length) return null;
-  const w = (kg: number) => `${fmtNum(Math.round(fromKg(kg, unit) * 2) / 2)} ${unit}`;
-  return (
-    <Section title="Plateau detective">
-      <ul className="space-y-3">
-        {stalls.map((p) => (
-          <li key={p.exerciseId} className="card p-4">
-            <p className="font-semibold">{exercise(p.exerciseId).name} has stalled for {p.weeks} weeks</p>
-            <p className="text-sm text-muted">Best estimated max {w(p.best)}. {p.causes[0].text}</p>
-            <Button kind="ghost" className="mt-3 w-full" onClick={() => setOpen(p)}>See the fix</Button>
-          </li>
-        ))}
-        {live.map((f) => (
-          <li key={f.exerciseId} className="card p-4">
-            <p className="font-semibold">{exercise(f.exerciseId).name}: {FIX_TEXT[f.kind].title.toLowerCase()}</p>
-            <p className="text-sm text-muted">Running until {new Date(f.until).toLocaleDateString("en", { day: "numeric", month: "short" })}. Your plan already includes it.</p>
-          </li>
-        ))}
-        {finished.map((f) => {
-          const r = fixResult(f, events);
-          return (
-            <li key={f.exerciseId + f.startedAt} className="card p-4">
-              <p className="font-semibold">{exercise(f.exerciseId).name}: fix finished</p>
-              <p className="text-sm text-muted">{!r ? "No sessions during the fix, so there's nothing to compare yet." : r.worked ? `It worked: your estimated max is up ${Math.round(r.gain * 1000) / 10}%.` : "No new best yet. If it's still stuck in a week or two, the detective will suggest a different fix."}</p>
-            </li>
-          );
-        })}
-      </ul>
-      <Sheet open={!!open} onClose={() => setOpen(null)} title={open ? `Why ${exercise(open.exerciseId).name} is stuck` : ""}>
-        {open && (
-          <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">What we found</h3>
-            <ul className="mt-2 space-y-2 text-sm">{open.causes.map((c) => <li key={c.kind}>{c.text}</li>)}</ul>
-            <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">Three-week fix</h3>
-            <div className="mt-2 space-y-2">
-              {[...new Set<FixKind>([open.fix, ...open.causes.map((c) => c.fix), "variation"])].slice(0, 3).map((k, i) => (
-                <button key={k} type="button" onClick={() => { fixPlateau(open, k); setOpen(null); }} className={`press w-full rounded-2xl border p-3 text-left ${i === 0 ? "border-accent bg-accent/10" : "border-line bg-raised"}`}>
-                  <span className="block font-semibold">{FIX_TEXT[k].title}{i === 0 ? " (suggested)" : ""}</span>
-                  <span className="text-sm text-muted">{FIX_TEXT[k].what}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-      </Sheet>
-    </Section>
   );
 }

@@ -5,6 +5,7 @@ import { haptic, sound } from "@/lib/juice";
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
+import { Mascot, type Mood } from "./Mascot";
 import { parseNum, t } from "@/lib/i18n";
 
 export function Button({ children, onClick, kind = "primary", className = "", disabled, label, icon }: { children: ReactNode; onClick?: () => void; kind?: "primary" | "ghost" | "quiet" | "danger"; className?: string; disabled?: boolean; label?: string; icon?: IconName }) {
@@ -247,12 +248,16 @@ export function Ring({ value, size = 220, stroke = 12, colour, from = "var(--gra
 }
 
 /** A friendly empty state: an icon in a soft tinted disc, a title, a line of help and an optional action. */
-export function EmptyState({ icon, title, body, action, tint = "var(--color-accent)" }: { icon: IconName; title: string; body?: ReactNode; action?: ReactNode; tint?: string }) {
+export function EmptyState({ icon, title, body, action, tint = "var(--color-accent)", mascot }: { icon: IconName; title: string; body?: ReactNode; action?: ReactNode; tint?: string; mascot?: Mood }) {
   return (
     <div className="flex flex-col items-center px-6 py-8 text-center">
-      <div className="grid h-14 w-14 place-items-center rounded-2xl" style={{ background: `color-mix(in srgb, ${tint} 16%, transparent)`, color: tint, boxShadow: `0 0 0 1px color-mix(in srgb, ${tint} 30%, transparent), 0 10px 30px -12px ${tint}` }}>
-        <Icon name={icon} size={26} />
-      </div>
+      {mascot ? (
+        <Mascot mood={mascot} size={88} className="animate-spring-in" />
+      ) : (
+        <div className="animate-spring-in grid h-14 w-14 place-items-center rounded-2xl" style={{ background: `color-mix(in srgb, ${tint} 16%, transparent)`, color: tint, boxShadow: `0 0 0 1px color-mix(in srgb, ${tint} 30%, transparent), 0 10px 30px -12px ${tint}` }}>
+          <Icon name={icon} size={26} />
+        </div>
+      )}
       <p className="mt-3 font-semibold">{title}</p>
       {body && <p className="mt-1 max-w-[30ch] text-sm text-muted">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
@@ -299,6 +304,84 @@ export function LinkToggle({ on, first, second, onToggle }: { on: boolean; first
     >
       <Icon name="link" size={18} />
     </button>
+  );
+}
+
+/**
+ * An on/off switch (juice pass, 2026-11-09). The knob springs across with a little overshoot and
+ * stretches while pressed; turning it gives a medium haptic and a soft two-note sound. Preferred over
+ * On/Off chips: one tap, one thumb, no reading.
+ */
+export function Switch({ on, onChange, label, labelledBy, describedBy }: { on: boolean; onChange: (v: boolean) => void; label?: string; labelledBy?: string; describedBy?: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={labelledBy ? undefined : label}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
+      onClick={() => {
+        onChange(!on);
+        haptic("toggle");
+        sound.toggle(!on);
+      }}
+      className={`group relative h-8 w-14 shrink-0 rounded-full border transition-colors duration-200 ${on ? "border-transparent" : "border-line bg-raised"}`}
+      style={on ? { background: "linear-gradient(135deg, var(--grad-a), var(--grad-c))" } : undefined}
+    >
+      <span
+        aria-hidden
+        className="absolute left-[3px] top-[3px] h-6 w-6 rounded-full bg-white shadow-[0_2px_6px_rgb(0_0_0/0.35)] transition-[transform,width] duration-[460ms] ease-[var(--ease-bounce)] group-active:w-7"
+        style={{ transform: on ? "translateX(24px)" : "translateX(0)" }}
+      />
+    </button>
+  );
+}
+
+/** A settings row: a label, an optional line of help and a switch on the right. */
+export function SwitchRow({ label, hint, on, onChange, info }: { label: string; hint?: ReactNode; on: boolean; onChange: (v: boolean) => void; info?: Term }) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className="card mt-3 flex items-center justify-between gap-4 px-4 py-3">
+      <div className="min-w-0">
+        <p id={`${id}-l`} className="flex items-center gap-1.5 font-medium">{label}{info && <Info term={info} />}</p>
+        {hint && <p id={`${id}-d`} className="mt-0.5 text-xs text-muted">{hint}</p>}
+      </div>
+      <Switch on={on} onChange={onChange} labelledBy={`${id}-l`} describedBy={hint ? `${id}-d` : undefined} />
+    </div>
+  );
+}
+
+/** A placeholder line or block that shimmers while content loads. */
+export function Skeleton({ className = "" }: { className?: string }) {
+  return <div className={`skeleton rounded-xl ${className}`} aria-hidden />;
+}
+
+/** The app's loading screen, shaped like Today so the real screen lands where the eye already is. */
+export function TodaySkeleton() {
+  return (
+    <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label="Loading">
+      <div className="flex items-center justify-between pt-3">
+        <Skeleton className="h-4 w-36" />
+        <div className="flex gap-2"><Skeleton className="h-8 w-14 rounded-full" /><Skeleton className="h-8 w-8 rounded-full" /></div>
+      </div>
+      <Skeleton className="mt-3 h-8 w-56" />
+      <div className="mt-4 flex gap-2"><Skeleton className="h-9 w-24 rounded-full" /><Skeleton className="h-9 w-20 rounded-full" /></div>
+      <Skeleton className="mt-4 h-20 w-full rounded-[20px]" />
+      <div className="card mt-4 flex items-center gap-4 p-4">
+        <Skeleton className="h-16 w-16 rounded-full" />
+        <div className="flex-1 space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-40" /></div>
+      </div>
+      <Skeleton className="mt-7 h-3 w-28" />
+      <div className="card mt-3 divide-y divide-line">
+        {[0, 1, 2, 3].map((i) => (
+          <div key={i} className="flex items-center gap-3 px-4 py-3.5">
+            <Skeleton className="h-9 w-9" />
+            <div className="flex-1 space-y-2"><Skeleton className="h-4 w-2/3" /><Skeleton className="h-3 w-1/3" /></div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

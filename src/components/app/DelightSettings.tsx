@@ -10,18 +10,11 @@ import type { DelightPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { say, voiceSupported } from "@/lib/voice";
 import { useState } from "react";
-import { Chip, Section } from "./ui";
+import { Icon } from "./icons";
+import { Chip, Section, SwitchRow } from "./ui";
 
 function Toggle({ label, on, set, hint }: { label: string; on: boolean; set: (v: boolean) => void; hint?: string }) {
-  return (
-    <Section title={label}>
-      <div className="flex flex-wrap gap-2">
-        <Chip active={on} onClick={() => set(true)}>On</Chip>
-        <Chip active={!on} onClick={() => set(false)}>Off</Chip>
-      </div>
-      {hint && <p className="mt-2 text-xs text-faint">{hint}</p>}
-    </Section>
-  );
+  return <SwitchRow label={label} hint={hint} on={on} onChange={set} />;
 }
 
 export function DelightSettings() {
@@ -56,7 +49,7 @@ export function DelightSettings() {
                 <button type="button" disabled={!open} aria-pressed={on} onClick={() => { haptic("tick"); put({ theme: t.id, seenThemes: [...new Set([...(d.seenThemes ?? []), t.id])] }); }} className={`press flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${on ? "border-accent" : "border-line"} ${open ? "" : "opacity-60"}`} style={{ background: t.palette.surface }}>
                   <span className="h-9 w-9 shrink-0 rounded-full border-4" style={{ background: t.palette.bg, borderColor: t.palette.accent }} aria-hidden />
                   <span className="min-w-0">
-                    <span className="block font-semibold" style={{ color: "#e8edf3" }}>{open ? t.name : `🔒 ${t.name}`}</span>
+                    <span className="block font-semibold" style={{ color: "#e8edf3" }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{t.name}</span>
                     <span className="block text-xs" style={{ color: "#a3afbf" }}>{t.how}</span>
                   </span>
                 </button>
@@ -76,7 +69,7 @@ export function DelightSettings() {
                   const ok = await setAppIcon(id);
                   if (ok) put({ icon: id });
                   setIconNote(ok ? "Done. On Android the home screen updates once you leave the app." : "Couldn't change the icon on this phone.");
-                }}>{open ? "" : "🔒 "}{id === "default" ? "Classic" : theme.name}</Chip>
+                }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{id === "default" ? "Classic" : theme.name}</Chip>
               );
             })}
           </div>

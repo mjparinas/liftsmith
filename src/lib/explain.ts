@@ -3,6 +3,7 @@ import { barFor } from "./loads";
 import { smallestJump } from "./plates";
 import { repRange, sessionsOf, TIMED } from "./progression";
 import type { Call } from "./readiness";
+import type { ItemWhy } from "./why";
 import type { AppEvent, Exercise, Gym, Profile } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -41,9 +42,11 @@ export interface ExplainInput {
   readiness?: number;
   /** Leave out sets from this session (the workout in progress). */
   sessionId?: string;
+  /** why.ts's reasons for this plan item, so the sheet also says why this exercise and this many sets. */
+  item?: ItemWhy;
 }
 
-export function explain({ ex, target, events, profile, gym, now, call = "normal", readiness, sessionId }: ExplainInput): Why {
+export function explain({ ex, target, events, profile, gym, now, call = "normal", readiness, sessionId, item }: ExplainInput): Why {
   const unit = gym.unit;
   const w = (kg: number) => `${fmtNum(fromKg(kg, unit))} ${unit}`;
   const timed = TIMED.has(ex.id);
@@ -80,6 +83,10 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
     else if (hitAll) lines.push(`You hit every set, so it's one more ${timed ? "step" : "rep"} this time.`);
     else lines.push(`Not every set reached ${tgt}, so it stays the same until they all do.`);
   }
+
+  // Why this exercise and this set count come from why.ts, the same words Today's plan shows.
+  if (item?.pick) lines.unshift(`Picked today: ${item.pick}.`);
+  if (item?.sets && !wk.deload && call !== "recover") lines.push(`${item.sets.charAt(0).toUpperCase()}${item.sets.slice(1)}.`);
 
   if (!wk.deload) lines.push(`${wk.label} of this block: leave about ${target.rir} ${target.rir === 1 ? "rep" : "reps"} in reserve. The reserve shrinks each week, then a deload resets it.`);
 

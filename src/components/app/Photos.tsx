@@ -3,7 +3,7 @@
 // like everything else); photos never leave this phone (photos.ts). Compare the first and latest photo of
 // a pose with a side-by-side slider. Plain <img> on purpose: photos are local blob URLs, not optimisable.
 /* eslint-disable @next/next/no-img-element */
-import { haptic } from "@/lib/juice";
+import { haptic, oops } from "@/lib/juice";
 import { deletePhoto, listPhotos, pairFor, preparePhoto, savePhoto, type Photo, type Pose } from "@/lib/photos";
 import { useApp } from "@/lib/store";
 import type { BodyweightEvent } from "@/lib/types";
@@ -47,6 +47,7 @@ export function Photos() {
       haptic("success");
       reload();
     } catch {
+      oops();
       setError("That photo couldn't be read. Try another.");
     } finally {
       setBusy(false);

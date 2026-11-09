@@ -39,27 +39,39 @@ export const juice = {
   },
 };
 
-export type HapticKind = "select" | "tick" | "tap" | "thud" | "success" | "warning" | "celebrate";
+/**
+ * The haptic vocabulary (juice pass, 2026-11-09): `select` a light tick for sliders, steppers, chips
+ * and pickers; `tick` a light tap for buttons; `toggle` a medium thud for switches; `tap` medium for
+ * Log set; `thud` heavy; `double` a crisp double tap; `success`, `warning` and `error` notifications;
+ * `celebrate` a double tap then a success buzz for PRs, level-ups and achievements.
+ */
+export type HapticKind = "select" | "tick" | "toggle" | "tap" | "thud" | "double" | "success" | "warning" | "error" | "celebrate";
 
 /** `force` buzzes even with Vibration off: the rest-over alert has its own setting (training.ts restAlertOf). */
 export function haptic(kind: HapticKind, force = false) {
   if (!feel.haptics && !force) return;
   if (kind === "celebrate") {
-    // A heavy thump then a success buzz, for PRs, level-ups and badges.
-    haptic("thud", force);
-    setTimeout(() => haptic("success", force), 180);
+    // A crisp double tap then a success buzz, for PRs, level-ups and badges.
+    haptic("double", force);
+    setTimeout(() => haptic("success", force), 220);
+    return;
+  }
+  if (kind === "double" && isNative()) {
+    haptic("tap", force);
+    setTimeout(() => haptic("tap", force), 90);
     return;
   }
   const h = cap()?.Plugins?.Haptics;
   if (h && isNative()) {
     if (kind === "success") void h.notification?.({ type: "SUCCESS" });
     else if (kind === "warning") void h.notification?.({ type: "WARNING" });
+    else if (kind === "error") void h.notification?.({ type: "ERROR" });
     else if (kind === "select") void (h.selectionChanged?.() ?? h.impact?.({ style: "LIGHT" }));
-    else void h.impact?.({ style: kind === "tick" ? "LIGHT" : kind === "tap" ? "MEDIUM" : "HEAVY" });
+    else void h.impact?.({ style: kind === "tick" ? "LIGHT" : kind === "tap" || kind === "toggle" ? "MEDIUM" : "HEAVY" });
     return;
   }
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    const p = { select: 5, tick: 8, tap: 18, thud: [40, 60, 40], success: [20, 40, 20, 40, 60], warning: [30, 50, 30] }[kind];
+    const p = { select: 5, tick: 8, toggle: 14, tap: 18, thud: [40, 60, 40], double: [22, 70, 22], success: [20, 40, 20, 40, 60], warning: [30, 50, 30], error: [40, 40, 40, 40, 40] }[kind];
     try {
       navigator.vibrate(p);
     } catch {}
@@ -134,6 +146,22 @@ export const sound = {
   /** Stepper and chip changes: barely there. */
   tick() {
     if (feel.sound) mallet(NOTE.E6, 0, 0.05, 0.18);
+  },
+  /** A switch turned on (a rising pair) or off (falling), quieter than a log. */
+  toggle(on: boolean) {
+    if (feel.sound) phrase(on ? [[NOTE.Cs6, 0, 0.06, 0.25], [NOTE.E6, 0.04, 0.09, 0.25]] : [[NOTE.E6, 0, 0.06, 0.2], [NOTE.Cs6, 0.04, 0.09, 0.2]]);
+  },
+  /** A small pop: a sheet opening, a card flipping, a crate lid. */
+  pop() {
+    if (feel.sound) mallet(NOTE.A5, 0, 0.07, 0.3);
+  },
+  /** Something didn't work (a failed send, a value out of range): low and soft, never harsh. */
+  error() {
+    if (feel.sound) phrase([[NOTE.B4, 0, 0.12, 0.4], [NOTE.Fs4, 0.09, 0.22, 0.4]]);
+  },
+  /** A goal or quest ticked off: a bright three-note run. */
+  done() {
+    if (feel.sound) phrase([[NOTE.E5, 0, 0.1, 0.4], [NOTE.A5, 0.05, 0.1, 0.45], [NOTE.E6, 0.1, 0.22, 0.5]]);
   },
   /** A set logged: a quick rising pair. */
   log() {
@@ -230,4 +258,10 @@ export function applyAccent(hex: string | undefined, light = false) {
   if (typeof document === "undefined") return;
   if (hex) document.documentElement.style.setProperty("--color-accent", light ? `color-mix(in srgb, ${hex} 70%, #000)` : hex);
   else document.documentElement.style.removeProperty("--color-accent");
+}
+
+/** Something went wrong: an error buzz and the soft error sound, together, so failures feel the same everywhere. */
+export function oops() {
+  haptic("error");
+  sound.error();
 }
