@@ -50,7 +50,9 @@ function run(id: ProgramId, sessions: number, opts: { gym?: Gym; reps?: Paramete
     plans.push(plan);
     events = play(events, plan, at, opts.reps, opts.weight);
   }
-  const next = programPlan({ src, profile: prof, gym, events, now: NOW })!;
+  // The next session two days after the last, like the ones before: a long gap would be a break
+  // (layoff.ts) and start it lighter, which has its own test.
+  const next = programPlan({ src, profile: prof, gym, events, now: NOW - 60 * D + (sessions + 1) * 2 * D })!;
   return { src, plans, next, events };
 }
 

@@ -16,6 +16,7 @@ import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
+import { implementsFor, perSide } from "@/lib/sides";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { can } from "@/lib/entitlements";
 import { useApp, warmingUp } from "@/lib/store";
@@ -213,12 +214,18 @@ export function Workout() {
   const counting = canCount && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
+  // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
+  // "Sides differ" adds a stepper for the right side.
+  const sidesSplit = !!ex && !!active && perSide(ex.id) && active.repsR !== undefined;
   const docked = hand !== "off";
   const weightStep = ex && gym && active
-    ? { label: t("workout.weight"), suffix: ex.load === "dumbbell" ? t("workout.each", { unit }) : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
+    ? { label: t("workout.weight"), suffix: ex.load === "dumbbell" && implementsFor(ex) === 2 ? t("workout.each", { unit }) : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
     : null;
   const repStep = ex && active
-    ? { label: t("workout.reps"), suffix: TIMED.has(ex.id) ? t("workout.seconds") : t("workout.reps"), value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    ? { label: sidesSplit ? t("workout.left") : t("workout.reps"), suffix: TIMED.has(ex.id) ? t("workout.seconds") : sidesSplit ? t("workout.leftReps") : perSide(ex.id) ? t("workout.repsEachSide") : t("workout.reps"), value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    : null;
+  const rightStep = ex && active && sidesSplit
+    ? { label: t("workout.right"), suffix: t("workout.rightReps"), value: String(active.repsR), onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)), onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1) }
     : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
@@ -286,7 +293,6 @@ export function Workout() {
               </div>
               <div className="flex shrink-0 gap-2">
                 {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("coach.changePlan")}><Icon name="clock" size={20} /></button>}
-                <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.howToLabel")}><Icon name="info" size={20} /></button>
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.swap")}><Icon name="swap" size={20} /></button>
               </div>
             </div>
@@ -320,8 +326,11 @@ export function Workout() {
             </div>
           ) : (
           <div className="relative mt-4 h-52">
-            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
-            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} className="h-full" />
+            {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}
+            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute inset-0 rounded-2xl">
+              <span className="absolute bottom-2 right-2 inline-flex min-h-11 items-center rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</span>
+            </button>
             {canCount && <AutoCountButton on={false} onToggle={() => changeCount({ ...countPrefs, on: true })} className="absolute bottom-2 left-2" />}
           </div>
           )}
@@ -361,9 +370,13 @@ export function Workout() {
                 {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
                 {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
                   // This gym's plates are in the other unit: show the weight in the lifter's unit too.
-                  <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" ? " each" : ""}</p>
+                  <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" && implementsFor(ex) === 2 ? " each" : ""}</p>
                 )}
                 {repStep && <Stepper display={docked} {...repStep} />}
+                {rightStep && <Stepper display={docked} {...rightStep} />}
+                {!warming && perSide(ex.id) && !TIMED.has(ex.id) && (
+                  <button type="button" onClick={() => { haptic("tick"); s.adjustRight(sidesSplit ? undefined : active.reps); }} className="press -mt-2 min-h-11 px-3 text-sm font-semibold text-accent">{sidesSplit ? t("workout.sidesSame") : t("workout.sidesDiffer")}</button>
+                )}
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
@@ -428,6 +441,7 @@ export function Workout() {
                 <div className="card flex min-w-0 flex-1 flex-col justify-center gap-2 px-2 py-2" role="group" aria-label={t("workout.adjust")}>
                   {ex?.load !== "bodyweight" && weightStep && <Stepper compact {...weightStep} />}
                   <Stepper compact {...repStep} />
+                  {rightStep && <Stepper compact {...rightStep} />}
                 </div>
               )}
               <div ref={logRef} className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>

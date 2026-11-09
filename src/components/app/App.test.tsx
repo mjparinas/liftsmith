@@ -26,8 +26,7 @@ async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commerci
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: gym }));
-  await user.click(screen.getByRole("button", { name: "Continue" }));
-  await user.click(screen.getByRole("button", { name: "Continue" }));
+  for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByText("Today's workout");
 }
@@ -53,7 +52,7 @@ describe("Pro trial offer", () => {
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-    for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
     await screen.findByText("Today's workout");
     expect(screen.queryByText(/Start free trial/)).not.toBeInTheDocument();
@@ -70,7 +69,7 @@ describe("Pro trial offer", () => {
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    for (let i = 0; i < 4; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await screen.findByText("Try Pro free for 14 days");
     const plans = screen.getAllByRole("button", { name: /free trial/ });
     expect(plans[0].textContent).toMatch(/Yearly/);
@@ -113,7 +112,10 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().events.filter((e) => e.type === "warmup")).toHaveLength(warmups.length);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
-    // every exercise shows its demo, and tapping it opens the how-to with full demo controls
+    // every exercise shows its demo, and tapping it opens the how-to with full demo controls.
+    // One control, one destination: the demo card is the only way in (no info icon beside it).
+    expect(screen.getAllByRole("button", { name: /how to/i })).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: /how to do it/i })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "How to ›" }));
     expect(await screen.findByRole("button", { name: "Skeleton" })).toBeInTheDocument();
     await user.click(screen.getByRole("dialog").parentElement!); // tap outside the sheet
@@ -356,7 +358,7 @@ describe("first run to finished workout", () => {
     await user.click(await screen.findByRole("button", { name: "Run setup again" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: /Get stronger/ }));
-    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    for (let i = 0; i < 4; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(useApp.getState().profile.goal).toBe("strength");
     expect(useApp.getState().gyms).toHaveLength(1);
@@ -386,7 +388,7 @@ describe("first run to finished workout", () => {
     await user.type(screen.getByLabelText("What should we call you?"), "Melvin Parinas");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-    for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
     await screen.findByText("Today's workout");
     expect(useApp.getState().profile.name).toBe("Melvin Parinas");
@@ -544,5 +546,38 @@ describe("game layer", () => {
     expect(useApp.getState().profile.lean).toBe(true);
     const { juice } = await import("@/lib/juice");
     expect(juice.lean).toBe(true);
+  });
+});
+
+describe("saving your progress (no accounts yet)", () => {
+  it("says where the data is saved before setup ends", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("What are you training for?");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    expect(await screen.findByText("Save your progress")).toBeInTheDocument();
+    expect(screen.getByText(/saved in this browser as you go/)).toBeInTheDocument();
+    expect(screen.getByText(/Add to Home Screen|Install app/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await screen.findByText("Today's workout");
+  });
+
+  it("restores a backup file from Settings", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const { backupJson } = await import("@/lib/exportData");
+    const s = useApp.getState();
+    const file = backupJson({ ...s.profile, name: "Restored" }, s.gyms, [{ type: "bodyweight", id: "bw-old", at: Date.now() - 86_400_000, kg: 81 } as never]);
+    Element.prototype.scrollIntoView ??= () => {};
+    location.hash = "#/settings/saving";
+    await screen.findByText("Saving and backup");
+    await user.upload(screen.getByLabelText("Backup file to restore"), new File([file], "backup.json", { type: "application/json" }));
+    expect(await screen.findByText("Backup restored.")).toBeInTheDocument();
+    expect(useApp.getState().profile.name).toBe("Restored");
+    expect(useApp.getState().events.some((e) => e.id === "bw-old")).toBe(true);
+    await user.upload(screen.getByLabelText("Backup file to restore"), new File(["{}"], "x.json", { type: "application/json" }));
+    expect(await screen.findByText("That file isn't a Liftsmith backup.")).toBeInTheDocument();
   });
 });
