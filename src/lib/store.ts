@@ -105,6 +105,10 @@ interface State {
   logInjury(part: BodyPart): string;
   setInjuryRule(injuryId: string, rule: Pick<InjuryRuleEvent, "exerciseId" | "action" | "pct" | "ack">): void;
   healInjury(injuryId: string): void;
+  /** A 0–10 pain rating, optionally tied to this workout and exercise. */
+  ratePain(injuryId: string, score: number, ctx?: { sessionId?: string; exerciseId?: string }): void;
+  /** Start a graded return (the lifter accepted the risks). */
+  startReturn(injuryId: string): void;
   autoEnd(now?: number): boolean;
   init(): Promise<void>;
   setProfile(p: Partial<Profile>): void;
@@ -293,6 +297,16 @@ export const useApp = create<State>((set, get) => {
 
     setInjuryRule(injuryId, rule) {
       commit([{ type: "injuryRule", id: uid(), at: Date.now(), injuryId, ...rule }]);
+      afterInjuryChange();
+    },
+
+    ratePain(injuryId, score, ctx = {}) {
+      commit([{ type: "pain", id: uid(), at: Date.now(), injuryId, score, ...ctx }]);
+      afterInjuryChange();
+    },
+
+    startReturn(injuryId) {
+      commit([{ type: "injuryReturn", id: uid(), at: Date.now(), injuryId, ack: true }]);
       afterInjuryChange();
     },
 

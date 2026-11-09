@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { defaultProfile, makeGym } from "./defaults";
 import { EXERCISES, exercise } from "./exercises";
 import { alternatives, generate } from "./generator";
-import { activeInjuries, affects, effectFor, injuries, lighten } from "./injury";
+import { activeInjuries, affects, effectFor, gradedReturn, injuries, lighten, painTrend, returnReady } from "./injury";
 import { roundLoad } from "./loads";
 import { target } from "./progression";
 import type { AppEvent, BodyPart, InjuryRuleEvent, SetEvent } from "./types";
@@ -152,5 +152,48 @@ describe("programs and routines with an injury", () => {
     expect(lit.injuryPct).toBe(60);
     expect(lit.target.weight).toBeLessThanOrEqual(bench.target.weight * 0.6 + 1e-6);
     for (const [k, x] of (lit.setTargets ?? []).entries()) expect(x.weight).toBeLessThanOrEqual((bench.setTargets?.[k].weight ?? bench.target.weight) * 0.6 + 1e-6);
+  });
+});
+
+describe("pain ratings and the graded return", () => {
+  const D = 24 * H;
+  const pain = (injuryId: string, score: number, at: number): AppEvent => ({ type: "pain", id: `e${n++}`, at, injuryId, score });
+  const ret = (injuryId: string, at: number): AppEvent => ({ type: "injuryReturn", id: `e${n++}`, at, injuryId, ack: true });
+  const T0 = NOW - 40 * D;
+
+  it("keeps ratings in order and shows the trend", () => {
+    const [k] = activeInjuries([hurt("knee", "k", T0), pain("k", 7, T0 + D), pain("k", 4, T0 + 3 * D), pain("k", 2, T0 + 6 * D)], NOW);
+    expect(k.pain.map((p) => p.score)).toEqual([7, 4, 2]);
+    expect(painTrend(k)).toMatchObject({ latest: 2, change: -5 });
+  });
+
+  it("offers a return only after about a week of pain at 2 or below, with a recent rating", () => {
+    const base = [hurt("knee", "k", T0), pain("k", 6, NOW - 12 * D)];
+    const ready = (evs: AppEvent[]) => returnReady(activeInjuries(evs, NOW)[0], NOW);
+    expect(ready([...base, pain("k", 2, NOW - 3 * D), pain("k", 1, NOW - D)])).toBe(false); // only 3 days low
+    expect(ready([...base, pain("k", 2, NOW - 7 * D), pain("k", 1, NOW - D)])).toBe(true);
+    expect(ready([...base, pain("k", 2, NOW - 7 * D), pain("k", 3, NOW - D)])).toBe(false); // latest not low
+    expect(ready([...base, pain("k", 2, NOW - 12 * D), pain("k", 1, NOW - 6 * D)])).toBe(false); // stale
+  });
+
+  it("steps 50 → 70 → 90% a week at a time on low pain, holds on 3–4, stops on 5+", () => {
+    const s = NOW - 22 * D;
+    const g = (ps: [number, number][], now = NOW) => gradedReturn(s, ps.map(([d, score]) => ({ at: s + d * D, score })), now);
+    expect(gradedReturn(s, [], s + D)).toMatchObject({ pct: 50, stage: 0 });
+    expect(g([[2, 1], [9, 1], [16, 2]], s + 17 * D)).toMatchObject({ pct: 90, stage: 2, readyToHeal: false });
+    expect(g([[2, 1], [9, 1], [16, 2]], s + 22 * D)).toMatchObject({ pct: 90, readyToHeal: true });
+    expect(g([[2, 1], [5, 3]], s + 10 * D)).toMatchObject({ pct: 50 }); // a 3 restarts the week
+    expect(g([[2, 1], [5, 3], [8, 1]], s + 13 * D)).toMatchObject({ pct: 70 });
+    expect(g([[2, 1], [9, 6]], s + 10 * D).stopped).toEqual({ at: s + 9 * D, score: 6 });
+    expect(g([[1, 2]], s + 30 * D)).toMatchObject({ pct: 70 }); // no new rating, no further step
+  });
+
+  it("brings skipped exercises back at the return's share, and skips them again if it stops", () => {
+    const evs = [hurt("knee", "k", T0), pain("k", 1, NOW - 8 * D), ret("k", NOW - 2 * D)];
+    expect(effectFor(exercise("back-squat"), activeInjuries(evs, NOW))).toMatchObject({ action: "light", pct: 50 });
+    const sq = plan(evs).items.filter((i) => affects("knee", exercise(i.exerciseId)));
+    expect(sq.length).toBeGreaterThan(0);
+    for (const it of sq) expect(it.injuryPct).toBe(50);
+    expect(effectFor(exercise("back-squat"), activeInjuries([...evs, pain("k", 5, NOW - D)], NOW))?.action).toBe("skip");
   });
 });

@@ -355,6 +355,12 @@ describe("injury mode", () => {
     expect(await screen.findByText(/isn't medical advice/)).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Log an injury" }));
     await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Knee" }));
+    // Then a 0–10 pain rating, which starts the trend.
+    await user.click(within(screen.getByRole("dialog", { name: "How bad is it right now?" })).getByRole("button", { name: "6" }));
+    expect(useApp.getState().events.find((e) => e.type === "pain")).toMatchObject({ score: 6 });
+    expect(screen.getByRole("img", { name: /Knee pain, oldest to newest: 6/ })).toBeInTheDocument();
+    await user.selectOptions(screen.getByRole("combobox", { name: "How does it feel today?" }), "4");
+    expect(useApp.getState().events.filter((e) => e.type === "pain").map((e) => e.type === "pain" && e.score)).toEqual([6, 4]);
     expect(kneeIn(useApp.getState().preview!.items.map((i) => i.exerciseId))).toEqual([]);
 
     // Choosing to train one lighter needs the risk warning ticked first.

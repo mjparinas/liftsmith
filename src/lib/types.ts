@@ -493,4 +493,21 @@ export interface InjuryHealedEvent extends EventBase {
   injuryId: string;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;
+/** A 0–10 pain rating for an injury: when it's logged, between sets, after a workout, or any day. */
+export interface PainEvent extends EventBase {
+  type: "pain";
+  injuryId: string;
+  /** 0 no pain, 10 the worst imaginable. */
+  score: number;
+  sessionId?: string;
+  exerciseId?: string;
+}
+
+/** The lifter chose a graded return (after reading the risks): skipped exercises come back lighter, step by step. */
+export interface InjuryReturnEvent extends EventBase {
+  type: "injuryReturn";
+  injuryId: string;
+  ack: true;
+}
+
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;

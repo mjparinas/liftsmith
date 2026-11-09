@@ -155,7 +155,7 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
-  const hurt = activeInjuries(events);
+  const hurt = activeInjuries(events, now);
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
   const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
   const random = rng(hash(dayKey(now) + gym.id));
@@ -252,7 +252,7 @@ export function injuredTarget(ex: Exercise, t: Target, hurt: readonly Injury[], 
  * or dropped; lighter ones are scaled, set by set. The adaptive plan does this as it picks.
  */
 export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Plan {
-  const hurt = activeInjuries(events);
+  const hurt = activeInjuries(events, now);
   if (!hurt.length) return plan;
   const items: PlanItem[] = [];
   for (const item of plan.items) {
