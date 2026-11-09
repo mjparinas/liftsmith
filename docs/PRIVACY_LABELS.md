@@ -15,6 +15,8 @@ Last reviewed: 2026-11-09 (usage analytics and the admin panel added).
 | Paywall views, trial starts, purchases with plan and price | Yes, with usage stats | Analytics | No |
 | Country and region (from the IP address on arrival; the address isn't stored) | Yes | Analytics | No |
 | Feedback message, optional email, optional screenshot, optional device details | Only when the user sends feedback | App functionality (support) | Email is given by the user |
+| Reminder email address, which reminder kinds are on, consent time | Only when the user turns on email reminders (double opt-in) | App functionality, developer communications (offers only if the user turns them on) | Yes, by the email address |
+| Training days and time, time zone, days a week, setup time, first and last workout times, days trained this week, streak, Pro state | Only with email reminders | App functionality (deciding when to send a reminder) | Yes, by the email address. No weights, reps or heart rate |
 | Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data, location | **No** (stays on the device) | | |
 | Advertising id (IDFA, Android advertising id) | **Never** (`AD_ID` permission removed in the manifest; no ATT prompt) | | |
 
@@ -36,9 +38,10 @@ Collected data types:
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
 | Device or other IDs › Device or other IDs | Yes (random install id) | No | No | Optional | Analytics |
-| Personal info › Email address | Yes (only if given with feedback) | No | No | Optional | App functionality |
+| Personal info › Email address | Yes (only if given with feedback, or for email reminders) | No | No | Optional | App functionality, Developer communications |
+| Health and fitness › Fitness info | Yes, only with email reminders: workout times and counts, never weights, reps or heart rate | No | No | Optional | App functionality |
 | Financial info › Purchase history | Yes (plan and price of a purchase) | No | No | Optional | Analytics |
-| Health and fitness › Health info / Fitness info | **No** (stays on the device) | | | | |
+| Health and fitness › Health info | **No** (stays on the device) | | | | |
 
 Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`).
 
@@ -46,7 +49,8 @@ Health Connect: the permissions declaration form still applies to the on-device 
 
 - Do you or your third-party partners collect data from this app? **Yes.**
 - **Data used to track you: none.** No IDFA, no ATT prompt, no data broker or ad network.
-- **Data linked to you** (only when the user sends feedback, for App Functionality): Contact Info › Email Address; User Content › Other User Content (the message and screenshot).
+- **Data linked to you** (only when the user sends feedback or turns on email reminders): Contact Info › Email Address (App Functionality; Developer's Advertising or Marketing, for Pro offers the user turns on); User Content › Other User Content (the feedback message and screenshot); Health & Fitness › Fitness (with email reminders only: workout times and counts, for App Functionality).
+- **Phone reminders** are local notifications scheduled on the device and collect nothing.
 - **Data not linked to you:**
   - Identifiers › Device ID (random install id): Analytics.
   - Usage Data › Product Interaction: Analytics.
