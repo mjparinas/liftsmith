@@ -1,7 +1,7 @@
 "use client";
 import { BRAND } from "@/lib/brand";
 import { decodeShare, encodeShare, SHARE_DAYS, shareCard, shareLevel, type ShareCard } from "@/lib/dashboard";
-import { mondayOf, type Stats } from "@/lib/derive";
+import { weekOf, type Stats } from "@/lib/derive";
 import { exerciseName } from "@/lib/game";
 import { shareName } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
@@ -38,7 +38,7 @@ export function ShareView({ card }: { card: ShareCard }) {
   // from that day, or null outside the 12-week window.
   const weeks = Array.from({ length: SHARE_DAYS / 7 + 1 }, (_, w) =>
     Array.from({ length: 7 }, (_, d) => {
-      const day = new Date(mondayOf(card.d0));
+      const day = new Date(weekOf(card.d0));
       day.setDate(day.getDate() + (w - SHARE_DAYS / 7) * 7 + d);
       const off = Math.round((card.d0 - day.getTime()) / 86400_000);
       return off >= 0 && off < SHARE_DAYS ? off : null;

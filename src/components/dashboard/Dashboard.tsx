@@ -5,7 +5,7 @@ import { applyAppearance, savedAppearance } from "@/lib/appearance";
 import { BRAND } from "@/lib/brand";
 import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals, yearGrid } from "@/lib/dashboard";
 import { defaultProfile } from "@/lib/defaults";
-import { derive } from "@/lib/derive";
+import { derive, setWeekStart } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exerciseName, game } from "@/lib/game";
 import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
@@ -104,7 +104,11 @@ export function Dashboard() {
     return () => document.removeEventListener("visibilitychange", on);
   }, [reload]);
 
-  const stats = useMemo(() => (data ? derive(data.events, now) : null), [data, now]);
+  const stats = useMemo(() => {
+    if (!data) return null;
+    setWeekStart(data.profile.training?.weekStart);
+    return derive(data.events, now);
+  }, [data, now]);
 
   if (!data || !stats) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   const { events, profile } = data;

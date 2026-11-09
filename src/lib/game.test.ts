@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { ACHIEVEMENTS, BADGE_COUNT, achievements, context, shareIds, shareName, unlocked } from "./achievements";
 import { defaultProfile } from "./defaults";
-import { derive, mondayOf } from "./derive";
+import { derive, weekOf } from "./derive";
 import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
 import type { AppEvent, SetEvent } from "./types";
 
@@ -22,7 +22,7 @@ function workout(at: number, id: string, k = 3, weight = 60, reps = 8): SetEvent
 }
 /** Three workouts (Mon, Tue, Wed) in the week `back` weeks before this one. */
 function goalWeek(back: number): SetEvent[] {
-  const mon = mondayOf(NOW) - back * W;
+  const mon = weekOf(NOW) - back * W;
   return [0, 1, 2].flatMap((d) => workout(mon + d * D + 10 * H, `w${back}d${d}`));
 }
 
@@ -54,7 +54,7 @@ describe("streak with freezes", () => {
     const ev = [6, 5, 4, 3, 1].flatMap(goalWeek);
     const st = goalStreak(derive(ev, NOW), profile(), NOW);
     expect(st.weeks).toBe(5);
-    expect(st.frozen).toEqual([mondayOf(NOW) - 2 * W]);
+    expect(st.frozen).toEqual([weekOf(NOW) - 2 * W]);
     expect(st.freezes).toBe(0);
   });
   it("breaks without a freeze", () => {
@@ -69,7 +69,7 @@ describe("streak with freezes", () => {
   it("flags a streak at risk when the days left can't meet the goal", () => {
     const ev = [3, 2, 1].flatMap(goalWeek);
     // Sunday evening with nothing this week: one day left, three needed.
-    const sun = mondayOf(NOW) + 6 * D + 18 * H;
+    const sun = weekOf(NOW) + 6 * D + 18 * H;
     const st = goalStreak(derive(ev, sun), profile(), sun);
     expect(st).toMatchObject({ needed: 3, daysLeft: 1, atRisk: true });
     // Wednesday: five days left.
@@ -141,19 +141,19 @@ describe("achievements", () => {
 
 describe("quests", () => {
   it("are three a week, always include the goal days, and are the same on every device", () => {
-    const q = questsFor([], profile(), mondayOf(NOW));
+    const q = questsFor([], profile(), weekOf(NOW));
     expect(q).toHaveLength(3);
     expect(q[0]).toMatchObject({ id: "days", goal: 3, have: 0 });
-    expect(questsFor([], profile(), mondayOf(NOW)).map((x) => x.id)).toEqual(q.map((x) => x.id));
-    const weeks = new Set(Array.from({ length: 8 }, (_, i) => questsFor([], profile(), mondayOf(NOW) - i * W).map((x) => x.id).join()));
+    expect(questsFor([], profile(), weekOf(NOW)).map((x) => x.id)).toEqual(q.map((x) => x.id));
+    const weeks = new Set(Array.from({ length: 8 }, (_, i) => questsFor([], profile(), weekOf(NOW) - i * W).map((x) => x.id).join()));
     expect(weeks.size).toBeGreaterThan(1);
   });
   it("track progress and never ask for more days than the goal", () => {
     const ev = goalWeek(0);
-    const q = questsFor(ev, profile(), mondayOf(NOW))[0];
+    const q = questsFor(ev, profile(), weekOf(NOW))[0];
     expect(q).toMatchObject({ have: 3, done: true });
     const more = [...ev, ...workout(NOW + 2 * H, "extra")];
-    expect(questsFor(more, profile(), mondayOf(NOW))[0].have).toBe(3);
+    expect(questsFor(more, profile(), weekOf(NOW))[0].have).toBe(3);
   });
   it("add their XP to the total", () => {
     const ev = goalWeek(0);
