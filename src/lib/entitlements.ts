@@ -16,9 +16,11 @@ import { hasPro } from "./billing";
 // planner are Pro.
 // Adaptive programming (the generator, RIR blocks, deloads and readiness calls) and the recovery map are Pro;
 // without Pro, Today follows a free fixed program (store.ts applyAccess).
-export type Feature = "adaptive" | "recoveryMap" | "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner";
+// Health twin (Melvin, 2026-11-09): seeing every number, trend and reason is free; sleep, HRV, resting
+// heart rate and breathing rate changing today's call ("healthReadiness") is Pro.
+export type Feature = "adaptive" | "recoveryMap" | "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner" | "healthReadiness";
 
-const PRO_FEATURES: ReadonlySet<Feature> = new Set(["adaptive", "recoveryMap", "advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner"]);
+const PRO_FEATURES: ReadonlySet<Feature> = new Set(["adaptive", "recoveryMap", "advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner", "healthReadiness"]);
 
 /** Whether the lifter has Pro: a store subscription or trial, or billing not live here. */
 export function isPro(): boolean {

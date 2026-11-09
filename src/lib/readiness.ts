@@ -7,8 +7,8 @@ import type { AppEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./typ
 // "Rest or push today?" (Melvin, 2026-11-09). Everything here comes from the lifter's own
 // logged data, on the device: how recovered the big muscles are, how many target reps they hit
 // lately, how sets felt, how long reps took compared with their own history, and whether heart
-// rate ran high for the same work. Health data (sleep, HRV, resting HR) slots in as `external`
-// once the readiness check-in lands. The lifter can always override the call.
+// rate ran high for the same work. Health data (sleep, HRV, resting HR, breathing rate) comes in as
+// `external` from the health twin (twin.ts healthExternal), for Pro. The lifter can always override the call.
 
 export type Call = "push" | "normal" | "recover";
 
@@ -34,6 +34,8 @@ export interface ExternalSignals {
   hrvDelta?: number;
   /** Resting heart rate against its 30-day baseline, in bpm. */
   restingHrDelta?: number;
+  /** Overnight breathing rate against its 30-day baseline, in breaths a minute. */
+  breathingDelta?: number;
   /** Pre-workout check-in, −1 (low) to 1 (great). */
   checkIn?: -1 | 0 | 1;
   /** Use logged periods (only when the lifter opted in to cycle-aware readiness). */
@@ -134,16 +136,8 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
     else if (d < -6) add(4, "Heart rate was low for the work");
   }
 
-  // 7. Health data and the check-in, when connected.
-  if (external.sleepHours !== undefined) {
-    if (external.sleepHours < 6) add(-12, "Short sleep");
-    else if (external.sleepHours >= 8) add(5, "Good sleep");
-  }
-  if (external.hrvDelta !== undefined) {
-    if (external.hrvDelta < -0.1) add(-10, "HRV below your baseline");
-    else if (external.hrvDelta > 0.05) add(5, "HRV above your baseline");
-  }
-  if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, "Resting heart rate is up");
+  // 7. Health data (the health twin, twin.ts) and the check-in, when connected.
+  for (const x of healthSignals(external)) add(x.points, x.text);
   if (external.checkIn === -1) add(-15, "You said you're low today");
   if (external.checkIn === 1) add(8, "You said you feel great");
   if (external.cycle) {
@@ -161,6 +155,26 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const challenge = call === "push" && !week.deload && now - lastChallenge > CHALLENGE_GAP && roll < CHALLENGE_ODDS;
 
   return { call, score, signals: signals.sort((a, b) => Math.abs(b.points) - Math.abs(a.points)), challenge };
+}
+
+/**
+ * What sleep, HRV, resting heart rate and breathing rate add to the score. Shared with the health twin
+ * (twin.ts), so the twin says exactly what the call counted.
+ */
+export function healthSignals(external: ExternalSignals): Signal[] {
+  const out: Signal[] = [];
+  const add = (points: number, text: string) => out.push({ points, text });
+  if (external.sleepHours !== undefined) {
+    if (external.sleepHours < 6) add(-12, "Short sleep");
+    else if (external.sleepHours >= 8) add(5, "Good sleep");
+  }
+  if (external.hrvDelta !== undefined) {
+    if (external.hrvDelta < -0.1) add(-10, "HRV below your baseline");
+    else if (external.hrvDelta > 0.05) add(5, "HRV above your baseline");
+  }
+  if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, "Resting heart rate is up");
+  if (external.breathingDelta !== undefined && external.breathingDelta >= 2) add(-8, "Breathing rate up overnight");
+  return out;
 }
 
 export const CALL_TEXT: Record<Call, { label: string; blurb: string }> = {

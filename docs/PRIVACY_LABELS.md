@@ -2,7 +2,7 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; privacy contact hello@getliftsmith.com).
+Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
@@ -14,6 +14,7 @@ Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connec
 | Screens viewed, setup steps, features used, permission answers, workout started/finished with exercise and set counts and length | Yes, with usage stats | Analytics | No |
 | Paywall views, trial starts, purchases with plan and price | Yes, with usage stats | Analytics | No |
 | Subscription: install id (as RevenueCat's user id), plan, price, currency, country, trial and renewal dates, store receipt | Yes, to RevenueCat (our billing service provider), and from the stores' server notifications back to our database | App functionality (unlocking Pro), Analytics (revenue) | No |
+| Creator code: the code, the install id, how it arrived (link, Play install referrer, typed) and platform | Only when the user uses a creator's code or link; sent whether usage stats are on or off, and also set as a RevenueCat subscriber attribute | App functionality (the trial length), creator commission (paying the referrer) | No |
 | Country and region (from the IP address on arrival; the address isn't stored) | Yes | Analytics | No |
 | Feedback message, optional email, optional screenshot, optional device details | Only when the user sends feedback | App functionality (support) | Email is given by the user |
 | Reminder email address, which reminder kinds are on, consent time | Only when the user turns on email reminders (double opt-in) | App functionality, developer communications (offers only if the user turns them on) | Yes, by the email address |
@@ -44,7 +45,7 @@ Collected data types:
 | Financial info › Purchase history | Yes (plan and price of a purchase; RevenueCat checks the receipt) | No | No | Optional | App functionality, Analytics |
 | Health and fitness › Health info | **No** (stays on the device) | | | | |
 
-Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
+Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE, the health twin), READ_SLEEP, READ_HEART_RATE_VARIABILITY and READ_RESPIRATORY_RATE (the health twin on the Body tab, and the Pro readiness call: "adjusts workout intensity to recovery"), READ_STEPS (the health twin and TDEE's activity level), READ_VO2_MAX (the health twin) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
 
 ## App Store: App Privacy
 

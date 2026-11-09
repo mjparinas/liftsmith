@@ -91,9 +91,55 @@ const WINDOW_DAYS = 28;
 
 export interface ActivityRead {
   activity: Activity;
-  source: "workouts" | "plan";
+  source: "workouts" | "steps" | "plan";
   /** Training days a week behind the read (average over the window, or the goal). */
   perWeek: number;
+  /** Average steps a day over the last week, when the level comes from steps. */
+  steps?: number;
+}
+
+const LEVELS: Activity[] = ["sedentary", "light", "moderate", "heavy", "athlete"];
+
+/**
+ * Steps a day to an activity level (the common pedometer bands: under 5,000 sedentary, 5,000 light,
+ * 7,500 moderate, 10,000 heavy).
+ */
+export function activityForSteps(steps: number): Activity {
+  if (steps < 5000) return "sedentary";
+  if (steps < 7500) return "light";
+  if (steps < 10000) return "moderate";
+  return "heavy";
+}
+
+/**
+ * The activity level from steps and training together (the health twin, 2026-11-09): the higher of the
+ * two, one level up when both say active (7,500+ steps and 3+ training days a week), because steps
+ * barely count lifting and training days don't count the rest of the day. Athlete stays a
+ * two-a-day training level.
+ */
+export function withSteps(training: ActivityRead, steps: number): ActivityRead {
+  const s = LEVELS.indexOf(activityForSteps(steps)), t = LEVELS.indexOf(training.activity);
+  let i = Math.max(s, t);
+  if (steps >= 7500 && training.perWeek >= 3 && i < 3) i += 1;
+  if (training.activity === "athlete") i = 4;
+  return { activity: LEVELS[i], source: "steps", perWeek: training.perWeek, steps: Math.round(steps / 100) * 100 };
+}
+
+/** Average steps a day over the last 7 finished days, when Health gave at least 5 of them. */
+export function recentSteps(events: readonly AppEvent[], now: number): number | undefined {
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+  const from = today.getTime() - 7 * DAY;
+  const by = new Map<string, { at: number; v: number }>();
+  for (const e of events) {
+    if (e.type !== "health" || e.metric !== "steps") continue;
+    const t = new Date(`${e.day}T12:00:00`).getTime();
+    if (t < from || t >= today.getTime()) continue;
+    const cur = by.get(e.day);
+    if (!cur || e.at >= cur.at) by.set(e.day, { at: e.at, v: e.value });
+  }
+  if (by.size < 5) return undefined;
+  return [...by.values()].reduce((s, x) => s + x.v, 0) / by.size;
 }
 
 /** Training days a week to an activity level: 0 sedentary, 1–2 light, 3–5 moderate, 6–7 heavy, two a day athlete. */
@@ -143,7 +189,7 @@ export function currentKg(events: AppEvent[], profile: Pick<Profile, "bodyweight
 
 export interface CurrentTdee {
   inputs: Partial<TdeeInputs>;
-  activity: ActivityRead | { activity: Activity; source: "manual"; perWeek?: undefined };
+  activity: ActivityRead | { activity: Activity; source: "manual"; perWeek?: undefined; steps?: undefined };
   /** Which inputs are still missing, in the order the screen asks for them. */
   missing: ("sex" | "age" | "height")[];
   result?: TdeeResult;
@@ -151,7 +197,9 @@ export interface CurrentTdee {
 
 export function currentTdee(events: AppEvent[], sessions: Pick<SessionSummary, "start">[], profile: Profile, now: number): CurrentTdee {
   const manual = profile.tdee?.activity;
-  const activity = manual ? { activity: manual, source: "manual" as const } : inferActivity(sessions, profile.daysPerWeek, now);
+  const steps = manual ? undefined : recentSteps(events, now);
+  const training = manual ? undefined : inferActivity(sessions, profile.daysPerWeek, now);
+  const activity = manual ? { activity: manual, source: "manual" as const } : steps !== undefined ? withSteps(training!, steps) : training!;
   const inputs: Partial<TdeeInputs> = {
     kg: Math.round(currentKg(events, profile) * 10) / 10,
     cm: profile.heightCm,
@@ -206,6 +254,7 @@ export function snapshotDue(cur: CurrentTdee, events: AppEvent[], now: number, i
     activity: i.activity,
     activitySource: cur.activity.source,
     ...(cur.activity.perWeek !== undefined ? { perWeek: cur.activity.perWeek } : {}),
+    ...(cur.activity.steps !== undefined ? { steps: cur.activity.steps } : {}),
     ...(i.bodyFat !== undefined ? { bodyFat: i.bodyFat } : {}),
     formula: cur.result.formula,
     trigger,
