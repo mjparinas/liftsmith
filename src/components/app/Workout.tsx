@@ -9,10 +9,10 @@ import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
 import { PainSelect } from "./Injuries";
-import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
 import { workoutWhy } from "@/lib/why";
-import { haptic, keepAwake, sound } from "@/lib/juice";
+import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
@@ -52,6 +52,8 @@ export function Workout() {
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
+  const [hrBusy, setHrBusy] = useState(false);
+  const [hrError, setHrError] = useState<string | null>(null);
   const [popKey, setPopKey] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
@@ -167,6 +169,9 @@ export function Workout() {
   };
 
   const connectHr = async () => {
+    if (hrBusy) return;
+    setHrBusy(true);
+    setHrError(null);
     try {
       hrConn = await connectHeartRate(
         (b) => {
@@ -176,7 +181,15 @@ export function Workout() {
         () => setBpm(null),
       );
       track("feature", { name: "heart_rate", detail: "workout" });
-    } catch {}
+    } catch (e) {
+      const msg = e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed");
+      if (msg) {
+        setHrError(msg);
+        oops();
+      }
+    } finally {
+      setHrBusy(false);
+    }
   };
 
   const unit = gym.unit;
@@ -210,11 +223,18 @@ export function Workout() {
               <span className="animate-beat inline-flex"><Icon name="heart" size={14} filled strokeWidth={1.5} /></span> {bpm}
             </span>
           ) : hrSupported() ? (
-            <button type="button" onClick={connectHr} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />Connect</button>
+            <button type="button" onClick={connectHr} disabled={hrBusy} aria-busy={hrBusy} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />{hrBusy ? t("hr.connecting") : t("hr.connect")}</button>
           ) : null}
           <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line bg-surface px-4 text-sm font-semibold">{t("workout.end")}</button>
         </div>
       </header>
+      {hrError && !bpm && (
+        <div role="alert" className="card mt-2 flex items-start gap-2 p-3 text-sm">
+          <Icon name="heart" size={16} className="mt-0.5 shrink-0 text-bad" />
+          <p className="flex-1 text-muted">{hrError}</p>
+          <button type="button" onClick={() => setHrError(null)} className="press -m-2 min-h-11 min-w-11 rounded-full px-2 text-muted hover:text-ink">{t("hr.dismiss")}</button>
+        </div>
+      )}
 
       <div className="mt-3 flex gap-1" aria-label="Progress">
         {active.plan.items.map((it, i) => (
