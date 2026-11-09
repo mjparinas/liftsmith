@@ -4,6 +4,8 @@ import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 import { currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message } from "./i18n";
 import { fmtNum, plainNum } from "./units";
+import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
+import { RARITY_LABEL } from "./game";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, MUSCLE_LABEL } from "./types";
 import { bandOf } from "./recovery";
 
@@ -78,6 +80,11 @@ describe("language", () => {
     expect(MUSCLE_LABEL.hamstrings).toBe("Isquiotibiales");
     expect(EQUIPMENT_LABEL.bench).toBe("Banco plano");
     expect(EQUIPMENT_GROUPS[2].title).toBe("Máquinas");
+    expect(RARITY_LABEL.epic).toBe("Épico");
+    expect(CATEGORY_LABEL.smart).toBe("Entrenar con cabeza");
+    setLanguage("fr");
+    expect(TIER_LABEL.gold).toBe("Or");
+    setLanguage("es");
     expect(t("done.prs", { count: 2 })).toBe("¡2 récords nuevos!");
   });
 });
