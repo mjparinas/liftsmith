@@ -159,5 +159,7 @@ describe("the website counter", () => {
     expect(isPublicPath("/")).toBe(true);
     expect(isPublicPath("/app/")).toBe(false);
     expect(isPublicPath("/admin/")).toBe(false);
+    expect(isPublicPath("/me/")).toBe(false);
+    expect(isPublicPath("/share/")).toBe(true);
   });
 });

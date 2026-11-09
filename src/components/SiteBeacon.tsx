@@ -9,7 +9,8 @@ import { useEffect } from "react";
 import { analyticsOn, rememberFirstTouch } from "@/lib/analytics";
 import { utmFrom } from "@/lib/analyticsSchema";
 
-export const isPublicPath = (path: string) => !/^\/(app|admin)(\/|$)/.test(path);
+/** The app, the admin panel and the lifter's own dashboard aren't counted; shared /share/ pages are (friends arriving). */
+export const isPublicPath = (path: string) => !/^\/(app|admin|me)(\/|$)/.test(path);
 
 /** What a click counts as: the app, a store badge, or anything marked data-cta. */
 export function ctaOf(a: Element | null): string | null {

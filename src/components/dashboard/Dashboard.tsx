@@ -6,6 +6,7 @@ import { derive } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exerciseName, goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
 import { load } from "@/lib/localdb";
+import { track } from "@/lib/analytics";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { APP_PATH } from "@/lib/site";
@@ -85,6 +86,7 @@ export function Dashboard() {
     [],
   );
   useEffect(() => {
+    track("screen_view", { screen: "me" });
     load().then((snap) => {
       setNow(Date.now());
       setData({ events: snap.events, profile: snap.profile ?? defaultProfile() });
