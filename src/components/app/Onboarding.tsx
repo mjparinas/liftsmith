@@ -14,7 +14,7 @@ import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { epley, KNOWN_LIFTS } from "@/lib/progression";
 import { useEffect, useState } from "react";
-import { connectHeartRate, hrSupported } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
@@ -75,6 +75,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
+  const [hrBusy, setHrBusy] = useState(false);
+  const [hrError, setHrError] = useState<string | null>(null);
   const [notify, setNotify] = useState<boolean | null>(null);
   const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState<Goal>(profile.goal);
@@ -248,20 +250,28 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               />
               {hrSupported() && (
                 <Tile
-                  title={hr ? t("setup.hr.on", { name: hr }) : t("setup.hr.connect")}
+                  title={hr ? t("setup.hr.on", { name: hr }) : hrBusy ? t("hr.connecting") : t("setup.hr.connect")}
                   blurb={t("setup.hr.blurb")}
                   active={!!hr}
                   onClick={async () => {
+                    if (hrBusy) return;
+                    setHrBusy(true);
+                    setHrError(null);
                     try {
                       const c = await connectHeartRate(() => {}, () => {});
                       setHr(c.name);
                       track("feature", { name: "heart_rate", detail: "setup" });
                       c.disconnect();
-                    } catch {}
+                    } catch (e) {
+                      setHrError(e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed"));
+                    } finally {
+                      setHrBusy(false);
+                    }
                   }}
                 />
               )}
             </div>
+            {hrError && <p className="mt-3 text-sm text-warn" role="alert">{hrError}</p>}
             {notify === false && <p className="mt-3 text-sm text-warn">{t("setup.notify.blocked")}</p>}
             <label className="card mt-3 flex items-start gap-3 p-4">
               <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--color-accent)]" checked={stats} onChange={(e) => setStats(e.target.checked)} />
