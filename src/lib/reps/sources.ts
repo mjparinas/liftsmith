@@ -32,8 +32,9 @@ export async function loadPose(model: keyof typeof MODEL = "lite"): Promise<Pose
   };
 }
 
-export async function openCamera(video: HTMLVideoElement): Promise<MediaStream> {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: "environment", width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } } });
+/** `user` is the screen-side camera, so the lifter can see themselves line up; `environment` the back one. */
+export async function openCamera(video: HTMLVideoElement, facing: "user" | "environment" = "user"): Promise<MediaStream> {
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } } });
   video.srcObject = stream;
   await video.play();
   return stream;
