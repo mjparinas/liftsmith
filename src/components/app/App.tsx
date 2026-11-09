@@ -8,7 +8,7 @@ import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { useAccount } from "@/lib/auth";
-import { useEffect } from "react";
+import { useEffect, type ReactNode } from "react";
 import { keepStorage } from "@/lib/saving";
 import { installDiag } from "@/lib/diag";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
@@ -53,6 +53,9 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
   { route: "achievements", label: "tab.awards", icon: "trophy" },
   { route: "gym", label: "tab.gyms", icon: "gym" },
 ];
+
+// Screens that hide the tab bar.
+const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
@@ -251,8 +254,29 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, remix: <Remix code={arg} />, pro: <Pro />, account: <Account /> }[route];
-  const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback" && route !== "pro";
+  const screens: Record<Route, ReactNode> = {
+    today: <Today />,
+    workout: <Workout />,
+    recovery: <Recovery />,
+    stats: <Stats />,
+    gym: <Gym />,
+    settings: <Settings />,
+    done: <Done />,
+    setup: <Onboarding rerun />,
+    feedback: <Feedback />,
+    achievements: <Achievements />,
+    recap: <Recap arg={arg} />,
+    photos: <Photos />,
+    programs: <Programs />,
+    injuries: <Injuries />,
+    training: <TrainingSettings />,
+    tools: <Tools arg={arg} />,
+    remix: <Remix code={arg} />,
+    pro: <Pro />,
+    account: <Account />,
+  };
+  const screen = screens[route];
+  const showNav = !FULL_SCREEN.has(route);
   if (route === "setup") return screen;
   return (
     <>
