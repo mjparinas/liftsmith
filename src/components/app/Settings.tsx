@@ -6,6 +6,8 @@ import { BRAND } from "@/lib/brand";
 import { useState } from "react";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
+import { MessageSettings } from "./MessageSettings";
+import { deleteEmail } from "@/lib/reminders";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -42,6 +44,7 @@ export function Settings() {
       </Section>
       <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <CalendarSettings />
+      <MessageSettings />
       <CycleSettings />
       <Section title="Training block">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
@@ -49,8 +52,8 @@ export function Settings() {
       <Section title="Data">
         {confirm ? (
           <div className="space-y-2">
-            <p className="text-sm text-muted">This erases every workout on this device. It can&apos;t be undone.</p>
-            <Button kind="danger" className="w-full" onClick={() => void reset()}>Erase everything</Button>
+            <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
+            <Button kind="danger" className="w-full" onClick={() => void deleteEmail().finally(() => void reset())}>Erase everything</Button>
             <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>Cancel</Button>
           </div>
         ) : (
