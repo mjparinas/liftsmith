@@ -368,5 +368,5 @@ export function reminderEnv(e: Record<string, string | undefined> = process.env)
   const need = { RESEND_API_KEY: e.RESEND_API_KEY, REMINDER_SECRET: e.REMINDER_SECRET, MAIL_FROM: e.MAIL_FROM, MAIL_POSTAL_ADDRESS: e.MAIL_POSTAL_ADDRESS };
   const missing = Object.entries(need).filter(([, v]) => !v).map(([k]) => k);
   if (missing.length) return { missing };
-  return { env: { siteUrl: (e.NEXT_PUBLIC_SITE_URL ?? "https://getliftsmith.com").replace(/\/$/, ""), secret: need.REMINDER_SECRET!, postalAddress: need.MAIL_POSTAL_ADDRESS! }, apiKey: need.RESEND_API_KEY!, from: need.MAIL_FROM! };
+  return { env: { siteUrl: (e.NEXT_PUBLIC_SITE_URL ?? "https://www.getliftsmith.com").replace(/\/$/, ""), secret: need.REMINDER_SECRET!, postalAddress: need.MAIL_POSTAL_ADDRESS! }, apiKey: need.RESEND_API_KEY!, from: need.MAIL_FROM! };
 }
