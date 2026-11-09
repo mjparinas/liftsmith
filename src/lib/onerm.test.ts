@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { allFormulas, allOneRms, detrain, dots, dotsBand, dotsFromData, estimate, formulasFor, marzagao, MAX_RTF, oneRm, qualityOf, repTable, rirOf, setEstimates, weightForReps } from "./onerm";
+import { strength } from "./strength";
 import type { AppEvent, SetEvent } from "./types";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -179,5 +180,13 @@ describe("DOTS", () => {
     expect(full.total).toBeCloseTo(450, 5);
     expect(full.score).toBeCloseTo(dots(450, 85, "male"), 6);
     expect(dotsFromData(events, { ...profile, sex: "female" }, NOW).sex).toBe("female");
+  });
+});
+
+describe("strength score", () => {
+  it("uses the same estimate as the calculator", () => {
+    const events = [set({ sessionId: "a", weight: 100, reps: 5 }), set({ sessionId: "b", at: NOW - 4 * DAY, weight: 95, reps: 6 })];
+    const lift = strength(events, { bodyweight: 80 }, NOW).lifts.find((l) => l.exerciseId === "bench-press")!;
+    expect(lift.e1rm).toBeCloseTo(oneRm(events, "bench-press", NOW)!.e1rm, 6);
   });
 });
