@@ -4,6 +4,7 @@ import { linksIn, relatedTo } from "@/components/site/ArticleView";
 import { EXERCISES, EXERCISE_BY_ID } from "./exercises";
 import { absolute, alternativesTo, articlePath, equipmentBySlug, equipmentSlug, equipmentWithPages, exercisesWith, kebab, muscleBySlug, muscleSlug, PAIR_MIN, pairExercises, pairs, siteRoutes, TOOL_PAGES } from "./seo";
 import sitemap from "@/app/sitemap";
+import { allFacts, COMPETITORS, OURS, TOPIC_LABEL } from "@/content/compare";
 import { EQUIPMENT, MUSCLES } from "./types";
 
 const paths = new Set(siteRoutes().map((r) => r.path));
@@ -102,6 +103,35 @@ describe("articles", () => {
       const r = relatedTo(a, ARTICLES);
       expect(r.length).toBe(3);
       expect(r).not.toContain(a);
+    }
+  });
+});
+
+describe("comparison pages", () => {
+  it("has a page for every competitor plus the Fitbod alternatives page", () => {
+    for (const c of COMPETITORS) expect(paths.has(`/compare/${c.slug}/`)).toBe(true);
+    expect(paths.has("/alternatives/fitbod/")).toBe(true);
+  });
+
+  // AGENTS.md: the build fails when any competitor fact is more than 90 days old. Re-check the source,
+  // then update the text and the date.
+  it("has a source and a check date under 90 days old on every competitor fact", () => {
+    const now = Date.now();
+    for (const f of allFacts()) {
+      expect(f.source, f.text).toMatch(/^https:\/\//);
+      const age = (now - Date.parse(`${f.checked}T00:00:00Z`)) / 86_400_000;
+      expect(age, `${f.text} (checked ${f.checked}): re-check ${f.source}`).toBeLessThanOrEqual(90);
+      expect(age).toBeGreaterThan(-1);
+    }
+  });
+
+  it("says what Liftsmith does for every topic, and gives every competitor fair, non-disparaging copy", () => {
+    for (const t of Object.keys(TOPIC_LABEL)) expect(OURS[t as keyof typeof OURS]).toBeTruthy();
+    const harsh = /\b(bad|worse|terrible|awful|scam|outdated|clunky|overpriced|rip-?off|#1|best)\b/i;
+    for (const c of COMPETITORS) {
+      expect(Object.keys(c.rows).length).toBeGreaterThanOrEqual(4);
+      expect(c.theirPick.length).toBeGreaterThan(20);
+      for (const x of [c.summary, c.theirPick, ...c.ourPick, ...(Object.values(c.rows).flat().map((f) => f!.text))]) expect(x).not.toMatch(harsh);
     }
   });
 });

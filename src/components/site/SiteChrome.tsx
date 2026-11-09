@@ -89,6 +89,7 @@ export function SiteFooter() {
           { href: "/tools/tdee-calculator/", label: "TDEE calculator" },
         ])}
         {col("Company", [
+          { href: "/compare/", label: "Compare apps" },
           { href: "/privacy/", label: "Privacy" },
           { href: "/#faq", label: "FAQ" },
         ])}
