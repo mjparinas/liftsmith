@@ -12,6 +12,7 @@ import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
 import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { GoalsCard, PlateausCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
 import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 
@@ -70,6 +71,9 @@ export function Stats() {
       </div>
       <TonnageCard />
       <StrengthCard />
+
+      <GoalsCard />
+      <PlateausCard />
 
       <Section title="Sets per muscle this week" icon="target" info="weeklySets">
         <div className="card p-4">
