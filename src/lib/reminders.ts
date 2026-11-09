@@ -240,7 +240,7 @@ let lastEmailBody = "";
  */
 export function refreshReminders(get: () => { profile: Profile; stats: Stats }, onStatus?: (s: MailStatus) => void, delay = 1500) {
   clearTimeout(timer);
-  timer = setTimeout(async () => {
+  const run = async () => {
     const { profile, stats } = get();
     await schedulePush(profile, stats);
     const email = profile.messages?.email;
@@ -255,5 +255,6 @@ export function refreshReminders(get: () => { profile: Profile; stats: Stats }, 
       lastEmailBody = body;
       if (status !== email.status) onStatus?.(status);
     }
-  }, delay);
+  };
+  timer = setTimeout(() => void run(), delay);
 }

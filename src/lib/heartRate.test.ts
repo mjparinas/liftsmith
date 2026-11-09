@@ -89,7 +89,7 @@ describe("connectHeartRate (Web Bluetooth)", () => {
   it("gives up with 'unreachable' when the device never answers, instead of hanging", async () => {
     vi.useFakeTimers();
     const fake = fakeBluetooth();
-    fake.connect.mockImplementation(() => new Promise(() => {}));
+    fake.connect.mockReturnValue(new Promise(() => {}));
     const p = connectHeartRate(() => {}, () => {}).catch((e) => e);
     await vi.advanceTimersByTimeAsync(60_000);
     const e = await p;

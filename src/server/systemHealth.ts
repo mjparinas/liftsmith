@@ -225,11 +225,17 @@ export async function buildsCheck(): Promise<HealthCheck> {
   let failing = 0;
   WORKFLOWS.forEach((w, i) => {
     const runs = lists[i];
-    if (runs instanceof Error) return rows.push({ label: w.label, value: runs.message, state: "warn" });
+    if (runs instanceof Error) {
+      rows.push({ label: w.label, value: runs.message, state: "warn" });
+      return;
+    }
     // A cancelled run (a newer push replaced it) says nothing about the code.
     const done = runs.find((r) => r.status === "completed" && r.conclusion !== "cancelled" && r.conclusion !== "skipped");
     const running = runs.find((r) => r.status !== "completed");
-    if (!done) return rows.push({ label: w.label, value: running ? "Running its first time" : "No runs yet", state: running ? "ok" : undefined, href: running?.html_url });
+    if (!done) {
+      rows.push({ label: w.label, value: running ? "Running its first time" : "No runs yet", state: running ? "ok" : undefined, href: running?.html_url });
+      return;
+    }
     const s = runState(done);
     if (s === "down") failing++;
     rows.push({ label: w.label, value: `${s === "down" ? "Failed" : "Passed"}: ${name(done)}`, at: Date.parse(done.created_at), state: s, href: done.html_url });

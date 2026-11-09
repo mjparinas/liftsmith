@@ -142,7 +142,7 @@ export function AutoCount({ exerciseId, pattern, body, bpm, prefs, onPrefs, coun
       let raf = 0;
       let lastT = -1;
       let seen = false;
-      (async () => {
+      void (async () => {
         let stream: MediaStream;
         try {
           stream = await openCamera(v, prefs.facing);

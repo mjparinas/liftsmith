@@ -314,7 +314,10 @@ export function twin(input: TwinInput): TwinMetric[] {
     judge: (v: number, b: { mean: number; low: number; high: number }) => { status: Status; chip: string; why: string }, about: string) => {
     const series = readings(events, metric);
     const cur = recent(series, now, 2);
-    if (!cur) return out.push(missing(id, label, what));
+    if (!cur) {
+      out.push(missing(id, label, what));
+      return;
+    }
     const b = baseline(series, now, floor);
     const j = b ? judge(cur.value, b) : { status: "info" as Status, chip: "Learning your normal", why: `${about} A week of readings sets your normal.` };
     out.push({ id, label, display: fmt(cur.value), value: cur.value, ...j, did: didFor(key, ext, pro), series: window30(series, now), band: b, source: "health", fresh: true });

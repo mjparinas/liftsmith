@@ -130,7 +130,8 @@ export function App() {
   // Sync with the lifter's account, when signed in (sync.ts): on open, on return, when online, after changes.
   const signedIn = useAccount((s) => !!s.account);
   useEffect(() => {
-    if (ready && signedIn) return startSync();
+    if (!ready || !signedIn) return;
+    return startSync();
   }, [ready, signedIn]);
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
