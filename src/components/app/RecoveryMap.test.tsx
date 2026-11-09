@@ -27,8 +27,8 @@ async function onboard(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-  for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
-  await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
+  for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+  await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByText("Today's workout");
 }
 
