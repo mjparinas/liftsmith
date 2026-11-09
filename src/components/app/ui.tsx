@@ -1,9 +1,9 @@
 "use client";
-import { createPortal } from "react-dom";
 import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
 import { haptic, sound } from "@/lib/juice";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
 
 export function Button({ children, onClick, kind = "primary", className = "", disabled, label, icon }: { children: ReactNode; onClick?: () => void; kind?: "primary" | "ghost" | "quiet" | "danger"; className?: string; disabled?: boolean; label?: string; icon?: IconName }) {
@@ -94,18 +94,17 @@ export function Section({ title, children, right, icon, info }: { title: string;
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
-  // Portalled to <body>: the page's entry animation makes its own stacking context, which would
-  // otherwise put the bottom nav over the sheet's last buttons.
-  const sheet = (
+  // Rendered on <body>, so a screen's own stacking (its rise animation) can't put it under the tab bar.
+  return createPortal(
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
       <div role="dialog" aria-label={title} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)]" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" />
         <h2 className="mb-3 text-lg font-semibold">{title}</h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
-  return typeof document === "undefined" ? sheet : createPortal(sheet, document.body);
 }
 
 /** A progress ring with a gradient stroke. `from`/`to` pick the gradient (defaults: brand blue to violet). */
@@ -176,5 +175,24 @@ export function StatTile({ label, value, icon, tint = "var(--color-accent)", cla
       </div>
       <div className="display mt-2 text-[28px]">{value}</div>
     </div>
+  );
+}
+
+/** The chain button between two exercises that pairs them as a superset, or splits them. */
+export function LinkToggle({ on, first, second, onToggle }: { on: boolean; first: string; second: string; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        haptic("select");
+        sound.tick();
+        onToggle();
+      }}
+      aria-pressed={on}
+      aria-label={on ? `Split ${second} from ${first}` : `Superset ${second} with ${first}`}
+      className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent/50 bg-accent/15 text-accent" : "border-line text-faint hover:text-ink"}`}
+    >
+      <Icon name="link" size={18} />
+    </button>
   );
 }

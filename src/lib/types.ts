@@ -134,6 +134,8 @@ export interface Exercise {
   start: number;
   setup: string;
   cues: string[];
+  /** The lifter made it. Used in swaps and logging, not picked by the generator. */
+  custom?: boolean;
 }
 
 export interface Bar {
@@ -241,11 +243,40 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /**
+   * Where Today's plan comes from (programs.ts). Missing means the adaptive generator. A program keeps
+   * the starting weights frozen when it was picked (kg, keyed by program slot), so replaying the
+   * history always gives the same weights; everything after that is derived from the logged sets.
+   * Saved routines plug in as their own kind.
+   */
+  planSource?: PlanSource;
   /** Appearance: dark (default), light, or follow the system (theme.ts). */
   theme?: "dark" | "light" | "system";
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
+  /** Saved routines, newest first (routines.ts). */
+  routines?: Routine[];
   onboarded: boolean;
+  updatedAt: number;
+}
+
+export type PlanSource =
+  | { kind: "adaptive" }
+  | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
+  | { kind: "routine"; id: string };
+/** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
+export interface RoutineItem {
+  exerciseId: string;
+  sets: number;
+  /** Superset: neighbours with the same group are done back to back. */
+  group?: string;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  items: RoutineItem[];
+  createdAt: number;
   updatedAt: number;
 }
 
@@ -307,6 +338,12 @@ export interface SetEvent extends EventBase {
   challenge?: boolean;
   /** Done lighter for an injury, at this share of the usual load (injury.ts). Progression skips these sets. */
   injuryPct?: number;
+  /** A program's "as many reps as you can" set: targetReps is the minimum. */
+  amrap?: boolean;
+  /** The program lift this set counts for (programs.ts), kept through swaps. */
+  slot?: string;
+  /** Superset group, shared by the exercises done back to back with this one. */
+  superset?: string;
 }
 
 export interface SessionStartEvent extends EventBase {
@@ -322,6 +359,10 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** The program and day the plan came from (programs.ts). */
+  program?: { id: string; day: number };
+  /** The saved routine the workout came from, if any. */
+  routine?: string;
 }
 
 export interface SessionEndEvent extends EventBase {
@@ -401,6 +442,27 @@ export interface WarmupEvent extends EventBase {
   reps: number;
 }
 
+/** A note the lifter wrote on an exercise during a workout. The latest one shows next time. */
+export interface NoteEvent extends EventBase {
+  type: "note";
+  sessionId: string;
+  exerciseId: string;
+  text: string;
+}
+
+/** How a logged set actually felt: reps the lifter says they had left (0 = failure, 4 = four or more). */
+export interface EffortEvent extends EventBase {
+  type: "effort";
+  setId: string;
+  rir: number;
+}
+
+/** The lifter's own exercise (table stakes, 2026-11-09). Registered into the library on load. */
+export interface CustomExerciseEvent extends EventBase {
+  type: "customExercise";
+  exercise: Pick<Exercise, "id" | "name" | "primary" | "secondary" | "load" | "compound">;
+}
+
 
 // --- Injury mode (Melvin, 2026-11-09; injury.ts). Kept on the device, never in analytics or reports. ---
 
@@ -431,4 +493,4 @@ export interface InjuryHealedEvent extends EventBase {
   injuryId: string;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;

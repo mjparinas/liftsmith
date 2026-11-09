@@ -14,10 +14,12 @@ import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { loadText, repsText } from "./format";
+import { programName } from "./Programs";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { CALL_STYLE, muscleHue } from "./theme";
-import { Button, EmptyState, Ring, Section } from "./ui";
+import { Button, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
@@ -44,7 +46,7 @@ export function greeting(hour: number, name: string): string {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
+  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation, toggleSuperset } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
@@ -56,6 +58,7 @@ export function Today() {
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
   const fill = `${((profile.minutes - 15) / 75) * 100}%`;
+  const fixed = !!preview?.program?.fixed;
 
   return (
     <div className="pb-44">
@@ -92,7 +95,14 @@ export function Today() {
           <Icon name="pin" size={15} className="text-accent" />
           {gym?.name ?? "Add a gym"}{gym && pickedByLocation === gym.id ? " · you're here" : ""}
         </button>
-        {preview && (
+        {preview?.program && (
+          <button type="button" onClick={() => go("programs")} className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5">
+            <Icon name="layers" size={15} className="text-accent" />
+            {programName(preview.program.id)} · {preview.program.dayName}
+          </button>
+        )}
+        {preview && fixed && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{preview.program!.note}</span>}
+        {preview && !fixed && (
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${preview.week.deload ? "border-warn/40 bg-warn/12 text-warn" : "border-line bg-surface text-muted"}`}>
             <Icon name="layers" size={15} className={preview.week.deload ? "" : "text-violet"} />
             {preview.week.label} · RIR {preview.week.rir}
@@ -114,7 +124,7 @@ export function Today() {
 
       <TodayMoments />
 
-      {readiness && preview && call && !active && (
+      {readiness && preview && call && !active && !fixed && (
         <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
           <div className="flex items-center gap-4">
             <Ring value={readiness.score / 100} size={64} stroke={6} from={call.hue} to={call.hue} track="color-mix(in srgb, var(--color-ink) 8%, transparent)">
@@ -169,7 +179,7 @@ export function Today() {
 
       {!active && <TodayGame />}
 
-      <div className="card mt-4 p-4">
+      {!fixed && <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted"><Icon name="clock" size={16} className="text-cyan" />Workout length</label>
           <span className="display text-[30px]">{profile.minutes}<span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
@@ -190,8 +200,8 @@ export function Today() {
         />
         <div className="mt-1.5 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
-      </div>
-      <PlanExtras />
+      </div>}
+      {!fixed && <PlanExtras />}
 
       {preview && preview.items.length > 0 ? (
         <>
@@ -200,27 +210,37 @@ export function Today() {
               {preview.items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
                 const hue = muscleHue(it.focus);
+                const ss = supersetLabel(preview.items, i);
                 return (
-                  <li key={it.exerciseId} className="animate-rise relative flex items-center gap-3 px-4 py-3.5" style={{ animationDelay: `${i * 40}ms` }}>
+                  <li key={it.exerciseId} className={`animate-rise relative flex items-center gap-3 px-4 py-3.5 ${ss ? "bg-accent/5" : ""}`} style={{ animationDelay: `${i * 40}ms` }}>
                     <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full" style={{ background: hue }} aria-hidden />
                     <span className="num grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-bold" style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}>{i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-semibold">{ex.name}</div>
+                      {ss && <div className="truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">{ss}</div>}
                       <div className="text-sm text-muted num">
-                        {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
+                        {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((t) => t.weight > it.target.weight) ? "up to " : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((t) => t.weight)), profile.unit)}
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
-                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium" style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
+                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
+                    {i > 0 && <LinkToggle on={linkedToNext(preview.items, i - 1)} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
                   </li>
                 );
               })}
             </ol>
+            {preview.items.length > 1 && (
+              <p className="mt-2 flex items-center gap-1.5 px-1 text-sm text-muted"><Icon name="link" size={14} />Link two exercises to do them as a superset<Info term="superset" /></p>
+            )}
           </Section>
           <Section title="Why these muscles" icon="recovery">
             <div className="card p-4">
               <BodyMap rec={rec} focus={focus} compact />
-              <p className="mt-3 text-sm text-muted">Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</p>
+              {preview.program && !preview.routineId ? (
+                <p className="mt-3 text-sm text-muted">{preview.program.dayName} of {programName(preview.program.id)}{fixed ? "" : `: recovered muscles from today's group, furthest from this week's ${preview.week.setsPerMuscle}-set goal`}. {preview.program.note}.</p>
+              ) : (
+                <p className="mt-3 text-sm text-muted">{preview.routineId ? <>Your routine works {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}. The map shows how recovered each muscle is.</> : <>Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</>}</p>
+              )}
             </div>
           </Section>
         </>

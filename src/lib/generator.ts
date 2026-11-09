@@ -1,12 +1,13 @@
 import { blockWeek, weekStart, type BlockWeek } from "./block";
 import { stepLoad } from "./loads";
 import type { Call } from "./readiness";
-import { available, EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { available, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "./exercises";
 import { activeInjuries, effectFor, lighten, skippedIds, type Injury } from "./injury";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { groupedSeconds } from "./superset";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
@@ -26,6 +27,26 @@ export interface PlanItem {
   injuryPct?: number;
   /** Lighter sets before the working sets (warmup.ts). */
   warmup?: WarmupSet[];
+  // ---- Set by a program (programs.ts); the adaptive plan leaves them out.
+  /** The program lift these sets count for, saved on each set so a swap keeps its progress. */
+  slot?: string;
+  /** A target for each working set, when they differ (ramps, percentages, a last set for max reps). */
+  setTargets?: SetTarget[];
+  /** Short scheme for lists, such as "5 × 5" or "5, 5, 5+". */
+  scheme?: string;
+  /** Tier or role, such as "T1" or "Main lift". */
+  label?: string;
+  /** Superset: neighbours with the same group are done back to back (superset.ts). */
+  group?: string;
+}
+
+export interface SetTarget {
+  /** Kilograms (per hand for dumbbells). */
+  weight: number;
+  /** Reps, or the minimum when `amrap`. Seconds for holds. */
+  reps: number;
+  /** As many good reps as possible. */
+  amrap?: boolean;
 }
 
 export interface Plan {
@@ -37,6 +58,10 @@ export interface Plan {
   call: Call;
   challenge: boolean;
   items: PlanItem[];
+  /** Set when a program built the plan: which program, which day of it, and a line for Today. */
+  program?: { id: string; day: number; dayName: string; note: string; fixed: boolean };
+  /** Set when the plan is a saved routine instead of the adaptive plan (routines.ts). */
+  routineId?: string;
 }
 
 export interface GenerateInput {
@@ -50,6 +75,8 @@ export interface GenerateInput {
   /** Today's push / normal / recover call, after any override by the lifter. */
   call?: Call;
   challenge?: boolean;
+  /** A split day (programs.ts): only these muscles, and only exercises whose main muscles are all in it. */
+  muscles?: readonly Muscle[];
 }
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
@@ -73,8 +100,8 @@ export function itemSeconds(item: Pick<PlanItem, "exerciseId" | "sets" | "restSe
 }
 
 /** The whole plan: every exercise plus the rest before each one after the first. */
-export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup">[]): number {
-  return items.reduce((s, i, n) => s + itemSeconds(i) + (n ? i.restSec : 0), 0);
+export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup" | "group">[]): number {
+  return groupedSeconds(items, (n) => itemSeconds(items[n]));
 }
 
 /** Hard sets per muscle since the start of this block week (secondary muscles count half). */
@@ -123,19 +150,21 @@ function order(a: Exercise, b: Exercise): number {
   return rank(a) - rank(b);
 }
 
-export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false }: GenerateInput): Plan {
+export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false, muscles }: GenerateInput): Plan {
+  const day = muscles ? new Set(muscles) : null;
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const hurt = activeInjuries(events);
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
-  const pool = available(gym.equipment).filter((e) => !skip.has(e.id));
+  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
   const random = rng(hash(dayKey(now) + gym.id));
   const recent = recentFor(events);
   const budget = minutes * 60;
 
   // Muscles ranked by how ready they are and how much of this week's target is left.
-  const ranked = MUSCLES.filter((m) => rec[m] >= 55)
+  // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
+  const ranked = MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
     .map((m) => {
       const left = Math.max(0, week.setsPerMuscle - done[m]) / week.setsPerMuscle;
       const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;
@@ -215,6 +244,42 @@ export function injuredTarget(ex: Exercise, t: Target, hurt: readonly Injury[], 
   const eff = effectFor(ex, hurt);
   if (eff?.action !== "light") return { target: t };
   return { target: lighten(t, ex, eff.pct, gym), injuryPct: eff.pct };
+}
+
+/**
+ * Injuries on a plan built elsewhere (a fixed program day or a saved routine): exercises an injury
+ * skips are swapped for the closest one that isn't skipped (keeping the program lift's sets and reps),
+ * or dropped; lighter ones are scaled, set by set. The adaptive plan does this as it picks.
+ */
+export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Plan {
+  const hurt = activeInjuries(events);
+  if (!hurt.length) return plan;
+  const items: PlanItem[] = [];
+  for (const item of plan.items) {
+    let ex = EXERCISE_BY_ID.get(item.exerciseId)!;
+    let next: PlanItem = item;
+    if (effectFor(ex, hurt)?.action === "skip") {
+      const alt = alternatives(ex.id, gym, [...items, ...plan.items].map((i) => i.exerciseId), hurt).find((e) => !LADDER_ONLY.has(e.id));
+      if (!alt) continue;
+      ex = alt;
+      const t = target(alt, events, profile, gym, now);
+      next = { ...item, exerciseId: alt.id, target: { ...t, reps: item.target.reps, note: item.target.note }, warmup: undefined, setTargets: item.setTargets?.map((x) => ({ ...x, weight: t.weight })) };
+    }
+    const eff = effectFor(ex, hurt);
+    if (eff?.action === "light") {
+      const lit = (w: number, reps: number) => lighten({ weight: w, reps, rir: next.target.rir, note: "" }, ex, eff.pct, gym);
+      next = {
+        ...next,
+        target: lighten(next.target, ex, eff.pct, gym),
+        setTargets: next.setTargets?.map((x) => ({ ...x, weight: lit(x.weight, x.reps).weight, reps: lit(x.weight, x.reps).reps, amrap: undefined })),
+        injuryPct: eff.pct,
+        challenge: undefined,
+        warmup: undefined,
+      };
+    }
+    items.push(next);
+  }
+  return { ...plan, items, challenge: items.some((i) => i.challenge) };
 }
 
 /** Turns the day's call into the plan: easy days drop a set and a step of load, push days go one rep closer to failure on the first lift. */

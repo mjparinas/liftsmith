@@ -5,7 +5,8 @@ import { AchievementRow, useGame } from "./Achievements";
 import { go } from "./router";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { fmtNum, fromKg } from "@/lib/units";
+import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { useState } from "react";
 import { ago, clock } from "./format";
 import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
@@ -13,8 +14,8 @@ import { HUE } from "./theme";
 import { Button, EmptyState, Section, StatTile } from "./ui";
 import { StrengthCard, TonnageCard } from "./Extras";
 
-function Spark({ points }: { points: number[] }) {
-  if (points.length < 2) return <div className="h-10 text-xs text-faint">Needs two sessions</div>;
+function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
+  if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty}</div>;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const w = 120;
@@ -88,6 +89,8 @@ export function Stats() {
         </div>
       </Section>
 
+      <BodyweightCard />
+
       <Section title="Estimated one-rep max" icon="progress" info="e1rm">
         <ul className="card divide-y divide-line">
           {top.map(([id, series]) => (
@@ -137,5 +140,40 @@ export function Stats() {
         </ul>
       </Section>
     </div>
+  );
+}
+
+/** Body weight log: one input, a trend line and the change over the last month. */
+function BodyweightCard() {
+  const { events, profile, logBodyweight } = useApp();
+  const unit = profile.unit;
+  const log = events.filter((e) => e.type === "bodyweight").sort((a, b) => a.at - b.at);
+  const [value, setValue] = useState("");
+  const last = log.at(-1);
+  const monthAgo = [...log].reverse().find((e) => !!last && e.type === "bodyweight" && e.at <= last.at - 28 * 86400_000);
+  const kg = (e: (typeof log)[number] | undefined) => (e?.type === "bodyweight" ? e.kg : undefined);
+  const change = kg(last) !== undefined && kg(monthAgo) !== undefined ? fromKg(kg(last)! - kg(monthAgo)!, unit) : undefined;
+  const submit = () => {
+    const n = Number(value);
+    if (!(n > 0)) return;
+    logBodyweight(toKg(n, unit));
+    setValue("");
+  };
+  return (
+    <Section title="Body weight" icon="heart">
+      <div className="card p-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <div className="num text-2xl font-bold">{fmtNum(Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10)} {unit}</div>
+            <div className="text-sm text-muted">{change !== undefined ? `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)} ${unit} in 4 weeks` : log.length ? `${log.length} weigh-in${log.length > 1 ? "s" : ""}` : "No weigh-ins yet"}</div>
+          </div>
+          <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty="Log twice for a trend" />
+        </div>
+        <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+          <input inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value.replace(/[^\d.]/g, ""))} placeholder={`Today, in ${unit}`} aria-label={`Today's body weight in ${unit}`} className="num min-h-11 w-0 min-w-0 flex-1 rounded-xl border border-line bg-surface px-3" />
+          <Button kind="ghost" label="Log body weight" onClick={submit}>Log</Button>
+        </form>
+      </div>
+    </Section>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useApp } from "@/lib/store";
+import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
@@ -10,9 +11,11 @@ import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
 import { erasePhotos } from "@/lib/photos";
 import { MessageSettings } from "./MessageSettings";
+import { ImportWorkouts } from "./ImportCsv";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
+import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -27,7 +30,7 @@ function Row<T extends string | number>({ label, value, options, onPick, info }:
 }
 
 export function Settings() {
-  const { profile, setProfile, reset } = useApp();
+  const { profile, setProfile, reset, events, gyms } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
   const { arg } = useRoute();
@@ -42,6 +45,12 @@ export function Settings() {
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>Injuries and sore spots</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
+      <Section title="Program">
+        <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
+          <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? "Adaptive"}</span>
+          <span className="text-accent">Change ›</span>
+        </button>
+      </Section>
       <Section title="Your name">
         <input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} className="card w-full px-4 py-3" placeholder="Optional" aria-label="Your name" />
       </Section>
@@ -81,6 +90,12 @@ export function Settings() {
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>
       <Section title="Data">
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>Export sets (CSV)</Button>
+          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events))}>Full backup (JSON)</Button>
+        </div>
+        <p className="mb-3 text-xs text-faint">The CSV has every working set for spreadsheets. The backup has everything: profile, gyms, workouts, body weight and heart rate.</p>
+        <div className="mb-4"><ImportWorkouts /></div>
         {confirm ? (
           <div className="space-y-2">
             <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>

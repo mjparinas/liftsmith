@@ -128,3 +128,29 @@ describe("swaps with an injury", () => {
     expect(effectFor(alts[0], active)).toBeNull();
   });
 });
+
+describe("programs and routines with an injury", () => {
+  it("a fixed program day swaps skipped lifts (keeping sets and reps) and lightens set by set", async () => {
+    const { pickProgram, programPlan } = await import("./programs");
+    const { injuryPass } = await import("./generator");
+    const p = profile();
+    const src = pickProgram("classic-5x5", { profile: p, gym, events: [], now: NOW });
+    if (src.kind !== "program") throw new Error("program");
+    const day = programPlan({ src, profile: p, gym, events: [], now: NOW })!;
+    expect(day.items.map((i) => i.exerciseId)).toContain("back-squat");
+    const evs = [hurt("knee", "k"), hurt("shoulder", "s"), rule("s", { exerciseId: "bench-press", action: "light", pct: 60, ack: true })];
+    const out = injuryPass(day, evs, p, gym, NOW);
+    const squat = day.items.find((i) => i.exerciseId === "back-squat")!;
+    const swapped = out.items.find((i) => i.slot === squat.slot)!;
+    if (swapped) {
+      expect(affects("knee", exercise(swapped.exerciseId))).toBe(false);
+      expect(swapped.sets).toBe(squat.sets);
+      expect(swapped.target.reps).toBe(squat.target.reps);
+    }
+    const bench = day.items.find((i) => i.exerciseId === "bench-press")!;
+    const lit = out.items.find((i) => i.exerciseId === "bench-press")!;
+    expect(lit.injuryPct).toBe(60);
+    expect(lit.target.weight).toBeLessThanOrEqual(bench.target.weight * 0.6 + 1e-6);
+    for (const [k, x] of (lit.setTargets ?? []).entries()) expect(x.weight).toBeLessThanOrEqual((bench.setTargets?.[k].weight ?? bench.target.weight) * 0.6 + 1e-6);
+  });
+});

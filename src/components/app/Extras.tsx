@@ -21,6 +21,8 @@ import { drillSeconds, warmupRoutine, type Drill } from "@/lib/warmupRoutine";
 import { useMemo, useState } from "react";
 import { go } from "./router";
 import { Button, Section, Sheet } from "./ui";
+import { Icon } from "./icons";
+import { RoutinesSheet } from "./Routines";
 
 /** Lean mode (Settings › Celebrations): no extra pop-ups. */
 export function lean(p: { lean?: boolean }): boolean {
@@ -96,7 +98,9 @@ export function TodayMoments() {
 
 /** "Same as last time", the general warm-up and gym buddy check-in, above the plan. */
 export function PlanExtras() {
-  const { events, preview, profile, gyms, setPlan, replan, active } = useApp();
+  const { events, preview, profile, gyms, setPlan, replan, active, routineId } = useApp();
+  const [routinesOpen, setRoutinesOpen] = useState(false);
+  const routine = profile.routines?.find((r) => r.id === routineId);
   const now = useNow(60_000);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const last = useMemo(() => lastWorkout(events), [events]);
@@ -125,10 +129,15 @@ export function PlanExtras() {
           {repeating ? "✓ Same as last time" : "↻ Same as last time"}
         </button>
       )}
+      <button type="button" aria-pressed={!!routine} onClick={() => { haptic("tick"); setRoutinesOpen(true); }} className={`press inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border px-3.5 ${routine ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>
+        <Icon name="layers" size={15} />
+        <span className="truncate">{routine ? routine.name : "Routines"}</span>
+      </button>
       {preview.items.length > 0 && (
         <button type="button" onClick={() => setWarmOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">🔥 Warm up first</button>
       )}
       <button type="button" onClick={() => setBuddyOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">👋 Check in</button>
+      <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
       <Sheet open={warmOpen} onClose={() => setWarmOpen(false)} title="Five-minute warm-up">
         <WarmupList drills={warmupRoutine(muscles, gym.equipment, now, 5)} />
       </Sheet>
