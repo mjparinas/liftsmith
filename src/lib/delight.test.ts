@@ -10,7 +10,7 @@ import { fitSize, pairFor, type Photo } from "./photos";
 import { changeText, lastLoadedKg, plateChange } from "./plateMemory";
 import { monthOf, recap, suggestedPeriod, yearOf } from "./recap";
 import { nextSeasonal, SEASONAL, seasonalChallenges } from "./seasonal";
-import { ageFactor, percentileOf, scoreOf, strength, twins } from "./strength";
+import { ageFactor, percentileOf, scoreBand, scoreOf, strength, twins } from "./strength";
 import { activeTheme, newlyUnlocked, THEMES, unlocked } from "./themes";
 import type { AppEvent, SetEvent } from "./types";
 import { doneCue, exerciseCue, setCue, spokenLoad } from "./voice";
@@ -176,6 +176,16 @@ describe("smart plate memory", () => {
       expect(changeText(plateChange([20, 2.5], [20, 5]), "kg", fmt)).toBe("Retirez 2.5, puis ajoutez 5 kg de chaque côté");
       expect(paceText(-65)).toBe("1:05 de retard");
       expect(TONNAGE[0].name).not.toBe("a grand piano");
+    } finally {
+      setLanguage("system");
+    }
+  });
+  it("words check-ins, seasonal challenges and the strength band in Spanish", () => {
+    setLanguage("es");
+    try {
+      expect(checkinText({ gym: "Iron Den", focus: ["Pecho", "Tríceps"], buddies: ["Sam"] })).toBe("¡Hola, Sam! Estoy en el gimnasio, en Iron Den, hoy toca pecho y tríceps. Te toca 💪");
+      expect(SEASONAL.find((d) => d.id === "halloween")!.name).toBe("Fuerza de miedo");
+      expect(scoreBand(60)).toBe("Intermedio");
     } finally {
       setLanguage("system");
     }

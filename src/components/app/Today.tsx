@@ -343,7 +343,7 @@ function FitAroundCalendar() {
       type="button"
       onClick={() => {
         haptic("tick");
-        setProfile({ minutes: fit, minutesDay: dayKey(Date.now()) });
+        setProfile({ minutes: fit, minutesDay: dayKey(now) });
       }}
       className="press mt-3 flex w-full items-center gap-2 rounded-xl border border-cyan/30 bg-cyan/8 px-3 py-2.5 text-left text-sm"
     >
