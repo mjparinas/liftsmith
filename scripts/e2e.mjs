@@ -1,5 +1,5 @@
 // Full playthrough: first run, a workout with rest, swaps and feedback, finish, and every tab.
-//   npm run build && node scripts/e2e.mjs [base-url] [out-dir]
+//   npm run build:static && node scripts/e2e.mjs [base-url] [out-dir]
 import fs from "node:fs";
 import { chromium, devices } from "playwright";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";

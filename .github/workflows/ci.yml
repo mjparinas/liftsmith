@@ -63,7 +63,7 @@ jobs:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
-      - run: npm run build
+      - run: npm run build:static
       - uses: actions/upload-artifact@v7
         with:
           name: web-build

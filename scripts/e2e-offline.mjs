@@ -1,5 +1,5 @@
 // Real offline: after one visit, the app opens and a workout runs with the network off.
-//   npm run build && node scripts/e2e-offline.mjs
+//   npm run build:static && node scripts/e2e-offline.mjs
 import { chromium } from "playwright";
 import { base, check, finish, onboard } from "./helpers.mjs";
 

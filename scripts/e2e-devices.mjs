@@ -1,5 +1,5 @@
 // Layout on common phones and tablets: no sideways scroll, the main button on screen, big targets.
-//   npm run build && node scripts/e2e-devices.mjs [base-url] [out-dir]
+//   npm run build:static && node scripts/e2e-devices.mjs [base-url] [out-dir]
 import fs from "node:fs";
 import { chromium, devices } from "playwright";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";

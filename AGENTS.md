@@ -12,12 +12,13 @@ npm test                     # unit + integration tests (Vitest; engine in node,
 npm run test:coverage
 npm run test:mutation        # Stryker on the engine; report in reports/mutation/
 npm run lint && npx tsc --noEmit
-npm run build                # static export to out/
+npm run build                # server build (Vercel): pages plus API routes (route.api.ts)
+npm run build:static         # static export to out/ (native shells, browser tests)
 node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
 node scripts/e2e-offline.mjs # real offline after one visit
 node scripts/e2e-devices.mjs # layout on 8 phones and tablets
 node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
-npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build)
+npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build:static)
 ```
 
 There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions (`.github/workflows/android.yml`).
@@ -86,7 +87,22 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link (saved or curated playlists). **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
 4. **Integrations server, right after the MVP and ahead of full sync** (Melvin decided, 2026-11-09). A small server on Vercel with libsql/Turso. Its first job is the OAuth exchange and token storage for **Strava, Oura and Whoop**, so all three ship in the first updates. Apply early for Strava Extended Access, Oura approval (including written consent to use their data in Pro features) and Whoop approval, because each caps us at 10 users until approved.
 5. **After that** (full order in the research doc's "How we win" section): Samsung Health Data SDK, a bar-speed sensor, watch apps, a Garmin Connect IQ app.
+6. **Approved additions (Melvin, 2026-11-09; details in the research doc's "Added to the plan"), built in this order, each on Android and iOS together:**
+   - **MVP+1 · Gym by location:** an opt-in geofence on each gym profile picks the active gym on arrival. Approximate location only, kept on the device.
+   - **MVP+1 · Cycle-aware readiness:** opt-in, with its own consent screen. Reads menstrual data from Health Connect and HealthKit, or the lifter logs it. It never leaves the device except through the user's own sync, and never goes to analytics.
+   - **MVP+1 · Voice and system shortcuts:** iOS App Intents and Shortcuts (log set, start workout, +30 s), Android App Actions, a Quick Settings tile, home-screen widgets, the iPhone Action button and Control Center.
+   - **MVP+2 · Calendar:** write planned training days to the device calendar, and read busy times only with permission.
+   - **With the server · Coach sharing:** a read-only link or PDF that expires and can be revoked, plus an opt-in weekly email (Resend).
+   - **With the server · Cloud integrations** (Strava, Oura, Whoop): connecting one explains that it creates a free account, then uses Google or Apple sign-in. Everything else stays account-free.
+   - **Before launch · Legal and consent:** the Health Connect declaration, HealthKit review notes, a privacy policy that covers each integration, Washington MHMDA and GDPR special-category consent, and export and delete that cover linked accounts.
+   - **Test devices:** Melvin has a Fitbit Air (check that its "Share heart rate" is seen by our 0x180D reader, since Google lists only some apps as compatible) and an Oura ring (readiness inputs through Health Connect and HealthKit now, the direct API later).
 - **Skipped:** Hume Health direct (no API; its data arrives through Apple Health), live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only, since iOS can't control other apps' volume, so it's skipped for platform parity).
+
+### In-app feedback (Melvin, 2026-11-09)
+- **Settings › Send feedback or report a bug** (`#/feedback`, `Feedback.tsx`): bug / idea / other, a message, an optional email for replies, an optional screenshot (picked from the photo library, shrunk to 1280 px JPEG), and device details that are on by default and shown before sending (app version, platform, screen, language, time zone, current screen, the last 30 errors). It never includes workouts, health data or names.
+- **Offline first:** reports go to an outbox in localStorage (`feedback.ts`) and are sent on open, when the connection returns, and right after writing. Only a 400/413/422 drops a report; 404, 429 and 5xx keep it for later.
+- **Delivery:** `POST /api/feedback/` (`src/app/api/feedback/route.api.ts`) checks the report (`feedbackServer.ts`), rate-limits per address, and emails it to the owner through **Resend** (`RESEND_API_KEY`, `FEEDBACK_TO`, optional `FEEDBACK_FROM` in Vercel). The reply-to is the sender's email, so the owner can answer straight from the inbox. CORS allows only the native shells' origins.
+- It's pure web code, so Android and iOS get it together (platform parity). Once the server has a database, reports are also stored and listed in the admin panel.
 
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
@@ -119,6 +135,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Stack copied from Gradelings** (`mjparinas/gradelings`): Next.js 16 static export, React 19, TypeScript, Tailwind 4, Zustand, Vitest.
 - **Capacitor, not Bubblewrap (Melvin chose it, 2026-11-09).** A TWA can't run a foreground service, show a live lock-screen countdown, read Health Connect, keep Bluetooth heart rate going with the screen off, or use StoreKit (it has no iOS app). Capacitor wraps the same static export and adds those through native plugins; it also builds the iOS app. The cost is a store release for each app change.
 - **Offline-first, like Gradelings.** Everything the lifter does is an event with a unique id (set, session start and end, feedback, swap), appended to IndexedDB first (`localdb.ts`). Stats, PRs, recovery, streaks, XP and progression are recomputed from events, never stored (`derive.ts`), so merging devices is order-independent and duplicate-safe. Profile and gyms are last-write-wins on `updatedAt`.
+- **Two builds** (`next.config.ts`): `npm run build` is the Vercel server build with API routes named `route.api.ts`; `npm run build:static` (`STATIC_EXPORT=1`) is the static export for the native shells and CI, and it leaves those routes out. Native apps call the API on `SITE_URL`.
 - **Sync (later):** push unsynced events and pull new ones by cursor (`POST /api/sync/`), when online, when the app becomes visible, and shortly after a change. Server on Vercel with libsql or Turso, as in Gradelings.
 - **One static page for the app** with hash routes (`#/today`, `#/workout`, …), so it works offline from one cached page.
 - **The active workout** is also kept in `localStorage`, so killing the app mid-set loses nothing.
@@ -160,7 +177,7 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 - **Accessibility:** axe-core WCAG 2.2 AA run, keyboard run, forced-colours support, and a colour-blind check. The recovery map's colours must pass it, and every band also has a label and a percentage.
 - **Browser tests like Gradelings':** a full playthrough, an offline run, a layout sweep across phones and tablets, and a tap-latency benchmark ("every tap answers within a frame or two").
 - **Store tooling:** scripts that make Play and App Store screenshots and the feature graphic from the real app, plus `docs/PLAY_LISTING.md` and `docs/PLAY_CONSOLE_ANSWERS.md`.
-- **Email** through Resend (receipts, weekly recap, win-back), with hashed unsubscribe tokens and the CASL mailing address.
+- **Email** through Resend (in-app feedback today; receipts, weekly recap, win-back later), with hashed unsubscribe tokens and the CASL mailing address.
 - **Exercise demo videos** self-hosted and cached on the device for offline use, like Gradelings' help videos.
 - **Data rights:** JSON export, erase device and delete account; a restore check for backups; a full-storage notice.
 - **Languages:** English at launch. UI text stays in one place per screen so Spanish and French can follow, as Gradelings did.
