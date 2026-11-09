@@ -32,6 +32,7 @@
     "@mediapipe/tasks-vision": "1.2.2",
     "@revenuecat/purchases-capacitor": "^14.1.0",
     "@types/canvas-confetti": "^1.9.0",
+    "@vercel/analytics": "^2.0.1",
     "canvas-confetti": "^1.9.4",
     "next": "16.4.5",
     "react": "19.3.1",
