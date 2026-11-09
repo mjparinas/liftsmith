@@ -47,6 +47,87 @@
   50% { box-shadow: 0 0 0 10px rgb(76 141 255 / 0); }
 }
 
+/* Light mode (Melvin, 2026-11-09). Settings › Appearance sets data-theme on <html> to dark, light
+   or system. Every colour is a token, so each one needs exactly one light value here. Text colours
+   keep WCAG AA contrast on the light surfaces (axe checks both themes). */
+:root {
+  color-scheme: dark;
+  /* Badge tiers, crate rarities and heart rate zones: drawn as text too, so they get light values. */
+  --tier-bronze: #c98a55;
+  --tier-silver: #c3ccd8;
+  --tier-gold: #f2c14e;
+  --tier-platinum: #9be7ff;
+  --rarity-common: #8a97a8;
+  --rarity-rare: #4c8dff;
+  --rarity-epic: #a78bfa;
+  --rarity-legendary: #f2c14e;
+  --hr-1: #8a97a8;
+  --hr-2: #4c8dff;
+  --hr-3: #34d399;
+  --hr-4: #f5b544;
+  --hr-5: #f0605d;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-raised: #eaeef3;
+  --color-line: #d3dae3;
+  --color-ink: #0e1621;
+  --color-muted: #4b5868;
+  --color-faint: #5c6876;
+  --color-accent: #1d4fc4;
+  --color-accent-ink: #ffffff;
+  --color-good: #0a7350;
+  --color-warn: #8a5100;
+  --color-bad: #a82222;
+  --color-gold: #775600;
+  --tier-bronze: #7f4e22;
+  --tier-silver: #535f6f;
+  --tier-gold: #775600;
+  --tier-platinum: #086780;
+  --rarity-common: #535f6f;
+  --rarity-rare: #1d4fc4;
+  --rarity-epic: #5f3fc4;
+  --rarity-legendary: #775600;
+  --hr-1: #535f6f;
+  --hr-2: #1d4fc4;
+  --hr-3: #0a7350;
+  --hr-4: #8a5100;
+  --hr-5: #a82222;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    color-scheme: light;
+    --color-bg: #f4f6f9;
+    --color-surface: #ffffff;
+    --color-raised: #eaeef3;
+    --color-line: #d3dae3;
+    --color-ink: #0e1621;
+    --color-muted: #4b5868;
+    --color-faint: #5c6876;
+    --color-accent: #1d4fc4;
+    --color-accent-ink: #ffffff;
+    --color-good: #0a7350;
+    --color-warn: #8a5100;
+    --color-bad: #a82222;
+    --color-gold: #775600;
+    --tier-bronze: #7f4e22;
+    --tier-silver: #535f6f;
+    --tier-gold: #775600;
+    --tier-platinum: #086780;
+    --rarity-common: #535f6f;
+    --rarity-rare: #1d4fc4;
+    --rarity-epic: #5f3fc4;
+    --rarity-legendary: #775600;
+    --hr-1: #535f6f;
+    --hr-2: #1d4fc4;
+    --hr-3: #0a7350;
+    --hr-4: #8a5100;
+    --hr-5: #a82222;
+  }
+}
+
 html, body {
   background: var(--color-bg);
   color: var(--color-ink);

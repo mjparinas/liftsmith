@@ -1,4 +1,5 @@
 "use client";
+import { applyTheme, isLight, savedTheme } from "@/lib/theme";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
@@ -33,6 +34,7 @@ export function App() {
   const { ready, init, profile, active } = useApp();
   const { route } = useRoute();
   useEffect(() => {
+    applyTheme(savedTheme());
     installDiag();
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
@@ -48,8 +50,20 @@ export function App() {
     juice.lean = !!profile.lean;
     const pick = (id?: string) => COSMETICS.find((c) => c.id === id);
     sound.theme = (pick(profile.cosmetics?.sound)?.value ?? "classic") as TimerSound;
-    applyAccent(pick(profile.cosmetics?.accent)?.value);
-  }, [profile.lean, profile.cosmetics]);
+    applyTheme(profile.theme ?? "dark");
+    applyAccent(pick(profile.cosmetics?.accent)?.value, isLight(profile.theme ?? "dark"));
+  }, [profile.lean, profile.cosmetics, profile.theme]);
+  // "Match system" follows the phone's setting live (status bar and accent; the colours are CSS).
+  useEffect(() => {
+    if (profile.theme !== "system" || typeof matchMedia === "undefined") return;
+    const mq = matchMedia("(prefers-color-scheme: light)");
+    const on = () => {
+      applyTheme("system");
+      applyAccent(COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value, mq.matches);
+    };
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, [profile.theme, profile.cosmetics]);
   // Which screens get used (the route name only, nothing on it).
   useEffect(() => {
     if (ready) track("screen_view", { screen: profile.onboarded ? route : "onboarding" });

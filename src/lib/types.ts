@@ -236,6 +236,8 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /** Appearance: dark (default), light, or follow the system (theme.ts). */
+  theme?: "dark" | "light" | "system";
   onboarded: boolean;
   updatedAt: number;
 }

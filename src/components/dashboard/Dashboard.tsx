@@ -1,4 +1,5 @@
 "use client";
+import { applyTheme, savedTheme } from "@/lib/theme";
 import { BRAND } from "@/lib/brand";
 import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals, yearGrid } from "@/lib/dashboard";
 import { defaultProfile } from "@/lib/defaults";
@@ -89,9 +90,11 @@ export function Dashboard() {
   );
   useEffect(() => {
     track("screen_view", { screen: "me" });
+    applyTheme(savedTheme());
     load().then((snap) => {
       setNow(Date.now());
       setData({ events: snap.events, profile: snap.profile ?? defaultProfile() });
+      applyTheme(snap.profile?.theme ?? "dark");
     });
     // Back from the app tab with new workouts: show them.
     const on = () => document.visibilityState === "visible" && void reload();

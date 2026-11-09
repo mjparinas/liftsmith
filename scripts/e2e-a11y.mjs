@@ -13,7 +13,7 @@ const scan = async (where) => {
   await page.waitForTimeout(400); // let entry animations settle before checking contrast
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
-    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(", ")}`);
+    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ") + (process.env.A11Y_DETAIL ? ` [${n.any?.[0]?.message}] ${n.html.slice(0, 160)}` : "")).join(", ")}`);
   }
 };
 try {
@@ -65,6 +65,27 @@ try {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
   await scan("feedback sent");
+  // Light mode: every main screen again, so the light tokens pass contrast too.
+  await page.goto(`${server.url}/app/#/settings`);
+  await page.getByRole("button", { name: "Light", exact: true }).click();
+  await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
+  await scan("light settings");
+  await page.getByRole("button", { name: "‹ Today" }).click();
+  await scan("light today");
+  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
+    await page.getByRole("button", { name: tab }).click();
+    await scan(`light ${tab}`);
+  }
+  await page.getByRole("button", { name: "Today" }).click();
+  await page.getByRole("button", { name: "Start workout" }).click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+  await scan("light workout");
+  await page.goto(`${server.url}/me/`);
+  await page.getByRole("heading", { name: /training/ }).waitFor();
+  for (const tab of ["Overview", "Lifts"]) {
+    await page.getByRole("link", { name: tab, exact: true }).click();
+    await scan(`light dashboard ${tab}`);
+  }
 } catch (e) {
   fail.push(String(e));
 }

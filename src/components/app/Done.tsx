@@ -10,7 +10,7 @@ import { track } from "@/lib/analytics";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useMemo, useState } from "react";
-import { Badge, LeagueCard, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
+import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
@@ -32,7 +32,6 @@ function useCountUp(to: number, ms = 900) {
   return v;
 }
 
-const RARITY_COLOUR = { common: "#8a97a8", rare: "#4c8dff", epic: "#a78bfa", legendary: "#f2c14e" } as const;
 
 /** The post-workout crate: shakes until tapped (never during a set), then shows its prize. */
 function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {

@@ -155,8 +155,9 @@ export async function keepAwake(on: boolean) {
 }
 
 /** Applies a crate accent colour to the whole app. */
-export function applyAccent(hex: string | undefined) {
+/** On a light screen a bright accent is darkened so text in it keeps its contrast. */
+export function applyAccent(hex: string | undefined, light = false) {
   if (typeof document === "undefined") return;
-  if (hex) document.documentElement.style.setProperty("--color-accent", hex);
+  if (hex) document.documentElement.style.setProperty("--color-accent", light ? `color-mix(in srgb, ${hex} 70%, #000)` : hex);
   else document.documentElement.style.removeProperty("--color-accent");
 }
