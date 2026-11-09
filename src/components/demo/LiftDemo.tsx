@@ -40,7 +40,8 @@ export interface LiftDemoProps {
 
 const BODY_KEY = "liftsmith.demo.body";
 const noSubscribe = () => () => {};
-const readBody = (): BodyKey | null => {
+/** The body the lifter last picked for the demos on this device, if any. */
+export const readBody = (): BodyKey | null => {
   try {
     const v = localStorage.getItem(BODY_KEY);
     return v === "male" || v === "female" ? v : null;

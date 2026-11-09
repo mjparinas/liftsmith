@@ -101,9 +101,10 @@ export function BodyMap({ rec, focus, compact }: { rec: Record<Muscle, number>; 
 }
 
 /** A legend swatch: the band's colour with the same mark the map uses. */
-export function Swatch({ band, colour }: { band: Band; colour: string }) {
+export function Swatch({ band, colour, hatchOnly }: { band: Band; colour: string; hatchOnly?: boolean }) {
   const id = useId().replace(/:/g, "");
-  const mark = BAND_MARK[band];
+  // the 3D map marks only Fatigued muscles (bright cross lines), so its legend does too
+  const mark = hatchOnly ? (band === "fatigued" ? "hatch" : null) : BAND_MARK[band];
   return (
     <svg viewBox="0 0 12 12" className="keep-colours h-3.5 w-3.5 shrink-0" aria-hidden="true">
       {mark && <Marks id={id} />}
@@ -113,12 +114,12 @@ export function Swatch({ band, colour }: { band: Band; colour: string }) {
   );
 }
 
-export function Legend() {
+export function Legend({ hatchOnly }: { hatchOnly?: boolean } = {}) {
   return (
     <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-4" aria-label={t("map.legend")}>
       {BANDS.map((b) => (
         <li key={b.band} className="flex flex-wrap items-center gap-x-2">
-          <Swatch band={b.band} colour={b.colour} />
+          <Swatch band={b.band} colour={b.colour} hatchOnly={hatchOnly} />
           <span className="text-ink">{b.label}</span>
           <span className="text-faint num">{b.min === 0 ? `<${num(0.4, { style: "percent" })}` : `${num(b.min / 100, { style: "percent" })}+`}</span>
         </li>

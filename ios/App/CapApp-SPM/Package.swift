@@ -21,7 +21,8 @@ let package = Package(
         .package(name: "CapacitorShare", path: "../../../node_modules/@capacitor/share"),
         .package(name: "CapacitorStatusBar", path: "../../../node_modules/@capacitor/status-bar"),
         .package(name: "CapacitorTextZoom", path: "../../../node_modules/@capacitor/text-zoom"),
-        .package(name: "CapgoCapacitorHealth", path: "../../../node_modules/@capgo/capacitor-health")
+        .package(name: "CapgoCapacitorHealth", path: "../../../node_modules/@capgo/capacitor-health"),
+        .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor")
     ],
     targets: [
         .target(
@@ -38,7 +39,8 @@ let package = Package(
                 .product(name: "CapacitorShare", package: "CapacitorShare"),
                 .product(name: "CapacitorStatusBar", package: "CapacitorStatusBar"),
                 .product(name: "CapacitorTextZoom", package: "CapacitorTextZoom"),
-                .product(name: "CapgoCapacitorHealth", package: "CapgoCapacitorHealth")
+                .product(name: "CapgoCapacitorHealth", package: "CapgoCapacitorHealth"),
+                .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor")
             ]
         )
     ]

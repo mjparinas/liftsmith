@@ -48,6 +48,13 @@ describe("collecting usage events", () => {
     expect(s).toMatchObject({ kind: "purchase", plan: "annual", currency: "USD", price_micros: 39_990_000, usd_micros: 39_990_000, store: "play", country: "US" });
   });
 
+  it("stops mirroring the app's purchases once store notifications come through RevenueCat", async () => {
+    vi.stubEnv("REVENUECAT_WEBHOOK_SECRET", "s3cret");
+    await storeBatch(batch([{ id: "ev-ccccccc2", name: "trial_start", at: NOW, props: { plan: "annual", store: "play" } }]), {}, NOW);
+    expect(await query("SELECT * FROM subscription_events")).toHaveLength(0);
+    expect(await query("SELECT * FROM events")).toHaveLength(1);
+  });
+
   it("reads only the country and region from the request", () => {
     expect(whereFrom(new Headers({ "x-vercel-ip-country": "ca", "x-vercel-ip-country-region": "ON", "x-vercel-ip-city": "Ottawa" }))).toEqual({ country: "CA", region: "ON" });
   });
