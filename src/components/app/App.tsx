@@ -1,5 +1,7 @@
 "use client";
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
+import { readPhoneLanguage, setLanguage, t, useLang } from "@/lib/i18n";
+import type { MessageKey } from "@/locales/en";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
@@ -33,12 +35,12 @@ import { goalStreak } from "@/lib/game";
 import { useNow } from "@/lib/useNow";
 import { activeTheme, applyTheme } from "@/lib/themes";
 
-const TABS: { route: Route; label: string; icon: IconName }[] = [
-  { route: "today", label: "Today", icon: "today" },
-  { route: "recovery", label: "Recovery", icon: "recovery" },
-  { route: "stats", label: "Progress", icon: "progress" },
-  { route: "achievements", label: "Awards", icon: "trophy" },
-  { route: "gym", label: "Gyms", icon: "gym" },
+const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
+  { route: "today", label: "tab.today", icon: "today" },
+  { route: "recovery", label: "tab.recovery", icon: "recovery" },
+  { route: "stats", label: "tab.progress", icon: "progress" },
+  { route: "achievements", label: "tab.awards", icon: "trophy" },
+  { route: "gym", label: "tab.gyms", icon: "gym" },
 ];
 
 export function App() {
@@ -57,6 +59,17 @@ export function App() {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Language (i18n.ts): the phone's language, read again on return in case it changed, or the
+  // one picked in Settings. useLang re-renders the whole app when it changes.
+  useLang();
+  const language = profile.language;
+  useEffect(() => {
+    setLanguage(language);
+    const reread = () => document.visibilityState === "visible" && void readPhoneLanguage();
+    reread();
+    document.addEventListener("visibilitychange", reread);
+    return () => document.removeEventListener("visibilitychange", reread);
+  }, [language]);
   // Accessibility (a11y.ts): text size, colour-blind safe colours, contrast. The phone's own text
   // size is read again when the app comes back, in case it was changed in the phone's settings.
   const a11y = profile.a11y;
@@ -188,25 +201,25 @@ export function App() {
     <>
       <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">{screen}</main>
       {showNav && (
-        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label="Main">
+        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label={t("nav.main")}>
           <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
-            {TABS.map((t) => {
-              const on = route === t.route;
+            {TABS.map((tab) => {
+              const on = route === tab.route;
               return (
-                <li key={t.route}>
+                <li key={tab.route}>
                   <button
                     type="button"
                     aria-current={on ? "page" : undefined}
                     onClick={() => {
                       if (!on) haptic("select");
-                      go(t.route);
+                      go(tab.route);
                     }}
                     className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
                   >
                     <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
-                      <Icon name={t.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                      <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                     </span>
-                    {t.label}
+                    {t(tab.label)}
                   </button>
                 </li>
               );
