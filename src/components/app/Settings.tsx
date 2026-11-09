@@ -8,6 +8,8 @@ import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { MessageSettings } from "./MessageSettings";
 import { deleteEmail } from "@/lib/reminders";
+import { SITE_URL } from "@/lib/site";
+import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -24,12 +26,14 @@ function Row<T extends string | number>({ label, value, options, onPick }: { lab
 export function Settings() {
   const { profile, setProfile, reset } = useApp();
   const [confirm, setConfirm] = useState(false);
+  const [stats, setStats] = useState(analyticsOn());
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
       <h1 className="text-2xl font-bold">Settings</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
+      <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
       <Section title="Your name">
         <input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} className="card w-full px-4 py-3" placeholder="Optional" aria-label="Your name" />
       </Section>
@@ -46,6 +50,13 @@ export function Settings() {
       <CalendarSettings />
       <MessageSettings />
       <CycleSettings />
+      <Section title="Usage stats">
+        <div className="flex flex-wrap gap-2">
+          <Chip active={stats} onClick={() => { setAnalytics(true); setStats(true); }}>Share anonymous stats</Chip>
+          <Chip active={!stats} onClick={() => { setAnalytics(false); setStats(false); }}>Off</Chip>
+        </div>
+        <p className="mt-2 text-xs text-faint">Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data. <a className="underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">Privacy</a>{stats ? ` · Install id ${installId().slice(0, 8)}` : ""}</p>
+      </Section>
       <Section title="Training block">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>

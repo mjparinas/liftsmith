@@ -13,7 +13,7 @@ export function OPTIONS(req: Request) {
 
 export async function POST(req: Request) {
   const h = cors(req.headers.get("origin"));
-  if (limited(req, 60)) return json(429, { error: "Too many requests" }, h);
+  if (await limited(req, "sub", 60)) return json(429, { error: "Too many requests" }, h);
   const s = setup();
   if (!s) return json(503, { error: "Email reminders are not configured" }, h);
   const raw = await readJson(req);
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
 export async function DELETE(req: Request) {
   const h = cors(req.headers.get("origin"));
-  if (limited(req, 60)) return json(429, { error: "Too many requests" }, h);
+  if (await limited(req, "sub", 60)) return json(429, { error: "Too many requests" }, h);
   const s = setup();
   if (!s) return json(503, { error: "Email reminders are not configured" }, h);
   const raw = (await readJson(req)) as { id?: unknown; token?: unknown } | undefined;

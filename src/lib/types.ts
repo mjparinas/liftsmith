@@ -274,6 +274,8 @@ export interface SessionStartEvent extends EventBase {
   /** The lifter changed the call before starting. */
   callOverridden?: boolean;
   challenge?: boolean;
+  /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
+  source?: "manual";
 }
 
 export interface SessionEndEvent extends EventBase {

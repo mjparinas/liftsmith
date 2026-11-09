@@ -2,6 +2,7 @@
 // and the store and mailer for this server.
 import { NATIVE_ORIGINS } from "@/lib/feedbackServer";
 import { reminderEnv, resendMailer, type Env, type Mailer, type Store } from "./reminders";
+import { rateLimit } from "./db";
 import { dbStore } from "./remindersDb";
 
 export const MAX_BODY = 8_000;
@@ -10,14 +11,14 @@ export function cors(origin: string | null): Record<string, string> {
   return origin && NATIVE_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
 }
 
-const hits = new Map<string, number[]>();
-/** True when this address made `limit` requests in the last hour (per server instance). */
-export function limited(req: Request, limit: number, now = Date.now()): boolean {
+/** True when this address made `limit` requests to `route` in the last hour (shared across instances, db.ts). */
+export async function limited(req: Request, route: string, limit: number): Promise<boolean> {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
-  if (recent.length >= limit) return true;
-  hits.set(ip, [...recent, now]);
-  return false;
+  try {
+    return !(await rateLimit(`reminders:${route}:${ip}`, limit, 3_600_000));
+  } catch {
+    return false; // the database is down: the handlers fail on their own
+  }
 }
 
 export async function readJson(req: Request): Promise<unknown | undefined> {

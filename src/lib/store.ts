@@ -10,6 +10,7 @@ import { setSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, Profile, Rating } from "./types";
+import { forgetAnalytics, track } from "./analytics";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 
@@ -232,11 +233,13 @@ export const useApp = create<State>((set, get) => {
       const sessionId = uid();
       const now = Date.now();
       const r = get().readiness;
+      const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
       commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge }]);
       set({ callOverride: null });
       set({ active: a });
       persistActive(a);
+      track("workout_start", { minutes: plan.minutes, exercises: plan.items.length, call: plan.call ?? "normal", overridden, gymKind: g.equipment.length ? "equipped" : "bodyweight" });
     },
 
     logSet() {
@@ -331,6 +334,7 @@ export const useApp = create<State>((set, get) => {
       const items = [...a.plan.items];
       items[a.index] = newItem;
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
+      track("feature", { name: "swap", detail: avoid ? "not available here" : "swap" });
       const next = loadItem({ ...a, plan: { ...a.plan, items } }, a.index);
       set({ active: next });
       persistActive(next);
@@ -368,6 +372,8 @@ export const useApp = create<State>((set, get) => {
       const evs: AppEvent[] = [end];
       if (hr.length) evs.push({ type: "hrSeries", id: uid(), at, sessionId: a.sessionId, start: a.startedAt, t: a.hrAt.filter((_, i) => inWindow[i]).map((t) => Math.round(t / 1000)), bpm: hr });
       commit(evs);
+      // Counts and length only: no weights, reps or heart rate leave the device.
+      track("workout_finish", { sets: sets.length, minutes: Math.round((end.type === "sessionEnd" ? end.seconds : 0) / 60), auto: !!opts.auto, exercises: new Set(sets.map((e) => (e.type === "set" ? e.exerciseId : ""))).size, challenge: !!a.plan.challenge });
       set({ active: null });
       persistActive(null);
       get().replan();
@@ -378,6 +384,7 @@ export const useApp = create<State>((set, get) => {
       const a = get().active;
       if (!a) return;
       const ids = get().events.filter((e) => "sessionId" in e && e.sessionId === a.sessionId).map((e) => e.id);
+      track("workout_discard", { sets: get().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId).length });
       const events = get().events.filter((e) => !ids.includes(e.id));
       set({ events, stats: derive(events, Date.now()), active: null });
       void deleteEvents(ids);
@@ -403,6 +410,7 @@ export const useApp = create<State>((set, get) => {
     async reset() {
       await eraseAll();
       persistActive(null);
+      forgetAnalytics();
       set({ events: [], profile: defaultProfile(), gyms: [], stats: derive([], Date.now()), active: null, preview: null });
     },
   };

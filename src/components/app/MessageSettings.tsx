@@ -53,7 +53,8 @@ export function MessageSettings() {
   }, [native]);
 
   const days = (profile.calendar?.days ?? defaultDays(profile.daysPerWeek)).map((d) => WEEKDAYS[d]).join(", ");
-  const time = clampTime(profile.calendar?.time ?? "18:00");
+  const [hh, mm] = clampTime(profile.calendar?.time ?? "18:00").split(":").map(Number);
+  const time = new Date(2000, 0, 1, hh, mm).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
   const pushOn = (k: MessageKind) => prefs.push[k] ?? DEFAULT_ON[k];
   const email = prefs.email;
   const emailOn = (k: MessageKind) => email?.kinds[k] ?? DEFAULT_ON[k];

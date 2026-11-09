@@ -1,8 +1,7 @@
-// The reminder subscription tables in the server's libSQL database (Turso in production, a local file
-// in development). Uses the same environment variables as the rest of the server (DATABASE_URL and
-// DATABASE_AUTH_TOKEN, or the TURSO_* pair the Vercel integration creates), so it shares one database
-// with analytics. Kept in its own file and tables so accounts can adopt it: account_id is nullable.
-import { createClient, type Client } from "@libsql/client";
+// The reminder subscription tables, in the server's one libSQL database (db.ts: Turso in production, a
+// local file in development, memory in tests). Kept in their own tables so accounts can adopt them:
+// account_id is nullable.
+import { query, run, type Row } from "./db";
 import type { Send, Store, Sub } from "./reminders";
 
 const SCHEMA = [
@@ -35,23 +34,24 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS reminder_sends_at ON reminder_sends (sub_id, send_at)`,
 ];
 
-let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
-function db(): Client {
-  if (!client) {
-    const url = process.env.DATABASE_URL ?? process.env.TURSO_DATABASE_URL ?? "file:local.db";
-    client = createClient({ url, authToken: process.env.DATABASE_AUTH_TOKEN ?? process.env.TURSO_AUTH_TOKEN });
-  }
-  return client;
-}
-
 async function init() {
-  ready ??= db().batch(SCHEMA, "write").then(() => undefined);
+  ready ??= (async () => {
+    for (const sql of SCHEMA) await run(sql);
+  })().catch((e) => {
+    ready = null;
+    throw e;
+  });
   await ready;
 }
 
-type Row = Record<string, unknown>;
+/** For tests, after resetDb(): the tables are made again on next use. */
+export function resetRemindersDb() {
+  ready = null;
+}
+
+
 
 const toSub = (r: Row): Sub => ({
   id: String(r.id),
@@ -82,45 +82,43 @@ export function dbStore(): Store {
   return {
     async get(id) {
       await init();
-      const r = await db().execute({ sql: "SELECT * FROM reminder_subs WHERE id = ?", args: [id] });
-      return r.rows[0] ? toSub(r.rows[0] as Row) : null;
+      const rows = await query("SELECT * FROM reminder_subs WHERE id = ?", [id]);
+      return rows[0] ? toSub(rows[0]) : null;
     },
     async put(s) {
       await init();
-      await db().execute({
-        sql: `INSERT INTO reminder_subs (id, account_id, email, token_hash, confirm_hash, status, kinds, plan, consent_at, created_at, updated_at, confirmed_at, confirm_sends)
+      await run(
+        `INSERT INTO reminder_subs (id, account_id, email, token_hash, confirm_hash, status, kinds, plan, consent_at, created_at, updated_at, confirmed_at, confirm_sends)
               VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT (id) DO UPDATE SET account_id = excluded.account_id, email = excluded.email, token_hash = excluded.token_hash,
                 confirm_hash = excluded.confirm_hash, status = excluded.status, kinds = excluded.kinds, plan = excluded.plan,
                 consent_at = excluded.consent_at, updated_at = excluded.updated_at, confirmed_at = excluded.confirmed_at, confirm_sends = excluded.confirm_sends`,
-        args: [s.id, s.accountId, s.email, s.tokenHash, s.confirmHash, s.status, JSON.stringify(s.kinds), JSON.stringify(s.plan), s.consentAt, s.createdAt, s.updatedAt, s.confirmedAt, JSON.stringify(s.confirmSends)],
-      });
+        [s.id, s.accountId, s.email, s.tokenHash, s.confirmHash, s.status, JSON.stringify(s.kinds), JSON.stringify(s.plan), s.consentAt, s.createdAt, s.updatedAt, s.confirmedAt, JSON.stringify(s.confirmSends)],
+      );
     },
     async remove(id) {
       await init();
-      await db().execute({ sql: "DELETE FROM reminder_subs WHERE id = ?", args: [id] });
+      await run("DELETE FROM reminder_subs WHERE id = ?", [id]);
     },
     async confirmed() {
       await init();
-      const r = await db().execute("SELECT * FROM reminder_subs WHERE status = 'confirmed'");
-      return r.rows.map((x) => toSub(x as Row));
+      return (await query("SELECT * FROM reminder_subs WHERE status = 'confirmed'")).map(toSub);
     },
     async sends(subId, since) {
       await init();
-      const r = await db().execute({ sql: "SELECT * FROM reminder_sends WHERE sub_id = ? AND send_at >= ?", args: [subId, since] });
-      return r.rows.map((x) => toSend(x as Row));
+      return (await query("SELECT * FROM reminder_sends WHERE sub_id = ? AND send_at >= ?", [subId, since])).map(toSend);
     },
     async putSend(s) {
       await init();
-      await db().execute({
-        sql: `INSERT INTO reminder_sends (sub_id, key, kind, send_at, resend_id, status) VALUES (?, ?, ?, ?, ?, ?)
+      await run(
+        `INSERT INTO reminder_sends (sub_id, key, kind, send_at, resend_id, status) VALUES (?, ?, ?, ?, ?, ?)
               ON CONFLICT (sub_id, key) DO UPDATE SET kind = excluded.kind, send_at = excluded.send_at, resend_id = excluded.resend_id, status = excluded.status`,
-        args: [s.subId, s.key, s.kind, s.sendAt, s.resendId, s.status],
-      });
+        [s.subId, s.key, s.kind, s.sendAt, s.resendId, s.status],
+      );
     },
     async removeSends(subId) {
       await init();
-      await db().execute({ sql: "DELETE FROM reminder_sends WHERE sub_id = ?", args: [subId] });
+      await run("DELETE FROM reminder_sends WHERE sub_id = ?", [subId]);
     },
   };
 }

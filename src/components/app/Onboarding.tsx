@@ -10,6 +10,7 @@ import { fromKg, toKg } from "@/lib/units";
 import { useEffect, useState } from "react";
 import { connectHeartRate, hrSupported } from "@/lib/heartRate";
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
+import { analyticsOn, platformStore, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { go } from "./router";
 import { Button } from "./ui";
@@ -34,6 +35,7 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   { id: "advanced", title: "Experienced", blurb: "3 years or more" },
 ];
 
+const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Pro trial offer"];
 
 /** The setup wizard: first run, and again from Settings ("Run setup again"). */
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
@@ -53,10 +55,20 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [bw, setBw] = useState(Math.round(fromKg(profile.bodyweight, profile.unit)));
   const [canHealth, setCanHealth] = useState(false);
   const [healthNote, setHealthNote] = useState<string | null>(null);
+  const [stats, setStats] = useState(analyticsOn());
+  const [prefilled, setPrefilled] = useState(false);
   useEffect(() => void healthAvailable().then(setCanHealth), []);
+  // The setup funnel: which step each install reached.
+  useEffect(() => {
+    track("onboarding_step", { step, name: STEP_NAMES[step] });
+    if (step === 4) track("paywall_view", { from: "setup" });
+  }, [step]);
 
   const fillFromHealth = async () => {
-    if (!(await connectHealth())) return setHealthNote("No access yet. You can allow it later in Settings.");
+    const ok = await connectHealth();
+    track("permission", { name: "health", granted: ok });
+    if (!ok) return setHealthNote("No access yet. You can allow it later in Settings.");
+    setPrefilled(true);
     const h = await readHints();
     if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
     setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
@@ -66,6 +78,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     setProfile({ unit });
     const id = keepGyms ? profile.activeGymId : addGym(preset);
     setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true, ...(pro ? { pro } : {}) });
+    setAnalytics(stats);
+    track("onboarding_complete", { rerun, goal, experience: exp, days, preset: keepGyms ? "kept" : preset, unit, healthPrefill: prefilled });
     haptic("success");
     if (rerun) go("today");
   };
@@ -133,7 +147,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 title={notify ? "Workout notifications on" : "Turn on workout notifications"}
                 blurb="Rest timer and next set on your lock screen, and a reminder on your training days. Change them in Settings."
                 active={!!notify}
-                onClick={async () => setNotify(await notifyPermission())}
+                onClick={async () => {
+                  const ok = await notifyPermission();
+                  track("permission", { name: "notifications", granted: ok });
+                  setNotify(ok);
+                }}
               />
               {hrSupported() && (
                 <Tile
@@ -144,6 +162,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                     try {
                       const c = await connectHeartRate(() => {}, () => {});
                       setHr(c.name);
+                      track("feature", { name: "heart_rate", detail: "setup" });
                       c.disconnect();
                     } catch {}
                   }}
@@ -151,6 +170,13 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               )}
             </div>
             {notify === false && <p className="mt-3 text-sm text-warn">Notifications are blocked. You can allow them in your phone&apos;s settings.</p>}
+            <label className="card mt-3 flex items-start gap-3 p-4">
+              <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--color-accent)]" checked={stats} onChange={(e) => setStats(e.target.checked)} />
+              <span>
+                <span className="block font-semibold">Share anonymous usage stats</span>
+                <span className="block text-sm text-muted">Which screens and features get used, your device model and app version. Never your weights, workouts in detail or health data. Change it any time in Settings.</span>
+              </span>
+            </label>
           </>
         )}
         {step === 4 && (
@@ -167,7 +193,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 <button
                   key={plan}
                   type="button"
-                  onClick={() => { haptic("tick"); finish(startTrial(plan, trialDays, Date.now())); }}
+                  onClick={() => {
+                    haptic("tick");
+                    track("trial_start", { plan, store: platformStore() });
+                    finish(startTrial(plan, trialDays, Date.now()));
+                  }}
                   className={`press w-full rounded-2xl border p-4 text-left ${plan === "annual" ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
                 >
                   <div className="flex items-baseline justify-between gap-2">
@@ -178,7 +208,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 </button>
               ))}
             </div>
-            <Button kind="quiet" className="mt-4 w-full" onClick={() => finish(declineTrial(trialDays, Date.now()))}>Not now, keep the free plan</Button>
+            <Button kind="quiet" className="mt-4 w-full" onClick={() => {
+              track("paywall_close", { from: "setup" });
+              finish(declineTrial(trialDays, Date.now()));
+            }}>Not now, keep the free plan</Button>
             <p className="mt-2 text-center text-xs text-muted">The free plan keeps the workout logger, plate math, rest timer and classic 5x5.</p>
           </>
         )}

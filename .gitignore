@@ -13,4 +13,4 @@ reports/
 coverage/
 e2e-shots/
 /build
-local.db*
+.data/

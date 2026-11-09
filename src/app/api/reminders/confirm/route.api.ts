@@ -10,7 +10,7 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  if (limited(req, 30)) return html(page("Try again later", "Too many tries from this connection."), 429);
+  if (await limited(req, "confirm", 30)) return html(page("Try again later", "Too many tries from this connection."), 429);
   const s = setup();
   if (!s) return html(page("Not available", "Email reminders aren't set up yet."), 503);
   const f = await fields(req);

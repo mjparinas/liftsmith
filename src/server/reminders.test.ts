@@ -243,3 +243,27 @@ it("plans in the subscriber's zone, not the server's", async () => {
   const week = f.sent.find((m) => m.subject === "Your training week")!;
   expect(parts(week.scheduledAt!, tokyo)).toMatchObject({ wd: 1, h: 8 });
 });
+
+describe("database store", () => {
+  it("round-trips subscriptions and sends through libSQL", async () => {
+    const { resetDb } = await import("./db");
+    const { dbStore, resetRemindersDb } = await import("./remindersDb");
+    await resetDb();
+    resetRemindersDb();
+    const store = dbStore();
+    const f = fakeMail();
+    await subscribe(ok(body()), store, f.mail, env, MON - 3600_000);
+    expect(await confirm(ID, confirmToken(f.sent[0]), store, f.mail, env, MON - 3600_000)).toBe("confirmed");
+    const sub = (await store.get(ID))!;
+    expect(sub).toMatchObject({ email: "lifter@example.com", status: "confirmed", accountId: null, plan: { tz: TZ, days: [1, 3, 5] } });
+    expect((await store.confirmed()).map((s) => s.id)).toEqual([ID]);
+    const sends = await store.sends(ID, 0);
+    expect(sends.map((s) => s.key).sort()).toEqual(["reminder:2026-11-09", "welcome"]);
+    // Running again changes nothing; deleting removes it all.
+    await runDaily(store, f.mail, env, MON - 1800_000);
+    expect(await store.sends(ID, 0)).toHaveLength(2);
+    await remove(ID, TOKEN, store, f.mail, MON);
+    expect(await store.get(ID)).toBeNull();
+    expect(await store.sends(ID, 0)).toEqual([]);
+  });
+});
