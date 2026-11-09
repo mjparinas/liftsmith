@@ -10,6 +10,7 @@ import { recovery } from "./recovery";
 import type { AppEvent, SetEvent } from "./types";
 import { toKg } from "./units";
 import { goalStreak, levelOf } from "./game";
+import { makeSet } from "@/test/factories";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
 const H = 3600_000;
@@ -18,9 +19,8 @@ function profile() {
   return { ...defaultProfile(NOW), onboarded: true, activeGymId: "g" };
 }
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, targetReps = reps, sessionId = "s1"): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId, exerciseId, weight, reps, targetReps, rir: 2 };
+  return makeSet({ at, sessionId, exerciseId, weight, reps, targetReps });
 }
 
 describe("exercise library", () => {

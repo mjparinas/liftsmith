@@ -2,13 +2,13 @@ import { describe, expect, it } from "vitest";
 import { allFormulas, allOneRms, detrain, dots, dotsBand, dotsFromData, estimate, formulasFor, marzagao, MAX_RTF, oneRm, qualityOf, repTable, rirOf, setEstimates, weightForReps } from "./onerm";
 import { strength } from "./strength";
 import type { AppEvent, SetEvent } from "./types";
+import { makeSet } from "@/test/factories";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
 const DAY = 86400_000;
 
-let n = 0;
 function set(over: Partial<SetEvent> & { exerciseId?: string } = {}): SetEvent {
-  return { type: "set", id: `s${n++}`, at: NOW - DAY, sessionId: "a", exerciseId: "bench-press", weight: 100, reps: 5, targetReps: 5, rir: 0, startedAt: NOW - DAY, ...over };
+  return makeSet({ at: NOW - DAY, sessionId: "a", weight: 100, reps: 5, targetReps: 5, rir: 0, startedAt: NOW - DAY, ...over });
 }
 
 describe("formulas", () => {
