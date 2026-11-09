@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Drawn by scripts/make-theme-icons.py -->
-<resources>
-    <color name="ic_launcher_forge_background">#140D0A</color>
-    <color name="ic_launcher_glacier_background">#08121A</color>
-    <color name="ic_launcher_aurora_background">#0B0D18</color>
-    <color name="ic_launcher_royal_background">#120B1B</color>
-</resources>
