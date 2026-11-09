@@ -190,3 +190,39 @@ describe("programs", () => {
     expect(ramp[1].weight).toBeGreaterThan(ramp[0].weight);
   });
 });
+
+describe("game layer", () => {
+  it("finishing a workout unlocks badges and a crate, and Awards shows quests, league and badges", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // The first lift starts with warm-ups (they don't count as sets), so go straight to working weight.
+    await user.click(await screen.findByRole("button", { name: "Skip warm-up" }));
+    await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    await user.click(screen.getByRole("button", { name: "End" }));
+    await user.click(screen.getByRole("button", { name: "Finish and save" }));
+    const unlockedList = await screen.findByRole("region", { name: "Badges unlocked" });
+    expect(within(unlockedList).getByText("Showing up")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /You earned a crate/ }));
+    expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
+    expect(screen.getByText(/-week streak/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "See all achievements" }));
+    expect(await screen.findByRole("heading", { name: "Achievements" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
+    expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
+    expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Secret" }));
+    expect(screen.getAllByText("Secret achievement").length).toBeGreaterThan(5);
+  });
+
+  it("lean mode is one switch in Settings", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(await screen.findByRole("button", { name: "Lean mode" }));
+    expect(useApp.getState().profile.lean).toBe(true);
+    const { juice } = await import("@/lib/juice");
+    expect(juice.lean).toBe(true);
+  });
+});
