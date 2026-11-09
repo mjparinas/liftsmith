@@ -101,9 +101,58 @@ jobs:
           path: e2e-shots
           retention-days: 7
 
+  # Platform parity: every PR builds both native shells from the same web build.
+  android:
+    name: Android debug build
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-build
+          path: out
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npx cap sync android
+      - run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+      - uses: actions/upload-artifact@v7
+        with:
+          name: liftsmith-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+  ios:
+    name: iOS simulator build
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-build
+          path: out
+      - run: npx cap sync ios
+      - name: Build for the simulator (unsigned)
+        run: >
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug
+          -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+
   passed:
     name: CI passed
-    needs: [static, unit, build, browser]
+    needs: [static, unit, build, browser, android, ios]
     if: always()
     runs-on: ubuntu-latest
     steps:

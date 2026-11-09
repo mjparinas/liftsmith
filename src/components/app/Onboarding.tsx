@@ -5,8 +5,9 @@ import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import type { Experience, Goal, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { connectHeartRate, hrSupported } from "@/lib/heartRate";
+import { connectHealth, healthAvailable, readHints } from "@/lib/health";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { go } from "./router";
 import { Button } from "./ui";
@@ -46,6 +47,16 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [unit, setUnit] = useState<Unit>(profile.unit);
   const [days, setDays] = useState(profile.daysPerWeek);
   const [bw, setBw] = useState(Math.round(fromKg(profile.bodyweight, profile.unit)));
+  const [canHealth, setCanHealth] = useState(false);
+  const [healthNote, setHealthNote] = useState<string | null>(null);
+  useEffect(() => void healthAvailable().then(setCanHealth), []);
+
+  const fillFromHealth = async () => {
+    if (!(await connectHealth())) return setHealthNote("No access yet. You can allow it later in Settings.");
+    const h = await readHints();
+    if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
+    setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
+  };
 
   const finish = () => {
     setProfile({ unit });
@@ -97,6 +108,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <p className="mt-2 text-sm text-muted">days a week. Your streak counts weeks you hit this, so rest days never break it.</p>
             <h2 className="mt-8 text-lg font-semibold">Your body weight</h2>
             <p className="text-sm text-muted">Only used to suggest a safe first weight for each lift.</p>
+            {canHealth && (
+              <button type="button" onClick={fillFromHealth} className="press mt-3 min-h-11 rounded-2xl border border-line bg-surface px-4 text-sm font-semibold">
+                Fill in from {/iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect"}
+              </button>
+            )}
+            {healthNote && <p className="mt-2 text-sm text-muted">{healthNote}</p>}
             <div className="mt-3 flex items-center gap-3">
               <input inputMode="numeric" value={bw} onChange={(e) => setBw(Number(e.target.value.replace(/\D/g, "")) || 0)} className="num w-32 rounded-2xl border border-line bg-surface px-4 py-3 text-2xl font-semibold" aria-label="Body weight" />
               <span className="text-muted">{unit}</span>
