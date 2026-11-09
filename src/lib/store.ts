@@ -6,6 +6,8 @@ import { generate, type Plan, type PlanItem } from "./generator";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise } from "./exercises";
+import { setSeconds } from "./generator";
+import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, Profile, Rating } from "./types";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
@@ -23,7 +25,27 @@ export interface Active {
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
   askFeedback: string | null;
+  /** Heart rate samples (bpm) and when each arrived (ms after startedAt), at most one a second. */
   hr: number[];
+  hrAt: number[];
+  /** When the current set's work started: the end of the last rest, or the start of the workout. */
+  setStart: number;
+  /** Seconds rested before the current set, recorded when the rest ends. */
+  lastRest?: number;
+  /** When the last rest began (the previous Log set). */
+  restStart?: number;
+  /** Last time the lifter did anything; a workout idle for AUTO_END_MS ends itself. */
+  lastAt: number;
+}
+
+/** A workout left running ends itself this long after the last activity (Melvin, 2026-11-09). */
+export const AUTO_END_MS = 3 * 3600_000;
+
+/** Stats for the heart rate samples between two moments. */
+export function hrWindow(a: Pick<Active, "hr" | "hrAt" | "startedAt">, from: number, to: number) {
+  const xs = a.hr.filter((_, i) => a.startedAt + a.hrAt[i] >= from && a.startedAt + a.hrAt[i] <= to);
+  if (!xs.length) return {};
+  return { hrAvg: Math.round(xs.reduce((s, x) => s + x, 0) / xs.length), hrMax: Math.max(...xs), hrEnd: xs[xs.length - 1] };
 }
 
 interface State {
@@ -35,6 +57,12 @@ interface State {
   active: Active | null;
   /** The plan preview on Today, rebuilt when the length or gym changes. */
   preview: Plan | null;
+  /** Today's push / normal / recover call from the lifter's data. */
+  readiness: Readiness | null;
+  /** The lifter's own call for today, overriding the suggestion. */
+  callOverride: Call | null;
+  setCall(c: Call | null): void;
+  autoEnd(now?: number): boolean;
   init(): Promise<void>;
   setProfile(p: Partial<Profile>): void;
   saveGym(g: Gym): void;
@@ -49,7 +77,7 @@ interface State {
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
   goTo(index: number): void;
-  finish(): AppEvent | null;
+  finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
   reset(): Promise<void>;
@@ -90,6 +118,8 @@ export const useApp = create<State>((set, get) => {
     stats: derive([], Date.now()),
     active: null,
     preview: null,
+    readiness: null,
+    callOverride: null,
 
     async init() {
       const snap = await load();
@@ -97,10 +127,14 @@ export const useApp = create<State>((set, get) => {
       let active: Active | null = null;
       try {
         const raw = localStorage.getItem(ACTIVE_KEY);
-        if (raw) active = JSON.parse(raw);
+        if (raw) {
+          const a = JSON.parse(raw) as Active;
+          // Workouts saved by older builds lack the data-capture fields.
+          active = { ...a, hrAt: a.hrAt ?? a.hr.map(() => 0), setStart: a.setStart ?? a.startedAt, lastAt: a.lastAt ?? a.startedAt };
+        }
       } catch {}
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
-      get().replan();
+      if (!get().autoEnd()) get().replan();
     },
 
     setProfile(p) {
@@ -135,8 +169,24 @@ export const useApp = create<State>((set, get) => {
     replan() {
       const g = gym();
       if (!g) return set({ preview: null });
-      const { profile, events } = get();
-      set({ preview: generate({ gym: g, profile, events, minutes: profile.minutes, now: Date.now() }) });
+      const { profile, events, callOverride } = get();
+      const now = Date.now();
+      const r = readiness(events, profile, now);
+      const call = callOverride ?? r.call;
+      set({ readiness: r, preview: generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }) });
+    },
+
+    setCall(c) {
+      set({ callOverride: c });
+      get().replan();
+    },
+
+    autoEnd(now = Date.now()) {
+      const a = get().active;
+      if (!a || now - a.lastAt < AUTO_END_MS) return false;
+      // End it where the lifter stopped, not hours later, so duration and stats stay true.
+      get().finish({ at: Math.min(now, a.lastAt + 60_000), auto: true });
+      return true;
     },
 
     start() {
@@ -144,8 +194,11 @@ export const useApp = create<State>((set, get) => {
       const g = gym();
       if (!plan || !g || !plan.items.length) return;
       const sessionId = uid();
-      const a = loadItem({ sessionId, startedAt: Date.now(), plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [] }, 0);
-      commit([{ type: "sessionStart", id: uid(), at: Date.now(), sessionId, gymId: g.id, minutes: plan.minutes }]);
+      const now = Date.now();
+      const r = get().readiness;
+      const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
+      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge }]);
+      set({ callOverride: null });
       set({ active: a });
       persistActive(a);
     },
@@ -156,9 +209,35 @@ export const useApp = create<State>((set, get) => {
       const item = a.plan.items[a.index];
       if (!item) return;
       const now = Date.now();
-      commit([{ type: "set", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps, targetReps: item.target.reps, rir: item.target.rir }]);
-      const done = setsDone(get().events, a.sessionId, item.exerciseId);
-      let next: Active = { ...a };
+      const ex = exercise(item.exerciseId);
+      const already = setsDone(get().events, a.sessionId, item.exerciseId);
+      // A set takes seconds to a couple of minutes; a longer gap means the lifter rested past the
+      // timer, so the duration is left out rather than guessed.
+      const duration = (now - a.setStart) / 1000;
+      // Logged before the rest timer ran out: the set started at some unknown point during the rest.
+      const earlyLog = !!a.restUntil && a.restUntil > now;
+      const plausible = !earlyLog && duration >= 3 && duration <= Math.max(180, 3 * setSeconds(ex, a.reps));
+      commit([
+        {
+          type: "set",
+          id: uid(),
+          at: now,
+          sessionId: a.sessionId,
+          exerciseId: item.exerciseId,
+          weight: a.weight,
+          reps: a.reps,
+          targetReps: item.target.reps,
+          rir: item.target.rir,
+          targetWeight: item.target.weight,
+          startedAt: a.setStart,
+          durationSec: plausible ? Math.round(duration) : undefined,
+          restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
+          ...hrWindow(a, a.setStart, now),
+          challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+        },
+      ]);
+      const done = already + 1;
+      let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now };
       if (done >= item.sets) {
         // Exercise finished: ask how it felt and move on.
         next = loadItem({ ...a, askFeedback: item.exerciseId }, Math.min(a.index + 1, a.plan.items.length));
@@ -173,7 +252,7 @@ export const useApp = create<State>((set, get) => {
     adjust(weight, reps) {
       const a = get().active;
       if (!a) return;
-      const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps) };
+      const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps), lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
@@ -189,7 +268,9 @@ export const useApp = create<State>((set, get) => {
     skipRest() {
       const a = get().active;
       if (!a) return;
-      const next = { ...a, restUntil: null };
+      // Rest is over (timer ran out or Skip): the next set's work starts now.
+      const now = Date.now();
+      const next = { ...a, restUntil: null, setStart: now, lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest };
       set({ active: next });
       persistActive(next);
     },
@@ -198,7 +279,7 @@ export const useApp = create<State>((set, get) => {
       const a = get().active;
       if (!a?.askFeedback) return;
       if (rating !== 0) commit([{ type: "feedback", id: uid(), at: Date.now(), sessionId: a.sessionId, exerciseId: a.askFeedback, rating }]);
-      const next = { ...a, askFeedback: null };
+      const next = { ...a, askFeedback: null, lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
@@ -227,20 +308,30 @@ export const useApp = create<State>((set, get) => {
       persistActive(next);
     },
 
-    finish() {
+    finish(opts = {}) {
       const a = get().active;
       if (!a) return null;
-      const hr = a.hr;
+      const at = opts.at ?? Date.now();
+      const inWindow = a.hrAt.map((t) => a.startedAt + t <= at);
+      const hr = a.hr.filter((_, i) => inWindow[i]);
+      const sets = get().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId);
+      const sum = (k: "durationSec" | "restSec") => sets.reduce((s, e) => s + ((e.type === "set" && e[k]) || 0), 0);
       const end: AppEvent = {
         type: "sessionEnd",
         id: uid(),
-        at: Date.now(),
+        at,
         sessionId: a.sessionId,
-        seconds: Math.round((Date.now() - a.startedAt) / 1000),
+        seconds: Math.max(0, Math.round((at - a.startedAt) / 1000)),
         avgHr: hr.length ? Math.round(hr.reduce((s, x) => s + x, 0) / hr.length) : undefined,
         maxHr: hr.length ? Math.max(...hr) : undefined,
+        minHr: hr.length ? Math.min(...hr) : undefined,
+        workSec: sets.length ? sum("durationSec") : undefined,
+        restSec: sets.length ? sum("restSec") : undefined,
+        auto: opts.auto || undefined,
       };
-      commit([end]);
+      const evs: AppEvent[] = [end];
+      if (hr.length) evs.push({ type: "hrSeries", id: uid(), at, sessionId: a.sessionId, start: a.startedAt, t: a.hrAt.filter((_, i) => inWindow[i]).map((t) => Math.round(t / 1000)), bpm: hr });
+      commit(evs);
       set({ active: null });
       persistActive(null);
       get().replan();
@@ -261,9 +352,16 @@ export const useApp = create<State>((set, get) => {
     pushHr(bpm) {
       const a = get().active;
       if (!a) return;
-      // Keep one sample every few seconds at most; the store re-renders on each.
-      const hr = [...a.hr, bpm].slice(-5000);
-      set({ active: { ...a, hr } });
+      // At most one sample a second (straps send about one), kept for the whole workout.
+      const t = Date.now() - a.startedAt;
+      const last = a.hrAt.length - 1;
+      const same = last >= 0 && t - a.hrAt[last] < 1000;
+      const hr = same ? [...a.hr.slice(0, -1), bpm] : [...a.hr, bpm];
+      const hrAt = same ? [...a.hrAt.slice(0, -1), t] : [...a.hrAt, t];
+      const next = { ...a, hr, hrAt };
+      set({ active: next });
+      // Saved every 15 samples so a crash or a killed app keeps the stream.
+      if (!same && hr.length % 15 === 0) persistActive(next);
     },
 
     async reset() {

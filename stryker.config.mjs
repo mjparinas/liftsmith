@@ -8,6 +8,7 @@ const config = {
   vitest: { configFile: "vitest.config.mts", related: true },
   coverageAnalysis: "perTest",
   mutate: [
+    "src/lib/readiness.ts",
     "src/lib/plates.ts",
     "src/lib/progression.ts",
     "src/lib/recovery.ts",

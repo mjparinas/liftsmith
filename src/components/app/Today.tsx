@@ -4,6 +4,7 @@ import { BodyMap } from "@/components/BodyMap";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, xpTotal } from "@/lib/game";
 import { haptic } from "@/lib/juice";
+import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
@@ -24,7 +25,7 @@ export function Flame({ weeks }: { weeks: number }) {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, stats, setProfile, start, active } = useApp();
+  const { profile, gyms, preview, events, stats, setProfile, start, active, readiness, callOverride, setCall } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
@@ -67,6 +68,37 @@ export function Today() {
         )}
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
+
+      {readiness && preview && !active && (
+        <section className="card mt-4 p-4" aria-labelledby="call-title">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 id="call-title" className="text-lg font-semibold">{CALL_TEXT[preview.call].label}</h2>
+            <span className="num text-sm text-muted">Readiness {readiness.score}</span>
+          </div>
+          <p className="mt-1 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : CALL_TEXT[preview.call].blurb}</p>
+          {readiness.signals.length > 0 && (
+            <ul className="mt-2 space-y-0.5 text-sm">
+              {readiness.signals.slice(0, 3).map((g) => (
+                <li key={g.text} className={g.points > 0 ? "text-accent" : g.points < 0 ? "text-warn" : "text-muted"}>{g.points > 0 ? "▲" : g.points < 0 ? "▼" : "•"} {g.text}</li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-3 grid grid-cols-3 gap-2" role="group" aria-label="Today's call">
+            {(["recover", "normal", "push"] as Call[]).map((c) => (
+              <button
+                key={c}
+                type="button"
+                aria-pressed={preview.call === c}
+                onClick={() => { haptic("tick"); setCall(c === readiness.call ? null : c); }}
+                className={`press min-h-11 rounded-xl border text-sm font-semibold ${preview.call === c ? "border-accent bg-accent/10" : "border-line bg-surface text-muted"}`}
+              >
+                {c === "recover" ? "Go easy" : c === "normal" ? "As planned" : "Push"}
+              </button>
+            ))}
+          </div>
+          {callOverride && <p className="mt-2 text-xs text-faint">Your call today. We suggested {CALL_TEXT[readiness.call].label.toLowerCase()}.</p>}
+        </section>
+      )}
 
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
