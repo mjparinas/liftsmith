@@ -13,6 +13,7 @@ import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
 import { Button, EmptyState, Section, StatTile } from "./ui";
 import { StrengthCard, TonnageCard } from "./Extras";
+import { DotsCard, OneRmSection } from "./OneRepMax";
 
 function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty}</div>;
@@ -43,7 +44,6 @@ export function Stats() {
   const xp = g.xp;
   const lvl = g.level;
   const streak = g.streak;
-  const top = [...stats.e1rmSeries.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, 6);
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
   const tiles: [string, string, IconName, string][] = [
     ["Workouts", String(stats.sessions.length), "dumbbell", HUE.accent],
@@ -91,20 +91,8 @@ export function Stats() {
 
       <BodyweightCard />
 
-      <Section title="Estimated one-rep max" icon="progress" info="e1rm">
-        <ul className="card divide-y divide-line">
-          {top.map(([id, series]) => (
-            <li key={id} className="flex items-center justify-between gap-3 px-4 py-3">
-              <div className="min-w-0">
-                <div className="truncate font-medium">{exercise(id).name}</div>
-                <div className="num text-sm text-muted">{fmtNum(Math.round(fromKg(series.at(-1)!.e1rm, unit)))} {unit}</div>
-              </div>
-              <Spark points={series.map((p) => p.e1rm)} />
-            </li>
-          ))}
-          {!top.length && <li><EmptyState icon="progress" tint={HUE.cyan} title="Trends appear here" body="Log a few weighted sets and your estimated maxes will chart themselves." /></li>}
-        </ul>
-      </Section>
+      <OneRmSection />
+      <DotsCard />
 
       <Section title="Personal records" icon="trophy">
         <ul className="card divide-y divide-line">

@@ -43,7 +43,7 @@ export const GLOSSARY = {
   },
   e1rm: {
     title: "Estimated one-rep max",
-    body: ["The most you could probably lift once, worked out from a heavier set of a few reps (the Epley formula). It lets you compare a set of 5 with a set of 8, so you can see real strength trends without testing a true max."],
+    body: ["The most you could probably lift once, worked out from your sets with the reps you had left added. It uses the formulas research found most accurate for each rep range (Brzycki and Epley up to 10 reps to failure, Mayhew and Wathan above), each averaged with a 2026 weight-based equation fitted on over 300,000 sets. Recent, heavy, close-to-failure sets count most and sets past 20 reps are ignored. It lets you compare a set of 5 with a set of 8, so you can see real strength trends without testing a true max."],
   },
   weeklySets: {
     title: "Sets per muscle this week",
