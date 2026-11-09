@@ -24,9 +24,12 @@ try {
   await onboard(page);
   await scan("today");
   await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("workout");
-  await page.getByRole("button", { name: /Log set/ }).click();
+  // Skip the warm-ups so the saved workout has a working set.
+  const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+  if (await skipWarm.isVisible()) await skipWarm.click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   await scan("rest");
   await page.getByRole("button", { name: "Plate math" }).click();
   await scan("rest plate math");
@@ -34,11 +37,13 @@ try {
   await scan("rest breathing");
   await page.getByRole("button", { name: "End" }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();
-  await page.getByRole("button", { name: "Done" }).click();
+  await page.getByRole("button", { name: /You earned a crate/ }).click();
+  await scan("done");
+  await page.getByRole("button", { name: "Done", exact: true }).click();
   await page.getByRole("button", { name: "🔥 Warm up first" }).click();
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
-  for (const tab of ["Recovery", "Progress", "Gyms"]) {
+  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
     await page.getByRole("button", { name: tab }).click();
     await scan(tab);
   }
@@ -52,7 +57,7 @@ try {
   // The web dashboard and a share link, with the workout just saved.
   await page.goto(`${server.url}/me/`);
   await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Trophies", "Log a workout", "Share"]) {
+  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Achievements", "Log a workout", "Share"]) {
     await page.getByRole("link", { name: tab, exact: true }).click();
     await scan(`dashboard ${tab}`);
   }

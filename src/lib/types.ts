@@ -214,6 +214,28 @@ export interface Profile {
   pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
   calendar?: CalendarPrefs;
+  /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
+  lean?: boolean;
+  /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
+  cosmetics?: { accent?: string; sound?: string; plates?: string };
+  /**
+   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
+   * Health Connect has neither, so the app asks on every platform.
+   */
+  birthYear?: number;
+  sex?: "male" | "female";
+  /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
+  knownMaxes?: Partial<Record<string, number>>;
+  /**
+   * Reminders and lifecycle messages (messages.ts). Each type is on or off per channel; missing means
+   * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
+   */
+  messages?: {
+    push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+    email?: { address: string; consentAt: number; status: "pending" | "confirmed" | "unsubscribed"; kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>> };
+    /** When reminders were first set up: comebacks count from here until there's a workout. */
+    startedAt?: number;
+  };
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   onboarded: boolean;
@@ -360,4 +382,14 @@ export interface CheckinEvent extends EventBase {
   buddies: string[];
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent;
+/** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
+export interface WarmupEvent extends EventBase {
+  type: "warmup";
+  sessionId: string;
+  exerciseId: string;
+  /** Kilograms, per hand for dumbbells. */
+  weight: number;
+  reps: number;
+}
+
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent;

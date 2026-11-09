@@ -1,4 +1,4 @@
-package com.liftsmith.app;
+package com.getliftsmith.app;
 
 import android.content.Context;
 import android.media.AudioAttributes;

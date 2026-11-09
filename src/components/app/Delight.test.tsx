@@ -20,6 +20,12 @@ beforeEach(async () => {
 });
 afterEach(cleanup);
 
+async function skipWarmups(user: ReturnType<typeof userEvent.setup>) {
+  await screen.findByRole("button", { name: /Log set|Log warm-up/ });
+  const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+  if (skip) await user.click(skip);
+}
+
 async function onboard(user: ReturnType<typeof userEvent.setup>) {
   render(<App />);
   await screen.findByText("What are you training for?");
@@ -33,8 +39,8 @@ async function onboard(user: ReturnType<typeof userEvent.setup>) {
 /** Puts a barbell exercise first, so plate memory has something to show. */
 function barbellFirst() {
   const p = useApp.getState().preview!;
-  const i = p.items.findIndex((it) => exercise(it.exerciseId).load === "barbell");
-  if (i > 0) useApp.getState().setPlan({ ...p, items: [p.items[i], ...p.items.filter((_, j) => j !== i)] });
+  const bench = { ...p.items[0], exerciseId: "bench-press", sets: 3, warmup: undefined, target: { ...p.items[0].target, weight: 60, reps: 8 } };
+  useApp.getState().setPlan({ ...p, items: [bench, ...p.items.slice(1).filter((it) => it.exerciseId !== "bench-press")] });
   return useApp.getState().preview!.items[0];
 }
 
@@ -45,6 +51,7 @@ describe("workout extras", () => {
     const first = barbellFirst();
     expect(exercise(first.exerciseId).load).toBe("barbell");
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    await skipWarmups(user);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     // Resting: the next set is the same weight, so no plates change.
     expect(await screen.findByText("Same plates: no change")).toBeInTheDocument();
@@ -66,6 +73,7 @@ describe("workout extras", () => {
     await user.click(screen.getByRole("button", { name: "↻ Same as last time" }));
     expect(useApp.getState().preview!.items.map((i) => i.exerciseId)).toEqual([first.exerciseId]);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    await skipWarmups(user);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.queryByText(/Same as last time \(/) ?? screen.queryByRole("button", { name: /Last time .* Use it/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Log set/ }));

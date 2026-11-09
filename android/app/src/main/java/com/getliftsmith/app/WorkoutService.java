@@ -1,4 +1,4 @@
-package com.liftsmith.app;
+package com.getliftsmith.app;
 
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -26,8 +26,8 @@ import androidx.core.app.ServiceCompat;
  */
 public class WorkoutService extends Service {
 
-    static final String ACTION_UPDATE = "com.liftsmith.app.UPDATE";
-    static final String BROADCAST_ACTION = "com.liftsmith.app.WORKOUT_ACTION";
+    static final String ACTION_UPDATE = "com.getliftsmith.app.UPDATE";
+    static final String BROADCAST_ACTION = "com.getliftsmith.app.WORKOUT_ACTION";
     static final String EXTRA_ACTION = "action";
     private static final String CHANNEL_LIVE = "workout-live";
     private static final String CHANNEL_ALERT = "rest-over";

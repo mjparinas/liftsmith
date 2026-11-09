@@ -1,4 +1,4 @@
-package com.liftsmith.app;
+package com.getliftsmith.app;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -49,14 +49,14 @@ public class AppIconPlugin extends Plugin {
         PackageManager pm = ctx.getPackageManager();
         for (String name : ICONS) {
             int state = name.equals(want) ? PackageManager.COMPONENT_ENABLED_STATE_ENABLED : PackageManager.COMPONENT_ENABLED_STATE_DISABLED;
-            pm.setComponentEnabledSetting(new ComponentName(ctx, alias(name)), state, PackageManager.DONT_KILL_APP);
+            pm.setComponentEnabledSetting(new ComponentName(ctx, ctx.getPackageName() + alias(name)), state, PackageManager.DONT_KILL_APP);
         }
         p.edit().putString("current", want).remove("pending").apply();
     }
 
     private static String alias(String name) {
         for (String n : ICONS) {
-            if (n.equals(name)) return "com.liftsmith.app.Icon" + Character.toUpperCase(n.charAt(0)) + n.substring(1);
+            if (n.equals(name)) return ".Icon" + Character.toUpperCase(n.charAt(0)) + n.substring(1);
         }
         return null;
     }

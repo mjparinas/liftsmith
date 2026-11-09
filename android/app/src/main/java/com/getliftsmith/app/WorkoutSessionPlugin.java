@@ -1,4 +1,4 @@
-package com.liftsmith.app;
+package com.getliftsmith.app;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;

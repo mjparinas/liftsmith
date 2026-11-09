@@ -99,13 +99,14 @@ export interface VoiceState {
   resting: boolean;
   left: number;
   index: number;
+  warmup?: boolean;
 }
 
 const platform = () => (typeof window !== "undefined" ? (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() : undefined) ?? "web";
 
 /** The cue said when rest ends. Android's workout service says it (screen locked too); elsewhere this hook does. */
 export function restEndCue(v: VoiceState): string {
-  return setCue({ name: v.exName, setNo: v.setNo, sets: v.sets, kg: v.kg, reps: v.reps, rir: v.rir, unit: v.unit, load: v.load, timed: TIMED.has(v.exerciseId), challenge: v.challenge });
+  return setCue({ name: v.exName, setNo: v.setNo, sets: v.sets, kg: v.kg, reps: v.reps, rir: v.rir, unit: v.unit, load: v.load, timed: TIMED.has(v.exerciseId), challenge: v.challenge, warmup: v.warmup });
 }
 
 export function useVoiceCoach(v: VoiceState | null, enabled: boolean) {

@@ -9,7 +9,7 @@ import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { useMemo, useState } from "react";
-import { shareText } from "@/lib/buddy";
+import { shareCard } from "@/lib/shareImage";
 import { go } from "./router";
 import { Button, Chip } from "./ui";
 
@@ -49,9 +49,17 @@ export function Recap({ arg }: { arg?: string }) {
 
   const share = async () => {
     haptic("tap");
-    const lines = [`My ${r.label} in lifting`, `${r.workouts} workouts · ${fmtTonnage(r.volumeKg, unit)} lifted`, r.prs.length ? `${r.prs.length} PRs, top: ${r.prs[0].name}` : null, r.likeA ? `That's more than ${r.likeA} 💪` : null].filter(Boolean);
-    const res = await shareText(lines.join("\n"));
-    setNote(res === "copied" ? "Copied to share." : null);
+    const res = await shareCard(
+      {
+        kicker: period.kind === "year" ? "Year in lifting" : "Monthly recap",
+        headline: r.label,
+        tiles: ([["Workouts", String(r.workouts)], ["Lifted", fmtTonnage(r.volumeKg, unit)], ["Sets", r.sets.toLocaleString("en-US")], ["PRs", String(r.prs.length)]] as [string, string][]),
+        lines: [r.likeA ? `More than ${r.likeA}` : null, r.topExercise ? `Most-done lift: ${r.topExercise.name}` : null, r.prs[0] ? `Top PR: ${r.prs[0].name} ${fmtNum(fromKg(r.prs[0].weight, unit))} ${unit} × ${r.prs[0].reps}` : null, r.favouriteDay ? `${r.favouriteDay}s were for lifting` : null].filter((x): x is string => !!x),
+        footer: "Liftsmith",
+      },
+      `liftsmith-recap-${period.kind}`,
+    );
+    setNote(res === "failed" ? "Couldn't share the card." : res === "download" ? "Saved the image." : null);
   };
 
   return (

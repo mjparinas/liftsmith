@@ -22,9 +22,9 @@ import { useMemo, useState } from "react";
 import { go } from "./router";
 import { Button, Section, Sheet } from "./ui";
 
-/** Lean mode (gamification): fewer pop-ups. Read loosely until the field lands in Profile. */
-export function lean(p: object): boolean {
-  return !!(p as { lean?: boolean }).lean;
+/** Lean mode (Settings › Celebrations): no extra pop-ups. */
+export function lean(p: { lean?: boolean }): boolean {
+  return !!p.lean;
 }
 
 function MomentCard({ m, onClose }: { m: Moment; onClose?: () => void }) {
@@ -275,7 +275,7 @@ export function TonnageCard() {
 export function StrengthCard() {
   const { events, profile, setProfile } = useApp();
   const now = useNow(3600_000);
-  const p = profile as typeof profile & { birthYear?: number; sex?: "male" | "female" };
+  const p = profile;
   const adjustAge = profile.delight?.ageAdjust !== false;
   const r = useMemo(() => strength(events, p, now, { adjustAge }), [events, p, now, adjustAge]);
   if (r.overall === null) return null;
