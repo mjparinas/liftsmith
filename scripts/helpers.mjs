@@ -37,7 +37,8 @@ export async function onboard(page, gym = /Commercial gym/) {
   await page.getByRole("button", { name: gym }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
-  await page.getByRole("button", { name: "Build my first workout" }).click();
+  await page.getByRole("button", { name: "Continue" }).click();
+  await page.getByRole("button", { name: "Not now, keep the free plan" }).click();
   await page.getByText("Today's workout").waitFor();
 }
 

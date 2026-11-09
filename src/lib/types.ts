@@ -196,6 +196,11 @@ export interface Profile {
    * feedback reports.
    */
   cycle?: { enabled: boolean; consentAt: number };
+  /**
+   * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
+   * choice; billing will read it to start the store trial.
+   */
+  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
   onboarded: boolean;
   updatedAt: number;
 }
