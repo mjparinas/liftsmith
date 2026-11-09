@@ -1,6 +1,7 @@
 "use client";
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
+import { mergeBackup, type Backup } from "./backup";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
 import { weekStart } from "./block";
@@ -175,6 +176,8 @@ interface State {
   applyHealthBody(r: BodyReadings): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
+  /** Restores a full backup file (backup.ts): its profile comes back, its gyms and events are added. Returns the events added. */
+  restoreBackup(b: Backup): number;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
   reset(): Promise<void>;
@@ -847,6 +850,18 @@ export const useApp = create<State>((set, get) => {
       const have = new Set(get().events.map((e) => e.id));
       const fresh = evs.filter((e) => !have.has(e.id));
       if (fresh.length) commit(fresh);
+      get().replan();
+      return fresh.length;
+    },
+
+    restoreBackup(b) {
+      const { profile, gyms, fresh } = mergeBackup(get(), b);
+      setWeekStart(profile.training?.weekStart);
+      set({ profile, gyms });
+      void saveRecord("profile", profile);
+      void saveRecord("gyms", gyms);
+      if (fresh.length) commit(fresh);
+      else set({ stats: derive(get().events, Date.now()) });
       get().replan();
       return fresh.length;
     },

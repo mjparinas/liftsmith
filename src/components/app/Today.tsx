@@ -27,6 +27,7 @@ import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
 import { CoachNotes } from "./Insights";
+import { SaveNudge } from "./Saving";
 import { callWhy, itemWhy, whyContext } from "@/lib/why";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
@@ -186,6 +187,7 @@ export function Today() {
       )}
 
       {!active && <CoachNotes limit={2} />}
+      {!active && <SaveNudge />}
 
       {!active && <TodayGame />}
 

@@ -18,6 +18,8 @@ import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRa
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
+import { keepStorage } from "@/lib/saving";
+import { SaveStep } from "./Saving";
 import { go } from "./router";
 import { BumpField, Button } from "./ui";
 
@@ -42,7 +44,7 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   { id: "advanced", get title() { return t("exp.advanced"); }, get blurb() { return t("setup.exp.advanced.blurb"); } },
 ];
 
-const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Pro trial offer"];
+const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Save your progress", "Pro trial offer"];
 
 const KNOWN = [
   { id: KNOWN_LIFTS.squat, get name() { return t("setup.knownSquat"); } },
@@ -68,7 +70,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [step, setStep] = useState(0);
   // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
   // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
-  const STEPS = rerun || !billingLive() ? 4 : 5;
+  const STEPS = rerun || !billingLive() ? 5 : 6;
+  const PRO_STEP = 5;
   const trialDays = flag("trialDays");
   // The store's own trial length for this person (null once they've used a trial), else the flag's.
   const offers = useBilling((b) => b.offers);
@@ -100,7 +103,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // The setup funnel: which step each install reached.
   useEffect(() => {
     track("onboarding_step", { step, name: STEP_NAMES[step] });
-    if (step === 4) track("paywall_view", { from: "setup" });
+    if (step === PRO_STEP) track("paywall_view", { from: "setup" });
   }, [step]);
 
   const fillFromHealth = async () => {
@@ -134,6 +137,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       ...(pro ? { pro } : {}),
     });
     setAnalytics(stats);
+    // In a browser, ask it to keep this site's storage, so the workouts saved here aren't cleared (saving.ts).
+    void keepStorage();
     track("onboarding_complete", { rerun, goal, experience: exp, days, preset: keepGyms ? "kept" : preset, unit, healthPrefill: prefilled });
     haptic("success");
     if (rerun) go("today");
@@ -282,7 +287,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             </label>
           </>
         )}
-        {step === 4 && (
+        {step === 4 && <SaveStep />}
+        {step === PRO_STEP && (
           <>
             <h1 className="text-3xl font-extrabold tracking-tight">{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
@@ -304,7 +310,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       </div>
       <div className="flex gap-3 pb-2">
         {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>{t("setup.back")}</Button>}
-        {step < 4 && (
+        {step < PRO_STEP && (
           <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
             {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>

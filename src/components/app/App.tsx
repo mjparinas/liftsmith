@@ -8,6 +8,7 @@ import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
+import { keepStorage } from "@/lib/saving";
 import { installDiag } from "@/lib/diag";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { COSMETICS } from "@/lib/game";
@@ -120,6 +121,10 @@ export function App() {
   useEffect(() => {
     if (ready) void startBilling();
   }, [ready]);
+  // In a browser, keep asking it not to clear this site's storage (no accounts yet; saving.ts).
+  useEffect(() => {
+    if (ready && profile.onboarded) void keepStorage();
+  }, [ready, profile.onboarded]);
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
   }, [ready, profile.onboarded, billing.live, billing.ent]);
