@@ -12,6 +12,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(InstallInfoPlugin())
         bridge?.registerPluginInstance(VoiceCoachPlugin())
         bridge?.registerPluginInstance(AppIconPlugin())
+        bridge?.registerPluginInstance(AccountSignInPlugin())
     }
 }
 

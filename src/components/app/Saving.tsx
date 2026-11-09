@@ -10,10 +10,12 @@ import { STORE_LINKS } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { go } from "./router";
 import { Button, Section } from "./ui";
+import { AccountPanel } from "./Account";
+import { useAccount } from "@/lib/auth";
 
 // "Save your progress" (Melvin, 2026-11-09: "it's not clear how to save my information or register").
-// There are no accounts yet, so these say plainly where the data lives, keep it from being cleared in
-// a browser (home screen), and move it between devices (backup and restore). AGENTS.md "Saving".
+// These say plainly where the data lives, offer the optional account (backup and sync, Account.tsx), keep
+// it from being cleared in a browser (home screen), and move it by file (backup and restore). AGENTS.md "Saving".
 
 const subscribeWhere = (f: () => void) => {
   const mq = window.matchMedia?.("(display-mode: standalone)");
@@ -25,12 +27,14 @@ const useWhere = (): Where => useSyncExternalStore(subscribeWhere, where, () => 
 /** Where it's saved, and in a browser what can clear it. */
 export function SavedWhere() {
   const w = useWhere();
+  const account = useAccount((s) => s.account);
   const [kept, setKept] = useState(false);
   useEffect(() => void storageKept().then(setKept), [w]);
   return (
     <div className="space-y-2">
       <p>{w === "native" ? t("save.lead.native") : t("save.lead.web")}</p>
-      {w === "browser" && <p className="text-sm text-muted">{t("save.risk.web")}{isIos() ? ` ${t("save.risk.ios")}` : ""}</p>}
+      {account && <p className="text-sm text-muted">{t("save.synced", { email: account.email ?? "" })}</p>}
+      {w === "browser" && !account && <p className="text-sm text-muted">{t("save.risk.web")}{isIos() ? ` ${t("save.risk.ios")}` : ""}</p>}
       {w === "installed" && <p className="text-sm text-muted">{t("save.installed")}</p>}
       {w === "browser" && kept && <p className="text-sm text-muted">{t("save.kept")}</p>}
     </div>
@@ -66,13 +70,19 @@ export function InstallHelp() {
 
 /** The setup wizard's last step before the Pro offer. */
 export function SaveStep() {
+  const account = useAccount((s) => s.account);
   return (
     <>
       <h1 className="text-3xl font-extrabold tracking-tight">{t("save.title")}</h1>
       <div className="card mt-6 p-4"><SavedWhere /></div>
+      {!account && (
+        <div className="mt-4">
+          <p className="mb-3 text-sm text-muted">{t("save.accounts")}</p>
+          <AccountPanel />
+        </div>
+      )}
       <InstallHelp />
-      <p className="mt-4 text-sm text-muted">{t("save.accounts")}</p>
-      <p className="mt-2 text-sm text-muted">{t("save.later")}</p>
+      <p className="mt-4 text-sm text-muted">{t("save.later")}</p>
     </>
   );
 }
@@ -80,6 +90,7 @@ export function SaveStep() {
 /** Settings › Saving and backup: where it lives, the home screen, a backup file and restoring one. */
 export function SavingSettings() {
   const { profile, gyms, events, restoreBackup } = useApp();
+  const account = useAccount((s) => s.account);
   const input = useRef<HTMLInputElement>(null);
   const [note, setNote] = useState<string | null>(null);
   const pick = async (f: File | undefined) => {
@@ -109,7 +120,12 @@ export function SavingSettings() {
         </div>
         <input ref={input} type="file" accept=".json,application/json" className="sr-only" aria-label={t("save.restore.file")} tabIndex={-1} onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ""; }} />
         {note && <p className="mt-2 text-sm text-muted" role="status">{note}</p>}
-        <p className="mt-3 text-xs text-faint">{t("save.accounts")}</p>
+        {!account && (
+          <>
+            <p className="mt-3 text-xs text-faint">{t("save.accounts")}</p>
+            <Button kind="ghost" className="mt-2 w-full" onClick={() => go("account")}>{t("save.signIn")}</Button>
+          </>
+        )}
       </Section>
     </div>
   );
@@ -131,7 +147,8 @@ export function SaveNudge() {
   const { events } = useApp();
   const stored = useSyncExternalStore(noSubscribe, nudgeHidden, () => true);
   const [dismissed, setDismissed] = useState(false);
-  const hidden = stored || dismissed;
+  const signedIn = useAccount((s) => !!s.account);
+  const hidden = stored || dismissed || signedIn;
   if (w !== "browser" || hidden || !events.some((e) => e.type === "sessionEnd")) return null;
   const dismiss = () => {
     setDismissed(true);

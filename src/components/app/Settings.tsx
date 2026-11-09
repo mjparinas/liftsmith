@@ -22,6 +22,7 @@ import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { CreatorCode } from "./CreatorCode";
+import { useAccount } from "@/lib/auth";
 import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
 import { feel } from "@/lib/juice";
 import { entActive, useBilling } from "@/lib/billing";
@@ -85,7 +86,8 @@ export function Settings() {
         </button>
       </h1>
       {motionNote && <p className="mt-2 text-sm text-muted" role="status">{motionNote}</p>}
-      <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
+      <AccountRow />
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>{t("settings.injuries")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("tools")}>{t("settings.tools")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>{t("settings.feedback")}</Button>
@@ -182,5 +184,19 @@ function AccessibilitySettings() {
       <Row<Contrast> label={t("a11y.contrast")} value={a.contrast} onPick={(contrast) => set({ contrast })} options={[["system", t("a11y.text.system")], ["standard", t("a11y.colours.standard")], ["more", t("a11y.contrast.more")]]} />
       <p className="mt-2 px-1 text-xs text-faint">{t("a11y.contrast.note")}</p>
     </div>
+  );
+}
+
+/** Settings' first row: sign in to back up and sync, or who's signed in. */
+function AccountRow() {
+  const account = useAccount((s) => s.account);
+  return (
+    <button type="button" onClick={() => go("account")} className="press card mt-4 flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
+      <span>
+        <span className="block font-semibold">{t("account.row")}</span>
+        <span className="block text-sm text-muted">{account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}</span>
+      </span>
+      <span aria-hidden className="text-faint">›</span>
+    </button>
   );
 }

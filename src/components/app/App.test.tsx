@@ -549,7 +549,7 @@ describe("game layer", () => {
   });
 });
 
-describe("saving your progress (no accounts yet)", () => {
+describe("saving your progress", () => {
   it("says where the data is saved before setup ends", async () => {
     const user = userEvent.setup();
     render(<App />);
