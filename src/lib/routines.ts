@@ -56,7 +56,7 @@ export function planFromRoutine(base: Plan, routine: Routine, events: readonly A
   if (!kept.length) return null;
   const plain: PlanItem[] = kept.map((i) => {
     const ex = EXERCISE_BY_ID.get(i.exerciseId)!;
-    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
+    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal, profile.training), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
   });
   // A superset only holds where both exercises are still here and next to each other.
   const linked = withLinks(plain, kept.slice(0, -1).map((k, i) => !!k.group && k.group === kept[i + 1].group));

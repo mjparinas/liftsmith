@@ -1,5 +1,5 @@
 import { achievementXp, achievements, context, nearest, type Achievement } from "./achievements";
-import { mondayOf, type Stats } from "./derive";
+import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { epley, TIMED } from "./progression";
 import { hash, rng } from "./random";
@@ -69,7 +69,7 @@ export interface Streak {
   needed: number;
   /** Freezes held now (earned one per FREEZE_EVERY goal weeks, at most MAX_FREEZES). */
   freezes: number;
-  /** Mondays of past weeks a freeze saved. */
+  /** Week starts of past weeks a freeze saved. */
   frozen: number[];
   /** Longest run ever. */
   best: number;
@@ -84,7 +84,7 @@ export interface Streak {
 function trainingDays(stats: Stats): Map<number, Set<string>> {
   const days = new Map<number, Set<string>>();
   for (const s of stats.sessions) {
-    const w = mondayOf(s.start);
+    const w = weekOf(s.start);
     days.set(w, (days.get(w) ?? new Set()).add(new Date(s.start).toDateString()));
   }
   return days;
@@ -94,17 +94,17 @@ function trainingDays(stats: Stats): Map<number, Set<string>> {
 export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, now: number): Streak {
   const days = trainingDays(stats);
   const goal = Math.max(1, profile.daysPerWeek);
-  const thisMonday = mondayOf(now);
+  const thisWeekStart = weekOf(now);
   const met = (w: number) => (days.get(w)?.size ?? 0) >= goal;
-  const weeks = [...days.keys()].filter((w) => w < thisMonday).sort((a, b) => a - b);
+  const weeks = [...days.keys()].filter((w) => w < thisWeekStart).sort((a, b) => a - b);
   let streak = 0;
   let run = 0;
   let freezes = 0;
   let best = 0;
   const frozen: number[] = [];
   if (weeks.length) {
-    // Walk every week from the first workout to last week. mondayOf(w + 8 days) steps across DST safely.
-    for (let w = weeks[0]; w < thisMonday; w = mondayOf(w + WEEK + DAY)) {
+    // Walk every week from the first workout to last week. weekOf(w + 8 days) steps across DST safely.
+    for (let w = weeks[0]; w < thisWeekStart; w = weekOf(w + WEEK + DAY)) {
       if (met(w)) {
         streak++;
         run++;
@@ -119,13 +119,13 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
       best = Math.max(best, streak);
     }
   }
-  const thisWeek = days.get(thisMonday)?.size ?? 0;
+  const thisWeek = days.get(thisWeekStart)?.size ?? 0;
   const metNow = thisWeek >= goal;
   const weeksNow = streak + (metNow ? 1 : 0);
   const today = new Date(now);
   today.setHours(0, 0, 0, 0);
   const trainedToday = stats.sessions.some((s) => new Date(s.start).toDateString() === today.toDateString());
-  const daysLeft = 7 - Math.round((today.getTime() - thisMonday) / DAY);
+  const daysLeft = 7 - Math.round((today.getTime() - thisWeekStart) / DAY);
   const needed = Math.max(0, goal - thisWeek);
   // Days still free to train: today only counts if not trained yet.
   const free = daysLeft - (trainedToday ? 1 : 0);
@@ -191,7 +191,7 @@ function sessionsOf(sets: SetEvent[]): Session[] {
 /** The three quests for the week starting on `monday`, with progress. */
 export function questsFor(events: readonly AppEvent[], profile: Profile, monday: number): Quest[] {
   const all = setsOf(events);
-  const end = mondayOf(monday + WEEK + DAY);
+  const end = weekOf(monday + WEEK + DAY);
   const sets = all.filter((s) => s.at >= monday && s.at < end);
   const before = all.filter((s) => s.at < monday);
   const sessions = sessionsOf(sets);
@@ -231,7 +231,7 @@ export interface LeagueState {
 }
 
 export function weekXp(events: readonly AppEvent[], stats: Stats, profile: Profile, monday: number): number {
-  const end = mondayOf(monday + WEEK + DAY);
+  const end = weekOf(monday + WEEK + DAY);
   let xp = 0;
   for (const s of stats.sessions) {
     if (s.start < monday || s.start >= end) continue;
@@ -242,20 +242,20 @@ export function weekXp(events: readonly AppEvent[], stats: Stats, profile: Profi
 }
 
 export function league(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number, streak?: Streak): LeagueState {
-  const thisMonday = mondayOf(now);
-  const first = stats.sessions.length ? mondayOf(Math.min(...stats.sessions.map((s) => s.start))) : thisMonday;
+  const thisWeekStart = weekOf(now);
+  const first = stats.sessions.length ? weekOf(Math.min(...stats.sessions.map((s) => s.start))) : thisWeekStart;
   const frozen = new Set(streak?.frozen ?? goalStreak(stats, profile, now).frozen);
   let i = 0;
   const history: [number, number][] = [];
-  for (let w = first; w < thisMonday; w = mondayOf(w + WEEK + DAY)) {
+  for (let w = first; w < thisWeekStart; w = weekOf(w + WEEK + DAY)) {
     history.push([w, i]);
     const xp = weekXp(events, stats, profile, w);
     if (xp >= promoteAt(i) && i < LEAGUES.length - 1) i++;
     // A frozen week never drops you a league.
     else if (xp < demoteBelow(i) && !frozen.has(w)) i--;
   }
-  history.push([thisMonday, i]);
-  return { league: LEAGUES[i], index: i, weekXp: weekXp(events, stats, profile, thisMonday), promoteAt: i < LEAGUES.length - 1 ? promoteAt(i) : null, demoteBelow: demoteBelow(i), history };
+  history.push([thisWeekStart, i]);
+  return { league: LEAGUES[i], index: i, weekXp: weekXp(events, stats, profile, thisWeekStart), promoteAt: i < LEAGUES.length - 1 ? promoteAt(i) : null, demoteBelow: demoteBelow(i), history };
 }
 
 // ---------- Crates: one per finished workout, its prize picked from the session id so every device agrees.
@@ -367,9 +367,9 @@ export interface Game {
 
 export function questXp(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): number {
   if (!stats.sessions.length) return 0;
-  const first = mondayOf(Math.min(...stats.sessions.map((s) => s.start)));
+  const first = weekOf(Math.min(...stats.sessions.map((s) => s.start)));
   let xp = 0;
-  for (let w = first; w <= mondayOf(now); w = mondayOf(w + WEEK + DAY)) for (const q of questsFor(events, profile, w)) if (q.done) xp += q.xp;
+  for (let w = first; w <= weekOf(now); w = weekOf(w + WEEK + DAY)) for (const q of questsFor(events, profile, w)) if (q.done) xp += q.xp;
   return xp;
 }
 
@@ -383,7 +383,7 @@ export function game(events: readonly AppEvent[], stats: Stats, profile: Profile
     xp,
     level: levelOf(xp),
     streak,
-    quests: questsFor(events, profile, mondayOf(now)),
+    quests: questsFor(events, profile, weekOf(now)),
     league: league(events, stats, profile, now, streak),
     achievements: list,
     badges: { earned: list.reduce((n, a) => n + a.level, 0), total },
