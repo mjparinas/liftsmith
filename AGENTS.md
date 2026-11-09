@@ -118,7 +118,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 ### Name
 - **Liftsmith** (Melvin chose it, 2026-11-09; the working name before was Setwise). The name is set in `src/lib/brand.ts`.
 - **App id: `com.getliftsmith.app`** for the Android package and the iOS bundle id, with the widget extension at `com.getliftsmith.app.widgets` (Melvin, 2026-11-09). It can never change after the first Play and App Store upload.
-- **Domain: `getliftsmith.com`** (Melvin chose it, 2026-11-09; he's registering it). It's the default `SITE_URL` (`src/lib/site.ts`, overridable with `NEXT_PUBLIC_SITE_URL`). Attach it to the Vercel project once it's bought, which also makes production public.
+- **Domain: `getliftsmith.com`** (Melvin chose it and bought it on Cloudflare, 2026-11-09). It is attached to the Vercel project with `www.getliftsmith.com`, which makes production public (custom domains skip Vercel Authentication). It's the default `SITE_URL` (`src/lib/site.ts`, overridable with `NEXT_PUBLIC_SITE_URL`).
 
 ### Training engine (src/lib)
 - **Equipment and gym profiles.** Each gym has its own equipment list, bars, the exact plates owned (with counts), dumbbells, kettlebells and machine step. The generator uses only exercises whose every needed item is at the active gym (`available` in `exercises.ts`).
@@ -181,8 +181,14 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 
 ### Heart rate and health
 - **Live heart rate comes over Bluetooth**, not Health Connect, because Health Connect gets Fitbit data in batches, often minutes late. Any standard heart rate broadcaster works (Heart Rate Service 0x180D): Fitbit Charge 6 and Pixel Watch "share heart rate", Polar, Garmin, Wahoo straps (`heartRate.ts`).
-- **Health Connect** (Android) and **Apple Health** (iOS) go through one plugin, `@capgo/capacitor-health` (`src/lib/health.ts`). Reads (weight, height, body fat, resting HR, HRV, sleep, HR) prefill the wizard's body weight step ("Fill in from Health Connect / Apple Health"). Finished workouts are written as active calories (about 5 METs) and average HR, because the plugin can't write workout sessions yet. The Android Health Connect privacy rationale is `public/privacypolicy.html`.
+- **Health Connect** (Android) and **Apple Health** (iOS) go through one plugin, `@capgo/capacitor-health` (`src/lib/health.ts`). Reads (weight, height, body fat, resting HR; nothing else, see "Google Play review" below) prefill the wizard's body weight step ("Fill in from Health Connect / Apple Health"). Finished workouts are written as active calories (about 5 METs) and average HR, because the plugin can't write workout sessions yet. The Android Health Connect privacy rationale is `public/privacypolicy.html`.
 - Native heart rate uses `@capacitor-community/bluetooth-le` on both platforms (keeps reading with the screen off; iOS has the `bluetooth-central` background mode). The web build keeps Web Bluetooth.
+
+### Google Play review (Melvin, 2026-11-09; audit: https://claude.ai/artifact/5YAP14XHLSZUfXbcEWD4hS)
+- **Ask only for health data a feature uses today.** Play's Health Connect review rejects any permission the app doesn't visibly use. `READ` and `WRITE` in `health.ts` are the list (reads: weight, height, body fat, resting heart rate; writes: active calories, heart rate), and the manifest strips every other permission the health plugin adds (`tools:node="remove"`). The same list drives HealthKit, and the iOS usage strings match it. Sleep and HRV come back with readiness (roadmap step 2), added to `health.ts`, the manifest, both privacy pages and the iOS strings in the same change. `storePolicy.test.ts` fails when the manifest and `health.ts` disagree.
+- **Precise location stops at Android 11** (`maxSdkVersion="30"`), where scanning for a Bluetooth heart rate monitor still needs it; Android 12+ scans with `BLUETOOTH_SCAN` (`neverForLocation`) and the app asks only for approximate location.
+- **The privacy pages carry the Health Connect Limited Use statement and a contact address** (`CONTACT_EMAIL` in `site.ts`, hello@getliftsmith.com). The policy URL for the store listing and the Health Connect form is https://getliftsmith.com/privacy/. `public/privacypolicy.html` is also the in-app Health Connect rationale (loaded from the app's assets), so its links are absolute.
+- Melvin's developer account doesn't need Play's 12-tester closed test.
 
 ### Integrations roadmap (Melvin agreed, 2026-11-09; research: https://claude.ai/artifact/UoDvYPVgFxt8wwPuJJS7KH)
 1. **MVP:** Health Connect + HealthKit reads to prefill the wizard, plus writing finished workouts. Bluetooth 0x180D stays the only live heart rate path (straps, Garmin/Polar/Whoop broadcast, Fitbit Charge 6, Pixel Watch). The wizard's connect step offers Health access and heart rate pairing only.
@@ -464,7 +470,6 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 
 ## Open items
 - Reminder emails in Vercel: verify a sending domain in Resend, then set `MAIL_FROM`, `MAIL_POSTAL_ADDRESS` (a real mailing address or PO box), `REMINDER_SECRET` and `CRON_SECRET`.
-- Register getliftsmith.com and attach it to the Vercel project.
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.

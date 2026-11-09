@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BRAND } from "@/lib/brand";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND.name} collects, why, and how to turn it off.` };
 
@@ -32,7 +33,8 @@ export default function Privacy() {
 
       <h2 className="mt-8 text-xl font-semibold">Health data</h2>
       <p className="mt-2">If you try the rep counter, the camera picture and motion sensor readings are analysed on your device as you lift and then thrown away. Nothing is recorded, saved or sent to us.</p>
-      <p className="mt-2">With your permission the app reads weight, height, body fat, resting heart rate, heart rate variability, sleep and heart rate from Health Connect or Apple Health to suggest starting weights, adjust workouts and keep your TDEE (daily calories) current, and writes finished workouts back. These readings stay on your phone and are never part of usage stats. <a className="text-accent underline" href="/privacypolicy.html">More about health data</a>.</p>
+      <p className="mt-2">With your permission the app reads weight, height, body fat and resting heart rate from Health Connect or Apple Health to fill in setup, bring in weigh-ins and body fat, and keep your TDEE (daily calories) current, and writes a finished workout&apos;s active calories and average heart rate back. These readings stay on your phone and are never part of usage stats. <a className="text-accent underline" href="/privacypolicy.html">More about health data</a>.</p>
+      <p className="mt-2">{BRAND.name}&apos;s use of information received from Health Connect adheres to the <a className="text-accent underline" href="https://support.google.com/googleplay/android-developer/answer/12991134">Health Connect Permissions policy</a>, including the Limited Use requirements. Information from Apple Health is used the same way: only for the features above, never transferred to anyone, never used for advertising, credit or lending decisions, and never read by people.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
       <p className="mt-2">Phone reminders are scheduled on your phone from your own data and send nothing to us. If you turn on email reminders, we keep your email address, which kinds of email you chose, when you agreed, and only what&apos;s needed to time them: your training days and time, time zone, days-a-week goal, when you finished setup, when your first and latest workouts were, how many days you trained this week, your streak and whether you have Pro. Never your weights, reps, heart rate or health data. Nothing is sent until you confirm the address, offers stay off unless you turn them on, and every email has a one-click unsubscribe link. Stop all email in Settings › Reminders, or erase this device, and we delete your address and its history.</p>
@@ -44,6 +46,9 @@ export default function Privacy() {
 
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>
       <p className="mt-2">Turn usage stats off in Settings. Erase everything on your device from Settings › Erase this device. To ask what we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under Settings › Usage stats) and we&apos;ll do it within 30 days.</p>
+
+      <h2 className="mt-8 text-xl font-semibold">Contact</h2>
+      <p className="mt-2">Questions about privacy or your data: <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. You can also send feedback from the app (Settings › Send feedback or report a bug).</p>
     </main>
   );
 }
