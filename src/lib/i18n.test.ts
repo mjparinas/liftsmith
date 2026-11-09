@@ -4,7 +4,6 @@ import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 import { clockTime, currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message, weekday } from "./i18n";
 import { fmtNum, plainNum } from "./units";
-import { KIND_INFO } from "./messages";
 import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
 import { RARITY_LABEL } from "./game";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, MUSCLE_LABEL } from "./types";
@@ -77,7 +76,7 @@ describe("language", () => {
     setLanguage("fr");
     expect(weekday(3, "long")).toBe("mercredi");
     expect(clockTime(18, 0)).toBe("18:00");
-    expect(KIND_INFO.missed.label).toBe("Séances manquées");
+    expect(t("msgKind.missed")).toBe("Séances manquées");
   });
 
   it("translates engine labels (muscles, recovery bands) on each read", () => {

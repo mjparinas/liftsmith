@@ -2,7 +2,7 @@
 import { clockTime, list, t, weekday } from "@/lib/i18n";
 import { oops } from "@/lib/juice";
 import { defaultDays } from "@/lib/calendar";
-import { clampTime, DEFAULT_ON, EMAIL_KINDS, KIND_INFO, PUSH_KINDS, type MessageKind } from "@/lib/messages";
+import { clampTime, DEFAULT_ON, EMAIL_KINDS, PUSH_KINDS, type MessageKind } from "@/lib/messages";
 import { askPush, deleteEmail, EMAIL_RE, pushAllowed, pushSupported, syncEmail } from "@/lib/reminders";
 import { useApp } from "@/lib/store";
 import type { Profile } from "@/lib/types";
@@ -109,7 +109,7 @@ export function MessageSettings() {
               {allowed === false && <p className="mt-1 text-xs text-warn">{t("msg.pushOff")}</p>}
               <div className="mt-1 divide-y divide-line">
                 {PUSH_KINDS.map((k) => (
-                  <Toggle key={k} id={`push-${k}`} label={KIND_INFO[k].label} blurb={k === "reminder" ? t("msg.reminderPush") : KIND_INFO[k].blurb} on={!!allowed && pushOn(k)} onChange={(v) => void setPush(k, v)} />
+                  <Toggle key={k} id={`push-${k}`} label={t(`msgKind.${k}`)} blurb={t(k === "reminder" ? "msg.reminderPush" : `msgKind.${k}.blurb`)} on={!!allowed && pushOn(k)} onChange={(v) => void setPush(k, v)} />
                 ))}
               </div>
             </>
@@ -140,7 +140,7 @@ export function MessageSettings() {
               )}
               <div className="mt-1 divide-y divide-line">
                 {EMAIL_KINDS.map((k) => (
-                  <Toggle key={k} id={`email-${k}`} label={KIND_INFO[k].label} blurb={k === "reminder" ? t("msg.reminderEmail") : KIND_INFO[k].blurb} on={emailOn(k)} onChange={(v) => setEmailKind(k, v)} />
+                  <Toggle key={k} id={`email-${k}`} label={t(`msgKind.${k}`)} blurb={t(k === "reminder" ? "msg.reminderEmail" : `msgKind.${k}.blurb`)} on={emailOn(k)} onChange={(v) => setEmailKind(k, v)} />
                 ))}
               </div>
               <Button kind="quiet" className="mt-2 w-full" disabled={busy} onClick={() => void stop()}>{t("msg.stop")}</Button>
