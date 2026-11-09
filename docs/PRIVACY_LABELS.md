@@ -44,7 +44,7 @@ Collected data types:
 | Financial info › Purchase history | Yes (plan and price of a purchase; RevenueCat checks the receipt) | No | No | Optional | App functionality, Analytics |
 | Health and fitness › Health info | **No** (stays on the device) | | | | |
 
-Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://getliftsmith.com/privacy/.
+Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
 
 ## App Store: App Privacy
 
