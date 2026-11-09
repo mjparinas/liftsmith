@@ -25,12 +25,32 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ## Platform parity (rule, Melvin, 2026-11-09)
 
-- **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
+- **Every feature goes in both apps, plus the web app wherever it makes sense** (Melvin, 2026-11-09). Each feature lands on Android and iOS in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. The web app (`/app/`) gets it too when the browser can do it (for example, `.ics` files instead of calendar access, and manifest shortcuts instead of widgets).
+- **One-platform features are allowed when they're very useful** (Melvin, 2026-11-09). If a feature is very useful on one platform but the other ecosystem can't support it, build it anyway. Record the gap under "Platform deltas" below, and in the pull request description, say what each platform does instead.
 - Platform equivalents: Health Connect ↔ HealthKit (Apple Health); foreground-service notification ↔ Live Activity (lock screen and Dynamic Island); Play Billing ↔ StoreKit; Sign in with Google ↔ Sign in with Apple (both offered on iOS); Wear OS ↔ Apple Watch.
 - CI builds both apps on every pull request (`android` and `ios` jobs in `ci.yml`).
 - **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) runs a **Live Activity** (lock screen and Dynamic Island: rest countdown, next set and plates, heart rate, Log set / +30 s links; drawn by the `LiftsmithWidgets` extension) and schedules a time-sensitive rest-over notification with the same two buttons. Heart-rate-only changes reach the Live Activity at most every 15 s, because iOS budgets updates. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
 - Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins). `InstallInfo` (device and install source for analytics) is registered on both.
 - Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
+
+### Platform deltas
+Every place where Android, iOS and the web app differ, and why. Keep this table current, and update it in the same change as the feature.
+
+| Feature | Android | iOS | Web app | Why |
+| --- | --- | --- | --- | --- |
+| Lock-screen workout | Ongoing foreground-service notification | Live Activity plus a rest-over notification | Service-worker notification and an alert while the page is open | Each platform's own mechanism |
+| Quick toggle | Quick Settings tile | Control Center control (iOS 18+) or a Shortcut control | None | No browser equivalent |
+| Widgets | Home-screen widget | Home and lock-screen widgets | Manifest shortcuts | No browser widgets |
+| Voice | App Actions, start workout only | Siri and App Shortcuts, all three actions | None | Custom App Actions intents need Google's review |
+| Calendar | Read and write | Read and write | `.ics` download, no busy times | Browsers can't reach the calendar |
+| AirPods Pro heart rate | None | Yes (planned) | None | Apple only |
+| Volume follows intensity | Yes (planned extra) | None | None | iOS can't set system volume or control other apps. It was skipped before; it can come back as an Android extra |
+| Samsung Health Data SDK | Yes (planned) | None | None | Samsung devices only |
+| Date of birth and sex | Asked in the app | From Apple Health | Asked in the app | Health Connect has neither |
+| Fitbit Air data | Health Connect | Apple Health, one way only | None | Fitbit syncs to Apple Health one way |
+| Health data | Health Connect | Apple Health | None | Browsers have no health store |
+| Bluetooth heart rate | Yes | Yes | Web Bluetooth, Chrome only | Browser support |
+| Gym by location | Yes | Yes | None | No geofence in the web app |
 
 ## Product decisions
 
@@ -84,7 +104,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 ### Integrations roadmap (Melvin agreed, 2026-11-09; research: https://claude.ai/artifact/UoDvYPVgFxt8wwPuJJS7KH)
 1. **MVP:** Health Connect + HealthKit reads to prefill the wizard, plus writing finished workouts. Bluetooth 0x180D stays the only live heart rate path (straps, Garmin/Polar/Whoop broadcast, Fitbit Charge 6, Pixel Watch). The wizard's connect step offers Health access and heart rate pairing only.
 2. **Next: readiness.** An on-device readiness score from sleep, HRV and resting HR against a 30-day baseline, plus a pre-workout check-in (energy, soreness, feeling unwell). It feeds `generator.ts`/`block.ts` as a low/normal/high adjustment the lifter can override. **Readiness auto-adjust is a Pro feature.**
-3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link (saved or curated playlists). **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
+3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link. **For now, public playlists that we curate** (Melvin, 2026-11-09). The lifter's own saved playlists come later. **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
 4. **Integrations server, right after the MVP and ahead of full sync** (Melvin decided, 2026-11-09). A small server on Vercel with libsql/Turso. Its first job is the OAuth exchange and token storage for **Strava, Oura and Whoop**, so all three ship in the first updates. Apply early for Strava Extended Access, Oura approval (including written consent to use their data in Pro features) and Whoop approval, because each caps us at 10 users until approved.
 5. **After that** (full order in the research doc's "How we win" section): Samsung Health Data SDK, a bar-speed sensor, watch apps, a Garmin Connect IQ app.
 6. **Approved additions (Melvin, 2026-11-09; details in the research doc's "Added to the plan"), built in this order, each on Android and iOS together:**
@@ -96,7 +116,8 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
    - **With the server · Cloud integrations** (Strava, Oura, Whoop): connecting one explains that it creates a free account, then uses Google or Apple sign-in. Everything else stays account-free.
    - **Before launch · Legal and consent:** the Health Connect declaration, HealthKit review notes, a privacy policy that covers each integration, Washington MHMDA and GDPR special-category consent, and export and delete that cover linked accounts.
    - **Test devices:** Melvin has a Fitbit Air (check that its "Share heart rate" is seen by our 0x180D reader, since Google lists only some apps as compatible) and an Oura ring (readiness inputs through Health Connect and HealthKit now, the direct API later).
-- **Skipped:** Hume Health direct (no API; its data arrives through Apple Health), live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only, since iOS can't control other apps' volume, so it's skipped for platform parity).
+- **Hume:** Melvin says Hume Body Pod data does reach Health Connect (2026-11-09), so it needs no special handling on Android: it arrives through Health Connect, and on iOS through Apple Health. Body weight and composition prefill the wizard through `health.ts`. There is no direct integration, because Hume has no API.
+- **Skipped:** live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only; iOS can't control other apps' volume. It was skipped under the old strict parity rule and can come back as an Android extra under the 2026-11-09 rule; see Platform deltas).
 
 ### In-app feedback (Melvin, 2026-11-09)
 - **Settings › Send feedback or report a bug** (`#/feedback`, `Feedback.tsx`): bug / idea / other, a message, an optional email for replies, an optional screenshot (picked from the photo library, shrunk to 1280 px JPEG), and device details that are on by default and shown before sending (app version, platform, screen, language, time zone, current screen, the last 30 errors). It never includes workouts, health data or names.
@@ -147,6 +168,15 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
 - Stats: weekly sets per muscle against the target, estimated one-rep max trends (Epley), PRs, volume, session history, streaks and trophies.
+
+### Web dashboard (Melvin, 2026-11-09: "a website for users as well, similar to Hevy")
+- Hevy's site is a big-screen view (routines, exercise progress, friends' workouts), and its feature guide says workouts can be logged from a browser; past workouts can be added by hand. Ours matches that: the full app already runs in a browser at `/app/` (live logging), and `/me/` is a desktop dashboard (`src/components/dashboard/`, views in `src/lib/dashboard.ts`).
+- Tabs (hash routes `#/overview`, `#/calendar`, `#/lifts`, `#/history/<session>`, `#/trophies`, `#/log`, `#/share`): level and totals, workouts a week, a year heatmap and a month calendar of training days, one-rep max trends and bests by exercise, weekly sets per muscle, every set of every workout, trophies, **log a past workout**, and a share link. Linked from Settings ("Open the big-screen dashboard"); it works in the native shells too, since it's part of the same static export.
+- **It reads the same on-device event log** as the app, so today it shows the workouts saved in that browser or app. Workouts from other devices arrive when sync lands (the planned `src/lib/sync.ts` and `src/lib/auth.ts`); the dashboard has no data path of its own to change.
+- **Past workouts** are written as the same events a live workout writes, with `source: "manual"` on the `sessionStart`, sets spread across the workout, what was lifted taken as the target (so progression counts it as hit) and RIR 2 assumed for recovery. No editing or deleting yet: deletes need sync tombstones.
+- **Free vs Pro** (`src/lib/entitlements.ts`, `can("advancedStats")`): overview, calendar, history, bests, PRs, trophies, past-workout logging and sharing are free; one-rep max trends and weekly sets per muscle are Pro, like the app's advanced stats. `isPro()` is always true until billing lands; then a running trial counts as Pro.
+- **Sharing before accounts:** `/share/#<summary>`. The summary lives in the link's fragment, which browsers never send to a server, so nothing is uploaded. It holds level and XP, workouts, goal streak, trophy ids, the top five estimated one-rep maxes and which of the last 84 days had a workout; the name only when the lifter ticks it. **Never** heart rate, body weight, cycle data, gyms or locations. `decodeShare` validates every field and rejects anything unknown. Following friends and a shared feed wait for accounts.
+- `/me/` and `/share/` are `noindex`. The heatmap squares are pointer-only (too small to tap); keyboard and screen reader users get the same days from the month calendar.
 
 ### Engagement and juice (owner request, 2026-11-09)
 - Duolingo-style loops and Gradelings-style juice: XP per set with PR and session bonuses, levels with titles, a training-week streak with freezes, PR celebrations (confetti, heavy haptic, fanfare), "plate club" trophies (2-plate bench, 3-plate squat, 4-plate deadlift, bodyweight bench), a post-workout crate of random cosmetics, weekly quests, customization (accent colours, plate and bar finishes, timer sounds), and opt-in nudge notifications.
