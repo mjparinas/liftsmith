@@ -2,6 +2,7 @@ import { dedupe } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { TIMED } from "./progression";
 import type { AppEvent, EffortEvent, Profile, SetEvent } from "./types";
+import { t } from "./i18n";
 
 // One-rep max estimates for the Progress screen's calculator (Melvin, 2026-11-09: "use the latest research
 // and algorithms, use as much existing data as possible").
@@ -252,11 +253,11 @@ export function dots(totalKg: number, bodyweightKg: number, sex: "male" | "femal
 
 /** Rough DOTS levels used by lifters and coaches (not an official scale). */
 export function dotsBand(score: number): string {
-  if (score >= 500) return "Elite";
-  if (score >= 400) return "Advanced";
-  if (score >= 300) return "Intermediate";
-  if (score >= 200) return "Novice";
-  return "Beginner";
+  if (score >= 500) return t("dots.band.elite");
+  if (score >= 400) return t("dots.band.advanced");
+  if (score >= 300) return t("dots.band.intermediate");
+  if (score >= 200) return t("dots.band.novice");
+  return t("dots.band.beginner");
 }
 
 export const DOTS_LIFTS = { squat: "back-squat", bench: "bench-press", deadlift: "deadlift" } as const;

@@ -2,7 +2,7 @@
 import { BodyMap, Legend, Swatch } from "@/components/BodyMap";
 import { DEMO_COLOURS, STAGE_BANDS } from "@/components/demo/colours";
 import type { DemoSettings, Loop, View } from "@/components/demo/engine";
-import { detectMode, readBody } from "@/components/demo/LiftDemo";
+import { bodyFor, detectMode } from "@/components/demo/LiftDemo";
 import { blockWeek, weekStart } from "@/lib/block";
 import { weeklySets } from "@/lib/generator";
 import { list, t } from "@/lib/i18n";
@@ -151,7 +151,7 @@ function Body3D({ rec, focus, selected, onPick, compact, onFail, groups }: {
   }
 
   const settings: DemoSettings = {
-    exerciseId: null, body: readBody() ?? "male", view, skeleton: false, muscles: true, path: false, speed: 1, playing: false,
+    exerciseId: null, body: bodyFor(profile.sex), view, skeleton: false, muscles: true, path: false, speed: 1, playing: false,
     fps: 30, paint, hatch, selected: lit, calm: calm(),
   };
   const latest = useRef(settings);
@@ -188,7 +188,7 @@ function Body3D({ rec, focus, selected, onPick, compact, onFail, groups }: {
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [view, paint, hatch, lit]);
+  }, [view, paint, hatch, lit, settings.body]);
 
   const summary = groups.map((g) => t("map.group", { band: g.label, muscles: list(g.muscles.map((m) => MUSCLE_LABEL[m].toLowerCase())) })).join(" ");
   return (

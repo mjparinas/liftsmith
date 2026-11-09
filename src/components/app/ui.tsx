@@ -1,7 +1,7 @@
 "use client";
 import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
-import { haptic, sound } from "@/lib/juice";
+import { calm, haptic, sound } from "@/lib/juice";
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
@@ -162,10 +162,18 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
   return <SheetBody onClose={onClose} title={title}>{children}</SheetBody>;
 }
 
+/** How far (px) a sheet must be pulled down to close, or how fast (px/ms) a flick of at least `flick` px must be. */
+const SWIPE_CLOSE = { distance: 96, speed: 0.6, flick: 40 };
+/** Drags that start on these belong to the control under the finger (a 3D figure, a slider), not the sheet. */
+const NO_SWIPE = "canvas, input[type=range], [data-no-swipe]";
+
 /**
  * The open sheet: a modal dialog rendered on <body>, so a screen's own stacking (its rise animation)
  * can't put it under the tab bar. Focus moves into it when it opens and back to where it was when it
  * closes; Escape closes it, and Tab stays inside it (keyboard and switch access, WCAG 2.1.2, 2.4.3).
+ * It closes four ways, so it's always clear how to get out (Melvin, 2026-11-09): the ✕ button in its
+ * header, swiping it down (from the handle, or anywhere while it's scrolled to the top), tapping
+ * outside, and Escape.
  */
 function SheetBody({ onClose, title, children }: { onClose: () => void; title: string; children: ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
@@ -198,14 +206,80 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
       if (before?.isConnected) before.focus();
     };
   }, []);
+
+  // Swipe down to close. Native touch listeners, because touchmove must be non-passive to stop the page
+  // scrolling while the sheet follows the finger. A drag only starts downward, at the top of the sheet's
+  // scroll, and not on a control that drags itself.
+  useEffect(() => {
+    const el = box.current;
+    if (!el) return;
+    let start: { x: number; y: number; t: number } | null = null;
+    let dragging = false;
+    let dy = 0;
+    const set = (y: number, animate: boolean) => {
+      el.style.transition = animate ? "transform 220ms var(--ease-out-expo, ease-out)" : "none";
+      el.style.transform = y ? `translateY(${y}px)` : "";
+    };
+    const down = (e: TouchEvent) => {
+      const target = e.target as Element | null;
+      const onHandle = !!target?.closest("[data-sheet-handle]");
+      if (e.touches.length !== 1 || (!onHandle && (el.scrollTop > 0 || target?.closest(NO_SWIPE)))) { start = null; return; }
+      start = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: e.timeStamp || Date.now() };
+      dragging = false;
+      dy = 0;
+    };
+    const move = (e: TouchEvent) => {
+      if (!start) return;
+      const x = e.touches[0].clientX - start.x;
+      const y = e.touches[0].clientY - start.y;
+      if (!dragging) {
+        if (Math.abs(y) < 8 && Math.abs(x) < 8) return;
+        if (y <= 0 || Math.abs(x) > Math.abs(y)) { start = null; return; } // a scroll up or a sideways drag: leave it alone
+        dragging = true;
+      }
+      if (e.cancelable) e.preventDefault();
+      dy = Math.max(0, y);
+      set(dy, false);
+    };
+    const up = (e: TouchEvent) => {
+      if (!start || !dragging) { start = null; return; }
+      const ms = Math.max(1, (e.timeStamp || Date.now()) - start.t);
+      start = null;
+      dragging = false;
+      if (dy >= SWIPE_CLOSE.distance || (dy >= SWIPE_CLOSE.flick && dy / ms >= SWIPE_CLOSE.speed)) {
+        set(el.offsetHeight || window.innerHeight, true);
+        haptic("select");
+        window.setTimeout(() => closeRef.current(), calm() ? 0 : 160);
+      } else set(0, true);
+    };
+    el.addEventListener("touchstart", down, { passive: true });
+    el.addEventListener("touchmove", move, { passive: false });
+    el.addEventListener("touchend", up);
+    el.addEventListener("touchcancel", up);
+    return () => {
+      el.removeEventListener("touchstart", down);
+      el.removeEventListener("touchmove", move);
+      el.removeEventListener("touchend", up);
+      el.removeEventListener("touchcancel", up);
+    };
+  }, []);
+
   return createPortal(
     // Tapping outside closes it too: a pointer convenience, since Escape and the sheet's own buttons cover the keyboard.
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
-      <div ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={`${id}-t`} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none" onClick={(e) => e.stopPropagation()}>
-        <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" />
-        <h2 id={`${id}-t`} className="mb-3 text-lg font-semibold">{title}</h2>
+      <div ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={`${id}-t`} data-testid="sheet" className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none" onClick={(e) => e.stopPropagation()}>
+        <div data-sheet-handle className="-mx-5 flex cursor-grab justify-center pb-2 pt-1" style={{ touchAction: "none" }} aria-hidden="true">
+          <div className="h-1.5 w-10 rounded-full bg-line" />
+        </div>
+        <div className="mb-3 flex items-start gap-2">
+          <h2 id={`${id}-t`} className="min-w-0 flex-1 pt-2 text-lg font-semibold">{title}</h2>
+          <button type="button" onClick={() => { haptic("tick"); onClose(); }} aria-label={t("map.close")} data-testid="sheet-close"
+            className="press -mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-raised text-muted">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          </button>
+        </div>
         {children}
       </div>
     </div>,
@@ -289,7 +363,7 @@ export function StatTile({ label, value, icon, tint = "var(--color-accent)", cla
 }
 
 /** The chain button between two exercises that pairs them as a superset, or splits them. */
-export function LinkToggle({ on, first, second, onToggle }: { on: boolean; first: string; second: string; onToggle: () => void }) {
+export function LinkToggle({ on, first, second, onToggle, className = "" }: { on: boolean; first: string; second: string; onToggle: () => void; className?: string }) {
   return (
     <button
       type="button"
@@ -300,7 +374,7 @@ export function LinkToggle({ on, first, second, onToggle }: { on: boolean; first
       }}
       aria-pressed={on}
       aria-label={on ? `Split ${second} from ${first}` : `Superset ${second} with ${first}`}
-      className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent/50 bg-accent/15 text-accent" : "border-line text-faint hover:text-ink"}`}
+      className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent bg-accent text-bg" : "border-line bg-surface text-muted hover:text-ink"} ${className}`}
     >
       <Icon name="link" size={18} />
     </button>

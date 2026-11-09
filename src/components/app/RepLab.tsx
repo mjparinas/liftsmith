@@ -10,7 +10,8 @@ import { loadPose, openCamera, startMotion, type PoseEngine } from "@/lib/reps/s
 import { RepTracker } from "@/lib/reps/tracker";
 import type { MotionProfile, SetSummary } from "@/lib/reps/types";
 import type { Pattern } from "@/lib/types";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
+import { useApp } from "@/lib/store";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
@@ -31,6 +32,7 @@ type Source = "camera" | "motion";
 type Facing = "user" | "environment";
 
 export function RepLab() {
+  const sex = useApp((st) => st.profile.sex);
   const [on, setOn] = useState(() => flag("repLab"));
   const [lift, setLift] = useState(0);
   const [source, setSource] = useState<Source>("camera");
@@ -224,7 +226,7 @@ export function RepLab() {
       {profile && (
         <div className="relative mt-4 aspect-[4/5] sm:aspect-[4/3]">
           {/* The figure does the lift with you; the camera is only a small preview for lining up. */}
-          <LiftDemo exerciseId={id} view="side" label={running ? `${label} · following you` : label} follow={follow} className="h-full" />
+          <LiftDemo exerciseId={id} body={bodyFor(sex)} view="side" label={running ? `${label} · following you` : label} follow={follow} className="h-full" />
           {source === "camera" && (
             <div className="absolute bottom-3 right-3 aspect-[3/4] w-[32%] overflow-hidden rounded-xl border border-line bg-bg shadow-lg" style={{ display: running ? "block" : "none" }}>
               <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
