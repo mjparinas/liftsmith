@@ -8,6 +8,7 @@ import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { flag } from "@/lib/flags";
 import { declineTrial, PRICES, startTrial, type Plan } from "@/lib/trial";
+import { billingLive } from "@/lib/billing";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { epley, KNOWN_LIFTS } from "@/lib/progression";
@@ -64,8 +65,9 @@ export function knownMaxes(entries: Record<string, { w: string; r: string }>, un
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const { profile, setProfile, addGym, gyms } = useApp();
   const [step, setStep] = useState(0);
-  // First run ends with the Pro trial offer; a rerun from Settings doesn't show it again.
-  const STEPS = rerun ? 4 : 5;
+  // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
+  // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
+  const STEPS = rerun || !billingLive() ? 4 : 5;
   const trialDays = flag("trialDays");
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
