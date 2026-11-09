@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from "react";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
@@ -77,16 +76,12 @@ export async function readPhoneLanguage(): Promise<void> {
 export const currentLang = () => lang;
 export const currentTag = () => tag;
 
-/** Re-renders a component when the language changes. Returns the language. */
-export function useLang(): Lang {
-  return useSyncExternalStore(
-    (on) => {
-      listeners.add(on);
-      return () => listeners.delete(on);
-    },
-    () => lang,
-    () => "en",
-  );
+/** Calls `on` when the language changes; returns the unsubscribe. `useLang` (useLang.ts) builds on it. */
+export function subscribeLang(on: () => void): () => void {
+  listeners.add(on);
+  return () => {
+    listeners.delete(on);
+  };
 }
 
 const rules = new Map<string, Intl.PluralRules>();
