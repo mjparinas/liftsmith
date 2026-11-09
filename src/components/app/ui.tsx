@@ -3,6 +3,7 @@ import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
 import { haptic, sound } from "@/lib/juice";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
 
 export function Button({ children, onClick, kind = "primary", className = "", disabled, label, icon }: { children: ReactNode; onClick?: () => void; kind?: "primary" | "ghost" | "quiet" | "danger"; className?: string; disabled?: boolean; label?: string; icon?: IconName }) {
@@ -93,14 +94,16 @@ export function Section({ title, children, right, icon, info }: { title: string;
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
-  return (
+  // Rendered on <body>, so a screen's own stacking (its rise animation) can't put it under the tab bar.
+  return createPortal(
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
       <div role="dialog" aria-label={title} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)]" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" />
         <h2 className="mb-3 text-lg font-semibold">{title}</h2>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 
