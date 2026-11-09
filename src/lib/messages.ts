@@ -32,11 +32,9 @@ export const EMAIL_KINDS = KINDS.filter((k) => KIND_INFO[k].email);
 /** On unless the lifter turned them off. Pro offers are off until they turn them on (store rules and GDPR). */
 export const DEFAULT_ON: Record<MessageKind, boolean> = { reminder: true, missed: true, streak: true, milestone: true, pro: false };
 
-/**
- * Billing isn't live yet, and until it is everyone has Pro (AGENTS.md "Money"). A Pro offer to someone
- * who already has every Pro feature would be misleading, so the planner sends none until this is true.
- */
-export const BILLING_LIVE = false;
+// Billing isn't live yet, and until it is everyone has Pro, so the planner sends no Pro offers (billing.ts).
+export { BILLING_LIVE } from "./billing";
+import { BILLING_LIVE } from "./billing";
 
 export type ProState =
   | { state: "pro" }

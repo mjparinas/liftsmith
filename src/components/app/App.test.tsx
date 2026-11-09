@@ -5,6 +5,7 @@ import { act, cleanup, fireEvent, render, screen, within } from "@testing-librar
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useApp } from "@/lib/store";
+import { setBillingLive } from "@/lib/billing";
 import { App } from "./App";
 
 // jsdom has no canvas.
@@ -26,8 +27,7 @@ async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commerci
   await user.click(screen.getByRole("button", { name: gym }));
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: "Continue" }));
-  await user.click(screen.getByRole("button", { name: "Continue" }));
-  await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
+  await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByText("Today's workout");
 }
 
@@ -44,7 +44,23 @@ describe("setup in another language", () => {
 });
 
 describe("Pro trial offer", () => {
+  afterEach(() => setBillingLive(false));
+
+  it("shows no priced offer while billing isn't live", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("What are you training for?");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Save" }));
+    await screen.findByText("Today's workout");
+    expect(screen.queryByText(/Start free trial/)).not.toBeInTheDocument();
+    expect(useApp.getState().profile.pro).toBeUndefined();
+  });
+
   it("ends first-run setup with the trial offer, yearly first, and records the choice", async () => {
+    setBillingLive(true);
     const user = userEvent.setup();
     render(<App />);
     await screen.findByText("What are you training for?");
@@ -342,8 +358,8 @@ describe("first run to finished workout", () => {
     await user.type(screen.getByLabelText("What should we call you?"), "Melvin Parinas");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
-    await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
+    for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Save" }));
     await screen.findByText("Today's workout");
     expect(useApp.getState().profile.name).toBe("Melvin Parinas");
     expect(screen.getByText(/^Good (morning|afternoon|evening), Melvin$/)).toBeInTheDocument();
