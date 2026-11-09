@@ -91,6 +91,26 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Seeded randomness only** in the generator (`random.ts`), never `Math.random`, so plans are reproducible and testable.
 - **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
 
+## Borrowed from Gradelings (Melvin asked, 2026-11-09)
+
+Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings code where it fits rather than rewriting it.
+
+- **Branches and merging:** pull requests go to `staging`; a nightly workflow promotes `staging` to `main` when CI is green (one production build a day). Agents may merge a pull request into `staging` once every check, including "CI passed", is green; never into `main`. Flaky tests are fixed at the cause, never retried.
+- **Feature flags** defined in code (`src/lib/flags.ts`), state on the server, cached on the device for offline use, so a feature can be switched off without a store release. A/B tests read through the same path.
+- **Admin panel** (`/admin/`, admin emails from the environment, every change audited): subscriptions, trial-to-paid, a weekly retention table, revenue, users, a read-only support role, maintenance mode and alerts. The owner's test account is left out of every metric.
+- **Error reporting:** Sentry with a scrubber (no workout notes, names or health data leave the device), loaded only when something goes wrong.
+- **Analytics:** Vercel Web Analytics on public pages only, plus counted clicks on calls to action. In the app, only the events needed for the admin dashboard, disclosed on `/privacy/`. Health data never leaves the device except through sync to the user's own account.
+- **Security:** hashed Content Security Policy with no `'unsafe-inline'`, security headers, size-limited request bodies, hashed session tokens, `security.txt`.
+- **More engagement, Gradelings-style:** streak freezes computed in `derive`, never stored; mystery crates picked from the session id so every device agrees; a weekly "you got stronger" recap; an "almost there" card ("1 more rep for a bench PR"); shareable milestone cards; seasonal events; a few Easter eggs. Nothing blocks a tap or pushes late-night use.
+- **What's new** screen after an update, and **promo, referral and friends-and-family codes** (store promo codes on native).
+- **Accessibility:** axe-core WCAG 2.2 AA run, keyboard run, forced-colours support, and a colour-blind check. The recovery map's colours must pass it, and every band also has a label and a percentage.
+- **Browser tests like Gradelings':** a full playthrough, an offline run, a layout sweep across phones and tablets, and a tap-latency benchmark ("every tap answers within a frame or two").
+- **Store tooling:** scripts that make Play and App Store screenshots and the feature graphic from the real app, plus `docs/PLAY_LISTING.md` and `docs/PLAY_CONSOLE_ANSWERS.md`.
+- **Email** through Resend (receipts, weekly recap, win-back), with hashed unsubscribe tokens and the CASL mailing address.
+- **Exercise demo videos** self-hosted and cached on the device for offline use, like Gradelings' help videos.
+- **Data rights:** JSON export, erase device and delete account; a restore check for backups; a full-storage notice.
+- **Languages:** English at launch. UI text stays in one place per screen so Spanish and French can follow, as Gradelings did.
+
 ## Open items
 - Confirm the Android package id and register a domain.
 - A GitHub repo for the project (cloud sessions can't create repos; Melvin to create one).
