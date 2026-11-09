@@ -31,6 +31,18 @@ async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commerci
   await screen.findByText("Today's workout");
 }
 
+describe("setup in another language", () => {
+  it("runs the setup wizard in the profile's language", async () => {
+    const user = userEvent.setup();
+    useApp.getState().setProfile({ language: "fr" });
+    render(<App />);
+    expect(await screen.findByText("Quel est votre objectif ?")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Prendre du muscle/ })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Continuer" }));
+    expect(await screen.findByText("Où vous entraînez-vous ?")).toBeInTheDocument();
+  });
+});
+
 describe("Pro trial offer", () => {
   it("ends first-run setup with the trial offer, yearly first, and records the choice", async () => {
     const user = userEvent.setup();
