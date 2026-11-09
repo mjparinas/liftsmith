@@ -12,6 +12,7 @@ import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
+import { programName } from "./Programs";
 import { go } from "./router";
 import { Button, Section } from "./ui";
 
@@ -35,6 +36,7 @@ export function Today() {
   const lvl = levelOf(xpTotal(stats));
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
   const hour = new Date().getHours();
+  const fixed = !!preview?.program?.fixed;
   const hello = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
   return (
@@ -63,7 +65,13 @@ export function Today() {
         <button type="button" onClick={() => go("gym")} className="press rounded-full border border-line bg-surface px-3 py-1.5">
           📍 {gym?.name ?? "Add a gym"}{gym && pickedByLocation === gym.id ? " · you're here" : ""}
         </button>
-        {preview && (
+        {preview?.program && (
+          <button type="button" onClick={() => go("programs")} className="press rounded-full border border-line bg-surface px-3 py-1.5">
+            📋 {programName(preview.program.id)} · {preview.program.dayName}
+          </button>
+        )}
+        {preview && fixed && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{preview.program!.note}</span>}
+        {preview && !fixed && (
           <span className={`rounded-full px-3 py-1.5 ${preview.week.deload ? "bg-warn/15 text-warn" : "bg-surface text-muted border border-line"}`}>
             {preview.week.label} · RIR {preview.week.rir}
           </span>
@@ -71,7 +79,7 @@ export function Today() {
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
 
-      {readiness && preview && !active && (
+      {readiness && preview && !active && !fixed && (
         <section className="card mt-4 p-4" aria-labelledby="call-title">
           <div className="flex items-baseline justify-between gap-3">
             <h2 id="call-title" className="text-lg font-semibold">{CALL_TEXT[preview.call].label}</h2>
@@ -102,7 +110,7 @@ export function Today() {
         </section>
       )}
 
-      <div className="card mt-4 p-4">
+      {!fixed && <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <label htmlFor="len" className="text-sm font-medium text-muted">Workout length</label>
           <span className="num text-2xl font-bold">{profile.minutes}<span className="ml-1 text-base font-medium text-muted">min</span></span>
@@ -122,7 +130,7 @@ export function Today() {
         />
         <div className="mt-1 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
-      </div>
+      </div>}
 
       {preview && preview.items.length > 0 ? (
         <>
@@ -136,7 +144,7 @@ export function Today() {
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-medium">{ex.name}</div>
                       <div className="text-sm text-muted num">
-                        {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
+                        {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((t) => t.weight > it.target.weight) ? "up to " : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((t) => t.weight)), profile.unit)}
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
@@ -149,7 +157,9 @@ export function Today() {
           <Section title="Why these muscles">
             <div className="card p-4">
               <BodyMap rec={rec} focus={focus} compact />
-              <p className="mt-3 text-sm text-muted">Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</p>
+              {preview.program ? (
+                <p className="mt-3 text-sm text-muted">{preview.program.dayName} of {programName(preview.program.id)}{fixed ? "" : `: recovered muscles from today's group, furthest from this week's ${preview.week.setsPerMuscle}-set goal`}. {preview.program.note}.</p>
+              ) : <p className="mt-3 text-sm text-muted">Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</p>}
             </div>
           </Section>
         </>

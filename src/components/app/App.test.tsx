@@ -148,3 +148,45 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
   });
 });
+
+describe("programs", () => {
+  it("picks a classic program from Settings, plans its day, and logs each set against the program lift", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(screen.getByRole("button", { name: /Adaptive.*Change/ }));
+    await screen.findByText("Programs");
+    await user.click(screen.getByRole("button", { name: /Classic 5×5/ }));
+    const sheet = await screen.findByRole("dialog");
+    expect(within(sheet).getByText(/StrongLifts 5×5 by Mehdi Hadim/)).toBeTruthy();
+    await user.click(within(sheet).getByRole("button", { name: "Start this program" }));
+    await screen.findByText(/Classic 5×5 · Workout A/);
+    // Fixed programs follow their own rules: no length slider or push / easy call.
+    expect(screen.queryByLabelText("Workout length")).toBeNull();
+    const plan = useApp.getState().preview!;
+    expect(plan.items.map((i) => i.exerciseId)).toEqual(["back-squat", "bench-press", "barbell-row"]);
+
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    act(() => useApp.getState().skipWarmup());
+    act(() => useApp.getState().logSet());
+    const set = useApp.getState().events.find((e) => e.type === "set");
+    expect(set).toMatchObject({ slot: "back-squat", targetReps: 5, targetWeight: plan.items[0].target.weight });
+    expect(useApp.getState().events.find((e) => e.type === "sessionStart")).toMatchObject({ program: { id: "classic-5x5", day: 0 } });
+  });
+
+  it("loads each set's own weight in a ramping program", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const { pickProgram } = await import("@/lib/programs");
+    const s = useApp.getState;
+    const gym = s().gyms[0];
+    act(() => s().setProfile({ planSource: pickProgram("ramping-5x5", { profile: s().profile, gym, events: [], now: Date.now() }) }));
+    const ramp = s().preview!.items[0].setTargets!;
+    act(() => s().start());
+    act(() => s().skipWarmup());
+    expect(s().active!.weight).toBe(ramp[0].weight);
+    act(() => s().logSet());
+    expect(s().active!.weight).toBe(ramp[1].weight);
+    expect(ramp[1].weight).toBeGreaterThan(ramp[0].weight);
+  });
+});

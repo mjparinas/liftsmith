@@ -13,6 +13,7 @@ import { Gym } from "./Gym";
 import { Onboarding } from "./Onboarding";
 import { Recovery } from "./Recovery";
 import { go, parse, useRoute, type Route } from "./router";
+import { Programs } from "./Programs";
 import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
@@ -123,7 +124,7 @@ export function App() {
   if (!ready) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, programs: <Programs /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (

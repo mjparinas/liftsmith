@@ -226,6 +226,10 @@ export function Workout() {
                   <p>Warm-up: easy, smooth reps. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
                   <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
                 </div>
+              ) : item.setTargets?.[doneSets]?.amrap ? (
+                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Last set: as many good reps as you can, at least {item.setTargets[doneSets].reps}. Log what you got</p>
+              ) : item.slot ? (
+                <p className="mt-3 text-center text-sm text-muted">{item.label ? `${item.label} · ` : ""}{item.target.note}</p>
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
@@ -251,7 +255,7 @@ export function Workout() {
                 <li key={it.exerciseId}>
                   <button type="button" onClick={() => s.goTo(active.index + 1 + i)} className="press flex w-full items-center justify-between px-4 py-3 text-left">
                     <span className="font-medium">{e.name}</span>
-                    <span className="num text-sm text-muted">{it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}</span>
+                    <span className="num text-sm text-muted">{it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}</span>
                   </button>
                 </li>
               );

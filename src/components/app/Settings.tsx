@@ -10,6 +10,7 @@ import { MessageSettings } from "./MessageSettings";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
+import { programName } from "./Programs";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -34,6 +35,12 @@ export function Settings() {
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
+      <Section title="Program">
+        <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
+          <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? "Adaptive"}</span>
+          <span className="text-accent">Change ›</span>
+        </button>
+      </Section>
       <Section title="Your name">
         <input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} className="card w-full px-4 py-3" placeholder="Optional" aria-label="Your name" />
       </Section>

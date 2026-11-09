@@ -232,9 +232,21 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /**
+   * Where Today's plan comes from (programs.ts). Missing means the adaptive generator. A program keeps
+   * the starting weights frozen when it was picked (kg, keyed by program slot), so replaying the
+   * history always gives the same weights; everything after that is derived from the logged sets.
+   * Saved routines plug in as their own kind.
+   */
+  planSource?: PlanSource;
   onboarded: boolean;
   updatedAt: number;
 }
+
+export type PlanSource =
+  | { kind: "adaptive" }
+  | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
+  | { kind: "routine"; id: string };
 
 // --- Events: everything that happens is appended, and every stat is derived from them. ---
 
@@ -269,6 +281,10 @@ export interface SetEvent extends EventBase {
   hrEnd?: number;
   /** Part of a challenge (e.g. as many reps as possible on the last set). */
   challenge?: boolean;
+  /** A program's "as many reps as you can" set: targetReps is the minimum. */
+  amrap?: boolean;
+  /** The program lift this set counts for (programs.ts), kept through swaps. */
+  slot?: string;
 }
 
 export interface SessionStartEvent extends EventBase {
@@ -284,6 +300,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** The program and day the plan came from (programs.ts). */
+  program?: { id: string; day: number };
 }
 
 export interface SessionEndEvent extends EventBase {
