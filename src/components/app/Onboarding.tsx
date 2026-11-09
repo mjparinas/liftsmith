@@ -17,8 +17,9 @@ import { Button } from "./ui";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
-    <button type="button" aria-pressed={active} onClick={() => { haptic("tick"); onClick(); }} className={`press w-full rounded-2xl border p-4 text-left ${active ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>
-      <div className="font-semibold">{title}</div>
+    <button type="button" aria-pressed={active} onClick={() => { haptic("tick"); onClick(); }} className={`press relative w-full rounded-2xl border p-4 text-left ${active ? "border-accent/70 bg-accent/12 shadow-[0_0_0_3px_rgb(76_141_255/0.14),0_10px_30px_-14px_rgb(76_141_255/0.7)]" : "border-line bg-surface hover:border-accent/30"}`}>
+      {active && <span className="btn-primary absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full" aria-hidden><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>}
+      <div className="pr-6 font-semibold">{title}</div>
       {blurb && <div className="mt-0.5 text-sm text-muted">{blurb}</div>}
     </button>
   );
@@ -47,6 +48,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [notify, setNotify] = useState<boolean | null>(null);
+  const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState<Goal>(profile.goal);
   const [exp, setExp] = useState<Experience>(profile.experience);
   const [preset, setPreset] = useState<GymPreset>("commercial");
@@ -77,7 +79,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const finish = (pro?: Profile["pro"]) => {
     setProfile({ unit });
     const id = keepGyms ? profile.activeGymId : addGym(preset);
-    setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true, ...(pro ? { pro } : {}) });
+    setProfile({ name: name.trim(), goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true, ...(pro ? { pro } : {}) });
     setAnalytics(stats);
     track("onboarding_complete", { rerun, goal, experience: exp, days, preset: keepGyms ? "kept" : preset, unit, healthPrefill: prefilled });
     haptic("success");
@@ -85,25 +87,28 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   };
 
   return (
-    <main className="safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
+    <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="mt-6 flex gap-1.5" aria-hidden>
         {Array.from({ length: STEPS }, (_, i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-accent" : "bg-line"}`} />
+          <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i <= step ? "bg-gradient-to-r from-accent to-accent-2" : "bg-line"}`} />
         ))}
       </div>
       <div key={step} className="animate-rise flex-1 py-8">
         {step === 0 && (
           <>
-            <p className="text-sm font-semibold uppercase tracking-wider text-accent">{BRAND.name}</p>
-            <h1 className="mt-1 text-3xl font-bold">What are you training for?</h1>
+            <p className="text-gradient text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
+            <h1 className="mt-1 text-3xl font-extrabold tracking-tight">What are you training for?</h1>
             <div className="mt-6 space-y-3">{GOALS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />)}</div>
             <h2 className="mt-8 text-lg font-semibold">How long have you been lifting?</h2>
             <div className="mt-3 space-y-3">{LEVELS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={exp === g.id} onClick={() => setExp(g.id)} />)}</div>
+            <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">What should we call you?</label>
+            <p className="text-sm text-muted">Optional. Used to greet you on Today.</p>
+            <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder="Your first name" maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
           </>
         )}
         {step === 1 && (
           <>
-            <h1 className="text-3xl font-bold">Where do you train?</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Where do you train?</h1>
             <p className="mt-2 text-muted">You can fine-tune equipment, plates and add more gyms later.</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               {rerun && gyms.length > 0 && <Tile title="Keep my gyms" blurb={gyms.map((g) => g.name).join(", ")} active={keepGyms} onClick={() => setKeepGyms(true)} />}
@@ -117,10 +122,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 2 && (
           <>
-            <h1 className="text-3xl font-bold">How often can you train?</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">How often can you train?</h1>
             <div className="mt-6 grid grid-cols-6 gap-2">
               {[1, 2, 3, 4, 5, 6].map((d) => (
-                <button key={d} type="button" aria-pressed={days === d} onClick={() => { haptic("tick"); setDays(d); }} className={`press num aspect-square rounded-2xl border text-xl font-semibold ${days === d ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>{d}</button>
+                <button key={d} type="button" aria-pressed={days === d} onClick={() => { haptic("tick"); setDays(d); }} className={`press num aspect-square rounded-2xl border text-xl font-bold ${days === d ? "btn-primary border-transparent" : "border-line bg-surface"}`}>{d}</button>
               ))}
             </div>
             <p className="mt-2 text-sm text-muted">days a week. Your streak counts weeks you hit this, so rest days never break it.</p>
@@ -140,7 +145,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 3 && (
           <>
-            <h1 className="text-3xl font-bold">Stay in the zone</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Stay in the zone</h1>
             <p className="mt-2 text-muted">Both are optional, and you can change them later in Settings.</p>
             <div className="mt-6 space-y-3">
               <Tile
@@ -181,7 +186,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 4 && (
           <>
-            <h1 className="text-3xl font-bold">Try Pro free for {trialDays} days</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Try Pro free for {trialDays} days</h1>
             <p className="mt-2 text-muted">Workouts that adapt to your recovery, your gym and how every set felt.</p>
             <ul className="mt-4 space-y-1.5 text-sm">
               {["Adaptive workouts with blocks, deloads and progression", "Push or easy-day calls from your own data", "Recovery map and advanced stats"].map((t) => (

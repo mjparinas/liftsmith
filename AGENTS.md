@@ -58,7 +58,22 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 ### Positioning
 - **An original app.** It borrows ideas from Fitbod (daily adaptive workouts, equipment matching, recovery map, variability setting) and Gymverse (periodized blocks with RIR and deloads, exercise swaps, lock-screen timer). It never uses their names in the UI, their art, screenshots, exercise videos or exact look. Exercise names, setup text and cues are our own.
 - **Focus on the workout, not the app.** One tap logs a set as planned. The next set is always pre-filled. The rest timer starts itself. Anything optional (feedback, swaps, info) appears between sets and never adds a tap during a set.
-- **Dark, trustworthy, professional.** Deep navy-black background, one blue accent (`#4c8dff`), green, amber and red reserved for status (recovery bands, warnings). Large touch targets, tabular numbers, system font (Roboto on Android).
+- **Dark, trustworthy, professional.** Deep navy-black background, one blue brand accent (`#4c8dff`, one CSS variable so cosmetics can recolour it), green, amber and red reserved for status (recovery bands, warnings). Large touch targets, tabular numbers, system font (Roboto on Android).
+
+### Visual design system (Melvin, 2026-11-09: "liven it up, but keep it simple and professional")
+- **Tokens live in `src/app/globals.css`.** Brand blue plus four supporting hues used only as tints for marks, chips and card glows, never for body text: violet `#a78bfa` (levels, Pro, quotes), cyan `#38d6e8` (rest, time, easy days), ember `#ff8a3d` (streaks, push days, challenges), mint `#34d399` (done). Status colours keep their meaning. Named roles are in `src/components/app/theme.ts`: muscle families (push blue, pull cyan, legs violet, core ember) and the readiness call (push ember, normal blue, easy cyan).
+- **The primary action is a blue-to-violet gradient with dark ink** (`.btn-primary`, 7:1+ contrast). One primary per screen. Cards are raised glass (`.card`, hairline border and a faint top light); `.card-tint` with `--tint` gives a card a hue for the hero card on each screen. A soft light sits at the top of every screen (`.aurora`).
+- **Type:** 28–30 px extra-bold screen titles, tight tracking; big numbers use `.display` (tabular, 800). Section labels are small caps with an icon.
+- **Icons:** one hand-drawn stroke set (`src/components/app/icons.tsx`, 24-unit grid, 2 px). No emoji in app chrome.
+- **Empty states** use `EmptyState` (icon in a tinted tile, a title, one line of help, and an action when there's an obvious next step). No bare "nothing here" lines.
+- **Motion:** short and purposeful (`rise`, `pop`, `fade`, `bump` on a stepper number, `burst` from Log set, `beat` on the live heart rate). Nothing moves during a set except what the lifter touched. `prefers-reduced-motion` and **Lean mode** (`profile.lean`, Settings) both cut motion and confetti (`.calm` on `<html>`, `calm()` in `juice.ts`).
+- **Sound set:** every sound is one synthesized voice (a soft glassy mallet) in A major pentatonic (`juice.ts`), so sounds never clash: a near-silent tick for steppers and chips, a rising pair for Log set, a phrase for Start, a three-note chime for rest over, a falling pair for discard, a longer phrase for the end of a workout. No sound on navigation. One **Sounds** switch (`profile.restSounds`) covers them all.
+- **Haptics** go through `@capacitor/haptics` on both Android and iOS (selection ticks for steppers, chips and tabs; medium for Log set; heavy at rest end; success and warning notifications), falling back to `navigator.vibrate` on the web. **Vibration** can be turned off in Settings (`profile.haptics`).
+- Before/after screenshots: `node scripts/shots.mjs [base-url] [out-dir]` (after `npm run build:static`).
+
+### Today screen (Melvin, 2026-11-09)
+- The greeting uses the lifter's first name when one is set ("Good evening, Melvin"). Setup's first step asks for it (optional), and Settings can change it.
+- **Daily quote:** one quote a day on Today about effort, health, hard work and discipline, from `src/lib/quotes.ts` (380 quotes, at least 365 so none repeats within a year; bundled, so it works offline). A fixed seeded shuffle picks the day's quote, so every device shows the same one and it changes at local midnight. Every quote has its author and, where known, its source; only documented quotes, with common misattributions left out (a test checks a few). Settings › Daily quote turns it off (`profile.quotes`).
 
 ### Name
 - **Liftsmith** (Melvin chose it, 2026-11-09; the working name before was Setwise). The name is set in `src/lib/brand.ts`.
