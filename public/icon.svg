@@ -1,1 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="112" fill="#0a0d12"/><rect x="96" y="244" width="320" height="24" rx="8" fill="#8e99a6"/><rect x="128" y="168" width="44" height="176" rx="10" fill="#4c8dff"/><rect x="180" y="196" width="30" height="120" rx="8" fill="#34d399"/><rect x="340" y="168" width="44" height="176" rx="10" fill="#4c8dff"/><rect x="302" y="196" width="30" height="120" rx="8" fill="#34d399"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><defs>
+    <linearGradient id="g" gradientUnits="userSpaceOnUse" x1="206" y1="196" x2="804" y2="794">
+      <stop offset="0" stop-color="#5b9cff"/><stop offset=".55" stop-color="#7f8bff"/><stop offset="1" stop-color="#9b86ff"/>
+    </linearGradient>
+    <radialGradient id="glow" gradientUnits="userSpaceOnUse" cx="512" cy="0" r="920">
+      <stop offset="0" stop-color="#4c8dff" stop-opacity=".34"/><stop offset="1" stop-color="#4c8dff" stop-opacity="0"/>
+    </radialGradient>
+  </defs><rect width="1024" height="1024" rx="224" fill="#080b10"/><rect width="1024" height="1024" rx="224" fill="url(#glow)"/><g fill="url(#g)" transform="translate(512 512) scale(1) translate(-505 -495)">
+  <rect x="226" y="302" width="572" height="36" rx="18"/>
+  <rect x="280" y="196" width="68" height="248" rx="20"/>
+  <rect x="676" y="196" width="68" height="248" rx="20"/>
+  <rect x="358" y="236" width="40" height="168" rx="14"/>
+  <rect x="626" y="236" width="40" height="168" rx="14"/>
+  <path d="M206 478C206 470 214 466 224 466C300 466 340 458 372 458L788 458Q804 458 804 474L804 534Q804 550 788 550C724 550 676 572 652 612L644 646L712 680Q726 688 726 704L726 778Q726 794 710 794L314 794Q298 794 298 778L298 704Q298 688 312 680L380 646L372 612C356 580 320 560 276 546C232 532 206 506 206 478Z"/></g></svg>

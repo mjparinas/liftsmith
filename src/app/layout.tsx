@@ -9,7 +9,14 @@ export const metadata: Metadata = {
   title: { default: `${BRAND.name}: adaptive strength training`, template: `%s | ${BRAND.name}` },
   description: "Workouts built around your equipment, your recovery and your time. Progressive overload, RIR blocks and deloads, with a plate-loading guide for every barbell set.",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg" },
+  // Drawn by scripts/make-icons.mjs: SVG for modern browsers, .ico for the rest, a full-square PNG for iOS.
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", sizes: "16x16 32x32 48x48" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
