@@ -156,7 +156,7 @@ describe("share links", () => {
     expect(card).toMatchObject({ v: 1, u: "kg", w: 3 });
     expect(card.n).toBeUndefined();
     expect(card.d).toEqual([1, 30]); // the 200-day-old workout is outside the 12 weeks
-    expect(card.t).toContain("first");
+    expect(card.t).toContain("workouts.bronze");
     expect(card.l[0][0]).toBe("back-squat");
     const json = JSON.stringify(card);
     for (const leak of ["82", "130", "avgHr", "hr", "bodyweight", "g1", "cycle"]) expect(json).not.toContain(`"${leak}`);

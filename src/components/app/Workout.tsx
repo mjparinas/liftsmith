@@ -1,7 +1,8 @@
 "use client";
 import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
-import { PlateBar } from "@/components/PlateBar";
+import { PlateBar, type PlateFinish } from "@/components/PlateBar";
+import { COSMETICS } from "@/lib/game";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
@@ -18,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Ring, Sheet, Stepper } from "./ui";
+import { AlmostThere, PrMoment } from "./WorkoutJuice";
 
 let hrConn: HrConnection | null = null;
 
@@ -131,9 +133,11 @@ export function Workout() {
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
   const zone = bpm ? hrZone(bpm) : null;
+  const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
     <div className="pb-44">
+      <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button type="button" onClick={() => go("today")} className="press -ml-2 min-h-11 rounded-full px-2 text-muted">‹ Today</button>
         <div className="num text-sm text-muted">{clock(elapsed)} · {setsLogged}/{totalSets} sets</div>
@@ -197,7 +201,8 @@ export function Workout() {
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               <div className="mt-5 w-full border-t border-line pt-4">
                 <p className="text-center text-sm text-muted">Next up: <span className="text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
-                {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact /></div>}
+                {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} /></div>}
+                <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
               </div>
             </section>
           ) : (
@@ -221,7 +226,7 @@ export function Workout() {
               )}
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">
-                  <PlateBar loading={loading} bar={bar.weight} unit={unit} />
+                  <PlateBar loading={loading} bar={bar.weight} unit={unit} finish={finish} />
                 </div>
               )}
             </section>
