@@ -1,4 +1,6 @@
 "use client";
+import { activeInjuries, PART_LABEL } from "@/lib/injury";
+import { PainSelect } from "./Injuries";
 import { Info } from "@/components/Info";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
@@ -200,6 +202,8 @@ export function Done() {
         </ul>
       )}
 
+      <PainAfter sessionId={s.sessionId} />
+
       {crate && <Crate item={crate.item} duplicate={crate.duplicate} />}
 
       <div className="mt-4 space-y-3 text-left">
@@ -213,5 +217,18 @@ export function Done() {
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>Done</Button>
       <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">See all achievements</button>
     </div>
+  );
+}
+
+/** After a workout, one optional pain rating per active injury, tied to this session. */
+function PainAfter({ sessionId }: { sessionId: string }) {
+  const { events, ratePain } = useApp();
+  const hurt = activeInjuries(events);
+  if (!hurt.length) return null;
+  return (
+    <section className="card mt-4 space-y-2 p-4 text-left" aria-label="Pain after this workout">
+      {hurt.map((i) => <PainSelect key={i.id} label={`How's your ${PART_LABEL[i.part].toLowerCase()} after this workout?`} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
+      <p className="text-xs text-muted">Optional. It feeds the pain trend and the graded return on the Injuries screen.</p>
+    </section>
   );
 }

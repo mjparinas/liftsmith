@@ -90,6 +90,8 @@ try {
   await page.getByRole("button", { name: "Log an injury" }).click();
   await scan("injury picker");
   await page.getByRole("button", { name: "Knee" }).click();
+  await scan("pain rating");
+  await page.getByRole("button", { name: "6", exact: true }).click();
   await scan("injuries");
   await page.getByRole("button", { name: "Lighter" }).first().click();
   await scan("injury risk warning");

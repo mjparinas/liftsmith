@@ -7,7 +7,8 @@ import { COSMETICS } from "@/lib/game";
 import { LiftDemo } from "@/components/demo/LiftDemo";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
-import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
+import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
+import { PainSelect } from "./Injuries";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
 import { haptic, keepAwake, sound } from "@/lib/juice";
@@ -251,6 +252,7 @@ export function Workout() {
               <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
               {lastSet && !rated && <Effort target={lastSet.rir} onPick={(r) => { haptic("tick"); s.rateEffort(lastSet.id, r); }} />}
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
+              {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
               <div className="mt-5 w-full border-t border-line/70 pt-4">
                 <p className="text-center text-sm text-muted">Next up: <span className="font-semibold text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
                 {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} /></div>}
@@ -469,5 +471,23 @@ function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { 
       </label>
       <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">Add and use it now</button>
     </form>
+  );
+}
+
+/**
+ * Between sets, one optional pain check for an exercise trained despite an injury (lighter, marked
+ * fine, or in a graded return): once per exercise per workout, never during a set.
+ */
+function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: string }) {
+  const { events, ratePain } = useApp();
+  const ex = exercise(exerciseId);
+  const hurt = activeInjuries(events).filter((i) => effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip");
+  const asked = (id: string) => events.some((e) => e.type === "pain" && e.injuryId === id && e.sessionId === sessionId && e.exerciseId === exerciseId);
+  const todo = hurt.filter((i) => !asked(i.id));
+  if (!todo.length) return null;
+  return (
+    <div className="mt-3 w-full space-y-2">
+      {todo.map((i) => <PainSelect key={i.id} label={`${PART_LABEL[i.part]} pain after that set?`} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
+    </div>
   );
 }
