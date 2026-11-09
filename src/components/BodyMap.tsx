@@ -40,7 +40,7 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
   return (
     <figure className="flex flex-1 flex-col items-center">
       <svg viewBox="20 0 160 412" className="h-auto w-full max-w-[180px]" role="img" aria-label={`${label} muscles`}>
-        <path d={SILHOUETTE} fill="#161d27" stroke="#263142" strokeWidth={1.2} />
+        <path d={SILHOUETTE} fill="var(--color-raised)" stroke="var(--color-line)" strokeWidth={1.2} />
         {[1, -1].map((side) => (
           <g key={side} transform={side === -1 ? "translate(200,0) scale(-1,1)" : undefined}>
             {shapes.map((s) => {
@@ -48,7 +48,7 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
               const b = bandOf(r);
               const hot = focus?.includes(s.m);
               return (
-                <path key={s.m} d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "#fff" : "#0a0d12"} strokeWidth={hot ? 1.6 : 1}>
+                <path key={s.m} d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "var(--color-ink)" : "var(--color-bg)"} strokeWidth={hot ? 1.6 : 1}>
                   <title>{`${MUSCLE_LABEL[s.m]}: ${r}% recovered (${b.label})`}</title>
                 </path>
               );

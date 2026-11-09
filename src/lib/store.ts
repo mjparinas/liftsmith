@@ -5,12 +5,14 @@ import { derive, type Stats } from "./derive";
 import { generate, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
-import { exercise } from "./exercises";
+import { exercise, registerCustom } from "./exercises";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
+import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
+import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, Gym, Profile, Rating } from "./types";
+import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 import { programPlan } from "./programs";
 
@@ -76,10 +78,18 @@ interface State {
   setCall(c: Call | null): void;
   /** Log that a period started on this day (cycle-aware readiness). */
   logPeriod(day: number): void;
+  /** A note on an exercise (empty clears it for next time). */
+  addNote(exerciseId: string, text: string): void;
+  /** How many reps the lifter says they had left on a logged set. */
+  rateEffort(setId: string, rir: number): void;
+  /** Creates the lifter's own exercise and returns its id. */
+  addCustomExercise(e: { name: string; primary: Muscle; load: LoadKind; compound: boolean }): string;
   /** Turn cycle-aware readiness off and erase every logged period. */
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
   pickedByLocation: string | null;
+  /** Supersets picked on Today, as "first>second" exercise pairs, kept when the plan is rebuilt. */
+  links: string[];
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
   autoEnd(now?: number): boolean;
@@ -99,13 +109,30 @@ interface State {
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
   goTo(index: number): void;
+  /** Link exercise `index` with the next one as a superset, or split them. Works on Today's plan and mid-workout. */
+  toggleSuperset(index: number): void;
   finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
+  /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
+  setPlan(plan: Plan | null): void;
+  /** Log a weigh-in and make it the profile's body weight. */
+  logBodyweight(kg: number): void;
+  /** Record a gym buddy check-in. */
+  checkin(buddies: string[]): void;
   reset(): Promise<void>;
 }
 
 const ACTIVE_KEY = "liftsmith.active";
+
+/** Re-applies the supersets picked on Today to a rebuilt plan, where both exercises are still neighbours. */
+function relink(plan: Plan, links: readonly string[]): Plan {
+  if (!links.length) return plan;
+  const want = new Set(links);
+  const l = linksOf(plan.items).map((_, i) => want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
+  const items = withLinks(plan.items, l);
+  return { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
+}
 const uid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
 function persistActive(a: Active | null) {
@@ -121,6 +148,7 @@ function setsDone(events: AppEvent[], sessionId: string, exerciseId: string): nu
 
 export const useApp = create<State>((set, get) => {
   const commit = (evs: AppEvent[]) => {
+    registerCustom(evs);
     const events = [...get().events, ...evs];
     set({ events, stats: derive(events, Date.now()) });
     void appendEvents(evs);
@@ -149,6 +177,23 @@ export const useApp = create<State>((set, get) => {
     readiness: null,
     callOverride: null,
     pickedByLocation: null,
+    links: [],
+
+    addNote(exerciseId, text) {
+      const a = get().active;
+      commit([{ type: "note", id: uid(), at: Date.now(), sessionId: a?.sessionId ?? "", exerciseId, text: text.trim().slice(0, 500) }]);
+    },
+
+    rateEffort(setId, rir) {
+      if (get().events.some((e) => e.type === "effort" && e.setId === setId)) return;
+      commit([{ type: "effort", id: uid(), at: Date.now(), setId, rir: Math.max(0, Math.min(4, Math.round(rir))) }]);
+    },
+
+    addCustomExercise({ name, primary, load, compound }) {
+      const id = `custom-${uid().slice(0, 12)}`;
+      commit([{ type: "customExercise", id: uid(), at: Date.now(), exercise: { id, name: name.trim().slice(0, 60) || "My exercise", primary: [primary], secondary: [], load, compound } }]);
+      return id;
+    },
 
     logPeriod(day) {
       if (get().events.some((e) => e.type === "cycle" && e.day === day)) return;
@@ -230,7 +275,7 @@ export const useApp = create<State>((set, get) => {
       const call = callOverride ?? r.call;
       const src = profile.planSource;
       const fromProgram = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
-      set({ readiness: r, preview: fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }) });
+      set({ readiness: r, preview: relink(fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }), get().links) });
     },
 
     setCall(c) {
@@ -256,7 +301,7 @@ export const useApp = create<State>((set, get) => {
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
       commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge, program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined }]);
-      set({ callOverride: null });
+      set({ callOverride: null, links: [] });
       set({ active: a });
       persistActive(a);
       track("workout_start", { minutes: plan.minutes, exercises: plan.items.length, call: plan.call ?? "normal", overridden, gymKind: g.equipment.length ? "equipped" : "bodyweight" });
@@ -317,22 +362,24 @@ export const useApp = create<State>((set, get) => {
           restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
           ...hrWindow(a, a.setStart, now),
           challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+          superset: item.group,
         },
       ]);
-      const done = already + 1;
+      // Alone, the next set is the same exercise until its sets are done. In a superset it's the
+      // next exercise of the round (superset.ts).
+      const items = a.plan.items;
+      const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
       let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
-      const nextT = item.setTargets?.[done];
-      const prevT = item.setTargets?.[done - 1];
-      if (nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps)) next = { ...next, weight: nextT.weight, reps: nextT.reps };
-      if (done >= item.sets) {
-        // Exercise finished: ask how it felt and move on.
-        next = loadItem({ ...a, askFeedback: item.exerciseId }, Math.min(a.index + 1, a.plan.items.length));
-      }
-      const last = next.index >= a.plan.items.length;
-      next.restTotal = last ? 0 : item.restSec;
-      next.restUntil = last ? null : now + item.restSec * 1000;
+      const nextT = item.setTargets?.[already + 1];
+      const prevT = item.setTargets?.[already];
+      if (step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps)) next = { ...next, weight: nextT.weight, reps: nextT.reps };
+      if (step.finished) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
+      if (step.index !== a.index) next = loadItem(next, Math.min(step.index, items.length));
+      const last = next.index >= items.length;
+      next.restTotal = last ? 0 : step.rest;
+      next.restUntil = last ? null : now + step.rest * 1000;
       set({ active: next });
       persistActive(next);
     },
@@ -410,6 +457,23 @@ export const useApp = create<State>((set, get) => {
       persistActive(next);
     },
 
+    toggleSuperset(index) {
+      const a = get().active;
+      if (a) {
+        const items = toggleLink(a.plan.items, index);
+        const next = { ...a, plan: { ...a.plan, items }, lastAt: Date.now() };
+        set({ active: next });
+        persistActive(next);
+        return;
+      }
+      const p = get().preview;
+      if (!p) return;
+      const items = toggleLink(p.items, index);
+      const links = items.slice(0, -1).flatMap((it, i) => (items[i + 1] && it.group && it.group === items[i + 1].group ? [`${it.exerciseId}>${items[i + 1].exerciseId}`] : []));
+      track("feature", { name: "superset", detail: links.length > get().links.length ? "link" : "split" });
+      set({ links, preview: { ...p, items, estMinutes: Math.round(planSeconds(items) / 60) } });
+    },
+
     goTo(index) {
       const a = get().active;
       if (!a) return;
@@ -475,6 +539,23 @@ export const useApp = create<State>((set, get) => {
       set({ active: next });
       // Saved every 15 samples so a crash or a killed app keeps the stream.
       if (!same && hr.length % 15 === 0) persistActive(next);
+    },
+
+    setPlan(plan) {
+      if (get().active) return;
+      if (plan) set({ preview: plan });
+      else get().replan();
+    },
+
+    logBodyweight(kg) {
+      if (!(kg > 0)) return;
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
+      get().setProfile({ bodyweight: kg });
+    },
+
+    checkin(buddies) {
+      commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
+      track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
     },
 
     async reset() {

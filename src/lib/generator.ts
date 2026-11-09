@@ -6,6 +6,7 @@ import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { groupedSeconds } from "./superset";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
@@ -32,6 +33,8 @@ export interface PlanItem {
   scheme?: string;
   /** Tier or role, such as "T1" or "Main lift". */
   label?: string;
+  /** Superset: neighbours with the same group are done back to back (superset.ts). */
+  group?: string;
 }
 
 export interface SetTarget {
@@ -92,8 +95,8 @@ export function itemSeconds(item: Pick<PlanItem, "exerciseId" | "sets" | "restSe
 }
 
 /** The whole plan: every exercise plus the rest before each one after the first. */
-export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup">[]): number {
-  return items.reduce((s, i, n) => s + itemSeconds(i) + (n ? i.restSec : 0), 0);
+export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup" | "group">[]): number {
+  return groupedSeconds(items, (n) => itemSeconds(items[n]));
 }
 
 /** Hard sets per muscle since the start of this block week (secondary muscles count half). */
@@ -148,7 +151,7 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const skip = new Set([...exclude, ...avoided(events, gym.id, now)]);
-  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
+  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
   const random = rng(hash(dayKey(now) + gym.id));
   const recent = recentFor(events);
   const budget = minutes * 60;

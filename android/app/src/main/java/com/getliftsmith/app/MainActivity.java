@@ -9,6 +9,15 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(WorkoutSessionPlugin.class);
         registerPlugin(CalendarPlugin.class);
         registerPlugin(InstallInfoPlugin.class);
+        registerPlugin(VoiceCoachPlugin.class);
+        registerPlugin(AppIconPlugin.class);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // An earned app icon picked in Settings switches once the app is in the background.
+        AppIconPlugin.applyPending(this);
     }
 }
