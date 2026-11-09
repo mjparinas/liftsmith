@@ -31,11 +31,17 @@ async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commerci
   await screen.findByText("Today's workout");
 }
 
+async function skipWarm(user: ReturnType<typeof userEvent.setup>) {
+  const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+  if (skip) await user.click(skip);
+}
+
 describe("coaching in the workout", () => {
   it("explains the suggested weight", async () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    await skipWarm(user);
     await user.click(await screen.findByRole("button", { name: /Why\?/ }));
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByText(/first time/i)).toBeInTheDocument();
@@ -58,8 +64,11 @@ describe("coaching in the workout", () => {
   it("does a busy exercise later", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    location.hash = `#/remix/${encodeRemix([{ exerciseId: "leg-press", sets: 3, restSec: 120, target: { reps: 10 } }, { exerciseId: "lat-pulldown", sets: 3, restSec: 90, target: { reps: 10 } }])}`;
+    await user.click(await screen.findByRole("button", { name: "Start this workout" }));
+    await skipWarm(user);
     const first = useApp.getState().active!.plan.items[0].exerciseId;
+    expect(first).toBe("leg-press");
     await user.click(await screen.findByRole("button", { name: "Change the plan" }));
     await user.click(screen.getByRole("button", { name: /later$/ }));
     expect(useApp.getState().active!.plan.items[1].exerciseId).toBe(first);
@@ -71,6 +80,7 @@ describe("coaching in the workout", () => {
     // A leg press workout, from a shared link.
     location.hash = `#/remix/${encodeRemix([{ exerciseId: "leg-press", sets: 3, restSec: 120, target: { reps: 10 } }])}`;
     await user.click(await screen.findByRole("button", { name: "Start this workout" }));
+    await skipWarm(user);
     await user.click(await screen.findByRole("button", { name: /Save setup/ }));
     await user.type(screen.getByRole("textbox", { name: "Back angle" }), "3");
     await user.click(screen.getByRole("button", { name: "Save" }));
@@ -106,6 +116,7 @@ describe("goals and buying advice", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    await skipWarm(user);
     await user.click(await screen.findByRole("button", { name: /Log set/ }));
     await user.click(screen.getByRole("button", { name: "End" }));
     await user.click(screen.getByRole("button", { name: "Finish and save" }));

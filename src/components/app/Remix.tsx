@@ -84,7 +84,7 @@ export function ShareWorkout({ sessionId }: { sessionId: string }) {
   };
   return (
     <div className="mt-4">
-      <Button kind="ghost" className="w-full" onClick={share}>Share this workout</Button>
+      <Button kind="ghost" className="w-full" onClick={share}>Send it to a friend to try</Button>
       <p className="mt-1 text-xs text-faint">{note ?? "Friends get it rebuilt for their own gym and weights. Only exercises, sets and reps are in the link."}</p>
     </div>
   );

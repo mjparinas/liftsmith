@@ -57,6 +57,14 @@ describe("first run to finished workout", () => {
     expect(plan.items.length).toBeGreaterThan(2);
 
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Warm-ups first, each logged as its own event with a short rest after it.
+    const warmups = plan.items[0].warmup ?? [];
+    for (let i = 0; i < warmups.length; i++) {
+      expect(await screen.findByText(new RegExp(`Warm-up ${i + 1} of ${warmups.length}`))).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /Log warm-up/ }));
+      await user.click(screen.getByRole("button", { name: "Skip rest" }));
+    }
+    expect(useApp.getState().events.filter((e) => e.type === "warmup")).toHaveLength(warmups.length);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
 
@@ -81,6 +89,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     const before = useApp.getState().active!;
     await user.click(screen.getByRole("button", { name: "More reps" }));
     await user.click(screen.getByRole("button", { name: /Log set/ }));
@@ -125,6 +135,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     const id = useApp.getState().active!.sessionId;
     cleanup();
@@ -134,5 +146,41 @@ describe("first run to finished workout", () => {
     });
     expect(useApp.getState().active?.sessionId).toBe(id);
     expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
+  });
+});
+
+describe("game layer", () => {
+  it("finishing a workout unlocks badges and a crate, and Awards shows quests, league and badges", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    await user.click(screen.getByRole("button", { name: "End" }));
+    await user.click(screen.getByRole("button", { name: "Finish and save" }));
+    const unlockedList = await screen.findByRole("region", { name: "Badges unlocked" });
+    expect(within(unlockedList).getByText("Showing up")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /You earned a crate/ }));
+    expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
+    expect(screen.getByText(/-week streak/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole("button", { name: "See all achievements" }));
+    expect(await screen.findByRole("heading", { name: "Achievements" })).toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
+    expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
+    expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Secret" }));
+    expect(screen.getAllByText("Secret achievement").length).toBeGreaterThan(5);
+  });
+
+  it("lean mode is one switch in Settings", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(await screen.findByRole("button", { name: "Lean mode" }));
+    expect(useApp.getState().profile.lean).toBe(true);
+    const { juice } = await import("@/lib/juice");
+    expect(juice.lean).toBe(true);
   });
 });

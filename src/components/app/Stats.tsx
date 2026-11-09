@@ -1,13 +1,15 @@
 "use client";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
-import { goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
+import { AchievementRow, useGame } from "./Achievements";
+import { go } from "./router";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { ago, clock } from "./format";
 import { Section } from "./ui";
 import { GoalsCard, PlateausCard } from "./Coach";
+import { StrengthCard, TonnageCard } from "./Extras";
 
 function Spark({ points }: { points: number[] }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">Needs two sessions</div>;
@@ -24,12 +26,13 @@ function Spark({ points }: { points: number[] }) {
 }
 
 export function Stats() {
-  const { stats, profile, events } = useApp();
+  const { stats, profile } = useApp();
   const now = useNow();
   const unit = profile.unit;
-  const xp = xpTotal(stats);
-  const lvl = levelOf(xp);
-  const streak = goalStreak(stats, profile, now);
+  const g = useGame();
+  const xp = g.xp;
+  const lvl = g.level;
+  const streak = g.streak;
   const top = [...stats.e1rmSeries.entries()].sort((a, b) => b[1].length - a[1].length).slice(0, 6);
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
   const tiles = [
@@ -38,7 +41,6 @@ export function Stats() {
     ["Sets", String(stats.totalSets)],
     ["Volume", `${fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10)}k ${unit}`],
   ];
-  const tr = trophies(events, stats, profile);
   return (
     <div className="pb-24">
       <h1 className="pt-2 text-2xl font-bold">Progress</h1>
@@ -60,6 +62,8 @@ export function Stats() {
           </div>
         ))}
       </div>
+      <TonnageCard />
+      <StrengthCard />
 
       <GoalsCard />
       <PlateausCard />
@@ -110,15 +114,11 @@ export function Stats() {
         </ul>
       </Section>
 
-      <Section title={`Trophies · ${tr.filter((t) => t.earned).length} of ${tr.length}`}>
-        <div className="grid grid-cols-3 gap-2">
-          {tr.map((t) => (
-            <div key={t.id} className={`card p-3 text-center ${t.earned ? "" : "text-muted"}`} title={t.detail}>
-              <div className={`text-2xl ${t.earned ? "" : "opacity-40"}`} aria-hidden>{t.earned ? (t.tier === "gold" ? "🥇" : t.tier === "silver" ? "🥈" : "🥉") : "🔒"}</div>
-              <div className="mt-1 text-xs font-medium leading-tight">{t.name}</div>
-            </div>
-          ))}
-        </div>
+      <Section title={`Achievements · ${g.badges.earned} of ${g.badges.total} badges`} right={<button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">See all</button>}>
+        <ul className="card divide-y divide-line">
+          {g.nearest.map((a) => <AchievementRow key={a.id} a={a} />)}
+          {!g.nearest.length && <li className="px-4 py-3 text-muted">Finish a workout to start earning badges.</li>}
+        </ul>
       </Section>
 
       <Section title="History">
