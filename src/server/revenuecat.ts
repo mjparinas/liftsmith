@@ -7,6 +7,7 @@
 // RevenueCat sends the Authorization header we set in its dashboard; REVENUECAT_WEBHOOK_SECRET must match.
 // Docs: https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields
 import { timingSafeEqual } from "node:crypto";
+import { claimFromStore } from "./creators";
 import { batch } from "./db";
 
 export interface RcEvent {
@@ -32,6 +33,8 @@ export interface RcEvent {
   original_transaction_id?: string;
   transaction_id?: string;
   entitlement_ids?: string[] | null;
+  /** Attributes the app set on the subscriber; `creator_code` names the creator who brought them (creator.ts). */
+  subscriber_attributes?: Record<string, { value?: string | null } | undefined> | null;
 }
 
 export type Kind = "trial_start" | "trial_convert" | "purchase" | "renew" | "cancel" | "uncancel" | "billing_recover" | "refund" | "expire";
@@ -113,5 +116,6 @@ export async function storeRcEvent(e: RcEvent, now = Date.now()): Promise<"store
     });
   }
   await batch(stmts);
+  await claimFromStore(user, e.subscriber_attributes?.creator_code?.value, at);
   return stmts.length ? "stored" : "ignored";
 }
