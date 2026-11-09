@@ -8,6 +8,7 @@ import { fmtNum } from "@/lib/units";
 import { useMemo, useState } from "react";
 import { go } from "./router";
 import { Chip, Section } from "./ui";
+import { t } from "@/lib/i18n";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
@@ -46,10 +47,10 @@ export function Bar({ value, label, colour = "var(--color-accent)" }: { value: n
 }
 
 function progressText(a: Achievement) {
-  if (!a.next) return "Every tier done";
-  if (a.hidden) return "Secret";
+  if (!a.next) return t("awards.allTiers");
+  if (a.hidden) return t("awards.secret");
   const u = a.unit ? (a.unit === "×" ? "×" : ` ${a.unit}`) : "";
-  return `${fmtNum(a.value)}${u} of ${fmtNum(a.next.at)}${u}`;
+  return t("awards.of", { value: `${fmtNum(a.value)}${u}`, goal: `${fmtNum(a.next.at)}${u}` });
 }
 
 export function AchievementRow({ a }: { a: Achievement }) {
@@ -64,11 +65,11 @@ export function AchievementRow({ a }: { a: Achievement }) {
         <p className="truncate text-sm text-muted">{a.next ? a.next.detail : a.detail}</p>
         {!a.hidden && (
           <div className="mt-1.5 flex items-center gap-2">
-            <div className="flex-1"><Bar value={a.progress} label={`${a.name} progress`} colour={a.next ? TIER_COLOUR[a.next.tier] : TIER_COLOUR.platinum} /></div>
+            <div className="flex-1"><Bar value={a.progress} label={t("awards.progress", { name: a.name })} colour={a.next ? TIER_COLOUR[a.next.tier] : TIER_COLOUR.platinum} /></div>
             <span className="num shrink-0 text-xs text-faint">{progressText(a)}</span>
           </div>
         )}
-        <span className="sr-only">{a.level} of {a.levels} tiers</span>
+        <span className="sr-only">{t("awards.tiers", { level: a.level, count: a.levels })}</span>
       </div>
     </li>
   );
@@ -79,32 +80,32 @@ export function StreakCard({ g }: { g: Game }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-semibold">🔥 {s.weeks}-week streak</span>
-        <span className="text-sm text-muted" title="Freezes save your streak if a week falls short. You earn one every 4 goal weeks, up to 2.">
-          {"🧊".repeat(s.freezes)}{s.freezes === 0 ? "No freezes" : ` ${s.freezes} freeze${s.freezes > 1 ? "s" : ""}`}
+        <span className="font-semibold">🔥 {t("awards.streak", { count: s.weeks })}</span>
+        <span className="text-sm text-muted" title={t("awards.freezeHelp")}>
+          {"🧊".repeat(s.freezes)}{s.freezes === 0 ? t("awards.noFreezes") : ` ${t("awards.freezes", { count: s.freezes })}`}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted">
-        {s.needed === 0 ? "This week's goal is done. Rest well." : s.atRisk ? (s.freezeReady ? "Your goal is out of reach this week, but a freeze will keep your streak." : "Your goal is out of reach this week. Your streak resets on Monday.") : `${s.needed} more workout${s.needed > 1 ? "s" : ""} this week to ${s.weeks > 0 ? "keep it going" : "start your streak"}.`}
+        {s.needed === 0 ? t("awards.goalDone") : s.atRisk ? t(s.freezeReady ? "awards.atRiskFreeze" : "awards.atRisk") : t(s.weeks > 0 ? "awards.needKeep" : "awards.needStart", { count: s.needed })}
       </p>
-      <p className="mt-1 text-xs text-faint">Best: {s.best} weeks · a freeze every 4 goal weeks, up to 2</p>
+      <p className="mt-1 text-xs text-faint">{t("awards.best", { count: s.best })}</p>
     </div>
   );
 }
 
 export function QuestsCard({ g }: { g: Game }) {
   return (
-    <ul className="card divide-y divide-line" aria-label="Weekly quests">
+    <ul className="card divide-y divide-line" aria-label={t("awards.quests")}>
       {g.quests.map((q) => (
         <li key={q.id} className="flex items-center gap-3 px-4 py-3">
           <span aria-hidden className="text-2xl">{q.done ? "✅" : q.icon}</span>
           <div className="min-w-0 flex-1">
             <div className="flex justify-between gap-2">
               <span className={`truncate ${q.done ? "text-muted line-through" : "font-medium"}`}>{q.title}</span>
-              <span className="num shrink-0 text-sm text-accent">+{q.xp} XP</span>
+              <span className="num shrink-0 text-sm text-accent">{t("awards.plusXp", { xp: q.xp })}</span>
             </div>
             <div className="mt-1.5 flex items-center gap-2">
-              <div className="flex-1"><Bar value={q.have / q.goal} label={`${q.title} progress`} colour={q.done ? "var(--color-good)" : undefined} /></div>
+              <div className="flex-1"><Bar value={q.have / q.goal} label={t("awards.progress", { name: q.title })} colour={q.done ? "var(--color-good)" : undefined} /></div>
               <span className="num text-xs text-faint">{q.have}/{q.goal}</span>
             </div>
           </div>
@@ -120,17 +121,17 @@ export function LeagueCard({ g }: { g: Game }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-semibold">🏅 {l.league} league</span>
-        <span className="num text-sm text-muted">{fmtNum(l.weekXp)} XP this week</span>
+        <span className="font-semibold">🏅 {t("awards.league", { league: l.league })}</span>
+        <span className="num text-sm text-muted">{t("awards.weekXp", { xp: l.weekXp })}</span>
       </div>
-      <div className="mt-2"><Bar value={pct} label="Progress to the next league" /></div>
+      <div className="mt-2"><Bar value={pct} label={t("awards.leagueProgress")} /></div>
       <p className="mt-1.5 text-xs text-faint">
-        {l.promoteAt ? (l.weekXp >= l.promoteAt ? `You move up to ${LEAGUES[l.index + 1]} on Monday.` : `${fmtNum(l.promoteAt - l.weekXp)} XP more this week to move up to ${LEAGUES[l.index + 1]}.`) : "Top league. Stay above the line to keep it."}
-        {l.demoteBelow > 0 && l.weekXp < l.demoteBelow ? ` Below ${fmtNum(l.demoteBelow)} XP drops you a league.` : ""}
+        {l.promoteAt ? (l.weekXp >= l.promoteAt ? t("awards.moveUp", { league: LEAGUES[l.index + 1] }) : t("awards.toMoveUp", { xp: l.promoteAt - l.weekXp, league: LEAGUES[l.index + 1] })) : t("awards.topLeague")}
+        {l.demoteBelow > 0 && l.weekXp < l.demoteBelow ? ` ${t("awards.drop", { xp: l.demoteBelow })}` : ""}
       </p>
-      <ol className="mt-3 flex gap-1" aria-label="Leagues">
+      <ol className="mt-3 flex gap-1" aria-label={t("awards.leagues")}>
         {LEAGUES.map((name, i) => (
-          <li key={name} title={name} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}><span className="sr-only">{name}{i === l.index ? " (you)" : ""}</span></li>
+          <li key={name} title={name} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}><span className="sr-only">{name}{i === l.index ? ` ${t("awards.you")}` : ""}</span></li>
         ))}
       </ol>
     </div>
@@ -146,7 +147,7 @@ function Locker({ g }: { g: Game }) {
     if (c.kind === "accent") applyAccent(c.value);
     if (c.kind === "sound") sound.preview(c.value as TimerSound);
   };
-  const groups: [Cosmetic["kind"], string, string][] = [["accent", "Accent colour", "accent-blue"], ["sound", "Rest timer sound", "sound-classic"], ["plates", "Plate finish", "plates-classic"]];
+  const groups: [Cosmetic["kind"], string, string][] = [["accent", t("awards.locker.accent"), "accent-blue"], ["sound", t("awards.locker.sound"), "sound-classic"], ["plates", t("awards.locker.plates"), "plates-classic"]];
   return (
     <div className="space-y-4">
       {groups.map(([kind, label, def]) => (
@@ -174,7 +175,7 @@ function Locker({ g }: { g: Game }) {
           </div>
         </div>
       ))}
-      <p className="text-xs text-faint">Every finished workout opens a crate. Repeats turn into 25 bonus XP.</p>
+      <p className="text-xs text-faint">{t("awards.locker.note")}</p>
     </div>
   );
 }
@@ -189,23 +190,23 @@ export function Achievements() {
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">‹ Progress</button>
-      <h1 className="text-2xl font-bold">Achievements</h1>
+      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">‹ {t("progress.title")}</button>
+      <h1 className="text-2xl font-bold">{t("awards.title")}</h1>
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
-          <span className="font-semibold">Level {g.level.level} · {g.level.title}</span>
-          <span className="num text-sm text-muted">{fmtNum(g.xp)} XP</span>
+          <span className="font-semibold">{t("progress.level", { level: g.level.level })} · {g.level.title}</span>
+          <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
         </div>
-        <div className="mt-2"><Bar value={g.level.into / g.level.span} label="Progress to the next level" /></div>
-        {g.level.next && <p className="num mt-1.5 text-xs text-faint">{fmtNum(g.level.span - g.level.into)} XP to {g.level.next}</p>}
-        <p className="num mt-3 text-sm"><span className="font-semibold">{g.badges.earned}</span> <span className="text-muted">of {g.badges.total} badges earned</span></p>
+        <div className="mt-2"><Bar value={g.level.into / g.level.span} label={t("awards.levelProgress")} /></div>
+        {g.level.next && <p className="num mt-1.5 text-xs text-faint">{t("progress.xpTo", { xp: g.level.span - g.level.into, next: g.level.next })}</p>}
+        <p className="num mt-3 text-sm"><span className="font-semibold">{fmtNum(g.badges.earned)}</span> <span className="text-muted">{t("awards.badgesOf", { total: g.badges.total })}</span></p>
       </div>
-      <Section title="This week's quests"><QuestsCard g={g} /></Section>
-      <Section title="League"><LeagueCard g={g} /></Section>
-      <Section title="Streak"><StreakCard g={g} /></Section>
-      <Section title="Badges">
+      <Section title={t("awards.weekQuests")}><QuestsCard g={g} /></Section>
+      <Section title={t("awards.leagueTitle")}><LeagueCard g={g} /></Section>
+      <Section title={t("awards.streakTitle")}><StreakCard g={g} /></Section>
+      <Section title={t("awards.badges")}>
         <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
-          {FILTERS.map((f) => <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{f === "all" ? "All" : f === "earned" ? "Earned" : CATEGORY_LABEL[f]}</Chip>)}
+          {FILTERS.map((f) => <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{f === "all" ? t("awards.all") : f === "earned" ? t("awards.earned") : CATEGORY_LABEL[f]}</Chip>)}
         </div>
         <ul className="card divide-y divide-line">
           {sorted.filter((a) => !a.hidden || filter === "secret").map((a) => <AchievementRow key={a.id} a={a} />)}
@@ -213,14 +214,14 @@ export function Achievements() {
             <li>
               <button type="button" onClick={() => setFilter("secret")} className="press flex w-full items-center gap-3 px-4 py-3 text-left">
                 <Badge a={{ icon: "❔", tier: null, hidden: true, name: "" }} />
-                <span><span className="block font-semibold">{hiddenLeft} secret achievements</span><span className="text-sm text-muted">Hidden until you earn them</span></span>
+                <span><span className="block font-semibold">{t("awards.secretCount", { count: hiddenLeft })}</span><span className="text-sm text-muted">{t("awards.hidden")}</span></span>
               </button>
             </li>
           )}
-          {!sorted.length && <li className="px-4 py-3 text-muted">Nothing here yet.</li>}
+          {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
-      <Section title="Locker"><Locker g={g} /></Section>
+      <Section title={t("awards.locker")}><Locker g={g} /></Section>
     </div>
   );
 }

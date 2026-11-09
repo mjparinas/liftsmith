@@ -32,11 +32,8 @@ export const EMAIL_KINDS = KINDS.filter((k) => KIND_INFO[k].email);
 /** On unless the lifter turned them off. Pro offers are off until they turn them on (store rules and GDPR). */
 export const DEFAULT_ON: Record<MessageKind, boolean> = { reminder: true, missed: true, streak: true, milestone: true, pro: false };
 
-/**
- * Billing isn't live yet, and until it is everyone has Pro (AGENTS.md "Money"). A Pro offer to someone
- * who already has every Pro feature would be misleading, so the planner sends none until this is true.
- */
-export const BILLING_LIVE = false;
+// While billing isn't live everyone has Pro, so the planner sends no Pro offers (billing.ts).
+import { billingLive as billingIsLive } from "./billing";
 
 export type ProState =
   | { state: "pro" }
@@ -302,7 +299,7 @@ export function milestone(prev: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks"
 }
 
 /** How a profile's Pro choice reads for messages (trial.ts records it; billing will own it). */
-export function proState(pro: { trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean } | undefined, now: number, billingLive = BILLING_LIVE): ProState {
+export function proState(pro: { trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean } | undefined, now: number, billingLive = billingIsLive()): ProState {
   if (!billingLive || pro?.subscribed) return { state: "pro" };
   if (pro?.trialStartedAt && pro.trialDays) {
     const endsAt = pro.trialStartedAt + pro.trialDays * DAY;

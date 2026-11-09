@@ -87,6 +87,18 @@ const SCHEMA = [
     source TEXT NOT NULL DEFAULT 'app'
   )`,
   `CREATE INDEX IF NOT EXISTS subscription_events_at ON subscription_events (at)`,
+  // The store entitlement per RevenueCat user (the app's install id), kept up to date by the webhook, so
+  // accounts and sync can read Pro from the server later (revenuecat.ts).
+  `CREATE TABLE IF NOT EXISTS entitlements (
+    app_user_id TEXT PRIMARY KEY,
+    active INTEGER NOT NULL,
+    plan TEXT,
+    period TEXT,
+    store TEXT,
+    expires_at INTEGER,
+    family INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL
+  )`,
   // Admin sign-in: one-time email links and sessions. Only hashes of the tokens are stored.
   `CREATE TABLE IF NOT EXISTS admin_links (
     token_hash TEXT PRIMARY KEY,

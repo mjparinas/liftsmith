@@ -13,6 +13,7 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { defaultDays } from "./calendar";
 import type { Stats } from "./derive";
 import { goalStreak } from "./game";
+import { storePro } from "./billing";
 import { isNative } from "./juice";
 import { dayStart, mondayIn, plan, proState, type Message, type MessageKind, type PlanInput } from "./messages";
 import { SITE_URL } from "./site";
@@ -50,7 +51,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
     weekStart: monday,
     // goalStreak counts this week once it's met; the planner wants the weeks before it.
     streakWeeks: g.weeks - (g.thisWeek >= Math.max(1, profile.daysPerWeek) ? 1 : 0),
-    pro: proState(profile.pro, now),
+    pro: storePro(now) ?? proState(profile.pro, now),
     kinds: (channel === "push" ? prefs?.push : prefs?.email?.kinds) ?? {},
   };
 }
