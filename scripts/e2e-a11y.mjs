@@ -37,6 +37,11 @@ try {
   }
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
+  await page.getByRole("button", { name: "Set up" }).click();
+  await scan("cycle consent");
+  await page.getByRole("button", { name: "I agree, turn it on" }).click();
+  await page.getByRole("button", { name: "Period started today" }).click();
+  await scan("cycle on");
   await page.getByRole("button", { name: "Send feedback or report a bug" }).click();
   await page.getByRole("button", { name: "See what's included" }).click();
   await scan("feedback");
