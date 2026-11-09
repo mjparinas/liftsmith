@@ -205,7 +205,7 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 - **Browser tests like Gradelings':** a full playthrough, an offline run, a layout sweep across phones and tablets, and a tap-latency benchmark ("every tap answers within a frame or two").
 - **Store tooling:** scripts that make Play and App Store screenshots and the feature graphic from the real app, plus `docs/PLAY_LISTING.md` and `docs/PLAY_CONSOLE_ANSWERS.md`.
 - **Email** through Resend (in-app feedback today; receipts, weekly recap, win-back later), with hashed unsubscribe tokens and the CASL mailing address.
-- **Exercise demo videos** self-hosted and cached on the device for offline use, like Gradelings' help videos.
+- **Exercise demos (Melvin approved, 2026-11-09):** a procedural 3D hologram wireframe built with three.js, not filmed videos. Male and female bodies are driven by the same keyframes, and there are toggles for the skeleton, the target muscles and the bar path. Being procedural, the demos ship inside the app and work offline. The 2D version stays as a low-power fallback, and 3D becomes the default only after it has been tested on a mid-range Android phone. Prototype: https://claude.ai/artifact/WrmuLVALnkzLjBPoLcxN8i (source in the project files: `exercise-demos/wireframe-lift-demos.html`).
 - **Data rights:** JSON export, erase device and delete account; a restore check for backups; a full-storage notice.
 - **Languages:** English at launch. UI text stays in one place per screen so Spanish and French can follow, as Gradelings did.
 
