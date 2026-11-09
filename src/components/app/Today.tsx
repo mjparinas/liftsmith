@@ -25,7 +25,7 @@ export function Flame({ weeks }: { weeks: number }) {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, stats, setProfile, start, active, readiness, callOverride, setCall } = useApp();
+  const { profile, gyms, preview, events, stats, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
@@ -59,7 +59,7 @@ export function Today() {
 
       <div className="mt-4 flex flex-wrap gap-2 text-sm">
         <button type="button" onClick={() => go("gym")} className="press rounded-full border border-line bg-surface px-3 py-1.5">
-          📍 {gym?.name ?? "Add a gym"}
+          📍 {gym?.name ?? "Add a gym"}{gym && pickedByLocation === gym.id ? " · you're here" : ""}
         </button>
         {preview && (
           <span className={`rounded-full px-3 py-1.5 ${preview.week.deload ? "bg-warn/15 text-warn" : "bg-surface text-muted border border-line"}`}>

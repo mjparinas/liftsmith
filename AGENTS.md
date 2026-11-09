@@ -104,6 +104,12 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Delivery:** `POST /api/feedback/` (`src/app/api/feedback/route.api.ts`) checks the report (`feedbackServer.ts`), rate-limits per address, and emails it to the owner through **Resend** (`RESEND_API_KEY`, `FEEDBACK_TO`, optional `FEEDBACK_FROM` in Vercel). The reply-to is the sender's email, so the owner can answer straight from the inbox. CORS allows only the native shells' origins.
 - It's pure web code, so Android and iOS get it together (platform parity). Once the server has a database, reports are also stored and listed in the admin panel.
 
+### Gym by location (Melvin, 2026-11-09; built)
+- Opt-in per gym: **Gyms › Pick this gym when I'm here › Use where I am now** saves the gym's position rounded to about 100 m, with a 300 m radius (`Gym.place`).
+- When the app opens or comes back to the foreground, and only if some gym opted in, it asks for one **approximate** position (`src/lib/geo.ts`, `@capacitor/geolocation`). It switches the active gym only when exactly one gym is clearly in range, never mid-workout, and Today shows "you're here".
+- No background location and no precise location. Android declares only `ACCESS_COARSE_LOCATION`; iOS asks "when in use" with reduced accuracy by default (`NSLocationDefaultAccuracyReduced`). The position is never sent anywhere. The same code runs on both platforms (parity).
+- A true background geofence (switch before the app opens) was left out on purpose: it needs "always" location, which costs trust and app-review scrutiny for little gain.
+
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
 - Stats: weekly sets per muscle against the target, estimated one-rep max trends (Epley), PRs, volume, session history, streaks and trophies.

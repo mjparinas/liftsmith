@@ -7,6 +7,7 @@ import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./locald
 import { target } from "./progression";
 import { exercise } from "./exercises";
 import { setSeconds } from "./generator";
+import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, Profile, Rating } from "./types";
 
@@ -62,6 +63,10 @@ interface State {
   /** The lifter's own call for today, overriding the suggestion. */
   callOverride: Call | null;
   setCall(c: Call | null): void;
+  /** The gym last picked automatically by location, for the hint on Today. */
+  pickedByLocation: string | null;
+  /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
+  pickGymByLocation(fix?: Fix | null): Promise<string | null>;
   autoEnd(now?: number): boolean;
   init(): Promise<void>;
   setProfile(p: Partial<Profile>): void;
@@ -120,6 +125,18 @@ export const useApp = create<State>((set, get) => {
     preview: null,
     readiness: null,
     callOverride: null,
+    pickedByLocation: null,
+
+    async pickGymByLocation(fix) {
+      const { gyms, active, profile } = get();
+      // Never mid-workout, and never ask for location unless a gym opted in.
+      if (active || !wantsLocation(gyms)) return null;
+      const g = gymAt(gyms, fix === undefined ? await locate() : fix);
+      if (!g || g.id === profile.activeGymId) return null;
+      get().setProfile({ activeGymId: g.id });
+      set({ pickedByLocation: g.id });
+      return g.id;
+    },
 
     async init() {
       const snap = await load();

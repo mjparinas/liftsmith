@@ -1,4 +1,5 @@
 "use client";
+import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { PlateBar } from "@/components/PlateBar";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { haptic } from "@/lib/juice";
@@ -14,6 +15,7 @@ export function Gym() {
   const [adding, setAdding] = useState(false);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const [testKg, setTestKg] = useState(100);
+  const [placeNote, setPlaceNote] = useState<string | null>(null);
   if (!gym) return null;
   const update = (patch: Partial<GymT>) => saveGym({ ...gym, ...patch });
 
@@ -29,6 +31,27 @@ export function Gym() {
 
       <Section title="Name">
         <input value={gym.name} onChange={(e) => update({ name: e.target.value })} className="card w-full px-4 py-3" aria-label="Gym name" />
+      </Section>
+
+      <Section title="Pick this gym when I'm here">
+        {gym.place ? (
+          <div className="card flex items-center justify-between gap-3 p-4">
+            <p className="text-sm text-muted">On. Opening the app near here switches to {gym.name}.</p>
+            <Button kind="quiet" onClick={() => update({ place: undefined })}>Turn off</Button>
+          </div>
+        ) : (
+          <>
+            <Button kind="ghost" className="w-full" onClick={async () => {
+              setPlaceNote(null);
+              const fix = await locate();
+              if (!fix) return setPlaceNote("Location is off or not allowed. You can allow approximate location in your phone's settings.");
+              update({ place: { lat: roundPlace(fix.lat), lon: roundPlace(fix.lon), radiusM: DEFAULT_RADIUS_M } });
+              setPlaceNote(null);
+            }}>Use where I am now</Button>
+            <p className="mt-2 text-xs text-faint">Optional. Uses approximate location only when the app opens, never in the background, and it stays on your phone.</p>
+          </>
+        )}
+        {placeNote && <p className="mt-2 text-sm text-warn">{placeNote}</p>}
       </Section>
 
       <Section title="Equipment">
