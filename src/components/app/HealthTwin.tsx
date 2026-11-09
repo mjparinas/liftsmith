@@ -125,9 +125,9 @@ export function HealthTwin() {
 function Pin({ m, className, onOpen }: { m?: TwinMetric; className: string; onOpen: (id: TwinId) => void }) {
   if (!m || !m.display) return null;
   return (
-    <button type="button" onClick={() => onOpen(m.id)} aria-label={`${m.label}: ${m.display}, ${m.chip}`}
+    <button type="button" onClick={() => onOpen(m.id)}
       className={`press absolute z-10 max-w-[9.5rem] rounded-xl border border-line bg-surface/90 px-2.5 py-1.5 text-left backdrop-blur ${className}`}>
-      <span className="block truncate text-[0.6875rem] uppercase tracking-wider text-muted">{m.label}</span>
+      <span className="block truncate text-[0.6875rem] uppercase tracking-wider text-muted">{m.label}<span className="sr-only">:</span></span>
       <span className="num block text-sm font-bold text-ink">{m.display}</span>
       <span className={`block truncate text-[0.6875rem] ${m.status === "good" ? "text-good" : m.status === "watch" ? "text-warn" : "text-muted"}`}>{m.chip}</span>
     </button>

@@ -143,7 +143,7 @@ try {
   await page.getByRole("button", { name: "‹ Today" }).click();
   await scan("light today");
   for (const tab of ["Body", "Progress", "Awards", "Gyms"]) {
-    await page.getByRole("button", { name: tab }).click();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(`light ${tab}`);
   }
   await page.getByRole("button", { name: "Today" }).click();
