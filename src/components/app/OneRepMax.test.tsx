@@ -29,7 +29,7 @@ describe("One-rep max calculator", () => {
     seed([set("bench-press", 100, 1), set("bench-press", 100, 1, 3)]);
     const user = userEvent.setup();
     render(<OneRmSection />);
-    await user.click(screen.getByRole("button", { name: /Barbell bench press: open the one-rep max calculator/ }));
+    await user.click(screen.getByRole("button", { name: /Barbell bench press/ }));
     const dialog = screen.getByRole("dialog");
     expect(within(dialog).getByTestId("onerm-estimate")).toHaveTextContent("100 kg");
     expect(within(dialog).getByTestId("onerm-calc")).toHaveTextContent("100 kg");

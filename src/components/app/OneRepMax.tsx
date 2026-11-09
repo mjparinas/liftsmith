@@ -20,7 +20,6 @@ const T = {
   emptyTitle: "Trends appear here",
   emptyBody: "Log a few weighted sets and your estimated maxes will chart themselves.",
   needsTwo: "Needs two sessions",
-  open: (name: string) => `${name}: open the one-rep max calculator`,
   range: (lo: string, hi: string, unit: string) => `Likely ${lo} to ${hi} ${unit}`,
   confidence: { high: "High confidence", medium: "Medium confidence", low: "Low confidence" },
   fromSetup: "From the max you entered at setup. Log a few sets and it switches to your real lifting.",
@@ -94,7 +93,7 @@ export function OneRmSection() {
       <ul className="card divide-y divide-line">
         {shown.map((r) => (
           <li key={r.exerciseId}>
-            <button type="button" onClick={() => setOpen(r.exerciseId)} aria-label={T.open(exercise(r.exerciseId).name)} className="press flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
+            <button type="button" onClick={() => setOpen(r.exerciseId)} aria-haspopup="dialog" className="press flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
               <div className="min-w-0">
                 <div className="truncate font-medium">{exercise(r.exerciseId).name}</div>
                 <div className="num text-sm text-muted">{kgTo(r.e1rm, unit)} {unit} <span className="text-faint">· ±{kgTo((r.high - r.low) / 2, unit)}</span></div>
