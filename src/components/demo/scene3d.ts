@@ -1,9 +1,9 @@
 import {
   AdditiveBlending, BoxGeometry, BufferAttribute, BufferGeometry, Color, CylinderGeometry, DoubleSide, DynamicDrawUsage,
-  EdgesGeometry, GridHelper, Group, IcosahedronGeometry, Line, LineBasicMaterial, LineDashedMaterial, LineSegments, Mesh,
+  EdgesGeometry, GridHelper, Group, IcosahedronGeometry, Line, LineBasicMaterial, LineDashedMaterial, LineSegments, Mesh, MeshBasicMaterial,
   PerspectiveCamera, Scene as T3Scene, ShaderMaterial, TorusGeometry, Vector3, WebGLRenderer, type BufferGeometry as Geo, type Material,
 } from "three";
-import { partIndices } from "@/lib/demo/mesh";
+import { partIndices, REGIONS } from "@/lib/demo/mesh";
 import { anchorAt, type Anchor, type Prop, type Vec } from "@/lib/demo/rig";
 import { DEMO_COLOURS } from "./colours";
 import type { Frame, Scene } from "./engine";
@@ -17,6 +17,9 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   const scene = new T3Scene();
   const camera = new PerspectiveCamera(32, 1, 0.1, 40);
   const cHolo = new Color(DEMO_COLOURS.holo), cEmber = new Color(DEMO_COLOURS.ember).multiplyScalar(1.35);
+  // on the recovery map, the parts that aren't a muscle are a dim neutral, so no band (Fresh green, the
+  // colour-blind set's blue) can be mistaken for the hologram's own cyan
+  const cBase = new Color(DEMO_COLOURS.steel).multiplyScalar(0.4);
   const disposables: { dispose(): void }[] = [];
   const keep = <T extends { dispose(): void }>(x: T) => (disposables.push(x), x);
 
@@ -34,24 +37,32 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   const steelMat = keep(new LineBasicMaterial({ color: new Color(DEMO_COLOURS.steel), transparent: true, opacity: 0.85, blending: AdditiveBlending, depthWrite: false }));
   const propMat = keep(new LineBasicMaterial({ color: new Color(DEMO_COLOURS.steel), transparent: true, opacity: 0.32, blending: AdditiveBlending, depthWrite: false }));
 
+  // Painted muscles (the recovery map) need a solid figure: a depth-only pass of the shell hides the far
+  // side's lines, so the back's colours never show through the front. Pushed back a little so the
+  // lines on the surface itself still pass.
+  const occludeMat = keep(new MeshBasicMaterial({ colorWrite: false, depthWrite: true, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 }));
+
   // everything that moves with the figure (rolled for side planks)
   const fig = new Group();
   scene.add(fig);
 
-  const parts = new Map<string, { pos: BufferAttribute; col: BufferAttribute; gS: BufferGeometry; objs: (Mesh | LineSegments)[] }>();
+  const parts = new Map<string, { pos: BufferAttribute; col: BufferAttribute; colD: BufferAttribute; gS: BufferGeometry; objs: (Mesh | LineSegments)[]; occluder: Mesh }>();
   const ensureParts = (f: Frame) => {
     if (parts.size) return;
     for (const m of f.meshes) {
       const n = m.P.NT * m.P.M;
       const pos = new BufferAttribute(m.pos, 3); pos.setUsage(DynamicDrawUsage);
       const col = new BufferAttribute(new Float32Array(n * 3), 3); col.setUsage(DynamicDrawUsage);
+      const colD = new BufferAttribute(new Float32Array(n * 3), 3); colD.setUsage(DynamicDrawUsage);
       const { lines, diags, tris } = partIndices(m.P);
       const gW = keep(new BufferGeometry()); gW.setAttribute("position", pos); gW.setAttribute("color", col); gW.setIndex(lines);
-      const gD = keep(new BufferGeometry()); gD.setAttribute("position", pos); gD.setAttribute("color", col); gD.setIndex(diags);
+      const gD = keep(new BufferGeometry()); gD.setAttribute("position", pos); gD.setAttribute("color", colD); gD.setIndex(diags);
       const gS = keep(new BufferGeometry()); gS.setAttribute("position", pos); gS.setAttribute("aColor", col); gS.setIndex(tris);
       const objs = [new Mesh(gS, shellMat), new LineSegments(gW, wireMat), new LineSegments(gD, diagMat)];
-      for (const o of objs) { o.frustumCulled = false; fig.add(o); }
-      parts.set(m.P.name, { pos, col, gS, objs });
+      const occluder = new Mesh(gS, occludeMat);
+      occluder.renderOrder = -1;
+      for (const o of [...objs, occluder]) { o.frustumCulled = false; fig.add(o); }
+      parts.set(m.P.name, { pos, col, colD, gS, objs, occluder });
     }
   };
 
@@ -154,6 +165,9 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   (grid.material as LineBasicMaterial).transparent = true; (grid.material as LineBasicMaterial).opacity = 0.06;
   floor.add(grid); keep(grid.geometry); keep(grid.material as LineBasicMaterial);
 
+  let paintFor: Frame["s"]["paint"] = undefined;
+  let paintCols: (Color | null)[] = [];
+
   const place = (o: { position: Vector3 }, p: Vec) => o.position.set(p[0], p[1], p[2]);
 
   return {
@@ -177,19 +191,45 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       fig.rotation.x = (f.roll * Math.PI) / 180;
       fig.position.set(0, f.place.lift, f.place.shiftZ);
       const pulse = s.muscles ? (s.highlight ? 0.85 : 0.45 + 0.55 * f.effort) : 0;
+      // painted muscles (the recovery map): parse each muscle's colour once per change
+      if (f.changed || paintFor !== s.paint) {
+        paintFor = s.paint;
+        paintCols = REGIONS.map((r) => (s.paint?.[r.id] ? new Color(s.paint[r.id]) : null));
+      }
+      diagMat.opacity = s.paint ? 0.7 : 0.16;
       for (const m of f.meshes) {
         const p = parts.get(m.P.name)!;
         const vis = m.P.kind !== "hair" || !!f.body.hair;
         for (const o of p.objs) o.visible = vis;
+        p.occluder.visible = vis && !!s.paint;
         if (!vis) continue;
         p.pos.needsUpdate = true;
         p.gS.computeVertexNormals();
-        const c = p.col.array as Float32Array;
-        for (let k = 0; k < m.weights.length; k++) {
-          const w = Math.min(1, m.weights[k] * pulse * 1.7);
-          c[k * 3] = cHolo.r + (cEmber.r - cHolo.r) * w; c[k * 3 + 1] = cHolo.g + (cEmber.g - cHolo.g) * w; c[k * 3 + 2] = cHolo.b + (cEmber.b - cHolo.b) * w;
+        const c = p.col.array as Float32Array, d = p.colD.array as Float32Array;
+        if (s.paint) {
+          for (let k = 0; k < m.weights.length; k++) {
+            const r = m.which[k], pc = r >= 0 ? paintCols[r] : null;
+            const id = r >= 0 ? REGIONS[r].id : null;
+            const on = !!id && !!s.selected?.includes(id);
+            const dim = s.selected?.length && !on ? 0.4 : 1;
+            const w = pc ? Math.min(1, m.weights[k] * 1.6) : 0;
+            const cr = pc ? cBase.r + (pc.r - cBase.r) * w : cBase.r, cg = pc ? cBase.g + (pc.g - cBase.g) * w : cBase.g, cb = pc ? cBase.b + (pc.b - cBase.b) * w : cBase.b;
+            const lit = (on ? 1.35 : 1) * (pc ? dim : s.selected?.length ? 0.6 : 1);
+            c[k * 3] = cr * lit; c[k * 3 + 1] = cg * lit; c[k * 3 + 2] = cb * lit;
+            // cross lines: bright on hatched (fatigued) muscles, faint everywhere else
+            const h = id && w > 0.3 ? s.hatch?.[id] ?? 0 : 0;
+            const dk = (0.23 + 0.77 * h) * lit;
+            d[k * 3] = cr * dk; d[k * 3 + 1] = cg * dk; d[k * 3 + 2] = cb * dk;
+          }
+        } else {
+          for (let k = 0; k < m.weights.length; k++) {
+            const w = Math.min(1, m.weights[k] * pulse * 1.7);
+            c[k * 3] = cHolo.r + (cEmber.r - cHolo.r) * w; c[k * 3 + 1] = cHolo.g + (cEmber.g - cHolo.g) * w; c[k * 3 + 2] = cHolo.b + (cEmber.b - cHolo.b) * w;
+          }
+          d.set(c);
         }
         p.col.needsUpdate = true;
+        p.colD.needsUpdate = true;
       }
       // loads
       const load = f.motion.load, hold = f.motion.hold ?? "each";
