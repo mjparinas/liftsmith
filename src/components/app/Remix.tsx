@@ -5,6 +5,7 @@ import { haptic } from "@/lib/juice";
 import { adaptRemix, decodeRemix, encodeShared, remixUrl, sharedFromSession } from "@/lib/remix";
 import { useNow } from "@/lib/useNow";
 import { useApp } from "@/lib/store";
+import { t } from "@/lib/i18n";
 import { useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
@@ -70,22 +71,22 @@ export function ShareWorkout({ sessionId }: { sessionId: string }) {
   const url = remixUrl(encodeShared(items));
   const share = async () => {
     haptic("tap");
-    const text = "Try my workout in Liftsmith. It adapts to your gym and your weights.";
+    const text = t("done.remixText");
     try {
       if (navigator.share) {
         await navigator.share({ title: "A workout for you", text, url });
         return;
       }
       await navigator.clipboard.writeText(url);
-      setNote("Link copied.");
+      setNote(t("done.remixCopied"));
     } catch {
       setNote(null);
     }
   };
   return (
     <div className="mt-4">
-      <Button kind="ghost" className="w-full" onClick={share}>Send it to a friend to try</Button>
-      <p className="mt-1 text-xs text-faint">{note ?? "Friends get it rebuilt for their own gym and weights. Only exercises, sets and reps are in the link."}</p>
+      <Button kind="ghost" className="w-full" onClick={share}>{t("done.remixShare")}</Button>
+      <p className="mt-1 text-xs text-faint">{note ?? t("done.remixHint")}</p>
     </div>
   );
 }

@@ -139,3 +139,13 @@ export function list(items: string[], type: "conjunction" | "disjunction" = "con
 export function parseNum(s: string): number {
   return Number(s.trim().replace(/\s/g, "").replace(",", "."));
 }
+
+/**
+ * A lookup table whose values are translated on each read, for labels kept in engine tables
+ * (muscle names, recovery bands): `MUSCLE_LABEL.chest` reads `muscle.chest` in the current language.
+ */
+export function translated<K extends string>(keys: readonly K[], key: (k: K) => MessageKey): Record<K, string> {
+  const out = {} as Record<K, string>;
+  for (const k of keys) Object.defineProperty(out, k, { get: () => t(key(k)), enumerable: true });
+  return out;
+}

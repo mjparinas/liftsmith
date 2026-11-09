@@ -1,3 +1,4 @@
+import { translated } from "./i18n";
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
 // own unit (so 45 lb plates stay exactly 45 lb) and converted at the edges (src/lib/units.ts).
 
@@ -25,26 +26,8 @@ export const MUSCLES = [
 ] as const;
 export type Muscle = (typeof MUSCLES)[number];
 
-export const MUSCLE_LABEL: Record<Muscle, string> = {
-  chest: "Chest",
-  frontDelts: "Front delts",
-  sideDelts: "Side delts",
-  rearDelts: "Rear delts",
-  biceps: "Biceps",
-  triceps: "Triceps",
-  forearms: "Forearms",
-  abs: "Abs",
-  obliques: "Obliques",
-  traps: "Traps",
-  upperBack: "Upper back",
-  lats: "Lats",
-  lowerBack: "Lower back",
-  glutes: "Glutes",
-  quads: "Quads",
-  hamstrings: "Hamstrings",
-  adductors: "Adductors",
-  calves: "Calves",
-};
+/** Muscle names in the current language (src/locales, keys `muscle.*`). */
+export const MUSCLE_LABEL: Record<Muscle, string> = translated(MUSCLES, (m) => `muscle.${m}`);
 
 /** Large muscles take longer to recover (about 72 h against 48 h). */
 export const LARGE_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "lowerBack", "glutes", "quads", "hamstrings"]);
@@ -233,6 +216,12 @@ export interface Profile {
    */
   birthYear?: number;
   sex?: "male" | "female";
+  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Tools › TDEE. */
+  heightCm?: number;
+  /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
+  bodyFat?: { pct: number; at: number };
+  /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */
+  tdee?: { activity?: "sedentary" | "light" | "moderate" | "heavy" | "athlete"; useBodyFat?: boolean };
   /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
   knownMaxes?: Partial<Record<string, number>>;
   /**
@@ -481,6 +470,30 @@ export interface BodyweightEvent extends EventBase {
 }
 
 /**
+ * A TDEE snapshot (tdee.ts), recorded whenever an input that matters changes, so the history and graph
+ * keep the past even after the profile moves on. Calories a day.
+ */
+export interface TdeeEvent extends EventBase {
+  type: "tdee";
+  kcal: number;
+  bmr: number;
+  kg: number;
+  cm: number;
+  age: number;
+  sex: "male" | "female";
+  activity: "sedentary" | "light" | "moderate" | "heavy" | "athlete";
+  /** Where the activity level came from: the lifter's workouts, the days-a-week goal, or picked by hand. */
+  activitySource: "workouts" | "plan" | "manual";
+  /** Training days a week behind an automatic activity level. */
+  perWeek?: number;
+  bodyFat?: number;
+  formula: "mifflin" | "katch";
+  /** Recorded on its own when an input changed, or saved from the calculator. */
+  trigger: "auto" | "manual";
+  changes: ("first" | "weight" | "age" | "height" | "sex" | "activity" | "bodyFat" | "recheck")[];
+}
+
+/**
  * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
  * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
  */
@@ -568,4 +581,4 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
+export type AppEvent = BodyweightEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;

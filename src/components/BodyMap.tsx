@@ -1,5 +1,6 @@
 "use client";
 import { bandOf, BANDS, type Band } from "@/lib/recovery";
+import { num, t } from "@/lib/i18n";
 import { useId } from "react";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 
@@ -60,7 +61,7 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
   const id = useId().replace(/:/g, "");
   return (
     <figure className="flex flex-1 flex-col items-center">
-      <svg viewBox="20 0 160 412" className="keep-colours h-auto w-full max-w-[180px]" role="img" aria-label={`${label} muscles`}>
+      <svg viewBox="20 0 160 412" className="keep-colours h-auto w-full max-w-[180px]" role="img" aria-label={t("map.label", { side: label })}>
         <Marks id={id} />
         <path d={SILHOUETTE} fill="var(--color-raised)" stroke="var(--color-line)" strokeWidth={1.2} />
         {[1, -1].map((side) => (
@@ -73,7 +74,7 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
               return (
                 <g key={s.m}>
                   <path d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "var(--color-ink)" : "var(--color-bg)"} strokeWidth={hot ? 1.6 : 1}>
-                    <title>{`${MUSCLE_LABEL[s.m]}: ${r}% recovered (${b.label})`}</title>
+                    <title>{t("map.muscle", { muscle: MUSCLE_LABEL[s.m], pct: r, band: b.label })}</title>
                   </path>
                   {mark && <path d={s.d} fill={`url(#${id}-${mark})`} pointerEvents="none" aria-hidden="true" data-mark={mark} />}
                 </g>
@@ -91,8 +92,8 @@ export function BodyMap({ rec, focus, compact }: { rec: Record<Muscle, number>; 
   return (
     <div>
       <div className={`flex gap-2 ${compact ? "max-w-[300px]" : "max-w-[380px]"} mx-auto`}>
-        <Figure shapes={FRONT} rec={rec} label="Front" focus={focus} />
-        <Figure shapes={BACK} rec={rec} label="Back" focus={focus} />
+        <Figure shapes={FRONT} rec={rec} label={t("map.front")} focus={focus} />
+        <Figure shapes={BACK} rec={rec} label={t("map.back")} focus={focus} />
       </div>
       <Legend />
     </div>
@@ -114,12 +115,12 @@ export function Swatch({ band, colour }: { band: Band; colour: string }) {
 
 export function Legend() {
   return (
-    <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-4" aria-label="Legend">
+    <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-4" aria-label={t("map.legend")}>
       {BANDS.map((b) => (
         <li key={b.band} className="flex flex-wrap items-center gap-x-2">
           <Swatch band={b.band} colour={b.colour} />
           <span className="text-ink">{b.label}</span>
-          <span className="text-faint num">{b.min === 0 ? "<40%" : `${b.min}%+`}</span>
+          <span className="text-faint num">{b.min === 0 ? `<${num(0.4, { style: "percent" })}` : `${num(b.min / 100, { style: "percent" })}+`}</span>
         </li>
       ))}
     </ul>
