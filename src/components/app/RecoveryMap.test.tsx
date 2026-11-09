@@ -77,7 +77,7 @@ describe("recovery map", () => {
     await onboard(user);
     await act(async () => useApp.getState().importWorkouts(squats(Date.now())));
     await act(async () => { location.hash = "#/recovery"; window.dispatchEvent(new HashChangeEvent("hashchange")); });
-    await screen.findByRole("heading", { name: /Recovery/ });
+    await screen.findByRole("heading", { name: /^Body$/ });
     const row = screen.getAllByRole("button").find((b) => /Quads/.test(b.textContent ?? "") && b.hasAttribute("aria-pressed"))!;
     await user.click(row);
     expect(row).toHaveAttribute("aria-pressed", "true");

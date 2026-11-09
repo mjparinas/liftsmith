@@ -72,7 +72,7 @@ try {
   await shot("done");
   await page.getByRole("button", { name: "Done", exact: true }).click();
 
-  for (const tab of ["Recovery", "Progress", "Gyms"]) {
+  for (const tab of ["Body", "Progress", "Gyms"]) {
     await page.getByRole("button", { name: tab }).click();
     await page.waitForTimeout(200);
     await shot(tab.toLowerCase());

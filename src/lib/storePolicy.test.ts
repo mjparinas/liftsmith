@@ -19,10 +19,13 @@ const PERMISSION: Record<string, string> = {
   heartRate: "HEART_RATE",
   heartRateVariability: "HEART_RATE_VARIABILITY",
   sleep: "SLEEP",
+  steps: "STEPS",
+  vo2Max: "VO2_MAX",
+  respiratoryRate: "RESPIRATORY_RATE",
   calories: "ACTIVE_CALORIES_BURNED",
 };
 
-const tags = [...manifest.matchAll(/<uses-permission[^>]*android:name="android\.permission\.health\.([A-Z_]+)"([^>]*)\/>/g)];
+const tags = [...manifest.matchAll(/<uses-permission[^>]*android:name="android\.permission\.health\.([A-Z0-9_]+)"([^>]*)\/>/g)];
 const kept = tags.filter((m) => !m[2].includes('tools:node="remove"')).map((m) => m[1]);
 
 describe("Play store policy config", () => {
@@ -34,7 +37,7 @@ describe("Play store policy config", () => {
 
   it("removes every other health permission the plugin adds", () => {
     const removed = tags.filter((m) => m[2].includes('tools:node="remove"')).map((m) => m[1]);
-    for (const p of ["READ_SLEEP", "READ_HEART_RATE_VARIABILITY", "READ_HEART_RATE", "READ_BLOOD_GLUCOSE", "READ_NUTRITION", "READ_EXERCISE", "WRITE_WEIGHT"]) {
+    for (const p of ["READ_HEART_RATE", "READ_OXYGEN_SATURATION", "READ_BLOOD_PRESSURE", "READ_BLOOD_GLUCOSE", "READ_NUTRITION", "READ_EXERCISE", "WRITE_WEIGHT"]) {
       expect(removed).toContain(p);
     }
   });
@@ -47,7 +50,7 @@ describe("Play store policy config", () => {
     const page = readFileSync(join(root, "public/privacypolicy.html"), "utf8");
     expect(page).toContain("Limited Use");
     expect(page).toContain(CONTACT_EMAIL);
-    for (const t of ["weight", "height", "body fat", "resting heart rate"]) expect(page).toContain(t);
-    expect(page).not.toMatch(/sleep|variability/);
+    for (const t of ["weight", "height", "body fat", "resting heart rate", "sleep", "heart rate variability", "steps", "VO2 max", "respiratory rate"]) expect(page).toContain(t);
+    expect(page).not.toMatch(/blood|oxygen saturation|nutrition/i);
   });
 });
