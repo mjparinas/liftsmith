@@ -2,8 +2,6 @@
 // TDEE results and history graph, shared by the app (Tools › TDEE) and the public calculator page.
 import { ACTIVITIES, ACTIVITY, bmiBand, type Activity, type TdeeResult } from "@/lib/tdee";
 import type { TdeeEvent } from "@/lib/types";
-import { haptic } from "@/lib/juice";
-import { useEffect, useRef } from "react";
 
 const T = {
   perDay: "calories a day",
@@ -109,60 +107,3 @@ export function TdeeChart({ points, now }: { points: Pick<TdeeEvent, "at" | "kca
     </figure>
   );
 }
-
-/**
- * A value with big − and + buttons, no typing (Melvin, 2026-11-09: one hand, eyes on the lift).
- * Holding a button repeats, speeding up after a moment. Symmetric, so it suits either hand.
- */
-export function Bump({ label, value, onStep, id }: { label: string; value: string; onStep: (dir: 1 | -1, big: boolean) => void; id: string }) {
-  return (
-    <div className="flex items-center justify-between gap-2">
-      <span className="font-semibold" id={`${id}-label`}>{label}</span>
-      <span className="flex items-center gap-2" role="group" aria-labelledby={`${id}-label`}>
-        <HoldButton dir={-1} label={`Less ${label.toLowerCase()}`} onStep={onStep}>−</HoldButton>
-        <output id={id} aria-live="polite" className="num min-w-[5.5rem] text-center text-lg font-semibold">{value}</output>
-        <HoldButton dir={1} label={`More ${label.toLowerCase()}`} onStep={onStep}>+</HoldButton>
-      </span>
-    </div>
-  );
-}
-
-function HoldButton({ dir, label, onStep, children }: { dir: 1 | -1; label: string; onStep: (dir: 1 | -1, big: boolean) => void; children: string }) {
-  const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const count = useRef(0);
-  useEffect(() => () => clearTimeout(timer.current), []);
-  const stop = () => clearTimeout(timer.current);
-  const start = () => {
-    count.current = 0;
-    const tick = () => {
-      count.current++;
-      onStep(dir, count.current > 8);
-      timer.current = setTimeout(tick, count.current > 8 ? 70 : 140);
-    };
-    timer.current = setTimeout(tick, 420);
-  };
-  // A plain tap (or Enter) steps once; a hold has already stepped.
-  const click = () => {
-    if (count.current === 0) {
-      haptic("select");
-      onStep(dir, false);
-    }
-    count.current = 0;
-  };
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className="press grid h-12 w-12 shrink-0 touch-manipulation select-none place-items-center rounded-full border border-line bg-raised text-xl font-bold active:border-accent/60 active:bg-accent/15"
-      onPointerDown={start}
-      onPointerUp={stop}
-      onPointerLeave={stop}
-      onPointerCancel={stop}
-      onContextMenu={(e) => e.preventDefault()}
-      onClick={click}
-    >
-      {children}
-    </button>
-  );
-}
-

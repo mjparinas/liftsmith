@@ -1,9 +1,29 @@
 "use client";
-import { bandOf, BANDS } from "@/lib/recovery";
+import { bandOf, BANDS, type Band } from "@/lib/recovery";
+import { useId } from "react";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 
 // An original front-and-back body map. Each muscle is drawn once for the left half and mirrored.
-// Colours come from the recovery bands, and every region has a title for screen readers.
+// Colours come from the recovery bands, and every region has a title for screen readers. Colour is
+// never the only cue (WCAG 1.4.1): Recovering muscles carry dots and Fatigued ones diagonal hatching,
+// and the legend shows the same marks, so the map reads with any kind of colour blindness, in
+// greyscale and in forced-colour modes.
+
+/** The pattern drawn over each band, if any. */
+export const BAND_MARK: Record<Band, "dots" | "hatch" | null> = { fresh: null, ready: null, recovering: "dots", fatigued: "hatch" };
+
+function Marks({ id }: { id: string }) {
+  return (
+    <defs>
+      <pattern id={`${id}-dots`} width="6" height="6" patternUnits="userSpaceOnUse">
+        <circle cx="3" cy="3" r="1.3" fill="var(--color-bg)" fillOpacity={0.75} />
+      </pattern>
+      <pattern id={`${id}-hatch`} width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+        <rect width="2" height="5" fill="var(--color-bg)" fillOpacity={0.7} />
+      </pattern>
+    </defs>
+  );
+}
 
 type Shape = { m: Muscle; d: string };
 
@@ -37,9 +57,11 @@ const SILHOUETTE =
   "M100,8 C88,8 82,18 82,30 C82,42 88,50 92,52 L92,60 Q70,62 56,68 Q36,72 32,96 Q28,128 34,156 Q26,190 30,232 L48,232 Q58,192 58,160 Q62,140 62,118 Q60,150 64,196 Q58,212 60,232 Q56,280 64,326 Q58,362 66,404 L88,404 Q94,364 92,330 Q96,290 98,250 L100,240 L102,250 Q104,290 108,330 Q106,364 112,404 L134,404 Q142,362 136,326 Q144,280 140,232 Q142,212 136,196 Q140,150 138,118 Q138,140 142,160 Q142,192 152,232 L170,232 Q174,190 166,156 Q172,128 168,96 Q164,72 144,68 Q130,62 108,60 L108,52 C112,50 118,42 118,30 C118,18 112,8 100,8 Z";
 
 function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Muscle, number>; label: string; focus?: Muscle[] }) {
+  const id = useId().replace(/:/g, "");
   return (
     <figure className="flex flex-1 flex-col items-center">
-      <svg viewBox="20 0 160 412" className="h-auto w-full max-w-[180px]" role="img" aria-label={`${label} muscles`}>
+      <svg viewBox="20 0 160 412" className="keep-colours h-auto w-full max-w-[180px]" role="img" aria-label={`${label} muscles`}>
+        <Marks id={id} />
         <path d={SILHOUETTE} fill="var(--color-raised)" stroke="var(--color-line)" strokeWidth={1.2} />
         {[1, -1].map((side) => (
           <g key={side} transform={side === -1 ? "translate(200,0) scale(-1,1)" : undefined}>
@@ -47,10 +69,14 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
               const r = rec[s.m];
               const b = bandOf(r);
               const hot = focus?.includes(s.m);
+              const mark = BAND_MARK[b.band];
               return (
-                <path key={s.m} d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "var(--color-ink)" : "var(--color-bg)"} strokeWidth={hot ? 1.6 : 1}>
-                  <title>{`${MUSCLE_LABEL[s.m]}: ${r}% recovered (${b.label})`}</title>
-                </path>
+                <g key={s.m}>
+                  <path d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "var(--color-ink)" : "var(--color-bg)"} strokeWidth={hot ? 1.6 : 1}>
+                    <title>{`${MUSCLE_LABEL[s.m]}: ${r}% recovered (${b.label})`}</title>
+                  </path>
+                  {mark && <path d={s.d} fill={`url(#${id}-${mark})`} pointerEvents="none" aria-hidden="true" data-mark={mark} />}
+                </g>
               );
             })}
           </g>
@@ -73,12 +99,25 @@ export function BodyMap({ rec, focus, compact }: { rec: Record<Muscle, number>; 
   );
 }
 
+/** A legend swatch: the band's colour with the same mark the map uses. */
+export function Swatch({ band, colour }: { band: Band; colour: string }) {
+  const id = useId().replace(/:/g, "");
+  const mark = BAND_MARK[band];
+  return (
+    <svg viewBox="0 0 12 12" className="keep-colours h-3.5 w-3.5 shrink-0" aria-hidden="true">
+      {mark && <Marks id={id} />}
+      <circle cx="6" cy="6" r="6" fill={colour} />
+      {mark && <circle cx="6" cy="6" r="6" fill={`url(#${id}-${mark})`} data-mark={mark} />}
+    </svg>
+  );
+}
+
 export function Legend() {
   return (
     <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm sm:grid-cols-4" aria-label="Legend">
       {BANDS.map((b) => (
-        <li key={b.band} className="flex items-center gap-2">
-          <span className="h-3 w-3 shrink-0 rounded-full" style={{ background: b.colour }} />
+        <li key={b.band} className="flex flex-wrap items-center gap-x-2">
+          <Swatch band={b.band} colour={b.colour} />
           <span className="text-ink">{b.label}</span>
           <span className="text-faint num">{b.min === 0 ? "<40%" : `${b.min}%+`}</span>
         </li>

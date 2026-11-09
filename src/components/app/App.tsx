@@ -1,4 +1,5 @@
 "use client";
+import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
@@ -19,6 +20,7 @@ import { Recovery } from "./Recovery";
 import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
 import { Settings } from "./Settings";
+import { TrainingSettings } from "./TrainingSettings";
 import { Injuries } from "./Injuries";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
@@ -56,8 +58,21 @@ export function App() {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Accessibility (a11y.ts): text size, colour-blind safe colours, contrast. The phone's own text
+  // size is read again when the app comes back, in case it was changed in the phone's settings.
+  const a11y = profile.a11y;
+  useEffect(() => {
+    applyA11y(a11y);
+    const reread = () => {
+      if (document.visibilityState === "visible") void readPhoneTextScale().then(() => applyA11y(a11y));
+    };
+    reread();
+    document.addEventListener("visibilitychange", reread);
+    return () => document.removeEventListener("visibilitychange", reread);
+  }, [a11y]);
   useEffect(() => {
     applyAppearance(savedAppearance());
+    applyA11y(savedA11y());
     installDiag();
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
@@ -184,7 +199,7 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, tools: <Tools arg={arg} /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
@@ -204,7 +219,7 @@ export function App() {
                       if (!on) haptic("select");
                       go(t.route);
                     }}
-                    className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[11px] font-medium ${on ? "text-ink" : "text-faint"}`}
+                    className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
                   >
                     <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
                       <Icon name={t.icon} size={22} strokeWidth={on ? 2.4 : 2} />

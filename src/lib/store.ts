@@ -1,7 +1,8 @@
 "use client";
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
-import { derive, type Stats } from "./derive";
+import { derive, setWeekStart, type Stats } from "./derive";
+import { minutesForToday } from "./training";
 import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
@@ -47,6 +48,8 @@ export interface Active {
   lastAt: number;
   /** Warm-up sets done for the exercise on screen (warmup.ts). Missing in workouts saved before warm-ups. */
   warm?: number;
+  /** Rest auto-start is off: the rest (seconds) waiting for a tap on Start rest. */
+  restReady?: number;
 }
 
 /** True while the exercise on screen still has warm-up sets to do. */
@@ -122,6 +125,8 @@ interface State {
   adjust(weight: number, reps: number): void;
   addRest(sec: number): void;
   skipRest(): void;
+  /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
+  startRest(): void;
   /** Skip the rest of the warm-ups and go to the working weight. */
   skipWarmup(): void;
   feedback(r: Rating): void;
@@ -333,7 +338,14 @@ export const useApp = create<State>((set, get) => {
 
     async init() {
       const snap = await load();
-      const profile = snap.profile ?? defaultProfile();
+      let profile = snap.profile ?? defaultProfile();
+      setWeekStart(profile.training?.weekStart);
+      // A new day: the length slider goes back to the lifter's default length.
+      const minutes = minutesForToday(profile, Date.now());
+      if (minutes) {
+        profile = { ...profile, minutes };
+        void saveRecord("profile", profile);
+      }
       let active: Active | null = null;
       try {
         const raw = localStorage.getItem(ACTIVE_KEY);
@@ -351,7 +363,11 @@ export const useApp = create<State>((set, get) => {
       const profile = { ...get().profile, ...p, updatedAt: Date.now() };
       set({ profile });
       void saveRecord("profile", profile);
-      if ("minutes" in p || "planSource" in p || "activeGymId" in p || "variability" in p || "goal" in p || "experience" in p) get().replan();
+      if ("training" in p) {
+        setWeekStart(profile.training?.weekStart);
+        set({ stats: derive(get().events, Date.now()) });
+      }
+      if ("minutes" in p || "training" in p || "planSource" in p || "activeGymId" in p || "variability" in p || "goal" in p || "experience" in p) get().replan();
     },
 
     saveGym(g) {
@@ -431,6 +447,7 @@ export const useApp = create<State>((set, get) => {
       if (!item) return;
       const now = Date.now();
       const ex = exercise(item.exerciseId);
+      const autoRest = get().profile.training?.autoRest !== false;
       if (warmingUp(a)) {
         // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
         commit([{ type: "warmup", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps }]);
@@ -446,7 +463,8 @@ export const useApp = create<State>((set, get) => {
           lastRest: undefined,
           setStart: now,
           restTotal: WARMUP_REST,
-          restUntil: now + WARMUP_REST * 1000,
+          restUntil: autoRest ? now + WARMUP_REST * 1000 : null,
+          restReady: autoRest ? undefined : WARMUP_REST,
         };
         set({ active: next });
         persistActive(next);
@@ -487,7 +505,7 @@ export const useApp = create<State>((set, get) => {
       // next exercise of the round (superset.ts).
       const items = a.plan.items;
       const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
-      let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now };
+      let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
       const nextT = item.setTargets?.[already + 1];
@@ -497,7 +515,9 @@ export const useApp = create<State>((set, get) => {
       if (step.index !== a.index) next = loadItem(next, Math.min(step.index, items.length));
       const last = next.index >= items.length;
       next.restTotal = last ? 0 : step.rest;
-      next.restUntil = last ? null : now + step.rest * 1000;
+      next.restUntil = last || !autoRest ? null : now + step.rest * 1000;
+      // Auto-start off: the rest waits for Start rest. The set's clock still runs from Log set.
+      if (!last && !autoRest && step.rest > 0) next.restReady = step.rest;
       set({ active: next });
       persistActive(next);
     },
@@ -532,7 +552,17 @@ export const useApp = create<State>((set, get) => {
       if (!a) return;
       // Rest is over (timer ran out or Skip): the next set's work starts now.
       const now = Date.now();
-      const next = { ...a, restUntil: null, setStart: now, lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest };
+      const next = { ...a, restUntil: null, restReady: undefined, setStart: now, lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    startRest() {
+      const a = get().active;
+      if (!a?.restReady) return;
+      const now = Date.now();
+      // The rest counts from Log set (restStart), so a late tap still records the real rest taken.
+      const next: Active = { ...a, restUntil: now + a.restReady * 1000, restTotal: a.restReady, restReady: undefined, lastAt: now };
       set({ active: next });
       persistActive(next);
     },

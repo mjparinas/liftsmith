@@ -258,12 +258,62 @@ export interface Profile {
   planSource?: PlanSource;
   /** Appearance: dark (default), light, or follow the system (theme.ts). */
   theme?: "dark" | "light" | "system";
+  /** Accessibility: text size, colour-blind safe colours, contrast (a11y.ts). */
+  a11y?: import("./a11y").A11y;
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */
   routines?: Routine[];
+  /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
+  training?: TrainingPrefs;
+  /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
+  minutesDay?: string;
   onboarded: boolean;
   updatedAt: number;
+}
+
+/** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
+export type EffortScale = "rir" | "rpe";
+/** The rest-over alert: sound, vibration, both, or neither (the timer still shows). */
+export type RestAlert = "both" | "sound" | "vibrate" | "silent";
+
+/** One exercise's own rest, rep range and working sets, set by the lifter. */
+export interface ExercisePrefs {
+  /** Seconds. */
+  rest?: number;
+  /** Lowest and highest reps for double progression. */
+  reps?: [number, number];
+  sets?: number;
+}
+
+/**
+ * Workout preferences (Melvin, 2026-11-09). Every field is optional; missing means the automatic
+ * choice (by goal, by the block, or the old default), so older profiles load unchanged.
+ */
+export interface TrainingPrefs {
+  /** Default rest in seconds for compound lifts and for isolation work. */
+  rest?: { compound?: number; isolation?: number };
+  /** Preferred rep ranges for compound lifts and for isolation work. */
+  reps?: { compound?: [number, number]; isolation?: [number, number] };
+  /** Working sets per exercise. Missing is automatic (3, 4 on the first big lifts, more when time allows). */
+  sets?: number;
+  /** Per-exercise overrides, keyed by exercise id. They win over everything above. */
+  exercises?: Record<string, ExercisePrefs>;
+  effort?: EffortScale;
+  /** Start the rest timer by itself after Log set. Missing means on. */
+  autoRest?: boolean;
+  /** Missing means it follows Sounds and Vibration. */
+  restAlert?: RestAlert;
+  /** Keep the screen on during a workout. Missing means on. */
+  keepAwake?: boolean;
+  /** Exercises the planner picks first when they fit. */
+  favourites?: string[];
+  /** Muscles that get more weekly sets and go first in the plan. */
+  priorities?: Muscle[];
+  /** Default workout length (minutes) the slider goes back to each day. Missing means it stays where it was left. */
+  minutes?: number;
+  /** 1 Monday (default) or 0 Sunday: streaks, quests and weekly stats. */
+  weekStart?: 0 | 1;
 }
 
 export type PlanSource =

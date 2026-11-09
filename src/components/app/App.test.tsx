@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Integration test: the whole app from first run to a finished workout, through the real store
 // and IndexedDB (fake-indexeddb), the way a lifter uses it.
-import { act, cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useApp } from "@/lib/store";
@@ -100,6 +100,30 @@ describe("first run to finished workout", () => {
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     const set = useApp.getState().events.find((e) => e.type === "set")!;
     expect(set.type === "set" && set.reps).toBe(before.reps + 1);
+  });
+
+  it("one-handed controls dock the bumps beside Log set, and holding a bump keeps stepping", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    act(() => useApp.getState().setProfile({ a11y: { hand: "left" } }));
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    const dock = screen.getByRole("group", { name: "Adjust this set" });
+    // Only the docked buttons, so a screen reader doesn't hear each control twice.
+    expect(screen.getAllByRole("button", { name: "More reps" })).toHaveLength(1);
+    expect(dock.parentElement!.className).toContain("flex-row-reverse");
+    const more = within(dock).getByRole("button", { name: "More reps" });
+    const start = useApp.getState().active!.reps;
+    fireEvent.click(more); // keyboard or screen reader: one step
+    expect(useApp.getState().active!.reps).toBe(start + 1);
+    fireEvent.pointerDown(more, { button: 0 });
+    await act(() => new Promise((r) => setTimeout(r, 900)));
+    fireEvent.pointerUp(more);
+    const held = useApp.getState().active!.reps;
+    expect(held).toBeGreaterThanOrEqual(start + 4);
+    await act(() => new Promise((r) => setTimeout(r, 500)));
+    expect(useApp.getState().active!.reps).toBe(held); // stops on release
   });
 
   it("swaps an exercise for one that hits the same muscles", async () => {

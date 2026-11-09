@@ -1,17 +1,17 @@
 "use client";
 // Tools: calculators that use what the app already knows. First up, TDEE (tdee.ts), kept current from
 // weigh-ins, birthday, height, body fat and training days, with a history graph.
-import { Bump, TdeeChart, TdeeResults } from "@/components/Tdee";
+import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { connectHealth, healthAvailable, readBody } from "@/lib/health";
 import { useApp } from "@/lib/store";
-import { ACTIVITIES, ACTIVITY, currentTdee, tdeeHistory, tdeeLog, type Activity } from "@/lib/tdee";
+import { ACTIVITIES, ACTIVITY, currentKg, currentTdee, tdeeHistory, tdeeLog, type Activity } from "@/lib/tdee";
 import type { TdeeEvent, Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { track } from "@/lib/analytics";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { go } from "./router";
-import { Button, Chip, Section } from "./ui";
+import { BumpField, Button, Chip, Section } from "./ui";
 import { Icon } from "./icons";
 
 // Screen text in one place (i18n).
@@ -33,6 +33,9 @@ const T = {
   height: "Height",
   weight: "Weight",
   weightNote: "Saved as today's weigh-in. Hold + or − to go faster.",
+  optional: "Your age",
+  heightCm: "Height (cm)",
+  heightIn: "Height (in)",
   set: "Tap + or −",
   off: "Off",
   on: "On",
@@ -81,7 +84,6 @@ function ToolsHub() {
   );
 }
 
-const clamp = (n: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, n));
 
 function TdeeScreen() {
   const { events, stats, profile, setProfile, logBodyweight } = useApp();
@@ -90,8 +92,15 @@ function TdeeScreen() {
   const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
   const history = useMemo(() => tdeeHistory(events), [events]);
   const log = useMemo(() => tdeeLog(events), [events]);
-  // Weight is bumped on screen and saved as one weigh-in a moment after the last tap.
-  const [kg, setKg] = useState(cur.inputs.kg ?? profile.bodyweight);
+  // Number boxes use the shared BumpField (− box +, hold to repeat, typing still works). Each box keeps its
+  // own text; a valid value goes to the profile straight away, and weight becomes one weigh-in 1.5 s
+  // after the last change, so holding + doesn't log dozens.
+  const imperial = unit === "lb";
+  const [age, setAge] = useState(cur.inputs.age !== undefined ? String(cur.inputs.age) : "");
+  const [height, setHeight] = useState(profile.heightCm ? String(imperial ? Math.round(profile.heightCm / 2.54) : Math.round(profile.heightCm)) : "");
+  const [weight, setWeight] = useState(fmtNum(Math.round(fromKg(cur.inputs.kg ?? profile.bodyweight, unit) * 10) / 10));
+  const fat = profile.bodyFat?.pct;
+  const [fatText, setFatText] = useState(fat !== undefined ? fmtNum(fat) : "");
   const save = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   useEffect(() => () => clearTimeout(save.current), []);
   const [canHealth, setCanHealth] = useState(false);
@@ -107,43 +116,36 @@ function TdeeScreen() {
     if (!(await connectHealth())) return setHealthNote(T.healthNone);
     const r = await readBody();
     useApp.getState().applyHealthBody(r);
-    if (r.weight) setKg((kgRef.current = Math.round(r.weight.value * 10) / 10));
+    const p = useApp.getState().profile;
+    if (r.weight) setWeight(fmtNum(Math.round(fromKg(r.weight.value, unit) * 10) / 10));
+    if (p.heightCm) setHeight(String(imperial ? Math.round(p.heightCm / 2.54) : Math.round(p.heightCm)));
+    if (p.bodyFat) setFatText(fmtNum(p.bodyFat.pct));
     setHealthNote(T.healthDone);
   };
 
-  const kgRef = useRef(kg);
-  const bumpKg = (dir: 1 | -1, big: boolean) => {
-    // 0.1 kg or 0.2 lb a tap (1 kg / 2 lb when held). Saved as one weigh-in 1.5 s after the last tap.
-    const step = (unit === "kg" ? 0.1 : toKg(0.2, "lb")) * (big ? 10 : 1);
-    const next = Math.round(clamp(kgRef.current + dir * step, 25, 350) * 100) / 100;
-    kgRef.current = next;
-    setKg(next);
+  const onAge = (v: string) => {
+    setAge(v);
+    const n = Number(v);
+    if (n >= 13 && n <= 100) setProfile({ birthYear: new Date(now).getFullYear() - n });
+  };
+  const onHeight = (v: string) => {
+    setHeight(v);
+    const cm = Number(v) * (imperial ? 2.54 : 1);
+    if (cm >= 100 && cm <= 250) setProfile({ heightCm: Math.round(cm * 10) / 10 });
+  };
+  const onWeight = (v: string) => {
+    setWeight(v);
     clearTimeout(save.current);
+    const kg = Math.round(toKg(Number(v), unit) * 10) / 10;
+    if (!(kg >= 25 && kg <= 350)) return;
     save.current = setTimeout(() => {
-      const v = Math.round(next * 10) / 10;
-      if (Math.abs(v - latest().bodyweight) >= 0.05) logBodyweight(v);
+      if (Math.abs(kg - currentKg(useApp.getState().events, useApp.getState().profile)) >= 0.05) logBodyweight(kg);
     }, 1500);
   };
-  // Holding a button repeats from a timer, so each step reads the latest profile, not this render's.
-  const latest = () => useApp.getState().profile;
-  const age = cur.inputs.age;
-  const bumpAge = (dir: 1 | -1) => {
-    const by = latest().birthYear;
-    const was = by ? new Date(now).getFullYear() - by : 30 - dir;
-    setProfile({ birthYear: new Date(now).getFullYear() - clamp(was + dir, 13, 100) });
-  };
-  const bumpHeight = (dir: 1 | -1, big: boolean) => {
-    // 1 cm or 1 inch a tap (5 when held).
-    const p = latest();
-    const step = (unit === "kg" ? 1 : 2.54) * (big ? 5 : 1);
-    const base = p.heightCm ?? (p.sex === "female" ? 163 : p.sex === "male" ? 177 : 170) - dir * step;
-    setProfile({ heightCm: Math.round(clamp(base + dir * step, 100, 250) * 10) / 10 });
-  };
-  const fat = profile.bodyFat?.pct;
-  const bumpFat = (dir: 1 | -1, big: boolean) => {
-    const p = latest();
-    const was = p.bodyFat?.pct ?? 20 - dir * 0.5;
-    setProfile({ bodyFat: { pct: clamp(Math.round((was + dir * (big ? 2 : 0.5)) * 2) / 2, 3, 60), at: Date.now() }, tdee: { ...p.tdee, useBodyFat: true } });
+  const onFat = (v: string) => {
+    setFatText(v);
+    const n = Number(v);
+    if (v && n >= 3 && n <= 60) setProfile({ bodyFat: { pct: n, at: Date.now() }, tdee: { ...useApp.getState().profile.tdee, useBodyFat: true } });
   };
   const setActivity = (a: Activity | undefined) => setProfile({ tdee: { ...profile.tdee, activity: a } });
   const a = cur.activity;
@@ -170,10 +172,16 @@ function TdeeScreen() {
               <Chip active={profile.sex === "male"} onClick={() => setProfile({ sex: "male" })}>{T.male}</Chip>
             </div>
           </div>
-          <Bump id="tdee-age" label={T.age} value={age !== undefined ? String(age) : T.set} onStep={(d) => bumpAge(d)} />
-          <Bump id="tdee-height" label={T.height} value={profile.heightCm ? heightText(profile.heightCm, unit) : T.set} onStep={bumpHeight} />
+          <Row id="tdee-age" label={T.age}>
+            <BumpField id="tdee-age" label={T.age.toLowerCase()} value={age} onChange={onAge} step={1} start={30} min={13} max={100} placeholder={T.optional} />
+          </Row>
+          <Row id="tdee-height" label={imperial ? T.heightIn : T.heightCm}>
+            <BumpField id="tdee-height" label={T.height.toLowerCase()} value={height} onChange={onHeight} step={1} start={imperial ? (profile.sex === "female" ? 64 : 70) : profile.sex === "female" ? 163 : 177} min={imperial ? 40 : 100} max={imperial ? 98 : 250} />
+          </Row>
           <div>
-            <Bump id="tdee-weight" label={T.weight} value={`${fmtNum(Math.round(fromKg(kg, unit) * 10) / 10)} ${unit}`} onStep={bumpKg} />
+            <Row id="tdee-weight" label={`${T.weight} (${unit})`}>
+              <BumpField id="tdee-weight" label={T.weight.toLowerCase()} value={weight} onChange={onWeight} step={imperial ? 0.5 : 0.1} start={Math.round(fromKg(profile.bodyweight, unit))} min={imperial ? 55 : 25} max={imperial ? 770 : 350} />
+            </Row>
             <p className="mt-1 text-xs text-faint">{T.weightNote}</p>
           </div>
           <div>
@@ -181,10 +189,16 @@ function TdeeScreen() {
               <span className="font-semibold" id="tdee-fat-on">{T.bodyFat}</span>
               <div className="flex gap-2" role="group" aria-labelledby="tdee-fat-on">
                 <Chip active={!useFat} onClick={() => setProfile({ tdee: { ...profile.tdee, useBodyFat: false } })}>{T.off}</Chip>
-                <Chip active={useFat} onClick={() => (fat === undefined ? bumpFat(1, false) : setProfile({ tdee: { ...profile.tdee, useBodyFat: true } }))}>{T.on}</Chip>
+                <Chip active={useFat} onClick={() => (fat === undefined ? onFat(profile.sex === "female" ? "25" : "18") : setProfile({ tdee: { ...profile.tdee, useBodyFat: true } }))}>{T.on}</Chip>
               </div>
             </div>
-            {useFat && <div className="mt-3"><Bump id="tdee-fat" label={T.bodyFatPct} value={`${fmtNum(fat!)}%`} onStep={bumpFat} /></div>}
+            {useFat && (
+              <div className="mt-3">
+                <Row id="tdee-fat" label={T.bodyFatPct}>
+                  <BumpField id="tdee-fat" label="body fat" value={fatText} onChange={onFat} step={0.5} start={20} min={3} max={60} />
+                </Row>
+              </div>
+            )}
             <p className="mt-1 text-xs text-faint">{T.bodyFatNote}</p>
           </div>
         </div>
@@ -225,11 +239,15 @@ function TdeeScreen() {
   );
 }
 
-export function heightText(cm: number, unit: Unit): string {
-  if (unit === "kg") return `${Math.round(cm)} cm`;
-  const inches = Math.round(cm / 2.54);
-  return `${Math.floor(inches / 12)}′ ${inches % 12}″`;
+function Row({ id, label, children }: { id: string; label: string; children: ReactNode }) {
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <label htmlFor={id} className="shrink-0 font-semibold">{label}</label>
+      <div className="w-48 max-w-[60%]">{children}</div>
+    </div>
+  );
 }
+
 
 /** Why a snapshot was recorded, in words. */
 export function whyText(e: TdeeEvent, prev: TdeeEvent | undefined, unit: Unit): string {

@@ -13,18 +13,17 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe("Tools › TDEE", () => {
-  it("asks for what's missing, filled in with bump buttons only, then shows TDEE", async () => {
+  it("asks for what's missing, filled in with bump buttons, then shows TDEE", async () => {
     const user = userEvent.setup();
     render(<Tools arg="tdee" />);
     expect(screen.getByText("Add your sex, age and height to see your TDEE.")).toBeInTheDocument();
-    expect(screen.queryByRole("textbox")).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "Male" }));
     await user.click(screen.getByRole("button", { name: "More age" }));
     await user.click(screen.getByRole("button", { name: "More height" }));
     // The first tap lands on a typical value (30, and 177 cm for a man), not one step past it.
-    expect(screen.getByText("30")).toBeInTheDocument();
-    expect(screen.getByText("177 cm")).toBeInTheDocument();
+    expect(screen.getByLabelText("Age")).toHaveValue("30");
+    expect(screen.getByLabelText("Height (cm)")).toHaveValue("177");
     // Mifflin: 10×80 + 6.25×177 − 5×30 + 5 = 1761 BMR; ×1.55 (3 days a week goal) = 2730.
     expect(screen.getByTestId("tdee-value")).toHaveTextContent("2,730");
     expect(screen.getByText(/From your goal of 3 days a week/)).toBeInTheDocument();

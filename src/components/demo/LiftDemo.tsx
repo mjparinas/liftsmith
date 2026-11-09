@@ -156,6 +156,8 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
           <canvas
             key={mode}
             ref={canvasRef}
+            // A canvas drawn as a labelled picture; the rule counts every canvas as interactive.
+            // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role
             role="img"
             aria-label={alt}
             className="absolute inset-0 block h-full w-full"
@@ -164,15 +166,15 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
           />
         )}
         {(mode === "none" || failed) && <div className="absolute inset-0 grid place-items-center p-4 text-center text-sm text-muted">{name}</div>}
-        <div className="pointer-events-none absolute inset-x-3 top-2 flex justify-between gap-2 font-mono text-[11px] uppercase tracking-wider text-muted">
+        <div className="pointer-events-none absolute inset-x-3 top-2 flex justify-between gap-2 font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
           <span className="truncate">{label ?? (controls ? VIEWS.find((v) => v[0] === view)?.[1] : "")}</span>
           <span ref={phaseRef} className="shrink-0 text-[#5cc8ff]" aria-hidden />
         </div>
         {!!bpm && (
-          <span className="pointer-events-none absolute bottom-2 left-3 font-mono text-[11px] tabular-nums text-[#ff6b84]" aria-label={`Heart rate ${bpm}`}>♥ {bpm}</span>
+          <span className="pointer-events-none absolute bottom-2 left-3 font-mono text-[0.6875rem] tabular-nums text-[#ff6b84]" aria-label={`Heart rate ${bpm}`}>♥ {bpm}</span>
         )}
         {controls && (
-          <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[11px] uppercase tracking-wider text-muted">
+          <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
             <span>{bpm ? "" : "Drag to rotate"}</span>
             <span>{body === "male" ? "Male" : "Female"}{mode === "2d" ? " · 2D" : ""}</span>
           </div>
@@ -193,9 +195,9 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
           </div>
           {ex && (
             <p className="flex flex-wrap items-center gap-1.5 text-sm">
-              <span className="font-mono text-[11px] uppercase tracking-wider text-muted">Works</span>
-              {ex.primary.map((m) => <span key={m} className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[13px] text-[#ffb3a3]">{MUSCLE_LABEL[m]}</span>)}
-              {ex.secondary.map((m) => <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[13px] text-muted">{MUSCLE_LABEL[m]}</span>)}
+              <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">Works</span>
+              {ex.primary.map((m) => <span key={m} className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[0.8125rem] text-[#ffb3a3]">{MUSCLE_LABEL[m]}</span>)}
+              {ex.secondary.map((m) => <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[0.8125rem] text-muted">{MUSCLE_LABEL[m]}</span>)}
             </p>
           )}
         </div>
