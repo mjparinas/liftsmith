@@ -9,6 +9,7 @@ import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types
 import { fmtNum } from "@/lib/units";
 import { useState } from "react";
 import { Button, Chip, Section, Sheet } from "./ui";
+import { BuyNext } from "./BuyNext";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -117,6 +118,8 @@ export function Gym() {
           {gym.dumbbells.length ? `${fmtNum(gym.dumbbells[0])} to ${fmtNum(gym.dumbbells.at(-1)!)} ${gym.unit}, ${gym.dumbbells.length} pairs` : "None"}
         </div>
       </Section>
+
+      <BuyNext gym={gym} />
 
       {gyms.length > 1 && <Button kind="danger" className="mt-6 w-full" onClick={() => removeGym(gym.id)}>Remove this gym</Button>}
 

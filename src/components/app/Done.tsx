@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
+import { ShareWorkout } from "./Remix";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -74,6 +75,7 @@ export function Done() {
         <p className="font-semibold">🔥 {streak.weeks > 0 ? `${streak.weeks}-week streak` : "Streak starts this week"}</p>
         <p className="text-sm text-muted">{streak.needed > 0 ? `${streak.needed} more workout${streak.needed > 1 ? "s" : ""} this week to ${streak.weeks > 0 ? "keep it going" : "start your streak"}.` : "This week's goal is done. Rest well."}</p>
       </div>
+      <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-6 w-full py-4 text-lg" onClick={() => go("today")}>Done</Button>
     </div>
   );

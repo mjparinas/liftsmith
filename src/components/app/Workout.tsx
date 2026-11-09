@@ -11,6 +11,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { can } from "@/lib/entitlements";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -18,6 +19,7 @@ import { useEffect, useRef, useState } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Ring, Sheet, Stepper } from "./ui";
+import { MachineSettings, ReplanSheet, WhySheet } from "./WorkoutExtras";
 
 let hrConn: HrConnection | null = null;
 
@@ -29,6 +31,8 @@ export function Workout() {
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
+  const [whyOpen, setWhyOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
   const [popKey, setPopKey] = useState(0);
   const restRef = useRef<number | null>(null);
@@ -171,10 +175,12 @@ export function Workout() {
                 <h1 className="mt-0.5 text-[26px] font-bold leading-tight">{ex.name}</h1>
               </div>
               <div className="flex shrink-0 gap-2">
+                {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line bg-surface text-muted" aria-label="Change the plan">⏱</button>}
                 <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line bg-surface text-muted" aria-label="How to do it">i</button>
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line bg-surface text-muted" aria-label="Swap exercise">⇄</button>
               </div>
             </div>
+            <MachineSettings exerciseId={ex.id} gym={gym} />
             <div className="mt-2 flex gap-1.5">
               {Array.from({ length: item.sets }, (_, i) => (
                 <span key={i} className={`h-2 w-8 rounded-full ${i < doneSets ? "bg-good" : i === doneSets ? "bg-accent" : "bg-line"}`} />
@@ -217,7 +223,9 @@ export function Workout() {
               {item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
+                <button type="button" onClick={() => setWhyOpen(true)} className="press mx-auto mt-3 block min-h-11 text-center text-sm text-muted">
+                  Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note} <span className="text-accent underline underline-offset-2">Why?</span>
+                </button>
               )}
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">
@@ -278,6 +286,8 @@ export function Workout() {
           </div>
         )}
       </Sheet>
+      <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
+      <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
       <Sheet open={endOpen} onClose={() => setEndOpen(false)} title="End workout?">
         <div className="space-y-3">
           <Button className="w-full" onClick={end}>Finish and save</Button>

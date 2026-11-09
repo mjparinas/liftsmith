@@ -7,6 +7,7 @@ import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { ago, clock } from "./format";
 import { Section } from "./ui";
+import { GoalsCard, PlateausCard } from "./Coach";
 
 function Spark({ points }: { points: number[] }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">Needs two sessions</div>;
@@ -59,6 +60,9 @@ export function Stats() {
           </div>
         ))}
       </div>
+
+      <GoalsCard />
+      <PlateausCard />
 
       <Section title="Sets per muscle this week">
         <div className="card p-4">
