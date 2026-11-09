@@ -1,0 +1,146 @@
+name: Release
+
+# Store builds. Runs when staging is promoted to main, or by hand. Android goes to the Play internal
+# track and iOS to TestFlight; promoting further (closed, open, production) stays a human step in the
+# store consoles. Each platform job skips itself until its secrets exist (see AGENTS.md, CI/CD).
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  web:
+    name: Web build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: npm run build
+      - id: v
+        run: echo "version=$(node -p "require('./package.json').version")" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-build
+          path: out
+          retention-days: 3
+
+  android:
+    name: Android · Play internal track
+    needs: web
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE_B64 != '' }}
+      HAS_PLAY: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON != '' }}
+    steps:
+      - if: env.HAS_KEY != 'true'
+        run: echo "::notice::ANDROID_KEYSTORE_B64 is not set, so the Android release is skipped."
+      - uses: actions/checkout@v7
+        if: env.HAS_KEY == 'true'
+      - uses: ./.github/actions/setup
+        if: env.HAS_KEY == 'true'
+      - uses: actions/download-artifact@v8
+        if: env.HAS_KEY == 'true'
+        with:
+          name: web-build
+          path: out
+      - uses: actions/setup-java@v5
+        if: env.HAS_KEY == 'true'
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - if: env.HAS_KEY == 'true'
+        run: npx cap sync android
+      - name: Signed app bundle
+        if: env.HAS_KEY == 'true'
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          VERSION_CODE: ${{ github.run_number }}
+          VERSION_NAME: ${{ needs.web.outputs.version }}
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 -d > "$RUNNER_TEMP/upload.jks"
+          ANDROID_KEYSTORE_PATH="$RUNNER_TEMP/upload.jks" ./gradlew bundleRelease --no-daemon
+      - uses: actions/upload-artifact@v7
+        if: env.HAS_KEY == 'true'
+        with:
+          name: liftsmith-release-aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 30
+      - name: Upload to Play (internal)
+        if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.liftsmith.app
+          releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+
+  ios:
+    name: iOS · TestFlight
+    needs: web
+    runs-on: macos-latest
+    timeout-minutes: 45
+    env:
+      HAS_ASC: ${{ secrets.ASC_KEY_P8 != '' && secrets.APPLE_TEAM_ID != '' }}
+    steps:
+      - if: env.HAS_ASC != 'true'
+        run: echo "::notice::ASC_KEY_P8 or APPLE_TEAM_ID is not set, so the iOS release is skipped."
+      - uses: actions/checkout@v7
+        if: env.HAS_ASC == 'true'
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: env.HAS_ASC == 'true'
+        with:
+          xcode-version: latest-stable
+      - uses: ./.github/actions/setup
+        if: env.HAS_ASC == 'true'
+      - uses: actions/download-artifact@v8
+        if: env.HAS_ASC == 'true'
+        with:
+          name: web-build
+          path: out
+      - if: env.HAS_ASC == 'true'
+        run: npx cap sync ios
+      - name: Archive and upload
+        if: env.HAS_ASC == 'true'
+        env:
+          ASC_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          ASC_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+          TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          KEY="$RUNNER_TEMP/AuthKey_$ASC_KEY_ID.p8"
+          echo "${{ secrets.ASC_KEY_P8 }}" > "$KEY"
+          AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Release \
+            -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Liftsmith.xcarchive" \
+            DEVELOPMENT_TEAM="$TEAM_ID" CODE_SIGN_STYLE=Automatic \
+            MARKETING_VERSION="${{ needs.web.outputs.version }}" CURRENT_PROJECT_VERSION="${{ github.run_number }}" \
+            "${AUTH[@]}" archive
+          cat > "$RUNNER_TEMP/export.plist" <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>upload</string>
+            <key>teamID</key><string>$TEAM_ID</string>
+            <key>signingStyle</key><string>automatic</string>
+          </dict></plist>
+          PLIST
+          xcodebuild -exportArchive -archivePath "$RUNNER_TEMP/Liftsmith.xcarchive" \
+            -exportOptionsPlist "$RUNNER_TEMP/export.plist" -exportPath "$RUNNER_TEMP/export" "${AUTH[@]}"

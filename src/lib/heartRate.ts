@@ -1,8 +1,12 @@
 "use client";
 // Live heart rate from any Bluetooth heart rate broadcaster (standard Heart Rate Service 0x180D):
 // Fitbit Charge 6 and Pixel Watch "share heart rate", Polar, Garmin, Wahoo, Coros straps.
-// The web build uses Web Bluetooth (Chrome on Android); the native shell will use the
-// Capacitor BLE plugin so it keeps reading with the screen off.
+// The web build uses Web Bluetooth (Chrome on Android). The native shells (Android and iOS) use the
+// Capacitor BLE plugin, which keeps reading with the screen off.
+import { isNative } from "./juice";
+
+const HR_SERVICE = "0000180d-0000-1000-8000-00805f9b34fb";
+const HR_MEASUREMENT = "00002a37-0000-1000-8000-00805f9b34fb";
 
 export function parseHeartRate(view: DataView): number {
   const flags = view.getUint8(0);
@@ -23,10 +27,20 @@ type BT = {
 };
 
 export function hrSupported(): boolean {
-  return typeof navigator !== "undefined" && "bluetooth" in navigator;
+  return isNative() || (typeof navigator !== "undefined" && "bluetooth" in navigator);
+}
+
+async function connectNative(onBpm: (bpm: number) => void, onGone: () => void): Promise<HrConnection> {
+  const { BleClient } = await import("@capacitor-community/bluetooth-le");
+  await BleClient.initialize({ androidNeverForLocation: true });
+  const device = await BleClient.requestDevice({ services: [HR_SERVICE] });
+  await BleClient.connect(device.deviceId, onGone);
+  await BleClient.startNotifications(device.deviceId, HR_SERVICE, HR_MEASUREMENT, (v) => onBpm(parseHeartRate(v)));
+  return { name: device.name ?? "Heart rate monitor", disconnect: () => void BleClient.disconnect(device.deviceId) };
 }
 
 export async function connectHeartRate(onBpm: (bpm: number) => void, onGone: () => void): Promise<HrConnection> {
+  if (isNative()) return connectNative(onBpm, onGone);
   const bt = (navigator as unknown as { bluetooth: BT }).bluetooth;
   const device = await bt.requestDevice({ filters: [{ services: ["heart_rate"] }] });
   const server = await device.gatt!.connect();

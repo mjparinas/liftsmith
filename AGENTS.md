@@ -24,9 +24,12 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ## Platform parity (rule, Melvin, 2026-11-09)
 
-- **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
+- **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
 - Platform equivalents: Health Connect ↔ HealthKit (Apple Health); foreground-service notification ↔ Live Activity (lock screen and Dynamic Island); Play Billing ↔ StoreKit; Sign in with Google ↔ Sign in with Apple (both offered on iOS); Wear OS ↔ Apple Watch.
-- CI builds both apps on every pull request that touches app code.
+- CI builds both apps on every pull request (`android` and `ios` jobs in `ci.yml`).
+- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) schedules a time-sensitive rest-over notification with the same two buttons. The iOS lock-screen countdown needs a Live Activity (a widget extension target), which is the next parity item. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
+- Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins).
+- Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
 
 ## Product decisions
 
@@ -64,7 +67,16 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ### Heart rate and health
 - **Live heart rate comes over Bluetooth**, not Health Connect, because Health Connect gets Fitbit data in batches, often minutes late. Any standard heart rate broadcaster works (Heart Rate Service 0x180D): Fitbit Charge 6 and Pixel Watch "share heart rate", Polar, Garmin, Wahoo straps (`heartRate.ts`).
-- **Health Connect** (Android) reads heart rate history and writes finished workouts and calories, so they show in Google's and Fitbit's apps. **Apple Health** (HealthKit) does the same on iOS.
+- **Health Connect** (Android) and **Apple Health** (iOS) go through one plugin, `@capgo/capacitor-health` (`src/lib/health.ts`). Reads (weight, height, body fat, resting HR, HRV, sleep, HR) prefill the wizard's body weight step ("Fill in from Health Connect / Apple Health"). Finished workouts are written as active calories (about 5 METs) and average HR, because the plugin can't write workout sessions yet. The Android Health Connect privacy rationale is `public/privacypolicy.html`.
+- Native heart rate uses `@capacitor-community/bluetooth-le` on both platforms (keeps reading with the screen off; iOS has the `bluetooth-central` background mode). The web build keeps Web Bluetooth.
+
+### Integrations roadmap (Melvin agreed, 2026-11-09; research: https://claude.ai/artifact/UoDvYPVgFxt8wwPuJJS7KH)
+1. **MVP:** Health Connect + HealthKit reads to prefill the wizard, plus writing finished workouts. Bluetooth 0x180D stays the only live heart rate path (straps, Garmin/Polar/Whoop broadcast, Fitbit Charge 6, Pixel Watch). The wizard's connect step offers Health access and heart rate pairing only.
+2. **Next: readiness.** An on-device readiness score from sleep, HRV and resting HR against a 30-day baseline, plus a pre-workout check-in (energy, soreness, feeling unwell). It feeds `generator.ts`/`block.ts` as a low/normal/high adjustment the lifter can override. **Readiness auto-adjust is a Pro feature.**
+3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link (saved or curated playlists). **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
+4. **With sync/server:** Strava upload (needs a Strava subscription; 10 athletes before review).
+5. **Later, on demand:** Oura and Whoop direct APIs (server side, 10-user caps; Oura needs written consent for a paid feature).
+- **Skipped:** Hume Health direct (no API; its data arrives through Apple Health), live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only, since iOS can't control other apps' volume, so it's skipped for platform parity).
 
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
@@ -117,7 +129,9 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - `.github/workflows/ci.yml` on every pull request and push to `main` and `staging`: types, lint (no warnings), dependency audit, unit and integration tests with coverage, build, then browser tests in three parallel jobs. **"CI passed"** is the one required check.
 - `mutation.yml`: weekly, on demand, and on pull requests that touch the engine.
 - `promote-staging.yml`: nightly, merges `staging` into `main` when CI passed on staging (copied from Gradelings).
-- `android.yml` and `ios.yml` (with the native shells): build both apps on pull requests; on demand, sign and upload to Play internal testing and TestFlight.
+- `ci.yml` also builds an Android debug APK (uploaded as an artifact to install and try) and an unsigned iOS simulator build on every pull request. Both are part of "CI passed".
+- `release.yml`: on every promotion to `main` and on demand, builds a signed Android App Bundle and uploads it to the Play **internal** track, and archives iOS and uploads it to **TestFlight**. Version name comes from `package.json`, build number from the run number. Each platform skips itself with a notice until its secrets exist. Promoting past internal testing stays a human step in the store consoles.
+- Secrets: `ANDROID_KEYSTORE_B64` (base64 upload keystore, alias `upload`), `ANDROID_KEYSTORE_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`, `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8` (App Store Connect API key, App Manager role). The first Android upload must be done by hand in Play Console before the API can upload.
 - Web deploys through Vercel's Git integration: `main` is production, `staging` and pull requests get previews.
 - Dependabot targets `staging`, weekly.
 
@@ -143,5 +157,5 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 
 ## Open items
 - Confirm the Android package id and register a domain.
-- A GitHub repo for the project (cloud sessions can't create repos; Melvin to create one).
-- Play Console account, Health Connect permissions declaration, privacy policy page.
+- Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
+- iOS Live Activity for the lock-screen rest countdown (widget extension), to match Android.

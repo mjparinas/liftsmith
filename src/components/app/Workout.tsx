@@ -4,11 +4,12 @@ import { PlateBar } from "@/components/PlateBar";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { saveWorkout } from "@/lib/health";
 import { haptic, keepAwake, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
-import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { notifyPermission, onSessionAction, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -38,6 +39,16 @@ export function Workout() {
     sound.enabled = profile.restSounds;
     return () => void keepAwake(false);
   }, [profile.restSounds]);
+
+  // Buttons on the native lock-screen notification.
+  useEffect(
+    () =>
+      onSessionAction((a) => {
+        if (a === "log") useApp.getState().logSet();
+        else useApp.getState().addRest(30);
+      }),
+    [],
+  );
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -77,6 +88,7 @@ export function Workout() {
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
+      sound: profile.restSounds,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -101,7 +113,9 @@ export function Workout() {
   };
 
   const end = () => {
-    s.finish();
+    const startedAt = active.startedAt;
+    const ev = s.finish();
+    if (ev?.type === "sessionEnd") void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
     void stopSession();
     hrConn?.disconnect();
     hrConn = null;

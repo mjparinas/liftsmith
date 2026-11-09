@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Liftsmith</string>
+    <string name="title_activity_main">Liftsmith</string>
+    <string name="package_name">com.liftsmith.app</string>
+    <string name="custom_url_scheme">com.liftsmith.app</string>
+</resources>

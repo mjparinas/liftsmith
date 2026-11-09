@@ -12,3 +12,4 @@ reports/
 .stryker-tmp/
 coverage/
 e2e-shots/
+/build
