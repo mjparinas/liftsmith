@@ -5,14 +5,14 @@ import { derive, type Stats } from "./derive";
 import { generate, type Plan, type PlanItem } from "./generator";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
-import { exercise } from "./exercises";
+import { exercise, registerCustom } from "./exercises";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
 import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
 import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, Gym, Profile, Rating } from "./types";
+import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
@@ -77,6 +77,12 @@ interface State {
   setCall(c: Call | null): void;
   /** Log that a period started on this day (cycle-aware readiness). */
   logPeriod(day: number): void;
+  /** A note on an exercise (empty clears it for next time). */
+  addNote(exerciseId: string, text: string): void;
+  /** How many reps the lifter says they had left on a logged set. */
+  rateEffort(setId: string, rir: number): void;
+  /** Creates the lifter's own exercise and returns its id. */
+  addCustomExercise(e: { name: string; primary: Muscle; load: LoadKind; compound: boolean }): string;
   /** Turn cycle-aware readiness off and erase every logged period. */
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
@@ -141,6 +147,7 @@ function setsDone(events: AppEvent[], sessionId: string, exerciseId: string): nu
 
 export const useApp = create<State>((set, get) => {
   const commit = (evs: AppEvent[]) => {
+    registerCustom(evs);
     const events = [...get().events, ...evs];
     set({ events, stats: derive(events, Date.now()) });
     void appendEvents(evs);
@@ -168,6 +175,22 @@ export const useApp = create<State>((set, get) => {
     callOverride: null,
     pickedByLocation: null,
     links: [],
+
+    addNote(exerciseId, text) {
+      const a = get().active;
+      commit([{ type: "note", id: uid(), at: Date.now(), sessionId: a?.sessionId ?? "", exerciseId, text: text.trim().slice(0, 500) }]);
+    },
+
+    rateEffort(setId, rir) {
+      if (get().events.some((e) => e.type === "effort" && e.setId === setId)) return;
+      commit([{ type: "effort", id: uid(), at: Date.now(), setId, rir: Math.max(0, Math.min(4, Math.round(rir))) }]);
+    },
+
+    addCustomExercise({ name, primary, load, compound }) {
+      const id = `custom-${uid().slice(0, 12)}`;
+      commit([{ type: "customExercise", id: uid(), at: Date.now(), exercise: { id, name: name.trim().slice(0, 60) || "My exercise", primary: [primary], secondary: [], load, compound } }]);
+      return id;
+    },
 
     logPeriod(day) {
       if (get().events.some((e) => e.type === "cycle" && e.day === day)) return;

@@ -15,7 +15,7 @@ import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { useApp, warmingUp } from "@/lib/store";
-import { MUSCLE_LABEL } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
@@ -57,6 +57,13 @@ export function Workout() {
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
   const finished = !!active && active.index >= active.plan.items.length;
+  // The latest note on this exercise (from any workout), and the set just logged, for the optional
+  // reps-left rating during rest.
+  const noteEv = ex ? [...events].reverse().find((e) => e.type === "note" && e.exerciseId === ex.id) : undefined;
+  const note = noteEv?.type === "note" ? noteEv.text : "";
+  const lastEv = active ? [...events].reverse().find((e) => e.type === "set" && e.sessionId === active.sessionId) : undefined;
+  const lastSet = lastEv?.type === "set" && active && active.lastAt - lastEv.at < 5000 ? lastEv : undefined;
+  const rated = !!lastSet && events.some((e) => e.type === "effort" && e.setId === lastSet.id);
   const warming = !!active && warmingUp(active);
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
@@ -206,6 +213,7 @@ export function Workout() {
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[28px] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
+                {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
                 <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label="How to do it"><Icon name="info" size={20} /></button>
@@ -240,6 +248,7 @@ export function Workout() {
                 <Button kind="ghost" icon="chevronRight" onClick={() => s.skipRest()}>Skip rest</Button>
               </div>
               <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
+              {lastSet && !rated && <Effort target={lastSet.rir} onPick={(r) => { haptic("tick"); s.rateEffort(lastSet.id, r); }} />}
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               <div className="mt-5 w-full border-t border-line/70 pt-4">
                 <p className="text-center text-sm text-muted">Next up: <span className="font-semibold text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
@@ -329,6 +338,7 @@ export function Workout() {
 
       <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={`Swap ${ex?.name ?? ""}`}>
         {ex && <SwapList fromId={ex.id} gymEquipment={gym} skip={active.plan.items.map((i) => i.exerciseId)} onPick={(id, avoid) => { s.swap(id, avoid); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
+        {ex && <CustomExercise muscle={ex.primary[0]} onCreate={(c) => { const id = s.addCustomExercise(c); s.swap(id, false); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
       </Sheet>
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
@@ -340,6 +350,7 @@ export function Workout() {
                 <li key={c} className="flex gap-3"><span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent">{i + 1}</span>{c}</li>
               ))}
             </ol>
+            <NoteEditor key={ex.id + note} initial={note} onSave={(t) => { s.addNote(ex.id, t); setInfoOpen(false); }} />
           </div>
         )}
       </Sheet>
@@ -391,5 +402,64 @@ function SwapList({ fromId, gymEquipment, skip, onPick }: { fromId: string; gymE
         {!list.length && <li className="py-3 text-muted">No other exercise for these muscles at this gym.</li>}
       </ul>
     </div>
+  );
+}
+
+/** Optional, during rest: how many more reps the lifter could have done on the set just logged. */
+function Effort({ target, onPick }: { target: number; onPick: (rir: number) => void }) {
+  return (
+    <div className="animate-rise mt-4 w-full text-center">
+      <p className="text-sm text-muted">Reps left in the tank on that set? (aim was {target})<Info term="rir" /></p>
+      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label="Reps left in the tank">
+        {[0, 1, 2, 3, 4].map((r) => (
+          <button key={r} type="button" onClick={() => onPick(r)} className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold">{r === 4 ? "4+" : r}</button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NoteEditor({ initial, onSave }: { initial: string; onSave: (text: string) => void }) {
+  const [text, setText] = useState(initial);
+  return (
+    <div className="border-t border-line pt-4">
+      <label htmlFor="ex-note" className="text-sm font-semibold">Your note</label>
+      <textarea id="ex-note" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={500} placeholder="Seat height 4, grip on the rings, left knee caves…" className="mt-1 w-full rounded-xl border border-line bg-raised p-3 text-sm" />
+      <p className="text-xs text-faint">Shows under this exercise every time you do it.</p>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => onSave(text)}>Save note</Button>
+    </div>
+  );
+}
+
+const LOADS: [LoadKind, string][] = [["barbell", "Barbell"], ["dumbbell", "Dumbbells"], ["machine", "Machine or cable"], ["kettlebell", "Kettlebell"], ["bodyweight", "Bodyweight"]];
+
+/** "Add your own exercise", at the bottom of the swap sheet. */
+function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { name: string; primary: Muscle; load: LoadKind; compound: boolean }) => void }) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+  const [primary, setPrimary] = useState<Muscle>(muscle);
+  const [load, setLoad] = useState<LoadKind>("machine");
+  const [compound, setCompound] = useState(false);
+  if (!open) return <Button kind="quiet" className="mt-3 w-full" onClick={() => setOpen(true)}>+ Add your own exercise</Button>;
+  return (
+    <form className="mt-4 space-y-3 border-t border-line pt-4" onSubmit={(e) => { e.preventDefault(); if (name.trim()) onCreate({ name, primary, load, compound }); }}>
+      <h3 className="font-semibold">Your own exercise</h3>
+      <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Name, e.g. Belt squat" aria-label="Exercise name" className="w-full rounded-xl border border-line bg-raised px-3 py-3" />
+      <label className="block text-sm">Main muscle
+        <select value={primary} onChange={(e) => setPrimary(e.target.value as Muscle)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
+          {MUSCLES.map((m) => <option key={m} value={m}>{MUSCLE_LABEL[m]}</option>)}
+        </select>
+      </label>
+      <label className="block text-sm">Equipment
+        <select value={load} onChange={(e) => setLoad(e.target.value as LoadKind)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
+          {LOADS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+        </select>
+      </label>
+      <label className="flex items-center gap-3 text-sm">
+        <input type="checkbox" checked={compound} onChange={(e) => setCompound(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
+        Works several muscles (a big lift)
+      </label>
+      <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">Add and use it now</button>
+    </form>
   );
 }

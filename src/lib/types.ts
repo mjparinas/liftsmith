@@ -134,6 +134,8 @@ export interface Exercise {
   start: number;
   setup: string;
   cues: string[];
+  /** The lifter made it. Used in swaps and logging, not picked by the generator. */
+  custom?: boolean;
 }
 
 export interface Bar {
@@ -401,4 +403,25 @@ export interface WarmupEvent extends EventBase {
   reps: number;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent;
+/** A note the lifter wrote on an exercise during a workout. The latest one shows next time. */
+export interface NoteEvent extends EventBase {
+  type: "note";
+  sessionId: string;
+  exerciseId: string;
+  text: string;
+}
+
+/** How a logged set actually felt: reps the lifter says they had left (0 = failure, 4 = four or more). */
+export interface EffortEvent extends EventBase {
+  type: "effort";
+  setId: string;
+  rir: number;
+}
+
+/** The lifter's own exercise (table stakes, 2026-11-09). Registered into the library on load. */
+export interface CustomExerciseEvent extends EventBase {
+  type: "customExercise";
+  exercise: Pick<Exercise, "id" | "name" | "primary" | "secondary" | "load" | "compound">;
+}
+
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent;
