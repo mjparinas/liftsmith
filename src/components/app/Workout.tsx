@@ -24,6 +24,8 @@ import { effortAim, effortChoices, restAlertOf, restLabel } from "@/lib/training
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
+import { cleanA11y } from "@/lib/a11y";
+import { t } from "@/lib/i18n";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
@@ -76,7 +78,7 @@ export function Workout() {
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
   const ssLabel = active && item ? supersetLabel(active.plan.items, active.index) : null;
-  const setLabel = warming ? `Warm-up ${warmDone + 1} of ${warmTotal}` : `Set ${Math.min(doneSets + 1, item?.sets ?? 1)} of ${item?.sets ?? 1}`;
+  const setLabel = warming ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal }) : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
   const voiceOn = !!profile.delight?.voice;
@@ -169,6 +171,15 @@ export function Workout() {
   };
 
   const unit = gym.unit;
+  // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
+  const hand = cleanA11y(profile.a11y).hand;
+  const docked = hand !== "off";
+  const weightStep = ex && gym && active
+    ? { label: t("workout.weight"), suffix: ex.load === "dumbbell" ? t("workout.each", { unit }) : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
+    : null;
+  const repStep = ex && active
+    ? { label: t("workout.reps"), suffix: TIMED.has(ex.id) ? t("workout.seconds") : t("workout.reps"), value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
@@ -176,13 +187,13 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className="pb-44">
+    <div className={docked ? "pb-56" : "pb-44"}>
       <PrMoment />
       <header className="flex items-center justify-between pt-1">
-        <button type="button" onClick={() => go("today")} className="press -ml-2 inline-flex min-h-11 items-center gap-0.5 rounded-full pl-1 pr-2 text-muted hover:text-ink"><Icon name="chevronLeft" size={20} />Today</button>
+        <button type="button" onClick={() => go("today")} className="press -ml-2 inline-flex min-h-11 items-center gap-0.5 rounded-full pl-1 pr-2 text-muted hover:text-ink"><Icon name="chevronLeft" size={20} />{t("nav.back.today")}</button>
         <div className="flex flex-col items-center leading-tight">
           <span className="display text-lg">{clock(elapsed)}</span>
-          <span className="num text-[11px] font-medium text-muted">{setsLogged}/{totalSets} sets</span>
+          <span className="num text-[0.6875rem] font-medium text-muted">{t("workout.setsDone", { done: setsLogged, total: totalSets })}</span>
         </div>
         <div className="flex items-center gap-2">
           {bpm ? (
@@ -192,7 +203,7 @@ export function Workout() {
           ) : hrSupported() ? (
             <button type="button" onClick={connectHr} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />Connect</button>
           ) : null}
-          <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line bg-surface px-4 text-sm font-semibold">End</button>
+          <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line bg-surface px-4 text-sm font-semibold">{t("workout.end")}</button>
         </div>
       </header>
 
@@ -222,12 +233,12 @@ export function Workout() {
               <div className="min-w-0">
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
-                <h1 className="mt-0.5 text-[28px] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
+                <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
                 {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
-                <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label="How to do it"><Icon name="info" size={20} /></button>
-                <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label="Swap exercise"><Icon name="swap" size={20} /></button>
+                <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.howToLabel")}><Icon name="info" size={20} /></button>
+                <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.swap")}><Icon name="swap" size={20} /></button>
               </div>
             </div>
             <div className="mt-2.5 flex items-center gap-1.5" aria-hidden>
@@ -242,27 +253,29 @@ export function Workout() {
 
           <div className="relative mt-4 h-52">
             <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
-            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">How to ›</button>
+            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
           </div>
 
+          {/* Screen readers hear the rest start, ten seconds left and rest over, not every second. */}
+          <p className="sr-only" aria-live="polite">{resting ? (left <= 10 ? t("workout.sr.tenLeft") : t("workout.sr.rest", { time: clock(active.restTotal) })) : events.some((e) => e.type === "set" && e.sessionId === active.sessionId) ? t("workout.sr.over", { load: loadText(ex, active.weight, profile.unit), reps: repsText(ex, active.reps) }) : ""}</p>
           {resting ? (
             <section className="card-tint animate-pop mt-5 flex flex-col items-center p-5" style={{ "--tint": HUE.cyan } as CSSProperties}>
               <Ring value={left / Math.max(1, active.restTotal)} from={HUE.cyan} to={HUE.accent} stroke={14}>
                 <div className="text-center">
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan">Rest</div>
-                  <div className={`display mt-1 text-[64px] ${left <= 3.5 ? "animate-pulse text-cyan" : ""}`}>{clock(left)}</div>
+                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan">{t("workout.rest")}</div>
+                  <div role="timer" aria-label={t("workout.restLeft", { time: clock(left) })} className={`display mt-1 text-[4rem] ${left <= 3.5 ? "animate-pulse text-cyan" : ""}`}>{clock(left)}</div>
                 </div>
               </Ring>
               <div className="mt-4 flex gap-3">
-                <Button kind="ghost" icon="plus" onClick={() => s.addRest(30)} label="+30 s">30 s</Button>
-                <Button kind="ghost" icon="chevronRight" onClick={() => s.skipRest()}>Skip rest</Button>
+                <Button kind="ghost" icon="plus" onClick={() => s.addRest(30)} label={t("workout.add30")}>30 s</Button>
+                <Button kind="ghost" icon="chevronRight" onClick={() => s.skipRest()}>{t("workout.skipRest")}</Button>
               </div>
               <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
               {lastSet && !rated && <Effort target={lastSet.rir} scale={scale} onPick={(r) => { haptic("tick"); s.rateEffort(lastSet.id, r); }} />}
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
               <div className="mt-5 w-full border-t border-line/70 pt-4">
-                <p className="text-center text-sm text-muted">Next up: <span className="font-semibold text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
+                <p className="text-center text-sm text-muted">{t("workout.nextUp")} <span className="font-semibold text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
                 {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} /></div>}
                 <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
                 <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
@@ -275,25 +288,17 @@ export function Workout() {
                 <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>Start rest · {restLabel(active.restReady)}</Button>
               ) : null}
               <div className="flex flex-col items-center gap-5">
-                {ex.load !== "bodyweight" && (
-                  <Stepper
-                    label="weight"
-                    suffix={ex.load === "dumbbell" ? `${unit} each` : unit}
-                    value={fmtNum(fromKg(active.weight, unit))}
-                    onDown={() => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps)}
-                    onUp={() => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps)}
-                  />
-                )}
+                {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
                 {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
                   // This gym's plates are in the other unit: show the weight in the lifter's unit too.
                   <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" ? " each" : ""}</p>
                 )}
-                <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
+                {repStep && <Stepper display={docked} {...repStep} />}
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
                   <p>Warm-up: easy, smooth reps<Info term="warmup" />. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
-                  <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
+                  <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">{t("workout.skipWarmup")}</button>
                 </div>
               ) : item.setTargets?.[doneSets]?.amrap ? (
                 <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Last set: as many good reps as you can, at least {item.setTargets[doneSets].reps}. Log what you got</p>
@@ -318,7 +323,7 @@ export function Workout() {
 
       {!finished && active.plan.items.length > active.index + 1 && (
         <section className="mt-6">
-          <h2 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">Coming up</h2>
+          <h2 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("workout.comingUp")}</h2>
           <ol className="card divide-y divide-line/70 overflow-hidden">
             {active.plan.items.slice(active.index + 1).map((it, i) => {
               const e = exercise(it.exerciseId);
@@ -328,7 +333,7 @@ export function Workout() {
                 <li key={it.exerciseId} className={`flex items-center gap-1 pr-2 ${ss ? "bg-accent/5" : ""}`}>
                   <button type="button" onClick={() => s.goTo(at)} className="press flex min-w-0 flex-1 items-center justify-between gap-3 py-3 pl-4 text-left">
                     <span className="flex min-w-0 flex-col">
-                      {ss && <span className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
+                      {ss && <span className="truncate text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
                       <span className="flex min-w-0 items-center gap-2.5 font-medium"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden /><span className="truncate">{e.name}</span></span>
                     </span>
                     <span className="num shrink-0 text-sm text-muted">{it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}</span>
@@ -344,15 +349,23 @@ export function Workout() {
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
           {finished ? (
-            <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>Finish workout</Button>
+            <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>{t("workout.finish")}</Button>
           ) : resting ? (
-            <Button kind="ghost" className="w-full py-5 text-xl" onClick={() => { s.skipRest(); log(); }}>Log set now</Button>
+            <Button kind="ghost" className="w-full py-5 text-xl" onClick={() => { s.skipRest(); log(); }}>{t("workout.logNow")}</Button>
           ) : (
-            <div className="relative">
-              {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
-              <Button className="relative w-full py-5 text-xl" onClick={log}>
-                {warming ? "Log warm-up" : "Log set"} <Icon name="check" size={24} strokeWidth={2.8} />
-              </Button>
+            <div className={docked ? `flex items-stretch gap-3 ${hand === "left" ? "flex-row-reverse" : ""}` : ""}>
+              {docked && repStep && (
+                <div className="card flex min-w-0 flex-1 flex-col justify-center gap-2 px-2 py-2" role="group" aria-label={t("workout.adjust")}>
+                  {ex?.load !== "bodyweight" && weightStep && <Stepper compact {...weightStep} />}
+                  <Stepper compact {...repStep} />
+                </div>
+              )}
+              <div className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>
+                {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
+                <Button className={`relative w-full text-xl ${docked ? "h-full min-h-28 flex-col" : "py-5"}`} onClick={log}>
+                  {warming ? t("workout.logWarmup") : t("workout.logSet")} <Icon name="check" size={24} strokeWidth={2.8} />
+                </Button>
+              </div>
             </div>
           )}
         </div>

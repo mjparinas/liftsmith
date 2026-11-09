@@ -47,7 +47,7 @@ export function Feedback() {
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">‹ Settings</button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">Send feedback</h1>
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">Send feedback</h1>
       <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label="Kind of feedback">
         {KINDS.map(([k, label]) => <Chip key={k} active={kind === k} onClick={() => setKind(k)}>{label}</Chip>)}
       </div>

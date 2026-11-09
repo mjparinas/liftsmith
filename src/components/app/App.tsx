@@ -1,4 +1,7 @@
 "use client";
+import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
+import { readPhoneLanguage, setLanguage, t, useLang } from "@/lib/i18n";
+import type { MessageKey } from "@/locales/en";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
@@ -30,13 +33,15 @@ import { Recap } from "./Recap";
 import { goalStreak } from "@/lib/game";
 import { useNow } from "@/lib/useNow";
 import { activeTheme, applyTheme } from "@/lib/themes";
+import { readHeight } from "@/lib/health";
+import { Tools } from "./Tools";
 
-const TABS: { route: Route; label: string; icon: IconName }[] = [
-  { route: "today", label: "Today", icon: "today" },
-  { route: "recovery", label: "Recovery", icon: "recovery" },
-  { route: "stats", label: "Progress", icon: "progress" },
-  { route: "achievements", label: "Awards", icon: "trophy" },
-  { route: "gym", label: "Gyms", icon: "gym" },
+const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
+  { route: "today", label: "tab.today", icon: "today" },
+  { route: "recovery", label: "tab.recovery", icon: "recovery" },
+  { route: "stats", label: "tab.progress", icon: "progress" },
+  { route: "achievements", label: "tab.awards", icon: "trophy" },
+  { route: "gym", label: "tab.gyms", icon: "gym" },
 ];
 
 export function App() {
@@ -55,8 +60,32 @@ export function App() {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Language (i18n.ts): the phone's language, read again on return in case it changed, or the
+  // one picked in Settings. useLang re-renders the whole app when it changes.
+  useLang();
+  const language = profile.language;
+  useEffect(() => {
+    setLanguage(language);
+    const reread = () => document.visibilityState === "visible" && void readPhoneLanguage();
+    reread();
+    document.addEventListener("visibilitychange", reread);
+    return () => document.removeEventListener("visibilitychange", reread);
+  }, [language]);
+  // Accessibility (a11y.ts): text size, colour-blind safe colours, contrast. The phone's own text
+  // size is read again when the app comes back, in case it was changed in the phone's settings.
+  const a11y = profile.a11y;
+  useEffect(() => {
+    applyA11y(a11y);
+    const reread = () => {
+      if (document.visibilityState === "visible") void readPhoneTextScale().then(() => applyA11y(a11y));
+    };
+    reread();
+    document.addEventListener("visibilitychange", reread);
+    return () => document.removeEventListener("visibilitychange", reread);
+  }, [a11y]);
   useEffect(() => {
     applyAppearance(savedAppearance());
+    applyA11y(savedA11y());
     installDiag();
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
@@ -151,6 +180,24 @@ export function App() {
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);
+  // TDEE tracking (tdee.ts): height from Health Connect or Apple Health on open (weigh-ins and body fat come
+  // in through the store's importHealthBody), then
+  // a snapshot whenever weight, age, height or training days change. Debounced, so typing a weight in
+  // Settings records the final value, not every keystroke.
+  useEffect(() => {
+    if (!ready) return;
+    void readHeight().then((r) => useApp.getState().applyHealthBody(r));
+    let t: ReturnType<typeof setTimeout> | undefined;
+    const unsub = useApp.subscribe((s, prev) => {
+      if (s.events === prev.events && s.profile === prev.profile) return;
+      clearTimeout(t);
+      t = setTimeout(() => useApp.getState().refreshTdee(), 2000);
+    });
+    return () => {
+      unsub();
+      clearTimeout(t);
+    };
+  }, [ready]);
   useEffect(() => {
     if (ready && active && route === "today" && sessionStorage.getItem("ls.resumed") !== "1") {
       sessionStorage.setItem("ls.resumed", "1");
@@ -166,32 +213,32 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
     <>
       <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">{screen}</main>
       {showNav && (
-        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label="Main">
+        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label={t("nav.main")}>
           <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
-            {TABS.map((t) => {
-              const on = route === t.route;
+            {TABS.map((tab) => {
+              const on = route === tab.route;
               return (
-                <li key={t.route}>
+                <li key={tab.route}>
                   <button
                     type="button"
                     aria-current={on ? "page" : undefined}
                     onClick={() => {
                       if (!on) haptic("select");
-                      go(t.route);
+                      go(tab.route);
                     }}
-                    className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[11px] font-medium ${on ? "text-ink" : "text-faint"}`}
+                    className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
                   >
                     <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
-                      <Icon name={t.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                      <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                     </span>
-                    {t.label}
+                    {t(tab.label)}
                   </button>
                 </li>
               );

@@ -20,6 +20,7 @@ import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 import { programPlan } from "./programs";
+import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 
@@ -146,6 +147,10 @@ interface State {
   importHealthBody(): Promise<number>;
   /** Make the current week the deload week (a coach's note action). The next block starts after it. */
   startDeload(): void;
+  /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
+  refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
+  /** Applies height read from Health Connect or Apple Health, then refreshes TDEE. */
+  applyHealthBody(r: BodyReadings): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
   /** Record a gym buddy check-in. */
@@ -714,6 +719,7 @@ export const useApp = create<State>((set, get) => {
         const last = get().events.filter((e) => e.type === "bodyweight").reduce((t, e) => Math.max(t, e.at), 0);
         if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
       }
+      if (fresh.length) get().refreshTdee();
       return fresh.length;
     },
 
@@ -723,6 +729,19 @@ export const useApp = create<State>((set, get) => {
       const build = Math.min(6, Math.max(3, p.blockWeeks));
       get().setProfile({ blockStart: weekStart(p, now) - build * 7 * 86_400_000 });
       get().replan();
+    },
+
+    refreshTdee(trigger = "auto", now = Date.now()) {
+      const { events, stats, profile } = get();
+      const ev = snapshotDue(currentTdee(events, stats.sessions, profile, now), events, now, uid(), trigger);
+      if (ev) commit([ev]);
+      return ev;
+    },
+
+    applyHealthBody(r) {
+      const p = bodyUpdates(r, get().profile);
+      if (Object.keys(p).length) get().setProfile(p);
+      get().refreshTdee();
     },
 
     importWorkouts(evs) {

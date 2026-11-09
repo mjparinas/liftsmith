@@ -12,8 +12,9 @@ import { ago, clock } from "./format";
 import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
-import { Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
 import { StrengthCard, TonnageCard } from "./Extras";
+import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 
 function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty}</div>;
@@ -54,7 +55,7 @@ export function Stats() {
   ];
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Progress</h1>
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Progress</h1>
       <CoachNotes title="What to do next" />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
@@ -92,6 +93,7 @@ export function Stats() {
       </Section>
 
       <BodyweightCard />
+      <TdeeCard />
 
       <Section title="Estimated one-rep max" icon="progress" info="e1rm">
         <ul className="card divide-y divide-line">
@@ -145,6 +147,25 @@ export function Stats() {
   );
 }
 
+/** TDEE now, with its history as a sparkline. Opens Tools › TDEE. */
+function TdeeCard() {
+  const { events, stats, profile } = useApp();
+  const now = useNow(60_000);
+  const cur = currentTdee(events, stats.sessions, profile, now);
+  const hist = tdeeHistory(events);
+  return (
+    <Section title="Daily calories (TDEE)" icon="flame" right={<button type="button" onClick={() => go("tools")} className="press text-sm text-accent">All tools</button>}>
+      <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center justify-between gap-3 p-4 text-left">
+        <div>
+          <div className="num text-2xl font-bold">{cur.result ? `${cur.result.tdee.toLocaleString("en-US")} kcal` : "Not set up"}</div>
+          <div className="text-sm text-muted">{cur.result ? `${ACTIVITY[cur.activity.activity].label}${cur.activity.source === "manual" ? "" : ", from your training"}` : "Add age, sex and height"}</div>
+        </div>
+        <Spark points={hist.map((e) => e.kcal)} empty="Tracked as things change" />
+      </button>
+    </Section>
+  );
+}
+
 /** Body weight log: one input, a trend line and the change over the last month. */
 function BodyweightCard() {
   const { events, profile, logBodyweight } = useApp();
@@ -172,7 +193,7 @@ function BodyweightCard() {
           <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty="Log twice for a trend" />
         </div>
         <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <input inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value.replace(/[^\d.]/g, ""))} placeholder={`Today, in ${unit}`} aria-label={`Today's body weight in ${unit}`} className="num min-h-11 w-0 min-w-0 flex-1 rounded-xl border border-line bg-surface px-3" />
+          <BumpField label={`Today's body weight in ${unit}`} placeholder={`Today, ${unit}`} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10} min={1} className="min-w-0 flex-1" />
           <Button kind="ghost" label="Log body weight" onClick={submit}>Log</Button>
         </form>
       </div>

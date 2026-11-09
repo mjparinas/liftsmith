@@ -8,7 +8,7 @@ import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 import { useState } from "react";
-import { Button, Chip, Section, Sheet } from "./ui";
+import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -21,7 +21,7 @@ export function Gym() {
 
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Gyms</h1>
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Gyms</h1>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>{g.name}</Chip>
@@ -99,9 +99,9 @@ export function Gym() {
             })}
           </ul>
           <div className="mt-4 border-t border-line pt-4">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm">
               <span className="text-muted">Try a weight</span>
-              <input inputMode="decimal" value={testKg} onChange={(e) => setTestKg(Number(e.target.value) || 0)} className="num w-24 rounded-xl border border-line bg-raised px-3 py-1.5 text-right" aria-label="Test weight" />
+              <BumpField label="Test weight" value={String(testKg)} onChange={(v) => setTestKg(Number(v) || 0)} step={gym.unit === "lb" ? 5 : 2.5} start={testKg} max={1000} className="w-44 max-w-full" />
             </div>
             <PlateBar loading={loadBar(testKg, gym.bars[0]?.weight ?? 20, gym.plates)} bar={gym.bars[0]?.weight ?? 20} unit={gym.unit} />
           </div>
@@ -111,9 +111,9 @@ export function Gym() {
       <Section title="Bars">
         <ul className="card divide-y divide-line">
           {gym.bars.map((b, i) => (
-            <li key={b.id} className="flex items-center justify-between px-4 py-3">
+            <li key={b.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
               <span>{b.name}</span>
-              <input inputMode="decimal" value={b.weight} onChange={(e) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(e.target.value) || 0 } : x)) })} className="num w-20 rounded-xl border border-line bg-raised px-3 py-1.5 text-right" aria-label={`${b.name} weight`} />
+              <BumpField label={`${b.name} weight`} value={String(b.weight)} onChange={(v) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(v) || 0 } : x)) })} step={gym.unit === "lb" ? 1 : 0.5} start={b.weight} max={100} className="w-44 max-w-full" />
             </li>
           ))}
         </ul>

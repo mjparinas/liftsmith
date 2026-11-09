@@ -47,12 +47,12 @@ public class WorkoutService extends Service {
         running = true;
         refreshTile();
         NotificationManager nm = getSystemService(NotificationManager.class);
-        NotificationChannel live = new NotificationChannel(CHANNEL_LIVE, "Workout in progress", NotificationManager.IMPORTANCE_LOW);
-        live.setDescription("Rest timer, next set and heart rate while you train");
+        NotificationChannel live = new NotificationChannel(CHANNEL_LIVE, getString(R.string.channel_live), NotificationManager.IMPORTANCE_LOW);
+        live.setDescription(getString(R.string.channel_live_desc));
         live.setShowBadge(false);
         live.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        NotificationChannel alert = new NotificationChannel(CHANNEL_ALERT, "Rest over", NotificationManager.IMPORTANCE_HIGH);
-        alert.setDescription("Sounds and vibrates when your rest ends");
+        NotificationChannel alert = new NotificationChannel(CHANNEL_ALERT, getString(R.string.rest_over), NotificationManager.IMPORTANCE_HIGH);
+        alert.setDescription(getString(R.string.channel_alert_desc));
         alert.enableVibration(true);
         alert.setVibrationPattern(new long[] { 0, 250, 120, 250 });
         alert.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
@@ -60,8 +60,8 @@ public class WorkoutService extends Service {
         nm.createNotificationChannel(live);
         nm.createNotificationChannel(alert);
         // The same alert without vibration, for lifters who pick "sound only" (channel settings can't change once made).
-        NotificationChannel soundOnly = new NotificationChannel(CHANNEL_ALERT_SOUND, "Rest over (sound only)", NotificationManager.IMPORTANCE_HIGH);
-        soundOnly.setDescription("Sounds without vibrating when your rest ends");
+        NotificationChannel soundOnly = new NotificationChannel(CHANNEL_ALERT_SOUND, getString(R.string.channel_alert_sound), NotificationManager.IMPORTANCE_HIGH);
+        soundOnly.setDescription(getString(R.string.channel_alert_sound_desc));
         soundOnly.enableVibration(false);
         soundOnly.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
         soundOnly.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -86,14 +86,14 @@ public class WorkoutService extends Service {
         boolean resting = restUntil > System.currentTimeMillis();
 
         StringBuilder body = new StringBuilder();
-        body.append(resting ? "Next: " : "").append(next);
+        body.append(resting ? getString(R.string.next_prefix) + " " : "").append(next);
         if (plates != null && !plates.isEmpty()) body.append("\n").append(plates);
         if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
 
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
             .setSmallIcon(R.drawable.ic_stat_workout)
             .setContentTitle(title)
-            .setContentText(resting ? "Rest · next: " + next : setLabel + " · " + next)
+            .setContentText(resting ? getString(R.string.rest_next, next) : setLabel + " · " + next)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
             .setSubText(setLabel)
             .setOngoing(true)
@@ -103,8 +103,8 @@ public class WorkoutService extends Service {
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setColor(0xFF4C8DFF)
             .setContentIntent(openApp())
-            .addAction(0, "Log set", action("log"))
-            .addAction(0, "+30 s", action("add30"));
+            .addAction(0, getString(R.string.shortcut_log_short), action("log"))
+            .addAction(0, getString(R.string.add_30), action("add30"));
         if (resting) {
             // A live countdown drawn by the system: right on the lock screen without waking the app every second.
             b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
@@ -133,8 +133,8 @@ public class WorkoutService extends Service {
         NotificationManager nm = getSystemService(NotificationManager.class);
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, sound && !vibrate ? CHANNEL_ALERT_SOUND : CHANNEL_ALERT)
             .setSmallIcon(R.drawable.ic_stat_workout)
-            .setContentTitle("Rest over")
-            .setContentText("Up next: " + next)
+            .setContentTitle(getString(R.string.rest_over))
+            .setContentText(getString(R.string.up_next, next))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)

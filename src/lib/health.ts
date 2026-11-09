@@ -107,6 +107,31 @@ export function pairBody(weights: readonly { value: number; startDate: string }[
   return [...by.values()].sort((a, b) => a.at - b.at);
 }
 
+export interface HealthValue {
+  value: number;
+  /** When it was measured (ms). */
+  at: number;
+}
+
+/**
+ * The newest height (cm), for TDEE autofill (tdee.ts bodyUpdates). Weigh-ins and body fat come in
+ * through readBody instead, as bodyweight events, so there is one import path for them.
+ */
+export async function readHeight(): Promise<{ height?: HealthValue }> {
+  if (!(await healthAvailable())) return {};
+  try {
+    const { Health } = await health();
+    const startDate = new Date(Date.now() - 3650 * 86_400_000).toISOString();
+    const s = (await Health.readSamples({ dataType: "height", startDate, limit: 1, ascending: false })).samples[0];
+    const at = s ? Date.parse(s.endDate || s.startDate) : NaN;
+    if (!s || !Number.isFinite(s.value) || !Number.isFinite(at)) return {};
+    // Height can arrive in metres.
+    return { height: { value: s.value < 3 ? s.value * 100 : s.value, at } };
+  } catch {
+    return {}; // Not allowed yet, or the store is unavailable.
+  }
+}
+
 /** Rough active calories for resistance training: about 5 METs. */
 export function strengthKcal(seconds: number, bodyweightKg: number): number {
   return Math.round(5 * bodyweightKg * (seconds / 3600));

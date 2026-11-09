@@ -47,7 +47,7 @@ export function DelightSettings() {
       <section id="themes" className="mt-6 scroll-mt-4">
         <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">Themes</h2>
         {light && <p className="mb-2 px-1 text-sm text-muted">With Appearance set to light, a theme changes the accent colour only.</p>}
-        <ul className="grid grid-cols-2 gap-2">
+        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9.5rem),1fr))] gap-2">
           {THEMES.map((t) => {
             const open = unlocked(t, ctx);
             const on = (d.theme ?? "midnight") === t.id;

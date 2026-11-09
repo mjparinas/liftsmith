@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
@@ -44,9 +45,9 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
 
 /** The greeting, by local time of day, with the lifter's first name when they've given one. */
 export function greeting(hour: number, name: string): string {
-  const part = hour < 5 ? "Good evening" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const part = t(hour < 5 ? "today.evening" : hour < 12 ? "today.morning" : hour < 18 ? "today.afternoon" : "today.evening");
   const first = name.trim().split(/\s+/)[0];
-  return first ? `${part}, ${first}` : part;
+  return first ? t("today.hello", { greeting: part, name: first }) : part;
 }
 
 export function Today() {
@@ -86,7 +87,7 @@ export function Today() {
           </button>
           </div>
         </div>
-        <h1 className="mt-1 text-[30px] font-extrabold leading-tight tracking-tight">Today&apos;s workout</h1>
+        <h1 className="mt-1 text-[1.875rem] font-extrabold leading-tight tracking-tight">Today&apos;s workout</h1>
       </header>
 
       {active && (
@@ -137,7 +138,7 @@ export function Today() {
               <span className="display text-xl" aria-label={`Readiness ${readiness.score}`}>{readiness.score}</span>
             </Ring>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: call.hue }}>
+              <div className="flex flex-wrap items-center gap-x-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: call.hue }}>
                 <Icon name={call.icon} size={14} strokeWidth={2.4} />
                 <span>Readiness</span>
                 <Info term="readiness" />
@@ -150,7 +151,7 @@ export function Today() {
             <ul className="mt-2 space-y-1 text-sm">
               {readiness.signals.slice(0, 3).map((g) => (
                 <li key={g.text} className={`flex items-center gap-2 ${g.points > 0 ? "text-mint" : g.points < 0 ? "text-warn" : "text-muted"}`}>
-                  <span aria-hidden className="grid h-4 w-4 place-items-center text-[10px]">{g.points > 0 ? "▲" : g.points < 0 ? "▼" : "•"}</span>
+                  <span aria-hidden className="grid h-4 w-4 place-items-center text-[0.625rem]">{g.points > 0 ? "▲" : g.points < 0 ? "▼" : "•"}</span>
                   <span className="text-ink/90">{g.text}</span>
                 </li>
               ))}
@@ -190,7 +191,7 @@ export function Today() {
       {!fixed && <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted"><Icon name="clock" size={16} className="text-cyan" />Workout length</label>
-          <span className="display text-[30px]">{profile.minutes}<span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
+          <span className="display text-[1.875rem]">{profile.minutes}<span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
         </div>
         <input
           id="len"
@@ -272,7 +273,7 @@ export function Today() {
                 go("workout");
               }}
             >
-              Start workout
+              {t("today.start")}
             </Button>
           </div>
         </div>
@@ -287,7 +288,7 @@ function DailyQuote({ now }: { now: number }) {
   return (
     <figure className="card-tint relative mt-4 overflow-hidden p-4 pl-12" style={{ "--tint": "var(--color-violet)" } as CSSProperties} aria-label="Quote of the day">
       <span className="absolute left-4 top-4 text-violet" aria-hidden><Icon name="quote" size={20} strokeWidth={2.4} /></span>
-      <blockquote className="text-[15px] font-medium leading-snug text-ink">{q.text}</blockquote>
+      <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{q.text}</blockquote>
       <figcaption className="mt-2 text-xs text-muted">
         <span className="font-semibold text-ink/80">{q.by}</span>
         {q.source && <span>, {q.source}</span>}
