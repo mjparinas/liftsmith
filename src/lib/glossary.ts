@@ -79,6 +79,47 @@ export const GLOSSARY = {
     title: "Why we ask",
     body: ["Only to suggest a safe first weight for each lift. We start on the light side and adjust after your first session. It stays on your phone."],
   },
+  healthTwin: {
+    title: "Health",
+    body: [
+      "Your body's numbers in one place: weight, body fat, energy, sleep, heart and steps, from Liftsmith and your phone's health app.",
+      "Each one is compared with your own normal over the last 30 days, never with other people, and says what to do about it. It isn't medical advice.",
+    ],
+  },
+  hrv: {
+    title: "HRV: heart rate variability",
+    body: [
+      "The tiny changes in time between heartbeats, measured by a watch or ring, mostly overnight. Higher than your own normal usually means you've recovered; lower means stress from training, poor sleep or illness.",
+      "Only your own trend matters: phones and watches measure it differently, so don't compare your number with anyone else's.",
+    ],
+  },
+  restingHr: {
+    title: "Resting heart rate",
+    body: ["Your heart rate when you're fully at rest, usually measured while you sleep. A few beats over your own normal for a day or two is an early sign to take it easier."],
+  },
+  breathingRate: {
+    title: "Breathing rate",
+    body: ["Breaths a minute while you sleep, from a watch or ring. It stays very steady, so a jump of two or more over your normal is often one of the first signs of getting ill."],
+  },
+  vo2max: {
+    title: "VO₂ max",
+    body: [
+      "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.",
+      "Lifting barely moves it. Two 20-minute hard cardio sessions a week do.",
+    ],
+  },
+  leanMass: {
+    title: "Lean mass",
+    body: ["Everything in your body that isn't fat: muscle, bone, organs and water. Your weight times the share that isn't fat. Lean mass rising while body fat holds or falls means training is building muscle."],
+  },
+  bmi: {
+    title: "BMI: body mass index",
+    body: ["Weight divided by height squared. It's a rough guide for people who don't lift: it can't tell muscle from fat, so muscular lifters often read as overweight. When you have a body fat reading, trust that instead."],
+  },
+  restDrop: {
+    title: "Heart rate drop in rest",
+    body: ["How many beats a minute your heart rate falls in the first minute after a set, from your heart rate monitor. A bigger drop over the months means a fitter heart; a smaller one than usual can mean you're tired."],
+  },
 } as const satisfies Record<string, { title: string; body: readonly string[] }>;
 
 export type Term = keyof typeof GLOSSARY;

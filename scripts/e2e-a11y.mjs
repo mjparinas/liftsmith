@@ -51,9 +51,20 @@ try {
   await page.getByRole("button", { name: "🔥 Warm up first" }).click();
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
-  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
+  for (const tab of ["Body", "Progress", "Awards", "Gyms"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);
+    if (tab === "Body") {
+      // The health twin (Body › Health) and one metric's detail sheet.
+      await page.getByTestId("body-health").click();
+      await page.getByTestId("twin-weight").waitFor();
+      await scan("body health");
+      await page.getByTestId("twin-weight").click();
+      await page.getByRole("dialog").waitFor();
+      await scan("body health detail");
+      await page.keyboard.press("Escape");
+      await page.getByTestId("body-muscles").click();
+    }
   }
   // Delightful extras: recap and body/photos.
   await page.goto(`${server.url}/app/#/recap`);
@@ -138,8 +149,8 @@ try {
   await scan("light settings");
   await page.getByRole("button", { name: "‹ Today" }).click();
   await scan("light today");
-  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
-    await page.getByRole("button", { name: tab }).click();
+  for (const tab of ["Body", "Progress", "Awards", "Gyms"]) {
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(`light ${tab}`);
   }
   await page.getByRole("button", { name: "Today" }).click();

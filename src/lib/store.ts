@@ -4,7 +4,8 @@ import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
 import { weekStart } from "./block";
-import { readBody } from "./health";
+import { readBody, readDaily } from "./health";
+import { healthExternal } from "./twin";
 import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
@@ -161,6 +162,8 @@ interface State {
   logBodyweight(kg: number, bodyFat?: number): void;
   /** Weigh-ins and body fat from Health Connect or Apple Health (native, when allowed), deduplicated by day. */
   importHealthBody(): Promise<number>;
+  /** Sleep, HRV, resting HR, steps, VO2 max and breathing rate from Health, one reading a day (the health twin). */
+  importHealthDaily(): Promise<number>;
   /** Make the current week the deload week (a coach's note action). The next block starts after it. */
   startDeload(): void;
   /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
@@ -380,6 +383,7 @@ export const useApp = create<State>((set, get) => {
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
       if (!get().autoEnd()) get().replan();
       void get().importHealthBody().catch(() => 0);
+      void get().importHealthDaily().catch(() => 0);
     },
 
     setProfile(p) {
@@ -420,7 +424,8 @@ export const useApp = create<State>((set, get) => {
       if (!g) return set({ preview: null });
       const { profile, events, callOverride } = get();
       const now = Date.now();
-      const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled });
+      // Health signals (sleep, HRV, resting HR, breathing rate) move the call for Pro only (AGENTS.md "Health twin").
+      const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...(can("healthReadiness") ? healthExternal(events, now) : {}) });
       const call = callOverride ?? r.call;
       const src = profile.planSource;
       const programDay = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
@@ -796,6 +801,20 @@ export const useApp = create<State>((set, get) => {
         if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
       }
       if (fresh.length) get().refreshTdee();
+      return fresh.length;
+    },
+
+    async importHealthDaily() {
+      const readings = await readDaily(45);
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = readings
+        .map((r) => ({ type: "health" as const, id: `health-${r.metric}-${r.day}-${Math.round(r.value * 10)}`, at: r.at, metric: r.metric, day: r.day, value: r.value }))
+        .filter((e) => !have.has(e.id));
+      if (fresh.length) {
+        commit(fresh);
+        if (!get().active) get().replan();
+        if (fresh.some((e) => e.metric === "steps")) get().refreshTdee();
+      }
       return fresh.length;
     },
 

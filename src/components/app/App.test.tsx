@@ -81,7 +81,10 @@ describe("Pro trial offer", () => {
     expect(useApp.getState().profile.pro).toMatchObject({ declinedAt: expect.any(Number) });
     expect(useApp.getState().profile.planSource).toMatchObject({ kind: "program", id: "classic-5x5" });
     expect(useApp.getState().profile.proPlan).toEqual({ kind: "adaptive" });
-    await user.click(screen.getByRole("button", { name: "Recovery" }));
+    await user.click(screen.getByRole("button", { name: "Body" }));
+    // Without Pro the Body tab opens on Health (free); Muscles is the locked recovery map.
+    expect(await screen.findByTestId("body-health")).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByTestId("body-muscles"));
     expect(await screen.findByText("The recovery map is part of Pro")).toBeInTheDocument();
     // Pro arrives (a purchase, a restore): their adaptive plan comes back.
     act(() => setBillingLive(true, { active: true, trial: true, plan: "annual", expiresAt: Date.now() + 14 * 86_400_000, willRenew: true }));

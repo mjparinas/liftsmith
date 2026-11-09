@@ -39,7 +39,7 @@ await page.waitForTimeout(1200);
 await shot("05-done");
 await page.getByRole("button", { name: "Done", exact: true }).click();
 await shot("06-today");
-for (const [tab, n] of [["Recovery", "07-recovery"], ["Progress", "08-progress"], ["Gyms", "09-gyms"]]) {
+for (const [tab, n] of [["Body", "07-recovery"], ["Progress", "08-progress"], ["Gyms", "09-gyms"]]) {
   await page.getByRole("button", { name: tab, exact: true }).click();
   await shot(n);
 }

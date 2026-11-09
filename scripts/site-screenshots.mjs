@@ -90,7 +90,7 @@ try {
   await page.reload();
   await page.getByText("Today's workout").waitFor();
   await shot("today");
-  for (const [tab, name] of [["Recovery", "recovery"], ["Progress", "progress"]]) {
+  for (const [tab, name] of [["Body", "recovery"], ["Progress", "progress"]]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await shot(name);
   }

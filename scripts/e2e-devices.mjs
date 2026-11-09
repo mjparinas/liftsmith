@@ -32,7 +32,7 @@ for (const { name } of pick()) {
     await noSideScroll("onboarding");
     await onboard(page);
     await noSideScroll("today");
-    for (const tab of ["Today", "Recovery", "Progress", "Gyms"]) {
+    for (const tab of ["Today", "Body", "Progress", "Gyms"]) {
       const b = await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).boundingBox();
       check(b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1, `${name}: the ${tab} tab is off screen`, fail);
     }
@@ -58,7 +58,7 @@ for (const { name } of pick()) {
     await page.getByRole("button", { name: "End" }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();
     await page.getByRole("button", { name: "Done", exact: true }).click();
-    for (const tab of ["Recovery", "Progress", "Gyms"]) {
+    for (const tab of ["Body", "Progress", "Gyms"]) {
       await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
       await noSideScroll(tab);
     }

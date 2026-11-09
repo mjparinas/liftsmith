@@ -14,8 +14,48 @@ import { Button, EmptyState, Section } from "./ui";
 import { can } from "@/lib/entitlements";
 import { go } from "./router";
 import { t } from "@/lib/i18n";
+import { HealthTwin } from "./HealthTwin";
+import { haptic, sound } from "@/lib/juice";
 
+const VIEW_KEY = "liftsmith.body.view";
+type BodyView = "muscles" | "health";
+const savedView = (): BodyView => {
+  try {
+    return localStorage.getItem(VIEW_KEY) === "health" ? "health" : "muscles";
+  } catch {
+    return "muscles";
+  }
+};
+
+/**
+ * The Body tab (health twin, 2026-11-09): one figure, two views. Muscles is the recovery map (Pro);
+ * Health is the health twin (free). Without Pro it opens on Health.
+ */
 export function Recovery() {
+  const [view, setView] = useState<BodyView>(() => (can("recoveryMap") ? savedView() : "health"));
+  const pick = (v: BodyView) => {
+    haptic("select");
+    sound.tick();
+    setView(v);
+    try { localStorage.setItem(VIEW_KEY, v); } catch {}
+  };
+  return (
+    <div className="pb-24">
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("body.title")}</h1>
+      <div className="mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
+        {(["muscles", "health"] as const).map((v) => (
+          <button key={v} type="button" aria-pressed={view === v} onClick={() => pick(v)} data-testid={`body-${v}`}
+            className={`press min-h-11 flex-1 rounded-full text-sm font-semibold ${view === v ? "bg-raised text-ink shadow-[inset_0_0_0_1px_var(--color-line)]" : "text-muted"}`}>
+            {t(v === "muscles" ? "body.muscles" : "body.health")}
+          </button>
+        ))}
+      </div>
+      {view === "health" ? <HealthTwin /> : <Muscles />}
+    </div>
+  );
+}
+
+function Muscles() {
   const { events, profile } = useApp();
   const now = useNow();
   const rec = recovery(events, now);
@@ -25,16 +65,14 @@ export function Recovery() {
   const [picked, setPicked] = useState<Muscle | null>(null);
   if (!can("recoveryMap")) {
     return (
-      <div className="pb-24">
-        <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("recovery.title")}<Info term="recovery" /></h1>
+      <div className="mt-4">
         <EmptyState icon="lock" title={t("recovery.locked.title")} body={t("recovery.locked.body")} action={<Button onClick={() => go("pro", "recovery")}>{t("pro.settings.see")}</Button>} />
       </div>
     );
   }
   return (
-    <div className="pb-24">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("recovery.title")}<Info term="recovery" /></h1>
-      <p className="mt-1 text-muted">{t("recovery.lead")} {t("map.pick")}</p>
+    <div>
+      <p className="mt-3 text-muted">{t("recovery.lead")} {t("map.pick")}<Info term="recovery" /></p>
       <div className="card mt-4 p-4">
         <RecoveryMap rec={rec} chips={false} selected={picked} onSelect={setPicked} />
       </div>

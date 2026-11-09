@@ -45,6 +45,7 @@ const T = {
   activity: "Activity",
   auto: "Auto",
   autoWorkouts: (d: number, a: Activity) => `From your workouts: ${fmtNum(d)} training days a week over the last 4 weeks, so ${ACTIVITY[a].label.toLowerCase()}.`,
+  autoSteps: (steps: number, d: number, a: Activity) => `From your steps and workouts: about ${fmtNum(steps)} steps a day this week and ${fmtNum(d)} training days a week, so ${ACTIVITY[a].label.toLowerCase()}.`,
   autoPlan: (d: number, a: Activity) => `From your goal of ${d} days a week (${ACTIVITY[a].label.toLowerCase()}) until there are two weeks of workouts.`,
   manual: "Picked by hand. Choose Auto to follow your workouts.",
   missing: (m: string[]) => `Add your ${m.join(", ").replace(/, ([^,]*)$/, " and $1")} to see your TDEE.`,
@@ -211,7 +212,7 @@ function TdeeScreen() {
           <Chip active={a.source !== "manual"} onClick={() => setActivity(undefined)}>{T.auto}</Chip>
           {ACTIVITIES.map((x) => <Chip key={x} active={a.source === "manual" && a.activity === x} onClick={() => setActivity(x)}>{ACTIVITY[x].label}</Chip>)}
         </div>
-        <p className="mt-2 text-sm text-muted">{a.source === "workouts" ? T.autoWorkouts(a.perWeek, a.activity) : a.source === "plan" ? T.autoPlan(a.perWeek, a.activity) : T.manual}</p>
+        <p className="mt-2 text-sm text-muted">{a.source === "steps" ? T.autoSteps(a.steps ?? 0, a.perWeek, a.activity) : a.source === "workouts" ? T.autoWorkouts(a.perWeek, a.activity) : a.source === "plan" ? T.autoPlan(a.perWeek, a.activity) : T.manual}</p>
       </Section>
 
       <Section title={T.results}>
@@ -261,7 +262,7 @@ export function whyText(e: TdeeEvent, prev: TdeeEvent | undefined, unit: Unit): 
         if (!prev) return `Weight ${w}`;
         return `Weight ${e.kg > prev.kg ? "up" : "down"} to ${w}`;
       }
-      case "activity": return `${ACTIVITY[e.activity].label}${e.perWeek !== undefined && e.activitySource === "workouts" ? ` (${fmtNum(e.perWeek)} days a week)` : ""}`;
+      case "activity": return `${ACTIVITY[e.activity].label}${e.steps !== undefined && e.activitySource === "steps" ? ` (${fmtNum(e.steps)} steps a day)` : e.perWeek !== undefined && e.activitySource === "workouts" ? ` (${fmtNum(e.perWeek)} days a week)` : ""}`;
       case "age": return `Turned ${e.age}`;
       case "height": return "Height updated";
       case "sex": return "Sex updated";
