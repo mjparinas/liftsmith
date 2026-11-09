@@ -127,7 +127,7 @@ export function Workout() {
       // The rest-over alert follows its own setting (Workout preferences), not only Sounds and Vibration.
       sound.restEnd(alert.sound);
       if (alert.vibrate) haptic("thud", true);
-      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : "Next set", alert);
+      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -152,7 +152,7 @@ export function Workout() {
   if (!active || !gym) {
     return (
       <div className="card mt-10">
-        <EmptyState icon="dumbbell" mascot="curious" title="No workout running" body="Start one from Today. It's planned around your gym and recovery." action={<Button onClick={() => go("today")}>Back to today</Button>} />
+        <EmptyState icon="dumbbell" mascot="curious" title={t("wk.none")} body={t("wk.noneBody")} action={<Button onClick={() => go("today")}>{t("wk.back")}</Button>} />
       </div>
     );
   }
@@ -261,7 +261,7 @@ export function Workout() {
         </div>
       )}
 
-      <div className="mt-3 flex gap-1" aria-label="Progress">
+      <div className="mt-3 flex gap-1" aria-label={t("wk.progress")}>
         {active.plan.items.map((it, i) => (
           <button
             key={i}
@@ -276,8 +276,8 @@ export function Workout() {
       {finished ? (
         <div className="card animate-pop mt-6 p-6 text-center">
           <div className="text-4xl">🏁</div>
-          <h2 className="mt-2 text-2xl font-bold">All sets done</h2>
-          <p className="mt-1 text-muted">Great work. Finish to see your summary.</p>
+          <h2 className="mt-2 text-2xl font-bold">{t("wk.allDone")}</h2>
+          <p className="mt-1 text-muted">{t("wk.allDoneBody")}</p>
           {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
         </div>
       ) : ex && item ? (
@@ -289,7 +289,7 @@ export function Workout() {
                 {ssNext && <p className="mb-1 ml-1.5 inline-flex max-w-full items-center truncate text-xs font-medium text-muted" data-testid="superset-next">{t("workout.ssThen", { name: ssNext })}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
-                {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
+                {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">{t("wk.yourNote")}</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
                 {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("coach.changePlan")}><Icon name="clock" size={20} /></button>}
@@ -380,15 +380,15 @@ export function Workout() {
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
-                  <p>Warm-up: easy, smooth reps<Info term="warmup" />. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
+                  <p>{t("wk.warmLine")}<Info term="warmup" />{t("wk.working", { load: loadText(ex, item.target.weight, profile.unit) })}</p>
                   <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">{t("workout.skipWarmup")}</button>
                 </div>
               ) : item.setTargets?.[doneSets]?.amrap ? (
-                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Last set: as many good reps as you can, at least {item.setTargets[doneSets].reps}. Log what you got</p>
+                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">{t("wk.amrap", { n: item.setTargets[doneSets].reps })}</p>
               ) : item.slot ? (
                 <p className="mt-3 text-center text-sm text-muted">{item.label ? `${item.label} · ` : ""}{item.target.note}</p>
               ) : item.challenge && doneSets + 1 === item.sets ? (
-                <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
+                <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />{t("wk.challenge")}</p>
               ) : (
                 <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)} <button type="button" onClick={() => setWhyOpen(true)} className="press inline-flex min-h-11 items-center px-1 text-accent underline underline-offset-2">{t("coach.why")}</button></p>
               )}
@@ -455,7 +455,7 @@ export function Workout() {
         </div>
       </div>
 
-      <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={`Swap ${ex?.name ?? ""}`}>
+      <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={t("wk.swapTitle", { name: ex?.name ?? "" })}>
         {ex && <SwapList fromId={ex.id} gymEquipment={gym} skip={active.plan.items.map((i) => i.exerciseId)} hurt={activeInjuries(events)} onPick={(id, avoid) => { s.swap(id, avoid); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
         {ex && <CustomExercise muscle={ex.primary[0]} onCreate={(c) => { const id = s.addCustomExercise(c); s.swap(id, false); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
       </Sheet>
@@ -477,11 +477,11 @@ export function Workout() {
       </Sheet>
       <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
       <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
-      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title="End workout?">
+      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title={t("wk.endTitle")}>
         <div className="space-y-3">
-          <Button icon="check" className="w-full" onClick={end}>Finish and save</Button>
-          <Button kind="danger" className="w-full" onClick={() => { haptic("warning"); sound.back(); s.discard(); void stopSession(); go("today"); }}>Discard workout</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>Keep going</Button>
+          <Button icon="check" className="w-full" onClick={end}>{t("wk.finishSave")}</Button>
+          <Button kind="danger" className="w-full" onClick={() => { haptic("warning"); sound.back(); s.discard(); void stopSession(); go("today"); }}>{t("wk.discard")}</Button>
+          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>{t("wk.keepGoing")}</Button>
         </div>
       </Sheet>
     </div>
@@ -508,7 +508,7 @@ function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string
     <div>
       <label className="mb-3 flex items-center gap-3 rounded-xl bg-raised p-3 text-sm">
         <input type="checkbox" checked={avoid} onChange={(e) => setAvoid(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
-        Not available here (skip it at this gym for 2 weeks)
+        {t("wk.notHere")}
       </label>
       <ul className="divide-y divide-line">
         {list.map((e) => (
@@ -516,16 +516,16 @@ function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string
             <button type="button" onClick={() => onPick(e.id, avoid)} className="press flex w-full items-center justify-between py-3 text-left">
               <span>
                 <span className="block font-medium">{e.name}</span>
-                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{hurt.length ? (effectFor(e, hurt) ? ` · ${effectFor(e, hurt)!.action === "light" ? `injury: ${effectFor(e, hurt)!.pct}% load` : "you marked it fine"}` : " · avoids your injury") : ""}</span>
+                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{hurt.length ? (effectFor(e, hurt) ? (effectFor(e, hurt)!.action === "light" ? t("wk.injuryLoad", { n: effectFor(e, hurt)!.pct ?? 0 }) : t("wk.markedFine")) : t("wk.avoids")) : ""}</span>
               </span>
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent"><Icon name="swap" size={16} />Swap</span>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent"><Icon name="swap" size={16} />{t("wk.swap")}</span>
             </button>
           </li>
         ))}
-        {!list.length && <li className="py-3 text-muted">No other exercise for these muscles at this gym.</li>}
+        {!list.length && <li className="py-3 text-muted">{t("wk.noAlt")}</li>}
       </ul>
       <button type="button" onClick={() => go("injuries")} className="press mt-3 w-full rounded-xl border border-line bg-raised px-3 py-3 text-left text-sm">
-        Hurts? <span className="font-semibold text-accent">Log an injury</span> and the rest of this workout works around it.
+        {t("wk.hurts")}<span className="font-semibold text-accent">{t("wk.logInjury")}</span>{t("wk.hurtsAfter")}
       </button>
     </div>
   );
@@ -537,8 +537,8 @@ function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rp
   const aim = effortChoices(scale).find((c) => c.rir === Math.min(4, target))?.label ?? String(target);
   return (
     <div className="animate-rise mt-4 w-full text-center">
-      <p className="text-sm text-muted">{rpe ? `How hard was that set, as RPE? (aim was ${aim})` : `Reps left in the tank on that set? (aim was ${target})`}<Info term={rpe ? "rpe" : "rir"} /></p>
-      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? "RPE of that set" : "Reps left in the tank"}>
+      <p className="text-sm text-muted">{rpe ? t("wk.rpeAsk", { aim }) : t("wk.rirAsk", { aim: target })}<Info term={rpe ? "rpe" : "rir"} /></p>
+      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? t("wk.rpeGroup") : t("wk.rirGroup")}>
         {effortChoices(scale).map((c) => (
           <button key={c.rir} type="button" onClick={() => onPick(c.rir)} className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold">{c.label}</button>
         ))}
@@ -551,15 +551,15 @@ function NoteEditor({ initial, onSave }: { initial: string; onSave: (text: strin
   const [text, setText] = useState(initial);
   return (
     <div className="border-t border-line pt-4">
-      <label htmlFor="ex-note" className="text-sm font-semibold">Your note</label>
-      <textarea id="ex-note" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={500} placeholder="Seat height 4, grip on the rings, left knee caves…" className="mt-1 w-full rounded-xl border border-line bg-raised p-3 text-sm" />
-      <p className="text-xs text-faint">Shows under this exercise every time you do it.</p>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => onSave(text)}>Save note</Button>
+      <label htmlFor="ex-note" className="text-sm font-semibold">{t("wk.noteLabel")}</label>
+      <textarea id="ex-note" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={500} placeholder={t("wk.notePlaceholder")} className="mt-1 w-full rounded-xl border border-line bg-raised p-3 text-sm" />
+      <p className="text-xs text-faint">{t("wk.noteHint")}</p>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => onSave(text)}>{t("wk.saveNote")}</Button>
     </div>
   );
 }
 
-const LOADS: [LoadKind, string][] = [["barbell", "Barbell"], ["dumbbell", "Dumbbells"], ["machine", "Machine or cable"], ["kettlebell", "Kettlebell"], ["bodyweight", "Bodyweight"]];
+const LOADS: LoadKind[] = ["barbell", "dumbbell", "machine", "kettlebell", "bodyweight"];
 
 /** "Add your own exercise", at the bottom of the swap sheet. */
 function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { name: string; primary: Muscle; load: LoadKind; compound: boolean }) => void }) {
@@ -568,26 +568,26 @@ function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { 
   const [primary, setPrimary] = useState<Muscle>(muscle);
   const [load, setLoad] = useState<LoadKind>("machine");
   const [compound, setCompound] = useState(false);
-  if (!open) return <Button kind="quiet" className="mt-3 w-full" onClick={() => setOpen(true)}>+ Add your own exercise</Button>;
+  if (!open) return <Button kind="quiet" className="mt-3 w-full" onClick={() => setOpen(true)}>{t("wk.addOwn")}</Button>;
   return (
     <form className="mt-4 space-y-3 border-t border-line pt-4" onSubmit={(e) => { e.preventDefault(); if (name.trim()) onCreate({ name, primary, load, compound }); }}>
-      <h3 className="font-semibold">Your own exercise</h3>
-      <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Name, e.g. Belt squat" aria-label="Exercise name" className="w-full rounded-xl border border-line bg-raised px-3 py-3" />
-      <label className="block text-sm">Main muscle
+      <h3 className="font-semibold">{t("wk.own")}</h3>
+      <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder={t("wk.ownName")} aria-label={t("wk.ownNameLabel")} className="w-full rounded-xl border border-line bg-raised px-3 py-3" />
+      <label className="block text-sm">{t("wk.mainMuscle")}
         <select value={primary} onChange={(e) => setPrimary(e.target.value as Muscle)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
           {MUSCLES.map((m) => <option key={m} value={m}>{MUSCLE_LABEL[m]}</option>)}
         </select>
       </label>
-      <label className="block text-sm">Equipment
+      <label className="block text-sm">{t("wk.equipment")}
         <select value={load} onChange={(e) => setLoad(e.target.value as LoadKind)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
-          {LOADS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          {LOADS.map((v) => <option key={v} value={v}>{t(`wk.load.${v}`)}</option>)}
         </select>
       </label>
       <label className="flex items-center gap-3 text-sm">
         <input type="checkbox" checked={compound} onChange={(e) => setCompound(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
-        Works several muscles (a big lift)
+        {t("wk.compound")}
       </label>
-      <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">Add and use it now</button>
+      <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">{t("wk.addUse")}</button>
     </form>
   );
 }
