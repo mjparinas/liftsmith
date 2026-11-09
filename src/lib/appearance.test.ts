@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { applyTheme, isLight, savedTheme } from "./theme";
+import { applyAppearance as applyTheme, isLight, savedAppearance as savedTheme } from "./appearance";
+import { applyTheme as applyEarned, THEME_BY_ID } from "./themes";
 
 function mockSystem(light: boolean) {
   vi.stubGlobal("matchMedia", (q: string) => ({ matches: light && q.includes("light"), media: q, addEventListener() {}, removeEventListener() {} }));
@@ -12,7 +13,7 @@ afterEach(() => {
   delete document.documentElement.dataset.theme;
 });
 
-describe("theme", () => {
+describe("appearance", () => {
   it("defaults to dark", () => {
     expect(savedTheme()).toBe("dark");
     applyTheme();
@@ -48,5 +49,17 @@ describe("theme", () => {
     applyTheme("dark");
     expect(meta.content).toBe("#0a0d12");
     meta.remove();
+  });
+
+  it("keeps light surfaces under an earned theme, and only darkens its accent", () => {
+    const st = document.documentElement.style;
+    const forge = THEME_BY_ID.get("forge")!;
+    applyEarned(forge);
+    expect(st.getPropertyValue("--color-bg")).toBe(forge.palette.bg);
+    applyEarned(forge, true);
+    expect(st.getPropertyValue("--color-bg")).toBe("");
+    expect(st.getPropertyValue("--color-accent")).toContain("color-mix");
+    applyEarned(THEME_BY_ID.get("midnight")!, true);
+    expect(st.getPropertyValue("--color-accent")).toBe("");
   });
 });
