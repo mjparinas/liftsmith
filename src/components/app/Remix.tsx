@@ -25,20 +25,20 @@ export function Remix({ code }: { code?: string }) {
   if (!remix || !remix.plan.items.length) {
     return (
       <div className="pt-10 text-center">
-        <p className="text-muted">This workout link didn’t open. It may be from a newer version of the app, or cut short.</p>
-        <Button className="mt-4" onClick={() => go("today")}>Back to today</Button>
+        <p className="text-muted">{t("remix.broken")}</p>
+        <Button className="mt-4" onClick={() => go("today")}>{t("remix.back")}</Button>
       </div>
     );
   }
   const { plan, swapped, missing } = remix;
   return (
     <div className="pb-24">
-      <h1 className="pt-2 text-2xl font-bold">Shared workout</h1>
-      <p className="mt-1 text-muted">Rebuilt for {gym?.name ?? "your gym"} at your own weights. About {plan.estMinutes} min.</p>
+      <h1 className="pt-2 text-2xl font-bold">{t("remix.title")}</h1>
+      <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym?.name ?? t("remix.yourGym"), min: plan.estMinutes })}</p>
       {(swapped.length > 0 || missing.length > 0) && (
         <div className="card mt-4 p-4 text-sm">
-          {swapped.map((x) => <p key={x.from} className="text-muted">{exercise(x.from).name} → <span className="text-ink">{exercise(x.to).name}</span> (closest match here)</p>)}
-          {missing.map((id) => <p key={id} className="text-muted">{exercise(id).name}: nothing similar here, left out</p>)}
+          {swapped.map((x) => <p key={x.from} className="text-muted">{exercise(x.from).name} → <span className="text-ink">{exercise(x.to).name}</span> {t("remix.closest")}</p>)}
+          {missing.map((id) => <p key={id} className="text-muted">{t("remix.missing", { name: exercise(id).name })}</p>)}
         </div>
       )}
       <ol className="card mt-4 divide-y divide-line">
@@ -53,11 +53,11 @@ export function Remix({ code }: { code?: string }) {
         })}
       </ol>
       {active ? (
-        <p className="mt-6 text-center text-sm text-muted">Finish the workout you’re in first, then open the link again.</p>
+        <p className="mt-6 text-center text-sm text-muted">{t("remix.finishFirst")}</p>
       ) : (
-        <Button className="mt-6 w-full py-4 text-lg" onClick={() => { haptic("tap"); track("feature", { name: "remix", detail: swapped.length ? "adapted" : "as shared" }); start(plan); go("workout"); }}>Start this workout</Button>
+        <Button className="mt-6 w-full py-4 text-lg" onClick={() => { haptic("tap"); track("feature", { name: "remix", detail: swapped.length ? "adapted" : "as shared" }); start(plan); go("workout"); }}>{t("remix.start")}</Button>
       )}
-      <Button kind="quiet" className="mt-2 w-full" onClick={() => go("today")}>Not now</Button>
+      <Button kind="quiet" className="mt-2 w-full" onClick={() => go("today")}>{t("remix.notNow")}</Button>
     </div>
   );
 }
@@ -74,7 +74,7 @@ export function ShareWorkout({ sessionId }: { sessionId: string }) {
     const text = t("done.remixText");
     try {
       if (navigator.share) {
-        await navigator.share({ title: "A workout for you", text, url });
+        await navigator.share({ title: t("remix.shareTitle"), text, url });
         return;
       }
       await navigator.clipboard.writeText(url);
