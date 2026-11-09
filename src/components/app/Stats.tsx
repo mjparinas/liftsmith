@@ -11,7 +11,7 @@ import { ago, clock } from "./format";
 import type { CSSProperties } from "react";
 import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
-import { Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
 import { StrengthCard, TonnageCard } from "./Extras";
 
 function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
@@ -170,7 +170,7 @@ function BodyweightCard() {
           <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty="Log twice for a trend" />
         </div>
         <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <input inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value.replace(/[^\d.]/g, ""))} placeholder={`Today, in ${unit}`} aria-label={`Today's body weight in ${unit}`} className="num min-h-11 w-0 min-w-0 flex-1 rounded-xl border border-line bg-surface px-3" />
+          <BumpField label={`Today's body weight in ${unit}`} placeholder={`Today, ${unit}`} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10} min={1} className="min-w-0 flex-1" />
           <Button kind="ghost" label="Log body weight" onClick={submit}>Log</Button>
         </form>
       </div>

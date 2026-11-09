@@ -8,7 +8,7 @@ import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 import { useState } from "react";
-import { Button, Chip, Section, Sheet } from "./ui";
+import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -104,9 +104,9 @@ export function Gym() {
       <Section title="Bars">
         <ul className="card divide-y divide-line">
           {gym.bars.map((b, i) => (
-            <li key={b.id} className="flex items-center justify-between px-4 py-3">
+            <li key={b.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
               <span>{b.name}</span>
-              <input inputMode="decimal" value={b.weight} onChange={(e) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(e.target.value) || 0 } : x)) })} className="num w-20 rounded-xl border border-line bg-raised px-3 py-1.5 text-right" aria-label={`${b.name} weight`} />
+              <BumpField label={`${b.name} weight`} value={String(b.weight)} onChange={(v) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(v) || 0 } : x)) })} step={gym.unit === "lb" ? 1 : 0.5} start={b.weight} max={100} className="w-44 max-w-full" />
             </li>
           ))}
         </ul>

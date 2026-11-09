@@ -149,6 +149,12 @@ try {
     await page.getByRole("heading", { level: 1 }).first().waitFor();
     await scan(`dark ${tab}, colour-blind safe, more contrast`);
   }
+  // One-handed controls: the bump buttons docked beside Log set (a workout is still open from above).
+  await page.goto(`${server.url}/app/#/settings`);
+  await page.getByRole("group", { name: "One-handed controls" }).getByRole("button", { name: "Right hand" }).click();
+  await page.goto(`${server.url}/app/#/workout`);
+  await page.getByRole("group", { name: "Adjust this set" }).waitFor();
+  await scan("one-handed workout");
   // Forced colours (Windows High Contrast and similar).
   await page.emulateMedia({ forcedColors: "active" });
   await page.goto(`${server.url}/app/#/today`);

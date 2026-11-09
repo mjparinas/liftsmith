@@ -21,6 +21,7 @@ import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
+import { cleanA11y } from "@/lib/a11y";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
@@ -161,6 +162,15 @@ export function Workout() {
   };
 
   const unit = gym.unit;
+  // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
+  const hand = cleanA11y(profile.a11y).hand;
+  const docked = hand !== "off";
+  const weightStep = ex && gym && active
+    ? { label: "weight", suffix: ex.load === "dumbbell" ? `${unit} each` : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
+    : null;
+  const repStep = ex && active
+    ? { label: "reps", suffix: TIMED.has(ex.id) ? "seconds" : "reps", value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
@@ -168,7 +178,7 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className="pb-44">
+    <div className={docked ? "pb-56" : "pb-44"}>
       <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button type="button" onClick={() => go("today")} className="press -ml-2 inline-flex min-h-11 items-center gap-0.5 rounded-full pl-1 pr-2 text-muted hover:text-ink"><Icon name="chevronLeft" size={20} />Today</button>
@@ -266,16 +276,8 @@ export function Workout() {
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
               <div className="flex flex-col items-center gap-5">
-                {ex.load !== "bodyweight" && (
-                  <Stepper
-                    label="weight"
-                    suffix={ex.load === "dumbbell" ? `${unit} each` : unit}
-                    value={fmtNum(fromKg(active.weight, unit))}
-                    onDown={() => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps)}
-                    onUp={() => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps)}
-                  />
-                )}
-                <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
+                {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
+                {repStep && <Stepper display={docked} {...repStep} />}
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
@@ -335,11 +337,19 @@ export function Workout() {
           ) : resting ? (
             <Button kind="ghost" className="w-full py-5 text-xl" onClick={() => { s.skipRest(); log(); }}>Log set now</Button>
           ) : (
-            <div className="relative">
-              {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
-              <Button className="relative w-full py-5 text-xl" onClick={log}>
-                {warming ? "Log warm-up" : "Log set"} <Icon name="check" size={24} strokeWidth={2.8} />
-              </Button>
+            <div className={docked ? `flex items-stretch gap-3 ${hand === "left" ? "flex-row-reverse" : ""}` : ""}>
+              {docked && repStep && (
+                <div className="card flex min-w-0 flex-1 flex-col justify-center gap-2 px-2 py-2" role="group" aria-label="Adjust this set">
+                  {ex?.load !== "bodyweight" && weightStep && <Stepper compact {...weightStep} />}
+                  <Stepper compact {...repStep} />
+                </div>
+              )}
+              <div className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>
+                {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
+                <Button className={`relative w-full text-xl ${docked ? "h-full min-h-28 flex-col" : "py-5"}`} onClick={log}>
+                  {warming ? "Log warm-up" : "Log set"} <Icon name="check" size={24} strokeWidth={2.8} />
+                </Button>
+              </div>
             </div>
           )}
         </div>
