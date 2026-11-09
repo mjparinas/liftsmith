@@ -1,4 +1,7 @@
 "use client";
+import { activeInjuries, PART_LABEL } from "@/lib/injury";
+import { PainSelect } from "./Injuries";
+import { Info } from "@/components/Info";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { TIER_LABEL, unlocked } from "@/lib/achievements";
@@ -10,7 +13,7 @@ import { track } from "@/lib/analytics";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useMemo, useState } from "react";
-import { Badge, LeagueCard, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
+import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
@@ -18,6 +21,8 @@ import { ShareWorkout } from "./Remix";
 import { DoneMoments, lean } from "./Extras";
 import { PrReplayButton } from "./PrReplay";
 import { doneCue, say, voice } from "@/lib/voice";
+import { doneItems } from "@/lib/routines";
+import { SaveDoneAsRoutine } from "./Routines";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -36,7 +41,6 @@ function useCountUp(to: number, ms = 900) {
   return v;
 }
 
-const RARITY_COLOUR = { common: "#8a97a8", rare: "#4c8dff", epic: "#a78bfa", legendary: "#f2c14e" } as const;
 
 /** The post-workout crate: shakes until tapped (never during a set), then shows its prize. */
 function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
@@ -151,7 +155,7 @@ export function Done() {
       <div className="mt-6 grid grid-cols-3 gap-3">
         {[["Time", clock(s.seconds)], ["Sets", String(s.sets)], ["Volume", `${fmtNum(vol)} ${profile.unit}`]].map(([k, v]) => (
           <div key={k} className="card animate-rise p-3">
-            <div className="text-xs uppercase tracking-wider text-faint">{k}</div>
+            <div className="text-xs uppercase tracking-wider text-faint">{k}{k === "Volume" && <Info term="volume" />}</div>
             <div className="num mt-1 text-xl font-bold">{v}</div>
           </div>
         ))}
@@ -199,6 +203,8 @@ export function Done() {
         </ul>
       )}
 
+      <PainAfter sessionId={s.sessionId} />
+
       {crate && <Crate item={crate.item} duplicate={crate.duplicate} />}
 
       <div className="mt-4 space-y-3 text-left">
@@ -208,9 +214,23 @@ export function Done() {
 
       <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>Share this workout</Button>
       {shared && <p className="mt-2 text-sm text-muted" role="status">{shared}</p>}
+      <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>Done</Button>
       <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">See all achievements</button>
     </div>
+  );
+}
+
+/** After a workout, one optional pain rating per active injury, tied to this session. */
+function PainAfter({ sessionId }: { sessionId: string }) {
+  const { events, ratePain } = useApp();
+  const hurt = activeInjuries(events);
+  if (!hurt.length) return null;
+  return (
+    <section className="card mt-4 space-y-2 p-4 text-left" aria-label="Pain after this workout">
+      {hurt.map((i) => <PainSelect key={i.id} label={`How's your ${PART_LABEL[i.part].toLowerCase()} after this workout?`} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
+      <p className="text-xs text-muted">Optional. It feeds the pain trend and the graded return on the Injuries screen.</p>
+    </section>
   );
 }

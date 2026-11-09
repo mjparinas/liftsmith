@@ -1,7 +1,7 @@
 import { blockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
 import { roundLoad, stepLoad } from "./loads";
-import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent } from "./types";
+import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent, TrainingPrefs } from "./types";
 
 // What weight and reps to suggest for an exercise today.
 //
@@ -12,8 +12,17 @@ import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent } from "./types";
 /** Holds and carries are counted in seconds. */
 export const TIMED = new Set(["plank", "side-plank", "superman", "copenhagen-plank", "farmers-carry", "kb-suitcase-carry", "dead-bug"]);
 
-export function repRange(ex: Exercise, goal: Goal): [number, number] {
+/**
+ * The rep range for double progression. The lifter's own range for this exercise wins, then their
+ * range for compound or isolation lifts (loaded exercises only: bodyweight work keeps adding reps),
+ * then the default for their goal. Holds stay in seconds and ignore both.
+ */
+export function repRange(ex: Exercise, goal: Goal, training?: TrainingPrefs): [number, number] {
   if (TIMED.has(ex.id)) return [20, 45];
+  const own = training?.exercises?.[ex.id]?.reps;
+  if (own) return own;
+  const kind = ex.compound ? training?.reps?.compound : training?.reps?.isolation;
+  if (kind && ex.load !== "bodyweight") return kind;
   if (ex.load === "bodyweight") return ex.compound ? [6, 15] : [10, 20];
   if (!ex.compound) return goal === "strength" ? [8, 12] : [10, 15];
   return goal === "strength" ? [4, 6] : goal === "muscle" ? [6, 10] : [8, 12];
@@ -46,6 +55,19 @@ export function sessionsOf(events: readonly AppEvent[], exerciseId: string): Set
     by.set(e.sessionId, list);
   }
   return [...by.values()].sort((a, b) => b[0].at - a[0].at);
+}
+
+/**
+ * Reps-left ratings on last session's sets, against what the plan aimed for: two or more reps
+ * easier on average counts as "too easy", one or more harder (closer to failure) as "too hard".
+ */
+export function effortSignal(events: readonly AppEvent[], sets: readonly SetEvent[]): number {
+  const ids = new Map(sets.map((s) => [s.id, s.rir]));
+  const diffs: number[] = [];
+  for (const e of events) if (e.type === "effort" && ids.has(e.setId)) diffs.push(e.rir - ids.get(e.setId)!);
+  if (!diffs.length) return 0;
+  const mean = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+  return mean >= 2 ? 1 : mean <= -1 ? -1 : 0;
 }
 
 function lastFeedback(events: readonly AppEvent[], exerciseId: string, sessionId: string): number {
@@ -107,16 +129,17 @@ export function startE1rm(ex: Exercise, profile: Profile, now: number): number {
 
 export function target(ex: Exercise, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Target {
   const wk = blockWeek(profile, now);
-  const [lo, hi] = repRange(ex, profile.goal);
+  const [lo, hi] = repRange(ex, profile.goal, profile.training);
   const rir = wk.rir;
-  const past = sessionsOf(events, ex.id);
+  // Sessions done lighter for an injury don't count: the plan picks up from before it.
+  const past = sessionsOf(events, ex.id).filter((ss) => !ss.every((x) => x.injuryPct));
   const last = past[0];
 
   if (ex.load === "bodyweight") {
     if (!last) return { weight: 0, reps: lo, rir, note: "First time: find your level" };
     const best = Math.max(...last.map((s) => s.reps));
     const hit = last.every((s) => s.reps >= s.targetReps);
-    const fb = lastFeedback(events, ex.id, last[0].sessionId);
+    const fb = lastFeedback(events, ex.id, last[0].sessionId) || effortSignal(events, last);
     let reps = hit ? last[0].targetReps + 1 : last[0].targetReps;
     if (fb > 0) reps += 1;
     if (fb < 0) reps = Math.max(lo, reps - 2);
@@ -136,7 +159,7 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
   const lastTarget = last[0].targetReps;
   const allHit = last.every((s) => s.reps >= s.targetReps);
   const bigMiss = last.some((s) => s.reps <= s.targetReps - 2);
-  const fb = lastFeedback(events, ex.id, last[0].sessionId);
+  const fb = lastFeedback(events, ex.id, last[0].sessionId) || effortSignal(events, last);
 
   // After the first session, if it showed the cautious start was light (felt too easy, two or more
   // reps over target, or the lifter raised the weight), jump to what the logged sets show instead of

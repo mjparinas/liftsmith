@@ -1,7 +1,8 @@
 "use client";
 // PR replay on the summary: after a new best, the lift plays back with the lifter's own numbers, rep by
-// rep. The bar and plates are drawn from their gym; the 3D figure (LiftDemo, from the 3D demo work) joins
-// it once that lands. Respects reduced motion: it shows the final frame without moving.
+// rep: the 3D figure (LiftDemo) performs the lift that many times, with their bar and plates from their
+// gym shown underneath. Respects reduced motion: the figure holds a still pose and the counter shows the end.
+import { LiftDemo } from "@/components/demo/LiftDemo";
 import { PlateBar } from "@/components/PlateBar";
 import type { Pr } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
@@ -55,10 +56,7 @@ function Replay({ pr }: { pr: Pr }) {
     return () => cancelAnimationFrame(raf);
   }, [run, pr.reps, reduced]);
   const rep = Math.min(pr.reps, Math.floor(t / REP_MS) + (t >= pr.reps * REP_MS ? 0 : 1));
-  const phase = (t % REP_MS) / REP_MS;
   const done = t >= pr.reps * REP_MS;
-  // Down and up once per rep; the bar sits at the top between reps.
-  const depth = done ? 0 : Math.sin(Math.PI * phase);
   const unit = profile.unit;
   const bar = ex.load === "barbell" && gym ? barFor(ex, gym) : null;
   const loading = bar && gym ? loadBar(fromKg(pr.weight, gym.unit), bar.weight, gym.plates) : null;
@@ -67,10 +65,9 @@ function Replay({ pr }: { pr: Pr }) {
       <p className="text-sm uppercase tracking-wider text-gold">New personal best</p>
       <h3 className="text-2xl font-bold">{ex.name}</h3>
       <p className="num mt-1 text-4xl font-bold">{fmtNum(fromKg(pr.weight, unit))} {unit} × {pr.reps}</p>
-      <div className="relative mx-auto mt-4 h-44 w-full max-w-xs overflow-hidden rounded-2xl bg-raised" aria-hidden>
-        <div className="absolute inset-x-4" style={{ top: `${18 + depth * 52}%`, transition: reduced ? undefined : "none" }}>
-          {loading && bar ? <PlateBar loading={loading} bar={bar.weight} unit={gym!.unit} compact /> : <div className="mx-auto h-3 w-3/4 rounded-full bg-accent" />}
-        </div>
+      <div className="mx-auto mt-4 w-full max-w-sm overflow-hidden rounded-2xl bg-raised" aria-hidden>
+        <LiftDemo key={run} exerciseId={pr.exerciseId} reps={pr.reps} still={reduced} label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`} className="h-56" />
+        {loading && bar && <div className="px-4 pb-3"><PlateBar loading={loading} bar={bar.weight} unit={gym!.unit} compact /></div>}
       </div>
       <p className="num mt-3 text-lg font-semibold" aria-live="polite">{done ? `${pr.reps} reps. Every one of them yours.` : `Rep ${rep}`}</p>
       <p className="num text-sm text-muted">Estimated max now {fmtNum(Math.round(fromKg(pr.e1rm, unit)))} {unit}</p>

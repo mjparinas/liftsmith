@@ -1,6 +1,7 @@
 "use client";
 // Settings for the delightful extras: voice coach, ghost mode, plate memory, rest timer extras, earned
 // themes and app icons.
+import { useLight } from "@/lib/appearance";
 import { goalStreak } from "@/lib/game";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
@@ -25,6 +26,7 @@ function Toggle({ label, on, set, hint }: { label: string; on: boolean; set: (v:
 
 export function DelightSettings() {
   const { profile, setProfile, stats } = useApp();
+  const light = useLight(profile.theme ?? "dark");
   const now = useNow(60_000);
   const d = profile.delight ?? {};
   const put = (p: Partial<DelightPrefs>) => setProfile({ delight: { ...d, ...p } });
@@ -44,7 +46,8 @@ export function DelightSettings() {
       </Section>
       <section id="themes" className="mt-6 scroll-mt-4">
         <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">Themes</h2>
-        <ul className="grid grid-cols-2 gap-2">
+        {light && <p className="mb-2 px-1 text-sm text-muted">With Appearance set to light, a theme changes the accent colour only.</p>}
+        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9.5rem),1fr))] gap-2">
           {THEMES.map((t) => {
             const open = unlocked(t, ctx);
             const on = (d.theme ?? "midnight") === t.id;
