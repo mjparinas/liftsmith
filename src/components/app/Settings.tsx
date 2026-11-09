@@ -1,5 +1,6 @@
 "use client";
 import { useApp } from "@/lib/store";
+import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
@@ -27,7 +28,7 @@ function Row<T extends string | number>({ label, value, options, onPick, info }:
 }
 
 export function Settings() {
-  const { profile, setProfile, reset } = useApp();
+  const { profile, setProfile, reset, events, gyms } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
   const { arg } = useRoute();
@@ -80,6 +81,11 @@ export function Settings() {
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>
       <Section title="Data">
+        <div className="mb-3 grid grid-cols-2 gap-2">
+          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>Export sets (CSV)</Button>
+          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events))}>Full backup (JSON)</Button>
+        </div>
+        <p className="mb-3 text-xs text-faint">The CSV has every working set for spreadsheets. The backup has everything: profile, gyms, workouts, body weight and heart rate.</p>
         {confirm ? (
           <div className="space-y-2">
             <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
