@@ -34,7 +34,6 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   "workout.comingUp": "À suivre",
   "workout.startRest": "Lancer le repos · {time}",
   "workout.howTo": "Comment faire ›",
-  "workout.howToLabel": "Comment faire",
   // Coaching helpers on the workout screen (CoachExtras.tsx)
   "coach.why": "Pourquoi ?",
   "coach.changePlan": "Modifier le plan",
@@ -385,7 +384,6 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   "settings.full": "Complet : confettis, sons, coffres",
   "settings.lean": "Mode sobre",
   "settings.lean.note": "Le mode sobre coupe les confettis, les sons de célébration et les animations. Les sons du minuteur et les vibrations restent. L’XP, les séries et les badges comptent toujours.",
-  "settings.achievements": "Succès et casier",
   "settings.stats": "Statistiques d’utilisation",
   "settings.stats.on": "Partager des statistiques anonymes",
   "settings.stats.note": "Écrans et fonctions utilisés, modèle de l’appareil, version de l’app et comment vous nous avez trouvés, sous un identifiant d’installation aléatoire. Jamais vos charges, vos séances ni vos données de santé.",

@@ -37,7 +37,6 @@ export const en = {
   "workout.comingUp": "Coming up",
   "workout.startRest": "Start rest · {time}",
   "workout.howTo": "How to ›",
-  "workout.howToLabel": "How to do it",
   // Coaching helpers on the workout screen (CoachExtras.tsx)
   "coach.why": "Why?",
   "coach.changePlan": "Change the plan",
@@ -393,7 +392,6 @@ export const en = {
   "settings.full": "Full: confetti, sounds, crates",
   "settings.lean": "Lean mode",
   "settings.lean.note": "Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.",
-  "settings.achievements": "Achievements and locker",
   "settings.stats": "Usage stats",
   "settings.stats.on": "Share anonymous stats",
   "settings.stats.note": "Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data.",

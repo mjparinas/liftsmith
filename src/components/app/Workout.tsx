@@ -267,7 +267,6 @@ export function Workout() {
               </div>
               <div className="flex shrink-0 gap-2">
                 {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("coach.changePlan")}><Icon name="clock" size={20} /></button>}
-                <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.howToLabel")}><Icon name="info" size={20} /></button>
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.swap")}><Icon name="swap" size={20} /></button>
               </div>
             </div>
@@ -283,8 +282,11 @@ export function Workout() {
           </section>
 
           <div className="relative mt-4 h-52">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
-            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
+            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} className="h-full" />
+            {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}
+            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute inset-0 rounded-2xl">
+              <span className="absolute bottom-2 right-2 inline-flex min-h-11 items-center rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</span>
+            </button>
           </div>
 
           {/* Screen readers hear the rest start, ten seconds left and rest over, not every second. */}
