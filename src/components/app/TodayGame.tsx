@@ -1,4 +1,5 @@
 "use client";
+import { LEAGUE_LABEL } from "@/lib/game";
 import { fmtNum } from "@/lib/units";
 import { Badge, Bar, TIER_COLOUR, useGame } from "./Achievements";
 import { go } from "./router";
@@ -20,7 +21,7 @@ export function TodayGame() {
       )}
       <div className="flex items-baseline justify-between">
         <span className="font-semibold">This week</span>
-        <span className="text-sm text-muted">🏅 {g.league.league} · <span className="num">{fmtNum(g.league.weekXp)} XP</span></span>
+        <span className="text-sm text-muted">🏅 {LEAGUE_LABEL[g.league.league]} · <span className="num">{fmtNum(g.league.weekXp)} XP</span></span>
       </div>
       <ul className="mt-2 space-y-2">
         {(open.length ? open : g.quests).slice(0, 3).map((q) => (

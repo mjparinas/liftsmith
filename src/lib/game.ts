@@ -1,4 +1,5 @@
-import { translated } from "./i18n";
+import type { MessageKey } from "@/locales/en";
+import { num, t, translated } from "./i18n";
 import { achievementXp, achievements, context, nearest, type Achievement } from "./achievements";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
@@ -16,20 +17,21 @@ const WEEK = 7 * DAY;
 // ---------- Levels: 50 of them on a gentle curve, with a title every few levels.
 
 const TITLES: [number, string][] = [
-  [1, "Rookie"],
-  [4, "Regular"],
-  [8, "Grinder"],
-  [12, "Iron"],
-  [16, "Steel"],
-  [21, "Titan"],
-  [26, "Legend"],
-  [31, "Mythic"],
+  [1, "rookie"],
+  [4, "regular"],
+  [8, "grinder"],
+  [12, "iron"],
+  [16, "steel"],
+  [21, "titan"],
+  [26, "legend"],
+  [31, "mythic"],
 ];
 export const MAX_LEVEL = 50;
 export const levelAt = (n: number) => (n <= 1 ? 0 : Math.round((50 * Math.pow(n - 1, 1.8)) / 10) * 10);
-export const titleOf = (n: number) => TITLES.filter(([at]) => n >= at).at(-1)![1];
+/** The level's title in the current language. */
+export const titleOf = (n: number) => t(`lvl.${TITLES.filter(([at]) => n >= at).at(-1)![1]}` as MessageKey);
 /** Kept for older callers: the first level of each title. */
-export const LEVELS = TITLES.map(([n, title]) => ({ at: levelAt(n), title }));
+export const LEVELS = TITLES.map(([n, id]) => ({ at: levelAt(n), get title() { return t(`lvl.${id}` as MessageKey); } }));
 
 export function levelOf(xp: number) {
   let n = 1;
@@ -42,7 +44,7 @@ export function levelOf(xp: number) {
     into: xp - levelAt(n),
     span: nextAt === null ? 1 : nextAt - levelAt(n),
     /** The next level's name: a new title when one starts there, otherwise "Level n". */
-    next: nextTitle === null ? null : nextTitle !== titleOf(n) ? nextTitle : `Level ${n + 1}`,
+    next: nextTitle === null ? null : nextTitle !== titleOf(n) ? nextTitle : t("progress.level", { level: n + 1 }),
   };
 }
 
@@ -146,20 +148,21 @@ export interface Quest {
   done: boolean;
 }
 
+const q = (id: string, n = 1) => t(`quest.${id}` as MessageKey, { count: n, n: num(n) });
 type QuestDef = { id: string; icon: string; xp: number; title(goal: number): string; goal(p: Profile): number; have(sets: SetEvent[], sessions: Session[], before: SetEvent[]): number };
 type Session = { id: string; at: number; sets: SetEvent[] };
 
 const QUESTS: QuestDef[] = [
   // Train the goal number of days, never more, so nobody is pushed to train sore.
-  { id: "days", icon: "📆", xp: 150, title: (n) => `Train ${n} day${n > 1 ? "s" : ""} this week`, goal: (p) => Math.max(1, p.daysPerWeek), have: (_s, ss) => new Set(ss.map((s) => new Date(s.at).toDateString())).size },
-  { id: "pr", icon: "🏆", xp: 120, title: () => "Set a personal record", goal: () => 1, have: (sets, _ss, before) => prsIn(sets, before) },
-  { id: "new-ex", icon: "🧭", xp: 80, title: () => "Try an exercise you've never done", goal: () => 1, have: (sets, _ss, before) => { const old = new Set(before.map((s) => s.exerciseId)); return new Set(sets.filter((s) => !old.has(s.exerciseId)).map((s) => s.exerciseId)).size; } },
-  { id: "on-target", icon: "🎯", xp: 100, title: () => "Hit every target rep in a workout", goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)).length },
-  { id: "sets", icon: "✅", xp: 100, title: (n) => `Log ${n} sets`, goal: (p) => Math.max(1, p.daysPerWeek) * 14, have: (sets) => sets.length },
-  { id: "legs", icon: "🦵", xp: 80, title: () => "Do a workout with legs in it", goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.some((x) => EXERCISE_BY_ID.get(x.exerciseId)?.primary.some((m) => m === "quads" || m === "hamstrings" || m === "glutes"))).length },
-  { id: "muscles", icon: "🫀", xp: 100, title: (n) => `Train ${n} different muscles`, goal: (p) => Math.min(10, 4 + Math.max(1, p.daysPerWeek) * 2), have: (sets) => new Set(sets.flatMap((s) => EXERCISE_BY_ID.get(s.exerciseId)?.primary ?? [])).size },
-  { id: "reps", icon: "🔁", xp: 100, title: (n) => `Do ${n} reps`, goal: (p) => Math.max(1, p.daysPerWeek) * 120, have: (sets) => sets.reduce((t, s) => t + (TIMED.has(s.exerciseId) ? 0 : s.reps), 0) },
-  { id: "rest", icon: "⏳", xp: 60, title: (n) => `Take the full rest before ${n} sets`, goal: (p) => Math.max(1, p.daysPerWeek) * 8, have: (sets) => sets.filter((s) => (s.restSec ?? 0) >= 60).length },
+  { id: "days", icon: "📆", xp: 150, title: (n) => q("days", n), goal: (p) => Math.max(1, p.daysPerWeek), have: (_s, ss) => new Set(ss.map((s) => new Date(s.at).toDateString())).size },
+  { id: "pr", icon: "🏆", xp: 120, title: () => q("pr"), goal: () => 1, have: (sets, _ss, before) => prsIn(sets, before) },
+  { id: "new-ex", icon: "🧭", xp: 80, title: () => q("new-ex"), goal: () => 1, have: (sets, _ss, before) => { const old = new Set(before.map((s) => s.exerciseId)); return new Set(sets.filter((s) => !old.has(s.exerciseId)).map((s) => s.exerciseId)).size; } },
+  { id: "on-target", icon: "🎯", xp: 100, title: () => q("on-target"), goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)).length },
+  { id: "sets", icon: "✅", xp: 100, title: (n) => q("sets", n), goal: (p) => Math.max(1, p.daysPerWeek) * 14, have: (sets) => sets.length },
+  { id: "legs", icon: "🦵", xp: 80, title: () => q("legs"), goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.some((x) => EXERCISE_BY_ID.get(x.exerciseId)?.primary.some((m) => m === "quads" || m === "hamstrings" || m === "glutes"))).length },
+  { id: "muscles", icon: "🫀", xp: 100, title: (n) => q("muscles", n), goal: (p) => Math.min(10, 4 + Math.max(1, p.daysPerWeek) * 2), have: (sets) => new Set(sets.flatMap((s) => EXERCISE_BY_ID.get(s.exerciseId)?.primary ?? [])).size },
+  { id: "reps", icon: "🔁", xp: 100, title: (n) => q("reps", n), goal: (p) => Math.max(1, p.daysPerWeek) * 120, have: (sets) => sets.reduce((t, s) => t + (TIMED.has(s.exerciseId) ? 0 : s.reps), 0) },
+  { id: "rest", icon: "⏳", xp: 60, title: (n) => q("rest", n), goal: (p) => Math.max(1, p.daysPerWeek) * 8, have: (sets) => sets.filter((s) => (s.restSec ?? 0) >= 60).length },
 ];
 
 function prsIn(sets: SetEvent[], before: SetEvent[]): number {
@@ -216,6 +219,8 @@ export function questsFor(events: readonly AppEvent[], profile: Profile, monday:
 
 export const LEAGUES = ["Bronze", "Silver", "Gold", "Sapphire", "Ruby", "Emerald", "Diamond"] as const;
 export type League = (typeof LEAGUES)[number];
+/** A league's name in the current language (`LEAGUES` stays the stable id). */
+export const LEAGUE_LABEL: Record<League, string> = translated(LEAGUES, (l) => `league.${l.toLowerCase()}` as MessageKey);
 /** Weekly XP needed to move up from each league, and below which you drop a league. */
 export const promoteAt = (i: number) => 300 + 150 * i;
 export const demoteBelow = (i: number) => (i === 0 ? 0 : 100 + 50 * i);
@@ -271,23 +276,25 @@ export interface Cosmetic {
   value: string;
 }
 
-export const COSMETICS: Cosmetic[] = [
-  { id: "accent-blue", kind: "accent", name: "Liftsmith blue", rarity: "common", value: "#4c8dff" },
-  { id: "accent-teal", kind: "accent", name: "Teal", rarity: "common", value: "#2dd4bf" },
-  { id: "accent-lime", kind: "accent", name: "Lime", rarity: "common", value: "#a3e635" },
-  { id: "accent-violet", kind: "accent", name: "Violet", rarity: "rare", value: "#a78bfa" },
-  { id: "accent-orange", kind: "accent", name: "Ember", rarity: "rare", value: "#fb923c" },
-  { id: "accent-pink", kind: "accent", name: "Flamingo", rarity: "epic", value: "#f472b6" },
-  { id: "accent-gold", kind: "accent", name: "Gold rush", rarity: "legendary", value: "#f2c14e" },
-  { id: "sound-classic", kind: "sound", name: "Classic beeps", rarity: "common", value: "classic" },
-  { id: "sound-chime", kind: "sound", name: "Chime", rarity: "common", value: "chime" },
-  { id: "sound-arcade", kind: "sound", name: "Arcade", rarity: "rare", value: "arcade" },
-  { id: "sound-gong", kind: "sound", name: "Gong", rarity: "epic", value: "gong" },
-  { id: "plates-classic", kind: "plates", name: "Competition colours", rarity: "common", value: "classic" },
-  { id: "plates-black", kind: "plates", name: "Matte black", rarity: "rare", value: "black" },
-  { id: "plates-chrome", kind: "plates", name: "Chrome", rarity: "epic", value: "chrome" },
-  { id: "plates-neon", kind: "plates", name: "Neon", rarity: "legendary", value: "neon" },
+const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
+  { id: "accent-blue", kind: "accent", rarity: "common", value: "#4c8dff" },
+  { id: "accent-teal", kind: "accent", rarity: "common", value: "#2dd4bf" },
+  { id: "accent-lime", kind: "accent", rarity: "common", value: "#a3e635" },
+  { id: "accent-violet", kind: "accent", rarity: "rare", value: "#a78bfa" },
+  { id: "accent-orange", kind: "accent", rarity: "rare", value: "#fb923c" },
+  { id: "accent-pink", kind: "accent", rarity: "epic", value: "#f472b6" },
+  { id: "accent-gold", kind: "accent", rarity: "legendary", value: "#f2c14e" },
+  { id: "sound-classic", kind: "sound", rarity: "common", value: "classic" },
+  { id: "sound-chime", kind: "sound", rarity: "common", value: "chime" },
+  { id: "sound-arcade", kind: "sound", rarity: "rare", value: "arcade" },
+  { id: "sound-gong", kind: "sound", rarity: "epic", value: "gong" },
+  { id: "plates-classic", kind: "plates", rarity: "common", value: "classic" },
+  { id: "plates-black", kind: "plates", rarity: "rare", value: "black" },
+  { id: "plates-chrome", kind: "plates", rarity: "epic", value: "chrome" },
+  { id: "plates-neon", kind: "plates", rarity: "legendary", value: "neon" },
 ];
+/** Cosmetics with their names in the current language (getters, so a language change shows at once). */
+export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({ ...c, get name() { return t(`cos.${c.id}` as MessageKey); } }));
 export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 60, rare: 28, epic: 10, legendary: 2 };
 export const RARITY_LABEL: Record<Rarity, string> = translated(["common", "rare", "epic", "legendary"], (k) => `rarity.${k}`);

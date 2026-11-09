@@ -1,4 +1,5 @@
-import { translated } from "./i18n";
+import type { MessageKey } from "@/locales/en";
+import { num, t, translated } from "./i18n";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { TIMED } from "./progression";
@@ -226,9 +227,10 @@ export interface Achievement {
   hidden: boolean;
 }
 
-function fill(detail: string, n: number) {
-  return detail.replace("{n}", String(n)).replace(/\(s\)/g, n === 1 ? "" : "s");
-}
+/** An achievement's name in the current language (the English one in the table is the source). */
+export const achName = (id: string) => t(`ach.${id}` as MessageKey);
+/** What a tier asks for, with its threshold, in the current language. */
+const fill = (id: string, n: number) => t(`ach.${id}.d` as MessageKey, { count: n, n: num(n) });
 
 export function evaluate(def: AchievementDef, c: Ctx): Achievement {
   const value = def.value(c);
@@ -242,9 +244,9 @@ export function evaluate(def: AchievementDef, c: Ctx): Achievement {
   const hidden = !!def.secret && level === 0;
   return {
     id: def.id,
-    name: hidden ? "Secret achievement" : def.name,
+    name: hidden ? t("ach.secret") : achName(def.id),
     /** What the highest tier reached asked for (or the first tier, before any). */
-    detail: hidden ? "Keep training to find this one." : fill(def.detail, def.tiers[Math.max(0, level - 1)]),
+    detail: hidden ? t("ach.secretHint") : fill(def.id, def.tiers[Math.max(0, level - 1)]),
     icon: hidden ? "❔" : def.icon,
     category: def.category,
     secret: !!def.secret,
@@ -253,7 +255,7 @@ export function evaluate(def: AchievementDef, c: Ctx): Achievement {
     tier,
     level,
     levels: def.tiers.length,
-    next: nextAt === undefined ? null : { tier: names[level], at: nextAt, detail: hidden ? "???" : fill(def.detail, nextAt) },
+    next: nextAt === undefined ? null : { tier: names[level], at: nextAt, detail: hidden ? "???" : fill(def.id, nextAt) },
     progress,
     hidden,
   };
@@ -303,7 +305,7 @@ export function shareName(id: string): string | null {
   const [aid, tier] = id.split(".");
   const d = ACHIEVEMENTS.find((x) => x.id === aid);
   if (!d || !TIERS.includes(tier as Tier)) return null;
-  return `${d.icon} ${d.name} · ${TIER_LABEL[tier as Tier]}`;
+  return `${d.icon} ${achName(d.id)} · ${TIER_LABEL[tier as Tier]}`;
 }
 
 /** Closest unearned goals, for "almost there" nudges. Secret ones are left out. */
