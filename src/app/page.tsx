@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { HeroLift } from "@/components/site/HeroLift";
 import { DemoPicker } from "@/components/site/DemoPicker";
+import { SiteFooter } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
@@ -156,46 +157,13 @@ function Header() {
           <a href="#demos" className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">3D demos</a>
           <a href="#pricing" className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">Pricing</a>
           <a href="#faq" className="hidden rounded-lg px-3 py-2 hover:bg-surface lg:inline">FAQ</a>
+          <Link href="/blog/" className="hidden rounded-lg px-3 py-2 hover:bg-surface lg:inline">Blog</Link>
           <Link href={APP_PATH} data-cta="header" className="press ml-1 inline-flex min-h-11 items-center rounded-xl bg-accent px-4 text-accent-ink">
             Start free
           </Link>
         </nav>
       </div>
     </header>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-[1.5fr_1fr_1fr]">
-        <div>
-          <p className="text-lg font-bold">{name}</p>
-          <p className="mt-2 max-w-sm text-sm text-muted">{BRAND.tagline} Adaptive strength training for Android, iPhone and the web. No ads, ever.</p>
-          <StoreBadges className="mt-4" webLink={false} place="footer" />
-        </div>
-        <nav aria-label="Product">
-          <p className="font-semibold">Product</p>
-          <ul className="mt-2 space-y-2 text-sm text-muted">
-            <li><Link href={APP_PATH} className="hover:text-ink">Open the app</Link></li>
-            <li><a href="#features" className="hover:text-ink">Features</a></li>
-            <li><a href="#pricing" className="hover:text-ink">Pricing</a></li>
-            <li><Link href="/me/" className="hover:text-ink">Your dashboard</Link></li>
-            <li><Link href="/tools/tdee-calculator/" className="hover:text-ink">TDEE calculator</Link></li>
-          </ul>
-        </nav>
-        <nav aria-label="Company">
-          <p className="font-semibold">Company</p>
-          <ul className="mt-2 space-y-2 text-sm text-muted">
-            <li><a href="/privacypolicy.html" className="hover:text-ink">Privacy</a></li>
-            <li><a href="#faq" className="hover:text-ink">FAQ</a></li>
-          </ul>
-        </nav>
-      </div>
-      <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted">
-        © {new Date().getFullYear()} {name}. Google Play and the Google Play logo are trademarks of Google LLC. Apple, the Apple logo and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc.
-      </p>
-    </footer>
   );
 }
 
@@ -479,7 +447,7 @@ export default function Home() {
           </div>
         </section>
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   );
 }

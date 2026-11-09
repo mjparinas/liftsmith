@@ -8,7 +8,7 @@ import { chromium, devices } from "playwright";
 import { base, finish, onboard } from "./helpers.mjs";
 
 const server = await base();
-const browser = await chromium.launch();
+const browser = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 const ctx = await browser.newContext({ ...devices["Pixel 7"] });
 const page = await ctx.newPage();
 const fail = [];
@@ -96,6 +96,13 @@ try {
   await page.goto(`${server.url}/tools/tdee-calculator/`);
   await page.getByTestId("tdee-value").waitFor();
   await scan("tdee public page");
+  // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
+  // guide, blog post and index, calculators).
+  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/"]) {
+    await page.goto(`${server.url}${path}`);
+    await page.getByRole("heading", { level: 1 }).waitFor();
+    await scan(`site ${path}`);
+  }
   await page.goto(`${server.url}/app/#/pro`);
   await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
   await scan("pro");

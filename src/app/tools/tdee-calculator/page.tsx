@@ -3,6 +3,7 @@ import Link from "next/link";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { TdeeCalculator } from "@/components/site/TdeeCalculator";
+import { CtaBanner, Crumbs, JsonLd, SitePage } from "@/components/site/SiteChrome";
 
 export const metadata: Metadata = {
   title: "TDEE calculator: calories a day to maintain, cut or bulk",
@@ -25,11 +26,9 @@ const jsonLd = [
 
 export default function TdeePage() {
   return (
-    <main className="mx-auto max-w-5xl px-5 py-10">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <nav className="text-sm text-muted" aria-label="Breadcrumb">
-        <Link href="/" className="hover:text-ink">{BRAND.name}</Link> › <Link href="/tools/" className="hover:text-ink">Tools</Link> › TDEE calculator
-      </nav>
+    <SitePage kind="tool" sticky="Calories that follow your weigh-ins">
+      <JsonLd data={jsonLd} />
+      <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "TDEE calculator" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-4xl">TDEE calculator</h1>
       <p className="mt-2 max-w-2xl text-muted">How many calories a day you burn, and what to eat to hold, lose or gain weight. Tap + and − to set your numbers; hold a button to go faster.</p>
       <div className="mt-8"><TdeeCalculator /></div>
@@ -49,6 +48,7 @@ export default function TdeePage() {
           ))}
         </dl>
       </section>
-    </main>
+      <CtaBanner cta="tool-tdee-end" title="Your TDEE, kept up to date" body={`${BRAND.name} recalculates it from your weigh-ins and the days you actually train, and plans your workouts too.`} />
+    </SitePage>
   );
 }

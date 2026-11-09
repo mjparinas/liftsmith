@@ -1,6 +1,7 @@
 "use client";
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
-import { readPhoneLanguage, setLanguage, t, useLang } from "@/lib/i18n";
+import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
+import { useLang } from "@/lib/useLang";
 import type { MessageKey } from "@/locales/en";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
