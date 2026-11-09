@@ -101,7 +101,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 ### Money
 - **No ads, ever** (Melvin, 2026-11-09). No ad SDKs, sponsored placements, interstitials or rewarded videos, in either app or on the site. The subscription is the only revenue.
 - **Prices (confirmed by Melvin, 2026-11-09):** Pro is $6.99 a month or $39.99 a year. The annual plan is pushed as "about $3.33 a month, less than half of Fitbod", with a 7-day free trial on the annual plan. **No lifetime plan.**
-- **Free tier:** the workout logger, plate graphic, rest timer and live notification. **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
+- **Free tier:** the workout logger, plate graphic, rest timer and live notification, plus a **classic 5x5 program mode** (Melvin, 2026-11-09; not built yet). **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
 - **Billing is native:** Google Play Billing on Android and StoreKit on iOS, through a Capacitor purchases plugin. The subscription is checked on the device so Pro works offline, and verified by the server once accounts exist.
 - Until billing lands, the app has a single `pro` entitlement switched on, so the paywall drops in without reworking screens.
 
