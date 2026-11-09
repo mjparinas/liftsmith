@@ -103,7 +103,7 @@ export function repeatPlan(base: Plan, events: readonly AppEvent[], profile: Pro
   const kept = last.items.filter((i) => can.has(i.exerciseId));
   const plain: PlanItem[] = kept.map((i) => {
     const ex = exercise(i.exerciseId);
-    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
+    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal, profile.training), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
   });
   if (!plain.length) return null;
   // Supersets come back as they were, where both exercises are still here and next to each other.

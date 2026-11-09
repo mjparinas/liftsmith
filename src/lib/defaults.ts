@@ -66,6 +66,19 @@ export function makeGym(preset: GymPreset, unit: Unit, id = crypto.randomUUID())
   };
 }
 
+/**
+ * Switches a gym's plates between kg and lb. Plates, bars, dumbbells and kettlebells are real objects
+ * that don't convert (a 20 kg plate isn't a 45 lb plate), so they're replaced with the standard kit in
+ * the new unit; equipment, name and place are kept. The lifter can then edit the kit as usual.
+ */
+export function switchGymUnit(gym: Gym, unit: Unit): Gym {
+  if (gym.unit === unit) return gym;
+  const heaviest = gym.dumbbells.at(-1) ?? 0;
+  const big = gym.unit === "kg" ? heaviest > 35 : heaviest > 75;
+  const kit = makeGym(big ? "commercial" : "home", unit, gym.id);
+  return { ...gym, unit, bars: kit.bars, plates: kit.plates, dumbbells: gym.dumbbells.length ? kit.dumbbells : [], kettlebells: gym.kettlebells.length ? kit.kettlebells : [], machineStep: kit.machineStep, updatedAt: Date.now() };
+}
+
 export function defaultProfile(now = Date.now()): Profile {
   const d = new Date(now);
   d.setHours(0, 0, 0, 0);

@@ -1,7 +1,7 @@
 import { blockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
 import { roundLoad, stepLoad } from "./loads";
-import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent } from "./types";
+import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent, TrainingPrefs } from "./types";
 
 // What weight and reps to suggest for an exercise today.
 //
@@ -12,8 +12,17 @@ import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent } from "./types";
 /** Holds and carries are counted in seconds. */
 export const TIMED = new Set(["plank", "side-plank", "superman", "copenhagen-plank", "farmers-carry", "kb-suitcase-carry", "dead-bug"]);
 
-export function repRange(ex: Exercise, goal: Goal): [number, number] {
+/**
+ * The rep range for double progression. The lifter's own range for this exercise wins, then their
+ * range for compound or isolation lifts (loaded exercises only: bodyweight work keeps adding reps),
+ * then the default for their goal. Holds stay in seconds and ignore both.
+ */
+export function repRange(ex: Exercise, goal: Goal, training?: TrainingPrefs): [number, number] {
   if (TIMED.has(ex.id)) return [20, 45];
+  const own = training?.exercises?.[ex.id]?.reps;
+  if (own) return own;
+  const kind = ex.compound ? training?.reps?.compound : training?.reps?.isolation;
+  if (kind && ex.load !== "bodyweight") return kind;
   if (ex.load === "bodyweight") return ex.compound ? [6, 15] : [10, 20];
   if (!ex.compound) return goal === "strength" ? [8, 12] : [10, 15];
   return goal === "strength" ? [4, 6] : goal === "muscle" ? [6, 10] : [8, 12];
@@ -120,7 +129,7 @@ export function startE1rm(ex: Exercise, profile: Profile, now: number): number {
 
 export function target(ex: Exercise, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Target {
   const wk = blockWeek(profile, now);
-  const [lo, hi] = repRange(ex, profile.goal);
+  const [lo, hi] = repRange(ex, profile.goal, profile.training);
   const rir = wk.rir;
   // Sessions done lighter for an injury don't count: the plan picks up from before it.
   const past = sessionsOf(events, ex.id).filter((ss) => !ss.every((x) => x.injuryPct));

@@ -110,8 +110,8 @@ describe("Today and Progress extras", () => {
     location.hash = "#/stats";
     expect(await screen.findByText("Lifted in total")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Body and photos/ }));
-    await user.clear(await screen.findByLabelText(/Body weight in/));
-    await user.type(screen.getByLabelText(/Body weight in/), "81.5");
+    await user.clear(await screen.findByRole("textbox", { name: /Body weight in/ }));
+    await user.type(screen.getByRole("textbox", { name: /Body weight in/ }), "81.5");
     await user.click(screen.getByRole("button", { name: "Log" }));
     expect(useApp.getState().profile.bodyweight).toBeCloseTo(81.5);
     expect(useApp.getState().events.some((e) => e.type === "bodyweight")).toBe(true);

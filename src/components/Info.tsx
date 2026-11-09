@@ -30,6 +30,9 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
 
   return (
     <>
+      {/* A line-break opportunity, so with large text the button can drop to the next line instead of
+          pushing past the screen edge. */}
+      <wbr />
       <button
         ref={btn}
         type="button"
@@ -41,10 +44,13 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
         }}
         className={`press -my-3 inline-grid h-11 w-11 shrink-0 place-items-center align-middle normal-case tracking-normal ${className}`}
       >
-        <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full border border-current text-[11px] font-bold leading-none text-muted">i</span>
+        <span aria-hidden className="grid h-5 w-5 place-items-center rounded-full border border-current text-[0.6875rem] font-bold leading-none text-muted">i</span>
       </button>
       {open && createPortal(
+        // Tapping outside closes it: a pointer convenience; Escape and Got it cover the keyboard.
+        // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
         <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/60 p-4 sm:items-center" onClick={close}>
+          {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
           <div
             role="dialog"
             aria-modal="true"
@@ -53,7 +59,7 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
             onClick={(e) => e.stopPropagation()}
           >
             <h2 id={`${id}-t`} className="text-lg font-semibold">{title}</h2>
-            <div className="mt-2 space-y-2 text-[15px] leading-relaxed text-muted">
+            <div className="mt-2 space-y-2 text-[0.9375rem] leading-relaxed text-muted">
               {body.map((p) => <p key={p}>{p}</p>)}
             </div>
             <button ref={ok} type="button" onClick={close} className="press mt-4 min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">Got it</button>

@@ -1,12 +1,13 @@
 "use client";
-import { dayKey, heat, type DayTotals, type GridDay } from "@/lib/dashboard";
+import { dayKey, heat, weekdayNames, type DayTotals, type GridDay } from "@/lib/dashboard";
 import { useEffect, useRef, useState } from "react";
 
 // Small SVG charts for the web dashboard. One series each (the title names it, so no legend), the
 // accent colour for data, recessive grid lines, and a hover or focus readout on every mark.
 
 const HEAT = ["var(--color-raised)", "rgb(76 141 255 / 0.3)", "rgb(76 141 255 / 0.55)", "rgb(76 141 255 / 0.8)", "var(--color-accent)"];
-const DOW = ["Mon", "", "Wed", "", "Fri", "", "Sun"];
+/** Every other weekday label down the side of the year grid, in the lifter's week order. */
+const dow = () => weekdayNames().map((d, i) => (i % 2 ? "" : d));
 
 function dayLabel(ms: number) {
   return new Date(ms).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -39,9 +40,9 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
         <div className="relative inline-grid" role="img" aria-label={summary(grid, days)} style={{ gridTemplateColumns: `28px repeat(${grid.length}, ${cell}px)`, columnGap: gap, rowGap: gap }}>
           <div />
           {grid.map((_, i) => (
-            <div key={i} className="h-4 text-[10px] leading-4 text-faint" aria-hidden>{months.find((m) => m.x === i)?.label ?? ""}</div>
+            <div key={i} className="h-4 text-[0.625rem] leading-4 text-faint" aria-hidden>{months.find((m) => m.x === i)?.label ?? ""}</div>
           ))}
-          {DOW.map((label, row) => (
+          {dow().map((label, row) => (
             <Row key={row} label={label} row={row} grid={grid} days={days} cell={cell} onHover={setHover} onPick={onPick} />
           ))}
         </div>
@@ -61,7 +62,7 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
 function Row({ label, row, grid, days, cell, onHover, onPick }: { label: string; row: number; grid: GridDay[][]; days: Map<string, DayTotals>; cell: number; onHover: (d: GridDay | null) => void; onPick?: (ms: number) => void }) {
   return (
     <>
-      <div className="text-[10px] leading-[13px] text-faint" aria-hidden>{label}</div>
+      <div className="text-[0.625rem] leading-[13px] text-faint" aria-hidden>{label}</div>
       {grid.map((col) => {
         const d = col[row];
         if (d.future) return <div key={d.key} style={{ width: cell, height: cell }} />;
@@ -69,6 +70,7 @@ function Row({ label, row, grid, days, cell, onHover, onPick }: { label: string;
         // Pointer-only: the squares are too small to tap, so keyboard and screen reader users get the
         // same days from the month calendar and the summary on the grid.
         return (
+          // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
           <div
             key={d.key}
             onMouseEnter={() => onHover(d)}
@@ -89,7 +91,7 @@ export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (
   return (
     <table className="w-full table-fixed border-separate border-spacing-1 text-sm">
       <thead>
-        <tr>{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">{d}</th>)}</tr>
+        <tr>{weekdayNames().map((d) => <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">{d}</th>)}</tr>
       </thead>
       <tbody>
         {rows.map((r, i) => (

@@ -9,6 +9,7 @@ import { recovery } from "./recovery";
 import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
 import { groupedSeconds } from "./superset";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
+import { PRIORITY_VOLUME } from "./training";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
 // recovered and furthest below this week's set target, sized to fit the minutes asked for.
@@ -81,7 +82,12 @@ export interface GenerateInput {
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
 
-export function restFor(ex: Exercise, goal: Profile["goal"]): number {
+/** Rest between sets: the lifter's time for this exercise, then their compound or isolation default, then by goal. */
+export function restFor(ex: Exercise, goal: Profile["goal"], training?: Profile["training"]): number {
+  const own = training?.exercises?.[ex.id]?.rest;
+  if (own) return own;
+  const kind = ex.compound ? training?.rest?.compound : training?.rest?.isolation;
+  if (kind) return kind;
   if (ex.load === "bodyweight" && !ex.compound) return 45;
   if (!ex.compound) return 75;
   if (ex.load === "bodyweight") return 75;
@@ -159,6 +165,9 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
   const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
   const random = rng(hash(dayKey(now) + gym.id));
+  const training = profile.training;
+  const favs = new Set(training?.favourites ?? []);
+  const prio = new Set(training?.priorities ?? []);
   const recent = recentFor(events);
   const budget = minutes * 60;
 
@@ -166,9 +175,11 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
   const ranked = MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
     .map((m) => {
-      const left = Math.max(0, week.setsPerMuscle - done[m]) / week.setsPerMuscle;
+      // Priority muscles (Settings) aim for a third more sets this week and rank ahead.
+      const goal = week.setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1);
+      const left = Math.max(0, goal - done[m]) / week.setsPerMuscle;
       const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;
-      return { m, score: (rec[m] / 100) * (0.25 + left) * big + random() * 0.05 };
+      return { m, score: (rec[m] / 100) * (0.25 + left) * big * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
     })
     .sort((a, b) => b.score - a.score)
     .map((x) => x.m);
@@ -182,8 +193,10 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     const cands = pool.filter((e) => e.primary.includes(m) && !used.has(e.id) && e.primary.every((p) => rec[p] >= 40));
     if (!cands.length) return undefined;
     const prev = (recent.get(m) ?? []).map((id) => cands.find((c) => c.id === id)).find(Boolean);
-    if (prev && random() < KEEP[profile.variability]) return prev;
-    const weighted = cands.map((c) => ({ c, w: (compoundFirst && c.compound ? (c.load === "barbell" ? 4 : 3) : 1) * (c.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) * (0.5 + random()) }));
+    // A favourite that fits beats keeping last time's exercise, unless last time's was a favourite too.
+    const favHere = cands.some((c) => favs.has(c.id));
+    if (prev && (!favHere || favs.has(prev.id)) && random() < KEEP[profile.variability]) return prev;
+    const weighted = cands.map((c) => ({ c, w: (compoundFirst && c.compound ? (c.load === "barbell" ? 4 : 3) : 1) * (c.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) * (favs.has(c.id) ? 6 : 1) * (0.5 + random()) }));
     weighted.sort((a, b) => b.w - a.w);
     return weighted[0].c;
   };
@@ -192,10 +205,12 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     const ex = pick(m, compoundFirst);
     if (!ex) return false;
     const t = injuredTarget(ex, target(ex, events, profile, gym, now), hurt, gym);
-    const baseSets = ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3;
+    // The lifter's set count (for this exercise, then for every exercise) replaces the automatic one.
+    const chosen = training?.exercises?.[ex.id]?.sets ?? training?.sets;
+    const baseSets = chosen ?? (ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3);
     const sets = week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets;
     const warmup = warmupFor(ex, t.target.weight, gym, warmed);
-    const item: PlanItem = { exerciseId: ex.id, sets, restSec: restFor(ex, profile.goal), focus: m, target: t.target, injuryPct: t.injuryPct, warmup: warmup.length ? warmup : undefined };
+    const item: PlanItem = { exerciseId: ex.id, sets, restSec: restFor(ex, profile.goal, training), focus: m, target: t.target, injuryPct: t.injuryPct, warmup: warmup.length ? warmup : undefined };
     const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
     if (total + cost > budget) return false;
     total += cost;
@@ -215,8 +230,11 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     }
   }
 
-  // Leftover time: an extra set on the earliest exercises.
-  for (const item of items) {
+  // Leftover time: an extra set on the earliest exercises, priority muscles first. A set count the
+  // lifter chose is kept as it is.
+  const fixed = (id: string) => (training?.exercises?.[id]?.sets ?? training?.sets) !== undefined;
+  for (const item of [...items].sort((a, b) => Number(prio.has(b.focus)) - Number(prio.has(a.focus)))) {
+    if (fixed(item.exerciseId)) continue;
     const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
     const extra = setSeconds(ex, item.target.reps) + item.restSec;
     if (item.sets < 5 && !week.deload && call !== "recover" && !item.injuryPct && total + extra <= budget) {

@@ -181,6 +181,7 @@ function Footer() {
             <li><a href="#features" className="hover:text-ink">Features</a></li>
             <li><a href="#pricing" className="hover:text-ink">Pricing</a></li>
             <li><Link href="/me/" className="hover:text-ink">Your dashboard</Link></li>
+            <li><Link href="/tools/tdee-calculator/" className="hover:text-ink">TDEE calculator</Link></li>
           </ul>
         </nav>
         <nav aria-label="Company">
