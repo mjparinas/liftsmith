@@ -1,4 +1,5 @@
 import { exercise, available } from "./exercises";
+import { t } from "./i18n";
 import { restFor, planSeconds, type Plan, type PlanItem } from "./generator";
 import { withLinks } from "./superset";
 import { sessionsOf, target } from "./progression";
@@ -61,9 +62,10 @@ export function paceDelta(g: Ghost | null, logged: readonly { at: number }[]): n
 
 /** "0:42 ahead", "1:05 behind", "level". */
 export function paceText(delta: number): string {
-  if (Math.abs(delta) < 5) return "level with your ghost";
+  if (Math.abs(delta) < 5) return t("ghost.level");
   const a = Math.abs(delta);
-  return `${Math.floor(a / 60)}:${String(a % 60).padStart(2, "0")} ${delta > 0 ? "ahead" : "behind"}`;
+  const time = `${Math.floor(a / 60)}:${String(a % 60).padStart(2, "0")}`;
+  return t(delta > 0 ? "ghost.ahead" : "ghost.behind", { time });
 }
 
 // --- Same as last time -------------------------------------------------------------------------
