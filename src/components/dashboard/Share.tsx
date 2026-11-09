@@ -3,6 +3,7 @@ import { BRAND } from "@/lib/brand";
 import { decodeShare, encodeShare, SHARE_DAYS, shareCard, shareLevel, type ShareCard } from "@/lib/dashboard";
 import { mondayOf, type Stats } from "@/lib/derive";
 import { exerciseName } from "@/lib/game";
+import { shareName } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -12,6 +13,7 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 // Sharing with friends, before accounts exist: the summary travels in the link's #fragment, which
 // browsers never send to a server, so nobody but the people given the link can read it.
 
+/** Names for trophy ids in links made before achievements. */
 const TROPHY_NAME: Record<string, string> = {
   first: "First rep",
   ten: "Habit",
@@ -51,7 +53,7 @@ export function ShareView({ card }: { card: ShareCard }) {
         {[
           ["Workouts", fmtNum(card.w)],
           ["Week streak", fmtNum(card.s)],
-          ["Trophies", fmtNum(card.t.length)],
+          ["Badges", fmtNum(card.t.length)],
         ].map(([k, v]) => (
           <div key={k} className="rounded-2xl bg-raised p-3">
             <dt className="text-xs uppercase tracking-wider text-faint">{k}</dt>
@@ -82,9 +84,9 @@ export function ShareView({ card }: { card: ShareCard }) {
       )}
       {card.t.length > 0 && (
         <>
-          <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">Trophies</h3>
+          <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">Badges</h3>
           <ul className="mt-2 flex flex-wrap gap-2">
-            {card.t.map((t) => <li key={t} className="rounded-full border border-line px-3 py-1 text-sm">{TROPHY_NAME[t] ?? t}</li>)}
+            {card.t.map((t) => <li key={t} className="rounded-full border border-line px-3 py-1 text-sm">{shareName(t) ?? TROPHY_NAME[t] ?? t}</li>)}
           </ul>
         </>
       )}
@@ -118,7 +120,7 @@ export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       <div>
-        <p className="text-muted">Send friends a link to your training summary: level, workouts, streak, trophies, best lifts and the days you trained in the last 12 weeks.</p>
+        <p className="text-muted">Send friends a link to your training summary: level, workouts, streak, badges, best lifts and the days you trained in the last 12 weeks.</p>
         <p className="mt-2 text-sm text-faint">It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.</p>
         <label className="mt-4 flex items-center gap-3">
           <input type="checkbox" checked={withName} onChange={(e) => setWithName(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" disabled={!profile.name.trim()} />

@@ -51,7 +51,7 @@ for (const name of DEVICES) {
     await noSideScroll("rest");
     await page.getByRole("button", { name: "End" }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();
-    await page.getByRole("button", { name: "Done" }).click();
+    await page.getByRole("button", { name: "Done", exact: true }).click();
     for (const tab of ["Recovery", "Progress", "Gyms"]) {
       await page.getByRole("button", { name: tab }).click();
       await noSideScroll(tab);

@@ -214,6 +214,10 @@ export interface Profile {
   pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
   calendar?: CalendarPrefs;
+  /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
+  lean?: boolean;
+  /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
+  cosmetics?: { accent?: string; sound?: string; plates?: string };
   onboarded: boolean;
   updatedAt: number;
 }

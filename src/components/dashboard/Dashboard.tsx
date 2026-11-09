@@ -4,7 +4,9 @@ import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals
 import { defaultProfile } from "@/lib/defaults";
 import { derive } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
-import { exerciseName, goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
+import { exerciseName, game } from "@/lib/game";
+import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
+import { AchievementRow, Badge, Bar, LeagueCard, QuestsCard, StreakCard, TIER_COLOUR } from "@/components/app/Achievements";
 import { load } from "@/lib/localdb";
 import { track } from "@/lib/analytics";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
@@ -16,7 +18,7 @@ import { LogPast } from "./LogPast";
 import { SharePanel } from "./Share";
 
 // The web dashboard (/me/), Hevy-style big-screen view of your training: overview, a calendar of the
-// days you trained, lift progress, history, trophies, logging a past workout, and a share link.
+// days you trained, lift progress, history, achievements, logging a past workout, and a share link.
 // It reads the same on-device event log as the app. Workouts from other devices arrive with sync.
 
 const TABS = [
@@ -24,7 +26,7 @@ const TABS = [
   ["calendar", "Calendar"],
   ["lifts", "Lifts"],
   ["history", "History"],
-  ["trophies", "Trophies"],
+  ["trophies", "Achievements"],
   ["log", "Log a workout"],
   ["share", "Share"],
 ] as const;
@@ -128,7 +130,7 @@ export function Dashboard() {
         {tab === "calendar" && <CalendarTab stats={stats} now={now} unit={unit} go={go} />}
         {tab === "lifts" && <Lifts events={events} stats={stats} unit={unit} />}
         {tab === "history" && <History events={events} stats={stats} unit={unit} open={arg} go={go} />}
-        {tab === "trophies" && <Trophies events={events} stats={stats} profile={profile} />}
+        {tab === "trophies" && <Trophies events={events} stats={stats} profile={profile} now={now} />}
         {tab === "log" && <LogPast profile={profile} now={now} onSaved={(sid) => void reload().then(() => go("history", sid))} />}
         {tab === "share" && <SharePanel events={events} stats={stats} profile={profile} now={now} />}
       </div>
@@ -141,13 +143,12 @@ type Go = (t: Tab, arg?: string) => void;
 
 function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; profile: Profile; stats: Stats; now: number; go: Go }) {
   const unit = profile.unit;
-  const xp = xpTotal(stats);
-  const lvl = levelOf(xp);
-  const streak = goalStreak(stats, profile, now);
+  const g = useMemo(() => game(events, stats, profile, now), [events, stats, profile, now]);
+  const xp = g.xp;
+  const lvl = g.level;
+  const streak = g.streak;
   const weeks = weeklyTotals(stats, now, 12);
   const days = trainingDays(stats);
-  const tr = trophies(events, stats, profile);
-  const nextTrophy = tr.find((t) => !t.earned);
   if (!stats.sessions.length) {
     return (
       <div className="card p-6">
@@ -205,11 +206,27 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
       <Panel title="Training days" className="lg:col-span-3">
         <YearHeatmap grid={yearGrid(now, 26)} days={days} onPick={(ms) => go("calendar", dayKey(ms))} />
       </Panel>
-      {nextTrophy && (
-        <Panel title="Next trophy" className="lg:col-span-3">
-          <p><span className="font-semibold">{nextTrophy.name}</span> <span className="text-muted">· {nextTrophy.detail}</span></p>
-        </Panel>
-      )}
+      <Panel title="This week's quests">
+        <QuestsCard g={g} />
+      </Panel>
+      <Panel title="League and streak">
+        <div className="space-y-3"><LeagueCard g={g} /><StreakCard g={g} /></div>
+      </Panel>
+      <Panel title={`Almost there · ${g.badges.earned} of ${g.badges.total} badges`}>
+        <ul className="divide-y divide-line">
+          {g.nearest.map((a) => (
+            <li key={a.id} className="flex items-center gap-3 py-2">
+              <Badge a={a} size={36} />
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium">{a.next?.detail ?? a.detail}</p>
+                <div className="mt-1"><Bar value={a.progress} label={`${a.name} progress`} colour={a.next ? TIER_COLOUR[a.next.tier] : undefined} /></div>
+              </div>
+            </li>
+          ))}
+          {!g.nearest.length && <li className="py-2 text-sm text-muted">Every badge in sight is done.</li>}
+        </ul>
+        <button type="button" onClick={() => go("trophies")} className="press mt-3 text-sm text-accent">See all achievements</button>
+      </Panel>
     </div>
   );
 }
@@ -426,22 +443,30 @@ function SessionView({ detail, summary, unit }: { detail: NonNullable<ReturnType
   );
 }
 
-function Trophies({ events, stats, profile }: { events: AppEvent[]; stats: Stats; profile: Profile }) {
-  const tr = trophies(events, stats, profile);
-  const earned = tr.filter((t) => t.earned).length;
+const CATEGORIES: Category[] = ["consistency", "strength", "volume", "records", "explore", "smart", "secret"];
+
+function Trophies({ events, stats, profile, now }: { events: AppEvent[]; stats: Stats; profile: Profile; now: number }) {
+  const g = useMemo(() => game(events, stats, profile, now), [events, stats, profile, now]);
   return (
     <div>
-      <p className="mb-4 text-muted">{earned} of {tr.length} earned.</p>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-        {tr.map((t) => (
-          <li key={t.id} className={`card p-4 ${t.earned ? "" : "border-dashed"}`}>
-            <div className={`text-2xl ${t.earned ? "" : "grayscale"}`} aria-hidden>{t.earned ? (t.tier === "gold" ? "🥇" : t.tier === "silver" ? "🥈" : "🥉") : "🔒"}</div>
-            <div className="mt-2 font-semibold">{t.name}</div>
-            <div className="text-sm text-muted">{t.detail}</div>
-            <div className="mt-1 text-xs text-faint">{t.earned ? "Earned" : "Not yet"}</div>
-          </li>
-        ))}
-      </ul>
+      <div className="card mb-4 p-5">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <span className="text-lg font-semibold">{g.badges.earned} of {g.badges.total} badges</span>
+          <span className="text-sm text-muted">{g.achievements.filter((a) => a.level > 0).length} of {g.achievements.length} achievements started</span>
+        </div>
+        <div className="mt-2"><Bar value={g.badges.earned / g.badges.total} label="Badges earned" /></div>
+        <p className="mt-2 text-sm text-muted">Each achievement has up to four tiers: bronze, silver, gold and platinum. Secret ones show up once you earn them.</p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {CATEGORIES.map((c) => {
+          const list = g.achievements.filter((a) => a.category === c).sort((a, b) => b.level - a.level || b.progress - a.progress);
+          return (
+            <Panel key={c} title={`${CATEGORY_LABEL[c]} · ${list.reduce((n, a) => n + a.level, 0)} of ${list.reduce((n, a) => n + a.levels, 0)}`}>
+              <ul className="-mx-4 divide-y divide-line">{list.map((a) => <AchievementRow key={a.id} a={a} />)}</ul>
+            </Panel>
+          );
+        })}
+      </div>
     </div>
   );
 }
