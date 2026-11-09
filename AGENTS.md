@@ -19,6 +19,7 @@ node scripts/e2e-offline.mjs # real offline after one visit
 node scripts/e2e-devices.mjs # layout on 13 phones and tablets (DEVICES=ios|android|full|names)
 DEVICE='iPhone 16' node scripts/e2e.mjs  # the playthrough on another device
 node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
+node scripts/site-screenshots.mjs # real app screenshots for the home page (public/screens/)
 npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build:static)
 ```
 
@@ -275,6 +276,13 @@ Small things that make the app a pleasure, all derived from events (never stored
 ### Public pages and SEO (owner request, 2026-11-09)
 - Like Gradelings: statically generated pages for every exercise, muscle, piece of equipment, muscle-and-equipment pair (only pairs with 3+ exercises), exercise alternatives, tools (plate calculator, one-rep max calculator) and training guides (RIR, deloads, progressive overload). All are in `sitemap.xml` with structured data (`HowTo`, `ItemList`, `WebApplication`, `Article`, `FAQPage`), and each ends with a call to action into the app. Built from the same data as the app.
 - The app (`/app/`) is `noindex` and disallowed in `robots.txt`.
+- **Home page (Melvin, 2026-11-09: "more interesting, professional, screenshots, every major feature, the 3D lifter, testimonials, plenty of calls to action, store buttons").** Laid out like Gradelings' home page: hero, how it works, one section per major feature with a real screenshot, the interactive 3D demo, smaller features, testimonials, pricing, FAQ (also `FAQPage` data) and a final call to action. Every call to action into the app carries its own `data-cta` name so the site beacon counts each placement. All names come from `BRAND`, so a rename needs no page edits.
+  - **Hero:** the 3D lifter (`src/components/site/HeroLift.tsx`, on the shared demo engine in `src/components/demo`) works through squat, deadlift, bench and press, switching between the male and female figures. It labels the working muscles on the body and shows reps, the volume sum, an Epley one-rep max, plates per side from `plates.ts`, a running total lifted, and a heart rate trace that also beats in the figure's chest (Melvin asked for the numbers and the heart rate monitor). It is captioned as demo data. On phones the lifter sits between the headline and the buttons. Without WebGL the hero shows the Today screenshot.
+  - **Screenshots are real.** `scripts/site-screenshots.mjs` drives the static build through two and a half weeks of four-day training on a fake clock and writes `public/screens/*.webp`. Run it again after a visible change to Today, the workout screen, the finish screen, Recovery or Progress.
+  - **Testimonials follow the Gradelings rule** (`src/content/testimonials.ts`): only real quotes given with permission show on the live site. A made-up quote is marked `sample`, labelled "Sample quote, not a real user", and appears only in development and preview builds. Liftsmith has no users yet, so production shows only the "be one of our first lifters" call to action until beta testers send quotes.
+  - **Store badges** (`StoreBadges.tsx`) link to `STORE_LINKS` in `src/lib/site.ts` (`NEXT_PUBLIC_GOOGLE_PLAY_URL`, `NEXT_PUBLIC_APP_STORE_URL`). Until a listing exists the badge is dimmed with "Soon" and a link to the web app sits beside it. The badges are drawn in the stores' standard black style; swap in the official artwork from Apple's and Google's badge pages before launch.
+  - **Pricing** reads `PRICES` (`trial.ts`) and the trial length from the `trialDays` flag, so the page can't drift from the app.
+  - **Dark only.** The home page stays on the dark tokens whatever the app's Appearance setting, because the hologram only reads on a dark ground (like the share image). Its few fixed hologram colours (ember labels, heart red) match the demo engine's.
 - **Comparison pages** (`/compare/fitbod/`, `/compare/hevy/`, `/compare/strong/`, `/compare/gymverse/`, `/alternatives/fitbod/`): every competitor fact lives in one data file with its source URL and the date checked, and the build fails when any row is more than 90 days old. Competitors are named in text only (no logos or screenshots), with a trademark line. Claims are factual and dated, never disparaging.
 
 ## Architecture decisions
@@ -340,5 +348,6 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 ## Open items
 - Reminder emails in Vercel: verify a sending domain in Resend, then set `MAIL_FROM`, `MAIL_POSTAL_ADDRESS` (a real mailing address or PO box), `REMINDER_SECRET` and `CRON_SECRET`.
 - Register getliftsmith.com and attach it to the Vercel project.
+- Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.
