@@ -1,5 +1,6 @@
 import { exercise, available } from "./exercises";
-import { restFor, itemSeconds, type Plan, type PlanItem } from "./generator";
+import { restFor, planSeconds, type Plan, type PlanItem } from "./generator";
+import { withLinks } from "./superset";
 import { sessionsOf, target } from "./progression";
 import type { AppEvent, Gym, Profile, SetEvent } from "./types";
 
@@ -71,7 +72,7 @@ export interface LastWorkout {
   sessionId: string;
   at: number;
   /** Exercises in the order they were done, with the number of sets. */
-  items: { exerciseId: string; sets: number }[];
+  items: { exerciseId: string; sets: number; superset?: string }[];
 }
 
 export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: string): LastWorkout | null {
@@ -81,11 +82,13 @@ export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: stri
   const own = sets.filter((s) => s.sessionId === latest.sessionId).sort((a, b) => a.at - b.at);
   const order: string[] = [];
   const count = new Map<string, number>();
+  const group = new Map<string, string>();
   for (const s of own) {
     if (!count.has(s.exerciseId)) order.push(s.exerciseId);
     count.set(s.exerciseId, (count.get(s.exerciseId) ?? 0) + 1);
+    if (s.superset) group.set(s.exerciseId, s.superset);
   }
-  return { sessionId: latest.sessionId, at: own[0].at, items: order.map((exerciseId) => ({ exerciseId, sets: count.get(exerciseId)! })) };
+  return { sessionId: latest.sessionId, at: own[0].at, items: order.map((exerciseId) => ({ exerciseId, sets: count.get(exerciseId)!, ...(group.has(exerciseId) ? { superset: group.get(exerciseId) } : {}) })) };
 }
 
 /**
@@ -97,14 +100,15 @@ export function repeatPlan(base: Plan, events: readonly AppEvent[], profile: Pro
   const last = lastWorkout(events);
   if (!last) return null;
   const can = new Set(available(gym.equipment).map((e) => e.id));
-  const items: PlanItem[] = last.items
-    .filter((i) => can.has(i.exerciseId))
-    .map((i) => {
-      const ex = exercise(i.exerciseId);
-      return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
-    });
-  if (!items.length) return null;
-  const sec = items.reduce((t, i) => t + itemSeconds(i), 0);
+  const kept = last.items.filter((i) => can.has(i.exerciseId));
+  const plain: PlanItem[] = kept.map((i) => {
+    const ex = exercise(i.exerciseId);
+    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
+  });
+  if (!plain.length) return null;
+  // Supersets come back as they were, where both exercises are still here and next to each other.
+  const items = withLinks(plain, kept.slice(0, -1).map((k, i) => !!k.superset && k.superset === kept[i + 1].superset));
+  const sec = planSeconds(items);
   return { ...base, gymId: gym.id, challenge: false, items, estMinutes: Math.round(sec / 60)};
 }
 

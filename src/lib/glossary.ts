@@ -57,6 +57,13 @@ export const GLOSSARY = {
     title: "Recovery",
     body: ["Each set tires the muscles it works. That fatigue fades over 2 to 3 days. Fresh is 90% or more, Ready 70%, Recovering 40%, and Fatigued is below 40%. The plan avoids muscles that are still fatigued."],
   },
+  superset: {
+    title: "Superset",
+    body: [
+      "Two or more exercises done back to back: one set of the first, then straight to one set of the next, then the rest. It saves time, and works best for exercises that don't tire the same muscles, like a row with a press.",
+      "Tap the link between two exercises to pair them, and again to split them.",
+    ],
+  },
   warmup: {
     title: "Warm-up sets",
     body: ["Lighter sets that build up to your working weight. They aren't counted in your stats or progress. Skip them if you're already warm."],

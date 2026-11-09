@@ -8,6 +8,8 @@ import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
+import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
+import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating } from "./types";
@@ -85,6 +87,8 @@ interface State {
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
   pickedByLocation: string | null;
+  /** Supersets picked on Today, as "first>second" exercise pairs, kept when the plan is rebuilt. */
+  links: string[];
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
   autoEnd(now?: number): boolean;
@@ -104,6 +108,8 @@ interface State {
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
   goTo(index: number): void;
+  /** Link exercise `index` with the next one as a superset, or split them. Works on Today's plan and mid-workout. */
+  toggleSuperset(index: number): void;
   finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
@@ -117,6 +123,15 @@ interface State {
 }
 
 const ACTIVE_KEY = "liftsmith.active";
+
+/** Re-applies the supersets picked on Today to a rebuilt plan, where both exercises are still neighbours. */
+function relink(plan: Plan, links: readonly string[]): Plan {
+  if (!links.length) return plan;
+  const want = new Set(links);
+  const l = linksOf(plan.items).map((_, i) => want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
+  const items = withLinks(plan.items, l);
+  return { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
+}
 const uid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
 
 function persistActive(a: Active | null) {
@@ -159,6 +174,7 @@ export const useApp = create<State>((set, get) => {
     readiness: null,
     callOverride: null,
     pickedByLocation: null,
+    links: [],
 
     addNote(exerciseId, text) {
       const a = get().active;
@@ -254,7 +270,7 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled });
       const call = callOverride ?? r.call;
-      set({ readiness: r, preview: generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }) });
+      set({ readiness: r, preview: relink(generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }), get().links) });
     },
 
     setCall(c) {
@@ -280,7 +296,7 @@ export const useApp = create<State>((set, get) => {
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
       commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge }]);
-      set({ callOverride: null });
+      set({ callOverride: null, links: [] });
       set({ active: a });
       persistActive(a);
       track("workout_start", { minutes: plan.minutes, exercises: plan.items.length, call: plan.call ?? "normal", overridden, gymKind: g.equipment.length ? "equipped" : "bodyweight" });
@@ -338,17 +354,19 @@ export const useApp = create<State>((set, get) => {
           restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
           ...hrWindow(a, a.setStart, now),
           challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+          superset: item.group,
         },
       ]);
-      const done = already + 1;
+      // Alone, the next set is the same exercise until its sets are done. In a superset it's the
+      // next exercise of the round (superset.ts).
+      const items = a.plan.items;
+      const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
       let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now };
-      if (done >= item.sets) {
-        // Exercise finished: ask how it felt and move on.
-        next = loadItem({ ...a, askFeedback: item.exerciseId }, Math.min(a.index + 1, a.plan.items.length));
-      }
-      const last = next.index >= a.plan.items.length;
-      next.restTotal = last ? 0 : item.restSec;
-      next.restUntil = last ? null : now + item.restSec * 1000;
+      if (step.finished) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
+      if (step.index !== a.index) next = loadItem(next, Math.min(step.index, items.length));
+      const last = next.index >= items.length;
+      next.restTotal = last ? 0 : step.rest;
+      next.restUntil = last ? null : now + step.rest * 1000;
       set({ active: next });
       persistActive(next);
     },
@@ -416,6 +434,23 @@ export const useApp = create<State>((set, get) => {
       const next = loadItem({ ...a, plan: { ...a.plan, items } }, a.index);
       set({ active: next });
       persistActive(next);
+    },
+
+    toggleSuperset(index) {
+      const a = get().active;
+      if (a) {
+        const items = toggleLink(a.plan.items, index);
+        const next = { ...a, plan: { ...a.plan, items }, lastAt: Date.now() };
+        set({ active: next });
+        persistActive(next);
+        return;
+      }
+      const p = get().preview;
+      if (!p) return;
+      const items = toggleLink(p.items, index);
+      const links = items.slice(0, -1).flatMap((it, i) => (items[i + 1] && it.group && it.group === items[i + 1].group ? [`${it.exerciseId}>${items[i + 1].exerciseId}`] : []));
+      track("feature", { name: "superset", detail: links.length > get().links.length ? "link" : "split" });
+      set({ links, preview: { ...p, items, estMinutes: Math.round(planSeconds(items) / 60) } });
     },
 
     goTo(index) {

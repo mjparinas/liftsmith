@@ -16,7 +16,8 @@ import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { CALL_STYLE, muscleHue } from "./theme";
-import { Button, EmptyState, Ring, Section } from "./ui";
+import { Button, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
@@ -43,7 +44,7 @@ export function greeting(hour: number, name: string): string {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
+  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation, toggleSuperset } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
@@ -195,22 +196,28 @@ export function Today() {
               {preview.items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
                 const hue = muscleHue(it.focus);
+                const ss = supersetLabel(preview.items, i);
                 return (
-                  <li key={it.exerciseId} className="animate-rise relative flex items-center gap-3 px-4 py-3.5" style={{ animationDelay: `${i * 40}ms` }}>
+                  <li key={it.exerciseId} className={`animate-rise relative flex items-center gap-3 px-4 py-3.5 ${ss ? "bg-accent/5" : ""}`} style={{ animationDelay: `${i * 40}ms` }}>
                     <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full" style={{ background: hue }} aria-hidden />
                     <span className="num grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-bold" style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}>{i + 1}</span>
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-semibold">{ex.name}</div>
+                      {ss && <div className="truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">{ss}</div>}
                       <div className="text-sm text-muted num">
                         {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
-                    <span className="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium" style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>
+                    <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>
+                    {i > 0 && <LinkToggle on={linkedToNext(preview.items, i - 1)} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
                   </li>
                 );
               })}
             </ol>
+            {preview.items.length > 1 && (
+              <p className="mt-2 flex items-center gap-1.5 px-1 text-sm text-muted"><Icon name="link" size={14} />Link two exercises to do them as a superset<Info term="superset" /></p>
+            )}
           </Section>
           <Section title="Why these muscles" icon="recovery">
             <div className="card p-4">
