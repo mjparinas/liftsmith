@@ -1,5 +1,6 @@
 import { blockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
+import { layoff } from "./layoff";
 import { roundLoad, stepLoad } from "./loads";
 import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent, TrainingPrefs } from "./types";
 import { t } from "./i18n";
@@ -128,7 +129,29 @@ export function startE1rm(ex: Exercise, profile: Profile, now: number): number {
   return epley(tenRm, 10) * LEVEL[profile.experience] * sexFactor(ex, profile.sex) * ageFactor(profile.birthYear, now);
 }
 
+/**
+ * Today's target, then eased after a break (layoff.ts): the first session back starts lighter, and
+ * the next two close the gap to the pre-break weight unless normal progression is already past it or
+ * the last session was a struggle. Deload weeks keep their own lighter weight.
+ */
 export function target(ex: Exercise, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Target {
+  const base = baseTarget(ex, events, profile, gym, now);
+  if (ex.load === "bodyweight" || blockWeek(profile, now).deload) return base;
+  const lay = layoff(ex, events, now);
+  if (!lay) return base;
+  const w = roundLoad(lay.before * (1 - lay.today), ex, gym).kg;
+  if (lay.done === 0) {
+    const [lo, hi] = repRange(ex, profile.goal, profile.training);
+    const last = sessionsOf(events, ex.id).find((ss) => !ss.every((x) => x.injuryPct));
+    const reps = Math.min(hi, Math.max(lo, last?.[0].targetReps ?? lo));
+    return { weight: w, reps, rir: base.rir, note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }) };
+  }
+  const struggled = base.note === t("note.tooHard") || base.note === t("note.missedTwo");
+  if (!struggled && w > base.weight + 1e-6) return { ...base, weight: w, note: t("note.rampBack") };
+  return base;
+}
+
+function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Target {
   const wk = blockWeek(profile, now);
   const [lo, hi] = repRange(ex, profile.goal, profile.training);
   const rir = wk.rir;

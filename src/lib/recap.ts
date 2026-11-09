@@ -1,3 +1,4 @@
+import { setVolume } from "./sides";
 import { dedupe, derive, weekOf } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { date, weekday } from "./i18n";
@@ -117,8 +118,8 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
   const activeWeeks = new Set(sessions.map((s) => weekOf(s.start))).size;
 
   const prev = shift(period, -1);
-  const prevVol = all.filter((e): e is SetEvent => e.type === "set" && e.at >= prev.start && e.at < prev.end).reduce((v, s) => v + s.weight * s.reps, 0);
-  const volumeKg = sets.reduce((v, s) => v + s.weight * s.reps, 0);
+  const prevVol = all.filter((e): e is SetEvent => e.type === "set" && e.at >= prev.start && e.at < prev.end).reduce((v, s) => v + setVolume(s), 0);
+  const volumeKg = sets.reduce((v, s) => v + setVolume(s), 0);
   const hrs = sessions.map((s) => s.avgHr).filter((x): x is number => !!x);
 
   return {

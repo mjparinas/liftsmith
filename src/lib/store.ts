@@ -12,6 +12,7 @@ import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
+import { implementsFor } from "./sides";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
 import { afterSet, applyLinks, linksOf, toggleLink } from "./superset";
@@ -40,6 +41,11 @@ export interface Active {
   /** Working values for the next set (kg, reps), editable with the steppers. */
   weight: number;
   reps: number;
+  /**
+   * Per-side exercises (sides.ts) when the sides differ: the right side's reps, with `reps` then the
+   * left. Unset means both sides did `reps`, which keeps logging to one tap.
+   */
+  repsR?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -146,6 +152,8 @@ interface State {
   fixPlateau(p: Plateau, kind: FixKind): void;
   logSet(): void;
   adjust(weight: number, reps: number): void;
+  /** Right side's reps on a per-side exercise; undefined goes back to "both sides the same". */
+  adjustRight(reps: number | undefined): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
@@ -578,11 +586,14 @@ export const useApp = create<State>((set, get) => {
           sessionId: a.sessionId,
           exerciseId: item.exerciseId,
           weight: a.weight,
-          reps: a.reps,
+          reps: a.repsR !== undefined ? Math.min(a.reps, a.repsR) : a.reps,
+          ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
+          implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
+          comeback: planned.comeback,
           slot: item.slot,
           startedAt: a.setStart,
           durationSec: plausible ? Math.round(duration) : undefined,
@@ -597,7 +608,7 @@ export const useApp = create<State>((set, get) => {
       // next exercise of the round (superset.ts).
       const items = a.plan.items;
       const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
-      let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
+      let next: Active = { ...a, repsR: undefined, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
       const nextT = item.setTargets?.[already + 1];
@@ -618,6 +629,14 @@ export const useApp = create<State>((set, get) => {
       const a = get().active;
       if (!a) return;
       const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    adjustRight(reps) {
+      const a = get().active;
+      if (!a) return;
+      const next = { ...a, repsR: reps === undefined ? undefined : Math.max(0, reps), lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
