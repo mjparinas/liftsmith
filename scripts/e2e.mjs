@@ -61,7 +61,7 @@ try {
   await page.getByRole("button", { name: "Finish workout" }).click();
   await page.getByText(/XP/).first().waitFor();
   await shot("done");
-  await page.getByRole("button", { name: "Done" }).click();
+  await page.getByRole("button", { name: "Done", exact: true }).click();
 
   for (const tab of ["Recovery", "Progress", "Gyms"]) {
     await page.getByRole("button", { name: tab }).click();

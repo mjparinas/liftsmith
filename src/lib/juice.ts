@@ -25,10 +25,30 @@ const reducedMotion = () => typeof matchMedia !== "undefined" && matchMedia("(pr
 /** True when motion flourishes should be skipped: the system setting or Lean mode. */
 export const calm = () => feel.calm || reducedMotion();
 
-export type HapticKind = "select" | "tick" | "tap" | "thud" | "success" | "warning";
+/**
+ * Lean mode (Settings): no confetti, no celebration sounds or pop-ups, for lifters who want the logger
+ * and nothing else. Haptics and the rest-timer sounds stay, because they do a job. Same flag as
+ * `feel.calm`; kept under this name for the celebration code.
+ */
+export const juice = {
+  get lean() {
+    return feel.calm;
+  },
+  set lean(v: boolean) {
+    feel.calm = v;
+  },
+};
+
+export type HapticKind = "select" | "tick" | "tap" | "thud" | "success" | "warning" | "celebrate";
 
 export function haptic(kind: HapticKind) {
   if (!feel.haptics) return;
+  if (kind === "celebrate") {
+    // A heavy thump then a success buzz, for PRs, level-ups and badges.
+    haptic("thud");
+    setTimeout(() => haptic("success"), 180);
+    return;
+  }
   const h = cap()?.Plugins?.Haptics;
   if (h && isNative()) {
     if (kind === "success") void h.notification?.({ type: "SUCCESS" });
@@ -68,7 +88,7 @@ function audio(): AudioContext | null {
 }
 
 /** A major pentatonic, by name, so phrases read like music. */
-export const NOTE = { A4: 440, B4: 493.88, Cs5: 554.37, E5: 659.25, Fs5: 739.99, A5: 880, B5: 987.77, Cs6: 1108.73, E6: 1318.51, Fs6: 1479.98, A6: 1760 } as const;
+export const NOTE = { A3: 220, E4: 329.63, Fs4: 369.99, A4: 440, B4: 493.88, Cs5: 554.37, E5: 659.25, Fs5: 739.99, A5: 880, B5: 987.77, Cs6: 1108.73, E6: 1318.51, Fs6: 1479.98, A6: 1760 } as const;
 
 /** One mallet note: start and length in seconds, level 0..1. */
 export function mallet(freq: number, start = 0, dur = 0.18, level = 0.5) {
@@ -95,7 +115,14 @@ export function mallet(freq: number, start = 0, dur = 0.18, level = 0.5) {
 
 const phrase = (notes: [number, number, number?, number?][]) => notes.forEach(([f, at, dur, lvl]) => mallet(f, at, dur, lvl));
 
+export type TimerSound = "classic" | "chime" | "arcade" | "gong";
+
+/** Celebration sounds go quiet in Lean mode; working sounds (log, rest) don't. */
+const party = () => feel.sound && !feel.calm;
+
 export const sound = {
+  /** The rest-timer sound picked in Settings (unlocked from crates). Every theme stays in the same key. */
+  theme: "classic" as TimerSound,
   /** Kept for older callers; mirrors feel.sound. */
   get enabled() {
     return feel.sound;
@@ -123,9 +150,24 @@ export const sound = {
   countdown() {
     if (feel.sound) mallet(NOTE.E5, 0, 0.09, 0.4);
   },
-  /** Rest is over: a clear three-note chime that cuts through gym music. */
+  /** Rest is over: a clear phrase that cuts through gym music, in the chosen timer sound. */
   restEnd() {
-    if (feel.sound) phrase([[NOTE.A5, 0, 0.22, 0.8], [NOTE.Cs6, 0.12, 0.22, 0.8], [NOTE.E6, 0.24, 0.5, 0.9]]);
+    if (!feel.sound) return;
+    const t = this.theme;
+    if (t === "chime") phrase([[NOTE.E5, 0, 0.7, 0.7], [NOTE.A5, 0.18, 0.7, 0.7], [NOTE.Cs6, 0.36, 0.9, 0.8]]);
+    else if (t === "arcade") phrase([NOTE.A5, NOTE.B5, NOTE.Cs6, NOTE.E6, NOTE.A6].map((f, i) => [f, i * 0.07, 0.1, 0.7] as [number, number, number, number]));
+    else if (t === "gong") phrase([[NOTE.A3, 0, 1.8, 1], [NOTE.E4, 0.01, 1.4, 0.4], [NOTE.A4, 0.02, 1.1, 0.25]]);
+    else phrase([[NOTE.A5, 0, 0.22, 0.8], [NOTE.Cs6, 0.12, 0.22, 0.8], [NOTE.E6, 0.24, 0.5, 0.9]]);
+  },
+  /** A preview of a timer sound, for the picker. */
+  preview(t: TimerSound) {
+    const was = this.theme;
+    const on = feel.sound;
+    this.theme = t;
+    feel.sound = true;
+    this.restEnd();
+    this.theme = was;
+    feel.sound = on;
   },
   /** A step back (discard, undo). */
   back() {
@@ -133,8 +175,26 @@ export const sound = {
   },
   /** End of a workout and other big moments. */
   fanfare() {
-    if (!feel.sound) return;
+    if (!party()) return;
     phrase([[NOTE.A4, 0, 0.3, 0.5], [NOTE.Cs5, 0.09, 0.3, 0.5], [NOTE.E5, 0.18, 0.3, 0.55], [NOTE.A5, 0.27, 0.45, 0.6], [NOTE.Cs6, 0.42, 0.5, 0.45], [NOTE.E6, 0.42, 0.7, 0.4], [NOTE.A6, 0.5, 0.8, 0.25]]);
+  },
+  /** A new personal record: a rising run with a final sparkle. */
+  pr() {
+    if (party()) phrase([[NOTE.E5, 0, 0.2, 0.55], [NOTE.A5, 0.07, 0.2, 0.55], [NOTE.Cs6, 0.14, 0.2, 0.55], [NOTE.E6, 0.21, 0.35, 0.6], [NOTE.A6, 0.34, 0.6, 0.35]]);
+  },
+  /** A badge unlocked. */
+  badge() {
+    if (party()) phrase([[NOTE.B5, 0, 0.14, 0.5], [NOTE.E6, 0.1, 0.4, 0.55]]);
+  },
+  /** Level up: a bigger fanfare. */
+  levelUp() {
+    if (party()) phrase([NOTE.A4, NOTE.Cs5, NOTE.E5, NOTE.A5, NOTE.E5, NOTE.A5, NOTE.Cs6, NOTE.E6].map((f, i) => [f, i * 0.08, i === 7 ? 0.7 : 0.28, 0.5] as [number, number, number, number]));
+  },
+  /** A crate opening: a soft roll, then a reveal (higher for a rare find). */
+  crate(rare: boolean) {
+    if (!party()) return;
+    for (let i = 0; i < 6; i++) mallet(NOTE.E4, i * 0.06, 0.06, 0.3);
+    phrase([[NOTE.E5, 0.4, 0.3, 0.55], [NOTE.A5, 0.48, 0.3, 0.55], [rare ? NOTE.E6 : NOTE.Cs6, 0.56, 0.6, 0.6]]);
   },
 };
 
@@ -161,4 +221,11 @@ export async function keepAwake(on: boolean) {
       lock = null;
     }
   } catch {}
+}
+
+/** Applies a crate accent colour to the whole app. */
+export function applyAccent(hex: string | undefined) {
+  if (typeof document === "undefined") return;
+  if (hex) document.documentElement.style.setProperty("--color-accent", hex);
+  else document.documentElement.style.removeProperty("--color-accent");
 }

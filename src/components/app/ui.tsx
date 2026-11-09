@@ -62,7 +62,7 @@ export function Stepper({ value, onDown, onUp, label, suffix }: { value: string;
           <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden><path d="M5 12h14" /></svg>
         </button>
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display text-[56px] ${key ? "animate-bump" : ""}`}>{value}</div>
+          <div key={key} className={`display text-[56px] ${key ? "animate-nudge" : ""}`}>{value}</div>
         </div>
         <button type="button" className={btn} aria-label={`More ${label}`} onClick={() => step(1)}>
           <Icon name="plus" size={22} strokeWidth={2.6} />

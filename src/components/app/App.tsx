@@ -4,9 +4,12 @@ import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
 import { installDiag } from "@/lib/diag";
+import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { COSMETICS } from "@/lib/game";
 import { flushFeedback } from "@/lib/feedback";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startAnalytics, track } from "@/lib/analytics";
+import { Achievements } from "./Achievements";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
@@ -18,12 +21,12 @@ import { Stats } from "./Stats";
 import { Today } from "./Today";
 import { Workout } from "./Workout";
 import { Icon, type IconName } from "./icons";
-import { feel, haptic } from "@/lib/juice";
 
 const TABS: { route: Route; label: string; icon: IconName }[] = [
   { route: "today", label: "Today", icon: "today" },
   { route: "recovery", label: "Recovery", icon: "recovery" },
   { route: "stats", label: "Progress", icon: "progress" },
+  { route: "achievements", label: "Awards", icon: "trophy" },
   { route: "gym", label: "Gyms", icon: "gym" },
 ];
 
@@ -41,13 +44,17 @@ export function App() {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
     return () => window.removeEventListener("online", online);
   }, [init]);
-  // Sounds, haptics and Lean mode follow the profile everywhere (juice.ts reads `feel`).
+  // Sounds, haptics, Lean mode and equipped cosmetics (accent colour, rest timer sound) apply app-wide
+  // (juice.ts reads `feel`).
   useEffect(() => {
     feel.sound = profile.restSounds;
     feel.haptics = profile.haptics !== false;
     feel.calm = !!profile.lean;
     document.documentElement.classList.toggle("calm", !!profile.lean);
-  }, [profile.restSounds, profile.haptics, profile.lean]);
+    const pick = (id?: string) => COSMETICS.find((c) => c.id === id);
+    sound.theme = (pick(profile.cosmetics?.sound)?.value ?? "classic") as TimerSound;
+    applyAccent(pick(profile.cosmetics?.accent)?.value);
+  }, [profile.restSounds, profile.haptics, profile.lean, profile.cosmetics]);
   // Which screens get used (the route name only, nothing on it).
   useEffect(() => {
     if (ready) track("screen_view", { screen: profile.onboarded ? route : "onboarding" });
@@ -137,7 +144,7 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
@@ -145,7 +152,7 @@ export function App() {
       <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">{screen}</main>
       {showNav && (
         <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label="Main">
-          <ul className="mx-auto grid max-w-lg grid-cols-4 px-2 pt-1.5">
+          <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
             {TABS.map((t) => {
               const on = route === t.route;
               return (
@@ -159,7 +166,7 @@ export function App() {
                     }}
                     className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[11px] font-medium ${on ? "text-ink" : "text-faint"}`}
                   >
-                    <span className={`grid h-8 w-14 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
+                    <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
                       <Icon name={t.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                     </span>
                     {t.label}

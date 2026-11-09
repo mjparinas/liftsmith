@@ -48,8 +48,15 @@ export function Settings() {
       </Section>
       <Row<string> label="Sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <Row<string> label="Vibration" value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
-      <Row<string> label="Lean mode: no confetti or motion flourishes" value={profile.lean ? "on" : "off"} onPick={(v) => setProfile({ lean: v === "on" })} options={[["off", "Off"], ["on", "On"]]} />
       <Row<string> label="Daily quote on Today" value={profile.quotes === false ? "off" : "on"} onPick={(v) => setProfile({ quotes: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <Section title="Celebrations">
+        <div className="flex flex-wrap gap-2">
+          <Chip active={!profile.lean} onClick={() => setProfile({ lean: false })}>Full: confetti, sounds, crates</Chip>
+          <Chip active={!!profile.lean} onClick={() => setProfile({ lean: true })}>Lean mode</Chip>
+        </div>
+        <p className="mt-2 text-xs text-faint">Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.</p>
+        <Button kind="ghost" className="mt-3 w-full" onClick={() => go("achievements")}>Achievements and locker</Button>
+      </Section>
       <CalendarSettings />
       <MessageSettings />
       <CycleSettings />

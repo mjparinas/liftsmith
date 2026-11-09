@@ -2,7 +2,6 @@
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { exercise } from "@/lib/exercises";
-import { goalStreak, levelOf, xpTotal } from "@/lib/game";
 import { haptic, sound } from "@/lib/juice";
 import { quoteOfDay } from "@/lib/quotes";
 import { CALL_TEXT, type Call } from "@/lib/readiness";
@@ -16,17 +15,19 @@ import { go } from "./router";
 import { Icon } from "./icons";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { Button, EmptyState, Ring, Section } from "./ui";
+import { useGame } from "./Achievements";
+import { TodayGame } from "./TodayGame";
 
-export function Flame({ weeks }: { weeks: number }) {
+export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
   return (
     <span
       className={`num inline-flex h-9 items-center gap-1 rounded-full border px-2.5 text-sm font-bold ${lit ? "border-ember/40 bg-ember/12 text-ember" : "border-line bg-surface text-faint"}`}
-      title={`${weeks}-week streak`}
-      aria-label={`${weeks}-week streak`}
+      title={`${weeks}-week streak${freezes ? `, ${freezes} freeze${freezes > 1 ? "s" : ""}` : ""}`}
     >
       <Icon name="flame" size={16} filled={lit} strokeWidth={1.6} className={lit ? "drop-shadow-[0_0_6px_rgb(255_138_61/0.7)]" : ""} />
       {weeks}
+      {freezes > 0 && <span aria-label={`${freezes} streak freeze${freezes > 1 ? "s" : ""}`}>{" 🧊"}{freezes > 1 ? freezes : ""}</span>}
     </span>
   );
 }
@@ -39,12 +40,13 @@ export function greeting(hour: number, name: string): string {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, stats, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
+  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
-  const streak = goalStreak(stats, profile, now);
-  const lvl = levelOf(xpTotal(stats));
+  const g = useGame();
+  const streak = g.streak;
+  const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
@@ -56,13 +58,15 @@ export function Today() {
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-sm font-medium text-muted">{hello}</p>
           <div className="flex shrink-0 items-center gap-2">
-          <Flame weeks={streak.weeks} />
-          <span
-            className="num inline-flex h-9 items-center rounded-full border border-violet/40 bg-violet/12 px-2.5 text-sm font-bold text-violet"
+          <Flame weeks={streak.weeks} freezes={streak.freezes} />
+          <button
+            type="button"
+            onClick={() => go("achievements")}
+            className="press num inline-flex h-9 items-center rounded-full border border-violet/40 bg-violet/12 px-2.5 text-sm font-bold text-violet"
             title={`${lvl.title}: ${lvl.into} of ${lvl.span} XP to ${lvl.next ?? "max"}`}
           >
             Lv {lvl.level}
-          </span>
+          </button>
           <button type="button" aria-label="Settings" onClick={() => go("settings")} className="press grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink">
             <Icon name="settings" size={18} />
           </button>
@@ -150,6 +154,8 @@ export function Today() {
           {callOverride && <p className="mt-2 text-xs text-faint">Your call today. We suggested {CALL_TEXT[readiness.call].label.toLowerCase()}.</p>}
         </section>
       )}
+
+      {!active && <TodayGame />}
 
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
