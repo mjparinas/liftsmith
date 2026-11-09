@@ -28,7 +28,10 @@ export async function POST(req: Request) {
   const checked = checkBatch(body);
   if (!checked.ok) return json(400, { error: checked.error }, h);
   try {
+    // Per install, and per address too, since the install id is whatever the caller says it is.
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
     if (!(await rateLimit(`collect:${checked.batch.context.installId}`, 120, 3_600_000))) return json(429, { error: "Slow down" }, h);
+    if (!(await rateLimit(`collect-ip:${ip}`, 600, 3_600_000))) return json(429, { error: "Slow down" }, h);
     const r = await storeBatch(checked.batch, whereFrom(req.headers));
     return json(200, { ok: true, ...r }, h);
   } catch {

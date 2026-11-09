@@ -142,12 +142,13 @@ export async function verifyEmail(email: string, code: string, platform: Platfor
   const r = rows[0];
   const wrong = { code: 401, body: { error: "That code didn't match. Check the latest email, or ask for a new code." } };
   if (!r || Number(r.expires_at) < now || Number(r.tries) >= CODE_TRIES) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
-  if (hash(`${email}:${code.trim()}`) !== String(r.code_hash)) {
-    await run("UPDATE account_codes SET tries = tries + 1 WHERE email = ?", [email]);
-    return wrong;
-  }
-  // One use only.
-  await run("UPDATE account_codes SET expires_at = 0 WHERE email = ?", [email]);
+  // Count the try before comparing, in one statement, so parallel guesses can't all pass the tries check.
+  const counted = await query("UPDATE account_codes SET tries = tries + 1 WHERE email = ? AND tries < ? AND expires_at >= ? RETURNING tries", [email, CODE_TRIES, now]);
+  if (!counted.length) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
+  if (hash(`${email}:${code.trim()}`) !== String(r.code_hash)) return wrong;
+  // One use only: whoever clears it first gets the session.
+  const used = await query("UPDATE account_codes SET expires_at = 0 WHERE email = ? AND code_hash = ? AND expires_at >= ? RETURNING email", [email, r.code_hash, now]);
+  if (!used.length) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
   const id = await accountFor("email", email, email, now);
   return { code: 200, body: await startSession(id, platform, now) };
 }

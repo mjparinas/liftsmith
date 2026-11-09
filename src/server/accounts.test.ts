@@ -92,6 +92,14 @@ describe("accounts", () => {
     expect((await startEmail("a@b.co", null, NOW + 86_400_001)).code).toBe(200);
   });
 
+  it("counts parallel guesses, so a burst can't get past five tries", async () => {
+    const code = String((await startEmail("burst@b.co", null, NOW)).body.devCode);
+    const wrong = code === "000000" ? "111111" : "000000";
+    await Promise.all(Array.from({ length: 20 }, () => verifyEmail("burst@b.co", wrong, "web", NOW)));
+    expect((await query<{ tries: number }>("SELECT tries FROM account_codes WHERE email = 'burst@b.co'"))[0].tries).toBe(5);
+    expect((await verifyEmail("burst@b.co", code, "web", NOW)).code).toBe(401);
+  });
+
   it("finds the session from a Bearer token, and deleting the account removes everything", async () => {
     const r = await signInWith("google", { idToken: "t", nonce: "n", platform: "web" }, { verify: verify("g-1", "x@y.co"), now: NOW });
     const token = String(r.body.token);

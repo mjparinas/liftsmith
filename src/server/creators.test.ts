@@ -60,8 +60,8 @@ describe("creator codes on the server", () => {
     await claimCode({ installId: "install-test", code: "LIFT-ALEX" }, NOW - 100 * DAY);
     await batch([
       { sql: "INSERT INTO installs (id, first_seen, last_seen, platform, test) VALUES ('install-test', 0, 0, 'android', 1)", args: [] },
-      { sql: "INSERT INTO subscription_events (id, at, install_id, store, kind, usd_micros) VALUES ('p1', ?, 'install-0005', 'play', 'purchase', 39990000)", args: [NOW - 90 * DAY] },
-      { sql: "INSERT INTO subscription_events (id, at, install_id, store, kind, usd_micros) VALUES ('p2', ?, 'install-test', 'play', 'purchase', 39990000)", args: [NOW - 90 * DAY] },
+      { sql: "INSERT INTO subscription_events (id, at, install_id, store, kind, usd_micros, source) VALUES ('p1', ?, 'install-0005', 'play', 'purchase', 39990000, 'store')", args: [NOW - 90 * DAY] },
+      { sql: "INSERT INTO subscription_events (id, at, install_id, store, kind, usd_micros, source) VALUES ('p2', ?, 'install-test', 'play', 'purchase', 39990000, 'store')", args: [NOW - 90 * DAY] },
     ]);
     let { rows } = await loadCreators(NOW);
     expect(rows[0]).toMatchObject({ code: "LIFT-ALEX", signups: 1, paying: 1 });
@@ -70,5 +70,14 @@ describe("creator codes on the server", () => {
     expect(await recordPayout("LIFT-ALEX", 10.2, "m@x", "Wise 123", NOW)).toBe(true);
     ({ rows } = await loadCreators(NOW));
     expect(rows[0].owed).toBeCloseTo(0, 2);
+  });
+
+  it("pays commission only on store-verified events, never on the app's own (forgeable) purchase events", async () => {
+    await add("LIFT-ALEX", "Alex");
+    await claimCode({ installId: "install-0006", code: "LIFT-ALEX" }, NOW - 100 * DAY);
+    await run("INSERT INTO subscription_events (id, at, install_id, store, kind, usd_micros, source) VALUES ('fake', ?, 'install-0006', 'play', 'purchase', 999000000, 'app')", [NOW - 90 * DAY]);
+    const { rows } = await loadCreators(NOW);
+    expect(rows[0]).toMatchObject({ code: "LIFT-ALEX", signups: 1, paying: 0 });
+    expect(rows[0].owed).toBe(0);
   });
 });
