@@ -244,7 +244,9 @@ export function DotsCard() {
   const { events, profile } = useApp();
   const now = useNow(3600_000);
   const unit = profile.unit;
-  const [sex, setSex] = useState<"male" | "female">(profile.sex ?? "male");
+  // The formula follows the sex set in the profile; the picker shows only when it isn't set (Melvin, 2026-11-09).
+  const [picked, setSex] = useState<"male" | "female">("male");
+  const sex = profile.sex ?? picked;
   const rep = useMemo(() => dotsFromData(events, profile, now, sex), [events, profile, now, sex]);
   // Overrides in the lifter's unit, adjusted with steppers.
   const [edit, setEdit] = useState<Partial<Record<DotsLift | "bw", number>>>({});
@@ -274,11 +276,13 @@ export function DotsCard() {
           <span className="text-muted">{T.dotsTotal}</span>
           <span>{kgTo(total, unit)} {unit} · {T.dotsBw} {kgTo1(bw, unit)} {unit}</span>
         </div>
+        {!profile.sex && (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label={T.dotsSex}>
           <span className="text-muted">{T.dotsSex}</span>
           <Chip active={sex === "male"} onClick={() => setSex("male")}>{T.male}</Chip>
           <Chip active={sex === "female"} onClick={() => setSex("female")}>{T.female}</Chip>
         </div>
+        )}
         <details className="mt-2">
           <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{T.dotsCalc}</summary>
           <div className="mt-1 grid grid-cols-2 gap-3">
