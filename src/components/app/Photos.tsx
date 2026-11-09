@@ -107,7 +107,7 @@ function WeightChart({ points }: { points: { at: number; v: number }[] }) {
 
 function Single({ photo }: { photo: Photo }) {
   const url = useObjectUrl(photo.blob);
-  return url ? <img src={url} alt={`Latest ${photo.pose} photo`} className="mt-3 w-full rounded-2xl" /> : null;
+  return url ? <img src={url} alt={`Your latest ${photo.pose} view`} className="mt-3 w-full rounded-2xl" /> : null;
 }
 
 /** Before and after in one frame, with a slider that wipes between them. */

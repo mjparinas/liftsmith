@@ -21,7 +21,7 @@ export function Gym() {
 
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Gyms</h1>
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Gyms</h1>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>{g.name}</Chip>
