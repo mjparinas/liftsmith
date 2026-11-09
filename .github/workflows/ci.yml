@@ -83,7 +83,9 @@ jobs:
       matrix:
         include:
           - { name: "playthrough and offline", run: "node scripts/e2e.mjs '' e2e-shots && node scripts/e2e-offline.mjs" }
-          - { name: "devices", run: "node scripts/e2e-devices.mjs '' e2e-shots/devices" }
+          # Layout sweep on 13 phones and tablets (scripts/devices.mjs), then the full playthrough again on an
+          # iPhone in WebKit, the engine behind the iOS app. About 30 s of tests in one job.
+          - { name: "devices", run: "node scripts/e2e-devices.mjs '' e2e-shots/devices && DEVICE='iPhone 16' node scripts/e2e.mjs '' e2e-shots/iphone" }
           - { name: "accessibility", run: "node scripts/e2e-a11y.mjs" }
     steps:
       - uses: actions/checkout@v7

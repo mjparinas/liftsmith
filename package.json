@@ -9,7 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "e2e:all": "node scripts/e2e.mjs && node scripts/e2e-offline.mjs && node scripts/e2e-devices.mjs && node scripts/e2e-a11y.mjs",
+    "e2e:all": "node scripts/e2e.mjs && node scripts/e2e-offline.mjs && node scripts/e2e-devices.mjs && DEVICE='iPhone 16' node scripts/e2e.mjs && node scripts/e2e-a11y.mjs",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
     "e2e": "node scripts/e2e.mjs"

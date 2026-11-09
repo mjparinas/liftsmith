@@ -16,7 +16,8 @@ npm run build                # server build (Vercel): pages plus API routes (rou
 npm run build:static         # static export to out/ (native shells, browser tests)
 node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
 node scripts/e2e-offline.mjs # real offline after one visit
-node scripts/e2e-devices.mjs # layout on 8 phones and tablets
+node scripts/e2e-devices.mjs # layout on 13 phones and tablets (DEVICES=ios|android|full|names)
+DEVICE='iPhone 16' node scripts/e2e.mjs  # the playthrough on another device
 node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
 npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build:static)
 ```
@@ -218,6 +219,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 - **Unit tests** (`src/lib/*.test.ts`, node) for every engine rule: plates, recovery, blocks, progression, generator, stats, game.
 - **Component and integration tests** (`*.test.tsx`, `// @vitest-environment jsdom`, Testing Library, fake-indexeddb): the whole app from first run to a saved workout through the real store and IndexedDB, steppers, swaps, a bodyweight gym, and a workout surviving a reload.
 - **Browser tests** (Playwright, `scripts/e2e*.mjs`): playthrough, offline, a device layout sweep (no sideways scroll, Log set fully on screen and 48 px+, controls 44 px+), and axe WCAG 2.2 AA with no serious or critical problems. Any console error fails a run.
+- **Device coverage** (Melvin asked, 2026-11-09: "comprehensive but not too many"). One list in `scripts/devices.mjs`, 13 devices, each adding a screen size the others don't: iPhone SE (3rd gen), iPhone 16, iPhone 17 Pro Max, iPad Mini, iPad Pro 11 landscape; Galaxy S9+ (320 wide, the narrowest), Galaxy S24 (360, the most common Android width), Pixel 7, Galaxy A55, Pixel 7 landscape, Galaxy Z Fold 7 opened, Galaxy Tab S9 portrait and landscape. iOS devices run in **WebKit** (the iOS app is a WKWebView) and Android ones in Chromium. Every device gets the layout sweep plus a logged and saved set (about 2 s each); the full playthrough runs on Pixel 7 and again on iPhone 16 in WebKit. Offline and accessibility runs stay on Pixel 7. Add a device only when it brings a new size or engine, and drop one when another covers it. Cloud sessions have only Chromium, so WebKit devices skip locally and run in CI, where a missing engine fails the run.
 - **Mutation tests** (Stryker, `stryker.config.mjs`, Gradelings' Vitest 5 runner in `scripts/stryker-vitest5.mjs`) on the engine, run by hand (not in CI); the run fails below the `break` score. It is a ratchet: the first run scored 34%, so `break` is 30 for now; raise it (target 60, Gradelings aims for 85) as engine tests land.
 - A bug fix comes with a test that fails without it. Flaky tests are fixed at the cause, never retried.
 - Colour tokens must pass contrast: `--color-faint` was raised to `#808c9d` because axe failed `#5b6777`.

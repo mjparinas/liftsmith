@@ -84,7 +84,7 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
       }}
     >
       <p className="text-muted">Forgot to track a workout, or trained without your phone? Add it here and it counts towards your stats, PRs, streak and next workouts.</p>
-      <div className="mt-4 grid gap-3 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm text-muted">Started</span>
           <input type="datetime-local" required value={start} max={localInput(now)} onChange={(e) => setStart(e.target.value)} className={`${input} mt-1`} />
