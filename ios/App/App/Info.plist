@@ -66,6 +66,10 @@
 	</array>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Liftsmith uses your approximate location when you open the app to pick the gym you're at. It never tracks you in the background and your location stays on your phone.</string>
+	<key>NSLocationDefaultAccuracyReduced</key>
+	<true/>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Liftsmith reads your weight, height, resting heart rate and heart rate to set up your training and show effort during workouts.</string>
 	<key>NSHealthUpdateUsageDescription</key>
@@ -76,5 +80,22 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.liftsmith.app.shortcuts</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>liftsmith</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSSupportsLiveActivities</key>
+	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Liftsmith adds your training days to your calendar and, if you turn it on, checks when you're busy so it can offer a workout that fits. It only looks at times, never at what your events are.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Liftsmith adds your training days to your calendar and, if you turn it on, checks when you're busy so it can offer a workout that fits. It only looks at times, never at what your events are.</string>
 </dict>
 </plist>

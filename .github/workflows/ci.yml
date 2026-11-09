@@ -63,7 +63,7 @@ jobs:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
-      - run: npm run build
+      - run: npm run build:static
       - uses: actions/upload-artifact@v7
         with:
           name: web-build
@@ -146,6 +146,21 @@ jobs:
           name: web-build
           path: out
       - run: npx cap sync ios
+      # Swift packages download Capacitor's binaries from GitHub releases, which sometimes return 5xx.
+      # Cache them, and retry resolution with backoff before building.
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            build/ios/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('ios/App/CapApp-SPM/Package.swift', 'package-lock.json') }}
+      - name: Resolve Swift packages (with retries)
+        run: |
+          for i in 1 2 3 4; do
+            xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App -derivedDataPath build/ios && exit 0
+            echo "::warning::Package resolution failed (attempt $i), retrying in $((i * 15)) s"; sleep $((i * 15))
+          done
+          exit 1
       - name: Build for the simulator (unsigned)
         run: >
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug

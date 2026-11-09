@@ -17,7 +17,8 @@ export interface SessionState {
   sound?: boolean;
 }
 
-export type SessionAction = "log" | "add30";
+/** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */
+export type SessionAction = "log" | "add30" | "start";
 type Handle = { remove(): Promise<void> };
 type Plugin = {
   update(s: SessionState): Promise<void>;
@@ -62,7 +63,7 @@ export async function restOverAlert(next: string) {
   await reg?.showNotification("Rest over", { tag: "rest", body: `Up next: ${next}`, vibrate: [200, 100, 200], icon: "/icon-192.png" } as NotificationOptions);
 }
 
-/** Log set / +30 s buttons on the native notification. Returns an unsubscribe function. */
+/** Log set / +30 s on the native notification, and the voice and system shortcuts. Returns an unsubscribe function. */
 export function onSessionAction(cb: (a: SessionAction) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};

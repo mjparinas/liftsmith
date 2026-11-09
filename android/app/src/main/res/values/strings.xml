@@ -4,4 +4,11 @@
     <string name="title_activity_main">Liftsmith</string>
     <string name="package_name">com.liftsmith.app</string>
     <string name="custom_url_scheme">com.liftsmith.app</string>
+    <string name="shortcut_start_short">Start workout</string>
+    <string name="shortcut_start_long">Start today\'s workout</string>
+    <string name="shortcut_log_short">Log set</string>
+    <string name="shortcut_log_long">Log the current set as planned</string>
+    <string name="shortcut_rest_short">+30 s rest</string>
+    <string name="shortcut_rest_long">Add 30 seconds to the rest timer</string>
+    <string name="widget_description">Start today\'s workout or log a set in one tap</string>
 </resources>

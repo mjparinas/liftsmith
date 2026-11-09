@@ -1,5 +1,5 @@
 // Full playthrough: first run, a workout with rest, swaps and feedback, finish, and every tab.
-//   npm run build && node scripts/e2e.mjs [base-url] [out-dir]
+//   npm run build:static && node scripts/e2e.mjs [base-url] [out-dir]
 //   DEVICE="iPhone 16" runs it on another device from scripts/devices.mjs (default Pixel 7)
 import fs from "node:fs";
 import { closeAll, open } from "./devices.mjs";
@@ -75,6 +75,13 @@ try {
   await page.reload();
   await page.getByRole("button", { name: "Progress" }).click();
   check((await page.getByText(/No workouts yet/).count()) === 0, "History survives a reload", fail);
+
+  // Shortcuts: the web manifest's "Start workout" link starts today's workout, and "Log set" logs one.
+  await page.goto(`${server.url}/app/?do=start`);
+  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  check(!page.url().includes("do="), "The shortcut link is cleared after it runs", fail);
+  await page.goto(`${server.url}/app/?do=log`);
+  await page.getByRole("button", { name: /Skip/ }).waitFor();
 } catch (e) {
   fail.push(String(e));
   await shot("failure").catch(() => {});

@@ -4,6 +4,8 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useState } from "react";
+import { CalendarSettings } from "./CalendarSettings";
+import { CycleSettings } from "./CycleSettings";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -25,6 +27,7 @@ export function Settings() {
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
       <h1 className="text-2xl font-bold">Settings</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <Section title="Your name">
         <input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} className="card w-full px-4 py-3" placeholder="Optional" aria-label="Your name" />
       </Section>
@@ -38,6 +41,8 @@ export function Settings() {
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>
       <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <CalendarSettings />
+      <CycleSettings />
       <Section title="Training block">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>

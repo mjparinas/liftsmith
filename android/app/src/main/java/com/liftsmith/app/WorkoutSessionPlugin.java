@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
 import com.getcapacitor.JSObject;
@@ -38,6 +39,30 @@ public class WorkoutSessionPlugin extends Plugin {
             }
         };
         ContextCompat.registerReceiver(getContext(), receiver, new IntentFilter(WorkoutService.BROADCAST_ACTION), ContextCompat.RECEIVER_NOT_EXPORTED);
+        // A shortcut that cold-started the app. The event is kept until the web app listens for it.
+        if (getActivity() != null && deliver(getActivity().getIntent())) getActivity().setIntent(new Intent(Intent.ACTION_MAIN));
+    }
+
+    @Override
+    protected void handleOnNewIntent(Intent intent) {
+        super.handleOnNewIntent(intent);
+        deliver(intent);
+    }
+
+    /** Shortcut links: liftsmith://start, liftsmith://log, liftsmith://add30. Anything else is ignored. */
+    static String shortcutAction(Uri uri) {
+        if (uri == null || !"liftsmith".equals(uri.getScheme())) return null;
+        String a = uri.getHost();
+        return "start".equals(a) || "log".equals(a) || "add30".equals(a) ? a : null;
+    }
+
+    private boolean deliver(Intent intent) {
+        String a = intent == null ? null : shortcutAction(intent.getData());
+        if (a == null) return false;
+        JSObject data = new JSObject();
+        data.put("action", a);
+        notifyListeners("action", data, true);
+        return true;
     }
 
     @Override

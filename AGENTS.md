@@ -12,13 +12,14 @@ npm test                     # unit + integration tests (Vitest; engine in node,
 npm run test:coverage
 npm run test:mutation        # Stryker on the engine; report in reports/mutation/
 npm run lint && npx tsc --noEmit
-npm run build                # static export to out/
+npm run build                # server build (Vercel): pages plus API routes (route.api.ts)
+npm run build:static         # static export to out/ (native shells, browser tests)
 node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
 node scripts/e2e-offline.mjs # real offline after one visit
 node scripts/e2e-devices.mjs # layout on 13 phones and tablets (DEVICES=ios|android|full|names)
 DEVICE='iPhone 16' node scripts/e2e.mjs  # the playthrough on another device
 node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
-npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build)
+npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build:static)
 ```
 
 There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions (`.github/workflows/android.yml`).
@@ -28,7 +29,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
 - Platform equivalents: Health Connect ↔ HealthKit (Apple Health); foreground-service notification ↔ Live Activity (lock screen and Dynamic Island); Play Billing ↔ StoreKit; Sign in with Google ↔ Sign in with Apple (both offered on iOS); Wear OS ↔ Apple Watch.
 - CI builds both apps on every pull request (`android` and `ios` jobs in `ci.yml`).
-- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) schedules a time-sensitive rest-over notification with the same two buttons. The iOS lock-screen countdown needs a Live Activity (a widget extension target), which is the next parity item. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
+- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) runs a **Live Activity** (lock screen and Dynamic Island: rest countdown, next set and plates, heart rate, Log set / +30 s links; drawn by the `LiftsmithWidgets` extension) and schedules a time-sensitive rest-over notification with the same two buttons. Heart-rate-only changes reach the Live Activity at most every 15 s, because iOS budgets updates. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
 - Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins).
 - Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
 
@@ -63,7 +64,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ### Workout screen
 - Big target weight and reps with steppers, the barbell plate graphic for every barbell set, a big Log set button, an automatic rest timer with +30 s and Skip, and the next set's plates shown during rest so the lifter can load while resting.
-- **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`). On iOS this will be a Live Activity.
+- **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. On iOS the same content is a Live Activity on the lock screen and in the Dynamic Island. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`).
 - The screen stays on during a workout (wake lock).
 
 ### Workout data and coaching (Melvin, 2026-11-09: "win on data")
@@ -87,7 +88,49 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link (saved or curated playlists). **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
 4. **Integrations server, right after the MVP and ahead of full sync** (Melvin decided, 2026-11-09). A small server on Vercel with libsql/Turso. Its first job is the OAuth exchange and token storage for **Strava, Oura and Whoop**, so all three ship in the first updates. Apply early for Strava Extended Access, Oura approval (including written consent to use their data in Pro features) and Whoop approval, because each caps us at 10 users until approved.
 5. **After that** (full order in the research doc's "How we win" section): Samsung Health Data SDK, a bar-speed sensor, watch apps, a Garmin Connect IQ app.
+6. **Approved additions (Melvin, 2026-11-09; details in the research doc's "Added to the plan"), built in this order, each on Android and iOS together:**
+   - **MVP+1 · Gym by location:** an opt-in geofence on each gym profile picks the active gym on arrival. Approximate location only, kept on the device.
+   - **MVP+1 · Cycle-aware readiness:** opt-in, with its own consent screen. Reads menstrual data from Health Connect and HealthKit, or the lifter logs it. It never leaves the device except through the user's own sync, and never goes to analytics.
+   - **MVP+1 · Voice and system shortcuts:** iOS App Intents and Shortcuts (log set, start workout, +30 s), Android App Actions, a Quick Settings tile, home-screen widgets, the iPhone Action button and Control Center.
+   - **MVP+2 · Calendar:** write planned training days to the device calendar, and read busy times only with permission.
+   - **With the server · Coach sharing:** a read-only link or PDF that expires and can be revoked, plus an opt-in weekly email (Resend).
+   - **With the server · Cloud integrations** (Strava, Oura, Whoop): connecting one explains that it creates a free account, then uses Google or Apple sign-in. Everything else stays account-free.
+   - **Before launch · Legal and consent:** the Health Connect declaration, HealthKit review notes, a privacy policy that covers each integration, Washington MHMDA and GDPR special-category consent, and export and delete that cover linked accounts.
+   - **Test devices:** Melvin has a Fitbit Air (check that its "Share heart rate" is seen by our 0x180D reader, since Google lists only some apps as compatible) and an Oura ring (readiness inputs through Health Connect and HealthKit now, the direct API later).
 - **Skipped:** Hume Health direct (no API; its data arrives through Apple Health), live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only, since iOS can't control other apps' volume, so it's skipped for platform parity).
+
+### In-app feedback (Melvin, 2026-11-09)
+- **Settings › Send feedback or report a bug** (`#/feedback`, `Feedback.tsx`): bug / idea / other, a message, an optional email for replies, an optional screenshot (picked from the photo library, shrunk to 1280 px JPEG), and device details that are on by default and shown before sending (app version, platform, screen, language, time zone, current screen, the last 30 errors). It never includes workouts, health data or names.
+- **Offline first:** reports go to an outbox in localStorage (`feedback.ts`) and are sent on open, when the connection returns, and right after writing. Only a 400/413/422 drops a report; 404, 429 and 5xx keep it for later.
+- **Delivery:** `POST /api/feedback/` (`src/app/api/feedback/route.api.ts`) checks the report (`feedbackServer.ts`), rate-limits per address, and emails it to the owner through **Resend** (`RESEND_API_KEY`, `FEEDBACK_TO`, optional `FEEDBACK_FROM` in Vercel). The reply-to is the sender's email, so the owner can answer straight from the inbox. CORS allows only the native shells' origins.
+- It's pure web code, so Android and iOS get it together (platform parity). Once the server has a database, reports are also stored and listed in the admin panel.
+
+### Gym by location (Melvin, 2026-11-09; built)
+- Opt-in per gym: **Gyms › Pick this gym when I'm here › Use where I am now** saves the gym's position rounded to about 100 m, with a 300 m radius (`Gym.place`).
+- When the app opens or comes back to the foreground, and only if some gym opted in, it asks for one **approximate** position (`src/lib/geo.ts`, `@capacitor/geolocation`). It switches the active gym only when exactly one gym is clearly in range, never mid-workout, and Today shows "you're here".
+- No background location and no precise location. Android declares only `ACCESS_COARSE_LOCATION`; iOS asks "when in use" with reduced accuracy by default (`NSLocationDefaultAccuracyReduced`). The position is never sent anywhere. The same code runs on both platforms (parity).
+- A true background geofence (switch before the app opens) was left out on purpose: it needs "always" location, which costs trust and app-review scrutiny for little gain.
+
+### Cycle-aware readiness (Melvin, 2026-11-09; built)
+- **Opt-in, with its own consent sheet** (Settings › Cycle-aware readiness › Set up). The sheet says what is logged, that it stays on the phone (only the user's own backup/sync moves it), that it is never used for analytics or ads or included in feedback reports, that it isn't medical advice, contraception or a fertility tool, and that turning it off deletes it. `profile.cycle.consentAt` records the agreement.
+- The lifter logs the first day of a period with one tap ("Period started today" / "Started yesterday"), stored as `cycle` events. `src/lib/cycle.ts` estimates the cycle day and phase from their own median cycle length (gaps of 21 to 45 days, default 28), and says nothing if nothing was logged in the last two cycles.
+- It feeds `readiness.ts` as a small nudge the lifter can override: period days −5 ("go by feel"), late luteal −4, follicular +3, otherwise 0. The effect is small on purpose, because the evidence is mixed and individual.
+- **Turn off and delete** removes every cycle event and the consent. Reading menstrual data from Health Connect and HealthKit waits for health plugin support (the current plugin has no menstruation type); logging works the same on both platforms (parity).
+
+
+### Voice and system shortcuts (Melvin, 2026-11-09; built)
+- **Three actions everywhere:** start workout (starts today's plan, or reopens the one running), log set (as planned), and +30 s rest. Log set and +30 s do nothing without a workout, so a stray tap never logs a set nobody did. All entry points run `src/lib/shortcuts.ts`, through the WorkoutSession plugin's `action` event (the same event as the notification buttons), so they behave the same on every platform.
+- **iOS** (`ios/App/App/ShortcutIntents.swift`): App Intents plus App Shortcuts, so Siri ("Start a workout in Liftsmith"), Spotlight and the Shortcuts app work with no setup, and the lifter can put any of them on the Action button or in Control Center (iOS 18) as a Shortcut control. The intents open the app (`openAppWhenRun`), because the workout state lives in the web layer.
+- **Android:** launcher shortcuts and an App Actions `START_EXERCISE` capability (`res/xml/shortcuts.xml`), and a Quick Settings tile (`WorkoutTileService.java`) that reads "Start workout", or "Log set" while a workout runs. All open `liftsmith://start|log|add30`. Custom App Actions intents for log set were left out, because they need Google's review and the tile and notification already cover it.
+- **Web:** the manifest's shortcuts open `/app/?do=start` and `/app/?do=log`.
+- **Widgets and controls:** Android has a home-screen widget (`WorkoutWidget.java`, Start workout and Log set). iOS has one widget extension target, `ios/App/LiftsmithWidgets` (iOS 16.2+): a home-screen and lock-screen widget (small: start; medium: start and log set), the workout Live Activity, and an iOS 18 Control Center control that runs `StartWorkoutIntent`. Widget and Live Activity buttons open `liftsmith://` links, which `SceneDelegate` hands to `ShortcutInbox`.
+- Code shared by the app and the extension lives in `ios/App/Shared/` (`WorkoutIntents.swift`: the intents and `ShortcutInbox`; `WorkoutActivity.swift`: the Live Activity attributes). The extension's bundle id is `com.liftsmith.app.widgets`; release signing creates its profile automatically.
+- Widgets don't show whether a workout is running, because that needs an App Group shared with the app (an Apple portal step). Log set does nothing without a workout, so the widgets stay correct without it.
+### Calendar (Melvin, 2026-11-09, roadmap MVP+2; built)
+- **Settings › Calendar** (`CalendarSettings.tsx`, `src/lib/calendar.ts`): pick training weekdays (defaults spread the days-a-week goal, 3 → Mon, Wed, Fri) and a time, then **Add to my calendar**. That writes one weekly repeating event (the workout length) to the default calendar, and Update or Remove replace or delete it by its saved id. The web build downloads a `.ics` file instead.
+- **Fit workouts around my calendar** is a separate opt-in (native only). When it's on and nothing is running, Today reads busy times for the next 3 hours every 5 minutes. If something starts before the planned workout could finish, it offers a shorter length that fits ("Busy at 7:00 pm · Fit a 30-minute workout"): the free time less 10 minutes, rounded down to 5, at least 15 (`fitLength`).
+- **Privacy:** only start and end times are read. Titles, places, attendees and notes are never read. All-day events, events marked free and Liftsmith's own event are ignored, and nothing leaves the phone.
+- Native: `CalendarPlugin.java` (CalendarContract, `READ_CALENDAR` + `WRITE_CALENDAR`) and `CalendarPlugin.swift` (EventKit, full access on iOS 17+, because updating our own event and reading busy times both need reads). The same JS drives both (parity).
 
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
@@ -101,7 +144,8 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ### Money
 - **No ads, ever** (Melvin, 2026-11-09). No ad SDKs, sponsored placements, interstitials or rewarded videos, in either app or on the site. The subscription is the only revenue.
-- **Prices (confirmed by Melvin, 2026-11-09):** Pro is $6.99 a month or $39.99 a year. The annual plan is pushed as "about $3.33 a month, less than half of Fitbod", with a 7-day free trial on the annual plan. **No lifetime plan.**
+- **Prices (confirmed by Melvin, 2026-11-09):** Pro is $6.99 a month or $39.99 a year. The annual plan is pushed as "about $3.33 a month, less than half of Fitbod". **No lifetime plan.**
+- **Trial (Melvin, 2026-11-09, revenue forecast; replaces the earlier 7-day trial on the annual plan):** every new user sees a **14-day Pro trial offer as the last step of setup**, annual plan first, then monthly, then "Not now, keep the free plan". Anyone who declines keeps the free logger and 5x5. The offer isn't shown again on "Run setup again". The length comes from the `trialDays` flag (`src/lib/flags.ts`, 7 or 14) so it can be A/B tested. Why: about 82% of trials start on install day, and trials of 17+ days convert at 42.5% against 25.5% for 4 days or fewer (RevenueCat data; forecast doc https://claude.ai/artifact/CiXkRo29nsLCuTzKYkQfx7). Until billing lands, the choice is only recorded on the profile (`profile.pro`, `trial.ts`), Pro stays on for everyone, and billing will start the store trial from it. Neither plan is pre-selected: each is its own button.
 - **Free tier:** the workout logger, plate graphic, rest timer and live notification, plus a **classic 5x5 program mode** (Melvin, 2026-11-09; not built yet). **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
 - **Billing is native:** Google Play Billing on Android and StoreKit on iOS, through a Capacitor purchases plugin. The subscription is checked on the device so Pro works offline, and verified by the server once accounts exist.
 - Until billing lands, the app has a single `pro` entitlement switched on, so the paywall drops in without reworking screens.
@@ -120,6 +164,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Stack copied from Gradelings** (`mjparinas/gradelings`): Next.js 16 static export, React 19, TypeScript, Tailwind 4, Zustand, Vitest.
 - **Capacitor, not Bubblewrap (Melvin chose it, 2026-11-09).** A TWA can't run a foreground service, show a live lock-screen countdown, read Health Connect, keep Bluetooth heart rate going with the screen off, or use StoreKit (it has no iOS app). Capacitor wraps the same static export and adds those through native plugins; it also builds the iOS app. The cost is a store release for each app change.
 - **Offline-first, like Gradelings.** Everything the lifter does is an event with a unique id (set, session start and end, feedback, swap), appended to IndexedDB first (`localdb.ts`). Stats, PRs, recovery, streaks, XP and progression are recomputed from events, never stored (`derive.ts`), so merging devices is order-independent and duplicate-safe. Profile and gyms are last-write-wins on `updatedAt`.
+- **Two builds** (`next.config.ts`): `npm run build` is the Vercel server build with API routes named `route.api.ts`; `npm run build:static` (`STATIC_EXPORT=1`) is the static export for the native shells and CI, and it leaves those routes out. Native apps call the API on `SITE_URL`.
 - **Sync (later):** push unsynced events and pull new ones by cursor (`POST /api/sync/`), when online, when the app becomes visible, and shortly after a change. Server on Vercel with libsql or Turso, as in Gradelings.
 - **One static page for the app** with hash routes (`#/today`, `#/workout`, …), so it works offline from one cached page.
 - **The active workout** is also kept in `localStorage`, so killing the app mid-set loses nothing.
@@ -152,7 +197,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings code where it fits rather than rewriting it.
 
 - **Branches and merging:** pull requests go to `staging`; a nightly workflow promotes `staging` to `main` when CI is green (one production build a day). **Agents watch CI on every pull request they open and merge it into `staging` as soon as every check, including "CI passed", is green; when a check fails they find the cause, push a fix and repeat until it merges** (Melvin, 2026-11-09). Agents never merge into `main`; only the nightly promotion does. Flaky tests are fixed at the cause, never retried.
-- **Feature flags** defined in code (`src/lib/flags.ts`), state on the server, cached on the device for offline use, so a feature can be switched off without a store release. A/B tests read through the same path.
+- **Feature flags** defined in code (`src/lib/flags.ts`, built: `flag()`, `cacheFlags()`, a stable per-device `variant()`), state on the server (later), cached on the device for offline use, so a feature can be switched off without a store release. A/B tests read through the same path.
 - **Admin panel** (`/admin/`, admin emails from the environment, every change audited): subscriptions, trial-to-paid, a weekly retention table, revenue, users, a read-only support role, maintenance mode and alerts. The owner's test account is left out of every metric.
 - **Error reporting:** Sentry with a scrubber (no workout notes, names or health data leave the device), loaded only when something goes wrong.
 - **Analytics:** Vercel Web Analytics on public pages only, plus counted clicks on calls to action. In the app, only the events needed for the admin dashboard, disclosed on `/privacy/`. Health data never leaves the device except through sync to the user's own account.
@@ -162,12 +207,11 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 - **Accessibility:** axe-core WCAG 2.2 AA run, keyboard run, forced-colours support, and a colour-blind check. The recovery map's colours must pass it, and every band also has a label and a percentage.
 - **Browser tests like Gradelings':** a full playthrough, an offline run, a layout sweep across phones and tablets, and a tap-latency benchmark ("every tap answers within a frame or two").
 - **Store tooling:** scripts that make Play and App Store screenshots and the feature graphic from the real app, plus `docs/PLAY_LISTING.md` and `docs/PLAY_CONSOLE_ANSWERS.md`.
-- **Email** through Resend (receipts, weekly recap, win-back), with hashed unsubscribe tokens and the CASL mailing address.
-- **Exercise demo videos** self-hosted and cached on the device for offline use, like Gradelings' help videos.
+- **Email** through Resend (in-app feedback today; receipts, weekly recap, win-back later), with hashed unsubscribe tokens and the CASL mailing address.
+- **Exercise demos (Melvin approved, 2026-11-09):** a procedural 3D hologram wireframe built with three.js, not filmed videos. Male and female bodies are driven by the same keyframes, and there are toggles for the skeleton, the target muscles and the bar path. Being procedural, the demos ship inside the app and work offline. The 2D version stays as a low-power fallback, and 3D becomes the default only after it has been tested on a mid-range Android phone. Prototype: https://claude.ai/artifact/WrmuLVALnkzLjBPoLcxN8i (source in the project files: `exercise-demos/wireframe-lift-demos.html`).
 - **Data rights:** JSON export, erase device and delete account; a restore check for backups; a full-storage notice.
 - **Languages:** English at launch. UI text stays in one place per screen so Spanish and French can follow, as Gradelings did.
 
 ## Open items
 - Confirm the Android package id and register a domain.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
-- iOS Live Activity for the lock-screen rest countdown (widget extension), to match Android.

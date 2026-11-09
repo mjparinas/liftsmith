@@ -9,7 +9,7 @@ import { haptic, keepAwake, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
-import { notifyPermission, onSessionAction, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -39,16 +39,6 @@ export function Workout() {
     sound.enabled = profile.restSounds;
     return () => void keepAwake(false);
   }, [profile.restSounds]);
-
-  // Buttons on the native lock-screen notification.
-  useEffect(
-    () =>
-      onSessionAction((a) => {
-        if (a === "log") useApp.getState().logSet();
-        else useApp.getState().addRest(30);
-      }),
-    [],
-  );
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;

@@ -1,6 +1,6 @@
 // Layout on the phones and tablets in scripts/devices.mjs: no sideways scroll, the main buttons on screen,
 // big targets, and a set logged and saved on each one.
-//   npm run build && node scripts/e2e-devices.mjs [base-url] [out-dir]
+//   npm run build:static && node scripts/e2e-devices.mjs [base-url] [out-dir]
 //   DEVICES=ios|android|full|"Pixel 7,iPad Mini" picks a subset (default: all)
 import fs from "node:fs";
 import { closeAll, open, pick } from "./devices.mjs";

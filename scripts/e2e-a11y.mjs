@@ -1,5 +1,5 @@
 // axe-core WCAG 2.2 A/AA on every screen, failing on serious and critical problems.
-//   npm run build && node scripts/e2e-a11y.mjs [base-url]
+//   npm run build:static && node scripts/e2e-a11y.mjs [base-url]
 import AxeBuilder from "@axe-core/playwright";
 import { chromium, devices } from "playwright";
 import { base, finish, onboard } from "./helpers.mjs";
@@ -35,6 +35,20 @@ try {
     await page.getByRole("button", { name: tab }).click();
     await scan(tab);
   }
+  await page.goto(`${server.url}/app/#/settings`);
+  await scan("settings");
+  await page.getByRole("button", { name: "Set up" }).click();
+  await scan("cycle consent");
+  await page.getByRole("button", { name: "I agree, turn it on" }).click();
+  await page.getByRole("button", { name: "Period started today" }).click();
+  await scan("cycle on");
+  await page.getByRole("button", { name: "Send feedback or report a bug" }).click();
+  await page.getByRole("button", { name: "See what's included" }).click();
+  await scan("feedback");
+  await page.getByLabel("Message").fill("The rest timer skipped a beat");
+  await page.getByRole("button", { name: "Send", exact: true }).click();
+  await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
+  await scan("feedback sent");
 } catch (e) {
   fail.push(String(e));
 }

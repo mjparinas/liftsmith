@@ -26,9 +26,27 @@ async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commerci
   await user.click(screen.getByRole("button", { name: gym }));
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: "Continue" }));
-  await user.click(screen.getByRole("button", { name: "Build my first workout" }));
+  await user.click(screen.getByRole("button", { name: "Continue" }));
+  await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
   await screen.findByText("Today's workout");
 }
+
+describe("Pro trial offer", () => {
+  it("ends first-run setup with the trial offer, yearly first, and records the choice", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("What are you training for?");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await screen.findByText("Try Pro free for 14 days");
+    const plans = screen.getAllByRole("button", { name: /Start free trial/ });
+    expect(plans[0].textContent).toMatch(/Yearly/);
+    await user.click(plans[0]);
+    await screen.findByText("Today's workout");
+    expect(useApp.getState().profile.pro).toMatchObject({ plan: "annual", trialDays: 14 });
+  });
+});
 
 describe("first run to finished workout", () => {
   it("onboards, plans, logs sets with rest, and saves the session", async () => {

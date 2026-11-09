@@ -22,6 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Voice and system shortcuts: liftsmith://start, liftsmith://log, liftsmith://add30 (src/lib/shortcuts.ts). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="liftsmith" />
+            </intent-filter>
+
+            <!-- Launcher shortcuts and App Actions. -->
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+
         </activity>
 
         <!-- The live workout notification (WorkoutService.java). Special use: a user-started workout timer. -->
@@ -31,6 +42,29 @@
             android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Rest timer and set logging for a workout the user started; shows a live countdown on the lock screen." />
         </service>
+
+        <!-- Quick Settings tile: Start workout, or Log set while one is running. -->
+        <service
+            android:name=".WorkoutTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_stat_workout"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Home-screen widget: Start workout and Log set (WorkoutWidget.java). -->
+        <receiver
+            android:name=".WorkoutWidget"
+            android:exported="false"
+            android:label="@string/shortcut_start_short">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/widget_workout_info" />
+        </receiver>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -53,5 +87,10 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps). -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
+    <!-- Gym by location: approximate only, while the app is open (no background or precise location). -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Calendar: write training days, and read busy times (start and end only) when the lifter turns it on. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 </manifest>

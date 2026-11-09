@@ -162,12 +162,28 @@ export interface Gym {
   kettlebells: number[];
   /** Pin-stack step for machines and cables, in the gym's unit. */
   machineStep: number;
+  /**
+   * Opt-in "pick this gym when I'm here" (Melvin, 2026-11-09). Approximate position only, kept on the
+   * device (and in the user's own sync). Rounded to about 100 m when saved.
+   */
+  place?: { lat: number; lon: number; radiusM: number };
   updatedAt: number;
 }
 
 export type Goal = "strength" | "muscle" | "general";
 export type Experience = "new" | "intermediate" | "advanced";
 export type Variability = "consistent" | "balanced" | "variable";
+
+export interface CalendarPrefs {
+  /** Weekdays to train, 0 = Sunday. */
+  days: number[];
+  /** Local time of day, "HH:MM". */
+  time: string;
+  /** Training days were written to the device calendar. */
+  write: boolean;
+  /** The lifter allowed reading busy times (start and end only). */
+  read: boolean;
+}
 
 export interface Profile {
   name: string;
@@ -185,6 +201,19 @@ export interface Profile {
   /** Weeks of build before the deload week. */
   blockWeeks: number;
   restSounds: boolean;
+  /**
+   * Cycle-aware readiness (Melvin, 2026-11-09). Opt-in with its own consent screen; consentAt is when
+   * the lifter agreed. Cycle data stays on the device (and the user's own sync), never in analytics or
+   * feedback reports.
+   */
+  cycle?: { enabled: boolean; consentAt: number };
+  /**
+   * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
+   * choice; billing will read it to start the store trial.
+   */
+  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
+  /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
+  calendar?: CalendarPrefs;
   onboarded: boolean;
   updatedAt: number;
 }
@@ -281,4 +310,11 @@ export interface SwapEvent extends EventBase {
   avoid: boolean;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent;
+/** The first day of a period, logged by the lifter (cycle-aware readiness). */
+export interface CycleEvent extends EventBase {
+  type: "cycle";
+  /** Local midnight of the day the period started (ms). */
+  day: number;
+}
+
+export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent;
