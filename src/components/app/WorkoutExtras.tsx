@@ -5,6 +5,7 @@
 import { PlateBar } from "@/components/PlateBar";
 import { barFor } from "@/lib/loads";
 import { ghostFor, paceDelta, paceText, sameAsLast, type Ghost } from "@/lib/ghost";
+import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { changeText, lastLoadedKg, plateChange } from "@/lib/plateMemory";
 import { loadBar } from "@/lib/plates";
@@ -46,14 +47,14 @@ export function SameAsLastChip({ ghost, setIndex, ex, unit, weight, reps, onUse 
   const last = sameAsLast(ghost, setIndex);
   if (!last) return null;
   const same = Math.abs(last.weight - weight) < 0.01 && last.reps === reps;
-  const txt = `${ex.load === "bodyweight" && last.weight === 0 ? "Bodyweight" : `${fmtNum(fromKg(last.weight, unit))} ${unit}`} × ${last.reps}${TIMED.has(ex.id) ? " s" : ""}`;
+  const txt = `${ex.load === "bodyweight" && last.weight === 0 ? t("ghost.bodyweight") : `${fmtNum(fromKg(last.weight, unit))} ${unit}`} × ${last.reps}${TIMED.has(ex.id) ? " s" : ""}`;
   return (
     <div className="mt-3 flex justify-center">
       {same ? (
-        <span className="text-xs text-faint">Same as last time ({txt})</span>
+        <span className="text-xs text-faint">{t("ghost.same", { set: txt })}</span>
       ) : (
         <button type="button" onClick={() => { haptic("tick"); onUse(last.weight, last.reps); }} className="press min-h-11 rounded-full border border-line bg-raised px-4 text-sm text-muted">
-          Last time {txt} · <span className="text-accent">Use it</span>
+          {t("ghost.last", { set: txt })} · <span className="text-accent">{t("ghost.use")}</span>
         </button>
       )}
     </div>
@@ -70,7 +71,7 @@ export function GhostLine({ ghost, logged, nextIndex, unit }: { ghost: Ghost | n
   return (
     <p className="mt-3 text-center text-sm text-muted">
       <span aria-hidden>👻 </span>
-      {next ? <>Last time: {fmtNum(fromKg(next.weight, unit))} {unit} × {next.reps}{next.restSec ? ` after ${clock(next.restSec)} rest` : ""}</> : "Last time you stopped here"}
+      {next ? t(next.restSec ? "ghost.lastSetRest" : "ghost.lastSet", { weight: fmtNum(fromKg(next.weight, unit)), unit, reps: next.reps, rest: next.restSec ? clock(next.restSec) : "" }) : t("ghost.stopped")}
       {delta !== null && <span className={delta >= 5 ? "text-good" : delta <= -5 ? "text-warn" : ""}> · {paceText(delta)}</span>}
     </p>
   );
@@ -143,9 +144,9 @@ export function RestExtra({ left, gym }: { left: number; gym: Gym }) {
     <div className="mt-4 w-full">
       {mode === "breathe" && <Breathe left={left} />}
       {mode === "game" && <PlateMath gym={gym} />}
-      <div className="mt-2 flex justify-center gap-1 text-xs" role="group" aria-label="While you rest">
-        {([["breathe", "Breathe"], ["game", "Plate math"], ["off", "Neither"]] as const).map(([m, l]) => (
-          <button key={m} type="button" aria-pressed={mode === m} onClick={() => pick(m)} className={`press min-h-11 rounded-full px-3 ${mode === m ? "bg-raised text-ink" : "text-faint"}`}>{l}</button>
+      <div className="mt-2 flex justify-center gap-1 text-xs" role="group" aria-label={t("extra.group")}>
+        {(["breathe", "game", "off"] as const).map((m) => (
+          <button key={m} type="button" aria-pressed={mode === m} onClick={() => pick(m)} className={`press min-h-11 rounded-full px-3 ${mode === m ? "bg-raised text-ink" : "text-faint"}`}>{t(`extra.${m}`)}</button>
         ))}
       </div>
     </div>
@@ -155,28 +156,28 @@ export function RestExtra({ left, gym }: { left: number; gym: Gym }) {
 /** Slow breathing paced to the rest: in 4 s, out 6 s, which helps the heart rate come down between sets. */
 export const BREATH = { in: 4, out: 6 } as const;
 
-export function breathPhase(t: number): { phase: "in" | "out"; p: number } {
+export function breathPhase(secs: number): { phase: "in" | "out"; p: number } {
   const cyc = BREATH.in + BREATH.out;
-  const x = ((t % cyc) + cyc) % cyc;
+  const x = ((secs % cyc) + cyc) % cyc;
   return x < BREATH.in ? { phase: "in", p: x / BREATH.in } : { phase: "out", p: 1 - (x - BREATH.in) / BREATH.out };
 }
 
 function Breathe({ left }: { left: number }) {
-  const [t, setT] = useState(0);
+  const [secs, setSecs] = useState(0);
   useEffect(() => {
     const t0 = Date.now();
-    const id = setInterval(() => setT((Date.now() - t0) / 1000), 100);
+    const id = setInterval(() => setSecs((Date.now() - t0) / 1000), 100);
     return () => clearInterval(id);
   }, []);
-  const { phase, p } = breathPhase(t);
+  const { phase, p } = breathPhase(secs);
   const scale = 0.55 + 0.45 * p;
   return (
     <div className="flex flex-col items-center rounded-2xl bg-raised py-4">
       <div className="grid h-28 w-28 place-items-center">
         <div className="rounded-full bg-accent/25 ring-2 ring-accent/60 motion-reduce:transition-none" style={{ width: `${scale * 100}%`, height: `${scale * 100}%`, transition: "width 100ms linear, height 100ms linear" }} />
       </div>
-      <p className="text-sm font-semibold" aria-live="polite">{phase === "in" ? "Breathe in through the nose" : "Long breath out"}</p>
-      {left > 0 && <p className="text-xs text-faint">Slow breaths bring your heart rate down for the next set</p>}
+      <p className="text-sm font-semibold" aria-live="polite">{t(phase === "in" ? "extra.in" : "extra.out")}</p>
+      {left > 0 && <p className="text-xs text-faint">{t("extra.why")}</p>}
     </div>
   );
 }
@@ -226,7 +227,7 @@ function PlateMath({ gym }: { gym: Gym }) {
   };
   return (
     <div className="rounded-2xl bg-raised p-3">
-      <div className="flex items-center justify-between text-xs text-faint"><span>What&apos;s on the bar?</span><span className="num">Streak {streak}</span></div>
+      <div className="flex items-center justify-between text-xs text-faint"><span>{t("extra.quiz")}</span><span className="num">{t("extra.streak", { count: streak })}</span></div>
       <div className="mt-1"><PlateBar loading={{ total: q.answer, perSide: q.perSide, exact: true }} bar={q.bar} unit={gym.unit} compact /></div>
       <div className="mt-2 grid grid-cols-3 gap-2">
         {q.options.map((o) => {

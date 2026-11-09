@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { checkinText } from "./buddy";
+import { setLanguage } from "./i18n";
 import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
 import { generate } from "./generator";
@@ -167,6 +168,17 @@ describe("smart plate memory", () => {
     expect(changeText(plateChange([20, 2.5], [20, 5]), "kg", fmt)).toBe("Take off 2.5, then add 5 kg each side");
     expect(changeText(plateChange([20], [20, 1.25, 1.25]), "kg", fmt)).toBe("Add 2×1.25 kg each side");
     expect(changeText(plateChange([20], [20]), "kg", fmt)).toBe("Same plates: no change");
+  });
+  it("words the change, the ghost's pace and tonnage in French", () => {
+    const fmt = (x: number) => String(x);
+    setLanguage("fr");
+    try {
+      expect(changeText(plateChange([20, 2.5], [20, 5]), "kg", fmt)).toBe("Retirez 2.5, puis ajoutez 5 kg de chaque côté");
+      expect(paceText(-65)).toBe("1:05 de retard");
+      expect(TONNAGE[0].name).not.toBe("a grand piano");
+    } finally {
+      setLanguage("system");
+    }
   });
   it("knows what's on the bar from the last set or warm-up of the exercise this session", () => {
     const evs = [set("back-squat", 1, 60, 5, "s"), { type: "warmup", id: "w", at: 2, sessionId: "s", exerciseId: "back-squat", weight: 80, reps: 3 }, set("back-squat", 3, 100, 5, "other")];
