@@ -274,7 +274,7 @@ export function DotsCard() {
           <span className="text-muted">{T.dotsTotal}</span>
           <span>{kgTo(total, unit)} {unit} · {T.dotsBw} {kgTo1(bw, unit)} {unit}</span>
         </div>
-        <div className="mt-3 flex items-center gap-2 text-sm" role="group" aria-label={T.dotsSex}>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label={T.dotsSex}>
           <span className="text-muted">{T.dotsSex}</span>
           <Chip active={sex === "male"} onClick={() => setSex("male")}>{T.male}</Chip>
           <Chip active={sex === "female"} onClick={() => setSex("female")}>{T.female}</Chip>
