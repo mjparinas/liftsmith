@@ -9,9 +9,12 @@
 // Programs (Melvin, 2026-11-09): every fixed program (classic 5x5, novice 3x5, 5x5 plus arms,
 // ramping 5x5, tiered, training max waves, bodyweight skills) is free; the adaptive splits
 // (push/pull/legs, upper/lower) are Pro.
-export type Feature = "advancedStats" | "adaptiveSplits";
+// Coaching (Melvin picked them, 2026-11-09): "why this weight", workout remix links, what to buy next and
+// machine settings are free; changing the plan mid-workout, the plateau detective and the goal-date
+// planner are Pro.
+export type Feature = "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner";
 
-const PRO_FEATURES: ReadonlySet<Feature> = new Set(["advancedStats", "adaptiveSplits"]);
+const PRO_FEATURES: ReadonlySet<Feature> = new Set(["advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner"]);
 
 /** Whether the lifter has Pro. Always true until billing lands. */
 export function isPro(): boolean {

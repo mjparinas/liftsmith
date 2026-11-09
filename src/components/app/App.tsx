@@ -19,6 +19,7 @@ import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
 import { Onboarding } from "./Onboarding";
 import { Recovery } from "./Recovery";
+import { Remix } from "./Remix";
 import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
 import { Settings } from "./Settings";
@@ -212,7 +213,7 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} /> , remix: <Remix code={arg} /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
