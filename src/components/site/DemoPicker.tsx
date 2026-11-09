@@ -18,7 +18,7 @@ export function DemoPicker() {
           </button>
         ))}
       </div>
-      <LiftDemo exerciseId={id} controls />
+      <LiftDemo exerciseId={id} controls bodyToggle />
     </div>
   );
 }

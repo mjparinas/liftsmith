@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { LiftDemo, detectMode } from "./LiftDemo";
+import { LiftDemo, bodyFor, detectMode } from "./LiftDemo";
 
 describe("LiftDemo", () => {
   afterEach(cleanup);
@@ -26,13 +26,27 @@ describe("LiftDemo", () => {
     expect(screen.getByRole("button", { name: "Play" })).toBeInTheDocument();
   });
 
-  it("remembers the chosen body on this device", () => {
-    const { unmount } = render(<LiftDemo exerciseId="push-up" controls />);
+  it("shows no body toggle or body label in the app; the figure follows the body it's given", () => {
+    const { rerender } = render(<LiftDemo exerciseId="push-up" controls />);
+    expect(screen.queryByRole("button", { name: "Female" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Male" })).toBeNull();
+    expect(screen.queryByText(/^(Male|Female)$/)).toBeNull();
+    rerender(<LiftDemo exerciseId="push-up" body="female" controls />);
+    expect(screen.queryByText(/^(Male|Female)$/)).toBeNull();
+  });
+
+  it("keeps the toggle on the public site's demos", () => {
+    render(<LiftDemo exerciseId="push-up" controls bodyToggle />);
+    expect(screen.getByRole("button", { name: "Male" })).toHaveAttribute("aria-pressed", "true");
     fireEvent.click(screen.getByRole("button", { name: "Female" }));
-    expect(localStorage.getItem("liftsmith.demo.body")).toBe("female");
-    unmount();
-    render(<LiftDemo exerciseId="push-up" controls />);
     expect(screen.getByRole("button", { name: "Female" })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  it("picks the figure from Settings' sex, male when it isn't set", () => {
+    expect(bodyFor("female")).toBe("female");
+    expect(bodyFor("male")).toBe("male");
+    expect(bodyFor(undefined)).toBe("male");
+    expect(bodyFor(null)).toBe("male");
   });
 
   it("calls it a hand path when there's no barbell", () => {

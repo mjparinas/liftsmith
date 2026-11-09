@@ -4,7 +4,7 @@ import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { COSMETICS } from "@/lib/game";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
@@ -283,7 +283,7 @@ export function Workout() {
           </section>
 
           <div className="relative mt-4 h-52">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
             <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
           </div>
 
@@ -409,7 +409,7 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} controls />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">

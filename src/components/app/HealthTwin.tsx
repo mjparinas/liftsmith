@@ -4,7 +4,7 @@
 // and every metric below as a tile that says what it means and what to do. Tapping one opens its last
 // 30 days against the lifter's own normal. Free to see; health signals moving today's call is Pro.
 import { Info } from "@/components/Info";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { can, isPro } from "@/lib/entitlements";
 import type { Term } from "@/lib/glossary";
 import { connectHealth, healthAvailable } from "@/lib/health";
@@ -98,7 +98,7 @@ export function HealthTwin() {
       {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
 
       <div className="keep-colours relative mx-auto mt-4 h-[24rem] max-w-[420px]">
-        <LiftDemo className="h-full" view="front" bpm={rhr?.value ? Math.round(rhr.value) : null} label={t("body.health")} />
+        <LiftDemo className="h-full" body={bodyFor(profile.sex)} view="front" bpm={rhr?.value ? Math.round(rhr.value) : null} label={t("body.health")} />
         <span className="sr-only">{t("twin.figure", { summary })}</span>
         <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
         <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
