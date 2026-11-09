@@ -1,4 +1,6 @@
 "use client";
+import { Info } from "@/components/Info";
+import type { Term } from "@/lib/glossary";
 import { haptic } from "@/lib/juice";
 import type { ReactNode } from "react";
 
@@ -57,11 +59,11 @@ export function Stepper({ value, onDown, onUp, label, suffix }: { value: string;
   );
 }
 
-export function Section({ title, children, right }: { title: string; children: ReactNode; right?: ReactNode }) {
+export function Section({ title, children, right, info }: { title: string; children: ReactNode; right?: ReactNode; info?: Term }) {
   return (
     <section className="mt-6">
       <div className="mb-2 flex items-end justify-between px-1">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">{title}</h2>
+        <h2 className="text-sm font-semibold uppercase tracking-wider text-muted">{title}{info && <Info term={info} />}</h2>
         {right}
       </div>
       {children}

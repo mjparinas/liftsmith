@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
@@ -13,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Section } from "./ui";
+import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
 
@@ -69,16 +71,19 @@ export function Today() {
         {preview && (
           <span className={`rounded-full px-3 py-1.5 ${preview.week.deload ? "bg-warn/15 text-warn" : "bg-surface text-muted border border-line"}`}>
             {preview.week.label} · RIR {preview.week.rir}
+            <Info term={preview.week.deload ? "deload" : "rir"} className="-mr-3" />
           </span>
         )}
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
 
+      <TodayMoments />
+
       {readiness && preview && !active && (
         <section className="card mt-4 p-4" aria-labelledby="call-title">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 id="call-title" className="text-lg font-semibold">{CALL_TEXT[preview.call].label}</h2>
-            <span className="num text-sm text-muted">Readiness {readiness.score}</span>
+            <h2 id="call-title" className="text-lg font-semibold">{CALL_TEXT[preview.call].label}<Info term="call" /></h2>
+            <span className="num text-sm text-muted">Readiness {readiness.score}<Info term="readiness" className="-mr-3" /></span>
           </div>
           <p className="mt-1 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : CALL_TEXT[preview.call].blurb}</p>
           {readiness.signals.length > 0 && (
@@ -128,6 +133,7 @@ export function Today() {
         <div className="mt-1 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
       </div>
+      <PlanExtras />
 
       {preview && preview.items.length > 0 ? (
         <>

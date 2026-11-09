@@ -10,6 +10,8 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(WorkoutSessionPlugin())
         bridge?.registerPluginInstance(CalendarPlugin())
         bridge?.registerPluginInstance(InstallInfoPlugin())
+        bridge?.registerPluginInstance(VoiceCoachPlugin())
+        bridge?.registerPluginInstance(AppIconPlugin())
     }
 }
 

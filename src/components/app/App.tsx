@@ -20,6 +20,11 @@ import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
 import { Workout } from "./Workout";
+import { Photos } from "./Photos";
+import { Recap } from "./Recap";
+import { goalStreak } from "@/lib/game";
+import { useNow } from "@/lib/useNow";
+import { activeTheme, applyTheme } from "@/lib/themes";
 
 const TABS: { route: Route; label: string; icon: string }[] = [
   { route: "today", label: "Today", icon: "M4 12h4l3-8 4 16 3-8h2" },
@@ -30,8 +35,17 @@ const TABS: { route: Route; label: string; icon: string }[] = [
 ];
 
 export function App() {
-  const { ready, init, profile, active } = useApp();
-  const { route } = useRoute();
+  const { ready, init, profile, active, stats } = useApp();
+  const { route, arg } = useRoute();
+  // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
+  const now = useNow(3600_000);
+  const themeId = activeTheme(profile.delight?.theme, { stats, goalWeeks: goalStreak(stats, profile, now).weeks, now }).id;
+  // An equipped cosmetic accent (game.ts COSMETICS) wins over the theme's accent, so it goes on second.
+  useEffect(() => {
+    applyTheme(activeTheme(themeId, { stats, goalWeeks: 0, now: Date.now() }));
+    const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
+    if (accent) applyAccent(accent);
+  }, [themeId, profile.cosmetics]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     installDiag();
     startAnalytics();
@@ -48,7 +62,6 @@ export function App() {
     juice.lean = !!profile.lean;
     const pick = (id?: string) => COSMETICS.find((c) => c.id === id);
     sound.theme = (pick(profile.cosmetics?.sound)?.value ?? "classic") as TimerSound;
-    applyAccent(pick(profile.cosmetics?.accent)?.value);
   }, [profile.lean, profile.cosmetics]);
   // Which screens get used (the route name only, nothing on it).
   useEffect(() => {
@@ -134,7 +147,7 @@ export function App() {
   if (!ready) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
