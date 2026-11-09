@@ -99,9 +99,9 @@ export function Gym() {
             })}
           </ul>
           <div className="mt-4 border-t border-line pt-4">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm">
               <span className="text-muted">Try a weight</span>
-              <input inputMode="decimal" value={testKg} onChange={(e) => setTestKg(Number(e.target.value) || 0)} className="num w-24 rounded-xl border border-line bg-raised px-3 py-1.5 text-right" aria-label="Test weight" />
+              <BumpField label="Test weight" value={String(testKg)} onChange={(v) => setTestKg(Number(v) || 0)} step={gym.unit === "lb" ? 5 : 2.5} start={testKg} max={1000} className="w-44 max-w-full" />
             </div>
             <PlateBar loading={loadBar(testKg, gym.bars[0]?.weight ?? 20, gym.plates)} bar={gym.bars[0]?.weight ?? 20} unit={gym.unit} />
           </div>
