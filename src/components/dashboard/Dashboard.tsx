@@ -298,7 +298,7 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
         )}
       </Panel>
       <Panel title="Bests by exercise" className="lg:col-span-2">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Bests by exercise, scrolls sideways">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-faint">
