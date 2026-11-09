@@ -119,6 +119,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   "settings.title": "Ajustes",
   "settings.rerun": "Repetir la configuración",
   "settings.injuries": "Lesiones y molestias",
+  "settings.tools": "Herramientas: calculadora de TDEE",
   "settings.feedback": "Enviar comentarios o informar de un error",
   "settings.dashboard": "Abrir el panel para pantalla grande",
   "settings.training": "Preferencias de entrenamiento: descanso, reps, series, temporizador",

@@ -13,6 +13,7 @@ import { Icon, type IconName } from "./icons";
 import { HUE } from "./theme";
 import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
 import { StrengthCard, TonnageCard } from "./Extras";
+import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 
 function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty}</div>;
@@ -90,6 +91,7 @@ export function Stats() {
       </Section>
 
       <BodyweightCard />
+      <TdeeCard />
 
       <Section title="Estimated one-rep max" icon="progress" info="e1rm">
         <ul className="card divide-y divide-line">
@@ -140,6 +142,25 @@ export function Stats() {
         </ul>
       </Section>
     </div>
+  );
+}
+
+/** TDEE now, with its history as a sparkline. Opens Tools › TDEE. */
+function TdeeCard() {
+  const { events, stats, profile } = useApp();
+  const now = useNow(60_000);
+  const cur = currentTdee(events, stats.sessions, profile, now);
+  const hist = tdeeHistory(events);
+  return (
+    <Section title="Daily calories (TDEE)" icon="flame" right={<button type="button" onClick={() => go("tools")} className="press text-sm text-accent">All tools</button>}>
+      <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center justify-between gap-3 p-4 text-left">
+        <div>
+          <div className="num text-2xl font-bold">{cur.result ? `${cur.result.tdee.toLocaleString("en-US")} kcal` : "Not set up"}</div>
+          <div className="text-sm text-muted">{cur.result ? `${ACTIVITY[cur.activity.activity].label}${cur.activity.source === "manual" ? "" : ", from your training"}` : "Add age, sex and height"}</div>
+        </div>
+        <Spark points={hist.map((e) => e.kcal)} empty="Tracked as things change" />
+      </button>
+    </Section>
   );
 }
 

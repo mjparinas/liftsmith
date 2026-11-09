@@ -126,6 +126,7 @@ export const en = {
   "settings.title": "Settings",
   "settings.rerun": "Run setup again",
   "settings.injuries": "Injuries and sore spots",
+  "settings.tools": "Tools: TDEE calculator",
   "settings.feedback": "Send feedback or report a bug",
   "settings.dashboard": "Open the big-screen dashboard",
   "settings.training": "Workout preferences: rest, reps, sets, timer",

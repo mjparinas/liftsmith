@@ -45,6 +45,7 @@ export function Settings() {
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("settings.title")}</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>{t("settings.injuries")}</Button>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("tools")}>{t("settings.tools")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>{t("settings.feedback")}</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">{t("settings.dashboard")}</a>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>{t("settings.training")}</Button>
