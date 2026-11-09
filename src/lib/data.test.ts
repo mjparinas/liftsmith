@@ -172,6 +172,15 @@ describe("data capture in a workout", () => {
     expect(sets[1].restSec).toBe(20);
   });
 
+  it("logs a weigh-in as an event and makes it the body weight", () => {
+    const s = useApp.getState;
+    s().logBodyweight(81.25);
+    expect(s().events.filter((e) => e.type === "bodyweight")).toMatchObject([{ kg: 81.25 }]);
+    expect(s().profile.bodyweight).toBe(81.25);
+    s().logBodyweight(0);
+    expect(s().events.filter((e) => e.type === "bodyweight")).toHaveLength(1);
+  });
+
   it("keeps one heart rate sample a second", () => {
     const s = useApp.getState;
     s().start();

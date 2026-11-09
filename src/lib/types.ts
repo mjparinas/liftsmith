@@ -329,4 +329,10 @@ export interface CycleEvent extends EventBase {
   day: number;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent;
+/** A body weight weigh-in (kg), logged in Progress or filled in from Health Connect / Apple Health. */
+export interface BodyweightEvent extends EventBase {
+  type: "bodyweight";
+  kg: number;
+}
+
+export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | BodyweightEvent;

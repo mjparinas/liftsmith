@@ -66,6 +66,8 @@ interface State {
   setCall(c: Call | null): void;
   /** Log that a period started on this day (cycle-aware readiness). */
   logPeriod(day: number): void;
+  /** Log a weigh-in (kg). It also becomes the profile's body weight. */
+  logBodyweight(kg: number): void;
   /** Turn cycle-aware readiness off and erase every logged period. */
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
@@ -131,6 +133,12 @@ export const useApp = create<State>((set, get) => {
     readiness: null,
     callOverride: null,
     pickedByLocation: null,
+
+    logBodyweight(kg) {
+      if (!(kg > 0)) return;
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg: Math.round(kg * 100) / 100 }]);
+      get().setProfile({ bodyweight: kg });
+    },
 
     logPeriod(day) {
       if (get().events.some((e) => e.type === "cycle" && e.day === day)) return;
