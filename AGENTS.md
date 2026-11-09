@@ -116,6 +116,13 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - It feeds `readiness.ts` as a small nudge the lifter can override: period days −5 ("go by feel"), late luteal −4, follicular +3, otherwise 0. The effect is small on purpose, because the evidence is mixed and individual.
 - **Turn off and delete** removes every cycle event and the consent. Reading menstrual data from Health Connect and HealthKit waits for health plugin support (the current plugin has no menstruation type); logging works the same on both platforms (parity).
 
+
+### Voice and system shortcuts (Melvin, 2026-11-09; part 1 built)
+- **Three actions everywhere:** start workout (starts today's plan, or reopens the one running), log set (as planned), and +30 s rest. Log set and +30 s do nothing without a workout, so a stray tap never logs a set nobody did. All entry points run `src/lib/shortcuts.ts`, through the WorkoutSession plugin's `action` event (the same event as the notification buttons), so they behave the same on every platform.
+- **iOS** (`ios/App/App/ShortcutIntents.swift`): App Intents plus App Shortcuts, so Siri ("Start a workout in Liftsmith"), Spotlight and the Shortcuts app work with no setup, and the lifter can put any of them on the Action button or in Control Center (iOS 18) as a Shortcut control. The intents open the app (`openAppWhenRun`), because the workout state lives in the web layer.
+- **Android:** launcher shortcuts and an App Actions `START_EXERCISE` capability (`res/xml/shortcuts.xml`), and a Quick Settings tile (`WorkoutTileService.java`) that reads "Start workout", or "Log set" while a workout runs. All open `liftsmith://start|log|add30`. Custom App Actions intents for log set were left out, because they need Google's review and the tile and notification already cover it.
+- **Web:** the manifest's shortcuts open `/app/?do=start` and `/app/?do=log`.
+- **Next (part 2), with one iOS widget extension target:** home-screen widgets on both platforms, a native Control Center control on iOS 18, and the Live Activity lock-screen countdown (the open parity item).
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
 - Stats: weekly sets per muscle against the target, estimated one-rep max trends (Epley), PRs, volume, session history, streaks and trophies.

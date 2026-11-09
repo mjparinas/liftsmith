@@ -22,6 +22,17 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
+            <!-- Voice and system shortcuts: liftsmith://start, liftsmith://log, liftsmith://add30 (src/lib/shortcuts.ts). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="liftsmith" />
+            </intent-filter>
+
+            <!-- Launcher shortcuts and App Actions. -->
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
+
         </activity>
 
         <!-- The live workout notification (WorkoutService.java). Special use: a user-started workout timer. -->
@@ -30,6 +41,18 @@
             android:exported="false"
             android:foregroundServiceType="specialUse">
             <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Rest timer and set logging for a workout the user started; shows a live countdown on the lock screen." />
+        </service>
+
+        <!-- Quick Settings tile: Start workout, or Log set while one is running. -->
+        <service
+            android:name=".WorkoutTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_stat_workout"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
         </service>
 
         <provider

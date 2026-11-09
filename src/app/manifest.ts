@@ -12,5 +12,10 @@ export default function manifest(): MetadataRoute.Manifest {
     background_color: "#0a0d12",
     theme_color: "#0a0d12",
     icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml", purpose: "any" }],
+    // Long-press the installed app's icon. The same actions as the native shortcuts (src/lib/shortcuts.ts).
+    shortcuts: [
+      { name: "Start workout", short_name: "Start", url: "/app/?do=start", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
+      { name: "Log set", short_name: "Log set", url: "/app/?do=log", icons: [{ src: "/icon.svg", sizes: "any", type: "image/svg+xml" }] },
+    ],
   };
 }

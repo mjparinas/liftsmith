@@ -5,6 +5,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.media.AudioAttributes;
@@ -15,6 +16,7 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.service.quicksettings.TileService;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
 
@@ -32,12 +34,17 @@ public class WorkoutService extends Service {
     private static final int ID_LIVE = 1;
     private static final int ID_ALERT = 2;
 
+    /** Whether a workout is running, for the Quick Settings tile (WorkoutTileService). */
+    static volatile boolean running = false;
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable restOver;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        running = true;
+        refreshTile();
         NotificationManager nm = getSystemService(NotificationManager.class);
         NotificationChannel live = new NotificationChannel(CHANNEL_LIVE, "Workout in progress", NotificationManager.IMPORTANCE_LOW);
         live.setDescription("Rest timer, next set and heart rate while you train");
@@ -138,7 +145,17 @@ public class WorkoutService extends Service {
     @Override
     public void onDestroy() {
         if (restOver != null) handler.removeCallbacks(restOver);
+        running = false;
+        refreshTile();
         super.onDestroy();
+    }
+
+    private void refreshTile() {
+        try {
+            TileService.requestListeningState(this, new ComponentName(this, WorkoutTileService.class));
+        } catch (RuntimeException ignored) {
+            // The tile isn't added; nothing to refresh.
+        }
     }
 
     @Override
