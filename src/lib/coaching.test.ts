@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { setLanguage } from "./i18n";
 import { equipmentTips, loadableTotals, plateTips } from "./buying";
 import { defaultProfile, makeGym } from "./defaults";
 import { exercise } from "./exercises";
@@ -168,6 +169,12 @@ describe("goal-date planner", () => {
     const far = forecast({ exerciseId: "bench-press", kg: 160, by: NOW + 60 * DAY }, evs, p, NOW);
     expect(far.status).toBe("unlikely");
     expect(far.text).toMatch(/Not realistic/);
+    setLanguage("fr");
+    try {
+      expect(forecast({ exerciseId: "bench-press", kg: 160, by: NOW + 60 * DAY }, evs, p, NOW).text).toMatch(/^Pas réaliste d’ici /);
+    } finally {
+      setLanguage("system");
+    }
     expect(far.realistic).toBeLessThan(110);
     // Never promises more than twice the typical rate, however good the last month was.
     expect(far.rate).toBeLessThanOrEqual(TYPICAL_MONTHLY.intermediate * 1.5 + 1e-9);

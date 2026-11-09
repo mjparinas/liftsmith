@@ -5,6 +5,7 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { decodeShare } from "@/lib/dashboard";
+import { setLanguage } from "@/lib/i18n";
 import { defaultProfile } from "@/lib/defaults";
 import { appendEvents, eraseAll, load, saveRecord } from "@/lib/localdb";
 import type { AppEvent, SetEvent } from "@/lib/types";
@@ -42,11 +43,21 @@ beforeEach(async () => {
 afterEach(cleanup);
 
 describe("web dashboard", () => {
+  it("follows the language picked in the app's Settings", async () => {
+    await saveRecord("profile", { ...defaultProfile(), name: "Sam", onboarded: true, unit: "kg", language: "fr" });
+    await appendEvents(workout(Date.now() - D, "a"));
+    render(<Dashboard />);
+    expect(await screen.findByRole("heading", { name: "L’entraînement de Sam" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Historique" })).toBeInTheDocument();
+    expect(screen.getByText("Séances").nextSibling).toHaveTextContent("1");
+    setLanguage("system");
+  });
+
   it("shows the overview, then each tab", async () => {
     await seed();
     const user = userEvent.setup();
     render(<Dashboard />);
-    expect(await screen.findByRole("heading", { name: "Sam's training" })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { name: "Sam’s training" })).toBeInTheDocument();
     expect(screen.getByText("Workouts").nextSibling).toHaveTextContent("2");
     expect(screen.getByText(/Showing the workouts saved in this browser/)).toBeInTheDocument();
 
@@ -147,6 +158,6 @@ describe("web dashboard", () => {
   it("explains a broken share link", async () => {
     location.hash = "#broken";
     render(<SharedProfile />);
-    expect(await screen.findByText("This link doesn't work")).toBeInTheDocument();
+    expect(await screen.findByText("This link doesn’t work")).toBeInTheDocument();
   });
 });

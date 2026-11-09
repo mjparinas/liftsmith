@@ -1,5 +1,5 @@
 "use client";
-import { list, t } from "@/lib/i18n";
+import { clockTime, list, t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
@@ -35,11 +35,11 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
   return (
     <span
       className={`num inline-flex h-9 items-center gap-1 rounded-full border px-2.5 text-sm font-bold ${lit ? "border-ember/40 bg-ember/12 text-ember" : "border-line bg-surface text-faint"}`}
-      title={`${weeks}-week streak${freezes ? `, ${freezes} freeze${freezes > 1 ? "s" : ""}` : ""}`}
+      title={freezes ? t("td.streakTitle", { streak: t("awards.streak", { count: weeks }), freezes: t("awards.freezes", { count: freezes }) }) : t("awards.streak", { count: weeks })}
     >
       <Icon name="flame" size={16} filled={lit} strokeWidth={1.6} className={lit ? "drop-shadow-[0_0_6px_rgb(255_138_61/0.7)]" : ""} />
       {weeks}
-      {freezes > 0 && <span aria-label={`${freezes} streak freeze${freezes > 1 ? "s" : ""}`}>{" 🧊"}{freezes > 1 ? freezes : ""}</span>}
+      {freezes > 0 && <span aria-label={t("td.freezeLabel", { count: freezes })}>{" 🧊"}{freezes > 1 ? freezes : ""}</span>}
     </span>
   );
 }
@@ -80,29 +80,29 @@ export function Today() {
             type="button"
             onClick={() => go("achievements")}
             className="press num inline-flex h-9 items-center rounded-full border border-violet/40 bg-violet/12 px-2.5 text-sm font-bold text-violet"
-            title={`${lvl.title}: ${lvl.into} of ${lvl.span} XP to ${lvl.next ?? "max"}`}
+            title={t("td.lvlTitle", { title: lvl.title, into: lvl.into, span: lvl.span, next: lvl.next ?? t("td.max") })}
           >
-            Lv {lvl.level}
+            {t("td.lv", { n: lvl.level })}
           </button>
-          <button type="button" aria-label="Settings" onClick={() => go("settings")} className="press grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink">
+          <button type="button" aria-label={t("td.settings")} onClick={() => go("settings")} className="press grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink">
             <Icon name="settings" size={18} />
           </button>
           </div>
         </div>
-        <h1 className="mt-1 text-[1.875rem] font-extrabold leading-tight tracking-tight">Today&apos;s workout</h1>
+        <h1 className="mt-1 text-[1.875rem] font-extrabold leading-tight tracking-tight">{t("td.title")}</h1>
       </header>
 
       {active && (
         <button type="button" onClick={() => go("workout")} className="press btn-primary animate-glow mt-4 flex w-full items-center justify-between rounded-2xl px-4 py-3.5 text-left font-semibold">
-          <span className="flex items-center gap-2"><span className="h-2 w-2 animate-pulse rounded-full bg-accent-ink" />Workout in progress</span>
-          <span className="flex items-center gap-1">Resume <Icon name="chevronRight" size={18} strokeWidth={2.6} /></span>
+          <span className="flex items-center gap-2"><span className="h-2 w-2 animate-pulse rounded-full bg-accent-ink" />{t("td.inProgress")}</span>
+          <span className="flex items-center gap-1">{t("td.resume")} <Icon name="chevronRight" size={18} strokeWidth={2.6} /></span>
         </button>
       )}
 
       <div className="mt-4 flex flex-wrap gap-2 text-sm">
         <button type="button" onClick={() => go("gym")} className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5">
           <Icon name="pin" size={15} className="text-accent" />
-          {gym?.name ?? "Add a gym"}{gym && pickedByLocation === gym.id ? " · you're here" : ""}
+          {gym?.name ?? t("td.addGym")}{gym && pickedByLocation === gym.id ? t("td.here") : ""}
         </button>
         {preview?.program && (
           <button type="button" onClick={() => go("programs")} className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5">
@@ -137,18 +137,18 @@ export function Today() {
         <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
           <div className="flex items-center gap-4">
             <Ring value={readiness.score / 100} size={64} stroke={6} from={call.hue} to={call.hue} track="color-mix(in srgb, var(--color-ink) 8%, transparent)">
-              <span className="display text-xl" aria-label={`Readiness ${readiness.score}`}>{readiness.score}</span>
+              <span className="display text-xl" aria-label={t("td.readinessN", { n: readiness.score })}>{readiness.score}</span>
             </Ring>
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-x-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: call.hue }}>
                 <Icon name={call.icon} size={14} strokeWidth={2.4} />
-                <span>Readiness</span>
+                <span>{t("td.readiness")}</span>
                 <Info term="readiness" />
               </div>
               <h2 id="call-title" className="mt-0.5 text-xl font-bold">{CALL_TEXT[preview.call].label}<Info term="call" /></h2>
             </div>
           </div>
-          <p className="mt-3 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : callWhy(readiness, preview.call, preview.week.deload)}</p>
+          <p className="mt-3 text-sm text-muted">{preview.challenge ? t("td.challenge") : callWhy(readiness, preview.call, preview.week.deload)}</p>
           {readiness.signals.length > 0 && (
             <ul className="mt-2 space-y-1 text-sm">
               {readiness.signals.slice(0, 3).map((g) => (
@@ -159,7 +159,7 @@ export function Today() {
               ))}
             </ul>
           )}
-          <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1" role="group" aria-label="Today's call">
+          <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1" role="group" aria-label={t("td.call")}>
             {(["recover", "normal", "push"] as Call[]).map((c) => {
               const on = preview.call === c;
               const hue = CALL_STYLE[c].hue;
@@ -177,12 +177,12 @@ export function Today() {
                   style={on ? { background: `color-mix(in srgb, ${hue} 22%, var(--color-surface))`, boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${hue} 55%, transparent)` } : undefined}
                 >
                   <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} className={on ? "" : "opacity-70"} />
-                  {c === "recover" ? "Go easy" : c === "normal" ? "As planned" : "Push"}
+                  {c === "recover" ? t("td.goEasy") : c === "normal" ? t("td.asPlanned") : t("td.push")}
                 </button>
               );
             })}
           </div>
-          {callOverride && <p className="mt-2 text-xs text-faint">Your call today. We suggested {CALL_TEXT[readiness.call].label.toLowerCase()}.</p>}
+          {callOverride && <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: CALL_TEXT[readiness.call].label.toLocaleLowerCase() })}</p>}
         </section>
       )}
 
@@ -193,8 +193,8 @@ export function Today() {
 
       {!fixed && <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
-          <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted"><Icon name="clock" size={16} className="text-cyan" />Workout length</label>
-          <span className="display text-[1.875rem]"><span key={lenKey} className={`inline-block ${lenKey ? "animate-nudge" : ""}`}>{profile.minutes}</span><span className="ml-1 text-base font-semibold tracking-normal text-muted">min</span></span>
+          <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted"><Icon name="clock" size={16} className="text-cyan" />{t("td.length")}</label>
+          <span className="display text-[1.875rem]"><span key={lenKey} className={`inline-block ${lenKey ? "animate-nudge" : ""}`}>{profile.minutes}</span><span className="ml-1 text-base font-semibold tracking-normal text-muted">{t("td.min")}</span></span>
         </div>
         <input
           id="len"
@@ -219,7 +219,7 @@ export function Today() {
 
       {preview && preview.items.length > 0 ? (
         <>
-          <Section title={`${preview.items.length} exercises · about ${preview.estMinutes} min`} icon="dumbbell">
+          <Section title={t("td.planTitle", { count: preview.items.length, min: preview.estMinutes })} icon="dumbbell">
             <ol className="stagger card overflow-hidden" data-testid="plan-list">
               {preview.items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
@@ -237,12 +237,12 @@ export function Today() {
                       {ss && <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={12} />{ss}</div>}
                       <div className="truncate font-semibold">{ex.name}</div>
                       <div className="text-sm text-muted num">
-                        {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((t) => t.weight > it.target.weight) ? "up to " : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((t) => t.weight)), profile.unit)}
-                        {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
+                        {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((st) => st.weight > it.target.weight) ? t("td.upTo") : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((st) => st.weight)), profile.unit)}
+                        {" · "}{it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}{t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
                       </div>
                       {why && <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">{itemWhy(it, why).short}</p>}
                     </div>
-                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
+                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">{t("td.injury", { n: it.injuryPct })}</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
                     {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
                     {i > 0 && <LinkToggle className="absolute -top-[22px] right-3 z-10" on={joinsPrev} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
                   </li>
@@ -255,25 +255,25 @@ export function Today() {
               return (
                 <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
                   <Icon name="link" size={14} className="mt-[3px] shrink-0" />
-                  <span>{grouped ? <>Linked exercises alternate: one set of each, then one rest{saved > 0 ? `. Saves about ${saved} min` : ""}. Tap a link to split them.</> : <>Tap a link between two exercises to do them as a superset.</>}<Info term="superset" /></span>
+                  <span>{grouped ? (saved > 0 ? t("td.ssLinkedSaves", { n: saved }) : t("td.ssLinked")) : t("td.ssHint")}<Info term="superset" /></span>
                 </p>
               );
             })()}
           </Section>
-          <Section title="Why these muscles" icon="recovery">
+          <Section title={t("td.whyMuscles")} icon="recovery">
             <div className="card p-4">
               <RecoveryMap rec={rec} focus={focus} compact chips={false} />
               {preview.program && !preview.routineId ? (
-                <p className="mt-3 text-sm text-muted">{preview.program.dayName} of {programName(preview.program.id)}{fixed ? "" : `: recovered muscles from today's group, furthest from this week's ${preview.week.setsPerMuscle}-set goal`}. {preview.program.note}.</p>
+                <p className="mt-3 text-sm text-muted">{t(fixed ? "td.programDay" : "td.programDayAdaptive", { day: preview.program.dayName ?? "", program: programName(preview.program.id) ?? "", sets: preview.week.setsPerMuscle, note: preview.program.note ?? "" })}</p>
               ) : (
-                <p className="mt-3 text-sm text-muted">{preview.routineId ? <>Your routine works {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}. The map shows how recovered each muscle is.</> : <>Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</>}</p>
+                <p className="mt-3 text-sm text-muted">{preview.routineId ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())) }) : t("td.targets", { muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())), sets: preview.week.setsPerMuscle })}</p>
               )}
             </div>
           </Section>
         </>
       ) : (
         <div className="card mt-6">
-          <EmptyState icon="moon" mascot="sleepy" tint="var(--color-cyan)" title="Rest day" body="Everything is still recovering. Take the day, or shorten the session for some light work." />
+          <EmptyState icon="moon" mascot="sleepy" tint="var(--color-cyan)" title={t("td.restDay")} body={t("td.restBody")} />
         </div>
       )}
 
@@ -303,7 +303,7 @@ export function Today() {
 function DailyQuote({ now }: { now: number }) {
   const q = quoteOfDay(now);
   return (
-    <figure className="card-tint relative mt-4 overflow-hidden p-4 pl-12" style={{ "--tint": "var(--color-violet)" } as CSSProperties} aria-label="Quote of the day">
+    <figure className="card-tint relative mt-4 overflow-hidden p-4 pl-12" style={{ "--tint": "var(--color-violet)" } as CSSProperties} aria-label={t("td.quote")}>
       <span className="absolute left-4 top-4 text-violet" aria-hidden><Icon name="quote" size={20} strokeWidth={2.4} /></span>
       <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{q.text}</blockquote>
       <figcaption className="mt-2 text-xs text-muted">
@@ -336,18 +336,19 @@ function FitAroundCalendar() {
   const free = freeMinutes(busy, now);
   const fit = fitLength(free.minutes, profile.minutes);
   if (!fit || !free.until) return null;
-  const at = new Date(free.until).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const until = new Date(free.until);
+  const at = clockTime(until.getHours(), until.getMinutes());
   return (
     <button
       type="button"
       onClick={() => {
         haptic("tick");
-        setProfile({ minutes: fit, minutesDay: dayKey(Date.now()) });
+        setProfile({ minutes: fit, minutesDay: dayKey(now) });
       }}
       className="press mt-3 flex w-full items-center gap-2 rounded-xl border border-cyan/30 bg-cyan/8 px-3 py-2.5 text-left text-sm"
     >
       <Icon name="calendar" size={16} className="text-cyan" />
-      <span>Busy at {at} · <span className="font-semibold text-cyan">Fit a {fit}-minute workout</span></span>
+      <span>{t("td.busy", { at })}<span className="font-semibold text-cyan">{t("td.fit", { n: fit })}</span></span>
     </button>
   );
 }

@@ -3,6 +3,7 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { game, levelOf } from "./game";
 import { shareIds, shareName } from "./achievements";
 import { epley } from "./progression";
+import { t, weekday } from "./i18n";
 import type { AppEvent, Profile, SessionEndEvent, SessionStartEvent, SetEvent, Unit } from "./types";
 
 // The web dashboard (/me/): pure views over the event log, plus the two things it writes: a past
@@ -186,20 +187,20 @@ export const MANUAL_RIR = 2;
  * is taken as the target, so it counts as hit for progression.
  */
 export function pastWorkoutEvents(w: PastWorkout, now: number, newId: () => string = () => crypto.randomUUID()): PastResult {
-  if (!Number.isFinite(w.start) || w.start > now) return { ok: false, error: "Pick a time that has already happened." };
-  if (w.start < new Date(2000, 0, 1).getTime()) return { ok: false, error: "That date is too far back." };
-  if (!Number.isInteger(w.minutes) || w.minutes < 1 || w.minutes > 600) return { ok: false, error: "Length must be 1 to 600 minutes." };
+  if (!Number.isFinite(w.start) || w.start > now) return { ok: false, error: t("past.err.future") };
+  if (w.start < new Date(2000, 0, 1).getTime()) return { ok: false, error: t("past.err.old") };
+  if (!Number.isInteger(w.minutes) || w.minutes < 1 || w.minutes > 600) return { ok: false, error: t("past.err.length") };
   const sets: { exerciseId: string; set: PastSet }[] = [];
   for (const ex of w.exercises) {
-    if (!EXERCISE_BY_ID.has(ex.exerciseId)) return { ok: false, error: "Pick an exercise from the list." };
+    if (!EXERCISE_BY_ID.has(ex.exerciseId)) return { ok: false, error: t("past.err.exercise") };
     for (const s of ex.sets) {
-      if (!Number.isInteger(s.reps) || s.reps < 1 || s.reps > 1000) return { ok: false, error: "Reps must be a whole number from 1 to 1000." };
-      if (!Number.isFinite(s.weight) || s.weight < 0 || s.weight > 1000) return { ok: false, error: "Weight must be 0 to 1000 kg." };
+      if (!Number.isInteger(s.reps) || s.reps < 1 || s.reps > 1000) return { ok: false, error: t("past.err.reps") };
+      if (!Number.isFinite(s.weight) || s.weight < 0 || s.weight > 1000) return { ok: false, error: t("past.err.weight") };
       sets.push({ exerciseId: ex.exerciseId, set: s });
     }
   }
-  if (!sets.length) return { ok: false, error: "Add at least one set." };
-  if (sets.length > 200) return { ok: false, error: "That's more than 200 sets." };
+  if (!sets.length) return { ok: false, error: t("past.err.none") };
+  if (sets.length > 200) return { ok: false, error: t("past.err.many") };
 
   const sessionId = newId();
   const seconds = w.minutes * 60;
@@ -326,6 +327,6 @@ export function shareLevel(card: Pick<ShareCard, "xp">) {
 
 /** Short weekday names in the lifter's week order. */
 export function weekdayNames(): string[] {
-  const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  const names = [0, 1, 2, 3, 4, 5, 6].map((d) => weekday(d));
   return [...names.slice(weekStartDay()), ...names.slice(0, weekStartDay())];
 }

@@ -94,9 +94,9 @@ export function daysAway(stats: Stats, now: number): number | null {
 export const COMEBACK_DAYS = 14;
 
 function weeksText(days: number): string {
-  if (days < 21) return `${days} days`;
-  if (days < 60) return `${Math.round(days / 7)} weeks`;
-  return `${Math.round(days / 30)} months`;
+  if (days < 21) return t("mom.days", { count: days });
+  if (days < 60) return t("mom.weeks", { count: Math.round(days / 7) });
+  return t("mom.months", { count: Math.round(days / 30) });
 }
 
 /** Moments for the Today screen (before a workout). */
@@ -106,12 +106,12 @@ export function todayMoments(stats: Stats, now: number): Moment[] {
   if (first) {
     const y = anniversaryYears(first.start, now);
     if (y > 0 && !stats.sessions.some((s) => sameDay(s.start, now) && s !== first)) {
-      out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: `${y} year${y > 1 ? "s" : ""} since your first workout`, detail: `${stats.sessions.length} workouts and ${stats.totalSets.toLocaleString("en-US")} sets since then. Happy liftiversary.` });
+      out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: t("mom.anniv", { count: y }), detail: t("mom.annivBody", { workouts: num(stats.sessions.length), sets: num(stats.totalSets) }) });
     }
   }
   const away = daysAway(stats, now);
   if (away !== null && away >= COMEBACK_DAYS) {
-    out.push({ id: "comeback", kind: "comeback", emoji: "👋", title: "Welcome back", detail: `It's been ${weeksText(away)}. Today's plan eases you back in, and your streak starts fresh this week. No catching up needed.` });
+    out.push({ id: "comeback", kind: "comeback", emoji: "👋", title: t("mom.back"), detail: t("mom.backBody", { time: weeksText(away) }) });
   }
   return out;
 }
@@ -125,16 +125,16 @@ export function doneMoments(stats: Stats): Moment[] {
   const s = stats.sessions[0];
   if (!s) return out;
   const n = stats.sessions.length;
-  if (COUNT_MILESTONES.includes(n)) out.push({ id: `count-${n}`, kind: "count", emoji: "🎉", title: `Workout number ${n}`, detail: n >= 100 ? "Triple digits. That's a habit for life." : "Every one of them counted." });
+  if (COUNT_MILESTONES.includes(n)) out.push({ id: `count-${n}`, kind: "count", emoji: "🎉", title: t("mom.count", { n }), detail: n >= 100 ? t("mom.count100") : t("mom.countBody") });
   const hit = crossed(stats.totalVolume - s.volume, stats.totalVolume);
-  if (hit) out.push({ id: `tonnage-${hit.kg}`, kind: "tonnage", emoji: hit.emoji, title: `You've now lifted ${hit.name}`, detail: `About ${fmtTonnage(hit.kg, "kg")} in total, one set at a time.` });
+  if (hit) out.push({ id: `tonnage-${hit.kg}`, kind: "tonnage", emoji: hit.emoji, title: t("mom.ton", { name: hit.name }), detail: t("mom.tonBody", { kg: fmtTonnage(hit.kg, "kg") }) });
   const prev = stats.sessions[1];
   if (prev) {
     const gap = Math.floor((s.start - prev.start) / DAY);
-    if (gap >= COMEBACK_DAYS) out.push({ id: "comeback-done", kind: "comeback", emoji: "💪", title: "Comeback complete", detail: `First workout in ${weeksText(gap)}. The hardest one is done.` });
+    if (gap >= COMEBACK_DAYS) out.push({ id: "comeback-done", kind: "comeback", emoji: "💪", title: t("mom.comeback"), detail: t("mom.comebackBody", { time: weeksText(gap) }) });
     const first = stats.sessions.at(-1)!;
     const y = anniversaryYears(first.start, s.start);
-    if (y > 0) out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: `${y} year${y > 1 ? "s" : ""} of lifting`, detail: "You trained on your liftiversary. Fitting." });
+    if (y > 0) out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: t("mom.years", { count: y }), detail: t("mom.yearsBody") });
   }
   return out;
 }

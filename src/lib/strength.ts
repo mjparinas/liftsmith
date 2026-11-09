@@ -1,5 +1,6 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { estimate, oneRm } from "./onerm";
+import { t } from "./i18n";
 import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Exercise, type Muscle, type Profile } from "./types";
 
 // Strength score and "strength twins". Each exercise's current estimated one-rep max (onerm.ts) is compared
@@ -117,9 +118,9 @@ export function twins(report: StrengthReport): LiftScore[] {
 }
 
 export function scoreBand(score: number): string {
-  if (score >= 88) return "Elite";
-  if (score >= 75) return "Advanced";
-  if (score >= 50) return "Intermediate";
-  if (score >= 30) return "Novice";
-  return "Starting out";
+  if (score >= 88) return t("sband.elite");
+  if (score >= 75) return t("sband.advanced");
+  if (score >= 50) return t("sband.intermediate");
+  if (score >= 30) return t("sband.novice");
+  return t("sband.start");
 }
