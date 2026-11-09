@@ -105,7 +105,7 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
 }
 
 /** A progress ring with a gradient stroke. `from`/`to` pick the gradient (defaults: brand blue to violet). */
-export function Ring({ value, size = 220, stroke = 12, colour, from = "#5b9cff", to = "#9b86ff", track = "var(--color-line)", glow = true, children }: { value: number; size?: number; stroke?: number; colour?: string; from?: string; to?: string; track?: string; glow?: boolean; children?: ReactNode }) {
+export function Ring({ value, size = 220, stroke = 12, colour, from = "var(--grad-a)", to = "var(--grad-c)", track = "var(--color-line)", glow = true, children }: { value: number; size?: number; stroke?: number; colour?: string; from?: string; to?: string; track?: string; glow?: boolean; children?: ReactNode }) {
   const id = useId().replace(/:/g, "");
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -115,11 +115,11 @@ export function Ring({ value, size = 220, stroke = 12, colour, from = "#5b9cff",
       <svg width={size} height={size} className="-rotate-90 overflow-visible" aria-hidden>
         <defs>
           <linearGradient id={`g${id}`} x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stopColor={colour ?? from} />
-            <stop offset="1" stopColor={colour ?? to} />
+            <stop offset="0" style={{ stopColor: colour ?? from }} />
+            <stop offset="1" style={{ stopColor: colour ?? to }} />
           </linearGradient>
         </defs>
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle cx={size / 2} cy={size / 2} r={r} fill="none" style={{ stroke: track }} strokeWidth={stroke} />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -130,7 +130,7 @@ export function Ring({ value, size = 220, stroke = 12, colour, from = "#5b9cff",
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - v)}
-          style={{ transition: "stroke-dashoffset 250ms linear", filter: glow ? `drop-shadow(0 0 ${stroke / 2}px ${colour ?? from}66)` : undefined }}
+          style={{ transition: "stroke-dashoffset 250ms linear", filter: glow ? `drop-shadow(0 0 ${stroke / 2}px color-mix(in srgb, ${colour ?? from} 40%, transparent))` : undefined }}
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center">{children}</div>

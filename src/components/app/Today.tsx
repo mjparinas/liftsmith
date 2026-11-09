@@ -112,7 +112,7 @@ export function Today() {
       {readiness && preview && call && !active && (
         <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
           <div className="flex items-center gap-4">
-            <Ring value={readiness.score / 100} size={64} stroke={6} from={call.hue} to={call.hue} track="rgb(255 255 255 / 0.08)">
+            <Ring value={readiness.score / 100} size={64} stroke={6} from={call.hue} to={call.hue} track="color-mix(in srgb, var(--color-ink) 8%, transparent)">
               <span className="display text-xl" aria-label={`Readiness ${readiness.score}`}>{readiness.score}</span>
             </Ring>
             <div className="min-w-0 flex-1">

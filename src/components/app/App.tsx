@@ -1,4 +1,5 @@
 "use client";
+import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
@@ -41,13 +42,18 @@ export function App() {
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
   const themeId = activeTheme(profile.delight?.theme, { stats, goalWeeks: goalStreak(stats, profile, now).weeks, now }).id;
-  // An equipped cosmetic accent (game.ts COSMETICS) wins over the theme's accent, so it goes on second.
+  // Colours, in order: Appearance (dark, light or match system), then the earned theme (only its
+  // accent on a light screen), then an equipped cosmetic accent (game.ts COSMETICS), which wins.
+  const appearance = profile.theme ?? "dark";
+  const light = useLight(appearance);
   useEffect(() => {
-    applyTheme(activeTheme(themeId, { stats, goalWeeks: 0, now: Date.now() }));
+    applyAppearance(appearance);
+    applyTheme(activeTheme(themeId, { stats, goalWeeks: 0, now: Date.now() }), light);
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
-    if (accent) applyAccent(accent);
-  }, [themeId, profile.cosmetics]); // eslint-disable-line react-hooks/exhaustive-deps
+    if (accent) applyAccent(accent, light);
+  }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
+    applyAppearance(savedAppearance());
     installDiag();
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
