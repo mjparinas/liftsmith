@@ -19,6 +19,9 @@ import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
+import { applyFixes, startFix, type FixKind, type Plateau } from "./plateau";
+import { doLater, fitToTime } from "./replan";
+import { withSettings, type Setting } from "./machineSettings";
 import { programPlan } from "./programs";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
 
@@ -122,7 +125,16 @@ interface State {
   addGym(preset: GymPreset): string;
   removeGym(id: string): void;
   replan(): void;
-  start(): void;
+  /** Starts today's plan, or the plan given (a shared workout). */
+  start(plan?: Plan): void;
+  /** Fits the rest of the workout into this many minutes; returns what changed. */
+  shortOnTime(minutes: number): string[];
+  /** Moves the current exercise after the next one (equipment busy). */
+  later(): void;
+  /** Saves machine settings for an exercise at the active workout's (or active) gym. */
+  setMachineSettings(exerciseId: string, list: Setting[], gymId?: string): void;
+  /** Starts a three-week plateau fix (plateau.ts). */
+  fixPlateau(p: Plateau, kind: FixKind): void;
   logSet(): void;
   adjust(weight: number, reps: number): void;
   addRest(sec: number): void;
@@ -415,6 +427,8 @@ export const useApp = create<State>((set, get) => {
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
       if (fromRoutine) plan = { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
+      // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
+      if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
       set({ readiness: r, preview: relink(plan, get().links) });
     },
 
@@ -431,8 +445,51 @@ export const useApp = create<State>((set, get) => {
       return true;
     },
 
-    start() {
-      const plan = get().preview;
+    shortOnTime(minutes) {
+      const a = get().active;
+      if (!a) return [];
+      const item = a.plan.items[a.index];
+      const done = item ? setsDone(get().events, a.sessionId, item.exerciseId) : 0;
+      const fit = fitToTime(a.plan.items, a.index, done, minutes);
+      const next = { ...a, plan: { ...a.plan, items: fit.items }, lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+      track("feature", { name: "replan", detail: "time" });
+      return fit.changes;
+    },
+
+    later() {
+      const a = get().active;
+      if (!a) return;
+      const item = a.plan.items[a.index];
+      // Only before its first set: once started, finishing it is quicker than coming back.
+      if (!item || setsDone(get().events, a.sessionId, item.exerciseId) > 0) return;
+      const next = loadItem({ ...a, plan: { ...a.plan, items: doLater(a.plan.items, a.index) }, lastAt: Date.now() }, a.index);
+      set({ active: next });
+      persistActive(next);
+      track("feature", { name: "replan", detail: "later" });
+    },
+
+    setMachineSettings(exerciseId, list, gymId) {
+      const id = gymId ?? get().active?.plan.gymId ?? get().profile.activeGymId;
+      const g = get().gyms.find((x) => x.id === id);
+      if (!g) return;
+      const next = withSettings(g, exerciseId, list);
+      const gyms = get().gyms.map((x) => (x.id === g.id ? { ...next, updatedAt: Date.now() } : x));
+      set({ gyms });
+      void saveRecord("gyms", gyms);
+    },
+
+    fixPlateau(p, kind) {
+      const now = Date.now();
+      const fixes = (get().profile.plateauFixes ?? []).filter((f) => f.exerciseId !== p.exerciseId || f.until < now - 90 * 86400_000);
+      get().setProfile({ plateauFixes: [...fixes, startFix(p, kind, gym() ?? null, now)] });
+      track("feature", { name: "plateau_fix", detail: kind });
+      get().replan();
+    },
+
+    start(given) {
+      const plan = given ?? get().preview;
       const g = gym();
       if (!plan || !g || !plan.items.length) return;
       const sessionId = uid();
