@@ -1,6 +1,7 @@
 "use client";
 import { useApp } from "@/lib/store";
-import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
+import { saveFile, setsCsv, stamp } from "@/lib/exportData";
+import { SavingSettings } from "./Saving";
 import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fromKg, plainNum, toKg } from "@/lib/units";
@@ -51,7 +52,7 @@ function ProRow() {
 }
 
 export function Settings() {
-  const { profile, setProfile, reset, events, gyms } = useApp();
+  const { profile, setProfile, reset, events } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
   const { arg } = useRoute();
@@ -83,6 +84,7 @@ export function Settings() {
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>{t("settings.feedback")}</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">{t("settings.dashboard")}</a>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>{t("settings.training")}</Button>
+      <SavingSettings />
       <ProRow />
       <Section title={t("settings.program")}>
         <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
@@ -137,10 +139,7 @@ export function Settings() {
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>{t("settings.newBlock")}</Button>
       </Section>
       <Section title={t("settings.data")}>
-        <div className="mb-3 grid grid-cols-2 gap-2">
-          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>{t("settings.exportCsv")}</Button>
-          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events))}>{t("settings.backup")}</Button>
-        </div>
+        <Button kind="ghost" className="mb-3 w-full" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>{t("settings.exportCsv")}</Button>
         <p className="mb-3 text-xs text-faint">{t("settings.data.note")}</p>
         <div className="mb-4"><ImportWorkouts /></div>
         {confirm ? (
