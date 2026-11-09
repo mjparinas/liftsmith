@@ -1,3 +1,4 @@
+import { translated } from "./i18n";
 import { achievementXp, achievements, context, nearest, type Achievement } from "./achievements";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
@@ -289,7 +290,7 @@ export const COSMETICS: Cosmetic[] = [
 ];
 export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 60, rare: 28, epic: 10, legendary: 2 };
-export const RARITY_LABEL: Record<Rarity, string> = { common: "Common", rare: "Rare", epic: "Epic", legendary: "Legendary" };
+export const RARITY_LABEL: Record<Rarity, string> = translated(["common", "rare", "epic", "legendary"], (k) => `rarity.${k}`);
 
 export function crateFor(sessionId: string): Cosmetic {
   const r = rng(hash(`crate:${sessionId}`))();

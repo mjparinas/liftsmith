@@ -154,3 +154,14 @@ describe("accessibility settings", () => {
     expect(root.dataset.contrast).toBe("system");
   });
 });
+
+describe("3D recovery map", () => {
+  it("paints with the dark theme's band colours, and they stand out on the stage", async () => {
+    const { STAGE_BANDS } = await import("@/components/demo/colours");
+    for (const [set, suffix] of [["standard", "std"], ["cvd", "cvd"]] as const)
+      for (const [band, hex] of Object.entries(STAGE_BANDS[set])) {
+        expect(hex, `${band} ${set}`).toBe(DARK[`--band-${band}-${suffix}`]);
+        expect(contrast(hex, "#05080c"), `${band} ${set}`).toBeGreaterThanOrEqual(3);
+      }
+  });
+});

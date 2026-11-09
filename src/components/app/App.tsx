@@ -23,6 +23,8 @@ import { RepLab } from "./RepLab";
 import { Remix } from "./Remix";
 import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
+import { Pro } from "./Pro";
+import { startBilling, useBilling } from "@/lib/billing";
 import { Settings } from "./Settings";
 import { TrainingSettings } from "./TrainingSettings";
 import { Injuries } from "./Injuries";
@@ -105,6 +107,15 @@ export function App() {
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
     return () => window.removeEventListener("online", online);
   }, [init]);
+  // Store billing (billing.ts): the Pro entitlement re-renders the app, and keeps the plan source in step
+  // (free lifters follow the free classic 5x5; Pro brings their own plan back).
+  const billing = useBilling();
+  useEffect(() => {
+    if (ready) void startBilling();
+  }, [ready]);
+  useEffect(() => {
+    if (ready && profile.onboarded) useApp.getState().applyAccess();
+  }, [ready, profile.onboarded, billing.live, billing.ent]);
   // Sounds, haptics, Lean mode and equipped cosmetics (accent colour, rest timer sound) apply app-wide
   // (juice.ts reads `feel`).
   useEffect(() => {
@@ -220,8 +231,8 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, remix: <Remix code={arg} />, lab: <RepLab /> }[route];
-  const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback" && route !== "lab";
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, remix: <Remix code={arg} />, lab: <RepLab />, pro: <Pro /> }[route];
+  const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback" && route !== "lab" && route !== "pro";
   if (route === "setup") return screen;
   return (
     <>

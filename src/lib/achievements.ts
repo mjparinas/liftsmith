@@ -1,3 +1,4 @@
+import { translated } from "./i18n";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { TIMED } from "./progression";
@@ -10,19 +11,11 @@ import { fromKg } from "./units";
 
 export type Tier = "bronze" | "silver" | "gold" | "platinum";
 export const TIERS: Tier[] = ["bronze", "silver", "gold", "platinum"];
-export const TIER_LABEL: Record<Tier, string> = { bronze: "Bronze", silver: "Silver", gold: "Gold", platinum: "Platinum" };
+export const TIER_LABEL: Record<Tier, string> = translated(["bronze", "silver", "gold", "platinum"], (k) => `tier.${k}`);
 export const TIER_XP: Record<Tier, number> = { bronze: 25, silver: 75, gold: 150, platinum: 300 };
 
 export type Category = "consistency" | "strength" | "volume" | "records" | "explore" | "smart" | "secret";
-export const CATEGORY_LABEL: Record<Category, string> = {
-  consistency: "Consistency",
-  strength: "Strength",
-  volume: "Volume",
-  records: "Records",
-  explore: "Exploring",
-  smart: "Training smart",
-  secret: "Secret",
-};
+export const CATEGORY_LABEL: Record<Category, string> = translated(["consistency", "strength", "volume", "records", "explore", "smart", "secret"], (k) => `category.${k}`);
 
 /** Everything an achievement can measure, computed once from the events. */
 export interface Ctx {

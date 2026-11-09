@@ -14,3 +14,6 @@ coverage/
 e2e-shots/
 /build
 .data/
+# Google Play art: raw captures and the promo video are rebuilt by scripts/play-*.mjs (video goes to YouTube)
+store/play/raw/
+store/play/promo-video.mp4

@@ -54,7 +54,8 @@ export async function storeBatch(b: Batch, where: Where, now = Date.now()): Prom
       sql: "INSERT OR IGNORE INTO events (id, install_id, name, at, received_at, platform, app_version, props) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       args: [e.id, c.installId, e.name, e.at, now, c.platform, c.appVersion, e.props ? JSON.stringify(e.props) : null],
     });
-    if (e.name === "trial_start" || e.name === "purchase") {
+    // Until store notifications arrive through RevenueCat (revenuecat.ts), the app's own events stand in for them.
+    if ((e.name === "trial_start" || e.name === "purchase") && !process.env.REVENUECAT_WEBHOOK_SECRET) {
       const p = e.props ?? {};
       const kind = e.name === "trial_start" ? "trial_start" : "purchase";
       const price = typeof p.price === "number" ? Math.round(p.price * 1_000_000) : null;

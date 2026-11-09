@@ -3,7 +3,7 @@ import { t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
-import { BodyMap } from "@/components/BodyMap";
+import { RecoveryMap } from "./RecoveryMap";
 import { exercise } from "@/lib/exercises";
 import { haptic, sound } from "@/lib/juice";
 import { quoteOfDay } from "@/lib/quotes";
@@ -248,7 +248,7 @@ export function Today() {
           </Section>
           <Section title="Why these muscles" icon="recovery">
             <div className="card p-4">
-              <BodyMap rec={rec} focus={focus} compact />
+              <RecoveryMap rec={rec} focus={focus} compact chips={false} />
               {preview.program && !preview.routineId ? (
                 <p className="mt-3 text-sm text-muted">{preview.program.dayName} of {programName(preview.program.id)}{fixed ? "" : `: recovered muscles from today's group, furthest from this week's ${preview.week.setsPerMuscle}-set goal`}. {preview.program.note}.</p>
               ) : (
