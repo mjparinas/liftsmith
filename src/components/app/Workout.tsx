@@ -3,6 +3,7 @@ import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { COSMETICS } from "@/lib/game";
+import { LiftDemo } from "@/components/demo/LiftDemo";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
@@ -217,6 +218,11 @@ export function Workout() {
             </div>
           </section>
 
+          <div className="relative mt-4 h-52">
+            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
+            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">How to ›</button>
+          </div>
+
           {resting ? (
             <section className="card-tint animate-pop mt-5 flex flex-col items-center p-5" style={{ "--tint": HUE.cyan } as CSSProperties}>
               <Ring value={left / Math.max(1, active.restTotal)} from={HUE.cyan} to={HUE.accent} stroke={14}>
@@ -317,13 +323,13 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
+            <LiftDemo exerciseId={ex.id} bpm={bpm} controls />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">
               {ex.cues.map((c, i) => (
                 <li key={c} className="flex gap-3"><span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-sm font-bold text-accent">{i + 1}</span>{c}</li>
               ))}
             </ol>
-            <p className="text-sm text-faint">Works: {[...ex.primary, ...ex.secondary].map((m) => MUSCLE_LABEL[m]).join(", ")}</p>
           </div>
         )}
       </Sheet>

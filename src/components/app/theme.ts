@@ -4,13 +4,14 @@ import type { Call } from "@/lib/readiness";
 import type { Muscle } from "@/lib/types";
 import type { IconName } from "./icons";
 
+// CSS variables (globals.css), so each hue has a dark and a light value.
 export const HUE = {
-  accent: "#4c8dff",
-  violet: "#a78bfa",
-  cyan: "#38d6e8",
-  ember: "#ff8a3d",
-  mint: "#34d399",
-  gold: "#f2c14e",
+  accent: "var(--color-accent)",
+  violet: "var(--color-violet)",
+  cyan: "var(--color-cyan)",
+  ember: "var(--color-ember)",
+  mint: "var(--color-mint)",
+  gold: "var(--color-gold)",
 } as const;
 
 /** Muscle families get one hue each, so a plan's balance shows at a glance. */

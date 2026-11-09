@@ -84,6 +84,27 @@ try {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
   await scan("feedback sent");
+  // Light mode: every main screen again, so the light tokens pass contrast too.
+  await page.goto(`${server.url}/app/#/settings`);
+  await page.getByRole("button", { name: "Light", exact: true }).click();
+  await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
+  await scan("light settings");
+  await page.getByRole("button", { name: "‹ Today" }).click();
+  await scan("light today");
+  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
+    await page.getByRole("button", { name: tab }).click();
+    await scan(`light ${tab}`);
+  }
+  await page.getByRole("button", { name: "Today" }).click();
+  await page.getByRole("button", { name: "Start workout" }).click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+  await scan("light workout");
+  await page.goto(`${server.url}/me/`);
+  await page.getByRole("heading", { name: /training/ }).waitFor();
+  for (const tab of ["Overview", "Lifts"]) {
+    await page.getByRole("link", { name: tab, exact: true }).click();
+    await scan(`light dashboard ${tab}`);
+  }
 } catch (e) {
   fail.push(String(e));
 }

@@ -36,7 +36,16 @@ try {
 
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+  // the exercise demo draws on the workout screen, and the how-to sheet has the full controls
+  await page.locator('canvas[role="img"]').first().waitFor();
+  await page.waitForTimeout(800);
   await shot("workout");
+  await page.getByRole("button", { name: "How to ›" }).click();
+  await page.getByRole("button", { name: "Skeleton" }).click();
+  await page.waitForTimeout(800);
+  await shot("how-to");
+  check((await page.locator('canvas[role="img"]').count()) >= 1, "The how-to sheet shows the exercise demo", fail);
+  await page.mouse.click(10, 10); // tap outside the sheet to close it
 
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   check(await page.getByText("Rest", { exact: true }).isVisible(), "Rest timer starts after logging a set", fail);
