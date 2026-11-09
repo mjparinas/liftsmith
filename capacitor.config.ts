@@ -2,7 +2,7 @@ import type { CapacitorConfig } from "@capacitor/cli";
 
 // The Android and iOS apps wrap the same static export (out/). Package id is permanent after the first store upload.
 const config: CapacitorConfig = {
-  appId: "com.liftsmith.app",
+  appId: "com.getliftsmith.app",
   appName: "Liftsmith",
   webDir: "out",
   backgroundColor: "#0a0d12",

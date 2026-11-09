@@ -4,7 +4,7 @@ import { capped, checkBody, confirm, memoryStore, reminderEnv, remove, runDaily,
 
 const TZ = "America/Toronto";
 const MON = zoned(2026, 11, 9, 0, 0, TZ);
-const env: Env = { siteUrl: "https://liftsmith.app", secret: "s3cret", postalAddress: "123 Example St, Toronto ON M5V 0A1, Canada" };
+const env: Env = { siteUrl: "https://getliftsmith.com", secret: "s3cret", postalAddress: "123 Example St, Toronto ON M5V 0A1, Canada" };
 const ID = "a".repeat(32);
 const TOKEN = "b".repeat(64);
 

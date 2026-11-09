@@ -63,8 +63,8 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 
 ### Name
 - **Liftsmith** (Melvin chose it, 2026-11-09; the working name before was Setwise). The name is set in `src/lib/brand.ts`.
-- Android package id: `com.liftsmith.app` (proposed). It must be final before the first Play upload and can never change after it.
-- Site domain placeholder: `liftsmith.app` (`src/lib/site.ts`, overridable with `NEXT_PUBLIC_SITE_URL`); not yet registered.
+- **App id: `com.getliftsmith.app`** for the Android package and the iOS bundle id, with the widget extension at `com.getliftsmith.app.widgets` (Melvin, 2026-11-09). It can never change after the first Play and App Store upload.
+- **Domain: `getliftsmith.com`** (Melvin chose it, 2026-11-09; he's registering it). It's the default `SITE_URL` (`src/lib/site.ts`, overridable with `NEXT_PUBLIC_SITE_URL`). Attach it to the Vercel project once it's bought, which also makes production public.
 
 ### Training engine (src/lib)
 - **Equipment and gym profiles.** Each gym has its own equipment list, bars, the exact plates owned (with counts), dumbbells, kettlebells and machine step. The generator uses only exercises whose every needed item is at the active gym (`available` in `exercises.ts`).
@@ -145,7 +145,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 - **Android:** launcher shortcuts and an App Actions `START_EXERCISE` capability (`res/xml/shortcuts.xml`), and a Quick Settings tile (`WorkoutTileService.java`) that reads "Start workout", or "Log set" while a workout runs. All open `liftsmith://start|log|add30`. Custom App Actions intents for log set were left out, because they need Google's review and the tile and notification already cover it.
 - **Web:** the manifest's shortcuts open `/app/?do=start` and `/app/?do=log`.
 - **Widgets and controls:** Android has a home-screen widget (`WorkoutWidget.java`, Start workout and Log set). iOS has one widget extension target, `ios/App/LiftsmithWidgets` (iOS 16.2+): a home-screen and lock-screen widget (small: start; medium: start and log set), the workout Live Activity, and an iOS 18 Control Center control that runs `StartWorkoutIntent`. Widget and Live Activity buttons open `liftsmith://` links, which `SceneDelegate` hands to `ShortcutInbox`.
-- Code shared by the app and the extension lives in `ios/App/Shared/` (`WorkoutIntents.swift`: the intents and `ShortcutInbox`; `WorkoutActivity.swift`: the Live Activity attributes). The extension's bundle id is `com.liftsmith.app.widgets`; release signing creates its profile automatically.
+- Code shared by the app and the extension lives in `ios/App/Shared/` (`WorkoutIntents.swift`: the intents and `ShortcutInbox`; `WorkoutActivity.swift`: the Live Activity attributes). The extension's bundle id is `com.getliftsmith.app.widgets`; release signing creates its profile automatically.
 - Widgets don't show whether a workout is running, because that needs an App Group shared with the app (an Apple portal step). Log set does nothing without a workout, so the widgets stay correct without it.
 ### Calendar (Melvin, 2026-11-09, roadmap MVP+2; built)
 - **Settings › Calendar** (`CalendarSettings.tsx`, `src/lib/calendar.ts`): pick training weekdays (defaults spread the days-a-week goal, 3 → Mon, Wed, Fri) and a time, then **Add to my calendar**. That writes one weekly repeating event (the workout length) to the default calendar, and Update or Remove replace or delete it by its saved id. The web build downloads a `.ics` file instead.
@@ -183,7 +183,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 - **What the server keeps** (`reminder_subs` and `reminder_sends`, `src/server/remindersDb.ts`, in the same database as analytics): the address, which kinds are on, when the lifter agreed, and the planner's numbers only: training days and time, time zone, days a week, setup time, last and first workout times, days trained this week, streak weeks and Pro state. **No workouts, weights, heart rate or health data.** The device keeps a random subscription id and secret in localStorage; the server stores only hashes of it and of the confirmation token. `account_id` is nullable so accounts can claim the subscription later and send the same fields from sync.
 - **Scheduling:** a Vercel cron (`vercel.json`, once a day at 00:05 UTC, which works on every Vercel plan) runs `GET /api/cron/reminders/` (`CRON_SECRET`), plans each confirmed subscriber's next 26 hours in their own time zone and hands each email to Resend with `scheduled_at` and an idempotency key. When the phone reports a change (say, a workout that makes a missed-day nudge wrong), the server cancels the scheduled emails that no longer apply and schedules any new ones. If the phone is offline after a workout, a scheduled nudge can still go out; that's accepted.
 - **Every email** carries a one-click unsubscribe link (an HMAC of the subscription id, so the token is never stored) and the `List-Unsubscribe` and `List-Unsubscribe-Post` headers (RFC 8058, required by Gmail and Yahoo for bulk senders), says why it was sent and where to change it, and includes the postal address (CAN-SPAM, CASL). The routes refuse to send without `MAIL_POSTAL_ADDRESS`. Unsubscribing stops everything and cancels what's scheduled; the app's syncs can't quietly resubscribe. **Stop all email and delete my address** in Settings, and **Erase this device**, delete the row and its history from the server.
-- **Server environment:** `RESEND_API_KEY`, `MAIL_FROM` (a sender on a domain verified in Resend, e.g. `Liftsmith <coach@liftsmith.app>`), `MAIL_POSTAL_ADDRESS`, `REMINDER_SECRET` (a long random string for unsubscribe links), `CRON_SECRET`, and the database. Without them `/api/reminders/` answers 503 and the app says it couldn't reach the server.
+- **Server environment:** `RESEND_API_KEY`, `MAIL_FROM` (a sender on a domain verified in Resend, e.g. `Liftsmith <coach@getliftsmith.com>`), `MAIL_POSTAL_ADDRESS`, `REMINDER_SECRET` (a long random string for unsubscribe links), `CRON_SECRET`, and the database. Without them `/api/reminders/` answers 503 and the app says it couldn't reach the server.
 - **Later:** switch the streak alert to the gamification thread's `goalStreak` `atRisk` flag and freezes once that lands; a weekly-quest "almost done" nudge; win-back and receipts by email once accounts and billing exist.
 
 ### Stats and recovery map
@@ -279,6 +279,6 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 
 ## Open items
 - Reminder emails in Vercel: verify a sending domain in Resend, then set `MAIL_FROM`, `MAIL_POSTAL_ADDRESS` (a real mailing address or PO box), `REMINDER_SECRET` and `CRON_SECRET`.
-- Confirm the Android package id and register a domain.
+- Register getliftsmith.com and attach it to the Vercel project.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.

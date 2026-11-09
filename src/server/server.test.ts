@@ -79,7 +79,7 @@ describe("website page views", () => {
 });
 
 describe("admin sign-in", () => {
-  const req = (url: string, init: RequestInit = {}) => new Request(`https://liftsmith.app${url}`, init);
+  const req = (url: string, init: RequestInit = {}) => new Request(`https://getliftsmith.com${url}`, init);
   const signIn = async (email: string) => {
     const r = await startSignIn(req("/api/admin/login/", { method: "POST" }), email);
     const { devLink } = (await r.json()) as { devLink?: string };
@@ -120,7 +120,7 @@ describe("admin sign-in", () => {
     const cookie = await signIn("help@example.com");
     const get = await requireStaff(req("/api/admin/stats/", { headers: { cookie: `ls_admin=${cookie}` } }));
     expect("staff" in get && get.staff.role).toBe("support");
-    const post = await requireStaff(req("/api/admin/installs/", { method: "POST", headers: { cookie: `ls_admin=${cookie}`, origin: "https://liftsmith.app" } }), { write: true });
+    const post = await requireStaff(req("/api/admin/installs/", { method: "POST", headers: { cookie: `ls_admin=${cookie}`, origin: "https://getliftsmith.com" } }), { write: true });
     expect("response" in post && post.response.status).toBe(404);
   });
 
