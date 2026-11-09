@@ -7,7 +7,7 @@ import { exercise } from "@/lib/exercises";
 import { TIER_LABEL, unlocked } from "@/lib/achievements";
 import { derive } from "@/lib/derive";
 import { COSMETICS, RARITY_LABEL, crates, game, type Cosmetic } from "@/lib/game";
-import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
 import { shareCard } from "@/lib/shareImage";
 import { track } from "@/lib/analytics";
 import { useApp } from "@/lib/store";
@@ -25,6 +25,7 @@ import { PrReplayButton } from "./PrReplay";
 import { doneCue, say, voice } from "@/lib/voice";
 import { doneItems } from "@/lib/routines";
 import { SaveDoneAsRoutine } from "./Routines";
+import { date, t } from "@/lib/i18n";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -63,28 +64,28 @@ function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
       <button type="button" onClick={reveal} className="press card mt-4 flex w-full items-center gap-4 p-4 text-left">
         <span aria-hidden className="animate-shake grid h-14 w-14 shrink-0 place-items-center rounded-2xl" style={{ background: "color-mix(in srgb, var(--color-violet) 18%, transparent)", color: "var(--color-violet)" }}><Icon name="gift" size={30} /></span>
         <span>
-          <span className="block font-semibold">You earned a crate</span>
-          <span className="text-sm text-muted">Tap to open it</span>
+          <span className="block font-semibold">{t("done.crate")}</span>
+          <span className="text-sm text-muted">{t("done.crateTap")}</span>
         </span>
       </button>
     );
   }
   return (
     <div className="card animate-pop mt-4 p-4 text-left" style={{ boxShadow: `inset 0 0 0 2px ${RARITY_COLOUR[item.rarity]}` }}>
-      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: RARITY_COLOUR[item.rarity] }}>{RARITY_LABEL[item.rarity]} {item.kind === "accent" ? "accent colour" : item.kind === "sound" ? "timer sound" : "plate finish"}</p>
+      <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: RARITY_COLOUR[item.rarity] }}>{t(item.kind === "accent" ? "done.crate.accent" : item.kind === "sound" ? "done.crate.sound" : "done.crate.plate", { rarity: RARITY_LABEL[item.rarity] })}</p>
       <div className="mt-1 flex items-center justify-between gap-3">
         <span className="flex items-center gap-2 text-lg font-semibold">
           {item.kind === "accent" && <span aria-hidden className="h-5 w-5 rounded-full" style={{ background: item.value }} />}
           {item.name}
         </span>
         {duplicate ? (
-          <span className="text-sm text-muted">Already yours · +25 XP</span>
+          <span className="text-sm text-muted">{t("done.crateDup")}</span>
         ) : (
           <Button kind={equipped ? "quiet" : "ghost"} className="py-2" disabled={equipped} onClick={() => {
             setProfile({ cosmetics: { ...profile.cosmetics, [item.kind]: item.id } });
             if (item.kind === "accent") applyAccent(item.value);
             if (item.kind === "sound") sound.preview(item.value as TimerSound);
-          }}>{equipped ? "Equipped" : "Use it"}</Button>
+          }}>{equipped ? t("done.equipped") : t("done.useIt")}</Button>
         )}
       </div>
     </div>
@@ -122,27 +123,24 @@ export function Done() {
     if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!s) return <div className="pt-10 text-center"><Button onClick={() => go("today")}>Back to today</Button></div>;
+  if (!s) return <div className="pt-10 text-center"><Button onClick={() => go("today")}>{t("done.back")}</Button></div>;
 
   const share = async () => {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     const how = await shareCard({
-      kicker: new Date(s.start).toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" }),
-      headline: prs.length ? `${prs.length} new PR${prs.length > 1 ? "s" : ""}` : "Workout done",
-      tiles: [["Time", clock(s.seconds)], ["Sets", String(s.sets)], ["Volume", `${fmtNum(Math.round(fromKg(s.volume, profile.unit)))} ${profile.unit}`]],
+      kicker: date(s.start, { weekday: "long", month: "long", day: "numeric" }),
+      headline: prs.length ? t("done.prsShare", { count: prs.length }) : t("done.title"),
+      tiles: [[t("done.time"), clock(s.seconds)], [t("done.sets"), fmtNum(s.sets)], [t("done.volume"), `${fmtNum(Math.round(fromKg(s.volume, profile.unit)))} ${profile.unit}`]],
       lines: [
         ...prs.slice(0, 3).map((p) => `🏆 ${exercise(p.exerciseId).name} · ${fmtNum(fromKg(p.weight, profile.unit))} ${profile.unit} × ${p.reps}`),
         ...badges.slice(0, 4).map((b) => `${b.a.icon} ${b.a.name} · ${TIER_LABEL[b.tier]}`),
       ].slice(0, 4),
-      footer: `Level ${after.level.level} · ${after.level.title} · ${after.streak.weeks}-week streak`,
+      footer: t("done.footer", { level: after.level.level, title: after.level.title, count: after.streak.weeks }),
       accent,
     }, `liftsmith-${new Date(s.start).toISOString().slice(0, 10)}`);
     track("feature", { name: "share_card", detail: how });
-    if (how === "failed") {
-      haptic("error");
-      sound.error();
-    }
-    setShared(how === "download" ? "Saved the image." : how === "failed" ? "Couldn't share that. Try again." : null);
+    if (how === "failed") oops();
+    setShared(how === "download" ? t("done.saved") : how === "failed" ? t("done.shareFailed") : null);
   };
 
   return (
@@ -155,27 +153,27 @@ export function Done() {
           </span>
         )}
       </div>
-      <h1 className="mt-3 text-3xl font-bold">{prs.length ? `${prs.length} new PR${prs.length > 1 ? "s" : ""}!` : "Workout done"}</h1>
-      <p className="num mt-2 text-4xl font-bold text-accent" aria-label={`${gained} XP earned`}>+{xp} XP</p>
-      <p className="mt-1 text-sm text-muted">Level {after.level.level} · {after.level.title}</p>
+      <h1 className="mt-3 text-3xl font-bold">{prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}</h1>
+      <p className="num mt-2 text-4xl font-bold text-accent" aria-label={t("done.xp", { xp: gained })}>+{xp} XP</p>
+      <p className="mt-1 text-sm text-muted">{t("done.level", { level: after.level.level, title: after.level.title })}</p>
 
       {levelUp && (
         <div className="card animate-bump mt-4 border-accent p-4" role="status" style={{ boxShadow: "0 0 0 2px var(--color-accent)" }}>
-          <p className="text-xs font-semibold uppercase tracking-wider text-accent">Level up</p>
-          <p className="mt-1 text-2xl font-bold">Level {after.level.level}{after.level.title !== before.level.title ? ` · ${after.level.title}` : ""}</p>
-          {after.level.title !== before.level.title && <p className="text-sm text-muted">New title unlocked</p>}
+          <p className="text-xs font-semibold uppercase tracking-wider text-accent">{t("done.levelUp")}</p>
+          <p className="mt-1 text-2xl font-bold">{after.level.title !== before.level.title ? t("done.level", { level: after.level.level, title: after.level.title }) : t("done.levelOnly", { level: after.level.level })}</p>
+          {after.level.title !== before.level.title && <p className="text-sm text-muted">{t("done.newTitle")}</p>}
         </div>
       )}
 
       <div className="mt-6 grid grid-cols-3 gap-3">
-        {[["Time", clock(s.seconds)], ["Sets", String(s.sets)], ["Volume", `${fmtNum(vol)} ${profile.unit}`]].map(([k, v]) => (
+        {[[t("done.time"), clock(s.seconds), ""], [t("done.sets"), fmtNum(s.sets), ""], [t("done.volume"), `${fmtNum(vol)} ${profile.unit}`, "volume"]].map(([k, v, term]) => (
           <div key={k} className="card animate-rise p-3">
-            <div className="text-xs uppercase tracking-wider text-faint">{k}{k === "Volume" && <Info term="volume" />}</div>
+            <div className="text-xs uppercase tracking-wider text-faint">{k}{term === "volume" && <Info term="volume" />}</div>
             <div className="num mt-1 text-xl font-bold">{v}</div>
           </div>
         ))}
       </div>
-      {s.avgHr && <p className="num mt-3 text-sm text-muted">♥ average {s.avgHr} bpm, max {s.maxHr}</p>}
+      {s.avgHr && <p className="num mt-3 text-sm text-muted">{t("done.hr", { avg: s.avgHr, max: s.maxHr ?? 0 })}</p>}
       {prs.length > 0 && (
         <ul className="card mt-4 divide-y divide-line text-left">
           {prs.map((p) => (
@@ -190,8 +188,8 @@ export function Done() {
       {!lean(profile) && <DoneMoments />}
 
       {badges.length > 0 && (
-        <section className="mt-4 text-left" aria-label="Badges unlocked">
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-faint">Badges unlocked</h2>
+        <section className="mt-4 text-left" aria-label={t("done.badges")}>
+          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-faint">{t("done.badges")}</h2>
           <ul className="card divide-y divide-line">
             {badges.map(({ a, tier }, i) => (
               <li key={a.id} className="animate-rise flex items-center gap-3 px-4 py-3" style={{ animationDelay: `${600 + i * 150}ms`, animationFillMode: "both" }}>
@@ -208,7 +206,7 @@ export function Done() {
       )}
 
       {questsDone.length > 0 && (
-        <ul className="card mt-4 divide-y divide-line text-left" aria-label="Quests completed">
+        <ul className="card mt-4 divide-y divide-line text-left" aria-label={t("done.quests")}>
           {questsDone.map((q) => (
             <li key={q.id} className="flex justify-between px-4 py-3">
               <span>✅ {q.title}</span>
@@ -227,11 +225,11 @@ export function Done() {
         <LeagueCard g={after} />
       </div>
 
-      <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>Share this workout</Button>
+      <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>{t("done.share")}</Button>
       {shared && <p className="mt-2 text-sm text-muted" role="status">{shared}</p>}
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
-      <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>Done</Button>
-      <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">See all achievements</button>
+      <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>{t("done.done")}</Button>
+      <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">{t("done.allAchievements")}</button>
     </div>
   );
 }
@@ -242,9 +240,9 @@ function PainAfter({ sessionId }: { sessionId: string }) {
   const hurt = activeInjuries(events);
   if (!hurt.length) return null;
   return (
-    <section className="card mt-4 space-y-2 p-4 text-left" aria-label="Pain after this workout">
-      {hurt.map((i) => <PainSelect key={i.id} label={`How's your ${PART_LABEL[i.part].toLowerCase()} after this workout?`} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
-      <p className="text-xs text-muted">Optional. It feeds the pain trend and the graded return on the Injuries screen.</p>
+    <section className="card mt-4 space-y-2 p-4 text-left" aria-label={t("done.pain")}>
+      {hurt.map((i) => <PainSelect key={i.id} label={t("done.painAsk", { part: PART_LABEL[i.part].toLowerCase() })} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
+      <p className="text-xs text-muted">{t("done.painNote")}</p>
     </section>
   );
 }

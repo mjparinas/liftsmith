@@ -1,11 +1,12 @@
 "use client";
 import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
+import { applyA11y, savedA11y } from "@/lib/a11y";
 import { applyAppearance, savedAppearance } from "@/lib/appearance";
 import { BRAND } from "@/lib/brand";
 import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals, yearGrid } from "@/lib/dashboard";
 import { defaultProfile } from "@/lib/defaults";
-import { derive } from "@/lib/derive";
+import { derive, setWeekStart } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exerciseName, game } from "@/lib/game";
 import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
@@ -93,10 +94,12 @@ export function Dashboard() {
   useEffect(() => {
     track("screen_view", { screen: "me" });
     applyAppearance(savedAppearance());
+    applyA11y(savedA11y());
     load().then((snap) => {
       setNow(Date.now());
       setData({ events: snap.events, profile: snap.profile ?? defaultProfile() });
       applyAppearance(snap.profile?.theme ?? "dark");
+      applyA11y(snap.profile?.a11y);
     });
     // Back from the app tab with new workouts: show them.
     const on = () => document.visibilityState === "visible" && void reload();
@@ -104,7 +107,11 @@ export function Dashboard() {
     return () => document.removeEventListener("visibilitychange", on);
   }, [reload]);
 
-  const stats = useMemo(() => (data ? derive(data.events, now) : null), [data, now]);
+  const stats = useMemo(() => {
+    if (!data) return null;
+    setWeekStart(data.profile.training?.weekStart);
+    return derive(data.events, now);
+  }, [data, now]);
 
   if (!data || !stats) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   const { events, profile } = data;

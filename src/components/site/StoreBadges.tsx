@@ -31,8 +31,8 @@ function Badge({ href, store, small, big, logo, cta }: { href: string | null; st
     <>
       {logo}
       <span className="flex flex-col leading-none">
-        <span className="text-[10px] font-medium tracking-wide">{small}</span>
-        <span className="mt-0.5 text-[19px] font-semibold tracking-tight">{big}</span>
+        <span className="text-[0.625rem] font-medium tracking-wide">{small}</span>
+        <span className="mt-0.5 text-[1.1875rem] font-semibold tracking-tight">{big}</span>
       </span>
     </>
   );
@@ -48,7 +48,7 @@ function Badge({ href, store, small, big, logo, cta }: { href: string | null; st
       <span className={`${cls} opacity-60`} aria-hidden>
         {body}
       </span>
-      <span aria-hidden className="absolute -top-2 -right-2 rounded-full bg-accent px-2 py-0.5 text-[10px] font-bold text-accent-ink uppercase">
+      <span aria-hidden className="absolute -top-2 -right-2 rounded-full bg-accent px-2 py-0.5 text-[0.625rem] font-bold text-accent-ink uppercase">
         Soon
       </span>
     </span>

@@ -47,17 +47,18 @@ export const juice = {
  */
 export type HapticKind = "select" | "tick" | "toggle" | "tap" | "thud" | "double" | "success" | "warning" | "error" | "celebrate";
 
-export function haptic(kind: HapticKind) {
-  if (!feel.haptics) return;
+/** `force` buzzes even with Vibration off: the rest-over alert has its own setting (training.ts restAlertOf). */
+export function haptic(kind: HapticKind, force = false) {
+  if (!feel.haptics && !force) return;
   if (kind === "celebrate") {
     // A crisp double tap then a success buzz, for PRs, level-ups and badges.
-    haptic("double");
-    setTimeout(() => haptic("success"), 220);
+    haptic("double", force);
+    setTimeout(() => haptic("success", force), 220);
     return;
   }
   if (kind === "double" && isNative()) {
-    haptic("tap");
-    setTimeout(() => haptic("tap"), 90);
+    haptic("tap", force);
+    setTimeout(() => haptic("tap", force), 90);
     return;
   }
   const h = cap()?.Plugins?.Haptics;
@@ -175,12 +176,12 @@ export const sound = {
     if (feel.sound) phrase([[NOTE.A4, 0, 0.16, 0.45], [NOTE.Cs5, 0.07, 0.16, 0.45], [NOTE.E5, 0.14, 0.18, 0.5], [NOTE.A5, 0.21, 0.32, 0.55]]);
   },
   /** The last three seconds of rest. */
-  countdown() {
-    if (feel.sound) mallet(NOTE.E5, 0, 0.09, 0.4);
+  countdown(on = feel.sound) {
+    if (on) mallet(NOTE.E5, 0, 0.09, 0.4);
   },
   /** Rest is over: a clear phrase that cuts through gym music, in the chosen timer sound. */
-  restEnd() {
-    if (!feel.sound) return;
+  restEnd(on = feel.sound) {
+    if (!on) return;
     const t = this.theme;
     if (t === "chime") phrase([[NOTE.E5, 0, 0.7, 0.7], [NOTE.A5, 0.18, 0.7, 0.7], [NOTE.Cs6, 0.36, 0.9, 0.8]]);
     else if (t === "arcade") phrase([NOTE.A5, NOTE.B5, NOTE.Cs6, NOTE.E6, NOTE.A6].map((f, i) => [f, i * 0.07, 0.1, 0.7] as [number, number, number, number]));

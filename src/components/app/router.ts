@@ -1,11 +1,11 @@
 "use client";
 import { useEffect, useState } from "react";
 
-export type Route = "today" | "workout" | "recovery" | "stats" | "gym" | "settings" | "done" | "setup" | "feedback" | "achievements" | "recap" | "photos" | "programs" | "injuries";
+export type Route = "today" | "workout" | "recovery" | "stats" | "gym" | "settings" | "done" | "setup" | "feedback" | "achievements" | "recap" | "photos" | "programs" | "injuries" | "training" | "tools";
 
 export function parse(hash: string): { route: Route; arg?: string } {
   const [, r, arg] = hash.replace(/^#/, "").split("/");
-  const route = (["today", "workout", "recovery", "stats", "gym", "settings", "done", "setup", "feedback", "achievements", "recap", "photos", "programs", "injuries"] as Route[]).includes(r as Route) ? (r as Route) : "today";
+  const route = (["today", "workout", "recovery", "stats", "gym", "settings", "done", "setup", "feedback", "achievements", "recap", "photos", "programs", "injuries", "training", "tools"] as Route[]).includes(r as Route) ? (r as Route) : "today";
   return { route, arg };
 }
 

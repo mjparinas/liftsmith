@@ -1,3 +1,4 @@
+import { translated } from "./i18n";
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
 // own unit (so 45 lb plates stay exactly 45 lb) and converted at the edges (src/lib/units.ts).
 
@@ -25,26 +26,8 @@ export const MUSCLES = [
 ] as const;
 export type Muscle = (typeof MUSCLES)[number];
 
-export const MUSCLE_LABEL: Record<Muscle, string> = {
-  chest: "Chest",
-  frontDelts: "Front delts",
-  sideDelts: "Side delts",
-  rearDelts: "Rear delts",
-  biceps: "Biceps",
-  triceps: "Triceps",
-  forearms: "Forearms",
-  abs: "Abs",
-  obliques: "Obliques",
-  traps: "Traps",
-  upperBack: "Upper back",
-  lats: "Lats",
-  lowerBack: "Lower back",
-  glutes: "Glutes",
-  quads: "Quads",
-  hamstrings: "Hamstrings",
-  adductors: "Adductors",
-  calves: "Calves",
-};
+/** Muscle names in the current language (src/locales, keys `muscle.*`). */
+export const MUSCLE_LABEL: Record<Muscle, string> = translated(MUSCLES, (m) => `muscle.${m}`);
 
 /** Large muscles take longer to recover (about 72 h against 48 h). */
 export const LARGE_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "lowerBack", "glutes", "quads", "hamstrings"]);
@@ -231,6 +214,12 @@ export interface Profile {
    */
   birthYear?: number;
   sex?: "male" | "female";
+  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Tools › TDEE. */
+  heightCm?: number;
+  /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
+  bodyFat?: { pct: number; at: number };
+  /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */
+  tdee?: { activity?: "sedentary" | "light" | "moderate" | "heavy" | "athlete"; useBodyFat?: boolean };
   /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
   knownMaxes?: Partial<Record<string, number>>;
   /**
@@ -252,12 +241,64 @@ export interface Profile {
   planSource?: PlanSource;
   /** Appearance: dark (default), light, or follow the system (theme.ts). */
   theme?: "dark" | "light" | "system";
+  /** Accessibility: text size, colour-blind safe colours, contrast (a11y.ts). */
+  a11y?: import("./a11y").A11y;
+  /** Language: follow the phone, or a chosen one (i18n.ts). */
+  language?: import("./i18n").LangPref;
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */
   routines?: Routine[];
+  /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
+  training?: TrainingPrefs;
+  /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
+  minutesDay?: string;
   onboarded: boolean;
   updatedAt: number;
+}
+
+/** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
+export type EffortScale = "rir" | "rpe";
+/** The rest-over alert: sound, vibration, both, or neither (the timer still shows). */
+export type RestAlert = "both" | "sound" | "vibrate" | "silent";
+
+/** One exercise's own rest, rep range and working sets, set by the lifter. */
+export interface ExercisePrefs {
+  /** Seconds. */
+  rest?: number;
+  /** Lowest and highest reps for double progression. */
+  reps?: [number, number];
+  sets?: number;
+}
+
+/**
+ * Workout preferences (Melvin, 2026-11-09). Every field is optional; missing means the automatic
+ * choice (by goal, by the block, or the old default), so older profiles load unchanged.
+ */
+export interface TrainingPrefs {
+  /** Default rest in seconds for compound lifts and for isolation work. */
+  rest?: { compound?: number; isolation?: number };
+  /** Preferred rep ranges for compound lifts and for isolation work. */
+  reps?: { compound?: [number, number]; isolation?: [number, number] };
+  /** Working sets per exercise. Missing is automatic (3, 4 on the first big lifts, more when time allows). */
+  sets?: number;
+  /** Per-exercise overrides, keyed by exercise id. They win over everything above. */
+  exercises?: Record<string, ExercisePrefs>;
+  effort?: EffortScale;
+  /** Start the rest timer by itself after Log set. Missing means on. */
+  autoRest?: boolean;
+  /** Missing means it follows Sounds and Vibration. */
+  restAlert?: RestAlert;
+  /** Keep the screen on during a workout. Missing means on. */
+  keepAwake?: boolean;
+  /** Exercises the planner picks first when they fit. */
+  favourites?: string[];
+  /** Muscles that get more weekly sets and go first in the plan. */
+  priorities?: Muscle[];
+  /** Default workout length (minutes) the slider goes back to each day. Missing means it stays where it was left. */
+  minutes?: number;
+  /** 1 Monday (default) or 0 Sunday: streaks, quests and weekly stats. */
+  weekStart?: 0 | 1;
 }
 
 export type PlanSource =
@@ -423,6 +464,30 @@ export interface BodyweightEvent extends EventBase {
 }
 
 /**
+ * A TDEE snapshot (tdee.ts), recorded whenever an input that matters changes, so the history and graph
+ * keep the past even after the profile moves on. Calories a day.
+ */
+export interface TdeeEvent extends EventBase {
+  type: "tdee";
+  kcal: number;
+  bmr: number;
+  kg: number;
+  cm: number;
+  age: number;
+  sex: "male" | "female";
+  activity: "sedentary" | "light" | "moderate" | "heavy" | "athlete";
+  /** Where the activity level came from: the lifter's workouts, the days-a-week goal, or picked by hand. */
+  activitySource: "workouts" | "plan" | "manual";
+  /** Training days a week behind an automatic activity level. */
+  perWeek?: number;
+  bodyFat?: number;
+  formula: "mifflin" | "katch";
+  /** Recorded on its own when an input changed, or saved from the calculator. */
+  trigger: "auto" | "manual";
+  changes: ("first" | "weight" | "age" | "height" | "sex" | "activity" | "bodyFat" | "recheck")[];
+}
+
+/**
  * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
  * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
  */
@@ -510,4 +575,4 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
+export type AppEvent = BodyweightEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;

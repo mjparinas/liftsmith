@@ -16,7 +16,7 @@ import { connectHealth, healthAvailable, readHints } from "@/lib/health";
 import { analyticsOn, platformStore, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { go } from "./router";
-import { Button } from "./ui";
+import { BumpField, Button } from "./ui";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
@@ -101,6 +101,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     setPrefilled(true);
     const h = await readHints();
     if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
+    // Height isn't asked in setup, but TDEE (Tools) uses it, so keep it when Health has it.
+    if (h.height && h.height >= 100 && h.height <= 250) setProfile({ heightCm: Math.round(h.height) });
     setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
   };
 
@@ -185,12 +187,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             )}
             {healthNote && <p className="mt-2 text-sm text-muted">{healthNote}</p>}
             <div className="mt-3 flex items-center gap-3">
-              <input inputMode="numeric" value={bw} onChange={(e) => setBw(Number(e.target.value.replace(/\D/g, "")) || 0)} className="num w-32 rounded-2xl border border-line bg-surface px-4 py-3 text-2xl font-semibold" aria-label="Body weight" />
+              <BumpField value={bw ? String(bw) : ""} onChange={(v) => setBw(Number(v) || 0)} step={1} start={unit === "lb" ? 170 : 75} max={unit === "lb" ? 700 : 320} label="Body weight" size="lg" className="w-56" />
               <span className="text-muted">{unit}</span>
             </div>
             <div className="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3">
               <label htmlFor="setup-age" className="font-semibold">Age</label>
-              <input id="setup-age" inputMode="numeric" placeholder="Optional" value={age} onChange={(e) => setAge(e.target.value.replace(/\D/g, "").slice(0, 3))} className="num w-32 rounded-2xl border border-line bg-surface px-4 py-3 text-lg" />
+              <BumpField id="setup-age" label="age" placeholder="Optional" value={age} onChange={(v) => setAge(v.slice(0, 3))} step={1} start={30} min={13} max={110} className="w-48" />
               <span className="font-semibold" id="setup-sex">Sex</span>
               <div className="flex gap-2" role="group" aria-labelledby="setup-sex">
                 {(["female", "male"] as const).map((x) => (
@@ -208,12 +210,14 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               <div className="mt-2 space-y-2">
                 <p className="text-sm text-muted">Your best recent set of each, and we&apos;ll start from there.</p>
                 {KNOWN.map((k) => (
-                  <div key={k.id} className="flex items-center gap-2">
-                    <span className="w-32 text-sm">{k.name}</span>
-                    <input inputMode="decimal" placeholder={unit} aria-label={`${k.name} weight`} value={maxes[k.id].w} onChange={(e) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w: e.target.value.replace(/[^\d.]/g, "") } })} className="num w-24 rounded-xl border border-line bg-surface px-3 py-2" />
-                    <span className="text-muted">×</span>
-                    <input inputMode="numeric" aria-label={`${k.name} reps`} value={maxes[k.id].r} onChange={(e) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: e.target.value.replace(/\D/g, "").slice(0, 2) } })} className="num w-16 rounded-xl border border-line bg-surface px-3 py-2" />
+                  <div key={k.id}>
+                    <span className="text-sm font-medium">{k.name}</span>
+                    <div className="mt-1 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1.5">
+                    <BumpField label={`${k.name} weight`} placeholder={unit} value={maxes[k.id].w} onChange={(w) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w } })} step={unit === "lb" ? 5 : 2.5} start={unit === "lb" ? 135 : 60} max={unit === "lb" ? 1500 : 700} className="min-w-0" />
+                    <span className="text-sm text-muted">{unit}</span>
+                    <BumpField label={`${k.name} reps`} value={maxes[k.id].r} onChange={(r) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: r.slice(0, 2) } })} step={1} start={5} min={1} max={30} className="min-w-0" />
                     <span className="text-sm text-muted">reps</span>
+                    </div>
                   </div>
                 ))}
               </div>
