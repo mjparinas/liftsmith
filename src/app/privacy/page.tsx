@@ -36,11 +36,13 @@ export default function Privacy() {
 
       <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
       <p className="mt-2">Phone reminders are scheduled on your phone from your own data and send nothing to us. If you turn on email reminders, we keep your email address, which kinds of email you chose, when you agreed, and only what&apos;s needed to time them: your training days and time, time zone, days-a-week goal, when you finished setup, when your first and latest workouts were, how many days you trained this week, your streak and whether you have Pro. Never your weights, reps, heart rate or health data. Nothing is sent until you confirm the address, offers stay off unless you turn them on, and every email has a one-click unsubscribe link. Stop all email in Settings › Reminders, or erase this device, and we delete your address and its history.</p>
+      <h2 className="mt-8 text-xl font-semibold">Subscriptions</h2>
+      <p className="mt-2">Pro is bought through Google Play or the App Store, which take the payment; we never see your card. RevenueCat checks the store&apos;s receipts for us so the app knows whether you have Pro. It receives your random install id, the plan, its price, currency and country, trial and renewal dates, and the store&apos;s purchase receipt. Never your name, email, workouts or health data. The stores also tell us (through RevenueCat) when a subscription starts, renews, is cancelled or refunded, so we can count revenue.</p>
       <h2 className="mt-8 text-xl font-semibold">Feedback and bug reports</h2>
       <p className="mt-2">If you send feedback, we receive your message, your email if you give it, a screenshot if you attach one, and device details if you allow them. We use them only to answer you and fix problems.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Who processes it</h2>
-      <p className="mt-2">Usage stats and site visits are stored in our database (Turso), on servers run by Vercel. Emails go through Resend. None of them may use the data for their own purposes. We keep usage stats for up to 25 months.</p>
+      <p className="mt-2">Usage stats and site visits are stored in our database (Turso), on servers run by Vercel. Emails go through Resend. Subscriptions are checked by RevenueCat. None of them may use the data for their own purposes. We keep usage stats for up to 25 months.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>
       <p className="mt-2">Turn usage stats off in Settings. Erase everything on your device from Settings › Erase this device. To ask what we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under Settings › Usage stats) and we&apos;ll do it within 30 days.</p>

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Integration test: the whole app from first run to a finished workout, through the real store
 // and IndexedDB (fake-indexeddb), the way a lifter uses it.
-import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useApp } from "@/lib/store";
@@ -59,8 +59,11 @@ describe("Pro trial offer", () => {
     expect(useApp.getState().profile.pro).toBeUndefined();
   });
 
-  it("ends first-run setup with the trial offer, yearly first, and records the choice", async () => {
-    setBillingLive(true);
+  it("ends first-run setup with the store's trial offer, yearly first, and a free plan to fall back on", async () => {
+    setBillingLive(true, null, [
+      { plan: "annual", price: "$39.99", perMonth: "$3.33", trialDays: 14 },
+      { plan: "monthly", price: "$6.99", trialDays: 14 },
+    ]);
     const user = userEvent.setup();
     render(<App />);
     await screen.findByText("What are you training for?");
@@ -68,11 +71,22 @@ describe("Pro trial offer", () => {
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
     for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await screen.findByText("Try Pro free for 14 days");
-    const plans = screen.getAllByRole("button", { name: /Start free trial/ });
+    const plans = screen.getAllByRole("button", { name: /free trial/ });
     expect(plans[0].textContent).toMatch(/Yearly/);
-    await user.click(plans[0]);
+    expect(plans[0].textContent).toMatch(/then \$39\.99 a year/);
+    expect(screen.getByRole("button", { name: "Restore purchases" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
     await screen.findByText("Today's workout");
-    expect(useApp.getState().profile.pro).toMatchObject({ plan: "annual", trialDays: 14 });
+    // No Pro: Today follows the free classic 5x5, and the recovery map is locked.
+    expect(useApp.getState().profile.pro).toMatchObject({ declinedAt: expect.any(Number) });
+    expect(useApp.getState().profile.planSource).toMatchObject({ kind: "program", id: "classic-5x5" });
+    expect(useApp.getState().profile.proPlan).toEqual({ kind: "adaptive" });
+    await user.click(screen.getByRole("button", { name: "Recovery" }));
+    expect(await screen.findByText("The recovery map is part of Pro")).toBeInTheDocument();
+    // Pro arrives (a purchase, a restore): their adaptive plan comes back.
+    act(() => setBillingLive(true, { active: true, trial: true, plan: "annual", expiresAt: Date.now() + 14 * 86_400_000, willRenew: true }));
+    await waitFor(() => expect(useApp.getState().profile.planSource).toEqual({ kind: "adaptive" }));
+    expect(useApp.getState().profile.proPlan).toBeUndefined();
   });
 });
 
