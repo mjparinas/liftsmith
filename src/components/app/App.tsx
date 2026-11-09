@@ -1,4 +1,5 @@
 "use client";
+import { stopSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
 import { Done } from "./Done";
@@ -25,6 +26,23 @@ export function App() {
     void init();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
   }, [init]);
+  // A workout left running ends itself a few hours after the last set (checked each minute and on open).
+  useEffect(() => {
+    if (!ready) return;
+    const check = () => {
+      if (useApp.getState().autoEnd()) {
+        void stopSession();
+        if (location.hash.startsWith("#/workout")) go("today");
+      }
+    };
+    check();
+    const id = setInterval(check, 60_000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [ready]);
   useEffect(() => {
     if (ready && active && route === "today" && sessionStorage.getItem("ls.resumed") !== "1") {
       sessionStorage.setItem("ls.resumed", "1");

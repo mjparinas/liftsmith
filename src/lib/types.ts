@@ -207,6 +207,21 @@ export interface SetEvent extends EventBase {
   targetReps: number;
   /** Reps in reserve the plan aimed for. */
   rir: number;
+  // Captured automatically (Melvin, 2026-11-09: "win on data"). Optional so older events still load.
+  /** Kilograms the plan suggested, to compare with what was lifted. */
+  targetWeight?: number;
+  /** When the work started (ms): the end of the rest before it, or the start of the exercise. */
+  startedAt?: number;
+  /** Seconds from start to Log set. Left out when the gap is too long to be one set. */
+  durationSec?: number;
+  /** Seconds actually rested before this set (planned rest plus any +30 s or early skip). */
+  restSec?: number;
+  hrAvg?: number;
+  hrMax?: number;
+  /** Heart rate at Log set, the peak effort of the set. */
+  hrEnd?: number;
+  /** Part of a challenge (e.g. as many reps as possible on the last set). */
+  challenge?: boolean;
 }
 
 export interface SessionStartEvent extends EventBase {
@@ -214,6 +229,12 @@ export interface SessionStartEvent extends EventBase {
   sessionId: string;
   gymId: string;
   minutes: number;
+  /** The day's push / normal / recover call the plan was built with, and its score. */
+  call?: "push" | "normal" | "recover";
+  readiness?: number;
+  /** The lifter changed the call before starting. */
+  callOverridden?: boolean;
+  challenge?: boolean;
 }
 
 export interface SessionEndEvent extends EventBase {
@@ -222,7 +243,23 @@ export interface SessionEndEvent extends EventBase {
   seconds: number;
   avgHr?: number;
   maxHr?: number;
+  minHr?: number;
   kcal?: number;
+  /** Seconds under load (sum of set durations) and resting between sets. */
+  workSec?: number;
+  restSec?: number;
+  /** Ended automatically because the workout was left running (see AUTO_END_MS in store.ts). */
+  auto?: boolean;
+}
+
+/** The whole heart rate stream of a session, saved once at the end. */
+export interface HrSeriesEvent extends EventBase {
+  type: "hrSeries";
+  sessionId: string;
+  /** Session start (ms); t holds whole seconds from it. */
+  start: number;
+  t: number[];
+  bpm: number[];
 }
 
 export type Rating = -1 | 0 | 1;
@@ -244,4 +281,4 @@ export interface SwapEvent extends EventBase {
   avoid: boolean;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent;
+export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent;
