@@ -13,13 +13,23 @@ export interface SessionState {
   restUntil: number | null;
   setLabel: string;
   hr?: number;
+  /** Whether the native rest-over alert plays a sound (vibration always runs). */
+  sound?: boolean;
 }
 
-type Plugin = { update(s: SessionState): Promise<void>; stop(): Promise<void> };
+export type SessionAction = "log" | "add30";
+type Handle = { remove(): Promise<void> };
+type Plugin = {
+  update(s: SessionState): Promise<void>;
+  stop(): Promise<void>;
+  requestPermission(): Promise<{ granted: boolean }>;
+  addListener(event: "action", cb: (e: { action: SessionAction }) => void): Promise<Handle>;
+};
 const plugin = (): Plugin | undefined => (typeof window !== "undefined" ? (window as unknown as { Capacitor?: { Plugins?: { WorkoutSession?: Plugin } } }).Capacitor?.Plugins?.WorkoutSession : undefined);
 
 export async function notifyPermission(): Promise<boolean> {
-  if (isNative()) return true;
+  const p = plugin();
+  if (p && isNative()) return (await p.requestPermission()).granted;
   if (typeof Notification === "undefined") return false;
   if (Notification.permission === "granted") return true;
   if (Notification.permission === "denied") return false;
@@ -50,6 +60,14 @@ export async function restOverAlert(next: string) {
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   const reg = await navigator.serviceWorker?.getRegistration();
   await reg?.showNotification("Rest over", { tag: "rest", body: `Up next: ${next}`, vibrate: [200, 100, 200], icon: "/icon-192.png" } as NotificationOptions);
+}
+
+/** Log set / +30 s buttons on the native notification. Returns an unsubscribe function. */
+export function onSessionAction(cb: (a: SessionAction) => void): () => void {
+  const p = plugin();
+  if (!p || !isNative()) return () => {};
+  const handle = p.addListener("action", (e) => cb(e.action));
+  return () => void handle.then((h) => h.remove());
 }
 
 export async function stopSession() {

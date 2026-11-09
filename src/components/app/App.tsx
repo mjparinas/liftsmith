@@ -1,4 +1,5 @@
 "use client";
+import { stopSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
 import { Done } from "./Done";
@@ -23,8 +24,25 @@ export function App() {
   const { route } = useRoute();
   useEffect(() => {
     void init();
-    if ("serviceWorker" in navigator && location.hostname !== "localhost") void navigator.serviceWorker.register("/sw.js");
+    if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
   }, [init]);
+  // A workout left running ends itself a few hours after the last set (checked each minute and on open).
+  useEffect(() => {
+    if (!ready) return;
+    const check = () => {
+      if (useApp.getState().autoEnd()) {
+        void stopSession();
+        if (location.hash.startsWith("#/workout")) go("today");
+      }
+    };
+    check();
+    const id = setInterval(check, 60_000);
+    document.addEventListener("visibilitychange", check);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener("visibilitychange", check);
+    };
+  }, [ready]);
   useEffect(() => {
     if (ready && active && route === "today" && sessionStorage.getItem("ls.resumed") !== "1") {
       sessionStorage.setItem("ls.resumed", "1");
@@ -35,8 +53,9 @@ export function App() {
   if (!ready) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done /> }[route];
-  const showNav = route !== "workout" && route !== "done";
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun /> }[route];
+  const showNav = route !== "workout" && route !== "done" && route !== "setup";
+  if (route === "setup") return screen;
   return (
     <>
       <main className="safe-top mx-auto max-w-lg px-5">{screen}</main>

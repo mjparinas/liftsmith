@@ -7,20 +7,29 @@ The full plan with stages lives in the plan doc: https://claude.ai/artifact/S24k
 ## Commands
 
 ```bash
-npm run dev        # http://localhost:3000 (public site), http://localhost:3000/app/ (the app)
-npm test           # engine tests (Vitest)
-npm run typecheck
-npm run build      # static export to out/
-npx cap sync android   # copy out/ into the Android shell (after npm run build)
+npm run dev                  # http://localhost:3000 (public site), http://localhost:3000/app/ (the app)
+npm test                     # unit + integration tests (Vitest; engine in node, screens in jsdom)
+npm run test:coverage
+npm run test:mutation        # Stryker on the engine; report in reports/mutation/
+npm run lint && npx tsc --noEmit
+npm run build                # static export to out/
+node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
+node scripts/e2e-offline.mjs # real offline after one visit
+node scripts/e2e-devices.mjs # layout on 8 phones and tablets
+node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
+npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build)
 ```
 
 There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions (`.github/workflows/android.yml`).
 
 ## Platform parity (rule, Melvin, 2026-11-09)
 
-- **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
+- **Android and iOS ship together.** Every feature lands on both platforms in the same change: native Android code (Java or Kotlin in `android/`) and native iOS code (Swift in `ios/`) for anything the web layer can't do. A pull request that adds or changes a native feature on one platform must do the same on the other, or say in its description why it can't (for example, a platform API that doesn't exist) and what the other platform does instead.
 - Platform equivalents: Health Connect ↔ HealthKit (Apple Health); foreground-service notification ↔ Live Activity (lock screen and Dynamic Island); Play Billing ↔ StoreKit; Sign in with Google ↔ Sign in with Apple (both offered on iOS); Wear OS ↔ Apple Watch.
-- CI builds both apps on every pull request that touches app code.
+- CI builds both apps on every pull request (`android` and `ios` jobs in `ci.yml`).
+- **Live workout notification today:** Android runs a foreground service (`WorkoutService.java`) with an ongoing notification: lock-screen rest countdown (chronometer), next set and plates, heart rate, and Log set / +30 s buttons, plus a rest-over alert. iOS (`WorkoutSessionPlugin.swift`) schedules a time-sensitive rest-over notification with the same two buttons. The iOS lock-screen countdown needs a Live Activity (a widget extension target), which is the next parity item. Both are driven by the same `WorkoutSession` calls in `src/lib/sessionNotify.ts`.
+- Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins).
+- Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
 
 ## Product decisions
 
@@ -46,14 +55,38 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Plates.** Every suggested barbell weight is one the lifter's plates can make. The plate solver is a bounded knapsack (a greedy fill misses some combinations), prefers fewest plates, then heaviest first, and works in the gym's unit so 45 lb plates stay exact (`plates.ts`). Plate colours follow the common competition convention.
 - **Units.** Weights are stored in kilograms; a gym's plates, bars and dumbbells are stored in the gym's unit and converted at the edges (`units.ts`).
 
+### Setup wizard (Melvin, 2026-11-09)
+- First run opens a short wizard (`src/components/app/Onboarding.tsx`): goal and experience; gym and units; days a week and body weight; notifications and a heart rate monitor. Health connections (Health Connect, Apple Health, readiness sources) join it as they land, and should prefill age, body weight and height when the user allows it.
+- **It can be run again** from Settings ("Run setup again", `#/setup`). A rerun keeps existing gyms unless the user picks one to add, and never touches workout history.
+- One question per screen, big tiles, every step optional except the first three, under a minute in total.
+
 ### Workout screen
 - Big target weight and reps with steppers, the barbell plate graphic for every barbell set, a big Log set button, an automatic rest timer with +30 s and Skip, and the next set's plates shown during rest so the lifter can load while resting.
 - **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`). On iOS this will be a Live Activity.
 - The screen stays on during a workout (wake lock).
 
+### Workout data and coaching (Melvin, 2026-11-09: "win on data")
+- **Capture everything, automatically, with no extra taps.** Every set stores weight, reps, the planned weight, reps and RIR, when the work started, its duration, the rest actually taken before it, and heart rate during the set (average, peak, and the value at Log set). Every session stores its length, time under load, total rest, average, max and min heart rate, and the call it was built with (push / normal / easy, readiness score, whether the lifter overrode it). The **full heart rate stream** (one sample a second) is saved as an `hrSeries` event at the end, and the in-progress stream is checkpointed to localStorage every 15 samples.
+- **Set duration** runs from the end of the rest (timer ran out or Skip) to Log set. When the lifter logs before the rest ends, or the gap is far longer than a set could take, the duration is left out rather than guessed. A watch or HR-based set detector can refine this later.
+- **Forgotten workouts end themselves** 3 hours after the last activity (`AUTO_END_MS`), checked on open, every minute, and when the app comes back to the foreground. The end time is set to where the lifter stopped (last activity plus a minute), not when it was noticed, and the session is marked `auto`.
+- **The data drives the next workout** (`src/lib/readiness.ts`). A daily readiness score (50 baseline) from big-muscle recovery, days since the last workout and back-to-back days, target reps hit in the last two workouts, how sets felt, rep speed against the lifter's own history for the same exercises, and session heart rate against their usual. Sleep, HRV, resting HR and the pre-workout check-in plug into the same score when connected (integrations roadmap, step 2).
+  - 65 or more is a **push day**: the first compound lift goes one rep closer to failure. 35 or less is an **easy day**: one set fewer per exercise (minimum 2), a step lighter, one more rep in reserve, and no extra filler sets. A deload week is never a push day.
+  - **Challenges:** on about 30% of push days, at most one a week and never in a deload, the first compound's last set is as many good reps as possible. Challenge sets are flagged, so they don't skew the missed-reps signal.
+  - Today shows the call, the score, the top three reasons, and Go easy / As planned / Push buttons. **The lifter can always override**, and overrides are recorded.
+  - Weights and reps for the next session keep coming from `progression.ts` (double progression plus feedback), now on richer data.
+
 ### Heart rate and health
 - **Live heart rate comes over Bluetooth**, not Health Connect, because Health Connect gets Fitbit data in batches, often minutes late. Any standard heart rate broadcaster works (Heart Rate Service 0x180D): Fitbit Charge 6 and Pixel Watch "share heart rate", Polar, Garmin, Wahoo straps (`heartRate.ts`).
-- **Health Connect** (Android) reads heart rate history and writes finished workouts and calories, so they show in Google's and Fitbit's apps. **Apple Health** (HealthKit) does the same on iOS.
+- **Health Connect** (Android) and **Apple Health** (iOS) go through one plugin, `@capgo/capacitor-health` (`src/lib/health.ts`). Reads (weight, height, body fat, resting HR, HRV, sleep, HR) prefill the wizard's body weight step ("Fill in from Health Connect / Apple Health"). Finished workouts are written as active calories (about 5 METs) and average HR, because the plugin can't write workout sessions yet. The Android Health Connect privacy rationale is `public/privacypolicy.html`.
+- Native heart rate uses `@capacitor-community/bluetooth-le` on both platforms (keeps reading with the screen off; iOS has the `bluetooth-central` background mode). The web build keeps Web Bluetooth.
+
+### Integrations roadmap (Melvin agreed, 2026-11-09; research: https://claude.ai/artifact/UoDvYPVgFxt8wwPuJJS7KH)
+1. **MVP:** Health Connect + HealthKit reads to prefill the wizard, plus writing finished workouts. Bluetooth 0x180D stays the only live heart rate path (straps, Garmin/Polar/Whoop broadcast, Fitbit Charge 6, Pixel Watch). The wizard's connect step offers Health access and heart rate pairing only.
+2. **Next: readiness.** An on-device readiness score from sleep, HRV and resting HR against a 30-day baseline, plus a pre-workout check-in (energy, soreness, feeling unwell). It feeds `generator.ts`/`block.ts` as a low/normal/high adjustment the lifter can override. **Readiness auto-adjust is a Pro feature.**
+3. **Next: music.** Mood playlists chosen in the same check-in and opened by deep link (saved or curated playlists). **No Spotify API** (development mode is capped at 5 users, extended access needs 250k MAU, audio features were removed).
+4. **Integrations server, right after the MVP and ahead of full sync** (Melvin decided, 2026-11-09). A small server on Vercel with libsql/Turso. Its first job is the OAuth exchange and token storage for **Strava, Oura and Whoop**, so all three ship in the first updates. Apply early for Strava Extended Access, Oura approval (including written consent to use their data in Pro features) and Whoop approval, because each caps us at 10 users until approved.
+5. **After that** (full order in the research doc's "How we win" section): Samsung Health Data SDK, a bar-speed sensor, watch apps, a Garmin Connect IQ app.
+- **Skipped:** Hume Health direct (no API; its data arrives through Apple Health), live SpO2, the Google Health API, aggregators, and volume-follows-intensity (Android only, since iOS can't control other apps' volume, so it's skipped for platform parity).
 
 ### Stats and recovery map
 - An original front and back body map (`src/components/BodyMap.tsx`) coloured by recovery band, with a legend.
@@ -66,8 +99,9 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - XP, levels, streaks and trophies are derived from events, never stored (`game.ts`).
 
 ### Money
+- **No ads, ever** (Melvin, 2026-11-09). No ad SDKs, sponsored placements, interstitials or rewarded videos, in either app or on the site. The subscription is the only revenue.
 - **Prices (confirmed by Melvin, 2026-11-09):** Pro is $6.99 a month or $39.99 a year. The annual plan is pushed as "about $3.33 a month, less than half of Fitbod", with a 7-day free trial on the annual plan. **No lifetime plan.**
-- **Free tier:** the workout logger, plate graphic, rest timer and live notification. **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
+- **Free tier:** the workout logger, plate graphic, rest timer and live notification, plus a **classic 5x5 program mode** (Melvin, 2026-11-09; not built yet). **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
 - **Billing is native:** Google Play Billing on Android and StoreKit on iOS, through a Capacitor purchases plugin. The subscription is checked on the device so Pro works offline, and verified by the server once accounts exist.
 - Until billing lands, the app has a single `pro` entitlement switched on, so the paywall drops in without reworking screens.
 
@@ -91,11 +125,31 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Seeded randomness only** in the generator (`random.ts`), never `Math.random`, so plans are reproducible and testable.
 - **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
 
+## Testing (Melvin asked, 2026-11-09: like Gradelings)
+
+- **Unit tests** (`src/lib/*.test.ts`, node) for every engine rule: plates, recovery, blocks, progression, generator, stats, game.
+- **Component and integration tests** (`*.test.tsx`, `// @vitest-environment jsdom`, Testing Library, fake-indexeddb): the whole app from first run to a saved workout through the real store and IndexedDB, steppers, swaps, a bodyweight gym, and a workout surviving a reload.
+- **Browser tests** (Playwright, `scripts/e2e*.mjs`): playthrough, offline, a device layout sweep (no sideways scroll, Log set fully on screen and 48 px+, controls 44 px+), and axe WCAG 2.2 AA with no serious or critical problems. Any console error fails a run.
+- **Mutation tests** (Stryker, `stryker.config.mjs`, Gradelings' Vitest 5 runner in `scripts/stryker-vitest5.mjs`) on the engine, run by hand (not in CI); the run fails below the `break` score. It is a ratchet: the first run scored 34%, so `break` is 30 for now; raise it (target 60, Gradelings aims for 85) as engine tests land.
+- A bug fix comes with a test that fails without it. Flaky tests are fixed at the cause, never retried.
+- Colour tokens must pass contrast: `--color-faint` was raised to `#808c9d` because axe failed `#5b6777`.
+
+## CI/CD (Melvin asked, 2026-11-09: like Gradelings)
+
+- `.github/workflows/ci.yml` on every pull request and push to `main` and `staging`: types, lint (no warnings), dependency audit, unit and integration tests with coverage, build, then browser tests in three parallel jobs. **"CI passed"** is the one required check.
+- `mutation.yml`: **on demand only** (Actions › Mutation tests › Run workflow). Mutation runs are long and expensive, so they never run on pull requests or merges and never gate a merge (Melvin, 2026-11-09). Run one after a batch of engine work and raise `break` when the score rises.
+- `promote-staging.yml` (Melvin confirmed the Gradelings model, 2026-11-09): `main` is production and every pull request targets `staging`. At 09:00 UTC each night it opens a staging → main pull request and merges it when "CI passed" is green on staging's latest commit, then merges `main` back into `staging`. Run it by hand from the Actions tab to ship sooner. Scheduled workflows only run from the default branch, so the file must be on `main` before the nightly run starts. It needs "Allow GitHub Actions to create and approve pull requests" on, and `PROMOTE_TOKEN` if `main` requires reviews.
+- `ci.yml` also builds an Android debug APK (uploaded as an artifact to install and try) and an unsigned iOS simulator build on every pull request. Both are part of "CI passed".
+- `release.yml`: on every promotion to `main` and on demand, builds a signed Android App Bundle and uploads it to the Play **internal** track, and archives iOS and uploads it to **TestFlight**. Version name comes from `package.json`, build number from the run number. Each platform skips itself with a notice until its secrets exist. Promoting past internal testing stays a human step in the store consoles.
+- Secrets: `ANDROID_KEYSTORE_B64` (base64 upload keystore, alias `upload`), `ANDROID_KEYSTORE_PASSWORD`, `PLAY_SERVICE_ACCOUNT_JSON`, `APPLE_TEAM_ID`, `ASC_KEY_ID`, `ASC_ISSUER_ID`, `ASC_KEY_P8` (App Store Connect API key, App Manager role). The first Android upload must be done by hand in Play Console before the API can upload.
+- Web deploys through Vercel's Git integration: `main` is production, `staging` and pull requests get previews.
+- Dependabot targets `staging`, weekly.
+
 ## Borrowed from Gradelings (Melvin asked, 2026-11-09)
 
 Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings code where it fits rather than rewriting it.
 
-- **Branches and merging:** pull requests go to `staging`; a nightly workflow promotes `staging` to `main` when CI is green (one production build a day). Agents may merge a pull request into `staging` once every check, including "CI passed", is green; never into `main`. Flaky tests are fixed at the cause, never retried.
+- **Branches and merging:** pull requests go to `staging`; a nightly workflow promotes `staging` to `main` when CI is green (one production build a day). **Agents watch CI on every pull request they open and merge it into `staging` as soon as every check, including "CI passed", is green; when a check fails they find the cause, push a fix and repeat until it merges** (Melvin, 2026-11-09). Agents never merge into `main`; only the nightly promotion does. Flaky tests are fixed at the cause, never retried.
 - **Feature flags** defined in code (`src/lib/flags.ts`), state on the server, cached on the device for offline use, so a feature can be switched off without a store release. A/B tests read through the same path.
 - **Admin panel** (`/admin/`, admin emails from the environment, every change audited): subscriptions, trial-to-paid, a weekly retention table, revenue, users, a read-only support role, maintenance mode and alerts. The owner's test account is left out of every metric.
 - **Error reporting:** Sentry with a scrubber (no workout notes, names or health data leave the device), loaded only when something goes wrong.
@@ -113,5 +167,5 @@ Patterns from `mjparinas/gradelings` adopted for Liftsmith. Copy the Gradelings 
 
 ## Open items
 - Confirm the Android package id and register a domain.
-- A GitHub repo for the project (cloud sessions can't create repos; Melvin to create one).
-- Play Console account, Health Connect permissions declaration, privacy policy page.
+- Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
+- iOS Live Activity for the lock-screen rest countdown (widget extension), to match Android.

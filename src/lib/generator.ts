@@ -1,4 +1,6 @@
 import { blockWeek, weekStart, type BlockWeek } from "./block";
+import { stepLoad } from "./loads";
+import type { Call } from "./readiness";
 import { available, EXERCISE_BY_ID } from "./exercises";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
@@ -16,6 +18,8 @@ export interface PlanItem {
   restSec: number;
   focus: Muscle;
   target: Target;
+  /** Challenge: the last set is as many good reps as possible at the target weight. */
+  challenge?: boolean;
 }
 
 export interface Plan {
@@ -23,6 +27,9 @@ export interface Plan {
   minutes: number;
   estMinutes: number;
   week: BlockWeek;
+  /** The day's call the plan was built with (readiness.ts). */
+  call: Call;
+  challenge: boolean;
   items: PlanItem[];
 }
 
@@ -34,6 +41,9 @@ export interface GenerateInput {
   now: number;
   /** Exercises to leave out (e.g. swapped away this session). */
   exclude?: readonly string[];
+  /** Today's push / normal / recover call, after any override by the lifter. */
+  call?: Call;
+  challenge?: boolean;
 }
 
 const KEEP = { consistent: 0.75, balanced: 0.5, variable: 0.25 } as const;
@@ -101,7 +111,7 @@ function order(a: Exercise, b: Exercise): number {
   return rank(a) - rank(b);
 }
 
-export function generate({ gym, profile, events, minutes, now, exclude = [] }: GenerateInput): Plan {
+export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false }: GenerateInput): Plan {
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
@@ -167,14 +177,37 @@ export function generate({ gym, profile, events, minutes, now, exclude = [] }: G
   for (const item of items) {
     const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
     const extra = setSeconds(ex, item.target.reps) + item.restSec;
-    if (item.sets < 5 && !week.deload && total + extra <= budget) {
+    if (item.sets < 5 && !week.deload && call !== "recover" && total + extra <= budget) {
       item.sets += 1;
       total += extra;
     }
   }
 
   items.sort((a, b) => order(EXERCISE_BY_ID.get(a.exerciseId)!, EXERCISE_BY_ID.get(b.exerciseId)!));
-  return { gymId: gym.id, minutes, estMinutes: Math.round(total / 60), week, items };
+  applyCall(items, call, challenge && call === "push" && !week.deload, gym);
+  const est = items.reduce((s, i, n) => s + itemSeconds(i) + (n ? i.restSec : 0), 0) + (items.some((i) => EXERCISE_BY_ID.get(i.exerciseId)!.load === "barbell") ? WARMUP_SEC : 0);
+  return { gymId: gym.id, minutes, estMinutes: Math.round(est / 60), week, call, challenge: items.some((i) => i.challenge), items };
+}
+
+/** Turns the day's call into the plan: easy days drop a set and a step of load, push days go one rep closer to failure on the first lift. */
+function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) {
+  if (call === "recover") {
+    for (const item of items) {
+      const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
+      item.sets = Math.max(2, item.sets - 1);
+      if (ex.load === "bodyweight" || TIMED.has(ex.id)) item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: "Easy day: fewer reps" };
+      else item.target = { ...item.target, weight: stepLoad(item.target.weight, -1, ex, gym), rir: item.target.rir + 1, note: "Easy day: a step lighter" };
+    }
+    return;
+  }
+  if (call !== "push") return;
+  const first = items.find((i) => EXERCISE_BY_ID.get(i.exerciseId)!.compound && !TIMED.has(i.exerciseId));
+  if (!first) return;
+  if (first.target.rir > 0) first.target = { ...first.target, rir: first.target.rir - 1, note: `${first.target.note} · Push day: one rep closer to failure` };
+  if (challenge) {
+    first.challenge = true;
+    first.target = { ...first.target, note: "Challenge: last set, as many good reps as you can" };
+  }
 }
 
 /** Swaps for an exercise: same main muscles, doable at this gym, best match first. */

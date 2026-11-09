@@ -1,0 +1,33 @@
+name: Mutation tests
+
+# Stryker on the engine (plates, progression, recovery, readiness, blocks, generator, stats, game).
+# Run by hand only (Actions > Mutation tests > Run workflow): it is long and expensive, so it is not a
+# pull request or merge gate (Melvin, 2026-11-09). The incremental file is cached so a rerun only redoes
+# what changed. Fails below the `break` score in stryker.config.mjs.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    name: Stryker
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/cache@v6
+        with:
+          path: reports/mutation/stryker-incremental.json
+          key: stryker-${{ github.sha }}
+          restore-keys: stryker-
+      - run: npx stryker run
+      - uses: actions/upload-artifact@v7
+        if: ${{ !cancelled() }}
+        with:
+          name: mutation-report
+          path: reports/mutation
+          retention-days: 14

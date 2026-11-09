@@ -1,0 +1,164 @@
+name: CI
+
+# Copied from Gradelings and cut to size. Everything runs in parallel; "CI passed" is the one check to
+# require in branch protection, and it is green only when every other job is.
+
+on:
+  push:
+    branches: [main, staging]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  static:
+    name: Types, lint and audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - name: Types
+        run: npx tsc --noEmit
+      - name: Lint
+        if: ${{ !cancelled() }}
+        run: npx eslint --max-warnings 0
+      # Production dependencies ship to users, so they gate the build; dev tooling is reported only.
+      - name: Dependency audit
+        if: ${{ !cancelled() }}
+        run: npm audit --omit=dev --audit-level=high
+      - if: ${{ !cancelled() }}
+        run: npm audit --audit-level=high
+        continue-on-error: true
+
+  unit:
+    name: Unit and integration tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - run: npx vitest run --coverage
+      - name: Coverage summary
+        if: ${{ !cancelled() }}
+        run: node -e "const s=require('./coverage/coverage-summary.json').total;const r=['lines','statements','functions','branches'].map(k=>'| '+k+' | '+s[k].pct+'% |').join('\n');require('fs').appendFileSync(process.env.GITHUB_STEP_SUMMARY,'### Unit test coverage\n\n| | |\n|---|---|\n'+r+'\n')"
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/cache@v6
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
+      - run: npm run build
+      - uses: actions/upload-artifact@v7
+        with:
+          name: web-build
+          path: out
+          retention-days: 3
+
+  browser:
+    name: Browser · ${{ matrix.name }}
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { name: "playthrough and offline", run: "node scripts/e2e.mjs '' e2e-shots && node scripts/e2e-offline.mjs" }
+          - { name: "devices", run: "node scripts/e2e-devices.mjs '' e2e-shots/devices" }
+          - { name: "accessibility", run: "node scripts/e2e-a11y.mjs" }
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-build
+          path: out
+      - name: Run
+        run: ${{ matrix.run }}
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: screenshots-${{ strategy.job-index }}
+          path: e2e-shots
+          retention-days: 7
+
+  # Platform parity: every PR builds both native shells from the same web build.
+  android:
+    name: Android debug build
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v7
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-build
+          path: out
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 21
+          cache: gradle
+      - run: npx cap sync android
+      - run: ./gradlew assembleDebug --no-daemon
+        working-directory: android
+      - uses: actions/upload-artifact@v7
+        with:
+          name: liftsmith-debug-apk
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+
+  ios:
+    name: iOS simulator build
+    needs: build
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - uses: ./.github/actions/setup
+      - uses: actions/download-artifact@v8
+        with:
+          name: web-build
+          path: out
+      - run: npx cap sync ios
+      - name: Build for the simulator (unsigned)
+        run: >
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug
+          -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
+          -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+
+  passed:
+    name: CI passed
+    needs: [static, unit, build, browser, android, ios]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job succeeded
+        run: |
+          echo '${{ toJSON(needs) }}'
+          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+            exit 1
+          fi

@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, xpTotal, XP } from "@/lib/game";
 import { confetti, haptic, sound } from "@/lib/juice";
@@ -27,11 +28,12 @@ function useCountUp(to: number, ms = 900) {
 
 export function Done() {
   const { stats, profile } = useApp();
+  const now = useNow();
   const s = stats.sessions[0];
   const prs = s ? stats.prs.filter((p) => p.at >= s.start) : [];
   const gained = s ? s.sets * XP.set + XP.session + prs.length * XP.pr + (s.sets >= 12 ? XP.fullSession : 0) : 0;
   const lvl = levelOf(xpTotal(stats));
-  const streak = goalStreak(stats, profile, Date.now());
+  const streak = goalStreak(stats, profile, now);
   const xp = useCountUp(gained);
   const vol = useCountUp(s ? Math.round(fromKg(s.volume, profile.unit)) : 0);
 

@@ -1,0 +1,23 @@
+name: Set up Liftsmith
+description: Node 22 and the exact locked dependencies, with node_modules cached by lockfile (copied from Gradelings).
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 22
+        cache: npm
+    - id: modules
+      uses: actions/cache/restore@v6
+      with:
+        path: node_modules
+        key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+    - if: steps.modules.outputs.cache-hit != 'true'
+      run: npm ci --prefer-offline --no-audit --no-fund
+      shell: bash
+    - if: steps.modules.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      continue-on-error: true
+      with:
+        path: node_modules
+        key: ${{ steps.modules.outputs.cache-primary-key }}

@@ -1,13 +1,15 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { PlateBar } from "@/components/PlateBar";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { saveWorkout } from "@/lib/health";
 import { haptic, keepAwake, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
-import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { notifyPermission, onSessionAction, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -18,20 +20,11 @@ import { Button, Ring, Sheet, Stepper } from "./ui";
 
 let hrConn: HrConnection | null = null;
 
-function useNow(ms = 250) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(t);
-  }, [ms]);
-  return now;
-}
-
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
-  const now = useNow();
+  const now = useNow(250);
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
@@ -46,6 +39,16 @@ export function Workout() {
     sound.enabled = profile.restSounds;
     return () => void keepAwake(false);
   }, [profile.restSounds]);
+
+  // Buttons on the native lock-screen notification.
+  useEffect(
+    () =>
+      onSessionAction((a) => {
+        if (a === "log") useApp.getState().logSet();
+        else useApp.getState().addRest(30);
+      }),
+    [],
+  );
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -85,6 +88,7 @@ export function Workout() {
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
+      sound: profile.restSounds,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -109,7 +113,9 @@ export function Workout() {
   };
 
   const end = () => {
-    s.finish();
+    const startedAt = active.startedAt;
+    const ev = s.finish();
+    if (ev?.type === "sessionEnd") void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
     void stopSession();
     hrConn?.disconnect();
     hrConn = null;
@@ -137,7 +143,7 @@ export function Workout() {
   return (
     <div className="pb-44">
       <header className="flex items-center justify-between pt-1">
-        <button type="button" onClick={() => go("today")} className="press -ml-2 rounded-full px-2 py-1 text-muted" aria-label="Back">‹ Today</button>
+        <button type="button" onClick={() => go("today")} className="press -ml-2 min-h-11 rounded-full px-2 text-muted">‹ Today</button>
         <div className="num text-sm text-muted">{clock(elapsed)} · {setsLogged}/{totalSets} sets</div>
         <div className="flex items-center gap-2">
           {bpm ? (
@@ -145,9 +151,9 @@ export function Workout() {
               <span className="animate-pulse">♥</span> {bpm}
             </span>
           ) : hrSupported() ? (
-            <button type="button" onClick={connectHr} className="press rounded-full border border-line px-2.5 py-1 text-sm text-muted">♥ Connect</button>
+            <button type="button" onClick={connectHr} className="press min-h-11 rounded-full border border-line px-3 text-sm text-muted">♥ Connect</button>
           ) : null}
-          <button type="button" onClick={() => setEndOpen(true)} className="press rounded-full border border-line px-3 py-1 text-sm">End</button>
+          <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line px-4 text-sm">End</button>
         </div>
       </header>
 
@@ -216,7 +222,11 @@ export function Workout() {
                 )}
                 <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
               </div>
-              <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
+              {item.challenge && doneSets + 1 === item.sets ? (
+                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Challenge set: as many good reps as you can, then log what you got</p>
+              ) : (
+                <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
+              )}
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">
                   <PlateBar loading={loading} bar={bar.weight} unit={unit} />

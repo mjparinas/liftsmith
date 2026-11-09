@@ -1,0 +1,43 @@
+// axe-core WCAG 2.2 A/AA on every screen, failing on serious and critical problems.
+//   npm run build && node scripts/e2e-a11y.mjs [base-url]
+import AxeBuilder from "@axe-core/playwright";
+import { chromium, devices } from "playwright";
+import { base, finish, onboard } from "./helpers.mjs";
+
+const server = await base();
+const browser = await chromium.launch();
+const ctx = await browser.newContext({ ...devices["Pixel 7"] });
+const page = await ctx.newPage();
+const fail = [];
+const scan = async (where) => {
+  await page.waitForTimeout(400); // let entry animations settle before checking contrast
+  const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
+    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(", ")}`);
+  }
+};
+try {
+  await page.goto(`${server.url}/`);
+  await scan("home");
+  await page.goto(`${server.url}/app/`);
+  await scan("onboarding");
+  await onboard(page);
+  await scan("today");
+  await page.getByRole("button", { name: "Start workout" }).click();
+  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await scan("workout");
+  await page.getByRole("button", { name: /Log set/ }).click();
+  await scan("rest");
+  await page.getByRole("button", { name: "End" }).click();
+  await page.getByRole("button", { name: "Finish and save" }).click();
+  await page.getByRole("button", { name: "Done" }).click();
+  for (const tab of ["Recovery", "Progress", "Gyms"]) {
+    await page.getByRole("button", { name: tab }).click();
+    await scan(tab);
+  }
+} catch (e) {
+  fail.push(String(e));
+}
+await browser.close();
+server.close();
+finish("accessibility", fail);
