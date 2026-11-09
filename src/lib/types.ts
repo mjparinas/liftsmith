@@ -176,7 +176,9 @@ export interface Profile {
    * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
    * choice; billing will read it to start the store trial.
    */
-  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
+  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean };
+  /** The plan source a lifter had while Pro, kept while they're on the free plan so Pro brings it back (store.applyAccess). */
+  proPlan?: PlanSource;
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
   calendar?: CalendarPrefs;
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */

@@ -98,6 +98,9 @@ try {
   await scan("tdee public page");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
+  await page.goto(`${server.url}/app/#/pro`);
+  await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
+  await scan("pro");
   await page.getByRole("button", { name: "Set up" }).click();
   await scan("cycle consent");
   await page.getByRole("button", { name: "I agree, turn it on" }).click();

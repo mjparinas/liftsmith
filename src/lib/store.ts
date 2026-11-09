@@ -22,7 +22,9 @@ import { forgetAnalytics, track } from "./analytics";
 import { applyFixes, startFix, type FixKind, type Plateau } from "./plateau";
 import { doLater, fitToTime } from "./replan";
 import { withSettings, type Setting } from "./machineSettings";
-import { programPlan } from "./programs";
+import { pickProgram, programPlan, PROGRAM_BY_ID } from "./programs";
+import { can } from "./entitlements";
+import { forgetBilling } from "./billing";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
@@ -125,6 +127,8 @@ interface State {
   addGym(preset: GymPreset): string;
   removeGym(id: string): void;
   replan(): void;
+  /** Keeps the plan source in step with Pro: free lifters follow a free fixed program, and Pro brings back what they had. */
+  applyAccess(): void;
   /** Starts today's plan, or the plan given (a shared workout). */
   start(plan?: Plan): void;
   /** Fits the rest of the workout into this many minutes; returns what changed. */
@@ -430,6 +434,21 @@ export const useApp = create<State>((set, get) => {
       // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
       if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
       set({ readiness: r, preview: relink(plan, get().links) });
+    },
+
+    applyAccess() {
+      const { profile, events, ready } = get();
+      const g = gym();
+      if (!ready || !profile.onboarded || !g) return;
+      const src = profile.planSource ?? { kind: "adaptive" as const };
+      const free = src.kind === "program" && PROGRAM_BY_ID.get(src.id)?.tier === "free";
+      if (!can("adaptive")) {
+        // Adaptive plans and splits are Pro: keep what they had, and plan the free classic 5x5 meanwhile.
+        if (!free && src.kind !== "routine") get().setProfile({ proPlan: src, planSource: pickProgram("classic-5x5", { profile, gym: g, events, now: Date.now() }) });
+      } else if (profile.proPlan) {
+        // Pro again (a purchase, a restore, a renewal the phone just heard about): back to their own plan.
+        get().setProfile({ planSource: profile.proPlan, proPlan: undefined });
+      }
     },
 
     setCall(c) {
@@ -818,6 +837,7 @@ export const useApp = create<State>((set, get) => {
       await eraseAll();
       persistActive(null);
       forgetAnalytics();
+      forgetBilling();
       set({ events: [], profile: defaultProfile(), gyms: [], stats: derive([], Date.now()), active: null, preview: null });
     },
   };
