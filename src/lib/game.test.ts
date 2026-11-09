@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { ACHIEVEMENTS, BADGE_COUNT, achievements, context, shareIds, shareName, unlocked } from "./achievements";
+import { ACHIEVEMENTS, BADGE_COUNT, achName, achievements, context, shareIds, shareName, unlocked } from "./achievements";
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
-import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
+import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUE_LABEL, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
+import { setLanguage } from "./i18n";
 import type { AppEvent, SetEvent } from "./types";
 
 // Wednesday evening.
@@ -88,6 +89,26 @@ describe("achievements", () => {
       for (let i = 1; i < a.tiers.length; i++) expect(a.tiers[i], a.id).toBeGreaterThan(a.tiers[i - 1]);
     }
     expect(ACHIEVEMENTS.filter((a) => a.secret).length).toBeGreaterThanOrEqual(10);
+  });
+  it("have catalogue names that match the table in English, and translate", () => {
+    for (const a of ACHIEVEMENTS) expect(achName(a.id), a.id).toBe(a.name);
+    const ev = workout(NOW - D, "a");
+    const list = achievements(context(ev, derive(ev, NOW), profile(), 0));
+    expect(list.find((a) => a.id === "workouts")!.detail).toBe("Finish 1 workout");
+    expect(list.find((a) => a.id === "workouts")!.next!.detail).toBe("Finish 25 workouts");
+    setLanguage("fr");
+    try {
+      expect(list.length).toBeGreaterThan(0);
+      const fr = achievements(context(ev, derive(ev, NOW), profile(), 0));
+      expect(fr.find((a) => a.id === "workouts")!.name).toBe("Toujours là");
+      expect(fr.find((a) => a.secret && a.hidden)!.name).toBe("Succès secret");
+      expect(levelOf(0).title).toBe("Débutant");
+      expect(LEAGUE_LABEL.Gold).toBe("Or");
+      expect(COSMETICS.find((c) => c.id === "plates-black")!.name).toBe("Noir mat");
+      expect(questsFor([], profile(), weekOf(NOW))[0].title).toMatch(/^Entraînez-vous/);
+    } finally {
+      setLanguage("system");
+    }
   });
   it("show progress toward the next tier", () => {
     const ev = workout(NOW - D, "a");
