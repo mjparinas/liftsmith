@@ -1,11 +1,12 @@
 "use client";
+import { oops } from "@/lib/juice";
 import { WEEKDAYS, defaultDays } from "@/lib/calendar";
 import { clampTime, DEFAULT_ON, EMAIL_KINDS, KIND_INFO, PUSH_KINDS, type MessageKind } from "@/lib/messages";
 import { askPush, deleteEmail, EMAIL_RE, pushAllowed, pushSupported, syncEmail } from "@/lib/reminders";
 import { useApp } from "@/lib/store";
 import type { Profile } from "@/lib/types";
 import { useEffect, useState } from "react";
-import { Button, Section } from "./ui";
+import { Button, Section, Switch } from "./ui";
 
 type Prefs = NonNullable<Profile["messages"]>;
 
@@ -18,17 +19,7 @@ function Toggle({ id, label, blurb, on, onChange }: { id: string; label: string;
         <p id={`${id}-l`} className="text-sm">{label}</p>
         <p id={`${id}-d`} className="mt-0.5 text-xs text-muted">{blurb}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={on}
-        aria-labelledby={`${id}-l`}
-        aria-describedby={`${id}-d`}
-        onClick={() => onChange(!on)}
-        className={`press relative h-8 w-14 shrink-0 rounded-full border transition-colors ${on ? "border-accent bg-accent" : "border-line bg-surface"}`}
-      >
-        <span aria-hidden className={`absolute top-1 h-5.5 w-5.5 rounded-full bg-white transition-all ${on ? "left-7" : "left-1"}`} />
-      </button>
+      <Switch on={on} onChange={onChange} labelledBy={`${id}-l`} describedBy={`${id}-d`} />
     </div>
   );
 }
@@ -81,7 +72,10 @@ export function MessageSettings() {
     setProfile({ messages: next });
     const s = await syncEmail({ ...profile, messages: next }, stats, { resubscribe });
     setBusy(false);
-    if (!s) return setStatus("Couldn't reach the server. We'll try again when you're online.");
+    if (!s) {
+      oops();
+      return setStatus("Couldn't reach the server. We'll try again when you're online.");
+    }
     setProfile({ messages: { ...next, email: { ...next.email!, status: s } } });
     setStatus(s === "confirmed" ? "Email updated." : `Check ${a} for a confirmation link. Nothing is sent until you tap it.`);
   };
@@ -90,7 +84,10 @@ export function MessageSettings() {
     setBusy(true);
     const ok = await deleteEmail();
     setBusy(false);
-    if (!ok) return setStatus("Couldn't reach the server. Try again when you're online.");
+    if (!ok) {
+      oops();
+      return setStatus("Couldn't reach the server. Try again when you're online.");
+    }
     save({ email: undefined });
     setAddress("");
     setAgree(false);

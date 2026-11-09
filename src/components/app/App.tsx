@@ -24,6 +24,7 @@ import { Stats } from "./Stats";
 import { Today } from "./Today";
 import { Workout } from "./Workout";
 import { Icon, type IconName } from "./icons";
+import { TodaySkeleton } from "./ui";
 import { Photos } from "./Photos";
 import { Recap } from "./Recap";
 import { goalStreak } from "@/lib/game";
@@ -54,6 +55,12 @@ export function App() {
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    // iOS WebKit only shows :active (the instant pressed state) when a touch listener exists.
+    const noop = () => {};
+    document.addEventListener("touchstart", noop, { passive: true });
+    return () => document.removeEventListener("touchstart", noop);
+  }, []);
   useEffect(() => {
     applyAppearance(savedAppearance());
     installDiag();
@@ -159,9 +166,7 @@ export function App() {
 
   if (!ready)
     return (
-      <div className="grid min-h-dvh place-items-center" role="status" aria-label="Loading">
-        <div className="btn-primary grid h-14 w-14 animate-pulse place-items-center rounded-2xl"><Icon name="dumbbell" size={28} strokeWidth={2.4} /></div>
-      </div>
+      <TodaySkeleton />
     );
   if (!profile.onboarded) return <Onboarding />;
 

@@ -17,7 +17,8 @@ import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
-import { Button, Chip, Section } from "./ui";
+import { Button, Chip, Section, SwitchRow } from "./ui";
+import { feel } from "@/lib/juice";
 
 function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
@@ -64,9 +65,11 @@ export function Settings() {
       <Section title={`Body weight (${profile.unit})`}>
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>
-      <Row<string> label="Sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
-      <Row<string> label="Vibration" value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
-      <Row<string> label="Daily quote on Today" value={profile.quotes === false ? "off" : "on"} onPick={(v) => setProfile({ quotes: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <Section title="Feel">
+        <SwitchRow label="Sounds" hint="Soft chimes for sets, rest and milestones." on={!!profile.restSounds} onChange={(v) => { feel.sound = v; setProfile({ restSounds: v }); }} />
+        <SwitchRow label="Vibration" hint="Light taps as you adjust and log." on={profile.haptics !== false} onChange={(v) => { feel.haptics = v; setProfile({ haptics: v }); }} />
+        <SwitchRow label="Daily quote on Today" on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
+      </Section>
       <Section title="Celebrations">
         <div className="flex flex-wrap gap-2">
           <Chip active={!profile.lean} onClick={() => setProfile({ lean: false })}>Full: confetti, sounds, crates</Chip>
