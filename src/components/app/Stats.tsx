@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
 import { useApp } from "@/lib/store";
@@ -23,7 +24,7 @@ function Spark({ points }: { points: number[] }) {
 
 export function Stats() {
   const { stats, profile, events } = useApp();
-  const now = Date.now();
+  const now = useNow();
   const unit = profile.unit;
   const xp = xpTotal(stats);
   const lvl = levelOf(xp);
@@ -108,8 +109,8 @@ export function Stats() {
       <Section title={`Trophies · ${tr.filter((t) => t.earned).length} of ${tr.length}`}>
         <div className="grid grid-cols-3 gap-2">
           {tr.map((t) => (
-            <div key={t.id} className={`card p-3 text-center ${t.earned ? "" : "opacity-40"}`} title={t.detail}>
-              <div className="text-2xl" aria-hidden>{t.earned ? (t.tier === "gold" ? "🥇" : t.tier === "silver" ? "🥈" : "🥉") : "🔒"}</div>
+            <div key={t.id} className={`card p-3 text-center ${t.earned ? "" : "text-muted"}`} title={t.detail}>
+              <div className={`text-2xl ${t.earned ? "" : "opacity-40"}`} aria-hidden>{t.earned ? (t.tier === "gold" ? "🥇" : t.tier === "silver" ? "🥈" : "🥉") : "🔒"}</div>
               <div className="mt-1 text-xs font-medium leading-tight">{t.name}</div>
             </div>
           ))}

@@ -1,0 +1,67 @@
+name: Promote staging
+
+# Pull requests merge into `staging`; this job lands them on `main` once a night, so Vercel makes one production
+# build a day instead of one per merge (build minutes were most of the Vercel bill). It promotes only when CI
+# passed on staging's latest commit, and merges `main` back into `staging` afterwards so the two stay level.
+# Run it by hand from the Actions tab (Run workflow) to ship sooner.
+#
+# `main` only accepts changes through a pull request, so the job opens (or reuses) a pull request from `staging` and
+# merges it with a merge commit. The "CI passed" check it waited for is on the same commit, so the pull request
+# already shows it green. One-time setup: Settings > Actions > General > "Allow GitHub Actions to create and approve
+# pull requests" must be on. If `main` also requires a review, give the merge a token that may bypass it by adding a
+# repository secret PROMOTE_TOKEN (a fine-grained token with Contents and Pull requests write on this repository).
+
+on:
+  schedule:
+    - cron: "0 9 * * *" # 09:00 UTC, about 1-2 am Pacific
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  checks: read
+
+concurrency:
+  group: promote-staging
+  cancel-in-progress: false
+
+jobs:
+  promote:
+    name: Merge staging into main
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.PROMOTE_TOKEN || github.token }}
+          script: |
+            const { owner, repo } = context.repo;
+            const staging = (await github.rest.repos.getBranch({ owner, repo, branch: 'staging' })).data.commit.sha;
+            const cmp = await github.rest.repos.compareCommitsWithBasehead({ owner, repo, basehead: `main...${staging}` });
+            if (cmp.data.ahead_by === 0) {
+              core.notice('staging has nothing that main lacks.');
+              return;
+            }
+            const checks = await github.paginate(github.rest.checks.listForRef, { owner, repo, ref: staging, per_page: 100 });
+            const passed = checks.filter((c) => c.name === 'CI passed').sort((a, b) => b.id - a.id)[0];
+            if (!passed || passed.status !== 'completed' || passed.conclusion !== 'success') {
+              core.setFailed(`CI has not passed on staging (${staging.slice(0, 7)}): ${passed ? `${passed.status} / ${passed.conclusion}` : 'no "CI passed" check yet'}. Nothing promoted.`);
+              return;
+            }
+            core.info(`${cmp.data.ahead_by} commit(s) ahead, CI passed on ${staging.slice(0, 7)}.`);
+            // main only takes pull requests: open one from staging (or reuse the open one) and merge it with a merge commit,
+            // so a change that went straight to main (a Dependabot update, a hotfix) doesn't block the night's promotion.
+            const date = new Date().toISOString().slice(0, 10);
+            const open = await github.rest.pulls.list({ owner, repo, state: 'open', head: `${owner}:staging`, base: 'main' });
+            const pr = open.data[0] ?? (await github.rest.pulls.create({
+              owner, repo, head: 'staging', base: 'main',
+              title: `Promote staging to main (${date})`,
+              body: 'Opened by the nightly "Promote staging" workflow after CI passed on staging.',
+            })).data;
+            const merged = await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'merge', sha: staging, commit_title: `Promote staging to main (${date})` });
+            core.notice(`Merged pull request #${pr.number}; main is now ${merged.data.sha.slice(0, 7)}.`);
+            try {
+              await github.rest.repos.merge({ owner, repo, base: 'staging', head: 'main', commit_message: 'Bring main back into staging' });
+            } catch (e) {
+              core.warning(`Could not merge main back into staging: ${e.message}`);
+            }

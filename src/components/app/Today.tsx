@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, xpTotal } from "@/lib/game";
@@ -25,8 +26,8 @@ export function Flame({ weeks }: { weeks: number }) {
 export function Today() {
   const { profile, gyms, preview, events, stats, setProfile, start, active } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
-  const now = Date.now();
-  const rec = useMemo(() => recovery(events, now), [events]); // eslint-disable-line react-hooks/exhaustive-deps
+  const now = useNow();
+  const rec = useMemo(() => recovery(events, now), [events, now]);
   const streak = goalStreak(stats, profile, now);
   const lvl = levelOf(xpTotal(stats));
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];

@@ -1,0 +1,35 @@
+// Mutation testing for the rules that turn events into the workouts and numbers lifters see.
+// Run with `npm run test:mutation` (reruns only redo what changed). Report: reports/mutation/mutation.html
+// Copied from Gradelings, including its Vitest 5 runner (scripts/stryker-vitest5.mjs).
+/** @type {import('@stryker-mutator/api/core').PartialStrykerOptions} */
+const config = {
+  testRunner: "vitest5",
+  plugins: ["@stryker-mutator/*", "./scripts/stryker-vitest5.mjs"],
+  vitest: { configFile: "vitest.config.mts", related: true },
+  coverageAnalysis: "perTest",
+  mutate: [
+    "src/lib/plates.ts",
+    "src/lib/progression.ts",
+    "src/lib/recovery.ts",
+    "src/lib/block.ts",
+    "src/lib/generator.ts",
+    "src/lib/derive.ts",
+    "src/lib/game.ts",
+    "src/lib/loads.ts",
+    "src/lib/units.ts",
+  ],
+  mutator: { excludedMutations: ["StringLiteral"] },
+  reporters: ["clear-text", "progress", "html", "json"],
+  htmlReporter: { fileName: "reports/mutation/mutation.html" },
+  jsonReporter: { fileName: "reports/mutation/mutation.json" },
+  tempDirName: ".stryker-tmp",
+  incremental: true,
+  incrementalFile: "reports/mutation/stryker-incremental.json",
+  // Ratchet: the first run scored 34%, mostly untested engine paths. Raise break as tests land (target 60).
+  thresholds: { high: 85, low: 70, break: 30 },
+  concurrency: 4,
+  timeoutMS: 20000,
+  ignoreStatic: true,
+};
+
+export default config;

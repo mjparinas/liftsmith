@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { PlateBar } from "@/components/PlateBar";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
@@ -18,20 +19,11 @@ import { Button, Ring, Sheet, Stepper } from "./ui";
 
 let hrConn: HrConnection | null = null;
 
-function useNow(ms = 250) {
-  const [now, setNow] = useState(Date.now());
-  useEffect(() => {
-    const t = setInterval(() => setNow(Date.now()), ms);
-    return () => clearInterval(t);
-  }, [ms]);
-  return now;
-}
-
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
-  const now = useNow();
+  const now = useNow(250);
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
@@ -137,7 +129,7 @@ export function Workout() {
   return (
     <div className="pb-44">
       <header className="flex items-center justify-between pt-1">
-        <button type="button" onClick={() => go("today")} className="press -ml-2 rounded-full px-2 py-1 text-muted" aria-label="Back">‹ Today</button>
+        <button type="button" onClick={() => go("today")} className="press -ml-2 min-h-11 rounded-full px-2 text-muted">‹ Today</button>
         <div className="num text-sm text-muted">{clock(elapsed)} · {setsLogged}/{totalSets} sets</div>
         <div className="flex items-center gap-2">
           {bpm ? (
@@ -145,9 +137,9 @@ export function Workout() {
               <span className="animate-pulse">♥</span> {bpm}
             </span>
           ) : hrSupported() ? (
-            <button type="button" onClick={connectHr} className="press rounded-full border border-line px-2.5 py-1 text-sm text-muted">♥ Connect</button>
+            <button type="button" onClick={connectHr} className="press min-h-11 rounded-full border border-line px-3 text-sm text-muted">♥ Connect</button>
           ) : null}
-          <button type="button" onClick={() => setEndOpen(true)} className="press rounded-full border border-line px-3 py-1 text-sm">End</button>
+          <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line px-4 text-sm">End</button>
         </div>
       </header>
 

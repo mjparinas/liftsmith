@@ -7,11 +7,17 @@ The full plan with stages lives in the plan doc: https://claude.ai/artifact/S24k
 ## Commands
 
 ```bash
-npm run dev        # http://localhost:3000 (public site), http://localhost:3000/app/ (the app)
-npm test           # engine tests (Vitest)
-npm run typecheck
-npm run build      # static export to out/
-npx cap sync android   # copy out/ into the Android shell (after npm run build)
+npm run dev                  # http://localhost:3000 (public site), http://localhost:3000/app/ (the app)
+npm test                     # unit + integration tests (Vitest; engine in node, screens in jsdom)
+npm run test:coverage
+npm run test:mutation        # Stryker on the engine; report in reports/mutation/
+npm run lint && npx tsc --noEmit
+npm run build                # static export to out/
+node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
+node scripts/e2e-offline.mjs # real offline after one visit
+node scripts/e2e-devices.mjs # layout on 8 phones and tablets
+node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
+npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build)
 ```
 
 There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions (`.github/workflows/android.yml`).
@@ -46,6 +52,11 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **Plates.** Every suggested barbell weight is one the lifter's plates can make. The plate solver is a bounded knapsack (a greedy fill misses some combinations), prefers fewest plates, then heaviest first, and works in the gym's unit so 45 lb plates stay exact (`plates.ts`). Plate colours follow the common competition convention.
 - **Units.** Weights are stored in kilograms; a gym's plates, bars and dumbbells are stored in the gym's unit and converted at the edges (`units.ts`).
 
+### Setup wizard (Melvin, 2026-11-09)
+- First run opens a short wizard (`src/components/app/Onboarding.tsx`): goal and experience; gym and units; days a week and body weight; notifications and a heart rate monitor. Health connections (Health Connect, Apple Health, readiness sources) join it as they land, and should prefill age, body weight and height when the user allows it.
+- **It can be run again** from Settings ("Run setup again", `#/setup`). A rerun keeps existing gyms unless the user picks one to add, and never touches workout history.
+- One question per screen, big tiles, every step optional except the first three, under a minute in total.
+
 ### Workout screen
 - Big target weight and reps with steppers, the barbell plate graphic for every barbell set, a big Log set button, an automatic rest timer with +30 s and Skip, and the next set's plates shown during rest so the lifter can load while resting.
 - **Live workout notification and lock-screen rest timer.** On Android, a foreground service shows an ongoing notification with a live countdown, the next set and plates, heart rate, and Log set and +30 s buttons; it sounds and vibrates when rest ends. The web build falls back to a service-worker notification and an alert at rest end (`sessionNotify.ts`). On iOS this will be a Live Activity.
@@ -66,6 +77,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - XP, levels, streaks and trophies are derived from events, never stored (`game.ts`).
 
 ### Money
+- **No ads, ever** (Melvin, 2026-11-09). No ad SDKs, sponsored placements, interstitials or rewarded videos, in either app or on the site. The subscription is the only revenue.
 - **Prices (confirmed by Melvin, 2026-11-09):** Pro is $6.99 a month or $39.99 a year. The annual plan is pushed as "about $3.33 a month, less than half of Fitbod", with a 7-day free trial on the annual plan. **No lifetime plan.**
 - **Free tier:** the workout logger, plate graphic, rest timer and live notification. **Pro:** adaptive programming (generator, progression, RIR blocks and deloads), the recovery map and advanced stats.
 - **Billing is native:** Google Play Billing on Android and StoreKit on iOS, through a Capacitor purchases plugin. The subscription is checked on the device so Pro works offline, and verified by the server once accounts exist.
@@ -90,6 +102,24 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **The active workout** is also kept in `localStorage`, so killing the app mid-set loses nothing.
 - **Seeded randomness only** in the generator (`random.ts`), never `Math.random`, so plans are reproducible and testable.
 - **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
+
+## Testing (Melvin asked, 2026-11-09: like Gradelings)
+
+- **Unit tests** (`src/lib/*.test.ts`, node) for every engine rule: plates, recovery, blocks, progression, generator, stats, game.
+- **Component and integration tests** (`*.test.tsx`, `// @vitest-environment jsdom`, Testing Library, fake-indexeddb): the whole app from first run to a saved workout through the real store and IndexedDB, steppers, swaps, a bodyweight gym, and a workout surviving a reload.
+- **Browser tests** (Playwright, `scripts/e2e*.mjs`): playthrough, offline, a device layout sweep (no sideways scroll, Log set fully on screen and 48 px+, controls 44 px+), and axe WCAG 2.2 AA with no serious or critical problems. Any console error fails a run.
+- **Mutation tests** (Stryker, `stryker.config.mjs`, Gradelings' Vitest 5 runner in `scripts/stryker-vitest5.mjs`) on the engine; the run fails below the `break` score. It is a ratchet: the first run scored 34%, so `break` is 30 for now; raise it (target 60, Gradelings aims for 85) as engine tests land.
+- A bug fix comes with a test that fails without it. Flaky tests are fixed at the cause, never retried.
+- Colour tokens must pass contrast: `--color-faint` was raised to `#808c9d` because axe failed `#5b6777`.
+
+## CI/CD (Melvin asked, 2026-11-09: like Gradelings)
+
+- `.github/workflows/ci.yml` on every pull request and push to `main` and `staging`: types, lint (no warnings), dependency audit, unit and integration tests with coverage, build, then browser tests in three parallel jobs. **"CI passed"** is the one required check.
+- `mutation.yml`: weekly, on demand, and on pull requests that touch the engine.
+- `promote-staging.yml`: nightly, merges `staging` into `main` when CI passed on staging (copied from Gradelings).
+- `android.yml` and `ios.yml` (with the native shells): build both apps on pull requests; on demand, sign and upload to Play internal testing and TestFlight.
+- Web deploys through Vercel's Git integration: `main` is production, `staging` and pull requests get previews.
+- Dependabot targets `staging`, weekly.
 
 ## Borrowed from Gradelings (Melvin asked, 2026-11-09)
 
