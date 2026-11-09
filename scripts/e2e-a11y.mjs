@@ -28,13 +28,27 @@ try {
   await scan("workout");
   await page.getByRole("button", { name: /Log set/ }).click();
   await scan("rest");
+  await page.getByRole("button", { name: "Plate math" }).click();
+  await scan("rest plate math");
+  await page.getByRole("button", { name: "Breathe" }).click();
+  await scan("rest breathing");
   await page.getByRole("button", { name: "End" }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();
   await page.getByRole("button", { name: "Done" }).click();
+  await page.getByRole("button", { name: "🔥 Warm up first" }).click();
+  await scan("warm-up");
+  await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Recovery", "Progress", "Gyms"]) {
     await page.getByRole("button", { name: tab }).click();
     await scan(tab);
   }
+  // Delightful extras: recap and body/photos.
+  await page.goto(`${server.url}/app/#/recap`);
+  await page.getByRole("heading", { level: 1 }).waitFor();
+  await scan("recap");
+  await page.goto(`${server.url}/app/#/photos`);
+  await page.getByRole("heading", { name: "Body and photos" }).waitFor();
+  await scan("photos");
   // The web dashboard and a share link, with the workout just saved.
   await page.goto(`${server.url}/me/`);
   await page.getByRole("heading", { name: /training/ }).waitFor();

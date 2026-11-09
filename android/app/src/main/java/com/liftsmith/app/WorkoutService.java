@@ -108,7 +108,12 @@ public class WorkoutService extends Service {
         if (restOver != null) handler.removeCallbacks(restOver);
         if (resting) {
             final boolean sound = intent.getBooleanExtra("sound", true);
-            restOver = () -> alertRestOver(next, sound);
+            final String speak = intent.getStringExtra("speak");
+            restOver = () -> {
+                alertRestOver(next, sound);
+                // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
+                if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f);
+            };
             handler.postDelayed(restOver, restUntil - System.currentTimeMillis());
         }
         return START_NOT_STICKY;

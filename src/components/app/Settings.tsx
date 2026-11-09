@@ -3,12 +3,14 @@ import { useApp } from "@/lib/store";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
+import { DelightSettings } from "./DelightSettings";
+import { erasePhotos } from "@/lib/photos";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
-import { go } from "./router";
+import { go, useRoute } from "./router";
 import { Button, Chip, Section } from "./ui";
 
 function Row<T extends string | number>({ label, value, options, onPick }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void }) {
@@ -25,6 +27,10 @@ export function Settings() {
   const { profile, setProfile, reset } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
+  const { arg } = useRoute();
+  useEffect(() => {
+    if (arg) document.getElementById(arg)?.scrollIntoView({ block: "start" });
+  }, [arg]);
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
@@ -45,6 +51,7 @@ export function Settings() {
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>
       <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <DelightSettings />
       <CalendarSettings />
       <CycleSettings />
       <Section title="Usage stats">
@@ -61,7 +68,7 @@ export function Settings() {
         {confirm ? (
           <div className="space-y-2">
             <p className="text-sm text-muted">This erases every workout on this device. It can&apos;t be undone.</p>
-            <Button kind="danger" className="w-full" onClick={() => void reset()}>Erase everything</Button>
+            <Button kind="danger" className="w-full" onClick={() => { void erasePhotos(); void reset(); }}>Erase everything</Button>
             <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>Cancel</Button>
           </div>
         ) : (

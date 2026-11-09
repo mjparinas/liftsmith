@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 import { clock } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
+import { DoneMoments, lean } from "./Extras";
+import { PrReplayButton } from "./PrReplay";
+import { doneCue, say, voice } from "@/lib/voice";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -41,6 +44,7 @@ export function Done() {
     void confetti(prs.length > 0);
     haptic("success");
     sound.fanfare();
+    if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!s) return <div className="pt-10 text-center"><Button onClick={() => go("today")}>Back to today</Button></div>;
@@ -70,6 +74,8 @@ export function Done() {
           ))}
         </ul>
       )}
+      <PrReplayButton prs={prs} />
+      {!lean(profile) && <DoneMoments />}
       <div className="card mt-4 p-4">
         <p className="font-semibold">🔥 {streak.weeks > 0 ? `${streak.weeks}-week streak` : "Streak starts this week"}</p>
         <p className="text-sm text-muted">{streak.needed > 0 ? `${streak.needed} more workout${streak.needed > 1 ? "s" : ""} this week to ${streak.weeks > 0 ? "keep it going" : "start your streak"}.` : "This week's goal is done. Rest well."}</p>

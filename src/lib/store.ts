@@ -90,6 +90,12 @@ interface State {
   finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
+  /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
+  setPlan(plan: Plan | null): void;
+  /** Log a weigh-in and make it the profile's body weight. */
+  logBodyweight(kg: number): void;
+  /** Record a gym buddy check-in. */
+  checkin(buddies: string[]): void;
   reset(): Promise<void>;
 }
 
@@ -405,6 +411,23 @@ export const useApp = create<State>((set, get) => {
       set({ active: next });
       // Saved every 15 samples so a crash or a killed app keeps the stream.
       if (!same && hr.length % 15 === 0) persistActive(next);
+    },
+
+    setPlan(plan) {
+      if (get().active) return;
+      if (plan) set({ preview: plan });
+      else get().replan();
+    },
+
+    logBodyweight(kg) {
+      if (!(kg > 0)) return;
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
+      get().setProfile({ bodyweight: kg });
+    },
+
+    checkin(buddies) {
+      commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
+      track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
     },
 
     async reset() {

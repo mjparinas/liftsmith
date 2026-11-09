@@ -16,6 +16,11 @@ import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
 import { Workout } from "./Workout";
+import { Photos } from "./Photos";
+import { Recap } from "./Recap";
+import { goalStreak } from "@/lib/game";
+import { useNow } from "@/lib/useNow";
+import { activeTheme, applyTheme } from "@/lib/themes";
 
 const TABS: { route: Route; label: string; icon: string }[] = [
   { route: "today", label: "Today", icon: "M4 12h4l3-8 4 16 3-8h2" },
@@ -25,8 +30,14 @@ const TABS: { route: Route; label: string; icon: string }[] = [
 ];
 
 export function App() {
-  const { ready, init, profile, active } = useApp();
-  const { route } = useRoute();
+  const { ready, init, profile, active, stats } = useApp();
+  const { route, arg } = useRoute();
+  // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
+  const now = useNow(3600_000);
+  const themeId = activeTheme(profile.delight?.theme, { stats, goalWeeks: goalStreak(stats, profile, now).weeks, now }).id;
+  useEffect(() => {
+    if (ready) applyTheme(activeTheme(themeId, { stats, goalWeeks: 0, now: Date.now() }));
+  }, [ready, themeId]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     installDiag();
     startAnalytics();
@@ -96,7 +107,7 @@ export function App() {
   if (!ready) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback /> }[route];
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, recap: <Recap arg={arg} />, photos: <Photos /> }[route];
   const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
