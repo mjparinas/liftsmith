@@ -247,7 +247,25 @@ export interface Profile {
   theme?: "dark" | "light" | "system";
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
+  /** Saved routines, newest first (routines.ts). */
+  routines?: Routine[];
   onboarded: boolean;
+  updatedAt: number;
+}
+
+/** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
+export interface RoutineItem {
+  exerciseId: string;
+  sets: number;
+  /** Superset: neighbours with the same group are done back to back. */
+  group?: string;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  items: RoutineItem[];
+  createdAt: number;
   updatedAt: number;
 }
 
@@ -324,6 +342,8 @@ export interface SessionStartEvent extends EventBase {
   challenge?: boolean;
   /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
   source?: "manual";
+  /** The saved routine the workout came from, if any. */
+  routine?: string;
 }
 
 export interface SessionEndEvent extends EventBase {

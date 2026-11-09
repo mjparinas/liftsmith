@@ -9,10 +9,11 @@ import { exercise, registerCustom } from "./exercises";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
 import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
+import { planFromRoutine, upsertRoutine } from "./routines";
 import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating } from "./types";
+import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
@@ -89,6 +90,13 @@ interface State {
   pickedByLocation: string | null;
   /** Supersets picked on Today, as "first>second" exercise pairs, kept when the plan is rebuilt. */
   links: string[];
+  /** The saved routine used for today instead of the adaptive plan, if any. */
+  routineId: string | null;
+  /** Use a saved routine for today, or go back to the adaptive plan (null). */
+  pickRoutine(id: string | null): void;
+  /** Save a routine (new or edited) on the profile. */
+  saveRoutine(r: Routine): void;
+  deleteRoutine(id: string): void;
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
   autoEnd(now?: number): boolean;
@@ -130,7 +138,7 @@ const ACTIVE_KEY = "liftsmith.active";
 function relink(plan: Plan, links: readonly string[]): Plan {
   if (!links.length) return plan;
   const want = new Set(links);
-  const l = linksOf(plan.items).map((_, i) => want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
+  const l = linksOf(plan.items).map((on, i) => on || want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
   const items = withLinks(plan.items, l);
   return { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
 }
@@ -177,6 +185,26 @@ export const useApp = create<State>((set, get) => {
     callOverride: null,
     pickedByLocation: null,
     links: [],
+    routineId: null,
+
+    pickRoutine(id) {
+      if (get().active) return;
+      set({ routineId: id, links: [] });
+      if (id) track("feature", { name: "routine", detail: "use" });
+      get().replan();
+    },
+
+    saveRoutine(r) {
+      const fresh = !(get().profile.routines ?? []).some((x) => x.id === r.id);
+      get().setProfile({ routines: upsertRoutine(get().profile.routines ?? [], r, Date.now()) });
+      track("feature", { name: "routine", detail: fresh ? "save" : "edit" });
+      if (get().routineId === r.id) get().replan();
+    },
+
+    deleteRoutine(id) {
+      get().setProfile({ routines: (get().profile.routines ?? []).filter((x) => x.id !== id) });
+      if (get().routineId === id) get().pickRoutine(null);
+    },
 
     addNote(exerciseId, text) {
       const a = get().active;
@@ -272,7 +300,11 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled });
       const call = callOverride ?? r.call;
-      set({ readiness: r, preview: relink(generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge }), get().links) });
+      let plan = generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
+      // A saved routine replaces the adaptive plan for today, where this gym can do it.
+      const routine = profile.routines?.find((x) => x.id === get().routineId);
+      if (routine) plan = planFromRoutine(plan, routine, events, profile, g, now)?.plan ?? plan;
+      set({ readiness: r, preview: relink(plan, get().links) });
     },
 
     setCall(c) {
@@ -297,8 +329,8 @@ export const useApp = create<State>((set, get) => {
       const r = get().readiness;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
-      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge }]);
-      set({ callOverride: null, links: [] });
+      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge, routine: plan.routineId }]);
+      set({ callOverride: null, links: [], routineId: null });
       set({ active: a });
       persistActive(a);
       track("workout_start", { minutes: plan.minutes, exercises: plan.items.length, call: plan.call ?? "normal", overridden, gymKind: g.equipment.length ? "equipped" : "bodyweight" });

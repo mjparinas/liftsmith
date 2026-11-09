@@ -186,6 +186,57 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(3);
   });
 
+  it("saves today's plan as a routine, uses it, and saves a finished workout as one", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const plan = useApp.getState().preview!;
+    await user.click(screen.getByRole("button", { name: "Routines" }));
+    let dialog = screen.getByRole("dialog");
+    expect(within(dialog).getByText("No routines yet")).toBeInTheDocument();
+    await user.click(within(dialog).getByRole("button", { name: /Save today's plan as a routine/ }));
+    dialog = screen.getByRole("dialog");
+    const name = within(dialog).getByLabelText("Name");
+    await user.clear(name);
+    await user.type(name, "Monday");
+    // Drop the last exercise and add one from the library.
+    const last = plan.items[plan.items.length - 1].exerciseId;
+    await user.click(within(dialog).getAllByRole("button", { name: /^Remove / }).at(-1)!);
+    await user.click(within(dialog).getByRole("button", { name: "Add exercise" }));
+    await user.type(within(dialog).getByLabelText("Add exercise"), "lateral raise");
+    await user.click(within(dialog).getAllByRole("button", { name: /Lateral raise/i })[0]);
+    await user.click(within(dialog).getByRole("button", { name: "Save routine" }));
+    const saved = useApp.getState().profile.routines!;
+    expect(saved).toHaveLength(1);
+    expect(saved[0].name).toBe("Monday");
+    expect(saved[0].items.map((i) => i.exerciseId)).not.toContain(last);
+    expect(saved[0].items.at(-1)!.exerciseId).toMatch(/lateral-raise/);
+
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Use today" }));
+    const today = useApp.getState().preview!;
+    expect(today.routineId).toBe(saved[0].id);
+    expect(today.items.map((i) => i.exerciseId)).toEqual(saved[0].items.map((i) => i.exerciseId));
+    // The chip now names the routine, and the plan survives a rebuild.
+    expect(screen.getByRole("button", { name: "Monday" })).toHaveAttribute("aria-pressed", "true");
+    useApp.getState().replan();
+    expect(useApp.getState().preview!.routineId).toBe(saved[0].id);
+
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    expect(useApp.getState().events.find((e) => e.type === "sessionStart")).toMatchObject({ routine: saved[0].id });
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    await user.click(screen.getByRole("button", { name: "End" }));
+    await user.click(screen.getByRole("button", { name: "Finish and save" }));
+    await user.click(await screen.findByRole("button", { name: "Save as a routine" }));
+    dialog = screen.getByRole("dialog");
+    await user.type(within(dialog).getByLabelText("Name"), "Short one");
+    await user.click(within(dialog).getByRole("button", { name: "Save routine" }));
+    const two = useApp.getState().profile.routines!;
+    expect(two.map((r) => r.name)).toEqual(["Short one", "Monday"]);
+    expect(two[0].items).toEqual([{ exerciseId: saved[0].items[0].exerciseId, sets: 1 }]);
+    expect(screen.getByRole("button", { name: "Saved as a routine" })).toBeDisabled();
+  });
+
   it("a bodyweight gym only plans bodyweight exercises", async () => {
     const user = userEvent.setup();
     await onboard(user, /Bodyweight/);

@@ -6,10 +6,11 @@ import type { PlanItem } from "./generator";
 /** Seconds to move from one exercise to the next inside a round. */
 export const SWITCH_REST = 15;
 
-type Item = Pick<PlanItem, "exerciseId" | "sets" | "restSec"> & { group?: string };
+type Linkable = { exerciseId: string; group?: string };
+type Item = Pick<PlanItem, "exerciseId" | "sets" | "restSec"> & Linkable;
 
 /** First and last index (inclusive) of the superset that item i is in, or [i, i] on its own. */
-export function groupRange(items: readonly Item[], i: number): [number, number] {
+export function groupRange(items: readonly Linkable[], i: number): [number, number] {
   const g = items[i]?.group;
   if (!g) return [i, i];
   let s = i;
@@ -20,12 +21,12 @@ export function groupRange(items: readonly Item[], i: number): [number, number] 
 }
 
 /** True when item i and item i + 1 are in the same superset. */
-export function linkedToNext(items: readonly Item[], i: number): boolean {
+export function linkedToNext(items: readonly Linkable[], i: number): boolean {
   return !!items[i]?.group && items[i].group === items[i + 1]?.group;
 }
 
 /** Rebuilds the groups from which neighbours are linked. A group's id is its first exercise. */
-export function withLinks<T extends Item>(items: readonly T[], links: readonly boolean[]): T[] {
+export function withLinks<T extends Linkable>(items: readonly T[], links: readonly boolean[]): T[] {
   const out: T[] = [];
   let id: string | undefined;
   items.forEach((it, i) => {
@@ -39,12 +40,12 @@ export function withLinks<T extends Item>(items: readonly T[], links: readonly b
 }
 
 /** The links between neighbours (link[i] joins i and i + 1). */
-export function linksOf(items: readonly Item[]): boolean[] {
+export function linksOf(items: readonly Linkable[]): boolean[] {
   return items.slice(0, -1).map((_, i) => linkedToNext(items, i));
 }
 
 /** Links item i with the next one, or splits them if they're already linked. */
-export function toggleLink<T extends Item>(items: readonly T[], i: number): T[] {
+export function toggleLink<T extends Linkable>(items: readonly T[], i: number): T[] {
   if (i < 0 || i >= items.length - 1) return [...items];
   const links = linksOf(items);
   links[i] = !links[i];
