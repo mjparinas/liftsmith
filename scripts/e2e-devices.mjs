@@ -1,25 +1,23 @@
-// Layout on common phones and tablets: no sideways scroll, the main button on screen, big targets.
+// Layout on the phones and tablets in scripts/devices.mjs: no sideways scroll, the main buttons on screen,
+// big targets, and a set logged and saved on each one.
 //   npm run build && node scripts/e2e-devices.mjs [base-url] [out-dir]
+//   DEVICES=ios|android|full|"Pixel 7,iPad Mini" picks a subset (default: all)
 import fs from "node:fs";
-import { chromium, devices } from "playwright";
+import { closeAll, open, pick } from "./devices.mjs";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "e2e-shots/devices";
 fs.mkdirSync(OUT, { recursive: true });
 const TARGET = 44; // Apple's 44 pt; Android asks for 48 dp on the main controls
-const DEVICES = ["Galaxy S9+", "Galaxy S24", "Pixel 7", "iPhone SE (3rd gen)", "iPhone 15 Pro Max", "Pixel 7 landscape", "iPad Mini", "Galaxy Tab S9"];
 
 const server = await base();
-const browser = await chromium.launch();
 const fail = [];
-for (const name of DEVICES) {
-  const d = devices[name];
-  if (!d) {
-    console.log(`(skipping ${name}: not in this Playwright)`);
-    continue;
-  }
-  const opts = { ...d };
-  delete opts.defaultBrowserType;
+let ran = 0;
+for (const { name } of pick()) {
+  const t0 = Date.now();
+  const target = await open(name);
+  if (!target) continue;
+  const { browser, opts, engine } = target;
   const ctx = await browser.newContext(opts);
   const page = await ctx.newPage();
   const errors = [];
@@ -34,6 +32,11 @@ for (const name of DEVICES) {
     await noSideScroll("onboarding");
     await onboard(page);
     await noSideScroll("today");
+    for (const tab of ["Today", "Recovery", "Progress", "Gyms"]) {
+      const b = await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).boundingBox();
+      check(b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1, `${name}: the ${tab} tab is off screen`, fail);
+    }
+    await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
     check(start && start.y + start.height <= opts.viewport.height, `${name}: Start workout is below the fold`, fail);
     await page.getByRole("button", { name: "Start workout" }).click();
@@ -62,7 +65,10 @@ for (const name of DEVICES) {
   }
   fail.push(...errors.map((e) => `${name}: ${e}`));
   await ctx.close();
+  ran++;
+  console.log(`  ${name} (${engine}, ${opts.viewport.width}×${opts.viewport.height}) ${((Date.now() - t0) / 1000).toFixed(1)} s`);
 }
-await browser.close();
+await closeAll();
 server.close();
+check(ran > 0, "no device ran", fail);
 finish("devices", fail);
