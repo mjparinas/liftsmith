@@ -467,6 +467,8 @@ export interface CycleEvent extends EventBase {
 export interface BodyweightEvent extends EventBase {
   type: "bodyweight";
   kg: number;
+  /** Body fat percentage, when a scale or Health Connect / Apple Health gave one (insights.ts). */
+  bodyFat?: number;
 }
 
 /**

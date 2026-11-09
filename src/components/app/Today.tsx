@@ -26,6 +26,8 @@ import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { PlanExtras, TodayMoments } from "./Extras";
 import { useGame } from "./Achievements";
 import { TodayGame } from "./TodayGame";
+import { CoachNotes } from "./Insights";
+import { callWhy, itemWhy, whyContext } from "@/lib/why";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -62,6 +64,8 @@ export function Today() {
   const call = preview ? CALL_STYLE[preview.call] : null;
   const fill = `${((profile.minutes - 15) / 75) * 100}%`;
   const fixed = !!preview?.program?.fixed;
+  // Every recommendation says why (why.ts): one line per exercise, one sentence for the day's call.
+  const why = useMemo(() => (preview ? whyContext(preview, events, profile, now) : null), [preview, events, profile, now]);
 
   return (
     <div className="pb-44">
@@ -142,7 +146,7 @@ export function Today() {
               <h2 id="call-title" className="mt-0.5 text-xl font-bold">{CALL_TEXT[preview.call].label}<Info term="call" /></h2>
             </div>
           </div>
-          <p className="mt-3 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : CALL_TEXT[preview.call].blurb}</p>
+          <p className="mt-3 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : callWhy(readiness, preview.call, preview.week.deload)}</p>
           {readiness.signals.length > 0 && (
             <ul className="mt-2 space-y-1 text-sm">
               {readiness.signals.slice(0, 3).map((g) => (
@@ -179,6 +183,8 @@ export function Today() {
           {callOverride && <p className="mt-2 text-xs text-faint">Your call today. We suggested {CALL_TEXT[readiness.call].label.toLowerCase()}.</p>}
         </section>
       )}
+
+      {!active && <CoachNotes limit={2} />}
 
       {!active && <TodayGame />}
 
@@ -225,6 +231,7 @@ export function Today() {
                         {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((t) => t.weight > it.target.weight) ? "up to " : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((t) => t.weight)), profile.unit)}
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
+                      {why && <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">{itemWhy(it, why).short}</p>}
                     </div>
                     {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
                     {i > 0 && <LinkToggle on={linkedToNext(preview.items, i - 1)} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}

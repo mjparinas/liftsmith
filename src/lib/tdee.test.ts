@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { defaultProfile } from "./defaults";
-import { activityForDays, bmrKatch, bmrMifflin, bodyUpdates, calcTdee, changesSince, currentTdee, inferActivity, snapshotDue, tdeeHistory, validInputs } from "./tdee";
+import { activityForDays, bmrKatch, bmrMifflin, bodyUpdates, calcTdee, currentBodyFat, changesSince, currentTdee, inferActivity, snapshotDue, tdeeHistory, validInputs } from "./tdee";
 import type { AppEvent, Profile, TdeeEvent } from "./types";
 
 const DAY = 86_400_000;
@@ -124,20 +124,18 @@ describe("current TDEE and snapshots", () => {
 });
 
 describe("autofill from Health Connect / Apple Health", () => {
-  it("turns a newer weight into a weigh-in once, with an id from the measurement time", () => {
-    const r = { weight: { value: 79.44, at: NOW } };
-    const u = bodyUpdates(r, [], profile());
-    expect(u.events).toEqual([{ type: "bodyweight", id: `health-weight-${NOW}`, at: NOW, kg: 79.4 }]);
-    expect(u.profile.bodyweight).toBe(79.4);
-    expect(bodyUpdates(r, u.events, profile()).events).toEqual([]);
+  it("fills height, skipping nonsense", () => {
+    expect(bodyUpdates({ height: { value: 175.4, at: NOW } }, profile({ heightCm: undefined }))).toEqual({ heightCm: 175 });
+    expect(bodyUpdates({ height: { value: 12, at: NOW } }, profile())).toEqual({});
   });
-  it("ignores a health weight older than the latest weigh-in", () => {
-    const u = bodyUpdates({ weight: { value: 79, at: NOW - DAY } }, [{ type: "bodyweight", id: "x", at: NOW, kg: 80 }], profile());
-    expect(u.events).toEqual([]);
-  });
-  it("fills height and newer body fat, skipping nonsense", () => {
-    expect(bodyUpdates({ height: { value: 175.4, at: NOW }, bodyFat: { value: 18.25, at: NOW } }, [], profile({ heightCm: undefined })).profile).toEqual({ heightCm: 175, bodyFat: { pct: 18.3, at: NOW } });
-    expect(bodyUpdates({ height: { value: 12, at: NOW }, bodyFat: { value: 90, at: NOW } }, [], profile()).profile).toEqual({});
-    expect(bodyUpdates({ bodyFat: { value: 20, at: NOW - DAY } }, [], profile({ bodyFat: { pct: 18, at: NOW } })).profile).toEqual({});
+  it("takes body fat from the newest weigh-in that has one, or the value entered by hand if that's newer", () => {
+    const ev: AppEvent[] = [
+      { type: "bodyweight", id: "a", at: NOW - 2 * DAY, kg: 80, bodyFat: 19.04 },
+      { type: "bodyweight", id: "b", at: NOW - DAY, kg: 80 },
+    ];
+    expect(currentBodyFat(ev, profile())).toBe(19);
+    expect(currentBodyFat(ev, profile({ bodyFat: { pct: 17, at: NOW } }))).toBe(17);
+    expect(currentBodyFat(ev, profile({ bodyFat: { pct: 17, at: NOW - 5 * DAY } }))).toBe(19);
+    expect(currentBodyFat([], profile())).toBeUndefined();
   });
 });

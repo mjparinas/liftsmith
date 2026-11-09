@@ -1,4 +1,5 @@
 "use client";
+import { CoachNotes } from "./Insights";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { AchievementRow, useGame } from "./Achievements";
@@ -56,6 +57,7 @@ export function Stats() {
   return (
     <div className="pb-24">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Progress</h1>
+      <CoachNotes title="What to do next" />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
           <span className="font-bold">Level {lvl.level} · <span className="text-gradient">{lvl.title}</span></span>

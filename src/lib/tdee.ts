@@ -158,7 +158,7 @@ export function currentTdee(events: AppEvent[], sessions: Pick<SessionSummary, "
     age: ageAt(profile.birthYear, now),
     sex: profile.sex,
     activity: activity.activity,
-    bodyFat: profile.tdee?.useBodyFat === false ? undefined : profile.bodyFat?.pct,
+    bodyFat: profile.tdee?.useBodyFat === false ? undefined : currentBodyFat(events, profile),
   };
   const missing = ([["sex", inputs.sex], ["age", inputs.age], ["height", inputs.cm]] as const).filter(([, v]) => v === undefined).map(([k]) => k);
   return { inputs, activity, missing, result: validInputs(inputs) ? calcTdee(inputs) : undefined };
@@ -235,30 +235,23 @@ export function tdeeHistory(events: AppEvent[]): TdeeEvent[] {
 // --- Autofill from Health Connect / Apple Health ---
 
 export interface BodyReadings {
-  weight?: { value: number; at: number };
   height?: { value: number; at: number };
-  bodyFat?: { value: number; at: number };
 }
 
 /**
- * What a health reading changes: a newer weight becomes a weigh-in (its id comes from the measurement
- * time, so reading it again on every open never duplicates it), a new height or body fat goes to the profile.
- * Readings older than what the app already has, or out of range, are ignored.
+ * What a health reading changes: a new height goes to the profile. Weigh-ins and body fat come in as
+ * bodyweight events through the store's importHealthBody (one per day, `health-bw-<day>`), so there is
+ * one import path for them. Out-of-range readings are ignored.
  */
-export function bodyUpdates(r: BodyReadings, events: AppEvent[], profile: Profile): { events: AppEvent[]; profile: Partial<Profile> } {
-  const out: AppEvent[] = [];
+export function bodyUpdates(r: BodyReadings, profile: Profile): Partial<Profile> {
   const p: Partial<Profile> = {};
-  const w = r.weight;
-  if (w && inRange(w.value, 25, 350)) {
-    const id = `health-weight-${w.at}`;
-    let newest = -Infinity;
-    for (const e of events) if (e.type === "bodyweight") newest = Math.max(newest, e.at);
-    if (w.at > newest && !events.some((e) => e.id === id)) {
-      out.push({ type: "bodyweight", id, at: w.at, kg: Math.round(w.value * 10) / 10 });
-      p.bodyweight = Math.round(w.value * 10) / 10;
-    }
-  }
   if (r.height && inRange(r.height.value, 100, 250) && Math.abs((profile.heightCm ?? 0) - r.height.value) >= 1) p.heightCm = Math.round(r.height.value);
-  if (r.bodyFat && inRange(r.bodyFat.value, 3, 60) && r.bodyFat.at > (profile.bodyFat?.at ?? 0)) p.bodyFat = { pct: Math.round(r.bodyFat.value * 10) / 10, at: r.bodyFat.at };
-  return { events: out, profile: p };
+  return p;
+}
+
+/** Body fat for TDEE: the newer of the latest weigh-in that carries one and the value entered by hand. */
+export function currentBodyFat(events: AppEvent[], profile: Profile): number | undefined {
+  let last: { pct: number; at: number } | undefined = profile.bodyFat;
+  for (const e of events) if (e.type === "bodyweight" && e.bodyFat !== undefined && (!last || e.at > last.at)) last = { pct: e.bodyFat, at: e.at };
+  return last ? Math.round(last.pct * 10) / 10 : undefined;
 }
