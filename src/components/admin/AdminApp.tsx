@@ -1,9 +1,12 @@
 "use client";
 // The admin panel (/admin/, server build only). Modelled on Gradelings' panel: one row of filters, tabs for
 // each area, tiles for the headline numbers and charts below. Sign-in is an emailed one-time link.
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
+import { Inbox } from "./Inbox";
+import { System } from "./System";
+import { Todo } from "./Todo";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -11,7 +14,7 @@ type Data = Metrics & { staff: Staff };
 type Install = { id: string; firstSeen: number; lastSeen: number; platform: string; store: string | null; appVersion: string | null; device: string | null; os: string | null; country: string | null; locale: string | null; source: string | null; test: boolean; events: number; workouts: number };
 type Audit = { id: number; at: number; admin: string; action: string; target: string | null };
 
-const TABS = ["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Creators", "Installs"] as const;
+const TABS = ["Overview", "To Do", "Inbox", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Creators", "Installs", "System"] as const;
 type Tab = (typeof TABS)[number];
 const PERIODS = [7, 28, 90, 365] as const;
 const STORE_LABEL: Record<string, string> = { play: "Google Play", appstore: "App Store", web: "Web", other: "Other", android: "Android", ios: "iOS" };
@@ -244,6 +247,25 @@ export function AdminApp() {
   const [tab, setTab] = useState<Tab>("Overview");
   const [data, setData] = useState<Data | null>(null);
   const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
+  const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
+  const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
+  const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
+  const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
+  const go = useCallback((t: string) => (TABS as readonly string[]).includes(t) && setTab(t as Tab), []);
+  // The tab counts, once signed in: mail waiting for an answer, and everything on the to-do list.
+  useEffect(() => {
+    if (state !== "ok") return;
+    let live = true;
+    const read = (url: string, f: (j: Record<string, unknown>) => number | null) =>
+      fetch(url)
+        .then(async (r) => (r.ok ? f((await r.json()) as Record<string, unknown>) : null))
+        .catch(() => null);
+    void read("/api/admin/inbox/?count=1", (j) => (typeof j.waiting === "number" ? j.waiting : null)).then((n) => live && n != null && inboxCount(n));
+    void read("/api/admin/todo/", (j) => (Array.isArray(j.items) && Array.isArray(j.tasks) ? j.items.length + (j.tasks as { doneAt: unknown }[]).filter((t) => !t.doneAt).length : null)).then((n) => live && n != null && todoCount(n));
+    return () => {
+      live = false;
+    };
+  }, [state, inboxCount, todoCount]);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/stats/?days=${days}`)
@@ -288,6 +310,7 @@ export function AdminApp() {
           {TABS.map((t) => (
             <button key={t} type="button" aria-current={tab === t ? "page" : undefined} onClick={() => setTab(t)} className={`press shrink-0 rounded-lg px-3 py-1.5 text-sm ${tab === t ? "bg-raised text-ink" : "text-muted"}`}>
               {t}
+              {counts[t] ? <span className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-semibold text-accent-ink" aria-label={`${counts[t]} waiting`}>{counts[t]}</span> : null}
             </button>
           ))}
         </nav>
@@ -460,6 +483,9 @@ export function AdminApp() {
 
         {tab === "Creators" && <Creators admin={data.staff.role === "admin"} days={days} />}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} />}
+        {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
+        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "System" && <System />}
       </div>
     </div>
   );
