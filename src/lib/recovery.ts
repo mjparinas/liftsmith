@@ -1,0 +1,43 @@
+import { EXERCISE_BY_ID } from "./exercises";
+import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Muscle } from "./types";
+
+// Each hard set adds fatigue to the muscles it works: full for primary, half for secondary, a
+// little less when the set was left far from failure. Fatigue fades exponentially, so 90% of it is
+// gone after about 48 hours for small muscles and 72 hours for large ones.
+
+const PER_SET = 13; // % fatigue one primary set adds
+const HOURS_90 = { small: 48, large: 72 };
+
+export type Band = "fresh" | "ready" | "recovering" | "fatigued";
+
+export const BANDS: { band: Band; label: string; min: number; colour: string; hint: string }[] = [
+  { band: "fresh", label: "Fresh", min: 90, colour: "#34d399", hint: "Fully recovered" },
+  { band: "ready", label: "Ready", min: 70, colour: "#a3d977", hint: "Good to train" },
+  { band: "recovering", label: "Recovering", min: 40, colour: "#f5b544", hint: "Light work only" },
+  { band: "fatigued", label: "Fatigued", min: 0, colour: "#f0605d", hint: "Needs rest" },
+];
+
+export function bandOf(recovery: number): (typeof BANDS)[number] {
+  return BANDS.find((b) => recovery >= b.min) ?? BANDS[BANDS.length - 1];
+}
+
+function tau(m: Muscle): number {
+  const h = LARGE_MUSCLES.has(m) ? HOURS_90.large : HOURS_90.small;
+  return (h * 3600_000) / Math.log(10);
+}
+
+/** Recovery 0–100 for every muscle at `now`. */
+export function recovery(events: readonly AppEvent[], now: number): Record<Muscle, number> {
+  const fatigue = Object.fromEntries(MUSCLES.map((m) => [m, 0])) as Record<Muscle, number>;
+  const horizon = now - 7 * 24 * 3600_000;
+  for (const e of events) {
+    if (e.type !== "set" || e.at < horizon || e.at > now) continue;
+    const ex = EXERCISE_BY_ID.get(e.exerciseId);
+    if (!ex) continue;
+    const effort = e.rir >= 4 ? 0.6 : e.rir >= 3 ? 0.8 : 1;
+    const age = now - e.at;
+    for (const m of ex.primary) fatigue[m] += PER_SET * effort * Math.exp(-age / tau(m));
+    for (const m of ex.secondary) fatigue[m] += PER_SET * 0.5 * effort * Math.exp(-age / tau(m));
+  }
+  return Object.fromEntries(MUSCLES.map((m) => [m, Math.round(Math.max(0, 100 - Math.min(100, fatigue[m])))])) as Record<Muscle, number>;
+}
