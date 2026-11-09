@@ -3,7 +3,9 @@ import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
-import type { Experience, Goal, Unit } from "@/lib/types";
+import { flag } from "@/lib/flags";
+import { declineTrial, PRICES, startTrial, type Plan } from "@/lib/trial";
+import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { useEffect, useState } from "react";
 import { connectHeartRate, hrSupported } from "@/lib/heartRate";
@@ -32,12 +34,14 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   { id: "advanced", title: "Experienced", blurb: "3 years or more" },
 ];
 
-const STEPS = 4;
 
 /** The setup wizard: first run, and again from Settings ("Run setup again"). */
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const { profile, setProfile, addGym, gyms } = useApp();
   const [step, setStep] = useState(0);
+  // First run ends with the Pro trial offer; a rerun from Settings doesn't show it again.
+  const STEPS = rerun ? 4 : 5;
+  const trialDays = flag("trialDays");
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [notify, setNotify] = useState<boolean | null>(null);
@@ -58,10 +62,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
   };
 
-  const finish = () => {
+  const finish = (pro?: Profile["pro"]) => {
     setProfile({ unit });
     const id = keepGyms ? profile.activeGymId : addGym(preset);
-    setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true });
+    setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true, ...(pro ? { pro } : {}) });
     haptic("success");
     if (rerun) go("today");
   };
@@ -149,12 +153,43 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             {notify === false && <p className="mt-3 text-sm text-warn">Notifications are blocked. You can allow them in your phone&apos;s settings.</p>}
           </>
         )}
+        {step === 4 && (
+          <>
+            <h1 className="text-3xl font-bold">Try Pro free for {trialDays} days</h1>
+            <p className="mt-2 text-muted">Workouts that adapt to your recovery, your gym and how every set felt.</p>
+            <ul className="mt-4 space-y-1.5 text-sm">
+              {["Adaptive workouts with blocks, deloads and progression", "Push or easy-day calls from your own data", "Recovery map and advanced stats"].map((t) => (
+                <li key={t} className="flex gap-2"><span className="text-accent" aria-hidden>✓</span>{t}</li>
+              ))}
+            </ul>
+            <div className="mt-6 space-y-3">
+              {(["annual", "monthly"] as Plan[]).map((plan) => (
+                <button
+                  key={plan}
+                  type="button"
+                  onClick={() => { haptic("tick"); finish(startTrial(plan, trialDays, Date.now())); }}
+                  className={`press w-full rounded-2xl border p-4 text-left ${plan === "annual" ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
+                >
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-semibold">Start free trial · {plan === "annual" ? "Yearly" : "Monthly"}</span>
+                    {PRICES[plan].note && <span className="text-xs font-semibold text-accent">{PRICES[plan].note}</span>}
+                  </div>
+                  <div className="mt-0.5 text-sm text-muted">Free for {trialDays} days, then {PRICES[plan].price} {PRICES[plan].per}. Cancel any time.</div>
+                </button>
+              ))}
+            </div>
+            <Button kind="quiet" className="mt-4 w-full" onClick={() => finish(declineTrial(trialDays, Date.now()))}>Not now, keep the free plan</Button>
+            <p className="mt-2 text-center text-xs text-muted">The free plan keeps the workout logger, plate math, rest timer and classic 5x5.</p>
+          </>
+        )}
       </div>
       <div className="flex gap-3 pb-2">
         {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>Back</Button>}
-        <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
-          {step < STEPS - 1 ? "Continue" : rerun ? "Save" : "Build my first workout"}
-        </Button>
+        {step < 4 && (
+          <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
+            {step < STEPS - 1 ? "Continue" : "Save"}
+          </Button>
+        )}
       </div>
     </main>
   );

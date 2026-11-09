@@ -207,6 +207,11 @@ export interface Profile {
    * feedback reports.
    */
   cycle?: { enabled: boolean; consentAt: number };
+  /**
+   * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
+   * choice; billing will read it to start the store trial.
+   */
+  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
   calendar?: CalendarPrefs;
   onboarded: boolean;
