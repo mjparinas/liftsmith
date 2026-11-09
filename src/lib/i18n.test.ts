@@ -4,6 +4,8 @@ import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 import { currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message } from "./i18n";
 import { fmtNum, plainNum } from "./units";
+import { MUSCLE_LABEL } from "./types";
+import { bandOf } from "./recovery";
 
 const holes = (m: Message) => [...new Set(Object.values(typeof m === "string" ? { m } : m).flatMap((s) => [...s!.matchAll(/\{(\w+)\}/g)].map((x) => x[1])))].sort();
 
@@ -63,5 +65,17 @@ describe("language", () => {
     expect(plainNum(82.5)).toBe("82.5");
     expect(parseNum("82,5")).toBe(82.5);
     expect(parseNum(" 82.5 ")).toBe(82.5);
+  });
+
+  it("translates engine labels (muscles, recovery bands) on each read", () => {
+    expect(MUSCLE_LABEL.chest).toBe("Chest");
+    expect(bandOf(95).label).toBe("Fresh");
+    setLanguage("fr");
+    expect(MUSCLE_LABEL.chest).toBe("Pectoraux");
+    expect(bandOf(20).label).toBe("Fatigué");
+    expect(Object.keys(MUSCLE_LABEL)).toContain("hamstrings");
+    setLanguage("es");
+    expect(MUSCLE_LABEL.hamstrings).toBe("Isquiotibiales");
+    expect(t("done.prs", { count: 2 })).toBe("¡2 récords nuevos!");
   });
 });
