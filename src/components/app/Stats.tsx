@@ -17,9 +17,10 @@ import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
 import { DotsCard, OneRmSection } from "./OneRepMax";
 import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
+import { list, num, t } from "@/lib/i18n";
 
-function Spark({ points, empty = "Needs two sessions" }: { points: number[]; empty?: string }) {
-  if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty}</div>;
+function Spark({ points, empty }: { points: number[]; empty?: string }) {
+  if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const w = 120;
@@ -48,50 +49,50 @@ export function Stats() {
   const lvl = g.level;
   const streak = g.streak;
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
-  const tiles: [string, string, IconName, string][] = [
-    ["Workouts", String(stats.sessions.length), "dumbbell", HUE.accent],
-    ["Week streak", String(streak.weeks), "flame", HUE.ember],
-    ["Sets", String(stats.totalSets), "layers", HUE.violet],
-    ["Volume", `${fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10)}k ${unit}`, "progress", HUE.cyan],
+  const tiles: [string, string, string, IconName, string][] = [
+    ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
+    ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
+    ["sets", t("progress.sets"), num(stats.totalSets), "layers", HUE.violet],
+    ["volume", t("progress.volume"), t("progress.volumeK", { n: fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10), unit }), "progress", HUE.cyan],
   ];
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Progress</h1>
-      <CoachNotes title="What to do next" />
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <CoachNotes title={t("progress.next")} />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
-          <span className="font-bold">Level {lvl.level} · <span className="text-gradient">{lvl.title}</span></span>
-          <span className="num text-sm text-muted">{xp} XP</span>
+          <span className="font-bold">{t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span></span>
+          <span className="num text-sm text-muted">{t("progress.xp", { xp })}</span>
         </div>
         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
           <div className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]" style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }} />
         </div>
-        {lvl.next && <p className="mt-1.5 text-xs text-faint num">{lvl.span - lvl.into} XP to {lvl.next}</p>}
+        {lvl.next && <p className="mt-1.5 text-xs text-faint num">{t("progress.xpTo", { xp: lvl.span - lvl.into, next: lvl.next })}</p>}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {tiles.map(([k, v, icon, hue]) => <StatTile key={k} label={k} value={v} icon={icon} tint={hue} info={k === "Volume" ? "volume" : undefined} />)}
+        {tiles.map(([k, label, v, icon, hue]) => <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />)}
       </div>
       <TonnageCard />
       <StrengthCard />
 
       <GoalsCard />
 
-      <Section title="Sets per muscle this week" icon="target" info="weeklySets">
+      <Section title={t("progress.weekSets")} icon="target" info="weeklySets">
         <div className="card p-4">
           <ul className="space-y-2">
             {MUSCLES.filter((m) => thisWeek.sets[m] > 0).sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a]).map((m) => (
               <li key={m} className="flex items-center gap-3 text-sm">
                 <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
                 <div className="relative h-2.5 flex-1 rounded-full bg-raised">
-                  <div className="absolute inset-y-0 rounded-full bg-good/15" style={{ left: "50%", width: "50%" }} title="10 to 20 sets" />
+                  <div className="absolute inset-y-0 rounded-full bg-good/15" style={{ left: "50%", width: "50%" }} title={t("progress.band")} />
                   <div className="relative h-full rounded-full bg-gradient-to-r from-accent to-accent-2" style={{ width: `${Math.min(100, (thisWeek.sets[m] / 20) * 100)}%` }} />
                 </div>
                 <span className="num w-8 text-right">{fmtNum(thisWeek.sets[m])}</span>
               </li>
             ))}
-            {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && <li><EmptyState icon="target" title="No sets yet this week" body="Each set you log fills these bars toward this week's target." /></li>}
+            {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && <li><EmptyState icon="target" title={t("progress.noSets")} body={t("progress.noSets.body")} /></li>}
           </ul>
-          <p className="mt-3 text-xs text-faint">The green band is 10 to 20 hard sets a week, the range most research supports for growth.</p>
+          <p className="mt-3 text-xs text-faint">{t("progress.bandNote")}</p>
         </div>
       </Section>
 
@@ -101,7 +102,7 @@ export function Stats() {
       <OneRmSection />
       <DotsCard />
 
-      <Section title="Personal records" icon="trophy">
+      <Section title={t("progress.prs")} icon="trophy">
         <ul className="card divide-y divide-line">
           {stats.prs.slice(0, 8).map((p) => (
             <li key={p.at + p.exerciseId} className="flex justify-between px-4 py-3">
@@ -109,29 +110,29 @@ export function Stats() {
               <span className="num text-muted">{fmtNum(fromKg(p.weight, unit))} {unit} × {p.reps} · {ago(p.at, now)}</span>
             </li>
           ))}
-          {!stats.prs.length && <li><EmptyState icon="trophy" tint={HUE.gold} title="Your PRs will show here" body="Beat a previous best weight or reps and it lands on this list." /></li>}
+          {!stats.prs.length && <li><EmptyState icon="trophy" tint={HUE.gold} title={t("progress.noPrs")} body={t("progress.noPrs.body")} /></li>}
         </ul>
       </Section>
 
-      <Section title={`Achievements · ${g.badges.earned} of ${g.badges.total} badges`} right={<button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">See all</button>}>
+      <Section title={t("progress.achievements", { earned: g.badges.earned, total: g.badges.total })} right={<button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">{t("progress.seeAll")}</button>}>
         <ul className="card divide-y divide-line">
           {g.nearest.map((a) => <AchievementRow key={a.id} a={a} />)}
-          {!g.nearest.length && <li className="px-4 py-3 text-muted">Finish a workout to start earning badges.</li>}
+          {!g.nearest.length && <li className="px-4 py-3 text-muted">{t("progress.noBadges")}</li>}
         </ul>
       </Section>
 
-      <Section title="History" icon="calendar">
+      <Section title={t("progress.history")} icon="calendar">
         <ul className="card divide-y divide-line">
           {stats.sessions.slice(0, 20).map((s) => (
             <li key={s.sessionId} className="px-4 py-3">
               <div className="flex justify-between">
                 <span className="font-medium">{ago(s.start, now)}</span>
-                <span className="num text-sm text-muted">{clock(s.seconds)} · {s.sets} sets{s.avgHr ? ` · ♥ ${s.avgHr}` : ""}{s.prs ? ` · ${s.prs} PR` : ""}</span>
+                <span className="num text-sm text-muted">{clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}{s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}{s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}</span>
               </div>
-              <div className="mt-0.5 truncate text-sm text-muted">{s.exercises.map((e) => exercise(e).name).join(", ")}</div>
+              <div className="mt-0.5 truncate text-sm text-muted">{list(s.exercises.map((e) => exercise(e).name))}</div>
             </li>
           ))}
-          {!stats.sessions.length && <li><EmptyState icon="calendar" mascot="happy" title="No workouts yet" body="Finish your first workout and it starts your history." action={<Button icon="play" onClick={() => go("today")}>Plan today&apos;s workout</Button>} /></li>}
+          {!stats.sessions.length && <li><EmptyState icon="calendar" mascot="happy" title={t("progress.noWorkouts")} body={t("progress.noWorkouts.body")} action={<Button icon="play" onClick={() => go("today")}>{t("progress.plan")}</Button>} /></li>}
         </ul>
       </Section>
     </div>
@@ -145,13 +146,13 @@ function TdeeCard() {
   const cur = currentTdee(events, stats.sessions, profile, now);
   const hist = tdeeHistory(events);
   return (
-    <Section title="Daily calories (TDEE)" icon="flame" right={<button type="button" onClick={() => go("tools")} className="press text-sm text-accent">All tools</button>}>
+    <Section title={t("progress.tdee")} icon="flame" right={<button type="button" onClick={() => go("tools")} className="press text-sm text-accent">{t("progress.allTools")}</button>}>
       <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center justify-between gap-3 p-4 text-left">
         <div>
-          <div className="num text-2xl font-bold">{cur.result ? `${cur.result.tdee.toLocaleString("en-US")} kcal` : "Not set up"}</div>
-          <div className="text-sm text-muted">{cur.result ? `${ACTIVITY[cur.activity.activity].label}${cur.activity.source === "manual" ? "" : ", from your training"}` : "Add age, sex and height"}</div>
+          <div className="num text-2xl font-bold">{cur.result ? t("progress.kcal", { kcal: cur.result.tdee }) : t("progress.tdee.none")}</div>
+          <div className="text-sm text-muted">{cur.result ? (cur.activity.source === "manual" ? ACTIVITY[cur.activity.activity].label : t("progress.tdee.auto", { level: ACTIVITY[cur.activity.activity].label })) : t("progress.tdee.add")}</div>
         </div>
-        <Spark points={hist.map((e) => e.kcal)} empty="Tracked as things change" />
+        <Spark points={hist.map((e) => e.kcal)} empty={t("progress.tdee.spark")} />
       </button>
     </Section>
   );
@@ -174,18 +175,18 @@ function BodyweightCard() {
     setValue("");
   };
   return (
-    <Section title="Body weight" icon="heart">
+    <Section title={t("progress.bw")} icon="heart">
       <div className="card p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
             <div className="num text-2xl font-bold">{fmtNum(Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10)} {unit}</div>
-            <div className="text-sm text-muted">{change !== undefined ? `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)} ${unit} in 4 weeks` : log.length ? `${log.length} weigh-in${log.length > 1 ? "s" : ""}` : "No weigh-ins yet"}</div>
+            <div className="text-sm text-muted">{change !== undefined ? t("progress.bw.change", { change: `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)}`, unit }) : log.length ? t("progress.bw.count", { count: log.length }) : t("progress.bw.none")}</div>
           </div>
-          <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty="Log twice for a trend" />
+          <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />
         </div>
         <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <BumpField label={`Today's body weight in ${unit}`} placeholder={`Today, ${unit}`} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10} min={1} className="min-w-0 flex-1" />
-          <Button kind="ghost" label="Log body weight" onClick={submit}>Log</Button>
+          <BumpField label={t("progress.bw.label", { unit })} placeholder={t("progress.bw.placeholder", { unit })} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10} min={1} className="min-w-0 flex-1" />
+          <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>{t("progress.bw.log")}</Button>
         </form>
       </div>
     </Section>

@@ -153,6 +153,16 @@ describe("first run to finished workout", () => {
     expect(await screen.findByRole("button", { name: "Today" })).toBeInTheDocument();
   });
 
+  it("shows Progress in the chosen language", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    act(() => useApp.getState().setProfile({ language: "fr" }));
+    location.hash = "#/stats";
+    expect(await screen.findByRole("heading", { level: 1, name: "Progrès" })).toBeInTheDocument();
+    expect(screen.getByText("Records personnels")).toBeInTheDocument();
+    expect(screen.getByText("Aucune séance pour l’instant")).toBeInTheDocument();
+  });
+
   it("swaps an exercise for one that hits the same muscles", async () => {
     const user = userEvent.setup();
     await onboard(user);
