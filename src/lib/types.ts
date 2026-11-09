@@ -202,7 +202,12 @@ export interface Profile {
   blockStart: number;
   /** Weeks of build before the deload week. */
   blockWeeks: number;
+  /** App sounds, including the rest-over chime (Settings › Sounds). */
   restSounds: boolean;
+  /** Vibration on taps and at the end of rest. Missing means on. */
+  haptics?: boolean;
+  /** The daily quote on Today (Melvin, 2026-11-09). Missing means on. */
+  quotes?: boolean;
   /**
    * Cycle-aware readiness (Melvin, 2026-11-09). Opt-in with its own consent screen; consentAt is when
    * the lifter agreed. Cycle data stays on the device (and the user's own sync), never in analytics or
@@ -238,6 +243,8 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /** Appearance: dark (default), light, or follow the system (theme.ts). */
+  theme?: "dark" | "light" | "system";
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   onboarded: boolean;

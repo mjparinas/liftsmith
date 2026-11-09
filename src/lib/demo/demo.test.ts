@@ -1,0 +1,110 @@
+import { describe, expect, it } from "vitest";
+import { EXERCISES } from "../exercises";
+import { MUSCLES } from "../types";
+import { bounds, evalPart, jointsAt, partWeights, PARTS, placeVec, placement, REGIONS, skeletonSegments, SKEL_MAX } from "./mesh";
+import { missingMotions, motionFor, targetsFor } from "./motions";
+import { BODIES, cycleLength, ik, len, sample, solve, sub, V, type BodyKey, type Vec } from "./rig";
+
+const BODY_KEYS: BodyKey[] = ["male", "female"];
+const PHASES = [0, 0.25, 0.5, 0.75, 1];
+const JOINTS = ["hipC", "shC", "neck", "head", "hipL", "kneeL", "ankleL", "shL", "elbowL", "handL", "hipR", "kneeR", "ankleR", "shR", "elbowR", "handR"] as const;
+
+describe("exercise demos", () => {
+  it("has a motion for every exercise in the library", () => {
+    expect(missingMotions()).toEqual([]);
+  });
+
+  it("paints every app muscle somewhere on the body", () => {
+    for (const m of MUSCLES) expect(REGIONS.some((r) => r.id === m), m).toBe(true);
+  });
+
+  it("lights primary muscles fully and secondary ones at half", () => {
+    const t = targetsFor("back-squat");
+    expect(t.quads).toBe(1);
+    expect(t.glutes).toBe(1);
+    expect(t.adductors).toBe(0.5);
+    expect(targetsFor(null)).toEqual({});
+    expect(targetsFor("anything", { chest: 0.7 })).toEqual({ chest: 0.7 });
+  });
+
+  for (const e of EXERCISES) {
+    it(`${e.id}: limbs reach their targets on both bodies and nothing goes through the floor`, () => {
+      const m = motionFor(e.id);
+      expect(cycleLength(m.phases)).toBeGreaterThan(0.5);
+      for (const bk of BODY_KEYS) {
+        const B = BODIES[bk];
+        const pl = placement(m, B);
+        for (const d of PHASES) {
+          const pose = m.pose(B, d);
+          const J = jointsAt(m, B, d) as unknown as Record<string, Vec>;
+          for (const k of JOINTS) for (const v of J[k]) expect(Number.isFinite(v), `${bk} ${k} at ${d}`).toBe(true);
+          // the torso keeps its length
+          expect(Math.abs(len(sub(pose.sh, pose.hip)) - B.torso), `${bk} torso at ${d}`).toBeLessThan(0.02);
+          for (const s of ["L", "R"]) {
+            // hands and feet get to where the pose puts them (within 3 cm): grips stay on the bar
+            expect(len(sub(J["hand" + s], J["sh" + s])), `${bk} ${s} arm at ${d}`).toBeLessThan(B.upper + B.fore + 0.03);
+            expect(len(sub(J["ankle" + s], J["hip" + s])), `${bk} ${s} leg at ${d}`).toBeLessThan(B.thigh + B.shin + 0.03);
+            expect(Math.abs(len(sub(J["elbow" + s], J["sh" + s])) - B.upper), `${bk} ${s} upper arm at ${d}`).toBeLessThan(0.005);
+            expect(Math.abs(len(sub(J["knee" + s], J["hip" + s])) - B.thigh), `${bk} ${s} thigh at ${d}`).toBeLessThan(0.005);
+          }
+          for (const k of JOINTS) {
+            const p = placeVec(J[k], pl.roll(d), pl.lift, pl.shiftZ);
+            expect(p[1], `${bk} ${k} at ${d} is under the floor`).toBeGreaterThan(-0.03);
+          }
+        }
+      }
+    });
+  }
+
+  it("builds the mesh, the muscle paint and the skeleton for a pose", () => {
+    const B = BODIES.female;
+    const m = motionFor("deadlift");
+    const J = jointsAt(m, B, 0.5);
+    let painted = 0;
+    for (const P of PARTS) {
+      const pos = new Float32Array(P.NT * P.M * 3), meta = new Float32Array(P.NT * P.M * 2), w = new Float32Array(P.NT * P.M);
+      evalPart(P, J, B, pos, meta);
+      expect(pos.every(Number.isFinite), P.name).toBe(true);
+      partWeights(P, meta, targetsFor("deadlift"), w);
+      painted += w.filter((x) => x > 0.5).length;
+    }
+    expect(painted).toBeGreaterThan(100);
+    const n = skeletonSegments(J, B, new Float32Array(SKEL_MAX * 6));
+    expect(n).toBeGreaterThan(100);
+    expect(n).toBeLessThanOrEqual(SKEL_MAX);
+  });
+
+  it("frames the whole figure, including rolled side planks", () => {
+    for (const id of ["back-squat", "bench-press", "side-plank", "pull-up"]) {
+      const m = motionFor(id);
+      const b = bounds(m, BODIES.male, placement(m, BODIES.male));
+      expect(b.size, id).toBeGreaterThan(1.1);
+      expect(b.size, id).toBeLessThan(3);
+    }
+  });
+
+  it("samples tempo phases with eased values and wraps around", () => {
+    const m = motionFor("back-squat");
+    const total = cycleLength(m.phases);
+    expect(sample(m.phases, 0).d).toBe(0);
+    expect(sample(m.phases, total + 0.1).d).toBeCloseTo(sample(m.phases, 0.1).d);
+    const bottom = sample(m.phases, 0.6 + 1.8 + 0.1);
+    expect(bottom.d).toBe(1);
+  });
+
+  it("solves a two-bone chain to exact bone lengths", () => {
+    const k = ik(V(0, 1), V(0.3, 0.2), 0.45, 0.45, V(1, 0, 0));
+    expect(len(sub(k, V(0, 1)))).toBeCloseTo(0.45);
+    expect(len(sub(k, V(0.3, 0.2)))).toBeCloseTo(0.45);
+    expect(k[0]).toBeGreaterThan(0.15); // bends towards the pole
+  });
+
+  it("gives male and female figures the same motion with their own proportions", () => {
+    const m = motionFor("overhead-press");
+    const a = solve(m.pose(BODIES.male, 0), BODIES.male, { stance: 0.13, grip: 0.27 });
+    const b = solve(m.pose(BODIES.female, 0), BODIES.female, { stance: 0.13, grip: 0.27 });
+    expect(a.head[1]).toBeGreaterThan(b.head[1]);
+    expect(a.handR[1]).toBeGreaterThan(a.head[1]); // locked out overhead on both
+    expect(b.handR[1]).toBeGreaterThan(b.head[1]);
+  });
+});

@@ -59,7 +59,6 @@ for (const { name } of pick()) {
     await page.getByRole("button", { name: "Finish and save" }).click();
     await page.getByRole("button", { name: "Done", exact: true }).click();
     for (const tab of ["Recovery", "Progress", "Gyms"]) {
-      // The tab bar only: other screens can have buttons whose names contain "Gyms" or "Progress".
       await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
       await noSideScroll(tab);
     }
