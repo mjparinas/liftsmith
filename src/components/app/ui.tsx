@@ -2,7 +2,7 @@
 import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
 import { haptic, sound } from "@/lib/juice";
-import { useId, useState, type CSSProperties, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
 
@@ -40,8 +40,10 @@ export function Chip({ children, active, onClick }: { children: ReactNode; activ
         sound.tick();
         onClick?.();
       }}
-      className={`press rounded-full border px-3.5 py-2 text-sm ${active ? "border-accent/70 bg-accent/15 font-medium text-ink shadow-[0_0_0_3px_rgb(76_141_255/0.12)]" : "border-line bg-surface text-muted"}`}
+      className={`press inline-flex items-center gap-1 rounded-full border px-3.5 py-2 text-sm ${active ? "border-accent/70 bg-accent/15 font-medium text-ink shadow-[0_0_0_3px_rgb(76_141_255/0.12)]" : "border-line bg-surface text-muted"}`}
     >
+      {/* A tick as well as the colour, so the picked chip shows without relying on colour (WCAG 1.4.1). */}
+      {active && <Icon name="check" size={14} className="-ml-1 shrink-0 text-accent" />}
       {children}
     </button>
   );
@@ -65,7 +67,7 @@ export function Stepper({ value, onDown, onUp, label, suffix }: { value: string;
           <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden><path d="M5 12h14" /></svg>
         </button>
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display text-[56px] ${key ? "animate-nudge" : ""}`}>{value}</div>
+          <div key={key} className={`display text-[3.5rem] ${key ? "animate-nudge" : ""}`}>{value}</div>
         </div>
         <button type="button" className={btn} aria-label={`More ${label}`} onClick={() => step(1)}>
           <Icon name="plus" size={22} strokeWidth={2.6} />
@@ -79,7 +81,7 @@ export function Stepper({ value, onDown, onUp, label, suffix }: { value: string;
 export function Section({ title, children, right, icon, info }: { title: string; children: ReactNode; right?: ReactNode; icon?: IconName; info?: Term }) {
   return (
     <section className="mt-7">
-      <div className="mb-2.5 flex items-end justify-between px-1">
+      <div className="mb-2.5 flex flex-wrap items-end justify-between gap-x-2 px-1">
         <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
           {icon && <Icon name={icon} size={14} className="text-accent" />}
           {title}
@@ -94,12 +96,53 @@ export function Section({ title, children, right, icon, info }: { title: string;
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
-  // Rendered on <body>, so a screen's own stacking (its rise animation) can't put it under the tab bar.
+  return <SheetBody onClose={onClose} title={title}>{children}</SheetBody>;
+}
+
+/**
+ * The open sheet: a modal dialog rendered on <body>, so a screen's own stacking (its rise animation)
+ * can't put it under the tab bar. Focus moves into it when it opens and back to where it was when it
+ * closes; Escape closes it, and Tab stays inside it (keyboard and switch access, WCAG 2.1.2, 2.4.3).
+ */
+function SheetBody({ onClose, title, children }: { onClose: () => void; title: string; children: ReactNode }) {
+  const box = useRef<HTMLDivElement>(null);
+  const id = useId();
+  const closeRef = useRef(onClose);
+  useEffect(() => {
+    closeRef.current = onClose;
+  });
+  useEffect(() => {
+    const before = document.activeElement as HTMLElement | null;
+    box.current?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeRef.current();
+      if (e.key !== "Tab" || !box.current) return;
+      const f = [...box.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')];
+      if (!f.length) return;
+      const first = f[0];
+      const last = f[f.length - 1];
+      if (e.shiftKey && (document.activeElement === first || document.activeElement === box.current)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      if (before?.isConnected) before.focus();
+    };
+  }, []);
   return createPortal(
+    // Tapping outside closes it too: a pointer convenience, since Escape and the sheet's own buttons cover the keyboard.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
-      <div role="dialog" aria-label={title} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)]" onClick={(e) => e.stopPropagation()}>
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
+      <div ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={`${id}-t`} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none" onClick={(e) => e.stopPropagation()}>
         <div className="mx-auto mb-4 h-1.5 w-10 rounded-full bg-line" />
-        <h2 className="mb-3 text-lg font-semibold">{title}</h2>
+        <h2 id={`${id}-t`} className="mb-3 text-lg font-semibold">{title}</h2>
         {children}
       </div>
     </div>,
@@ -173,7 +216,7 @@ export function StatTile({ label, value, icon, tint = "var(--color-accent)", cla
         <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{label}{info && <Info term={info} />}</div>
         {icon && <span style={{ color: tint }}><Icon name={icon} size={16} /></span>}
       </div>
-      <div className="display mt-2 text-[28px]">{value}</div>
+      <div className="display mt-2 text-[1.75rem]">{value}</div>
     </div>
   );
 }

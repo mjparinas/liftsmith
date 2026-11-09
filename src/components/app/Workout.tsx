@@ -181,7 +181,7 @@ export function Workout() {
         <button type="button" onClick={() => go("today")} className="press -ml-2 inline-flex min-h-11 items-center gap-0.5 rounded-full pl-1 pr-2 text-muted hover:text-ink"><Icon name="chevronLeft" size={20} />Today</button>
         <div className="flex flex-col items-center leading-tight">
           <span className="display text-lg">{clock(elapsed)}</span>
-          <span className="num text-[11px] font-medium text-muted">{setsLogged}/{totalSets} sets</span>
+          <span className="num text-[0.6875rem] font-medium text-muted">{setsLogged}/{totalSets} sets</span>
         </div>
         <div className="flex items-center gap-2">
           {bpm ? (
@@ -221,7 +221,7 @@ export function Workout() {
               <div className="min-w-0">
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
-                <h1 className="mt-0.5 text-[28px] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
+                <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
                 {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
@@ -244,12 +244,14 @@ export function Workout() {
             <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">How to ›</button>
           </div>
 
+          {/* Screen readers hear the rest start, ten seconds left and rest over, not every second. */}
+          <p className="sr-only" aria-live="polite">{resting ? (left <= 10 ? "10 seconds of rest left" : `Rest, ${clock(active.restTotal)}`) : events.some((e) => e.type === "set" && e.sessionId === active.sessionId) ? `Rest over. Next: ${loadText(ex, active.weight, profile.unit)} for ${repsText(ex, active.reps)}` : ""}</p>
           {resting ? (
             <section className="card-tint animate-pop mt-5 flex flex-col items-center p-5" style={{ "--tint": HUE.cyan } as CSSProperties}>
               <Ring value={left / Math.max(1, active.restTotal)} from={HUE.cyan} to={HUE.accent} stroke={14}>
                 <div className="text-center">
                   <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan">Rest</div>
-                  <div className={`display mt-1 text-[64px] ${left <= 3.5 ? "animate-pulse text-cyan" : ""}`}>{clock(left)}</div>
+                  <div role="timer" aria-label={`${clock(left)} of rest left`} className={`display mt-1 text-[4rem] ${left <= 3.5 ? "animate-pulse text-cyan" : ""}`}>{clock(left)}</div>
                 </div>
               </Ring>
               <div className="mt-4 flex gap-3">
@@ -327,7 +329,7 @@ export function Workout() {
                 <li key={it.exerciseId} className={`flex items-center gap-1 pr-2 ${ss ? "bg-accent/5" : ""}`}>
                   <button type="button" onClick={() => s.goTo(at)} className="press flex min-w-0 flex-1 items-center justify-between gap-3 py-3 pl-4 text-left">
                     <span className="flex min-w-0 flex-col">
-                      {ss && <span className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
+                      {ss && <span className="truncate text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
                       <span className="flex min-w-0 items-center gap-2.5 font-medium"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden /><span className="truncate">{e.name}</span></span>
                     </span>
                     <span className="num shrink-0 text-sm text-muted">{it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}</span>

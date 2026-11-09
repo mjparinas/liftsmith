@@ -11,10 +11,10 @@ const HOURS_90 = { small: 48, large: 72 };
 export type Band = "fresh" | "ready" | "recovering" | "fatigued";
 
 export const BANDS: { band: Band; label: string; min: number; colour: string; hint: string }[] = [
-  { band: "fresh", label: "Fresh", min: 90, colour: "#34d399", hint: "Fully recovered" },
-  { band: "ready", label: "Ready", min: 70, colour: "#a3d977", hint: "Good to train" },
-  { band: "recovering", label: "Recovering", min: 40, colour: "#f5b544", hint: "Light work only" },
-  { band: "fatigued", label: "Fatigued", min: 0, colour: "#f0605d", hint: "Needs rest" },
+  { band: "fresh", label: "Fresh", min: 90, colour: "var(--band-fresh)", hint: "Fully recovered" },
+  { band: "ready", label: "Ready", min: 70, colour: "var(--band-ready)", hint: "Good to train" },
+  { band: "recovering", label: "Recovering", min: 40, colour: "var(--band-recovering)", hint: "Light work only" },
+  { band: "fatigued", label: "Fatigued", min: 0, colour: "var(--band-fatigued)", hint: "Needs rest" },
 ];
 
 export function bandOf(recovery: number): (typeof BANDS)[number] {

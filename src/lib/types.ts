@@ -252,6 +252,8 @@ export interface Profile {
   planSource?: PlanSource;
   /** Appearance: dark (default), light, or follow the system (theme.ts). */
   theme?: "dark" | "light" | "system";
+  /** Accessibility: text size, colour-blind safe colours, contrast (a11y.ts). */
+  a11y?: import("./a11y").A11y;
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */

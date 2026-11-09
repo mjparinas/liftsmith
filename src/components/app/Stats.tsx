@@ -53,7 +53,7 @@ export function Stats() {
   ];
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[28px] font-extrabold tracking-tight">Progress</h1>
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Progress</h1>
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
           <span className="font-bold">Level {lvl.level} · <span className="text-gradient">{lvl.title}</span></span>

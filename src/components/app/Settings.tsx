@@ -6,6 +6,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useEffect, useState } from "react";
+import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type TextSize } from "@/lib/a11y";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
@@ -22,7 +23,7 @@ import { Button, Chip, Section } from "./ui";
 function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
     <Section title={label} info={info}>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
         {options.map(([v, l]) => <Chip key={String(v)} active={v === value} onClick={() => onPick(v)}>{l}</Chip>)}
       </div>
     </Section>
@@ -40,7 +41,7 @@ export function Settings() {
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">Settings</h1>
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">Settings</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>Injuries and sore spots</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
@@ -61,6 +62,7 @@ export function Settings() {
       <Row<Variability> info="variety" label="Exercise variety" value={profile.variability} onPick={(variability) => setProfile({ variability })} options={[["consistent", "More consistent"], ["balanced", "Balanced"], ["variable", "More variety"]]} />
       <Row<number> info="deloadWeeks" label="Build weeks before a deload" value={profile.blockWeeks} onPick={(blockWeeks) => setProfile({ blockWeeks })} options={[3, 4, 5, 6].map((d) => [d, `${d} weeks`])} />
       <Row<"dark" | "light" | "system"> label="Appearance" value={profile.theme ?? "dark"} onPick={(theme) => setProfile({ theme })} options={[["dark", "Dark"], ["light", "Light"], ["system", "Match system"]]} />
+      <AccessibilitySettings />
       <Section title="Units">
         <div className="flex flex-wrap gap-2">
           {([["kg", "Kilograms"], ["lb", "Pounds"]] as const).map(([u, l]) => <Chip key={u} active={profile.unit === u} onClick={() => setProfile({ unit: u })}>{l}</Chip>)}
@@ -113,6 +115,23 @@ export function Settings() {
         )}
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{BRAND.name} · everything is stored on this device</p>
+    </div>
+  );
+}
+
+/** Settings › Accessibility: text size, colour-blind safe colours and contrast (a11y.ts). */
+function AccessibilitySettings() {
+  const { profile, setProfile } = useApp();
+  const a = cleanA11y(profile.a11y);
+  const set = (p: Partial<typeof a>) => setProfile({ a11y: { ...a, ...p } });
+  return (
+    <div id="accessibility">
+      <Row<TextSize> label="Text size" value={a.text} onPick={(text) => set({ text })} options={TEXT_SIZES} />
+      <p className="mt-2 px-1 text-xs text-faint">Match my phone follows the text size in your phone&apos;s settings. Every screen reflows to fit larger text.</p>
+      <Row<Colours> label="Colours" value={a.colours} onPick={(colours) => set({ colours })} options={[["standard", "Standard"], ["cvd", "Colour-blind safe"]]} />
+      <p className="mt-2 px-1 text-xs text-faint">Colour-blind safe uses blue, orange and pink instead of green, amber and red for recovery and status, so they stay apart with red-green or blue-yellow colour blindness. The recovery map also marks recovering muscles with dots and fatigued ones with stripes.</p>
+      <Row<Contrast> label="Contrast" value={a.contrast} onPick={(contrast) => set({ contrast })} options={[["system", "Match my phone"], ["standard", "Standard"], ["more", "More"]]} />
+      <p className="mt-2 px-1 text-xs text-faint">More makes secondary text and outlines stronger and removes background glows. For less motion, use Lean mode below or your phone&apos;s reduce motion setting.</p>
     </div>
   );
 }
