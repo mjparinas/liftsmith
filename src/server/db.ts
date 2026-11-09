@@ -207,6 +207,42 @@ const SCHEMA = [
     target TEXT,
     detail TEXT
   )`,
+  // Admin inbox (src/server/inbox.ts): mail is read live from Resend, so only what the admin did with each
+  // message is kept here, never its body.
+  `CREATE TABLE IF NOT EXISTS inbox_state (
+    email_id TEXT PRIMARY KEY,
+    handled_at INTEGER,
+    replied_at INTEGER,
+    replied_by TEXT,
+    archived_at INTEGER
+  )`,
+  // Admin to-do list (src/server/adminTodo.ts): items worked out from the data that were snoozed or dismissed,
+  // and the admins' own tasks.
+  `CREATE TABLE IF NOT EXISTS admin_todo_hidden (
+    key TEXT PRIMARY KEY,
+    until INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    note TEXT,
+    due INTEGER,
+    created_at INTEGER NOT NULL,
+    created_by TEXT NOT NULL,
+    done_at INTEGER,
+    done_by TEXT
+  )`,
+  // When scheduled jobs ran and how they went, for the System page (src/server/monitor.ts). Kept 60 days.
+  `CREATE TABLE IF NOT EXISTS job_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    job TEXT NOT NULL,
+    started_at INTEGER NOT NULL,
+    finished_at INTEGER,
+    ok INTEGER,
+    detail TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS job_runs_job ON job_runs (job, started_at)`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
