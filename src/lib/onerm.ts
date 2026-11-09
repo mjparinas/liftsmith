@@ -234,7 +234,8 @@ export function repTable(e1rm: number, maxReps = 12): { reps: number; weight: nu
 
 // --- DOTS (Melvin, 2026-11-09) ---------------------------------------------------------------------------
 // The powerlifting total scaled by body weight, so lifters of any size compare. Coefficients are the
-// published DOTS polynomial (body weight in kg, clamped to 40–210 kg for men and 40–150 kg for women).
+// published DOTS polynomial by Tim Konertz (BVDK), checked against OpenPowerlifting's crates/coefficients/src/dots.rs
+// (body weight in kg, clamped to 40–210 kg for men and 40–150 kg for women).
 
 const DOTS_COEF = {
   male: [-307.75076, 24.0900756, -0.1918759221, 0.0007391293, -0.000001093],
