@@ -5,6 +5,7 @@ import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { COSMETICS } from "@/lib/game";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
+import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
 import { haptic, keepAwake, sound } from "@/lib/juice";
@@ -268,7 +269,7 @@ export function Workout() {
       </div>
 
       <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={`Swap ${ex?.name ?? ""}`}>
-        {ex && <SwapList fromId={ex.id} gymEquipment={gym} skip={active.plan.items.map((i) => i.exerciseId)} onPick={(id, avoid) => { s.swap(id, avoid); setSwapOpen(false); haptic("tap"); }} />}
+        {ex && <SwapList fromId={ex.id} gymEquipment={gym} skip={active.plan.items.map((i) => i.exerciseId)} hurt={activeInjuries(events)} onPick={(id, avoid) => { s.swap(id, avoid); setSwapOpen(false); haptic("tap"); }} />}
       </Sheet>
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
@@ -307,9 +308,9 @@ function Feedback({ name, onPick }: { name: string; onPick: (r: -1 | 0 | 1) => v
   );
 }
 
-function SwapList({ fromId, gymEquipment, skip, onPick }: { fromId: string; gymEquipment: Parameters<typeof alternatives>[1]; skip: string[]; onPick: (id: string, avoid: boolean) => void }) {
+function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string; gymEquipment: Parameters<typeof alternatives>[1]; skip: string[]; hurt: Injury[]; onPick: (id: string, avoid: boolean) => void }) {
   const [avoid, setAvoid] = useState(false);
-  const list = alternatives(fromId, gymEquipment, skip).slice(0, 12);
+  const list = alternatives(fromId, gymEquipment, skip, hurt).slice(0, 12);
   return (
     <div>
       <label className="mb-3 flex items-center gap-3 rounded-xl bg-raised p-3 text-sm">
@@ -322,7 +323,7 @@ function SwapList({ fromId, gymEquipment, skip, onPick }: { fromId: string; gymE
             <button type="button" onClick={() => onPick(e.id, avoid)} className="press flex w-full items-center justify-between py-3 text-left">
               <span>
                 <span className="block font-medium">{e.name}</span>
-                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}</span>
+                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{hurt.length ? (effectFor(e, hurt) ? ` · ${effectFor(e, hurt)!.action === "light" ? `injury: ${effectFor(e, hurt)!.pct}% load` : "you marked it fine"}` : " · avoids your injury") : ""}</span>
               </span>
               <span className="text-accent">Swap</span>
             </button>
@@ -330,6 +331,9 @@ function SwapList({ fromId, gymEquipment, skip, onPick }: { fromId: string; gymE
         ))}
         {!list.length && <li className="py-3 text-muted">No other exercise for these muscles at this gym.</li>}
       </ul>
+      <button type="button" onClick={() => go("injuries")} className="press mt-3 w-full rounded-xl border border-line bg-raised px-3 py-3 text-left text-sm">
+        Hurts? <span className="font-semibold text-accent">Log an injury</span> and the rest of this workout works around it.
+      </button>
     </div>
   );
 }

@@ -55,6 +55,15 @@ try {
   await page.getByRole("button", { name: "I agree, turn it on" }).click();
   await page.getByRole("button", { name: "Period started today" }).click();
   await scan("cycle on");
+  await page.getByRole("button", { name: "Injuries and sore spots" }).click();
+  await page.getByRole("button", { name: "Log an injury" }).click();
+  await scan("injury picker");
+  await page.getByRole("button", { name: "Knee" }).click();
+  await scan("injuries");
+  await page.getByRole("button", { name: "Lighter" }).first().click();
+  await scan("injury risk warning");
+  await page.getByRole("button", { name: /Keep skipping/ }).click();
+  await page.goto(`${server.url}/app/#/settings`);
   await page.getByRole("button", { name: "Send feedback or report a bug" }).click();
   await page.getByRole("button", { name: "See what's included" }).click();
   await scan("feedback");

@@ -2,14 +2,15 @@
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, type Stats } from "./derive";
-import { generate, type Plan, type PlanItem } from "./generator";
+import { alternatives, generate, injuredTarget, type Plan, type PlanItem } from "./generator";
+import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise } from "./exercises";
 import { setSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, Gym, Profile, Rating } from "./types";
+import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, Profile, Rating } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
@@ -72,6 +73,10 @@ interface State {
   pickedByLocation: string | null;
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
+  /** Injury mode: log a hurt body part (affected exercises are skipped), change what happens, mark healed. */
+  logInjury(part: BodyPart): string;
+  setInjuryRule(injuryId: string, rule: Pick<InjuryRuleEvent, "exerciseId" | "action" | "pct" | "ack">): void;
+  healInjury(injuryId: string): void;
   autoEnd(now?: number): boolean;
   init(): Promise<void>;
   setProfile(p: Partial<Profile>): void;
@@ -114,6 +119,36 @@ export const useApp = create<State>((set, get) => {
     void appendEvents(evs);
   };
   const gym = () => get().gyms.find((g) => g.id === get().profile.activeGymId) ?? get().gyms[0];
+  // An injury change replans Today, and the rest of a workout in progress: exercises not started yet
+  // that the injury now skips are swapped for one that avoids it (or dropped), lighter ones re-targeted.
+  const afterInjuryChange = () => {
+    const a = get().active;
+    const g = gym();
+    if (a && g) {
+      const { events, profile } = get();
+      const hurt = activeInjuries(events);
+      const now = Date.now();
+      const items: PlanItem[] = a.plan.items.slice(0, a.index);
+      for (const item of a.plan.items.slice(a.index)) {
+        if (setsDone(events, a.sessionId, item.exerciseId) > 0) {
+          items.push(item);
+          continue;
+        }
+        let ex = exercise(item.exerciseId);
+        if (effectFor(ex, hurt)?.action === "skip") {
+          const alt = alternatives(ex.id, g, [...items, ...a.plan.items].map((i) => i.exerciseId), hurt)[0];
+          if (!alt) continue;
+          ex = alt;
+        }
+        const t = injuredTarget(ex, target(ex, events, profile, g, now), hurt, g);
+        items.push({ ...item, exerciseId: ex.id, target: t.target, injuryPct: t.injuryPct, challenge: t.injuryPct ? undefined : item.challenge });
+      }
+      const next = loadItem({ ...a, plan: { ...a.plan, items } }, Math.min(a.index, items.length));
+      set({ active: next });
+      persistActive(next);
+    }
+    get().replan();
+  };
   const loadItem = (a: Active, index: number): Active => {
     const item = a.plan.items[index];
     if (!item) return { ...a, index };
@@ -145,6 +180,23 @@ export const useApp = create<State>((set, get) => {
       await deleteEvents(ids);
       get().setProfile({ cycle: undefined });
       get().replan();
+    },
+
+    logInjury(part) {
+      const injuryId = uid();
+      commit([{ type: "injury", id: uid(), at: Date.now(), injuryId, part }]);
+      afterInjuryChange();
+      return injuryId;
+    },
+
+    setInjuryRule(injuryId, rule) {
+      commit([{ type: "injuryRule", id: uid(), at: Date.now(), injuryId, ...rule }]);
+      afterInjuryChange();
+    },
+
+    healInjury(injuryId) {
+      commit([{ type: "injuryHealed", id: uid(), at: Date.now(), injuryId }]);
+      afterInjuryChange();
     },
 
     async pickGymByLocation(fix) {
@@ -273,6 +325,7 @@ export const useApp = create<State>((set, get) => {
           restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
           ...hrWindow(a, a.setStart, now),
           challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+          injuryPct: item.injuryPct,
         },
       ]);
       const done = already + 1;
@@ -328,9 +381,10 @@ export const useApp = create<State>((set, get) => {
       const g = gym();
       if (!a || !g) return;
       const item = a.plan.items[a.index];
-      const t = target(exercise(toId), get().events, get().profile, g, Date.now());
+      const to = exercise(toId);
+      const t = injuredTarget(to, target(to, get().events, get().profile, g, Date.now()), activeInjuries(get().events), g);
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
-      const newItem: PlanItem = { ...item, exerciseId: toId, target: t, sets: Math.max(1, item.sets - done) };
+      const newItem: PlanItem = { ...item, exerciseId: toId, target: t.target, injuryPct: t.injuryPct, sets: Math.max(1, item.sets - done) };
       const items = [...a.plan.items];
       items[a.index] = newItem;
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);

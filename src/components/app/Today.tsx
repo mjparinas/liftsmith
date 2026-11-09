@@ -7,6 +7,7 @@ import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
@@ -36,6 +37,7 @@ export function Today() {
   const streak = g.streak;
   const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
+  const hurt = useMemo(() => activeInjuries(events), [events]);
   const hour = new Date().getHours();
   const hello = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
 
@@ -70,6 +72,9 @@ export function Today() {
             {preview.week.label} · RIR {preview.week.rir}
           </span>
         )}
+        <button type="button" onClick={() => go("injuries")} className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}>
+          {hurt.length ? `Training around: ${hurt.map((i) => PART_LABEL[i.part].toLowerCase()).join(", ")}` : "Something hurts?"}
+        </button>
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
 
@@ -143,7 +148,7 @@ export function Today() {
                         {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
                       </div>
                     </div>
-                    <span className="shrink-0 rounded-full bg-raised px-2 py-0.5 text-xs text-muted">{MUSCLE_LABEL[it.focus]}</span>
+                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2 py-0.5 text-xs text-warn">Injury {it.injuryPct}%</span> : <span className="shrink-0 rounded-full bg-raised px-2 py-0.5 text-xs text-muted">{MUSCLE_LABEL[it.focus]}</span>}
                   </li>
                 );
               })}

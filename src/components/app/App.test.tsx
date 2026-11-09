@@ -137,6 +137,59 @@ describe("first run to finished workout", () => {
   });
 });
 
+describe("injury mode", () => {
+  it("logs an injury from Today, skips its exercises, warns before training one lighter, and ends when healed", async () => {
+    const { affects } = await import("@/lib/injury");
+    const { exercise } = await import("@/lib/exercises");
+    const user = userEvent.setup();
+    await onboard(user);
+    const kneeIn = (ids: string[]) => ids.filter((id) => affects("knee", exercise(id)));
+    await user.click(screen.getByRole("button", { name: "Something hurts?" }));
+    expect(await screen.findByText(/isn't medical advice/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Log an injury" }));
+    await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Knee" }));
+    expect(kneeIn(useApp.getState().preview!.items.map((i) => i.exerciseId))).toEqual([]);
+
+    // Choosing to train one lighter needs the risk warning ticked first.
+    const card = screen.getByRole("region", { name: "Knee injury" });
+    const first = within(card).getAllByRole("group", { name: /with a knee injury/ })[0];
+    const name = first.getAttribute("aria-label")!.replace(" with a knee injury", "");
+    const id = (await import("@/lib/exercises")).EXERCISES.find((e) => e.name === name)!.id;
+    await user.click(within(first).getByRole("button", { name: "Lighter" }));
+    const warn = screen.getByRole("dialog", { name: "Before you train it" });
+    expect(within(warn).getByText(/make the injury worse/)).toBeInTheDocument();
+    const go = within(warn).getByRole("button", { name: "Train it at 70%" });
+    expect(go).toBeDisabled();
+    await user.click(within(warn).getByRole("button", { name: "60%" }));
+    await user.click(within(warn).getByRole("checkbox", { name: "I understand the risks" }));
+    await user.click(within(warn).getByRole("button", { name: "Train it at 60%" }));
+    expect(useApp.getState().events.find((e) => e.type === "injuryRule")).toMatchObject({ exerciseId: id, action: "light", pct: 60, ack: true });
+    expect(within(card).getByText("60% load")).toBeInTheDocument();
+    const leg = useApp.getState().preview!.items.find((i) => i.exerciseId === id);
+    if (leg) expect(leg.injuryPct).toBe(60);
+
+    await user.click(within(card).getByRole("button", { name: "I'm fully healed" }));
+    await user.click(screen.getByRole("button", { name: "Yes, it's fully healed" }));
+    expect(screen.queryByRole("region", { name: "Knee injury" })).not.toBeInTheDocument();
+    expect(screen.getByText(/Nothing logged/)).toBeInTheDocument();
+  });
+
+  it("an injury logged mid-workout swaps the exercises not started yet", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    const { affects } = await import("@/lib/injury");
+    const { exercise } = await import("@/lib/exercises");
+    const items = useApp.getState().active!.plan.items;
+    const part = (["shoulder", "knee", "lowerBack", "chest"] as const).find((p) => items.slice(1).some((i) => affects(p, exercise(i.exerciseId))))!;
+    act(() => void useApp.getState().logInjury(part));
+    const after = useApp.getState().active!.plan.items;
+    expect(after[0].exerciseId).toBe(items[0].exerciseId);
+    expect(after.slice(1).filter((i) => affects(part, exercise(i.exerciseId)))).toEqual([]);
+  });
+});
+
 describe("game layer", () => {
   it("finishing a workout unlocks badges and a crate, and Awards shows quests, league and badges", async () => {
     const user = userEvent.setup();
