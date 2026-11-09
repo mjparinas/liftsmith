@@ -79,8 +79,8 @@ describe("usage analytics on the device", () => {
 
   it("remembers the first website visit's source, and only the first", () => {
     setAnalytics(true);
-    rememberFirstTouch({ search: "?utm_source=reddit&utm_medium=social&utm_campaign=launch", pathname: "/exercises/back-squat/", hostname: "getliftsmith.com" }, "https://www.reddit.com/r/fitness");
-    rememberFirstTouch({ search: "?utm_source=other", pathname: "/", hostname: "getliftsmith.com" }, "");
+    rememberFirstTouch({ search: "?utm_source=reddit&utm_medium=social&utm_campaign=launch", pathname: "/exercises/back-squat/", hostname: "www.getliftsmith.com" }, "https://www.reddit.com/r/fitness");
+    rememberFirstTouch({ search: "?utm_source=other", pathname: "/", hostname: "www.getliftsmith.com" }, "");
     expect(JSON.parse(localStorage.getItem("liftsmith.firstTouch")!)).toEqual({ landing: "/exercises/back-squat/", referrer: "reddit.com", source: "reddit", medium: "social", campaign: "launch" });
   });
 
@@ -130,7 +130,7 @@ describe("what the server accepts", () => {
     expect(utmFrom("?gclid=abc")).toEqual({ source: "google" });
     expect(utmFrom("?q=1")).toBeUndefined();
     expect(referrerHost("https://www.google.com/search?q=lift")).toBe("google.com");
-    expect(referrerHost("https://getliftsmith.com/x", "getliftsmith.com")).toBeUndefined();
+    expect(referrerHost("https://www.getliftsmith.com/x", "www.getliftsmith.com")).toBeUndefined();
     expect(referrerHost("not a url")).toBeUndefined();
     expect(parsePlayReferrer("utm_source=youtube&utm_medium=video&utm_campaign=launch")).toMatchObject({ source: "youtube", medium: "video", campaign: "launch" });
     expect(parsePlayReferrer(undefined)).toEqual({});
