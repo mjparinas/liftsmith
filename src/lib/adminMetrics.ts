@@ -173,6 +173,7 @@ export function replaySubs(subs: SubEvent[], at: number): SubState[] {
       s.price = usdOf(e) ?? s.price;
     }
     if (e.kind === "cancel") s.cancelled = true;
+    if (e.kind === "uncancel") s.cancelled = false;
     if (e.kind === "refund" || e.kind === "expire") {
       s.ended = e.at;
       s.until = Math.min(s.until, e.at);

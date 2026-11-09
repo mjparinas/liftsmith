@@ -7,14 +7,16 @@ import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { flag } from "@/lib/flags";
-import { declineTrial, PRICES, startTrial, type Plan } from "@/lib/trial";
+import { declineTrial, startTrial } from "@/lib/trial";
+import { billingLive, useBilling } from "@/lib/billing";
+import { Plans, ProFeatures } from "./Pro";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { epley, KNOWN_LIFTS } from "@/lib/progression";
 import { useEffect, useState } from "react";
 import { connectHeartRate, hrSupported } from "@/lib/heartRate";
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
-import { analyticsOn, platformStore, setAnalytics, track } from "@/lib/analytics";
+import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
 import { go } from "./router";
 import { BumpField, Button } from "./ui";
@@ -64,9 +66,13 @@ export function knownMaxes(entries: Record<string, { w: string; r: string }>, un
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const { profile, setProfile, addGym, gyms } = useApp();
   const [step, setStep] = useState(0);
-  // First run ends with the Pro trial offer; a rerun from Settings doesn't show it again.
-  const STEPS = rerun ? 4 : 5;
+  // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
+  // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
+  const STEPS = rerun || !billingLive() ? 4 : 5;
   const trialDays = flag("trialDays");
+  // The store's own trial length for this person (null once they've used a trial), else the flag's.
+  const offers = useBilling((b) => b.offers);
+  const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [notify, setNotify] = useState<boolean | null>(null);
@@ -268,36 +274,19 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 4 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.pro.title", { days: trialDays })}</h1>
-            <p className="mt-2 text-muted">{t("setup.pro.lead")}</p>
-            <ul className="mt-4 space-y-1.5 text-sm">
-              {[t("setup.pro.f1"), t("setup.pro.f2"), t("setup.pro.f3")].map((f) => (
-                <li key={f} className="flex gap-2"><span className="text-accent" aria-hidden>✓</span>{f}</li>
-              ))}
-            </ul>
-            <div className="mt-6 space-y-3">
-              {(["annual", "monthly"] as Plan[]).map((plan) => (
-                <button
-                  key={plan}
-                  type="button"
-                  onClick={() => {
-                    haptic("tick");
-                    track("trial_start", { plan, store: platformStore() });
-                    finish(startTrial(plan, trialDays, Date.now()));
-                  }}
-                  className={`press w-full rounded-2xl border p-4 text-left ${plan === "annual" ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
-                >
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-semibold">{t("setup.pro.start", { plan: plan === "annual" ? t("setup.pro.yearly") : t("setup.pro.monthly") })}</span>
-                    {PRICES[plan].note && <span className="text-xs font-semibold text-accent">{PRICES[plan].note}</span>}
-                  </div>
-                  <div className="mt-0.5 text-sm text-muted">{t("setup.pro.terms", { days: trialDays, price: PRICES[plan].price, per: PRICES[plan].per })}</div>
-                </button>
-              ))}
-            </div>
-            <Button kind="quiet" className="mt-4 w-full" onClick={() => {
+            <h1 className="text-3xl font-extrabold tracking-tight">{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
+            <p className="mt-2 text-muted">{t("pro.lead")}</p>
+            <ProFeatures />
+            <Plans
+              from="setup"
+              onDone={(plan, trial) => {
+                const now = Date.now();
+                finish(trial && offerDays ? startTrial(plan, offerDays, now) : { offeredAt: now, plan, subscribed: true });
+              }}
+            />
+            <Button kind="quiet" className="mt-2 w-full" onClick={() => {
               track("paywall_close", { from: "setup" });
-              finish(declineTrial(trialDays, Date.now()));
+              finish(declineTrial(offerDays ?? trialDays, Date.now()));
             }}>{t("setup.pro.decline")}</Button>
             <p className="mt-2 text-center text-xs text-muted">{t("setup.pro.free")}</p>
           </>

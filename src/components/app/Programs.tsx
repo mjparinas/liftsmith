@@ -20,6 +20,7 @@ const TEXT = {
   adaptiveBlurb: "Plans each workout from your gym, recovery and training block, sized to the time you have.",
   current: "Current",
   pro: "Pro",
+  unlock: "Unlock with Pro",
   free: "Free",
   start: "Start this program",
   restart: "Restart from the beginning",
@@ -39,7 +40,9 @@ export function Programs() {
   const choose = (id: ProgramId | null) => {
     haptic("tap");
     if (!gym) return;
-    setProfile({ planSource: id ? pickProgram(id, { profile, gym, events, now: Date.now() }) : { kind: "adaptive" } });
+    // Adaptive plans and splits are Pro: without it, the paywall instead.
+    if (!id ? !can("adaptive") : PROGRAM_BY_ID.get(id)?.tier === "pro" && !can("adaptiveSplits")) return go("pro", "programs");
+    setProfile({ planSource: id ? pickProgram(id, { profile, gym, events, now: Date.now() }) : { kind: "adaptive" }, proPlan: undefined });
     track("feature", { name: "program", detail: id ?? "adaptive" });
     setOpen(null);
     go("today");
@@ -57,6 +60,7 @@ export function Programs() {
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold">{TEXT.adaptive}</span>
               {!currentId && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{TEXT.current}</span>}
+              {!can("adaptive") && <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{TEXT.pro}</span>}
             </div>
             <p className="mt-1 text-sm text-muted">{TEXT.adaptiveBlurb}</p>
           </button>
@@ -118,7 +122,7 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
         </ul>
       </div>
       <p className="text-xs text-faint">{p.basedOn} Names belong to their owners; this app isn&apos;t affiliated with them.</p>
-      <Button className="w-full" disabled={!allowed} onClick={onStart}>{current ? TEXT.restart : TEXT.start}</Button>
+      <Button className="w-full" onClick={onStart}>{!allowed ? TEXT.unlock : current ? TEXT.restart : TEXT.start}</Button>
     </div>
   );
 }
