@@ -11,8 +11,11 @@ type HealthModule = typeof import("@capgo/capacitor-health");
 let mod: Promise<HealthModule> | null = null;
 const health = () => (mod ??= import("@capgo/capacitor-health"));
 
-const READ = ["weight", "height", "bodyFat", "restingHeartRate", "heartRateVariability", "sleep", "heartRate"] as const;
-const WRITE = ["calories", "heartRate"] as const;
+// Only what a feature uses today: Play's Health Connect review rejects any permission the app doesn't
+// visibly use, so keep this list, the manifest's health permissions and the privacy pages in step.
+// Sleep and HRV join when readiness reads them (integrations roadmap, step 2).
+export const READ = ["weight", "height", "bodyFat", "restingHeartRate"] as const;
+export const WRITE = ["calories", "heartRate"] as const;
 
 export async function healthAvailable(): Promise<boolean> {
   if (!isNative()) return false;

@@ -2,7 +2,7 @@
 "NSCameraUsageDescription" = "Pour prendre des photos de progression. Elles restent sur ce téléphone et ne sont jamais envoyées.";
 "NSBluetoothAlwaysUsageDescription" = "Liftsmith se connecte à votre ceinture ou montre cardio pour afficher votre fréquence cardiaque en direct pendant les séances.";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith utilise votre position approximative à l’ouverture de l’app pour choisir la salle où vous êtes. Il ne vous suit jamais en arrière-plan et votre position reste sur votre téléphone.";
-"NSHealthShareUsageDescription" = "Liftsmith lit votre poids, votre taille, votre fréquence cardiaque au repos et votre fréquence cardiaque pour préparer votre entraînement et montrer l’effort pendant les séances.";
+"NSHealthShareUsageDescription" = "Liftsmith lit votre poids, votre taille, votre masse grasse et votre fréquence cardiaque au repos pour préparer votre entraînement et tenir à jour vos pesées et vos calories quotidiennes.";
 "NSHealthUpdateUsageDescription" = "Liftsmith enregistre vos séances terminées, les calories et la fréquence cardiaque dans Santé.";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith ajoute vos jours d’entraînement à votre calendrier et, si vous l’activez, regarde quand vous êtes occupé pour proposer une séance qui tient dans votre emploi du temps. Il ne regarde que les horaires, jamais le contenu de vos événements.";
 "NSCalendarsUsageDescription" = "Liftsmith ajoute vos jours d’entraînement à votre calendrier et, si vous l’activez, regarde quand vous êtes occupé pour proposer une séance qui tient dans votre emploi du temps. Il ne regarde que les horaires, jamais le contenu de vos événements.";
