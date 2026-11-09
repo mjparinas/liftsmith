@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
@@ -42,9 +43,9 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
 
 /** The greeting, by local time of day, with the lifter's first name when they've given one. */
 export function greeting(hour: number, name: string): string {
-  const part = hour < 5 ? "Good evening" : hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+  const part = t(hour < 5 ? "today.evening" : hour < 12 ? "today.morning" : hour < 18 ? "today.afternoon" : "today.evening");
   const first = name.trim().split(/\s+/)[0];
-  return first ? `${part}, ${first}` : part;
+  return first ? t("today.hello", { greeting: part, name: first }) : part;
 }
 
 export function Today() {
@@ -265,7 +266,7 @@ export function Today() {
                 go("workout");
               }}
             >
-              Start workout
+              {t("today.start")}
             </Button>
           </div>
         </div>

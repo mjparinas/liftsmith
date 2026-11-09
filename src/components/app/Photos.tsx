@@ -7,7 +7,7 @@ import { haptic } from "@/lib/juice";
 import { deletePhoto, listPhotos, pairFor, preparePhoto, savePhoto, type Photo, type Pose } from "@/lib/photos";
 import { useApp } from "@/lib/store";
 import type { BodyweightEvent } from "@/lib/types";
-import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
@@ -22,7 +22,7 @@ export function Photos() {
   const { events, profile, logBodyweight } = useApp();
   const unit = profile.unit;
   const weighIns = useMemo(() => events.filter((e): e is BodyweightEvent => e.type === "bodyweight").sort((a, b) => a.at - b.at), [events]);
-  const [value, setValue] = useState(fmtNum(fromKg(profile.bodyweight, unit)));
+  const [value, setValue] = useState(plainNum(fromKg(profile.bodyweight, unit)));
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [pose, setPose] = useState<Pose>("front");
   const [busy, setBusy] = useState(false);

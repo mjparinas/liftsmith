@@ -1,0 +1,52 @@
+import type { MessageKey } from "./en";
+import type { Message } from "@/lib/i18n";
+
+// Français. Première traduction, à faire relire par un locuteur natif.
+export const fr: Partial<Record<MessageKey, Message>> = {
+  "tab.today": "Aujourd’hui",
+  "tab.recovery": "Récupération",
+  "tab.progress": "Progrès",
+  "tab.awards": "Trophées",
+  "tab.gyms": "Salles",
+  "nav.main": "Principale",
+  "nav.back.today": "Aujourd’hui",
+
+  "today.morning": "Bonjour",
+  "today.afternoon": "Bon après-midi",
+  "today.evening": "Bonsoir",
+  "today.hello": "{greeting}, {name}",
+  "today.start": "Commencer la séance",
+
+  "workout.setsDone": "{done}/{total} séries",
+  "workout.end": "Fin",
+  "workout.setOf": "Série {n} sur {total}",
+  "workout.warmupOf": "Échauffement {n} sur {total}",
+  "workout.logSet": "Valider la série",
+  "workout.logWarmup": "Valider l’échauffement",
+  "workout.logNow": "Valider la série maintenant",
+  "workout.finish": "Terminer la séance",
+  "workout.rest": "Repos",
+  "workout.restLeft": "Encore {time} de repos",
+  "workout.add30": "+30 s",
+  "workout.skipRest": "Passer le repos",
+  "workout.skipWarmup": "Passer l’échauffement",
+  "workout.nextUp": "Ensuite :",
+  "workout.comingUp": "À suivre",
+  "workout.howTo": "Comment faire ›",
+  "workout.howToLabel": "Comment faire",
+  "workout.swap": "Changer d’exercice",
+  "workout.adjust": "Ajuster cette série",
+  "workout.weight": "charge",
+  "workout.reps": "rép.",
+  "workout.seconds": "secondes",
+  "workout.each": "{unit} chacun",
+  "workout.sr.rest": "Repos, {time}",
+  "workout.sr.tenLeft": "Encore 10 secondes de repos",
+  "workout.sr.over": "Fin du repos. Ensuite : {load} pour {reps}",
+  "workout.more": "Plus de {what}",
+  "workout.less": "Moins de {what}",
+
+  "settings.language": "Langue",
+  "settings.language.system": "Comme le téléphone",
+  "settings.language.note": "« Comme le téléphone » suit la langue choisie pour Liftsmith dans les réglages du téléphone. Les nombres, les dates et les unités suivent votre région. Certains écrans sont encore en anglais pendant la traduction.",
+};

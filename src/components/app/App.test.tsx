@@ -126,6 +126,19 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().active!.reps).toBe(held); // stops on release
   });
 
+  it("switches language from Settings, for the app and the page", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: "Español" }));
+    expect(await screen.findByRole("button", { name: "Hoy" })).toBeInTheDocument();
+    expect(document.documentElement.lang).toMatch(/^es/);
+    await user.click(screen.getByRole("button", { name: "Français" }));
+    expect(await screen.findByRole("button", { name: "Aujourd’hui" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "English" }));
+    expect(await screen.findByRole("button", { name: "Today" })).toBeInTheDocument();
+  });
+
   it("swaps an exercise for one that hits the same muscles", async () => {
     const user = userEvent.setup();
     await onboard(user);

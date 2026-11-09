@@ -254,6 +254,8 @@ export interface Profile {
   theme?: "dark" | "light" | "system";
   /** Accessibility: text size, colour-blind safe colours, contrast (a11y.ts). */
   a11y?: import("./a11y").A11y;
+  /** Language: follow the phone, or a chosen one (i18n.ts). */
+  language?: import("./i18n").LangPref;
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */
