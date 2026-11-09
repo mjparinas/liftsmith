@@ -125,7 +125,7 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const skip = new Set([...exclude, ...avoided(events, gym.id, now)]);
-  const pool = available(gym.equipment).filter((e) => !skip.has(e.id));
+  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom);
   const random = rng(hash(dayKey(now) + gym.id));
   const recent = recentFor(events);
   const budget = minutes * 60;
