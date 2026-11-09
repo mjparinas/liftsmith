@@ -13,6 +13,9 @@ import PairPage from "./muscles/[muscle]/[equipment]/page";
 import EquipmentPage from "./equipment/[slug]/page";
 import PlatePage from "./tools/plate-calculator/page";
 import OneRmPage from "./tools/one-rep-max-calculator/page";
+import ComparePage from "./compare/[slug]/page";
+import CompareIndex from "./compare/page";
+import FitbodAlternatives from "./alternatives/fitbod/page";
 
 // The pages exist to send readers into the app (Melvin, 2026-11-09: "emphasis on the call to actions").
 const ctas = () => [...document.querySelectorAll("[data-cta]")].map((a) => a.getAttribute("data-cta")!);
@@ -56,6 +59,21 @@ describe("SEO pages", () => {
 
   it("renders the indexes and the calculators", () => {
     for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage]) {
+      render(<P />);
+      expectCtas();
+      cleanup();
+    }
+  });
+
+  it("renders the comparison pages with sources, the trademark line and calls to action", async () => {
+    for (const slug of ["fitbod", "hevy", "strong", "gymverse"]) {
+      render(await ComparePage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getAllByText(/checked Nov 9, 2026/).length).toBeGreaterThan(3);
+      expect(screen.getByText(/trademarks of their owners/)).toBeInTheDocument();
+      cleanup();
+    }
+    for (const P of [CompareIndex, FitbodAlternatives]) {
       render(<P />);
       expectCtas();
       cleanup();

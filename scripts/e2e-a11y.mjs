@@ -109,7 +109,7 @@ try {
   await scan("tdee public page");
   // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
   // guide, blog post and index, calculators).
-  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/"]) {
+  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/", "/compare/", "/compare/fitbod/", "/alternatives/fitbod/"]) {
     await page.goto(`${server.url}${path}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan(`site ${path}`);
