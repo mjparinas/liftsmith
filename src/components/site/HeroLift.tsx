@@ -95,7 +95,7 @@ export function HeroLift() {
     let hr = 96, beat = 0, effortS = 0, traceClock = 0, lastNow = performance.now(), lastBpm = 0;
     const trace: number[] = Array(64).fill(96);
 
-    (async () => {
+    void (async () => {
       try {
         const probe = document.createElement("canvas");
         if (!(probe.getContext("webgl2") ?? probe.getContext("webgl"))) throw new Error("no WebGL");

@@ -95,7 +95,7 @@ export function Dashboard() {
     track("screen_view", { screen: "me" });
     applyAppearance(savedAppearance());
     applyA11y(savedA11y());
-    load().then((snap) => {
+    void load().then((snap) => {
       setNow(Date.now());
       setData({ events: snap.events, profile: snap.profile ?? defaultProfile() });
       applyAppearance(snap.profile?.theme ?? "dark");

@@ -494,6 +494,10 @@ Small things that make the app a pleasure, all derived from events (never stored
 - **Seeded randomness only** in the generator (`random.ts`), never `Math.random`, so plans are reproducible and testable.
 - **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
 
+## Code conventions (Melvin asked, 2026-11-09: "easier to maintain and change")
+- **Strict TypeScript plus** `noImplicitReturns` and `noFallthroughCasesInSwitch` (`tsconfig.json`). No `any`.
+- **Type-aware lint on `src/`** (`eslint.config.mjs`): `no-floating-promises` (a promise nobody waits for loses its error; await it, or mark a deliberate fire-and-forget with `void`), `no-misused-promises` (no async function where a plain callback is expected; JSX handlers may be async), and `switch-exhaustiveness-check` (a `switch` over a union covers every case or has a `default`).
+
 ## Testing (Melvin asked, 2026-11-09: like Gradelings)
 
 - **Unit tests** (`src/lib/*.test.ts`, node) for every engine rule: plates, recovery, blocks, progression, generator, stats, game.
