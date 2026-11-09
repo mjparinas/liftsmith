@@ -35,6 +35,17 @@ try {
     await page.getByRole("button", { name: tab }).click();
     await scan(tab);
   }
+  // The web dashboard and a share link, with the workout just saved.
+  await page.goto(`${server.url}/me/`);
+  await page.getByRole("heading", { name: /training/ }).waitFor();
+  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Trophies", "Log a workout", "Share"]) {
+    await page.getByRole("link", { name: tab, exact: true }).click();
+    await scan(`dashboard ${tab}`);
+  }
+  const link = await page.getByLabel("Your link").inputValue();
+  await page.goto(link);
+  await page.getByRole("article", { name: "Shared training summary" }).waitFor();
+  await scan("shared summary");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();

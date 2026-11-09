@@ -27,6 +27,7 @@ export function Settings() {
       <h1 className="text-2xl font-bold">Settings</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
+      <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
       <Section title="Your name">
         <input value={profile.name} onChange={(e) => setProfile({ name: e.target.value })} className="card w-full px-4 py-3" placeholder="Optional" aria-label="Your name" />
       </Section>
