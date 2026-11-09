@@ -60,6 +60,14 @@ for (const { name } of pick()) {
       await noSideScroll(tab);
     }
     await page.screenshot({ path: `${OUT}/${tag}-gyms.png` });
+    await page.goto(`${server.url}/me/`);
+    await page.getByRole("heading", { name: /training/ }).waitFor();
+    for (const tab of ["Overview", "Calendar", "Lifts", "History", "Log a workout", "Share"]) {
+      await page.getByRole("link", { name: tab, exact: true }).click();
+      await noSideScroll(`dashboard ${tab}`);
+    }
+    await page.getByRole("link", { name: "Overview", exact: true }).click();
+    await page.screenshot({ path: `${OUT}/${tag}-dashboard.png` });
   } catch (e) {
     fail.push(`${name}: ${e}`);
   }
