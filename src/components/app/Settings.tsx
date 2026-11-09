@@ -21,6 +21,7 @@ import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
+import { CreatorCode } from "./CreatorCode";
 import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
 import { feel } from "@/lib/juice";
 import { entActive, useBilling } from "@/lib/billing";
@@ -86,6 +87,9 @@ export function Settings() {
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>{t("settings.training")}</Button>
       <SavingSettings />
       <ProRow />
+      <Section title={t("creator.title")}>
+        <CreatorCode />
+      </Section>
       <Section title={t("settings.program")}>
         <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
           <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}</span>

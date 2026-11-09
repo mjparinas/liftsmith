@@ -6,6 +6,7 @@ import { alternatives } from "./generator";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { ARTICLES, type Article } from "@/content/articles";
 import { SITE_URL } from "./site";
+import { COMPETITORS } from "@/content/compare";
 
 /** frontDelts → front-delts. */
 export const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -121,6 +122,9 @@ export function siteRoutes(): Route[] {
     { path: "/tools/", priority: 0.7 },
     ...TOOL_PAGES.map((t) => ({ path: t.path, priority: 0.8 })),
     { path: "/privacy/", priority: 0.2 },
+    { path: "/compare/", priority: 0.6 },
+    { path: "/alternatives/fitbod/", priority: 0.7 },
+    ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),
   ];
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });

@@ -1,5 +1,6 @@
 import { dedupe, derive, weekOf } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
+import { date, weekday } from "./i18n";
 import { tonnage } from "./moments";
 import { type AppEvent, type Muscle, type SetEvent } from "./types";
 
@@ -20,7 +21,7 @@ export function yearOf(ms: number): Period {
 
 export function periodLabel(p: Period): string {
   const d = new Date(p.start);
-  return p.kind === "year" ? String(d.getFullYear()) : d.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  return p.kind === "year" ? String(d.getFullYear()) : date(d, { month: "long", year: "numeric" });
 }
 
 /**
@@ -35,7 +36,6 @@ export function suggestedPeriod(now: number): Period {
   return monthOf(now);
 }
 
-const WEEKDAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export interface Recap {
   period: Period;
@@ -49,7 +49,8 @@ export interface Recap {
   topExercise: { id: string; name: string; sets: number } | null;
   topMuscle: { muscle: Muscle; sets: number } | null;
   favouriteDay: string | null;
-  timeOfDay: "early bird" | "lunchtime lifter" | "after-work lifter" | "night owl" | null;
+  /** When most sessions start; the screen words it (`recap.tod.<key>`). */
+  timeOfDay: "early" | "lunch" | "evening" | "night" | null;
   heaviest: { exerciseId: string; name: string; weight: number } | null;
   /** Distinct weeks with a workout, against the weeks in the period so far. */
   activeWeeks: number;
@@ -110,7 +111,6 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
   }
   const favDay = topOf(days);
   const tod = topOf(new Map(Object.entries(hours)));
-  const todLabel = { early: "early bird", lunch: "lunchtime lifter", evening: "after-work lifter", night: "night owl" } as const;
 
   const until = Math.min(now, period.end);
   const weeks = Math.max(1, Math.ceil((until - weekOf(period.start)) / (7 * 86400_000)));
@@ -132,8 +132,8 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
     prs: [...bestPr.values()].sort((a, b) => b.e1rm - a.e1rm).map((p) => ({ exerciseId: p.exerciseId, name: EXERCISE_BY_ID.get(p.exerciseId)?.name ?? p.exerciseId, weight: p.weight, reps: p.reps })),
     topExercise: topEx ? { id: topEx[0], name: EXERCISE_BY_ID.get(topEx[0])?.name ?? topEx[0], sets: topEx[1] } : null,
     topMuscle: topM ? { muscle: topM[0], sets: topM[1] } : null,
-    favouriteDay: favDay && sessions.length >= 2 ? WEEKDAYS[favDay[0]] : null,
-    timeOfDay: tod && tod[1] > 0 && sessions.length >= 2 ? todLabel[tod[0] as keyof typeof todLabel] : null,
+    favouriteDay: favDay && sessions.length >= 2 ? weekday(Number(favDay[0]), "long") : null,
+    timeOfDay: tod && tod[1] > 0 && sessions.length >= 2 ? (tod[0] as NonNullable<Recap["timeOfDay"]>) : null,
     heaviest,
     activeWeeks,
     weeks: Math.min(weeks, period.kind === "year" ? 53 : 6),

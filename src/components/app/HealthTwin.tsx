@@ -4,14 +4,16 @@
 // and every metric below as a tile that says what it means and what to do. Tapping one opens its last
 // 30 days against the lifter's own normal. Free to see; health signals moving today's call is Pro.
 import { Info } from "@/components/Info";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { can, isPro } from "@/lib/entitlements";
+import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
 import { connectHealth, healthAvailable } from "@/lib/health";
-import { t } from "@/lib/i18n";
+import { date, t } from "@/lib/i18n";
 import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
+import { scoreBand, strength } from "@/lib/strength";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
@@ -98,7 +100,7 @@ export function HealthTwin() {
       {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
 
       <div className="keep-colours relative mx-auto mt-4 h-[24rem] max-w-[420px]">
-        <LiftDemo className="h-full" view="front" bpm={rhr?.value ? Math.round(rhr.value) : null} label={t("body.health")} />
+        <LiftDemo className="h-full" body={bodyFor(profile.sex)} view="front" bpm={rhr?.value ? Math.round(rhr.value) : null} label={t("body.health")} />
         <span className="sr-only">{t("twin.figure", { summary })}</span>
         <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
         <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
@@ -106,6 +108,8 @@ export function HealthTwin() {
         <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
         <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
       </div>
+
+      <FitnessAgeCard native={native} store={store} />
 
       <Section title={t("twin.group.body")} icon="target">
         <Tiles ids={BODY} by={by} onOpen={setOpen} />
@@ -119,6 +123,57 @@ export function HealthTwin() {
         {current && <Detail m={current} store={store} onConnect={() => void connect()} onEasy={() => { setCall("recover"); setOpen(null); go("today"); }} />}
       </Sheet>
     </div>
+  );
+}
+
+/**
+ * Fitness age from VO2 max (AGENTS.md "Fitness age"; docs/FITNESS_AGE.md). General wellness only: a range,
+ * its source and what moves it, a standing note that it isn't medical advice, no warning colours, never a
+ * notification. Beside it, this week's strength training and the strength score.
+ */
+function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
+  const { events, profile, stats } = useApp();
+  const now = useNow(60_000);
+  const r = useMemo(() => fitnessAge(events, profile, now), [events, profile, now]);
+  const week = useMemo(() => strengthWeek(stats.sessions, now), [stats.sessions, now]);
+  const score = useMemo(() => strength(events, profile, now, { adjustAge: profile.delight?.ageAdjust !== false }).overall, [events, profile, now]);
+  const [how, setHow] = useState(false);
+  const v: FitnessAge | null = r.ok ? r.value : null;
+  const big = v ? (v.atFloor ? t("fit.floor", { age: v.fitnessAge }) : v.atCeiling ? t("fit.ceiling", { age: v.fitnessAge }) : t("fit.value", { age: v.fitnessAge })) : "—";
+  const one = (x: number) => (Math.round(x * 10) / 10).toFixed(1);
+  return (
+    <Section title={t("fit.title")} icon="heart">
+      <div className="card p-4" data-testid="fitness-age">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+          <span className="num display text-3xl">{big}</span>
+          {v && <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${v.verdict === "younger" ? "border-good/50 text-good" : "border-line text-muted"}`}>{t(`fit.chip.${v.verdict}`)}</span>}
+          <Info term="fitnessAge" />
+        </div>
+        {v ? (
+          <>
+            <p className="mt-1 text-sm text-muted">{t("fit.range", { low: v.low, high: v.high, age: v.age })}</p>
+            <p className="mt-2 text-sm text-muted">{t("fit.from", { vo2: one(v.vo2), date: date(new Date(`${v.day}T12:00:00`), { day: "numeric", month: "short" }), who: t(v.sex === "male" ? "fit.man" : "fit.woman"), age: v.age, expected: one(v.expected) })}</p>
+            <p className="mt-2 text-sm text-ink">{t(`fit.todo.${v.verdict}`)}</p>
+          </>
+        ) : (
+          <p className="mt-1 text-sm text-muted">
+            {r.ok ? "" : r.missing.includes("vo2") ? (native ? t("fit.missing.vo2", { source: store }) : t("fit.missing.web")) : t("fit.missing.profile")}
+          </p>
+        )}
+        <p className="mt-3 text-sm text-muted">{t("fit.strength", { count: week.days, minutes: week.minutes })}</p>
+        {score !== null && <p className="mt-1 text-sm text-muted">{t("fit.score", { score, band: scoreBand(score) })}</p>}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button kind="ghost" onClick={() => setHow(true)}>{t("fit.how")}</Button>
+          {!r.ok && !r.missing.includes("vo2") && <Button kind="ghost" onClick={() => go("tools", "tdee")}>{t("fit.addProfile")}</Button>}
+          {score !== null && <Button kind="ghost" onClick={() => go("stats")}>{t("fit.seeProgress")}</Button>}
+        </div>
+        <p className="mt-3 text-xs text-faint">{t("fit.disclaimer")}</p>
+      </div>
+      <Sheet open={how} onClose={() => setHow(false)} title={t("fit.how")}>
+        {(["fit.how.1", "fit.how.2", "fit.how.3", "fit.how.4"] as const).map((k) => <p key={k} className="mt-2">{t(k)}</p>)}
+        <p className="mt-4 text-xs text-faint">{t("fit.disclaimer")}</p>
+      </Sheet>
+    </Section>
   );
 }
 

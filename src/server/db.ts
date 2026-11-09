@@ -99,6 +99,35 @@ const SCHEMA = [
     family INTEGER NOT NULL DEFAULT 0,
     updated_at INTEGER NOT NULL
   )`,
+  // Creator program (src/server/creators.ts). A creator's code, their terms, and which installs came with it.
+  `CREATE TABLE IF NOT EXISTS creators (
+    code TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact TEXT,
+    rate REAL NOT NULL DEFAULT 0.3,
+    months INTEGER NOT NULL DEFAULT 12,
+    active INTEGER NOT NULL DEFAULT 1,
+    note TEXT,
+    created_at INTEGER NOT NULL
+  )`,
+  // One row per install: the code it came with. Fixed once the install starts a trial or buys.
+  `CREATE TABLE IF NOT EXISTS creator_installs (
+    install_id TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    source TEXT NOT NULL,
+    platform TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS creator_installs_code ON creator_installs (code)`,
+  // Commission paid out, recorded by an admin after paying (PayPal or Wise, outside the app).
+  `CREATE TABLE IF NOT EXISTS creator_payouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL,
+    usd_micros INTEGER NOT NULL,
+    paid_at INTEGER NOT NULL,
+    admin TEXT NOT NULL,
+    note TEXT
+  )`,
   // Admin sign-in: one-time email links and sessions. Only hashes of the tokens are stored.
   `CREATE TABLE IF NOT EXISTS admin_links (
     token_hash TEXT PRIMARY KEY,

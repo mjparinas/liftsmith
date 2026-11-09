@@ -3,6 +3,7 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { setWeekStart } from "@/lib/derive";
+import { setLanguage } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { ExercisePrefsEditor, FavouriteButton, TrainingSettings } from "./TrainingSettings";
 
@@ -13,11 +14,23 @@ beforeEach(async () => {
 afterEach(() => {
   cleanup();
   setWeekStart(1);
+  setLanguage("en");
 });
 
 const training = () => useApp.getState().profile.training;
 
 describe("Settings › Workout preferences", () => {
+  it("shows in the chosen language, with the weekday names from Intl", async () => {
+    setLanguage("fr");
+    const user = userEvent.setup();
+    render(<TrainingSettings />);
+    expect(screen.getByRole("heading", { name: "Préférences d’entraînement" })).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "dimanche" }));
+    expect(training()?.weekStart).toBe(0);
+    await user.click(screen.getByRole("button", { name: "RPE : de 1 à 10" }));
+    expect(training()?.effort).toBe("rpe");
+  });
+
   it("saves each choice, and Auto clears it", async () => {
     const user = userEvent.setup();
     render(<TrainingSettings />);

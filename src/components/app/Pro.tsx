@@ -9,6 +9,7 @@ import { useNow } from "@/lib/useNow";
 import { useApp } from "@/lib/store";
 import type { Plan } from "@/lib/trial";
 import { go, useRoute, type Route } from "./router";
+import { CreatorCode } from "./CreatorCode";
 import { Button } from "./ui";
 
 // The paywall (#/pro, also the last step of first-run setup). AGENTS.md "Money": plain prices from the
@@ -93,6 +94,7 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
         })}
       </div>
       {note && <p role="status" className="mt-3 text-sm text-warn">{note}</p>}
+      <CreatorCode collapsed />
       <Button kind="quiet" className="mt-3 w-full" disabled={busy} onClick={() => void doRestore()}>{t("pro.restore")}</Button>
       <p className="mt-2 text-xs text-faint">{t(store === "appstore" ? "pro.legal.appstore" : "pro.legal.play")}</p>
       <p className="mt-1 flex gap-4 text-xs">

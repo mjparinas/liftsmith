@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { useApp } from "@/lib/store";
 import { setBillingLive } from "@/lib/billing";
 import { App } from "./App";
+import { exercise } from "@/lib/exercises";
 
 // jsdom has no canvas.
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
@@ -220,6 +221,13 @@ describe("first run to finished workout", () => {
     expect(plan.items[1].group).toBe(plan.items[0].group);
     expect(plan.estMinutes).toBeLessThanOrEqual(before.estMinutes);
     expect(screen.getAllByText("Superset A · 1 of 2").length).toBeGreaterThan(0);
+    // The pair reads as one block on Today, and the hint says what linking does.
+    const rows = within(screen.getByTestId("plan-list")).getAllByRole("listitem");
+    expect(rows[0].getAttribute("data-superset")).toBe(plan.items[0].group);
+    expect(rows[1].getAttribute("data-superset")).toBe(plan.items[0].group);
+    expect(rows[2]?.getAttribute("data-superset") ?? null).toBeNull();
+    expect(screen.getByTestId("superset-hint").textContent).toMatch(/one set of each, then one rest/);
+    expect(toggle.getAttribute("aria-pressed")).toBe("true");
     // The link survives a rebuild of the plan (here, the call changing).
     useApp.getState().setCall("normal");
     expect(useApp.getState().preview!.items[1].group).toBeDefined();
@@ -230,12 +238,15 @@ describe("first run to finished workout", () => {
       if (w) await user.click(w);
     };
     await skip();
+    // The workout says where the next set goes.
+    expect(screen.getByTestId("superset-next").textContent).toBe(`Then ${exercise(b).name}`);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     // Straight to the second exercise after a short switch.
     expect(useApp.getState().active!.index).toBe(1);
     expect(useApp.getState().active!.restTotal).toBe(15);
     await user.click(screen.getByRole("button", { name: "Skip rest" }));
     await skip();
+    expect(screen.getByTestId("superset-next").textContent).toBe(`Then ${exercise(a).name}`);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     // Round done: back to the first, after a full rest.
     expect(useApp.getState().active!.index).toBe(0);

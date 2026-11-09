@@ -1,5 +1,6 @@
 "use client";
 import { GLOSSARY, type Term } from "@/lib/glossary";
+import { currentLang, t } from "@/lib/i18n";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -36,7 +37,7 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
       <button
         ref={btn}
         type="button"
-        aria-label={`What is ${title.toLowerCase()}?`}
+        aria-label={t("info.whatIs", { term: currentLang() === "en" ? title.toLowerCase() : title })}
         aria-haspopup="dialog"
         onClick={(e) => {
           e.stopPropagation();
@@ -62,7 +63,7 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
             <div className="mt-2 space-y-2 text-[0.9375rem] leading-relaxed text-muted">
               {body.map((p) => <p key={p}>{p}</p>)}
             </div>
-            <button ref={ok} type="button" onClick={close} className="press mt-4 min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">Got it</button>
+            <button ref={ok} type="button" onClick={close} className="press mt-4 min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">{t("coach.gotIt")}</button>
           </div>
         </div>,
         document.body,

@@ -88,8 +88,9 @@ describe("Today and Progress extras", () => {
     await user.click(screen.getByRole("button", { name: "🔥 Warm up first" }));
     const warm = screen.getByRole("dialog", { name: "Five-minute warm-up" });
     expect(within(warm).getAllByRole("listitem").length).toBeGreaterThan(2);
-    await user.click(within(warm).getAllByRole("button")[0]);
-    expect(within(warm).getAllByRole("button")[0]).toHaveAttribute("aria-pressed", "true");
+    const drill = () => within(warm).getAllByRole("button").filter((b) => b.hasAttribute("aria-pressed"))[0];
+    await user.click(drill());
+    expect(drill()).toHaveAttribute("aria-pressed", "true");
     await user.click(warm.parentElement!);
 
     const writeText = vi.fn(async () => {});

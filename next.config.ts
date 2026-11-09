@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   pageExtensions: isStatic ? ["tsx", "ts"] : ["api.tsx", "api.ts", "tsx", "ts"],
+  // Creator links (www.getliftsmith.com/c/<code>/) all open the one /c/ page, which reads the code from the address.
+  ...(isStatic ? {} : { rewrites: async () => [{ source: "/c/:code/", destination: "/c/" }] }),
   env: { NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev", NEXT_PUBLIC_STATIC: isStatic ? "1" : "" },
 };
 

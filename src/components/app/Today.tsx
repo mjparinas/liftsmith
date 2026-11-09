@@ -1,7 +1,7 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { list, t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
-import { itemSeconds } from "@/lib/generator";
+import { itemSeconds, planSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
 import { RecoveryMap } from "./RecoveryMap";
 import { exercise } from "@/lib/exercises";
@@ -121,11 +121,11 @@ export function Today() {
         {streak.needed > 0 && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted">
             <Icon name="target" size={15} className="text-ember" />
-            {streak.needed} more this week for your goal
+            {t("today.goalMore", { count: streak.needed })}
           </span>
         )}
         <button type="button" onClick={() => go("injuries")} className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}>
-          {hurt.length ? `Training around: ${hurt.map((i) => PART_LABEL[i.part].toLowerCase()).join(", ")}` : "Something hurts?"}
+          {hurt.length ? t("today.trainingAround", { parts: list(hurt.map((i) => PART_LABEL[i.part].toLocaleLowerCase())) }) : t("today.somethingHurts")}
         </button>
       </div>
 
@@ -220,18 +220,22 @@ export function Today() {
       {preview && preview.items.length > 0 ? (
         <>
           <Section title={`${preview.items.length} exercises · about ${preview.estMinutes} min`} icon="dumbbell">
-            <ol className="stagger card divide-y divide-line/70 overflow-hidden">
+            <ol className="stagger card overflow-hidden" data-testid="plan-list">
               {preview.items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
                 const hue = muscleHue(it.focus);
                 const ss = supersetLabel(preview.items, i);
+                const joinsPrev = i > 0 && linkedToNext(preview.items, i - 1);
+                const joinsNext = linkedToNext(preview.items, i);
+                // Supersets read as one block: a shared tint, one accent bracket down the left that runs
+                // across the rows, and a dashed join where the link button sits on the line between them.
                 return (
-                  <li key={it.exerciseId} className={`animate-rise relative flex items-center gap-3 px-4 py-3.5 ${ss ? "bg-accent/5" : ""}`} style={{ animationDelay: `${i * 40}ms` }}>
-                    <span className="absolute inset-y-3 left-0 w-[3px] rounded-r-full" style={{ background: hue }} aria-hidden />
+                  <li key={it.exerciseId} data-superset={it.group ?? undefined} className={`animate-rise relative flex items-center gap-3 px-4 py-3.5 ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""}`} style={{ animationDelay: `${i * 40}ms` }}>
+                    <span className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`} style={ss ? undefined : { background: hue }} aria-hidden />
                     <span className="num grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-bold" style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}>{i + 1}</span>
-                    <div className="min-w-0 flex-1">
+                    <div className={`min-w-0 flex-1 ${preview.items.length > 1 ? "max-[389px]:pr-9" : ""}`}>
+                      {ss && <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={12} />{ss}</div>}
                       <div className="truncate font-semibold">{ex.name}</div>
-                      {ss && <div className="truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">{ss}</div>}
                       <div className="text-sm text-muted num">
                         {it.label ? `${it.label} · ` : ""}{it.scheme ?? `${it.sets} × ${repsText(ex, it.target.reps)}`} · {(it.setTargets ?? []).some((t) => t.weight > it.target.weight) ? "up to " : ""}{loadText(ex, Math.max(it.target.weight, ...(it.setTargets ?? []).map((t) => t.weight)), profile.unit)}
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
@@ -239,14 +243,22 @@ export function Today() {
                       {why && <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">{itemWhy(it, why).short}</p>}
                     </div>
                     {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
-                    {i > 0 && <LinkToggle on={linkedToNext(preview.items, i - 1)} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
+                    {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
+                    {i > 0 && <LinkToggle className="absolute -top-[22px] right-3 z-10" on={joinsPrev} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
                   </li>
                 );
               })}
             </ol>
-            {preview.items.length > 1 && (
-              <p className="mt-2 flex items-center gap-1.5 px-1 text-sm text-muted"><Icon name="link" size={14} />Link two exercises to do them as a superset<Info term="superset" /></p>
-            )}
+            {preview.items.length > 1 && (() => {
+              const grouped = preview.items.some((x) => x.group);
+              const saved = grouped ? Math.round((planSeconds(preview.items.map(({ group: _g, ...x }) => x)) - planSeconds(preview.items)) / 60) : 0; // eslint-disable-line @typescript-eslint/no-unused-vars
+              return (
+                <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
+                  <Icon name="link" size={14} className="mt-[3px] shrink-0" />
+                  <span>{grouped ? <>Linked exercises alternate: one set of each, then one rest{saved > 0 ? `. Saves about ${saved} min` : ""}. Tap a link to split them.</> : <>Tap a link between two exercises to do them as a superset.</>}<Info term="superset" /></span>
+                </p>
+              );
+            })()}
           </Section>
           <Section title="Why these muscles" icon="recovery">
             <div className="card p-4">

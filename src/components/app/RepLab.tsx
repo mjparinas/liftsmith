@@ -10,7 +10,9 @@ import { loadPose, openCamera, startMotion, type PoseEngine } from "@/lib/reps/s
 import { RepTracker } from "@/lib/reps/tracker";
 import type { MotionProfile, SetSummary } from "@/lib/reps/types";
 import type { Pattern } from "@/lib/types";
-import { useEffect, useRef, useState } from "react";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
+import { useApp } from "@/lib/store";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -27,11 +29,14 @@ const BONES: [number, number][] = [[11, 12], [11, 13], [13, 15], [12, 14], [14, 
 const HEIGHT_KEY = "liftsmith.lab.heightCm";
 
 type Source = "camera" | "motion";
+type Facing = "user" | "environment";
 
 export function RepLab() {
+  const sex = useApp((st) => st.profile.sex);
   const [on, setOn] = useState(() => flag("repLab"));
   const [lift, setLift] = useState(0);
   const [source, setSource] = useState<Source>("camera");
+  const [facing, setFacing] = useState<Facing>("user");
   const [heightCm, setHeightCm] = useState(() => {
     try {
       return Number(localStorage.getItem(HEIGHT_KEY)) || 0;
@@ -41,11 +46,15 @@ export function RepLab() {
   });
   const [running, setRunning] = useState(false);
   const [status, setStatus] = useState("");
-  const [live, setLive] = useState<{ reps: number; phase: string; fps: number; ms: number }>({ reps: 0, phase: "rest", fps: 0, ms: 0 });
+  const [live, setLive] = useState<{ reps: number; phase: string; fps: number; ms: number; inView?: boolean }>({ reps: 0, phase: "rest", fps: 0, ms: 0 });
   const [result, setResult] = useState<SetSummary>();
   const video = useRef<HTMLVideoElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const stopRef = useRef<() => void>(undefined);
+  // Where the lifter is in the rep right now (0 at rest, 1 at the bottom), read by the 3D figure every
+  // frame so it follows them; null when nothing is running, and the figure plays its own demo.
+  const progress = useRef<number | null>(null);
+  const follow = useCallback(() => progress.current, []);
 
   useEffect(() => () => stopRef.current?.(), []);
 
@@ -65,6 +74,7 @@ export function RepLab() {
   const stop = () => {
     stopRef.current?.();
     stopRef.current = undefined;
+    progress.current = null;
     setRunning(false);
   };
 
@@ -90,7 +100,7 @@ export function RepLab() {
   async function startCamera(p: MotionProfile) {
     const v = video.current!;
     setStatus("Opening the camera…");
-    const stream = await openCamera(v);
+    const stream = await openCamera(v, facing);
     setStatus("Loading the pose model (first time only)…");
     let engine: PoseEngine;
     try {
@@ -99,7 +109,7 @@ export function RepLab() {
       stream.getTracks().forEach((t) => t.stop());
       throw e;
     }
-    setStatus("Stand side-on to the camera, whole body in view.");
+    setStatus("Stand side-on to the camera with your whole body in the small preview. The figure follows you.");
     const signal = new PoseSignal(p, BLAZEPOSE, heightCm ? heightCm / 100 : undefined);
     const tracker = new RepTracker(p);
     let raf = 0;
@@ -117,11 +127,13 @@ export function RepLab() {
       const kps = engine.detect(v, now);
       inferMs = 0.9 * inferMs + 0.1 * (performance.now() - a);
       draw(kps, v);
-      const evs = tracker.push(signal.sample(now, kps, v.videoWidth / Math.max(1, v.videoHeight)));
+      const smp = signal.sample(now, kps, v.videoWidth / Math.max(1, v.videoHeight));
+      const evs = tracker.push(smp);
+      progress.current = smp.conf >= 0.3 ? tracker.progress : null;
       frames++;
       if (now - since > 500 || evs.length) {
         const s = tracker.summary();
-        setLive({ reps: s.full, phase: tracker.state, fps: Math.round((frames * 1000) / (now - since)), ms: Math.round(inferMs) });
+        setLive({ reps: s.full, phase: tracker.state, fps: Math.round((frames * 1000) / (now - since)), ms: Math.round(inferMs), inView: smp.conf >= 0.3 });
         if (now - since > 500) {
           frames = 0;
           since = now;
@@ -145,6 +157,7 @@ export function RepLab() {
     let last = 0;
     const off = await startMotion((r) => {
       const evs = r.fused ? counter.pushFused(r.t, r.fused.up, r.fused.rot) : counter.push(r.t, ...r.raw);
+      progress.current = counter.progress;
       if (evs.length || r.t - last > 300) {
         last = r.t;
         setLive((l) => ({ ...l, reps: counter.summary().full, phase: counter.tracker.state }));
@@ -202,9 +215,25 @@ export function RepLab() {
       )}
 
       {source === "camera" && (
-        <div className="card relative mt-4 aspect-[4/3] overflow-hidden" style={{ display: running ? "block" : "none" }}>
-          <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-contain" />
-          <canvas ref={canvas} className="absolute inset-0 h-full w-full object-contain" aria-hidden />
+        <Section title="Camera">
+          <div className="flex flex-wrap gap-2">
+            <Chip active={facing === "user"} onClick={() => !running && setFacing("user")}>Front (see yourself)</Chip>
+            <Chip active={facing === "environment"} onClick={() => !running && setFacing("environment")}>Back</Chip>
+          </div>
+        </Section>
+      )}
+
+      {profile && (
+        <div className="relative mt-4 aspect-[4/5] sm:aspect-[4/3]">
+          {/* The figure does the lift with you; the camera is only a small preview for lining up. */}
+          <LiftDemo exerciseId={id} body={bodyFor(sex)} view="side" label={running ? `${label} · following you` : label} follow={follow} className="h-full" />
+          {source === "camera" && (
+            <div className="absolute bottom-3 right-3 aspect-[3/4] w-[32%] overflow-hidden rounded-xl border border-line bg-bg shadow-lg" style={{ display: running ? "block" : "none" }}>
+              <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} />
+              <canvas ref={canvas} className="absolute inset-0 h-full w-full object-cover" style={{ transform: facing === "user" ? "scaleX(-1)" : undefined }} aria-hidden />
+              <span className={`absolute inset-x-1 bottom-1 rounded-md bg-bg/80 px-1 text-center text-xs ${live.inView ? "text-good" : "text-warn"}`} role="status">{live.inView ? "In view" : "Step into view"}</span>
+            </div>
+          )}
         </div>
       )}
 

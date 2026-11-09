@@ -7,6 +7,8 @@ import type { DemoSettings, Loop, View } from "./engine";
 
 // The exercise demo: a procedural 3D hologram figure (three.js, lazy-loaded) performing the lift,
 // male or female from the same motion, with toggles for the skeleton, target muscles and bar path.
+// In the app the body follows the sex in Settings (male when it isn't set; Melvin, 2026-11-09), so
+// there's no body toggle or body label there; the public site's demos keep the toggle (`bodyToggle`).
 // Phones without WebGL get the same figure drawn with the 2D canvas.
 //
 //   <LiftDemo exerciseId="back-squat" />                     inline demo
@@ -20,7 +22,10 @@ export interface LiftDemoProps {
   reps?: number;
   /** Shown at the top left of the stage. */
   label?: string;
+  /** Which figure. The app passes `bodyFor(profile.sex)`; left out, it's the male figure. */
   body?: BodyKey;
+  /** Offer the Male / Female toggle with the controls (public site only; the app uses Settings). */
+  bodyToggle?: boolean;
   view?: View;
   /** Don't animate (a still pose). */
   still?: boolean;
@@ -33,22 +38,16 @@ export interface LiftDemoProps {
   bpm?: number | null;
   /** Frames per second cap; the inline demo uses 30 to save battery. */
   fps?: number;
+  /** Follow the lifter instead of the demo's timing: 0 at the start position, 1 at the far end, null for the demo. */
+  follow?: () => number | null;
   className?: string;
   onDone?: () => void;
   onClick?: () => void;
 }
 
-const BODY_KEY = "liftsmith.demo.body";
 const noSubscribe = () => () => {};
-/** The body the lifter last picked for the demos on this device, if any. */
-export const readBody = (): BodyKey | null => {
-  try {
-    const v = localStorage.getItem(BODY_KEY);
-    return v === "male" || v === "female" ? v : null;
-  } catch {
-    return null;
-  }
-};
+/** The figure for the lifter: the sex set in Settings, the male figure when it isn't set. */
+export const bodyFor = (sex?: string | null): BodyKey => (sex === "female" ? "female" : "male");
 
 export type DemoMode = "3d" | "2d" | "none";
 /** WebGL when the device has it, the 2D canvas otherwise, nothing where there is no canvas (tests). */
@@ -71,7 +70,7 @@ export function detectMode(): DemoMode {
 
 const VIEWS: [View, string][] = [["orbit", "Orbit"], ["front", "Front"], ["three", "3/4"], ["side", "Side"]];
 
-export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view: viewProp, still, paused, controls, highlight, bpm, fps, className = "", onDone, onClick }: LiftDemoProps) {
+export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyToggle, view: viewProp, still, paused, controls, highlight, bpm, fps, follow, className = "", onDone, onClick }: LiftDemoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loopRef = useRef<Loop | null>(null);
   const phaseRef = useRef<HTMLSpanElement>(null);
@@ -79,9 +78,8 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
   const [fellBack, setFellBack] = useState(false);
   const [failed, setFailed] = useState(false);
   const mode: DemoMode | null = fellBack ? "2d" : envMode;
-  const savedBody = useSyncExternalStore(noSubscribe, readBody, () => null);
   const [bodyPick, setBodyPick] = useState<BodyKey | null>(null);
-  const body: BodyKey = bodyProp ?? bodyPick ?? savedBody ?? "male";
+  const body: BodyKey = (bodyToggle ? bodyPick : null) ?? bodyProp ?? "male";
   const [viewPick, setViewPick] = useState<View | null>(null);
   const view: View = viewPick ?? viewProp ?? (controls ? "orbit" : "three");
   const [skeleton, setSkeleton] = useState(false);
@@ -90,7 +88,7 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(!still);
 
-  const settings: DemoSettings = { exerciseId, body, view, skeleton, muscles, path, speed, playing: playing && !paused && !still, reps, highlight, bpm: bpm ?? null, fps: fps ?? (controls ? 60 : 30) };
+  const settings: DemoSettings = { exerciseId, body, view, skeleton, muscles, path, speed, playing: playing && !paused && !still, reps, highlight, bpm: bpm ?? null, fps: fps ?? (controls ? 60 : 30), follow: follow ?? null };
   const latest = useRef(settings);
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -135,12 +133,8 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps]);
+  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps, follow]);
 
-  const pickBody = (b: BodyKey) => {
-    setBodyPick(b);
-    try { localStorage.setItem(BODY_KEY, b); } catch {}
-  };
   const setView = setViewPick;
 
   const ex = exerciseId ? EXERCISES.find((e) => e.id === exerciseId) : undefined;
@@ -177,14 +171,14 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
         {controls && (
           <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
             <span>{bpm ? "" : "Drag to rotate"}</span>
-            <span>{body === "male" ? "Male" : "Female"}{mode === "2d" ? " · 2D" : ""}</span>
+            <span>{mode === "2d" ? "2D" : ""}</span>
           </div>
         )}
       </div>
       {controls && (
         <div className="mt-3 space-y-3">
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Demo controls">
-            <Seg label="Body" value={body} options={[["male", "Male"], ["female", "Female"]]} onPick={pickBody} />
+            {bodyToggle && <Seg label="Body" value={body} options={[["male", "Male"], ["female", "Female"]]} onPick={setBodyPick} />}
             <Seg label="View" value={view} options={VIEWS} onPick={setView} />
           </div>
           <div className="flex flex-wrap items-center gap-2">

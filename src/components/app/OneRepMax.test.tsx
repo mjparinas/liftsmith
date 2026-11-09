@@ -68,4 +68,22 @@ describe("DOTS", () => {
     expect(Number(screen.getByTestId("dots-score").textContent)).toBeCloseTo(358.6, 1);
     expect(screen.getByText("Intermediate")).toBeInTheDocument();
   });
+
+  it("uses the profile's sex and hides the formula picker, showing it only when sex isn't set", async () => {
+    seed([set("back-squat", 180, 1), set("bench-press", 120, 1), set("deadlift", 220, 1)]);
+    useApp.getState().setProfile({ sex: "female" });
+    const { unmount } = render(<DotsCard />);
+    expect(screen.queryByRole("group", { name: "Formula" })).toBeNull();
+    const female = Number(screen.getByTestId("dots-score").textContent);
+    expect(female).toBeGreaterThan(358.6);
+    unmount();
+
+    useApp.getState().setProfile({ sex: undefined });
+    const user = userEvent.setup();
+    render(<DotsCard />);
+    const picker = screen.getByRole("group", { name: "Formula" });
+    expect(Number(screen.getByTestId("dots-score").textContent)).toBeCloseTo(358.6, 1);
+    await user.click(within(picker).getByRole("button", { name: /Women/ }));
+    expect(Number(screen.getByTestId("dots-score").textContent)).toBeCloseTo(female, 1);
+  });
 });

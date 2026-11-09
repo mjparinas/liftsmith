@@ -4,6 +4,7 @@ import { target } from "./progression";
 import { linksOf, withLinks } from "./superset";
 import type { AppEvent, Gym, Profile, Routine, RoutineItem } from "./types";
 import { withWarmups } from "./warmup";
+import { t } from "./i18n";
 
 // Saved routines (table stakes, Melvin, 2026-11-09): the lifter's own list of exercises and set
 // counts, with supersets, to use instead of the adaptive plan on any day. Weights and reps still come
@@ -23,7 +24,7 @@ export function cleanRoutine(r: Routine): Routine {
     kept.map((i) => ({ ...i, sets: clampSets(i.sets) })),
     linksOf(kept),
   );
-  return { ...r, name: r.name.trim().slice(0, NAME_MAX) || "My routine", items };
+  return { ...r, name: r.name.trim().slice(0, NAME_MAX) || t("rt.defaultName"), items };
 }
 
 /** A routine from a plan or from what was done: exercises, set counts and supersets. */

@@ -4,15 +4,15 @@ import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { COSMETICS } from "@/lib/game";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
 import { PainSelect } from "./Injuries";
-import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
 import { workoutWhy } from "@/lib/why";
-import { haptic, keepAwake, sound } from "@/lib/juice";
+import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
@@ -32,7 +32,7 @@ import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
 import { burst } from "./burst";
 import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
-import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { afterSet, groupRange, linkedToNext, supersetLabel } from "@/lib/superset";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
@@ -52,6 +52,8 @@ export function Workout() {
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
+  const [hrBusy, setHrBusy] = useState(false);
+  const [hrError, setHrError] = useState<string | null>(null);
   const [popKey, setPopKey] = useState(0);
   const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
@@ -84,6 +86,15 @@ export function Workout() {
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
   const ssLabel = active && item ? supersetLabel(active.plan.items, active.index) : null;
+  // In a superset, which exercise comes after this set (the next one of the round, or back to the first).
+  const ssNext = (() => {
+    if (!ssLabel || !active || !item) return null;
+    const items = active.plan.items;
+    const done = (i: number) => events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId).length + (i === active.index ? 1 : 0);
+    const step = afterSet(items, active.index, done);
+    const [s0, e0] = groupRange(items, active.index);
+    return step.index !== active.index && step.index >= s0 && step.index <= e0 ? exercise(items[step.index].exerciseId).name : null;
+  })();
   const setLabel = warming ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal }) : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
@@ -167,6 +178,9 @@ export function Workout() {
   };
 
   const connectHr = async () => {
+    if (hrBusy) return;
+    setHrBusy(true);
+    setHrError(null);
     try {
       hrConn = await connectHeartRate(
         (b) => {
@@ -176,7 +190,15 @@ export function Workout() {
         () => setBpm(null),
       );
       track("feature", { name: "heart_rate", detail: "workout" });
-    } catch {}
+    } catch (e) {
+      const msg = e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed");
+      if (msg) {
+        setHrError(msg);
+        oops();
+      }
+    } finally {
+      setHrBusy(false);
+    }
   };
 
   const unit = gym.unit;
@@ -210,11 +232,18 @@ export function Workout() {
               <span className="animate-beat inline-flex"><Icon name="heart" size={14} filled strokeWidth={1.5} /></span> {bpm}
             </span>
           ) : hrSupported() ? (
-            <button type="button" onClick={connectHr} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />Connect</button>
+            <button type="button" onClick={connectHr} disabled={hrBusy} aria-busy={hrBusy} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />{hrBusy ? t("hr.connecting") : t("hr.connect")}</button>
           ) : null}
           <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line bg-surface px-4 text-sm font-semibold">{t("workout.end")}</button>
         </div>
       </header>
+      {hrError && !bpm && (
+        <div role="alert" className="card mt-2 flex items-start gap-2 p-3 text-sm">
+          <Icon name="heart" size={16} className="mt-0.5 shrink-0 text-bad" />
+          <p className="flex-1 text-muted">{hrError}</p>
+          <button type="button" onClick={() => setHrError(null)} className="press -m-2 min-h-11 min-w-11 rounded-full px-2 text-muted hover:text-ink">{t("hr.dismiss")}</button>
+        </div>
+      )}
 
       <div className="mt-3 flex gap-1" aria-label="Progress">
         {active.plan.items.map((it, i) => (
@@ -241,6 +270,7 @@ export function Workout() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
+                {ssNext && <p className="mb-1 ml-1.5 inline-flex max-w-full items-center truncate text-xs font-medium text-muted" data-testid="superset-next">{t("workout.ssThen", { name: ssNext })}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
                 {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
@@ -263,7 +293,7 @@ export function Workout() {
           </section>
 
           <div className="relative mt-4 h-52">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
             <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
           </div>
 
@@ -296,7 +326,7 @@ export function Workout() {
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
               {active.restReady ? (
-                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>Start rest · {restLabel(active.restReady)}</Button>
+                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>{t("workout.startRest", { time: restLabel(active.restReady) })}</Button>
               ) : null}
               <div className="flex flex-col items-center gap-5">
                 {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
@@ -389,7 +419,7 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} controls />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">
@@ -398,7 +428,7 @@ export function Workout() {
               ))}
             </ol>
             <NoteEditor key={ex.id + note} initial={note} onSave={(t) => { s.addNote(ex.id, t); setInfoOpen(false); }} />
-            <ExercisePrefsEditor exerciseId={ex.id} note="Changes apply from the next workout." />
+            <ExercisePrefsEditor exerciseId={ex.id} note={t("train.ex.nextWorkout")} />
           </div>
         )}
       </Sheet>
@@ -418,9 +448,9 @@ export function Workout() {
 function Feedback({ name, onPick }: { name: string; onPick: (r: -1 | 0 | 1) => void }) {
   return (
     <div className="animate-rise mt-4 w-full rounded-2xl border border-line bg-raised/70 p-3 text-center">
-      <p className="text-sm text-muted">How was {name}?</p>
+      <p className="text-sm text-muted">{t("workout.howWas", { name })}</p>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        {([[1, "Too easy"], [0, "About right"], [-1, "Too hard"]] as const).map(([r, l]) => (
+        {([[1, t("workout.tooEasy")], [0, t("workout.aboutRight")], [-1, t("workout.tooHard")]] as const).map(([r, l]) => (
           <button key={r} type="button" onClick={() => { haptic("select"); sound.tick(); onPick(r); }} className="press min-h-11 rounded-xl border border-line bg-surface py-2 text-sm font-medium hover:border-accent/50">{l}</button>
         ))}
       </div>
@@ -532,7 +562,7 @@ function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: s
   if (!todo.length) return null;
   return (
     <div className="mt-3 w-full space-y-2">
-      {todo.map((i) => <PainSelect key={i.id} label={`${PART_LABEL[i.part]} pain after that set?`} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
+      {todo.map((i) => <PainSelect key={i.id} label={t("inj.pain.afterSet", { part: PART_LABEL[i.part] })} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
     </div>
   );
 }
