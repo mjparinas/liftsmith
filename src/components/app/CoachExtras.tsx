@@ -8,6 +8,7 @@ import { busyEquipment, minutesLeft } from "@/lib/replan";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
+import { itemWhy, whyContext } from "@/lib/why";
 import { list, t } from "@/lib/i18n";
 import { useState } from "react";
 import { Button, Sheet } from "./ui";
@@ -21,7 +22,7 @@ export function WhySheet({ open, onClose, item, gym }: { open: boolean; onClose:
   const now = useNow();
   if (!open || !item || !active) return null;
   const ex = exercise(item.exerciseId);
-  const why = explain({ ex, target: item.target, events, profile, gym, now, call: active.plan.call, readiness: readiness?.score, sessionId: active.sessionId });
+  const why = explain({ ex, target: item.target, events, profile, gym, now, call: active.plan.call, readiness: readiness?.score, sessionId: active.sessionId, item: itemWhy(item, whyContext(active.plan, events, profile, now)) });
   return (
     <Sheet open onClose={onClose} title={t("coach.whyTitle", { name: ex.name })}>
       <p className="font-semibold">{why.title}</p>

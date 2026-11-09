@@ -60,6 +60,15 @@ describe("explain every number", () => {
     expect(text).toMatch(/fell 2 or more reps short/);
     expect(text).toMatch(/easy day \(readiness 30\)/);
   });
+  it("adds why.ts's reasons for the exercise and the set count", () => {
+    const ex = exercise("bench-press");
+    const p = profile();
+    const t = target(ex, [], p, gym, NOW);
+    const item = { pick: "Chest 96% recovered, 4 of 12 sets this week", sets: "5 sets, your setting", load: t.note, short: "" };
+    const why = explain({ ex, target: t, events: [], profile: p, gym, now: NOW, item });
+    expect(why.lines[0]).toBe("Picked today: Chest 96% recovered, 4 of 12 sets this week.");
+    expect(why.lines).toContain("5 sets, your setting.");
+  });
   it("leaves out the workout in progress", () => {
     const ex = exercise("bench-press");
     const p = profile();
