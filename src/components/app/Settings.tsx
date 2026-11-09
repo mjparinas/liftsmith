@@ -3,9 +3,10 @@ import { useApp } from "@/lib/store";
 import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
-import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { fromKg, plainNum, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useEffect, useState } from "react";
+import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
@@ -62,6 +63,8 @@ export function Settings() {
       <Row<Variability> info="variety" label="Exercise variety" value={profile.variability} onPick={(variability) => setProfile({ variability })} options={[["consistent", "More consistent"], ["balanced", "Balanced"], ["variable", "More variety"]]} />
       <Row<number> info="deloadWeeks" label="Build weeks before a deload" value={profile.blockWeeks} onPick={(blockWeeks) => setProfile({ blockWeeks })} options={[3, 4, 5, 6].map((d) => [d, `${d} weeks`])} />
       <Row<"dark" | "light" | "system"> label="Appearance" value={profile.theme ?? "dark"} onPick={(theme) => setProfile({ theme })} options={[["dark", "Dark"], ["light", "Light"], ["system", "Match system"]]} />
+      <Row<LangPref> label={t("settings.language")} value={profile.language ?? "system"} onPick={(language) => setProfile({ language })} options={[["system", t("settings.language.system")], ...LANGS.map((l) => [l, LANG_NAME[l]] as [LangPref, string])]} />
+      <p className="mt-2 px-1 text-xs text-faint">{t("settings.language.note")}</p>
       <AccessibilitySettings />
       <Section title="Units">
         <div className="flex flex-wrap gap-2">
@@ -70,7 +73,7 @@ export function Settings() {
         <p className="mt-2 text-xs text-faint">Weights, body weight and stats show in this unit. Each gym keeps its own plates in kg or lb (change it under Gym), and the workout shows both when they differ.</p>
       </Section>
       <Section title={`Body weight (${profile.unit})`}>
-        <BumpField label="Body weight" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(v) => setProfile({ bodyweight: toKg(Number(v) || 0, profile.unit) })} step={profile.unit === "lb" ? 1 : 0.5} start={fromKg(profile.bodyweight, profile.unit)} min={1} />
+        <BumpField label="Body weight" value={plainNum(fromKg(profile.bodyweight, profile.unit))} onChange={(v) => setProfile({ bodyweight: toKg(Number(v) || 0, profile.unit) })} step={profile.unit === "lb" ? 1 : 0.5} start={fromKg(profile.bodyweight, profile.unit)} min={1} />
       </Section>
       <Row<string> label="Sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <Row<string> label="Vibration" value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />

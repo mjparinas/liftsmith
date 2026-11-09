@@ -5,6 +5,7 @@ import { haptic, sound } from "@/lib/juice";
 import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Icon, type IconName } from "./icons";
+import { parseNum, t } from "@/lib/i18n";
 
 export function Button({ children, onClick, kind = "primary", className = "", disabled, label, icon }: { children: ReactNode; onClick?: () => void; kind?: "primary" | "ghost" | "quiet" | "danger"; className?: string; disabled?: boolean; label?: string; icon?: IconName }) {
   const styles = {
@@ -93,7 +94,7 @@ function Bump({ dir, label, size, onStep }: { dir: 1 | -1; label: string; size: 
   const repeat = useRepeat(() => onStep(dir));
   const dim = size === "lg" ? "h-14 w-14" : "h-12 w-12";
   return (
-    <button type="button" className={`press grid ${dim} shrink-0 touch-none select-none place-items-center rounded-full border border-line bg-raised text-ink active:border-accent/60 active:bg-accent/15`} aria-label={`${dir > 0 ? "More" : "Less"} ${label}`} {...repeat}>
+    <button type="button" className={`press grid ${dim} shrink-0 touch-none select-none place-items-center rounded-full border border-line bg-raised text-ink active:border-accent/60 active:bg-accent/15`} aria-label={t(dir > 0 ? "workout.more" : "workout.less", { what: label })} {...repeat}>
       {dir > 0 ? <Icon name="plus" size={22} strokeWidth={2.6} /> : <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden><path d="M5 12h14" /></svg>}
     </button>
   );
@@ -311,7 +312,7 @@ export function BumpField({ value, onChange, step, start, min = 0, max = 9999, l
   const bump = (d: 1 | -1) => {
     haptic("select");
     sound.tick();
-    const n = Number(value);
+    const n = parseNum(value);
     const from = value.trim() === "" || !Number.isFinite(n) ? start : n;
     // Snap to the step, so 81.3 bumped by 0.5 goes to 81.5, not 81.8.
     const next = Math.round((from + d * step) / step) * step;
@@ -325,7 +326,8 @@ export function BumpField({ value, onChange, step, start, min = 0, max = 9999, l
         inputMode={decimals ? "decimal" : "numeric"}
         value={value}
         placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value.replace(decimals ? /[^\d.]/g : /\D/g, ""))}
+        // A comma decimal (82,5 on a Spanish or French keyboard) is kept as a point.
+        onChange={(e) => onChange(e.target.value.replace(",", ".").replace(decimals ? /[^\d.]/g : /\D/g, ""))}
         aria-label={id ? undefined : label}
         className={`num min-w-0 flex-1 rounded-2xl border border-line bg-surface px-2 text-center font-semibold ${size === "lg" ? "py-3 text-2xl" : "min-h-12 text-lg"}`}
       />

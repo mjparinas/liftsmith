@@ -1,0 +1,52 @@
+import type { MessageKey } from "./en";
+import type { Message } from "@/lib/i18n";
+
+// Español. Traducción inicial; pendiente de revisión por un hablante nativo.
+export const es: Partial<Record<MessageKey, Message>> = {
+  "tab.today": "Hoy",
+  "tab.recovery": "Recuperación",
+  "tab.progress": "Progreso",
+  "tab.awards": "Logros",
+  "tab.gyms": "Gimnasios",
+  "nav.main": "Principal",
+  "nav.back.today": "Hoy",
+
+  "today.morning": "Buenos días",
+  "today.afternoon": "Buenas tardes",
+  "today.evening": "Buenas noches",
+  "today.hello": "{greeting}, {name}",
+  "today.start": "Empezar entrenamiento",
+
+  "workout.setsDone": "{done}/{total} series",
+  "workout.end": "Terminar",
+  "workout.setOf": "Serie {n} de {total}",
+  "workout.warmupOf": "Calentamiento {n} de {total}",
+  "workout.logSet": "Registrar serie",
+  "workout.logWarmup": "Registrar calentamiento",
+  "workout.logNow": "Registrar serie ya",
+  "workout.finish": "Terminar entrenamiento",
+  "workout.rest": "Descanso",
+  "workout.restLeft": "Quedan {time} de descanso",
+  "workout.add30": "+30 s",
+  "workout.skipRest": "Saltar descanso",
+  "workout.skipWarmup": "Saltar calentamiento",
+  "workout.nextUp": "Siguiente:",
+  "workout.comingUp": "A continuación",
+  "workout.howTo": "Cómo se hace ›",
+  "workout.howToLabel": "Cómo se hace",
+  "workout.swap": "Cambiar ejercicio",
+  "workout.adjust": "Ajustar esta serie",
+  "workout.weight": "peso",
+  "workout.reps": "reps",
+  "workout.seconds": "segundos",
+  "workout.each": "{unit} cada una",
+  "workout.sr.rest": "Descanso, {time}",
+  "workout.sr.tenLeft": "Quedan 10 segundos de descanso",
+  "workout.sr.over": "Fin del descanso. Siguiente: {load} por {reps}",
+  "workout.more": "Más {what}",
+  "workout.less": "Menos {what}",
+
+  "settings.language": "Idioma",
+  "settings.language.system": "Igual que el teléfono",
+  "settings.language.note": "«Igual que el teléfono» usa el idioma elegido para Liftsmith en los ajustes del teléfono. Los números, las fechas y las unidades siguen tu región. Algunas pantallas siguen en inglés mientras avanza la traducción.",
+};
