@@ -32,6 +32,7 @@
 		D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
 		DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC786AFE3663E4C12B2D909 /* Foundation.framework */; };
 		A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000007 /* InstallInfoPlugin.swift */; };
+		D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E1A0010000000000000002 /* DelightPlugins.swift */; };
 		A1F5E0010000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
@@ -80,6 +81,7 @@
 		A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionPlugin.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000005 /* ShortcutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutIntents.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000007 /* InstallInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallInfoPlugin.swift; sourceTree = "<group>"; };
+		D3E1A0010000000000000002 /* DelightPlugins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelightPlugins.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A1F5E0010000000000000003 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		BB05485F3EDA6B8DD896565A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */,
 				A1F5E0010000000000000005 /* ShortcutIntents.swift */,
 				A1F5E0010000000000000007 /* InstallInfoPlugin.swift */,
+				D3E1A0010000000000000002 /* DelightPlugins.swift */,
 				A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */,
 				A1F5E0010000000000000003 /* App.entitlements */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -326,6 +329,7 @@
 				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
 				D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */,
 				A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */,
+				D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -375,7 +379,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app.widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
@@ -498,6 +502,7 @@
 			baseConfigurationReference = 958DCC722DB07C7200EA8C5F /* debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-forge AppIcon-glacier AppIcon-aurora AppIcon-royal";
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -509,7 +514,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
-				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_VERSION = 5.0;
@@ -521,6 +526,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_ALTERNATE_APPICON_NAMES = "AppIcon-forge AppIcon-glacier AppIcon-aurora AppIcon-royal";
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -531,7 +537,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_VERSION = 5.0;
@@ -554,7 +560,7 @@
 					"@executable_path/../../Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.liftsmith.app.widgets;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;

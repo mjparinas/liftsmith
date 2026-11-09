@@ -1,7 +1,8 @@
 "use client";
 import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
-import { PlateBar } from "@/components/PlateBar";
+import { PlateBar, type PlateFinish } from "@/components/PlateBar";
+import { COSMETICS } from "@/lib/game";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
@@ -11,13 +12,17 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
-import { useApp } from "@/lib/store";
+import { useApp, warmingUp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useRef, useState } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Ring, Sheet, Stepper } from "./ui";
+import { epley } from "@/lib/progression";
+import { prCue, say } from "@/lib/voice";
+import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
+import { AlmostThere, PrMoment } from "./WorkoutJuice";
 
 let hrConn: HrConnection | null = null;
 
@@ -47,6 +52,15 @@ export function Workout() {
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
   const finished = !!active && active.index >= active.plan.items.length;
+  const warming = !!active && warmingUp(active);
+  const warmTotal = item?.warmup?.length ?? 0;
+  const warmDone = Math.min(active?.warm ?? 0, warmTotal);
+  const setLabel = warming ? `Warm-up ${warmDone + 1} of ${warmTotal}` : `Set ${Math.min(doneSets + 1, item?.sets ?? 1)} of ${item?.sets ?? 1}`;
+  // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
+  const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
+  const voiceOn = !!profile.delight?.voice;
+  const voiceState: VoiceState | null = active && ex && item ? { exName: ex.name, exerciseId: ex.id, setNo: Math.min(doneSets + 1, item.sets), sets: item.sets, kg: active.weight, reps: active.reps, rir: item.target.rir, unit: profile.unit, load: ex.load, challenge: item.challenge, resting, left, index: active.index, warmup: warming } : null;
+  useVoiceCoach(voiceState, voiceOn);
 
   // Rest countdown: beeps in the last 3 seconds, then the alert.
   useEffect(() => {
@@ -74,14 +88,16 @@ export function Workout() {
     if (!active || !ex || !gym) return;
     void updateSession({
       title: resting ? `Rest · ${ex.name}` : ex.name,
-      setLabel: `Set ${Math.min(doneSets + 1, item!.sets)} of ${item!.sets}`,
+      setLabel,
       next: `${loadText(ex, active.weight, profile.unit)} × ${repsText(ex, active.reps)}`,
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
       sound: profile.restSounds,
+      // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
+      speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!active || !gym) {
     return (
@@ -99,6 +115,10 @@ export function Workout() {
   const log = () => {
     haptic("tap");
     sound.log();
+    if (voiceOn && ex && active.weight > 0) {
+      const best = Math.max(0, ...(s.stats.e1rmSeries.get(ex.id) ?? []).map((p) => p.e1rm));
+      if (best > 0 && epley(active.weight, active.reps) > best + 0.01) say(prCue(ex.name));
+    }
     setPopKey((k) => k + 1);
     s.logSet();
   };
@@ -131,9 +151,11 @@ export function Workout() {
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
   const zone = bpm ? hrZone(bpm) : null;
+  const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
     <div className="pb-44">
+      <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button type="button" onClick={() => go("today")} className="press -ml-2 min-h-11 rounded-full px-2 text-muted">‹ Today</button>
         <div className="num text-sm text-muted">{clock(elapsed)} · {setsLogged}/{totalSets} sets</div>
@@ -167,7 +189,7 @@ export function Workout() {
           <section className="mt-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm text-accent">{item.focus && MUSCLE_LABEL[item.focus]} · Set {Math.min(doneSets + 1, item.sets)} of {item.sets}</p>
+                <p className="text-sm text-accent">{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[26px] font-bold leading-tight">{ex.name}</h1>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -175,9 +197,12 @@ export function Workout() {
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-10 w-10 place-items-center rounded-full border border-line bg-surface text-muted" aria-label="Swap exercise">⇄</button>
               </div>
             </div>
-            <div className="mt-2 flex gap-1.5">
+            <div className="mt-2 flex items-center gap-1.5">
+              {Array.from({ length: warmTotal }, (_, i) => (
+                <span key={`w${i}`} className={`h-1.5 w-4 rounded-full ${i < warmDone ? "bg-good/60" : warming && i === warmDone ? "bg-accent/70" : "bg-line"}`} />
+              ))}
               {Array.from({ length: item.sets }, (_, i) => (
-                <span key={i} className={`h-2 w-8 rounded-full ${i < doneSets ? "bg-good" : i === doneSets ? "bg-accent" : "bg-line"}`} />
+                <span key={i} className={`h-2 w-8 rounded-full ${i < doneSets ? "bg-good" : !warming && i === doneSets ? "bg-accent" : "bg-line"}`} />
               ))}
             </div>
           </section>
@@ -194,11 +219,15 @@ export function Workout() {
                 <Button kind="ghost" onClick={() => s.addRest(30)}>+30 s</Button>
                 <Button kind="ghost" onClick={() => s.skipRest()}>Skip rest</Button>
               </div>
+              <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               <div className="mt-5 w-full border-t border-line pt-4">
                 <p className="text-center text-sm text-muted">Next up: <span className="text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
-                {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact /></div>}
+                {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} /></div>}
+                <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
+                <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
               </div>
+              <RestExtra left={left} gym={gym} />
             </section>
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
@@ -214,14 +243,21 @@ export function Workout() {
                 )}
                 <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
               </div>
-              {item.challenge && doneSets + 1 === item.sets ? (
+              {warming ? (
+                <div className="mt-3 text-center text-sm text-muted">
+                  <p>Warm-up: easy, smooth reps. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
+                  <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
+                </div>
+              ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
                 <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
               )}
+              <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">
-                  <PlateBar loading={loading} bar={bar.weight} unit={unit} />
+                  <PlateBar loading={loading} bar={bar.weight} unit={unit} finish={finish} />
+                  <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
                 </div>
               )}
             </section>
@@ -256,7 +292,7 @@ export function Workout() {
             <Button kind="ghost" className="w-full py-5 text-xl" onClick={() => { s.skipRest(); log(); }}>Log set now</Button>
           ) : (
             <Button className="w-full py-5 text-xl shadow-lg shadow-accent/25" onClick={log}>
-              Log set ✓
+              {warming ? "Log warm-up ✓" : "Log set ✓"}
             </Button>
           )}
         </div>

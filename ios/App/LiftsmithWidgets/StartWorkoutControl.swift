@@ -7,7 +7,7 @@ import WidgetKit
 @available(iOS 18.0, *)
 struct StartWorkoutControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
-        StaticControlConfiguration(kind: "com.liftsmith.app.start") {
+        StaticControlConfiguration(kind: "com.getliftsmith.app.start") {
             ControlWidgetButton(action: StartWorkoutIntent()) {
                 Label("Start workout", systemImage: "figure.strengthtraining.traditional")
             }
