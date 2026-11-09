@@ -149,3 +149,13 @@ export function translated<K extends string>(keys: readonly K[], key: (k: K) => 
   for (const k of keys) Object.defineProperty(out, k, { get: () => t(key(k)), enumerable: true });
   return out;
 }
+
+/** A weekday's name in the current language, Sunday = 0 (Intl, so "lun." in French, "lun" in Spanish). */
+export function weekday(day: number, style: "short" | "long" = "short"): string {
+  return date(new Date(2024, 0, 7 + day, 12), { weekday: style });
+}
+
+/** A clock time ("6:00 PM", "18:00") in the current language and region. */
+export function clockTime(hh: number, mm: number): string {
+  return date(new Date(2000, 0, 1, hh, mm), { hour: "numeric", minute: "2-digit" });
+}
