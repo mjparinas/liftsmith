@@ -33,6 +33,8 @@ export interface LiftDemoProps {
   bpm?: number | null;
   /** Frames per second cap; the inline demo uses 30 to save battery. */
   fps?: number;
+  /** Follow the lifter instead of the demo's timing: 0 at the start position, 1 at the far end, null for the demo. */
+  follow?: () => number | null;
   className?: string;
   onDone?: () => void;
   onClick?: () => void;
@@ -71,7 +73,7 @@ export function detectMode(): DemoMode {
 
 const VIEWS: [View, string][] = [["orbit", "Orbit"], ["front", "Front"], ["three", "3/4"], ["side", "Side"]];
 
-export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view: viewProp, still, paused, controls, highlight, bpm, fps, className = "", onDone, onClick }: LiftDemoProps) {
+export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view: viewProp, still, paused, controls, highlight, bpm, fps, follow, className = "", onDone, onClick }: LiftDemoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loopRef = useRef<Loop | null>(null);
   const phaseRef = useRef<HTMLSpanElement>(null);
@@ -90,7 +92,7 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(!still);
 
-  const settings: DemoSettings = { exerciseId, body, view, skeleton, muscles, path, speed, playing: playing && !paused && !still, reps, highlight, bpm: bpm ?? null, fps: fps ?? (controls ? 60 : 30) };
+  const settings: DemoSettings = { exerciseId, body, view, skeleton, muscles, path, speed, playing: playing && !paused && !still, reps, highlight, bpm: bpm ?? null, fps: fps ?? (controls ? 60 : 30), follow: follow ?? null };
   const latest = useRef(settings);
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -135,7 +137,7 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, view:
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps]);
+  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps, follow]);
 
   const pickBody = (b: BodyKey) => {
     setBodyPick(b);
