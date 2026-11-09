@@ -117,6 +117,14 @@ jobs:
           path: out
       - if: env.HAS_ASC == 'true'
         run: npx cap sync ios
+      - name: Resolve Swift packages (with retries)
+        if: env.HAS_ASC == 'true'
+        run: |
+          for i in 1 2 3 4; do
+            xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App && exit 0
+            echo "::warning::Package resolution failed (attempt $i), retrying in $((i * 15)) s"; sleep $((i * 15))
+          done
+          exit 1
       - name: Archive and upload
         if: env.HAS_ASC == 'true'
         env:
