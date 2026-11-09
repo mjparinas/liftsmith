@@ -11,8 +11,8 @@ const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
   trailingSlash: true,
   images: { unoptimized: true },
-  pageExtensions: isStatic ? ["tsx", "ts"] : ["api.ts", "tsx", "ts"],
-  env: { NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev" },
+  pageExtensions: isStatic ? ["tsx", "ts"] : ["api.tsx", "api.ts", "tsx", "ts"],
+  env: { NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev", NEXT_PUBLIC_STATIC: isStatic ? "1" : "" },
 };
 
 export default nextConfig;

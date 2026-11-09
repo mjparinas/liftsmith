@@ -6,6 +6,10 @@ import { BRAND } from "@/lib/brand";
 import { useState } from "react";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
+import { MessageSettings } from "./MessageSettings";
+import { deleteEmail } from "@/lib/reminders";
+import { SITE_URL } from "@/lib/site";
+import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
 
@@ -22,6 +26,7 @@ function Row<T extends string | number>({ label, value, options, onPick }: { lab
 export function Settings() {
   const { profile, setProfile, reset } = useApp();
   const [confirm, setConfirm] = useState(false);
+  const [stats, setStats] = useState(analyticsOn());
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
@@ -43,15 +48,23 @@ export function Settings() {
       </Section>
       <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <CalendarSettings />
+      <MessageSettings />
       <CycleSettings />
+      <Section title="Usage stats">
+        <div className="flex flex-wrap gap-2">
+          <Chip active={stats} onClick={() => { setAnalytics(true); setStats(true); }}>Share anonymous stats</Chip>
+          <Chip active={!stats} onClick={() => { setAnalytics(false); setStats(false); }}>Off</Chip>
+        </div>
+        <p className="mt-2 text-xs text-faint">Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data. <a className="underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">Privacy</a>{stats ? ` · Install id ${installId().slice(0, 8)}` : ""}</p>
+      </Section>
       <Section title="Training block">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>
       </Section>
       <Section title="Data">
         {confirm ? (
           <div className="space-y-2">
-            <p className="text-sm text-muted">This erases every workout on this device. It can&apos;t be undone.</p>
-            <Button kind="danger" className="w-full" onClick={() => void reset()}>Erase everything</Button>
+            <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
+            <Button kind="danger" className="w-full" onClick={() => void deleteEmail().finally(() => void reset())}>Erase everything</Button>
             <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>Cancel</Button>
           </div>
         ) : (

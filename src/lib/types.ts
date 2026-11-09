@@ -222,6 +222,16 @@ export interface Profile {
   sex?: "male" | "female";
   /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
   knownMaxes?: Partial<Record<string, number>>;
+  /**
+   * Reminders and lifecycle messages (messages.ts). Each type is on or off per channel; missing means
+   * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
+   */
+  messages?: {
+    push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+    email?: { address: string; consentAt: number; status: "pending" | "confirmed" | "unsubscribed"; kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>> };
+    /** When reminders were first set up: comebacks count from here until there's a workout. */
+    startedAt?: number;
+  };
   onboarded: boolean;
   updatedAt: number;
 }

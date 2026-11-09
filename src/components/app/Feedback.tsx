@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics";
 import { diagnostics } from "@/lib/diag";
 import { buildFeedback, MAX_MESSAGE, sendFeedback, shrinkImage, type FeedbackKind } from "@/lib/feedback";
 import { haptic } from "@/lib/juice";
@@ -26,6 +27,7 @@ export function Feedback() {
   const submit = async () => {
     setState("sending");
     const ok = await sendFeedback(buildFeedback({ kind, message, email, screenshot: shot, includeDiag }));
+    track("feedback_sent", { kind });
     haptic("success");
     setState(ok ? "sent" : "queued");
   };

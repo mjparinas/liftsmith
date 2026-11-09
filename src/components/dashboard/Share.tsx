@@ -3,6 +3,7 @@ import { BRAND } from "@/lib/brand";
 import { decodeShare, encodeShare, SHARE_DAYS, shareCard, shareLevel, type ShareCard } from "@/lib/dashboard";
 import { mondayOf, type Stats } from "@/lib/derive";
 import { exerciseName } from "@/lib/game";
+import { track } from "@/lib/analytics";
 import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import Link from "next/link";
@@ -101,6 +102,7 @@ export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]
     try {
       await navigator.clipboard.writeText(url);
       setNote("Link copied.");
+      track("feature", { name: "share_profile", detail: "copy" });
     } catch {
       setNote("Couldn't copy. Select the link and copy it.");
     }
@@ -108,12 +110,13 @@ export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]
   const share = async () => {
     try {
       await navigator.share({ title: `My ${BRAND.name} training`, url });
+      track("feature", { name: "share_profile", detail: "native" });
     } catch {
       // Closed the share sheet: nothing to do.
     }
   };
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <div>
         <p className="text-muted">Send friends a link to your training summary: level, workouts, streak, trophies, best lifts and the days you trained in the last 12 weeks.</p>
         <p className="mt-2 text-sm text-faint">It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.</p>

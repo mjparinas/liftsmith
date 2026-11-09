@@ -1,4 +1,5 @@
 "use client";
+import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar } from "@/components/PlateBar";
 import { exercise } from "@/lib/exercises";
@@ -125,6 +126,7 @@ export function Workout() {
         },
         () => setBpm(null),
       );
+      track("feature", { name: "heart_rate", detail: "workout" });
     } catch {}
   };
 

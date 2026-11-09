@@ -6,6 +6,7 @@ import { derive } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exerciseName, goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
 import { load } from "@/lib/localdb";
+import { track } from "@/lib/analytics";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { APP_PATH } from "@/lib/site";
@@ -55,7 +56,7 @@ const dateText = (ms: number) => new Date(ms).toLocaleDateString([], { weekday: 
 
 function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
   return (
-    <section className={`card p-5 ${className}`}>
+    <section className={`card min-w-0 p-5 ${className}`}>
       <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{title}</h2>
       {children}
     </section>
@@ -85,6 +86,7 @@ export function Dashboard() {
     [],
   );
   useEffect(() => {
+    track("screen_view", { screen: "me" });
     load().then((snap) => {
       setNow(Date.now());
       setData({ events: snap.events, profile: snap.profile ?? defaultProfile() });
@@ -167,7 +169,7 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
     ["PRs", fmtNum(stats.prs.length)],
   ];
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
       <section className="card p-5 lg:col-span-3" aria-label="Level">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="text-lg font-semibold">Level {lvl.level} · {lvl.title}</span>
@@ -229,7 +231,7 @@ function CalendarTab({ stats, now, unit, go }: { stats: Stats; now: number; unit
     return d.getFullYear() === ym.y && d.getMonth() === ym.m;
   }).length;
   return (
-    <div className="grid gap-4">
+    <div className="grid grid-cols-1 gap-4">
       <Panel title="The last year">
         <YearHeatmap
           grid={yearGrid(now)}
@@ -241,7 +243,7 @@ function CalendarTab({ stats, now, unit, go }: { stats: Stats; now: number; unit
           }}
         />
       </Panel>
-      <div className="grid gap-4 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="card p-5 lg:col-span-2" aria-label={month}>
           <div className="mb-3 flex items-center justify-between gap-2">
             <button type="button" onClick={() => shift(-1)} className="press h-11 w-11 rounded-xl border border-line bg-raised" aria-label="Previous month">‹</button>
@@ -279,7 +281,7 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
   const lastWeek = stats.weeklyMuscleSets.at(-2)!;
   if (!bests.length) return <div className="card p-6 text-muted">Log a few sets and your lifts show here.</div>;
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <Panel title="Estimated one-rep max over time" className="lg:col-span-2">
         {!pro ? (
           <ProLock what="One-rep max trends" />
@@ -298,7 +300,7 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
         )}
       </Panel>
       <Panel title="Bests by exercise" className="lg:col-span-2">
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" tabIndex={0} role="region" aria-label="Bests by exercise, scrolls sideways">
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-faint">
@@ -362,7 +364,7 @@ function History({ events, stats, unit, open, go }: { events: AppEvent[]; stats:
   const detail = open ? sessionDetail(events, open) : null;
   if (!stats.sessions.length) return <div className="card p-6 text-muted">No workouts yet.</div>;
   return (
-    <div className="grid gap-4 lg:grid-cols-5">
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
       <ul className="card divide-y divide-line lg:col-span-2" aria-label="Workouts">
         {stats.sessions.slice(0, shown).map((s) => (
           <li key={s.sessionId}>

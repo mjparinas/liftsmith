@@ -1,14 +1,20 @@
 // Full playthrough: first run, a workout with rest, swaps and feedback, finish, and every tab.
 //   npm run build:static && node scripts/e2e.mjs [base-url] [out-dir]
+//   DEVICE="iPhone 16" runs it on another device from scripts/devices.mjs (default Pixel 7)
 import fs from "node:fs";
-import { chromium, devices } from "playwright";
+import { closeAll, open } from "./devices.mjs";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "e2e-shots";
 fs.mkdirSync(OUT, { recursive: true });
 const server = await base();
-const browser = await chromium.launch();
-const ctx = await browser.newContext({ ...devices["Pixel 7"] });
+const DEVICE = process.env.DEVICE || "Pixel 7";
+const target = await open(DEVICE);
+if (!target) {
+  server.close();
+  process.exit(0);
+}
+const ctx = await target.browser.newContext(target.opts);
 const page = await ctx.newPage();
 const errors = [];
 const fail = [];
@@ -80,6 +86,6 @@ try {
   fail.push(String(e));
   await shot("failure").catch(() => {});
 }
-await browser.close();
+await closeAll();
 server.close();
-finish("playthrough", [...fail, ...errors]);
+finish(`playthrough on ${DEVICE}`, [...fail, ...errors]);

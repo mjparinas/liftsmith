@@ -1,0 +1,347 @@
+"use client";
+// The admin panel (/admin/, server build only). Modelled on Gradelings' panel: one row of filters, tabs for
+// each area, tiles for the headline numbers and charts below. Sign-in is an emailed one-time link.
+import { useEffect, useState } from "react";
+import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
+import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
+
+type Staff = { email: string; role: "admin" | "support" };
+type Data = Metrics & { staff: Staff };
+type Install = { id: string; firstSeen: number; lastSeen: number; platform: string; store: string | null; appVersion: string | null; device: string | null; os: string | null; country: string | null; locale: string | null; source: string | null; test: boolean; events: number; workouts: number };
+type Audit = { id: number; at: number; admin: string; action: string; target: string | null };
+
+const TABS = ["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Installs"] as const;
+type Tab = (typeof TABS)[number];
+const PERIODS = [7, 28, 90, 365] as const;
+const STORE_LABEL: Record<string, string> = { play: "Google Play", appstore: "App Store", web: "Web", other: "Other", android: "Android", ios: "iOS" };
+const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
+const when = (t: number) => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+function SignIn() {
+  const [email, setEmail] = useState("");
+  const [msg, setMsg] = useState<string | null>(typeof location !== "undefined" && location.search.includes("link=expired") ? "That link has expired or was already used. Ask for a new one." : null);
+  const [dev, setDev] = useState<string | null>(null);
+  const send = async () => {
+    const r = await fetch("/api/admin/login/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email }) });
+    const j = (await r.json().catch(() => ({}))) as { message?: string; error?: string; devLink?: string };
+    setMsg(j.message ?? j.error ?? "Something went wrong.");
+    setDev(j.devLink ?? null);
+  };
+  return (
+    <main className="mx-auto max-w-sm px-5 py-20">
+      <h1 className="text-2xl font-bold">Liftsmith admin</h1>
+      <p className="mt-2 text-sm text-muted">We&apos;ll email you a link that signs you in once.</p>
+      <label className="mt-6 block text-sm" htmlFor="admin-email">Email</label>
+      <input id="admin-email" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="card mt-1 w-full px-4 py-3" />
+      <button type="button" onClick={() => void send()} className="press mt-3 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">Email me a link</button>
+      {msg && <p className="mt-4 text-sm text-muted" role="status">{msg}</p>}
+      {dev && <a className="mt-2 block break-all text-sm text-accent" href={dev}>Development sign-in link</a>}
+    </main>
+  );
+}
+
+function StoreTable({ rows, all, assumed }: { rows: StoreRevenue[]; all: StoreRevenue; assumed: Metrics["revenue"]["assumed"] }) {
+  const cols = ["All", ...rows.map((r) => STORE_LABEL[r.store])];
+  const xs = [all, ...rows];
+  const line = (label: string, f: (r: StoreRevenue) => string, a?: string) => [label, ...xs.map(f), a ?? ""];
+  return (
+    <Table
+      columns={["Measure", ...cols, "Forecast assumes"]}
+      rows={[
+        line("Downloads a week", (r) => String(r.downloadsPerWeek)),
+        line("Setup wizard completion", (r) => fmtPct(r.wizardCompletion)),
+        line("Trial starts", (r) => fmtInt(r.trialStarts)),
+        line("Trial to paid", (r) => `${fmtPct(r.trialToPaid)} (${r.trialsEnded} ended)`, fmtPct(assumed.trialToPaid)),
+        line("Download to paid, day 35", (r) => `${fmtPct(r.downloadToPaidD35)} (of ${fmtInt(r.d35Cohort)})`, fmtPct(assumed.downloadToPaidD35)),
+        line("Annual share of new paid", (r) => `${fmtPct(r.annualShare, 0)} (${r.paidStarts})`, fmtPct(assumed.annualShare, 0)),
+        line("Monthly churn (30 days)", (r) => fmtPct(r.monthlyChurn), fmtPct(assumed.monthlyChurn, 0)),
+        line("Annual first renewal", (r) => `${fmtPct(r.annualFirstRenewal, 0)} (${r.annualDue} due)`, fmtPct(assumed.annualFirstRenewal, 0)),
+        line("Refund rate (90 days)", (r) => fmtPct(r.refundRate), fmtPct(assumed.refundRate)),
+        line("Revenue per install, day 14", (r) => fmtUsd(r.revenuePerInstallD14, 2)),
+        line("Revenue per install, day 60", (r) => fmtUsd(r.revenuePerInstallD60, 2), fmtUsd(assumed.revenuePerInstallD60, 2)),
+        line("Realised price, monthly ($6.99)", (r) => fmtUsd(r.realisedMonthly, 2)),
+        line("Realised price, annual ($39.99)", (r) => fmtUsd(r.realisedAnnual, 2), `${fmtPct(assumed.realisedPrice, 0)} of list`),
+        line("Paying subscribers", (r) => fmtInt(r.paying)),
+        line("Gross MRR", (r) => fmtUsd(r.grossMrr)),
+        line("Net MRR (after 15% fee, refunds, VAT)", (r) => fmtUsd(r.netMrr)),
+        ["Billing-failure cancellations", fmtPct(all.billingFailureShare), fmtPct(rows[0]?.billingFailureShare), "n/a", "n/a", "Play: 31% of cancels (benchmark)"],
+      ]}
+    />
+  );
+}
+
+function Installs({ admin }: { admin: boolean }) {
+  const [data, setData] = useState<{ installs: Install[]; audit: Audit[] } | null>(null);
+  const [version, setVersion] = useState(0);
+  useEffect(() => {
+    let live = true;
+    fetch("/api/admin/installs/")
+      .then(async (r) => {
+        if (r.ok && live) setData(await r.json());
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [version]);
+  const mark = async (id: string, test: boolean) => {
+    await fetch("/api/admin/installs/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, test }) });
+    setVersion((v) => v + 1);
+  };
+  if (!data) return <p className="text-muted">Loading…</p>;
+  return (
+    <div className="space-y-4">
+      <Card title="Latest installs" subtitle="Device and source only. Mark your own phones and CI devices as test so they're left out of every number. The install id is shown in the app under Settings › Usage stats.">
+        <Table
+          columns={["Id", "First seen", "Last seen", "Platform", "Device", "OS", "Version", "Country", "Source", "Workouts", "Events", ""]}
+          rows={data.installs.map((i) => [
+            <code key="id" className="text-xs">{i.id.slice(0, 8)}</code>,
+            when(i.firstSeen),
+            when(i.lastSeen),
+            STORE_LABEL[i.store ?? ""] ?? i.platform,
+            i.device ?? "—",
+            i.os ?? "—",
+            i.appVersion ?? "—",
+            i.country ?? "—",
+            i.source ?? "—",
+            i.workouts,
+            i.events,
+            admin ? (
+              <button key={i.id} type="button" className="text-xs text-accent underline" title={i.id} onClick={() => void mark(i.id, !i.test)}>
+                {i.test ? "Count it" : "Mark test"}
+              </button>
+            ) : i.test ? "test" : "",
+          ])}
+        />
+      </Card>
+      <Card title="Audit log" subtitle="Every sign-in and change made in the panel.">
+        <Table columns={["When", "Who", "What", "Target"]} rows={data.audit.map((a) => [when(a.at), a.admin, a.action, a.target ?? ""])} empty="No changes yet." />
+      </Card>
+    </div>
+  );
+}
+
+export function AdminApp() {
+  const [days, setDays] = useState<(typeof PERIODS)[number]>(28);
+  const [tab, setTab] = useState<Tab>("Overview");
+  const [data, setData] = useState<Data | null>(null);
+  const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
+  useEffect(() => {
+    let live = true;
+    fetch(`/api/admin/stats/?days=${days}`)
+      .then(async (r) => {
+        if (!live) return;
+        if (r.status === 404) return setState("signin");
+        if (!r.ok) return setState("error");
+        const j = (await r.json()) as Data;
+        if (!live) return;
+        setData(j);
+        setState("ok");
+      })
+      .catch(() => live && setState("error"));
+    return () => {
+      live = false;
+    };
+  }, [days]);
+
+  if (state === "signin") return <SignIn />;
+  if (state === "error") return <main className="p-8 text-muted">The stats didn&apos;t load. Is the database set up (DATABASE_URL or TURSO_DATABASE_URL)?</main>;
+  if (!data) return <main className="p-8 text-muted">Loading…</main>;
+  const o = data.overview;
+  const rev = data.revenue;
+  const site = data.site;
+
+  return (
+    <div className="mx-auto max-w-6xl px-4 pb-16">
+      <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
+        <div className="flex flex-wrap items-center gap-3">
+          <h1 className="mr-auto text-lg font-bold">Liftsmith admin</h1>
+          <div className="flex gap-1" role="group" aria-label="Period">
+            {PERIODS.map((p) => (
+              <button key={p} type="button" aria-pressed={days === p} onClick={() => setDays(p)} className={`press rounded-full border px-3 py-1.5 text-sm ${days === p ? "border-accent bg-accent/15" : "border-line text-muted"}`}>
+                {p === 365 ? "1 year" : `${p} days`}
+              </button>
+            ))}
+          </div>
+          <span className="text-xs text-muted">{data.staff.email} ({data.staff.role})</span>
+          <button type="button" className="text-xs text-muted underline" onClick={() => void fetch("/api/admin/logout/", { method: "POST" }).then(() => setState("signin"))}>Sign out</button>
+        </div>
+        <nav className="mt-3 flex gap-1 overflow-x-auto" aria-label="Sections">
+          {TABS.map((t) => (
+            <button key={t} type="button" aria-current={tab === t ? "page" : undefined} onClick={() => setTab(t)} className={`press shrink-0 rounded-lg px-3 py-1.5 text-sm ${tab === t ? "bg-raised text-ink" : "text-muted"}`}>
+              {t}
+            </button>
+          ))}
+        </nav>
+      </header>
+
+      <div className="mt-4 space-y-4">
+        {tab === "Overview" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Tile label="New installs" value={fmtInt(o.installs)} delta={delta(o.installs, o.prevInstalls)} sub="vs the period before" />
+              <Tile label="Site visitors" value={fmtInt(o.visitors)} delta={delta(o.visitors, o.prevVisitors)} sub="daily unique, summed" />
+              <Tile label="Active today / week / month" value={`${fmtInt(o.dau)} / ${fmtInt(o.wau)} / ${fmtInt(o.mau)}`} sub={`stickiness ${fmtPct(o.stickiness, 0)} (DAU/MAU)`} />
+              <Tile label="Workouts finished" value={fmtInt(o.workouts)} />
+              <Tile label="Finished setup" value={fmtPct(o.setupRate, 0)} sub={o.minutesToSetup != null ? `median ${o.minutesToSetup} min after install` : undefined} />
+              <Tile label="Started a workout" value={fmtPct(o.firstWorkoutRate, 0)} sub={o.hoursToFirstWorkout != null ? `median ${o.hoursToFirstWorkout} h after install` : undefined} />
+              <Tile label="Trial starts" value={fmtInt(o.trialStarts)} />
+              <Tile label="MRR gross / net" value={`${fmtUsd(o.grossMrr)} / ${fmtUsd(o.netMrr)}`} sub={`${fmtInt(o.paying)} paying`} />
+            </div>
+            <Card title="New installs a day" subtitle="By store.">
+              <StackedBars rows={data.installsDaily} keys={["play", "appstore", "web", "other"]} labels={STORE_LABEL} label="New installs a day by store" />
+            </Card>
+            <Card title="Active installs a day" subtitle="Installs that opened the app or did anything, by platform.">
+              <LineChart rows={data.activeDaily} x="day" lines={[{ key: "android", label: "Android" }, { key: "ios", label: "iOS" }, { key: "web", label: "Web" }]} xLabel={fmtDay} label="Active installs a day" />
+            </Card>
+          </>
+        )}
+
+        {tab === "Traffic" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
+              <Tile label="Page views" value={fmtInt(site.views)} delta={delta(site.views, site.prevViews)} />
+              <Tile label="Pages a visitor" value={site.viewsPerVisitor == null ? "—" : String(site.viewsPerVisitor)} />
+              <Tile label="Call-to-action clicks" value={fmtInt(site.ctaTotal)} sub={`${fmtPct(site.ctaRate)} of visitors`} />
+            </div>
+            <Card title="Visitors and page views" subtitle="Public pages only, cookieless; a visitor counts once a day. Bots are left out.">
+              <LineChart rows={site.daily} x="day" lines={[{ key: "visitors", label: "Visitors" }, { key: "views", label: "Page views" }]} xLabel={fmtDay} label="Visitors and page views a day" />
+            </Card>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card title="Top pages"><BarList rows={site.pages} /></Card>
+              <Card title="Referrers" subtitle="The site that linked to us."><BarList rows={site.referrers} /></Card>
+              <Card title="UTM source / medium"><BarList rows={site.sources} /></Card>
+              <Card title="Campaigns"><BarList rows={site.campaigns} empty="No tagged campaigns yet." /></Card>
+              <Card title="Countries"><BarList rows={site.countries} /></Card>
+              <Card title="Devices"><BarList rows={site.devices} /></Card>
+              <Card title="Browsers"><BarList rows={site.browsers} /></Card>
+              <Card title="Operating systems"><BarList rows={site.os} /></Card>
+            </div>
+            <Card title="Call-to-action clicks" subtitle="Open the app, Google Play and App Store links, by the page they were on.">
+              <Table columns={["Click", "Page", "Clicks"]} rows={site.ctas.map((c) => [c.key, c.path, fmtInt(c.n)])} empty="No clicks yet." />
+            </Card>
+          </>
+        )}
+
+        {tab === "Acquisition" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Tile label="New installs" value={fmtInt(o.installs)} />
+              <Tile label="From Apple Search Ads" value={fmtInt(data.acquisition.searchAds)} />
+              <Tile label="Tagged campaigns" value={fmtInt(data.acquisition.campaigns.reduce((s, c) => s + c.n, 0))} />
+              <Tile label="Countries" value={fmtInt(data.devices.countries.length)} />
+            </div>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card title="Where installs came from" subtitle="Play install referrer tags, Apple Search Ads, or the first website visit for web installs."><BarList rows={data.acquisition.sources} /></Card>
+              <Card title="Campaigns"><BarList rows={data.acquisition.campaigns} empty="Tag store and site links with utm_source, utm_medium and utm_campaign to see them here." /></Card>
+              <Card title="Referring sites (web installs)"><BarList rows={data.acquisition.referrers} /></Card>
+              <Card title="Countries"><BarList rows={data.devices.countries} /></Card>
+              <Card title="Stores"><BarList rows={data.devices.stores.map((s) => ({ ...s, key: STORE_LABEL[s.key] ?? s.key }))} /></Card>
+              <Card title="Languages"><BarList rows={data.devices.locales} /></Card>
+            </div>
+          </>
+        )}
+
+        {tab === "Funnel" && (
+          <>
+            <Card title="From install to paid" subtitle="The installs made in the period, and how far each got.">
+              <Funnel steps={data.funnel} />
+            </Card>
+            <Card title="Website to web app" subtitle="Visitors in the period. Store installs are credited by their store link's tags instead (Acquisition).">
+              <Funnel steps={data.siteFunnel} />
+            </Card>
+            <div className="grid gap-4 md:grid-cols-3">
+              {Object.entries(data.funnelByStore).map(([s, steps]) => (
+                <Card key={s} title={STORE_LABEL[s]}><Funnel steps={steps} /></Card>
+              ))}
+            </div>
+            <Card title="Setup wizard, step by step" subtitle="Installs that reached each step.">
+              <Funnel steps={data.onboarding.map((s) => ({ key: `${s.step + 1}. ${s.name}`, n: s.n }))} />
+            </Card>
+          </>
+        )}
+
+        {tab === "Retention" && (
+          <>
+            <div className="grid grid-cols-3 gap-3">
+              <Tile label="Day 1" value={fmtPct(data.retention.d1, 0)} sub="back on day 1 or later" />
+              <Tile label="Day 7" value={fmtPct(data.retention.d7, 0)} sub="back on day 7 or later" />
+              <Tile label="Day 30" value={fmtPct(data.retention.d30, 0)} sub="back on day 30 or later" />
+            </div>
+            <Card title="Weekly cohorts" subtitle="Each row is a week's installs; each cell the share that used the app in that week after installing (W0 is the install week).">
+              <CohortTable rows={data.retention.cohorts} />
+            </Card>
+          </>
+        )}
+
+        {tab === "Engagement" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Tile label="Workouts finished" value={fmtInt(data.engagement.finished)} sub={data.engagement.perActiveInstall != null ? `${data.engagement.perActiveInstall} a monthly active install` : undefined} />
+              <Tile label="Average length" value={data.engagement.avgMinutes == null ? "—" : `${data.engagement.avgMinutes} min`} />
+              <Tile label="Average sets" value={data.engagement.avgSets == null ? "—" : String(data.engagement.avgSets)} />
+              <Tile label="Ended by themselves" value={fmtPct(data.engagement.autoEnded, 0)} sub={`${fmtInt(data.engagement.prs)} PRs`} />
+            </div>
+            <Card title="Workouts finished a day">
+              <LineChart rows={data.engagement.workoutsDaily} x="day" lines={[{ key: "n", label: "Workouts" }]} xLabel={fmtDay} label="Workouts finished a day" />
+            </Card>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card title="Screens viewed"><BarList rows={data.engagement.screens} /></Card>
+              <Card title="Features used" subtitle="Installs that used each feature."><BarList rows={data.engagement.features} /></Card>
+              <Card title="Permissions" subtitle="Granted and refused, when the app asked.">
+                <Table columns={["Permission", "Granted", "Refused", "Rate"]} rows={data.engagement.permissions.map((p) => [p.key, fmtInt(p.granted), fmtInt(p.denied), fmtPct(p.granted + p.denied ? p.granted / (p.granted + p.denied) : null, 0)])} />
+              </Card>
+            </div>
+          </>
+        )}
+
+        {tab === "Devices" && (
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card title="Platforms"><BarList rows={data.devices.platforms.map((s) => ({ ...s, key: STORE_LABEL[s.key] ?? s.key }))} /></Card>
+            <Card title="Operating system versions"><BarList rows={data.devices.os} /></Card>
+            <Card title="Device models"><BarList rows={data.devices.models} /></Card>
+            <Card title="Manufacturers"><BarList rows={data.devices.manufacturers} /></Card>
+            <Card title="App versions in use" subtitle="Installs active in the period."><BarList rows={data.devices.versions} /></Card>
+            <Card title="Phones and tablets"><BarList rows={data.devices.formFactors} /></Card>
+          </div>
+        )}
+
+        {tab === "Revenue" && (
+          <>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+              <Tile label="Gross MRR" value={fmtUsd(rev.all.grossMrr)} />
+              <Tile label="Net MRR" value={fmtUsd(rev.all.netMrr)} sub="after store fee, refunds and VAT" />
+              <Tile label="Paying subscribers" value={fmtInt(rev.all.paying)} />
+              <Tile label="Paywall views" value={fmtInt(rev.paywallViews)} sub={`${fmtInt(rev.all.trialStarts)} trials`} />
+            </div>
+            <Card title="Forecast against actual" subtitle="Gross MRR by month since launch, log scale. Dashed: the forecast's conservative, base and optimistic cases.">
+              {rev.forecast.length ? (
+                <LineChart
+                  rows={rev.forecast}
+                  x="month"
+                  lines={[{ key: "actual", label: "Actual" }, { key: "lo", label: "Conservative", dashed: true }, { key: "mid", label: "Base", dashed: true }, { key: "hi", label: "Optimistic", dashed: true }]}
+                  xLabel={(m) => `M${m}`}
+                  yFormat={(v) => fmtUsd(v)}
+                  log
+                  height={220}
+                  label="Gross MRR against the forecast"
+                />
+              ) : (
+                <p className="text-sm text-muted">Starts with the first store install (or set LAUNCH_DATE).</p>
+              )}
+            </Card>
+            <Card title="Forecast inputs by store" subtitle="The numbers the revenue forecast depends on, measured. Subscription numbers come from the app's purchase events until store server notifications land with billing.">
+              <StoreTable rows={rev.byStore} all={rev.all} assumed={rev.assumed} />
+            </Card>
+            <Card title="Gross MRR over the period">
+              <LineChart rows={rev.mrrDaily} x="day" lines={[{ key: "gross", label: "Gross MRR" }]} xLabel={fmtDay} yFormat={(v) => fmtUsd(v)} label="Gross MRR over the period" />
+            </Card>
+          </>
+        )}
+
+        {tab === "Installs" && <Installs admin={data.staff.role === "admin"} />}
+      </div>
+    </div>
+  );
+}
