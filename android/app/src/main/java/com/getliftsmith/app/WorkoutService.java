@@ -31,6 +31,7 @@ public class WorkoutService extends Service {
     static final String EXTRA_ACTION = "action";
     private static final String CHANNEL_LIVE = "workout-live";
     private static final String CHANNEL_ALERT = "rest-over";
+    private static final String CHANNEL_ALERT_SOUND = "rest-over-sound";
     private static final int ID_LIVE = 1;
     private static final int ID_ALERT = 2;
 
@@ -58,6 +59,13 @@ public class WorkoutService extends Service {
         alert.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         nm.createNotificationChannel(live);
         nm.createNotificationChannel(alert);
+        // The same alert without vibration, for lifters who pick "sound only" (channel settings can't change once made).
+        NotificationChannel soundOnly = new NotificationChannel(CHANNEL_ALERT_SOUND, "Rest over (sound only)", NotificationManager.IMPORTANCE_HIGH);
+        soundOnly.setDescription("Sounds without vibrating when your rest ends");
+        soundOnly.enableVibration(false);
+        soundOnly.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
+        soundOnly.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+        nm.createNotificationChannel(soundOnly);
     }
 
     @Override
@@ -108,9 +116,10 @@ public class WorkoutService extends Service {
         if (restOver != null) handler.removeCallbacks(restOver);
         if (resting) {
             final boolean sound = intent.getBooleanExtra("sound", true);
+            final boolean vibrate = intent.getBooleanExtra("vibrate", true);
             final String speak = intent.getStringExtra("speak");
             restOver = () -> {
-                alertRestOver(next, sound);
+                alertRestOver(next, sound, vibrate);
                 // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
                 if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f);
             };
@@ -119,9 +128,10 @@ public class WorkoutService extends Service {
         return START_NOT_STICKY;
     }
 
-    private void alertRestOver(String next, boolean sound) {
+    /** The rest-over alert: sound, vibration, both or neither, as picked in Workout preferences. */
+    private void alertRestOver(String next, boolean sound, boolean vibrate) {
         NotificationManager nm = getSystemService(NotificationManager.class);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_ALERT)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this, sound && !vibrate ? CHANNEL_ALERT_SOUND : CHANNEL_ALERT)
             .setSmallIcon(R.drawable.ic_stat_workout)
             .setContentTitle("Rest over")
             .setContentText("Up next: " + next)
@@ -133,6 +143,7 @@ public class WorkoutService extends Service {
             .setContentIntent(openApp());
         if (!sound) b.setSilent(true);
         nm.notify(ID_ALERT, b.build());
+        if (!vibrate) return;
         Vibrator v = getSystemService(Vibrator.class);
         if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 250, 120, 250 }, -1));
     }
