@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Empezar entrenamiento</string>
+    <string name="shortcut_start_long">Empezar el entrenamiento de hoy</string>
+    <string name="shortcut_log_short">Registrar serie</string>
+    <string name="shortcut_log_long">Registrar la serie actual como estaba prevista</string>
+    <string name="shortcut_rest_short">+30 s de descanso</string>
+    <string name="shortcut_rest_long">Añadir 30 segundos al descanso</string>
+    <string name="widget_description">Empieza el entrenamiento de hoy o registra una serie con un toque</string>
+    <string name="channel_live">Entrenamiento en curso</string>
+    <string name="channel_live_desc">Descanso, siguiente serie y frecuencia cardiaca mientras entrenas</string>
+    <string name="rest_over">Fin del descanso</string>
+    <string name="channel_alert_desc">Suena y vibra al terminar el descanso</string>
+    <string name="channel_alert_sound">Fin del descanso (solo sonido)</string>
+    <string name="channel_alert_sound_desc">Suena sin vibrar al terminar el descanso</string>
+    <string name="next_prefix">Siguiente:</string>
+    <string name="rest_next">Descanso · siguiente: %1$s</string>
+    <string name="up_next">Siguiente: %1$s</string>
+    <string name="add_30">+30 s</string>
+</resources>

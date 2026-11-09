@@ -22,6 +22,13 @@ export const GLOSSARY = {
       "The plan starts with more in the tank and moves closer to failure across the block.",
     ],
   },
+  rpe: {
+    title: "RPE: rate of perceived exertion",
+    body: [
+      "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.",
+      "Pick this scale or reps in reserve in Settings › Workout preferences. The plan works the same either way.",
+    ],
+  },
   blockWeek: {
     title: "Training block",
     body: ["Where you are in your block: which build week (or the deload), and how many reps to leave in the tank this week. You can change the block length in Settings."],

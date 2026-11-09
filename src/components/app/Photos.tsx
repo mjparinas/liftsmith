@@ -7,10 +7,10 @@ import { haptic } from "@/lib/juice";
 import { deletePhoto, listPhotos, pairFor, preparePhoto, savePhoto, type Photo, type Pose } from "@/lib/photos";
 import { useApp } from "@/lib/store";
 import type { BodyweightEvent } from "@/lib/types";
-import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { go } from "./router";
-import { Button, Chip, Section } from "./ui";
+import { BumpField, Button, Chip, Section } from "./ui";
 
 function useObjectUrl(blob: Blob | undefined): string | undefined {
   const url = useMemo(() => (blob ? URL.createObjectURL(blob) : undefined), [blob]);
@@ -22,7 +22,7 @@ export function Photos() {
   const { events, profile, logBodyweight } = useApp();
   const unit = profile.unit;
   const weighIns = useMemo(() => events.filter((e): e is BodyweightEvent => e.type === "bodyweight").sort((a, b) => a.at - b.at), [events]);
-  const [value, setValue] = useState(fmtNum(fromKg(profile.bodyweight, unit)));
+  const [value, setValue] = useState(plainNum(fromKg(profile.bodyweight, unit)));
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [pose, setPose] = useState<Pose>("front");
   const [busy, setBusy] = useState(false);
@@ -68,7 +68,7 @@ export function Photos() {
       <Section title={`Body weight (${unit})`}>
         <div className="card p-4">
           <div className="flex gap-2">
-            <input inputMode="decimal" value={value} onChange={(e) => setValue(e.target.value)} aria-label={`Body weight in ${unit}`} className="num min-w-0 flex-1 rounded-2xl border border-line bg-raised px-4 py-3 text-xl" />
+            <BumpField label={`Body weight in ${unit}`} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Number(value) || 70} min={1} className="min-w-0 flex-1" />
             <Button onClick={save}>Log</Button>
           </div>
           {weighIns.length > 1 && <WeightChart points={weighIns.map((w) => ({ at: w.at, v: fromKg(w.kg, unit) }))} />}
@@ -107,7 +107,7 @@ function WeightChart({ points }: { points: { at: number; v: number }[] }) {
 
 function Single({ photo }: { photo: Photo }) {
   const url = useObjectUrl(photo.blob);
-  return url ? <img src={url} alt={`Latest ${photo.pose} photo`} className="mt-3 w-full rounded-2xl" /> : null;
+  return url ? <img src={url} alt={`Your latest ${photo.pose} view`} className="mt-3 w-full rounded-2xl" /> : null;
 }
 
 /** Before and after in one frame, with a slider that wipes between them. */

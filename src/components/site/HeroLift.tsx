@@ -245,6 +245,7 @@ export function HeroLift() {
   return (
     <figure className="relative">
       <div ref={stage} className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border border-line sm:aspect-[5/6]" style={{ background: "radial-gradient(ellipse at 50% 42%, #0e2236 0%, #070b11 68%)" }}>
+        {/* eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a labelled picture */}
         <canvas ref={canvas} className="absolute inset-0 block h-full w-full touch-pan-y" role="img" aria-label={`Animated 3D wireframe figure doing ${ex?.name.toLowerCase() ?? "a lift"}, with the working muscles highlighted and labelled`} />
 
         <svg ref={svg} className="pointer-events-none absolute inset-0 h-full w-full fill-[#ff8a6f] stroke-[#ff8a6f]/70" aria-hidden />
@@ -255,7 +256,7 @@ export function HeroLift() {
               labelEls.current[m] = el;
             }}
             aria-hidden
-            className="pointer-events-none absolute top-0 left-0 rounded-lg border border-[#ff5b3a]/50 bg-[#1a0f0c]/80 px-2 py-1 text-center font-mono text-[11px] tracking-wide text-[#ffb3a3] uppercase opacity-0 backdrop-blur transition-opacity duration-300"
+            className="pointer-events-none absolute top-0 left-0 rounded-lg border border-[#ff5b3a]/50 bg-[#1a0f0c]/80 px-2 py-1 text-center font-mono text-[0.6875rem] tracking-wide text-[#ffb3a3] uppercase opacity-0 backdrop-blur transition-opacity duration-300"
             style={{ width: LABEL_W }}
           >
             {MUSCLE_LABEL[m]}
@@ -264,7 +265,7 @@ export function HeroLift() {
 
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-2">
           <div className="min-w-0 rounded-2xl border border-white/10 bg-black/50 px-3 py-2 backdrop-blur">
-            <p className="font-mono text-[10px] tracking-widest text-holo uppercase">
+            <p className="font-mono text-[0.625rem] tracking-widest text-holo uppercase">
               Set 1 · <span ref={phaseEl} />
             </p>
             <p className="truncate text-base font-bold sm:text-lg">{ex?.name}</p>
@@ -288,13 +289,13 @@ export function HeroLift() {
 
         <div className="pointer-events-none absolute inset-x-3 bottom-3 grid grid-cols-[auto_1fr] gap-3 rounded-2xl border border-white/10 bg-black/60 p-3 backdrop-blur">
           <div className="pr-1 text-center sm:pr-3">
-            <p className="font-mono text-[10px] tracking-widest text-muted uppercase">Reps</p>
+            <p className="font-mono text-[0.625rem] tracking-widest text-muted uppercase">Reps</p>
             <p className="num text-4xl leading-none font-bold">
               <span ref={repEl}>0</span>
               <span className="text-lg text-muted">/{p.reps}</span>
             </p>
           </div>
-          <div className="min-w-0 border-l border-white/10 pl-3 font-mono text-[11px] leading-relaxed sm:text-xs">
+          <div className="min-w-0 border-l border-white/10 pl-3 font-mono text-[0.6875rem] leading-relaxed sm:text-xs">
             <p className="truncate">
               <span className="text-muted">Volume </span>
               <span ref={calcEl} className="num text-ink" />

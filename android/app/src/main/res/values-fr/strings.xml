@@ -1,0 +1,20 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Commencer la séance</string>
+    <string name="shortcut_start_long">Commencer la séance du jour</string>
+    <string name="shortcut_log_short">Valider la série</string>
+    <string name="shortcut_log_long">Valider la série en cours comme prévu</string>
+    <string name="shortcut_rest_short">+30 s de repos</string>
+    <string name="shortcut_rest_long">Ajouter 30 secondes au repos</string>
+    <string name="widget_description">Commencez la séance du jour ou validez une série en un geste</string>
+    <string name="channel_live">Séance en cours</string>
+    <string name="channel_live_desc">Minuteur de repos, série suivante et fréquence cardiaque pendant l’entraînement</string>
+    <string name="rest_over">Fin du repos</string>
+    <string name="channel_alert_desc">Sonne et vibre à la fin du repos</string>
+    <string name="channel_alert_sound">Fin du repos (son seulement)</string>
+    <string name="channel_alert_sound_desc">Sonne sans vibrer à la fin du repos</string>
+    <string name="next_prefix">Ensuite :</string>
+    <string name="rest_next">Repos · ensuite : %1$s</string>
+    <string name="up_next">Ensuite : %1$s</string>
+    <string name="add_30">+30 s</string>
+</resources>

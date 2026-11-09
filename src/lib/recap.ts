@@ -1,4 +1,4 @@
-import { dedupe, derive, mondayOf } from "./derive";
+import { dedupe, derive, weekOf } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { tonnage } from "./moments";
 import { type AppEvent, type Muscle, type SetEvent } from "./types";
@@ -113,8 +113,8 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
   const todLabel = { early: "early bird", lunch: "lunchtime lifter", evening: "after-work lifter", night: "night owl" } as const;
 
   const until = Math.min(now, period.end);
-  const weeks = Math.max(1, Math.ceil((until - mondayOf(period.start)) / (7 * 86400_000)));
-  const activeWeeks = new Set(sessions.map((s) => mondayOf(s.start))).size;
+  const weeks = Math.max(1, Math.ceil((until - weekOf(period.start)) / (7 * 86400_000)));
+  const activeWeeks = new Set(sessions.map((s) => weekOf(s.start))).size;
 
   const prev = shift(period, -1);
   const prevVol = all.filter((e): e is SetEvent => e.type === "set" && e.at >= prev.start && e.at < prev.end).reduce((v, s) => v + s.weight * s.reps, 0);
