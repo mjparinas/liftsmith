@@ -1,5 +1,6 @@
 "use client";
-import { stopSession } from "@/lib/sessionNotify";
+import { onSessionAction, stopSession } from "@/lib/sessionNotify";
+import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
 import { installDiag } from "@/lib/diag";
@@ -61,6 +62,23 @@ export function App() {
     pick();
     document.addEventListener("visibilitychange", pick);
     return () => document.removeEventListener("visibilitychange", pick);
+  }, [ready]);
+  // Notification buttons, voice and system shortcuts (Siri, App Actions, Quick Settings tile, launcher
+  // and web manifest shortcuts). Registered once the store is ready, so a cold start's action waits for it.
+  useEffect(() => {
+    if (!ready) return;
+    const run = (a: ShortcutAction) => {
+      const to = runShortcut(a);
+      if (!location.hash.startsWith(`#/${to}`)) go(to);
+    };
+    const fromLink = linkAction(location.search);
+    if (fromLink) {
+      // Keep Next.js's own history state, or its router puts the old URL back.
+      history.replaceState(history.state, "", location.pathname + location.hash);
+      sessionStorage.setItem("ls.resumed", "1");
+      run(fromLink);
+    }
+    return onSessionAction(run);
   }, [ready]);
   useEffect(() => {
     if (ready && active && route === "today" && sessionStorage.getItem("ls.resumed") !== "1") {

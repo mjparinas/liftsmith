@@ -35,6 +35,19 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         let log = UNNotificationAction(identifier: "log", title: "Log set", options: [])
         let add = UNNotificationAction(identifier: "add30", title: "+30 s", options: [])
         center.setNotificationCategories([UNNotificationCategory(identifier: category, actions: [log, add], intentIdentifiers: [], options: [])])
+
+        // Siri, Shortcuts, the Action button and Control Center (ShortcutIntents.swift).
+        NotificationCenter.default.addObserver(self, selector: #selector(shortcut(_:)), name: ShortcutInbox.notification, object: nil)
+        if let a = ShortcutInbox.pending { deliverShortcut(a) }
+    }
+
+    @objc private func shortcut(_ note: Notification) {
+        if let a = note.userInfo?["action"] as? String { deliverShortcut(a) }
+    }
+
+    private func deliverShortcut(_ action: String) {
+        ShortcutInbox.pending = nil
+        notifyListeners("action", data: ["action": action], retainUntilConsumed: true)
     }
 
     @objc func requestPermission(_ call: CAPPluginCall) {
