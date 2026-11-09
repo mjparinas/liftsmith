@@ -2,7 +2,8 @@
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { derive, type Stats } from "./derive";
-import { generate, type Plan, type PlanItem, type SetTarget } from "./generator";
+import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
+import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
@@ -13,7 +14,7 @@ import { planFromRoutine, upsertRoutine } from "./routines";
 import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, Gym, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
+import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
 import { forgetAnalytics, track } from "./analytics";
 import { programPlan } from "./programs";
 
@@ -100,6 +101,10 @@ interface State {
   deleteRoutine(id: string): void;
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
+  /** Injury mode: log a hurt body part (affected exercises are skipped), change what happens, mark healed. */
+  logInjury(part: BodyPart): string;
+  setInjuryRule(injuryId: string, rule: Pick<InjuryRuleEvent, "exerciseId" | "action" | "pct" | "ack">): void;
+  healInjury(injuryId: string): void;
   autoEnd(now?: number): boolean;
   init(): Promise<void>;
   setProfile(p: Partial<Profile>): void;
@@ -164,6 +169,45 @@ export const useApp = create<State>((set, get) => {
     void appendEvents(evs);
   };
   const gym = () => get().gyms.find((g) => g.id === get().profile.activeGymId) ?? get().gyms[0];
+  // An injury change replans Today, and the rest of a workout in progress: exercises not started yet
+  // that the injury now skips are swapped for one that avoids it (or dropped), lighter ones re-targeted.
+  const afterInjuryChange = () => {
+    const a = get().active;
+    const g = gym();
+    if (a && g) {
+      const { events, profile } = get();
+      const hurt = activeInjuries(events);
+      const now = Date.now();
+      const items: PlanItem[] = a.plan.items.slice(0, a.index);
+      for (const item of a.plan.items.slice(a.index)) {
+        if (setsDone(events, a.sessionId, item.exerciseId) > 0) {
+          items.push(item);
+          continue;
+        }
+        let ex = exercise(item.exerciseId);
+        if (item.setTargets) {
+          // A program's sets: keep its scheme, lighten or swap them in place (once).
+          if (item.injuryPct && effectFor(ex, hurt)?.action !== "skip") items.push(item);
+          else items.push(...injuryPass({ ...a.plan, items: [item] }, events, profile, g, now).items);
+          continue;
+        }
+        if (effectFor(ex, hurt)?.action === "skip") {
+          const alt = alternatives(ex.id, g, [...items, ...a.plan.items].map((i) => i.exerciseId), hurt)[0];
+          if (!alt) continue;
+          ex = alt;
+        }
+        const t = injuredTarget(ex, target(ex, events, profile, g, now), hurt, g);
+        // Warm-ups follow the new exercise and load.
+        const warmed = new Set(items.flatMap((i) => exercise(i.exerciseId).primary));
+        const wu = warmupFor(ex, t.target.weight, g, warmed);
+        items.push({ ...item, exerciseId: ex.id, target: t.target, injuryPct: t.injuryPct, challenge: t.injuryPct ? undefined : item.challenge, warmup: wu.length ? wu : undefined });
+      }
+      const next = loadItem({ ...a, plan: { ...a.plan, items } }, Math.min(a.index, items.length));
+      set({ active: next });
+      persistActive(next);
+    }
+    get().replan();
+  };
   const loadItem = (a: Active, index: number): Active => {
     const item = a.plan.items[index];
     if (!item) return { ...a, index, warm: 0 };
@@ -240,6 +284,23 @@ export const useApp = create<State>((set, get) => {
       get().replan();
     },
 
+    logInjury(part) {
+      const injuryId = uid();
+      commit([{ type: "injury", id: uid(), at: Date.now(), injuryId, part }]);
+      afterInjuryChange();
+      return injuryId;
+    },
+
+    setInjuryRule(injuryId, rule) {
+      commit([{ type: "injuryRule", id: uid(), at: Date.now(), injuryId, ...rule }]);
+      afterInjuryChange();
+    },
+
+    healInjury(injuryId) {
+      commit([{ type: "injuryHealed", id: uid(), at: Date.now(), injuryId }]);
+      afterInjuryChange();
+    },
+
     async pickGymByLocation(fix) {
       const { gyms, active, profile } = get();
       // Never mid-workout, and never ask for location unless a gym opted in.
@@ -304,13 +365,14 @@ export const useApp = create<State>((set, get) => {
       const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled });
       const call = callOverride ?? r.call;
       const src = profile.planSource;
-      const fromProgram = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
+      const programDay = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
+      const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
       let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
       // A saved routine replaces today's plan (adaptive or program), where this gym can do it.
       const routine = profile.routines?.find((x) => x.id === get().routineId);
       // It isn't a program day, so the program's next day stays next.
       const fromRoutine = routine ? planFromRoutine(plan, routine, events, profile, g, now)?.plan : undefined;
-      if (fromRoutine) plan = { ...fromRoutine, program: undefined };
+      if (fromRoutine) plan = { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
       set({ readiness: r, preview: relink(plan, get().links) });
     },
 
@@ -398,6 +460,7 @@ export const useApp = create<State>((set, get) => {
           restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
           ...hrWindow(a, a.setStart, now),
           challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+          injuryPct: item.injuryPct,
           superset: item.group,
         },
       ]);
@@ -469,20 +532,21 @@ export const useApp = create<State>((set, get) => {
       const g = gym();
       if (!a || !g) return;
       const item = a.plan.items[a.index];
-      const t = target(exercise(toId), get().events, get().profile, g, Date.now());
+      const to = exercise(toId);
+      const t = injuredTarget(to, target(to, get().events, get().profile, g, Date.now()), activeInjuries(get().events), g);
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
-      const newItem: PlanItem = { ...item, exerciseId: toId, target: t, sets: Math.max(1, item.sets - done) };
+      const newItem: PlanItem = { ...item, exerciseId: toId, target: t.target, injuryPct: t.injuryPct, sets: Math.max(1, item.sets - done) };
       // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
       // to what the new exercise usually takes. A ladder step keeps bodyweight.
       if (item.setTargets) {
         const rest = item.setTargets.slice(Math.min(done, item.setTargets.length - 1));
-        newItem.setTargets = rest.map((x) => ({ ...x, weight: t.weight }));
-        newItem.target = { ...t, reps: rest[0].reps, note: item.target.note };
+        newItem.setTargets = rest.map((x) => ({ ...x, weight: t.target.weight }));
+        newItem.target = { ...t.target, reps: rest[0].reps, note: item.target.note };
         newItem.sets = rest.length;
       }
       // The new exercise gets its own warm-ups, unless working sets were already done.
       const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
-      const wu = done ? [] : warmupFor(exercise(toId), t.weight, g, warmed);
+      const wu = done ? [] : warmupFor(exercise(toId), t.target.weight, g, warmed);
       newItem.warmup = wu.length ? wu : undefined;
       const items = [...a.plan.items];
       items[a.index] = newItem;

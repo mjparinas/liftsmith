@@ -10,6 +10,7 @@ import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { loadText, repsText } from "./format";
@@ -53,6 +54,7 @@ export function Today() {
   const streak = g.streak;
   const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
+  const hurt = useMemo(() => activeInjuries(events), [events]);
   const hello = greeting(new Date(now).getHours(), profile.name);
   const call = preview ? CALL_STYLE[preview.call] : null;
   const fill = `${((profile.minutes - 15) / 75) * 100}%`;
@@ -113,6 +115,9 @@ export function Today() {
             {streak.needed} more this week for your goal
           </span>
         )}
+        <button type="button" onClick={() => go("injuries")} className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}>
+          {hurt.length ? `Training around: ${hurt.map((i) => PART_LABEL[i.part].toLowerCase()).join(", ")}` : "Something hurts?"}
+        </button>
       </div>
 
       {profile.quotes !== false && <DailyQuote now={now} />}
@@ -218,7 +223,7 @@ export function Today() {
                         {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
-                    <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>
+                    {it.injuryPct ? <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">Injury {it.injuryPct}%</span> : <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`} style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>}
                     {i > 0 && <LinkToggle on={linkedToNext(preview.items, i - 1)} first={exercise(preview.items[i - 1].exerciseId).name} second={ex.name} onToggle={() => toggleSuperset(i - 1)} />}
                   </li>
                 );

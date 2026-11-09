@@ -336,6 +336,8 @@ export interface SetEvent extends EventBase {
   hrEnd?: number;
   /** Part of a challenge (e.g. as many reps as possible on the last set). */
   challenge?: boolean;
+  /** Done lighter for an injury, at this share of the usual load (injury.ts). Progression skips these sets. */
+  injuryPct?: number;
   /** A program's "as many reps as you can" set: targetReps is the minimum. */
   amrap?: boolean;
   /** The program lift this set counts for (programs.ts), kept through swaps. */
@@ -461,4 +463,34 @@ export interface CustomExerciseEvent extends EventBase {
   exercise: Pick<Exercise, "id" | "name" | "primary" | "secondary" | "load" | "compound">;
 }
 
-export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent;
+
+// --- Injury mode (Melvin, 2026-11-09; injury.ts). Kept on the device, never in analytics or reports. ---
+
+export const BODY_PARTS = ["neck", "shoulder", "elbow", "wrist", "chest", "upperBack", "lowerBack", "abs", "hip", "groin", "quad", "hamstring", "knee", "calf", "ankle"] as const;
+export type BodyPart = (typeof BODY_PARTS)[number];
+
+/** The lifter logged an injury or a sore spot. Affected exercises are skipped until it's marked healed. */
+export interface InjuryEvent extends EventBase {
+  type: "injury";
+  injuryId: string;
+  part: BodyPart;
+}
+
+/** What to do with exercises an injury affects: one exercise, or every one when exerciseId is left out. */
+export interface InjuryRuleEvent extends EventBase {
+  type: "injuryRule";
+  injuryId: string;
+  exerciseId?: string;
+  /** skip: leave it out. light: keep it at pct% of the usual load. ok: the lifter says it doesn't hurt. */
+  action: "skip" | "light" | "ok";
+  pct?: number;
+  /** The lifter read and accepted the risk warning before choosing to train it. */
+  ack?: boolean;
+}
+
+export interface InjuryHealedEvent extends EventBase {
+  type: "injuryHealed";
+  injuryId: string;
+}
+
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;

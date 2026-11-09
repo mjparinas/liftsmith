@@ -786,6 +786,8 @@ export function programSessions(events: readonly AppEvent[], id: string, since: 
     .map(([sid, s]) => {
       const by = new Map<string, SetEvent[]>();
       for (const x of sets.get(sid)!.sort((a, b) => a.at - b.at)) {
+        // Sets done lighter for an injury don't move the program lift (injury.ts).
+        if (x.injuryPct) continue;
         const k = x.slot ?? x.exerciseId;
         by.set(k, [...(by.get(k) ?? []), x]);
       }

@@ -122,7 +122,8 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
   const wk = blockWeek(profile, now);
   const [lo, hi] = repRange(ex, profile.goal);
   const rir = wk.rir;
-  const past = sessionsOf(events, ex.id);
+  // Sessions done lighter for an injury don't count: the plan picks up from before it.
+  const past = sessionsOf(events, ex.id).filter((ss) => !ss.every((x) => x.injuryPct));
   const last = past[0];
 
   if (ex.load === "bodyweight") {
