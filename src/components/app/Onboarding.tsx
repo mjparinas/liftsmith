@@ -1,4 +1,5 @@
 "use client";
+import { t } from "@/lib/i18n";
 import { Mascot } from "./Mascot";
 import { Info } from "@/components/Info";
 import { BRAND } from "@/lib/brand";
@@ -29,23 +30,23 @@ function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string
 }
 
 const GOALS: { id: Goal; title: string; blurb: string }[] = [
-  { id: "muscle", title: "Build muscle", blurb: "6–12 reps, more volume" },
-  { id: "strength", title: "Get stronger", blurb: "Heavier, 4–6 reps on the big lifts" },
-  { id: "general", title: "Stay fit", blurb: "A bit of everything" },
+  { id: "muscle", get title() { return t("goal.muscle"); }, get blurb() { return t("setup.goal.muscle.blurb"); } },
+  { id: "strength", get title() { return t("goal.strength"); }, get blurb() { return t("setup.goal.strength.blurb"); } },
+  { id: "general", get title() { return t("goal.general"); }, get blurb() { return t("setup.goal.general.blurb"); } },
 ];
 const LEVELS: { id: Experience; title: string; blurb: string }[] = [
-  { id: "new", title: "New to lifting", blurb: "Under a year" },
-  { id: "intermediate", title: "Some experience", blurb: "1 to 3 years" },
-  { id: "advanced", title: "Experienced", blurb: "3 years or more" },
+  { id: "new", get title() { return t("setup.exp.new"); }, get blurb() { return t("setup.exp.new.blurb"); } },
+  { id: "intermediate", get title() { return t("setup.exp.intermediate"); }, get blurb() { return t("setup.exp.intermediate.blurb"); } },
+  { id: "advanced", get title() { return t("exp.advanced"); }, get blurb() { return t("setup.exp.advanced.blurb"); } },
 ];
 
 const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Pro trial offer"];
 
 const KNOWN = [
-  { id: KNOWN_LIFTS.squat, name: "Back squat" },
-  { id: KNOWN_LIFTS.hpush, name: "Bench press" },
-  { id: KNOWN_LIFTS.hinge, name: "Deadlift" },
-  { id: KNOWN_LIFTS.vpush, name: "Overhead press" },
+  { id: KNOWN_LIFTS.squat, get name() { return t("setup.knownSquat"); } },
+  { id: KNOWN_LIFTS.hpush, get name() { return t("setup.knownBench"); } },
+  { id: KNOWN_LIFTS.hinge, get name() { return t("setup.knownDeadlift"); } },
+  { id: KNOWN_LIFTS.vpush, get name() { return t("setup.knownPress"); } },
 ];
 
 /** Turns "weight × reps" entries into estimated one-rep maxes in kg. Blank entries keep what was saved. */
@@ -97,13 +98,13 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const fillFromHealth = async () => {
     const ok = await connectHealth();
     track("permission", { name: "health", granted: ok });
-    if (!ok) return setHealthNote("No access yet. You can allow it later in Settings.");
+    if (!ok) return setHealthNote(t("setup.health.denied"));
     setPrefilled(true);
     const h = await readHints();
     if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
     // Height isn't asked in setup, but TDEE (Tools) uses it, so keep it when Health has it.
     if (h.height && h.height >= 100 && h.height <= 250) setProfile({ heightCm: Math.round(h.height) });
-    setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
+    setHealthNote(h.bodyweight ? t("setup.health.filled") : t("setup.health.noWeight"));
   };
 
   const finish = (pro?: Profile["pro"]) => {
@@ -144,79 +145,79 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               <Mascot mood="happy" size={64} className="animate-spring-in shrink-0" />
               <div>
                 <p className="text-gradient text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
-                <h1 className="mt-1 text-3xl font-extrabold tracking-tight">What are you training for?</h1>
+                <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{t("setup.goal.title")}</h1>
               </div>
             </div>
             <div className="mt-6 space-y-3">{GOALS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />)}</div>
-            <h2 className="mt-8 text-lg font-semibold">How long have you been lifting?</h2>
+            <h2 className="mt-8 text-lg font-semibold">{t("setup.exp.title")}</h2>
             <div className="mt-3 space-y-3">{LEVELS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={exp === g.id} onClick={() => setExp(g.id)} />)}</div>
-            <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">What should we call you?</label>
-            <p className="text-sm text-muted">Optional. Used to greet you on Today.</p>
-            <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder="Your first name" maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
+            <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">{t("setup.name.title")}</label>
+            <p className="text-sm text-muted">{t("setup.name.note")}</p>
+            <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder={t("setup.name.placeholder")} maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
           </>
         )}
         {step === 1 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">Where do you train?</h1>
-            <p className="mt-2 text-muted">You can fine-tune equipment, plates and add more gyms later.</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.gym.title")}</h1>
+            <p className="mt-2 text-muted">{t("setup.gym.note")}</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              {rerun && gyms.length > 0 && <Tile title="Keep my gyms" blurb={gyms.map((g) => g.name).join(", ")} active={keepGyms} onClick={() => setKeepGyms(true)} />}
-              {PRESETS.map((p) => <Tile key={p.id} title={rerun ? `Add: ${p.name}` : p.name} blurb={p.blurb} active={!keepGyms && preset === p.id} onClick={() => { setKeepGyms(false); setPreset(p.id); }} />)}
+              {rerun && gyms.length > 0 && <Tile title={t("setup.gym.keep")} blurb={gyms.map((g) => g.name).join(", ")} active={keepGyms} onClick={() => setKeepGyms(true)} />}
+              {PRESETS.map((p) => <Tile key={p.id} title={rerun ? t("setup.gym.add", { name: p.name }) : p.name} blurb={p.blurb} active={!keepGyms && preset === p.id} onClick={() => { setKeepGyms(false); setPreset(p.id); }} />)}
             </div>
-            <h2 className="mt-8 text-lg font-semibold">Your plates are in</h2>
+            <h2 className="mt-8 text-lg font-semibold">{t("setup.plates")}</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              {(["kg", "lb"] as Unit[]).map((u) => <Tile key={u} title={u === "kg" ? "Kilograms" : "Pounds"} active={unit === u} onClick={() => { setUnit(u); setBw(Math.round(fromKg(toKg(bw, unit), u))); }} />)}
+              {(["kg", "lb"] as Unit[]).map((u) => <Tile key={u} title={u === "kg" ? t("units.kg") : t("units.lb")} active={unit === u} onClick={() => { setUnit(u); setBw(Math.round(fromKg(toKg(bw, unit), u))); }} />)}
             </div>
           </>
         )}
         {step === 2 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">How often can you train?</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.days.title")}</h1>
             <div className="mt-6 grid grid-cols-6 gap-2">
               {[1, 2, 3, 4, 5, 6].map((d) => (
                 <button key={d} type="button" aria-pressed={days === d} onClick={() => { haptic("tick"); setDays(d); }} className={`press num aspect-square rounded-2xl border text-xl font-bold ${days === d ? "btn-primary border-transparent" : "border-line bg-surface"}`}>{d}</button>
               ))}
             </div>
-            <p className="mt-2 text-sm text-muted">days a week. Your streak counts weeks you hit this, so rest days never break it.</p>
-            <h2 className="mt-8 text-lg font-semibold">Your body weight</h2>
-            <p className="text-sm text-muted">Only used to suggest a safe first weight for each lift.<Info term="firstWeights" /></p>
+            <p className="mt-2 text-sm text-muted">{t("setup.days.note")}</p>
+            <h2 className="mt-8 text-lg font-semibold">{t("setup.bw.title")}</h2>
+            <p className="text-sm text-muted">{t("setup.bw.note")}<Info term="firstWeights" /></p>
             {canHealth && (
               <button type="button" onClick={fillFromHealth} className="press mt-3 min-h-11 rounded-2xl border border-line bg-surface px-4 text-sm font-semibold">
-                Fill in from {/iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect"}
+                {t("setup.health.fill", { source: /iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect" })}
               </button>
             )}
             {healthNote && <p className="mt-2 text-sm text-muted">{healthNote}</p>}
             <div className="mt-3 flex items-center gap-3">
-              <BumpField value={bw ? String(bw) : ""} onChange={(v) => setBw(Number(v) || 0)} step={1} start={unit === "lb" ? 170 : 75} max={unit === "lb" ? 700 : 320} label="Body weight" size="lg" className="w-56" />
+              <BumpField value={bw ? String(bw) : ""} onChange={(v) => setBw(Number(v) || 0)} step={1} start={unit === "lb" ? 170 : 75} max={unit === "lb" ? 700 : 320} label={t("settings.bodyweight.label")} size="lg" className="w-56" />
               <span className="text-muted">{unit}</span>
             </div>
             <div className="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3">
-              <label htmlFor="setup-age" className="font-semibold">Age</label>
-              <BumpField id="setup-age" label="age" placeholder="Optional" value={age} onChange={(v) => setAge(v.slice(0, 3))} step={1} start={30} min={13} max={110} className="w-48" />
-              <span className="font-semibold" id="setup-sex">Sex</span>
+              <label htmlFor="setup-age" className="font-semibold">{t("setup.age")}</label>
+              <BumpField id="setup-age" label={t("setup.age")} placeholder={t("settings.optional")} value={age} onChange={(v) => setAge(v.slice(0, 3))} step={1} start={30} min={13} max={110} className="w-48" />
+              <span className="font-semibold" id="setup-sex">{t("setup.sex")}</span>
               <div className="flex gap-2" role="group" aria-labelledby="setup-sex">
                 {(["female", "male"] as const).map((x) => (
                   <button key={x} type="button" aria-pressed={sex === x} onClick={() => { haptic("tick"); setSex(sex === x ? undefined : x); }} className={`press min-h-11 rounded-2xl border px-4 text-sm font-semibold ${sex === x ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>
-                    {x === "female" ? "Female" : "Male"}
+                    {x === "female" ? t("setup.female") : t("setup.male")}
                   </button>
                 ))}
               </div>
             </div>
-            <p className="mt-2 text-sm text-muted">Both optional. Starting weights are lighter when we don&apos;t know.</p>
+            <p className="mt-2 text-sm text-muted">{t("setup.ageSex.note")}</p>
             <button type="button" aria-expanded={maxesOpen} onClick={() => setMaxesOpen(!maxesOpen)} className="press mt-5 min-h-11 text-sm font-semibold text-accent">
-              {maxesOpen ? "Hide my numbers" : "I know my numbers (optional)"}
+              {maxesOpen ? t("setup.maxes.hide") : t("setup.maxes.show")}
             </button>
             {maxesOpen && (
               <div className="mt-2 space-y-2">
-                <p className="text-sm text-muted">Your best recent set of each, and we&apos;ll start from there.</p>
+                <p className="text-sm text-muted">{t("setup.maxes.note")}</p>
                 {KNOWN.map((k) => (
                   <div key={k.id}>
                     <span className="text-sm font-medium">{k.name}</span>
                     <div className="mt-1 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1.5">
-                    <BumpField label={`${k.name} weight`} placeholder={unit} value={maxes[k.id].w} onChange={(w) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w } })} step={unit === "lb" ? 5 : 2.5} start={unit === "lb" ? 135 : 60} max={unit === "lb" ? 1500 : 700} className="min-w-0" />
+                    <BumpField label={t("setup.maxes.weight", { lift: k.name })} placeholder={unit} value={maxes[k.id].w} onChange={(w) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w } })} step={unit === "lb" ? 5 : 2.5} start={unit === "lb" ? 135 : 60} max={unit === "lb" ? 1500 : 700} className="min-w-0" />
                     <span className="text-sm text-muted">{unit}</span>
-                    <BumpField label={`${k.name} reps`} value={maxes[k.id].r} onChange={(r) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: r.slice(0, 2) } })} step={1} start={5} min={1} max={30} className="min-w-0" />
-                    <span className="text-sm text-muted">reps</span>
+                    <BumpField label={t("setup.maxes.reps", { lift: k.name })} value={maxes[k.id].r} onChange={(r) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: r.slice(0, 2) } })} step={1} start={5} min={1} max={30} className="min-w-0" />
+                    <span className="text-sm text-muted">{t("workout.reps")}</span>
                     </div>
                   </div>
                 ))}
@@ -226,12 +227,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 3 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">Stay in the zone</h1>
-            <p className="mt-2 text-muted">Both are optional, and you can change them later in Settings.</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.zone.title")}</h1>
+            <p className="mt-2 text-muted">{t("setup.zone.note")}</p>
             <div className="mt-6 space-y-3">
               <Tile
-                title={notify ? "Workout notifications on" : "Turn on workout notifications"}
-                blurb="Rest timer and next set on your lock screen, and a reminder on your training days. Change them in Settings."
+                title={notify ? t("setup.notify.on") : t("setup.notify.turnOn")}
+                blurb={t("setup.notify.blurb")}
                 active={!!notify}
                 onClick={async () => {
                   const ok = await notifyPermission();
@@ -241,8 +242,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               />
               {hrSupported() && (
                 <Tile
-                  title={hr ? `Heart rate: ${hr}` : "Connect a heart rate monitor"}
-                  blurb="Fitbit Charge 6 or Pixel Watch (turn on heart rate sharing), Polar, Garmin or any Bluetooth strap"
+                  title={hr ? t("setup.hr.on", { name: hr }) : t("setup.hr.connect")}
+                  blurb={t("setup.hr.blurb")}
                   active={!!hr}
                   onClick={async () => {
                     try {
@@ -255,23 +256,23 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 />
               )}
             </div>
-            {notify === false && <p className="mt-3 text-sm text-warn">Notifications are blocked. You can allow them in your phone&apos;s settings.</p>}
+            {notify === false && <p className="mt-3 text-sm text-warn">{t("setup.notify.blocked")}</p>}
             <label className="card mt-3 flex items-start gap-3 p-4">
               <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--color-accent)]" checked={stats} onChange={(e) => setStats(e.target.checked)} />
               <span>
-                <span className="block font-semibold">Share anonymous usage stats</span>
-                <span className="block text-sm text-muted">Which screens and features get used, your device model and app version. Never your weights, workouts in detail or health data. Change it any time in Settings.</span>
+                <span className="block font-semibold">{t("setup.stats.title")}</span>
+                <span className="block text-sm text-muted">{t("setup.stats.note")}</span>
               </span>
             </label>
           </>
         )}
         {step === 4 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">Try Pro free for {trialDays} days</h1>
-            <p className="mt-2 text-muted">Workouts that adapt to your recovery, your gym and how every set felt.</p>
+            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.pro.title", { days: trialDays })}</h1>
+            <p className="mt-2 text-muted">{t("setup.pro.lead")}</p>
             <ul className="mt-4 space-y-1.5 text-sm">
-              {["Adaptive workouts with blocks, deloads and progression", "Push or easy-day calls from your own data", "Recovery map and advanced stats"].map((t) => (
-                <li key={t} className="flex gap-2"><span className="text-accent" aria-hidden>✓</span>{t}</li>
+              {[t("setup.pro.f1"), t("setup.pro.f2"), t("setup.pro.f3")].map((f) => (
+                <li key={f} className="flex gap-2"><span className="text-accent" aria-hidden>✓</span>{f}</li>
               ))}
             </ul>
             <div className="mt-6 space-y-3">
@@ -287,26 +288,26 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                   className={`press w-full rounded-2xl border p-4 text-left ${plan === "annual" ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
                 >
                   <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-semibold">Start free trial · {plan === "annual" ? "Yearly" : "Monthly"}</span>
+                    <span className="font-semibold">{t("setup.pro.start", { plan: plan === "annual" ? t("setup.pro.yearly") : t("setup.pro.monthly") })}</span>
                     {PRICES[plan].note && <span className="text-xs font-semibold text-accent">{PRICES[plan].note}</span>}
                   </div>
-                  <div className="mt-0.5 text-sm text-muted">Free for {trialDays} days, then {PRICES[plan].price} {PRICES[plan].per}. Cancel any time.</div>
+                  <div className="mt-0.5 text-sm text-muted">{t("setup.pro.terms", { days: trialDays, price: PRICES[plan].price, per: PRICES[plan].per })}</div>
                 </button>
               ))}
             </div>
             <Button kind="quiet" className="mt-4 w-full" onClick={() => {
               track("paywall_close", { from: "setup" });
               finish(declineTrial(trialDays, Date.now()));
-            }}>Not now, keep the free plan</Button>
-            <p className="mt-2 text-center text-xs text-muted">The free plan keeps the workout logger, plate math, rest timer and classic 5x5.</p>
+            }}>{t("setup.pro.decline")}</Button>
+            <p className="mt-2 text-center text-xs text-muted">{t("setup.pro.free")}</p>
           </>
         )}
       </div>
       <div className="flex gap-3 pb-2">
-        {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>Back</Button>}
+        {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>{t("setup.back")}</Button>}
         {step < 4 && (
           <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
-            {step < STEPS - 1 ? "Continue" : "Save"}
+            {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>
         )}
       </div>
