@@ -2,8 +2,9 @@ import { afterEach, describe, expect, it } from "vitest";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
-import { currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message } from "./i18n";
+import { clockTime, currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message, weekday } from "./i18n";
 import { fmtNum, plainNum } from "./units";
+import { KIND_INFO } from "./messages";
 import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
 import { RARITY_LABEL } from "./game";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, MUSCLE_LABEL } from "./types";
@@ -67,6 +68,16 @@ describe("language", () => {
     expect(plainNum(82.5)).toBe("82.5");
     expect(parseNum("82,5")).toBe(82.5);
     expect(parseNum(" 82.5 ")).toBe(82.5);
+  });
+
+  it("names weekdays and clock times with the platform's own formats", () => {
+    setLanguage("en");
+    expect(weekday(0)).toBe("Sun");
+    expect(weekday(1, "long")).toBe("Monday");
+    setLanguage("fr");
+    expect(weekday(3, "long")).toBe("mercredi");
+    expect(clockTime(18, 0)).toBe("18:00");
+    expect(KIND_INFO.missed.label).toBe("Séances manquées");
   });
 
   it("translates engine labels (muscles, recovery bands) on each read", () => {

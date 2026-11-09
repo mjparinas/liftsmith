@@ -14,15 +14,23 @@
 //  - Pro offers only go to people who don't have Pro, are opt-in on both channels, and are rare.
 //  - No message pretends to be something else (no fake urgency, no fake countdowns).
 
+import { t } from "./i18n";
+
 export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro";
 export type Channel = "push" | "email";
 
+const kind = (k: MessageKind, push: boolean, email: boolean) => ({
+  get label() { return t(`msgKind.${k}`); },
+  get blurb() { return t(`msgKind.${k}.blurb`); },
+  push,
+  email,
+});
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
-  reminder: { label: "Workout reminders", blurb: "On your training days at your workout time. By email, one note on Monday with your week.", push: true, email: true },
-  missed: { label: "Missed workouts", blurb: "A nudge the day after a missed training day, and a check-in if a week goes by.", push: true, email: true },
-  streak: { label: "Streak alerts", blurb: "When this week's goal is still reachable but only just.", push: true, email: true },
-  milestone: { label: "Milestones", blurb: "Your first workout, and streaks of 4, 8, 12, 26 and 52 weeks.", push: false, email: true },
-  pro: { label: "Pro trial and offers", blurb: "When your trial is about to end, and now and then what Pro adds. Never more than one every two weeks.", push: true, email: true },
+  reminder: kind("reminder", true, true),
+  missed: kind("missed", true, true),
+  streak: kind("streak", true, true),
+  milestone: kind("milestone", false, true),
+  pro: kind("pro", true, true),
 };
 
 export const KINDS = Object.keys(KIND_INFO) as MessageKind[];
