@@ -3,6 +3,7 @@ import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { haptic } from "@/lib/juice";
 import { affects, DEFAULT_PCT, effectFor, injuries, LIGHT_PCTS, LOW_PAIN, PART_LABEL, painTrend, RETURN_PCTS, returnReady, STOP_PAIN, type Injury, type InjuryAction } from "@/lib/injury";
+import { date, list, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { useNow } from "@/lib/useNow";
 import { BODY_PARTS, type Gym } from "@/lib/types";
@@ -13,11 +14,13 @@ import { Button, Chip, Section, Sheet } from "./ui";
 // Injury mode (Melvin, 2026-11-09). Wording is neutral and never diagnoses: we say what the app does,
 // that it isn't medical advice, and that a professional can say what's safe.
 
-export const NOT_ADVICE = "Liftsmith isn't a medical app and this isn't medical advice. If something hurts, a doctor or physiotherapist can tell you what's safe.";
+/** The not-medical-advice line every injury screen shows. */
+export const notAdvice = () => t("inj.notAdvice");
 
 type Warn = { injuryId: string; exerciseId?: string; name: string; action: "light" | "ok" | "return"; pct: number };
 
-const day = (ms: number) => new Date(ms).toLocaleDateString([], { month: "short", day: "numeric" });
+const day = (ms: number) => date(ms, { month: "short", day: "numeric" });
+const lower = (part: Injury["part"]) => PART_LABEL[part].toLocaleLowerCase();
 
 export function Injuries() {
   const { events, gyms, profile, logInjury, setInjuryRule, healInjury, ratePain, startReturn, active: workout } = useApp();
@@ -40,30 +43,30 @@ export function Injuries() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">{workout ? "‹ Back to workout" : "‹ Today"}</button>
-      <h1 className="text-2xl font-bold">Injuries</h1>
-      <p className="mt-2 text-sm text-muted">Tell Liftsmith what hurts and it plans around it. Exercises that load that area are left out until you say it&apos;s healed, or you can choose to keep some of them lighter.</p>
-      <p className="mt-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{NOT_ADVICE}</p>
+      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">{workout ? t("inj.backWorkout") : t("inj.backToday")}</button>
+      <h1 className="text-2xl font-bold">{t("inj.title")}</h1>
+      <p className="mt-2 text-sm text-muted">{t("inj.intro")}</p>
+      <p className="mt-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{notAdvice()}</p>
 
-      <Button className="mt-4 w-full" onClick={() => setAdding(true)}>Log an injury</Button>
+      <Button className="mt-4 w-full" onClick={() => setAdding(true)}>{t("inj.log")}</Button>
 
-      {active.map((inj) => gym && <InjuryCard key={inj.id} inj={inj} gym={gym} hurt={active} onChoose={choose} onHeal={() => setHealing(inj)} onReturn={() => setWarn({ injuryId: inj.id, name: `the ${PART_LABEL[inj.part].toLowerCase()} exercises you skipped`, action: "return", pct: RETURN_PCTS[0] })} />)}
-      {!active.length && <p className="card mt-6 p-5 text-muted">Nothing logged. Your plans use every exercise your gym allows.</p>}
+      {active.map((inj) => gym && <InjuryCard key={inj.id} inj={inj} gym={gym} hurt={active} onChoose={choose} onHeal={() => setHealing(inj)} onReturn={() => setWarn({ injuryId: inj.id, name: t("inj.returnName", { part: lower(inj.part) }), action: "return", pct: RETURN_PCTS[0] })} />)}
+      {!active.length && <p className="card mt-6 p-5 text-muted">{t("inj.none")}</p>}
 
       {past.length > 0 && (
-        <Section title="Healed">
+        <Section title={t("inj.healed")}>
           <ul className="card divide-y divide-line">
             {past.slice(0, 10).map((i) => (
               <li key={i.id} className="flex justify-between px-4 py-3 text-sm">
                 <span>{PART_LABEL[i.part]}</span>
-                <span className="num text-muted">{day(i.since)} to {day(i.healedAt!)}</span>
+                <span className="num text-muted">{t("inj.range", { from: day(i.since), to: day(i.healedAt!) })}</span>
               </li>
             ))}
           </ul>
         </Section>
       )}
 
-      <Sheet open={adding} onClose={() => setAdding(false)} title="What hurts?">
+      <Sheet open={adding} onClose={() => setAdding(false)} title={t("inj.whatHurts")}>
         <div className="grid grid-cols-2 gap-2">
           {BODY_PARTS.filter((p) => !active.some((i) => i.part === p)).map((p) => (
             <button
@@ -80,17 +83,17 @@ export function Injuries() {
             </button>
           ))}
         </div>
-        <p className="mt-4 text-sm text-muted">Exercises that load it are skipped until you mark it healed. Stop any exercise that causes sharp pain. Swelling, numbness, tingling or pain that doesn&apos;t settle are reasons to see a doctor or physiotherapist.</p>
+        <p className="mt-4 text-sm text-muted">{t("inj.addNote")}</p>
       </Sheet>
 
-      <Sheet open={!!rating} onClose={() => setRating(null)} title="How bad is it right now?">
-        <p className="mb-3 text-sm text-muted">0 is no pain, 10 the worst you can imagine. Rating it now and then lets Liftsmith show the trend and suggest a graded return once it settles.</p>
-        <div className="grid grid-cols-4 gap-2" role="group" aria-label="Pain from 0 to 10">
+      <Sheet open={!!rating} onClose={() => setRating(null)} title={t("inj.rateTitle")}>
+        <p className="mb-3 text-sm text-muted">{t("inj.rateBody")}</p>
+        <div className="grid grid-cols-4 gap-2" role="group" aria-label={t("inj.rateGroup")}>
           {Array.from({ length: 11 }, (_, n) => (
             <button key={n} type="button" onClick={() => { haptic("tick"); if (rating) ratePain(rating, n); setRating(null); }} className="press num min-h-12 rounded-xl border border-line bg-raised text-lg font-semibold">{n}</button>
           ))}
         </div>
-        <Button kind="quiet" className="mt-3 w-full" onClick={() => setRating(null)}>Skip for now</Button>
+        <Button kind="quiet" className="mt-3 w-full" onClick={() => setRating(null)}>{t("inj.skipNow")}</Button>
       </Sheet>
 
       <RiskSheet
@@ -106,12 +109,12 @@ export function Injuries() {
         }}
       />
 
-      <Sheet open={!!healing} onClose={() => setHealing(null)} title={`Mark ${healing ? PART_LABEL[healing.part].toLowerCase() : ""} as healed?`}>
+      <Sheet open={!!healing} onClose={() => setHealing(null)} title={t("inj.healTitle", { part: healing ? lower(healing.part) : "" })}>
         <div className="space-y-3 text-sm">
-          <p>Every exercise it was skipping or lightening comes back into your plans, at the weights you used before the injury.</p>
-          <p className="text-muted">Ease back in. If the first sessions feel heavy, tap &quot;Too hard&quot; after the exercise and the next plan comes down a step. If the pain comes back, log it again.</p>
-          <Button className="w-full" onClick={() => { if (healing) healInjury(healing.id); setHealing(null); haptic("success"); }}>Yes, it&apos;s fully healed</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setHealing(null)}>Not yet</Button>
+          <p>{t("inj.healBody1")}</p>
+          <p className="text-muted">{t("inj.healBody2", { tooHard: t("workout.tooHard") })}</p>
+          <Button className="w-full" onClick={() => { if (healing) healInjury(healing.id); setHealing(null); haptic("success"); }}>{t("inj.healYes")}</Button>
+          <Button kind="quiet" className="w-full" onClick={() => setHealing(null)}>{t("inj.notYet")}</Button>
         </div>
       </Sheet>
     </div>
@@ -125,26 +128,27 @@ function InjuryCard({ inj, gym, hurt, onChoose, onHeal, onReturn }: { inj: Injur
   const label = PART_LABEL[inj.part];
   const skipped = affected.filter((e) => (inj.rules.get(e.id) ?? inj.all).action === "skip").length;
   const lighter = affected.filter((e) => (inj.rules.get(e.id) ?? inj.all).action === "light").length;
+  const fine = affected.length - skipped - lighter;
 
   return (
-    <section className="card mt-6 p-4" aria-label={`${label} injury`}>
+    <section className="card mt-6 p-4" aria-label={t("inj.cardLabel", { part: label })}>
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="text-lg font-semibold">{label}</h2>
-        <span className="num text-sm text-muted">Since {day(inj.since)}</span>
+        <span className="num text-sm text-muted">{t("inj.since", { date: day(inj.since) })}</span>
       </div>
       <p className="mt-1 text-sm text-muted">
-        At {gym.name}: {skipped} skipped{lighter ? `, ${lighter} lighter` : ""}{affected.length - skipped - lighter ? `, ${affected.length - skipped - lighter} marked fine` : ""}.
+        {t("inj.at", { gym: gym.name, counts: list([t("inj.nSkipped", { count: skipped }), ...(lighter ? [t("inj.nLighter", { count: lighter })] : []), ...(fine ? [t("inj.nFine", { count: fine })] : [])]) })}
       </p>
 
       <PainBlock inj={inj} label={label} />
       <ReturnBlock inj={inj} label={label} onStart={onReturn} onHeal={onHeal} />
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={`All ${label.toLowerCase()} exercises`}>
-        <Chip active={inj.all.action === "skip" && inj.rules.size === 0} onClick={() => onChoose(inj, "skip", undefined, `every ${label.toLowerCase()} exercise`, inj.all.pct)}>Skip them all</Chip>
-        <Chip active={inj.all.action === "light" && inj.rules.size === 0} onClick={() => onChoose(inj, "light", undefined, `every ${label.toLowerCase()} exercise`, inj.all.action === "light" ? inj.all.pct : DEFAULT_PCT)}>Train them all lighter</Chip>
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("inj.allGroup", { part: label.toLocaleLowerCase() })}>
+        <Chip active={inj.all.action === "skip" && inj.rules.size === 0} onClick={() => onChoose(inj, "skip", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.pct)}>{t("inj.skipAll")}</Chip>
+        <Chip active={inj.all.action === "light" && inj.rules.size === 0} onClick={() => onChoose(inj, "light", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.action === "light" ? inj.all.pct : DEFAULT_PCT)}>{t("inj.lightAll")}</Chip>
       </div>
       {inj.all.action === "light" && (
-        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Share of your usual load">
+        <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("inj.share")}>
           {LIGHT_PCTS.map((p) => <Chip key={p} active={inj.all.pct === p} onClick={() => onChoose(inj, "light", undefined, "", p)}>{p}%</Chip>)}
         </div>
       )}
@@ -157,10 +161,10 @@ function InjuryCard({ inj, gym, hurt, onChoose, onHeal, onReturn }: { inj: Injur
             <li key={e.id} className="py-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="min-w-0 font-medium">{e.name}</span>
-                <span className="shrink-0 text-xs text-muted">{r.action === "skip" ? (inj.returning && !inj.returning.stopped ? `Return: ${inj.returning.pct}%` : "Skipped") : r.action === "light" ? `${r.pct}% load` : "Fine"}</span>
+                <span className="shrink-0 text-xs text-muted">{r.action === "skip" ? (inj.returning && !inj.returning.stopped ? t("inj.returnPct", { pct: inj.returning.pct }) : t("inj.skipped")) : r.action === "light" ? t("inj.load", { pct: r.pct }) : t("inj.fine")}</span>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-label={`${e.name} with a ${label.toLowerCase()} injury`}>
-                {([["skip", "Skip"], ["light", "Lighter"], ["ok", "Doesn't hurt"]] as const).map(([a, l]) => (
+              <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-label={t("inj.exGroup", { name: e.name, part: label.toLocaleLowerCase() })}>
+                {([["skip", t("inj.act.skip")], ["light", t("inj.act.light")], ["ok", t("inj.act.ok")]] as const).map(([a, l]) => (
                   <button
                     key={a}
                     type="button"
@@ -172,15 +176,15 @@ function InjuryCard({ inj, gym, hurt, onChoose, onHeal, onReturn }: { inj: Injur
                   </button>
                 ))}
               </div>
-              {swaps.length > 0 && <p className="mt-2 text-sm text-muted">Avoids it: {swaps.map((s) => s.name).join(" · ")}</p>}
+              {swaps.length > 0 && <p className="mt-2 text-sm text-muted">{t("inj.avoids", { names: swaps.map((s) => s.name).join(" · ") })}</p>}
             </li>
           );
         })}
       </ul>
-      {affected.length > shown.length && <Button kind="quiet" className="w-full" onClick={() => setShowAll(true)}>Show all {affected.length}</Button>}
-      {!affected.length && <p className="mt-3 text-sm text-muted">Nothing at this gym loads it.</p>}
+      {affected.length > shown.length && <Button kind="quiet" className="w-full" onClick={() => setShowAll(true)}>{t("inj.showAll", { count: affected.length })}</Button>}
+      {!affected.length && <p className="mt-3 text-sm text-muted">{t("inj.nothingHere")}</p>}
 
-      <Button kind="ghost" className="mt-3 w-full" onClick={onHeal}>I&apos;m fully healed</Button>
+      <Button kind="ghost" className="mt-3 w-full" onClick={onHeal}>{t("inj.fullyHealed")}</Button>
     </section>
   );
 }
@@ -197,34 +201,34 @@ function RiskSheet({ warn, onClose, onConfirm }: { warn: Warn | null; onClose: (
   }
   if (!warn) return null;
   return (
-    <Sheet open onClose={onClose} title="Before you train it">
+    <Sheet open onClose={onClose} title={t("inj.risk.title")}>
       <div className="space-y-3 text-sm">
         {warn.action === "return" ? (
-          <p>A graded return brings back {warn.name} at {RETURN_PCTS[0]}% of your usual load, then {RETURN_PCTS[1]}% and {RETURN_PCTS[2]}%, a week at a time while your pain stays at {LOW_PAIN} or below. Pain of {STOP_PAIN} or more stops it. Please read this first.</p>
+          <p>{t("inj.risk.return", { name: warn.name, a: RETURN_PCTS[0], b: RETURN_PCTS[1], c: RETURN_PCTS[2], low: LOW_PAIN, stop: STOP_PAIN })}</p>
         ) : (
-          <p>You&apos;re choosing to keep training {warn.name}{warn.action === "light" ? " at a lighter load" : " at your usual load"}. Please read this first.</p>
+          <p>{t(warn.action === "light" ? "inj.risk.light" : "inj.risk.usual", { name: warn.name })}</p>
         )}
         <ul className="list-disc space-y-1.5 pl-5">
-          <li>Training an injured area can make the injury worse, slow down healing, or turn a short problem into a long one.</li>
-          <li>Pain can change how you move, which can overload other joints and muscles.</li>
-          <li>Stop straight away if you feel sharp or stabbing pain, pain that builds during the set, swelling, numbness, tingling, or a joint giving way.</li>
-          <li>A lighter load lowers the strain, but it doesn&apos;t make training an injury safe.</li>
+          <li>{t("inj.risk.1")}</li>
+          <li>{t("inj.risk.2")}</li>
+          <li>{t("inj.risk.3")}</li>
+          <li>{t("inj.risk.4")}</li>
         </ul>
-        <p className="text-muted">{NOT_ADVICE}</p>
+        <p className="text-muted">{notAdvice()}</p>
         {warn.action === "light" && (
           <div>
-            <p className="mb-2 font-medium">Share of your usual load</p>
-            <div className="flex flex-wrap gap-2" role="group" aria-label="Share of your usual load">
+            <p className="mb-2 font-medium">{t("inj.share")}</p>
+            <div className="flex flex-wrap gap-2" role="group" aria-label={t("inj.share")}>
               {LIGHT_PCTS.map((p) => <Chip key={p} active={pct === p} onClick={() => setPct(p)}>{p}%</Chip>)}
             </div>
           </div>
         )}
         <label className="flex items-center gap-3 rounded-xl bg-raised p-3">
           <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
-          I understand the risks
+          {t("inj.risk.ok")}
         </label>
-        <Button className="w-full" disabled={!ok} onClick={() => onConfirm({ ...warn, pct })}>{warn.action === "return" ? "Start the graded return" : `Train ${warn.exerciseId ? "it" : "them"} ${warn.action === "light" ? `at ${pct}%` : "as usual"}`}</Button>
-        <Button kind="quiet" className="w-full" onClick={onClose}>{warn.exerciseId ? "Keep skipping it" : warn.action === "return" ? "Not yet" : "Keep skipping them"}</Button>
+        <Button className="w-full" disabled={!ok} onClick={() => onConfirm({ ...warn, pct })}>{warn.action === "return" ? t("inj.risk.startReturn") : warn.action === "light" ? t(warn.exerciseId ? "inj.risk.itAt" : "inj.risk.themAt", { pct }) : t(warn.exerciseId ? "inj.risk.itUsual" : "inj.risk.themUsual")}</Button>
+        <Button kind="quiet" className="w-full" onClick={onClose}>{warn.exerciseId ? t("inj.risk.keepIt") : warn.action === "return" ? t("inj.notYet") : t("inj.risk.keepThem")}</Button>
       </div>
     </Sheet>
   );
@@ -235,7 +239,7 @@ export function PainSelect({ label, onRate, className = "" }: { label: string; o
   const [saved, setSaved] = useState<number | null>(null);
   return (
     <label className={`flex items-center justify-between gap-3 rounded-xl bg-raised px-3 py-2 text-sm ${className}`}>
-      <span>{saved === null ? label : `Saved: ${saved} of 10`}</span>
+      <span>{saved === null ? label : t("inj.pain.saved", { n: saved })}</span>
       <select
         aria-label={label}
         value={saved ?? ""}
@@ -248,7 +252,7 @@ export function PainSelect({ label, onRate, className = "" }: { label: string; o
         className="num min-h-11 rounded-lg border border-line bg-surface px-2 text-ink"
       >
         <option value="" disabled>0–10</option>
-        {Array.from({ length: 11 }, (_, n) => <option key={n} value={n}>{n}{n === 0 ? " no pain" : n === 10 ? " worst" : ""}</option>)}
+        {Array.from({ length: 11 }, (_, n) => <option key={n} value={n}>{n === 0 ? t("inj.pain.none", { n }) : n === 10 ? t("inj.pain.worst", { n }) : n}</option>)}
       </select>
     </label>
   );
@@ -256,19 +260,19 @@ export function PainSelect({ label, onRate, className = "" }: { label: string; o
 
 function PainBlock({ inj, label }: { inj: Injury; label: string }) {
   const { ratePain } = useApp();
-  const t = painTrend(inj);
+  const trend = painTrend(inj);
   return (
     <div className="mt-3 space-y-2">
-      {t.points.length > 0 && (
+      {trend.points.length > 0 && (
         <div className="flex items-center gap-3">
-          <Sparkline points={t.points} label={`${label} pain, oldest to newest: ${t.points.join(", ")} out of 10`} />
+          <Sparkline points={trend.points} label={t("inj.pain.spark", { part: label, points: trend.points.join(", ") })} />
           <div className="shrink-0 text-right text-sm">
-            <div className="num font-semibold">Pain {t.latest}/10</div>
-            {t.change !== undefined && <div className={`text-xs ${t.change < 0 ? "text-good" : t.change > 0 ? "text-warn" : "text-muted"}`}>{t.change < 0 ? `Down ${-t.change}` : t.change > 0 ? `Up ${t.change}` : "No change"} over the last {t.points.length} ratings</div>}
+            <div className="num font-semibold">{t("inj.pain.now", { n: trend.latest ?? 0 })}</div>
+            {trend.change !== undefined && <div className={`text-xs ${trend.change < 0 ? "text-good" : trend.change > 0 ? "text-warn" : "text-muted"}`}>{t("inj.pain.over", { count: trend.points.length, change: trend.change < 0 ? t("inj.pain.down", { n: -trend.change }) : trend.change > 0 ? t("inj.pain.up", { n: trend.change }) : t("inj.pain.same") })}</div>}
           </div>
         </div>
       )}
-      <PainSelect key={inj.pain.length} label="How does it feel today?" onRate={(n) => ratePain(inj.id, n)} />
+      <PainSelect key={inj.pain.length} label={t("inj.pain.today")} onRate={(n) => ratePain(inj.id, n)} />
     </div>
   );
 }
@@ -293,24 +297,24 @@ function ReturnBlock({ inj, label, onStart, onHeal }: { inj: Injury; label: stri
   if (r && !r.stopped) {
     return (
       <div className="mt-3 rounded-xl border border-accent/30 bg-accent/10 p-3 text-sm">
-        <p className="font-semibold">Graded return: step {r.stage + 1} of 3, at {r.pct}%</p>
+        <p className="font-semibold">{t("inj.ret.step", { step: r.stage + 1, pct: r.pct })}</p>
         <p className="mt-1 text-muted">
           {r.readyToHeal
-            ? `A week at ${RETURN_PCTS[2]}% with low pain. If your ${label.toLowerCase()} feels right, you can mark it healed.`
-            : `Each step lasts at least a week and needs a rating of ${LOW_PAIN} or less to move on. A ${LOW_PAIN + 1} or ${STOP_PAIN - 1} restarts the week; ${STOP_PAIN} or more stops the return.`}
+            ? t("inj.ret.ready", { pct: RETURN_PCTS[2], part: label.toLocaleLowerCase() })
+            : t("inj.ret.rules", { low: LOW_PAIN, a: LOW_PAIN + 1, b: STOP_PAIN - 1, stop: STOP_PAIN })}
         </p>
-        {r.readyToHeal && <Button kind="ghost" className="mt-2 w-full" onClick={onHeal}>Mark it healed</Button>}
+        {r.readyToHeal && <Button kind="ghost" className="mt-2 w-full" onClick={onHeal}>{t("inj.ret.markHealed")}</Button>}
       </div>
     );
   }
   if (returnReady(inj, now)) {
     return (
       <div className="mt-3 rounded-xl border border-good/30 bg-good/10 p-3 text-sm">
-        <p>Your pain has been {LOW_PAIN} or lower for about a week{r?.stopped ? " since the last return stopped" : ""}.</p>
-        <Button kind="ghost" className="mt-2 w-full" onClick={onStart}>Start a graded return</Button>
+        <p>{t(r?.stopped ? "inj.ret.lowSince" : "inj.ret.low", { low: LOW_PAIN })}</p>
+        <Button kind="ghost" className="mt-2 w-full" onClick={onStart}>{t("inj.ret.start")}</Button>
       </div>
     );
   }
-  if (r?.stopped) return <p className="mt-3 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">The graded return stopped when pain reached {r.stopped.score}. Skipped exercises stay out until it settles again.</p>;
+  if (r?.stopped) return <p className="mt-3 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{t("inj.ret.stopped", { score: r.stopped.score })}</p>;
   return null;
 }

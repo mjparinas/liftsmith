@@ -1,7 +1,7 @@
 import { roundLoad } from "./loads";
 import { TIMED, type Target } from "./progression";
-import type { AppEvent, BodyPart, Exercise, Gym, Muscle, Pattern } from "./types";
-import { t as tr } from "./i18n";
+import { BODY_PARTS, type AppEvent, type BodyPart, type Exercise, type Gym, type Muscle, type Pattern } from "./types";
+import { t as tr, translated } from "./i18n";
 
 // Injury mode (Melvin, 2026-11-09). The lifter logs an injury by body part. Exercises that load that
 // part are skipped until they mark it healed, or, if they choose after a risk warning, kept at a share
@@ -10,23 +10,7 @@ import { t as tr } from "./i18n";
 // The matching is deliberately broad (better to skip one exercise too many), and the lifter can mark
 // any single exercise as "doesn't hurt". None of this is medical advice, and the screens say so.
 
-export const PART_LABEL: Record<BodyPart, string> = {
-  neck: "Neck",
-  shoulder: "Shoulder",
-  elbow: "Elbow",
-  wrist: "Wrist or hand",
-  chest: "Chest",
-  upperBack: "Upper back",
-  lowerBack: "Lower back",
-  abs: "Abs or core",
-  hip: "Hip",
-  groin: "Groin",
-  quad: "Front of thigh",
-  hamstring: "Hamstring",
-  knee: "Knee",
-  calf: "Calf",
-  ankle: "Ankle or foot",
-};
+export const PART_LABEL: Record<BodyPart, string> = translated(BODY_PARTS, (p) => `part.${p}`);
 
 interface PartRule {
   /** Affected when any of these is a primary muscle. */

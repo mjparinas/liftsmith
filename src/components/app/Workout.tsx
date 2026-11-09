@@ -418,9 +418,9 @@ export function Workout() {
 function Feedback({ name, onPick }: { name: string; onPick: (r: -1 | 0 | 1) => void }) {
   return (
     <div className="animate-rise mt-4 w-full rounded-2xl border border-line bg-raised/70 p-3 text-center">
-      <p className="text-sm text-muted">How was {name}?</p>
+      <p className="text-sm text-muted">{t("workout.howWas", { name })}</p>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        {([[1, "Too easy"], [0, "About right"], [-1, "Too hard"]] as const).map(([r, l]) => (
+        {([[1, t("workout.tooEasy")], [0, t("workout.aboutRight")], [-1, t("workout.tooHard")]] as const).map(([r, l]) => (
           <button key={r} type="button" onClick={() => { haptic("select"); sound.tick(); onPick(r); }} className="press min-h-11 rounded-xl border border-line bg-surface py-2 text-sm font-medium hover:border-accent/50">{l}</button>
         ))}
       </div>
@@ -532,7 +532,7 @@ function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: s
   if (!todo.length) return null;
   return (
     <div className="mt-3 w-full space-y-2">
-      {todo.map((i) => <PainSelect key={i.id} label={`${PART_LABEL[i.part]} pain after that set?`} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
+      {todo.map((i) => <PainSelect key={i.id} label={t("inj.pain.afterSet", { part: PART_LABEL[i.part] })} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
     </div>
   );
 }
