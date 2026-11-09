@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar, type PlateFinish } from "@/components/PlateBar";
@@ -261,13 +262,13 @@ export function Workout() {
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
-                  <p>Warm-up: easy, smooth reps. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
+                  <p>Warm-up: easy, smooth reps<Info term="warmup" />. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
                   <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
                 </div>
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-4 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
+                <p className="mt-4 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank<Info term="rir" /> · {item.target.note}</p>
               )}
               <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (

@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
@@ -93,6 +94,7 @@ export function Today() {
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${preview.week.deload ? "border-warn/40 bg-warn/12 text-warn" : "border-line bg-surface text-muted"}`}>
             <Icon name="layers" size={15} className={preview.week.deload ? "" : "text-violet"} />
             {preview.week.label} · RIR {preview.week.rir}
+            <Info term={preview.week.deload ? "deload" : "rir"} className="-mr-3" />
           </span>
         )}
         {streak.needed > 0 && (
@@ -117,8 +119,9 @@ export function Today() {
               <div className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: call.hue }}>
                 <Icon name={call.icon} size={14} strokeWidth={2.4} />
                 <span>Readiness</span>
+                <Info term="readiness" />
               </div>
-              <h2 id="call-title" className="mt-0.5 text-xl font-bold">{CALL_TEXT[preview.call].label}</h2>
+              <h2 id="call-title" className="mt-0.5 text-xl font-bold">{CALL_TEXT[preview.call].label}<Info term="call" /></h2>
             </div>
           </div>
           <p className="mt-3 text-sm text-muted">{preview.challenge ? "Challenge day: your first lift ends with an as-many-reps-as-you-can set." : CALL_TEXT[preview.call].blurb}</p>

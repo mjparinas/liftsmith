@@ -1,4 +1,6 @@
 "use client";
+import { Info } from "@/components/Info";
+import type { Term } from "@/lib/glossary";
 import { applyAppearance, savedAppearance } from "@/lib/appearance";
 import { BRAND } from "@/lib/brand";
 import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals, yearGrid } from "@/lib/dashboard";
@@ -57,10 +59,10 @@ const tonnes = (kg: number, unit: Unit) => (unit === "kg" ? `${fmtNum(Math.round
 const hours = (sec: number) => `${fmtNum(Math.round(sec / 360) / 10)} h`;
 const dateText = (ms: number) => new Date(ms).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
-function Panel({ title, children, className = "" }: { title: string; children: React.ReactNode; className?: string }) {
+function Panel({ title, children, className = "", info }: { title: string; children: React.ReactNode; className?: string; info?: Term }) {
   return (
     <section className={`card min-w-0 p-5 ${className}`}>
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{title}</h2>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{title}{info && <Info term={info} />}</h2>
       {children}
     </section>
   );
@@ -302,7 +304,7 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
   if (!bests.length) return <div className="card p-6 text-muted">Log a few sets and your lifts show here.</div>;
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      <Panel title="Estimated one-rep max over time" className="lg:col-span-2">
+      <Panel title="Estimated one-rep max over time" className="lg:col-span-2" info="e1rm">
         {!pro ? (
           <ProLock what="One-rep max trends" />
         ) : charted.length ? (
@@ -347,7 +349,7 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
           </table>
         </div>
       </Panel>
-      <Panel title="Hard sets per muscle this week" className="lg:col-span-2">
+      <Panel title="Hard sets per muscle this week" className="lg:col-span-2" info="weeklySets">
         {!pro ? (
           <ProLock what="Weekly sets per muscle" />
         ) : (

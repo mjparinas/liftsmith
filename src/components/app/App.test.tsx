@@ -185,6 +185,7 @@ describe("game layer", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Warm-ups don't earn XP or badges, so go straight to a working set.
     const skip = screen.queryByRole("button", { name: "Skip warm-up" });
     if (skip) await user.click(skip);
     await user.click(await screen.findByRole("button", { name: /Log set/ }));

@@ -64,12 +64,12 @@ export function Stats() {
         {lvl.next && <p className="mt-1.5 text-xs text-faint num">{lvl.span - lvl.into} XP to {lvl.next}</p>}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {tiles.map(([k, v, icon, hue]) => <StatTile key={k} label={k} value={v} icon={icon} tint={hue} />)}
+        {tiles.map(([k, v, icon, hue]) => <StatTile key={k} label={k} value={v} icon={icon} tint={hue} info={k === "Volume" ? "volume" : undefined} />)}
       </div>
       <TonnageCard />
       <StrengthCard />
 
-      <Section title="Sets per muscle this week" icon="target">
+      <Section title="Sets per muscle this week" icon="target" info="weeklySets">
         <div className="card p-4">
           <ul className="space-y-2">
             {MUSCLES.filter((m) => thisWeek.sets[m] > 0).sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a]).map((m) => (
@@ -88,7 +88,7 @@ export function Stats() {
         </div>
       </Section>
 
-      <Section title="Estimated one-rep max" icon="progress">
+      <Section title="Estimated one-rep max" icon="progress" info="e1rm">
         <ul className="card divide-y divide-line">
           {top.map(([id, series]) => (
             <li key={id} className="flex items-center justify-between gap-3 px-4 py-3">
