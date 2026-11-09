@@ -1,4 +1,4 @@
-import type { Equipment, Exercise, LoadKind, Muscle, Pattern } from "./types";
+import type { AppEvent, CustomExerciseEvent, Equipment, Exercise, LoadKind, Muscle, Pattern } from "./types";
 
 // The exercise library. Text is our own. `start` is a rough first-session load as a share of body
 // weight for an intermediate lifter; the progression engine takes over after the first session.
@@ -137,7 +137,34 @@ export const EXERCISES: Exercise[] = ROWS.map(([id, name, primary, secondary, ne
   cues,
 }));
 
-export const EXERCISE_BY_ID: ReadonlyMap<string, Exercise> = new Map(EXERCISES.map((e) => [e.id, e]));
+const BY_ID = new Map(EXERCISES.map((e) => [e.id, e]));
+export const EXERCISE_BY_ID: ReadonlyMap<string, Exercise> = BY_ID;
+
+const CUSTOM_NEEDS: Record<LoadKind, Equipment[]> = { barbell: ["barbell"], dumbbell: ["dumbbells"], kettlebell: ["kettlebells"], machine: [], bodyweight: [] };
+const CUSTOM_START: Record<LoadKind, number> = { barbell: 0.4, dumbbell: 0.12, kettlebell: 0.12, machine: 0.3, bodyweight: 0 };
+
+/**
+ * Adds the lifter's own exercises to the library (idempotent), so every screen, swap, stat and
+ * export can look them up. Called when events load and when one is created.
+ */
+export function registerCustom(events: readonly AppEvent[]): void {
+  for (const e of events) {
+    if (e.type !== "customExercise" || BY_ID.has(e.exercise.id)) continue;
+    const c = (e as CustomExerciseEvent).exercise;
+    const ex: Exercise = {
+      ...c,
+      needs: CUSTOM_NEEDS[c.load],
+      pattern: c.compound ? "core" : "isolation",
+      start: CUSTOM_START[c.load],
+      setup: "Your own exercise.",
+      cues: ["Set it up the way you usually do", "Control every rep"],
+      custom: true,
+    };
+    if (c.compound) ex.pattern = c.primary.some((m) => ["quads", "glutes"].includes(m)) ? "squat" : c.primary.some((m) => ["lats", "upperBack"].includes(m)) ? "hpull" : c.primary.some((m) => ["chest", "frontDelts", "triceps"].includes(m)) ? "hpush" : "hinge";
+    EXERCISES.push(ex);
+    BY_ID.set(ex.id, ex);
+  }
+}
 
 export function exercise(id: string): Exercise {
   const e = EXERCISE_BY_ID.get(id);
