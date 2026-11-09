@@ -1,5 +1,5 @@
 "use client";
-import { t } from "@/lib/i18n";
+import { list, t } from "@/lib/i18n";
 import { Info } from "@/components/Info";
 import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
@@ -120,11 +120,11 @@ export function Today() {
         {streak.needed > 0 && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted">
             <Icon name="target" size={15} className="text-ember" />
-            {streak.needed} more this week for your goal
+            {t("today.goalMore", { count: streak.needed })}
           </span>
         )}
         <button type="button" onClick={() => go("injuries")} className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}>
-          {hurt.length ? `Training around: ${hurt.map((i) => PART_LABEL[i.part].toLowerCase()).join(", ")}` : "Something hurts?"}
+          {hurt.length ? t("today.trainingAround", { parts: list(hurt.map((i) => PART_LABEL[i.part].toLocaleLowerCase())) }) : t("today.somethingHurts")}
         </button>
       </div>
 
