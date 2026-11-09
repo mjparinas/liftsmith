@@ -5,7 +5,7 @@ import { anniversaryYears } from "./moments";
 // training milestones derived from stats, never bought and never stored as "earned" (like game.ts).
 // Seasonal themes are open to everyone during their season. A cosmetic accent picked in the
 // gamification work (profile.cosmetics.accent) wins over the theme's accent.
-// Icons are drawn by scripts/make-theme-icons.py; Android switches launcher aliases and iOS uses
+// Icons are drawn by scripts/make-icons.mjs; Android switches launcher aliases and iOS uses
 // alternate app icons (AppIconPlugin), so each earned icon exists on both.
 
 export interface ThemePalette {
