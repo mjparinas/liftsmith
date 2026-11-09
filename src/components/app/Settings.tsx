@@ -4,6 +4,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useState } from "react";
+import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { go } from "./router";
 import { Button, Chip, Section } from "./ui";
@@ -40,6 +41,7 @@ export function Settings() {
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>
       <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <CalendarSettings />
       <CycleSettings />
       <Section title="Training block">
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>Start a new block today</Button>

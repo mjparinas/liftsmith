@@ -8,7 +8,8 @@ import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
-import { useMemo } from "react";
+import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
+import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Section } from "./ui";
@@ -119,6 +120,7 @@ export function Today() {
           className="slider mt-3 w-full"
         />
         <div className="mt-1 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
+        <FitAroundCalendar />
       </div>
 
       {preview && preview.items.length > 0 ? (
@@ -163,5 +165,42 @@ export function Today() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Calendar (MVP+2): when the lifter allowed reading busy times and something starts before the planned
+ * workout could finish, offer a length that fits. Only start and end times are read, on the phone.
+ */
+function FitAroundCalendar() {
+  const { profile, setProfile, active } = useApp();
+  const on = !!profile.calendar?.read && !active;
+  const now = useNow(60_000);
+  const bucket = Math.floor(now / 300_000); // look again every 5 minutes
+  const [busy, setBusy] = useState<Busy[] | null>(null);
+  useEffect(() => {
+    if (!on) return;
+    let live = true;
+    void busyTimes(Date.now()).then((b) => live && setBusy(b));
+    return () => {
+      live = false;
+    };
+  }, [on, bucket]);
+  if (!on || !busy) return null;
+  const free = freeMinutes(busy, now);
+  const fit = fitLength(free.minutes, profile.minutes);
+  if (!fit || !free.until) return null;
+  const at = new Date(free.until).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        haptic("tick");
+        setProfile({ minutes: fit });
+      }}
+      className="press mt-3 w-full rounded-xl border border-line bg-surface px-3 py-2.5 text-left text-sm"
+    >
+      📅 Busy at {at} · <span className="font-semibold text-accent">Fit a {fit}-minute workout</span>
+    </button>
   );
 }

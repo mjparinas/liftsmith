@@ -174,6 +174,17 @@ export type Goal = "strength" | "muscle" | "general";
 export type Experience = "new" | "intermediate" | "advanced";
 export type Variability = "consistent" | "balanced" | "variable";
 
+export interface CalendarPrefs {
+  /** Weekdays to train, 0 = Sunday. */
+  days: number[];
+  /** Local time of day, "HH:MM". */
+  time: string;
+  /** Training days were written to the device calendar. */
+  write: boolean;
+  /** The lifter allowed reading busy times (start and end only). */
+  read: boolean;
+}
+
 export interface Profile {
   name: string;
   goal: Goal;
@@ -196,6 +207,8 @@ export interface Profile {
    * feedback reports.
    */
   cycle?: { enabled: boolean; consentAt: number };
+  /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
+  calendar?: CalendarPrefs;
   onboarded: boolean;
   updatedAt: number;
 }
