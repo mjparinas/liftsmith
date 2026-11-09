@@ -1,4 +1,5 @@
 import { blockWeek } from "./block";
+import { cycleSignal, cycleState } from "./cycle";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import type { AppEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
@@ -35,6 +36,8 @@ export interface ExternalSignals {
   restingHrDelta?: number;
   /** Pre-workout check-in, −1 (low) to 1 (great). */
   checkIn?: -1 | 0 | 1;
+  /** Use logged periods (only when the lifter opted in to cycle-aware readiness). */
+  cycle?: boolean;
 }
 
 const DAY = 86_400_000;
@@ -76,7 +79,10 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const sessions = recentSessions(events);
   const week = blockWeek(profile, now);
 
-  if (!sessions.length) return { call: "normal", score: 50, signals: [{ points: 0, text: "First workout: we'll learn your level" }], challenge: false };
+  if (!sessions.length) {
+    const c = external.cycle ? cycleSignal(cycleState(events, now)) : null;
+    return { call: "normal", score: 50, signals: [{ points: 0, text: "First workout: we'll learn your level" }, ...(c ? [c] : [])], challenge: false };
+  }
 
   // 1. Recovery of the big muscles.
   const rec = recovery(events, now);
@@ -140,6 +146,10 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, "Resting heart rate is up");
   if (external.checkIn === -1) add(-15, "You said you're low today");
   if (external.checkIn === 1) add(8, "You said you feel great");
+  if (external.cycle) {
+    const c = cycleSignal(cycleState(events, now));
+    if (c) signals.push(c);
+  }
 
   const score = Math.max(0, Math.min(100, Math.round(50 + signals.reduce((s, x) => s + x.points, 0))));
   let call: Call = score >= PUSH_AT ? "push" : score <= RECOVER_AT ? "recover" : "normal";

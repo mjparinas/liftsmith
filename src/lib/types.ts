@@ -190,6 +190,12 @@ export interface Profile {
   /** Weeks of build before the deload week. */
   blockWeeks: number;
   restSounds: boolean;
+  /**
+   * Cycle-aware readiness (Melvin, 2026-11-09). Opt-in with its own consent screen; consentAt is when
+   * the lifter agreed. Cycle data stays on the device (and the user's own sync), never in analytics or
+   * feedback reports.
+   */
+  cycle?: { enabled: boolean; consentAt: number };
   onboarded: boolean;
   updatedAt: number;
 }
@@ -286,4 +292,11 @@ export interface SwapEvent extends EventBase {
   avoid: boolean;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent;
+/** The first day of a period, logged by the lifter (cycle-aware readiness). */
+export interface CycleEvent extends EventBase {
+  type: "cycle";
+  /** Local midnight of the day the period started (ms). */
+  day: number;
+}
+
+export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent;
