@@ -2,7 +2,7 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
+Last reviewed: 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
@@ -19,7 +19,10 @@ Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connec
 | Feedback message, optional email, optional screenshot, optional device details | Only when the user sends feedback | App functionality (support) | Email is given by the user |
 | Reminder email address, which reminder kinds are on, consent time | Only when the user turns on email reminders (double opt-in) | App functionality, developer communications (offers only if the user turns them on) | Yes, by the email address |
 | Training days and time, time zone, days a week, setup time, first and last workout times, days trained this week, streak, Pro state | Only with email reminders | App functionality (deciding when to send a reminder) | Yes, by the email address. No weights, reps or heart rate |
-| Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data, location | **No** (stays on the device) | | |
+| Account: email address, sign-in methods (Google or Apple account id), session tokens (hashed) | Only when the user signs in (optional) | App functionality (sync and backup), account management | Yes |
+| Synced copy: workouts and sets, notes, body weight, gyms, routines, settings, and if used Health Connect / Apple Health readings, injuries and cycle logs | Only when the user signs in (optional); deleted with the account | App functionality (backup and sync to the user's own devices) | Yes, to the user's own account. Never in usage stats, never shared |
+| Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data | **No** without an account (stays on the device) | | |
+| Location, progress photos | **Never** | | |
 | Advertising id (IDFA, Android advertising id) | **Never** (`AD_ID` permission removed in the manifest; no ATT prompt) | | |
 
 Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off until switched on inside them. They can be switched off in Settings › Usage stats and in the setup wizard.
@@ -28,7 +31,8 @@ Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off u
 
 - Does your app collect or share any of the required user data types? **Yes.**
 - Is all of the user data collected by your app encrypted in transit? **Yes** (HTTPS only).
-- Do you provide a way for users to request that their data is deleted? **Yes** (Settings › Erase this device resets the install id; deletion on request through in-app feedback with the install id).
+- Do you provide a way for users to request that their data is deleted? **Yes** (Settings › Account and sync › Delete my account deletes the account and its synced copy; Settings › Erase this device resets the install id; deletion on request through in-app feedback with the install id).
+- Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/app/#/account (sign in, then Delete my account).
 - **Shared** with third parties: **none** (Vercel, Turso, Resend and RevenueCat are service providers acting for us, which Play does not count as sharing).
 
 Collected data types:
@@ -40,10 +44,12 @@ Collected data types:
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
 | Device or other IDs › Device or other IDs | Yes (random install id) | No | No | Optional | Analytics |
-| Personal info › Email address | Yes (only if given with feedback, or for email reminders) | No | No | Optional | App functionality, Developer communications |
-| Health and fitness › Fitness info | Yes, only with email reminders: workout times and counts, never weights, reps or heart rate | No | No | Optional | App functionality |
+| Personal info › Email address | Yes (only if given with feedback, for email reminders, or to sign in to an account) | No | No | Optional | App functionality, Developer communications, Account management |
+| Personal info › User IDs | Yes (account id, Google or Apple account id, only when signed in) | No | No | Optional | App functionality, Account management |
+| Health and fitness › Fitness info | Yes: with email reminders, workout times and counts; with an account, the synced workouts, sets, body weight and heart rate | No | No | Optional | App functionality |
 | Financial info › Purchase history | Yes (plan and price of a purchase; RevenueCat checks the receipt) | No | No | Optional | App functionality, Analytics |
-| Health and fitness › Health info | **No** (stays on the device) | | | | |
+| Health and fitness › Health info | Yes, only with an account: synced Health Connect readings, injuries and cycle logs, for the user's own devices | No | No | Optional | App functionality |
+| App activity › Other user-generated content | Yes, with an account: exercise notes and routines | No | No | Optional | App functionality |
 
 Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE, the health twin), READ_SLEEP, READ_HEART_RATE_VARIABILITY and READ_RESPIRATORY_RATE (the health twin on the Body tab, and the Pro readiness call: "adjusts workout intensity to recovery"), READ_STEPS (the health twin and TDEE's activity level), READ_VO2_MAX (the health twin) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
 
@@ -51,7 +57,7 @@ Health Connect: the permissions declaration form still applies to the on-device 
 
 - Do you or your third-party partners collect data from this app? **Yes.**
 - **Data used to track you: none.** No IDFA, no ATT prompt, no data broker or ad network.
-- **Data linked to you** (only when the user sends feedback or turns on email reminders): Contact Info › Email Address (App Functionality; Developer's Advertising or Marketing, for Pro offers the user turns on); User Content › Other User Content (the feedback message and screenshot); Health & Fitness › Fitness (with email reminders only: workout times and counts, for App Functionality).
+- **Data linked to you** (only when the user signs in, sends feedback or turns on email reminders): Contact Info › Email Address and Identifiers › User ID (signing in; App Functionality); Health & Fitness › Health and Fitness, and User Content › Other User Content (the synced copy of the user's data, with an account only; App Functionality); Contact Info › Email Address (App Functionality; Developer's Advertising or Marketing, for Pro offers the user turns on); User Content › Other User Content (the feedback message and screenshot); Health & Fitness › Fitness (with email reminders only: workout times and counts, for App Functionality).
 - **Phone reminders** are local notifications scheduled on the device and collect nothing.
 - **Data not linked to you:**
   - Identifiers › Device ID (random install id): Analytics.
@@ -59,6 +65,6 @@ Health Connect: the permissions declaration form still applies to the on-device 
   - Diagnostics › Other Diagnostic Data: Analytics, App Functionality.
   - Purchases › Purchase History: App Functionality, Analytics (RevenueCat checks the store receipt).
   - Location › Coarse Location (country from IP): Analytics.
-- Health & Fitness: **not collected** (Apple Health data stays on the device).
+- Health & Fitness without an account: **not collected** (Apple Health data stays on the device). With an account it's synced to the user's own account (above), never used for tracking.
 
 The privacy manifest (`PrivacyInfo.xcprivacy`) declares the same "not linked, not tracking" types for analytics.
