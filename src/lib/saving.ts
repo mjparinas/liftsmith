@@ -1,7 +1,7 @@
 import { isNative } from "./juice";
 
 // Where the lifter's data lives, and how to keep it safe (Melvin, 2026-11-09: "it's not clear how to
-// save my information or register"). There are no accounts yet: everything is saved on the device as
+// save my information or register"). Everything is saved on the device as
 // it happens (IndexedDB, localdb.ts). On Android and iOS that storage belongs to the app and stays
 // until it's uninstalled. In a browser it can be cleared: by clearing site data, in a private window,
 // and by Safari, which deletes a site's storage after 7 days without a visit unless it's on the home

@@ -122,6 +122,10 @@ try {
   await page.goto(`${server.url}/app/#/pro`);
   await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
   await scan("pro");
+  await page.goto(`${server.url}/app/#/account`);
+  await page.getByRole("heading", { name: "Account and sync" }).waitFor();
+  await page.getByRole("button", { name: "Continue with email" }).click();
+  await scan("account");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();

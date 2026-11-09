@@ -1,4 +1,4 @@
-// Sign-in for the admin panel (/admin/). Liftsmith has no accounts yet, so an admin signs in with a one-time
+// Sign-in for the admin panel (/admin/). Admins are separate from lifters' accounts: an admin signs in with a one-time
 // link emailed through Resend to an address on ADMIN_EMAILS (or SUPPORT_EMAILS, read-only). The lists live in
 // the environment, so nothing a request writes can make someone an admin. Without either list the panel and
 // its API answer 404. Only hashes of links and session tokens are stored; every change is audited.
