@@ -1,6 +1,7 @@
 import type { Stats } from "./derive";
 import type { Unit } from "./types";
 import { fromKg } from "./units";
+import { num, t } from "./i18n";
 
 // Lifetime tonnage, anniversaries, workout-count milestones and comebacks: small moments derived from
 // the event log, never stored (like game.ts). Celebrations only; the badges for tonnage and comebacks
@@ -8,21 +9,27 @@ import { fromKg } from "./units";
 
 const DAY = 86400_000;
 
-/** Rough masses, rounded and labelled "about" in the app. Kilograms. */
-export const TONNAGE: { kg: number; name: string; emoji: string }[] = [
-  { kg: 500, name: "a grand piano", emoji: "🎹" },
-  { kg: 1_500, name: "a family car", emoji: "🚗" },
-  { kg: 6_000, name: "an African elephant", emoji: "🐘" },
-  { kg: 8_000, name: "a T. rex", emoji: "🦖" },
-  { kg: 12_000, name: "a double-decker bus", emoji: "🚌" },
-  { kg: 30_000, name: "a humpback whale", emoji: "🐋" },
-  { kg: 60_000, name: "a battle tank", emoji: "🛡️" },
-  { kg: 150_000, name: "a blue whale", emoji: "🐳" },
-  { kg: 225_000, name: "the Statue of Liberty", emoji: "🗽" },
-  { kg: 420_000, name: "the International Space Station", emoji: "🛰️" },
-  { kg: 1_000_000, name: "a million kilograms", emoji: "🏔️" },
-  { kg: 7_300_000, name: "the Eiffel Tower's iron", emoji: "🗼" },
-];
+/** Rough masses, rounded and labelled "about" in the app. Kilograms. The name is read from the language catalogue (`ton.<id>`). */
+const TONNAGE_ROWS = [
+  { kg: 500, id: "piano", emoji: "🎹" },
+  { kg: 1_500, id: "car", emoji: "🚗" },
+  { kg: 6_000, id: "elephant", emoji: "🐘" },
+  { kg: 8_000, id: "trex", emoji: "🦖" },
+  { kg: 12_000, id: "bus", emoji: "🚌" },
+  { kg: 30_000, id: "humpback", emoji: "🐋" },
+  { kg: 60_000, id: "tank", emoji: "🛡️" },
+  { kg: 150_000, id: "bluewhale", emoji: "🐳" },
+  { kg: 225_000, id: "liberty", emoji: "🗽" },
+  { kg: 420_000, id: "iss", emoji: "🛰️" },
+  { kg: 1_000_000, id: "million", emoji: "🏔️" },
+  { kg: 7_300_000, id: "eiffel", emoji: "🗼" },
+] as const;
+export const TONNAGE: { kg: number; id: (typeof TONNAGE_ROWS)[number]["id"]; name: string; emoji: string }[] = TONNAGE_ROWS.map((r) => ({
+  ...r,
+  get name() {
+    return t(`ton.${r.id}`);
+  },
+}));
 
 export type Milestone = (typeof TONNAGE)[number];
 
@@ -45,9 +52,9 @@ export function crossed(beforeKg: number, afterKg: number): Milestone | null {
 
 /** "152 t" in kilograms, "335,100 lb" in pounds. */
 export function fmtTonnage(kg: number, unit: Unit): string {
-  if (unit === "lb") return `${Math.round(fromKg(kg, "lb")).toLocaleString("en-US")} lb`;
-  if (kg >= 1000) return `${(kg / 1000).toLocaleString("en-US", { maximumFractionDigits: kg >= 100_000 ? 0 : 1 })} t`;
-  return `${Math.round(kg).toLocaleString("en-US")} kg`;
+  if (unit === "lb") return `${num(Math.round(fromKg(kg, "lb")))} lb`;
+  if (kg >= 1000) return `${num(kg / 1000, { maximumFractionDigits: kg >= 100_000 ? 0 : 1 })} t`;
+  return `${num(Math.round(kg))} kg`;
 }
 
 export const COUNT_MILESTONES = [10, 25, 50, 100, 150, 200, 250, 300, 365, 400, 500, 750, 1000];

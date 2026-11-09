@@ -1,8 +1,9 @@
 "use client";
 // The one-rep max calculator and the DOTS score on the Progress screen (Melvin, 2026-11-09). The maths is in
-// src/lib/onerm.ts; this file only shows it. All text is in T, so it can move to a message file.
+// src/lib/onerm.ts; this file only shows it. Text is in the language catalogues (orm.*, dots.*).
 import { exercise } from "@/lib/exercises";
-import { allFormulas, allOneRms, dots, dotsBand, dotsFromData, DOTS_LIFTS, estimate, MAX_RTF, oneRm, repTable, type DotsLift, type OneRm, type RirSource } from "@/lib/onerm";
+import { allFormulas, allOneRms, dots, dotsBand, dotsFromData, DOTS_LIFTS, estimate, MAX_RTF, oneRm, repTable, type DotsLift, type OneRm } from "@/lib/onerm";
+import { list as listOf, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import type { Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
@@ -13,60 +14,14 @@ import { ago } from "./format";
 import { HUE } from "./theme";
 import { Chip, EmptyState, Section, Sheet } from "./ui";
 
-const T = {
-  title: "Estimated one-rep max",
-  showAll: (n: number) => `Show all ${n}`,
-  showFewer: "Show fewer",
-  emptyTitle: "Trends appear here",
-  emptyBody: "Log a few weighted sets and your estimated maxes will chart themselves.",
-  needsTwo: "Needs two sessions",
-  range: (lo: string, hi: string, unit: string) => `Likely ${lo} to ${hi} ${unit}`,
-  confidence: { high: "High confidence", medium: "Medium confidence", low: "Low confidence" },
-  fromSetup: "From the max you entered at setup. Log a few sets and it switches to your real lifting.",
-  basis: (w: string, unit: string, reps: number, rir: number, when: string) => `Mostly from ${w} ${unit} × ${reps}${rir ? ` with ${rir} in reserve` : " to failure"}, ${when}`,
-  rirWhy: {
-    reported: "the reserve you reported",
-    failure: "an all-out or missed set",
-    planned: "the plan's reserve",
-    assumed: "an assumed 2 in reserve (logged without one)",
-  } satisfies Record<RirSource, string>,
-  sessions: (n: number) => `${n} session${n === 1 ? "" : "s"} in the last 6 months`,
-  table: "What you could lift",
-  tableHead: ["Reps", "% of max", "Weight"],
-  tableNote: "To failure. For 2 in reserve, use the row two reps higher.",
-  calc: "Try a set",
-  calcBody: "Enter any set to see the max it points to.",
-  weight: "Weight",
-  reps: "Reps",
-  rir: "Reps left in the tank",
-  less: (what: string) => `Less ${what.toLowerCase()}`,
-  more: (what: string) => `More ${what.toLowerCase()}`,
-  calcResult: "Estimated max",
-  tooMany: `Past ${MAX_RTF} reps to failure no formula is reliable. Try a heavier set.`,
-  formulas: "How each formula sees it",
-  formulasNote: "Up to 10 reps to failure the estimate averages Brzycki, Epley and the 2026 weight-based equation; above that, Mayhew, Wathan and the 2026 equation. Highlighted ones are in use.",
-  method: "Each session's best set counts, with reps in reserve added. Recent, heavy, close-to-failure sets count most, and sets past 20 reps are ignored.",
-  pickExercise: "Exercise",
-  // DOTS
-  dotsTitle: "DOTS score",
-  dotsBody: "Your squat, bench and deadlift total scaled for body weight, so lifters of any size compare. Worked out from your estimated maxes.",
-  dotsMissing: (names: string) => `Needs an estimated max for ${names}. Log a heavy set of each, or enter them below.`,
-  dotsTotal: "Total",
-  dotsBw: "Body weight",
-  dotsSex: "Formula",
-  male: "Men's",
-  female: "Women's",
-  dotsCalc: "Change the numbers",
-  dotsReset: "Use my data",
-  dotsNote: "Estimated maxes, not meet lifts. Bands are a rough guide: under 200 beginner, 300 intermediate, 400 advanced, 500 elite.",
-  liftName: { squat: "Squat", bench: "Bench", deadlift: "Deadlift" } satisfies Record<DotsLift, string>,
-};
+const conf = (c: OneRm["confidence"]) => t(`orm.conf.${c}`);
+const liftName = (k: DotsLift) => t(`dots.lift.${k}`);
 
 const kgTo = (kg: number, unit: Unit) => fmtNum(Math.round(fromKg(kg, unit)));
 const kgTo1 = (kg: number, unit: Unit) => fmtNum(Math.round(fromKg(kg, unit) * 10) / 10);
 
 function Trend({ points }: { points: number[] }) {
-  if (points.length < 2) return <div className="h-10 text-xs text-faint">{T.needsTwo}</div>;
+  if (points.length < 2) return <div className="h-10 text-xs text-faint">{t("orm.needsTwo")}</div>;
   const min = Math.min(...points);
   const max = Math.max(...points);
   const w = 120;
@@ -89,7 +44,7 @@ export function OneRmSection() {
   const [open, setOpen] = useState<string | null>(null);
   const shown = all ? list : list.slice(0, 6);
   return (
-    <Section title={T.title} icon="progress" info="e1rm" right={list.length > 6 ? <button type="button" onClick={() => setAll(!all)} className="press min-h-11 text-sm text-accent">{all ? T.showFewer : T.showAll(list.length)}</button> : undefined}>
+    <Section title={t("orm.title")} icon="progress" info="e1rm" right={list.length > 6 ? <button type="button" onClick={() => setAll(!all)} className="press min-h-11 text-sm text-accent">{all ? t("orm.showFewer") : t("orm.showAll", { count: list.length })}</button> : undefined}>
       <ul className="card divide-y divide-line">
         {shown.map((r) => (
           <li key={r.exerciseId}>
@@ -102,7 +57,7 @@ export function OneRmSection() {
             </button>
           </li>
         ))}
-        {!list.length && <li><EmptyState icon="progress" tint={HUE.cyan} title={T.emptyTitle} body={T.emptyBody} /></li>}
+        {!list.length && <li><EmptyState icon="progress" tint={HUE.cyan} title={t("orm.emptyTitle")} body={t("orm.emptyBody")} /></li>}
       </ul>
       {open && <OneRmSheet exerciseId={open} choices={list.map((l) => l.exerciseId)} onPick={setOpen} onClose={() => setOpen(null)} />}
     </Section>
@@ -117,7 +72,7 @@ function OneRmSheet({ exerciseId, choices, onPick, onClose }: { exerciseId: stri
   return (
     <Sheet open onClose={onClose} title={exercise(exerciseId).name}>
       <label className="block text-sm text-muted">
-        {T.pickExercise}
+        {t("orm.pick")}
         <select value={exerciseId} onChange={(e) => onPick(e.target.value)} className="mt-1 min-h-11 w-full rounded-xl border border-line bg-surface px-3 text-ink">
           {choices.map((id) => <option key={id} value={id}>{exercise(id).name}</option>)}
         </select>
@@ -125,7 +80,7 @@ function OneRmSheet({ exerciseId, choices, onPick, onClose }: { exerciseId: stri
       {r && <Estimate r={r} unit={unit} now={now} />}
       {r && <RepTable e1rm={r.e1rm} unit={unit} />}
       <SetCalculator unit={unit} seed={r?.basis ? { weight: r.basis.weight, reps: r.basis.reps, rir: r.basis.rir } : undefined} />
-      <p className="mt-4 text-xs text-faint">{T.method}</p>
+      <p className="mt-4 text-xs text-faint">{t("orm.method")}</p>
     </Sheet>
   );
 }
@@ -135,13 +90,13 @@ function Estimate({ r, unit, now }: { r: OneRm; unit: Unit; now: number }) {
   return (
     <div className="mt-4 rounded-2xl bg-raised p-4" data-testid="onerm-estimate">
       <div className="num text-4xl font-extrabold">{kgTo(r.e1rm, unit)} <span className="text-lg font-semibold text-muted">{unit}</span></div>
-      <div className="num mt-1 text-sm text-muted">{T.range(kgTo(r.low, unit), kgTo(r.high, unit), unit)} · {T.confidence[r.confidence]}</div>
+      <div className="num mt-1 text-sm text-muted">{t("orm.range", { lo: kgTo(r.low, unit), hi: kgTo(r.high, unit), unit })} · {conf(r.confidence)}</div>
       {r.source === "setup" ? (
-        <p className="mt-2 text-sm text-muted">{T.fromSetup}</p>
+        <p className="mt-2 text-sm text-muted">{t("orm.fromSetup")}</p>
       ) : (
         b && (
           <p className="mt-2 text-sm text-muted">
-            {T.basis(kgTo1(b.weight, unit), unit, b.reps, b.rir, ago(b.at, now))} ({T.rirWhy[b.rirSource]}). {T.sessions(r.sessions)}.
+            {t(b.rir ? "orm.basisRir" : "orm.basisFail", { weight: kgTo1(b.weight, unit), unit, reps: b.reps, rir: b.rir, when: ago(b.at, now) })} ({t(`orm.rir.${b.rirSource}`)}). {t("orm.sessions", { count: r.sessions })}.
           </p>
         )
       )}
@@ -153,10 +108,10 @@ function RepTable({ e1rm, unit }: { e1rm: number; unit: Unit }) {
   const rows = repTable(e1rm, 12);
   return (
     <div className="mt-4">
-      <h3 className="font-semibold">{T.table}</h3>
+      <h3 className="font-semibold">{t("orm.table")}</h3>
       <table className="num mt-2 w-full text-sm">
         <thead className="text-left text-faint">
-          <tr>{T.tableHead.map((h, i) => <th key={h} scope="col" className={`py-1 font-medium ${i ? "text-right" : ""}`}>{h}</th>)}</tr>
+          <tr>{[t("orm.head.reps"), t("orm.head.pct"), t("orm.head.weight")].map((h, i) => <th key={h} scope="col" className={`py-1 font-medium ${i ? "text-right" : ""}`}>{h}</th>)}</tr>
         </thead>
         <tbody className="divide-y divide-line">
           {rows.map((x) => (
@@ -168,7 +123,7 @@ function RepTable({ e1rm, unit }: { e1rm: number; unit: Unit }) {
           ))}
         </tbody>
       </table>
-      <p className="mt-1 text-xs text-faint">{T.tableNote}</p>
+      <p className="mt-1 text-xs text-faint">{t("orm.tableNote")}</p>
     </div>
   );
 }
@@ -184,9 +139,9 @@ function Bump({ label, value, onChange, step, min = 0, max = 9999, suffix }: { l
     <div className="min-w-0">
       <div className="text-xs text-muted">{label}</div>
       <div className="mt-1 flex items-center justify-between gap-1">
-        <button type="button" className={btn} aria-label={T.less(label)} onClick={() => bump(-1)}>−</button>
+        <button type="button" className={btn} aria-label={t("orm.less", { what: label.toLocaleLowerCase() })} onClick={() => bump(-1)}>−</button>
         <span className="num min-w-0 truncate text-center text-lg font-bold" aria-live="polite">{fmtNum(Math.round(value * 10) / 10)}{suffix ? <span className="text-xs font-normal text-muted"> {suffix}</span> : null}</span>
-        <button type="button" className={btn} aria-label={T.more(label)} onClick={() => bump(1)}>+</button>
+        <button type="button" className={btn} aria-label={t("orm.more", { what: label.toLocaleLowerCase() })} onClick={() => bump(1)}>+</button>
       </div>
     </div>
   );
@@ -205,24 +160,24 @@ function SetCalculator({ unit, seed }: { unit: Unit; seed?: { weight: number; re
   const rows = ok ? allFormulas(kg, rtf) : [];
   return (
     <div className="mt-5">
-      <h3 className="font-semibold">{T.calc}</h3>
-      <p className="text-sm text-muted">{T.calcBody}</p>
+      <h3 className="font-semibold">{t("orm.calc")}</h3>
+      <p className="text-sm text-muted">{t("orm.calcBody")}</p>
       <div className="mt-2 grid grid-cols-2 gap-3">
-        <Bump label={T.weight} value={w} onChange={setW} step={weightStep(unit)} suffix={unit} />
-        <Bump label={T.reps} value={reps} onChange={setReps} step={1} min={1} max={30} />
+        <Bump label={t("orm.weight")} value={w} onChange={setW} step={weightStep(unit)} suffix={unit} />
+        <Bump label={t("orm.reps")} value={reps} onChange={setReps} step={1} min={1} max={30} />
       </div>
-      <div className="mt-3 text-xs text-muted">{T.rir}</div>
-      <div className="mt-1 flex flex-wrap gap-2" role="group" aria-label={T.rir}>
+      <div className="mt-3 text-xs text-muted">{t("orm.rir")}</div>
+      <div className="mt-1 flex flex-wrap gap-2" role="group" aria-label={t("orm.rir")}>
         {[0, 1, 2, 3, 4].map((v) => <Chip key={v} active={rir === v} onClick={() => setRir(v)}>{v === 4 ? "4+" : v}</Chip>)}
       </div>
-      {rtf > MAX_RTF && <p className="mt-2 text-sm text-warn">{T.tooMany}</p>}
+      {rtf > MAX_RTF && <p className="mt-2 text-sm text-warn">{t("orm.tooMany", { max: MAX_RTF })}</p>}
       {ok && (
         <>
           <p className="mt-3 text-sm text-muted" aria-live="polite">
-            {T.calcResult} <span className="num text-xl font-bold text-ink" data-testid="onerm-calc">{kgTo1(best, unit)} {unit}</span>
+            {t("orm.calcResult")} <span className="num text-xl font-bold text-ink" data-testid="onerm-calc">{kgTo1(best, unit)} {unit}</span>
           </p>
           <details className="mt-2">
-            <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{T.formulas}</summary>
+            <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{t("orm.formulas")}</summary>
             <ul className="num divide-y divide-line text-sm">
               {rows.map((f) => (
                 <li key={f.id} className={`flex justify-between py-1.5 ${f.used ? "font-semibold text-ink" : "text-muted"}`}>
@@ -231,7 +186,7 @@ function SetCalculator({ unit, seed }: { unit: Unit; seed?: { weight: number; re
                 </li>
               ))}
             </ul>
-            <p className="mt-1 text-xs text-faint">{T.formulasNote}</p>
+            <p className="mt-1 text-xs text-faint">{t("orm.formulasNote")}</p>
           </details>
         </>
       )}
@@ -256,12 +211,12 @@ export function DotsCard() {
   const total = lifts.reduce((s, k) => s + kgOf(k), 0);
   const complete = lifts.every((k) => kgOf(k) > 0) && bw > 0;
   const score = complete ? dots(total, bw, sex) : null;
-  const missing = lifts.filter((k) => !(kgOf(k) > 0)).map((k) => T.liftName[k]);
+  const missing = lifts.filter((k) => !(kgOf(k) > 0)).map((k) => liftName(k));
   const edited = Object.keys(edit).length > 0;
   const step = weightStep(unit);
   const field = (k: DotsLift | "bw") => edit[k] ?? (k === "bw" ? Math.round(fromKg(rep.bodyweight, unit) * 2) / 2 : Math.round(fromKg(rep.lifts[k]?.e1rm ?? 0, unit) / step) * step);
   return (
-    <Section title={T.dotsTitle} icon="trophy">
+    <Section title={t("dots.title")} icon="trophy">
       <div className="card p-4">
         <div className="flex items-center gap-4">
           <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full border-4 border-accent">
@@ -269,29 +224,29 @@ export function DotsCard() {
           </div>
           <div>
             {score !== null && <p className="font-semibold">{dotsBand(score)}</p>}
-            <p className="text-sm text-muted">{score !== null ? T.dotsBody : T.dotsMissing(missing.join(", "))}</p>
+            <p className="text-sm text-muted">{score !== null ? t("dots.body") : t("dots.missing", { names: listOf(missing) })}</p>
           </div>
         </div>
         <div className="num mt-3 flex justify-between text-sm">
-          <span className="text-muted">{T.dotsTotal}</span>
-          <span>{kgTo(total, unit)} {unit} · {T.dotsBw} {kgTo1(bw, unit)} {unit}</span>
+          <span className="text-muted">{t("dots.total")}</span>
+          <span>{kgTo(total, unit)} {unit} · {t("dots.bw")} {kgTo1(bw, unit)} {unit}</span>
         </div>
         {!profile.sex && (
-        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label={T.dotsSex}>
-          <span className="text-muted">{T.dotsSex}</span>
-          <Chip active={sex === "male"} onClick={() => setSex("male")}>{T.male}</Chip>
-          <Chip active={sex === "female"} onClick={() => setSex("female")}>{T.female}</Chip>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label={t("dots.sex")}>
+          <span className="text-muted">{t("dots.sex")}</span>
+          <Chip active={sex === "male"} onClick={() => setSex("male")}>{t("dots.male")}</Chip>
+          <Chip active={sex === "female"} onClick={() => setSex("female")}>{t("dots.female")}</Chip>
         </div>
         )}
         <details className="mt-2">
-          <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{T.dotsCalc}</summary>
+          <summary className="press min-h-11 cursor-pointer py-2 text-sm font-semibold text-accent">{t("dots.calc")}</summary>
           <div className="mt-1 grid grid-cols-2 gap-3">
-            {lifts.map((k) => <Bump key={k} label={T.liftName[k]} value={field(k)} onChange={(v) => setEdit({ ...edit, [k]: v })} step={step} suffix={unit} />)}
-            <Bump label={T.dotsBw} value={field("bw")} onChange={(v) => setEdit({ ...edit, bw: v })} step={unit === "lb" ? 1 : 0.5} min={30} suffix={unit} />
+            {lifts.map((k) => <Bump key={k} label={liftName(k)} value={field(k)} onChange={(v) => setEdit({ ...edit, [k]: v })} step={step} suffix={unit} />)}
+            <Bump label={t("dots.bw")} value={field("bw")} onChange={(v) => setEdit({ ...edit, bw: v })} step={unit === "lb" ? 1 : 0.5} min={30} suffix={unit} />
           </div>
-          {edited && <button type="button" onClick={() => setEdit({})} className="press mt-2 min-h-11 text-sm text-accent">{T.dotsReset}</button>}
+          {edited && <button type="button" onClick={() => setEdit({})} className="press mt-2 min-h-11 text-sm text-accent">{t("dots.reset")}</button>}
         </details>
-        <p className="mt-2 text-xs text-faint">{T.dotsNote}</p>
+        <p className="mt-2 text-xs text-faint">{t("dots.note")}</p>
       </div>
     </Section>
   );

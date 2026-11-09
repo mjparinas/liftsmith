@@ -1,6 +1,7 @@
 // Smart plate memory: what's already on the bar, and only the change to make. Plates go on heaviest
 // first (inside), so the plates that can stay are the shared run from the inside out; everything
 // outside that run comes off, then the new outer plates go on. Per side, in the gym's unit.
+import { t } from "./i18n";
 
 export interface PlateChange {
   keep: number[];
@@ -27,12 +28,11 @@ const list = (xs: readonly number[], fmt: (n: number) => string) => {
 
 /** "Take off 2.5, add 5 (each side)", "No change", or null when the bar starts empty. */
 export function changeText(c: PlateChange, unit: string, fmt: (n: number) => string): string {
-  if (!c.remove.length && !c.add.length) return "Same plates: no change";
-  const parts: string[] = [];
-  if (c.remove.length) parts.push(`take off ${list(c.remove, fmt)}`);
-  if (c.add.length) parts.push(`add ${list(c.add, fmt)}`);
-  const s = parts.join(", then ");
-  return `${s[0].toUpperCase()}${s.slice(1)} ${unit} each side`;
+  if (!c.remove.length && !c.add.length) return t("pm.same");
+  const off = list(c.remove, fmt);
+  const add = list(c.add, fmt);
+  if (c.remove.length && c.add.length) return t("pm.offAdd", { off, add, unit });
+  return c.remove.length ? t("pm.off", { off, unit }) : t("pm.add", { add, unit });
 }
 
 /**
