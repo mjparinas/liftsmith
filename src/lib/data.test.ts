@@ -125,6 +125,7 @@ describe("data capture in a workout", () => {
   it("records duration, rest, heart rate and the plan for every set, and the stream at the end", () => {
     const s = useApp.getState;
     s().start();
+    s().skipWarmup();
     const rest = s().active!.plan.items[0].restSec;
     // Warm-up, then the first set takes 40 s.
     vi.setSystemTime(NOW + 60_000);
@@ -163,6 +164,7 @@ describe("data capture in a workout", () => {
   it("leaves out set duration when the set was logged before the rest ended", () => {
     const s = useApp.getState;
     s().start();
+    s().skipWarmup();
     vi.setSystemTime(NOW + 30_000);
     s().logSet();
     vi.setSystemTime(NOW + 50_000); // rest still running
@@ -170,6 +172,15 @@ describe("data capture in a workout", () => {
     const sets = s().events.filter((e): e is SetEvent => e.type === "set");
     expect(sets[1].durationSec).toBeUndefined();
     expect(sets[1].restSec).toBe(20);
+  });
+
+  it("logs a weigh-in as an event and makes it the body weight", () => {
+    const s = useApp.getState;
+    s().logBodyweight(81.25);
+    expect(s().events.filter((e) => e.type === "bodyweight")).toMatchObject([{ kg: 81.25 }]);
+    expect(s().profile.bodyweight).toBe(81.25);
+    s().logBodyweight(0);
+    expect(s().events.filter((e) => e.type === "bodyweight")).toHaveLength(1);
   });
 
   it("keeps one heart rate sample a second", () => {

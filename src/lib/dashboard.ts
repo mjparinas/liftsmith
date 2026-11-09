@@ -1,6 +1,7 @@
-import { dedupe, mondayOf, type Stats } from "./derive";
+import { dedupe, weekOf, weekStartDay, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
-import { goalStreak, levelOf, trophies, xpTotal } from "./game";
+import { game, levelOf } from "./game";
+import { shareIds, shareName } from "./achievements";
 import { epley } from "./progression";
 import type { AppEvent, Profile, SessionEndEvent, SessionStartEvent, SetEvent, Unit } from "./types";
 
@@ -46,10 +47,10 @@ export interface GridDay {
   future: boolean;
 }
 
-/** The last `weeks` weeks as columns of seven days, Monday first, ending with the current week. */
+/** The last `weeks` weeks as columns of seven days, from the lifter's first day of the week, ending with the current week. */
 export function yearGrid(now: number, weeks = 53): GridDay[][] {
   const today = startOfDay(now);
-  const first = mondayOf(today) - (weeks - 1) * 7 * DAY;
+  const first = weekOf(today) - (weeks - 1) * 7 * DAY;
   const cols: GridDay[][] = [];
   for (let w = 0; w < weeks; w++) {
     const col: GridDay[] = [];
@@ -65,10 +66,10 @@ export function yearGrid(now: number, weeks = 53): GridDay[][] {
   return cols;
 }
 
-/** A month as rows of seven cells, Monday first; cells outside the month are null. */
+/** A month as rows of seven cells, from the lifter's first day of the week; cells outside the month are null. */
 export function monthGrid(year: number, month: number): (GridDay | null)[][] {
   const first = new Date(year, month, 1);
-  const lead = (first.getDay() + 6) % 7;
+  const lead = (first.getDay() + 7 - weekStartDay()) % 7;
   const days = new Date(year, month + 1, 0).getDate();
   const cells: (GridDay | null)[] = Array.from({ length: lead }, () => null);
   for (let d = 1; d <= days; d++) {
@@ -149,10 +150,10 @@ export function sessionDetail(events: readonly AppEvent[], sessionId: string): S
 /** Workouts, sets and volume for each of the last `weeks` weeks, oldest first. */
 export function weeklyTotals(stats: Pick<Stats, "sessions">, now: number, weeks = 12): { weekStart: number; sessions: number; sets: number; volume: number }[] {
   const out = [];
-  const thisWeek = mondayOf(now);
+  const thisWeek = weekOf(now);
   for (let i = weeks - 1; i >= 0; i--) {
-    const ws = mondayOf(thisWeek - i * 7 * DAY + 12 * 3600_000);
-    const list = stats.sessions.filter((s) => mondayOf(s.start) === ws);
+    const ws = weekOf(thisWeek - i * 7 * DAY + 12 * 3600_000);
+    const list = stats.sessions.filter((s) => weekOf(s.start) === ws);
     out.push({ weekStart: ws, sessions: list.length, sets: list.reduce((n, s) => n + s.sets, 0), volume: list.reduce((n, s) => n + s.volume, 0) });
   }
   return out;
@@ -237,7 +238,7 @@ export interface ShareCard {
   w: number;
   /** Weeks in a row meeting the weekly goal. */
   s: number;
-  /** Trophies earned (ids). */
+  /** Badges earned: "<achievement>.<tier>" for the highest tier of each (older links hold trophy ids). */
   t: string[];
   /** Top lifts: [exercise id, best estimated one-rep max in kg]. */
   l: [string, number][];
@@ -262,14 +263,15 @@ export function shareCard(events: readonly AppEvent[], stats: Stats, profile: Pr
     .slice(0, 5)
     .map((b): [string, number] => [b.exerciseId, Math.round(b.e1rm)]);
   const name = profile.name.trim().slice(0, 40);
+  const g = game(events, stats, profile, now);
   return {
     v: 1,
     ...(opts.name && name ? { n: name } : {}),
     u: profile.unit,
-    xp: xpTotal(stats),
+    xp: g.xp,
     w: stats.sessions.length,
-    s: goalStreak(stats, profile, now).weeks,
-    t: trophies(events, stats, profile).filter((t) => t.earned).map((t) => t.id),
+    s: g.streak.weeks,
+    t: shareIds(g.achievements),
     l: lifts,
     d: [...days].sort((a, b) => a - b),
     d0,
@@ -292,7 +294,8 @@ export function encodeShare(card: ShareCard): string {
   return toBase64Url(JSON.stringify(card));
 }
 
-const KNOWN_TROPHIES = new Set(["first", "ten", "fifty", "first-pr", "plate-ohp", "plate-bench", "two-plate-bench", "bw-bench", "three-plate-squat", "four-plate-dead", "ten-pullups", "explorer", "streak-4", "volume-100k"]);
+/** Trophy ids from links made before achievements (2026-11-09). */
+export const KNOWN_TROPHIES = new Set(["first", "ten", "fifty", "first-pr", "plate-ohp", "plate-bench", "two-plate-bench", "bw-bench", "three-plate-squat", "four-plate-dead", "ten-pullups", "explorer", "streak-4", "volume-100k"]);
 const int = (x: unknown, lo: number, hi: number): x is number => typeof x === "number" && Number.isInteger(x) && x >= lo && x <= hi;
 
 /** Reads a share link. Anything malformed or unexpected gives null; nothing in it is trusted. */
@@ -310,7 +313,7 @@ export function decodeShare(fragment: string): ShareCard | null {
   if (c.n !== undefined && (typeof c.n !== "string" || c.n.length > 40)) return null;
   if (c.u !== "kg" && c.u !== "lb") return null;
   if (!int(c.xp, 0, 10_000_000) || !int(c.w, 0, 100_000) || !int(c.s, 0, 10_000) || !int(c.d0, 0, 8.64e15)) return null;
-  if (!Array.isArray(c.t) || c.t.length > 50 || !c.t.every((t) => typeof t === "string" && KNOWN_TROPHIES.has(t))) return null;
+  if (!Array.isArray(c.t) || c.t.length > 100 || !c.t.every((t) => typeof t === "string" && (KNOWN_TROPHIES.has(t) || shareName(t) !== null))) return null;
   if (!Array.isArray(c.l) || c.l.length > 5 || !c.l.every((x) => Array.isArray(x) && x.length === 2 && typeof x[0] === "string" && EXERCISE_BY_ID.has(x[0]) && int(x[1], 0, 2000))) return null;
   if (!Array.isArray(c.d) || c.d.length > SHARE_DAYS || !c.d.every((x) => int(x, 0, SHARE_DAYS - 1))) return null;
   const n = typeof c.n === "string" ? c.n.trim() : "";
@@ -319,4 +322,10 @@ export function decodeShare(fragment: string): ShareCard | null {
 
 export function shareLevel(card: Pick<ShareCard, "xp">) {
   return levelOf(card.xp);
+}
+
+/** Short weekday names in the lifter's week order. */
+export function weekdayNames(): string[] {
+  const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return [...names.slice(weekStartDay()), ...names.slice(0, weekStartDay())];
 }

@@ -1,3 +1,4 @@
+import { registerCustom } from "./exercises";
 import type { AppEvent, Gym, Profile } from "./types";
 
 // Offline storage: events in IndexedDB (append-only), profile and gyms as last-write-wins records.
@@ -42,13 +43,18 @@ function tx<T>(db: IDBDatabase, store: string, mode: IDBTransactionMode, fn: (s:
 
 export async function load(): Promise<Snapshot> {
   const db = await open();
-  if (!db) return { ...memory, events: [...memory.events] };
+  if (!db) {
+    registerCustom(memory.events);
+    return { ...memory, events: [...memory.events] };
+  }
   const [events, profile, gyms] = await Promise.all([
     tx<AppEvent[]>(db, "events", "readonly", (s) => s.getAll() as IDBRequest<AppEvent[]>),
     tx<Profile>(db, "records", "readonly", (s) => s.get("profile") as IDBRequest<Profile>),
     tx<Gym[]>(db, "records", "readonly", (s) => s.get("gyms") as IDBRequest<Gym[]>),
   ]);
-  return { events: (events ?? []).sort((a, b) => a.at - b.at), profile: profile ?? null, gyms: gyms ?? [] };
+  const sorted = (events ?? []).sort((a, b) => a.at - b.at);
+  registerCustom(sorted);
+  return { events: sorted, profile: profile ?? null, gyms: gyms ?? [] };
 }
 
 export async function appendEvents(events: AppEvent[]): Promise<void> {

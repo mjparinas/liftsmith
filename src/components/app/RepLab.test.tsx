@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { FLAG_CACHE_KEY, flag } from "@/lib/flags";
@@ -20,7 +20,7 @@ describe("rep counter lab", () => {
     render(<Settings />);
     expect(screen.queryByRole("button", { name: /Rep counter lab/ })).toBeNull();
     const title = screen.getByRole("heading", { name: "Settings" });
-    for (let i = 0; i < 5; i++) await user.click(title);
+    for (let i = 0; i < 5; i++) await user.click(within(title).getByRole("button"));
     expect(location.hash).toBe("#/lab");
   });
 

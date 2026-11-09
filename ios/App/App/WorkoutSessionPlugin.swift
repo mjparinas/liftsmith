@@ -10,6 +10,8 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(WorkoutSessionPlugin())
         bridge?.registerPluginInstance(CalendarPlugin())
         bridge?.registerPluginInstance(InstallInfoPlugin())
+        bridge?.registerPluginInstance(VoiceCoachPlugin())
+        bridge?.registerPluginInstance(AppIconPlugin())
     }
 }
 
@@ -80,6 +82,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         content.title = "Rest over"
         content.body = ["Up next: \(call.getString("next") ?? "")", call.getString("plates")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n")
         content.categoryIdentifier = category
+        // Rest-over alert (Workout preferences): iOS can't vibrate a local notification without its sound,
+        // or play the sound without the phone's own Sounds & Haptics choice, so "vibrate only" posts a
+        // silent banner here and the app buzzes itself when it's open. Android does all four exactly.
         content.sound = (call.getBool("sound") ?? true) ? UNNotificationSound.default : nil
         if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)

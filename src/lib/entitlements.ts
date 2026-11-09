@@ -6,9 +6,12 @@
 // Pro: adaptive programming, the recovery map and advanced stats (on the dashboard: one-rep max trends,
 // weekly sets per muscle against the target, and per-exercise detail).
 
-export type Feature = "advancedStats";
+// Programs (Melvin, 2026-11-09): every fixed program (classic 5x5, novice 3x5, 5x5 plus arms,
+// ramping 5x5, tiered, training max waves, bodyweight skills) is free; the adaptive splits
+// (push/pull/legs, upper/lower) are Pro.
+export type Feature = "advancedStats" | "adaptiveSplits";
 
-const PRO_FEATURES: ReadonlySet<Feature> = new Set(["advancedStats"]);
+const PRO_FEATURES: ReadonlySet<Feature> = new Set(["advancedStats", "adaptiveSplits"]);
 
 /** Whether the lifter has Pro. Always true until billing lands. */
 export function isPro(): boolean {

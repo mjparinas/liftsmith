@@ -13,8 +13,11 @@ export interface SessionState {
   restUntil: number | null;
   setLabel: string;
   hr?: number;
-  /** Whether the native rest-over alert plays a sound (vibration always runs). */
+  /** Whether the native rest-over alert plays a sound and vibrates (Workout preferences › Rest-over alert). */
   sound?: boolean;
+  vibrate?: boolean;
+  /** Voice coach: said by the Android service when rest ends (voice.ts). iOS and the web say it in the page. */
+  speak?: string;
 }
 
 /** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */
@@ -56,11 +59,11 @@ export async function updateSession(s: SessionState) {
   } as NotificationOptions);
 }
 
-export async function restOverAlert(next: string) {
+export async function restOverAlert(next: string, alert: { sound: boolean; vibrate: boolean } = { sound: true, vibrate: true }) {
   if (isNative()) return; // the native service sounds its own alert
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   const reg = await navigator.serviceWorker?.getRegistration();
-  await reg?.showNotification("Rest over", { tag: "rest", body: `Up next: ${next}`, vibrate: [200, 100, 200], icon: "/icon-192.png" } as NotificationOptions);
+  await reg?.showNotification("Rest over", { tag: "rest", body: `Up next: ${next}`, silent: !alert.sound && !alert.vibrate, vibrate: alert.vibrate ? [200, 100, 200] : undefined, icon: "/icon-192.png" } as NotificationOptions);
 }
 
 /** Log set / +30 s on the native notification, and the voice and system shortcuts. Returns an unsubscribe function. */

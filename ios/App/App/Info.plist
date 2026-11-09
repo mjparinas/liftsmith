@@ -6,6 +6,12 @@
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>es</string>
+		<string>fr</string>
+	</array>
 	<key>CFBundleDisplayName</key>
         <string>Liftsmith</string>
 	<key>CFBundleExecutable</key>
@@ -65,7 +71,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Liftsmith can count your reps from the camera. Video is analysed on this iPhone and never recorded or sent.</string>
+	<string>Liftsmith uses the camera to take progress photos and, if you try it, to count your reps. Photos stay on this phone and are never uploaded; rep counting analyses video on this iPhone and never records or sends it.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Liftsmith can count your reps from this iPhone's motion sensors while you lift.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
@@ -88,7 +94,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.liftsmith.app.shortcuts</string>
+			<string>com.getliftsmith.app.shortcuts</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>liftsmith</string>

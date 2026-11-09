@@ -1,10 +1,24 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import { createRequire } from "node:module";
+
+// The full jsx-a11y rule set (Next registers the plugin but turns on only a few of its rules). Taken
+// from Next's own copy, so there is one plugin instance.
+const jsxA11y = createRequire(import.meta.resolve("eslint-config-next"))("eslint-plugin-jsx-a11y");
 
 export default defineConfig([
   ...nextVitals,
   ...nextTs,
+  {
+    files: ["src/**/*.tsx"],
+    rules: {
+      ...jsxA11y.flatConfigs.strict.rules,
+      // Scrollable regions must be focusable so keyboard users can scroll them (axe scrollable-region-focusable).
+      "jsx-a11y/no-noninteractive-tabindex": ["error", { roles: ["region"], tags: [] }],
+      "jsx-a11y/label-has-associated-control": ["error", { depth: 3 }],
+    },
+  },
   {
     // Plans must be reproducible: content and engine code use the seeded rng in src/lib/random.ts.
     files: ["src/lib/**/*.ts"],
