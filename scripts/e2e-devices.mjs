@@ -1,25 +1,23 @@
-// Layout on common phones and tablets: no sideways scroll, the main button on screen, big targets.
-//   npm run build && node scripts/e2e-devices.mjs [base-url] [out-dir]
+// Layout on the phones and tablets in scripts/devices.mjs: no sideways scroll, the main buttons on screen,
+// big targets, and a set logged and saved on each one.
+//   npm run build:static && node scripts/e2e-devices.mjs [base-url] [out-dir]
+//   DEVICES=ios|android|full|"Pixel 7,iPad Mini" picks a subset (default: all)
 import fs from "node:fs";
-import { chromium, devices } from "playwright";
+import { closeAll, open, pick } from "./devices.mjs";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "e2e-shots/devices";
 fs.mkdirSync(OUT, { recursive: true });
 const TARGET = 44; // Apple's 44 pt; Android asks for 48 dp on the main controls
-const DEVICES = ["Galaxy S9+", "Galaxy S24", "Pixel 7", "iPhone SE (3rd gen)", "iPhone 15 Pro Max", "Pixel 7 landscape", "iPad Mini", "Galaxy Tab S9"];
 
 const server = await base();
-const browser = await chromium.launch();
 const fail = [];
-for (const name of DEVICES) {
-  const d = devices[name];
-  if (!d) {
-    console.log(`(skipping ${name}: not in this Playwright)`);
-    continue;
-  }
-  const opts = { ...d };
-  delete opts.defaultBrowserType;
+let ran = 0;
+for (const { name } of pick()) {
+  const t0 = Date.now();
+  const target = await open(name);
+  if (!target) continue;
+  const { browser, opts, engine } = target;
   const ctx = await browser.newContext(opts);
   const page = await ctx.newPage();
   const errors = [];
@@ -34,12 +32,17 @@ for (const name of DEVICES) {
     await noSideScroll("onboarding");
     await onboard(page);
     await noSideScroll("today");
+    for (const tab of ["Today", "Recovery", "Progress", "Gyms"]) {
+      const b = await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).boundingBox();
+      check(b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1, `${name}: the ${tab} tab is off screen`, fail);
+    }
+    await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
     check(start && start.y + start.height <= opts.viewport.height, `${name}: Start workout is below the fold`, fail);
     await page.getByRole("button", { name: "Start workout" }).click();
-    await page.getByRole("button", { name: /Log set/ }).waitFor();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
     await noSideScroll("workout");
-    const log = await page.getByRole("button", { name: /Log set/ }).boundingBox();
+    const log = await page.getByRole("button", { name: /Log (set|warm-up)/ }).boundingBox();
     check(log && log.y >= 0 && log.y + log.height <= opts.viewport.height, `${name}: Log set is not fully on screen`, fail);
     check(log && log.height >= 48, `${name}: Log set is under 48 px tall`, fail);
     for (const label of ["More reps", "Less reps", "Swap exercise", "End"]) {
@@ -47,22 +50,36 @@ for (const name of DEVICES) {
       check(b && b.height >= TARGET - 8 && b.width >= TARGET - 8, `${name}: "${label}" is too small to tap (${b?.width}×${b?.height})`, fail);
     }
     await page.screenshot({ path: `${OUT}/${tag}-workout.png` });
-    await page.getByRole("button", { name: /Log set/ }).click();
+    // Skip the warm-ups so the saved workout has a working set.
+    const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+    if (await skipWarm.isVisible()) await skipWarm.click();
+    await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
     await noSideScroll("rest");
     await page.getByRole("button", { name: "End" }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();
-    await page.getByRole("button", { name: "Done" }).click();
+    await page.getByRole("button", { name: "Done", exact: true }).click();
     for (const tab of ["Recovery", "Progress", "Gyms"]) {
-      await page.getByRole("button", { name: tab }).click();
+      await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
       await noSideScroll(tab);
     }
     await page.screenshot({ path: `${OUT}/${tag}-gyms.png` });
+    await page.goto(`${server.url}/me/`);
+    await page.getByRole("heading", { name: /training/ }).waitFor();
+    for (const tab of ["Overview", "Calendar", "Lifts", "History", "Log a workout", "Share"]) {
+      await page.getByRole("link", { name: tab, exact: true }).click();
+      await noSideScroll(`dashboard ${tab}`);
+    }
+    await page.getByRole("link", { name: "Overview", exact: true }).click();
+    await page.screenshot({ path: `${OUT}/${tag}-dashboard.png` });
   } catch (e) {
     fail.push(`${name}: ${e}`);
   }
   fail.push(...errors.map((e) => `${name}: ${e}`));
   await ctx.close();
+  ran++;
+  console.log(`  ${name} (${engine}, ${opts.viewport.width}×${opts.viewport.height}) ${((Date.now() - t0) / 1000).toFixed(1)} s`);
 }
-await browser.close();
+await closeAll();
 server.close();
+check(ran > 0, "no device ran", fail);
 finish("devices", fail);

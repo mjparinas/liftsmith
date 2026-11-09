@@ -1,7 +1,12 @@
 name: CI
 
 # Copied from Gradelings and cut to size. Everything runs in parallel; "CI passed" is the one check to
-# require in branch protection, and it is green only when every other job is.
+# require in branch protection, and it is green only when every other job is (a skipped job counts as passed).
+#
+# Speed (2026-11-09): the native builds only run on a pull request that touches native code, Capacitor or
+# dependencies (the "changes" job), and always on pushes to staging and main; the device sweep is split by
+# platform; Gradle uses its build cache; the iOS build compiles for one simulator architecture and doesn't wait
+# for the web build.
 
 on:
   push:
@@ -19,6 +24,35 @@ env:
   NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
+  # Which parts of the repo this pull request touches. On a PR the checkout is GitHub's merge commit, whose
+  # first parent is the tip of the base branch, so HEAD^1..HEAD is exactly what merging would change.
+  changes:
+    name: Changed files
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      native: ${{ steps.diff.outputs.native }}
+    steps:
+      - uses: actions/checkout@v7
+        if: github.event_name == 'pull_request'
+        with:
+          fetch-depth: 2
+      - id: diff
+        run: |
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "native=true" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          files=$(git diff --name-only HEAD^1 HEAD)
+          echo "$files"
+          # Anything that can change what the Android or iOS compiler sees: the native projects, Capacitor's
+          # config, the npm packages (Capacitor plugins carry native code), and CI itself.
+          if echo "$files" | grep -qE '^(android/|ios/|capacitor\.config\.|package(-lock)?\.json$|\.github/(workflows/ci\.yml|actions/))'; then
+            echo "native=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "native=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::No native, Capacitor or dependency changes, so the Android and iOS builds are skipped. They still run on every push to staging and main."
+          fi
+
   static:
     name: Types, lint and audit
     runs-on: ubuntu-latest
@@ -63,7 +97,7 @@ jobs:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-${{ github.sha }}
           restore-keys: next-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
-      - run: npm run build
+      - run: npm run build:static
       - uses: actions/upload-artifact@v7
         with:
           name: web-build
@@ -76,14 +110,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     container:
-      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      image: mcr.microsoft.com/playwright:v1.65.0-noble
       options: --ipc=host
     strategy:
       fail-fast: false
       matrix:
         include:
-          - { name: "playthrough and offline", run: "node scripts/e2e.mjs '' e2e-shots && node scripts/e2e-offline.mjs" }
-          - { name: "devices", run: "node scripts/e2e-devices.mjs '' e2e-shots/devices" }
+          # The playthrough on Pixel 7 (Chromium) and again on an iPhone in WebKit, the engine behind the iOS app.
+          - { name: "playthrough and offline", run: "node scripts/e2e.mjs '' e2e-shots && node scripts/e2e-offline.mjs && DEVICE='iPhone 16' node scripts/e2e.mjs '' e2e-shots/iphone" }
+          # Layout sweep on the phones and tablets in scripts/devices.mjs, split by platform so the halves run
+          # side by side.
+          - { name: "devices · iOS", run: "DEVICES=ios node scripts/e2e-devices.mjs '' e2e-shots/devices" }
+          - { name: "devices · Android", run: "DEVICES=android node scripts/e2e-devices.mjs '' e2e-shots/devices" }
           - { name: "accessibility", run: "node scripts/e2e-a11y.mjs" }
     steps:
       - uses: actions/checkout@v7
@@ -101,10 +139,11 @@ jobs:
           path: e2e-shots
           retention-days: 7
 
-  # Platform parity: every PR builds both native shells from the same web build.
+  # Platform parity: both native shells build together, always both or neither (see "changes").
   android:
     name: Android debug build
-    needs: build
+    needs: [changes, build]
+    if: needs.changes.outputs.native == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -114,13 +153,22 @@ jobs:
         with:
           name: web-build
           path: out
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: temurin
           java-version: 21
           cache: gradle
       - run: npx cap sync android
-      - run: ./gradlew assembleDebug --no-daemon
+      # Gradle's build cache is keyed by task inputs, not file times, so it reuses compiled plugins and
+      # resources from earlier runs even on a fresh checkout.
+      - uses: actions/cache@v6
+        with:
+          path: ~/.gradle/caches/build-cache-1
+          key: gradle-build-${{ runner.os }}-${{ hashFiles('package-lock.json', 'android/**/*.gradle') }}-${{ github.sha }}
+          restore-keys: |
+            gradle-build-${{ runner.os }}-${{ hashFiles('package-lock.json', 'android/**/*.gradle') }}-
+            gradle-build-${{ runner.os }}-
+      - run: ./gradlew assembleDebug --no-daemon --build-cache --parallel
         working-directory: android
       - uses: actions/upload-artifact@v7
         with:
@@ -128,9 +176,12 @@ jobs:
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 7
 
+  # Doesn't wait for the web build: nobody installs this build, and the compile doesn't depend on the web
+  # files, so a placeholder page stands in for out/ (the Android job keeps the real one for its APK).
   ios:
     name: iOS simulator build
-    needs: build
+    needs: changes
+    if: needs.changes.outputs.native == 'true'
     runs-on: macos-latest
     timeout-minutes: 30
     steps:
@@ -139,20 +190,36 @@ jobs:
         with:
           xcode-version: latest-stable
       - uses: ./.github/actions/setup
-      - uses: actions/download-artifact@v8
-        with:
-          name: web-build
-          path: out
+      - name: Placeholder web build
+        run: mkdir -p out/app && echo '<!doctype html><title>Liftsmith</title>' | tee out/index.html > out/app/index.html
       - run: npx cap sync ios
+      # Swift packages download Capacitor's binaries from GitHub releases, which sometimes return 5xx.
+      # Cache them, and retry resolution with backoff before building.
+      - uses: actions/cache@v6
+        with:
+          path: |
+            ~/Library/Caches/org.swift.swiftpm
+            build/ios/SourcePackages
+          key: spm-${{ runner.os }}-${{ hashFiles('ios/App/CapApp-SPM/Package.swift', 'package-lock.json') }}
+      - name: Resolve Swift packages (with retries)
+        run: |
+          for i in 1 2 3 4; do
+            xcodebuild -resolvePackageDependencies -project ios/App/App.xcodeproj -scheme App -derivedDataPath build/ios && exit 0
+            echo "::warning::Package resolution failed (attempt $i), retrying in $((i * 15)) s"; sleep $((i * 15))
+          done
+          exit 1
+      # A generic simulator destination builds every simulator architecture; arm64 alone (the runner's own)
+      # halves the compile. No index store either, since nobody browses this build in Xcode.
       - name: Build for the simulator (unsigned)
         run: >
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug
           -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
-          -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+          -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
+          COMPILER_INDEX_STORE_ENABLE=NO build
 
   passed:
     name: CI passed
-    needs: [static, unit, build, browser, android, ios]
+    needs: [changes, static, unit, build, browser, android, ios]
     if: always()
     runs-on: ubuntu-latest
     steps:

@@ -1,23 +1,83 @@
 @import "tailwindcss";
 
+/*
+ * Liftsmith design tokens (design pass, 2026-11-09). Dark navy base, one blue brand accent with a
+ * blue-to-violet gradient for primary actions, and a small set of supporting hues used as tints:
+ * violet (levels, Pro), cyan (rest, recovery), ember (streaks, push days), mint (done, fresh).
+ * Green, amber and red still mean status only. Every text pairing passes WCAG AA on --color-surface.
+ */
 @theme {
-  --color-bg: #0a0d12;
-  --color-surface: #11161d;
-  --color-raised: #18202a;
+  --color-bg: #080b10;
+  --color-surface: #10151d;
+  --color-raised: #18202b;
   --color-line: #232d3a;
-  --color-ink: #e8edf3;
-  --color-muted: #8a97a8;
+  --color-ink: #eef2f7;
+  --color-muted: #94a1b2;
   --color-faint: #808c9d;
   --color-accent: #4c8dff;
+  --color-accent-2: #8b7bff;
   --color-accent-ink: #06122a;
+  --color-violet: #a78bfa;
+  --color-cyan: #38d6e8;
+  --color-ember: #ff8a3d;
+  --color-mint: #34d399;
   --color-good: #34d399;
   --color-warn: #f5b544;
   --color-bad: #f0605d;
   --color-gold: #f2c14e;
+  --color-holo: #5cc8ff;
+
   --font-sans: "Inter", "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --animate-pop: pop 380ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  --animate-rise: rise 320ms cubic-bezier(0.22, 1, 0.36, 1);
-  --animate-glow: glow 1.6s ease-in-out infinite;
+
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --animate-pop: pop 380ms var(--ease-spring);
+  --animate-rise: rise 360ms var(--ease-out-expo) both;
+  --animate-fade: fade 220ms ease-out both;
+  --animate-glow: glow 1.8s ease-in-out infinite;
+  --animate-nudge: nudge 260ms var(--ease-spring);
+  --animate-burst: burst 520ms var(--ease-out-expo) forwards;
+  --animate-beat: beat 1s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.8s linear infinite;
+  --animate-shake: shake 520ms ease-in-out infinite;
+  --animate-bump: bump 700ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* A real spring (overshoot, then settle) where linear() is supported; a back-ease elsewhere. */
+  --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-spring-in: spring-in 620ms var(--ease-bounce) both;
+  --animate-bob: bob 3.2s ease-in-out infinite;
+  --animate-blink: blink 5s ease-in-out infinite;
+  --animate-twinkle: twinkle 1.6s ease-in-out infinite;
+  --animate-float-z: float-z 2.6s ease-out infinite;
+}
+
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-bounce: linear(0, 0.13 4%, 0.5 10%, 0.92 17%, 1.1 23%, 1.14 27%, 1.11 32%, 1.02 41%, 0.98 48%, 0.975 53%, 0.99 62%, 1.005 72%, 1);
+  }
+}
+
+@keyframes spring-in {
+  0% { transform: scale(0.7) translateY(8px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+/* The mascot's idle loop: a slow bob and a blink every few seconds. */
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  95% { transform: scaleY(0.1); }
+}
+@keyframes twinkle {
+  0%, 100% { opacity: 0.25; transform: scale(0.7); }
+  50% { opacity: 1; transform: scale(1); }
+}
+@keyframes float-z {
+  0% { opacity: 0; transform: translate(0, 4px) scale(0.7); }
+  30% { opacity: 1; }
+  100% { opacity: 0; transform: translate(6px, -12px) scale(1.05); }
 }
 
 @keyframes pop {
@@ -28,9 +88,256 @@
   0% { transform: translateY(14px); opacity: 0; }
   100% { transform: translateY(0); opacity: 1; }
 }
+@keyframes fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes shake {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20% { transform: rotate(-8deg) scale(1.04); }
+  40% { transform: rotate(7deg) scale(1.06); }
+  60% { transform: rotate(-5deg) scale(1.04); }
+  80% { transform: rotate(4deg) scale(1.02); }
+}
+@keyframes bump {
+  0% { transform: translateY(-24px) scale(0.85); opacity: 0; }
+  60% { transform: translateY(4px) scale(1.03); opacity: 1; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
 @keyframes glow {
   0%, 100% { box-shadow: 0 0 0 0 rgb(76 141 255 / 0.45); }
   50% { box-shadow: 0 0 0 10px rgb(76 141 255 / 0); }
+}
+/* A number that just changed: a quick lift and settle. */
+@keyframes nudge {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+/* The ring that leaves the Log set button. */
+@keyframes burst {
+  0% { transform: scale(0.85); opacity: 0.7; }
+  100% { transform: scale(1.18, 1.6); opacity: 0; }
+}
+@keyframes beat {
+  0%, 100% { transform: scale(1); }
+  15% { transform: scale(1.22); }
+  30% { transform: scale(1); }
+}
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Light mode (Melvin, 2026-11-09). Settings › Appearance sets data-theme on <html> to dark, light
+   or system. Every colour is a token, so each one needs exactly one light value here. Text colours
+   keep WCAG AA contrast on the light surfaces (axe checks both themes). */
+:root {
+  color-scheme: dark;
+  /* Status and recovery colours: a standard set and a colour-blind safe set (Settings ›
+     Accessibility), picked below by data-cvd. a11y.test.ts checks both stay distinct when simulated
+     for protanopia, deuteranopia and tritanopia, and their contrast. */
+  --good-std: #34d399;
+  --warn-std: #f5b544;
+  --bad-std: #f0605d;
+  --good-cvd: #4aa3ff;
+  --warn-cvd: #ffb000;
+  --bad-cvd: #ff6b9a;
+  --band-fresh-std: #34d399;
+  --band-ready-std: #a3d977;
+  --band-recovering-std: #f5b544;
+  --band-fatigued-std: #f0605d;
+  --band-fresh-cvd: #2f7dff;
+  --band-ready-cvd: #8fd0ff;
+  --band-recovering-cvd: #ffb000;
+  --band-fatigued-cvd: #e8467c;
+  /* Effects: primary gradient, its ink, the screen glow, card sheen and shadow. */
+  --grad-a: #5b9cff;
+  --grad-b: #7f8bff;
+  --grad-c: #9b86ff;
+  --btn-ink: #06122a;
+  --text-grad-a: #7fb0ff;
+  --text-grad-b: #b3a6ff;
+  --glow-a: rgb(76 141 255 / 0.16);
+  --glow-b: rgb(139 123 255 / 0.12);
+  --sheen: rgb(255 255 255 / 0.03);
+  --sheen-edge: rgb(255 255 255 / 0.05);
+  --shadow: rgb(0 0 0 / 0.6);
+  /* Badge tiers, crate rarities and heart rate zones: drawn as text too, so they get light values. */
+  --tier-bronze: #c98a55;
+  --tier-silver: #c3ccd8;
+  --tier-gold: #f2c14e;
+  --tier-platinum: #9be7ff;
+  --rarity-common: #8a97a8;
+  --rarity-rare: #4c8dff;
+  --rarity-epic: #a78bfa;
+  --rarity-legendary: #f2c14e;
+  --hr-1: #8a97a8;
+  --hr-2: #4c8dff;
+  --hr-3: #34d399;
+  --hr-4: #f5b544;
+  --hr-5: #f0605d;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-violet: #5f3fc4;
+  --color-cyan: #0b6f80;
+  --color-ember: #b24a00;
+  --color-mint: #0a7350;
+  --color-accent-2: #4a3fc9;
+  --grad-a: #1d4fc4;
+  --grad-b: #3a45c8;
+  --grad-c: #5a3dc6;
+  --btn-ink: #ffffff;
+  --text-grad-a: #1d4fc4;
+  --text-grad-b: #5f3fc4;
+  --glow-a: rgb(29 79 196 / 0.10);
+  --glow-b: rgb(95 63 196 / 0.08);
+  --sheen: rgb(255 255 255 / 0);
+  --sheen-edge: rgb(255 255 255 / 0.9);
+  --shadow: rgb(16 24 40 / 0.14);
+  --color-bg: #f4f6f9;
+  --color-surface: #ffffff;
+  --color-raised: #eaeef3;
+  --color-line: #d3dae3;
+  --color-ink: #0e1621;
+  --color-muted: #4b5868;
+  --color-faint: #5c6876;
+  --color-accent: #1d4fc4;
+  --color-accent-ink: #ffffff;
+  --good-std: #0a7350;
+  --warn-std: #8a5100;
+  --bad-std: #a82222;
+  --good-cvd: #0b5fb3;
+  --warn-cvd: #8a5100;
+  --bad-cvd: #b3245e;
+  --band-fresh-std: #0a7350;
+  --band-ready-std: #5f8f1e;
+  --band-recovering-std: #b36b00;
+  --band-fatigued-std: #a82222;
+  --band-fresh-cvd: #0b5fb3;
+  --band-ready-cvd: #3f97d1;
+  --band-recovering-cvd: #b36b00;
+  --band-fatigued-cvd: #c0254b;
+  --color-gold: #775600;
+  --tier-bronze: #7f4e22;
+  --tier-silver: #535f6f;
+  --tier-gold: #775600;
+  --tier-platinum: #086780;
+  --rarity-common: #535f6f;
+  --rarity-rare: #1d4fc4;
+  --rarity-epic: #5f3fc4;
+  --rarity-legendary: #775600;
+  --hr-1: #535f6f;
+  --hr-2: #1d4fc4;
+  --hr-3: #0a7350;
+  --hr-4: #8a5100;
+  --hr-5: #a82222;
+}
+@media (prefers-color-scheme: light) {
+  :root[data-theme="system"] {
+    color-scheme: light;
+    --color-violet: #5f3fc4;
+    --color-cyan: #0b6f80;
+    --color-ember: #b24a00;
+    --color-mint: #0a7350;
+    --color-accent-2: #4a3fc9;
+    --grad-a: #1d4fc4;
+    --grad-b: #3a45c8;
+    --grad-c: #5a3dc6;
+    --btn-ink: #ffffff;
+    --text-grad-a: #1d4fc4;
+    --text-grad-b: #5f3fc4;
+    --glow-a: rgb(29 79 196 / 0.10);
+    --glow-b: rgb(95 63 196 / 0.08);
+    --sheen: rgb(255 255 255 / 0);
+    --sheen-edge: rgb(255 255 255 / 0.9);
+    --shadow: rgb(16 24 40 / 0.14);
+    --color-bg: #f4f6f9;
+    --color-surface: #ffffff;
+    --color-raised: #eaeef3;
+    --color-line: #d3dae3;
+    --color-ink: #0e1621;
+    --color-muted: #4b5868;
+    --color-faint: #5c6876;
+    --color-accent: #1d4fc4;
+    --color-accent-ink: #ffffff;
+    --good-std: #0a7350;
+    --warn-std: #8a5100;
+    --bad-std: #a82222;
+    --good-cvd: #0b5fb3;
+    --warn-cvd: #8a5100;
+    --bad-cvd: #b3245e;
+    --band-fresh-std: #0a7350;
+    --band-ready-std: #5f8f1e;
+    --band-recovering-std: #b36b00;
+    --band-fatigued-std: #a82222;
+    --band-fresh-cvd: #0b5fb3;
+    --band-ready-cvd: #3f97d1;
+    --band-recovering-cvd: #b36b00;
+    --band-fatigued-cvd: #c0254b;
+    --color-gold: #775600;
+    --tier-bronze: #7f4e22;
+    --tier-silver: #535f6f;
+    --tier-gold: #775600;
+    --tier-platinum: #086780;
+    --rarity-common: #535f6f;
+    --rarity-rare: #1d4fc4;
+    --rarity-epic: #5f3fc4;
+    --rarity-legendary: #775600;
+    --hr-1: #535f6f;
+    --hr-2: #1d4fc4;
+    --hr-3: #0a7350;
+    --hr-4: #8a5100;
+    --hr-5: #a82222;
+  }
+}
+
+/* Which set of status colours is in use: standard, or colour-blind safe (Settings › Accessibility). */
+:root {
+  --color-good: var(--good-std);
+  --color-warn: var(--warn-std);
+  --color-bad: var(--bad-std);
+  --band-fresh: var(--band-fresh-std);
+  --band-ready: var(--band-ready-std);
+  --band-recovering: var(--band-recovering-std);
+  --band-fatigued: var(--band-fatigued-std);
+}
+:root[data-cvd="on"] {
+  --color-good: var(--good-cvd);
+  --color-warn: var(--warn-cvd);
+  --color-bad: var(--bad-cvd);
+  --band-fresh: var(--band-fresh-cvd);
+  --band-ready: var(--band-ready-cvd);
+  --band-recovering: var(--band-recovering-cvd);
+  --band-fatigued: var(--band-fatigued-cvd);
+}
+
+/* More contrast (Settings › Accessibility, or the phone's increase-contrast setting when set to
+   match it): secondary text and borders move toward the main text colour, and the decorative glows,
+   sheen and gradient text go. Built from each theme's own ink and background, so it works in dark
+   and light alike. */
+:root[data-contrast="more"] {
+  --color-muted: color-mix(in srgb, var(--color-ink) 88%, var(--color-bg));
+  --color-faint: color-mix(in srgb, var(--color-ink) 80%, var(--color-bg));
+  --color-line: color-mix(in srgb, var(--color-ink) 45%, var(--color-bg));
+  --glow-a: transparent;
+  --glow-b: transparent;
+  --sheen: transparent;
+  --text-grad-a: var(--color-ink);
+  --text-grad-b: var(--color-ink);
+}
+@media (prefers-contrast: more) {
+  :root[data-contrast="system"] {
+    --color-muted: color-mix(in srgb, var(--color-ink) 88%, var(--color-bg));
+    --color-faint: color-mix(in srgb, var(--color-ink) 80%, var(--color-bg));
+    --color-line: color-mix(in srgb, var(--color-ink) 45%, var(--color-bg));
+    --glow-a: transparent;
+    --glow-b: transparent;
+    --sheen: transparent;
+    --text-grad-a: var(--color-ink);
+    --text-grad-b: var(--color-ink);
+  }
 }
 
 html, body {
@@ -40,24 +347,123 @@ html, body {
   overscroll-behavior-y: none;
 }
 
-body { font-family: var(--font-sans); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+/* A soft light at the top of every app screen, so the dark base has depth without noise. */
+.aurora { position: relative; isolation: isolate; }
+.aurora::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 420px;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(60% 70% at 15% 0%, var(--glow-a), transparent 70%),
+    radial-gradient(50% 60% at 95% 5%, var(--glow-b), transparent 70%);
+}
 
 .num { font-variant-numeric: tabular-nums; }
 
-/* Squash on press, like Gradelings' buttons. */
-.press { transition: transform 120ms ease, background-color 150ms ease, opacity 150ms ease; }
-.press:active { transform: scale(0.96); }
+/* Display numbers: tight, heavy, tabular. */
+.display { font-variant-numeric: tabular-nums; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
 
-.card { background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 20px; }
+/* Squash on press, spring back on release (juice pass, 2026-11-09). The press is instant (70 ms) so a
+   tap always shows it landed; the release is a spring with a little overshoot. The primary action
+   squashes and stretches; tappable cards dip less. */
+.press {
+  transition: transform 460ms var(--ease-bounce), background-color 150ms ease, border-color 150ms ease, opacity 150ms ease, box-shadow 200ms ease;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.press:active:not(:disabled) { transform: scale(0.95); transition-duration: 70ms, 150ms, 150ms, 150ms, 200ms; transition-timing-function: ease-out; }
+.btn-primary.press:active:not(:disabled), .squash.press:active:not(:disabled) { transform: scale(1.02, 0.9); }
+.card.press:active:not(:disabled), .card-tint.press:active:not(:disabled) { transform: scale(0.98); }
+
+/* Lists that arrive with a short stagger (screens, never during a set). */
+.stagger > * { animation: var(--animate-rise); }
+.stagger > :nth-child(2) { animation-delay: 40ms; }
+.stagger > :nth-child(3) { animation-delay: 80ms; }
+.stagger > :nth-child(4) { animation-delay: 120ms; }
+.stagger > :nth-child(5) { animation-delay: 160ms; }
+.stagger > :nth-child(6) { animation-delay: 200ms; }
+.stagger > :nth-child(n + 7) { animation-delay: 240ms; }
+
+/* The mascot's eyes blink about their own centre. */
+.blink { transform-box: fill-box; transform-origin: center; animation: var(--animate-blink); }
+.twinkle { transform-box: fill-box; transform-origin: center; animation: var(--animate-twinkle); }
+.float-z { transform-box: fill-box; animation: var(--animate-float-z); }
+
+/* Cards: a hairline border with a faint top light, so they read as raised glass. */
+.card {
+  background: linear-gradient(180deg, var(--sheen), transparent 40%), var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 var(--sheen-edge), 0 8px 24px -16px var(--shadow);
+}
+
+/* A card tinted by a hue: set --tint on the element (e.g. var(--color-ember)). */
+.card-tint {
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--tint, var(--color-accent)) 18%, transparent), transparent 60%),
+    linear-gradient(180deg, var(--sheen), transparent 40%),
+    var(--color-surface);
+  border: 1px solid color-mix(in srgb, var(--tint, var(--color-accent)) 28%, var(--color-line));
+  border-radius: 20px;
+  box-shadow: inset 0 1px 0 var(--sheen-edge), 0 12px 32px -18px color-mix(in srgb, var(--tint, var(--color-accent)) 50%, transparent);
+}
+
+/* The primary action: blue to violet, dark ink on dark screens and white ink on light ones (7:1+),
+   a soft coloured shadow and a top highlight. */
+.btn-primary {
+  background: linear-gradient(135deg, var(--grad-a) 0%, var(--grad-b) 55%, var(--grad-c) 100%);
+  color: var(--btn-ink);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), 0 10px 28px -10px color-mix(in srgb, var(--grad-a) 65%, transparent);
+}
+.btn-primary:active { box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 4px 14px -8px color-mix(in srgb, var(--grad-a) 60%, transparent); }
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--text-grad-a), var(--text-grad-b));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Loading placeholder. */
+.skeleton {
+  background: linear-gradient(90deg, var(--color-raised) 25%, color-mix(in srgb, var(--color-raised) 60%, var(--color-line)) 50%, var(--color-raised) 75%);
+  background-size: 200% 100%;
+  animation: var(--animate-shimmer);
+}
 
 .safe-bottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 .safe-top { padding-top: max(12px, env(safe-area-inset-top)); }
 
-input[type="range"].slider { -webkit-appearance: none; appearance: none; height: 6px; border-radius: 999px; background: var(--color-line); }
-input[type="range"].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 999px; background: var(--color-accent); border: 4px solid var(--color-bg); box-shadow: 0 0 0 1px var(--color-accent); }
+input[type="range"].slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--grad-a), var(--grad-c)) 0 / var(--fill, 50%) 100% no-repeat, var(--color-line); }
+input[type="range"].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 999px; background: #fff; border: 5px solid var(--color-accent); box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent) 18%, transparent), 0 4px 10px var(--shadow); transition: box-shadow 150ms ease; }
+input[type="range"].slider:active::-webkit-slider-thumb { box-shadow: 0 0 0 10px color-mix(in srgb, var(--color-accent) 22%, transparent), 0 4px 10px var(--shadow); }
+input[type="range"].slider::-moz-range-thumb { width: 18px; height: 18px; border-radius: 999px; background: #fff; border: 5px solid var(--color-accent); }
 
-:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; box-shadow: 0 0 0 2px var(--color-bg); }
 
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: 1ms !important; transition-duration: 1ms !important; }
+  *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
+
+/* Calm mode (Settings › Motion): the same as the system's reduced-motion setting, for this app only. */
+.calm *, .calm *::before, .calm *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
+
+/* Windows High Contrast and other forced-colour modes: the system picks the colours. Keep edges on
+   cards and buttons, a visible focus ring, and the recovery map's own colours (its patterns and
+   labels carry the meaning too). */
+@media (forced-colors: active) {
+  .btn-primary, .card, .card-tint { border: 1px solid CanvasText; }
+  .text-gradient { color: CanvasText; background: none; }
+  :focus-visible { outline: 3px solid Highlight; }
+  .keep-colours { forced-color-adjust: none; }
+}
+
+/* Skip link: hidden until focused from the keyboard. */
+.skip-link { position: absolute; left: 12px; top: -100px; z-index: 100; }
+.skip-link:focus { top: 12px; }

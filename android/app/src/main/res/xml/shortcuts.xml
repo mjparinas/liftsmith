@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Launcher shortcuts (long-press the app icon) and App Actions ("Hey Google, start a workout on Liftsmith").
+  Each opens a liftsmith:// link that WorkoutSessionPlugin hands to src/lib/shortcuts.ts. The targetPackage
+  must match the application id (com.getliftsmith.app).
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <capability android:name="actions.intent.START_EXERCISE">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.getliftsmith.app" android:targetClass="com.getliftsmith.app.MainActivity" android:data="liftsmith://start" />
+    </capability>
+
+    <shortcut android:shortcutId="start" android:enabled="true" android:icon="@drawable/ic_shortcut_start" android:shortcutShortLabel="@string/shortcut_start_short" android:shortcutLongLabel="@string/shortcut_start_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.getliftsmith.app" android:targetClass="com.getliftsmith.app.MainActivity" android:data="liftsmith://start" />
+    </shortcut>
+    <shortcut android:shortcutId="log" android:enabled="true" android:icon="@drawable/ic_shortcut_log" android:shortcutShortLabel="@string/shortcut_log_short" android:shortcutLongLabel="@string/shortcut_log_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.getliftsmith.app" android:targetClass="com.getliftsmith.app.MainActivity" android:data="liftsmith://log" />
+    </shortcut>
+    <shortcut android:shortcutId="add30" android:enabled="true" android:icon="@drawable/ic_shortcut_rest" android:shortcutShortLabel="@string/shortcut_rest_short" android:shortcutLongLabel="@string/shortcut_rest_long">
+        <intent android:action="android.intent.action.VIEW" android:targetPackage="com.getliftsmith.app" android:targetClass="com.getliftsmith.app.MainActivity" android:data="liftsmith://add30" />
+    </shortcut>
+</shortcuts>

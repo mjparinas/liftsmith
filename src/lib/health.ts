@@ -1,6 +1,7 @@
 "use client";
 // Health Connect (Android) and Apple Health (iOS) through one plugin, @capgo/capacitor-health.
-// Reads prefill the setup wizard (weight, height, resting heart rate). Finished workouts are
+// Reads prefill the setup wizard (weight, height, resting heart rate) and bring in weigh-ins with body
+// fat for the coach's notes (insights.ts). Finished workouts are
 // written back as active calories and heart rate samples, because the plugin can't write
 // workout sessions yet. On the web every call is a no-op. Live heart rate never comes from
 // here: Health Connect is batched, so live HR uses Bluetooth (heartRate.ts).
@@ -55,6 +56,80 @@ export async function readHints(): Promise<HealthHints> {
   const safe = (p: Promise<number | undefined>) => p.catch(() => undefined);
   const [bodyweight, height, restingHr] = await Promise.all([safe(latest("weight", 365)), safe(latest("height", 3650)), safe(latest("restingHeartRate", 30))]);
   return { bodyweight, height: height !== undefined && height < 3 ? height * 100 : height, restingHr };
+}
+
+export interface BodyReading {
+  /** Local day key (YYYY-MM-DD), one reading per day. */
+  day: string;
+  at: number;
+  kg: number;
+  /** Percent. */
+  bodyFat?: number;
+}
+
+/**
+ * Weigh-ins and body fat over the last `days`, one per day (the latest that day), for the body
+ * composition insights (insights.ts). Smart scales and the Hume Body Pod write here. Empty on the
+ * web, without permission, or when nothing was found.
+ */
+export async function readBody(days: number): Promise<BodyReading[]> {
+  if (!(await healthAvailable())) return [];
+  const { Health } = await health();
+  const startDate = new Date(Date.now() - days * 86_400_000).toISOString();
+  const read = async (dataType: "weight" | "bodyFat") => {
+    try {
+      return (await Health.readSamples({ dataType, startDate, limit: 500, ascending: true })).samples;
+    } catch {
+      return [];
+    }
+  };
+  const [weights, fats] = await Promise.all([read("weight"), read("bodyFat")]);
+  return pairBody(weights, fats);
+}
+
+/** One reading per local day: that day's latest weight, with that day's latest body fat. Exported for tests. */
+export function pairBody(weights: readonly { value: number; startDate: string }[], fats: readonly { value: number; startDate: string }[]): BodyReading[] {
+  const key = (iso: string) => {
+    const d = new Date(iso);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const fatBy = new Map<string, number>();
+  // HealthKit gives a fraction (0.18), Health Connect a percentage (18).
+  for (const f of fats) if (f.value > 0) fatBy.set(key(f.startDate), f.value <= 1 ? f.value * 100 : f.value);
+  const by = new Map<string, BodyReading>();
+  for (const w of weights) {
+    if (!(w.value > 0)) continue;
+    const day = key(w.startDate);
+    const at = Date.parse(w.startDate);
+    const prev = by.get(day);
+    if (!prev || at >= prev.at) by.set(day, { day, at, kg: w.value, bodyFat: fatBy.get(day) });
+  }
+  return [...by.values()].sort((a, b) => a.at - b.at);
+}
+
+export interface HealthValue {
+  value: number;
+  /** When it was measured (ms). */
+  at: number;
+}
+
+/**
+ * The newest height (cm), for TDEE autofill (tdee.ts bodyUpdates). Weigh-ins and body fat come in
+ * through readBody instead, as bodyweight events, so there is one import path for them.
+ */
+export async function readHeight(): Promise<{ height?: HealthValue }> {
+  if (!(await healthAvailable())) return {};
+  try {
+    const { Health } = await health();
+    const startDate = new Date(Date.now() - 3650 * 86_400_000).toISOString();
+    const s = (await Health.readSamples({ dataType: "height", startDate, limit: 1, ascending: false })).samples[0];
+    const at = s ? Date.parse(s.endDate || s.startDate) : NaN;
+    if (!s || !Number.isFinite(s.value) || !Number.isFinite(at)) return {};
+    // Height can arrive in metres.
+    return { height: { value: s.value < 3 ? s.value * 100 : s.value, at } };
+  } catch {
+    return {}; // Not allowed yet, or the store is unavailable.
+  }
 }
 
 /** Rough active calories for resistance training: about 5 METs. */

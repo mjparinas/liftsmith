@@ -1,7 +1,24 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Liftsmith</string>
-    <string name="title_activity_main">Liftsmith</string>
-    <string name="package_name">com.liftsmith.app</string>
-    <string name="custom_url_scheme">com.liftsmith.app</string>
+    <string name="app_name" translatable="false">Liftsmith</string>
+    <string name="title_activity_main" translatable="false">Liftsmith</string>
+    <string name="package_name" translatable="false">com.getliftsmith.app</string>
+    <string name="custom_url_scheme" translatable="false">com.getliftsmith.app</string>
+    <string name="shortcut_start_short">Start workout</string>
+    <string name="shortcut_start_long">Start today\'s workout</string>
+    <string name="shortcut_log_short">Log set</string>
+    <string name="shortcut_log_long">Log the current set as planned</string>
+    <string name="shortcut_rest_short">+30 s rest</string>
+    <string name="shortcut_rest_long">Add 30 seconds to the rest timer</string>
+    <string name="widget_description">Start today\'s workout or log a set in one tap</string>
+    <string name="channel_live">Workout in progress</string>
+    <string name="channel_live_desc">Rest timer, next set and heart rate while you train</string>
+    <string name="rest_over">Rest over</string>
+    <string name="channel_alert_desc">Sounds and vibrates when your rest ends</string>
+    <string name="channel_alert_sound">Rest over (sound only)</string>
+    <string name="channel_alert_sound_desc">Sounds without vibrating when your rest ends</string>
+    <string name="next_prefix">Next:</string>
+    <string name="rest_next">Rest · next: %1$s</string>
+    <string name="up_next">Up next: %1$s</string>
+    <string name="add_30">+30 s</string>
 </resources>

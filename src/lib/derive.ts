@@ -30,7 +30,7 @@ export interface Stats {
   totalSets: number;
   totalVolume: number;
   totalSeconds: number;
-  /** Consecutive weeks (Monday to Sunday) with at least one workout, up to this week. */
+  /** Consecutive weeks (from the lifter's first day of the week) with at least one workout, up to this week. */
   weekStreak: number;
   /** Best estimated one-rep max per exercise per session, oldest first. */
   e1rmSeries: Map<string, { at: number; e1rm: number }[]>;
@@ -50,10 +50,24 @@ export function dedupe(events: readonly AppEvent[]): AppEvent[] {
   return out;
 }
 
-export function mondayOf(ms: number): number {
+/**
+ * The first day of the week for streaks, quests, recaps and weekly stats: 1 Monday (default) or 0
+ * Sunday (Settings › Workout preferences). Set once from the profile by the store, like `feel` in
+ * juice.ts, so every weekly calculation agrees without threading the profile through each one.
+ */
+let firstDay: 0 | 1 = 1;
+export function setWeekStart(day: 0 | 1 | undefined) {
+  firstDay = day === 0 ? 0 : 1;
+}
+export function weekStartDay(): 0 | 1 {
+  return firstDay;
+}
+
+/** Local midnight at the start of the week holding `ms`. */
+export function weekOf(ms: number): number {
   const d = new Date(ms);
   d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  d.setDate(d.getDate() - ((d.getDay() + 7 - firstDay) % 7));
   return d.getTime();
 }
 
@@ -103,19 +117,19 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
   }
   sessions.sort((a, b) => b.start - a.start);
 
-  const thisWeek = mondayOf(now);
-  const weeks = new Set(sessions.map((s) => mondayOf(s.start)));
+  const thisWeek = weekOf(now);
+  const weeks = new Set(sessions.map((s) => weekOf(s.start)));
   let weekStreak = 0;
   // A week in progress without a workout yet doesn't break the streak.
-  let w = weeks.has(thisWeek) ? thisWeek : mondayOf(thisWeek - 86400_000);
+  let w = weeks.has(thisWeek) ? thisWeek : weekOf(thisWeek - 86400_000);
   while (weeks.has(w)) {
     weekStreak++;
-    w = mondayOf(w - 86400_000);
+    w = weekOf(w - 86400_000);
   }
 
   const weeklyMuscleSets: Stats["weeklyMuscleSets"] = [];
   for (let i = 7; i >= 0; i--) {
-    const ws = mondayOf(thisWeek - i * 7 * 86400_000 + 3600_000 * 12);
+    const ws = weekOf(thisWeek - i * 7 * 86400_000 + 3600_000 * 12);
     const we = ws + 7 * 86400_000;
     const counts = Object.fromEntries(MUSCLES.map((m) => [m, 0])) as Record<Muscle, number>;
     for (const s of sets) {

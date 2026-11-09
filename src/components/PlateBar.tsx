@@ -6,7 +6,17 @@ import { fmtNum } from "@/lib/units";
 // A barbell with the plates to load on each side, heaviest nearest the collar. The point is that
 // nobody has to do plate maths between sets.
 
-export function PlateBar({ loading, bar, unit, compact }: { loading: Loading; bar: number; unit: Unit; compact?: boolean }) {
+export type PlateFinish = "classic" | "black" | "chrome" | "neon";
+
+/** Plate finishes won from crates keep the weight colour as a rim, so plates stay easy to tell apart. */
+function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
+  if (finish === "black") return { fill: "#1b2027", stroke: s.fill, strokeWidth: 2.5, text: s.fill === "#e8e8e8" ? "#e8e8e8" : s.fill };
+  if (finish === "chrome") return { fill: "url(#chrome)", stroke: s.fill, strokeWidth: 2.5, text: "#111" };
+  if (finish === "neon") return { fill: "#0a0d12", stroke: s.fill, strokeWidth: 3, text: s.fill, glow: true };
+  return { fill: s.fill, stroke: "#0a0d12", strokeWidth: 1, text: s.text };
+}
+
+export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { loading: Loading; bar: number; unit: Unit; compact?: boolean; finish?: PlateFinish }) {
   const plates = loading.perSide;
   const W = 360;
   const cy = 60;
@@ -26,6 +36,13 @@ export function PlateBar({ loading, bar, unit, compact }: { loading: Loading; ba
             <stop offset="0.5" stopColor="#8e99a6" />
             <stop offset="1" stopColor="#5e6873" />
           </linearGradient>
+          <linearGradient id="chrome" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#f4f7fb" />
+            <stop offset="0.45" stopColor="#9aa6b4" />
+            <stop offset="0.55" stopColor="#e2e8ef" />
+            <stop offset="1" stopColor="#6b7684" />
+          </linearGradient>
+          <filter id="neon" x="-50%" y="-20%" width="200%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
         </defs>
         {/* shaft */}
         <rect x={collar} y={cy - 3} width={W - collar * 2} height={6} rx={2} fill="url(#steel)" />
@@ -37,20 +54,23 @@ export function PlateBar({ loading, bar, unit, compact }: { loading: Loading; ba
         <rect x={W - collar - 4} y={cy - 11} width={6} height={22} rx={2} fill="#aeb7c2" />
         {[false, true].map((mirror) => (
           <g key={String(mirror)} transform={mirror ? `translate(${W},0) scale(-1,1)` : undefined}>
-            {left.map(({ w, s, x }, i) => (
+            {left.map(({ w, s, x }, i) => {
+              const f = finished(s, finish);
+              return (
               <g key={i}>
-                <rect x={x} y={cy - s.height / 2} width={s.width} height={s.height} rx={2.5} fill={s.fill} stroke="#0a0d12" strokeWidth={1} />
+                <rect x={x} y={cy - s.height / 2} width={s.width} height={s.height} rx={2.5} fill={f.fill} stroke={f.stroke} strokeWidth={f.strokeWidth} filter={"glow" in f ? "url(#neon)" : undefined} />
                 {!mirror && s.height > 48 && (
-                  <text x={x + s.width / 2} y={cy + 3.5} fontSize={9} fontWeight={700} textAnchor="middle" fill={s.text} transform={`rotate(-90 ${x + s.width / 2} ${cy})`}>
+                  <text x={x + s.width / 2} y={cy + 3.5} fontSize={9} fontWeight={700} textAnchor="middle" fill={f.text} transform={`rotate(-90 ${x + s.width / 2} ${cy})`}>
                     {fmtNum(w)}
                   </text>
                 )}
               </g>
-            ))}
+              );
+            })}
           </g>
         ))}
         {!compact && (
-          <text x={W / 2} y={cy + 30} fontSize={11} textAnchor="middle" fill="#8a97a8">
+          <text x={W / 2} y={cy + 30} fontSize={11} textAnchor="middle" style={{ fill: "var(--color-faint)" }}>
             {`${fmtNum(bar)} ${unit} bar`}
           </text>
         )}

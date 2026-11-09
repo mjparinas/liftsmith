@@ -3,6 +3,7 @@ import { loadBar } from "@/lib/plates";
 import type { Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { TIMED } from "@/lib/progression";
+import { date, relative, t } from "@/lib/i18n";
 
 export function loadText(ex: Exercise, kg: number, unit: Unit): string {
   if (ex.load === "bodyweight") return kg > 0 ? `+${fmtNum(fromKg(kg, unit))} ${unit}` : "Bodyweight";
@@ -29,8 +30,8 @@ export function clock(sec: number): string {
 
 export function ago(ms: number, now = Date.now()): string {
   const d = Math.floor((now - ms) / 86400_000);
-  if (d <= 0) return "Today";
-  if (d === 1) return "Yesterday";
-  if (d < 7) return `${d} days ago`;
-  return new Date(ms).toLocaleDateString([], { month: "short", day: "numeric" });
+  if (d <= 0) return t("time.today");
+  if (d === 1) return t("time.yesterday");
+  if (d < 7) return relative(-d, "day");
+  return date(ms, { month: "short", day: "numeric" });
 }

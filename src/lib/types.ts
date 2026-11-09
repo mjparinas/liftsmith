@@ -1,3 +1,4 @@
+import { translated } from "./i18n";
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
 // own unit (so 45 lb plates stay exactly 45 lb) and converted at the edges (src/lib/units.ts).
 
@@ -25,26 +26,8 @@ export const MUSCLES = [
 ] as const;
 export type Muscle = (typeof MUSCLES)[number];
 
-export const MUSCLE_LABEL: Record<Muscle, string> = {
-  chest: "Chest",
-  frontDelts: "Front delts",
-  sideDelts: "Side delts",
-  rearDelts: "Rear delts",
-  biceps: "Biceps",
-  triceps: "Triceps",
-  forearms: "Forearms",
-  abs: "Abs",
-  obliques: "Obliques",
-  traps: "Traps",
-  upperBack: "Upper back",
-  lats: "Lats",
-  lowerBack: "Lower back",
-  glutes: "Glutes",
-  quads: "Quads",
-  hamstrings: "Hamstrings",
-  adductors: "Adductors",
-  calves: "Calves",
-};
+/** Muscle names in the current language (src/locales, keys `muscle.*`). */
+export const MUSCLE_LABEL: Record<Muscle, string> = translated(MUSCLES, (m) => `muscle.${m}`);
 
 /** Large muscles take longer to recover (about 72 h against 48 h). */
 export const LARGE_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "lowerBack", "glutes", "quads", "hamstrings"]);
@@ -134,6 +117,8 @@ export interface Exercise {
   start: number;
   setup: string;
   cues: string[];
+  /** The lifter made it. Used in swaps and logging, not picked by the generator. */
+  custom?: boolean;
 }
 
 export interface Bar {
@@ -162,12 +147,30 @@ export interface Gym {
   kettlebells: number[];
   /** Pin-stack step for machines and cables, in the gym's unit. */
   machineStep: number;
+  /**
+   * Opt-in "pick this gym when I'm here" (Melvin, 2026-11-09). Approximate position only, kept on the
+   * device (and in the user's own sync). Rounded to about 100 m when saved.
+   */
+  place?: { lat: number; lon: number; radiusM: number };
+  /** Machine settings per exercise ("Seat 4", "Back pad 2"), machineSettings.ts. */
+  settings?: Record<string, { label: string; value: string }[]>;
   updatedAt: number;
 }
 
 export type Goal = "strength" | "muscle" | "general";
 export type Experience = "new" | "intermediate" | "advanced";
 export type Variability = "consistent" | "balanced" | "variable";
+
+export interface CalendarPrefs {
+  /** Weekdays to train, 0 = Sunday. */
+  days: number[];
+  /** Local time of day, "HH:MM". */
+  time: string;
+  /** Training days were written to the device calendar. */
+  write: boolean;
+  /** The lifter allowed reading busy times (start and end only). */
+  read: boolean;
+}
 
 export interface Profile {
   name: string;
@@ -184,9 +187,167 @@ export interface Profile {
   blockStart: number;
   /** Weeks of build before the deload week. */
   blockWeeks: number;
+  /** App sounds, including the rest-over chime (Settings › Sounds). */
   restSounds: boolean;
+  /** Vibration on taps and at the end of rest. Missing means on. */
+  haptics?: boolean;
+  /** The daily quote on Today (Melvin, 2026-11-09). Missing means on. */
+  quotes?: boolean;
+  /**
+   * Cycle-aware readiness (Melvin, 2026-11-09). Opt-in with its own consent screen; consentAt is when
+   * the lifter agreed. Cycle data stays on the device (and the user's own sync), never in analytics or
+   * feedback reports.
+   */
+  cycle?: { enabled: boolean; consentAt: number };
+  /**
+   * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
+   * choice; billing will read it to start the store trial.
+   */
+  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number };
+  /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
+  calendar?: CalendarPrefs;
+  /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
+  lean?: boolean;
+  /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
+  cosmetics?: { accent?: string; sound?: string; plates?: string };
+  /**
+   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
+   * Health Connect has neither, so the app asks on every platform.
+   */
+  birthYear?: number;
+  sex?: "male" | "female";
+  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Tools › TDEE. */
+  heightCm?: number;
+  /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
+  bodyFat?: { pct: number; at: number };
+  /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */
+  tdee?: { activity?: "sedentary" | "light" | "moderate" | "heavy" | "athlete"; useBodyFat?: boolean };
+  /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
+  knownMaxes?: Partial<Record<string, number>>;
+  /**
+   * Reminders and lifecycle messages (messages.ts). Each type is on or off per channel; missing means
+   * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
+   */
+  messages?: {
+    push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+    email?: { address: string; consentAt: number; status: "pending" | "confirmed" | "unsubscribed"; kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>> };
+    /** When reminders were first set up: comebacks count from here until there's a workout. */
+    startedAt?: number;
+  };
+  /** One-rep max goals with a date (goals.ts). */
+  goals?: import("./goals").LiftGoal[];
+  /** Three-week fixes started from the plateau detective (plateau.ts). */
+  plateauFixes?: import("./plateau").PlateauFix[];
+  /**
+   * Where Today's plan comes from (programs.ts). Missing means the adaptive generator. A program keeps
+   * the starting weights frozen when it was picked (kg, keyed by program slot), so replaying the
+   * history always gives the same weights; everything after that is derived from the logged sets.
+   * Saved routines plug in as their own kind.
+   */
+  planSource?: PlanSource;
+  /** Appearance: dark (default), light, or follow the system (theme.ts). */
+  theme?: "dark" | "light" | "system";
+  /** Accessibility: text size, colour-blind safe colours, contrast (a11y.ts). */
+  a11y?: import("./a11y").A11y;
+  /** Language: follow the phone, or a chosen one (i18n.ts). */
+  language?: import("./i18n").LangPref;
+  /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
+  delight?: DelightPrefs;
+  /** Saved routines, newest first (routines.ts). */
+  routines?: Routine[];
+  /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
+  training?: TrainingPrefs;
+  /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
+  minutesDay?: string;
   onboarded: boolean;
   updatedAt: number;
+}
+
+/** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
+export type EffortScale = "rir" | "rpe";
+/** The rest-over alert: sound, vibration, both, or neither (the timer still shows). */
+export type RestAlert = "both" | "sound" | "vibrate" | "silent";
+
+/** One exercise's own rest, rep range and working sets, set by the lifter. */
+export interface ExercisePrefs {
+  /** Seconds. */
+  rest?: number;
+  /** Lowest and highest reps for double progression. */
+  reps?: [number, number];
+  sets?: number;
+}
+
+/**
+ * Workout preferences (Melvin, 2026-11-09). Every field is optional; missing means the automatic
+ * choice (by goal, by the block, or the old default), so older profiles load unchanged.
+ */
+export interface TrainingPrefs {
+  /** Default rest in seconds for compound lifts and for isolation work. */
+  rest?: { compound?: number; isolation?: number };
+  /** Preferred rep ranges for compound lifts and for isolation work. */
+  reps?: { compound?: [number, number]; isolation?: [number, number] };
+  /** Working sets per exercise. Missing is automatic (3, 4 on the first big lifts, more when time allows). */
+  sets?: number;
+  /** Per-exercise overrides, keyed by exercise id. They win over everything above. */
+  exercises?: Record<string, ExercisePrefs>;
+  effort?: EffortScale;
+  /** Start the rest timer by itself after Log set. Missing means on. */
+  autoRest?: boolean;
+  /** Missing means it follows Sounds and Vibration. */
+  restAlert?: RestAlert;
+  /** Keep the screen on during a workout. Missing means on. */
+  keepAwake?: boolean;
+  /** Exercises the planner picks first when they fit. */
+  favourites?: string[];
+  /** Muscles that get more weekly sets and go first in the plan. */
+  priorities?: Muscle[];
+  /** Default workout length (minutes) the slider goes back to each day. Missing means it stays where it was left. */
+  minutes?: number;
+  /** 1 Monday (default) or 0 Sunday: streaks, quests and weekly stats. */
+  weekStart?: 0 | 1;
+}
+
+export type PlanSource =
+  | { kind: "adaptive" }
+  | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
+  | { kind: "routine"; id: string };
+/** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
+export interface RoutineItem {
+  exerciseId: string;
+  sets: number;
+  /** Superset: neighbours with the same group are done back to back. */
+  group?: string;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  items: RoutineItem[];
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface DelightPrefs {
+  /** Spoken cues between sets. Off by default. */
+  voice?: boolean;
+  /** Race last time's pace on the rest timer. On unless turned off. */
+  ghost?: boolean;
+  /** Show only the plates to add or take off between sets. On unless turned off. */
+  plateMemory?: boolean;
+  /** A breathing guide or a mini-game on the rest timer. Off by default. */
+  restExtra?: "breathe" | "game" | "off";
+  /** Earned theme picked in Settings (themes.ts). */
+  theme?: string;
+  /** Earned app icon picked in Settings (native only). */
+  icon?: string;
+  /** Themes the lifter has already been told about, for the "new theme" moment. */
+  seenThemes?: string[];
+  /** Strength score adjusted for age (needs a birth year). On unless turned off. */
+  ageAdjust?: boolean;
+  /** Gym buddies for check-ins: names only, kept on the device and in the user's own sync. */
+  buddies?: { id: string; name: string }[];
+  /** Moments already shown on Today, so each appears once. */
+  seenMoments?: string[];
 }
 
 // --- Events: everything that happens is appended, and every stat is derived from them. ---
@@ -222,6 +383,14 @@ export interface SetEvent extends EventBase {
   hrEnd?: number;
   /** Part of a challenge (e.g. as many reps as possible on the last set). */
   challenge?: boolean;
+  /** Done lighter for an injury, at this share of the usual load (injury.ts). Progression skips these sets. */
+  injuryPct?: number;
+  /** A program's "as many reps as you can" set: targetReps is the minimum. */
+  amrap?: boolean;
+  /** The program lift this set counts for (programs.ts), kept through swaps. */
+  slot?: string;
+  /** Superset group, shared by the exercises done back to back with this one. */
+  superset?: string;
 }
 
 export interface SessionStartEvent extends EventBase {
@@ -235,6 +404,12 @@ export interface SessionStartEvent extends EventBase {
   /** The lifter changed the call before starting. */
   callOverridden?: boolean;
   challenge?: boolean;
+  /** Logged by hand after the fact on the web dashboard, not tracked live (no timing or heart rate). */
+  source?: "manual";
+  /** The program and day the plan came from (programs.ts). */
+  program?: { id: string; day: number };
+  /** The saved routine the workout came from, if any. */
+  routine?: string;
 }
 
 export interface SessionEndEvent extends EventBase {
@@ -281,4 +456,131 @@ export interface SwapEvent extends EventBase {
   avoid: boolean;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent;
+/** The first day of a period, logged by the lifter (cycle-aware readiness). */
+export interface CycleEvent extends EventBase {
+  type: "cycle";
+  /** Local midnight of the day the period started (ms). */
+  day: number;
+}
+
+/** A body weight weigh-in (progress photos screen). Kilograms. */
+export interface BodyweightEvent extends EventBase {
+  type: "bodyweight";
+  kg: number;
+  /** Body fat percentage, when a scale or Health Connect / Apple Health gave one (insights.ts). */
+  bodyFat?: number;
+}
+
+/**
+ * A TDEE snapshot (tdee.ts), recorded whenever an input that matters changes, so the history and graph
+ * keep the past even after the profile moves on. Calories a day.
+ */
+export interface TdeeEvent extends EventBase {
+  type: "tdee";
+  kcal: number;
+  bmr: number;
+  kg: number;
+  cm: number;
+  age: number;
+  sex: "male" | "female";
+  activity: "sedentary" | "light" | "moderate" | "heavy" | "athlete";
+  /** Where the activity level came from: the lifter's workouts, the days-a-week goal, or picked by hand. */
+  activitySource: "workouts" | "plan" | "manual";
+  /** Training days a week behind an automatic activity level. */
+  perWeek?: number;
+  bodyFat?: number;
+  formula: "mifflin" | "katch";
+  /** Recorded on its own when an input changed, or saved from the calculator. */
+  trigger: "auto" | "manual";
+  changes: ("first" | "weight" | "age" | "height" | "sex" | "activity" | "bodyFat" | "recheck")[];
+}
+
+/**
+ * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
+ * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
+ */
+export interface CheckinEvent extends EventBase {
+  type: "checkin";
+  gymId?: string;
+  buddies: string[];
+}
+
+/** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
+export interface WarmupEvent extends EventBase {
+  type: "warmup";
+  sessionId: string;
+  exerciseId: string;
+  /** Kilograms, per hand for dumbbells. */
+  weight: number;
+  reps: number;
+}
+
+/** A note the lifter wrote on an exercise during a workout. The latest one shows next time. */
+export interface NoteEvent extends EventBase {
+  type: "note";
+  sessionId: string;
+  exerciseId: string;
+  text: string;
+}
+
+/** How a logged set actually felt: reps the lifter says they had left (0 = failure, 4 = four or more). */
+export interface EffortEvent extends EventBase {
+  type: "effort";
+  setId: string;
+  rir: number;
+}
+
+/** The lifter's own exercise (table stakes, 2026-11-09). Registered into the library on load. */
+export interface CustomExerciseEvent extends EventBase {
+  type: "customExercise";
+  exercise: Pick<Exercise, "id" | "name" | "primary" | "secondary" | "load" | "compound">;
+}
+
+
+// --- Injury mode (Melvin, 2026-11-09; injury.ts). Kept on the device, never in analytics or reports. ---
+
+export const BODY_PARTS = ["neck", "shoulder", "elbow", "wrist", "chest", "upperBack", "lowerBack", "abs", "hip", "groin", "quad", "hamstring", "knee", "calf", "ankle"] as const;
+export type BodyPart = (typeof BODY_PARTS)[number];
+
+/** The lifter logged an injury or a sore spot. Affected exercises are skipped until it's marked healed. */
+export interface InjuryEvent extends EventBase {
+  type: "injury";
+  injuryId: string;
+  part: BodyPart;
+}
+
+/** What to do with exercises an injury affects: one exercise, or every one when exerciseId is left out. */
+export interface InjuryRuleEvent extends EventBase {
+  type: "injuryRule";
+  injuryId: string;
+  exerciseId?: string;
+  /** skip: leave it out. light: keep it at pct% of the usual load. ok: the lifter says it doesn't hurt. */
+  action: "skip" | "light" | "ok";
+  pct?: number;
+  /** The lifter read and accepted the risk warning before choosing to train it. */
+  ack?: boolean;
+}
+
+export interface InjuryHealedEvent extends EventBase {
+  type: "injuryHealed";
+  injuryId: string;
+}
+
+/** A 0–10 pain rating for an injury: when it's logged, between sets, after a workout, or any day. */
+export interface PainEvent extends EventBase {
+  type: "pain";
+  injuryId: string;
+  /** 0 no pain, 10 the worst imaginable. */
+  score: number;
+  sessionId?: string;
+  exerciseId?: string;
+}
+
+/** The lifter chose a graded return (after reading the risks): skipped exercises come back lighter, step by step. */
+export interface InjuryReturnEvent extends EventBase {
+  type: "injuryReturn";
+  injuryId: string;
+  ack: true;
+}
+
+export type AppEvent = BodyweightEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
