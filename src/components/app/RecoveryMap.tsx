@@ -17,7 +17,7 @@ import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "reac
 import { Button } from "./ui";
 
 // The recovery map (Melvin, 2026-11-09): the exercise demos' 3D hologram figure, standing, with each
-// muscle painted in its recovery band's colour. Fatigued muscles also get bright cross lines, so the
+// muscle drawn inside the glass body as a glowing volume in its recovery band's colour. Fatigued muscles also get stripes, so the
 // state never rests on colour alone, and every band is listed in words under the figure. Tapping a
 // muscle (on the body or in the list) says what to do with it and why (action over stats).
 // Devices without WebGL get the 2D map (BodyMap), with the same list and advice.

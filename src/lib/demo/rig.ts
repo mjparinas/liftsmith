@@ -47,6 +47,8 @@ export function interp(tab: readonly (readonly number[])[], t: number, col: numb
 type Tab = number[][];
 export interface Body {
   s: number; shin: number; thigh: number; torso: number; upper: number; fore: number; neck: number;
+  /** How far below the top of the torso the shoulder joints sit, so the arms hang from the shoulders, not the neck. */
+  shDrop: number;
   shW: number; hipW: number; head: [number, number]; jaw: number; chin: number; hand: number; def: number; hair?: boolean;
   torsoSide: Tab; torsoFront: Tab;
   side: { thigh: Tab; shin: Tab; upper: Tab; fore: Tab };
@@ -57,7 +59,7 @@ export type BodyKey = "male" | "female";
 export const BODIES: Record<BodyKey, Body> = {
   male: {
     s: 1, shin: 0.45, thigh: 0.45, torso: 0.52, upper: 0.3, fore: 0.28, neck: 0.09,
-    shW: 0.2, hipW: 0.095, head: [0.088, 0.115], jaw: 0.066, chin: 0.04, hand: 0.038, def: 0.3,
+    shDrop: 0.05, shW: 0.2, hipW: 0.095, head: [0.088, 0.115], jaw: 0.066, chin: 0.04, hand: 0.038, def: 0.3,
     torsoSide: [[-0.12, 0.08, 0.09], [0, 0.11, 0.15], [0.15, 0.115, 0.135], [0.32, 0.11, 0.095], [0.5, 0.115, 0.1], [0.66, 0.14, 0.12], [0.8, 0.158, 0.13], [0.92, 0.125, 0.13], [1.02, 0.075, 0.1], [1.16, 0.058, 0.058]],
     torsoFront: [[-0.12, 0.07], [-0.02, 0.165], [0.15, 0.162], [0.35, 0.145], [0.55, 0.165], [0.75, 0.205], [0.88, 0.228], [0.97, 0.218], [1.03, 0.15], [1.08, 0.078], [1.16, 0.064]],
     side: {
@@ -75,7 +77,7 @@ export const BODIES: Record<BodyKey, Body> = {
   },
   female: {
     s: 0.93, shin: 0.42, thigh: 0.43, torso: 0.48, upper: 0.275, fore: 0.255, neck: 0.085,
-    shW: 0.17, hipW: 0.1, head: [0.083, 0.108], jaw: 0.056, chin: 0.032, hand: 0.032, def: 0.14, hair: true,
+    shDrop: 0.045, shW: 0.17, hipW: 0.1, head: [0.083, 0.108], jaw: 0.056, chin: 0.032, hand: 0.032, def: 0.14, hair: true,
     torsoSide: [[-0.12, 0.08, 0.1], [0, 0.1, 0.165], [0.13, 0.1, 0.152], [0.32, 0.085, 0.08], [0.5, 0.09, 0.085], [0.64, 0.125, 0.1], [0.74, 0.148, 0.1], [0.84, 0.12, 0.1], [0.95, 0.09, 0.095], [1.03, 0.064, 0.07], [1.16, 0.048, 0.048]],
     torsoFront: [[-0.12, 0.075], [-0.02, 0.19], [0.12, 0.186], [0.38, 0.122], [0.55, 0.138], [0.72, 0.155], [0.86, 0.168], [0.95, 0.163], [1.02, 0.11], [1.08, 0.056], [1.16, 0.048]],
     side: {
@@ -173,8 +175,18 @@ export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
     const rot = (x: number, y: number): Vec => V(x * Math.cos(p) + y * Math.sin(p), -x * Math.sin(p) + y * Math.cos(p));
     j["heel" + side] = add(ankle, rot(-0.055 * B.s, -0.075));
     j["toe" + side] = add(ankle, add(rot(0.18 * B.s, -0.075), V(0, 0, sgn * 0.03)));
-    const sh = V(pose.sh[0], pose.sh[1] + (pose.shrug ?? 0), pose.sh[2] + sgn * B.shW);
     const hand = pick(pose.hand, side, sgn, o.grip, V(0, 0, o.grip));
+    // The shoulder sits shDrop below the top of the torso, but rides back up (the shoulder blade lifts)
+    // when the hand needs it: hanging from a bar, locking out overhead.
+    const top = V(pose.sh[0], pose.sh[1] + (pose.shrug ?? 0), pose.sh[2] + sgn * B.shW);
+    const fits = (d: number) => len(sub(hand, add(top, mul(up, -d)))) <= B.upper + B.fore - 0.002;
+    let drop = B.shDrop;
+    if (!fits(drop)) {
+      let lo = 0, hi = drop;
+      for (let k = 0; k < 12; k++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+      drop = lo;
+    }
+    const sh = add(top, mul(up, -drop));
     j["sh" + side] = sh;
     j["hand" + side] = hand;
     j["elbow" + side] = ik(sh, hand, B.upper, B.fore, pick(pose.elbowPole, side, sgn, 0.4, V(-1, -0.7, 0.4)));

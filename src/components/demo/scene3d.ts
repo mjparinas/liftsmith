@@ -37,16 +37,29 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   const steelMat = keep(new LineBasicMaterial({ color: new Color(DEMO_COLOURS.steel), transparent: true, opacity: 0.85, blending: AdditiveBlending, depthWrite: false }));
   const propMat = keep(new LineBasicMaterial({ color: new Color(DEMO_COLOURS.steel), transparent: true, opacity: 0.32, blending: AdditiveBlending, depthWrite: false }));
 
-  // Painted muscles (the recovery map) need a solid figure: a depth-only pass of the shell hides the far
-  // side's lines, so the back's colours never show through the front. Pushed back a little so the
-  // lines on the surface itself still pass.
+  // Depth only: a hidden core inside the painted muscles, so the far side's muscles never show through.
   const occludeMat = keep(new MeshBasicMaterial({ colorWrite: false, depthWrite: true, side: DoubleSide, polygonOffset: true, polygonOffsetFactor: 2, polygonOffsetUnits: 2 }));
+
+  // Painted muscles (the recovery map) are drawn inside the body as glowing volumes: each muscle's
+  // patch of skin pulled in toward its limb's core, under a faint glass skin. Fatigued muscles carry
+  // stripes (aHatch), so their state never rests on colour alone.
+  const innerVert = `attribute vec3 aColor; attribute float aHatch; varying vec3 vC; varying float vRim; varying float vH;
+    void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vec3 n = normalize(normalMatrix * normal); vec3 v = normalize(-mv.xyz);
+      vRim = 1.0 - abs(dot(n, v)); vC = aColor; vH = aHatch; gl_Position = projectionMatrix * mv; }`;
+  const glowMat = keep(new ShaderMaterial({
+    vertexShader: innerVert,
+    fragmentShader: `varying vec3 vC; varying float vRim; varying float vH;
+      void main(){ float stripe = vH > 0.5 && mod(gl_FragCoord.x + gl_FragCoord.y, 10.0) < 3.5 ? 1.0 : 0.0; float a = 0.16 + 0.9 * pow(vRim, 1.6); a *= 1.0 - 0.7 * stripe; gl_FragColor = vec4(vC * 1.25, a); }`,
+    transparent: true, depthWrite: false, blending: AdditiveBlending, side: DoubleSide,
+  }));
+  const INSET = 0.72;
 
   // everything that moves with the figure (rolled for side planks)
   const fig = new Group();
   scene.add(fig);
 
-  const parts = new Map<string, { pos: BufferAttribute; col: BufferAttribute; colD: BufferAttribute; gS: BufferGeometry; objs: (Mesh | LineSegments)[]; occluder: Mesh }>();
+  interface Inner { core: Mesh; corePos: BufferAttribute; pos: BufferAttribute; col: BufferAttribute; hatch: BufferAttribute; geo: BufferGeometry; tris: number[]; glow: Mesh }
+  const parts = new Map<string, { pos: BufferAttribute; col: BufferAttribute; colD: BufferAttribute; gS: BufferGeometry; objs: (Mesh | LineSegments)[]; inner: Inner }>();
   const ensureParts = (f: Frame) => {
     if (parts.size) return;
     for (const m of f.meshes) {
@@ -59,10 +72,16 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       const gD = keep(new BufferGeometry()); gD.setAttribute("position", pos); gD.setAttribute("color", colD); gD.setIndex(diags);
       const gS = keep(new BufferGeometry()); gS.setAttribute("position", pos); gS.setAttribute("aColor", col); gS.setIndex(tris);
       const objs = [new Mesh(gS, shellMat), new LineSegments(gW, wireMat), new LineSegments(gD, diagMat)];
-      const occluder = new Mesh(gS, occludeMat);
-      occluder.renderOrder = -1;
-      for (const o of [...objs, occluder]) { o.frustumCulled = false; fig.add(o); }
-      parts.set(m.P.name, { pos, col, colD, gS, objs, occluder });
+      const iPos = new BufferAttribute(new Float32Array(n * 3), 3); iPos.setUsage(DynamicDrawUsage);
+      const iCol = new BufferAttribute(new Float32Array(n * 3), 3); iCol.setUsage(DynamicDrawUsage);
+      const iHatch = new BufferAttribute(new Float32Array(n), 1); iHatch.setUsage(DynamicDrawUsage);
+      const geo = keep(new BufferGeometry()); geo.setAttribute("position", iPos); geo.setAttribute("aColor", iCol); geo.setAttribute("aHatch", iHatch);
+      const corePos = new BufferAttribute(new Float32Array(n * 3), 3); corePos.setUsage(DynamicDrawUsage);
+      const coreGeo = keep(new BufferGeometry()); coreGeo.setAttribute("position", corePos); coreGeo.setIndex(tris);
+      const core = new Mesh(coreGeo, occludeMat); core.renderOrder = -3;
+      const inner: Inner = { core, corePos, pos: iPos, col: iCol, hatch: iHatch, geo, tris, glow: new Mesh(geo, glowMat) };
+      for (const o of [...objs, core, inner.glow]) { o.frustumCulled = false; fig.add(o); }
+      parts.set(m.P.name, { pos, col, colD, gS, objs, inner });
     }
   };
 
@@ -165,6 +184,56 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
   (grid.material as LineBasicMaterial).transparent = true; (grid.material as LineBasicMaterial).opacity = 0.06;
   floor.add(grid); keep(grid.geometry); keep(grid.material as LineBasicMaterial);
 
+  // which muscles each part's inner geometry covers; rebuilt when the paint changes
+  const innerKey = new Map<string, unknown>();
+  const drawInner = (m: Frame["meshes"][number], inner: Inner, s: Frame["s"], vis: boolean) => {
+    const on = vis && !!s.paint;
+    inner.glow.visible = on;
+    // a hidden core inside the muscles, so the far side's muscles don't show through
+    inner.core.visible = on;
+    if (!on) return;
+    const { NT, M } = m.P;
+    const keep = (k: number) => m.which[k] >= 0 && m.weights[k] > 0.25;
+    if (innerKey.get(m.P.name) !== s.paint) {
+      innerKey.set(m.P.name, s.paint);
+      const t: number[] = [];
+      // a triangle that spans two muscles is left out, so each muscle stands apart with a groove between
+      const same = (x: number, y: number) => m.which[x] === m.which[y];
+      for (let i = 0; i < inner.tris.length; i += 3) {
+        const [x, y, z] = [inner.tris[i], inner.tris[i + 1], inner.tris[i + 2]];
+        if (keep(x) && keep(y) && keep(z) && same(x, y) && same(y, z)) t.push(x, y, z);
+      }
+      inner.geo.setIndex(t);
+    }
+    // pull each ring's muscle vertices toward the ring's centre
+    const a = inner.pos.array as Float32Array, co = inner.corePos.array as Float32Array;
+    for (let i = 0; i < NT; i++) {
+      let cx = 0, cy = 0, cz = 0;
+      for (let j = 0; j < M; j++) { const k = (i * M + j) * 3; cx += m.pos[k]; cy += m.pos[k + 1]; cz += m.pos[k + 2]; }
+      cx /= M; cy /= M; cz /= M;
+      for (let j = 0; j < M; j++) {
+        const v = i * M + j, k = v * 3;
+        // a muscle belly: its middle sits just under the skin, its edges sink toward the bone
+        const f = INSET + 0.17 * Math.min(1, m.weights[v]);
+        co[k] = cx + (m.pos[k] - cx) * 0.62; co[k + 1] = cy + (m.pos[k + 1] - cy) * 0.62; co[k + 2] = cz + (m.pos[k + 2] - cz) * 0.62;
+        a[k] = cx + (m.pos[k] - cx) * f; a[k + 1] = cy + (m.pos[k + 1] - cy) * f; a[k + 2] = cz + (m.pos[k + 2] - cz) * f;
+      }
+    }
+    inner.pos.needsUpdate = true;
+    inner.corePos.needsUpdate = true;
+    inner.geo.computeVertexNormals();
+    const c = inner.col.array as Float32Array, h = inner.hatch.array as Float32Array;
+    for (let k = 0; k < m.weights.length; k++) {
+      const r = m.which[k], pc = r >= 0 ? paintCols[r] : null;
+      const id = r >= 0 ? REGIONS[r].id : null;
+      const lit = s.selected?.length ? (id && s.selected.includes(id) ? 1.3 : 0.35) : 1;
+      c[k * 3] = (pc?.r ?? 0) * lit; c[k * 3 + 1] = (pc?.g ?? 0) * lit; c[k * 3 + 2] = (pc?.b ?? 0) * lit;
+      h[k] = id ? s.hatch?.[id] ?? 0 : 0;
+    }
+    inner.col.needsUpdate = true;
+    inner.hatch.needsUpdate = true;
+  };
+
   let paintFor: Frame["s"]["paint"] = undefined;
   let paintCols: (Color | null)[] = [];
 
@@ -201,25 +270,15 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         const p = parts.get(m.P.name)!;
         const vis = m.P.kind !== "hair" || !!f.body.hair;
         for (const o of p.objs) o.visible = vis;
-        p.occluder.visible = vis && !!s.paint;
         if (!vis) continue;
         p.pos.needsUpdate = true;
         p.gS.computeVertexNormals();
         const c = p.col.array as Float32Array, d = p.colD.array as Float32Array;
         if (s.paint) {
+          // glass skin over the muscles: a faint neutral wireframe, no colour on the surface
           for (let k = 0; k < m.weights.length; k++) {
-            const r = m.which[k], pc = r >= 0 ? paintCols[r] : null;
-            const id = r >= 0 ? REGIONS[r].id : null;
-            const on = !!id && !!s.selected?.includes(id);
-            const dim = s.selected?.length && !on ? 0.4 : 1;
-            const w = pc ? Math.min(1, m.weights[k] * 1.6) : 0;
-            const cr = pc ? cBase.r + (pc.r - cBase.r) * w : cBase.r, cg = pc ? cBase.g + (pc.g - cBase.g) * w : cBase.g, cb = pc ? cBase.b + (pc.b - cBase.b) * w : cBase.b;
-            const lit = (on ? 1.35 : 1) * (pc ? dim : s.selected?.length ? 0.6 : 1);
-            c[k * 3] = cr * lit; c[k * 3 + 1] = cg * lit; c[k * 3 + 2] = cb * lit;
-            // cross lines: bright on hatched (fatigued) muscles, faint everywhere else
-            const h = id && w > 0.3 ? s.hatch?.[id] ?? 0 : 0;
-            const dk = (0.23 + 0.77 * h) * lit;
-            d[k * 3] = cr * dk; d[k * 3 + 1] = cg * dk; d[k * 3 + 2] = cb * dk;
+            c[k * 3] = cBase.r * 0.32; c[k * 3 + 1] = cBase.g * 0.34; c[k * 3 + 2] = cBase.b * 0.4;
+            d[k * 3] = c[k * 3] * 0.4; d[k * 3 + 1] = c[k * 3 + 1] * 0.4; d[k * 3 + 2] = c[k * 3 + 2] * 0.4;
           }
         } else {
           for (let k = 0; k < m.weights.length; k++) {
@@ -230,6 +289,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         }
         p.col.needsUpdate = true;
         p.colD.needsUpdate = true;
+        drawInner(m, p.inner, s, vis);
       }
       // loads
       const load = f.motion.load, hold = f.motion.hold ?? "each";
