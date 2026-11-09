@@ -10,6 +10,7 @@ import type { DelightPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { say, voiceSupported } from "@/lib/voice";
 import { useState } from "react";
+import { t } from "@/lib/i18n";
 import { Icon } from "./icons";
 import { Chip, Section, SwitchRow } from "./ui";
 
@@ -28,29 +29,29 @@ export function DelightSettings() {
   return (
     <>
       {voiceSupported() && (
-        <Toggle label="Voice coach" on={!!d.voice} set={(voice) => { put({ voice }); if (voice) say("Voice coach on. I'll call out each set.", true); }} hint="Spoken cues between sets: the next weight and reps, the last set, ten seconds left, and new bests. Music dips while it talks." />
+        <Toggle label={t("delight.voice")} on={!!d.voice} set={(voice) => { put({ voice }); if (voice) say("Voice coach on. I'll call out each set.", true); }} hint={t("delight.voiceHint")} />
       )}
-      <Toggle label="Ghost mode" on={d.ghost !== false} set={(ghost) => put({ ghost })} hint="Race your last session of each exercise: its weights, reps and rests show on the rest timer." />
-      <Toggle label="Smart plate memory" on={d.plateMemory !== false} set={(plateMemory) => put({ plateMemory })} hint="Between sets, show only the plates to add or take off." />
-      <Section title="While you rest">
+      <Toggle label={t("delight.ghost")} on={d.ghost !== false} set={(ghost) => put({ ghost })} hint={t("delight.ghostHint")} />
+      <Toggle label={t("delight.plates")} on={d.plateMemory !== false} set={(plateMemory) => put({ plateMemory })} hint={t("delight.platesHint")} />
+      <Section title={t("delight.rest")}>
         <div className="flex flex-wrap gap-2">
-          {([["breathe", "Breathing guide"], ["game", "Plate math game"], ["off", "Neither"]] as const).map(([v, l]) => <Chip key={v} active={(d.restExtra ?? "off") === v} onClick={() => put({ restExtra: v })}>{l}</Chip>)}
+          {([["breathe", t("delight.breathe")], ["game", t("delight.game")], ["off", t("delight.neither")]] as const).map(([v, l]) => <Chip key={v} active={(d.restExtra ?? "off") === v} onClick={() => put({ restExtra: v })}>{l}</Chip>)}
         </div>
       </Section>
       <section id="themes" className="mt-6 scroll-mt-4">
-        <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">Themes</h2>
-        {light && <p className="mb-2 px-1 text-sm text-muted">With Appearance set to light, a theme changes the accent colour only.</p>}
+        <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">{t("delight.themes")}</h2>
+        {light && <p className="mb-2 px-1 text-sm text-muted">{t("delight.lightNote")}</p>}
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9.5rem),1fr))] gap-2">
-          {THEMES.map((t) => {
-            const open = unlocked(t, ctx);
-            const on = (d.theme ?? "midnight") === t.id;
+          {THEMES.map((th) => {
+            const open = unlocked(th, ctx);
+            const on = (d.theme ?? "midnight") === th.id;
             return (
-              <li key={t.id}>
-                <button type="button" disabled={!open} aria-pressed={on} onClick={() => { haptic("tick"); put({ theme: t.id, seenThemes: [...new Set([...(d.seenThemes ?? []), t.id])] }); }} className={`press flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${on ? "border-accent" : "border-line"} ${open ? "" : "opacity-60"}`} style={{ background: t.palette.surface }}>
-                  <span className="h-9 w-9 shrink-0 rounded-full border-4" style={{ background: t.palette.bg, borderColor: t.palette.accent }} aria-hidden />
+              <li key={th.id}>
+                <button type="button" disabled={!open} aria-pressed={on} onClick={() => { haptic("tick"); put({ theme: th.id, seenThemes: [...new Set([...(d.seenThemes ?? []), th.id])] }); }} className={`press flex w-full items-center gap-3 rounded-2xl border p-3 text-left ${on ? "border-accent" : "border-line"} ${open ? "" : "opacity-60"}`} style={{ background: th.palette.surface }}>
+                  <span className="h-9 w-9 shrink-0 rounded-full border-4" style={{ background: th.palette.bg, borderColor: th.palette.accent }} aria-hidden />
                   <span className="min-w-0">
-                    <span className="block font-semibold" style={{ color: "#e8edf3" }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{t.name}</span>
-                    <span className="block text-xs" style={{ color: "#a3afbf" }}>{t.how}</span>
+                    <span className="block font-semibold" style={{ color: "#e8edf3" }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{th.name}</span>
+                    <span className="block text-xs" style={{ color: "#a3afbf" }}>{th.how}</span>
                   </span>
                 </button>
               </li>
@@ -59,17 +60,17 @@ export function DelightSettings() {
         </ul>
       </section>
       {appIconSupported() && (
-        <Section title="App icon">
+        <Section title={t("delight.icon")}>
           <div className="flex flex-wrap gap-2">
             {APP_ICONS.map(({ id, theme }) => {
               const open = unlocked(theme, ctx);
               return (
                 <Chip key={id} active={(d.icon ?? "default") === id} onClick={async () => {
-                  if (!open) return setIconNote(`${theme.name}: ${theme.how.toLowerCase()} to unlock.`);
+                  if (!open) return setIconNote(t("delight.iconLocked", { name: theme.name, how: theme.how.toLowerCase() }));
                   const ok = await setAppIcon(id);
                   if (ok) put({ icon: id });
-                  setIconNote(ok ? "Done. On Android the home screen updates once you leave the app." : "Couldn't change the icon on this phone.");
-                }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{id === "default" ? "Classic" : theme.name}</Chip>
+                  setIconNote(t(ok ? "delight.iconDone" : "delight.iconFailed"));
+                }}>{!open && <Icon name="lock" size={14} className="mr-1 inline-block align-[-2px]" />}{id === "default" ? t("delight.classic") : theme.name}</Chip>
               );
             })}
           </div>

@@ -1,30 +1,22 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { CtaBanner, Crumbs, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { TOOL_PAGES } from "@/lib/seo";
 
 export const metadata: Metadata = {
   title: "Free tools for lifters",
-  description: `Free calculators from ${BRAND.name}: TDEE and daily calories, with more on the way.`,
+  description: `Free calculators from ${BRAND.name}: plates per side, one-rep max and TDEE. No sign-up, nothing stored.`,
   alternates: { canonical: "/tools/" },
 };
 
-const TOOLS = [{ href: "/tools/tdee-calculator/", name: "TDEE calculator", blurb: "Calories a day to maintain, cut or bulk, with BMR, BMI and a protein range." }];
-
 export default function ToolsIndex() {
   return (
-    <main className="mx-auto max-w-3xl px-5 py-10">
-      <nav className="text-sm text-muted" aria-label="Breadcrumb"><Link href="/" className="hover:text-ink">{BRAND.name}</Link> › Tools</nav>
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight">Tools</h1>
-      <ul className="mt-6 space-y-3">
-        {TOOLS.map((t) => (
-          <li key={t.href}>
-            <Link href={t.href} className="press card block p-5 hover:border-accent/40">
-              <span className="block text-lg font-semibold">{t.name}</span>
-              <span className="block text-muted">{t.blurb}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+    <SitePage kind="tools-index">
+      <Crumbs items={[{ label: "Tools" }]} />
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Free tools for lifters</h1>
+      <p className="mt-3 max-w-2xl text-lg text-muted">The same calculators the {BRAND.name} app runs on, free in your browser. No sign-up, and nothing you enter is stored or sent.</p>
+      <LinkGrid items={TOOL_PAGES.map((t) => ({ href: t.path, title: t.name, body: t.blurb }))} />
+      <CtaBanner cta="tools-index-end" title="Let the app do the maths for you" body={`In ${BRAND.name} these run on their own: plates drawn for every set, your max estimated from every set you log, and calories that follow your weigh-ins.`} />
+    </SitePage>
   );
 }

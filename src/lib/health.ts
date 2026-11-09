@@ -1,18 +1,24 @@
 "use client";
 // Health Connect (Android) and Apple Health (iOS) through one plugin, @capgo/capacitor-health.
-// Reads prefill the setup wizard (weight, height, resting heart rate) and bring in weigh-ins with body
-// fat for the coach's notes (insights.ts). Finished workouts are
+// Reads prefill the setup wizard (weight, height, resting heart rate), bring in weigh-ins with body
+// fat for the coach's notes (insights.ts), and feed the health twin (readDaily, twin.ts). Finished workouts are
 // written back as active calories and heart rate samples, because the plugin can't write
 // workout sessions yet. On the web every call is a no-op. Live heart rate never comes from
 // here: Health Connect is batched, so live HR uses Bluetooth (heartRate.ts).
 import { isNative } from "./juice";
+import type { HealthMetric } from "./types";
 
 type HealthModule = typeof import("@capgo/capacitor-health");
 let mod: Promise<HealthModule> | null = null;
 const health = () => (mod ??= import("@capgo/capacitor-health"));
 
-const READ = ["weight", "height", "bodyFat", "restingHeartRate", "heartRateVariability", "sleep", "heartRate"] as const;
-const WRITE = ["calories", "heartRate"] as const;
+// Only what a feature uses today: Play's Health Connect review rejects any permission the app doesn't
+// visibly use, so keep this list, the manifest's health permissions and the privacy pages in step.
+// Weight, height, body fat and resting HR: setup, weigh-ins, TDEE and the health twin. Sleep, HRV, steps,
+// VO2 max and breathing rate: the health twin (twin.ts), the readiness call (sleep, HRV, resting HR,
+// breathing rate) and TDEE's activity level (steps).
+export const READ = ["weight", "height", "bodyFat", "restingHeartRate", "sleep", "heartRateVariability", "steps", "vo2Max", "respiratoryRate"] as const;
+export const WRITE = ["calories", "heartRate"] as const;
 
 export async function healthAvailable(): Promise<boolean> {
   if (!isNative()) return false;
@@ -149,4 +155,120 @@ export async function saveWorkout(w: { start: number; end: number; bodyweightKg:
   } catch {
     // Permission was revoked or the store is unavailable; the workout is still in the local log.
   }
+}
+
+// --- The health twin's daily readings (twin.ts) ---
+
+/** Local day key, YYYY-MM-DD. */
+export function localDayKey(t: number): string {
+  const d = new Date(t);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export interface DailyReading {
+  metric: HealthMetric;
+  day: string;
+  value: number;
+  /** The newest sample behind it (ms). */
+  at: number;
+}
+
+interface Sample {
+  value: number;
+  startDate: string;
+  endDate: string;
+  sleepState?: string;
+  stages?: { startDate: string; endDate: string; stage: string }[];
+}
+
+const ASLEEP = new Set(["asleep", "light", "deep", "rem"]);
+
+/**
+ * Hours asleep per night, keyed by the day the night ended. Health Connect gives sessions with stages;
+ * Apple Health gives one segment per stage, often from two sources (watch and phone) at once, so asleep
+ * time is the union of every asleep interval, never a sum. A session without stages counts in full;
+ * in-bed and awake time never counts. Exported for tests.
+ */
+export function sleepNights(samples: readonly Sample[]): DailyReading[] {
+  const spans: [number, number][] = [];
+  for (const s of samples) {
+    const staged = s.stages?.filter((x) => ASLEEP.has(x.stage)) ?? [];
+    if (s.stages?.length) for (const x of staged) spans.push([Date.parse(x.startDate), Date.parse(x.endDate)]);
+    else if (!s.sleepState || ASLEEP.has(s.sleepState)) spans.push([Date.parse(s.startDate), Date.parse(s.endDate)]);
+  }
+  const ok = spans.filter(([a, b]) => Number.isFinite(a) && Number.isFinite(b) && b > a).sort((x, y) => x[0] - y[0]);
+  // Merge overlaps, then group by the day each stretch ends (a nap that day counts toward it too).
+  const merged: [number, number][] = [];
+  for (const sp of ok) {
+    const last = merged[merged.length - 1];
+    if (last && sp[0] <= last[1]) last[1] = Math.max(last[1], sp[1]);
+    else merged.push([...sp]);
+  }
+  const by = new Map<string, { ms: number; at: number }>();
+  for (const [a, b] of merged) {
+    const day = localDayKey(b);
+    const cur = by.get(day) ?? { ms: 0, at: 0 };
+    by.set(day, { ms: cur.ms + (b - a), at: Math.max(cur.at, b) });
+  }
+  return [...by.entries()]
+    .map(([day, v]) => ({ metric: "sleep" as const, day, value: Math.round((v.ms / 3_600_000) * 100) / 100, at: v.at }))
+    .filter((r) => r.value >= 1 && r.value <= 16)
+    .sort((a, b) => a.at - b.at);
+}
+
+/** One value per local day: the mean of that day's samples (HRV, breathing rate) or the latest (resting HR, VO2 max). Exported for tests. */
+export function perDay(metric: HealthMetric, samples: readonly Sample[], how: "mean" | "latest", ok: (v: number) => boolean): DailyReading[] {
+  const by = new Map<string, { sum: number; n: number; latest: number; at: number }>();
+  for (const s of samples) {
+    const at = Date.parse(s.endDate || s.startDate);
+    if (!Number.isFinite(at) || !ok(s.value)) continue;
+    const day = localDayKey(at);
+    const cur = by.get(day) ?? { sum: 0, n: 0, latest: s.value, at: 0 };
+    cur.sum += s.value;
+    cur.n += 1;
+    if (at >= cur.at) { cur.at = at; cur.latest = s.value; }
+    by.set(day, cur);
+  }
+  return [...by.entries()]
+    .map(([day, v]) => ({ metric, day, value: Math.round((how === "mean" ? v.sum / v.n : v.latest) * 10) / 10, at: v.at }))
+    .sort((a, b) => a.at - b.at);
+}
+
+/**
+ * The last `days` of sleep, HRV, resting heart rate, steps, VO2 max and overnight breathing rate, one
+ * reading per metric per day. Steps only for finished days (today's count is still growing). Empty on
+ * the web, and a metric the lifter didn't allow is simply missing.
+ */
+export async function readDaily(days: number, now = Date.now()): Promise<DailyReading[]> {
+  if (!(await healthAvailable())) return [];
+  const { Health } = await health();
+  const startDate = new Date(now - days * 86_400_000).toISOString();
+  const read = async (dataType: (typeof READ)[number]): Promise<Sample[]> => {
+    try {
+      return (await Health.readSamples({ dataType, startDate, limit: 2000, ascending: true })).samples as Sample[];
+    } catch {
+      return [];
+    }
+  };
+  const steps = async (): Promise<DailyReading[]> => {
+    try {
+      const midnight = new Date(now);
+      midnight.setHours(0, 0, 0, 0);
+      const r = await Health.queryAggregated({ dataType: "steps", startDate, endDate: midnight.toISOString(), bucket: "day", aggregation: "sum" });
+      return r.samples
+        .filter((s) => s.value > 0 && s.value < 100_000)
+        .map((s) => ({ metric: "steps" as const, day: localDayKey(Date.parse(s.startDate) + 12 * 3_600_000), value: Math.round(s.value), at: Date.parse(s.endDate) - 1 }));
+    } catch {
+      return [];
+    }
+  };
+  const [sleep, hrv, rhr, vo2, breath, st] = await Promise.all([read("sleep"), read("heartRateVariability"), read("restingHeartRate"), read("vo2Max"), read("respiratoryRate"), steps()]);
+  return [
+    ...sleepNights(sleep),
+    ...perDay("hrv", hrv, "mean", (v) => v > 5 && v < 300),
+    ...perDay("restingHr", rhr, "latest", (v) => v > 25 && v < 130),
+    ...perDay("vo2max", vo2, "latest", (v) => v > 10 && v < 95),
+    ...perDay("breathing", breath, "mean", (v) => v > 4 && v < 40),
+    ...st,
+  ];
 }

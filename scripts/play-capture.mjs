@@ -130,7 +130,7 @@ try {
     await page.getByText("Today's workout").waitFor();
     await shot(`today${sfx}`);
     await shotAt(`today-plan${sfx}`, /exercises · about/i);
-    await nav("Recovery");
+    await nav("Body");
     await shot(`recovery${sfx}`);
     await nav("Progress");
     await shot(`progress${sfx}`);

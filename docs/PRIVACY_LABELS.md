@@ -2,7 +2,7 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-09 (subscriptions through RevenueCat added).
+Last reviewed: 2026-11-09 (subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
@@ -44,7 +44,7 @@ Collected data types:
 | Financial info › Purchase history | Yes (plan and price of a purchase; RevenueCat checks the receipt) | No | No | Optional | App functionality, Analytics |
 | Health and fitness › Health info | **No** (stays on the device) | | | | |
 
-Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`).
+Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE, the health twin), READ_SLEEP, READ_HEART_RATE_VARIABILITY and READ_RESPIRATORY_RATE (the health twin on the Body tab, and the Pro readiness call: "adjusts workout intensity to recovery"), READ_STEPS (the health twin and TDEE's activity level), READ_VO2_MAX (the health twin) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
 
 ## App Store: App Privacy
 

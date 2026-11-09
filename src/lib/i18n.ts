@@ -1,4 +1,3 @@
-import { useSyncExternalStore } from "react";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
@@ -77,16 +76,12 @@ export async function readPhoneLanguage(): Promise<void> {
 export const currentLang = () => lang;
 export const currentTag = () => tag;
 
-/** Re-renders a component when the language changes. Returns the language. */
-export function useLang(): Lang {
-  return useSyncExternalStore(
-    (on) => {
-      listeners.add(on);
-      return () => listeners.delete(on);
-    },
-    () => lang,
-    () => "en",
-  );
+/** Calls `on` when the language changes; returns the unsubscribe. `useLang` (useLang.ts) builds on it. */
+export function subscribeLang(on: () => void): () => void {
+  listeners.add(on);
+  return () => {
+    listeners.delete(on);
+  };
 }
 
 const rules = new Map<string, Intl.PluralRules>();
@@ -148,4 +143,14 @@ export function translated<K extends string>(keys: readonly K[], key: (k: K) => 
   const out = {} as Record<K, string>;
   for (const k of keys) Object.defineProperty(out, k, { get: () => t(key(k)), enumerable: true });
   return out;
+}
+
+/** A weekday's name in the current language, Sunday = 0 (Intl, so "lun." in French, "lun" in Spanish). */
+export function weekday(day: number, style: "short" | "long" = "short"): string {
+  return date(new Date(2024, 0, 7 + day, 12), { weekday: style });
+}
+
+/** A clock time ("6:00 PM", "18:00") in the current language and region. */
+export function clockTime(hh: number, mm: number): string {
+  return date(new Date(2000, 0, 1, hh, mm), { hour: "numeric", minute: "2-digit" });
 }

@@ -3,6 +3,7 @@ import { cycleState, startOfDay } from "@/lib/cycle";
 import { useApp } from "@/lib/store";
 import { useNow } from "@/lib/useNow";
 import { useState } from "react";
+import { t } from "@/lib/i18n";
 import { Button, Section, Sheet } from "./ui";
 
 const DAY = 86_400_000;
@@ -18,38 +19,38 @@ export function CycleSettings() {
   const today = startOfDay(now);
 
   return (
-    <Section title="Cycle-aware readiness">
+    <Section title={t("cycle.title")}>
       {!on ? (
         <>
-          <p className="text-sm text-muted">Optional. Log the day your period starts and Liftsmith nudges the day&apos;s push or easy call a little around your cycle.</p>
-          <Button kind="ghost" className="mt-3 w-full" onClick={() => setConsent(true)}>Set up</Button>
+          <p className="text-sm text-muted">{t("cycle.intro")}</p>
+          <Button kind="ghost" className="mt-3 w-full" onClick={() => setConsent(true)}>{t("cycle.setUp")}</Button>
         </>
       ) : (
         <div className="card space-y-3 p-4">
-          <p className="text-sm">{state ? `Cycle day ${state.day} of about ${state.length}.` : "Log the first day of your next period to start."}</p>
+          <p className="text-sm">{state ? t("cycle.day", { day: state.day, length: state.length }) : t("cycle.logFirst")}</p>
           <div className="grid grid-cols-2 gap-2">
-            <Button kind="ghost" onClick={() => logPeriod(today)}>Period started today</Button>
-            <Button kind="ghost" onClick={() => logPeriod(today - DAY)}>Started yesterday</Button>
+            <Button kind="ghost" onClick={() => logPeriod(today)}>{t("cycle.today")}</Button>
+            <Button kind="ghost" onClick={() => logPeriod(today - DAY)}>{t("cycle.yesterday")}</Button>
           </div>
           {confirmOff ? (
             <div className="space-y-2">
-              <p className="text-sm text-muted">This turns it off and deletes every period you logged on this device.</p>
-              <Button kind="danger" className="w-full" onClick={() => { void forgetCycle(); setConfirmOff(false); }}>Turn off and delete</Button>
-              <Button kind="quiet" className="w-full" onClick={() => setConfirmOff(false)}>Cancel</Button>
+              <p className="text-sm text-muted">{t("cycle.offNote")}</p>
+              <Button kind="danger" className="w-full" onClick={() => { void forgetCycle(); setConfirmOff(false); }}>{t("cycle.offConfirm")}</Button>
+              <Button kind="quiet" className="w-full" onClick={() => setConfirmOff(false)}>{t("cycle.cancel")}</Button>
             </div>
           ) : (
-            <Button kind="quiet" className="w-full" onClick={() => setConfirmOff(true)}>Turn off and delete cycle data</Button>
+            <Button kind="quiet" className="w-full" onClick={() => setConfirmOff(true)}>{t("cycle.off")}</Button>
           )}
         </div>
       )}
-      <Sheet open={consent} onClose={() => setConsent(false)} title="Cycle-aware readiness">
+      <Sheet open={consent} onClose={() => setConsent(false)} title={t("cycle.title")}>
         <div className="space-y-3 text-sm">
-          <p>You log the first day of each period. Liftsmith estimates where you are in your cycle from your own typical length and adjusts the day&apos;s readiness a little. For example, it might suggest going by feel during your period. You can always override the call.</p>
-          <p><strong>Your cycle data stays on this phone.</strong> It only leaves it through your own backup and sync if you turn those on. It is never used for analytics or ads, never included in feedback reports, and never shared or sold.</p>
-          <p>Research on cycle phase and strength is mixed and varies between people, so the effect is small. This isn&apos;t medical advice, contraception or a fertility tool.</p>
-          <p>You can turn it off at any time, which deletes everything you logged.</p>
-          <Button className="w-full" onClick={() => { setProfile({ cycle: { enabled: true, consentAt: Date.now() } }); replan(); setConsent(false); }}>I agree, turn it on</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setConsent(false)}>Not now</Button>
+          <p>{t("cycle.consent1")}</p>
+          <p><strong>{t("cycle.consent2a")}</strong> {t("cycle.consent2b")}</p>
+          <p>{t("cycle.consent3")}</p>
+          <p>{t("cycle.consent4")}</p>
+          <Button className="w-full" onClick={() => { setProfile({ cycle: { enabled: true, consentAt: Date.now() } }); replan(); setConsent(false); }}>{t("cycle.agree")}</Button>
+          <Button kind="quiet" className="w-full" onClick={() => setConsent(false)}>{t("cycle.notNow")}</Button>
         </div>
       </Sheet>
     </Section>

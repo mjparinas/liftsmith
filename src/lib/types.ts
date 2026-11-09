@@ -446,6 +446,25 @@ export interface BodyweightEvent extends EventBase {
   bodyFat?: number;
 }
 
+/** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
+export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing";
+
+/**
+ * One day's reading of a health measure from Health Connect or Apple Health (the health twin, twin.ts):
+ * hours asleep for the night that ended that day, the day's average HRV (ms), resting heart rate (bpm),
+ * steps, VO2 max (mL/kg/min) or overnight breathing rate (breaths a minute). The id holds the metric,
+ * day and value, so a re-import of the same number adds nothing; when a day's number changes (more
+ * samples came in), the reading with the latest `at` wins. Health data: it stays on the device (and the
+ * lifter's own sync), never analytics, feedback or share links.
+ */
+export interface HealthEvent extends EventBase {
+  type: "health";
+  metric: HealthMetric;
+  /** Local day, YYYY-MM-DD. */
+  day: string;
+  value: number;
+}
+
 /**
  * A TDEE snapshot (tdee.ts), recorded whenever an input that matters changes, so the history and graph
  * keep the past even after the profile moves on. Calories a day.
@@ -460,9 +479,11 @@ export interface TdeeEvent extends EventBase {
   sex: "male" | "female";
   activity: "sedentary" | "light" | "moderate" | "heavy" | "athlete";
   /** Where the activity level came from: the lifter's workouts, the days-a-week goal, or picked by hand. */
-  activitySource: "workouts" | "plan" | "manual";
+  activitySource: "workouts" | "steps" | "plan" | "manual";
   /** Training days a week behind an automatic activity level. */
   perWeek?: number;
+  /** Average steps a day behind a steps-based activity level. */
+  steps?: number;
   bodyFat?: number;
   formula: "mifflin" | "katch";
   /** Recorded on its own when an input changed, or saved from the calculator. */
@@ -558,4 +579,4 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
-export type AppEvent = BodyweightEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
+export type AppEvent = BodyweightEvent | HealthEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
