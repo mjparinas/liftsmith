@@ -6,6 +6,7 @@ import type { Call } from "./readiness";
 import type { ItemWhy } from "./why";
 import type { AppEvent, Exercise, Gym, Profile } from "./types";
 import { fmtNum, fromKg } from "./units";
+import { date, num, relative, t } from "./i18n";
 
 // "Why this weight?" (Melvin picked it, 2026-11-09). Every suggested weight and rep count can be tapped
 // to see the reasons behind it, in plain words, rebuilt from the same data progression.ts used: the last
@@ -19,15 +20,13 @@ export interface Why {
   lines: string[];
 }
 
-const LEVEL_WORD = { new: "a new lifter", intermediate: "an intermediate lifter", advanced: "an advanced lifter" } as const;
 const SHARE = { new: 0.7, intermediate: 1, advanced: 1.25 } as const;
 
 function day(ms: number, now: number): string {
   const d = Math.floor((now - ms) / 86400_000);
-  if (d <= 0) return "earlier today";
-  if (d === 1) return "yesterday";
-  if (d < 7) return `${d} days ago`;
-  return `on ${new Date(ms).toLocaleDateString("en", { month: "short", day: "numeric" })}`;
+  if (d <= 0) return t("explain.earlierToday");
+  if (d < 7) return relative(-d, "day");
+  return t("explain.on", { date: date(ms, { month: "short", day: "numeric" }) });
 }
 
 export interface ExplainInput {
@@ -50,7 +49,8 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   const unit = gym.unit;
   const w = (kg: number) => `${fmtNum(fromKg(kg, unit))} ${unit}`;
   const timed = TIMED.has(ex.id);
-  const repWord = timed ? "seconds" : "reps";
+  const repWord = timed ? t("explain.seconds") : t("explain.reps");
+  const count = (n: number) => t(timed ? "explain.secondsN" : "explain.repsN", { count: n });
   const [lo, hi] = repRange(ex, profile.goal);
   const wk = blockWeek(profile, now);
   const past = sessionsOf(events, ex.id).filter((s) => s[0].sessionId !== sessionId);
@@ -59,47 +59,48 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   let title = target.note.split(" · ")[0];
 
   if (!last) {
-    if (ex.load === "bodyweight") lines.push(`This is your first time, so start at ${target.reps} ${repWord} and find your level.`);
+    if (ex.load === "bodyweight") lines.push(t("explain.firstBw", { target: count(target.reps) }));
     else {
-      lines.push(`This is your first time, so it starts from about ${Math.round(ex.start * SHARE[profile.experience] * 100)}% of your body weight (${w(profile.bodyweight)}), the usual start for ${LEVEL_WORD[profile.experience]}.`);
-      lines.push("It's on the light side on purpose. If it feels easy, say so after the last set and next time goes up.");
+      lines.push(t("explain.firstLoad", { pct: Math.round(ex.start * SHARE[profile.experience] * 100), bw: w(profile.bodyweight), level: t(`explain.level.${profile.experience}`) }));
+      lines.push(t("explain.firstLight"));
     }
-    title = "A cautious first try";
+    title = t("explain.firstTitle");
   } else {
     const sets = [...last].sort((a, b) => a.at - b.at);
-    const list = sets.map((s) => (ex.load === "bodyweight" && !s.weight ? `${s.reps}` : `${w(s.weight)} × ${s.reps}`)).join(", ");
+    const done = sets.map((s) => (ex.load === "bodyweight" && !s.weight ? num(s.reps) : `${w(s.weight)} × ${num(s.reps)}`)).join(", ");
     const tgt = sets[0].targetReps;
-    lines.push(`Last time (${day(sets[0].at, now)}): ${list}, aiming for ${tgt} ${repWord}.`);
+    lines.push(t("explain.last", { when: day(sets[0].at, now), sets: done, target: count(tgt) }));
     const hitAll = sets.every((s) => s.reps >= s.targetReps);
     const bigMiss = sets.some((s) => s.reps <= s.targetReps - 2);
     const fb = [...events].reverse().find((e) => e.type === "feedback" && e.exerciseId === ex.id && e.sessionId === sets[0].sessionId);
     const rating = fb?.type === "feedback" ? fb.rating : 0;
-    if (rating > 0) lines.push("You said it felt too easy, so it moves up a step more.");
-    if (rating < 0) lines.push("You said it felt too hard, so it backs off a step.");
-    if (wk.deload) lines.push(`It's the deload week, so it's about 10% lighter with fewer sets to let you recover before the next block.`);
-    else if (bigMiss && rating >= 0) lines.push(`A set fell 2 or more ${repWord} short, so the weight drops one step and the ${repWord} go back to ${lo}.`);
-    else if (hitAll && tgt >= hi) lines.push(`You hit every set at the top of your ${lo}–${hi} range, so the weight goes up one step and the ${repWord} go back to ${lo}.`);
-    else if (hitAll && ex.load !== "bodyweight") lines.push(`You hit every set, so you get one more ${timed ? "second block" : "rep"} at the same weight. At ${hi} ${repWord} the weight goes up.`);
-    else if (hitAll) lines.push(`You hit every set, so it's one more ${timed ? "step" : "rep"} this time.`);
-    else lines.push(`Not every set reached ${tgt}, so it stays the same until they all do.`);
+    if (rating > 0) lines.push(t("explain.feltEasy"));
+    if (rating < 0) lines.push(t("explain.feltHard"));
+    if (wk.deload) lines.push(t("explain.deload"));
+    else if (bigMiss && rating >= 0) lines.push(t("explain.bigMiss", { unit: repWord, lo }));
+    else if (hitAll && tgt >= hi) lines.push(t("explain.top", { unit: repWord, lo, hi }));
+    else if (hitAll && ex.load !== "bodyweight") lines.push(t(timed ? "explain.oneMoreTimed" : "explain.oneMoreRep", { hi, unit: repWord }));
+    else if (hitAll) lines.push(t(timed ? "explain.oneMoreBwTimed" : "explain.oneMoreBw"));
+    else lines.push(t("explain.same", { target: num(tgt) }));
   }
 
   // Why this exercise and this set count come from why.ts, the same words Today's plan shows.
-  if (item?.pick) lines.unshift(`Picked today: ${item.pick}.`);
+  if (item?.pick) lines.unshift(t("explain.picked", { pick: item.pick }));
   if (item?.sets && !wk.deload && call !== "recover") lines.push(`${item.sets.charAt(0).toUpperCase()}${item.sets.slice(1)}.`);
 
-  if (!wk.deload) lines.push(`${wk.label} of this block: leave about ${target.rir} ${target.rir === 1 ? "rep" : "reps"} in reserve. The reserve shrinks each week, then a deload resets it.`);
+  if (!wk.deload) lines.push(t("explain.rir", { week: wk.label, count: target.rir }));
 
-  if (call === "recover") lines.push(`Today is an easy day${readiness !== undefined ? ` (readiness ${readiness})` : ""}: one step lighter, one more rep in reserve and one set fewer.`);
-  if (call === "push" && /Push day/.test(target.note)) lines.push(`Today is a push day${readiness !== undefined ? ` (readiness ${readiness})` : ""}, so the first big lift goes one rep closer to failure.`);
-  if (/Challenge/.test(target.note)) lines.push("Challenge: on the last set, do as many good reps as you can and log what you got. It won't count as a miss.");
+  const scored = readiness !== undefined;
+  if (call === "recover") lines.push(scored ? t("explain.easyScore", { score: readiness }) : t("explain.easy"));
+  if (call === "push" && target.note.includes(t("note.push"))) lines.push(scored ? t("explain.pushScore", { score: readiness }) : t("explain.push"));
+  if (target.note.includes(t("note.challenge"))) lines.push(t("explain.challenge"));
 
   if (ex.load === "barbell") {
     const jump = smallestJump(gym.plates);
     const bar = barFor(ex, gym);
-    if (jump > 0) lines.push(`With your plates, this bar (${fmtNum(bar.weight)} ${unit}) moves in ${fmtNum(jump)} ${unit} steps, and every weight shown is one you can actually load.`);
-  } else if (ex.load === "dumbbell" && gym.dumbbells.length) lines.push("Rounded to the nearest dumbbell this gym has.");
-  else if (ex.load === "machine") lines.push(`Rounded to this gym's ${fmtNum(gym.machineStep || (unit === "kg" ? 2.5 : 5))} ${unit} pin steps.`);
+    if (jump > 0) lines.push(t("explain.barbell", { bar: `${fmtNum(bar.weight)} ${unit}`, jump: `${fmtNum(jump)} ${unit}` }));
+  } else if (ex.load === "dumbbell" && gym.dumbbells.length) lines.push(t("explain.dumbbell"));
+  else if (ex.load === "machine") lines.push(t("explain.machine", { step: `${fmtNum(gym.machineStep || (unit === "kg" ? 2.5 : 5))} ${unit}` }));
 
   return { title, lines };
 }

@@ -6,12 +6,13 @@ import type { Readiness, Signal } from "./readiness";
 import { recovery } from "./recovery";
 import { PRIORITY_VOLUME } from "./training";
 import { MUSCLE_LABEL, type AppEvent, type Muscle, type Profile } from "./types";
+import { currentTag, list, t } from "./i18n";
 
 // Every recommendation says why (Melvin, 2026-11-09: "action-oriented recommendations, not stats
 // for the sake of stats"). Each exercise in a plan gets one short line covering why it was picked,
 // why that many sets, and why that weight and those reps. The day's call gets a sentence that names
 // the signals behind it. Everything is rebuilt from the same data the generator and progression used,
-// so it never disagrees with the plan. All the words live here, in one place, for translation later.
+// so it never disagrees with the plan. The words live in the catalogues (src/locales, keys why.*).
 
 export interface ItemWhy {
   /** Why this exercise today, e.g. "Chest 96% recovered, 4 of 12 sets this week". */
@@ -45,7 +46,8 @@ export function whyContext(plan: Plan, events: readonly AppEvent[], profile: Pro
   };
 }
 
-const lower = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+/** Lower-cases the first letter to continue a sentence, but leaves acronyms (HRV, VFC) alone. */
+const lower = (s: string) => (/^\p{Lu}{2}/u.test(s) ? s : s.charAt(0).toLocaleLowerCase(currentTag()) + s.slice(1));
 
 export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
   const ex = EXERCISE_BY_ID.get(item.exerciseId);
@@ -56,15 +58,15 @@ export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
     const m = item.focus;
     const goal = Math.round(ctx.week.setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1));
     const done = Math.round(ctx.done[m]);
-    pick = `${MUSCLE_LABEL[m]} ${Math.round(ctx.rec[m])}% recovered, ${done} of ${goal} sets this week${prio.has(m) ? " (a priority)" : ""}`;
-    if (training?.favourites?.includes(ex.id)) pick += ", and a favourite";
+    pick = t(prio.has(m) ? "why.pickPriority" : "why.pick", { muscle: MUSCLE_LABEL[m], pct: Math.round(ctx.rec[m]), done, goal });
+    if (training?.favourites?.includes(ex.id)) pick = t("why.favourite", { pick });
   }
 
   let sets: string | undefined;
   const own = training?.exercises?.[item.exerciseId]?.sets ?? training?.sets;
-  if (ctx.week.deload) sets = "half the sets for the deload";
-  else if (ctx.call === "recover") sets = "one set fewer for an easy day";
-  else if (own !== undefined && !ctx.chosen) sets = `${own} sets, your setting`;
+  if (ctx.week.deload) sets = t("why.deloadSets");
+  else if (ctx.call === "recover") sets = t("why.easySets");
+  else if (own !== undefined && !ctx.chosen) sets = t("why.ownSets", { count: own });
 
   const load = item.target.note || "";
 
@@ -72,7 +74,7 @@ export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
   return { pick, sets, load, short: short.charAt(0).toUpperCase() + short.slice(1) };
 }
 
-const joinAnd = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+const joinAnd = (xs: string[]) => list(xs);
 
 /**
  * One sentence on why today is a push, steady or easy day, naming the strongest signals that point
@@ -82,22 +84,22 @@ export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean): st
   const up = r.signals.filter((s) => s.points > 0);
   const down = r.signals.filter((s) => s.points < 0);
   const names = (xs: Signal[]) => joinAnd(xs.slice(0, 2).map((s) => lower(s.text)));
-  const score = `readiness ${r.score}`;
+  const score = t("why.score", { score: r.score });
   if (chosen !== r.call) {
-    const what = r.call === "push" ? "a push day" : r.call === "recover" ? "an easy day" : "a steady day";
+    const what = t(`why.what.${r.call}`);
     const because = r.call === "recover" ? down : r.call === "push" ? up : [];
-    return `Your call today. We suggested ${what}${because.length ? ` because ${names(because)}` : ""} (${score}).`;
+    return because.length ? t("why.call.overrideBecause", { what, reasons: names(because), score }) : t("why.call.override", { what, score });
   }
-  if (deload) return `Deload week, so it's lighter with half the sets whatever the score (${score}). You come back fresher for the next block.`;
-  if (chosen === "push") return `Push today: ${up.length ? names(up) : "you're fresh"} (${score}). Your first big lift goes one rep closer to failure.`;
-  if (chosen === "recover") return `Go easy today: ${down.length ? names(down) : "you need the recovery"} (${score}). One set fewer and a step lighter, so you come back stronger.`;
-  if (!r.signals.length || (up.length === 0 && down.length === 0)) return `Train as planned (${score}). Weights follow on from last time.`;
-  const mixed = up.length && down.length ? `${names(up)}, but ${names(down)}` : names(up.length ? up : down);
-  return `Train as planned: ${mixed} (${score}). Weights follow on from last time.`;
+  if (deload) return t("why.call.deload", { score });
+  if (chosen === "push") return t("why.call.push", { reasons: up.length ? names(up) : t("why.call.fresh"), score });
+  if (chosen === "recover") return t("why.call.easy", { reasons: down.length ? names(down) : t("why.call.needRecovery"), score });
+  if (!r.signals.length || (up.length === 0 && down.length === 0)) return t("why.call.planned", { score });
+  const mixed = up.length && down.length ? t("why.call.but", { up: names(up), down: names(down) }) : names(up.length ? up : down);
+  return t("why.call.plannedBecause", { reasons: mixed, score });
 }
 
 /** The line under the target on the workout screen: why that weight and reps, and the set count when the day changed it. */
 export function workoutWhy(item: PlanItem, plan: Pick<Plan, "week" | "call">): string {
-  const sets = plan.week.deload ? "half the sets for the deload" : plan.call === "recover" ? "one set fewer for an easy day" : undefined;
+  const sets = plan.week.deload ? t("why.deloadSets") : plan.call === "recover" ? t("why.easySets") : undefined;
   return [item.target.note, sets].filter(Boolean).join(" · ");
 }

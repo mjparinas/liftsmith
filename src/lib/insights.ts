@@ -7,12 +7,13 @@ import { can } from "./entitlements";
 import { activeFixes, findPlateaus, fixResult, FIX_TEXT, type FixKind, type Plateau } from "./plateau";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
+import { currentTag, date, list, t } from "./i18n";
 
 // Coach's notes (Melvin, 2026-11-09): proactive, action-oriented insights instead of charts to
 // interpret. Each one says what we noticed, the numbers behind it, and one thing to do, ideally a
 // single tap (start a deload, make a muscle a priority, fit a short workout). Only shown when there
-// is something worth acting on. Derived from events every time, never stored. All the words live
-// here, in one place, for translation later.
+// is something worth acting on. Derived from events every time, never stored. The words live in the
+// catalogues (src/locales, keys ins.*).
 
 const DAY = 86_400_000;
 const WEEK = 7 * DAY;
@@ -53,7 +54,9 @@ export interface InsightInput {
 }
 
 const name = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
-const weeksText = (n: number) => `${n} week${n === 1 ? "" : "s"}`;
+const weeksText = (n: number) => t("ins.weeks", { count: n });
+/** Exercise names inside a sentence. */
+const lowerName = (id: string) => name(id).toLocaleLowerCase(currentTag());
 
 /** Best estimated one-rep max per session for a loaded lift, oldest first. */
 function e1Series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
@@ -148,10 +151,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       out.push({
         id: `missed-${recent[0].at}`,
         tone: "warn",
-        title: "Fatigue is building up",
-        why: `You hit only ${pct}% of your target reps over your last 3 workouts.`,
-        advice: canDeload ? "A deload now (lighter, half the sets) usually brings the reps back within a week." : "Today's plan is already lighter. Sleep and food matter most this week.",
-        action: canDeload ? { kind: "deload", label: "Start a deload week" } : undefined,
+        title: t("ins.fatigue.title"),
+        why: t("ins.fatigue.why", { pct }),
+        advice: canDeload ? t("ins.fatigue.advice") : t("ins.fatigue.adviceLight"),
+        action: canDeload ? { kind: "deload", label: t("ins.deload") } : undefined,
       });
     }
   }
@@ -164,17 +167,17 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
   const fatigue = out.find((x) => x.id.startsWith("missed-"));
   if (stalled.length >= 2 && fatigue) {
     // Same cause, same fix: one note, not two deload buttons.
-    const names = stalled.slice(0, 3).map((s) => name(s.exerciseId).toLowerCase());
-    fatigue.why += ` ${names.length > 1 ? `${names.slice(0, -1).join(", ")} and ${names.at(-1)} have` : `${names[0]} has`} had no new best in ${weeksText(stalled[0].weeks)} or more, too.`;
+    const names = stalled.slice(0, 3).map((s) => lowerName(s.exerciseId));
+    fatigue.why += ` ${t("ins.fatigue.stalledToo", { count: names.length, names: list(names), weeks: weeksText(stalled[0].weeks) })}`;
   } else if (stalled.length >= 2) {
-    const names = stalled.slice(0, 3).map((s) => name(s.exerciseId).toLowerCase());
+    const names = stalled.slice(0, 3).map((s) => lowerName(s.exerciseId));
     out.push({
       id: `stall-many-${stalled.map((s) => s.exerciseId).join(",")}`,
       tone: "warn",
-      title: `${stalled.length} lifts have stalled`,
-      why: `No new best on ${names.slice(0, -1).join(", ")} and ${names.at(-1)} in ${weeksText(stalled[0].weeks)} or more.`,
-      advice: canDeload ? "When several lifts stall at once it's usually fatigue, not strength. Deload for a week, then build again." : "This week's deload should clear it. Next block, they start a little lighter and build again.",
-      action: canDeload ? { kind: "deload", label: "Start a deload week" } : undefined,
+      title: t("ins.stallMany.title", { count: stalled.length }),
+      why: t("ins.stallMany.why", { names: list(names), weeks: weeksText(stalled[0].weeks) }),
+      advice: canDeload ? t("ins.stallMany.advice") : t("ins.stallMany.adviceDeload"),
+      action: canDeload ? { kind: "deload", label: t("ins.deload") } : undefined,
     });
   } else if (can("plateauDetective")) {
     for (const p of findPlateaus(events, profile, now, fixes).slice(0, 2)) {
@@ -182,10 +185,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       out.push({
         id: `plateau-${p.exerciseId}-${p.weeks}-${p.fix}`,
         tone: "warn",
-        title: `${name(p.exerciseId)} has stalled`,
-        why: `No new best in ${weeksText(p.weeks)} (best estimated one-rep max ${w(p.best)}). ${p.causes[0].text}`,
-        advice: `Three-week fix: ${fix.what}`,
-        action: { kind: "plateau", plateau: p, fix: p.fix, label: `Start: ${fix.title.toLowerCase()}` },
+        title: t("ins.stalled.title", { name: name(p.exerciseId) }),
+        why: t("ins.plateau.why", { weeks: weeksText(p.weeks), best: w(p.best), cause: p.causes[0].text }),
+        advice: t("ins.plateau.advice", { what: fix.what }),
+        action: { kind: "plateau", plateau: p, fix: p.fix, label: t("ins.plateau.action", { fix: fix.title.toLocaleLowerCase(currentTag()) }) },
       });
     }
   } else if (stalled.length === 1) {
@@ -193,10 +196,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `stall-${s.exerciseId}-${s.sessions}`,
       tone: "warn",
-      title: `${name(s.exerciseId)} has stalled`,
-      why: `No new best in ${weeksText(s.weeks)} over ${s.sessions} sessions. Your best estimated one-rep max is ${w(s.best)}.`,
-      advice: "Next time it drops one step and builds back up. Swapping it for a close variation for a few weeks also works: tap Swap during the workout.",
-      action: { kind: "go", route: "stats", label: "See your lifts" },
+      title: t("ins.stalled.title", { name: name(s.exerciseId) }),
+      why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }),
+      advice: t("ins.stall.advice"),
+      action: { kind: "go", route: "stats", label: t("ins.stall.action") },
     });
   }
 
@@ -205,9 +208,9 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `fix-live-${f.exerciseId}-${f.startedAt}`,
       tone: "info",
-      title: `${name(f.exerciseId)}: ${FIX_TEXT[f.kind].title.toLowerCase()}`,
-      why: `A plateau fix is running until ${new Date(f.until).toLocaleDateString("en", { day: "numeric", month: "short" })}.`,
-      advice: "Your plan already includes it. Train as planned.",
+      title: t("ins.fixLive.title", { name: name(f.exerciseId), fix: FIX_TEXT[f.kind].title.toLocaleLowerCase(currentTag()) }),
+      why: t("ins.fixLive.why", { date: date(f.until, { day: "numeric", month: "short" }) }),
+      advice: t("ins.fixLive.advice"),
     });
   }
   for (const f of fixes.filter((x) => x.until <= now && now - x.until < 21 * DAY)) {
@@ -215,9 +218,9 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `fix-done-${f.exerciseId}-${f.startedAt}`,
       tone: r?.worked ? "good" : "info",
-      title: `${name(f.exerciseId)}: fix finished`,
-      why: !r ? "No sessions during the fix, so there's nothing to compare yet." : r.worked ? `It worked: your estimated one-rep max is up ${Math.round(r.gain * 1000) / 10}%.` : "No new best yet.",
-      advice: r?.worked ? "Back to the normal plan. Keep building from here." : "If it's still stuck in a week or two, you'll get a different fix here.",
+      title: t("ins.fixDone.title", { name: name(f.exerciseId) }),
+      why: !r ? t("ins.fixDone.noData") : r.worked ? t("ins.fixDone.worked", { pct: Math.round(r.gain * 1000) / 10 }) : t("ins.fixDone.notYet"),
+      advice: r?.worked ? t("ins.fixDone.adviceWorked") : t("ins.fixDone.adviceStuck"),
     });
   }
 
@@ -238,10 +241,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         out.push({
           id: `volume-${m}-${thisWeek}`,
           tone: "info",
-          title: `${MUSCLE_LABEL[m]} is getting too little work`,
-          why: `About ${Math.round(avg)} sets a week for the last 2 weeks, against a goal of ${week.setsPerMuscle}.`,
-          advice: `Make it a priority and plans put ${MUSCLE_LABEL[m].toLowerCase()} first with a third more sets.`,
-          action: { kind: "priority", muscle: m, label: `Prioritise ${MUSCLE_LABEL[m].toLowerCase()}` },
+          title: t("ins.volume.title", { muscle: MUSCLE_LABEL[m] }),
+          why: t("ins.volume.why", { sets: Math.round(avg), goal: week.setsPerMuscle }),
+          advice: t("ins.volume.advice", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+          action: { kind: "priority", muscle: m, label: t("ins.volume.action", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }) },
         });
       }
     }
@@ -258,20 +261,17 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       out.push({
         id: `fat-up-${fat.at(-1)!.at}`,
         tone: "warn",
-        title: "Body fat is creeping up",
-        why: `Up about ${fmtNum(Math.round(change * 10) / 10)} points in ${weeksText(span)} (now ${fmtNum(Math.round(fat.at(-1)!.v * 10) / 10)}%).`,
-        advice:
-          profile.goal === "muscle"
-            ? "Gaining a little fat while building muscle is normal, but this is fast. About 200 to 300 fewer calories a day keeps more of the gain as muscle."
-            : "Your training is on track, so look at food first: about 300 fewer calories a day, keeping protein high, usually turns it around within a month.",
+        title: t("ins.fatUp.title"),
+        why: t("ins.fatUp.why", { change: fmtNum(Math.round(change * 10) / 10), weeks: weeksText(span), now: fmtNum(Math.round(fat.at(-1)!.v * 10) / 10) }),
+        advice: profile.goal === "muscle" ? t("ins.fatUp.adviceMuscle") : t("ins.fatUp.advice"),
       });
     } else if (change <= -1 && !stalled.length) {
       out.push({
         id: `fat-down-${fat.at(-1)!.at}`,
         tone: "good",
-        title: "Losing fat, keeping strength",
-        why: `Body fat is down about ${fmtNum(Math.round(-change * 10) / 10)} points in ${weeksText(span)} and none of your lifts have stalled.`,
-        advice: "Keep doing exactly this. Heavy sets tell your body to hold on to muscle while you lose fat.",
+        title: t("ins.fatDown.title"),
+        why: t("ins.fatDown.why", { change: fmtNum(Math.round(-change * 10) / 10), weeks: weeksText(span) }),
+        advice: t("ins.fatDown.advice"),
       });
     }
   }
@@ -282,18 +282,18 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       out.push({
         id: `weight-down-${ins.at(-1)!.at}`,
         tone: "warn",
-        title: "Weight is dropping fast",
-        why: `Down about ${w(-perWeek)} a week, ${fmtNum(Math.round(-pct * 10) / 10)}% of your body weight.`,
-        advice: stalled.length ? "That's likely why lifts have stalled. Aim for under 1% a week: a little more food on training days helps you keep your strength." : "Faster than 1% a week tends to cost muscle. A little more food on training days helps you keep your strength.",
+        title: t("ins.weightDown.title"),
+        why: t("ins.weightDown.why", { weight: w(-perWeek), pct: fmtNum(Math.round(-pct * 10) / 10) }),
+        advice: stalled.length ? t("ins.weightDown.adviceStalled") : t("ins.weightDown.advice"),
       });
     } else if (pct >= 0.5 && profile.goal !== "muscle") {
       out.push({
         id: `weight-up-${ins.at(-1)!.at}`,
         tone: "info",
-        title: "Weight is going up",
-        why: `Up about ${w(perWeek)} a week over ${weeksText(Math.round((ins.at(-1)!.at - ins[0].at) / WEEK))}.`,
-        advice: "If that's not what you want, about 250 fewer calories a day evens it out. Log body fat too and we'll tell muscle from fat.",
-        action: { kind: "go", route: "stats", label: "See your weigh-ins" },
+        title: t("ins.weightUp.title"),
+        why: t("ins.weightUp.why", { weight: w(perWeek), weeks: weeksText(Math.round((ins.at(-1)!.at - ins[0].at) / WEEK)) }),
+        advice: t("ins.weightUp.advice"),
+        action: { kind: "go", route: "stats", label: t("ins.weightUp.action") },
       });
     }
   }
@@ -303,10 +303,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `streak-${Math.floor(now / DAY)}`,
       tone: "info",
-      title: streak.weeks > 0 ? `Your ${streak.weeks}-week streak needs ${streak.needed} more` : `${streak.needed} more for this week's goal`,
-      why: `You need ${streak.needed} more workout${streak.needed > 1 ? "s" : ""} this week for your ${profile.daysPerWeek}-day goal, and the days are running out.`,
-      advice: "Short on time? A 30-minute workout still counts.",
-      action: profile.minutes > 30 ? { kind: "minutes", minutes: 30, label: "Make today 30 minutes" } : undefined,
+      title: streak.weeks > 0 ? t("ins.streak.title", { weeks: streak.weeks, needed: streak.needed }) : t("ins.streak.titleGoal", { needed: streak.needed }),
+      why: t("ins.streak.why", { count: streak.needed, days: profile.daysPerWeek }),
+      advice: t("ins.streak.advice"),
+      action: profile.minutes > 30 ? { kind: "minutes", minutes: 30, label: t("ins.streak.action") } : undefined,
     });
   }
 
@@ -315,9 +315,9 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `last-hard-${weekStart(profile, now)}`,
       tone: "info",
-      title: "Last hard week of the block",
-      why: `${week.label}: the deload starts next week.`,
-      advice: "This is the week to go for it. You'll recover next week.",
+      title: t("ins.lastHard.title"),
+      why: t("ins.lastHard.why", { week: week.label }),
+      advice: t("ins.lastHard.advice"),
     });
   }
 
@@ -327,9 +327,9 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `gain-${gain.exerciseId}-${Math.round(gain.pct)}`,
       tone: "good",
-      title: `${name(gain.exerciseId)} is moving`,
-      why: `Your estimated one-rep max is up ${Math.round(gain.pct)}% in ${weeksText(gain.weeks)}.`,
-      advice: "Keep the same exercise and rep range while it keeps climbing.",
+      title: t("ins.gain.title", { name: name(gain.exerciseId) }),
+      why: t("ins.gain.why", { pct: Math.round(gain.pct), weeks: weeksText(gain.weeks) }),
+      advice: t("ins.gain.advice"),
     });
   }
 

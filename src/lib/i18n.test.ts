@@ -1,3 +1,7 @@
+import { CALL_TEXT } from "./readiness";
+import { FIX_TEXT } from "./plateau";
+import { callWhy } from "./why";
+import { GLOSSARY } from "./glossary";
 import { afterEach, describe, expect, it } from "vitest";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
@@ -77,6 +81,32 @@ describe("language", () => {
     expect(weekday(3, "long")).toBe("mercredi");
     expect(clockTime(18, 0)).toBe("18:00");
     expect(t("msgKind.missed")).toBe("Séances manquées");
+  });
+
+  it("explains glossary terms in the chosen language, one paragraph per line", () => {
+    setLanguage("fr");
+    expect(GLOSSARY.deload.title).toBe("Semaine de décharge");
+    expect(GLOSSARY.rir.body).toHaveLength(2);
+    setLanguage("es");
+    expect(GLOSSARY.superset.title).toBe("Superserie");
+    setLanguage("en");
+    expect(GLOSSARY.deloadWeeks.body[1]).toMatch(/^Then comes one deload week/);
+  });
+
+  it("gives coaching reasons in the chosen language", () => {
+    // Signals are worded when readiness runs, in the language of the moment.
+    const sig = () => ({ call: "push" as const, score: 70, signals: [{ points: 10, text: t("sig.bigRecovered") }, { points: 8, text: t("sig.rested") }], challenge: false });
+    const r = sig();
+    setLanguage("fr");
+    expect(CALL_TEXT.push.label).toBe("Jour pour pousser");
+    expect(FIX_TEXT.rest.title).toBe("Se reposer plus longtemps");
+    expect(callWhy({ ...sig(), signals: [{ points: 10, text: t("sig.bigRecovered") }, { points: 5, text: t("sig.hrvHigh") }] }, "push", false)).toBe(
+      "On pousse aujourd’hui : grands muscles entièrement récupérés et VFC au-dessus de votre normale (forme 70). Votre premier gros exercice va une répétition plus près de l’échec.",
+    );
+    setLanguage("es");
+    expect(callWhy(sig(), "recover", false)).toBe("Hoy decides tú. Sugerimos un día para apretar porque: músculos grandes recuperados del todo y has descansado desde el último entrenamiento (preparación 70).");
+    setLanguage("en");
+    expect(callWhy(r, "push", false)).toBe("Push today: big muscles fully recovered and rested since your last workout (readiness 70). Your first big lift goes one rep closer to failure.");
   });
 
   it("translates engine labels (muscles, recovery bands) on each read", () => {
