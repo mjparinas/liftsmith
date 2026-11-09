@@ -25,6 +25,7 @@
     "@capacitor/status-bar": "^8.0.4",
     "@capgo/capacitor-health": "^8.12.0",
     "@libsql/client": "^0.18.0",
+    "@mediapipe/tasks-vision": "1.2.2",
     "@types/canvas-confetti": "^1.9.0",
     "canvas-confetti": "^1.9.4",
     "next": "16.4.3",

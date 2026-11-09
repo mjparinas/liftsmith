@@ -3,7 +3,8 @@ import { useApp } from "@/lib/store";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { flag } from "@/lib/flags";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { MessageSettings } from "./MessageSettings";
@@ -27,10 +28,22 @@ export function Settings() {
   const { profile, setProfile, reset } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
+  const taps = useRef<number[]>([]);
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
-      <h1 className="text-2xl font-bold">Settings</h1>
+      {/* Five quick taps on the title open the experiments lab (Easter egg; AGENTS.md "Rep counter lab"). */}
+      <h1
+        className="text-2xl font-bold"
+        onClick={() => {
+          const now = Date.now();
+          taps.current = [...taps.current.filter((t) => now - t < 2000), now];
+          if (taps.current.length >= 5) go("lab");
+        }}
+      >
+        Settings
+      </h1>
+      {flag("repLab") && <Button kind="ghost" className="mt-4 w-full" onClick={() => go("lab")}>Rep counter lab (experiment)</Button>}
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>

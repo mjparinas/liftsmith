@@ -64,6 +64,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Liftsmith can count your reps from the camera. Video is analysed on this iPhone and never recorded or sent.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Liftsmith can count your reps from this iPhone's motion sensors while you lift.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>

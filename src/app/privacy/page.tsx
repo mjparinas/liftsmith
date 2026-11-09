@@ -31,6 +31,7 @@ export default function Privacy() {
       <p className="mt-2">We count page views and clicks on our download and &ldquo;open the app&rdquo; buttons with our own cookieless counter. For each one we keep the page, the website you came from, campaign tags in the link, your country, and your browser, operating system and device type. To count a visitor once a day without cookies, we keep a one-way code made from your internet address, your browser and a secret that changes every day, so a visit can&apos;t be linked to the next day&apos;s or turned back into your address. If your browser sends a Global Privacy Control signal, nothing is counted. When usage stats are allowed, the site also remembers on your device how you first found us, so a web app install can be credited to it.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Health data</h2>
+      <p className="mt-2">If you try the rep counter, the camera picture and motion sensor readings are analysed on your device as you lift and then thrown away. Nothing is recorded, saved or sent to us.</p>
       <p className="mt-2">With your permission the app reads weight, height, body fat, resting heart rate, heart rate variability, sleep and heart rate from Health Connect or Apple Health to suggest starting weights and adjust workouts, and writes finished workouts back. These readings stay on your phone and are never part of usage stats. <a className="text-accent underline" href="/privacypolicy.html">More about health data</a>.</p>
 
       <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
