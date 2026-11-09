@@ -3,6 +3,7 @@ import { cycleSignal, cycleState } from "./cycle";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import type { AppEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
+import { t } from "./i18n";
 
 // "Rest or push today?" (Melvin, 2026-11-09). Everything here comes from the lifter's own
 // logged data, on the device: how recovered the big muscles are, how many target reps they hit
@@ -83,28 +84,28 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
 
   if (!sessions.length) {
     const c = external.cycle ? cycleSignal(cycleState(events, now)) : null;
-    return { call: "normal", score: 50, signals: [{ points: 0, text: "First workout: we'll learn your level" }, ...(c ? [c] : [])], challenge: false };
+    return { call: "normal", score: 50, signals: [{ points: 0, text: t("sig.firstWorkout") }, ...(c ? [c] : [])], challenge: false };
   }
 
   // 1. Recovery of the big muscles.
   const rec = recovery(events, now);
   const big = BIG.reduce((s, m) => s + rec[m], 0) / BIG.length;
-  if (big >= 90) add(10, "Big muscles fully recovered");
-  else if (big < 60) add(-15, "Big muscles still recovering");
+  if (big >= 90) add(10, t("sig.bigRecovered"));
+  else if (big < 60) add(-15, t("sig.bigRecovering"));
 
   // 2. Days since the last workout, and how many in a row.
   const gap = (now - sessions[0].at) / DAY;
   const streak = sessions.filter((s) => now - s.at < 3 * DAY).length;
-  if (gap >= 2 && gap < 10) add(8, "Rested since your last workout");
-  if (gap >= 10) add(-5, "Been a while: ease back in");
-  if (streak >= 3) add(-10, "Three workouts in three days");
+  if (gap >= 2 && gap < 10) add(8, t("sig.rested"));
+  if (gap >= 10) add(-5, t("sig.longGap"));
+  if (streak >= 3) add(-10, t("sig.threeInRow"));
 
   // 3. Target reps hit in the last two workouts.
   const lastTwo = sessions.slice(0, 2).flatMap((s) => s.sets).filter((s) => !s.challenge);
   if (lastTwo.length >= 4) {
     const hit = lastTwo.filter((s) => s.reps >= s.targetReps).length / lastTwo.length;
-    if (hit >= 0.95) add(12, "Hit every target lately");
-    else if (hit < 0.7) add(-12, "Missed reps lately");
+    if (hit >= 0.95) add(12, t("sig.hitAll"));
+    else if (hit < 0.7) add(-12, t("sig.missed"));
   }
 
   // 4. How the last workout felt.
@@ -112,8 +113,8 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const ratings = events.filter((e) => e.type === "feedback" && e.sessionId === lastId).map((e) => (e.type === "feedback" ? e.rating : 0));
   const hard = ratings.filter((r) => r < 0).length;
   const easy = ratings.filter((r) => r > 0).length;
-  if (hard >= 2) add(-10, "Last workout felt hard");
-  else if (easy >= 2 && hard === 0) add(8, "Last workout felt easy");
+  if (hard >= 2) add(-10, t("sig.feltHard"));
+  else if (easy >= 2 && hard === 0) add(8, t("sig.feltEasy"));
 
   // 5. Rep speed: slower reps than usual at the same exercises means fatigue.
   const slowdowns: number[] = [];
@@ -123,8 +124,8 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   }
   if (slowdowns.length) {
     const slow = median(slowdowns);
-    if (slow > 1.15) add(-8, "Reps were slower than usual");
-    else if (slow < 0.92) add(5, "Reps were quicker than usual");
+    if (slow > 1.15) add(-8, t("sig.slowReps"));
+    else if (slow < 0.92) add(5, t("sig.quickReps"));
   }
 
   // 6. Heart rate for the work: a higher average than usual hints at fatigue or illness.
@@ -132,14 +133,14 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   if (ends.length >= 4) {
     const usual = median(ends.slice(1, 8).map((e) => e.avgHr!));
     const d = ends[0].avgHr! - usual;
-    if (d > 8) add(-8, "Heart rate ran high last time");
-    else if (d < -6) add(4, "Heart rate was low for the work");
+    if (d > 8) add(-8, t("sig.hrHigh"));
+    else if (d < -6) add(4, t("sig.hrLow"));
   }
 
   // 7. Health data (the health twin, twin.ts) and the check-in, when connected.
   for (const x of healthSignals(external)) add(x.points, x.text);
-  if (external.checkIn === -1) add(-15, "You said you're low today");
-  if (external.checkIn === 1) add(8, "You said you feel great");
+  if (external.checkIn === -1) add(-15, t("sig.low"));
+  if (external.checkIn === 1) add(8, t("sig.great"));
   if (external.cycle) {
     const c = cycleSignal(cycleState(events, now));
     if (c) signals.push(c);
@@ -165,20 +166,25 @@ export function healthSignals(external: ExternalSignals): Signal[] {
   const out: Signal[] = [];
   const add = (points: number, text: string) => out.push({ points, text });
   if (external.sleepHours !== undefined) {
-    if (external.sleepHours < 6) add(-12, "Short sleep");
-    else if (external.sleepHours >= 8) add(5, "Good sleep");
+    if (external.sleepHours < 6) add(-12, t("sig.shortSleep"));
+    else if (external.sleepHours >= 8) add(5, t("sig.goodSleep"));
   }
   if (external.hrvDelta !== undefined) {
-    if (external.hrvDelta < -0.1) add(-10, "HRV below your baseline");
-    else if (external.hrvDelta > 0.05) add(5, "HRV above your baseline");
+    if (external.hrvDelta < -0.1) add(-10, t("sig.hrvLow"));
+    else if (external.hrvDelta > 0.05) add(5, t("sig.hrvHigh"));
   }
-  if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, "Resting heart rate is up");
-  if (external.breathingDelta !== undefined && external.breathingDelta >= 2) add(-8, "Breathing rate up overnight");
+  if (external.restingHrDelta !== undefined && external.restingHrDelta > 5) add(-8, t("sig.restingUp"));
+  if (external.breathingDelta !== undefined && external.breathingDelta >= 2) add(-8, t("sig.breathingUp"));
   return out;
 }
 
-export const CALL_TEXT: Record<Call, { label: string; blurb: string }> = {
-  push: { label: "Push day", blurb: "You're fresh. One rep closer to failure on your first lift." },
-  normal: { label: "Train as planned", blurb: "Steady progress from last time." },
-  recover: { label: "Easy day", blurb: "One set fewer and a step lighter, so you recover for next time." },
-};
+/** The call's label and one-line blurb, translated on each read. */
+const callText = (c: Call) => ({
+  get label() {
+    return t(`callText.${c}`);
+  },
+  get blurb() {
+    return t(`callText.${c}.blurb`);
+  },
+});
+export const CALL_TEXT: Record<Call, { label: string; blurb: string }> = { push: callText("push"), normal: callText("normal"), recover: callText("recover") };

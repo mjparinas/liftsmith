@@ -1,6 +1,7 @@
 import { roundLoad } from "./loads";
 import { TIMED, type Target } from "./progression";
 import type { AppEvent, BodyPart, Exercise, Gym, Muscle, Pattern } from "./types";
+import { t as tr } from "./i18n";
 
 // Injury mode (Melvin, 2026-11-09). The lifter logs an injury by body part. Exercises that load that
 // part are skipped until they mark it healed, or, if they choose after a risk warning, kept at a share
@@ -243,7 +244,7 @@ export function skippedIds(exercises: readonly Exercise[], active: readonly Inju
  */
 export function lighten(t: Target, ex: Exercise, pct: number, gym: Gym): Target {
   const share = pct / 100;
-  const note = `Injury: ${pct}% of usual, stop if it hurts`;
+  const note = tr("note.injury", { pct });
   const rir = Math.max(t.rir, 3);
   if (ex.load === "bodyweight" || TIMED.has(ex.id) || t.weight <= 0) {
     return { ...t, reps: Math.max(TIMED.has(ex.id) ? 10 : 3, Math.round(t.reps * share)), rir, note };
