@@ -113,7 +113,7 @@ export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]
     }
   };
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
       <div>
         <p className="text-muted">Send friends a link to your training summary: level, workouts, streak, trophies, best lifts and the days you trained in the last 12 weeks.</p>
         <p className="mt-2 text-sm text-faint">It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.</p>
