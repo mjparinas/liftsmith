@@ -4,5 +4,5 @@
 import { LiftDemo } from "@/components/demo/LiftDemo";
 
 export function ExerciseDemo({ id }: { id: string }) {
-  return <LiftDemo exerciseId={id} controls />;
+  return <LiftDemo exerciseId={id} controls bodyToggle />;
 }

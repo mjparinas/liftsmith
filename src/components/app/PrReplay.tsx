@@ -2,7 +2,7 @@
 // PR replay on the summary: after a new best, the lift plays back with the lifter's own numbers, rep by
 // rep: the 3D figure (LiftDemo) performs the lift that many times, with their bar and plates from their
 // gym shown underneath. Respects reduced motion: the figure holds a still pose and the counter shows the end.
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { PlateBar } from "@/components/PlateBar";
 import type { Pr } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
@@ -66,7 +66,7 @@ function Replay({ pr }: { pr: Pr }) {
       <h3 className="text-2xl font-bold">{ex.name}</h3>
       <p className="num mt-1 text-4xl font-bold">{fmtNum(fromKg(pr.weight, unit))} {unit} × {pr.reps}</p>
       <div className="mx-auto mt-4 w-full max-w-sm overflow-hidden rounded-2xl bg-raised" aria-hidden>
-        <LiftDemo key={run} exerciseId={pr.exerciseId} reps={pr.reps} still={reduced} label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`} className="h-56" />
+        <LiftDemo key={run} exerciseId={pr.exerciseId} body={bodyFor(profile.sex)} reps={pr.reps} still={reduced} label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`} className="h-56" />
         {loading && bar && <div className="px-4 pb-3"><PlateBar loading={loading} bar={bar.weight} unit={gym!.unit} compact /></div>}
       </div>
       <p className="num mt-3 text-lg font-semibold" aria-live="polite">{done ? `${pr.reps} reps. Every one of them yours.` : `Rep ${rep}`}</p>
