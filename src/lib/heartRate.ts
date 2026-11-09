@@ -58,5 +58,5 @@ export async function connectHeartRate(onBpm: (bpm: number) => void, onGone: () 
 export function hrZone(bpm: number, maxHr = 185): { zone: number; colour: string } {
   const p = bpm / maxHr;
   const zone = p < 0.6 ? 1 : p < 0.7 ? 2 : p < 0.8 ? 3 : p < 0.9 ? 4 : 5;
-  return { zone, colour: ["#8a97a8", "#4c8dff", "#34d399", "#f5b544", "#f0605d"][zone - 1] };
+  return { zone, colour: `var(--hr-${zone})` };
 }

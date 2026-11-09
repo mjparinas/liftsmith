@@ -70,7 +70,7 @@ export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { 
           </g>
         ))}
         {!compact && (
-          <text x={W / 2} y={cy + 30} fontSize={11} textAnchor="middle" fill="#8a97a8">
+          <text x={W / 2} y={cy + 30} fontSize={11} textAnchor="middle" style={{ fill: "var(--color-faint)" }}>
             {`${fmtNum(bar)} ${unit} bar`}
           </text>
         )}
