@@ -10,7 +10,10 @@ const ctx = await browser.newContext({ ...devices["Pixel 7"] });
 const page = await ctx.newPage();
 const fail = [];
 const scan = async (where) => {
-  await page.waitForTimeout(400); // let entry animations settle before checking contrast
+  // Let entry animations finish before checking contrast: a card still fading in reads as low contrast.
+  // A fixed wait was too short on slow CI machines. Looping animations are left alone.
+  await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {}))));
+  await page.waitForTimeout(100);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
     fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(", ")}`);
