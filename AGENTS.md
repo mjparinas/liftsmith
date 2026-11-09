@@ -90,6 +90,9 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 - **Screen readers:** the rest timer is a `timer`; a polite live region says when rest starts, at ten seconds left and when rest is over (not every second). Sheets are modal dialogs labelled by their title.
 - **Forced colours** (Windows High Contrast): cards and buttons keep an edge, the focus ring uses `Highlight`, and the recovery map keeps its colours (`.keep-colours`).
 - **Quick, one-handed input (Melvin, 2026-11-09: "the less manual typing the better"):** every screen should be fast to adjust in the gym. Prefer steppers with bump buttons, sliders, toggles and chips over text fields, and offer typing only as a fallback. Design for one hand, and respect left- or right-handed use.
+  - Every − / + bump (`Bump` in `ui.tsx`) **repeats while held**, faster the longer it's held; a keyboard or screen reader click steps once.
+  - Numbers a lifter would type use **`BumpField`** (− box +, typing still works): body weight in setup, Settings and the weigh-in on Progress and Body and photos, age and known lifts in setup, and bar weights in Gyms. An empty box bumps from a sensible start (the last weigh-in, 30 years, a common bar). New number inputs use it too.
+  - **One-handed controls** (Settings › Accessibility: Off, Right hand, Left hand; `profile.a11y.hand`): during a workout the weight and rep bumps move down into a dock beside Log set, with Log set under that hand's thumb; the big numbers stay on the set card. Off by default.
 - Every new screen gets an axe scan in the a11y run, and every new colour is a token that passes `a11y.test.ts`.
 
 ### Today screen (Melvin, 2026-11-09)

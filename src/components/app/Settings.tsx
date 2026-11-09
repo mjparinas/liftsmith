@@ -6,7 +6,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useEffect, useState } from "react";
-import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type TextSize } from "@/lib/a11y";
+import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
@@ -18,7 +18,7 @@ import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
-import { Button, Chip, Section } from "./ui";
+import { BumpField, Button, Chip, Section } from "./ui";
 
 function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
@@ -70,7 +70,7 @@ export function Settings() {
         <p className="mt-2 text-xs text-faint">Weights, body weight and stats show in this unit. Each gym keeps its own plates in kg or lb (change it under Gym), and the workout shows both when they differ.</p>
       </Section>
       <Section title={`Body weight (${profile.unit})`}>
-        <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
+        <BumpField label="Body weight" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(v) => setProfile({ bodyweight: toKg(Number(v) || 0, profile.unit) })} step={profile.unit === "lb" ? 1 : 0.5} start={fromKg(profile.bodyweight, profile.unit)} min={1} />
       </Section>
       <Row<string> label="Sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <Row<string> label="Vibration" value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
@@ -126,6 +126,8 @@ function AccessibilitySettings() {
   const set = (p: Partial<typeof a>) => setProfile({ a11y: { ...a, ...p } });
   return (
     <div id="accessibility">
+      <Row<Hand> label="One-handed controls" value={a.hand} onPick={(hand) => set({ hand })} options={[["off", "Off"], ["right", "Right hand"], ["left", "Left hand"]]} />
+      <p className="mt-2 px-1 text-xs text-faint">During a workout, the weight and rep buttons move down next to Log set, with Log set under the thumb of the hand holding the phone. Hold a + or − button to keep changing.</p>
       <Row<TextSize> label="Text size" value={a.text} onPick={(text) => set({ text })} options={TEXT_SIZES} />
       <p className="mt-2 px-1 text-xs text-faint">Match my phone follows the text size in your phone&apos;s settings. Every screen reflows to fit larger text.</p>
       <Row<Colours> label="Colours" value={a.colours} onPick={(colours) => set({ colours })} options={[["standard", "Standard"], ["cvd", "Colour-blind safe"]]} />

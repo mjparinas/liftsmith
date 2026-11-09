@@ -128,9 +128,9 @@ describe("colour tokens", () => {
 
 describe("accessibility settings", () => {
   it("cleans unknown values to the defaults", () => {
-    expect(cleanA11y(undefined)).toEqual({ text: "system", colours: "standard", contrast: "system" });
-    expect(cleanA11y({ text: "999", colours: "pink", contrast: "max" })).toEqual({ text: "system", colours: "standard", contrast: "system" });
-    expect(cleanA11y({ text: "130", colours: "cvd", contrast: "more" })).toEqual({ text: "130", colours: "cvd", contrast: "more" });
+    expect(cleanA11y(undefined)).toEqual({ text: "system", colours: "standard", contrast: "system", hand: "off" });
+    expect(cleanA11y({ text: "999", colours: "pink", contrast: "max" })).toEqual({ text: "system", colours: "standard", contrast: "system", hand: "off" });
+    expect(cleanA11y({ text: "130", colours: "cvd", contrast: "more", hand: "left" })).toEqual({ text: "130", colours: "cvd", contrast: "more", hand: "left" });
   });
 
   it("follows the phone's text size within limits", () => {
@@ -147,7 +147,7 @@ describe("accessibility settings", () => {
     expect(root.style.fontSize).toBe("130%");
     expect(root.dataset.cvd).toBe("on");
     expect(root.dataset.contrast).toBe("more");
-    expect(savedA11y()).toEqual({ text: "130", colours: "cvd", contrast: "more" });
+    expect(savedA11y()).toEqual({ text: "130", colours: "cvd", contrast: "more", hand: "off" });
     applyA11y(undefined);
     expect(root.style.fontSize).toBe("");
     expect(root.dataset.cvd).toBeUndefined();
