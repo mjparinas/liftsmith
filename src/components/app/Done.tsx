@@ -18,6 +18,8 @@ import { Button } from "./ui";
 import { DoneMoments, lean } from "./Extras";
 import { PrReplayButton } from "./PrReplay";
 import { doneCue, say, voice } from "@/lib/voice";
+import { doneItems } from "@/lib/routines";
+import { SaveDoneAsRoutine } from "./Routines";
 
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
@@ -207,6 +209,7 @@ export function Done() {
 
       <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>Share this workout</Button>
       {shared && <p className="mt-2 text-sm text-muted" role="status">{shared}</p>}
+      <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>Done</Button>
       <button type="button" onClick={() => go("achievements")} className="press mt-3 text-sm text-muted underline">See all achievements</button>
     </div>

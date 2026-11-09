@@ -37,6 +37,8 @@ export interface Plan {
   call: Call;
   challenge: boolean;
   items: PlanItem[];
+  /** Set when the plan is a saved routine instead of the adaptive plan (routines.ts). */
+  routineId?: string;
 }
 
 export interface GenerateInput {
