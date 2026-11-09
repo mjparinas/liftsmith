@@ -72,11 +72,21 @@ export function newlyUnlocked(seen: readonly string[], c: UnlockContext): Theme[
 
 export const APP_ICONS = THEMES.filter((t) => t.icon).map((t) => ({ id: t.icon!, theme: t }));
 
-/** Sets the palette on the page. Call applyAccent (cosmetics) after this so a picked accent wins. */
-export function applyTheme(t: Theme) {
+/**
+ * Sets the palette on the page. Call applyAccent (cosmetics) after this so a picked accent wins.
+ * Earned palettes are dark. On a light screen (Settings › Appearance) only the accent carries over,
+ * darkened so text in it keeps its contrast, and the light surfaces from globals.css stay.
+ */
+export function applyTheme(t: Theme, light = false) {
   if (typeof document === "undefined") return;
   const s = document.documentElement.style;
   const p = t.palette;
+  if (light) {
+    for (const k of ["--color-bg", "--color-surface", "--color-raised", "--color-line", "--color-accent-ink"]) s.removeProperty(k);
+    if (t.id === "midnight") s.removeProperty("--color-accent");
+    else s.setProperty("--color-accent", `color-mix(in srgb, ${p.accent} 60%, #000)`);
+    return;
+  }
   s.setProperty("--color-bg", p.bg);
   s.setProperty("--color-surface", p.surface);
   s.setProperty("--color-raised", p.raised);

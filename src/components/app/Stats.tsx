@@ -24,8 +24,8 @@ function Spark({ points }: { points: number[] }) {
     <svg width={w} height={h} aria-hidden>
       <defs>
         <linearGradient id="spark" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#5b9cff" stopOpacity="0.35" />
-          <stop offset="1" stopColor="#5b9cff" stopOpacity="0" />
+          <stop offset="0" style={{ stopColor: "var(--grad-a)", stopOpacity: 0.35 }} />
+          <stop offset="1" style={{ stopColor: "var(--grad-a)", stopOpacity: 0 }} />
         </linearGradient>
       </defs>
       <path d={`${d} L${w},${h} L0,${h} Z`} fill="url(#spark)" stroke="none" />

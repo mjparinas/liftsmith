@@ -11,8 +11,9 @@ import { Chip, Section } from "./ui";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
-export const TIER_COLOUR: Record<Tier, string> = { bronze: "#c98a55", silver: "#c3ccd8", gold: "#f2c14e", platinum: "#9be7ff" };
-const RARITY_COLOUR = { common: "#8a97a8", rare: "#4c8dff", epic: "#a78bfa", legendary: "#f2c14e" } as const;
+// CSS variables (globals.css), so each has a dark and a light value.
+export const TIER_COLOUR: Record<Tier, string> = { bronze: "var(--tier-bronze)", silver: "var(--tier-silver)", gold: "var(--tier-gold)", platinum: "var(--tier-platinum)" };
+export const RARITY_COLOUR = { common: "var(--rarity-common)", rare: "var(--rarity-rare)", epic: "var(--rarity-epic)", legendary: "var(--rarity-legendary)" } as const;
 
 export function useGame(): Game {
   const { events, stats, profile } = useApp();
@@ -28,7 +29,7 @@ export function Badge({ a, size = 56 }: { a: Pick<Achievement, "icon" | "tier" |
     <span
       aria-hidden
       className="grid shrink-0 place-items-center rounded-full"
-      style={{ width: size, height: size, fontSize: size * 0.46, background: a.tier ? `radial-gradient(circle at 35% 30%, ${c}55, ${c}14 70%)` : "var(--color-raised)", boxShadow: `inset 0 0 0 3px ${c}`, filter: a.tier || a.hidden ? undefined : "grayscale(1)", opacity: a.tier ? 1 : 0.55 }}
+      style={{ width: size, height: size, fontSize: size * 0.46, background: a.tier ? `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${c} 33%, transparent), color-mix(in srgb, ${c} 8%, transparent) 70%)` : "var(--color-raised)", boxShadow: `inset 0 0 0 3px ${c}`, filter: a.tier || a.hidden ? undefined : "grayscale(1)", opacity: a.tier ? 1 : 0.55 }}
     >
       {a.icon}
     </span>
