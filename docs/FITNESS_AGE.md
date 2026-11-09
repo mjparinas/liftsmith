@@ -1,6 +1,6 @@
 # Health and fitness age: options and recommendation
 
-Status: **proposed, waiting for Melvin's pick** (2026-11-09). Nothing is built yet. Whatever is picked ships on Android, iOS and the web app in one change.
+Status: **decided and built** (2026-11-09). Melvin picked option 1, fitness age from VO₂ max. It ships on Android, iOS and the web app in one change; see AGENTS.md "Fitness age" for how it's built.
 
 Question (Melvin, 2026-11-09): can the data we already have estimate how healthy someone is, or how fast they're ageing, using current research, without diagnosing anything and without becoming a medical device for the FDA or Health Canada?
 
@@ -73,7 +73,7 @@ Out of reach: we have no blood or DNA samples, and Health Connect and HealthKit 
 - Free to view, like the rest of the health twin.
 - Engine: a pure function in `src/lib/fitnessAge.ts` (HUNT reference values by sex, interpolated by age; range from the reading's error band; needs a VO₂ max from the last 120 days and an age), tested in node. The card in `HealthTwin.tsx`, a glossary entry, and text in `en.ts`, `es.ts`, `fr.ts`.
 - No native code: VO₂ max already arrives through `health.ts` on Android and iOS, so both apps get it from the same build. The web app shows the card with "On your phone", like the other health-store metrics.
-- Before building, check the HUNT reference values' exact published form (tables or regression) and cite them in the code.
+- Reference values: Loe et al. 2013, Table 2 (HUNT 3 Fitness Study means by sex and ten-year age group), cited in `fitnessAge.ts`. The range uses a reading 8% higher or lower, the middle of the reported watch error.
 
 Later, if many lifters have no VO₂ max: the non-exercise estimate (option 2) with an optional waist input, clearly labelled.
 

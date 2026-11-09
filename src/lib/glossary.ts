@@ -9,7 +9,7 @@ import { t } from "./i18n";
 const TERMS = [
   "deloadWeeks", "deload", "rir", "rpe", "blockWeek", "readiness", "call", "volume", "e1rm", "weeklySets",
   "variety", "recovery", "superset", "warmup", "firstWeights", "healthTwin", "hrv", "restingHr",
-  "breathingRate", "vo2max", "leanMass", "bmi", "restDrop",
+  "breathingRate", "vo2max", "leanMass", "bmi", "restDrop", "fitnessAge",
 ] as const;
 
 export type Term = (typeof TERMS)[number];

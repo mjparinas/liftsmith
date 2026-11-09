@@ -63,6 +63,11 @@ try {
       await page.getByRole("dialog").waitFor();
       await scan("body health detail");
       await page.keyboard.press("Escape");
+      // Fitness age and how it's worked out.
+      await page.getByTestId("fitness-age").getByRole("button", { name: "How is this worked out?" }).click();
+      await page.getByRole("dialog").waitFor();
+      await scan("fitness age how");
+      await page.keyboard.press("Escape");
       await page.getByTestId("body-muscles").click();
     }
   }
