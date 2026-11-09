@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { playLinkWithCode } from "@/lib/creatorCode";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
 
 // Google Play and App Store badges in the stores' standard black style. Until a listing exists
@@ -56,11 +57,13 @@ function Badge({ href, store, small, big, logo, cta }: { href: string | null; st
 }
 
 /** `place` names where the badges sit, so the beacon counts each placement separately. */
-export function StoreBadges({ className = "", webLink = true, place }: { className?: string; webLink?: boolean; place: string }) {
+export function StoreBadges({ className = "", webLink = true, place, code }: { className?: string; webLink?: boolean; place: string; code?: string }) {
   const soon = !STORE_LINKS.googlePlay || !STORE_LINKS.appStore;
+  // A creator's code rides through the Play install as its referrer (src/lib/creator.ts).
+  const play = STORE_LINKS.googlePlay && code ? playLinkWithCode(STORE_LINKS.googlePlay, code) : STORE_LINKS.googlePlay;
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
-      <Badge href={STORE_LINKS.googlePlay} store="Google Play" small="GET IT ON" big="Google Play" logo={<PlayLogo />} cta={`google-play-${place}`} />
+      <Badge href={play} store="Google Play" small="GET IT ON" big="Google Play" logo={<PlayLogo />} cta={`google-play-${place}`} />
       <Badge href={STORE_LINKS.appStore} store="App Store" small="Download on the" big="App Store" logo={<AppleLogo />} cta={`app-store-${place}`} />
       {webLink && soon && (
         <Link href={APP_PATH} className="text-sm font-semibold text-accent underline-offset-4 hover:underline" data-cta={`open-app-${place}`}>

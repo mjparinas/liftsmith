@@ -26,6 +26,7 @@ import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
 import { Pro } from "./Pro";
 import { startBilling, useBilling } from "@/lib/billing";
+import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { Settings } from "./Settings";
 import { TrainingSettings } from "./TrainingSettings";
 import { Injuries } from "./Injuries";
@@ -102,7 +103,12 @@ export function App() {
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();
-    const online = () => void flushFeedback();
+    // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
+    void startCreator();
+    const online = () => {
+      void flushFeedback();
+      if (useCreator.getState().claim?.status === "pending") void sendClaim();
+    };
     window.addEventListener("online", online);
     void init();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");

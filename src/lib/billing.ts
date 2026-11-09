@@ -12,6 +12,7 @@
 // advertising id), so store server notifications land on the same install in the admin panel.
 import { create } from "zustand";
 import { installId, platformStore, track } from "./analytics";
+import { activeCode, CREATOR_OFFERING, creatorHooks } from "./creator";
 import { flag } from "./flags";
 import { isNative } from "./juice";
 import type { ProState } from "./messages";
@@ -187,6 +188,7 @@ export async function startBilling(): Promise<void> {
     await Purchases.addCustomerInfoUpdateListener((info) => setEnt(entFromInfo(info as never)));
     const { customerInfo } = await Purchases.getCustomerInfo();
     setEnt(entFromInfo(customerInfo as never));
+    await tagCreator(activeCode());
     await loadOffers();
   } catch {
     // Offline or the store isn't reachable: keep the cached answer, and try again on the next open.
@@ -194,11 +196,31 @@ export async function startBilling(): Promise<void> {
   }
 }
 
-/** The plans for sale, annual first. The trialDays flag (7 or 14) picks a "trial7" offering when one exists. */
+/** Tells RevenueCat which creator code this subscriber came with, so the store webhook carries it (creator.ts). */
+async function tagCreator(code: string | null): Promise<void> {
+  if (!sdk) return;
+  try {
+    await sdk.setAttributes({ creator_code: code });
+  } catch {
+    // Sent again on the next open.
+  }
+}
+
+// When a code is checked or removed, the attribute and the offers follow.
+creatorHooks.onChecked = (code) => {
+  void tagCreator(code).then(() => loadOffers()).catch(() => {});
+};
+
+/** Which offering to sell from: a creator code's 30-day trial first, then the trialDays A/B ("trial7"), then the default. */
+export function pickOffering<O>(all: Record<string, O>, current: O | null, code: string | null, trialDays: number): O | null {
+  return (code ? all[CREATOR_OFFERING] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;
+}
+
+/** The plans for sale, annual first. */
 export async function loadOffers(): Promise<Offer[] | null> {
   if (!sdk) return null;
   const all = await sdk.getOfferings();
-  const offering = (flag("trialDays") === 7 && all.all["trial7"]) || all.current;
+  const offering = pickOffering(all.all, all.current, activeCode(), flag("trialDays"));
   if (!offering) return null;
   packages = { annual: offering.annual ?? undefined, monthly: offering.monthly ?? undefined };
   // iOS knows whether this Apple ID already used the trial; Android only offers a trial to people who can get it.

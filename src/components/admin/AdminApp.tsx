@@ -3,6 +3,7 @@
 // each area, tiles for the headline numbers and charts below. Sign-in is an emailed one-time link.
 import { useEffect, useState } from "react";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
+import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -10,7 +11,7 @@ type Data = Metrics & { staff: Staff };
 type Install = { id: string; firstSeen: number; lastSeen: number; platform: string; store: string | null; appVersion: string | null; device: string | null; os: string | null; country: string | null; locale: string | null; source: string | null; test: boolean; events: number; workouts: number };
 type Audit = { id: number; at: number; admin: string; action: string; target: string | null };
 
-const TABS = ["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Installs"] as const;
+const TABS = ["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue", "Creators", "Installs"] as const;
 type Tab = (typeof TABS)[number];
 const PERIODS = [7, 28, 90, 365] as const;
 const STORE_LABEL: Record<string, string> = { play: "Google Play", appstore: "App Store", web: "Web", other: "Other", android: "Android", ios: "iOS" };
@@ -116,6 +117,123 @@ function Installs({ admin }: { admin: boolean }) {
       </Card>
       <Card title="Audit log" subtitle="Every sign-in and change made in the panel.">
         <Table columns={["When", "Who", "What", "Target"]} rows={data.audit.map((a) => [when(a.at), a.admin, a.action, a.target ?? ""])} empty="No changes yet." />
+      </Card>
+    </div>
+  );
+}
+
+const blank = { code: "", name: "", contact: "", rate: "30", months: "12", note: "", active: true };
+
+/** The creator program (AGENTS.md "Marketing and growth"): who's in it, what their codes brought in, and what they're owed. */
+function Creators({ admin, days }: { admin: boolean; days: number }) {
+  const [data, setData] = useState<{ rows: CreatorRow[]; payouts: Payout[] } | null>(null);
+  const [version, setVersion] = useState(0);
+  const [form, setForm] = useState(blank);
+  const [msg, setMsg] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    fetch(`/api/admin/creators/?days=${days}`)
+      .then(async (r) => {
+        if (r.ok && live) setData(await r.json());
+      })
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [version, days]);
+  const post = async (body: unknown) => {
+    const r = await fetch("/api/admin/creators/", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const j = (await r.json().catch(() => ({}))) as { error?: string };
+    setMsg(r.ok ? "Saved." : (j.error ?? "Something went wrong."));
+    if (r.ok) setVersion((v) => v + 1);
+    return r.ok;
+  };
+  const save = async () => {
+    if (await post({ action: "save", ...form, rate: Number(form.rate) / 100, months: Number(form.months) })) setForm(blank);
+  };
+  const edit = (c: CreatorRow) => setForm({ code: c.code, name: c.name, contact: c.contact ?? "", rate: String(Math.round(c.rate * 1000) / 10), months: String(c.months), note: c.note ?? "", active: c.active });
+  const pay = async (c: CreatorRow) => {
+    const amount = window.prompt(`Record a payout to ${c.name}. Amount paid in USD (owed: ${fmtUsd(c.owed, 2)}):`, c.owed.toFixed(2));
+    if (!amount) return;
+    const note = window.prompt("Note (PayPal or Wise reference), optional:") ?? "";
+    await post({ action: "payout", code: c.code, usd: Number(amount), note });
+  };
+  if (!data) return <p className="text-muted">Loading…</p>;
+  const rows = data.rows;
+  const sum = (f: (r: CreatorRow) => number) => rows.reduce((t, r) => t + f(r), 0);
+  const field = (label: string, key: keyof typeof blank, hint?: string) => (
+    <label className="block text-sm">
+      <span className="text-xs text-muted">{label}</span>
+      <input
+        value={String(form[key])}
+        onChange={(e) => setForm({ ...form, [key]: e.target.value })}
+        placeholder={hint}
+        className="card mt-1 w-full px-3 py-2"
+      />
+    </label>
+  );
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Tile label="Creators" value={fmtInt(rows.filter((r) => r.active).length)} sub={`${rows.length} in all`} />
+        <Tile label={`Code sign-ups, ${days} days`} value={fmtInt(sum((r) => r.signupsPeriod))} sub={`${fmtInt(sum((r) => r.signups))} all time`} />
+        <Tile label="Paying subscribers" value={fmtInt(sum((r) => r.paying))} sub={`${fmtInt(sum((r) => r.trials))} trials`} />
+        <Tile label="Commission earned" value={fmtUsd(sum((r) => r.earned), 2)} sub={`${fmtUsd(sum((r) => r.paid), 2)} paid`} />
+        <Tile label="Owed now" value={fmtUsd(sum((r) => Math.max(0, r.owed)), 2)} sub={`${rows.filter((r) => r.payable).length} ready to pay`} />
+      </div>
+      <Card
+        title="Creators"
+        subtitle={`Commission is the rate times our net revenue (the store price less its ${Math.round(STORE_FEE * 100)}% fee) for each subscriber's first months after their first payment. Revenue counts once it's ${HOLD_DAYS} days old, so refunds can't be paid out; a refund takes its share back. Pay monthly once someone is owed ${fmtUsd(MIN_PAYOUT)} or more.`}
+        right={<a className="text-xs text-accent underline" href="/api/admin/creators/?format=csv">Payout list (CSV)</a>}
+      >
+        <Table
+          columns={["Code", "Name", "Terms", "Sign-ups", "Trials", "Paying", "Refunds", "Gross", "Earned", "Paid", "Owed", "Last paid", ""]}
+          empty="No creators yet. Add the first one below."
+          rows={rows.map((r) => [
+            <code key="c" className="text-xs">{r.code}</code>,
+            <span key="n">{r.name}{!r.active && <span className="ml-1 text-xs text-muted">(paused)</span>}</span>,
+            `${Math.round(r.rate * 100)}% · ${r.months} mo`,
+            fmtInt(r.signups),
+            fmtInt(r.trials),
+            fmtInt(r.paying),
+            fmtInt(r.refunds),
+            fmtUsd(r.gross, 2),
+            fmtUsd(r.earned, 2),
+            fmtUsd(r.paid, 2),
+            <span key="o" className={r.payable ? "font-semibold text-good" : ""}>{fmtUsd(r.owed, 2)}</span>,
+            r.lastPayout ? when(r.lastPayout) : "—",
+            admin ? (
+              <span key="a" className="flex gap-2 text-xs">
+                <button type="button" className="text-accent underline" onClick={() => edit(r)}>Edit</button>
+                {r.owed > 0 && <button type="button" className="text-accent underline" onClick={() => void pay(r)}>Record payout</button>}
+              </span>
+            ) : "",
+          ])}
+        />
+      </Card>
+      {admin && (
+        <Card title={form.code && rows.some((r) => r.code === form.code.toUpperCase()) ? `Edit ${form.code.toUpperCase()}` : "Add a creator"} subtitle="Their link is www.getliftsmith.com/c/<code>. Followers get a 30-day Pro trial through the creator30 offering.">
+          <div className="grid gap-3 md:grid-cols-3">
+            {field("Code", "code", "LIFT-ALEX")}
+            {field("Name or handle", "name", "@alexlifts")}
+            {field("Contact (email or handle)", "contact")}
+            {field("Commission %", "rate")}
+            {field("Months per subscriber", "months")}
+            {field("Note", "note", "Agreement signed 2026-11-09")}
+          </div>
+          <label className="mt-3 flex items-center gap-2 text-sm">
+            <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
+            Active (a paused code stops working for new sign-ups; existing subscribers still earn)
+          </label>
+          <div className="mt-3 flex gap-3">
+            <button type="button" onClick={() => void save()} className="press rounded-xl bg-accent px-4 py-2 font-semibold text-accent-ink">Save creator</button>
+            <button type="button" onClick={() => setForm(blank)} className="press rounded-xl px-4 py-2 text-muted">Clear</button>
+          </div>
+          {msg && <p role="status" className="mt-2 text-sm text-muted">{msg}</p>}
+        </Card>
+      )}
+      <Card title="Payouts" subtitle="Recorded after paying by PayPal or Wise.">
+        <Table columns={["When", "Code", "Amount", "By", "Note"]} rows={data.payouts.map((p) => [when(p.paidAt), p.code, fmtUsd(p.usd, 2), p.admin, p.note ?? ""])} empty="No payouts yet." />
       </Card>
     </div>
   );
@@ -340,6 +458,7 @@ export function AdminApp() {
           </>
         )}
 
+        {tab === "Creators" && <Creators admin={data.staff.role === "admin"} days={days} />}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} />}
       </div>
     </div>
