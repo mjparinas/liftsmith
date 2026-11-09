@@ -200,7 +200,12 @@ export interface Profile {
   blockStart: number;
   /** Weeks of build before the deload week. */
   blockWeeks: number;
+  /** App sounds, including the rest-over chime (Settings › Sounds). */
   restSounds: boolean;
+  /** Vibration on taps and at the end of rest. Missing means on. */
+  haptics?: boolean;
+  /** The daily quote on Today (Melvin, 2026-11-09). Missing means on. */
+  quotes?: boolean;
   /**
    * Cycle-aware readiness (Melvin, 2026-11-09). Opt-in with its own consent screen; consentAt is when
    * the lifter agreed. Cycle data stays on the device (and the user's own sync), never in analytics or
@@ -219,6 +224,14 @@ export interface Profile {
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
   cosmetics?: { accent?: string; sound?: string; plates?: string };
   /**
+   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
+   * Health Connect has neither, so the app asks on every platform.
+   */
+  birthYear?: number;
+  sex?: "male" | "female";
+  /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
+  knownMaxes?: Partial<Record<string, number>>;
+  /**
    * Reminders and lifecycle messages (messages.ts). Each type is on or off per channel; missing means
    * the default (Pro offers off, the rest on). Email needs an address and a confirmed opt-in.
    */
@@ -228,8 +241,35 @@ export interface Profile {
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
+  /** Appearance: dark (default), light, or follow the system (theme.ts). */
+  theme?: "dark" | "light" | "system";
+  /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
+  delight?: DelightPrefs;
   onboarded: boolean;
   updatedAt: number;
+}
+
+export interface DelightPrefs {
+  /** Spoken cues between sets. Off by default. */
+  voice?: boolean;
+  /** Race last time's pace on the rest timer. On unless turned off. */
+  ghost?: boolean;
+  /** Show only the plates to add or take off between sets. On unless turned off. */
+  plateMemory?: boolean;
+  /** A breathing guide or a mini-game on the rest timer. Off by default. */
+  restExtra?: "breathe" | "game" | "off";
+  /** Earned theme picked in Settings (themes.ts). */
+  theme?: string;
+  /** Earned app icon picked in Settings (native only). */
+  icon?: string;
+  /** Themes the lifter has already been told about, for the "new theme" moment. */
+  seenThemes?: string[];
+  /** Strength score adjusted for age (needs a birth year). On unless turned off. */
+  ageAdjust?: boolean;
+  /** Gym buddies for check-ins: names only, kept on the device and in the user's own sync. */
+  buddies?: { id: string; name: string }[];
+  /** Moments already shown on Today, so each appears once. */
+  seenMoments?: string[];
 }
 
 // --- Events: everything that happens is appended, and every stat is derived from them. ---
@@ -335,6 +375,33 @@ export interface CycleEvent extends EventBase {
   day: number;
 }
 
+/** A body weight weigh-in (progress photos screen). Kilograms. */
+export interface BodyweightEvent extends EventBase {
+  type: "bodyweight";
+  kg: number;
+}
+
+/**
+ * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
+ * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
+ */
+export interface CheckinEvent extends EventBase {
+  type: "checkin";
+  gymId?: string;
+  buddies: string[];
+}
+
+/** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
+export interface WarmupEvent extends EventBase {
+  type: "warmup";
+  sessionId: string;
+  exerciseId: string;
+  /** Kilograms, per hand for dumbbells. */
+  weight: number;
+  reps: number;
+}
+
+
 // --- Injury mode (Melvin, 2026-11-09; injury.ts). Kept on the device, never in analytics or reports. ---
 
 export const BODY_PARTS = ["neck", "shoulder", "elbow", "wrist", "chest", "upperBack", "lowerBack", "abs", "hip", "groin", "quad", "hamstring", "knee", "calf", "ankle"] as const;
@@ -364,4 +431,4 @@ export interface InjuryHealedEvent extends EventBase {
   injuryId: string;
 }
 
-export type AppEvent = SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;
+export type AppEvent = BodyweightEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent;

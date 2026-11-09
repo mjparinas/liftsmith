@@ -28,11 +28,12 @@ describe("shortcuts", () => {
   it("logs a set and adds rest only during a workout", () => {
     expect(runShortcut("log")).toBe("today");
     expect(runShortcut("add30")).toBe("today");
-    expect(useApp.getState().events.some((e) => e.type === "set")).toBe(false);
+    expect(useApp.getState().events.some((e) => e.type === "set" || e.type === "warmup")).toBe(false);
 
     runShortcut("start");
     expect(runShortcut("log")).toBe("workout");
-    expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
+    // The first set of the day is usually a warm-up; either way exactly one set is logged.
+    expect(useApp.getState().events.filter((e) => e.type === "set" || e.type === "warmup")).toHaveLength(1);
     const until = useApp.getState().active!.restUntil!;
     runShortcut("add30");
     expect(useApp.getState().active!.restUntil).toBe(until + 30_000);

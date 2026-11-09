@@ -1,4 +1,5 @@
 import { blockWeek } from "./block";
+import { EXERCISE_BY_ID } from "./exercises";
 import { roundLoad, stepLoad } from "./loads";
 import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent } from "./types";
 
@@ -55,7 +56,54 @@ function lastFeedback(events: readonly AppEvent[], exerciseId: string, sessionId
   return 0;
 }
 
-const LEVEL = { new: 0.7, intermediate: 1, advanced: 1.25 } as const;
+// ---- First-session starting weights (Melvin, 2026-11-09: a 145 lb "experienced" lifter was offered
+// a 175 lb squat). An exercise's `start` is a share of body weight the lifter can do for about 10
+// reps; that gives an estimated one-rep max, scaled down by experience, sex and age, and the first
+// session aims two reps further from failure than the block asks. Known maxes from setup replace the
+// estimate for that lift and its close relatives. The first logged session then recalibrates.
+
+/** Share of the table estimate by experience. Conservative: self-reported experience runs high. */
+export const LEVEL = { new: 0.55, intermediate: 0.8, advanced: 1 } as const;
+/** Extra reps in reserve for a first session. */
+export const FIRST_RIR = 2;
+/** Lifts that can be entered in setup, by the movement pattern they stand in for. */
+export const KNOWN_LIFTS = { squat: "back-squat", hpush: "bench-press", hinge: "deadlift", vpush: "overhead-press" } as const;
+
+const UPPER = new Set(["chest", "frontDelts", "sideDelts", "rearDelts", "biceps", "triceps", "forearms", "lats", "upperBack", "traps"]);
+
+/** Strength relative to the table, by sex: unknown sits between the two. */
+export function sexFactor(ex: Exercise, sex: Profile["sex"]): number {
+  const upper = ex.primary.some((m) => UPPER.has(m));
+  if (sex === "male") return 1;
+  if (sex === "female") return upper ? 0.6 : 0.75;
+  return upper ? 0.8 : 0.88;
+}
+
+export function ageFactor(birthYear: number | undefined, now: number): number {
+  if (!birthYear) return 1;
+  const age = new Date(now).getFullYear() - birthYear;
+  if (age < 18) return 0.8;
+  if (age < 40) return 1;
+  if (age < 50) return 0.92;
+  if (age < 60) return 0.84;
+  if (age < 70) return 0.75;
+  return 0.65;
+}
+
+/** Estimated one-rep max (kg, per hand for dumbbells) for a lift the lifter has never logged. */
+export function startE1rm(ex: Exercise, profile: Profile, now: number): number {
+  const ref = KNOWN_LIFTS[ex.pattern as keyof typeof KNOWN_LIFTS];
+  const known = ref ? profile.knownMaxes?.[ref] : undefined;
+  if (known && known > 0) {
+    if (ex.id === ref) return known;
+    const refEx = EXERCISE_BY_ID.get(ref);
+    // A relative of an entered lift (front squat from back squat, dumbbell press from bench):
+    // scale by the two `start` shares, with a margin because the ratio is rough.
+    if (refEx && refEx.start > 0) return known * (ex.start / refEx.start) * 0.85;
+  }
+  const tenRm = ex.start * profile.bodyweight;
+  return epley(tenRm, 10) * LEVEL[profile.experience] * sexFactor(ex, profile.sex) * ageFactor(profile.birthYear, now);
+}
 
 export function target(ex: Exercise, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Target {
   const wk = blockWeek(profile, now);
@@ -79,10 +127,10 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
   }
 
   if (!last) {
-    const start = ex.start * profile.bodyweight * LEVEL[profile.experience];
-    const e1 = epley(start, 8, 2);
+    const e1 = startE1rm(ex, profile, now);
     const reps = lo;
-    return { weight: roundLoad(weightFor(e1, reps, rir), ex, gym).kg, reps, rir, note: "First time: a cautious start" };
+    const known = !!profile.knownMaxes?.[KNOWN_LIFTS[ex.pattern as keyof typeof KNOWN_LIFTS]];
+    return { weight: roundLoad(weightFor(e1, reps, rir + FIRST_RIR), ex, gym).kg, reps, rir, note: known ? "First time: from the numbers you entered" : "First time: a cautious start, adjust if it's light" };
   }
 
   const lastWeight = Math.max(...last.map((s) => s.weight));
@@ -90,6 +138,18 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
   const allHit = last.every((s) => s.reps >= s.targetReps);
   const bigMiss = last.some((s) => s.reps <= s.targetReps - 2);
   const fb = lastFeedback(events, ex.id, last[0].sessionId);
+
+  // After the first session, if it showed the cautious start was light (felt too easy, two or more
+  // reps over target, or the lifter raised the weight), jump to what the logged sets show instead of
+  // one step at a time. Capped at +25% to stay safe.
+  const light = fb > 0 || last.some((s) => s.reps >= s.targetReps + 2 || (s.targetWeight !== undefined && s.weight > s.targetWeight + 1e-6));
+  if (past.length === 1 && light && !wk.deload && !bigMiss && fb >= 0) {
+    // The first session aimed FIRST_RIR further from failure: "too easy" means that margin was real.
+    const extra = fb > 0 ? FIRST_RIR : 0;
+    const shown = Math.max(...last.map((s) => epley(s.weight, s.reps, s.rir + extra)));
+    const w = roundLoad(Math.min(weightFor(shown, lo, rir), lastWeight * 1.25), ex, gym).kg;
+    if (w > stepLoad(lastWeight, 1, ex, gym) + 1e-6) return { weight: w, reps: lo, rir, note: "Calibrated from your first session" };
+  }
 
   if (wk.deload) {
     const w = roundLoad(lastWeight * 0.9, ex, gym).kg;

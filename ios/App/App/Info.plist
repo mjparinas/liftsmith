@@ -64,6 +64,8 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>Take progress photos. They stay on this phone and are never uploaded.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
@@ -84,7 +86,7 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.liftsmith.app.shortcuts</string>
+			<string>com.getliftsmith.app.shortcuts</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>liftsmith</string>

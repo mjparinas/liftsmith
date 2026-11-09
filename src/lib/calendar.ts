@@ -62,7 +62,7 @@ export function trainingIcs(p: Pick<CalendarPrefs, "days" | "time">, minutes: nu
     "PRODID:-//Liftsmith//Training days//EN",
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
-    `UID:training-${now}@liftsmith.app`,
+    `UID:training-${now}@getliftsmith.com`,
     `DTSTAMP:${icsUtc(now)}`,
     `DTSTART:${icsLocal(start)}`,
     `DTEND:${icsLocal(start + minutes * MIN)}`,

@@ -13,7 +13,7 @@ const scan = async (where) => {
   await page.waitForTimeout(400); // let entry animations settle before checking contrast
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
-    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(", ")}`);
+    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ") + (process.env.A11Y_DETAIL ? ` [${n.any?.[0]?.message}] ${n.html.slice(0, 160)}` : "")).join(", ")}`);
   }
 };
 try {
@@ -24,19 +24,36 @@ try {
   await onboard(page);
   await scan("today");
   await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log set/ }).waitFor();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("workout");
-  await page.getByRole("button", { name: /Log set/ }).click();
+  // Skip the warm-ups so the saved workout has a working set.
+  const skipWarm = page.getByRole("button", { name: "Skip warm-up" });
+  if (await skipWarm.isVisible()) await skipWarm.click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   await scan("rest");
+  await page.getByRole("button", { name: "Plate math" }).click();
+  await scan("rest plate math");
+  await page.getByRole("button", { name: "Breathe" }).click();
+  await scan("rest breathing");
   await page.getByRole("button", { name: "End" }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
   await page.getByRole("button", { name: "Done", exact: true }).click();
+  await page.getByRole("button", { name: "🔥 Warm up first" }).click();
+  await scan("warm-up");
+  await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
-    await page.getByRole("button", { name: tab }).click();
+    await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);
   }
+  // Delightful extras: recap and body/photos.
+  await page.goto(`${server.url}/app/#/recap`);
+  await page.getByRole("heading", { level: 1 }).waitFor();
+  await scan("recap");
+  await page.goto(`${server.url}/app/#/photos`);
+  await page.getByRole("heading", { name: "Body and photos" }).waitFor();
+  await scan("photos");
   // The web dashboard and a share link, with the workout just saved.
   await page.goto(`${server.url}/me/`);
   await page.getByRole("heading", { name: /training/ }).waitFor();
@@ -71,6 +88,27 @@ try {
   await page.getByRole("button", { name: "Send", exact: true }).click();
   await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
   await scan("feedback sent");
+  // Light mode: every main screen again, so the light tokens pass contrast too.
+  await page.goto(`${server.url}/app/#/settings`);
+  await page.getByRole("button", { name: "Light", exact: true }).click();
+  await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
+  await scan("light settings");
+  await page.getByRole("button", { name: "‹ Today" }).click();
+  await scan("light today");
+  for (const tab of ["Recovery", "Progress", "Awards", "Gyms"]) {
+    await page.getByRole("button", { name: tab }).click();
+    await scan(`light ${tab}`);
+  }
+  await page.getByRole("button", { name: "Today" }).click();
+  await page.getByRole("button", { name: "Start workout" }).click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
+  await scan("light workout");
+  await page.goto(`${server.url}/me/`);
+  await page.getByRole("heading", { name: /training/ }).waitFor();
+  for (const tab of ["Overview", "Lifts"]) {
+    await page.getByRole("link", { name: tab, exact: true }).click();
+    await scan(`light dashboard ${tab}`);
+  }
 } catch (e) {
   fail.push(String(e));
 }

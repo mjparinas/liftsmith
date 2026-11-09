@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Liftsmith</string>
     <string name="title_activity_main">Liftsmith</string>
-    <string name="package_name">com.liftsmith.app</string>
-    <string name="custom_url_scheme">com.liftsmith.app</string>
+    <string name="package_name">com.getliftsmith.app</string>
+    <string name="custom_url_scheme">com.getliftsmith.app</string>
     <string name="shortcut_start_short">Start workout</string>
     <string name="shortcut_start_long">Start today\'s workout</string>
     <string name="shortcut_log_short">Log set</string>

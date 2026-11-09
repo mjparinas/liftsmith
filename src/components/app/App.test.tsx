@@ -57,8 +57,20 @@ describe("first run to finished workout", () => {
     expect(plan.items.length).toBeGreaterThan(2);
 
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Warm-ups first, each logged as its own event with a short rest after it.
+    const warmups = plan.items[0].warmup ?? [];
+    for (let i = 0; i < warmups.length; i++) {
+      expect(await screen.findByText(new RegExp(`Warm-up ${i + 1} of ${warmups.length}`))).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /Log warm-up/ }));
+      await user.click(screen.getByRole("button", { name: "Skip rest" }));
+    }
+    expect(useApp.getState().events.filter((e) => e.type === "warmup")).toHaveLength(warmups.length);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
+    // every exercise shows its demo, and tapping it opens the how-to with full demo controls
+    await user.click(screen.getByRole("button", { name: "How to ›" }));
+    expect(await screen.findByRole("button", { name: "Skeleton" })).toBeInTheDocument();
+    await user.click(screen.getByRole("dialog").parentElement!); // tap outside the sheet
 
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     expect(await screen.findByText("Rest")).toBeInTheDocument();
@@ -81,6 +93,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     const before = useApp.getState().active!;
     await user.click(screen.getByRole("button", { name: "More reps" }));
     await user.click(screen.getByRole("button", { name: /Log set/ }));
@@ -125,6 +139,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     const id = useApp.getState().active!.sessionId;
     cleanup();
@@ -134,6 +150,33 @@ describe("first run to finished workout", () => {
     });
     expect(useApp.getState().active?.sessionId).toBe(id);
     expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
+  });
+
+  it("setup asks for a name, Today greets with it, and the daily quote can be turned off", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await screen.findByText("What are you training for?");
+    await user.type(screen.getByLabelText("What should we call you?"), "Melvin Parinas");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
+    await screen.findByText("Today's workout");
+    expect(useApp.getState().profile.name).toBe("Melvin Parinas");
+    expect(screen.getByText(/^Good (morning|afternoon|evening), Melvin$/)).toBeInTheDocument();
+    expect(screen.getByRole("figure", { name: "Quote of the day" })).toBeInTheDocument();
+    act(() => useApp.getState().setProfile({ quotes: false }));
+    expect(screen.queryByRole("figure", { name: "Quote of the day" })).not.toBeInTheDocument();
+  });
+});
+
+describe("greeting", () => {
+  it("uses the time of day and the first name only", async () => {
+    const { greeting } = await import("./Today");
+    expect(greeting(8, "")).toBe("Good morning");
+    expect(greeting(14, "  ")).toBe("Good afternoon");
+    expect(greeting(20, "Melvin Parinas")).toBe("Good evening, Melvin");
+    expect(greeting(2, "Sam")).toBe("Good evening, Sam");
   });
 });
 
@@ -178,6 +221,8 @@ describe("injury mode", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = await screen.findByRole("button", { name: /Skip warm-up|Log set/ });
+    if (/Skip warm-up/.test(skip.textContent ?? "")) await user.click(skip);
     await user.click(await screen.findByRole("button", { name: /Log set/ }));
     const { affects } = await import("@/lib/injury");
     const { exercise } = await import("@/lib/exercises");
@@ -195,6 +240,9 @@ describe("game layer", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Warm-ups don't earn XP or badges, so go straight to a working set.
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     await user.click(await screen.findByRole("button", { name: /Log set/ }));
     await user.click(screen.getByRole("button", { name: "End" }));
     await user.click(screen.getByRole("button", { name: "Finish and save" }));
