@@ -2,7 +2,10 @@
 import { stopSession } from "@/lib/sessionNotify";
 import { useApp } from "@/lib/store";
 import { useEffect } from "react";
+import { installDiag } from "@/lib/diag";
+import { flushFeedback } from "@/lib/feedback";
 import { Done } from "./Done";
+import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
 import { Onboarding } from "./Onboarding";
 import { Recovery } from "./Recovery";
@@ -23,8 +26,14 @@ export function App() {
   const { ready, init, profile, active } = useApp();
   const { route } = useRoute();
   useEffect(() => {
+    installDiag();
+    // Feedback written offline goes out as soon as there's a connection.
+    void flushFeedback();
+    const online = () => void flushFeedback();
+    window.addEventListener("online", online);
     void init();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
+    return () => window.removeEventListener("online", online);
   }, [init]);
   // A workout left running ends itself a few hours after the last set (checked each minute and on open).
   useEffect(() => {
@@ -53,8 +62,8 @@ export function App() {
   if (!ready) return <div className="grid min-h-dvh place-items-center text-muted">Loading…</div>;
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun /> }[route];
-  const showNav = route !== "workout" && route !== "done" && route !== "setup";
+  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback /> }[route];
+  const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback";
   if (route === "setup") return screen;
   return (
     <>
