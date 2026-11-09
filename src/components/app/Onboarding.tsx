@@ -100,6 +100,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     setPrefilled(true);
     const h = await readHints();
     if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
+    // Height isn't asked in setup, but TDEE (Tools) uses it, so keep it when Health has it.
+    if (h.height && h.height >= 100 && h.height <= 250) setProfile({ heightCm: Math.round(h.height) });
     setHealthNote(h.bodyweight ? "Filled in from your health data." : "Connected. No recent weight found, so enter it below.");
   };
 

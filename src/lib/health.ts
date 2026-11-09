@@ -57,6 +57,35 @@ export async function readHints(): Promise<HealthHints> {
   return { bodyweight, height: height !== undefined && height < 3 ? height * 100 : height, restingHr };
 }
 
+export interface BodyReading {
+  value: number;
+  /** When it was measured (ms). */
+  at: number;
+}
+
+/** The newest weight (kg), height (cm) and body fat (percent), with when each was measured, for TDEE autofill. */
+export async function readBody(): Promise<{ weight?: BodyReading; height?: BodyReading; bodyFat?: BodyReading }> {
+  if (!(await healthAvailable())) return {};
+  const one = async (dataType: (typeof READ)[number], days: number): Promise<BodyReading | undefined> => {
+    try {
+      const { Health } = await health();
+      const startDate = new Date(Date.now() - days * 86_400_000).toISOString();
+      const s = (await Health.readSamples({ dataType, startDate, limit: 1, ascending: false })).samples[0];
+      const at = s ? Date.parse(s.endDate || s.startDate) : NaN;
+      return s && Number.isFinite(s.value) && Number.isFinite(at) ? { value: s.value, at } : undefined;
+    } catch {
+      return undefined; // Not allowed yet, or the store is unavailable.
+    }
+  };
+  const [weight, height, bodyFat] = await Promise.all([one("weight", 365), one("height", 3650), one("bodyFat", 90)]);
+  return {
+    weight,
+    // Height can arrive in metres, body fat as a fraction (HealthKit's percent unit is 0 to 1).
+    height: height && { ...height, value: height.value < 3 ? height.value * 100 : height.value },
+    bodyFat: bodyFat && { ...bodyFat, value: bodyFat.value <= 1 ? bodyFat.value * 100 : bodyFat.value },
+  };
+}
+
 /** Rough active calories for resistance training: about 5 METs. */
 export function strengthKcal(seconds: number, bodyweightKg: number): number {
   return Math.round(5 * bodyweightKg * (seconds / 3600));

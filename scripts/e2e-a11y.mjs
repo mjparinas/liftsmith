@@ -79,6 +79,17 @@ try {
   await page.getByRole("button", { name: "Start this program" }).click();
   await page.getByText(/Tiered progression · Day 1/).waitFor();
   await scan("today on a program");
+  // Tools › TDEE, filled in with bump buttons, and the public calculator page.
+  await page.goto(`${server.url}/app/#/tools/tdee`);
+  await page.getByRole("heading", { name: "TDEE calculator" }).waitFor();
+  await page.getByRole("button", { name: "Male", exact: true }).click();
+  await page.getByRole("button", { name: "More age" }).click();
+  await page.getByRole("button", { name: "More height" }).click();
+  await page.getByTestId("tdee-value").waitFor();
+  await scan("tdee");
+  await page.goto(`${server.url}/tools/tdee-calculator/`);
+  await page.getByTestId("tdee-value").waitFor();
+  await scan("tdee public page");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();
