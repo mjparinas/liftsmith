@@ -12,11 +12,13 @@ const fail = [];
 const scan = async (where) => {
   // Let entry animations finish before checking contrast: a card still fading in reads as low contrast.
   // A fixed wait was too short on slow CI machines. Looping animations are left alone.
+  // Wait a moment first so animations started by the click have begun, then for them to finish.
+  await page.waitForTimeout(300);
   await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {}))));
   await page.waitForTimeout(100);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
   for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
-    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ")).join(", ")}`);
+    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ") + (process.env.A11Y_DETAIL ? ` [${n.any?.[0]?.message}] ${n.html.slice(0, 160)}` : "")).join(", ")}`);
   }
 };
 try {
