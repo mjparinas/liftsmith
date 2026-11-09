@@ -10,6 +10,7 @@ import { fmtNum } from "@/lib/units";
 import { useState } from "react";
 import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 import { BuyNext } from "./BuyNext";
+import { t } from "@/lib/i18n";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -22,47 +23,47 @@ export function Gym() {
 
   return (
     <div className="pb-24">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">Gyms</h1>
+      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("gym.title")}</h1>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>{g.name}</Chip>
         ))}
-        <Chip onClick={() => setAdding(true)}>+ Add gym</Chip>
+        <Chip onClick={() => setAdding(true)}>{t("gym.add")}</Chip>
       </div>
 
-      <Section title="Name">
-        <input value={gym.name} onChange={(e) => update({ name: e.target.value })} className="card w-full px-4 py-3" aria-label="Gym name" />
+      <Section title={t("gym.name")}>
+        <input value={gym.name} onChange={(e) => update({ name: e.target.value })} className="card w-full px-4 py-3" aria-label={t("gym.nameLabel")} />
       </Section>
 
-      <Section title="This gym's plates are in">
+      <Section title={t("gym.unit")}>
         <div className="flex flex-wrap gap-2">
-          {(["kg", "lb"] as const).map((u) => <Chip key={u} active={gym.unit === u} onClick={() => saveGym(switchGymUnit(gym, u))}>{u === "kg" ? "Kilograms" : "Pounds"}</Chip>)}
+          {(["kg", "lb"] as const).map((u) => <Chip key={u} active={gym.unit === u} onClick={() => saveGym(switchGymUnit(gym, u))}>{t(u === "kg" ? "gym.unit.kg" : "gym.unit.lb")}</Chip>)}
         </div>
-        <p className="mt-2 text-xs text-faint">Switching swaps the plates, bars and dumbbells below for a standard {gym.unit === "kg" ? "pound" : "kilogram"} set, which you can then edit. Your workout history stays as it is.</p>
+        <p className="mt-2 text-xs text-faint">{t(gym.unit === "kg" ? "gym.unit.noteLb" : "gym.unit.noteKg")}</p>
       </Section>
 
-      <Section title="Pick this gym when I'm here">
+      <Section title={t("gym.place")}>
         {gym.place ? (
           <div className="card flex items-center justify-between gap-3 p-4">
-            <p className="text-sm text-muted">On. Opening the app near here switches to {gym.name}.</p>
-            <Button kind="quiet" onClick={() => update({ place: undefined })}>Turn off</Button>
+            <p className="text-sm text-muted">{t("gym.place.on", { name: gym.name })}</p>
+            <Button kind="quiet" onClick={() => update({ place: undefined })}>{t("gym.place.off")}</Button>
           </div>
         ) : (
           <>
             <Button kind="ghost" className="w-full" onClick={async () => {
               setPlaceNote(null);
               const fix = await locate();
-              if (!fix) return setPlaceNote("Location is off or not allowed. You can allow approximate location in your phone's settings.");
+              if (!fix) return setPlaceNote(t("gym.place.denied"));
               update({ place: { lat: roundPlace(fix.lat), lon: roundPlace(fix.lon), radiusM: DEFAULT_RADIUS_M } });
               setPlaceNote(null);
-            }}>Use where I am now</Button>
-            <p className="mt-2 text-xs text-faint">Optional. Uses approximate location only when the app opens, never in the background, and it stays on your phone.</p>
+            }}>{t("gym.place.use")}</Button>
+            <p className="mt-2 text-xs text-faint">{t("gym.place.note")}</p>
           </>
         )}
         {placeNote && <p className="mt-2 text-sm text-warn">{placeNote}</p>}
       </Section>
 
-      <Section title="Equipment">
+      <Section title={t("gym.equipment")}>
         <div className="card space-y-4 p-4">
           {EQUIPMENT_GROUPS.map((grp) => (
             <div key={grp.title}>
@@ -79,11 +80,11 @@ export function Gym() {
               </div>
             </div>
           ))}
-          <p className="text-sm text-muted">Bodyweight exercises are always included.</p>
+          <p className="text-sm text-muted">{t("gym.bodyweight")}</p>
         </div>
       </Section>
 
-      <Section title={`Plates you own (${gym.unit})`}>
+      <Section title={t("gym.plates", { unit: gym.unit })}>
         <div className="card p-4">
           <ul className="space-y-2">
             {gym.plates.map((p, i) => {
@@ -92,45 +93,45 @@ export function Gym() {
                 <li key={p.weight} className="flex items-center gap-3">
                   <span className="grid h-9 w-9 place-items-center rounded-lg text-xs font-bold" style={{ background: st.fill, color: st.text }}>{fmtNum(p.weight)}</span>
                   <span className="flex-1 text-sm text-muted">{fmtNum(p.weight)} {gym.unit}</span>
-                  <button type="button" aria-label={`Fewer ${p.weight} plates`} className="press h-9 w-9 rounded-full border border-line bg-raised" onClick={() => { haptic("tick"); update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 2) } : x)) }); }}>−</button>
-                  <span className="num w-10 text-center font-semibold">{p.count}</span>
-                  <button type="button" aria-label={`More ${p.weight} plates`} className="press h-9 w-9 rounded-full border border-line bg-raised" onClick={() => { haptic("tick"); update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: x.count + 2 } : x)) }); }}>+</button>
+                  <button type="button" aria-label={t("gym.plates.fewer", { weight: fmtNum(p.weight) })} className="press h-9 w-9 rounded-full border border-line bg-raised" onClick={() => { haptic("tick"); update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 2) } : x)) }); }}>−</button>
+                  <span className="num w-10 text-center font-semibold">{fmtNum(p.count)}</span>
+                  <button type="button" aria-label={t("gym.plates.more", { weight: fmtNum(p.weight) })} className="press h-9 w-9 rounded-full border border-line bg-raised" onClick={() => { haptic("tick"); update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: x.count + 2 } : x)) }); }}>+</button>
                 </li>
               );
             })}
           </ul>
           <div className="mt-4 border-t border-line pt-4">
             <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 text-sm">
-              <span className="text-muted">Try a weight</span>
-              <BumpField label="Test weight" value={String(testKg)} onChange={(v) => setTestKg(Number(v) || 0)} step={gym.unit === "lb" ? 5 : 2.5} start={testKg} max={1000} className="w-44 max-w-full" />
+              <span className="text-muted">{t("gym.try")}</span>
+              <BumpField label={t("gym.tryLabel")} value={String(testKg)} onChange={(v) => setTestKg(Number(v) || 0)} step={gym.unit === "lb" ? 5 : 2.5} start={testKg} max={1000} className="w-44 max-w-full" />
             </div>
             <PlateBar loading={loadBar(testKg, gym.bars[0]?.weight ?? 20, gym.plates)} bar={gym.bars[0]?.weight ?? 20} unit={gym.unit} />
           </div>
         </div>
       </Section>
 
-      <Section title="Bars">
+      <Section title={t("gym.bars")}>
         <ul className="card divide-y divide-line">
           {gym.bars.map((b, i) => (
             <li key={b.id} className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3">
               <span>{b.name}</span>
-              <BumpField label={`${b.name} weight`} value={String(b.weight)} onChange={(v) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(v) || 0 } : x)) })} step={gym.unit === "lb" ? 1 : 0.5} start={b.weight} max={100} className="w-44 max-w-full" />
+              <BumpField label={t("gym.barWeight", { name: b.name })} value={String(b.weight)} onChange={(v) => update({ bars: gym.bars.map((x, j) => (j === i ? { ...x, weight: Number(v) || 0 } : x)) })} step={gym.unit === "lb" ? 1 : 0.5} start={b.weight} max={100} className="w-44 max-w-full" />
             </li>
           ))}
         </ul>
       </Section>
 
-      <Section title={`Dumbbells (${gym.unit}, each)`}>
+      <Section title={t("gym.dumbbells", { unit: gym.unit })}>
         <div className="card p-4 text-sm text-muted">
-          {gym.dumbbells.length ? `${fmtNum(gym.dumbbells[0])} to ${fmtNum(gym.dumbbells.at(-1)!)} ${gym.unit}, ${gym.dumbbells.length} pairs` : "None"}
+          {gym.dumbbells.length ? t("gym.dumbbells.range", { from: fmtNum(gym.dumbbells[0]), to: fmtNum(gym.dumbbells.at(-1)!), unit: gym.unit, count: gym.dumbbells.length }) : t("gym.dumbbells.none")}
         </div>
       </Section>
 
       <BuyNext gym={gym} />
 
-      {gyms.length > 1 && <Button kind="danger" className="mt-6 w-full" onClick={() => removeGym(gym.id)}>Remove this gym</Button>}
+      {gyms.length > 1 && <Button kind="danger" className="mt-6 w-full" onClick={() => removeGym(gym.id)}>{t("gym.remove")}</Button>}
 
-      <Sheet open={adding} onClose={() => setAdding(false)} title="Add a gym">
+      <Sheet open={adding} onClose={() => setAdding(false)} title={t("gym.addTitle")}>
         <div className="grid grid-cols-2 gap-3">
           {PRESETS.map((p) => (
             <button key={p.id} type="button" className="press card p-4 text-left" onClick={() => { const id = addGym(p.id as GymPreset); setProfile({ activeGymId: id }); setAdding(false); }}>

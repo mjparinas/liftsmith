@@ -4,7 +4,7 @@ import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 import { currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, type Message } from "./i18n";
 import { fmtNum, plainNum } from "./units";
-import { MUSCLE_LABEL } from "./types";
+import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, MUSCLE_LABEL } from "./types";
 import { bandOf } from "./recovery";
 
 const holes = (m: Message) => [...new Set(Object.values(typeof m === "string" ? { m } : m).flatMap((s) => [...s!.matchAll(/\{(\w+)\}/g)].map((x) => x[1])))].sort();
@@ -76,6 +76,8 @@ describe("language", () => {
     expect(Object.keys(MUSCLE_LABEL)).toContain("hamstrings");
     setLanguage("es");
     expect(MUSCLE_LABEL.hamstrings).toBe("Isquiotibiales");
+    expect(EQUIPMENT_LABEL.bench).toBe("Banco plano");
+    expect(EQUIPMENT_GROUPS[2].title).toBe("Máquinas");
     expect(t("done.prs", { count: 2 })).toBe("¡2 récords nuevos!");
   });
 });
