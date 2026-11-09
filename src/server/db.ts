@@ -128,6 +128,64 @@ const SCHEMA = [
     admin TEXT NOT NULL,
     note TEXT
   )`,
+  // Accounts (src/server/accounts.ts): optional, for sync. One account per person; each sign-in method
+  // (Google, Apple, an emailed code) is an identity on it. Accounts with the same verified email are one account.
+  `CREATE TABLE IF NOT EXISTS accounts (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    created_at INTEGER NOT NULL,
+    last_seen INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS accounts_email ON accounts (email)`,
+  `CREATE TABLE IF NOT EXISTS account_identities (
+    provider TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    email TEXT,
+    created_at INTEGER NOT NULL,
+    apple_refresh TEXT,
+    PRIMARY KEY (provider, subject)
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_identities_account ON account_identities (account_id)`,
+  // Sessions: only a hash of the token is stored. The token lives on the device.
+  `CREATE TABLE IF NOT EXISTS account_sessions (
+    token_hash TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    last_seen INTEGER NOT NULL,
+    platform TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_sessions_account ON account_sessions (account_id)`,
+  // Email sign-in codes: a hash of the code, tries left, and how many were sent today.
+  `CREATE TABLE IF NOT EXISTS account_codes (
+    email TEXT PRIMARY KEY,
+    code_hash TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    tries INTEGER NOT NULL DEFAULT 0,
+    sent INTEGER NOT NULL DEFAULT 0,
+    window_start INTEGER NOT NULL
+  )`,
+  // Sync (src/server/sync.ts): every event the lifter's devices wrote, in arrival order (seq is the cursor).
+  // A deleted event stays as a tombstone (body NULL) so other devices delete it too.
+  `CREATE TABLE IF NOT EXISTS sync_events (
+    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    body TEXT,
+    session TEXT,
+    UNIQUE (account_id, id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS sync_events_account_seq ON sync_events (account_id, seq)`,
+  // The profile and each gym, last write wins on updated_at. A removed gym keeps a row with body NULL.
+  `CREATE TABLE IF NOT EXISTS sync_records (
+    account_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    body TEXT,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, key)
+  )`,
   // Admin sign-in: one-time email links and sessions. Only hashes of the tokens are stored.
   `CREATE TABLE IF NOT EXISTS admin_links (
     token_hash TEXT PRIMARY KEY,

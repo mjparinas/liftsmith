@@ -32,6 +32,7 @@
 		D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
 		DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC786AFE3663E4C12B2D909 /* Foundation.framework */; };
 		A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000007 /* InstallInfoPlugin.swift */; };
+		A1F5E00A0000000000000001 /* AccountSignInPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E00A0000000000000002 /* AccountSignInPlugin.swift */; };
 		D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E1A0010000000000000002 /* DelightPlugins.swift */; };
 		A1F5E0010000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */; };
 		C1A0B0010000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0010000000000000002 /* InfoPlist.strings */; };
@@ -82,6 +83,7 @@
 		A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WorkoutSessionPlugin.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000005 /* ShortcutIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShortcutIntents.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000007 /* InstallInfoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstallInfoPlugin.swift; sourceTree = "<group>"; };
+		A1F5E00A0000000000000002 /* AccountSignInPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccountSignInPlugin.swift; sourceTree = "<group>"; };
 		D3E1A0010000000000000002 /* DelightPlugins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelightPlugins.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A1F5E0010000000000000003 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
@@ -147,6 +149,7 @@
 				A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */,
 				A1F5E0010000000000000005 /* ShortcutIntents.swift */,
 				A1F5E0010000000000000007 /* InstallInfoPlugin.swift */,
+				A1F5E00A0000000000000002 /* AccountSignInPlugin.swift */,
 				D3E1A0010000000000000002 /* DelightPlugins.swift */,
 				A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */,
 				A1F5E0010000000000000003 /* App.entitlements */,
@@ -336,6 +339,7 @@
 				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
 				D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */,
 				A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */,
+				A1F5E00A0000000000000001 /* AccountSignInPlugin.swift in Sources */,
 				D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

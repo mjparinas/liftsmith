@@ -21,7 +21,8 @@ import { notifyPermission } from "@/lib/sessionNotify";
 import { keepStorage } from "@/lib/saving";
 import { SaveStep } from "./Saving";
 import { go } from "./router";
-import { BumpField, Button } from "./ui";
+import { BumpField, Button, Sheet } from "./ui";
+import { AccountPanel } from "./Account";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
@@ -76,6 +77,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // The store's own trial length for this person (null once they've used a trial), else the flag's.
   const offers = useBilling((b) => b.offers);
   const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
+  const [signIn, setSignIn] = useState(false);
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [hrBusy, setHrBusy] = useState(false);
@@ -167,6 +169,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">{t("setup.name.title")}</label>
             <p className="text-sm text-muted">{t("setup.name.note")}</p>
             <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder={t("setup.name.placeholder")} maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
+            {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
+            {!rerun && <Button kind="quiet" className="mt-6 w-full" onClick={() => setSignIn(true)}>{t("account.setup")}</Button>}
+            <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
+              <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
+              <AccountPanel onSignedIn={() => setSignIn(false)} />
+            </Sheet>
           </>
         )}
         {step === 1 && (

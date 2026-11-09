@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
 import { mergeBackup, type Backup } from "./backup";
+import { signOut } from "./auth";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
 import { weekStart } from "./block";
@@ -186,6 +187,8 @@ interface State {
   importWorkouts(evs: AppEvent[]): number;
   /** Restores a full backup file (backup.ts): its profile comes back, its gyms and events are added. Returns the events added. */
   restoreBackup(b: Backup): number;
+  /** Applies what sync pulled from the lifter's other devices (sync.ts). Written locally without queueing it back. */
+  applySynced(p: { events: AppEvent[]; deleted: string[]; profile: Profile | null; gyms: Gym[] | null }): void;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
   reset(): Promise<void>;
@@ -885,12 +888,37 @@ export const useApp = create<State>((set, get) => {
       return fresh.length;
     },
 
+    applySynced({ events: incoming, deleted, profile, gyms }) {
+      const have = new Set(get().events.map((e) => e.id));
+      const gone = new Set(deleted.filter((id) => have.has(id)));
+      const fresh = incoming.filter((e) => !have.has(e.id) && !gone.has(e.id));
+      if (fresh.length || gone.size) {
+        registerCustom(fresh);
+        const events = [...get().events.filter((e) => !gone.has(e.id)), ...fresh].sort((a, b) => a.at - b.at);
+        set({ events, stats: derive(events, Date.now()) });
+        if (fresh.length) void appendEvents(fresh, { remote: true });
+        if (gone.size) void deleteEvents([...gone], { remote: true });
+      }
+      if (gyms) {
+        set({ gyms });
+        void saveRecord("gyms", gyms, { remote: true });
+      }
+      if (profile) {
+        setWeekStart(profile.training?.weekStart);
+        set({ profile, stats: derive(get().events, Date.now()) });
+        void saveRecord("profile", profile, { remote: true });
+      }
+      if (fresh.length || gone.size || gyms || profile) get().replan();
+    },
+
     checkin(buddies) {
       commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
       track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
     },
 
     async reset() {
+      // Erasing the device signs it out (the account and its synced copy stay).
+      void signOut();
       await eraseAll();
       persistActive(null);
       forgetAnalytics();

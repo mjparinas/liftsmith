@@ -1,4 +1,5 @@
 import { registerCustom } from "./exercises";
+import { noteChanged, noteDeleted, noteEvents } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
 
 // Offline storage: events in IndexedDB (append-only), profile and gyms as last-write-wins records.
@@ -57,10 +58,13 @@ export async function load(): Promise<Snapshot> {
   return { events: sorted, profile: profile ?? null, gyms: gyms ?? [] };
 }
 
-export async function appendEvents(events: AppEvent[]): Promise<void> {
+/** `remote`: the events came from sync, so they aren't queued to be pushed back. */
+export async function appendEvents(events: AppEvent[], opts: { remote?: boolean } = {}): Promise<void> {
+  if (!opts.remote) noteEvents(events.map((e) => e.id));
   const db = await open();
   if (!db) {
-    memory.events.push(...events);
+    const have = new Set(events.map((e) => e.id));
+    memory.events = [...memory.events.filter((e) => !have.has(e.id)), ...events];
     return;
   }
   await tx(db, "events", "readwrite", (s) => {
@@ -68,7 +72,8 @@ export async function appendEvents(events: AppEvent[]): Promise<void> {
   });
 }
 
-export async function deleteEvents(ids: string[]): Promise<void> {
+export async function deleteEvents(ids: string[], opts: { remote?: boolean } = {}): Promise<void> {
+  if (!opts.remote) noteDeleted(ids);
   const db = await open();
   if (!db) {
     memory.events = memory.events.filter((e) => !ids.includes(e.id));
@@ -79,7 +84,8 @@ export async function deleteEvents(ids: string[]): Promise<void> {
   });
 }
 
-export async function saveRecord(key: "profile" | "gyms", value: unknown): Promise<void> {
+export async function saveRecord(key: "profile" | "gyms", value: unknown, opts: { remote?: boolean } = {}): Promise<void> {
+  if (!opts.remote) noteChanged();
   const db = await open();
   if (!db) {
     (memory as unknown as Record<string, unknown>)[key] = value;
