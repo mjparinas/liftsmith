@@ -36,7 +36,7 @@ export function Settings() {
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ Today</button>
-      <h1 className="text-2xl font-bold">Settings</h1>
+      <h1 className="text-[28px] font-extrabold tracking-tight">Settings</h1>
       <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>Run setup again</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
@@ -52,7 +52,9 @@ export function Settings() {
       <Section title={`Body weight (${profile.unit})`}>
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>
-      <Row<string> label="Rest timer sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <Row<string> label="Sounds" value={profile.restSounds ? "on" : "off"} onPick={(v) => setProfile({ restSounds: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <Row<string> label="Vibration" value={profile.haptics === false ? "off" : "on"} onPick={(v) => setProfile({ haptics: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
+      <Row<string> label="Daily quote on Today" value={profile.quotes === false ? "off" : "on"} onPick={(v) => setProfile({ quotes: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <Section title="Celebrations">
         <div className="flex flex-wrap gap-2">
           <Chip active={!profile.lean} onClick={() => setProfile({ lean: false })}>Full: confetti, sounds, crates</Chip>
