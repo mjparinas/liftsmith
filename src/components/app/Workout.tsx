@@ -22,7 +22,8 @@ import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
 import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
-import { Button, EmptyState, Ring, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
+import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
 import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
@@ -59,6 +60,7 @@ export function Workout() {
   const warming = !!active && warmingUp(active);
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
+  const ssLabel = active && item ? supersetLabel(active.plan.items, active.index) : null;
   const setLabel = warming ? `Warm-up ${warmDone + 1} of ${warmTotal}` : `Set ${Math.min(doneSets + 1, item?.sets ?? 1)} of ${item?.sets ?? 1}`;
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
@@ -201,6 +203,7 @@ export function Workout() {
           <section className="mt-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
+                {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[28px] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
               </div>
@@ -288,12 +291,18 @@ export function Workout() {
           <ol className="card divide-y divide-line/70 overflow-hidden">
             {active.plan.items.slice(active.index + 1).map((it, i) => {
               const e = exercise(it.exerciseId);
+              const at = active.index + 1 + i;
+              const ss = supersetLabel(active.plan.items, at);
               return (
-                <li key={it.exerciseId}>
-                  <button type="button" onClick={() => s.goTo(active.index + 1 + i)} className="press flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
-                    <span className="flex min-w-0 items-center gap-2.5 font-medium"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden /><span className="truncate">{e.name}</span></span>
-                    <span className="num text-sm text-muted">{it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}</span>
+                <li key={it.exerciseId} className={`flex items-center gap-1 pr-2 ${ss ? "bg-accent/5" : ""}`}>
+                  <button type="button" onClick={() => s.goTo(at)} className="press flex min-w-0 flex-1 items-center justify-between gap-3 py-3 pl-4 text-left">
+                    <span className="flex min-w-0 flex-col">
+                      {ss && <span className="truncate text-[11px] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
+                      <span className="flex min-w-0 items-center gap-2.5 font-medium"><span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden /><span className="truncate">{e.name}</span></span>
+                    </span>
+                    <span className="num shrink-0 text-sm text-muted">{it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}</span>
                   </button>
+                  <LinkToggle on={linkedToNext(active.plan.items, at - 1)} first={exercise(active.plan.items[at - 1].exerciseId).name} second={e.name} onToggle={() => s.toggleSuperset(at - 1)} />
                 </li>
               );
             })}

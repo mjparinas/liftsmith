@@ -174,3 +174,22 @@ export function StatTile({ label, value, icon, tint = "var(--color-accent)", cla
     </div>
   );
 }
+
+/** The chain button between two exercises that pairs them as a superset, or splits them. */
+export function LinkToggle({ on, first, second, onToggle }: { on: boolean; first: string; second: string; onToggle: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={() => {
+        haptic("select");
+        sound.tick();
+        onToggle();
+      }}
+      aria-pressed={on}
+      aria-label={on ? `Split ${second} from ${first}` : `Superset ${second} with ${first}`}
+      className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent/50 bg-accent/15 text-accent" : "border-line text-faint hover:text-ink"}`}
+    >
+      <Icon name="link" size={18} />
+    </button>
+  );
+}

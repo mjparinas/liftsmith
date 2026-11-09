@@ -305,6 +305,8 @@ export interface SetEvent extends EventBase {
   hrEnd?: number;
   /** Part of a challenge (e.g. as many reps as possible on the last set). */
   challenge?: boolean;
+  /** Superset group, shared by the exercises done back to back with this one. */
+  superset?: string;
 }
 
 export interface SessionStartEvent extends EventBase {
