@@ -52,6 +52,16 @@ export function App() {
       document.removeEventListener("visibilitychange", check);
     };
   }, [ready]);
+  // Gym by location: once on open and each time the app comes back to the foreground (never on a timer).
+  useEffect(() => {
+    if (!ready) return;
+    const pick = () => {
+      if (document.visibilityState === "visible") void useApp.getState().pickGymByLocation();
+    };
+    pick();
+    document.addEventListener("visibilitychange", pick);
+    return () => document.removeEventListener("visibilitychange", pick);
+  }, [ready]);
   useEffect(() => {
     if (ready && active && route === "today" && sessionStorage.getItem("ls.resumed") !== "1") {
       sessionStorage.setItem("ls.resumed", "1");

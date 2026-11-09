@@ -162,6 +162,11 @@ export interface Gym {
   kettlebells: number[];
   /** Pin-stack step for machines and cables, in the gym's unit. */
   machineStep: number;
+  /**
+   * Opt-in "pick this gym when I'm here" (Melvin, 2026-11-09). Approximate position only, kept on the
+   * device (and in the user's own sync). Rounded to about 100 m when saved.
+   */
+  place?: { lat: number; lon: number; radiusM: number };
   updatedAt: number;
 }
 
