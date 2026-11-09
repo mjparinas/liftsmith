@@ -147,7 +147,6 @@ function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
           <span className="num display text-3xl">{big}</span>
           {v && <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${v.verdict === "younger" ? "border-good/50 text-good" : "border-line text-muted"}`}>{t(`fit.chip.${v.verdict}`)}</span>}
-          <Info term="fitnessAge" />
         </div>
         {v ? (
           <>

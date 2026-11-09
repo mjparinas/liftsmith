@@ -113,7 +113,10 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().events.filter((e) => e.type === "warmup")).toHaveLength(warmups.length);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
-    // every exercise shows its demo, and tapping it opens the how-to with full demo controls
+    // every exercise shows its demo, and tapping it opens the how-to with full demo controls.
+    // One control, one destination: the demo card is the only way in (no info icon beside it).
+    expect(screen.getAllByRole("button", { name: /how to/i })).toHaveLength(1);
+    expect(screen.queryByRole("button", { name: /how to do it/i })).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "How to ›" }));
     expect(await screen.findByRole("button", { name: "Skeleton" })).toBeInTheDocument();
     await user.click(screen.getByRole("dialog").parentElement!); // tap outside the sheet

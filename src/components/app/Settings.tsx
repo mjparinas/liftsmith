@@ -124,7 +124,6 @@ export function Settings() {
           <Chip active={!!profile.lean} onClick={() => setProfile({ lean: true })}>{t("settings.lean")}</Chip>
         </div>
         <p className="mt-2 text-xs text-faint">{t("settings.lean.note")}</p>
-        <Button kind="ghost" className="mt-3 w-full" onClick={() => go("achievements")}>{t("settings.achievements")}</Button>
       </Section>
       <DelightSettings />
       <CalendarSettings />

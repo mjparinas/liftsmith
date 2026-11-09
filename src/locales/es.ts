@@ -35,7 +35,6 @@ export const es: Partial<Record<MessageKey, Message>> = {
   "workout.comingUp": "A continuación",
   "workout.startRest": "Iniciar descanso · {time}",
   "workout.howTo": "Cómo se hace ›",
-  "workout.howToLabel": "Cómo se hace",
   // Coaching helpers on the workout screen (CoachExtras.tsx)
   "coach.why": "¿Por qué?",
   "coach.changePlan": "Cambiar el plan",
@@ -386,7 +385,6 @@ export const es: Partial<Record<MessageKey, Message>> = {
   "settings.full": "Completo: confeti, sonidos, cajas",
   "settings.lean": "Modo sobrio",
   "settings.lean.note": "El modo sobrio quita el confeti, los sonidos de celebración y las animaciones. Los sonidos del temporizador y la vibración siguen. La XP, las rachas y las insignias cuentan igual.",
-  "settings.achievements": "Logros y taquilla",
   "settings.stats": "Estadísticas de uso",
   "settings.stats.on": "Compartir estadísticas anónimas",
   "settings.stats.note": "Pantallas y funciones usadas, modelo del dispositivo, versión de la app y cómo nos encontraste, con un identificador de instalación aleatorio. Nunca tus pesos, tus entrenamientos ni tus datos de salud.",
