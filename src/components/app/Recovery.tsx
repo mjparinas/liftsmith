@@ -1,4 +1,5 @@
 "use client";
+import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { blockWeek, weekStart } from "@/lib/block";
 import { weeklySets } from "@/lib/generator";
@@ -9,7 +10,7 @@ import { Section } from "./ui";
 
 export function Recovery() {
   const { events, profile } = useApp();
-  const now = Date.now();
+  const now = useNow();
   const rec = recovery(events, now);
   const wk = blockWeek(profile, now);
   const done = weeklySets(events, weekStart(profile, now));

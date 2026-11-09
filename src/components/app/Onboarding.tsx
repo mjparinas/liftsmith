@@ -6,6 +6,9 @@ import { useApp } from "@/lib/store";
 import type { Experience, Goal, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { useState } from "react";
+import { connectHeartRate, hrSupported } from "@/lib/heartRate";
+import { notifyPermission } from "@/lib/sessionNotify";
+import { go } from "./router";
 import { Button } from "./ui";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
@@ -28,9 +31,15 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   { id: "advanced", title: "Experienced", blurb: "3 years or more" },
 ];
 
-export function Onboarding() {
-  const { profile, setProfile, addGym } = useApp();
+const STEPS = 4;
+
+/** The setup wizard: first run, and again from Settings ("Run setup again"). */
+export function Onboarding({ rerun = false }: { rerun?: boolean }) {
+  const { profile, setProfile, addGym, gyms } = useApp();
   const [step, setStep] = useState(0);
+  const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
+  const [hr, setHr] = useState<string | null>(null);
+  const [notify, setNotify] = useState<boolean | null>(null);
   const [goal, setGoal] = useState<Goal>(profile.goal);
   const [exp, setExp] = useState<Experience>(profile.experience);
   const [preset, setPreset] = useState<GymPreset>("commercial");
@@ -40,15 +49,16 @@ export function Onboarding() {
 
   const finish = () => {
     setProfile({ unit });
-    const id = addGym(preset);
+    const id = keepGyms ? profile.activeGymId : addGym(preset);
     setProfile({ goal, experience: exp, unit, daysPerWeek: days, bodyweight: toKg(bw, unit), activeGymId: id, onboarded: true });
     haptic("success");
+    if (rerun) go("today");
   };
 
   return (
     <main className="safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="mt-6 flex gap-1.5" aria-hidden>
-        {[0, 1, 2].map((i) => (
+        {Array.from({ length: STEPS }, (_, i) => (
           <div key={i} className={`h-1.5 flex-1 rounded-full ${i <= step ? "bg-accent" : "bg-line"}`} />
         ))}
       </div>
@@ -67,7 +77,8 @@ export function Onboarding() {
             <h1 className="text-3xl font-bold">Where do you train?</h1>
             <p className="mt-2 text-muted">You can fine-tune equipment, plates and add more gyms later.</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              {PRESETS.map((p) => <Tile key={p.id} title={p.name} blurb={p.blurb} active={preset === p.id} onClick={() => setPreset(p.id)} />)}
+              {rerun && gyms.length > 0 && <Tile title="Keep my gyms" blurb={gyms.map((g) => g.name).join(", ")} active={keepGyms} onClick={() => setKeepGyms(true)} />}
+              {PRESETS.map((p) => <Tile key={p.id} title={rerun ? `Add: ${p.name}` : p.name} blurb={p.blurb} active={!keepGyms && preset === p.id} onClick={() => { setKeepGyms(false); setPreset(p.id); }} />)}
             </div>
             <h2 className="mt-8 text-lg font-semibold">Your plates are in</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">
@@ -92,11 +103,40 @@ export function Onboarding() {
             </div>
           </>
         )}
+        {step === 3 && (
+          <>
+            <h1 className="text-3xl font-bold">Stay in the zone</h1>
+            <p className="mt-2 text-muted">Both are optional, and you can change them later in Settings.</p>
+            <div className="mt-6 space-y-3">
+              <Tile
+                title={notify ? "Workout notifications on" : "Turn on workout notifications"}
+                blurb="Rest timer and next set on your lock screen, and an alert when rest is over"
+                active={!!notify}
+                onClick={async () => setNotify(await notifyPermission())}
+              />
+              {hrSupported() && (
+                <Tile
+                  title={hr ? `Heart rate: ${hr}` : "Connect a heart rate monitor"}
+                  blurb="Fitbit Charge 6 or Pixel Watch (turn on heart rate sharing), Polar, Garmin or any Bluetooth strap"
+                  active={!!hr}
+                  onClick={async () => {
+                    try {
+                      const c = await connectHeartRate(() => {}, () => {});
+                      setHr(c.name);
+                      c.disconnect();
+                    } catch {}
+                  }}
+                />
+              )}
+            </div>
+            {notify === false && <p className="mt-3 text-sm text-warn">Notifications are blocked. You can allow them in your phone&apos;s settings.</p>}
+          </>
+        )}
       </div>
       <div className="flex gap-3 pb-2">
-        {step > 0 && <Button kind="ghost" onClick={() => setStep(step - 1)}>Back</Button>}
-        <Button className="flex-1 py-4 text-lg" onClick={() => (step < 2 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
-          {step < 2 ? "Continue" : "Build my first workout"}
+        {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>Back</Button>}
+        <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
+          {step < STEPS - 1 ? "Continue" : rerun ? "Save" : "Build my first workout"}
         </Button>
       </div>
     </main>
