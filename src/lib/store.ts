@@ -7,6 +7,7 @@ import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./locald
 import { target } from "./progression";
 import { exercise } from "./exercises";
 import { setSeconds } from "./generator";
+import { WARMUP_REST, warmupFor } from "./warmup";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readiness, type Call, type Readiness } from "./readiness";
 import type { AppEvent, Gym, Profile, Rating } from "./types";
@@ -38,6 +39,14 @@ export interface Active {
   restStart?: number;
   /** Last time the lifter did anything; a workout idle for AUTO_END_MS ends itself. */
   lastAt: number;
+  /** Warm-up sets done for the exercise on screen (warmup.ts). Missing in workouts saved before warm-ups. */
+  warm?: number;
+}
+
+/** True while the exercise on screen still has warm-up sets to do. */
+export function warmingUp(a: Pick<Active, "plan" | "index" | "warm">): boolean {
+  const w = a.plan.items[a.index]?.warmup?.length ?? 0;
+  return (a.warm ?? 0) < w;
 }
 
 /** A workout left running ends itself this long after the last activity (Melvin, 2026-11-09). */
@@ -84,12 +93,20 @@ interface State {
   adjust(weight: number, reps: number): void;
   addRest(sec: number): void;
   skipRest(): void;
+  /** Skip the rest of the warm-ups and go to the working weight. */
+  skipWarmup(): void;
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
   goTo(index: number): void;
   finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
+  /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
+  setPlan(plan: Plan | null): void;
+  /** Log a weigh-in and make it the profile's body weight. */
+  logBodyweight(kg: number): void;
+  /** Record a gym buddy check-in. */
+  checkin(buddies: string[]): void;
   reset(): Promise<void>;
 }
 
@@ -116,8 +133,12 @@ export const useApp = create<State>((set, get) => {
   const gym = () => get().gyms.find((g) => g.id === get().profile.activeGymId) ?? get().gyms[0];
   const loadItem = (a: Active, index: number): Active => {
     const item = a.plan.items[index];
-    if (!item) return { ...a, index };
-    return { ...a, index, weight: item.target.weight, reps: item.target.reps };
+    if (!item) return { ...a, index, warm: 0 };
+    // Coming back to an exercise that's already started skips its warm-ups.
+    const started = setsDone(get().events, a.sessionId, item.exerciseId) > 0;
+    const warm = started ? (item.warmup?.length ?? 0) : 0;
+    const first = !started && item.warmup?.[0];
+    return { ...a, index, warm, weight: first ? first.weight : item.target.weight, reps: first ? first.reps : item.target.reps };
   };
 
   return {
@@ -249,6 +270,27 @@ export const useApp = create<State>((set, get) => {
       if (!item) return;
       const now = Date.now();
       const ex = exercise(item.exerciseId);
+      if (warmingUp(a)) {
+        // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
+        commit([{ type: "warmup", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps }]);
+        const warm = (a.warm ?? 0) + 1;
+        const nextWarm = item.warmup![warm];
+        const next: Active = {
+          ...a,
+          warm,
+          weight: nextWarm ? nextWarm.weight : item.target.weight,
+          reps: nextWarm ? nextWarm.reps : item.target.reps,
+          lastAt: now,
+          restStart: now,
+          lastRest: undefined,
+          setStart: now,
+          restTotal: WARMUP_REST,
+          restUntil: now + WARMUP_REST * 1000,
+        };
+        set({ active: next });
+        persistActive(next);
+        return;
+      }
       const already = setsDone(get().events, a.sessionId, item.exerciseId);
       // A set takes seconds to a couple of minutes; a longer gap means the lifter rested past the
       // timer, so the duration is left out rather than guessed.
@@ -304,6 +346,15 @@ export const useApp = create<State>((set, get) => {
       persistActive(next);
     },
 
+    skipWarmup() {
+      const a = get().active;
+      if (!a || !warmingUp(a)) return;
+      const item = a.plan.items[a.index];
+      const next: Active = { ...a, warm: item.warmup!.length, weight: item.target.weight, reps: item.target.reps, restUntil: null, setStart: Date.now(), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
     skipRest() {
       const a = get().active;
       if (!a) return;
@@ -331,6 +382,10 @@ export const useApp = create<State>((set, get) => {
       const t = target(exercise(toId), get().events, get().profile, g, Date.now());
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
       const newItem: PlanItem = { ...item, exerciseId: toId, target: t, sets: Math.max(1, item.sets - done) };
+      // The new exercise gets its own warm-ups, unless working sets were already done.
+      const warmed = new Set(a.plan.items.slice(0, a.index).flatMap((i) => exercise(i.exerciseId).primary));
+      const wu = done ? [] : warmupFor(exercise(toId), t.weight, g, warmed);
+      newItem.warmup = wu.length ? wu : undefined;
       const items = [...a.plan.items];
       items[a.index] = newItem;
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
@@ -405,6 +460,23 @@ export const useApp = create<State>((set, get) => {
       set({ active: next });
       // Saved every 15 samples so a crash or a killed app keeps the stream.
       if (!same && hr.length % 15 === 0) persistActive(next);
+    },
+
+    setPlan(plan) {
+      if (get().active) return;
+      if (plan) set({ preview: plan });
+      else get().replan();
+    },
+
+    logBodyweight(kg) {
+      if (!(kg > 0)) return;
+      commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
+      get().setProfile({ bodyweight: kg });
+    },
+
+    checkin(buddies) {
+      commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
+      track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
     },
 
     async reset() {

@@ -18,7 +18,7 @@ try {
   await page.reload();
   check(await page.getByText("Today's workout").isVisible(), "App opens offline", fail);
   await page.getByRole("button", { name: "Start workout" }).click();
-  await page.getByRole("button", { name: /Log set/ }).click();
+  await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   check(await page.getByText("Rest", { exact: true }).isVisible(), "Sets log offline", fail);
 } catch (e) {
   fail.push(String(e));

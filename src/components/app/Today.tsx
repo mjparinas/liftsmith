@@ -1,8 +1,8 @@
 "use client";
+import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { exercise } from "@/lib/exercises";
-import { goalStreak, levelOf, xpTotal } from "@/lib/game";
 import { haptic } from "@/lib/juice";
 import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
@@ -13,25 +13,30 @@ import { useEffect, useMemo, useState } from "react";
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Section } from "./ui";
+import { PlanExtras, TodayMoments } from "./Extras";
+import { useGame } from "./Achievements";
+import { TodayGame } from "./TodayGame";
 
-export function Flame({ weeks }: { weeks: number }) {
+export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-sm font-semibold num" title={`${weeks}-week streak`}>
+    <span className="inline-flex items-center gap-1 rounded-full border border-line bg-surface px-2.5 py-1 text-sm font-semibold num" title={`${weeks}-week streak${freezes ? `, ${freezes} freeze${freezes > 1 ? "s" : ""}` : ""}`}>
       <svg width="14" height="16" viewBox="0 0 14 16" aria-hidden>
         <path d="M7 0c1 3 5 5 5 9a5 5 0 0 1-10 0c0-2 1-3 2-4 0 2 1 3 2 3 0-3-1-5 1-8z" fill={weeks > 0 ? "#ff8a3d" : "#5b6777"} />
       </svg>
       {weeks}
+      {freezes > 0 && <span aria-label={`${freezes} streak freeze${freezes > 1 ? "s" : ""}`}>{" 🧊"}{freezes > 1 ? freezes : ""}</span>}
     </span>
   );
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, stats, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
+  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
-  const streak = goalStreak(stats, profile, now);
-  const lvl = levelOf(xpTotal(stats));
+  const g = useGame();
+  const streak = g.streak;
+  const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
   const hour = new Date().getHours();
   const hello = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
@@ -44,8 +49,8 @@ export function Today() {
           <h1 className="text-2xl font-bold">Today&apos;s workout</h1>
         </div>
         <div className="flex items-center gap-2">
-          <Flame weeks={streak.weeks} />
-          <span className="rounded-full bg-accent/15 px-2.5 py-1 text-sm font-semibold text-accent" title={`${lvl.title}: ${lvl.into} of ${lvl.span} XP to ${lvl.next ?? "max"}`}>Lv {lvl.level}</span>
+          <Flame weeks={streak.weeks} freezes={streak.freezes} />
+          <button type="button" onClick={() => go("achievements")} className="press min-h-9 rounded-full bg-accent/15 px-2.5 py-1 text-sm font-semibold text-accent" title={`${lvl.title}: ${lvl.into} of ${lvl.span} XP to ${lvl.next ?? "max"}`}>Lv {lvl.level}</button>
           <button type="button" aria-label="Settings" onClick={() => go("settings")} className="press grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden><circle cx="12" cy="12" r="3" /><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z" /></svg>
           </button>
@@ -69,6 +74,8 @@ export function Today() {
         )}
         {streak.needed > 0 && <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{streak.needed} more this week for your goal</span>}
       </div>
+
+      <TodayMoments />
 
       {readiness && preview && !active && (
         <section className="card mt-4 p-4" aria-labelledby="call-title">
@@ -101,6 +108,8 @@ export function Today() {
         </section>
       )}
 
+      {!active && <TodayGame />}
+
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <label htmlFor="len" className="text-sm font-medium text-muted">Workout length</label>
@@ -122,6 +131,7 @@ export function Today() {
         <div className="mt-1 flex justify-between text-xs text-faint num"><span>15</span><span>45</span><span>90</span></div>
         <FitAroundCalendar />
       </div>
+      <PlanExtras />
 
       {preview && preview.items.length > 0 ? (
         <>
@@ -136,6 +146,7 @@ export function Today() {
                       <div className="truncate font-medium">{ex.name}</div>
                       <div className="text-sm text-muted num">
                         {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
+                        {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
                     <span className="shrink-0 rounded-full bg-raised px-2 py-0.5 text-xs text-muted">{MUSCLE_LABEL[it.focus]}</span>
