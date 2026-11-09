@@ -93,5 +93,9 @@
 	</array>
 	<key>NSSupportsLiveActivities</key>
 	<true/>
+	<key>NSCalendarsFullAccessUsageDescription</key>
+	<string>Liftsmith adds your training days to your calendar and, if you turn it on, checks when you're busy so it can offer a workout that fits. It only looks at times, never at what your events are.</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>Liftsmith adds your training days to your calendar and, if you turn it on, checks when you're busy so it can offer a workout that fits. It only looks at times, never at what your events are.</string>
 </dict>
 </plist>
