@@ -145,7 +145,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <div className="mt-6 space-y-3">
               <Tile
                 title={notify ? "Workout notifications on" : "Turn on workout notifications"}
-                blurb="Rest timer and next set on your lock screen, and an alert when rest is over"
+                blurb="Rest timer and next set on your lock screen, and a reminder on your training days. Change them in Settings."
                 active={!!notify}
                 onClick={async () => {
                   const ok = await notifyPermission();

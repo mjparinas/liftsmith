@@ -35,7 +35,7 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
   });
   return (
     <div>
-      <div className="overflow-x-auto pb-1">
+      <div className="overflow-x-auto pb-1" tabIndex={0} role="region" aria-label="Training days this year, scrolls sideways">
         <div className="relative inline-grid" role="img" aria-label={summary(grid, days)} style={{ gridTemplateColumns: `28px repeat(${grid.length}, ${cell}px)`, columnGap: gap, rowGap: gap }}>
           <div />
           {grid.map((_, i) => (

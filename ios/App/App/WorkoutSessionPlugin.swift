@@ -31,9 +31,13 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
 
     private let restId = "liftsmith.rest"
     private let category = "liftsmith.workout"
+    /// Capacitor's own notification router, which delivers reminder taps to @capacitor/local-notifications.
+    /// This plugin only handles the workout's own notifications and passes everything else on to it.
+    private weak var next: UNUserNotificationCenterDelegate?
 
     override public func load() {
         let center = UNUserNotificationCenter.current()
+        next = (center.delegate !== self ? center.delegate : nil) ?? (bridge?.notificationRouter as UNUserNotificationCenterDelegate?)
         center.delegate = self
         let log = UNNotificationAction(identifier: "log", title: "Log set", options: [])
         let add = UNNotificationAction(identifier: "add30", title: "+30 s", options: [])
@@ -133,12 +137,22 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         call.resolve()
     }
 
-    // The app plays its own sound and haptic when rest ends in the foreground.
+    private func ours(_ n: UNNotification) -> Bool {
+        n.request.identifier == restId || n.request.content.categoryIdentifier == category
+    }
+
+    // The app plays its own sound and haptic when rest ends in the foreground. Reminders go to Capacitor.
     public func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-        completionHandler([])
+        if ours(notification) { return completionHandler([]) }
+        if let next = next, next.userNotificationCenter?(center, willPresent: notification, withCompletionHandler: completionHandler) != nil { return }
+        completionHandler([.banner, .list])
     }
 
     public func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        if !ours(response.notification) {
+            if let next = next, next.userNotificationCenter?(center, didReceive: response, withCompletionHandler: completionHandler) != nil { return }
+            return completionHandler()
+        }
         let action = response.actionIdentifier
         if action == "log" || action == "add30" {
             notifyListeners("action", data: ["action": action], retainUntilConsumed: true)
