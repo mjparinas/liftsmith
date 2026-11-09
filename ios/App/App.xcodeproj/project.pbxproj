@@ -28,6 +28,7 @@
 		A1F5E0010000000000000004 /* ShortcutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000005 /* ShortcutIntents.swift */; };
 		AF6645131DB97D20C8BEEA68 /* WorkoutLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */; };
 		CCAC65A6C31069F3AFFA6ACC /* LiftsmithWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */; };
+		D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */; };
 		D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
 		DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC786AFE3663E4C12B2D909 /* Foundation.framework */; };
 /* End PBXBuildFile section */
@@ -80,6 +81,7 @@
 		BB05485F3EDA6B8DD896565A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiftsmithWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutActivity.swift; sourceTree = "<group>"; };
+		CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalendarPlugin.swift; sourceTree = "<group>"; };
 		CEC786AFE3663E4C12B2D909 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StartWorkoutControl.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -142,6 +144,7 @@
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -314,6 +317,7 @@
 				A1F5E0010000000000000004 /* ShortcutIntents.swift in Sources */,
 				9632D695CCD0A9D1A115E9B6 /* WorkoutIntents.swift in Sources */,
 				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
+				D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

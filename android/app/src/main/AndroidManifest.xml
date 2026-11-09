@@ -90,4 +90,7 @@
     <!-- Gym by location: approximate only, while the app is open (no background or precise location). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Calendar: write training days, and read busy times (start and end only) when the lifter turns it on. -->
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
 </manifest>
