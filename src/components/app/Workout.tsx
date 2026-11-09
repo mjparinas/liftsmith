@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar } from "@/components/PlateBar";
@@ -217,7 +218,7 @@ export function Workout() {
               {item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
+                <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank<Info term="rir" /> · {item.target.note}</p>
               )}
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">

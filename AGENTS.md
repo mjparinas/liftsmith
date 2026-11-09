@@ -58,6 +58,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 ### Positioning
 - **An original app.** It borrows ideas from Fitbod (daily adaptive workouts, equipment matching, recovery map, variability setting) and Gymverse (periodized blocks with RIR and deloads, exercise swaps, lock-screen timer). It never uses their names in the UI, their art, screenshots, exercise videos or exact look. Exercise names, setup text and cues are our own.
 - **Focus on the workout, not the app.** One tap logs a set as planned. The next set is always pre-filled. The rest timer starts itself. Anything optional (feedback, swaps, info) appears between sets and never adds a tap during a set.
+- **Explain every label that isn't obvious** (Melvin, 2026-11-09). Jargon and training terms (deload, build weeks, RIR, readiness, today's call, volume, estimated one-rep max, sets per muscle, exercise variety, recovery, warm-ups) get the one shared `Info` button (`src/components/Info.tsx`): a small "i" with a 44 px tap target that opens a short plain-language dialog. The text lives in `src/lib/glossary.ts`, so it can be translated in one place. `Section` (app) and `Panel` (web dashboard) take an `info` term. Any new label a lifter might not understand gets a glossary entry in the same change.
 - **Dark, trustworthy, professional.** Deep navy-black background, one blue accent (`#4c8dff`), green, amber and red reserved for status (recovery bands, warnings). Large touch targets, tabular numbers, system font (Roboto on Android).
 
 ### Name

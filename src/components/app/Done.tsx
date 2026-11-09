@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, xpTotal, XP } from "@/lib/game";
@@ -54,7 +55,7 @@ export function Done() {
       <div className="mt-6 grid grid-cols-3 gap-3">
         {[["Time", clock(s.seconds)], ["Sets", String(s.sets)], ["Volume", `${fmtNum(vol)} ${profile.unit}`]].map(([k, v]) => (
           <div key={k} className="card animate-rise p-3">
-            <div className="text-xs uppercase tracking-wider text-faint">{k}</div>
+            <div className="text-xs uppercase tracking-wider text-faint">{k}{k === "Volume" && <Info term="volume" />}</div>
             <div className="num mt-1 text-xl font-bold">{v}</div>
           </div>
         ))}

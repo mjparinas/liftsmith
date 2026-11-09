@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { useNow } from "@/lib/useNow";
 import { exercise } from "@/lib/exercises";
 import { goalStreak, levelOf, trophies, xpTotal } from "@/lib/game";
@@ -54,13 +55,13 @@ export function Stats() {
       <div className="mt-3 grid grid-cols-2 gap-3">
         {tiles.map(([k, v]) => (
           <div key={k} className="card p-4">
-            <div className="text-xs uppercase tracking-wider text-faint">{k}</div>
+            <div className="text-xs uppercase tracking-wider text-faint">{k}{k === "Volume" && <Info term="volume" />}</div>
             <div className="num mt-1 text-2xl font-bold">{v}</div>
           </div>
         ))}
       </div>
 
-      <Section title="Sets per muscle this week">
+      <Section title="Sets per muscle this week" info="weeklySets">
         <div className="card p-4">
           <ul className="space-y-2">
             {MUSCLES.filter((m) => thisWeek.sets[m] > 0).sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a]).map((m) => (
@@ -79,7 +80,7 @@ export function Stats() {
         </div>
       </Section>
 
-      <Section title="Estimated one-rep max">
+      <Section title="Estimated one-rep max" info="e1rm">
         <ul className="card divide-y divide-line">
           {top.map(([id, series]) => (
             <li key={id} className="flex items-center justify-between gap-3 px-4 py-3">

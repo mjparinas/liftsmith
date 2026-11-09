@@ -1,4 +1,5 @@
 "use client";
+import { Info } from "@/components/Info";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { haptic } from "@/lib/juice";
@@ -125,7 +126,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             </div>
             <p className="mt-2 text-sm text-muted">days a week. Your streak counts weeks you hit this, so rest days never break it.</p>
             <h2 className="mt-8 text-lg font-semibold">Your body weight</h2>
-            <p className="text-sm text-muted">Only used to suggest a safe first weight for each lift.</p>
+            <p className="text-sm text-muted">Only used to suggest a safe first weight for each lift.<Info term="firstWeights" /></p>
             {canHealth && (
               <button type="button" onClick={fillFromHealth} className="press mt-3 min-h-11 rounded-2xl border border-line bg-surface px-4 text-sm font-semibold">
                 Fill in from {/iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect"}
