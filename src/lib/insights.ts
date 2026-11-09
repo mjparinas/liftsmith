@@ -3,6 +3,8 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { weeklySets } from "./generator";
 import { epley, sessionsOf, TIMED } from "./progression";
 import type { Streak } from "./game";
+import { can } from "./entitlements";
+import { activeFixes, findPlateaus, fixResult, FIX_TEXT, type FixKind, type Plateau } from "./plateau";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -25,6 +27,8 @@ export type InsightAction =
   | { kind: "priority"; muscle: Muscle; label: string }
   /** Set today's workout length. */
   | { kind: "minutes"; minutes: number; label: string }
+  /** Start the plateau detective's three-week fix for a lift (store.fixPlateau). */
+  | { kind: "plateau"; plateau: Plateau; fix: FixKind; label: string }
   /** Open a screen. */
   | { kind: "go"; route: string; label: string };
 
@@ -152,8 +156,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     }
   }
 
-  // 2. Stalled lifts.
-  const stalled = stalls(events, now);
+  // 2. Stalled lifts. Several at once is a fatigue problem (deload); one on its own goes to the
+  // plateau detective (plateau.ts, Pro), which finds the likely cause and offers a three-week fix.
+  const fixes = profile.plateauFixes ?? [];
+  const fixing = new Set(activeFixes(fixes, now).map((f) => f.exerciseId));
+  const stalled = stalls(events, now).filter((s) => !fixing.has(s.exerciseId));
   const fatigue = out.find((x) => x.id.startsWith("missed-"));
   if (stalled.length >= 2 && fatigue) {
     // Same cause, same fix: one note, not two deload buttons.
@@ -169,6 +176,18 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       advice: canDeload ? "When several lifts stall at once it's usually fatigue, not strength. Deload for a week, then build again." : "This week's deload should clear it. Next block, they start a little lighter and build again.",
       action: canDeload ? { kind: "deload", label: "Start a deload week" } : undefined,
     });
+  } else if (can("plateauDetective")) {
+    for (const p of findPlateaus(events, profile, now, fixes).slice(0, 2)) {
+      const fix = FIX_TEXT[p.fix];
+      out.push({
+        id: `plateau-${p.exerciseId}-${p.weeks}-${p.fix}`,
+        tone: "warn",
+        title: `${name(p.exerciseId)} has stalled`,
+        why: `No new best in ${weeksText(p.weeks)} (best estimated one-rep max ${w(p.best)}). ${p.causes[0].text}`,
+        advice: `Three-week fix: ${fix.what}`,
+        action: { kind: "plateau", plateau: p, fix: p.fix, label: `Start: ${fix.title.toLowerCase()}` },
+      });
+    }
   } else if (stalled.length === 1) {
     const s = stalled[0];
     out.push({
@@ -178,6 +197,27 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       why: `No new best in ${weeksText(s.weeks)} over ${s.sessions} sessions. Your best estimated one-rep max is ${w(s.best)}.`,
       advice: "Next time it drops one step and builds back up. Swapping it for a close variation for a few weeks also works: tap Swap during the workout.",
       action: { kind: "go", route: "stats", label: "See your lifts" },
+    });
+  }
+
+  // Plateau fixes: running ones say they're in the plan, finished ones say whether they worked.
+  for (const f of activeFixes(fixes, now)) {
+    out.push({
+      id: `fix-live-${f.exerciseId}-${f.startedAt}`,
+      tone: "info",
+      title: `${name(f.exerciseId)}: ${FIX_TEXT[f.kind].title.toLowerCase()}`,
+      why: `A plateau fix is running until ${new Date(f.until).toLocaleDateString("en", { day: "numeric", month: "short" })}.`,
+      advice: "Your plan already includes it. Train as planned.",
+    });
+  }
+  for (const f of fixes.filter((x) => x.until <= now && now - x.until < 21 * DAY)) {
+    const r = fixResult(f, events);
+    out.push({
+      id: `fix-done-${f.exerciseId}-${f.startedAt}`,
+      tone: r?.worked ? "good" : "info",
+      title: `${name(f.exerciseId)}: fix finished`,
+      why: !r ? "No sessions during the fix, so there's nothing to compare yet." : r.worked ? `It worked: your estimated one-rep max is up ${Math.round(r.gain * 1000) / 10}%.` : "No new best yet.",
+      advice: r?.worked ? "Back to the normal plan. Keep building from here." : "If it's still stuck in a week or two, you'll get a different fix here.",
     });
   }
 
