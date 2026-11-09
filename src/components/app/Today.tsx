@@ -1,4 +1,5 @@
 "use client";
+import { itemSeconds } from "@/lib/generator";
 import { useNow } from "@/lib/useNow";
 import { BodyMap } from "@/components/BodyMap";
 import { exercise } from "@/lib/exercises";
@@ -195,6 +196,7 @@ export function Today() {
                       <div className="truncate font-semibold">{ex.name}</div>
                       <div className="text-sm text-muted num">
                         {it.sets} × {repsText(ex, it.target.reps)} · {loadText(ex, it.target.weight, profile.unit)}
+                        {" · "}{it.warmup ? `${it.warmup.length} warm-up${it.warmup.length > 1 ? "s" : ""} · ` : ""}{Math.max(1, Math.round(itemSeconds(it) / 60))} min
                       </div>
                     </div>
                     <span className="shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium" style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}>{MUSCLE_LABEL[it.focus]}</span>

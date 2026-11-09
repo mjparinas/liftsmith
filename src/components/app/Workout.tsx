@@ -12,7 +12,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
-import { useApp } from "@/lib/store";
+import { useApp, warmingUp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -51,6 +51,10 @@ export function Workout() {
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
   const finished = !!active && active.index >= active.plan.items.length;
+  const warming = !!active && warmingUp(active);
+  const warmTotal = item?.warmup?.length ?? 0;
+  const warmDone = Math.min(active?.warm ?? 0, warmTotal);
+  const setLabel = warming ? `Warm-up ${warmDone + 1} of ${warmTotal}` : `Set ${Math.min(doneSets + 1, item?.sets ?? 1)} of ${item?.sets ?? 1}`;
 
   // Rest countdown: beeps in the last 3 seconds, then the alert.
   useEffect(() => {
@@ -78,14 +82,14 @@ export function Workout() {
     if (!active || !ex || !gym) return;
     void updateSession({
       title: resting ? `Rest · ${ex.name}` : ex.name,
-      setLabel: `Set ${Math.min(doneSets + 1, item!.sets)} of ${item!.sets}`,
+      setLabel,
       next: `${loadText(ex, active.weight, profile.unit)} × ${repsText(ex, active.reps)}`,
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
       sound: profile.restSounds,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!active || !gym) {
     return (
@@ -181,7 +185,7 @@ export function Workout() {
           <section className="mt-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · Set {Math.min(doneSets + 1, item.sets)} of {item.sets}</p>
+                <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[28px] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
               </div>
               <div className="flex shrink-0 gap-2">
@@ -189,9 +193,12 @@ export function Workout() {
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label="Swap exercise"><Icon name="swap" size={20} /></button>
               </div>
             </div>
-            <div className="mt-2.5 flex gap-1.5" aria-hidden>
+            <div className="mt-2.5 flex items-center gap-1.5" aria-hidden>
+              {Array.from({ length: warmTotal }, (_, i) => (
+                <span key={`w${i}`} className={`h-1.5 w-4 rounded-full transition-all duration-300 ${i < warmDone ? "bg-mint/60" : warming && i === warmDone ? "bg-accent/70" : "bg-line"}`} />
+              ))}
               {Array.from({ length: item.sets }, (_, i) => (
-                <span key={i} className={`h-2 w-8 rounded-full transition-all duration-300 ${i < doneSets ? "bg-mint" : i === doneSets ? "w-10 bg-gradient-to-r from-accent to-accent-2" : "bg-line"}`} />
+                <span key={i} className={`h-2 w-8 rounded-full transition-all duration-300 ${i < doneSets ? "bg-mint" : !warming && i === doneSets ? "w-10 bg-gradient-to-r from-accent to-accent-2" : "bg-line"}`} />
               ))}
             </div>
           </section>
@@ -229,7 +236,12 @@ export function Workout() {
                 )}
                 <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
               </div>
-              {item.challenge && doneSets + 1 === item.sets ? (
+              {warming ? (
+                <div className="mt-4 text-center text-sm text-muted">
+                  <p>Warm-up: easy, smooth reps. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
+                  <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">Skip warm-up</button>
+                </div>
+              ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
                 <p className="mt-4 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
@@ -273,7 +285,7 @@ export function Workout() {
             <div className="relative">
               {popKey > 0 && <span key={popKey} className="animate-burst pointer-events-none absolute inset-0 rounded-2xl border-2 border-accent" aria-hidden />}
               <Button className="relative w-full py-5 text-xl" onClick={log}>
-                Log set <Icon name="check" size={24} strokeWidth={2.8} />
+                {warming ? "Log warm-up" : "Log set"} <Icon name="check" size={24} strokeWidth={2.8} />
               </Button>
             </div>
           )}

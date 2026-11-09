@@ -57,6 +57,14 @@ describe("first run to finished workout", () => {
     expect(plan.items.length).toBeGreaterThan(2);
 
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Warm-ups first, each logged as its own event with a short rest after it.
+    const warmups = plan.items[0].warmup ?? [];
+    for (let i = 0; i < warmups.length; i++) {
+      expect(await screen.findByText(new RegExp(`Warm-up ${i + 1} of ${warmups.length}`))).toBeInTheDocument();
+      await user.click(screen.getByRole("button", { name: /Log warm-up/ }));
+      await user.click(screen.getByRole("button", { name: "Skip rest" }));
+    }
+    expect(useApp.getState().events.filter((e) => e.type === "warmup")).toHaveLength(warmups.length);
     await screen.findByRole("button", { name: /Log set/ });
     expect(screen.getByText(/Set 1 of/)).toBeInTheDocument();
 
@@ -81,6 +89,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     const before = useApp.getState().active!;
     await user.click(screen.getByRole("button", { name: "More reps" }));
     await user.click(screen.getByRole("button", { name: /Log set/ }));
@@ -125,6 +135,8 @@ describe("first run to finished workout", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     const id = useApp.getState().active!.sessionId;
     cleanup();
@@ -169,7 +181,10 @@ describe("game layer", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
-    await user.click(await screen.findByRole("button", { name: /Log set/ }));
+    await screen.findByRole("button", { name: /Log (set|warm-up)/ });
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
     await user.click(screen.getByRole("button", { name: "End" }));
     await user.click(screen.getByRole("button", { name: "Finish and save" }));
     const unlockedList = await screen.findByRole("region", { name: "Badges unlocked" });
