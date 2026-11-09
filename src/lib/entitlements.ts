@@ -1,5 +1,7 @@
-// What the lifter's plan unlocks. Until billing lands (Play Billing and StoreKit), everyone has Pro, so
-// the paywall drops in here without reworking screens (AGENTS.md "Money").
+import { hasPro } from "./billing";
+
+// What the lifter's plan unlocks (AGENTS.md "Money"). Pro comes from the store subscription (billing.ts);
+// while billing isn't live on a device (the web app, builds without a RevenueCat key), everyone has Pro.
 //
 // Free: the logger, plate graphic, rest timer, live notification, classic 5x5, and on the web dashboard
 // the overview, calendar, history, PR list, trophies, past-workout logging and share links.
@@ -12,13 +14,15 @@
 // Coaching (Melvin picked them, 2026-11-09): "why this weight", workout remix links, what to buy next and
 // machine settings are free; changing the plan mid-workout, the plateau detective and the goal-date
 // planner are Pro.
-export type Feature = "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner";
+// Adaptive programming (the generator, RIR blocks, deloads and readiness calls) and the recovery map are Pro;
+// without Pro, Today follows a free fixed program (store.ts applyAccess).
+export type Feature = "adaptive" | "recoveryMap" | "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner";
 
-const PRO_FEATURES: ReadonlySet<Feature> = new Set(["advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner"]);
+const PRO_FEATURES: ReadonlySet<Feature> = new Set(["adaptive", "recoveryMap", "advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner"]);
 
-/** Whether the lifter has Pro. Always true until billing lands. */
+/** Whether the lifter has Pro: a store subscription or trial, or billing not live here. */
 export function isPro(): boolean {
-  return true;
+  return hasPro();
 }
 
 export function can(feature: Feature, pro = isPro()): boolean {

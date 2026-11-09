@@ -22,6 +22,8 @@ import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
 import { feel } from "@/lib/juice";
+import { entActive, useBilling } from "@/lib/billing";
+import { useNow } from "@/lib/useNow";
 
 function Row<T extends string | number>({ label, value, options, onPick, info }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void; info?: Term }) {
   return (
@@ -29,6 +31,21 @@ function Row<T extends string | number>({ label, value, options, onPick, info }:
       <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
         {options.map(([v, l]) => <Chip key={String(v)} active={v === value} onClick={() => onPick(v)}>{l}</Chip>)}
       </div>
+    </Section>
+  );
+}
+
+/** Liftsmith Pro: the plan this lifter is on, and the way to the paywall, Restore and Manage subscription. */
+function ProRow() {
+  const { live, ent } = useBilling();
+  const now = useNow(60_000);
+  const status = !live ? t("pro.settings.unlocked") : entActive(ent, now) ? (ent?.plan === "monthly" ? t("pro.status.monthly") : t("pro.status.yearly")) : t("pro.settings.free");
+  return (
+    <Section title={t("pro.settings")}>
+      <button type="button" onClick={() => go("pro", "settings")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
+        <span>{status}</span>
+        <span className="text-accent">{t("pro.settings.see")}</span>
+      </button>
     </Section>
   );
 }
@@ -66,6 +83,7 @@ export function Settings() {
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>{t("settings.feedback")}</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">{t("settings.dashboard")}</a>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>{t("settings.training")}</Button>
+      <ProRow />
       <Section title={t("settings.program")}>
         <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
           <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}</span>

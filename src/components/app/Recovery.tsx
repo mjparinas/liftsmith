@@ -10,7 +10,9 @@ import { weeklySets } from "@/lib/generator";
 import { bandOf, recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { Section } from "./ui";
+import { Button, EmptyState, Section } from "./ui";
+import { can } from "@/lib/entitlements";
+import { go } from "./router";
 import { t } from "@/lib/i18n";
 
 export function Recovery() {
@@ -21,6 +23,14 @@ export function Recovery() {
   const done = weeklySets(events, weekStart(profile, now));
   const list = [...MUSCLES].sort((a, b) => rec[a] - rec[b]);
   const [picked, setPicked] = useState<Muscle | null>(null);
+  if (!can("recoveryMap")) {
+    return (
+      <div className="pb-24">
+        <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("recovery.title")}<Info term="recovery" /></h1>
+        <EmptyState icon="lock" title={t("recovery.locked.title")} body={t("recovery.locked.body")} action={<Button onClick={() => go("pro", "recovery")}>{t("pro.settings.see")}</Button>} />
+      </div>
+    );
+  }
   return (
     <div className="pb-24">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("recovery.title")}<Info term="recovery" /></h1>
