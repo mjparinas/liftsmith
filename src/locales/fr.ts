@@ -31,6 +31,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   "workout.skipRest": "Passer le repos",
   "workout.skipWarmup": "Passer l’échauffement",
   "workout.nextUp": "Ensuite :",
+  "workout.ssThen": "Puis {name}",
   "workout.comingUp": "À suivre",
   "workout.startRest": "Lancer le repos · {time}",
   "workout.howTo": "Comment faire ›",

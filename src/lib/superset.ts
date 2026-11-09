@@ -52,6 +52,21 @@ export function toggleLink<T extends Linkable>(items: readonly T[], i: number): 
   return withLinks(items, links);
 }
 
+/**
+ * Re-applies the lifter's superset choices to a rebuilt plan, where both exercises are still
+ * neighbours: "a>b" links them, and "!a>b" splits a pair the plan linked itself (a routine, or
+ * "Same as last time"). Other pairs keep the plan's own links.
+ */
+export function applyLinks<T extends Linkable>(items: readonly T[], links: readonly string[]): T[] {
+  if (!links.length) return [...items];
+  const want = new Set(links);
+  const l = linksOf(items).map((on, i) => {
+    const key = `${items[i].exerciseId}>${items[i + 1].exerciseId}`;
+    return want.has(key) || (on && !want.has(`!${key}`));
+  });
+  return withLinks(items, l);
+}
+
 /** Rest after a full round of a superset: the longest rest any of its exercises asks for. */
 export function roundRest(items: readonly Item[], i: number): number {
   const [s, e] = groupRange(items, i);

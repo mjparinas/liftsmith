@@ -13,7 +13,7 @@ import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
-import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
+import { afterSet, applyLinks, linksOf, toggleLink } from "./superset";
 import { planFromRoutine, upsertRoutine } from "./routines";
 import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
@@ -102,7 +102,10 @@ interface State {
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
   pickedByLocation: string | null;
-  /** Supersets picked on Today, as "first>second" exercise pairs, kept when the plan is rebuilt. */
+  /**
+   * Superset choices made on Today, kept when the plan is rebuilt: "first>second" links a pair, and
+   * "!first>second" splits a pair the plan itself linked (a routine or "Same as last time").
+   */
   links: string[];
   /** The saved routine used for today instead of the adaptive plan, if any. */
   routineId: string | null;
@@ -179,12 +182,10 @@ interface State {
 
 const ACTIVE_KEY = "liftsmith.active";
 
-/** Re-applies the supersets picked on Today to a rebuilt plan, where both exercises are still neighbours. */
+/** Re-applies the superset choices made on Today to a rebuilt plan (superset.ts `applyLinks`). */
 function relink(plan: Plan, links: readonly string[]): Plan {
   if (!links.length) return plan;
-  const want = new Set(links);
-  const l = linksOf(plan.items).map((on, i) => on || want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
-  const items = withLinks(plan.items, l);
+  const items = applyLinks(plan.items, links);
   return { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
 }
 const uid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
@@ -704,10 +705,13 @@ export const useApp = create<State>((set, get) => {
         return;
       }
       const p = get().preview;
-      if (!p) return;
+      if (!p || index < 0 || index >= p.items.length - 1) return;
       const items = toggleLink(p.items, index);
-      const links = items.slice(0, -1).flatMap((it, i) => (items[i + 1] && it.group && it.group === items[i + 1].group ? [`${it.exerciseId}>${items[i + 1].exerciseId}`] : []));
-      track("feature", { name: "superset", detail: links.length > get().links.length ? "link" : "split" });
+      // Remember this pair's choice only; other pairs keep theirs.
+      const key = `${items[index].exerciseId}>${items[index + 1].exerciseId}`;
+      const on = linksOf(items)[index];
+      const links = [...get().links.filter((k) => k !== key && k !== `!${key}`), on ? key : `!${key}`];
+      track("feature", { name: "superset", detail: on ? "link" : "split" });
       set({ links, preview: { ...p, items, estMinutes: Math.round(planSeconds(items) / 60) } });
     },
 
