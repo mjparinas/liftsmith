@@ -156,6 +156,36 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().active!.plan.items[0].group).toBeUndefined();
   });
 
+  it("imports a Strong export from Settings, once", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings";
+    const csv = [
+      "Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Reps,Distance,Seconds,Notes,Workout Notes,RPE",
+      "2026-01-05 18:00:00,Push,50m,Bench Press (Barbell),1,100,5,0,0,,,",
+      "2026-01-05 18:00:00,Push,50m,Bench Press (Barbell),2,100,5,0,0,,,",
+      "2026-01-05 18:00:00,Push,50m,Mystery Lift,1,20,10,0,0,,,",
+    ].join("\n");
+    const file = () => new File([csv], "strong.csv", { type: "text/csv" });
+    await user.upload(await screen.findByLabelText("CSV file to import"), file());
+    const dialog = await screen.findByRole("dialog", { name: "Import from Strong" });
+    expect(within(dialog).getByText(/1 workout, 3 sets/)).toBeInTheDocument();
+    await user.click(within(dialog).getByRole("button", { name: "lb" }));
+    expect(within(dialog).getByLabelText("Bench Press (Barbell)")).toHaveValue("bench-press");
+    expect(within(dialog).getByLabelText("Mystery Lift")).toHaveValue("custom");
+    await user.click(within(dialog).getByRole("button", { name: "Import" }));
+    expect(await screen.findByText("Imported 1 workout with 3 sets.")).toBeInTheDocument();
+    const ev = useApp.getState().events;
+    expect(ev.filter((e) => e.type === "set")).toHaveLength(3);
+    expect(ev.some((e) => e.type === "customExercise" && e.exercise.name === "Mystery Lift")).toBe(true);
+    expect(useApp.getState().stats.sessions).toHaveLength(1);
+    // The same file again adds nothing.
+    await user.upload(screen.getByLabelText("CSV file to import"), file());
+    await user.click(within(await screen.findByRole("dialog")).getByRole("button", { name: "Import" }));
+    expect(await screen.findByText("Those workouts are already here.")).toBeInTheDocument();
+    expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(3);
+  });
+
   it("saves today's plan as a routine, uses it, and saves a finished workout as one", async () => {
     const user = userEvent.setup();
     await onboard(user);

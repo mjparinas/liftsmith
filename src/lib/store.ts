@@ -126,6 +126,8 @@ interface State {
   setPlan(plan: Plan | null): void;
   /** Log a weigh-in and make it the profile's body weight. */
   logBodyweight(kg: number): void;
+  /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
+  importWorkouts(evs: AppEvent[]): number;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
   reset(): Promise<void>;
@@ -585,6 +587,14 @@ export const useApp = create<State>((set, get) => {
       if (!(kg > 0)) return;
       commit([{ type: "bodyweight", id: uid(), at: Date.now(), kg }]);
       get().setProfile({ bodyweight: kg });
+    },
+
+    importWorkouts(evs) {
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = evs.filter((e) => !have.has(e.id));
+      if (fresh.length) commit(fresh);
+      get().replan();
+      return fresh.length;
     },
 
     checkin(buddies) {

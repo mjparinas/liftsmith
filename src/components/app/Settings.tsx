@@ -11,6 +11,7 @@ import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
 import { erasePhotos } from "@/lib/photos";
 import { MessageSettings } from "./MessageSettings";
+import { ImportWorkouts } from "./ImportCsv";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
@@ -93,6 +94,7 @@ export function Settings() {
           <Button kind="ghost" onClick={() => void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events))}>Full backup (JSON)</Button>
         </div>
         <p className="mb-3 text-xs text-faint">The CSV has every working set for spreadsheets. The backup has everything: profile, gyms, workouts, body weight and heart rate.</p>
+        <div className="mb-4"><ImportWorkouts /></div>
         {confirm ? (
           <div className="space-y-2">
             <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
