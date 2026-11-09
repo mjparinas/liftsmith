@@ -108,7 +108,9 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
   const [creators, installs, subs, payouts] = await Promise.all([
     query("SELECT * FROM creators ORDER BY created_at DESC"),
     query("SELECT * FROM creator_installs WHERE install_id NOT IN (SELECT id FROM installs WHERE test = 1)"),
-    query("SELECT * FROM subscription_events WHERE install_id IN (SELECT install_id FROM creator_installs) ORDER BY at"),
+    // Only store-verified events (the RevenueCat webhook) earn commission. The app's own trial_start and purchase
+    // events reach /api/collect/ unauthenticated, so anyone could forge one for an install that carries a code.
+    query("SELECT * FROM subscription_events WHERE source = 'store' AND install_id IN (SELECT install_id FROM creator_installs) ORDER BY at"),
     query("SELECT * FROM creator_payouts ORDER BY paid_at DESC"),
   ]);
   const payoutList = payouts.map((p): Payout => ({ id: n(p.id), code: String(p.code), usd: n(p.usd_micros) / 1e6, paidAt: n(p.paid_at), admin: String(p.admin), note: s(p.note) }));

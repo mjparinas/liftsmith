@@ -298,15 +298,16 @@ export async function batch(stmts: { sql: string; args: InValue[] }[]): Promise<
 
 /** Counts a hit against `key` and says whether it's within `limit` per `windowMs`. */
 export async function rateLimit(key: string, limit: number, windowMs: number, now = Date.now()): Promise<boolean> {
-  const rows = await query<{ count: number; reset_at: number }>("SELECT count, reset_at FROM rate_limits WHERE key = ?", [key]);
-  const r = rows[0];
-  if (!r || Number(r.reset_at) <= now) {
-    await run("INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count = 1, reset_at = excluded.reset_at", [key, now + windowMs]);
-    return true;
-  }
-  if (Number(r.count) >= limit) return false;
-  await run("UPDATE rate_limits SET count = count + 1 WHERE key = ?", [key]);
-  return true;
+  // One atomic statement, so parallel requests can't all read the same count and slip past the limit.
+  const rows = await query<{ count: number }>(
+    `INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+     ON CONFLICT(key) DO UPDATE SET
+       count = CASE WHEN rate_limits.reset_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+       reset_at = CASE WHEN rate_limits.reset_at <= ? THEN excluded.reset_at ELSE rate_limits.reset_at END
+     RETURNING count`,
+    [key, now + windowMs, now, now],
+  );
+  return Number(rows[0]?.count ?? 1) <= limit;
 }
 
 /** For tests: a fresh in-memory database. */

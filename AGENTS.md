@@ -482,6 +482,13 @@ Small things that make the app a pleasure, all derived from events (never stored
   - *Admin:* the **Creators** tab (`src/app/api/admin/creators/route.api.ts`, numbers in `src/lib/creatorMetrics.ts`, pure and tested): add, edit or pause a creator (code, name, contact, commission share, months, note), and per creator sign-ups (all time and in the period), trials, paying subscribers, refunds, store revenue, earned, cleared, paid and owed; **Record payout** (audited) and the month's **payout list CSV** (everyone owed $25+). Test installs are left out. Tables `creators`, `creator_installs`, `creator_payouts`.
 - **The rules we hold in marketing:** no fake or incentivised reviews, no sock-puppet accounts, Melvin says he built the app whenever he mentions it, competitor claims only from the dated comparison data, and no fake countdowns or scarcity.
 
+## Security (audit, 2026-11-09)
+
+- **Creator commission counts only store-verified events** (`source = 'store'`, from the RevenueCat webhook). The app's own `trial_start` and `purchase` events reach `/api/collect/` without authentication, so they may stand in for revenue on the admin panel until the webhook is set, but never for money owed to a creator (`loadCreators`).
+- **Rate limits are one atomic statement** (`rateLimit` in `db.ts`: an upsert with `RETURNING count`), so a burst of parallel requests can't all read the same count. **Email sign-in codes count each try before comparing** and are used up with a conditional update, so parallel guesses can't pass the five-try limit. Both have tests that fail on the old read-then-write code.
+- Every public route that writes or sends rate-limits through the database, never only in memory (serverless instances don't share memory): feedback per address, `/api/collect/` per install and per address. Secrets in headers (cron, RevenueCat) are compared in constant time (`authorized` in `revenuecat.ts`).
+- Rate limits key on the first `x-forwarded-for` address, which Vercel sets itself.
+
 ## Architecture decisions
 
 - **Stack copied from Gradelings** (`mjparinas/gradelings`): Next.js 16 static export, React 19, TypeScript, Tailwind 4, Zustand, Vitest.

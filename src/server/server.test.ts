@@ -65,6 +65,11 @@ describe("collecting usage events", () => {
     expect(await rateLimit("k", 2, 1000, NOW)).toBe(false);
     expect(await rateLimit("k", 2, 1000, NOW + 2000)).toBe(true);
   });
+
+  it("holds the limit under a burst of parallel requests", async () => {
+    const answers = await Promise.all(Array.from({ length: 30 }, () => rateLimit("burst", 5, 60_000, NOW)));
+    expect(answers.filter(Boolean)).toHaveLength(5);
+  });
 });
 
 describe("website page views", () => {
