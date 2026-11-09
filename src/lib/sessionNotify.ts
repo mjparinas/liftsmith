@@ -15,6 +15,8 @@ export interface SessionState {
   hr?: number;
   /** Whether the native rest-over alert plays a sound (vibration always runs). */
   sound?: boolean;
+  /** Voice coach: said by the Android service when rest ends (voice.ts). iOS and the web say it in the page. */
+  speak?: string;
 }
 
 /** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */

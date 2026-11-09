@@ -19,6 +19,9 @@ import { useEffect, useRef, useState } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
 import { Button, Ring, Sheet, Stepper } from "./ui";
+import { epley } from "@/lib/progression";
+import { prCue, say } from "@/lib/voice";
+import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { AlmostThere, PrMoment } from "./WorkoutJuice";
 
 let hrConn: HrConnection | null = null;
@@ -53,6 +56,11 @@ export function Workout() {
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
   const setLabel = warming ? `Warm-up ${warmDone + 1} of ${warmTotal}` : `Set ${Math.min(doneSets + 1, item?.sets ?? 1)} of ${item?.sets ?? 1}`;
+  // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
+  const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
+  const voiceOn = !!profile.delight?.voice;
+  const voiceState: VoiceState | null = active && ex && item ? { exName: ex.name, exerciseId: ex.id, setNo: Math.min(doneSets + 1, item.sets), sets: item.sets, kg: active.weight, reps: active.reps, rir: item.target.rir, unit: profile.unit, load: ex.load, challenge: item.challenge, resting, left, index: active.index, warmup: warming } : null;
+  useVoiceCoach(voiceState, voiceOn);
 
   // Rest countdown: beeps in the last 3 seconds, then the alert.
   useEffect(() => {
@@ -86,6 +94,8 @@ export function Workout() {
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
       sound: profile.restSounds,
+      // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
+      speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -105,6 +115,10 @@ export function Workout() {
   const log = () => {
     haptic("tap");
     sound.log();
+    if (voiceOn && ex && active.weight > 0) {
+      const best = Math.max(0, ...(s.stats.e1rmSeries.get(ex.id) ?? []).map((p) => p.e1rm));
+      if (best > 0 && epley(active.weight, active.reps) > best + 0.01) say(prCue(ex.name));
+    }
     setPopKey((k) => k + 1);
     s.logSet();
   };
@@ -205,12 +219,15 @@ export function Workout() {
                 <Button kind="ghost" onClick={() => s.addRest(30)}>+30 s</Button>
                 <Button kind="ghost" onClick={() => s.skipRest()}>Skip rest</Button>
               </div>
+              <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               <div className="mt-5 w-full border-t border-line pt-4">
                 <p className="text-center text-sm text-muted">Next up: <span className="text-ink">{loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}</span></p>
                 {loading && bar && <div className="mt-2"><PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} /></div>}
                 <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
+                <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
               </div>
+              <RestExtra left={left} gym={gym} />
             </section>
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
@@ -236,9 +253,11 @@ export function Workout() {
               ) : (
                 <p className="mt-3 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank · {item.target.note}</p>
               )}
+              <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (
                 <div className="mt-4 border-t border-line pt-4">
                   <PlateBar loading={loading} bar={bar.weight} unit={unit} finish={finish} />
+                  <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
                 </div>
               )}
             </section>
