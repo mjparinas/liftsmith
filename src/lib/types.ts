@@ -1,4 +1,4 @@
-import { translated } from "./i18n";
+import { t, translated } from "./i18n";
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
 // own unit (so 45 lb plates stay exactly 45 lb) and converted at the edges (src/lib/units.ts).
 
@@ -62,40 +62,13 @@ export const EQUIPMENT = [
 ] as const;
 export type Equipment = (typeof EQUIPMENT)[number];
 
-export const EQUIPMENT_LABEL: Record<Equipment, string> = {
-  barbell: "Barbell",
-  ezBar: "EZ curl bar",
-  trapBar: "Trap bar",
-  dumbbells: "Dumbbells",
-  kettlebells: "Kettlebells",
-  bench: "Flat bench",
-  inclineBench: "Adjustable bench",
-  rack: "Squat rack",
-  pullupBar: "Pull-up bar",
-  dipBars: "Dip bars",
-  cable: "Cable station",
-  latPulldown: "Lat pulldown",
-  seatedRow: "Seated row",
-  legPress: "Leg press",
-  legExtension: "Leg extension",
-  legCurl: "Leg curl",
-  chestPress: "Chest press machine",
-  pecDeck: "Pec deck",
-  shoulderPress: "Shoulder press machine",
-  smith: "Smith machine",
-  hackSquat: "Hack squat",
-  calfMachine: "Calf raise machine",
-  bands: "Resistance bands",
-  rings: "Gymnastic rings",
-  box: "Box or step",
-  abWheel: "Ab wheel",
-};
+export const EQUIPMENT_LABEL: Record<Equipment, string> = translated(EQUIPMENT, (e) => `equipment.${e}`);
 
 export const EQUIPMENT_GROUPS: { title: string; items: Equipment[] }[] = [
-  { title: "Free weights", items: ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells"] },
-  { title: "Benches and racks", items: ["bench", "inclineBench", "rack", "pullupBar", "dipBars", "box"] },
-  { title: "Machines", items: ["cable", "latPulldown", "seatedRow", "legPress", "legExtension", "legCurl", "chestPress", "pecDeck", "shoulderPress", "smith", "hackSquat", "calfMachine"] },
-  { title: "Small gear", items: ["bands", "rings", "abWheel"] },
+  { get title() { return t("equipment.group.free"); }, items: ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells"] },
+  { get title() { return t("equipment.group.benches"); }, items: ["bench", "inclineBench", "rack", "pullupBar", "dipBars", "box"] },
+  { get title() { return t("equipment.group.machines"); }, items: ["cable", "latPulldown", "seatedRow", "legPress", "legExtension", "legCurl", "chestPress", "pecDeck", "shoulderPress", "smith", "hackSquat", "calfMachine"] },
+  { get title() { return t("equipment.group.small"); }, items: ["bands", "rings", "abWheel"] },
 ];
 
 /** How an exercise is loaded decides how its weight is rounded and drawn. */
