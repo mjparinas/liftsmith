@@ -19,6 +19,8 @@ import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/l
 import { useApp, warmingUp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import { effortAim, effortChoices, restAlertOf, restLabel } from "@/lib/training";
+import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { clock, loadText, plateText, repsText } from "./format";
 import { go } from "./router";
@@ -46,12 +48,15 @@ export function Workout() {
   const restRef = useRef<number | null>(null);
   const lastBeep = useRef(0);
 
+  const awake = profile.training?.keepAwake !== false;
+  const alert = restAlertOf(profile);
+  const scale = profile.training?.effort;
   useEffect(() => {
-    void keepAwake(true);
+    void keepAwake(awake);
     void notifyPermission();
     sound.enabled = profile.restSounds;
     return () => void keepAwake(false);
-  }, [profile.restSounds]);
+  }, [profile.restSounds, awake]);
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -87,13 +92,14 @@ export function Workout() {
     const secs = Math.ceil(left);
     if (secs <= 3 && secs > 0 && lastBeep.current !== secs) {
       lastBeep.current = secs;
-      sound.countdown();
+      sound.countdown(alert.sound);
     }
     if (left <= 0) {
       lastBeep.current = 0;
-      sound.restEnd();
-      haptic("thud");
-      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : "Next set");
+      // The rest-over alert follows its own setting (Workout preferences), not only Sounds and Vibration.
+      sound.restEnd(alert.sound);
+      if (alert.vibrate) haptic("thud", true);
+      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : "Next set", alert);
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -108,7 +114,8 @@ export function Workout() {
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
-      sound: profile.restSounds,
+      sound: alert.sound,
+      vibrate: alert.vibrate,
       // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
     });
@@ -252,7 +259,7 @@ export function Workout() {
                 <Button kind="ghost" icon="chevronRight" onClick={() => s.skipRest()}>Skip rest</Button>
               </div>
               <GhostLine ghost={ghost} logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)} nextIndex={doneSets} unit={profile.unit} />
-              {lastSet && !rated && <Effort target={lastSet.rir} onPick={(r) => { haptic("tick"); s.rateEffort(lastSet.id, r); }} />}
+              {lastSet && !rated && <Effort target={lastSet.rir} scale={scale} onPick={(r) => { haptic("tick"); s.rateEffort(lastSet.id, r); }} />}
               {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
               {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
               <div className="mt-5 w-full border-t border-line/70 pt-4">
@@ -265,6 +272,9 @@ export function Workout() {
             </section>
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
+              {active.restReady ? (
+                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>Start rest · {restLabel(active.restReady)}</Button>
+              ) : null}
               <div className="flex flex-col items-center gap-5">
                 {ex.load !== "bodyweight" && (
                   <Stepper
@@ -274,6 +284,10 @@ export function Workout() {
                     onDown={() => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps)}
                     onUp={() => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps)}
                   />
+                )}
+                {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
+                  // This gym's plates are in the other unit: show the weight in the lifter's unit too.
+                  <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" ? " each" : ""}</p>
                 )}
                 <Stepper label="reps" suffix={TIMED.has(ex.id) ? "seconds" : "reps"} value={String(active.reps)} onDown={() => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1))} onUp={() => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1))} />
               </div>
@@ -289,7 +303,7 @@ export function Workout() {
               ) : item.challenge && doneSets + 1 === item.sets ? (
                 <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
               ) : (
-                <p className="mt-4 text-center text-sm text-muted">Leave {item.target.rir} {item.target.rir === 1 ? "rep" : "reps"} in the tank<Info term="rir" /> · {item.target.note}</p>
+                <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {item.target.note}</p>
               )}
               <SameAsLastChip ghost={ghost} setIndex={doneSets} ex={ex} unit={profile.unit} weight={active.weight} reps={active.reps} onUse={(w, r) => s.adjust(w, r)} />
               {loading && bar && (
@@ -353,6 +367,7 @@ export function Workout() {
         {ex && (
           <div className="space-y-4">
             <LiftDemo exerciseId={ex.id} bpm={bpm} controls />
+            <FavouriteButton exerciseId={ex.id} />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">
               {ex.cues.map((c, i) => (
@@ -360,6 +375,7 @@ export function Workout() {
               ))}
             </ol>
             <NoteEditor key={ex.id + note} initial={note} onSave={(t) => { s.addNote(ex.id, t); setInfoOpen(false); }} />
+            <ExercisePrefsEditor exerciseId={ex.id} note="Changes apply from the next workout." />
           </div>
         )}
       </Sheet>
@@ -418,13 +434,15 @@ function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string
 }
 
 /** Optional, during rest: how many more reps the lifter could have done on the set just logged. */
-function Effort({ target, onPick }: { target: number; onPick: (rir: number) => void }) {
+function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rpe"; onPick: (rir: number) => void }) {
+  const rpe = scale === "rpe";
+  const aim = effortChoices(scale).find((c) => c.rir === Math.min(4, target))?.label ?? String(target);
   return (
     <div className="animate-rise mt-4 w-full text-center">
-      <p className="text-sm text-muted">Reps left in the tank on that set? (aim was {target})<Info term="rir" /></p>
-      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label="Reps left in the tank">
-        {[0, 1, 2, 3, 4].map((r) => (
-          <button key={r} type="button" onClick={() => onPick(r)} className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold">{r === 4 ? "4+" : r}</button>
+      <p className="text-sm text-muted">{rpe ? `How hard was that set, as RPE? (aim was ${aim})` : `Reps left in the tank on that set? (aim was ${target})`}<Info term={rpe ? "rpe" : "rir"} /></p>
+      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? "RPE of that set" : "Reps left in the tank"}>
+        {effortChoices(scale).map((c) => (
+          <button key={c.rir} type="button" onClick={() => onPick(c.rir)} className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold">{c.label}</button>
         ))}
       </div>
     </div>

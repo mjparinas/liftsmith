@@ -1,4 +1,4 @@
-import { dedupe, mondayOf, type Stats } from "./derive";
+import { dedupe, weekOf, weekStartDay, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { game, levelOf } from "./game";
 import { shareIds, shareName } from "./achievements";
@@ -47,10 +47,10 @@ export interface GridDay {
   future: boolean;
 }
 
-/** The last `weeks` weeks as columns of seven days, Monday first, ending with the current week. */
+/** The last `weeks` weeks as columns of seven days, from the lifter's first day of the week, ending with the current week. */
 export function yearGrid(now: number, weeks = 53): GridDay[][] {
   const today = startOfDay(now);
-  const first = mondayOf(today) - (weeks - 1) * 7 * DAY;
+  const first = weekOf(today) - (weeks - 1) * 7 * DAY;
   const cols: GridDay[][] = [];
   for (let w = 0; w < weeks; w++) {
     const col: GridDay[] = [];
@@ -66,10 +66,10 @@ export function yearGrid(now: number, weeks = 53): GridDay[][] {
   return cols;
 }
 
-/** A month as rows of seven cells, Monday first; cells outside the month are null. */
+/** A month as rows of seven cells, from the lifter's first day of the week; cells outside the month are null. */
 export function monthGrid(year: number, month: number): (GridDay | null)[][] {
   const first = new Date(year, month, 1);
-  const lead = (first.getDay() + 6) % 7;
+  const lead = (first.getDay() + 7 - weekStartDay()) % 7;
   const days = new Date(year, month + 1, 0).getDate();
   const cells: (GridDay | null)[] = Array.from({ length: lead }, () => null);
   for (let d = 1; d <= days; d++) {
@@ -150,10 +150,10 @@ export function sessionDetail(events: readonly AppEvent[], sessionId: string): S
 /** Workouts, sets and volume for each of the last `weeks` weeks, oldest first. */
 export function weeklyTotals(stats: Pick<Stats, "sessions">, now: number, weeks = 12): { weekStart: number; sessions: number; sets: number; volume: number }[] {
   const out = [];
-  const thisWeek = mondayOf(now);
+  const thisWeek = weekOf(now);
   for (let i = weeks - 1; i >= 0; i--) {
-    const ws = mondayOf(thisWeek - i * 7 * DAY + 12 * 3600_000);
-    const list = stats.sessions.filter((s) => mondayOf(s.start) === ws);
+    const ws = weekOf(thisWeek - i * 7 * DAY + 12 * 3600_000);
+    const list = stats.sessions.filter((s) => weekOf(s.start) === ws);
     out.push({ weekStart: ws, sessions: list.length, sets: list.reduce((n, s) => n + s.sets, 0), volume: list.reduce((n, s) => n + s.volume, 0) });
   }
   return out;
@@ -322,4 +322,10 @@ export function decodeShare(fragment: string): ShareCard | null {
 
 export function shareLevel(card: Pick<ShareCard, "xp">) {
   return levelOf(card.xp);
+}
+
+/** Short weekday names in the lifter's week order. */
+export function weekdayNames(): string[] {
+  const names = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return [...names.slice(weekStartDay()), ...names.slice(0, weekStartDay())];
 }

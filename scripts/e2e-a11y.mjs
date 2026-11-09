@@ -82,6 +82,9 @@ try {
   await page.getByRole("button", { name: "Start this program" }).click();
   await page.getByText(/Tiered progression · Day 1/).waitFor();
   await scan("today on a program");
+  await page.goto(`${server.url}/app/#/training`);
+  await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
+  await scan("workout preferences");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();

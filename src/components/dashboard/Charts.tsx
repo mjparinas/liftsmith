@@ -1,12 +1,13 @@
 "use client";
-import { dayKey, heat, type DayTotals, type GridDay } from "@/lib/dashboard";
+import { dayKey, heat, weekdayNames, type DayTotals, type GridDay } from "@/lib/dashboard";
 import { useEffect, useRef, useState } from "react";
 
 // Small SVG charts for the web dashboard. One series each (the title names it, so no legend), the
 // accent colour for data, recessive grid lines, and a hover or focus readout on every mark.
 
 const HEAT = ["var(--color-raised)", "rgb(76 141 255 / 0.3)", "rgb(76 141 255 / 0.55)", "rgb(76 141 255 / 0.8)", "var(--color-accent)"];
-const DOW = ["Mon", "", "Wed", "", "Fri", "", "Sun"];
+/** Every other weekday label down the side of the year grid, in the lifter's week order. */
+const dow = () => weekdayNames().map((d, i) => (i % 2 ? "" : d));
 
 function dayLabel(ms: number) {
   return new Date(ms).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
@@ -41,7 +42,7 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
           {grid.map((_, i) => (
             <div key={i} className="h-4 text-[0.625rem] leading-4 text-faint" aria-hidden>{months.find((m) => m.x === i)?.label ?? ""}</div>
           ))}
-          {DOW.map((label, row) => (
+          {dow().map((label, row) => (
             <Row key={row} label={label} row={row} grid={grid} days={days} cell={cell} onHover={setHover} onPick={onPick} />
           ))}
         </div>
@@ -90,7 +91,7 @@ export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (
   return (
     <table className="w-full table-fixed border-separate border-spacing-1 text-sm">
       <thead>
-        <tr>{["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((d) => <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">{d}</th>)}</tr>
+        <tr>{weekdayNames().map((d) => <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">{d}</th>)}</tr>
       </thead>
       <tbody>
         {rows.map((r, i) => (

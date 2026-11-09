@@ -9,6 +9,8 @@ import { quoteOfDay } from "@/lib/quotes";
 import { CALL_TEXT, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
+import { dayKey } from "@/lib/random";
+import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
@@ -105,8 +107,8 @@ export function Today() {
         {preview && !fixed && (
           <span className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${preview.week.deload ? "border-warn/40 bg-warn/12 text-warn" : "border-line bg-surface text-muted"}`}>
             <Icon name="layers" size={15} className={preview.week.deload ? "" : "text-violet"} />
-            {preview.week.label} · RIR {preview.week.rir}
-            <Info term={preview.week.deload ? "deload" : "rir"} className="-mr-3" />
+            {preview.week.label} · {effortLabel(preview.week.rir, profile.training?.effort)}
+            <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-mr-3" />
           </span>
         )}
         {streak.needed > 0 && (
@@ -193,7 +195,7 @@ export function Today() {
           value={profile.minutes}
           onChange={(e) => {
             haptic("select");
-            setProfile({ minutes: Number(e.target.value) });
+            setProfile({ minutes: Number(e.target.value), minutesDay: dayKey(Date.now()) });
           }}
           className="slider mt-4 w-full"
           style={{ "--fill": fill } as CSSProperties}
@@ -315,7 +317,7 @@ function FitAroundCalendar() {
       type="button"
       onClick={() => {
         haptic("tick");
-        setProfile({ minutes: fit });
+        setProfile({ minutes: fit, minutesDay: dayKey(Date.now()) });
       }}
       className="press mt-3 flex w-full items-center gap-2 rounded-xl border border-cyan/30 bg-cyan/8 px-3 py-2.5 text-left text-sm"
     >

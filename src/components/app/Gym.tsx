@@ -1,7 +1,7 @@
 "use client";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { PlateBar } from "@/components/PlateBar";
-import { PRESETS, type GymPreset } from "@/lib/defaults";
+import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
 import { useApp } from "@/lib/store";
@@ -31,6 +31,13 @@ export function Gym() {
 
       <Section title="Name">
         <input value={gym.name} onChange={(e) => update({ name: e.target.value })} className="card w-full px-4 py-3" aria-label="Gym name" />
+      </Section>
+
+      <Section title="This gym's plates are in">
+        <div className="flex flex-wrap gap-2">
+          {(["kg", "lb"] as const).map((u) => <Chip key={u} active={gym.unit === u} onClick={() => saveGym(switchGymUnit(gym, u))}>{u === "kg" ? "Kilograms" : "Pounds"}</Chip>)}
+        </div>
+        <p className="mt-2 text-xs text-faint">Switching swaps the plates, bars and dumbbells below for a standard {gym.unit === "kg" ? "pound" : "kilogram"} set, which you can then edit. Your workout history stays as it is.</p>
       </Section>
 
       <Section title="Pick this gym when I'm here">

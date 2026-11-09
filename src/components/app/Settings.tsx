@@ -46,6 +46,7 @@ export function Settings() {
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>Injuries and sore spots</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>Send feedback or report a bug</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">Open the big-screen dashboard</a>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>Workout preferences: rest, reps, sets, timer</Button>
       <Section title="Program">
         <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
           <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? "Adaptive"}</span>
@@ -62,7 +63,12 @@ export function Settings() {
       <Row<number> info="deloadWeeks" label="Build weeks before a deload" value={profile.blockWeeks} onPick={(blockWeeks) => setProfile({ blockWeeks })} options={[3, 4, 5, 6].map((d) => [d, `${d} weeks`])} />
       <Row<"dark" | "light" | "system"> label="Appearance" value={profile.theme ?? "dark"} onPick={(theme) => setProfile({ theme })} options={[["dark", "Dark"], ["light", "Light"], ["system", "Match system"]]} />
       <AccessibilitySettings />
-      <Row<"kg" | "lb"> label="Units" value={profile.unit} onPick={(unit) => setProfile({ unit })} options={[["kg", "Kilograms"], ["lb", "Pounds"]]} />
+      <Section title="Units">
+        <div className="flex flex-wrap gap-2">
+          {([["kg", "Kilograms"], ["lb", "Pounds"]] as const).map(([u, l]) => <Chip key={u} active={profile.unit === u} onClick={() => setProfile({ unit: u })}>{l}</Chip>)}
+        </div>
+        <p className="mt-2 text-xs text-faint">Weights, body weight and stats show in this unit. Each gym keeps its own plates in kg or lb (change it under Gym), and the workout shows both when they differ.</p>
+      </Section>
       <Section title={`Body weight (${profile.unit})`}>
         <input inputMode="decimal" value={fmtNum(fromKg(profile.bodyweight, profile.unit))} onChange={(e) => setProfile({ bodyweight: toKg(Number(e.target.value) || 0, profile.unit) })} className="card num w-full px-4 py-3" aria-label="Body weight" />
       </Section>

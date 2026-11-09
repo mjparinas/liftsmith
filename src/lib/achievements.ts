@@ -1,4 +1,4 @@
-import { mondayOf, type Stats } from "./derive";
+import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { TIMED } from "./progression";
 import { MUSCLES, type AppEvent, type Muscle, type Profile, type SessionStartEvent, type SetEvent } from "./types";
@@ -88,10 +88,10 @@ export const ACHIEVEMENTS: AchievementDef[] = [
   // ---- Consistency
   { id: "workouts", name: "Showing up", detail: "Finish {n} workout(s)", icon: "🏋️", category: "consistency", tiers: [1, 25, 100, 365], value: (c) => c.stats.sessions.length },
   { id: "goal-streak", name: "Unbroken", detail: "Meet your weekly goal {n} weeks running", icon: "🔥", category: "consistency", tiers: [2, 8, 26, 52], unit: "weeks", value: (c) => c.bestStreak },
-  { id: "training-weeks", name: "Seasons", detail: "Train in {n} different weeks", icon: "📅", category: "consistency", tiers: [4, 26, 52, 156], unit: "weeks", value: (c) => new Set(c.sessions.map((s) => mondayOf(s.at))).size },
+  { id: "training-weeks", name: "Seasons", detail: "Train in {n} different weeks", icon: "📅", category: "consistency", tiers: [4, 26, 52, 156], unit: "weeks", value: (c) => new Set(c.sessions.map((s) => weekOf(s.at))).size },
   { id: "hours", name: "Time under the bar", detail: "Spend {n} hours lifting", icon: "⏱️", category: "consistency", tiers: [10, 50, 200, 500], unit: "h", value: (c) => Math.floor(c.stats.totalSeconds / 3600) },
   { id: "early", name: "Early bird", detail: "Finish {n} workouts that start before 8 am", icon: "🌅", category: "consistency", tiers: [1, 10, 50], value: (c) => countSessions(c, (s) => hourOf(s.at) < 8 && hourOf(s.at) >= 4) },
-  { id: "weekend", name: "Weekend warrior", detail: "Train on {n} weekends", icon: "🗓️", category: "consistency", tiers: [4, 20, 52], value: (c) => new Set(c.sessions.filter((s) => [0, 6].includes(new Date(s.at).getDay())).map((s) => mondayOf(s.at))).size },
+  { id: "weekend", name: "Weekend warrior", detail: "Train on {n} weekends", icon: "🗓️", category: "consistency", tiers: [4, 20, 52], value: (c) => new Set(c.sessions.filter((s) => [0, 6].includes(new Date(s.at).getDay())).map((s) => weekOf(s.at))).size },
   { id: "lunch", name: "Lunch break lifter", detail: "Finish {n} workouts started between 11 am and 2 pm", icon: "🥪", category: "consistency", tiers: [5, 25], value: (c) => countSessions(c, (s) => hourOf(s.at) >= 11 && hourOf(s.at) < 14) },
 
   // ---- Strength: plate clubs (45 lb plates a side) and body-weight ratios
@@ -178,7 +178,7 @@ function musclesHit(sets: SetEvent[]): Set<Muscle> {
 const MAJOR: Muscle[] = ["chest", "upperBack", "lats", "quads", "hamstrings", "glutes", "frontDelts", "biceps", "triceps", "abs"];
 function fullWeek(c: Ctx): boolean {
   const byWeek = new Map<number, SetEvent[]>();
-  for (const s of c.sets) byWeek.set(mondayOf(s.at), [...(byWeek.get(mondayOf(s.at)) ?? []), s]);
+  for (const s of c.sets) byWeek.set(weekOf(s.at), [...(byWeek.get(weekOf(s.at)) ?? []), s]);
   for (const sets of byWeek.values()) {
     const hit = musclesHit(sets);
     if (MAJOR.every((m) => hit.has(m))) return true;
