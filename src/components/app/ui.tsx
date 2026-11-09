@@ -94,8 +94,7 @@ export function Section({ title, children, right, icon, info }: { title: string;
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
-  // Rendered on <body>: the animated <main> is its own stacking context, which would put the sheet
-  // under the tab bar on screens that have one.
+  // Rendered on <body>, so a screen's own stacking (its rise animation) can't put it under the tab bar.
   return createPortal(
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
       <div role="dialog" aria-label={title} className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto rounded-t-3xl border-t border-line bg-surface p-5 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)]" onClick={(e) => e.stopPropagation()}>

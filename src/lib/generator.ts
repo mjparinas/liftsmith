@@ -57,6 +57,8 @@ export interface Plan {
   items: PlanItem[];
   /** Set when a program built the plan: which program, which day of it, and a line for Today. */
   program?: { id: string; day: number; dayName: string; note: string; fixed: boolean };
+  /** Set when the plan is a saved routine instead of the adaptive plan (routines.ts). */
+  routineId?: string;
 }
 
 export interface GenerateInput {

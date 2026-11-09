@@ -231,9 +231,11 @@ export function Today() {
           <Section title="Why these muscles" icon="recovery">
             <div className="card p-4">
               <BodyMap rec={rec} focus={focus} compact />
-              {preview.program ? (
+              {preview.program && !preview.routineId ? (
                 <p className="mt-3 text-sm text-muted">{preview.program.dayName} of {programName(preview.program.id)}{fixed ? "" : `: recovered muscles from today's group, furthest from this week's ${preview.week.setsPerMuscle}-set goal`}. {preview.program.note}.</p>
-              ) : <p className="mt-3 text-sm text-muted">Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</p>}
+              ) : (
+                <p className="mt-3 text-sm text-muted">{preview.routineId ? <>Your routine works {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}. The map shows how recovered each muscle is.</> : <>Today targets {focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLowerCase()).join(", ")}: recovered, and furthest from this week&apos;s {preview.week.setsPerMuscle}-set goal.</>}</p>
+              )}
             </div>
           </Section>
         </>

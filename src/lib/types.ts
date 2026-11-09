@@ -254,6 +254,8 @@ export interface Profile {
   theme?: "dark" | "light" | "system";
   /** Delightful extras (moments, themes, voice coach, ghost mode...). See "Delightful extras" in AGENTS.md. */
   delight?: DelightPrefs;
+  /** Saved routines, newest first (routines.ts). */
+  routines?: Routine[];
   onboarded: boolean;
   updatedAt: number;
 }
@@ -262,6 +264,22 @@ export type PlanSource =
   | { kind: "adaptive" }
   | { kind: "program"; id: string; startedAt: number; start: Record<string, number> }
   | { kind: "routine"; id: string };
+/** A saved routine (routines.ts): exercises, set counts and supersets, in order. */
+export interface RoutineItem {
+  exerciseId: string;
+  sets: number;
+  /** Superset: neighbours with the same group are done back to back. */
+  group?: string;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  items: RoutineItem[];
+  createdAt: number;
+  updatedAt: number;
+}
+
 export interface DelightPrefs {
   /** Spoken cues between sets. Off by default. */
   voice?: boolean;
@@ -341,6 +359,8 @@ export interface SessionStartEvent extends EventBase {
   source?: "manual";
   /** The program and day the plan came from (programs.ts). */
   program?: { id: string; day: number };
+  /** The saved routine the workout came from, if any. */
+  routine?: string;
 }
 
 export interface SessionEndEvent extends EventBase {
