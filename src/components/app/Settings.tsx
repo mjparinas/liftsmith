@@ -6,6 +6,8 @@ import { BRAND } from "@/lib/brand";
 import { useState } from "react";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
+import { MessageSettings } from "./MessageSettings";
+import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { go } from "./router";
@@ -49,6 +51,7 @@ export function Settings() {
       <Row<string> label="Lean mode: no confetti or motion flourishes" value={profile.lean ? "on" : "off"} onPick={(v) => setProfile({ lean: v === "on" })} options={[["off", "Off"], ["on", "On"]]} />
       <Row<string> label="Daily quote on Today" value={profile.quotes === false ? "off" : "on"} onPick={(v) => setProfile({ quotes: v === "on" })} options={[["on", "On"], ["off", "Off"]]} />
       <CalendarSettings />
+      <MessageSettings />
       <CycleSettings />
       <Section title="Usage stats">
         <div className="flex flex-wrap gap-2">
@@ -63,8 +66,8 @@ export function Settings() {
       <Section title="Data">
         {confirm ? (
           <div className="space-y-2">
-            <p className="text-sm text-muted">This erases every workout on this device. It can&apos;t be undone.</p>
-            <Button kind="danger" className="w-full" onClick={() => void reset()}>Erase everything</Button>
+            <p className="text-sm text-muted">This erases every workout on this device, and your reminder email address from our server. It can&apos;t be undone.</p>
+            <Button kind="danger" className="w-full" onClick={() => void deleteEmail().finally(() => void reset())}>Erase everything</Button>
             <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>Cancel</Button>
           </div>
         ) : (
