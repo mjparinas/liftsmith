@@ -5,7 +5,7 @@
 import fs from "node:fs";
 
 import { closeAll, open, pick } from "./devices.mjs";
-import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
+import { base, check, finish, onboard, stubSignIn, watchErrors } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "e2e-shots/devices";
 fs.mkdirSync(OUT, { recursive: true });
@@ -20,6 +20,7 @@ for (const { name } of pick()) {
   if (!target) continue;
   const { browser, opts, engine } = target;
   const ctx = await browser.newContext(opts);
+  await stubSignIn(ctx);
   const page = await ctx.newPage();
   const errors = [];
   watchErrors(page, errors);
