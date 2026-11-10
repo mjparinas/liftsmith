@@ -32,7 +32,8 @@ const kept = tags.filter((m) => !m[2].includes('tools:node="remove"')).map((m) =
 
 describe("Play store policy config", () => {
   it("declares exactly the Health Connect permissions health.ts requests", () => {
-    const wanted = [...READ.map((t) => `READ_${PERMISSION[t]}`), ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`)];
+    // WRITE_EXERCISE is asked for by our own HealthWorkoutPlugin.kt (workouts as exercise sessions).
+    const wanted = [...READ.map((t) => `READ_${PERMISSION[t]}`), ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`), "WRITE_EXERCISE"];
     expect(wanted.every((w) => !w.includes("undefined"))).toBe(true);
     expect([...kept].sort()).toEqual([...wanted].sort());
   });
@@ -83,8 +84,11 @@ describe("Play store policy config", () => {
     for (const section of ["cloud-backup", "device-transfer"]) {
       const body = rules.match(new RegExp(`<${section}>([\\s\\S]*?)</${section}>`))?.[1] ?? "";
       expect(body).toContain('<exclude domain="root" path="app_webview/" />');
+      // The home-screen widget's snapshot (today's plan, coach's note) is personal too.
+      expect(body).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
     }
     expect(res("full_backup_content")).toContain('<exclude domain="root" path="app_webview/" />');
+    expect(res("full_backup_content")).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
   });
 
   it("keeps the web view's storage out of iCloud backup", () => {

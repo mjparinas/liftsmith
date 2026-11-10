@@ -1,5 +1,6 @@
 // POST /api/billing/revenuecat/: RevenueCat's webhook (src/server/revenuecat.ts). Server build only (Vercel).
 // Needs REVENUECAT_WEBHOOK_SECRET (the same value as the Authorization header set in RevenueCat) and a database.
+import { alertForStoreEvent } from "@/server/alerts";
 import { authorized, storeRcEvent, type RcEvent } from "@/server/revenuecat";
 
 const MAX = 64_000;
@@ -19,6 +20,8 @@ export async function POST(req: Request) {
   if (!body.event?.id) return Response.json({ error: "No event" }, { status: 400 });
   try {
     const r = await storeRcEvent(body.event);
+    // A new paying customer or a failed payment emails the admins (never throws).
+    if (r === "stored") await alertForStoreEvent(`rc-${body.event.id}`);
     return Response.json({ ok: true, r });
   } catch {
     // RevenueCat retries failed deliveries, so a database hiccup isn't lost.

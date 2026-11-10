@@ -276,6 +276,11 @@ export interface Profile {
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */
   routines?: Routine[];
+  /**
+   * Connected apps (connections.ts): the music app the playlist link on Today opens (missing means no
+   * link), and whether finished workouts go to Strava once it's connected (missing means yes).
+   */
+  connections?: { music?: MusicApp; stravaPost?: boolean };
   /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
   training?: TrainingPrefs;
   /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
@@ -283,6 +288,9 @@ export interface Profile {
   onboarded: boolean;
   updatedAt: number;
 }
+
+/** A music app the playlist link opens (connections.ts MUSIC). */
+export type MusicApp = "spotify" | "apple" | "youtube";
 
 /** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
 export type EffortScale = "rir" | "rpe";
@@ -558,6 +566,20 @@ export interface CheckinEvent extends EventBase {
   buddies: string[];
 }
 
+/**
+ * The pre-workout check-in on Today: how the lifter feels, in three taps at most. The newest one from today
+ * moves today's call (readiness.ts); older ones are history. Kept and synced like any other event.
+ */
+export interface FeelEvent extends EventBase {
+  type: "feel";
+  /** −1 low, 0 okay, 1 great. */
+  energy: -1 | 0 | 1;
+  /** Sore from the last workout. */
+  sore?: boolean;
+  /** Feeling ill: today becomes an easy day whatever else the data says. */
+  unwell?: boolean;
+}
+
 /** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
 export interface WarmupEvent extends EventBase {
   type: "warmup";
@@ -657,6 +679,7 @@ export type AppEvent =
   | HealthEvent
   | TdeeEvent
   | CheckinEvent
+  | FeelEvent
   | SetEvent
   | SessionStartEvent
   | SessionEndEvent

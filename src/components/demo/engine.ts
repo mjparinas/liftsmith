@@ -52,6 +52,8 @@ export interface DemoSettings {
   bpm?: number | null;
   /** Frames per second cap (30 for the small inline demo). */
   fps: number;
+  /** Cap on device pixels per CSS pixel; 2 when left out (the public site uses 1.5). */
+  maxDpr?: number;
   /**
    * Paint muscles in their own colours (the recovery map) instead of the ember target glow. Hex colours;
    * `hatch` (0..1) lights the cross lines on a muscle so its state doesn't rest on colour alone, and
@@ -240,7 +242,7 @@ export function startLoop(
       const r = canvas.getBoundingClientRect();
       if (r.width !== size[0] || r.height !== size[1]) {
         size = [r.width, r.height];
-        scene.resize(r.width, r.height, Math.min(2, window.devicePixelRatio || 1));
+        scene.resize(r.width, r.height, Math.min(s.maxDpr ?? 2, window.devicePixelRatio || 1));
       }
       const smp = target !== null ? { d: followD, label: "", effort: 0.4 + 0.6 * followD } : sample(motion.phases, t);
       const J = jointsAt(motion, body, smp.d);

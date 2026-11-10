@@ -1,7 +1,8 @@
 "use client";
 
 // The admin System tab (as in Gradelings): one card per part of the stack (live site, uptime, builds, deploys,
-// database, email, the daily job, subscriptions, settings) and the providers' public status pages. Every card
+// database, email, the daily job, subscriptions, admin security, capacity, backups, settings) and the providers'
+// public status pages, under the maintenance mode switch. Every card
 // loads on its own, so a slow service never holds up the rest; results are cached on the server for a minute.
 import { useCallback, useEffect, useState } from "react";
 
@@ -15,8 +16,58 @@ import {
   type HealthCheck,
   type StatusPage,
 } from "@/lib/systemHealth";
+import { isVisible } from "@/lib/visibility";
 
+import { MaintenanceCard, useMaintenance } from "./Maintenance";
 import { ago } from "./time";
+import { TwoFactorCard } from "./TwoFactor";
+
+const AUTO_KEY = "liftsmith.admin.autoRefresh";
+const readAuto = () => {
+  try {
+    return localStorage.getItem(AUTO_KEY) === "1";
+  } catch {
+    return false;
+  }
+};
+
+/** Records the day a restore from backup was practised (docs/RESTORE.md), for the Backups card. */
+function RestoreDrill({ done }: { done: () => void }) {
+  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [msg, setMsg] = useState<string | null>(null);
+  const save = async () => {
+    const r = await fetch("/api/admin/system/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "restore-drill", date }),
+    });
+    const j = (await r.json().catch(() => ({}))) as { error?: string };
+    setMsg(r.ok ? "Recorded." : (j.error ?? "That didn't save."));
+    if (r.ok) done();
+  };
+  return (
+    <section className="card p-4">
+      <h2 className="font-semibold">Record a restore practice</h2>
+      <p className="mt-0.5 text-xs text-muted">
+        After restoring a Turso backup into a spare database and checking it (docs/RESTORE.md), note the day here.
+      </p>
+      <div className="mt-2 flex flex-wrap items-end gap-2 text-sm">
+        <label htmlFor="drill-date" className="block">
+          <span className="block text-xs text-muted">Practised on</span>
+          <input id="drill-date" type="date" value={date} onChange={(e) => setDate(e.target.value)} className="card mt-1 px-2 py-1.5" />
+        </label>
+        <button type="button" onClick={() => void save()} className="press rounded-lg border border-line px-3 py-1.5">
+          Record restore practice
+        </button>
+      </div>
+      {msg && (
+        <p role="status" className="mt-2 text-sm text-muted">
+          {msg}
+        </p>
+      )}
+    </section>
+  );
+}
 
 const DOT: Record<CheckState, string> = { ok: "bg-good", warn: "bg-warn", down: "bg-bad", off: "bg-line" };
 const TEXT: Record<CheckState, string> = { ok: "text-good", warn: "text-warn", down: "text-bad", off: "text-muted" };
@@ -161,9 +212,23 @@ function PageRow({
   );
 }
 
-export function System() {
+export function System({ admin = false, maintenance }: { admin?: boolean; maintenance?: ReturnType<typeof useMaintenance> }) {
   const [round, setRound] = useState(0);
   const [refresh, setRefresh] = useState(false);
+  const own = useMaintenance();
+  const [mState, mChanged] = maintenance ?? own;
+  // Auto refresh (Gradelings): off by default, remembered on this browser; reads the server's one-minute cache.
+  const [auto, setAuto] = useState(readAuto);
+  useEffect(() => {
+    if (!auto) return;
+    const t = setInterval(() => {
+      // Not while the tab is hidden: it refreshes when it comes back (Gradelings #553).
+      if (!isVisible()) return;
+      setRefresh(false);
+      setRound((r) => r + 1);
+    }, 60_000);
+    return () => clearInterval(t);
+  }, [auto]);
   const [states, setStates] = useState<Record<string, CheckState>>({});
   const report = useCallback((id: string, s: CheckState) => setStates((x) => (x[id] === s ? x : { ...x, [id]: s })), []);
   const all = Object.values(states);
@@ -171,6 +236,7 @@ export function System() {
   const total = CHECKS.length + STATUS_PAGES.length;
   return (
     <div className="space-y-4">
+      <MaintenanceCard state={mState} admin={admin} changed={mChanged} />
       <div className="flex flex-wrap items-center gap-3">
         <p className="text-sm">
           {all.length < total ? (
@@ -181,13 +247,28 @@ export function System() {
             </>
           )}
         </p>
+        <label className="ml-auto flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={auto}
+            onChange={(e) => {
+              setAuto(e.target.checked);
+              try {
+                localStorage.setItem(AUTO_KEY, e.target.checked ? "1" : "0");
+              } catch {
+                // Not remembered; it still works for this visit.
+              }
+            }}
+          />
+          Auto refresh every minute
+        </label>
         <button
           type="button"
           onClick={() => {
             setRefresh(true);
             setRound((r) => r + 1);
           }}
-          className="press ml-auto rounded-lg border border-line px-3 py-1.5 text-sm"
+          className="press rounded-lg border border-line px-3 py-1.5 text-sm"
         >
           Check again
         </button>
@@ -197,6 +278,15 @@ export function System() {
           <CheckCard key={c.id} id={c.id} title={c.title} round={round} refresh={refresh} report={report} />
         ))}
       </div>
+      <TwoFactorCard />
+      {admin && (
+        <RestoreDrill
+          done={() => {
+            setRefresh(true);
+            setRound((r) => r + 1);
+          }}
+        />
+      )}
       <section className="card p-4">
         <h2 className="font-semibold">Providers&apos; status pages</h2>
         <p className="mt-0.5 text-xs text-muted">What each service says about itself, read from its public status page.</p>

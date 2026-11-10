@@ -222,7 +222,7 @@ export function applyFixes(
         ).kg;
         return {
           ...item,
-          target: { ...item.target, weight: Math.min(kg, item.target.weight), note: "Plateau fix: about 10% lighter, then build back" },
+          target: { ...item.target, weight: Math.min(kg, item.target.weight), note: t("note.fixReset") },
         };
       }
       case "reps": {
@@ -231,14 +231,14 @@ export function applyFixes(
         const recent = sessionsOf(events, ex.id)[0];
         const e1 = recent ? Math.max(...recent.map((s) => epley(s.weight, s.reps))) : f.from;
         const kg = roundLoad(weightFor(e1, reps, item.target.rir), ex, gym).kg;
-        return { ...item, target: { ...item.target, weight: kg, reps, note: `Plateau fix: ${reps} reps for three weeks` } };
+        return { ...item, target: { ...item.target, weight: kg, reps, note: t("note.fixReps", { reps }) } };
       }
       case "variation": {
         if (!f.swapTo || plan.items.some((i) => i.exerciseId === f.swapTo)) return item;
         const alt = EXERCISE_BY_ID.get(f.swapTo);
         if (!alt || !alt.needs.every((n) => gym.equipment.includes(n))) return item;
-        const t = target(alt, events, profile, gym, now);
-        return { ...item, exerciseId: alt.id, target: { ...t, note: `Plateau fix: ${alt.name} instead of ${ex.name} for three weeks` } };
+        const next = target(alt, events, profile, gym, now);
+        return { ...item, exerciseId: alt.id, target: { ...next, note: t("note.fixSwap", { name: alt.name, was: ex.name }) } };
       }
     }
   });

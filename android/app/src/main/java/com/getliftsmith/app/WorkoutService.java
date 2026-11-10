@@ -83,6 +83,9 @@ public class WorkoutService extends Service {
         String plates = intent.getStringExtra("plates");
         long restUntil = intent.getLongExtra("restUntil", 0L);
         int hr = intent.getIntExtra("hr", 0);
+        String chip = intent.getStringExtra("chip");
+        int done = intent.getIntExtra("done", 0);
+        int total = intent.getIntExtra("total", 0);
         boolean resting = restUntil > System.currentTimeMillis();
 
         StringBuilder body = new StringBuilder();
@@ -104,10 +107,22 @@ public class WorkoutService extends Service {
             .setColor(0xFF4C8DFF)
             .setContentIntent(openApp())
             .addAction(0, getString(R.string.shortcut_log_short), action("log"))
-            .addAction(0, getString(R.string.add_30), action("add30"));
+            .addAction(0, getString(R.string.add_30), action("add30"))
+            // Android 16 Live Updates: ask for promotion, so the workout gets a chip in the status bar and sits at the
+            // top of the shade and the lock screen. Samsung's One UI 8 shows promoted notifications in its Now Bar too.
+            // Promotion needs an ongoing notification with a title, a standard or BigText style, no custom views and
+            // no colorized background, on a channel above IMPORTANCE_MIN; all true here. Older Android ignores it.
+            .setRequestPromotedOngoing(true);
+        // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
+        if (total > 0) b.setProgress(total, Math.min(done, total), false);
         if (resting) {
-            // A live countdown drawn by the system: right on the lock screen without waking the app every second.
+            // A live countdown drawn by the system: right on the lock screen, and in the status bar chip on Android 16,
+            // without waking the app every second.
             b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
+        } else {
+            // While lifting the chip shows the set ("2/4"), not a clock.
+            b.setShowWhen(false);
+            if (chip != null && !chip.isEmpty()) b.setShortCriticalText(chip);
         }
         Notification n = b.build();
         int type = Build.VERSION.SDK_INT >= 34 ? ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE : 0;
@@ -118,10 +133,11 @@ public class WorkoutService extends Service {
             final boolean sound = intent.getBooleanExtra("sound", true);
             final boolean vibrate = intent.getBooleanExtra("vibrate", true);
             final String speak = intent.getStringExtra("speak");
+            final String speakLang = intent.getStringExtra("speakLang");
             restOver = () -> {
                 alertRestOver(next, sound, vibrate);
                 // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
-                if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f);
+                if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f, speakLang);
             };
             handler.postDelayed(restOver, restUntil - System.currentTimeMillis());
         }

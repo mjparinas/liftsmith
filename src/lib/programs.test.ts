@@ -5,7 +5,7 @@ import { available, exercise, LADDER_ONLY } from "./exercises";
 import { generate, type Plan } from "./generator";
 import { barFor } from "./loads";
 import { loadBar } from "./plates";
-import { missingFor, pickProgram, programPlan, PROGRAMS, SPLITS, weeklyPreview, type Ctx, type ProgramId } from "./programs";
+import { missingFor, PICKER_ORDER, pickProgram, programPlan, PROGRAMS, SPLITS, weeklyPreview, type Ctx, type ProgramId } from "./programs";
 import type { AppEvent, Gym, PlanSource, Profile, SetEvent } from "./types";
 import { fromKg, toKg } from "./units";
 
@@ -113,6 +113,20 @@ describe("program list", () => {
       expect(p.basedOn.length).toBeGreaterThan(10);
       expect(p.how.length).toBeGreaterThanOrEqual(3);
     }
+  });
+
+  it("lists Pro programs first in the picker, each group in its usual order", () => {
+    expect(PICKER_ORDER.map((p) => p.id)).toEqual([
+      "ppl",
+      "upper-lower",
+      "classic-5x5",
+      "novice-3x5",
+      "5x5-plus",
+      "ramping-5x5",
+      "tiered",
+      "waves",
+      "calisthenics",
+    ]);
   });
 
   it("never uses a trademarked program name as the name", () => {

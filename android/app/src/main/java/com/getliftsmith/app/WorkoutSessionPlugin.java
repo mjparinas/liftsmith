@@ -103,7 +103,19 @@ public class WorkoutSessionPlugin extends Plugin {
         i.putExtra("sound", call.getBoolean("sound", true));
         i.putExtra("vibrate", call.getBoolean("vibrate", true));
         i.putExtra("speak", call.getString("speak", ""));
+        i.putExtra("speakLang", call.getString("speakLang", ""));
+        i.putExtra("chip", call.getString("chip", ""));
+        i.putExtra("done", call.getInt("done", 0));
+        i.putExtra("total", call.getInt("total", 0));
         ContextCompat.startForegroundService(getContext(), i);
+        call.resolve();
+    }
+
+    /** The home-screen widget's snapshot (src/lib/widget.ts), drawn by WorkoutWidget. */
+    @PluginMethod
+    public void setWidget(PluginCall call) {
+        String json = call.getString("json");
+        if (json != null) WorkoutWidget.save(getContext(), json);
         call.resolve();
     }
 

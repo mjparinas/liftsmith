@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "./i18n";
 import { isNative } from "./juice";
 
 // The live workout notification. In the Capacitor shell this calls the native WorkoutSession
@@ -19,6 +20,20 @@ export interface SessionState {
   vibrate?: boolean;
   /** Voice coach: said by the Android service when rest ends (voice.ts). iOS and the web say it in the page. */
   speak?: string;
+  /** The cue's language (the app's, which can differ from the phone's), so the speech engine uses the right voice. */
+  speakLang?: string;
+  /** A few characters for the Android 16 status bar chip and Now Bar, and iOS's compact Dynamic Island, while lifting
+   *  (`chipText`). During rest the chip shows the countdown instead. */
+  chip?: string;
+  /** Working sets logged so far and planned in the whole workout, for the progress bar on both platforms. */
+  done?: number;
+  total?: number;
+}
+
+/** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
+ *  chip's 96 dp (Android shows the text only when it fits) in every language. */
+export function chipText(warming: boolean, n: number, total: number): string {
+  return `${warming ? "W" : ""}${n}/${total}`;
 }
 
 /** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */
@@ -71,9 +86,9 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
   if (isNative()) return; // the native service sounds its own alert
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   const reg = await navigator.serviceWorker?.getRegistration();
-  await reg?.showNotification("Rest over", {
+  await reg?.showNotification(t("workout.notify.over"), {
     tag: "rest",
-    body: `Up next: ${next}`,
+    body: t("workout.notify.next", { next }),
     silent: !alert.sound && !alert.vibrate,
     vibrate: alert.vibrate ? [200, 100, 200] : undefined,
     icon: "/icon-192.png",

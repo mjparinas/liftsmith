@@ -9,6 +9,18 @@ import { fmtNum } from "@/lib/units";
 
 export type PlateFinish = "classic" | "black" | "chrome" | "neon";
 
+/** The words on the graphic. English here for the website; the app's PlateBar (app/Plates.tsx) passes its language's. */
+export const PLATE_WORDS = {
+  label: "Load {plates} {unit} on each side of a {bar} {unit} bar",
+  noPlates: "no plates",
+  bar: "{bar} {unit} bar",
+  eachSide: "Each side:",
+  empty: "Empty bar",
+  nearest: "nearest you can load",
+};
+export type PlateWords = Record<keyof typeof PLATE_WORDS, string>;
+const fill = (s: string, v: Record<string, string>) => s.replace(/\{(\w+)\}/g, (_, k: string) => v[k] ?? "");
+
 /** Plate finishes won from crates keep the weight colour as a rim, so plates stay easy to tell apart. */
 function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
   if (finish === "black") return { fill: "#1b2027", stroke: s.fill, strokeWidth: 2.5, text: s.fill === "#e8e8e8" ? "#e8e8e8" : s.fill };
@@ -23,12 +35,14 @@ export function PlateBar({
   unit,
   compact,
   finish = "classic",
+  words: w = PLATE_WORDS,
 }: {
   loading: Loading;
   bar: number;
   unit: Unit;
   compact?: boolean;
   finish?: PlateFinish;
+  words?: PlateWords;
 }) {
   const plates = loading.perSide;
   const W = 360;
@@ -46,7 +60,7 @@ export function PlateBar({
         viewBox={`0 0 ${W} 120`}
         className="w-full"
         role="img"
-        aria-label={`Load ${plates.length ? plates.map(fmtNum).join(", ") : "no plates"} ${unit} on each side of a ${fmtNum(bar)} ${unit} bar`}
+        aria-label={fill(w.label, { plates: plates.length ? plates.map(fmtNum).join(", ") : w.noPlates, unit, bar: fmtNum(bar) })}
       >
         <defs>
           <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
@@ -113,19 +127,19 @@ export function PlateBar({
         ))}
         {!compact && (
           <text x={W / 2} y={cy + 30} fontSize={11} textAnchor="middle" style={{ fill: "var(--color-faint)" }}>
-            {`${fmtNum(bar)} ${unit} bar`}
+            {fill(w.bar, { bar: fmtNum(bar), unit })}
           </text>
         )}
       </svg>
       <p className="text-center text-sm text-muted num">
         {plates.length ? (
           <>
-            Each side: <span className="font-semibold text-ink">{plates.map(fmtNum).join(" + ")}</span> {unit}
+            {w.eachSide} <span className="font-semibold text-ink">{plates.map(fmtNum).join(" + ")}</span> {unit}
           </>
         ) : (
-          "Empty bar"
+          w.empty
         )}
-        {!loading.exact && <span className="ml-2 text-warn">nearest you can load</span>}
+        {!loading.exact && <span className="ml-2 text-warn">{w.nearest}</span>}
       </p>
     </div>
   );

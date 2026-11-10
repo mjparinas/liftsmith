@@ -598,9 +598,14 @@ export function localDay(now: number): number {
  * comes round again, so neighbouring days don't get quotes from the same author.
  */
 export function quoteOfDay(now: number, list: Quote[] = QUOTES): Quote {
-  const order = shuffled(list.length);
+  return list[quoteIndexOfDay(now, list.length)];
+}
+
+/** Where today's quote sits in a list of n quotes. Its text in the app's language is `quote.<index>`. */
+export function quoteIndexOfDay(now: number, n: number = QUOTES.length): number {
+  const order = shuffled(n);
   const day = localDay(now);
-  return list[order[((day % list.length) + list.length) % list.length]];
+  return order[((day % n) + n) % n];
 }
 
 let cache: { n: number; order: number[] } | null = null;

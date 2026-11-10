@@ -1,5 +1,6 @@
 import { exercise } from "./exercises";
 import { setSeconds, type PlanItem } from "./generator";
+import { t } from "./i18n";
 import type { Equipment } from "./types";
 
 // Changing the plan mid-workout (Melvin picked it, 2026-11-09). Other apps plan before you start and
@@ -68,9 +69,9 @@ export function fitToTime(items: readonly PlanItem[], index: number, doneOnCurre
     dropped.push(c.it.exerciseId);
     next.splice(c.i, 1);
   }
-  for (const [id, n] of cut) if (!dropped.includes(id)) changes.push(`${exercise(id).name}: ${n} ${n === 1 ? "set" : "sets"} fewer`);
-  for (const id of dropped) changes.push(`${exercise(id).name}: skipped today`);
-  if (!changes.length) changes.push("Everything still fits.");
+  for (const [id, n] of cut) if (!dropped.includes(id)) changes.push(t("coach.fewer", { name: exercise(id).name, count: n }));
+  for (const id of dropped) changes.push(t("coach.skipped", { name: exercise(id).name }));
+  if (!changes.length) changes.push(t("coach.allFit"));
   return { items: next, changes, minutes: Math.ceil(remainingSeconds(next, index, doneOnCurrent) / 60) };
 }
 

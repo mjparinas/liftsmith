@@ -14,6 +14,11 @@ struct WorkoutAttributes: ActivityAttributes {
         /// End of the current rest, or nil while lifting.
         var restUntil: Date?
         var hr: Int?
+        /// A few characters for the compact Dynamic Island while lifting ("2/4"); Android's status bar chip shows the same.
+        var chip: String?
+        /// Working sets logged and planned in the whole workout, for the progress bar (Android: the notification's bar).
+        var done: Int?
+        var total: Int?
     }
 
     var startedAt: Date

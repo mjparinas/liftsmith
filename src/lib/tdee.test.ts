@@ -11,6 +11,7 @@ import {
   currentBodyFat,
   currentTdee,
   inferActivity,
+  parseBodyFat,
   snapshotDue,
   tdeeHistory,
   validInputs,
@@ -166,5 +167,21 @@ describe("autofill from Health Connect / Apple Health", () => {
     expect(currentBodyFat(ev, profile({ bodyFat: { pct: 17, at: NOW } }))).toBe(17);
     expect(currentBodyFat(ev, profile({ bodyFat: { pct: 17, at: NOW - 5 * DAY } }))).toBe(19);
     expect(currentBodyFat([], profile())).toBeUndefined();
+  });
+});
+
+describe("parseBodyFat", () => {
+  it("takes 3 to 60%, a comma decimal, and rounds to 0.1", () => {
+    expect(parseBodyFat("18.46")).toBe(18.5);
+    expect(parseBodyFat("17,5")).toBe(17.5);
+    expect(parseBodyFat("3")).toBe(3);
+    expect(parseBodyFat("60")).toBe(60);
+  });
+  it("is undefined for an empty box or a value out of range", () => {
+    expect(parseBodyFat("")).toBeUndefined();
+    expect(parseBodyFat("  ")).toBeUndefined();
+    expect(parseBodyFat("2.9")).toBeUndefined();
+    expect(parseBodyFat("61")).toBeUndefined();
+    expect(parseBodyFat("abc")).toBeUndefined();
   });
 });

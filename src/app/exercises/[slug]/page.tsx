@@ -66,7 +66,7 @@ export default async function ExercisePage({ params }: Props) {
       </p>
       <div className="mt-8 grid gap-8 lg:grid-cols-[1.1fr_1fr]">
         <div>
-          <ExerciseDemo id={e.id} />
+          <ExerciseDemo id={e.id} labels={MUSCLE_NAME} />
           <p className="mt-2 text-xs text-muted">Drag to turn the figure. The highlighted muscles are the ones doing the work.</p>
         </div>
         <div>

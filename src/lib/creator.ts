@@ -10,7 +10,7 @@
 // - Android: the link sends people to Play with an install referrer (utm_source=creator, utm_campaign=<code>),
 //   which the InstallInfo plugin already reads;
 // - iPhone: the App Store passes nothing per install, so the link page shows the code to type in setup's
-//   trial step or Settings › Creator code (Platform deltas in AGENTS.md).
+//   trial step or Settings › Redeem a code (Platform deltas in AGENTS.md).
 //
 // The code is sent to POST /api/creator/ with the random install id (never anything else). That claim is
 // how the creator gets paid, so it is sent whatever the usage-stats switch says, and /privacy/ says so.
@@ -19,7 +19,7 @@
 import { create } from "zustand";
 
 import { installId, platformStore } from "./analytics";
-import { normalizeCode, playLinkWithCode } from "./creatorCode";
+import { DEFAULT_OFFERING, DEFAULT_TRIAL_DAYS, normalizeCode, OFFERING_ID, playLinkWithCode, type CodeKind } from "./creatorCode";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
@@ -29,12 +29,13 @@ export { normalizeCode, playLinkWithCode };
 export const CREATOR_KEY = "liftsmith.creator";
 /** Set when the lifter removes a code, so a link or the install referrer doesn't bring it back. */
 const CLEARED_KEY = "liftsmith.creatorCleared";
-/** The trial a creator's followers get, in days (the store offering behind it is "creator30"). */
-export const CREATOR_TRIAL_DAYS = 30;
-export const CREATOR_OFFERING = "creator30";
+/** The trial a code gives unless the server says otherwise, in days (the store offering behind it is "creator30"). */
+export const CREATOR_TRIAL_DAYS = DEFAULT_TRIAL_DAYS;
+export const CREATOR_OFFERING = DEFAULT_OFFERING;
 
 export type CodeSource = "link" | "referrer" | "typed";
-export type CodeStatus = "pending" | "ok" | "unknown";
+/** pending: not checked yet (offline); ok: live; unknown: no such code; ended: past its end date or out of uses. */
+export type CodeStatus = "pending" | "ok" | "unknown" | "ended";
 
 export interface CreatorClaim {
   code: string;
@@ -42,8 +43,12 @@ export interface CreatorClaim {
   source: CodeSource;
   /** pending: not checked with the server yet (offline); ok: a live creator; unknown: no such code. */
   status: CodeStatus;
-  /** The creator's display name, once the server has said. */
+  /** The creator's display name, once the server has said (never for a promo code). */
   name?: string;
+  /** What the server said the code is and gives; until then, a creator's 30-day trial is assumed. */
+  kind?: CodeKind;
+  trialDays?: number | null;
+  offering?: string;
 }
 
 /** A code in a link: /c/<code>/, or ?c= / ?code= on any page. */
@@ -89,9 +94,22 @@ function writeClaim(c: CreatorClaim | null) {
 
 export const useCreator = create<{ claim: CreatorClaim | null; checking: boolean }>(() => ({ claim: null, checking: false }));
 
+const dead = (c: CreatorClaim) => c.status === "unknown" || c.status === "ended";
+
 /** The code that gives the longer trial: one the server knows (or hasn't checked yet, offline). */
 export function activeCode(c: CreatorClaim | null = useCreator.getState().claim): string | null {
-  return c && c.status !== "unknown" ? c.code : null;
+  return c && !dead(c) ? c.code : null;
+}
+
+/** The RevenueCat offering to sell from with the active code, or null without one. */
+export function activeOffering(c: CreatorClaim | null = useCreator.getState().claim): string | null {
+  return activeCode(c) ? (c?.offering ?? CREATOR_OFFERING) : null;
+}
+
+/** The trial the active code gives, in days, or null when it gives a discount (or there's no code). */
+export function codeTrialDays(c: CreatorClaim | null = useCreator.getState().claim): number | null {
+  if (!activeCode(c)) return null;
+  return c?.trialDays === undefined ? CREATOR_TRIAL_DAYS : c.trialDays;
 }
 
 export type SetResult = "ok" | "invalid" | "locked" | "same";
@@ -104,9 +122,9 @@ export function setCode(raw: string, source: CodeSource, locked: boolean, now = 
   const code = normalizeCode(raw);
   if (!code) return "invalid";
   const cur = readClaim();
-  if (cur?.code === code && cur.status !== "unknown") return "same";
+  if (cur?.code === code && !dead(cur)) return "same";
   if (locked) return "locked";
-  if (cur && cur.status !== "unknown" && cur.source === "typed" && source !== "typed") return "locked";
+  if (cur && !dead(cur) && cur.source === "typed" && source !== "typed") return "locked";
   writeClaim({ code, at: now, source, status: "pending" });
   return "ok";
 }
@@ -141,7 +159,7 @@ export const creatorHooks: { onChecked?: (code: string | null) => void } = {};
 /** Sends the claim to the server: checks the code and records which creator this install came from. */
 export async function sendClaim(post: Post = fetch): Promise<CodeStatus | null> {
   const c = readClaim();
-  if (!c || c.status === "unknown") return null;
+  if (!c || dead(c)) return null;
   useCreator.setState({ checking: true });
   try {
     const r = await post(creatorUrl(), {
@@ -149,16 +167,33 @@ export async function sendClaim(post: Post = fetch): Promise<CodeStatus | null> 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ installId: installId(), code: c.code, source: c.source, platform: platformStore() }),
     });
-    if (r.status === 404) {
-      writeClaim({ ...c, status: "unknown" });
+    if (r.status === 404 || r.status === 410) {
+      const status = r.status === 404 ? "unknown" : "ended";
+      writeClaim({ ...c, status });
       creatorHooks.onChecked?.(null);
-      return "unknown";
+      return status;
     }
     if (!r.ok) return null; // Server not set up or busy: stays pending, tried again on the next open.
-    const j = (await r.json().catch(() => ({}))) as { name?: string; code?: string };
+    const j = (await r.json().catch(() => ({}))) as {
+      name?: unknown;
+      code?: unknown;
+      kind?: unknown;
+      trialDays?: unknown;
+      offering?: unknown;
+    };
     // The server may answer with the code it already holds for this install (a trial started under it).
-    const code = normalizeCode(j.code) ?? c.code;
-    writeClaim({ ...c, code, status: "ok", ...(j.name ? { name: String(j.name).slice(0, 60) } : {}) });
+    const code = normalizeCode(typeof j.code === "string" ? j.code : null) ?? c.code;
+    const next: CreatorClaim = { ...c, code, status: "ok" };
+    delete next.name; // A promo code has none, and a kept code may belong to someone else.
+    writeClaim({
+      ...next,
+      ...(typeof j.name === "string" && j.name ? { name: j.name.slice(0, 60) } : {}),
+      ...(j.kind === "promo" || j.kind === "creator" ? { kind: j.kind } : {}),
+      ...(j.trialDays === null || (typeof j.trialDays === "number" && j.trialDays > 0 && j.trialDays <= 90)
+        ? { trialDays: j.trialDays }
+        : {}),
+      ...(typeof j.offering === "string" && OFFERING_ID.test(j.offering) ? { offering: j.offering } : {}),
+    });
     creatorHooks.onChecked?.(code);
     return "ok";
   } catch {

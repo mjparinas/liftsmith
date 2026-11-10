@@ -4,14 +4,15 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
+import { musicLink, openOutside } from "@/lib/connections";
 import { exercise } from "@/lib/exercises";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { clockTime, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
-import { quoteOfDay } from "@/lib/quotes";
+import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
-import { CALL_TEXT, type Call } from "@/lib/readiness";
+import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
@@ -19,6 +20,7 @@ import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { callWhy, itemWhy, whyContext } from "@/lib/why";
+import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { PlanExtras, TodayMoments } from "./Extras";
@@ -31,7 +33,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
-import { Button, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { Button, Chip, EmptyState, LinkToggle, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -53,6 +55,41 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
         </span>
       )}
     </span>
+  );
+}
+
+/**
+ * The pre-workout check-in (Melvin, 2026-11-10): how the lifter feels today, in one tap. Low, sore and
+ * unwell take today easier (unwell makes it an easy day outright), great nudges it up; the call above, the
+ * plan and the playlist follow at once. Optional, and changeable all day.
+ */
+function FeelCheckIn({ now }: { now: number }) {
+  const { events, feel } = useApp();
+  const said = todayFeel(events, now);
+  const energies = [
+    { v: -1, key: "td.feelLow" },
+    { v: 0, key: "td.feelOk" },
+    { v: 1, key: "td.feelGreat" },
+  ] as const;
+  return (
+    <div className="mt-3" role="group" aria-labelledby="feel-title">
+      <p id="feel-title" className="text-sm font-medium">
+        {t("td.feel")}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {energies.map((e) => (
+          <Chip key={e.v} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
+            {t(e.key)}
+          </Chip>
+        ))}
+        <Chip active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
+          {t("td.feelSore")}
+        </Chip>
+        <Chip active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
+          {t("td.feelUnwell")}
+        </Chip>
+      </div>
+    </div>
   );
 }
 
@@ -164,6 +201,16 @@ export function Today() {
             {t("today.goalMore", { count: streak.needed })}
           </span>
         )}
+        {preview && !active && profile.connections?.music && (
+          <button
+            type="button"
+            onClick={() => openOutside(musicLink(profile.connections!.music!, preview.call))}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5"
+          >
+            <Icon name="play" size={15} className="text-cyan" />
+            {t("conn.music.play", { mood: t(`conn.music.${preview.call}`) })}
+          </button>
+        )}
         <button
           type="button"
           onClick={() => go("injuries")}
@@ -227,6 +274,7 @@ export function Today() {
               ))}
             </ul>
           )}
+          <FeelCheckIn now={now} />
           <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1" role="group" aria-label={t("td.call")}>
             {(["recover", "normal", "push"] as Call[]).map((c) => {
               const on = preview.call === c;
@@ -460,7 +508,8 @@ export function Today() {
 
 /** One quote a day from quotes.ts, with its author. Turned off in Settings › Daily quote. */
 function DailyQuote({ now }: { now: number }) {
-  const q = quoteOfDay(now);
+  const i = quoteIndexOfDay(now);
+  const q = QUOTES[i];
   return (
     <figure
       className="card-tint relative mt-4 overflow-hidden p-4 pl-12"
@@ -470,7 +519,7 @@ function DailyQuote({ now }: { now: number }) {
       <span className="absolute left-4 top-4 text-violet" aria-hidden>
         <Icon name="quote" size={20} strokeWidth={2.4} />
       </span>
-      <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{q.text}</blockquote>
+      <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{t(`quote.${i}` as MessageKey)}</blockquote>
       <figcaption className="mt-2 text-xs text-muted">
         <span className="font-semibold text-ink/80">{q.by}</span>
         {q.source && <span>, {q.source}</span>}

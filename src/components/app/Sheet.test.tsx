@@ -2,6 +2,8 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+import { handleBack } from "@/lib/back";
+
 import { Sheet } from "./ui";
 
 const touch = (x: number, y: number) => ({ touches: [{ clientX: x, clientY: y }] });
@@ -16,6 +18,19 @@ describe("Sheet", () => {
   afterEach(() => {
     cleanup();
     vi.useRealTimers();
+  });
+
+  it("closes on the phone's back button instead of leaving the screen, and stops catching back once closed", () => {
+    const onClose = vi.fn();
+    const { unmount } = render(
+      <Sheet open onClose={onClose} title="Back squat">
+        <p>Body</p>
+      </Sheet>,
+    );
+    expect(handleBack({ history: 1, atRoot: false })).toBe("closed");
+    expect(onClose).toHaveBeenCalledTimes(1);
+    unmount();
+    expect(handleBack({ history: 1, atRoot: false })).toBe("back");
   });
 
   it("has a visible close button", () => {
@@ -90,5 +105,23 @@ describe("Sheet", () => {
       vi.advanceTimersByTime(500);
     });
     expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it("moves with the finger while dragged, over its rise-in animation", () => {
+    render(
+      <Sheet open onClose={vi.fn()} title="Back squat">
+        <p>Body</p>
+      </Sheet>,
+    );
+    const sheet = screen.getByRole("dialog");
+    const handle = sheet.querySelector("[data-sheet-handle]")!;
+    fireEvent.touchStart(handle, touch(100, 100));
+    fireEvent.touchMove(handle, touch(100, 130));
+    fireEvent.touchMove(handle, touch(100, 160));
+    // A filling CSS animation overrides an inline transform, so the drag only shows once it's cleared.
+    expect(sheet.style.animation).toBe("none");
+    expect(sheet.style.transform).toBe("translateY(60px)");
+    expect(sheet.parentElement!.style.animation).toBe("none");
+    fireEvent.touchEnd(handle, { touches: [] });
   });
 });

@@ -2,6 +2,7 @@ import ActivityKit
 import Capacitor
 import UIKit
 import UserNotifications
+import WidgetKit
 
 /// Registers the app's own plugins with the bridge (Capacitor 8 with SPM has no auto-registration
 /// for plugins that live in the app target). Main.storyboard and SceneDelegate use this class.
@@ -13,6 +14,10 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(VoiceCoachPlugin())
         bridge?.registerPluginInstance(AppIconPlugin())
         bridge?.registerPluginInstance(AccountSignInPlugin())
+        bridge?.registerPluginInstance(HealthWorkoutPlugin())
+        // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
+        // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
+        webView?.allowsBackForwardNavigationGestures = true
     }
 }
 
@@ -30,6 +35,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "update", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setWidget", returnType: CAPPluginReturnPromise),
     ]
 
     private let restId = "liftsmith.rest"
@@ -42,7 +48,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         let center = UNUserNotificationCenter.current()
         next = (center.delegate !== self ? center.delegate : nil) ?? (bridge?.notificationRouter as UNUserNotificationCenterDelegate?)
         center.delegate = self
-        let log = UNNotificationAction(identifier: "log", title: "Log set", options: [])
+        let log = UNNotificationAction(identifier: "log", title: NSLocalizedString("Log set", comment: "Rest-over alert button"), options: [])
         let add = UNNotificationAction(identifier: "add30", title: "+30 s", options: [])
         center.setNotificationCategories([UNNotificationCategory(identifier: category, actions: [log, add], intentIdentifiers: [], options: [])])
 
@@ -80,8 +86,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         guard delay > 0.5 else { return call.resolve() }
 
         let content = UNMutableNotificationContent()
-        content.title = "Rest over"
-        content.body = ["Up next: \(call.getString("next") ?? "")", call.getString("plates")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n")
+        content.title = NSLocalizedString("Rest over", comment: "Rest-over alert title")
+        content.body = [String(format: NSLocalizedString("Up next: %@", comment: "Rest-over alert, the next set"), call.getString("next") ?? ""), call.getString("plates")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n")
         content.categoryIdentifier = category
         // Rest-over alert (Workout preferences): iOS can't vibrate a local notification without its sound,
         // or play the sound without the phone's own Sounds & Haptics choice, so "vibrate only" posts a
@@ -102,7 +108,10 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             next: call.getString("next") ?? "",
             plates: call.getString("plates") ?? "",
             restUntil: restUntil,
-            hr: call.getInt("hr")
+            hr: call.getInt("hr"),
+            chip: call.getString("chip"),
+            done: call.getInt("done"),
+            total: call.getInt("total")
         )
         // Heart rate arrives about once a second; the system budgets updates, so a change in heart rate alone is
         // pushed at most every 15 s. Anything else (a set logged, rest added) goes out straight away.
@@ -133,6 +142,16 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             for a in Activity<WorkoutAttributes>.activities where a.id != current?.id { await a.end(nil, dismissalPolicy: .immediate) }
             await current?.end(nil, dismissalPolicy: .immediate)
         }
+    }
+
+    /// The home-screen widget's snapshot (src/lib/widget.ts), read by QuickStartWidget in the widget extension.
+    /// The extension can only read it through the shared App Group "group.com.getliftsmith.app"; until both targets
+    /// have that capability, the snapshot stays in the app's own container and the widget shows its plain buttons.
+    @objc func setWidget(_ call: CAPPluginCall) {
+        guard let json = call.getString("json") else { return call.resolve() }
+        UserDefaults(suiteName: "group.com.getliftsmith.app")?.set(json, forKey: "widget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "QuickStart")
+        call.resolve()
     }
 
     @objc func stop(_ call: CAPPluginCall) {

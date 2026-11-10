@@ -30,6 +30,7 @@ afterEach(cleanup);
 
 async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commercial gym/) {
   render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Get started" }));
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: gym }));
@@ -43,10 +44,29 @@ describe("setup in another language", () => {
     const user = userEvent.setup();
     useApp.getState().setProfile({ language: "fr" });
     render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Commencer" }));
     expect(await screen.findByText("Quel est votre objectif ?")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Prendre du muscle/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Continuer" }));
     expect(await screen.findByText("Où vous entraînez-vous ?")).toBeInTheDocument();
+  });
+});
+
+describe("welcome screen", () => {
+  it("greets a new install before the first question, with sign-in for an existing account", async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    expect(await screen.findByText("Training that adapts to you")).toBeInTheDocument();
+    expect(screen.queryByText("What are you training for?")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "I already have an account" }));
+    expect(await screen.findByRole("dialog", { name: "Sign in" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Close" }));
+    await user.click(screen.getByRole("button", { name: "Get started" }));
+    expect(await screen.findByText("What are you training for?")).toBeInTheDocument();
+    // Sign-in lives on the welcome screen only, so the goal step has no second button for it.
+    expect(screen.queryByRole("button", { name: /Sign in/ })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Back" }));
+    expect(await screen.findByRole("button", { name: "Get started" })).toBeInTheDocument();
   });
 });
 
@@ -56,6 +76,7 @@ describe("Pro trial offer", () => {
   it("shows no priced offer while billing isn't live", async () => {
     const user = userEvent.setup();
     render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
@@ -73,6 +94,7 @@ describe("Pro trial offer", () => {
     ]);
     const user = userEvent.setup();
     render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
@@ -190,11 +212,11 @@ describe("first run to finished workout", () => {
   it("switches language from Settings, for the app and the page", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/look";
     await user.click(await screen.findByRole("button", { name: "Español" }));
     expect(await screen.findByRole("button", { name: "Hoy" })).toBeInTheDocument();
     expect(document.documentElement.lang).toMatch(/^es/);
-    expect(screen.getByRole("heading", { level: 1, name: "Ajustes" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Aspecto" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Tamaño del texto" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Français" }));
     expect(await screen.findByRole("button", { name: "Aujourd’hui" })).toBeInTheDocument();
@@ -279,7 +301,7 @@ describe("first run to finished workout", () => {
   it("imports a Strong export from Settings, once", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/data";
     const csv = [
       "Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Reps,Distance,Seconds,Notes,Workout Notes,RPE",
       "2026-01-05 18:00:00,Push,50m,Bench Press (Barbell),1,100,5,0,0,,,",
@@ -371,7 +393,7 @@ describe("first run to finished workout", () => {
   it("setup can be run again from Settings without losing gyms", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/training";
     await user.click(await screen.findByRole("button", { name: "Run setup again" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: /Get stronger/ }));
@@ -401,6 +423,7 @@ describe("first run to finished workout", () => {
   it("setup asks for a name, Today greets with it, and the daily quote can be turned off", async () => {
     const user = userEvent.setup();
     render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
     await screen.findByText("What are you training for?");
     await user.type(screen.getByLabelText("What should we call you?"), "Melvin Parinas");
     await user.click(screen.getByRole("button", { name: "Continue" }));
@@ -431,7 +454,8 @@ describe("programs", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.click(screen.getByRole("button", { name: /Adaptive.*Change/ }));
+    await user.click(await screen.findByRole("button", { name: /^Training/ }));
+    await user.click(await screen.findByRole("button", { name: /Adaptive.*Change/ }));
     await screen.findByText("Programs");
     await user.click(screen.getByRole("button", { name: /Classic 5×5/ }));
     const sheet = await screen.findByRole("dialog");
@@ -571,7 +595,8 @@ describe("game layer", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.click(await screen.findByRole("button", { name: "Lean mode" }));
+    await user.click(await screen.findByRole("button", { name: /^Look and feel/ }));
+    await user.click(await screen.findByRole("switch", { name: "Lean mode" }));
     expect(useApp.getState().profile.lean).toBe(true);
     const { juice } = await import("@/lib/juice");
     expect(juice.lean).toBe(true);
@@ -582,6 +607,7 @@ describe("saving your progress", () => {
   it("says where the data is saved before setup ends", async () => {
     const user = userEvent.setup();
     render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(screen.getByRole("button", { name: /Commercial gym/ }));

@@ -3,8 +3,8 @@ name: CI
 # Copied from Gradelings and cut to size. Everything runs in parallel; "CI passed" is the one check to
 # require in branch protection, and it is green only when every other job is (a skipped job counts as passed).
 #
-# Speed (2026-11-09): the native builds only run on a pull request that touches native code, Capacitor or
-# dependencies (the "changes" job), and always on pushes to staging and main; the device sweep is split by
+# Speed (2026-11-09, 2026-11-10): the "changes" job skips everything for a tree that already passed and for
+# Markdown-only changes, and skips the native builds unless native code, Capacitor or dependencies changed; the device sweep is split by
 # platform; Gradle uses its build cache; the iOS build compiles for one simulator architecture and doesn't wait
 # for the web build.
 
@@ -24,37 +24,100 @@ env:
   NEXT_TELEMETRY_DISABLED: 1
 
 jobs:
-  # Which parts of the repo this pull request touches. On a PR the checkout is GitHub's merge commit, whose
-  # first parent is the tip of the base branch, so HEAD^1..HEAD is exactly what merging would change.
+  # What this run has to do (Melvin asked, 2026-11-10: "find other ways to reduce CI runs"). Three answers:
+  #  1. Nothing, when this exact tree already passed. "CI passed" records the tree it tested as a commit status
+  #     ("CI passed tree") on the commit it ran for, so the staging push after a squash merge (when staging didn't
+  #     move meanwhile), the nightly promotion pull request, the push to main and the merge back into staging are
+  #     all recognised as already tested and finish in seconds.
+  #  2. Only the gate, when every changed file is Markdown (docs, AGENTS.md, READMEs) and the commit before it passed.
+  #     docs/PLAY_LISTING.md is the exception: a unit test checks it. Locale text (src/locales/) is not "copy" here:
+  #     it is app code, the tests check every key in every language, and longer text can break layouts.
+  #  3. The web jobs, plus both native builds when native code, Capacitor or dependencies changed.
+  # On a pull request the checkout is GitHub's merge commit: HEAD^1 is the base branch tip and HEAD^2 the pull
+  # request's head. On a push the diff is against the branch's previous tip.
   changes:
     name: Changed files
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: read
     outputs:
+      web: ${{ steps.diff.outputs.web }}
       native: ${{ steps.diff.outputs.native }}
+      tree: ${{ steps.diff.outputs.tree }}
     steps:
       - uses: actions/checkout@v7
-        if: github.event_name == 'pull_request'
         with:
           fetch-depth: 2
       - id: diff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
         run: |
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "native=true" >> "$GITHUB_OUTPUT"; exit 0
+          tree=$(git rev-parse 'HEAD^{tree}')
+          echo "tree=$tree" >> "$GITHUB_OUTPUT"
+          everything() { echo "web=true" >> "$GITHUB_OUTPUT"; echo "native=true" >> "$GITHUB_OUTPUT"; exit 0; }
+          # passed <commit> <tree>: did "CI passed" succeed on that commit, testing that tree?
+          passed() {
+            [ -n "$1" ] || return 1
+            desc=$(gh api "repos/$REPO/commits/$1/statuses?per_page=100" \
+              --jq '[.[] | select(.context == "CI passed tree")][0] | select(.state == "success") | .description' 2>/dev/null || true)
+            [ "$desc" = "Passed on tree $2" ]
+          }
+
+          # 1. This tree already passed: on this commit (a re-run), a parent (a merge whose result equals one side), or
+          #    the pull request a squash commit came from.
+          candidates="$(git rev-parse HEAD^@ 2>/dev/null || true)"
+          if [ "$EVENT" = push ]; then
+            candidates="$GITHUB_SHA $candidates $(gh api "repos/$REPO/commits/$GITHUB_SHA/pulls" --jq '.[].head.sha' 2>/dev/null || true)"
           fi
-          files=$(git diff --name-only HEAD^1 HEAD)
+          for c in $candidates; do
+            if passed "$c" "$tree"; then
+              echo "web=false" >> "$GITHUB_OUTPUT"; echo "native=false" >> "$GITHUB_OUTPUT"
+              echo "::notice::This exact tree already passed CI on ${c:0:7}, so nothing runs again."
+              exit 0
+            fi
+          done
+
+          # 2 and 3. What changed since the base.
+          if [ "$EVENT" = pull_request ]; then
+            base=$(git rev-parse HEAD^1)
+          else
+            base=$BEFORE
+            case "$base" in ""|0000000000000000000000000000000000000000) everything ;; esac
+            git fetch --no-tags --depth=1 origin "$base" || everything
+          fi
+          files=$(git diff --name-only "$base" HEAD)
           echo "$files"
-          # Anything that can change what the Android or iOS compiler sees: the native projects, Capacitor's
-          # config, the npm packages (Capacitor plugins carry native code), and CI itself.
-          if echo "$files" | grep -qE '^(android/|ios/|capacitor\.config\.|package(-lock)?\.json$|\.github/(workflows/ci\.yml|actions/))'; then
+          [ -n "$files" ] || everything
+
+          # Here-strings rather than pipes: with pipefail, a pipe into grep -q can fail on SIGPIPE.
+          not_md=$(grep -vE '\.md$' <<< "$files" || true)
+          if [ -z "$not_md" ] && ! grep -qx 'docs/PLAY_LISTING.md' <<< "$files" \
+            && passed "$base" "$(git rev-parse "$base^{tree}")"; then
+            echo "web=false" >> "$GITHUB_OUTPUT"; echo "native=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Only Markdown changed and ${base:0:7} passed CI, so the tests and builds are skipped."
+            exit 0
+          fi
+          echo "web=true" >> "$GITHUB_OUTPUT"
+
+          # Anything that can change what the Android or iOS compiler sees: the native projects, Capacitor's config,
+          # the npm packages (Capacitor plugins carry native code), and CI itself.
+          if grep -qE '^(android/|ios/|capacitor\.config\.|package(-lock)?\.json$|\.github/(workflows/ci\.yml|actions/))' <<< "$files"; then
             echo "native=true" >> "$GITHUB_OUTPUT"
           else
             echo "native=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::No native, Capacitor or dependency changes, so the Android and iOS builds are skipped. They still run on every push to staging and main."
+            echo "::notice::No native, Capacitor or dependency changes, so the Android and iOS builds are skipped."
           fi
 
   static:
     name: Types, lint and audit
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -81,6 +144,8 @@ jobs:
 
   unit:
     name: Unit and integration tests
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -93,6 +158,8 @@ jobs:
 
   build:
     name: Build
+    needs: changes
+    if: needs.changes.outputs.web == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -228,10 +295,23 @@ jobs:
     needs: [changes, static, unit, build, browser, android, ios]
     if: always()
     runs-on: ubuntu-latest
+    permissions:
+      statuses: write
     steps:
       - name: Every job succeeded
         run: |
           echo '${{ toJSON(needs) }}'
-          if [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
+          if [ "${{ needs.changes.result }}" != "success" ] || [ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" = "true" ]; then
             exit 1
           fi
+      # Lets later runs on the same tree finish at once (see "changes"). A pull request's status goes on its head
+      # commit, which is what a squash merge and the promotion pull request look up. Dependabot's token can't write
+      # statuses; its merges then simply run in full.
+      - name: Record the tested tree
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: >
+          gh api "repos/${{ github.repository }}/statuses/$SHA" -f state=success -f context="CI passed tree"
+          -f description="Passed on tree ${{ needs.changes.outputs.tree }}" --silent

@@ -19,6 +19,7 @@ const browser = await chromium.launch({
 });
 const PHONE = { width: 390, height: 844 };
 const TABLET = { width: 800, height: 1280 };
+const DESKTOP = { width: 1280, height: 720 }; // Chromebook screenshots (16:9)
 const ctx = await browser.newContext({
   viewport: PHONE,
   deviceScaleFactor: 2,
@@ -26,6 +27,11 @@ const ctx = await browser.newContext({
   hasTouch: true,
   colorScheme: "dark",
   reducedMotion: "reduce",
+});
+// Headless Chromium only has software WebGL, which the site and app treat as no WebGL (src/lib/webgl.ts);
+// this flag keeps the 3D figure in the pictures.
+await ctx.addInitScript(() => {
+  window.__liftsmithForceWebGL = true;
 });
 const page = await ctx.newPage();
 page.on("dialog", (d) => d.dismiss().catch(() => {}));
@@ -114,6 +120,7 @@ async function workout({ late = false, last = false } = {}) {
 
 /** A believable lifter: some experience, 80 kg, 32, male, with known numbers, so the weights look real. */
 async function setup() {
+  await page.getByRole("button", { name: "Get started" }).click();
   await page.locator("#setup-name").fill("Sam");
   await page.getByRole("button", { name: /Some experience/ }).click();
   await page.getByRole("button", { name: "Continue" }).click();
@@ -157,6 +164,7 @@ try {
   for (const [vp, sfx] of [
     [PHONE, ""],
     [TABLET, "-tablet"],
+    [DESKTOP, "-desktop"],
   ]) {
     await page.setViewportSize(vp);
     await page.evaluate(() => {
@@ -200,7 +208,7 @@ try {
   // One-handed controls (right hand), then today's workout at phone and tablet size.
   await page.setViewportSize(PHONE);
   await page.evaluate(() => {
-    location.hash = "#/settings";
+    location.hash = "#/settings/workout";
     window.scrollTo(0, 0);
   });
   await page.getByRole("button", { name: "Right hand", exact: true }).click();
@@ -222,6 +230,9 @@ try {
   await page.setViewportSize(TABLET);
   await page.waitForTimeout(1200);
   await shot("workout-tablet");
+  await page.setViewportSize(DESKTOP);
+  await page.waitForTimeout(1200);
+  await shot("workout-desktop");
   if (!taken.has("workout")) throw new Error("no barbell set in the last four workouts to photograph");
 } catch (e) {
   console.error(e);

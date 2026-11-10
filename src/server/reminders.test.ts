@@ -120,6 +120,16 @@ describe("checking the subscription", () => {
 });
 
 describe("double opt-in", () => {
+  it("writes the emails in the language the phone sent, and English for a missing or unknown one", async () => {
+    expect(ok(body({ lang: "xx" })).plan.lang).toBeUndefined();
+    expect(ok(body()).plan.lang).toBeUndefined();
+    const store = memoryStore();
+    const { mail, sent } = fakeMail();
+    await subscribe(ok(body({ lang: "es" })), store, mail, env, MON);
+    expect(store.subs.get(ID)!.plan.lang).toBe("es");
+    expect(sent[0].subject).toBe("Confirma tus correos de Liftsmith");
+  });
+
   it("sends only a confirmation until the link's button is pressed, then a welcome", async () => {
     const store = memoryStore();
     const { mail, sent } = fakeMail();

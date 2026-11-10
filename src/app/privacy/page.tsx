@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
-const UPDATED = "9 November 2026";
+const UPDATED = "10 November 2026";
 
 export default function Privacy() {
   return (
@@ -85,9 +85,9 @@ export default function Privacy() {
         With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and
         respiratory rate from Health Connect or Apple Health to fill in setup, bring in weigh-ins and body fat, keep your TDEE (daily
         calories) current, show the Health view on the Body tab against your own normal, and (with Pro) adjust how hard today&apos;s workout
-        is, and writes a finished workout&apos;s active calories and average heart rate back. These readings stay on your phone and are
-        never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your other devices have them, and
-        nowhere else.{" "}
+        is, and saves each finished workout back as a strength training workout with its time, title, sets, active calories and average
+        heart rate. These readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your
+        own account so your other devices have them, and nowhere else.{" "}
         <a className="text-accent underline" href="/privacypolicy.html">
           More about health data
         </a>
@@ -115,6 +115,18 @@ export default function Privacy() {
         and sync, which deletes your account and our copy at once.
       </p>
 
+      <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
+      <p className="mt-2">
+        These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name}; we
+        keep the access it gives us (encrypted) with your account, plus your name on Strava to show who&apos;s connected. With Strava
+        connected, each finished workout (its start time, length and your sets) is posted to your Strava account, unless you turn that off.
+        With Oura or WHOOP connected, the app asks our server for your last few weeks of sleep, heart rate variability, resting heart rate,
+        breathing rate and (Oura) steps; our server fetches them from the service and passes them straight to your phone without keeping
+        them, and they&apos;re then treated like readings from Health Connect or Apple Health. Disconnect in Settings › Connected apps, or
+        delete your account, and we withdraw our access at the service and delete what we kept. Music links open your music app with a
+        public playlist and send nothing to us.
+      </p>
+
       <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
       <p className="mt-2">
         Phone reminders are scheduled on your phone from your own data and send nothing to us. If you turn on email reminders, we keep your
@@ -132,13 +144,14 @@ export default function Privacy() {
         data. The stores also tell us (through RevenueCat) when a subscription starts, renews, is cancelled or refunded, so we can count
         revenue.
       </p>
-      <h2 className="mt-8 text-xl font-semibold">Creator codes</h2>
+      <h2 className="mt-8 text-xl font-semibold">Codes</h2>
       <p className="mt-2">
-        If you use a creator&apos;s code or link, we record the code with your random install id, where it came from (a link, the Play
-        install, or typed in) and your platform, and RevenueCat keeps the code with your subscription. We do this whether usage stats are on
-        or off, because it&apos;s how we pay the creator their share when you subscribe. Anything we tell a creator is totals for their code
-        (sign-ups, trials, subscribers and what they earned), never who you are. You can remove a code in Settings › Creator code until a
-        trial or subscription starts.
+        If you use a code or its link, whether a creator&apos;s or one of ours, we record the code with your random install id, where it
+        came from (a link, the Play install, or typed in) and your platform, and RevenueCat keeps the code with your subscription. We do
+        this whether usage stats are on or off, because it&apos;s how we give you what the code offers, keep a limited code to its number of
+        uses, and pay a creator their share when you subscribe. Anything we tell a creator is totals for their code (sign-ups, trials,
+        subscribers and what they earned), never who you are. You can remove a code in Settings › Redeem a code until a trial or
+        subscription starts.
       </p>
       <h2 className="mt-8 text-xl font-semibold">Feedback and bug reports</h2>
       <p className="mt-2">
@@ -149,8 +162,9 @@ export default function Privacy() {
       <h2 className="mt-8 text-xl font-semibold">Who processes it</h2>
       <p className="mt-2">
         Usage stats, site visits, accounts and synced data are stored in our database (Turso), on servers run by Vercel. Emails go through
-        Resend. Subscriptions are checked by RevenueCat. None of them may use the data for their own purposes. We keep usage stats for up to
-        25 months.
+        Resend. Subscriptions are checked by RevenueCat. When you email us, we may ask Anthropic&apos;s Claude for a first draft of our
+        answer; your message is sent for that one request, and a person reads and sends every reply. None of them may use the data for their
+        own purposes. We keep usage stats for up to 25 months.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

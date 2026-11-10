@@ -1,24 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
-import { type PlateFinish } from "@/components/PlateBar";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
+import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
 import { saveWorkout } from "@/lib/health";
-import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
-import { t } from "@/lib/i18n";
+import { hrSupported } from "@/lib/heartRate";
+import { hrLink } from "@/lib/hrLink";
+import { currentTag, t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
-import { haptic, keepAwake, oops, sound } from "@/lib/juice";
+import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { chipText, notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -26,6 +27,7 @@ import { restAlertOf } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
+import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
 
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
@@ -33,6 +35,7 @@ import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { clock, loadText, plateText, repsText } from "./format";
 import { Icon } from "./icons";
+import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
@@ -43,21 +46,37 @@ import { SetCard } from "./workout/SetCard";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
-let hrConn: HrConnection | null = null;
+// However a workout ends (End, Discard, the automatic end of a forgotten one), the heart rate monitor
+// is released fully, so the next workout can reach it again.
+if (typeof window !== "undefined") {
+  useApp.subscribe((st, prev) => {
+    if (prev.active && !st.active) void hrLink.stop();
+  });
+}
+
+/** How often a heart-rate-only change reaches the live notification (iOS's Live Activity has its own 15 s budget). */
+export const HR_NOTIFY_MS = 5_000;
 
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
-  const now = useNow(250);
+  // While hidden the clock stops (the native notification counts the rest down itself); the web has no
+  // native alert, so it asks for one tick when rest ends, for its rest-over notification.
+  const restAt = useApp((st) => st.active?.restUntil);
+  const now = useNow(250, !isNative() && restAt ? restAt : undefined);
+  const visible = useVisible();
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [bpm, setBpm] = useState<number | null>(null);
-  const [hrBusy, setHrBusy] = useState(false);
-  const [hrError, setHrError] = useState<string | null>(null);
+  const [lastBpm, setBpm] = useState<number | null>(null);
+  const hr = useSyncExternalStore(hrLink.subscribe, hrLink.get, hrLink.get);
+  const hrBusy = hr.status === "connecting";
+  const hrError = hr.error;
+  // A reading only counts while the monitor is connected.
+  const bpm = hr.status === "live" ? lastBpm : null;
   const [popKey, setPopKey] = useState(0);
   // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
   const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
@@ -73,11 +92,27 @@ export function Workout() {
   const alert = restAlertOf(profile);
   const scale = profile.training?.effort;
   useEffect(() => {
-    void keepAwake(awake);
     void notifyPermission();
     sound.enabled = profile.restSounds;
+  }, [profile.restSounds]);
+  // The screen stays on while this screen is in front. The phone drops the lock when the app is hidden,
+  // so it's asked for again on return, and let go when the lifter leaves the screen.
+  useEffect(() => {
+    void keepAwake(awake && visible);
     return () => void keepAwake(false);
-  }, [profile.restSounds, awake]);
+  }, [awake, visible]);
+
+  // Heart rate: readings go to this screen and the workout's HR log; a monitor that connected before
+  // connects by itself when the workout starts (once, quietly; the Connect button stays as the fallback).
+  const sessionId = active?.sessionId;
+  useEffect(() => {
+    hrLink.onBpm((b) => {
+      setBpm(b);
+      useApp.getState().pushHr(b);
+    });
+    if (sessionId && hrSupported()) hrLink.auto(sessionId);
+    return () => hrLink.onBpm(() => {});
+  }, [sessionId]);
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -151,17 +186,27 @@ export function Workout() {
     }
     if (left <= 0) {
       lastBeep.current = 0;
+      // Rest that ran out while the app was away already got its alert (the native notification, or the
+      // web's one tick at restUntil); coming back doesn't chime again.
+      const late = left < -2;
       // The rest-over alert follows its own setting (Workout preferences), not only Sounds and Vibration.
-      sound.restEnd(alert.sound);
-      if (alert.vibrate) haptic("thud", true);
-      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
+      if (!late) sound.restEnd(alert.sound);
+      if (alert.vibrate && !late) haptic("thud", true);
+      if (!late || !isVisible())
+        void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep the live notification in step.
+  // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
+  // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.
+  const notified = useRef({ key: "", at: 0 });
   useEffect(() => {
     if (!active || !ex || !gym) return;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}`;
+    const t0 = Date.now();
+    if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
+    notified.current = { key, at: t0 };
     void updateSession({
       title: resting ? `Rest · ${ex.name}` : ex.name,
       setLabel,
@@ -173,6 +218,11 @@ export function Workout() {
       vibrate: alert.vibrate,
       // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
+      speakLang: currentTag(),
+      // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
+      chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
+      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
+      total: active.plan.items.reduce((n, i) => n + i.sets, 0),
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -211,35 +261,29 @@ export function Workout() {
   const end = () => {
     const startedAt = active.startedAt;
     const ev = s.finish();
-    if (ev?.type === "sessionEnd") void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
+    if (ev?.type === "sessionEnd") {
+      // The same title and sets Strava gets, as the workout's title and notes in Health Connect or Apple Health.
+      const summary = stravaWorkout(useApp.getState().events, ev.sessionId, profile.unit);
+      void saveWorkout({
+        id: ev.sessionId,
+        start: startedAt,
+        end: ev.at,
+        bodyweightKg: profile.bodyweight,
+        avgHr: ev.avgHr,
+        title: summary?.name,
+        notes: summary?.description,
+      });
+      queueStrava(ev.sessionId);
+    }
     void stopSession();
-    hrConn?.disconnect();
-    hrConn = null;
     go("done");
   };
 
   const connectHr = async () => {
-    if (hrBusy) return;
-    setHrBusy(true);
-    setHrError(null);
-    try {
-      hrConn = await connectHeartRate(
-        (b) => {
-          setBpm(b);
-          s.pushHr(b);
-        },
-        () => setBpm(null),
-      );
-      track("feature", { name: "heart_rate", detail: "workout" });
-    } catch (e) {
-      const msg = e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed");
-      if (msg) {
-        setHrError(msg);
-        oops();
-      }
-    } finally {
-      setHrBusy(false);
-    }
+    await hrLink.tap();
+    const st = hrLink.get();
+    if (st.error) oops();
+    else if (st.status === "live") track("feature", { name: "heart_rate", detail: "workout" });
   };
 
   const unit = gym.unit;
@@ -290,7 +334,6 @@ export function Workout() {
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
-  const zone = bpm ? hrZone(bpm) : null;
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
@@ -313,10 +356,7 @@ export function Workout() {
         </div>
         <div className="flex items-center gap-2">
           {bpm ? (
-            <span
-              className="num flex min-h-9 items-center gap-1 rounded-full border border-line bg-surface px-2.5 text-sm font-bold"
-              style={{ color: zone!.colour }}
-            >
+            <span className="num flex min-h-9 items-center gap-1 rounded-full border border-heart/40 bg-surface px-2.5 text-sm font-bold text-heart">
               <span className="animate-beat inline-flex">
                 <Icon name="heart" size={14} filled strokeWidth={1.5} />
               </span>{" "}
@@ -330,8 +370,8 @@ export function Workout() {
               aria-busy={hrBusy}
               className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"
             >
-              <Icon name="heart" size={14} className="text-bad" />
-              {hrBusy ? t("hr.connecting") : t("hr.connect")}
+              <Icon name="heart" size={14} className="text-heart" />
+              {hr.status === "connecting" ? t("hr.connecting") : hr.status === "reconnecting" ? t("hr.reconnecting") : t("hr.connect")}
             </button>
           ) : null}
           <button
@@ -349,7 +389,7 @@ export function Workout() {
           <p className="flex-1 text-muted">{hrError}</p>
           <button
             type="button"
-            onClick={() => setHrError(null)}
+            onClick={() => hrLink.dismiss()}
             className="press -m-2 min-h-11 min-w-11 rounded-full px-2 text-muted hover:text-ink"
           >
             {t("hr.dismiss")}
@@ -445,23 +485,27 @@ export function Workout() {
 
           {counting ? (
             <div className="relative mt-4 h-72">
-              <AutoCount
-                key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
-                exerciseId={ex.id}
-                pattern={ex.pattern}
-                body={bodyFor(profile.sex)}
-                bpm={bpm}
-                prefs={countPrefs}
-                onPrefs={changeCount}
-                counting={!resting}
-                setKey={`${active.index}:${doneSets}:${warmDone}`}
-                onCount={(n) => {
-                  const a = useApp.getState().active;
-                  if (a) s.adjust(a.weight, n);
-                }}
-                onClose={() => changeCount({ ...countPrefs, on: false })}
-                paused={infoOpen || swapOpen || endOpen}
-              />
+              {/* The camera and pose model shut off while the app is in the background, and start fresh on return. */}
+              {visible && (
+                <AutoCount
+                  key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
+                  exerciseId={ex.id}
+                  pattern={ex.pattern}
+                  body={bodyFor(profile.sex)}
+                  bpm={bpm}
+                  hrTrend={active.hr}
+                  prefs={countPrefs}
+                  onPrefs={changeCount}
+                  counting={!resting}
+                  setKey={`${active.index}:${doneSets}:${warmDone}`}
+                  onCount={(n) => {
+                    const a = useApp.getState().active;
+                    if (a) s.adjust(a.weight, n);
+                  }}
+                  onClose={() => changeCount({ ...countPrefs, on: false })}
+                  paused={infoOpen || swapOpen || endOpen}
+                />
+              )}
             </div>
           ) : (
             <div className="relative mt-4 h-52">
@@ -469,6 +513,7 @@ export function Workout() {
                 exerciseId={ex.id}
                 body={bodyFor(profile.sex)}
                 bpm={bpm}
+                hrTrend={active.hr}
                 paused={infoOpen || swapOpen || endOpen}
                 className="h-full"
               />

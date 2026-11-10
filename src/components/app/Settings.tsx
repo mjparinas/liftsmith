@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+// Settings (restructured 2026-11-10, Melvin approved the audit): Liftsmith Pro first, then Account, then one
+// row per group, each opening its own page (#/settings/<group>) with a line saying what's in it. Every
+// setting lives in exactly one group. Old deep links still land: #/settings/saving opens Your data at
+// Saving and backup, #/settings/themes and #/settings/accessibility open Look and feel at that section.
+import { useEffect, useRef, useState, type ReactNode } from "react";
 
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
@@ -10,26 +14,46 @@ import { BRAND } from "@/lib/brand";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import { flag, setLocalFlag } from "@/lib/flags";
 import type { Term } from "@/lib/glossary";
-import { LANG_NAME, LANGS, num, t, type LangPref } from "@/lib/i18n";
+import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { feel } from "@/lib/juice";
 import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import type { Experience, Goal, Variability } from "@/lib/types";
-import { fromKg, plainNum, toKg } from "@/lib/units";
+import { fromKg, plainNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { CalendarSettings } from "./CalendarSettings";
-import { CreatorCode } from "./CreatorCode";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
+import { Icon, type IconName } from "./icons";
 import { ImportWorkouts } from "./ImportCsv";
 import { MessageSettings } from "./MessageSettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
-import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
+import { RestTimerSettings } from "./TrainingSettings";
+import { Button, Chip, Section, SwitchRow } from "./ui";
+
+const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
+type Group = (typeof GROUPS)[number];
+
+const GROUP_ICON: Record<Group, IconName> = {
+  training: "target",
+  workout: "dumbbell",
+  reminders: "clock",
+  look: "sparkle",
+  body: "heart",
+  data: "lock",
+};
+
+/** Old deep links into the single long Settings screen, and the group (and section) they open now. */
+const LEGACY: Record<string, [Group, string]> = {
+  saving: ["data", "saving"],
+  themes: ["look", "themes"],
+  accessibility: ["look", "accessibility"],
+};
 
 function Row<T extends string | number>({
   label,
@@ -57,10 +81,31 @@ function Row<T extends string | number>({
   );
 }
 
-/** Liftsmith Pro: the plan this lifter is on, and the way to the paywall, Restore and Manage subscription. */
-function ProRow() {
+/** A row that opens another page: a title, a line saying what's there, and a chevron. The whole row is the one button. */
+function NavRow({ title, sub, icon, onClick }: { title: string; sub?: string; icon?: IconName; onClick: () => void }) {
+  return (
+    <button type="button" onClick={onClick} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
+      {icon && (
+        <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-raised text-accent">
+          <Icon name={icon} size={20} />
+        </span>
+      )}
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold">{title}</span>
+        {sub && <span className="block text-sm text-muted">{sub}</span>}
+      </span>
+      <span aria-hidden className="text-faint">
+        ›
+      </span>
+    </button>
+  );
+}
+
+/** Liftsmith Pro, first on Settings and the one tinted card there (Melvin, 2026-11-10: "it should be at the very top"). */
+function ProCard() {
   const { live, ent } = useBilling();
   const now = useNow(60_000);
+  const pro = !live || entActive(ent, now);
   const status = !live
     ? t("pro.settings.unlocked")
     : entActive(ent, now)
@@ -69,35 +114,68 @@ function ProRow() {
         : t("pro.status.yearly")
       : t("pro.settings.free");
   return (
-    <Section title={t("pro.settings")}>
-      <button
-        type="button"
-        onClick={() => go("pro", "settings")}
-        className="press card flex w-full items-center justify-between px-4 py-3 text-left"
-      >
-        <span>{status}</span>
-        <span className="text-accent">{t("pro.settings.see")}</span>
-      </button>
-    </Section>
+    <section
+      className="card card-tint mt-4 p-4"
+      style={{ "--tint": "var(--color-violet)" } as React.CSSProperties}
+      aria-labelledby="pro-card"
+    >
+      <h2 id="pro-card" className="text-lg font-bold">
+        {t("pro.settings")}
+      </h2>
+      <p className="mt-1 text-sm text-ink">{status}</p>
+      {!pro && <p className="mt-1 text-sm text-muted">{t("settings.pro.lead")}</p>}
+      <Button className="mt-3 w-full" icon="sparkle" onClick={() => go("pro", "settings")}>
+        {pro && live ? t("settings.pro.manage") : t("pro.settings.see")}
+      </Button>
+    </section>
+  );
+}
+
+/** Settings' second row: sign in to back up and sync, or who's signed in. */
+function AccountRow() {
+  const account = useAccount((s) => s.account);
+  return (
+    <div className="mt-3">
+      <NavRow
+        title={t("account.row")}
+        sub={account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}
+        icon="link"
+        onClick={() => go("account")}
+      />
+    </div>
   );
 }
 
 export function Settings() {
-  const { profile, setProfile, reset, events } = useApp();
-  const [confirm, setConfirm] = useState(false);
-  const [stats, setStats] = useState(analyticsOn());
+  const { profile } = useApp();
   const { arg } = useRoute();
+  const legacy = arg ? LEGACY[arg] : undefined;
+  const group: Group | null = legacy ? legacy[0] : (GROUPS as readonly string[]).includes(arg ?? "") ? (arg as Group) : null;
+  const anchor = legacy?.[1];
   useEffect(() => {
-    if (arg) document.getElementById(arg)?.scrollIntoView({ block: "start" });
-  }, [arg]);
+    if (anchor) document.getElementById(anchor)?.scrollIntoView?.({ block: "start" });
+  }, [anchor]);
   const taps = useRef<number[]>([]);
   const [motionNote, setMotionNote] = useState("");
+
+  if (group) return <GroupPage group={group} />;
+
+  const goal = t(`goal.${profile.goal}`);
+  const program = programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive");
+  const sums: Record<Group, string> = {
+    training: t("settings.g.training.sum", { program, goal, count: profile.daysPerWeek }),
+    workout: t("settings.g.workout.sum"),
+    reminders: t("settings.g.reminders.sum"),
+    look: t("settings.g.look.sum"),
+    body: t("settings.g.body.sum"),
+    data: t("settings.g.data.sum"),
+  };
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">
         ‹ {t("nav.back.today")}
       </button>
-      {/* Five quick taps on the title switch phone-motion rep counting on or off (the `repMotion` flag, for testing; AGENTS.md "Camera rep counting"). */}
+      {/* Five quick taps on the title switch phone-motion rep counting on or off (the `repMotion` flag, for testing; docs/decisions/camera-rep-counting.md). */}
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">
         <button
           type="button"
@@ -121,47 +199,57 @@ export function Settings() {
           {motionNote}
         </p>
       )}
+      <ProCard />
       <AccountRow />
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("setup")}>
-        {t("settings.rerun")}
-      </Button>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>
-        {t("settings.injuries")}
-      </Button>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("tools")}>
-        {t("settings.tools")}
-      </Button>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>
-        {t("settings.feedback")}
-      </Button>
-      <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">
-        {t("settings.dashboard")}
-      </a>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>
-        {t("settings.training")}
-      </Button>
-      <SavingSettings />
-      <ProRow />
-      <Section title={t("creator.title")}>
-        <CreatorCode />
+      <div className="mt-2">
+        <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
+      </div>
+      <ul className="mt-3 space-y-2">
+        {GROUPS.map((g) => (
+          <li key={g}>
+            <NavRow title={t(`settings.g.${g}`)} sub={sums[g]} icon={GROUP_ICON[g]} onClick={() => go("settings", g)} />
+          </li>
+        ))}
+      </ul>
+      <Section title={t("settings.g.help")}>
+        <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
+      <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+    </div>
+  );
+}
+
+/** One group's page: "‹ Settings", its title, and its settings. */
+function GroupPage({ group }: { group: Group }) {
+  const body: Record<Group, ReactNode> = {
+    training: <TrainingGroup />,
+    workout: <WorkoutGroup />,
+    reminders: <MessageSettings />,
+    look: <LookGroup />,
+    body: <BodyGroup />,
+    data: <DataGroup />,
+  };
+  return (
+    <div className="pb-24">
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
+        {t("settings.back")}
+      </button>
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t(`settings.g.${group}`)}</h1>
+      {body[group]}
+    </div>
+  );
+}
+
+/** Training: what the plan is built for, when you train, injuries, and the rarer block options. */
+function TrainingGroup() {
+  const { profile, setProfile } = useApp();
+  return (
+    <>
       <Section title={t("settings.program")}>
-        <button
-          type="button"
+        <NavRow
+          title={programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}
+          sub={t("settings.change")}
           onClick={() => go("programs")}
-          className="press card flex w-full items-center justify-between px-4 py-3 text-left"
-        >
-          <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}</span>
-          <span className="text-accent">{t("settings.change")}</span>
-        </button>
-      </Section>
-      <Section title={t("settings.name")}>
-        <input
-          value={profile.name}
-          onChange={(e) => setProfile({ name: e.target.value })}
-          className="card w-full px-4 py-3"
-          placeholder={t("settings.optional")}
-          aria-label={t("settings.name")}
         />
       </Section>
       <Row<Goal>
@@ -184,73 +272,61 @@ export function Settings() {
           ["advanced", t("exp.advanced")],
         ]}
       />
-      <Row<number>
-        label={t("settings.days")}
-        value={profile.daysPerWeek}
-        onPick={(daysPerWeek) => setProfile({ daysPerWeek })}
-        options={[1, 2, 3, 4, 5, 6].map((d) => [d, num(d)])}
-      />
-      <Row<Variability>
-        info="variety"
-        label={t("settings.variety")}
-        value={profile.variability}
-        onPick={(variability) => setProfile({ variability })}
-        options={[
-          ["consistent", t("variety.consistent")],
-          ["balanced", t("variety.balanced")],
-          ["variable", t("variety.variable")],
-        ]}
-      />
-      <Row<number>
-        info="deloadWeeks"
-        label={t("settings.block")}
-        value={profile.blockWeeks}
-        onPick={(blockWeeks) => setProfile({ blockWeeks })}
-        options={[3, 4, 5, 6].map((d) => [d, t("settings.weeks", { count: d })])}
-      />
-      <Row<"dark" | "light" | "system">
-        label={t("settings.appearance")}
-        value={profile.theme ?? "dark"}
-        onPick={(theme) => setProfile({ theme })}
-        options={[
-          ["dark", t("appearance.dark")],
-          ["light", t("appearance.light")],
-          ["system", t("appearance.system")],
-        ]}
-      />
-      <Row<LangPref>
-        label={t("settings.language")}
-        value={profile.language ?? "system"}
-        onPick={(language) => setProfile({ language })}
-        options={[["system", t("settings.language.system")], ...LANGS.map((l) => [l, LANG_NAME[l]] as [LangPref, string])]}
-      />
-      <p className="mt-2 px-1 text-xs text-faint">{t("settings.language.note")}</p>
-      <AccessibilitySettings />
-      <Section title={t("settings.units")}>
-        <div className="flex flex-wrap gap-2">
-          {(
-            [
-              ["kg", t("units.kg")],
-              ["lb", t("units.lb")],
-            ] as const
-          ).map(([u, l]) => (
-            <Chip key={u} active={profile.unit === u} onClick={() => setProfile({ unit: u })}>
-              {l}
-            </Chip>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-faint">{t("settings.units.note")}</p>
-      </Section>
-      <Section title={t("settings.bodyweight", { unit: profile.unit })}>
-        <BumpField
-          label={t("settings.bodyweight.label")}
-          value={plainNum(fromKg(profile.bodyweight, profile.unit))}
-          onChange={(v) => setProfile({ bodyweight: toKg(Number(v) || 0, profile.unit) })}
-          step={profile.unit === "lb" ? 1 : 0.5}
-          start={fromKg(profile.bodyweight, profile.unit)}
-          min={1}
+      <CalendarSettings />
+      <div className="mt-6">
+        <NavRow title={t("settings.injuries")} icon="heart" onClick={() => go("injuries")} />
+      </div>
+      <Section title={t("settings.more")}>
+        <Row<Variability>
+          info="variety"
+          label={t("settings.variety")}
+          value={profile.variability}
+          onPick={(variability) => setProfile({ variability })}
+          options={[
+            ["consistent", t("variety.consistent")],
+            ["balanced", t("variety.balanced")],
+            ["variable", t("variety.variable")],
+          ]}
         />
+        <Row<number>
+          info="deloadWeeks"
+          label={t("settings.block")}
+          value={profile.blockWeeks}
+          onPick={(blockWeeks) => setProfile({ blockWeeks })}
+          options={[3, 4, 5, 6].map((d) => [d, t("settings.weeks", { count: d })])}
+        />
+        <Section title={t("settings.trainingBlock")} info="blockWeek">
+          <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>
+            {t("settings.newBlock")}
+          </Button>
+        </Section>
       </Section>
+      <Button kind="ghost" className="mt-6 w-full" onClick={() => go("setup")}>
+        {t("settings.rerun")}
+      </Button>
+    </>
+  );
+}
+
+/** Workout: what happens while you lift. One-handed controls first, then sounds, the rest timer and the extras between sets. */
+function WorkoutGroup() {
+  const { profile, setProfile } = useApp();
+  const a = cleanA11y(profile.a11y);
+  return (
+    <>
+      <div id="one-handed">
+        <Row<Hand>
+          label={t("a11y.hand")}
+          value={a.hand}
+          onPick={(hand) => setProfile({ a11y: { ...a, hand } })}
+          options={[
+            ["off", t("settings.off")],
+            ["right", t("a11y.hand.right")],
+            ["left", t("a11y.hand.left")],
+          ]}
+        />
+        <p className="mt-2 px-1 text-xs text-faint">{t("a11y.hand.note")}</p>
+      </div>
       <SwitchRow
         label={t("settings.sounds")}
         on={!!profile.restSounds}
@@ -267,116 +343,54 @@ export function Settings() {
           setProfile({ haptics: v });
         }}
       />
-      <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
-      <Section title={t("settings.celebrations")}>
-        <div className="flex flex-wrap gap-2">
-          <Chip active={!profile.lean} onClick={() => setProfile({ lean: false })}>
-            {t("settings.full")}
-          </Chip>
-          <Chip active={!!profile.lean} onClick={() => setProfile({ lean: true })}>
-            {t("settings.lean")}
-          </Chip>
-        </div>
-        <p className="mt-2 text-xs text-faint">{t("settings.lean.note")}</p>
+      <RestTimerSettings />
+      <Section title={t("settings.duringRest")}>
+        <DelightSettings part="workout" />
       </Section>
-      <DelightSettings />
-      <CalendarSettings />
-      <MessageSettings />
-      <CycleSettings />
-      <Section title={t("settings.stats")}>
-        <div className="flex flex-wrap gap-2">
-          <Chip
-            active={stats}
-            onClick={() => {
-              setAnalytics(true);
-              setStats(true);
-            }}
-          >
-            {t("settings.stats.on")}
-          </Chip>
-          <Chip
-            active={!stats}
-            onClick={() => {
-              setAnalytics(false);
-              setStats(false);
-            }}
-          >
-            {t("settings.off")}
-          </Chip>
-        </div>
-        <p className="mt-2 text-xs text-faint">
-          {t("settings.stats.note")}{" "}
-          <a className="underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">
-            {t("settings.privacy")}
-          </a>
-          {stats ? ` · ${t("settings.installId", { id: installId().slice(0, 8) })}` : ""}
-        </p>
+      <Section title={t("train.title")}>
+        <NavRow title={t("settings.plan")} onClick={() => go("training")} />
       </Section>
-      <Section title={t("settings.trainingBlock")} info="blockWeek">
-        <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>
-          {t("settings.newBlock")}
-        </Button>
-      </Section>
-      <Section title={t("settings.data")}>
-        <Button
-          kind="ghost"
-          className="mb-3 w-full"
-          onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}
-        >
-          {t("settings.exportCsv")}
-        </Button>
-        <p className="mb-3 text-xs text-faint">{t("settings.data.note")}</p>
-        <div className="mb-4">
-          <ImportWorkouts />
-        </div>
-        {confirm ? (
-          <div className="space-y-2">
-            <p className="text-sm text-muted">{t("settings.erase.warn")}</p>
-            <Button
-              kind="danger"
-              className="w-full"
-              onClick={() =>
-                void deleteEmail().finally(() => {
-                  void erasePhotos();
-                  void reset();
-                })
-              }
-            >
-              {t("settings.erase.confirm")}
-            </Button>
-            <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>
-              {t("settings.cancel")}
-            </Button>
-          </div>
-        ) : (
-          <Button kind="danger" className="w-full" onClick={() => setConfirm(true)}>
-            {t("settings.erase")}
-          </Button>
-        )}
-      </Section>
-      <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
-    </div>
+    </>
   );
 }
 
-/** Settings › Accessibility: text size, colour-blind safe colours and contrast (a11y.ts). */
+/** Look and feel: appearance, earned themes and icons, the daily quote, language, and accessibility. */
+function LookGroup() {
+  const { profile, setProfile } = useApp();
+  return (
+    <>
+      <Row<"dark" | "light" | "system">
+        label={t("settings.appearance")}
+        value={profile.theme ?? "dark"}
+        onPick={(theme) => setProfile({ theme })}
+        options={[
+          ["dark", t("appearance.dark")],
+          ["light", t("appearance.light")],
+          ["system", t("appearance.system")],
+        ]}
+      />
+      <DelightSettings part="look" />
+      <SwitchRow label={t("settings.quote")} on={profile.quotes !== false} onChange={(v) => setProfile({ quotes: v })} />
+      <Row<LangPref>
+        label={t("settings.language")}
+        value={profile.language ?? "system"}
+        onPick={(language) => setProfile({ language })}
+        options={[["system", t("settings.language.system")], ...LANGS.map((l) => [l, LANG_NAME[l]] as [LangPref, string])]}
+      />
+      <p className="mt-2 px-1 text-xs text-faint">{t("settings.language.note")}</p>
+      <AccessibilitySettings />
+    </>
+  );
+}
+
+/** Look and feel › Accessibility: text size, colour-blind safe colours, contrast and Lean mode (a11y.ts). */
 function AccessibilitySettings() {
   const { profile, setProfile } = useApp();
   const a = cleanA11y(profile.a11y);
   const set = (p: Partial<typeof a>) => setProfile({ a11y: { ...a, ...p } });
   return (
-    <div id="accessibility">
-      <Row<Hand>
-        label={t("a11y.hand")}
-        value={a.hand}
-        onPick={(hand) => set({ hand })}
-        options={[
-          ["off", t("settings.off")],
-          ["right", t("a11y.hand.right")],
-          ["left", t("a11y.hand.left")],
-        ]}
-      />
-      <p className="mt-2 px-1 text-xs text-faint">{t("a11y.hand.note")}</p>
+    <section id="accessibility" className="mt-6 scroll-mt-4">
+      <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">{t("settings.accessibility")}</h2>
       <Row<TextSize>
         label={t("a11y.text")}
         value={a.text}
@@ -405,28 +419,110 @@ function AccessibilitySettings() {
         ]}
       />
       <p className="mt-2 px-1 text-xs text-faint">{t("a11y.contrast.note")}</p>
-    </div>
+      <SwitchRow label={t("settings.lean")} hint={t("settings.lean.note")} on={!!profile.lean} onChange={(lean) => setProfile({ lean })} />
+    </section>
   );
 }
 
-/** Settings' first row: sign in to back up and sync, or who's signed in. */
-function AccountRow() {
-  const account = useAccount((s) => s.account);
+/** Body and units: units, the body weight the plan uses (from the last weigh-in), and cycle-aware readiness. */
+function BodyGroup() {
+  const { profile, setProfile } = useApp();
   return (
-    <button
-      type="button"
-      onClick={() => go("account")}
-      className="press card mt-4 flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
-    >
-      <span>
-        <span className="block font-semibold">{t("account.row")}</span>
-        <span className="block text-sm text-muted">
-          {account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}
-        </span>
-      </span>
-      <span aria-hidden className="text-faint">
-        ›
-      </span>
-    </button>
+    <>
+      <Section title={t("settings.units")}>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("settings.units")}>
+          {(
+            [
+              ["kg", t("units.kg")],
+              ["lb", t("units.lb")],
+            ] as const
+          ).map(([u, l]) => (
+            <Chip key={u} active={profile.unit === u} onClick={() => setProfile({ unit: u })}>
+              {l}
+            </Chip>
+          ))}
+        </div>
+        <p className="mt-2 text-xs text-faint">{t("settings.units.note")}</p>
+      </Section>
+      <Section title={t("settings.bodyweight.label")}>
+        <NavRow
+          title={t("settings.bw.now", { weight: plainNum(fromKg(profile.bodyweight, profile.unit)), unit: profile.unit })}
+          sub={t("settings.bw.log")}
+          onClick={() => go("stats")}
+        />
+        <p className="mt-2 px-1 text-xs text-faint">{t("settings.bw.note")}</p>
+      </Section>
+      <CycleSettings />
+    </>
+  );
+}
+
+/** Your data and privacy: saving and backup, the sets CSV, importing, usage stats, and erasing this device. */
+function DataGroup() {
+  const { profile, reset, events } = useApp();
+  const [confirm, setConfirm] = useState(false);
+  const [stats, setStats] = useState(analyticsOn());
+  return (
+    <>
+      <div id="saving" className="scroll-mt-4">
+        <SavingSettings />
+      </div>
+      <Section title={t("settings.data")}>
+        <Button
+          kind="ghost"
+          className="mb-3 w-full"
+          onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}
+        >
+          {t("settings.exportCsv")}
+        </Button>
+        <p className="mb-3 text-xs text-faint">{t("settings.data.note")}</p>
+        <ImportWorkouts />
+      </Section>
+      <Section title={t("settings.stats")}>
+        <SwitchRow
+          label={t("settings.stats.on")}
+          on={stats}
+          onChange={(v) => {
+            setAnalytics(v);
+            setStats(v);
+          }}
+          hint={
+            <>
+              {t("settings.stats.note")}{" "}
+              <a className="underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">
+                {t("settings.privacy")}
+              </a>
+              {stats ? ` · ${t("settings.installId", { id: installId().slice(0, 8) })}` : ""}
+            </>
+          }
+        />
+      </Section>
+      <Section title={t("settings.erase")}>
+        {confirm ? (
+          <div className="space-y-2">
+            <p className="text-sm text-muted">{t("settings.erase.warn")}</p>
+            <Button
+              kind="danger"
+              className="w-full"
+              onClick={() =>
+                void deleteEmail().finally(() => {
+                  void erasePhotos();
+                  void reset();
+                })
+              }
+            >
+              {t("settings.erase.confirm")}
+            </Button>
+            <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>
+              {t("settings.cancel")}
+            </Button>
+          </div>
+        ) : (
+          <Button kind="danger" className="w-full" onClick={() => setConfirm(true)}>
+            {t("settings.erase")}
+          </Button>
+        )}
+      </Section>
+    </>
   );
 }

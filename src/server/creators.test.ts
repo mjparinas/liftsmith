@@ -1,13 +1,29 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
-import { checkCreator, claimCode, claimFromStore, findCreator, loadCreators, recordPayout, saveCreator } from "./creators";
+import { checkCreator, claimCode, claimFromStore, findCode, loadCreators, recordPayout, saveCreator } from "./creators";
 import { batch, query, resetDb, run } from "./db";
 import { storeRcEvent } from "./revenuecat";
 
 const NOW = Date.UTC(2026, 10, 9);
 const DAY = 86_400_000;
 const add = (code: string, name: string, active = true) =>
-  saveCreator({ code, name, contact: null, rate: 0.3, months: 12, active, note: null }, NOW);
+  saveCreator(
+    {
+      code,
+      kind: "creator",
+      name,
+      contact: null,
+      rate: 0.3,
+      months: 12,
+      active,
+      note: null,
+      trialDays: 30,
+      offering: "creator30",
+      endsAt: null,
+      maxUses: null,
+    },
+    NOW,
+  );
 
 beforeEach(async () => {
   await resetDb();
@@ -30,13 +46,12 @@ describe("creator codes on the server", () => {
     await add("LIFT-OLD", "Old", false);
     expect(await claimCode({ installId: "install-0001", code: "lift-alex", source: "typed", platform: "appstore" }, NOW)).toEqual({
       ok: true,
-      code: "LIFT-ALEX",
-      name: "Alex",
+      info: { code: "LIFT-ALEX", kind: "creator", name: "Alex", trialDays: 30, offering: "creator30" },
     });
     expect(await claimCode({ installId: "install-0001", code: "LIFT-NOPE" })).toMatchObject({ ok: false, status: 404 });
     expect(await claimCode({ installId: "install-0001", code: "LIFT-OLD" })).toMatchObject({ ok: false, status: 404 });
     expect(await claimCode({ installId: "bad", code: "LIFT-ALEX" })).toMatchObject({ ok: false, status: 400 });
-    expect(await findCreator("LIFT-OLD")).toBeNull();
+    expect(await findCode("LIFT-OLD")).toEqual({ ok: false, status: 404 });
     const rows = await query("SELECT * FROM creator_installs");
     expect(rows).toHaveLength(1);
     expect(rows[0]).toMatchObject({ code: "LIFT-ALEX", source: "typed" });
@@ -51,7 +66,10 @@ describe("creator codes on the server", () => {
     await run("INSERT INTO subscription_events (id, at, install_id, store, kind) VALUES ('t1', ?, 'install-0002', 'play', 'trial_start')", [
       NOW,
     ]);
-    expect(await claimCode({ installId: "install-0002", code: "LIFT-ALEX" }, NOW)).toEqual({ ok: true, code: "LIFT-SAM", name: "Sam" });
+    expect(await claimCode({ installId: "install-0002", code: "LIFT-ALEX" }, NOW)).toMatchObject({
+      ok: true,
+      info: { code: "LIFT-SAM", name: "Sam" },
+    });
     expect((await query("SELECT code FROM creator_installs"))[0].code).toBe("LIFT-SAM");
   });
 
@@ -81,6 +99,65 @@ describe("creator codes on the server", () => {
       code: "LIFT-ALEX",
       source: "link",
     });
+  });
+
+  it("checks a promo code: no commission, its own trial or offer, an end date and a limit", () => {
+    expect(
+      checkCreator({
+        kind: "promo",
+        code: "summer",
+        name: "Summer sale",
+        rate: 0.3,
+        offering: "promo_half",
+        maxUses: "100",
+        endsAt: "2026-12-31",
+      }),
+    ).toMatchObject({
+      ok: true,
+      creator: {
+        code: "SUMMER",
+        kind: "promo",
+        rate: 0,
+        trialDays: null,
+        offering: "promo_half",
+        maxUses: 100,
+        endsAt: Date.parse("2026-12-31"),
+      },
+    });
+    expect(checkCreator({ code: "LIFT-ALEX", name: "Alex" })).toMatchObject({
+      creator: { kind: "creator", trialDays: 30, offering: "creator30" },
+    });
+    expect(checkCreator({ kind: "promo", code: "SUMMER", name: "" }).ok).toBe(false);
+    expect(checkCreator({ kind: "promo", code: "SUMMER", name: "S", trialDays: 120 }).ok).toBe(false);
+    expect(checkCreator({ kind: "promo", code: "SUMMER", name: "S", offering: "no spaces" }).ok).toBe(false);
+    expect(checkCreator({ kind: "promo", code: "SUMMER", name: "S", endsAt: "soon" }).ok).toBe(false);
+    expect(checkCreator({ kind: "promo", code: "SUMMER", name: "S", maxUses: 0 }).ok).toBe(false);
+  });
+
+  it("gives a promo code's own terms without a name, and stops it once it ends or runs out", async () => {
+    const promo = (code: string, over: Record<string, unknown>) => {
+      const c = checkCreator({ kind: "promo", code, name: "Internal label", ...over });
+      if (!c.ok) throw new Error(c.error);
+      return saveCreator(c.creator, NOW);
+    };
+    await promo("WELCOME", { trialDays: 21, offering: "trial21" });
+    await promo("ENDED", { endsAt: NOW - DAY });
+    await promo("TWO", { maxUses: 2 });
+    expect(await claimCode({ installId: "install-0101", code: "welcome" }, NOW)).toEqual({
+      ok: true,
+      info: { code: "WELCOME", kind: "promo", name: null, trialDays: 21, offering: "trial21" },
+    });
+    expect(await claimCode({ installId: "install-0101", code: "ENDED" }, NOW)).toMatchObject({ ok: false, status: 410 });
+    expect(await claimCode({ installId: "install-0102", code: "TWO" }, NOW)).toMatchObject({ ok: true });
+    expect(await claimCode({ installId: "install-0103", code: "TWO" }, NOW)).toMatchObject({ ok: true });
+    expect(await claimCode({ installId: "install-0104", code: "TWO" }, NOW)).toMatchObject({ ok: false, status: 410 });
+    // An install that already holds it keeps it, and the store webhook still records a purchase made with it.
+    expect(await claimCode({ installId: "install-0103", code: "TWO" }, NOW)).toMatchObject({ ok: true });
+    await claimFromStore("install-0105", "ENDED", NOW);
+    expect(await query("SELECT code FROM creator_installs WHERE install_id = 'install-0105'")).toEqual([{ code: "ENDED" }]);
+    // No commission on our own codes.
+    const { rows } = await loadCreators(NOW);
+    expect(rows.find((r) => r.code === "WELCOME")).toMatchObject({ kind: "promo", rate: 0, trialDays: 21, offering: "trial21" });
   });
 
   it("loads what each creator is owed, leaving test installs out, and records payouts", async () => {

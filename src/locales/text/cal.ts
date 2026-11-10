@@ -4,7 +4,6 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
-  "cal.title": "Calendar",
   "cal.days": "Training days",
   "cal.time": "Time",
   "cal.download": "Download calendar file",
@@ -21,12 +20,13 @@ export const en = {
   "cal.saved": "Your training days are in your calendar.",
   "cal.failed": "That didn't work. Check that this phone has a calendar you can add to.",
   "cal.removed": "Removed from your calendar.",
+  "cal.eventTitle": "Liftsmith workout",
+  "cal.eventNote": "Open Liftsmith to start today's workout.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
-  "cal.title": "Calendario",
   "cal.days": "Días de entrenamiento",
   "cal.time": "Hora",
   "cal.download": "Descargar archivo de calendario",
@@ -43,10 +43,11 @@ export const es: Partial<Record<Key, Message>> = {
   "cal.saved": "Tus días de entrenamiento están en tu calendario.",
   "cal.failed": "No ha funcionado. Comprueba que este teléfono tenga un calendario donde añadir eventos.",
   "cal.removed": "Quitado de tu calendario.",
+  "cal.eventTitle": "Entrenamiento de Liftsmith",
+  "cal.eventNote": "Abre Liftsmith para empezar el entrenamiento de hoy.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "cal.title": "Calendrier",
   "cal.days": "Jours d’entraînement",
   "cal.time": "Heure",
   "cal.download": "Télécharger le fichier de calendrier",
@@ -63,4 +64,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "cal.saved": "Vos jours d’entraînement sont dans votre calendrier.",
   "cal.failed": "Ça n’a pas marché. Vérifiez que ce téléphone a un calendrier où ajouter des événements.",
   "cal.removed": "Retiré de votre calendrier.",
+  "cal.eventTitle": "Séance Liftsmith",
+  "cal.eventNote": "Ouvrez Liftsmith pour commencer la séance du jour.",
 };

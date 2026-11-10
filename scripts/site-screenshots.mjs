@@ -24,6 +24,11 @@ const ctx = await browser.newContext({
   colorScheme: "dark",
   reducedMotion: "reduce",
 });
+// Headless Chromium only has software WebGL, which the site and app treat as no WebGL (src/lib/webgl.ts);
+// this flag keeps the 3D figure in the pictures.
+await ctx.addInitScript(() => {
+  window.__liftsmithForceWebGL = true;
+});
 const page = await ctx.newPage();
 page.on("dialog", (d) => d.dismiss().catch(() => {}));
 
@@ -46,7 +51,9 @@ async function shot(name, { clip } = {}) {
   const png = `${TMP}/${name}.png`;
   await page.screenshot({ path: png, clip });
   await sharp(png).webp({ quality: 82 }).toFile(`${OUT}/${name}.webp`);
-  console.log(`  ${OUT}/${name}.webp`);
+  // A 540 px copy for phones (src/components/site/Screenshot.tsx picks between them).
+  await sharp(png).resize({ width: 540 }).webp({ quality: 82 }).toFile(`${OUT}/${name}-540.webp`);
+  console.log(`  ${OUT}/${name}.webp (+ -540)`);
 }
 
 /** One workout, set by set, with real-feeling rests (the clock jumps forward instead of waiting).

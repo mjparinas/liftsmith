@@ -25,7 +25,7 @@ const TONE = {
   good: { hue: "var(--color-mint)", icon: "sparkle" },
 } as const;
 
-function readDismissed(): string[] {
+export function readDismissed(): string[] {
   try {
     const raw = localStorage.getItem(KEY);
     return raw ? (JSON.parse(raw) as string[]) : [];

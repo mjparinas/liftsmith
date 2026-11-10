@@ -30,6 +30,7 @@ afterEach(cleanup);
 
 async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commercial gym/) {
   render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Get started" }));
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: gym }));
@@ -147,5 +148,28 @@ describe("goals and buying advice", () => {
     const before = useApp.getState().gyms[0].equipment.length;
     await user.click(screen.getAllByRole("button", { name: "I have it" })[0]);
     expect(useApp.getState().gyms[0].equipment.length).toBe(before + 1);
+  });
+});
+
+describe("pre-workout check-in", () => {
+  it("makes today an easy day when the lifter is unwell, and remembers the answer", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const group = screen.getByRole("group", { name: "How do you feel?" });
+    await user.click(within(group).getByRole("button", { name: "Unwell" }));
+    expect(useApp.getState().readiness?.call).toBe("recover");
+    expect(useApp.getState().preview?.call).toBe("recover");
+    expect(within(group).getByRole("button", { name: "Unwell" })).toHaveAttribute("aria-pressed", "true");
+    expect(screen.getByText("You said you're feeling unwell, so today is easy")).toBeInTheDocument();
+    await user.click(within(group).getByRole("button", { name: "Great" }));
+    // Picking an energy keeps the unwell answer.
+    expect(
+      useApp
+        .getState()
+        .events.filter((e) => e.type === "feel")
+        .at(-1),
+    ).toMatchObject({ energy: 1, unwell: true });
+    await user.click(within(group).getByRole("button", { name: "Unwell" }));
+    expect(useApp.getState().readiness?.call).not.toBe("recover");
   });
 });

@@ -13,6 +13,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { Info } from "@/components/Info";
+import { useBack } from "@/lib/back";
 import type { Term } from "@/lib/glossary";
 import { parseNum, t } from "@/lib/i18n";
 import { calm, haptic, sound } from "@/lib/juice";
@@ -257,6 +258,8 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
   useEffect(() => {
     closeRef.current = onClose;
   });
+  // The phone's back button closes the sheet before it leaves the screen (back.ts).
+  useBack(true, () => closeRef.current());
   useEffect(() => {
     const before = document.activeElement as HTMLElement | null;
     box.current?.focus();
@@ -295,9 +298,19 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     let start: { x: number; y: number; t: number } | null = null;
     let dragging = false;
     let dy = 0;
+    const backdrop = el.parentElement;
     const set = (y: number, animate: boolean) => {
+      // The rise-in animation fills "both", and a filling animation beats an inline transform, so the sheet
+      // stayed put under the finger on phones. Drop it once the lifter drags; it has done its job by then.
+      el.style.animation = "none";
       el.style.transition = animate ? "transform 220ms var(--ease-out-expo, ease-out)" : "none";
       el.style.transform = y ? `translateY(${y}px)` : "";
+      // The dimmed backdrop lightens as the sheet goes down, so it reads as one thing leaving.
+      if (backdrop) {
+        backdrop.style.animation = "none";
+        backdrop.style.transition = animate ? "opacity 220ms var(--ease-out-expo, ease-out)" : "none";
+        backdrop.style.opacity = y ? String(Math.max(0.2, 1 - y / (el.offsetHeight || window.innerHeight))) : "";
+      }
     };
     const down = (e: TouchEvent) => {
       const target = e.target as Element | null;
@@ -573,7 +586,7 @@ export function LinkToggle({
         onToggle();
       }}
       aria-pressed={on}
-      aria-label={on ? `Split ${second} from ${first}` : `Superset ${second} with ${first}`}
+      aria-label={t(on ? "fmt.unlink" : "fmt.link", { second, first })}
       className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent bg-accent text-bg" : "border-line bg-surface text-muted hover:text-ink"} ${className}`}
     >
       <Icon name="link" size={18} />
@@ -665,7 +678,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 /** The app's loading screen, shaped like Today so the real screen lands where the eye already is. */
 export function TodaySkeleton() {
   return (
-    <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label="Loading">
+    <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label={t("nav.loading")}>
       <div className="flex items-center justify-between pt-3">
         <Skeleton className="h-4 w-36" />
         <div className="flex gap-2">

@@ -1,7 +1,8 @@
 "use client";
 
+import { t } from "./i18n";
 import { isNative } from "./juice";
-import type { CalendarPrefs } from "./types";
+import type { CalendarPrefs, Profile } from "./types";
 
 export type { CalendarPrefs };
 
@@ -40,6 +41,16 @@ export function defaultPrefs(perWeek: number): CalendarPrefs {
   return { days: defaultDays(perWeek), time: "18:00", write: false, read: false };
 }
 
+/**
+ * The lifter's training days. Settings › Training sets the days and the days-a-week goal together (one
+ * control, Melvin approved 2026-11-10), so they agree; if they don't (setup was run again with a new
+ * days-a-week), the goal wins and the days are spread out again.
+ */
+export function trainingDays(profile: Pick<Profile, "calendar" | "daysPerWeek">): number[] {
+  const days = profile.calendar?.days;
+  return days?.length && days.length === profile.daysPerWeek ? days : defaultDays(profile.daysPerWeek);
+}
+
 /** The next start of a training session at or after `from`, in local time. */
 export function nextStart(days: number[], time: string, from: number): number | null {
   if (!days.length) return null;
@@ -65,7 +76,7 @@ const icsUtc = (t: number) =>
     .replace(/\.\d{3}/, "");
 
 /** A calendar file with one weekly repeating event (floating local time, so it follows the lifter's zone). */
-export function trainingIcs(p: Pick<CalendarPrefs, "days" | "time">, minutes: number, now: number, title = "Liftsmith workout"): string {
+export function trainingIcs(p: Pick<CalendarPrefs, "days" | "time">, minutes: number, now: number, title = t("cal.eventTitle")): string {
   const start = nextStart(p.days, p.time, now) ?? now;
   const byday = [...p.days]
     .sort()
@@ -83,7 +94,7 @@ export function trainingIcs(p: Pick<CalendarPrefs, "days" | "time">, minutes: nu
     `DTEND:${icsLocal(start + minutes * MIN)}`,
     `RRULE:FREQ=WEEKLY;BYDAY=${byday}`,
     `SUMMARY:${title}`,
-    "DESCRIPTION:Open Liftsmith to start today's workout.",
+    `DESCRIPTION:${t("cal.eventNote")}`,
     "END:VEVENT",
     "END:VCALENDAR",
     "",
@@ -115,7 +126,14 @@ export function fitLength(free: number, planned: number): number | null {
 // Native side: CalendarPlugin.java (Android, CalendarContract) and CalendarPlugin.swift (iOS, EventKit).
 type Plugin = {
   requestAccess(): Promise<{ granted: boolean }>;
-  saveTrainingDays(o: { days: number[]; hour: number; minute: number; minutes: number; title: string }): Promise<{ saved: boolean }>;
+  saveTrainingDays(o: {
+    days: number[];
+    hour: number;
+    minute: number;
+    minutes: number;
+    title: string;
+    notes: string;
+  }): Promise<{ saved: boolean }>;
   removeTrainingDays(): Promise<void>;
   busy(o: { from: number; to: number }): Promise<{ busy: Busy[] }>;
 };
@@ -142,7 +160,8 @@ export async function saveTrainingDays(prefs: Pick<CalendarPrefs, "days" | "time
   if (!p || !isNative() || !prefs.days.length) return false;
   const [hour, minute] = prefs.time.split(":").map(Number);
   try {
-    return (await p.saveTrainingDays({ days: prefs.days, hour, minute, minutes, title: "Liftsmith workout" })).saved;
+    return (await p.saveTrainingDays({ days: prefs.days, hour, minute, minutes, title: t("cal.eventTitle"), notes: t("cal.eventNote") }))
+      .saved;
   } catch {
     return false;
   }

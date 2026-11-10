@@ -6,31 +6,36 @@ import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { useAccount } from "@/lib/auth";
+import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling } from "@/lib/billing";
+import { startConnections } from "@/lib/connections";
 import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS, goalStreak } from "@/lib/game";
 import { readHeight } from "@/lib/health";
-import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
+import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
-import { onSessionAction, stopSession } from "@/lib/sessionNotify";
+import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme } from "@/lib/themes";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
+import { watchWorkout } from "@/lib/workoutWatch";
 import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
 import { Achievements } from "./Achievements";
+import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
+import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
 import { Onboarding } from "./Onboarding";
@@ -40,7 +45,7 @@ import { Programs } from "./Programs";
 import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
-import { go, parse, useRoute, type Route } from "./router";
+import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
@@ -79,6 +84,8 @@ export function App() {
   // Language (i18n.ts): the phone's language, read again on return in case it changed, or the
   // one picked in Settings. useLang re-renders the whole app when it changes.
   useLang();
+  // The home-screen widget (widget.ts): today's call and why, the weekly goal and the top coach's note.
+  useHomeWidget();
   const language = profile.language;
   useEffect(() => {
     setLanguage(language);
@@ -87,6 +94,8 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [language]);
+  // Today's plan words its notes and labels when it's built, so a new language rebuilds it.
+  useEffect(() => subscribeLang(() => useApp.getState().replan()), []);
   // Accessibility (a11y.ts): text size, colour-blind safe colours, contrast. The phone's own text
   // size is read again when the app comes back, in case it was changed in the phone's settings.
   const a11y = profile.a11y;
@@ -99,6 +108,18 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [a11y]);
+  useEffect(() => {
+    // Android's back button: close a sheet, else the previous screen, and leave the app only from Today (back.ts).
+    let stop = () => {};
+    let gone = false;
+    void startBackButton({ depth: historyDepth, atRoot: () => parse(location.hash).route === "today", back: goBack }).then((s) =>
+      gone ? s() : (stop = s),
+    );
+    return () => {
+      gone = true;
+      stop();
+    };
+  }, []);
   useEffect(() => {
     // iOS WebKit only shows :active (the instant pressed state) when a touch listener exists.
     const noop = () => {};
@@ -141,6 +162,11 @@ export function App() {
     if (!ready || !signedIn) return;
     return startSync();
   }, [ready, signedIn]);
+  // Strava, Oura and WHOOP (Connected apps): status, readings in and workouts out, while signed in.
+  useEffect(() => {
+    if (!ready || !signedIn) return;
+    return startConnections();
+  }, [ready, signedIn]);
   const accountPro = useAccount((s) => !!s.account?.pro);
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
@@ -159,22 +185,14 @@ export function App() {
   useEffect(() => {
     if (ready) track("screen_view", { screen: profile.onboarded ? route : "onboarding" });
   }, [ready, route, profile.onboarded]);
-  // A workout left running ends itself a few hours after the last set (checked each minute and on open).
+  // A workout left running ends itself a few hours after the last set: one timer for that moment (moved
+  // each time the lifter does something), checked again on return. No minute-by-minute polling, so a
+  // phone with a forgotten workout isn't woken every minute (docs/decisions/battery.md).
   useEffect(() => {
     if (!ready) return;
-    const check = () => {
-      if (useApp.getState().autoEnd()) {
-        void stopSession();
-        if (location.hash.startsWith("#/workout")) go("today");
-      }
-    };
-    check();
-    const id = setInterval(check, 60_000);
-    document.addEventListener("visibilitychange", check);
-    return () => {
-      clearInterval(id);
-      document.removeEventListener("visibilitychange", check);
-    };
+    return watchWorkout(useApp, () => {
+      if (location.hash.startsWith("#/workout")) go("today");
+    });
   }, [ready]);
   // Gym by location: once on open and each time the app comes back to the foreground (never on a timer).
   useEffect(() => {
@@ -277,6 +295,7 @@ export function App() {
     remix: <Remix code={arg} />,
     pro: <Pro />,
     account: <Account />,
+    connections: <Connections />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

@@ -4,6 +4,8 @@ export const DEMO_COLOURS = {
   ember: "#ff5b3a",
   bone: "#f3e6d3",
   steel: "#d4e0ea",
+  /** The live heart rate and its trend line: the dark theme's `--color-heart` (a test keeps them in step). */
+  heart: "#f0605d",
 } as const;
 
 /**

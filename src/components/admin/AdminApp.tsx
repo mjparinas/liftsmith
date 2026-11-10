@@ -7,14 +7,19 @@ import { useCallback, useEffect, useState } from "react";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
+import { Automations } from "./Automations";
+import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
+import { MaintenanceBanner, useMaintenance } from "./Maintenance";
+import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { Todo } from "./Todo";
+import { loadTwoFactor, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -47,11 +52,12 @@ const TABS = [
   "Engagement",
   "Devices",
   "Revenue",
-  "Creators",
+  "Codes",
   "Users",
   "Installs",
   "Flags",
   "A/B Tests",
+  "Automations",
   "System",
   "Log",
 ] as const;
@@ -260,9 +266,26 @@ function Installs({ admin, open, setOpen }: { admin: boolean; open: string | nul
   );
 }
 
-const blank = { code: "", name: "", contact: "", rate: "30", months: "12", note: "", active: true };
+const blank = {
+  kind: "creator" as "creator" | "promo",
+  code: "",
+  name: "",
+  contact: "",
+  rate: "30",
+  months: "12",
+  note: "",
+  active: true,
+  trialDays: "30",
+  offering: "creator30",
+  endsAt: "",
+  maxUses: "",
+};
+const dayOf = (ms: number | null) => (ms == null ? "" : new Date(ms).toISOString().slice(0, 10));
 
-/** The creator program (AGENTS.md "Marketing and growth"): who's in it, what their codes brought in, and what they're owed. */
+/**
+ * Codes (docs/decisions/marketing-and-growth.md): creators' codes, with what they brought in and what each creator
+ * is owed, and promo codes of our own (no commission), each with its own trial or offering, end date and limit.
+ */
 function Creators({ admin, days }: { admin: boolean; days: number }) {
   const [data, setData] = useState<{ rows: CreatorRow[]; payouts: Payout[] } | null>(null);
   const [version, setVersion] = useState(0);
@@ -291,10 +314,21 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
     return r.ok;
   };
   const save = async () => {
-    if (await post({ action: "save", ...form, rate: Number(form.rate) / 100, months: Number(form.months) })) setForm(blank);
+    const body = {
+      action: "save",
+      ...form,
+      rate: Number(form.rate) / 100,
+      months: Number(form.months),
+      // A promo with no trial gives what its offering gives (a discount).
+      trialDays: form.trialDays.trim() || null,
+      endsAt: form.endsAt ? `${form.endsAt}T23:59:59Z` : null,
+      maxUses: form.maxUses.trim() || null,
+    };
+    if (await post(body)) setForm(blank);
   };
   const edit = (c: CreatorRow) =>
     setForm({
+      kind: c.kind,
       code: c.code,
       name: c.name,
       contact: c.contact ?? "",
@@ -302,6 +336,10 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       months: String(c.months),
       note: c.note ?? "",
       active: c.active,
+      trialDays: c.trialDays == null ? "" : String(c.trialDays),
+      offering: c.offering,
+      endsAt: dayOf(c.endsAt),
+      maxUses: c.maxUses == null ? "" : String(c.maxUses),
     });
   const pay = async (c: CreatorRow) => {
     const amount = window.prompt(`Record a payout to ${c.name}. Amount paid in USD (owed: ${fmtUsd(c.owed, 2)}):`, c.owed.toFixed(2));
@@ -312,11 +350,13 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
   if (!data) return <p className="text-muted">Loading…</p>;
   const rows = data.rows;
   const sum = (f: (r: CreatorRow) => number) => rows.reduce((t, r) => t + f(r), 0);
-  const field = (label: string, key: keyof typeof blank, hint?: string) => (
+  const promo = form.kind === "promo";
+  const field = (label: string, key: Exclude<keyof typeof blank, "kind" | "active">, hint?: string, type = "text") => (
     <label className="block text-sm">
       <span className="text-xs text-muted">{label}</span>
       <input
-        value={String(form[key])}
+        type={type}
+        value={form[key]}
         onChange={(e) => setForm({ ...form, [key]: e.target.value })}
         placeholder={hint}
         className="card mt-1 w-full px-3 py-2"
@@ -326,7 +366,11 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-        <Tile label="Creators" value={fmtInt(rows.filter((r) => r.active).length)} sub={`${rows.length} in all`} />
+        <Tile
+          label="Live codes"
+          value={fmtInt(rows.filter((r) => r.active).length)}
+          sub={`${rows.filter((r) => r.kind === "creator").length} creators · ${rows.filter((r) => r.kind === "promo").length} promo`}
+        />
         <Tile
           label={`Code sign-ups, ${days} days`}
           value={fmtInt(sum((r) => r.signupsPeriod))}
@@ -354,7 +398,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
         />
       </div>
       <Card
-        title="Creators"
+        title="Codes"
         subtitle={`Commission is the rate times our net revenue (the store price less its ${Math.round(STORE_FEE * 100)}% fee) for each subscriber's first months after their first payment. Revenue counts once it's ${HOLD_DAYS} days old, so refunds can't be paid out; a refund takes its share back. Pay monthly once someone is owed ${fmtUsd(MIN_PAYOUT)} or more.`}
         right={
           <a className="text-xs text-accent underline" href="/api/admin/creators/?format=csv">
@@ -364,7 +408,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       >
         <Table
           columns={["Code", "Name", "Terms", "Sign-ups", "Trials", "Paying", "Refunds", "Gross", "Earned", "Paid", "Owed", "Last paid", ""]}
-          empty="No creators yet. Add the first one below."
+          empty="No codes yet. Add the first one below."
           rows={rows.map((r) => [
             <code key="c" className="text-xs">
               {r.code}
@@ -373,7 +417,14 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
               {r.name}
               {!r.active && <span className="ml-1 text-xs text-muted">(paused)</span>}
             </span>,
-            `${Math.round(r.rate * 100)}% · ${r.months} mo`,
+            [
+              r.kind === "promo" ? "Promo" : `${Math.round(r.rate * 100)}% · ${r.months} mo`,
+              r.trialDays == null ? `offer ${r.offering}` : `${r.trialDays}-day trial`,
+              r.endsAt != null ? `ends ${dayOf(r.endsAt)}` : "",
+              r.maxUses != null ? `${fmtInt(r.signups)}/${fmtInt(r.maxUses)} used` : "",
+            ]
+              .filter(Boolean)
+              .join(" · "),
             fmtInt(r.signups),
             fmtInt(r.trials),
             fmtInt(r.paying),
@@ -404,20 +455,37 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       </Card>
       {admin && (
         <Card
-          title={form.code && rows.some((r) => r.code === form.code.toUpperCase()) ? `Edit ${form.code.toUpperCase()}` : "Add a creator"}
-          subtitle="Their link is www.getliftsmith.com/c/<code>. Followers get a 30-day Pro trial through the creator30 offering."
+          title={form.code && rows.some((r) => r.code === form.code.toUpperCase()) ? `Edit ${form.code.toUpperCase()}` : "Add a code"}
+          subtitle="Its link is www.getliftsmith.com/c/<code>, or people type it under Settings › Redeem a code. The trial and offering decide what it gives: a longer trial through creator30, or a discount through any RevenueCat offering whose store products carry it (set those up in RevenueCat, Play Console and App Store Connect first)."
         >
+          <div className="mb-3 flex gap-2 text-sm" role="group" aria-label="Kind of code">
+            {(["creator", "promo"] as const).map((k) => (
+              <button
+                key={k}
+                type="button"
+                aria-pressed={form.kind === k}
+                onClick={() => setForm({ ...form, kind: k, ...(k === "promo" && form.trialDays === "30" ? { trialDays: "" } : {}) })}
+                className={`press rounded-xl border px-3 py-1.5 ${form.kind === k ? "border-accent text-accent" : "border-line text-muted"}`}
+              >
+                {k === "creator" ? "Creator's code (earns commission)" : "Promo code (ours, no commission)"}
+              </button>
+            ))}
+          </div>
           <div className="grid gap-3 md:grid-cols-3">
-            {field("Code", "code", "LIFT-ALEX")}
-            {field("Name or handle", "name", "@alexlifts")}
-            {field("Contact (email or handle)", "contact")}
-            {field("Commission %", "rate")}
-            {field("Months per subscriber", "months")}
-            {field("Note", "note", "Agreement signed 2026-11-09")}
+            {field("Code", "code", promo ? "SUMMER26" : "LIFT-ALEX")}
+            {field(promo ? "Label (only shown here)" : "Name or handle", "name", promo ? "Summer sale 2026" : "@alexlifts")}
+            {!promo && field("Contact (email or handle)", "contact")}
+            {!promo && field("Commission %", "rate")}
+            {!promo && field("Months per subscriber", "months")}
+            {field("Trial days (blank: the offering's own terms)", "trialDays", promo ? "blank for a discount" : "30")}
+            {field("RevenueCat offering", "offering", "creator30")}
+            {field("Ends (optional)", "endsAt", "", "date")}
+            {field("Most uses (optional)", "maxUses", "500")}
+            {field("Note", "note", promo ? "Newsletter, 2026-12" : "Agreement signed 2026-11-09")}
           </div>
           <label className="mt-3 flex items-center gap-2 text-sm">
             <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} />
-            Active (a paused code stops working for new sign-ups; existing subscribers still earn)
+            Active (a paused or ended code stops working for new sign-ups; people who already used it keep what it gave)
           </label>
           <div className="mt-3 flex gap-3">
             <button
@@ -425,7 +493,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
               onClick={() => void save()}
               className="press rounded-xl bg-accent px-4 py-2 font-semibold text-accent-ink"
             >
-              Save creator
+              Save code
             </button>
             <button type="button" onClick={() => setForm(blank)} className="press rounded-xl px-4 py-2 text-muted">
               Clear
@@ -454,7 +522,10 @@ export function AdminApp() {
   const [view, setView] = useState<View>(readView);
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
-  const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
+  const [state, setState] = useState<"loading" | "signin" | "twofactor" | "ok" | "error">("loading");
+  const [twoFactor, setTwoFactor] = useState<TwoFactorInfo | null>(null);
+  // Maintenance mode's state, for the banner on every tab and the switch on System.
+  const maintenance = useMaintenance();
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
@@ -499,7 +570,13 @@ export function AdminApp() {
     fetch(`/api/admin/stats/?days=${days}`)
       .then(async (r) => {
         if (!live) return;
-        if (r.status === 404) return setState("signin");
+        if (r.status === 404) {
+          // Signed in with the link but not past the second step yet, or not signed in at all.
+          const tf = await loadTwoFactor();
+          if (!live) return;
+          setTwoFactor(tf);
+          return setState(tf && !tf.ready ? "twofactor" : "signin");
+        }
         if (!r.ok) return setState("error");
         const j = (await r.json()) as Data;
         if (!live) return;
@@ -513,6 +590,7 @@ export function AdminApp() {
   }, [days]);
 
   if (state === "signin") return <SignIn />;
+  if (state === "twofactor" && twoFactor) return <TwoFactorGate info={twoFactor} />;
   if (state === "error")
     return <main className="p-8 text-muted">The stats didn&apos;t load. Is the database set up (DATABASE_URL or TURSO_DATABASE_URL)?</main>;
   if (!data) return <main className="p-8 text-muted">Loading…</main>;
@@ -573,6 +651,7 @@ export function AdminApp() {
       </header>
 
       <div className="mt-4 space-y-4">
+        <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
         {tab === "Overview" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -624,6 +703,7 @@ export function AdminApp() {
         {tab === "Traffic" && (
           <>
             <SearchConsole days={days} />
+            <BingSearch days={days} />
             <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
@@ -830,6 +910,7 @@ export function AdminApp() {
               <Tile label="Paying subscribers" value={fmtInt(rev.all.paying)} />
               <Tile label="Paywall views" value={fmtInt(rev.paywallViews)} sub={`${fmtInt(rev.all.trialStarts)} trials`} />
             </div>
+            <RunningCosts admin={data.staff.role === "admin"} netMrr={rev.all.netMrr} />
             <Card
               title="Forecast against actual"
               subtitle="Gross MRR by month since launch, log scale. Dashed: the forecast's conservative, base and optimistic cases."
@@ -873,14 +954,15 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Creators" && <Creators admin={data.staff.role === "admin"} days={days} />}
+        {tab === "Codes" && <Creators admin={data.staff.role === "admin"} days={days} />}
         {tab === "Users" && <Users admin={data.staff.role === "admin"} me={data.staff.email} open={view.open} setOpen={openIn("Users")} />}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
-        {tab === "System" && <System />}
+        {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
+        {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}
       </div>
     </div>

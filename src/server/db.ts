@@ -199,6 +199,25 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
   )`,
+  // Two-step sign-in for staff (src/server/twoFactor.ts): the authenticator secret (sealed with TWO_FACTOR_KEY),
+  // one-time recovery codes (hashes only) and the sessions that have passed the second step.
+  `CREATE TABLE IF NOT EXISTS admin_two_factor (
+    email TEXT PRIMARY KEY,
+    secret TEXT,
+    pending TEXT,
+    enabled_at INTEGER,
+    last_step INTEGER
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_backup_codes (
+    email TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    used_at INTEGER,
+    PRIMARY KEY (email, code_hash)
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_session_steps (
+    token_hash TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS admin_audit (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at INTEGER NOT NULL,
@@ -280,12 +299,81 @@ const SCHEMA = [
     at INTEGER NOT NULL,
     PRIMARY KEY (flag, install_id)
   )`,
+  // Small admin settings (src/server/settings.ts): maintenance mode, alert switches, running costs, saved replies,
+  // the last restore practice, and when each alert last went out.
+  `CREATE TABLE IF NOT EXISTS admin_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  // Failed sign-ins to a staff address (ADMIN_EMAILS, SUPPORT_EMAILS) only, kept 30 days, for the System tab's
+  // Admin security card and the repeated-failures alert. The address and which step failed, nothing else.
+  `CREATE TABLE IF NOT EXISTS staff_sign_in_failures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    step TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  // One database size sample a day, kept 90 days, for the System tab's Capacity card.
+  `CREATE TABLE IF NOT EXISTS db_size_samples (
+    day INTEGER PRIMARY KEY,
+    bytes INTEGER NOT NULL
+  )`,
+  // Connected apps (src/server/connect.ts): one row per account and cloud service (Strava, Oura, Whoop). The
+  // tokens are encrypted with a key made from that service's client secret, so a copy of the database alone
+  // can't use them. Deleted with the account, and on Disconnect (after revoking the token at the service).
+  `CREATE TABLE IF NOT EXISTS connections (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT,
+    expires_at INTEGER NOT NULL,
+    who TEXT,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider)
+  )`,
+  // One-time OAuth states: the app asks for one while signed in, the service sends it back to the callback.
+  `CREATE TABLE IF NOT EXISTS connect_states (
+    state TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    expires_at INTEGER NOT NULL
+  )`,
+  // Workouts already posted to Strava, so a retry from a second device or a flaky network never posts twice.
+  `CREATE TABLE IF NOT EXISTS connect_uploads (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    remote_id TEXT,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider, session_id)
+  )`,
+  // Public pages already sent to IndexNow, and as what (src/server/indexnow.ts).
+  `CREATE TABLE IF NOT EXISTS indexnow_sent (
+    url TEXT PRIMARY KEY,
+    sig TEXT NOT NULL,
+    sent_at INTEGER NOT NULL
+  )`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,
     reset_at INTEGER NOT NULL
   )`,
+];
+
+/**
+ * Columns added to a table after it first shipped: CREATE TABLE IF NOT EXISTS leaves an existing table alone,
+ * so each one is added here if it's missing. Only ever append; a column is never renamed or dropped.
+ */
+const COLUMNS: [table: string, column: string, def: string][] = [
+  // Codes of our own, not only creators' (Melvin, 2026-11-10): see src/server/creators.ts.
+  ["creators", "kind", "TEXT NOT NULL DEFAULT 'creator'"],
+  ["creators", "trial_days", "INTEGER"],
+  ["creators", "offering", "TEXT"],
+  ["creators", "ends_at", "INTEGER"],
+  ["creators", "max_uses", "INTEGER"],
 ];
 
 let client: Client | null = null;
@@ -311,6 +399,10 @@ async function db(): Promise<Client> {
   const c = client;
   ready ??= (async () => {
     for (const s of SCHEMA) await c.execute(s);
+    for (const [table, column, def] of COLUMNS) {
+      const have = await c.execute(`PRAGMA table_info(${table})`);
+      if (!have.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
+    }
   })();
   await ready;
   return c;

@@ -13,9 +13,10 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 
 import { storePro } from "./billing";
-import { defaultDays } from "./calendar";
+import { trainingDays } from "./calendar";
 import type { Stats } from "./derive";
 import { goalStreak } from "./game";
+import { currentLang } from "./i18n";
 import { isNative } from "./juice";
 import { dayStart, mondayIn, plan, proState, type Message, type MessageKind, type PlanInput } from "./messages";
 import { SITE_URL } from "./site";
@@ -43,7 +44,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
   const prefs = profile.messages;
   return {
     tz,
-    days: profile.calendar?.days ?? defaultDays(profile.daysPerWeek),
+    days: trainingDays(profile),
     time: profile.calendar?.time ?? "18:00",
     daysPerWeek: profile.daysPerWeek,
     startedAt: prefs?.startedAt ?? profile.blockStart,
@@ -55,6 +56,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
     streakWeeks: g.weeks - (g.thisWeek >= Math.max(1, profile.daysPerWeek) ? 1 : 0),
     pro: storePro(now) ?? proState(profile.pro, now),
     kinds: (channel === "push" ? prefs?.push : prefs?.email?.kinds) ?? {},
+    lang: currentLang(),
   };
 }
 
@@ -193,6 +195,7 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
     weekStart: i.weekStart,
     streakWeeks: i.streakWeeks,
     pro: i.pro,
+    lang: i.lang,
   };
 }
 

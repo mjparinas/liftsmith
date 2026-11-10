@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { DemoPicker } from "@/components/site/DemoPicker";
 import { HeroLift } from "@/components/site/HeroLift";
+import { perSide } from "@/components/site/heroPlates";
+import { HERO_PROGRAM } from "@/components/site/heroProgram";
+import { Screenshot } from "@/components/site/Screenshot";
 import { SiteFooter } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
+import { faqJsonLd, FAQS } from "@/lib/faqs";
 import { FLAGS } from "@/lib/flags";
+import { FREE_FEATURES, PRO_FEATURES } from "@/lib/plans";
+import { MUSCLE_NAME } from "@/lib/seo";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
 
@@ -31,6 +36,7 @@ function Cta({ children, cta, className = "" }: { children: React.ReactNode; cta
   return (
     <Link
       href={APP_PATH}
+      prefetch={false}
       data-cta={cta}
       className={`press inline-flex min-h-14 items-center justify-center rounded-2xl bg-accent px-7 text-lg font-semibold text-accent-ink shadow-[0_10px_40px_-10px_rgb(76_141_255/0.7)] ${className}`}
     >
@@ -56,14 +62,7 @@ function Phone({ src, alt, className = "" }: { src: string; alt: string; classNa
     <div
       className={`relative rounded-[2.4rem] border border-[#2a3442] bg-[#0b0f15] p-2 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8),0_0_0_1px_rgb(255_255_255/0.03)] ${className}`}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={780}
-        height={1688}
-        className="h-auto w-full rounded-[2rem]"
-        sizes="(min-width: 1024px) 300px, 70vw"
-      />
+      <Screenshot src={src} alt={alt} sizes="(min-width: 1024px) 300px, 70vw" className="h-auto w-full rounded-[2rem]" />
     </div>
   );
 }
@@ -180,31 +179,6 @@ const MORE = [
   { title: "No account needed", body: "Sign in with Google or Apple only if you want sync and backup." },
 ];
 
-const FAQS = [
-  {
-    q: `Is ${name} free?`,
-    a: `Yes. The workout logger, plate graphic, rest timer and lock-screen notification are free, and a classic 5×5 program is on its way to the free plan. Pro adds adaptive programming, readiness adjustments, the recovery map and advanced stats, for ${PRICES.monthly.price} a month or ${PRICES.annual.price} a year, with a ${TRIAL_DAYS}-day free trial.`,
-  },
-  { q: "Are there ads?", a: "No, and there never will be. The subscription is the only way we make money." },
-  {
-    q: "Is it on Android and iPhone?",
-    a: "Both apps are on the way to Google Play and the App Store and ship with the same features. Until then, the full app runs in your browser and works offline once it has loaded.",
-  },
-  {
-    q: "What equipment do I need?",
-    a: "Whatever you have. Tell it your gym's equipment and plates, or choose bodyweight only, and every exercise it plans is one you can do there.",
-  },
-  {
-    q: "Does it work with my heart rate monitor?",
-    a: "Any strap or watch that broadcasts standard Bluetooth heart rate works, including Polar and Wahoo straps, Garmin watches set to broadcast, Fitbit Charge 6 and Pixel Watch.",
-  },
-  {
-    q: "Do I need an account?",
-    a: "No. Everything works on your phone without one. Sign in with Google or Apple when you want your workouts synced and backed up.",
-  },
-  { q: "How do I cancel?", a: "In two taps, from your Google Play or App Store subscriptions. No tricks and no countdowns." },
-];
-
 function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/80 backdrop-blur-lg">
@@ -235,6 +209,7 @@ function Header() {
           </Link>
           <Link
             href={APP_PATH}
+            prefetch={false}
             data-cta="header"
             className="press ml-1 inline-flex min-h-11 items-center rounded-xl bg-accent px-4 text-accent-ink"
           >
@@ -263,11 +238,7 @@ export default function Home() {
         { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-    },
+    faqJsonLd(FAQS),
   ];
 
   return (
@@ -294,7 +265,7 @@ export default function Home() {
               </p>
             </div>
             <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
-              <HeroLift />
+              <HeroLift labels={MUSCLE_NAME} plates={HERO_PROGRAM.map((s) => perSide(s.kg))} />
             </div>
             <div>
               <div className="flex flex-wrap gap-3">
@@ -400,6 +371,7 @@ export default function Home() {
                 </ul>
                 <Link
                   href={APP_PATH}
+                  prefetch={false}
                   data-cta={`feature-${f.id}`}
                   className="mt-6 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
                 >
@@ -444,7 +416,7 @@ export default function Home() {
               monitor connected the figure&apos;s heart beats with yours. Try it: pick a lift and drag the figure.
             </p>
             <div className="mt-10">
-              <DemoPicker />
+              <DemoPicker labels={MUSCLE_NAME} />
             </div>
             <div className="mt-10 flex justify-center">
               <Cta cta="demos">Learn your lifts free</Cta>
@@ -476,6 +448,7 @@ export default function Home() {
               </p>
               <Link
                 href={APP_PATH}
+                prefetch={false}
                 data-cta="juice"
                 className="mt-5 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
               >
@@ -547,14 +520,7 @@ export default function Home() {
                 <span className="num text-5xl font-bold">$0</span> <span className="text-muted">forever</span>
               </p>
               <ul className="mt-6 flex-1 space-y-3">
-                {[
-                  "Workout logger with pre-filled sets",
-                  "Plate graphic for every barbell set",
-                  "Automatic rest timer",
-                  "Lock-screen notification and Live Activity",
-                  "Classic 5×5 program (coming soon)",
-                  "Works offline, no account needed",
-                ].map((x) => (
+                {FREE_FEATURES.map((x) => (
                   <li key={x} className="flex gap-2.5">
                     <Check />
                     {x}
@@ -563,6 +529,7 @@ export default function Home() {
               </ul>
               <Link
                 href={APP_PATH}
+                prefetch={false}
                 data-cta="pricing-free"
                 className="press mt-8 inline-flex min-h-14 items-center justify-center rounded-2xl border border-line bg-raised text-lg font-semibold"
               >
@@ -582,14 +549,7 @@ export default function Home() {
                 {PRICES.annual.note}, or {PRICES.monthly.price} {PRICES.monthly.per}
               </p>
               <ul className="mt-6 flex-1 space-y-3">
-                {[
-                  "Everything in Free",
-                  "Adaptive workouts from your gym, time and history",
-                  "Automatic weights and reps, RIR blocks and deloads",
-                  "Daily readiness: push, as planned or go easy",
-                  "Recovery map",
-                  "Advanced stats: one-rep max trends, sets per muscle",
-                ].map((x) => (
+                {PRO_FEATURES.map((x) => (
                   <li key={x} className="flex gap-2.5">
                     <Check />
                     {x}

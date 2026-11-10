@@ -5,7 +5,6 @@
 // guide or plate-math mini-game on the rest timer.
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { PlateBar } from "@/components/PlateBar";
 import { ghostFor, paceDelta, paceText, sameAsLast, type Ghost } from "@/lib/ghost";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -17,9 +16,11 @@ import { hash, rng } from "@/lib/random";
 import { useApp } from "@/lib/store";
 import type { AppEvent, Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
 import { exerciseCue, restCue, say, setCue, voice } from "@/lib/voice";
 
 import { clock } from "./format";
+import { PlateBar } from "./Plates";
 
 export function useGhost(events: readonly AppEvent[], exerciseId: string | undefined, sessionId: string | undefined): Ghost | null {
   // Only earlier sessions matter, so the ghost is stable through the workout.
@@ -237,12 +238,9 @@ export function breathPhase(secs: number): { phase: "in" | "out"; p: number } {
 }
 
 function Breathe({ left }: { left: number }) {
-  const [secs, setSecs] = useState(0);
-  useEffect(() => {
-    const t0 = Date.now();
-    const id = setInterval(() => setSecs((Date.now() - t0) / 1000), 100);
-    return () => clearInterval(id);
-  }, []);
+  // Paced by useNow, so the animation stops while the app is in the background.
+  const [t0] = useState(() => Date.now());
+  const secs = (useNow(100) - t0) / 1000;
   const { phase, p } = breathPhase(secs);
   const scale = 0.55 + 0.45 * p;
   return (

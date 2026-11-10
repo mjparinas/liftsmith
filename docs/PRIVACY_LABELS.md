@@ -15,7 +15,7 @@ Last reviewed: 2026-11-10 (feature flag checks and A/B test groups added, under 
 | Screens viewed, setup steps, features used, permission answers, workout started/finished with exercise and set counts and length | Yes, with usage stats | Analytics | No |
 | Paywall views, trial starts, purchases with plan and price | Yes, with usage stats | Analytics | No |
 | Subscription: install id (as RevenueCat's user id), plan, price, currency, country, trial and renewal dates, store receipt | Yes, to RevenueCat (our billing service provider), and from the stores' server notifications back to our database | App functionality (unlocking Pro), Analytics (revenue) | No |
-| Creator code: the code, the install id, how it arrived (link, Play install referrer, typed) and platform | Only when the user uses a creator's code or link; sent whether usage stats are on or off, and also set as a RevenueCat subscriber attribute | App functionality (the trial length), creator commission (paying the referrer) | No |
+| Code (a creator's or our own promo code): the code, the install id, how it arrived (link, Play install referrer, typed) and platform | Only when the user uses a code or its link; sent whether usage stats are on or off, and also set as a RevenueCat subscriber attribute | App functionality (the trial or offer, use limits), creator commission (paying the referrer) | No |
 | Country and region (from the IP address on arrival; the address isn't stored) | Yes | Analytics | No |
 | Feedback message, optional email, optional screenshot, optional device details | Only when the user sends feedback | App functionality (support) | Email is given by the user |
 | Reminder email address, which reminder kinds are on, consent time | Only when the user turns on email reminders (double opt-in) | App functionality, developer communications (offers only if the user turns them on) | Yes, by the email address |
@@ -34,7 +34,7 @@ Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off u
 - Is all of the user data collected by your app encrypted in transit? **Yes** (HTTPS only).
 - Do you provide a way for users to request that their data is deleted? **Yes** (Settings › Account and sync › Delete my account deletes the account and its synced copy; Settings › Erase this device resets the install id; deletion on request through in-app feedback with the install id).
 - Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/delete-account/ (2026-11-10: names the app, gives the in-app steps, the web app path and an email route from the account address, and lists what is deleted, kept and for how long). Deleting some data without deleting the account: **Yes** (cycle logs, email reminders and usage stats in Settings; anything else by email within 30 days).
-- **Shared** with third parties: **none** (Vercel, Turso, Resend and RevenueCat are service providers acting for us, which Play does not count as sharing).
+- **Shared** with third parties: **none** (Vercel, Turso, Resend, RevenueCat and Anthropic, which may draft an answer to an email someone sends us, are service providers acting for us, which Play does not count as sharing).
 
 Collected data types:
 
@@ -54,7 +54,7 @@ Collected data types:
 | Health and fitness › Health info | Yes, only with an account: synced Health Connect readings, injuries and cycle logs, for the user's own devices | No | No | Optional | App functionality |
 | App activity › Other user-generated content | Yes, with an account: exercise notes and routines | No | No | Optional | App functionality |
 
-Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE, the health twin), READ_SLEEP, READ_HEART_RATE_VARIABILITY and READ_RESPIRATORY_RATE (the health twin on the Body tab, and the Pro readiness call: "adjusts workout intensity to recovery"), READ_STEPS (the health twin and TDEE's activity level), READ_VO2_MAX (the health twin) and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
+Health Connect: the permissions declaration form still applies to the on-device reads and writes (see `public/privacypolicy.html`). Declare only READ_WEIGHT, READ_HEIGHT, READ_BODY_FAT and READ_RESTING_HEART_RATE (setup, weigh-ins, TDEE, the health twin), READ_SLEEP, READ_HEART_RATE_VARIABILITY and READ_RESPIRATORY_RATE (the health twin on the Body tab, and the Pro readiness call: "adjusts workout intensity to recovery"), READ_STEPS (the health twin and TDEE's activity level), READ_VO2_MAX (the health twin) WRITE_EXERCISE (each finished workout as a strength training session; added 2026-11-10, so the declaration form needs it added), and WRITE_ACTIVE_CALORIES_BURNED and WRITE_HEART_RATE (finished workouts). Privacy policy URL: https://www.getliftsmith.com/privacy/.
 
 ## App Store: App Privacy
 

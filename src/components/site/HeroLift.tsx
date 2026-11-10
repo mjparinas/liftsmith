@@ -5,94 +5,42 @@
 // figures. The working muscles are labelled on the body, and the numbers the app tracks tick up: reps,
 // the volume sum, an Epley one-rep max estimate, plates per side from the real plate solver, a running
 // total, and a heart rate trace that also beats in the figure's chest. It is all demo data and says so.
-// three.js loads after the page does; without WebGL the hero shows a real app screenshot instead.
-import Image from "next/image";
+// three.js loads once the page has loaded and gone quiet, and the figure runs at 30 fps; without GPU WebGL (none,
+// or drawn in software) the hero shows a real app screenshot instead (src/lib/webgl.ts).
 import { useEffect, useRef, useState } from "react";
 
-import type { Frame, Loop, Scene, View } from "@/components/demo/engine";
-import { PLATE_SETS } from "@/lib/defaults";
-import { add, cross, lerpV, mul, norm, sub, type BodyKey, type Joints, type Vec } from "@/lib/demo/rig";
+import type { Frame, Loop, Scene } from "@/components/demo/engine";
+import { lerpV, type Vec } from "@/lib/demo/rig";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
-import { loadBar } from "@/lib/plates";
-import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+import type { Muscle } from "@/lib/types";
+import { probeWebGL } from "@/lib/webgl";
 
-interface Step {
-  id: string;
-  body: BodyKey;
-  kg: number;
-  reps: number;
-  view: View;
-}
-export const HERO_PROGRAM: Step[] = [
-  { id: "back-squat", body: "male", kg: 100, reps: 5, view: "three" },
-  { id: "deadlift", body: "female", kg: 100, reps: 5, view: "side" },
-  { id: "bench-press", body: "male", kg: 80, reps: 5, view: "three" },
-  { id: "overhead-press", body: "female", kg: 35, reps: 5, view: "three" },
-];
+import { epley, HERO_PROGRAM, labelled, muscleAnchor } from "./heroProgram";
+import { Screenshot } from "./Screenshot";
 
-/** The muscles to label: the primary ones first, then secondary, at most four. */
-export function labelled(id: string): Muscle[] {
-  const e = EXERCISE_BY_ID.get(id);
-  return e ? [...e.primary, ...e.secondary].slice(0, 4) : [];
-}
-
-export const epley = (kg: number, reps: number) => (reps <= 0 ? 0 : kg * (1 + reps / 30));
-export const perSide = (kg: number) => loadBar(kg, 20, PLATE_SETS.kg).perSide;
 const lb = (kg: number) => Math.round(kg / 0.45359237);
 const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
 
-/** A point on the body for each muscle's label, in the figure's frame (x forward, y up, z to the right). */
-export function muscleAnchor(m: Muscle, J: Joints): Vec {
-  const up = norm(sub(J.shC, J.hipC));
-  const fwd = norm(cross(up, [0, 0, 1])); // the chest's facing direction
-  const torso = (t: number, f: number, z = 0): Vec => add(add(lerpV(J.hipC, J.shC, t), mul(fwd, f)), [0, 0, z]);
-  const limb = (a: Vec, b: Vec, t: number, f: number, z = 0): Vec => {
-    const front = mul(norm(cross(norm(sub(b, a)), [0, 0, 1])), -1);
-    return add(add(lerpV(a, b, t), mul(front, f)), [0, 0, z]);
-  };
-  switch (m) {
-    case "quads":
-      return limb(J.hipR, J.kneeR, 0.45, 0.07);
-    case "hamstrings":
-      return limb(J.hipR, J.kneeR, 0.45, -0.07);
-    case "adductors":
-      return limb(J.hipR, J.kneeR, 0.3, 0, -0.06);
-    case "calves":
-      return limb(J.kneeR, J.ankleR, 0.3, -0.05);
-    case "glutes":
-      return torso(-0.04, -0.13, 0.06);
-    case "lowerBack":
-      return torso(0.3, -0.11);
-    case "upperBack":
-      return torso(0.75, -0.12);
-    case "lats":
-      return torso(0.62, -0.05, 0.13);
-    case "traps":
-      return add(lerpV(J.shC, J.neck, 0.6), mul(fwd, -0.03));
-    case "chest":
-      return torso(0.78, 0.12, 0.06);
-    case "abs":
-      return torso(0.45, 0.11);
-    case "obliques":
-      return torso(0.42, 0.05, 0.13);
-    case "frontDelts":
-      return add(J.shR, mul(fwd, 0.04));
-    case "sideDelts":
-      return add(J.shR, [0, 0, 0.05]);
-    case "rearDelts":
-      return add(J.shR, mul(fwd, -0.04));
-    case "biceps":
-      return limb(J.shR, J.elbowR, 0.55, 0.04);
-    case "triceps":
-      return limb(J.shR, J.elbowR, 0.55, -0.04);
-    case "forearms":
-      return lerpV(J.elbowR, J.handR, 0.5);
-  }
-}
-
 const LABEL_W = 104;
 
-export function HeroLift() {
+/** Resolves once the page has loaded and the browser has a quiet moment (at most 2 s after load). */
+export function afterLoad(): Promise<void> {
+  return new Promise((resolve) => {
+    const idle = () =>
+      window.requestIdleCallback ? window.requestIdleCallback(() => resolve(), { timeout: 2000 }) : setTimeout(resolve, 200);
+    if (document.readyState === "complete") idle();
+    else window.addEventListener("load", idle, { once: true });
+  });
+}
+
+export interface HeroLiftProps {
+  /** Muscle names, from the server (English), so the page doesn't load the app's language catalogues. */
+  labels: Partial<Record<Muscle, string>>;
+  /** Plates per side for each step of HERO_PROGRAM, worked out on the server (heroPlates.ts). */
+  plates: number[][];
+}
+
+export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const svg = useRef<SVGSVGElement>(null);
@@ -130,8 +78,12 @@ export function HeroLift() {
 
     void (async () => {
       try {
-        const probe = document.createElement("canvas");
-        if (!(probe.getContext("webgl2") ?? probe.getContext("webgl"))) throw new Error("no WebGL");
+        // Software WebGL (no GPU, or a blocklisted one) can't keep up: show the screenshot instead.
+        if (probeWebGL() !== "gpu") throw new Error("no GPU WebGL");
+        // Let the page finish loading and go quiet before three.js is fetched and the figure starts, so the
+        // text and buttons are ready to use first.
+        await afterLoad();
+        if (cancelled) return;
         const [{ startLoop }, { createScene3D }, { placeVec }, T3] = await Promise.all([
           import("@/components/demo/engine"),
           import("@/components/demo/scene3d"),
@@ -255,7 +207,8 @@ export function HeroLift() {
             playing: true,
             reps: first.reps,
             bpm: 96,
-            fps: 60,
+            fps: 30,
+            maxDpr: 1.5,
           },
           (label) => {
             if (phaseEl.current && phaseEl.current.textContent !== label) phaseEl.current.textContent = label;
@@ -291,19 +244,18 @@ export function HeroLift() {
 
   const p = HERO_PROGRAM[step];
   const ex = EXERCISE_BY_ID.get(p.id);
-  const plates = perSide(p.kg);
+  const plates = platesByStep[step] ?? [];
   const shown = labelled(p.id);
 
   if (status === "failed") {
     return (
       <div className="mx-auto w-full max-w-[300px]">
-        <Image
+        <Screenshot
           src="/screens/today.webp"
           alt="The app's Today screen: the readiness call and the planned exercises"
-          width={780}
-          height={1688}
+          sizes="300px"
           priority
-          className="rounded-[2rem] border border-line shadow-2xl"
+          className="h-auto w-full rounded-[2rem] border border-line shadow-2xl"
         />
       </div>
     );
@@ -335,7 +287,7 @@ export function HeroLift() {
             className="pointer-events-none absolute top-0 left-0 rounded-lg border border-[#ff5b3a]/50 bg-[#1a0f0c]/80 px-2 py-1 text-center font-mono text-[0.6875rem] tracking-wide text-[#ffb3a3] uppercase opacity-0 backdrop-blur transition-opacity duration-300"
             style={{ width: LABEL_W }}
           >
-            {MUSCLE_LABEL[m]}
+            {labels[m] ?? m}
           </div>
         ))}
 

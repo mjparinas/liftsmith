@@ -44,6 +44,8 @@ export const en = {
   "workout.tooEasy": "Too easy",
   "workout.aboutRight": "About right",
   "workout.tooHard": "Too hard",
+  "workout.notify.over": "Rest over",
+  "workout.notify.next": "Up next: {next}",
 } as const;
 
 type Key = keyof typeof en;
@@ -89,6 +91,8 @@ export const es: Partial<Record<Key, Message>> = {
   "workout.tooEasy": "Demasiado fácil",
   "workout.aboutRight": "Justo bien",
   "workout.tooHard": "Demasiado duro",
+  "workout.notify.over": "Fin del descanso",
+  "workout.notify.next": "Siguiente: {next}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -132,4 +136,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "workout.tooEasy": "Trop facile",
   "workout.aboutRight": "Comme il faut",
   "workout.tooHard": "Trop dur",
+  "workout.notify.over": "Fin du repos",
+  "workout.notify.next": "Ensuite : {next}",
 };

@@ -8,6 +8,7 @@
 // so we don't pay out on money that comes back. A refund takes its share back off what's earned.
 // Payouts go out monthly once a creator is owed at least MIN_PAYOUT.
 import type { SubEvent } from "./adminMetrics";
+import type { CodeKind } from "./creatorCode";
 import { ASSUMED } from "./forecast";
 
 const DAY = 86_400_000;
@@ -21,6 +22,8 @@ const PAID = new Set(["purchase", "trial_convert", "renew"]);
 
 export interface Creator {
   code: string;
+  /** A creator's code earns commission; a promo code (our own) has a rate of 0. */
+  kind: CodeKind;
   name: string;
   contact: string | null;
   rate: number;
@@ -28,6 +31,14 @@ export interface Creator {
   active: boolean;
   note: string | null;
   createdAt: number;
+  /** The trial it gives (days), or null when its offering gives a discount instead. */
+  trialDays: number | null;
+  /** The RevenueCat offering the app sells from with this code. */
+  offering: string;
+  /** No new sign-ups after this time, or null for no end. */
+  endsAt: number | null;
+  /** No new sign-ups once this many installs have used it, or null for no limit. */
+  maxUses: number | null;
 }
 
 export interface CreatorInstall {

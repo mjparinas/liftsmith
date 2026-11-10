@@ -126,7 +126,7 @@
             </intent-filter>
         </service>
 
-        <!-- Home-screen widget: Start workout and Log set (WorkoutWidget.java). -->
+        <!-- Home-screen widget: today's plan and why, weekly goal, coach's note, Start / Log set (WorkoutWidget.java). -->
         <receiver
             android:name=".WorkoutWidget"
             android:exported="false"
@@ -152,6 +152,8 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Android 16 Live Updates for the workout notification (status bar chip, Samsung Now Bar). Granted at install. -->
+    <uses-permission android:name="android.permission.POST_PROMOTED_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -171,7 +173,7 @@
          Reads: weight, height and body fat (setup, weigh-ins, TDEE, the health twin), resting heart rate (setup, the
          health twin and readiness), sleep, HRV and respiratory rate (the health twin and readiness), steps (the health
          twin and TDEE's activity level) and VO2 max (the health twin).
-         Writes: a finished workout's active calories and average heart rate. Add a type here and in health.ts together. -->
+         Writes: a finished workout as an exercise session, with its active calories and average heart rate. Add a type here and in health.ts together. -->
     <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
     <uses-permission android:name="android.permission.health.READ_HEIGHT" />
     <uses-permission android:name="android.permission.health.READ_RESTING_HEART_RATE" />
@@ -183,6 +185,8 @@
     <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" />
     <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" />
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" />
+    <!-- Each finished workout as a strength training session (HealthWorkoutPlugin.kt). -->
+    <uses-permission android:name="android.permission.health.WRITE_EXERCISE" />
         <uses-permission android:name="android.permission.health.WRITE_STEPS" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_DISTANCE" tools:node="remove" />
     <uses-permission android:name="android.permission.health.WRITE_DISTANCE" tools:node="remove" />
