@@ -34,7 +34,7 @@ export default defineConfig([
   {
     // Plans must be reproducible: content and engine code use the seeded rng in src/lib/random.ts.
     files: ["src/lib/**/*.ts"],
-    ignores: ["**/*.test.ts", "src/lib/store.ts", "src/lib/juice.ts"],
+    ignores: ["**/*.test.ts", "src/lib/store/shared.ts", "src/lib/juice.ts"],
     rules: {
       "no-restricted-properties": [
         "error",
