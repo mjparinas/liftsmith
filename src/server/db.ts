@@ -349,6 +349,12 @@ const SCHEMA = [
     at INTEGER NOT NULL,
     PRIMARY KEY (account_id, provider, session_id)
   )`,
+  // Public pages already sent to IndexNow, and as what (src/server/indexnow.ts).
+  `CREATE TABLE IF NOT EXISTS indexnow_sent (
+    url TEXT PRIMARY KEY,
+    sig TEXT NOT NULL,
+    sent_at INTEGER NOT NULL
+  )`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,

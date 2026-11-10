@@ -204,6 +204,12 @@ export const SETTINGS: { names: string[]; label: string; need: "required" | "rec
     what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
   },
   {
+    names: ["BING_WEBMASTER_API_KEY"],
+    label: "Bing Webmaster key",
+    need: "optional",
+    what: "The API key from Bing Webmaster Tools (Settings › API access), for the Traffic tab's Bing part.",
+  },
+  {
     names: ["TWO_FACTOR_KEY"],
     label: "Two-step encryption key",
     need: "recommended",

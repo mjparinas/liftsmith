@@ -8,6 +8,7 @@ import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
 import { Automations } from "./Automations";
+import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
@@ -702,6 +703,7 @@ export function AdminApp() {
         {tab === "Traffic" && (
           <>
             <SearchConsole days={days} />
+            <BingSearch days={days} />
             <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
