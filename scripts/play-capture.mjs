@@ -19,6 +19,7 @@ const browser = await chromium.launch({
 });
 const PHONE = { width: 390, height: 844 };
 const TABLET = { width: 800, height: 1280 };
+const DESKTOP = { width: 1280, height: 720 }; // Chromebook screenshots (16:9)
 const ctx = await browser.newContext({
   viewport: PHONE,
   deviceScaleFactor: 2,
@@ -157,6 +158,7 @@ try {
   for (const [vp, sfx] of [
     [PHONE, ""],
     [TABLET, "-tablet"],
+    [DESKTOP, "-desktop"],
   ]) {
     await page.setViewportSize(vp);
     await page.evaluate(() => {
@@ -222,6 +224,9 @@ try {
   await page.setViewportSize(TABLET);
   await page.waitForTimeout(1200);
   await shot("workout-tablet");
+  await page.setViewportSize(DESKTOP);
+  await page.waitForTimeout(1200);
+  await shot("workout-desktop");
   if (!taken.has("workout")) throw new Error("no barbell set in the last four workouts to photograph");
 } catch (e) {
   console.error(e);
