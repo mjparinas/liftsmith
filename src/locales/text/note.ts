@@ -28,6 +28,9 @@ export const en = {
   "note.injury": "Injury: {pct}% of usual, stop if it hurts",
   "note.fixSet": "Plateau fix: one extra set",
   "note.fixRest": "Plateau fix: longer rest",
+  "note.fixReset": "Plateau fix: about 10% lighter, then build back",
+  "note.fixReps": "Plateau fix: {reps} reps for three weeks",
+  "note.fixSwap": "Plateau fix: {name} instead of {was} for three weeks",
 } as const;
 
 type Key = keyof typeof en;
@@ -57,6 +60,9 @@ export const es: Partial<Record<Key, Message>> = {
   "note.injury": "Lesión: {pct}% de lo habitual, para si duele",
   "note.fixSet": "Plan contra el estancamiento: una serie extra",
   "note.fixRest": "Plan contra el estancamiento: más descanso",
+  "note.fixReset": "Plan contra el estancamiento: un 10 % menos de peso y volver a subir",
+  "note.fixReps": "Plan contra el estancamiento: {reps} repeticiones durante tres semanas",
+  "note.fixSwap": "Plan contra el estancamiento: {name} en lugar de {was} durante tres semanas",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -84,4 +90,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "note.injury": "Blessure : {pct} % de l’habitude, arrêtez si ça fait mal",
   "note.fixSet": "Plan anti-plateau : une série de plus",
   "note.fixRest": "Plan anti-plateau : repos plus long",
+  "note.fixReset": "Plan anti-plateau : environ 10 % plus léger, puis on remonte",
+  "note.fixReps": "Plan anti-plateau : {reps} répétitions pendant trois semaines",
+  "note.fixSwap": "Plan anti-plateau : {name} à la place de {was} pendant trois semaines",
 };

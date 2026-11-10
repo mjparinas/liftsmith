@@ -1,6 +1,7 @@
 "use client";
 
 import { LEAGUE_LABEL } from "@/lib/game";
+import { t } from "@/lib/i18n";
 import { fmtNum } from "@/lib/units";
 
 import { Badge, Bar, TIER_COLOUR, useGame } from "./Achievements";
@@ -18,13 +19,11 @@ export function TodayGame() {
     <button type="button" onClick={() => go("achievements")} className="press card mt-4 block w-full p-4 text-left">
       {s.atRisk && (
         <p className={`mb-3 rounded-xl px-3 py-2 text-sm ${s.freezeReady ? "bg-accent/10 text-accent" : "bg-warn/15 text-warn"}`}>
-          {s.freezeReady
-            ? `🧊 This week's goal is out of reach. A freeze will save your ${s.weeks}-week streak.`
-            : `🔥 This week's goal is out of reach, so your ${s.weeks}-week streak starts again on Monday. Every 4 goal weeks earns a freeze.`}
+          {s.freezeReady ? t("game.freezeSaves", { count: s.weeks }) : t("game.streakResets", { count: s.weeks })}
         </p>
       )}
       <div className="flex items-baseline justify-between">
-        <span className="font-semibold">This week</span>
+        <span className="font-semibold">{t("game.thisWeek")}</span>
         <span className="text-sm text-muted">
           🏅 {LEAGUE_LABEL[g.league.league]} · <span className="num">{fmtNum(g.league.weekXp)} XP</span>
         </span>
@@ -45,10 +44,10 @@ export function TodayGame() {
           <Badge a={near} size={36} />
           <div className="min-w-0 flex-1">
             <p className="truncate text-sm">
-              <span className="font-medium">Almost there:</span> <span className="text-muted">{near.next.detail}</span>
+              <span className="font-medium">{t("game.almost")}</span> <span className="text-muted">{near.next.detail}</span>
             </p>
             <div className="mt-1">
-              <Bar value={near.progress} label={`${near.name} progress`} colour={TIER_COLOUR[near.next.tier]} />
+              <Bar value={near.progress} label={t("awards.progress", { name: near.name })} colour={TIER_COLOUR[near.next.tier]} />
             </div>
           </div>
         </div>

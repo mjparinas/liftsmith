@@ -31,15 +31,19 @@ import * as creator from "./text/creator";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
+import * as demo from "./text/demo";
 import * as done from "./text/done";
 import * as dots from "./text/dots";
 import * as equipment from "./text/equipment";
+import * as ex from "./text/ex";
 import * as exp from "./text/exp";
 import * as explain from "./text/explain";
 import * as extra from "./text/extra";
 import * as fb from "./text/fb";
 import * as fit from "./text/fit";
 import * as fix from "./text/fix";
+import * as fmt from "./text/fmt";
+import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -64,7 +68,9 @@ import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
 import * as photos from "./text/photos";
+import * as plate from "./text/plate";
 import * as pm from "./text/pm";
+import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -84,6 +90,7 @@ import * as sig from "./text/sig";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
 import * as today from "./text/today";
@@ -93,6 +100,8 @@ import * as train from "./text/train";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
+import * as vc from "./text/vc";
+import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
@@ -125,15 +134,19 @@ export const en = {
   ...cycle.en,
   ...dash.en,
   ...delight.en,
+  ...demo.en,
   ...done.en,
   ...dots.en,
   ...equipment.en,
+  ...ex.en,
   ...exp.en,
   ...explain.en,
   ...extra.en,
   ...fb.en,
   ...fit.en,
   ...fix.en,
+  ...fmt.en,
+  ...game.en,
   ...ghost.en,
   ...gl.en,
   ...gloss.en,
@@ -158,7 +171,9 @@ export const en = {
   ...part.en,
   ...past.en,
   ...photos.en,
+  ...plate.en,
   ...pm.en,
+  ...pr.en,
   ...pro.en,
   ...prog.en,
   ...progress.en,
@@ -178,6 +193,7 @@ export const en = {
   ...tab.en,
   ...td.en,
   ...tdee.en,
+  ...theme.en,
   ...tier.en,
   ...time.en,
   ...today.en,
@@ -187,6 +203,8 @@ export const en = {
   ...twin.en,
   ...units.en,
   ...variety.en,
+  ...vc.en,
+  ...warm.en,
   ...wdg.en,
   ...why.en,
   ...wk.en,

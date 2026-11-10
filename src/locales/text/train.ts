@@ -63,6 +63,8 @@ export const en = {
   "train.ex.nextWorkout": "Changes apply from the next workout.",
   "train.fav.on": "Favourite: planned first when it fits",
   "train.fav.off": "Add to favourites",
+  "train.aimRpe": "Aim for RPE {rpe}",
+  "train.aimRir": { one: "Leave {count} rep in the tank", other: "Leave {count} reps in the tank" },
 } as const;
 
 type Key = keyof typeof en;
@@ -129,6 +131,8 @@ export const es: Partial<Record<Key, Message>> = {
   "train.ex.nextWorkout": "Los cambios se aplican desde el próximo entrenamiento.",
   "train.fav.on": "Favorito: se planifica primero cuando encaja",
   "train.fav.off": "Añadir a favoritos",
+  "train.aimRpe": "Apunta a un RPE {rpe}",
+  "train.aimRir": { one: "Deja {count} repetición en reserva", other: "Deja {count} repeticiones en reserva" },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -194,4 +198,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "train.ex.nextWorkout": "Les changements s’appliquent dès la prochaine séance.",
   "train.fav.on": "Favori : prévu en premier quand il convient",
   "train.fav.off": "Ajouter aux favoris",
+  "train.aimRpe": "Visez un RPE de {rpe}",
+  "train.aimRir": { one: "Gardez {count} répétition en réserve", other: "Gardez {count} répétitions en réserve" },
 };

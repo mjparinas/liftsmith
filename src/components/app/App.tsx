@@ -14,7 +14,7 @@ import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS, goalStreak } from "@/lib/game";
 import { readHeight } from "@/lib/health";
-import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
+import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -94,6 +94,8 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [language]);
+  // Today's plan words its notes and labels when it's built, so a new language rebuilds it.
+  useEffect(() => subscribeLang(() => useApp.getState().replan()), []);
   // Accessibility (a11y.ts): text size, colour-blind safe colours, contrast. The phone's own text
   // size is read again when the app comes back, in case it was changed in the phone's settings.
   const a11y = profile.a11y;

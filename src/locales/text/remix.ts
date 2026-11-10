@@ -15,6 +15,8 @@ export const en = {
   "remix.start": "Start this workout",
   "remix.notNow": "Not now",
   "remix.shareTitle": "A workout for you",
+  "remix.noteSame": "From a shared workout, at your weights",
+  "remix.noteSwap": "Swapped in for {name} at this gym",
 } as const;
 
 type Key = keyof typeof en;
@@ -31,6 +33,8 @@ export const es: Partial<Record<Key, Message>> = {
   "remix.start": "Empezar este entrenamiento",
   "remix.notNow": "Ahora no",
   "remix.shareTitle": "Un entrenamiento para ti",
+  "remix.noteSame": "De un entrenamiento compartido, con tus pesos",
+  "remix.noteSwap": "En lugar de {name} en este gimnasio",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -45,4 +49,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "remix.start": "Commencer cette séance",
   "remix.notNow": "Pas maintenant",
   "remix.shareTitle": "Une séance pour vous",
+  "remix.noteSame": "Tiré d’une séance partagée, avec vos charges",
+  "remix.noteSwap": "Remplace {name} dans cette salle",
 };

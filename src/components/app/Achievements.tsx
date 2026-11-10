@@ -9,6 +9,7 @@ import { applyAccent, sound, type TimerSound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
+import type { MessageKey } from "@/locales/en";
 
 import { go } from "./router";
 import { Chip, Section } from "./ui";
@@ -79,8 +80,9 @@ export function Bar({ value, label, colour = "var(--color-accent)" }: { value: n
 function progressText(a: Achievement) {
   if (!a.next) return t("awards.allTiers");
   if (a.hidden) return t("awards.secret");
-  const u = a.unit ? (a.unit === "×" ? "×" : ` ${a.unit}`) : "";
-  return t("awards.of", { value: `${fmtNum(a.value)}${u}`, goal: `${fmtNum(a.next.at)}${u}` });
+  const amount = (n: number) =>
+    a.unit ? t(`awards.u.${a.unit === "×" ? "x" : a.unit}` as MessageKey, { n: fmtNum(n), count: n }) : fmtNum(n);
+  return t("awards.of", { value: amount(a.value), goal: amount(a.next.at) });
 }
 
 export function AchievementRow({ a }: { a: Achievement }) {

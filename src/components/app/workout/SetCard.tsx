@@ -1,7 +1,6 @@
 "use client";
 
 import { Info } from "@/components/Info";
-import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import type { PlanItem } from "@/lib/generator";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -17,6 +16,7 @@ import { workoutWhy } from "@/lib/why";
 
 import { loadText } from "../format";
 import { Icon } from "../icons";
+import { PlateBar, type PlateFinish } from "../Plates";
 import { Button, Stepper } from "../ui";
 import { PlateChange, SameAsLastChip, useGhost } from "../WorkoutExtras";
 
