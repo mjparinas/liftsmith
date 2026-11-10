@@ -103,6 +103,7 @@ export function StoreBadges({
       {webLink && soon && (
         <Link
           href={APP_PATH}
+          prefetch={false}
           className="text-sm font-semibold text-accent underline-offset-4 hover:underline"
           data-cta={`open-app-${place}`}
         >

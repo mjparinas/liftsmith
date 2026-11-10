@@ -7,14 +7,18 @@ import { useCallback, useEffect, useState } from "react";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
+import { Automations } from "./Automations";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
+import { MaintenanceBanner, useMaintenance } from "./Maintenance";
+import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { Todo } from "./Todo";
+import { loadTwoFactor, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -52,6 +56,7 @@ const TABS = [
   "Installs",
   "Flags",
   "A/B Tests",
+  "Automations",
   "System",
   "Log",
 ] as const;
@@ -454,7 +459,10 @@ export function AdminApp() {
   const [view, setView] = useState<View>(readView);
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
-  const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
+  const [state, setState] = useState<"loading" | "signin" | "twofactor" | "ok" | "error">("loading");
+  const [twoFactor, setTwoFactor] = useState<TwoFactorInfo | null>(null);
+  // Maintenance mode's state, for the banner on every tab and the switch on System.
+  const maintenance = useMaintenance();
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
@@ -499,7 +507,13 @@ export function AdminApp() {
     fetch(`/api/admin/stats/?days=${days}`)
       .then(async (r) => {
         if (!live) return;
-        if (r.status === 404) return setState("signin");
+        if (r.status === 404) {
+          // Signed in with the link but not past the second step yet, or not signed in at all.
+          const tf = await loadTwoFactor();
+          if (!live) return;
+          setTwoFactor(tf);
+          return setState(tf && !tf.ready ? "twofactor" : "signin");
+        }
         if (!r.ok) return setState("error");
         const j = (await r.json()) as Data;
         if (!live) return;
@@ -513,6 +527,7 @@ export function AdminApp() {
   }, [days]);
 
   if (state === "signin") return <SignIn />;
+  if (state === "twofactor" && twoFactor) return <TwoFactorGate info={twoFactor} />;
   if (state === "error")
     return <main className="p-8 text-muted">The stats didn&apos;t load. Is the database set up (DATABASE_URL or TURSO_DATABASE_URL)?</main>;
   if (!data) return <main className="p-8 text-muted">Loading…</main>;
@@ -573,6 +588,7 @@ export function AdminApp() {
       </header>
 
       <div className="mt-4 space-y-4">
+        <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
         {tab === "Overview" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -830,6 +846,7 @@ export function AdminApp() {
               <Tile label="Paying subscribers" value={fmtInt(rev.all.paying)} />
               <Tile label="Paywall views" value={fmtInt(rev.paywallViews)} sub={`${fmtInt(rev.all.trialStarts)} trials`} />
             </div>
+            <RunningCosts admin={data.staff.role === "admin"} netMrr={rev.all.netMrr} />
             <Card
               title="Forecast against actual"
               subtitle="Gross MRR by month since launch, log scale. Dashed: the forecast's conservative, base and optimistic cases."
@@ -880,7 +897,8 @@ export function AdminApp() {
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
-        {tab === "System" && <System />}
+        {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
+        {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}
       </div>
     </div>

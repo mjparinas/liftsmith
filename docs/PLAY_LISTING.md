@@ -5,7 +5,7 @@ The text and art for the Play Console's **Main store listing** (Grow › Store p
 ```bash
 npm run build:static
 node scripts/play-capture.mjs   # about 2½ minutes; raw screens in store/play/raw/ (not committed)
-node scripts/play-compose.mjs   # store/play/phone, tablet-7, tablet-10, feature-graphic.png
+node scripts/play-compose.mjs   # store/play/phone, tablet-7, tablet-10, chromebook, feature-graphic.png
 node scripts/play-video.mjs     # store/play/promo-video.mp4 (not committed; upload to YouTube)
 ```
 
@@ -131,6 +131,21 @@ The logger, plate math, rest timer, lock-screen controls, fixed programs and coa
 ## Tablet screenshots (7, 7-inch 1080×1920 and 10-inch 1440×2560)
 
 `store/play/tablet-7/` and `store/play/tablet-10/`: Today, the plan with reasons, Recovery, Progress, one-rep max / DOTS / PRs, TDEE, and achievements.
+
+## Chromebook screenshots (8, 1920×1080)
+
+`store/play/chromebook/`. Play Console › Main store listing › Chromebook screenshots (16:9, each side 1080 to 7680 px; 4 to 8 shots). The app captured at 1280×720, shown in a window beside the caption. Same captions as the phone and tablet shots:
+
+| # | File | Headline |
+| --- | --- | --- |
+| 1 | 01-today.jpg | Your workout, already planned |
+| 2 | 02-today-plan.jpg | Every exercise says why |
+| 3 | 03-workout.jpg | One tap logs the set |
+| 4 | 04-recovery.jpg | See what's recovered |
+| 5 | 05-progress.jpg | Your coach says what to do next |
+| 6 | 06-progress-dots.jpg | One-rep max, DOTS and PRs |
+| 7 | 07-tdee-result.jpg | Calories that keep up with you |
+| 8 | 08-achievements.jpg | Quests, streaks and 150+ badges |
 
 ## Feature graphic (1024×500)
 

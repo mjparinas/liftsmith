@@ -60,7 +60,11 @@ describe("heartbeat on the figure", () => {
   afterEach(cleanup);
   it("shows the live heart rate only when a monitor is connected", () => {
     const { rerender } = render(<LiftDemo exerciseId="back-squat" bpm={128} />);
-    expect(screen.getByLabelText("Heart rate 128")).toHaveTextContent("♥ 128");
+    expect(screen.getByLabelText("Heart rate 128")).toHaveTextContent("128");
+    // One reading draws no trend line yet; a few do.
+    expect(screen.queryByTestId("heart-trend")).toBeNull();
+    rerender(<LiftDemo exerciseId="back-squat" bpm={128} hrTrend={[118, 122, 125, 128]} />);
+    expect(screen.getByTestId("heart-trend").querySelector("path[stroke]")?.getAttribute("d")).toMatch(/^M0 /);
     rerender(<LiftDemo exerciseId="back-squat" bpm={null} />);
     expect(screen.queryByLabelText(/Heart rate/)).toBeNull();
   });

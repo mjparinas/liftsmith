@@ -3,7 +3,8 @@ import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { DEMO_LIFTS } from "@/components/site/DemoPicker";
-import { epley, HERO_PROGRAM, labelled, muscleAnchor, perSide } from "@/components/site/HeroLift";
+import { perSide } from "@/components/site/heroPlates";
+import { epley, HERO_PROGRAM, labelled, muscleAnchor } from "@/components/site/heroProgram";
 import { QUOTES, visibleQuotes } from "@/content/testimonials";
 import { jointsAt } from "@/lib/demo/mesh";
 import { hasMotion, motionFor } from "@/lib/demo/motions";

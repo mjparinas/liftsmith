@@ -4,16 +4,22 @@
 // never holds up the rest (each call has a time limit).
 import {
   betterStackState,
+  capacityState,
   CHECKS,
+  daysUntilFull,
   JOB_LATE_MS,
   jobState,
+  megabytes,
   pageAssets,
+  RESTORE_DRILL_DAYS,
+  restoreDrillState,
   runState,
   settingRows,
   SITE_FILES,
   SITE_PAGES,
   SITE_SLOW_MS,
   siteAddressProblem,
+  STAFF_FAILURES_WARN,
   STATUS_PAGES,
   statuspageState,
   uptimeRobotStatus,
@@ -27,9 +33,13 @@ import {
   type StatusPageName,
 } from "@/lib/systemHealth";
 
+import { adminEmails, supportEmails } from "./adminAuth";
+import { dbSize, sizeSamples } from "./capacity";
 import { query } from "./db";
 import { inboxDomains, readKey } from "./inbox";
 import { recentJobRuns } from "./monitor";
+import { getJson as getSettingJson } from "./settings";
+import { enrolledEmails, twoFactorMode } from "./twoFactor";
 
 const DAY = 86_400_000;
 const TIMEOUT = 8_000;
@@ -662,6 +672,118 @@ export async function billingCheck(now = Date.now()): Promise<HealthCheck> {
   };
 }
 
+// ---------- Admin security ----------
+
+export async function securityCheck(now = Date.now()): Promise<HealthCheck> {
+  const staff = [...[...adminEmails()].map((e) => [e, "admin"] as const), ...[...supportEmails()].map((e) => [e, "support"] as const)];
+  const rows = await query<{ email: string; day: number; week: number; last: number }>(
+    `SELECT email, SUM(CASE WHEN at >= ? THEN 1 ELSE 0 END) AS day, COUNT(*) AS week, MAX(at) AS last FROM staff_sign_in_failures WHERE at >= ? GROUP BY email`,
+    [now - DAY, now - 7 * DAY],
+  );
+  const by = new Map(rows.map((r) => [String(r.email), r]));
+  const enrolled = await enrolledEmails();
+  const required = twoFactorMode() === "required";
+  const without = staff.filter(([e]) => !enrolled.has(e)).length;
+  const day = rows.reduce((t, r) => t + Number(r.day), 0);
+  const week = rows.reduce((t, r) => t + Number(r.week), 0);
+  const lastAlert = Number(await getSettingJson<string | null>("alert-sent:staff-sign-ins", null)) || null;
+  const state: CheckState = !staff.length ? "off" : day >= STAFF_FAILURES_WARN || (!required && without) ? "warn" : "ok";
+  return {
+    id: "security",
+    title: "Admin security",
+    state,
+    summary: !staff.length
+      ? "No staff addresses: set ADMIN_EMAILS."
+      : `${plural(staff.length, "staff address")}, ${num(staff.length - without)} with two-step sign-in${required ? " (required)" : ""}. ${plural(day, "failed sign-in")} in 24 hours, ${num(week)} in 7 days.`,
+    rows: [
+      ...staff.map(([e, role]) => {
+        const f = by.get(e);
+        return {
+          label: `${e} (${role})`,
+          value: `${enrolled.has(e) ? "Two-step on" : required ? "Two-step at next sign-in" : "No two-step"} · ${f ? `${plural(Number(f.week), "failed sign-in")} in 7 days` : "no failed sign-ins in 7 days"}`,
+          state: ((f && Number(f.day) >= STAFF_FAILURES_WARN) || (!required && !enrolled.has(e)) ? "warn" : "ok") as CheckState,
+          ...(f ? { at: Number(f.last) } : {}),
+        };
+      }),
+      ...(typeof lastAlert === "number" ? [{ label: "Last repeated-failures alert", value: "", at: lastAlert }] : []),
+    ],
+    setup: staff.length ? undefined : "Set ADMIN_EMAILS (and optionally SUPPORT_EMAILS) in Vercel.",
+  };
+}
+
+// ---------- Capacity ----------
+
+export async function capacityCheck(): Promise<HealthCheck> {
+  const bytes = await dbSize();
+  const samples = await sizeSamples();
+  const limitMb = Number(env("DATABASE_SIZE_LIMIT_MB")) || null;
+  const limit = limitMb ? limitMb * 1_048_576 : null;
+  const share = limit ? bytes / limit : null;
+  const [ev] = await query<{ events: number; synced: number }>(
+    "SELECT (SELECT COUNT(*) FROM events) AS events, (SELECT COUNT(*) FROM sync_events) AS synced",
+  ).catch(() => [undefined]);
+  const left = daysUntilFull([...samples, { day: Math.floor(Date.now() / DAY), bytes }], limit);
+  const week = samples.find((x) => x.day <= Math.floor(Date.now() / DAY) - 7);
+  return {
+    id: "capacity",
+    title: "Capacity",
+    state: capacityState(share),
+    summary: `The database is ${megabytes(bytes)}${limit ? `, ${Math.round((share ?? 0) * 100)}% of the ${megabytes(limit)} limit` : ""}.`,
+    rows: [
+      { label: "Size", value: megabytes(bytes), state: capacityState(share) },
+      ...(week ? [{ label: "Growth in 7 days", value: megabytes(Math.max(0, bytes - week.bytes)) }] : []),
+      ...(left != null
+        ? [{ label: "Full in", value: `about ${plural(left, "day")} at this rate`, state: (left < 30 ? "warn" : "ok") as CheckState }]
+        : []),
+      ...(ev
+        ? [
+            { label: "Usage events", value: num(Number(ev.events)) },
+            { label: "Synced events", value: num(Number(ev.synced)) },
+          ]
+        : []),
+      ...(!limit ? [{ label: "Limit", value: "Set DATABASE_SIZE_LIMIT_MB to your Turso plan's storage for a warning at 70%." }] : []),
+    ],
+    link: { label: "Turso dashboard", href: "https://app.turso.tech/" },
+  };
+}
+
+// ---------- Backups ----------
+
+export async function backupsCheck(now = Date.now()): Promise<HealthCheck> {
+  const hosted = Boolean(env("TURSO_DATABASE_URL") || env("DATABASE_URL"));
+  const drill = await getSettingJson<{ at?: number; by?: string } | null>("restore-drill", null);
+  const at = typeof drill?.at === "number" ? drill.at : null;
+  if (!hosted)
+    return {
+      id: "backups",
+      title: "Backups",
+      state: "off",
+      summary: "A local database file: nothing to back up here.",
+      rows: [],
+      setup: "Set TURSO_DATABASE_URL.",
+    };
+  const state = restoreDrillState(at, now);
+  return {
+    id: "backups",
+    title: "Backups",
+    state,
+    summary:
+      at == null
+        ? "Turso keeps point-in-time backups, but no restore has been practised yet."
+        : state === "ok"
+          ? "A restore was practised in the last month."
+          : `The last restore practice is over ${RESTORE_DRILL_DAYS} days old.`,
+    rows: [
+      { label: "Backups", value: "Turso point-in-time restore (made by Turso itself)" },
+      { label: "Last restore practice", value: at == null ? "Never recorded" : (drill?.by ?? ""), ...(at != null ? { at } : {}), state },
+    ],
+    link: {
+      label: "How to practise a restore (docs/RESTORE.md)",
+      href: "https://github.com/mjparinas/liftsmith/blob/main/docs/RESTORE.md",
+    },
+  };
+}
+
 // ---------- Settings ----------
 
 export function settingsCheck(): HealthCheck {
@@ -746,6 +868,9 @@ const RUNNERS: Record<CheckId, (now: number) => Promise<HealthCheck>> = {
   email: (now) => emailCheck(now),
   job: (now) => jobCheck(now),
   billing: (now) => billingCheck(now),
+  security: (now) => securityCheck(now),
+  capacity: () => capacityCheck(),
+  backups: (now) => backupsCheck(now),
   settings: async () => settingsCheck(),
 };
 

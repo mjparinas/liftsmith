@@ -83,7 +83,7 @@ export function CreatorLanding() {
         </li>
         <li className="card p-4">
           <span className="font-semibold">In your browser:</span> the code is saved.{" "}
-          <Link href={APP_PATH} className="font-semibold text-accent underline" data-cta="open-app-creator">
+          <Link href={APP_PATH} prefetch={false} className="font-semibold text-accent underline" data-cta="open-app-creator">
             Open the web app →
           </Link>
         </li>

@@ -56,6 +56,9 @@ export const CHECKS = [
   { id: "email", title: "Email (Resend)" },
   { id: "job", title: "Daily reminder job" },
   { id: "billing", title: "Subscriptions (RevenueCat)" },
+  { id: "security", title: "Admin security" },
+  { id: "capacity", title: "Capacity" },
+  { id: "backups", title: "Backups" },
   { id: "settings", title: "Settings" },
 ] as const;
 export type CheckId = (typeof CHECKS)[number]["id"];
@@ -200,7 +203,60 @@ export const SETTINGS: { names: string[]; label: string; need: "required" | "rec
     need: "optional",
     what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
   },
+  {
+    names: ["TWO_FACTOR_KEY"],
+    label: "Two-step encryption key",
+    need: "recommended",
+    what: "Encrypts staff authenticator secrets in the database. Without it they're stored as they are. Don't change it once set.",
+  },
+  {
+    names: ["ADMIN_2FA"],
+    label: "Two-step for staff",
+    need: "optional",
+    what: "Unset: every staff sign-in needs an authenticator code. Set to optional to let staff without it in.",
+  },
+  {
+    names: ["DATABASE_SIZE_LIMIT_MB"],
+    label: "Database size limit",
+    need: "optional",
+    what: "Your Turso plan's storage, in megabytes, for the Capacity card's warning.",
+  },
 ];
+
+/** A restore practice (docs/RESTORE.md) older than this is stale: monthly, with a few days of slack. */
+export const RESTORE_DRILL_DAYS = 35;
+
+/** Warns when no restore practice has been recorded or the last one is stale. */
+export function restoreDrillState(at: number | null, now: number): CheckState {
+  if (at == null) return "warn";
+  return now - at > RESTORE_DRILL_DAYS * 86_400_000 ? "warn" : "ok";
+}
+
+/** Failed staff sign-ins in a day before the Admin security card warns. */
+export const STAFF_FAILURES_WARN = 10;
+
+/** Share of the database size limit used, as a state: a warning at 70%, down at 90%. */
+export function capacityState(usedShare: number | null): CheckState {
+  if (usedShare == null) return "ok";
+  return usedShare >= 0.9 ? "down" : usedShare >= 0.7 ? "warn" : "ok";
+}
+
+/** Megabytes with a thousands separator ("1,240 MB"), or one decimal under 10. */
+export function megabytes(bytes: number): string {
+  const mb = bytes / 1_048_576;
+  return mb < 10 ? `${Math.round(mb * 10) / 10} MB` : `${Math.round(mb).toLocaleString("en-US")} MB`;
+}
+
+/** Days until `limit` at the growth seen between the oldest and newest samples; null without a week of samples or growth. */
+export function daysUntilFull(samples: { day: number; bytes: number }[], limit: number | null): number | null {
+  if (!limit || samples.length < 2) return null;
+  const sorted = [...samples].sort((a, b) => a.day - b.day);
+  const first = sorted[0]!;
+  const last = sorted[sorted.length - 1]!;
+  if (last.day - first.day < 7 || last.bytes <= first.bytes) return null;
+  const perDay = (last.bytes - first.bytes) / (last.day - first.day);
+  return Math.max(0, Math.floor((limit - last.bytes) / perDay));
+}
 
 /** Which settings are set, by name. `env` is looked up, never returned. */
 export function settingRows(env: (name: string) => string): CheckRow[] {

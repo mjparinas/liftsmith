@@ -4,6 +4,7 @@
 //   phone/NN-name.jpg     1080×1920 (9:16, the size Play needs for promotion)
 //   tablet-7/NN-name.jpg  1080×1920
 //   tablet-10/NN-name.jpg 1440×2560
+//   chromebook/NN-name.jpg 1920×1080 (16:9 landscape, Chromebook screenshots)
 //   feature-graphic.png   1024×500
 // Captions live in SHOTS below and in docs/PLAY_LISTING.md; keep them the same.
 //   node scripts/play-compose.mjs
@@ -34,6 +35,17 @@ export const TABLET_SHOTS = [
   ["achievements-tablet", "Quests, streaks and 150+ badges", "Streaks count weeks, so rest days never break them"],
 ];
 
+export const CHROMEBOOK_SHOTS = [
+  ["today-desktop", "Your workout, already planned", "Built from your gym, your recovery and your training block"],
+  ["today-plan-desktop", "Every exercise says why", "Recovery, weekly sets and last time, in plain words"],
+  ["workout-desktop", "One tap logs the set", "Target weight, plates per side and a 3D demo of every lift"],
+  ["recovery-desktop", "See what's recovered", "Every muscle, from your own sets"],
+  ["progress-desktop", "Your coach says what to do next", "Spot stalls and short muscles early, fix them in one tap"],
+  ["progress-dots-desktop", "One-rep max, DOTS and PRs", "Estimated from every set you log"],
+  ["tdee-result-desktop", "Calories that keep up with you", "TDEE from your weigh-ins and how often you train"],
+  ["achievements-desktop", "Quests, streaks and 150+ badges", "Streaks count weeks, so rest days never break them"],
+];
+
 const TOKENS = `
   :root { --bg:#080b10; --ink:#eef2f7; --muted:#94a1b2; --accent:#4c8dff; --violet:#a78bfa; --cyan:#38d6e8; --ember:#ff8a3d; --mint:#34d399; --line:#232d3a; }
   * { margin:0; box-sizing:border-box; }
@@ -59,6 +71,25 @@ function frameHtml(img, title, sub, { tablet = false, pos = "top" } = {}) {
   </style></head><body><div class="aurora"></div>
     <div class="cap"><h1>${title}</h1><p>${sub}</p></div>
     <div class="dev"><div class="win"><img src="${img}"></div></div>
+  </body></html>`;
+}
+
+/** A landscape Chromebook shot: the caption on the left, the app in a window on the right,
+ * cropped to the middle 4:3 of the 1280×720 capture so the app column reads at a useful size. */
+function desktopHtml(img, title, sub) {
+  return `<!doctype html><html><head><meta charset="utf-8"><style>${TOKENS}
+    .cap { position:absolute; left:100px; top:0; bottom:0; width:520px; display:flex; flex-direction:column; justify-content:center; }
+    h1 { font-size:64px; line-height:1.06; font-weight:800; letter-spacing:-0.02em; }
+    p { margin-top:26px; font-size:32px; line-height:1.35; color:var(--muted); }
+    .dev { position:absolute; right:80px; top:50%; width:1150px; transform:translateY(-50%); border-radius:26px; padding:14px;
+      background:linear-gradient(160deg,#2a3443,#121821); box-shadow:0 0 0 2px #3a4656, 0 40px 120px rgba(0,0,0,.6), 0 0 160px rgba(76,141,255,.18); }
+    .bar { height:30px; display:flex; align-items:center; gap:9px; padding:0 8px 12px; }
+    .bar i { width:12px; height:12px; border-radius:50%; background:#3a4656; }
+    .win { aspect-ratio:4/3; overflow:hidden; border-radius:14px; }
+    .win img { display:block; width:100%; height:100%; object-fit:cover; object-position:center top; }
+  </style></head><body><div class="aurora"></div>
+    <div class="cap"><h1>${title}</h1><p>${sub}</p></div>
+    <div class="dev"><div class="bar"><i></i><i></i><i></i></div><div class="win"><img src="${img}"></div></div>
   </body></html>`;
 }
 
@@ -113,6 +144,12 @@ for (const [i, [name, title, sub]] of TABLET_SHOTS.entries()) {
   const base = name.replace(/-tablet$/, "");
   await render(html, `${ROOT}/tablet-7/${n(i)}-${base}.jpg`, { width: 1080, height: 1920 });
   await render(html, `${ROOT}/tablet-10/${n(i)}-${base}.jpg`, { width: 1080, height: 1920, scale: 4 / 3 });
+}
+for (const [i, [name, title, sub]] of CHROMEBOOK_SHOTS.entries()) {
+  await render(desktopHtml(url(`${RAW}/${name}.png`), title, sub), `${ROOT}/chromebook/${n(i)}-${name.replace(/-desktop$/, "")}.jpg`, {
+    width: 1920,
+    height: 1080,
+  });
 }
 const icon = fs.existsSync(`${ROOT}/icon-512.png`) ? `${ROOT}/icon-512.png` : "public/icon.svg";
 await render(featureHtml(url(icon), [url(`${RAW}/today.png`), url(`${RAW}/workout.png`)]), `${ROOT}/feature-graphic.png`, {

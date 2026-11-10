@@ -11,6 +11,8 @@ import { APP_PATH, SITE_URL } from "@/lib/site";
 
 import { StoreBadges } from "./StoreBadges";
 
+const APP_ONLY = /^\/(app|me)\//;
+
 export function JsonLd({ data }: { data: object | object[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
 }
@@ -46,7 +48,12 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
-          <Link href={APP_PATH} data-cta="header" className="press btn-primary ml-1 inline-flex min-h-11 items-center rounded-xl px-4">
+          <Link
+            href={APP_PATH}
+            prefetch={false}
+            data-cta="header"
+            className="press btn-primary ml-1 inline-flex min-h-11 items-center rounded-xl px-4"
+          >
             Start free
           </Link>
         </nav>
@@ -56,13 +63,15 @@ export function SiteHeader() {
 }
 
 export function SiteFooter() {
+  // The app (/app/) and the dashboard (/me/) are big client-only pages: never prefetch their code from a public page,
+  // or every visitor downloads it whether they open it or not.
   const col = (title: string, links: { href: string; label: string }[]) => (
     <nav aria-label={title}>
       <p className="font-semibold">{title}</p>
       <ul className="mt-2 space-y-2 text-sm text-muted">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="hover:text-ink">
+            <Link href={l.href} prefetch={APP_ONLY.test(l.href) ? false : undefined} className="hover:text-ink">
               {l.label}
             </Link>
           </li>
@@ -101,6 +110,7 @@ export function SiteFooter() {
         {col("Company", [
           { href: "/compare/", label: "Compare apps" },
           { href: "/privacy/", label: "Privacy" },
+          { href: "/trust/", label: "Trust centre" },
           { href: "/delete-account/", label: "Delete your account" },
           { href: "/#faq", label: "FAQ" },
         ])}
@@ -159,6 +169,7 @@ export function CtaButton({ cta, children = "Start free", big }: { cta: string; 
   return (
     <Link
       href={APP_PATH}
+      prefetch={false}
       data-cta={cta}
       className={`press btn-primary inline-flex items-center justify-center rounded-2xl font-semibold ${big ? "min-h-14 px-7 text-lg" : "min-h-12 px-6"}`}
     >
@@ -222,6 +233,7 @@ export function StickyCta({ cta, text = `Get your plan in ${BRAND.name}` }: { ct
         <p className="text-sm font-semibold">{text}</p>
         <Link
           href={APP_PATH}
+          prefetch={false}
           data-cta={cta}
           className="press btn-primary inline-flex min-h-11 shrink-0 items-center rounded-xl px-4 font-semibold"
         >

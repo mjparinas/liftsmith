@@ -50,6 +50,7 @@ export function watchErrors(page, errors) {
 }
 
 export async function onboard(page, gym = /Commercial gym/) {
+  await page.getByRole("button", { name: "Get started" }).click();
   await page.getByRole("button", { name: "Continue" }).click();
   await page.getByRole("button", { name: gym }).click();
   await page.getByRole("button", { name: "Continue" }).click();

@@ -35,6 +35,7 @@ async function skipWarmups(user: ReturnType<typeof userEvent.setup>) {
 
 async function onboard(user: ReturnType<typeof userEvent.setup>) {
   render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Get started" }));
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: /Commercial gym/ }));

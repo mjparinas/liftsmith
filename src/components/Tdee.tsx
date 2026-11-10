@@ -28,7 +28,7 @@ export function TdeeResults({ r, activity }: { r: TdeeResult; activity: Activity
           <Cell label={t("tdee.protein")} value={`${r.protein[0]}–${r.protein[1]} g`} note={t("tdee.proteinNote")} />
         </div>
       </div>
-      <h3 className="mt-5 mb-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("tdee.byActivity")}</h3>
+      <h2 className="mt-5 mb-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("tdee.byActivity")}</h2>
       <table className="card w-full overflow-hidden text-sm">
         <tbody className="divide-y divide-line">
           {ACTIVITIES.map((a) => (

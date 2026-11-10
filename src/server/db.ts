@@ -199,6 +199,25 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
   )`,
+  // Two-step sign-in for staff (src/server/twoFactor.ts): the authenticator secret (sealed with TWO_FACTOR_KEY),
+  // one-time recovery codes (hashes only) and the sessions that have passed the second step.
+  `CREATE TABLE IF NOT EXISTS admin_two_factor (
+    email TEXT PRIMARY KEY,
+    secret TEXT,
+    pending TEXT,
+    enabled_at INTEGER,
+    last_step INTEGER
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_backup_codes (
+    email TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    used_at INTEGER,
+    PRIMARY KEY (email, code_hash)
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_session_steps (
+    token_hash TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS admin_audit (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at INTEGER NOT NULL,
@@ -279,6 +298,26 @@ const SCHEMA = [
     variant TEXT NOT NULL,
     at INTEGER NOT NULL,
     PRIMARY KEY (flag, install_id)
+  )`,
+  // Small admin settings (src/server/settings.ts): maintenance mode, alert switches, running costs, saved replies,
+  // the last restore practice, and when each alert last went out.
+  `CREATE TABLE IF NOT EXISTS admin_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  // Failed sign-ins to a staff address (ADMIN_EMAILS, SUPPORT_EMAILS) only, kept 30 days, for the System tab's
+  // Admin security card and the repeated-failures alert. The address and which step failed, nothing else.
+  `CREATE TABLE IF NOT EXISTS staff_sign_in_failures (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL,
+    step TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  // One database size sample a day, kept 90 days, for the System tab's Capacity card.
+  `CREATE TABLE IF NOT EXISTS db_size_samples (
+    day INTEGER PRIMARY KEY,
+    bytes INTEGER NOT NULL
   )`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
