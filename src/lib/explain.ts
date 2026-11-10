@@ -53,10 +53,10 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   const count = (n: number) => t(timed ? "explain.secondsN" : "explain.repsN", { count: n });
   const [lo, hi] = repRange(ex, profile.goal);
   const wk = blockWeek(profile, now);
-  const past = sessionsOf(events, ex.id).filter((s) => s[0].sessionId !== sessionId);
+  const past = sessionsOf(events, ex.id).filter((s) => s[0]!.sessionId !== sessionId);
   const last = past[0];
   const lines: string[] = [];
-  let title = target.note.split(" · ")[0];
+  let title = target.note.split(" · ")[0]!;
 
   if (!last) {
     if (ex.load === "bodyweight") lines.push(t("explain.firstBw", { target: count(target.reps) }));
@@ -74,11 +74,11 @@ export function explain({ ex, target, events, profile, gym, now, call = "normal"
   } else {
     const sets = [...last].sort((a, b) => a.at - b.at);
     const done = sets.map((s) => (ex.load === "bodyweight" && !s.weight ? num(s.reps) : `${w(s.weight)} × ${num(s.reps)}`)).join(", ");
-    const tgt = sets[0].targetReps;
-    lines.push(t("explain.last", { when: day(sets[0].at, now), sets: done, target: count(tgt) }));
+    const tgt = sets[0]!.targetReps;
+    lines.push(t("explain.last", { when: day(sets[0]!.at, now), sets: done, target: count(tgt) }));
     const hitAll = sets.every((s) => s.reps >= s.targetReps);
     const bigMiss = sets.some((s) => s.reps <= s.targetReps - 2);
-    const fb = [...events].reverse().find((e) => e.type === "feedback" && e.exerciseId === ex.id && e.sessionId === sets[0].sessionId);
+    const fb = [...events].reverse().find((e) => e.type === "feedback" && e.exerciseId === ex.id && e.sessionId === sets[0]!.sessionId);
     const rating = fb?.type === "feedback" ? fb.rating : 0;
     if (rating > 0) lines.push(t("explain.feltEasy"));
     if (rating < 0) lines.push(t("explain.feltHard"));

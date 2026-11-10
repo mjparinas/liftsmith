@@ -32,7 +32,7 @@ export function blockWeek(profile: Pick<Profile, "blockStart" | "blockWeeks" | "
     return { week, length, deload: true, rir: 4, setsPerMuscle: Math.round(lo / 2), volume: 0.5, label: t("block.deload") };
   }
   // Spread the RIR steps over however many build weeks there are.
-  const step = RIR_STEPS[Math.round((week / Math.max(1, build - 1)) * (RIR_STEPS.length - 1))];
+  const step = RIR_STEPS[Math.round((week / Math.max(1, build - 1)) * (RIR_STEPS.length - 1))]!;
   const sets = Math.round(lo + ((hi - lo) * week) / Math.max(1, build - 1));
   return {
     week,

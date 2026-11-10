@@ -50,13 +50,13 @@ export function layoff(ex: Exercise, events: readonly AppEvent[], now: number): 
   muscle.sort((a, b) => b - a);
   // The most recent gap, counting the one up to now.
   let back = now;
-  let away = now - muscle[0];
+  let away = now - muscle[0]!;
   if (away < BREAK_DAYS * DAY) {
     away = 0;
     for (let i = 0; i + 1 < muscle.length; i++) {
-      if (muscle[i] - muscle[i + 1] >= BREAK_DAYS * DAY) {
-        back = muscle[i];
-        away = muscle[i] - muscle[i + 1];
+      if (muscle[i]! - muscle[i + 1]! >= BREAK_DAYS * DAY) {
+        back = muscle[i]!;
+        away = muscle[i]! - muscle[i + 1]!;
         break;
       }
     }

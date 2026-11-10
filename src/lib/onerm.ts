@@ -220,7 +220,7 @@ export function oneRm(events: readonly AppEvent[], exerciseId: string, now: numb
   const top = [...scored].sort((a, b) => b.value - a.value).slice(0, 3);
   const wsum = top.reduce((s, x) => s + x.weight, 0);
   const e1rm = top.reduce((s, x) => s + x.value * x.weight, 0) / wsum;
-  const basis = [...top].sort((a, b) => b.weight - a.weight)[0].b;
+  const basis = [...top].sort((a, b) => b.weight - a.weight)[0]!.b;
   // Error grows with reps to failure and with a guessed RIR; agreeing sessions shrink it.
   const base = basis.rtf <= 5 ? 0.03 : basis.rtf <= 10 ? 0.05 : 0.08;
   const guess = basis.rirSource === "assumed" ? 0.03 : basis.rirSource === "planned" ? 0.01 : 0;

@@ -56,7 +56,7 @@ export function sessionsOf(events: readonly AppEvent[], exerciseId: string): Set
     list.push(e);
     by.set(e.sessionId, list);
   }
-  return [...by.values()].sort((a, b) => b[0].at - a[0].at);
+  return [...by.values()].sort((a, b) => b[0]!.at - a[0]!.at);
 }
 
 /**
@@ -74,7 +74,7 @@ export function effortSignal(events: readonly AppEvent[], sets: readonly SetEven
 
 function lastFeedback(events: readonly AppEvent[], exerciseId: string, sessionId: string): number {
   for (let i = events.length - 1; i >= 0; i--) {
-    const e = events[i];
+    const e = events[i]!;
     if (e.type === "feedback" && e.exerciseId === exerciseId && e.sessionId === sessionId) return e.rating;
   }
   return 0;
@@ -143,7 +143,7 @@ export function target(ex: Exercise, events: readonly AppEvent[], profile: Profi
   if (lay.done === 0) {
     const [lo, hi] = repRange(ex, profile.goal, profile.training);
     const last = sessionsOf(events, ex.id).find((ss) => !ss.every((x) => x.injuryPct));
-    const reps = Math.min(hi, Math.max(lo, last?.[0].targetReps ?? lo));
+    const reps = Math.min(hi, Math.max(lo, last?.[0]!.targetReps ?? lo));
     return { weight: w, reps, rir: base.rir, note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }) };
   }
   const struggled = base.note === t("note.tooHard") || base.note === t("note.missedTwo");
@@ -163,8 +163,8 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
     if (!last) return { weight: 0, reps: lo, rir, note: t("note.firstLevel") };
     const best = Math.max(...last.map((s) => s.reps));
     const hit = last.every((s) => s.reps >= s.targetReps);
-    const fb = lastFeedback(events, ex.id, last[0].sessionId) || effortSignal(events, last);
-    let reps = hit ? last[0].targetReps + 1 : last[0].targetReps;
+    const fb = lastFeedback(events, ex.id, last[0]!.sessionId) || effortSignal(events, last);
+    let reps = hit ? last[0]!.targetReps + 1 : last[0]!.targetReps;
     if (fb > 0) reps += 1;
     if (fb < 0) reps = Math.max(lo, reps - 2);
     reps = Math.min(Math.max(lo, reps), Math.max(hi, best + 1));
@@ -185,10 +185,10 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
   }
 
   const lastWeight = Math.max(...last.map((s) => s.weight));
-  const lastTarget = last[0].targetReps;
+  const lastTarget = last[0]!.targetReps;
   const allHit = last.every((s) => s.reps >= s.targetReps);
   const bigMiss = last.some((s) => s.reps <= s.targetReps - 2);
-  const fb = lastFeedback(events, ex.id, last[0].sessionId) || effortSignal(events, last);
+  const fb = lastFeedback(events, ex.id, last[0]!.sessionId) || effortSignal(events, last);
 
   // After the first session, if it showed the cautious start was light (felt too easy, two or more
   // reps over target, or the lifter raised the weight), jump to what the logged sets show instead of

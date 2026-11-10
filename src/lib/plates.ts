@@ -24,7 +24,7 @@ function sidesAvailable(plates: PlateStock[]): { w: number; pairs: number }[] {
 /** Fewer plates wins; on a tie, the one with the heavier first plate (how lifters load a bar). */
 function better(a: number[], b: number[]): boolean {
   if (a.length !== b.length) return a.length < b.length;
-  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] > b[i];
+  for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i]! > b[i]!;
   return false;
 }
 
@@ -94,7 +94,7 @@ export function plateStyle(weight: number, unit: "kg" | "lb"): { fill: string; t
   const t = Math.min(1, Math.max(0, kg / 25));
   const height = 34 + Math.round(t * 66);
   const width = kg >= 15 ? 14 : kg >= 5 ? 11 : 8;
-  const colour =
+  const colour: [string, string] =
     kg >= 24
       ? ["#d33b3b", "#fff"]
       : kg >= 19

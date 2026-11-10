@@ -375,7 +375,7 @@ interface LinearDef {
 
 function linearEngine(def: LinearDef): Engine {
   const all = () => [...new Set(def.days.flatMap((d) => d.lifts.map((l) => l[0])).concat(def.pick ? ["power-clean"] : []))];
-  const liftsOf = (s: State, day: number) => def.pick?.(s, day) ?? def.days[day].lifts;
+  const liftsOf = (s: State, day: number) => def.pick?.(s, day) ?? def.days[day]!.lifts;
   return {
     days: def.days.length,
     keys: all,
@@ -384,10 +384,10 @@ function linearEngine(def: LinearDef): Engine {
       return W(key, ctx, acc ? 8 : 5, 3);
     },
     build(s, day, lift) {
-      const d = def.days[day];
+      const d = def.days[day]!;
       return {
         name: d.name,
-        note: `Next time: ${def.days[(day + 1) % def.days.length].name}`,
+        note: `Next time: ${def.days[(day + 1) % def.days.length]!.name}`,
         slots: liftsOf(s, day).map(([ex, sets, reps]) =>
           linearSlot(ex, lift(ex), sets, reps, def.accessories?.has(ex) ? 90 : 180, def.accessories?.has(ex) ? "Accessory" : undefined),
         ),
@@ -598,18 +598,18 @@ const TIERED: Engine = {
   days: 4,
   keys: () => [...new Set(TIER_DAYS.flatMap((d) => [`T1:${d.t1}`, `T2:${d.t2}`, `T3:${d.t3}`]))],
   startFor(key, ctx) {
-    const [tier, ex] = key.split(":");
+    const [tier, ex] = key.split(":") as [string, string];
     if (tier === "T3") return W(ex, ctx, 15, 5);
     const fiveRm = W(ex, ctx, 5, 0);
     return fiveRm * (tier === "T1" ? 0.85 : 0.65);
   },
   build(_s, day, lift) {
-    const d = TIER_DAYS[day];
+    const d = TIER_DAYS[day]!;
     const l1 = lift(`T1:${d.t1}`);
     const l2 = lift(`T2:${d.t2}`);
     const l3 = lift(`T3:${d.t3}`);
-    const [s1, r1] = T1[l1.stage];
-    const [s2, r2] = T2[l2.stage];
+    const [s1, r1] = T1[l1.stage]!;
+    const [s2, r2] = T2[l2.stage]!;
     const n1 =
       l1.last === "up"
         ? "Got them all: weight up"
@@ -655,13 +655,13 @@ const TIERED: Engine = {
     };
   },
   apply(_s, day, sets, lift, ctx) {
-    const d = TIER_DAYS[day];
+    const d = TIER_DAYS[day]!;
     const tier = (key: string, ex: string, schemes: [number, number][], onReset: (l: Lift) => void) => {
       const got = sets.get(key);
       if (!got?.length) return;
       const l = lift(key);
       const base = baseOf(l, got, ex, ctx.gym);
-      if (allHit(got, schemes[l.stage][0])) {
+      if (allHit(got, schemes[l.stage]![0])) {
         if (l.stage === 0) l.base = base;
         l.w = up(base, ex, ctx.gym, isLower(ex));
         l.last = "up";
@@ -681,7 +681,7 @@ const TIERED: Engine = {
     const t3 = sets.get(`T3:${d.t3}`);
     if (t3?.length) {
       const l = lift(`T3:${d.t3}`);
-      const last = t3[t3.length - 1];
+      const last = t3[t3.length - 1]!;
       if (last.reps >= 25) {
         l.w = up(baseOf(l, t3, d.t3, ctx.gym), d.t3, ctx.gym, false);
         l.last = "up";
@@ -717,7 +717,7 @@ const WAVE: Engine = {
   days: 4,
   keys: () => WAVE_LIFTS.flatMap((l) => [`tm:${WAVE_EX[l]}`, `acc:${WAVE_ASSIST[l]}`]),
   startFor(key, ctx) {
-    const [kind, ex] = key.split(":");
+    const [kind, ex] = key.split(":") as [string, string];
     if (kind === "tm") return 0.9 * e1Of(ex, ctx);
     return exercise(ex).load === "bodyweight" ? 5 : W(ex, ctx, 10, 3);
   },
@@ -727,11 +727,11 @@ const WAVE: Engine = {
     return { w: bw ? 0 : start, fails: 0, stage: 0, base: start, wk: bw ? Math.round(start) : 0, miss: false };
   },
   build(s, day, lift, ctx) {
-    const name = WAVE_LIFTS[day];
+    const name = WAVE_LIFTS[day]!;
     const ex = WAVE_EX[name];
     const l = lift(`tm:${ex}`);
-    const w = WAVES[l.wk];
-    const main: SetTarget[] = w.pcts.map((p, i) => ({ weight: l.w * p, reps: w.reps[i], amrap: w.amrap && i === 2 ? true : undefined }));
+    const w = WAVES[l.wk]!;
+    const main: SetTarget[] = w.pcts.map((p, i) => ({ weight: l.w * p, reps: w.reps[i]!, amrap: w.amrap && i === 2 ? true : undefined }));
     const deload = l.wk === 3;
     const extra: SetTarget[] = deload ? [] : straight(l.w * 0.5, 5, 10);
     const cycle = Math.floor(s.n / 16) + 1;
@@ -769,7 +769,7 @@ const WAVE: Engine = {
     };
   },
   apply(_s, day, sets, lift, ctx) {
-    const name = WAVE_LIFTS[day];
+    const name = WAVE_LIFTS[day]!;
     const ex = WAVE_EX[name];
     const l = lift(`tm:${ex}`);
     const got = sets.get(`tm:${ex}`) ?? [];
@@ -824,7 +824,7 @@ const LADDER: Engine = {
   fresh(start, key, ctx) {
     const steps = LADDERS.find((l) => `ladder:${l.key}` === key)!.steps;
     // Start on the step the gym can do nearest the one picked for the lifter's level.
-    const ex = ladderStep(steps, Math.round(start), ctx.gym) ?? steps[0];
+    const ex = ladderStep(steps, Math.round(start), ctx.gym) ?? steps[0]!;
     return { w: steps.indexOf(ex), fails: 0, stage: 0, base: 0, wk: TIMED.has(ex) ? HOLD_MIN : LADDER_MIN, miss: false };
   },
   build(_s, _day, lift, ctx) {
@@ -868,11 +868,11 @@ const LADDER: Engine = {
       if (!got?.length) continue;
       const l = lift(key);
       // A swap to another step of the same ladder moves the lifter to that step.
-      const did = lad.steps.indexOf(got[0].exerciseId);
+      const did = lad.steps.indexOf(got[0]!.exerciseId);
       if (did >= 0 && did !== l.w) {
         l.w = did;
       }
-      const ex = lad.steps[l.w];
+      const ex = lad.steps[l.w]!;
       const timed = TIMED.has(ex);
       if (!allHit(got, 3)) {
         l.last = "same";
@@ -882,7 +882,7 @@ const LADDER: Engine = {
       if (timed ? l.wk + 5 > HOLD_MAX : l.wk + 1 > LADDER_MAX) {
         if (next !== null) {
           l.w = next;
-          l.wk = TIMED.has(lad.steps[next]) ? HOLD_MIN : LADDER_MIN;
+          l.wk = TIMED.has(lad.steps[next]!) ? HOLD_MIN : LADDER_MIN;
           l.last = "step";
           continue;
         }
@@ -899,14 +899,14 @@ const LADDER: Engine = {
 
 /** The step to do: this one if the gym can, else the nearest easier one, else the nearest harder one. */
 function ladderStep(steps: string[], at: number, gym: Gym): string | null {
-  const ok = (i: number) => available(gym.equipment, [exercise(steps[i])]).length > 0;
-  for (let i = Math.min(at, steps.length - 1); i >= 0; i--) if (ok(i)) return steps[i];
-  for (let i = at + 1; i < steps.length; i++) if (ok(i)) return steps[i];
+  const ok = (i: number) => available(gym.equipment, [exercise(steps[i]!)]).length > 0;
+  for (let i = Math.min(at, steps.length - 1); i >= 0; i--) if (ok(i)) return steps[i]!;
+  for (let i = at + 1; i < steps.length; i++) if (ok(i)) return steps[i]!;
   return null;
 }
 
 function nextStep(steps: string[], at: number, gym: Gym): number | null {
-  for (let i = at + 1; i < steps.length; i++) if (available(gym.equipment, [exercise(steps[i])]).length) return i;
+  for (let i = at + 1; i < steps.length; i++) if (available(gym.equipment, [exercise(steps[i]!)]).length) return i;
   return null;
 }
 
@@ -1024,8 +1024,8 @@ function toItems(day: Day, gym: Gym): PlanItem[] {
       exerciseId: id,
       sets: sets.length,
       restSec: slot.rest,
-      focus: ex.primary[0],
-      target: { weight: sets[0].weight, reps: sets[0].reps, rir: slot.rir ?? 2, note },
+      focus: ex.primary[0]!,
+      target: { weight: sets[0]!.weight, reps: sets[0]!.reps, rir: slot.rir ?? 2, note },
       slot: slot.key,
       setTargets: sets,
       scheme: slot.scheme,
@@ -1062,15 +1062,15 @@ export function programPlan({
   if (info.kind === "split") {
     const days = SPLITS[info.id as keyof typeof SPLITS];
     const done = programSessions(events, src.id, src.startedAt);
-    const day = done.length ? (done[done.length - 1].day + 1) % days.length : 0;
-    const plan = generate({ gym, profile, events, minutes: profile.minutes, now, call, challenge, exclude, muscles: days[day].muscles });
+    const day = done.length ? (done[done.length - 1]!.day + 1) % days.length : 0;
+    const plan = generate({ gym, profile, events, minutes: profile.minutes, now, call, challenge, exclude, muscles: days[day]!.muscles });
     return {
       ...plan,
       program: {
         id: src.id,
         day,
-        dayName: days[day].name,
-        note: `Next time: ${days[(day + 1) % days.length].name.toLowerCase()}`,
+        dayName: days[day]!.name,
+        note: `Next time: ${days[(day + 1) % days.length]!.name.toLowerCase()}`,
         fixed: false,
       },
     };
@@ -1078,7 +1078,7 @@ export function programPlan({
   const engine = ENGINES[info.id]!;
   const s = programState(src, ctx);
   const day = s.next;
-  const lift = (k: string) => s.lifts[k];
+  const lift = (k: string) => s.lifts[k]!;
   const d = engine.build(s, day, lift, ctx);
   const items = toItems(d, gym).map((it) => comebackItem(it, events, gym, now));
   return {
@@ -1109,7 +1109,7 @@ function comebackItem(item: PlanItem, events: readonly AppEvent[], gym: Gym, now
     setTargets,
     target: {
       ...item.target,
-      weight: setTargets[0].weight,
+      weight: setTargets[0]!.weight,
       note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }),
     },
   };
@@ -1136,7 +1136,7 @@ export function weeklyPreview(id: ProgramId, ctx: Ctx): Record<Muscle, number> {
           events: [],
           minutes: ctx.profile.minutes,
           now: ctx.now,
-          muscles: days[i % days.length].muscles,
+          muscles: days[i % days.length]!.muscles,
         }).items,
       );
     return out;
@@ -1147,7 +1147,7 @@ export function weeklyPreview(id: ProgramId, ctx: Ctx): Record<Muscle, number> {
   for (let i = 0; i < info.daysPerWeek; i++)
     add(
       toItems(
-        engine.build(s, i % engine.days, (k) => s.lifts[k], ctx),
+        engine.build(s, i % engine.days, (k) => s.lifts[k]!, ctx),
         ctx.gym,
       ),
     );

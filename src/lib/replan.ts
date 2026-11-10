@@ -18,7 +18,7 @@ export function priority(item: PlanItem, position: number): number {
 export function remainingSeconds(items: readonly PlanItem[], index: number, doneOnCurrent: number): number {
   let total = 0;
   for (let i = index; i < items.length; i++) {
-    const it = items[i];
+    const it = items[i]!;
     const left = i === index ? it.sets - doneOnCurrent : it.sets;
     if (left <= 0) continue;
     const ex = exercise(it.exerciseId);
@@ -45,7 +45,7 @@ export function fitToTime(items: readonly PlanItem[], index: number, doneOnCurre
   const next = items.map((i) => ({ ...i }));
   const changes: string[] = [];
   const cut = new Map<string, number>();
-  const floor = (i: number) => (i === index ? Math.max(doneOnCurrent + 1, Math.min(2, next[i].sets)) : 2);
+  const floor = (i: number) => (i === index ? Math.max(doneOnCurrent + 1, Math.min(2, next[i]!.sets)) : 2);
   const order = () =>
     next
       .map((it, i) => ({ it, i }))
@@ -79,7 +79,7 @@ export function doLater(items: readonly PlanItem[], index: number): PlanItem[] {
   if (index >= items.length - 1) return [...items];
   const next = [...items];
   const [cur] = next.splice(index, 1);
-  next.splice(index + 1, 0, cur);
+  next.splice(index + 1, 0, cur!);
   return next;
 }
 

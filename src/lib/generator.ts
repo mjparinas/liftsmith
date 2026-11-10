@@ -110,7 +110,7 @@ export function itemSeconds(item: Pick<PlanItem, "exerciseId" | "sets" | "restSe
 
 /** The whole plan: every exercise plus the rest before each one after the first. */
 export function planSeconds(items: readonly Pick<PlanItem, "exerciseId" | "sets" | "restSec" | "target" | "warmup" | "group">[]): number {
-  return groupedSeconds(items, (n) => itemSeconds(items[n]));
+  return groupedSeconds(items, (n) => itemSeconds(items[n]!));
 }
 
 /** Hard sets per muscle since the start of this block week (secondary muscles count half). */
@@ -141,7 +141,7 @@ export function avoided(events: readonly AppEvent[], gymId: string, now: number)
 function recentFor(events: readonly AppEvent[]): Map<Muscle, string[]> {
   const out = new Map<Muscle, string[]>();
   for (let i = events.length - 1; i >= 0; i--) {
-    const e = events[i];
+    const e = events[i]!;
     if (e.type !== "set") continue;
     const ex = EXERCISE_BY_ID.get(e.exerciseId);
     if (!ex) continue;
@@ -224,7 +224,7 @@ export function generate({
         (0.5 + random()),
     }));
     weighted.sort((a, b) => b.w - a.w);
-    return weighted[0].c;
+    return weighted[0]!.c;
   };
 
   const tryAdd = (m: Muscle, compoundFirst: boolean): boolean => {
@@ -284,7 +284,7 @@ export function generate({
   // sets come off the end first.
   const final = withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!);
   for (let i = final.length - 1; i >= 0 && planSeconds(final) > budget;) {
-    if (final[i].sets > 2) final[i] = { ...final[i], sets: final[i].sets - 1 };
+    if (final[i]!.sets > 2) final[i] = { ...final[i]!, sets: final[i]!.sets - 1 };
     else i--;
   }
   const est = planSeconds(final);
