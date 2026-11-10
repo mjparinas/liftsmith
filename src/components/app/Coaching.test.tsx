@@ -30,6 +30,7 @@ afterEach(cleanup);
 
 async function onboard(user: ReturnType<typeof userEvent.setup>, gym = /Commercial gym/) {
   render(<App />);
+  await user.click(await screen.findByRole("button", { name: "Get started" }));
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: gym }));
