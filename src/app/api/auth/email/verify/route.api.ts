@@ -1,4 +1,5 @@
-// POST /api/auth/email/verify/ {email, code, platform}: signs in with the emailed code. Server build only.
+// POST /api/auth/email/verify/ {email, code, platform}: signs in with the emailed code (six digits), or the
+// store review account's fixed 12 to 16 digit code (src/server/review.ts). Server build only.
 import { hasDb, preflight, readJson, reply } from "@/server/accountHttp";
 import { cleanEmail, limited, platformOf, verifyEmail } from "@/server/accounts";
 
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
   if (await limited(req, "verify", 30)) return reply(req, 429, { error: "Too many tries. Wait a few minutes." });
   const raw = (await readJson(req)) as { email?: unknown; code?: unknown; platform?: unknown } | undefined;
   const email = cleanEmail(raw?.email);
-  if (!email || typeof raw?.code !== "string" || !/^\s*\d{6}\s*$/.test(raw.code))
+  if (!email || typeof raw?.code !== "string" || !/^\s*(\d{6}|\d{12,16})\s*$/.test(raw.code))
     return reply(req, 400, { error: "Enter the six-digit code." });
   const r = await verifyEmail(email, raw.code, platformOf(raw.platform));
   return reply(req, r.code, r.body);

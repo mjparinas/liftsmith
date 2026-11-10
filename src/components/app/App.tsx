@@ -138,9 +138,10 @@ export function App() {
     if (!ready || !signedIn) return;
     return startSync();
   }, [ready, signedIn]);
+  const accountPro = useAccount((s) => !!s.account?.pro);
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
-  }, [ready, profile.onboarded, billing.live, billing.ent]);
+  }, [ready, profile.onboarded, billing.live, billing.ent, accountPro]);
   // Sounds, haptics, Lean mode and equipped cosmetics (accent colour, rest timer sound) apply app-wide
   // (juice.ts reads `feel`).
   useEffect(() => {

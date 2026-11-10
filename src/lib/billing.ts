@@ -13,6 +13,7 @@
 import { create } from "zustand";
 
 import { installId, platformStore, track } from "./analytics";
+import { accountPro } from "./auth";
 import { activeCode, CREATOR_OFFERING, creatorHooks } from "./creator";
 import { flag } from "./flags";
 import { isNative } from "./juice";
@@ -74,10 +75,13 @@ export function entActive(ent: Entitlement | null | undefined, now: number): boo
   return ent.expiresAt == null || ent.expiresAt + OFFLINE_GRACE_MS > now;
 }
 
-/** Pro on this device: always while billing isn't live, otherwise from the store entitlement. */
+/**
+ * Pro on this device: always while billing isn't live, otherwise from the store entitlement, or from the
+ * signed-in account when the server gives it Pro without a purchase (the store review account).
+ */
 export function hasPro(now = Date.now()): boolean {
   const s = useBilling.getState();
-  return !s.live || entActive(s.ent, now);
+  return !s.live || entActive(s.ent, now) || accountPro();
 }
 
 // ---------- Mapping the SDK's answers (pure, tested) ----------
