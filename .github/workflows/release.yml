@@ -29,6 +29,26 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
+      # A wrong RevenueCat key builds fine but every store call fails with "Invalid API Key", so stop here instead.
+      # Android takes the Play Store app's public key (goog_), iOS the App Store app's (appl_). Never the secret
+      # key (sk_) or the Test Store key (test_). Only the prefix is checked; the key itself is never printed.
+      - name: Check the RevenueCat keys
+        env:
+          ANDROID_KEY: ${{ secrets.REVENUECAT_ANDROID_KEY }}
+          IOS_KEY: ${{ secrets.REVENUECAT_IOS_KEY }}
+        run: |
+          ok=true
+          a="$(printf '%s' "$ANDROID_KEY" | tr -d '[:space:]')"
+          i="$(printf '%s' "$IOS_KEY" | tr -d '[:space:]')"
+          if [ -n "$a" ] && [ "${a#goog_}" = "$a" ]; then
+            echo "::error::REVENUECAT_ANDROID_KEY must be the public key of the Play Store app in RevenueCat (it starts with goog_). It starts with '${a:0:3}…'."
+            ok=false
+          fi
+          if [ -n "$i" ] && [ "${i#appl_}" = "$i" ]; then
+            echo "::error::REVENUECAT_IOS_KEY must be the public key of the App Store app in RevenueCat (it starts with appl_). It starts with '${i:0:3}…'."
+            ok=false
+          fi
+          $ok
       - run: npm run build:static
         env:
           # RevenueCat's public SDK keys (billing.ts). Without them the apps build with billing off: no prices, Pro for everyone.
