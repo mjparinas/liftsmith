@@ -31,6 +31,8 @@ export const en = {
   "account.notSynced": "Not synced yet. It syncs when you're online.",
   "account.waiting": { one: "{count} change waiting to sync.", other: "{count} changes waiting to sync." },
   "account.syncError": "Couldn't reach the server. It'll try again when you're online.",
+  "account.syncFull":
+    "Your account's sync storage is full, so new changes stay on this device. Everything here is safe. Tell us through Send feedback in Settings.",
   "account.syncNow": "Sync now",
   "account.signOut": "Sign out",
   "account.signOutNote": "Signing out keeps everything on this device. It just stops syncing.",
@@ -81,6 +83,8 @@ export const es: Partial<Record<Key, Message>> = {
   "account.notSynced": "Aún sin sincronizar. Se sincroniza cuando tienes conexión.",
   "account.waiting": { one: "{count} cambio pendiente de sincronizar.", other: "{count} cambios pendientes de sincronizar." },
   "account.syncError": "No se pudo conectar con el servidor. Lo intentará de nuevo cuando tengas conexión.",
+  "account.syncFull":
+    "El almacenamiento de sincronización de tu cuenta está lleno, así que los cambios nuevos se quedan en este dispositivo. Todo lo de aquí está a salvo. Avísanos con Enviar comentarios en Ajustes.",
   "account.syncNow": "Sincronizar ahora",
   "account.signOut": "Cerrar sesión",
   "account.signOutNote": "Al cerrar sesión todo se queda en este dispositivo. Solo deja de sincronizarse.",
@@ -133,6 +137,8 @@ export const fr: Partial<Record<Key, Message>> = {
     other: "{count} modifications en attente de synchronisation.",
   },
   "account.syncError": "Impossible de joindre le serveur. Nouvel essai dès que vous serez en ligne.",
+  "account.syncFull":
+    "L'espace de synchronisation de votre compte est plein : les nouvelles modifications restent sur cet appareil. Tout ce qui est ici est en sécurité. Dites-le-nous avec Envoyer un avis dans Réglages.",
   "account.syncNow": "Synchroniser",
   "account.signOut": "Se déconnecter",
   "account.signOutNote": "Se déconnecter garde tout sur cet appareil. La synchronisation s'arrête, c'est tout.",
