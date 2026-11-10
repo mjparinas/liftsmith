@@ -560,7 +560,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               {offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}
             </h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
-            <ProFeatures />
+            <ProFeatures compact />
             <Plans
               from="setup"
               onDone={(plan, trial) => {

@@ -773,3 +773,15 @@ export function BumpField({
     </div>
   );
 }
+
+/**
+ * The small "Pro" tag on an entry point a free lifter can see but not use yet (AGENTS.md "Money": Pro
+ * features are shown, never hidden). The control it sits on opens the paywall at that feature.
+ */
+export function ProTag({ className = "" }: { className?: string }) {
+  return (
+    <span className={`rounded-full bg-warn/15 px-1.5 py-0.5 text-xs font-semibold leading-none text-warn ${className}`}>
+      {t("prog.pro")}
+    </span>
+  );
+}

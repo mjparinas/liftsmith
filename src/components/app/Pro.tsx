@@ -5,16 +5,18 @@ import { useState } from "react";
 import { platformStore } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { billingLive, buy, entActive, manageUrl, restore, retryBilling, useBilling, type BuyResult } from "@/lib/billing";
+import { PRO_FEATURES, type Feature } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import type { Plan } from "@/lib/trial";
 import { useNow } from "@/lib/useNow";
+import type { MessageKey } from "@/locales/en";
 
 import { CreatorCode } from "./CreatorCode";
 import { celebratePro } from "./ProWelcome";
-import { go, useRoute, type Route } from "./router";
+import { go, goBack, historyDepth, ROUTES, useRoute, type Route } from "./router";
 import { Button } from "./ui";
 
 // The paywall (#/pro, also the last step of first-run setup). AGENTS.md "Money": plain prices from the
@@ -23,18 +25,72 @@ import { Button } from "./ui";
 
 const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 
-export function ProFeatures() {
+// What each Pro screen entry point passes as the route argument (#/pro/<from>): the feature it was for,
+// so the paywall can mark it, and the screen to go back to when there's no history (a fresh launch).
+const FROM: Record<string, { feature?: Feature; back: Route }> = {
+  programs: { feature: "adaptive", back: "programs" },
+  splits: { feature: "adaptiveSplits", back: "programs" },
+  today: { feature: "adaptive", back: "today" },
+  recovery: { feature: "recoveryMap", back: "recovery" },
+  twin: { feature: "healthReadiness", back: "recovery" },
+  count: { feature: "autoCount", back: "workout" },
+  replan: { feature: "replan", back: "workout" },
+  goals: { feature: "goalPlanner", back: "stats" },
+  plateau: { feature: "plateauDetective", back: "stats" },
+  settings: { back: "settings" },
+  setup: { back: "today" },
+};
+
+/** Where #/pro/<arg> came from: the feature to mark on the paywall and the screen behind it. */
+export function proFrom(arg: string | undefined): { feature?: Feature; back: Route } {
+  if (arg && FROM[arg]) return FROM[arg];
+  return { back: arg && (ROUTES as readonly string[]).includes(arg) && arg !== "pro" ? (arg as Route) : "today" };
+}
+
+/**
+ * Everything Pro unlocks, one row per gated feature (PRO_FEATURES in entitlements.ts), with a line on what
+ * it does. The feature the lifter tapped comes first and is marked. `compact` (setup) shows titles only.
+ */
+export function ProFeatures({ focus, compact = false }: { focus?: Feature; compact?: boolean }) {
+  const order = focus ? [focus, ...PRO_FEATURES.filter((f) => f !== focus)] : [...PRO_FEATURES];
   return (
-    <ul className="mt-4 space-y-1.5 text-sm">
-      {[t("pro.f1"), t("pro.f2"), t("pro.f3"), t("pro.f4"), t("pro.f5")].map((f) => (
-        <li key={f} className="flex gap-2">
-          <span className="text-accent" aria-hidden>
-            ✓
-          </span>
-          {f}
-        </li>
-      ))}
-    </ul>
+    <section className="mt-5" aria-labelledby="pro-unlocks">
+      <h2 id="pro-unlocks" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+        {t("pro.unlocks")}
+      </h2>
+      <ul className={`mt-2 ${compact ? "space-y-1.5 text-sm" : "space-y-2"}`}>
+        {order.map((f) => {
+          const title = t(`pro.ft.${f}` as MessageKey);
+          if (compact)
+            return (
+              <li key={f} className="flex gap-2">
+                <span className="text-accent" aria-hidden>
+                  ✓
+                </span>
+                {title}
+              </li>
+            );
+          const picked = f === focus;
+          return (
+            <li key={f} className={`rounded-2xl border p-3 ${picked ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>
+              <div className="flex items-start gap-2">
+                <span className="mt-0.5 text-accent" aria-hidden>
+                  ✓
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="font-semibold">
+                    {title}
+                    {picked && <span className="ml-2 text-xs font-semibold text-accent">{t("pro.youAsked")}</span>}
+                  </p>
+                  <p className="mt-0.5 text-sm text-muted">{t(`pro.fb.${f}` as MessageKey)}</p>
+                </div>
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+      {!compact && <p className="mt-3 text-sm text-muted">{t("pro.free")}</p>}
+    </section>
   );
 }
 
@@ -143,7 +199,10 @@ export function Pro() {
   const { arg } = useRoute();
   const { live, ent } = useBilling();
   const { profile, setProfile } = useApp();
-  const back = (arg as Route | undefined) ?? "settings";
+  const from = proFrom(arg);
+  const back = from.back;
+  // Back steps back through the app's history; on a fresh launch, the screen this was opened for.
+  const leave = () => (historyDepth() > 0 ? goBack() : go(back));
   const now = useNow(60_000);
   const viaAccount = useAccount((s) => !!s.account?.pro);
   const active = live && (entActive(ent, now) || viaAccount);
@@ -151,12 +210,12 @@ export function Pro() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go(back)} className="press -ml-2 min-h-11 pt-2 text-muted">
+      <button type="button" onClick={leave} className="press -ml-2 min-h-11 pt-2 text-muted">
         ‹ {t("pro.back")}
       </button>
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">{active ? t("pro.youHave") : t("pro.title")}</h1>
       <p className="mt-2 text-muted">{t("pro.lead")}</p>
-      <ProFeatures />
+      <ProFeatures focus={active ? undefined : from.feature} />
       {!billingLive() ? (
         // The web app and builds without store billing: nothing to buy here, and everything is on.
         <p className="card mt-6 p-4 text-sm text-muted">{t("pro.notHere")}</p>
@@ -182,7 +241,7 @@ export function Pro() {
         </div>
       ) : (
         <Plans
-          from={back}
+          from={arg ?? back}
           onDone={(plan, trial) => {
             const now = Date.now();
             const days = useBilling.getState().offers?.find((o) => o.plan === plan)?.trialDays ?? undefined;
@@ -195,7 +254,7 @@ export function Pro() {
               },
             });
             useApp.getState().applyAccess();
-            go(back === "pro" ? "today" : back);
+            leave();
           }}
         />
       )}

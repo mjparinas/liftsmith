@@ -12,7 +12,7 @@ import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Sheet } from "./ui";
+import { Button, ProTag, Sheet } from "./ui";
 
 // Pick how Today's workout is planned: the adaptive engine (the default), a classic fixed program,
 // or a split the adaptive engine fills in. Program details (summary, steps, credit) are still English.
@@ -30,7 +30,8 @@ export function Programs() {
     haptic("tap");
     if (!gym) return;
     // Adaptive plans and splits are Pro: without it, the paywall instead.
-    if (!id ? !can("adaptive") : PROGRAM_BY_ID.get(id)?.tier === "pro" && !can("adaptiveSplits")) return go("pro", "programs");
+    if (!id && !can("adaptive")) return go("pro", "programs");
+    if (id && PROGRAM_BY_ID.get(id)?.tier === "pro" && !can("adaptiveSplits")) return go("pro", "splits");
     setProfile({ planSource: id ? pickProgram(id, { profile, gym, events, now: Date.now() }) : { kind: "adaptive" }, proPlan: undefined });
     track("feature", { name: "program", detail: id ?? "adaptive" });
     setOpen(null);
@@ -58,9 +59,7 @@ export function Programs() {
               {!currentId && (
                 <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>
               )}
-              {!can("adaptive") && (
-                <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>
-              )}
+              {!can("adaptive") && <ProTag />}
             </div>
             <p className="mt-1 text-sm text-muted">{t("prog.adaptiveBlurb")}</p>
           </button>

@@ -13,7 +13,7 @@ import { useNow } from "@/lib/useNow";
 import { useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go, type Route } from "./router";
-import { Section } from "./ui";
+import { ProTag, Section } from "./ui";
 
 // Coach's notes: the proactive insights from insights.ts, each with what we saw, what to do and a
 // one-tap action. "Got it" hides a note on this device until the finding changes (its id changes).
@@ -84,7 +84,10 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
     else if (a.kind === "priority") setProfile({ training: togglePriority(profile.training, a.muscle) });
     else if (a.kind === "plateau") fixPlateau(a.plateau, a.fix);
     else if (a.kind === "minutes") setProfile({ minutes: a.minutes, minutesDay: dayKey(Date.now()) });
-    else if (a.kind === "go") return go(a.route as Route);
+    else if (a.kind === "go") {
+      const [route, arg] = a.route.split("/");
+      return go(route as Route, arg);
+    }
     setDone(true);
   };
   return (
@@ -102,10 +105,12 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
               <button
                 type="button"
                 onClick={act}
+                aria-label={i.action.kind === "go" && i.action.pro ? t("pro.locked", { what: i.action.label }) : undefined}
                 className="press min-h-11 rounded-xl px-3.5 text-sm font-semibold"
                 style={{ background: `color-mix(in srgb, ${tone.hue} 20%, var(--color-surface))`, color: "var(--color-ink)" }}
               >
                 {i.action.label}
+                {i.action.kind === "go" && i.action.pro && <ProTag className="ml-2" />}
               </button>
             )}
             {done && (
