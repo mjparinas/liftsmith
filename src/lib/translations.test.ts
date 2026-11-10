@@ -5,7 +5,7 @@ import { en } from "@/locales/text/ex";
 import { defaultProfile, makeGym } from "./defaults";
 import { ENGLISH_ROWS, englishName, exercise, EXERCISES } from "./exercises";
 import { alternatives, generate } from "./generator";
-import { setLanguage } from "./i18n";
+import { setLanguage, t } from "./i18n";
 
 // Text that lives outside the catalogues' usual path. The exercise library's text follows the app's language (src/locales/text/ex.ts), while the rows in
 // exercises.ts stay the English source and anything that must not depend on the language reads them.
@@ -80,5 +80,57 @@ describe("achievement units", () => {
     const { ACHIEVEMENTS } = await import("./achievements");
     const { en: catalogue } = await import("@/locales/en");
     for (const a of ACHIEVEMENTS) if (a.unit) expect(catalogue, a.id).toHaveProperty(`awards.u.${a.unit === "×" ? "x" : a.unit}`);
+  });
+});
+
+describe("programs", () => {
+  it("every program's text follows the language, with every step of how it works", async () => {
+    const { PROGRAMS } = await import("./programs");
+    const { en: catalogue } = await import("@/locales/en");
+    for (const p of PROGRAMS) {
+      expect(catalogue, p.id).toHaveProperty(`pgm.${p.id}.how${p.how.length}`);
+      expect(catalogue, p.id).not.toHaveProperty(`pgm.${p.id}.how${p.how.length + 1}`);
+    }
+    setLanguage("es");
+    expect(PROGRAMS.find((p) => p.id === "classic-5x5")!.name).toBe("5×5 clásico");
+    setLanguage("fr");
+    expect(PROGRAMS.find((p) => p.id === "upper-lower")!.summary).toContain("haut du corps");
+  });
+});
+
+describe("daily quotes", () => {
+  it("the English catalogue matches QUOTES word for word, and every quote has Spanish and French", async () => {
+    const { QUOTES } = await import("./quotes");
+    const quote = await import("@/locales/text/quote");
+    const english = Object.values(quote.en);
+    expect(english).toEqual(QUOTES.map((q) => q.text));
+    expect(Object.keys(quote.es)).toHaveLength(QUOTES.length);
+    expect(Object.keys(quote.fr)).toHaveLength(QUOTES.length);
+    setLanguage("es");
+    expect(t("quote.146")).toBe("Cae siete veces, levántate ocho.");
+    setLanguage("fr");
+    expect(t("quote.146")).toBe("Tombez sept fois, relevez-vous huit.");
+  });
+});
+
+describe("health twin", () => {
+  it("labels, chips and lines follow the language", async () => {
+    const { twin } = await import("./twin");
+    const input = {
+      events: [],
+      profile: defaultProfile(),
+      sessions: [],
+      now: Date.UTC(2026, 10, 10, 12),
+      pro: false,
+      native: true,
+      store: "Health Connect",
+    };
+    setLanguage("es");
+    const sleep = twin(input).find((m) => m.id === "sleep")!;
+    expect(sleep.label).toBe("Sueño");
+    expect(sleep.chip).toBe("Sin conectar");
+    expect(sleep.why).toBe("Llega desde Health Connect. Permite el sueño allí, o lleva un reloj o anillo que lo registre.");
+    setLanguage("fr");
+    expect(twin(input).find((m) => m.id === "weight")!.label).toBe("Poids");
   });
 });
