@@ -1,0 +1,8 @@
+# Calendar (Melvin, 2026-11-09, roadmap MVP+2; built)
+
+Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
+
+- **Settings › Calendar** (`CalendarSettings.tsx`, `src/lib/calendar.ts`): pick training weekdays (defaults spread the days-a-week goal, 3 → Mon, Wed, Fri) and a time, then **Add to my calendar**. That writes one weekly repeating event (the workout length) to the default calendar, and Update or Remove replace or delete it by its saved id. The web build downloads a `.ics` file instead.
+- **Fit workouts around my calendar** is a separate opt-in (native only). When it's on and nothing is running, Today reads busy times for the next 3 hours every 5 minutes. If something starts before the planned workout could finish, it offers a shorter length that fits ("Busy at 7:00 pm · Fit a 30-minute workout"): the free time less 10 minutes, rounded down to 5, at least 15 (`fitLength`).
+- **Privacy:** only start and end times are read. Titles, places, attendees and notes are never read. All-day events, events marked free and Liftsmith's own event are ignored, and nothing leaves the phone.
+- Native: `CalendarPlugin.java` (CalendarContract, `READ_CALENDAR` + `WRITE_CALENDAR`) and `CalendarPlugin.swift` (EventKit, full access on iOS 17+, because updating our own event and reading busy times both need reads). The same JS drives both (parity).
