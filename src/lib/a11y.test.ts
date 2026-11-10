@@ -123,6 +123,11 @@ describe("colour tokens", () => {
       });
     }
 
+    it(`${name}: the live heart rate red is readable text on every surface`, () => {
+      for (const bg of ["--color-bg", "--color-surface"])
+        expect(contrast(t["--color-heart"], t[bg]), `heart on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    });
+
     it(`${name}: the colour-blind safe set stays distinct for every kind of colour vision`, () => {
       const bands = BANDS.map((b) => t[`--band-${b}-cvd`]);
       const status = ["good", "warn", "bad"].map((s) => t[`--${s}-cvd`]);
@@ -161,6 +166,8 @@ describe("colour tokens", () => {
   it("picks the set by data-cvd and keeps every status colour behind a token", () => {
     expect(block(":root {\n  --color-good: var(--good-std);")["--band-fatigued"]).toBe("var(--band-fatigued-std)");
     expect(block(':root[data-cvd="on"]')["--color-bad"]).toBe("var(--bad-cvd)");
+    // The heart stays red with colour-blind safe colours: it's an identity colour, not a status.
+    expect(block(':root[data-cvd="on"]')["--color-heart"]).toBeUndefined();
   });
 
   it("raises secondary text and outlines in More contrast, for both the setting and the phone's", () => {
@@ -220,5 +227,11 @@ describe("3D recovery map", () => {
         expect(hex, `${band} ${set}`).toBe(DARK[`--band-${band}-${suffix}`]);
         expect(contrast(hex, "#05080c"), `${band} ${set}`).toBeGreaterThanOrEqual(3);
       }
+  });
+
+  it("draws the live heart rate in the dark theme's heart red, readable on the stage", async () => {
+    const { DEMO_COLOURS } = await import("@/components/demo/colours");
+    expect(DEMO_COLOURS.heart).toBe(DARK["--color-heart"]);
+    for (const stage of ["#05080c", "#0b1a2a"]) expect(contrast(DEMO_COLOURS.heart, stage)).toBeGreaterThanOrEqual(4.5);
   });
 });

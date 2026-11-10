@@ -11,7 +11,7 @@ import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
 import { saveWorkout } from "@/lib/health";
-import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported, type HrConnection } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, keepAwake, oops, sound } from "@/lib/juice";
@@ -290,7 +290,6 @@ export function Workout() {
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
-  const zone = bpm ? hrZone(bpm) : null;
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
@@ -313,10 +312,7 @@ export function Workout() {
         </div>
         <div className="flex items-center gap-2">
           {bpm ? (
-            <span
-              className="num flex min-h-9 items-center gap-1 rounded-full border border-line bg-surface px-2.5 text-sm font-bold"
-              style={{ color: zone!.colour }}
-            >
+            <span className="num flex min-h-9 items-center gap-1 rounded-full border border-heart/40 bg-surface px-2.5 text-sm font-bold text-heart">
               <span className="animate-beat inline-flex">
                 <Icon name="heart" size={14} filled strokeWidth={1.5} />
               </span>{" "}
@@ -330,7 +326,7 @@ export function Workout() {
               aria-busy={hrBusy}
               className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"
             >
-              <Icon name="heart" size={14} className="text-bad" />
+              <Icon name="heart" size={14} className="text-heart" />
               {hrBusy ? t("hr.connecting") : t("hr.connect")}
             </button>
           ) : null}
@@ -451,6 +447,7 @@ export function Workout() {
                 pattern={ex.pattern}
                 body={bodyFor(profile.sex)}
                 bpm={bpm}
+                hrTrend={active.hr}
                 prefs={countPrefs}
                 onPrefs={changeCount}
                 counting={!resting}
@@ -469,6 +466,7 @@ export function Workout() {
                 exerciseId={ex.id}
                 body={bodyFor(profile.sex)}
                 bpm={bpm}
+                hrTrend={active.hr}
                 paused={infoOpen || swapOpen || endOpen}
                 className="h-full"
               />

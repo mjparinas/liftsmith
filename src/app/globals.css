@@ -24,6 +24,9 @@
   --color-good: #34d399;
   --color-warn: #f5b544;
   --color-bad: #f0605d;
+  /* The live heart rate badge: always red, even with colour-blind safe colours, because it's an
+     identity colour (the heart icon and the number carry the meaning), not a status. */
+  --color-heart: #f0605d;
   --color-gold: #f2c14e;
   --color-holo: #5cc8ff;
 
@@ -235,6 +238,7 @@
   --hr-3: #0a7350;
   --hr-4: #8a5100;
   --hr-5: #a82222;
+  --color-heart: #c4262b;
 }
 @media (prefers-color-scheme: light) {
   :root[data-theme="system"] {
@@ -292,6 +296,7 @@
     --hr-3: #0a7350;
     --hr-4: #8a5100;
     --hr-5: #a82222;
+    --color-heart: #c4262b;
   }
 }
 
