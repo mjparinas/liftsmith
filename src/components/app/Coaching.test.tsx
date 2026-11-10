@@ -5,15 +5,22 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { encodeRemix } from "@/lib/remix";
 import { remainingSeconds } from "@/lib/replan";
 import { useApp } from "@/lib/store";
+
 import { App } from "./App";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
 beforeEach(async () => {
-  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  window.matchMedia ??= ((q: string) => ({
+    matches: false,
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  })) as unknown as typeof window.matchMedia;
   window.scrollTo = () => {};
   location.hash = "";
   await useApp.getState().reset();
@@ -64,7 +71,10 @@ describe("coaching in the workout", () => {
   it("does a busy exercise later", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = `#/remix/${encodeRemix([{ exerciseId: "leg-press", sets: 3, restSec: 120, target: { reps: 10 } }, { exerciseId: "lat-pulldown", sets: 3, restSec: 90, target: { reps: 10 } }])}`;
+    location.hash = `#/remix/${encodeRemix([
+      { exerciseId: "leg-press", sets: 3, restSec: 120, target: { reps: 10 } },
+      { exerciseId: "lat-pulldown", sets: 3, restSec: 90, target: { reps: 10 } },
+    ])}`;
     await user.click(await screen.findByRole("button", { name: "Start this workout" }));
     await skipWarm(user);
     const first = useApp.getState().active!.plan.items[0].exerciseId;

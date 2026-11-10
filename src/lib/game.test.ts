@@ -1,11 +1,31 @@
 import { describe, expect, it } from "vitest";
-import { ACHIEVEMENTS, BADGE_COUNT, achName, achievements, context, shareIds, shareName, unlocked } from "./achievements";
+
+import { makeSet } from "@/test/factories";
+
+import { ACHIEVEMENTS, achievements, achName, BADGE_COUNT, context, shareIds, shareName, unlocked } from "./achievements";
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
-import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUE_LABEL, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
+import {
+  COSMETICS,
+  crateFor,
+  crates,
+  game,
+  goalStreak,
+  isPr,
+  league,
+  LEAGUE_LABEL,
+  LEAGUES,
+  levelAt,
+  levelOf,
+  MAX_FREEZES,
+  owned,
+  questsFor,
+  repsForPr,
+  STARTER,
+  xpTotal,
+} from "./game";
 import { setLanguage } from "./i18n";
 import type { AppEvent, SetEvent } from "./types";
-import { makeSet } from "@/test/factories";
 
 // Wednesday evening.
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -166,7 +186,13 @@ describe("quests", () => {
     expect(q).toHaveLength(3);
     expect(q[0]).toMatchObject({ id: "days", goal: 3, have: 0 });
     expect(questsFor([], profile(), weekOf(NOW)).map((x) => x.id)).toEqual(q.map((x) => x.id));
-    const weeks = new Set(Array.from({ length: 8 }, (_, i) => questsFor([], profile(), weekOf(NOW) - i * W).map((x) => x.id).join()));
+    const weeks = new Set(
+      Array.from({ length: 8 }, (_, i) =>
+        questsFor([], profile(), weekOf(NOW) - i * W)
+          .map((x) => x.id)
+          .join(),
+      ),
+    );
     expect(weeks.size).toBeGreaterThan(1);
   });
   it("track progress and never ask for more days than the goal", () => {

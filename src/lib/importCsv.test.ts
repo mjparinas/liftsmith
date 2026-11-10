@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { setsCsv } from "./exportData";
 import { customId, defaultMapping, guessExercise, importEvents, matchExercise, parseCsv, parseDate, readImport } from "./importCsv";
 import type { AppEvent } from "./types";
@@ -26,8 +27,14 @@ const HEVY = `"title","start_time","end_time","description","exercise_title","su
 
 describe("CSV parsing", () => {
   it("handles quotes, escaped quotes, CRLF, a BOM and semicolons", () => {
-    expect(parseCsv('﻿a,b\r\n"x, ""y""",2\r\n')).toEqual([["a", "b"], ['x, "y"', "2"]]);
-    expect(parseCsv("a;b;c\n1;2,5;3")).toEqual([["a", "b", "c"], ["1", "2,5", "3"]]);
+    expect(parseCsv('﻿a,b\r\n"x, ""y""",2\r\n')).toEqual([
+      ["a", "b"],
+      ['x, "y"', "2"],
+    ]);
+    expect(parseCsv("a;b;c\n1;2,5;3")).toEqual([
+      ["a", "b", "c"],
+      ["1", "2,5", "3"],
+    ]);
   });
 
   it("reads dates the apps write", () => {
@@ -68,7 +75,19 @@ describe("reading exports", () => {
   });
 
   it("reads Liftsmith's own export back", () => {
-    const events: AppEvent[] = [{ type: "set", id: "1", at: new Date(2026, 10, 3, 9).getTime(), sessionId: "abcdefgh-1", exerciseId: "bench-press", weight: 100, reps: 5, targetReps: 5, rir: 2 }];
+    const events: AppEvent[] = [
+      {
+        type: "set",
+        id: "1",
+        at: new Date(2026, 10, 3, 9).getTime(),
+        sessionId: "abcdefgh-1",
+        exerciseId: "bench-press",
+        weight: 100,
+        reps: 5,
+        targetReps: 5,
+        rir: 2,
+      },
+    ];
     const f = readImport(setsCsv(events, "lb"))!;
     expect(f.format).toBe("liftsmith");
     expect(f.workouts[0].sets[0]).toMatchObject({ name: "Barbell bench press", unit: "lb", reps: 5 });
@@ -124,7 +143,10 @@ describe("import events", () => {
     expect(custom.type === "customExercise" && custom.exercise.id).toBe(customId("Zottman Thing"));
     expect(out.events.some((e) => e.type === "set" && e.exerciseId === customId("Zottman Thing"))).toBe(true);
     // Sets sit inside the workout, in order.
-    const sets = out.events.filter((e) => e.type === "set" || e.type === "warmup").slice(0, 3).map((e) => e.at);
+    const sets = out.events
+      .filter((e) => e.type === "set" || e.type === "warmup")
+      .slice(0, 3)
+      .map((e) => e.at);
     expect([...sets].sort((a, b) => a - b)).toEqual(sets);
   });
 

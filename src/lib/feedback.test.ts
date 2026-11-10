@@ -1,11 +1,15 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { recordError } from "./diag";
 import { buildFeedback, flushFeedback, OUTBOX_KEY, pending, sendFeedback } from "./feedback";
 import { checkFeedback, feedbackEmail } from "./feedbackServer";
 
 const ok = () => vi.fn(async () => new Response("{}", { status: 200 })) as unknown as typeof fetch;
-const offline = () => vi.fn(async () => { throw new TypeError("Failed to fetch"); }) as unknown as typeof fetch;
+const offline = () =>
+  vi.fn(async () => {
+    throw new TypeError("Failed to fetch");
+  }) as unknown as typeof fetch;
 
 describe("in-app feedback", () => {
   beforeEach(() => localStorage.clear());
@@ -26,12 +30,17 @@ describe("in-app feedback", () => {
     expect(pending()).toBe(2);
     const post = ok();
     expect(await flushFeedback(post)).toBe(0);
-    const bodies = (post as unknown as { mock: { calls: [string, RequestInit][] } }).mock.calls.map((c) => JSON.parse(c[1].body as string).message);
+    const bodies = (post as unknown as { mock: { calls: [string, RequestInit][] } }).mock.calls.map(
+      (c) => JSON.parse(c[1].body as string).message,
+    );
     expect(bodies).toEqual(["Dark plates", "Crash"]);
   });
 
   it("keeps a report when the server isn't ready or isn't there, and drops one it rejects", async () => {
-    await sendFeedback(buildFeedback({ kind: "bug", message: "a", includeDiag: false }), vi.fn(async () => new Response("{}", { status: 503 })) as unknown as typeof fetch);
+    await sendFeedback(
+      buildFeedback({ kind: "bug", message: "a", includeDiag: false }),
+      vi.fn(async () => new Response("{}", { status: 503 })) as unknown as typeof fetch,
+    );
     expect(pending()).toBe(1);
     await flushFeedback(vi.fn(async () => new Response("", { status: 404 })) as unknown as typeof fetch);
     expect(pending()).toBe(1);

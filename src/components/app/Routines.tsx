@@ -1,12 +1,15 @@
 "use client";
-import { available, EXERCISES, exercise } from "@/lib/exercises";
+
+import { useMemo, useState } from "react";
+
+import { available, exercise, EXERCISES } from "@/lib/exercises";
 import { currentTag, t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { MAX_ITEMS, moveItem, NAME_MAX, routineFrom } from "@/lib/routines";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
 import { MUSCLE_LABEL, type Routine, type RoutineItem } from "@/lib/types";
-import { useMemo, useState } from "react";
+
 import { Icon } from "./icons";
 import { Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
@@ -40,7 +43,15 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
             saveRoutine(r);
             setEditing(null);
           }}
-          onDelete={routines.some((r) => r.id === editing.id) ? () => { haptic("warning"); deleteRoutine(editing.id); setEditing(null); } : undefined}
+          onDelete={
+            routines.some((r) => r.id === editing.id)
+              ? () => {
+                  haptic("warning");
+                  deleteRoutine(editing.id);
+                  setEditing(null);
+                }
+              : undefined
+          }
           onCancel={() => setEditing(null)}
         />
       </Sheet>
@@ -49,20 +60,52 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
   return (
     <Sheet open={open} onClose={close} title={t("rt.title")}>
       {routineId && (
-        <Button kind="ghost" icon="sparkle" className="mb-3 w-full" onClick={() => { haptic("tick"); pickRoutine(null); close(); }}>{t("rt.backAdaptive")}</Button>
+        <Button
+          kind="ghost"
+          icon="sparkle"
+          className="mb-3 w-full"
+          onClick={() => {
+            haptic("tick");
+            pickRoutine(null);
+            close();
+          }}
+        >
+          {t("rt.backAdaptive")}
+        </Button>
       )}
       {routines.length ? (
         <ul className="space-y-2">
           {routines.map((r) => {
             const on = r.id === routineId;
             return (
-              <li key={r.id} className={`flex items-center gap-2 rounded-2xl border p-3 ${on ? "border-accent/50 bg-accent/10" : "border-line bg-raised"}`}>
+              <li
+                key={r.id}
+                className={`flex items-center gap-2 rounded-2xl border p-3 ${on ? "border-accent/50 bg-accent/10" : "border-line bg-raised"}`}
+              >
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-semibold">{r.name}</div>
                   <div className="num text-sm text-muted">{summary(r)}</div>
                 </div>
-                <button type="button" onClick={() => setEditing(r)} aria-label={t("rt.editName", { name: r.name })} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line text-muted hover:text-ink"><Icon name="settings" size={18} /></button>
-                <button type="button" aria-pressed={on} onClick={() => { haptic("tap"); pickRoutine(on ? null : r.id); close(); }} className={`press min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ${on ? "bg-accent/20 text-accent" : "border border-accent/50 text-accent"}`}>{on ? t("rt.inUse") : t("rt.useToday")}</button>
+                <button
+                  type="button"
+                  onClick={() => setEditing(r)}
+                  aria-label={t("rt.editName", { name: r.name })}
+                  className="press grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line text-muted hover:text-ink"
+                >
+                  <Icon name="settings" size={18} />
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => {
+                    haptic("tap");
+                    pickRoutine(on ? null : r.id);
+                    close();
+                  }}
+                  className={`press min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold ${on ? "bg-accent/20 text-accent" : "border border-accent/50 text-accent"}`}
+                >
+                  {on ? t("rt.inUse") : t("rt.useToday")}
+                </button>
               </li>
             );
           })}
@@ -72,9 +115,26 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
       )}
       <div className="mt-4 grid gap-2">
         {preview && preview.items.length > 0 && (
-          <Button kind="ghost" icon="plus" className="w-full" onClick={() => setEditing(routineFrom(preview.items, t("rt.todaysPlan"), newId(), Date.now()))}>{t("rt.saveToday")}</Button>
+          <Button
+            kind="ghost"
+            icon="plus"
+            className="w-full"
+            onClick={() => setEditing(routineFrom(preview.items, t("rt.todaysPlan"), newId(), Date.now()))}
+          >
+            {t("rt.saveToday")}
+          </Button>
         )}
-        <Button kind="quiet" icon="plus" className="w-full" onClick={() => { const at = Date.now(); setEditing({ id: newId(), name: "", items: [], createdAt: at, updatedAt: at }); }}>{t("rt.build")}</Button>
+        <Button
+          kind="quiet"
+          icon="plus"
+          className="w-full"
+          onClick={() => {
+            const at = Date.now();
+            setEditing({ id: newId(), name: "", items: [], createdAt: at, updatedAt: at });
+          }}
+        >
+          {t("rt.build")}
+        </Button>
       </div>
     </Sheet>
   );
@@ -88,7 +148,13 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
   if (!items.length) return null;
   return (
     <>
-      <Button kind="quiet" icon={saved ? "check" : "layers"} className="mt-3 w-full" disabled={saved} onClick={() => setEditing({ ...routineFrom(items, "", newId(), Date.now()), name: "" })}>
+      <Button
+        kind="quiet"
+        icon={saved ? "check" : "layers"}
+        className="mt-3 w-full"
+        disabled={saved}
+        onClick={() => setEditing({ ...routineFrom(items, "", newId(), Date.now()), name: "" })}
+      >
         {saved ? t("rt.saved") : t("rt.saveAs")}
       </Button>
       <Sheet open={!!editing} onClose={() => setEditing(null)} title={t("rt.saveAs")}>
@@ -109,7 +175,17 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
   );
 }
 
-function RoutineEditor({ initial, onSave, onDelete, onCancel }: { initial: Routine; onSave: (r: Routine) => void; onDelete?: () => void; onCancel: () => void }) {
+function RoutineEditor({
+  initial,
+  onSave,
+  onDelete,
+  onCancel,
+}: {
+  initial: Routine;
+  onSave: (r: Routine) => void;
+  onDelete?: () => void;
+  onCancel: () => void;
+}) {
   const { gyms, profile } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const [name, setName] = useState(initial.name);
@@ -131,8 +207,17 @@ function RoutineEditor({ initial, onSave, onDelete, onCancel }: { initial: Routi
   };
   return (
     <div>
-      <label className="block text-sm font-medium" htmlFor="routine-name">{t("rt.name")}</label>
-      <input id="routine-name" value={name} maxLength={NAME_MAX} onChange={(e) => setName(e.target.value)} placeholder={t("rt.namePlaceholder")} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent" />
+      <label className="block text-sm font-medium" htmlFor="routine-name">
+        {t("rt.name")}
+      </label>
+      <input
+        id="routine-name"
+        value={name}
+        maxLength={NAME_MAX}
+        onChange={(e) => setName(e.target.value)}
+        placeholder={t("rt.namePlaceholder")}
+        className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      />
       {items.length > 0 && (
         <ol className="mt-4 divide-y divide-line/70 overflow-hidden rounded-2xl border border-line">
           {items.map((it, i) => {
@@ -141,7 +226,12 @@ function RoutineEditor({ initial, onSave, onDelete, onCancel }: { initial: Routi
               <li key={`${it.exerciseId}-${i}`} className={`px-3 py-2 ${it.group ? "bg-accent/5" : ""}`}>
                 <div className="flex items-center gap-2">
                   {i > 0 ? (
-                    <LinkToggle on={linkedToNext(items, i - 1)} first={exercise(items[i - 1].exerciseId).name} second={ex.name} onToggle={() => setItems(toggleLink(items, i - 1))} />
+                    <LinkToggle
+                      on={linkedToNext(items, i - 1)}
+                      first={exercise(items[i - 1].exerciseId).name}
+                      second={ex.name}
+                      onToggle={() => setItems(toggleLink(items, i - 1))}
+                    />
                   ) : (
                     <span className="w-11 shrink-0" aria-hidden />
                   )}
@@ -149,19 +239,80 @@ function RoutineEditor({ initial, onSave, onDelete, onCancel }: { initial: Routi
                     <div className="truncate font-medium">{ex.name}</div>
                     <div className="text-xs text-muted">{ex.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}</div>
                   </div>
-                  <button type="button" onClick={() => remove(i)} aria-label={t("rt.remove", { name: ex.name })} className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:text-bad">
-                    <svg width="18" height="18" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2} strokeLinecap="round" aria-hidden><path d="M6 6l12 12M18 6 6 18" /></svg>
+                  <button
+                    type="button"
+                    onClick={() => remove(i)}
+                    aria-label={t("rt.remove", { name: ex.name })}
+                    className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:text-bad"
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2.2}
+                      strokeLinecap="round"
+                      aria-hidden
+                    >
+                      <path d="M6 6l12 12M18 6 6 18" />
+                    </svg>
                   </button>
                 </div>
                 <div className="mt-1 flex items-center justify-between pl-[52px]">
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => setSets(i, -1)} aria-label={t("rt.fewer", { name: ex.name })} className="press grid h-11 w-11 place-items-center rounded-full border border-line"><svg width="16" height="16" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden><path d="M5 12h14" /></svg></button>
+                    <button
+                      type="button"
+                      onClick={() => setSets(i, -1)}
+                      aria-label={t("rt.fewer", { name: ex.name })}
+                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
+                    >
+                      <svg
+                        width="16"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.6}
+                        strokeLinecap="round"
+                        aria-hidden
+                      >
+                        <path d="M5 12h14" />
+                      </svg>
+                    </button>
                     <span className="num w-16 text-center text-sm font-semibold">{t("rt.sets", { count: it.sets })}</span>
-                    <button type="button" onClick={() => setSets(i, 1)} aria-label={t("rt.more", { name: ex.name })} className="press grid h-11 w-11 place-items-center rounded-full border border-line"><Icon name="plus" size={16} strokeWidth={2.6} /></button>
+                    <button
+                      type="button"
+                      onClick={() => setSets(i, 1)}
+                      aria-label={t("rt.more", { name: ex.name })}
+                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
+                    >
+                      <Icon name="plus" size={16} strokeWidth={2.6} />
+                    </button>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button type="button" disabled={i === 0} onClick={() => { tick(); setItems(moveItem(items, i, -1)); }} aria-label={t("rt.up", { name: ex.name })} className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"><Icon name="chevronLeft" size={18} className="rotate-90" /></button>
-                    <button type="button" disabled={i === items.length - 1} onClick={() => { tick(); setItems(moveItem(items, i, 1)); }} aria-label={t("rt.down", { name: ex.name })} className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"><Icon name="chevronRight" size={18} className="rotate-90" /></button>
+                    <button
+                      type="button"
+                      disabled={i === 0}
+                      onClick={() => {
+                        tick();
+                        setItems(moveItem(items, i, -1));
+                      }}
+                      aria-label={t("rt.up", { name: ex.name })}
+                      className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
+                    >
+                      <Icon name="chevronLeft" size={18} className="rotate-90" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={i === items.length - 1}
+                      onClick={() => {
+                        tick();
+                        setItems(moveItem(items, i, 1));
+                      }}
+                      aria-label={t("rt.down", { name: ex.name })}
+                      className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
+                    >
+                      <Icon name="chevronRight" size={18} className="rotate-90" />
+                    </button>
                   </div>
                 </div>
               </li>
@@ -169,17 +320,34 @@ function RoutineEditor({ initial, onSave, onDelete, onCancel }: { initial: Routi
           })}
         </ol>
       )}
-      {items.length < MAX_ITEMS && (
-        adding ? (
-          <ExercisePicker gymEquipment={gym?.equipment ?? []} skip={items.map((i) => i.exerciseId)} onPick={(id) => { tick(); setItems([...items, { exerciseId: id, sets: 3 }]); setAdding(false); }} />
+      {items.length < MAX_ITEMS &&
+        (adding ? (
+          <ExercisePicker
+            gymEquipment={gym?.equipment ?? []}
+            skip={items.map((i) => i.exerciseId)}
+            onPick={(id) => {
+              tick();
+              setItems([...items, { exerciseId: id, sets: 3 }]);
+              setAdding(false);
+            }}
+          />
         ) : (
-          <Button kind="quiet" icon="plus" className="mt-3 w-full" onClick={() => setAdding(true)}>{t("rt.add")}</Button>
-        )
-      )}
+          <Button kind="quiet" icon="plus" className="mt-3 w-full" onClick={() => setAdding(true)}>
+            {t("rt.add")}
+          </Button>
+        ))}
       <div className="mt-5 grid gap-2">
-        <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>{t("rt.save")}</Button>
-        {onDelete && <Button kind="danger" className="w-full" onClick={onDelete}>{t("rt.delete")}</Button>}
-        <Button kind="quiet" className="w-full" onClick={onCancel}>{t("rt.cancel")}</Button>
+        <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>
+          {t("rt.save")}
+        </Button>
+        {onDelete && (
+          <Button kind="danger" className="w-full" onClick={onDelete}>
+            {t("rt.delete")}
+          </Button>
+        )}
+        <Button kind="quiet" className="w-full" onClick={onCancel}>
+          {t("rt.cancel")}
+        </Button>
       </div>
     </div>
   );
@@ -189,21 +357,42 @@ function ExercisePicker({ gymEquipment, skip, onPick }: { gymEquipment: readonly
   const [q, setQ] = useState("");
   const can = useMemo(() => new Set(available(gymEquipment).map((e) => e.id)), [gymEquipment]);
   const words = q.toLocaleLowerCase(currentTag()).split(/\s+/).filter(Boolean);
-  const list = EXERCISES.filter((e) => !skip.includes(e.id) && words.every((w) => e.name.toLowerCase().includes(w) || e.primary.some((m) => MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()).includes(w))))
+  const list = EXERCISES.filter(
+    (e) =>
+      !skip.includes(e.id) &&
+      words.every(
+        (w) => e.name.toLowerCase().includes(w) || e.primary.some((m) => MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()).includes(w)),
+      ),
+  )
     // What this gym can do first.
     .sort((a, b) => Number(can.has(b.id)) - Number(can.has(a.id)) || a.name.localeCompare(b.name))
     .slice(0, 12);
   return (
     <div className="mt-4 rounded-2xl border border-line p-3">
-      <label className="block text-sm font-medium" htmlFor="routine-search">{t("rt.add")}</label>
-      <input id="routine-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("rt.search")} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent" />
+      <label className="block text-sm font-medium" htmlFor="routine-search">
+        {t("rt.add")}
+      </label>
+      <input
+        id="routine-search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder={t("rt.search")}
+        className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      />
       <ul className="mt-2 divide-y divide-line/70">
         {list.map((e) => (
           <li key={e.id}>
-            <button type="button" onClick={() => onPick(e.id)} className="press flex min-h-11 w-full items-center justify-between gap-3 py-2 text-left">
+            <button
+              type="button"
+              onClick={() => onPick(e.id)}
+              className="press flex min-h-11 w-full items-center justify-between gap-3 py-2 text-left"
+            >
               <span className="min-w-0">
                 <span className="block truncate font-medium">{e.name}</span>
-                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{can.has(e.id) ? "" : ` · ${t("rt.notHere")}`}</span>
+                <span className="text-sm text-muted">
+                  {e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}
+                  {can.has(e.id) ? "" : ` · ${t("rt.notHere")}`}
+                </span>
               </span>
               <Icon name="plus" size={18} className="text-accent" />
             </button>

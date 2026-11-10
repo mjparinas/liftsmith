@@ -16,7 +16,18 @@ export const nextId = (prefix = "e") => `${prefix}${++n}`;
 /** One working set: 60 kg × 8 on the bench at `NOW`, hit as planned at 2 reps in reserve. */
 export function makeSet(over: Partial<SetEvent> = {}): SetEvent {
   const reps = over.reps ?? 8;
-  return { type: "set", id: nextId("set"), at: NOW, sessionId: "s1", exerciseId: "bench-press", weight: 60, reps, targetReps: reps, rir: 2, ...over };
+  return {
+    type: "set",
+    id: nextId("set"),
+    at: NOW,
+    sessionId: "s1",
+    exerciseId: "bench-press",
+    weight: 60,
+    reps,
+    targetReps: reps,
+    rir: 2,
+    ...over,
+  };
 }
 
 /** `count` sets of the same exercise a minute apart, starting at `over.at`. */
@@ -36,7 +47,11 @@ export function makeSessionEnd(over: Partial<SessionEndEvent> = {}): SessionEndE
 /** A whole workout: start, `sets`, end. The sets take the session's id and are spread a minute apart. */
 export function makeWorkout(sessionId: string, at: number, sets: Partial<SetEvent>[]) {
   const logged = sets.map((s, i) => makeSet({ ...s, sessionId, at: at + (i + 1) * 60_000 }));
-  return [makeSessionStart({ sessionId, at }), ...logged, makeSessionEnd({ sessionId, at: at + (sets.length + 1) * 60_000, seconds: (sets.length + 1) * 60 })];
+  return [
+    makeSessionStart({ sessionId, at }),
+    ...logged,
+    makeSessionEnd({ sessionId, at: at + (sets.length + 1) * 60_000, seconds: (sets.length + 1) * 60 }),
+  ];
 }
 
 /** The profile a new install starts with, onboarded, plus overrides. */

@@ -5,155 +5,227 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "gloss.fitnessAge.title": "Fitness age",
-  "gloss.fitnessAge.body": "The age at which a typical healthy person of your sex has your VO₂ max, from a large Norwegian study of healthy adults.\nIt's a fitness estimate, not a health check. Hard cardio lowers it within weeks.",
+  "gloss.fitnessAge.body":
+    "The age at which a typical healthy person of your sex has your VO₂ max, from a large Norwegian study of healthy adults.\nIt's a fitness estimate, not a health check. Hard cardio lowers it within weeks.",
   "gloss.deloadWeeks.title": "Build weeks before a deload",
-  "gloss.deloadWeeks.body": "Your training runs in blocks. During the build weeks the plan gets a little harder each week: more sets and fewer reps left in the tank.\nThen comes one deload week: lighter, about half the sets. It lets your joints and nerves catch up, so you come back stronger. Pick fewer build weeks if you're new or busy, more if you recover well.",
+  "gloss.deloadWeeks.body":
+    "Your training runs in blocks. During the build weeks the plan gets a little harder each week: more sets and fewer reps left in the tank.\nThen comes one deload week: lighter, about half the sets. It lets your joints and nerves catch up, so you come back stronger. Pick fewer build weeks if you're new or busy, more if you recover well.",
   "gloss.deload.title": "Deload week",
-  "gloss.deload.body": "An easier week after a block of hard training: lighter weights and about half the sets. It isn't lost progress. It's when your body absorbs the work, so the next block starts stronger.",
+  "gloss.deload.body":
+    "An easier week after a block of hard training: lighter weights and about half the sets. It isn't lost progress. It's when your body absorbs the work, so the next block starts stronger.",
   "gloss.rir.title": "RIR: reps in reserve",
-  "gloss.rir.body": "How many more reps you could have done when you stop the set. RIR 2 means you finish the set feeling you had about two more good reps in you.\nThe plan starts with more in the tank and moves closer to failure across the block.",
+  "gloss.rir.body":
+    "How many more reps you could have done when you stop the set. RIR 2 means you finish the set feeling you had about two more good reps in you.\nThe plan starts with more in the tank and moves closer to failure across the block.",
   "gloss.rpe.title": "RPE: rate of perceived exertion",
-  "gloss.rpe.body": "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.\nPick this scale or reps in reserve in Settings › Workout preferences. The plan works the same either way.",
+  "gloss.rpe.body":
+    "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.\nPick this scale or reps in reserve in Settings › Workout preferences. The plan works the same either way.",
   "gloss.blockWeek.title": "Training block",
-  "gloss.blockWeek.body": "Where you are in your block: which build week (or the deload), and how many reps to leave in the tank this week. You can change the block length in Settings.",
+  "gloss.blockWeek.body":
+    "Where you are in your block: which build week (or the deload), and how many reps to leave in the tank this week. You can change the block length in Settings.",
   "gloss.readiness.title": "Readiness",
-  "gloss.readiness.body": "A score from 0 to 100, with 50 as a normal day. It comes from how recovered your big muscles are, how recent workouts went (reps hit, how sets felt, rep speed and heart rate), and rest days.\n65 or more is a push day, 35 or less is an easy day. You can always overrule it.",
+  "gloss.readiness.body":
+    "A score from 0 to 100, with 50 as a normal day. It comes from how recovered your big muscles are, how recent workouts went (reps hit, how sets felt, rep speed and heart rate), and rest days.\n65 or more is a push day, 35 or less is an easy day. You can always overrule it.",
   "gloss.call.title": "Today's call",
-  "gloss.call.body": "Push: your first big lift goes one rep closer to failure. As planned: the normal plan. Go easy: a set fewer, a step lighter and one more rep in reserve. Your choice is saved.",
+  "gloss.call.body":
+    "Push: your first big lift goes one rep closer to failure. As planned: the normal plan. Go easy: a set fewer, a step lighter and one more rep in reserve. Your choice is saved.",
   "gloss.volume.title": "Volume",
-  "gloss.volume.body": "Weight × reps, added up over every working set. It's a rough measure of how much total work you did. Warm-ups aren't counted.",
+  "gloss.volume.body":
+    "Weight × reps, added up over every working set. It's a rough measure of how much total work you did. Warm-ups aren't counted.",
   "gloss.e1rm.title": "Estimated one-rep max",
-  "gloss.e1rm.body": "The most you could probably lift once, worked out from your sets with the reps you had left added. It uses the formulas research found most accurate for each rep range (Brzycki and Epley up to 10 reps to failure, Mayhew and Wathan above), each averaged with a 2026 weight-based equation fitted on over 300,000 sets. Recent, heavy, close-to-failure sets count most and sets past 20 reps are ignored. It lets you compare a set of 5 with a set of 8, so you can see real strength trends without testing a true max.",
+  "gloss.e1rm.body":
+    "The most you could probably lift once, worked out from your sets with the reps you had left added. It uses the formulas research found most accurate for each rep range (Brzycki and Epley up to 10 reps to failure, Mayhew and Wathan above), each averaged with a 2026 weight-based equation fitted on over 300,000 sets. Recent, heavy, close-to-failure sets count most and sets past 20 reps are ignored. It lets you compare a set of 5 with a set of 8, so you can see real strength trends without testing a true max.",
   "gloss.weeklySets.title": "Sets per muscle this week",
-  "gloss.weeklySets.body": "Hard sets that worked each muscle this week. Secondary muscles count as half a set. The green band, 10 to 20, is the range most research supports for growth. The plan aims at the muscles furthest below it.",
+  "gloss.weeklySets.body":
+    "Hard sets that worked each muscle this week. Secondary muscles count as half a set. The green band, 10 to 20, is the range most research supports for growth. The plan aims at the muscles furthest below it.",
   "gloss.variety.title": "Exercise variety",
-  "gloss.variety.body": "How often the plan keeps the same exercise for a muscle. More consistent is better for tracking progress on a lift. More variety keeps things fresh and spreads the stress.",
+  "gloss.variety.body":
+    "How often the plan keeps the same exercise for a muscle. More consistent is better for tracking progress on a lift. More variety keeps things fresh and spreads the stress.",
   "gloss.recovery.title": "Recovery",
-  "gloss.recovery.body": "Each set tires the muscles it works. That fatigue fades over 2 to 3 days. Fresh is 90% or more, Ready 70%, Recovering 40%, and Fatigued is below 40%. The plan avoids muscles that are still fatigued.",
+  "gloss.recovery.body":
+    "Each set tires the muscles it works. That fatigue fades over 2 to 3 days. Fresh is 90% or more, Ready 70%, Recovering 40%, and Fatigued is below 40%. The plan avoids muscles that are still fatigued.",
   "gloss.superset.title": "Superset",
-  "gloss.superset.body": "Two or more exercises done back to back: one set of the first, then straight to one set of the next, then the rest. It saves time, and works best for exercises that don't tire the same muscles, like a row with a press.\nTap the link between two exercises to pair them, and again to split them.",
+  "gloss.superset.body":
+    "Two or more exercises done back to back: one set of the first, then straight to one set of the next, then the rest. It saves time, and works best for exercises that don't tire the same muscles, like a row with a press.\nTap the link between two exercises to pair them, and again to split them.",
   "gloss.warmup.title": "Warm-up sets",
-  "gloss.warmup.body": "Lighter sets that build up to your working weight. They aren't counted in your stats or progress. Skip them if you're already warm.",
+  "gloss.warmup.body":
+    "Lighter sets that build up to your working weight. They aren't counted in your stats or progress. Skip them if you're already warm.",
   "gloss.firstWeights.title": "Why we ask",
-  "gloss.firstWeights.body": "Only to suggest a safe first weight for each lift. We start on the light side and adjust after your first session. It stays on your phone.",
+  "gloss.firstWeights.body":
+    "Only to suggest a safe first weight for each lift. We start on the light side and adjust after your first session. It stays on your phone.",
   "gloss.healthTwin.title": "Health",
-  "gloss.healthTwin.body": "Your body's numbers in one place: weight, body fat, energy, sleep, heart and steps, from Liftsmith and your phone's health app.\nEach one is compared with your own normal over the last 30 days, never with other people, and says what to do about it. It isn't medical advice.",
+  "gloss.healthTwin.body":
+    "Your body's numbers in one place: weight, body fat, energy, sleep, heart and steps, from Liftsmith and your phone's health app.\nEach one is compared with your own normal over the last 30 days, never with other people, and says what to do about it. It isn't medical advice.",
   "gloss.hrv.title": "HRV: heart rate variability",
-  "gloss.hrv.body": "The tiny changes in time between heartbeats, measured by a watch or ring, mostly overnight. Higher than your own normal usually means you've recovered; lower means stress from training, poor sleep or illness.\nOnly your own trend matters: phones and watches measure it differently, so don't compare your number with anyone else's.",
+  "gloss.hrv.body":
+    "The tiny changes in time between heartbeats, measured by a watch or ring, mostly overnight. Higher than your own normal usually means you've recovered; lower means stress from training, poor sleep or illness.\nOnly your own trend matters: phones and watches measure it differently, so don't compare your number with anyone else's.",
   "gloss.restingHr.title": "Resting heart rate",
-  "gloss.restingHr.body": "Your heart rate when you're fully at rest, usually measured while you sleep. A few beats over your own normal for a day or two is an early sign to take it easier.",
+  "gloss.restingHr.body":
+    "Your heart rate when you're fully at rest, usually measured while you sleep. A few beats over your own normal for a day or two is an early sign to take it easier.",
   "gloss.breathingRate.title": "Breathing rate",
-  "gloss.breathingRate.body": "Breaths a minute while you sleep, from a watch or ring. It stays very steady, so a jump of two or more over your normal is often one of the first signs of getting ill.",
+  "gloss.breathingRate.body":
+    "Breaths a minute while you sleep, from a watch or ring. It stays very steady, so a jump of two or more over your normal is often one of the first signs of getting ill.",
   "gloss.vo2max.title": "VO₂ max",
-  "gloss.vo2max.body": "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.\nLifting barely moves it. Two 20-minute hard cardio sessions a week do.",
+  "gloss.vo2max.body":
+    "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.\nLifting barely moves it. Two 20-minute hard cardio sessions a week do.",
   "gloss.leanMass.title": "Lean mass",
-  "gloss.leanMass.body": "Everything in your body that isn't fat: muscle, bone, organs and water. Your weight times the share that isn't fat. Lean mass rising while body fat holds or falls means training is building muscle.",
+  "gloss.leanMass.body":
+    "Everything in your body that isn't fat: muscle, bone, organs and water. Your weight times the share that isn't fat. Lean mass rising while body fat holds or falls means training is building muscle.",
   "gloss.bmi.title": "BMI: body mass index",
-  "gloss.bmi.body": "Weight divided by height squared. It's a rough guide for people who don't lift: it can't tell muscle from fat, so muscular lifters often read as overweight. When you have a body fat reading, trust that instead.",
+  "gloss.bmi.body":
+    "Weight divided by height squared. It's a rough guide for people who don't lift: it can't tell muscle from fat, so muscular lifters often read as overweight. When you have a body fat reading, trust that instead.",
   "gloss.restDrop.title": "Heart rate drop in rest",
-  "gloss.restDrop.body": "How many beats a minute your heart rate falls in the first minute after a set, from your heart rate monitor. A bigger drop over the months means a fitter heart; a smaller one than usual can mean you're tired.",
+  "gloss.restDrop.body":
+    "How many beats a minute your heart rate falls in the first minute after a set, from your heart rate monitor. A bigger drop over the months means a fitter heart; a smaller one than usual can mean you're tired.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "gloss.fitnessAge.title": "Edad física",
-  "gloss.fitnessAge.body": "La edad a la que una persona sana típica de tu sexo tiene tu VO₂ máx, según un gran estudio noruego con adultos sanos.\nEs una estimación de forma física, no un chequeo de salud. El cardio intenso la baja en semanas.",
+  "gloss.fitnessAge.body":
+    "La edad a la que una persona sana típica de tu sexo tiene tu VO₂ máx, según un gran estudio noruego con adultos sanos.\nEs una estimación de forma física, no un chequeo de salud. El cardio intenso la baja en semanas.",
   "gloss.deloadWeeks.title": "Semanas de carga antes de una descarga",
-  "gloss.deloadWeeks.body": "Tu entrenamiento va por bloques. Durante las semanas de carga el plan se vuelve un poco más duro cada semana: más series y menos repeticiones en reserva.\nLuego llega una semana de descarga: más ligera, con la mitad de series aproximadamente. Deja que articulaciones y sistema nervioso se pongan al día, para que vuelvas más fuerte. Elige menos semanas de carga si eres nuevo o vas con poco tiempo, y más si te recuperas bien.",
+  "gloss.deloadWeeks.body":
+    "Tu entrenamiento va por bloques. Durante las semanas de carga el plan se vuelve un poco más duro cada semana: más series y menos repeticiones en reserva.\nLuego llega una semana de descarga: más ligera, con la mitad de series aproximadamente. Deja que articulaciones y sistema nervioso se pongan al día, para que vuelvas más fuerte. Elige menos semanas de carga si eres nuevo o vas con poco tiempo, y más si te recuperas bien.",
   "gloss.deload.title": "Semana de descarga",
-  "gloss.deload.body": "Una semana más fácil tras un bloque de entrenamiento duro: pesos más ligeros y la mitad de series aproximadamente. No es progreso perdido. Es cuando tu cuerpo asimila el trabajo, para que el siguiente bloque empiece más fuerte.",
+  "gloss.deload.body":
+    "Una semana más fácil tras un bloque de entrenamiento duro: pesos más ligeros y la mitad de series aproximadamente. No es progreso perdido. Es cuando tu cuerpo asimila el trabajo, para que el siguiente bloque empiece más fuerte.",
   "gloss.rir.title": "RIR: repeticiones en reserva",
-  "gloss.rir.body": "Cuántas repeticiones más podrías haber hecho al terminar la serie. RIR 2 significa que acabas la serie sintiendo que te quedaban unas dos buenas repeticiones.\nEl plan empieza con más reserva y se acerca al fallo a lo largo del bloque.",
+  "gloss.rir.body":
+    "Cuántas repeticiones más podrías haber hecho al terminar la serie. RIR 2 significa que acabas la serie sintiendo que te quedaban unas dos buenas repeticiones.\nEl plan empieza con más reserva y se acerca al fallo a lo largo del bloque.",
   "gloss.rpe.title": "RPE: esfuerzo percibido",
-  "gloss.rpe.body": "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.\nElige esta escala o las repeticiones en reserva en Ajustes › Preferencias de entrenamiento. El plan funciona igual con ambas.",
+  "gloss.rpe.body":
+    "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.\nElige esta escala o las repeticiones en reserva en Ajustes › Preferencias de entrenamiento. El plan funciona igual con ambas.",
   "gloss.blockWeek.title": "Bloque de entrenamiento",
-  "gloss.blockWeek.body": "En qué punto del bloque estás: qué semana de carga (o la descarga) y cuántas repeticiones dejar en reserva esta semana. Puedes cambiar la duración del bloque en Ajustes.",
+  "gloss.blockWeek.body":
+    "En qué punto del bloque estás: qué semana de carga (o la descarga) y cuántas repeticiones dejar en reserva esta semana. Puedes cambiar la duración del bloque en Ajustes.",
   "gloss.readiness.title": "Preparación",
-  "gloss.readiness.body": "Una puntuación de 0 a 100, donde 50 es un día normal. Sale de lo recuperados que están tus músculos grandes, cómo fueron los últimos entrenamientos (repeticiones logradas, sensaciones, velocidad de las repeticiones y frecuencia cardiaca) y los días de descanso.\n65 o más es un día para apretar; 35 o menos, un día suave. Siempre puedes decidir tú.",
+  "gloss.readiness.body":
+    "Una puntuación de 0 a 100, donde 50 es un día normal. Sale de lo recuperados que están tus músculos grandes, cómo fueron los últimos entrenamientos (repeticiones logradas, sensaciones, velocidad de las repeticiones y frecuencia cardiaca) y los días de descanso.\n65 o más es un día para apretar; 35 o menos, un día suave. Siempre puedes decidir tú.",
   "gloss.call.title": "La decisión de hoy",
-  "gloss.call.body": "Apretar: tu primer ejercicio grande va una repetición más cerca del fallo. Según el plan: el plan normal. Suave: una serie menos, un escalón más ligero y una repetición más en reserva. Tu elección se guarda.",
+  "gloss.call.body":
+    "Apretar: tu primer ejercicio grande va una repetición más cerca del fallo. Según el plan: el plan normal. Suave: una serie menos, un escalón más ligero y una repetición más en reserva. Tu elección se guarda.",
   "gloss.volume.title": "Volumen",
-  "gloss.volume.body": "Peso × repeticiones, sumado en todas las series de trabajo. Es una medida aproximada del trabajo total que hiciste. Las series de calentamiento no cuentan.",
+  "gloss.volume.body":
+    "Peso × repeticiones, sumado en todas las series de trabajo. Es una medida aproximada del trabajo total que hiciste. Las series de calentamiento no cuentan.",
   "gloss.e1rm.title": "1RM estimado",
-  "gloss.e1rm.body": "Lo máximo que probablemente podrías levantar una vez, calculado a partir de tus series sumando las repeticiones que te quedaban. Usa las fórmulas que la investigación encontró más precisas para cada rango de repeticiones (Brzycki y Epley hasta 10 repeticiones al fallo, Mayhew y Wathan por encima), cada una promediada con una ecuación de 2026 basada en el peso y ajustada con más de 300.000 series. Las series recientes, pesadas y cercanas al fallo cuentan más, y las de más de 20 repeticiones se ignoran. Permite comparar una serie de 5 con una de 8, para ver tu tendencia de fuerza real sin probar un máximo.",
+  "gloss.e1rm.body":
+    "Lo máximo que probablemente podrías levantar una vez, calculado a partir de tus series sumando las repeticiones que te quedaban. Usa las fórmulas que la investigación encontró más precisas para cada rango de repeticiones (Brzycki y Epley hasta 10 repeticiones al fallo, Mayhew y Wathan por encima), cada una promediada con una ecuación de 2026 basada en el peso y ajustada con más de 300.000 series. Las series recientes, pesadas y cercanas al fallo cuentan más, y las de más de 20 repeticiones se ignoran. Permite comparar una serie de 5 con una de 8, para ver tu tendencia de fuerza real sin probar un máximo.",
   "gloss.weeklySets.title": "Series por músculo esta semana",
-  "gloss.weeklySets.body": "Series duras que trabajaron cada músculo esta semana. Los músculos secundarios cuentan como media serie. La franja verde, de 10 a 20, es el rango que más respalda la investigación para ganar músculo. El plan se centra en los músculos más alejados de ella.",
+  "gloss.weeklySets.body":
+    "Series duras que trabajaron cada músculo esta semana. Los músculos secundarios cuentan como media serie. La franja verde, de 10 a 20, es el rango que más respalda la investigación para ganar músculo. El plan se centra en los músculos más alejados de ella.",
   "gloss.variety.title": "Variedad de ejercicios",
-  "gloss.variety.body": "Con qué frecuencia el plan mantiene el mismo ejercicio para un músculo. Más constancia ayuda a seguir el progreso de un ejercicio. Más variedad lo mantiene fresco y reparte el estrés.",
+  "gloss.variety.body":
+    "Con qué frecuencia el plan mantiene el mismo ejercicio para un músculo. Más constancia ayuda a seguir el progreso de un ejercicio. Más variedad lo mantiene fresco y reparte el estrés.",
   "gloss.recovery.title": "Recuperación",
-  "gloss.recovery.body": "Cada serie cansa los músculos que trabaja. Esa fatiga desaparece en 2 o 3 días. Fresco es el 90% o más, Listo el 70%, Recuperándose el 40%, y Fatigado está por debajo del 40%. El plan evita los músculos que siguen fatigados.",
+  "gloss.recovery.body":
+    "Cada serie cansa los músculos que trabaja. Esa fatiga desaparece en 2 o 3 días. Fresco es el 90% o más, Listo el 70%, Recuperándose el 40%, y Fatigado está por debajo del 40%. El plan evita los músculos que siguen fatigados.",
   "gloss.superset.title": "Superserie",
-  "gloss.superset.body": "Dos o más ejercicios seguidos: una serie del primero, directamente una serie del siguiente, y luego el descanso. Ahorra tiempo y funciona mejor con ejercicios que no cansan los mismos músculos, como un remo con un press.\nToca el enlace entre dos ejercicios para unirlos, y otra vez para separarlos.",
+  "gloss.superset.body":
+    "Dos o más ejercicios seguidos: una serie del primero, directamente una serie del siguiente, y luego el descanso. Ahorra tiempo y funciona mejor con ejercicios que no cansan los mismos músculos, como un remo con un press.\nToca el enlace entre dos ejercicios para unirlos, y otra vez para separarlos.",
   "gloss.warmup.title": "Series de calentamiento",
-  "gloss.warmup.body": "Series más ligeras que van subiendo hasta tu peso de trabajo. No cuentan en tus estadísticas ni en tu progreso. Sáltalas si ya estás caliente.",
+  "gloss.warmup.body":
+    "Series más ligeras que van subiendo hasta tu peso de trabajo. No cuentan en tus estadísticas ni en tu progreso. Sáltalas si ya estás caliente.",
   "gloss.firstWeights.title": "Por qué lo preguntamos",
-  "gloss.firstWeights.body": "Solo para sugerir un primer peso seguro para cada ejercicio. Empezamos por lo ligero y ajustamos tras tu primera sesión. No sale de tu teléfono.",
+  "gloss.firstWeights.body":
+    "Solo para sugerir un primer peso seguro para cada ejercicio. Empezamos por lo ligero y ajustamos tras tu primera sesión. No sale de tu teléfono.",
   "gloss.healthTwin.title": "Salud",
-  "gloss.healthTwin.body": "Los números de tu cuerpo en un solo lugar: peso, grasa corporal, energía, sueño, corazón y pasos, de Liftsmith y de la app de salud de tu teléfono.\nCada uno se compara con tu propia normalidad de los últimos 30 días, nunca con otras personas, y dice qué hacer al respecto. No es consejo médico.",
+  "gloss.healthTwin.body":
+    "Los números de tu cuerpo en un solo lugar: peso, grasa corporal, energía, sueño, corazón y pasos, de Liftsmith y de la app de salud de tu teléfono.\nCada uno se compara con tu propia normalidad de los últimos 30 días, nunca con otras personas, y dice qué hacer al respecto. No es consejo médico.",
   "gloss.hrv.title": "VFC: variabilidad de la frecuencia cardiaca",
-  "gloss.hrv.body": "Los pequeños cambios en el tiempo entre latidos, medidos por un reloj o un anillo, sobre todo de noche. Más alta que tu normalidad suele indicar que te has recuperado; más baja, estrés por el entrenamiento, mal sueño o enfermedad.\nSolo importa tu propia tendencia: teléfonos y relojes la miden de forma distinta, así que no compares tu número con el de nadie.",
+  "gloss.hrv.body":
+    "Los pequeños cambios en el tiempo entre latidos, medidos por un reloj o un anillo, sobre todo de noche. Más alta que tu normalidad suele indicar que te has recuperado; más baja, estrés por el entrenamiento, mal sueño o enfermedad.\nSolo importa tu propia tendencia: teléfonos y relojes la miden de forma distinta, así que no compares tu número con el de nadie.",
   "gloss.restingHr.title": "Frecuencia cardiaca en reposo",
-  "gloss.restingHr.body": "Tu frecuencia cardiaca en reposo total, normalmente medida mientras duermes. Unas pocas pulsaciones por encima de tu normalidad durante uno o dos días es una señal temprana para tomártelo con más calma.",
+  "gloss.restingHr.body":
+    "Tu frecuencia cardiaca en reposo total, normalmente medida mientras duermes. Unas pocas pulsaciones por encima de tu normalidad durante uno o dos días es una señal temprana para tomártelo con más calma.",
   "gloss.breathingRate.title": "Frecuencia respiratoria",
-  "gloss.breathingRate.body": "Respiraciones por minuto mientras duermes, de un reloj o un anillo. Es muy estable, así que un salto de dos o más sobre tu normalidad suele ser una de las primeras señales de que te estás poniendo enfermo.",
+  "gloss.breathingRate.body":
+    "Respiraciones por minuto mientras duermes, de un reloj o un anillo. Es muy estable, así que un salto de dos o más sobre tu normalidad suele ser una de las primeras señales de que te estás poniendo enfermo.",
   "gloss.vo2max.title": "VO₂ máx",
-  "gloss.vo2max.body": "Cuánto oxígeno puede usar tu cuerpo al máximo esfuerzo, en mililitros por kilo y minuto. Los relojes lo estiman a partir de paseos y carreras. Es la mejor medida única de la forma del corazón.\nLevantar pesas apenas lo mueve. Dos sesiones de cardio intenso de 20 minutos a la semana, sí.",
+  "gloss.vo2max.body":
+    "Cuánto oxígeno puede usar tu cuerpo al máximo esfuerzo, en mililitros por kilo y minuto. Los relojes lo estiman a partir de paseos y carreras. Es la mejor medida única de la forma del corazón.\nLevantar pesas apenas lo mueve. Dos sesiones de cardio intenso de 20 minutos a la semana, sí.",
   "gloss.leanMass.title": "Masa magra",
-  "gloss.leanMass.body": "Todo lo que hay en tu cuerpo que no es grasa: músculo, hueso, órganos y agua. Tu peso por la parte que no es grasa. Si la masa magra sube mientras la grasa se mantiene o baja, el entrenamiento está construyendo músculo.",
+  "gloss.leanMass.body":
+    "Todo lo que hay en tu cuerpo que no es grasa: músculo, hueso, órganos y agua. Tu peso por la parte que no es grasa. Si la masa magra sube mientras la grasa se mantiene o baja, el entrenamiento está construyendo músculo.",
   "gloss.bmi.title": "IMC: índice de masa corporal",
-  "gloss.bmi.body": "El peso dividido por la altura al cuadrado. Es una guía aproximada para quien no entrena con pesas: no distingue músculo de grasa, así que muchos levantadores musculados salen con sobrepeso. Si tienes una medida de grasa corporal, fíate de ella.",
+  "gloss.bmi.body":
+    "El peso dividido por la altura al cuadrado. Es una guía aproximada para quien no entrena con pesas: no distingue músculo de grasa, así que muchos levantadores musculados salen con sobrepeso. Si tienes una medida de grasa corporal, fíate de ella.",
   "gloss.restDrop.title": "Bajada de pulsaciones en el descanso",
-  "gloss.restDrop.body": "Cuántas pulsaciones por minuto baja tu frecuencia cardiaca en el primer minuto tras una serie, según tu pulsómetro. Una bajada mayor con los meses indica un corazón más en forma; una menor de lo habitual puede indicar cansancio.",
+  "gloss.restDrop.body":
+    "Cuántas pulsaciones por minuto baja tu frecuencia cardiaca en el primer minuto tras una serie, según tu pulsómetro. Una bajada mayor con los meses indica un corazón más en forma; una menor de lo habitual puede indicar cansancio.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "gloss.fitnessAge.title": "Âge physique",
-  "gloss.fitnessAge.body": "L’âge auquel une personne en bonne santé typique de votre sexe a votre VO₂ max, d’après une grande étude norvégienne sur des adultes en bonne santé.\nC’est une estimation de la forme physique, pas un bilan de santé. Le cardio intense le fait baisser en quelques semaines.",
+  "gloss.fitnessAge.body":
+    "L’âge auquel une personne en bonne santé typique de votre sexe a votre VO₂ max, d’après une grande étude norvégienne sur des adultes en bonne santé.\nC’est une estimation de la forme physique, pas un bilan de santé. Le cardio intense le fait baisser en quelques semaines.",
   "gloss.deloadWeeks.title": "Semaines de progression avant une décharge",
-  "gloss.deloadWeeks.body": "Votre entraînement est organisé en blocs. Pendant les semaines de progression, le plan devient un peu plus dur chaque semaine : plus de séries et moins de répétitions en réserve.\nVient ensuite une semaine de décharge : plus légère, avec environ la moitié des séries. Elle laisse vos articulations et votre système nerveux récupérer, pour revenir plus fort. Choisissez moins de semaines de progression si vous débutez ou manquez de temps, plus si vous récupérez bien.",
+  "gloss.deloadWeeks.body":
+    "Votre entraînement est organisé en blocs. Pendant les semaines de progression, le plan devient un peu plus dur chaque semaine : plus de séries et moins de répétitions en réserve.\nVient ensuite une semaine de décharge : plus légère, avec environ la moitié des séries. Elle laisse vos articulations et votre système nerveux récupérer, pour revenir plus fort. Choisissez moins de semaines de progression si vous débutez ou manquez de temps, plus si vous récupérez bien.",
   "gloss.deload.title": "Semaine de décharge",
-  "gloss.deload.body": "Une semaine plus facile après un bloc d’entraînement dur : des charges plus légères et environ la moitié des séries. Ce n’est pas du progrès perdu. C’est le moment où votre corps assimile le travail, pour que le bloc suivant commence plus fort.",
+  "gloss.deload.body":
+    "Une semaine plus facile après un bloc d’entraînement dur : des charges plus légères et environ la moitié des séries. Ce n’est pas du progrès perdu. C’est le moment où votre corps assimile le travail, pour que le bloc suivant commence plus fort.",
   "gloss.rir.title": "RIR : répétitions en réserve",
-  "gloss.rir.body": "Combien de répétitions de plus vous auriez pu faire en arrêtant la série. RIR 2 signifie que vous terminez la série en sentant qu’il vous restait environ deux bonnes répétitions.\nLe plan commence avec plus de réserve et se rapproche de l’échec au fil du bloc.",
+  "gloss.rir.body":
+    "Combien de répétitions de plus vous auriez pu faire en arrêtant la série. RIR 2 signifie que vous terminez la série en sentant qu’il vous restait environ deux bonnes répétitions.\nLe plan commence avec plus de réserve et se rapproche de l’échec au fil du bloc.",
   "gloss.rpe.title": "RPE : effort perçu",
-  "gloss.rpe.body": "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.\nChoisissez cette échelle ou les répétitions en réserve dans Réglages › Préférences d’entraînement. Le plan fonctionne de la même façon dans les deux cas.",
+  "gloss.rpe.body":
+    "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.\nChoisissez cette échelle ou les répétitions en réserve dans Réglages › Préférences d’entraînement. Le plan fonctionne de la même façon dans les deux cas.",
   "gloss.blockWeek.title": "Bloc d’entraînement",
-  "gloss.blockWeek.body": "Où vous en êtes dans votre bloc : quelle semaine de progression (ou la décharge), et combien de répétitions garder en réserve cette semaine. Vous pouvez changer la durée du bloc dans Réglages.",
+  "gloss.blockWeek.body":
+    "Où vous en êtes dans votre bloc : quelle semaine de progression (ou la décharge), et combien de répétitions garder en réserve cette semaine. Vous pouvez changer la durée du bloc dans Réglages.",
   "gloss.readiness.title": "Forme du jour",
-  "gloss.readiness.body": "Un score de 0 à 100, où 50 est une journée normale. Il vient de la récupération de vos grands muscles, du déroulé des dernières séances (répétitions réussies, ressenti, vitesse des répétitions et fréquence cardiaque) et des jours de repos.\n65 ou plus, c’est un jour pour pousser ; 35 ou moins, un jour tranquille. Vous pouvez toujours passer outre.",
+  "gloss.readiness.body":
+    "Un score de 0 à 100, où 50 est une journée normale. Il vient de la récupération de vos grands muscles, du déroulé des dernières séances (répétitions réussies, ressenti, vitesse des répétitions et fréquence cardiaque) et des jours de repos.\n65 ou plus, c’est un jour pour pousser ; 35 ou moins, un jour tranquille. Vous pouvez toujours passer outre.",
   "gloss.call.title": "Le choix du jour",
-  "gloss.call.body": "Pousser : votre premier gros exercice va une répétition plus près de l’échec. Comme prévu : le plan normal. Tranquille : une série de moins, un cran plus léger et une répétition de plus en réserve. Votre choix est enregistré.",
+  "gloss.call.body":
+    "Pousser : votre premier gros exercice va une répétition plus près de l’échec. Comme prévu : le plan normal. Tranquille : une série de moins, un cran plus léger et une répétition de plus en réserve. Votre choix est enregistré.",
   "gloss.volume.title": "Volume",
-  "gloss.volume.body": "Charge × répétitions, additionnées sur toutes les séries de travail. C’est une mesure approximative du travail total effectué. Les échauffements ne comptent pas.",
+  "gloss.volume.body":
+    "Charge × répétitions, additionnées sur toutes les séries de travail. C’est une mesure approximative du travail total effectué. Les échauffements ne comptent pas.",
   "gloss.e1rm.title": "1RM estimé",
-  "gloss.e1rm.body": "Le maximum que vous pourriez sans doute soulever une fois, calculé à partir de vos séries en ajoutant les répétitions qu’il vous restait. Il utilise les formules que la recherche a trouvées les plus précises pour chaque fourchette de répétitions (Brzycki et Epley jusqu’à 10 répétitions à l’échec, Mayhew et Wathan au-delà), chacune moyennée avec une équation de 2026 fondée sur la charge et ajustée sur plus de 300 000 séries. Les séries récentes, lourdes et proches de l’échec comptent le plus, et celles de plus de 20 répétitions sont ignorées. Il permet de comparer une série de 5 et une série de 8, pour voir votre vraie tendance de force sans tester un maximum.",
+  "gloss.e1rm.body":
+    "Le maximum que vous pourriez sans doute soulever une fois, calculé à partir de vos séries en ajoutant les répétitions qu’il vous restait. Il utilise les formules que la recherche a trouvées les plus précises pour chaque fourchette de répétitions (Brzycki et Epley jusqu’à 10 répétitions à l’échec, Mayhew et Wathan au-delà), chacune moyennée avec une équation de 2026 fondée sur la charge et ajustée sur plus de 300 000 séries. Les séries récentes, lourdes et proches de l’échec comptent le plus, et celles de plus de 20 répétitions sont ignorées. Il permet de comparer une série de 5 et une série de 8, pour voir votre vraie tendance de force sans tester un maximum.",
   "gloss.weeklySets.title": "Séries par muscle cette semaine",
-  "gloss.weeklySets.body": "Les séries difficiles qui ont travaillé chaque muscle cette semaine. Les muscles secondaires comptent pour une demi-série. La bande verte, de 10 à 20, est la fourchette que la recherche soutient le plus pour la prise de muscle. Le plan vise les muscles les plus en dessous.",
+  "gloss.weeklySets.body":
+    "Les séries difficiles qui ont travaillé chaque muscle cette semaine. Les muscles secondaires comptent pour une demi-série. La bande verte, de 10 à 20, est la fourchette que la recherche soutient le plus pour la prise de muscle. Le plan vise les muscles les plus en dessous.",
   "gloss.variety.title": "Variété des exercices",
-  "gloss.variety.body": "La fréquence à laquelle le plan garde le même exercice pour un muscle. Plus de régularité aide à suivre les progrès sur un exercice. Plus de variété garde les choses fraîches et répartit le stress.",
+  "gloss.variety.body":
+    "La fréquence à laquelle le plan garde le même exercice pour un muscle. Plus de régularité aide à suivre les progrès sur un exercice. Plus de variété garde les choses fraîches et répartit le stress.",
   "gloss.recovery.title": "Récupération",
-  "gloss.recovery.body": "Chaque série fatigue les muscles qu’elle travaille. Cette fatigue s’efface en 2 à 3 jours. Frais, c’est 90 % ou plus, Prêt 70 %, En récupération 40 %, et Fatigué est sous 40 %. Le plan évite les muscles encore fatigués.",
+  "gloss.recovery.body":
+    "Chaque série fatigue les muscles qu’elle travaille. Cette fatigue s’efface en 2 à 3 jours. Frais, c’est 90 % ou plus, Prêt 70 %, En récupération 40 %, et Fatigué est sous 40 %. Le plan évite les muscles encore fatigués.",
   "gloss.superset.title": "Superset",
-  "gloss.superset.body": "Deux exercices ou plus enchaînés : une série du premier, directement une série du suivant, puis le repos. Cela fait gagner du temps, et marche mieux avec des exercices qui ne fatiguent pas les mêmes muscles, comme un tirage avec un développé.\nTouchez le lien entre deux exercices pour les associer, et de nouveau pour les séparer.",
+  "gloss.superset.body":
+    "Deux exercices ou plus enchaînés : une série du premier, directement une série du suivant, puis le repos. Cela fait gagner du temps, et marche mieux avec des exercices qui ne fatiguent pas les mêmes muscles, comme un tirage avec un développé.\nTouchez le lien entre deux exercices pour les associer, et de nouveau pour les séparer.",
   "gloss.warmup.title": "Séries d’échauffement",
-  "gloss.warmup.body": "Des séries plus légères qui montent jusqu’à votre charge de travail. Elles ne comptent ni dans vos statistiques ni dans vos progrès. Passez-les si vous êtes déjà échauffé.",
+  "gloss.warmup.body":
+    "Des séries plus légères qui montent jusqu’à votre charge de travail. Elles ne comptent ni dans vos statistiques ni dans vos progrès. Passez-les si vous êtes déjà échauffé.",
   "gloss.firstWeights.title": "Pourquoi nous le demandons",
-  "gloss.firstWeights.body": "Uniquement pour proposer une première charge sûre pour chaque exercice. Nous commençons léger et ajustons après votre première séance. Cela reste sur votre téléphone.",
+  "gloss.firstWeights.body":
+    "Uniquement pour proposer une première charge sûre pour chaque exercice. Nous commençons léger et ajustons après votre première séance. Cela reste sur votre téléphone.",
   "gloss.healthTwin.title": "Santé",
-  "gloss.healthTwin.body": "Les chiffres de votre corps au même endroit : poids, masse grasse, énergie, sommeil, cœur et pas, depuis Liftsmith et l’app santé de votre téléphone.\nChacun est comparé à votre propre normale des 30 derniers jours, jamais à d’autres personnes, et dit quoi faire. Ce n’est pas un avis médical.",
+  "gloss.healthTwin.body":
+    "Les chiffres de votre corps au même endroit : poids, masse grasse, énergie, sommeil, cœur et pas, depuis Liftsmith et l’app santé de votre téléphone.\nChacun est comparé à votre propre normale des 30 derniers jours, jamais à d’autres personnes, et dit quoi faire. Ce n’est pas un avis médical.",
   "gloss.hrv.title": "VFC : variabilité de la fréquence cardiaque",
-  "gloss.hrv.body": "Les infimes variations du temps entre deux battements, mesurées par une montre ou une bague, surtout la nuit. Plus haute que votre normale, elle indique en général que vous avez récupéré ; plus basse, du stress lié à l’entraînement, un mauvais sommeil ou une maladie.\nSeule votre propre tendance compte : téléphones et montres la mesurent différemment, alors ne comparez pas votre chiffre à celui des autres.",
+  "gloss.hrv.body":
+    "Les infimes variations du temps entre deux battements, mesurées par une montre ou une bague, surtout la nuit. Plus haute que votre normale, elle indique en général que vous avez récupéré ; plus basse, du stress lié à l’entraînement, un mauvais sommeil ou une maladie.\nSeule votre propre tendance compte : téléphones et montres la mesurent différemment, alors ne comparez pas votre chiffre à celui des autres.",
   "gloss.restingHr.title": "Fréquence cardiaque au repos",
-  "gloss.restingHr.body": "Votre fréquence cardiaque au repos complet, en général mesurée pendant le sommeil. Quelques battements au-dessus de votre normale pendant un jour ou deux sont un signe précoce qu’il faut lever le pied.",
+  "gloss.restingHr.body":
+    "Votre fréquence cardiaque au repos complet, en général mesurée pendant le sommeil. Quelques battements au-dessus de votre normale pendant un jour ou deux sont un signe précoce qu’il faut lever le pied.",
   "gloss.breathingRate.title": "Fréquence respiratoire",
-  "gloss.breathingRate.body": "Le nombre de respirations par minute pendant le sommeil, mesuré par une montre ou une bague. Elle est très stable, donc une hausse de deux ou plus au-dessus de votre normale est souvent l’un des premiers signes d’une maladie.",
+  "gloss.breathingRate.body":
+    "Le nombre de respirations par minute pendant le sommeil, mesuré par une montre ou une bague. Elle est très stable, donc une hausse de deux ou plus au-dessus de votre normale est souvent l’un des premiers signes d’une maladie.",
   "gloss.vo2max.title": "VO₂ max",
-  "gloss.vo2max.body": "La quantité d’oxygène que votre corps peut utiliser à l’effort maximal, en millilitres par kilo et par minute. Les montres l’estiment à partir de la marche et de la course. C’est la meilleure mesure unique de la forme cardiaque.\nLa musculation la fait à peine bouger. Deux séances de cardio intense de 20 minutes par semaine, si.",
+  "gloss.vo2max.body":
+    "La quantité d’oxygène que votre corps peut utiliser à l’effort maximal, en millilitres par kilo et par minute. Les montres l’estiment à partir de la marche et de la course. C’est la meilleure mesure unique de la forme cardiaque.\nLa musculation la fait à peine bouger. Deux séances de cardio intense de 20 minutes par semaine, si.",
   "gloss.leanMass.title": "Masse maigre",
-  "gloss.leanMass.body": "Tout ce qui, dans votre corps, n’est pas de la graisse : muscles, os, organes et eau. Votre poids multiplié par la part qui n’est pas de la graisse. Si la masse maigre monte pendant que la masse grasse se maintient ou baisse, l’entraînement construit du muscle.",
+  "gloss.leanMass.body":
+    "Tout ce qui, dans votre corps, n’est pas de la graisse : muscles, os, organes et eau. Votre poids multiplié par la part qui n’est pas de la graisse. Si la masse maigre monte pendant que la masse grasse se maintient ou baisse, l’entraînement construit du muscle.",
   "gloss.bmi.title": "IMC : indice de masse corporelle",
-  "gloss.bmi.body": "Le poids divisé par la taille au carré. C’est un repère approximatif pour les personnes qui ne font pas de musculation : il ne distingue pas le muscle de la graisse, donc les pratiquants musclés paraissent souvent en surpoids. Si vous avez une mesure de masse grasse, fiez-vous plutôt à elle.",
+  "gloss.bmi.body":
+    "Le poids divisé par la taille au carré. C’est un repère approximatif pour les personnes qui ne font pas de musculation : il ne distingue pas le muscle de la graisse, donc les pratiquants musclés paraissent souvent en surpoids. Si vous avez une mesure de masse grasse, fiez-vous plutôt à elle.",
   "gloss.restDrop.title": "Baisse du rythme cardiaque au repos",
-  "gloss.restDrop.body": "De combien de battements par minute votre fréquence cardiaque baisse dans la première minute après une série, d’après votre cardiofréquencemètre. Une baisse plus grande au fil des mois signifie un cœur plus en forme ; une baisse plus faible que d’habitude peut signaler de la fatigue.",
+  "gloss.restDrop.body":
+    "De combien de battements par minute votre fréquence cardiaque baisse dans la première minute après une série, d’après votre cardiofréquencemètre. Une baisse plus grande au fil des mois signifie un cœur plus en forme ; une baisse plus faible que d’habitude peut signaler de la fatigue.",
 };

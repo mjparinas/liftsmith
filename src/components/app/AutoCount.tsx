@@ -1,21 +1,24 @@
 "use client";
+
 // Camera rep counting on the workout screen (Melvin, 2026-11-09; AGENTS.md "Camera rep counting").
 // An optional switch beside the exercise: while it's on, the camera watches the set, the 3D figure follows
 // the lifter, and the reps counted fill in the reps for Log set, so logging stays one tap. Frames are read
 // in memory and dropped: video never leaves the phone and is never recorded.
 // Phone motion counting is behind the `repMotion` flag (off by default), because it was unreliable.
+import { useCallback, useEffect, useRef, useState } from "react";
+
 import { LiftDemo } from "@/components/demo/LiftDemo";
 import { can } from "@/lib/entitlements";
 import { flag } from "@/lib/flags";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
-import { ImuRepCounter, imuProfile } from "@/lib/reps/imu";
+import { imuProfile, ImuRepCounter } from "@/lib/reps/imu";
 import { BLAZEPOSE, PoseSignal } from "@/lib/reps/pose";
 import { profileFor } from "@/lib/reps/profiles";
 import { loadPose, openCamera, startMotion, type PoseEngine } from "@/lib/reps/sources";
 import { RepTracker } from "@/lib/reps/tracker";
 import type { Pattern } from "@/lib/types";
-import { useCallback, useEffect, useRef, useState } from "react";
+
 import { Icon } from "./icons";
 
 export type Facing = "user" | "environment";
@@ -74,7 +77,19 @@ type Phase = "starting" | "loading" | "ready" | "error";
  * (mirrored for the front camera) with a flip button, and the live count. `counting` is false during rest,
  * and each new set starts a fresh count (`setKey` changes when a set is logged).
  */
-export function AutoCount({ exerciseId, pattern, body, bpm, prefs, onPrefs, counting, setKey, onCount, onClose, paused }: {
+export function AutoCount({
+  exerciseId,
+  pattern,
+  body,
+  bpm,
+  prefs,
+  onPrefs,
+  counting,
+  setKey,
+  onCount,
+  onClose,
+  paused,
+}: {
   exerciseId: string;
   pattern: Pattern;
   body: "male" | "female";
@@ -124,7 +139,15 @@ export function AutoCount({ exerciseId, pattern, body, bpm, prefs, onPrefs, coun
     const fail = (e: unknown) => {
       if (stopped) return;
       const name = e instanceof DOMException ? e.name : "";
-      setError(name === "NotAllowedError" || name === "SecurityError" ? t("count.err.denied") : name === "NotFoundError" || name === "OverconstrainedError" ? t("count.err.noCamera") : camera ? t("count.err.model") : t("count.err.motion"));
+      setError(
+        name === "NotAllowedError" || name === "SecurityError"
+          ? t("count.err.denied")
+          : name === "NotFoundError" || name === "OverconstrainedError"
+            ? t("count.err.noCamera")
+            : camera
+              ? t("count.err.model")
+              : t("count.err.motion"),
+      );
       setPhase("error");
       oops();
     };
@@ -230,18 +253,43 @@ export function AutoCount({ exerciseId, pattern, body, bpm, prefs, onPrefs, coun
   }, [setKey, counting]);
 
   const mirror = camera && prefs.facing === "user" ? { transform: "scaleX(-1)" } : undefined;
-  const status = phase === "error" ? error : phase === "starting" ? t("count.opening") : phase === "loading" ? t("count.loading") : !counting ? t("count.resting") : inView ? t("count.counting") : t("count.position");
+  const status =
+    phase === "error"
+      ? error
+      : phase === "starting"
+        ? t("count.opening")
+        : phase === "loading"
+          ? t("count.loading")
+          : !counting
+            ? t("count.resting")
+            : inView
+              ? t("count.counting")
+              : t("count.position");
 
   return (
     <div className="relative h-full" data-testid="auto-count">
       <LiftDemo exerciseId={exerciseId} body={body} view="side" bpm={bpm} follow={follow} paused={paused} className="h-full" />
-      <div className="absolute left-2 top-2 rounded-2xl border border-line bg-bg/80 px-3 py-1.5 text-center backdrop-blur" aria-live="polite">
+      <div
+        className="absolute left-2 top-2 rounded-2xl border border-line bg-bg/80 px-3 py-1.5 text-center backdrop-blur"
+        aria-live="polite"
+      >
         <div className="display text-3xl leading-none">{count}</div>
         <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">{t("count.reps")}</div>
       </div>
-      <p className={`absolute inset-x-2 bottom-2 mr-[36%] rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : inView || !counting ? "text-muted" : "text-warn"}`} role={phase === "error" ? "alert" : "status"}>{status}</p>
-      <button type="button" onClick={onClose} className="press absolute right-2 top-7 inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm text-muted" aria-label={t("count.off")}>
-        <Icon name="camera" size={16} className="text-accent" />{t("count.stop")}
+      <p
+        className={`absolute inset-x-2 bottom-2 mr-[36%] rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : inView || !counting ? "text-muted" : "text-warn"}`}
+        role={phase === "error" ? "alert" : "status"}
+      >
+        {status}
+      </p>
+      <button
+        type="button"
+        onClick={onClose}
+        className="press absolute right-2 top-7 inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm text-muted"
+        aria-label={t("count.off")}
+      >
+        <Icon name="camera" size={16} className="text-accent" />
+        {t("count.stop")}
       </button>
       {camera && (
         <div className="absolute bottom-2 right-2 aspect-[3/4] w-[32%] overflow-hidden rounded-xl border border-line bg-bg shadow-lg">
@@ -249,11 +297,16 @@ export function AutoCount({ exerciseId, pattern, body, bpm, prefs, onPrefs, coun
           <span className={`absolute left-1 top-1 h-2.5 w-2.5 rounded-full ${inView ? "bg-good" : "bg-warn"}`} aria-hidden />
           <button
             type="button"
-            onClick={() => { haptic("select"); onPrefs({ ...prefs, facing: prefs.facing === "user" ? "environment" : "user" }); }}
+            onClick={() => {
+              haptic("select");
+              onPrefs({ ...prefs, facing: prefs.facing === "user" ? "environment" : "user" });
+            }}
             className="press absolute bottom-0 right-0 grid h-11 w-11 place-items-center text-ink"
             aria-label={prefs.facing === "user" ? t("count.flipToBack") : t("count.flipToFront")}
           >
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-bg/80"><Icon name="flip" size={18} /></span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-bg/80">
+              <Icon name="flip" size={18} />
+            </span>
           </button>
         </div>
       )}
@@ -275,12 +328,16 @@ export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean;
   return (
     <button
       type="button"
-      onClick={() => { haptic("toggle"); onToggle(); }}
+      onClick={() => {
+        haptic("toggle");
+        onToggle();
+      }}
       aria-pressed={on}
       aria-label={t("count.toggle")}
       className={`press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm ${on ? "border-accent bg-accent/15 text-accent" : "border-line bg-bg/70 text-muted hover:text-ink"} ${className}`}
     >
-      <Icon name="camera" size={16} className="text-accent" />{t("count.start")}
+      <Icon name="camera" size={16} className="text-accent" />
+      {t("count.start")}
     </button>
   );
 }

@@ -1,10 +1,16 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { applyAppearance as applyTheme, isLight, savedAppearance as savedTheme } from "./appearance";
 import { applyTheme as applyEarned, THEME_BY_ID } from "./themes";
 
 function mockSystem(light: boolean) {
-  vi.stubGlobal("matchMedia", (q: string) => ({ matches: light && q.includes("light"), media: q, addEventListener() {}, removeEventListener() {} }));
+  vi.stubGlobal("matchMedia", (q: string) => ({
+    matches: light && q.includes("light"),
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  }));
 }
 
 afterEach(() => {

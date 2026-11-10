@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultProfile } from "./defaults";
 import { perDay, sleepNights } from "./health";
 import { healthSignals } from "./readiness";
@@ -19,7 +20,8 @@ function daily(metric: HealthMetric, n: number, f: (ago: number) => number, toda
   }
   return out;
 }
-const get = (evs: AppEvent[], id: string, p: Profile = profile, pro = true) => twin({ events: evs, profile: p, sessions: [], now: NOW, pro, native: true, store: "Health Connect" }).find((m) => m.id === id)!;
+const get = (evs: AppEvent[], id: string, p: Profile = profile, pro = true) =>
+  twin({ events: evs, profile: p, sessions: [], now: NOW, pro, native: true, store: "Health Connect" }).find((m) => m.id === id)!;
 
 describe("health readings from the store", () => {
   it("counts sleep as the union of asleep time, by the day the night ended", () => {
@@ -29,13 +31,21 @@ describe("health readings from the store", () => {
       { value: 0, startDate: "2026-11-09T01:00:00", endDate: "2026-11-09T06:30:00", sleepState: "asleep" },
       { value: 0, startDate: "2026-11-08T22:30:00", endDate: "2026-11-09T07:00:00", sleepState: "inBed" },
       // Health Connect: a session with stages.
-      { value: 0, startDate: "2026-11-07T23:00:00", endDate: "2026-11-08T07:00:00", stages: [
-        { startDate: "2026-11-07T23:00:00", endDate: "2026-11-08T03:00:00", stage: "deep" },
-        { startDate: "2026-11-08T03:00:00", endDate: "2026-11-08T03:30:00", stage: "awake" },
-        { startDate: "2026-11-08T03:30:00", endDate: "2026-11-08T07:00:00", stage: "rem" },
-      ] },
+      {
+        value: 0,
+        startDate: "2026-11-07T23:00:00",
+        endDate: "2026-11-08T07:00:00",
+        stages: [
+          { startDate: "2026-11-07T23:00:00", endDate: "2026-11-08T03:00:00", stage: "deep" },
+          { startDate: "2026-11-08T03:00:00", endDate: "2026-11-08T03:30:00", stage: "awake" },
+          { startDate: "2026-11-08T03:30:00", endDate: "2026-11-08T07:00:00", stage: "rem" },
+        ],
+      },
     ]);
-    expect(nights.map((n) => [n.day, n.value])).toEqual([["2026-11-08", 7.5], ["2026-11-09", 7.5]]);
+    expect(nights.map((n) => [n.day, n.value])).toEqual([
+      ["2026-11-08", 7.5],
+      ["2026-11-09", 7.5],
+    ]);
   });
 
   it("keeps one value a day: the mean for HRV, the latest for resting heart rate, dropping junk", () => {
@@ -81,7 +91,11 @@ describe("the health twin", () => {
   });
 
   it("flags short sleep over the week, and a breathing rate jump", () => {
-    const evs = [...daily("sleep", 7, (ago) => (ago < 4 ? 5.8 : 7.6)), ...daily("breathing", 20, () => 14, false), ...daily("breathing", 1, () => 16.5)];
+    const evs = [
+      ...daily("sleep", 7, (ago) => (ago < 4 ? 5.8 : 7.6)),
+      ...daily("breathing", 20, () => 14, false),
+      ...daily("breathing", 1, () => 16.5),
+    ];
     expect(get(evs, "sleep").status).toBe("watch");
     expect(get(evs, "sleep").display).toBe("5 h 48");
     expect(get(evs, "breathing").chip).toBe("Up overnight");
@@ -119,11 +133,29 @@ describe("the health twin", () => {
 
   it("measures how far heart rate falls in a minute of rest", () => {
     const start = NOW - 2 * DAY;
-    const t: number[] = [], bpm: number[] = [];
-    for (let s = 0; s < 900; s++) { t.push(s); bpm.push(s % 180 < 40 ? 140 : 110); }
+    const t: number[] = [],
+      bpm: number[] = [];
+    for (let s = 0; s < 900; s++) {
+      t.push(s);
+      bpm.push(s % 180 < 40 ? 140 : 110);
+    }
     const evs: AppEvent[] = [
       { type: "hrSeries", id: "hr", at: start + 900_000, sessionId: "s1", start, t, bpm },
-      ...[39, 219, 399, 579].map((sec, i) => ({ type: "set", id: `set${i}`, at: start + sec * 1000, sessionId: "s1", exerciseId: "squat", weight: 100, reps: 5, targetWeight: 100, targetReps: 5, rir: 2 }) as AppEvent),
+      ...[39, 219, 399, 579].map(
+        (sec, i) =>
+          ({
+            type: "set",
+            id: `set${i}`,
+            at: start + sec * 1000,
+            sessionId: "s1",
+            exerciseId: "squat",
+            weight: 100,
+            reps: 5,
+            targetWeight: 100,
+            targetReps: 5,
+            rir: 2,
+          }) as AppEvent,
+      ),
     ];
     expect(restDrops(evs)).toEqual([{ day: dayOf(start), value: 30 }]);
   });

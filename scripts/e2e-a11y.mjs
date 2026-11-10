@@ -5,6 +5,7 @@
 //   npm run build:static && node scripts/e2e-a11y.mjs [base-url]
 import AxeBuilder from "@axe-core/playwright";
 import { chromium, devices } from "playwright";
+
 import { base, finish, onboard } from "./helpers.mjs";
 
 const server = await base();
@@ -17,11 +18,23 @@ const scan = async (where, skip = []) => {
   // A fixed wait was too short on slow CI machines. Looping animations are left alone.
   // Wait a moment first so animations started by the click have begun, then for them to finish.
   await page.waitForTimeout(300);
-  await page.evaluate(() => Promise.all(document.getAnimations().filter((a) => a.effect?.getTiming().iterations !== Infinity).map((a) => a.finished.catch(() => {}))));
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   await page.waitForTimeout(100);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).disableRules(skip).analyze();
   for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")) {
-    fail.push(`${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes.slice(0, 3).map((n) => n.target.join(" ") + (process.env.A11Y_DETAIL ? ` [${n.any?.[0]?.message}] ${n.html.slice(0, 160)}` : "")).join(", ")}`);
+    fail.push(
+      `${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(" ") + (process.env.A11Y_DETAIL ? ` [${n.any?.[0]?.message}] ${n.html.slice(0, 160)}` : ""))
+        .join(", ")}`,
+    );
   }
 };
 try {
@@ -114,7 +127,22 @@ try {
   await scan("tdee public page");
   // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
   // guide, blog post and index, calculators).
-  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/", "/compare/", "/compare/fitbod/", "/alternatives/fitbod/"]) {
+  for (const path of [
+    "/exercises/",
+    "/exercises/bench-press/",
+    "/exercises/bench-press/alternatives/",
+    "/muscles/chest/",
+    "/muscles/chest/dumbbells/",
+    "/equipment/barbell/",
+    "/guides/reps-in-reserve/",
+    "/blog/",
+    "/blog/how-long-to-rest-between-sets/",
+    "/tools/plate-calculator/",
+    "/tools/one-rep-max-calculator/",
+    "/compare/",
+    "/compare/fitbod/",
+    "/alternatives/fitbod/",
+  ]) {
     await page.goto(`${server.url}${path}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan(`site ${path}`);
@@ -212,7 +240,12 @@ try {
 await ctx.close();
 
 // Keyboard only, with the largest text on a common narrow phone (360 px).
-const kctx = await browser.newContext({ ...devices["Galaxy S24"] ?? devices["Pixel 7"], viewport: { width: 360, height: 780 }, hasTouch: false, isMobile: false });
+const kctx = await browser.newContext({
+  ...(devices["Galaxy S24"] ?? devices["Pixel 7"]),
+  viewport: { width: 360, height: 780 },
+  hasTouch: false,
+  isMobile: false,
+});
 const kp = await kctx.newPage();
 try {
   await kp.goto(`${server.url}/app/`);
@@ -240,7 +273,11 @@ try {
         const cs = getComputedStyle(el);
         const ring = (cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none";
         const r = el.getBoundingClientRect();
-        return { name: (el.getAttribute("aria-label") || el.textContent || "").trim().slice(0, 40), ring, seen: r.width > 0 && r.height > 0 };
+        return {
+          name: (el.getAttribute("aria-label") || el.textContent || "").trim().slice(0, 40),
+          ring,
+          seen: r.width > 0 && r.height > 0,
+        };
       });
       if (f && f.seen && !f.ring) fail.push(`keyboard: no visible focus ring on "${f.name}"`);
       if (f && what.test(f.name)) {

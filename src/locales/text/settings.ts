@@ -26,7 +26,8 @@ export const en = {
   "settings.weeks": { one: "{count} week", other: "{count} weeks" },
   "settings.appearance": "Appearance",
   "settings.units": "Units",
-  "settings.units.note": "Weights, body weight and stats show in this unit. Each gym keeps its own plates in kg or lb (change it under Gym), and the workout shows both when they differ.",
+  "settings.units.note":
+    "Weights, body weight and stats show in this unit. Each gym keeps its own plates in kg or lb (change it under Gym), and the workout shows both when they differ.",
   "settings.bodyweight": "Body weight ({unit})",
   "settings.bodyweight.label": "Body weight",
   "settings.on": "On",
@@ -37,10 +38,12 @@ export const en = {
   "settings.celebrations": "Celebrations",
   "settings.full": "Full: confetti, sounds, crates",
   "settings.lean": "Lean mode",
-  "settings.lean.note": "Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.",
+  "settings.lean.note":
+    "Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.",
   "settings.stats": "Usage stats",
   "settings.stats.on": "Share anonymous stats",
-  "settings.stats.note": "Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data.",
+  "settings.stats.note":
+    "Screens and features used, device model, app version and how you found us, under a random install id. Never your weights, workout details or health data.",
   "settings.privacy": "Privacy",
   "settings.installId": "Install id {id}",
   "settings.trainingBlock": "Training block",
@@ -55,14 +58,16 @@ export const en = {
   "settings.footer": "{brand} · everything is stored on this device",
   "settings.language": "Language",
   "settings.language.system": "Match my phone",
-  "settings.language.note": "Match my phone follows the language set for Liftsmith in your phone's settings. Numbers, dates and units follow your region. Some screens are still in English while translation is under way.",
+  "settings.language.note":
+    "Match my phone follows the language set for Liftsmith in your phone's settings. Numbers, dates and units follow your region. Some screens are still in English while translation is under way.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "settings.title": "Ajustes",
-  "settings.motionOn": "El conteo de repeticiones con el movimiento del teléfono está activado (experimento). Aparece como opción mientras cuentas con la cámara.",
+  "settings.motionOn":
+    "El conteo de repeticiones con el movimiento del teléfono está activado (experimento). Aparece como opción mientras cuentas con la cámara.",
   "settings.motionOff": "El conteo de repeticiones con el movimiento del teléfono está desactivado.",
   "settings.rerun": "Repetir la configuración",
   "settings.injuries": "Lesiones y molestias",
@@ -83,7 +88,8 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.weeks": { one: "{count} semana", other: "{count} semanas" },
   "settings.appearance": "Apariencia",
   "settings.units": "Unidades",
-  "settings.units.note": "Los pesos, el peso corporal y las estadísticas se muestran en esta unidad. Cada gimnasio guarda sus discos en kg o lb (se cambia en Gimnasio) y el entrenamiento muestra ambos cuando no coinciden.",
+  "settings.units.note":
+    "Los pesos, el peso corporal y las estadísticas se muestran en esta unidad. Cada gimnasio guarda sus discos en kg o lb (se cambia en Gimnasio) y el entrenamiento muestra ambos cuando no coinciden.",
   "settings.bodyweight": "Peso corporal ({unit})",
   "settings.bodyweight.label": "Peso corporal",
   "settings.on": "Sí",
@@ -94,10 +100,12 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.celebrations": "Celebraciones",
   "settings.full": "Completo: confeti, sonidos, cajas",
   "settings.lean": "Modo sobrio",
-  "settings.lean.note": "El modo sobrio quita el confeti, los sonidos de celebración y las animaciones. Los sonidos del temporizador y la vibración siguen. La XP, las rachas y las insignias cuentan igual.",
+  "settings.lean.note":
+    "El modo sobrio quita el confeti, los sonidos de celebración y las animaciones. Los sonidos del temporizador y la vibración siguen. La XP, las rachas y las insignias cuentan igual.",
   "settings.stats": "Estadísticas de uso",
   "settings.stats.on": "Compartir estadísticas anónimas",
-  "settings.stats.note": "Pantallas y funciones usadas, modelo del dispositivo, versión de la app y cómo nos encontraste, con un identificador de instalación aleatorio. Nunca tus pesos, tus entrenamientos ni tus datos de salud.",
+  "settings.stats.note":
+    "Pantallas y funciones usadas, modelo del dispositivo, versión de la app y cómo nos encontraste, con un identificador de instalación aleatorio. Nunca tus pesos, tus entrenamientos ni tus datos de salud.",
   "settings.privacy": "Privacidad",
   "settings.installId": "Id. de instalación {id}",
   "settings.trainingBlock": "Bloque de entrenamiento",
@@ -105,19 +113,22 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.data": "Datos",
   "settings.exportCsv": "Exportar series (CSV)",
   "settings.data.note": "El CSV tiene todas las series efectivas, para hojas de cálculo. La copia completa está en Guardado y copias.",
-  "settings.erase.warn": "Esto borra todos los entrenamientos de este dispositivo y tu correo de recordatorios de nuestro servidor. No se puede deshacer.",
+  "settings.erase.warn":
+    "Esto borra todos los entrenamientos de este dispositivo y tu correo de recordatorios de nuestro servidor. No se puede deshacer.",
   "settings.erase.confirm": "Borrarlo todo",
   "settings.cancel": "Cancelar",
   "settings.erase": "Borrar este dispositivo",
   "settings.footer": "{brand} · todo se guarda en este dispositivo",
   "settings.language": "Idioma",
   "settings.language.system": "Igual que el teléfono",
-  "settings.language.note": "«Igual que el teléfono» usa el idioma elegido para Liftsmith en los ajustes del teléfono. Los números, las fechas y las unidades siguen tu región. Algunas pantallas siguen en inglés mientras avanza la traducción.",
+  "settings.language.note":
+    "«Igual que el teléfono» usa el idioma elegido para Liftsmith en los ajustes del teléfono. Los números, las fechas y las unidades siguen tu región. Algunas pantallas siguen en inglés mientras avanza la traducción.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "settings.title": "Réglages",
-  "settings.motionOn": "Le comptage des répétitions par les mouvements du téléphone est activé (expérience). Il apparaît comme option quand le comptage par caméra est activé.",
+  "settings.motionOn":
+    "Le comptage des répétitions par les mouvements du téléphone est activé (expérience). Il apparaît comme option quand le comptage par caméra est activé.",
   "settings.motionOff": "Le comptage des répétitions par les mouvements du téléphone est désactivé.",
   "settings.rerun": "Refaire la configuration",
   "settings.injuries": "Blessures et douleurs",
@@ -138,7 +149,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.weeks": { one: "{count} semaine", other: "{count} semaines" },
   "settings.appearance": "Apparence",
   "settings.units": "Unités",
-  "settings.units.note": "Les charges, le poids de corps et les statistiques s’affichent dans cette unité. Chaque salle garde ses disques en kg ou en lb (à changer dans Salle), et la séance affiche les deux quand ils diffèrent.",
+  "settings.units.note":
+    "Les charges, le poids de corps et les statistiques s’affichent dans cette unité. Chaque salle garde ses disques en kg ou en lb (à changer dans Salle), et la séance affiche les deux quand ils diffèrent.",
   "settings.bodyweight": "Poids de corps ({unit})",
   "settings.bodyweight.label": "Poids de corps",
   "settings.on": "Activé",
@@ -149,10 +161,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.celebrations": "Célébrations",
   "settings.full": "Complet : confettis, sons, coffres",
   "settings.lean": "Mode sobre",
-  "settings.lean.note": "Le mode sobre coupe les confettis, les sons de célébration et les animations. Les sons du minuteur et les vibrations restent. L’XP, les séries et les badges comptent toujours.",
+  "settings.lean.note":
+    "Le mode sobre coupe les confettis, les sons de célébration et les animations. Les sons du minuteur et les vibrations restent. L’XP, les séries et les badges comptent toujours.",
   "settings.stats": "Statistiques d’utilisation",
   "settings.stats.on": "Partager des statistiques anonymes",
-  "settings.stats.note": "Écrans et fonctions utilisés, modèle de l’appareil, version de l’app et comment vous nous avez trouvés, sous un identifiant d’installation aléatoire. Jamais vos charges, vos séances ni vos données de santé.",
+  "settings.stats.note":
+    "Écrans et fonctions utilisés, modèle de l’appareil, version de l’app et comment vous nous avez trouvés, sous un identifiant d’installation aléatoire. Jamais vos charges, vos séances ni vos données de santé.",
   "settings.privacy": "Confidentialité",
   "settings.installId": "Id. d’installation {id}",
   "settings.trainingBlock": "Bloc d’entraînement",
@@ -160,12 +174,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.data": "Données",
   "settings.exportCsv": "Exporter les séries (CSV)",
   "settings.data.note": "Le CSV contient toutes les séries de travail, pour les tableurs. La sauvegarde complète est dans Sauvegarde.",
-  "settings.erase.warn": "Cela efface toutes les séances de cet appareil et votre adresse e-mail de rappels sur notre serveur. C’est irréversible.",
+  "settings.erase.warn":
+    "Cela efface toutes les séances de cet appareil et votre adresse e-mail de rappels sur notre serveur. C’est irréversible.",
   "settings.erase.confirm": "Tout effacer",
   "settings.cancel": "Annuler",
   "settings.erase": "Effacer cet appareil",
   "settings.footer": "{brand} · tout est enregistré sur cet appareil",
   "settings.language": "Langue",
   "settings.language.system": "Comme le téléphone",
-  "settings.language.note": "« Comme le téléphone » suit la langue choisie pour Liftsmith dans les réglages du téléphone. Les nombres, les dates et les unités suivent votre région. Certains écrans sont encore en anglais pendant la traduction.",
+  "settings.language.note":
+    "« Comme le téléphone » suit la langue choisie pour Liftsmith dans les réglages du téléphone. Les nombres, les dates et les unités suivent votre région. Certains écrans sont encore en anglais pendant la traduction.",
 };

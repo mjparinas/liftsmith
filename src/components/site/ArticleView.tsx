@@ -2,12 +2,14 @@
 // action, related exercises, questions, related reading and the big banner at the end.
 import Link from "next/link";
 import type { ReactNode } from "react";
+
 import { CTA_COPY, readMinutes, type Article, type Block } from "@/content/articles";
 import { BRAND } from "@/lib/brand";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { articlePath, MUSCLE_NAME } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
-import { CtaBanner, CtaButton, CtaInline, Crumbs, JsonLd, LinkGrid } from "./SiteChrome";
+
+import { Crumbs, CtaBanner, CtaButton, CtaInline, JsonLd, LinkGrid } from "./SiteChrome";
 
 /** [label](/path/) and **bold** inside a line of text. */
 export function rich(text: string): ReactNode[] {
@@ -18,8 +20,22 @@ export function rich(text: string): ReactNode[] {
   let i = 0;
   while ((m = re.exec(text))) {
     if (m.index > last) out.push(text.slice(last, m.index));
-    if (m[1]) out.push(<Link key={i++} href={m[2]} className="font-medium text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent">{m[1]}</Link>);
-    else out.push(<strong key={i++} className="font-semibold text-ink">{m[3]}</strong>);
+    if (m[1])
+      out.push(
+        <Link
+          key={i++}
+          href={m[2]}
+          className="font-medium text-accent underline decoration-accent/40 underline-offset-2 hover:decoration-accent"
+        >
+          {m[1]}
+        </Link>,
+      );
+    else
+      out.push(
+        <strong key={i++} className="font-semibold text-ink">
+          {m[3]}
+        </strong>,
+      );
     last = re.lastIndex;
   }
   if (last < text.length) out.push(text.slice(last));
@@ -34,8 +50,22 @@ export function linksIn(text: string): string[] {
 function BlockView({ b, a, n }: { b: Block; a: Article; n: number }) {
   if ("h2" in b) return <h2 className="mt-10 text-2xl font-bold tracking-tight">{b.h2}</h2>;
   if ("p" in b) return <p className="mt-4 leading-relaxed text-muted">{rich(b.p)}</p>;
-  if ("ul" in b) return <ul className="mt-4 list-disc space-y-2 pl-6 leading-relaxed text-muted">{b.ul.map((x, i) => <li key={i}>{rich(x)}</li>)}</ul>;
-  if ("ol" in b) return <ol className="mt-4 list-decimal space-y-2 pl-6 leading-relaxed text-muted">{b.ol.map((x, i) => <li key={i}>{rich(x)}</li>)}</ol>;
+  if ("ul" in b)
+    return (
+      <ul className="mt-4 list-disc space-y-2 pl-6 leading-relaxed text-muted">
+        {b.ul.map((x, i) => (
+          <li key={i}>{rich(x)}</li>
+        ))}
+      </ul>
+    );
+  if ("ol" in b)
+    return (
+      <ol className="mt-4 list-decimal space-y-2 pl-6 leading-relaxed text-muted">
+        {b.ol.map((x, i) => (
+          <li key={i}>{rich(x)}</li>
+        ))}
+      </ol>
+    );
   if ("tip" in b)
     return (
       <p className="card mt-6 border-l-4 border-l-accent p-4 leading-relaxed">
@@ -72,10 +102,20 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       mainEntityOfPage: url,
       url,
       author: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
-      publisher: { "@type": "Organization", name: BRAND.name, url: SITE_URL, logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` } },
+      publisher: {
+        "@type": "Organization",
+        name: BRAND.name,
+        url: SITE_URL,
+        logo: { "@type": "ImageObject", url: `${SITE_URL}/icon-512.png` },
+      },
     },
   ];
-  if (a.faq?.length) jsonLd.push({ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })) });
+  if (a.faq?.length)
+    jsonLd.push({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: a.faq.map(([q, ans]) => ({ "@type": "Question", name: q, acceptedAnswer: { "@type": "Answer", text: ans } })),
+    });
   let ctas = 0;
   const [intro, ...rest] = a.body;
   return (
@@ -85,13 +125,18 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       <p className="mt-6 text-sm font-semibold tracking-wide text-accent uppercase">{a.tag}</p>
       <h1 className="mt-2 max-w-3xl text-3xl font-extrabold tracking-tight md:text-5xl">{a.title}</h1>
       <p className="mt-3 text-sm text-muted">
-        <time dateTime={a.date}>{new Date(`${a.date}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}</time> · {readMinutes(a)} min read
+        <time dateTime={a.date}>
+          {new Date(`${a.date}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}
+        </time>{" "}
+        · {readMinutes(a)} min read
       </p>
       <div className="max-w-3xl">
         {intro && <BlockView b={intro} a={a} n={0} />}
         {/* Call to action at the top: for readers who already know what they want. */}
         <div className="mt-6 flex flex-wrap items-center gap-3 rounded-2xl border border-accent/30 bg-accent/10 p-4">
-          <p className="min-w-0 flex-1 text-sm"><span className="font-semibold">{top.title}.</span> <span className="text-muted">Free to start, no account needed.</span></p>
+          <p className="min-w-0 flex-1 text-sm">
+            <span className="font-semibold">{top.title}.</span> <span className="text-muted">Free to start, no account needed.</span>
+          </p>
           <CtaButton cta={`${a.kind}-top`}>{top.button}</CtaButton>
         </div>
         {rest.map((b, i) => {

@@ -12,7 +12,11 @@ import { fromKg } from "./units";
 export const EXPORT_VERSION = 1;
 
 export function backupJson(profile: Profile, gyms: Gym[], events: readonly AppEvent[], now = Date.now()): string {
-  return JSON.stringify({ app: "liftsmith", version: EXPORT_VERSION, exportedAt: new Date(now).toISOString(), profile, gyms, events }, null, 1);
+  return JSON.stringify(
+    { app: "liftsmith", version: EXPORT_VERSION, exportedAt: new Date(now).toISOString(), profile, gyms, events },
+    null,
+    1,
+  );
 }
 
 const cell = (v: string | number | undefined) => {
@@ -28,7 +32,23 @@ function local(at: number) {
   return [`${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`, `${pad(d.getHours())}:${pad(d.getMinutes())}`];
 }
 
-export const CSV_HEADER = ["Date", "Time", "Workout", "Exercise", "Set", "Weight", "Unit", "Per hand", "Reps", "Target reps", "Target RIR", "Seconds", "Rest seconds", "Avg HR", "Max HR"];
+export const CSV_HEADER = [
+  "Date",
+  "Time",
+  "Workout",
+  "Exercise",
+  "Set",
+  "Weight",
+  "Unit",
+  "Per hand",
+  "Reps",
+  "Target reps",
+  "Target RIR",
+  "Seconds",
+  "Rest seconds",
+  "Avg HR",
+  "Max HR",
+];
 
 /** Every working set, oldest first. Weights in the lifter's unit; dumbbells are per hand. */
 export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
@@ -43,7 +63,23 @@ export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
     count.set(key, n);
     const [date, time] = local(s.at);
     rows.push(
-      [date, time, s.sessionId.slice(0, 8), ex?.name ?? s.exerciseId, n, Math.round(fromKg(s.weight, unit) * 100) / 100, unit, ex?.load === "dumbbell" || ex?.load === "kettlebell" ? "yes" : "", s.reps, s.targetReps, s.rir, s.durationSec, s.restSec, s.hrAvg, s.hrMax]
+      [
+        date,
+        time,
+        s.sessionId.slice(0, 8),
+        ex?.name ?? s.exerciseId,
+        n,
+        Math.round(fromKg(s.weight, unit) * 100) / 100,
+        unit,
+        ex?.load === "dumbbell" || ex?.load === "kettlebell" ? "yes" : "",
+        s.reps,
+        s.targetReps,
+        s.rir,
+        s.durationSec,
+        s.restSec,
+        s.hrAvg,
+        s.hrMax,
+      ]
         .map(cell)
         .join(","),
     );
@@ -54,7 +90,10 @@ export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
 /** Hands a text file to the share sheet on the phone, or downloads it in the browser. */
 export async function saveFile(name: string, mime: string, text: string): Promise<void> {
   if (isNative()) {
-    const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([import("@capacitor/filesystem"), import("@capacitor/share")]);
+    const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
+      import("@capacitor/filesystem"),
+      import("@capacitor/share"),
+    ]);
     const { uri } = await Filesystem.writeFile({ path: name, data: text, directory: Directory.Cache, encoding: Encoding.UTF8 });
     await Share.share({ title: name, files: [uri] });
     return;

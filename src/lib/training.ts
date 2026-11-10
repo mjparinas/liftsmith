@@ -9,7 +9,16 @@ import type { ExercisePrefs, Muscle, Profile, RestAlert, TrainingPrefs } from ".
 // picks something.
 
 export const REST_OPTIONS = [30, 45, 60, 75, 90, 120, 150, 180, 240, 300] as const;
-export const REP_RANGES: readonly [number, number][] = [[3, 5], [4, 6], [5, 8], [6, 10], [8, 12], [10, 15], [12, 20], [15, 25]];
+export const REP_RANGES: readonly [number, number][] = [
+  [3, 5],
+  [4, 6],
+  [5, 8],
+  [6, 10],
+  [8, 12],
+  [10, 15],
+  [12, 20],
+  [15, 25],
+];
 export const SET_OPTIONS = [2, 3, 4, 5, 6] as const;
 export const LENGTH_OPTIONS = [20, 30, 45, 60, 75, 90] as const;
 /** More than three priorities stops being a priority. */
@@ -70,7 +79,10 @@ export function effortAim(rir: number, scale: TrainingPrefs["effort"]): string {
 
 /** The choices on the optional "how hard was that set" row, stored as reps in reserve. */
 export function effortChoices(scale: TrainingPrefs["effort"]): { rir: number; label: string }[] {
-  return [0, 1, 2, 3, 4].map((rir) => ({ rir, label: scale === "rpe" ? (rir === 4 ? "≤6" : String(rpeOf(rir))) : rir === 4 ? "4+" : String(rir) }));
+  return [0, 1, 2, 3, 4].map((rir) => ({
+    rir,
+    label: scale === "rpe" ? (rir === 4 ? "≤6" : String(rpeOf(rir))) : rir === 4 ? "4+" : String(rir),
+  }));
 }
 
 /**

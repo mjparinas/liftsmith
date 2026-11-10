@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+
 import { applyA11y, cleanA11y, savedA11y, textPercent } from "./a11y";
 
 // Colour checks on the real tokens in globals.css: text contrast (WCAG 1.4.3), graphics contrast
@@ -40,10 +41,26 @@ const contrast = (a: string, b: string) => {
 };
 
 const SIM: Record<string, number[][]> = {
-  normal: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
-  protanopia: [[0.152286, 1.052583, -0.204868], [0.114503, 0.786281, 0.099216], [-0.003882, -0.048116, 1.051998]],
-  deuteranopia: [[0.367322, 0.860646, -0.227968], [0.280085, 0.672501, 0.047413], [-0.01182, 0.04294, 0.968881]],
-  tritanopia: [[1.255528, -0.076749, -0.178779], [-0.078411, 0.930809, 0.147602], [0.004733, 0.691367, 0.3039]],
+  normal: [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1],
+  ],
+  protanopia: [
+    [0.152286, 1.052583, -0.204868],
+    [0.114503, 0.786281, 0.099216],
+    [-0.003882, -0.048116, 1.051998],
+  ],
+  deuteranopia: [
+    [0.367322, 0.860646, -0.227968],
+    [0.280085, 0.672501, 0.047413],
+    [-0.01182, 0.04294, 0.968881],
+  ],
+  tritanopia: [
+    [1.255528, -0.076749, -0.178779],
+    [-0.078411, 0.930809, 0.147602],
+    [0.004733, 0.691367, 0.3039],
+  ],
 };
 function lab([r, g, b]: number[]): number[] {
   const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116);
@@ -52,7 +69,18 @@ function lab([r, g, b]: number[]): number[] {
   const z = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883);
   return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
 }
-const seen = (hex: string, kind: string) => lab(SIM[kind].map((row) => Math.min(1, Math.max(0, row.reduce((n, k, j) => n + k * rgb(hex)[j], 0)))));
+const seen = (hex: string, kind: string) =>
+  lab(
+    SIM[kind].map((row) =>
+      Math.min(
+        1,
+        Math.max(
+          0,
+          row.reduce((n, k, j) => n + k * rgb(hex)[j], 0),
+        ),
+      ),
+    ),
+  );
 /** The smallest colour difference (CIE76) between any two of `hexes` for one kind of vision. */
 function closest(hexes: string[], kind: string): number {
   let min = Infinity;
@@ -85,7 +113,8 @@ describe("colour tokens", () => {
     for (const set of ["std", "cvd"]) {
       it(`${name} ${set}: status colours are readable text on every surface`, () => {
         for (const s of ["good", "warn", "bad"]) {
-          for (const bg of ["--color-bg", "--color-surface"]) expect(contrast(t[`--${s}-${set}`], t[bg]), `${s} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+          for (const bg of ["--color-bg", "--color-surface"])
+            expect(contrast(t[`--${s}-${set}`], t[bg]), `${s} on ${bg}`).toBeGreaterThanOrEqual(4.5);
         }
       });
 
@@ -105,12 +134,27 @@ describe("colour tokens", () => {
 
     it(`${name}: the colour-blind safe set beats the standard one for red-green colour blindness`, () => {
       for (const kind of ["protanopia", "deuteranopia"]) {
-        expect(closest(BANDS.map((b) => t[`--band-${b}-cvd`]), kind)).toBeGreaterThan(closest(BANDS.map((b) => t[`--band-${b}-std`]), kind));
+        expect(
+          closest(
+            BANDS.map((b) => t[`--band-${b}-cvd`]),
+            kind,
+          ),
+        ).toBeGreaterThan(
+          closest(
+            BANDS.map((b) => t[`--band-${b}-std`]),
+            kind,
+          ),
+        );
       }
     });
 
     it(`${name}: the standard set is distinct with typical colour vision`, () => {
-      expect(closest(BANDS.map((b) => t[`--band-${b}-std`]), "normal")).toBeGreaterThanOrEqual(25);
+      expect(
+        closest(
+          BANDS.map((b) => t[`--band-${b}-std`]),
+          "normal",
+        ),
+      ).toBeGreaterThanOrEqual(25);
     });
   }
 
@@ -129,8 +173,18 @@ describe("colour tokens", () => {
 describe("accessibility settings", () => {
   it("cleans unknown values to the defaults", () => {
     expect(cleanA11y(undefined)).toEqual({ text: "system", colours: "standard", contrast: "system", hand: "off" });
-    expect(cleanA11y({ text: "999", colours: "pink", contrast: "max" })).toEqual({ text: "system", colours: "standard", contrast: "system", hand: "off" });
-    expect(cleanA11y({ text: "130", colours: "cvd", contrast: "more", hand: "left" })).toEqual({ text: "130", colours: "cvd", contrast: "more", hand: "left" });
+    expect(cleanA11y({ text: "999", colours: "pink", contrast: "max" })).toEqual({
+      text: "system",
+      colours: "standard",
+      contrast: "system",
+      hand: "off",
+    });
+    expect(cleanA11y({ text: "130", colours: "cvd", contrast: "more", hand: "left" })).toEqual({
+      text: "130",
+      colours: "cvd",
+      contrast: "more",
+      hand: "left",
+    });
   });
 
   it("follows the phone's text size within limits", () => {
@@ -158,7 +212,10 @@ describe("accessibility settings", () => {
 describe("3D recovery map", () => {
   it("paints with the dark theme's band colours, and they stand out on the stage", async () => {
     const { STAGE_BANDS } = await import("@/components/demo/colours");
-    for (const [set, suffix] of [["standard", "std"], ["cvd", "cvd"]] as const)
+    for (const [set, suffix] of [
+      ["standard", "std"],
+      ["cvd", "cvd"],
+    ] as const)
       for (const [band, hex] of Object.entries(STAGE_BANDS[set])) {
         expect(hex, `${band} ${set}`).toBe(DARK[`--band-${band}-${suffix}`]);
         expect(contrast(hex, "#05080c"), `${band} ${set}`).toBeGreaterThanOrEqual(3);

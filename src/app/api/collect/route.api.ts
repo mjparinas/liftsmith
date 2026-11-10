@@ -6,7 +6,14 @@ import { storeBatch, whereFrom } from "@/server/collect";
 import { rateLimit } from "@/server/db";
 
 function cors(origin: string | null): Record<string, string> {
-  return origin && NATIVE_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
+  return origin && NATIVE_ORIGINS.has(origin)
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        Vary: "Origin",
+      }
+    : {};
 }
 const json = (status: number, body: unknown, headers: Record<string, string>) => Response.json(body, { status, headers });
 

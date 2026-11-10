@@ -1,7 +1,7 @@
 // GET /api/account/: the signed-in account. DELETE /api/account/: deletes it and everything synced to it
 // (App Store guideline 5.1.1(v) and Google Play's account deletion rule). Server build only.
-import { accountInfo, deleteAccount } from "@/server/accounts";
 import { preflight, reply, signedIn } from "@/server/accountHttp";
+import { accountInfo, deleteAccount } from "@/server/accounts";
 
 export const OPTIONS = preflight;
 

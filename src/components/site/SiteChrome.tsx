@@ -5,8 +5,10 @@
 // name, and the site beacon records it with the page path, so the admin panel shows which ones work.
 import Link from "next/link";
 import type { ReactNode } from "react";
+
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
+
 import { StoreBadges } from "./StoreBadges";
 
 export function JsonLd({ data }: { data: object | object[] }) {
@@ -40,7 +42,9 @@ export function SiteHeader() {
         <Logo />
         <nav aria-label="Site" className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
           {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">{n.label}</Link>
+            <Link key={n.href} href={n.href} className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
+              {n.label}
+            </Link>
           ))}
           <Link href={APP_PATH} data-cta="header" className="press btn-primary ml-1 inline-flex min-h-11 items-center rounded-xl px-4">
             Start free
@@ -57,7 +61,11 @@ export function SiteFooter() {
       <p className="font-semibold">{title}</p>
       <ul className="mt-2 space-y-2 text-sm text-muted">
         {links.map((l) => (
-          <li key={l.href}><Link href={l.href} className="hover:text-ink">{l.label}</Link></li>
+          <li key={l.href}>
+            <Link href={l.href} className="hover:text-ink">
+              {l.label}
+            </Link>
+          </li>
         ))}
       </ul>
     </nav>
@@ -67,7 +75,9 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
         <div>
           <p className="text-lg font-bold">{BRAND.name}</p>
-          <p className="mt-2 max-w-sm text-sm text-muted">{BRAND.tagline} Adaptive strength training for Android, iPhone and the web. No ads, ever.</p>
+          <p className="mt-2 max-w-sm text-sm text-muted">
+            {BRAND.tagline} Adaptive strength training for Android, iPhone and the web. No ads, ever.
+          </p>
           <StoreBadges className="mt-4" webLink={false} place="footer" />
         </div>
         {col("Product", [
@@ -95,7 +105,8 @@ export function SiteFooter() {
         ])}
       </div>
       <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted">
-        © {new Date().getFullYear()} {BRAND.name}. Google Play and the Google Play logo are trademarks of Google LLC. Apple, the Apple logo and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc.
+        © {new Date().getFullYear()} {BRAND.name}. Google Play and the Google Play logo are trademarks of Google LLC. Apple, the Apple logo
+        and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc.
       </p>
     </footer>
   );
@@ -112,7 +123,12 @@ export function Crumbs({ items }: { items: Crumb[] }) {
   const data = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: all.map((c, i) => ({ "@type": "ListItem", position: i + 1, name: c.label, ...(c.href ? { item: `${SITE_URL}${c.href}` } : {}) })),
+    itemListElement: all.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.label,
+      ...(c.href ? { item: `${SITE_URL}${c.href}` } : {}),
+    })),
   };
   return (
     <>
@@ -122,7 +138,13 @@ export function Crumbs({ items }: { items: Crumb[] }) {
           {all.map((c, i) => (
             <li key={i} className="flex gap-x-1.5">
               {i > 0 && <span aria-hidden>›</span>}
-              {c.href && i < all.length - 1 ? <Link href={c.href} className="hover:text-ink">{c.label}</Link> : <span aria-current={i === all.length - 1 ? "page" : undefined}>{c.label}</span>}
+              {c.href && i < all.length - 1 ? (
+                <Link href={c.href} className="hover:text-ink">
+                  {c.label}
+                </Link>
+              ) : (
+                <span aria-current={i === all.length - 1 ? "page" : undefined}>{c.label}</span>
+              )}
             </li>
           ))}
         </ol>
@@ -134,14 +156,28 @@ export function Crumbs({ items }: { items: Crumb[] }) {
 /** The main button into the app. */
 export function CtaButton({ cta, children = "Start free", big }: { cta: string; children?: ReactNode; big?: boolean }) {
   return (
-    <Link href={APP_PATH} data-cta={cta} className={`press btn-primary inline-flex items-center justify-center rounded-2xl font-semibold ${big ? "min-h-14 px-7 text-lg" : "min-h-12 px-6"}`}>
+    <Link
+      href={APP_PATH}
+      data-cta={cta}
+      className={`press btn-primary inline-flex items-center justify-center rounded-2xl font-semibold ${big ? "min-h-14 px-7 text-lg" : "min-h-12 px-6"}`}
+    >
       {children}
     </Link>
   );
 }
 
 /** The big end-of-page call to action, with the store badges. */
-export function CtaBanner({ cta, title, body, button = "Start free in your browser" }: { cta: string; title: string; body: string; button?: string }) {
+export function CtaBanner({
+  cta,
+  title,
+  body,
+  button = "Start free in your browser",
+}: {
+  cta: string;
+  title: string;
+  body: string;
+  button?: string;
+}) {
   return (
     <section className="card-tint mt-12 p-6 md:p-10" style={{ ["--tint" as string]: "var(--color-violet)" }} aria-label="Get the app">
       <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{title}</h2>
@@ -153,7 +189,9 @@ export function CtaBanner({ cta, title, body, button = "Start free in your brows
         <li>✓ No ads, ever</li>
       </ul>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <CtaButton cta={cta} big>{button}</CtaButton>
+        <CtaButton cta={cta} big>
+          {button}
+        </CtaButton>
         <StoreBadges webLink={false} place={`${cta}-badges`} />
       </div>
     </section>
@@ -168,7 +206,9 @@ export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: s
         <p className="font-bold">{title}</p>
         <p className="mt-1 text-sm text-muted">{body}</p>
       </div>
-      <div className="shrink-0"><CtaButton cta={cta}>{button}</CtaButton></div>
+      <div className="shrink-0">
+        <CtaButton cta={cta}>{button}</CtaButton>
+      </div>
     </aside>
   );
 }
@@ -179,7 +219,13 @@ export function StickyCta({ cta, text = `Get your plan in ${BRAND.name}` }: { ct
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-bg/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-lg md:hidden">
       <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
         <p className="text-sm font-semibold">{text}</p>
-        <Link href={APP_PATH} data-cta={cta} className="press btn-primary inline-flex min-h-11 shrink-0 items-center rounded-xl px-4 font-semibold">Start free</Link>
+        <Link
+          href={APP_PATH}
+          data-cta={cta}
+          className="press btn-primary inline-flex min-h-11 shrink-0 items-center rounded-xl px-4 font-semibold"
+        >
+          Start free
+        </Link>
       </div>
     </div>
   );

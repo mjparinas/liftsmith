@@ -1,13 +1,13 @@
 import { blockWeek, weekStart } from "./block";
-import { EXERCISE_BY_ID } from "./exercises";
-import { weeklySets } from "./generator";
-import { epley, sessionsOf, TIMED } from "./progression";
-import type { Streak } from "./game";
 import { can } from "./entitlements";
-import { activeFixes, findPlateaus, fixResult, FIX_TEXT, type FixKind, type Plateau } from "./plateau";
+import { EXERCISE_BY_ID } from "./exercises";
+import type { Streak } from "./game";
+import { weeklySets } from "./generator";
+import { currentTag, date, list, t } from "./i18n";
+import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
+import { epley, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
-import { currentTag, date, list, t } from "./i18n";
 
 // Coach's notes (Melvin, 2026-11-09): proactive, action-oriented insights instead of charts to
 // interpret. Each one says what we noticed, the numbers behind it, and one thing to do, ideally a
@@ -61,7 +61,10 @@ const lowerName = (id: string) => name(id).toLocaleLowerCase(currentTag());
 /** Best estimated one-rep max per session for a loaded lift, oldest first. */
 function e1Series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
   return sessionsOf(events, exerciseId)
-    .map((sets) => ({ at: sets[0].at, e1: Math.max(0, ...sets.filter((s) => !s.challenge && s.weight > 0).map((s) => epley(s.weight, s.reps))) }))
+    .map((sets) => ({
+      at: sets[0].at,
+      e1: Math.max(0, ...sets.filter((s) => !s.challenge && s.weight > 0).map((s) => epley(s.weight, s.reps))),
+    }))
     .filter((s) => s.e1 > 0)
     .reverse();
 }
@@ -112,7 +115,9 @@ function bestGain(events: readonly AppEvent[], now: number): { exerciseId: strin
 
 /** Weigh-ins in the window, oldest first. */
 function weighIns(events: readonly AppEvent[], now: number, days: number): BodyweightEvent[] {
-  return events.filter((e): e is BodyweightEvent => e.type === "bodyweight" && now - e.at <= days * DAY && e.at <= now).sort((a, b) => a.at - b.at);
+  return events
+    .filter((e): e is BodyweightEvent => e.type === "bodyweight" && now - e.at <= days * DAY && e.at <= now)
+    .sort((a, b) => a.at - b.at);
 }
 
 /** Change per week by least squares, so one odd weigh-in doesn't swing it. */
@@ -188,7 +193,12 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         title: t("ins.stalled.title", { name: name(p.exerciseId) }),
         why: t("ins.plateau.why", { weeks: weeksText(p.weeks), best: w(p.best), cause: p.causes[0].text }),
         advice: t("ins.plateau.advice", { what: fix.what }),
-        action: { kind: "plateau", plateau: p, fix: p.fix, label: t("ins.plateau.action", { fix: fix.title.toLocaleLowerCase(currentTag()) }) },
+        action: {
+          kind: "plateau",
+          plateau: p,
+          fix: p.fix,
+          label: t("ins.plateau.action", { fix: fix.title.toLocaleLowerCase(currentTag()) }),
+        },
       });
     }
   } else if (stalled.length === 1) {
@@ -219,7 +229,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       id: `fix-done-${f.exerciseId}-${f.startedAt}`,
       tone: r?.worked ? "good" : "info",
       title: t("ins.fixDone.title", { name: name(f.exerciseId) }),
-      why: !r ? t("ins.fixDone.noData") : r.worked ? t("ins.fixDone.worked", { pct: Math.round(r.gain * 1000) / 10 }) : t("ins.fixDone.notYet"),
+      why: !r
+        ? t("ins.fixDone.noData")
+        : r.worked
+          ? t("ins.fixDone.worked", { pct: Math.round(r.gain * 1000) / 10 })
+          : t("ins.fixDone.notYet"),
       advice: r?.worked ? t("ins.fixDone.adviceWorked") : t("ins.fixDone.adviceStuck"),
     });
   }
@@ -230,8 +244,14 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     const priorities = new Set(profile.training?.priorities ?? []);
     const firstSet = Math.min(...recent.map((s) => s.sets[0].at));
     if (firstSet <= thisWeek - 2 * WEEK) {
-      const a = weeklySets(events.filter((e) => e.at < thisWeek), thisWeek - WEEK);
-      const b = weeklySets(events.filter((e) => e.at < thisWeek - WEEK), thisWeek - 2 * WEEK);
+      const a = weeklySets(
+        events.filter((e) => e.at < thisWeek),
+        thisWeek - WEEK,
+      );
+      const b = weeklySets(
+        events.filter((e) => e.at < thisWeek - WEEK),
+        thisWeek - 2 * WEEK,
+      );
       const lagging = BIG.filter((m) => !priorities.has(m))
         .map((m) => ({ m, avg: (a[m] + b[m]) / 2 }))
         .filter((x) => x.avg < week.setsPerMuscle * 0.5)
@@ -244,7 +264,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
           title: t("ins.volume.title", { muscle: MUSCLE_LABEL[m] }),
           why: t("ins.volume.why", { sets: Math.round(avg), goal: week.setsPerMuscle }),
           advice: t("ins.volume.advice", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
-          action: { kind: "priority", muscle: m, label: t("ins.volume.action", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }) },
+          action: {
+            kind: "priority",
+            muscle: m,
+            label: t("ins.volume.action", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+          },
         });
       }
     }
@@ -262,7 +286,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         id: `fat-up-${fat.at(-1)!.at}`,
         tone: "warn",
         title: t("ins.fatUp.title"),
-        why: t("ins.fatUp.why", { change: fmtNum(Math.round(change * 10) / 10), weeks: weeksText(span), now: fmtNum(Math.round(fat.at(-1)!.v * 10) / 10) }),
+        why: t("ins.fatUp.why", {
+          change: fmtNum(Math.round(change * 10) / 10),
+          weeks: weeksText(span),
+          now: fmtNum(Math.round(fat.at(-1)!.v * 10) / 10),
+        }),
         advice: profile.goal === "muscle" ? t("ins.fatUp.adviceMuscle") : t("ins.fatUp.advice"),
       });
     } else if (change <= -1 && !stalled.length) {
@@ -303,7 +331,10 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `streak-${Math.floor(now / DAY)}`,
       tone: "info",
-      title: streak.weeks > 0 ? t("ins.streak.title", { weeks: streak.weeks, needed: streak.needed }) : t("ins.streak.titleGoal", { needed: streak.needed }),
+      title:
+        streak.weeks > 0
+          ? t("ins.streak.title", { weeks: streak.weeks, needed: streak.needed })
+          : t("ins.streak.titleGoal", { needed: streak.needed }),
       why: t("ins.streak.why", { count: streak.needed, days: profile.daysPerWeek }),
       advice: t("ins.streak.advice"),
       action: profile.minutes > 30 ? { kind: "minutes", minutes: 30, label: t("ins.streak.action") } : undefined,

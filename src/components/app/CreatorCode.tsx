@@ -1,14 +1,17 @@
 "use client";
+
 // Entering a creator code (AGENTS.md "Marketing and growth"): in Settings › Creator code, and under the
 // plans on the paywall and setup's trial step. A code from a link or the Play install referrer arrives by
 // itself (creator.ts); this is for iPhone, where the App Store passes nothing, and for anyone who was told
 // a code. The code can't change once a trial or subscription has started.
 import { useState } from "react";
+
 import { useBilling } from "@/lib/billing";
 import { clearCode, CREATOR_TRIAL_DAYS, sendClaim, setCode, useCreator } from "@/lib/creator";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { useApp } from "@/lib/store";
+
 import { Button } from "./ui";
 
 /** True once this lifter has a trial or subscription: the code belongs to it then. */
@@ -93,16 +96,29 @@ export function CreatorCode({ collapsed = false }: { collapsed?: boolean }) {
             aria-label={t("creator.title")}
             className="card min-h-11 min-w-0 flex-1 px-4 py-2 uppercase"
           />
-          <Button kind="ghost" disabled={checking || !text.trim()} onClick={() => void apply()}>{t("creator.apply")}</Button>
+          <Button kind="ghost" disabled={checking || !text.trim()} onClick={() => void apply()}>
+            {t("creator.apply")}
+          </Button>
         </div>
       )}
       {claim && !locked && (
-        <button type="button" className="press mt-2 min-h-11 text-sm text-muted underline" onClick={() => { clearCode(false); setNote(null); }}>
+        <button
+          type="button"
+          className="press mt-2 min-h-11 text-sm text-muted underline"
+          onClick={() => {
+            clearCode(false);
+            setNote(null);
+          }}
+        >
           {t("creator.remove")}
         </button>
       )}
       {locked && !claim && <p className="mt-2 text-sm text-muted">{t("creator.lockedNone")}</p>}
-      {note && <p role="status" className="mt-2 text-sm text-warn">{note}</p>}
+      {note && (
+        <p role="status" className="mt-2 text-sm text-warn">
+          {note}
+        </p>
+      )}
     </div>
   );
 }

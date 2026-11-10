@@ -1,7 +1,7 @@
+import { t as tr, translated } from "./i18n";
 import { roundLoad } from "./loads";
 import { TIMED, type Target } from "./progression";
 import { BODY_PARTS, type AppEvent, type BodyPart, type Exercise, type Gym, type Muscle, type Pattern } from "./types";
-import { t as tr, translated } from "./i18n";
 
 // Injury mode (Melvin, 2026-11-09). The lifter logs an injury by body part. Exercises that load that
 // part are skipped until they mark it healed, or, if they choose after a risk warning, kept at a share
@@ -25,7 +25,12 @@ interface PartRule {
 
 const RULES: Record<BodyPart, PartRule> = {
   neck: { primary: ["traps"], secondary: ["traps"], patterns: [], ids: ["overhead-press", "back-squat"] },
-  shoulder: { primary: ["frontDelts", "sideDelts", "rearDelts"], secondary: ["frontDelts", "sideDelts", "rearDelts"], patterns: ["vpush", "vpull"], ids: [] },
+  shoulder: {
+    primary: ["frontDelts", "sideDelts", "rearDelts"],
+    secondary: ["frontDelts", "sideDelts", "rearDelts"],
+    patterns: ["vpush", "vpull"],
+    ids: [],
+  },
   elbow: { primary: ["biceps", "triceps", "forearms"], secondary: ["biceps"], patterns: [], ids: [] },
   wrist: { primary: ["forearms"], secondary: ["forearms"], patterns: ["hpush", "vpush"], ids: ["front-squat", "plank", "side-plank"] },
   chest: { primary: ["chest"], secondary: ["chest"], patterns: [], ids: [] },
@@ -44,7 +49,12 @@ const RULES: Record<BodyPart, PartRule> = {
 /** Does this exercise load the injured part? */
 export function affects(part: BodyPart, ex: Exercise): boolean {
   const r = RULES[part];
-  return r.ids.includes(ex.id) || r.patterns.includes(ex.pattern) || ex.primary.some((m) => r.primary.includes(m)) || ex.secondary.some((m) => r.secondary.includes(m));
+  return (
+    r.ids.includes(ex.id) ||
+    r.patterns.includes(ex.pattern) ||
+    ex.primary.some((m) => r.primary.includes(m)) ||
+    ex.secondary.some((m) => r.secondary.includes(m))
+  );
 }
 
 /** Shares of the usual load the lifter can pick, and the one offered first. */
@@ -95,11 +105,23 @@ export interface Injury {
 /** Every injury logged, newest first. Rules apply in time order, so the latest choice wins on every device. */
 export function injuries(events: readonly AppEvent[], now = Date.now()): Injury[] {
   const by = new Map<string, Injury>();
-  const evs = events.filter((e) => e.type === "injury" || e.type === "injuryRule" || e.type === "injuryHealed" || e.type === "pain" || e.type === "injuryReturn").sort((a, b) => a.at - b.at || a.id.localeCompare(b.id));
+  const evs = events
+    .filter(
+      (e) => e.type === "injury" || e.type === "injuryRule" || e.type === "injuryHealed" || e.type === "pain" || e.type === "injuryReturn",
+    )
+    .sort((a, b) => a.at - b.at || a.id.localeCompare(b.id));
   const returns = new Map<string, number>();
   for (const e of evs) {
     if (e.type === "injury") {
-      if (!by.has(e.injuryId)) by.set(e.injuryId, { id: e.injuryId, part: e.part, since: e.at, pain: [], all: { action: "skip", pct: DEFAULT_PCT }, rules: new Map() });
+      if (!by.has(e.injuryId))
+        by.set(e.injuryId, {
+          id: e.injuryId,
+          part: e.part,
+          since: e.at,
+          pain: [],
+          all: { action: "skip", pct: DEFAULT_PCT },
+          rules: new Map(),
+        });
       continue;
     }
     const inj = by.get(e.injuryId);
@@ -173,7 +195,8 @@ export function gradedReturn(start: number, pain: readonly PainReading[], now: n
     if (p.at < start) continue;
     if (p.at > now) break;
     step(p.at);
-    if (p.score >= STOP_PAIN) return { startedAt: start, pct: RETURN_PCTS[stage], stage, readyToHeal: false, stopped: { at: p.at, score: p.score } };
+    if (p.score >= STOP_PAIN)
+      return { startedAt: start, pct: RETURN_PCTS[stage], stage, readyToHeal: false, stopped: { at: p.at, score: p.score } };
     if (p.score > LOW_PAIN) {
       from = p.at;
       low = false;

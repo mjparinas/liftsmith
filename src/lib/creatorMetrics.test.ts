@@ -1,12 +1,35 @@
 import { describe, expect, it } from "vitest";
+
 import type { SubEvent } from "./adminMetrics";
 import { addMonths, commissionOn, creatorRows, HOLD_DAYS, payoutCsv, STORE_FEE, type Creator } from "./creatorMetrics";
 
 const DAY = 86_400_000;
 const NOW = Date.UTC(2027, 5, 1);
-const creator = (over: Partial<Creator> = {}): Creator => ({ code: "LIFT-ALEX", name: "Alex", contact: null, rate: 0.3, months: 12, active: true, note: null, createdAt: 0, ...over });
+const creator = (over: Partial<Creator> = {}): Creator => ({
+  code: "LIFT-ALEX",
+  name: "Alex",
+  contact: null,
+  rate: 0.3,
+  months: 12,
+  active: true,
+  note: null,
+  createdAt: 0,
+  ...over,
+});
 let seq = 0;
-const sub = (installId: string, kind: string, at: number, usd: number | null = null): SubEvent => ({ id: `s${seq++}`, at, installId, subscription: null, store: "play", kind, plan: "annual", usd, priceLocal: usd, currency: "USD", reason: null });
+const sub = (installId: string, kind: string, at: number, usd: number | null = null): SubEvent => ({
+  id: `s${seq++}`,
+  at,
+  installId,
+  subscription: null,
+  store: "play",
+  kind,
+  plan: "annual",
+  usd,
+  priceLocal: usd,
+  currency: "USD",
+  reason: null,
+});
 
 describe("creator commission", () => {
   it("is the rate times net revenue, and refunds take it back", () => {
@@ -50,9 +73,21 @@ describe("creator commission", () => {
 
   it("subtracts payouts and refunds, and lists only payable creators", () => {
     const t0 = NOW - 200 * DAY;
-    const installs = Array.from({ length: 4 }, (_, i) => ({ installId: `i${i}`, code: "LIFT-ALEX", at: t0, source: "link", platform: "play" }));
+    const installs = Array.from({ length: 4 }, (_, i) => ({
+      installId: `i${i}`,
+      code: "LIFT-ALEX",
+      at: t0,
+      source: "link",
+      platform: "play",
+    }));
     const subs = [...installs.map((i) => sub(i.installId, "purchase", t0, 39.99)), sub("i0", "refund", NOW - 2 * DAY, 39.99)];
-    const [row] = creatorRows({ now: NOW, creators: [creator({ name: "=Alex" })], installs, subs, payouts: [{ id: 1, code: "LIFT-ALEX", usd: 5, paidAt: NOW - 20 * DAY, admin: "m@x", note: null }] });
+    const [row] = creatorRows({
+      now: NOW,
+      creators: [creator({ name: "=Alex" })],
+      installs,
+      subs,
+      payouts: [{ id: 1, code: "LIFT-ALEX", usd: 5, paidAt: NOW - 20 * DAY, admin: "m@x", note: null }],
+    });
     expect(row.refunds).toBe(1);
     expect(row.cleared).toBeCloseTo(3 * 39.99 * 0.85 * 0.3, 2);
     expect(row.owed).toBeCloseTo(row.cleared - 5, 2);
@@ -66,7 +101,13 @@ describe("creator commission", () => {
 
   it("holds revenue for the refund window", () => {
     const at = NOW - (HOLD_DAYS - 1) * DAY;
-    const [row] = creatorRows({ now: NOW, creators: [creator()], installs: [{ installId: "x", code: "LIFT-ALEX", at, source: "link", platform: "play" }], subs: [sub("x", "purchase", at, 39.99)], payouts: [] });
+    const [row] = creatorRows({
+      now: NOW,
+      creators: [creator()],
+      installs: [{ installId: "x", code: "LIFT-ALEX", at, source: "link", platform: "play" }],
+      subs: [sub("x", "purchase", at, 39.99)],
+      payouts: [],
+    });
     expect(row.cleared).toBe(0);
     expect(row.earned).toBeGreaterThan(0);
   });

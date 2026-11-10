@@ -1,35 +1,45 @@
 "use client";
+
 import { create } from "zustand";
-import { defaultProfile, makeGym, type GymPreset } from "./defaults";
-import { mergeBackup, type Backup } from "./backup";
+
+import { forgetAnalytics, track } from "./analytics";
 import { signOut } from "./auth";
-import { derive, setWeekStart, type Stats } from "./derive";
-import { minutesForToday } from "./training";
+import { mergeBackup, type Backup } from "./backup";
+import { forgetBilling } from "./billing";
 import { weekStart } from "./block";
+import { defaultProfile, makeGym, type GymPreset } from "./defaults";
+import { derive, setWeekStart, type Stats } from "./derive";
+import { can } from "./entitlements";
+import { exercise, registerCustom } from "./exercises";
+import {
+  alternatives,
+  generate,
+  injuredTarget,
+  injuryPass,
+  planSeconds,
+  setSeconds,
+  type Plan,
+  type PlanItem,
+  type SetTarget,
+} from "./generator";
+import { gymAt, locate, wantsLocation, type Fix } from "./geo";
 import { readBody, readDaily } from "./health";
-import { healthExternal } from "./twin";
-import { alternatives, generate, injuredTarget, injuryPass, type Plan, type PlanItem, type SetTarget } from "./generator";
 import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
-import { target } from "./progression";
-import { exercise, registerCustom } from "./exercises";
-import { implementsFor } from "./sides";
-import { setSeconds } from "./generator";
-import { WARMUP_REST, warmupFor } from "./warmup";
-import { afterSet, applyLinks, linksOf, toggleLink } from "./superset";
-import { planFromRoutine, upsertRoutine } from "./routines";
-import { planSeconds } from "./generator";
-import { gymAt, locate, wantsLocation, type Fix } from "./geo";
-import { readiness, type Call, type Readiness } from "./readiness";
-import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
-import { forgetAnalytics, track } from "./analytics";
-import { applyFixes, startFix, type FixKind, type Plateau } from "./plateau";
-import { doLater, fitToTime } from "./replan";
 import { withSettings, type Setting } from "./machineSettings";
-import { pickProgram, programPlan, PROGRAM_BY_ID } from "./programs";
-import { can } from "./entitlements";
-import { forgetBilling } from "./billing";
+import { applyFixes, startFix, type FixKind, type Plateau } from "./plateau";
+import { pickProgram, PROGRAM_BY_ID, programPlan } from "./programs";
+import { target } from "./progression";
+import { readiness, type Call, type Readiness } from "./readiness";
+import { doLater, fitToTime } from "./replan";
+import { planFromRoutine, upsertRoutine } from "./routines";
+import { implementsFor } from "./sides";
+import { afterSet, applyLinks, linksOf, toggleLink } from "./superset";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "./tdee";
+import { minutesForToday } from "./training";
+import { healthExternal } from "./twin";
+import type { AppEvent, BodyPart, Gym, InjuryRuleEvent, LoadKind, Muscle, Profile, Rating, Routine } from "./types";
+import { WARMUP_REST, warmupFor } from "./warmup";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 
@@ -246,7 +256,12 @@ export const useApp = create<State>((set, get) => {
           continue;
         }
         if (effectFor(ex, hurt)?.action === "skip") {
-          const alt = alternatives(ex.id, g, [...items, ...a.plan.items].map((i) => i.exerciseId), hurt)[0];
+          const alt = alternatives(
+            ex.id,
+            g,
+            [...items, ...a.plan.items].map((i) => i.exerciseId),
+            hurt,
+          )[0];
           if (!alt) continue;
           ex = alt;
         }
@@ -254,7 +269,14 @@ export const useApp = create<State>((set, get) => {
         // Warm-ups follow the new exercise and load.
         const warmed = new Set(items.flatMap((i) => exercise(i.exerciseId).primary));
         const wu = warmupFor(ex, t.target.weight, g, warmed);
-        items.push({ ...item, exerciseId: ex.id, target: t.target, injuryPct: t.injuryPct, challenge: t.injuryPct ? undefined : item.challenge, warmup: wu.length ? wu : undefined });
+        items.push({
+          ...item,
+          exerciseId: ex.id,
+          target: t.target,
+          injuryPct: t.injuryPct,
+          challenge: t.injuryPct ? undefined : item.challenge,
+          warmup: wu.length ? wu : undefined,
+        });
       }
       const next = loadItem({ ...a, plan: { ...a.plan, items } }, Math.min(a.index, items.length));
       set({ active: next });
@@ -319,7 +341,14 @@ export const useApp = create<State>((set, get) => {
 
     addCustomExercise({ name, primary, load, compound }) {
       const id = `custom-${uid().slice(0, 12)}`;
-      commit([{ type: "customExercise", id: uid(), at: Date.now(), exercise: { id, name: name.trim().slice(0, 60) || "My exercise", primary: [primary], secondary: [], load, compound } }]);
+      commit([
+        {
+          type: "customExercise",
+          id: uid(),
+          at: Date.now(),
+          exercise: { id, name: name.trim().slice(0, 60) || "My exercise", primary: [primary], secondary: [], load, compound },
+        },
+      ]);
       return id;
     },
 
@@ -330,7 +359,9 @@ export const useApp = create<State>((set, get) => {
     },
 
     async forgetCycle() {
-      const ids = get().events.filter((e) => e.type === "cycle").map((e) => e.id);
+      const ids = get()
+        .events.filter((e) => e.type === "cycle")
+        .map((e) => e.id);
       const events = get().events.filter((e) => e.type !== "cycle");
       set({ events, stats: derive(events, Date.now()) });
       await deleteEvents(ids);
@@ -397,8 +428,12 @@ export const useApp = create<State>((set, get) => {
       } catch {}
       set({ ready: true, events: snap.events, profile, gyms: snap.gyms, stats: derive(snap.events, Date.now()), active });
       if (!get().autoEnd()) get().replan();
-      void get().importHealthBody().catch(() => 0);
-      void get().importHealthDaily().catch(() => 0);
+      void get()
+        .importHealthBody()
+        .catch(() => 0);
+      void get()
+        .importHealthDaily()
+        .catch(() => 0);
     },
 
     setProfile(p) {
@@ -409,7 +444,16 @@ export const useApp = create<State>((set, get) => {
         setWeekStart(profile.training?.weekStart);
         set({ stats: derive(get().events, Date.now()) });
       }
-      if ("minutes" in p || "training" in p || "planSource" in p || "activeGymId" in p || "variability" in p || "goal" in p || "experience" in p) get().replan();
+      if (
+        "minutes" in p ||
+        "training" in p ||
+        "planSource" in p ||
+        "activeGymId" in p ||
+        "variability" in p ||
+        "goal" in p ||
+        "experience" in p
+      )
+        get().replan();
     },
 
     saveGym(g) {
@@ -440,7 +484,10 @@ export const useApp = create<State>((set, get) => {
       const { profile, events, callOverride } = get();
       const now = Date.now();
       // Health signals (sleep, HRV, resting HR, breathing rate) move the call for Pro only (AGENTS.md "Health twin").
-      const r = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...(can("healthReadiness") ? healthExternal(events, now) : {}) });
+      const r = readiness(events, profile, now, {
+        cycle: !!profile.cycle?.enabled,
+        ...(can("healthReadiness") ? healthExternal(events, now) : {}),
+      });
       const call = callOverride ?? r.call;
       const src = profile.planSource;
       const programDay = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
@@ -464,7 +511,8 @@ export const useApp = create<State>((set, get) => {
       const free = src.kind === "program" && PROGRAM_BY_ID.get(src.id)?.tier === "free";
       if (!can("adaptive")) {
         // Adaptive plans and splits are Pro: keep what they had, and plan the free classic 5x5 meanwhile.
-        if (!free && src.kind !== "routine") get().setProfile({ proPlan: src, planSource: pickProgram("classic-5x5", { profile, gym: g, events, now: Date.now() }) });
+        if (!free && src.kind !== "routine")
+          get().setProfile({ proPlan: src, planSource: pickProgram("classic-5x5", { profile, gym: g, events, now: Date.now() }) });
       } else if (profile.proPlan) {
         // Pro again (a purchase, a restore, a renewal the phone just heard about): back to their own plan.
         get().setProfile({ planSource: profile.proPlan, proPlan: undefined });
@@ -535,12 +583,50 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const r = get().readiness;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
-      const a = loadItem({ sessionId, startedAt: now, plan, index: 0, weight: 0, reps: 0, restUntil: null, restTotal: 0, askFeedback: null, hr: [], hrAt: [], setStart: now, lastAt: now }, 0);
-      commit([{ type: "sessionStart", id: uid(), at: now, sessionId, gymId: g.id, minutes: plan.minutes, call: plan.call, readiness: r?.score, callOverridden: get().callOverride !== null && get().callOverride !== r?.call, challenge: plan.challenge, program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined, routine: plan.routineId }]);
+      const a = loadItem(
+        {
+          sessionId,
+          startedAt: now,
+          plan,
+          index: 0,
+          weight: 0,
+          reps: 0,
+          restUntil: null,
+          restTotal: 0,
+          askFeedback: null,
+          hr: [],
+          hrAt: [],
+          setStart: now,
+          lastAt: now,
+        },
+        0,
+      );
+      commit([
+        {
+          type: "sessionStart",
+          id: uid(),
+          at: now,
+          sessionId,
+          gymId: g.id,
+          minutes: plan.minutes,
+          call: plan.call,
+          readiness: r?.score,
+          callOverridden: get().callOverride !== null && get().callOverride !== r?.call,
+          challenge: plan.challenge,
+          program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined,
+          routine: plan.routineId,
+        },
+      ]);
       set({ callOverride: null, links: [], routineId: null });
       set({ active: a });
       persistActive(a);
-      track("workout_start", { minutes: plan.minutes, exercises: plan.items.length, call: plan.call ?? "normal", overridden, gymKind: g.equipment.length ? "equipped" : "bodyweight" });
+      track("workout_start", {
+        minutes: plan.minutes,
+        exercises: plan.items.length,
+        call: plan.call ?? "normal",
+        overridden,
+        gymKind: g.equipment.length ? "equipped" : "bodyweight",
+      });
     },
 
     logSet() {
@@ -553,7 +639,9 @@ export const useApp = create<State>((set, get) => {
       const autoRest = get().profile.training?.autoRest !== false;
       if (warmingUp(a)) {
         // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
-        commit([{ type: "warmup", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps }]);
+        commit([
+          { type: "warmup", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps },
+        ]);
         const warm = (a.warm ?? 0) + 1;
         const nextWarm = item.warmup![warm];
         const next: Active = {
@@ -610,13 +698,16 @@ export const useApp = create<State>((set, get) => {
       // Alone, the next set is the same exercise until its sets are done. In a superset it's the
       // next exercise of the round (superset.ts).
       const items = a.plan.items;
-      const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
+      const step = afterSet(items, a.index, (i) =>
+        i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId),
+      );
       let next: Active = { ...a, repsR: undefined, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
       const nextT = item.setTargets?.[already + 1];
       const prevT = item.setTargets?.[already];
-      if (step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps)) next = { ...next, weight: nextT.weight, reps: nextT.reps };
+      if (step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
+        next = { ...next, weight: nextT.weight, reps: nextT.reps };
       if (step.finished) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
       if (step.index !== a.index) next = loadItem(next, Math.min(step.index, items.length));
       const last = next.index >= items.length;
@@ -656,7 +747,15 @@ export const useApp = create<State>((set, get) => {
       const a = get().active;
       if (!a || !warmingUp(a)) return;
       const item = a.plan.items[a.index];
-      const next: Active = { ...a, warm: item.warmup!.length, weight: item.target.weight, reps: item.target.reps, restUntil: null, setStart: Date.now(), lastAt: Date.now() };
+      const next: Active = {
+        ...a,
+        warm: item.warmup!.length,
+        weight: item.target.weight,
+        reps: item.target.reps,
+        restUntil: null,
+        setStart: Date.now(),
+        lastAt: Date.now(),
+      };
       set({ active: next });
       persistActive(next);
     },
@@ -666,7 +765,13 @@ export const useApp = create<State>((set, get) => {
       if (!a) return;
       // Rest is over (timer ran out or Skip): the next set's work starts now.
       const now = Date.now();
-      const next = { ...a, restUntil: null, restReady: undefined, setStart: now, lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest };
+      const next = {
+        ...a,
+        restUntil: null,
+        restReady: undefined,
+        setStart: now,
+        lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
+      };
       set({ active: next });
       persistActive(next);
     },
@@ -684,7 +789,8 @@ export const useApp = create<State>((set, get) => {
     feedback(rating) {
       const a = get().active;
       if (!a?.askFeedback) return;
-      if (rating !== 0) commit([{ type: "feedback", id: uid(), at: Date.now(), sessionId: a.sessionId, exerciseId: a.askFeedback, rating }]);
+      if (rating !== 0)
+        commit([{ type: "feedback", id: uid(), at: Date.now(), sessionId: a.sessionId, exerciseId: a.askFeedback, rating }]);
       const next = { ...a, askFeedback: null, lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
@@ -698,7 +804,13 @@ export const useApp = create<State>((set, get) => {
       const to = exercise(toId);
       const t = injuredTarget(to, target(to, get().events, get().profile, g, Date.now()), activeInjuries(get().events), g);
       const done = setsDone(get().events, a.sessionId, item.exerciseId);
-      const newItem: PlanItem = { ...item, exerciseId: toId, target: t.target, injuryPct: t.injuryPct, sets: Math.max(1, item.sets - done) };
+      const newItem: PlanItem = {
+        ...item,
+        exerciseId: toId,
+        target: t.target,
+        injuryPct: t.injuryPct,
+        sets: Math.max(1, item.sets - done),
+      };
       // A program keeps its sets and reps (and the lift the sets count for); only the weight changes,
       // to what the new exercise usually takes. A ladder step keeps bodyweight.
       if (item.setTargets) {
@@ -770,10 +882,25 @@ export const useApp = create<State>((set, get) => {
         auto: opts.auto || undefined,
       };
       const evs: AppEvent[] = [end];
-      if (hr.length) evs.push({ type: "hrSeries", id: uid(), at, sessionId: a.sessionId, start: a.startedAt, t: a.hrAt.filter((_, i) => inWindow[i]).map((t) => Math.round(t / 1000)), bpm: hr });
+      if (hr.length)
+        evs.push({
+          type: "hrSeries",
+          id: uid(),
+          at,
+          sessionId: a.sessionId,
+          start: a.startedAt,
+          t: a.hrAt.filter((_, i) => inWindow[i]).map((t) => Math.round(t / 1000)),
+          bpm: hr,
+        });
       commit(evs);
       // Counts and length only: no weights, reps or heart rate leave the device.
-      track("workout_finish", { sets: sets.length, minutes: Math.round((end.type === "sessionEnd" ? end.seconds : 0) / 60), auto: !!opts.auto, exercises: new Set(sets.map((e) => (e.type === "set" ? e.exerciseId : ""))).size, challenge: !!a.plan.challenge });
+      track("workout_finish", {
+        sets: sets.length,
+        minutes: Math.round((end.type === "sessionEnd" ? end.seconds : 0) / 60),
+        auto: !!opts.auto,
+        exercises: new Set(sets.map((e) => (e.type === "set" ? e.exerciseId : ""))).size,
+        challenge: !!a.plan.challenge,
+      });
       set({ active: null });
       persistActive(null);
       get().replan();
@@ -783,7 +910,9 @@ export const useApp = create<State>((set, get) => {
     discard() {
       const a = get().active;
       if (!a) return;
-      const ids = get().events.filter((e) => "sessionId" in e && e.sessionId === a.sessionId).map((e) => e.id);
+      const ids = get()
+        .events.filter((e) => "sessionId" in e && e.sessionId === a.sessionId)
+        .map((e) => e.id);
       track("workout_discard", { sets: get().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId).length });
       const events = get().events.filter((e) => !ids.includes(e.id));
       set({ events, stats: derive(events, Date.now()), active: null });
@@ -822,11 +951,21 @@ export const useApp = create<State>((set, get) => {
     async importHealthBody() {
       const readings = await readBody(120);
       const have = new Set(get().events.map((e) => e.id));
-      const fresh = readings.map((r) => ({ type: "bodyweight" as const, id: `health-bw-${r.day}`, at: r.at, kg: r.kg, ...(r.bodyFat ? { bodyFat: r.bodyFat } : {}) })).filter((e) => !have.has(e.id));
+      const fresh = readings
+        .map((r) => ({
+          type: "bodyweight" as const,
+          id: `health-bw-${r.day}`,
+          at: r.at,
+          kg: r.kg,
+          ...(r.bodyFat ? { bodyFat: r.bodyFat } : {}),
+        }))
+        .filter((e) => !have.has(e.id));
       if (fresh.length) {
         commit(fresh);
         const newest = fresh.reduce((a, b) => (b.at > a.at ? b : a));
-        const last = get().events.filter((e) => e.type === "bodyweight").reduce((t, e) => Math.max(t, e.at), 0);
+        const last = get()
+          .events.filter((e) => e.type === "bodyweight")
+          .reduce((t, e) => Math.max(t, e.at), 0);
         if (newest.at >= last) get().setProfile({ bodyweight: newest.kg });
       }
       if (fresh.length) get().refreshTdee();
@@ -837,7 +976,14 @@ export const useApp = create<State>((set, get) => {
       const readings = await readDaily(45);
       const have = new Set(get().events.map((e) => e.id));
       const fresh = readings
-        .map((r) => ({ type: "health" as const, id: `health-${r.metric}-${r.day}-${Math.round(r.value * 10)}`, at: r.at, metric: r.metric, day: r.day, value: r.value }))
+        .map((r) => ({
+          type: "health" as const,
+          id: `health-${r.metric}-${r.day}-${Math.round(r.value * 10)}`,
+          at: r.at,
+          metric: r.metric,
+          day: r.day,
+          value: r.value,
+        }))
         .filter((e) => !have.has(e.id));
       if (fresh.length) {
         commit(fresh);

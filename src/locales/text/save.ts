@@ -17,12 +17,14 @@ export const en = {
   "save.app": "Or get the app:",
   "save.getAndroid": "Google Play",
   "save.getIos": "App Store",
-  "save.accounts": "Sign in to back it up to your account and sync it to your other devices. It's optional: without an account it stays on this device only.",
+  "save.accounts":
+    "Sign in to back it up to your account and sync it to your other devices. It's optional: without an account it stays on this device only.",
   "save.synced": "Backed up to your account ({email}) and synced to your devices.",
   "save.signIn": "Sign in to sync",
   "save.later": "You can sign in, or save a backup file, any time in Settings.",
   "save.settings": "Saving and backup",
-  "save.move": "Moving to a new phone, or from the browser to the app? Sign in on both and your workouts follow you. Or save a backup file here and restore it there.",
+  "save.move":
+    "Moving to a new phone, or from the browser to the app? Sign in on both and your workouts follow you. Or save a backup file here and restore it there.",
   "save.backup": "Save a backup file",
   "save.restore": "Restore a backup",
   "save.restore.file": "Backup file to restore",
@@ -51,12 +53,14 @@ export const es: Partial<Record<Key, Message>> = {
   "save.app": "O descarga la app:",
   "save.getAndroid": "Google Play",
   "save.getIos": "App Store",
-  "save.accounts": "Inicia sesión para guardar una copia en tu cuenta y sincronizarla con tus otros dispositivos. Es opcional: sin cuenta, se queda solo en este dispositivo.",
+  "save.accounts":
+    "Inicia sesión para guardar una copia en tu cuenta y sincronizarla con tus otros dispositivos. Es opcional: sin cuenta, se queda solo en este dispositivo.",
   "save.synced": "Copia guardada en tu cuenta ({email}) y sincronizada con tus dispositivos.",
   "save.signIn": "Iniciar sesión y sincronizar",
   "save.later": "Puedes iniciar sesión, o guardar una copia, cuando quieras en Ajustes.",
   "save.settings": "Guardado y copias",
-  "save.move": "¿Cambias de teléfono o pasas del navegador a la app? Inicia sesión en los dos y tus entrenamientos te siguen. O guarda una copia aquí y restáurala allí.",
+  "save.move":
+    "¿Cambias de teléfono o pasas del navegador a la app? Inicia sesión en los dos y tus entrenamientos te siguen. O guarda una copia aquí y restáurala allí.",
   "save.backup": "Guardar una copia",
   "save.restore": "Restaurar una copia",
   "save.restore.file": "Archivo de copia para restaurar",
@@ -79,16 +83,19 @@ export const fr: Partial<Record<Key, Message>> = {
   "save.kept": "Ce navigateur a accepté de ne pas les effacer.",
   "save.install": "Ajouter à l'écran d'accueil",
   "save.install.ios": "Pour les protéger : dans Safari, touchez Partager, puis Sur l'écran d'accueil.",
-  "save.install.other": "Pour les protéger : ouvrez le menu du navigateur et choisissez Installer l'application ou Ajouter à l'écran d'accueil.",
+  "save.install.other":
+    "Pour les protéger : ouvrez le menu du navigateur et choisissez Installer l'application ou Ajouter à l'écran d'accueil.",
   "save.app": "Ou téléchargez l'app :",
   "save.getAndroid": "Google Play",
   "save.getIos": "App Store",
-  "save.accounts": "Connectez-vous pour sauvegarder vos données sur votre compte et les synchroniser avec vos autres appareils. C'est facultatif : sans compte, elles restent sur cet appareil uniquement.",
+  "save.accounts":
+    "Connectez-vous pour sauvegarder vos données sur votre compte et les synchroniser avec vos autres appareils. C'est facultatif : sans compte, elles restent sur cet appareil uniquement.",
   "save.synced": "Sauvegardé sur votre compte ({email}) et synchronisé avec vos appareils.",
   "save.signIn": "Se connecter pour synchroniser",
   "save.later": "Vous pouvez vous connecter, ou enregistrer une sauvegarde, à tout moment dans Réglages.",
   "save.settings": "Sauvegarde",
-  "save.move": "Vous changez de téléphone, ou passez du navigateur à l'app ? Connectez-vous sur les deux et vos séances vous suivent. Ou enregistrez une sauvegarde ici, puis restaurez-la là-bas.",
+  "save.move":
+    "Vous changez de téléphone, ou passez du navigateur à l'app ? Connectez-vous sur les deux et vos séances vous suivent. Ou enregistrez une sauvegarde ici, puis restaurez-la là-bas.",
   "save.backup": "Enregistrer une sauvegarde",
   "save.restore": "Restaurer une sauvegarde",
   "save.restore.file": "Fichier de sauvegarde à restaurer",
@@ -96,7 +103,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "save.restored.none": "Tout le contenu de cette sauvegarde est déjà ici.",
   "save.bad": "Ce fichier n'est pas une sauvegarde Liftsmith.",
   "save.nudge.title": "Sauvegardé dans ce navigateur seulement",
-  "save.nudge.body": "Connectez-vous pour sauvegarder vos séances, ou ajoutez Liftsmith à votre écran d'accueil, pour qu'elles ne puissent pas être effacées.",
+  "save.nudge.body":
+    "Connectez-vous pour sauvegarder vos séances, ou ajoutez Liftsmith à votre écran d'accueil, pour qu'elles ne puissent pas être effacées.",
   "save.nudge.go": "Les protéger",
   "save.nudge.dismiss": "Compris",
 };

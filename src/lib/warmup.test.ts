@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultProfile, makeGym } from "./defaults";
 import { exercise } from "./exercises";
 import { generate, itemSeconds, planSeconds, setSeconds } from "./generator";
@@ -35,7 +36,9 @@ describe("first-session starting weights", () => {
     expect(e({ ...base, birthYear: 1966 })).toBeLessThan(e({ ...base, birthYear: 1996 }));
     // Women are scaled more on upper-body lifts than lower-body ones.
     const bench = exercise("bench-press");
-    expect(startE1rm(bench, { ...base, sex: "female" }, NOW) / startE1rm(bench, base, NOW)).toBeLessThan(e({ ...base, sex: "female" }) / e(base));
+    expect(startE1rm(bench, { ...base, sex: "female" }, NOW) / startE1rm(bench, base, NOW)).toBeLessThan(
+      e({ ...base, sex: "female" }) / e(base),
+    );
   });
 
   it("ages by decade", () => {
@@ -67,7 +70,18 @@ describe("first-session starting weights", () => {
   it("catches up after a first session that was too light", () => {
     const gym = makeGym("commercial", "kg");
     const p = profile({ bodyweight: 80, goal: "muscle" });
-    const s = (reps: number, i: number): SetEvent => ({ type: "set", id: `c${i}`, at: NOW - 72 * H + i, sessionId: "first", exerciseId: "back-squat", weight: 60, reps, targetReps: 6, rir: 3, targetWeight: 60 });
+    const s = (reps: number, i: number): SetEvent => ({
+      type: "set",
+      id: `c${i}`,
+      at: NOW - 72 * H + i,
+      sessionId: "first",
+      exerciseId: "back-squat",
+      weight: 60,
+      reps,
+      targetReps: 6,
+      rir: 3,
+      targetWeight: 60,
+    });
     // Twelve reps when six were asked: the start was light, so it jumps more than one step.
     const t = target(squat, [s(12, 0), s(12, 1), s(11, 2)], p, gym, NOW);
     expect(t.weight).toBeGreaterThan(62.5);
@@ -109,7 +123,13 @@ describe("warm-ups", () => {
 
   it("counts warm-ups and rest in exercise and workout length", () => {
     const base = { exerciseId: "back-squat", sets: 3, restSec: 120, target: { weight: 100, reps: 5, rir: 2, note: "" } };
-    const warm = { ...base, warmup: [{ weight: 20, reps: 10 }, { weight: 60, reps: 5 }] };
+    const warm = {
+      ...base,
+      warmup: [
+        { weight: 20, reps: 10 },
+        { weight: 60, reps: 5 },
+      ],
+    };
     const ex = exercise("back-squat");
     expect(itemSeconds(warm) - itemSeconds(base)).toBe(setSeconds(ex, 10) + setSeconds(ex, 5) + 2 * WARMUP_REST);
     expect(itemSeconds(base)).toBe(60 + 3 * setSeconds(ex, 5) + 2 * 120);

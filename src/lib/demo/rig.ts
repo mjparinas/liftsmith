@@ -37,7 +37,8 @@ export function interp(tab: readonly (readonly number[])[], t: number, col: numb
   if (t <= tab[0][0]) return tab[0][col];
   for (let i = 1; i < tab.length; i++)
     if (t <= tab[i][0]) {
-      const t0 = tab[i - 1][0], t1 = tab[i][0];
+      const t0 = tab[i - 1][0],
+        t1 = tab[i][0];
       return lerp(tab[i - 1][col], tab[i][col], (t - t0) / (t1 - t0));
     }
   return tab[tab.length - 1][col];
@@ -46,11 +47,25 @@ export function interp(tab: readonly (readonly number[])[], t: number, col: numb
 // ---------- body types: bone lengths + shape tables (side profile [t, front, back], front profile [t, outer, inner]) ----------
 type Tab = number[][];
 export interface Body {
-  s: number; shin: number; thigh: number; torso: number; upper: number; fore: number; neck: number;
+  s: number;
+  shin: number;
+  thigh: number;
+  torso: number;
+  upper: number;
+  fore: number;
+  neck: number;
   /** How far below the top of the torso the shoulder joints sit, so the arms hang from the shoulders, not the neck. */
   shDrop: number;
-  shW: number; hipW: number; head: [number, number]; jaw: number; chin: number; hand: number; def: number; hair?: boolean;
-  torsoSide: Tab; torsoFront: Tab;
+  shW: number;
+  hipW: number;
+  head: [number, number];
+  jaw: number;
+  chin: number;
+  hand: number;
+  def: number;
+  hair?: boolean;
+  torsoSide: Tab;
+  torsoFront: Tab;
   side: { thigh: Tab; shin: Tab; upper: Tab; fore: Tab };
   front: { thigh: Tab; shin: Tab; upper: Tab; fore: Tab };
 }
@@ -58,39 +73,205 @@ export type BodyKey = "male" | "female";
 
 export const BODIES: Record<BodyKey, Body> = {
   male: {
-    s: 1, shin: 0.45, thigh: 0.45, torso: 0.52, upper: 0.3, fore: 0.28, neck: 0.09,
-    shDrop: 0.05, shW: 0.2, hipW: 0.095, head: [0.088, 0.115], jaw: 0.066, chin: 0.04, hand: 0.038, def: 0.3,
-    torsoSide: [[-0.12, 0.08, 0.09], [0, 0.11, 0.15], [0.15, 0.115, 0.135], [0.32, 0.11, 0.095], [0.5, 0.115, 0.1], [0.66, 0.14, 0.12], [0.8, 0.158, 0.13], [0.92, 0.125, 0.13], [1.02, 0.075, 0.1], [1.16, 0.058, 0.058]],
-    torsoFront: [[-0.12, 0.07], [-0.02, 0.165], [0.15, 0.162], [0.35, 0.145], [0.55, 0.165], [0.75, 0.205], [0.88, 0.228], [0.97, 0.218], [1.03, 0.15], [1.08, 0.078], [1.16, 0.064]],
+    s: 1,
+    shin: 0.45,
+    thigh: 0.45,
+    torso: 0.52,
+    upper: 0.3,
+    fore: 0.28,
+    neck: 0.09,
+    shDrop: 0.05,
+    shW: 0.2,
+    hipW: 0.095,
+    head: [0.088, 0.115],
+    jaw: 0.066,
+    chin: 0.04,
+    hand: 0.038,
+    def: 0.3,
+    torsoSide: [
+      [-0.12, 0.08, 0.09],
+      [0, 0.11, 0.15],
+      [0.15, 0.115, 0.135],
+      [0.32, 0.11, 0.095],
+      [0.5, 0.115, 0.1],
+      [0.66, 0.14, 0.12],
+      [0.8, 0.158, 0.13],
+      [0.92, 0.125, 0.13],
+      [1.02, 0.075, 0.1],
+      [1.16, 0.058, 0.058],
+    ],
+    torsoFront: [
+      [-0.12, 0.07],
+      [-0.02, 0.165],
+      [0.15, 0.162],
+      [0.35, 0.145],
+      [0.55, 0.165],
+      [0.75, 0.205],
+      [0.88, 0.228],
+      [0.97, 0.218],
+      [1.03, 0.15],
+      [1.08, 0.078],
+      [1.16, 0.064],
+    ],
     side: {
-      thigh: [[0, 0.09, 0.09], [0.25, 0.092, 0.086], [0.55, 0.08, 0.072], [0.85, 0.06, 0.058], [1, 0.05, 0.048]],
-      shin: [[0, 0.045, 0.048], [0.2, 0.045, 0.074], [0.42, 0.042, 0.068], [0.7, 0.032, 0.04], [1, 0.028, 0.03]],
-      upper: [[0, 0.064, 0.066], [0.18, 0.068, 0.066], [0.45, 0.055, 0.06], [0.75, 0.043, 0.048], [1, 0.036, 0.036]],
-      fore: [[0, 0.038, 0.038], [0.25, 0.047, 0.045], [0.6, 0.034, 0.032], [1, 0.024, 0.024]],
+      thigh: [
+        [0, 0.09, 0.09],
+        [0.25, 0.092, 0.086],
+        [0.55, 0.08, 0.072],
+        [0.85, 0.06, 0.058],
+        [1, 0.05, 0.048],
+      ],
+      shin: [
+        [0, 0.045, 0.048],
+        [0.2, 0.045, 0.074],
+        [0.42, 0.042, 0.068],
+        [0.7, 0.032, 0.04],
+        [1, 0.028, 0.03],
+      ],
+      upper: [
+        [0, 0.064, 0.066],
+        [0.18, 0.068, 0.066],
+        [0.45, 0.055, 0.06],
+        [0.75, 0.043, 0.048],
+        [1, 0.036, 0.036],
+      ],
+      fore: [
+        [0, 0.038, 0.038],
+        [0.25, 0.047, 0.045],
+        [0.6, 0.034, 0.032],
+        [1, 0.024, 0.024],
+      ],
     },
     front: {
-      thigh: [[0, 0.095, 0.07], [0.3, 0.102, 0.076], [0.6, 0.082, 0.066], [0.85, 0.06, 0.05], [1, 0.05, 0.045]],
-      shin: [[0, 0.048, 0.045], [0.22, 0.064, 0.058], [0.45, 0.056, 0.048], [0.75, 0.035, 0.032], [1, 0.03, 0.028]],
-      upper: [[0, 0.078, 0.045], [0.2, 0.072, 0.05], [0.5, 0.056, 0.05], [0.8, 0.043, 0.04], [1, 0.036, 0.034]],
-      fore: [[0, 0.04, 0.038], [0.25, 0.048, 0.043], [0.6, 0.034, 0.03], [1, 0.024, 0.024]],
+      thigh: [
+        [0, 0.095, 0.07],
+        [0.3, 0.102, 0.076],
+        [0.6, 0.082, 0.066],
+        [0.85, 0.06, 0.05],
+        [1, 0.05, 0.045],
+      ],
+      shin: [
+        [0, 0.048, 0.045],
+        [0.22, 0.064, 0.058],
+        [0.45, 0.056, 0.048],
+        [0.75, 0.035, 0.032],
+        [1, 0.03, 0.028],
+      ],
+      upper: [
+        [0, 0.078, 0.045],
+        [0.2, 0.072, 0.05],
+        [0.5, 0.056, 0.05],
+        [0.8, 0.043, 0.04],
+        [1, 0.036, 0.034],
+      ],
+      fore: [
+        [0, 0.04, 0.038],
+        [0.25, 0.048, 0.043],
+        [0.6, 0.034, 0.03],
+        [1, 0.024, 0.024],
+      ],
     },
   },
   female: {
-    s: 0.93, shin: 0.42, thigh: 0.43, torso: 0.48, upper: 0.275, fore: 0.255, neck: 0.085,
-    shDrop: 0.045, shW: 0.17, hipW: 0.1, head: [0.083, 0.108], jaw: 0.056, chin: 0.032, hand: 0.032, def: 0.14, hair: true,
-    torsoSide: [[-0.12, 0.08, 0.1], [0, 0.1, 0.165], [0.13, 0.1, 0.152], [0.32, 0.085, 0.08], [0.5, 0.09, 0.085], [0.64, 0.125, 0.1], [0.74, 0.148, 0.1], [0.84, 0.12, 0.1], [0.95, 0.09, 0.095], [1.03, 0.064, 0.07], [1.16, 0.048, 0.048]],
-    torsoFront: [[-0.12, 0.075], [-0.02, 0.19], [0.12, 0.186], [0.38, 0.122], [0.55, 0.138], [0.72, 0.155], [0.86, 0.168], [0.95, 0.163], [1.02, 0.11], [1.08, 0.056], [1.16, 0.048]],
+    s: 0.93,
+    shin: 0.42,
+    thigh: 0.43,
+    torso: 0.48,
+    upper: 0.275,
+    fore: 0.255,
+    neck: 0.085,
+    shDrop: 0.045,
+    shW: 0.17,
+    hipW: 0.1,
+    head: [0.083, 0.108],
+    jaw: 0.056,
+    chin: 0.032,
+    hand: 0.032,
+    def: 0.14,
+    hair: true,
+    torsoSide: [
+      [-0.12, 0.08, 0.1],
+      [0, 0.1, 0.165],
+      [0.13, 0.1, 0.152],
+      [0.32, 0.085, 0.08],
+      [0.5, 0.09, 0.085],
+      [0.64, 0.125, 0.1],
+      [0.74, 0.148, 0.1],
+      [0.84, 0.12, 0.1],
+      [0.95, 0.09, 0.095],
+      [1.03, 0.064, 0.07],
+      [1.16, 0.048, 0.048],
+    ],
+    torsoFront: [
+      [-0.12, 0.075],
+      [-0.02, 0.19],
+      [0.12, 0.186],
+      [0.38, 0.122],
+      [0.55, 0.138],
+      [0.72, 0.155],
+      [0.86, 0.168],
+      [0.95, 0.163],
+      [1.02, 0.11],
+      [1.08, 0.056],
+      [1.16, 0.048],
+    ],
     side: {
-      thigh: [[0, 0.085, 0.092], [0.25, 0.08, 0.082], [0.55, 0.068, 0.064], [0.85, 0.05, 0.048], [1, 0.044, 0.042]],
-      shin: [[0, 0.04, 0.042], [0.2, 0.04, 0.062], [0.42, 0.038, 0.057], [0.7, 0.028, 0.034], [1, 0.024, 0.026]],
-      upper: [[0, 0.05, 0.05], [0.18, 0.05, 0.05], [0.45, 0.04, 0.045], [0.75, 0.034, 0.036], [1, 0.03, 0.03]],
-      fore: [[0, 0.031, 0.031], [0.25, 0.036, 0.034], [0.6, 0.027, 0.026], [1, 0.02, 0.02]],
+      thigh: [
+        [0, 0.085, 0.092],
+        [0.25, 0.08, 0.082],
+        [0.55, 0.068, 0.064],
+        [0.85, 0.05, 0.048],
+        [1, 0.044, 0.042],
+      ],
+      shin: [
+        [0, 0.04, 0.042],
+        [0.2, 0.04, 0.062],
+        [0.42, 0.038, 0.057],
+        [0.7, 0.028, 0.034],
+        [1, 0.024, 0.026],
+      ],
+      upper: [
+        [0, 0.05, 0.05],
+        [0.18, 0.05, 0.05],
+        [0.45, 0.04, 0.045],
+        [0.75, 0.034, 0.036],
+        [1, 0.03, 0.03],
+      ],
+      fore: [
+        [0, 0.031, 0.031],
+        [0.25, 0.036, 0.034],
+        [0.6, 0.027, 0.026],
+        [1, 0.02, 0.02],
+      ],
     },
     front: {
-      thigh: [[0, 0.102, 0.066], [0.3, 0.09, 0.07], [0.6, 0.068, 0.058], [0.85, 0.05, 0.045], [1, 0.044, 0.04]],
-      shin: [[0, 0.042, 0.04], [0.22, 0.053, 0.05], [0.45, 0.046, 0.042], [0.75, 0.03, 0.028], [1, 0.026, 0.024]],
-      upper: [[0, 0.06, 0.036], [0.2, 0.055, 0.038], [0.5, 0.043, 0.038], [0.8, 0.034, 0.032], [1, 0.03, 0.028]],
-      fore: [[0, 0.031, 0.031], [0.25, 0.036, 0.033], [0.6, 0.027, 0.025], [1, 0.02, 0.02]],
+      thigh: [
+        [0, 0.102, 0.066],
+        [0.3, 0.09, 0.07],
+        [0.6, 0.068, 0.058],
+        [0.85, 0.05, 0.045],
+        [1, 0.044, 0.04],
+      ],
+      shin: [
+        [0, 0.042, 0.04],
+        [0.22, 0.053, 0.05],
+        [0.45, 0.046, 0.042],
+        [0.75, 0.03, 0.028],
+        [1, 0.026, 0.024],
+      ],
+      upper: [
+        [0, 0.06, 0.036],
+        [0.2, 0.055, 0.038],
+        [0.5, 0.043, 0.038],
+        [0.8, 0.034, 0.032],
+        [1, 0.03, 0.028],
+      ],
+      fore: [
+        [0, 0.031, 0.031],
+        [0.25, 0.036, 0.033],
+        [0.6, 0.027, 0.025],
+        [1, 0.02, 0.02],
+      ],
     },
   },
 };
@@ -136,12 +317,34 @@ export interface Pose {
 }
 
 export interface Joints {
-  hipC: Vec; shC: Vec; neck: Vec; head: Vec; headDir: Vec; bar?: Vec;
-  hipL: Vec; kneeL: Vec; ankleL: Vec; heelL: Vec; toeL: Vec; shL: Vec; elbowL: Vec; handL: Vec;
-  hipR: Vec; kneeR: Vec; ankleR: Vec; heelR: Vec; toeR: Vec; shR: Vec; elbowR: Vec; handR: Vec;
+  hipC: Vec;
+  shC: Vec;
+  neck: Vec;
+  head: Vec;
+  headDir: Vec;
+  bar?: Vec;
+  hipL: Vec;
+  kneeL: Vec;
+  ankleL: Vec;
+  heelL: Vec;
+  toeL: Vec;
+  shL: Vec;
+  elbowL: Vec;
+  handL: Vec;
+  hipR: Vec;
+  kneeR: Vec;
+  ankleR: Vec;
+  heelR: Vec;
+  toeR: Vec;
+  shR: Vec;
+  elbowR: Vec;
+  handR: Vec;
 }
 
-const SIDES: [Side, number][] = [["L", -1], ["R", 1]];
+const SIDES: [Side, number][] = [
+  ["L", -1],
+  ["R", 1],
+];
 const isPer = <T>(v: PerSide<T>): v is { L: T; R: T } => typeof v === "object" && v !== null && "L" in (v as object);
 function pick(v: PerSide<Vec> | undefined, side: Side, sgn: number, defZ: number, fallback: Vec): Vec {
   if (v === undefined) return [fallback[0], fallback[1], sgn * Math.abs(fallback[2])];
@@ -153,7 +356,10 @@ function pickN(v: PerSide<number> | undefined, side: Side): number {
   return typeof v === "number" ? v : v[side];
 }
 
-export interface PoseOpts { stance: number; grip: number }
+export interface PoseOpts {
+  stance: number;
+  grip: number;
+}
 
 /** Turns a pose into every joint, solving knees and elbows with IK. */
 export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
@@ -182,8 +388,13 @@ export function solve(pose: Pose, B: Body, o: PoseOpts): Joints {
     const fits = (d: number) => len(sub(hand, add(top, mul(up, -d)))) <= B.upper + B.fore - 0.002;
     let drop = B.shDrop;
     if (!fits(drop)) {
-      let lo = 0, hi = drop;
-      for (let k = 0; k < 12; k++) { const mid = (lo + hi) / 2; if (fits(mid)) lo = mid; else hi = mid; }
+      let lo = 0,
+        hi = drop;
+      for (let k = 0; k < 12; k++) {
+        const mid = (lo + hi) / 2;
+        if (fits(mid)) lo = mid;
+        else hi = mid;
+      }
       drop = lo;
     }
     const sh = add(top, mul(up, -drop));
@@ -199,15 +410,31 @@ export type PhaseRow = [dur: number, from: number, to: number, label: string, ef
 
 export const TEMPO = {
   /** Start at the top, lower, then drive back up (squats, presses from the top, push-ups). */
-  lowerFirst: (lower = "Lower · 2s", drive = "Drive · 1s", top = "Brace", bottom = "Bottom"): PhaseRow[] => [[0.6, 0, 0, top, 0.35], [1.8, 0, 1, lower, 0.55], [0.35, 1, 1, bottom, 0.6], [1.0, 1, 0, drive, 1]],
+  lowerFirst: (lower = "Lower · 2s", drive = "Drive · 1s", top = "Brace", bottom = "Bottom"): PhaseRow[] => [
+    [0.6, 0, 0, top, 0.35],
+    [1.8, 0, 1, lower, 0.55],
+    [0.35, 1, 1, bottom, 0.6],
+    [1.0, 1, 0, drive, 1],
+  ],
   /** Start long, lift, squeeze, lower (pulls, curls, deadlifts, raises). */
-  liftFirst: (lift = "Lift · 1s", lower = "Lower · 2s", start = "Set", squeeze = "Squeeze"): PhaseRow[] => [[0.6, 0, 0, start, 0.35], [1.1, 0, 1, lift, 1], [0.45, 1, 1, squeeze, 0.8], [1.6, 1, 0, lower, 0.55]],
+  liftFirst: (lift = "Lift · 1s", lower = "Lower · 2s", start = "Set", squeeze = "Squeeze"): PhaseRow[] => [
+    [0.6, 0, 0, start, 0.35],
+    [1.1, 0, 1, lift, 1],
+    [0.45, 1, 1, squeeze, 0.8],
+    [1.6, 1, 0, lower, 0.55],
+  ],
   /** Holds breathe slowly. */
-  hold: (label = "Hold · breathe"): PhaseRow[] => [[2, 0, 1, label, 0.8], [2, 1, 0, label, 0.8]],
+  hold: (label = "Hold · breathe"): PhaseRow[] => [
+    [2, 0, 1, label, 0.8],
+    [2, 1, 0, label, 0.8],
+  ],
   /** Carries walk: d runs 0 to 1 each stride pair. */
   walk: (): PhaseRow[] => [[1.2, 0, 1, "Walk tall", 0.8]],
   /** Alternating sides: 0 → 1 is one side, 1 → 0 the other. */
-  alternate: (a = "One side", b = "Other side"): PhaseRow[] => [[1.4, 0, 1, a, 1], [1.4, 1, 0, b, 1]],
+  alternate: (a = "One side", b = "Other side"): PhaseRow[] => [
+    [1.4, 0, 1, a, 1],
+    [1.4, 1, 0, b, 1],
+  ],
 };
 
 export function cycleLength(phases: PhaseRow[]) {

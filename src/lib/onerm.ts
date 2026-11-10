@@ -1,8 +1,8 @@
 import { dedupe } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
+import { t } from "./i18n";
 import { TIMED } from "./progression";
 import type { AppEvent, EffortEvent, Profile, SetEvent } from "./types";
-import { t } from "./i18n";
 
 // One-rep max estimates for the Progress screen's calculator (Melvin, 2026-11-09: "use the latest research
 // and algorithms, use as much existing data as possible").
@@ -78,7 +78,13 @@ export function estimate(weight: number, rtf: number): number {
 /** Every formula's answer for a set, for the calculator's "how each formula sees it" list. */
 export function allFormulas(weight: number, rtf: number): { id: FormulaId; name: string; year: number; e1rm: number; used: boolean }[] {
   const used = new Set(rtf <= 1 ? [] : formulasFor(rtf));
-  return FORMULAS.map((f) => ({ id: f.id, name: f.name, year: f.year, e1rm: weight > 0 && rtf >= 1 ? f.fn(weight, rtf) : 0, used: used.has(f.id) }));
+  return FORMULAS.map((f) => ({
+    id: f.id,
+    name: f.name,
+    year: f.year,
+    e1rm: weight > 0 && rtf >= 1 ? f.fn(weight, rtf) : 0,
+    used: used.has(f.id),
+  }));
 }
 
 /** Weight (kg) for `reps` with `rir` in reserve, from a 1RM: the best estimate turned around by bisection. */
@@ -149,7 +155,18 @@ export function setEstimates(events: readonly AppEvent[], exerciseId?: string): 
     const { rir, source } = rirOf(s, effort.get(s.id));
     const rtf = s.reps + rir;
     if (rtf > MAX_RTF) continue;
-    out.push({ setId: s.id, sessionId: s.sessionId, at: s.at, weight: s.weight, reps: s.reps, rir, rirSource: source, rtf, e1rm: estimate(s.weight, rtf), quality: qualityOf(rtf, rir, source) });
+    out.push({
+      setId: s.id,
+      sessionId: s.sessionId,
+      at: s.at,
+      weight: s.weight,
+      reps: s.reps,
+      rir,
+      rirSource: source,
+      rtf,
+      e1rm: estimate(s.weight, rtf),
+      quality: qualityOf(rtf, rir, source),
+    });
   }
   return out.sort((a, b) => a.at - b.at);
 }
@@ -211,7 +228,17 @@ export function oneRm(events: readonly AppEvent[], exerciseId: string, now: numb
   const spread = top.length > 1 ? (Math.max(...values) - Math.min(...values)) / e1rm / 2 : 0.02;
   const err = Math.min(0.15, base + guess + spread * 0.5);
   const confidence = err <= 0.05 && top.length >= 2 ? "high" : err <= 0.08 ? "medium" : "low";
-  return { exerciseId, e1rm, low: e1rm * (1 - err), high: e1rm * (1 + err), basis, source: "logged", confidence, trend, sessions: recent.length };
+  return {
+    exerciseId,
+    e1rm,
+    low: e1rm * (1 - err),
+    high: e1rm * (1 + err),
+    basis,
+    source: "logged",
+    confidence,
+    trend,
+    sessions: recent.length,
+  };
 }
 
 /** Every exercise with a usable estimate, most sessions first. */
@@ -279,8 +306,15 @@ export interface DotsReport {
 }
 
 /** DOTS from the lifter's own estimated maxes. Null score until all three lifts have one. */
-export function dotsFromData(events: readonly AppEvent[], profile: Pick<Profile, "bodyweight" | "knownMaxes" | "sex">, now: number, sex = profile.sex ?? "male"): DotsReport {
-  const lifts = Object.fromEntries((Object.keys(DOTS_LIFTS) as DotsLift[]).map((k) => [k, oneRm(events, DOTS_LIFTS[k], now, profile)])) as Record<DotsLift, OneRm | null>;
+export function dotsFromData(
+  events: readonly AppEvent[],
+  profile: Pick<Profile, "bodyweight" | "knownMaxes" | "sex">,
+  now: number,
+  sex = profile.sex ?? "male",
+): DotsReport {
+  const lifts = Object.fromEntries(
+    (Object.keys(DOTS_LIFTS) as DotsLift[]).map((k) => [k, oneRm(events, DOTS_LIFTS[k], now, profile)]),
+  ) as Record<DotsLift, OneRm | null>;
   const total = Object.values(lifts).reduce((s, l) => s + (l?.e1rm ?? 0), 0);
   const bodyweight = latestBodyweight(events, profile);
   const complete = Object.values(lifts).every((l) => !!l);

@@ -2,7 +2,7 @@
 // phone), with a simple HTML twin. Every email carries the same footer: why it was sent, where to
 // change it, a one-click unsubscribe link and the sender's postal address (CAN-SPAM and CASL).
 import { BRAND } from "@/lib/brand";
-import { SITE_URL, APP_PATH } from "@/lib/site";
+import { APP_PATH, SITE_URL } from "@/lib/site";
 
 export interface Mail {
   subject: string;
@@ -19,7 +19,12 @@ const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&
 
 function wrap(title: string, paras: string[], cta: { label: string; url: string } | null, footer: Footer | null, why: string): Mail {
   const foot = footer
-    ? [why, `Choose which emails you get in the app under Settings, Reminders.`, `Unsubscribe from all ${BRAND.name} emails: ${footer.unsubscribeUrl}`, `${BRAND.name}, ${footer.postalAddress}`]
+    ? [
+        why,
+        `Choose which emails you get in the app under Settings, Reminders.`,
+        `Unsubscribe from all ${BRAND.name} emails: ${footer.unsubscribeUrl}`,
+        `${BRAND.name}, ${footer.postalAddress}`,
+      ]
     : [why, "If you didn't ask for this, ignore it and you won't hear from us again."];
   const text = [title, "", ...paras.flatMap((p) => [p, ""]), ...(cta ? [`${cta.label}: ${cta.url}`, ""] : []), "--", ...foot].join("\n");
   const html = `<!doctype html><html><body style="margin:0;background:#0a0d12;color:#e8edf4;font-family:Roboto,-apple-system,Segoe UI,Arial,sans-serif">
@@ -62,13 +67,24 @@ export function welcomeMail(footer: Footer): Mail {
 
 /** A planned message (messages.ts) or a milestone, as an email. */
 export function messageMail(m: { title: string; body: string; route?: string; kind: string }, footer: Footer): Mail {
-  const cta = m.kind === "pro" ? { label: "See Pro", url: appUrl("settings") } : { label: "Open today's workout", url: appUrl(m.route ?? "today") };
-  return wrap(m.title, [m.body], cta, footer, `You're getting this because you turned on ${m.kind === "pro" ? "Pro trial and offer" : "reminder"} emails in the app.`);
+  const cta =
+    m.kind === "pro" ? { label: "See Pro", url: appUrl("settings") } : { label: "Open today's workout", url: appUrl(m.route ?? "today") };
+  return wrap(
+    m.title,
+    [m.body],
+    cta,
+    footer,
+    `You're getting this because you turned on ${m.kind === "pro" ? "Pro trial and offer" : "reminder"} emails in the app.`,
+  );
 }
 
 /** The page shown after following a link from an email: a button that POSTs, so mail scanners that open links can't act for the reader. */
 export function page(title: string, body: string, form?: { action: string; fields: Record<string, string>; button: string }): string {
-  const fields = form ? Object.entries(form.fields).map(([k, v]) => `<input type="hidden" name="${esc(k)}" value="${esc(v)}">`).join("") : "";
+  const fields = form
+    ? Object.entries(form.fields)
+        .map(([k, v]) => `<input type="hidden" name="${esc(k)}" value="${esc(v)}">`)
+        .join("")
+    : "";
   return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${esc(title)} · ${esc(BRAND.name)}</title></head>
 <body style="margin:0;background:#0a0d12;color:#e8edf4;font-family:Roboto,-apple-system,Segoe UI,Arial,sans-serif"><main style="max-width:480px;margin:0 auto;padding:48px 20px">
 <p style="color:#4c8dff;font-weight:700">${esc(BRAND.name)}</p><h1 style="font-size:24px">${esc(title)}</h1><p style="font-size:16px;line-height:1.5">${esc(body)}</p>

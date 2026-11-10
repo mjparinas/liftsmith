@@ -1,11 +1,13 @@
 "use client";
+
+import { useEffect, useState } from "react";
+
 import { exercise } from "@/lib/exercises";
 import { isPr, repsForPr } from "@/lib/game";
 import { confetti, haptic, juice, sound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import type { SetEvent } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
-import { useEffect, useState } from "react";
 
 // Moments during a workout that never add a tap: a PR banner the instant a record set is logged, and an
 // "almost there" line during rest when the next set could beat the best.
@@ -36,12 +38,23 @@ export function PrMoment() {
 
   if (!shown) return null;
   return (
-    <div role="status" aria-live="polite" className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-[max(env(safe-area-inset-top),12px)]">
-      <div className={`${juice.lean ? "" : "animate-bump"} flex items-center gap-3 rounded-2xl border border-gold/50 bg-surface px-4 py-3 shadow-xl`} style={{ boxShadow: "0 10px 40px rgb(0 0 0 / 0.5), inset 0 0 0 1px var(--color-gold)" }}>
-        <span aria-hidden className="text-3xl">🏆</span>
+    <div
+      role="status"
+      aria-live="polite"
+      className="pointer-events-none fixed inset-x-0 top-0 z-50 flex justify-center px-5 pt-[max(env(safe-area-inset-top),12px)]"
+    >
+      <div
+        className={`${juice.lean ? "" : "animate-bump"} flex items-center gap-3 rounded-2xl border border-gold/50 bg-surface px-4 py-3 shadow-xl`}
+        style={{ boxShadow: "0 10px 40px rgb(0 0 0 / 0.5), inset 0 0 0 1px var(--color-gold)" }}
+      >
+        <span aria-hidden className="text-3xl">
+          🏆
+        </span>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gold">New personal record</p>
-          <p className="num font-semibold">{exercise(shown.exerciseId).name} · {fmtNum(fromKg(shown.weight, profile.unit))} {profile.unit} × {shown.reps}</p>
+          <p className="num font-semibold">
+            {exercise(shown.exerciseId).name} · {fmtNum(fromKg(shown.weight, profile.unit))} {profile.unit} × {shown.reps}
+          </p>
         </div>
       </div>
     </div>

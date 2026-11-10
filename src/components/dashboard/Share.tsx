@@ -1,16 +1,18 @@
 "use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+
+import { shareName } from "@/lib/achievements";
+import { track } from "@/lib/analytics";
 import { BRAND } from "@/lib/brand";
 import { decodeShare, encodeShare, SHARE_DAYS, shareCard, shareLevel, type ShareCard } from "@/lib/dashboard";
 import { weekOf, type Stats } from "@/lib/derive";
 import { exerciseName } from "@/lib/game";
-import { shareName } from "@/lib/achievements";
-import { track } from "@/lib/analytics";
 import { date, readPhoneLanguage, t } from "@/lib/i18n";
-import { useLang } from "@/lib/useLang";
 import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
-import Link from "next/link";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useLang } from "@/lib/useLang";
 
 // Sharing with friends, before accounts exist: the summary travels in the link's #fragment, which
 // browsers never send to a server, so nobody but the people given the link can read it.
@@ -67,7 +69,9 @@ export function ShareView({ card }: { card: ShareCard }) {
       <div className="mt-2 flex gap-1" role="img" aria-label={t("dash.trainedOf", { n: trained.size, total: SHARE_DAYS })}>
         {weeks.map((col, i) => (
           <div key={i} className="flex flex-col gap-1">
-            {col.map((off, d) => <span key={d} className={`block h-3 w-3 rounded-[3px] ${off === null ? "" : trained.has(off) ? "bg-accent" : "bg-raised"}`} />)}
+            {col.map((off, d) => (
+              <span key={d} className={`block h-3 w-3 rounded-[3px] ${off === null ? "" : trained.has(off) ? "bg-accent" : "bg-raised"}`} />
+            ))}
           </div>
         ))}
       </div>
@@ -78,7 +82,9 @@ export function ShareView({ card }: { card: ShareCard }) {
             {card.l.map(([id, kg]) => (
               <li key={id} className="flex justify-between py-2">
                 <span>{exerciseName(id)}</span>
-                <span className="num font-semibold">{fmtNum(Math.round(fromKg(kg, card.u)))} {card.u}</span>
+                <span className="num font-semibold">
+                  {fmtNum(Math.round(fromKg(kg, card.u)))} {card.u}
+                </span>
               </li>
             ))}
           </ul>
@@ -88,11 +94,17 @@ export function ShareView({ card }: { card: ShareCard }) {
         <>
           <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">{t("share.badges")}</h3>
           <ul className="mt-2 flex flex-wrap gap-2">
-            {card.t.map((id) => <li key={id} className="rounded-full border border-line px-3 py-1 text-sm">{shareName(id) ?? TROPHY_NAME[id] ?? id}</li>)}
+            {card.t.map((id) => (
+              <li key={id} className="rounded-full border border-line px-3 py-1 text-sm">
+                {shareName(id) ?? TROPHY_NAME[id] ?? id}
+              </li>
+            ))}
           </ul>
         </>
       )}
-      <p className="mt-5 text-xs text-faint">{t("share.made", { date: date(card.d0, { month: "short", day: "numeric", year: "numeric" }) })}</p>
+      <p className="mt-5 text-xs text-faint">
+        {t("share.made", { date: date(card.d0, { month: "short", day: "numeric", year: "numeric" }) })}
+      </p>
     </article>
   );
 }
@@ -125,16 +137,38 @@ export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]
         <p className="text-muted">{t("share.intro")}</p>
         <p className="mt-2 text-sm text-faint">{t("share.privacy")}</p>
         <label className="mt-4 flex items-center gap-3">
-          <input type="checkbox" checked={withName} onChange={(e) => setWithName(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" disabled={!profile.name.trim()} />
+          <input
+            type="checkbox"
+            checked={withName}
+            onChange={(e) => setWithName(e.target.checked)}
+            className="h-5 w-5 accent-[var(--color-accent)]"
+            disabled={!profile.name.trim()}
+          />
           <span>{profile.name.trim() ? t("share.withName", { name: profile.name.trim() }) : t("share.noName")}</span>
         </label>
-        <label className="mt-4 block text-sm text-muted" htmlFor="share-url">{t("share.yourLink")}</label>
-        <input id="share-url" readOnly value={url} onFocus={(e) => e.currentTarget.select()} className="card num mt-1 w-full px-3 py-2 text-sm" />
+        <label className="mt-4 block text-sm text-muted" htmlFor="share-url">
+          {t("share.yourLink")}
+        </label>
+        <input
+          id="share-url"
+          readOnly
+          value={url}
+          onFocus={(e) => e.currentTarget.select()}
+          className="card num mt-1 w-full px-3 py-2 text-sm"
+        />
         <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={() => void copy()} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">{t("share.copy")}</button>
-          {typeof navigator !== "undefined" && "share" in navigator && <button type="button" onClick={() => void share()} className="press rounded-2xl border border-line bg-raised px-5 py-3">{t("share.share")}</button>}
+          <button type="button" onClick={() => void copy()} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
+            {t("share.copy")}
+          </button>
+          {typeof navigator !== "undefined" && "share" in navigator && (
+            <button type="button" onClick={() => void share()} className="press rounded-2xl border border-line bg-raised px-5 py-3">
+              {t("share.share")}
+            </button>
+          )}
         </div>
-        <p className="mt-2 min-h-5 text-sm text-good" aria-live="polite">{note}</p>
+        <p className="mt-2 min-h-5 text-sm text-good" aria-live="polite">
+          {note}
+        </p>
         <p className="mt-4 text-sm text-faint">{t("share.friends")}</p>
       </div>
       <ShareView card={card} />
@@ -168,7 +202,9 @@ export function SharedProfile() {
           <p className="mt-2 text-muted">{t("share.brokenBody")}</p>
         </div>
       )}
-      <Link href="/" className="press mt-6 block rounded-2xl bg-accent px-6 py-4 text-center text-lg font-semibold text-accent-ink">{t("share.try", { brand: BRAND.name })}</Link>
+      <Link href="/" className="press mt-6 block rounded-2xl bg-accent px-6 py-4 text-center text-lg font-semibold text-accent-ink">
+        {t("share.try", { brand: BRAND.name })}
+      </Link>
     </main>
   );
 }

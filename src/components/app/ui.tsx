@@ -1,14 +1,42 @@
 "use client";
+
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
+import { createPortal } from "react-dom";
+
 import { Info } from "@/components/Info";
 import type { Term } from "@/lib/glossary";
+import { parseNum, t } from "@/lib/i18n";
 import { calm, haptic, sound } from "@/lib/juice";
-import { useEffect, useId, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
-import { createPortal } from "react-dom";
+
 import { Icon, type IconName } from "./icons";
 import { Mascot, type Mood } from "./Mascot";
-import { parseNum, t } from "@/lib/i18n";
 
-export function Button({ children, onClick, kind = "primary", className = "", disabled, label, icon }: { children: ReactNode; onClick?: () => void; kind?: "primary" | "ghost" | "quiet" | "danger"; className?: string; disabled?: boolean; label?: string; icon?: IconName }) {
+export function Button({
+  children,
+  onClick,
+  kind = "primary",
+  className = "",
+  disabled,
+  label,
+  icon,
+}: {
+  children: ReactNode;
+  onClick?: () => void;
+  kind?: "primary" | "ghost" | "quiet" | "danger";
+  className?: string;
+  disabled?: boolean;
+  label?: string;
+  icon?: IconName;
+}) {
   const styles = {
     primary: "btn-primary font-semibold",
     ghost: "bg-raised text-ink border border-line hover:border-accent/40",
@@ -95,8 +123,19 @@ function Bump({ dir, label, size, onStep }: { dir: 1 | -1; label: string; size: 
   const repeat = useRepeat(() => onStep(dir));
   const dim = size === "lg" ? "h-14 w-14" : "h-12 w-12";
   return (
-    <button type="button" className={`press grid ${dim} shrink-0 touch-none select-none place-items-center rounded-full border border-line bg-raised text-ink active:border-accent/60 active:bg-accent/15`} aria-label={t(dir > 0 ? "workout.more" : "workout.less", { what: label })} {...repeat}>
-      {dir > 0 ? <Icon name="plus" size={22} strokeWidth={2.6} /> : <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden><path d="M5 12h14" /></svg>}
+    <button
+      type="button"
+      className={`press grid ${dim} shrink-0 touch-none select-none place-items-center rounded-full border border-line bg-raised text-ink active:border-accent/60 active:bg-accent/15`}
+      aria-label={t(dir > 0 ? "workout.more" : "workout.less", { what: label })}
+      {...repeat}
+    >
+      {dir > 0 ? (
+        <Icon name="plus" size={22} strokeWidth={2.6} />
+      ) : (
+        <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden>
+          <path d="M5 12h14" />
+        </svg>
+      )}
     </button>
   );
 }
@@ -105,7 +144,23 @@ function Bump({ dir, label, size, onStep }: { dir: 1 | -1; label: string; size: 
  * A big number with − and + bump buttons (hold to repeat). `compact` is the one-handed dock's size;
  * `display` shows the number only, when the dock holds the buttons.
  */
-export function Stepper({ value, onDown, onUp, label, suffix, compact, display }: { value: string; onDown: () => void; onUp: () => void; label: string; suffix?: string; compact?: boolean; display?: boolean }) {
+export function Stepper({
+  value,
+  onDown,
+  onUp,
+  label,
+  suffix,
+  compact,
+  display,
+}: {
+  value: string;
+  onDown: () => void;
+  onUp: () => void;
+  label: string;
+  suffix?: string;
+  compact?: boolean;
+  display?: boolean;
+}) {
   // The number lifts for a moment when it changes.
   const [key, setKey] = useState(0);
   const step = (d: 1 | -1) => {
@@ -120,7 +175,9 @@ export function Stepper({ value, onDown, onUp, label, suffix, compact, display }
       <div className="flex items-center justify-between gap-1.5">
         <Bump dir={-1} label={label} size="md" onStep={step} />
         <div className="min-w-0 text-center leading-none">
-          <div key={key} className={`display text-[1.75rem] ${key ? "animate-nudge" : ""}`}>{value}</div>
+          <div key={key} className={`display text-[1.75rem] ${key ? "animate-nudge" : ""}`}>
+            {value}
+          </div>
           <div className="mt-1 truncate text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-faint">{suffix ?? label}</div>
         </div>
         <Bump dir={1} label={label} size="md" onStep={step} />
@@ -132,7 +189,9 @@ export function Stepper({ value, onDown, onUp, label, suffix, compact, display }
       <div className="flex items-center gap-6">
         {!display && <Bump dir={-1} label={label} size="lg" onStep={step} />}
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display text-[3.5rem] ${key ? "animate-nudge" : ""}`}>{value}</div>
+          <div key={key} className={`display text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
+            {value}
+          </div>
         </div>
         {!display && <Bump dir={1} label={label} size="lg" onStep={step} />}
       </div>
@@ -141,7 +200,19 @@ export function Stepper({ value, onDown, onUp, label, suffix, compact, display }
   );
 }
 
-export function Section({ title, children, right, icon, info }: { title: string; children: ReactNode; right?: ReactNode; icon?: IconName; info?: Term }) {
+export function Section({
+  title,
+  children,
+  right,
+  icon,
+  info,
+}: {
+  title: string;
+  children: ReactNode;
+  right?: ReactNode;
+  icon?: IconName;
+  info?: Term;
+}) {
   return (
     <section className="mt-7">
       <div className="mb-2.5 flex flex-wrap items-end justify-between gap-x-2 px-1">
@@ -159,7 +230,11 @@ export function Section({ title, children, right, icon, info }: { title: string;
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   if (!open) return null;
-  return <SheetBody onClose={onClose} title={title}>{children}</SheetBody>;
+  return (
+    <SheetBody onClose={onClose} title={title}>
+      {children}
+    </SheetBody>
+  );
 }
 
 /** How far (px) a sheet must be pulled down to close, or how fast (px/ms) a flick of at least `flick` px must be. */
@@ -188,7 +263,11 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeRef.current();
       if (e.key !== "Tab" || !box.current) return;
-      const f = [...box.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])')];
+      const f = [
+        ...box.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select, textarea, [tabindex]:not([tabindex="-1"])',
+        ),
+      ];
       if (!f.length) return;
       const first = f[0];
       const last = f[f.length - 1];
@@ -223,7 +302,10 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     const down = (e: TouchEvent) => {
       const target = e.target as Element | null;
       const onHandle = !!target?.closest("[data-sheet-handle]");
-      if (e.touches.length !== 1 || (!onHandle && (el.scrollTop > 0 || target?.closest(NO_SWIPE)))) { start = null; return; }
+      if (e.touches.length !== 1 || (!onHandle && (el.scrollTop > 0 || target?.closest(NO_SWIPE)))) {
+        start = null;
+        return;
+      }
       start = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: e.timeStamp || Date.now() };
       dragging = false;
       dy = 0;
@@ -234,7 +316,10 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
       const y = e.touches[0].clientY - start.y;
       if (!dragging) {
         if (Math.abs(y) < 8 && Math.abs(x) < 8) return;
-        if (y <= 0 || Math.abs(x) > Math.abs(y)) { start = null; return; } // a scroll up or a sideways drag: leave it alone
+        if (y <= 0 || Math.abs(x) > Math.abs(y)) {
+          start = null;
+          return;
+        } // a scroll up or a sideways drag: leave it alone
         dragging = true;
       }
       if (e.cancelable) e.preventDefault();
@@ -242,7 +327,10 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
       set(dy, false);
     };
     const up = (e: TouchEvent) => {
-      if (!start || !dragging) { start = null; return; }
+      if (!start || !dragging) {
+        start = null;
+        return;
+      }
       const ms = Math.max(1, (e.timeStamp || Date.now()) - start.t);
       start = null;
       dragging = false;
@@ -269,15 +357,50 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
-      <div ref={box} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={`${id}-t`} data-testid="sheet" className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none" onClick={(e) => e.stopPropagation()}>
-        <div data-sheet-handle className="-mx-5 flex cursor-grab justify-center pb-2 pt-1" style={{ touchAction: "none" }} aria-hidden="true">
+      <div
+        ref={box}
+        tabIndex={-1}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={`${id}-t`}
+        data-testid="sheet"
+        className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div
+          data-sheet-handle
+          className="-mx-5 flex cursor-grab justify-center pb-2 pt-1"
+          style={{ touchAction: "none" }}
+          aria-hidden="true"
+        >
           <div className="h-1.5 w-10 rounded-full bg-line" />
         </div>
         <div className="mb-3 flex items-start gap-2">
-          <h2 id={`${id}-t`} className="min-w-0 flex-1 pt-2 text-lg font-semibold">{title}</h2>
-          <button type="button" onClick={() => { haptic("tick"); onClose(); }} aria-label={t("map.close")} data-testid="sheet-close"
-            className="press -mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-raised text-muted">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
+          <h2 id={`${id}-t`} className="min-w-0 flex-1 pt-2 text-lg font-semibold">
+            {title}
+          </h2>
+          <button
+            type="button"
+            onClick={() => {
+              haptic("tick");
+              onClose();
+            }}
+            aria-label={t("map.close")}
+            data-testid="sheet-close"
+            className="press -mr-2 grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-raised text-muted"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
           </button>
         </div>
         {children}
@@ -288,7 +411,27 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
 }
 
 /** A progress ring with a gradient stroke. `from`/`to` pick the gradient (defaults: brand blue to violet). */
-export function Ring({ value, size = 220, stroke = 12, colour, from = "var(--grad-a)", to = "var(--grad-c)", track = "var(--color-line)", glow = true, children }: { value: number; size?: number; stroke?: number; colour?: string; from?: string; to?: string; track?: string; glow?: boolean; children?: ReactNode }) {
+export function Ring({
+  value,
+  size = 220,
+  stroke = 12,
+  colour,
+  from = "var(--grad-a)",
+  to = "var(--grad-c)",
+  track = "var(--color-line)",
+  glow = true,
+  children,
+}: {
+  value: number;
+  size?: number;
+  stroke?: number;
+  colour?: string;
+  from?: string;
+  to?: string;
+  track?: string;
+  glow?: boolean;
+  children?: ReactNode;
+}) {
   const id = useId().replace(/:/g, "");
   const r = (size - stroke) / 2;
   const c = 2 * Math.PI * r;
@@ -313,7 +456,10 @@ export function Ring({ value, size = 220, stroke = 12, colour, from = "var(--gra
           strokeLinecap="round"
           strokeDasharray={c}
           strokeDashoffset={c * (1 - v)}
-          style={{ transition: "stroke-dashoffset 250ms linear", filter: glow ? `drop-shadow(0 0 ${stroke / 2}px color-mix(in srgb, ${colour ?? from} 40%, transparent))` : undefined }}
+          style={{
+            transition: "stroke-dashoffset 250ms linear",
+            filter: glow ? `drop-shadow(0 0 ${stroke / 2}px color-mix(in srgb, ${colour ?? from} 40%, transparent))` : undefined,
+          }}
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center">{children}</div>
@@ -322,13 +468,34 @@ export function Ring({ value, size = 220, stroke = 12, colour, from = "var(--gra
 }
 
 /** A friendly empty state: an icon in a soft tinted disc, a title, a line of help and an optional action. */
-export function EmptyState({ icon, title, body, action, tint = "var(--color-accent)", mascot }: { icon: IconName; title: string; body?: ReactNode; action?: ReactNode; tint?: string; mascot?: Mood }) {
+export function EmptyState({
+  icon,
+  title,
+  body,
+  action,
+  tint = "var(--color-accent)",
+  mascot,
+}: {
+  icon: IconName;
+  title: string;
+  body?: ReactNode;
+  action?: ReactNode;
+  tint?: string;
+  mascot?: Mood;
+}) {
   return (
     <div className="flex flex-col items-center px-6 py-8 text-center">
       {mascot ? (
         <Mascot mood={mascot} size={88} className="animate-spring-in" />
       ) : (
-        <div className="animate-spring-in grid h-14 w-14 place-items-center rounded-2xl" style={{ background: `color-mix(in srgb, ${tint} 16%, transparent)`, color: tint, boxShadow: `0 0 0 1px color-mix(in srgb, ${tint} 30%, transparent), 0 10px 30px -12px ${tint}` }}>
+        <div
+          className="animate-spring-in grid h-14 w-14 place-items-center rounded-2xl"
+          style={{
+            background: `color-mix(in srgb, ${tint} 16%, transparent)`,
+            color: tint,
+            boxShadow: `0 0 0 1px color-mix(in srgb, ${tint} 30%, transparent), 0 10px 30px -12px ${tint}`,
+          }}
+        >
           <Icon name={icon} size={26} />
         </div>
       )}
@@ -350,12 +517,33 @@ export function Badge({ icon, tint = "var(--color-accent)", size = 36 }: { icon:
 }
 
 /** A metric tile: label, big number, optional icon and hue. */
-export function StatTile({ label, value, icon, tint = "var(--color-accent)", className = "", info }: { label: string; value: ReactNode; icon?: IconName; tint?: string; className?: string; info?: Term }) {
+export function StatTile({
+  label,
+  value,
+  icon,
+  tint = "var(--color-accent)",
+  className = "",
+  info,
+}: {
+  label: string;
+  value: ReactNode;
+  icon?: IconName;
+  tint?: string;
+  className?: string;
+  info?: Term;
+}) {
   return (
     <div className={`card-tint p-4 ${className}`} style={{ "--tint": tint } as CSSProperties}>
       <div className="flex items-center justify-between">
-        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{label}{info && <Info term={info} />}</div>
-        {icon && <span style={{ color: tint }}><Icon name={icon} size={16} /></span>}
+        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+          {label}
+          {info && <Info term={info} />}
+        </div>
+        {icon && (
+          <span style={{ color: tint }}>
+            <Icon name={icon} size={16} />
+          </span>
+        )}
       </div>
       <div className="display mt-2 text-[1.75rem]">{value}</div>
     </div>
@@ -363,7 +551,19 @@ export function StatTile({ label, value, icon, tint = "var(--color-accent)", cla
 }
 
 /** The chain button between two exercises that pairs them as a superset, or splits them. */
-export function LinkToggle({ on, first, second, onToggle, className = "" }: { on: boolean; first: string; second: string; onToggle: () => void; className?: string }) {
+export function LinkToggle({
+  on,
+  first,
+  second,
+  onToggle,
+  className = "",
+}: {
+  on: boolean;
+  first: string;
+  second: string;
+  onToggle: () => void;
+  className?: string;
+}) {
   return (
     <button
       type="button"
@@ -386,7 +586,19 @@ export function LinkToggle({ on, first, second, onToggle, className = "" }: { on
  * stretches while pressed; turning it gives a medium haptic and a soft two-note sound. Preferred over
  * On/Off chips: one tap, one thumb, no reading.
  */
-export function Switch({ on, onChange, label, labelledBy, describedBy }: { on: boolean; onChange: (v: boolean) => void; label?: string; labelledBy?: string; describedBy?: string }) {
+export function Switch({
+  on,
+  onChange,
+  label,
+  labelledBy,
+  describedBy,
+}: {
+  on: boolean;
+  onChange: (v: boolean) => void;
+  label?: string;
+  labelledBy?: string;
+  describedBy?: string;
+}) {
   return (
     <button
       type="button"
@@ -413,13 +625,32 @@ export function Switch({ on, onChange, label, labelledBy, describedBy }: { on: b
 }
 
 /** A settings row: a label, an optional line of help and a switch on the right. */
-export function SwitchRow({ label, hint, on, onChange, info }: { label: string; hint?: ReactNode; on: boolean; onChange: (v: boolean) => void; info?: Term }) {
+export function SwitchRow({
+  label,
+  hint,
+  on,
+  onChange,
+  info,
+}: {
+  label: string;
+  hint?: ReactNode;
+  on: boolean;
+  onChange: (v: boolean) => void;
+  info?: Term;
+}) {
   const id = useId().replace(/:/g, "");
   return (
     <div className="card mt-3 flex items-center justify-between gap-4 px-4 py-3">
       <div className="min-w-0">
-        <p id={`${id}-l`} className="flex items-center gap-1.5 font-medium">{label}{info && <Info term={info} />}</p>
-        {hint && <p id={`${id}-d`} className="mt-0.5 text-xs text-muted">{hint}</p>}
+        <p id={`${id}-l`} className="flex items-center gap-1.5 font-medium">
+          {label}
+          {info && <Info term={info} />}
+        </p>
+        {hint && (
+          <p id={`${id}-d`} className="mt-0.5 text-xs text-muted">
+            {hint}
+          </p>
+        )}
       </div>
       <Switch on={on} onChange={onChange} labelledBy={`${id}-l`} describedBy={hint ? `${id}-d` : undefined} />
     </div>
@@ -437,21 +668,33 @@ export function TodaySkeleton() {
     <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label="Loading">
       <div className="flex items-center justify-between pt-3">
         <Skeleton className="h-4 w-36" />
-        <div className="flex gap-2"><Skeleton className="h-8 w-14 rounded-full" /><Skeleton className="h-8 w-8 rounded-full" /></div>
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-14 rounded-full" />
+          <Skeleton className="h-8 w-8 rounded-full" />
+        </div>
       </div>
       <Skeleton className="mt-3 h-8 w-56" />
-      <div className="mt-4 flex gap-2"><Skeleton className="h-9 w-24 rounded-full" /><Skeleton className="h-9 w-20 rounded-full" /></div>
+      <div className="mt-4 flex gap-2">
+        <Skeleton className="h-9 w-24 rounded-full" />
+        <Skeleton className="h-9 w-20 rounded-full" />
+      </div>
       <Skeleton className="mt-4 h-20 w-full rounded-[20px]" />
       <div className="card mt-4 flex items-center gap-4 p-4">
         <Skeleton className="h-16 w-16 rounded-full" />
-        <div className="flex-1 space-y-2"><Skeleton className="h-3 w-20" /><Skeleton className="h-5 w-40" /></div>
+        <div className="flex-1 space-y-2">
+          <Skeleton className="h-3 w-20" />
+          <Skeleton className="h-5 w-40" />
+        </div>
       </div>
       <Skeleton className="mt-7 h-3 w-28" />
       <div className="card mt-3 divide-y divide-line">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3 px-4 py-3.5">
             <Skeleton className="h-9 w-9" />
-            <div className="flex-1 space-y-2"><Skeleton className="h-4 w-2/3" /><Skeleton className="h-3 w-1/3" /></div>
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-2/3" />
+              <Skeleton className="h-3 w-1/3" />
+            </div>
           </div>
         ))}
       </div>
@@ -464,7 +707,31 @@ export function TodaySkeleton() {
  * otherwise type: body weight, age, bar weight, known lifts. Typing still works as a fallback.
  * `value` is the text in the box; an empty box bumps from `start`.
  */
-export function BumpField({ value, onChange, step, start, min = 0, max = 9999, label, id, placeholder, size = "md", className = "" }: { value: string; onChange: (v: string) => void; step: number; start: number; min?: number; max?: number; label: string; id?: string; placeholder?: string; size?: "md" | "lg"; className?: string }) {
+export function BumpField({
+  value,
+  onChange,
+  step,
+  start,
+  min = 0,
+  max = 9999,
+  label,
+  id,
+  placeholder,
+  size = "md",
+  className = "",
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  step: number;
+  start: number;
+  min?: number;
+  max?: number;
+  label: string;
+  id?: string;
+  placeholder?: string;
+  size?: "md" | "lg";
+  className?: string;
+}) {
   const decimals = (String(step).split(".")[1] ?? "").length;
   const bump = (d: 1 | -1) => {
     haptic("select");

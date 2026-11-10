@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { defaultProfile } from "./defaults";
 import { isShortcut, linkAction, runShortcut } from "./shortcuts";
 import { useApp } from "./store";

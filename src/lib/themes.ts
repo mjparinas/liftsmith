@@ -40,16 +40,91 @@ export interface UnlockContext {
 const BASE = { surface: "#11161d", raised: "#18202a", line: "#232d3a" };
 
 export const THEMES: Theme[] = [
-  { id: "midnight", name: "Midnight", how: "Yours from day one", icon: "default", palette: { bg: "#0a0d12", ...BASE, accent: "#4c8dff", accentInk: "#06122a" }, earned: () => true },
-  { id: "forge", name: "Forge", how: "Lift a double-decker bus (12 t in total)", icon: "forge", palette: { bg: "#100b09", surface: "#19120f", raised: "#231a15", line: "#33261f", accent: "#ff7a3d", accentInk: "#2a0e02" }, earned: (c) => c.stats.totalVolume >= 12_000 },
-  { id: "glacier", name: "Glacier", how: "Finish 25 workouts", icon: "glacier", palette: { bg: "#081016", surface: "#0e1922", raised: "#15232e", line: "#1f3240", accent: "#5fd4ff", accentInk: "#022230" }, earned: (c) => c.stats.sessions.length >= 25 },
-  { id: "volt", name: "Volt", how: "Set 10 personal bests", icon: null, palette: { bg: "#0b0e0a", surface: "#121810", raised: "#1a2217", line: "#263221", accent: "#b6f23a", accentInk: "#182400" }, earned: (c) => c.stats.prs.length >= 10 },
-  { id: "aurora", name: "Aurora", how: "Meet your weekly goal 8 weeks running", icon: "aurora", palette: { bg: "#0a0c14", surface: "#11141f", raised: "#181c2b", line: "#252a3d", accent: "#3ee0a8", accentInk: "#032419" }, earned: (c) => c.goalWeeks >= 8 },
-  { id: "rose", name: "Rose", how: "Finish 50 workouts", icon: null, palette: { bg: "#120a0e", surface: "#1b1016", raised: "#25171e", line: "#36222c", accent: "#ff6fa5", accentInk: "#2c0616" }, earned: (c) => c.stats.sessions.length >= 50 },
-  { id: "abyss", name: "Abyss", how: "Lift a blue whale (150 t in total)", icon: null, palette: { bg: "#06100f", surface: "#0b1918", raised: "#112322", line: "#1a3331", accent: "#2ed3c6", accentInk: "#012320" }, earned: (c) => c.stats.totalVolume >= 150_000 },
-  { id: "royal", name: "Royal", how: "Reach your first liftiversary", icon: "royal", palette: { bg: "#0e0a14", surface: "#160f1f", raised: "#1f162b", line: "#2e2240", accent: "#f2c14e", accentInk: "#2a1d00" }, earned: (c) => { const first = c.stats.sessions.at(-1); return !!first && (c.now - first.start >= 365 * 86400_000 || anniversaryYears(first.start, c.now) > 0); } },
-  { id: "pumpkin", name: "Pumpkin", how: "Open to everyone in October", icon: null, season: [9], palette: { bg: "#0f0b08", surface: "#18120d", raised: "#221a13", line: "#33271c", accent: "#ff9a1f", accentInk: "#2a1500" }, earned: () => false },
-  { id: "frost", name: "Frost", how: "Open to everyone in December", icon: null, season: [11], palette: { bg: "#090d14", surface: "#0f1520", raised: "#161e2c", line: "#222d40", accent: "#9ec9ff", accentInk: "#0a1a33" }, earned: () => false },
+  {
+    id: "midnight",
+    name: "Midnight",
+    how: "Yours from day one",
+    icon: "default",
+    palette: { bg: "#0a0d12", ...BASE, accent: "#4c8dff", accentInk: "#06122a" },
+    earned: () => true,
+  },
+  {
+    id: "forge",
+    name: "Forge",
+    how: "Lift a double-decker bus (12 t in total)",
+    icon: "forge",
+    palette: { bg: "#100b09", surface: "#19120f", raised: "#231a15", line: "#33261f", accent: "#ff7a3d", accentInk: "#2a0e02" },
+    earned: (c) => c.stats.totalVolume >= 12_000,
+  },
+  {
+    id: "glacier",
+    name: "Glacier",
+    how: "Finish 25 workouts",
+    icon: "glacier",
+    palette: { bg: "#081016", surface: "#0e1922", raised: "#15232e", line: "#1f3240", accent: "#5fd4ff", accentInk: "#022230" },
+    earned: (c) => c.stats.sessions.length >= 25,
+  },
+  {
+    id: "volt",
+    name: "Volt",
+    how: "Set 10 personal bests",
+    icon: null,
+    palette: { bg: "#0b0e0a", surface: "#121810", raised: "#1a2217", line: "#263221", accent: "#b6f23a", accentInk: "#182400" },
+    earned: (c) => c.stats.prs.length >= 10,
+  },
+  {
+    id: "aurora",
+    name: "Aurora",
+    how: "Meet your weekly goal 8 weeks running",
+    icon: "aurora",
+    palette: { bg: "#0a0c14", surface: "#11141f", raised: "#181c2b", line: "#252a3d", accent: "#3ee0a8", accentInk: "#032419" },
+    earned: (c) => c.goalWeeks >= 8,
+  },
+  {
+    id: "rose",
+    name: "Rose",
+    how: "Finish 50 workouts",
+    icon: null,
+    palette: { bg: "#120a0e", surface: "#1b1016", raised: "#25171e", line: "#36222c", accent: "#ff6fa5", accentInk: "#2c0616" },
+    earned: (c) => c.stats.sessions.length >= 50,
+  },
+  {
+    id: "abyss",
+    name: "Abyss",
+    how: "Lift a blue whale (150 t in total)",
+    icon: null,
+    palette: { bg: "#06100f", surface: "#0b1918", raised: "#112322", line: "#1a3331", accent: "#2ed3c6", accentInk: "#012320" },
+    earned: (c) => c.stats.totalVolume >= 150_000,
+  },
+  {
+    id: "royal",
+    name: "Royal",
+    how: "Reach your first liftiversary",
+    icon: "royal",
+    palette: { bg: "#0e0a14", surface: "#160f1f", raised: "#1f162b", line: "#2e2240", accent: "#f2c14e", accentInk: "#2a1d00" },
+    earned: (c) => {
+      const first = c.stats.sessions.at(-1);
+      return !!first && (c.now - first.start >= 365 * 86400_000 || anniversaryYears(first.start, c.now) > 0);
+    },
+  },
+  {
+    id: "pumpkin",
+    name: "Pumpkin",
+    how: "Open to everyone in October",
+    icon: null,
+    season: [9],
+    palette: { bg: "#0f0b08", surface: "#18120d", raised: "#221a13", line: "#33271c", accent: "#ff9a1f", accentInk: "#2a1500" },
+    earned: () => false,
+  },
+  {
+    id: "frost",
+    name: "Frost",
+    how: "Open to everyone in December",
+    icon: null,
+    season: [11],
+    palette: { bg: "#090d14", surface: "#0f1520", raised: "#161e2c", line: "#222d40", accent: "#9ec9ff", accentInk: "#0a1a33" },
+    earned: () => false,
+  },
 ];
 
 export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]));

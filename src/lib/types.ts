@@ -1,4 +1,5 @@
 import { t, translated } from "./i18n";
+
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
 // own unit (so 45 lb plates stay exactly 45 lb) and converted at the edges (src/lib/units.ts).
 
@@ -65,10 +66,43 @@ export type Equipment = (typeof EQUIPMENT)[number];
 export const EQUIPMENT_LABEL: Record<Equipment, string> = translated(EQUIPMENT, (e) => `equipment.${e}`);
 
 export const EQUIPMENT_GROUPS: { title: string; items: Equipment[] }[] = [
-  { get title() { return t("equipment.group.free"); }, items: ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells"] },
-  { get title() { return t("equipment.group.benches"); }, items: ["bench", "inclineBench", "rack", "pullupBar", "dipBars", "box"] },
-  { get title() { return t("equipment.group.machines"); }, items: ["cable", "latPulldown", "seatedRow", "legPress", "legExtension", "legCurl", "chestPress", "pecDeck", "shoulderPress", "smith", "hackSquat", "calfMachine"] },
-  { get title() { return t("equipment.group.small"); }, items: ["bands", "rings", "abWheel"] },
+  {
+    get title() {
+      return t("equipment.group.free");
+    },
+    items: ["barbell", "ezBar", "trapBar", "dumbbells", "kettlebells"],
+  },
+  {
+    get title() {
+      return t("equipment.group.benches");
+    },
+    items: ["bench", "inclineBench", "rack", "pullupBar", "dipBars", "box"],
+  },
+  {
+    get title() {
+      return t("equipment.group.machines");
+    },
+    items: [
+      "cable",
+      "latPulldown",
+      "seatedRow",
+      "legPress",
+      "legExtension",
+      "legCurl",
+      "chestPress",
+      "pecDeck",
+      "shoulderPress",
+      "smith",
+      "hackSquat",
+      "calfMachine",
+    ],
+  },
+  {
+    get title() {
+      return t("equipment.group.small");
+    },
+    items: ["bands", "rings", "abWheel"],
+  },
 ];
 
 /** How an exercise is loaded decides how its weight is rounded and drawn. */
@@ -176,7 +210,14 @@ export interface Profile {
    * The Pro trial offer at the end of setup (trial.ts). Until native billing lands this only records the
    * choice; billing will read it to start the store trial.
    */
-  pro?: { offeredAt: number; plan?: "annual" | "monthly"; trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean };
+  pro?: {
+    offeredAt: number;
+    plan?: "annual" | "monthly";
+    trialStartedAt?: number;
+    trialDays?: number;
+    declinedAt?: number;
+    subscribed?: boolean;
+  };
   /** The plan source a lifter had while Pro, kept while they're on the free plan so Pro brings it back (store.applyAccess). */
   proPlan?: PlanSource;
   /** Calendar (roadmap MVP+2): training days written to the calendar, and busy times read with permission. */
@@ -205,7 +246,12 @@ export interface Profile {
    */
   messages?: {
     push: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
-    email?: { address: string; consentAt: number; status: "pending" | "confirmed" | "unsubscribed"; kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>> };
+    email?: {
+      address: string;
+      consentAt: number;
+      status: "pending" | "confirmed" | "unsubscribed";
+      kinds: Partial<Record<"reminder" | "missed" | "streak" | "milestone" | "pro", boolean>>;
+    };
     /** When reminders were first set up: comebacks count from here until there's a workout. */
     startedAt?: number;
   };
@@ -543,10 +589,25 @@ export interface CustomExerciseEvent extends EventBase {
   exercise: Pick<Exercise, "id" | "name" | "primary" | "secondary" | "load" | "compound">;
 }
 
-
 // --- Injury mode (Melvin, 2026-11-09; injury.ts). Kept on the device, never in analytics or reports. ---
 
-export const BODY_PARTS = ["neck", "shoulder", "elbow", "wrist", "chest", "upperBack", "lowerBack", "abs", "hip", "groin", "quad", "hamstring", "knee", "calf", "ankle"] as const;
+export const BODY_PARTS = [
+  "neck",
+  "shoulder",
+  "elbow",
+  "wrist",
+  "chest",
+  "upperBack",
+  "lowerBack",
+  "abs",
+  "hip",
+  "groin",
+  "quad",
+  "hamstring",
+  "knee",
+  "calf",
+  "ankle",
+] as const;
 export type BodyPart = (typeof BODY_PARTS)[number];
 
 /** The lifter logged an injury or a sore spot. Affected exercises are skipped until it's marked healed. */

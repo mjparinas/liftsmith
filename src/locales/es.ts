@@ -1,6 +1,6 @@
-import type { MessageKey } from "./en";
 import type { Message } from "@/lib/i18n";
 
+import type { MessageKey } from "./en";
 // Español. Traducción inicial; pendiente de revisión por un hablante nativo.
 // The text is in src/locales/text/<prefix>.ts, beside the English.
 

@@ -1,4 +1,5 @@
 "use client";
+
 // Creator codes (AGENTS.md "Marketing and growth", Melvin approved 2026-11-09). A creator shares a code
 // (LIFT-NAME) or a link (getliftsmith.com/c/lift-name). The lifter's followers get a 30-day Pro trial
 // instead of 14 days, and the creator earns 30% of our net revenue from each subscriber who used the
@@ -16,10 +17,11 @@
 // The code also goes to RevenueCat as a subscriber attribute, so the store's purchase webhook carries it too.
 // Once a trial or purchase has started, the code can't be changed: it belongs to that subscription.
 import { create } from "zustand";
+
 import { installId, platformStore } from "./analytics";
+import { normalizeCode, playLinkWithCode } from "./creatorCode";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
-import { normalizeCode, playLinkWithCode } from "./creatorCode";
 import { SITE_URL } from "./site";
 
 export { normalizeCode, playLinkWithCode };

@@ -22,7 +22,13 @@ export type Contrast = "system" | "standard" | "more";
 export type Hand = "off" | "right" | "left";
 export type A11y = { text?: TextSize; colours?: Colours; contrast?: Contrast; hand?: Hand };
 
-export const TEXT_SIZES: [TextSize, string][] = [["system", "Match my phone"], ["100", "Default"], ["115", "Large"], ["130", "Larger"], ["150", "Largest"]];
+export const TEXT_SIZES: [TextSize, string][] = [
+  ["system", "Match my phone"],
+  ["100", "Default"],
+  ["115", "Large"],
+  ["130", "Larger"],
+  ["150", "Largest"],
+];
 
 const KEY = "liftsmith.a11y";
 const TEXT = new Set<TextSize>(["system", "100", "115", "130", "150"]);

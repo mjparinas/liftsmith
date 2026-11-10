@@ -3,13 +3,20 @@
 // the environment, so nothing a request writes can make someone an admin. Without either list the panel and
 // its API answer 404. Only hashes of links and session tokens are stored; every change is audited.
 import { createHash, randomBytes } from "node:crypto";
+
 import { query, rateLimit, run } from "./db";
 
 export const COOKIE = "ls_admin";
 const LINK_MS = 15 * 60_000;
 const SESSION_MS = 7 * 86_400_000;
 
-const list = (v: string | undefined) => new Set((v ?? "").split(",").map((e) => e.trim().toLowerCase()).filter((e) => e.includes("@")));
+const list = (v: string | undefined) =>
+  new Set(
+    (v ?? "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => e.includes("@")),
+  );
 export const adminEmails = () => list(process.env.ADMIN_EMAILS);
 export function supportEmails() {
   const admins = adminEmails();
@@ -21,7 +28,8 @@ export const roleOf = (email: string): Role | null => (adminEmails().has(email) 
 const hash = (t: string) => createHash("sha256").update(t).digest("hex");
 const token = () => randomBytes(32).toString("base64url");
 
-const json = (status: number, body: unknown, headers: HeadersInit = {}) => Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
+const json = (status: number, body: unknown, headers: HeadersInit = {}) =>
+  Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 export const notFound = () => json(404, { error: "Not found" });
 
 /** Requests that change something must come from our own pages. */
@@ -68,13 +76,21 @@ export async function startSignIn(req: Request, email: string, send: typeof fetc
 /** Finishes a sign-in from the emailed link: sets the session cookie and goes to the panel. */
 export async function finishSignIn(req: Request, now = Date.now()): Promise<Response> {
   const t = new URL(req.url).searchParams.get("token") ?? "";
-  const rows = await query<{ email: string; expires_at: number; used_at: number | null }>("SELECT email, expires_at, used_at FROM admin_links WHERE token_hash = ?", [hash(t)]);
+  const rows = await query<{ email: string; expires_at: number; used_at: number | null }>(
+    "SELECT email, expires_at, used_at FROM admin_links WHERE token_hash = ?",
+    [hash(t)],
+  );
   const link = rows[0];
   const back = (q: string) => new Response(null, { status: 303, headers: { Location: `/admin/${q}`, "Cache-Control": "no-store" } });
   if (!t || !link || link.used_at != null || Number(link.expires_at) < now || !roleOf(String(link.email))) return back("?link=expired");
   await run("UPDATE admin_links SET used_at = ? WHERE token_hash = ?", [now, hash(t)]);
   const s = token();
-  await run("INSERT INTO admin_sessions (token_hash, email, created_at, expires_at) VALUES (?, ?, ?, ?)", [hash(s), link.email, now, now + SESSION_MS]);
+  await run("INSERT INTO admin_sessions (token_hash, email, created_at, expires_at) VALUES (?, ?, ?, ?)", [
+    hash(s),
+    link.email,
+    now,
+    now + SESSION_MS,
+  ]);
   await audit(String(link.email), "signin", null);
   const res = back("");
   res.headers.append("Set-Cookie", `${COOKIE}=${s}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_MS / 1000}`);
@@ -98,7 +114,9 @@ export interface Staff {
 export async function getStaff(req: Request, now = Date.now()): Promise<Staff | null> {
   const c = cookie(req);
   if (!c) return null;
-  const rows = await query<{ email: string; expires_at: number }>("SELECT email, expires_at FROM admin_sessions WHERE token_hash = ?", [hash(c)]);
+  const rows = await query<{ email: string; expires_at: number }>("SELECT email, expires_at FROM admin_sessions WHERE token_hash = ?", [
+    hash(c),
+  ]);
   const s = rows[0];
   if (!s || Number(s.expires_at) < now) return null;
   // Taking an address off the list in the environment ends its sessions at once.
@@ -123,7 +141,13 @@ export async function signOut(req: Request): Promise<Response> {
 }
 
 export async function audit(admin: string, action: string, target: string | null, detail?: unknown): Promise<void> {
-  await run("INSERT INTO admin_audit (at, admin, action, target, detail) VALUES (?, ?, ?, ?, ?)", [Date.now(), admin, action, target, detail === undefined ? null : JSON.stringify(detail).slice(0, 2000)]);
+  await run("INSERT INTO admin_audit (at, admin, action, target, detail) VALUES (?, ?, ?, ?, ?)", [
+    Date.now(),
+    admin,
+    action,
+    target,
+    detail === undefined ? null : JSON.stringify(detail).slice(0, 2000),
+  ]);
 }
 
 export { json };

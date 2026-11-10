@@ -1,4 +1,5 @@
 "use client";
+
 // Page views and call-to-action clicks on the public site, sent to our own server (/api/pv/). Cookieless:
 // nothing is stored on the device for counting, and the server's visitor hash changes every day. The app
 // (/app/) and the admin panel (/admin/) send nothing from here. A Global Privacy Control signal is respected.
@@ -6,6 +7,7 @@
 // install can be credited to it, when usage stats are on (src/lib/analytics.ts).
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+
 import { analyticsOn, rememberFirstTouch } from "@/lib/analytics";
 import { utmFrom } from "@/lib/analyticsSchema";
 

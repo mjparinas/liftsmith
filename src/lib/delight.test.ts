@@ -1,10 +1,14 @@
 import { describe, expect, it } from "vitest";
+
+import { breathPhase, plateQuiz } from "@/components/app/WorkoutExtras";
+import { makeSet } from "@/test/factories";
+
 import { checkinText } from "./buddy";
-import { setLanguage } from "./i18n";
 import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
 import { generate } from "./generator";
 import { ghostFor, lastWorkout, paceDelta, paceText, repeatPlan, sameAsLast } from "./ghost";
+import { setLanguage } from "./i18n";
 import { anniversaryYears, crossed, doneMoments, fmtTonnage, todayMoments, tonnage, TONNAGE } from "./moments";
 import { fitSize, pairFor, type Photo } from "./photos";
 import { changeText, lastLoadedKg, plateChange } from "./plateMemory";
@@ -15,8 +19,6 @@ import { activeTheme, newlyUnlocked, THEMES, unlocked } from "./themes";
 import type { AppEvent, SetEvent } from "./types";
 import { doneCue, exerciseCue, setCue, spokenLoad } from "./voice";
 import { DRILLS, warmupRoutine } from "./warmupRoutine";
-import { breathPhase, plateQuiz } from "@/components/app/WorkoutExtras";
-import { makeSet } from "@/test/factories";
 
 const D = 86400_000;
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -93,7 +95,7 @@ describe("recap", () => {
     expect(r.topExercise?.id).toBe("bench-press");
     expect(r.topMuscle?.muscle).toBe("chest");
     expect(r.prs.map((p) => p.exerciseId)).toEqual(["bench-press"]);
-    expect(r.volumeChange).toBeCloseTo((2928 / 1200) - 1);
+    expect(r.volumeChange).toBeCloseTo(2928 / 1200 - 1);
     expect(r.likeA).toBe("a family car");
     expect(r.label).toBe("November 2026");
   });
@@ -119,7 +121,11 @@ describe("ghost mode and same as last time", () => {
   it("takes the most recent other session of the exercise", () => {
     const g = ghostFor([...last, set("bench-press", NOW, 62.5, 8, "now")], "bench-press", "now")!;
     expect(g.sessionId).toBe("a");
-    expect(g.sets.map((s) => [s.reps, s.restSec, s.offset])).toEqual([[8, undefined, 0], [8, 120, 150], [7, 125, 300]]);
+    expect(g.sets.map((s) => [s.reps, s.restSec, s.offset])).toEqual([
+      [8, undefined, 0],
+      [8, 120, 150],
+      [7, 125, 300],
+    ]);
     expect(ghostFor(last, "squat")).toBeNull();
   });
   it("rebuilds rest from start times for older sets", () => {
@@ -144,11 +150,22 @@ describe("ghost mode and same as last time", () => {
   it("repeats the last workout's exercises and sets, keeping progression and the gym's limits", () => {
     const gym = makeGym("commercial", "kg", "g");
     const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
-    const evs: AppEvent[] = [set("back-squat", NOW - D, 100, 5, "L"), set("back-squat", NOW - D + 1000, 100, 5, "L"), set("bench-press", NOW - D + 2000, 70, 8, "L"), set("leg-press", NOW - 5 * D, 150, 10, "old")];
-    expect(lastWorkout(evs)?.items).toEqual([{ exerciseId: "back-squat", sets: 2 }, { exerciseId: "bench-press", sets: 1 }]);
+    const evs: AppEvent[] = [
+      set("back-squat", NOW - D, 100, 5, "L"),
+      set("back-squat", NOW - D + 1000, 100, 5, "L"),
+      set("bench-press", NOW - D + 2000, 70, 8, "L"),
+      set("leg-press", NOW - 5 * D, 150, 10, "old"),
+    ];
+    expect(lastWorkout(evs)?.items).toEqual([
+      { exerciseId: "back-squat", sets: 2 },
+      { exerciseId: "bench-press", sets: 1 },
+    ]);
     const base = generate({ gym, profile, events: evs, minutes: 45, now: NOW });
     const p = repeatPlan(base, evs, profile, gym, NOW)!;
-    expect(p.items.map((i) => [i.exerciseId, i.sets])).toEqual([["back-squat", 2], ["bench-press", 1]]);
+    expect(p.items.map((i) => [i.exerciseId, i.sets])).toEqual([
+      ["back-squat", 2],
+      ["bench-press", 1],
+    ]);
     expect(p.items[0].target.weight).toBeGreaterThan(0);
     const bw = makeGym("bodyweight", "kg", "b");
     expect(repeatPlan(base, evs, profile, bw, NOW)).toBeNull();
@@ -183,7 +200,9 @@ describe("smart plate memory", () => {
   it("words check-ins, seasonal challenges and the strength band in Spanish", () => {
     setLanguage("es");
     try {
-      expect(checkinText({ gym: "Iron Den", focus: ["Pecho", "Tríceps"], buddies: ["Sam"] })).toBe("¡Hola, Sam! Estoy en el gimnasio, en Iron Den, hoy toca pecho y tríceps. Te toca 💪");
+      expect(checkinText({ gym: "Iron Den", focus: ["Pecho", "Tríceps"], buddies: ["Sam"] })).toBe(
+        "¡Hola, Sam! Estoy en el gimnasio, en Iron Den, hoy toca pecho y tríceps. Te toca 💪",
+      );
       expect(SEASONAL.find((d) => d.id === "halloween")!.name).toBe("Fuerza de miedo");
       expect(scoreBand(60)).toBe("Intermedio");
     } finally {
@@ -191,7 +210,11 @@ describe("smart plate memory", () => {
     }
   });
   it("knows what's on the bar from the last set or warm-up of the exercise this session", () => {
-    const evs = [set("back-squat", 1, 60, 5, "s"), { type: "warmup", id: "w", at: 2, sessionId: "s", exerciseId: "back-squat", weight: 80, reps: 3 }, set("back-squat", 3, 100, 5, "other")];
+    const evs = [
+      set("back-squat", 1, 60, 5, "s"),
+      { type: "warmup", id: "w", at: 2, sessionId: "s", exerciseId: "back-squat", weight: 80, reps: 3 },
+      set("back-squat", 3, 100, 5, "other"),
+    ];
     expect(lastLoadedKg(evs, "s", "back-squat")).toBe(80);
     expect(lastLoadedKg(evs, "s", "deadlift")).toBeNull();
   });
@@ -209,7 +232,9 @@ describe("voice coach cues", () => {
     expect(spokenLoad(0, "kg", "bodyweight")).toBe("bodyweight");
     expect(spokenLoad(10, "kg", "dumbbell")).toBe("10 kilos each");
     expect(spokenLoad(45.359237, "lb", "barbell")).toBe("100 pounds");
-    expect(exerciseCue("Plank", 3, { kg: 0, reps: 30, rir: 2, unit: "kg", load: "bodyweight", timed: true })).toBe("Next up, Plank. three sets of 30 seconds at bodyweight.");
+    expect(exerciseCue("Plank", 3, { kg: 0, reps: 30, rir: 2, unit: "kg", load: "bodyweight", timed: true })).toBe(
+      "Next up, Plank. three sets of 30 seconds at bodyweight.",
+    );
     expect(doneCue(18, 6400, "kg")).toBe("Workout done. 18 sets, 6,400 kilos moved. Great work.");
   });
 });
@@ -231,7 +256,12 @@ describe("strength score and twins", () => {
     expect(ageFactor(18)).toBeCloseTo(1.05);
   });
   it("scores recent lifts, gives older lifters credit, and ignores bodyweight and old sets", () => {
-    const evs = [set("bench-press", NOW - D, 80, 5), set("back-squat", NOW - D, 120, 5), set("push-up", NOW - D, 0, 20), set("deadlift", NOW - 400 * D, 200, 5)];
+    const evs = [
+      set("bench-press", NOW - D, 80, 5),
+      set("back-squat", NOW - D, 120, 5),
+      set("push-up", NOW - D, 0, 20),
+      set("deadlift", NOW - 400 * D, 200, 5),
+    ];
     const young = strength(evs, { bodyweight: 80, birthYear: 1996 }, NOW);
     const older = strength(evs, { bodyweight: 80, birthYear: 1966 }, NOW);
     expect(young.lifts.map((l) => l.exerciseId).sort()).toEqual(["back-squat", "bench-press"]);
@@ -262,7 +292,11 @@ describe("general warm-up", () => {
 describe("seasonal challenges", () => {
   it("counts progress inside the window only", () => {
     const halloween = new Date("2026-10-28T12:00").getTime();
-    const evs = [set("deadlift", halloween - D, 100, 10, "a"), set("deadlift", halloween, 100, 10, "b"), set("deadlift", halloween - 10 * D, 500, 10, "c")];
+    const evs = [
+      set("deadlift", halloween - D, 100, 10, "a"),
+      set("deadlift", halloween, 100, 10, "b"),
+      set("deadlift", halloween - 10 * D, 500, 10, "c"),
+    ];
     const c = seasonalChallenges(evs, halloween).find((x) => x.id === "halloween")!;
     expect(c.progress).toBe(2000);
     expect(c.done).toBe(false);
@@ -271,7 +305,8 @@ describe("seasonal challenges", () => {
   });
   it("teases the next one and every window is valid", () => {
     expect(nextSeasonal(NOW)?.def.id).toBe("twelve-days");
-    for (const s of SEASONAL) expect(new Date(2026, s.to[0], s.to[1]).getTime()).toBeGreaterThanOrEqual(new Date(2026, s.from[0], s.from[1]).getTime());
+    for (const s of SEASONAL)
+      expect(new Date(2026, s.to[0], s.to[1]).getTime()).toBeGreaterThanOrEqual(new Date(2026, s.from[0], s.from[1]).getTime());
   });
 });
 
@@ -280,10 +315,25 @@ describe("earned themes", () => {
   it("unlocks from milestones, and seasonal themes only in season", () => {
     const empty = ctx([]);
     expect(THEMES.filter((t) => unlocked(t, empty)).map((t) => t.id)).toEqual(["midnight"]);
-    expect(unlocked(THEMES.find((t) => t.id === "frost")!, ctx([], 0, new Date("2026-12-05").getTime()))).toBe(true);
-    expect(unlocked(THEMES.find((t) => t.id === "aurora")!, ctx([], 8))).toBe(true);
+    expect(
+      unlocked(
+        THEMES.find((t) => t.id === "frost")!,
+        ctx([], 0, new Date("2026-12-05").getTime()),
+      ),
+    ).toBe(true);
+    expect(
+      unlocked(
+        THEMES.find((t) => t.id === "aurora")!,
+        ctx([], 8),
+      ),
+    ).toBe(true);
     const heavy = [...workout(1, 600)];
-    expect(unlocked(THEMES.find((t) => t.id === "forge")!, ctx(heavy))).toBe(true);
+    expect(
+      unlocked(
+        THEMES.find((t) => t.id === "forge")!,
+        ctx(heavy),
+      ),
+    ).toBe(true);
     expect(newlyUnlocked([], ctx(heavy)).map((t) => t.id)).toEqual(["forge"]);
     expect(newlyUnlocked(["forge"], ctx(heavy))).toEqual([]);
   });
@@ -293,7 +343,9 @@ describe("earned themes", () => {
   });
   it("keeps text readable on every theme (WCAG AA)", () => {
     const lum = (hex: string) => {
-      const c = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+      const c = [1, 3, 5]
+        .map((i) => parseInt(hex.slice(i, i + 2), 16) / 255)
+        .map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
       return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2];
     };
     const ratio = (a: string, b: string) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
@@ -329,7 +381,9 @@ describe("rest extras", () => {
 
 describe("buddies and photos", () => {
   it("writes a friendly check-in", () => {
-    expect(checkinText({ gym: "Iron Den", focus: ["Chest", "Triceps"], buddies: ["Sam"] })).toBe("Hey Sam! I'm at the gym at Iron Den, training chest and triceps today. Your turn 💪");
+    expect(checkinText({ gym: "Iron Den", focus: ["Chest", "Triceps"], buddies: ["Sam"] })).toBe(
+      "Hey Sam! I'm at the gym at Iron Den, training chest and triceps today. Your turn 💪",
+    );
     expect(checkinText({ gym: "My gym", buddies: [] })).toBe("I'm at the gym. Your turn 💪");
     expect(checkinText({ buddies: ["A", "B"] })).toMatch(/^Hey crew!/);
   });

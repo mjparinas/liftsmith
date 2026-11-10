@@ -3,7 +3,7 @@
 // scripts, nothing from the network unless images are asked for) and only frameable by the panel itself.
 import { json, requireStaff } from "@/server/adminAuth";
 import { emailPage, emailViewPolicy, sanitizeEmailHtml } from "@/server/emailHtml";
-import { getInboxHtml, InboxError, inboxConfigured } from "@/server/inbox";
+import { getInboxHtml, inboxConfigured, InboxError } from "@/server/inbox";
 
 const ID = /^[A-Za-z0-9-]{1,100}$/;
 

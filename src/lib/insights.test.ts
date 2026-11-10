@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { blockWeek } from "./block";
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
@@ -19,9 +20,19 @@ const gym = makeGym("commercial", "kg", "g1");
 
 let n = 0;
 const set = (at: number, sessionId: string, over: Partial<SetEvent> = {}): SetEvent => ({
-  type: "set", id: `s${n++}`, at, sessionId, exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2, ...over,
+  type: "set",
+  id: `s${n++}`,
+  at,
+  sessionId,
+  exerciseId: "back-squat",
+  weight: 100,
+  reps: 5,
+  targetReps: 5,
+  rir: 2,
+  ...over,
 });
-const session = (at: number, id: string, over: Partial<SetEvent> = {}, count = 3): AppEvent[] => Array.from({ length: count }, (_, i) => set(at + i * 1000, id, over));
+const session = (at: number, id: string, over: Partial<SetEvent> = {}, count = 3): AppEvent[] =>
+  Array.from({ length: count }, (_, i) => set(at + i * 1000, id, over));
 
 describe("why: every recommendation explains itself", () => {
   it("says why each exercise, why that many sets and why that load", () => {
@@ -58,7 +69,11 @@ describe("why: every recommendation explains itself", () => {
   });
 
   it("explains the day's call with the signals behind it", () => {
-    const hard: AppEvent[] = [...session(NOW - 2 * D, "a", { reps: 2 }, 4), ...session(NOW - D, "b", { reps: 2 }, 4), ...session(NOW - 3600_000, "c", { reps: 2 }, 4)];
+    const hard: AppEvent[] = [
+      ...session(NOW - 2 * D, "a", { reps: 2 }, 4),
+      ...session(NOW - D, "b", { reps: 2 }, 4),
+      ...session(NOW - 3600_000, "c", { reps: 2 }, 4),
+    ];
     const r = readiness(hard, base, NOW);
     expect(r.call).toBe("recover");
     expect(callWhy(r, "recover", false)).toMatch(/^Go easy today: .*missed reps lately.*\(readiness \d+\)/i);
@@ -74,7 +89,9 @@ describe("why: every recommendation explains itself", () => {
 
 describe("insights: coach's notes", () => {
   const weekly = (weeks: number, weight: (i: number) => number, exerciseId = "back-squat", reps = 5) =>
-    Array.from({ length: weeks }, (_, i) => session(NOW - (weeks - i) * W + D, `${exerciseId}-${i}`, { exerciseId, weight: weight(i), reps, targetReps: reps })).flat();
+    Array.from({ length: weeks }, (_, i) =>
+      session(NOW - (weeks - i) * W + D, `${exerciseId}-${i}`, { exerciseId, weight: weight(i), reps, targetReps: reps }),
+    ).flat();
 
   it("finds a lift with no new best in 3+ weeks while still training it", () => {
     // Three rising weeks, then four flat ones.
@@ -89,7 +106,14 @@ describe("insights: coach's notes", () => {
     expect(s.action?.kind).toBe("plateau");
     // A running fix replaces the stall note with a note that it's in the plan.
     const p = (s.action as { plateau: import("./plateau").Plateau }).plateau;
-    const running = insights({ events: flat, profile: { ...base, plateauFixes: [{ exerciseId: p.exerciseId, kind: p.fix, startedAt: NOW - D, until: NOW + 20 * D, from: p.best }] }, now: NOW });
+    const running = insights({
+      events: flat,
+      profile: {
+        ...base,
+        plateauFixes: [{ exerciseId: p.exerciseId, kind: p.fix, startedAt: NOW - D, until: NOW + 20 * D, from: p.best }],
+      },
+      now: NOW,
+    });
     expect(running.some((x) => x.id.startsWith("plateau-"))).toBe(false);
     expect(running.find((x) => x.id.startsWith("fix-live-"))?.advice).toMatch(/already includes it/);
   });
@@ -112,7 +136,11 @@ describe("insights: coach's notes", () => {
 
   it("warns when reps were missed three workouts running", () => {
     const p = { ...base, blockStart: NOW - 2 * W - D };
-    const ev = [...session(NOW - 5 * D, "a", { reps: 3 }), ...session(NOW - 3 * D, "b", { reps: 3 }), ...session(NOW - D, "c", { reps: 2 })];
+    const ev = [
+      ...session(NOW - 5 * D, "a", { reps: 3 }),
+      ...session(NOW - 3 * D, "b", { reps: 3 }),
+      ...session(NOW - D, "c", { reps: 2 }),
+    ];
     const note = insights({ events: ev, profile: p, now: NOW })[0];
     expect(note.title).toBe("Fatigue is building up");
     expect(note.tone).toBe("warn");
@@ -121,14 +149,23 @@ describe("insights: coach's notes", () => {
 
   it("folds stalled lifts into the fatigue note instead of offering a second deload", () => {
     const p = { ...base, blockStart: NOW - 2 * W - D };
-    const flat = (id: string, w0: number) => weekly(7, (i) => (i < 2 ? w0 + i * 5 : w0 + 5), id, 5).map((e, k, all) => (e.type === "set" && e.at > all.at(-1)!.at - 3 * W ? { ...e, reps: 2 } : e));
+    const flat = (id: string, w0: number) =>
+      weekly(7, (i) => (i < 2 ? w0 + i * 5 : w0 + 5), id, 5).map((e, k, all) =>
+        e.type === "set" && e.at > all.at(-1)!.at - 3 * W ? { ...e, reps: 2 } : e,
+      );
     const notes = insights({ events: [...flat("back-squat", 90), ...flat("bench-press", 60)], profile: p, now: NOW });
     expect(notes.filter((x) => x.action?.kind === "deload")).toHaveLength(1);
     expect(notes[0].why).toMatch(/have had no new best in \d weeks or more, too/);
   });
 
   it("spots rising body fat and gives advice for the goal", () => {
-    const ev: AppEvent[] = [0, 1, 2, 3, 4].map((i) => ({ type: "bodyweight", id: `b${i}`, at: NOW - (5 - i) * W, kg: 80 + i * 0.3, bodyFat: 18 + i * 0.5 }));
+    const ev: AppEvent[] = [0, 1, 2, 3, 4].map((i) => ({
+      type: "bodyweight",
+      id: `b${i}`,
+      at: NOW - (5 - i) * W,
+      kg: 80 + i * 0.3,
+      bodyFat: 18 + i * 0.5,
+    }));
     const cut = insights({ events: ev, profile: { ...base, goal: "general" }, now: NOW }).find((x) => x.id.startsWith("fat-up"))!;
     expect(cut.title).toBe("Body fat is creeping up");
     expect(cut.why).toMatch(/Up about 2 points in 4 weeks \(now 20%\)/);
@@ -175,6 +212,9 @@ describe("health: weigh-ins and body fat", () => {
         { value: 18.5, startDate: "2026-11-02T07:00:00" },
       ],
     );
-    expect(r.map((x) => [x.kg, x.bodyFat])).toEqual([[80.5, 19], [80, 18.5]]);
+    expect(r.map((x) => [x.kg, x.bodyFat])).toEqual([
+      [80.5, 19],
+      [80, 18.5],
+    ]);
   });
 });

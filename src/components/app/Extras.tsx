@@ -1,12 +1,16 @@
 "use client";
+
 // Delightful extras on Today, Done and Progress: moments (anniversaries, comebacks, tonnage), seasonal
 // challenges, newly earned themes, "same as last time", the general warm-up, gym buddy check-ins, the
 // lifetime tonnage card, the strength score and the recap entry. Kept here so the screens they sit on only
 // gain one line each.
+import { useMemo, useState } from "react";
+
 import { checkinText, shareText } from "@/lib/buddy";
 import { exercise } from "@/lib/exercises";
 import { goalStreak } from "@/lib/game";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
+import { date, t as tr } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { doneMoments, fmtTonnage, todayMoments, tonnage, type Moment } from "@/lib/moments";
 import { suggestedPeriod } from "@/lib/recap";
@@ -18,13 +22,12 @@ import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { drillSeconds, warmupRoutine, type Drill } from "@/lib/warmupRoutine";
-import { useMemo, useState } from "react";
-import { go } from "./router";
-import { Button, Section, Sheet } from "./ui";
-import { Icon } from "./icons";
-import { RoutinesSheet } from "./Routines";
-import { date, t as tr } from "@/lib/i18n";
 import type { MessageKey } from "@/locales/en";
+
+import { Icon } from "./icons";
+import { go } from "./router";
+import { RoutinesSheet } from "./Routines";
+import { Button, Section, Sheet } from "./ui";
 
 /** Lean mode (Settings › Celebrations): no extra pop-ups. */
 export function lean(p: { lean?: boolean }): boolean {
@@ -34,13 +37,22 @@ export function lean(p: { lean?: boolean }): boolean {
 function MomentCard({ m, onClose }: { m: Moment; onClose?: () => void }) {
   return (
     <div className="card animate-rise flex items-start gap-3 p-4" role="status">
-      <span className="text-3xl" aria-hidden>{m.emoji}</span>
+      <span className="text-3xl" aria-hidden>
+        {m.emoji}
+      </span>
       <div className="min-w-0 flex-1">
         <p className="font-semibold">{m.title}</p>
         <p className="mt-0.5 text-sm text-muted">{m.detail}</p>
       </div>
       {onClose && (
-        <button type="button" onClick={onClose} aria-label={tr("x.dismiss")} className="press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-faint">✕</button>
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label={tr("x.dismiss")}
+          className="press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-faint"
+        >
+          ✕
+        </button>
       )}
     </div>
   );
@@ -63,10 +75,26 @@ export function TodayMoments() {
   const dismiss = (id: string) => setProfile({ delight: { ...profile.delight, seenMoments: [...seen.slice(-40), `${id}:${day}`] } });
   return (
     <div className="mt-4 space-y-3 empty:hidden">
-      {moments.map((m) => <MomentCard key={m.id} m={m} onClose={() => dismiss(m.id)} />)}
+      {moments.map((m) => (
+        <MomentCard key={m.id} m={m} onClose={() => dismiss(m.id)} />
+      ))}
       {fresh.length > 0 && (
-        <button type="button" onClick={() => { haptic("tick"); setProfile({ delight: { ...profile.delight, seenThemes: [...(profile.delight?.seenThemes ?? []), ...fresh.map((t) => t.id)] } }); go("settings", "themes"); }} className="press card flex w-full items-center gap-3 p-4 text-left">
-          <span className="h-10 w-10 shrink-0 rounded-full border-4" style={{ background: fresh[0].palette.bg, borderColor: fresh[0].palette.accent }} aria-hidden />
+        <button
+          type="button"
+          onClick={() => {
+            haptic("tick");
+            setProfile({
+              delight: { ...profile.delight, seenThemes: [...(profile.delight?.seenThemes ?? []), ...fresh.map((t) => t.id)] },
+            });
+            go("settings", "themes");
+          }}
+          className="press card flex w-full items-center gap-3 p-4 text-left"
+        >
+          <span
+            className="h-10 w-10 shrink-0 rounded-full border-4"
+            style={{ background: fresh[0].palette.bg, borderColor: fresh[0].palette.accent }}
+            aria-hidden
+          />
           <span className="min-w-0 flex-1">
             <span className="block font-semibold">{tr("x.newTheme", { name: fresh[0].name })}</span>
             <span className="block text-sm text-muted">{tr("x.tryTheme", { how: fresh[0].how })}</span>
@@ -76,23 +104,46 @@ export function TodayMoments() {
       {seasonal.map((c) => (
         <div key={c.id} className="card p-4">
           <div className="flex items-center gap-3">
-            <span className="text-3xl" aria-hidden>{c.emoji}</span>
+            <span className="text-3xl" aria-hidden>
+              {c.emoji}
+            </span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">{c.name}{c.done ? tr("x.done") : ""}</p>
+              <p className="font-semibold">
+                {c.name}
+                {c.done ? tr("x.done") : ""}
+              </p>
               <p className="text-sm text-muted">{c.detail}</p>
             </div>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label={tr("x.progress", { name: c.name })} aria-valuemin={0} aria-valuemax={c.goal} aria-valuenow={c.progress}>
-            <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${(c.progress / c.goal) * 100}%` }} />
+          <div
+            className="mt-3 h-2 overflow-hidden rounded-full bg-raised"
+            role="progressbar"
+            aria-label={tr("x.progress", { name: c.name })}
+            aria-valuemin={0}
+            aria-valuemax={c.goal}
+            aria-valuenow={c.progress}
+          >
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-accent to-good"
+              style={{ width: `${(c.progress / c.goal) * 100}%` }}
+            />
           </div>
           <p className="num mt-1.5 text-xs text-faint">
-            {c.measure === "kg" ? tr("x.ofKg", { n: fmtNum(Math.round(fromKg(c.progress, profile.unit))), goal: fmtNum(Math.round(fromKg(c.goal, profile.unit))), unit: profile.unit }) : tr(`x.of.${c.measure}` as MessageKey, { n: c.progress, goal: c.goal })}
+            {c.measure === "kg"
+              ? tr("x.ofKg", {
+                  n: fmtNum(Math.round(fromKg(c.progress, profile.unit))),
+                  goal: fmtNum(Math.round(fromKg(c.goal, profile.unit))),
+                  unit: profile.unit,
+                })
+              : tr(`x.of.${c.measure}` as MessageKey, { n: c.progress, goal: c.goal })}
             {!c.done && c.daysLeft > 0 ? tr("x.daysLeft", { count: c.daysLeft }) : ""}
           </p>
         </div>
       ))}
       {teaser && teaser.start - now < 7 * 86400_000 && (
-        <p className="px-1 text-sm text-faint">{teaser.def.emoji} {tr("x.starts", { name: teaser.def.name, day: date(teaser.start, { weekday: "long" }) })}</p>
+        <p className="px-1 text-sm text-faint">
+          {teaser.def.emoji} {tr("x.starts", { name: teaser.def.name, day: date(teaser.start, { weekday: "long" }) })}
+        </p>
       )}
     </div>
   );
@@ -127,24 +178,53 @@ export function PlanExtras() {
   return (
     <div className="mt-3 flex flex-wrap gap-2 text-sm">
       {last && (
-        <button type="button" aria-pressed={repeating} onClick={toggleRepeat} className={`press min-h-11 rounded-full border px-3.5 ${repeating ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>
+        <button
+          type="button"
+          aria-pressed={repeating}
+          onClick={toggleRepeat}
+          className={`press min-h-11 rounded-full border px-3.5 ${repeating ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
+        >
           {repeating ? tr("x.sameOn") : tr("x.sameOff")}
         </button>
       )}
-      <button type="button" aria-pressed={!!routine} onClick={() => { haptic("tick"); setRoutinesOpen(true); }} className={`press inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border px-3.5 ${routine ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>
+      <button
+        type="button"
+        aria-pressed={!!routine}
+        onClick={() => {
+          haptic("tick");
+          setRoutinesOpen(true);
+        }}
+        className={`press inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border px-3.5 ${routine ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
+      >
         <Icon name="layers" size={15} />
         <span className="truncate">{routine ? routine.name : tr("x.routines")}</span>
       </button>
       {preview.items.length > 0 && (
-        <button type="button" onClick={() => setWarmOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">{tr("x.warmUp")}</button>
+        <button
+          type="button"
+          onClick={() => setWarmOpen(true)}
+          className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted"
+        >
+          {tr("x.warmUp")}
+        </button>
       )}
-      <button type="button" onClick={() => setBuddyOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">{tr("x.checkIn")}</button>
+      <button
+        type="button"
+        onClick={() => setBuddyOpen(true)}
+        className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted"
+      >
+        {tr("x.checkIn")}
+      </button>
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
       <Sheet open={warmOpen} onClose={() => setWarmOpen(false)} title={tr("x.warmTitle")}>
         <WarmupList drills={warmupRoutine(muscles, gym.equipment, now, 5)} />
       </Sheet>
       <Sheet open={buddyOpen} onClose={() => setBuddyOpen(false)} title={tr("x.buddyTitle")}>
-        <BuddyCheckin focus={[...new Set(preview.items.map((i) => i.focus))] as Muscle[]} gymName={gym.name} onDone={() => setBuddyOpen(false)} />
+        <BuddyCheckin
+          focus={[...new Set(preview.items.map((i) => i.focus))] as Muscle[]}
+          gymName={gym.name}
+          onDone={() => setBuddyOpen(false)}
+        />
       </Sheet>
     </div>
   );
@@ -161,10 +241,28 @@ function WarmupList({ drills }: { drills: Drill[] }) {
           const on = done.includes(d.id);
           return (
             <li key={d.id}>
-              <button type="button" aria-pressed={on} onClick={() => { haptic("tick"); setDone(on ? done.filter((x) => x !== d.id) : [...done, d.id]); }} className={`press flex w-full items-start gap-3 rounded-2xl border p-3 text-left ${on ? "border-good/40 bg-good/10" : "border-line bg-raised"}`}>
-                <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border text-sm ${on ? "border-good bg-good text-bg" : "border-line"}`} aria-hidden>{on ? "✓" : ""}</span>
+              <button
+                type="button"
+                aria-pressed={on}
+                onClick={() => {
+                  haptic("tick");
+                  setDone(on ? done.filter((x) => x !== d.id) : [...done, d.id]);
+                }}
+                className={`press flex w-full items-start gap-3 rounded-2xl border p-3 text-left ${on ? "border-good/40 bg-good/10" : "border-line bg-raised"}`}
+              >
+                <span
+                  className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border text-sm ${on ? "border-good bg-good text-bg" : "border-line"}`}
+                  aria-hidden
+                >
+                  {on ? "✓" : ""}
+                </span>
                 <span>
-                  <span className="block font-medium">{d.name} <span className="num text-sm font-normal text-muted">· {d.reps ? tr("x.reps", { n: d.reps }) : tr("x.secs", { n: d.seconds })}</span></span>
+                  <span className="block font-medium">
+                    {d.name}{" "}
+                    <span className="num text-sm font-normal text-muted">
+                      · {d.reps ? tr("x.reps", { n: d.reps }) : tr("x.secs", { n: d.seconds })}
+                    </span>
+                  </span>
                   <span className="block text-sm text-muted">{d.how}</span>
                 </span>
               </button>
@@ -213,20 +311,49 @@ function BuddyCheckin({ focus, gymName, onDone }: { focus: Muscle[]; gymName: st
             const on = picked.includes(b.id);
             return (
               <li key={b.id} className="flex items-center">
-                <button type="button" aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== b.id) : [...picked, b.id])} className={`press min-h-11 rounded-l-full border px-3.5 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>{b.name}</button>
-                <button type="button" aria-label={tr("x.removeBuddy", { name: b.name })} onClick={() => remove(b.id)} className="press min-h-11 rounded-r-full border border-l-0 border-line bg-surface px-2.5 text-faint">✕</button>
+                <button
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setPicked(on ? picked.filter((x) => x !== b.id) : [...picked, b.id])}
+                  className={`press min-h-11 rounded-l-full border px-3.5 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
+                >
+                  {b.name}
+                </button>
+                <button
+                  type="button"
+                  aria-label={tr("x.removeBuddy", { name: b.name })}
+                  onClick={() => remove(b.id)}
+                  className="press min-h-11 rounded-r-full border border-l-0 border-line bg-surface px-2.5 text-faint"
+                >
+                  ✕
+                </button>
               </li>
             );
           })}
         </ul>
       )}
       <div className="mt-3 flex gap-2">
-        <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder={tr("x.addBuddy")} aria-label={tr("x.buddyName")} className="card min-w-0 flex-1 px-4 py-3" />
-        <Button kind="ghost" onClick={add} disabled={!name.trim()}>{tr("x.add")}</Button>
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && add()}
+          placeholder={tr("x.addBuddy")}
+          aria-label={tr("x.buddyName")}
+          className="card min-w-0 flex-1 px-4 py-3"
+        />
+        <Button kind="ghost" onClick={add} disabled={!name.trim()}>
+          {tr("x.add")}
+        </Button>
       </div>
       <p className="mt-4 rounded-2xl bg-raised p-3 text-sm">{text}</p>
-      {note && <p className="mt-2 text-sm text-accent" role="status">{note}</p>}
-      <Button className="mt-4 w-full" onClick={() => void send()}>{tr("x.send")}</Button>
+      {note && (
+        <p className="mt-2 text-sm text-accent" role="status">
+          {note}
+        </p>
+      )}
+      <Button className="mt-4 w-full" onClick={() => void send()}>
+        {tr("x.send")}
+      </Button>
     </div>
   );
 }
@@ -238,7 +365,13 @@ export function DoneMoments() {
   const { stats } = useApp();
   const ms = doneMoments(stats);
   if (!ms.length) return null;
-  return <div className="mt-4 space-y-3 text-left">{ms.map((m) => <MomentCard key={m.id} m={m} />)}</div>;
+  return (
+    <div className="mt-4 space-y-3 text-left">
+      {ms.map((m) => (
+        <MomentCard key={m.id} m={m} />
+      ))}
+    </div>
+  );
 }
 
 // --- Progress ---------------------------------------------------------------------------------
@@ -256,24 +389,36 @@ export function TonnageCard() {
           <span className="text-xs uppercase tracking-wider text-faint">{tr("x.total")}</span>
           <span className="num text-2xl font-bold">{fmtTonnage(stats.totalVolume, profile.unit)}</span>
         </div>
-        <p className="mt-1 text-sm text-muted">{t.last ? tr("x.moreThan", { emoji: t.last.emoji, name: t.last.name }) : tr("x.firstMilestone")}</p>
+        <p className="mt-1 text-sm text-muted">
+          {t.last ? tr("x.moreThan", { emoji: t.last.emoji, name: t.last.name }) : tr("x.firstMilestone")}
+        </p>
         {t.next && (
           <>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised">
               <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${t.progress * 100}%` }} />
             </div>
-            <p className="num mt-1.5 text-xs text-faint">{tr("x.toGo", { left: fmtTonnage(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}</p>
+            <p className="num mt-1.5 text-xs text-faint">
+              {tr("x.toGo", { left: fmtTonnage(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}
+            </p>
           </>
         )}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        <button type="button" onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)} className="press card p-4 text-left">
-          <span className="block text-2xl" aria-hidden>{p.kind === "year" ? "🏆" : "📅"}</span>
+        <button
+          type="button"
+          onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)}
+          className="press card p-4 text-left"
+        >
+          <span className="block text-2xl" aria-hidden>
+            {p.kind === "year" ? "🏆" : "📅"}
+          </span>
           <span className="mt-1 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
           <span className="block text-xs text-muted">{tr("x.highlights")}</span>
         </button>
         <button type="button" onClick={() => go("photos")} className="press card p-4 text-left">
-          <span className="block text-2xl" aria-hidden>📸</span>
+          <span className="block text-2xl" aria-hidden>
+            📸
+          </span>
           <span className="mt-1 block font-semibold">{tr("x.photos")}</span>
           <span className="block text-xs text-muted">{tr("x.private")}</span>
         </button>
@@ -308,14 +453,21 @@ export function StrengthCard() {
           {ms.slice(0, 8).map(([m, v]) => (
             <li key={m} className="flex items-center gap-3 text-sm">
               <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
-              <span className="h-2 flex-1 overflow-hidden rounded-full bg-raised"><span className="block h-full rounded-full bg-accent" style={{ width: `${v}%` }} /></span>
+              <span className="h-2 flex-1 overflow-hidden rounded-full bg-raised">
+                <span className="block h-full rounded-full bg-accent" style={{ width: `${v}%` }} />
+              </span>
               <span className="num w-8 text-right">{v}</span>
             </li>
           ))}
         </ul>
         {p.birthYear ? (
           <label className="mt-4 flex items-center gap-3 text-sm">
-            <input type="checkbox" checked={adjustAge} onChange={(e) => setProfile({ delight: { ...profile.delight, ageAdjust: e.target.checked } })} className="h-5 w-5 accent-[var(--color-accent)]" />
+            <input
+              type="checkbox"
+              checked={adjustAge}
+              onChange={(e) => setProfile({ delight: { ...profile.delight, ageAdjust: e.target.checked } })}
+              className="h-5 w-5 accent-[var(--color-accent)]"
+            />
             {tr("x.adjustAge")}
           </label>
         ) : (
@@ -325,15 +477,23 @@ export function StrengthCard() {
       {tw.length > 0 && (
         <div className="card mt-3 p-4">
           <p className="font-semibold">{tr("x.twins")}</p>
-          <p className="text-sm text-muted">{tr(p.birthYear && p.sex ? "x.twinsAgeSex" : p.birthYear ? "x.twinsAge" : p.sex ? "x.twinsSex" : "x.twinsBody")}</p>
+          <p className="text-sm text-muted">
+            {tr(p.birthYear && p.sex ? "x.twinsAgeSex" : p.birthYear ? "x.twinsAge" : p.sex ? "x.twinsSex" : "x.twinsBody")}
+          </p>
           <ul className="mt-3 divide-y divide-line">
             {tw.map((l) => (
               <li key={l.exerciseId} className="flex items-center justify-between py-2.5">
                 <span>
                   <span className="block font-medium">{l.name}</span>
-                  <span className="num text-xs text-muted">{tr("x.estMax", { kg: `${fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} ${profile.unit}` })}</span>
+                  <span className="num text-xs text-muted">
+                    {tr("x.estMax", { kg: `${fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} ${profile.unit}` })}
+                  </span>
                 </span>
-                <span className="num text-right text-sm">{tr("x.stronger")}<br /><span className="text-lg font-bold text-accent">{l.percentile}%</span></span>
+                <span className="num text-right text-sm">
+                  {tr("x.stronger")}
+                  <br />
+                  <span className="text-lg font-bold text-accent">{l.percentile}%</span>
+                </span>
               </li>
             ))}
           </ul>

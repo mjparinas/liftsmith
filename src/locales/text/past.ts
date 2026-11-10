@@ -4,7 +4,8 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
-  "past.intro": "Forgot to track a workout, or trained without your phone? Add it here and it counts towards your stats, PRs, streak and next workouts.",
+  "past.intro":
+    "Forgot to track a workout, or trained without your phone? Add it here and it counts towards your stats, PRs, streak and next workouts.",
   "past.started": "Started",
   "past.length": "Length (minutes)",
   "past.remove": "Remove",
@@ -35,7 +36,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
-  "past.intro": "¿Olvidaste registrar un entrenamiento o entrenaste sin el teléfono? Añádelo aquí y contará para tus estadísticas, récords, racha y próximos entrenamientos.",
+  "past.intro":
+    "¿Olvidaste registrar un entrenamiento o entrenaste sin el teléfono? Añádelo aquí y contará para tus estadísticas, récords, racha y próximos entrenamientos.",
   "past.started": "Empezó",
   "past.length": "Duración (minutos)",
   "past.remove": "Quitar",
@@ -64,7 +66,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "past.intro": "Vous avez oublié d’enregistrer une séance, ou vous vous êtes entraîné sans téléphone ? Ajoutez-la ici : elle compte pour vos stats, records, série et prochaines séances.",
+  "past.intro":
+    "Vous avez oublié d’enregistrer une séance, ou vous vous êtes entraîné sans téléphone ? Ajoutez-la ici : elle compte pour vos stats, records, série et prochaines séances.",
   "past.started": "Début",
   "past.length": "Durée (minutes)",
   "past.remove": "Retirer",

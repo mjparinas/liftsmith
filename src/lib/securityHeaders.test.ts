@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { CSP, SECURITY_HEADERS } from "./securityHeaders";
 
 describe("security headers", () => {

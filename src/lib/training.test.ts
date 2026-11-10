@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { defaultProfile, makeGym, switchGymUnit } from "./defaults";
 import { derive, setWeekStart, weekOf } from "./derive";
 import { exercise } from "./exercises";
@@ -64,7 +65,17 @@ describe("rep ranges", () => {
     const p = profile({ reps: { compound: [3, 5] } });
     expect(target(exercise("back-squat"), [], p, gym, NOW).reps).toBe(3);
     // Every set at the top of the custom range: weight goes up, reps back to the bottom.
-    const sets: SetEvent[] = [0, 1, 2].map((i) => ({ type: "set", id: `s${i}`, at: NOW - D + i, sessionId: "a", exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2 }));
+    const sets: SetEvent[] = [0, 1, 2].map((i) => ({
+      type: "set",
+      id: `s${i}`,
+      at: NOW - D + i,
+      sessionId: "a",
+      exerciseId: "back-squat",
+      weight: 100,
+      reps: 5,
+      targetReps: 5,
+      rir: 2,
+    }));
     const t = target(exercise("back-squat"), sets, p, gym, NOW);
     expect(t.reps).toBe(3);
     expect(t.weight).toBeGreaterThan(100);
@@ -92,13 +103,18 @@ describe("favourites and priorities", () => {
     const focus = auto.items[0].focus;
     // Another exercise for the same muscle at this gym, not in today's plan.
     const first = exercise(auto.items[0].exerciseId);
-    const alt = alternatives(first.id, gym).find((e) => !used.has(e.id) && e.primary.every((m) => first.primary.includes(m)) && e.primary.includes(focus))?.id;
+    const alt = alternatives(first.id, gym).find(
+      (e) => !used.has(e.id) && e.primary.every((m) => first.primary.includes(m)) && e.primary.includes(focus),
+    )?.id;
     expect(alt, `an alternative for ${focus}`).toBeDefined();
     const p = plan({ favourites: [alt!] }, 60);
     expect(p.items.map((i) => i.exerciseId)).toContain(alt);
   });
   it("gives priority muscles more sets", () => {
-    const sets = (t?: TrainingPrefs) => plan(t, 60).items.filter((i) => exercise(i.exerciseId).primary.includes("calves")).reduce((n, i) => n + i.sets, 0);
+    const sets = (t?: TrainingPrefs) =>
+      plan(t, 60)
+        .items.filter((i) => exercise(i.exerciseId).primary.includes("calves"))
+        .reduce((n, i) => n + i.sets, 0);
     expect(sets({ priorities: ["calves"] })).toBeGreaterThan(sets());
   });
   it("keeps at most three priorities and toggles favourites", () => {
@@ -159,7 +175,17 @@ describe("first day of the week", () => {
     // Sunday then Monday: two Monday-start weeks, one Sunday-start week.
     const sun = new Date("2026-11-08T10:00:00").getTime();
     const mon = sun + D;
-    const ev: SetEvent[] = [sun, mon].map((at, i) => ({ type: "set", id: `w${i}`, at, sessionId: `w${i}`, exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2 }));
+    const ev: SetEvent[] = [sun, mon].map((at, i) => ({
+      type: "set",
+      id: `w${i}`,
+      at,
+      sessionId: `w${i}`,
+      exerciseId: "back-squat",
+      weight: 100,
+      reps: 5,
+      targetReps: 5,
+      rir: 2,
+    }));
     expect(derive(ev, mon + 1000).weekStreak).toBe(2);
     setWeekStart(0);
     expect(derive(ev, mon + 1000).weekStreak).toBe(1);

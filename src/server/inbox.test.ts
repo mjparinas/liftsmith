@@ -1,10 +1,29 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { query, resetDb } from "./db";
-import { addressOf, fromUs, getInboxMessage, htmlToText, InboxError, isOurs, listInbox, markArchived, markHandled, replyToInbox, waitingMail } from "./inbox";
+import {
+  addressOf,
+  fromUs,
+  getInboxMessage,
+  htmlToText,
+  InboxError,
+  isOurs,
+  listInbox,
+  markArchived,
+  markHandled,
+  replyToInbox,
+  waitingMail,
+} from "./inbox";
 
 const NOW = Date.UTC(2026, 10, 9, 12);
 const DAY = 86_400_000;
-const mail = (id: string, to: string, from = "Pat <pat@example.com>", at = NOW - DAY) => ({ id, from, to: [to], subject: `About ${id}`, created_at: new Date(at).toISOString() });
+const mail = (id: string, to: string, from = "Pat <pat@example.com>", at = NOW - DAY) => ({
+  id,
+  from,
+  to: [to],
+  subject: `About ${id}`,
+  created_at: new Date(at).toISOString(),
+});
 
 /** A fake Resend: pages of received mail, single messages, and the send endpoint. */
 function fakeResend(pages: { data: ReturnType<typeof mail>[]; has_more: boolean }[], full: Record<string, object> = {}) {
@@ -79,14 +98,28 @@ describe("admin inbox", () => {
   });
 
   it("replies in the same thread and marks the message answered", async () => {
-    const { f, calls } = fakeResend([], { a1: { ...mail("a1", "hello@getliftsmith.com"), reply_to: ["Pat <pat+reply@example.com>"], message_id: "<m1@example.com>", text: "Hi" } });
+    const { f, calls } = fakeResend([], {
+      a1: {
+        ...mail("a1", "hello@getliftsmith.com"),
+        reply_to: ["Pat <pat+reply@example.com>"],
+        message_id: "<m1@example.com>",
+        text: "Hi",
+      },
+    });
     vi.stubEnv("FEEDBACK_FROM", "Liftsmith <hello@getliftsmith.com>");
     expect(await replyToInbox("a1", "Thanks!\n\nMelvin", "admin@getliftsmith.com", f, NOW)).toBe(true);
     const sent = calls.find((c) => c.init?.method === "POST")!;
     const body = JSON.parse(String(sent.init!.body)) as Record<string, unknown>;
-    expect(body).toMatchObject({ to: ["pat+reply@example.com"], subject: "Re: About a1", from: "Liftsmith <hello@getliftsmith.com>", headers: { "In-Reply-To": "<m1@example.com>" } });
+    expect(body).toMatchObject({
+      to: ["pat+reply@example.com"],
+      subject: "Re: About a1",
+      from: "Liftsmith <hello@getliftsmith.com>",
+      headers: { "In-Reply-To": "<m1@example.com>" },
+    });
     expect(String(body.html)).toContain("<p>Thanks!</p><p>Melvin</p>");
-    const [state] = await query<{ replied_by: string; handled_at: number }>("SELECT replied_by, handled_at FROM inbox_state WHERE email_id = 'a1'");
+    const [state] = await query<{ replied_by: string; handled_at: number }>(
+      "SELECT replied_by, handled_at FROM inbox_state WHERE email_id = 'a1'",
+    );
     expect(state).toMatchObject({ replied_by: "admin@getliftsmith.com", handled_at: NOW });
   });
 

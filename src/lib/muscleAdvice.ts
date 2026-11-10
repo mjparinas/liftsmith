@@ -1,5 +1,5 @@
-import { t, relative } from "./i18n";
 import { EXERCISE_BY_ID } from "./exercises";
+import { relative, t } from "./i18n";
 import { bandOf, recovery, type Band } from "./recovery";
 import type { AppEvent, Muscle } from "./types";
 
@@ -31,7 +31,8 @@ export interface MuscleAdvice {
 /** When `m` climbs back to `target`% given the sets logged so far, to the nearest quarter hour. Null if it's there. */
 export function readyAt(events: readonly AppEvent[], m: Muscle, now: number, target = READY): number | null {
   if (recovery(events, now)[m] >= target) return null;
-  let lo = 0, hi = 8 * 24 * 4; // quarter hours; fatigue only fades, so a binary search is exact
+  let lo = 0,
+    hi = 8 * 24 * 4; // quarter hours; fatigue only fades, so a binary search is exact
   while (lo < hi) {
     const mid = (lo + hi) >> 1;
     if (recovery(events, now + mid * 900_000)[m] >= target) hi = mid;

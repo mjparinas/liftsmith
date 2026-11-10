@@ -1,9 +1,9 @@
 import { EXERCISE_BY_ID } from "./exercises";
+import { date, t } from "./i18n";
 import { roundLoad } from "./loads";
 import { epley, sessionsOf } from "./progression";
 import type { AppEvent, Experience, Gym, Profile } from "./types";
 import { fmtNum, fromKg } from "./units";
-import { date, t } from "./i18n";
 
 // Goal-date planner (Melvin picked it, 2026-11-09: "it should be realistic"). The lifter sets a one-rep
 // max to reach by a date, e.g. a 100 kg bench by March. We forecast where they'll likely be, with a
@@ -92,11 +92,27 @@ export function project(start: number, rate: number, months: number, exp: Experi
   return v * (1 + r * (m - whole));
 }
 
-export function forecast(goal: Pick<LiftGoal, "exerciseId" | "kg" | "by">, events: readonly AppEvent[], profile: Profile, now: number): Forecast {
+export function forecast(
+  goal: Pick<LiftGoal, "exerciseId" | "kg" | "by">,
+  events: readonly AppEvent[],
+  profile: Profile,
+  now: number,
+): Forecast {
   const hist = e1rmHistory(events, goal.exerciseId);
   const name = EXERCISE_BY_ID.get(goal.exerciseId)?.name ?? t("gl.thisLift");
   if (!hist.length) {
-    return { now: 0, low: 0, mid: 0, high: 0, rate: 0, observed: null, status: "noData", likelyAt: null, realistic: 0, text: t("gl.noData", { name }) };
+    return {
+      now: 0,
+      low: 0,
+      mid: 0,
+      high: 0,
+      rate: 0,
+      observed: null,
+      status: "noData",
+      likelyAt: null,
+      realistic: 0,
+      text: t("gl.noData", { name }),
+    };
   }
   const recent = hist.filter((h) => h.at >= now - 28 * DAY);
   const cur = Math.max(...(recent.length ? recent : hist.slice(-1)).map((h) => h.e1));
@@ -114,17 +130,27 @@ export function forecast(goal: Pick<LiftGoal, "exerciseId" | "kg" | "by">, event
 
   let likelyAt: number | null = null;
   if (cur >= goal.kg) likelyAt = now;
-  else for (let w = 1; w <= 260; w++) if (project(cur, rate, (w * 7 * DAY) / MONTH, exp, buildShare) >= goal.kg) { likelyAt = now + w * 7 * DAY; break; }
+  else
+    for (let w = 1; w <= 260; w++)
+      if (project(cur, rate, (w * 7 * DAY) / MONTH, exp, buildShare) >= goal.kg) {
+        likelyAt = now + w * 7 * DAY;
+        break;
+      }
 
-  const status: Forecast["status"] = cur >= goal.kg ? "done" : low >= goal.kg ? "likely" : mid >= goal.kg ? "onTrack" : high >= goal.kg ? "stretch" : "unlikely";
+  const status: Forecast["status"] =
+    cur >= goal.kg ? "done" : low >= goal.kg ? "likely" : mid >= goal.kg ? "onTrack" : high >= goal.kg ? "stretch" : "unlikely";
   const kg = (v: number) => `${fmtNum(Math.round(fromKg(v, profile.unit) * 2) / 2)} ${profile.unit}`;
   const when = (ms: number) => date(ms, { month: "long", year: "numeric" });
   const text = {
     done: () => t("gl.done", { kg: kg(cur) }),
     likely: () => t("gl.likely", { when: when(goal.by) }),
     onTrack: () => t("gl.onTrack", { kg: kg(mid), when: when(goal.by) }),
-    stretch: () => (likelyAt ? t("gl.stretchWhen", { kg: kg(mid), goal: kg(goal.kg), at: when(likelyAt) }) : t("gl.stretch", { kg: kg(mid) })),
-    unlikely: () => (likelyAt ? t("gl.unlikelyWhen", { when: when(goal.by), kg: kg(mid), goal: kg(goal.kg), at: when(likelyAt) }) : t("gl.unlikely", { when: when(goal.by), kg: kg(mid) })),
+    stretch: () =>
+      likelyAt ? t("gl.stretchWhen", { kg: kg(mid), goal: kg(goal.kg), at: when(likelyAt) }) : t("gl.stretch", { kg: kg(mid) }),
+    unlikely: () =>
+      likelyAt
+        ? t("gl.unlikelyWhen", { when: when(goal.by), kg: kg(mid), goal: kg(goal.kg), at: when(likelyAt) })
+        : t("gl.unlikely", { when: when(goal.by), kg: kg(mid) }),
     noData: () => "",
   }[status]();
   return { now: cur, low, mid, high, rate, observed, status, likelyAt, realistic: mid, text };
@@ -151,9 +177,6 @@ export function testDay(goal: LiftGoal, f: Forecast, gym: Gym, now: number): Tes
   const r = (kg: number) => roundLoad(kg, ex, gym).kg;
   const third = r(Math.min(Math.max(goal.kg, expected * 0.98), expected * 1.02));
   const attempts: [number, number, number] = [r(expected * 0.9), r(expected * 0.96), third];
-  const advice =
-    days > 7
-      ? t("gl.adviceWeek")
-      : t("gl.adviceTaper");
+  const advice = days > 7 ? t("gl.adviceWeek") : t("gl.adviceTaper");
   return { days, attempts, advice };
 }

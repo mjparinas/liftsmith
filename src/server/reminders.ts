@@ -8,7 +8,20 @@
 // stored hashed. The subscription has its own table with a nullable account id, so accounts can claim
 // it later.
 import { createHash, createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-import { dateKey, EMAIL_KINDS, KIND_INFO, milestone, plan, validTz, type Message, type MessageKind, type PlanInput, type ProState } from "@/lib/messages";
+
+import {
+  dateKey,
+  EMAIL_KINDS,
+  KIND_INFO,
+  milestone,
+  plan,
+  validTz,
+  type Message,
+  type MessageKind,
+  type PlanInput,
+  type ProState,
+} from "@/lib/messages";
+
 import { confirmMail, messageMail, welcomeMail, type Footer, type Mail } from "./reminderEmails";
 
 export type Status = "pending" | "confirmed" | "unsubscribed";
@@ -91,7 +104,10 @@ export const unsubUrl = (env: Env, id: string) => `${env.siteUrl}/api/reminders/
 const footer = (env: Env, id: string): Footer => ({ unsubscribeUrl: unsubUrl(env, id), postalAddress: env.postalAddress });
 
 /** RFC 8058 one-click unsubscribe, which Gmail and Yahoo require of bulk senders. */
-const listHeaders = (env: Env, id: string) => ({ "List-Unsubscribe": `<${unsubUrl(env, id)}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" });
+const listHeaders = (env: Env, id: string) => ({
+  "List-Unsubscribe": `<${unsubUrl(env, id)}>`,
+  "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+});
 
 // --- Checking what the phone sends ---
 
@@ -123,13 +139,22 @@ export function checkBody(b: unknown): { ok: true; body: SubBody } | { ok: false
     kinds[k as MessageKind] = v;
   }
   if (typeof x.tz !== "string" || x.tz.length > 64 || !validTz(x.tz)) return { ok: false, error: "Bad time zone" };
-  if (!Array.isArray(x.days) || x.days.length > 7 || !x.days.every((d) => Number.isInteger(d) && d >= 0 && d <= 6) || new Set(x.days).size !== x.days.length) return { ok: false, error: "Bad days" };
+  if (
+    !Array.isArray(x.days) ||
+    x.days.length > 7 ||
+    !x.days.every((d) => Number.isInteger(d) && d >= 0 && d <= 6) ||
+    new Set(x.days).size !== x.days.length
+  )
+    return { ok: false, error: "Bad days" };
   if (typeof x.time !== "string" || !/^([01]\d|2[0-3]):[0-5]\d$/.test(x.time)) return { ok: false, error: "Bad time" };
-  if (!Number.isInteger(x.daysPerWeek) || (x.daysPerWeek as number) < 1 || (x.daysPerWeek as number) > 7) return { ok: false, error: "Bad days per week" };
+  if (!Number.isInteger(x.daysPerWeek) || (x.daysPerWeek as number) < 1 || (x.daysPerWeek as number) > 7)
+    return { ok: false, error: "Bad days per week" };
   for (const k of ["startedAt", "weekStart", "consentAt"]) if (!num(x[k])) return { ok: false, error: `Bad ${k}` };
   for (const k of ["lastWorkoutAt", "firstWorkoutAt"]) if (!optNum(x[k])) return { ok: false, error: `Bad ${k}` };
-  if (!Number.isInteger(x.weekDays) || (x.weekDays as number) < 0 || (x.weekDays as number) > 7) return { ok: false, error: "Bad weekDays" };
-  if (!Number.isInteger(x.streakWeeks) || (x.streakWeeks as number) < 0 || (x.streakWeeks as number) > 5000) return { ok: false, error: "Bad streakWeeks" };
+  if (!Number.isInteger(x.weekDays) || (x.weekDays as number) < 0 || (x.weekDays as number) > 7)
+    return { ok: false, error: "Bad weekDays" };
+  if (!Number.isInteger(x.streakWeeks) || (x.streakWeeks as number) < 0 || (x.streakWeeks as number) > 5000)
+    return { ok: false, error: "Bad streakWeeks" };
   const p = x.pro as Record<string, unknown> | undefined;
   let pro: ProState;
   if (p?.state === "pro") pro = { state: "pro" };
@@ -184,7 +209,21 @@ export async function subscribe(body: SubBody, store: Store, mail: Mailer, env: 
   if (prev && !same(prev.tokenHash, sha256(body.token))) return { code: 403, body: { error: "Not yours" } };
 
   if (!prev) {
-    const sub: Sub = { id: body.id, accountId: null, email: body.email, tokenHash: sha256(body.token), confirmHash: null, status: "pending", kinds: body.kinds, plan: body.plan, consentAt: body.consentAt, createdAt: now, updatedAt: now, confirmedAt: null, confirmSends: [] };
+    const sub: Sub = {
+      id: body.id,
+      accountId: null,
+      email: body.email,
+      tokenHash: sha256(body.token),
+      confirmHash: null,
+      status: "pending",
+      kinds: body.kinds,
+      plan: body.plan,
+      consentAt: body.consentAt,
+      createdAt: now,
+      updatedAt: now,
+      confirmedAt: null,
+      confirmSends: [],
+    };
     await sendConfirm(sub, store, mail, env, now);
     return { code: 200, body: { status: "pending" } };
   }
@@ -226,7 +265,14 @@ export async function remove(id: string, token: string, store: Store, mail: Mail
 }
 
 /** POST /api/reminders/confirm/: the button on the page the confirmation link opens. */
-export async function confirm(id: string, token: string, store: Store, mail: Mailer, env: Env, now: number): Promise<"confirmed" | "already" | "invalid"> {
+export async function confirm(
+  id: string,
+  token: string,
+  store: Store,
+  mail: Mailer,
+  env: Env,
+  now: number,
+): Promise<"confirmed" | "already" | "invalid"> {
   const sub = await store.get(id);
   if (!sub) return "invalid";
   if (sub.status === "confirmed") return "already";
@@ -235,7 +281,12 @@ export async function confirm(id: string, token: string, store: Store, mail: Mai
   await store.put(sub);
   const sends = await store.sends(sub.id, 0);
   if (!sends.some((s) => s.key === "welcome")) {
-    const r = await mail.send({ ...welcomeMail(footer(env, sub.id)), to: sub.email, idempotencyKey: `welcome-${sub.id}`, headers: listHeaders(env, sub.id) });
+    const r = await mail.send({
+      ...welcomeMail(footer(env, sub.id)),
+      to: sub.email,
+      idempotencyKey: `welcome-${sub.id}`,
+      headers: listHeaders(env, sub.id),
+    });
     await store.putSend({ subId: sub.id, key: "welcome", kind: "welcome", sendAt: now, resendId: r?.id ?? null, status: "sent" });
   }
   await schedule(sub, store, mail, env, now);
@@ -271,11 +322,31 @@ export function capped(m: Pick<Message, "kind" | "at">, sends: readonly Send[], 
   return false;
 }
 
-async function deliver(sub: Sub, m: Pick<Message, "key" | "kind" | "at" | "title" | "body" | "route">, store: Store, mail: Mailer, env: Env, now: number): Promise<boolean> {
+async function deliver(
+  sub: Sub,
+  m: Pick<Message, "key" | "kind" | "at" | "title" | "body" | "route">,
+  store: Store,
+  mail: Mailer,
+  env: Env,
+  now: number,
+): Promise<boolean> {
   const later = m.at - now > 60_000;
-  const r = await mail.send({ ...messageMail(m, footer(env, sub.id)), to: sub.email, idempotencyKey: `${sub.id}-${m.key}`, scheduledAt: later ? m.at : undefined, headers: listHeaders(env, sub.id) });
+  const r = await mail.send({
+    ...messageMail(m, footer(env, sub.id)),
+    to: sub.email,
+    idempotencyKey: `${sub.id}-${m.key}`,
+    scheduledAt: later ? m.at : undefined,
+    headers: listHeaders(env, sub.id),
+  });
   if (!r) return false;
-  await store.putSend({ subId: sub.id, key: m.key, kind: m.kind, sendAt: later ? m.at : now, resendId: r.id, status: later ? "scheduled" : "sent" });
+  await store.putSend({
+    subId: sub.id,
+    key: m.key,
+    kind: m.kind,
+    sendAt: later ? m.at : now,
+    resendId: r.id,
+    status: later ? "scheduled" : "sent",
+  });
   return true;
 }
 
@@ -350,23 +421,55 @@ export function resendMailer(apiKey: string, from: string): Mailer {
     async send(m) {
       const r = await fetch("https://api.resend.com/emails", {
         method: "POST",
-        headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json", "Idempotency-Key": m.idempotencyKey.slice(0, 256) },
-        body: JSON.stringify({ from, to: [m.to], subject: m.subject, text: m.text, html: m.html, headers: m.headers, ...(m.scheduledAt ? { scheduled_at: new Date(m.scheduledAt).toISOString() } : {}) }),
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "Idempotency-Key": m.idempotencyKey.slice(0, 256),
+        },
+        body: JSON.stringify({
+          from,
+          to: [m.to],
+          subject: m.subject,
+          text: m.text,
+          html: m.html,
+          headers: m.headers,
+          ...(m.scheduledAt ? { scheduled_at: new Date(m.scheduledAt).toISOString() } : {}),
+        }),
       });
       if (!r.ok) return null;
       return (await r.json()) as { id: string };
     },
     async cancel(id) {
-      const r = await fetch(`https://api.resend.com/emails/${encodeURIComponent(id)}/cancel`, { method: "POST", headers: { Authorization: `Bearer ${apiKey}` } });
+      const r = await fetch(`https://api.resend.com/emails/${encodeURIComponent(id)}/cancel`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${apiKey}` },
+      });
       return r.ok;
     },
   };
 }
 
 /** The server's settings, or null with what's missing (the routes answer 503 until it's set up). */
-export function reminderEnv(e: Record<string, string | undefined> = process.env): { env: Env; apiKey: string; from: string } | { missing: string[] } {
-  const need = { RESEND_API_KEY: e.RESEND_API_KEY, REMINDER_SECRET: e.REMINDER_SECRET, MAIL_FROM: e.MAIL_FROM, MAIL_POSTAL_ADDRESS: e.MAIL_POSTAL_ADDRESS };
-  const missing = Object.entries(need).filter(([, v]) => !v).map(([k]) => k);
+export function reminderEnv(
+  e: Record<string, string | undefined> = process.env,
+): { env: Env; apiKey: string; from: string } | { missing: string[] } {
+  const need = {
+    RESEND_API_KEY: e.RESEND_API_KEY,
+    REMINDER_SECRET: e.REMINDER_SECRET,
+    MAIL_FROM: e.MAIL_FROM,
+    MAIL_POSTAL_ADDRESS: e.MAIL_POSTAL_ADDRESS,
+  };
+  const missing = Object.entries(need)
+    .filter(([, v]) => !v)
+    .map(([k]) => k);
   if (missing.length) return { missing };
-  return { env: { siteUrl: (e.NEXT_PUBLIC_SITE_URL ?? "https://www.getliftsmith.com").replace(/\/$/, ""), secret: need.REMINDER_SECRET!, postalAddress: need.MAIL_POSTAL_ADDRESS! }, apiKey: need.RESEND_API_KEY!, from: need.MAIL_FROM! };
+  return {
+    env: {
+      siteUrl: (e.NEXT_PUBLIC_SITE_URL ?? "https://www.getliftsmith.com").replace(/\/$/, ""),
+      secret: need.REMINDER_SECRET!,
+      postalAddress: need.MAIL_POSTAL_ADDRESS!,
+    },
+    apiKey: need.RESEND_API_KEY!,
+    from: need.MAIL_FROM!,
+  };
 }

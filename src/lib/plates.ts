@@ -95,13 +95,20 @@ export function plateStyle(weight: number, unit: "kg" | "lb"): { fill: string; t
   const height = 34 + Math.round(t * 66);
   const width = kg >= 15 ? 14 : kg >= 5 ? 11 : 8;
   const colour =
-    kg >= 24 ? ["#d33b3b", "#fff"] :
-    kg >= 19 ? ["#2f6fdb", "#fff"] :
-    kg >= 14 ? ["#e7b416", "#111"] :
-    kg >= 9 ? ["#2e9e5b", "#04140b"] :
-    kg >= 4.5 ? ["#e8e8e8", "#111"] :
-    kg >= 2 ? ["#d33b3b", "#fff"] :
-    kg >= 1.1 ? ["#2f6fdb", "#fff"] :
-    ["#9aa4b2", "#111"];
+    kg >= 24
+      ? ["#d33b3b", "#fff"]
+      : kg >= 19
+        ? ["#2f6fdb", "#fff"]
+        : kg >= 14
+          ? ["#e7b416", "#111"]
+          : kg >= 9
+            ? ["#2e9e5b", "#04140b"]
+            : kg >= 4.5
+              ? ["#e8e8e8", "#111"]
+              : kg >= 2
+                ? ["#d33b3b", "#fff"]
+                : kg >= 1.1
+                  ? ["#2f6fdb", "#fff"]
+                  : ["#9aa4b2", "#111"];
   return { fill: colour[0], text: colour[1], height, width };
 }

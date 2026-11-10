@@ -67,7 +67,8 @@ export const es: Partial<Record<Key, Message>> = {
   "progress.band": "De 10 a 20 series",
   "progress.noSets": "Aún no hay series esta semana",
   "progress.noSets.body": "Cada serie que registres llena estas barras hacia el objetivo de la semana.",
-  "progress.bandNote": "La franja verde son de 10 a 20 series duras por semana, el rango que más respalda la investigación para ganar músculo.",
+  "progress.bandNote":
+    "La franja verde son de 10 a 20 series duras por semana, el rango que más respalda la investigación para ganar músculo.",
   "progress.prs": "Récords personales",
   "progress.noPrs": "Tus récords aparecerán aquí",
   "progress.noPrs.body": "Supera un peso o unas repeticiones anteriores y aparecerá en esta lista.",
@@ -114,7 +115,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "progress.band": "De 10 à 20 séries",
   "progress.noSets": "Aucune série cette semaine",
   "progress.noSets.body": "Chaque série enregistrée remplit ces barres vers l’objectif de la semaine.",
-  "progress.bandNote": "La bande verte correspond à 10 à 20 séries difficiles par semaine, la fourchette que la recherche soutient le plus pour la prise de muscle.",
+  "progress.bandNote":
+    "La bande verte correspond à 10 à 20 séries difficiles par semaine, la fourchette que la recherche soutient le plus pour la prise de muscle.",
   "progress.prs": "Records personnels",
   "progress.noPrs": "Vos records apparaîtront ici",
   "progress.noPrs.body": "Battez un poids ou un nombre de répétitions précédent et il arrivera dans cette liste.",

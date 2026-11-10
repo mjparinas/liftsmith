@@ -1,11 +1,33 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultProfile } from "./defaults";
-import { activityForDays, bmrKatch, bmrMifflin, bodyUpdates, calcTdee, currentBodyFat, changesSince, currentTdee, inferActivity, snapshotDue, tdeeHistory, validInputs } from "./tdee";
+import {
+  activityForDays,
+  bmrKatch,
+  bmrMifflin,
+  bodyUpdates,
+  calcTdee,
+  changesSince,
+  currentBodyFat,
+  currentTdee,
+  inferActivity,
+  snapshotDue,
+  tdeeHistory,
+  validInputs,
+} from "./tdee";
 import type { AppEvent, Profile, TdeeEvent } from "./types";
 
 const DAY = 86_400_000;
 const NOW = new Date(2026, 10, 9, 12).getTime();
-const profile = (p: Partial<Profile> = {}): Profile => ({ ...defaultProfile(), bodyweight: 80, daysPerWeek: 3, sex: "male", birthYear: 1996, heightCm: 180, ...p });
+const profile = (p: Partial<Profile> = {}): Profile => ({
+  ...defaultProfile(),
+  bodyweight: 80,
+  daysPerWeek: 3,
+  sex: "male",
+  birthYear: 1996,
+  heightCm: 180,
+  ...p,
+});
 const sessionsOn = (days: number[]) => days.map((d) => ({ start: NOW - d * DAY }));
 
 describe("TDEE formulas", () => {
@@ -101,7 +123,9 @@ describe("current TDEE and snapshots", () => {
     const p = profile({ daysPerWeek: 3 });
     const first = snapshotDue(currentTdee([], [], p, NOW), [], NOW, "a")!;
     const later = NOW + 30 * DAY;
-    const six = Array.from({ length: 28 }, (_, i) => i).filter((d) => d % 7 !== 6).map((d) => ({ start: later - d * DAY - 3600_000 }));
+    const six = Array.from({ length: 28 }, (_, i) => i)
+      .filter((d) => d % 7 !== 6)
+      .map((d) => ({ start: later - d * DAY - 3600_000 }));
     const next = snapshotDue(currentTdee([first], six, p, later), [first], later, "b")!;
     expect(next.changes).toContain("activity");
     expect(next.activity).toBe("heavy");
@@ -109,7 +133,12 @@ describe("current TDEE and snapshots", () => {
   });
   it("notices age, height, sex and body fat changes", () => {
     const prev = { kg: 80, cm: 180, age: 30, sex: "male", activity: "moderate" } as TdeeEvent;
-    expect(changesSince(prev, { kg: 80, cm: 182, age: 31, sex: "female", activity: "moderate", bodyFat: 20 })).toEqual(["age", "height", "sex", "bodyFat"]);
+    expect(changesSince(prev, { kg: 80, cm: 182, age: 31, sex: "female", activity: "moderate", bodyFat: 20 })).toEqual([
+      "age",
+      "height",
+      "sex",
+      "bodyFat",
+    ]);
   });
   it("a manual save records even without a change", () => {
     const p = profile();

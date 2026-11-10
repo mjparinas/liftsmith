@@ -12,8 +12,10 @@ export const en = {
   "gym.unit": "This gym's plates are in",
   "gym.unit.kg": "Kilograms",
   "gym.unit.lb": "Pounds",
-  "gym.unit.noteLb": "Switching swaps the plates, bars and dumbbells below for a standard pound set, which you can then edit. Your workout history stays as it is.",
-  "gym.unit.noteKg": "Switching swaps the plates, bars and dumbbells below for a standard kilogram set, which you can then edit. Your workout history stays as it is.",
+  "gym.unit.noteLb":
+    "Switching swaps the plates, bars and dumbbells below for a standard pound set, which you can then edit. Your workout history stays as it is.",
+  "gym.unit.noteKg":
+    "Switching swaps the plates, bars and dumbbells below for a standard kilogram set, which you can then edit. Your workout history stays as it is.",
   "gym.place": "Pick this gym when I'm here",
   "gym.place.on": "On. Opening the app near here switches to {name}.",
   "gym.place.off": "Turn off",
@@ -46,13 +48,16 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.unit": "Los discos de este gimnasio están en",
   "gym.unit.kg": "Kilos",
   "gym.unit.lb": "Libras",
-  "gym.unit.noteLb": "Al cambiar, los discos, barras y mancuernas de abajo pasan a un juego estándar en libras, que luego puedes editar. Tu historial de entrenamientos no cambia.",
-  "gym.unit.noteKg": "Al cambiar, los discos, barras y mancuernas de abajo pasan a un juego estándar en kilos, que luego puedes editar. Tu historial de entrenamientos no cambia.",
+  "gym.unit.noteLb":
+    "Al cambiar, los discos, barras y mancuernas de abajo pasan a un juego estándar en libras, que luego puedes editar. Tu historial de entrenamientos no cambia.",
+  "gym.unit.noteKg":
+    "Al cambiar, los discos, barras y mancuernas de abajo pasan a un juego estándar en kilos, que luego puedes editar. Tu historial de entrenamientos no cambia.",
   "gym.place": "Elegir este gimnasio cuando esté aquí",
   "gym.place.on": "Activado. Al abrir la app cerca de aquí se cambia a {name}.",
   "gym.place.off": "Desactivar",
   "gym.place.use": "Usar dónde estoy ahora",
-  "gym.place.denied": "La ubicación está desactivada o no está permitida. Puedes permitir la ubicación aproximada en los ajustes del teléfono.",
+  "gym.place.denied":
+    "La ubicación está desactivada o no está permitida. Puedes permitir la ubicación aproximada en los ajustes del teléfono.",
   "gym.place.note": "Opcional. Usa solo la ubicación aproximada al abrir la app, nunca en segundo plano, y no sale de tu teléfono.",
   "gym.equipment": "Material",
   "gym.bodyweight": "Los ejercicios con peso corporal siempre se incluyen.",
@@ -78,14 +83,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.unit": "Les disques de cette salle sont en",
   "gym.unit.kg": "Kilogrammes",
   "gym.unit.lb": "Livres",
-  "gym.unit.noteLb": "Changer remplace les disques, barres et haltères ci-dessous par un jeu standard en livres, que vous pourrez ensuite modifier. Votre historique ne change pas.",
-  "gym.unit.noteKg": "Changer remplace les disques, barres et haltères ci-dessous par un jeu standard en kilogrammes, que vous pourrez ensuite modifier. Votre historique ne change pas.",
+  "gym.unit.noteLb":
+    "Changer remplace les disques, barres et haltères ci-dessous par un jeu standard en livres, que vous pourrez ensuite modifier. Votre historique ne change pas.",
+  "gym.unit.noteKg":
+    "Changer remplace les disques, barres et haltères ci-dessous par un jeu standard en kilogrammes, que vous pourrez ensuite modifier. Votre historique ne change pas.",
   "gym.place": "Choisir cette salle quand j’y suis",
   "gym.place.on": "Activé. Ouvrir l’app près d’ici passe à {name}.",
   "gym.place.off": "Désactiver",
   "gym.place.use": "Utiliser ma position actuelle",
-  "gym.place.denied": "La localisation est désactivée ou refusée. Vous pouvez autoriser la position approximative dans les réglages du téléphone.",
-  "gym.place.note": "Facultatif. Utilise seulement la position approximative à l’ouverture de l’app, jamais en arrière-plan, et elle reste sur votre téléphone.",
+  "gym.place.denied":
+    "La localisation est désactivée ou refusée. Vous pouvez autoriser la position approximative dans les réglages du téléphone.",
+  "gym.place.note":
+    "Facultatif. Utilise seulement la position approximative à l’ouverture de l’app, jamais en arrière-plan, et elle reste sur votre téléphone.",
   "gym.equipment": "Matériel",
   "gym.bodyweight": "Les exercices au poids du corps sont toujours inclus.",
   "gym.plates": "Vos disques ({unit})",

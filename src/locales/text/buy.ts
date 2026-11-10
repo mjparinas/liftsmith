@@ -14,7 +14,10 @@ export const en = {
   "buy.more": { one: "{count} more weight you can load up to {hi}", other: "{count} more weights you can load up to {hi}" },
   "buy.room": "room past your current {max} limit",
   "buy.kit": { one: "{item}: {count} new exercise.", other: "{item}: {count} new exercises." },
-  "buy.kitMuscles": { one: "{item}: {unlocks}, and the first loaded work for {count} muscle.", other: "{item}: {unlocks}, and the first loaded work for {count} muscles." },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks}, and the first loaded work for {count} muscle.",
+    other: "{item}: {unlocks}, and the first loaded work for {count} muscles.",
+  },
   "buy.newEx": { one: "{count} new exercise", other: "{count} new exercises" },
 } as const;
 
@@ -31,7 +34,10 @@ export const es: Partial<Record<Key, Message>> = {
   "buy.more": { one: "{count} peso más que puedes cargar hasta {hi}", other: "{count} pesos más que puedes cargar hasta {hi}" },
   "buy.room": "margen por encima de tu límite actual de {max}",
   "buy.kit": { one: "{item}: {count} ejercicio nuevo.", other: "{item}: {count} ejercicios nuevos." },
-  "buy.kitMuscles": { one: "{item}: {unlocks}, y el primer trabajo con carga para {count} músculo.", other: "{item}: {unlocks}, y el primer trabajo con carga para {count} músculos." },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks}, y el primer trabajo con carga para {count} músculo.",
+    other: "{item}: {unlocks}, y el primer trabajo con carga para {count} músculos.",
+  },
   "buy.newEx": { one: "{count} ejercicio nuevo", other: "{count} ejercicios nuevos" },
 };
 
@@ -46,6 +52,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "buy.more": { one: "{count} charge de plus possible jusqu’à {hi}", other: "{count} charges de plus possibles jusqu’à {hi}" },
   "buy.room": "de la marge au-delà de votre limite actuelle de {max}",
   "buy.kit": { one: "{item} : {count} nouvel exercice.", other: "{item} : {count} nouveaux exercices." },
-  "buy.kitMuscles": { one: "{item} : {unlocks}, et le premier travail chargé pour {count} muscle.", other: "{item} : {unlocks}, et le premier travail chargé pour {count} muscles." },
+  "buy.kitMuscles": {
+    one: "{item} : {unlocks}, et le premier travail chargé pour {count} muscle.",
+    other: "{item} : {unlocks}, et le premier travail chargé pour {count} muscles.",
+  },
   "buy.newEx": { one: "{count} nouvel exercice", other: "{count} nouveaux exercices" },
 };

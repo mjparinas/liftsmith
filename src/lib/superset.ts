@@ -80,7 +80,11 @@ export function roundRest(items: readonly Item[], i: number): number {
  * the last one of a round it rests the full time and starts the next round. When every exercise in
  * the superset is done it moves past the superset.
  */
-export function afterSet(items: readonly Item[], index: number, done: (i: number) => number): { index: number; rest: number; finished: boolean } {
+export function afterSet(
+  items: readonly Item[],
+  index: number,
+  done: (i: number) => number,
+): { index: number; rest: number; finished: boolean } {
   const item = items[index];
   const [s, e] = groupRange(items, index);
   if (s === e) {
@@ -117,7 +121,7 @@ export function supersetLabel(items: readonly Item[], i: number): string | null 
  */
 export function groupedSeconds(items: readonly Item[], alone: (i: number) => number): number {
   let total = 0;
-  for (let i = 0; i < items.length; ) {
+  for (let i = 0; i < items.length;) {
     const [s, e] = groupRange(items, i);
     if (s === e) {
       total += alone(i) + (i ? items[i].restSec : 0);

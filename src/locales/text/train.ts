@@ -12,9 +12,11 @@ export const en = {
   "train.compound": "Big lifts (squats, presses, rows)",
   "train.isolation": "Smaller lifts (curls, raises, extensions)",
   "train.reps": "Rep ranges",
-  "train.repsNote": "Weights go up when you reach the top of the range on every set, then reps start again from the bottom. Bodyweight exercises keep adding reps.",
+  "train.repsNote":
+    "Weights go up when you reach the top of the range on every set, then reps start again from the bottom. Bodyweight exercises keep adding reps.",
   "train.sets": "Sets per exercise",
-  "train.setsNote": "Auto plans 3, or 4 on the first big lifts, and adds a set when there's time. Deload weeks and easy days still use fewer.",
+  "train.setsNote":
+    "Auto plans 3, or 4 on the first big lifts, and adds a set when there's time. Deload weeks and easy days still use fewer.",
   "train.effort": "Effort scale",
   "train.effortNote": "RPE 8 is the same as 2 reps in reserve. The plan works the same either way.",
   "train.effort.rir": "RIR: reps in reserve",
@@ -30,7 +32,8 @@ export const en = {
   "train.alert.sound": "Sound only",
   "train.alert.vibrate": "Vibration only",
   "train.alert.silent": "Silent",
-  "train.alertNote": "On iPhone the lock-screen alert can't vibrate without its sound, so Vibration only shows a silent banner there and buzzes when the app is open.",
+  "train.alertNote":
+    "On iPhone the lock-screen alert can't vibrate without its sound, so Vibration only shows a silent banner there and buzzes when the app is open.",
   "train.awake": "Keep the screen on during a workout",
   "train.length": "Default workout length",
   "train.lastUsed": "Last used",
@@ -67,15 +70,18 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "train.title": "Preferencias de entrenamiento",
   "train.back": "‹ Ajustes",
-  "train.intro": "Auto significa que la app elige por ti según tu objetivo y tu bloque de entrenamiento. Los cambios se aplican al siguiente plan.",
+  "train.intro":
+    "Auto significa que la app elige por ti según tu objetivo y tu bloque de entrenamiento. Los cambios se aplican al siguiente plan.",
   "train.auto": "Auto",
   "train.rest": "Descanso entre series",
   "train.compound": "Ejercicios grandes (sentadillas, presses, remos)",
   "train.isolation": "Ejercicios pequeños (curls, elevaciones, extensiones)",
   "train.reps": "Rangos de repeticiones",
-  "train.repsNote": "El peso sube cuando llegas al tope del rango en todas las series, y las repeticiones vuelven a empezar por abajo. Los ejercicios con peso corporal siguen sumando repeticiones.",
+  "train.repsNote":
+    "El peso sube cuando llegas al tope del rango en todas las series, y las repeticiones vuelven a empezar por abajo. Los ejercicios con peso corporal siguen sumando repeticiones.",
   "train.sets": "Series por ejercicio",
-  "train.setsNote": "Auto planifica 3, o 4 en los primeros ejercicios grandes, y añade una serie si hay tiempo. Las semanas de descarga y los días suaves siguen usando menos.",
+  "train.setsNote":
+    "Auto planifica 3, o 4 en los primeros ejercicios grandes, y añade una serie si hay tiempo. Las semanas de descarga y los días suaves siguen usando menos.",
   "train.effort": "Escala de esfuerzo",
   "train.effortNote": "RPE 8 equivale a 2 repeticiones en reserva. El plan funciona igual con ambas.",
   "train.effort.rir": "RIR: repeticiones en reserva",
@@ -91,7 +97,8 @@ export const es: Partial<Record<Key, Message>> = {
   "train.alert.sound": "Solo sonido",
   "train.alert.vibrate": "Solo vibración",
   "train.alert.silent": "Silencio",
-  "train.alertNote": "En iPhone el aviso de la pantalla de bloqueo no puede vibrar sin sonido, así que Solo vibración muestra allí un aviso silencioso y vibra cuando la app está abierta.",
+  "train.alertNote":
+    "En iPhone el aviso de la pantalla de bloqueo no puede vibrar sin sonido, así que Solo vibración muestra allí un aviso silencioso y vibra cuando la app está abierta.",
   "train.awake": "Mantener la pantalla encendida durante el entrenamiento",
   "train.length": "Duración predeterminada",
   "train.lastUsed": "La última usada",
@@ -106,7 +113,8 @@ export const es: Partial<Record<Key, Message>> = {
   "train.remove": "Quitar",
   "train.removeFav": "Quitar {name} de favoritos",
   "train.overrides": "Descanso, repeticiones y series de un ejercicio",
-  "train.overridesNote": "Esto manda sobre todo lo anterior. También puedes ajustarlo desde la hoja Cómo se hace del ejercicio durante un entrenamiento.",
+  "train.overridesNote":
+    "Esto manda sobre todo lo anterior. También puedes ajustarlo desde la hoja Cómo se hace del ejercicio durante un entrenamiento.",
   "train.find": "Añadir un ejercicio: elige un músculo",
   "train.findFav": "Añadir un favorito: elige un músculo",
   "train.none": "Aún ninguno.",
@@ -126,15 +134,18 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "train.title": "Préférences d’entraînement",
   "train.back": "‹ Réglages",
-  "train.intro": "Auto signifie que l’app choisit pour vous d’après votre objectif et votre bloc d’entraînement. Les changements s’appliquent au prochain plan.",
+  "train.intro":
+    "Auto signifie que l’app choisit pour vous d’après votre objectif et votre bloc d’entraînement. Les changements s’appliquent au prochain plan.",
   "train.auto": "Auto",
   "train.rest": "Repos entre les séries",
   "train.compound": "Gros exercices (squats, développés, tirages)",
   "train.isolation": "Petits exercices (curls, élévations, extensions)",
   "train.reps": "Fourchettes de répétitions",
-  "train.repsNote": "La charge monte quand vous atteignez le haut de la fourchette sur chaque série, puis les répétitions repartent du bas. Les exercices au poids du corps continuent d’ajouter des répétitions.",
+  "train.repsNote":
+    "La charge monte quand vous atteignez le haut de la fourchette sur chaque série, puis les répétitions repartent du bas. Les exercices au poids du corps continuent d’ajouter des répétitions.",
   "train.sets": "Séries par exercice",
-  "train.setsNote": "Auto prévoit 3 séries, ou 4 sur les premiers gros exercices, et en ajoute une quand il y a le temps. Les semaines de décharge et les jours tranquilles en gardent moins.",
+  "train.setsNote":
+    "Auto prévoit 3 séries, ou 4 sur les premiers gros exercices, et en ajoute une quand il y a le temps. Les semaines de décharge et les jours tranquilles en gardent moins.",
   "train.effort": "Échelle d’effort",
   "train.effortNote": "RPE 8 équivaut à 2 répétitions en réserve. Le plan fonctionne de la même façon dans les deux cas.",
   "train.effort.rir": "RIR : répétitions en réserve",
@@ -150,7 +161,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "train.alert.sound": "Son uniquement",
   "train.alert.vibrate": "Vibration uniquement",
   "train.alert.silent": "Silencieux",
-  "train.alertNote": "Sur iPhone, l’alerte de l’écran verrouillé ne peut pas vibrer sans son, donc Vibration uniquement y affiche une bannière silencieuse et vibre quand l’app est ouverte.",
+  "train.alertNote":
+    "Sur iPhone, l’alerte de l’écran verrouillé ne peut pas vibrer sans son, donc Vibration uniquement y affiche une bannière silencieuse et vibre quand l’app est ouverte.",
   "train.awake": "Garder l’écran allumé pendant la séance",
   "train.length": "Durée de séance par défaut",
   "train.lastUsed": "Dernière utilisée",
@@ -159,13 +171,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "train.week": "La semaine commence le",
   "train.weekNote": "Pour les séries de semaines, les quêtes, les bilans et les statistiques hebdomadaires.",
   "train.priorities": "Muscles prioritaires",
-  "train.prioritiesNote": "Jusqu’à {max}. Ils reçoivent environ un tiers de séries en plus chaque semaine et passent en premier quand ils sont récupérés.",
+  "train.prioritiesNote":
+    "Jusqu’à {max}. Ils reçoivent environ un tiers de séries en plus chaque semaine et passent en premier quand ils sont récupérés.",
   "train.favourites": "Exercices favoris",
   "train.favouritesNote": "Choisis en premier quand ils conviennent au jour et que votre salle a le matériel.",
   "train.remove": "Retirer",
   "train.removeFav": "Retirer {name} des favoris",
   "train.overrides": "Repos, répétitions et séries d’un exercice",
-  "train.overridesNote": "Ces réglages l’emportent sur tout ce qui précède. Vous pouvez aussi les régler depuis la fiche Comment faire de l’exercice pendant une séance.",
+  "train.overridesNote":
+    "Ces réglages l’emportent sur tout ce qui précède. Vous pouvez aussi les régler depuis la fiche Comment faire de l’exercice pendant une séance.",
   "train.find": "Ajouter un exercice : choisissez un muscle",
   "train.findFav": "Ajouter un favori : choisissez un muscle",
   "train.none": "Aucun pour l’instant.",

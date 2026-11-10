@@ -1,28 +1,44 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+
+import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { readMinutes } from "@/content/articles";
-import { CtaBanner, CtaInline, Crumbs, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { articlePath, articlesOf } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Blog: strength training, made simple",
-  description: "Plain-words articles on building muscle and strength: sets, rest, warm-ups, plateaus, recovery, home workouts, nutrition and more.",
+  description:
+    "Plain-words articles on building muscle and strength: sets, rest, warm-ups, plateaus, recovery, home workouts, nutrition and more.",
   alternates: { canonical: "/blog/" },
 };
 
 export default function BlogIndex() {
   const posts = articlesOf("blog");
-  const jsonLd = { "@context": "https://schema.org", "@type": "Blog", name: `${BRAND.name} blog`, url: `${SITE_URL}/blog/`, blogPost: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: `${SITE_URL}${articlePath(p)}`, datePublished: p.date })) };
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: `${BRAND.name} blog`,
+    url: `${SITE_URL}/blog/`,
+    blogPost: posts.map((p) => ({ "@type": "BlogPosting", headline: p.title, url: `${SITE_URL}${articlePath(p)}`, datePublished: p.date })),
+  };
   const [first, ...rest] = posts;
   return (
     <SitePage kind="blog-index">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ label: "Blog" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Strength training, made simple</h1>
-      <p className="mt-3 max-w-2xl text-lg text-muted">Short, practical articles on lifting: what to do, why it works, and how to stop guessing. Every one ends with a way to put it into practice today.</p>
-      <CtaInline cta="blog-index-top" title={`Rather skip the reading? ${BRAND.name} plans it all for you.`} body="Every set, rep and weight, picked from your equipment and recovery, and moved forward each session." button="Get today's workout" />
+      <p className="mt-3 max-w-2xl text-lg text-muted">
+        Short, practical articles on lifting: what to do, why it works, and how to stop guessing. Every one ends with a way to put it into
+        practice today.
+      </p>
+      <CtaInline
+        cta="blog-index-top"
+        title={`Rather skip the reading? ${BRAND.name} plans it all for you.`}
+        body="Every set, rep and weight, picked from your equipment and recovery, and moved forward each session."
+        button="Get today's workout"
+      />
       <ul className="mt-6 grid gap-4 md:grid-cols-2">
         {[first, ...rest].map((p, i) => (
           <li key={p.slug} className={i === 0 ? "md:col-span-2" : ""}>
@@ -35,7 +51,11 @@ export default function BlogIndex() {
           </li>
         ))}
       </ul>
-      <CtaBanner cta="blog-index-end" title="Put it into practice today" body={`${BRAND.name} turns all of this into a workout you can start right now: the right exercises, sets, reps, weights and rest, adjusted every session.`} />
+      <CtaBanner
+        cta="blog-index-end"
+        title="Put it into practice today"
+        body={`${BRAND.name} turns all of this into a workout you can start right now: the right exercises, sets, reps, weights and rest, adjusted every session.`}
+      />
     </SitePage>
   );
 }

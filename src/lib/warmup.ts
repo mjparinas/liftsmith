@@ -24,8 +24,23 @@ type Step = [share: number, reps: number];
 function ramp(ex: Exercise, kg: number, warm: boolean): Step[] {
   if (!ex.compound) return warm ? [] : [[0.5, 10]];
   if (warm) return ex.load === "barbell" ? [[0.7, 3]] : [];
-  if (ex.load === "barbell") return kg >= 100 ? [[0.5, 5], [0.7, 3], [0.85, 1]] : kg >= 50 ? [[0.55, 5], [0.8, 2]] : [[0.6, 5]];
-  return [[0.5, 8], [0.75, 4]];
+  if (ex.load === "barbell")
+    return kg >= 100
+      ? [
+          [0.5, 5],
+          [0.7, 3],
+          [0.85, 1],
+        ]
+      : kg >= 50
+        ? [
+            [0.55, 5],
+            [0.8, 2],
+          ]
+        : [[0.6, 5]];
+  return [
+    [0.5, 8],
+    [0.75, 4],
+  ];
 }
 
 /**

@@ -1,4 +1,5 @@
 "use client";
+
 // Particle and checkmark bursts (juice pass, 2026-11-09). A burst comes from the thing the lifter just
 // touched (Log set, a crate, a finished goal), lasts under a second, never blocks a tap, and is skipped
 // in Lean mode and with reduced motion. Drawn with plain DOM and the Web Animations API, so there is no
@@ -81,7 +82,10 @@ export function burst(from: Element | { x: number; y: number } | null | undefine
     circle.setAttribute("style", "fill:var(--color-mint)");
     const tick = document.createElementNS(ns, "path");
     tick.setAttribute("d", "M15 27l7 7 15-16");
-    tick.setAttribute("style", "fill:none;stroke:var(--color-bg);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40");
+    tick.setAttribute(
+      "style",
+      "fill:none;stroke:var(--color-bg);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40",
+    );
     svg.append(circle, tick);
     layer.appendChild(svg);
     svg.animate(

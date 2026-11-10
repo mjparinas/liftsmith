@@ -12,7 +12,9 @@
     "e2e:all": "node scripts/e2e.mjs && node scripts/e2e-offline.mjs && node scripts/e2e-devices.mjs && DEVICE='iPhone 16' node scripts/e2e.mjs && node scripts/e2e-a11y.mjs",
     "test:coverage": "vitest run --coverage",
     "test:mutation": "stryker run",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^8.3.0",
@@ -44,6 +46,7 @@
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
     "@capacitor/cli": "^8.6.0",
+    "@ianvs/prettier-plugin-sort-imports": "4.7.1",
     "@stryker-mutator/api": "^10.1.1",
     "@stryker-mutator/core": "^10.1.1",
     "@stryker-mutator/vitest-runner": "^10.1.1",
@@ -63,6 +66,7 @@
     "fast-check": "^4.10.2",
     "jsdom": "^31.0.0",
     "playwright": "^1.65.0",
+    "prettier": "3.9.10",
     "tailwindcss": "^4",
     "typescript": "npm:@typescript/typescript6@^6.0.2",
     "vitest": "^5.0.3"

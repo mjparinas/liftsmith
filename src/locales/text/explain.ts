@@ -29,7 +29,10 @@ export const en = {
   "explain.oneMoreBwTimed": "You hit every set, so it's one more step this time.",
   "explain.same": "Not every set reached {target}, so it stays the same until they all do.",
   "explain.picked": "Picked today: {pick}.",
-  "explain.rir": { one: "{week} of this block: leave about {count} rep in reserve. The reserve shrinks each week, then a deload resets it.", other: "{week} of this block: leave about {count} reps in reserve. The reserve shrinks each week, then a deload resets it." },
+  "explain.rir": {
+    one: "{week} of this block: leave about {count} rep in reserve. The reserve shrinks each week, then a deload resets it.",
+    other: "{week} of this block: leave about {count} reps in reserve. The reserve shrinks each week, then a deload resets it.",
+  },
   "explain.easy": "Today is an easy day: one step lighter, one more rep in reserve and one set fewer.",
   "explain.easyScore": "Today is an easy day (readiness {score}): one step lighter, one more rep in reserve and one set fewer.",
   "explain.push": "Today is a push day, so the first big lift goes one rep closer to failure.",
@@ -53,28 +56,39 @@ export const es: Partial<Record<Key, Message>> = {
   "explain.earlierToday": "hoy, antes",
   "explain.on": "el {date}",
   "explain.firstBw": "Es tu primera vez, así que empieza con {target} y encuentra tu nivel.",
-  "explain.firstLoad": "Es tu primera vez, así que parte de aproximadamente el {pct}% de tu peso corporal ({bw}), el comienzo habitual para {level}.",
+  "explain.firstLoad":
+    "Es tu primera vez, así que parte de aproximadamente el {pct}% de tu peso corporal ({bw}), el comienzo habitual para {level}.",
   "explain.firstLight": "Es ligero a propósito. Si te resulta fácil, dilo tras la última serie y la próxima vez sube.",
   "explain.firstTitle": "Un primer intento prudente",
   "explain.last": "La última vez ({when}): {sets}, buscando {target}.",
   "explain.feltEasy": "Dijiste que se hizo demasiado fácil, así que sube un escalón más.",
   "explain.feltHard": "Dijiste que se hizo demasiado duro, así que baja un escalón.",
-  "explain.deload": "Es la semana de descarga, así que es un 10% más ligero y con menos series para recuperarte antes del siguiente bloque.",
+  "explain.deload":
+    "Es la semana de descarga, así que es un 10% más ligero y con menos series para recuperarte antes del siguiente bloque.",
   "explain.bigMiss": "En una serie faltaron 2 o más {unit}, así que el peso baja un escalón y vuelves a {lo} {unit}.",
-  "explain.top": "Completaste todas las series en lo alto de tu rango de {lo}–{hi}, así que el peso sube un escalón y vuelves a {lo} {unit}.",
-  "explain.oneMoreRep": "Completaste todas las series, así que haces una repetición más con el mismo peso. Al llegar a {hi} {unit}, sube el peso.",
-  "explain.oneMoreTimed": "Completaste todas las series, así que sumas un bloque de segundos con el mismo peso. Al llegar a {hi} {unit}, sube el peso.",
+  "explain.top":
+    "Completaste todas las series en lo alto de tu rango de {lo}–{hi}, así que el peso sube un escalón y vuelves a {lo} {unit}.",
+  "explain.oneMoreRep":
+    "Completaste todas las series, así que haces una repetición más con el mismo peso. Al llegar a {hi} {unit}, sube el peso.",
+  "explain.oneMoreTimed":
+    "Completaste todas las series, así que sumas un bloque de segundos con el mismo peso. Al llegar a {hi} {unit}, sube el peso.",
   "explain.oneMoreBw": "Completaste todas las series, así que esta vez es una repetición más.",
   "explain.oneMoreBwTimed": "Completaste todas las series, así que esta vez es un paso más.",
   "explain.same": "No todas las series llegaron a {target}, así que se mantiene igual hasta que todas lleguen.",
   "explain.picked": "Elegido hoy: {pick}.",
-  "explain.rir": { one: "{week} de este bloque: deja unas {count} repetición en reserva. La reserva baja cada semana y la descarga la reinicia.", other: "{week} de este bloque: deja unas {count} repeticiones en reserva. La reserva baja cada semana y la descarga la reinicia." },
+  "explain.rir": {
+    one: "{week} de este bloque: deja unas {count} repetición en reserva. La reserva baja cada semana y la descarga la reinicia.",
+    other: "{week} de este bloque: deja unas {count} repeticiones en reserva. La reserva baja cada semana y la descarga la reinicia.",
+  },
   "explain.easy": "Hoy es un día suave: un escalón más ligero, una repetición más en reserva y una serie menos.",
   "explain.easyScore": "Hoy es un día suave (preparación {score}): un escalón más ligero, una repetición más en reserva y una serie menos.",
   "explain.push": "Hoy es día para apretar, así que el primer ejercicio grande va una repetición más cerca del fallo.",
-  "explain.pushScore": "Hoy es día para apretar (preparación {score}), así que el primer ejercicio grande va una repetición más cerca del fallo.",
-  "explain.challenge": "Reto: en la última serie, haz todas las buenas repeticiones que puedas y registra lo que consigas. No contará como fallo.",
-  "explain.barbell": "Con tus discos, esta barra ({bar}) avanza de {jump} en {jump}, y cada peso que ves es uno que puedes cargar de verdad.",
+  "explain.pushScore":
+    "Hoy es día para apretar (preparación {score}), así que el primer ejercicio grande va una repetición más cerca del fallo.",
+  "explain.challenge":
+    "Reto: en la última serie, haz todas las buenas repeticiones que puedas y registra lo que consigas. No contará como fallo.",
+  "explain.barbell":
+    "Con tus discos, esta barra ({bar}) avanza de {jump} en {jump}, y cada peso que ves es uno que puedes cargar de verdad.",
   "explain.dumbbell": "Redondeado a la mancuerna más cercana que tiene este gimnasio.",
   "explain.machine": "Redondeado a los saltos de {step} de las máquinas de este gimnasio.",
 };
@@ -98,20 +112,28 @@ export const fr: Partial<Record<Key, Message>> = {
   "explain.feltHard": "Vous avez trouvé ça trop dur, donc ça redescend d’un cran.",
   "explain.deload": "C’est la semaine de décharge : environ 10 % plus léger, avec moins de séries, pour récupérer avant le prochain bloc.",
   "explain.bigMiss": "Une série a manqué de 2 {unit} ou plus, donc la charge baisse d’un cran et les {unit} reviennent à {lo}.",
-  "explain.top": "Toutes les séries réussies en haut de votre fourchette de {lo} à {hi}, donc la charge monte d’un cran et les {unit} reviennent à {lo}.",
+  "explain.top":
+    "Toutes les séries réussies en haut de votre fourchette de {lo} à {hi}, donc la charge monte d’un cran et les {unit} reviennent à {lo}.",
   "explain.oneMoreRep": "Toutes les séries réussies : une répétition de plus à la même charge. À {hi} {unit}, la charge monte.",
   "explain.oneMoreTimed": "Toutes les séries réussies : un palier de secondes de plus à la même charge. À {hi} {unit}, la charge monte.",
   "explain.oneMoreBw": "Toutes les séries réussies : une répétition de plus cette fois.",
   "explain.oneMoreBwTimed": "Toutes les séries réussies : un palier de plus cette fois.",
   "explain.same": "Toutes les séries n’ont pas atteint {target}, donc on garde la même chose jusqu’à ce qu’elles y arrivent toutes.",
   "explain.picked": "Choisi aujourd’hui : {pick}.",
-  "explain.rir": { one: "{week} de ce bloc : gardez environ {count} répétition en réserve. La réserve diminue chaque semaine, puis une décharge la remet à zéro.", other: "{week} de ce bloc : gardez environ {count} répétitions en réserve. La réserve diminue chaque semaine, puis une décharge la remet à zéro." },
+  "explain.rir": {
+    one: "{week} de ce bloc : gardez environ {count} répétition en réserve. La réserve diminue chaque semaine, puis une décharge la remet à zéro.",
+    other:
+      "{week} de ce bloc : gardez environ {count} répétitions en réserve. La réserve diminue chaque semaine, puis une décharge la remet à zéro.",
+  },
   "explain.easy": "Aujourd’hui est un jour tranquille : un cran plus léger, une répétition de plus en réserve et une série de moins.",
-  "explain.easyScore": "Aujourd’hui est un jour tranquille (forme {score}) : un cran plus léger, une répétition de plus en réserve et une série de moins.",
+  "explain.easyScore":
+    "Aujourd’hui est un jour tranquille (forme {score}) : un cran plus léger, une répétition de plus en réserve et une série de moins.",
   "explain.push": "Aujourd’hui on pousse : le premier gros exercice va une répétition plus près de l’échec.",
   "explain.pushScore": "Aujourd’hui on pousse (forme {score}) : le premier gros exercice va une répétition plus près de l’échec.",
-  "explain.challenge": "Défi : sur la dernière série, faites autant de bonnes répétitions que possible et notez votre résultat. Ça ne comptera pas comme un échec.",
-  "explain.barbell": "Avec vos disques, cette barre ({bar}) progresse par paliers de {jump}, et chaque charge affichée est réellement chargeable.",
+  "explain.challenge":
+    "Défi : sur la dernière série, faites autant de bonnes répétitions que possible et notez votre résultat. Ça ne comptera pas comme un échec.",
+  "explain.barbell":
+    "Avec vos disques, cette barre ({bar}) progresse par paliers de {jump}, et chaque charge affichée est réellement chargeable.",
   "explain.dumbbell": "Arrondi à l’haltère le plus proche de cette salle.",
   "explain.machine": "Arrondi aux paliers de {step} des machines de cette salle.",
 };

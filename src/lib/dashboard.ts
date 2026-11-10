@@ -1,9 +1,9 @@
+import { shareIds, shareName } from "./achievements";
 import { dedupe, weekOf, weekStartDay, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { game, levelOf } from "./game";
-import { shareIds, shareName } from "./achievements";
-import { epley } from "./progression";
 import { t, weekday } from "./i18n";
+import { epley } from "./progression";
 import type { AppEvent, Profile, SessionEndEvent, SessionStartEvent, SetEvent, Unit } from "./types";
 
 // The web dashboard (/me/): pure views over the event log, plus the two things it writes: a past
@@ -37,7 +37,13 @@ export function trainingDays(stats: Pick<Stats, "sessions">): Map<string, DayTot
   for (const s of stats.sessions) {
     const k = dayKey(s.start);
     const t = out.get(k) ?? { sessions: 0, sets: 0, volume: 0, seconds: 0, prs: 0 };
-    out.set(k, { sessions: t.sessions + 1, sets: t.sets + s.sets, volume: t.volume + s.volume, seconds: t.seconds + s.seconds, prs: t.prs + s.prs });
+    out.set(k, {
+      sessions: t.sessions + 1,
+      sets: t.sets + s.sets,
+      volume: t.volume + s.volume,
+      seconds: t.seconds + s.seconds,
+      prs: t.prs + s.prs,
+    });
   }
   return out;
 }
@@ -149,13 +155,22 @@ export function sessionDetail(events: readonly AppEvent[], sessionId: string): S
 }
 
 /** Workouts, sets and volume for each of the last `weeks` weeks, oldest first. */
-export function weeklyTotals(stats: Pick<Stats, "sessions">, now: number, weeks = 12): { weekStart: number; sessions: number; sets: number; volume: number }[] {
+export function weeklyTotals(
+  stats: Pick<Stats, "sessions">,
+  now: number,
+  weeks = 12,
+): { weekStart: number; sessions: number; sets: number; volume: number }[] {
   const out = [];
   const thisWeek = weekOf(now);
   for (let i = weeks - 1; i >= 0; i--) {
     const ws = weekOf(thisWeek - i * 7 * DAY + 12 * 3600_000);
     const list = stats.sessions.filter((s) => weekOf(s.start) === ws);
-    out.push({ weekStart: ws, sessions: list.length, sets: list.reduce((n, s) => n + s.sets, 0), volume: list.reduce((n, s) => n + s.volume, 0) });
+    out.push({
+      weekStart: ws,
+      sessions: list.length,
+      sets: list.reduce((n, s) => n + s.sets, 0),
+      volume: list.reduce((n, s) => n + s.volume, 0),
+    });
   }
   return out;
 }
@@ -206,7 +221,15 @@ export function pastWorkoutEvents(w: PastWorkout, now: number, newId: () => stri
   const seconds = w.minutes * 60;
   const end = Math.min(now, w.start + seconds * 1000);
   const span = end - w.start;
-  const started: SessionStartEvent = { id: newId(), at: w.start, type: "sessionStart", sessionId, gymId: w.gymId, minutes: w.minutes, source: "manual" };
+  const started: SessionStartEvent = {
+    id: newId(),
+    at: w.start,
+    type: "sessionStart",
+    sessionId,
+    gymId: w.gymId,
+    minutes: w.minutes,
+    source: "manual",
+  };
   const setEvents: SetEvent[] = sets.map(({ exerciseId, set }, i) => ({
     id: newId(),
     // Spread across the workout, the last set a little before the end.
@@ -296,7 +319,22 @@ export function encodeShare(card: ShareCard): string {
 }
 
 /** Trophy ids from links made before achievements (2026-11-09). */
-export const KNOWN_TROPHIES = new Set(["first", "ten", "fifty", "first-pr", "plate-ohp", "plate-bench", "two-plate-bench", "bw-bench", "three-plate-squat", "four-plate-dead", "ten-pullups", "explorer", "streak-4", "volume-100k"]);
+export const KNOWN_TROPHIES = new Set([
+  "first",
+  "ten",
+  "fifty",
+  "first-pr",
+  "plate-ohp",
+  "plate-bench",
+  "two-plate-bench",
+  "bw-bench",
+  "three-plate-squat",
+  "four-plate-dead",
+  "ten-pullups",
+  "explorer",
+  "streak-4",
+  "volume-100k",
+]);
 const int = (x: unknown, lo: number, hi: number): x is number => typeof x === "number" && Number.isInteger(x) && x >= lo && x <= hi;
 
 /** Reads a share link. Anything malformed or unexpected gives null; nothing in it is trusted. */
@@ -314,11 +352,32 @@ export function decodeShare(fragment: string): ShareCard | null {
   if (c.n !== undefined && (typeof c.n !== "string" || c.n.length > 40)) return null;
   if (c.u !== "kg" && c.u !== "lb") return null;
   if (!int(c.xp, 0, 10_000_000) || !int(c.w, 0, 100_000) || !int(c.s, 0, 10_000) || !int(c.d0, 0, 8.64e15)) return null;
-  if (!Array.isArray(c.t) || c.t.length > 100 || !c.t.every((t) => typeof t === "string" && (KNOWN_TROPHIES.has(t) || shareName(t) !== null))) return null;
-  if (!Array.isArray(c.l) || c.l.length > 5 || !c.l.every((x) => Array.isArray(x) && x.length === 2 && typeof x[0] === "string" && EXERCISE_BY_ID.has(x[0]) && int(x[1], 0, 2000))) return null;
+  if (
+    !Array.isArray(c.t) ||
+    c.t.length > 100 ||
+    !c.t.every((t) => typeof t === "string" && (KNOWN_TROPHIES.has(t) || shareName(t) !== null))
+  )
+    return null;
+  if (
+    !Array.isArray(c.l) ||
+    c.l.length > 5 ||
+    !c.l.every((x) => Array.isArray(x) && x.length === 2 && typeof x[0] === "string" && EXERCISE_BY_ID.has(x[0]) && int(x[1], 0, 2000))
+  )
+    return null;
   if (!Array.isArray(c.d) || c.d.length > SHARE_DAYS || !c.d.every((x) => int(x, 0, SHARE_DAYS - 1))) return null;
   const n = typeof c.n === "string" ? c.n.trim() : "";
-  return { v: 1, ...(n ? { n } : {}), u: c.u, xp: c.xp, w: c.w, s: c.s, t: [...new Set(c.t as string[])], l: c.l as [string, number][], d: [...new Set(c.d as number[])], d0: c.d0 };
+  return {
+    v: 1,
+    ...(n ? { n } : {}),
+    u: c.u,
+    xp: c.xp,
+    w: c.w,
+    s: c.s,
+    t: [...new Set(c.t as string[])],
+    l: c.l as [string, number][],
+    d: [...new Set(c.d as number[])],
+    d0: c.d0,
+  };
 }
 
 export function shareLevel(card: Pick<ShareCard, "xp">) {

@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
-import { readiness, RECOVER_AT, PUSH_AT } from "./readiness";
+import { PUSH_AT, readiness, RECOVER_AT } from "./readiness";
 import { AUTO_END_MS, hrWindow, useApp } from "./store";
 import type { AppEvent, SetEvent } from "./types";
 
@@ -17,7 +18,16 @@ const gym = makeGym("commercial", "kg", "g1");
 
 let n = 0;
 const set = (at: number, sessionId: string, over: Partial<SetEvent> = {}): SetEvent => ({
-  type: "set", id: `s${n++}`, at, sessionId, exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2, ...over,
+  type: "set",
+  id: `s${n++}`,
+  at,
+  sessionId,
+  exerciseId: "back-squat",
+  weight: 100,
+  reps: 5,
+  targetReps: 5,
+  rir: 2,
+  ...over,
 });
 const session = (at: number, id: string, over: Partial<SetEvent> = {}, count = 4): AppEvent[] => [
   { type: "sessionStart", id: `st-${id}`, at: at - 600_000, sessionId: id, gymId: "g1", minutes: 45 },
@@ -41,7 +51,9 @@ describe("readiness: rest or push", () => {
     expect(r.score).toBeLessThanOrEqual(RECOVER_AT);
     expect(r.call).toBe("recover");
     expect(r.challenge).toBe(false);
-    expect(r.signals.map((s) => s.text)).toEqual(expect.arrayContaining(["Missed reps lately", "Last workout felt hard", "Three workouts in three days"]));
+    expect(r.signals.map((s) => s.text)).toEqual(
+      expect.arrayContaining(["Missed reps lately", "Last workout felt hard", "Three workouts in three days"]),
+    );
   });
 
   it("calls a push day when rested, recovered and hitting every target", () => {

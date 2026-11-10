@@ -1,9 +1,21 @@
 "use client";
+
 // The admin System tab (as in Gradelings): one card per part of the stack (live site, uptime, builds, deploys,
 // database, email, the daily job, subscriptions, settings) and the providers' public status pages. Every card
 // loads on its own, so a slow service never holds up the rest; results are cached on the server for a minute.
 import { useCallback, useEffect, useState } from "react";
-import { CHECKS, STATE_LABEL, STATUS_PAGES, worst, type CheckResult, type CheckState, type HealthCheck, type StatusPage } from "@/lib/systemHealth";
+
+import {
+  CHECKS,
+  STATE_LABEL,
+  STATUS_PAGES,
+  worst,
+  type CheckResult,
+  type CheckState,
+  type HealthCheck,
+  type StatusPage,
+} from "@/lib/systemHealth";
+
 import { ago } from "./time";
 
 const DOT: Record<CheckState, string> = { ok: "bg-good", warn: "bg-warn", down: "bg-bad", off: "bg-line" };
@@ -37,7 +49,19 @@ function useCard<T>(url: string, round: number, refresh: boolean) {
   return r;
 }
 
-function CheckCard({ id, title, round, refresh, report }: { id: string; title: string; round: number; refresh: boolean; report: (id: string, s: CheckState) => void }) {
+function CheckCard({
+  id,
+  title,
+  round,
+  refresh,
+  report,
+}: {
+  id: string;
+  title: string;
+  round: number;
+  refresh: boolean;
+  report: (id: string, s: CheckState) => void;
+}) {
   const { data, error } = useCard<HealthCheck>(`/api/admin/system/?check=${id}`, round, refresh);
   const c = data?.result;
   useEffect(() => {
@@ -58,8 +82,16 @@ function CheckCard({ id, title, round, refresh, report }: { id: string; title: s
               {c.rows.map((row, i) => (
                 <div key={i} className="flex flex-wrap justify-between gap-x-3 border-b border-line/50 pb-1">
                   <dt className="text-muted">
-                    {row.state && <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${DOT[row.state]}`} aria-label={STATE_LABEL[row.state]} />}
-                    {row.href ? <a href={row.href} target="_blank" rel="noreferrer" className="underline">{row.label}</a> : row.label}
+                    {row.state && (
+                      <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${DOT[row.state]}`} aria-label={STATE_LABEL[row.state]} />
+                    )}
+                    {row.href ? (
+                      <a href={row.href} target="_blank" rel="noreferrer" className="underline">
+                        {row.label}
+                      </a>
+                    ) : (
+                      row.label
+                    )}
                   </dt>
                   <dd className="num text-right">
                     {row.value}
@@ -71,7 +103,13 @@ function CheckCard({ id, title, round, refresh, report }: { id: string; title: s
           )}
           {c.setup && <p className="mt-3 rounded-lg border border-line p-2 text-xs text-muted">To set up: {c.setup}</p>}
           <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs text-muted">
-            {c.link ? <a href={c.link.href} target="_blank" rel="noreferrer" className="text-accent underline">{c.link.label}</a> : <span />}
+            {c.link ? (
+              <a href={c.link.href} target="_blank" rel="noreferrer" className="text-accent underline">
+                {c.link.label}
+              </a>
+            ) : (
+              <span />
+            )}
             {data && <span>Checked {ago(data.checkedAt)}</span>}
           </div>
         </>
@@ -80,7 +118,19 @@ function CheckCard({ id, title, round, refresh, report }: { id: string; title: s
   );
 }
 
-function PageRow({ name, url, round, refresh, report }: { name: string; url: string; round: number; refresh: boolean; report: (id: string, s: CheckState) => void }) {
+function PageRow({
+  name,
+  url,
+  round,
+  refresh,
+  report,
+}: {
+  name: string;
+  url: string;
+  round: number;
+  refresh: boolean;
+  report: (id: string, s: CheckState) => void;
+}) {
   const { data, error } = useCard<StatusPage>(`/api/admin/system/?page=${encodeURIComponent(name)}`, round, refresh);
   const p = data?.result;
   useEffect(() => {
@@ -89,13 +139,21 @@ function PageRow({ name, url, round, refresh, report }: { name: string; url: str
   return (
     <li className="py-2">
       <div className="flex items-center justify-between gap-3">
-        <a href={url} target="_blank" rel="noreferrer" className="font-semibold underline">{name}</a>
+        <a href={url} target="_blank" rel="noreferrer" className="font-semibold underline">
+          {name}
+        </a>
         {p ? <Badge state={p.state} /> : <span className="text-xs text-muted">{error ? "Couldn't read it" : "Checking…"}</span>}
       </div>
       {p && <p className="text-sm text-muted">{p.description}</p>}
       {p?.incidents.map((i, k) => (
         <p key={k} className="text-sm">
-          {i.href ? <a href={i.href} target="_blank" rel="noreferrer" className="underline">{i.name}</a> : i.name}
+          {i.href ? (
+            <a href={i.href} target="_blank" rel="noreferrer" className="underline">
+              {i.name}
+            </a>
+          ) : (
+            i.name
+          )}
           {i.startedAt ? <span className="text-muted"> · {ago(i.startedAt)}</span> : null}
         </p>
       ))}
@@ -135,13 +193,17 @@ export function System() {
         </button>
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {CHECKS.map((c) => <CheckCard key={c.id} id={c.id} title={c.title} round={round} refresh={refresh} report={report} />)}
+        {CHECKS.map((c) => (
+          <CheckCard key={c.id} id={c.id} title={c.title} round={round} refresh={refresh} report={report} />
+        ))}
       </div>
       <section className="card p-4">
         <h2 className="font-semibold">Providers&apos; status pages</h2>
         <p className="mt-0.5 text-xs text-muted">What each service says about itself, read from its public status page.</p>
         <ul className="mt-2 divide-y divide-line/60">
-          {STATUS_PAGES.map((p) => <PageRow key={p.name} name={p.name} url={p.url} round={round} refresh={refresh} report={report} />)}
+          {STATUS_PAGES.map((p) => (
+            <PageRow key={p.name} name={p.name} url={p.url} round={round} refresh={refresh} report={report} />
+          ))}
         </ul>
       </section>
     </div>

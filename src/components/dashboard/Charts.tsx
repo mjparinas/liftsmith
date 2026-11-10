@@ -1,7 +1,9 @@
 "use client";
+
+import { useEffect, useRef, useState } from "react";
+
 import { dayKey, heat, weekdayNames, type DayTotals, type GridDay } from "@/lib/dashboard";
 import { date, t as tr } from "@/lib/i18n";
-import { useEffect, useRef, useState } from "react";
 
 // Small SVG charts for the web dashboard. One series each (the title names it, so no legend), the
 // accent colour for data, recessive grid lines, and a hover or focus readout on every mark.
@@ -16,7 +18,11 @@ function dayLabel(ms: number) {
 
 function describe(t: DayTotals | undefined) {
   if (!t) return tr("dash.restDayT");
-  const parts = [tr("dash.workoutsN", { count: t.sessions }), tr("dash.setsN", { count: t.sets }), ...(t.prs ? [tr("dash.prN", { count: t.prs })] : [])];
+  const parts = [
+    tr("dash.workoutsN", { count: t.sessions }),
+    tr("dash.setsN", { count: t.sets }),
+    ...(t.prs ? [tr("dash.prN", { count: t.prs })] : []),
+  ];
   return parts.join(", ");
 }
 
@@ -39,10 +45,17 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
   return (
     <div>
       <div className="overflow-x-auto pb-1" tabIndex={0} role="region" aria-label={tr("dash.yearScroll")}>
-        <div className="relative inline-grid" role="img" aria-label={summary(grid, days)} style={{ gridTemplateColumns: `28px repeat(${grid.length}, ${cell}px)`, columnGap: gap, rowGap: gap }}>
+        <div
+          className="relative inline-grid"
+          role="img"
+          aria-label={summary(grid, days)}
+          style={{ gridTemplateColumns: `28px repeat(${grid.length}, ${cell}px)`, columnGap: gap, rowGap: gap }}
+        >
           <div />
           {grid.map((_, i) => (
-            <div key={i} className="h-4 text-[0.625rem] leading-4 text-faint" aria-hidden>{months.find((m) => m.x === i)?.label ?? ""}</div>
+            <div key={i} className="h-4 text-[0.625rem] leading-4 text-faint" aria-hidden>
+              {months.find((m) => m.x === i)?.label ?? ""}
+            </div>
           ))}
           {dow().map((label, row) => (
             <Row key={row} label={label} row={row} grid={grid} days={days} cell={cell} onHover={setHover} onPick={onPick} />
@@ -50,10 +63,14 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
         </div>
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-        <span aria-live="polite" className="num min-h-4">{hover ? `${dayLabel(hover.ms)}: ${describe(days.get(hover.key))}` : tr("dash.pointAt")}</span>
+        <span aria-live="polite" className="num min-h-4">
+          {hover ? `${dayLabel(hover.ms)}: ${describe(days.get(hover.key))}` : tr("dash.pointAt")}
+        </span>
         <span className="flex items-center gap-1" aria-hidden>
           {tr("dash.fewer")}
-          {HEAT.map((c, i) => <span key={i} className="inline-block h-3 w-3 rounded-[3px]" style={{ background: c }} />)}
+          {HEAT.map((c, i) => (
+            <span key={i} className="inline-block h-3 w-3 rounded-[3px]" style={{ background: c }} />
+          ))}
           {tr("dash.moreSets")}
         </span>
       </div>
@@ -61,10 +78,28 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
   );
 }
 
-function Row({ label, row, grid, days, cell, onHover, onPick }: { label: string; row: number; grid: GridDay[][]; days: Map<string, DayTotals>; cell: number; onHover: (d: GridDay | null) => void; onPick?: (ms: number) => void }) {
+function Row({
+  label,
+  row,
+  grid,
+  days,
+  cell,
+  onHover,
+  onPick,
+}: {
+  label: string;
+  row: number;
+  grid: GridDay[][];
+  days: Map<string, DayTotals>;
+  cell: number;
+  onHover: (d: GridDay | null) => void;
+  onPick?: (ms: number) => void;
+}) {
   return (
     <>
-      <div className="text-[0.625rem] leading-[13px] text-faint" aria-hidden>{label}</div>
+      <div className="text-[0.625rem] leading-[13px] text-faint" aria-hidden>
+        {label}
+      </div>
       {grid.map((col) => {
         const d = col[row];
         if (d.future) return <div key={d.key} style={{ width: cell, height: cell }} />;
@@ -88,12 +123,30 @@ function Row({ label, row, grid, days, cell, onHover, onPick }: { label: string;
 }
 
 /** One month as a calendar, with the workouts on each day. */
-export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (GridDay | null)[][]; days: Map<string, DayTotals>; today: number; selected: string | null; onPick: (key: string) => void }) {
+export function MonthCalendar({
+  rows,
+  days,
+  today,
+  selected,
+  onPick,
+}: {
+  rows: (GridDay | null)[][];
+  days: Map<string, DayTotals>;
+  today: number;
+  selected: string | null;
+  onPick: (key: string) => void;
+}) {
   const todayKey = dayKey(today);
   return (
     <table className="w-full table-fixed border-separate border-spacing-1 text-sm">
       <thead>
-        <tr>{weekdayNames().map((d) => <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">{d}</th>)}</tr>
+        <tr>
+          {weekdayNames().map((d) => (
+            <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">
+              {d}
+            </th>
+          ))}
+        </tr>
       </thead>
       <tbody>
         {rows.map((r, i) => (
@@ -110,9 +163,20 @@ export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (
                     onClick={() => onPick(d.key)}
                     className={`press flex h-16 w-full flex-col items-start rounded-xl border p-1.5 text-left ${on ? "border-accent" : "border-line"} ${t ? "bg-accent/15" : "bg-surface"}`}
                   >
-                    <span className={`num text-xs ${d.key === todayKey ? "rounded-full bg-accent px-1.5 font-semibold text-accent-ink" : "text-muted"}`}>{new Date(d.ms).getDate()}</span>
-                    <span className="sr-only">, {dayLabel(d.ms)}: {describe(t)}</span>
-                    {t && <span aria-hidden className="num mt-auto text-xs font-semibold text-ink">{tr("dash.setsN", { count: t.sets })}{t.prs ? tr("dash.prMark") : ""}</span>}
+                    <span
+                      className={`num text-xs ${d.key === todayKey ? "rounded-full bg-accent px-1.5 font-semibold text-accent-ink" : "text-muted"}`}
+                    >
+                      {new Date(d.ms).getDate()}
+                    </span>
+                    <span className="sr-only">
+                      , {dayLabel(d.ms)}: {describe(t)}
+                    </span>
+                    {t && (
+                      <span aria-hidden className="num mt-auto text-xs font-semibold text-ink">
+                        {tr("dash.setsN", { count: t.sets })}
+                        {t.prs ? tr("dash.prMark") : ""}
+                      </span>
+                    )}
                   </button>
                 </td>
               );
@@ -125,7 +189,17 @@ export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (
 }
 
 /** A line over time with a crosshair readout. Points are [ms, value]. */
-export function LineChart({ points, format, label, height = 180 }: { points: [number, number][]; format: (v: number) => string; label: string; height?: number }) {
+export function LineChart({
+  points,
+  format,
+  label,
+  height = 180,
+}: {
+  points: [number, number][];
+  format: (v: number) => string;
+  label: string;
+  height?: number;
+}) {
   const [hi, setHi] = useState<number | null>(null);
   // Draw at the real width so the axis text stays its true size on a phone and a big screen.
   const box = useRef<HTMLElement>(null);
@@ -153,7 +227,7 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
   const d = points.map((p, i) => `${i ? "L" : "M"}${X(p[0]).toFixed(1)},${Y(p[1]).toFixed(1)}`).join(" ");
   const ticks = [y0 + (y1 - y0) * 0.1, (y0 + y1) / 2, y1 - (y1 - y0) * 0.1];
   const near = (clientX: number, rect: DOMRect) => {
-    const t = x0 + ((clientX - rect.left) / rect.width * w - pad.l) / (w - pad.l - pad.r) * (x1 - x0);
+    const t = x0 + ((((clientX - rect.left) / rect.width) * w - pad.l) / (w - pad.l - pad.r)) * (x1 - x0);
     let best = 0;
     for (let i = 1; i < points.length; i++) if (Math.abs(points[i][0] - t) < Math.abs(points[best][0] - t)) best = i;
     return best;
@@ -175,13 +249,29 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
         {ticks.map((t) => (
           <g key={t}>
             <line x1={pad.l} x2={w - pad.r} y1={Y(t)} y2={Y(t)} stroke="var(--color-line)" strokeWidth={1} />
-            <text x={pad.l - 6} y={Y(t) + 4} textAnchor="end" fontSize={11} fill="var(--color-faint)">{format(t)}</text>
+            <text x={pad.l - 6} y={Y(t) + 4} textAnchor="end" fontSize={11} fill="var(--color-faint)">
+              {format(t)}
+            </text>
           </g>
         ))}
-        <text x={pad.l} y={height - 6} fontSize={11} fill="var(--color-faint)">{date(x0, { month: "short", year: "numeric" })}</text>
-        <text x={w - pad.r} y={height - 6} textAnchor="end" fontSize={11} fill="var(--color-faint)">{date(x1, { month: "short", year: "numeric" })}</text>
+        <text x={pad.l} y={height - 6} fontSize={11} fill="var(--color-faint)">
+          {date(x0, { month: "short", year: "numeric" })}
+        </text>
+        <text x={w - pad.r} y={height - 6} textAnchor="end" fontSize={11} fill="var(--color-faint)">
+          {date(x1, { month: "short", year: "numeric" })}
+        </text>
         <path d={d} fill="none" stroke="var(--color-accent)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
-        {hi !== null && <line x1={X(p[0])} x2={X(p[0])} y1={pad.t} y2={height - pad.b} stroke="var(--color-muted)" strokeWidth={1} strokeDasharray="3 3" />}
+        {hi !== null && (
+          <line
+            x1={X(p[0])}
+            x2={X(p[0])}
+            y1={pad.t}
+            y2={height - pad.b}
+            stroke="var(--color-muted)"
+            strokeWidth={1}
+            strokeDasharray="3 3"
+          />
+        )}
         <circle cx={X(p[0])} cy={Y(p[1])} r={5} fill="var(--color-accent)" stroke="var(--color-surface)" strokeWidth={2} />
       </svg>
     </figure>
@@ -189,7 +279,17 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
 }
 
 /** Columns, one per week, with the value under the pointer read out above. */
-export function WeekBars({ weeks, value, format, label }: { weeks: { weekStart: number }[]; value: (i: number) => number; format: (v: number) => string; label: string }) {
+export function WeekBars({
+  weeks,
+  value,
+  format,
+  label,
+}: {
+  weeks: { weekStart: number }[];
+  value: (i: number) => number;
+  format: (v: number) => string;
+  label: string;
+}) {
   const [hi, setHi] = useState<number | null>(null);
   const vals = weeks.map((_, i) => value(i));
   const max = Math.max(1, ...vals);
@@ -197,7 +297,8 @@ export function WeekBars({ weeks, value, format, label }: { weeks: { weekStart: 
   return (
     <figure>
       <figcaption className="num mb-2 text-sm text-muted" aria-live="polite">
-        {tr("dash.weekOfShort", { date: date(weeks[i].weekStart, { month: "short", day: "numeric" }) })} <span className="font-semibold text-ink">{format(vals[i])}</span>
+        {tr("dash.weekOfShort", { date: date(weeks[i].weekStart, { month: "short", day: "numeric" }) })}{" "}
+        <span className="font-semibold text-ink">{format(vals[i])}</span>
       </figcaption>
       <div className="flex h-28 items-end gap-1" role="group" aria-label={label}>
         {weeks.map((wk, j) => (
@@ -211,7 +312,10 @@ export function WeekBars({ weeks, value, format, label }: { weeks: { weekStart: 
             onBlur={() => setHi(null)}
             className="flex h-full flex-1 items-end"
           >
-            <span className={`block w-full rounded-t-[4px] ${j === i ? "bg-accent" : "bg-accent/55"}`} style={{ height: `${Math.max(vals[j] ? 4 : 1, (vals[j] / max) * 100)}%` }} />
+            <span
+              className={`block w-full rounded-t-[4px] ${j === i ? "bg-accent" : "bg-accent/55"}`}
+              style={{ height: `${Math.max(vals[j] ? 4 : 1, (vals[j] / max) * 100)}%` }}
+            />
           </button>
         ))}
       </div>

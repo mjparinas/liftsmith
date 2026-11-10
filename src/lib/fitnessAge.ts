@@ -15,8 +15,22 @@ type Sex = "male" | "female";
 
 /** [age, mean VO2 max in mL/kg/min]: Loe et al. 2013, Table 2, at each age group's middle (70+ at 75). */
 export const HUNT_REFERENCE: Record<Sex, readonly (readonly [number, number])[]> = {
-  male: [[25, 54.4], [35, 49.1], [45, 47.2], [55, 42.6], [65, 39.2], [75, 35.3]],
-  female: [[25, 43.0], [35, 40.0], [45, 38.4], [55, 34.4], [65, 31.1], [75, 28.3]],
+  male: [
+    [25, 54.4],
+    [35, 49.1],
+    [45, 47.2],
+    [55, 42.6],
+    [65, 39.2],
+    [75, 35.3],
+  ],
+  female: [
+    [25, 43.0],
+    [35, 40.0],
+    [45, 38.4],
+    [55, 34.4],
+    [65, 31.1],
+    [75, 28.3],
+  ],
 };
 
 /** Ages the answer is kept within: a little past the study's youngest and oldest groups. */
@@ -37,13 +51,15 @@ export function expectedVo2(sex: Sex, age: number): number {
   const a = Math.min(MAX_AGE, Math.max(MIN_AGE, age));
   let i = 0;
   while (i < ref.length - 2 && a > ref[i + 1][0]) i++;
-  const [x0, y0] = ref[i], [x1, y1] = ref[i + 1];
+  const [x0, y0] = ref[i],
+    [x1, y1] = ref[i + 1];
   return y0 + ((a - x0) / (x1 - x0)) * (y1 - y0);
 }
 
 /** The age whose typical VO2 max equals `vo2`, within MIN_AGE to MAX_AGE. */
 export function ageForVo2(sex: Sex, vo2: number): number {
-  let lo = MIN_AGE, hi = MAX_AGE;
+  let lo = MIN_AGE,
+    hi = MAX_AGE;
   if (vo2 >= expectedVo2(sex, lo)) return lo;
   if (vo2 <= expectedVo2(sex, hi)) return hi;
   // The reference falls with age, so a binary search finds the crossing.
@@ -82,7 +98,8 @@ export interface FitnessAge {
 export type FitnessAgeResult = { ok: true; value: FitnessAge } | { ok: false; missing: FitnessAgeMissing[] };
 
 const median = (xs: number[]) => {
-  const s = [...xs].sort((a, b) => a - b), m = Math.floor(s.length / 2);
+  const s = [...xs].sort((a, b) => a - b),
+    m = Math.floor(s.length / 2);
   return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
 };
 
@@ -112,9 +129,18 @@ export function fitnessAge(events: readonly AppEvent[], profile: Pick<Profile, "
   return {
     ok: true,
     value: {
-      vo2, day: used[used.length - 1].day, readings: used.length, age: age!, sex,
-      expected: expectedVo2(sex, age!), fitnessAge: fit, low, high,
-      atFloor: exact <= MIN_AGE, atCeiling: exact >= MAX_AGE, diff,
+      vo2,
+      day: used[used.length - 1].day,
+      readings: used.length,
+      age: age!,
+      sex,
+      expected: expectedVo2(sex, age!),
+      fitnessAge: fit,
+      low,
+      high,
+      atFloor: exact <= MIN_AGE,
+      atCeiling: exact >= MAX_AGE,
+      diff,
       verdict: diff <= -TYPICAL_YEARS ? "younger" : diff >= TYPICAL_YEARS ? "older" : "typical",
     },
   };

@@ -1,4 +1,5 @@
 "use client";
+
 import { isNative } from "./juice";
 
 // The live workout notification. In the Capacitor shell this calls the native WorkoutSession
@@ -29,7 +30,10 @@ type Plugin = {
   requestPermission(): Promise<{ granted: boolean }>;
   addListener(event: "action", cb: (e: { action: SessionAction }) => void): Promise<Handle>;
 };
-const plugin = (): Plugin | undefined => (typeof window !== "undefined" ? (window as unknown as { Capacitor?: { Plugins?: { WorkoutSession?: Plugin } } }).Capacitor?.Plugins?.WorkoutSession : undefined);
+const plugin = (): Plugin | undefined =>
+  typeof window !== "undefined"
+    ? (window as unknown as { Capacitor?: { Plugins?: { WorkoutSession?: Plugin } } }).Capacitor?.Plugins?.WorkoutSession
+    : undefined;
 
 export async function notifyPermission(): Promise<boolean> {
   const p = plugin();
@@ -46,10 +50,14 @@ export async function updateSession(s: SessionState) {
   if (typeof Notification === "undefined" || Notification.permission !== "granted" || !("serviceWorker" in navigator)) return;
   const reg = await navigator.serviceWorker.getRegistration();
   if (!reg) return;
-  const until = s.restUntil ? new Date(s.restUntil).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" }) : null;
+  const until = s.restUntil
+    ? new Date(s.restUntil).toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" })
+    : null;
   await reg.showNotification(s.title, {
     tag: "workout",
-    body: [until ? `Rest until ${until}` : s.setLabel, `Next: ${s.next}`, s.plates, s.hr ? `♥ ${s.hr} bpm` : null].filter(Boolean).join("\n"),
+    body: [until ? `Rest until ${until}` : s.setLabel, `Next: ${s.next}`, s.plates, s.hr ? `♥ ${s.hr} bpm` : null]
+      .filter(Boolean)
+      .join("\n"),
     silent: true,
     requireInteraction: true,
     icon: "/icon-192.png",
@@ -63,7 +71,13 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
   if (isNative()) return; // the native service sounds its own alert
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   const reg = await navigator.serviceWorker?.getRegistration();
-  await reg?.showNotification("Rest over", { tag: "rest", body: `Up next: ${next}`, silent: !alert.sound && !alert.vibrate, vibrate: alert.vibrate ? [200, 100, 200] : undefined, icon: "/icon-192.png" } as NotificationOptions);
+  await reg?.showNotification("Rest over", {
+    tag: "rest",
+    body: `Up next: ${next}`,
+    silent: !alert.sound && !alert.vibrate,
+    vibrate: alert.vibrate ? [200, 100, 200] : undefined,
+    icon: "/icon-192.png",
+  } as NotificationOptions);
 }
 
 /** Log set / +30 s on the native notification, and the voice and system shortcuts. Returns an unsubscribe function. */

@@ -28,8 +28,10 @@ export const en = {
   "pro.retry": "Try again",
   "pro.offline.play": "Couldn't reach Google Play. Check your connection and try again.",
   "pro.offline.appstore": "Couldn't reach the App Store. Check your connection and try again.",
-  "pro.legal.play": "Paid through your Google Play account. The subscription renews automatically until you cancel it in Google Play › Payments & subscriptions. Cancel before a free trial ends and you won't be charged.",
-  "pro.legal.appstore": "Paid through your Apple Account. The subscription renews automatically unless you cancel it at least 24 hours before the end of the period, in Settings › your name › Subscriptions. Cancel before a free trial ends and you won't be charged.",
+  "pro.legal.play":
+    "Paid through your Google Play account. The subscription renews automatically until you cancel it in Google Play › Payments & subscriptions. Cancel before a free trial ends and you won't be charged.",
+  "pro.legal.appstore":
+    "Paid through your Apple Account. The subscription renews automatically unless you cancel it at least 24 hours before the end of the period, in Settings › your name › Subscriptions. Cancel before a free trial ends and you won't be charged.",
   "pro.termsLink": "Terms of use",
   "pro.privacyLink": "Privacy policy",
   "pro.notHere": "Pro is sold in the Liftsmith app for Android and iPhone. Everything is unlocked here.",
@@ -73,8 +75,10 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.retry": "Reintentar",
   "pro.offline.play": "No se pudo conectar con Google Play. Revisa tu conexión e inténtalo de nuevo.",
   "pro.offline.appstore": "No se pudo conectar con el App Store. Revisa tu conexión e inténtalo de nuevo.",
-  "pro.legal.play": "Se paga con tu cuenta de Google Play. La suscripción se renueva automáticamente hasta que la canceles en Google Play › Pagos y suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
-  "pro.legal.appstore": "Se paga con tu cuenta de Apple. La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del final del periodo, en Ajustes › tu nombre › Suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
+  "pro.legal.play":
+    "Se paga con tu cuenta de Google Play. La suscripción se renueva automáticamente hasta que la canceles en Google Play › Pagos y suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
+  "pro.legal.appstore":
+    "Se paga con tu cuenta de Apple. La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del final del periodo, en Ajustes › tu nombre › Suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
   "pro.termsLink": "Términos de uso",
   "pro.privacyLink": "Política de privacidad",
   "pro.notHere": "Pro se vende en la app de Liftsmith para Android y iPhone. Aquí todo está desbloqueado.",
@@ -116,8 +120,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.retry": "Réessayer",
   "pro.offline.play": "Impossible de joindre Google Play. Vérifiez votre connexion et réessayez.",
   "pro.offline.appstore": "Impossible de joindre l’App Store. Vérifiez votre connexion et réessayez.",
-  "pro.legal.play": "Payé via votre compte Google Play. L’abonnement se renouvelle automatiquement jusqu’à sa résiliation dans Google Play › Paiements et abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
-  "pro.legal.appstore": "Payé via votre compte Apple. L’abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période, dans Réglages › votre nom › Abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
+  "pro.legal.play":
+    "Payé via votre compte Google Play. L’abonnement se renouvelle automatiquement jusqu’à sa résiliation dans Google Play › Paiements et abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
+  "pro.legal.appstore":
+    "Payé via votre compte Apple. L’abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période, dans Réglages › votre nom › Abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
   "pro.termsLink": "Conditions d’utilisation",
   "pro.privacyLink": "Politique de confidentialité",
   "pro.notHere": "Pro est vendu dans l’app Liftsmith pour Android et iPhone. Tout est débloqué ici.",

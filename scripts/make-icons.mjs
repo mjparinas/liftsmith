@@ -15,8 +15,8 @@
 // ImageMagick for favicon.ico).
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
-import path from "node:path";
 import { createRequire } from "node:module";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const require = createRequire(import.meta.url);
@@ -193,7 +193,12 @@ async function main() {
 
   // Web.
   write(path.join(PUB, "icon.svg"), svg(p, { radius: 224 }).replace(/ width="1024" height="1024"/, "") + "\n");
-  write(path.join(PUB, "icon-mono.svg"), svg(p, { kind: "mono" }).replace(/ width="1024" height="1024"/, "").replace("#ffffff", "#000000") + "\n");
+  write(
+    path.join(PUB, "icon-mono.svg"),
+    svg(p, { kind: "mono" })
+      .replace(/ width="1024" height="1024"/, "")
+      .replace("#ffffff", "#000000") + "\n",
+  );
   await png(svg(p), path.join(PUB, "apple-touch-icon.png"), 180, { opaque: true });
   await png(svg(p, { radius: 224 }), path.join(PUB, "icon-192.png"), 192);
   await png(svg(p, { radius: 224 }), path.join(PUB, "icon-512.png"), 512);

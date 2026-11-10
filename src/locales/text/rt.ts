@@ -52,7 +52,8 @@ export const es: Partial<Record<Key, Message>> = {
   "rt.inUse": "En uso",
   "rt.useToday": "Usar hoy",
   "rt.empty": "Aún no hay rutinas",
-  "rt.emptyBody": "Guarda el plan de hoy, un entrenamiento terminado o crea la tuya. Los pesos siguen subiendo a medida que te haces más fuerte.",
+  "rt.emptyBody":
+    "Guarda el plan de hoy, un entrenamiento terminado o crea la tuya. Los pesos siguen subiendo a medida que te haces más fuerte.",
   "rt.todaysPlan": "Plan de hoy",
   "rt.saveToday": "Guardar el plan de hoy como rutina",
   "rt.build": "Crear una rutina nueva",
@@ -87,7 +88,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "rt.inUse": "Utilisée",
   "rt.useToday": "Utiliser aujourd’hui",
   "rt.empty": "Aucune routine pour l’instant",
-  "rt.emptyBody": "Enregistrez le plan du jour, une séance terminée, ou créez la vôtre. Les charges montent toujours à mesure que vous progressez.",
+  "rt.emptyBody":
+    "Enregistrez le plan du jour, une séance terminée, ou créez la vôtre. Les charges montent toujours à mesure que vous progressez.",
   "rt.todaysPlan": "Plan du jour",
   "rt.saveToday": "Enregistrer le plan du jour comme routine",
   "rt.build": "Créer une nouvelle routine",

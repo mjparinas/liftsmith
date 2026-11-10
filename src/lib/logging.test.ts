@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { defaultProfile, makeGym } from "./defaults";
-import { EXERCISE_BY_ID, EXERCISES, exercise, registerCustom } from "./exercises";
+import { exercise, EXERCISE_BY_ID, EXERCISES, registerCustom } from "./exercises";
 import { generate } from "./generator";
 import { effortSignal, target } from "./progression";
 import { useApp } from "./store";
@@ -15,7 +16,18 @@ const profile = { ...defaultProfile(NOW - 3 * D), onboarded: true, bodyweight: 8
 const gym = makeGym("commercial", "kg", "g1");
 
 const sets = (over: Partial<SetEvent> = {}): SetEvent[] =>
-  [0, 1, 2].map((i) => ({ type: "set", id: `s${i}`, at: NOW - D + i * 1000, sessionId: "a", exerciseId: "back-squat", weight: 100, reps: 7, targetReps: 7, rir: 2, ...over }));
+  [0, 1, 2].map((i) => ({
+    type: "set",
+    id: `s${i}`,
+    at: NOW - D + i * 1000,
+    sessionId: "a",
+    exerciseId: "back-squat",
+    weight: 100,
+    reps: 7,
+    targetReps: 7,
+    rir: 2,
+    ...over,
+  }));
 const effort = (setId: string, rir: number): AppEvent => ({ type: "effort", id: `e-${setId}`, at: NOW - D + 5000, setId, rir });
 
 describe("set effort", () => {
@@ -55,7 +67,12 @@ describe("set effort", () => {
 });
 
 describe("custom exercises", () => {
-  const ev: AppEvent = { type: "customExercise", id: "c1", at: NOW, exercise: { id: "custom-landmine", name: "Landmine press", primary: ["chest"], secondary: [], load: "barbell", compound: true } };
+  const ev: AppEvent = {
+    type: "customExercise",
+    id: "c1",
+    at: NOW,
+    exercise: { id: "custom-landmine", name: "Landmine press", primary: ["chest"], secondary: [], load: "barbell", compound: true },
+  };
 
   it("registers once into the library, as a custom exercise", () => {
     const before = EXERCISES.length;

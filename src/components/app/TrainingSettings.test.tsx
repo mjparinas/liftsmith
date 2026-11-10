@@ -2,9 +2,11 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { setWeekStart } from "@/lib/derive";
 import { setLanguage } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
+
 import { ExercisePrefsEditor, FavouriteButton, TrainingSettings } from "./TrainingSettings";
 
 beforeEach(async () => {
@@ -63,7 +65,12 @@ describe("Settings › Workout preferences", () => {
 
   it("sets one exercise's rest, reps and sets, with the default shown", async () => {
     const user = userEvent.setup();
-    render(<><FavouriteButton exerciseId="back-squat" /><ExercisePrefsEditor exerciseId="back-squat" /></>);
+    render(
+      <>
+        <FavouriteButton exerciseId="back-squat" />
+        <ExercisePrefsEditor exerciseId="back-squat" />
+      </>,
+    );
     expect(screen.getByRole("button", { name: "Default (2 min)" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Default (6–10)" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "3–5" }));

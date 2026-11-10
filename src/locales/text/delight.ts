@@ -5,7 +5,8 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "delight.voice": "Voice coach",
-  "delight.voiceHint": "Spoken cues between sets: the next weight and reps, the last set, ten seconds left, and new bests. Music dips while it talks.",
+  "delight.voiceHint":
+    "Spoken cues between sets: the next weight and reps, the last set, ten seconds left, and new bests. Music dips while it talks.",
   "delight.ghost": "Ghost mode",
   "delight.ghostHint": "Race your last session of each exercise: its weights, reps and rests show on the rest timer.",
   "delight.plates": "Smart plate memory",
@@ -27,7 +28,8 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "delight.voice": "Entrenador por voz",
-  "delight.voiceHint": "Indicaciones habladas entre series: el siguiente peso y repeticiones, la última serie, los últimos diez segundos y los nuevos récords. La música baja mientras habla.",
+  "delight.voiceHint":
+    "Indicaciones habladas entre series: el siguiente peso y repeticiones, la última serie, los últimos diez segundos y los nuevos récords. La música baja mientras habla.",
   "delight.ghost": "Modo fantasma",
   "delight.ghostHint": "Compite con tu última sesión de cada ejercicio: sus pesos, repeticiones y descansos aparecen en el temporizador.",
   "delight.plates": "Memoria de discos",
@@ -47,7 +49,8 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "delight.voice": "Coach vocal",
-  "delight.voiceHint": "Des indications parlées entre les séries : le prochain poids et les répétitions, la dernière série, les dix dernières secondes et les nouveaux records. La musique baisse pendant qu’il parle.",
+  "delight.voiceHint":
+    "Des indications parlées entre les séries : le prochain poids et les répétitions, la dernière série, les dix dernières secondes et les nouveaux records. La musique baisse pendant qu’il parle.",
   "delight.ghost": "Mode fantôme",
   "delight.ghostHint": "Affrontez votre dernière séance de chaque exercice : ses poids, répétitions et repos s’affichent sur le minuteur.",
   "delight.plates": "Mémoire des disques",

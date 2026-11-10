@@ -1,6 +1,6 @@
-import { setVolume } from "./sides";
 import { EXERCISE_BY_ID } from "./exercises";
 import { epley } from "./progression";
+import { setVolume } from "./sides";
 import { MUSCLES, type AppEvent, type Muscle, type SetEvent } from "./types";
 
 // Every stat is recomputed from the event log, never stored (as in Gradelings' derive.ts), so

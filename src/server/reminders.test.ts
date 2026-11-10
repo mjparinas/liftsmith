@@ -1,6 +1,24 @@
 import { describe, expect, it } from "vitest";
+
 import { addDays, atTime, parts, zoned } from "@/lib/messages";
-import { capped, checkBody, confirm, memoryStore, reminderEnv, remove, runDaily, schedule, sha256, subscribe, unsubscribe, unsubToken, type Env, type Mailer, type Outgoing } from "./reminders";
+
+import {
+  capped,
+  checkBody,
+  confirm,
+  memoryStore,
+  reminderEnv,
+  remove,
+  runDaily,
+  schedule,
+  sha256,
+  subscribe,
+  unsubscribe,
+  unsubToken,
+  type Env,
+  type Mailer,
+  type Outgoing,
+} from "./reminders";
 
 const TZ = "America/Toronto";
 const MON = zoned(2026, 11, 9, 0, 0, TZ);
@@ -89,7 +107,15 @@ describe("checking the subscription", () => {
 
   it("needs every setting before it sends anything", () => {
     expect(reminderEnv({ RESEND_API_KEY: "k", REMINDER_SECRET: "s", MAIL_FROM: "a@b.c" })).toEqual({ missing: ["MAIL_POSTAL_ADDRESS"] });
-    expect(reminderEnv({ RESEND_API_KEY: "k", REMINDER_SECRET: "s", MAIL_FROM: "a@b.c", MAIL_POSTAL_ADDRESS: "x", NEXT_PUBLIC_SITE_URL: "https://x.app/" })).toMatchObject({ env: { siteUrl: "https://x.app" } });
+    expect(
+      reminderEnv({
+        RESEND_API_KEY: "k",
+        REMINDER_SECRET: "s",
+        MAIL_FROM: "a@b.c",
+        MAIL_POSTAL_ADDRESS: "x",
+        NEXT_PUBLIC_SITE_URL: "https://x.app/",
+      }),
+    ).toMatchObject({ env: { siteUrl: "https://x.app" } });
   });
 });
 
@@ -187,7 +213,14 @@ describe("scheduling", () => {
   });
 
   it("caps email at one a day, three a week and one Pro email a fortnight", () => {
-    const s = (day: number, kind: "reminder" | "pro" = "reminder") => ({ subId: ID, key: `${kind}:${day}`, kind, sendAt: atTime(addDays(MON, day, TZ), "08:00", TZ), resendId: null, status: "sent" as const });
+    const s = (day: number, kind: "reminder" | "pro" = "reminder") => ({
+      subId: ID,
+      key: `${kind}:${day}`,
+      kind,
+      sendAt: atTime(addDays(MON, day, TZ), "08:00", TZ),
+      resendId: null,
+      status: "sent" as const,
+    });
     const at = (day: number, h = 12) => atTime(addDays(MON, day, TZ), `${h}:00`, TZ);
     expect(capped({ kind: "missed", at: at(0) }, [s(0)], TZ)).toBe(true);
     expect(capped({ kind: "missed", at: at(1) }, [s(0)], TZ)).toBe(false);

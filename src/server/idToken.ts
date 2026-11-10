@@ -53,14 +53,24 @@ export function audiences(p: Provider, env: NodeJS.ProcessEnv = process.env): Se
     p === "google"
       ? [env.GOOGLE_CLIENT_IDS, env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID, env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID]
       : [env.APPLE_CLIENT_IDS, env.NEXT_PUBLIC_APPLE_SERVICES_ID, "com.getliftsmith.app"];
-  return new Set(raw.flatMap((v) => (v ?? "").split(",")).map((v) => v.trim()).filter(Boolean));
+  return new Set(
+    raw
+      .flatMap((v) => (v ?? "").split(","))
+      .map((v) => v.trim())
+      .filter(Boolean),
+  );
 }
 
 /**
  * Verifies a provider's ID token. `nonce` is the raw value the app made; the provider was given its SHA-256
  * (hex), so the token must carry that hash. Returns the claims, or a short reason it was refused.
  */
-export async function verifyIdToken(p: Provider, token: string, nonce: string, opts: { aud?: Set<string>; get?: Fetch; now?: number } = {}): Promise<{ ok: true; claims: Claims } | { ok: false; error: string }> {
+export async function verifyIdToken(
+  p: Provider,
+  token: string,
+  nonce: string,
+  opts: { aud?: Set<string>; get?: Fetch; now?: number } = {},
+): Promise<{ ok: true; claims: Claims } | { ok: false; error: string }> {
   const now = opts.now ?? Date.now();
   const get = opts.get ?? ((u: string) => fetch(u));
   const aud = opts.aud ?? audiences(p);

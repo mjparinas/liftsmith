@@ -1,14 +1,22 @@
 // HTTP plumbing shared by the reminder routes: CORS for the native shells, a per-address rate limit,
 // and the store and mailer for this server.
 import { NATIVE_ORIGINS } from "@/lib/feedbackServer";
-import { reminderEnv, resendMailer, type Env, type Mailer, type Store } from "./reminders";
+
 import { rateLimit } from "./db";
+import { reminderEnv, resendMailer, type Env, type Mailer, type Store } from "./reminders";
 import { dbStore } from "./remindersDb";
 
 export const MAX_BODY = 8_000;
 
 export function cors(origin: string | null): Record<string, string> {
-  return origin && NATIVE_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
+  return origin && NATIVE_ORIGINS.has(origin)
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        Vary: "Origin",
+      }
+    : {};
 }
 
 /** True when this address made `limit` requests to `route` in the last hour (shared across instances, db.ts). */
@@ -50,4 +58,8 @@ export function setup(): { env: Env; store: Store; mail: Mailer } | null {
   return { env: e.env, store: dbStore(), mail: resendMailer(e.apiKey, e.from) };
 }
 
-export const html = (body: string, status = 200) => new Response(body, { status, headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" } });
+export const html = (body: string, status = 200) =>
+  new Response(body, {
+    status,
+    headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },
+  });

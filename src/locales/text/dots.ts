@@ -5,7 +5,8 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "dots.title": "DOTS score",
-  "dots.body": "Your squat, bench and deadlift total scaled for body weight, so lifters of any size compare. Worked out from your estimated maxes.",
+  "dots.body":
+    "Your squat, bench and deadlift total scaled for body weight, so lifters of any size compare. Worked out from your estimated maxes.",
   "dots.missing": "Needs an estimated max for {names}. Log a heavy set of each, or enter them below.",
   "dots.total": "Total",
   "dots.bw": "Body weight",
@@ -29,7 +30,8 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "dots.title": "Puntuación DOTS",
-  "dots.body": "El total de sentadilla, press de banca y peso muerto ajustado al peso corporal, para comparar a personas de cualquier tamaño. Calculado con tus máximos estimados.",
+  "dots.body":
+    "El total de sentadilla, press de banca y peso muerto ajustado al peso corporal, para comparar a personas de cualquier tamaño. Calculado con tus máximos estimados.",
   "dots.missing": "Necesita un máximo estimado de {names}. Registra una serie pesada de cada uno, o ponlos abajo.",
   "dots.total": "Total",
   "dots.bw": "Peso corporal",
@@ -38,7 +40,8 @@ export const es: Partial<Record<Key, Message>> = {
   "dots.female": "Mujeres",
   "dots.calc": "Cambiar los números",
   "dots.reset": "Usar mis datos",
-  "dots.note": "Máximos estimados, no levantamientos de competición. Las franjas son orientativas: menos de 200 principiante, 300 intermedio, 400 avanzado, 500 élite.",
+  "dots.note":
+    "Máximos estimados, no levantamientos de competición. Las franjas son orientativas: menos de 200 principiante, 300 intermedio, 400 avanzado, 500 élite.",
   "dots.lift.squat": "Sentadilla",
   "dots.lift.bench": "Banca",
   "dots.lift.deadlift": "Peso muerto",
@@ -51,7 +54,8 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "dots.title": "Score DOTS",
-  "dots.body": "Votre total squat, développé couché et soulevé de terre rapporté au poids de corps, pour comparer des gabarits différents. Calculé à partir de vos maximums estimés.",
+  "dots.body":
+    "Votre total squat, développé couché et soulevé de terre rapporté au poids de corps, pour comparer des gabarits différents. Calculé à partir de vos maximums estimés.",
   "dots.missing": "Il faut un maximum estimé pour {names}. Enregistrez une série lourde de chacun, ou saisissez-les ci-dessous.",
   "dots.total": "Total",
   "dots.bw": "Poids de corps",
@@ -60,7 +64,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "dots.female": "Femmes",
   "dots.calc": "Changer les chiffres",
   "dots.reset": "Utiliser mes données",
-  "dots.note": "Maximums estimés, pas des barres de compétition. Les paliers sont indicatifs : moins de 200 débutant, 300 intermédiaire, 400 avancé, 500 élite.",
+  "dots.note":
+    "Maximums estimés, pas des barres de compétition. Les paliers sont indicatifs : moins de 200 débutant, 300 intermédiaire, 400 avancé, 500 élite.",
   "dots.lift.squat": "Squat",
   "dots.lift.bench": "Développé couché",
   "dots.lift.deadlift": "Soulevé de terre",

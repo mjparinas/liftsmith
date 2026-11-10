@@ -1,4 +1,5 @@
 "use client";
+
 // Health Connect (Android) and Apple Health (iOS) through one plugin, @capgo/capacitor-health.
 // Reads prefill the setup wizard (weight, height, resting heart rate), bring in weigh-ins with body
 // fat for the coach's notes (insights.ts), and feed the health twin (readDaily, twin.ts). Finished workouts are
@@ -17,7 +18,17 @@ const health = () => (mod ??= import("@capgo/capacitor-health"));
 // Weight, height, body fat and resting HR: setup, weigh-ins, TDEE and the health twin. Sleep, HRV, steps,
 // VO2 max and breathing rate: the health twin (twin.ts), the readiness call (sleep, HRV, resting HR,
 // breathing rate) and TDEE's activity level (steps).
-export const READ = ["weight", "height", "bodyFat", "restingHeartRate", "sleep", "heartRateVariability", "steps", "vo2Max", "respiratoryRate"] as const;
+export const READ = [
+  "weight",
+  "height",
+  "bodyFat",
+  "restingHeartRate",
+  "sleep",
+  "heartRateVariability",
+  "steps",
+  "vo2Max",
+  "respiratoryRate",
+] as const;
 export const WRITE = ["calories", "heartRate"] as const;
 
 export async function healthAvailable(): Promise<boolean> {
@@ -60,7 +71,11 @@ async function latest(dataType: (typeof READ)[number], days: number): Promise<nu
 export async function readHints(): Promise<HealthHints> {
   if (!(await healthAvailable())) return {};
   const safe = (p: Promise<number | undefined>) => p.catch(() => undefined);
-  const [bodyweight, height, restingHr] = await Promise.all([safe(latest("weight", 365)), safe(latest("height", 3650)), safe(latest("restingHeartRate", 30))]);
+  const [bodyweight, height, restingHr] = await Promise.all([
+    safe(latest("weight", 365)),
+    safe(latest("height", 3650)),
+    safe(latest("restingHeartRate", 30)),
+  ]);
   return { bodyweight, height: height !== undefined && height < 3 ? height * 100 : height, restingHr };
 }
 
@@ -94,7 +109,10 @@ export async function readBody(days: number): Promise<BodyReading[]> {
 }
 
 /** One reading per local day: that day's latest weight, with that day's latest body fat. Exported for tests. */
-export function pairBody(weights: readonly { value: number; startDate: string }[], fats: readonly { value: number; startDate: string }[]): BodyReading[] {
+export function pairBody(
+  weights: readonly { value: number; startDate: string }[],
+  fats: readonly { value: number; startDate: string }[],
+): BodyReading[] {
   const key = (iso: string) => {
     const d = new Date(iso);
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -150,7 +168,13 @@ export async function saveWorkout(w: { start: number; end: number; bodyweightKg:
   const endDate = new Date(w.end).toISOString();
   const metadata = { source: "Liftsmith", activity: "strengthTraining" };
   try {
-    await Health.saveSample({ dataType: "calories", value: strengthKcal((w.end - w.start) / 1000, w.bodyweightKg), startDate, endDate, metadata });
+    await Health.saveSample({
+      dataType: "calories",
+      value: strengthKcal((w.end - w.start) / 1000, w.bodyweightKg),
+      startDate,
+      endDate,
+      metadata,
+    });
     if (w.avgHr) await Health.saveSample({ dataType: "heartRate", value: w.avgHr, startDate, endDate, metadata });
   } catch {
     // Permission was revoked or the store is unavailable; the workout is still in the local log.
@@ -217,7 +241,12 @@ export function sleepNights(samples: readonly Sample[]): DailyReading[] {
 }
 
 /** One value per local day: the mean of that day's samples (HRV, breathing rate) or the latest (resting HR, VO2 max). Exported for tests. */
-export function perDay(metric: HealthMetric, samples: readonly Sample[], how: "mean" | "latest", ok: (v: number) => boolean): DailyReading[] {
+export function perDay(
+  metric: HealthMetric,
+  samples: readonly Sample[],
+  how: "mean" | "latest",
+  ok: (v: number) => boolean,
+): DailyReading[] {
   const by = new Map<string, { sum: number; n: number; latest: number; at: number }>();
   for (const s of samples) {
     const at = Date.parse(s.endDate || s.startDate);
@@ -226,7 +255,10 @@ export function perDay(metric: HealthMetric, samples: readonly Sample[], how: "m
     const cur = by.get(day) ?? { sum: 0, n: 0, latest: s.value, at: 0 };
     cur.sum += s.value;
     cur.n += 1;
-    if (at >= cur.at) { cur.at = at; cur.latest = s.value; }
+    if (at >= cur.at) {
+      cur.at = at;
+      cur.latest = s.value;
+    }
     by.set(day, cur);
   }
   return [...by.entries()]
@@ -254,15 +286,33 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
     try {
       const midnight = new Date(now);
       midnight.setHours(0, 0, 0, 0);
-      const r = await Health.queryAggregated({ dataType: "steps", startDate, endDate: midnight.toISOString(), bucket: "day", aggregation: "sum" });
+      const r = await Health.queryAggregated({
+        dataType: "steps",
+        startDate,
+        endDate: midnight.toISOString(),
+        bucket: "day",
+        aggregation: "sum",
+      });
       return r.samples
         .filter((s) => s.value > 0 && s.value < 100_000)
-        .map((s) => ({ metric: "steps" as const, day: localDayKey(Date.parse(s.startDate) + 12 * 3_600_000), value: Math.round(s.value), at: Date.parse(s.endDate) - 1 }));
+        .map((s) => ({
+          metric: "steps" as const,
+          day: localDayKey(Date.parse(s.startDate) + 12 * 3_600_000),
+          value: Math.round(s.value),
+          at: Date.parse(s.endDate) - 1,
+        }));
     } catch {
       return [];
     }
   };
-  const [sleep, hrv, rhr, vo2, breath, st] = await Promise.all([read("sleep"), read("heartRateVariability"), read("restingHeartRate"), read("vo2Max"), read("respiratoryRate"), steps()]);
+  const [sleep, hrv, rhr, vo2, breath, st] = await Promise.all([
+    read("sleep"),
+    read("heartRateVariability"),
+    read("restingHeartRate"),
+    read("vo2Max"),
+    read("respiratoryRate"),
+    steps(),
+  ]);
   return [
     ...sleepNights(sleep),
     ...perDay("hrv", hrv, "mean", (v) => v > 5 && v < 300),

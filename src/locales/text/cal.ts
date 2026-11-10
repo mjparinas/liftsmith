@@ -12,7 +12,8 @@ export const en = {
   "cal.add": "Add to my calendar",
   "cal.remove": "Remove from my calendar",
   "cal.fit": "Fit workouts around my calendar",
-  "cal.fitNote": "When something's coming up soon, Today offers a shorter workout that fits. Liftsmith only sees when you're busy, never what the events are, and it stays on this phone.",
+  "cal.fitNote":
+    "When something's coming up soon, Today offers a shorter workout that fits. Liftsmith only sees when you're busy, never what the events are, and it stays on this phone.",
   "cal.onOff": "On · Turn off",
   "cal.turnOn": "Turn on",
   "cal.downloaded": "Calendar file downloaded. Open it to add your training days.",
@@ -33,7 +34,8 @@ export const es: Partial<Record<Key, Message>> = {
   "cal.add": "Añadir a mi calendario",
   "cal.remove": "Quitar de mi calendario",
   "cal.fit": "Adaptar los entrenamientos a mi calendario",
-  "cal.fitNote": "Cuando tienes algo pronto, Hoy te ofrece un entrenamiento más corto que encaje. Liftsmith solo ve cuándo estás ocupado, nunca qué son los eventos, y no sale de este teléfono.",
+  "cal.fitNote":
+    "Cuando tienes algo pronto, Hoy te ofrece un entrenamiento más corto que encaje. Liftsmith solo ve cuándo estás ocupado, nunca qué son los eventos, y no sale de este teléfono.",
   "cal.onOff": "Activado · Desactivar",
   "cal.turnOn": "Activar",
   "cal.downloaded": "Archivo de calendario descargado. Ábrelo para añadir tus días de entrenamiento.",
@@ -52,7 +54,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "cal.add": "Ajouter à mon calendrier",
   "cal.remove": "Retirer de mon calendrier",
   "cal.fit": "Adapter les séances à mon calendrier",
-  "cal.fitNote": "Quand quelque chose arrive bientôt, Aujourd’hui propose une séance plus courte qui tient. Liftsmith voit seulement quand vous êtes occupé, jamais le contenu des événements, et rien ne quitte ce téléphone.",
+  "cal.fitNote":
+    "Quand quelque chose arrive bientôt, Aujourd’hui propose une séance plus courte qui tient. Liftsmith voit seulement quand vous êtes occupé, jamais le contenu des événements, et rien ne quitte ce téléphone.",
   "cal.onOff": "Activé · Désactiver",
   "cal.turnOn": "Activer",
   "cal.downloaded": "Fichier de calendrier téléchargé. Ouvrez-le pour ajouter vos jours d’entraînement.",
