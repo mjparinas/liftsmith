@@ -151,9 +151,13 @@ export default function Privacy() {
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>
       <p className="mt-2">
         Turn usage stats off in Settings. Erase everything on your device from Settings › Erase this device. Delete your account and
-        everything synced to it from Settings › Account and sync (sign in at www.getliftsmith.com/app/ to do it from a browser). To ask what
-        we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under Settings › Usage
-        stats) and we&apos;ll do it within 30 days.
+        everything synced to it from Settings › Account and sync (sign in at www.getliftsmith.com/app/ to do it from a browser; every way to
+        delete, and what&apos;s kept, is on{" "}
+        <a className="text-accent underline" href="/delete-account/">
+          Delete your account
+        </a>
+        ). To ask what we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under
+        Settings › Usage stats) and we&apos;ll do it within 30 days.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Contact</h2>

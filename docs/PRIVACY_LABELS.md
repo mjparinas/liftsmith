@@ -32,7 +32,7 @@ Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off u
 - Does your app collect or share any of the required user data types? **Yes.**
 - Is all of the user data collected by your app encrypted in transit? **Yes** (HTTPS only).
 - Do you provide a way for users to request that their data is deleted? **Yes** (Settings › Account and sync › Delete my account deletes the account and its synced copy; Settings › Erase this device resets the install id; deletion on request through in-app feedback with the install id).
-- Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/app/#/account (sign in, then Delete my account).
+- Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/delete-account/ (2026-11-10: names the app, gives the in-app steps, the web app path and an email route from the account address, and lists what is deleted, kept and for how long). Deleting some data without deleting the account: **Yes** (cycle logs, email reminders and usage stats in Settings; anything else by email within 30 days).
 - **Shared** with third parties: **none** (Vercel, Turso, Resend and RevenueCat are service providers acting for us, which Play does not count as sharing).
 
 Collected data types:
