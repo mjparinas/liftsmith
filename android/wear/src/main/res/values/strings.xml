@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Liftsmith</string>
+    <string name="channel">Workout in progress</string>
+    <string name="in_progress">Workout in progress</string>
+    <string name="none_title">No workout running</string>
+    <string name="none_body">Start one on your phone and it shows here.</string>
+    <string name="log_set">Log set</string>
+    <string name="add_30">+30 s</string>
+    <string name="up_next">Next: %1$s</string>
+    <string name="rest_left">Rest, %1$s left</string>
+    <string name="bpm">♥ %1$d bpm</string>
+</resources>

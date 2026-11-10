@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app's dark tokens (src/app/globals.css): watches are always dark. -->
+<resources>
+    <color name="bg">#080B10</color>
+    <color name="ink">#EEF2F7</color>
+    <color name="dim">#A3AEBD</color>
+    <color name="accent">#4C8DFF</color>
+    <color name="accent_ink">#06122A</color>
+    <color name="card">#1A2230</color>
+    <color name="heart">#F0605D</color>
+</resources>

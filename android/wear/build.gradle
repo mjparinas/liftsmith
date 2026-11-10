@@ -1,0 +1,48 @@
+apply plugin: 'com.android.application'
+
+// The Wear OS app: the workout running on the phone, on the wrist (docs/decisions/watch-apps.md).
+// Same application id and signing key as the phone app, which the Data Layer needs to pair them.
+android {
+    namespace = "com.getliftsmith.app.wear"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "com.getliftsmith.app"
+        // Wear OS 3 and up (API 30), the Data Layer and foreground health services the app relies on.
+        minSdkVersion 30
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        // Play needs every bundle of one app to have its own version code, so the watch's sits well above the
+        // phone's (both come from the release run number; see .github/workflows/release.yml).
+        versionCode(((System.getenv("VERSION_CODE") ?: "1") as int) + 100000000)
+        versionName(System.getenv("VERSION_NAME") ?: "0.1.0")
+    }
+    signingConfigs {
+        release {
+            if (System.getenv("ANDROID_KEYSTORE_PATH")) {
+                storeFile file(System.getenv("ANDROID_KEYSTORE_PATH"))
+                storePassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+                keyAlias System.getenv("ANDROID_KEY_ALIAS") ?: "upload"
+                keyPassword System.getenv("ANDROID_KEYSTORE_PASSWORD")
+            }
+        }
+    }
+    buildTypes {
+        release {
+            if (System.getenv("ANDROID_KEYSTORE_PATH")) signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+}
+
+dependencies {
+    implementation "androidx.core:core:$androidxCoreVersion"
+    implementation "com.google.android.gms:play-services-wearable:$playServicesWearableVersion"
+    // Ongoing Activity: the workout's icon on the watch face and in the recents list while it runs.
+    implementation "androidx.wear:wear-ongoing:$wearOngoingVersion"
+    testImplementation "junit:junit:$junitVersion"
+    // Android's own org.json is a stub in local unit tests.
+    testImplementation "org.json:json:20250517"
+}

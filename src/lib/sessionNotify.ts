@@ -28,6 +28,8 @@ export interface SessionState {
   /** Working sets logged so far and planned in the whole workout, for the progress bar on both platforms. */
   done?: number;
   total?: number;
+  /** The workout's id: the watch apps open themselves once per workout (watch-apps.md). */
+  sessionId?: string;
 }
 
 /** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
@@ -44,6 +46,7 @@ type Plugin = {
   stop(): Promise<void>;
   requestPermission(): Promise<{ granted: boolean }>;
   addListener(event: "action", cb: (e: { action: SessionAction }) => void): Promise<Handle>;
+  addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Promise<Handle>;
 };
 const plugin = (): Plugin | undefined =>
   typeof window !== "undefined"
@@ -100,6 +103,14 @@ export function onSessionAction(cb: (a: SessionAction) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
   const handle = p.addListener("action", (e) => cb(e.action));
+  return () => void handle.then((h) => h.remove());
+}
+
+/** Heart rate from the watch app's own sensor (Wear OS or Apple Watch), about every 2 s. Returns an unsubscribe function. */
+export function onWatchHeartRate(cb: (bpm: number) => void): () => void {
+  const p = plugin();
+  if (!p || !isNative()) return () => {};
+  const handle = p.addListener("heartRate", (e) => cb(e.bpm));
   return () => void handle.then((h) => h.remove());
 }
 
