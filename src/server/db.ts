@@ -243,6 +243,16 @@ const SCHEMA = [
     detail TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS job_runs_job ON job_runs (job, started_at)`,
+  // Private staff notes on an account (Users tab, src/server/adminUsers.ts). Never shown to the lifter; deleted
+  // with the account.
+  `CREATE TABLE IF NOT EXISTS account_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    author TEXT NOT NULL,
+    text TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_notes_account ON account_notes (account_id)`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
