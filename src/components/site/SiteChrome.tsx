@@ -35,6 +35,7 @@ export const NAV = [
   { href: "/guides/", label: "Guides" },
   { href: "/blog/", label: "Blog" },
   { href: "/tools/", label: "Tools" },
+  { href: "/pricing/", label: "Pricing" },
 ] as const;
 
 export function SiteHeader() {
@@ -81,7 +82,7 @@ export function SiteFooter() {
   );
   return (
     <footer className="border-t border-line">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1fr_1fr]">
         <div>
           <p className="text-lg font-bold">{BRAND.name}</p>
           <p className="mt-2 max-w-sm text-sm text-muted">
@@ -92,7 +93,8 @@ export function SiteFooter() {
         {col("Product", [
           { href: APP_PATH, label: "Open the app" },
           { href: "/#features", label: "Features" },
-          { href: "/#pricing", label: "Pricing" },
+          { href: "/pricing/", label: "Pricing" },
+          { href: "/whats-new/", label: "What's new" },
           { href: "/me/", label: "Your dashboard" },
         ])}
         {col("Learn", [
@@ -107,12 +109,19 @@ export function SiteFooter() {
           { href: "/tools/one-rep-max-calculator/", label: "One-rep max calculator" },
           { href: "/tools/tdee-calculator/", label: "TDEE calculator" },
         ])}
+        {col("Support", [
+          { href: "/help/", label: "Help and questions" },
+          { href: "/contact/", label: "Contact us" },
+          { href: "/status/", label: "Service status" },
+          { href: "/delete-account/", label: "Delete your account" },
+        ])}
         {col("Company", [
+          { href: "/about/", label: "About us" },
           { href: "/compare/", label: "Compare apps" },
           { href: "/privacy/", label: "Privacy" },
+          { href: "/terms/", label: "Terms of use" },
           { href: "/trust/", label: "Trust centre" },
-          { href: "/delete-account/", label: "Delete your account" },
-          { href: "/#faq", label: "FAQ" },
+          { href: "/accessibility/", label: "Accessibility" },
         ])}
       </div>
       <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted">

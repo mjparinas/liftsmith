@@ -8,6 +8,7 @@ import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { alternatives } from "./generator";
 import { SITE_URL } from "./site";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
+import { WHATS_NEW } from "./whatsNew";
 
 /** frontDelts → front-delts. */
 export const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -172,6 +173,14 @@ export function siteRoutes(): Route[] {
     { path: "/privacy/", priority: 0.2 },
     { path: "/delete-account/", priority: 0.2 },
     { path: "/trust/", priority: 0.3 },
+    { path: "/terms/", priority: 0.2 },
+    { path: "/accessibility/", priority: 0.3 },
+    { path: "/pricing/", priority: 0.8 },
+    { path: "/help/", priority: 0.6 },
+    { path: "/contact/", priority: 0.4 },
+    { path: "/about/", priority: 0.4 },
+    { path: "/whats-new/", priority: 0.5, date: WHATS_NEW[0]?.day },
+    { path: "/status/", priority: 0.2 },
     { path: "/compare/", priority: 0.6 },
     { path: "/alternatives/fitbod/", priority: 0.7 },
     ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),

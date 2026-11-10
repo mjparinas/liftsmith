@@ -5,7 +5,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 
 import { BRAND } from "@/lib/brand";
-import { FAQS } from "@/lib/faqs";
+import { ALL_FAQS } from "@/lib/faqs";
 import { DEFAULT_REPLIES, fillReply, repliesProblem, type SavedReply } from "@/lib/savedReplies";
 
 import { getSetting } from "./settings";
@@ -30,7 +30,7 @@ export async function savedReplies(): Promise<SavedReply[]> {
 
 /** The fixed part of the request: who we are, how to write, and everything the draft may draw on. */
 export async function draftInstructions(): Promise<string> {
-  const faqs = FAQS.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n");
+  const faqs = ALL_FAQS.map((f) => `Q: ${f.q}\nA: ${f.a}`).join("\n\n");
   const replies = (await savedReplies()).map((r) => `${r.title}:\n${fillReply(r.body)}`).join("\n\n");
   return `You draft email replies for the owner of ${BRAND.name}, a strength training app for Android, iPhone and the web that plans each workout from the lifter's equipment, recovery and training block. The owner reads every draft and changes it before it is sent.
 

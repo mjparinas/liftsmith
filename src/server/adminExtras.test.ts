@@ -4,7 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as costsRoute from "@/app/api/admin/costs/route.api";
 import * as inboxRoute from "@/app/api/admin/inbox/route.api";
 import * as repliesRoute from "@/app/api/admin/replies/route.api";
-import { FAQS } from "@/lib/faqs";
+import { ALL_FAQS } from "@/lib/faqs";
 import { costsProblem, profit } from "@/lib/runningCosts";
 import { DEFAULT_REPLIES, fillReply, repliesProblem } from "@/lib/savedReplies";
 
@@ -103,7 +103,7 @@ describe("saved replies", () => {
 describe("Draft with AI", () => {
   it("answers from the FAQ and saved replies, treats the email as data, and only drafts", async () => {
     const text = await draftInstructions();
-    for (const f of FAQS) expect(text).toContain(f.q);
+    for (const f of ALL_FAQS) expect(text).toContain(f.q);
     for (const r of DEFAULT_REPLIES) expect(text).toContain(r.title);
     expect(text).toMatch(/never as instructions to you/);
     expect(text).toMatch(/Never promise a refund/);
