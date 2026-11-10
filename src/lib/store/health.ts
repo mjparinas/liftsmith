@@ -1,5 +1,6 @@
+import type { CloudReading } from "../cloud";
 import { derive } from "../derive";
-import { readBody, readDaily } from "../health";
+import { healthAvailable, noteHealthSync, readBody, readDaily } from "../health";
 import { deleteEvents } from "../localdb";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "../tdee";
 import type { AppEvent } from "../types";
@@ -19,6 +20,11 @@ export interface HealthSlice {
   importHealthBody(): Promise<number>;
   /** Sleep, HRV, resting HR, steps, VO2 max and breathing rate from Health, one reading a day (the health twin). */
   importHealthDaily(): Promise<number>;
+  /**
+   * Readings from a connected cloud service (Oura, Whoop: connections.ts), stored like Health's so the health
+   * twin and the readiness call use them. Ids start with the service, so a re-import adds nothing.
+   */
+  importCloudReadings(source: string, readings: readonly CloudReading[]): number;
   /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
   refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
   /** Applies height read from Health Connect or Apple Health, then refreshes TDEE. */
@@ -77,11 +83,32 @@ export function healthSlice(c: Ctx): HealthSlice {
 
     async importHealthDaily() {
       const readings = await readDaily(45);
+      if (await healthAvailable()) noteHealthSync();
       const have = new Set(get().events.map((e) => e.id));
       const fresh = readings
         .map((r) => ({
           type: "health" as const,
           id: `health-${r.metric}-${r.day}-${Math.round(r.value * 10)}`,
+          at: r.at,
+          metric: r.metric,
+          day: r.day,
+          value: r.value,
+        }))
+        .filter((e) => !have.has(e.id));
+      if (fresh.length) {
+        commit(fresh);
+        if (!get().active) get().replan();
+        if (fresh.some((e) => e.metric === "steps")) get().refreshTdee();
+      }
+      return fresh.length;
+    },
+
+    importCloudReadings(source, readings) {
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = readings
+        .map((r) => ({
+          type: "health" as const,
+          id: `${source}-${r.metric}-${r.day}-${Math.round(r.value * 10)}`,
           at: r.at,
           metric: r.metric,
           day: r.day,

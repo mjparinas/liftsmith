@@ -173,6 +173,9 @@ try {
   await page.getByRole("heading", { name: "Account and sync" }).waitFor();
   await page.getByRole("button", { name: "Continue with email" }).click();
   await scan("account");
+  await page.goto(`${server.url}/app/#/connections`);
+  await page.getByRole("heading", { name: "Connected apps" }).waitFor();
+  await scan("connections");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();

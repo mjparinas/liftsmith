@@ -319,6 +319,36 @@ const SCHEMA = [
     day INTEGER PRIMARY KEY,
     bytes INTEGER NOT NULL
   )`,
+  // Connected apps (src/server/connect.ts): one row per account and cloud service (Strava, Oura, Whoop). The
+  // tokens are encrypted with a key made from that service's client secret, so a copy of the database alone
+  // can't use them. Deleted with the account, and on Disconnect (after revoking the token at the service).
+  `CREATE TABLE IF NOT EXISTS connections (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    access_token TEXT NOT NULL,
+    refresh_token TEXT,
+    expires_at INTEGER NOT NULL,
+    who TEXT,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider)
+  )`,
+  // One-time OAuth states: the app asks for one while signed in, the service sends it back to the callback.
+  `CREATE TABLE IF NOT EXISTS connect_states (
+    state TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    expires_at INTEGER NOT NULL
+  )`,
+  // Workouts already posted to Strava, so a retry from a second device or a flaky network never posts twice.
+  `CREATE TABLE IF NOT EXISTS connect_uploads (
+    account_id TEXT NOT NULL,
+    provider TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    remote_id TEXT,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, provider, session_id)
+  )`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,

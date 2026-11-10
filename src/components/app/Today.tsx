@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
+import { musicLink, openOutside } from "@/lib/connections";
 import { exercise } from "@/lib/exercises";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { clockTime, list, t } from "@/lib/i18n";
@@ -163,6 +164,16 @@ export function Today() {
             <Icon name="target" size={15} className="text-ember" />
             {t("today.goalMore", { count: streak.needed })}
           </span>
+        )}
+        {preview && !active && profile.connections?.music && (
+          <button
+            type="button"
+            onClick={() => openOutside(musicLink(profile.connections!.music!, preview.call))}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5"
+          >
+            <Icon name="play" size={15} className="text-cyan" />
+            {t("conn.music.play", { mood: t(`conn.music.${preview.call}`) })}
+          </button>
         )}
         <button
           type="button"

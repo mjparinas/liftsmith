@@ -24,6 +24,7 @@ import * as callText from "./text/callText";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as coach from "./text/coach";
+import * as conn from "./text/conn";
 import * as cos from "./text/cos";
 import * as count from "./text/count";
 import * as creator from "./text/creator";
@@ -116,6 +117,7 @@ export const en = {
   ...category.en,
   ...cause.en,
   ...coach.en,
+  ...conn.en,
   ...cos.en,
   ...count.en,
   ...creator.en,

@@ -22,6 +22,7 @@ import * as callText from "./text/callText";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as coach from "./text/coach";
+import * as conn from "./text/conn";
 import * as cos from "./text/cos";
 import * as count from "./text/count";
 import * as creator from "./text/creator";
@@ -114,6 +115,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...category.fr,
   ...cause.fr,
   ...coach.fr,
+  ...conn.fr,
   ...cos.fr,
   ...count.fr,
   ...creator.fr,

@@ -21,6 +21,7 @@ import { fromKg, plainNum, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { CalendarSettings } from "./CalendarSettings";
+import { ConnectionsRow } from "./Connections";
 import { CreatorCode } from "./CreatorCode";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
@@ -122,6 +123,7 @@ export function Settings() {
         </p>
       )}
       <AccountRow />
+      <ConnectionsRow />
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("setup")}>
         {t("settings.rerun")}
       </Button>

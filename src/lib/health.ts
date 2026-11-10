@@ -322,3 +322,51 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
     ...st,
   ];
 }
+
+// --- Connected apps (Connections.tsx): status, permissions and Sync now ---
+
+export type HealthPerm = (typeof READ)[number] | (typeof WRITE)[number];
+
+/**
+ * What the lifter allowed. Health Connect says which reads and writes were allowed; Apple Health never
+ * tells an app about reads (privacy), so on iOS `reads` is null and only writes are known.
+ */
+export async function healthPermissions(): Promise<{ reads: HealthPerm[] | null; writes: HealthPerm[] } | null> {
+  if (!(await healthAvailable())) return null;
+  try {
+    const r = await (await health()).Health.checkAuthorization({ read: [...READ], write: [...WRITE] });
+    const ios = (await import("@capacitor/core")).Capacitor.getPlatform() === "ios";
+    return { reads: ios ? null : (r.readAuthorized as HealthPerm[]), writes: r.writeAuthorized as HealthPerm[] };
+  } catch {
+    return null;
+  }
+}
+
+/** Health Connect's own settings for Liftsmith (Android): change permissions, or install Health Connect. */
+export async function openHealthSettings(): Promise<boolean> {
+  if (!isNative()) return false;
+  try {
+    await (await health()).Health.openHealthConnectSettings();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+const LAST_KEY = "ls.health.last";
+
+/** When Health was last read (ms), on this device. */
+export function healthLastSync(): number | null {
+  try {
+    const v = Number(localStorage.getItem(LAST_KEY));
+    return v > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+export function noteHealthSync(at = Date.now()): void {
+  try {
+    localStorage.setItem(LAST_KEY, String(at));
+  } catch {}
+}
