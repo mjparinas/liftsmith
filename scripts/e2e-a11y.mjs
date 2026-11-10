@@ -150,6 +150,7 @@ try {
     "/compare/",
     "/compare/fitbod/",
     "/alternatives/fitbod/",
+    "/trust/",
   ]) {
     await page.goto(`${server.url}${path}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
