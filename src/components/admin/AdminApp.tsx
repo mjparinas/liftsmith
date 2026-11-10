@@ -456,7 +456,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       {admin && (
         <Card
           title={form.code && rows.some((r) => r.code === form.code.toUpperCase()) ? `Edit ${form.code.toUpperCase()}` : "Add a code"}
-          subtitle="Its link is www.getliftsmith.com/c/<code>, or people type it under Settings › Redeem a code. The trial and offering decide what it gives: a longer trial through creator30, or a discount through any RevenueCat offering whose store products carry it (set those up in RevenueCat, Play Console and App Store Connect first)."
+          subtitle="Its link is www.getliftsmith.com/c/<code>, or people type it under Settings › Redeem a code. The trial and offering decide what it gives: a longer trial through creator30, or a discount through any RevenueCat offering whose store products carry it (set those up in RevenueCat, Play Console and App Store Connect first). On Google Play, tag the code's offer with the offering id and rc-ignore-offer."
         >
           <div className="mb-3 flex gap-2 text-sm" role="group" aria-label="Kind of code">
             {(["creator", "promo"] as const).map((k) => (
