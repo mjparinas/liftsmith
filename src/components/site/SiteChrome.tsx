@@ -101,6 +101,7 @@ export function SiteFooter() {
         {col("Company", [
           { href: "/compare/", label: "Compare apps" },
           { href: "/privacy/", label: "Privacy" },
+          { href: "/delete-account/", label: "Delete your account" },
           { href: "/#faq", label: "FAQ" },
         ])}
       </div>
