@@ -7,8 +7,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        excludeWebStorageFromBackup()
         return true
+    }
+
+    /// Keeps the web view's storage (IndexedDB, localStorage: workouts, health readings, injuries,
+    /// cycle logs, progress photos and the account session token) out of iCloud and computer backups,
+    /// like Android's data_extraction_rules.xml. Signing in and sync carry the data instead.
+    /// Excluding the folder covers everything WebKit writes inside it later.
+    private func excludeWebStorageFromBackup() {
+        guard let library = FileManager.default.urls(for: .libraryDirectory, in: .userDomainMask).first else { return }
+        var webKit = library.appendingPathComponent("WebKit", isDirectory: true)
+        do {
+            try FileManager.default.createDirectory(at: webKit, withIntermediateDirectories: true)
+            var values = URLResourceValues()
+            values.isExcludedFromBackup = true
+            try webKit.setResourceValues(values)
+        } catch {
+            NSLog("Liftsmith: could not exclude web storage from backup: \(error)")
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {

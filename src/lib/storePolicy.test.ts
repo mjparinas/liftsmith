@@ -1,6 +1,7 @@
 // Store review rules that live in config files rather than code: the Android manifest must ask for
 // exactly the Health Connect permissions health.ts uses (Play rejects unused ones), and precise
-// location must stop at Android 11, where Bluetooth scanning no longer needs it.
+// location must stop at Android 11, where Bluetooth scanning no longer needs it. The web view's
+// storage stays out of phone backups on both platforms.
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -72,5 +73,24 @@ describe("Play store policy config", () => {
     ])
       expect(page).toContain(t);
     expect(page).not.toMatch(/blood|oxygen saturation|nutrition/i);
+  });
+
+  it("keeps the web view's storage out of Google backup and device transfer", () => {
+    expect(manifest).toContain('android:dataExtractionRules="@xml/data_extraction_rules"');
+    expect(manifest).toContain('android:fullBackupContent="@xml/full_backup_content"');
+    const res = (name: string) => readFileSync(join(root, `android/app/src/main/res/xml/${name}.xml`), "utf8");
+    const rules = res("data_extraction_rules");
+    for (const section of ["cloud-backup", "device-transfer"]) {
+      const body = rules.match(new RegExp(`<${section}>([\\s\\S]*?)</${section}>`))?.[1] ?? "";
+      expect(body).toContain('<exclude domain="root" path="app_webview/" />');
+    }
+    expect(res("full_backup_content")).toContain('<exclude domain="root" path="app_webview/" />');
+  });
+
+  it("keeps the web view's storage out of iCloud backup", () => {
+    const appDelegate = readFileSync(join(root, "ios/App/App/AppDelegate.swift"), "utf8");
+    expect(appDelegate).toMatch(/didFinishLaunchingWithOptions[\s\S]*?excludeWebStorageFromBackup\(\)/);
+    expect(appDelegate).toContain('appendingPathComponent("WebKit"');
+    expect(appDelegate).toContain("isExcludedFromBackup = true");
   });
 });

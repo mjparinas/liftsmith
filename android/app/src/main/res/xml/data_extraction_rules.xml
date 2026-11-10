@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Android 12+: keep the web view's storage (IndexedDB, localStorage, cache) out of Google's cloud
+     backup and out of phone-to-phone transfer. It holds workouts, health readings, injuries, cycle
+     logs, progress photos and the account session token. Signing in and sync carry the data instead.
+     Keep in step with full_backup_content.xml (Android 11 and older). -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="app_webview/" />
+        <exclude domain="sharedpref" path="WebViewChromiumPrefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="app_webview/" />
+        <exclude domain="sharedpref" path="WebViewChromiumPrefs.xml" />
+    </device-transfer>
+</data-extraction-rules>
