@@ -27,6 +27,7 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
       { title: "Usage stats you control", note: "No advertising id. Off by default in the EU and UK, off anytime in Settings." },
       { title: "No cookies on this website", note: "Visits are counted without cookies, and Global Privacy Control turns it off." },
       { title: "Delete anytime", note: "Your account and everything synced to it, in a few taps." },
+      { title: "Where synced data lives", note: "In our own Turso database. Never with ad networks or data brokers." },
     ],
   },
   {
@@ -70,7 +71,7 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
   {
     title: "Email and AI",
     controls: [
-      { title: "Signed email (SPF and DKIM)", note: "Mail from getliftsmith.com can be checked as really ours." },
+      { title: "SPF, DKIM and DMARC", note: "Mail from getliftsmith.com is signed, and fakes are sent to spam." },
       { title: "Nothing until you confirm", note: "Reminder emails need a confirmed address, with one-click unsubscribe." },
       { title: "AI drafts, human replies", note: "A person reads and sends every reply to your email." },
     ],
