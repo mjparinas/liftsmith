@@ -24,6 +24,7 @@ import { useNow } from "@/lib/useNow";
 import { drillSeconds, warmupRoutine, type Drill } from "@/lib/warmupRoutine";
 import type { MessageKey } from "@/locales/en";
 
+import { openStats } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { RoutinesSheet } from "./Routines";
@@ -471,7 +472,9 @@ export function StrengthCard() {
             {tr("x.adjustAge")}
           </label>
         ) : (
-          <p className="mt-4 text-xs text-faint">{tr("x.addBirth")}</p>
+          <button type="button" onClick={openStats} className="press mt-3 min-h-11 text-left text-sm font-semibold text-accent">
+            {tr("x.addBirth")} ›
+          </button>
         )}
       </div>
       {tw.length > 0 && (

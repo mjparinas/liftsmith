@@ -28,3 +28,23 @@ export function fmtNum(n: number): string {
 export function fmtWeight(kg: number, unit: Unit): string {
   return `${fmtNum(fromKg(kg, unit))} ${unit}`;
 }
+
+export const CM_PER_IN = 2.54;
+
+/** Centimetres as whole feet and inches (5 ft 10 in), rounded to the nearest inch. */
+export function cmToFtIn(cm: number): { ft: number; inch: number } {
+  const total = Math.round(cm / CM_PER_IN);
+  return { ft: Math.floor(total / 12), inch: total % 12 };
+}
+
+/** Feet and inches as centimetres, to 0.1 cm. */
+export function ftInToCm(ft: number, inch: number): number {
+  return Math.round((ft * 12 + inch) * CM_PER_IN * 10) / 10;
+}
+
+/** A height for display: 177 cm, or 5′ 10″ when the lifter uses pounds. */
+export function fmtHeight(cm: number, unit: Unit): string {
+  if (unit === "kg") return `${fmtNum(Math.round(cm))} cm`;
+  const { ft, inch } = cmToFtIn(cm);
+  return `${ft}′ ${inch}″`;
+}

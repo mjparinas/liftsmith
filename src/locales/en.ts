@@ -92,6 +92,7 @@ import * as settings from "./text/settings";
 import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
+import * as stats from "./text/stats";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
@@ -200,6 +201,7 @@ export const en = {
   ...setup.en,
   ...share.en,
   ...sig.en,
+  ...stats.en,
   ...tab.en,
   ...td.en,
   ...tdee.en,

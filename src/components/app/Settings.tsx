@@ -25,6 +25,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fromKg, plainNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
+import { BodyStats } from "./BodyStats";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
@@ -55,6 +56,8 @@ const LEGACY: Record<string, [Group, string]> = {
   saving: ["data", "saving"],
   themes: ["look", "themes"],
   accessibility: ["look", "accessibility"],
+  // Your stats (BodyStats.tsx): every screen that needs age, sex or height links here.
+  stats: ["body", "stats"],
 };
 
 function Row<T extends string | number>({
@@ -464,11 +467,15 @@ function AccessibilitySettings() {
   );
 }
 
-/** Body and units: units, the body weight the plan uses (from the last weigh-in), and cycle-aware readiness. */
+/**
+ * Body and units: Your stats (sex, age, height: the one place every tool reads them from), units, the body
+ * weight the plan uses (from the last weigh-in), and cycle-aware readiness.
+ */
 function BodyGroup() {
   const { profile, setProfile } = useApp();
   return (
     <>
+      <BodyStats />
       <Section title={t("settings.units")}>
         <div className="flex flex-wrap gap-2" role="group" aria-label={t("settings.units")}>
           {(

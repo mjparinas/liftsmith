@@ -319,17 +319,29 @@ export function tdeeHistory(events: AppEvent[]): TdeeEvent[] {
 
 export interface BodyReadings {
   height?: { value: number; at: number };
+  /** Apple Health only (Health Connect stores neither). */
+  sex?: "male" | "female";
+  birthYear?: number;
 }
 
 /**
- * What a health reading changes: a new height goes to the profile. Weigh-ins and body fat come in as
- * bodyweight events through the store's importHealthBody (one per day, `health-bw-<day>`), so there is
- * one import path for them. Out-of-range readings are ignored.
+ * What a health reading changes: a new height goes to the profile, unless the lifter typed a height after it
+ * was measured. Sex and birth year fill in only when Your stats has none, so what the lifter set wins.
+ * Weigh-ins and body fat come in as bodyweight events through the store's importHealthBody (one per day,
+ * `health-bw-<day>`), so there is one import path for them. Out-of-range readings are ignored.
  */
-export function bodyUpdates(r: BodyReadings, profile: Profile): Partial<Profile> {
+export function bodyUpdates(r: BodyReadings, profile: Profile, now = Date.now()): Partial<Profile> {
   const p: Partial<Profile> = {};
-  if (r.height && inRange(r.height.value, 100, 250) && Math.abs((profile.heightCm ?? 0) - r.height.value) >= 1)
+  if (
+    r.height &&
+    inRange(r.height.value, 100, 250) &&
+    Math.abs((profile.heightCm ?? 0) - r.height.value) >= 1 &&
+    !(profile.heightCm && profile.heightAt && profile.heightAt > r.height.at)
+  )
     p.heightCm = Math.round(r.height.value);
+  if (r.sex && !profile.sex) p.sex = r.sex;
+  const year = new Date(now).getFullYear();
+  if (r.birthYear && !profile.birthYear && inRange(year - r.birthYear, 13, 100)) p.birthYear = r.birthYear;
   return p;
 }
 

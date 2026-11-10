@@ -32,20 +32,25 @@ describe("Tools › TDEE", () => {
     expect(screen.getByText("Surpoids")).toBeInTheDocument();
   });
 
-  it("asks for what's missing, filled in with bump buttons, then shows TDEE", async () => {
+  it("reads sex, age and height from Your stats, and links there when they're missing", async () => {
     const user = userEvent.setup();
-    render(<Tools arg="tdee" />);
+    const { unmount } = render(<Tools arg="tdee" />);
     expect(screen.getByText("Add your sex, age, and height to see your TDEE.")).toBeInTheDocument();
+    expect(
+      screen.getByText("This needs your sex, age, and height. Set them once in Your stats and every tool uses them."),
+    ).toBeInTheDocument();
+    // No boxes for them here: Your stats is the one place.
+    expect(screen.queryByLabelText("Age")).toBeNull();
+    await user.click(screen.getByRole("button", { name: /Add your stats/ }));
+    expect(window.location.hash).toBe("#/settings/stats");
+    unmount();
 
-    await user.click(screen.getByRole("button", { name: "Male" }));
-    await user.click(screen.getByRole("button", { name: "More age" }));
-    await user.click(screen.getByRole("button", { name: "More height" }));
-    // The first tap lands on a typical value (30, and 177 cm for a man), not one step past it.
-    expect(screen.getByLabelText("Age")).toHaveValue("30");
-    expect(screen.getByLabelText("Height (cm)")).toHaveValue("177");
+    useApp.getState().setProfile({ sex: "male", birthYear: new Date().getFullYear() - 30, heightCm: 177 });
+    render(<Tools arg="tdee" />);
     // Mifflin: 10×80 + 6.25×177 − 5×30 + 5 = 1761 BMR; ×1.55 (3 days a week goal) = 2730.
     expect(screen.getByTestId("tdee-value")).toHaveTextContent("2,730");
-    expect(screen.getByText(/From your goal of 3 days a week/)).toBeInTheDocument();
+    expect(screen.getByText("177 cm")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Edit your stats/ })).toBeInTheDocument();
   });
 
   it("records a snapshot when inputs change and charts the history", async () => {

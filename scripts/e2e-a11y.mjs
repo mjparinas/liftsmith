@@ -122,12 +122,18 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
-  // Tools › TDEE, filled in with bump buttons, and the public calculator page.
+  // Tools › TDEE without stats (it links to Your stats), Your stats filled in with bump buttons, then TDEE
+  // reading them, and the public calculator page.
   await page.goto(`${server.url}/app/#/tools/tdee`);
   await page.getByRole("heading", { name: "TDEE calculator" }).waitFor();
+  await page.getByRole("button", { name: /Add your stats/ }).waitFor();
+  await scan("tdee, stats missing");
+  await page.getByRole("button", { name: /Add your stats/ }).click();
   await page.getByRole("button", { name: "Male", exact: true }).click();
   await page.getByRole("button", { name: "More age" }).click();
   await page.getByRole("button", { name: "More height" }).click();
+  await scan("your stats");
+  await page.goto(`${server.url}/app/#/tools/tdee`);
   await page.getByTestId("tdee-value").waitFor();
   await scan("tdee");
   await page.goto(`${server.url}/tools/tdee-calculator/`);

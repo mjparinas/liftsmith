@@ -69,5 +69,6 @@ Health Connect: the permissions declaration form still applies to the on-device 
   - Purchases › Purchase History: App Functionality, Analytics (RevenueCat checks the store receipt).
   - Location › Coarse Location (country from IP): Analytics.
 - Health & Fitness without an account: **not collected** (Apple Health data stays on the device). With an account it's synced to the user's own account (above), never used for tracking.
+- Apple Health reads also include **sex and date of birth** (2026-11-10, Your stats): only the birth year is kept, in the profile, the same field the lifter can type. Health Connect has neither, so Android's declaration is unchanged.
 
 The privacy manifest (`PrivacyInfo.xcprivacy`) declares the same "not linked, not tracking" types for analytics.

@@ -26,6 +26,7 @@ import type { Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
+import { StatsNeeded } from "./BodyStats";
 import { ago } from "./format";
 import { HUE } from "./theme";
 import { Chip, EmptyState, Section, Sheet } from "./ui";
@@ -315,9 +316,9 @@ export function DotsCard() {
   const { events, profile } = useApp();
   const now = useNow(3600_000);
   const unit = profile.unit;
-  // The formula follows the sex set in the profile; the picker shows only when it isn't set (Melvin, 2026-11-09).
-  const [picked, setSex] = useState<"male" | "female">("male");
-  const sex = profile.sex ?? picked;
+  // The formula follows the sex in Your stats (Melvin, 2026-11-09). Without one there's no score, and the card
+  // links to Your stats instead (Melvin, 2026-11-10: tools read stats from one place).
+  const sex = profile.sex ?? "male";
   const rep = useMemo(() => dotsFromData(events, profile, now, sex), [events, profile, now, sex]);
   // Overrides in the lifter's unit, adjusted with steppers.
   const [edit, setEdit] = useState<Partial<Record<DotsLift | "bw", number>>>({});
@@ -326,7 +327,7 @@ export function DotsCard() {
   const bw = edit.bw !== undefined ? toKg(edit.bw, unit) : rep.bodyweight;
   const total = lifts.reduce((s, k) => s + kgOf(k), 0);
   const complete = lifts.every((k) => kgOf(k) > 0) && bw > 0;
-  const score = complete ? dots(total, bw, sex) : null;
+  const score = complete && profile.sex ? dots(total, bw, sex) : null;
   const missing = lifts.filter((k) => !(kgOf(k) > 0)).map((k) => liftName(k));
   const edited = Object.keys(edit).length > 0;
   const step = weightStep(unit);
@@ -344,7 +345,9 @@ export function DotsCard() {
           </div>
           <div>
             {score !== null && <p className="font-semibold">{dotsBand(score)}</p>}
-            <p className="text-sm text-muted">{score !== null ? t("dots.body") : t("dots.missing", { names: listOf(missing) })}</p>
+            <p className="text-sm text-muted">
+              {score !== null ? t("dots.body") : missing.length ? t("dots.missing", { names: listOf(missing) }) : ""}
+            </p>
           </div>
         </div>
         <div className="num mt-3 flex justify-between text-sm">
@@ -354,14 +357,8 @@ export function DotsCard() {
           </span>
         </div>
         {!profile.sex && (
-          <div className="mt-3 flex flex-wrap items-center gap-2 text-sm" role="group" aria-label={t("dots.sex")}>
-            <span className="text-muted">{t("dots.sex")}</span>
-            <Chip active={sex === "male"} onClick={() => setSex("male")}>
-              {t("dots.male")}
-            </Chip>
-            <Chip active={sex === "female"} onClick={() => setSex("female")}>
-              {t("dots.female")}
-            </Chip>
+          <div className="mt-3">
+            <StatsNeeded need={["sex"]} />
           </div>
         )}
         <details className="mt-2">

@@ -227,13 +227,16 @@ export interface Profile {
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
   cosmetics?: { accent?: string; sound?: string; plates?: string };
   /**
-   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
-   * Health Connect has neither, so the app asks on every platform.
+   * Your stats (Settings › Body and units, BodyStats.tsx): the one place for age, sex and height, which
+   * TDEE, fitness age, DOTS, strength scores and starting weights all read. Also asked in setup. Apple Health
+   * fills age and sex (HealthWorkoutPlugin.swift `characteristics`); Health Connect has neither.
    */
   birthYear?: number;
   sex?: "male" | "female";
-  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Tools › TDEE. */
+  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
+  /** When height was entered by hand (ms), so an older health reading doesn't replace it. */
+  heightAt?: number;
   /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
   bodyFat?: { pct: number; at: number };
   /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */

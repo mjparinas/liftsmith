@@ -20,6 +20,7 @@ import { scoreBand, strength } from "@/lib/strength";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 
+import { openStats } from "./BodyStats";
 import { go } from "./router";
 import { Button, ProTag, Section, Sheet } from "./ui";
 
@@ -258,7 +259,7 @@ function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
             {t("fit.how")}
           </Button>
           {!r.ok && !r.missing.includes("vo2") && (
-            <Button kind="ghost" onClick={() => go("tools", "tdee")}>
+            <Button kind="ghost" onClick={openStats}>
               {t("fit.addProfile")}
             </Button>
           )}
