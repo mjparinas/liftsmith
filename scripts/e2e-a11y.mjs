@@ -152,6 +152,7 @@ try {
     "/compare/",
     "/compare/fitbod/",
     "/alternatives/fitbod/",
+    "/trust/",
     "/pricing/",
     "/help/",
     "/contact/",

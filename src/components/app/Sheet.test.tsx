@@ -91,4 +91,22 @@ describe("Sheet", () => {
     });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
+
+  it("moves with the finger while dragged, over its rise-in animation", () => {
+    render(
+      <Sheet open onClose={vi.fn()} title="Back squat">
+        <p>Body</p>
+      </Sheet>,
+    );
+    const sheet = screen.getByRole("dialog");
+    const handle = sheet.querySelector("[data-sheet-handle]")!;
+    fireEvent.touchStart(handle, touch(100, 100));
+    fireEvent.touchMove(handle, touch(100, 130));
+    fireEvent.touchMove(handle, touch(100, 160));
+    // A filling CSS animation overrides an inline transform, so the drag only shows once it's cleared.
+    expect(sheet.style.animation).toBe("none");
+    expect(sheet.style.transform).toBe("translateY(60px)");
+    expect(sheet.parentElement!.style.animation).toBe("none");
+    fireEvent.touchEnd(handle, { touches: [] });
+  });
 });

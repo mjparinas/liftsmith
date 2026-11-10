@@ -120,6 +120,7 @@ export function SiteFooter() {
           { href: "/compare/", label: "Compare apps" },
           { href: "/privacy/", label: "Privacy" },
           { href: "/terms/", label: "Terms of use" },
+          { href: "/trust/", label: "Trust centre" },
           { href: "/accessibility/", label: "Accessibility" },
         ])}
       </div>

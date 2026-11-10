@@ -82,6 +82,7 @@ export function AutoCount({
   pattern,
   body,
   bpm,
+  hrTrend,
   prefs,
   onPrefs,
   counting,
@@ -94,6 +95,8 @@ export function AutoCount({
   pattern: Pattern;
   body: "male" | "female";
   bpm?: number | null;
+  /** Recent heart rate readings for the trend line on the figure. */
+  hrTrend?: readonly number[];
   prefs: CountPrefs;
   onPrefs: (p: CountPrefs) => void;
   counting: boolean;
@@ -268,7 +271,16 @@ export function AutoCount({
 
   return (
     <div className="relative h-full" data-testid="auto-count">
-      <LiftDemo exerciseId={exerciseId} body={body} view="side" bpm={bpm} follow={follow} paused={paused} className="h-full" />
+      <LiftDemo
+        exerciseId={exerciseId}
+        body={body}
+        view="side"
+        bpm={bpm}
+        hrTrend={hrTrend}
+        follow={follow}
+        paused={paused}
+        className="h-full"
+      />
       <div
         className="absolute left-2 top-2 rounded-2xl border border-line bg-bg/80 px-3 py-1.5 text-center backdrop-blur"
         aria-live="polite"
