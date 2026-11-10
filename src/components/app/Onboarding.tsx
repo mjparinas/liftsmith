@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { Info } from "@/components/Info";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
+import { useBack } from "@/lib/back";
 import { billingLive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
@@ -265,6 +266,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     haptic("success");
     if (rerun) go("today");
   };
+
+  // The Back button and the phone's back button do the same thing: the previous question, then the
+  // welcome screen on first run. On a rerun's first question, the phone's back leaves for the previous screen.
+  const stepBack = () => (step > 0 ? setStep(step - 1) : rerun ? go("settings") : setWelcome(true));
+  useBack(!welcome && (step > 0 || !rerun), stepBack);
 
   if (welcome) return <Welcome onStart={() => setWelcome(false)} />;
 
@@ -576,7 +582,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
       </div>
       <div className="flex gap-3 pb-2">
-        <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : rerun ? go("settings") : setWelcome(true))}>
+        <Button kind="ghost" onClick={stepBack}>
           {t("setup.back")}
         </Button>
         {step < PRO_STEP && (
