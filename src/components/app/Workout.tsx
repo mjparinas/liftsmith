@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { type PlateFinish } from "@/components/PlateBar";
@@ -11,7 +11,8 @@ import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
 import { saveWorkout } from "@/lib/health";
-import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { hrSupported, hrZone } from "@/lib/heartRate";
+import { hrLink } from "@/lib/hrLink";
 import { t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, keepAwake, oops, sound } from "@/lib/juice";
@@ -43,7 +44,13 @@ import { SetCard } from "./workout/SetCard";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
-let hrConn: HrConnection | null = null;
+// However a workout ends (End, Discard, the automatic end of a forgotten one), the heart rate monitor
+// is released fully, so the next workout can reach it again.
+if (typeof window !== "undefined") {
+  useApp.subscribe((st, prev) => {
+    if (prev.active && !st.active) void hrLink.stop();
+  });
+}
 
 export function Workout() {
   const s = useApp();
@@ -55,9 +62,12 @@ export function Workout() {
   const [endOpen, setEndOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
-  const [bpm, setBpm] = useState<number | null>(null);
-  const [hrBusy, setHrBusy] = useState(false);
-  const [hrError, setHrError] = useState<string | null>(null);
+  const [lastBpm, setBpm] = useState<number | null>(null);
+  const hr = useSyncExternalStore(hrLink.subscribe, hrLink.get, hrLink.get);
+  const hrBusy = hr.status === "connecting";
+  const hrError = hr.error;
+  // A reading only counts while the monitor is connected.
+  const bpm = hr.status === "live" ? lastBpm : null;
   const [popKey, setPopKey] = useState(0);
   // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
   const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
@@ -78,6 +88,18 @@ export function Workout() {
     sound.enabled = profile.restSounds;
     return () => void keepAwake(false);
   }, [profile.restSounds, awake]);
+
+  // Heart rate: readings go to this screen and the workout's HR log; a monitor that connected before
+  // connects by itself when the workout starts (once, quietly; the Connect button stays as the fallback).
+  const sessionId = active?.sessionId;
+  useEffect(() => {
+    hrLink.onBpm((b) => {
+      setBpm(b);
+      useApp.getState().pushHr(b);
+    });
+    if (sessionId && hrSupported()) hrLink.auto(sessionId);
+    return () => hrLink.onBpm(() => {});
+  }, [sessionId]);
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -213,33 +235,14 @@ export function Workout() {
     const ev = s.finish();
     if (ev?.type === "sessionEnd") void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
     void stopSession();
-    hrConn?.disconnect();
-    hrConn = null;
     go("done");
   };
 
   const connectHr = async () => {
-    if (hrBusy) return;
-    setHrBusy(true);
-    setHrError(null);
-    try {
-      hrConn = await connectHeartRate(
-        (b) => {
-          setBpm(b);
-          s.pushHr(b);
-        },
-        () => setBpm(null),
-      );
-      track("feature", { name: "heart_rate", detail: "workout" });
-    } catch (e) {
-      const msg = e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed");
-      if (msg) {
-        setHrError(msg);
-        oops();
-      }
-    } finally {
-      setHrBusy(false);
-    }
+    await hrLink.tap();
+    const st = hrLink.get();
+    if (st.error) oops();
+    else if (st.status === "live") track("feature", { name: "heart_rate", detail: "workout" });
   };
 
   const unit = gym.unit;
@@ -331,7 +334,7 @@ export function Workout() {
               className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"
             >
               <Icon name="heart" size={14} className="text-bad" />
-              {hrBusy ? t("hr.connecting") : t("hr.connect")}
+              {hr.status === "connecting" ? t("hr.connecting") : hr.status === "reconnecting" ? t("hr.reconnecting") : t("hr.connect")}
             </button>
           ) : null}
           <button
@@ -349,7 +352,7 @@ export function Workout() {
           <p className="flex-1 text-muted">{hrError}</p>
           <button
             type="button"
-            onClick={() => setHrError(null)}
+            onClick={() => hrLink.dismiss()}
             className="press -m-2 min-h-11 min-w-11 rounded-full px-2 text-muted hover:text-ink"
           >
             {t("hr.dismiss")}

@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { classify, connectHeartRate, HrError, hrMessage, parseHeartRate } from "./heartRate";
+import { classify, connectHeartRate, HrError, hrMessage, parseHeartRate, savedHr, saveHr } from "./heartRate";
 
 const err = (name: string, message: string) => Object.assign(new Error(message), { name });
 
@@ -11,12 +11,29 @@ type Fake = {
   disconnect: ReturnType<typeof vi.fn>;
 };
 
-function fakeBluetooth(opts: { pick?: () => Promise<void>; name?: string } = {}): Fake {
+function fakeStorage() {
+  const m = new Map<string, string>();
+  vi.stubGlobal("localStorage", {
+    getItem: (k: string) => m.get(k) ?? null,
+    setItem: (k: string, v: string) => void m.set(k, v),
+    removeItem: (k: string) => void m.delete(k),
+  });
+}
+
+type FakeOpts = { pick?: () => Promise<void>; name?: string; known?: boolean; stop?: ReturnType<typeof vi.fn> };
+function fakeBluetooth(opts: FakeOpts = {}): Fake & { requestDevice: ReturnType<typeof vi.fn> } {
   const ch = Object.assign(new EventTarget(), {
     startNotifications: vi.fn(async () => undefined),
+    stopNotifications: opts.stop ?? vi.fn(async () => undefined),
     value: undefined as DataView | undefined,
   });
-  const fake: Fake = {
+  const device = () => ({ id: "dev-1", name: opts.name ?? "Fitbit Air", gatt, addEventListener: () => {} });
+  const requestDevice = vi.fn(async () => {
+    await opts.pick?.();
+    return device();
+  });
+  const fake = {
+    requestDevice,
     connect: vi.fn(),
     getPrimaryService: vi.fn(async () => ({ getCharacteristic: async () => ch })),
     startNotifications: ch.startNotifications,
@@ -26,12 +43,7 @@ function fakeBluetooth(opts: { pick?: () => Promise<void>; name?: string } = {})
   const server = { connected: true, getPrimaryService: fake.getPrimaryService, disconnect: fake.disconnect };
   fake.connect.mockResolvedValue(server);
   vi.stubGlobal("navigator", {
-    bluetooth: {
-      requestDevice: async () => {
-        await opts.pick?.();
-        return { name: opts.name ?? "Fitbit Air", gatt, addEventListener: () => {} };
-      },
-    },
+    bluetooth: { requestDevice, ...(opts.known ? { getDevices: async () => [device()] } : {}) },
   });
   return fake;
 }
@@ -131,5 +143,79 @@ describe("connectHeartRate (Web Bluetooth)", () => {
       () => {},
     ).catch((x) => x);
     expect((e as HrError).problem).toBe("cancelled");
+  });
+});
+
+describe("reconnecting to the monitor used last time (Web Bluetooth)", () => {
+  it("remembers the monitor and reconnects to it without the picker", async () => {
+    fakeStorage();
+    const first = fakeBluetooth({ known: true });
+    const c = await connectHeartRate(
+      () => {},
+      () => {},
+    );
+    expect(savedHr()).toEqual({ id: "dev-1", name: "Fitbit Air" });
+    await c.disconnect();
+    first.requestDevice.mockClear();
+    await connectHeartRate(
+      () => {},
+      () => {},
+    );
+    expect(first.requestDevice).not.toHaveBeenCalled();
+    expect(first.connect).toHaveBeenCalledTimes(2);
+  });
+
+  it("never opens the picker when connecting quietly", async () => {
+    fakeStorage();
+    const fake = fakeBluetooth();
+    const e = await connectHeartRate(
+      () => {},
+      () => {},
+      { quiet: true },
+    ).catch((x) => x);
+    expect((e as HrError).problem).toBe("notFound");
+    expect(fake.requestDevice).not.toHaveBeenCalled();
+  });
+
+  it("opens the picker when the saved monitor can't be reached and the lifter tapped Connect", async () => {
+    fakeStorage();
+    const fake = fakeBluetooth({ known: true });
+    saveHr({ id: "dev-1", name: "Fitbit Air" });
+    fake.connect.mockRejectedValueOnce(err("NetworkError", "Connection failed for unknown reason."));
+    await connectHeartRate(
+      () => {},
+      () => {},
+    );
+    expect(fake.requestDevice).toHaveBeenCalledTimes(1);
+  });
+
+  it("stops the readings and drops the link when released", async () => {
+    fakeStorage();
+    const stop = vi.fn(async () => undefined);
+    const fake = fakeBluetooth({ stop });
+    const c = await connectHeartRate(
+      () => {},
+      () => {},
+    );
+    await c.disconnect();
+    expect(stop).toHaveBeenCalled();
+    expect(fake.disconnect).toHaveBeenCalled();
+  });
+});
+
+describe("a monitor that can't be found", () => {
+  it("reads Android's empty scan as not found, not a generic failure", () => {
+    expect(classify(new Error("No device found."), "pick")).toBe("notFound");
+  });
+
+  it("tells a returning Fitbit user to turn sharing off and on", () => {
+    fakeStorage();
+    saveHr({ id: "dev-1", name: "Fitbit Air" });
+    expect(hrMessage("notFound", "Fitbit Air")).toContain("off and on");
+  });
+
+  it("explains how a Fitbit starts sharing when nothing was found and no monitor is known", () => {
+    fakeStorage();
+    expect(hrMessage("notFound")).toContain("Share heart rate");
   });
 });
