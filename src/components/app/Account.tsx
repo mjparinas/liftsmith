@@ -280,13 +280,15 @@ function SignedIn() {
       <p className="text-sm text-muted" aria-live="polite">
         {busy
           ? t("account.syncing")
-          : s.lastError
-            ? t("account.syncError")
-            : waiting
-              ? t("account.waiting", { count: waiting })
-              : s.lastSync
-                ? t("account.synced", { when: ago(s.lastSync) })
-                : t("account.notSynced")}
+          : s.lastError === "full"
+            ? t("account.syncFull")
+            : s.lastError
+              ? t("account.syncError")
+              : waiting
+                ? t("account.waiting", { count: waiting })
+                : s.lastSync
+                  ? t("account.synced", { when: ago(s.lastSync) })
+                  : t("account.notSynced")}
       </p>
       <div className="grid grid-cols-2 gap-2">
         <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>

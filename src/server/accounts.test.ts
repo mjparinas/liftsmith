@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { accountInfo, appleClientSecret, deleteAccount, sessionOf, signInWith, startEmail, verifyEmail } from "./accounts";
 import { query, resetDb } from "./db";
 import { clearKeys, sha256hex, verifiedEmail, verifyIdToken, type Claims } from "./idToken";
-import { checkSync, sync } from "./sync";
+import { checkSync, sync, SyncFull } from "./sync";
 
 const NOW = 1_800_000_000_000;
 const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -285,5 +285,27 @@ describe("sync", () => {
     const p2 = await sync("acc", "web", req({ cursor: p1.cursor }));
     expect(p2.events.length).toBe(200);
     expect(p2.more).toBe(false);
+  });
+
+  it("refuses a push past the account's storage quota and stores none of it, but still pulls", async () => {
+    const quota = { events: 3, bytes: 10_000, records: 2 };
+    await sync("acc", "phone", req({ events: [ev("e1"), ev("e2")] as never }), quota);
+    await expect(sync("acc", "phone", req({ events: [ev("e3"), ev("e4")] as never }), quota)).rejects.toBeInstanceOf(SyncFull);
+    expect((await query("SELECT id FROM sync_events WHERE account_id = 'acc'")).length).toBe(2);
+    // Deleting a stored event takes no more room, but a tombstone for an id the account never had does.
+    await sync("acc", "phone", req({ deleted: ["e1"] }), quota);
+    await sync("acc", "phone", req({ deleted: ["x1"] }), quota);
+    await expect(sync("acc", "phone", req({ deleted: ["x2"] }), quota)).rejects.toBeInstanceOf(SyncFull);
+    // Pulls and pushes with nothing new still work, and another account has its own quota.
+    expect((await sync("acc", "web", req(), quota)).events.length).toBe(1);
+    await sync("other", "phone", req({ events: [ev("e1"), ev("e2"), ev("e3")] as never }), quota);
+
+    const big = { ...ev("huge"), note: "x".repeat(10_000) };
+    await expect(sync("third", "phone", req({ events: [big] as never }), quota)).rejects.toBeInstanceOf(SyncFull);
+
+    const gym = (id: string) => ({ key: `gym:${id}`, value: { id }, updatedAt: 1 });
+    await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota);
+    await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota); // updates are fine
+    await expect(sync("acc", "phone", req({ records: [gym("c")] }), quota)).rejects.toBeInstanceOf(SyncFull);
   });
 });

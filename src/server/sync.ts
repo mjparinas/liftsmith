@@ -7,6 +7,17 @@ import { batch, query } from "./db";
 export const MAX_EVENTS = 1000;
 export const PAGE = 500;
 export const MAX_BODY = 3_500_000;
+/** Storage per account. A lifter training five times a week writes about 10,000 events (3 MB) a year, so
+ *  these only stop abuse; nobody training for real gets near them. Tombstones count as events. */
+export const QUOTA = { events: 200_000, bytes: 50_000_000, /** the profile plus gyms */ records: 200 };
+export type Quota = typeof QUOTA;
+
+/** The push would take the account past its storage quota. Nothing from the request is stored. */
+export class SyncFull extends Error {
+  constructor() {
+    super("full");
+  }
+}
 
 export interface Rec {
   key: string;
@@ -75,7 +86,30 @@ export function checkSync(raw: unknown): { ok: true; body: SyncRequest } | { ok:
   };
 }
 
-export async function sync(accountId: string, session: string, req: SyncRequest): Promise<SyncResponse> {
+/** Throws SyncFull when storing this push would take the account past its quota. Parallel pushes can each
+ *  pass the check, so the account can end up over by at most a few pushes (1,000 events each); fine for a
+ *  limit that's about abuse, not billing. */
+async function checkQuota(accountId: string, req: SyncRequest, quota: Quota): Promise<void> {
+  const adds = req.events.length + req.deleted.length;
+  if (adds) {
+    const incoming = req.events.reduce((n, e) => n + JSON.stringify(e).length, 0);
+    const [use] = await query<{ n: number; bytes: number }>(
+      "SELECT COUNT(*) AS n, COALESCE(SUM(LENGTH(body)), 0) AS bytes FROM sync_events WHERE account_id = ?",
+      [accountId],
+    );
+    if (Number(use?.n ?? 0) + adds > quota.events || Number(use?.bytes ?? 0) + incoming > quota.bytes) throw new SyncFull();
+  }
+  if (req.records.length) {
+    const keys = new Set(
+      (await query<{ key: string }>("SELECT key FROM sync_records WHERE account_id = ?", [accountId])).map((r) => r.key),
+    );
+    const fresh = new Set(req.records.map((r) => r.key).filter((k) => !keys.has(k)));
+    if (keys.size + fresh.size > quota.records) throw new SyncFull();
+  }
+}
+
+export async function sync(accountId: string, session: string, req: SyncRequest, quota: Quota = QUOTA): Promise<SyncResponse> {
+  await checkQuota(accountId, req, quota);
   const stmts: { sql: string; args: (string | number | null)[] }[] = [];
   // New events. An id the account already has (or deleted) is left alone, so a tombstone is never undone.
   for (const e of req.events) {
