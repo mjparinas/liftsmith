@@ -1,10 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
-import { Info } from "@/components/Info";
-import { PlateBar, type PlateFinish } from "@/components/PlateBar";
+import { type PlateFinish } from "@/components/PlateBar";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
@@ -14,7 +13,7 @@ import { alternatives } from "@/lib/generator";
 import { saveWorkout } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
-import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
+import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
@@ -22,26 +21,27 @@ import { epley, TIMED } from "@/lib/progression";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
-import { afterSet, groupRange, linkedToNext, supersetLabel } from "@/lib/superset";
-import { effortAim, effortChoices, restAlertOf, restLabel } from "@/lib/training";
+import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
+import { restAlertOf } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { prCue, say } from "@/lib/voice";
-import { workoutWhy } from "@/lib/why";
 
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { clock, loadText, plateText, repsText } from "./format";
 import { Icon } from "./icons";
-import { PainSelect } from "./Injuries";
 import { go } from "./router";
-import { HUE, muscleHue } from "./theme";
+import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
-import { GhostLine, PlateChange, restEndCue, RestExtra, SameAsLastChip, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
-import { AlmostThere, PrMoment } from "./WorkoutJuice";
+import { Button, EmptyState, Sheet, Stepper } from "./ui";
+import { ComingUp } from "./workout/ComingUp";
+import { Feedback, RestCard } from "./workout/RestCard";
+import { SetCard } from "./workout/SetCard";
+import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
+import { PrMoment } from "./WorkoutJuice";
 
 let hrConn: HrConnection | null = null;
 
@@ -499,204 +499,46 @@ export function Workout() {
                 : ""}
           </p>
           {resting ? (
-            <section className="card-tint animate-pop mt-5 flex flex-col items-center p-5" style={{ "--tint": HUE.cyan } as CSSProperties}>
-              <Ring value={left / Math.max(1, active.restTotal)} from={HUE.cyan} to={HUE.accent} stroke={14}>
-                <div className="text-center">
-                  <div className="text-xs font-semibold uppercase tracking-[0.16em] text-cyan">{t("workout.rest")}</div>
-                  <div
-                    role="timer"
-                    aria-label={t("workout.restLeft", { time: clock(left) })}
-                    className={`display mt-1 text-[4rem] ${left <= 3.5 ? "animate-pulse text-cyan" : ""}`}
-                  >
-                    {clock(left)}
-                  </div>
-                </div>
-              </Ring>
-              <div className="mt-4 flex gap-3">
-                <Button kind="ghost" icon="plus" onClick={() => s.addRest(30)} label={t("workout.add30")}>
-                  30 s
-                </Button>
-                <Button kind="ghost" icon="chevronRight" onClick={() => s.skipRest()}>
-                  {t("workout.skipRest")}
-                </Button>
-              </div>
-              <GhostLine
-                ghost={ghost}
-                logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)}
-                nextIndex={doneSets}
-                unit={profile.unit}
-              />
-              {lastSet && !rated && (
-                <Effort
-                  target={lastSet.rir}
-                  scale={scale}
-                  onPick={(r) => {
-                    haptic("tick");
-                    s.rateEffort(lastSet.id, r);
-                  }}
-                />
-              )}
-              {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
-              {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
-              <div className="mt-5 w-full border-t border-line/70 pt-4">
-                <p className="text-center text-sm text-muted">
-                  {t("workout.nextUp")}{" "}
-                  <span className="font-semibold text-ink">
-                    {loadText(ex, active.weight, profile.unit)} × {repsText(ex, active.reps)}
-                  </span>
-                </p>
-                {loading && bar && (
-                  <div className="mt-2">
-                    <PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} />
-                  </div>
-                )}
-                <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
-                <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
-              </div>
-              <RestExtra left={left} gym={gym} />
-            </section>
+            <RestCard
+              active={active}
+              ex={ex}
+              gym={gym}
+              left={left}
+              ghost={ghost}
+              doneSets={doneSets}
+              lastSet={lastSet}
+              rated={rated}
+              scale={scale}
+              loading={loading}
+              bar={bar}
+              finish={finish}
+            />
           ) : (
-            <section key={popKey} className="card animate-rise mt-5 p-5">
-              {active.restReady ? (
-                <Button
-                  kind="ghost"
-                  icon="clock"
-                  className="mb-4 w-full"
-                  onClick={() => {
-                    haptic("tick");
-                    s.startRest();
-                  }}
-                >
-                  {t("workout.startRest", { time: restLabel(active.restReady) })}
-                </Button>
-              ) : null}
-              <div className="flex flex-col items-center gap-5">
-                {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
-                {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
-                  // This gym's plates are in the other unit: show the weight in the lifter's unit too.
-                  <p className="num -mt-3 text-sm text-muted">
-                    ≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}
-                    {ex.load === "dumbbell" && implementsFor(ex) === 2 ? " each" : ""}
-                  </p>
-                )}
-                {repStep && <Stepper display={docked} {...repStep} />}
-                {rightStep && <Stepper display={docked} {...rightStep} />}
-                {!warming && perSide(ex.id) && !TIMED.has(ex.id) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      haptic("tick");
-                      s.adjustRight(sidesSplit ? undefined : active.reps);
-                    }}
-                    className="press -mt-2 min-h-11 px-3 text-sm font-semibold text-accent"
-                  >
-                    {sidesSplit ? t("workout.sidesSame") : t("workout.sidesDiffer")}
-                  </button>
-                )}
-              </div>
-              {warming ? (
-                <div className="mt-4 text-center text-sm text-muted">
-                  <p>
-                    {t("wk.warmLine")}
-                    <Info term="warmup" />
-                    {t("wk.working", { load: loadText(ex, item.target.weight, profile.unit) })}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      haptic("tick");
-                      s.skipWarmup();
-                    }}
-                    className="press mt-1 min-h-11 px-3 font-semibold text-accent"
-                  >
-                    {t("workout.skipWarmup")}
-                  </button>
-                </div>
-              ) : item.setTargets?.[doneSets]?.amrap ? (
-                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">
-                  {t("wk.amrap", { n: item.setTargets[doneSets].reps })}
-                </p>
-              ) : item.slot ? (
-                <p className="mt-3 text-center text-sm text-muted">
-                  {item.label ? `${item.label} · ` : ""}
-                  {item.target.note}
-                </p>
-              ) : item.challenge && doneSets + 1 === item.sets ? (
-                <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember">
-                  <Icon name="bolt" size={16} strokeWidth={2.4} />
-                  {t("wk.challenge")}
-                </p>
-              ) : (
-                <p className="mt-4 text-center text-sm text-muted">
-                  {effortAim(item.target.rir, scale)}
-                  <Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)}{" "}
-                  <button
-                    type="button"
-                    onClick={() => setWhyOpen(true)}
-                    className="press inline-flex min-h-11 items-center px-1 text-accent underline underline-offset-2"
-                  >
-                    {t("coach.why")}
-                  </button>
-                </p>
-              )}
-              <SameAsLastChip
-                ghost={ghost}
-                setIndex={doneSets}
-                ex={ex}
-                unit={profile.unit}
-                weight={active.weight}
-                reps={active.reps}
-                onUse={(w, r) => s.adjust(w, r)}
-              />
-              {loading && bar && (
-                <div className="mt-4 border-t border-line pt-4">
-                  <PlateBar loading={loading} bar={bar.weight} unit={unit} finish={finish} />
-                  <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
-                </div>
-              )}
-            </section>
+            <SetCard
+              key={popKey}
+              active={active}
+              item={item}
+              ex={ex}
+              gym={gym}
+              doneSets={doneSets}
+              warming={warming}
+              docked={docked}
+              weightStep={weightStep}
+              repStep={repStep}
+              rightStep={rightStep}
+              sidesSplit={sidesSplit}
+              scale={scale}
+              ghost={ghost}
+              loading={loading}
+              bar={bar}
+              finish={finish}
+              onWhy={() => setWhyOpen(true)}
+            />
           )}
         </>
       ) : null}
 
-      {!finished && active.plan.items.length > active.index + 1 && (
-        <section className="mt-6">
-          <h2 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("workout.comingUp")}</h2>
-          <ol className="card divide-y divide-line/70 overflow-hidden">
-            {active.plan.items.slice(active.index + 1).map((it, i) => {
-              const e = exercise(it.exerciseId);
-              const at = active.index + 1 + i;
-              const ss = supersetLabel(active.plan.items, at);
-              return (
-                <li key={it.exerciseId} className={`flex items-center gap-1 pr-2 ${ss ? "bg-accent/5" : ""}`}>
-                  <button
-                    type="button"
-                    onClick={() => s.goTo(at)}
-                    className="press flex min-w-0 flex-1 items-center justify-between gap-3 py-3 pl-4 text-left"
-                  >
-                    <span className="flex min-w-0 flex-col">
-                      {ss && <span className="truncate text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
-                      <span className="flex min-w-0 items-center gap-2.5 font-medium">
-                        <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden />
-                        <span className="truncate">{e.name}</span>
-                      </span>
-                    </span>
-                    <span className="num shrink-0 text-sm text-muted">
-                      {it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}
-                    </span>
-                  </button>
-                  <LinkToggle
-                    on={linkedToNext(active.plan.items, at - 1)}
-                    first={exercise(active.plan.items[at - 1].exerciseId).name}
-                    second={e.name}
-                    onToggle={() => s.toggleSuperset(at - 1)}
-                  />
-                </li>
-              );
-            })}
-          </ol>
-        </section>
-      )}
+      {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
@@ -830,36 +672,6 @@ export function Workout() {
   );
 }
 
-function Feedback({ name, onPick }: { name: string; onPick: (r: -1 | 0 | 1) => void }) {
-  return (
-    <div className="animate-rise mt-4 w-full rounded-2xl border border-line bg-raised/70 p-3 text-center">
-      <p className="text-sm text-muted">{t("workout.howWas", { name })}</p>
-      <div className="mt-2 grid grid-cols-3 gap-2">
-        {(
-          [
-            [1, t("workout.tooEasy")],
-            [0, t("workout.aboutRight")],
-            [-1, t("workout.tooHard")],
-          ] as const
-        ).map(([r, l]) => (
-          <button
-            key={r}
-            type="button"
-            onClick={() => {
-              haptic("select");
-              sound.tick();
-              onPick(r);
-            }}
-            className="press min-h-11 rounded-xl border border-line bg-surface py-2 text-sm font-medium hover:border-accent/50"
-          >
-            {l}
-          </button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function SwapList({
   fromId,
   gymEquipment,
@@ -925,32 +737,6 @@ function SwapList({
         <span className="font-semibold text-accent">{t("wk.logInjury")}</span>
         {t("wk.hurtsAfter")}
       </button>
-    </div>
-  );
-}
-
-/** Optional, during rest: how many more reps the lifter could have done on the set just logged. */
-function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rpe"; onPick: (rir: number) => void }) {
-  const rpe = scale === "rpe";
-  const aim = effortChoices(scale).find((c) => c.rir === Math.min(4, target))?.label ?? String(target);
-  return (
-    <div className="animate-rise mt-4 w-full text-center">
-      <p className="text-sm text-muted">
-        {rpe ? t("wk.rpeAsk", { aim }) : t("wk.rirAsk", { aim: target })}
-        <Info term={rpe ? "rpe" : "rir"} />
-      </p>
-      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? t("wk.rpeGroup") : t("wk.rirGroup")}>
-        {effortChoices(scale).map((c) => (
-          <button
-            key={c.rir}
-            type="button"
-            onClick={() => onPick(c.rir)}
-            className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold"
-          >
-            {c.label}
-          </button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -1062,30 +848,5 @@ function CustomExercise({
         {t("wk.addUse")}
       </button>
     </form>
-  );
-}
-
-/**
- * Between sets, one optional pain check for an exercise trained despite an injury (lighter, marked
- * fine, or in a graded return): once per exercise per workout, never during a set.
- */
-function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: string }) {
-  const { events, ratePain } = useApp();
-  const ex = exercise(exerciseId);
-  const hurt = activeInjuries(events).filter((i) => effectFor(ex, [i]) && effectFor(ex, [i])!.action !== "skip");
-  const asked = (id: string) =>
-    events.some((e) => e.type === "pain" && e.injuryId === id && e.sessionId === sessionId && e.exerciseId === exerciseId);
-  const todo = hurt.filter((i) => !asked(i.id));
-  if (!todo.length) return null;
-  return (
-    <div className="mt-3 w-full space-y-2">
-      {todo.map((i) => (
-        <PainSelect
-          key={i.id}
-          label={t("inj.pain.afterSet", { part: PART_LABEL[i.part] })}
-          onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })}
-        />
-      ))}
-    </div>
   );
 }
