@@ -28,6 +28,7 @@ import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
+import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, muscleHue } from "./theme";
@@ -69,6 +70,9 @@ export function Today() {
     useApp();
   const [lenKey, setLenKey] = useState(0);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  const moveExercise = useApp((st) => st.moveExercise);
+  // Press and hold an exercise to drag it, or tap its number to move it with buttons (Reorder.tsx).
+  const reorder = useReorder(moveExercise, { min: 0, max: (preview?.items.length ?? 1) - 1 });
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
   const g = useGame();
@@ -329,26 +333,35 @@ export function Today() {
                 const ss = supersetLabel(preview.items, i);
                 const joinsPrev = i > 0 && linkedToNext(preview.items, i - 1);
                 const joinsNext = linkedToNext(preview.items, i);
+                const look = reorder.style(i);
+                const picked = reorder.picked === i;
                 // Supersets read as one block: a shared tint, one accent bracket down the left that runs
                 // across the rows, and a dashed join where the link button sits on the line between them.
                 return (
                   <li
                     key={it.exerciseId}
+                    {...reorder.row(i)}
                     data-superset={it.group ?? undefined}
-                    className={`animate-rise relative flex items-center gap-3 px-4 py-3.5 ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""}`}
-                    style={{ animationDelay: `${i * 40}ms` }}
+                    className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
+                    style={{ animationDelay: `${i * 40}ms`, ...look.css }}
                   >
                     <span
                       className={`absolute left-0 ${ss ? "w-1 bg-accent" : "w-[3px] rounded-r-full"} ${joinsPrev ? "top-0" : "top-3"} ${joinsNext ? "bottom-0" : "bottom-3"} ${ss && !joinsPrev ? "rounded-tr-full" : ""} ${ss && !joinsNext ? "rounded-br-full" : ""}`}
                       style={ss ? undefined : { background: hue }}
                       aria-hidden
                     />
-                    <span
-                      className="num grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-bold"
+                    {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
+                    <button
+                      type="button"
+                      data-no-drag
+                      onClick={() => reorder.setPicked(picked ? null : i)}
+                      aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
+                      aria-pressed={picked}
+                      className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
                       style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
                     >
                       {i + 1}
-                    </span>
+                    </button>
                     <div className={`min-w-0 flex-1 ${preview.items.length > 1 ? "max-[389px]:pr-9" : ""}`}>
                       {ss && (
                         <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
@@ -372,7 +385,16 @@ export function Today() {
                         </p>
                       )}
                     </div>
-                    {it.injuryPct ? (
+                    {picked ? (
+                      <MoveButtons
+                        name={ex.name}
+                        canUp={i > 0}
+                        canDown={i < preview.items.length - 1}
+                        onUp={() => reorder.step(i, -1)}
+                        onDown={() => reorder.step(i, 1)}
+                        onDone={() => reorder.setPicked(null)}
+                      />
+                    ) : it.injuryPct ? (
                       <span className="shrink-0 rounded-full bg-warn/15 px-2.5 py-0.5 text-xs font-medium text-warn">
                         {t("td.injury", { n: it.injuryPct })}
                       </span>

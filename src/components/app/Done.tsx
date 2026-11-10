@@ -25,6 +25,7 @@ import { clock } from "./format";
 import { Icon } from "./icons";
 import { PainSelect } from "./Injuries";
 import { Mascot } from "./Mascot";
+import { NextUpCard } from "./NextUp";
 import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
@@ -238,6 +239,7 @@ export function Done() {
         </ul>
       )}
       <PrReplayButton prs={prs} />
+      <NextUpCard sessionId={s.sessionId} />
       {!lean(profile) && <DoneMoments />}
 
       {badges.length > 0 && (

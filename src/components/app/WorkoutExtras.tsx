@@ -40,12 +40,33 @@ export function PlateChange({ ex, gym, kg, sessionId }: { ex: Exercise; gym: Gym
   const c = plateChange(from, to);
   const same = !c.add.length && !c.remove.length;
   return (
-    <p
+    <div
       className={`mt-2 rounded-xl px-3 py-2 text-center text-sm font-medium ${same ? "bg-good/10 text-good" : "bg-accent/10 text-accent"}`}
-      aria-live="polite"
     >
-      {changeText(c, gym.unit, fmtNum)}
-    </p>
+      {/* The change, drawn: plates to take off slide out, new ones slide on (one side). Lean mode shows it without the motion. */}
+      {!same && (
+        <div className="mb-1.5 flex flex-wrap items-center justify-center gap-1" aria-hidden data-testid="plate-change">
+          {c.remove.map((p, i) => (
+            <span
+              key={`r${i}`}
+              className="animate-plate-off num rounded-md border border-dashed border-line px-1.5 py-0.5 text-xs text-muted line-through"
+            >
+              {fmtNum(p)}
+            </span>
+          ))}
+          {c.add.map((p, i) => (
+            <span
+              key={`a${i}`}
+              className="animate-plate-on num rounded-md bg-accent/20 px-1.5 py-0.5 text-xs font-bold text-accent"
+              style={{ animationDelay: `${450 + i * 90}ms` }}
+            >
+              {fmtNum(p)}
+            </span>
+          ))}
+        </div>
+      )}
+      <p aria-live="polite">{changeText(c, gym.unit, fmtNum)}</p>
+    </div>
   );
 }
 

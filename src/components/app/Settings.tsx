@@ -27,6 +27,7 @@ import { useNow } from "@/lib/useNow";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
+import { HandsFree } from "./HandsFree";
 import { Icon, type IconName } from "./icons";
 import { ImportWorkouts } from "./ImportCsv";
 import { MessageSettings } from "./MessageSettings";
@@ -344,6 +345,9 @@ function WorkoutGroup() {
         }}
       />
       <RestTimerSettings />
+      <Section title={t("pol.hf.title")}>
+        <HandsFree />
+      </Section>
       <Section title={t("settings.duringRest")}>
         <DelightSettings part="workout" />
       </Section>

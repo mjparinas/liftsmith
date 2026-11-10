@@ -63,6 +63,7 @@ import * as part from "./text/part";
 import * as past from "./text/past";
 import * as photos from "./text/photos";
 import * as pm from "./text/pm";
+import * as pol from "./text/pol";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -157,6 +158,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...past.fr,
   ...photos.fr,
   ...pm.fr,
+  ...pol.fr,
   ...pro.fr,
   ...prog.fr,
   ...progress.fr,

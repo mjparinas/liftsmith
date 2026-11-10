@@ -65,6 +65,7 @@ import * as part from "./text/part";
 import * as past from "./text/past";
 import * as photos from "./text/photos";
 import * as pm from "./text/pm";
+import * as pol from "./text/pol";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
@@ -159,6 +160,7 @@ export const en = {
   ...past.en,
   ...photos.en,
   ...pm.en,
+  ...pol.en,
   ...pro.en,
   ...prog.en,
   ...progress.en,

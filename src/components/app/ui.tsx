@@ -579,6 +579,7 @@ export function LinkToggle({
 }) {
   return (
     <button
+      data-no-drag
       type="button"
       onClick={() => {
         haptic("select");

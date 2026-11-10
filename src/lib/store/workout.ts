@@ -5,6 +5,7 @@ import { injuredTarget, planSeconds, setSeconds, type Plan, type PlanItem, type 
 import { activeInjuries } from "../injury";
 import { deleteEvents } from "../localdb";
 import { target } from "../progression";
+import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
 import { implementsFor } from "../sides";
 import type { State } from "../store";
@@ -81,8 +82,20 @@ export function loadItem(get: () => State, a: Active, index: number): Active {
   return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps };
 }
 
+/** How long Undo stays offered after Log set when there's no rest to wait through. */
+export const UNDO_MS = 10_000;
+
 export interface WorkoutSlice {
   active: Active | null;
+  /**
+   * The last Log set, for Undo: the workout as it was before it and the events it wrote. Offered until
+   * the rest after it ends (or UNDO_MS with no rest), or the next set is logged. Not saved: a reload drops it.
+   */
+  undoable: { prev: Active; ids: string[]; until: number } | null;
+  /** Takes back the last Log set: its set (or warm-up) is deleted and the set card shows its numbers again. */
+  undoLast(): void;
+  /** Moves exercise `from` to `to` (indexes into the plan), on Today's plan or among those still to come mid-workout. */
+  moveExercise(from: number, to: number): void;
   /** A note on an exercise (empty clears it for next time). */
   addNote(exerciseId: string, text: string): void;
   /** How many reps the lifter says they had left on a logged set. */
@@ -120,6 +133,50 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
   const { set, get, commit, gym } = c;
   return {
     active: null,
+    undoable: null,
+
+    undoLast() {
+      const u = get().undoable;
+      const a = get().active;
+      if (!u || !a || a.sessionId !== u.prev.sessionId || Date.now() > u.until) {
+        set({ undoable: null });
+        return;
+      }
+      // The set's own reps-left rating goes with it.
+      const ids = [
+        ...u.ids,
+        ...get()
+          .events.filter((e) => e.type === "effort" && u.ids.includes(e.setId))
+          .map((e) => e.id),
+      ];
+      const events = get().events.filter((e) => !ids.includes(e.id));
+      const now = Date.now();
+      const next: Active = { ...u.prev, lastAt: now, restUntil: null, restReady: undefined };
+      set({ events, stats: derive(events, now), active: next, undoable: null });
+      void deleteEvents(ids);
+      persistActive(next);
+      track("feature", { name: "undo_set" });
+    },
+
+    moveExercise(from, to) {
+      const a = get().active;
+      if (a) {
+        // Only what's still to come: the exercise on screen and the ones done stay where they are.
+        if (from <= a.index || to <= a.index) return;
+        const next = { ...a, plan: { ...a.plan, items: moveItem(a.plan.items, from, to) }, lastAt: Date.now() };
+        set({ active: next });
+        persistActive(next);
+        track("feature", { name: "reorder", detail: "workout" });
+        return;
+      }
+      const p = get().preview;
+      if (!p) return;
+      const items = moveItem(p.items, from, to);
+      // The order and every pair's link are kept, so a rebuild of the same plan comes back as it was left.
+      const links = linksOf(items).map((on, i) => `${on ? "" : "!"}${items[i].exerciseId}>${items[i + 1].exerciseId}`);
+      set({ order: items.map((i) => i.exerciseId), links, preview: { ...p, items, estMinutes: Math.round(planSeconds(items) / 60) } });
+      track("feature", { name: "reorder", detail: "today" });
+    },
 
     addNote(exerciseId, text) {
       const a = get().active;
@@ -220,7 +277,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           routine: plan.routineId,
         },
       ]);
-      set({ callOverride: null, links: [], routineId: null });
+      set({ callOverride: null, links: [], order: [], routineId: null, undoable: null });
       set({ active: a });
       persistActive(a);
       track("workout_start", {
@@ -242,9 +299,8 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const autoRest = get().profile.training?.autoRest !== false;
       if (warmingUp(a)) {
         // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
-        commit([
-          { type: "warmup", id: uid(), at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps },
-        ]);
+        const wid = uid();
+        commit([{ type: "warmup", id: wid, at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps }]);
         const warm = (a.warm ?? 0) + 1;
         const nextWarm = item.warmup![warm];
         const next: Active = {
@@ -260,7 +316,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           restUntil: autoRest ? now + WARMUP_REST * 1000 : null,
           restReady: autoRest ? undefined : WARMUP_REST,
         };
-        set({ active: next });
+        set({ active: next, undoable: { prev: a, ids: [wid], until: Math.max(now + UNDO_MS, next.restUntil ?? 0) } });
         persistActive(next);
         return;
       }
@@ -272,10 +328,11 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       // Logged before the rest timer ran out: the set started at some unknown point during the rest.
       const earlyLog = !!a.restUntil && a.restUntil > now;
       const plausible = !earlyLog && duration >= 3 && duration <= Math.max(180, 3 * setSeconds(ex, a.reps));
+      const sid = uid();
       commit([
         {
           type: "set",
-          id: uid(),
+          id: sid,
           at: now,
           sessionId: a.sessionId,
           exerciseId: item.exerciseId,
@@ -318,7 +375,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       next.restUntil = last || !autoRest ? null : now + step.rest * 1000;
       // Auto-start off: the rest waits for Start rest. The set's clock still runs from Log set.
       if (!last && !autoRest && step.rest > 0) next.restReady = step.rest;
-      set({ active: next });
+      set({ active: next, undoable: { prev: a, ids: [sid], until: Math.max(now + UNDO_MS, next.restUntil ?? 0) } });
       persistActive(next);
     },
 
@@ -504,7 +561,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         exercises: new Set(sets.map((e) => (e.type === "set" ? e.exerciseId : ""))).size,
         challenge: !!a.plan.challenge,
       });
-      set({ active: null });
+      set({ active: null, undoable: null });
       persistActive(null);
       get().replan();
       return end;
@@ -518,7 +575,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         .map((e) => e.id);
       track("workout_discard", { sets: get().events.filter((e) => e.type === "set" && e.sessionId === a.sessionId).length });
       const events = get().events.filter((e) => !ids.includes(e.id));
-      set({ events, stats: derive(events, Date.now()), active: null });
+      set({ events, stats: derive(events, Date.now()), active: null, undoable: null });
       void deleteEvents(ids);
       persistActive(null);
       get().replan();

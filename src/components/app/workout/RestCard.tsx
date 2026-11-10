@@ -20,6 +20,7 @@ import { HUE } from "../theme";
 import { Button, Ring } from "../ui";
 import { GhostLine, PlateChange, RestExtra, useGhost } from "../WorkoutExtras";
 import { AlmostThere } from "../WorkoutJuice";
+import { HrReadyLine, TipCard } from "./Polish";
 
 type Ghost = ReturnType<typeof useGhost>;
 type Loading = ReturnType<typeof loadBar>;
@@ -42,6 +43,9 @@ export function RestCard({
   loading,
   bar,
   finish,
+  now,
+  setsLogged,
+  lastSetStart,
 }: {
   active: Active;
   ex: Exercise;
@@ -58,6 +62,11 @@ export function RestCard({
   loading: Loading | null;
   bar: Bar | null;
   finish: PlateFinish;
+  now: number;
+  /** Working sets logged in this workout, for the tip (one per workout, never on the first rest). */
+  setsLogged: number;
+  /** When the set just finished started, for the heart-rate-ready line. */
+  lastSetStart: number | undefined;
 }) {
   const s = useApp();
   const { events, profile } = s;
@@ -84,6 +93,7 @@ export function RestCard({
           {t("workout.skipRest")}
         </Button>
       </div>
+      <HrReadyLine active={active} setStart={lastSetStart} now={now} />
       <GhostLine
         ghost={ghost}
         logged={events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === ex.id)}
@@ -118,6 +128,7 @@ export function RestCard({
         <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
       </div>
       <RestExtra left={left} gym={gym} />
+      <TipCard active={active} setsLogged={setsLogged} />
     </section>
   );
 }

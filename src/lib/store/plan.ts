@@ -10,6 +10,7 @@ import { withSettings, type Setting } from "../machineSettings";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
 import { pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, type Call, type Readiness } from "../readiness";
+import { applyOrder } from "../reorder";
 import { planFromRoutine } from "../routines";
 import { healthExternal } from "../twin";
 import type { Gym, Profile } from "../types";
@@ -33,6 +34,8 @@ export interface PlanSlice {
    * "!first>second" splits a pair the plan itself linked (a routine or "Same as last time").
    */
   links: string[];
+  /** An order chosen on Today by dragging (exercise ids), kept when the plan is rebuilt with the same exercises. */
+  order: string[];
   /** Switches to the gym the lifter is at, if they opted in. `fix` is for tests. */
   pickGymByLocation(fix?: Fix | null): Promise<string | null>;
   setProfile(p: Partial<Profile>): void;
@@ -60,6 +63,7 @@ export function planSlice(c: Ctx): PlanSlice {
     callOverride: null,
     pickedByLocation: null,
     links: [],
+    order: [],
 
     async pickGymByLocation(fix) {
       const { gyms, active, profile } = get();
@@ -136,7 +140,7 @@ export function planSlice(c: Ctx): PlanSlice {
       if (fromRoutine) plan = { ...injuryPass(fromRoutine, events, profile, g, now), program: undefined };
       // Plateau fixes adjust the adaptive plan only; programs and routines stay as written.
       if (!fromProgram && !fromRoutine) plan = applyFixes(plan, profile.plateauFixes, events, profile, g, now);
-      set({ readiness: r, preview: relink(plan, get().links) });
+      set({ readiness: r, preview: relink({ ...plan, items: applyOrder(plan.items, get().order) }, get().links) });
     },
 
     applyAccess() {
