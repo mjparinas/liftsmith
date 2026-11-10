@@ -58,3 +58,58 @@ export const fr: Partial<Record<Key, Message>> = {
   "creator.okOffer": "Code {code} appliqué : son prix s'affiche sur les offres.",
   "creator.ended": "Le code {code} n'est plus disponible.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "creator.title": "Code einlösen",
+  "creator.have": "Hast du einen Code?",
+  "creator.placeholder": "z. B. LIFT-ALEX",
+  "creator.apply": "Einlösen",
+  "creator.remove": "Code entfernen",
+  "creator.note":
+    "Ein Code von uns oder von einem Creator, dem du folgst, kann dir eine längere Pro-Testphase oder einen günstigeren Preis geben.",
+  "creator.ok": "Code {code} von {name}: Deine Pro-Testphase dauert {days} Tage.",
+  "creator.okNoName": "Code {code} eingelöst: Deine Pro-Testphase dauert {days} Tage.",
+  "creator.pending": "Code {code} gespeichert. Wir prüfen ihn, wenn du das nächste Mal online bist.",
+  "creator.unknown": "Den Code {code} kennen wir nicht. Prüfe die Schreibweise und versuch es noch einmal.",
+  "creator.invalid": "Codes bestehen aus Buchstaben, Ziffern und Bindestrichen, wie LIFT-ALEX.",
+  "creator.locked": "Dein Abo nutzt bereits den Code {code}, deshalb lässt er sich nicht ändern.",
+  "creator.lockedNone": "Codes lassen sich nur hinzufügen, bevor eine Testphase oder ein Abo beginnt.",
+  "creator.okOffer": "Code {code} eingelöst: Sein Preis wird bei den Tarifen angezeigt.",
+  "creator.ended": "Der Code {code} ist abgelaufen.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "creator.title": "Riscatta un codice",
+  "creator.have": "Hai un codice?",
+  "creator.placeholder": "es. LIFT-ALEX",
+  "creator.apply": "Applica",
+  "creator.remove": "Rimuovi codice",
+  "creator.note": "Un codice nostro o di un creator che segui può darti una prova Pro più lunga o un prezzo più basso.",
+  "creator.ok": "Codice {code} di {name}: la tua prova Pro dura {days} giorni.",
+  "creator.okNoName": "Codice {code} applicato: la tua prova Pro dura {days} giorni.",
+  "creator.pending": "Codice {code} salvato. Lo verificheremo la prossima volta che sei online.",
+  "creator.unknown": "Non conosciamo il codice {code}. Controlla come l’hai scritto e riprova.",
+  "creator.invalid": "I codici sono lettere, cifre e trattini, come LIFT-ALEX.",
+  "creator.locked": "Il tuo abbonamento usa già il codice {code}, quindi non si può cambiare.",
+  "creator.lockedNone": "I codici si possono aggiungere solo prima che inizi una prova o un abbonamento.",
+  "creator.okOffer": "Codice {code} applicato: il suo prezzo compare nei piani.",
+  "creator.ended": "Il codice {code} è scaduto.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "creator.title": "コードを使う",
+  "creator.have": "コードをお持ちですか？",
+  "creator.placeholder": "例：LIFT-ALEX",
+  "creator.apply": "適用",
+  "creator.remove": "コードを削除",
+  "creator.note": "私たちやフォローしているクリエイターのコードで、Pro のお試しが長くなったり、価格が安くなったりします。",
+  "creator.ok": "{name}のコード {code}：Pro のお試しは{days}日間です。",
+  "creator.okNoName": "コード {code} を適用しました：Pro のお試しは{days}日間です。",
+  "creator.pending": "コード {code} を保存しました。次にオンラインになったときに確認します。",
+  "creator.unknown": "コード {code} は見つかりません。綴りを確認してもう一度お試しください。",
+  "creator.invalid": "コードは英字、数字、ハイフンでできています（例：LIFT-ALEX）。",
+  "creator.locked": "サブスクリプションにはすでにコード {code} が使われているため、変更できません。",
+  "creator.lockedNone": "コードはお試しやサブスクリプションの開始前にしか追加できません。",
+  "creator.okOffer": "コード {code} を適用しました：価格はプランに表示されます。",
+  "creator.ended": "コード {code} は終了しました。",
+};

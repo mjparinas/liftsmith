@@ -61,3 +61,54 @@ export const fr: Partial<Record<Key, Message>> = {
   },
   "wdg.goalMet": "Objectif de la semaine atteint : {done} sur {goal}. Le repos fait aussi partie de l’entraînement.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes} Min.",
+  "wdg.start": "Start",
+  "wdg.resume": "Fortsetzen",
+  "wdg.log": "Satz eintragen",
+  "wdg.activeWhy": "Dein nächster Satz ist bereit. Trag ihn hier ein oder öffne das Training.",
+  "wdg.stale": "Öffne Liftsmith für den heutigen Plan.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    one: "{done} von {goal} diese Woche. Noch {count} bis zu deinem Ziel.",
+    other: "{done} von {goal} diese Woche. Noch {count} bis zu deinem Ziel.",
+  },
+  "wdg.goalStreak": {
+    one: "{done} von {goal} diese Woche. Noch {count}, und deine Serie von {weeks} Wochen hält.",
+    other: "{done} von {goal} diese Woche. Noch {count}, und deine Serie von {weeks} Wochen hält.",
+  },
+  "wdg.goalMet": "Wochenziel erreicht: {done} von {goal}. Erholung ist auch Training.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes} min",
+  "wdg.start": "Inizia",
+  "wdg.resume": "Riprendi",
+  "wdg.log": "Registra serie",
+  "wdg.activeWhy": "La prossima serie è pronta. Registrala qui o apri l’allenamento.",
+  "wdg.stale": "Apri Liftsmith per il piano di oggi.",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": {
+    one: "{done} di {goal} questa settimana. Ancora {count} per l’obiettivo.",
+    other: "{done} di {goal} questa settimana. Ancora {count} per l’obiettivo.",
+  },
+  "wdg.goalStreak": {
+    one: "{done} di {goal} questa settimana. Ancora {count} per tenere la serie di {weeks} settimane.",
+    other: "{done} di {goal} questa settimana. Ancora {count} per tenere la serie di {weeks} settimane.",
+  },
+  "wdg.goalMet": "Obiettivo settimanale raggiunto: {done} di {goal}. Anche il riposo è allenamento.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "wdg.title": "{call} · {minutes}分",
+  "wdg.start": "開始",
+  "wdg.resume": "再開",
+  "wdg.log": "セットを記録",
+  "wdg.activeWhy": "次のセットの準備ができています。ここで記録するか、ワークアウトを開いてください。",
+  "wdg.stale": "Liftsmith を開いて今日のプランを確認しましょう。",
+  "wdg.note": "{note} · {action}",
+  "wdg.goal": { other: "今週 {done}/{goal}回。目標まであと{count}回。" },
+  "wdg.goalStreak": { other: "今週 {done}/{goal}回。あと{count}回で{weeks}週間の連続記録をキープ。" },
+  "wdg.goalMet": "今週の目標達成：{done}/{goal}回。休むこともトレーニングです。",
+};

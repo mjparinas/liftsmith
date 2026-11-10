@@ -6,7 +6,7 @@
 // (`health`, imported by the store from health.ts readDaily), and the heart rate streams of workouts.
 // Sleep, HRV, resting HR and breathing rate also feed the readiness call, for Pro (healthExternal).
 import type { SessionSummary } from "./derive";
-import { list, t } from "./i18n";
+import { inSentence, list, t } from "./i18n";
 import { healthSignals, type ExternalSignals } from "./readiness";
 import { ACTIVITY, bmiBand, currentTdee } from "./tdee";
 import type { AppEvent, HealthMetric, HrSeriesEvent, Profile, SetEvent } from "./types";
@@ -413,7 +413,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       status: ignore ? "info" : bmi >= 18.5 && bmi < 25 ? "steady" : "info",
       chip: ignore ? t("twin.c.ignore") : band,
       why: ignore
-        ? t("twin.w.bmiIgnore", { band: band.toLowerCase(), fat: fmtNum(Math.round(lastF!.bodyFat! * 10) / 10) })
+        ? t("twin.w.bmiIgnore", { band: inSentence(band, true), fat: fmtNum(Math.round(lastF!.bodyFat! * 10) / 10) })
         : t("twin.w.bmi"),
       series: [],
       source: "app",
@@ -437,7 +437,7 @@ export function twin(input: TwinInput): TwinMetric[] {
   // Energy: TDEE and what to eat for the goal.
   if (tdee.result) {
     const r = tdee.result;
-    const level = ACTIVITY[tdee.activity.activity].label.toLowerCase();
+    const level = inSentence(ACTIVITY[tdee.activity.activity].label, true);
     const from =
       tdee.activity.source === "steps"
         ? t("twin.from.steps", { level })
@@ -629,7 +629,7 @@ export function twin(input: TwinInput): TwinMetric[] {
   else {
     const avg = mean(week.map((p) => p.value));
     const counted = tdee.activity.source === "steps";
-    const tail = counted ? ` ${t("twin.w.stepsTail", { level: ACTIVITY[tdee.activity.activity].label.toLowerCase() })}` : "";
+    const tail = counted ? ` ${t("twin.w.stepsTail", { level: inSentence(ACTIVITY[tdee.activity.activity].label, true) })}` : "";
     const n = fmtNum(Math.round(avg / 100) * 100);
     const s: Status = avg < 5000 ? "watch" : avg >= 8000 ? "good" : "steady";
     const why = (avg < 5000 ? t("twin.w.stepsLow", { n }) : t("twin.w.steps", { n })) + tail;

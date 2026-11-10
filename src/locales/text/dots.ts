@@ -75,3 +75,74 @@ export const fr: Partial<Record<Key, Message>> = {
   "dots.band.novice": "Novice",
   "dots.band.beginner": "Débutant",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "dots.title": "DOTS-Wert",
+  "dots.body":
+    "Die Summe aus Kniebeuge, Bankdrücken und Kreuzheben, auf das Körpergewicht umgerechnet, damit sich Lifter jeder Größe vergleichen können. Berechnet aus deinen geschätzten Maxima.",
+  "dots.missing": "Braucht ein geschätztes Maximum für {names}. Trag von jeder Übung einen schweren Satz ein oder gib sie unten ein.",
+  "dots.total": "Summe",
+  "dots.bw": "Körpergewicht",
+  "dots.sex": "Formel",
+  "dots.male": "Männer",
+  "dots.female": "Frauen",
+  "dots.calc": "Werte ändern",
+  "dots.reset": "Meine Daten verwenden",
+  "dots.note":
+    "Geschätzte Maxima, keine Wettkampfleistungen. Die Stufen sind ein grober Anhaltspunkt: unter 200 Anfänger, 300 Mittelstufe, 400 fortgeschritten, 500 Elite.",
+  "dots.lift.squat": "Kniebeuge",
+  "dots.lift.bench": "Bankdrücken",
+  "dots.lift.deadlift": "Kreuzheben",
+  "dots.band.elite": "Elite",
+  "dots.band.advanced": "Fortgeschritten",
+  "dots.band.intermediate": "Mittelstufe",
+  "dots.band.novice": "Anfänger",
+  "dots.band.beginner": "Einsteiger",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "dots.title": "Punteggio DOTS",
+  "dots.body":
+    "Il totale di squat, panca e stacco rapportato al peso corporeo, così si possono confrontare atleti di ogni taglia. Calcolato dai tuoi massimali stimati.",
+  "dots.missing": "Serve un massimale stimato per {names}. Registra una serie pesante di ciascuno, o inseriscili qui sotto.",
+  "dots.total": "Totale",
+  "dots.bw": "Peso corporeo",
+  "dots.sex": "Formula",
+  "dots.male": "Uomini",
+  "dots.female": "Donne",
+  "dots.calc": "Cambia i numeri",
+  "dots.reset": "Usa i miei dati",
+  "dots.note":
+    "Massimali stimati, non alzate di gara. Le fasce sono indicative: sotto 200 principiante, 300 intermedio, 400 avanzato, 500 élite.",
+  "dots.lift.squat": "Squat",
+  "dots.lift.bench": "Panca",
+  "dots.lift.deadlift": "Stacco",
+  "dots.band.elite": "Élite",
+  "dots.band.advanced": "Avanzato",
+  "dots.band.intermediate": "Intermedio",
+  "dots.band.novice": "Principiante",
+  "dots.band.beginner": "Esordiente",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "dots.title": "DOTS スコア",
+  "dots.body":
+    "スクワット、ベンチプレス、デッドリフトの合計を体重で補正した値で、体格の違う人どうしでも比べられます。推定最大重量から計算します。",
+  "dots.missing": "{names}の推定最大重量が必要です。それぞれ重めのセットを記録するか、下に入力してください。",
+  "dots.total": "合計",
+  "dots.bw": "体重",
+  "dots.sex": "計算式",
+  "dots.male": "男性",
+  "dots.female": "女性",
+  "dots.calc": "数値を変える",
+  "dots.reset": "自分のデータを使う",
+  "dots.note": "推定最大重量で、大会記録ではありません。目安：200未満は初心者、300で中級、400で上級、500でエリート。",
+  "dots.lift.squat": "スクワット",
+  "dots.lift.bench": "ベンチプレス",
+  "dots.lift.deadlift": "デッドリフト",
+  "dots.band.elite": "エリート",
+  "dots.band.advanced": "上級",
+  "dots.band.intermediate": "中級",
+  "dots.band.novice": "初級",
+  "dots.band.beginner": "入門",
+};

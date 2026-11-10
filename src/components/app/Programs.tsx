@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
-import { list, t } from "@/lib/i18n";
+import { inSentence, list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { missingFor, PICKER_ORDER, pickProgram, PROGRAM_BY_ID, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
@@ -125,7 +125,7 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
       </ol>
       {missing.length > 0 && (
         <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">
-          {t("prog.needs", { items: list(missing.map((e) => EQUIPMENT_LABEL[e].toLocaleLowerCase())) })}
+          {t("prog.needs", { items: list(missing.map((e) => inSentence(EQUIPMENT_LABEL[e], true))) })}
         </p>
       )}
       <div>

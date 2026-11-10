@@ -1,7 +1,7 @@
 import { weekStart, type BlockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
 import { weeklySets, type Plan, type PlanItem } from "./generator";
-import { currentTag, list, t } from "./i18n";
+import { inSentence, list, t } from "./i18n";
 import type { Readiness, Signal } from "./readiness";
 import { recovery } from "./recovery";
 import { PRIORITY_VOLUME } from "./training";
@@ -46,7 +46,7 @@ export function whyContext(plan: Plan, events: readonly AppEvent[], profile: Pro
 }
 
 /** Lower-cases the first letter to continue a sentence, but leaves acronyms (HRV, VFC) alone. */
-const lower = (s: string) => (/^\p{Lu}{2}/u.test(s) ? s : s.charAt(0).toLocaleLowerCase(currentTag()) + s.slice(1));
+const lower = (s: string) => (/^\p{Lu}{2}/u.test(s) ? s : inSentence(s));
 
 export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
   const ex = EXERCISE_BY_ID.get(item.exerciseId);

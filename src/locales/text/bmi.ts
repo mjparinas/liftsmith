@@ -25,3 +25,24 @@ export const fr: Partial<Record<Key, Message>> = {
   "bmi.over": "Surpoids",
   "bmi.obese": "Obésité",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "bmi.under": "Untergewicht",
+  "bmi.healthy": "Gesunder Bereich",
+  "bmi.over": "Übergewicht",
+  "bmi.obese": "Adipositas",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "bmi.under": "Sottopeso",
+  "bmi.healthy": "Normopeso",
+  "bmi.over": "Sovrappeso",
+  "bmi.obese": "Obesità",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "bmi.under": "低体重",
+  "bmi.healthy": "標準範囲",
+  "bmi.over": "過体重",
+  "bmi.obese": "肥満",
+};

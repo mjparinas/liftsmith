@@ -1,0 +1,8 @@
+/* German Siri phrases for ShortcutIntents.swift. Every phrase keeps ${applicationName}. */
+"Start a workout in ${applicationName}" = "Starte ein Training in ${applicationName}";
+"Start ${applicationName}" = "Starte ${applicationName}";
+"Start my ${applicationName} workout" = "Starte mein ${applicationName} Training";
+"Log set in ${applicationName}" = "Trage den Satz in ${applicationName} ein";
+"Log a set in ${applicationName}" = "Trage einen Satz in ${applicationName} ein";
+"Add rest in ${applicationName}" = "Pause verlängern in ${applicationName}";
+"More rest in ${applicationName}" = "Mehr Pause in ${applicationName}";

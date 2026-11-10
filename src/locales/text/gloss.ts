@@ -238,3 +238,237 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.restDrop.body":
     "De combien de battements par minute votre fréquence cardiaque baisse dans la première minute après une série, d’après votre cardiofréquencemètre. Une baisse plus grande au fil des mois signifie un cœur plus en forme ; une baisse plus faible que d’habitude peut signaler de la fatigue.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "gloss.fitnessAge.title": "Fitnessalter",
+  "gloss.fitnessAge.body":
+    "Das Alter, in dem ein typischer gesunder Mensch deines Geschlechts deinen VO₂max hat, nach einer großen norwegischen Studie mit gesunden Erwachsenen.\nEs ist eine Fitness-Schätzung, keine Gesundheitsuntersuchung. Hartes Ausdauertraining senkt es innerhalb weniger Wochen.",
+  "gloss.deloadWeeks.title": "Aufbauwochen vor einem Deload",
+  "gloss.deloadWeeks.body":
+    "Dein Training läuft in Blöcken. In den Aufbauwochen wird der Plan jede Woche etwas härter: mehr Sätze und weniger Wiederholungen im Tank.\nDann kommt eine Deload-Woche: leichter, etwa die Hälfte der Sätze. So können Gelenke und Nerven aufholen, und du kommst stärker zurück. Wähle weniger Aufbauwochen, wenn du neu oder viel beschäftigt bist, mehr, wenn du dich gut erholst.",
+  "gloss.deload.title": "Deload-Woche",
+  "gloss.deload.body":
+    "Eine leichtere Woche nach einem Block harten Trainings: weniger Gewicht und etwa die Hälfte der Sätze. Das ist kein verlorener Fortschritt. In dieser Zeit verarbeitet dein Körper die Arbeit, damit der nächste Block stärker beginnt.",
+  "gloss.rir.title": "RIR: Wiederholungen in Reserve",
+  "gloss.rir.body":
+    "Wie viele Wiederholungen du noch geschafft hättest, als du den Satz beendest. RIR 2 heißt: Du beendest den Satz mit dem Gefühl, dass noch etwa zwei saubere Wiederholungen drin gewesen wären.\nDer Plan beginnt mit mehr Reserve und geht im Lauf des Blocks näher ans Muskelversagen.",
+  "gloss.rpe.title": "RPE: wahrgenommene Anstrengung",
+  "gloss.rpe.body":
+    "Wie schwer sich ein Satz angefühlt hat, auf einer Skala von 1 bis 10, wobei 10 alles ist, was du hattest. Eine 8 heißt, dass noch etwa zwei saubere Wiederholungen drin waren, also dasselbe wie 2 Wiederholungen in Reserve.\nWähle diese Skala oder Wiederholungen in Reserve unter Einstellungen › Trainingsvorlieben. Der Plan funktioniert in beiden Fällen gleich.",
+  "gloss.blockWeek.title": "Trainingsblock",
+  "gloss.blockWeek.body":
+    "Wo du in deinem Block stehst: welche Aufbauwoche (oder der Deload) und wie viele Wiederholungen du diese Woche in Reserve lassen sollst. Die Blocklänge kannst du in den Einstellungen ändern.",
+  "gloss.readiness.title": "Bereitschaft",
+  "gloss.readiness.body":
+    "Ein Wert von 0 bis 100, wobei 50 ein normaler Tag ist. Er ergibt sich daraus, wie erholt deine großen Muskeln sind, wie die letzten Trainings liefen (geschaffte Wiederholungen, wie sich die Sätze anfühlten, Wiederholungstempo und Herzfrequenz) und aus Ruhetagen.\nAb 65 ist ein Gas-geben-Tag, bei 35 oder weniger ein lockerer Tag. Du kannst ihn immer überstimmen.",
+  "gloss.call.title": "Die Empfehlung für heute",
+  "gloss.call.body":
+    "Gas geben: Deine erste große Übung geht eine Wiederholung näher ans Muskelversagen. Wie geplant: der normale Plan. Locker: ein Satz weniger, eine Stufe leichter und eine Wiederholung mehr in Reserve. Deine Wahl wird gespeichert.",
+  "gloss.volume.title": "Volumen",
+  "gloss.volume.body":
+    "Gewicht × Wiederholungen, über alle Arbeitssätze addiert. Ein grobes Maß dafür, wie viel Arbeit du insgesamt geleistet hast. Aufwärmsätze zählen nicht.",
+  "gloss.e1rm.title": "Geschätztes Einwiederholungsmaximum",
+  "gloss.e1rm.body":
+    "Das Gewicht, das du vermutlich einmal heben könntest, berechnet aus deinen Sätzen plus den Wiederholungen, die du noch übrig hattest. Es nutzt die Formeln, die laut Forschung für jeden Wiederholungsbereich am genauesten sind (Brzycki und Epley bis 10 Wiederholungen bis zum Versagen, Mayhew und Wathan darüber), jeweils gemittelt mit einer gewichtsbasierten Gleichung von 2026, die an über 300.000 Sätzen angepasst wurde. Neue, schwere Sätze nahe am Versagen zählen am meisten, Sätze über 20 Wiederholungen werden ignoriert. So kannst du einen Fünfersatz mit einem Achtersatz vergleichen und echte Kraftentwicklung sehen, ohne ein echtes Maximum zu testen.",
+  "gloss.weeklySets.title": "Sätze pro Muskel diese Woche",
+  "gloss.weeklySets.body":
+    "Harte Sätze, die diese Woche jeden Muskel trainiert haben. Mitbeteiligte Muskeln zählen als halber Satz. Der grüne Bereich, 10 bis 20, ist die Spanne, die die meiste Forschung für Muskelaufbau stützt. Der Plan zielt auf die Muskeln, die am weitesten darunter liegen.",
+  "gloss.variety.title": "Übungsvielfalt",
+  "gloss.variety.body":
+    "Wie oft der Plan für einen Muskel bei derselben Übung bleibt. Beständiger ist besser, um den Fortschritt bei einer Übung zu verfolgen. Mehr Abwechslung hält das Training frisch und verteilt die Belastung.",
+  "gloss.recovery.title": "Erholung",
+  "gloss.recovery.body":
+    "Jeder Satz ermüdet die Muskeln, die er trainiert. Diese Ermüdung lässt über 2 bis 3 Tage nach. Frisch ist ab 90 %, Bereit ab 70 %, In Erholung ab 40 %, und Ermüdet liegt unter 40 %. Der Plan meidet Muskeln, die noch ermüdet sind.",
+  "gloss.superset.title": "Supersatz",
+  "gloss.superset.body":
+    "Zwei oder mehr Übungen direkt hintereinander: ein Satz der ersten, dann sofort ein Satz der nächsten, dann die Pause. Das spart Zeit und funktioniert am besten mit Übungen, die nicht dieselben Muskeln ermüden, etwa Rudern mit Drücken.\nTippe auf die Verbindung zwischen zwei Übungen, um sie zu koppeln, und noch einmal, um sie zu trennen.",
+  "gloss.warmup.title": "Aufwärmsätze",
+  "gloss.warmup.body":
+    "Leichtere Sätze, die dich an dein Arbeitsgewicht heranführen. Sie zählen nicht zu deinen Statistiken oder deinem Fortschritt. Lass sie weg, wenn du schon warm bist.",
+  "gloss.firstWeights.title": "Warum wir fragen",
+  "gloss.firstWeights.body":
+    "Nur um für jede Übung ein sicheres erstes Gewicht vorzuschlagen. Wir fangen eher leicht an und passen nach deinem ersten Training an. Die Angaben bleiben auf deinem Handy.",
+  "gloss.healthTwin.title": "Gesundheit",
+  "gloss.healthTwin.body":
+    "Die Werte deines Körpers an einem Ort: Gewicht, Körperfett, Energie, Schlaf, Herz und Schritte, aus Liftsmith und der Gesundheits-App deines Handys.\nJeder Wert wird mit deinem eigenen Normalwert der letzten 30 Tage verglichen, nie mit anderen Menschen, und sagt dir, was zu tun ist. Das ist keine medizinische Beratung.",
+  "gloss.hrv.title": "HRV: Herzfrequenzvariabilität",
+  "gloss.hrv.body":
+    "Die winzigen Schwankungen der Zeit zwischen zwei Herzschlägen, gemessen von einer Uhr oder einem Ring, meist über Nacht. Höher als dein eigener Normalwert heißt meist, dass du erholt bist; niedriger deutet auf Stress durch Training, schlechten Schlaf oder Krankheit hin.\nNur dein eigener Verlauf zählt: Handys und Uhren messen sie unterschiedlich, also vergleiche deinen Wert nicht mit dem anderer.",
+  "gloss.restingHr.title": "Ruhepuls",
+  "gloss.restingHr.body":
+    "Deine Herzfrequenz in völliger Ruhe, meist im Schlaf gemessen. Ein paar Schläge über deinem Normalwert für ein, zwei Tage sind ein frühes Zeichen, es ruhiger angehen zu lassen.",
+  "gloss.breathingRate.title": "Atemfrequenz",
+  "gloss.breathingRate.body":
+    "Atemzüge pro Minute im Schlaf, gemessen von einer Uhr oder einem Ring. Sie ist sehr stabil, daher ist ein Anstieg um zwei oder mehr über deinen Normalwert oft eines der ersten Anzeichen einer Erkrankung.",
+  "gloss.vo2max.title": "VO₂max",
+  "gloss.vo2max.body":
+    "Wie viel Sauerstoff dein Körper bei voller Anstrengung nutzen kann, in Millilitern pro Kilogramm und Minute. Uhren schätzen ihn aus Spaziergängen und Läufen. Er ist das beste Einzelmaß für die Fitness deines Herzens.\nKrafttraining bewegt ihn kaum. Zwei harte Ausdauereinheiten von 20 Minuten pro Woche schon.",
+  "gloss.bodyFat.title": "Körperfett",
+  "gloss.bodyFat.body":
+    "Der Anteil deines Gewichts, der Fett ist, gemessen mit einer smarten Waage, einem Körperscanner oder einer Hautfaltenzange. Jede Methode misst anders, also bleib bei einer und miss immer zur selben Tageszeit, am besten morgens vor dem Essen.\nEine einzelne Messung sagt wenig. Drei oder mehr über ein paar Wochen zeigen den Trend, und die Coach-Notizen sagen dir, wenn er sich für dein Ziel in die falsche Richtung bewegt.",
+  "gloss.leanMass.title": "Magermasse",
+  "gloss.leanMass.body":
+    "Alles in deinem Körper, was kein Fett ist: Muskeln, Knochen, Organe und Wasser. Dein Gewicht mal dem Anteil, der kein Fett ist. Steigt die Magermasse, während das Körperfett gleich bleibt oder sinkt, baut das Training Muskeln auf.",
+  "gloss.bmi.title": "BMI: Body-Mass-Index",
+  "gloss.bmi.body":
+    "Gewicht geteilt durch Größe zum Quadrat. Ein grober Richtwert für Menschen, die kein Krafttraining machen: Er kann Muskeln nicht von Fett unterscheiden, daher gelten muskulöse Kraftsportler oft als übergewichtig. Wenn du einen Körperfettwert hast, verlass dich lieber darauf.",
+  "gloss.restDrop.title": "Herzfrequenzabfall in der Pause",
+  "gloss.restDrop.body":
+    "Um wie viele Schläge pro Minute deine Herzfrequenz in der ersten Minute nach einem Satz fällt, gemessen von deinem Herzfrequenzmesser. Ein größerer Abfall über die Monate bedeutet ein fitteres Herz; ein kleinerer als sonst kann heißen, dass du müde bist.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "gloss.fitnessAge.title": "Età fitness",
+  "gloss.fitnessAge.body":
+    "L’età in cui una persona sana tipica del tuo sesso ha il tuo VO₂ max, secondo un grande studio norvegese su adulti sani.\nÈ una stima della forma fisica, non un controllo medico. Il cardio intenso la abbassa nel giro di qualche settimana.",
+  "gloss.deloadWeeks.title": "Settimane di carico prima dello scarico",
+  "gloss.deloadWeeks.body":
+    "Il tuo allenamento procede a blocchi. Nelle settimane di carico il piano diventa un po’ più duro ogni settimana: più serie e meno ripetizioni di riserva.\nPoi arriva una settimana di scarico: più leggera, con circa metà delle serie. Dà tempo ad articolazioni e sistema nervoso di recuperare, così torni più forte. Scegli meno settimane di carico se sei alle prime armi o hai poco tempo, di più se recuperi bene.",
+  "gloss.deload.title": "Settimana di scarico",
+  "gloss.deload.body":
+    "Una settimana più facile dopo un blocco di allenamento duro: pesi più leggeri e circa metà delle serie. Non è un progresso perso. È il momento in cui il corpo assorbe il lavoro, così il blocco successivo parte più forte.",
+  "gloss.rir.title": "RIR: ripetizioni di riserva",
+  "gloss.rir.body":
+    "Quante ripetizioni in più avresti potuto fare quando chiudi la serie. RIR 2 significa che finisci la serie sentendo di avere ancora circa due buone ripetizioni.\nIl piano parte con più riserva e si avvicina al cedimento nel corso del blocco.",
+  "gloss.rpe.title": "RPE: sforzo percepito",
+  "gloss.rpe.body":
+    "Quanto è stata dura una serie su una scala da 1 a 10, dove 10 è tutto quello che avevi. Un 8 significa che avevi ancora circa due buone ripetizioni, come 2 ripetizioni di riserva.\nScegli questa scala o le ripetizioni di riserva in Impostazioni › Preferenze di allenamento. Il piano funziona allo stesso modo in entrambi i casi.",
+  "gloss.blockWeek.title": "Blocco di allenamento",
+  "gloss.blockWeek.body":
+    "A che punto sei del blocco: quale settimana di carico (o lo scarico) e quante ripetizioni lasciare di riserva questa settimana. Puoi cambiare la durata del blocco nelle Impostazioni.",
+  "gloss.readiness.title": "Prontezza",
+  "gloss.readiness.body":
+    "Un punteggio da 0 a 100, dove 50 è una giornata normale. Dipende da quanto sono recuperati i muscoli principali, da come sono andati gli ultimi allenamenti (ripetizioni completate, sensazioni sulle serie, velocità delle ripetizioni e frequenza cardiaca) e dai giorni di riposo.\nDa 65 in su è un giorno da spingere, 35 o meno un giorno leggero. Puoi sempre ignorarlo.",
+  "gloss.call.title": "La scelta di oggi",
+  "gloss.call.body":
+    "Spingi: il primo esercizio principale va una ripetizione più vicino al cedimento. Come previsto: il piano normale. Leggero: una serie in meno, un gradino più leggero e una ripetizione di riserva in più. La tua scelta viene salvata.",
+  "gloss.volume.title": "Volume",
+  "gloss.volume.body":
+    "Peso × ripetizioni, sommato su tutte le serie allenanti. È una misura approssimativa del lavoro totale svolto. Le serie di riscaldamento non contano.",
+  "gloss.e1rm.title": "Massimale stimato",
+  "gloss.e1rm.body":
+    "Il peso che probabilmente riusciresti a sollevare una volta, calcolato dalle tue serie aggiungendo le ripetizioni che ti restavano. Usa le formule che la ricerca ha trovato più precise per ogni intervallo di ripetizioni (Brzycki ed Epley fino a 10 ripetizioni a cedimento, Mayhew e Wathan oltre), ciascuna mediata con un’equazione del 2026 basata sul peso e calibrata su oltre 300.000 serie. Le serie recenti, pesanti e vicine al cedimento contano di più, quelle oltre le 20 ripetizioni vengono ignorate. Così puoi confrontare una serie da 5 con una da 8 e vedere i veri progressi di forza senza testare un massimale.",
+  "gloss.weeklySets.title": "Serie per muscolo questa settimana",
+  "gloss.weeklySets.body":
+    "Le serie impegnative che hanno allenato ogni muscolo questa settimana. I muscoli secondari contano mezza serie. La fascia verde, da 10 a 20, è l’intervallo che la maggior parte della ricerca indica per la crescita. Il piano punta ai muscoli più lontani da questa fascia.",
+  "gloss.variety.title": "Varietà degli esercizi",
+  "gloss.variety.body":
+    "Quanto spesso il piano mantiene lo stesso esercizio per un muscolo. Più costanza aiuta a seguire i progressi su un esercizio. Più varietà rende l’allenamento meno monotono e distribuisce lo stress.",
+  "gloss.recovery.title": "Recupero",
+  "gloss.recovery.body":
+    "Ogni serie affatica i muscoli che allena. Questa fatica si smaltisce in 2-3 giorni. Fresco è dal 90 % in su, Pronto dal 70 %, In recupero dal 40 %, e Affaticato è sotto il 40 %. Il piano evita i muscoli ancora affaticati.",
+  "gloss.superset.title": "Superserie",
+  "gloss.superset.body":
+    "Due o più esercizi eseguiti di seguito: una serie del primo, poi subito una serie del successivo, poi il riposo. Fa risparmiare tempo e funziona meglio con esercizi che non affaticano gli stessi muscoli, come un rematore con una spinta.\nTocca il collegamento tra due esercizi per abbinarli, e di nuovo per separarli.",
+  "gloss.warmup.title": "Serie di riscaldamento",
+  "gloss.warmup.body":
+    "Serie più leggere che ti portano gradualmente al peso di lavoro. Non contano nelle statistiche né nei progressi. Saltale se sei già caldo.",
+  "gloss.firstWeights.title": "Perché te lo chiediamo",
+  "gloss.firstWeights.body":
+    "Solo per suggerire un primo peso sicuro per ogni esercizio. Partiamo leggeri e aggiustiamo dopo il primo allenamento. Resta sul tuo telefono.",
+  "gloss.healthTwin.title": "Salute",
+  "gloss.healthTwin.body":
+    "I numeri del tuo corpo in un solo posto: peso, grasso corporeo, energia, sonno, cuore e passi, da Liftsmith e dall’app salute del telefono.\nOgnuno è confrontato con la tua normalità degli ultimi 30 giorni, mai con altre persone, e ti dice cosa fare. Non è un consiglio medico.",
+  "gloss.hrv.title": "HRV: variabilità della frequenza cardiaca",
+  "gloss.hrv.body":
+    "Le minime variazioni del tempo tra un battito e l’altro, misurate da un orologio o da un anello, soprattutto di notte. Un valore più alto della tua normalità di solito indica che hai recuperato; più basso indica stress da allenamento, sonno scarso o malattia.\nConta solo il tuo andamento: telefoni e orologi la misurano in modo diverso, quindi non confrontare il tuo numero con quello di altri.",
+  "gloss.restingHr.title": "Frequenza cardiaca a riposo",
+  "gloss.restingHr.body":
+    "La frequenza cardiaca quando sei completamente a riposo, di solito misurata mentre dormi. Qualche battito sopra la tua normalità per un giorno o due è un primo segnale per andarci più piano.",
+  "gloss.breathingRate.title": "Frequenza respiratoria",
+  "gloss.breathingRate.body":
+    "Respiri al minuto mentre dormi, da un orologio o un anello. È molto stabile, quindi un aumento di due o più rispetto alla tua normalità è spesso uno dei primi segnali di una malattia in arrivo.",
+  "gloss.vo2max.title": "VO₂ max",
+  "gloss.vo2max.body":
+    "Quanto ossigeno il corpo riesce a usare al massimo sforzo, in millilitri per chilo al minuto. Gli orologi lo stimano da camminate e corse. È la migliore misura singola della forma del cuore.\nI pesi lo spostano appena. Due sessioni di cardio intenso da 20 minuti a settimana sì.",
+  "gloss.bodyFat.title": "Grasso corporeo",
+  "gloss.bodyFat.body":
+    "La parte del tuo peso che è grasso, da una bilancia smart, uno scanner corporeo o una plicometria. Ogni metodo misura in modo diverso, quindi usane sempre uno e misura alla stessa ora, meglio al mattino prima di mangiare.\nUna sola misurazione dice poco. Tre o più nell’arco di qualche settimana mostrano l’andamento, e le note del coach ti avvisano quando va nella direzione sbagliata per il tuo obiettivo.",
+  "gloss.leanMass.title": "Massa magra",
+  "gloss.leanMass.body":
+    "Tutto ciò che nel corpo non è grasso: muscoli, ossa, organi e acqua. Il tuo peso moltiplicato per la parte che non è grasso. Se la massa magra sale mentre il grasso corporeo resta uguale o scende, l’allenamento sta costruendo muscolo.",
+  "gloss.bmi.title": "IMC: indice di massa corporea",
+  "gloss.bmi.body":
+    "Il peso diviso per l’altezza al quadrato. È un’indicazione approssimativa per chi non si allena con i pesi: non distingue il muscolo dal grasso, quindi chi è muscoloso risulta spesso in sovrappeso. Se hai una misura del grasso corporeo, fidati di quella.",
+  "gloss.restDrop.title": "Calo della frequenza cardiaca nel riposo",
+  "gloss.restDrop.body":
+    "Di quanti battiti al minuto scende la frequenza cardiaca nel primo minuto dopo una serie, dal tuo cardiofrequenzimetro. Un calo più ampio nel corso dei mesi indica un cuore più in forma; uno più piccolo del solito può voler dire che sei stanco.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "gloss.fitnessAge.title": "フィットネス年齢",
+  "gloss.fitnessAge.body":
+    "ノルウェーの健康な成人を対象にした大規模な研究にもとづき、同じ性別の健康な人があなたと同じ VO₂max を持つ年齢です。\n健康診断ではなく、体力の目安です。きつめの有酸素運動を続ければ数週間で下がります。",
+  "gloss.deloadWeeks.title": "ディロード前の強化週",
+  "gloss.deloadWeeks.body":
+    "トレーニングはブロック単位で進みます。強化週のあいだ、プランは毎週少しずつきつくなります。セット数が増え、余力のレップ数が減ります。\nその後にディロード週が1週あります。重量を軽くし、セット数はおよそ半分です。関節や神経が追いつく時間になり、より強くなって戻れます。初心者や忙しい人は強化週を少なめに、回復が早い人は多めにしましょう。",
+  "gloss.deload.title": "ディロード週",
+  "gloss.deload.body":
+    "きついトレーニングのブロックの後に入れる軽めの週です。重量を下げ、セット数はおよそ半分にします。進歩が失われるわけではありません。体がそれまでの負荷を吸収する期間で、次のブロックをより強い状態で始められます。",
+  "gloss.rir.title": "RIR：余力レップ数",
+  "gloss.rir.body":
+    "セットを終えた時点で、あと何回できたかを表します。RIR 2 は、あと2回ほどきれいにできそうな余力を残してセットを終えるという意味です。\nプランは余力を多めに残して始まり、ブロックが進むにつれて限界に近づいていきます。",
+  "gloss.rpe.title": "RPE：主観的運動強度",
+  "gloss.rpe.body":
+    "セットのきつさを1〜10で表します。10は出し切った状態です。8なら、あと2回ほどきれいにできる余力があったという意味で、余力レップ数2と同じです。\nこの尺度と余力レップ数のどちらを使うかは、設定 › ワークアウトの設定で選べます。どちらでもプランの動きは同じです。",
+  "gloss.blockWeek.title": "トレーニングブロック",
+  "gloss.blockWeek.body":
+    "ブロックの中で今どこにいるかを示します。何週目の強化週か（またはディロード週か）と、今週どれだけ余力を残すかです。ブロックの長さは設定で変更できます。",
+  "gloss.readiness.title": "コンディション",
+  "gloss.readiness.body":
+    "0〜100のスコアで、50が普段どおりの日です。大きな筋肉の回復具合、最近のワークアウトの内容（達成したレップ数、セットのきつさ、レップの速度、心拍数）、休養日から算出します。\n65以上は攻める日、35以下は軽めの日です。判断はいつでも自分で変えられます。",
+  "gloss.call.title": "今日の判断",
+  "gloss.call.body":
+    "攻める：最初の主要種目を1レップ限界に近づけます。予定どおり：通常のプランです。軽めに：1セット減らし、1段階軽くして、余力を1レップ増やします。選んだ内容は保存されます。",
+  "gloss.volume.title": "ボリューム",
+  "gloss.volume.body":
+    "重量 × レップ数を、すべての本番セットで合計したものです。こなした仕事量の大まかな目安です。ウォームアップは含みません。",
+  "gloss.e1rm.title": "推定1RM",
+  "gloss.e1rm.body":
+    "1回だけ挙げられるであろう最大重量です。各セットに、残っていた余力レップ数を足して計算します。レップ数の範囲ごとに研究で最も正確とされた式（限界まで10レップ以下は Brzycki と Epley、それ以上は Mayhew と Wathan）を使い、それぞれを30万セット以上で調整した2026年の体重ベースの式と平均します。最近の、重い、限界に近いセットほど重視し、20レップを超えるセットは使いません。5レップのセットと8レップのセットを比べられるので、本当の最大重量を測らなくても筋力の推移がわかります。",
+  "gloss.weeklySets.title": "今週の部位別セット数",
+  "gloss.weeklySets.body":
+    "今週、各部位を鍛えたきついセットの数です。補助的に使われた部位は0.5セットとして数えます。緑の帯（10〜20）は、筋肥大に効果的だとする研究が最も多い範囲です。プランはこの範囲から最も下回っている部位を優先します。",
+  "gloss.variety.title": "種目のバリエーション",
+  "gloss.variety.body":
+    "ある部位に対して、プランが同じ種目をどのくらい続けるかを決めます。固定するほど種目ごとの進歩を追いやすくなります。変化をつけるほど新鮮さが保たれ、負担も分散します。",
+  "gloss.recovery.title": "回復",
+  "gloss.recovery.body":
+    "セットをこなすと、使った筋肉は疲労します。その疲労は2〜3日かけて抜けていきます。90%以上は「万全」、70%以上は「準備OK」、40%以上は「回復中」、40%未満は「疲労」です。プランはまだ疲労している部位を避けます。",
+  "gloss.superset.title": "スーパーセット",
+  "gloss.superset.body":
+    "2つ以上の種目を続けて行う方法です。1つ目を1セット、すぐに次の種目を1セット行い、それから休憩します。時間の節約になり、ロウとプレスのように同じ筋肉を疲れさせない組み合わせで特に効果的です。\n2つの種目の間のリンクをタップすると組み合わせ、もう一度タップすると分けられます。",
+  "gloss.warmup.title": "ウォームアップセット",
+  "gloss.warmup.body":
+    "本番の重量まで段階的に上げていく軽めのセットです。記録や進歩には含まれません。すでに体が温まっていればスキップしてかまいません。",
+  "gloss.firstWeights.title": "お聞きする理由",
+  "gloss.firstWeights.body":
+    "各種目で安全な最初の重量を提案するためだけに使います。軽めから始め、最初のワークアウトの後に調整します。情報はスマートフォンの中だけに保存されます。",
+  "gloss.healthTwin.title": "ヘルス",
+  "gloss.healthTwin.body":
+    "体重、体脂肪、エネルギー、睡眠、心臓、歩数など、体の数値を Liftsmith とスマートフォンのヘルスケアアプリからまとめて表示します。\nどの数値も他人とではなく、直近30日間のあなた自身の普段の値と比べ、何をすべきかを伝えます。医学的な助言ではありません。",
+  "gloss.hrv.title": "HRV：心拍変動",
+  "gloss.hrv.body":
+    "心拍と心拍の間隔のわずかな揺らぎで、主に夜間にウォッチやリングで測定します。普段より高ければ回復できていることが多く、低ければトレーニングの負担、睡眠不足、体調不良などのストレスを示します。\n大事なのは自分自身の推移だけです。スマートフォンやウォッチによって測り方が違うので、他人の数値とは比べないでください。",
+  "gloss.restingHr.title": "安静時心拍数",
+  "gloss.restingHr.body":
+    "完全に安静にしているときの心拍数で、通常は睡眠中に測ります。普段より数拍高い日が1〜2日続いたら、ペースを落とす早めのサインです。",
+  "gloss.breathingRate.title": "呼吸数",
+  "gloss.breathingRate.body":
+    "睡眠中の1分あたりの呼吸数で、ウォッチやリングで測ります。とても安定した値なので、普段より2回以上増えたら、体調を崩す最初のサインであることがよくあります。",
+  "gloss.vo2max.title": "VO₂max",
+  "gloss.vo2max.body":
+    "全力を出したときに体が使える酸素の量で、体重1kgあたり1分間のミリリットルで表します。ウォッチがウォーキングやランニングから推定します。心肺の体力を表す最も優れた単一の指標です。\n筋トレではほとんど変わりません。週2回、20分のきつめの有酸素運動なら変わります。",
+  "gloss.bodyFat.title": "体脂肪",
+  "gloss.bodyFat.body":
+    "体重のうち脂肪が占める割合で、スマート体重計、ボディスキャナー、キャリパーなどで測ります。方法によって数値が違うので、1つの方法に決めて毎回同じ時間帯、できれば朝食前の朝に測りましょう。\n1回の測定ではあまり意味がありません。数週間で3回以上測ると傾向がわかり、目標に対して悪い方向に動いているとコーチのメモが知らせます。",
+  "gloss.leanMass.title": "除脂肪量",
+  "gloss.leanMass.body":
+    "体の中で脂肪以外のすべて、つまり筋肉、骨、内臓、水分です。体重に脂肪以外の割合を掛けて求めます。体脂肪が横ばいか減っている間に除脂肪量が増えていれば、トレーニングで筋肉がついています。",
+  "gloss.bmi.title": "BMI：体格指数",
+  "gloss.bmi.body":
+    "体重を身長の2乗で割った値です。筋トレをしない人向けの大まかな目安で、筋肉と脂肪を区別できないため、筋肉量の多い人は肥満と判定されがちです。体脂肪の測定値があれば、そちらを信頼してください。",
+  "gloss.restDrop.title": "休憩中の心拍数の低下",
+  "gloss.restDrop.body":
+    "セット後の最初の1分間で心拍数が1分あたり何拍下がるかを、心拍計で測ったものです。数か月かけて下がり幅が大きくなれば心肺が鍛えられた証拠で、いつもより小さければ疲れているのかもしれません。",
+};

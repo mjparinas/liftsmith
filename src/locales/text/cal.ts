@@ -67,3 +67,66 @@ export const fr: Partial<Record<Key, Message>> = {
   "cal.eventTitle": "Séance Liftsmith",
   "cal.eventNote": "Ouvrez Liftsmith pour commencer la séance du jour.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "cal.days": "Trainingstage",
+  "cal.time": "Uhrzeit",
+  "cal.download": "Kalenderdatei herunterladen",
+  "cal.update": "Meinen Kalender aktualisieren",
+  "cal.add": "Zu meinem Kalender hinzufügen",
+  "cal.remove": "Aus meinem Kalender entfernen",
+  "cal.fit": "Trainings an meinen Kalender anpassen",
+  "cal.fitNote":
+    "Wenn bald etwas ansteht, bietet Heute ein kürzeres Training an, das passt. Liftsmith sieht nur, wann du beschäftigt bist, nie, was die Termine sind, und das bleibt auf diesem Telefon.",
+  "cal.onOff": "An · Ausschalten",
+  "cal.turnOn": "Einschalten",
+  "cal.downloaded": "Kalenderdatei heruntergeladen. Öffne sie, um deine Trainingstage hinzuzufügen.",
+  "cal.denied": "Der Kalenderzugriff ist aus. Du kannst ihn in den Einstellungen deines Telefons erlauben.",
+  "cal.saved": "Deine Trainingstage sind in deinem Kalender.",
+  "cal.failed": "Das hat nicht geklappt. Prüfe, ob dieses Telefon einen Kalender hat, in den du eintragen kannst.",
+  "cal.removed": "Aus deinem Kalender entfernt.",
+  "cal.eventTitle": "Liftsmith-Training",
+  "cal.eventNote": "Öffne Liftsmith, um das heutige Training zu starten.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "cal.days": "Giorni di allenamento",
+  "cal.time": "Ora",
+  "cal.download": "Scarica il file del calendario",
+  "cal.update": "Aggiorna il mio calendario",
+  "cal.add": "Aggiungi al mio calendario",
+  "cal.remove": "Rimuovi dal mio calendario",
+  "cal.fit": "Adatta gli allenamenti al mio calendario",
+  "cal.fitNote":
+    "Quando hai un impegno a breve, Oggi propone un allenamento più corto che ci sta. Liftsmith vede solo quando sei occupato, mai di cosa si tratta, e tutto resta su questo telefono.",
+  "cal.onOff": "Attivo · Disattiva",
+  "cal.turnOn": "Attiva",
+  "cal.downloaded": "File del calendario scaricato. Aprilo per aggiungere i tuoi giorni di allenamento.",
+  "cal.denied": "L’accesso al calendario è disattivato. Puoi consentirlo nelle impostazioni del telefono.",
+  "cal.saved": "I tuoi giorni di allenamento sono nel calendario.",
+  "cal.failed": "Non ha funzionato. Controlla che sul telefono ci sia un calendario a cui aggiungere eventi.",
+  "cal.removed": "Rimosso dal calendario.",
+  "cal.eventTitle": "Allenamento Liftsmith",
+  "cal.eventNote": "Apri Liftsmith per iniziare l’allenamento di oggi.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "cal.days": "トレーニング日",
+  "cal.time": "時刻",
+  "cal.download": "カレンダーファイルをダウンロード",
+  "cal.update": "カレンダーを更新",
+  "cal.add": "カレンダーに追加",
+  "cal.remove": "カレンダーから削除",
+  "cal.fit": "予定に合わせてワークアウトを調整",
+  "cal.fitNote":
+    "もうすぐ予定があるときは、「今日」で収まる短めのワークアウトを提案します。Liftsmith が見るのは予定がある時間だけで、内容は見ません。情報はこの端末から出ません。",
+  "cal.onOff": "オン · オフにする",
+  "cal.turnOn": "オンにする",
+  "cal.downloaded": "カレンダーファイルをダウンロードしました。開くとトレーニング日が追加されます。",
+  "cal.denied": "カレンダーへのアクセスがオフです。端末の設定で許可できます。",
+  "cal.saved": "トレーニング日をカレンダーに追加しました。",
+  "cal.failed": "うまくいきませんでした。この端末に追加できるカレンダーがあるか確認してください。",
+  "cal.removed": "カレンダーから削除しました。",
+  "cal.eventTitle": "Liftsmith ワークアウト",
+  "cal.eventNote": "Liftsmith を開いて今日のワークアウトを始めましょう。",
+};

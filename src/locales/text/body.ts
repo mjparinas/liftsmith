@@ -40,3 +40,39 @@ export const fr: Partial<Record<Key, Message>> = {
   "body.fat.last": "Masse grasse {pct} %",
   "body.fat.range": "La masse grasse doit être comprise entre 3 et 60 %.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "body.title": "Körper",
+  "body.views": "Körperansichten",
+  "body.muscles": "Muskeln",
+  "body.health": "Gesundheit",
+  "body.fat.label": "Körperfett % (optional)",
+  "body.fat.field": "Körperfett in Prozent",
+  "body.fat.placeholder": "Körperfett %",
+  "body.fat.last": "Körperfett {pct} %",
+  "body.fat.range": "Das Körperfett muss zwischen 3 und 60 % liegen.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "body.title": "Corpo",
+  "body.views": "Viste del corpo",
+  "body.muscles": "Muscoli",
+  "body.health": "Salute",
+  "body.fat.label": "Massa grassa % (facoltativa)",
+  "body.fat.field": "percentuale di massa grassa",
+  "body.fat.placeholder": "Massa grassa %",
+  "body.fat.last": "Massa grassa {pct}%",
+  "body.fat.range": "La massa grassa deve essere tra il 3 e il 60%.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "body.title": "体",
+  "body.views": "体のビュー",
+  "body.muscles": "筋肉",
+  "body.health": "健康",
+  "body.fat.label": "体脂肪率 %（任意）",
+  "body.fat.field": "体脂肪率",
+  "body.fat.placeholder": "体脂肪率 %",
+  "body.fat.last": "体脂肪率 {pct}%",
+  "body.fat.range": "体脂肪率は3〜60%の範囲で入力してください。",
+};

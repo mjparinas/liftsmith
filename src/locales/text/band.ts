@@ -37,3 +37,36 @@ export const fr: Partial<Record<Key, Message>> = {
   "band.fatigued": "Fatigué",
   "band.fatigued.hint": "Besoin de repos",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "band.fresh": "Frisch",
+  "band.fresh.hint": "Voll erholt",
+  "band.ready": "Bereit",
+  "band.ready.hint": "Gut zum Trainieren",
+  "band.recovering": "In Erholung",
+  "band.recovering.hint": "Nur leichte Arbeit",
+  "band.fatigued": "Ermüdet",
+  "band.fatigued.hint": "Braucht Ruhe",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "band.fresh": "Fresco",
+  "band.fresh.hint": "Del tutto recuperato",
+  "band.ready": "Pronto",
+  "band.ready.hint": "Pronto per l’allenamento",
+  "band.recovering": "In recupero",
+  "band.recovering.hint": "Solo lavoro leggero",
+  "band.fatigued": "Affaticato",
+  "band.fatigued.hint": "Ha bisogno di riposo",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "band.fresh": "万全",
+  "band.fresh.hint": "完全に回復",
+  "band.ready": "準備OK",
+  "band.ready.hint": "トレーニングできる",
+  "band.recovering": "回復中",
+  "band.recovering.hint": "軽めのみ",
+  "band.fatigued": "疲労",
+  "band.fatigued.hint": "休養が必要",
+};

@@ -25,3 +25,24 @@ export const fr: Partial<Record<Key, Message>> = {
   "tier.gold": "Or",
   "tier.platinum": "Platine",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "tier.bronze": "Bronze",
+  "tier.silver": "Silber",
+  "tier.gold": "Gold",
+  "tier.platinum": "Platin",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "tier.bronze": "Bronzo",
+  "tier.silver": "Argento",
+  "tier.gold": "Oro",
+  "tier.platinum": "Platino",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "tier.bronze": "ブロンズ",
+  "tier.silver": "シルバー",
+  "tier.gold": "ゴールド",
+  "tier.platinum": "プラチナ",
+};

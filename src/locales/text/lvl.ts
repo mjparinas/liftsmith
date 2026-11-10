@@ -37,3 +37,36 @@ export const fr: Partial<Record<Key, Message>> = {
   "lvl.legend": "Légende",
   "lvl.mythic": "Mythique",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "Neuling",
+  "lvl.regular": "Stammgast",
+  "lvl.grinder": "Malocher",
+  "lvl.iron": "Eisen",
+  "lvl.steel": "Stahl",
+  "lvl.titan": "Titan",
+  "lvl.legend": "Legende",
+  "lvl.mythic": "Mythisch",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "Esordiente",
+  "lvl.regular": "Habitué",
+  "lvl.grinder": "Instancabile",
+  "lvl.iron": "Ferro",
+  "lvl.steel": "Acciaio",
+  "lvl.titan": "Titano",
+  "lvl.legend": "Leggenda",
+  "lvl.mythic": "Mitico",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "lvl.rookie": "ルーキー",
+  "lvl.regular": "レギュラー",
+  "lvl.grinder": "努力家",
+  "lvl.iron": "アイアン",
+  "lvl.steel": "スチール",
+  "lvl.titan": "タイタン",
+  "lvl.legend": "レジェンド",
+  "lvl.mythic": "ミシック",
+};

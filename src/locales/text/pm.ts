@@ -25,3 +25,24 @@ export const fr: Partial<Record<Key, Message>> = {
   "pm.off": "Retirez {off} {unit} de chaque côté",
   "pm.add": "Ajoutez {add} {unit} de chaque côté",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "pm.same": "Gleiche Scheiben: keine Änderung",
+  "pm.offAdd": "{off} abnehmen, dann {add} {unit} pro Seite auflegen",
+  "pm.off": "{off} {unit} pro Seite abnehmen",
+  "pm.add": "{add} {unit} pro Seite auflegen",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "pm.same": "Stessi dischi: nessun cambio",
+  "pm.offAdd": "Togli {off}, poi aggiungi {add} {unit} per lato",
+  "pm.off": "Togli {off} {unit} per lato",
+  "pm.add": "Aggiungi {add} {unit} per lato",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "pm.same": "同じプレート：変更なし",
+  "pm.offAdd": "{off}を外して、片側に{add} {unit}を追加",
+  "pm.off": "片側から{off} {unit}を外す",
+  "pm.add": "片側に{add} {unit}を追加",
+};

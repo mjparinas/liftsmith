@@ -46,3 +46,45 @@ export const fr: Partial<Record<Key, Message>> = {
   "pr.estMax": "Max estimé maintenant {weight}",
   "pr.again": "Revoir",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "pr.banner": "Neuer persönlicher Rekord",
+  "pr.isNew": "🏆 {reps} Wdh. mit {weight} sind ein neuer PR.",
+  "pr.inReach": "🏆 PR in Reichweite: {reps} Wdh. mit {weight} schlagen deine Bestleistung.",
+  "pr.replay": "▶ {name} nochmal ansehen",
+  "pr.replayTitle": "PR-Wiederholung",
+  "pr.newBest": "Neue Bestleistung",
+  "pr.demoLabel": "Neue Bestleistung: {weight} × {reps}",
+  "pr.allReps": { one: "{count} Wiederholung. Jede einzelne deine.", other: "{count} Wiederholungen. Jede einzelne deine." },
+  "pr.rep": "Wdh. {n}",
+  "pr.estMax": "Geschätztes Maximum jetzt {weight}",
+  "pr.again": "Nochmal abspielen",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "pr.banner": "Nuovo record personale",
+  "pr.isNew": "🏆 {reps} ripetizioni con {weight} sono un nuovo PR.",
+  "pr.inReach": "🏆 PR a portata: {reps} ripetizioni con {weight} battono il tuo record.",
+  "pr.replay": "▶ Rivedi {name}",
+  "pr.replayTitle": "Replay del PR",
+  "pr.newBest": "Nuovo record",
+  "pr.demoLabel": "Nuovo record: {weight} × {reps}",
+  "pr.allReps": { one: "{count} ripetizione. Ognuna è tua.", other: "{count} ripetizioni. Ognuna è tua." },
+  "pr.rep": "Rip. {n}",
+  "pr.estMax": "Massimale stimato ora {weight}",
+  "pr.again": "Riproduci di nuovo",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "pr.banner": "自己ベスト更新",
+  "pr.isNew": "🏆 {weight}で{reps}回は自己ベストです。",
+  "pr.inReach": "🏆 自己ベスト目前：{weight}で{reps}回なら記録更新です。",
+  "pr.replay": "▶ {name}をリプレイ",
+  "pr.replayTitle": "自己ベストのリプレイ",
+  "pr.newBest": "自己ベスト",
+  "pr.demoLabel": "自己ベスト：{weight} × {reps}",
+  "pr.allReps": { other: "{count}回。すべてあなたの力です。" },
+  "pr.rep": "{n}回目",
+  "pr.estMax": "推定最大重量は{weight}に",
+  "pr.again": "もう一度再生",
+};
