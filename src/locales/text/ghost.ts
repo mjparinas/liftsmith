@@ -43,3 +43,42 @@ export const fr: Partial<Record<Key, Message>> = {
   "ghost.last": "La dernière fois {set}",
   "ghost.use": "Reprendre",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "ghost.level": "gleichauf mit deinem Geist",
+  "ghost.ahead": "{time} voraus",
+  "ghost.behind": "{time} zurück",
+  "ghost.lastSet": "Letztes Mal: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "Letztes Mal: {weight} {unit} × {reps} nach {rest} Pause",
+  "ghost.stopped": "Letztes Mal hast du hier aufgehört",
+  "ghost.bodyweight": "Körpergewicht",
+  "ghost.same": "Wie letztes Mal ({set})",
+  "ghost.last": "Letztes Mal {set}",
+  "ghost.use": "Übernehmen",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "ghost.level": "alla pari con il tuo fantasma",
+  "ghost.ahead": "{time} avanti",
+  "ghost.behind": "{time} indietro",
+  "ghost.lastSet": "L’ultima volta: {weight} {unit} × {reps}",
+  "ghost.lastSetRest": "L’ultima volta: {weight} {unit} × {reps} dopo {rest} di riposo",
+  "ghost.stopped": "L’ultima volta ti sei fermato qui",
+  "ghost.bodyweight": "Corpo libero",
+  "ghost.same": "Come l’ultima volta ({set})",
+  "ghost.last": "L’ultima volta {set}",
+  "ghost.use": "Usalo",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "ghost.level": "ゴーストと互角",
+  "ghost.ahead": "{time}リード",
+  "ghost.behind": "{time}遅れ",
+  "ghost.lastSet": "前回：{weight} {unit} × {reps}",
+  "ghost.lastSetRest": "前回：{rest}の休憩後に{weight} {unit} × {reps}",
+  "ghost.stopped": "前回はここで終了しました",
+  "ghost.bodyweight": "自重",
+  "ghost.same": "前回と同じ（{set}）",
+  "ghost.last": "前回 {set}",
+  "ghost.use": "使う",
+};

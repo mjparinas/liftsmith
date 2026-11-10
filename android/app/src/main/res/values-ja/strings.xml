@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">ワークアウト開始</string>
+    <string name="shortcut_start_long">今日のワークアウトを開始</string>
+    <string name="shortcut_log_short">セットを記録</string>
+    <string name="shortcut_log_long">今のセットを予定どおり記録</string>
+    <string name="shortcut_rest_short">休憩 +30 秒</string>
+    <string name="shortcut_rest_long">休憩タイマーに 30 秒追加</string>
+    <string name="widget_description">今日のワークアウトとその理由、今週の目標、コーチのメモ。開始ボタン付き</string>
+    <string name="channel_live">ワークアウト中</string>
+    <string name="channel_live_desc">トレーニング中の休憩タイマー、次のセット、心拍数</string>
+    <string name="rest_over">休憩終了</string>
+    <string name="channel_alert_desc">休憩が終わると音とバイブでお知らせ</string>
+    <string name="channel_alert_sound">休憩終了（音のみ）</string>
+    <string name="channel_alert_sound_desc">休憩が終わるとバイブなしで音でお知らせ</string>
+    <string name="next_prefix">次：</string>
+    <string name="rest_next">休憩 · 次：%1$s</string>
+    <string name="up_next">次：%1$s</string>
+    <string name="add_30">+30 秒</string>
+    <string name="widget_title">今日のワークアウト</string>
+</resources>

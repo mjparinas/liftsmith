@@ -70,3 +70,69 @@ export const fr: Partial<Record<Key, Message>> = {
   "hr.tip.fitbit":
     "Sur un Fitbit, activez d'abord le partage : app Google Health › Connexions › votre appareil › Partager la fréquence cardiaque › Commencer. Sur une Pixel Watch, utilisez Connected Fitness dans les réglages rapides.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "hr.connect": "Verbinden",
+  "hr.connecting": "Wird verbunden…",
+  "hr.reconnecting": "Wird neu verbunden…",
+  "hr.dismiss": "Schließen",
+  "hr.device": "der Sensor",
+  "hr.err.bluetoothOff": "Bluetooth ist aus. Schalte es ein und versuch es noch einmal.",
+  "hr.err.blocked":
+    "Bluetooth ist hier nicht erlaubt. Erlaube es in den Einstellungen deines Browsers oder Telefons und versuch es dann noch einmal.",
+  "hr.err.notFound": "Kein Herzfrequenzsensor gefunden. Prüfe, ob er an ist, die Herzfrequenz teilt und nah an deinem Telefon ist.",
+  "hr.err.lost": "Verbindung zu {name} verloren. Tippe auf Verbinden, um es noch einmal zu versuchen.",
+  "hr.err.unreachable":
+    "{name} ist nicht erreichbar. Vielleicht ist es mit einer anderen App oder einem Gerät verbunden: Trenne es dort, halte es in der Nähe und versuch es noch einmal.",
+  "hr.err.noService": "{name} teilt die Herzfrequenz nicht auf dem Standardweg und kann sich deshalb nicht verbinden.",
+  "hr.err.pairing":
+    "{name} muss zuerst gekoppelt werden. Bestätige die Kopplungsanfrage am Gerät oder Telefon und versuch es dann noch einmal.",
+  "hr.err.failed": "Die Herzfrequenz von {name} ließ sich nicht starten. Versuch es gleich noch einmal.",
+  "hr.tip.reshare":
+    "Wenn es schon einmal verbunden war, schalte das Teilen aus und wieder ein: Google Health-App › Verbindungen › dein Gerät › Herzfrequenz teilen.",
+  "hr.tip.fitbit":
+    "Schalte bei einem Fitbit zuerst das Teilen ein: Google Health-App › Verbindungen › dein Gerät › Herzfrequenz teilen › Los geht’s. Auf einer Pixel Watch nutze Connected Fitness in den Schnelleinstellungen.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "hr.connect": "Collega",
+  "hr.connecting": "Collegamento…",
+  "hr.reconnecting": "Ricollegamento…",
+  "hr.dismiss": "Ignora",
+  "hr.device": "il sensore",
+  "hr.err.bluetoothOff": "Il Bluetooth è spento. Accendilo e riprova.",
+  "hr.err.blocked": "Il Bluetooth non è consentito qui. Consentilo nelle impostazioni del browser o del telefono, poi riprova.",
+  "hr.err.notFound":
+    "Nessun cardiofrequenzimetro trovato. Controlla che sia acceso, che condivida la frequenza cardiaca e che sia vicino al telefono.",
+  "hr.err.lost": "Persa la connessione con {name}. Tocca Collega per riprovare.",
+  "hr.err.unreachable":
+    "Impossibile raggiungere {name}. Potrebbe essere collegato a un’altra app o macchina: scollegalo lì, tienilo vicino e riprova.",
+  "hr.err.noService": "{name} non condivide la frequenza cardiaca nel modo standard, quindi non può collegarsi.",
+  "hr.err.pairing": "{name} deve prima essere associato. Accetta la richiesta di associazione sul dispositivo o sul telefono, poi riprova.",
+  "hr.err.failed": "Impossibile avviare la frequenza cardiaca da {name}. Riprova tra poco.",
+  "hr.tip.reshare":
+    "Se si era già collegato, disattiva e riattiva la condivisione: app Google Health › Connessioni › il tuo dispositivo › Condividi frequenza cardiaca.",
+  "hr.tip.fitbit":
+    "Su un Fitbit attiva prima la condivisione: app Google Health › Connessioni › il tuo dispositivo › Condividi frequenza cardiaca › Inizia. Su un Pixel Watch usa Connected Fitness nelle impostazioni rapide.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "hr.connect": "接続",
+  "hr.connecting": "接続中…",
+  "hr.reconnecting": "再接続中…",
+  "hr.dismiss": "閉じる",
+  "hr.device": "心拍計",
+  "hr.err.bluetoothOff": "Bluetooth がオフです。オンにしてもう一度お試しください。",
+  "hr.err.blocked": "ここでは Bluetooth が許可されていません。ブラウザか端末の設定で許可してから、もう一度お試しください。",
+  "hr.err.notFound": "心拍計が見つかりません。電源が入っていて、心拍数を共有していて、端末の近くにあるか確認してください。",
+  "hr.err.lost": "{name}との接続が切れました。「接続」をタップしてもう一度お試しください。",
+  "hr.err.unreachable":
+    "{name}に接続できません。別のアプリや機器につながっている可能性があります。そちらで切断し、近くに置いてもう一度お試しください。",
+  "hr.err.noService": "{name}は標準の方法で心拍数を共有しないため、接続できません。",
+  "hr.err.pairing": "{name}は先にペアリングが必要です。機器か端末でペアリングを許可してから、もう一度お試しください。",
+  "hr.err.failed": "{name}から心拍数を取得できませんでした。少ししてからもう一度お試しください。",
+  "hr.tip.reshare":
+    "以前は接続できていた場合は、共有をオフにしてからオンに戻してください：Google Health アプリ › 接続 › お使いの端末 › 心拍数を共有。",
+  "hr.tip.fitbit":
+    "Fitbit では、まず共有をオンにしてください：Google Health アプリ › 接続 › お使いの端末 › 心拍数を共有 › 開始。Pixel Watch ではクイック設定の Connected Fitness を使ってください。",
+};

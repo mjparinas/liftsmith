@@ -1,6 +1,6 @@
 "use client";
 
-import { list, t } from "./i18n";
+import { inSentence, list, t } from "./i18n";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 
@@ -12,7 +12,7 @@ export function checkinText(opts: { name?: string; gym?: string; focus?: string[
   const who = opts.buddies.length === 1 ? opts.buddies[0] : opts.buddies.length ? t("buddy.crew") : "";
   const hi = who ? t("buddy.hi", { who }) : "";
   const gym = opts.gym && opts.gym !== "My gym" ? opts.gym : "";
-  const focus = opts.focus?.length ? list(opts.focus.map((f) => f.toLowerCase())) : "";
+  const focus = opts.focus?.length ? list(opts.focus.map((f) => inSentence(f, true))) : "";
   const body =
     gym && focus
       ? t("buddy.atGymFocus", { gym, focus })

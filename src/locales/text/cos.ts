@@ -58,3 +58,57 @@ export const fr: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "Chrome",
   "cos.plates-neon": "Néon",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "cos.accent-blue": "Liftsmith-Blau",
+  "cos.accent-teal": "Petrol",
+  "cos.accent-lime": "Limette",
+  "cos.accent-violet": "Violett",
+  "cos.accent-orange": "Glut",
+  "cos.accent-pink": "Flamingo",
+  "cos.accent-gold": "Goldrausch",
+  "cos.sound-classic": "Klassische Pieptöne",
+  "cos.sound-chime": "Glockenspiel",
+  "cos.sound-arcade": "Arcade",
+  "cos.sound-gong": "Gong",
+  "cos.plates-classic": "Wettkampffarben",
+  "cos.plates-black": "Mattschwarz",
+  "cos.plates-chrome": "Chrom",
+  "cos.plates-neon": "Neon",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "cos.accent-blue": "Blu Liftsmith",
+  "cos.accent-teal": "Verde acqua",
+  "cos.accent-lime": "Lime",
+  "cos.accent-violet": "Viola",
+  "cos.accent-orange": "Brace",
+  "cos.accent-pink": "Fenicottero",
+  "cos.accent-gold": "Febbre dell’oro",
+  "cos.sound-classic": "Bip classici",
+  "cos.sound-chime": "Carillon",
+  "cos.sound-arcade": "Arcade",
+  "cos.sound-gong": "Gong",
+  "cos.plates-classic": "Colori da gara",
+  "cos.plates-black": "Nero opaco",
+  "cos.plates-chrome": "Cromo",
+  "cos.plates-neon": "Neon",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "cos.accent-blue": "Liftsmith ブルー",
+  "cos.accent-teal": "ティール",
+  "cos.accent-lime": "ライム",
+  "cos.accent-violet": "バイオレット",
+  "cos.accent-orange": "エンバー",
+  "cos.accent-pink": "フラミンゴ",
+  "cos.accent-gold": "ゴールドラッシュ",
+  "cos.sound-classic": "クラシックビープ",
+  "cos.sound-chime": "チャイム",
+  "cos.sound-arcade": "アーケード",
+  "cos.sound-gong": "ゴング",
+  "cos.plates-classic": "競技用カラー",
+  "cos.plates-black": "マットブラック",
+  "cos.plates-chrome": "クローム",
+  "cos.plates-neon": "ネオン",
+};

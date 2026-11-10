@@ -5,7 +5,7 @@
 import { useMemo, useState } from "react";
 
 import { exercise } from "@/lib/exercises";
-import { list as listOf, t } from "@/lib/i18n";
+import { inSentence, list as listOf, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import {
   allFormulas,
@@ -235,14 +235,14 @@ function Bump({
     <div className="min-w-0">
       <div className="text-xs text-muted">{label}</div>
       <div className="mt-1 flex items-center justify-between gap-1">
-        <button type="button" className={btn} aria-label={t("orm.less", { what: label.toLocaleLowerCase() })} onClick={() => bump(-1)}>
+        <button type="button" className={btn} aria-label={t("orm.less", { what: inSentence(label, true) })} onClick={() => bump(-1)}>
           −
         </button>
         <span className="num min-w-0 truncate text-center text-lg font-bold" aria-live="polite">
           {fmtNum(Math.round(value * 10) / 10)}
           {suffix ? <span className="text-xs font-normal text-muted"> {suffix}</span> : null}
         </span>
-        <button type="button" className={btn} aria-label={t("orm.more", { what: label.toLocaleLowerCase() })} onClick={() => bump(1)}>
+        <button type="button" className={btn} aria-label={t("orm.more", { what: inSentence(label, true) })} onClick={() => bump(1)}>
           +
         </button>
       </div>

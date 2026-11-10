@@ -2,7 +2,7 @@
 
 import { useMemo, type CSSProperties } from "react";
 
-import { clockTime, date, list, t } from "@/lib/i18n";
+import { clockTime, date, inSentence, list, t } from "@/lib/i18n";
 import { nextUp } from "@/lib/nextUp";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
@@ -23,7 +23,7 @@ export function NextUpCard({ sessionId }: { sessionId: string }) {
   const d = new Date(n.at);
   // Mid-sentence muscle names in lower case ("Chest and quads will be fresh"), the first one capitalised.
   const muscles = (ms: readonly Muscle[]) => {
-    const text = list(ms.map((m) => MUSCLE_LABEL[m].toLocaleLowerCase()));
+    const text = list(ms.map((m) => inSentence(MUSCLE_LABEL[m], true)));
     return text.charAt(0).toLocaleUpperCase() + text.slice(1);
   };
   const lines: string[] = [];

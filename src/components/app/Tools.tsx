@@ -7,7 +7,7 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { track } from "@/lib/analytics";
 import { connectHealth, healthAvailable, readHeight } from "@/lib/health";
-import { date, list, num, t } from "@/lib/i18n";
+import { date, inSentence, list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import {
   ACTIVITIES,
@@ -28,7 +28,7 @@ import { Icon } from "./icons";
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
 
-const level = (a: Activity) => ACTIVITY[a].label.toLocaleLowerCase();
+const level = (a: Activity) => inSentence(ACTIVITY[a].label, true);
 const kcal = (n: number) => num(n);
 
 const DAY = 86_400_000;
@@ -203,7 +203,7 @@ function TdeeScreen() {
           <Row id="tdee-age" label={t("tdee.age")}>
             <BumpField
               id="tdee-age"
-              label={t("tdee.age").toLocaleLowerCase()}
+              label={inSentence(t("tdee.age"), true)}
               value={age}
               onChange={onAge}
               step={1}
@@ -216,7 +216,7 @@ function TdeeScreen() {
           <Row id="tdee-height" label={imperial ? t("tdee.heightIn") : t("tdee.heightCm")}>
             <BumpField
               id="tdee-height"
-              label={t("tdee.height").toLocaleLowerCase()}
+              label={inSentence(t("tdee.height"), true)}
               value={height}
               onChange={onHeight}
               step={1}
@@ -229,7 +229,7 @@ function TdeeScreen() {
             <Row id="tdee-weight" label={t("tdee.weightUnit", { unit })}>
               <BumpField
                 id="tdee-weight"
-                label={t("tdee.weight").toLocaleLowerCase()}
+                label={inSentence(t("tdee.weight"), true)}
                 value={weight}
                 onChange={onWeight}
                 step={imperial ? 0.5 : 0.1}
@@ -266,7 +266,7 @@ function TdeeScreen() {
                 <Row id="tdee-fat" label={t("tdee.bodyFatPct")}>
                   <BumpField
                     id="tdee-fat"
-                    label={t("tdee.bodyFatPct").toLocaleLowerCase()}
+                    label={inSentence(t("tdee.bodyFatPct"), true)}
                     value={fatText}
                     onChange={onFat}
                     step={0.5}

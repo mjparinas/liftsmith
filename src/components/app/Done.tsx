@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, type Cosmetic } from "@/lib/game";
-import { date, t } from "@/lib/i18n";
+import { date, inSentence, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
 import { doneItems } from "@/lib/routines";
@@ -316,7 +316,7 @@ function PainAfter({ sessionId }: { sessionId: string }) {
       {hurt.map((i) => (
         <PainSelect
           key={i.id}
-          label={t("done.painAsk", { part: PART_LABEL[i.part].toLocaleLowerCase() })}
+          label={t("done.painAsk", { part: inSentence(PART_LABEL[i.part], true) })}
           onRate={(n) => ratePain(i.id, n, { sessionId })}
         />
       ))}

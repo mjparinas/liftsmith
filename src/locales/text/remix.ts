@@ -52,3 +52,51 @@ export const fr: Partial<Record<Key, Message>> = {
   "remix.noteSame": "Tiré d’une séance partagée, avec vos charges",
   "remix.noteSwap": "Remplace {name} dans cette salle",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "remix.broken": "Dieser Trainingslink ließ sich nicht öffnen. Er stammt vielleicht aus einer neueren App-Version oder ist abgeschnitten.",
+  "remix.back": "Zurück zu Heute",
+  "remix.title": "Geteiltes Training",
+  "remix.rebuilt": "Für {gym} mit deinen eigenen Gewichten neu aufgebaut. Etwa {min} Min.",
+  "remix.yourGym": "dein Studio",
+  "remix.closest": "(nächste Entsprechung hier)",
+  "remix.missing": "{name}: hier nichts Ähnliches, weggelassen",
+  "remix.finishFirst": "Beende zuerst dein laufendes Training und öffne den Link dann erneut.",
+  "remix.start": "Dieses Training starten",
+  "remix.notNow": "Nicht jetzt",
+  "remix.shareTitle": "Ein Training für dich",
+  "remix.noteSame": "Aus einem geteilten Training, mit deinen Gewichten",
+  "remix.noteSwap": "Ersetzt {name} in diesem Studio",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "remix.broken": "Questo link all’allenamento non si è aperto. Potrebbe venire da una versione più recente dell’app, o essere troncato.",
+  "remix.back": "Torna a oggi",
+  "remix.title": "Allenamento condiviso",
+  "remix.rebuilt": "Ricostruito per {gym} con i tuoi pesi. Circa {min} min.",
+  "remix.yourGym": "la tua palestra",
+  "remix.closest": "(il più simile qui)",
+  "remix.missing": "{name}: niente di simile qui, escluso",
+  "remix.finishFirst": "Prima finisci l’allenamento in corso, poi riapri il link.",
+  "remix.start": "Inizia questo allenamento",
+  "remix.notNow": "Non ora",
+  "remix.shareTitle": "Un allenamento per te",
+  "remix.noteSame": "Da un allenamento condiviso, con i tuoi pesi",
+  "remix.noteSwap": "Al posto di {name} in questa palestra",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "remix.broken": "このワークアウトのリンクを開けませんでした。新しいバージョンのアプリのものか、途中で切れている可能性があります。",
+  "remix.back": "今日に戻る",
+  "remix.title": "共有されたワークアウト",
+  "remix.rebuilt": "{gym}向けに、あなたの重量で組み直しました。約{min}分。",
+  "remix.yourGym": "あなたのジム",
+  "remix.closest": "（ここで最も近い種目）",
+  "remix.missing": "{name}：ここに似た種目がないため省略",
+  "remix.finishFirst": "実行中のワークアウトを終えてから、もう一度リンクを開いてください。",
+  "remix.start": "このワークアウトを開始",
+  "remix.notNow": "今はしない",
+  "remix.shareTitle": "あなたへのワークアウト",
+  "remix.noteSame": "共有ワークアウトから、あなたの重量で",
+  "remix.noteSwap": "このジムでは{name}の代わり",
+};

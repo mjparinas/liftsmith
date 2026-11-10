@@ -19,3 +19,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "block.deload": "Semaine de décharge",
   "block.week": "Semaine {week} sur {count}",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "block.deload": "Deload-Woche",
+  "block.week": "Woche {week} von {count}",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "block.deload": "Settimana di scarico",
+  "block.week": "Settimana {week} di {count}",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "block.deload": "ディロード週",
+  "block.week": "第{week}週（全{count}週）",
+};

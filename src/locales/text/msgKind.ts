@@ -44,3 +44,43 @@ export const fr: Partial<Record<Key, Message>> = {
   "msgKind.pro.blurb":
     "Quand votre essai se termine bientôt, et de temps en temps ce qu’apporte Pro. Jamais plus d’un toutes les deux semaines.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "msgKind.reminder": "Trainingserinnerungen",
+  "msgKind.reminder.blurb": "An deinen Trainingstagen zu deiner Trainingszeit. Per E-Mail eine Nachricht am Montag mit deiner Woche.",
+  "msgKind.missed": "Verpasste Trainings",
+  "msgKind.missed.blurb": "Ein Stups am Tag nach einem verpassten Trainingstag und eine Nachfrage, wenn eine Woche vergeht.",
+  "msgKind.streak": "Serien-Hinweise",
+  "msgKind.streak.blurb": "Wenn das Wochenziel noch zu schaffen ist, aber nur knapp.",
+  "msgKind.milestone": "Meilensteine",
+  "msgKind.milestone.blurb": "Dein erstes Training und Serien von 4, 8, 12, 26 und 52 Wochen.",
+  "msgKind.pro": "Pro-Testphase und Angebote",
+  "msgKind.pro.blurb": "Wenn deine Testphase bald endet und ab und zu, was Pro bietet. Nie öfter als einmal in zwei Wochen.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "msgKind.reminder": "Promemoria di allenamento",
+  "msgKind.reminder.blurb":
+    "Nei tuoi giorni di allenamento all’ora dell’allenamento. Via email, un messaggio il lunedì con la tua settimana.",
+  "msgKind.missed": "Allenamenti saltati",
+  "msgKind.missed.blurb": "Una spinta il giorno dopo un allenamento saltato, e un saluto se passa una settimana.",
+  "msgKind.streak": "Avvisi sulla serie",
+  "msgKind.streak.blurb": "Quando l’obiettivo della settimana è ancora raggiungibile, ma per poco.",
+  "msgKind.milestone": "Traguardi",
+  "msgKind.milestone.blurb": "Il tuo primo allenamento e le serie di 4, 8, 12, 26 e 52 settimane.",
+  "msgKind.pro": "Prova Pro e offerte",
+  "msgKind.pro.blurb": "Quando la prova sta per finire e, ogni tanto, cosa aggiunge Pro. Mai più di una ogni due settimane.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "msgKind.reminder": "ワークアウトのリマインダー",
+  "msgKind.reminder.blurb": "トレーニング日のワークアウト時刻にお知らせ。メールでは月曜日に1週間分をまとめて1通。",
+  "msgKind.missed": "逃したワークアウト",
+  "msgKind.missed.blurb": "トレーニング日を逃した翌日にひと声、1週間空いたら様子をうかがいます。",
+  "msgKind.streak": "連続記録のお知らせ",
+  "msgKind.streak.blurb": "今週の目標がぎりぎり達成できるときに。",
+  "msgKind.milestone": "マイルストーン",
+  "msgKind.milestone.blurb": "初めてのワークアウトと、4・8・12・26・52週の連続記録。",
+  "msgKind.pro": "Pro のお試しとお得な情報",
+  "msgKind.pro.blurb": "お試し期間の終了前と、ときどき Pro でできること。2週間に1回まで。",
+};

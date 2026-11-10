@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "appearance.light": "Clair",
   "appearance.system": "Comme le système",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "appearance.dark": "Dunkel",
+  "appearance.light": "Hell",
+  "appearance.system": "Wie das System",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "appearance.dark": "Scuro",
+  "appearance.light": "Chiaro",
+  "appearance.system": "Come il sistema",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "appearance.dark": "ダーク",
+  "appearance.light": "ライト",
+  "appearance.system": "システムに合わせる",
+};

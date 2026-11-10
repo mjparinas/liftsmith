@@ -1,0 +1,12 @@
+/* Japanese text for the widget, the Control Center button and the Live Activity. Follows the phone's language. */
+"Start workout" = "ワークアウト開始";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Liftsmith を開き、今日のワークアウトか実行中のワークアウトを開始します。";
+"Log set" = "セットを記録";
+"Logs the current set as planned. Does nothing when no workout is running." = "今のセットを予定どおり記録します。ワークアウト中でなければ何もしません。";
+"Add 30 seconds of rest" = "休憩を 30 秒追加";
+"Adds 30 seconds to the rest timer." = "休憩タイマーに 30 秒追加します。";
+"Start today's workout in Liftsmith." = "Liftsmith で今日のワークアウトを開始します。";
+"Today's workout" = "今日のワークアウト";
+"Today's workout and why, your weekly goal and coach's note, with Start." = "今日のワークアウトとその理由、今週の目標、コーチのメモ。開始ボタン付き。";
+"Lift" = "セット";
+"Next: %@" = "次：%@";

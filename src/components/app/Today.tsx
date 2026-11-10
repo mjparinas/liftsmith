@@ -7,7 +7,7 @@ import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
 import { exercise } from "@/lib/exercises";
 import { itemSeconds, planSeconds } from "@/lib/generator";
-import { clockTime, list, t } from "@/lib/i18n";
+import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
@@ -221,7 +221,7 @@ export function Today() {
           className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
         >
           {hurt.length
-            ? t("today.trainingAround", { parts: list(hurt.map((i) => PART_LABEL[i.part].toLocaleLowerCase())) })
+            ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
             : t("today.somethingHurts")}
         </button>
       </div>
@@ -293,7 +293,7 @@ export function Today() {
                     sound.tick();
                     setCall(c === readiness.call ? null : c);
                   }}
-                  className={`press inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-semibold ${on ? "text-ink" : "text-muted"}`}
+                  className={`press inline-flex min-h-11 min-w-0 flex-wrap items-center justify-center gap-x-1.5 rounded-xl px-1 text-center text-sm leading-tight font-semibold ${on ? "text-ink" : "text-muted"}`}
                   style={
                     on
                       ? {
@@ -310,7 +310,7 @@ export function Today() {
             })}
           </div>
           {callOverride && (
-            <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: CALL_TEXT[readiness.call].label.toLocaleLowerCase() })}</p>
+            <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: inSentence(CALL_TEXT[readiness.call].label, true) })}</p>
           )}
         </section>
       )}
@@ -490,9 +490,9 @@ export function Today() {
               ) : (
                 <p className="mt-3 text-sm text-muted">
                   {preview.routineId
-                    ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())) })
+                    ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
                     : t("td.targets", {
-                        muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())),
+                        muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
                         sets: preview.week.setsPerMuscle,
                       })}
                 </p>

@@ -58,3 +58,58 @@ export const fr: Partial<Record<Key, Message>> = {
   },
   "buy.newEx": { one: "{count} nouvel exercice", other: "{count} nouveaux exercices" },
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "buy.title": "Was du als Nächstes kaufen solltest",
+  "buy.got": "Hab ich gekauft",
+  "buy.have": "Hab ich",
+  "buy.note":
+    "Basierend auf deinen Scheiben, deiner Ausrüstung und den Gewichten, die du bewegst. Keine Werbung, keine gesponserten Tipps.",
+  "buy.pair": "Ein Paar {w}-Scheiben: {why}.",
+  "buy.sep": ";",
+  "buy.jumps": "Sprünge von {to} statt {from}, damit langsame Übungen wie das Drücken weiter vorankommen",
+  "buy.more": {
+    one: "{count} weiteres Gewicht, das du bis {hi} laden kannst",
+    other: "{count} weitere Gewichte, die du bis {hi} laden kannst",
+  },
+  "buy.room": "Luft über deine aktuelle Grenze von {max}",
+  "buy.kit": { one: "{item}: {count} neue Übung.", other: "{item}: {count} neue Übungen." },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks} und das erste Training mit Gewicht für {count} Muskel.",
+    other: "{item}: {unlocks} und das erste Training mit Gewicht für {count} Muskeln.",
+  },
+  "buy.newEx": { one: "{count} neue Übung", other: "{count} neue Übungen" },
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "buy.title": "Cosa comprare dopo",
+  "buy.got": "Li ho presi",
+  "buy.have": "Ce l’ho",
+  "buy.note": "In base ai tuoi dischi, all’attrezzatura e ai pesi che sollevi. Niente pubblicità né consigli sponsorizzati.",
+  "buy.pair": "Una coppia di dischi da {w}: {why}.",
+  "buy.sep": ";",
+  "buy.jumps": "salti di {to} invece di {from}, così gli esercizi lenti come la distensione continuano a progredire",
+  "buy.more": { one: "{count} peso in più che puoi caricare fino a {hi}", other: "{count} pesi in più che puoi caricare fino a {hi}" },
+  "buy.room": "margine oltre il tuo limite attuale di {max}",
+  "buy.kit": { one: "{item}: {count} nuovo esercizio.", other: "{item}: {count} nuovi esercizi." },
+  "buy.kitMuscles": {
+    one: "{item}: {unlocks}, e il primo lavoro con carico per {count} muscolo.",
+    other: "{item}: {unlocks}, e il primo lavoro con carico per {count} muscoli.",
+  },
+  "buy.newEx": { one: "{count} nuovo esercizio", other: "{count} nuovi esercizi" },
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "buy.title": "次に買うもの",
+  "buy.got": "買いました",
+  "buy.have": "持っています",
+  "buy.note": "手持ちのプレート、器具、扱う重量をもとにしています。広告やスポンサーのおすすめはありません。",
+  "buy.pair": "{w}のプレート2枚：{why}。",
+  "buy.sep": "、",
+  "buy.jumps": "{from}ではなく{to}刻みになり、プレスのように伸びにくい種目も前進し続けます",
+  "buy.more": { other: "{hi}までで付けられる重量が{count}通り増えます" },
+  "buy.room": "今の上限{max}を超える余裕",
+  "buy.kit": { other: "{item}：新しい種目が{count}つ。" },
+  "buy.kitMuscles": { other: "{item}：{unlocks}。さらに{count}つの筋肉で初めて負荷をかけたトレーニングができます。" },
+  "buy.newEx": { other: "新しい種目{count}つ" },
+};

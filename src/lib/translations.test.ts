@@ -5,8 +5,9 @@ import { en } from "@/locales/text/ex";
 import { defaultProfile, makeGym } from "./defaults";
 import { ENGLISH_ROWS, englishName, exercise, EXERCISES } from "./exercises";
 import { alternatives, generate } from "./generator";
-import { setLanguage, t } from "./i18n";
+import { LANGS, setLanguage, t } from "./i18n";
 
+const OTHER_LANGS = LANGS.filter((l) => l !== "en");
 // Text that lives outside the catalogues' usual path. The exercise library's text follows the app's language (src/locales/text/ex.ts), while the rows in
 // exercises.ts stay the English source and anything that must not depend on the language reads them.
 
@@ -36,11 +37,12 @@ describe("exercise text", () => {
     expect(exercise("bench-press").name).toBe("Barbell bench press");
   });
 
-  it("every built-in exercise has a Spanish and French name different enough to be real text", () => {
-    for (const lang of ["es", "fr"] as const) {
+  it("every built-in exercise has a name in every language, different enough to be real text", () => {
+    for (const lang of OTHER_LANGS) {
       setLanguage(lang);
       for (const e of EXERCISES) {
-        expect(e.name.length, e.id).toBeGreaterThan(2);
+        // Japanese packs a word into fewer characters (懸垂 is "pull-up").
+        expect(e.name.length, e.id).toBeGreaterThan(lang === "ja" ? 1 : 2);
         expect(e.cues.length, e.id).toBe(ENGLISH_ROWS.find((r) => r.id === e.id)!.cues.length);
       }
     }
@@ -55,7 +57,7 @@ describe("exercise text", () => {
     });
     setLanguage("en");
     const english = run();
-    for (const lang of ["es", "fr"] as const) {
+    for (const lang of OTHER_LANGS) {
       setLanguage(lang);
       expect(run(), lang).toEqual(english);
     }
@@ -99,17 +101,18 @@ describe("programs", () => {
 });
 
 describe("daily quotes", () => {
-  it("the English catalogue matches QUOTES word for word, and every quote has Spanish and French", async () => {
+  it("the English catalogue matches QUOTES word for word, and every quote is in every language", async () => {
     const { QUOTES } = await import("./quotes");
     const quote = await import("@/locales/text/quote");
     const english = Object.values(quote.en);
     expect(english).toEqual(QUOTES.map((q) => q.text));
-    expect(Object.keys(quote.es)).toHaveLength(QUOTES.length);
-    expect(Object.keys(quote.fr)).toHaveLength(QUOTES.length);
+    for (const lang of OTHER_LANGS) expect(Object.keys(quote[lang]), lang).toHaveLength(QUOTES.length);
     setLanguage("es");
     expect(t("quote.146")).toBe("Cae siete veces, levántate ocho.");
     setLanguage("fr");
     expect(t("quote.146")).toBe("Tombez sept fois, relevez-vous huit.");
+    setLanguage("ja");
+    expect(t("quote.146")).toBe("七転び八起き。");
   });
 });
 

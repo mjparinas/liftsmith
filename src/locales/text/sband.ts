@@ -28,3 +28,27 @@ export const fr: Partial<Record<Key, Message>> = {
   "sband.novice": "Débutant",
   "sband.start": "Premiers pas",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "sband.elite": "Elite",
+  "sband.advanced": "Fortgeschritten",
+  "sband.intermediate": "Mittelstufe",
+  "sband.novice": "Anfänger",
+  "sband.start": "Einsteiger",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "sband.elite": "Élite",
+  "sband.advanced": "Avanzato",
+  "sband.intermediate": "Intermedio",
+  "sband.novice": "Principiante",
+  "sband.start": "Agli inizi",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "sband.elite": "エリート",
+  "sband.advanced": "上級",
+  "sband.intermediate": "中級",
+  "sband.novice": "初級",
+  "sband.start": "入門",
+};

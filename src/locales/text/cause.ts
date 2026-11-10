@@ -48,3 +48,43 @@ export const fr: Partial<Record<Key, Message>> = {
   "cause.none":
     "Rien ne ressort de vos données. Effort, séries et repos semblent corrects, donc changer d’exercice est la meilleure prochaine étape.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "cause.missed": "{missed} deiner letzten {count} Sätze blieben unter den Ziel-Wiederholungen. Das Gewicht ist dir davongelaufen.",
+  "cause.hard": {
+    one: "Du hast es seit deiner letzten Bestleistung {count} Mal als zu schwer bewertet.",
+    other: "Du hast es seit deiner letzten Bestleistung {count} Mal als zu schwer bewertet.",
+  },
+  "cause.volume": "Es hatte etwa {sets} harte Sätze pro Woche, gegenüber {want} für diesen Block.",
+  "cause.rest": "Du hast zwischen den Sätzen etwa {sec} Sekunden pausiert, geplant waren {planned}.",
+  "cause.readiness":
+    "Deine Bereitschaft lag im Schnitt bei {avg}, unter dem Ausgangswert 50. Die Erholung könnte die Grenze sein: Schlaf, Ernährung und Stress zählen auch.",
+  "cause.sameReps": "Jede Einheit seit deiner Bestleistung lag im selben Bereich von {lo}–{hi} Wiederholungen.",
+  "cause.none":
+    "In deinen Daten fällt nichts auf. Einsatz, Sätze und Pausen sehen gut aus, also ist ein Übungswechsel der beste nächste Schritt.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "cause.missed": "{missed} delle tue ultime {count} serie sono rimaste sotto le ripetizioni previste. Il peso ti ha superato.",
+  "cause.hard": {
+    one: "L’hai valutato troppo duro {count} volta dal tuo ultimo record.",
+    other: "L’hai valutato troppo duro {count} volte dal tuo ultimo record.",
+  },
+  "cause.volume": "Ha avuto circa {sets} serie impegnative a settimana, contro le {want} di questo blocco.",
+  "cause.rest": "Hai riposato circa {sec} secondi tra le serie, contro i {planned} previsti.",
+  "cause.readiness":
+    "La tua prontezza è stata in media {avg}, sotto la base di 50. Il limite potrebbe essere il recupero: contano anche sonno, alimentazione e stress.",
+  "cause.sameReps": "Ogni seduta dal tuo record è stata nello stesso intervallo di {lo}–{hi} ripetizioni.",
+  "cause.none": "Nei tuoi dati non spicca nulla. Impegno, serie e riposo sembrano a posto, quindi cambiare esercizio è il passo migliore.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "cause.missed": "直近{count}セットのうち{missed}セットで目標レップに届きませんでした。重量が今の力を上回っています。",
+  "cause.hard": { other: "前回のベスト以降、{count}回「きつすぎる」と評価しています。" },
+  "cause.volume": "週あたりのハードセットは約{sets}で、このブロックの目安は{want}です。",
+  "cause.rest": "セット間の休憩は約{sec}秒で、予定は{planned}でした。",
+  "cause.readiness":
+    "コンディションの平均は{avg}で、基準の50を下回っています。回復が限界かもしれません。睡眠、食事、ストレスも影響します。",
+  "cause.sameReps": "ベスト以降のセッションはすべて同じ{lo}〜{hi}レップの範囲でした。",
+  "cause.none": "データに目立った問題はありません。強度、セット数、休憩はどれも問題ないので、種目を変えるのが次の一手です。",
+};

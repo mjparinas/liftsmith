@@ -19,3 +19,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "notes.title": "Notes du coach",
   "notes.done": "C’est fait. Le plan du jour est à jour",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "notes.title": "Coach-Notizen",
+  "notes.done": "Erledigt. Der heutige Plan ist aktualisiert",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "notes.title": "Note del coach",
+  "notes.done": "Fatto. Il piano di oggi è aggiornato",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "notes.title": "コーチのメモ",
+  "notes.done": "完了。今日のプランを更新しました",
+};

@@ -52,3 +52,51 @@ export const fr: Partial<Record<Key, Message>> = {
   "map.close": "Fermer",
   "map.selected": "{muscle}, récupéré à {pct} %",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "map.front": "Vorne",
+  "map.back": "Hinten",
+  "map.label": "Muskeln {side}",
+  "map.muscle": "{muscle}: {pct} % erholt ({band})",
+  "map.legend": "Legende",
+  "map.figure": "3D-Körper, nach Erholung eingefärbt. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "Zum Drehen ziehen. Tippe auf einen Muskel.",
+  "map.pick": "Tippe auf einen Muskel am Körper oder unten, um zu sehen, was du damit machen kannst.",
+  "map.view": "Ansicht",
+  "map.byBand": "Muskeln nach Erholung",
+  "map.close": "Schließen",
+  "map.selected": "{muscle}, {pct} % erholt",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "map.front": "Davanti",
+  "map.back": "Dietro",
+  "map.label": "Muscoli ({side})",
+  "map.muscle": "{muscle}: recupero al {pct}% ({band})",
+  "map.legend": "Legenda",
+  "map.figure": "Corpo 3D colorato in base al recupero. {summary}",
+  "map.group": "{band}: {muscles}.",
+  "map.turn": "Trascina per ruotare. Tocca un muscolo.",
+  "map.pick": "Tocca un muscolo sul corpo, o uno qui sotto, per vedere cosa farne.",
+  "map.view": "Vista",
+  "map.byBand": "Muscoli per recupero",
+  "map.close": "Chiudi",
+  "map.selected": "{muscle}, recupero al {pct}%",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "map.front": "前面",
+  "map.back": "背面",
+  "map.label": "{side}の筋肉",
+  "map.muscle": "{muscle}：回復 {pct}%（{band}）",
+  "map.legend": "凡例",
+  "map.figure": "回復度で色分けした3Dの体。{summary}",
+  "map.group": "{band}：{muscles}。",
+  "map.turn": "ドラッグで回転。筋肉をタップ。",
+  "map.pick": "体の筋肉か下の一覧をタップすると、どうすればいいかが表示されます。",
+  "map.view": "表示",
+  "map.byBand": "回復度別の筋肉",
+  "map.close": "閉じる",
+  "map.selected": "{muscle}、回復 {pct}%",
+};

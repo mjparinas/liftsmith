@@ -1,0 +1,8 @@
+/* Japanese Siri phrases for ShortcutIntents.swift. Every phrase keeps ${applicationName}. */
+"Start a workout in ${applicationName}" = "${applicationName}でワークアウトを開始";
+"Start ${applicationName}" = "${applicationName}を開始";
+"Start my ${applicationName} workout" = "${applicationName}のワークアウトを始めて";
+"Log set in ${applicationName}" = "${applicationName}でセットを記録";
+"Log a set in ${applicationName}" = "${applicationName}でセットを記録して";
+"Add rest in ${applicationName}" = "${applicationName}で休憩を追加";
+"More rest in ${applicationName}" = "${applicationName}で休憩を延長";
