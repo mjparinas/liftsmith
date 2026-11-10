@@ -43,7 +43,7 @@ function ToolsHub() {
   const now = useNow(60_000);
   const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
         {t("tools.back")}
       </button>
@@ -166,7 +166,7 @@ function TdeeScreen() {
   const useFat = fat !== undefined && profile.tdee?.useBodyFat !== false;
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("tools")} className="press -ml-2 pt-2 text-muted">
         {t("tools.backTools")}
       </button>

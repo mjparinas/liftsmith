@@ -75,7 +75,7 @@ export function Photos() {
   const change = first && last && first !== last ? fromKg(last.kg - first.kg, unit) : null;
 
   return (
-    <div className="pb-28">
+    <div className="pb-2">
       <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">
         {t("photos.back")}
       </button>

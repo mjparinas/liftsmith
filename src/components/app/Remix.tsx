@@ -37,7 +37,7 @@ export function Remix({ code }: { code?: string }) {
   }
   const { plan, swapped, missing } = remix;
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <h1 className="pt-2 text-2xl font-bold">{t("remix.title")}</h1>
       <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym?.name ?? t("remix.yourGym"), min: plan.estMinutes })}</p>
       {(swapped.length > 0 || missing.length > 0) && (

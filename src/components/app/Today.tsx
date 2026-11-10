@@ -125,7 +125,7 @@ export function Today() {
   const why = useMemo(() => (preview ? whyContext(preview, events, profile, now) : null), [preview, events, profile, now]);
 
   return (
-    <div className="pb-44">
+    <div className="pb-28">
       <header className="pt-3">
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-sm font-medium text-muted">{hello}</p>
@@ -521,7 +521,7 @@ export function Today() {
       )}
 
       {!active && preview && preview.items.length > 0 && (
-        <div className="safe-bottom pointer-events-none fixed inset-x-0 bottom-16 z-30 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pt-8">
+        <div className="pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 pb-3 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pt-8">
           <div className="pointer-events-auto mx-auto max-w-lg">
             <Button
               icon="play"

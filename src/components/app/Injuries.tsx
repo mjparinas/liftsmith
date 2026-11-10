@@ -59,7 +59,7 @@ export function Injuries() {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">
         {workout ? t("inj.backWorkout") : t("inj.backToday")}
       </button>

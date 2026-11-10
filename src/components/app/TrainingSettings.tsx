@@ -97,7 +97,7 @@ export function TrainingSettings() {
   const [open, setOpen] = useState<string | null>(null);
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings", "workout")} className="press -ml-2 min-h-11 pt-2 text-muted">
         {t("settings.back.workout")}
       </button>
