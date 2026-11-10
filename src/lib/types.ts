@@ -276,6 +276,11 @@ export interface Profile {
   delight?: DelightPrefs;
   /** Saved routines, newest first (routines.ts). */
   routines?: Routine[];
+  /**
+   * Connected apps (connections.ts): the music app the playlist link on Today opens (missing means no
+   * link), and whether finished workouts go to Strava once it's connected (missing means yes).
+   */
+  connections?: { music?: MusicApp; stravaPost?: boolean };
   /** Workout preferences (Settings › Workout preferences, training.ts). Missing fields mean the automatic default. */
   training?: TrainingPrefs;
   /** The local day (random.ts dayKey) the length slider was last moved, so the default length comes back the next day. */
@@ -283,6 +288,9 @@ export interface Profile {
   onboarded: boolean;
   updatedAt: number;
 }
+
+/** A music app the playlist link opens (connections.ts MUSIC). */
+export type MusicApp = "spotify" | "apple" | "youtube";
 
 /** How effort is shown: reps in reserve, or RPE (10 minus reps in reserve). Stored as RIR either way. */
 export type EffortScale = "rir" | "rpe";

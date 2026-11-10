@@ -6,6 +6,7 @@ import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { type PlateFinish } from "@/components/PlateBar";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
+import { queueStrava } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
@@ -259,7 +260,10 @@ export function Workout() {
   const end = () => {
     const startedAt = active.startedAt;
     const ev = s.finish();
-    if (ev?.type === "sessionEnd") void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
+    if (ev?.type === "sessionEnd") {
+      void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
+      queueStrava(ev.sessionId);
+    }
     void stopSession();
     go("done");
   };

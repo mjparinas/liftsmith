@@ -24,6 +24,7 @@ export const ROUTES = [
   "remix",
   "pro",
   "account",
+  "connections",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 

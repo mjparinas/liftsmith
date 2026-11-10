@@ -4,6 +4,7 @@
 // same account. The device gets a random session token; the server keeps only its hash.
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
+import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
@@ -242,6 +243,8 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     [accountId],
   );
   for (const a of apple) if (a.apple_refresh) await Promise.resolve(revoke(String(a.apple_refresh))).catch(() => null);
+  // Connected apps (Strava, Oura, Whoop): revoked at each service and forgotten.
+  await forgetAll(accountId).catch(() => null);
   await batch([
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },

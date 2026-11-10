@@ -115,6 +115,18 @@ export default function Privacy() {
         and sync, which deletes your account and our copy at once.
       </p>
 
+      <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
+      <p className="mt-2">
+        These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name}; we
+        keep the access it gives us (encrypted) with your account, plus your name on Strava to show who&apos;s connected. With Strava
+        connected, each finished workout (its start time, length and your sets) is posted to your Strava account, unless you turn that off.
+        With Oura or WHOOP connected, the app asks our server for your last few weeks of sleep, heart rate variability, resting heart rate,
+        breathing rate and (Oura) steps; our server fetches them from the service and passes them straight to your phone without keeping
+        them, and they&apos;re then treated like readings from Health Connect or Apple Health. Disconnect in Settings › Connected apps, or
+        delete your account, and we withdraw our access at the service and delete what we kept. Music links open your music app with a
+        public playlist and send nothing to us.
+      </p>
+
       <h2 className="mt-8 text-xl font-semibold">Reminders</h2>
       <p className="mt-2">
         Phone reminders are scheduled on your phone from your own data and send nothing to us. If you turn on email reminders, we keep your

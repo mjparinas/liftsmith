@@ -8,6 +8,7 @@ import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling } from "@/lib/billing";
+import { startConnections } from "@/lib/connections";
 import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
@@ -30,6 +31,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
 import { Achievements } from "./Achievements";
+import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
@@ -157,6 +159,11 @@ export function App() {
   useEffect(() => {
     if (!ready || !signedIn) return;
     return startSync();
+  }, [ready, signedIn]);
+  // Strava, Oura and WHOOP (Connected apps): status, readings in and workouts out, while signed in.
+  useEffect(() => {
+    if (!ready || !signedIn) return;
+    return startConnections();
   }, [ready, signedIn]);
   const accountPro = useAccount((s) => !!s.account?.pro);
   useEffect(() => {
@@ -286,6 +293,7 @@ export function App() {
     remix: <Remix code={arg} />,
     pro: <Pro />,
     account: <Account />,
+    connections: <Connections />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

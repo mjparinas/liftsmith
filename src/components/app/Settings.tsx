@@ -201,6 +201,9 @@ export function Settings() {
       )}
       <ProCard />
       <AccountRow />
+      <div className="mt-2">
+        <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
+      </div>
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>
