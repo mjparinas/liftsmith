@@ -63,6 +63,11 @@ try {
       await page.getByRole("dialog").waitFor();
       await scan("body health detail");
       await page.keyboard.press("Escape");
+      // Fitness age and how it's worked out.
+      await page.getByTestId("fitness-age").getByRole("button", { name: "How is this worked out?" }).click();
+      await page.getByRole("dialog").waitFor();
+      await scan("fitness age how");
+      await page.keyboard.press("Escape");
       await page.getByTestId("body-muscles").click();
     }
   }
@@ -109,7 +114,7 @@ try {
   await scan("tdee public page");
   // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
   // guide, blog post and index, calculators).
-  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/"]) {
+  for (const path of ["/exercises/", "/exercises/bench-press/", "/exercises/bench-press/alternatives/", "/muscles/chest/", "/muscles/chest/dumbbells/", "/equipment/barbell/", "/guides/reps-in-reserve/", "/blog/", "/blog/how-long-to-rest-between-sets/", "/tools/plate-calculator/", "/tools/one-rep-max-calculator/", "/compare/", "/compare/fitbod/", "/alternatives/fitbod/"]) {
     await page.goto(`${server.url}${path}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan(`site ${path}`);
@@ -117,6 +122,10 @@ try {
   await page.goto(`${server.url}/app/#/pro`);
   await page.getByRole("heading", { name: "Liftsmith Pro" }).waitFor();
   await scan("pro");
+  await page.goto(`${server.url}/app/#/account`);
+  await page.getByRole("heading", { name: "Account and sync" }).waitFor();
+  await page.getByRole("button", { name: "Continue with email" }).click();
+  await scan("account");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   await page.getByRole("button", { name: "Set up" }).click();

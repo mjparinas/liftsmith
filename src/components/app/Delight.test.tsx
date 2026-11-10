@@ -31,7 +31,7 @@ async function onboard(user: ReturnType<typeof userEvent.setup>) {
   await screen.findByText("What are you training for?");
   await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
-  for (let i = 0; i < 2; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+  for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByText("Today's workout");
 }
@@ -88,8 +88,9 @@ describe("Today and Progress extras", () => {
     await user.click(screen.getByRole("button", { name: "🔥 Warm up first" }));
     const warm = screen.getByRole("dialog", { name: "Five-minute warm-up" });
     expect(within(warm).getAllByRole("listitem").length).toBeGreaterThan(2);
-    await user.click(within(warm).getAllByRole("button")[0]);
-    expect(within(warm).getAllByRole("button")[0]).toHaveAttribute("aria-pressed", "true");
+    const drill = () => within(warm).getAllByRole("button").filter((b) => b.hasAttribute("aria-pressed"))[0];
+    await user.click(drill());
+    expect(drill()).toHaveAttribute("aria-pressed", "true");
     await user.click(warm.parentElement!);
 
     const writeText = vi.fn(async () => {});

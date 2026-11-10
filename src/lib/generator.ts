@@ -10,6 +10,7 @@ import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Prof
 import { groupedSeconds } from "./superset";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 import { PRIORITY_VOLUME } from "./training";
+import { t } from "./i18n";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
 // recovered and furthest below this week's set target, sized to fit the minutes asked for.
@@ -48,6 +49,8 @@ export interface SetTarget {
   reps: number;
   /** As many good reps as possible. */
   amrap?: boolean;
+  /** Lighter for the first session back after a break (layoff.ts); the program rebuilds from it. */
+  comeback?: boolean;
 }
 
 export interface Plan {
@@ -307,8 +310,8 @@ function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) 
       const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
       item.sets = Math.max(2, item.sets - 1);
       if (item.injuryPct) continue; // already lighter for the injury
-      if (ex.load === "bodyweight" || TIMED.has(ex.id)) item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: "Easy day: fewer reps" };
-      else item.target = { ...item.target, weight: stepLoad(item.target.weight, -1, ex, gym), rir: item.target.rir + 1, note: "Easy day: a step lighter" };
+      if (ex.load === "bodyweight" || TIMED.has(ex.id)) item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
+      else item.target = { ...item.target, weight: stepLoad(item.target.weight, -1, ex, gym), rir: item.target.rir + 1, note: t("note.easyLighter") };
     }
     return;
   }
@@ -316,10 +319,10 @@ function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) 
   // Never push or challenge an exercise kept lighter for an injury.
   const first = items.find((i) => EXERCISE_BY_ID.get(i.exerciseId)!.compound && !TIMED.has(i.exerciseId) && !i.injuryPct);
   if (!first) return;
-  if (first.target.rir > 0) first.target = { ...first.target, rir: first.target.rir - 1, note: `${first.target.note} · Push day: one rep closer to failure` };
+  if (first.target.rir > 0) first.target = { ...first.target, rir: first.target.rir - 1, note: `${first.target.note} · ${t("note.push")}` };
   if (challenge) {
     first.challenge = true;
-    first.target = { ...first.target, note: "Challenge: last set, as many good reps as you can" };
+    first.target = { ...first.target, note: t("note.challenge") };
   }
 }
 

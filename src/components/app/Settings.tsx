@@ -1,12 +1,13 @@
 "use client";
 import { useApp } from "@/lib/store";
-import { backupJson, saveFile, setsCsv, stamp } from "@/lib/exportData";
+import { saveFile, setsCsv, stamp } from "@/lib/exportData";
+import { SavingSettings } from "./Saving";
 import type { Term } from "@/lib/glossary";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fromKg, plainNum, toKg } from "@/lib/units";
 import { BRAND } from "@/lib/brand";
 import { useEffect, useRef, useState } from "react";
-import { flag } from "@/lib/flags";
+import { cacheFlags, flag } from "@/lib/flags";
 import { LANG_NAME, LANGS, num, t, type LangPref } from "@/lib/i18n";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { CalendarSettings } from "./CalendarSettings";
@@ -20,6 +21,8 @@ import { SITE_URL } from "@/lib/site";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
+import { CreatorCode } from "./CreatorCode";
+import { useAccount } from "@/lib/auth";
 import { BumpField, Button, Chip, Section, SwitchRow } from "./ui";
 import { feel } from "@/lib/juice";
 import { entActive, useBilling } from "@/lib/billing";
@@ -51,7 +54,7 @@ function ProRow() {
 }
 
 export function Settings() {
-  const { profile, setProfile, reset, events, gyms } = useApp();
+  const { profile, setProfile, reset, events } = useApp();
   const [confirm, setConfirm] = useState(false);
   const [stats, setStats] = useState(analyticsOn());
   const { arg } = useRoute();
@@ -59,10 +62,11 @@ export function Settings() {
     if (arg) document.getElementById(arg)?.scrollIntoView({ block: "start" });
   }, [arg]);
   const taps = useRef<number[]>([]);
+  const [motionNote, setMotionNote] = useState("");
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">‹ {t("nav.back.today")}</button>
-      {/* Five quick taps on the title open the experiments lab (Easter egg; AGENTS.md "Rep counter lab"). */}
+      {/* Five quick taps on the title switch phone-motion rep counting on or off (the `repMotion` flag, for testing; AGENTS.md "Camera rep counting"). */}
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">
         <button
           type="button"
@@ -70,20 +74,30 @@ export function Settings() {
           onClick={() => {
             const now = Date.now();
             taps.current = [...taps.current.filter((x) => now - x < 2000), now];
-            if (taps.current.length >= 5) go("lab");
+            if (taps.current.length >= 5) {
+              taps.current = [];
+              const on = !flag("repMotion");
+              cacheFlags({ repMotion: on });
+              setMotionNote(on ? t("settings.motionOn") : t("settings.motionOff"));
+            }
           }}
         >
           {t("settings.title")}
         </button>
       </h1>
-      {flag("repLab") && <Button kind="ghost" className="mt-4 w-full" onClick={() => go("lab")}>{t("settings.lab")}</Button>}
-      <Button kind="ghost" className="mt-4 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
+      {motionNote && <p className="mt-2 text-sm text-muted" role="status">{motionNote}</p>}
+      <AccountRow />
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => go("setup")}>{t("settings.rerun")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("injuries")}>{t("settings.injuries")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("tools")}>{t("settings.tools")}</Button>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("feedback")}>{t("settings.feedback")}</Button>
       <a href="/me/" className="press mt-2 block w-full rounded-2xl border border-line bg-raised px-5 py-3 text-center text-ink">{t("settings.dashboard")}</a>
       <Button kind="ghost" className="mt-2 w-full" onClick={() => go("training")}>{t("settings.training")}</Button>
+      <SavingSettings />
       <ProRow />
+      <Section title={t("creator.title")}>
+        <CreatorCode />
+      </Section>
       <Section title={t("settings.program")}>
         <button type="button" onClick={() => go("programs")} className="press card flex w-full items-center justify-between px-4 py-3 text-left">
           <span>{programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}</span>
@@ -120,7 +134,6 @@ export function Settings() {
           <Chip active={!!profile.lean} onClick={() => setProfile({ lean: true })}>{t("settings.lean")}</Chip>
         </div>
         <p className="mt-2 text-xs text-faint">{t("settings.lean.note")}</p>
-        <Button kind="ghost" className="mt-3 w-full" onClick={() => go("achievements")}>{t("settings.achievements")}</Button>
       </Section>
       <DelightSettings />
       <CalendarSettings />
@@ -137,10 +150,7 @@ export function Settings() {
         <Button kind="ghost" className="w-full" onClick={() => setProfile({ blockStart: Date.now() })}>{t("settings.newBlock")}</Button>
       </Section>
       <Section title={t("settings.data")}>
-        <div className="mb-3 grid grid-cols-2 gap-2">
-          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>{t("settings.exportCsv")}</Button>
-          <Button kind="ghost" onClick={() => void saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events))}>{t("settings.backup")}</Button>
-        </div>
+        <Button kind="ghost" className="mb-3 w-full" onClick={() => void saveFile(`liftsmith-sets-${stamp()}.csv`, "text/csv", setsCsv(events, profile.unit))}>{t("settings.exportCsv")}</Button>
         <p className="mb-3 text-xs text-faint">{t("settings.data.note")}</p>
         <div className="mb-4"><ImportWorkouts /></div>
         {confirm ? (
@@ -174,5 +184,19 @@ function AccessibilitySettings() {
       <Row<Contrast> label={t("a11y.contrast")} value={a.contrast} onPick={(contrast) => set({ contrast })} options={[["system", t("a11y.text.system")], ["standard", t("a11y.colours.standard")], ["more", t("a11y.contrast.more")]]} />
       <p className="mt-2 px-1 text-xs text-faint">{t("a11y.contrast.note")}</p>
     </div>
+  );
+}
+
+/** Settings' first row: sign in to back up and sync, or who's signed in. */
+function AccountRow() {
+  const account = useAccount((s) => s.account);
+  return (
+    <button type="button" onClick={() => go("account")} className="press card mt-4 flex w-full items-center justify-between gap-3 px-4 py-3 text-left">
+      <span>
+        <span className="block font-semibold">{t("account.row")}</span>
+        <span className="block text-sm text-muted">{account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}</span>
+      </span>
+      <span aria-hidden className="text-faint">›</span>
+    </button>
   );
 }

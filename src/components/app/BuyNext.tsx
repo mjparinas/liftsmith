@@ -3,6 +3,7 @@ import { equipmentTips, plateTips } from "@/lib/buying";
 import { useApp } from "@/lib/store";
 import type { Gym } from "@/lib/types";
 import { Section } from "./ui";
+import { t } from "@/lib/i18n";
 
 // "What to buy next" for home gyms (buying.ts). Advice only: no shop links or sponsored picks.
 
@@ -19,16 +20,16 @@ export function BuyNext({ gym }: { gym: Gym }) {
     saveGym({ ...gym, plates: next });
   };
   return (
-    <Section title="What to buy next">
+    <Section title={t("buy.title")}>
       <ul className="card divide-y divide-line">
-        {[...plates.map((t) => ({ key: `p${t.weight}`, text: t.text, act: () => addPair(t.weight), label: "I got them" })), ...kit.map((t) => ({ key: t.item, text: t.text, act: () => saveGym({ ...gym, equipment: [...gym.equipment, t.item] }), label: "I have it" }))].map((t) => (
-          <li key={t.key} className="flex items-start justify-between gap-3 px-4 py-3">
-            <p className="text-sm">{t.text}</p>
-            <button type="button" onClick={t.act} className="press min-h-11 shrink-0 rounded-full border border-line px-3 text-sm text-accent">{t.label}</button>
+        {[...plates.map((p) => ({ key: `p${p.weight}`, text: p.text, act: () => addPair(p.weight), label: t("buy.got") })), ...kit.map((k) => ({ key: k.item, text: k.text, act: () => saveGym({ ...gym, equipment: [...gym.equipment, k.item] }), label: t("buy.have") }))].map((row) => (
+          <li key={row.key} className="flex items-start justify-between gap-3 px-4 py-3">
+            <p className="text-sm">{row.text}</p>
+            <button type="button" onClick={row.act} className="press min-h-11 shrink-0 rounded-full border border-line px-3 text-sm text-accent">{row.label}</button>
           </li>
         ))}
       </ul>
-      <p className="mt-2 px-1 text-xs text-faint">Based on your plates, equipment and the weights you lift. No ads or sponsored picks.</p>
+      <p className="mt-2 px-1 text-xs text-faint">{t("buy.note")}</p>
     </Section>
   );
 }

@@ -1,6 +1,7 @@
 import { roundLoad } from "./loads";
 import { TIMED, type Target } from "./progression";
-import type { AppEvent, BodyPart, Exercise, Gym, Muscle, Pattern } from "./types";
+import { BODY_PARTS, type AppEvent, type BodyPart, type Exercise, type Gym, type Muscle, type Pattern } from "./types";
+import { t as tr, translated } from "./i18n";
 
 // Injury mode (Melvin, 2026-11-09). The lifter logs an injury by body part. Exercises that load that
 // part are skipped until they mark it healed, or, if they choose after a risk warning, kept at a share
@@ -9,23 +10,7 @@ import type { AppEvent, BodyPart, Exercise, Gym, Muscle, Pattern } from "./types
 // The matching is deliberately broad (better to skip one exercise too many), and the lifter can mark
 // any single exercise as "doesn't hurt". None of this is medical advice, and the screens say so.
 
-export const PART_LABEL: Record<BodyPart, string> = {
-  neck: "Neck",
-  shoulder: "Shoulder",
-  elbow: "Elbow",
-  wrist: "Wrist or hand",
-  chest: "Chest",
-  upperBack: "Upper back",
-  lowerBack: "Lower back",
-  abs: "Abs or core",
-  hip: "Hip",
-  groin: "Groin",
-  quad: "Front of thigh",
-  hamstring: "Hamstring",
-  knee: "Knee",
-  calf: "Calf",
-  ankle: "Ankle or foot",
-};
+export const PART_LABEL: Record<BodyPart, string> = translated(BODY_PARTS, (p) => `part.${p}`);
 
 interface PartRule {
   /** Affected when any of these is a primary muscle. */
@@ -243,7 +228,7 @@ export function skippedIds(exercises: readonly Exercise[], active: readonly Inju
  */
 export function lighten(t: Target, ex: Exercise, pct: number, gym: Gym): Target {
   const share = pct / 100;
-  const note = `Injury: ${pct}% of usual, stop if it hurts`;
+  const note = tr("note.injury", { pct });
   const rir = Math.max(t.rir, 3);
   if (ex.load === "bodyweight" || TIMED.has(ex.id) || t.weight <= 0) {
     return { ...t, reps: Math.max(TIMED.has(ex.id) ? 10 : 3, Math.round(t.reps * share)), rir, note };

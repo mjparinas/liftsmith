@@ -35,6 +35,11 @@ export interface DemoSettings {
   selected?: readonly Muscle[] | null;
   /** Lean mode or reduced motion: camera turns snap instead of easing. */
   calm?: boolean;
+  /**
+   * Follow the lifter: read every frame, it returns how far through the rep they are (0 the start
+   * position, 1 the far end), or null to fall back to the demo's own timing. Used by camera rep counting.
+   */
+  follow?: (() => number | null) | null;
 }
 
 export interface Camera { yaw: number; pitch: number; target: Vec; distance: number; aspect: number }
@@ -83,6 +88,7 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
   let yaw = s.view === "orbit" ? 50 : VIEW_YAW[s.view], yawTarget = yaw, pitch = 10;
   let drag: { x: number; y: number; yaw: number; pitch: number } | null = null;
   let visible = true, raf = 0, last = 0, lastDraw = 0, done = false, clock = 0;
+  let followD = 0;
 
   const setup = () => {
     motion = motionFor(s.exerciseId);
@@ -148,7 +154,9 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
     }
     if (s.view === "orbit" && !drag && s.playing) yawTarget += dt * 18;
     yaw = s.calm ? yawTarget : yaw + (yawTarget - yaw) * Math.min(1, dt * 5);
-    const animating = (s.playing && !done) || !!s.bpm || !!drag || Math.abs(yawTarget - yaw) > 0.05 || (s.view === "orbit" && s.playing);
+    const target = s.follow?.() ?? null;
+    if (target !== null) followD += (clamp(target, 0, 1) - followD) * Math.min(1, dt * 14);
+    const animating = !!s.follow || (s.playing && !done) || !!s.bpm || !!drag || Math.abs(yawTarget - yaw) > 0.05 || (s.view === "orbit" && s.playing);
     if (changed || now - lastDraw >= 1000 / s.fps - 4) {
       lastDraw = now;
       const r = canvas.getBoundingClientRect();
@@ -156,7 +164,7 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
         size = [r.width, r.height];
         scene.resize(r.width, r.height, Math.min(2, window.devicePixelRatio || 1));
       }
-      const smp = sample(motion.phases, t);
+      const smp = target !== null ? { d: followD, label: "", effort: 0.4 + 0.6 * followD } : sample(motion.phases, t);
       const J = jointsAt(motion, body, smp.d);
       for (const m of meshes) {
         if (m.P.kind === "hair" && !body.hair) continue;

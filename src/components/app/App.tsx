@@ -7,25 +7,29 @@ import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
-import { useEffect } from "react";
+import { useAccount } from "@/lib/auth";
+import { useEffect, type ReactNode } from "react";
+import { keepStorage } from "@/lib/saving";
 import { installDiag } from "@/lib/diag";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { COSMETICS } from "@/lib/game";
 import { flushFeedback } from "@/lib/feedback";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startAnalytics, track } from "@/lib/analytics";
+import { Account } from "./Account";
 import { Achievements } from "./Achievements";
+import { startSync } from "@/lib/sync";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
 import { Onboarding } from "./Onboarding";
 import { Recovery } from "./Recovery";
-import { RepLab } from "./RepLab";
 import { Remix } from "./Remix";
 import { go, parse, useRoute, type Route } from "./router";
 import { Programs } from "./Programs";
 import { Pro } from "./Pro";
 import { startBilling, useBilling } from "@/lib/billing";
+import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { Settings } from "./Settings";
 import { TrainingSettings } from "./TrainingSettings";
 import { Injuries } from "./Injuries";
@@ -49,6 +53,9 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
   { route: "achievements", label: "tab.awards", icon: "trophy" },
   { route: "gym", label: "tab.gyms", icon: "gym" },
 ];
+
+// Screens that hide the tab bar.
+const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
@@ -102,7 +109,12 @@ export function App() {
     startAnalytics();
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();
-    const online = () => void flushFeedback();
+    // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
+    void startCreator();
+    const online = () => {
+      void flushFeedback();
+      if (useCreator.getState().claim?.status === "pending") void sendClaim();
+    };
     window.addEventListener("online", online);
     void init();
     if ("serviceWorker" in navigator && process.env.NODE_ENV === "production") void navigator.serviceWorker.register("/sw.js");
@@ -114,6 +126,16 @@ export function App() {
   useEffect(() => {
     if (ready) void startBilling();
   }, [ready]);
+  // In a browser, keep asking it not to clear this site's storage (saving.ts); an account backs it up too (sync.ts).
+  useEffect(() => {
+    if (ready && profile.onboarded) void keepStorage();
+  }, [ready, profile.onboarded]);
+  // Sync with the lifter's account, when signed in (sync.ts): on open, on return, when online, after changes.
+  const signedIn = useAccount((s) => !!s.account);
+  useEffect(() => {
+    if (!ready || !signedIn) return;
+    return startSync();
+  }, [ready, signedIn]);
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
   }, [ready, profile.onboarded, billing.live, billing.ent]);
@@ -232,8 +254,29 @@ export function App() {
     );
   if (!profile.onboarded) return <Onboarding />;
 
-  const screen = { today: <Today />, workout: <Workout />, recovery: <Recovery />, stats: <Stats />, gym: <Gym />, settings: <Settings />, done: <Done />, setup: <Onboarding rerun />, feedback: <Feedback />, achievements: <Achievements />, recap: <Recap arg={arg} />, photos: <Photos />, programs: <Programs />, injuries: <Injuries />, training: <TrainingSettings />, tools: <Tools arg={arg} />, remix: <Remix code={arg} />, lab: <RepLab />, pro: <Pro /> }[route];
-  const showNav = route !== "workout" && route !== "done" && route !== "setup" && route !== "feedback" && route !== "lab" && route !== "pro";
+  const screens: Record<Route, ReactNode> = {
+    today: <Today />,
+    workout: <Workout />,
+    recovery: <Recovery />,
+    stats: <Stats />,
+    gym: <Gym />,
+    settings: <Settings />,
+    done: <Done />,
+    setup: <Onboarding rerun />,
+    feedback: <Feedback />,
+    achievements: <Achievements />,
+    recap: <Recap arg={arg} />,
+    photos: <Photos />,
+    programs: <Programs />,
+    injuries: <Injuries />,
+    training: <TrainingSettings />,
+    tools: <Tools arg={arg} />,
+    remix: <Remix code={arg} />,
+    pro: <Pro />,
+    account: <Account />,
+  };
+  const screen = screens[route];
+  const showNav = !FULL_SCREEN.has(route);
   if (route === "setup") return screen;
   return (
     <>

@@ -8,10 +8,13 @@ import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
+import { date, num, t } from "@/lib/i18n";
 import { useMemo, useState } from "react";
 import { shareCard } from "@/lib/shareImage";
 import { go } from "./router";
 import { Button, Chip } from "./ui";
+
+const cap = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 
 export function parsePeriod(arg: string | undefined, now: number): Period {
   if (arg?.startsWith("y")) {
@@ -19,8 +22,8 @@ export function parsePeriod(arg: string | undefined, now: number): Period {
     if (y > 2000) return yearOf(new Date(y, 6, 1).getTime());
   }
   if (arg?.startsWith("m")) {
-    const t = Number(arg.slice(1));
-    if (t > 0) return monthOf(t + 86400_000);
+    const ms = Number(arg.slice(1));
+    if (ms > 0) return monthOf(ms + 86400_000);
   }
   return monthOf(now);
 }
@@ -35,44 +38,44 @@ export function Recap({ arg }: { arg?: string }) {
   const unit = profile.unit;
   const hours = Math.round(r.seconds / 360) / 10;
   const cards: { k: string; big: string; small: string }[] = [
-    { k: "workouts", big: String(r.workouts), small: `workout${r.workouts === 1 ? "" : "s"}${r.weeks > 1 ? ` across ${r.activeWeeks} of ${r.weeks} weeks` : ""}` },
-    { k: "volume", big: fmtTonnage(r.volumeKg, unit), small: r.likeA ? `lifted. That's more than ${r.likeA}.` : "lifted" },
-    { k: "sets", big: r.sets.toLocaleString("en-US"), small: `sets and ${r.reps.toLocaleString("en-US")} reps in ${hours} hours` },
+    { k: "workouts", big: num(r.workouts), small: r.weeks > 1 ? t("recap.workoutsWeeks", { count: r.workouts, active: r.activeWeeks, weeks: r.weeks }) : t("recap.workouts", { count: r.workouts }) },
+    { k: "volume", big: fmtTonnage(r.volumeKg, unit), small: r.likeA ? t("recap.liftedLike", { thing: r.likeA }) : t("recap.lifted") },
+    { k: "sets", big: num(r.sets), small: t("recap.sets", { reps: num(r.reps), hours: num(hours) }) },
   ];
-  if (r.prs.length) cards.push({ k: "prs", big: String(r.prs.length), small: `personal best${r.prs.length > 1 ? "s" : ""}, led by ${r.prs[0].name} at ${fmtNum(fromKg(r.prs[0].weight, unit))} ${unit} × ${r.prs[0].reps}` });
-  if (r.topExercise) cards.push({ k: "top", big: r.topExercise.name, small: `your most-done lift, ${r.topExercise.sets} sets` });
-  if (r.topMuscle) cards.push({ k: "muscle", big: MUSCLE_LABEL[r.topMuscle.muscle], small: "got the most work" });
-  if (r.favouriteDay) cards.push({ k: "day", big: r.favouriteDay, small: `was your day${r.timeOfDay ? `, and you're a ${r.timeOfDay}` : ""}` });
-  if (r.heaviest) cards.push({ k: "heavy", big: `${fmtNum(fromKg(r.heaviest.weight, unit))} ${unit}`, small: `heaviest bar: ${r.heaviest.name}` });
-  if (r.volumeChange !== null) cards.push({ k: "change", big: `${r.volumeChange >= 0 ? "+" : ""}${Math.round(r.volumeChange * 100)}%`, small: `volume against the ${period.kind} before` });
-  if (r.avgHr) cards.push({ k: "hr", big: `${r.avgHr} bpm`, small: "average heart rate while lifting" });
+  if (r.prs.length) cards.push({ k: "prs", big: num(r.prs.length), small: t("recap.prs", { count: r.prs.length, name: r.prs[0].name, weight: fmtNum(fromKg(r.prs[0].weight, unit)), unit, reps: r.prs[0].reps }) });
+  if (r.topExercise) cards.push({ k: "top", big: r.topExercise.name, small: t("recap.top", { sets: r.topExercise.sets }) });
+  if (r.topMuscle) cards.push({ k: "muscle", big: MUSCLE_LABEL[r.topMuscle.muscle], small: t("recap.muscle") });
+  if (r.favouriteDay) cards.push({ k: "day", big: cap(r.favouriteDay), small: r.timeOfDay ? t("recap.dayTod", { tod: t(`recap.tod.${r.timeOfDay}`) }) : t("recap.day") });
+  if (r.heaviest) cards.push({ k: "heavy", big: `${fmtNum(fromKg(r.heaviest.weight, unit))} ${unit}`, small: t("recap.heavy", { name: r.heaviest.name }) });
+  if (r.volumeChange !== null) cards.push({ k: "change", big: `${r.volumeChange >= 0 ? "+" : ""}${num(Math.round(r.volumeChange * 100))}%`, small: t(period.kind === "year" ? "recap.changeYear" : "recap.changeMonth") });
+  if (r.avgHr) cards.push({ k: "hr", big: `${num(r.avgHr)} bpm`, small: t("recap.hr") });
 
   const share = async () => {
     haptic("tap");
     const res = await shareCard(
       {
-        kicker: period.kind === "year" ? "Year in lifting" : "Monthly recap",
+        kicker: t(period.kind === "year" ? "recap.year" : "recap.month"),
         headline: r.label,
-        tiles: ([["Workouts", String(r.workouts)], ["Lifted", fmtTonnage(r.volumeKg, unit)], ["Sets", r.sets.toLocaleString("en-US")], ["PRs", String(r.prs.length)]] as [string, string][]),
-        lines: [r.likeA ? `More than ${r.likeA}` : null, r.topExercise ? `Most-done lift: ${r.topExercise.name}` : null, r.prs[0] ? `Top PR: ${r.prs[0].name} ${fmtNum(fromKg(r.prs[0].weight, unit))} ${unit} × ${r.prs[0].reps}` : null, r.favouriteDay ? `${r.favouriteDay}s were for lifting` : null].filter((x): x is string => !!x),
+        tiles: ([[t("recap.card.workouts"), num(r.workouts)], [t("recap.card.lifted"), fmtTonnage(r.volumeKg, unit)], [t("recap.card.sets"), num(r.sets)], [t("recap.card.prs"), num(r.prs.length)]] as [string, string][]),
+        lines: [r.likeA ? t("recap.card.like", { thing: r.likeA }) : null, r.topExercise ? t("recap.card.top", { name: r.topExercise.name }) : null, r.prs[0] ? t("recap.card.pr", { name: r.prs[0].name, weight: fmtNum(fromKg(r.prs[0].weight, unit)), unit, reps: r.prs[0].reps }) : null, r.favouriteDay ? t("recap.card.day", { day: r.favouriteDay }) : null].filter((x): x is string => !!x),
         footer: "Liftsmith",
       },
       `liftsmith-recap-${period.kind}`,
     );
-    setNote(res === "failed" ? "Couldn't share the card." : res === "download" ? "Saved the image." : null);
+    setNote(res === "failed" ? t("recap.shareFailed") : res === "download" ? t("recap.saved") : null);
   };
 
   return (
     <div className="pb-28">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">‹ Progress</button>
-      <p className="text-sm uppercase tracking-wider text-accent">{period.kind === "year" ? "Year in lifting" : "Monthly recap"}</p>
+      <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">{t("recap.back")}</button>
+      <p className="text-sm uppercase tracking-wider text-accent">{t(period.kind === "year" ? "recap.year" : "recap.month")}</p>
       <h1 className="text-3xl font-bold">{r.label}</h1>
       <div className="mt-3 flex flex-wrap gap-2">
-        <Chip active={period.kind === "year"} onClick={() => setPeriod(yearOf(period.start))}>Whole year</Chip>
-        {months.map((m) => <Chip key={m.start} active={period.kind === "month" && period.start === m.start} onClick={() => setPeriod(m)}>{new Date(m.start).toLocaleDateString("en-US", { month: "short", year: "2-digit" })}</Chip>)}
+        <Chip active={period.kind === "year"} onClick={() => setPeriod(yearOf(period.start))}>{t("recap.wholeYear")}</Chip>
+        {months.map((m) => <Chip key={m.start} active={period.kind === "month" && period.start === m.start} onClick={() => setPeriod(m)}>{date(m.start, { month: "short", year: "2-digit" })}</Chip>)}
       </div>
       {r.workouts === 0 ? (
-        <p className="card mt-6 p-5 text-muted">No workouts in {r.label} yet. Your recap fills in as you train.</p>
+        <p className="card mt-6 p-5 text-muted">{t("recap.none", { period: r.label })}</p>
       ) : (
         <ol className="mt-5 space-y-3">
           {cards.map((c, i) => (
@@ -83,7 +86,7 @@ export function Recap({ arg }: { arg?: string }) {
           ))}
         </ol>
       )}
-      {r.workouts > 0 && <Button className="mt-5 w-full py-4" onClick={() => void share()}>Share my {period.kind === "year" ? "year" : "month"}</Button>}
+      {r.workouts > 0 && <Button className="mt-5 w-full py-4" onClick={() => void share()}>{t(period.kind === "year" ? "recap.shareYear" : "recap.shareMonth")}</Button>}
       {note && <p className="mt-2 text-center text-sm text-accent" role="status">{note}</p>}
     </div>
   );

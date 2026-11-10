@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { afterSet, groupRange, groupedSeconds, linksOf, roundRest, supersetLabel, SWITCH_REST, toggleLink, withLinks } from "./superset";
+import { afterSet, applyLinks, groupRange, groupedSeconds, linksOf, roundRest, supersetLabel, SWITCH_REST, toggleLink, withLinks } from "./superset";
 
 const it3: { exerciseId: string; sets: number; restSec: number; group?: string }[] = [
   { exerciseId: "a", sets: 3, restSec: 120 },
@@ -19,6 +19,17 @@ describe("supersets", () => {
     expect(linksOf(split)).toEqual([false, true]);
     // Out of range does nothing.
     expect(toggleLink(it3, 2).map((i) => i.group)).toEqual([undefined, undefined, undefined]);
+  });
+
+  it("keeps the lifter's links and splits when the plan is rebuilt", () => {
+    // Linked on Today, then the plan is rebuilt without groups: the link comes back.
+    expect(applyLinks(it3, ["a>b"]).map((i) => i.group)).toEqual(["ss-a", "ss-a", undefined]);
+    // A plan that links b and c itself (a routine): splitting it on Today must stick across a rebuild.
+    const routine = withLinks(it3, [false, true]);
+    expect(applyLinks(routine, ["!b>c"]).map((i) => i.group)).toEqual([undefined, undefined, undefined]);
+    expect(applyLinks(routine, ["a>b", "!b>c"]).map((i) => i.group)).toEqual(["ss-a", "ss-a", undefined]);
+    // Pairs no longer next to each other are left alone.
+    expect(applyLinks(it3, ["a>c"]).map((i) => i.group)).toEqual([undefined, undefined, undefined]);
   });
 
   it("alternates through a round, then rests the longest rest", () => {

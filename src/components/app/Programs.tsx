@@ -5,30 +5,16 @@ import { haptic } from "@/lib/juice";
 import { missingFor, pickProgram, PROGRAM_BY_ID, PROGRAMS, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, MUSCLES, MUSCLE_LABEL } from "@/lib/types";
+import { list, t } from "@/lib/i18n";
 import { useNow } from "@/lib/useNow";
 import { useMemo, useState } from "react";
 import { go } from "./router";
 import { Button, Sheet } from "./ui";
 
 // Pick how Today's workout is planned: the adaptive engine (the default), a classic fixed program,
-// or a split the adaptive engine fills in. Text for the screen stays here so it can be translated.
+// or a split the adaptive engine fills in. Program details (summary, steps, credit) are still English.
 
-const TEXT = {
-  title: "Programs",
-  intro: "Pick how your workouts are planned. You can switch any time; your history and stats stay.",
-  adaptive: "Adaptive (recommended)",
-  adaptiveBlurb: "Plans each workout from your gym, recovery and training block, sized to the time you have.",
-  current: "Current",
-  pro: "Pro",
-  unlock: "Unlock with Pro",
-  free: "Free",
-  start: "Start this program",
-  restart: "Restart from the beginning",
-  needs: "This gym is missing",
-  needsAfter: "Exercises it can't do are swapped for the closest match.",
-  week: "A typical week, in hard sets per muscle",
-  perWeek: (n: number) => `${n} days a week`,
-};
+const level = (l: ProgramInfo["level"]) => t(`prog.level.${l}`);
 
 export function Programs() {
   const { profile, gyms, events, setProfile } = useApp();
@@ -50,19 +36,19 @@ export function Programs() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">‹ Settings</button>
-      <h1 className="text-2xl font-bold">{TEXT.title}</h1>
-      <p className="mt-1 text-sm text-muted">{TEXT.intro}</p>
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">{t("train.back")}</button>
+      <h1 className="text-2xl font-bold">{t("prog.title")}</h1>
+      <p className="mt-1 text-sm text-muted">{t("prog.intro")}</p>
 
       <ul className="mt-4 space-y-3">
         <li>
           <button type="button" onClick={() => choose(null)} aria-pressed={!currentId} className={`press card w-full p-4 text-left ${!currentId ? "border-accent" : ""}`}>
             <div className="flex items-center justify-between gap-2">
-              <span className="font-semibold">{TEXT.adaptive}</span>
-              {!currentId && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{TEXT.current}</span>}
-              {!can("adaptive") && <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{TEXT.pro}</span>}
+              <span className="font-semibold">{t("prog.adaptive")}</span>
+              {!currentId && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>}
+              {!can("adaptive") && <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>}
             </div>
-            <p className="mt-1 text-sm text-muted">{TEXT.adaptiveBlurb}</p>
+            <p className="mt-1 text-sm text-muted">{t("prog.adaptiveBlurb")}</p>
           </button>
         </li>
         {PROGRAMS.map((p) => (
@@ -71,11 +57,11 @@ export function Programs() {
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold">{p.name}</span>
                 <span className="flex shrink-0 gap-1.5">
-                  {currentId === p.id && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{TEXT.current}</span>}
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${p.tier === "pro" ? "bg-warn/15 text-warn" : "bg-raised text-muted"}`}>{p.tier === "pro" ? TEXT.pro : TEXT.free}</span>
+                  {currentId === p.id && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>}
+                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${p.tier === "pro" ? "bg-warn/15 text-warn" : "bg-raised text-muted"}`}>{p.tier === "pro" ? t("prog.pro") : t("prog.free")}</span>
                 </span>
               </div>
-              <p className="mt-0.5 text-xs text-faint">{p.level} · {TEXT.perWeek(p.daysPerWeek)} · also known as {p.aka[0]}</p>
+              <p className="mt-0.5 text-xs text-faint">{level(p.level)} · {t("prog.perWeek", { count: p.daysPerWeek })} · {t("prog.aka", { name: p.aka[0] })}</p>
               <p className="mt-1 text-sm text-muted">{p.summary}</p>
             </button>
           </li>
@@ -107,10 +93,10 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
         ))}
       </ol>
       {missing.length > 0 && (
-        <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">{TEXT.needs}: {missing.map((e) => EQUIPMENT_LABEL[e].toLowerCase()).join(", ")}. {TEXT.needsAfter}</p>
+        <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">{t("prog.needs", { items: list(missing.map((e) => EQUIPMENT_LABEL[e].toLocaleLowerCase())) })}</p>
       )}
       <div>
-        <h3 className="text-sm font-semibold text-muted">{TEXT.week}</h3>
+        <h3 className="text-sm font-semibold text-muted">{t("prog.week")}</h3>
         <ul className="mt-2 space-y-1">
           {rows.map((m) => (
             <li key={m} className="flex items-center gap-2 text-sm">
@@ -121,8 +107,8 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
           ))}
         </ul>
       </div>
-      <p className="text-xs text-faint">{p.basedOn} Names belong to their owners; this app isn&apos;t affiliated with them.</p>
-      <Button className="w-full" onClick={onStart}>{!allowed ? TEXT.unlock : current ? TEXT.restart : TEXT.start}</Button>
+      <p className="text-xs text-faint">{p.basedOn} {t("prog.owners")}</p>
+      <Button className="w-full" onClick={onStart}>{!allowed ? t("prog.unlock") : current ? t("prog.restart") : t("prog.start")}</Button>
     </div>
   );
 }

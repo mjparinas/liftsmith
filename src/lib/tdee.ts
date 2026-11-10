@@ -10,18 +10,16 @@
 // the profile. The current value is always computed fresh; events are the record of the past.
 import type { AppEvent, Profile, TdeeEvent } from "./types";
 import type { SessionSummary } from "./derive";
+import { t } from "./i18n";
 
 export type Activity = "sedentary" | "light" | "moderate" | "heavy" | "athlete";
 export const ACTIVITIES: Activity[] = ["sedentary", "light", "moderate", "heavy", "athlete"];
 
 /** The standard activity factors (Harris-Benedict / Mifflin convention). */
-export const ACTIVITY: Record<Activity, { factor: number; label: string; detail: string }> = {
-  sedentary: { factor: 1.2, label: "Sedentary", detail: "Desk job, little or no exercise" },
-  light: { factor: 1.375, label: "Light exercise", detail: "1 to 2 days a week" },
-  moderate: { factor: 1.55, label: "Moderate exercise", detail: "3 to 5 days a week" },
-  heavy: { factor: 1.725, label: "Heavy exercise", detail: "6 to 7 days a week" },
-  athlete: { factor: 1.9, label: "Athlete", detail: "Twice a day, or a physical job plus training" },
-};
+const FACTOR: Record<Activity, number> = { sedentary: 1.2, light: 1.375, moderate: 1.55, heavy: 1.725, athlete: 1.9 };
+export const ACTIVITY: Record<Activity, { factor: number; label: string; detail: string }> = Object.fromEntries(
+  ACTIVITIES.map((a) => [a, { factor: FACTOR[a], get label() { return t(`activity.${a}`); }, get detail() { return t(`activity.${a}.detail`); } }]),
+) as Record<Activity, { factor: number; label: string; detail: string }>;
 
 export type Sex = "male" | "female";
 export type Formula = "mifflin" | "katch";
@@ -78,10 +76,10 @@ export function calcTdee(i: TdeeInputs): TdeeResult {
 }
 
 export function bmiBand(bmi: number): string {
-  if (bmi < 18.5) return "Underweight";
-  if (bmi < 25) return "Healthy range";
-  if (bmi < 30) return "Overweight";
-  return "Obese";
+  if (bmi < 18.5) return t("bmi.under");
+  if (bmi < 25) return t("bmi.healthy");
+  if (bmi < 30) return t("bmi.over");
+  return t("bmi.obese");
 }
 
 // --- Activity from the lifter's own training ---

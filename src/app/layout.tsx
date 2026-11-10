@@ -3,6 +3,7 @@ import "./globals.css";
 import { BRAND } from "@/lib/brand";
 import { SITE_URL } from "@/lib/site";
 import { SiteBeacon } from "@/components/SiteBeacon";
+import { VercelAnalytics } from "@/components/VercelAnalytics";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-dvh antialiased">
         {children}
         <SiteBeacon />
+        <VercelAnalytics />
       </body>
     </html>
   );

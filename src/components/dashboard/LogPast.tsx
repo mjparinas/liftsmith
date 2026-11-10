@@ -4,6 +4,7 @@ import { EXERCISES, EXERCISE_BY_ID } from "@/lib/exercises";
 import { appendEvents } from "@/lib/localdb";
 import type { Profile } from "@/lib/types";
 import { toKg } from "@/lib/units";
+import { t } from "@/lib/i18n";
 import { useState } from "react";
 
 // Log a workout after the fact, on a big screen: pick the day, add exercises and sets, save. It writes
@@ -23,11 +24,11 @@ function localInput(ms: number): string {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-function weightLabel(exerciseId: string): string {
+function weightLabel(exerciseId: string, unit: string): string {
   const load = EXERCISE_BY_ID.get(exerciseId)?.load;
-  if (load === "bodyweight") return "Added weight";
-  if (load === "dumbbell" || load === "kettlebell") return "Weight each";
-  return "Weight";
+  if (load === "bodyweight") return t("past.added", { unit });
+  if (load === "dumbbell" || load === "kettlebell") return t("past.each", { unit });
+  return t("past.weight", { unit });
 }
 
 let n = 0;
@@ -83,14 +84,14 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
         void save();
       }}
     >
-      <p className="text-muted">Forgot to track a workout, or trained without your phone? Add it here and it counts towards your stats, PRs, streak and next workouts.</p>
+      <p className="text-muted">{t("past.intro")}</p>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block">
-          <span className="text-sm text-muted">Started</span>
+          <span className="text-sm text-muted">{t("past.started")}</span>
           <input type="datetime-local" required value={start} max={localInput(now)} onChange={(e) => setStart(e.target.value)} className={`${input} mt-1`} />
         </label>
         <label className="block">
-          <span className="text-sm text-muted">Length (minutes)</span>
+          <span className="text-sm text-muted">{t("past.length")}</span>
           <input type="number" inputMode="numeric" min={1} max={600} required value={minutes} onChange={(e) => setMinutes(e.target.value)} className={`${input} mt-1`} />
         </label>
       </div>
@@ -100,15 +101,15 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
           <li key={row.key} className="card p-4">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-semibold">{EXERCISE_BY_ID.get(row.exerciseId)?.name}</h3>
-              <button type="button" onClick={() => dropRow(ri)} className="press rounded-xl px-3 py-2 text-sm text-muted">Remove</button>
+              <button type="button" onClick={() => dropRow(ri)} className="press rounded-xl px-3 py-2 text-sm text-muted">{t("past.remove")}</button>
             </div>
             <table className="mt-2 w-full text-sm">
               <thead>
                 <tr className="text-left text-faint">
-                  <th scope="col" className="w-10 font-medium">Set</th>
-                  <th scope="col" className="font-medium">{weightLabel(row.exerciseId)} ({unit})</th>
-                  <th scope="col" className="font-medium">Reps</th>
-                  <th scope="col" className="w-12"><span className="sr-only">Remove</span></th>
+                  <th scope="col" className="w-10 font-medium">{t("past.set")}</th>
+                  <th scope="col" className="font-medium">{weightLabel(row.exerciseId, unit)}</th>
+                  <th scope="col" className="font-medium">{t("past.reps")}</th>
+                  <th scope="col" className="w-12"><span className="sr-only">{t("past.remove")}</span></th>
                 </tr>
               </thead>
               <tbody>
@@ -118,37 +119,37 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
                     <tr key={si}>
                       <td className="num py-1 text-muted">{si + 1}</td>
                       <td className="py-1 pr-2">
-                        <input inputMode="decimal" type="number" min={0} step="any" value={s.weight} placeholder="0" aria-label={`${name} set ${si + 1} weight`} onChange={(e) => edit(ri, si, "weight", e.target.value)} className={input} />
+                        <input inputMode="decimal" type="number" min={0} step="any" value={s.weight} placeholder="0" aria-label={t("past.setWeight", { name, n: si + 1 })} onChange={(e) => edit(ri, si, "weight", e.target.value)} className={input} />
                       </td>
                       <td className="py-1 pr-2">
-                        <input inputMode="numeric" type="number" min={1} step={1} required value={s.reps} aria-label={`${name} set ${si + 1} reps`} onChange={(e) => edit(ri, si, "reps", e.target.value)} className={input} />
+                        <input inputMode="numeric" type="number" min={1} step={1} required value={s.reps} aria-label={t("past.setReps", { name, n: si + 1 })} onChange={(e) => edit(ri, si, "reps", e.target.value)} className={input} />
                       </td>
                       <td className="py-1 text-right">
-                        <button type="button" aria-label={`Remove ${name} set ${si + 1}`} onClick={() => dropSet(ri, si)} className="press h-11 w-11 rounded-xl text-muted">×</button>
+                        <button type="button" aria-label={t("past.removeSet", { name, n: si + 1 })} onClick={() => dropSet(ri, si)} className="press h-11 w-11 rounded-xl text-muted">×</button>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            <button type="button" onClick={() => addSet(ri)} className="press mt-2 rounded-xl border border-line bg-raised px-4 py-2 text-sm">Add set</button>
+            <button type="button" onClick={() => addSet(ri)} className="press mt-2 rounded-xl border border-line bg-raised px-4 py-2 text-sm">{t("past.addSet")}</button>
           </li>
         ))}
       </ol>
 
       <div className="mt-4 flex flex-wrap items-end gap-2">
         <label className="block min-w-0 flex-1">
-          <span className="text-sm text-muted">Exercise</span>
+          <span className="text-sm text-muted">{t("past.exercise")}</span>
           <select value={pick} onChange={(e) => setPick(e.target.value)} className={`${input} mt-1`}>
-            <option value="">Choose an exercise…</option>
+            <option value="">{t("past.choose")}</option>
             {SORTED.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
           </select>
         </label>
-        <button type="button" onClick={add} disabled={!pick} className="press rounded-2xl border border-line bg-raised px-5 py-3 disabled:opacity-40">Add exercise</button>
+        <button type="button" onClick={add} disabled={!pick} className="press rounded-2xl border border-line bg-raised px-5 py-3 disabled:opacity-40">{t("past.addExercise")}</button>
       </div>
 
       {error && <p role="alert" className="mt-4 text-bad">{error}</p>}
-      <button type="submit" disabled={!rows.length || saving} className="press mt-6 rounded-2xl bg-accent px-6 py-3 font-semibold text-accent-ink disabled:opacity-40">{saving ? "Saving…" : "Save workout"}</button>
+      <button type="submit" disabled={!rows.length || saving} className="press mt-6 rounded-2xl bg-accent px-6 py-3 font-semibold text-accent-ink disabled:opacity-40">{saving ? t("past.saving") : t("past.save")}</button>
     </form>
   );
 }

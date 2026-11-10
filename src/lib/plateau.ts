@@ -4,6 +4,7 @@ import { exercise, EXERCISE_BY_ID } from "./exercises";
 import { roundLoad } from "./loads";
 import { epley, repRange, sessionsOf, target, TIMED, weightFor } from "./progression";
 import type { AppEvent, Gym, Profile, SetEvent } from "./types";
+import { t } from "./i18n";
 
 // Plateau detective (Melvin picked it, 2026-11-09). When a lift's estimated one-rep max hasn't moved
 // for three weeks or more, look through the lifter's own data for the likely reason, say what we
@@ -49,12 +50,21 @@ export interface Plateau {
   fix: FixKind;
 }
 
+/** Each fix's name and what it does, translated on each read. */
+const fixText = (k: FixKind) => ({
+  get title() {
+    return t(`fix.${k}`);
+  },
+  get what() {
+    return t(`fix.${k}.what`);
+  },
+});
 export const FIX_TEXT: Record<FixKind, { title: string; what: string }> = {
-  reset: { title: "Reset and rebuild", what: "Drop the weight about 10% and build back up over the next sessions. Most lifters pass their old best within three weeks." },
-  reps: { title: "Change the rep range", what: "Three weeks in a different rep range. A new stimulus, with the weight worked out from your current strength." },
-  volume: { title: "More weekly sets", what: "One extra set each time you do it for three weeks, to give the muscle more work to adapt to." },
-  rest: { title: "Rest longer", what: "One more minute of rest between sets for three weeks, so each set is done fresh." },
-  variation: { title: "Switch to a close variation", what: "Three weeks on a similar lift, then back. It works the same muscles a different way." },
+  reset: fixText("reset"),
+  reps: fixText("reps"),
+  volume: fixText("volume"),
+  rest: fixText("rest"),
+  variation: fixText("variation"),
 };
 
 /** Best estimated one-rep max per session for a lift, oldest first (sets with no load are left out). */
@@ -99,10 +109,10 @@ function diagnose(events: readonly AppEvent[], profile: Profile, id: string, sin
 
   const missed = sets.filter((s) => !s.challenge && s.reps < s.targetReps).length;
   const missShare = missed / Math.max(1, sets.filter((s) => !s.challenge).length);
-  if (missShare >= 0.3) causes.push({ kind: "missed", fix: "reset", weight: missShare * 3, text: `${missed} of your last ${sets.length} sets fell short of the target reps. The weight has got ahead of you.` });
+  if (missShare >= 0.3) causes.push({ kind: "missed", fix: "reset", weight: missShare * 3, text: t("cause.missed", { missed, count: sets.length }) });
 
   const hard = events.filter((e) => e.type === "feedback" && e.exerciseId === id && e.at > from && e.rating < 0).length;
-  if (hard >= 2) causes.push({ kind: "hard", fix: "reset", weight: 1 + hard * 0.4, text: `You rated it too hard ${hard} times since your last best.` });
+  if (hard >= 2) causes.push({ kind: "hard", fix: "reset", weight: 1 + hard * 0.4, text: t("cause.hard", { count: hard }) });
 
   // Weekly hard sets for the main muscle against this block's target.
   const weeks = Math.max(1, Math.round((now - from) / WEEK));
@@ -116,27 +126,27 @@ function diagnose(events: readonly AppEvent[], profile: Profile, id: string, sin
   }
   const perWeek = musc / weeks;
   const want = blockWeek(profile, now).setsPerMuscle;
-  if (perWeek < want * 0.7) causes.push({ kind: "volume", fix: "volume", weight: 1.5 * (1 - perWeek / want) + 0.5, text: `It's had about ${Math.round(perWeek)} hard sets a week, against ${want} for this block.` });
+  if (perWeek < want * 0.7) causes.push({ kind: "volume", fix: "volume", weight: 1.5 * (1 - perWeek / want) + 0.5, text: t("cause.volume", { sets: Math.round(perWeek), want }) });
 
   const rests = sets.map((s) => s.restSec).filter((r): r is number => typeof r === "number" && r > 0);
   const planned = restFor(ex, profile.goal);
   if (rests.length >= 3) {
     const avg = rests.reduce((a, b) => a + b, 0) / rests.length;
-    if (avg < planned * 0.75) causes.push({ kind: "rest", fix: "rest", weight: 1.2, text: `You've rested about ${Math.round(avg)} seconds between sets, against ${planned} planned.` });
+    if (avg < planned * 0.75) causes.push({ kind: "rest", fix: "rest", weight: 1.2, text: t("cause.rest", { sec: Math.round(avg), planned }) });
   }
 
   const reads = events.filter((e) => e.type === "sessionStart" && e.at > from && typeof e.readiness === "number").map((e) => (e.type === "sessionStart" ? e.readiness! : 0));
   if (reads.length >= 3) {
     const avg = reads.reduce((a, b) => a + b, 0) / reads.length;
-    if (avg < 42) causes.push({ kind: "readiness", fix: "reset", weight: 1, text: `Your readiness has averaged ${Math.round(avg)}, below the 50 baseline. Recovery may be the limit: sleep, food and stress count too.` });
+    if (avg < 42) causes.push({ kind: "readiness", fix: "reset", weight: 1, text: t("cause.readiness", { avg: Math.round(avg) }) });
   }
 
   const ranges = new Set(sets.map((s) => s.targetReps));
   const [lo, hi] = repRange(ex, profile.goal);
-  if (since.length >= 4 && [...ranges].every((r) => r >= lo && r <= hi)) causes.push({ kind: "sameReps", fix: "reps", weight: 0.8, text: `Every session since your best has been in the same ${lo}–${hi} rep range.` });
+  if (since.length >= 4 && [...ranges].every((r) => r >= lo && r <= hi)) causes.push({ kind: "sameReps", fix: "reps", weight: 0.8, text: t("cause.sameReps", { lo, hi }) });
 
   causes.sort((a, b) => b.weight - a.weight);
-  if (!causes.length) return [{ kind: "none", fix: "variation", text: "Nothing in your data stands out. Effort, sets and rest all look fine, so a change of exercise is the best next step." }];
+  if (!causes.length) return [{ kind: "none", fix: "variation", text: t("cause.none") }];
   return causes.map((c) => ({ kind: c.kind, text: c.text, fix: c.fix }));
 }
 
@@ -173,9 +183,9 @@ export function applyFixes(plan: Plan, fixes: readonly PlateauFix[] | undefined,
     const ex = exercise(item.exerciseId);
     switch (f.kind) {
       case "volume":
-        return { ...item, sets: Math.min(5, item.sets + 1), target: { ...item.target, note: `${item.target.note} · Plateau fix: one extra set` } };
+        return { ...item, sets: Math.min(5, item.sets + 1), target: { ...item.target, note: `${item.target.note} · ${t("note.fixSet")}` } };
       case "rest":
-        return { ...item, restSec: item.restSec + 60, target: { ...item.target, note: `${item.target.note} · Plateau fix: longer rest` } };
+        return { ...item, restSec: item.restSec + 60, target: { ...item.target, note: `${item.target.note} · ${t("note.fixRest")}` } };
       case "reset": {
         // Only the first session of the fix drops; double progression rebuilds from there.
         const doneSince = sessionsOf(events, ex.id).some((s) => s[0].at >= f.startedAt);

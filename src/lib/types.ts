@@ -362,10 +362,21 @@ export interface SetEvent extends EventBase {
   injuryPct?: number;
   /** A program's "as many reps as you can" set: targetReps is the minimum. */
   amrap?: boolean;
+  /** Planned lighter for the first session back after a break (layoff.ts); a program builds on it. */
+  comeback?: boolean;
   /** The program lift this set counts for (programs.ts), kept through swaps. */
   slot?: string;
   /** Superset group, shared by the exercises done back to back with this one. */
   superset?: string;
+  /**
+   * Dumbbells or kettlebells held (1 or 2), recorded when the set is logged so a later change to the
+   * exercise never rewrites history. `weight` is per implement. Missing on older sets: sides.ts
+   * fills it from the exercise.
+   */
+  implements?: 1 | 2;
+  /** Per-side exercises (sides.ts) when the two sides differ: reps on each. `reps` is then the lower. */
+  repsL?: number;
+  repsR?: number;
 }
 
 export interface SessionStartEvent extends EventBase {
@@ -579,4 +590,25 @@ export interface InjuryReturnEvent extends EventBase {
   ack: true;
 }
 
-export type AppEvent = BodyweightEvent | HealthEvent | TdeeEvent | CheckinEvent | SetEvent | SessionStartEvent | SessionEndEvent | FeedbackEvent | SwapEvent | HrSeriesEvent | CycleEvent | WarmupEvent | NoteEvent | EffortEvent | CustomExerciseEvent | InjuryEvent | InjuryRuleEvent | InjuryHealedEvent | PainEvent | InjuryReturnEvent;
+// Every event kind, one per line so two changes adding an event don't touch the same line.
+export type AppEvent =
+  | BodyweightEvent
+  | HealthEvent
+  | TdeeEvent
+  | CheckinEvent
+  | SetEvent
+  | SessionStartEvent
+  | SessionEndEvent
+  | FeedbackEvent
+  | SwapEvent
+  | HrSeriesEvent
+  | CycleEvent
+  | WarmupEvent
+  | NoteEvent
+  | EffortEvent
+  | CustomExerciseEvent
+  | InjuryEvent
+  | InjuryRuleEvent
+  | InjuryHealedEvent
+  | PainEvent
+  | InjuryReturnEvent;

@@ -1,6 +1,8 @@
 "use client";
 import { create } from "zustand";
 import { defaultProfile, makeGym, type GymPreset } from "./defaults";
+import { mergeBackup, type Backup } from "./backup";
+import { signOut } from "./auth";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { minutesForToday } from "./training";
 import { weekStart } from "./block";
@@ -11,9 +13,10 @@ import { activeInjuries, effectFor } from "./injury";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { target } from "./progression";
 import { exercise, registerCustom } from "./exercises";
+import { implementsFor } from "./sides";
 import { setSeconds } from "./generator";
 import { WARMUP_REST, warmupFor } from "./warmup";
-import { afterSet, linksOf, toggleLink, withLinks } from "./superset";
+import { afterSet, applyLinks, linksOf, toggleLink } from "./superset";
 import { planFromRoutine, upsertRoutine } from "./routines";
 import { planSeconds } from "./generator";
 import { gymAt, locate, wantsLocation, type Fix } from "./geo";
@@ -39,6 +42,11 @@ export interface Active {
   /** Working values for the next set (kg, reps), editable with the steppers. */
   weight: number;
   reps: number;
+  /**
+   * Per-side exercises (sides.ts) when the sides differ: the right side's reps, with `reps` then the
+   * left. Unset means both sides did `reps`, which keeps logging to one tap.
+   */
+  repsR?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -102,7 +110,10 @@ interface State {
   forgetCycle(): Promise<void>;
   /** The gym last picked automatically by location, for the hint on Today. */
   pickedByLocation: string | null;
-  /** Supersets picked on Today, as "first>second" exercise pairs, kept when the plan is rebuilt. */
+  /**
+   * Superset choices made on Today, kept when the plan is rebuilt: "first>second" links a pair, and
+   * "!first>second" splits a pair the plan itself linked (a routine or "Same as last time").
+   */
   links: string[];
   /** The saved routine used for today instead of the adaptive plan, if any. */
   routineId: string | null;
@@ -142,6 +153,8 @@ interface State {
   fixPlateau(p: Plateau, kind: FixKind): void;
   logSet(): void;
   adjust(weight: number, reps: number): void;
+  /** Right side's reps on a per-side exercise; undefined goes back to "both sides the same". */
+  adjustRight(reps: number | undefined): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
@@ -172,6 +185,10 @@ interface State {
   applyHealthBody(r: BodyReadings): void;
   /** Save imported workouts (importCsv.ts), skipping any already saved. Returns how many events were new. */
   importWorkouts(evs: AppEvent[]): number;
+  /** Restores a full backup file (backup.ts): its profile comes back, its gyms and events are added. Returns the events added. */
+  restoreBackup(b: Backup): number;
+  /** Applies what sync pulled from the lifter's other devices (sync.ts). Written locally without queueing it back. */
+  applySynced(p: { events: AppEvent[]; deleted: string[]; profile: Profile | null; gyms: Gym[] | null }): void;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
   reset(): Promise<void>;
@@ -179,12 +196,10 @@ interface State {
 
 const ACTIVE_KEY = "liftsmith.active";
 
-/** Re-applies the supersets picked on Today to a rebuilt plan, where both exercises are still neighbours. */
+/** Re-applies the superset choices made on Today to a rebuilt plan (superset.ts `applyLinks`). */
 function relink(plan: Plan, links: readonly string[]): Plan {
   if (!links.length) return plan;
-  const want = new Set(links);
-  const l = linksOf(plan.items).map((on, i) => on || want.has(`${plan.items[i].exerciseId}>${plan.items[i + 1].exerciseId}`));
-  const items = withLinks(plan.items, l);
+  const items = applyLinks(plan.items, links);
   return { ...plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
 }
 const uid = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : Math.random().toString(36).slice(2));
@@ -574,11 +589,14 @@ export const useApp = create<State>((set, get) => {
           sessionId: a.sessionId,
           exerciseId: item.exerciseId,
           weight: a.weight,
-          reps: a.reps,
+          reps: a.repsR !== undefined ? Math.min(a.reps, a.repsR) : a.reps,
+          ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
+          implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
+          comeback: planned.comeback,
           slot: item.slot,
           startedAt: a.setStart,
           durationSec: plausible ? Math.round(duration) : undefined,
@@ -593,7 +611,7 @@ export const useApp = create<State>((set, get) => {
       // next exercise of the round (superset.ts).
       const items = a.plan.items;
       const step = afterSet(items, a.index, (i) => (i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId)));
-      let next: Active = { ...a, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
+      let next: Active = { ...a, repsR: undefined, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
       const nextT = item.setTargets?.[already + 1];
@@ -614,6 +632,14 @@ export const useApp = create<State>((set, get) => {
       const a = get().active;
       if (!a) return;
       const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    adjustRight(reps) {
+      const a = get().active;
+      if (!a) return;
+      const next = { ...a, repsR: reps === undefined ? undefined : Math.max(0, reps), lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
@@ -704,10 +730,13 @@ export const useApp = create<State>((set, get) => {
         return;
       }
       const p = get().preview;
-      if (!p) return;
+      if (!p || index < 0 || index >= p.items.length - 1) return;
       const items = toggleLink(p.items, index);
-      const links = items.slice(0, -1).flatMap((it, i) => (items[i + 1] && it.group && it.group === items[i + 1].group ? [`${it.exerciseId}>${items[i + 1].exerciseId}`] : []));
-      track("feature", { name: "superset", detail: links.length > get().links.length ? "link" : "split" });
+      // Remember this pair's choice only; other pairs keep theirs.
+      const key = `${items[index].exerciseId}>${items[index + 1].exerciseId}`;
+      const on = linksOf(items)[index];
+      const links = [...get().links.filter((k) => k !== key && k !== `!${key}`), on ? key : `!${key}`];
+      track("feature", { name: "superset", detail: on ? "link" : "split" });
       set({ links, preview: { ...p, items, estMinutes: Math.round(planSeconds(items) / 60) } });
     },
 
@@ -847,12 +876,49 @@ export const useApp = create<State>((set, get) => {
       return fresh.length;
     },
 
+    restoreBackup(b) {
+      const { profile, gyms, fresh } = mergeBackup(get(), b);
+      setWeekStart(profile.training?.weekStart);
+      set({ profile, gyms });
+      void saveRecord("profile", profile);
+      void saveRecord("gyms", gyms);
+      if (fresh.length) commit(fresh);
+      else set({ stats: derive(get().events, Date.now()) });
+      get().replan();
+      return fresh.length;
+    },
+
+    applySynced({ events: incoming, deleted, profile, gyms }) {
+      const have = new Set(get().events.map((e) => e.id));
+      const gone = new Set(deleted.filter((id) => have.has(id)));
+      const fresh = incoming.filter((e) => !have.has(e.id) && !gone.has(e.id));
+      if (fresh.length || gone.size) {
+        registerCustom(fresh);
+        const events = [...get().events.filter((e) => !gone.has(e.id)), ...fresh].sort((a, b) => a.at - b.at);
+        set({ events, stats: derive(events, Date.now()) });
+        if (fresh.length) void appendEvents(fresh, { remote: true });
+        if (gone.size) void deleteEvents([...gone], { remote: true });
+      }
+      if (gyms) {
+        set({ gyms });
+        void saveRecord("gyms", gyms, { remote: true });
+      }
+      if (profile) {
+        setWeekStart(profile.training?.weekStart);
+        set({ profile, stats: derive(get().events, Date.now()) });
+        void saveRecord("profile", profile, { remote: true });
+      }
+      if (fresh.length || gone.size || gyms || profile) get().replan();
+    },
+
     checkin(buddies) {
       commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
       track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
     },
 
     async reset() {
+      // Erasing the device signs it out (the account and its synced copy stay).
+      void signOut();
       await eraseAll();
       persistActive(null);
       forgetAnalytics();

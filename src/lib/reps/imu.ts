@@ -50,6 +50,8 @@ export class ImuRepCounter {
   private mags: { t: number; m: number }[] = [];
   /** Readings since the wrist was last still: re-integrated with drift removed when it stops again. */
   private seg: { t: number; a: number }[] = [];
+  /** Height right now, integrated as readings arrive (no drift removal yet), for a figure that follows along. */
+  private live = 0;
 
   private minRom: number;
 
@@ -124,6 +126,7 @@ export class ImuRepCounter {
     // Speed since the wrist was last still (short enough that drift stays small), to tell a slow, smooth
     // movement or a held position apart from standing still, allowing for drift on long segments.
     this.v += vert * dt;
+    this.live += this.v * dt;
     const still = stillish && Math.abs(this.v) < 0.12 + 0.03 * ((t - (this.seg[0]?.t ?? t)) / 1000);
     if (!still) {
       this.stillFor = 0;
@@ -139,6 +142,7 @@ export class ImuRepCounter {
     this.stillFor = this.stillFor || t;
     if (t - this.stillFor > 3000) this.h = 0;
     const out = this.seg.length ? this.flush(true) : [];
+    this.live = this.h;
     out.push(...this.tracker.push({ t, pos: this.h, bar: this.h, conf: 1 }));
     return out;
   }
@@ -177,7 +181,13 @@ export class ImuRepCounter {
       out.push(...this.tracker.push({ t: seg[i].t, pos, bar: pos, conf: 1 }));
     }
     this.h = snap ? 0 : hEnd;
+    this.live = this.h;
     return out;
+  }
+
+  /** How far through the rep the lifter is right now (0 at rest, 1 at the set's deepest point). */
+  get progress(): number {
+    return this.tracker.progressAt(this.live);
   }
 
   summary(): SetSummary {

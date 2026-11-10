@@ -2,9 +2,21 @@
 // Only in the server build (Vercel). The static export used for the native shells and CI leaves it out
 // (see pageExtensions in next.config.ts). Needs RESEND_API_KEY and FEEDBACK_TO; FEEDBACK_FROM is optional.
 import { checkFeedback, feedbackEmail, MAX_BODY, NATIVE_ORIGINS } from "@/lib/feedbackServer";
+import { rateLimit } from "@/server/db";
 
 const hits = new Map<string, number[]>();
-const LIMIT = 10; // reports per address per hour, per server instance
+const LIMIT = 10; // reports per address per hour
+
+/** Shared across instances through the database; per instance only when the database can't answer. */
+async function tooMany(ip: string, now: number): Promise<boolean> {
+  try {
+    return !(await rateLimit(`feedback:${ip}`, LIMIT, 3_600_000, now));
+  } catch {
+    const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
+    hits.set(ip, [...recent, now]);
+    return recent.length >= LIMIT;
+  }
+}
 
 function cors(origin: string | null): Record<string, string> {
   return origin && NATIVE_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
@@ -22,9 +34,7 @@ export async function POST(req: Request) {
 
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
   const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < 3_600_000);
-  if (recent.length >= LIMIT) return json(429, { error: "Too many reports, try again later" }, h);
-  hits.set(ip, [...recent, now]);
+  if (await tooMany(ip, now)) return json(429, { error: "Too many reports, try again later" }, h);
 
   let body: unknown;
   try {

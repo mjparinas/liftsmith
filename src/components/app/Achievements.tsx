@@ -1,6 +1,6 @@
 "use client";
 import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
-import { COSMETICS, LEAGUES, RARITY_LABEL, game, type Cosmetic, type Game } from "@/lib/game";
+import { COSMETICS, LEAGUE_LABEL, LEAGUES, RARITY_LABEL, game, type Cosmetic, type Game } from "@/lib/game";
 import { applyAccent, sound, type TimerSound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { useNow } from "@/lib/useNow";
@@ -121,17 +121,17 @@ export function LeagueCard({ g }: { g: Game }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-semibold">🏅 {t("awards.league", { league: l.league })}</span>
+        <span className="font-semibold">🏅 {t("awards.league", { league: LEAGUE_LABEL[l.league] })}</span>
         <span className="num text-sm text-muted">{t("awards.weekXp", { xp: l.weekXp })}</span>
       </div>
       <div className="mt-2"><Bar value={pct} label={t("awards.leagueProgress")} /></div>
       <p className="mt-1.5 text-xs text-faint">
-        {l.promoteAt ? (l.weekXp >= l.promoteAt ? t("awards.moveUp", { league: LEAGUES[l.index + 1] }) : t("awards.toMoveUp", { xp: l.promoteAt - l.weekXp, league: LEAGUES[l.index + 1] })) : t("awards.topLeague")}
+        {l.promoteAt ? (l.weekXp >= l.promoteAt ? t("awards.moveUp", { league: LEAGUE_LABEL[LEAGUES[l.index + 1]] }) : t("awards.toMoveUp", { xp: l.promoteAt - l.weekXp, league: LEAGUE_LABEL[LEAGUES[l.index + 1]] })) : t("awards.topLeague")}
         {l.demoteBelow > 0 && l.weekXp < l.demoteBelow ? ` ${t("awards.drop", { xp: l.demoteBelow })}` : ""}
       </p>
       <ol className="mt-3 flex gap-1" aria-label={t("awards.leagues")}>
         {LEAGUES.map((name, i) => (
-          <li key={name} title={name} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}><span className="sr-only">{name}{i === l.index ? ` ${t("awards.you")}` : ""}</span></li>
+          <li key={name} title={LEAGUE_LABEL[name]} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}><span className="sr-only">{LEAGUE_LABEL[name]}{i === l.index ? ` ${t("awards.you")}` : ""}</span></li>
         ))}
       </ol>
     </div>

@@ -99,6 +99,93 @@ const SCHEMA = [
     family INTEGER NOT NULL DEFAULT 0,
     updated_at INTEGER NOT NULL
   )`,
+  // Creator program (src/server/creators.ts). A creator's code, their terms, and which installs came with it.
+  `CREATE TABLE IF NOT EXISTS creators (
+    code TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    contact TEXT,
+    rate REAL NOT NULL DEFAULT 0.3,
+    months INTEGER NOT NULL DEFAULT 12,
+    active INTEGER NOT NULL DEFAULT 1,
+    note TEXT,
+    created_at INTEGER NOT NULL
+  )`,
+  // One row per install: the code it came with. Fixed once the install starts a trial or buys.
+  `CREATE TABLE IF NOT EXISTS creator_installs (
+    install_id TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    source TEXT NOT NULL,
+    platform TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS creator_installs_code ON creator_installs (code)`,
+  // Commission paid out, recorded by an admin after paying (PayPal or Wise, outside the app).
+  `CREATE TABLE IF NOT EXISTS creator_payouts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    code TEXT NOT NULL,
+    usd_micros INTEGER NOT NULL,
+    paid_at INTEGER NOT NULL,
+    admin TEXT NOT NULL,
+    note TEXT
+  )`,
+  // Accounts (src/server/accounts.ts): optional, for sync. One account per person; each sign-in method
+  // (Google, Apple, an emailed code) is an identity on it. Accounts with the same verified email are one account.
+  `CREATE TABLE IF NOT EXISTS accounts (
+    id TEXT PRIMARY KEY,
+    email TEXT,
+    created_at INTEGER NOT NULL,
+    last_seen INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS accounts_email ON accounts (email)`,
+  `CREATE TABLE IF NOT EXISTS account_identities (
+    provider TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    email TEXT,
+    created_at INTEGER NOT NULL,
+    apple_refresh TEXT,
+    PRIMARY KEY (provider, subject)
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_identities_account ON account_identities (account_id)`,
+  // Sessions: only a hash of the token is stored. The token lives on the device.
+  `CREATE TABLE IF NOT EXISTS account_sessions (
+    token_hash TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    last_seen INTEGER NOT NULL,
+    platform TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_sessions_account ON account_sessions (account_id)`,
+  // Email sign-in codes: a hash of the code, tries left, and how many were sent today.
+  `CREATE TABLE IF NOT EXISTS account_codes (
+    email TEXT PRIMARY KEY,
+    code_hash TEXT NOT NULL,
+    expires_at INTEGER NOT NULL,
+    tries INTEGER NOT NULL DEFAULT 0,
+    sent INTEGER NOT NULL DEFAULT 0,
+    window_start INTEGER NOT NULL
+  )`,
+  // Sync (src/server/sync.ts): every event the lifter's devices wrote, in arrival order (seq is the cursor).
+  // A deleted event stays as a tombstone (body NULL) so other devices delete it too.
+  `CREATE TABLE IF NOT EXISTS sync_events (
+    seq INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    body TEXT,
+    session TEXT,
+    UNIQUE (account_id, id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS sync_events_account_seq ON sync_events (account_id, seq)`,
+  // The profile and each gym, last write wins on updated_at. A removed gym keeps a row with body NULL.
+  `CREATE TABLE IF NOT EXISTS sync_records (
+    account_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    body TEXT,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, key)
+  )`,
   // Admin sign-in: one-time email links and sessions. Only hashes of the tokens are stored.
   `CREATE TABLE IF NOT EXISTS admin_links (
     token_hash TEXT PRIMARY KEY,
@@ -120,6 +207,42 @@ const SCHEMA = [
     target TEXT,
     detail TEXT
   )`,
+  // Admin inbox (src/server/inbox.ts): mail is read live from Resend, so only what the admin did with each
+  // message is kept here, never its body.
+  `CREATE TABLE IF NOT EXISTS inbox_state (
+    email_id TEXT PRIMARY KEY,
+    handled_at INTEGER,
+    replied_at INTEGER,
+    replied_by TEXT,
+    archived_at INTEGER
+  )`,
+  // Admin to-do list (src/server/adminTodo.ts): items worked out from the data that were snoozed or dismissed,
+  // and the admins' own tasks.
+  `CREATE TABLE IF NOT EXISTS admin_todo_hidden (
+    key TEXT PRIMARY KEY,
+    until INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    note TEXT,
+    due INTEGER,
+    created_at INTEGER NOT NULL,
+    created_by TEXT NOT NULL,
+    done_at INTEGER,
+    done_by TEXT
+  )`,
+  // When scheduled jobs ran and how they went, for the System page (src/server/monitor.ts). Kept 60 days.
+  `CREATE TABLE IF NOT EXISTS job_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    job TEXT NOT NULL,
+    started_at INTEGER NOT NULL,
+    finished_at INTEGER,
+    ok INTEGER,
+    detail TEXT
+  )`,
+  `CREATE INDEX IF NOT EXISTS job_runs_job ON job_runs (job, started_at)`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
@@ -175,15 +298,16 @@ export async function batch(stmts: { sql: string; args: InValue[] }[]): Promise<
 
 /** Counts a hit against `key` and says whether it's within `limit` per `windowMs`. */
 export async function rateLimit(key: string, limit: number, windowMs: number, now = Date.now()): Promise<boolean> {
-  const rows = await query<{ count: number; reset_at: number }>("SELECT count, reset_at FROM rate_limits WHERE key = ?", [key]);
-  const r = rows[0];
-  if (!r || Number(r.reset_at) <= now) {
-    await run("INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?) ON CONFLICT(key) DO UPDATE SET count = 1, reset_at = excluded.reset_at", [key, now + windowMs]);
-    return true;
-  }
-  if (Number(r.count) >= limit) return false;
-  await run("UPDATE rate_limits SET count = count + 1 WHERE key = ?", [key]);
-  return true;
+  // One atomic statement, so parallel requests can't all read the same count and slip past the limit.
+  const rows = await query<{ count: number }>(
+    `INSERT INTO rate_limits (key, count, reset_at) VALUES (?, 1, ?)
+     ON CONFLICT(key) DO UPDATE SET
+       count = CASE WHEN rate_limits.reset_at <= ? THEN 1 ELSE rate_limits.count + 1 END,
+       reset_at = CASE WHEN rate_limits.reset_at <= ? THEN excluded.reset_at ELSE rate_limits.reset_at END
+     RETURNING count`,
+    [key, now + windowMs, now, now],
+  );
+  return Number(rows[0]?.count ?? 1) <= limit;
 }
 
 /** For tests: a fresh in-memory database. */

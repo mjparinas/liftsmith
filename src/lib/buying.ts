@@ -3,6 +3,7 @@ import { smallestJump } from "./plates";
 import { sessionsOf } from "./progression";
 import { EQUIPMENT, EQUIPMENT_LABEL, MUSCLES, type AppEvent, type Equipment, type Gym, type Muscle, type PlateStock } from "./types";
 import { fmtNum, fromKg } from "./units";
+import { t } from "./i18n";
 
 // What to buy next (Melvin picked it, 2026-11-09). Uses the plate solver and the exercise library to
 // say which purchase helps this lifter most: a pair of small plates that makes finer jumps possible,
@@ -21,6 +22,8 @@ export interface PlateTip {
   /** The smallest jump before and after, in the gym's unit. */
   jumpFrom: number;
   jumpTo: number;
+  /** It lifts the most the plates can load past what the lifter is close to. */
+  room: boolean;
 }
 
 const CANDIDATES = { kg: [0.5, 1.25, 2.5, 5, 10, 15, 20, 25], lb: [1, 2.5, 5, 10, 25, 35, 45] } as const;
@@ -83,15 +86,16 @@ export function plateTips(gym: Gym, events: readonly AppEvent[]): PlateTip[] {
     const jumpTo = smallestJump(next);
     if (gained <= 0 && jumpTo >= jump) continue;
     const parts: string[] = [];
-    if (jumpTo < jump) parts.push(`jumps of ${fmtNum(jumpTo)} ${u} instead of ${fmtNum(jump)} ${u}, so slow lifts like the press keep moving`);
-    if (gained > 0) parts.push(`${gained} more ${gained === 1 ? "weight" : "weights"} you can load up to ${fmtNum(Math.round(hi))} ${u}`);
-    if (top * 1.1 > maxNow && w >= (u === "kg" ? 10 : 25)) parts.push(`room past your current ${fmtNum(maxNow)} ${u} limit`);
-    tips.push({ weight: w, count: 2, text: `A pair of ${fmtNum(w)} ${u} plates: ${parts.join("; ")}.`, newLoads: gained, jumpFrom: jump, jumpTo });
+    const room = top * 1.1 > maxNow && w >= (u === "kg" ? 10 : 25);
+    if (jumpTo < jump) parts.push(t("buy.jumps", { to: `${fmtNum(jumpTo)} ${u}`, from: `${fmtNum(jump)} ${u}` }));
+    if (gained > 0) parts.push(t("buy.more", { count: gained, hi: `${fmtNum(Math.round(hi))} ${u}` }));
+    if (room) parts.push(t("buy.room", { max: `${fmtNum(maxNow)} ${u}` }));
+    tips.push({ weight: w, count: 2, text: t("buy.pair", { w: `${fmtNum(w)} ${u}`, why: parts.join(t("buy.sep")) }), newLoads: gained, jumpFrom: jump, jumpTo, room });
   }
   // Running out of plates matters most, then finer jumps, then sheer variety.
   // A 2.5 kg (5 lb) total jump suits most lifts; much finer only helps once you're already there.
   const ideal = u === "kg" ? 2.5 : 5;
-  const score = (t: PlateTip) => (/limit/.test(t.text) ? 1000 : 0) + (t.jumpTo < t.jumpFrom ? 100 + (t.jumpFrom - t.jumpTo) * 10 - 40 * Math.abs(Math.log2(t.jumpTo / ideal)) : 0) + t.newLoads;
+  const score = (p: PlateTip) => (p.room ? 1000 : 0) + (p.jumpTo < p.jumpFrom ? 100 + (p.jumpFrom - p.jumpTo) * 10 - 40 * Math.abs(Math.log2(p.jumpTo / ideal)) : 0) + p.newLoads;
   return tips.sort((a, b) => score(b) - score(a)).slice(0, 3);
 }
 
@@ -118,7 +122,9 @@ export function equipmentTips(gym: Gym): EquipmentTip[] {
     const unlocks = [...next].filter((id) => !have.has(id)).length;
     if (!unlocks) continue;
     const newMuscles = MUSCLES.filter((m) => loaded(next).has(m) && !coveredNow.has(m));
-    const text = `${EQUIPMENT_LABEL[item]}: ${unlocks} new ${unlocks === 1 ? "exercise" : "exercises"}${newMuscles.length ? `, and the first loaded work for ${newMuscles.length} ${newMuscles.length === 1 ? "muscle" : "muscles"}` : ""}.`;
+    const text = newMuscles.length
+      ? t("buy.kitMuscles", { item: EQUIPMENT_LABEL[item], unlocks: t("buy.newEx", { count: unlocks }), count: newMuscles.length })
+      : t("buy.kit", { item: EQUIPMENT_LABEL[item], count: unlocks });
     out.push({ item, label: EQUIPMENT_LABEL[item], unlocks, newMuscles, text });
   }
   return out.sort((a, b) => b.newMuscles.length * 4 + b.unlocks - (a.newMuscles.length * 4 + a.unlocks)).slice(0, 3);

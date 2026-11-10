@@ -5,6 +5,7 @@ import { defaultMapping, importEvents, readImport, type ImportFile, type Mapping
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import type { Unit } from "@/lib/types";
+import { t } from "@/lib/i18n";
 import { useMemo, useRef, useState } from "react";
 import { Button, Chip, Sheet } from "./ui";
 
@@ -26,9 +27,9 @@ export function ImportWorkouts() {
   const pick = async (f: File | undefined) => {
     if (!f) return;
     setNote(null);
-    if (f.size > 20_000_000) return setNote("That file is too big to import (over 20 MB).");
+    if (f.size > 20_000_000) return setNote(t("imp.tooBig"));
     const read = readImport(await f.text());
-    if (!read || !read.workouts.length) return setNote("That file doesn't look like a workout export from Strong, Hevy or Liftsmith.");
+    if (!read || !read.workouts.length) return setNote(t("imp.notExport"));
     setFile(read);
     setMapping(defaultMapping(read));
     setUnit(read.unit ?? profile.unit);
@@ -41,35 +42,35 @@ export function ImportWorkouts() {
     const added = importWorkouts(out.events);
     haptic("success");
     track("feature", { name: "import", detail: file.format });
-    setNote(added ? `Imported ${out.workouts} workout${out.workouts === 1 ? "" : "s"} with ${out.sets} sets.` : "Those workouts are already here.");
+    setNote(added ? t("imp.done", { count: out.workouts, sets: out.sets }) : t("imp.already"));
     setFile(null);
   };
 
   const totalSets = file?.workouts.reduce((n, w) => n + w.sets.length, 0) ?? 0;
   return (
     <div className="mt-3">
-      <input ref={input} type="file" accept=".csv,text/csv,text/comma-separated-values" className="sr-only" aria-label="CSV file to import" onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ""; }} />
-      <Button kind="ghost" icon="plus" className="w-full" onClick={() => input.current?.click()}>Import workouts (CSV)</Button>
-      <p className="mt-2 text-xs text-faint">From Strong, Hevy, or a Liftsmith export. The file is read on this device and never uploaded.</p>
+      <input ref={input} type="file" accept=".csv,text/csv,text/comma-separated-values" className="sr-only" aria-label={t("imp.fileLabel")} onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ""; }} />
+      <Button kind="ghost" icon="plus" className="w-full" onClick={() => input.current?.click()}>{t("imp.button")}</Button>
+      <p className="mt-2 text-xs text-faint">{t("imp.note")}</p>
       {note && <p className="mt-2 text-sm text-muted" role="status">{note}</p>}
-      <Sheet open={!!file} onClose={() => setFile(null)} title={`Import from ${file ? FORMAT_NAME[file.format] : ""}`}>
+      <Sheet open={!!file} onClose={() => setFile(null)} title={t("imp.title", { source: file ? FORMAT_NAME[file.format] : "" })}>
         {file && (
           <div>
             <p className="text-sm text-muted">
-              {file.workouts.length} workout{file.workouts.length === 1 ? "" : "s"}, {totalSets} sets
-              {file.skipped ? `. ${file.skipped} row${file.skipped === 1 ? "" : "s"} left out (cardio, rest timers or empty sets)` : ""}. Workouts you&apos;ve imported before are skipped.
+              {t("imp.summary", { count: file.workouts.length, sets: totalSets })}
+              {file.skipped ? `. ${t("imp.skipped", { count: file.skipped })}` : ""}. {t("imp.again")}
             </p>
             {file.unit === null && (
               <div className="mt-4">
-                <p className="text-sm font-medium">Weights in this file are in</p>
+                <p className="text-sm font-medium">{t("imp.unit")}</p>
                 <div className="mt-2 flex gap-2">
                   <Chip active={unit === "kg"} onClick={() => setUnit("kg")}>kg</Chip>
                   <Chip active={unit === "lb"} onClick={() => setUnit("lb")}>lb</Chip>
                 </div>
               </div>
             )}
-            <h3 className="mt-5 text-sm font-semibold">Exercises</h3>
-            <p className="text-xs text-faint">Check each one. &ldquo;Add as my own&rdquo; creates a custom exercise with that name.</p>
+            <h3 className="mt-5 text-sm font-semibold">{t("imp.exercises")}</h3>
+            <p className="text-xs text-faint">{t("imp.check")}</p>
             <ul className="mt-2 divide-y divide-line/70">
               {names.map((n, i) => (
                 <li key={n} className="py-2">
@@ -80,15 +81,15 @@ export function ImportWorkouts() {
                     onChange={(e) => setMapping({ ...mapping, [n]: e.target.value })}
                     className={`mt-1 min-h-11 w-full rounded-xl border bg-raised px-3 text-sm ${mapping[n] === "custom" ? "border-warn/50" : "border-line"}`}
                   >
-                    <option value="custom">Add as my own exercise</option>
+                    <option value="custom">{t("imp.custom")}</option>
                     {library.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
                   </select>
                 </li>
               ))}
             </ul>
             <div className="mt-5 grid gap-2">
-              <Button icon="check" className="w-full" onClick={run}>Import</Button>
-              <Button kind="quiet" className="w-full" onClick={() => setFile(null)}>Cancel</Button>
+              <Button icon="check" className="w-full" onClick={run}>{t("imp.import")}</Button>
+              <Button kind="quiet" className="w-full" onClick={() => setFile(null)}>{t("imp.cancel")}</Button>
             </div>
           </div>
         )}

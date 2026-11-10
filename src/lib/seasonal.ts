@@ -1,5 +1,8 @@
+import { setVolume } from "./sides";
 import { dedupe } from "./derive";
 import type { AppEvent, SetEvent } from "./types";
+import { t } from "./i18n";
+import type { MessageKey } from "@/locales/en";
 
 // Holiday and seasonal challenges. Dated windows in the lifter's local time, each with a goal counted
 // from workouts, sets or tonnage (never from a single muscle, so nothing rewards training a muscle that's
@@ -19,16 +22,27 @@ export interface SeasonalDef {
   measure: "workouts" | "sets" | "kg" | "days";
 }
 
-export const SEASONAL: SeasonalDef[] = [
-  { id: "new-year", name: "Fresh start week", emoji: "🎆", detail: "Three workouts in the first week of the year.", from: [0, 1], to: [0, 7], goal: 3, measure: "workouts" },
-  { id: "valentine", name: "Heart pumping", emoji: "💘", detail: "60 hard sets between 10 and 16 February. Any muscles, your plan picks.", from: [1, 10], to: [1, 16], goal: 60, measure: "sets" },
-  { id: "spring", name: "Spring into it", emoji: "🌱", detail: "Six workouts in the two weeks after the spring equinox.", from: [2, 20], to: [3, 2], goal: 6, measure: "workouts" },
-  { id: "solstice", name: "Longest day", emoji: "☀️", detail: "Train on four different days around the June solstice (18 to 24 June).", from: [5, 18], to: [5, 24], goal: 4, measure: "days" },
-  { id: "back-to-it", name: "Back to it", emoji: "🍂", detail: "Eight workouts from 1 to 21 September.", from: [8, 1], to: [8, 21], goal: 8, measure: "workouts" },
-  { id: "halloween", name: "Spooky strong", emoji: "🎃", detail: "Lift 6,660 kg (6.66 t) between 25 and 31 October.", from: [9, 25], to: [9, 31], goal: 6660, measure: "kg" },
-  { id: "twelve-days", name: "Twelve days of lifting", emoji: "🎄", detail: "Six workouts from 13 to 24 December.", from: [11, 13], to: [11, 24], goal: 6, measure: "workouts" },
-  { id: "last-rep", name: "Last rep of the year", emoji: "🥂", detail: "One workout between Boxing Day and New Year's Eve.", from: [11, 26], to: [11, 31], goal: 1, measure: "workouts" },
+const ROWS: Omit<SeasonalDef, "name" | "detail">[] = [
+  { id: "new-year", emoji: "🎆", from: [0, 1], to: [0, 7], goal: 3, measure: "workouts" },
+  { id: "valentine", emoji: "💘", from: [1, 10], to: [1, 16], goal: 60, measure: "sets" },
+  { id: "spring", emoji: "🌱", from: [2, 20], to: [3, 2], goal: 6, measure: "workouts" },
+  { id: "solstice", emoji: "☀️", from: [5, 18], to: [5, 24], goal: 4, measure: "days" },
+  { id: "back-to-it", emoji: "🍂", from: [8, 1], to: [8, 21], goal: 8, measure: "workouts" },
+  { id: "halloween", emoji: "🎃", from: [9, 25], to: [9, 31], goal: 6660, measure: "kg" },
+  { id: "twelve-days", emoji: "🎄", from: [11, 13], to: [11, 24], goal: 6, measure: "workouts" },
+  { id: "last-rep", emoji: "🥂", from: [11, 26], to: [11, 31], goal: 1, measure: "workouts" },
 ];
+
+/** The challenges, with names and details read from the language catalogue (`sea.<id>`, `sea.<id>.d`). */
+export const SEASONAL: SeasonalDef[] = ROWS.map((r) => ({
+  ...r,
+  get name() {
+    return t(`sea.${r.id}` as MessageKey);
+  },
+  get detail() {
+    return t(`sea.${r.id}.d` as MessageKey);
+  },
+}));
 
 export interface SeasonalChallenge extends SeasonalDef {
   start: number;
@@ -51,7 +65,7 @@ function progressOf(def: SeasonalDef, events: readonly AppEvent[], start: number
     case "sets":
       return sets.length;
     case "kg":
-      return Math.round(sets.reduce((v, s) => v + s.weight * s.reps, 0));
+      return Math.round(sets.reduce((v, s) => v + setVolume(s), 0));
     case "days":
       return new Set(sets.map((s) => new Date(s.at).toDateString())).size;
     case "workouts":

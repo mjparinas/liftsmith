@@ -2,39 +2,27 @@
 // TDEE results and history graph, shared by the app (Tools › TDEE) and the public calculator page.
 import { ACTIVITIES, ACTIVITY, bmiBand, type Activity, type TdeeResult } from "@/lib/tdee";
 import type { TdeeEvent } from "@/lib/types";
+import { date as fmtDate, num, t } from "@/lib/i18n";
 
-const T = {
-  perDay: "calories a day",
-  maintenance: "Maintenance",
-  bmr: "Resting (BMR)",
-  formulaKatch: "Katch-McArdle, from your lean mass",
-  formulaMifflin: "Mifflin-St Jeor",
-  cut: "Lose about 0.5 kg a week",
-  bulk: "Lean bulk, about 0.25 kg a week",
-  protein: "Protein",
-  bmi: "BMI",
-  byActivity: "At each activity level",
-  chartEmpty: "Your TDEE is recorded each time your weight, age or training days change. Changes will chart here.",
-};
 
-const kcal = (n: number) => n.toLocaleString("en-US");
+const kcal = (n: number) => num(n);
 
 export function TdeeResults({ r, activity }: { r: TdeeResult; activity: Activity }) {
   return (
     <div>
       <div className="card p-5 text-center">
-        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{T.maintenance}</div>
+        <div className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("tdee.maintenance")}</div>
         <div className="num mt-1 text-5xl font-extrabold tracking-tight" data-testid="tdee-value">{kcal(r.tdee)}</div>
-        <div className="text-sm text-muted">{T.perDay}</div>
+        <div className="text-sm text-muted">{t("tdee.perDay")}</div>
         <div className="mt-4 grid grid-cols-2 gap-2 text-left text-sm">
-          <Cell label={T.bmr} value={`${kcal(r.bmr)} kcal`} note={r.formula === "katch" ? T.formulaKatch : T.formulaMifflin} />
-          <Cell label={T.bmi} value={String(r.bmi)} note={bmiBand(r.bmi)} />
-          <Cell label={T.cut} value={`${kcal(r.cut)} kcal`} />
-          <Cell label={T.bulk} value={`${kcal(r.bulk)} kcal`} />
-          <Cell label={T.protein} value={`${r.protein[0]}–${r.protein[1]} g`} note="1.6 to 2.2 g per kg" />
+          <Cell label={t("tdee.bmr")} value={`${kcal(r.bmr)} kcal`} note={r.formula === "katch" ? t("tdee.formulaKatch") : t("tdee.formulaMifflin")} />
+          <Cell label={t("tdee.bmi")} value={num(r.bmi)} note={bmiBand(r.bmi)} />
+          <Cell label={t("tdee.cut")} value={`${kcal(r.cut)} kcal`} />
+          <Cell label={t("tdee.bulk")} value={`${kcal(r.bulk)} kcal`} />
+          <Cell label={t("tdee.protein")} value={`${r.protein[0]}–${r.protein[1]} g`} note={t("tdee.proteinNote")} />
         </div>
       </div>
-      <h3 className="mt-5 mb-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{T.byActivity}</h3>
+      <h3 className="mt-5 mb-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("tdee.byActivity")}</h3>
       <table className="card w-full overflow-hidden text-sm">
         <tbody className="divide-y divide-line">
           {ACTIVITIES.map((a) => (
@@ -64,7 +52,7 @@ function Cell({ label, value, note }: { label: string; value: string; note?: str
 
 /** TDEE over time: one point a day it changed, with the value range and dates on the axes. */
 export function TdeeChart({ points, now }: { points: Pick<TdeeEvent, "at" | "kcal">[]; now: number }) {
-  if (points.length < 2) return <p className="card p-4 text-sm text-muted">{T.chartEmpty}</p>;
+  if (points.length < 2) return <p className="card p-4 text-sm text-muted">{t("tdee.chartEmpty")}</p>;
   const w = 320;
   const h = 150;
   const pad = { l: 44, r: 10, t: 12, b: 24 };
@@ -82,13 +70,13 @@ export function TdeeChart({ points, now }: { points: Pick<TdeeEvent, "at" | "kca
   let d = `M${x(points[0].at)},${y(points[0].kcal)}`;
   for (let i = 1; i < points.length; i++) d += ` H${x(points[i].at)} V${y(points[i].kcal)}`;
   d += ` H${x(t1)}`;
-  const date = (t: number) => new Date(t).toLocaleDateString("en-US", { month: "short", day: "numeric" });
+  const date = (ms: number) => fmtDate(ms, { month: "short", day: "numeric" });
   const mid = Math.round((lo + hi) / 2);
   const first = points[0].kcal;
   const last = points.at(-1)!.kcal;
   return (
     <figure className="card p-3">
-      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label={`TDEE from ${kcal(first)} on ${date(t0)} to ${kcal(last)} now, ${points.length} changes`}>
+      <svg viewBox={`0 0 ${w} ${h}`} className="w-full" role="img" aria-label={t("tdee.chartLabel", { from: kcal(first), date: date(t0), to: kcal(last), count: points.length })}>
         {[lo, mid, hi].map((v) => (
           <g key={v}>
             <line x1={pad.l} x2={w - pad.r} y1={y(v)} y2={y(v)} stroke="var(--color-line)" strokeDasharray="3 4" />
@@ -102,7 +90,7 @@ export function TdeeChart({ points, now }: { points: Pick<TdeeEvent, "at" | "kca
           </circle>
         ))}
         <text x={pad.l} y={h - 6} fontSize="10" fill="var(--color-faint)">{date(t0)}</text>
-        <text x={w - pad.r} y={h - 6} fontSize="10" fill="var(--color-faint)" textAnchor="end">Today</text>
+        <text x={w - pad.r} y={h - 6} fontSize="10" fill="var(--color-faint)" textAnchor="end">{t("tdee.today")}</text>
       </svg>
     </figure>
   );

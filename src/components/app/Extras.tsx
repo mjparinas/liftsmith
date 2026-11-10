@@ -23,6 +23,8 @@ import { go } from "./router";
 import { Button, Section, Sheet } from "./ui";
 import { Icon } from "./icons";
 import { RoutinesSheet } from "./Routines";
+import { date, t as tr } from "@/lib/i18n";
+import type { MessageKey } from "@/locales/en";
 
 /** Lean mode (Settings › Celebrations): no extra pop-ups. */
 export function lean(p: { lean?: boolean }): boolean {
@@ -38,7 +40,7 @@ function MomentCard({ m, onClose }: { m: Moment; onClose?: () => void }) {
         <p className="mt-0.5 text-sm text-muted">{m.detail}</p>
       </div>
       {onClose && (
-        <button type="button" onClick={onClose} aria-label="Dismiss" className="press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-faint">✕</button>
+        <button type="button" onClick={onClose} aria-label={tr("x.dismiss")} className="press -mr-1 -mt-1 grid h-11 w-11 shrink-0 place-items-center rounded-full text-faint">✕</button>
       )}
     </div>
   );
@@ -66,8 +68,8 @@ export function TodayMoments() {
         <button type="button" onClick={() => { haptic("tick"); setProfile({ delight: { ...profile.delight, seenThemes: [...(profile.delight?.seenThemes ?? []), ...fresh.map((t) => t.id)] } }); go("settings", "themes"); }} className="press card flex w-full items-center gap-3 p-4 text-left">
           <span className="h-10 w-10 shrink-0 rounded-full border-4" style={{ background: fresh[0].palette.bg, borderColor: fresh[0].palette.accent }} aria-hidden />
           <span className="min-w-0 flex-1">
-            <span className="block font-semibold">New theme unlocked: {fresh[0].name}</span>
-            <span className="block text-sm text-muted">{fresh[0].how}. Tap to try it.</span>
+            <span className="block font-semibold">{tr("x.newTheme", { name: fresh[0].name })}</span>
+            <span className="block text-sm text-muted">{tr("x.tryTheme", { how: fresh[0].how })}</span>
           </span>
         </button>
       )}
@@ -76,21 +78,21 @@ export function TodayMoments() {
           <div className="flex items-center gap-3">
             <span className="text-3xl" aria-hidden>{c.emoji}</span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">{c.name}{c.done ? " · done!" : ""}</p>
+              <p className="font-semibold">{c.name}{c.done ? tr("x.done") : ""}</p>
               <p className="text-sm text-muted">{c.detail}</p>
             </div>
           </div>
-          <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label={`${c.name} progress`} aria-valuemin={0} aria-valuemax={c.goal} aria-valuenow={c.progress}>
+          <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label={tr("x.progress", { name: c.name })} aria-valuemin={0} aria-valuemax={c.goal} aria-valuenow={c.progress}>
             <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${(c.progress / c.goal) * 100}%` }} />
           </div>
           <p className="num mt-1.5 text-xs text-faint">
-            {c.measure === "kg" ? `${fmtNum(Math.round(fromKg(c.progress, profile.unit)))} of ${fmtNum(Math.round(fromKg(c.goal, profile.unit)))} ${profile.unit}` : `${c.progress} of ${c.goal} ${c.measure === "days" ? "days" : c.measure}`}
-            {!c.done && c.daysLeft > 0 ? ` · ${c.daysLeft} day${c.daysLeft > 1 ? "s" : ""} left` : ""}
+            {c.measure === "kg" ? tr("x.ofKg", { n: fmtNum(Math.round(fromKg(c.progress, profile.unit))), goal: fmtNum(Math.round(fromKg(c.goal, profile.unit))), unit: profile.unit }) : tr(`x.of.${c.measure}` as MessageKey, { n: c.progress, goal: c.goal })}
+            {!c.done && c.daysLeft > 0 ? tr("x.daysLeft", { count: c.daysLeft }) : ""}
           </p>
         </div>
       ))}
       {teaser && teaser.start - now < 7 * 86400_000 && (
-        <p className="px-1 text-sm text-faint">{teaser.def.emoji} {teaser.def.name} starts {new Date(teaser.start).toLocaleDateString([], { weekday: "long" })}.</p>
+        <p className="px-1 text-sm text-faint">{teaser.def.emoji} {tr("x.starts", { name: teaser.def.name, day: date(teaser.start, { weekday: "long" }) })}</p>
       )}
     </div>
   );
@@ -126,22 +128,22 @@ export function PlanExtras() {
     <div className="mt-3 flex flex-wrap gap-2 text-sm">
       {last && (
         <button type="button" aria-pressed={repeating} onClick={toggleRepeat} className={`press min-h-11 rounded-full border px-3.5 ${repeating ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>
-          {repeating ? "✓ Same as last time" : "↻ Same as last time"}
+          {repeating ? tr("x.sameOn") : tr("x.sameOff")}
         </button>
       )}
       <button type="button" aria-pressed={!!routine} onClick={() => { haptic("tick"); setRoutinesOpen(true); }} className={`press inline-flex min-h-11 max-w-full items-center gap-1.5 rounded-full border px-3.5 ${routine ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>
         <Icon name="layers" size={15} />
-        <span className="truncate">{routine ? routine.name : "Routines"}</span>
+        <span className="truncate">{routine ? routine.name : tr("x.routines")}</span>
       </button>
       {preview.items.length > 0 && (
-        <button type="button" onClick={() => setWarmOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">🔥 Warm up first</button>
+        <button type="button" onClick={() => setWarmOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">{tr("x.warmUp")}</button>
       )}
-      <button type="button" onClick={() => setBuddyOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">👋 Check in</button>
+      <button type="button" onClick={() => setBuddyOpen(true)} className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted">{tr("x.checkIn")}</button>
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
-      <Sheet open={warmOpen} onClose={() => setWarmOpen(false)} title="Five-minute warm-up">
+      <Sheet open={warmOpen} onClose={() => setWarmOpen(false)} title={tr("x.warmTitle")}>
         <WarmupList drills={warmupRoutine(muscles, gym.equipment, now, 5)} />
       </Sheet>
-      <Sheet open={buddyOpen} onClose={() => setBuddyOpen(false)} title="Tell your gym buddies">
+      <Sheet open={buddyOpen} onClose={() => setBuddyOpen(false)} title={tr("x.buddyTitle")}>
         <BuddyCheckin focus={[...new Set(preview.items.map((i) => i.focus))] as Muscle[]} gymName={gym.name} onDone={() => setBuddyOpen(false)} />
       </Sheet>
     </div>
@@ -153,7 +155,7 @@ function WarmupList({ drills }: { drills: Drill[] }) {
   const total = Math.round(drills.reduce((s, d) => s + drillSeconds(d), 0) / 60);
   return (
     <div>
-      <p className="text-sm text-muted">About {total} minutes for the muscles in today&apos;s plan. Your first lift still ramps up with warm-up sets.</p>
+      <p className="text-sm text-muted">{tr("x.warmIntro", { count: total })}</p>
       <ol className="mt-3 space-y-2">
         {drills.map((d) => {
           const on = done.includes(d.id);
@@ -162,7 +164,7 @@ function WarmupList({ drills }: { drills: Drill[] }) {
               <button type="button" aria-pressed={on} onClick={() => { haptic("tick"); setDone(on ? done.filter((x) => x !== d.id) : [...done, d.id]); }} className={`press flex w-full items-start gap-3 rounded-2xl border p-3 text-left ${on ? "border-good/40 bg-good/10" : "border-line bg-raised"}`}>
                 <span className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border text-sm ${on ? "border-good bg-good text-bg" : "border-line"}`} aria-hidden>{on ? "✓" : ""}</span>
                 <span>
-                  <span className="block font-medium">{d.name} <span className="num text-sm font-normal text-muted">· {d.reps ? `${d.reps} reps` : `${d.seconds} s`}</span></span>
+                  <span className="block font-medium">{d.name} <span className="num text-sm font-normal text-muted">· {d.reps ? tr("x.reps", { n: d.reps }) : tr("x.secs", { n: d.seconds })}</span></span>
                   <span className="block text-sm text-muted">{d.how}</span>
                 </span>
               </button>
@@ -194,17 +196,17 @@ function BuddyCheckin({ focus, gymName, onDone }: { focus: Muscle[]; gymName: st
   const send = async () => {
     const r = await shareText(text);
     if (r === "cancelled" || r === "failed") {
-      setNote(r === "failed" ? "Couldn't open the share sheet." : null);
+      setNote(r === "failed" ? tr("x.shareFail") : null);
       return;
     }
     checkin(names);
     haptic("success");
-    if (r === "copied") setNote("Copied. Paste it into your group chat.");
+    if (r === "copied") setNote(tr("x.copied"));
     else onDone();
   };
   return (
     <div>
-      <p className="text-sm text-muted">Sends a quick &quot;I&apos;m at the gym&quot; through your usual messaging app. Once accounts arrive, buddies who use the app get a nudge straight to their phone.</p>
+      <p className="text-sm text-muted">{tr("x.buddyIntro")}</p>
       {buddies.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-2">
           {buddies.map((b) => {
@@ -212,19 +214,19 @@ function BuddyCheckin({ focus, gymName, onDone }: { focus: Muscle[]; gymName: st
             return (
               <li key={b.id} className="flex items-center">
                 <button type="button" aria-pressed={on} onClick={() => setPicked(on ? picked.filter((x) => x !== b.id) : [...picked, b.id])} className={`press min-h-11 rounded-l-full border px-3.5 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}>{b.name}</button>
-                <button type="button" aria-label={`Remove ${b.name}`} onClick={() => remove(b.id)} className="press min-h-11 rounded-r-full border border-l-0 border-line bg-surface px-2.5 text-faint">✕</button>
+                <button type="button" aria-label={tr("x.removeBuddy", { name: b.name })} onClick={() => remove(b.id)} className="press min-h-11 rounded-r-full border border-l-0 border-line bg-surface px-2.5 text-faint">✕</button>
               </li>
             );
           })}
         </ul>
       )}
       <div className="mt-3 flex gap-2">
-        <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder="Add a buddy's name" aria-label="Buddy's name" className="card min-w-0 flex-1 px-4 py-3" />
-        <Button kind="ghost" onClick={add} disabled={!name.trim()}>Add</Button>
+        <input value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => e.key === "Enter" && add()} placeholder={tr("x.addBuddy")} aria-label={tr("x.buddyName")} className="card min-w-0 flex-1 px-4 py-3" />
+        <Button kind="ghost" onClick={add} disabled={!name.trim()}>{tr("x.add")}</Button>
       </div>
       <p className="mt-4 rounded-2xl bg-raised p-3 text-sm">{text}</p>
       {note && <p className="mt-2 text-sm text-accent" role="status">{note}</p>}
-      <Button className="mt-4 w-full" onClick={() => void send()}>Check in</Button>
+      <Button className="mt-4 w-full" onClick={() => void send()}>{tr("x.send")}</Button>
     </div>
   );
 }
@@ -251,29 +253,29 @@ export function TonnageCard() {
     <>
       <div className="card mt-3 p-4">
         <div className="flex items-baseline justify-between gap-3">
-          <span className="text-xs uppercase tracking-wider text-faint">Lifted in total</span>
+          <span className="text-xs uppercase tracking-wider text-faint">{tr("x.total")}</span>
           <span className="num text-2xl font-bold">{fmtTonnage(stats.totalVolume, profile.unit)}</span>
         </div>
-        <p className="mt-1 text-sm text-muted">{t.last ? `${t.last.emoji} More than ${t.last.name}.` : "Your first big milestone is a grand piano."}</p>
+        <p className="mt-1 text-sm text-muted">{t.last ? tr("x.moreThan", { emoji: t.last.emoji, name: t.last.name }) : tr("x.firstMilestone")}</p>
         {t.next && (
           <>
             <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised">
               <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${t.progress * 100}%` }} />
             </div>
-            <p className="num mt-1.5 text-xs text-faint">{fmtTonnage(t.next.kg - stats.totalVolume, profile.unit)} to go until {t.next.name} {t.next.emoji}</p>
+            <p className="num mt-1.5 text-xs text-faint">{tr("x.toGo", { left: fmtTonnage(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}</p>
           </>
         )}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
         <button type="button" onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)} className="press card p-4 text-left">
           <span className="block text-2xl" aria-hidden>{p.kind === "year" ? "🏆" : "📅"}</span>
-          <span className="mt-1 block font-semibold">{p.kind === "year" ? "Your year in lifting" : "Monthly recap"}</span>
-          <span className="block text-xs text-muted">Highlights to share</span>
+          <span className="mt-1 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
+          <span className="block text-xs text-muted">{tr("x.highlights")}</span>
         </button>
         <button type="button" onClick={() => go("photos")} className="press card p-4 text-left">
           <span className="block text-2xl" aria-hidden>📸</span>
-          <span className="mt-1 block font-semibold">Body and photos</span>
-          <span className="block text-xs text-muted">Private, on this phone</span>
+          <span className="mt-1 block font-semibold">{tr("x.photos")}</span>
+          <span className="block text-xs text-muted">{tr("x.private")}</span>
         </button>
       </div>
     </>
@@ -291,7 +293,7 @@ export function StrengthCard() {
   const ms = (Object.entries(r.muscles) as [Muscle, number][]).sort((a, b) => b[1] - a[1]);
   const tw = twins(r);
   return (
-    <Section title="Strength score">
+    <Section title={tr("x.score")}>
       <div className="card p-4">
         <div className="flex items-center gap-4">
           <div className="grid h-20 w-20 shrink-0 place-items-center rounded-full border-4 border-accent">
@@ -299,7 +301,7 @@ export function StrengthCard() {
           </div>
           <div>
             <p className="font-semibold">{scoreBand(r.overall)}</p>
-            <p className="text-sm text-muted">Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight{r.adjusted.age ? ", adjusted for your age" : ""}. 50 is typical.</p>
+            <p className="text-sm text-muted">{tr(r.adjusted.age ? "x.scoreBodyAge" : "x.scoreBody")}</p>
           </div>
         </div>
         <ul className="mt-4 space-y-2">
@@ -314,28 +316,28 @@ export function StrengthCard() {
         {p.birthYear ? (
           <label className="mt-4 flex items-center gap-3 text-sm">
             <input type="checkbox" checked={adjustAge} onChange={(e) => setProfile({ delight: { ...profile.delight, ageAdjust: e.target.checked } })} className="h-5 w-5 accent-[var(--color-accent)]" />
-            Adjust for age
+            {tr("x.adjustAge")}
           </label>
         ) : (
-          <p className="mt-4 text-xs text-faint">Add your birth year in setup to adjust the score for age.</p>
+          <p className="mt-4 text-xs text-faint">{tr("x.addBirth")}</p>
         )}
       </div>
       {tw.length > 0 && (
         <div className="card mt-3 p-4">
-          <p className="font-semibold">Strength twins</p>
-          <p className="text-sm text-muted">How you compare with trained lifters of your {p.birthYear ? "age, " : ""}{p.sex ? "sex and " : ""}body weight.</p>
+          <p className="font-semibold">{tr("x.twins")}</p>
+          <p className="text-sm text-muted">{tr(p.birthYear && p.sex ? "x.twinsAgeSex" : p.birthYear ? "x.twinsAge" : p.sex ? "x.twinsSex" : "x.twinsBody")}</p>
           <ul className="mt-3 divide-y divide-line">
             {tw.map((l) => (
               <li key={l.exerciseId} className="flex items-center justify-between py-2.5">
                 <span>
                   <span className="block font-medium">{l.name}</span>
-                  <span className="num text-xs text-muted">Estimated max {fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} {profile.unit}</span>
+                  <span className="num text-xs text-muted">{tr("x.estMax", { kg: `${fmtNum(Math.round(fromKg(l.e1rm, profile.unit)))} ${profile.unit}` })}</span>
                 </span>
-                <span className="num text-right text-sm">Stronger than<br /><span className="text-lg font-bold text-accent">{l.percentile}%</span></span>
+                <span className="num text-right text-sm">{tr("x.stronger")}<br /><span className="text-lg font-bold text-accent">{l.percentile}%</span></span>
               </li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-faint">An estimate from typical strength standards, not from other users. Real rankings against lifters like you come with accounts.</p>
+          <p className="mt-2 text-xs text-faint">{tr("x.twinsNote")}</p>
         </div>
       )}
     </Section>

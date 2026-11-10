@@ -4,18 +4,19 @@ import { track } from "@/lib/analytics";
 import { useNow } from "@/lib/useNow";
 import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { COSMETICS } from "@/lib/game";
-import { LiftDemo } from "@/components/demo/LiftDemo";
+import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
 import { exercise } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { activeInjuries, effectFor, PART_LABEL, type Injury } from "@/lib/injury";
 import { PainSelect } from "./Injuries";
-import { connectHeartRate, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported, hrZone, type HrConnection } from "@/lib/heartRate";
 import { saveWorkout } from "@/lib/health";
 import { workoutWhy } from "@/lib/why";
-import { haptic, keepAwake, sound } from "@/lib/juice";
+import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { TIMED } from "@/lib/progression";
+import { implementsFor, perSide } from "@/lib/sides";
 import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { can } from "@/lib/entitlements";
 import { useApp, warmingUp } from "@/lib/store";
@@ -32,12 +33,13 @@ import { Icon } from "./icons";
 import { HUE, muscleHue } from "./theme";
 import { burst } from "./burst";
 import { Button, EmptyState, LinkToggle, Ring, Sheet, Stepper } from "./ui";
-import { linkedToNext, supersetLabel } from "@/lib/superset";
+import { afterSet, groupRange, linkedToNext, supersetLabel } from "@/lib/superset";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { epley } from "@/lib/progression";
 import { prCue, say } from "@/lib/voice";
 import { GhostLine, PlateChange, RestExtra, SameAsLastChip, restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { AlmostThere, PrMoment } from "./WorkoutJuice";
+import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 
 let hrConn: HrConnection | null = null;
 
@@ -52,7 +54,15 @@ export function Workout() {
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [bpm, setBpm] = useState<number | null>(null);
+  const [hrBusy, setHrBusy] = useState(false);
+  const [hrError, setHrError] = useState<string | null>(null);
   const [popKey, setPopKey] = useState(0);
+  // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
+  const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
+  const changeCount = (p: CountPrefs) => {
+    setCountPrefs(p);
+    saveCountPrefs(p);
+  };
   const logRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<number | null>(null);
   const lastBeep = useRef(0);
@@ -84,6 +94,15 @@ export function Workout() {
   const warmTotal = item?.warmup?.length ?? 0;
   const warmDone = Math.min(active?.warm ?? 0, warmTotal);
   const ssLabel = active && item ? supersetLabel(active.plan.items, active.index) : null;
+  // In a superset, which exercise comes after this set (the next one of the round, or back to the first).
+  const ssNext = (() => {
+    if (!ssLabel || !active || !item) return null;
+    const items = active.plan.items;
+    const done = (i: number) => events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId).length + (i === active.index ? 1 : 0);
+    const step = afterSet(items, active.index, done);
+    const [s0, e0] = groupRange(items, active.index);
+    return step.index !== active.index && step.index >= s0 && step.index <= e0 ? exercise(items[step.index].exerciseId).name : null;
+  })();
   const setLabel = warming ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal }) : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
@@ -108,7 +127,7 @@ export function Workout() {
       // The rest-over alert follows its own setting (Workout preferences), not only Sounds and Vibration.
       sound.restEnd(alert.sound);
       if (alert.vibrate) haptic("thud", true);
-      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : "Next set", alert);
+      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -133,7 +152,7 @@ export function Workout() {
   if (!active || !gym) {
     return (
       <div className="card mt-10">
-        <EmptyState icon="dumbbell" mascot="curious" title="No workout running" body="Start one from Today. It's planned around your gym and recovery." action={<Button onClick={() => go("today")}>Back to today</Button>} />
+        <EmptyState icon="dumbbell" mascot="curious" title={t("wk.none")} body={t("wk.noneBody")} action={<Button onClick={() => go("today")}>{t("wk.back")}</Button>} />
       </div>
     );
   }
@@ -167,6 +186,9 @@ export function Workout() {
   };
 
   const connectHr = async () => {
+    if (hrBusy) return;
+    setHrBusy(true);
+    setHrError(null);
     try {
       hrConn = await connectHeartRate(
         (b) => {
@@ -176,18 +198,34 @@ export function Workout() {
         () => setBpm(null),
       );
       track("feature", { name: "heart_rate", detail: "workout" });
-    } catch {}
+    } catch (e) {
+      const msg = e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed");
+      if (msg) {
+        setHrError(msg);
+        oops();
+      }
+    } finally {
+      setHrBusy(false);
+    }
   };
 
   const unit = gym.unit;
+  const canCount = !!ex && countable(ex.id, ex.pattern, countPrefs.source);
+  const counting = canCount && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
+  // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
+  // "Sides differ" adds a stepper for the right side.
+  const sidesSplit = !!ex && !!active && perSide(ex.id) && active.repsR !== undefined;
   const docked = hand !== "off";
   const weightStep = ex && gym && active
-    ? { label: t("workout.weight"), suffix: ex.load === "dumbbell" ? t("workout.each", { unit }) : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
+    ? { label: t("workout.weight"), suffix: ex.load === "dumbbell" && implementsFor(ex) === 2 ? t("workout.each", { unit }) : unit, value: fmtNum(fromKg(active.weight, unit)), onDown: () => s.adjust(stepLoad(active.weight, -1, ex, gym), active.reps), onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps) }
     : null;
   const repStep = ex && active
-    ? { label: t("workout.reps"), suffix: TIMED.has(ex.id) ? t("workout.seconds") : t("workout.reps"), value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    ? { label: sidesSplit ? t("workout.left") : t("workout.reps"), suffix: TIMED.has(ex.id) ? t("workout.seconds") : sidesSplit ? t("workout.leftReps") : perSide(ex.id) ? t("workout.repsEachSide") : t("workout.reps"), value: String(active.reps), onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)), onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)) }
+    : null;
+  const rightStep = ex && active && sidesSplit
+    ? { label: t("workout.right"), suffix: t("workout.rightReps"), value: String(active.repsR), onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)), onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1) }
     : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
@@ -210,13 +248,20 @@ export function Workout() {
               <span className="animate-beat inline-flex"><Icon name="heart" size={14} filled strokeWidth={1.5} /></span> {bpm}
             </span>
           ) : hrSupported() ? (
-            <button type="button" onClick={connectHr} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />Connect</button>
+            <button type="button" onClick={connectHr} disabled={hrBusy} aria-busy={hrBusy} className="press inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-sm text-muted"><Icon name="heart" size={14} className="text-bad" />{hrBusy ? t("hr.connecting") : t("hr.connect")}</button>
           ) : null}
           <button type="button" onClick={() => setEndOpen(true)} className="press min-h-11 min-w-11 rounded-full border border-line bg-surface px-4 text-sm font-semibold">{t("workout.end")}</button>
         </div>
       </header>
+      {hrError && !bpm && (
+        <div role="alert" className="card mt-2 flex items-start gap-2 p-3 text-sm">
+          <Icon name="heart" size={16} className="mt-0.5 shrink-0 text-bad" />
+          <p className="flex-1 text-muted">{hrError}</p>
+          <button type="button" onClick={() => setHrError(null)} className="press -m-2 min-h-11 min-w-11 rounded-full px-2 text-muted hover:text-ink">{t("hr.dismiss")}</button>
+        </div>
+      )}
 
-      <div className="mt-3 flex gap-1" aria-label="Progress">
+      <div className="mt-3 flex gap-1" aria-label={t("wk.progress")}>
         {active.plan.items.map((it, i) => (
           <button
             key={i}
@@ -231,8 +276,8 @@ export function Workout() {
       {finished ? (
         <div className="card animate-pop mt-6 p-6 text-center">
           <div className="text-4xl">🏁</div>
-          <h2 className="mt-2 text-2xl font-bold">All sets done</h2>
-          <p className="mt-1 text-muted">Great work. Finish to see your summary.</p>
+          <h2 className="mt-2 text-2xl font-bold">{t("wk.allDone")}</h2>
+          <p className="mt-1 text-muted">{t("wk.allDoneBody")}</p>
           {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
         </div>
       ) : ex && item ? (
@@ -241,13 +286,13 @@ export function Workout() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 {ssLabel && <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent"><Icon name="link" size={13} />{ssLabel}</p>}
+                {ssNext && <p className="mb-1 ml-1.5 inline-flex max-w-full items-center truncate text-xs font-medium text-muted" data-testid="superset-next">{t("workout.ssThen", { name: ssNext })}</p>}
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>{item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}</p>
                 <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
-                {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">Your note:</span> {note}</p>}
+                {note && <p className="mt-1 text-sm text-muted"><span className="font-semibold text-ink">{t("wk.yourNote")}</span> {note}</p>}
               </div>
               <div className="flex shrink-0 gap-2">
                 {can("replan") && <button type="button" onClick={() => setPlanOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("coach.changePlan")}><Icon name="clock" size={20} /></button>}
-                <button type="button" onClick={() => setInfoOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.howToLabel")}><Icon name="info" size={20} /></button>
                 <button type="button" onClick={() => setSwapOpen(true)} className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink" aria-label={t("workout.swap")}><Icon name="swap" size={20} /></button>
               </div>
             </div>
@@ -262,10 +307,33 @@ export function Workout() {
             </div>
           </section>
 
+          {counting ? (
+            <div className="relative mt-4 h-72">
+              <AutoCount
+                key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
+                exerciseId={ex.id}
+                pattern={ex.pattern}
+                body={bodyFor(profile.sex)}
+                bpm={bpm}
+                prefs={countPrefs}
+                onPrefs={changeCount}
+                counting={!resting}
+                setKey={`${active.index}:${doneSets}:${warmDone}`}
+                onCount={(n) => { const a = useApp.getState().active; if (a) s.adjust(a.weight, n); }}
+                onClose={() => changeCount({ ...countPrefs, on: false })}
+                paused={infoOpen || swapOpen || endOpen}
+              />
+            </div>
+          ) : (
           <div className="relative mt-4 h-52">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} paused={infoOpen || swapOpen || endOpen} onClick={() => setInfoOpen(true)} className="h-full" />
-            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute bottom-2 right-2 min-h-11 rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</button>
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} paused={infoOpen || swapOpen || endOpen} className="h-full" />
+            {/* One way into the how-to sheet: the whole demo card is the button (AGENTS.md "One control, one destination"). */}
+            <button type="button" onClick={() => setInfoOpen(true)} className="press absolute inset-0 rounded-2xl">
+              <span className="absolute bottom-2 right-2 inline-flex min-h-11 items-center rounded-full border border-line bg-bg/70 px-3 text-sm text-muted">{t("workout.howTo")}</span>
+            </button>
+            {canCount && <AutoCountButton on={false} onToggle={() => changeCount({ ...countPrefs, on: true })} className="absolute bottom-2 left-2" />}
           </div>
+          )}
 
           {/* Screen readers hear the rest start, ten seconds left and rest over, not every second. */}
           <p className="sr-only" aria-live="polite">{resting ? (left <= 10 ? t("workout.sr.tenLeft") : t("workout.sr.rest", { time: clock(active.restTotal) })) : events.some((e) => e.type === "set" && e.sessionId === active.sessionId) ? t("workout.sr.over", { load: loadText(ex, active.weight, profile.unit), reps: repsText(ex, active.reps) }) : ""}</p>
@@ -296,27 +364,31 @@ export function Workout() {
           ) : (
             <section key={popKey} className="card animate-rise mt-5 p-5">
               {active.restReady ? (
-                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>Start rest · {restLabel(active.restReady)}</Button>
+                <Button kind="ghost" icon="clock" className="mb-4 w-full" onClick={() => { haptic("tick"); s.startRest(); }}>{t("workout.startRest", { time: restLabel(active.restReady) })}</Button>
               ) : null}
               <div className="flex flex-col items-center gap-5">
                 {ex.load !== "bodyweight" && weightStep && <Stepper display={docked} {...weightStep} />}
                 {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
                   // This gym's plates are in the other unit: show the weight in the lifter's unit too.
-                  <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" ? " each" : ""}</p>
+                  <p className="num -mt-3 text-sm text-muted">≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}{ex.load === "dumbbell" && implementsFor(ex) === 2 ? " each" : ""}</p>
                 )}
                 {repStep && <Stepper display={docked} {...repStep} />}
+                {rightStep && <Stepper display={docked} {...rightStep} />}
+                {!warming && perSide(ex.id) && !TIMED.has(ex.id) && (
+                  <button type="button" onClick={() => { haptic("tick"); s.adjustRight(sidesSplit ? undefined : active.reps); }} className="press -mt-2 min-h-11 px-3 text-sm font-semibold text-accent">{sidesSplit ? t("workout.sidesSame") : t("workout.sidesDiffer")}</button>
+                )}
               </div>
               {warming ? (
                 <div className="mt-4 text-center text-sm text-muted">
-                  <p>Warm-up: easy, smooth reps<Info term="warmup" />. Working weight {loadText(ex, item.target.weight, profile.unit)}.</p>
+                  <p>{t("wk.warmLine")}<Info term="warmup" />{t("wk.working", { load: loadText(ex, item.target.weight, profile.unit) })}</p>
                   <button type="button" onClick={() => { haptic("tick"); s.skipWarmup(); }} className="press mt-1 min-h-11 px-3 font-semibold text-accent">{t("workout.skipWarmup")}</button>
                 </div>
               ) : item.setTargets?.[doneSets]?.amrap ? (
-                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">Last set: as many good reps as you can, at least {item.setTargets[doneSets].reps}. Log what you got</p>
+                <p className="mt-3 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm font-semibold text-accent">{t("wk.amrap", { n: item.setTargets[doneSets].reps })}</p>
               ) : item.slot ? (
                 <p className="mt-3 text-center text-sm text-muted">{item.label ? `${item.label} · ` : ""}{item.target.note}</p>
               ) : item.challenge && doneSets + 1 === item.sets ? (
-                <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />Challenge set: as many good reps as you can, then log what you got</p>
+                <p className="mt-4 flex items-center justify-center gap-1.5 rounded-xl border border-ember/40 bg-ember/12 px-3 py-2 text-center text-sm font-semibold text-ember"><Icon name="bolt" size={16} strokeWidth={2.4} />{t("wk.challenge")}</p>
               ) : (
                 <p className="mt-4 text-center text-sm text-muted">{effortAim(item.target.rir, scale)}<Info term={scale === "rpe" ? "rpe" : "rir"} /> · {workoutWhy(item, active.plan)} <button type="button" onClick={() => setWhyOpen(true)} className="press inline-flex min-h-11 items-center px-1 text-accent underline underline-offset-2">{t("coach.why")}</button></p>
               )}
@@ -369,6 +441,7 @@ export function Workout() {
                 <div className="card flex min-w-0 flex-1 flex-col justify-center gap-2 px-2 py-2" role="group" aria-label={t("workout.adjust")}>
                   {ex?.load !== "bodyweight" && weightStep && <Stepper compact {...weightStep} />}
                   <Stepper compact {...repStep} />
+                  {rightStep && <Stepper compact {...rightStep} />}
                 </div>
               )}
               <div ref={logRef} className={`relative ${docked ? "w-[42%] shrink-0" : ""}`}>
@@ -382,14 +455,14 @@ export function Workout() {
         </div>
       </div>
 
-      <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={`Swap ${ex?.name ?? ""}`}>
+      <Sheet open={swapOpen} onClose={() => setSwapOpen(false)} title={t("wk.swapTitle", { name: ex?.name ?? "" })}>
         {ex && <SwapList fromId={ex.id} gymEquipment={gym} skip={active.plan.items.map((i) => i.exerciseId)} hurt={activeInjuries(events)} onPick={(id, avoid) => { s.swap(id, avoid); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
         {ex && <CustomExercise muscle={ex.primary[0]} onCreate={(c) => { const id = s.addCustomExercise(c); s.swap(id, false); setSwapOpen(false); haptic("tap"); sound.swap(); }} />}
       </Sheet>
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} bpm={bpm} controls />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">
@@ -398,17 +471,17 @@ export function Workout() {
               ))}
             </ol>
             <NoteEditor key={ex.id + note} initial={note} onSave={(t) => { s.addNote(ex.id, t); setInfoOpen(false); }} />
-            <ExercisePrefsEditor exerciseId={ex.id} note="Changes apply from the next workout." />
+            <ExercisePrefsEditor exerciseId={ex.id} note={t("train.ex.nextWorkout")} />
           </div>
         )}
       </Sheet>
       <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
       <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
-      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title="End workout?">
+      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title={t("wk.endTitle")}>
         <div className="space-y-3">
-          <Button icon="check" className="w-full" onClick={end}>Finish and save</Button>
-          <Button kind="danger" className="w-full" onClick={() => { haptic("warning"); sound.back(); s.discard(); void stopSession(); go("today"); }}>Discard workout</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>Keep going</Button>
+          <Button icon="check" className="w-full" onClick={end}>{t("wk.finishSave")}</Button>
+          <Button kind="danger" className="w-full" onClick={() => { haptic("warning"); sound.back(); s.discard(); void stopSession(); go("today"); }}>{t("wk.discard")}</Button>
+          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>{t("wk.keepGoing")}</Button>
         </div>
       </Sheet>
     </div>
@@ -418,9 +491,9 @@ export function Workout() {
 function Feedback({ name, onPick }: { name: string; onPick: (r: -1 | 0 | 1) => void }) {
   return (
     <div className="animate-rise mt-4 w-full rounded-2xl border border-line bg-raised/70 p-3 text-center">
-      <p className="text-sm text-muted">How was {name}?</p>
+      <p className="text-sm text-muted">{t("workout.howWas", { name })}</p>
       <div className="mt-2 grid grid-cols-3 gap-2">
-        {([[1, "Too easy"], [0, "About right"], [-1, "Too hard"]] as const).map(([r, l]) => (
+        {([[1, t("workout.tooEasy")], [0, t("workout.aboutRight")], [-1, t("workout.tooHard")]] as const).map(([r, l]) => (
           <button key={r} type="button" onClick={() => { haptic("select"); sound.tick(); onPick(r); }} className="press min-h-11 rounded-xl border border-line bg-surface py-2 text-sm font-medium hover:border-accent/50">{l}</button>
         ))}
       </div>
@@ -435,7 +508,7 @@ function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string
     <div>
       <label className="mb-3 flex items-center gap-3 rounded-xl bg-raised p-3 text-sm">
         <input type="checkbox" checked={avoid} onChange={(e) => setAvoid(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
-        Not available here (skip it at this gym for 2 weeks)
+        {t("wk.notHere")}
       </label>
       <ul className="divide-y divide-line">
         {list.map((e) => (
@@ -443,16 +516,16 @@ function SwapList({ fromId, gymEquipment, skip, hurt, onPick }: { fromId: string
             <button type="button" onClick={() => onPick(e.id, avoid)} className="press flex w-full items-center justify-between py-3 text-left">
               <span>
                 <span className="block font-medium">{e.name}</span>
-                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{hurt.length ? (effectFor(e, hurt) ? ` · ${effectFor(e, hurt)!.action === "light" ? `injury: ${effectFor(e, hurt)!.pct}% load` : "you marked it fine"}` : " · avoids your injury") : ""}</span>
+                <span className="text-sm text-muted">{e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}{hurt.length ? (effectFor(e, hurt) ? (effectFor(e, hurt)!.action === "light" ? t("wk.injuryLoad", { n: effectFor(e, hurt)!.pct ?? 0 }) : t("wk.markedFine")) : t("wk.avoids")) : ""}</span>
               </span>
-              <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent"><Icon name="swap" size={16} />Swap</span>
+              <span className="inline-flex items-center gap-1 text-sm font-semibold text-accent"><Icon name="swap" size={16} />{t("wk.swap")}</span>
             </button>
           </li>
         ))}
-        {!list.length && <li className="py-3 text-muted">No other exercise for these muscles at this gym.</li>}
+        {!list.length && <li className="py-3 text-muted">{t("wk.noAlt")}</li>}
       </ul>
       <button type="button" onClick={() => go("injuries")} className="press mt-3 w-full rounded-xl border border-line bg-raised px-3 py-3 text-left text-sm">
-        Hurts? <span className="font-semibold text-accent">Log an injury</span> and the rest of this workout works around it.
+        {t("wk.hurts")}<span className="font-semibold text-accent">{t("wk.logInjury")}</span>{t("wk.hurtsAfter")}
       </button>
     </div>
   );
@@ -464,8 +537,8 @@ function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rp
   const aim = effortChoices(scale).find((c) => c.rir === Math.min(4, target))?.label ?? String(target);
   return (
     <div className="animate-rise mt-4 w-full text-center">
-      <p className="text-sm text-muted">{rpe ? `How hard was that set, as RPE? (aim was ${aim})` : `Reps left in the tank on that set? (aim was ${target})`}<Info term={rpe ? "rpe" : "rir"} /></p>
-      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? "RPE of that set" : "Reps left in the tank"}>
+      <p className="text-sm text-muted">{rpe ? t("wk.rpeAsk", { aim }) : t("wk.rirAsk", { aim: target })}<Info term={rpe ? "rpe" : "rir"} /></p>
+      <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? t("wk.rpeGroup") : t("wk.rirGroup")}>
         {effortChoices(scale).map((c) => (
           <button key={c.rir} type="button" onClick={() => onPick(c.rir)} className="press num min-h-11 rounded-xl border border-line bg-surface text-sm font-semibold">{c.label}</button>
         ))}
@@ -478,15 +551,15 @@ function NoteEditor({ initial, onSave }: { initial: string; onSave: (text: strin
   const [text, setText] = useState(initial);
   return (
     <div className="border-t border-line pt-4">
-      <label htmlFor="ex-note" className="text-sm font-semibold">Your note</label>
-      <textarea id="ex-note" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={500} placeholder="Seat height 4, grip on the rings, left knee caves…" className="mt-1 w-full rounded-xl border border-line bg-raised p-3 text-sm" />
-      <p className="text-xs text-faint">Shows under this exercise every time you do it.</p>
-      <Button kind="ghost" className="mt-2 w-full" onClick={() => onSave(text)}>Save note</Button>
+      <label htmlFor="ex-note" className="text-sm font-semibold">{t("wk.noteLabel")}</label>
+      <textarea id="ex-note" value={text} onChange={(e) => setText(e.target.value)} rows={3} maxLength={500} placeholder={t("wk.notePlaceholder")} className="mt-1 w-full rounded-xl border border-line bg-raised p-3 text-sm" />
+      <p className="text-xs text-faint">{t("wk.noteHint")}</p>
+      <Button kind="ghost" className="mt-2 w-full" onClick={() => onSave(text)}>{t("wk.saveNote")}</Button>
     </div>
   );
 }
 
-const LOADS: [LoadKind, string][] = [["barbell", "Barbell"], ["dumbbell", "Dumbbells"], ["machine", "Machine or cable"], ["kettlebell", "Kettlebell"], ["bodyweight", "Bodyweight"]];
+const LOADS: LoadKind[] = ["barbell", "dumbbell", "machine", "kettlebell", "bodyweight"];
 
 /** "Add your own exercise", at the bottom of the swap sheet. */
 function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { name: string; primary: Muscle; load: LoadKind; compound: boolean }) => void }) {
@@ -495,26 +568,26 @@ function CustomExercise({ muscle, onCreate }: { muscle: Muscle; onCreate: (c: { 
   const [primary, setPrimary] = useState<Muscle>(muscle);
   const [load, setLoad] = useState<LoadKind>("machine");
   const [compound, setCompound] = useState(false);
-  if (!open) return <Button kind="quiet" className="mt-3 w-full" onClick={() => setOpen(true)}>+ Add your own exercise</Button>;
+  if (!open) return <Button kind="quiet" className="mt-3 w-full" onClick={() => setOpen(true)}>{t("wk.addOwn")}</Button>;
   return (
     <form className="mt-4 space-y-3 border-t border-line pt-4" onSubmit={(e) => { e.preventDefault(); if (name.trim()) onCreate({ name, primary, load, compound }); }}>
-      <h3 className="font-semibold">Your own exercise</h3>
-      <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder="Name, e.g. Belt squat" aria-label="Exercise name" className="w-full rounded-xl border border-line bg-raised px-3 py-3" />
-      <label className="block text-sm">Main muscle
+      <h3 className="font-semibold">{t("wk.own")}</h3>
+      <input value={name} onChange={(e) => setName(e.target.value)} maxLength={60} placeholder={t("wk.ownName")} aria-label={t("wk.ownNameLabel")} className="w-full rounded-xl border border-line bg-raised px-3 py-3" />
+      <label className="block text-sm">{t("wk.mainMuscle")}
         <select value={primary} onChange={(e) => setPrimary(e.target.value as Muscle)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
           {MUSCLES.map((m) => <option key={m} value={m}>{MUSCLE_LABEL[m]}</option>)}
         </select>
       </label>
-      <label className="block text-sm">Equipment
+      <label className="block text-sm">{t("wk.equipment")}
         <select value={load} onChange={(e) => setLoad(e.target.value as LoadKind)} className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3">
-          {LOADS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+          {LOADS.map((v) => <option key={v} value={v}>{t(`wk.load.${v}`)}</option>)}
         </select>
       </label>
       <label className="flex items-center gap-3 text-sm">
         <input type="checkbox" checked={compound} onChange={(e) => setCompound(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
-        Works several muscles (a big lift)
+        {t("wk.compound")}
       </label>
-      <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">Add and use it now</button>
+      <button type="submit" disabled={!name.trim()} className="press min-h-11 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink disabled:opacity-40">{t("wk.addUse")}</button>
     </form>
   );
 }
@@ -532,7 +605,7 @@ function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: s
   if (!todo.length) return null;
   return (
     <div className="mt-3 w-full space-y-2">
-      {todo.map((i) => <PainSelect key={i.id} label={`${PART_LABEL[i.part]} pain after that set?`} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
+      {todo.map((i) => <PainSelect key={i.id} label={t("inj.pain.afterSet", { part: PART_LABEL[i.part] })} onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })} />)}
     </div>
   );
 }

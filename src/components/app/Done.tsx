@@ -243,7 +243,7 @@ function PainAfter({ sessionId }: { sessionId: string }) {
   if (!hurt.length) return null;
   return (
     <section className="card mt-4 space-y-2 p-4 text-left" aria-label={t("done.pain")}>
-      {hurt.map((i) => <PainSelect key={i.id} label={t("done.painAsk", { part: PART_LABEL[i.part].toLowerCase() })} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
+      {hurt.map((i) => <PainSelect key={i.id} label={t("done.painAsk", { part: PART_LABEL[i.part].toLocaleLowerCase() })} onRate={(n) => ratePain(i.id, n, { sessionId })} />)}
       <p className="text-xs text-muted">{t("done.painNote")}</p>
     </section>
   );

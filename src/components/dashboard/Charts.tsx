@@ -1,5 +1,6 @@
 "use client";
 import { dayKey, heat, weekdayNames, type DayTotals, type GridDay } from "@/lib/dashboard";
+import { date, t as tr } from "@/lib/i18n";
 import { useEffect, useRef, useState } from "react";
 
 // Small SVG charts for the web dashboard. One series each (the title names it, so no legend), the
@@ -10,18 +11,19 @@ const HEAT = ["var(--color-raised)", "rgb(76 141 255 / 0.3)", "rgb(76 141 255 / 
 const dow = () => weekdayNames().map((d, i) => (i % 2 ? "" : d));
 
 function dayLabel(ms: number) {
-  return new Date(ms).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  return date(ms, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 }
 
 function describe(t: DayTotals | undefined) {
-  if (!t) return "Rest day";
-  return `${t.sessions} workout${t.sessions > 1 ? "s" : ""}, ${t.sets} sets${t.prs ? `, ${t.prs} PR${t.prs > 1 ? "s" : ""}` : ""}`;
+  if (!t) return tr("dash.restDayT");
+  const parts = [tr("dash.workoutsN", { count: t.sessions }), tr("dash.setsN", { count: t.sets }), ...(t.prs ? [tr("dash.prN", { count: t.prs })] : [])];
+  return parts.join(", ");
 }
 
 function summary(grid: GridDay[][], days: Map<string, DayTotals>) {
   const shown = grid.flat().filter((d) => !d.future);
   const trained = shown.filter((d) => days.has(d.key)).length;
-  return `Trained on ${trained} of the last ${shown.length} days`;
+  return tr("dash.trainedOf", { n: trained, total: shown.length });
 }
 
 /** A year of training days, one square per day, darker for more sets. */
@@ -32,11 +34,11 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
   const months: { x: number; label: string }[] = [];
   grid.forEach((col, i) => {
     const d = new Date(col[0].ms);
-    if (d.getDate() <= 7) months.push({ x: i, label: d.toLocaleDateString([], { month: "short" }) });
+    if (d.getDate() <= 7) months.push({ x: i, label: date(d, { month: "short" }) });
   });
   return (
     <div>
-      <div className="overflow-x-auto pb-1" tabIndex={0} role="region" aria-label="Training days this year, scrolls sideways">
+      <div className="overflow-x-auto pb-1" tabIndex={0} role="region" aria-label={tr("dash.yearScroll")}>
         <div className="relative inline-grid" role="img" aria-label={summary(grid, days)} style={{ gridTemplateColumns: `28px repeat(${grid.length}, ${cell}px)`, columnGap: gap, rowGap: gap }}>
           <div />
           {grid.map((_, i) => (
@@ -48,11 +50,11 @@ export function YearHeatmap({ grid, days, onPick }: { grid: GridDay[][]; days: M
         </div>
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-muted">
-        <span aria-live="polite" className="num min-h-4">{hover ? `${dayLabel(hover.ms)}: ${describe(days.get(hover.key))}` : "Point at a day for details"}</span>
+        <span aria-live="polite" className="num min-h-4">{hover ? `${dayLabel(hover.ms)}: ${describe(days.get(hover.key))}` : tr("dash.pointAt")}</span>
         <span className="flex items-center gap-1" aria-hidden>
-          Fewer sets
+          {tr("dash.fewer")}
           {HEAT.map((c, i) => <span key={i} className="inline-block h-3 w-3 rounded-[3px]" style={{ background: c }} />)}
-          More
+          {tr("dash.moreSets")}
         </span>
       </div>
     </div>
@@ -110,7 +112,7 @@ export function MonthCalendar({ rows, days, today, selected, onPick }: { rows: (
                   >
                     <span className={`num text-xs ${d.key === todayKey ? "rounded-full bg-accent px-1.5 font-semibold text-accent-ink" : "text-muted"}`}>{new Date(d.ms).getDate()}</span>
                     <span className="sr-only">, {dayLabel(d.ms)}: {describe(t)}</span>
-                    {t && <span aria-hidden className="num mt-auto text-xs font-semibold text-ink">{t.sets} sets{t.prs ? " · PR" : ""}</span>}
+                    {t && <span aria-hidden className="num mt-auto text-xs font-semibold text-ink">{tr("dash.setsN", { count: t.sets })}{t.prs ? tr("dash.prMark") : ""}</span>}
                   </button>
                 </td>
               );
@@ -135,7 +137,7 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
-  if (points.length < 2) return <p className="text-sm text-muted">Needs two sessions to draw a trend.</p>;
+  if (points.length < 2) return <p className="text-sm text-muted">{tr("dash.needTwo")}</p>;
   const pad = { l: 44, r: 12, t: 12, b: 24 };
   const xs = points.map((p) => p[0]);
   const ys = points.map((p) => p[1]);
@@ -160,13 +162,13 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
   return (
     <figure ref={box}>
       <figcaption className="num mb-1 text-sm text-muted" aria-live="polite">
-        {new Date(p[0]).toLocaleDateString([], { month: "short", day: "numeric", year: "numeric" })}: <span className="font-semibold text-ink">{format(p[1])}</span>
+        {date(p[0], { month: "short", day: "numeric", year: "numeric" })}: <span className="font-semibold text-ink">{format(p[1])}</span>
       </figcaption>
       <svg
         viewBox={`0 0 ${w} ${height}`}
         className="w-full touch-none"
         role="img"
-        aria-label={`${label}: from ${format(points[0][1])} to ${format(points.at(-1)![1])} over ${points.length} sessions`}
+        aria-label={tr("dash.trend", { label, from: format(points[0][1]), to: format(points.at(-1)![1]), n: points.length })}
         onPointerMove={(e) => setHi(near(e.clientX, e.currentTarget.getBoundingClientRect()))}
         onPointerLeave={() => setHi(null)}
       >
@@ -176,8 +178,8 @@ export function LineChart({ points, format, label, height = 180 }: { points: [nu
             <text x={pad.l - 6} y={Y(t) + 4} textAnchor="end" fontSize={11} fill="var(--color-faint)">{format(t)}</text>
           </g>
         ))}
-        <text x={pad.l} y={height - 6} fontSize={11} fill="var(--color-faint)">{new Date(x0).toLocaleDateString([], { month: "short", year: "numeric" })}</text>
-        <text x={w - pad.r} y={height - 6} textAnchor="end" fontSize={11} fill="var(--color-faint)">{new Date(x1).toLocaleDateString([], { month: "short", year: "numeric" })}</text>
+        <text x={pad.l} y={height - 6} fontSize={11} fill="var(--color-faint)">{date(x0, { month: "short", year: "numeric" })}</text>
+        <text x={w - pad.r} y={height - 6} textAnchor="end" fontSize={11} fill="var(--color-faint)">{date(x1, { month: "short", year: "numeric" })}</text>
         <path d={d} fill="none" stroke="var(--color-accent)" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
         {hi !== null && <line x1={X(p[0])} x2={X(p[0])} y1={pad.t} y2={height - pad.b} stroke="var(--color-muted)" strokeWidth={1} strokeDasharray="3 3" />}
         <circle cx={X(p[0])} cy={Y(p[1])} r={5} fill="var(--color-accent)" stroke="var(--color-surface)" strokeWidth={2} />
@@ -195,14 +197,14 @@ export function WeekBars({ weeks, value, format, label }: { weeks: { weekStart: 
   return (
     <figure>
       <figcaption className="num mb-2 text-sm text-muted" aria-live="polite">
-        Week of {new Date(weeks[i].weekStart).toLocaleDateString([], { month: "short", day: "numeric" })}: <span className="font-semibold text-ink">{format(vals[i])}</span>
+        {tr("dash.weekOfShort", { date: date(weeks[i].weekStart, { month: "short", day: "numeric" }) })} <span className="font-semibold text-ink">{format(vals[i])}</span>
       </figcaption>
       <div className="flex h-28 items-end gap-1" role="group" aria-label={label}>
         {weeks.map((wk, j) => (
           <button
             key={wk.weekStart}
             type="button"
-            aria-label={`Week of ${new Date(wk.weekStart).toLocaleDateString([], { month: "short", day: "numeric" })}: ${format(vals[j])}`}
+            aria-label={tr("dash.weekOf", { date: date(wk.weekStart, { month: "short", day: "numeric" }), value: format(vals[j]) })}
             onMouseEnter={() => setHi(j)}
             onMouseLeave={() => setHi(null)}
             onFocus={() => setHi(j)}

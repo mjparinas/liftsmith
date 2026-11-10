@@ -61,7 +61,9 @@ describe("burst", () => {
     expect(layer.querySelectorAll("span")).toHaveLength(8);
     expect(layer.querySelector("svg path")).not.toBeNull();
     expect(animate).toHaveBeenCalledTimes(10);
-    act(() => vi.advanceTimersByTime(1500));
+    act(() => {
+      vi.advanceTimersByTime(1500);
+    });
     expect(document.querySelector("[data-burst]")).toBeNull();
   });
 });

@@ -79,6 +79,7 @@ export class RepTracker {
   private win: number[] = [];
   private barWin: number[] = [];
   private attempts: Rep[] = [];
+  private lastE = 0;
 
   constructor(
     private profile: MotionProfile,
@@ -115,6 +116,7 @@ export class RepTracker {
     const bar = s.bar === undefined || !Number.isFinite(s.bar) ? undefined : this.barFilt.filter(median5(this.barWin, s.bar), s.t);
     if (this.rest === undefined) this.rest = x;
     const e = this.excursion(x);
+    this.lastE = e;
 
     if (this.phase === "recover") {
       // After a miss, wait until the lifter is back at rest (racked, stood up, spotted) before arming again.
@@ -209,6 +211,24 @@ export class RepTracker {
   /** True once the set has ended on its own (idle after the last rep, or a failed rep and idle). */
   get over() {
     return this.overSent;
+  }
+
+  /**
+   * How far through the rep the lifter is right now, 0 at rest and 1 at the set's deepest point so far
+   * (or a typical full rep before the first one), for a figure that follows them.
+   */
+  get progress(): number {
+    return this.rest === undefined ? 0 : this.scale(this.lastE);
+  }
+
+  /** The same for a position that hasn't been through the filters yet (a live motion estimate). */
+  progressAt(pos: number): number {
+    return this.rest === undefined || !Number.isFinite(pos) ? this.progress : this.scale(this.excursion(pos));
+  }
+
+  private scale(e: number) {
+    const deepest = Math.max(this.peak, ...this.attempts.filter((r) => r.kind !== "failed").map((r) => r.rom));
+    return Math.min(1, e / Math.max(deepest, this.profile.minRom * 1.25));
   }
 
   /** The current excursion phase, for a live display. */

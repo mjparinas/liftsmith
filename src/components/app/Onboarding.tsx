@@ -14,12 +14,15 @@ import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 import { epley, KNOWN_LIFTS } from "@/lib/progression";
 import { useEffect, useState } from "react";
-import { connectHeartRate, hrSupported } from "@/lib/heartRate";
+import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
 import { connectHealth, healthAvailable, readHints } from "@/lib/health";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { notifyPermission } from "@/lib/sessionNotify";
+import { keepStorage } from "@/lib/saving";
+import { SaveStep } from "./Saving";
 import { go } from "./router";
-import { BumpField, Button } from "./ui";
+import { BumpField, Button, Sheet } from "./ui";
+import { AccountPanel } from "./Account";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
@@ -42,7 +45,7 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   { id: "advanced", get title() { return t("exp.advanced"); }, get blurb() { return t("setup.exp.advanced.blurb"); } },
 ];
 
-const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Pro trial offer"];
+const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Save your progress", "Pro trial offer"];
 
 const KNOWN = [
   { id: KNOWN_LIFTS.squat, get name() { return t("setup.knownSquat"); } },
@@ -68,13 +71,17 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [step, setStep] = useState(0);
   // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
   // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
-  const STEPS = rerun || !billingLive() ? 4 : 5;
+  const STEPS = rerun || !billingLive() ? 5 : 6;
+  const PRO_STEP = 5;
   const trialDays = flag("trialDays");
   // The store's own trial length for this person (null once they've used a trial), else the flag's.
   const offers = useBilling((b) => b.offers);
   const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
+  const [signIn, setSignIn] = useState(false);
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
+  const [hrBusy, setHrBusy] = useState(false);
+  const [hrError, setHrError] = useState<string | null>(null);
   const [notify, setNotify] = useState<boolean | null>(null);
   const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState<Goal>(profile.goal);
@@ -98,7 +105,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // The setup funnel: which step each install reached.
   useEffect(() => {
     track("onboarding_step", { step, name: STEP_NAMES[step] });
-    if (step === 4) track("paywall_view", { from: "setup" });
+    if (step === PRO_STEP) track("paywall_view", { from: "setup" });
   }, [step]);
 
   const fillFromHealth = async () => {
@@ -132,6 +139,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       ...(pro ? { pro } : {}),
     });
     setAnalytics(stats);
+    // In a browser, ask it to keep this site's storage, so the workouts saved here aren't cleared (saving.ts).
+    void keepStorage();
     track("onboarding_complete", { rerun, goal, experience: exp, days, preset: keepGyms ? "kept" : preset, unit, healthPrefill: prefilled });
     haptic("success");
     if (rerun) go("today");
@@ -160,6 +169,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">{t("setup.name.title")}</label>
             <p className="text-sm text-muted">{t("setup.name.note")}</p>
             <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder={t("setup.name.placeholder")} maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
+            {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
+            {!rerun && <Button kind="quiet" className="mt-6 w-full" onClick={() => setSignIn(true)}>{t("account.setup")}</Button>}
+            <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
+              <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
+              <AccountPanel onSignedIn={() => setSignIn(false)} />
+            </Sheet>
           </>
         )}
         {step === 1 && (
@@ -248,20 +263,28 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               />
               {hrSupported() && (
                 <Tile
-                  title={hr ? t("setup.hr.on", { name: hr }) : t("setup.hr.connect")}
+                  title={hr ? t("setup.hr.on", { name: hr }) : hrBusy ? t("hr.connecting") : t("setup.hr.connect")}
                   blurb={t("setup.hr.blurb")}
                   active={!!hr}
                   onClick={async () => {
+                    if (hrBusy) return;
+                    setHrBusy(true);
+                    setHrError(null);
                     try {
                       const c = await connectHeartRate(() => {}, () => {});
                       setHr(c.name);
                       track("feature", { name: "heart_rate", detail: "setup" });
                       c.disconnect();
-                    } catch {}
+                    } catch (e) {
+                      setHrError(e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed"));
+                    } finally {
+                      setHrBusy(false);
+                    }
                   }}
                 />
               )}
             </div>
+            {hrError && <p className="mt-3 text-sm text-warn" role="alert">{hrError}</p>}
             {notify === false && <p className="mt-3 text-sm text-warn">{t("setup.notify.blocked")}</p>}
             <label className="card mt-3 flex items-start gap-3 p-4">
               <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--color-accent)]" checked={stats} onChange={(e) => setStats(e.target.checked)} />
@@ -272,7 +295,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             </label>
           </>
         )}
-        {step === 4 && (
+        {step === 4 && <SaveStep />}
+        {step === PRO_STEP && (
           <>
             <h1 className="text-3xl font-extrabold tracking-tight">{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
@@ -294,7 +318,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       </div>
       <div className="flex gap-3 pb-2">
         {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>{t("setup.back")}</Button>}
-        {step < 4 && (
+        {step < PRO_STEP && (
           <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
             {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>

@@ -1,3 +1,4 @@
+import { setVolume } from "./sides";
 import { EXERCISE_BY_ID } from "./exercises";
 import { epley } from "./progression";
 import { MUSCLES, type AppEvent, type Muscle, type SetEvent } from "./types";
@@ -108,7 +109,7 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
       start,
       seconds: end?.type === "sessionEnd" ? end.seconds : Math.round((list.at(-1)!.at - start) / 1000),
       sets: list.length,
-      volume: list.reduce((v, s) => v + s.weight * s.reps, 0),
+      volume: list.reduce((v, s) => v + setVolume(s), 0),
       exercises: [...new Set(list.map((s) => s.exerciseId))],
       avgHr: end?.type === "sessionEnd" ? end.avgHr : undefined,
       maxHr: end?.type === "sessionEnd" ? end.maxHr : undefined,
@@ -145,7 +146,7 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
   return {
     sessions,
     totalSets: sets.length,
-    totalVolume: sets.reduce((v, s) => v + s.weight * s.reps, 0),
+    totalVolume: sets.reduce((v, s) => v + setVolume(s), 0),
     totalSeconds: sessions.reduce((t, s) => t + s.seconds, 0),
     weekStreak,
     e1rmSeries,

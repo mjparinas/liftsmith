@@ -3,6 +3,7 @@ import "fake-indexeddb/auto";
 import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { setLanguage } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { Tools } from "./Tools";
 
@@ -10,13 +11,26 @@ beforeEach(async () => {
   await useApp.getState().reset();
   useApp.getState().setProfile({ onboarded: true, bodyweight: 80, unit: "kg", sex: undefined, birthYear: undefined, heightCm: undefined, daysPerWeek: 3 });
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  setLanguage("en");
+});
 
 describe("Tools › TDEE", () => {
+  it("speaks the phone's language, with its number format", async () => {
+    setLanguage("fr");
+    useApp.getState().setProfile({ sex: "male", birthYear: new Date().getFullYear() - 30, heightCm: 177 });
+    render(<Tools arg="tdee" />);
+    expect(screen.getByRole("heading", { name: "Calculateur de DEJ" })).toBeInTheDocument();
+    expect(screen.getByTestId("tdee-value").textContent?.replace(/\s/g, "")).toBe("2730");
+    expect(screen.getByText(/D’après votre objectif de 3 jours par semaine \(exercice modéré\)/)).toBeInTheDocument();
+    expect(screen.getByText("Surpoids")).toBeInTheDocument();
+  });
+
   it("asks for what's missing, filled in with bump buttons, then shows TDEE", async () => {
     const user = userEvent.setup();
     render(<Tools arg="tdee" />);
-    expect(screen.getByText("Add your sex, age and height to see your TDEE.")).toBeInTheDocument();
+    expect(screen.getByText("Add your sex, age, and height to see your TDEE.")).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: "Male" }));
     await user.click(screen.getByRole("button", { name: "More age" }));

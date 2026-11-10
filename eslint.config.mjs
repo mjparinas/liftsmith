@@ -20,6 +20,18 @@ export default defineConfig([
     },
   },
   {
+    // Type-aware checks for bugs the compiler can't see: a promise nobody waits for (its error is
+    // lost), an async function where a plain callback is expected, and a switch that misses a case
+    // of a union. JSX handlers may be async (React ignores the returned promise).
+    files: ["src/**/*.{ts,tsx}"],
+    languageOptions: { parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname } },
+    rules: {
+      "@typescript-eslint/no-floating-promises": "error",
+      "@typescript-eslint/no-misused-promises": ["error", { checksVoidReturn: { attributes: false } }],
+      "@typescript-eslint/switch-exhaustiveness-check": ["error", { considerDefaultExhaustiveForUnions: true }],
+    },
+  },
+  {
     // Plans must be reproducible: content and engine code use the seeded rng in src/lib/random.ts.
     files: ["src/lib/**/*.ts"],
     ignores: ["**/*.test.ts", "src/lib/store.ts", "src/lib/juice.ts"],

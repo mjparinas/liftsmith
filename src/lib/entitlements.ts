@@ -18,9 +18,21 @@ import { hasPro } from "./billing";
 // without Pro, Today follows a free fixed program (store.ts applyAccess).
 // Health twin (Melvin, 2026-11-09): seeing every number, trend and reason is free; sleep, HRV, resting
 // heart rate and breathing rate changing today's call ("healthReadiness") is Pro.
-export type Feature = "adaptive" | "recoveryMap" | "advancedStats" | "adaptiveSplits" | "replan" | "plateauDetective" | "goalPlanner" | "healthReadiness";
-
-const PRO_FEATURES: ReadonlySet<Feature> = new Set(["adaptive", "recoveryMap", "advancedStats", "adaptiveSplits", "replan", "plateauDetective", "goalPlanner", "healthReadiness"]);
+// Camera rep counting on the workout screen ("autoCount", 2026-11-09) is Pro.
+// One line per feature, so two changes adding one don't touch the same line. Every feature listed is Pro.
+const PRO_FEATURES = [
+  "adaptive",
+  "recoveryMap",
+  "advancedStats",
+  "adaptiveSplits",
+  "replan",
+  "plateauDetective",
+  "goalPlanner",
+  "healthReadiness",
+  "autoCount",
+] as const;
+export type Feature = (typeof PRO_FEATURES)[number];
+const PRO: ReadonlySet<Feature> = new Set(PRO_FEATURES);
 
 /** Whether the lifter has Pro: a store subscription or trial, or billing not live here. */
 export function isPro(): boolean {
@@ -28,5 +40,5 @@ export function isPro(): boolean {
 }
 
 export function can(feature: Feature, pro = isPro()): boolean {
-  return !PRO_FEATURES.has(feature) || pro;
+  return !PRO.has(feature) || pro;
 }

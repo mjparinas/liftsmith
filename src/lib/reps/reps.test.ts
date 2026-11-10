@@ -217,3 +217,35 @@ describe.runIf(process.env.REP_ACCURACY)("accuracy report", () => {
     }
   });
 });
+
+describe("live progress for a figure that follows the lifter", () => {
+  it("tracks the camera rep from rest to the bottom and back", () => {
+    const tr = new RepTracker(SQUAT);
+    let peak = 0;
+    let after = 1;
+    for (const [t, pos] of squats([90, 90])) {
+      tr.push({ t, pos, conf: 1 });
+      if (t < 6000) peak = Math.max(peak, tr.progress);
+      after = tr.progress;
+    }
+    expect(peak).toBeGreaterThan(0.85);
+    expect(peak).toBeLessThanOrEqual(1);
+    expect(after).toBeLessThan(0.05);
+  });
+
+  it("moves with the bar during a motion rep, before the rep is counted", () => {
+    const p = imuProfile("bench-press", "hpush")!;
+    const c = new ImuRepCounter(p);
+    const sim = simulateSet(["full", "full", "full"], 3);
+    let mid = 0;
+    let last = 0;
+    for (const x of imuSamples(sim, 12, { romM: 0.4, downFirst: true })) {
+      c.pushFused(x.t, x.up, x.rot);
+      const truth = sim.pos(x.t);
+      if (truth > 0.8) mid = Math.max(mid, c.progress);
+      last = c.progress;
+    }
+    expect(mid).toBeGreaterThan(0.5);
+    expect(last).toBeLessThan(0.2);
+  });
+});

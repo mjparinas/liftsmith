@@ -3,6 +3,7 @@
 // to the day's readiness. Evidence that cycle phase changes strength is mixed and individual, so the
 // effect is deliberately small and worded as "go by feel", never as a rule. Nothing here leaves the device.
 import type { AppEvent, CycleEvent } from "./types";
+import { t } from "./i18n";
 
 const DAY = 86_400_000;
 export const DEFAULT_CYCLE = 28;
@@ -61,12 +62,12 @@ export function cycleSignal(state: CycleState | null): { points: number; text: s
   if (!state) return null;
   switch (state.phase) {
     case "period":
-      return { points: -5, text: `Cycle day ${state.day}: go by feel today` };
+      return { points: -5, text: t("sig.cycle.period", { day: state.day }) };
     case "late-luteal":
-      return { points: -4, text: `Cycle day ${state.day}: energy can dip before a period` };
+      return { points: -4, text: t("sig.cycle.late", { day: state.day }) };
     case "follicular":
-      return { points: 3, text: `Cycle day ${state.day}: often a good time to push` };
+      return { points: 3, text: t("sig.cycle.follicular", { day: state.day }) };
     default:
-      return { points: 0, text: `Cycle day ${state.day}` };
+      return { points: 0, text: t("sig.cycle.day", { day: state.day }) };
   }
 }
