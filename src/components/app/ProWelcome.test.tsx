@@ -61,7 +61,8 @@ describe("Pro welcome", () => {
     expect(screen.getByText(/taking your health seriously/)).toBeInTheDocument();
     expect(screen.getByText("Recovery map")).toBeInTheDocument();
     expect(screen.getByText(/Free for 14 days. You can cancel/)).toBeInTheDocument();
-    await vi.waitFor(() => expect(confetti).toHaveBeenCalled());
+    // All three bursts (juice.confetti fires the side ones 220 and 360 ms later), so none lands in the next test.
+    await vi.waitFor(() => expect(confetti).toHaveBeenCalledTimes(3));
   });
 
   it("thanks a paid subscription without trial wording", async () => {
@@ -71,6 +72,7 @@ describe("Pro welcome", () => {
     await user.click(screen.getByRole("button", { name: /Subscribe · Monthly/ }));
     expect(await screen.findByRole("dialog", { name: "Welcome to Pro" })).toBeInTheDocument();
     expect(screen.queryByText(/You can cancel any time in your store account/)).toBeNull();
+    await vi.waitFor(() => expect(confetti).toHaveBeenCalledTimes(3));
     await user.click(screen.getByRole("button", { name: "Let's train" }));
     expect(screen.queryByRole("dialog")).toBeNull();
   });
