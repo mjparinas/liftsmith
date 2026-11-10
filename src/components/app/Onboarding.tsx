@@ -516,7 +516,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                       );
                       setHr(c.name);
                       track("feature", { name: "heart_rate", detail: "setup" });
-                      c.disconnect();
+                      // Released straight away; it's remembered, so the first workout connects by itself.
+                      void c.disconnect();
                     } catch (e) {
                       setHrError(e instanceof HrError ? hrMessage(e.problem, e.device) : hrMessage("failed"));
                     } finally {

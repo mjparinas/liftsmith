@@ -18,7 +18,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 | Fitbit Air data | Health Connect | Apple Health, one way only | None | Fitbit syncs to Apple Health one way |
 | Health data | Health Connect | Apple Health | None | Browsers have no health store |
 | Health twin | All metrics from Health Connect (HRV is RMSSD); fitness age from its VO₂ max | All metrics from Apple Health (HRV is SDNN, so values run higher; only the lifter's own trend is used); fitness age from its VO₂ max | Weigh-ins, body fat, BMI, TDEE and the rest-time heart rate drop (Web Bluetooth); health-store metrics and fitness age say "On your phone" | Browsers have no health store |
-| Bluetooth heart rate | Yes | Yes | Web Bluetooth, Chrome only | Browser support |
+| Bluetooth heart rate | Yes; the last monitor reconnects by address without a scan | Yes; the last monitor reconnects by its iOS id without a scan | Web Bluetooth, Chrome only; reconnects without the picker only where the browser keeps the permission (`getDevices`) | Browser support |
 | Gym by location | Yes | Yes | None | No geofence in the web app |
 | Voice coach | System TextToSpeech; the rest-over cue is said by the workout service, so it's heard with the screen locked | AVSpeechSynthesizer while the app is open (screen stays on in a workout); locked screen gets the rest-over notification only | Web Speech API while the page is open | iOS suspends background apps, so it can't speak from the lock screen without an audio session we don't keep |
 | Earned app icons | Launcher activity-aliases, switched when the app goes to the background | Alternate app icons (iOS shows its own "icon changed" alert) | None | Browsers can't change a home-screen icon |
