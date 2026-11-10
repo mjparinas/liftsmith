@@ -6,7 +6,7 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "msg.title": "Reminders",
   "msg.intro":
-    "Reminders follow your training days ({days}) at {time}. Change them under Calendar. Nothing is sent between {quietFrom} and {quietTo}, and never more than one a day.",
+    "Reminders follow your training days ({days}) at {time}. Change them under Settings › Training. Nothing is sent between {quietFrom} and {quietTo}, and never more than one a day.",
   "msg.noDays": "none picked",
   "msg.push": "Phone notifications",
   "msg.pushOff": "Notifications are off for Liftsmith. Turning one on asks again, or allow them in your phone's settings.",
@@ -37,7 +37,7 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "msg.title": "Recordatorios",
   "msg.intro":
-    "Los recordatorios siguen tus días de entrenamiento ({days}) a las {time}. Cámbialos en Calendario. No se envía nada entre las {quietFrom} y las {quietTo}, y nunca más de uno al día.",
+    "Los recordatorios siguen tus días de entrenamiento ({days}) a las {time}. Cámbialos en Ajustes › Entrenamiento. No se envía nada entre las {quietFrom} y las {quietTo}, y nunca más de uno al día.",
   "msg.noDays": "ninguno elegido",
   "msg.push": "Notificaciones del teléfono",
   "msg.pushOff":
@@ -67,7 +67,7 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "msg.title": "Rappels",
   "msg.intro":
-    "Les rappels suivent vos jours d’entraînement ({days}) à {time}. Modifiez-les dans Calendrier. Rien n’est envoyé entre {quietFrom} et {quietTo}, et jamais plus d’un par jour.",
+    "Les rappels suivent vos jours d’entraînement ({days}) à {time}. Modifiez-les dans Réglages › Entraînement. Rien n’est envoyé entre {quietFrom} et {quietTo}, et jamais plus d’un par jour.",
   "msg.noDays": "aucun choisi",
   "msg.push": "Notifications du téléphone",
   "msg.pushOff":

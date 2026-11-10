@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-import { defaultDays } from "@/lib/calendar";
+import { trainingDays } from "@/lib/calendar";
 import { clockTime, list, t, weekday } from "@/lib/i18n";
 import { oops } from "@/lib/juice";
 import { clampTime, DEFAULT_ON, EMAIL_KINDS, PUSH_KINDS, type MessageKind } from "@/lib/messages";
@@ -63,7 +63,7 @@ export function MessageSettings() {
     if (native) void pushAllowed().then(setAllowed);
   }, [native]);
 
-  const days = (profile.calendar?.days ?? defaultDays(profile.daysPerWeek)).map((d) => weekday(d));
+  const days = trainingDays(profile).map((d) => weekday(d));
   const [hh, mm] = clampTime(profile.calendar?.time ?? "18:00")
     .split(":")
     .map(Number);

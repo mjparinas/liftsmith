@@ -139,7 +139,8 @@ describe("Today and Progress extras", () => {
     const midnight = await screen.findByRole("button", { name: /Midnight/ });
     expect(midnight).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByRole("button", { name: /Forge/ })).toBeDisabled();
-    await user.click(screen.getByRole("switch", { name: "Ghost mode" }));
+    location.hash = "#/settings/workout";
+    await user.click(await screen.findByRole("switch", { name: "Ghost mode" }));
     expect(useApp.getState().profile.delight?.ghost).toBe(false);
   });
 });
