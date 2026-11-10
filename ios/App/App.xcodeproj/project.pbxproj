@@ -37,6 +37,9 @@
 		D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E1A0010000000000000002 /* DelightPlugins.swift */; };
 		A1F5E0010000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */; };
 		C1A0B0010000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0010000000000000002 /* InfoPlist.strings */; };
+		C1A0B0020000000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0020000000000000002 /* Localizable.strings */; };
+		C1A0B0030000000000000001 /* AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0030000000000000002 /* AppShortcuts.strings */; };
+		C1A0B0040000000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0040000000000000002 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -97,6 +100,12 @@
 		EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StartWorkoutControl.swift; sourceTree = "<group>"; };
 		C1A0B0010000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C1A0B0010000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		C1A0B0020000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0020000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0030000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		C1A0B0030000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		C1A0B0040000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0040000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,6 +169,8 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				C1A0B0010000000000000002 /* InfoPlist.strings */,
+				C1A0B0020000000000000002 /* Localizable.strings */,
+				C1A0B0030000000000000002 /* AppShortcuts.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 				CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */,
@@ -176,6 +187,7 @@
 				6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */,
 				EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */,
 				BB05485F3EDA6B8DD896565A /* Info.plist */,
+				C1A0B0040000000000000002 /* Localizable.strings */,
 			);
 			name = LiftsmithWidgets;
 			path = LiftsmithWidgets;
@@ -298,6 +310,8 @@
 			files = (
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
 				C1A0B0010000000000000001 /* InfoPlist.strings in Resources */,
+				C1A0B0020000000000000001 /* Localizable.strings in Resources */,
+				C1A0B0030000000000000001 /* AppShortcuts.strings in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
@@ -311,6 +325,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A0B0040000000000000001 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -383,6 +398,33 @@
 				C1A0B0010000000000000004 /* fr */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0020000000000000002 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0020000000000000003 /* es */,
+				C1A0B0020000000000000004 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0030000000000000002 /* AppShortcuts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0030000000000000003 /* es */,
+				C1A0B0030000000000000004 /* fr */,
+			);
+			name = AppShortcuts.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0040000000000000002 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0040000000000000003 /* es */,
+				C1A0B0040000000000000004 /* fr */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */

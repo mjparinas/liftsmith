@@ -81,6 +81,7 @@ import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
 import * as sband from "./text/sband";
@@ -186,6 +187,7 @@ export const en = {
   ...recap.en,
   ...recovery.en,
   ...remix.en,
+  ...rmd.en,
   ...rt.en,
   ...save.en,
   ...sband.en,

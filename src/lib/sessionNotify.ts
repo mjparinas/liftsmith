@@ -1,5 +1,6 @@
 "use client";
 
+import { t } from "./i18n";
 import { isNative } from "./juice";
 
 // The live workout notification. In the Capacitor shell this calls the native WorkoutSession
@@ -85,9 +86,9 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
   if (isNative()) return; // the native service sounds its own alert
   if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
   const reg = await navigator.serviceWorker?.getRegistration();
-  await reg?.showNotification("Rest over", {
+  await reg?.showNotification(t("workout.notify.over"), {
     tag: "rest",
-    body: `Up next: ${next}`,
+    body: t("workout.notify.next", { next }),
     silent: !alert.sound && !alert.vibrate,
     vibrate: alert.vibrate ? [200, 100, 200] : undefined,
     icon: "/icon-192.png",

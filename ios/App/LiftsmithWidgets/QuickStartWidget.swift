@@ -74,11 +74,11 @@ struct QuickStartView: View {
 
     private var snap: QuickStartWidget.Snapshot? { entry.snap }
     /// Every line comes from the app in the lifter's language; once stale, the title says to open the app for today.
-    private var title: String { (entry.stale ? snap?.stale : snap?.title) ?? "Start workout" }
+    private var title: String { (entry.stale ? snap?.stale : snap?.title) ?? String(localized: "Start workout") }
     private var why: String { entry.stale ? "" : snap?.why ?? "" }
-    private var startLabel: String { snap?.start ?? "Start workout" }
+    private var startLabel: String { snap?.start ?? String(localized: "Start workout") }
     /// Log set shows while a workout runs, or always in the plain fallback (it does nothing without a workout).
-    private var logLabel: String { snap == nil ? "Log set" : entry.stale ? "" : snap?.log ?? "" }
+    private var logLabel: String { snap == nil ? String(localized: "Log set") : entry.stale ? "" : snap?.log ?? "" }
     private var hue: Color {
         switch entry.stale ? "normal" : snap?.kind ?? "normal" {
         case "push": return Brand.ember

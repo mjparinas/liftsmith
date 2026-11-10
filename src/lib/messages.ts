@@ -1,5 +1,6 @@
 // While billing isn't live everyone has Pro, so the planner sends no Pro offers (billing.ts).
 import { billingLive as billingIsLive } from "./billing";
+import { dayName, say, type MsgLang } from "./messageText";
 
 // Reminders and lifecycle messages (Melvin, 2026-11-09): workout reminders on training days, a nudge
 // after a missed training day, streak alerts, comebacks, milestones and Pro offers, by push
@@ -76,6 +77,8 @@ export interface PlanInput {
   streakWeeks: number;
   pro: ProState;
   kinds: Partial<Record<MessageKind, boolean>>;
+  /** The app's language, for the words of each message. English when missing (older subscriptions). */
+  lang?: MsgLang;
 }
 
 export interface Message {
@@ -194,16 +197,8 @@ export function clampTime(hhmm: string): string {
   return `${String(h).padStart(2, "0")}:${String(Math.min(59, m)).padStart(2, "0")}`;
 }
 
-const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-
-const PRO_FEATURES = [
-  { title: "Workouts that adapt to you", body: "Pro plans each session from your recovery, your gym and how every set felt." },
-  { title: "See what's recovered", body: "The recovery map shows which muscles are fresh before you pick a workout." },
-  { title: "Know you're getting stronger", body: "Pro tracks your estimated max on every lift and your weekly sets per muscle." },
-  { title: "Push days and easy days", body: "Pro reads your readiness and adjusts the day's workout. You can always override it." },
-];
-
-const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
+/** Pro offers in the order they go out (PRO_OFFER_DAYS). */
+const PRO_FEATURES = ["rmd.pro1", "rmd.pro2", "rmd.pro3", "rmd.pro4"] as const;
 
 /**
  * Every message due in [from, to) on one channel, at most one a day, in time order. The phone calls it
@@ -211,7 +206,7 @@ const plural = (n: number, w: string) => `${n} ${w}${n === 1 ? "" : "s"}`;
  * A plan assumes no workout happens after `from`: when one does, the plan is recomputed.
  */
 export function plan(input: PlanInput, from: number, to: number, channel: Channel): Message[] {
-  const { tz } = input;
+  const { tz, lang } = input;
   const on = (k: MessageKind) => KIND_INFO[k][channel] && (input.kinds[k] ?? DEFAULT_ON[k]);
   const email = channel === "email";
   const sendHour = email ? "08:00" : "09:00";
@@ -239,8 +234,8 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       if (needed > 0 && needed === daysLeft && !trainedToday) {
         streakLine =
           needed === 1
-            ? `One workout today keeps your ${input.streakWeeks}-week streak.`
-            : `${needed} workouts left this week to keep your ${input.streakWeeks}-week streak.`;
+            ? say(lang, "rmd.streakOne", { weeks: input.streakWeeks })
+            : say(lang, "rmd.streakMany", { needed, weeks: input.streakWeeks });
       }
     }
 
@@ -250,23 +245,24 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       add(
         "reminder",
         atTime(day, time, tz),
-        first ? "Your first workout is ready" : "Today's workout is ready",
-        streakLine ??
-          (first ? "It's planned around your gym and takes one tap a set." : "Planned from your recovery and last session. Tap to start."),
+        first ? say(lang, "rmd.firstReady") : say(lang, "rmd.todayReady"),
+        streakLine ?? (first ? say(lang, "rmd.firstReadyBody") : say(lang, "rmd.todayReadyBody")),
       );
     }
     if (email && wd === 1 && input.days.length) {
       const lastWeek = input.weekStart === addDays(monday, -7, tz) ? input.weekDays : null;
-      const names = [...input.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((d) => DAY_NAMES[d]);
+      const names = [...input.days].sort((a, b) => ((a + 6) % 7) - ((b + 6) % 7)).map((d) => dayName(lang, d));
       add(
         "reminder",
         atTime(day, sendHour, tz),
-        "Your training week",
-        `This week: ${names.join(", ")} at ${time}.${lastWeek !== null ? ` Last week you trained ${plural(lastWeek, "day")} of ${goal}.` : ""} Each workout is planned when you open the app.`,
+        say(lang, "rmd.week"),
+        lastWeek !== null
+          ? say(lang, "rmd.weekBodyLast", { days: names.join(", "), time, trained: say(lang, "rmd.days", { count: lastWeek }), goal })
+          : say(lang, "rmd.weekBody", { days: names.join(", "), time }),
       );
     }
 
-    if (streakLine) add("streak", atTime(day, sendHour, tz), "Keep your streak", streakLine);
+    if (streakLine) add("streak", atTime(day, sendHour, tz), say(lang, "rmd.keepStreak"), streakLine);
 
     // Missed: once per lapse, the day after the first missed training day (by email, the second), and
     // only if today isn't a training day itself (its reminder already says it). Longer lapses get the
@@ -282,8 +278,8 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       add(
         "missed",
         atTime(day, sendHour, tz),
-        email ? "Two training days slipped by" : "Missed yesterday? Today works too",
-        "A short workout today picks your freshest muscles. Your streak counts weeks, so there's still time.",
+        email ? say(lang, "rmd.missedTwo") : say(lang, "rmd.missedOne"),
+        say(lang, "rmd.missedBody"),
       );
     }
 
@@ -293,10 +289,8 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       add(
         "missed",
         atTime(day, sendHour, tz),
-        input.firstWorkoutAt ? "Ready when you are" : "Your first workout is still waiting",
-        input.firstWorkoutAt
-          ? `It's been ${quiet} days. Your next workout starts a little lighter so you can ease back in.`
-          : "Pick a length, tap start, and the app does the planning.",
+        input.firstWorkoutAt ? say(lang, "rmd.ready") : say(lang, "rmd.firstWaiting"),
+        input.firstWorkoutAt ? say(lang, "rmd.comeback", { days: quiet }) : say(lang, "rmd.firstWaitingBody"),
       );
     }
 
@@ -304,24 +298,12 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
     // everyone as Pro while billing is off, so none go out until it's live.
     if (input.pro.state === "trial") {
       if (day === addDays(input.pro.endsAt, -2, tz))
-        add(
-          "pro",
-          atTime(day, "12:00", tz),
-          "Your Pro trial ends in 2 days",
-          "Keep adaptive workouts, the recovery map and full stats, or do nothing and stay on the free plan.",
-          "settings",
-        );
+        add("pro", atTime(day, "12:00", tz), say(lang, "rmd.trialEnds"), say(lang, "rmd.trialEndsBody"), "settings");
     }
     if (input.pro.state === "free") {
       const n = PRO_OFFER_DAYS.indexOf(Math.round((day - dayStart(input.pro.since, tz)) / DAY));
-      if (n >= 0)
-        add(
-          "pro",
-          atTime(day, "12:00", tz),
-          PRO_FEATURES[n].title,
-          `${PRO_FEATURES[n].body} Try Pro free, cancel in two taps.`,
-          "settings",
-        );
+      const offer = PRO_FEATURES[n];
+      if (offer) add("pro", atTime(day, "12:00", tz), say(lang, offer), say(lang, `${offer}.body`), "settings");
     }
 
     // One a day: the reminder (the lifter asked for it) wins, then streak, missed, Pro.
@@ -340,22 +322,23 @@ export function inQuiet(at: number, tz: string): boolean {
 /** A milestone email for a change the phone just reported, or null. Sent right away, not scheduled. */
 export function milestone(
   prev: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks"> | null,
-  next: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks">,
+  next: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks" | "lang">,
   now: number,
 ): { key: string; title: string; body: string } | null {
+  const { lang } = next;
   if (next.firstWorkoutAt && !prev?.firstWorkoutAt && now - next.firstWorkoutAt < 3 * DAY) {
     return {
       key: "milestone:first",
-      title: "Your first workout is in the books",
-      body: "Nice work. Your next workout builds on today's weights and reps, and your recovery map now shows what you trained.",
+      title: say(lang, "rmd.firstDone"),
+      body: say(lang, "rmd.firstDoneBody"),
     };
   }
   const w = MILESTONE_WEEKS.find((m) => next.streakWeeks >= m && (prev?.streakWeeks ?? 0) < m);
   if (w)
     return {
       key: `milestone:streak${w}`,
-      title: `${w} weeks in a row`,
-      body: `You've hit your training goal ${w} weeks running. That's how strength is built.`,
+      title: say(lang, "rmd.streakWeeks", { weeks: w }),
+      body: say(lang, "rmd.streakWeeksBody", { weeks: w }),
     };
   return null;
 }

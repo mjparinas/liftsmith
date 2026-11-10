@@ -79,6 +79,7 @@ import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
 import * as sband from "./text/sband";
@@ -184,6 +185,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...recap.fr,
   ...recovery.fr,
   ...remix.fr,
+  ...rmd.fr,
   ...rt.fr,
   ...save.fr,
   ...sband.fr,
