@@ -17,6 +17,17 @@ export async function trackJob(job: string, fn: () => Promise<Response>, now: ()
     console.error("[monitor] could not record job start", (e as Error).message);
   }
   const finish = async (ok: boolean, detail: string) => {
+    // A failed run emails the admins (src/server/alerts.ts; at most once every 6 hours per job).
+    if (!ok)
+      await import("./alerts")
+        .then((a) =>
+          a.sendAlert(`job:${job}`, {
+            subject: `The ${job} job failed`,
+            lines: [detail.slice(0, 300) || "No detail."],
+            path: "/admin/?tab=System",
+          }),
+        )
+        .catch(() => false);
     if (id === null) return;
     await run("UPDATE job_runs SET finished_at = ?, ok = ?, detail = ? WHERE id = ?", [now(), ok ? 1 : 0, detail.slice(0, 1000), id]).catch(
       (e: Error) => console.error("[monitor] could not record job end", e.message),
