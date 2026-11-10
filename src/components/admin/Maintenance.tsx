@@ -4,6 +4,8 @@
 // switch on; off needs no typing) and the banner every tab shows while it's on.
 import { useCallback, useEffect, useState } from "react";
 
+import { isVisible, onVisibility } from "@/lib/visibility";
+
 import { ago } from "./time";
 
 type State = { on: boolean; since: number | null; by: string | null };
@@ -19,10 +21,13 @@ export function useMaintenance(): [State | null, () => void] {
         .then(async (r) => r.ok && live && setState((await r.json()) as State))
         .catch(() => {});
     void read();
-    const t = setInterval(() => void read(), 30_000);
+    // Not while the tab is hidden; it reads again when it comes back.
+    const t = setInterval(() => isVisible() && void read(), 30_000);
+    const off = onVisibility((v) => v && void read());
     return () => {
       live = false;
       clearInterval(t);
+      off();
     };
   }, [version]);
   return [state, useCallback(() => setVersion((v) => v + 1), [])];

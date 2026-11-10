@@ -14,7 +14,7 @@ import { saveWorkout } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported, type HrConnection } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
-import { haptic, keepAwake, oops, sound } from "@/lib/juice";
+import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
@@ -26,6 +26,7 @@ import { restAlertOf } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
+import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
 
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
@@ -45,11 +46,18 @@ import { PrMoment } from "./WorkoutJuice";
 
 let hrConn: HrConnection | null = null;
 
+/** How often a heart-rate-only change reaches the live notification (iOS's Live Activity has its own 15 s budget). */
+export const HR_NOTIFY_MS = 5_000;
+
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
-  const now = useNow(250);
+  // While hidden the clock stops (the native notification counts the rest down itself); the web has no
+  // native alert, so it asks for one tick when rest ends, for its rest-over notification.
+  const restAt = useApp((st) => st.active?.restUntil);
+  const now = useNow(250, !isNative() && restAt ? restAt : undefined);
+  const visible = useVisible();
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
@@ -73,11 +81,15 @@ export function Workout() {
   const alert = restAlertOf(profile);
   const scale = profile.training?.effort;
   useEffect(() => {
-    void keepAwake(awake);
     void notifyPermission();
     sound.enabled = profile.restSounds;
+  }, [profile.restSounds]);
+  // The screen stays on while this screen is in front. The phone drops the lock when the app is hidden,
+  // so it's asked for again on return, and let go when the lifter leaves the screen.
+  useEffect(() => {
+    void keepAwake(awake && visible);
     return () => void keepAwake(false);
-  }, [profile.restSounds, awake]);
+  }, [awake, visible]);
 
   const item = active?.plan.items[active.index];
   const ex = item ? exercise(item.exerciseId) : null;
@@ -151,17 +163,27 @@ export function Workout() {
     }
     if (left <= 0) {
       lastBeep.current = 0;
+      // Rest that ran out while the app was away already got its alert (the native notification, or the
+      // web's one tick at restUntil); coming back doesn't chime again.
+      const late = left < -2;
       // The rest-over alert follows its own setting (Workout preferences), not only Sounds and Vibration.
-      sound.restEnd(alert.sound);
-      if (alert.vibrate) haptic("thud", true);
-      void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
+      if (!late) sound.restEnd(alert.sound);
+      if (alert.vibrate && !late) haptic("thud", true);
+      if (!late || !isVisible())
+        void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Keep the live notification in step.
+  // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
+  // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.
+  const notified = useRef({ key: "", at: 0 });
   useEffect(() => {
     if (!active || !ex || !gym) return;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}`;
+    const t0 = Date.now();
+    if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
+    notified.current = { key, at: t0 };
     void updateSession({
       title: resting ? `Rest · ${ex.name}` : ex.name,
       setLabel,
@@ -441,24 +463,27 @@ export function Workout() {
 
           {counting ? (
             <div className="relative mt-4 h-72">
-              <AutoCount
-                key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
-                exerciseId={ex.id}
-                pattern={ex.pattern}
-                body={bodyFor(profile.sex)}
-                bpm={bpm}
-                hrTrend={active.hr}
-                prefs={countPrefs}
-                onPrefs={changeCount}
-                counting={!resting}
-                setKey={`${active.index}:${doneSets}:${warmDone}`}
-                onCount={(n) => {
-                  const a = useApp.getState().active;
-                  if (a) s.adjust(a.weight, n);
-                }}
-                onClose={() => changeCount({ ...countPrefs, on: false })}
-                paused={infoOpen || swapOpen || endOpen}
-              />
+              {/* The camera and pose model shut off while the app is in the background, and start fresh on return. */}
+              {visible && (
+                <AutoCount
+                  key={`${ex.id}:${countPrefs.facing}:${countPrefs.source}`}
+                  exerciseId={ex.id}
+                  pattern={ex.pattern}
+                  body={bodyFor(profile.sex)}
+                  bpm={bpm}
+                  hrTrend={active.hr}
+                  prefs={countPrefs}
+                  onPrefs={changeCount}
+                  counting={!resting}
+                  setKey={`${active.index}:${doneSets}:${warmDone}`}
+                  onCount={(n) => {
+                    const a = useApp.getState().active;
+                    if (a) s.adjust(a.weight, n);
+                  }}
+                  onClose={() => changeCount({ ...countPrefs, on: false })}
+                  paused={infoOpen || swapOpen || endOpen}
+                />
+              )}
             </div>
           ) : (
             <div className="relative mt-4 h-52">

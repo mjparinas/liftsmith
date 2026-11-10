@@ -350,12 +350,22 @@ export async function confetti(big = false) {
   if (big) setTimeout(() => void c({ particleCount: 90, angle: 120, spread: 70, origin: { x: 1 }, colors }), 360);
 }
 
-/** Keeps the screen on during a workout. */
-let lock: { release(): Promise<void> } | null = null;
+/**
+ * Keeps the screen on during a workout. The phone drops the lock itself when the app is hidden (it never
+ * keeps a backgrounded screen on); the workout screen asks again on return, so `lock` is cleared then.
+ */
+type Lock = { release(): Promise<void>; addEventListener?(type: "release", cb: () => void): void };
+let lock: Lock | null = null;
 export async function keepAwake(on: boolean) {
   try {
-    const nav = navigator as Navigator & { wakeLock?: { request(t: "screen"): Promise<{ release(): Promise<void> }> } };
-    if (on && !lock && nav.wakeLock) lock = await nav.wakeLock.request("screen");
+    const nav = navigator as Navigator & { wakeLock?: { request(t: "screen"): Promise<Lock> } };
+    if (on && !lock && nav.wakeLock) {
+      const l = await nav.wakeLock.request("screen");
+      lock = l;
+      l.addEventListener?.("release", () => {
+        if (lock === l) lock = null;
+      });
+    }
     if (!on && lock) {
       await lock.release();
       lock = null;

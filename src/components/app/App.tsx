@@ -17,13 +17,14 @@ import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
-import { onSessionAction, stopSession } from "@/lib/sessionNotify";
+import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme } from "@/lib/themes";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
+import { watchWorkout } from "@/lib/workoutWatch";
 import type { MessageKey } from "@/locales/en";
 
 import { Account } from "./Account";
@@ -159,22 +160,14 @@ export function App() {
   useEffect(() => {
     if (ready) track("screen_view", { screen: profile.onboarded ? route : "onboarding" });
   }, [ready, route, profile.onboarded]);
-  // A workout left running ends itself a few hours after the last set (checked each minute and on open).
+  // A workout left running ends itself a few hours after the last set: one timer for that moment (moved
+  // each time the lifter does something), checked again on return. No minute-by-minute polling, so a
+  // phone with a forgotten workout isn't woken every minute (docs/decisions/battery.md).
   useEffect(() => {
     if (!ready) return;
-    const check = () => {
-      if (useApp.getState().autoEnd()) {
-        void stopSession();
-        if (location.hash.startsWith("#/workout")) go("today");
-      }
-    };
-    check();
-    const id = setInterval(check, 60_000);
-    document.addEventListener("visibilitychange", check);
-    return () => {
-      clearInterval(id);
-      document.removeEventListener("visibilitychange", check);
-    };
+    return watchWorkout(useApp, () => {
+      if (location.hash.startsWith("#/workout")) go("today");
+    });
   }, [ready]);
   // Gym by location: once on open and each time the app comes back to the foreground (never on a timer).
   useEffect(() => {
