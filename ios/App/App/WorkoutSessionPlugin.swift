@@ -2,6 +2,7 @@ import ActivityKit
 import Capacitor
 import UIKit
 import UserNotifications
+import WidgetKit
 
 /// Registers the app's own plugins with the bridge (Capacitor 8 with SPM has no auto-registration
 /// for plugins that live in the app target). Main.storyboard and SceneDelegate use this class.
@@ -30,6 +31,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         CAPPluginMethod(name: "requestPermission", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "update", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "stop", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "setWidget", returnType: CAPPluginReturnPromise),
     ]
 
     private let restId = "liftsmith.rest"
@@ -136,6 +138,16 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             for a in Activity<WorkoutAttributes>.activities where a.id != current?.id { await a.end(nil, dismissalPolicy: .immediate) }
             await current?.end(nil, dismissalPolicy: .immediate)
         }
+    }
+
+    /// The home-screen widget's snapshot (src/lib/widget.ts), read by QuickStartWidget in the widget extension.
+    /// The extension can only read it through the shared App Group "group.com.getliftsmith.app"; until both targets
+    /// have that capability, the snapshot stays in the app's own container and the widget shows its plain buttons.
+    @objc func setWidget(_ call: CAPPluginCall) {
+        guard let json = call.getString("json") else { return call.resolve() }
+        UserDefaults(suiteName: "group.com.getliftsmith.app")?.set(json, forKey: "widget")
+        WidgetCenter.shared.reloadTimelines(ofKind: "QuickStart")
+        call.resolve()
     }
 
     @objc func stop(_ call: CAPPluginCall) {

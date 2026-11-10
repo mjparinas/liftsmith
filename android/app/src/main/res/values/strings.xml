@@ -10,7 +10,7 @@
     <string name="shortcut_log_long">Log the current set as planned</string>
     <string name="shortcut_rest_short">+30 s rest</string>
     <string name="shortcut_rest_long">Add 30 seconds to the rest timer</string>
-    <string name="widget_description">Start today\'s workout or log a set in one tap</string>
+    <string name="widget_description">Today\'s workout and why, your weekly goal and coach\'s note, with Start</string>
     <string name="channel_live">Workout in progress</string>
     <string name="channel_live_desc">Rest timer, next set and heart rate while you train</string>
     <string name="rest_over">Rest over</string>
@@ -21,4 +21,5 @@
     <string name="rest_next">Rest · next: %1$s</string>
     <string name="up_next">Up next: %1$s</string>
     <string name="add_30">+30 s</string>
+    <string name="widget_title">Today\'s workout</string>
 </resources>

@@ -126,7 +126,7 @@
             </intent-filter>
         </service>
 
-        <!-- Home-screen widget: Start workout and Log set (WorkoutWidget.java). -->
+        <!-- Home-screen widget: today's plan and why, weekly goal, coach's note, Start / Log set (WorkoutWidget.java). -->
         <receiver
             android:name=".WorkoutWidget"
             android:exported="false"
