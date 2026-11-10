@@ -4,6 +4,13 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "setup.welcome.title": "Training that adapts to you",
+  "setup.welcome.lead": "Liftsmith plans each workout from your gym, your recovery and your goal, then gets out of the way while you lift.",
+  "setup.welcome.plan": "A fresh plan every day, with the reason behind each weight",
+  "setup.welcome.tap": "One tap logs a set, and the rest timer starts itself",
+  "setup.welcome.quick": "Set up in under a minute. No account needed.",
+  "setup.welcome.start": "Get started",
+  "setup.welcome.signIn": "I already have an account",
   "setup.goal.muscle.blurb": "6–12 reps, more volume",
   "setup.goal.strength.blurb": "Heavier, 4–6 reps on the big lifts",
   "setup.goal.general.blurb": "A bit of everything",
@@ -67,6 +74,14 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "setup.welcome.title": "Entrenamiento que se adapta a ti",
+  "setup.welcome.lead":
+    "Liftsmith planifica cada entrenamiento según tu gimnasio, tu recuperación y tu objetivo, y luego te deja levantar sin distracciones.",
+  "setup.welcome.plan": "Un plan nuevo cada día, con el motivo de cada peso",
+  "setup.welcome.tap": "Un toque registra una serie, y el descanso empieza solo",
+  "setup.welcome.quick": "Configúralo en menos de un minuto. Sin cuenta.",
+  "setup.welcome.start": "Empezar",
+  "setup.welcome.signIn": "Ya tengo una cuenta",
   "setup.goal.muscle.blurb": "6–12 reps, más volumen",
   "setup.goal.strength.blurb": "Más peso, 4–6 reps en los básicos",
   "setup.goal.general.blurb": "Un poco de todo",
@@ -130,6 +145,14 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "setup.welcome.title": "Un entraînement qui s'adapte à vous",
+  "setup.welcome.lead":
+    "Liftsmith prépare chaque séance selon votre salle, votre récupération et votre objectif, puis se fait discret pendant que vous soulevez.",
+  "setup.welcome.plan": "Un nouveau plan chaque jour, avec la raison de chaque charge",
+  "setup.welcome.tap": "Un appui enregistre une série, et le repos démarre tout seul",
+  "setup.welcome.quick": "Prêt en moins d'une minute. Sans compte.",
+  "setup.welcome.start": "Commencer",
+  "setup.welcome.signIn": "J'ai déjà un compte",
   "setup.goal.muscle.blurb": "6 à 12 répétitions, plus de volume",
   "setup.goal.strength.blurb": "Plus lourd, 4 à 6 répétitions sur les gros mouvements",
   "setup.goal.general.blurb": "Un peu de tout",

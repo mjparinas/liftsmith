@@ -27,8 +27,12 @@ const shot = async (n, full = false) => {
   await page.screenshot({ path: `${OUT}/${n}.png`, fullPage: full });
 };
 await page.goto(`${server.url}/app/`);
+await page.getByRole("button", { name: "Get started" }).waitFor();
+await shot("00-welcome");
+await page.getByRole("button", { name: "Get started" }).click();
 await page.getByRole("button", { name: "Continue" }).waitFor();
 await shot("01-setup");
+await page.getByRole("button", { name: "Back" }).click();
 await onboard(page);
 await shot("02-today-empty-history");
 await page.locator("#len").fill("30");

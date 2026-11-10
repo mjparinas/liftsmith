@@ -31,7 +31,7 @@ for (const { name } of pick()) {
   };
   try {
     await page.goto(`${server.url}/app/`);
-    await noSideScroll("onboarding");
+    await noSideScroll("welcome");
     await onboard(page);
     await noSideScroll("today");
     for (const tab of ["Today", "Body", "Progress", "Gyms"]) {

@@ -50,7 +50,6 @@ export const en = {
   "account.row": "Account and sync",
   "account.row.out": "Sign in to back up and sync",
   "account.row.in": "Signed in as {email}",
-  "account.setup": "Already use Liftsmith? Sign in",
 } as const;
 
 type Key = keyof typeof en;
@@ -103,7 +102,6 @@ export const es: Partial<Record<Key, Message>> = {
   "account.row": "Cuenta y sincronización",
   "account.row.out": "Inicia sesión para guardar y sincronizar",
   "account.row.in": "Sesión iniciada como {email}",
-  "account.setup": "¿Ya usas Liftsmith? Inicia sesión",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -157,5 +155,4 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.row": "Compte et synchronisation",
   "account.row.out": "Connectez-vous pour sauvegarder et synchroniser",
   "account.row.in": "Connecté en tant que {email}",
-  "account.setup": "Vous utilisez déjà Liftsmith ? Connectez-vous",
 };

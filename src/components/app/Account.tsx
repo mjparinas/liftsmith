@@ -1,8 +1,8 @@
 "use client";
 
 // Optional account: sign in to back up and sync (auth.ts, sync.ts). `AccountPanel` is the sign-in and status
-// block, used on the Account screen (#/account), in Settings and on setup's first step ("Already use
-// Liftsmith? Sign in").
+// block, used on the Account screen (#/account), in Settings and on the welcome screen before
+// setup ("I already have an account").
 import { useEffect, useRef, useState } from "react";
 
 import { track } from "@/lib/analytics";

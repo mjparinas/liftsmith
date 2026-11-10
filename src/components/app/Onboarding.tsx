@@ -20,12 +20,12 @@ import { declineTrial, startTrial } from "@/lib/trial";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 
-import { AccountPanel } from "./Account";
 import { Mascot } from "./Mascot";
 import { Plans, ProFeatures } from "./Pro";
 import { go } from "./router";
 import { SaveStep } from "./Saving";
-import { BumpField, Button, Sheet } from "./ui";
+import { BumpField, Button } from "./ui";
+import { Welcome } from "./Welcome";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
@@ -182,7 +182,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // The store's own trial length for this person (null once they've used a trial), else the flag's.
   const offers = useBilling((b) => b.offers);
   const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
-  const [signIn, setSignIn] = useState(false);
+  // First run opens on the welcome screen; a rerun from Settings goes straight to the questions.
+  const [welcome, setWelcome] = useState(!rerun);
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [hrBusy, setHrBusy] = useState(false);
@@ -214,9 +215,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   useEffect(() => void healthAvailable().then(setCanHealth), []);
   // The setup funnel: which step each install reached.
   useEffect(() => {
+    if (welcome) return track("onboarding_step", { step: -1, name: "Welcome" });
     track("onboarding_step", { step, name: STEP_NAMES[step] });
     if (step === PRO_STEP) track("paywall_view", { from: "setup" });
-  }, [step]);
+  }, [step, welcome]);
 
   const fillFromHealth = async () => {
     const ok = await connectHealth();
@@ -264,6 +266,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     if (rerun) go("today");
   };
 
+  if (welcome) return <Welcome onStart={() => setWelcome(false)} />;
+
   return (
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="mt-6 flex gap-1.5" aria-hidden>
@@ -308,16 +312,6 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               maxLength={40}
               className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none"
             />
-            {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
-            {!rerun && (
-              <Button kind="quiet" className="mt-6 w-full" onClick={() => setSignIn(true)}>
-                {t("account.setup")}
-              </Button>
-            )}
-            <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
-              <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
-              <AccountPanel onSignedIn={() => setSignIn(false)} />
-            </Sheet>
           </>
         )}
         {step === 1 && (
@@ -582,11 +576,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
       </div>
       <div className="flex gap-3 pb-2">
-        {(step > 0 || rerun) && (
-          <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>
-            {t("setup.back")}
-          </Button>
-        )}
+        <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : rerun ? go("settings") : setWelcome(true))}>
+          {t("setup.back")}
+        </Button>
         {step < PRO_STEP && (
           <Button
             className="flex-1 py-4 text-lg"

@@ -120,6 +120,7 @@ async function workout({ late = false, last = false } = {}) {
 
 /** A believable lifter: some experience, 80 kg, 32, male, with known numbers, so the weights look real. */
 async function setup() {
+  await page.getByRole("button", { name: "Get started" }).click();
   await page.locator("#setup-name").fill("Sam");
   await page.getByRole("button", { name: /Some experience/ }).click();
   await page.getByRole("button", { name: "Continue" }).click();

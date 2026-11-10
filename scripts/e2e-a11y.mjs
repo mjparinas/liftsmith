@@ -42,7 +42,14 @@ try {
   await page.goto(`${server.url}/`);
   await scan("home");
   await page.goto(`${server.url}/app/`);
+  await scan("welcome");
+  await page.getByRole("button", { name: "I already have an account" }).click();
+  await page.getByRole("dialog").waitFor();
+  await scan("welcome sign-in");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Get started" }).click();
   await scan("onboarding");
+  await page.getByRole("button", { name: "Back" }).click();
   await onboard(page);
   await scan("today");
   await page.getByRole("button", { name: "Start workout" }).click();
