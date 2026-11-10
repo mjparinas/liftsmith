@@ -12,7 +12,7 @@ import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { quoteOfDay } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
-import { CALL_TEXT, type Call } from "@/lib/readiness";
+import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
@@ -32,7 +32,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
-import { Button, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { Button, Chip, EmptyState, LinkToggle, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -54,6 +54,41 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
         </span>
       )}
     </span>
+  );
+}
+
+/**
+ * The pre-workout check-in (Melvin, 2026-11-10): how the lifter feels today, in one tap. Low, sore and
+ * unwell take today easier (unwell makes it an easy day outright), great nudges it up; the call above, the
+ * plan and the playlist follow at once. Optional, and changeable all day.
+ */
+function FeelCheckIn({ now }: { now: number }) {
+  const { events, feel } = useApp();
+  const said = todayFeel(events, now);
+  const energies = [
+    { v: -1, key: "td.feelLow" },
+    { v: 0, key: "td.feelOk" },
+    { v: 1, key: "td.feelGreat" },
+  ] as const;
+  return (
+    <div className="mt-3" role="group" aria-labelledby="feel-title">
+      <p id="feel-title" className="text-sm font-medium">
+        {t("td.feel")}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {energies.map((e) => (
+          <Chip key={e.v} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
+            {t(e.key)}
+          </Chip>
+        ))}
+        <Chip active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
+          {t("td.feelSore")}
+        </Chip>
+        <Chip active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
+          {t("td.feelUnwell")}
+        </Chip>
+      </div>
+    </div>
   );
 }
 
@@ -238,6 +273,7 @@ export function Today() {
               ))}
             </ul>
           )}
+          <FeelCheckIn now={now} />
           <div className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1" role="group" aria-label={t("td.call")}>
             {(["recover", "normal", "push"] as Call[]).map((c) => {
               const on = preview.call === c;

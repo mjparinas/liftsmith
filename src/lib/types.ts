@@ -566,6 +566,20 @@ export interface CheckinEvent extends EventBase {
   buddies: string[];
 }
 
+/**
+ * The pre-workout check-in on Today: how the lifter feels, in three taps at most. The newest one from today
+ * moves today's call (readiness.ts); older ones are history. Kept and synced like any other event.
+ */
+export interface FeelEvent extends EventBase {
+  type: "feel";
+  /** −1 low, 0 okay, 1 great. */
+  energy: -1 | 0 | 1;
+  /** Sore from the last workout. */
+  sore?: boolean;
+  /** Feeling ill: today becomes an easy day whatever else the data says. */
+  unwell?: boolean;
+}
+
 /** A warm-up set (warmup.ts). Its own type, so stats, recovery, progression and streaks never count it. */
 export interface WarmupEvent extends EventBase {
   type: "warmup";
@@ -665,6 +679,7 @@ export type AppEvent =
   | HealthEvent
   | TdeeEvent
   | CheckinEvent
+  | FeelEvent
   | SetEvent
   | SessionStartEvent
   | SessionEndEvent

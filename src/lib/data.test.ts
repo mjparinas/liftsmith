@@ -3,9 +3,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
-import { PUSH_AT, readiness, RECOVER_AT } from "./readiness";
+import { PUSH_AT, readiness, RECOVER_AT, todayFeel } from "./readiness";
 import { AUTO_END_MS, hrWindow, useApp } from "./store";
-import type { AppEvent, SetEvent } from "./types";
+import type { AppEvent, FeelEvent, SetEvent } from "./types";
 
 // "Win on data" (Melvin, 2026-11-09): every set and the whole heart rate stream are captured,
 // a forgotten workout ends itself, and the data decides whether today is a push or an easy day.
@@ -82,6 +82,24 @@ describe("readiness: rest or push", () => {
     expect(readiness(ev, profile, NOW, { sleepHours: 4, hrvDelta: -0.3, checkIn: -1, restingHrDelta: 9 }).call).toBe("recover");
     const high = readiness(ev, profile, NOW, { sleepHours: 8.5, hrvDelta: 0.1, checkIn: 1 });
     expect(high.score).toBeGreaterThan(low.score);
+  });
+
+  it("counts today's check-in: energy, sore, and unwell making it an easy day", () => {
+    const feel = (at: number, over: Partial<FeelEvent> = {}): FeelEvent => ({ type: "feel", id: `f${n++}`, at, energy: 0, ...over });
+    const ev = session(NOW - 3 * D, "a");
+    const base = readiness(ev, profile, NOW);
+    expect(readiness([...ev, feel(NOW - H, { energy: -1 })], profile, NOW).score).toBe(base.score - 15);
+    expect(readiness([...ev, feel(NOW - H, { energy: 1 })], profile, NOW).score).toBe(base.score + 8);
+    const sore = readiness([...ev, feel(NOW - H, { sore: true })], profile, NOW);
+    expect(sore.score).toBe(base.score - 8);
+    expect(sore.signals.map((s) => s.text)).toContain("You said you're sore");
+    // Unwell is an easy day whatever else says push, even on the first workout.
+    expect(readiness([...ev, feel(NOW - H, { energy: 1, unwell: true })], profile, NOW, { sleepHours: 9 }).call).toBe("recover");
+    expect(readiness([feel(NOW - H, { unwell: true })], profile, NOW).call).toBe("recover");
+    // Yesterday's answer doesn't count today; the newest one today does.
+    expect(readiness([...ev, feel(NOW - D, { energy: -1 })], profile, NOW).score).toBe(base.score);
+    const later = feel(NOW - 1000, { energy: 1 });
+    expect(todayFeel([...ev, feel(NOW - H, { energy: -1 }), later], NOW)).toBe(later);
   });
 
   it("never pushes in a deload week", () => {

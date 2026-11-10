@@ -11,7 +11,7 @@ vi.mock("@capgo/capacitor-health", () => ({
 let os = "android";
 vi.mock("@capacitor/core", () => ({ Capacitor: { getPlatform: () => os } }));
 
-const save = vi.fn(async (_o: unknown) => ({ saved: true }));
+const save = vi.fn<(o: unknown) => Promise<{ saved: boolean }>>(async () => ({ saved: true }));
 const W = {
   id: "s1",
   start: 1_000_000,
