@@ -57,7 +57,7 @@ export interface Forecast {
 /** Best estimated one-rep max per session for a lift, oldest first. */
 export function e1rmHistory(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
   return sessionsOf(events, exerciseId)
-    .map((sets) => ({ at: sets[0].at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, Math.min(s.reps, 12)) : 0))) }))
+    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, Math.min(s.reps, 12)) : 0))) }))
     .filter((x) => x.e1 > 0)
     .reverse();
 }
@@ -65,16 +65,16 @@ export function e1rmHistory(events: readonly AppEvent[], exerciseId: string): { 
 /** Monthly gain (share) from a least-squares fit of log one-rep max over the last 12 weeks. */
 export function observedRate(hist: { at: number; e1: number }[], now: number): number | null {
   const pts = hist.filter((h) => h.at >= now - 84 * DAY);
-  if (pts.length < 4 || pts.at(-1)!.at - pts[0].at < 28 * DAY) return null;
-  const xs = pts.map((p) => (p.at - pts[0].at) / MONTH);
+  if (pts.length < 4 || pts.at(-1)!.at - pts[0]!.at < 28 * DAY) return null;
+  const xs = pts.map((p) => (p.at - pts[0]!.at) / MONTH);
   const ys = pts.map((p) => Math.log(p.e1));
   const mx = xs.reduce((a, b) => a + b, 0) / xs.length;
   const my = ys.reduce((a, b) => a + b, 0) / ys.length;
   let num = 0;
   let den = 0;
   for (let i = 0; i < xs.length; i++) {
-    num += (xs[i] - mx) * (ys[i] - my);
-    den += (xs[i] - mx) ** 2;
+    num += (xs[i]! - mx) * (ys[i]! - my);
+    den += (xs[i]! - mx) ** 2;
   }
   return den > 0 ? Math.exp(num / den) - 1 : null;
 }

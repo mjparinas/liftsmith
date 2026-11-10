@@ -34,13 +34,13 @@ export function periodStarts(events: readonly AppEvent[]): number[] {
 export function cycleLength(starts: readonly number[]): number {
   const gaps = starts
     .slice(1)
-    .map((s, i) => Math.round((s - starts[i]) / DAY))
+    .map((s, i) => Math.round((s - starts[i]!) / DAY))
     .filter((g) => g >= 21 && g <= 45)
     .slice(-6)
     .sort((a, b) => a - b);
   if (!gaps.length) return DEFAULT_CYCLE;
   const m = gaps.length >> 1;
-  return gaps.length % 2 ? gaps[m] : Math.round((gaps[m - 1] + gaps[m]) / 2);
+  return gaps.length % 2 ? gaps[m]! : Math.round((gaps[m - 1]! + gaps[m]!) / 2);
 }
 
 export function cycleState(events: readonly AppEvent[], now: number): CycleState | null {

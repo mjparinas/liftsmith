@@ -70,7 +70,7 @@ export const FIX_TEXT: Record<FixKind, { title: string; what: string }> = {
 /** Best estimated one-rep max per session for a lift, oldest first (sets with no load are left out). */
 function series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number; sets: SetEvent[] }[] {
   return sessionsOf(events, exerciseId)
-    .map((sets) => ({ at: sets[0].at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, s.reps) : 0))), sets }))
+    .map((sets) => ({ at: sets[0]!.at, e1: Math.max(...sets.map((s) => (s.weight > 0 ? epley(s.weight, s.reps) : 0))), sets }))
     .filter((s) => s.e1 > 0)
     .reverse();
 }
@@ -97,7 +97,7 @@ export function findPlateaus(events: readonly AppEvent[], profile: Profile, now:
     const since = s.filter((x) => x.at > bestAt);
     if (since.length < 2) continue;
     const causes = diagnose(events, profile, id, since, bestAt, now);
-    out.push({ exerciseId: id, weeks: Math.floor((now - bestAt) / WEEK), best, bestAt, causes, fix: causes[0].fix });
+    out.push({ exerciseId: id, weeks: Math.floor((now - bestAt) / WEEK), best, bestAt, causes, fix: causes[0]!.fix });
   }
   return out.sort((a, b) => b.weeks - a.weeks);
 }
@@ -124,7 +124,7 @@ function diagnose(
 
   // Weekly hard sets for the main muscle against this block's target.
   const weeks = Math.max(1, Math.round((now - from) / WEEK));
-  const muscle = ex.primary[0];
+  const muscle = ex.primary[0]!;
   let musc = 0;
   for (const e of events) {
     if (e.type !== "set" || e.at <= from) continue;
@@ -213,7 +213,7 @@ export function applyFixes(
         return { ...item, restSec: item.restSec + 60, target: { ...item.target, note: `${item.target.note} · ${t("note.fixRest")}` } };
       case "reset": {
         // Only the first session of the fix drops; double progression rebuilds from there.
-        const doneSince = sessionsOf(events, ex.id).some((s) => s[0].at >= f.startedAt);
+        const doneSince = sessionsOf(events, ex.id).some((s) => s[0]!.at >= f.startedAt);
         if (doneSince) return item;
         const kg = roundLoad(
           f.from > 0 ? weightFor(f.from * 0.9, item.target.reps, item.target.rir) : item.target.weight * 0.9,

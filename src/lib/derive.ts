@@ -103,7 +103,7 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
       if (prev === undefined || e1 > prev) best.set(exId, e1);
     }
     const end = ends.get(sessionId);
-    const start = list[0].at;
+    const start = list[0]!.at;
     sessions.push({
       sessionId,
       start,

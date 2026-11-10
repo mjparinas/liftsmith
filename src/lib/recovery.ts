@@ -59,7 +59,7 @@ export const BANDS: { band: Band; label: string; min: number; colour: string; hi
 ];
 
 export function bandOf(recovery: number): (typeof BANDS)[number] {
-  return BANDS.find((b) => recovery >= b.min) ?? BANDS[BANDS.length - 1];
+  return BANDS.find((b) => recovery >= b.min) ?? BANDS[BANDS.length - 1]!;
 }
 
 function tau(m: Muscle): number {

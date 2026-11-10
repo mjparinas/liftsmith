@@ -83,14 +83,14 @@ export function planFromRoutine(
       exerciseId: ex.id,
       sets: i.sets,
       restSec: restFor(ex, profile.goal, profile.training),
-      focus: ex.primary[0],
+      focus: ex.primary[0]!,
       target: target(ex, events, profile, gym, now),
     };
   });
   // A superset only holds where both exercises are still here and next to each other.
   const linked = withLinks(
     plain,
-    kept.slice(0, -1).map((k, i) => !!k.group && k.group === kept[i + 1].group),
+    kept.slice(0, -1).map((k, i) => !!k.group && k.group === kept[i + 1]!.group),
   );
   const items = withWarmups(linked, gym, (id) => EXERCISE_BY_ID.get(id)!);
   return {
@@ -110,7 +110,7 @@ export function moveItem(items: readonly RoutineItem[], i: number, dir: -1 | 1):
   const j = i + dir;
   if (j < 0 || j >= items.length) return [...items];
   const out = items.map(({ group: _g, ...x }) => x as RoutineItem); // eslint-disable-line @typescript-eslint/no-unused-vars
-  [out[i], out[j]] = [out[j], out[i]];
+  [out[i], out[j]] = [out[j]!, out[i]!];
   // Moving breaks the links around the two that swapped; the rest stay.
   const lo = Math.min(i, j);
   const links = linksOf(items).map((on, k) => on && k !== lo - 1 && k !== lo && k !== lo + 1);

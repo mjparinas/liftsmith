@@ -118,7 +118,7 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
   const frozen: number[] = [];
   if (weeks.length) {
     // Walk every week from the first workout to last week. weekOf(w + 8 days) steps across DST safely.
-    for (let w = weeks[0]; w < thisWeekStart; w = weekOf(w + WEEK + DAY)) {
+    for (let w = weeks[0]!; w < thisWeekStart; w = weekOf(w + WEEK + DAY)) {
       if (met(w)) {
         streak++;
         run++;
@@ -283,7 +283,7 @@ function setsOf(events: readonly AppEvent[]): SetEvent[] {
 function sessionsOf(sets: SetEvent[]): Session[] {
   const by = new Map<string, SetEvent[]>();
   for (const s of sets) by.set(s.sessionId, [...(by.get(s.sessionId) ?? []), s]);
-  return [...by].map(([id, list]) => ({ id, at: list[0].at, sets: list }));
+  return [...by].map(([id, list]) => ({ id, at: list[0]!.at, sets: list }));
 }
 
 /** The three quests for the week starting on `monday`, with progress. */
@@ -296,9 +296,9 @@ export function questsFor(events: readonly AppEvent[], profile: Profile, monday:
   const r = rng(hash(`quests:${new Date(monday).toDateString()}`));
   // "Train your days" is always one of the three; the other two rotate.
   const pool = QUESTS.slice(1);
-  const picks = [QUESTS[0]];
+  const picks = [QUESTS[0]!];
   while (picks.length < 3) {
-    const q = pool.splice(Math.floor(r() * pool.length), 1)[0];
+    const q = pool.splice(Math.floor(r() * pool.length), 1)[0]!;
     picks.push(q);
   }
   return picks.map((q) => {
@@ -356,7 +356,7 @@ export function league(events: readonly AppEvent[], stats: Stats, profile: Profi
   }
   history.push([thisWeekStart, i]);
   return {
-    league: LEAGUES[i],
+    league: LEAGUES[i]!,
     index: i,
     weekXp: weekXp(events, stats, profile, thisWeekStart),
     promoteAt: i < LEAGUES.length - 1 ? promoteAt(i) : null,
@@ -414,7 +414,7 @@ export function crateFor(sessionId: string): Cosmetic {
     x -= RARITY_WEIGHT[c.rarity];
     if (x < 0) return c;
   }
-  return pool[pool.length - 1];
+  return pool[pool.length - 1]!;
 }
 
 /** Crates from every finished workout, oldest first; a repeat prize turns into bonus XP. */

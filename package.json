@@ -14,7 +14,8 @@
     "test:mutation": "stryker run",
     "e2e": "node scripts/e2e.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "typecheck:engine": "tsc --noEmit -p tsconfig.engine.json"
   },
   "dependencies": {
     "@capacitor-community/bluetooth-le": "^8.3.0",

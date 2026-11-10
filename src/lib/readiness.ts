@@ -54,14 +54,14 @@ const median = (xs: number[]) => {
   if (!xs.length) return NaN;
   const s = [...xs].sort((a, b) => a - b);
   const m = s.length >> 1;
-  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+  return s.length % 2 ? s[m]! : (s[m - 1]! + s[m]!) / 2;
 };
 
 /** Sessions with at least one set, newest first, each with its sets. */
 function recentSessions(events: readonly AppEvent[]): { id: string; at: number; sets: SetEvent[] }[] {
   const by = new Map<string, SetEvent[]>();
   for (const e of events) if (e.type === "set") by.set(e.sessionId, [...(by.get(e.sessionId) ?? []), e]);
-  return [...by.entries()].map(([id, sets]) => ({ id, at: sets[sets.length - 1].at, sets })).sort((a, b) => b.at - a.at);
+  return [...by.entries()].map(([id, sets]) => ({ id, at: sets[sets.length - 1]!.at, sets })).sort((a, b) => b.at - a.at);
 }
 
 /** Seconds per rep for one exercise in each past session, newest first. */
@@ -94,7 +94,7 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   else if (big < 60) add(-15, t("sig.bigRecovering"));
 
   // 2. Days since the last workout, and how many in a row.
-  const gap = (now - sessions[0].at) / DAY;
+  const gap = (now - sessions[0]!.at) / DAY;
   const streak = sessions.filter((s) => now - s.at < 3 * DAY).length;
   if (gap >= 2 && gap < 10) add(8, t("sig.rested"));
   if (gap >= 10) add(-5, t("sig.longGap"));
@@ -112,7 +112,7 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   }
 
   // 4. How the last workout felt.
-  const lastId = sessions[0].id;
+  const lastId = sessions[0]!.id;
   const ratings = events.filter((e) => e.type === "feedback" && e.sessionId === lastId).map((e) => (e.type === "feedback" ? e.rating : 0));
   const hard = ratings.filter((r) => r < 0).length;
   const easy = ratings.filter((r) => r > 0).length;
@@ -121,9 +121,9 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
 
   // 5. Rep speed: slower reps than usual at the same exercises means fatigue.
   const slowdowns: number[] = [];
-  for (const ex of new Set(sessions[0].sets.map((s) => s.exerciseId))) {
+  for (const ex of new Set(sessions[0]!.sets.map((s) => s.exerciseId))) {
     const h = paceHistory(events, ex);
-    if (h.length >= 3) slowdowns.push(h[0] / median(h.slice(1, 6)));
+    if (h.length >= 3) slowdowns.push(h[0]! / median(h.slice(1, 6)));
   }
   if (slowdowns.length) {
     const slow = median(slowdowns);
@@ -135,7 +135,7 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const ends = events.filter((e): e is SessionEndEvent => e.type === "sessionEnd" && !!e.avgHr).sort((a, b) => b.at - a.at);
   if (ends.length >= 4) {
     const usual = median(ends.slice(1, 8).map((e) => e.avgHr!));
-    const d = ends[0].avgHr! - usual;
+    const d = ends[0]!.avgHr! - usual;
     if (d > 8) add(-8, t("sig.hrHigh"));
     else if (d < -6) add(4, t("sig.hrLow"));
   }
