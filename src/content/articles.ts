@@ -6,6 +6,8 @@
 import { BLOG_A } from "./blog/a";
 import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
+import { BLOG_D } from "./blog/d";
+import { BLOG_E } from "./blog/e";
 import { GUIDES } from "./guides";
 
 export type CtaTopic =
@@ -135,7 +137,7 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
   },
 };
 
-export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C];
+export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C, ...BLOG_D, ...BLOG_E];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));
 
