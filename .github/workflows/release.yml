@@ -84,7 +84,9 @@ jobs:
         if: env.HAS_KEY == 'true'
         with:
           name: liftsmith-release-aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: |
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/wear/build/outputs/bundle/release/wear-release.aab
           retention-days: 30
       - name: Upload to Play (internal)
         if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true'
@@ -94,6 +96,19 @@ jobs:
           packageName: com.getliftsmith.app
           releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
           track: internal
+          status: completed
+      # The Wear OS app goes to Play's Wear OS internal track. Play takes it only once the Wear OS form factor is
+      # added in Play Console (Test and release › Advanced settings › Form factors), so until then this step fails
+      # without stopping the phone release (docs/decisions/watch-apps.md).
+      - name: Upload the Wear OS app to Play (Wear OS internal)
+        if: env.HAS_KEY == 'true' && env.HAS_PLAY == 'true'
+        continue-on-error: true
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.getliftsmith.app
+          releaseFiles: android/wear/build/outputs/bundle/release/wear-release.aab
+          track: wear:internal
           status: completed
 
   ios:

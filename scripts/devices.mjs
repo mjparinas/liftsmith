@@ -43,7 +43,9 @@ export async function open(name) {
   const { defaultBrowserType, ...opts } = d;
   const type = defaultBrowserType === "webkit" ? webkit : chromium;
   if (!(defaultBrowserType in launched)) {
-    launched[defaultBrowserType] = await type.launch().catch((e) => {
+    // PW_CHROMIUM points at another Chromium (cloud sessions ship one that doesn't match the pinned Playwright).
+    const launchOpts = defaultBrowserType !== "webkit" && process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {};
+    launched[defaultBrowserType] = await type.launch(launchOpts).catch((e) => {
       if (process.env.CI) throw e;
       console.log(`(skipping ${defaultBrowserType} devices: ${String(e).split("\n")[0]})`);
       return null;

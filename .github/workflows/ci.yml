@@ -241,12 +241,18 @@ jobs:
           restore-keys: |
             gradle-build-${{ runner.os }}-${{ hashFiles('package-lock.json', 'android/**/*.gradle') }}-
             gradle-build-${{ runner.os }}-
-      - run: ./gradlew assembleDebug --no-daemon --build-cache --parallel
+      # The phone app and the Wear OS app (android/wear), plus both apps' native unit tests.
+      - run: ./gradlew assembleDebug :app:testDebugUnitTest :wear:testDebugUnitTest --no-daemon --build-cache --parallel
         working-directory: android
       - uses: actions/upload-artifact@v7
         with:
           name: liftsmith-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
+          retention-days: 7
+      - uses: actions/upload-artifact@v7
+        with:
+          name: liftsmith-wear-debug-apk
+          path: android/wear/build/outputs/apk/debug/wear-debug.apk
           retention-days: 7
 
   # Doesn't wait for the web build: nobody installs this build, and the compile doesn't depend on the web
@@ -282,11 +288,12 @@ jobs:
           done
           exit 1
       # A generic simulator destination builds every simulator architecture; arm64 alone (the runner's own)
-      # halves the compile. No index store either, since nobody browses this build in Xcode.
+      # halves the compile. No index store either, since nobody browses this build in Xcode. No -sdk: the
+      # destination picks the iOS simulator, and the embedded Apple Watch app builds for the watch simulator.
       - name: Build for the simulator (unsigned)
         run: >
           xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug
-          -sdk iphonesimulator -destination 'generic/platform=iOS Simulator'
+          -destination 'generic/platform=iOS Simulator'
           -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO ARCHS=arm64 ONLY_ACTIVE_ARCH=YES
           COMPILER_INDEX_STORE_ENABLE=NO build
 

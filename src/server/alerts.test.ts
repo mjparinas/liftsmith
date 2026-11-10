@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import * as automationsRoute from "@/app/api/admin/automations/route.api";
 import * as maintenanceRoute from "@/app/api/admin/maintenance/route.api";
@@ -84,22 +84,33 @@ describe("maintenance mode", () => {
   });
 
   it("answers 503 from the proxy while on, and reads the switch at most every 15 seconds", async () => {
+    // The proxy reads the clock itself; pin it to NOW, or once the real time passes NOW its cached reading
+    // looks newer than NOW + the cache time and the switch never seems stale.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
+    onTestFinished(() => void vi.useRealTimers());
     const req = (path: string) =>
       ({ nextUrl: new URL(`${SITE}${path}`), headers: new Headers({ origin: "capacitor://localhost" }) }) as never;
-    expect((await proxy(req("/api/sync/"))).status).toBe(200);
-    await setMaintenance(true, "owner@example.com", NOW);
-    const api = await proxy(req("/api/sync/"));
-    expect(api.status).toBe(503);
-    expect(api.headers.get("x-maintenance")).toBe("on");
-    expect(api.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
-    expect(await api.json()).toMatchObject({ error: expect.stringMatching(/maintenance/) });
-    const page = await proxy(req("/exercises/"));
-    expect(page.headers.get("content-type")).toMatch(/text\/html/);
-    expect((await proxy(req("/admin/"))).status).toBe(200);
-    // Another server's copy catches up within the cache time.
-    await run("UPDATE admin_settings SET value = ? WHERE key = 'maintenance'", [JSON.stringify({ on: false })]);
-    expect(await maintenanceOn(NOW + 1000)).toBe(true);
-    expect(await maintenanceOn(NOW + MAINTENANCE_CACHE_MS + 1)).toBe(false);
+    // The proxy reads the clock itself, so pin it to NOW: the cache times below are counted from there.
+    vi.useFakeTimers({ now: NOW, toFake: ["Date"] });
+    try {
+      expect((await proxy(req("/api/sync/"))).status).toBe(200);
+      await setMaintenance(true, "owner@example.com", NOW);
+      const api = await proxy(req("/api/sync/"));
+      expect(api.status).toBe(503);
+      expect(api.headers.get("x-maintenance")).toBe("on");
+      expect(api.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
+      expect(await api.json()).toMatchObject({ error: expect.stringMatching(/maintenance/) });
+      const page = await proxy(req("/exercises/"));
+      expect(page.headers.get("content-type")).toMatch(/text\/html/);
+      expect((await proxy(req("/admin/"))).status).toBe(200);
+      // Another server's copy catches up within the cache time.
+      await run("UPDATE admin_settings SET value = ? WHERE key = 'maintenance'", [JSON.stringify({ on: false })]);
+      expect(await maintenanceOn(NOW + 1000)).toBe(true);
+      expect(await maintenanceOn(NOW + MAINTENANCE_CACHE_MS + 1)).toBe(false);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("needs TURN ON typed and an admin, and is audited", async () => {

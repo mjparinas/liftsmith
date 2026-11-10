@@ -6,6 +6,7 @@ import { useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 
 import { loadText, repsText } from "../format";
+import { MoveButtons, useReorder } from "../Reorder";
 import { muscleHue } from "../theme";
 import { LinkToggle } from "../ui";
 
@@ -13,6 +14,10 @@ import { LinkToggle } from "../ui";
 export function ComingUp() {
   const s = useApp();
   const { active, profile } = s;
+  const last = (active?.plan.items.length ?? 1) - 1;
+  const lo = (active?.index ?? 0) + 1;
+  // Press and hold a row to drag it (Reorder.tsx); only exercises still to come move.
+  const r = useReorder((from, to) => s.moveExercise(from, to), { min: lo, max: last });
   if (!active) return null;
   return (
     <section className="mt-6">
@@ -22,8 +27,14 @@ export function ComingUp() {
           const e = exercise(it.exerciseId);
           const at = active.index + 1 + i;
           const ss = supersetLabel(active.plan.items, at);
+          const look = r.style(at);
           return (
-            <li key={it.exerciseId} className={`flex items-center gap-1 pr-2 ${ss ? "bg-accent/5" : ""}`}>
+            <li
+              key={it.exerciseId}
+              {...r.row(at)}
+              className={`flex select-none items-center gap-1 pr-2 transition-shadow ${ss ? "bg-accent/5" : ""} ${look.className}`}
+              style={look.css}
+            >
               <button
                 type="button"
                 onClick={() => s.goTo(at)}
@@ -40,12 +51,23 @@ export function ComingUp() {
                   {it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}
                 </span>
               </button>
-              <LinkToggle
-                on={linkedToNext(active.plan.items, at - 1)}
-                first={exercise(active.plan.items[at - 1].exerciseId).name}
-                second={e.name}
-                onToggle={() => s.toggleSuperset(at - 1)}
-              />
+              {r.picked === at ? (
+                <MoveButtons
+                  name={e.name}
+                  canUp={at > lo}
+                  canDown={at < last}
+                  onUp={() => r.step(at, -1)}
+                  onDown={() => r.step(at, 1)}
+                  onDone={() => r.setPicked(null)}
+                />
+              ) : (
+                <LinkToggle
+                  on={linkedToNext(active.plan.items, at - 1)}
+                  first={exercise(active.plan.items[at - 1].exerciseId).name}
+                  second={e.name}
+                  onToggle={() => s.toggleSuperset(at - 1)}
+                />
+              )}
             </li>
           );
         })}

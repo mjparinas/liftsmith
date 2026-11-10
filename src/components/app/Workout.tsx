@@ -19,7 +19,7 @@ import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { chipText, notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -29,6 +29,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
+import { pickBpm, type WatchReading } from "@/lib/watchHr";
 
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
@@ -41,6 +42,7 @@ import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, Sheet, Stepper } from "./ui";
 import { ComingUp } from "./workout/ComingUp";
+import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
@@ -75,8 +77,10 @@ export function Workout() {
   const hr = useSyncExternalStore(hrLink.subscribe, hrLink.get, hrLink.get);
   const hrBusy = hr.status === "connecting";
   const hrError = hr.error;
-  // A reading only counts while the monitor is connected.
-  const bpm = hr.status === "live" ? lastBpm : null;
+  // Heart rate from our own watch app (Wear OS, Apple Watch), used when no Bluetooth monitor is live (watchHr.ts).
+  const [watchHr, setWatchHr] = useState<WatchReading | null>(null);
+  // A reading only counts while the monitor is connected, or while the watch's is fresh.
+  const bpm = pickBpm(hr.status === "live" ? lastBpm : null, watchHr, now);
   const [popKey, setPopKey] = useState(0);
   // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
   const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
@@ -111,7 +115,17 @@ export function Workout() {
       useApp.getState().pushHr(b);
     });
     if (sessionId && hrSupported()) hrLink.auto(sessionId);
-    return () => hrLink.onBpm(() => {});
+    // The watch's readings go into the workout's log only while no monitor is, so one stream never mixes with another.
+    const offWatch = sessionId
+      ? onWatchHeartRate((b) => {
+          setWatchHr({ bpm: b, at: Date.now() });
+          if (hrLink.get().status !== "live") useApp.getState().pushHr(b);
+        })
+      : () => {};
+    return () => {
+      hrLink.onBpm(() => {});
+      offWatch();
+    };
   }, [sessionId]);
 
   const item = active?.plan.items[active.index];
@@ -183,6 +197,7 @@ export function Workout() {
     if (secs <= 3 && secs > 0 && lastBeep.current !== secs) {
       lastBeep.current = secs;
       sound.countdown(alert.sound);
+      countdownTick(alert.vibrate);
     }
     if (left <= 0) {
       lastBeep.current = 0;
@@ -223,6 +238,7 @@ export function Workout() {
       chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
+      sessionId: active.sessionId,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -243,6 +259,10 @@ export function Workout() {
   const elapsed = Math.floor((now - active.startedAt) / 1000);
   const totalSets = active.plan.items.reduce((n, i) => n + i.sets, 0);
   const setsLogged = events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length;
+  // The final working set of the whole workout gets its own label and a bigger burst.
+  const lastOfAll = !warming && !finished && setsLogged + 1 >= totalSets;
+  // Undo sits above the big button, so the page leaves room for it while it's there.
+  const undoShown = !!s.undoable && now <= s.undoable.until;
 
   const log = () => {
     haptic("tap");
@@ -254,7 +274,11 @@ export function Workout() {
     setPopKey((k) => k + 1);
     // From the top edge of Log set, so the check rises clear of the button's label.
     const r = logRef.current?.getBoundingClientRect();
-    if (r) burst({ x: r.left + r.width / 2, y: r.top }, { check: true, count: 12, reach: 80 });
+    if (r)
+      burst(
+        { x: r.left + r.width / 2, y: r.top },
+        lastOfAll ? { check: true, count: 24, reach: 130 } : { check: true, count: 12, reach: 80 },
+      );
     s.logSet();
   };
 
@@ -337,7 +361,7 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className={docked ? "pb-56" : "pb-44"}>
+    <div className={docked ? (undoShown ? "pb-[17.5rem]" : "pb-56") : undoShown ? "pb-[14.5rem]" : "pb-44"}>
       <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button
@@ -557,6 +581,9 @@ export function Workout() {
               loading={loading}
               bar={bar}
               finish={finish}
+              now={now}
+              setsLogged={setsLogged}
+              lastSetStart={lastEv?.type === "set" ? lastEv.startedAt : undefined}
             />
           ) : (
             <SetCard
@@ -587,6 +614,7 @@ export function Workout() {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
+          <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
           {finished ? (
             <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>
               {t("workout.finish")}
@@ -625,6 +653,14 @@ export function Workout() {
                 )}
                 <Button className={`relative w-full text-xl ${docked ? "h-full min-h-28 flex-col" : "py-5"}`} onClick={log}>
                   {warming ? t("workout.logWarmup") : t("workout.logSet")} <Icon name="check" size={24} strokeWidth={2.8} />
+                  {lastOfAll && (
+                    <span
+                      className="rounded-full bg-(--btn-ink)/15 px-2.5 py-0.5 text-sm font-bold uppercase tracking-wider"
+                      data-testid="last-set"
+                    >
+                      {t("pol.lastSet")}
+                    </span>
+                  )}
                 </Button>
               </div>
             </div>
