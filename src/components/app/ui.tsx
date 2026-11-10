@@ -295,9 +295,19 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     let start: { x: number; y: number; t: number } | null = null;
     let dragging = false;
     let dy = 0;
+    const backdrop = el.parentElement;
     const set = (y: number, animate: boolean) => {
+      // The rise-in animation fills "both", and a filling animation beats an inline transform, so the sheet
+      // stayed put under the finger on phones. Drop it once the lifter drags; it has done its job by then.
+      el.style.animation = "none";
       el.style.transition = animate ? "transform 220ms var(--ease-out-expo, ease-out)" : "none";
       el.style.transform = y ? `translateY(${y}px)` : "";
+      // The dimmed backdrop lightens as the sheet goes down, so it reads as one thing leaving.
+      if (backdrop) {
+        backdrop.style.animation = "none";
+        backdrop.style.transition = animate ? "opacity 220ms var(--ease-out-expo, ease-out)" : "none";
+        backdrop.style.opacity = y ? String(Math.max(0.2, 1 - y / (el.offsetHeight || window.innerHeight))) : "";
+      }
     };
     const down = (e: TouchEvent) => {
       const target = e.target as Element | null;
