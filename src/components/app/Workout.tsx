@@ -17,6 +17,7 @@ import { hrLink } from "@/lib/hrLink";
 import { currentTag, t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
+import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
@@ -312,10 +313,9 @@ export function Workout() {
   };
 
   const unit = gym.unit;
-  const canCount = !!ex && countable(ex.id, ex.pattern, countPrefs.source);
-  // Free lifters see the Count reps button marked Pro; it opens the Pro screen (a saved "on" is ignored).
-  const countPro = can("autoCount");
-  const counting = canCount && countPro && countPrefs.on;
+  // Camera rep counting is a lab (Settings › Labs, Pro): offered only while that lab is on.
+  const canCount = !!ex && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
+  const counting = canCount && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
@@ -553,8 +553,7 @@ export function Workout() {
               {canCount && (
                 <AutoCountButton
                   on={false}
-                  locked={!countPro}
-                  onToggle={() => (countPro ? changeCount({ ...countPrefs, on: true }) : go("pro", "count"))}
+                  onToggle={() => changeCount({ ...countPrefs, on: true })}
                   className="absolute bottom-2 left-2"
                 />
               )}

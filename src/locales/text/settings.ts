@@ -5,8 +5,6 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "settings.title": "Settings",
-  "settings.motionOn": "Phone motion rep counting is on (experiment). It shows as an option while camera counting is on.",
-  "settings.motionOff": "Phone motion rep counting is off.",
   "settings.rerun": "Run setup again",
   "settings.injuries": "Injuries and sore spots",
   "settings.feedback": "Send feedback or report a bug",
@@ -83,9 +81,6 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "settings.title": "Ajustes",
-  "settings.motionOn":
-    "El conteo de repeticiones con el movimiento del teléfono está activado (experimento). Aparece como opción mientras cuentas con la cámara.",
-  "settings.motionOff": "El conteo de repeticiones con el movimiento del teléfono está desactivado.",
   "settings.rerun": "Repetir la configuración",
   "settings.injuries": "Lesiones y molestias",
   "settings.feedback": "Enviar comentarios o informar de un error",
@@ -165,9 +160,6 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "settings.title": "Réglages",
-  "settings.motionOn":
-    "Le comptage des répétitions par les mouvements du téléphone est activé (expérience). Il apparaît comme option quand le comptage par caméra est activé.",
-  "settings.motionOff": "Le comptage des répétitions par les mouvements du téléphone est désactivé.",
   "settings.rerun": "Refaire la configuration",
   "settings.injuries": "Blessures et douleurs",
   "settings.feedback": "Envoyer un avis ou signaler un bug",

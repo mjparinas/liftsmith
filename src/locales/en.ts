@@ -54,6 +54,7 @@ import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
+import * as lab from "./text/lab";
 import * as league from "./text/league";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -161,6 +162,7 @@ export const en = {
   ...info.en,
   ...inj.en,
   ...ins.en,
+  ...lab.en,
   ...league.en,
   ...lvl.en,
   ...map.en,

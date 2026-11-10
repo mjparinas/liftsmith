@@ -52,6 +52,7 @@ import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
+import * as lab from "./text/lab";
 import * as league from "./text/league";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -159,6 +160,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...info.fr,
   ...inj.fr,
   ...ins.fr,
+  ...lab.fr,
   ...league.fr,
   ...lvl.fr,
   ...map.fr,

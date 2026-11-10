@@ -43,10 +43,10 @@ describe("remembered choices", () => {
     expect(loadCountPrefs()).toEqual({ on: true, facing: "environment", source: "camera" });
   });
 
-  it("only uses phone motion while the repMotion flag is on", () => {
+  it("only uses phone motion while the phone motion lab is on", () => {
     saveCountPrefs({ on: true, facing: "user", source: "motion" });
     expect(loadCountPrefs().source).toBe("camera");
-    cacheFlags({ repMotion: true });
+    cacheFlags({ labRepCount: true, repMotion: true });
     expect(loadCountPrefs().source).toBe("motion");
     localStorage.removeItem(FLAG_CACHE_KEY);
   });
@@ -88,7 +88,7 @@ describe("the counting stage", () => {
   });
 
   it("fills in the reps as they're counted (phone motion, behind its flag)", async () => {
-    cacheFlags({ repMotion: true });
+    cacheFlags({ labRepCount: true, repMotion: true });
     const { props } = stage({ prefs: { on: true, facing: "user", source: "motion" } });
     await act(async () => {});
     expect(motion.cb).toBeDefined();
@@ -103,7 +103,7 @@ describe("the counting stage", () => {
   });
 
   it("doesn't count while resting", async () => {
-    cacheFlags({ repMotion: true });
+    cacheFlags({ labRepCount: true, repMotion: true });
     const { props } = stage({ prefs: { on: true, facing: "user", source: "motion" }, counting: false });
     await act(async () => {});
     const sim = simulateSet(["full", "full"], 11);
@@ -126,12 +126,5 @@ describe("the switch", () => {
     expect(b).toHaveAttribute("aria-pressed", "false");
     await user.click(b);
     expect(onToggle).toHaveBeenCalled();
-  });
-
-  it("is marked Pro when locked", () => {
-    render(<AutoCountButton on={false} locked onToggle={() => {}} />);
-    const b = screen.getByRole("button", { name: "Count reps with the camera, a Pro feature: see Pro" });
-    expect(b).not.toHaveAttribute("aria-pressed");
-    expect(b).toHaveTextContent("Pro");
   });
 });

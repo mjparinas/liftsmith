@@ -178,8 +178,8 @@ try {
   await scan("connections");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
-  // Every group page of Settings (2026-11-10).
-  for (const group of ["training", "workout", "reminders", "look", "body", "data"]) {
+  // Every group page of Settings, and Labs (2026-11-10).
+  for (const group of ["training", "workout", "reminders", "look", "body", "data", "labs"]) {
     await page.goto(`${server.url}/app/#/settings/${group}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan(`settings ${group}`);
