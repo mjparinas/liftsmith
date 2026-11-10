@@ -102,7 +102,10 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             next: call.getString("next") ?? "",
             plates: call.getString("plates") ?? "",
             restUntil: restUntil,
-            hr: call.getInt("hr")
+            hr: call.getInt("hr"),
+            chip: call.getString("chip"),
+            done: call.getInt("done"),
+            total: call.getInt("total")
         )
         // Heart rate arrives about once a second; the system budgets updates, so a change in heart rate alone is
         // pushed at most every 15 s. Anything else (a set logged, rest added) goes out straight away.

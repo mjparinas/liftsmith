@@ -103,6 +103,9 @@ public class WorkoutSessionPlugin extends Plugin {
         i.putExtra("sound", call.getBoolean("sound", true));
         i.putExtra("vibrate", call.getBoolean("vibrate", true));
         i.putExtra("speak", call.getString("speak", ""));
+        i.putExtra("chip", call.getString("chip", ""));
+        i.putExtra("done", call.getInt("done", 0));
+        i.putExtra("total", call.getInt("total", 0));
         ContextCompat.startForegroundService(getContext(), i);
         call.resolve();
     }

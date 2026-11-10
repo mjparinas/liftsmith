@@ -18,7 +18,7 @@ import { haptic, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { chipText, notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -173,6 +173,10 @@ export function Workout() {
       vibrate: alert.vibrate,
       // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
+      // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
+      chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
+      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
+      total: active.plan.items.reduce((n, i) => n + i.sets, 0),
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
