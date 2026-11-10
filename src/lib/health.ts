@@ -45,6 +45,8 @@ export async function connectHealth(): Promise<boolean> {
   if (!(await healthAvailable())) return false;
   try {
     const r = await (await health()).Health.requestAuthorization({ read: [...READ], write: [...WRITE] });
+    // Then saving workouts, which our own plugin asks for (the health plugin can't write them).
+    await allowWorkouts();
     // HealthKit never says whether reads were allowed, so an empty denied list counts as yes.
     return r.readAuthorized.length > 0 || r.readDenied.length < READ.length;
   } catch {
@@ -161,20 +163,82 @@ export function strengthKcal(seconds: number, bodyweightKg: number): number {
   return Math.round(5 * bodyweightKg * (seconds / 3600));
 }
 
-export async function saveWorkout(w: { start: number; end: number; bodyweightKg: number; avgHr?: number }): Promise<void> {
+// Our own small plugin (HealthWorkoutPlugin.kt / .swift): workouts as real workout sessions, which the health
+// plugin can't write. Missing on the web and on app builds from before it existed.
+interface WorkoutPlugin {
+  status(): Promise<{ granted: boolean }>;
+  request(): Promise<{ granted: boolean }>;
+  save(o: {
+    id: string;
+    start: number;
+    end: number;
+    title?: string;
+    notes?: string;
+    kcal?: number;
+    avgHr?: number;
+  }): Promise<{ saved: boolean }>;
+}
+const workoutPlugin = (): WorkoutPlugin | undefined =>
+  isNative()
+    ? (window as unknown as { Capacitor?: { Plugins?: { HealthWorkout?: WorkoutPlugin } } }).Capacitor?.Plugins?.HealthWorkout
+    : undefined;
+
+/** Whether finished workouts may be saved as workouts (Health Connect's exercise permission, Apple Health's workouts). */
+export async function workoutsAllowed(): Promise<boolean> {
+  try {
+    return (await workoutPlugin()?.status())?.granted ?? false;
+  } catch {
+    return false;
+  }
+}
+
+/** Asks to save workouts (one more Health Connect or Apple Health sheet). */
+export async function allowWorkouts(): Promise<boolean> {
+  if (!(await healthAvailable())) return false;
+  try {
+    return (await workoutPlugin()?.request())?.granted ?? false;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * A finished workout into Health Connect or Apple Health: a strength training session (titled, with the sets as
+ * notes on Android), its active calories and its average heart rate. On iOS the calories and heart rate go
+ * inside the workout, so they count toward the rings once; on Android they're separate records over the same time,
+ * which is how Health Connect links them. Without the workout permission only the calories and heart rate are
+ * written, as before.
+ */
+export async function saveWorkout(w: {
+  id?: string;
+  start: number;
+  end: number;
+  bodyweightKg: number;
+  avgHr?: number;
+  title?: string;
+  notes?: string;
+}): Promise<void> {
   if (!(await healthAvailable())) return;
+  const kcal = strengthKcal((w.end - w.start) / 1000, w.bodyweightKg);
+  let inWorkout = false;
+  const plugin = workoutPlugin();
+  if (plugin && w.id) {
+    try {
+      const saved = (await plugin.save({ id: w.id, start: w.start, end: w.end, title: w.title, notes: w.notes, kcal, avgHr: w.avgHr }))
+        .saved;
+      const ios = (await import("@capacitor/core")).Capacitor.getPlatform() === "ios";
+      inWorkout = saved && ios;
+    } catch {
+      // Fall through to the separate samples.
+    }
+  }
+  if (inWorkout) return;
   const { Health } = await health();
   const startDate = new Date(w.start).toISOString();
   const endDate = new Date(w.end).toISOString();
   const metadata = { source: "Liftsmith", activity: "strengthTraining" };
   try {
-    await Health.saveSample({
-      dataType: "calories",
-      value: strengthKcal((w.end - w.start) / 1000, w.bodyweightKg),
-      startDate,
-      endDate,
-      metadata,
-    });
+    await Health.saveSample({ dataType: "calories", value: kcal, startDate, endDate, metadata });
     if (w.avgHr) await Health.saveSample({ dataType: "heartRate", value: w.avgHr, startDate, endDate, metadata });
   } catch {
     // Permission was revoked or the store is unavailable; the workout is still in the local log.

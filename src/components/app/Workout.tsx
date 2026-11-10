@@ -6,7 +6,7 @@ import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { type PlateFinish } from "@/components/PlateBar";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
-import { queueStrava } from "@/lib/connections";
+import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
@@ -261,7 +261,17 @@ export function Workout() {
     const startedAt = active.startedAt;
     const ev = s.finish();
     if (ev?.type === "sessionEnd") {
-      void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
+      // The same title and sets Strava gets, as the workout's title and notes in Health Connect or Apple Health.
+      const summary = stravaWorkout(useApp.getState().events, ev.sessionId, profile.unit);
+      void saveWorkout({
+        id: ev.sessionId,
+        start: startedAt,
+        end: ev.at,
+        bodyweightKg: profile.bodyweight,
+        avgHr: ev.avgHr,
+        title: summary?.name,
+        notes: summary?.description,
+      });
       queueStrava(ev.sessionId);
     }
     void stopSession();

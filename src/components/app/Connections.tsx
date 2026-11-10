@@ -19,12 +19,14 @@ import {
   useCloud,
 } from "@/lib/connections";
 import {
+  allowWorkouts,
   connectHealth,
   healthAvailable,
   healthLastSync,
   healthPermissions,
   openHealthSettings,
   READ,
+  workoutsAllowed,
   WRITE,
   type HealthPerm,
 } from "@/lib/health";
@@ -65,11 +67,13 @@ function HealthCard() {
   const [last, setLast] = useState<number | null>(() => (typeof window === "undefined" ? null : healthLastSync()));
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
+  const [workouts, setWorkouts] = useState<boolean | null>(null);
 
   const check = () =>
     healthAvailable().then(async (a) => {
       setAvail(a);
       setPerms(a ? await healthPermissions() : null);
+      setWorkouts(a ? await workoutsAllowed() : null);
       setLast(healthLastSync());
     });
   useEffect(() => {
@@ -145,7 +149,19 @@ function HealthCard() {
                   <span className="sr-only">{allowed(k) ? t("conn.health.allowed") : t("conn.health.notAllowed")}</span>
                 </li>
               ))}
+              <li className="flex items-center gap-2">
+                <span aria-hidden className={workouts ? "text-good" : "text-faint"}>
+                  {workouts ? "✓" : "–"}
+                </span>
+                <span className={workouts ? "" : "text-muted"}>{t("conn.perm.workouts")}</span>
+                <span className="sr-only">{workouts ? t("conn.health.allowed") : t("conn.health.notAllowed")}</span>
+              </li>
             </ul>
+          )}
+          {connected && workouts === false && (
+            <Button kind="ghost" className="mt-3 w-full" onClick={() => void allowWorkouts().then(() => check())}>
+              {t("conn.health.allowWorkouts", { store })}
+            </Button>
           )}
           {p === "ios" && <p className="mt-2 text-xs text-muted">{t("conn.health.iosReads")}</p>}
           <Button className="mt-3 w-full" onClick={() => void sync()} disabled={busy}>
