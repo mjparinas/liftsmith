@@ -312,7 +312,9 @@ export function Workout() {
 
   const unit = gym.unit;
   const canCount = !!ex && countable(ex.id, ex.pattern, countPrefs.source);
-  const counting = canCount && countPrefs.on;
+  // Free lifters see the Count reps button marked Pro; it opens the Pro screen (a saved "on" is ignored).
+  const countPro = can("autoCount");
+  const counting = canCount && countPro && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
@@ -550,7 +552,8 @@ export function Workout() {
               {canCount && (
                 <AutoCountButton
                   on={false}
-                  onToggle={() => changeCount({ ...countPrefs, on: true })}
+                  locked={!countPro}
+                  onToggle={() => (countPro ? changeCount({ ...countPrefs, on: true }) : go("pro", "count"))}
                   className="absolute bottom-2 left-2"
                 />
               )}
