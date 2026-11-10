@@ -178,8 +178,11 @@ export function forgetBilling() {
 
 type Sdk = typeof import("@revenuecat/purchases-capacitor").Purchases;
 type Pkg = import("@revenuecat/purchases-capacitor").PurchasesPackage;
+type SubOption = import("@revenuecat/purchases-capacitor").SubscriptionOption;
 let sdk: Sdk | null = null;
 let packages: Partial<Record<Plan, Pkg>> = {};
+/** On Google Play, the code's own offer on each plan (a 30-day trial or a discount), bought instead of the default. */
+let codeOptions: Partial<Record<Plan, SubOption>> = {};
 let started = false;
 
 function apiKey(): string | undefined {
@@ -245,6 +248,31 @@ export function pickOffering<O>(all: Record<string, O>, current: O | null, codeO
   return (codeOffering ? all[codeOffering] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;
 }
 
+/** Play's tag that keeps an offer out of RevenueCat's default choice, so only people with a code get it. */
+export const IGNORE_TAG = "rc-ignore-offer";
+
+/**
+ * On Google Play, a code's offer lives on the same base plans as everyone else's (subscription `pro`), tagged in Play
+ * Console with the code's offering id (`creator30`) and `rc-ignore-offer`, so RevenueCat never picks it for people
+ * without a code. This finds it among the options Play says this person can get; null keeps the default.
+ */
+export function codeOption<O extends { tags: string[]; isBasePlan: boolean }>(
+  options: O[] | null | undefined,
+  tag: string | null,
+): O | null {
+  if (!tag || !options) return null;
+  return options.find((o) => !o.isBasePlan && o.tags.includes(tag)) ?? null;
+}
+
+/** Days of a Play option's free phase ("P30D", "P1M" as 30), or null when it has none. */
+export function freeDaysOf(o: { freePhase: { billingPeriod: { unit: string; value: number } } | null } | null): number | null {
+  const per = o?.freePhase?.billingPeriod;
+  if (!per) return null;
+  const unit: Record<string, number> = { DAY: 1, WEEK: 7, MONTH: 30, YEAR: 365 };
+  const d = (unit[per.unit.toUpperCase()] ?? 0) * per.value;
+  return d > 0 ? d : null;
+}
+
 /** The paywall's "Try again": starts the SDK again if it never came up, otherwise reloads the plans. */
 export async function retryBilling(): Promise<void> {
   if (!sdk) return startBilling();
@@ -266,6 +294,13 @@ export async function loadOffers(): Promise<Offer[] | null> {
     return null;
   }
   packages = { annual: offering.annual ?? undefined, monthly: offering.monthly ?? undefined };
+  codeOptions = {};
+  if (platformStore() !== "appstore") {
+    for (const plan of ["annual", "monthly"] as Plan[]) {
+      const o = codeOption(packages[plan]?.product.subscriptionOptions, activeOffering());
+      if (o) codeOptions[plan] = o;
+    }
+  }
   // iOS knows whether this Apple ID already used the trial; Android only offers a trial to people who can get it.
   let ineligible = new Set<string>();
   if (platformStore() === "appstore") {
@@ -286,7 +321,7 @@ export async function loadOffers(): Promise<Offer[] | null> {
         plan,
         price: pr.priceString,
         perMonth: plan === "annual" ? (pr.pricePerMonthString ?? undefined) : undefined,
-        trialDays: ineligible.has(pr.identifier) ? null : trialDaysOf(pr.introPrice),
+        trialDays: codeOptions[plan] ? freeDaysOf(codeOptions[plan]) : ineligible.has(pr.identifier) ? null : trialDaysOf(pr.introPrice),
       },
     ];
   });
@@ -305,7 +340,8 @@ export async function buy(plan: Plan, from: string): Promise<BuyResult> {
   if (!sdk || !p) return "error";
   useBilling.setState({ busy: true });
   try {
-    const r = await sdk.purchasePackage({ aPackage: p });
+    const option = codeOptions[plan];
+    const r = option ? await sdk.purchaseSubscriptionOption({ subscriptionOption: option }) : await sdk.purchasePackage({ aPackage: p });
     const ent = entFromInfo(r.customerInfo as never);
     setEnt(ent);
     const store = platformStore();
