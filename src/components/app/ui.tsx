@@ -13,6 +13,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { Info } from "@/components/Info";
+import { useBack } from "@/lib/back";
 import type { Term } from "@/lib/glossary";
 import { parseNum, t } from "@/lib/i18n";
 import { calm, haptic, sound } from "@/lib/juice";
@@ -257,6 +258,8 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
   useEffect(() => {
     closeRef.current = onClose;
   });
+  // The phone's back button closes the sheet before it leaves the screen (back.ts).
+  useBack(true, () => closeRef.current());
   useEffect(() => {
     const before = document.activeElement as HTMLElement | null;
     box.current?.focus();

@@ -6,6 +6,7 @@ import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { useAccount } from "@/lib/auth";
+import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling } from "@/lib/billing";
 import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
@@ -41,7 +42,7 @@ import { Programs } from "./Programs";
 import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
-import { go, parse, useRoute, type Route } from "./router";
+import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
@@ -100,6 +101,18 @@ export function App() {
     document.addEventListener("visibilitychange", reread);
     return () => document.removeEventListener("visibilitychange", reread);
   }, [a11y]);
+  useEffect(() => {
+    // Android's back button: close a sheet, else the previous screen, and leave the app only from Today (back.ts).
+    let stop = () => {};
+    let gone = false;
+    void startBackButton({ depth: historyDepth, atRoot: () => parse(location.hash).route === "today", back: goBack }).then((s) =>
+      gone ? s() : (stop = s),
+    );
+    return () => {
+      gone = true;
+      stop();
+    };
+  }, []);
   useEffect(() => {
     // iOS WebKit only shows :active (the instant pressed state) when a touch listener exists.
     const noop = () => {};

@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
+import { useBack } from "@/lib/back";
 import { GLOSSARY, type Term } from "@/lib/glossary";
 import { currentLang, t } from "@/lib/i18n";
 
@@ -22,6 +23,9 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
     setOpen(false);
     btn.current?.focus();
   }, []);
+
+  // The phone's back button closes the explanation first (back.ts).
+  useBack(open, close);
 
   useEffect(() => {
     if (!open) return;
