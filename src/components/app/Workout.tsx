@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
+import { beatStyle } from "@/lib/beat";
 import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
@@ -381,7 +382,7 @@ export function Workout() {
         <div className="flex items-center gap-2">
           {bpm ? (
             <span className="num flex min-h-9 items-center gap-1 rounded-full border border-heart/40 bg-surface px-2.5 text-sm font-bold text-heart">
-              <span className="animate-beat inline-flex">
+              <span className="animate-beat inline-flex" style={beatStyle(bpm)}>
                 <Icon name="heart" size={14} filled strokeWidth={1.5} />
               </span>{" "}
               {bpm}

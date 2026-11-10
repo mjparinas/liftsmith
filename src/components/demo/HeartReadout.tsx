@@ -3,6 +3,7 @@
 import { useId } from "react";
 
 import { Icon } from "@/components/app/icons";
+import { beatStyle } from "@/lib/beat";
 import { trendPath, trendPoints } from "@/lib/hrTrend";
 
 import { DEMO_COLOURS } from "./colours";
@@ -29,7 +30,7 @@ export function HeartReadout({ bpm, trend = [] }: { bpm: number; trend?: readonl
       aria-label={`Heart rate ${bpm}`}
       data-testid="heart-readout"
     >
-      <span className="animate-beat inline-flex" aria-hidden>
+      <span className="animate-beat inline-flex" style={beatStyle(bpm)} aria-hidden>
         <Icon name="heart" size={12} filled strokeWidth={1.5} />
       </span>
       <span aria-hidden>{bpm}</span>
