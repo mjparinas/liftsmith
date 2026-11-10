@@ -13,7 +13,14 @@ export const FLAGS = {
     label: "Trial length (days)",
     description: "How long the Pro trial offered at the end of setup lasts. The public site always says 14 days.",
   },
-  /** Counting reps from the phone's motion sensors on the workout screen (off: it was unreliable in tests). */
+  /** Labs (src/lib/labs.ts): camera rep counting on the workout screen, switched on in Settings › Labs (Pro). */
+  labRepCount: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: camera rep counting",
+    description: "Camera rep counting on the workout screen, an experiment Pro lifters switch on in Settings › Labs.",
+  },
+  /** Labs: counting reps from the phone's motion sensors on the workout screen (off: it was unreliable in tests). */
   repMotion: {
     default: false,
     options: [false, true] as const,

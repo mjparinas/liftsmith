@@ -33,7 +33,7 @@ const FROM: Record<string, { feature?: Feature; back: Route }> = {
   today: { feature: "adaptive", back: "today" },
   recovery: { feature: "recoveryMap", back: "recovery" },
   twin: { feature: "healthReadiness", back: "recovery" },
-  count: { feature: "autoCount", back: "workout" },
+  labs: { feature: "labs", back: "settings" },
   replan: { feature: "replan", back: "workout" },
   goals: { feature: "goalPlanner", back: "stats" },
   plateau: { feature: "plateauDetective", back: "stats" },

@@ -68,7 +68,7 @@ describe("Pro features without Pro", () => {
     expect(rows).toHaveLength(PRO_FEATURES.length);
     expect(rows[0]).toHaveTextContent("Adaptive workouts");
     expect(rows[0]).toHaveTextContent("You tapped this");
-    expect(within(list).getByText("Camera rep counting")).toBeInTheDocument();
+    expect(within(list).getByText("Labs")).toBeInTheDocument();
     expect(within(list).getByText(/Free, always/)).toBeInTheDocument();
   });
 

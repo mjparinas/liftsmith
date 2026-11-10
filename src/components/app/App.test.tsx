@@ -639,12 +639,24 @@ describe("saving your progress", () => {
   });
 });
 
-describe("camera rep counting without Pro", () => {
-  afterEach(() => setBillingLive(false));
+describe("Labs", () => {
+  afterEach(() => {
+    setBillingLive(false);
+    localStorage.removeItem("liftsmith.flags.local");
+  });
 
-  it("still shows Count reps on the squat, marked Pro, and opens the Pro screen", async () => {
+  async function startSquat(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    await user.click(await screen.findByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await screen.findByRole("button", { name: /Log set/ });
+  }
+
+  it("is Pro: without it the Labs row is marked Pro and opens Pro, and the workout has no Count reps", async () => {
     setBillingLive(true, null, [{ plan: "annual", price: "$39.99", perMonth: "$3.33", trialDays: 14 }]);
-    localStorage.setItem("liftsmith.autoCount", JSON.stringify({ on: true, facing: "user", source: "camera" }));
+    // Switched on before Pro ran out: still off without Pro.
+    localStorage.setItem("liftsmith.flags.local", JSON.stringify({ labRepCount: true }));
     const user = userEvent.setup();
     render(<App />);
     await user.click(await screen.findByRole("button", { name: "Get started" }));
@@ -654,15 +666,29 @@ describe("camera rep counting without Pro", () => {
     for (let i = 0; i < 4; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
     await user.click(await screen.findByRole("button", { name: "Not now, keep the free plan" }));
     await screen.findByText("Today's workout");
-    await user.click(screen.getByRole("button", { name: "Start workout" }));
-    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
-    if (skip) await user.click(skip);
-    // The free classic 5x5 opens on the squat. A saved "on" from before doesn't start the camera without Pro.
-    expect(screen.queryByRole("button", { name: "Stop counting" })).not.toBeInTheDocument();
-    const b = await screen.findByRole("button", { name: "Count reps with the camera, a Pro feature: see Pro" });
-    expect(b).toHaveTextContent("Pro");
-    await user.click(b);
-    expect(location.hash).toBe("#/pro/count");
-    localStorage.removeItem("liftsmith.autoCount");
+    await startSquat(user);
+    expect(screen.queryByRole("button", { name: "Count reps with the camera" })).not.toBeInTheDocument();
+    location.hash = "#/settings";
+    const row = await screen.findByRole("button", { name: /Labs/ });
+    expect(row).toHaveTextContent("Pro");
+    await user.click(row);
+    expect(location.hash).toBe("#/pro/labs");
+  });
+
+  it("switches camera rep counting on, and Count reps appears on the squat", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    expect(screen.queryByRole("button", { name: "Count reps with the camera" })).not.toBeInTheDocument();
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: /Labs/ }));
+    const sw = await screen.findByRole("switch", { name: /Camera rep counting/ });
+    // Phone motion builds on camera counting, so it shows once that's on.
+    expect(screen.queryByRole("switch", { name: /Phone motion/ })).not.toBeInTheDocument();
+    await user.click(sw);
+    expect(sw).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("switch", { name: /Phone motion/ })).toBeInTheDocument();
+    location.hash = "#/workout";
+    expect(await screen.findByRole("button", { name: "Count reps with the camera" })).toBeInTheDocument();
   });
 });

@@ -18,7 +18,7 @@ import { hasPro } from "./billing";
 // without Pro, Today follows a free fixed program (store.ts applyAccess).
 // Health twin (Melvin, 2026-11-09): seeing every number, trend and reason is free; sleep, HRV, resting
 // heart rate and breathing rate changing today's call ("healthReadiness") is Pro.
-// Camera rep counting on the workout screen ("autoCount", 2026-11-09) is Pro.
+// Labs, the experimental features (camera rep counting among them; "labs", 2026-11-10), is Pro.
 // One line per feature, so two changes adding one don't touch the same line. Every feature listed is Pro.
 export const PRO_FEATURES = [
   "adaptive",
@@ -29,7 +29,7 @@ export const PRO_FEATURES = [
   "plateauDetective",
   "goalPlanner",
   "healthReadiness",
-  "autoCount",
+  "labs",
 ] as const;
 export type Feature = (typeof PRO_FEATURES)[number];
 const PRO: ReadonlySet<Feature> = new Set(PRO_FEATURES);
