@@ -64,7 +64,7 @@ Out of reach: we have no blood or DNA samples, and Health Connect and HealthKit 
 5. **A range and its source.** "Fitness age about 34 to 38, from your watch's VO₂ max" with a "How is this worked out?" sheet: the method, the HUNT reference data, that watch estimates can be off by 5 to 15%, and "This is a fitness estimate for general wellness. It isn't medical advice and can't tell you about any health condition. If you have concerns about your health, a doctor may be helpful." That last line is general and shown always, never triggered by a value.
 6. **Always paired with what to do** (action over stats): what tends to raise VO₂ max, and what the lifter did recently.
 7. **Nothing leaves the device.** Same as the rest of the health twin: no analytics, feedback reports or share links. A share card, if ever, shows only the fitness age and only when the lifter ticks it.
-8. **Have a regulatory lawyer read the final screen text** before the first store release that includes it. This doc is research, not legal advice.
+8. **No lawyer review** (Melvin, 2026-11-10): rules 1 to 7 are the safeguard. This doc is research, not legal advice.
 
 ## Recommendation
 
