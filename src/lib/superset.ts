@@ -1,4 +1,5 @@
 import type { PlanItem } from "./generator";
+import { t } from "./i18n";
 
 // Supersets: two or more exercises done back to back, one set of each, then the rest.
 // Exercises in a superset sit next to each other in the plan and share `group`.
@@ -112,7 +113,7 @@ export function groupLetters(items: readonly Item[]): Map<string, string> {
 export function supersetLabel(items: readonly Item[], i: number): string | null {
   const [s, e] = groupRange(items, i);
   if (s === e) return null;
-  return `Superset ${groupLetters(items).get(items[i]!.group!)} · ${i - s + 1} of ${e - s + 1}`;
+  return t("fmt.superset", { letter: groupLetters(items).get(items[i]!.group!)!, n: i - s + 1, total: e - s + 1 });
 }
 
 /**

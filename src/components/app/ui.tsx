@@ -587,7 +587,7 @@ export function LinkToggle({
         onToggle();
       }}
       aria-pressed={on}
-      aria-label={on ? `Split ${second} from ${first}` : `Superset ${second} with ${first}`}
+      aria-label={t(on ? "fmt.unlink" : "fmt.link", { second, first })}
       className={`press grid h-11 w-11 shrink-0 place-items-center rounded-full border transition-colors ${on ? "border-accent bg-accent text-bg" : "border-line bg-surface text-muted hover:text-ink"} ${className}`}
     >
       <Icon name="link" size={18} />
@@ -679,7 +679,7 @@ export function Skeleton({ className = "" }: { className?: string }) {
 /** The app's loading screen, shaped like Today so the real screen lands where the eye already is. */
 export function TodaySkeleton() {
   return (
-    <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label="Loading">
+    <div className="aurora safe-top mx-auto max-w-lg px-5" role="status" aria-label={t("nav.loading")}>
       <div className="flex items-center justify-between pt-3">
         <Skeleton className="h-4 w-36" />
         <div className="flex gap-2">

@@ -23,6 +23,9 @@ export const en = {
   "coach.setupHint": "Shown here next time, so you set it up right the first time.",
   "coach.save": "Save",
   "coach.placeholder": "e.g. 4",
+  "coach.allFit": "Everything still fits.",
+  "coach.fewer": { one: "{name}: {count} set fewer", other: "{name}: {count} sets fewer" },
+  "coach.skipped": "{name}: skipped today",
 } as const;
 
 type Key = keyof typeof en;
@@ -47,6 +50,9 @@ export const es: Partial<Record<Key, Message>> = {
   "coach.setupHint": "Se mostrará aquí la próxima vez para que lo ajustes bien a la primera.",
   "coach.save": "Guardar",
   "coach.placeholder": "p. ej. 4",
+  "coach.allFit": "Todo sigue cabiendo.",
+  "coach.fewer": { one: "{name}: {count} serie menos", other: "{name}: {count} series menos" },
+  "coach.skipped": "{name}: se salta hoy",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -69,4 +75,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "coach.setupHint": "Affiché ici la prochaine fois, pour bien régler dès le départ.",
   "coach.save": "Enregistrer",
   "coach.placeholder": "ex. 4",
+  "coach.allFit": "Tout tient encore.",
+  "coach.fewer": { one: "{name} : {count} série de moins", other: "{name} : {count} séries de moins" },
+  "coach.skipped": "{name} : sauté aujourd’hui",
 };

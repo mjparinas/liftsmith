@@ -71,6 +71,8 @@ public class CalendarPlugin extends Plugin {
             int minute = call.getInt("minute", 0);
             int minutes = call.getInt("minutes", 45);
             String title = call.getString("title", "Liftsmith workout");
+            // Both come from the app in its language (calendar.ts).
+            String notes = call.getString("notes", "Open Liftsmith to start today's workout.");
             if (days.isEmpty()) {
                 call.reject("No days");
                 return;
@@ -90,7 +92,7 @@ public class CalendarPlugin extends Plugin {
             ContentValues v = new ContentValues();
             v.put(CalendarContract.Events.CALENDAR_ID, calendarId);
             v.put(CalendarContract.Events.TITLE, title);
-            v.put(CalendarContract.Events.DESCRIPTION, "Open Liftsmith to start today's workout.");
+            v.put(CalendarContract.Events.DESCRIPTION, notes);
             v.put(CalendarContract.Events.DTSTART, nextStart(days, hour, minute));
             v.put(CalendarContract.Events.DURATION, "PT" + minutes + "M");
             v.put(CalendarContract.Events.RRULE, "FREQ=WEEKLY;BYDAY=" + byday);

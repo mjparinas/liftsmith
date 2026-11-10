@@ -1321,9 +1321,32 @@ const ROWS: Row[] = [
   ],
 ];
 
+/**
+ * The built-in exercises' text in the app's language. i18n.ts installs the lookup (`setExerciseText`);
+ * this file doesn't import the catalogues itself, so the public website, which uses the library
+ * without them, stays light and English. The keys are `ex.<id>`, `ex.<id>.setup` and `ex.<id>.cue1`
+ * onwards (src/locales/text/ex.ts). A missing translation, or no lookup, reads the English row.
+ */
+let localise: ((key: string) => string | undefined) | null = null;
+export function setExerciseText(lookup: ((key: string) => string | undefined) | null): void {
+  localise = lookup;
+}
+const local = (key: string, english: string) => localise?.(key) ?? english;
+
+const ENGLISH_NAME = new Map(ROWS.map((r) => [r[0], r[1]]));
+/**
+ * The English name, whatever the app's language: for matching names from other apps' CSV exports
+ * and for tie-breaks that must not depend on the language (the generator stays reproducible).
+ */
+export function englishName(e: Pick<Exercise, "id" | "name">): string {
+  return ENGLISH_NAME.get(e.id) ?? e.name;
+}
+
 export const EXERCISES: Exercise[] = ROWS.map(([id, name, primary, secondary, needs, load, pattern, start, setup, cues]) => ({
   id,
-  name,
+  get name() {
+    return local(`ex.${id}`, name);
+  },
   primary,
   secondary,
   needs,
@@ -1331,9 +1354,18 @@ export const EXERCISES: Exercise[] = ROWS.map(([id, name, primary, secondary, ne
   pattern,
   compound: pattern !== "isolation" && pattern !== "core" && (secondary.length > 0 || pattern === "carry"),
   start,
-  setup,
-  cues,
+  get setup() {
+    return local(`ex.${id}.setup`, setup);
+  },
+  get cues() {
+    return cues.map((c, i) => local(`ex.${id}.cue${i + 1}`, c));
+  },
 }));
+
+/** Each built-in exercise's English text, as written in ROWS (a test checks the catalogue matches). */
+export const ENGLISH_ROWS: ReadonlyArray<{ id: string; name: string; setup: string; cues: readonly string[] }> = ROWS.map(
+  ([id, name, , , , , , , setup, cues]) => ({ id, name, setup, cues }),
+);
 
 const BY_ID = new Map(EXERCISES.map((e) => [e.id, e]));
 export const EXERCISE_BY_ID: ReadonlyMap<string, Exercise> = BY_ID;

@@ -3,7 +3,6 @@
 import { type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
-import { PlateBar, type PlateFinish } from "@/components/PlateBar";
 import { exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
 import { activeInjuries, effectFor, PART_LABEL } from "@/lib/injury";
@@ -16,6 +15,7 @@ import type { EffortScale, Exercise, Gym, SetEvent } from "@/lib/types";
 
 import { clock, loadText, repsText } from "../format";
 import { PainSelect } from "../Injuries";
+import { PlateBar, type PlateFinish } from "../Plates";
 import { HUE } from "../theme";
 import { Button, Ring } from "../ui";
 import { GhostLine, PlateChange, RestExtra, useGhost } from "../WorkoutExtras";

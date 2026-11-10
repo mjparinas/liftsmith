@@ -6,15 +6,16 @@
 import { useEffect, useState } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
-import { PlateBar } from "@/components/PlateBar";
 import type { Pr } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
+import { t as tr } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { barFor } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 
+import { PlateBar } from "./Plates";
 import { Sheet } from "./ui";
 
 const REP_MS = 1400;
@@ -35,11 +36,11 @@ export function PrReplayButton({ prs }: { prs: Pr[] }) {
             }}
             className="press min-h-11 rounded-full border border-gold/40 bg-gold/10 px-4 text-sm font-semibold text-gold"
           >
-            ▶ Replay {exercise(p.exerciseId).name}
+            {tr("pr.replay", { name: exercise(p.exerciseId).name })}
           </button>
         ))}
       </div>
-      <Sheet open={!!open} onClose={() => setOpen(null)} title="PR replay">
+      <Sheet open={!!open} onClose={() => setOpen(null)} title={tr("pr.replayTitle")}>
         {open && <Replay pr={open} />}
       </Sheet>
     </>
@@ -73,7 +74,7 @@ function Replay({ pr }: { pr: Pr }) {
   const loading = bar && gym ? loadBar(fromKg(pr.weight, gym.unit), bar.weight, gym.plates) : null;
   return (
     <div className="text-center">
-      <p className="text-sm uppercase tracking-wider text-gold">New personal best</p>
+      <p className="text-sm uppercase tracking-wider text-gold">{tr("pr.newBest")}</p>
       <h3 className="text-2xl font-bold">{ex.name}</h3>
       <p className="num mt-1 text-4xl font-bold">
         {fmtNum(fromKg(pr.weight, unit))} {unit} × {pr.reps}
@@ -85,7 +86,7 @@ function Replay({ pr }: { pr: Pr }) {
           body={bodyFor(profile.sex)}
           reps={pr.reps}
           still={reduced}
-          label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`}
+          label={tr("pr.demoLabel", { weight: `${fmtNum(fromKg(pr.weight, unit))} ${unit}`, reps: pr.reps })}
           className="h-56"
         />
         {loading && bar && (
@@ -95,11 +96,9 @@ function Replay({ pr }: { pr: Pr }) {
         )}
       </div>
       <p className="num mt-3 text-lg font-semibold" aria-live="polite">
-        {done ? `${pr.reps} reps. Every one of them yours.` : `Rep ${rep}`}
+        {done ? tr("pr.allReps", { count: pr.reps }) : tr("pr.rep", { n: rep })}
       </p>
-      <p className="num text-sm text-muted">
-        Estimated max now {fmtNum(Math.round(fromKg(pr.e1rm, unit)))} {unit}
-      </p>
+      <p className="num text-sm text-muted">{tr("pr.estMax", { weight: `${fmtNum(Math.round(fromKg(pr.e1rm, unit)))} ${unit}` })}</p>
       {done && !reduced && (
         <button
           type="button"
@@ -109,7 +108,7 @@ function Replay({ pr }: { pr: Pr }) {
           }}
           className="press mt-3 min-h-11 rounded-full border border-line px-4 text-sm text-muted"
         >
-          Play again
+          {tr("pr.again")}
         </button>
       )}
     </div>

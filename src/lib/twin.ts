@@ -6,6 +6,7 @@
 // (`health`, imported by the store from health.ts readDaily), and the heart rate streams of workouts.
 // Sleep, HRV, resting HR and breathing rate also feed the readiness call, for Pro (healthExternal).
 import type { SessionSummary } from "./derive";
+import { list, t } from "./i18n";
 import { healthSignals, type ExternalSignals } from "./readiness";
 import { ACTIVITY, bmiBand, currentTdee } from "./tdee";
 import type { AppEvent, HealthMetric, HrSeriesEvent, Profile, SetEvent } from "./types";
@@ -144,10 +145,8 @@ export function healthExternal(events: readonly AppEvent[], now: number): Extern
 function didFor(key: keyof ExternalSignals, ext: ExternalSignals, pro: boolean): string | undefined {
   const sig = healthSignals({ [key]: ext[key] } as ExternalSignals)[0];
   if (!sig) return undefined;
-  if (!pro) return `${sig.text}: with Pro, today's plan would take this into account.`;
-  return sig.points < 0
-    ? `${sig.text}: counted in today's call, so the plan leans easier.`
-    : `${sig.text}: counted in today's call, so the plan can push a little.`;
+  if (!pro) return t("twin.did.free", { signal: sig.text });
+  return sig.points < 0 ? t("twin.did.easier", { signal: sig.text }) : t("twin.did.push", { signal: sig.text });
 }
 
 // --- Rest-time heart rate drop ---
@@ -207,7 +206,7 @@ const pct = (x: number) => `${x > 0 ? "+" : ""}${fmtNum(Math.round(x))}%`;
 
 export function twin(input: TwinInput): TwinMetric[] {
   const { events, profile, now, pro, native } = input;
-  const store = input.store ?? "your Health app";
+  const store = input.store ?? t("twin.yourHealthApp");
   const unit = profile.unit;
   const ext = healthExternal(events, now);
   const missing = (id: TwinId, label: string, what: string): TwinMetric => ({
@@ -215,10 +214,8 @@ export function twin(input: TwinInput): TwinMetric[] {
     label,
     display: "",
     status: "missing",
-    chip: native ? "Not connected" : "On your phone",
-    why: native
-      ? `Comes from ${store}. Allow ${what} there, or wear a watch or ring that records it.`
-      : `Comes from your phone's health app. Open Liftsmith on your phone to see it.`,
+    chip: native ? t("twin.c.notConnected") : t("twin.c.onPhone"),
+    why: native ? t("twin.w.missing", { store, what }) : t("twin.w.missingWeb"),
     action: native ? { kind: "connect" } : undefined,
     series: [],
     source: "health",
@@ -241,11 +238,11 @@ export function twin(input: TwinInput): TwinMetric[] {
   {
     const recentW = weighIns.filter((e) => e.at >= now - 28 * DAY);
     let status: Status = "info",
-      chip = "One weigh-in",
-      why = "Weigh in once or twice a week, same time of day, to see your trend.";
+      chip = t("twin.c.oneWeighIn"),
+      why = t("twin.w.oneWeighIn");
     if (!lastW) {
-      chip = "From setup";
-      why = "Your setup weight. Log a weigh-in on Progress, or let a smart scale send it through your health app.";
+      chip = t("twin.c.fromSetup");
+      why = t("twin.w.fromSetup");
     } else if (recentW.length >= 3 && recentW[recentW.length - 1].at - recentW[0].at >= 10 * DAY) {
       // Least-squares slope in kg a day.
       const xs = recentW.map((e) => (e.at - recentW[0].at) / DAY),
@@ -254,36 +251,36 @@ export function twin(input: TwinInput): TwinMetric[] {
         my = mean(ys);
       const slope = xs.reduce((s, x, i) => s + (x - mx) * (ys[i] - my), 0) / (xs.reduce((s, x) => s + (x - mx) ** 2, 0) || 1);
       const perWeek = ((slope * 7) / kgNow) * 100;
-      const rate = `${perWeek > 0 ? "+" : ""}${fmtNum(Math.round(perWeek * 10) / 10)}% a week`;
-      const maint = tdee.result ? ` Eat about ${kcal(tdee.result.tdee)} to hold it.` : "";
+      const rate = t("twin.rate", { rate: `${perWeek > 0 ? "+" : ""}${fmtNum(Math.round(perWeek * 10) / 10)}` });
+      const maint = tdee.result ? ` ${t("twin.w.maint", { kcal: kcal(tdee.result.tdee) })}` : "";
       if (perWeek < -1) {
         status = "watch";
-        chip = "Dropping fast";
-        why = `${rate}. Faster than 1% a week costs muscle and strength. Eat about 300 kcal more a day.`;
+        chip = t("twin.c.dropFast");
+        why = t("twin.w.dropFast", { rate });
       } else if (perWeek <= -0.25) {
         status = "good";
-        chip = "On pace";
-        why = `${rate}. A pace that keeps muscle while you lose fat, if losing is the aim.${maint}`;
+        chip = t("twin.c.onPace");
+        why = t("twin.w.onPace", { rate }) + maint;
       } else if (perWeek < 0.25) {
         status = "steady";
-        chip = "Steady";
-        why = `${rate}: holding steady.${maint}`;
+        chip = t("twin.c.steady");
+        why = t("twin.w.steadyWeight", { rate }) + maint;
       } else if (perWeek <= 0.5) {
         status = profile.goal === "muscle" ? "good" : "info";
-        chip = "Gaining slowly";
-        why = `${rate}. A lean-gain pace: most of it can be muscle while your lifts climb.`;
+        chip = t("twin.c.gainSlow");
+        why = t("twin.w.gainSlow", { rate });
       } else {
         status = "watch";
-        chip = "Gaining fast";
-        why = `${rate}. Faster than about 0.5% a week is mostly fat. Eat about 200 kcal less a day.`;
+        chip = t("twin.c.gainFast");
+        why = t("twin.w.gainFast", { rate });
       }
     } else if (recentW.length) {
-      chip = "Need more";
-      why = "Three weigh-ins over two weeks show your trend. Keep weighing in.";
+      chip = t("twin.c.needMore");
+      why = t("twin.w.needMore");
     }
     out.push({
       id: "weight",
-      label: "Weight",
+      label: t("twin.l.weight"),
       display: kgText(kgNow, unit),
       value: kgNow,
       status,
@@ -292,7 +289,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       series: window30(wSeries, now).map((p) => ({ ...p, value: unit === "lb" ? p.value * 2.20462 : p.value })),
       source: "app",
       fresh: !!lastW && lastW.at >= now - 2 * DAY,
-      action: { kind: "route", route: "stats", label: "Log a weigh-in" },
+      action: { kind: "route", route: "stats", label: t("twin.a.weighIn") },
     });
   }
 
@@ -301,11 +298,10 @@ export function twin(input: TwinInput): TwinMetric[] {
   const lastF = fats[fats.length - 1];
   if (!lastF) {
     out.push({
-      ...missing("bodyFat", "Body fat", "body fat"),
-      why: native
-        ? `Comes from a smart scale or body scanner through ${store}.`
-        : "Comes from a smart scale through your phone's health app.",
-      chip: native ? "No reading" : "On your phone",
+      ...missing("bodyFat", t("twin.l.bodyFat"), t("twin.what.bodyFat")),
+      why: native ? t("twin.w.fatMissing", { store }) : t("twin.w.fatMissingWeb"),
+      chip: t("twin.c.noReading"),
+      action: { kind: "route", route: "stats", label: t("twin.a.logFat") },
     });
   } else {
     const then = [...fats].reverse().find((e) => e.at <= lastF.at - 35 * DAY);
@@ -317,24 +313,24 @@ export function twin(input: TwinInput): TwinMetric[] {
     if (!then) {
       out.push({
         id: "bodyFat",
-        label: "Body fat",
+        label: t("twin.l.bodyFat"),
         display: `${fmtNum(Math.round(lastF.bodyFat! * 10) / 10)}%`,
         value: lastF.bodyFat,
         status: "info",
-        chip: "Building a trend",
-        why: "Readings five or more weeks apart show whether you're losing fat or gaining muscle.",
+        chip: t("twin.c.building"),
+        why: t("twin.w.fatTrend"),
         series: fatSeries,
         source: "health",
         fresh: lastF.at >= now - 2 * DAY,
       });
       out.push({
         id: "leanMass",
-        label: "Lean mass",
+        label: t("twin.l.leanMass"),
         display: kgText(lean(lastF), unit),
         value: lean(lastF),
         status: "info",
-        chip: "Building a trend",
-        why: "Everything that isn't fat: muscle, bone, water. The number that tells you if training is building muscle.",
+        chip: t("twin.c.building"),
+        why: t("twin.w.leanAbout"),
         series: [],
         source: "health",
         fresh: false,
@@ -346,32 +342,36 @@ export function twin(input: TwinInput): TwinMetric[] {
       const weeks = Math.round((lastF.at - then.at) / (7 * DAY));
       const dLeanText = `${dLean >= 0 ? "+" : "−"}${kgText(Math.abs(dLean), unit)}`;
       let fs: Status = "steady",
-        fc = "Steady",
-        fw = `${fmtNum(Math.round(dFat * 10) / 10)} points in ${weeks} weeks.`;
+        fc = t("twin.c.steady"),
+        fw = t("twin.w.fatSteady", { n: fmtNum(Math.round(dFat * 10) / 10), weeks });
       if (dFat <= -0.5) {
         fs = "good";
-        fc = "Down";
-        fw = `Down ${fmtNum(Math.round(-dFat * 10) / 10)} points in ${weeks} weeks.`;
+        fc = t("twin.c.down");
+        fw = t("twin.w.fatDown", { n: fmtNum(Math.round(-dFat * 10) / 10), weeks });
       } else if (dFat >= 1) {
         fs = "watch";
-        fc = "Creeping up";
-        fw = `Up ${fmtNum(Math.round(dFat * 10) / 10)} points in ${weeks} weeks. If that isn't the plan, eat about 200 kcal less a day and keep the lifting.`;
+        fc = t("twin.c.creeping");
+        fw = t("twin.w.fatUp", { n: fmtNum(Math.round(dFat * 10) / 10), weeks });
       }
       let ls: Status = "steady",
-        lc = "Kept",
-        lw = `${dLeanText} in ${weeks} weeks: muscle held.`;
+        lc = t("twin.c.kept"),
+        lw = t("twin.w.leanKept", { delta: dLeanText, weeks });
       if (dLean >= 0.3) {
         ls = "good";
-        lc = "Building";
-        lw = `${dLeanText} in ${weeks} weeks: the training is building muscle.`;
+        lc = t("twin.c.buildingMuscle");
+        lw = t("twin.w.leanUp", { delta: dLeanText, weeks });
       } else if (dLean <= -0.7 && dKg < 0) {
         ls = "watch";
-        lc = "Losing some";
-        lw = `${dLeanText} in ${weeks} weeks along with the weight. Slow the loss to about 0.5% a week and keep protein at ${tdee.result ? `${tdee.result.protein[0]}–${tdee.result.protein[1]} g` : "1.6–2.2 g per kg"} a day.`;
+        lc = t("twin.c.losingSome");
+        lw = t("twin.w.leanDown", {
+          delta: dLeanText,
+          weeks,
+          protein: tdee.result ? `${tdee.result.protein[0]}–${tdee.result.protein[1]} g` : t("twin.proteinPerKg"),
+        });
       }
       out.push({
         id: "bodyFat",
-        label: "Body fat",
+        label: t("twin.l.bodyFat"),
         display: `${fmtNum(Math.round(lastF.bodyFat! * 10) / 10)}%`,
         value: lastF.bodyFat,
         status: fs,
@@ -383,7 +383,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       });
       out.push({
         id: "leanMass",
-        label: "Lean mass",
+        label: t("twin.l.leanMass"),
         display: kgText(lean(lastF), unit),
         value: lean(lastF),
         status: ls,
@@ -407,14 +407,14 @@ export function twin(input: TwinInput): TwinMetric[] {
     const ignore = bmi >= 25 && lastF && lastF.bodyFat! < leanCut;
     out.push({
       id: "bmi",
-      label: "BMI",
+      label: t("twin.l.bmi"),
       display: fmtNum(Math.round(bmi * 10) / 10),
       value: bmi,
       status: ignore ? "info" : bmi >= 18.5 && bmi < 25 ? "steady" : "info",
-      chip: ignore ? "Ignore it" : band,
+      chip: ignore ? t("twin.c.ignore") : band,
       why: ignore
-        ? `Says "${band.toLowerCase()}", but at ${fmtNum(Math.round(lastF!.bodyFat! * 10) / 10)}% body fat you're lean. BMI can't tell muscle from fat.`
-        : "A rough guide made for people who don't lift. Body fat says more about you.",
+        ? t("twin.w.bmiIgnore", { band: band.toLowerCase(), fat: fmtNum(Math.round(lastF!.bodyFat! * 10) / 10) })
+        : t("twin.w.bmi"),
       series: [],
       source: "app",
       fresh: false,
@@ -422,12 +422,12 @@ export function twin(input: TwinInput): TwinMetric[] {
   } else {
     out.push({
       id: "bmi",
-      label: "BMI",
+      label: t("twin.l.bmi"),
       display: "",
       status: "missing",
-      chip: "Needs height",
-      why: "Add your height to see it.",
-      action: { kind: "route", route: "tools/tdee", label: "Add height" },
+      chip: t("twin.c.needsHeight"),
+      why: t("twin.w.needsHeight"),
+      action: { kind: "route", route: "tools/tdee", label: t("twin.a.addHeight") },
       series: [],
       source: "app",
       fresh: false,
@@ -437,21 +437,22 @@ export function twin(input: TwinInput): TwinMetric[] {
   // Energy: TDEE and what to eat for the goal.
   if (tdee.result) {
     const r = tdee.result;
+    const level = ACTIVITY[tdee.activity.activity].label.toLowerCase();
     const from =
       tdee.activity.source === "steps"
-        ? `your steps and training (${ACTIVITY[tdee.activity.activity].label.toLowerCase()})`
+        ? t("twin.from.steps", { level })
         : tdee.activity.source === "workouts"
-          ? `your training (${ACTIVITY[tdee.activity.activity].label.toLowerCase()})`
-          : `${ACTIVITY[tdee.activity.activity].label.toLowerCase()} activity`;
+          ? t("twin.from.workouts", { level })
+          : t("twin.from.level", { level });
     out.push({
       id: "tdee",
-      label: "Energy (TDEE)",
+      label: t("twin.l.tdee"),
       display: kcal(r.tdee),
       value: r.tdee,
       status: "info",
-      chip: "A day",
-      why: `About what you burn a day, from ${from}. To lose 0.5 kg a week eat about ${kcal(r.cut)}; for a lean gain about ${kcal(r.bulk)}. Protein ${r.protein[0]}–${r.protein[1]} g.`,
-      action: { kind: "route", route: "tools/tdee", label: "Open TDEE" },
+      chip: t("twin.c.aDay"),
+      why: t("twin.w.tdee", { from, cut: kcal(r.cut), bulk: kcal(r.bulk), low: r.protein[0], high: r.protein[1] }),
+      action: { kind: "route", route: "tools/tdee", label: t("twin.a.tdee") },
       series: [],
       source: "app",
       fresh: false,
@@ -459,12 +460,12 @@ export function twin(input: TwinInput): TwinMetric[] {
   } else {
     out.push({
       id: "tdee",
-      label: "Energy (TDEE)",
+      label: t("twin.l.tdee"),
       display: "",
       status: "missing",
-      chip: "Needs details",
-      why: `Add your ${tdee.missing.join(", ")} to see what you burn a day.`,
-      action: { kind: "route", route: "tools/tdee", label: "Add details" },
+      chip: t("twin.c.needsDetails"),
+      why: t("twin.w.needsDetails", { missing: list(tdee.missing.map((k) => t(`twin.need.${k}`))) }),
+      action: { kind: "route", route: "tools/tdee", label: t("twin.a.addDetails") },
       series: [],
       source: "app",
       fresh: false,
@@ -474,26 +475,26 @@ export function twin(input: TwinInput): TwinMetric[] {
   // Sleep: last night and the last seven.
   const sleep = readings(events, "sleep");
   const last7 = sleep.filter((p) => p.day >= daysBack(now, 6));
-  if (!sleep.length || !recent(sleep, now, 7)) out.push(missing("sleep", "Sleep", "sleep"));
+  if (!sleep.length || !recent(sleep, now, 7)) out.push(missing("sleep", t("twin.l.sleep"), t("twin.what.sleep")));
   else {
     const night = recent(sleep, now, 0);
     const avg = last7.length >= 3 ? mean(last7.map((p) => p.value)) : undefined;
     const short = last7.filter((p) => p.value < 7).length;
     let status: Status = "steady",
-      chip = "Enough",
+      chip = t("twin.c.enough"),
       why = "";
     if (avg !== undefined && avg < 7) {
       status = "watch";
-      chip = "Short";
-      why = `${hm(avg)} a night this week, under 7 h on ${short} of ${last7.length} nights. Short sleep slows recovery and strength more than any set count. An earlier, fixed bedtime is the cheapest gain there is.`;
+      chip = t("twin.c.short");
+      why = t("twin.w.sleepShort", { avg: hm(avg), short, nights: last7.length });
     } else if (avg !== undefined) {
       status = avg >= 7.5 ? "good" : "steady";
-      chip = avg >= 7.5 ? "Well rested" : "Enough";
-      why = `${hm(avg)} a night this week. 7 to 9 hours lets your muscles rebuild between workouts.`;
-    } else why = "A few more nights show your weekly average. 7 to 9 hours is what recovery needs.";
+      chip = avg >= 7.5 ? t("twin.c.rested") : t("twin.c.enough");
+      why = t("twin.w.sleepOk", { avg: hm(avg) });
+    } else why = t("twin.w.sleepFew");
     out.push({
       id: "sleep",
-      label: night ? "Sleep last night" : "Sleep",
+      label: night ? t("twin.l.sleepNight") : t("twin.l.sleep"),
       display: hm((night ?? sleep[sleep.length - 1]).value),
       value: (night ?? sleep[sleep.length - 1]).value,
       status,
@@ -526,9 +527,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       return;
     }
     const b = baseline(series, now, floor);
-    const j = b
-      ? judge(cur.value, b)
-      : { status: "info" as Status, chip: "Learning your normal", why: `${about} A week of readings sets your normal.` };
+    const j = b ? judge(cur.value, b) : { status: "info" as Status, chip: t("twin.c.learning"), why: t("twin.w.learning", { about }) };
     out.push({
       id,
       label,
@@ -544,9 +543,9 @@ export function twin(input: TwinInput): TwinMetric[] {
   };
   vsNormal(
     "hrv",
-    "HRV",
+    t("twin.l.hrv"),
     "hrv",
-    "heart rate variability",
+    t("twin.what.hrv"),
     2,
     (v) => `${fmtNum(Math.round(v))} ms`,
     "hrvDelta",
@@ -555,28 +554,28 @@ export function twin(input: TwinInput): TwinMetric[] {
       if (d < -10)
         return {
           status: "watch",
-          chip: "Below your normal",
-          why: `${pct(d)} on your normal of ${fmtNum(Math.round(b.mean))} ms. Your body is still under stress from training, sleep or something else: a day to go easier.`,
+          chip: t("twin.c.below"),
+          why: t("twin.w.hrvLow", { pct: pct(d), mean: fmtNum(Math.round(b.mean)) }),
         };
       if (d > 5)
         return {
           status: "good",
-          chip: "Above your normal",
-          why: `${pct(d)} on your normal of ${fmtNum(Math.round(b.mean))} ms. You've recovered well: a good day to push.`,
+          chip: t("twin.c.above"),
+          why: t("twin.w.hrvHigh", { pct: pct(d), mean: fmtNum(Math.round(b.mean)) }),
         };
       return {
         status: "steady",
-        chip: "Normal for you",
-        why: `Within your normal (${fmtNum(Math.round(b.low))}–${fmtNum(Math.round(b.high))} ms). Train as planned.`,
+        chip: t("twin.c.normal"),
+        why: t("twin.w.hrvNormal", { low: fmtNum(Math.round(b.low)), high: fmtNum(Math.round(b.high)) }),
       };
     },
-    "The beat-to-beat variation of your heart. Higher than your own normal means you've recovered.",
+    t("twin.about.hrv"),
   );
   vsNormal(
     "restingHr",
-    "Resting heart rate",
+    t("twin.l.restingHr"),
     "restingHr",
-    "resting heart rate",
+    t("twin.what.restingHr"),
     1.5,
     (v) => `${fmtNum(Math.round(v))} bpm`,
     "restingHrDelta",
@@ -585,64 +584,62 @@ export function twin(input: TwinInput): TwinMetric[] {
       if (d > 5)
         return {
           status: "watch",
-          chip: "Up",
-          why: `${fmtNum(Math.round(d))} bpm over your normal of ${fmtNum(Math.round(b.mean))}. That often comes with poor sleep, stress or a cold starting: go easy and see how tomorrow looks.`,
+          chip: t("twin.c.up"),
+          why: t("twin.w.rhrUp", { d: fmtNum(Math.round(d)), mean: fmtNum(Math.round(b.mean)) }),
         };
       if (d <= -3)
         return {
           status: "good",
-          chip: "Lower",
-          why: `${fmtNum(Math.round(-d))} bpm under your normal. A lower resting rate comes with better fitness and recovery.`,
+          chip: t("twin.c.lower"),
+          why: t("twin.w.rhrLow", { d: fmtNum(Math.round(-d)) }),
         };
-      return { status: "steady", chip: "Steady", why: `Close to your normal of ${fmtNum(Math.round(b.mean))} bpm.` };
+      return { status: "steady", chip: t("twin.c.steady"), why: t("twin.w.rhrNormal", { mean: fmtNum(Math.round(b.mean)) }) };
     },
-    "Your heart rate at rest. A few beats over your own normal is an early sign to take it easier.",
+    t("twin.about.restingHr"),
   );
   vsNormal(
     "breathing",
-    "Breathing rate",
+    t("twin.l.breathing"),
     "breathing",
-    "respiratory rate",
+    t("twin.what.breathing"),
     0.4,
-    (v) => `${fmtNum(Math.round(v * 10) / 10)} /min`,
+    (v) => t("twin.perMin", { n: fmtNum(Math.round(v * 10) / 10) }),
     "breathingDelta",
     (v, b) => {
       const d = v - b.mean;
       if (d >= 2)
         return {
           status: "watch",
-          chip: "Up overnight",
-          why: `${fmtNum(Math.round(d * 10) / 10)} breaths a minute over your normal while asleep. That's often one of the first signs of getting ill: an easy day or a rest day is the smart call.`,
+          chip: t("twin.c.upOvernight"),
+          why: t("twin.w.breathUp", { d: fmtNum(Math.round(d * 10) / 10) }),
         };
       return {
         status: "steady",
-        chip: "Normal for you",
-        why: `Close to your normal of ${fmtNum(Math.round(b.mean * 10) / 10)} breaths a minute while asleep.`,
+        chip: t("twin.c.normal"),
+        why: t("twin.w.breathNormal", { mean: fmtNum(Math.round(b.mean * 10) / 10) }),
       };
     },
-    "Breaths a minute while you sleep, from a watch or ring.",
+    t("twin.about.breathing"),
   );
 
   // Steps: the week against your normal, and what they do to TDEE.
   const steps = readings(events, "steps");
   const week = steps.filter((p) => p.day >= daysBack(now, 7) && p.day < dayOf(now));
-  if (!week.length) out.push(missing("steps", "Steps", "steps"));
+  if (!week.length) out.push(missing("steps", t("twin.l.steps"), t("twin.what.steps")));
   else {
     const avg = mean(week.map((p) => p.value));
     const counted = tdee.activity.source === "steps";
-    const tail = counted ? ` They set your TDEE's activity level (${ACTIVITY[tdee.activity.activity].label.toLowerCase()}).` : "";
+    const tail = counted ? ` ${t("twin.w.stepsTail", { level: ACTIVITY[tdee.activity.activity].label.toLowerCase() })}` : "";
+    const n = fmtNum(Math.round(avg / 100) * 100);
     const s: Status = avg < 5000 ? "watch" : avg >= 8000 ? "good" : "steady";
-    const why =
-      avg < 5000
-        ? `${fmtNum(Math.round(avg / 100) * 100)} a day this week. A 20-minute walk adds about 2,000 and helps you recover between workouts.${tail}`
-        : `${fmtNum(Math.round(avg / 100) * 100)} a day this week.${tail}`;
+    const why = (avg < 5000 ? t("twin.w.stepsLow", { n }) : t("twin.w.steps", { n })) + tail;
     out.push({
       id: "steps",
-      label: "Steps",
-      display: `${fmtNum(Math.round(avg / 100) * 100)} a day`,
+      label: t("twin.l.steps"),
+      display: t("twin.perDay", { n }),
       value: avg,
       status: s,
-      chip: avg < 5000 ? "Low" : avg >= 8000 ? "Active" : "Fair",
+      chip: avg < 5000 ? t("twin.c.low") : avg >= 8000 ? t("twin.c.active") : t("twin.c.fair"),
       why,
       series: window30(steps, now),
       source: "health",
@@ -655,26 +652,24 @@ export function twin(input: TwinInput): TwinMetric[] {
   const v = recent(vo2, now, 120);
   if (!v)
     out.push({
-      ...missing("vo2max", "VO₂ max", "VO₂ max"),
-      why: native
-        ? `Comes from an Apple Watch, Fitbit, Pixel Watch or Garmin through ${store}, after outdoor walks or runs.`
-        : "Comes from a watch through your phone's health app.",
+      ...missing("vo2max", t("twin.l.vo2max"), t("twin.what.vo2max")),
+      why: native ? t("twin.w.vo2Missing", { store }) : t("twin.w.vo2MissingWeb"),
     });
   else {
     const old = vo2.filter((p) => p.day <= daysBack(now, 75) && p.day >= daysBack(now, 120));
     const d = old.length ? v.value - mean(old.map((p) => p.value)) : undefined;
-    const base = "The best single measure of heart fitness. Lifting barely moves it; two 20-minute hard cardio sessions a week do.";
+    const about = t("twin.about.vo2");
     const [status, chip, why]: [Status, string, string] =
       d === undefined
-        ? ["info", "Cardio fitness", base]
+        ? ["info", t("twin.c.cardio"), about]
         : d <= -2
-          ? ["watch", "Slipping", `Down ${fmtNum(Math.round(-d * 10) / 10)} in three months. ${base}`]
+          ? ["watch", t("twin.c.slipping"), t("twin.w.vo2Down", { n: fmtNum(Math.round(-d * 10) / 10), about })]
           : d >= 1
-            ? ["good", "Rising", `Up ${fmtNum(Math.round(d * 10) / 10)} in three months. Keep the cardio going.`]
-            : ["steady", "Steady", `Steady over three months. ${base}`];
+            ? ["good", t("twin.c.rising"), t("twin.w.vo2Up", { n: fmtNum(Math.round(d * 10) / 10) })]
+            : ["steady", t("twin.c.steady"), t("twin.w.vo2Steady", { about })];
     out.push({
       id: "vo2max",
-      label: "VO₂ max",
+      label: t("twin.l.vo2max"),
       display: `${fmtNum(Math.round(v.value * 10) / 10)}`,
       value: v.value,
       status,
@@ -696,22 +691,18 @@ export function twin(input: TwinInput): TwinMetric[] {
     const earlier = drops.filter((p) => p.day <= daysBack(now, 30) && p.day >= daysBack(now, 120)).map((p) => p.value);
     const then = earlier.length >= 3 ? earlier.sort((a, b) => a - b)[Math.floor(earlier.length / 2)] : undefined;
     const d = then === undefined ? undefined : lastThree - then;
-    const about = "How far your heart rate falls in the first minute of rest between sets. A bigger drop means a fitter heart.";
+    const about = t("twin.about.restDrop");
     const [status, chip, why]: [Status, string, string] =
       d === undefined
-        ? ["info", "Your baseline", `${about} A month more shows your trend.`]
+        ? ["info", t("twin.c.baseline"), t("twin.w.dropBaseline", { about })]
         : d >= 3
-          ? ["good", "Fitter", `Up from −${fmtNum(Math.round(then!))} bpm a month or more ago. ${about}`]
+          ? ["good", t("twin.c.fitter"), t("twin.w.dropUp", { n: fmtNum(Math.round(then!)), about })]
           : d <= -4
-            ? [
-                "watch",
-                "Slower",
-                `Down from −${fmtNum(Math.round(then!))} bpm. Tired or under-recovered hearts settle slower: check sleep and take your easy days.`,
-              ]
-            : ["steady", "Steady", about];
+            ? ["watch", t("twin.c.slower"), t("twin.w.dropDown", { n: fmtNum(Math.round(then!)) })]
+            : ["steady", t("twin.c.steady"), about];
     out.push({
       id: "restDrop",
-      label: "Heart rate drop in rest",
+      label: t("twin.l.restDrop"),
       display: `−${fmtNum(Math.round(lastThree))} bpm`,
       value: lastThree,
       status,
@@ -724,12 +715,12 @@ export function twin(input: TwinInput): TwinMetric[] {
   } else {
     out.push({
       id: "restDrop",
-      label: "Heart rate drop in rest",
+      label: t("twin.l.restDrop"),
       display: "",
       status: "missing",
-      chip: "Needs a strap",
-      why: "Wear a heart rate monitor in three workouts to see how fast your heart settles between sets.",
-      action: { kind: "route", route: "settings", label: "Pair a monitor" },
+      chip: t("twin.c.needsStrap"),
+      why: t("twin.w.needsStrap"),
+      action: { kind: "route", route: "settings", label: t("twin.a.pair") },
       series: [],
       source: "app",
       fresh: false,

@@ -11,6 +11,14 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
   4. **Music:** None, Spotify, Apple Music or YouTube Music (`profile.connections.music`, synced with the profile).
   5. **Coming later**, in order: Samsung Health directly, Apple Watch and Wear OS apps, a Garmin watch app, bar speed sensors.
 
+## Workouts saved to Health Connect and Apple Health (2026-11-10)
+
+- The health plugin can only write samples, so finished workouts used to arrive as loose calories and heart rate. Our own small plugin now writes each one as a real workout: **`HealthWorkoutPlugin.kt`** (Android, the app module's first Kotlin file, because Health Connect's client is Kotlin-first; it asks only for `WRITE_EXERCISE` and writes a strength training `ExerciseSessionRecord` whose client record id is the workout id, so a second write updates it) and **`HealthWorkoutPlugin.swift`** (iOS, `HKWorkoutBuilder` with a traditional strength training workout, `HKMetadataKeyExternalUUID` set to the workout id and skipped if it's already there). Both are called `HealthWorkout` (`status`, `request`, `save`) from `saveWorkout` in `health.ts`.
+- Title and notes are the same as Strava's (`stravaWorkout`): "Strength training" and the sets, one line per exercise. iOS has no notes field, so only the title goes in (as the brand name).
+- **Calories and heart rate:** on iOS they go inside the workout (so the Move ring counts them once, and the plugin's separate samples are skipped); on Android they stay separate records over the same time, which is how Health Connect apps link them. Without the workout permission, both platforms write the samples as before.
+- The permission is asked for right after the health plugin's sheet when Health is connected (`connectHealth`), and Connected apps shows "Workouts (written)" with a **Save my workouts to …** button for lifters who connected before this existed.
+- Play: `WRITE_EXERCISE` must be added to the Health Connect declaration in Play Console (docs/PRIVACY_LABELS.md). The privacy policy and `public/privacypolicy.html` say workouts are saved with their time, title and sets.
+
 ## Strava, Oura and WHOOP: the server
 
 - **Routes** (server build only): `GET /api/connect/` (which services have keys, which this account connected), `POST /api/connect/<service>/` (a one-time sign-in link), `DELETE /api/connect/<service>/` (disconnect), `GET /api/connect/<service>/callback/` (the service sends the lifter back), `GET /api/connect/<oura|whoop>/daily/?days=45&tz=…` (readings), `POST /api/connect/strava/upload/` (one workout). All but the callback need the account's Bearer token. Code: `src/server/connect.ts`; shared types `src/lib/cloud.ts`; app side `src/lib/connections.ts`.

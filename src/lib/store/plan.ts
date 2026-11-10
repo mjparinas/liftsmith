@@ -9,12 +9,12 @@ import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
 import { pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
-import { readiness, type Call, type Readiness } from "../readiness";
+import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
 import { planFromRoutine } from "../routines";
 import { healthExternal } from "../twin";
-import type { Gym, Profile } from "../types";
-import { relink, type Ctx } from "./shared";
+import type { FeelEvent, Gym, Profile } from "../types";
+import { relink, uid, type Ctx } from "./shared";
 
 // The profile, gyms and Today's plan: settings, the push/easy call, superset links, plateau fixes and deloads.
 // One slice of the app's state (store.ts puts them together).
@@ -27,6 +27,11 @@ export interface PlanSlice {
   /** The lifter's own call for today, overriding the suggestion. */
   callOverride: Call | null;
   setCall(c: Call | null): void;
+  /**
+   * The pre-workout check-in on Today: merges the change into today's answer, saves it as a new "feel"
+   * event (the newest one today counts) and rebuilds the plan, so the call and the playlist follow.
+   */
+  feel(change: Partial<Pick<FeelEvent, "energy" | "sore" | "unwell">>): void;
   /** The gym last picked automatically by location, for the hint on Today. */
   pickedByLocation: string | null;
   /**
@@ -56,7 +61,7 @@ export interface PlanSlice {
 }
 
 export function planSlice(c: Ctx): PlanSlice {
-  const { set, get, gym } = c;
+  const { set, get, gym, commit } = c;
   return {
     preview: null,
     readiness: null,
@@ -161,6 +166,23 @@ export function planSlice(c: Ctx): PlanSlice {
 
     setCall(c) {
       set({ callOverride: c });
+      get().replan();
+    },
+
+    feel(change) {
+      const now = Date.now();
+      const was = todayFeel(get().events, now);
+      const next: FeelEvent = {
+        type: "feel",
+        id: uid(),
+        at: now,
+        energy: change.energy ?? was?.energy ?? 0,
+        sore: change.sore ?? was?.sore,
+        unwell: change.unwell ?? was?.unwell,
+      };
+      commit([next]);
+      // Only that the check-in was used: how the lifter feels stays out of usage stats.
+      track("feature", { name: "feel_checkin" });
       get().replan();
     },
 

@@ -6,6 +6,7 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "nav.main": "Main",
   "nav.back.today": "Today",
+  "nav.loading": "Loading",
 } as const;
 
 type Key = keyof typeof en;
@@ -13,9 +14,11 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "nav.main": "Principal",
   "nav.back.today": "Hoy",
+  "nav.loading": "Cargando",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "nav.main": "Principale",
   "nav.back.today": "Aujourd’hui",
+  "nav.loading": "Chargement",
 };

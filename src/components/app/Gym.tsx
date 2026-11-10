@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import { PlateBar } from "@/components/PlateBar";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { t } from "@/lib/i18n";
@@ -13,6 +12,7 @@ import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types
 import { fmtNum } from "@/lib/units";
 
 import { BuyNext } from "./BuyNext";
+import { PlateBar } from "./Plates";
 import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 
 export function Gym() {

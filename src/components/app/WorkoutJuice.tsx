@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 
 import { exercise } from "@/lib/exercises";
 import { isPr, repsForPr } from "@/lib/game";
+import { t } from "@/lib/i18n";
 import { confetti, haptic, juice, sound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import type { SetEvent } from "@/lib/types";
@@ -51,7 +52,7 @@ export function PrMoment() {
           🏆
         </span>
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-gold">New personal record</p>
+          <p className="text-xs font-semibold uppercase tracking-wider text-gold">{t("pr.banner")}</p>
           <p className="num font-semibold">
             {exercise(shown.exerciseId).name} · {fmtNum(fromKg(shown.weight, profile.unit))} {profile.unit} × {shown.reps}
           </p>
@@ -69,7 +70,7 @@ export function AlmostThere({ exerciseId, weight, reps }: { exerciseId: string; 
   const at = `${fmtNum(fromKg(weight, profile.unit))} ${profile.unit}`;
   return (
     <p className="mt-2 text-center text-sm text-gold">
-      {need <= reps ? `🏆 ${reps} reps at ${at} is a new PR.` : `🏆 PR in reach: ${need} reps at ${at} beats your best.`}
+      {need <= reps ? t("pr.isNew", { reps, weight: at }) : t("pr.inReach", { reps: need, weight: at })}
     </p>
   );
 }

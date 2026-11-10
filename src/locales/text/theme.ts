@@ -1,0 +1,75 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "theme.": the earned themes' names and how each is earned (src/lib/themes.ts),
+// in every language. theme.<id> is the name, theme.<id>.how the unlock line. English is the source.
+
+export const en = {
+  "theme.midnight": "Midnight",
+  "theme.midnight.how": "Yours from day one",
+  "theme.forge": "Forge",
+  "theme.forge.how": "Lift a double-decker bus (12 t in total)",
+  "theme.glacier": "Glacier",
+  "theme.glacier.how": "Finish 25 workouts",
+  "theme.volt": "Volt",
+  "theme.volt.how": "Set 10 personal bests",
+  "theme.aurora": "Aurora",
+  "theme.aurora.how": "Meet your weekly goal 8 weeks running",
+  "theme.rose": "Rose",
+  "theme.rose.how": "Finish 50 workouts",
+  "theme.abyss": "Abyss",
+  "theme.abyss.how": "Lift a blue whale (150 t in total)",
+  "theme.royal": "Royal",
+  "theme.royal.how": "Reach your first liftiversary",
+  "theme.pumpkin": "Pumpkin",
+  "theme.pumpkin.how": "Open to everyone in October",
+  "theme.frost": "Frost",
+  "theme.frost.how": "Open to everyone in December",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "theme.midnight": "Medianoche",
+  "theme.midnight.how": "Tuyo desde el primer día",
+  "theme.forge": "Fragua",
+  "theme.forge.how": "Levanta un autobús de dos pisos (12 t en total)",
+  "theme.glacier": "Glaciar",
+  "theme.glacier.how": "Termina 25 entrenamientos",
+  "theme.volt": "Voltio",
+  "theme.volt.how": "Consigue 10 mejores marcas",
+  "theme.aurora": "Aurora",
+  "theme.aurora.how": "Cumple tu objetivo semanal 8 semanas seguidas",
+  "theme.rose": "Rosa",
+  "theme.rose.how": "Termina 50 entrenamientos",
+  "theme.abyss": "Abismo",
+  "theme.abyss.how": "Levanta una ballena azul (150 t en total)",
+  "theme.royal": "Real",
+  "theme.royal.how": "Cumple tu primer aniversario levantando",
+  "theme.pumpkin": "Calabaza",
+  "theme.pumpkin.how": "Abierto a todos en octubre",
+  "theme.frost": "Escarcha",
+  "theme.frost.how": "Abierto a todos en diciembre",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "theme.midnight": "Minuit",
+  "theme.midnight.how": "À vous dès le premier jour",
+  "theme.forge": "Forge",
+  "theme.forge.how": "Soulevez un bus à impériale (12 t au total)",
+  "theme.glacier": "Glacier",
+  "theme.glacier.how": "Terminez 25 séances",
+  "theme.volt": "Volt",
+  "theme.volt.how": "Battez 10 records personnels",
+  "theme.aurora": "Aurore",
+  "theme.aurora.how": "Atteignez votre objectif hebdo 8 semaines d’affilée",
+  "theme.rose": "Rose",
+  "theme.rose.how": "Terminez 50 séances",
+  "theme.abyss": "Abysse",
+  "theme.abyss.how": "Soulevez une baleine bleue (150 t au total)",
+  "theme.royal": "Royal",
+  "theme.royal.how": "Fêtez votre premier anniversaire de muscu",
+  "theme.pumpkin": "Citrouille",
+  "theme.pumpkin.how": "Ouvert à tous en octobre",
+  "theme.frost": "Givre",
+  "theme.frost.how": "Ouvert à tous en décembre",
+};

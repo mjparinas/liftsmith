@@ -56,6 +56,14 @@ export const en = {
   "awards.secretCount": { one: "{count} secret achievement", other: "{count} secret achievements" },
   "awards.hidden": "Hidden until you earn them",
   "awards.none": "Nothing here yet.",
+  "awards.u.h": "{n} h",
+  "awards.u.lb": "{n} lb",
+  "awards.u.plates": { one: "{n} plate", other: "{n} plates" },
+  "awards.u.reps": { one: "{n} rep", other: "{n} reps" },
+  "awards.u.s": "{n} s",
+  "awards.u.t": "{n} t",
+  "awards.u.weeks": { one: "{n} week", other: "{n} weeks" },
+  "awards.u.x": "{n}×",
 } as const;
 
 type Key = keyof typeof en;
@@ -113,6 +121,14 @@ export const es: Partial<Record<Key, Message>> = {
   "awards.secretCount": { one: "{count} logro secreto", other: "{count} logros secretos" },
   "awards.hidden": "Ocultos hasta que los consigas",
   "awards.none": "Aún no hay nada aquí.",
+  "awards.u.h": "{n} h",
+  "awards.u.lb": "{n} lb",
+  "awards.u.plates": { one: "{n} disco", other: "{n} discos" },
+  "awards.u.reps": { one: "{n} repetición", other: "{n} repeticiones" },
+  "awards.u.s": "{n} s",
+  "awards.u.t": "{n} t",
+  "awards.u.weeks": { one: "{n} semana", other: "{n} semanas" },
+  "awards.u.x": "{n}×",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -169,4 +185,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "awards.secretCount": { one: "{count} succès secret", other: "{count} succès secrets" },
   "awards.hidden": "Cachés jusqu’à ce que vous les obteniez",
   "awards.none": "Rien ici pour l’instant.",
+  "awards.u.h": "{n} h",
+  "awards.u.lb": "{n} lb",
+  "awards.u.plates": { one: "{n} disque", other: "{n} disques" },
+  "awards.u.reps": { one: "{n} répétition", other: "{n} répétitions" },
+  "awards.u.s": "{n} s",
+  "awards.u.t": "{n} t",
+  "awards.u.weeks": { one: "{n} semaine", other: "{n} semaines" },
+  "awards.u.x": "{n}×",
 };

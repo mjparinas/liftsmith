@@ -84,15 +84,42 @@ export function detectMode(): DemoMode {
   return detected;
 }
 
-const VIEWS: [View, string][] = [
-  ["orbit", "Orbit"],
-  ["front", "Front"],
+/** The demo's words. English here for the website; the app's LiftDemo passes them in the lifter's language. */
+export const DEMO_WORDS = {
+  figure: "Figure",
+  alt: "3D figure doing {name}",
+  altDrag: "3D figure doing {name}. Drag to rotate.",
+  altNone: "3D figure",
+  drag: "Drag to rotate",
+  controls: "Demo controls",
+  body: "Body",
+  male: "Male",
+  female: "Female",
+  view: "View",
+  orbit: "Orbit",
+  front: "Front",
+  side: "Side",
+  skeleton: "Skeleton",
+  muscles: "Target muscles",
+  barPath: "Bar path",
+  handPath: "Hand path",
+  tempo: "Tempo",
+  pause: "Pause",
+  play: "Play",
+  works: "Works",
+};
+export type DemoWords = Record<keyof typeof DEMO_WORDS, string>;
+
+const viewsOf = (w: DemoWords): [View, string][] => [
+  ["orbit", w.orbit],
+  ["front", w.front],
   ["three", "3/4"],
-  ["side", "Side"],
+  ["side", w.side],
 ];
 
 export function LiftDemoCore({
   labels,
+  words: w = DEMO_WORDS,
   maxDpr,
   autoPlay2d,
   exerciseId = null,
@@ -113,7 +140,8 @@ export function LiftDemoCore({
   bare = false,
   onDone,
   onClick,
-}: LiftDemoProps & { labels: Partial<Record<Muscle, string>> }) {
+}: LiftDemoProps & { labels: Partial<Record<Muscle, string>>; words?: DemoWords }) {
+  const VIEWS = viewsOf(w);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loopRef = useRef<Loop | null>(null);
   const phaseRef = useRef<HTMLSpanElement>(null);
@@ -210,8 +238,8 @@ export function LiftDemoCore({
   const setView = setViewPick;
 
   const ex = exerciseId ? EXERCISES.find((e) => e.id === exerciseId) : undefined;
-  const name = ex?.name ?? "Figure";
-  const alt = ex ? `3D figure doing ${ex.name}${controls ? ". Drag to rotate." : ""}` : "3D figure";
+  const name = ex?.name ?? w.figure;
+  const alt = ex ? (controls ? w.altDrag : w.alt).replace("{name}", ex.name) : w.altNone;
 
   return (
     <div className={className}>
@@ -244,39 +272,39 @@ export function LiftDemoCore({
         {!!bpm && <HeartReadout bpm={bpm} trend={hrTrend} />}
         {controls && (
           <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
-            <span>{bpm ? "" : "Drag to rotate"}</span>
+            <span>{bpm ? "" : w.drag}</span>
             <span>{mode === "2d" ? "2D" : ""}</span>
           </div>
         )}
       </div>
       {controls && (
         <div className="mt-3 space-y-3">
-          <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Demo controls">
+          <div className="flex flex-wrap items-center gap-2" role="group" aria-label={w.controls}>
             {bodyToggle && (
               <Seg
-                label="Body"
+                label={w.body}
                 value={body}
                 options={[
-                  ["male", "Male"],
-                  ["female", "Female"],
+                  ["male", w.male],
+                  ["female", w.female],
                 ]}
                 onPick={setBodyPick}
               />
             )}
-            <Seg label="View" value={view} options={VIEWS} onPick={setView} />
+            <Seg label={w.view} value={view} options={VIEWS} onPick={setView} />
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <Toggle on={skeleton} onClick={() => setSkeleton((v) => !v)} dot="#f3e6d3">
-              Skeleton
+              {w.skeleton}
             </Toggle>
             <Toggle on={muscles} onClick={() => setMuscles((v) => !v)} dot="#ff5b3a">
-              Target muscles
+              {w.muscles}
             </Toggle>
             <Toggle on={path} onClick={() => setPath((v) => !v)} dot="#d4e0ea">
-              {ex && ex.load === "barbell" ? "Bar path" : "Hand path"}
+              {ex && ex.load === "barbell" ? w.barPath : w.handPath}
             </Toggle>
             <Seg
-              label="Tempo"
+              label={w.tempo}
               value={String(speed)}
               options={[
                 ["0.5", "0.5×"],
@@ -290,12 +318,12 @@ export function LiftDemoCore({
               aria-pressed={playing}
               className="press min-h-11 rounded-xl border border-line bg-surface px-3 text-sm"
             >
-              {playing ? "Pause" : "Play"}
+              {playing ? w.pause : w.play}
             </button>
           </div>
           {ex && (
             <p className="flex flex-wrap items-center gap-1.5 text-sm">
-              <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">Works</span>
+              <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">{w.works}</span>
               {ex.primary.map((m) => (
                 <span
                   key={m}

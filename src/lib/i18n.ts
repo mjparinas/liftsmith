@@ -2,6 +2,7 @@ import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
 
+import { setExerciseText } from "./exercises";
 import { isNative } from "./juice";
 
 // Languages (Melvin, 2026-11-09: "i18n and l10n, use as much native as possible").
@@ -24,6 +25,13 @@ export const LANG_NAME: Record<Lang, string> = { en: "English", es: "Español", 
 type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 export type Message = string | Plural;
 const CATALOG: Record<Lang, Partial<Record<MessageKey, Message>>> = { en, es, fr };
+
+// The exercise library is shared with the public website, so it reads its translations through this
+// lookup rather than importing the catalogues (exercises.ts, `setExerciseText`).
+setExerciseText((key) => {
+  const m = lang === "en" ? undefined : CATALOG[lang][key as MessageKey];
+  return typeof m === "string" ? m : undefined;
+});
 
 let phoneTags: readonly string[] = typeof navigator !== "undefined" ? (navigator.languages ?? [navigator.language]) : ["en"];
 let pref: LangPref = "system";

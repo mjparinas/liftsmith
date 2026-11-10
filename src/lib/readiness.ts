@@ -3,13 +3,14 @@ import { cycleSignal, cycleState } from "./cycle";
 import { t } from "./i18n";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
-import type { AppEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
+import type { AppEvent, FeelEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
 
 // "Rest or push today?" (Melvin, 2026-11-09). Everything here comes from the lifter's own
 // logged data, on the device: how recovered the big muscles are, how many target reps they hit
 // lately, how sets felt, how long reps took compared with their own history, and whether heart
 // rate ran high for the same work. Health data (sleep, HRV, resting HR, breathing rate) comes in as
-// `external` from the health twin (twin.ts healthExternal), for Pro. The lifter can always override the call.
+// `external` from the health twin (twin.ts healthExternal), for Pro. The pre-workout check-in on Today (a
+// "feel" event: energy, sore, unwell) counts for everyone. The lifter can always override the call.
 
 export type Call = "push" | "normal" | "recover";
 
@@ -37,7 +38,7 @@ export interface ExternalSignals {
   restingHrDelta?: number;
   /** Overnight breathing rate against its 30-day baseline, in breaths a minute. */
   breathingDelta?: number;
-  /** Pre-workout check-in, −1 (low) to 1 (great). */
+  /** Pre-workout check-in, −1 (low) to 1 (great). Defaults to today's check-in on Today (`todayFeel`). */
   checkIn?: -1 | 0 | 1;
   /** Use logged periods (only when the lifter opted in to cycle-aware readiness). */
   cycle?: boolean;
@@ -74,6 +75,25 @@ function paceHistory(events: readonly AppEvent[], exerciseId: string): number[] 
   return out;
 }
 
+/** Today's check-in: the newest "feel" event from the lifter's local today, if they answered. */
+export function todayFeel(events: readonly AppEvent[], now: number): FeelEvent | undefined {
+  const today = dayKey(now);
+  let best: FeelEvent | undefined;
+  for (const e of events) if (e.type === "feel" && dayKey(e.at) === today && (!best || e.at >= best.at)) best = e;
+  return best;
+}
+
+/** What the check-in adds: energy, soreness, and feeling unwell (which makes today easy on its own). */
+function feelSignals(feel: FeelEvent | undefined, checkIn: ExternalSignals["checkIn"]): Signal[] {
+  const out: Signal[] = [];
+  const energy = checkIn ?? feel?.energy;
+  if (feel?.unwell) out.push({ points: -25, text: t("sig.unwell") });
+  if (energy === -1) out.push({ points: -15, text: t("sig.low") });
+  if (energy === 1) out.push({ points: 8, text: t("sig.great") });
+  if (feel?.sore) out.push({ points: -8, text: t("sig.sore") });
+  return out;
+}
+
 export function readiness(events: readonly AppEvent[], profile: Profile, now: number, external: ExternalSignals = {}): Readiness {
   const signals: Signal[] = [];
   const add = (points: number, text: string) => {
@@ -81,10 +101,17 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   };
   const sessions = recentSessions(events);
   const week = blockWeek(profile, now);
+  const feel = todayFeel(events, now);
 
   if (!sessions.length) {
     const c = external.cycle ? cycleSignal(cycleState(events, now)) : null;
-    return { call: "normal", score: 50, signals: [{ points: 0, text: t("sig.firstWorkout") }, ...(c ? [c] : [])], challenge: false };
+    const said = feelSignals(feel, external.checkIn);
+    return {
+      call: feel?.unwell ? "recover" : "normal",
+      score: Math.max(0, Math.min(100, 50 + said.reduce((s, x) => s + x.points, 0))),
+      signals: [...said, { points: 0, text: t("sig.firstWorkout") }, ...(c ? [c] : [])],
+      challenge: false,
+    };
   }
 
   // 1. Recovery of the big muscles.
@@ -142,8 +169,7 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
 
   // 7. Health data (the health twin, twin.ts) and the check-in, when connected.
   for (const x of healthSignals(external)) add(x.points, x.text);
-  if (external.checkIn === -1) add(-15, t("sig.low"));
-  if (external.checkIn === 1) add(8, t("sig.great"));
+  for (const x of feelSignals(feel, external.checkIn)) add(x.points, x.text);
   if (external.cycle) {
     const c = cycleSignal(cycleState(events, now));
     if (c) signals.push(c);
@@ -152,6 +178,8 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const score = Math.max(0, Math.min(100, Math.round(50 + signals.reduce((s, x) => s + x.points, 0))));
   let call: Call = score >= PUSH_AT ? "push" : score <= RECOVER_AT ? "recover" : "normal";
   if (week.deload && call === "push") call = "normal";
+  // Feeling ill always means an easy day: training hard while sick isn't worth it.
+  if (feel?.unwell) call = "recover";
 
   // Challenges: now and then on a push day, never two in a week, never in a deload.
   const lastChallenge = events.reduce((t, e) => (e.type === "sessionStart" && e.challenge ? Math.max(t, e.at) : t), 0);

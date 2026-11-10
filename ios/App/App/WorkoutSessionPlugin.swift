@@ -14,6 +14,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(VoiceCoachPlugin())
         bridge?.registerPluginInstance(AppIconPlugin())
         bridge?.registerPluginInstance(AccountSignInPlugin())
+        bridge?.registerPluginInstance(HealthWorkoutPlugin())
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true
@@ -47,7 +48,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         let center = UNUserNotificationCenter.current()
         next = (center.delegate !== self ? center.delegate : nil) ?? (bridge?.notificationRouter as UNUserNotificationCenterDelegate?)
         center.delegate = self
-        let log = UNNotificationAction(identifier: "log", title: "Log set", options: [])
+        let log = UNNotificationAction(identifier: "log", title: NSLocalizedString("Log set", comment: "Rest-over alert button"), options: [])
         let add = UNNotificationAction(identifier: "add30", title: "+30 s", options: [])
         center.setNotificationCategories([UNNotificationCategory(identifier: category, actions: [log, add], intentIdentifiers: [], options: [])])
 
@@ -85,8 +86,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         guard delay > 0.5 else { return call.resolve() }
 
         let content = UNMutableNotificationContent()
-        content.title = "Rest over"
-        content.body = ["Up next: \(call.getString("next") ?? "")", call.getString("plates")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n")
+        content.title = NSLocalizedString("Rest over", comment: "Rest-over alert title")
+        content.body = [String(format: NSLocalizedString("Up next: %@", comment: "Rest-over alert, the next set"), call.getString("next") ?? ""), call.getString("plates")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: "\n")
         content.categoryIdentifier = category
         // Rest-over alert (Workout preferences): iOS can't vibrate a local notification without its sound,
         // or play the sound without the phone's own Sounds & Haptics choice, so "vibrate only" posts a
