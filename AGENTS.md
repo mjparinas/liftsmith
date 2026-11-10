@@ -114,7 +114,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - **One static page for the app** with hash routes (`#/today`, `#/workout`, …), so it works offline from one cached page.
 - **The active workout** is also kept in `localStorage`, so killing the app mid-set loses nothing.
 - **Seeded randomness only** in the generator (`random.ts`), never `Math.random`, so plans are reproducible and testable.
-- **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
+- **Native code** lives in the Android project as small Capacitor plugins (WorkoutSession foreground service; Health Connect; HealthWorkout, the one Kotlin plugin, because Health Connect's client is Kotlin-first), called from `src/lib/sessionNotify.ts` and friends, which fall back to web APIs when not native.
 
 ## Code conventions (Melvin asked, 2026-11-09: "easier to maintain and change")
 - **Strict TypeScript plus** `noImplicitReturns` and `noFallthroughCasesInSwitch` (`tsconfig.json`). No `any`.

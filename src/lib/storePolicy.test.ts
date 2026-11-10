@@ -32,7 +32,8 @@ const kept = tags.filter((m) => !m[2].includes('tools:node="remove"')).map((m) =
 
 describe("Play store policy config", () => {
   it("declares exactly the Health Connect permissions health.ts requests", () => {
-    const wanted = [...READ.map((t) => `READ_${PERMISSION[t]}`), ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`)];
+    // WRITE_EXERCISE is asked for by our own HealthWorkoutPlugin.kt (workouts as exercise sessions).
+    const wanted = [...READ.map((t) => `READ_${PERMISSION[t]}`), ...WRITE.map((t) => `WRITE_${PERMISSION[t]}`), "WRITE_EXERCISE"];
     expect(wanted.every((w) => !w.includes("undefined"))).toBe(true);
     expect([...kept].sort()).toEqual([...wanted].sort());
   });
