@@ -9,6 +9,7 @@ import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "
 
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Inbox } from "./Inbox";
+import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { Todo } from "./Todo";
 
@@ -581,6 +582,8 @@ export function AdminApp() {
 
         {tab === "Traffic" && (
           <>
+            <SearchConsole days={days} />
+            <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
               <Tile label="Page views" value={fmtInt(site.views)} delta={delta(site.views, site.prevViews)} />

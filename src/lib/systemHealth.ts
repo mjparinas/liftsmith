@@ -194,6 +194,12 @@ export const SETTINGS: { names: string[]; label: string; need: "required" | "rec
     what: "A read-only Actions token; the Builds card works without one, within GitHub's hourly limit.",
   },
   { names: ["VERCEL_TOKEN"], label: "Vercel token", need: "optional", what: "A read-only token, for the Deploys card's history." },
+  {
+    names: ["GOOGLE_SERVICE_ACCOUNT_KEY"],
+    label: "Search Console key",
+    need: "optional",
+    what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
+  },
 ];
 
 /** Which settings are set, by name. `env` is looked up, never returned. */
