@@ -64,6 +64,7 @@ export const TRUST_GROUPS: { title: string; controls: Control[] }[] = [
       { title: "Strict script policy", note: "Each website page runs only the scripts it lists." },
       { title: "Our own code, not a CDN", note: "Libraries and models are served by us. No trackers or ad scripts." },
       { title: "Rate limits on every public route", note: "Kept in the database, so bursts can't get around them." },
+      { title: "Uptime monitoring", note: "The site and its database are checked from outside, around the clock." },
     ],
   },
   {
