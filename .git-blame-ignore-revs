@@ -1,0 +1,5 @@
+# Formatting-only commits. GitHub skips them in blame; locally run
+# git config blame.ignoreRevsFile .git-blame-ignore-revs
+
+# Prettier and sorted imports (2026-11-10)
+b489681e4e7c0d84d78e23d565b79c5052e606c1

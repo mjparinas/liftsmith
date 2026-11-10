@@ -12,7 +12,7 @@ npm run dev                  # http://localhost:3000 (public site), http://local
 npm test                     # unit + integration tests (Vitest; engine in node, screens in jsdom)
 npm run test:coverage
 npm run test:mutation        # Stryker on the engine; report in reports/mutation/
-npm run lint && npx tsc --noEmit
+npm run lint && npx tsc --noEmit && npm run format:check
 npm run build                # server build (Vercel): pages plus API routes (route.api.ts)
 npm run build:static         # static export to out/ (native shells, browser tests)
 node scripts/e2e.mjs         # full playthrough (serves out/ itself, or pass a base URL)
@@ -115,6 +115,7 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 
 ## Code conventions (Melvin asked, 2026-11-09: "easier to maintain and change")
 - **Strict TypeScript plus** `noImplicitReturns` and `noFallthroughCasesInSwitch` (`tsconfig.json`). No `any`.
+- **Prettier formats every code file** (`prettier.config.mjs`: width 140, imports sorted and grouped: Node, packages, `@/`, relative). Run `npm run format` before committing; CI's Formatting step fails on unformatted code. Docs and data files are left as written (`.prettierignore`). Formatting-only commits go in `.git-blame-ignore-revs`.
 - **Type-aware lint on `src/`** (`eslint.config.mjs`): `no-floating-promises` (a promise nobody waits for loses its error; await it, or mark a deliberate fire-and-forget with `void`), `no-misused-promises` (no async function where a plain callback is expected; JSX handlers may be async), and `switch-exhaustiveness-check` (a `switch` over a union covers every case or has a `default`).
 
 ## Testing (Melvin asked, 2026-11-09: like Gradelings)
