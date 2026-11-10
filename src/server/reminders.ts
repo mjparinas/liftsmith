@@ -21,6 +21,7 @@ import {
   type PlanInput,
   type ProState,
 } from "@/lib/messages";
+import { isMsgLang } from "@/lib/messageText";
 
 import { confirmMail, messageMail, welcomeMail, type Footer, type Mail } from "./reminderEmails";
 
@@ -182,6 +183,8 @@ export function checkBody(b: unknown): { ok: true; body: SubBody } | { ok: false
         weekStart: x.weekStart as number,
         streakWeeks: x.streakWeeks as number,
         pro,
+        // Optional so older apps keep working; anything unknown reads as English.
+        lang: isMsgLang(x.lang) ? x.lang : undefined,
       },
     },
   };
@@ -198,7 +201,7 @@ async function sendConfirm(sub: Sub, store: Store, mail: Mailer, env: Env, now: 
   sub.confirmHash = sha256(token);
   sub.confirmSends = [...recent, now];
   await store.put(sub);
-  const m = confirmMail(`${env.siteUrl}/api/reminders/confirm/?s=${sub.id}&t=${token}`);
+  const m = confirmMail(`${env.siteUrl}/api/reminders/confirm/?s=${sub.id}&t=${token}`, sub.plan.lang);
   await mail.send({ ...m, to: sub.email, idempotencyKey: `confirm-${sub.id}-${now}` });
   return true;
 }
@@ -282,7 +285,7 @@ export async function confirm(
   const sends = await store.sends(sub.id, 0);
   if (!sends.some((s) => s.key === "welcome")) {
     const r = await mail.send({
-      ...welcomeMail(footer(env, sub.id)),
+      ...welcomeMail(footer(env, sub.id), sub.plan.lang),
       to: sub.email,
       idempotencyKey: `welcome-${sub.id}`,
       headers: listHeaders(env, sub.id),
@@ -332,7 +335,7 @@ async function deliver(
 ): Promise<boolean> {
   const later = m.at - now > 60_000;
   const r = await mail.send({
-    ...messageMail(m, footer(env, sub.id)),
+    ...messageMail(m, footer(env, sub.id), sub.plan.lang),
     to: sub.email,
     idempotencyKey: `${sub.id}-${m.key}`,
     scheduledAt: later ? m.at : undefined,

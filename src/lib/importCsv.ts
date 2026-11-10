@@ -1,5 +1,5 @@
 import { MANUAL_RIR } from "./dashboard";
-import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { englishName, EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { hash } from "./random";
 import type { AppEvent, Exercise, LoadKind, Muscle, SessionEndEvent, SessionStartEvent, SetEvent, Unit, WarmupEvent } from "./types";
 import { toKg } from "./units";
@@ -301,7 +301,7 @@ const LOAD_WORD: Record<LoadKind, string> = {
 };
 
 function libTokens(e: Exercise): Set<string> {
-  const t = tokens(e.name);
+  const t = tokens(englishName(e));
   t.add(LOAD_WORD[e.load]);
   return t;
 }

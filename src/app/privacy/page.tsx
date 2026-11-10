@@ -85,9 +85,9 @@ export default function Privacy() {
         With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and
         respiratory rate from Health Connect or Apple Health to fill in setup, bring in weigh-ins and body fat, keep your TDEE (daily
         calories) current, show the Health view on the Body tab against your own normal, and (with Pro) adjust how hard today&apos;s workout
-        is, and writes a finished workout&apos;s active calories and average heart rate back. These readings stay on your phone and are
-        never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your other devices have them, and
-        nowhere else.{" "}
+        is, and saves each finished workout back as a strength training workout with its time, title, sets, active calories and average
+        heart rate. These readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your
+        own account so your other devices have them, and nowhere else.{" "}
         <a className="text-accent underline" href="/privacypolicy.html">
           More about health data
         </a>

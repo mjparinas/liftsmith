@@ -10,9 +10,11 @@ import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { deletePhoto, listPhotos, pairFor, preparePhoto, savePhoto, type Photo, type Pose } from "@/lib/photos";
 import { useApp } from "@/lib/store";
+import { parseBodyFat } from "@/lib/tdee";
 import type { BodyweightEvent } from "@/lib/types";
 import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 
+import { BodyFatField } from "./BodyFatField";
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
 
@@ -27,6 +29,8 @@ export function Photos() {
   const unit = profile.unit;
   const weighIns = useMemo(() => events.filter((e): e is BodyweightEvent => e.type === "bodyweight").sort((a, b) => a.at - b.at), [events]);
   const [value, setValue] = useState(plainNum(fromKg(profile.bodyweight, unit)));
+  const [fat, setFat] = useState("");
+  const [fatError, setFatError] = useState(false);
   const [photos, setPhotos] = useState<Photo[]>([]);
   const [pose, setPose] = useState<Pose>("front");
   const [busy, setBusy] = useState(false);
@@ -40,9 +44,12 @@ export function Photos() {
 
   const save = () => {
     const kg = toKg(Number(value.replace(",", ".")), unit);
-    if (!(kg > 20 && kg < 400)) return;
+    const pct = parseBodyFat(fat);
+    setFatError(fat.trim() !== "" && pct === undefined);
+    if (!(kg > 20 && kg < 400) || (fat.trim() !== "" && pct === undefined)) return;
     haptic("success");
-    logBodyweight(kg);
+    logBodyweight(kg, pct);
+    setFat("");
   };
 
   const onFile = async (f: File | undefined) => {
@@ -77,18 +84,23 @@ export function Photos() {
 
       <Section title={t("photos.weight", { unit })}>
         <div className="card p-4">
-          <div className="flex gap-2">
-            <BumpField
-              label={t("photos.weightIn", { unit })}
-              value={value}
-              onChange={setValue}
-              step={unit === "lb" ? 0.2 : 0.1}
-              start={Number(value) || 70}
-              min={1}
-              className="min-w-0 flex-1"
-            />
+          <BumpField
+            label={t("photos.weightIn", { unit })}
+            value={value}
+            onChange={setValue}
+            step={unit === "lb" ? 0.2 : 0.1}
+            start={Number(value) || 70}
+            min={1}
+          />
+          <div className="mt-2 flex flex-wrap items-end gap-2">
+            <BodyFatField id="photos-bf" value={fat} onChange={setFat} />
             <Button onClick={save}>{t("photos.log")}</Button>
           </div>
+          {fatError && (
+            <p role="alert" className="mt-2 text-sm text-bad">
+              {t("body.fat.range")}
+            </p>
+          )}
           {weighIns.length > 1 && <WeightChart points={weighIns.map((w) => ({ at: w.at, v: fromKg(w.kg, unit) }))} />}
           {change !== null && (
             <p className="num mt-2 text-sm text-muted">

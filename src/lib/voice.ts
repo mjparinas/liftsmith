@@ -1,5 +1,6 @@
 "use client";
 
+import { currentLang, currentTag, t } from "./i18n";
 import type { Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -8,7 +9,7 @@ import { fmtNum, fromKg } from "./units";
 // VoiceCoach plugin (Android TextToSpeech, iOS AVSpeechSynthesizer), which lowers music while it talks
 // and works with the screen locked on Android. The web build uses the Web Speech API.
 
-type Plugin = { speak(o: { text: string; rate?: number }): Promise<void>; stop(): Promise<void> };
+type Plugin = { speak(o: { text: string; rate?: number; lang?: string }): Promise<void>; stop(): Promise<void> };
 type Cap = { isNativePlatform?: () => boolean; Plugins?: { VoiceCoach?: Plugin } };
 const cap = (): Cap | undefined => (typeof window !== "undefined" ? (window as unknown as { Capacitor?: Cap }).Capacitor : undefined);
 
@@ -25,7 +26,7 @@ export function say(text: string, force = false) {
   const c = cap();
   const p = c?.Plugins?.VoiceCoach;
   if (p && c?.isNativePlatform?.()) {
-    void p.speak({ text, rate: 1 }).catch(() => {});
+    void p.speak({ text, rate: 1, lang: currentTag() }).catch(() => {});
     return;
   }
   try {
@@ -33,21 +34,24 @@ export function say(text: string, force = false) {
     s.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 1.05;
-    u.lang = "en-US";
+    u.lang = currentTag();
     s.speak(u);
   } catch {}
 }
 
 // --- Cues (pure, tested) -----------------------------------------------------------------------
+// Whole lines from the catalogue (vc.*), so each language words them its own way. English says small
+// counts as words ("set two of four"), which reads more naturally; other languages pass digits, which
+// their speech engines say well.
 
 const WORDS = ["zero", "one", "two", "three", "four", "five"];
-const n = (x: number) => (x >= 0 && x < WORDS.length ? WORDS[x] : String(x));
+const n = (x: number) => (currentLang() === "en" && x >= 0 && x < WORDS.length ? WORDS[x]! : String(x));
+const weight = (kg: number, unit: Unit) => t(unit === "kg" ? "vc.kilos" : "vc.pounds", { n: fmtNum(fromKg(kg, unit)) });
 
 export function spokenLoad(kg: number, unit: Unit, load: string): string {
-  if (load === "bodyweight")
-    return kg > 0 ? `bodyweight plus ${fmtNum(fromKg(kg, unit))} ${unit === "kg" ? "kilos" : "pounds"}` : "bodyweight";
-  const w = `${fmtNum(fromKg(kg, unit))} ${unit === "kg" ? "kilos" : "pounds"}`;
-  return load === "dumbbell" || load === "kettlebell" ? `${w} each` : w;
+  if (load === "bodyweight") return kg > 0 ? t("vc.bodyweightPlus", { weight: weight(kg, unit) }) : t("vc.bodyweight");
+  const w = weight(kg, unit);
+  return load === "dumbbell" || load === "kettlebell" ? t("vc.each", { weight: w }) : w;
 }
 
 export interface SetCue {
@@ -66,26 +70,34 @@ export interface SetCue {
 
 /** Said when rest ends: what the next set is. */
 export function setCue(c: SetCue): string {
-  const what = `${spokenLoad(c.kg, c.unit, c.load)} for ${c.reps}${c.timed ? " seconds" : ""}`;
-  if (c.warmup) return `Warm-up. ${what}.`;
-  if (c.challenge && c.setNo === c.sets) return `Challenge set. ${what}, as many good reps as you can.`;
-  const tank = c.rir <= 0 ? "Take it close to failure." : `${n(c.rir)} in reserve.`;
-  if (c.setNo === c.sets && c.sets > 1) return `Last set. ${what}. ${tank}`;
-  return `Set ${n(c.setNo)} of ${n(c.sets)}. ${what}. ${tank}`;
+  const what = t(c.timed ? "vc.whatTimed" : "vc.what", { load: spokenLoad(c.kg, c.unit, c.load), reps: String(c.reps) });
+  if (c.warmup) return t("vc.warmup", { what });
+  if (c.challenge && c.setNo === c.sets) return t("vc.challenge", { what });
+  const effort = c.rir <= 0 ? t("vc.failure") : t("vc.reserve", { n: n(c.rir) });
+  if (c.setNo === c.sets && c.sets > 1) return t("vc.last", { what, effort });
+  return t("vc.set", { n: n(c.setNo), total: n(c.sets), what, effort });
 }
 
 /** Said when a new exercise comes up. */
 export function exerciseCue(name: string, sets: number, c: Omit<SetCue, "name" | "setNo" | "sets">): string {
-  return `Next up, ${name}. ${n(sets)} sets of ${c.reps}${c.timed ? " seconds" : ""} at ${spokenLoad(c.kg, c.unit, c.load)}.`;
+  return t(c.timed ? "vc.nextTimed" : "vc.next", { name, sets: n(sets), reps: String(c.reps), load: spokenLoad(c.kg, c.unit, c.load) });
 }
 
-export const restCue = { ten: "Ten seconds.", go: "Time to lift." } as const;
+export const restCue = {
+  get ten() {
+    return t("vc.ten");
+  },
+  get go() {
+    return t("vc.go");
+  },
+};
 
 export function prCue(name: string): string {
-  return `New personal best on ${name}. Nice.`;
+  return t("vc.pr", { name });
 }
 
 export function doneCue(sets: number, volumeKg: number, unit: Unit): string {
   const v = Math.round(fromKg(volumeKg, unit));
-  return `Workout done. ${sets} sets${v > 0 ? `, ${v.toLocaleString("en-US")} ${unit === "kg" ? "kilos" : "pounds"} moved` : ""}. Great work.`;
+  if (v <= 0) return t("vc.done", { sets: String(sets) });
+  return t("vc.doneMoved", { sets: String(sets), moved: t(unit === "kg" ? "vc.kilos" : "vc.pounds", { n: v }) });
 }

@@ -12,6 +12,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(VoiceCoachPlugin.class);
         registerPlugin(AppIconPlugin.class);
         registerPlugin(AccountSignInPlugin.class);
+        registerPlugin(HealthWorkoutPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

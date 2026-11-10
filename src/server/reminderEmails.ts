@@ -2,6 +2,7 @@
 // phone), with a simple HTML twin. Every email carries the same footer: why it was sent, where to
 // change it, a one-click unsubscribe link and the sender's postal address (CAN-SPAM and CASL).
 import { BRAND } from "@/lib/brand";
+import { say, type MsgLang } from "@/lib/messageText";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
 export interface Mail {
@@ -17,16 +18,31 @@ export interface Footer {
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]!);
 
-function wrap(title: string, paras: string[], cta: { label: string; url: string } | null, footer: Footer | null, why: string): Mail {
+function wrap(
+  lang: MsgLang | undefined,
+  title: string,
+  paras: string[],
+  cta: { label: string; url: string } | null,
+  footer: Footer | null,
+  why: string,
+): Mail {
+  const unsubscribe = say(lang, "rmd.mail.unsubscribe", { brand: BRAND.name });
   const foot = footer
     ? [
         why,
-        `Choose which emails you get in the app under Settings, Reminders.`,
-        `Unsubscribe from all ${BRAND.name} emails: ${footer.unsubscribeUrl}`,
+        say(lang, "rmd.mail.choose"),
+        say(lang, "rmd.mail.link", { label: unsubscribe, url: footer.unsubscribeUrl }),
         `${BRAND.name}, ${footer.postalAddress}`,
       ]
-    : [why, "If you didn't ask for this, ignore it and you won't hear from us again."];
-  const text = [title, "", ...paras.flatMap((p) => [p, ""]), ...(cta ? [`${cta.label}: ${cta.url}`, ""] : []), "--", ...foot].join("\n");
+    : [why, say(lang, "rmd.mail.ignore")];
+  const text = [
+    title,
+    "",
+    ...paras.flatMap((p) => [p, ""]),
+    ...(cta ? [say(lang, "rmd.mail.link", { label: cta.label, url: cta.url }), ""] : []),
+    "--",
+    ...foot,
+  ].join("\n");
   const html = `<!doctype html><html><body style="margin:0;background:#0a0d12;color:#e8edf4;font-family:Roboto,-apple-system,Segoe UI,Arial,sans-serif">
 <div style="max-width:520px;margin:0 auto;padding:32px 20px">
 <p style="color:#4c8dff;font-weight:700;margin:0 0 24px">${esc(BRAND.name)}</p>
@@ -34,48 +50,43 @@ function wrap(title: string, paras: string[], cta: { label: string; url: string 
 ${paras.map((p) => `<p style="font-size:16px;line-height:1.5;margin:0 0 14px">${esc(p)}</p>`).join("\n")}
 ${cta ? `<p style="margin:24px 0"><a href="${esc(cta.url)}" style="display:inline-block;background:#4c8dff;color:#fff;text-decoration:none;font-weight:700;padding:14px 22px;border-radius:14px">${esc(cta.label)}</a></p>` : ""}
 <hr style="border:0;border-top:1px solid #222a35;margin:28px 0 16px">
-${foot.map((l) => `<p style="font-size:12px;line-height:1.5;color:#808c9d;margin:0 0 6px">${l.startsWith("Unsubscribe") && footer ? `<a href="${esc(footer.unsubscribeUrl)}" style="color:#808c9d">Unsubscribe from all ${esc(BRAND.name)} emails</a>` : esc(l)}</p>`).join("\n")}
+${foot.map((l, i) => `<p style="font-size:12px;line-height:1.5;color:#808c9d;margin:0 0 6px">${i === 2 && footer ? `<a href="${esc(footer.unsubscribeUrl)}" style="color:#808c9d">${esc(unsubscribe)}</a>` : esc(l)}</p>`).join("\n")}
 </div></body></html>`;
   return { subject: title, text, html };
 }
 
 const appUrl = (route = "today") => `${SITE_URL}${APP_PATH}#/${route}`;
 
-export function confirmMail(confirmUrl: string): Mail {
+export function confirmMail(confirmUrl: string, lang?: MsgLang): Mail {
+  const brand = BRAND.name;
   return wrap(
-    `Confirm your ${BRAND.name} emails`,
-    ["Tap the button to start getting workout reminders by email. Nothing is sent until you do."],
-    { label: "Confirm my email", url: confirmUrl },
+    lang,
+    say(lang, "rmd.mail.confirm", { brand }),
+    [say(lang, "rmd.mail.confirmBody")],
+    { label: say(lang, "rmd.mail.confirmButton"), url: confirmUrl },
     null,
-    `Someone (hopefully you) entered this address in ${BRAND.name}.`,
+    say(lang, "rmd.mail.confirmWhy", { brand }),
   );
 }
 
-export function welcomeMail(footer: Footer): Mail {
+export function welcomeMail(footer: Footer, lang?: MsgLang): Mail {
   return wrap(
-    `Welcome to ${BRAND.name}`,
-    [
-      "You're all set. Each workout is planned when you open the app, from your gym's equipment, what's recovered and how your last sets went.",
-      "Log a set with one tap. The next set is filled in and the rest timer starts itself, so you can put the phone down and lift.",
-      "We'll email you on Monday with your training week, and only when it helps after that. You can turn any of it off in Settings.",
-    ],
-    { label: "Open today's workout", url: appUrl() },
+    lang,
+    say(lang, "rmd.mail.welcome", { brand: BRAND.name }),
+    [say(lang, "rmd.mail.welcome1"), say(lang, "rmd.mail.welcome2"), say(lang, "rmd.mail.welcome3")],
+    { label: say(lang, "rmd.mail.open"), url: appUrl() },
     footer,
-    "You're getting this because you turned on email from the app.",
+    say(lang, "rmd.mail.whyOn"),
   );
 }
 
 /** A planned message (messages.ts) or a milestone, as an email. */
-export function messageMail(m: { title: string; body: string; route?: string; kind: string }, footer: Footer): Mail {
-  const cta =
-    m.kind === "pro" ? { label: "See Pro", url: appUrl("settings") } : { label: "Open today's workout", url: appUrl(m.route ?? "today") };
-  return wrap(
-    m.title,
-    [m.body],
-    cta,
-    footer,
-    `You're getting this because you turned on ${m.kind === "pro" ? "Pro trial and offer" : "reminder"} emails in the app.`,
-  );
+export function messageMail(m: { title: string; body: string; route?: string; kind: string }, footer: Footer, lang?: MsgLang): Mail {
+  const pro = m.kind === "pro";
+  const cta = pro
+    ? { label: say(lang, "rmd.mail.seePro"), url: appUrl("settings") }
+    : { label: say(lang, "rmd.mail.open"), url: appUrl(m.route ?? "today") };
+  return wrap(lang, m.title, [m.body], cta, footer, say(lang, pro ? "rmd.mail.whyPro" : "rmd.mail.whyReminder"));
 }
 
 /** The page shown after following a link from an email: a button that POSTs, so mail scanners that open links can't act for the reader. */

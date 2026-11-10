@@ -133,10 +133,11 @@ public class WorkoutService extends Service {
             final boolean sound = intent.getBooleanExtra("sound", true);
             final boolean vibrate = intent.getBooleanExtra("vibrate", true);
             final String speak = intent.getStringExtra("speak");
+            final String speakLang = intent.getStringExtra("speakLang");
             restOver = () -> {
                 alertRestOver(next, sound, vibrate);
                 // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
-                if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f);
+                if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f, speakLang);
             };
             handler.postDelayed(restOver, restUntil - System.currentTimeMillis());
         }

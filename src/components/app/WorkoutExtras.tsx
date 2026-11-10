@@ -5,7 +5,6 @@
 // guide or plate-math mini-game on the rest timer.
 import { useEffect, useMemo, useRef, useState } from "react";
 
-import { PlateBar } from "@/components/PlateBar";
 import { ghostFor, paceDelta, paceText, sameAsLast, type Ghost } from "@/lib/ghost";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -21,6 +20,7 @@ import { useNow } from "@/lib/useNow";
 import { exerciseCue, restCue, say, setCue, voice } from "@/lib/voice";
 
 import { clock } from "./format";
+import { PlateBar } from "./Plates";
 
 export function useGhost(events: readonly AppEvent[], exerciseId: string | undefined, sessionId: string | undefined): Ghost | null {
   // Only earlier sessions matter, so the ghost is stable through the workout.

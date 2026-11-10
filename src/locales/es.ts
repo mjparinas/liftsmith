@@ -29,15 +29,19 @@ import * as creator from "./text/creator";
 import * as cycle from "./text/cycle";
 import * as dash from "./text/dash";
 import * as delight from "./text/delight";
+import * as demo from "./text/demo";
 import * as done from "./text/done";
 import * as dots from "./text/dots";
 import * as equipment from "./text/equipment";
+import * as ex from "./text/ex";
 import * as exp from "./text/exp";
 import * as explain from "./text/explain";
 import * as extra from "./text/extra";
 import * as fb from "./text/fb";
 import * as fit from "./text/fit";
 import * as fix from "./text/fix";
+import * as fmt from "./text/fmt";
+import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
@@ -61,16 +65,21 @@ import * as notes from "./text/notes";
 import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
+import * as pgm from "./text/pgm";
 import * as photos from "./text/photos";
+import * as plate from "./text/plate";
 import * as pm from "./text/pm";
+import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
 import * as quest from "./text/quest";
+import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
 import * as sband from "./text/sband";
@@ -82,6 +91,7 @@ import * as sig from "./text/sig";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
 import * as today from "./text/today";
@@ -91,6 +101,8 @@ import * as train from "./text/train";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
+import * as vc from "./text/vc";
+import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
@@ -123,15 +135,19 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...cycle.es,
   ...dash.es,
   ...delight.es,
+  ...demo.es,
   ...done.es,
   ...dots.es,
   ...equipment.es,
+  ...ex.es,
   ...exp.es,
   ...explain.es,
   ...extra.es,
   ...fb.es,
   ...fit.es,
   ...fix.es,
+  ...fmt.es,
+  ...game.es,
   ...ghost.es,
   ...gl.es,
   ...gloss.es,
@@ -155,16 +171,21 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...orm.es,
   ...part.es,
   ...past.es,
+  ...pgm.es,
   ...photos.es,
+  ...plate.es,
   ...pm.es,
+  ...pr.es,
   ...pro.es,
   ...prog.es,
   ...progress.es,
   ...quest.es,
+  ...quote.es,
   ...rarity.es,
   ...recap.es,
   ...recovery.es,
   ...remix.es,
+  ...rmd.es,
   ...rt.es,
   ...save.es,
   ...sband.es,
@@ -176,6 +197,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...tab.es,
   ...td.es,
   ...tdee.es,
+  ...theme.es,
   ...tier.es,
   ...time.es,
   ...today.es,
@@ -185,6 +207,8 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...twin.es,
   ...units.es,
   ...variety.es,
+  ...vc.es,
+  ...warm.es,
   ...wdg.es,
   ...why.es,
   ...wk.es,

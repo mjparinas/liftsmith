@@ -27,7 +27,7 @@ export const en = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Apple Health",
   "conn.health.what":
-    "Reads your weigh-ins, body fat, height, sleep, heart rate variability, resting heart rate, breathing rate, steps and VO2 max. Writes each workout's active calories and heart rate.",
+    "Reads your weigh-ins, body fat, height, sleep, heart rate variability, resting heart rate, breathing rate, steps and VO2 max. Saves each workout, with its active calories and heart rate.",
   "conn.health.web.title": "Health",
   "conn.health.web": "Health Connect and Apple Health work in the Liftsmith app for Android and iPhone. A browser can't reach them.",
   "conn.health.missing": "Health Connect isn't on this phone yet.",
@@ -50,6 +50,8 @@ export const en = {
   "conn.perm.respiratoryRate": "Breathing rate",
   "conn.perm.calories": "Active calories (written)",
   "conn.perm.heartRate": "Heart rate (written)",
+  "conn.perm.workouts": "Workouts (written)",
+  "conn.health.allowWorkouts": "Save my workouts to {store}",
   "conn.hr.title": "Heart rate monitor",
   "conn.hr.what":
     "Live heart rate on the workout screen and the lock screen, from a Bluetooth chest strap or a watch that broadcasts heart rate. Workouts reconnect to the last one by themselves. Test it here before the gym.",
@@ -114,7 +116,7 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Salud de Apple",
   "conn.health.what":
-    "Lee tus pesajes, grasa corporal, altura, sueño, variabilidad de la frecuencia cardiaca, frecuencia cardiaca en reposo, frecuencia respiratoria, pasos y VO2 máx. Escribe las calorías activas y la frecuencia cardiaca de cada entrenamiento.",
+    "Lee tus pesajes, grasa corporal, altura, sueño, variabilidad de la frecuencia cardiaca, frecuencia cardiaca en reposo, frecuencia respiratoria, pasos y VO2 máx. Guarda cada entrenamiento, con sus calorías activas y su frecuencia cardiaca.",
   "conn.health.web.title": "Salud",
   "conn.health.web":
     "Health Connect y Salud de Apple funcionan en la app de Liftsmith para Android y iPhone. Un navegador no puede acceder a ellas.",
@@ -138,6 +140,8 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.perm.respiratoryRate": "Frecuencia respiratoria",
   "conn.perm.calories": "Calorías activas (escritura)",
   "conn.perm.heartRate": "Frecuencia cardiaca (escritura)",
+  "conn.perm.workouts": "Entrenamientos (escritura)",
+  "conn.health.allowWorkouts": "Guardar mis entrenamientos en {store}",
   "conn.hr.title": "Pulsómetro",
   "conn.hr.what":
     "Frecuencia cardiaca en directo en la pantalla del entrenamiento y en la pantalla de bloqueo, desde una banda de pecho Bluetooth o un reloj que emita la frecuencia cardiaca. Los entrenamientos se reconectan solos al último. Pruébalo aquí antes de ir al gimnasio.",
@@ -203,7 +207,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Santé d’Apple",
   "conn.health.what":
-    "Lit vos pesées, votre masse grasse, votre taille, votre sommeil, la variabilité de la fréquence cardiaque, la fréquence cardiaque au repos, la fréquence respiratoire, vos pas et votre VO2 max. Écrit les calories actives et la fréquence cardiaque de chaque séance.",
+    "Lit vos pesées, votre masse grasse, votre taille, votre sommeil, la variabilité de la fréquence cardiaque, la fréquence cardiaque au repos, la fréquence respiratoire, vos pas et votre VO2 max. Enregistre chaque séance, avec ses calories actives et sa fréquence cardiaque.",
   "conn.health.web.title": "Santé",
   "conn.health.web":
     "Health Connect et Santé d’Apple fonctionnent dans l’app Liftsmith pour Android et iPhone. Un navigateur n’y a pas accès.",
@@ -228,6 +232,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.perm.respiratoryRate": "Fréquence respiratoire",
   "conn.perm.calories": "Calories actives (écriture)",
   "conn.perm.heartRate": "Fréquence cardiaque (écriture)",
+  "conn.perm.workouts": "Séances (écriture)",
+  "conn.health.allowWorkouts": "Enregistrer mes séances dans {store}",
   "conn.hr.title": "Cardiofréquencemètre",
   "conn.hr.what":
     "La fréquence cardiaque en direct sur l’écran de séance et l’écran verrouillé, depuis une ceinture Bluetooth ou une montre qui diffuse sa fréquence cardiaque. Les séances se reconnectent toutes seules au dernier. Testez-le ici avant la salle.",

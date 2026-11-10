@@ -3,10 +3,9 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
-import { type PlateFinish } from "@/components/PlateBar";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
-import { queueStrava } from "@/lib/connections";
+import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
@@ -14,7 +13,7 @@ import { alternatives } from "@/lib/generator";
 import { saveWorkout } from "@/lib/health";
 import { hrSupported } from "@/lib/heartRate";
 import { hrLink } from "@/lib/hrLink";
-import { t } from "@/lib/i18n";
+import { currentTag, t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
@@ -37,6 +36,7 @@ import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { clock, loadText, plateText, repsText } from "./format";
 import { Icon } from "./icons";
+import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
@@ -231,6 +231,7 @@ export function Workout() {
       vibrate: alert.vibrate,
       // The voice coach's rest-over cue, said by the native service so it's heard with the screen locked.
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
+      speakLang: currentTag(),
       // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
       chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
@@ -275,7 +276,17 @@ export function Workout() {
     const startedAt = active.startedAt;
     const ev = s.finish();
     if (ev?.type === "sessionEnd") {
-      void saveWorkout({ start: startedAt, end: ev.at, bodyweightKg: profile.bodyweight, avgHr: ev.avgHr });
+      // The same title and sets Strava gets, as the workout's title and notes in Health Connect or Apple Health.
+      const summary = stravaWorkout(useApp.getState().events, ev.sessionId, profile.unit);
+      void saveWorkout({
+        id: ev.sessionId,
+        start: startedAt,
+        end: ev.at,
+        bodyweightKg: profile.bodyweight,
+        avgHr: ev.avgHr,
+        title: summary?.name,
+        notes: summary?.description,
+      });
       queueStrava(ev.sessionId);
     }
     void stopSession();

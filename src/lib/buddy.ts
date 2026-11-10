@@ -32,7 +32,7 @@ export async function shareText(text: string): Promise<"shared" | "copied" | "ca
   const p = (window as unknown as { Capacitor?: { Plugins?: { Share?: Share } } }).Capacitor?.Plugins?.Share;
   try {
     if (p && isNative()) {
-      await p.share({ text, url, dialogTitle: "Tell your gym buddies" });
+      await p.share({ text, url, dialogTitle: t("buddy.shareTitle") });
       return "shared";
     }
     if (navigator.share) {

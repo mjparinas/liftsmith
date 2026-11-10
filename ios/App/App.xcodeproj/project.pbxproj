@@ -29,6 +29,7 @@
 		AF6645131DB97D20C8BEEA68 /* WorkoutLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */; };
 		CCAC65A6C31069F3AFFA6ACC /* LiftsmithWidgets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 70B206EE2EB828FFEC7CB570 /* LiftsmithWidgets.swift */; };
 		D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */; };
+		A1E0FBF2612E0CC3D9E27060 /* HealthWorkoutPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3894D6DC3045CF95DE6219F3 /* HealthWorkoutPlugin.swift */; };
 		D37B231AE9A612B01B303BA6 /* WorkoutIntents.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEE6358D8A4930C1BBB0B17 /* WorkoutIntents.swift */; };
 		DA6BE67C47D60B45DC0F642B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CEC786AFE3663E4C12B2D909 /* Foundation.framework */; };
 		A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000007 /* InstallInfoPlugin.swift */; };
@@ -43,6 +44,9 @@
 		E7A1C0DE0000000000000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000A /* Assets.xcassets */; };
 		E7A1C0DE000000000000000B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000C /* Localizable.strings */; };
 		E7A1C0DE000000000000000D /* LiftsmithWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000E /* LiftsmithWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		C1A0B0020000000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0020000000000000002 /* Localizable.strings */; };
+		C1A0B0030000000000000001 /* AppShortcuts.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0030000000000000002 /* AppShortcuts.strings */; };
+		C1A0B0040000000000000001 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0040000000000000002 /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +120,7 @@
 		BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LiftsmithWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		C992B603812DF1ADEFEF429F /* WorkoutActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WorkoutActivity.swift; sourceTree = "<group>"; };
 		CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = CalendarPlugin.swift; sourceTree = "<group>"; };
+		3894D6DC3045CF95DE6219F3 /* HealthWorkoutPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = HealthWorkoutPlugin.swift; sourceTree = "<group>"; };
 		CEC786AFE3663E4C12B2D909 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StartWorkoutControl.swift; sourceTree = "<group>"; };
 		C1A0B0010000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
@@ -131,6 +136,12 @@
 		E7A1C0DE0000000000000015 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E7A1C0DE0000000000000016 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E7A1C0DE000000000000000E /* LiftsmithWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiftsmithWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1A0B0020000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0020000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0030000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		C1A0B0030000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/AppShortcuts.strings; sourceTree = "<group>"; };
+		C1A0B0040000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		C1A0B0040000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -204,9 +215,12 @@
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
 				504EC3131FED79650016851F /* Info.plist */,
 				C1A0B0010000000000000002 /* InfoPlist.strings */,
+				C1A0B0020000000000000002 /* Localizable.strings */,
+				C1A0B0030000000000000002 /* AppShortcuts.strings */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 				CB3DE0A2982E3181498CA2C0 /* CalendarPlugin.swift */,
+				3894D6DC3045CF95DE6219F3 /* HealthWorkoutPlugin.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -219,6 +233,7 @@
 				6C0C4919AFED1985F321A64F /* WorkoutLiveActivity.swift */,
 				EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */,
 				BB05485F3EDA6B8DD896565A /* Info.plist */,
+				C1A0B0040000000000000002 /* Localizable.strings */,
 			);
 			name = LiftsmithWidgets;
 			path = LiftsmithWidgets;
@@ -375,6 +390,8 @@
 			files = (
 				504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */,
 				C1A0B0010000000000000001 /* InfoPlist.strings in Resources */,
+				C1A0B0020000000000000001 /* Localizable.strings in Resources */,
+				C1A0B0030000000000000001 /* AppShortcuts.strings in Resources */,
 				50B271D11FEDC1A000F3C39B /* public in Resources */,
 				504EC30F1FED79650016851F /* Assets.xcassets in Resources */,
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
@@ -388,6 +405,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1A0B0040000000000000001 /* Localizable.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -428,6 +446,7 @@
 				9632D695CCD0A9D1A115E9B6 /* WorkoutIntents.swift in Sources */,
 				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
 				D2C3974D24092A76E39419BB /* CalendarPlugin.swift in Sources */,
+				A1E0FBF2612E0CC3D9E27060 /* HealthWorkoutPlugin.swift in Sources */,
 				A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */,
 				A1F5E00A0000000000000001 /* AccountSignInPlugin.swift in Sources */,
 				D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */,
@@ -493,6 +512,33 @@
 				E7A1C0DE0000000000000014 /* en */,
 				E7A1C0DE0000000000000015 /* es */,
 				E7A1C0DE0000000000000016 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0020000000000000002 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0020000000000000003 /* es */,
+				C1A0B0020000000000000004 /* fr */,
+			);
+			name = Localizable.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0030000000000000002 /* AppShortcuts.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0030000000000000003 /* es */,
+				C1A0B0030000000000000004 /* fr */,
+			);
+			name = AppShortcuts.strings;
+			sourceTree = "<group>";
+		};
+		C1A0B0040000000000000002 /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				C1A0B0040000000000000003 /* es */,
+				C1A0B0040000000000000004 /* fr */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";

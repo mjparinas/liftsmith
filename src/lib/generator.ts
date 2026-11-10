@@ -1,5 +1,5 @@
 import { blockWeek, weekStart, type BlockWeek } from "./block";
-import { available, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "./exercises";
+import { available, englishName, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "./exercises";
 import { t } from "./i18n";
 import { activeInjuries, effectFor, lighten, skippedIds, type Injury } from "./injury";
 import { stepLoad } from "./loads";
@@ -397,6 +397,6 @@ export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly
       const clear = hurt.length && !eff(e) ? 10 : 0;
       return { e, s: shared + (e.pattern === ex.pattern ? 2 : 0) + (e.compound === ex.compound ? 1 : 0) + clear };
     })
-    .sort((a, b) => b.s - a.s || a.e.name.localeCompare(b.e.name))
+    .sort((a, b) => b.s - a.s || englishName(a.e).localeCompare(englishName(b.e)))
     .map((x) => x.e);
 }
