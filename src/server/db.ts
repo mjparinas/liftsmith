@@ -199,6 +199,25 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     expires_at INTEGER NOT NULL
   )`,
+  // Two-step sign-in for staff (src/server/twoFactor.ts): the authenticator secret (sealed with TWO_FACTOR_KEY),
+  // one-time recovery codes (hashes only) and the sessions that have passed the second step.
+  `CREATE TABLE IF NOT EXISTS admin_two_factor (
+    email TEXT PRIMARY KEY,
+    secret TEXT,
+    pending TEXT,
+    enabled_at INTEGER,
+    last_step INTEGER
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_backup_codes (
+    email TEXT NOT NULL,
+    code_hash TEXT NOT NULL,
+    used_at INTEGER,
+    PRIMARY KEY (email, code_hash)
+  )`,
+  `CREATE TABLE IF NOT EXISTS admin_session_steps (
+    token_hash TEXT PRIMARY KEY,
+    at INTEGER NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS admin_audit (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     at INTEGER NOT NULL,

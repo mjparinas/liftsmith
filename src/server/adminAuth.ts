@@ -5,6 +5,7 @@
 import { createHash, randomBytes } from "node:crypto";
 
 import { query, rateLimit, run } from "./db";
+import { passedSecondStep } from "./twoFactor";
 
 export const COOKIE = "ls_admin";
 const LINK_MS = 15 * 60_000;
@@ -115,17 +116,45 @@ export interface Staff {
   role: Role;
 }
 
-export async function getStaff(req: Request, now = Date.now()): Promise<Staff | null> {
+/** A signed-in staff session, whether or not it has passed the second step yet (src/server/twoFactor.ts). */
+export interface StaffSession extends Staff {
+  /** Hash of the session token, for the two-step routes. */
+  sessionHash: string;
+  twoFactor: boolean;
+  /** Whether it has passed every sign-in step, so the panel may open. */
+  ready: boolean;
+}
+
+export async function getStaffSession(req: Request, now = Date.now()): Promise<StaffSession | null> {
   const c = cookie(req);
   if (!c) return null;
-  const rows = await query<{ email: string; expires_at: number }>("SELECT email, expires_at FROM admin_sessions WHERE token_hash = ?", [
-    hash(c),
-  ]);
+  const rows = await query<{ email: string; expires_at: number; step_at: number | null; enabled_at: number | null }>(
+    `SELECT s.email, s.expires_at, st.at AS step_at, t.enabled_at
+     FROM admin_sessions s
+     LEFT JOIN admin_session_steps st ON st.token_hash = s.token_hash
+     LEFT JOIN admin_two_factor t ON t.email = s.email
+     WHERE s.token_hash = ?`,
+    [hash(c)],
+  );
   const s = rows[0];
   if (!s || Number(s.expires_at) < now) return null;
   // Taking an address off the list in the environment ends its sessions at once.
   const role = roleOf(String(s.email));
-  return role ? { email: String(s.email), role } : null;
+  if (!role) return null;
+  const twoFactor = s.enabled_at != null;
+  return {
+    email: String(s.email),
+    role,
+    sessionHash: hash(c),
+    twoFactor,
+    ready: passedSecondStep(twoFactor, s.step_at == null ? null : Number(s.step_at)),
+  };
+}
+
+/** The staff member behind a request, once every sign-in step is passed. */
+export async function getStaff(req: Request, now = Date.now()): Promise<Staff | null> {
+  const s = await getStaffSession(req, now);
+  return s?.ready ? { email: s.email, role: s.role } : null;
 }
 
 /** Guards an admin route: 404 for anyone else, so the API doesn't advertise itself. Changes need an admin. */
@@ -138,7 +167,10 @@ export async function requireStaff(req: Request, opts: { write?: boolean } = {})
 
 export async function signOut(req: Request): Promise<Response> {
   const c = cookie(req);
-  if (c) await run("DELETE FROM admin_sessions WHERE token_hash = ?", [hash(c)]);
+  if (c) {
+    await run("DELETE FROM admin_sessions WHERE token_hash = ?", [hash(c)]);
+    await run("DELETE FROM admin_session_steps WHERE token_hash = ?", [hash(c)]);
+  }
   const res = json(200, { ok: true });
   res.headers.append("Set-Cookie", `${COOKIE}=; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=0`);
   return res;

@@ -1,6 +1,6 @@
 // The admin Inbox (src/server/inbox.ts): mail Resend received for our domain. GET `?id=` opens one message,
 // `?count=1` says how many are waiting (the tab's count), otherwise a page of the newest (`?after=` continues).
-// POST `{ action: "handled" | "archive" | "reply", id, ... }`; changes need an admin and are audited.
+// POST `{ action: "handled" | "archive" | "reply" | "draft", id, ... }` (draft: Claude writes a first draft for the reply box); changes need an admin and are audited.
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import {
@@ -13,6 +13,7 @@ import {
   replyToInbox,
   waitingMail,
 } from "@/server/inbox";
+import { draftConfigured, draftReply } from "@/server/replyDraft";
 
 const ID = /^[A-Za-z0-9-]{1,100}$/;
 const fail = (e: unknown) => json(e instanceof InboxError ? e.status : 502, { error: (e as Error).message });
@@ -26,7 +27,7 @@ export async function GET(req: Request) {
   const after = q.get("after") ?? undefined;
   if ((id && !ID.test(id)) || (after && !ID.test(after))) return json(400, { error: "Bad request" });
   try {
-    if (id) return json(200, { message: await getInboxMessage(id) });
+    if (id) return json(200, { message: await getInboxMessage(id), canDraft: draftConfigured() });
     if (q.has("count")) return json(200, { waiting: (await waitingMail()).length });
     return json(200, { configured: true, ...(await listInbox({ after })) });
   } catch (e) {
@@ -51,6 +52,14 @@ export async function POST(req: Request) {
       await markArchived(id, body.archived !== false);
       await audit(gate.staff.email, body.archived === false ? "inbox.unarchive" : "inbox.archive", id);
       return json(200, { ok: true });
+    }
+    if (body.action === "draft") {
+      // Only a draft for the reply box: nothing is sent and the draft isn't stored.
+      if (!draftConfigured()) return json(400, { error: "AI drafts need ANTHROPIC_API_KEY." });
+      const m = await getInboxMessage(id);
+      const draft = await draftReply({ from: m.from, subject: m.subject, text: m.text });
+      await audit(gate.staff.email, "inbox.draft", id);
+      return json(200, { draft });
     }
     if (body.action === "reply") {
       const text = typeof body.text === "string" ? body.text.trim() : "";

@@ -204,6 +204,18 @@ export const SETTINGS: { names: string[]; label: string; need: "required" | "rec
     what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
   },
   {
+    names: ["TWO_FACTOR_KEY"],
+    label: "Two-step encryption key",
+    need: "recommended",
+    what: "Encrypts staff authenticator secrets in the database. Without it they're stored as they are. Don't change it once set.",
+  },
+  {
+    names: ["ADMIN_2FA"],
+    label: "Two-step for staff",
+    need: "optional",
+    what: "Unset: every staff sign-in needs an authenticator code. Set to optional to let staff without it in.",
+  },
+  {
     names: ["DATABASE_SIZE_LIMIT_MB"],
     label: "Database size limit",
     need: "optional",
