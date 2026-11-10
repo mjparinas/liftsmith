@@ -10,14 +10,14 @@ import { dayNumber, nearMisses, pathOf, type SearchPart, type SearchReport, type
 import { BarList, Card, fmtDay, fmtInt, fmtPct, LineChart, Table, Tile } from "./charts";
 import { ago } from "./time";
 
-const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
-const pos = (n: number) => n.toFixed(1);
-const shortDate = (d: string) => fmtDay(dayNumber(d));
+export const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
+export const pos = (n: number) => n.toFixed(1);
+export const shortDate = (d: string) => fmtDay(dayNumber(d));
 
-function rowsTable(rows: SearchRow[], label: (k: string) => string) {
+export function rowsTable(rows: SearchRow[], label: (k: string) => string) {
   return rows.map((r) => [label(r.key), fmtInt(r.clicks), fmtInt(r.impressions), fmtPct(r.ctr), pos(r.position)]);
 }
-const COLUMNS = ["Clicks", "Shown", "Click rate", "Position"];
+export const COLUMNS = ["Clicks", "Shown", "Click rate", "Position"];
 
 function Report({ r }: { r: SearchReport }) {
   const t = r.totals;
