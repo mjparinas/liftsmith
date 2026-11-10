@@ -19,6 +19,7 @@ import { RepTracker } from "@/lib/reps/tracker";
 import type { Pattern } from "@/lib/types";
 
 import { Icon } from "./icons";
+import { ProTag } from "./ui";
 
 export type Facing = "user" | "environment";
 export type CountSource = "camera" | "motion";
@@ -364,7 +365,7 @@ export function AutoCountButton({
     >
       <Icon name="camera" size={16} className="text-accent" />
       {t("count.start")}
-      {locked && <span className="rounded-full bg-warn/15 px-1.5 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>}
+      {locked && <ProTag />}
     </button>
   );
 }

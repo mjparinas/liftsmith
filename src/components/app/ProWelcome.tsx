@@ -39,7 +39,7 @@ export function ProWelcome() {
         <p className="mt-1 text-muted">{t("pro.welcome.body")}</p>
       </div>
       <p className="mt-5 text-xs font-semibold tracking-wider text-muted uppercase">{t("pro.welcome.unlocked")}</p>
-      <ProFeatures />
+      <ProFeatures compact />
       {trialDays ? <p className="mt-4 text-sm text-muted">{t("pro.welcome.trialNote", { days: trialDays })}</p> : null}
       <Button
         className="mt-6 w-full"

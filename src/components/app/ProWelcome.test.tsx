@@ -59,7 +59,7 @@ describe("Pro welcome", () => {
     expect(onDone).toHaveBeenCalledWith("annual", true);
     expect(await screen.findByRole("dialog", { name: "Your free trial has started" })).toBeInTheDocument();
     expect(screen.getByText(/taking your health seriously/)).toBeInTheDocument();
-    expect(screen.getByText("Recovery map and advanced stats")).toBeInTheDocument();
+    expect(screen.getByText("Recovery map")).toBeInTheDocument();
     expect(screen.getByText(/Free for 14 days. You can cancel/)).toBeInTheDocument();
     await vi.waitFor(() => expect(confetti).toHaveBeenCalled());
   });
