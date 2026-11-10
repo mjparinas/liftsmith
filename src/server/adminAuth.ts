@@ -82,7 +82,11 @@ export async function finishSignIn(req: Request, now = Date.now()): Promise<Resp
   );
   const link = rows[0];
   const back = (q: string) => new Response(null, { status: 303, headers: { Location: `/admin/${q}`, "Cache-Control": "no-store" } });
-  if (!t || !link || link.used_at != null || Number(link.expires_at) < now || !roleOf(String(link.email))) return back("?link=expired");
+  if (!t || !link || link.used_at != null || Number(link.expires_at) < now || !roleOf(String(link.email))) {
+    // A used or expired link for a staff address is noted for the System tab (and alerts when it repeats).
+    if (link) await import("./alerts").then((a) => a.reportStaffFailure(String(link.email), "link", { now }));
+    return back("?link=expired");
+  }
   await run("UPDATE admin_links SET used_at = ? WHERE token_hash = ?", [now, hash(t)]);
   const s = token();
   await run("INSERT INTO admin_sessions (token_hash, email, created_at, expires_at) VALUES (?, ?, ?, ?)", [

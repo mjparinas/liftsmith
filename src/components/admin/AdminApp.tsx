@@ -7,11 +7,13 @@ import { useCallback, useEffect, useState } from "react";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
+import { Automations } from "./Automations";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
+import { MaintenanceBanner, useMaintenance } from "./Maintenance";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { Todo } from "./Todo";
@@ -52,6 +54,7 @@ const TABS = [
   "Installs",
   "Flags",
   "A/B Tests",
+  "Automations",
   "System",
   "Log",
 ] as const;
@@ -455,6 +458,8 @@ export function AdminApp() {
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
   const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
+  // Maintenance mode's state, for the banner on every tab and the switch on System.
+  const maintenance = useMaintenance();
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
@@ -573,6 +578,7 @@ export function AdminApp() {
       </header>
 
       <div className="mt-4 space-y-4">
+        <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
         {tab === "Overview" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -880,7 +886,8 @@ export function AdminApp() {
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
-        {tab === "System" && <System />}
+        {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
+        {tab === "System" && <System admin={data.staff.role === "admin"} maintenance={maintenance} />}
         {tab === "Log" && <Log />}
       </div>
     </div>
