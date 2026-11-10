@@ -52,6 +52,9 @@
   --animate-blink: blink 5s ease-in-out infinite;
   --animate-twinkle: twinkle 1.6s ease-in-out infinite;
   --animate-float-z: float-z 2.6s ease-out infinite;
+  /* Plate memory on the rest card: plates coming off slide out and fade, new ones slide on (polish pass). */
+  --animate-plate-off: plate-off 700ms var(--ease-out-expo) 250ms both;
+  --animate-plate-on: plate-on 520ms var(--ease-bounce) both;
 }
 
 @supports (transition-timing-function: linear(0, 1)) {
@@ -92,6 +95,14 @@
 @keyframes rise {
   0% { transform: translateY(14px); opacity: 0.01; }
   100% { transform: translateY(0); opacity: 1; }
+}
+@keyframes plate-off {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(18px); opacity: 0.35; }
+}
+@keyframes plate-on {
+  0% { transform: translateX(-22px) scaleY(0.8); opacity: 0; }
+  100% { transform: translateX(0) scaleY(1); opacity: 1; }
 }
 @keyframes fade {
   from { opacity: 0; }

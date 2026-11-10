@@ -129,6 +129,7 @@ public class WorkoutService extends Service {
         ServiceCompat.startForeground(this, ID_LIVE, n, type);
 
         if (restOver != null) handler.removeCallbacks(restOver);
+        handler.removeCallbacks(countdownTick);
         if (resting) {
             final boolean sound = intent.getBooleanExtra("sound", true);
             final boolean vibrate = intent.getBooleanExtra("vibrate", true);
@@ -140,9 +141,23 @@ public class WorkoutService extends Service {
                 if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f, speakLang);
             };
             handler.postDelayed(restOver, restUntil - System.currentTimeMillis());
+            // Feel the countdown: three light ticks in the last three seconds, so rest ending is felt with the
+            // phone in a pocket. Same rule as the rest-over buzz: only when vibration is on for it.
+            if (vibrate) {
+                for (int s = 3; s >= 1; s--) {
+                    long at = restUntil - s * 1000L - System.currentTimeMillis();
+                    if (at > 0) handler.postDelayed(countdownTick, at);
+                }
+            }
         }
         return START_NOT_STICKY;
     }
+
+    /** One light tick of the rest countdown (posted three times; removeCallbacks cancels all of them). */
+    private final Runnable countdownTick = () -> {
+        Vibrator v = getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createOneShot(30, 120));
+    };
 
     /** The rest-over alert: sound, vibration, both or neither, as picked in Workout preferences. */
     private void alertRestOver(String next, boolean sound, boolean vibrate) {
@@ -177,6 +192,7 @@ public class WorkoutService extends Service {
     @Override
     public void onDestroy() {
         if (restOver != null) handler.removeCallbacks(restOver);
+        handler.removeCallbacks(countdownTick);
         running = false;
         refreshTile();
         super.onDestroy();
