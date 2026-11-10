@@ -8,6 +8,7 @@ import type { Muscle } from "@/lib/types";
 import { probeWebGL } from "@/lib/webgl";
 
 import type { DemoSettings, Loop, View } from "./engine";
+import { HeartReadout } from "./HeartReadout";
 
 // The demo without the language catalogues: muscle names come in as `labels`, so the public website can pass
 // English names from the server and keep every app string (three languages) out of its pages. The app uses
@@ -52,6 +53,8 @@ export interface LiftDemoProps {
   highlight?: Partial<Record<Muscle, number>>;
   /** Live heart rate: the figure's heart beats at this rate. Leave out when no monitor is connected. */
   bpm?: number | null;
+  /** Recent heart rate readings (oldest first), drawn as a small trend line beside the bpm. */
+  hrTrend?: readonly number[];
   /** Frames per second cap; the inline demo uses 30 to save battery. */
   fps?: number;
   /** Follow the lifter instead of the demo's timing: 0 at the start position, 1 at the far end, null for the demo. */
@@ -103,6 +106,7 @@ export function LiftDemoCore({
   controls,
   highlight,
   bpm,
+  hrTrend,
   fps,
   follow,
   className = "",
@@ -237,14 +241,7 @@ export function LiftDemoCore({
           <span className="truncate">{label ?? (controls ? VIEWS.find((v) => v[0] === view)?.[1] : "")}</span>
           <span ref={phaseRef} className="shrink-0 text-[#5cc8ff]" aria-hidden />
         </div>
-        {!!bpm && (
-          <span
-            className="pointer-events-none absolute bottom-2 left-3 font-mono text-[0.6875rem] tabular-nums text-[#ff6b84]"
-            aria-label={`Heart rate ${bpm}`}
-          >
-            ♥ {bpm}
-          </span>
-        )}
+        {!!bpm && <HeartReadout bpm={bpm} trend={hrTrend} />}
         {controls && (
           <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
             <span>{bpm ? "" : "Drag to rotate"}</span>
