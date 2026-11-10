@@ -17,6 +17,7 @@ import { hash, rng } from "@/lib/random";
 import { useApp } from "@/lib/store";
 import type { AppEvent, Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
 import { exerciseCue, restCue, say, setCue, voice } from "@/lib/voice";
 
 import { clock } from "./format";
@@ -237,12 +238,9 @@ export function breathPhase(secs: number): { phase: "in" | "out"; p: number } {
 }
 
 function Breathe({ left }: { left: number }) {
-  const [secs, setSecs] = useState(0);
-  useEffect(() => {
-    const t0 = Date.now();
-    const id = setInterval(() => setSecs((Date.now() - t0) / 1000), 100);
-    return () => clearInterval(id);
-  }, []);
+  // Paced by useNow, so the animation stops while the app is in the background.
+  const [t0] = useState(() => Date.now());
+  const secs = (useNow(100) - t0) / 1000;
   const { phase, p } = breathPhase(secs);
   const scale = 0.55 + 0.45 * p;
   return (

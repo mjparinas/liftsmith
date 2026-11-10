@@ -16,6 +16,7 @@ import {
   type HealthCheck,
   type StatusPage,
 } from "@/lib/systemHealth";
+import { isVisible } from "@/lib/visibility";
 
 import { MaintenanceCard, useMaintenance } from "./Maintenance";
 import { ago } from "./time";
@@ -221,6 +222,8 @@ export function System({ admin = false, maintenance }: { admin?: boolean; mainte
   useEffect(() => {
     if (!auto) return;
     const t = setInterval(() => {
+      // Not while the tab is hidden: it refreshes when it comes back (Gradelings #553).
+      if (!isVisible()) return;
       setRefresh(false);
       setRound((r) => r + 1);
     }, 60_000);

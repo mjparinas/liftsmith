@@ -27,6 +27,7 @@ import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
+import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
 import { Button, Section } from "./ui";
@@ -265,13 +266,11 @@ function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
 function SignedIn() {
   const account = useAccount((s) => s.account)!;
   const busy = useAccount((s) => s.busy);
+  // Redraws "last synced" every 30 s while on screen (useNow stops while the app is hidden).
+  useNow(30_000);
   const [, tick] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  useEffect(() => {
-    const id = setInterval(() => tick((n) => n + 1), 30_000);
-    return () => clearInterval(id);
-  }, []);
   const s = readSync();
   const waiting = s.out.length + s.del.length;
   const via = t(`account.via.${account.via}`);
