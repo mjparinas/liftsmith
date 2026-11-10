@@ -9,8 +9,8 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
   if (e.request.method !== "GET" || url.origin !== location.origin || url.pathname.startsWith("/api/")) return;
-  if (url.pathname.startsWith("/_next/static/")) {
-    // Hashed build files never change: cache first.
+  if (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/mediapipe/")) {
+    // Hashed build files and the versioned rep-counting runtime and model never change: cache first.
     e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request).then((res) => { const copy = res.clone(); caches.open(CACHE).then((c) => c.put(e.request, copy)); return res; })));
     return;
   }
