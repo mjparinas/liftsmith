@@ -661,7 +661,7 @@ function fullWeek(c: Ctx): boolean {
 
 function gapReturn(c: Ctx, days: number): boolean {
   const starts = c.sessions.map((s) => s.at).sort((a, b) => a - b);
-  for (let i = 1; i < starts.length; i++) if (starts[i] - starts[i - 1] >= days * DAY) return true;
+  for (let i = 1; i < starts.length; i++) if (starts[i]! - starts[i - 1]! >= days * DAY) return true;
   return false;
 }
 
@@ -718,16 +718,16 @@ export function evaluate(def: AchievementDef, c: Ctx): Achievement {
   const level = def.tiers.filter((t) => value >= t).length;
   // Tier names run from the top for short ladders: a one-step badge is gold, two steps are silver and gold.
   const names = TIERS.slice(def.tiers.length === 1 ? 2 : def.tiers.length === 2 ? 1 : 0);
-  const tier = level ? names[level - 1] : null;
-  const nextAt = def.tiers[level];
-  const prevAt = level ? def.tiers[level - 1] : 0;
+  const tier = level ? names[level - 1]! : null;
+  const nextAt = def.tiers[level]; // undefined at the top tier
+  const prevAt = level ? def.tiers[level - 1]! : 0;
   const progress = nextAt === undefined ? 1 : Math.max(0, Math.min(1, (value - prevAt) / (nextAt - prevAt)));
   const hidden = !!def.secret && level === 0;
   return {
     id: def.id,
     name: hidden ? t("ach.secret") : achName(def.id),
     /** What the highest tier reached asked for (or the first tier, before any). */
-    detail: hidden ? t("ach.secretHint") : fill(def.id, def.tiers[Math.max(0, level - 1)]),
+    detail: hidden ? t("ach.secretHint") : fill(def.id, def.tiers[Math.max(0, level - 1)]!),
     icon: hidden ? "❔" : def.icon,
     category: def.category,
     secret: !!def.secret,
@@ -736,7 +736,7 @@ export function evaluate(def: AchievementDef, c: Ctx): Achievement {
     tier,
     level,
     levels: def.tiers.length,
-    next: nextAt === undefined ? null : { tier: names[level], at: nextAt, detail: hidden ? "???" : fill(def.id, nextAt) },
+    next: nextAt === undefined ? null : { tier: names[level]!, at: nextAt, detail: hidden ? "???" : fill(def.id, nextAt) },
     progress,
     hidden,
   };
@@ -772,7 +772,7 @@ export function achievementXp(list: Achievement[]): number {
   let xp = 0;
   for (const a of list) {
     const names = tierNames(a.id);
-    for (let i = 0; i < a.level; i++) xp += TIER_XP[names[i]];
+    for (let i = 0; i < a.level; i++) xp += TIER_XP[names[i]!];
   }
   return xp;
 }

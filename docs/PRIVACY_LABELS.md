@@ -2,13 +2,14 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
+Last reviewed: 2026-11-10 (feature flag checks and A/B test groups added, under the install id and only with usage stats; Play's Data safety form filled in: photos, other personal info and the install id's second purpose added below). Before that, 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
 | Data | Sent | Why | Linked to a person? |
 |---|---|---|---|
 | Random install id (made on first open; not an advertising id) | Yes, with usage stats | Analytics | No (no account is attached; accounts are optional and analytics never carry one) |
+| Feature flag check: the install id and which version of a feature it was shown during an A/B test | Yes, with usage stats (without them the check carries no id and nothing is recorded) | Analytics (rollouts and A/B tests) | No |
 | Device maker, model, OS version, app version, screen, language, time zone | Yes, with usage stats | Analytics, app functionality (which devices to support) | No |
 | Install source: store, Play install referrer tags, Apple Search Ads attribution, first website visit's tags and referrer | Yes, with usage stats | Analytics | No |
 | Screens viewed, setup steps, features used, permission answers, workout started/finished with exercise and set counts and length | Yes, with usage stats | Analytics | No |
@@ -20,7 +21,7 @@ Last reviewed: 2026-11-09 (optional accounts with sync added: email and the sync
 | Reminder email address, which reminder kinds are on, consent time | Only when the user turns on email reminders (double opt-in) | App functionality, developer communications (offers only if the user turns them on) | Yes, by the email address |
 | Training days and time, time zone, days a week, setup time, first and last workout times, days trained this week, streak, Pro state | Only with email reminders | App functionality (deciding when to send a reminder) | Yes, by the email address. No weights, reps or heart rate |
 | Account: email address, sign-in methods (Google or Apple account id), session tokens (hashed) | Only when the user signs in (optional) | App functionality (sync and backup), account management | Yes |
-| Synced copy: workouts and sets, notes, body weight, gyms, routines, settings, and if used Health Connect / Apple Health readings, injuries and cycle logs | Only when the user signs in (optional); deleted with the account | App functionality (backup and sync to the user's own devices) | Yes, to the user's own account. Never in usage stats, never shared |
+| Synced copy: workouts and sets, notes, body weight, gyms, routines, settings and profile (including birth year and sex), and if used Health Connect / Apple Health readings, injuries and cycle logs | Only when the user signs in (optional); deleted with the account | App functionality (backup and sync to the user's own devices) | Yes, to the user's own account. Never in usage stats, never shared |
 | Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data | **No** without an account (stays on the device) | | |
 | Location, progress photos | **Never** | | |
 | Advertising id (IDFA, Android advertising id) | **Never** (`AD_ID` permission removed in the manifest; no ATT prompt) | | |
@@ -32,7 +33,7 @@ Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off u
 - Does your app collect or share any of the required user data types? **Yes.**
 - Is all of the user data collected by your app encrypted in transit? **Yes** (HTTPS only).
 - Do you provide a way for users to request that their data is deleted? **Yes** (Settings › Account and sync › Delete my account deletes the account and its synced copy; Settings › Erase this device resets the install id; deletion on request through in-app feedback with the install id).
-- Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/app/#/account (sign in, then Delete my account).
+- Account deletion: the app lets users create an account, so Play's account deletion form needs the in-app path above and a web link: https://www.getliftsmith.com/delete-account/ (2026-11-10: names the app, gives the in-app steps, the web app path and an email route from the account address, and lists what is deleted, kept and for how long). Deleting some data without deleting the account: **Yes** (cycle logs, email reminders and usage stats in Settings; anything else by email within 30 days).
 - **Shared** with third parties: **none** (Vercel, Turso, Resend and RevenueCat are service providers acting for us, which Play does not count as sharing).
 
 Collected data types:
@@ -43,9 +44,11 @@ Collected data types:
 | App activity › App interactions | Yes | No | No | Optional (user can turn off) | Analytics |
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
-| Device or other IDs › Device or other IDs | Yes (random install id) | No | No | Optional | Analytics |
+| Device or other IDs › Device or other IDs | Yes (random install id; RevenueCat uses it to unlock Pro) | No | No | Optional | Analytics, App functionality |
 | Personal info › Email address | Yes (only if given with feedback, for email reminders, or to sign in to an account) | No | No | Optional | App functionality, Developer communications, Account management |
 | Personal info › User IDs | Yes (account id, Google or Apple account id, only when signed in) | No | No | Optional | App functionality, Account management |
+| Personal info › Other info | Yes, only with an account: birth year and sex in the synced profile | No | No | Optional | App functionality |
+| Photos and videos › Photos | Yes, only if the user attaches a screenshot from the photo library to feedback. Progress photos are never uploaded | No | No | Optional | App functionality |
 | Health and fitness › Fitness info | Yes: with email reminders, workout times and counts; with an account, the synced workouts, sets, body weight and heart rate | No | No | Optional | App functionality |
 | Financial info › Purchase history | Yes (plan and price of a purchase; RevenueCat checks the receipt) | No | No | Optional | App functionality, Analytics |
 | Health and fitness › Health info | Yes, only with an account: synced Health Connect readings, injuries and cycle logs, for the user's own devices | No | No | Optional | App functionality |

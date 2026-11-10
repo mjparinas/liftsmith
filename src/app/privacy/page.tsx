@@ -41,6 +41,11 @@ export default function Privacy() {
           views, trials and purchases with the plan and price.
         </li>
         <li>Your country and region, worked out from your internet address when the stats arrive. The address itself isn&apos;t kept.</li>
+        <li>
+          When the app checks which features are switched on (feature flags), the install id goes with the question, so a feature can reach
+          some installs before others, and we record which version of a feature you were shown when we&apos;re comparing two. With usage
+          stats off, the app still checks, but without the install id, and you get the usual version.
+        </li>
       </ul>
       <p className="mt-2">
         We never collect, in usage stats, the weights or reps you lift, heart rate, body weight, readings from Health Connect or Apple
@@ -151,9 +156,13 @@ export default function Privacy() {
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>
       <p className="mt-2">
         Turn usage stats off in Settings. Erase everything on your device from Settings › Erase this device. Delete your account and
-        everything synced to it from Settings › Account and sync (sign in at www.getliftsmith.com/app/ to do it from a browser). To ask what
-        we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under Settings › Usage
-        stats) and we&apos;ll do it within 30 days.
+        everything synced to it from Settings › Account and sync (sign in at www.getliftsmith.com/app/ to do it from a browser; every way to
+        delete, and what&apos;s kept, is on{" "}
+        <a className="text-accent underline" href="/delete-account/">
+          Delete your account
+        </a>
+        ). To ask what we hold under your install id, or to have it deleted, send feedback from the app with your install id (shown under
+        Settings › Usage stats) and we&apos;ll do it within 30 days.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Contact</h2>

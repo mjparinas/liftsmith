@@ -243,6 +243,43 @@ const SCHEMA = [
     detail TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS job_runs_job ON job_runs (job, started_at)`,
+  // Private staff notes on an account (Users tab, src/server/adminUsers.ts). Never shown to the lifter; deleted
+  // with the account.
+  `CREATE TABLE IF NOT EXISTS account_notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    account_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    author TEXT NOT NULL,
+    text TEXT NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_notes_account ON account_notes (account_id)`,
+  // Feature flags and A/B tests (src/server/flags.ts). A flag's row appears once an admin changes it; until then
+  // its default in src/lib/flags.ts applies. Values are stored as JSON (14, true).
+  `CREATE TABLE IF NOT EXISTS feature_flags (
+    name TEXT PRIMARY KEY,
+    value TEXT NOT NULL,
+    rollout INTEGER NOT NULL DEFAULT 100,
+    updated_at INTEGER NOT NULL,
+    updated_by TEXT NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS experiments (
+    flag TEXT PRIMARY KEY,
+    description TEXT NOT NULL,
+    status TEXT NOT NULL,
+    variants TEXT NOT NULL,
+    winner TEXT,
+    created_at INTEGER NOT NULL,
+    started_at INTEGER,
+    stopped_at INTEGER
+  )`,
+  // Which variant each install was shown, recorded the first time it asks during a running test.
+  `CREATE TABLE IF NOT EXISTS experiment_assignments (
+    flag TEXT NOT NULL,
+    install_id TEXT NOT NULL,
+    variant TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (flag, install_id)
+  )`,
   // Shared across serverless instances, unlike an in-memory counter.
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,

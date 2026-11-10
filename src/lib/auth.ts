@@ -9,6 +9,7 @@
 // A provider shows only when the app was built with its public client id. The server checks every token.
 import { create } from "zustand";
 
+import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
@@ -20,6 +21,8 @@ export interface Account {
   providers: string[];
   /** How this device signed in. */
   via: Method;
+  /** Pro that comes with the account rather than a store purchase (the store review account). */
+  pro?: boolean;
 }
 
 export type Method = "google" | "apple" | "email";
@@ -27,9 +30,9 @@ export type Platform = "web" | "android" | "ios";
 
 /** Public client ids (not secrets), set at build time. Empty means that button isn't offered. */
 export const AUTH = {
-  googleWeb: process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "",
-  googleIos: process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? "",
-  appleServices: process.env.NEXT_PUBLIC_APPLE_SERVICES_ID ?? "",
+  googleWeb: process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID || GOOGLE_WEB_CLIENT_ID,
+  googleIos: process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID || GOOGLE_IOS_CLIENT_ID,
+  appleServices: process.env.NEXT_PUBLIC_APPLE_SERVICES_ID || APPLE_SERVICES_ID,
 };
 
 type Cap = { getPlatform?: () => string; Plugins?: { AccountSignIn?: SignInPlugin } };
@@ -117,12 +120,19 @@ export async function makeNonce(): Promise<{ raw: string; hashed: string }> {
 
 interface SessionReply {
   token: string;
-  account: { id: string; email: string | null; providers: string[] };
+  account: { id: string; email: string | null; providers: string[]; pro?: boolean };
 }
 
 /** Saves the session and starts this device's sync from scratch: everything on it is pushed once. */
 function signedInAs(r: SessionReply, via: Method): Account {
-  const a: Account = { token: r.token, id: r.account.id, email: r.account.email, providers: r.account.providers, via };
+  const a: Account = {
+    token: r.token,
+    id: r.account.id,
+    email: r.account.email,
+    providers: r.account.providers,
+    via,
+    ...(r.account.pro ? { pro: true } : {}),
+  };
   try {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
   } catch {}
@@ -226,6 +236,22 @@ export function verifyEmailCode(email: string, code: string): Promise<Account> {
   return withBusy(async () =>
     signedInAs(await api<SessionReply>("/api/auth/email/verify/", { body: { email, code, platform: platform() } }), "email"),
   );
+}
+
+/** Whether the signed-in account has Pro without a store purchase (billing.ts adds it to the store's answer). */
+export function accountPro(): boolean {
+  return !!useAccount.getState().account?.pro;
+}
+
+/** Records the account's Pro from a sync reply, when it changed. */
+export function setAccountPro(pro: boolean) {
+  const a = readAccount();
+  if (!a || !!a.pro === pro) return;
+  const next: Account = { ...a, pro };
+  try {
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(next));
+  } catch {}
+  useAccount.setState({ account: next });
 }
 
 /** Signs this device out. Everything stays on the device; it just stops syncing. */

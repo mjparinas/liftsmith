@@ -24,6 +24,17 @@ Rules for this text (Play's metadata policy plus our own):
 | Category | Health & Fitness |
 | Tags | Workout tracker, Strength training, Gym, Fitness, Weightlifting (pick from Play's list) |
 
+## Sign in details (App content › Sign in details, formerly "App access")
+
+Answer **Yes, some parts are restricted** (Pro is a subscription), and add one set of details. The password is the store review code, set as `REVIEW_SIGNIN_CODE` in Vercel; it lives only there and in Play Console, never here (docs/decisions/accounts-and-sign-in.md, "Store review account"). Give App Store Connect's App Review Information the same details.
+
+- **Name:** Reviewer account with Pro
+- **Username:** review@getliftsmith.com
+- **Password:** the 12-digit `REVIEW_SIGNIN_CODE`
+- **Any other information** (500 characters at most):
+
+> No account is needed to use the app: finish the short setup and every screen is reachable. This account has all Pro (paid) features, with no purchase or trial. To sign in: Settings > Account and sync > Continue with email. Enter the username above, tap "Email me a code" (no email is sent to this address), type the password above into the Code box, then tap Sign in. The code is reusable and never expires. Pro includes adaptive workouts, the recovery map and advanced stats.
+
 ## App name (30 characters at most)
 
 **Liftsmith: Gym Workout Planner** (30)

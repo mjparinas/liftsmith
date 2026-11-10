@@ -169,11 +169,11 @@ export function returnReady(inj: Pick<Injury, "pain" | "returning">, now: number
   if (inj.returning && !inj.returning.stopped) return false;
   const after = inj.returning?.stopped?.at ?? -Infinity;
   const xs = inj.pain.filter((p) => p.at > after);
-  if (!xs.length || now - xs[xs.length - 1].at > 4 * DAY) return false;
+  if (!xs.length || now - xs[xs.length - 1]!.at > 4 * DAY) return false;
   let i = xs.length;
-  while (i > 0 && xs[i - 1].score <= LOW_PAIN) i--;
+  while (i > 0 && xs[i - 1]!.score <= LOW_PAIN) i--;
   if (i === xs.length) return false;
-  return now - xs[i].at >= 6 * DAY;
+  return now - xs[i]!.at >= 6 * DAY;
 }
 
 /**
@@ -196,21 +196,21 @@ export function gradedReturn(start: number, pain: readonly PainReading[], now: n
     if (p.at > now) break;
     step(p.at);
     if (p.score >= STOP_PAIN)
-      return { startedAt: start, pct: RETURN_PCTS[stage], stage, readyToHeal: false, stopped: { at: p.at, score: p.score } };
+      return { startedAt: start, pct: RETURN_PCTS[stage]!, stage, readyToHeal: false, stopped: { at: p.at, score: p.score } };
     if (p.score > LOW_PAIN) {
       from = p.at;
       low = false;
     } else low = true;
   }
   step(now);
-  return { startedAt: start, pct: RETURN_PCTS[stage], stage, readyToHeal: stage === 2 && low && now - from >= WEEK };
+  return { startedAt: start, pct: RETURN_PCTS[stage]!, stage, readyToHeal: stage === 2 && low && now - from >= WEEK };
 }
 
 /** The pain trend: change from the first to the latest of the last `n` readings (negative is better). */
 export function painTrend(inj: Pick<Injury, "pain">, n = 14): { latest?: number; change?: number; points: number[] } {
   const points = inj.pain.slice(-n).map((p) => p.score);
   if (!points.length) return { points };
-  return { latest: points[points.length - 1], change: points.length > 1 ? points[points.length - 1] - points[0] : undefined, points };
+  return { latest: points[points.length - 1], change: points.length > 1 ? points[points.length - 1]! - points[0]! : undefined, points };
 }
 
 function clampPct(p: number): number {

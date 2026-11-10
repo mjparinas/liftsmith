@@ -1,10 +1,11 @@
 import { generateKeyPairSync, sign } from "node:crypto";
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { accountInfo, appleClientSecret, deleteAccount, sessionOf, signInWith, startEmail, verifyEmail } from "./accounts";
+import { accountInfo, accountPro, appleClientSecret, deleteAccount, sessionOf, signInWith, startEmail, verifyEmail } from "./accounts";
 import { query, resetDb } from "./db";
 import { clearKeys, sha256hex, verifiedEmail, verifyIdToken, type Claims } from "./idToken";
-import { checkSync, sync } from "./sync";
+import { REVIEW_EMAIL, reviewCode, reviewCodeMatches } from "./review";
+import { checkSync, sync, SyncFull } from "./sync";
 
 const NOW = 1_800_000_000_000;
 const { privateKey, publicKey } = generateKeyPairSync("rsa", { modulusLength: 2048 });
@@ -136,6 +137,56 @@ describe("accounts", () => {
     await startEmail("a@b.co", null, NOW);
     expect((await startEmail("a@b.co", null, NOW)).code).toBe(429);
     expect((await startEmail("a@b.co", null, NOW + 86_400_001)).code).toBe(200);
+  });
+
+  describe("the store review account", () => {
+    const CODE = "482915067341";
+    afterEach(() => {
+      delete process.env.REVIEW_SIGNIN_CODE;
+    });
+
+    it("is off until a 12 to 16 digit code is set in the environment", async () => {
+      expect(reviewCode({})).toBeNull();
+      expect(reviewCode({ REVIEW_SIGNIN_CODE: "123456" })).toBeNull();
+      expect(reviewCode({ REVIEW_SIGNIN_CODE: "12345678901a" })).toBeNull();
+      expect(reviewCode({ REVIEW_SIGNIN_CODE: "12345678901234567" })).toBeNull();
+      expect(reviewCode({ REVIEW_SIGNIN_CODE: ` ${CODE} ` })).toBe(CODE);
+      // Off: the address is like any other, so the fixed code means nothing and no Pro comes with it.
+      const sent = await startEmail(REVIEW_EMAIL, null, NOW);
+      expect(sent.body.devCode).toBeDefined();
+      expect((await verifyEmail(REVIEW_EMAIL, CODE, "android", NOW)).code).toBe(401);
+    });
+
+    it("signs in again and again with the fixed code, sends no email, and has Pro", async () => {
+      process.env.REVIEW_SIGNIN_CODE = CODE;
+      let mailed = 0;
+      const mail = async () => (mailed++, true);
+      for (let i = 0; i < 8; i++) expect((await startEmail(REVIEW_EMAIL, mail, NOW)).code).toBe(200);
+      expect(mailed).toBe(0);
+      const first = await verifyEmail(REVIEW_EMAIL, CODE, "android", NOW);
+      const again = await verifyEmail(REVIEW_EMAIL, ` ${CODE} `, "ios", NOW + 400 * 86_400_000);
+      expect(first.code).toBe(200);
+      expect(again.code).toBe(200);
+      const a = first.body.account as { id: string; pro: boolean };
+      expect(a.pro).toBe(true);
+      expect((again.body.account as { id: string }).id).toBe(a.id);
+      expect(await accountPro(a.id)).toBe(true);
+      // Taking the variable away takes the Pro away too.
+      delete process.env.REVIEW_SIGNIN_CODE;
+      expect(await accountPro(a.id)).toBe(false);
+    });
+
+    it("refuses a wrong code, and the code works for the review address only", async () => {
+      process.env.REVIEW_SIGNIN_CODE = CODE;
+      expect((await verifyEmail(REVIEW_EMAIL, "482915067340", "web", NOW)).code).toBe(401);
+      expect((await verifyEmail(REVIEW_EMAIL, "123456", "web", NOW)).code).toBe(401);
+      expect(reviewCodeMatches("someone@example.com", CODE)).toBe(false);
+      await startEmail("someone@example.com", null, NOW);
+      expect((await verifyEmail("someone@example.com", CODE, "web", NOW)).code).toBe(401);
+      // An ordinary account never has Pro from the server.
+      const r = await signInWith("google", { idToken: "t", nonce: "n", platform: "web" }, { verify: verify("g-9", "z@y.co"), now: NOW });
+      expect((r.body.account as { pro: boolean }).pro).toBe(false);
+    });
   });
 
   it("counts parallel guesses, so a burst can't get past five tries", async () => {
@@ -285,5 +336,27 @@ describe("sync", () => {
     const p2 = await sync("acc", "web", req({ cursor: p1.cursor }));
     expect(p2.events.length).toBe(200);
     expect(p2.more).toBe(false);
+  });
+
+  it("refuses a push past the account's storage quota and stores none of it, but still pulls", async () => {
+    const quota = { events: 3, bytes: 10_000, records: 2 };
+    await sync("acc", "phone", req({ events: [ev("e1"), ev("e2")] as never }), quota);
+    await expect(sync("acc", "phone", req({ events: [ev("e3"), ev("e4")] as never }), quota)).rejects.toBeInstanceOf(SyncFull);
+    expect((await query("SELECT id FROM sync_events WHERE account_id = 'acc'")).length).toBe(2);
+    // Deleting a stored event takes no more room, but a tombstone for an id the account never had does.
+    await sync("acc", "phone", req({ deleted: ["e1"] }), quota);
+    await sync("acc", "phone", req({ deleted: ["x1"] }), quota);
+    await expect(sync("acc", "phone", req({ deleted: ["x2"] }), quota)).rejects.toBeInstanceOf(SyncFull);
+    // Pulls and pushes with nothing new still work, and another account has its own quota.
+    expect((await sync("acc", "web", req(), quota)).events.length).toBe(1);
+    await sync("other", "phone", req({ events: [ev("e1"), ev("e2"), ev("e3")] as never }), quota);
+
+    const big = { ...ev("huge"), note: "x".repeat(10_000) };
+    await expect(sync("third", "phone", req({ events: [big] as never }), quota)).rejects.toBeInstanceOf(SyncFull);
+
+    const gym = (id: string) => ({ key: `gym:${id}`, value: { id }, updatedAt: 1 });
+    await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota);
+    await sync("acc", "phone", req({ records: [gym("a"), gym("b")] }), quota); // updates are fine
+    await expect(sync("acc", "phone", req({ records: [gym("c")] }), quota)).rejects.toBeInstanceOf(SyncFull);
   });
 });

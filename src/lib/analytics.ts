@@ -212,7 +212,7 @@ export function platformStore(): string {
 export const collectUrl = () => (isNative() || typeof location === "undefined" ? `${SITE_URL}/api/collect/` : "/api/collect/");
 
 /** The static export served on the web (browser tests, previews) has no server to send to. */
-const canSend = () => isNative() || process.env.NEXT_PUBLIC_STATIC !== "1";
+export const canSend = () => isNative() || process.env.NEXT_PUBLIC_STATIC !== "1";
 
 const REJECTED = new Set([400, 413, 422]);
 let flushing: Promise<number> | null = null;

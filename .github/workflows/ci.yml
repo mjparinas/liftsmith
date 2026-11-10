@@ -62,6 +62,9 @@ jobs:
       - uses: ./.github/actions/setup
       - name: Types
         run: npx tsc --noEmit
+      - name: Engine types (unchecked index access)
+        if: ${{ !cancelled() }}
+        run: npm run typecheck:engine
       - name: Lint
         if: ${{ !cancelled() }}
         run: npx eslint --max-warnings 0

@@ -164,12 +164,13 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
             inputMode="numeric"
             autoComplete="one-time-code"
             pattern="[0-9]*"
-            maxLength={6}
+            maxLength={16}
             value={code}
-            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            className="card display w-full px-4 py-3 text-center text-2xl tracking-[0.4em]"
+            // Six digits from the email; the store review account's fixed code is 12 to 16 (src/server/review.ts).
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 16))}
+            className={`card display w-full px-4 py-3 text-center ${code.length > 6 ? "text-xl tracking-wider" : "text-2xl tracking-[0.4em]"}`}
           />
-          <Button className="w-full" disabled={busy || code.length !== 6} onClick={() => void verify()}>
+          <Button className="w-full" disabled={busy || !(code.length === 6 || code.length >= 12)} onClick={() => void verify()}>
             {t("account.email.verify")}
           </Button>
           <Button
@@ -280,13 +281,15 @@ function SignedIn() {
       <p className="text-sm text-muted" aria-live="polite">
         {busy
           ? t("account.syncing")
-          : s.lastError
-            ? t("account.syncError")
-            : waiting
-              ? t("account.waiting", { count: waiting })
-              : s.lastSync
-                ? t("account.synced", { when: ago(s.lastSync) })
-                : t("account.notSynced")}
+          : s.lastError === "full"
+            ? t("account.syncFull")
+            : s.lastError
+              ? t("account.syncError")
+              : waiting
+                ? t("account.waiting", { count: waiting })
+                : s.lastSync
+                  ? t("account.synced", { when: ago(s.lastSync) })
+                  : t("account.notSynced")}
       </p>
       <div className="grid grid-cols-2 gap-2">
         <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>

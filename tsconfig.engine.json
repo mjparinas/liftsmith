@@ -1,0 +1,37 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noUncheckedIndexedAccess": true,
+    "incremental": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "src/lib/achievements.ts",
+    "src/lib/block.ts",
+    "src/lib/cycle.ts",
+    "src/lib/derive.ts",
+    "src/lib/exercises.ts",
+    "src/lib/explain.ts",
+    "src/lib/game.ts",
+    "src/lib/generator.ts",
+    "src/lib/goals.ts",
+    "src/lib/injury.ts",
+    "src/lib/layoff.ts",
+    "src/lib/loads.ts",
+    "src/lib/onerm.ts",
+    "src/lib/plateau.ts",
+    "src/lib/plates.ts",
+    "src/lib/programs.ts",
+    "src/lib/progression.ts",
+    "src/lib/readiness.ts",
+    "src/lib/recovery.ts",
+    "src/lib/replan.ts",
+    "src/lib/routines.ts",
+    "src/lib/sides.ts",
+    "src/lib/strength.ts",
+    "src/lib/superset.ts",
+    "src/lib/units.ts",
+    "src/lib/warmup.ts",
+    "src/lib/why.ts"
+  ]
+}

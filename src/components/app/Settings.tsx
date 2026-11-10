@@ -8,7 +8,7 @@ import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
-import { cacheFlags, flag } from "@/lib/flags";
+import { flag, setLocalFlag } from "@/lib/flags";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, num, t, type LangPref } from "@/lib/i18n";
 import { feel } from "@/lib/juice";
@@ -108,7 +108,7 @@ export function Settings() {
             if (taps.current.length >= 5) {
               taps.current = [];
               const on = !flag("repMotion");
-              cacheFlags({ repMotion: on });
+              setLocalFlag("repMotion", on);
               setMotionNote(on ? t("settings.motionOn") : t("settings.motionOff"));
             }
           }}

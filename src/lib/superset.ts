@@ -15,8 +15,8 @@ export function groupRange(items: readonly Linkable[], i: number): [number, numb
   if (!g) return [i, i];
   let s = i;
   let e = i;
-  while (s > 0 && items[s - 1].group === g) s--;
-  while (e < items.length - 1 && items[e + 1].group === g) e++;
+  while (s > 0 && items[s - 1]!.group === g) s--;
+  while (e < items.length - 1 && items[e + 1]!.group === g) e++;
   return [s, e];
 }
 
@@ -61,7 +61,7 @@ export function applyLinks<T extends Linkable>(items: readonly T[], links: reado
   if (!links.length) return [...items];
   const want = new Set(links);
   const l = linksOf(items).map((on, i) => {
-    const key = `${items[i].exerciseId}>${items[i + 1].exerciseId}`;
+    const key = `${items[i]!.exerciseId}>${items[i + 1]!.exerciseId}`;
     return want.has(key) || (on && !want.has(`!${key}`));
   });
   return withLinks(items, l);
@@ -85,13 +85,13 @@ export function afterSet(
   index: number,
   done: (i: number) => number,
 ): { index: number; rest: number; finished: boolean } {
-  const item = items[index];
+  const item = items[index]!;
   const [s, e] = groupRange(items, index);
   if (s === e) {
     const finished = done(index) >= item.sets;
     return { index: finished ? index + 1 : index, rest: item.restSec, finished };
   }
-  const left = (i: number) => done(i) < items[i].sets;
+  const left = (i: number) => done(i) < items[i]!.sets;
   const order = [...Array.from({ length: e - index }, (_, k) => index + 1 + k), ...Array.from({ length: index - s + 1 }, (_, k) => s + k)];
   const next = order.find(left);
   const finished = done(index) >= item.sets;
@@ -112,7 +112,7 @@ export function groupLetters(items: readonly Item[]): Map<string, string> {
 export function supersetLabel(items: readonly Item[], i: number): string | null {
   const [s, e] = groupRange(items, i);
   if (s === e) return null;
-  return `Superset ${groupLetters(items).get(items[i].group!)} · ${i - s + 1} of ${e - s + 1}`;
+  return `Superset ${groupLetters(items).get(items[i]!.group!)} · ${i - s + 1} of ${e - s + 1}`;
 }
 
 /**
@@ -124,7 +124,7 @@ export function groupedSeconds(items: readonly Item[], alone: (i: number) => num
   for (let i = 0; i < items.length;) {
     const [s, e] = groupRange(items, i);
     if (s === e) {
-      total += alone(i) + (i ? items[i].restSec : 0);
+      total += alone(i) + (i ? items[i]!.restSec : 0);
       i++;
       continue;
     }
@@ -134,7 +134,7 @@ export function groupedSeconds(items: readonly Item[], alone: (i: number) => num
     const switches = sets - 1 - (rounds - 1);
     const rest = roundRest(items, s);
     // Each exercise's own time without its between-set rests, plus the shared rests.
-    for (let k = s; k <= e; k++) total += alone(k) - (items[k].sets - 1) * items[k].restSec;
+    for (let k = s; k <= e; k++) total += alone(k) - (items[k]!.sets - 1) * items[k]!.restSec;
     total += switches * SWITCH_REST + (rounds - 1) * rest + (s ? rest : 0);
     i = e + 1;
   }

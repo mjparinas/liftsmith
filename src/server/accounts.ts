@@ -6,6 +6,7 @@ import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node
 
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
+import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
 
 export const SESSION_MS = 365 * 86_400_000;
 const CODE_MS = 10 * 60_000;
@@ -21,6 +22,8 @@ export interface AccountInfo {
   email: string | null;
   providers: string[];
   createdAt: number;
+  /** Pro that comes with the account, not a store purchase (only the store review account, review.ts). */
+  pro: boolean;
 }
 
 export type Platform = "web" | "android" | "ios";
@@ -32,12 +35,20 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
   const ids = await query<{ provider: string }>("SELECT DISTINCT provider FROM account_identities WHERE account_id = ? ORDER BY provider", [
     id,
   ]);
+  const email = rows[0].email ? String(rows[0].email) : null;
   return {
     id,
-    email: rows[0].email ? String(rows[0].email) : null,
+    email,
     providers: ids.map((r) => String(r.provider)),
     createdAt: Number(rows[0].created_at),
+    pro: accountHasPro(email),
   };
+}
+
+/** Whether the account has Pro on the server (not from a store purchase). Sync sends it on every round. */
+export async function accountPro(id: string): Promise<boolean> {
+  const rows = await query<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [id]);
+  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null);
 }
 
 /** Finds or makes the account for an identity, joining accounts by verified email. */
@@ -143,6 +154,8 @@ export function resendMail(): SendMail | null {
 
 /** Emails a six-digit sign-in code. Answers the same whether or not the address has an account. */
 export async function startEmail(email: string, mail: SendMail | null, now = Date.now()): Promise<Result> {
+  // The store review account signs in with its fixed code (review.ts): nothing to send, and nothing is sent.
+  if (isReviewEmail(email)) return { code: 200, body: { ok: true } };
   const rows = await query<{ sent: number; window_start: number }>("SELECT sent, window_start FROM account_codes WHERE email = ?", [email]);
   const r = rows[0];
   const fresh = !r || Number(r.window_start) < now - 86_400_000;
@@ -166,6 +179,13 @@ export async function startEmail(email: string, mail: SendMail | null, now = Dat
 }
 
 export async function verifyEmail(email: string, code: string, platform: Platform, now = Date.now()): Promise<Result> {
+  // The store review account: its fixed code from Vercel, reusable, for this one address only (review.ts).
+  // Guesses are held back by the verify route's per-address limit and the code's 12+ digits.
+  if (isReviewEmail(email)) {
+    if (!reviewCodeMatches(email, code)) return { code: 401, body: { error: "That code didn't match." } };
+    const id = await accountFor("email", email, email, now);
+    return { code: 200, body: await startSession(id, platform, now) };
+  }
   const rows = await query<{ code_hash: string; expires_at: number; tries: number }>(
     "SELECT code_hash, expires_at, tries FROM account_codes WHERE email = ?",
     [email],
@@ -227,6 +247,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

@@ -6,11 +6,12 @@
 import AxeBuilder from "@axe-core/playwright";
 import { chromium, devices } from "playwright";
 
-import { base, finish, onboard } from "./helpers.mjs";
+import { base, finish, onboard, stubSignIn } from "./helpers.mjs";
 
 const server = await base();
 const browser = await chromium.launch(process.env.PW_CHROMIUM ? { executablePath: process.env.PW_CHROMIUM } : {});
 const ctx = await browser.newContext({ ...devices["Pixel 7"] });
+await stubSignIn(ctx);
 const page = await ctx.newPage();
 const fail = [];
 const scan = async (where, skip = []) => {
@@ -246,6 +247,7 @@ const kctx = await browser.newContext({
   hasTouch: false,
   isMobile: false,
 });
+await stubSignIn(kctx);
 const kp = await kctx.newPage();
 try {
   await kp.goto(`${server.url}/app/`);

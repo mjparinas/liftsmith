@@ -35,6 +35,14 @@ export async function base() {
   return serve();
 }
 
+/** Sign-in providers' scripts. Tests never reach them: they only allow our real origin, and a run must not
+ * depend on someone else's servers. The stub leaves the buttons undrawn, which the app already handles. */
+export const SIGN_IN_HOSTS = /^https:\/\/(accounts\.google\.com|appleid\.cdn-apple\.com)\//;
+
+export function stubSignIn(ctx) {
+  return ctx.route(SIGN_IN_HOSTS, (r) => r.fulfill({ status: 200, contentType: "text/javascript", body: "" }));
+}
+
 /** Fails the run on any console error or page crash. */
 export function watchErrors(page, errors) {
   page.on("pageerror", (e) => errors.push(`pageerror: ${e}`));

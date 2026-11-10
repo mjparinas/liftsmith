@@ -8,9 +8,14 @@ import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
+import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
+import { InstallDetail } from "./InstallDetail";
+import { Log } from "./Log";
+import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { Todo } from "./Todo";
+import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
 type Data = Metrics & { staff: Staff };
@@ -30,7 +35,6 @@ type Install = {
   events: number;
   workouts: number;
 };
-type Audit = { id: number; at: number; admin: string; action: string; target: string | null };
 
 const TABS = [
   "Overview",
@@ -44,11 +48,34 @@ const TABS = [
   "Devices",
   "Revenue",
   "Creators",
+  "Users",
   "Installs",
+  "Flags",
+  "A/B Tests",
   "System",
+  "Log",
 ] as const;
 type Tab = (typeof TABS)[number];
 const PERIODS = [7, 28, 90, 365] as const;
+
+/** Where the panel is: a tab, and an account (Users) or install (Installs) open on it. In the address as ?tab=&open=. */
+type View = { tab: Tab; open: string | null };
+const isTab = (t: string | null): t is Tab => t != null && (TABS as readonly string[]).includes(t);
+function readView(): View {
+  if (typeof location === "undefined") return { tab: "Overview", open: null };
+  const q = new URLSearchParams(location.search);
+  const t = q.get("tab");
+  const tab = isTab(t) ? t : "Overview";
+  const open = q.get("open");
+  return { tab, open: open && /^[A-Za-z0-9_-]{8,64}$/.test(open) && (tab === "Users" || tab === "Installs") ? open : null };
+}
+export function viewUrl(v: View): string {
+  const q = new URLSearchParams();
+  if (v.tab !== "Overview") q.set("tab", v.tab);
+  if (v.open) q.set("open", v.open);
+  const s = q.toString();
+  return `/admin/${s ? `?${s}` : ""}`;
+}
 const STORE_LABEL: Record<string, string> = {
   play: "Google Play",
   appstore: "App Store",
@@ -159,8 +186,8 @@ function StoreTable({ rows, all, assumed }: { rows: StoreRevenue[]; all: StoreRe
   );
 }
 
-function Installs({ admin }: { admin: boolean }) {
-  const [data, setData] = useState<{ installs: Install[]; audit: Audit[] } | null>(null);
+function Installs({ admin, open, setOpen }: { admin: boolean; open: string | null; setOpen: (id: string | null) => void }) {
+  const [data, setData] = useState<{ installs: Install[] } | null>(null);
   const [version, setVersion] = useState(0);
   useEffect(() => {
     let live = true;
@@ -184,6 +211,7 @@ function Installs({ admin }: { admin: boolean }) {
   if (!data) return <p className="text-muted">Loading…</p>;
   return (
     <div className="space-y-4">
+      {open && <InstallDetail id={open} close={() => setOpen(null)} />}
       <Card
         title="Latest installs"
         subtitle="Device and source only. Mark your own phones and CI devices as test so they're left out of every number. The install id is shown in the app under Settings › Usage stats."
@@ -191,9 +219,15 @@ function Installs({ admin }: { admin: boolean }) {
         <Table
           columns={["Id", "First seen", "Last seen", "Platform", "Device", "OS", "Version", "Country", "Source", "Workouts", "Events", ""]}
           rows={data.installs.map((i) => [
-            <code key="id" className="text-xs">
-              {i.id.slice(0, 8)}
-            </code>,
+            <button
+              key="id"
+              type="button"
+              className="text-xs text-accent underline"
+              title="Open this install"
+              onClick={() => setOpen(i.id)}
+            >
+              <code>{i.id.slice(0, 8)}</code>
+            </button>,
             when(i.firstSeen),
             when(i.lastSeen),
             STORE_LABEL[i.store ?? ""] ?? i.platform,
@@ -220,13 +254,6 @@ function Installs({ admin }: { admin: boolean }) {
               ""
             ),
           ])}
-        />
-      </Card>
-      <Card title="Audit log" subtitle="Every sign-in and change made in the panel.">
-        <Table
-          columns={["When", "Who", "What", "Target"]}
-          rows={data.audit.map((a) => [when(a.at), a.admin, a.action, a.target ?? ""])}
-          empty="No changes yet."
         />
       </Card>
     </div>
@@ -424,14 +451,29 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
 
 export function AdminApp() {
   const [days, setDays] = useState<(typeof PERIODS)[number]>(28);
-  const [tab, setTab] = useState<Tab>("Overview");
+  const [view, setView] = useState<View>(readView);
+  const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
   const [state, setState] = useState<"loading" | "signin" | "ok" | "error">("loading");
   const [counts, setCounts] = useState<Partial<Record<Tab, number>>>({});
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
   const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
-  const go = useCallback((t: string) => (TABS as readonly string[]).includes(t) && setTab(t as Tab), []);
+  // Each tab (and an open account or install) has its own address, and every move is in the browser history,
+  // so Back, Forward, a reload and a shared link all land on the same place (as in Gradelings).
+  const navigate = useCallback((next: View) => {
+    setView(next);
+    const url = viewUrl(next);
+    if (url !== location.pathname + location.search) history.pushState(null, "", url);
+  }, []);
+  const setTab = useCallback((t: Tab) => navigate({ tab: t, open: null }), [navigate]);
+  const openIn = useCallback((t: Tab) => (id: string | null) => navigate({ tab: t, open: id }), [navigate]);
+  useEffect(() => {
+    const back = () => setView(readView());
+    addEventListener("popstate", back);
+    return () => removeEventListener("popstate", back);
+  }, []);
+  const go = useCallback((t: string) => (TABS as readonly string[]).includes(t) && setTab(t as Tab), [setTab]);
   // The tab counts, once signed in: mail waiting for an answer, and everything on the to-do list.
   useEffect(() => {
     if (state !== "ok") return;
@@ -581,6 +623,8 @@ export function AdminApp() {
 
         {tab === "Traffic" && (
           <>
+            <SearchConsole days={days} />
+            <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Visitors" value={fmtInt(site.visitors)} delta={delta(site.visitors, site.prevVisitors)} />
               <Tile label="Page views" value={fmtInt(site.views)} delta={delta(site.views, site.prevViews)} />
@@ -830,10 +874,14 @@ export function AdminApp() {
         )}
 
         {tab === "Creators" && <Creators admin={data.staff.role === "admin"} days={days} />}
-        {tab === "Installs" && <Installs admin={data.staff.role === "admin"} />}
+        {tab === "Users" && <Users admin={data.staff.role === "admin"} me={data.staff.email} open={view.open} setOpen={openIn("Users")} />}
+        {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
+        {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "System" && <System />}
+        {tab === "Log" && <Log />}
       </div>
     </div>
   );
