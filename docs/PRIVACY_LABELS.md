@@ -2,13 +2,14 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-10 (Play's Data safety form filled in: photos, other personal info and the install id's second purpose added below). Before that, 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
+Last reviewed: 2026-11-10 (feature flag checks and A/B test groups added, under the install id and only with usage stats; Play's Data safety form filled in: photos, other personal info and the install id's second purpose added below). Before that, 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
 | Data | Sent | Why | Linked to a person? |
 |---|---|---|---|
 | Random install id (made on first open; not an advertising id) | Yes, with usage stats | Analytics | No (no account is attached; accounts are optional and analytics never carry one) |
+| Feature flag check: the install id and which version of a feature it was shown during an A/B test | Yes, with usage stats (without them the check carries no id and nothing is recorded) | Analytics (rollouts and A/B tests) | No |
 | Device maker, model, OS version, app version, screen, language, time zone | Yes, with usage stats | Analytics, app functionality (which devices to support) | No |
 | Install source: store, Play install referrer tags, Apple Search Ads attribution, first website visit's tags and referrer | Yes, with usage stats | Analytics | No |
 | Screens viewed, setup steps, features used, permission answers, workout started/finished with exercise and set counts and length | Yes, with usage stats | Analytics | No |
