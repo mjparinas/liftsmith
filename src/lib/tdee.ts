@@ -340,3 +340,10 @@ export function currentBodyFat(events: AppEvent[], profile: Profile): number | u
     if (e.type === "bodyweight" && e.bodyFat !== undefined && (!last || e.at > last.at)) last = { pct: e.bodyFat, at: e.at };
   return last ? Math.round(last.pct * 10) / 10 : undefined;
 }
+
+/** Body fat entered by hand: a percentage from 3 to 60, rounded to 0.1, or undefined when empty or out of range. */
+export function parseBodyFat(text: string): number | undefined {
+  const n = Number(text.trim().replace(",", "."));
+  if (!text.trim() || !Number.isFinite(n) || n < 3 || n > 60) return undefined;
+  return Math.round(n * 10) / 10;
+}
