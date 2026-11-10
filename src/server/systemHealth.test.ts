@@ -67,4 +67,44 @@ describe("System page checks", () => {
     expect((await runCheck("database", { now: NOW })).result.state).not.toBe("down");
     expect((await runCheck("job", { now: NOW })).result.state).toBe("off");
   });
+
+  it("shows only Liftsmith monitors on the uptime card", async () => {
+    vi.stubEnv("UPTIMEROBOT_API_KEY", "key");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({
+          stat: "ok",
+          monitors: [
+            {
+              id: 1,
+              friendly_name: "Liftsmith health",
+              url: "https://www.getliftsmith.com/api/health/",
+              status: 2,
+              custom_uptime_ratio: "100-100-100",
+            },
+            { id: 2, friendly_name: "Site", url: "https://www.getliftsmith.com/", status: 2 },
+            { id: 3, friendly_name: "Gradelings", url: "https://www.gradelings.com/", status: 9 },
+          ],
+        }),
+      ),
+    );
+    const { result } = await runCheck("uptime", { now: NOW });
+    expect(result.rows.map((r) => r.label)).toEqual(["Liftsmith health", "Site"]);
+    expect(result.state).toBe("ok");
+    expect(JSON.stringify(result)).not.toContain("Gradelings");
+  });
+
+  it("says when the account has no Liftsmith monitors", async () => {
+    vi.stubEnv("UPTIMEROBOT_API_KEY", "key");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({ stat: "ok", monitors: [{ id: 3, friendly_name: "Gradelings", url: "https://www.gradelings.com/", status: 2 }] }),
+      ),
+    );
+    const { result } = await runCheck("uptime", { now: NOW });
+    expect(result.summary).toBe("UptimeRobot has no Liftsmith monitors yet.");
+    expect(result.rows).toEqual([]);
+  });
 });
