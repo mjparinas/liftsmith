@@ -3,6 +3,8 @@
 // the nonce. Only then is the token's subject trusted as the person's id at that provider.
 import { createHash, createPublicKey, verify, type webcrypto } from "node:crypto";
 
+import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "@/lib/authIds";
+
 export type Provider = "google" | "apple";
 
 export interface Claims {
@@ -51,8 +53,14 @@ export const sha256hex = (s: string) => createHash("sha256").update(s).digest("h
 export function audiences(p: Provider, env: NodeJS.ProcessEnv = process.env): Set<string> {
   const raw =
     p === "google"
-      ? [env.GOOGLE_CLIENT_IDS, env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID, env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID]
-      : [env.APPLE_CLIENT_IDS, env.NEXT_PUBLIC_APPLE_SERVICES_ID, "com.getliftsmith.app"];
+      ? [
+          env.GOOGLE_CLIENT_IDS,
+          env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+          env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+          GOOGLE_WEB_CLIENT_ID,
+          GOOGLE_IOS_CLIENT_ID,
+        ]
+      : [env.APPLE_CLIENT_IDS, env.NEXT_PUBLIC_APPLE_SERVICES_ID, APPLE_SERVICES_ID, "com.getliftsmith.app"];
   return new Set(
     raw
       .flatMap((v) => (v ?? "").split(","))

@@ -4,7 +4,7 @@
 import fs from "node:fs";
 
 import { closeAll, open } from "./devices.mjs";
-import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
+import { base, check, finish, onboard, stubSignIn, watchErrors } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "e2e-shots";
 fs.mkdirSync(OUT, { recursive: true });
@@ -16,6 +16,7 @@ if (!target) {
   process.exit(0);
 }
 const ctx = await target.browser.newContext(target.opts);
+await stubSignIn(ctx);
 const page = await ctx.newPage();
 const errors = [];
 const fail = [];

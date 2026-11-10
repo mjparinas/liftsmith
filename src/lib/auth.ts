@@ -9,6 +9,7 @@
 // A provider shows only when the app was built with its public client id. The server checks every token.
 import { create } from "zustand";
 
+import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
@@ -29,9 +30,9 @@ export type Platform = "web" | "android" | "ios";
 
 /** Public client ids (not secrets), set at build time. Empty means that button isn't offered. */
 export const AUTH = {
-  googleWeb: process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "",
-  googleIos: process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID ?? "",
-  appleServices: process.env.NEXT_PUBLIC_APPLE_SERVICES_ID ?? "",
+  googleWeb: process.env.NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID || GOOGLE_WEB_CLIENT_ID,
+  googleIos: process.env.NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID || GOOGLE_IOS_CLIENT_ID,
+  appleServices: process.env.NEXT_PUBLIC_APPLE_SERVICES_ID || APPLE_SERVICES_ID,
 };
 
 type Cap = { getPlatform?: () => string; Plugins?: { AccountSignIn?: SignInPlugin } };
