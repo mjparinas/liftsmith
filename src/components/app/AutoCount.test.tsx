@@ -127,4 +127,11 @@ describe("the switch", () => {
     await user.click(b);
     expect(onToggle).toHaveBeenCalled();
   });
+
+  it("is marked Pro when locked", () => {
+    render(<AutoCountButton on={false} locked onToggle={() => {}} />);
+    const b = screen.getByRole("button", { name: "Count reps with the camera, a Pro feature: see Pro" });
+    expect(b).not.toHaveAttribute("aria-pressed");
+    expect(b).toHaveTextContent("Pro");
+  });
 });
