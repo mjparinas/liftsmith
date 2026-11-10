@@ -32,8 +32,12 @@ describe("Play listing", () => {
   });
 
   it("has the art the listing names", () => {
-    for (const f of [...doc.matchAll(/\| \d \| (\d\d-[\w-]+\.jpg) \|/g)].map((m) => m[1])) {
-      expect(existsSync(join(process.cwd(), "store/play/phone", f)), f).toBe(true);
+    // Each screenshot table names files in the folder its section points to (`store/play/<folder>/`).
+    for (const section of doc.split(/^## /m)) {
+      const folder = /`store\/play\/(\w[\w-]*)\/`/.exec(section)?.[1];
+      const files = [...section.matchAll(/\| \d \| (\d\d-[\w-]+\.jpg) \|/g)].map((m) => m[1]!);
+      if (files.length) expect(folder, section.split("\n")[0]).toBeTruthy();
+      for (const f of files) expect(existsSync(join(process.cwd(), "store/play", folder!, f)), `${folder}/${f}`).toBe(true);
     }
     expect(existsSync(join(process.cwd(), "store/play/feature-graphic.png"))).toBe(true);
   });
