@@ -69,6 +69,7 @@ import * as pgm from "./text/pgm";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
 import * as pm from "./text/pm";
+import * as pol from "./text/pol";
 import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
@@ -175,6 +176,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...photos.es,
   ...plate.es,
   ...pm.es,
+  ...pol.es,
   ...pr.es,
   ...pro.es,
   ...prog.es,

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, onTestFinished, vi } from "vitest";
 
 import * as automationsRoute from "@/app/api/admin/automations/route.api";
 import * as maintenanceRoute from "@/app/api/admin/maintenance/route.api";
@@ -84,12 +84,16 @@ describe("maintenance mode", () => {
   });
 
   it("answers 503 from the proxy while on, and reads the switch at most every 15 seconds", async () => {
-    // The proxy reads the real clock; pin it to NOW so its cached answer and the checks below share one clock
-    // (before this, the test started failing once the real time passed NOW).
-    vi.useFakeTimers({ toFake: ["Date"], now: NOW });
+    // The proxy reads the clock itself; pin it to NOW, or once the real time passes NOW its cached reading
+    // looks newer than NOW + the cache time and the switch never seems stale.
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(NOW);
+    onTestFinished(() => void vi.useRealTimers());
+    const req = (path: string) =>
+      ({ nextUrl: new URL(`${SITE}${path}`), headers: new Headers({ origin: "capacitor://localhost" }) }) as never;
+    // The proxy reads the clock itself, so pin it to NOW: the cache times below are counted from there.
+    vi.useFakeTimers({ now: NOW, toFake: ["Date"] });
     try {
-      const req = (path: string) =>
-        ({ nextUrl: new URL(`${SITE}${path}`), headers: new Headers({ origin: "capacitor://localhost" }) }) as never;
       expect((await proxy(req("/api/sync/"))).status).toBe(200);
       await setMaintenance(true, "owner@example.com", NOW);
       const api = await proxy(req("/api/sync/"));

@@ -407,7 +407,7 @@ function MusicCard() {
   );
 }
 
-const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.watch", "conn.later.garmin", "conn.later.velocity"];
+const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.garmin", "conn.later.velocity"];
 
 export function Connections() {
   return (

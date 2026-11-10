@@ -17,6 +17,8 @@ const PATHS = {
   check: "M5 12.5l4.5 4.5L19 7.5",
   chevronLeft: "M15 18l-6-6 6-6",
   chevronRight: "M9 18l6-6-6-6",
+  chevronUp: "M6 15l6-6 6 6",
+  chevronDown: "M6 9l6 6 6-6",
   play: "M7 4.5v15l12-7.5z",
   plus: "M12 5v14M5 12h14",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
@@ -35,6 +37,8 @@ const PATHS = {
   gift: "M4 10h16v4H4zM5.5 14h13v7h-13zM12 10v11M12 10c-1.5-3.5-6-4-6-1.5S12 10 12 10zM12 10c1.5-3.5 6-4 6-1.5S12 10 12 10z",
   camera: "M3 8h4l2-3h6l2 3h4v11H3zM12 16.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z",
   flip: "M4 12a8 8 0 0 1 14-5.3M18 3v4h-4M20 12a8 8 0 0 1-14 5.3M6 21v-4h4",
+  undo: "M9 14 4 9l5-5M4 9h10.5a5.5 5.5 0 0 1 0 11H11",
+  lightbulb: "M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z",
 } as const;
 
 export type IconName = keyof typeof PATHS;
