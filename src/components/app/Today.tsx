@@ -10,7 +10,7 @@ import { itemSeconds, planSeconds } from "@/lib/generator";
 import { clockTime, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
-import { quoteOfDay } from "@/lib/quotes";
+import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
@@ -20,6 +20,7 @@ import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { callWhy, itemWhy, whyContext } from "@/lib/why";
+import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { PlanExtras, TodayMoments } from "./Extras";
@@ -507,7 +508,8 @@ export function Today() {
 
 /** One quote a day from quotes.ts, with its author. Turned off in Settings › Daily quote. */
 function DailyQuote({ now }: { now: number }) {
-  const q = quoteOfDay(now);
+  const i = quoteIndexOfDay(now);
+  const q = QUOTES[i];
   return (
     <figure
       className="card-tint relative mt-4 overflow-hidden p-4 pl-12"
@@ -517,7 +519,7 @@ function DailyQuote({ now }: { now: number }) {
       <span className="absolute left-4 top-4 text-violet" aria-hidden>
         <Icon name="quote" size={20} strokeWidth={2.4} />
       </span>
-      <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{q.text}</blockquote>
+      <blockquote className="text-[0.9375rem] font-medium leading-snug text-ink">{t(`quote.${i}` as MessageKey)}</blockquote>
       <figcaption className="mt-2 text-xs text-muted">
         <span className="font-semibold text-ink/80">{q.by}</span>
         {q.source && <span>, {q.source}</span>}

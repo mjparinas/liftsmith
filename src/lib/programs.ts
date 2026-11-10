@@ -1,7 +1,9 @@
+import type { MessageKey } from "@/locales/en";
+
 import { blockWeek } from "./block";
 import { available, exercise, EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import { alternatives, generate, planSeconds, type Plan, type PlanItem, type SetTarget } from "./generator";
-import { t } from "./i18n";
+import { currentTag, t } from "./i18n";
 import { layoff } from "./layoff";
 import { roundLoad, stepLoad } from "./loads";
 import { epley, sessionsOf, startE1rm, TIMED, weightFor } from "./progression";
@@ -47,19 +49,11 @@ export interface ProgramInfo {
   needs: Equipment[];
 }
 
-export const PROGRAMS: ProgramInfo[] = [
+const DATA: (Omit<ProgramInfo, "name" | "basedOn" | "summary" | "how"> & { steps: number })[] = [
   {
     id: "classic-5x5",
-    name: "Classic 5×5",
-    basedOn: "Based on the 5×5 programs of Bill Starr and StrongLifts 5×5 by Mehdi Hadim.",
     aka: ["5x5", "StrongLifts 5x5", "SL 5x5"],
-    summary: "Two alternating full-body workouts, three days a week. Add weight every session.",
-    how: [
-      "Workout A: squat, bench press and barbell row, 5 sets of 5.",
-      "Workout B: squat, overhead press, 5 sets of 5, and one set of 5 deadlifts.",
-      "Get every rep and the lift goes up next time: 2.5 kg (5 lb), or 5 kg (10 lb) on the deadlift.",
-      "Miss three sessions in a row on a lift and it drops 10% to build back up.",
-    ],
+    steps: 4,
     daysPerWeek: 3,
     level: "Beginner",
     tier: "free",
@@ -68,16 +62,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "novice-3x5",
-    name: "Novice 3×5",
-    basedOn: "Based on Starting Strength by Mark Rippetoe.",
     aka: ["Starting Strength", "SS", "3x5"],
-    summary: "Squat every session, alternate bench and press, finish with a pull. The fastest way to get strong from scratch.",
-    how: [
-      "Workout A: squat 3×5, bench press 3×5, deadlift 1×5.",
-      "Workout B: squat 3×5, overhead press 3×5, deadlift 1×5. After six sessions, power cleans 5×3 take the deadlift's place on B.",
-      "Squat and deadlift go up 5 kg (10 lb) a session, the rest 2.5 kg (5 lb).",
-      "Three misses in a row on a lift and it drops 10%.",
-    ],
+    steps: 4,
     daysPerWeek: 3,
     level: "Beginner",
     tier: "free",
@@ -86,15 +72,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "5x5-plus",
-    name: "5×5 plus arms",
-    basedOn: "Based on Ice Cream Fitness 5×5 by Jason Blaha.",
     aka: ["Ice Cream Fitness", "ICF 5x5", "ICF"],
-    summary: "The classic 5×5 with arm, trap and core work added for size as well as strength.",
-    how: [
-      "Workout A: squat, bench press and barbell row 5×5, then shrugs, skull crushers and curls 3×8.",
-      "Workout B: squat 5×5, deadlift 1×5, overhead press and row 5×5, then close-grip bench and curls 3×8, back extensions and cable crunches.",
-      "Every lift goes up a step when you get all its reps. Three misses in a row on a main lift drops it 10%.",
-    ],
+    steps: 3,
     daysPerWeek: 3,
     level: "Beginner",
     tier: "free",
@@ -103,16 +82,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "ramping-5x5",
-    name: "Ramping 5×5",
-    basedOn: "Based on the Madcow 5×5, itself from Bill Starr's 5×5.",
     aka: ["Madcow 5x5", "Madcow", "Bill Starr 5x5"],
-    summary: "For when adding weight every session stops working. Heavy, light and top-set days, with a new top set each week.",
-    how: [
-      "Heavy day: squat, bench and row, five sets of 5 ramping up 12.5% at a time to the week's top set.",
-      "Light day: lighter squats, then overhead press and deadlift ramping to their top set.",
-      "Top-set day: squat, bench and row ramp up, hit a triple 2.5% above the heavy day, then one back-off set of 8.",
-      "Make the triple and next week's top set is that weight, about 2.5% a week. Miss it and repeat the week.",
-    ],
+    steps: 4,
     daysPerWeek: 3,
     level: "Intermediate",
     tier: "free",
@@ -121,17 +92,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "tiered",
-    name: "Tiered progression",
-    basedOn: "Based on GZCLP by Cody Lefever (the GZCL method).",
     aka: ["GZCLP", "GZCL"],
-    summary:
-      "Three tiers each day: a heavy main lift, a lighter second lift for volume, and a light pump exercise. Each tier has its own plan for stalls.",
-    how: [
-      "T1, the main lift: 5×3, last set as many reps as you can. Get them all and add weight. Miss and move to 6×2, then 10×1, then restart 5×3 at 85%.",
-      "T2, the second lift: 3×10. Miss and move to 3×8, then 3×6, then back to 3×10 a little heavier than your last 3×10.",
-      "T3, the pump: 3×15, last set as many as you can. When that set reaches 25, add weight.",
-      "Four days: squat with bench, press with deadlift, bench with squat, deadlift with press.",
-    ],
+    steps: 4,
     daysPerWeek: 4,
     level: "Beginner",
     tier: "free",
@@ -140,16 +102,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "waves",
-    name: "Training max waves",
-    basedOn: "Based on 5/3/1 by Jim Wendler, with the Boring But Big extra sets.",
     aka: ["5/3/1", "531", "Wendler", "Boring But Big", "BBB"],
-    summary: "Slow, steady progress from a training max at 90% of your best. Four-week waves, one main lift a day.",
-    how: [
-      "Your training max is 90% of your estimated one-rep max.",
-      "Week 1: 65, 75, 85% for 5, 5 and as many as you can. Week 2: 70, 80, 90% for 3s. Week 3: 75, 85, 95% for 5, 3, 1+. Week 4 is a light deload.",
-      "After each main lift: 5×10 at 50% of the training max, then one assistance exercise.",
-      "Each four weeks the training max goes up 2.5 kg (5 lb) for press and bench, 5 kg (10 lb) for squat and deadlift. Fall short on a last set and it drops 10% instead.",
-    ],
+    steps: 4,
     daysPerWeek: 4,
     level: "Intermediate",
     tier: "free",
@@ -158,17 +112,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "calisthenics",
-    name: "Bodyweight skills",
-    basedOn: "Based on the r/bodyweightfitness Recommended Routine.",
     aka: ["Calisthenics", "Recommended Routine", "BWF RR", "bodyweight fitness"],
-    summary:
-      "Full-body bodyweight training, three days a week. Each movement climbs a ladder of harder versions, from wall push-ups to one-leg squats.",
-    how: [
-      "Pairs, done back to back: pull-up with squat, dip with hinge, row with push-up. Then three core exercises.",
-      "3 sets of 5 to 8 reps. When you get 3×8, the next session moves you one step up the ladder at 3×5.",
-      "Holds start at 20 seconds and add 5 each time, up to 60.",
-      "Steps your gym can't do are skipped. A pull-up bar is the one thing you need.",
-    ],
+    steps: 4,
     daysPerWeek: 3,
     level: "Any level",
     tier: "free",
@@ -177,15 +122,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "ppl",
-    name: "Push / pull / legs",
-    basedOn: "A classic bodybuilding split, planned day by day by the adaptive engine.",
     aka: ["PPL", "push pull legs"],
-    summary: "Chest, shoulders and triceps; back and biceps; then legs and core. Run it three or six days a week.",
-    how: [
-      "Each day trains only its muscles, with the exercises, sets and weights picked for your gym and recovery.",
-      "Keeps the training block: reps in reserve step down each week, then a deload.",
-      "Readiness still calls push and easy days, and you can always override.",
-    ],
+    steps: 3,
     daysPerWeek: 6,
     level: "Any level",
     tier: "pro",
@@ -194,15 +132,8 @@ export const PROGRAMS: ProgramInfo[] = [
   },
   {
     id: "upper-lower",
-    name: "Upper / lower",
-    basedOn: "A classic strength and size split, planned day by day by the adaptive engine.",
     aka: ["upper lower split", "UL", "upper/lower"],
-    summary: "Alternate upper body and lower body days, usually four a week.",
-    how: [
-      "Upper days: chest, back, shoulders and arms. Lower days: legs, glutes and core.",
-      "Each day's exercises, sets and weights are picked for your gym and recovery.",
-      "Keeps the training block, readiness and the push and easy calls.",
-    ],
+    steps: 3,
     daysPerWeek: 4,
     level: "Any level",
     tier: "pro",
@@ -210,6 +141,23 @@ export const PROGRAMS: ProgramInfo[] = [
     needs: [],
   },
 ];
+
+/** The programs, with their text in the app's language (pgm.<id>.* in src/locales/text/pgm.ts). */
+export const PROGRAMS: ProgramInfo[] = DATA.map(({ steps, ...p }) => ({
+  ...p,
+  get name() {
+    return t(`pgm.${p.id}.name` as MessageKey);
+  },
+  get basedOn() {
+    return t(`pgm.${p.id}.basedOn` as MessageKey);
+  },
+  get summary() {
+    return t(`pgm.${p.id}.summary` as MessageKey);
+  },
+  get how() {
+    return Array.from({ length: steps }, (_, i) => t(`pgm.${p.id}.how${i + 1}` as MessageKey));
+  },
+}));
 
 export const PROGRAM_BY_ID: ReadonlyMap<string, ProgramInfo> = new Map(PROGRAMS.map((p) => [p.id, p]));
 
@@ -355,10 +303,10 @@ function linear(l: Lift, sets: SetEvent[] | undefined, slotEx: string, planned: 
 }
 
 function linearNote(l: Lift, limit = 3): string {
-  if (l.last === "up") return "Got every rep last time: weight up";
-  if (l.last === "miss") return `Same weight: get every rep (${l.fails} of ${limit} misses before a reset)`;
-  if (l.last === "reset") return "10% lighter after three misses, to build back up";
-  return "First session: starting light on purpose";
+  if (l.last === "up") return t("pgm.lin.up");
+  if (l.last === "miss") return t("pgm.lin.miss", { fails: l.fails, limit });
+  if (l.last === "reset") return t("pgm.lin.reset");
+  return t("pgm.lin.first");
 }
 
 const straight = (w: number, sets: number, reps: number, amrapLast = false): SetTarget[] =>
@@ -393,9 +341,16 @@ function linearEngine(def: LinearDef): Engine {
       const d = def.days[day]!;
       return {
         name: d.name,
-        note: `Next time: ${def.days[(day + 1) % def.days.length]!.name}`,
+        note: t("pgm.next", { day: def.days[(day + 1) % def.days.length]!.name }),
         slots: liftsOf(s, day).map(([ex, sets, reps]) =>
-          linearSlot(ex, lift(ex), sets, reps, def.accessories?.has(ex) ? 90 : 180, def.accessories?.has(ex) ? "Accessory" : undefined),
+          linearSlot(
+            ex,
+            lift(ex),
+            sets,
+            reps,
+            def.accessories?.has(ex) ? 90 : 180,
+            def.accessories?.has(ex) ? t("pgm.accessory") : undefined,
+          ),
         ),
       };
     },
@@ -411,7 +366,9 @@ function linearEngine(def: LinearDef): Engine {
 const CLASSIC = linearEngine({
   days: [
     {
-      name: "Workout A",
+      get name() {
+        return t("pgm.workoutA");
+      },
       lifts: [
         ["back-squat", 5, 5],
         ["bench-press", 5, 5],
@@ -419,7 +376,9 @@ const CLASSIC = linearEngine({
       ],
     },
     {
-      name: "Workout B",
+      get name() {
+        return t("pgm.workoutB");
+      },
       lifts: [
         ["back-squat", 5, 5],
         ["overhead-press", 5, 5],
@@ -433,7 +392,9 @@ const CLASSIC = linearEngine({
 const NOVICE = linearEngine({
   days: [
     {
-      name: "Workout A",
+      get name() {
+        return t("pgm.workoutA");
+      },
       lifts: [
         ["back-squat", 3, 5],
         ["bench-press", 3, 5],
@@ -441,7 +402,9 @@ const NOVICE = linearEngine({
       ],
     },
     {
-      name: "Workout B",
+      get name() {
+        return t("pgm.workoutB");
+      },
       lifts: [
         ["back-squat", 3, 5],
         ["overhead-press", 3, 5],
@@ -464,7 +427,9 @@ const NOVICE = linearEngine({
 const PLUS = linearEngine({
   days: [
     {
-      name: "Workout A",
+      get name() {
+        return t("pgm.workoutA");
+      },
       lifts: [
         ["back-squat", 5, 5],
         ["bench-press", 5, 5],
@@ -475,7 +440,9 @@ const PLUS = linearEngine({
       ],
     },
     {
-      name: "Workout B",
+      get name() {
+        return t("pgm.workoutB");
+      },
       lifts: [
         ["back-squat", 5, 5],
         ["deadlift", 1, 5],
@@ -519,45 +486,40 @@ const RAMPING: Engine = {
     const week = Math.floor(s.n / 3) + 1;
     if (day === 0) {
       return {
-        name: "Heavy day",
-        note: `Week ${week}`,
+        name: t("pgm.heavy"),
+        note: t("pgm.week", { n: week }),
         slots: ["back-squat", "bench-press", "barbell-row"].map((ex) =>
-          slot(
-            ex,
-            ramp(RAMP5, 5, lift(ex).w),
-            "5 sets of 5, up to a top set",
-            lift(ex).last === "up" ? "Top set: last week's triple, now for 5" : "Ramp up 12.5% a set to the top set",
-          ),
+          slot(ex, ramp(RAMP5, 5, lift(ex).w), t("pgm.ramp5Scheme"), lift(ex).last === "up" ? t("pgm.topFor5") : t("pgm.ramp12")),
         ),
       };
     }
     if (day === 1) {
       const sq = lift("back-squat").w;
       return {
-        name: "Light day",
-        note: `Week ${week}`,
+        name: t("pgm.light"),
+        note: t("pgm.week", { n: week }),
         slots: [
           slot(
             "back-squat",
             [0.5, 0.625, 0.75, 0.75].map((p) => ({ weight: sq * p, reps: 5 })),
-            "4 × 5, light",
-            "Light squats to recover for the top-set day",
+            t("pgm.lightScheme"),
+            t("pgm.lightSquat"),
           ),
-          slot("overhead-press", ramp(RAMP4, 5, lift("overhead-press").w), "4 sets of 5, up to a top set", "Ramp up to the top set"),
-          slot("deadlift", ramp(RAMP4, 5, lift("deadlift").w), "4 sets of 5, up to a top set", "Ramp up to the top set"),
+          slot("overhead-press", ramp(RAMP4, 5, lift("overhead-press").w), t("pgm.ramp4Scheme"), t("pgm.rampTop")),
+          slot("deadlift", ramp(RAMP4, 5, lift("deadlift").w), t("pgm.ramp4Scheme"), t("pgm.rampTop")),
         ],
       };
     }
     return {
-      name: "Top-set day",
-      note: `Week ${week}`,
+      name: t("pgm.top"),
+      note: t("pgm.week", { n: week }),
       slots: ["back-squat", "bench-press", "barbell-row"].map((ex) => {
         const top = lift(ex).w;
         return slot(
           ex,
           [...ramp(RAMP5.slice(0, 4), 5, top), { weight: top * WEEKLY, reps: 3 }, { weight: top * 0.75, reps: 8 }],
-          "4 ramp sets, a triple, a back-off 8",
-          "The triple is a new top weight. Make it and next week starts there",
+          t("pgm.topScheme"),
+          t("pgm.triple"),
         );
       }),
     };
@@ -618,23 +580,23 @@ const TIERED: Engine = {
     const [s2, r2] = T2[l2.stage]!;
     const n1 =
       l1.last === "up"
-        ? "Got them all: weight up"
+        ? t("pgm.allUp")
         : l1.last === "step"
-          ? `Stalled: same weight as ${s1}×${r1}`
+          ? t("pgm.stalled", { scheme: `${s1}×${r1}` })
           : l1.last === "reset"
-            ? "Fresh start at 85%"
-            : "Last set: as many as you can";
+            ? t("pgm.fresh85")
+            : t("pgm.lastMax");
     const n2 =
       l2.last === "up"
-        ? "Got them all: weight up"
+        ? t("pgm.allUp")
         : l2.last === "step"
-          ? `Stalled: same weight as ${s2}×${r2}`
+          ? t("pgm.stalled", { scheme: `${s2}×${r2}` })
           : l2.last === "reset"
-            ? "Back to 3×10, heavier than last time"
-            : "Steady reps, a little in reserve";
+            ? t("pgm.back310")
+            : t("pgm.steadyReserve");
     return {
-      name: `Day ${day + 1}`,
-      note: `${exercise(d.t1).name} day`,
+      name: t("pgm.day", { n: day + 1 }),
+      note: t("pgm.liftDay", { name: exercise(d.t1).name }),
       slots: [
         {
           key: `T1:${d.t1}`,
@@ -654,7 +616,7 @@ const TIERED: Engine = {
           rest: 75,
           scheme: "3 × 15+",
           label: "T3",
-          note: l3.last === "up" ? "25+ last time: weight up" : "Weight goes up when the last set reaches 25",
+          note: l3.last === "up" ? t("pgm.t3up") : t("pgm.t3rule"),
           rir: 1,
         },
       ],
@@ -712,11 +674,11 @@ const WAVE_ASSIST: Record<(typeof WAVE_LIFTS)[number], string> = {
   "bench-press": "db-row",
   squat: "lying-leg-curl",
 };
-const WAVES: { name: string; pcts: number[]; reps: number[]; amrap: boolean }[] = [
-  { name: "5s week", pcts: [0.65, 0.75, 0.85], reps: [5, 5, 5], amrap: true },
-  { name: "3s week", pcts: [0.7, 0.8, 0.9], reps: [3, 3, 3], amrap: true },
-  { name: "5/3/1 week", pcts: [0.75, 0.85, 0.95], reps: [5, 3, 1], amrap: true },
-  { name: "Deload week", pcts: [0.4, 0.5, 0.6], reps: [5, 5, 5], amrap: false },
+const WAVES: { key: MessageKey; pcts: number[]; reps: number[]; amrap: boolean }[] = [
+  { key: "pgm.w5", pcts: [0.65, 0.75, 0.85], reps: [5, 5, 5], amrap: true },
+  { key: "pgm.w3", pcts: [0.7, 0.8, 0.9], reps: [3, 3, 3], amrap: true },
+  { key: "pgm.w531", pcts: [0.75, 0.85, 0.95], reps: [5, 3, 1], amrap: true },
+  { key: "pgm.wDeload", pcts: [0.4, 0.5, 0.6], reps: [5, 5, 5], amrap: false },
 ];
 
 const WAVE: Engine = {
@@ -745,8 +707,12 @@ const WAVE: Engine = {
     const a = lift(`acc:${aEx}`);
     const bw = exercise(aEx).load === "bodyweight";
     return {
-      name: { "overhead-press": "Press day", deadlift: "Deadlift day", "bench-press": "Bench day", squat: "Squat day" }[name],
-      note: `Cycle ${cycle} · ${w.name}`,
+      name: t(
+        { "overhead-press": "pgm.pressDay", deadlift: "pgm.deadliftDay", "bench-press": "pgm.benchDay", squat: "pgm.squatDay" }[
+          name
+        ] as MessageKey,
+      ),
+      note: t("pgm.cycle", { n: cycle, week: t(w.key) }),
       slots: [
         {
           key: `tm:${ex}`,
@@ -754,10 +720,10 @@ const WAVE: Engine = {
           sets: [...main, ...extra],
           rest: 180,
           scheme: `${w.reps.join(", ")}${w.amrap ? "+" : ""}${extra.length ? " · 5 × 10" : ""}`,
-          label: "Main lift",
+          label: t("pgm.main"),
           note: deload
-            ? "Deload: easy sets to recover"
-            : `Training max ${fmtNum(Math.round(fromKg(l.w, ctx.gym.unit)))} ${ctx.gym.unit}. Last heavy set: as many good reps as you can${extra.length ? ", then 5×10 at 50%" : ""}`,
+            ? t("pgm.deloadNote")
+            : t(extra.length ? "pgm.tmBbb" : "pgm.tm", { weight: `${fmtNum(Math.round(fromKg(l.w, ctx.gym.unit)))} ${ctx.gym.unit}` }),
           ramp: true,
           rir: 1,
         },
@@ -767,8 +733,8 @@ const WAVE: Engine = {
           sets: straight(a.w, deload ? 3 : 5, bw ? a.wk : 10),
           rest: 90,
           scheme: `${deload ? 3 : 5} × ${bw ? a.wk : 10}`,
-          label: "Assistance",
-          note: a.last === "up" ? "Got them all: a step up" : "Steady reps",
+          label: t("pgm.assist"),
+          note: a.last === "up" ? t("pgm.stepUp") : t("pgm.steady"),
           rir: 2,
         },
       ],
@@ -802,15 +768,69 @@ const WAVE: Engine = {
 // Bodyweight skills: ladders of harder versions
 
 export const LADDERS: { key: string; name: string; steps: string[]; timed?: boolean }[] = [
-  { key: "pull", name: "Pull-up", steps: ["scapular-pull", "negative-pull-up", "band-assisted-pull-up", "pull-up"] },
-  { key: "squat", name: "Squat", steps: ["bodyweight-squat", "split-squat", "bw-split-squat", "shrimp-squat", "pistol-squat"] },
-  { key: "dip", name: "Dip", steps: ["bench-dip", "negative-dip", "dip"] },
-  { key: "hinge", name: "Hinge", steps: ["glute-bridge", "single-leg-rdl", "nordic-curl"] },
-  { key: "row", name: "Row", steps: ["towel-row", "ring-row", "inverted-row"] },
-  { key: "push", name: "Push-up", steps: ["wall-push-up", "incline-push-up", "push-up", "diamond-push-up", "pseudo-planche-push-up"] },
-  { key: "core-front", name: "Core", steps: ["plank", "ab-wheel"] },
-  { key: "core-side", name: "Side core", steps: ["side-plank"] },
-  { key: "core-back", name: "Lower back", steps: ["superman", "back-extension"] },
+  {
+    key: "pull",
+    get name() {
+      return t("pgm.lad.pull");
+    },
+    steps: ["scapular-pull", "negative-pull-up", "band-assisted-pull-up", "pull-up"],
+  },
+  {
+    key: "squat",
+    get name() {
+      return t("pgm.lad.squat");
+    },
+    steps: ["bodyweight-squat", "split-squat", "bw-split-squat", "shrimp-squat", "pistol-squat"],
+  },
+  {
+    key: "dip",
+    get name() {
+      return t("pgm.lad.dip");
+    },
+    steps: ["bench-dip", "negative-dip", "dip"],
+  },
+  {
+    key: "hinge",
+    get name() {
+      return t("pgm.lad.hinge");
+    },
+    steps: ["glute-bridge", "single-leg-rdl", "nordic-curl"],
+  },
+  {
+    key: "row",
+    get name() {
+      return t("pgm.lad.row");
+    },
+    steps: ["towel-row", "ring-row", "inverted-row"],
+  },
+  {
+    key: "push",
+    get name() {
+      return t("pgm.lad.push");
+    },
+    steps: ["wall-push-up", "incline-push-up", "push-up", "diamond-push-up", "pseudo-planche-push-up"],
+  },
+  {
+    key: "core-front",
+    get name() {
+      return t("pgm.lad.core-front");
+    },
+    steps: ["plank", "ab-wheel"],
+  },
+  {
+    key: "core-side",
+    get name() {
+      return t("pgm.lad.core-side");
+    },
+    steps: ["side-plank"],
+  },
+  {
+    key: "core-back",
+    get name() {
+      return t("pgm.lad.core-back");
+    },
+    steps: ["superman", "back-extension"],
+  },
 ];
 const LADDER_MIN = 5;
 const LADDER_MAX = 8;
@@ -835,8 +855,8 @@ const LADDER: Engine = {
   },
   build(_s, _day, lift, ctx) {
     return {
-      name: "Full body",
-      note: "Pairs back to back, then core",
+      name: t("pgm.fullBody"),
+      note: t("pgm.pairs"),
       slots: LADDERS.flatMap((lad) => {
         const l = lift(`ladder:${lad.key}`);
         const ex = ladderStep(lad.steps, l.w, ctx.gym);
@@ -845,12 +865,12 @@ const LADDER: Engine = {
         const top = lad.steps.indexOf(ex) === lad.steps.length - 1;
         const note =
           l.last === "step"
-            ? "New step: start at 3×5"
+            ? t("pgm.newStep")
             : timed
-              ? `Hold for ${l.wk} s. Up 5 s each time you make all 3`
+              ? t("pgm.hold", { s: l.wk })
               : top
-                ? "Top of the ladder: add reps"
-                : `Get 3×${LADDER_MAX} and you move up a step`;
+                ? t("pgm.topLadder")
+                : t("pgm.moveUp", { max: LADDER_MAX });
         return [
           {
             key: `ladder:${lad.key}`,
@@ -925,13 +945,38 @@ const LEGS: Muscle[] = ["quads", "hamstrings", "glutes", "calves", "adductors", 
 
 export const SPLITS: Record<"ppl" | "upper-lower", { name: string; muscles: Muscle[] }[]> = {
   ppl: [
-    { name: "Push day", muscles: PUSH },
-    { name: "Pull day", muscles: PULL },
-    { name: "Leg day", muscles: LEGS },
+    {
+      get name() {
+        return t("pgm.pushDay");
+      },
+      muscles: PUSH,
+    },
+    {
+      get name() {
+        return t("pgm.pullDay");
+      },
+      muscles: PULL,
+    },
+    {
+      get name() {
+        return t("pgm.legDay");
+      },
+      muscles: LEGS,
+    },
   ],
   "upper-lower": [
-    { name: "Upper day", muscles: [...PUSH, ...PULL] },
-    { name: "Lower day", muscles: LEGS },
+    {
+      get name() {
+        return t("pgm.upperDay");
+      },
+      muscles: [...PUSH, ...PULL],
+    },
+    {
+      get name() {
+        return t("pgm.lowerDay");
+      },
+      muscles: LEGS,
+    },
   ],
 };
 
@@ -1025,7 +1070,7 @@ function toItems(day: Day, gym: Gym): PlanItem[] {
     // A stand-in exercise starts from the planned weight scaled by how heavy each usually goes.
     const scale = id === slot.ex ? 1 : orig.start > 0 && ex.start > 0 ? ex.start / orig.start : 0;
     const sets = slot.sets.map((t) => ({ ...t, weight: ex.load === "bodyweight" ? 0 : roundLoad(t.weight * scale, ex, gym).kg }));
-    const note = id === slot.ex ? slot.note : `In place of ${orig.name}, which needs kit this gym doesn't have`;
+    const note = id === slot.ex ? slot.note : t("pgm.standIn", { name: orig.name });
     items.push({
       exerciseId: id,
       sets: sets.length,
@@ -1076,7 +1121,7 @@ export function programPlan({
         id: src.id,
         day,
         dayName: days[day]!.name,
-        note: `Next time: ${days[(day + 1) % days.length]!.name.toLowerCase()}`,
+        note: t("pgm.next", { day: days[(day + 1) % days.length]!.name.toLocaleLowerCase(currentTag()) }),
         fixed: false,
       },
     };

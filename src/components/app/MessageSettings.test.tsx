@@ -53,6 +53,7 @@ describe("Settings › Reminders on the web", () => {
         "firstWorkoutAt",
         "id",
         "kinds",
+        "lang",
         "lastWorkoutAt",
         "pro",
         "resubscribe",

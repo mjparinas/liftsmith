@@ -213,3 +213,17 @@ describe("Pro state", () => {
     expect(proState(undefined, MON, true)).toEqual({ state: "pro" });
   });
 });
+
+describe("language", () => {
+  it("writes each message in the lifter's language, English when none is given", () => {
+    const from = MON,
+      to = addDays(MON, 1, TZ);
+    expect(plan(input(), from, to, "push")[0]!.title).toBe("Today's workout is ready");
+    expect(plan(input({ lang: "es" }), from, to, "push")[0]!.title).toBe("El entrenamiento de hoy está listo");
+    const week = plan(input({ lang: "fr", weekStart: addDays(MON, -7, TZ), weekDays: 1 }), from, to, "email")[0]!;
+    expect(week.title).toBe("Votre semaine d’entraînement");
+    expect(week.body).toContain("lundi, mercredi, vendredi à 18:00");
+    expect(week.body).toContain("1 jour sur 3");
+    expect(milestone(null, { firstWorkoutAt: MON, streakWeeks: 0, lang: "es" }, MON + 1000)!.title).toBe("Tu primer entrenamiento, hecho");
+  });
+});

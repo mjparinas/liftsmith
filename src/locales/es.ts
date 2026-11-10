@@ -65,6 +65,7 @@ import * as notes from "./text/notes";
 import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
+import * as pgm from "./text/pgm";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
 import * as pm from "./text/pm";
@@ -73,10 +74,12 @@ import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
 import * as quest from "./text/quest";
+import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
 import * as recap from "./text/recap";
 import * as recovery from "./text/recovery";
 import * as remix from "./text/remix";
+import * as rmd from "./text/rmd";
 import * as rt from "./text/rt";
 import * as save from "./text/save";
 import * as sband from "./text/sband";
@@ -168,6 +171,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...orm.es,
   ...part.es,
   ...past.es,
+  ...pgm.es,
   ...photos.es,
   ...plate.es,
   ...pm.es,
@@ -176,10 +180,12 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...prog.es,
   ...progress.es,
   ...quest.es,
+  ...quote.es,
   ...rarity.es,
   ...recap.es,
   ...recovery.es,
   ...remix.es,
+  ...rmd.es,
   ...rt.es,
   ...save.es,
   ...sband.es,
