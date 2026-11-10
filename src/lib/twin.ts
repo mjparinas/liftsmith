@@ -303,9 +303,10 @@ export function twin(input: TwinInput): TwinMetric[] {
     out.push({
       ...missing("bodyFat", "Body fat", "body fat"),
       why: native
-        ? `Comes from a smart scale or body scanner through ${store}.`
-        : "Comes from a smart scale through your phone's health app.",
-      chip: native ? "No reading" : "On your phone",
+        ? `Log it with a weigh-in on Progress, or it comes from a smart scale or body scanner through ${store}.`
+        : "Log it with a weigh-in on Progress, or it comes from a smart scale through your phone's health app.",
+      chip: "No reading",
+      action: { kind: "route", route: "stats", label: "Log body fat" },
     });
   } else {
     const then = [...fats].reverse().find((e) => e.at <= lastF.at - 35 * DAY);

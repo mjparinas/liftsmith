@@ -9,7 +9,17 @@ import { track } from "@/lib/analytics";
 import { connectHealth, healthAvailable, readHeight } from "@/lib/health";
 import { date, list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { ACTIVITIES, ACTIVITY, currentBodyFat, currentKg, currentTdee, tdeeHistory, tdeeLog, type Activity } from "@/lib/tdee";
+import {
+  ACTIVITIES,
+  ACTIVITY,
+  currentBodyFat,
+  currentKg,
+  currentTdee,
+  parseBodyFat,
+  tdeeHistory,
+  tdeeLog,
+  type Activity,
+} from "@/lib/tdee";
 import type { TdeeEvent, Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -112,20 +122,44 @@ function TdeeScreen() {
     const cm = Number(v) * (imperial ? 2.54 : 1);
     if (cm >= 100 && cm <= 250) setProfile({ heightCm: Math.round(cm * 10) / 10 });
   };
-  const onWeight = (v: string) => {
-    setWeight(v);
+  // Weight and body fat become one weigh-in 1.5 s after the last change to either, so the reading reaches
+  // the trend lines, the health twin and coach's notes, not just this calculator.
+  const pending = useRef<{ kg?: number; fat?: number }>({});
+  const persist = () => {
     clearTimeout(save.current);
-    const kg = Math.round(toKg(Number(v), unit) * 10) / 10;
-    if (!(kg >= 25 && kg <= 350)) return;
     save.current = setTimeout(() => {
-      if (Math.abs(kg - currentKg(useApp.getState().events, useApp.getState().profile)) >= 0.05) logBodyweight(kg);
+      const { events: ev, profile: p } = useApp.getState();
+      const curKg = currentKg(ev, p);
+      const { kg = curKg, fat: pct } = pending.current;
+      pending.current = {};
+      const kgChanged = Math.abs(kg - curKg) >= 0.05;
+      const fatChanged =
+        pct !== undefined &&
+        pct !==
+          currentBodyFat(
+            ev.filter((e) => e.type === "bodyweight"),
+            { ...p, bodyFat: undefined },
+          );
+      if (kgChanged || fatChanged) logBodyweight(kg, fatChanged ? pct : undefined);
     }, 1500);
   };
-  const onFat = (v: string) => {
+  const onWeight = (v: string) => {
+    setWeight(v);
+    const kg = Math.round(toKg(Number(v), unit) * 10) / 10;
+    if (!(kg >= 25 && kg <= 350)) return;
+    pending.current.kg = kg;
+    persist();
+  };
+  // `record` is false for the typical value filled in when body fat is switched on: a guess, not a reading,
+  // so it stays out of the weigh-ins (and coach's notes) until the lifter changes it.
+  const onFat = (v: string, record = true) => {
     setFatText(v);
-    const n = Number(v);
-    if (v && n >= 3 && n <= 60)
-      setProfile({ bodyFat: { pct: n, at: Date.now() }, tdee: { ...useApp.getState().profile.tdee, useBodyFat: true } });
+    const n = parseBodyFat(v);
+    if (n === undefined) return;
+    setProfile({ bodyFat: { pct: n, at: Date.now() }, tdee: { ...useApp.getState().profile.tdee, useBodyFat: true } });
+    if (!record) return;
+    pending.current.fat = n;
+    persist();
   };
   const setActivity = (a: Activity | undefined) => setProfile({ tdee: { ...profile.tdee, activity: a } });
   const a = cur.activity;
@@ -219,7 +253,7 @@ function TdeeScreen() {
                   active={useFat}
                   onClick={() =>
                     fat === undefined
-                      ? onFat(profile.sex === "female" ? "25" : "18")
+                      ? onFat(profile.sex === "female" ? "25" : "18", false)
                       : setProfile({ tdee: { ...profile.tdee, useBodyFat: true } })
                   }
                 >

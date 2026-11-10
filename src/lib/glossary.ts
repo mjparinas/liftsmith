@@ -28,6 +28,7 @@ const TERMS = [
   "restingHr",
   "breathingRate",
   "vo2max",
+  "bodyFat",
   "leanMass",
   "bmi",
   "restDrop",

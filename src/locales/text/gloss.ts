@@ -67,6 +67,9 @@ export const en = {
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.\nLifting barely moves it. Two 20-minute hard cardio sessions a week do.",
+  "gloss.bodyFat.title": "Body fat",
+  "gloss.bodyFat.body":
+    "The share of your weight that's fat, from a smart scale, a body scanner or a calipers check. Every method reads differently, so stick to one and measure at the same time of day, ideally in the morning before eating.\nOne reading means little. Three or more over a few weeks show the trend, and coach's notes tell you when it's moving the wrong way for your goal.",
   "gloss.leanMass.title": "Lean mass",
   "gloss.leanMass.body":
     "Everything in your body that isn't fat: muscle, bone, organs and water. Your weight times the share that isn't fat. Lean mass rising while body fat holds or falls means training is building muscle.",
@@ -144,6 +147,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.vo2max.title": "VO₂ máx",
   "gloss.vo2max.body":
     "Cuánto oxígeno puede usar tu cuerpo al máximo esfuerzo, en mililitros por kilo y minuto. Los relojes lo estiman a partir de paseos y carreras. Es la mejor medida única de la forma del corazón.\nLevantar pesas apenas lo mueve. Dos sesiones de cardio intenso de 20 minutos a la semana, sí.",
+  "gloss.bodyFat.title": "Grasa corporal",
+  "gloss.bodyFat.body":
+    "La parte de tu peso que es grasa, según una báscula inteligente, un escáner corporal o un plicómetro. Cada método da valores distintos, así que usa siempre el mismo y mide a la misma hora, mejor por la mañana antes de comer.\nUna sola lectura dice poco. Tres o más en unas semanas muestran la tendencia, y las notas del entrenador te avisan cuando va en la dirección equivocada para tu objetivo.",
   "gloss.leanMass.title": "Masa magra",
   "gloss.leanMass.body":
     "Todo lo que hay en tu cuerpo que no es grasa: músculo, hueso, órganos y agua. Tu peso por la parte que no es grasa. Si la masa magra sube mientras la grasa se mantiene o baja, el entrenamiento está construyendo músculo.",
@@ -219,6 +225,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "La quantité d’oxygène que votre corps peut utiliser à l’effort maximal, en millilitres par kilo et par minute. Les montres l’estiment à partir de la marche et de la course. C’est la meilleure mesure unique de la forme cardiaque.\nLa musculation la fait à peine bouger. Deux séances de cardio intense de 20 minutes par semaine, si.",
+  "gloss.bodyFat.title": "Masse grasse",
+  "gloss.bodyFat.body":
+    "La part de votre poids qui est de la graisse, mesurée par une balance connectée, un scanner corporel ou une pince à plis cutanés. Chaque méthode donne des valeurs différentes : gardez la même et mesurez à la même heure, idéalement le matin à jeun.\nUne seule mesure dit peu de chose. Trois ou plus sur quelques semaines montrent la tendance, et les notes du coach vous préviennent quand elle va dans le mauvais sens pour votre objectif.",
   "gloss.leanMass.title": "Masse maigre",
   "gloss.leanMass.body":
     "Tout ce qui, dans votre corps, n’est pas de la graisse : muscles, os, organes et eau. Votre poids multiplié par la part qui n’est pas de la graisse. Si la masse maigre monte pendant que la masse grasse se maintient ou baisse, l’entraînement construit du muscle.",

@@ -5,12 +5,13 @@ import { useState, type CSSProperties } from "react";
 import { exercise } from "@/lib/exercises";
 import { list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
+import { ACTIVITY, currentTdee, parseBodyFat, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { AchievementRow, useGame } from "./Achievements";
+import { BodyFatField } from "./BodyFatField";
 import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
 import { ago, clock } from "./format";
@@ -252,15 +253,23 @@ function BodyweightCard() {
   const unit = profile.unit;
   const log = events.filter((e) => e.type === "bodyweight").sort((a, b) => a.at - b.at);
   const [value, setValue] = useState("");
+  const [fat, setFat] = useState("");
+  const [fatError, setFatError] = useState(false);
   const last = log.at(-1);
   const monthAgo = [...log].reverse().find((e) => !!last && e.type === "bodyweight" && e.at <= last.at - 28 * 86400_000);
   const kg = (e: (typeof log)[number] | undefined) => (e?.type === "bodyweight" ? e.kg : undefined);
   const change = kg(last) !== undefined && kg(monthAgo) !== undefined ? fromKg(kg(last)! - kg(monthAgo)!, unit) : undefined;
+  const lastFat = [...log].reverse().find((e) => e.type === "bodyweight" && e.bodyFat !== undefined);
+  // Weight, body fat or both: body fat on its own is logged with the last weight, so the trend lines stay whole.
   const submit = () => {
     const n = Number(value);
-    if (!(n > 0)) return;
-    logBodyweight(toKg(n, unit));
+    const pct = parseBodyFat(fat);
+    setFatError(fat.trim() !== "" && pct === undefined);
+    if (fat.trim() !== "" && pct === undefined) return;
+    if (!(n > 0) && pct === undefined) return;
+    logBodyweight(n > 0 ? toKg(n, unit) : (kg(last) ?? profile.bodyweight), pct);
     setValue("");
+    setFat("");
   };
   return (
     <Section title={t("progress.bw")} icon="heart">
@@ -277,11 +286,14 @@ function BodyweightCard() {
                   ? t("progress.bw.count", { count: log.length })
                   : t("progress.bw.none")}
             </div>
+            {lastFat?.type === "bodyweight" && lastFat.bodyFat !== undefined && (
+              <div className="num text-sm text-muted">{t("body.fat.last", { pct: fmtNum(Math.round(lastFat.bodyFat * 10) / 10) })}</div>
+            )}
           </div>
           <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />
         </div>
         <form
-          className="mt-3 flex gap-2"
+          className="mt-3 space-y-2"
           onSubmit={(e) => {
             e.preventDefault();
             submit();
@@ -295,11 +307,18 @@ function BodyweightCard() {
             step={unit === "lb" ? 0.2 : 0.1}
             start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10}
             min={1}
-            className="min-w-0 flex-1"
           />
-          <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>
-            {t("progress.bw.log")}
-          </Button>
+          <div className="flex flex-wrap items-end gap-2">
+            <BodyFatField id="progress-bf" value={fat} onChange={setFat} />
+            <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>
+              {t("progress.bw.log")}
+            </Button>
+          </div>
+          {fatError && (
+            <p role="alert" className="text-sm text-bad">
+              {t("body.fat.range")}
+            </p>
+          )}
         </form>
       </div>
     </Section>
