@@ -13,7 +13,7 @@ import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS, goalStreak } from "@/lib/game";
-import { readHeight } from "@/lib/health";
+import { readBodyStats } from "@/lib/health";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
@@ -248,13 +248,13 @@ export function App() {
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);
-  // TDEE tracking (tdee.ts): height from Health Connect or Apple Health on open (weigh-ins and body fat come
+  // TDEE tracking (tdee.ts): height (and on iOS sex and birth year) from health data on open (weigh-ins and body fat come
   // in through the store's importHealthBody), then
   // a snapshot whenever weight, age, height or training days change. Debounced, so typing a weight in
   // Settings records the final value, not every keystroke.
   useEffect(() => {
     if (!ready) return;
-    void readHeight().then((r) => useApp.getState().applyHealthBody(r));
+    void readBodyStats().then((r) => useApp.getState().applyHealthBody(r));
     let t: ReturnType<typeof setTimeout> | undefined;
     const unsub = useApp.subscribe((s, prev) => {
       if (s.events === prev.events && s.profile === prev.profile) return;

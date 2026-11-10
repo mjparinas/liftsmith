@@ -52,7 +52,7 @@ export const en = {
   "x.scoreBodyAge":
     "Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight, adjusted for your age. 50 is typical.",
   "x.adjustAge": "Adjust for age",
-  "x.addBirth": "Add your birth year in setup to adjust the score for age.",
+  "x.addBirth": "Add your age in Your stats to adjust the score for age.",
   "x.twins": "Strength twins",
   "x.twinsBody": "How you compare with trained lifters of your body weight.",
   "x.twinsAge": "How you compare with trained lifters of your age and body weight.",
@@ -115,7 +115,7 @@ export const es: Partial<Record<Key, Message>> = {
   "x.scoreBodyAge":
     "Tus máximos estimados actuales (de los últimos 6 meses) frente a un atleta intermedio típico de tu peso corporal, ajustados a tu edad. 50 es lo típico.",
   "x.adjustAge": "Ajustar por edad",
-  "x.addBirth": "Añade tu año de nacimiento en la configuración para ajustar la puntuación por edad.",
+  "x.addBirth": "Añade tu edad en Tus datos para ajustar la puntuación por edad.",
   "x.twins": "Gemelos de fuerza",
   "x.twinsBody": "Cómo te comparas con atletas entrenados de tu peso corporal.",
   "x.twinsAge": "Cómo te comparas con atletas entrenados de tu edad y peso corporal.",
@@ -177,7 +177,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.scoreBodyAge":
     "Vos max estimés actuels (sur les 6 derniers mois) comparés à un sportif intermédiaire typique de votre poids, ajustés à votre âge. 50 est la moyenne.",
   "x.adjustAge": "Ajuster selon l’âge",
-  "x.addBirth": "Ajoutez votre année de naissance dans la configuration pour ajuster le score selon l’âge.",
+  "x.addBirth": "Ajoutez votre âge dans Vos mesures pour ajuster le score selon l’âge.",
   "x.twins": "Jumeaux de force",
   "x.twinsBody": "Comment vous vous situez face aux sportifs entraînés de votre poids.",
   "x.twinsAge": "Comment vous vous situez face aux sportifs entraînés de votre âge et de votre poids.",
@@ -238,7 +238,7 @@ export const de: Partial<Record<Key, Message>> = {
   "x.scoreBodyAge":
     "Deine aktuellen geschätzten Maxima (aus den letzten 6 Monaten) im Vergleich zu einem typischen Lifter der Mittelstufe mit deinem Körpergewicht, an dein Alter angepasst. 50 ist typisch.",
   "x.adjustAge": "An das Alter anpassen",
-  "x.addBirth": "Gib in der Einrichtung dein Geburtsjahr an, um den Wert an dein Alter anzupassen.",
+  "x.addBirth": "Gib unter Deine Daten dein Alter an, um den Wert an dein Alter anzupassen.",
   "x.twins": "Kraft-Zwillinge",
   "x.twinsBody": "Wie du im Vergleich zu trainierten Liftern mit deinem Körpergewicht dastehst.",
   "x.twinsAge": "Wie du im Vergleich zu trainierten Liftern deines Alters und Körpergewichts dastehst.",
@@ -299,7 +299,7 @@ export const it: Partial<Record<Key, Message>> = {
   "x.scoreBodyAge":
     "I tuoi massimali stimati attuali (degli ultimi 6 mesi) rispetto a un atleta intermedio tipico del tuo peso corporeo, corretti per l’età. 50 è la norma.",
   "x.adjustAge": "Correggi per l’età",
-  "x.addBirth": "Aggiungi l’anno di nascita nella configurazione per correggere il punteggio in base all’età.",
+  "x.addBirth": "Aggiungi la tua età in I tuoi dati per correggere il punteggio in base all’età.",
   "x.twins": "Gemelli di forza",
   "x.twinsBody": "Come ti confronti con atleti allenati del tuo peso corporeo.",
   "x.twinsAge": "Come ti confronti con atleti allenati della tua età e del tuo peso corporeo.",
@@ -355,7 +355,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "x.scoreBody": "現在の推定最大重量（直近6か月）を、同じ体重の標準的な中級者と比べた値です。50が平均です。",
   "x.scoreBodyAge": "現在の推定最大重量（直近6か月）を、同じ体重の標準的な中級者と比べ、年齢で補正した値です。50が平均です。",
   "x.adjustAge": "年齢で補正",
-  "x.addBirth": "初期設定で生まれた年を入力すると、スコアを年齢で補正できます。",
+  "x.addBirth": "「あなたのデータ」で年齢を入力すると、スコアを年齢で補正できます。",
   "x.twins": "筋力の双子",
   "x.twinsBody": "同じ体重のトレーニング経験者との比較。",
   "x.twinsAge": "同じ年齢・体重のトレーニング経験者との比較。",

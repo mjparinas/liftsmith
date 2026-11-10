@@ -90,6 +90,7 @@ import * as settings from "./text/settings";
 import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
+import * as stats from "./text/stats";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
@@ -198,6 +199,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...setup.ja,
   ...share.ja,
   ...sig.ja,
+  ...stats.ja,
   ...tab.ja,
   ...td.ja,
   ...tdee.ja,

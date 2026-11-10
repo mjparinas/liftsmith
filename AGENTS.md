@@ -200,3 +200,4 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Web dashboard](docs/decisions/web-dashboard.md) (`src/components/dashboard/`, `src/lib/dashboard.ts`, `src/lib/entitlements.ts`)
 - [Workout data and coaching](docs/decisions/workout-data-and-coaching.md) (`src/lib/readiness.ts`, `progression.ts`)
 - [Workout screen](docs/decisions/workout-screen.md) (`sessionNotify.ts`, `TrainingSettings.tsx`, `src/lib/training.ts`, `derive.ts`)
+- [Your stats](docs/decisions/your-stats.md) (`BodyStats.tsx`, `src/lib/health.ts`, `tdee.ts`, `HealthWorkoutPlugin.swift`)
