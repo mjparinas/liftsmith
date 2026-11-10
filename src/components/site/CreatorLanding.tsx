@@ -1,6 +1,6 @@
 "use client";
 
-// The page a creator's link opens (/c/<code>/). It saves the code for the web app on this site, sends Android
+// The page a code's link opens (/c/<code>/): a creator's code or one of our own (a promo code). It saves the code for the web app on this site, sends Android
 // installs through Play with the code as the install referrer, and on iPhone shows the code to type, because
 // the App Store passes nothing per install (AGENTS.md "Marketing and growth", Platform deltas).
 import Link from "next/link";
@@ -8,6 +8,7 @@ import { useEffect, useState, useSyncExternalStore } from "react";
 
 import { BRAND } from "@/lib/brand";
 import { codeFromUrl, CREATOR_TRIAL_DAYS, setCode } from "@/lib/creator";
+import type { CodeInfo } from "@/lib/creatorCode";
 import { APP_PATH } from "@/lib/site";
 
 import { StoreBadges } from "./StoreBadges";
@@ -21,7 +22,7 @@ export function CreatorLanding() {
     () => codeFromUrl(location.href),
     () => undefined,
   );
-  const [found, setFound] = useState<{ code: string; name: string | null; known: boolean } | null>(null);
+  const [found, setFound] = useState<{ code: string; info: CodeInfo | null; known: boolean; ended?: boolean } | null>(null);
   useEffect(() => {
     if (!code) return;
     // Saved for the web app on this site, unless the server says there's no such code (a mistyped link
@@ -30,27 +31,36 @@ export function CreatorLanding() {
     const save = () => setCode(code, "link", false);
     fetch(`/api/creator/?code=${encodeURIComponent(code)}`)
       .then(async (r) => {
-        if (r.status === 404) return setFound({ code, name: null, known: false });
+        if (r.status === 404 || r.status === 410) return setFound({ code, info: null, known: false, ended: r.status === 410 });
         save();
-        if (r.ok) {
-          const j = (await r.json()) as { name?: string };
-          setFound({ code, name: j.name ?? null, known: true });
-        }
+        if (r.ok) setFound({ code, info: (await r.json()) as CodeInfo, known: true });
       })
       .catch(save);
   }, [code]);
   const hit = found && found.code === code ? found : null;
-  const s = { code: code ?? null, name: hit?.name ?? null, known: code === null ? false : (hit?.known ?? null) };
-
-  const days = CREATOR_TRIAL_DAYS;
+  const info = hit?.info ?? null;
+  const s = { code: code ?? null, name: info?.name ?? null, known: code === null ? false : (hit?.known ?? null) };
+  const promo = info?.kind === "promo";
+  // Until the server answers, a creator's 30-day trial is assumed; a promo code may give a discount instead (null).
+  const days = info ? info.trialDays : CREATOR_TRIAL_DAYS;
   if (s.known === false)
     return (
       <div className="max-w-2xl">
-        <h1 className="text-3xl font-extrabold tracking-tight md:text-5xl">That code isn&apos;t one we know</h1>
+        <h1 className="text-3xl font-extrabold tracking-tight md:text-5xl">
+          {hit?.ended ? "That code has ended" : "That code isn\u2019t one we know"}
+        </h1>
         <p className="mt-3 text-lg text-muted">
           {s.code ? (
             <>
-              Check the spelling of <code className="font-semibold text-ink">{s.code}</code> with the creator who shared it.
+              {hit?.ended ? (
+                <>
+                  <code className="font-semibold text-ink">{s.code}</code> was only open for a while, or to a set number of people.
+                </>
+              ) : (
+                <>
+                  Check the spelling of <code className="font-semibold text-ink">{s.code}</code> with whoever shared it.
+                </>
+              )}
             </>
           ) : (
             "This link is missing its code."
@@ -63,13 +73,20 @@ export function CreatorLanding() {
 
   return (
     <div className="max-w-2xl">
-      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Creator code {s.code}</p>
+      <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Code {s.code}</p>
       <h1 className="mt-2 text-3xl font-extrabold tracking-tight md:text-5xl">
-        {s.name ? `${s.name} sent you a ${days}-day Pro trial` : `You've got a ${days}-day Pro trial`}
+        {days == null
+          ? `You've got a ${BRAND.name} Pro offer`
+          : s.name
+            ? `${s.name} sent you a ${days}-day Pro trial`
+            : `You've got a ${days}-day Pro trial`}
       </h1>
       <p className="mt-3 text-lg text-muted">
-        {BRAND.name} plans every workout around your gym, your plates and how recovered you are. The usual trial is 14 days; this code makes
-        it {days}. The free plan stays free after it.
+        {BRAND.name} plans every workout around your gym, your plates and how recovered you are.{" "}
+        {days == null
+          ? "The offer shows on the plans once the code is in the app."
+          : `The usual trial is 14 days; this code makes it ${days}.`}{" "}
+        The free plan stays free after it.
       </p>
       {s.code && <StoreBadges className="mt-6" place="creator" code={s.code} />}
       <ol className="mt-8 space-y-3 text-base">
@@ -78,8 +95,8 @@ export function CreatorLanding() {
         </li>
         <li className="card p-4">
           <span className="font-semibold">iPhone:</span> the App Store can&apos;t pass the code along, so type{" "}
-          <code className="font-semibold">{s.code}</code> under &ldquo;Have a creator code?&rdquo; on the last setup step, or in Settings ›
-          Creator code.
+          <code className="font-semibold">{s.code}</code> under &ldquo;Have a code?&rdquo; on the last setup step, or in Settings › Redeem a
+          code.
         </li>
         <li className="card p-4">
           <span className="font-semibold">In your browser:</span> the code is saved.{" "}
@@ -88,10 +105,12 @@ export function CreatorLanding() {
           </Link>
         </li>
       </ol>
-      <p className="mt-6 text-sm text-muted">
-        {s.name ?? "The creator"} earns a share of what {BRAND.name} makes if you subscribe. It costs you nothing extra, and they&apos;re
-        asked to say so when they share it.
-      </p>
+      {!promo && (
+        <p className="mt-6 text-sm text-muted">
+          {s.name ?? "The creator"} earns a share of what {BRAND.name} makes if you subscribe. It costs you nothing extra, and they&apos;re
+          asked to say so when they share it.
+        </p>
+      )}
     </div>
   );
 }

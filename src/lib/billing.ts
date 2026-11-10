@@ -14,7 +14,7 @@ import { create } from "zustand";
 
 import { installId, platformStore, track } from "./analytics";
 import { accountPro } from "./auth";
-import { activeCode, CREATOR_OFFERING, creatorHooks } from "./creator";
+import { activeCode, activeOffering, creatorHooks } from "./creator";
 import { flag } from "./flags";
 import { isNative } from "./juice";
 import type { ProState } from "./messages";
@@ -237,9 +237,12 @@ creatorHooks.onChecked = (code) => {
     .catch(() => {});
 };
 
-/** Which offering to sell from: a creator code's 30-day trial first, then the trialDays A/B ("trial7"), then the default. */
-export function pickOffering<O>(all: Record<string, O>, current: O | null, code: string | null, trialDays: number): O | null {
-  return (code ? all[CREATOR_OFFERING] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;
+/**
+ * Which offering to sell from: the active code's own offering first ("creator30" unless the code names another, for
+ * a longer trial or a discount), then the trialDays A/B ("trial7"), then the default.
+ */
+export function pickOffering<O>(all: Record<string, O>, current: O | null, codeOffering: string | null, trialDays: number): O | null {
+  return (codeOffering ? all[codeOffering] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;
 }
 
 /** The paywall's "Try again": starts the SDK again if it never came up, otherwise reloads the plans. */
@@ -257,7 +260,7 @@ export async function retryBilling(): Promise<void> {
 export async function loadOffers(): Promise<Offer[] | null> {
   if (!sdk) return null;
   const all = await sdk.getOfferings();
-  const offering = pickOffering(all.all, all.current, activeCode(), flag("trialDays"));
+  const offering = pickOffering(all.all, all.current, activeOffering(), flag("trialDays"));
   if (!offering) {
     useBilling.setState({ error: "No current offering in RevenueCat" });
     return null;

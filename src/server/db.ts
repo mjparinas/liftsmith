@@ -327,6 +327,19 @@ const SCHEMA = [
   )`,
 ];
 
+/**
+ * Columns added to a table after it first shipped: CREATE TABLE IF NOT EXISTS leaves an existing table alone,
+ * so each one is added here if it's missing. Only ever append; a column is never renamed or dropped.
+ */
+const COLUMNS: [table: string, column: string, def: string][] = [
+  // Codes of our own, not only creators' (Melvin, 2026-11-10): see src/server/creators.ts.
+  ["creators", "kind", "TEXT NOT NULL DEFAULT 'creator'"],
+  ["creators", "trial_days", "INTEGER"],
+  ["creators", "offering", "TEXT"],
+  ["creators", "ends_at", "INTEGER"],
+  ["creators", "max_uses", "INTEGER"],
+];
+
 let client: Client | null = null;
 let ready: Promise<void> | null = null;
 
@@ -350,6 +363,10 @@ async function db(): Promise<Client> {
   const c = client;
   ready ??= (async () => {
     for (const s of SCHEMA) await c.execute(s);
+    for (const [table, column, def] of COLUMNS) {
+      const have = await c.execute(`PRAGMA table_info(${table})`);
+      if (!have.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
+    }
   })();
   await ready;
   return c;

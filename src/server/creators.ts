@@ -1,8 +1,12 @@
-// The creator program on the server (AGENTS.md "Marketing and growth"). The app claims a code for its
-// install (POST /api/creator/), the RevenueCat webhook backs that up from the subscriber attribute, and the
-// admin panel's Creators tab adds creators, shows what each is owed and records payouts.
+// Codes on the server (docs/decisions/marketing-and-growth.md). The app claims a code for its install
+// (POST /api/creator/), the RevenueCat webhook backs that up from the subscriber attribute, and the admin
+// panel's Codes tab adds codes, shows what each creator is owed and records payouts.
+//
+// Two kinds share one table (Melvin, 2026-11-10): a creator's code earns them commission; a promo code is our
+// own, with no commission. Either can set its own trial length and RevenueCat offering (a longer trial, or a
+// discount through the offering's store products), an end date and a limit on how many installs may use it.
 import type { SubEvent } from "@/lib/adminMetrics";
-import { normalizeCode } from "@/lib/creatorCode";
+import { DEFAULT_OFFERING, DEFAULT_TRIAL_DAYS, normalizeCode, OFFERING_ID, type CodeInfo, type CodeKind } from "@/lib/creatorCode";
 import {
   creatorRows,
   DEFAULT_MONTHS,
@@ -20,14 +24,46 @@ const s = (v: unknown) => (v == null ? null : String(v));
 const SAFE_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const SOURCES = new Set(["link", "referrer", "typed", "store"]);
 
-export type ClaimResult = { ok: true; code: string; name: string } | { ok: false; status: 400 | 404; error: string };
+export type ClaimResult = { ok: true; info: CodeInfo } | { ok: false; status: 400 | 404 | 410; error: string };
 
-/** A live creator by code, or null. */
-export async function findCreator(raw: unknown): Promise<{ code: string; name: string } | null> {
+type Found = { ok: true; info: CodeInfo } | { ok: false; status: 404 | 410 };
+
+const infoOf = (r: Record<string, unknown>): CodeInfo => {
+  const kind: CodeKind = r.kind === "promo" ? "promo" : "creator";
+  return {
+    code: String(r.code),
+    kind,
+    name: kind === "creator" ? String(r.name) : null,
+    // A creator's code always gives a trial; a promo code without one gives what its offering gives.
+    trialDays: r.trial_days == null ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : n(r.trial_days),
+    offering: typeof r.offering === "string" && OFFERING_ID.test(r.offering) ? r.offering : DEFAULT_OFFERING,
+  };
+};
+
+/**
+ * A code by name. 404 when there's no such code or it's paused; 410 when it has ended or every use is taken.
+ * An install that already holds the code keeps it past the end date and the limit (`installId`), and the
+ * store webhook (`limits: false`) always records the code a purchase was made with.
+ */
+export async function findCode(raw: unknown, opts: { now?: number; installId?: string; limits?: boolean } = {}): Promise<Found> {
   const code = typeof raw === "string" ? normalizeCode(raw) : null;
-  if (!code) return null;
-  const rows = await query<{ code: string; name: string }>("SELECT code, name FROM creators WHERE code = ? AND active = 1", [code]);
-  return rows[0] ? { code: String(rows[0].code), name: String(rows[0].name) } : null;
+  if (!code) return { ok: false, status: 404 };
+  const rows = await query("SELECT * FROM creators WHERE code = ? AND active = 1", [code]);
+  const r = rows[0];
+  if (!r) return { ok: false, status: 404 };
+  if (opts.limits !== false) {
+    const held = opts.installId
+      ? (await query("SELECT 1 FROM creator_installs WHERE install_id = ? AND code = ?", [opts.installId, code])).length > 0
+      : false;
+    if (!held) {
+      if (r.ends_at != null && n(r.ends_at) <= (opts.now ?? Date.now())) return { ok: false, status: 410 };
+      if (r.max_uses != null) {
+        const used = await query<{ c: number }>("SELECT COUNT(*) AS c FROM creator_installs WHERE code = ?", [code]);
+        if (n(used[0]?.c) >= n(r.max_uses)) return { ok: false, status: 410 };
+      }
+    }
+  }
+  return { ok: true, info: infoOf(r) };
 }
 
 /** Whether this install has started a trial or bought: its code is fixed from then on. */
@@ -46,30 +82,31 @@ export async function claimCode(body: unknown, now = Date.now()): Promise<ClaimR
   if (typeof b.installId !== "string" || !SAFE_ID.test(b.installId)) return { ok: false, status: 400, error: "Bad install id" };
   const source = typeof b.source === "string" && SOURCES.has(b.source) ? b.source : "typed";
   const platform = typeof b.platform === "string" ? b.platform.slice(0, 16) : null;
-  const creator = await findCreator(b.code);
-  if (!creator) return { ok: false, status: 404, error: "No such code" };
+  const found = await findCode(b.code, { now, installId: b.installId });
+  if (!found.ok) return { ok: false, status: found.status, error: found.status === 410 ? "That code has ended" : "No such code" };
   const held = await query<{ code: string }>("SELECT code FROM creator_installs WHERE install_id = ?", [b.installId]);
-  if (held[0] && held[0].code !== creator.code && (await locked(b.installId))) {
-    const kept = await findCreator(held[0].code);
-    return { ok: true, code: String(held[0].code), name: kept?.name ?? String(held[0].code) };
+  if (held[0] && held[0].code !== found.info.code && (await locked(b.installId))) {
+    // The subscription belongs to the first code: answer with that one, whatever has happened to it since.
+    const kept = await query("SELECT * FROM creators WHERE code = ?", [held[0].code]);
+    return { ok: true, info: kept[0] ? infoOf(kept[0]) : { ...found.info, code: String(held[0].code), name: null } };
   }
   await run(
     `INSERT INTO creator_installs (install_id, code, at, source, platform) VALUES (?, ?, ?, ?, ?)
      ON CONFLICT(install_id) DO UPDATE SET code = excluded.code, at = excluded.at, source = excluded.source, platform = excluded.platform
      WHERE creator_installs.code <> excluded.code`,
-    [b.installId, creator.code, now, source, platform],
+    [b.installId, found.info.code, now, source, platform],
   );
-  return { ok: true, ...creator };
+  return { ok: true, info: found.info };
 }
 
 /** From the RevenueCat webhook: the subscriber attribute names the code, in case the app's claim never arrived. */
 export async function claimFromStore(installId: string | null, raw: string | null | undefined, now = Date.now()): Promise<void> {
   if (!installId || !SAFE_ID.test(installId)) return;
-  const creator = await findCreator(raw);
-  if (!creator) return;
+  const found = await findCode(raw, { limits: false });
+  if (!found.ok) return;
   await run("INSERT OR IGNORE INTO creator_installs (install_id, code, at, source, platform) VALUES (?, ?, ?, 'store', NULL)", [
     installId,
-    creator.code,
+    found.info.code,
     now,
   ]);
 }
@@ -78,12 +115,17 @@ export async function claimFromStore(installId: string | null, raw: string | nul
 
 export interface CreatorInput {
   code: string;
+  kind: CodeKind;
   name: string;
   contact: string | null;
   rate: number;
   months: number;
   active: boolean;
   note: string | null;
+  trialDays: number | null;
+  offering: string;
+  endsAt: number | null;
+  maxUses: number | null;
 }
 
 /** Checks a creator from the admin form. Rates are a share (0.3), not a percentage. */
@@ -92,22 +134,42 @@ export function checkCreator(body: unknown): { ok: true; creator: CreatorInput }
   const b = body as Record<string, unknown>;
   const code = normalizeCode(typeof b.code === "string" ? b.code : null);
   if (!code) return { ok: false, error: "A code is 3 to 24 letters, digits or dashes, like LIFT-ALEX." };
+  const kind: CodeKind = b.kind === "promo" ? "promo" : "creator";
   const name = typeof b.name === "string" ? b.name.trim().slice(0, 60) : "";
-  if (!name) return { ok: false, error: "Give the creator's name or handle." };
-  const rate = b.rate == null ? DEFAULT_RATE : Number(b.rate);
+  if (!name)
+    return { ok: false, error: kind === "promo" ? "Give the code a label, like Black Friday 2026." : "Give the creator's name or handle." };
+  // A promo code is ours: it never earns commission, whatever the form says.
+  const rate = kind === "promo" ? 0 : b.rate == null ? DEFAULT_RATE : Number(b.rate);
   if (!Number.isFinite(rate) || rate < 0 || rate > 0.7) return { ok: false, error: "The rate is a share between 0 and 0.7 (0.3 is 30%)." };
   const months = b.months == null ? DEFAULT_MONTHS : Number(b.months);
   if (!Number.isInteger(months) || months < 1 || months > 60) return { ok: false, error: "Months is a whole number from 1 to 60." };
+  const blank = (v: unknown) => v == null || v === "";
+  const trialDays = blank(b.trialDays) ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : Number(b.trialDays);
+  if (trialDays != null && (!Number.isInteger(trialDays) || trialDays < 1 || trialDays > 90))
+    return { ok: false, error: "The trial is a whole number of days from 1 to 90." };
+  const offering = blank(b.offering) ? DEFAULT_OFFERING : String(b.offering).trim();
+  if (!OFFERING_ID.test(offering)) return { ok: false, error: "The offering is a RevenueCat offering id, like creator30." };
+  const endsAt = blank(b.endsAt) ? null : typeof b.endsAt === "number" ? b.endsAt : Date.parse(String(b.endsAt));
+  if (endsAt != null && !Number.isFinite(endsAt)) return { ok: false, error: "The end date should look like 2026-12-31." };
+  const maxUses = blank(b.maxUses) ? null : Number(b.maxUses);
+  if (maxUses != null && (!Number.isInteger(maxUses) || maxUses < 1))
+    return { ok: false, error: "The limit is a whole number of uses, 1 or more." };
   const contact = typeof b.contact === "string" && b.contact.trim() ? b.contact.trim().slice(0, 120) : null;
   const note = typeof b.note === "string" && b.note.trim() ? b.note.trim().slice(0, 500) : null;
-  return { ok: true, creator: { code, name, contact, rate, months, active: b.active !== false, note } };
+  return {
+    ok: true,
+    creator: { code, kind, name, contact, rate, months, active: b.active !== false, note, trialDays, offering, endsAt, maxUses },
+  };
 }
 
 export async function saveCreator(c: CreatorInput, now = Date.now()): Promise<void> {
   await run(
-    `INSERT INTO creators (code, name, contact, rate, months, active, note, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-     ON CONFLICT(code) DO UPDATE SET name = excluded.name, contact = excluded.contact, rate = excluded.rate, months = excluded.months, active = excluded.active, note = excluded.note`,
-    [c.code, c.name, c.contact, c.rate, c.months, c.active ? 1 : 0, c.note, now],
+    `INSERT INTO creators (code, kind, name, contact, rate, months, active, note, trial_days, offering, ends_at, max_uses, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(code) DO UPDATE SET kind = excluded.kind, name = excluded.name, contact = excluded.contact, rate = excluded.rate,
+       months = excluded.months, active = excluded.active, note = excluded.note, trial_days = excluded.trial_days,
+       offering = excluded.offering, ends_at = excluded.ends_at, max_uses = excluded.max_uses`,
+    [c.code, c.kind, c.name, c.contact, c.rate, c.months, c.active ? 1 : 0, c.note, c.trialDays, c.offering, c.endsAt, c.maxUses, now],
   );
 }
 
@@ -147,6 +209,7 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
     since,
     creators: creators.map((c): Creator => ({
       code: String(c.code),
+      kind: c.kind === "promo" ? "promo" : "creator",
       name: String(c.name),
       contact: s(c.contact),
       rate: n(c.rate),
@@ -154,6 +217,10 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
       active: n(c.active) === 1,
       note: s(c.note),
       createdAt: n(c.created_at),
+      trialDays: infoOf(c).trialDays,
+      offering: infoOf(c).offering,
+      endsAt: c.ends_at == null ? null : n(c.ends_at),
+      maxUses: c.max_uses == null ? null : n(c.max_uses),
     })),
     installs: installs.map((i): CreatorInstall => ({
       installId: String(i.install_id),

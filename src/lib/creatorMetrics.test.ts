@@ -7,6 +7,7 @@ const DAY = 86_400_000;
 const NOW = Date.UTC(2027, 5, 1);
 const creator = (over: Partial<Creator> = {}): Creator => ({
   code: "LIFT-ALEX",
+  kind: "creator",
   name: "Alex",
   contact: null,
   rate: 0.3,
@@ -14,6 +15,10 @@ const creator = (over: Partial<Creator> = {}): Creator => ({
   active: true,
   note: null,
   createdAt: 0,
+  trialDays: 30,
+  offering: "creator30",
+  endsAt: null,
+  maxUses: null,
   ...over,
 });
 let seq = 0;

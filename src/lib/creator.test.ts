@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { pickOffering } from "./billing";
 import {
   activeCode,
+  activeOffering,
   clearCode,
   codeFromReferrer,
   codeFromUrl,
+  codeTrialDays,
   CREATOR_KEY,
   normalizeCode,
   playLinkWithCode,
@@ -95,9 +97,31 @@ describe("creator codes in the app", () => {
 
   it("sells from the creator offering when a code is active", () => {
     const all = { creator30: "c30", trial7: "t7" };
-    expect(pickOffering(all, "default", "LIFT-ALEX", 14)).toBe("c30");
+    expect(pickOffering(all, "default", "creator30", 14)).toBe("c30");
+    expect(pickOffering({ ...all, promo_half: "half" }, "default", "promo_half", 14)).toBe("half");
     expect(pickOffering(all, "default", null, 7)).toBe("t7");
     expect(pickOffering(all, "default", null, 14)).toBe("default");
-    expect(pickOffering({}, "default", "LIFT-ALEX", 7)).toBe("default");
+    expect(pickOffering({}, "default", "creator30", 7)).toBe("default");
+    // A code's offering comes from the server; until then, the creator one.
+    setCode("SUMMER", "typed", false);
+    expect(activeOffering()).toBe("creator30");
+    expect(codeTrialDays()).toBe(30);
+  });
+
+  it("takes a promo code's own trial and offering from the server, and drops a code that has ended", async () => {
+    setCode("SUMMER", "typed", false);
+    await sendClaim(
+      vi.fn().mockResolvedValue(res(200, { code: "SUMMER", kind: "promo", name: null, trialDays: null, offering: "promo_half" })),
+    );
+    expect(readClaim()).toMatchObject({ status: "ok", kind: "promo", trialDays: null, offering: "promo_half" });
+    expect(readClaim()?.name).toBeUndefined();
+    expect(activeOffering()).toBe("promo_half");
+    expect(codeTrialDays()).toBeNull();
+    setCode("OLD-SALE", "typed", false);
+    expect(await sendClaim(vi.fn().mockResolvedValue(res(410)))).toBe("ended");
+    expect(activeCode()).toBeNull();
+    expect(activeOffering()).toBeNull();
+    // An ended code can be replaced by a link.
+    expect(setCode("LIFT-SAM", "link", false)).toBe("ok");
   });
 });
