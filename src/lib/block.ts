@@ -1,5 +1,5 @@
-import type { Experience, Profile } from "./types";
 import { t } from "./i18n";
+import type { Experience, Profile } from "./types";
 
 // Periodized blocks: a few build weeks with reps in reserve stepping down, then a deload week.
 
@@ -34,7 +34,15 @@ export function blockWeek(profile: Pick<Profile, "blockStart" | "blockWeeks" | "
   // Spread the RIR steps over however many build weeks there are.
   const step = RIR_STEPS[Math.round((week / Math.max(1, build - 1)) * (RIR_STEPS.length - 1))];
   const sets = Math.round(lo + ((hi - lo) * week) / Math.max(1, build - 1));
-  return { week, length, deload: false, rir: step, setsPerMuscle: sets, volume: 1, label: t("block.week", { week: week + 1, count: build }) };
+  return {
+    week,
+    length,
+    deload: false,
+    rir: step,
+    setsPerMuscle: sets,
+    volume: 1,
+    label: t("block.week", { week: week + 1, count: build }),
+  };
 }
 
 /** Start of the current block week (for counting this week's sets). */

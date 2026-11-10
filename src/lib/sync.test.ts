@@ -1,29 +1,60 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
+
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { resetDb } from "@/server/db";
 import { sync as serverSync, type SyncRequest } from "@/server/sync";
+
 import { forgetAccount, methods, useAccount } from "./auth";
 import { defaultProfile, makeGym } from "./defaults";
 import { useApp } from "./store";
 import { localRecords, mergeRecords, pickBatch, syncNow } from "./sync";
-import { ACCOUNT_KEY, noteEvents, readSync, writeSync, emptySync } from "./syncOutbox";
+import { ACCOUNT_KEY, emptySync, noteEvents, readSync, writeSync } from "./syncOutbox";
 import type { AppEvent, Gym } from "./types";
 
 const profile = (over = {}) => ({ ...defaultProfile(1000), onboarded: true, activeGymId: "g1", updatedAt: 1000, ...over });
 const gym = (id: string, updatedAt = 1000): Gym => ({ ...makeGym("commercial", "kg", id), updatedAt });
-const set = (id: string, at = 5000): AppEvent => ({ type: "set", id, at, sessionId: "s", exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2 });
+const set = (id: string, at = 5000): AppEvent => ({
+  type: "set",
+  id,
+  at,
+  sessionId: "s",
+  exerciseId: "back-squat",
+  weight: 100,
+  reps: 5,
+  targetReps: 5,
+  rir: 2,
+});
 
 describe("merging records", () => {
   it("takes the newer profile, and the account's on a first sync", () => {
-    expect(mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "Old" , updatedAt: 500 }), updatedAt: 500 }], false).profile).toBeNull();
-    expect(mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "Old", updatedAt: 500 }), updatedAt: 500 }], true).profile?.name).toBe("Old");
-    expect(mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "New", updatedAt: 2000 }), updatedAt: 2000 }], false).profile?.name).toBe("New");
+    expect(
+      mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "Old", updatedAt: 500 }), updatedAt: 500 }], false).profile,
+    ).toBeNull();
+    expect(
+      mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "Old", updatedAt: 500 }), updatedAt: 500 }], true).profile
+        ?.name,
+    ).toBe("Old");
+    expect(
+      mergeRecords(profile(), [], [{ key: "profile", value: profile({ name: "New", updatedAt: 2000 }), updatedAt: 2000 }], false).profile
+        ?.name,
+    ).toBe("New");
   });
 
   it("adds, updates and removes gyms, and keeps the active gym real", () => {
     const p = profile({ activeGymId: "g1" });
-    const r = mergeRecords(p, [gym("g1"), gym("g2")], [{ key: "gym:g1", value: null, updatedAt: 3000 }, { key: "gym:g2", value: { ...gym("g2"), name: "Renamed" }, updatedAt: 3000 }, { key: "gym:g3", value: gym("g3"), updatedAt: 1 }], false, 9000);
+    const r = mergeRecords(
+      p,
+      [gym("g1"), gym("g2")],
+      [
+        { key: "gym:g1", value: null, updatedAt: 3000 },
+        { key: "gym:g2", value: { ...gym("g2"), name: "Renamed" }, updatedAt: 3000 },
+        { key: "gym:g3", value: gym("g3"), updatedAt: 1 },
+      ],
+      false,
+      9000,
+    );
     expect(r.gyms?.map((g) => g.id)).toEqual(["g2", "g3"]);
     expect(r.gyms?.[0].name).toBe("Renamed");
     expect(r.known).toEqual(["g2", "g3"]);
@@ -33,7 +64,11 @@ describe("merging records", () => {
 
   it("sends a removal for a gym the account had and this device dropped", () => {
     const recs = localRecords(profile(), [gym("g2")], ["g1", "g2"], 7000);
-    expect(recs.map((r) => [r.key, r.value === null])).toEqual([["profile", false], ["gym:g2", false], ["gym:g1", true]]);
+    expect(recs.map((r) => [r.key, r.value === null])).toEqual([
+      ["profile", false],
+      ["gym:g2", false],
+      ["gym:g1", true],
+    ]);
   });
 
   it("batches the outbox and skips events deleted since", () => {
@@ -86,9 +121,20 @@ describe("syncing the app with the server", () => {
     expect(readSync().out).toEqual([]);
     expect(readSync().first).toBe(false);
     // Another device logs a set and deletes nothing; this one pulls it.
-    await serverSync("acc", "phone", { cursor: 0, events: [set("theirs") as never], deleted: [], records: [{ key: "profile", value: profile({ name: "Melvin", updatedAt: 9000 }), updatedAt: 9000 }], first: false });
+    await serverSync("acc", "phone", {
+      cursor: 0,
+      events: [set("theirs") as never],
+      deleted: [],
+      records: [{ key: "profile", value: profile({ name: "Melvin", updatedAt: 9000 }), updatedAt: 9000 }],
+      first: false,
+    });
     await syncNow();
-    expect(useApp.getState().events.map((e) => e.id).sort()).toEqual(["mine", "theirs"]);
+    expect(
+      useApp
+        .getState()
+        .events.map((e) => e.id)
+        .sort(),
+    ).toEqual(["mine", "theirs"]);
     expect(useApp.getState().profile.name).toBe("Melvin");
     // A change pulled from elsewhere isn't queued to go back.
     expect(readSync().out).toEqual([]);

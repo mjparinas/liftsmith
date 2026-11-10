@@ -5,6 +5,7 @@
 import fs from "node:fs";
 import { chromium } from "playwright";
 import sharp from "sharp";
+
 import { base, onboard } from "./helpers.mjs";
 
 const OUT = "public/screens";
@@ -15,7 +16,14 @@ fs.mkdirSync(TMP, { recursive: true });
 const server = await base();
 // SwiftShader gives headless Chromium WebGL, so the 3D demo on the workout screen renders.
 const browser = await chromium.launch({ args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, colorScheme: "dark", reducedMotion: "reduce" });
+const ctx = await browser.newContext({
+  viewport: { width: 390, height: 844 },
+  deviceScaleFactor: 2,
+  isMobile: true,
+  hasTouch: true,
+  colorScheme: "dark",
+  reducedMotion: "reduce",
+});
 const page = await ctx.newPage();
 page.on("dialog", (d) => d.dismiss().catch(() => {}));
 
@@ -52,7 +60,17 @@ async function workout({ late = false, last = false } = {}) {
     if (await page.getByRole("button", { name: "Finish workout" }).isVisible()) break;
     const fb = page.getByRole("button", { name: "About right" });
     if (await fb.isVisible()) await fb.click();
-    const barbell = late && !taken.has("workout") && (await page.getByText(/Each side/).first().isVisible()) && (await page.getByText(/· Set \d+ of/).first().isVisible()); // a working set, not a warm-up
+    const barbell =
+      late &&
+      !taken.has("workout") &&
+      (await page
+        .getByText(/Each side/)
+        .first()
+        .isVisible()) &&
+      (await page
+        .getByText(/· Set \d+ of/)
+        .first()
+        .isVisible()); // a working set, not a warm-up
     if (barbell) {
       await shot("workout");
       taken.add("workout");
@@ -90,7 +108,10 @@ try {
   await page.reload();
   await page.getByText("Today's workout").waitFor();
   await shot("today");
-  for (const [tab, name] of [["Body", "recovery"], ["Progress", "progress"]]) {
+  for (const [tab, name] of [
+    ["Body", "recovery"],
+    ["Progress", "progress"],
+  ]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await shot(name);
   }

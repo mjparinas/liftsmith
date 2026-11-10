@@ -60,7 +60,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.seePro": "Voir Pro",
   "twin.plan": "Voir le plan du jour",
   "twin.connect": "Connecter {source}",
-  "twin.connect.body": "Autorisez le sommeil, la VFC, la fréquence cardiaque au repos, les pas, la VO₂ max et la fréquence respiratoire, et ils s’afficheront ici.",
+  "twin.connect.body":
+    "Autorisez le sommeil, la VFC, la fréquence cardiaque au repos, les pas, la VO₂ max et la fréquence respiratoire, et ils s’afficheront ici.",
   "twin.connect.none": "Rien n’est encore arrivé. Vérifiez ce que Liftsmith peut lire dans {source}.",
   "twin.group.body": "Corps et énergie",
   "twin.group.heart": "Cœur, sommeil et pas",

@@ -1,10 +1,10 @@
 import { blockWeek } from "./block";
-import { alternatives, restFor, type Plan } from "./generator";
 import { exercise, EXERCISE_BY_ID } from "./exercises";
+import { alternatives, restFor, type Plan } from "./generator";
+import { t } from "./i18n";
 import { roundLoad } from "./loads";
 import { epley, repRange, sessionsOf, target, TIMED, weightFor } from "./progression";
 import type { AppEvent, Gym, Profile, SetEvent } from "./types";
-import { t } from "./i18n";
 
 // Plateau detective (Melvin picked it, 2026-11-09). When a lift's estimated one-rep max hasn't moved
 // for three weeks or more, look through the lifter's own data for the likely reason, say what we
@@ -102,14 +102,22 @@ export function findPlateaus(events: readonly AppEvent[], profile: Profile, now:
   return out.sort((a, b) => b.weeks - a.weeks);
 }
 
-function diagnose(events: readonly AppEvent[], profile: Profile, id: string, since: { at: number; sets: SetEvent[] }[], from: number, now: number): Cause[] {
+function diagnose(
+  events: readonly AppEvent[],
+  profile: Profile,
+  id: string,
+  since: { at: number; sets: SetEvent[] }[],
+  from: number,
+  now: number,
+): Cause[] {
   const ex = exercise(id);
   const sets = since.flatMap((x) => x.sets);
   const causes: (Cause & { weight: number })[] = [];
 
   const missed = sets.filter((s) => !s.challenge && s.reps < s.targetReps).length;
   const missShare = missed / Math.max(1, sets.filter((s) => !s.challenge).length);
-  if (missShare >= 0.3) causes.push({ kind: "missed", fix: "reset", weight: missShare * 3, text: t("cause.missed", { missed, count: sets.length }) });
+  if (missShare >= 0.3)
+    causes.push({ kind: "missed", fix: "reset", weight: missShare * 3, text: t("cause.missed", { missed, count: sets.length }) });
 
   const hard = events.filter((e) => e.type === "feedback" && e.exerciseId === id && e.at > from && e.rating < 0).length;
   if (hard >= 2) causes.push({ kind: "hard", fix: "reset", weight: 1 + hard * 0.4, text: t("cause.hard", { count: hard }) });
@@ -126,16 +134,25 @@ function diagnose(events: readonly AppEvent[], profile: Profile, id: string, sin
   }
   const perWeek = musc / weeks;
   const want = blockWeek(profile, now).setsPerMuscle;
-  if (perWeek < want * 0.7) causes.push({ kind: "volume", fix: "volume", weight: 1.5 * (1 - perWeek / want) + 0.5, text: t("cause.volume", { sets: Math.round(perWeek), want }) });
+  if (perWeek < want * 0.7)
+    causes.push({
+      kind: "volume",
+      fix: "volume",
+      weight: 1.5 * (1 - perWeek / want) + 0.5,
+      text: t("cause.volume", { sets: Math.round(perWeek), want }),
+    });
 
   const rests = sets.map((s) => s.restSec).filter((r): r is number => typeof r === "number" && r > 0);
   const planned = restFor(ex, profile.goal);
   if (rests.length >= 3) {
     const avg = rests.reduce((a, b) => a + b, 0) / rests.length;
-    if (avg < planned * 0.75) causes.push({ kind: "rest", fix: "rest", weight: 1.2, text: t("cause.rest", { sec: Math.round(avg), planned }) });
+    if (avg < planned * 0.75)
+      causes.push({ kind: "rest", fix: "rest", weight: 1.2, text: t("cause.rest", { sec: Math.round(avg), planned }) });
   }
 
-  const reads = events.filter((e) => e.type === "sessionStart" && e.at > from && typeof e.readiness === "number").map((e) => (e.type === "sessionStart" ? e.readiness! : 0));
+  const reads = events
+    .filter((e) => e.type === "sessionStart" && e.at > from && typeof e.readiness === "number")
+    .map((e) => (e.type === "sessionStart" ? e.readiness! : 0));
   if (reads.length >= 3) {
     const avg = reads.reduce((a, b) => a + b, 0) / reads.length;
     if (avg < 42) causes.push({ kind: "readiness", fix: "reset", weight: 1, text: t("cause.readiness", { avg: Math.round(avg) }) });
@@ -143,7 +160,8 @@ function diagnose(events: readonly AppEvent[], profile: Profile, id: string, sin
 
   const ranges = new Set(sets.map((s) => s.targetReps));
   const [lo, hi] = repRange(ex, profile.goal);
-  if (since.length >= 4 && [...ranges].every((r) => r >= lo && r <= hi)) causes.push({ kind: "sameReps", fix: "reps", weight: 0.8, text: t("cause.sameReps", { lo, hi }) });
+  if (since.length >= 4 && [...ranges].every((r) => r >= lo && r <= hi))
+    causes.push({ kind: "sameReps", fix: "reps", weight: 0.8, text: t("cause.sameReps", { lo, hi }) });
 
   causes.sort((a, b) => b.weight - a.weight);
   if (!causes.length) return [{ kind: "none", fix: "variation", text: t("cause.none") }];
@@ -174,7 +192,14 @@ export function fixResult(f: PlateauFix, events: readonly AppEvent[]): { gain: n
  * Applies running fixes to a freshly generated plan. Kept outside the generator so the plan logic
  * stays one thing: the generator decides what to train, a fix only adjusts how.
  */
-export function applyFixes(plan: Plan, fixes: readonly PlateauFix[] | undefined, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Plan {
+export function applyFixes(
+  plan: Plan,
+  fixes: readonly PlateauFix[] | undefined,
+  events: readonly AppEvent[],
+  profile: Profile,
+  gym: Gym,
+  now: number,
+): Plan {
   const live = activeFixes(fixes, now);
   if (!live.length || plan.week.deload) return plan;
   const items = plan.items.map((item) => {
@@ -190,8 +215,15 @@ export function applyFixes(plan: Plan, fixes: readonly PlateauFix[] | undefined,
         // Only the first session of the fix drops; double progression rebuilds from there.
         const doneSince = sessionsOf(events, ex.id).some((s) => s[0].at >= f.startedAt);
         if (doneSince) return item;
-        const kg = roundLoad(f.from > 0 ? weightFor(f.from * 0.9, item.target.reps, item.target.rir) : item.target.weight * 0.9, ex, gym).kg;
-        return { ...item, target: { ...item.target, weight: Math.min(kg, item.target.weight), note: "Plateau fix: about 10% lighter, then build back" } };
+        const kg = roundLoad(
+          f.from > 0 ? weightFor(f.from * 0.9, item.target.reps, item.target.rir) : item.target.weight * 0.9,
+          ex,
+          gym,
+        ).kg;
+        return {
+          ...item,
+          target: { ...item.target, weight: Math.min(kg, item.target.weight), note: "Plateau fix: about 10% lighter, then build back" },
+        };
       }
       case "reps": {
         const [lo] = repRange(ex, profile.goal);

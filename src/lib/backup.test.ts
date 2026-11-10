@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { mergeBackup, parseBackup } from "./backup";
 import { defaultProfile, makeGym } from "./defaults";
 import { backupJson } from "./exportData";
@@ -23,7 +24,13 @@ describe("backup restore", () => {
   });
 
   it("drops broken events and gyms, and fills missing profile fields", () => {
-    const text = JSON.stringify({ app: "liftsmith", version: 1, profile: { name: "Old" }, gyms: [gym, { id: 3 }], events: [ev("ok"), { id: "x" }, null, { id: "y", type: "set", at: "soon" }] });
+    const text = JSON.stringify({
+      app: "liftsmith",
+      version: 1,
+      profile: { name: "Old" },
+      gyms: [gym, { id: 3 }],
+      events: [ev("ok"), { id: "x" }, null, { id: "y", type: "set", at: "soon" }],
+    });
     const b = parseBackup(text)!;
     expect(b.events.map((e) => e.id)).toEqual(["ok"]);
     expect(b.gyms).toHaveLength(1);
@@ -32,7 +39,11 @@ describe("backup restore", () => {
   });
 
   it("adds and never removes: events by id, gyms by id, the backup's profile back", () => {
-    const here = { profile: { ...defaultProfile(5), activeGymId: "g2", onboarded: true }, gyms: [{ ...makeGym("home", "kg"), id: "g2" }], events: [ev("a"), ev("local")] };
+    const here = {
+      profile: { ...defaultProfile(5), activeGymId: "g2", onboarded: true },
+      gyms: [{ ...makeGym("home", "kg"), id: "g2" }],
+      events: [ev("a"), ev("local")],
+    };
     const b = parseBackup(backupJson(profile, [gym], [ev("a"), ev("b"), ev("b")]))!;
     const m = mergeBackup(here, b, 99);
     expect(m.fresh.map((e) => e.id)).toEqual(["b"]);

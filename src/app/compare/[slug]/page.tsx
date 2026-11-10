@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { COMPETITORS, COMPETITOR_BY_SLUG, TRADEMARKS } from "@/content/compare";
+
 import { CompareTable } from "@/components/site/CompareTable";
-import { CtaBanner, CtaInline, Crumbs, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { COMPETITOR_BY_SLUG, COMPETITORS, TRADEMARKS } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
 
 export const dynamicParams = false;
@@ -27,13 +28,20 @@ export default async function ComparePage({ params }: Props) {
   return (
     <SitePage kind="compare" sticky={`Try ${BRAND.name} free`}>
       <Crumbs items={[{ href: "/compare/", label: "Compare" }, { label: `${BRAND.name} vs ${c.name}` }]} />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">{BRAND.name} vs {c.name}</h1>
-      <p className="mt-3 max-w-2xl text-lg text-muted">{c.name} is {c.summary.charAt(0).toLowerCase() + c.summary.slice(1)} Here&apos;s how the two compare, with a link to where we read each {c.name} fact.</p>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">
+        {BRAND.name} vs {c.name}
+      </h1>
+      <p className="mt-3 max-w-2xl text-lg text-muted">
+        {c.name} is {c.summary.charAt(0).toLowerCase() + c.summary.slice(1)} Here&apos;s how the two compare, with a link to where we read
+        each {c.name} fact.
+      </p>
       <section className="mt-8 grid gap-4 md:grid-cols-2">
         <div className="card-tint p-5" style={{ ["--tint" as string]: "var(--color-accent)" }}>
           <h2 className="text-lg font-bold">Where {BRAND.name} differs</h2>
           <ul className="mt-3 space-y-2 text-sm">
-            {c.ourPick.map((x) => <li key={x}>✓ {x}</li>)}
+            {c.ourPick.map((x) => (
+              <li key={x}>✓ {x}</li>
+            ))}
           </ul>
         </div>
         <div className="card p-5">
@@ -41,11 +49,23 @@ export default async function ComparePage({ params }: Props) {
           <p className="mt-3 text-sm text-muted">If {c.theirPick}</p>
         </div>
       </section>
-      <CtaInline cta="compare-top" title={`Switching from ${c.name}?`} body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${c.slug === "hevy" || c.slug === "strong" ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`} button="Try it free" />
+      <CtaInline
+        cta="compare-top"
+        title={`Switching from ${c.name}?`}
+        body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${c.slug === "hevy" || c.slug === "strong" ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`}
+        button="Try it free"
+      />
       <h2 className="mt-10 text-2xl font-bold tracking-tight">Side by side</h2>
       <CompareTable c={c} />
-      <p className="mt-3 text-xs text-muted">Prices are US prices from the store listings on the date shown and can differ by country. Topics {c.name}&apos;s own pages don&apos;t cover are left out.</p>
-      <CtaBanner cta="compare-end" title="See the difference on your next workout" body={`${BRAND.name} plans your sets, reps and weights, draws the plates and starts the rest timer for you. Free to start, no ads, ever.`} />
+      <p className="mt-3 text-xs text-muted">
+        Prices are US prices from the store listings on the date shown and can differ by country. Topics {c.name}&apos;s own pages
+        don&apos;t cover are left out.
+      </p>
+      <CtaBanner
+        cta="compare-end"
+        title="See the difference on your next workout"
+        body={`${BRAND.name} plans your sets, reps and weights, draws the plates and starts the rest timer for you. Free to start, no ads, ever.`}
+      />
       <section className="mt-12">
         <h2 className="text-2xl font-bold tracking-tight">More comparisons</h2>
         <LinkGrid items={others.map((o) => ({ href: `/compare/${o.slug}/`, title: `${BRAND.name} vs ${o.name}`, body: o.summary }))} />

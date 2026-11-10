@@ -1,9 +1,9 @@
 import { blockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
+import { t } from "./i18n";
 import { layoff } from "./layoff";
 import { roundLoad, stepLoad } from "./loads";
 import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent, TrainingPrefs } from "./types";
-import { t } from "./i18n";
 
 // What weight and reps to suggest for an exercise today.
 //
@@ -176,7 +176,12 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
     const e1 = startE1rm(ex, profile, now);
     const reps = lo;
     const known = !!profile.knownMaxes?.[KNOWN_LIFTS[ex.pattern as keyof typeof KNOWN_LIFTS]];
-    return { weight: roundLoad(weightFor(e1, reps, rir + FIRST_RIR), ex, gym).kg, reps, rir, note: known ? t("note.fromNumbers") : t("note.cautious") };
+    return {
+      weight: roundLoad(weightFor(e1, reps, rir + FIRST_RIR), ex, gym).kg,
+      reps,
+      rir,
+      note: known ? t("note.fromNumbers") : t("note.cautious"),
+    };
   }
 
   const lastWeight = Math.max(...last.map((s) => s.weight));
@@ -188,7 +193,8 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
   // After the first session, if it showed the cautious start was light (felt too easy, two or more
   // reps over target, or the lifter raised the weight), jump to what the logged sets show instead of
   // one step at a time. Capped at +25% to stay safe.
-  const light = fb > 0 || last.some((s) => s.reps >= s.targetReps + 2 || (s.targetWeight !== undefined && s.weight > s.targetWeight + 1e-6));
+  const light =
+    fb > 0 || last.some((s) => s.reps >= s.targetReps + 2 || (s.targetWeight !== undefined && s.weight > s.targetWeight + 1e-6));
   if (past.length === 1 && light && !wk.deload && !bigMiss && fb >= 0) {
     // The first session aimed FIRST_RIR further from failure: "too easy" means that margin was real.
     const extra = fb > 0 ? FIRST_RIR : 0;

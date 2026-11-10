@@ -1,8 +1,9 @@
-import { setVolume } from "./sides";
-import { dedupe } from "./derive";
-import type { AppEvent, SetEvent } from "./types";
-import { t } from "./i18n";
 import type { MessageKey } from "@/locales/en";
+
+import { dedupe } from "./derive";
+import { t } from "./i18n";
+import { setVolume } from "./sides";
+import type { AppEvent, SetEvent } from "./types";
 
 // Holiday and seasonal challenges. Dated windows in the lifter's local time, each with a goal counted
 // from workouts, sets or tonnage (never from a single muscle, so nothing rewards training a muscle that's
@@ -82,7 +83,14 @@ export function seasonalChallenges(events: readonly AppEvent[], now: number): Se
     const { start, end } = window(def, y);
     if (now < start || now >= end + 3 * 86400_000) continue;
     const progress = progressOf(def, evs, start, end);
-    out.push({ ...def, start, end, progress: Math.min(progress, def.goal), done: progress >= def.goal, daysLeft: Math.max(0, Math.ceil((end - now) / 86400_000)) });
+    out.push({
+      ...def,
+      start,
+      end,
+      progress: Math.min(progress, def.goal),
+      done: progress >= def.goal,
+      daysLeft: Math.max(0, Math.ceil((end - now) / 86400_000)),
+    });
   }
   return out;
 }

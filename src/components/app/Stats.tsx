@@ -1,23 +1,25 @@
 "use client";
-import { CoachNotes } from "./Insights";
-import { useNow } from "@/lib/useNow";
+
+import { useState, type CSSProperties } from "react";
+
 import { exercise } from "@/lib/exercises";
-import { AchievementRow, useGame } from "./Achievements";
-import { go } from "./router";
+import { list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
+import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
-import { useState } from "react";
-import { ago, clock } from "./format";
-import type { CSSProperties } from "react";
-import { Icon, type IconName } from "./icons";
-import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { useNow } from "@/lib/useNow";
+
+import { AchievementRow, useGame } from "./Achievements";
 import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
+import { ago, clock } from "./format";
+import { Icon, type IconName } from "./icons";
+import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
-import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
-import { list, num, t } from "@/lib/i18n";
+import { go } from "./router";
+import { HUE } from "./theme";
+import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -25,7 +27,9 @@ function Spark({ points, empty }: { points: number[]; empty?: string }) {
   const max = Math.max(...points);
   const w = 120;
   const h = 36;
-  const d = points.map((p, i) => `${i === 0 ? "M" : "L"}${(i / (points.length - 1)) * w},${h - ((p - min) / Math.max(1, max - min)) * (h - 4) - 2}`).join(" ");
+  const d = points
+    .map((p, i) => `${i === 0 ? "M" : "L"}${(i / (points.length - 1)) * w},${h - ((p - min) / Math.max(1, max - min)) * (h - 4) - 2}`)
+    .join(" ");
   return (
     <svg width={w} height={h} aria-hidden>
       <defs>
@@ -53,7 +57,13 @@ export function Stats() {
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
     ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
     ["sets", t("progress.sets"), num(stats.totalSets), "layers", HUE.violet],
-    ["volume", t("progress.volume"), t("progress.volumeK", { n: fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10), unit }), "progress", HUE.cyan],
+    [
+      "volume",
+      t("progress.volume"),
+      t("progress.volumeK", { n: fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10), unit }),
+      "progress",
+      HUE.cyan,
+    ],
   ];
   return (
     <div className="pb-24">
@@ -61,16 +71,23 @@ export function Stats() {
       <CoachNotes title={t("progress.next")} />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
-          <span className="font-bold">{t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span></span>
+          <span className="font-bold">
+            {t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span>
+          </span>
           <span className="num text-sm text-muted">{t("progress.xp", { xp })}</span>
         </div>
         <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
-          <div className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]" style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }} />
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
+            style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }}
+          />
         </div>
         {lvl.next && <p className="mt-1.5 text-xs text-faint num">{t("progress.xpTo", { xp: lvl.span - lvl.into, next: lvl.next })}</p>}
       </div>
       <div className="mt-3 grid grid-cols-2 gap-3">
-        {tiles.map(([k, label, v, icon, hue]) => <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />)}
+        {tiles.map(([k, label, v, icon, hue]) => (
+          <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
+        ))}
       </div>
       <TonnageCard />
       <StrengthCard />
@@ -80,17 +97,30 @@ export function Stats() {
       <Section title={t("progress.weekSets")} icon="target" info="weeklySets">
         <div className="card p-4">
           <ul className="space-y-2">
-            {MUSCLES.filter((m) => thisWeek.sets[m] > 0).sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a]).map((m) => (
-              <li key={m} className="flex items-center gap-3 text-sm">
-                <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
-                <div className="relative h-2.5 flex-1 rounded-full bg-raised">
-                  <div className="absolute inset-y-0 rounded-full bg-good/15" style={{ left: "50%", width: "50%" }} title={t("progress.band")} />
-                  <div className="relative h-full rounded-full bg-gradient-to-r from-accent to-accent-2" style={{ width: `${Math.min(100, (thisWeek.sets[m] / 20) * 100)}%` }} />
-                </div>
-                <span className="num w-8 text-right">{fmtNum(thisWeek.sets[m])}</span>
+            {MUSCLES.filter((m) => thisWeek.sets[m] > 0)
+              .sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a])
+              .map((m) => (
+                <li key={m} className="flex items-center gap-3 text-sm">
+                  <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
+                  <div className="relative h-2.5 flex-1 rounded-full bg-raised">
+                    <div
+                      className="absolute inset-y-0 rounded-full bg-good/15"
+                      style={{ left: "50%", width: "50%" }}
+                      title={t("progress.band")}
+                    />
+                    <div
+                      className="relative h-full rounded-full bg-gradient-to-r from-accent to-accent-2"
+                      style={{ width: `${Math.min(100, (thisWeek.sets[m] / 20) * 100)}%` }}
+                    />
+                  </div>
+                  <span className="num w-8 text-right">{fmtNum(thisWeek.sets[m])}</span>
+                </li>
+              ))}
+            {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && (
+              <li>
+                <EmptyState icon="target" title={t("progress.noSets")} body={t("progress.noSets.body")} />
               </li>
-            ))}
-            {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && <li><EmptyState icon="target" title={t("progress.noSets")} body={t("progress.noSets.body")} /></li>}
+            )}
           </ul>
           <p className="mt-3 text-xs text-faint">{t("progress.bandNote")}</p>
         </div>
@@ -106,17 +136,37 @@ export function Stats() {
         <ul className="card divide-y divide-line">
           {stats.prs.slice(0, 8).map((p) => (
             <li key={p.at + p.exerciseId} className="flex justify-between px-4 py-3">
-              <span className="flex items-center gap-2 font-medium"><span className="text-gold"><Icon name="trophy" size={16} /></span>{exercise(p.exerciseId).name}</span>
-              <span className="num text-muted">{fmtNum(fromKg(p.weight, unit))} {unit} × {p.reps} · {ago(p.at, now)}</span>
+              <span className="flex items-center gap-2 font-medium">
+                <span className="text-gold">
+                  <Icon name="trophy" size={16} />
+                </span>
+                {exercise(p.exerciseId).name}
+              </span>
+              <span className="num text-muted">
+                {fmtNum(fromKg(p.weight, unit))} {unit} × {p.reps} · {ago(p.at, now)}
+              </span>
             </li>
           ))}
-          {!stats.prs.length && <li><EmptyState icon="trophy" tint={HUE.gold} title={t("progress.noPrs")} body={t("progress.noPrs.body")} /></li>}
+          {!stats.prs.length && (
+            <li>
+              <EmptyState icon="trophy" tint={HUE.gold} title={t("progress.noPrs")} body={t("progress.noPrs.body")} />
+            </li>
+          )}
         </ul>
       </Section>
 
-      <Section title={t("progress.achievements", { earned: g.badges.earned, total: g.badges.total })} right={<button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">{t("progress.seeAll")}</button>}>
+      <Section
+        title={t("progress.achievements", { earned: g.badges.earned, total: g.badges.total })}
+        right={
+          <button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">
+            {t("progress.seeAll")}
+          </button>
+        }
+      >
         <ul className="card divide-y divide-line">
-          {g.nearest.map((a) => <AchievementRow key={a.id} a={a} />)}
+          {g.nearest.map((a) => (
+            <AchievementRow key={a.id} a={a} />
+          ))}
           {!g.nearest.length && <li className="px-4 py-3 text-muted">{t("progress.noBadges")}</li>}
         </ul>
       </Section>
@@ -127,12 +177,30 @@ export function Stats() {
             <li key={s.sessionId} className="px-4 py-3">
               <div className="flex justify-between">
                 <span className="font-medium">{ago(s.start, now)}</span>
-                <span className="num text-sm text-muted">{clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}{s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}{s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}</span>
+                <span className="num text-sm text-muted">
+                  {clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}
+                  {s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}
+                  {s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}
+                </span>
               </div>
               <div className="mt-0.5 truncate text-sm text-muted">{list(s.exercises.map((e) => exercise(e).name))}</div>
             </li>
           ))}
-          {!stats.sessions.length && <li><EmptyState icon="calendar" mascot="happy" title={t("progress.noWorkouts")} body={t("progress.noWorkouts.body")} action={<Button icon="play" onClick={() => go("today")}>{t("progress.plan")}</Button>} /></li>}
+          {!stats.sessions.length && (
+            <li>
+              <EmptyState
+                icon="calendar"
+                mascot="happy"
+                title={t("progress.noWorkouts")}
+                body={t("progress.noWorkouts.body")}
+                action={
+                  <Button icon="play" onClick={() => go("today")}>
+                    {t("progress.plan")}
+                  </Button>
+                }
+              />
+            </li>
+          )}
         </ul>
       </Section>
     </div>
@@ -146,11 +214,31 @@ function TdeeCard() {
   const cur = currentTdee(events, stats.sessions, profile, now);
   const hist = tdeeHistory(events);
   return (
-    <Section title={t("progress.tdee")} icon="flame" right={<button type="button" onClick={() => go("tools")} className="press text-sm text-accent">{t("progress.allTools")}</button>}>
-      <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center justify-between gap-3 p-4 text-left">
+    <Section
+      title={t("progress.tdee")}
+      icon="flame"
+      right={
+        <button type="button" onClick={() => go("tools")} className="press text-sm text-accent">
+          {t("progress.allTools")}
+        </button>
+      }
+    >
+      <button
+        type="button"
+        onClick={() => go("tools", "tdee")}
+        className="press card flex w-full items-center justify-between gap-3 p-4 text-left"
+      >
         <div>
-          <div className="num text-2xl font-bold">{cur.result ? t("progress.kcal", { kcal: cur.result.tdee }) : t("progress.tdee.none")}</div>
-          <div className="text-sm text-muted">{cur.result ? (cur.activity.source === "manual" ? ACTIVITY[cur.activity.activity].label : t("progress.tdee.auto", { level: ACTIVITY[cur.activity.activity].label })) : t("progress.tdee.add")}</div>
+          <div className="num text-2xl font-bold">
+            {cur.result ? t("progress.kcal", { kcal: cur.result.tdee }) : t("progress.tdee.none")}
+          </div>
+          <div className="text-sm text-muted">
+            {cur.result
+              ? cur.activity.source === "manual"
+                ? ACTIVITY[cur.activity.activity].label
+                : t("progress.tdee.auto", { level: ACTIVITY[cur.activity.activity].label })
+              : t("progress.tdee.add")}
+          </div>
         </div>
         <Spark points={hist.map((e) => e.kcal)} empty={t("progress.tdee.spark")} />
       </button>
@@ -179,14 +267,39 @@ function BodyweightCard() {
       <div className="card p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="num text-2xl font-bold">{fmtNum(Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10)} {unit}</div>
-            <div className="text-sm text-muted">{change !== undefined ? t("progress.bw.change", { change: `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)}`, unit }) : log.length ? t("progress.bw.count", { count: log.length }) : t("progress.bw.none")}</div>
+            <div className="num text-2xl font-bold">
+              {fmtNum(Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10)} {unit}
+            </div>
+            <div className="text-sm text-muted">
+              {change !== undefined
+                ? t("progress.bw.change", { change: `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)}`, unit })
+                : log.length
+                  ? t("progress.bw.count", { count: log.length })
+                  : t("progress.bw.none")}
+            </div>
           </div>
           <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />
         </div>
-        <form className="mt-3 flex gap-2" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-          <BumpField label={t("progress.bw.label", { unit })} placeholder={t("progress.bw.placeholder", { unit })} value={value} onChange={setValue} step={unit === "lb" ? 0.2 : 0.1} start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10} min={1} className="min-w-0 flex-1" />
-          <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>{t("progress.bw.log")}</Button>
+        <form
+          className="mt-3 flex gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            submit();
+          }}
+        >
+          <BumpField
+            label={t("progress.bw.label", { unit })}
+            placeholder={t("progress.bw.placeholder", { unit })}
+            value={value}
+            onChange={setValue}
+            step={unit === "lb" ? 0.2 : 0.1}
+            start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10}
+            min={1}
+            className="min-w-0 flex-1"
+          />
+          <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>
+            {t("progress.bw.log")}
+          </Button>
         </form>
       </div>
     </Section>

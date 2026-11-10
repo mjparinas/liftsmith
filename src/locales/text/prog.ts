@@ -30,7 +30,8 @@ export const es: Partial<Record<Key, Message>> = {
   "prog.title": "Programas",
   "prog.intro": "Elige cómo se planifican tus entrenamientos. Puedes cambiar cuando quieras; tu historial y tus estadísticas se mantienen.",
   "prog.adaptive": "Adaptativo (recomendado)",
-  "prog.adaptiveBlurb": "Planifica cada entrenamiento según tu gimnasio, tu recuperación y tu bloque de entrenamiento, ajustado al tiempo que tienes.",
+  "prog.adaptiveBlurb":
+    "Planifica cada entrenamiento según tu gimnasio, tu recuperación y tu bloque de entrenamiento, ajustado al tiempo que tienes.",
   "prog.current": "Actual",
   "prog.pro": "Pro",
   "prog.unlock": "Desbloquear con Pro",
@@ -49,9 +50,11 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "prog.title": "Programmes",
-  "prog.intro": "Choisissez comment vos séances sont planifiées. Vous pouvez changer à tout moment ; votre historique et vos stats restent.",
+  "prog.intro":
+    "Choisissez comment vos séances sont planifiées. Vous pouvez changer à tout moment ; votre historique et vos stats restent.",
   "prog.adaptive": "Adaptatif (recommandé)",
-  "prog.adaptiveBlurb": "Planifie chaque séance selon votre salle, votre récupération et votre bloc d’entraînement, à la mesure du temps dont vous disposez.",
+  "prog.adaptiveBlurb":
+    "Planifie chaque séance selon votre salle, votre récupération et votre bloc d’entraînement, à la mesure du temps dont vous disposez.",
   "prog.current": "Actuel",
   "prog.pro": "Pro",
   "prog.unlock": "Débloquer avec Pro",

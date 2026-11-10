@@ -1,14 +1,17 @@
 import type { Metadata, Viewport } from "next";
+
 import "./globals.css";
-import { BRAND } from "@/lib/brand";
-import { SITE_URL } from "@/lib/site";
+
 import { SiteBeacon } from "@/components/SiteBeacon";
 import { VercelAnalytics } from "@/components/VercelAnalytics";
+import { BRAND } from "@/lib/brand";
+import { SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: { default: `${BRAND.name}: adaptive strength training`, template: `%s | ${BRAND.name}` },
-  description: "Workouts built around your equipment, your recovery and your time. Progressive overload, RIR blocks and deloads, with a plate-loading guide for every barbell set.",
+  description:
+    "Workouts built around your equipment, your recovery and your time. Progressive overload, RIR blocks and deloads, with a plate-loading guide for every barbell set.",
   manifest: "/manifest.webmanifest",
   // Drawn by scripts/make-icons.mjs: SVG for modern browsers, .ico for the rest, a full-square PNG for iOS.
   icons: {

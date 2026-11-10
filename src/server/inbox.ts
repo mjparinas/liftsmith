@@ -20,7 +20,10 @@ export const inboxConfigured = () => Boolean(readKey());
 
 /** The domains whose mail this panel shows. */
 export function inboxDomains(): string[] {
-  const set = (process.env.INBOX_DOMAINS ?? "getliftsmith.com").split(",").map((d) => d.trim().toLowerCase().replace(/^@/, "")).filter(Boolean);
+  const set = (process.env.INBOX_DOMAINS ?? "getliftsmith.com")
+    .split(",")
+    .map((d) => d.trim().toLowerCase().replace(/^@/, ""))
+    .filter(Boolean);
   return set.length ? set : ["getliftsmith.com"];
 }
 
@@ -36,11 +39,19 @@ export class InboxError extends Error {
 async function resend<T>(path: string, f: typeof fetch = fetch): Promise<T> {
   let res: Response;
   try {
-    res = await f(`${base()}${path}`, { headers: { authorization: `Bearer ${readKey()}` }, cache: "no-store", signal: AbortSignal.timeout(10_000) });
+    res = await f(`${base()}${path}`, {
+      headers: { authorization: `Bearer ${readKey()}` },
+      cache: "no-store",
+      signal: AbortSignal.timeout(10_000),
+    });
   } catch {
     throw new InboxError("Couldn't reach Resend.", 502);
   }
-  if (res.status === 401 || res.status === 403) throw new InboxError("Resend refused the API key. Reading received mail needs a full-access key: set RESEND_INBOX_API_KEY (see AGENTS.md, Admin inbox).", 502);
+  if (res.status === 401 || res.status === 403)
+    throw new InboxError(
+      "Resend refused the API key. Reading received mail needs a full-access key: set RESEND_INBOX_API_KEY (see AGENTS.md, Admin inbox).",
+      502,
+    );
   if (res.status === 404) throw new InboxError("Resend has no such message.", 404);
   if (!res.ok) throw new InboxError(`Resend answered ${res.status}.`, 502);
   return (await res.json()) as T;
@@ -89,10 +100,13 @@ async function enrich(items: ResendReceived[]): Promise<InboxItem[]> {
   if (!items.length) return [];
   const ids = items.map((i) => i.id);
   const marks = ids.map(() => "?").join(", ");
-  const states = await query<{ email_id: string; handled_at: number | null; replied_at: number | null; replied_by: string | null; archived_at: number | null }>(
-    `SELECT email_id, handled_at, replied_at, replied_by, archived_at FROM inbox_state WHERE email_id IN (${marks})`,
-    ids,
-  );
+  const states = await query<{
+    email_id: string;
+    handled_at: number | null;
+    replied_at: number | null;
+    replied_by: string | null;
+    archived_at: number | null;
+  }>(`SELECT email_id, handled_at, replied_at, replied_by, archived_at FROM inbox_state WHERE email_id IN (${marks})`, ids);
   const state = new Map(states.map((s) => [String(s.email_id), s]));
   const num = (v: unknown) => (v == null ? null : Number(v));
   return items.map((i) => {
@@ -114,7 +128,10 @@ async function enrich(items: ResendReceived[]): Promise<InboxItem[]> {
 }
 
 /** The newest mail to our domain, up to `limit`, a Resend page at a time. `after` continues from a Resend id. */
-export async function listInbox(opts: { limit?: number; after?: string } = {}, f: typeof fetch = fetch): Promise<{ items: InboxItem[]; next: string | null }> {
+export async function listInbox(
+  opts: { limit?: number; after?: string } = {},
+  f: typeof fetch = fetch,
+): Promise<{ items: InboxItem[]; next: string | null }> {
   const limit = Math.min(100, Math.max(1, opts.limit ?? 50));
   const ours: ResendReceived[] = [];
   let after = opts.after;
@@ -205,22 +222,32 @@ export async function getInboxHtml(id: string, f: typeof fetch = fetch): Promise
 }
 
 export async function markHandled(id: string, handled: boolean, now = Date.now()): Promise<void> {
-  await run("INSERT INTO inbox_state (email_id, handled_at) VALUES (?, ?) ON CONFLICT (email_id) DO UPDATE SET handled_at = excluded.handled_at", [id, handled ? now : null]);
+  await run(
+    "INSERT INTO inbox_state (email_id, handled_at) VALUES (?, ?) ON CONFLICT (email_id) DO UPDATE SET handled_at = excluded.handled_at",
+    [id, handled ? now : null],
+  );
 }
 
 /** Archiving moves a message out of the Inbox list into Archived; it stays in Resend either way. */
 export async function markArchived(id: string, archived: boolean, now = Date.now()): Promise<void> {
-  await run("INSERT INTO inbox_state (email_id, archived_at) VALUES (?, ?) ON CONFLICT (email_id) DO UPDATE SET archived_at = excluded.archived_at", [id, archived ? now : null]);
+  await run(
+    "INSERT INTO inbox_state (email_id, archived_at) VALUES (?, ?) ON CONFLICT (email_id) DO UPDATE SET archived_at = excluded.archived_at",
+    [id, archived ? now : null],
+  );
 }
 
 /** The sender replies come from: the feedback or mail sender, on our verified domain. */
-export const replyFrom = () => process.env.FEEDBACK_FROM || process.env.MAIL_FROM || process.env.ADMIN_FROM || "Liftsmith <hello@getliftsmith.com>";
+export const replyFrom = () =>
+  process.env.FEEDBACK_FROM || process.env.MAIL_FROM || process.env.ADMIN_FROM || "Liftsmith <hello@getliftsmith.com>";
 
 /** Answers a received email as a threaded plain-text reply, and marks it answered. */
 export async function replyToInbox(id: string, text: string, admin: string, f: typeof fetch = fetch, now = Date.now()): Promise<boolean> {
   const m = await getInboxMessage(id, f);
   const subject = /^re:/i.test(m.subject) ? m.subject : `Re: ${m.subject === "(no subject)" ? "Liftsmith" : m.subject}`;
-  const paras = text.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean);
+  const paras = text
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
   const r = await f(`${base()}/emails`, {
     method: "POST",
     headers: { authorization: `Bearer ${sendKey()}`, "content-type": "application/json", "idempotency-key": `inbox-reply-${id}-${now}` },

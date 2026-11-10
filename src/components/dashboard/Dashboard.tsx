@@ -1,24 +1,27 @@
 "use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+
+import { AchievementRow, Badge, Bar, LeagueCard, QuestsCard, StreakCard, TIER_COLOUR } from "@/components/app/Achievements";
 import { Info } from "@/components/Info";
-import type { Term } from "@/lib/glossary";
 import { applyA11y, savedA11y } from "@/lib/a11y";
+import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
+import { track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance } from "@/lib/appearance";
 import { BRAND } from "@/lib/brand";
-import { date, readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
-import { useLang } from "@/lib/useLang";
 import { dayKey, liftBests, monthGrid, sessionDetail, trainingDays, weeklyTotals, yearGrid } from "@/lib/dashboard";
 import { defaultProfile } from "@/lib/defaults";
 import { derive, setWeekStart } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exerciseName, game } from "@/lib/game";
-import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
-import { AchievementRow, Badge, Bar, LeagueCard, QuestsCard, StreakCard, TIER_COLOUR } from "@/components/app/Achievements";
+import type { Term } from "@/lib/glossary";
+import { date, readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
 import { load } from "@/lib/localdb";
-import { track } from "@/lib/analytics";
+import { APP_PATH } from "@/lib/site";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
-import { APP_PATH } from "@/lib/site";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useLang } from "@/lib/useLang";
+
 import { LineChart, MonthCalendar, WeekBars, YearHeatmap } from "./Charts";
 import { LogPast } from "./LogPast";
 import { SharePanel } from "./Share";
@@ -50,14 +53,18 @@ function useTab(): [Tab, string | undefined, (t: Tab, arg?: string) => void] {
 }
 
 const kgText = (kg: number, unit: Unit) => `${fmtNum(Math.round(fromKg(kg, unit)))} ${unit}`;
-const tonnes = (kg: number, unit: Unit) => (unit === "kg" ? `${fmtNum(Math.round(kg / 100) / 10)} t` : `${fmtNum(Math.round(fromKg(kg, "lb") / 100) / 10)}k lb`);
+const tonnes = (kg: number, unit: Unit) =>
+  unit === "kg" ? `${fmtNum(Math.round(kg / 100) / 10)} t` : `${fmtNum(Math.round(fromKg(kg, "lb") / 100) / 10)}k lb`;
 const hours = (sec: number) => `${fmtNum(Math.round(sec / 360) / 10)} h`;
 const dateText = (ms: number) => date(ms, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
 function Panel({ title, children, className = "", info }: { title: string; children: React.ReactNode; className?: string; info?: Term }) {
   return (
     <section className={`card min-w-0 p-5 ${className}`}>
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">{title}{info && <Info term={info} />}</h2>
+      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">
+        {title}
+        {info && <Info term={info} />}
+      </h2>
       {children}
     </section>
   );
@@ -122,15 +129,25 @@ export function Dashboard() {
       <header className="flex flex-wrap items-center justify-between gap-3 py-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-accent">{BRAND.name}</p>
-          <h1 className="text-2xl font-bold">{profile.name.trim() ? t("dash.titleNamed", { name: profile.name.trim() }) : t("dash.title")}</h1>
+          <h1 className="text-2xl font-bold">
+            {profile.name.trim() ? t("dash.titleNamed", { name: profile.name.trim() }) : t("dash.title")}
+          </h1>
         </div>
-        <a href={APP_PATH} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">{t("dash.start")}</a>
+        <a href={APP_PATH} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
+          {t("dash.start")}
+        </a>
       </header>
       <nav aria-label={t("dash.nav")} className="-mx-1 overflow-x-auto border-b border-line">
         <ul className="flex min-w-max gap-1 px-1">
           {TABS.map((id) => (
             <li key={id}>
-              <a href={`#/${id}`} aria-current={tab === id ? "page" : undefined} className={`inline-block border-b-2 px-3 py-3 text-sm font-medium ${tab === id ? "border-accent text-ink" : "border-transparent text-muted"}`}>{t(`dash.tab.${id}`)}</a>
+              <a
+                href={`#/${id}`}
+                aria-current={tab === id ? "page" : undefined}
+                className={`inline-block border-b-2 px-3 py-3 text-sm font-medium ${tab === id ? "border-accent text-ink" : "border-transparent text-muted"}`}
+              >
+                {t(`dash.tab.${id}`)}
+              </a>
             </li>
           ))}
         </ul>
@@ -167,8 +184,12 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
         <h2 className="text-xl font-bold">{t("dash.empty")}</h2>
         <p className="mt-2 text-muted">{t("dash.emptyBody")}</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <a href={APP_PATH} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">{t("dash.openApp")}</a>
-          <button type="button" onClick={() => go("log")} className="press rounded-2xl border border-line bg-raised px-5 py-3">{t("dash.logPast")}</button>
+          <a href={APP_PATH} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
+            {t("dash.openApp")}
+          </a>
+          <button type="button" onClick={() => go("log")} className="press rounded-2xl border border-line bg-raised px-5 py-3">
+            {t("dash.logPast")}
+          </button>
         </div>
       </div>
     );
@@ -186,12 +207,29 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
       <section className="card p-5 lg:col-span-3" aria-label={t("dash.level")}>
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="text-lg font-semibold">{t("dash.levelTitle", { level: lvl.level, title: lvl.title })}</span>
-          <span className="num text-sm text-muted">{lvl.next ? t("dash.xpTo", { xp: fmtNum(xp), left: fmtNum(lvl.span - lvl.into), next: lvl.next }) : t("dash.xp", { xp: fmtNum(xp) })}</span>
+          <span className="num text-sm text-muted">
+            {lvl.next
+              ? t("dash.xpTo", { xp: fmtNum(xp), left: fmtNum(lvl.span - lvl.into), next: lvl.next })
+              : t("dash.xp", { xp: fmtNum(xp) })}
+          </span>
         </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label={t("awards.levelProgress")} aria-valuemin={0} aria-valuemax={lvl.span} aria-valuenow={lvl.into}>
+        <div
+          className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised"
+          role="progressbar"
+          aria-label={t("awards.levelProgress")}
+          aria-valuemin={0}
+          aria-valuemax={lvl.span}
+          aria-valuenow={lvl.into}
+        >
           <div className="h-full rounded-full bg-accent" style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }} />
         </div>
-        <p className="mt-2 text-sm text-muted">{t(streak.needed ? "dash.weekGoal" : "dash.weekGoalMet", { done: streak.thisWeek, count: Math.max(1, profile.daysPerWeek), left: streak.needed })}</p>
+        <p className="mt-2 text-sm text-muted">
+          {t(streak.needed ? "dash.weekGoal" : "dash.weekGoalMet", {
+            done: streak.thisWeek,
+            count: Math.max(1, profile.daysPerWeek),
+            left: streak.needed,
+          })}
+        </p>
       </section>
       <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:col-span-3 lg:grid-cols-6">
         {tiles.map(([k, v]) => (
@@ -202,14 +240,21 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
         ))}
       </dl>
       <Panel title={t("dash.perWeek")} className="lg:col-span-2">
-        <WeekBars weeks={weeks} value={(i) => weeks[i].sessions} format={(v) => t("dash.workoutsN", { count: v })} label={t("dash.weeksLabel")} />
+        <WeekBars
+          weeks={weeks}
+          value={(i) => weeks[i].sessions}
+          format={(v) => t("dash.workoutsN", { count: v })}
+          label={t("dash.weeksLabel")}
+        />
       </Panel>
       <Panel title={t("dash.recentPrs")}>
         <ul className="divide-y divide-line">
           {stats.prs.slice(0, 5).map((p) => (
             <li key={p.at + p.exerciseId} className="flex justify-between gap-2 py-2 text-sm">
               <span className="truncate">{exerciseName(p.exerciseId)}</span>
-              <span className="num shrink-0 text-muted">{kgText(p.weight, unit)} × {p.reps}</span>
+              <span className="num shrink-0 text-muted">
+                {kgText(p.weight, unit)} × {p.reps}
+              </span>
             </li>
           ))}
           {!stats.prs.length && <li className="py-2 text-sm text-muted">{t("dash.noPrs")}</li>}
@@ -222,7 +267,10 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
         <QuestsCard g={g} />
       </Panel>
       <Panel title={t("dash.leagueStreak")}>
-        <div className="space-y-3"><LeagueCard g={g} /><StreakCard g={g} /></div>
+        <div className="space-y-3">
+          <LeagueCard g={g} />
+          <StreakCard g={g} />
+        </div>
       </Panel>
       <Panel title={t("dash.almost", { earned: g.badges.earned, total: g.badges.total })}>
         <ul className="divide-y divide-line">
@@ -231,13 +279,21 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
               <Badge a={a} size={36} />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium">{a.next?.detail ?? a.detail}</p>
-                <div className="mt-1"><Bar value={a.progress} label={t("awards.progress", { name: a.name })} colour={a.next ? TIER_COLOUR[a.next.tier] : undefined} /></div>
+                <div className="mt-1">
+                  <Bar
+                    value={a.progress}
+                    label={t("awards.progress", { name: a.name })}
+                    colour={a.next ? TIER_COLOUR[a.next.tier] : undefined}
+                  />
+                </div>
               </div>
             </li>
           ))}
           {!g.nearest.length && <li className="py-2 text-sm text-muted">{t("dash.allDone")}</li>}
         </ul>
-        <button type="button" onClick={() => go("trophies")} className="press mt-3 text-sm text-accent">{t("dash.seeAll")}</button>
+        <button type="button" onClick={() => go("trophies")} className="press mt-3 text-sm text-accent">
+          {t("dash.seeAll")}
+        </button>
       </Panel>
     </div>
   );
@@ -275,9 +331,25 @@ function CalendarTab({ stats, now, unit, go }: { stats: Stats; now: number; unit
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
         <section className="card p-5 lg:col-span-2" aria-label={month}>
           <div className="mb-3 flex items-center justify-between gap-2">
-            <button type="button" onClick={() => shift(-1)} className="press h-11 w-11 rounded-xl border border-line bg-raised" aria-label={t("dash.prevMonth")}>‹</button>
-            <h2 className="text-center font-semibold">{month} <span className="num font-normal text-muted">· {t("dash.workoutsN", { count: monthCount })}</span></h2>
-            <button type="button" onClick={() => shift(1)} className="press h-11 w-11 rounded-xl border border-line bg-raised" aria-label={t("dash.nextMonth")}>›</button>
+            <button
+              type="button"
+              onClick={() => shift(-1)}
+              className="press h-11 w-11 rounded-xl border border-line bg-raised"
+              aria-label={t("dash.prevMonth")}
+            >
+              ‹
+            </button>
+            <h2 className="text-center font-semibold">
+              {month} <span className="num font-normal text-muted">· {t("dash.workoutsN", { count: monthCount })}</span>
+            </h2>
+            <button
+              type="button"
+              onClick={() => shift(1)}
+              className="press h-11 w-11 rounded-xl border border-line bg-raised"
+              aria-label={t("dash.nextMonth")}
+            >
+              ›
+            </button>
           </div>
           <MonthCalendar rows={monthGrid(ym.y, ym.m)} days={days} today={now} selected={selected} onPick={setSelected} />
         </section>
@@ -287,8 +359,16 @@ function CalendarTab({ stats, now, unit, go }: { stats: Stats; now: number; unit
           <ul className="space-y-3">
             {daySessions.map((s) => (
               <li key={s.sessionId}>
-                <button type="button" onClick={() => go("history", s.sessionId)} className="press w-full rounded-2xl border border-line bg-raised p-3 text-left">
-                  <span className="num block font-medium">{[t("dash.setsN", { count: s.sets }), tonnes(s.volume, unit), ...(s.prs ? [t("dash.prN", { count: s.prs })] : [])].join(" · ")}</span>
+                <button
+                  type="button"
+                  onClick={() => go("history", s.sessionId)}
+                  className="press w-full rounded-2xl border border-line bg-raised p-3 text-left"
+                >
+                  <span className="num block font-medium">
+                    {[t("dash.setsN", { count: s.sets }), tonnes(s.volume, unit), ...(s.prs ? [t("dash.prN", { count: s.prs })] : [])].join(
+                      " · ",
+                    )}
+                  </span>
                   <span className="mt-0.5 block text-sm text-muted">{s.exercises.map(exerciseName).join(", ")}</span>
                 </button>
               </li>
@@ -319,10 +399,18 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
             <label className="mb-3 block max-w-sm">
               <span className="sr-only">{t("dash.exercise")}</span>
               <select value={pick} onChange={(e) => setPick(e.target.value)} className="card w-full px-3 py-2">
-                {charted.map((b) => <option key={b.exerciseId} value={b.exerciseId}>{exerciseName(b.exerciseId)}</option>)}
+                {charted.map((b) => (
+                  <option key={b.exerciseId} value={b.exerciseId}>
+                    {exerciseName(b.exerciseId)}
+                  </option>
+                ))}
               </select>
             </label>
-            <LineChart points={series.map((p) => [p.at, fromKg(p.e1rm, unit)])} format={(v) => `${fmtNum(Math.round(v))} ${unit}`} label={t("dash.e1rmOf", { name: exerciseName(pick) })} />
+            <LineChart
+              points={series.map((p) => [p.at, fromKg(p.e1rm, unit)])}
+              format={(v) => `${fmtNum(Math.round(v))} ${unit}`}
+              label={t("dash.e1rmOf", { name: exerciseName(pick) })}
+            />
           </>
         ) : (
           <p className="text-sm text-muted">{t("dash.e1rmNeed")}</p>
@@ -333,21 +421,37 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-line text-left text-faint">
-                <th scope="col" className="py-2 font-medium">{t("dash.exercise")}</th>
-                <th scope="col" className="py-2 text-right font-medium">{t("dash.col.sessions")}</th>
-                <th scope="col" className="py-2 text-right font-medium">{t("dash.col.e1rm")}</th>
-                <th scope="col" className="py-2 text-right font-medium">{t("dash.col.from")}</th>
-                <th scope="col" className="py-2 text-right font-medium">{t("dash.col.heaviest")}</th>
-                <th scope="col" className="py-2 text-right font-medium">{t("dash.col.mostReps")}</th>
+                <th scope="col" className="py-2 font-medium">
+                  {t("dash.exercise")}
+                </th>
+                <th scope="col" className="py-2 text-right font-medium">
+                  {t("dash.col.sessions")}
+                </th>
+                <th scope="col" className="py-2 text-right font-medium">
+                  {t("dash.col.e1rm")}
+                </th>
+                <th scope="col" className="py-2 text-right font-medium">
+                  {t("dash.col.from")}
+                </th>
+                <th scope="col" className="py-2 text-right font-medium">
+                  {t("dash.col.heaviest")}
+                </th>
+                <th scope="col" className="py-2 text-right font-medium">
+                  {t("dash.col.mostReps")}
+                </th>
               </tr>
             </thead>
             <tbody className="num">
               {bests.map((b) => (
                 <tr key={b.exerciseId} className="border-b border-line/60">
-                  <th scope="row" className="py-2 text-left font-medium">{exerciseName(b.exerciseId)}</th>
+                  <th scope="row" className="py-2 text-left font-medium">
+                    {exerciseName(b.exerciseId)}
+                  </th>
                   <td className="py-2 text-right">{b.sessions}</td>
                   <td className="py-2 text-right">{b.e1rm > 0 ? kgText(b.e1rm, unit) : "–"}</td>
-                  <td className="py-2 text-right text-muted">{b.e1rmSet.weight > 0 ? `${kgText(b.e1rmSet.weight, unit)} × ${b.e1rmSet.reps}` : "–"}</td>
+                  <td className="py-2 text-right text-muted">
+                    {b.e1rmSet.weight > 0 ? `${kgText(b.e1rmSet.weight, unit)} × ${b.e1rmSet.reps}` : "–"}
+                  </td>
                   <td className="py-2 text-right">{b.heaviest > 0 ? kgText(b.heaviest, unit) : t("dash.bodyweight")}</td>
                   <td className="py-2 text-right">{b.mostReps}</td>
                 </tr>
@@ -363,21 +467,34 @@ function Lifts({ events, stats, unit }: { events: AppEvent[]; stats: Stats; unit
           <>
             <table className="w-full text-sm">
               <thead className="sr-only">
-                <tr><th scope="col">{t("dash.col.muscle")}</th><th scope="col">{t("dash.col.thisWeek")}</th><th scope="col">{t("dash.col.lastWeek")}</th></tr>
+                <tr>
+                  <th scope="col">{t("dash.col.muscle")}</th>
+                  <th scope="col">{t("dash.col.thisWeek")}</th>
+                  <th scope="col">{t("dash.col.lastWeek")}</th>
+                </tr>
               </thead>
               <tbody>
-                {MUSCLES.filter((m) => week.sets[m] > 0 || lastWeek.sets[m] > 0).sort((a, b) => week.sets[b] - week.sets[a]).map((m) => (
-                  <tr key={m}>
-                    <th scope="row" className="w-28 py-1 pr-3 text-left font-normal text-muted">{MUSCLE_LABEL[m]}</th>
-                    <td className="py-1">
-                      <div className="relative h-2.5 rounded-full bg-raised">
-                        <div className="absolute inset-y-0 rounded-full bg-good/15" style={{ left: "50%", width: "50%" }} />
-                        <div className="relative h-full rounded-full bg-accent" style={{ width: `${Math.min(100, (week.sets[m] / 20) * 100)}%` }} />
-                      </div>
-                    </td>
-                    <td className="num w-28 py-1 pl-3 text-right">{fmtNum(week.sets[m])} <span className="text-faint">{t("dash.lastWk", { n: fmtNum(lastWeek.sets[m]) })}</span></td>
-                  </tr>
-                ))}
+                {MUSCLES.filter((m) => week.sets[m] > 0 || lastWeek.sets[m] > 0)
+                  .sort((a, b) => week.sets[b] - week.sets[a])
+                  .map((m) => (
+                    <tr key={m}>
+                      <th scope="row" className="w-28 py-1 pr-3 text-left font-normal text-muted">
+                        {MUSCLE_LABEL[m]}
+                      </th>
+                      <td className="py-1">
+                        <div className="relative h-2.5 rounded-full bg-raised">
+                          <div className="absolute inset-y-0 rounded-full bg-good/15" style={{ left: "50%", width: "50%" }} />
+                          <div
+                            className="relative h-full rounded-full bg-accent"
+                            style={{ width: `${Math.min(100, (week.sets[m] / 20) * 100)}%` }}
+                          />
+                        </div>
+                      </td>
+                      <td className="num w-28 py-1 pl-3 text-right">
+                        {fmtNum(week.sets[m])} <span className="text-faint">{t("dash.lastWk", { n: fmtNum(lastWeek.sets[m]) })}</span>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
             <p className="mt-3 text-xs text-faint">{t("dash.band")}</p>
@@ -397,17 +514,29 @@ function History({ events, stats, unit, open, go }: { events: AppEvent[]; stats:
       <ul className="card divide-y divide-line lg:col-span-2" aria-label={t("dash.list")}>
         {stats.sessions.slice(0, shown).map((s) => (
           <li key={s.sessionId}>
-            <button type="button" aria-current={open === s.sessionId ? "true" : undefined} onClick={() => go("history", s.sessionId)} className={`w-full px-4 py-3 text-left ${open === s.sessionId ? "bg-accent/10" : ""}`}>
+            <button
+              type="button"
+              aria-current={open === s.sessionId ? "true" : undefined}
+              onClick={() => go("history", s.sessionId)}
+              className={`w-full px-4 py-3 text-left ${open === s.sessionId ? "bg-accent/10" : ""}`}
+            >
               <span className="flex justify-between gap-2">
                 <span className="font-medium">{dateText(s.start)}</span>
-                <span className="num text-sm text-muted">{t("dash.setsN", { count: s.sets })}{s.prs ? ` · ${t("dash.prN", { count: s.prs })}` : ""}</span>
+                <span className="num text-sm text-muted">
+                  {t("dash.setsN", { count: s.sets })}
+                  {s.prs ? ` · ${t("dash.prN", { count: s.prs })}` : ""}
+                </span>
               </span>
               <span className="mt-0.5 block truncate text-sm text-muted">{s.exercises.map(exerciseName).join(", ")}</span>
             </button>
           </li>
         ))}
         {stats.sessions.length > shown && (
-          <li><button type="button" onClick={() => setShown((n) => n + 30)} className="w-full px-4 py-3 text-accent">{t("dash.more")}</button></li>
+          <li>
+            <button type="button" onClick={() => setShown((n) => n + 30)} className="w-full px-4 py-3 text-accent">
+              {t("dash.more")}
+            </button>
+          </li>
         )}
       </ul>
       <section className="card p-5 lg:sticky lg:top-4 lg:col-span-3 lg:self-start" aria-label={t("dash.details")}>
@@ -421,7 +550,15 @@ function History({ events, stats, unit, open, go }: { events: AppEvent[]; stats:
   );
 }
 
-function SessionView({ detail, summary, unit }: { detail: NonNullable<ReturnType<typeof sessionDetail>>; summary: Stats["sessions"][number]; unit: Unit }) {
+function SessionView({
+  detail,
+  summary,
+  unit,
+}: {
+  detail: NonNullable<ReturnType<typeof sessionDetail>>;
+  summary: Stats["sessions"][number];
+  unit: Unit;
+}) {
   const facts = [
     t("dash.min", { n: Math.round(summary.seconds / 60) }),
     t("dash.setsN", { count: summary.sets }),
@@ -432,18 +569,29 @@ function SessionView({ detail, summary, unit }: { detail: NonNullable<ReturnType
   return (
     <>
       <h2 className="text-lg font-semibold">{dateText(detail.start)}</h2>
-      <p className="num text-sm text-muted">{facts.join(" · ")}{detail.manual ? t("dash.byHand") : ""}</p>
+      <p className="num text-sm text-muted">
+        {facts.join(" · ")}
+        {detail.manual ? t("dash.byHand") : ""}
+      </p>
       <div className="mt-4 space-y-4">
         {detail.exercises.map((g, i) => (
           <div key={i}>
             <h3 className="font-medium">{exerciseName(g.exerciseId)}</h3>
             <table className="mt-1 w-full text-sm">
-              <thead className="sr-only"><tr><th scope="col">{t("dash.col.set")}</th><th scope="col">{t("dash.col.weightReps")}</th></tr></thead>
+              <thead className="sr-only">
+                <tr>
+                  <th scope="col">{t("dash.col.set")}</th>
+                  <th scope="col">{t("dash.col.weightReps")}</th>
+                </tr>
+              </thead>
               <tbody className="num">
                 {g.sets.map((s, j) => (
                   <tr key={s.id} className="border-b border-line/60">
                     <td className="w-12 py-1 text-faint">{j + 1}</td>
-                    <td className="py-1">{s.weight > 0 ? `${kgText(s.weight, unit)} × ${s.reps}` : t("dash.repsN", { count: s.reps })}{s.challenge ? t("dash.challenge") : ""}</td>
+                    <td className="py-1">
+                      {s.weight > 0 ? `${kgText(s.weight, unit)} × ${s.reps}` : t("dash.repsN", { count: s.reps })}
+                      {s.challenge ? t("dash.challenge") : ""}
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -464,17 +612,32 @@ function Trophies({ events, stats, profile, now }: { events: AppEvent[]; stats: 
       <div className="card mb-4 p-5">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <span className="text-lg font-semibold">{t("dash.badges", { earned: g.badges.earned, total: g.badges.total })}</span>
-          <span className="text-sm text-muted">{t("dash.started", { started: g.achievements.filter((a) => a.level > 0).length, total: g.achievements.length })}</span>
+          <span className="text-sm text-muted">
+            {t("dash.started", { started: g.achievements.filter((a) => a.level > 0).length, total: g.achievements.length })}
+          </span>
         </div>
-        <div className="mt-2"><Bar value={g.badges.earned / g.badges.total} label={t("dash.badgesEarned")} /></div>
+        <div className="mt-2">
+          <Bar value={g.badges.earned / g.badges.total} label={t("dash.badgesEarned")} />
+        </div>
         <p className="mt-2 text-sm text-muted">{t("dash.tiersNote")}</p>
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
         {CATEGORIES.map((c) => {
           const list = g.achievements.filter((a) => a.category === c).sort((a, b) => b.level - a.level || b.progress - a.progress);
           return (
-            <Panel key={c} title={t("dash.catCount", { cat: CATEGORY_LABEL[c], done: list.reduce((n, a) => n + a.level, 0), total: list.reduce((n, a) => n + a.levels, 0) })}>
-              <ul className="-mx-4 divide-y divide-line">{list.map((a) => <AchievementRow key={a.id} a={a} />)}</ul>
+            <Panel
+              key={c}
+              title={t("dash.catCount", {
+                cat: CATEGORY_LABEL[c],
+                done: list.reduce((n, a) => n + a.level, 0),
+                total: list.reduce((n, a) => n + a.levels, 0),
+              })}
+            >
+              <ul className="-mx-4 divide-y divide-line">
+                {list.map((a) => (
+                  <AchievementRow key={a.id} a={a} />
+                ))}
+              </ul>
             </Panel>
           );
         })}

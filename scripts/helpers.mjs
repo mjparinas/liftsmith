@@ -3,7 +3,16 @@ import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
 
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".svg": "image/svg+xml", ".json": "application/json", ".webmanifest": "application/manifest+json", ".txt": "text/plain", ".xml": "application/xml" };
+const TYPES = {
+  ".html": "text/html",
+  ".js": "text/javascript",
+  ".css": "text/css",
+  ".svg": "image/svg+xml",
+  ".json": "application/json",
+  ".webmanifest": "application/manifest+json",
+  ".txt": "text/plain",
+  ".xml": "application/xml",
+};
 
 /** Serves the static export. Returns { url, close }. */
 export function serve(dir = path.resolve("out")) {

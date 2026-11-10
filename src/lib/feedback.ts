@@ -1,4 +1,5 @@
 "use client";
+
 // In-app feedback (Melvin, 2026-11-09). Reports go to an outbox in localStorage first, so they're
 // never lost offline, and are sent to /api/feedback/ when there's a connection. The server emails
 // them to the owner through Resend.
@@ -47,7 +48,13 @@ function write(items: FeedbackItem[]) {
 
 export const pending = () => read().length;
 
-export function buildFeedback(input: { kind: FeedbackKind; message: string; email?: string; screenshot?: string; includeDiag: boolean }): FeedbackItem {
+export function buildFeedback(input: {
+  kind: FeedbackKind;
+  message: string;
+  email?: string;
+  screenshot?: string;
+  includeDiag: boolean;
+}): FeedbackItem {
   return {
     id: typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : String(Date.now()),
     at: Date.now(),
@@ -68,7 +75,11 @@ export function flushFeedback(post: typeof fetch = fetch): Promise<number> {
     try {
       for (const item of read()) {
         try {
-          const r = await post(feedbackUrl(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(item) });
+          const r = await post(feedbackUrl(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(item),
+          });
           // The server rejected the report itself (bad or too big): drop it so it can't block the queue.
           // Anything else (404 before the server is deployed, 429, 5xx) keeps it for a later try.
           if (r.ok || REJECTED.has(r.status)) write(read().filter((x) => x.id !== item.id));

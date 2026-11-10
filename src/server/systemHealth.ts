@@ -5,15 +5,15 @@
 import {
   betterStackState,
   CHECKS,
-  jobState,
   JOB_LATE_MS,
+  jobState,
   pageAssets,
   runState,
   settingRows,
-  siteAddressProblem,
   SITE_FILES,
   SITE_PAGES,
   SITE_SLOW_MS,
+  siteAddressProblem,
   STATUS_PAGES,
   statuspageState,
   uptimeRobotStatus,
@@ -26,6 +26,7 @@ import {
   type StatusPage,
   type StatusPageName,
 } from "@/lib/systemHealth";
+
 import { query } from "./db";
 import { inboxDomains, readKey } from "./inbox";
 import { recentJobRuns } from "./monitor";
@@ -45,10 +46,20 @@ class HttpError extends Error {
   }
 }
 
-async function getJson<T>(service: string, url: string, headers: Record<string, string> = {}, init: Pick<RequestInit, "method" | "body"> = {}): Promise<T> {
+async function getJson<T>(
+  service: string,
+  url: string,
+  headers: Record<string, string> = {},
+  init: Pick<RequestInit, "method" | "body"> = {},
+): Promise<T> {
   let res: Response;
   try {
-    res = await fetch(url, { ...init, headers: { accept: "application/json", ...headers }, cache: "no-store", signal: AbortSignal.timeout(TIMEOUT) });
+    res = await fetch(url, {
+      ...init,
+      headers: { accept: "application/json", ...headers },
+      cache: "no-store",
+      signal: AbortSignal.timeout(TIMEOUT),
+    });
   } catch (e) {
     throw new Error((e as Error).name === "TimeoutError" ? `${service} didn't answer in time.` : `Couldn't reach ${service}.`);
   }
@@ -79,7 +90,12 @@ interface Probe {
 async function probe(url: string, text = false): Promise<Probe | { error: string }> {
   const started = Date.now();
   try {
-    const res = await fetch(url, { cache: "no-store", redirect: "follow", headers: { "user-agent": "Liftsmith-System-Check" }, signal: AbortSignal.timeout(TIMEOUT) });
+    const res = await fetch(url, {
+      cache: "no-store",
+      redirect: "follow",
+      headers: { "user-agent": "Liftsmith-System-Check" },
+      signal: AbortSignal.timeout(TIMEOUT),
+    });
     const body = text ? await res.text() : "";
     if (!text) await res.body?.cancel();
     return { status: res.status, ms: Date.now() - started, body };
@@ -93,11 +109,20 @@ const isProbe = (p: Probe | { error: string }): p is Probe => !("error" in p);
 export async function siteCheck(): Promise<HealthCheck> {
   const origin = siteOrigin();
   const title = "Live site";
-  if (/\/\/(localhost|127\.)/.test(origin)) return { id: "site", title, state: "off", summary: "The site address points at this computer.", rows: [], setup: "Set NEXT_PUBLIC_SITE_URL to https://www.getliftsmith.com." };
+  if (/\/\/(localhost|127\.)/.test(origin))
+    return {
+      id: "site",
+      title,
+      state: "off",
+      summary: "The site address points at this computer.",
+      rows: [],
+      setup: "Set NEXT_PUBLIC_SITE_URL to https://www.getliftsmith.com.",
+    };
   const pages = await Promise.all(SITE_PAGES.map(async (path) => ({ path, got: await probe(origin + path, true) })));
   const files = await Promise.all(SITE_FILES.map(async (path) => ({ path, got: await probe(origin + path) })));
   const assetPages = new Map<string, string>();
-  for (const { path, got } of pages) if (isProbe(got) && got.status === 200) for (const a of pageAssets(got.body)) if (!assetPages.has(a)) assetPages.set(a, path);
+  for (const { path, got } of pages)
+    if (isProbe(got) && got.status === 200) for (const a of pageAssets(got.body)) if (!assetPages.has(a)) assetPages.set(a, path);
   const assets = await Promise.all([...assetPages].map(async ([a, path]) => ({ a, path, got: await probe(origin + a) })));
   const missing = assets.filter((x) => !isProbe(x.got) || x.got.status !== 200);
 
@@ -106,15 +131,28 @@ export async function siteCheck(): Promise<HealthCheck> {
   for (const { path, got } of [...pages, ...files]) {
     const bad = !isProbe(got) ? got.error : got.status !== 200 ? `answered ${got.status}` : "";
     const slow = isProbe(got) && got.ms > SITE_SLOW_MS;
-    rows.push({ label: path, value: bad || `Loaded in ${(got as Probe).ms} ms`, state: bad ? "down" : slow ? "warn" : "ok", href: origin + path });
+    rows.push({
+      label: path,
+      value: bad || `Loaded in ${(got as Probe).ms} ms`,
+      state: bad ? "down" : slow ? "warn" : "ok",
+      href: origin + path,
+    });
     if (bad) problems.push(`${path} ${bad}`);
   }
   rows.push({
     label: "Scripts and styles",
-    value: missing.length ? `${assets.length - missing.length} of ${assets.length} loaded; missing: ${missing.slice(0, 3).map((x) => x.a.split("?")[0].split("/").pop()).join(", ")}` : assets.length ? `All ${assets.length} loaded` : "None found on the pages",
+    value: missing.length
+      ? `${assets.length - missing.length} of ${assets.length} loaded; missing: ${missing
+          .slice(0, 3)
+          .map((x) => x.a.split("?")[0].split("/").pop())
+          .join(", ")}`
+      : assets.length
+        ? `All ${assets.length} loaded`
+        : "None found on the pages",
     state: missing.length ? "down" : assets.length ? "ok" : "warn",
   });
-  if (missing.length) problems.push(`${plural(missing.length, "build file")} named by ${[...new Set(missing.map((x) => x.path))].join(", ")} didn't load`);
+  if (missing.length)
+    problems.push(`${plural(missing.length, "build file")} named by ${[...new Set(missing.map((x) => x.path))].join(", ")} didn't load`);
   const state: CheckState = problems.length ? "down" : worst(rows.map((r) => r.state ?? "ok"));
   const summary = problems.length
     ? `${problems[0].charAt(0).toUpperCase()}${problems[0].slice(1)}.${problems.length > 1 ? ` ${problems.length - 1} more problem${problems.length > 2 ? "s" : ""}.` : ""}`
@@ -145,7 +183,8 @@ export async function uptimeCheck(): Promise<HealthCheck> {
       state: "off",
       summary: "Not connected to UptimeRobot.",
       rows: [],
-      setup: "Add a free UptimeRobot HTTP monitor for https://www.getliftsmith.com/api/health/ (every 5 minutes), then set UPTIMEROBOT_API_KEY to the account's read-only API key (Integrations & API › API).",
+      setup:
+        "Add a free UptimeRobot HTTP monitor for https://www.getliftsmith.com/api/health/ (every 5 minutes), then set UPTIMEROBOT_API_KEY to the account's read-only API key (Integrations & API › API).",
       link: { label: "UptimeRobot", href: "https://uptimerobot.com/" },
     };
   }
@@ -158,21 +197,43 @@ export async function uptimeCheck(): Promise<HealthCheck> {
   );
   if (res.stat !== "ok") throw new Error(`UptimeRobot refused the request${res.error?.message ? `: ${res.error.message}` : "."}`);
   const monitors = res.monitors ?? [];
-  if (!monitors.length) return { id: "uptime", title: "Uptime", state: "warn", summary: "UptimeRobot has no monitors yet.", rows: [], setup: "Add a monitor for https://www.getliftsmith.com/api/health/.", link: ROBOT_LINK };
-  const ratios = (m: RobotMonitor) => (m.custom_uptime_ratio ?? "").split("-").map((r) => (r && Number.isFinite(Number(r)) ? Math.round(Number(r) * 100) / 100 : null));
+  if (!monitors.length)
+    return {
+      id: "uptime",
+      title: "Uptime",
+      state: "warn",
+      summary: "UptimeRobot has no monitors yet.",
+      rows: [],
+      setup: "Add a monitor for https://www.getliftsmith.com/api/health/.",
+      link: ROBOT_LINK,
+    };
+  const ratios = (m: RobotMonitor) =>
+    (m.custom_uptime_ratio ?? "").split("-").map((r) => (r && Number.isFinite(Number(r)) ? Math.round(Number(r) * 100) / 100 : null));
   const rows: CheckRow[] = monitors.map((m) => {
     const { state, label } = uptimeRobotStatus(m.status);
     const [day, week, month] = ratios(m);
-    return { label: m.friendly_name, value: [label, day == null ? "" : `${day}% 24 h`, week == null ? "" : `${week}% 7 days`, month == null ? "" : `${month}% 30 days`].filter(Boolean).join(" · "), state };
+    return {
+      label: m.friendly_name,
+      value: [label, day == null ? "" : `${day}% 24 h`, week == null ? "" : `${week}% 7 days`, month == null ? "" : `${month}% 30 days`]
+        .filter(Boolean)
+        .join(" · "),
+      state,
+    };
   });
-  const outages = monitors.flatMap((m) => (m.logs ?? []).filter((l) => l.type === 1).map((l) => ({ name: m.friendly_name, at: l.datetime * 1000 }))).sort((a, b) => b.at - a.at);
+  const outages = monitors
+    .flatMap((m) => (m.logs ?? []).filter((l) => l.type === 1).map((l) => ({ name: m.friendly_name, at: l.datetime * 1000 })))
+    .sort((a, b) => b.at - a.at);
   const down = monitors.filter((m) => uptimeRobotStatus(m.status).state === "down");
   const days = monitors.map((m) => ratios(m)[0]).filter((r): r is number => r != null);
   return {
     id: "uptime",
     title: "Uptime",
     state: worst(rows.map((r) => r.state ?? "ok")),
-    summary: down.length ? `Down: ${down.map((m) => m.friendly_name).join(", ")}.` : monitors.every((m) => m.status === 2) ? `Up.${days.length ? ` ${Math.min(...days)}% uptime in the last day.` : ""}` : "Not every monitor is up yet.",
+    summary: down.length
+      ? `Down: ${down.map((m) => m.friendly_name).join(", ")}.`
+      : monitors.every((m) => m.status === 2)
+        ? `Up.${days.length ? ` ${Math.min(...days)}% uptime in the last day.` : ""}`
+        : "Not every monitor is up yet.",
     rows: [...rows, ...(outages[0] ? [{ label: "Last outage", value: outages[0].name, at: outages[0].at }] : [])],
     link: ROBOT_LINK,
   };
@@ -191,7 +252,11 @@ interface GhRun {
 }
 
 /** The repository: GITHUB_REPOSITORY, else the one Vercel built from, else ours. */
-export const githubRepo = () => env("GITHUB_REPOSITORY") || (env("VERCEL_GIT_REPO_OWNER") && env("VERCEL_GIT_REPO_SLUG") ? `${env("VERCEL_GIT_REPO_OWNER")}/${env("VERCEL_GIT_REPO_SLUG")}` : "mjparinas/liftsmith");
+export const githubRepo = () =>
+  env("GITHUB_REPOSITORY") ||
+  (env("VERCEL_GIT_REPO_OWNER") && env("VERCEL_GIT_REPO_SLUG")
+    ? `${env("VERCEL_GIT_REPO_OWNER")}/${env("VERCEL_GIT_REPO_SLUG")}`
+    : "mjparinas/liftsmith");
 
 function ghHeaders(): Record<string, string> {
   const token = env("GITHUB_TOKEN");
@@ -211,14 +276,28 @@ export async function buildsCheck(): Promise<HealthCheck> {
   const link = { label: "GitHub Actions", href: `https://github.com/${repo}/actions` };
   const lists = await Promise.all(
     WORKFLOWS.map((w) =>
-      getJson<{ workflow_runs?: GhRun[] }>("GitHub", `https://api.github.com/repos/${repo}/actions/workflows/${w.file}/runs?per_page=10${w.branch ? `&branch=${w.branch}` : ""}`, ghHeaders())
+      getJson<{ workflow_runs?: GhRun[] }>(
+        "GitHub",
+        `https://api.github.com/repos/${repo}/actions/workflows/${w.file}/runs?per_page=10${w.branch ? `&branch=${w.branch}` : ""}`,
+        ghHeaders(),
+      )
         .then((r) => r.workflow_runs ?? [])
         .catch((e: Error) => e),
     ),
   );
   const refused = lists.find((l): l is Error => l instanceof Error);
   if (refused && lists.every((l) => l instanceof Error)) {
-    return { id: "builds", title, state: "warn", summary: refused.message, rows: [], setup: env("GITHUB_TOKEN") ? undefined : "GitHub limits unsigned reads to 60 an hour per address. Set GITHUB_TOKEN (fine-grained, this repository only, read-only Actions) if this keeps happening.", link };
+    return {
+      id: "builds",
+      title,
+      state: "warn",
+      summary: refused.message,
+      rows: [],
+      setup: env("GITHUB_TOKEN")
+        ? undefined
+        : "GitHub limits unsigned reads to 60 an hour per address. Set GITHUB_TOKEN (fine-grained, this repository only, read-only Actions) if this keeps happening.",
+      link,
+    };
   }
   const name = (r: GhRun) => (r.display_title ?? "").split("\n")[0].slice(0, 90);
   const rows: CheckRow[] = [];
@@ -233,20 +312,36 @@ export async function buildsCheck(): Promise<HealthCheck> {
     const done = runs.find((r) => r.status === "completed" && r.conclusion !== "cancelled" && r.conclusion !== "skipped");
     const running = runs.find((r) => r.status !== "completed");
     if (!done) {
-      rows.push({ label: w.label, value: running ? "Running its first time" : "No runs yet", state: running ? "ok" : undefined, href: running?.html_url });
+      rows.push({
+        label: w.label,
+        value: running ? "Running its first time" : "No runs yet",
+        state: running ? "ok" : undefined,
+        href: running?.html_url,
+      });
       return;
     }
     const s = runState(done);
     if (s === "down") failing++;
-    rows.push({ label: w.label, value: `${s === "down" ? "Failed" : "Passed"}: ${name(done)}`, at: Date.parse(done.created_at), state: s, href: done.html_url });
-    if (running) rows.push({ label: `${w.label}, running now`, value: name(running), at: Date.parse(running.created_at), href: running.html_url });
+    rows.push({
+      label: w.label,
+      value: `${s === "down" ? "Failed" : "Passed"}: ${name(done)}`,
+      at: Date.parse(done.created_at),
+      state: s,
+      href: done.html_url,
+    });
+    if (running)
+      rows.push({ label: `${w.label}, running now`, value: name(running), at: Date.parse(running.created_at), href: running.html_url });
   });
   const state = worst(rows.map((r) => r.state ?? "ok"));
   return {
     id: "builds",
     title,
     state,
-    summary: failing ? `${plural(failing, "workflow")} failed on its latest run.` : state === "warn" ? "Some runs couldn't be read." : "The latest builds of staging and main passed.",
+    summary: failing
+      ? `${plural(failing, "workflow")} failed on its latest run.`
+      : state === "warn"
+        ? "Some runs couldn't be read."
+        : "The latest builds of staging and main passed.",
     rows,
     link,
   };
@@ -271,7 +366,11 @@ export async function deploysCheck(): Promise<HealthCheck> {
   const sha = env("VERCEL_GIT_COMMIT_SHA");
   const here: CheckRow[] = env("VERCEL_ENV")
     ? [
-        { label: "Serving", value: `${env("VERCEL_ENV")} from ${env("VERCEL_GIT_COMMIT_REF") || "?"} at ${sha ? sha.slice(0, 7) : "?"}${env("VERCEL_GIT_COMMIT_MESSAGE") ? `: ${env("VERCEL_GIT_COMMIT_MESSAGE").split("\n")[0].slice(0, 80)}` : ""}`, href: sha ? `https://github.com/${githubRepo()}/commit/${sha}` : undefined },
+        {
+          label: "Serving",
+          value: `${env("VERCEL_ENV")} from ${env("VERCEL_GIT_COMMIT_REF") || "?"} at ${sha ? sha.slice(0, 7) : "?"}${env("VERCEL_GIT_COMMIT_MESSAGE") ? `: ${env("VERCEL_GIT_COMMIT_MESSAGE").split("\n")[0].slice(0, 80)}` : ""}`,
+          href: sha ? `https://github.com/${githubRepo()}/commit/${sha}` : undefined,
+        },
         ...(env("VERCEL_REGION") ? [{ label: "Region", value: env("VERCEL_REGION") }] : []),
       ]
     : [{ label: "Serving", value: "Not running on Vercel (a local or CI server)." }];
@@ -282,15 +381,20 @@ export async function deploysCheck(): Promise<HealthCheck> {
       id: "deploys",
       title,
       state: env("VERCEL_ENV") ? "ok" : "off",
-      summary: env("VERCEL_ENV") ? `This deployment is live${sha ? ` at ${sha.slice(0, 7)}` : ""}. Set VERCEL_TOKEN for the history.` : "Not running on Vercel.",
+      summary: env("VERCEL_ENV")
+        ? `This deployment is live${sha ? ` at ${sha.slice(0, 7)}` : ""}. Set VERCEL_TOKEN for the history.`
+        : "Not running on Vercel.",
       rows: here,
-      setup: "For recent deploys and failures, set VERCEL_TOKEN (Vercel › Account Settings › Tokens, scoped to the team). VERCEL_PROJECT_ID is set by Vercel itself.",
+      setup:
+        "For recent deploys and failures, set VERCEL_TOKEN (Vercel › Account Settings › Tokens, scoped to the team). VERCEL_PROJECT_ID is set by Vercel itself.",
       link,
     };
   }
   const team = env("VERCEL_TEAM_ID");
   const q = new URLSearchParams({ projectId: project, limit: "10", ...(team ? { teamId: team } : { slug: "melvins-projects-b69f55c3" }) });
-  const d = await getJson<{ deployments?: VercelDeployment[] }>("Vercel", `https://api.vercel.com/v6/deployments?${q}`, { authorization: `Bearer ${token}` });
+  const d = await getJson<{ deployments?: VercelDeployment[] }>("Vercel", `https://api.vercel.com/v6/deployments?${q}`, {
+    authorization: `Bearer ${token}`,
+  });
   const list = d.deployments ?? [];
   const stateOf = (x: VercelDeployment) => x.readyState ?? x.state ?? "";
   const prod = list.find((x) => x.target === "production" && stateOf(x) === "READY");
@@ -298,9 +402,26 @@ export async function deploysCheck(): Promise<HealthCheck> {
   const building = list.find((x) => stateOf(x) === "BUILDING" || stateOf(x) === "QUEUED" || stateOf(x) === "INITIALIZING");
   const rows: CheckRow[] = [
     ...here,
-    ...(prod ? [{ label: "Latest production", value: (prod.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 90) || prod.uid, at: prod.created, state: "ok" as const, href: prod.url ? `https://${prod.url}` : undefined }] : []),
-    ...(building ? [{ label: "Building now", value: (building.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 90), at: building.created }] : []),
-    ...list.slice(0, 6).map((x) => ({ label: `${x.target === "production" ? "Production" : "Preview"} ${stateOf(x).toLowerCase()}`, value: `${x.meta?.githubCommitRef ?? ""} ${(x.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 70)}`.trim(), at: x.created, state: (stateOf(x) === "ERROR" ? "down" : stateOf(x) === "READY" ? "ok" : undefined) as CheckState | undefined })),
+    ...(prod
+      ? [
+          {
+            label: "Latest production",
+            value: (prod.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 90) || prod.uid,
+            at: prod.created,
+            state: "ok" as const,
+            href: prod.url ? `https://${prod.url}` : undefined,
+          },
+        ]
+      : []),
+    ...(building
+      ? [{ label: "Building now", value: (building.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 90), at: building.created }]
+      : []),
+    ...list.slice(0, 6).map((x) => ({
+      label: `${x.target === "production" ? "Production" : "Preview"} ${stateOf(x).toLowerCase()}`,
+      value: `${x.meta?.githubCommitRef ?? ""} ${(x.meta?.githubCommitMessage ?? "").split("\n")[0].slice(0, 70)}`.trim(),
+      at: x.created,
+      state: (stateOf(x) === "ERROR" ? "down" : stateOf(x) === "READY" ? "ok" : undefined) as CheckState | undefined,
+    })),
   ];
   const latestProd = list.find((x) => x.target === "production" && stateOf(x) !== "CANCELED");
   const state: CheckState = latestProd && stateOf(latestProd) === "ERROR" ? "down" : failed.length ? "warn" : "ok";
@@ -308,7 +429,14 @@ export async function deploysCheck(): Promise<HealthCheck> {
     id: "deploys",
     title,
     state,
-    summary: state === "down" ? "The latest production deploy failed; the one before it is still serving." : failed.length ? `${plural(failed.length, "deploy")} failed this week.` : prod ? "Production is on its latest deploy." : "No production deploy found yet.",
+    summary:
+      state === "down"
+        ? "The latest production deploy failed; the one before it is still serving."
+        : failed.length
+          ? `${plural(failed.length, "deploy")} failed this week.`
+          : prod
+            ? "Production is on its latest deploy."
+            : "No production deploy found yet.",
     rows,
     link,
   };
@@ -356,13 +484,31 @@ interface ResendDomain {
 export async function emailCheck(now = Date.now()): Promise<HealthCheck> {
   const title = "Email (Resend)";
   const link = { label: "Resend dashboard", href: "https://resend.com/emails" };
-  if (!env("RESEND_API_KEY")) return { id: "email", title, state: "down", summary: "No Resend key: sign-in links, feedback and reminders can't be sent.", rows: [], setup: "Set RESEND_API_KEY.", link };
+  if (!env("RESEND_API_KEY"))
+    return {
+      id: "email",
+      title,
+      state: "down",
+      summary: "No Resend key: sign-in links, feedback and reminders can't be sent.",
+      rows: [],
+      setup: "Set RESEND_API_KEY.",
+      link,
+    };
   const rows: CheckRow[] = [];
   const key = readKey();
-  const domains = await getJson<{ data?: ResendDomain[] }>("Resend", "https://api.resend.com/domains", { authorization: `Bearer ${key}` }).catch((e: Error) => e);
+  const domains = await getJson<{ data?: ResendDomain[] }>("Resend", "https://api.resend.com/domains", {
+    authorization: `Bearer ${key}`,
+  }).catch((e: Error) => e);
   let state: CheckState = "ok";
   if (domains instanceof Error) {
-    rows.push({ label: "Domains", value: domains instanceof HttpError && (domains.status === 401 || domains.status === 403) ? "The key is sending-only, so domains and received mail can't be read. Set RESEND_INBOX_API_KEY to a full-access key." : domains.message, state: "warn" });
+    rows.push({
+      label: "Domains",
+      value:
+        domains instanceof HttpError && (domains.status === 401 || domains.status === 403)
+          ? "The key is sending-only, so domains and received mail can't be read. Set RESEND_INBOX_API_KEY to a full-access key."
+          : domains.message,
+      state: "warn",
+    });
     state = "warn";
   } else {
     const ours = (domains.data ?? []).filter((d) => inboxDomains().includes(d.name));
@@ -372,25 +518,49 @@ export async function emailCheck(now = Date.now()): Promise<HealthCheck> {
     }
     for (const d of ours) {
       const verified = d.status === "verified";
-      rows.push({ label: d.name, value: `${verified ? "Verified" : `Status: ${d.status}`} · sending ${d.capabilities?.sending ?? "?"} · receiving ${d.capabilities?.receiving ?? "?"}`, state: verified ? "ok" : "down" });
+      rows.push({
+        label: d.name,
+        value: `${verified ? "Verified" : `Status: ${d.status}`} · sending ${d.capabilities?.sending ?? "?"} · receiving ${d.capabilities?.receiving ?? "?"}`,
+        state: verified ? "ok" : "down",
+      });
       if (!verified) state = "down";
       else if (d.capabilities?.receiving && d.capabilities.receiving !== "enabled") {
-        rows.push({ label: "Receiving", value: "Off, so the Inbox stays empty. Turn on receiving for the domain in Resend.", state: "warn" });
+        rows.push({
+          label: "Receiving",
+          value: "Off, so the Inbox stays empty. Turn on receiving for the domain in Resend.",
+          state: "warn",
+        });
         state = worst([state, "warn"]);
       }
     }
   }
   // Reminder emails over the last week, from our own records.
-  const sends = await query<{ status: string; n: number }>("SELECT status, COUNT(*) AS n FROM reminder_sends WHERE send_at > ? GROUP BY status", [now - 7 * DAY]).catch(() => []);
-  const subs = await query<{ status: string; n: number }>("SELECT status, COUNT(*) AS n FROM reminder_subs GROUP BY status").catch(() => []);
+  const sends = await query<{ status: string; n: number }>(
+    "SELECT status, COUNT(*) AS n FROM reminder_sends WHERE send_at > ? GROUP BY status",
+    [now - 7 * DAY],
+  ).catch(() => []);
+  const subs = await query<{ status: string; n: number }>("SELECT status, COUNT(*) AS n FROM reminder_subs GROUP BY status").catch(
+    () => [],
+  );
   const count = (xs: { status: string; n: number }[], s: string) => Number(xs.find((x) => x.status === s)?.n ?? 0);
-  rows.push({ label: "Reminder emails, last 7 days", value: `${num(count(sends, "sent"))} sent, ${num(count(sends, "scheduled"))} scheduled, ${num(count(sends, "cancelled"))} cancelled` });
-  rows.push({ label: "Reminder subscribers", value: `${num(count(subs, "confirmed"))} confirmed, ${num(count(subs, "pending"))} waiting to confirm, ${num(count(subs, "unsubscribed"))} unsubscribed` });
+  rows.push({
+    label: "Reminder emails, last 7 days",
+    value: `${num(count(sends, "sent"))} sent, ${num(count(sends, "scheduled"))} scheduled, ${num(count(sends, "cancelled"))} cancelled`,
+  });
+  rows.push({
+    label: "Reminder subscribers",
+    value: `${num(count(subs, "confirmed"))} confirmed, ${num(count(subs, "pending"))} waiting to confirm, ${num(count(subs, "unsubscribed"))} unsubscribed`,
+  });
   return {
     id: "email",
     title,
     state,
-    summary: state === "ok" ? `Sending${domains instanceof Error ? "" : " and receiving"} on ${inboxDomains().join(", ")}.` : state === "down" ? "The sending domain needs attention in Resend." : "Sending works; some details can't be read with this key.",
+    summary:
+      state === "ok"
+        ? `Sending${domains instanceof Error ? "" : " and receiving"} on ${inboxDomains().join(", ")}.`
+        : state === "down"
+          ? "The sending domain needs attention in Resend."
+          : "Sending works; some details can't be read with this key.",
     rows,
     link,
   };
@@ -400,7 +570,15 @@ export async function emailCheck(now = Date.now()): Promise<HealthCheck> {
 
 export async function jobCheck(now = Date.now()): Promise<HealthCheck> {
   const title = "Daily reminder job";
-  if (!env("CRON_SECRET")) return { id: "job", title, state: "off", summary: "CRON_SECRET isn't set, so Vercel Cron can't run the job.", rows: [], setup: "Set CRON_SECRET (any long random string)." };
+  if (!env("CRON_SECRET"))
+    return {
+      id: "job",
+      title,
+      state: "off",
+      summary: "CRON_SECRET isn't set, so Vercel Cron can't run the job.",
+      rows: [],
+      setup: "Set CRON_SECRET (any long random string).",
+    };
   const runs = await recentJobRuns("reminders", 7);
   const state = jobState(runs, now);
   const last = runs[0];
@@ -430,7 +608,12 @@ export async function jobCheck(now = Date.now()): Promise<HealthCheck> {
         : now - last.startedAt > JOB_LATE_MS
           ? "The job hasn't run in over a day. Check Vercel › Settings › Cron Jobs."
           : "Ran in the last day.",
-    rows: runs.map((r) => ({ label: r.finishedAt == null ? "Running or stopped" : r.ok ? "Finished" : "Failed", value: short(r.detail) || (r.finishedAt ? `${Math.round((r.finishedAt - r.startedAt) / 1000)} s` : ""), at: r.startedAt, state: r.finishedAt == null ? undefined : r.ok ? "ok" : "down" })),
+    rows: runs.map((r) => ({
+      label: r.finishedAt == null ? "Running or stopped" : r.ok ? "Finished" : "Failed",
+      value: short(r.detail) || (r.finishedAt ? `${Math.round((r.finishedAt - r.startedAt) / 1000)} s` : ""),
+      at: r.startedAt,
+      state: r.finishedAt == null ? undefined : r.ok ? "ok" : "down",
+    })),
     link: { label: "Vercel cron jobs", href: "https://vercel.com/melvins-projects-b69f55c3/liftsmith/settings/cron-jobs" },
   };
 }
@@ -441,20 +624,39 @@ export async function billingCheck(now = Date.now()): Promise<HealthCheck> {
   const title = "Subscriptions (RevenueCat)";
   const link = { label: "RevenueCat dashboard", href: "https://app.revenuecat.com/" };
   if (!env("REVENUECAT_WEBHOOK_SECRET")) {
-    return { id: "billing", title, state: "off", summary: "Billing isn't live yet, so no store events arrive.", rows: [], setup: "When billing goes live: point RevenueCat's webhook at https://www.getliftsmith.com/api/billing/revenuecat/ and set REVENUECAT_WEBHOOK_SECRET (AGENTS.md, Open items).", link };
+    return {
+      id: "billing",
+      title,
+      state: "off",
+      summary: "Billing isn't live yet, so no store events arrive.",
+      rows: [],
+      setup:
+        "When billing goes live: point RevenueCat's webhook at https://www.getliftsmith.com/api/billing/revenuecat/ and set REVENUECAT_WEBHOOK_SECRET (AGENTS.md, Open items).",
+      link,
+    };
   }
-  const [last] = await query<{ at: number | null; n: number }>("SELECT MAX(at) AS at, COUNT(*) AS n FROM subscription_events WHERE source = 'store'");
-  const [week] = await query<{ n: number; failures: number }>("SELECT COUNT(*) AS n, SUM(CASE WHEN kind = 'cancel' AND reason = 'billing' THEN 1 ELSE 0 END) AS failures FROM subscription_events WHERE source = 'store' AND at > ?", [now - 7 * DAY]);
+  const [last] = await query<{ at: number | null; n: number }>(
+    "SELECT MAX(at) AS at, COUNT(*) AS n FROM subscription_events WHERE source = 'store'",
+  );
+  const [week] = await query<{ n: number; failures: number }>(
+    "SELECT COUNT(*) AS n, SUM(CASE WHEN kind = 'cancel' AND reason = 'billing' THEN 1 ELSE 0 END) AS failures FROM subscription_events WHERE source = 'store' AND at > ?",
+    [now - 7 * DAY],
+  );
   const at = last?.at == null ? null : Number(last.at);
   return {
     id: "billing",
     title,
     state: at == null ? "warn" : "ok",
-    summary: at == null ? "The webhook is set up, but no store event has arrived yet." : `${num(Number(week?.n ?? 0))} store events this week.`,
+    summary:
+      at == null ? "The webhook is set up, but no store event has arrived yet." : `${num(Number(week?.n ?? 0))} store events this week.`,
     rows: [
       ...(at ? [{ label: "Last store event", value: "", at }] : []),
       { label: "Store events, all time", value: num(Number(last?.n ?? 0)) },
-      { label: "Payment failures, last 7 days", value: num(Number(week?.failures ?? 0)), state: Number(week?.failures ?? 0) ? ("warn" as const) : ("ok" as const) },
+      {
+        label: "Payment failures, last 7 days",
+        value: num(Number(week?.failures ?? 0)),
+        state: Number(week?.failures ?? 0) ? ("warn" as const) : ("ok" as const),
+      },
     ],
     link,
   };
@@ -470,7 +672,13 @@ export function settingsCheck(): HealthCheck {
     rows.push({ label: "Site address format", value: problem ?? `Public address: ${new URL(site).host}`, state: problem ? "warn" : "ok" });
   }
   const missing = rows.filter((r) => r.state === "down").length;
-  return { id: "settings", title: "Settings", state: worst(rows.map((r) => r.state ?? "ok")), summary: missing ? `${plural(missing, "required setting")} missing.` : "Every required setting is present. Values are never shown.", rows };
+  return {
+    id: "settings",
+    title: "Settings",
+    state: worst(rows.map((r) => r.state ?? "ok")),
+    summary: missing ? `${plural(missing, "required setting")} missing.` : "Every required setting is present. Values are never shown.",
+    rows,
+  };
 }
 
 // ---------- Providers' status pages ----------
@@ -481,7 +689,9 @@ interface StatuspageSummary {
 }
 
 async function statuspage(name: string, url: string): Promise<StatusPage> {
-  const d = await getJson<StatuspageSummary>(name, `${url}/api/v2/summary.json`).catch(() => getJson<StatuspageSummary>(name, `${url}/api/v2/status.json`));
+  const d = await getJson<StatuspageSummary>(name, `${url}/api/v2/summary.json`).catch(() =>
+    getJson<StatuspageSummary>(name, `${url}/api/v2/status.json`),
+  );
   return {
     name,
     url,
@@ -496,7 +706,13 @@ async function statuspage(name: string, url: string): Promise<StatusPage> {
 async function tursoStatus(): Promise<StatusPage> {
   const d = await getJson<{ data?: { attributes?: { aggregate_state?: string } } }>("Turso", "https://status.turso.tech/index.json");
   const s = d.data?.attributes?.aggregate_state;
-  return { name: "Turso", url: "https://status.turso.tech", state: betterStackState(s), description: s ? s[0].toUpperCase() + s.slice(1) : "Unknown", incidents: [] };
+  return {
+    name: "Turso",
+    url: "https://status.turso.tech",
+    state: betterStackState(s),
+    description: s ? s[0].toUpperCase() + s.slice(1) : "Unknown",
+    incidents: [],
+  };
 }
 
 const STATUS_RUNNERS: Record<StatusPageName, () => Promise<StatusPage>> = {
@@ -510,7 +726,13 @@ const STATUS_RUNNERS: Record<StatusPageName, () => Promise<StatusPage>> = {
 /** One provider's status page; a page that can't be read is "worth a look", never an error. */
 async function readStatusPage(name: StatusPageName): Promise<StatusPage> {
   const url = STATUS_PAGES.find((p) => p.name === name)!.url;
-  return STATUS_RUNNERS[name]().catch((e: Error): StatusPage => ({ name, url, state: "warn", description: `Couldn't read the status page: ${e.message}`, incidents: [] }));
+  return STATUS_RUNNERS[name]().catch((e: Error): StatusPage => ({
+    name,
+    url,
+    state: "warn",
+    description: `Couldn't read the status page: ${e.message}`,
+    incidents: [],
+  }));
 }
 
 // ---------- One card at a time ----------

@@ -1,13 +1,30 @@
 "use client";
+
+import { useState } from "react";
+
 import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
-import { haptic } from "@/lib/juice";
-import { affects, DEFAULT_PCT, effectFor, injuries, LIGHT_PCTS, LOW_PAIN, PART_LABEL, painTrend, RETURN_PCTS, returnReady, STOP_PAIN, type Injury, type InjuryAction } from "@/lib/injury";
 import { date, list, t } from "@/lib/i18n";
+import {
+  affects,
+  DEFAULT_PCT,
+  effectFor,
+  injuries,
+  LIGHT_PCTS,
+  LOW_PAIN,
+  painTrend,
+  PART_LABEL,
+  RETURN_PCTS,
+  returnReady,
+  STOP_PAIN,
+  type Injury,
+  type InjuryAction,
+} from "@/lib/injury";
+import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
-import { useNow } from "@/lib/useNow";
 import { BODY_PARTS, type Gym } from "@/lib/types";
-import { useState } from "react";
+import { useNow } from "@/lib/useNow";
+
 import { go } from "./router";
 import { Button, Chip, Section, Sheet } from "./ui";
 
@@ -43,14 +60,33 @@ export function Injuries() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">{workout ? t("inj.backWorkout") : t("inj.backToday")}</button>
+      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">
+        {workout ? t("inj.backWorkout") : t("inj.backToday")}
+      </button>
       <h1 className="text-2xl font-bold">{t("inj.title")}</h1>
       <p className="mt-2 text-sm text-muted">{t("inj.intro")}</p>
       <p className="mt-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{notAdvice()}</p>
 
-      <Button className="mt-4 w-full" onClick={() => setAdding(true)}>{t("inj.log")}</Button>
+      <Button className="mt-4 w-full" onClick={() => setAdding(true)}>
+        {t("inj.log")}
+      </Button>
 
-      {active.map((inj) => gym && <InjuryCard key={inj.id} inj={inj} gym={gym} hurt={active} onChoose={choose} onHeal={() => setHealing(inj)} onReturn={() => setWarn({ injuryId: inj.id, name: t("inj.returnName", { part: lower(inj.part) }), action: "return", pct: RETURN_PCTS[0] })} />)}
+      {active.map(
+        (inj) =>
+          gym && (
+            <InjuryCard
+              key={inj.id}
+              inj={inj}
+              gym={gym}
+              hurt={active}
+              onChoose={choose}
+              onHeal={() => setHealing(inj)}
+              onReturn={() =>
+                setWarn({ injuryId: inj.id, name: t("inj.returnName", { part: lower(inj.part) }), action: "return", pct: RETURN_PCTS[0] })
+              }
+            />
+          ),
+      )}
       {!active.length && <p className="card mt-6 p-5 text-muted">{t("inj.none")}</p>}
 
       {past.length > 0 && (
@@ -90,10 +126,23 @@ export function Injuries() {
         <p className="mb-3 text-sm text-muted">{t("inj.rateBody")}</p>
         <div className="grid grid-cols-4 gap-2" role="group" aria-label={t("inj.rateGroup")}>
           {Array.from({ length: 11 }, (_, n) => (
-            <button key={n} type="button" onClick={() => { haptic("tick"); if (rating) ratePain(rating, n); setRating(null); }} className="press num min-h-12 rounded-xl border border-line bg-raised text-lg font-semibold">{n}</button>
+            <button
+              key={n}
+              type="button"
+              onClick={() => {
+                haptic("tick");
+                if (rating) ratePain(rating, n);
+                setRating(null);
+              }}
+              className="press num min-h-12 rounded-xl border border-line bg-raised text-lg font-semibold"
+            >
+              {n}
+            </button>
           ))}
         </div>
-        <Button kind="quiet" className="mt-3 w-full" onClick={() => setRating(null)}>{t("inj.skipNow")}</Button>
+        <Button kind="quiet" className="mt-3 w-full" onClick={() => setRating(null)}>
+          {t("inj.skipNow")}
+        </Button>
       </Sheet>
 
       <RiskSheet
@@ -104,7 +153,12 @@ export function Injuries() {
             startReturn(w.injuryId);
             return setWarn(null);
           }
-          setInjuryRule(w.injuryId, { exerciseId: w.exerciseId, action: w.action, pct: w.action === "light" ? w.pct : undefined, ack: true });
+          setInjuryRule(w.injuryId, {
+            exerciseId: w.exerciseId,
+            action: w.action,
+            pct: w.action === "light" ? w.pct : undefined,
+            ack: true,
+          });
           setWarn(null);
         }}
       />
@@ -113,15 +167,40 @@ export function Injuries() {
         <div className="space-y-3 text-sm">
           <p>{t("inj.healBody1")}</p>
           <p className="text-muted">{t("inj.healBody2", { tooHard: t("workout.tooHard") })}</p>
-          <Button className="w-full" onClick={() => { if (healing) healInjury(healing.id); setHealing(null); haptic("success"); }}>{t("inj.healYes")}</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setHealing(null)}>{t("inj.notYet")}</Button>
+          <Button
+            className="w-full"
+            onClick={() => {
+              if (healing) healInjury(healing.id);
+              setHealing(null);
+              haptic("success");
+            }}
+          >
+            {t("inj.healYes")}
+          </Button>
+          <Button kind="quiet" className="w-full" onClick={() => setHealing(null)}>
+            {t("inj.notYet")}
+          </Button>
         </div>
       </Sheet>
     </div>
   );
 }
 
-function InjuryCard({ inj, gym, hurt, onChoose, onHeal, onReturn }: { inj: Injury; gym: Gym; hurt: Injury[]; onChoose: (inj: Injury, a: InjuryAction, exerciseId: string | undefined, name: string, pct: number) => void; onHeal: () => void; onReturn: () => void }) {
+function InjuryCard({
+  inj,
+  gym,
+  hurt,
+  onChoose,
+  onHeal,
+  onReturn,
+}: {
+  inj: Injury;
+  gym: Gym;
+  hurt: Injury[];
+  onChoose: (inj: Injury, a: InjuryAction, exerciseId: string | undefined, name: string, pct: number) => void;
+  onHeal: () => void;
+  onReturn: () => void;
+}) {
   const [showAll, setShowAll] = useState(false);
   const affected = available(gym.equipment).filter((e) => affects(inj.part, e));
   const shown = showAll ? affected : affected.slice(0, 6);
@@ -137,54 +216,117 @@ function InjuryCard({ inj, gym, hurt, onChoose, onHeal, onReturn }: { inj: Injur
         <span className="num text-sm text-muted">{t("inj.since", { date: day(inj.since) })}</span>
       </div>
       <p className="mt-1 text-sm text-muted">
-        {t("inj.at", { gym: gym.name, counts: list([t("inj.nSkipped", { count: skipped }), ...(lighter ? [t("inj.nLighter", { count: lighter })] : []), ...(fine ? [t("inj.nFine", { count: fine })] : [])]) })}
+        {t("inj.at", {
+          gym: gym.name,
+          counts: list([
+            t("inj.nSkipped", { count: skipped }),
+            ...(lighter ? [t("inj.nLighter", { count: lighter })] : []),
+            ...(fine ? [t("inj.nFine", { count: fine })] : []),
+          ]),
+        })}
       </p>
 
       <PainBlock inj={inj} label={label} />
       <ReturnBlock inj={inj} label={label} onStart={onReturn} onHeal={onHeal} />
 
       <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("inj.allGroup", { part: label.toLocaleLowerCase() })}>
-        <Chip active={inj.all.action === "skip" && inj.rules.size === 0} onClick={() => onChoose(inj, "skip", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.pct)}>{t("inj.skipAll")}</Chip>
-        <Chip active={inj.all.action === "light" && inj.rules.size === 0} onClick={() => onChoose(inj, "light", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.action === "light" ? inj.all.pct : DEFAULT_PCT)}>{t("inj.lightAll")}</Chip>
+        <Chip
+          active={inj.all.action === "skip" && inj.rules.size === 0}
+          onClick={() => onChoose(inj, "skip", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.pct)}
+        >
+          {t("inj.skipAll")}
+        </Chip>
+        <Chip
+          active={inj.all.action === "light" && inj.rules.size === 0}
+          onClick={() =>
+            onChoose(
+              inj,
+              "light",
+              undefined,
+              t("inj.every", { part: label.toLocaleLowerCase() }),
+              inj.all.action === "light" ? inj.all.pct : DEFAULT_PCT,
+            )
+          }
+        >
+          {t("inj.lightAll")}
+        </Chip>
       </div>
       {inj.all.action === "light" && (
         <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("inj.share")}>
-          {LIGHT_PCTS.map((p) => <Chip key={p} active={inj.all.pct === p} onClick={() => onChoose(inj, "light", undefined, "", p)}>{p}%</Chip>)}
+          {LIGHT_PCTS.map((p) => (
+            <Chip key={p} active={inj.all.pct === p} onClick={() => onChoose(inj, "light", undefined, "", p)}>
+              {p}%
+            </Chip>
+          ))}
         </div>
       )}
 
       <ul className="mt-4 divide-y divide-line">
         {shown.map((e) => {
           const r = inj.rules.get(e.id) ?? inj.all;
-          const swaps = r.action === "skip" ? alternatives(e.id, gym, [], hurt).filter((a) => !effectFor(a, hurt)).slice(0, 2) : [];
+          const swaps =
+            r.action === "skip"
+              ? alternatives(e.id, gym, [], hurt)
+                  .filter((a) => !effectFor(a, hurt))
+                  .slice(0, 2)
+              : [];
           return (
             <li key={e.id} className="py-3">
               <div className="flex items-center justify-between gap-2">
                 <span className="min-w-0 font-medium">{e.name}</span>
-                <span className="shrink-0 text-xs text-muted">{r.action === "skip" ? (inj.returning && !inj.returning.stopped ? t("inj.returnPct", { pct: inj.returning.pct }) : t("inj.skipped")) : r.action === "light" ? t("inj.load", { pct: r.pct }) : t("inj.fine")}</span>
+                <span className="shrink-0 text-xs text-muted">
+                  {r.action === "skip"
+                    ? inj.returning && !inj.returning.stopped
+                      ? t("inj.returnPct", { pct: inj.returning.pct })
+                      : t("inj.skipped")
+                    : r.action === "light"
+                      ? t("inj.load", { pct: r.pct })
+                      : t("inj.fine")}
+                </span>
               </div>
-              <div className="mt-2 grid grid-cols-3 gap-2" role="group" aria-label={t("inj.exGroup", { name: e.name, part: label.toLocaleLowerCase() })}>
-                {([["skip", t("inj.act.skip")], ["light", t("inj.act.light")], ["ok", t("inj.act.ok")]] as const).map(([a, l]) => (
+              <div
+                className="mt-2 grid grid-cols-3 gap-2"
+                role="group"
+                aria-label={t("inj.exGroup", { name: e.name, part: label.toLocaleLowerCase() })}
+              >
+                {(
+                  [
+                    ["skip", t("inj.act.skip")],
+                    ["light", t("inj.act.light")],
+                    ["ok", t("inj.act.ok")],
+                  ] as const
+                ).map(([a, l]) => (
                   <button
                     key={a}
                     type="button"
                     aria-pressed={r.action === a}
-                    onClick={() => { haptic("tick"); onChoose(inj, a, e.id, e.name, r.action === "light" ? r.pct : inj.all.pct || DEFAULT_PCT); }}
+                    onClick={() => {
+                      haptic("tick");
+                      onChoose(inj, a, e.id, e.name, r.action === "light" ? r.pct : inj.all.pct || DEFAULT_PCT);
+                    }}
                     className={`press min-h-11 rounded-xl border text-sm ${r.action === a ? "border-accent bg-accent/10 font-semibold" : "border-line bg-surface text-muted"}`}
                   >
                     {l}
                   </button>
                 ))}
               </div>
-              {swaps.length > 0 && <p className="mt-2 text-sm text-muted">{t("inj.avoids", { names: swaps.map((s) => s.name).join(" · ") })}</p>}
+              {swaps.length > 0 && (
+                <p className="mt-2 text-sm text-muted">{t("inj.avoids", { names: swaps.map((s) => s.name).join(" · ") })}</p>
+              )}
             </li>
           );
         })}
       </ul>
-      {affected.length > shown.length && <Button kind="quiet" className="w-full" onClick={() => setShowAll(true)}>{t("inj.showAll", { count: affected.length })}</Button>}
+      {affected.length > shown.length && (
+        <Button kind="quiet" className="w-full" onClick={() => setShowAll(true)}>
+          {t("inj.showAll", { count: affected.length })}
+        </Button>
+      )}
       {!affected.length && <p className="mt-3 text-sm text-muted">{t("inj.nothingHere")}</p>}
 
-      <Button kind="ghost" className="mt-3 w-full" onClick={onHeal}>{t("inj.fullyHealed")}</Button>
+      <Button kind="ghost" className="mt-3 w-full" onClick={onHeal}>
+        {t("inj.fullyHealed")}
+      </Button>
     </section>
   );
 }
@@ -204,7 +346,16 @@ function RiskSheet({ warn, onClose, onConfirm }: { warn: Warn | null; onClose: (
     <Sheet open onClose={onClose} title={t("inj.risk.title")}>
       <div className="space-y-3 text-sm">
         {warn.action === "return" ? (
-          <p>{t("inj.risk.return", { name: warn.name, a: RETURN_PCTS[0], b: RETURN_PCTS[1], c: RETURN_PCTS[2], low: LOW_PAIN, stop: STOP_PAIN })}</p>
+          <p>
+            {t("inj.risk.return", {
+              name: warn.name,
+              a: RETURN_PCTS[0],
+              b: RETURN_PCTS[1],
+              c: RETURN_PCTS[2],
+              low: LOW_PAIN,
+              stop: STOP_PAIN,
+            })}
+          </p>
         ) : (
           <p>{t(warn.action === "light" ? "inj.risk.light" : "inj.risk.usual", { name: warn.name })}</p>
         )}
@@ -219,7 +370,11 @@ function RiskSheet({ warn, onClose, onConfirm }: { warn: Warn | null; onClose: (
           <div>
             <p className="mb-2 font-medium">{t("inj.share")}</p>
             <div className="flex flex-wrap gap-2" role="group" aria-label={t("inj.share")}>
-              {LIGHT_PCTS.map((p) => <Chip key={p} active={pct === p} onClick={() => setPct(p)}>{p}%</Chip>)}
+              {LIGHT_PCTS.map((p) => (
+                <Chip key={p} active={pct === p} onClick={() => setPct(p)}>
+                  {p}%
+                </Chip>
+              ))}
             </div>
           </div>
         )}
@@ -227,8 +382,16 @@ function RiskSheet({ warn, onClose, onConfirm }: { warn: Warn | null; onClose: (
           <input type="checkbox" checked={ok} onChange={(e) => setOk(e.target.checked)} className="h-5 w-5 accent-[var(--color-accent)]" />
           {t("inj.risk.ok")}
         </label>
-        <Button className="w-full" disabled={!ok} onClick={() => onConfirm({ ...warn, pct })}>{warn.action === "return" ? t("inj.risk.startReturn") : warn.action === "light" ? t(warn.exerciseId ? "inj.risk.itAt" : "inj.risk.themAt", { pct }) : t(warn.exerciseId ? "inj.risk.itUsual" : "inj.risk.themUsual")}</Button>
-        <Button kind="quiet" className="w-full" onClick={onClose}>{warn.exerciseId ? t("inj.risk.keepIt") : warn.action === "return" ? t("inj.notYet") : t("inj.risk.keepThem")}</Button>
+        <Button className="w-full" disabled={!ok} onClick={() => onConfirm({ ...warn, pct })}>
+          {warn.action === "return"
+            ? t("inj.risk.startReturn")
+            : warn.action === "light"
+              ? t(warn.exerciseId ? "inj.risk.itAt" : "inj.risk.themAt", { pct })
+              : t(warn.exerciseId ? "inj.risk.itUsual" : "inj.risk.themUsual")}
+        </Button>
+        <Button kind="quiet" className="w-full" onClick={onClose}>
+          {warn.exerciseId ? t("inj.risk.keepIt") : warn.action === "return" ? t("inj.notYet") : t("inj.risk.keepThem")}
+        </Button>
       </div>
     </Sheet>
   );
@@ -251,8 +414,14 @@ export function PainSelect({ label, onRate, className = "" }: { label: string; o
         }}
         className="num min-h-11 rounded-lg border border-line bg-surface px-2 text-ink"
       >
-        <option value="" disabled>0–10</option>
-        {Array.from({ length: 11 }, (_, n) => <option key={n} value={n}>{n === 0 ? t("inj.pain.none", { n }) : n === 10 ? t("inj.pain.worst", { n }) : n}</option>)}
+        <option value="" disabled>
+          0–10
+        </option>
+        {Array.from({ length: 11 }, (_, n) => (
+          <option key={n} value={n}>
+            {n === 0 ? t("inj.pain.none", { n }) : n === 10 ? t("inj.pain.worst", { n }) : n}
+          </option>
+        ))}
       </select>
     </label>
   );
@@ -268,7 +437,19 @@ function PainBlock({ inj, label }: { inj: Injury; label: string }) {
           <Sparkline points={trend.points} label={t("inj.pain.spark", { part: label, points: trend.points.join(", ") })} />
           <div className="shrink-0 text-right text-sm">
             <div className="num font-semibold">{t("inj.pain.now", { n: trend.latest ?? 0 })}</div>
-            {trend.change !== undefined && <div className={`text-xs ${trend.change < 0 ? "text-good" : trend.change > 0 ? "text-warn" : "text-muted"}`}>{t("inj.pain.over", { count: trend.points.length, change: trend.change < 0 ? t("inj.pain.down", { n: -trend.change }) : trend.change > 0 ? t("inj.pain.up", { n: trend.change }) : t("inj.pain.same") })}</div>}
+            {trend.change !== undefined && (
+              <div className={`text-xs ${trend.change < 0 ? "text-good" : trend.change > 0 ? "text-warn" : "text-muted"}`}>
+                {t("inj.pain.over", {
+                  count: trend.points.length,
+                  change:
+                    trend.change < 0
+                      ? t("inj.pain.down", { n: -trend.change })
+                      : trend.change > 0
+                        ? t("inj.pain.up", { n: trend.change })
+                        : t("inj.pain.same"),
+                })}
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -285,8 +466,16 @@ function Sparkline({ points, label }: { points: number[]; label: string }) {
   return (
     <svg role="img" aria-label={label} viewBox={`0 0 ${w} ${h}`} className="h-10 min-w-0 flex-1">
       <line x1="0" x2={w} y1={y(LOW_PAIN)} y2={y(LOW_PAIN)} stroke="var(--color-line)" strokeDasharray="3 3" />
-      <polyline fill="none" stroke="var(--color-warn)" strokeWidth="2" strokeLinejoin="round" points={points.map((v, i) => `${x(i)},${y(v)}`).join(" ")} />
-      {points.map((v, i) => <circle key={i} cx={x(i)} cy={y(v)} r="2.5" fill="var(--color-warn)" />)}
+      <polyline
+        fill="none"
+        stroke="var(--color-warn)"
+        strokeWidth="2"
+        strokeLinejoin="round"
+        points={points.map((v, i) => `${x(i)},${y(v)}`).join(" ")}
+      />
+      {points.map((v, i) => (
+        <circle key={i} cx={x(i)} cy={y(v)} r="2.5" fill="var(--color-warn)" />
+      ))}
     </svg>
   );
 }
@@ -303,7 +492,11 @@ function ReturnBlock({ inj, label, onStart, onHeal }: { inj: Injury; label: stri
             ? t("inj.ret.ready", { pct: RETURN_PCTS[2], part: label.toLocaleLowerCase() })
             : t("inj.ret.rules", { low: LOW_PAIN, a: LOW_PAIN + 1, b: STOP_PAIN - 1, stop: STOP_PAIN })}
         </p>
-        {r.readyToHeal && <Button kind="ghost" className="mt-2 w-full" onClick={onHeal}>{t("inj.ret.markHealed")}</Button>}
+        {r.readyToHeal && (
+          <Button kind="ghost" className="mt-2 w-full" onClick={onHeal}>
+            {t("inj.ret.markHealed")}
+          </Button>
+        )}
       </div>
     );
   }
@@ -311,10 +504,15 @@ function ReturnBlock({ inj, label, onStart, onHeal }: { inj: Injury; label: stri
     return (
       <div className="mt-3 rounded-xl border border-good/30 bg-good/10 p-3 text-sm">
         <p>{t(r?.stopped ? "inj.ret.lowSince" : "inj.ret.low", { low: LOW_PAIN })}</p>
-        <Button kind="ghost" className="mt-2 w-full" onClick={onStart}>{t("inj.ret.start")}</Button>
+        <Button kind="ghost" className="mt-2 w-full" onClick={onStart}>
+          {t("inj.ret.start")}
+        </Button>
       </div>
     );
   }
-  if (r?.stopped) return <p className="mt-3 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{t("inj.ret.stopped", { score: r.stopped.score })}</p>;
+  if (r?.stopped)
+    return (
+      <p className="mt-3 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{t("inj.ret.stopped", { score: r.stopped.score })}</p>
+    );
   return null;
 }

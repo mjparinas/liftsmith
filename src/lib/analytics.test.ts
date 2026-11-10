@@ -1,12 +1,31 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { analyticsOn, CONSENT_KEY, flushAnalytics, forgetAnalytics, fromUserAgent, ID_KEY, installId, needsOptIn, OUTBOX_KEY, queued, rememberFirstTouch, resetAnalyticsState, setAnalytics, track } from "./analytics";
+
+import {
+  analyticsOn,
+  CONSENT_KEY,
+  flushAnalytics,
+  forgetAnalytics,
+  fromUserAgent,
+  ID_KEY,
+  installId,
+  needsOptIn,
+  OUTBOX_KEY,
+  queued,
+  rememberFirstTouch,
+  resetAnalyticsState,
+  setAnalytics,
+  track,
+} from "./analytics";
 import { checkBatch, checkPageView, cleanProps, parsePlayReferrer, referrerHost, utmFrom } from "./analyticsSchema";
 
 type Calls = { mock: { calls: [string, RequestInit][] } };
 const ok = () => vi.fn(async () => new Response("{}", { status: 200 })) as unknown as typeof fetch;
 const status = (n: number) => vi.fn(async () => new Response("{}", { status: n })) as unknown as typeof fetch;
-const offline = () => vi.fn(async () => { throw new TypeError("Failed to fetch"); }) as unknown as typeof fetch;
+const offline = () =>
+  vi.fn(async () => {
+    throw new TypeError("Failed to fetch");
+  }) as unknown as typeof fetch;
 const body = (post: typeof fetch, i = 0) => JSON.parse((post as unknown as Calls).mock.calls[i][1].body as string);
 
 describe("usage analytics on the device", () => {
@@ -16,8 +35,10 @@ describe("usage analytics on the device", () => {
   });
 
   it("asks for consent first in the EU, EEA, UK and Switzerland only", () => {
-    for (const z of ["Europe/Paris", "Europe/London", "Europe/Zurich", "Atlantic/Reykjavik", "Europe/Dublin"]) expect(needsOptIn(z)).toBe(true);
-    for (const z of ["America/Toronto", "Asia/Manila", "Europe/Moscow", "Europe/Istanbul", "Australia/Sydney", ""]) expect(needsOptIn(z)).toBe(false);
+    for (const z of ["Europe/Paris", "Europe/London", "Europe/Zurich", "Atlantic/Reykjavik", "Europe/Dublin"])
+      expect(needsOptIn(z)).toBe(true);
+    for (const z of ["America/Toronto", "Asia/Manila", "Europe/Moscow", "Europe/Istanbul", "Australia/Sydney", ""])
+      expect(needsOptIn(z)).toBe(false);
   });
 
   it("follows the lifter's own choice over the default", () => {
@@ -79,14 +100,35 @@ describe("usage analytics on the device", () => {
 
   it("remembers the first website visit's source, and only the first", () => {
     setAnalytics(true);
-    rememberFirstTouch({ search: "?utm_source=reddit&utm_medium=social&utm_campaign=launch", pathname: "/exercises/back-squat/", hostname: "www.getliftsmith.com" }, "https://www.reddit.com/r/fitness");
+    rememberFirstTouch(
+      {
+        search: "?utm_source=reddit&utm_medium=social&utm_campaign=launch",
+        pathname: "/exercises/back-squat/",
+        hostname: "www.getliftsmith.com",
+      },
+      "https://www.reddit.com/r/fitness",
+    );
     rememberFirstTouch({ search: "?utm_source=other", pathname: "/", hostname: "www.getliftsmith.com" }, "");
-    expect(JSON.parse(localStorage.getItem("liftsmith.firstTouch")!)).toEqual({ landing: "/exercises/back-squat/", referrer: "reddit.com", source: "reddit", medium: "social", campaign: "launch" });
+    expect(JSON.parse(localStorage.getItem("liftsmith.firstTouch")!)).toEqual({
+      landing: "/exercises/back-squat/",
+      referrer: "reddit.com",
+      source: "reddit",
+      medium: "social",
+      campaign: "launch",
+    });
   });
 
   it("reads the OS and model from a browser's user agent", () => {
-    expect(fromUserAgent("Mozilla/5.0 (Linux; Android 15; Pixel 8 Build/AP3A) AppleWebKit/537.36 Chrome/130 Mobile")).toEqual({ os: "Android", osVersion: "15", model: "Pixel 8" });
-    expect(fromUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15")).toEqual({ os: "iOS", osVersion: "18.1", model: "iPhone" });
+    expect(fromUserAgent("Mozilla/5.0 (Linux; Android 15; Pixel 8 Build/AP3A) AppleWebKit/537.36 Chrome/130 Mobile")).toEqual({
+      os: "Android",
+      osVersion: "15",
+      model: "Pixel 8",
+    });
+    expect(fromUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15")).toEqual({
+      os: "iOS",
+      osVersion: "18.1",
+      model: "iPhone",
+    });
     expect(fromUserAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)").os).toBe("Windows");
   });
 });
@@ -96,10 +138,16 @@ describe("what the server accepts", () => {
   const now = Date.UTC(2026, 10, 9);
 
   it("drops unknown events and properties instead of storing them", () => {
-    const r = checkBatch({ context: { ...ctx, email: "x@y.z" }, events: [
-      { id: "e1aaaaaaaa", name: "workout_finish", at: now, props: { sets: 10, hrAvg: 150, notes: "hi" } },
-      { id: "e2aaaaaaaa", name: "heart_rate_sample", at: now, props: { bpm: 140 } },
-    ] }, now);
+    const r = checkBatch(
+      {
+        context: { ...ctx, email: "x@y.z" },
+        events: [
+          { id: "e1aaaaaaaa", name: "workout_finish", at: now, props: { sets: 10, hrAvg: 150, notes: "hi" } },
+          { id: "e2aaaaaaaa", name: "heart_rate_sample", at: now, props: { bpm: 140 } },
+        ],
+      },
+      now,
+    );
     expect(r.ok).toBe(true);
     if (!r.ok) return;
     expect(r.batch.events).toEqual([{ id: "e1aaaaaaaa", name: "workout_finish", at: now, props: { sets: 10 } }]);
@@ -113,10 +161,16 @@ describe("what the server accepts", () => {
   });
 
   it("ignores events from a clock far in the future or more than a year old", () => {
-    const r = checkBatch({ context: ctx, events: [
-      { id: "e3aaaaaaaa", name: "app_open", at: now + 3 * 86_400_000 },
-      { id: "e4aaaaaaaa", name: "app_open", at: now - 400 * 86_400_000 },
-    ] }, now);
+    const r = checkBatch(
+      {
+        context: ctx,
+        events: [
+          { id: "e3aaaaaaaa", name: "app_open", at: now + 3 * 86_400_000 },
+          { id: "e4aaaaaaaa", name: "app_open", at: now - 400 * 86_400_000 },
+        ],
+      },
+      now,
+    );
     expect(r.ok && r.batch.events.length).toBe(0);
   });
 
@@ -132,7 +186,11 @@ describe("what the server accepts", () => {
     expect(referrerHost("https://www.google.com/search?q=lift")).toBe("google.com");
     expect(referrerHost("https://www.getliftsmith.com/x", "www.getliftsmith.com")).toBeUndefined();
     expect(referrerHost("not a url")).toBeUndefined();
-    expect(parsePlayReferrer("utm_source=youtube&utm_medium=video&utm_campaign=launch")).toMatchObject({ source: "youtube", medium: "video", campaign: "launch" });
+    expect(parsePlayReferrer("utm_source=youtube&utm_medium=video&utm_campaign=launch")).toMatchObject({
+      source: "youtube",
+      medium: "video",
+      campaign: "launch",
+    });
     expect(parsePlayReferrer(undefined)).toEqual({});
   });
 

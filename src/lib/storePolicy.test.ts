@@ -4,6 +4,7 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+
 import { READ, WRITE } from "./health";
 import { CONTACT_EMAIL } from "./site";
 
@@ -37,7 +38,15 @@ describe("Play store policy config", () => {
 
   it("removes every other health permission the plugin adds", () => {
     const removed = tags.filter((m) => m[2].includes('tools:node="remove"')).map((m) => m[1]);
-    for (const p of ["READ_HEART_RATE", "READ_OXYGEN_SATURATION", "READ_BLOOD_PRESSURE", "READ_BLOOD_GLUCOSE", "READ_NUTRITION", "READ_EXERCISE", "WRITE_WEIGHT"]) {
+    for (const p of [
+      "READ_HEART_RATE",
+      "READ_OXYGEN_SATURATION",
+      "READ_BLOOD_PRESSURE",
+      "READ_BLOOD_GLUCOSE",
+      "READ_NUTRITION",
+      "READ_EXERCISE",
+      "WRITE_WEIGHT",
+    ]) {
       expect(removed).toContain(p);
     }
   });
@@ -50,7 +59,18 @@ describe("Play store policy config", () => {
     const page = readFileSync(join(root, "public/privacypolicy.html"), "utf8");
     expect(page).toContain("Limited Use");
     expect(page).toContain(CONTACT_EMAIL);
-    for (const t of ["weight", "height", "body fat", "resting heart rate", "sleep", "heart rate variability", "steps", "VO2 max", "respiratory rate"]) expect(page).toContain(t);
+    for (const t of [
+      "weight",
+      "height",
+      "body fat",
+      "resting heart rate",
+      "sleep",
+      "heart rate variability",
+      "steps",
+      "VO2 max",
+      "respiratory rate",
+    ])
+      expect(page).toContain(t);
     expect(page).not.toMatch(/blood|oxygen saturation|nutrition/i);
   });
 });

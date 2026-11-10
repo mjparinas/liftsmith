@@ -7,7 +7,7 @@
 // the trophy list) can crash the import; Vitest then reports a file error with no tests, which the
 // stock runner reads as "survived".
 import { declareFactoryPlugin, PluginKind } from "@stryker-mutator/api/plugin";
-import { DryRunStatus, determineHitLimitReached, TestStatus, toMutantRunResult } from "@stryker-mutator/api/test-runner";
+import { determineHitLimitReached, DryRunStatus, TestStatus, toMutantRunResult } from "@stryker-mutator/api/test-runner";
 import { strykerPlugins as vitestPlugins } from "@stryker-mutator/vitest-runner";
 
 const vitestFactory = vitestPlugins.find((plugin) => plugin.name === "vitest").factory;

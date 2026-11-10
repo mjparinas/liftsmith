@@ -1,13 +1,16 @@
 "use client";
+
+import { useMemo, useState } from "react";
+
 import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
+import { list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { missingFor, pickProgram, PROGRAM_BY_ID, PROGRAMS, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
-import { EQUIPMENT_LABEL, MUSCLES, MUSCLE_LABEL } from "@/lib/types";
-import { list, t } from "@/lib/i18n";
+import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
-import { useMemo, useState } from "react";
+
 import { go } from "./router";
 import { Button, Sheet } from "./ui";
 
@@ -36,32 +39,58 @@ export function Programs() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">{t("train.back")}</button>
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
+        {t("train.back")}
+      </button>
       <h1 className="text-2xl font-bold">{t("prog.title")}</h1>
       <p className="mt-1 text-sm text-muted">{t("prog.intro")}</p>
 
       <ul className="mt-4 space-y-3">
         <li>
-          <button type="button" onClick={() => choose(null)} aria-pressed={!currentId} className={`press card w-full p-4 text-left ${!currentId ? "border-accent" : ""}`}>
+          <button
+            type="button"
+            onClick={() => choose(null)}
+            aria-pressed={!currentId}
+            className={`press card w-full p-4 text-left ${!currentId ? "border-accent" : ""}`}
+          >
             <div className="flex items-center justify-between gap-2">
               <span className="font-semibold">{t("prog.adaptive")}</span>
-              {!currentId && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>}
-              {!can("adaptive") && <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>}
+              {!currentId && (
+                <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>
+              )}
+              {!can("adaptive") && (
+                <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>
+              )}
             </div>
             <p className="mt-1 text-sm text-muted">{t("prog.adaptiveBlurb")}</p>
           </button>
         </li>
         {PROGRAMS.map((p) => (
           <li key={p.id}>
-            <button type="button" onClick={() => { haptic("tick"); setOpen(p); }} className={`press card w-full p-4 text-left ${currentId === p.id ? "border-accent" : ""}`}>
+            <button
+              type="button"
+              onClick={() => {
+                haptic("tick");
+                setOpen(p);
+              }}
+              className={`press card w-full p-4 text-left ${currentId === p.id ? "border-accent" : ""}`}
+            >
               <div className="flex items-center justify-between gap-2">
                 <span className="font-semibold">{p.name}</span>
                 <span className="flex shrink-0 gap-1.5">
-                  {currentId === p.id && <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>}
-                  <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${p.tier === "pro" ? "bg-warn/15 text-warn" : "bg-raised text-muted"}`}>{p.tier === "pro" ? t("prog.pro") : t("prog.free")}</span>
+                  {currentId === p.id && (
+                    <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>
+                  )}
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${p.tier === "pro" ? "bg-warn/15 text-warn" : "bg-raised text-muted"}`}
+                  >
+                    {p.tier === "pro" ? t("prog.pro") : t("prog.free")}
+                  </span>
                 </span>
               </div>
-              <p className="mt-0.5 text-xs text-faint">{level(p.level)} · {t("prog.perWeek", { count: p.daysPerWeek })} · {t("prog.aka", { name: p.aka[0] })}</p>
+              <p className="mt-0.5 text-xs text-faint">
+                {level(p.level)} · {t("prog.perWeek", { count: p.daysPerWeek })} · {t("prog.aka", { name: p.aka[0] })}
+              </p>
               <p className="mt-1 text-sm text-muted">{p.summary}</p>
             </button>
           </li>
@@ -89,11 +118,16 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
       <p className="text-muted">{p.summary}</p>
       <ol className="space-y-2 text-sm">
         {p.how.map((h, i) => (
-          <li key={h} className="flex gap-3"><span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">{i + 1}</span>{h}</li>
+          <li key={h} className="flex gap-3">
+            <span className="num grid h-6 w-6 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">{i + 1}</span>
+            {h}
+          </li>
         ))}
       </ol>
       {missing.length > 0 && (
-        <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">{t("prog.needs", { items: list(missing.map((e) => EQUIPMENT_LABEL[e].toLocaleLowerCase())) })}</p>
+        <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">
+          {t("prog.needs", { items: list(missing.map((e) => EQUIPMENT_LABEL[e].toLocaleLowerCase())) })}
+        </p>
       )}
       <div>
         <h3 className="text-sm font-semibold text-muted">{t("prog.week")}</h3>
@@ -107,8 +141,12 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
           ))}
         </ul>
       </div>
-      <p className="text-xs text-faint">{p.basedOn} {t("prog.owners")}</p>
-      <Button className="w-full" onClick={onStart}>{!allowed ? t("prog.unlock") : current ? t("prog.restart") : t("prog.start")}</Button>
+      <p className="text-xs text-faint">
+        {p.basedOn} {t("prog.owners")}
+      </p>
+      <Button className="w-full" onClick={onStart}>
+        {!allowed ? t("prog.unlock") : current ? t("prog.restart") : t("prog.start")}
+      </Button>
     </div>
   );
 }

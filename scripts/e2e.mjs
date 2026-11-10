@@ -2,6 +2,7 @@
 //   npm run build:static && node scripts/e2e.mjs [base-url] [out-dir]
 //   DEVICE="iPhone 16" runs it on another device from scripts/devices.mjs (default Pixel 7)
 import fs from "node:fs";
+
 import { closeAll, open } from "./devices.mjs";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
 

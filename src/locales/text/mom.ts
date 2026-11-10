@@ -31,7 +31,8 @@ export const es: Partial<Record<Key, Message>> = {
   "mom.anniv": { one: "{count} año desde tu primer entrenamiento", other: "{count} años desde tu primer entrenamiento" },
   "mom.annivBody": "{workouts} entrenamientos y {sets} series desde entonces. Feliz aniversario.",
   "mom.back": "Bienvenido de nuevo",
-  "mom.backBody": "Han pasado {time}. El plan de hoy te ayuda a volver poco a poco, y tu racha empieza de nuevo esta semana. No hace falta recuperar nada.",
+  "mom.backBody":
+    "Han pasado {time}. El plan de hoy te ayuda a volver poco a poco, y tu racha empieza de nuevo esta semana. No hace falta recuperar nada.",
   "mom.count": "Entrenamiento número {n}",
   "mom.count100": "Tres cifras. Eso ya es un hábito para toda la vida.",
   "mom.countBody": "Cada uno contó.",

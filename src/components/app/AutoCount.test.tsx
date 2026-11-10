@@ -4,9 +4,11 @@
 import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { cacheFlags, FLAG_CACHE_KEY } from "@/lib/flags";
 import { imuSamples, simulateSet } from "@/lib/reps/simulate";
 import type { MotionReading } from "@/lib/reps/sources";
+
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 
 const motion: { cb?: (r: MotionReading) => void } = {};
@@ -92,7 +94,8 @@ describe("the counting stage", () => {
     expect(motion.cb).toBeDefined();
     const sim = simulateSet(["full", "full", "full"], 11);
     act(() => {
-      for (const x of imuSamples(sim, 12, { romM: 0.5, downFirst: true })) motion.cb!({ t: x.t, fused: { up: x.up, rot: x.rot }, raw: [x.x, x.y, x.z] });
+      for (const x of imuSamples(sim, 12, { romM: 0.5, downFirst: true }))
+        motion.cb!({ t: x.t, fused: { up: x.up, rot: x.rot }, raw: [x.x, x.y, x.z] });
     });
     expect(props.onCount).toHaveBeenLastCalledWith(3);
     expect(screen.getByText("3")).toBeInTheDocument();
@@ -105,7 +108,8 @@ describe("the counting stage", () => {
     await act(async () => {});
     const sim = simulateSet(["full", "full"], 11);
     act(() => {
-      for (const x of imuSamples(sim, 12, { romM: 0.5, downFirst: true })) motion.cb!({ t: x.t, fused: { up: x.up, rot: x.rot }, raw: [x.x, x.y, x.z] });
+      for (const x of imuSamples(sim, 12, { romM: 0.5, downFirst: true }))
+        motion.cb!({ t: x.t, fused: { up: x.up, rot: x.rot }, raw: [x.x, x.y, x.z] });
     });
     expect(props.onCount).not.toHaveBeenCalled();
     expect(screen.getByRole("status")).toHaveTextContent("Resting");

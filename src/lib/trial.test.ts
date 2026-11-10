@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { cacheFlags, flag, FLAG_CACHE_KEY, variant } from "./flags";
 import { declineTrial, startTrial, trialDaysLeft } from "./trial";
 

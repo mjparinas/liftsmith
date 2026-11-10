@@ -103,7 +103,10 @@ async function render(html, out, { width, height, scale = 1 }) {
 
 const n = (i) => String(i + 1).padStart(2, "0");
 for (const [i, [name, title, sub, pos]] of PHONE_SHOTS.entries()) {
-  await render(frameHtml(url(`${RAW}/${name}.png`), title, sub, { pos }), `${ROOT}/phone/${n(i)}-${name}.jpg`, { width: 1080, height: 1920 });
+  await render(frameHtml(url(`${RAW}/${name}.png`), title, sub, { pos }), `${ROOT}/phone/${n(i)}-${name}.jpg`, {
+    width: 1080,
+    height: 1920,
+  });
 }
 for (const [i, [name, title, sub]] of TABLET_SHOTS.entries()) {
   const html = frameHtml(url(`${RAW}/${name}.png`), title, sub, { tablet: true });
@@ -112,5 +115,8 @@ for (const [i, [name, title, sub]] of TABLET_SHOTS.entries()) {
   await render(html, `${ROOT}/tablet-10/${n(i)}-${base}.jpg`, { width: 1080, height: 1920, scale: 4 / 3 });
 }
 const icon = fs.existsSync(`${ROOT}/icon-512.png`) ? `${ROOT}/icon-512.png` : "public/icon.svg";
-await render(featureHtml(url(icon), [url(`${RAW}/today.png`), url(`${RAW}/workout.png`)]), `${ROOT}/feature-graphic.png`, { width: 1024, height: 500 });
+await render(featureHtml(url(icon), [url(`${RAW}/today.png`), url(`${RAW}/workout.png`)]), `${ROOT}/feature-graphic.png`, {
+  width: 1024,
+  height: 500,
+});
 await browser.close();

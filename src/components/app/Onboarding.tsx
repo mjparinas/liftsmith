@@ -1,33 +1,59 @@
 "use client";
-import { t } from "@/lib/i18n";
-import { Mascot } from "./Mascot";
+
+import { useEffect, useState } from "react";
+
 import { Info } from "@/components/Info";
+import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
+import { billingLive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
-import { haptic } from "@/lib/juice";
-import { useApp } from "@/lib/store";
 import { flag } from "@/lib/flags";
+import { connectHealth, healthAvailable, readHints } from "@/lib/health";
+import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
+import { t } from "@/lib/i18n";
+import { haptic } from "@/lib/juice";
+import { epley, KNOWN_LIFTS } from "@/lib/progression";
+import { keepStorage } from "@/lib/saving";
+import { notifyPermission } from "@/lib/sessionNotify";
+import { useApp } from "@/lib/store";
 import { declineTrial, startTrial } from "@/lib/trial";
-import { billingLive, useBilling } from "@/lib/billing";
-import { Plans, ProFeatures } from "./Pro";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
-import { epley, KNOWN_LIFTS } from "@/lib/progression";
-import { useEffect, useState } from "react";
-import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
-import { connectHealth, healthAvailable, readHints } from "@/lib/health";
-import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
-import { notifyPermission } from "@/lib/sessionNotify";
-import { keepStorage } from "@/lib/saving";
-import { SaveStep } from "./Saving";
-import { go } from "./router";
-import { BumpField, Button, Sheet } from "./ui";
+
 import { AccountPanel } from "./Account";
+import { Mascot } from "./Mascot";
+import { Plans, ProFeatures } from "./Pro";
+import { go } from "./router";
+import { SaveStep } from "./Saving";
+import { BumpField, Button, Sheet } from "./ui";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
   return (
-    <button type="button" aria-pressed={active} onClick={() => { haptic("tick"); onClick(); }} className={`press relative w-full rounded-2xl border p-4 text-left ${active ? "border-accent/70 bg-accent/12 shadow-[0_0_0_3px_rgb(76_141_255/0.14),0_10px_30px_-14px_rgb(76_141_255/0.7)]" : "border-line bg-surface hover:border-accent/30"}`}>
-      {active && <span className="btn-primary absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full" aria-hidden><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg></span>}
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={() => {
+        haptic("tick");
+        onClick();
+      }}
+      className={`press relative w-full rounded-2xl border p-4 text-left ${active ? "border-accent/70 bg-accent/12 shadow-[0_0_0_3px_rgb(76_141_255/0.14),0_10px_30px_-14px_rgb(76_141_255/0.7)]" : "border-line bg-surface hover:border-accent/30"}`}
+    >
+      {active && (
+        <span className="btn-primary absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full" aria-hidden>
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="3.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M5 12.5l4.5 4.5L19 7.5" />
+          </svg>
+        </span>
+      )}
       <div className="pr-6 font-semibold">{title}</div>
       {blurb && <div className="mt-0.5 text-sm text-muted">{blurb}</div>}
     </button>
@@ -35,27 +61,106 @@ function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string
 }
 
 const GOALS: { id: Goal; title: string; blurb: string }[] = [
-  { id: "muscle", get title() { return t("goal.muscle"); }, get blurb() { return t("setup.goal.muscle.blurb"); } },
-  { id: "strength", get title() { return t("goal.strength"); }, get blurb() { return t("setup.goal.strength.blurb"); } },
-  { id: "general", get title() { return t("goal.general"); }, get blurb() { return t("setup.goal.general.blurb"); } },
+  {
+    id: "muscle",
+    get title() {
+      return t("goal.muscle");
+    },
+    get blurb() {
+      return t("setup.goal.muscle.blurb");
+    },
+  },
+  {
+    id: "strength",
+    get title() {
+      return t("goal.strength");
+    },
+    get blurb() {
+      return t("setup.goal.strength.blurb");
+    },
+  },
+  {
+    id: "general",
+    get title() {
+      return t("goal.general");
+    },
+    get blurb() {
+      return t("setup.goal.general.blurb");
+    },
+  },
 ];
 const LEVELS: { id: Experience; title: string; blurb: string }[] = [
-  { id: "new", get title() { return t("setup.exp.new"); }, get blurb() { return t("setup.exp.new.blurb"); } },
-  { id: "intermediate", get title() { return t("setup.exp.intermediate"); }, get blurb() { return t("setup.exp.intermediate.blurb"); } },
-  { id: "advanced", get title() { return t("exp.advanced"); }, get blurb() { return t("setup.exp.advanced.blurb"); } },
+  {
+    id: "new",
+    get title() {
+      return t("setup.exp.new");
+    },
+    get blurb() {
+      return t("setup.exp.new.blurb");
+    },
+  },
+  {
+    id: "intermediate",
+    get title() {
+      return t("setup.exp.intermediate");
+    },
+    get blurb() {
+      return t("setup.exp.intermediate.blurb");
+    },
+  },
+  {
+    id: "advanced",
+    get title() {
+      return t("exp.advanced");
+    },
+    get blurb() {
+      return t("setup.exp.advanced.blurb");
+    },
+  },
 ];
 
-const STEP_NAMES = ["Goal and experience", "Gym and units", "Days and body weight", "Notifications and heart rate", "Save your progress", "Pro trial offer"];
+const STEP_NAMES = [
+  "Goal and experience",
+  "Gym and units",
+  "Days and body weight",
+  "Notifications and heart rate",
+  "Save your progress",
+  "Pro trial offer",
+];
 
 const KNOWN = [
-  { id: KNOWN_LIFTS.squat, get name() { return t("setup.knownSquat"); } },
-  { id: KNOWN_LIFTS.hpush, get name() { return t("setup.knownBench"); } },
-  { id: KNOWN_LIFTS.hinge, get name() { return t("setup.knownDeadlift"); } },
-  { id: KNOWN_LIFTS.vpush, get name() { return t("setup.knownPress"); } },
+  {
+    id: KNOWN_LIFTS.squat,
+    get name() {
+      return t("setup.knownSquat");
+    },
+  },
+  {
+    id: KNOWN_LIFTS.hpush,
+    get name() {
+      return t("setup.knownBench");
+    },
+  },
+  {
+    id: KNOWN_LIFTS.hinge,
+    get name() {
+      return t("setup.knownDeadlift");
+    },
+  },
+  {
+    id: KNOWN_LIFTS.vpush,
+    get name() {
+      return t("setup.knownPress");
+    },
+  },
 ];
 
 /** Turns "weight × reps" entries into estimated one-rep maxes in kg. Blank entries keep what was saved. */
-export function knownMaxes(entries: Record<string, { w: string; r: string }>, unit: Unit, prev?: Profile["knownMaxes"]): Profile["knownMaxes"] {
+export function knownMaxes(
+  entries: Record<string, { w: string; r: string }>,
+  unit: Unit,
+  prev?: Profile["knownMaxes"],
+): Profile["knownMaxes"] {
   const out = { ...(prev ?? {}) };
   for (const [id, { w, r }] of Object.entries(entries)) {
     const weight = Number(w);
@@ -95,7 +200,12 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [maxesOpen, setMaxesOpen] = useState(false);
   // Known lifts as weight × reps, in the lifter's unit.
   const [maxes, setMaxes] = useState<Record<string, { w: string; r: string }>>(() =>
-    Object.fromEntries(KNOWN.map((k) => [k.id, { w: profile.knownMaxes?.[k.id] ? String(Math.round(fromKg(profile.knownMaxes[k.id]!, profile.unit))) : "", r: "1" }])),
+    Object.fromEntries(
+      KNOWN.map((k) => [
+        k.id,
+        { w: profile.knownMaxes?.[k.id] ? String(Math.round(fromKg(profile.knownMaxes[k.id]!, profile.unit))) : "", r: "1" },
+      ]),
+    ),
   );
   const [canHealth, setCanHealth] = useState(false);
   const [healthNote, setHealthNote] = useState<string | null>(null);
@@ -141,7 +251,15 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     setAnalytics(stats);
     // In a browser, ask it to keep this site's storage, so the workouts saved here aren't cleared (saving.ts).
     void keepStorage();
-    track("onboarding_complete", { rerun, goal, experience: exp, days, preset: keepGyms ? "kept" : preset, unit, healthPrefill: prefilled });
+    track("onboarding_complete", {
+      rerun,
+      goal,
+      experience: exp,
+      days,
+      preset: keepGyms ? "kept" : preset,
+      unit,
+      healthPrefill: prefilled,
+    });
     haptic("success");
     if (rerun) go("today");
   };
@@ -150,7 +268,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="mt-6 flex gap-1.5" aria-hidden>
         {Array.from({ length: STEPS }, (_, i) => (
-          <div key={i} className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i <= step ? "bg-gradient-to-r from-accent to-accent-2" : "bg-line"}`} />
+          <div
+            key={i}
+            className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i <= step ? "bg-gradient-to-r from-accent to-accent-2" : "bg-line"}`}
+          />
         ))}
       </div>
       <div key={step} className="animate-rise flex-1 py-8">
@@ -163,14 +284,36 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{t("setup.goal.title")}</h1>
               </div>
             </div>
-            <div className="mt-6 space-y-3">{GOALS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />)}</div>
+            <div className="mt-6 space-y-3">
+              {GOALS.map((g) => (
+                <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />
+              ))}
+            </div>
             <h2 className="mt-8 text-lg font-semibold">{t("setup.exp.title")}</h2>
-            <div className="mt-3 space-y-3">{LEVELS.map((g) => <Tile key={g.id} title={g.title} blurb={g.blurb} active={exp === g.id} onClick={() => setExp(g.id)} />)}</div>
-            <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">{t("setup.name.title")}</label>
+            <div className="mt-3 space-y-3">
+              {LEVELS.map((g) => (
+                <Tile key={g.id} title={g.title} blurb={g.blurb} active={exp === g.id} onClick={() => setExp(g.id)} />
+              ))}
+            </div>
+            <label htmlFor="setup-name" className="mt-8 block text-lg font-semibold">
+              {t("setup.name.title")}
+            </label>
             <p className="text-sm text-muted">{t("setup.name.note")}</p>
-            <input id="setup-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="given-name" placeholder={t("setup.name.placeholder")} maxLength={40} className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none" />
+            <input
+              id="setup-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoComplete="given-name"
+              placeholder={t("setup.name.placeholder")}
+              maxLength={40}
+              className="mt-3 w-full rounded-2xl border border-line bg-surface px-4 py-3 text-lg focus:border-accent/70 focus:outline-none"
+            />
             {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
-            {!rerun && <Button kind="quiet" className="mt-6 w-full" onClick={() => setSignIn(true)}>{t("account.setup")}</Button>}
+            {!rerun && (
+              <Button kind="quiet" className="mt-6 w-full" onClick={() => setSignIn(true)}>
+                {t("account.setup")}
+              </Button>
+            )}
             <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
               <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
               <AccountPanel onSignedIn={() => setSignIn(false)} />
@@ -182,12 +325,40 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.gym.title")}</h1>
             <p className="mt-2 text-muted">{t("setup.gym.note")}</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
-              {rerun && gyms.length > 0 && <Tile title={t("setup.gym.keep")} blurb={gyms.map((g) => g.name).join(", ")} active={keepGyms} onClick={() => setKeepGyms(true)} />}
-              {PRESETS.map((p) => <Tile key={p.id} title={rerun ? t("setup.gym.add", { name: p.name }) : p.name} blurb={p.blurb} active={!keepGyms && preset === p.id} onClick={() => { setKeepGyms(false); setPreset(p.id); }} />)}
+              {rerun && gyms.length > 0 && (
+                <Tile
+                  title={t("setup.gym.keep")}
+                  blurb={gyms.map((g) => g.name).join(", ")}
+                  active={keepGyms}
+                  onClick={() => setKeepGyms(true)}
+                />
+              )}
+              {PRESETS.map((p) => (
+                <Tile
+                  key={p.id}
+                  title={rerun ? t("setup.gym.add", { name: p.name }) : p.name}
+                  blurb={p.blurb}
+                  active={!keepGyms && preset === p.id}
+                  onClick={() => {
+                    setKeepGyms(false);
+                    setPreset(p.id);
+                  }}
+                />
+              ))}
             </div>
             <h2 className="mt-8 text-lg font-semibold">{t("setup.plates")}</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">
-              {(["kg", "lb"] as Unit[]).map((u) => <Tile key={u} title={u === "kg" ? t("units.kg") : t("units.lb")} active={unit === u} onClick={() => { setUnit(u); setBw(Math.round(fromKg(toKg(bw, unit), u))); }} />)}
+              {(["kg", "lb"] as Unit[]).map((u) => (
+                <Tile
+                  key={u}
+                  title={u === "kg" ? t("units.kg") : t("units.lb")}
+                  active={unit === u}
+                  onClick={() => {
+                    setUnit(u);
+                    setBw(Math.round(fromKg(toKg(bw, unit), u)));
+                  }}
+                />
+              ))}
             </div>
           </>
         )}
@@ -196,36 +367,92 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.days.title")}</h1>
             <div className="mt-6 grid grid-cols-6 gap-2">
               {[1, 2, 3, 4, 5, 6].map((d) => (
-                <button key={d} type="button" aria-pressed={days === d} onClick={() => { haptic("tick"); setDays(d); }} className={`press num aspect-square rounded-2xl border text-xl font-bold ${days === d ? "btn-primary border-transparent" : "border-line bg-surface"}`}>{d}</button>
+                <button
+                  key={d}
+                  type="button"
+                  aria-pressed={days === d}
+                  onClick={() => {
+                    haptic("tick");
+                    setDays(d);
+                  }}
+                  className={`press num aspect-square rounded-2xl border text-xl font-bold ${days === d ? "btn-primary border-transparent" : "border-line bg-surface"}`}
+                >
+                  {d}
+                </button>
               ))}
             </div>
             <p className="mt-2 text-sm text-muted">{t("setup.days.note")}</p>
             <h2 className="mt-8 text-lg font-semibold">{t("setup.bw.title")}</h2>
-            <p className="text-sm text-muted">{t("setup.bw.note")}<Info term="firstWeights" /></p>
+            <p className="text-sm text-muted">
+              {t("setup.bw.note")}
+              <Info term="firstWeights" />
+            </p>
             {canHealth && (
-              <button type="button" onClick={fillFromHealth} className="press mt-3 min-h-11 rounded-2xl border border-line bg-surface px-4 text-sm font-semibold">
+              <button
+                type="button"
+                onClick={fillFromHealth}
+                className="press mt-3 min-h-11 rounded-2xl border border-line bg-surface px-4 text-sm font-semibold"
+              >
                 {t("setup.health.fill", { source: /iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect" })}
               </button>
             )}
             {healthNote && <p className="mt-2 text-sm text-muted">{healthNote}</p>}
             <div className="mt-3 flex items-center gap-3">
-              <BumpField value={bw ? String(bw) : ""} onChange={(v) => setBw(Number(v) || 0)} step={1} start={unit === "lb" ? 170 : 75} max={unit === "lb" ? 700 : 320} label={t("settings.bodyweight.label")} size="lg" className="w-56" />
+              <BumpField
+                value={bw ? String(bw) : ""}
+                onChange={(v) => setBw(Number(v) || 0)}
+                step={1}
+                start={unit === "lb" ? 170 : 75}
+                max={unit === "lb" ? 700 : 320}
+                label={t("settings.bodyweight.label")}
+                size="lg"
+                className="w-56"
+              />
               <span className="text-muted">{unit}</span>
             </div>
             <div className="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-3">
-              <label htmlFor="setup-age" className="font-semibold">{t("setup.age")}</label>
-              <BumpField id="setup-age" label={t("setup.age")} placeholder={t("settings.optional")} value={age} onChange={(v) => setAge(v.slice(0, 3))} step={1} start={30} min={13} max={110} className="w-48" />
-              <span className="font-semibold" id="setup-sex">{t("setup.sex")}</span>
+              <label htmlFor="setup-age" className="font-semibold">
+                {t("setup.age")}
+              </label>
+              <BumpField
+                id="setup-age"
+                label={t("setup.age")}
+                placeholder={t("settings.optional")}
+                value={age}
+                onChange={(v) => setAge(v.slice(0, 3))}
+                step={1}
+                start={30}
+                min={13}
+                max={110}
+                className="w-48"
+              />
+              <span className="font-semibold" id="setup-sex">
+                {t("setup.sex")}
+              </span>
               <div className="flex gap-2" role="group" aria-labelledby="setup-sex">
                 {(["female", "male"] as const).map((x) => (
-                  <button key={x} type="button" aria-pressed={sex === x} onClick={() => { haptic("tick"); setSex(sex === x ? undefined : x); }} className={`press min-h-11 rounded-2xl border px-4 text-sm font-semibold ${sex === x ? "border-accent bg-accent/10" : "border-line bg-surface"}`}>
+                  <button
+                    key={x}
+                    type="button"
+                    aria-pressed={sex === x}
+                    onClick={() => {
+                      haptic("tick");
+                      setSex(sex === x ? undefined : x);
+                    }}
+                    className={`press min-h-11 rounded-2xl border px-4 text-sm font-semibold ${sex === x ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
+                  >
                     {x === "female" ? t("setup.female") : t("setup.male")}
                   </button>
                 ))}
               </div>
             </div>
             <p className="mt-2 text-sm text-muted">{t("setup.ageSex.note")}</p>
-            <button type="button" aria-expanded={maxesOpen} onClick={() => setMaxesOpen(!maxesOpen)} className="press mt-5 min-h-11 text-sm font-semibold text-accent">
+            <button
+              type="button"
+              aria-expanded={maxesOpen}
+              onClick={() => setMaxesOpen(!maxesOpen)}
+              className="press mt-5 min-h-11 text-sm font-semibold text-accent"
+            >
               {maxesOpen ? t("setup.maxes.hide") : t("setup.maxes.show")}
             </button>
             {maxesOpen && (
@@ -235,10 +462,28 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                   <div key={k.id}>
                     <span className="text-sm font-medium">{k.name}</span>
                     <div className="mt-1 grid grid-cols-[1fr_auto] items-center gap-x-2 gap-y-1.5">
-                    <BumpField label={t("setup.maxes.weight", { lift: k.name })} placeholder={unit} value={maxes[k.id].w} onChange={(w) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w } })} step={unit === "lb" ? 5 : 2.5} start={unit === "lb" ? 135 : 60} max={unit === "lb" ? 1500 : 700} className="min-w-0" />
-                    <span className="text-sm text-muted">{unit}</span>
-                    <BumpField label={t("setup.maxes.reps", { lift: k.name })} value={maxes[k.id].r} onChange={(r) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: r.slice(0, 2) } })} step={1} start={5} min={1} max={30} className="min-w-0" />
-                    <span className="text-sm text-muted">{t("workout.reps")}</span>
+                      <BumpField
+                        label={t("setup.maxes.weight", { lift: k.name })}
+                        placeholder={unit}
+                        value={maxes[k.id].w}
+                        onChange={(w) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], w } })}
+                        step={unit === "lb" ? 5 : 2.5}
+                        start={unit === "lb" ? 135 : 60}
+                        max={unit === "lb" ? 1500 : 700}
+                        className="min-w-0"
+                      />
+                      <span className="text-sm text-muted">{unit}</span>
+                      <BumpField
+                        label={t("setup.maxes.reps", { lift: k.name })}
+                        value={maxes[k.id].r}
+                        onChange={(r) => setMaxes({ ...maxes, [k.id]: { ...maxes[k.id], r: r.slice(0, 2) } })}
+                        step={1}
+                        start={5}
+                        min={1}
+                        max={30}
+                        className="min-w-0"
+                      />
+                      <span className="text-sm text-muted">{t("workout.reps")}</span>
                     </div>
                   </div>
                 ))}
@@ -271,7 +516,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                     setHrBusy(true);
                     setHrError(null);
                     try {
-                      const c = await connectHeartRate(() => {}, () => {});
+                      const c = await connectHeartRate(
+                        () => {},
+                        () => {},
+                      );
                       setHr(c.name);
                       track("feature", { name: "heart_rate", detail: "setup" });
                       c.disconnect();
@@ -284,10 +532,19 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 />
               )}
             </div>
-            {hrError && <p className="mt-3 text-sm text-warn" role="alert">{hrError}</p>}
+            {hrError && (
+              <p className="mt-3 text-sm text-warn" role="alert">
+                {hrError}
+              </p>
+            )}
             {notify === false && <p className="mt-3 text-sm text-warn">{t("setup.notify.blocked")}</p>}
             <label className="card mt-3 flex items-start gap-3 p-4">
-              <input type="checkbox" className="mt-1 h-5 w-5 accent-[var(--color-accent)]" checked={stats} onChange={(e) => setStats(e.target.checked)} />
+              <input
+                type="checkbox"
+                className="mt-1 h-5 w-5 accent-[var(--color-accent)]"
+                checked={stats}
+                onChange={(e) => setStats(e.target.checked)}
+              />
               <span>
                 <span className="block font-semibold">{t("setup.stats.title")}</span>
                 <span className="block text-sm text-muted">{t("setup.stats.note")}</span>
@@ -298,7 +555,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         {step === 4 && <SaveStep />}
         {step === PRO_STEP && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">
+              {offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}
+            </h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
             <ProFeatures />
             <Plans
@@ -308,18 +567,32 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 finish(trial && offerDays ? startTrial(plan, offerDays, now) : { offeredAt: now, plan, subscribed: true });
               }}
             />
-            <Button kind="quiet" className="mt-2 w-full" onClick={() => {
-              track("paywall_close", { from: "setup" });
-              finish(declineTrial(offerDays ?? trialDays, Date.now()));
-            }}>{t("setup.pro.decline")}</Button>
+            <Button
+              kind="quiet"
+              className="mt-2 w-full"
+              onClick={() => {
+                track("paywall_close", { from: "setup" });
+                finish(declineTrial(offerDays ?? trialDays, Date.now()));
+              }}
+            >
+              {t("setup.pro.decline")}
+            </Button>
             <p className="mt-2 text-center text-xs text-muted">{t("setup.pro.free")}</p>
           </>
         )}
       </div>
       <div className="flex gap-3 pb-2">
-        {(step > 0 || rerun) && <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>{t("setup.back")}</Button>}
+        {(step > 0 || rerun) && (
+          <Button kind="ghost" onClick={() => (step > 0 ? setStep(step - 1) : go("settings"))}>
+            {t("setup.back")}
+          </Button>
+        )}
         {step < PRO_STEP && (
-          <Button className="flex-1 py-4 text-lg" onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())} disabled={step === 2 && bw < 25}>
+          <Button
+            className="flex-1 py-4 text-lg"
+            onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())}
+            disabled={step === 2 && bw < 25}
+          >
             {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>
         )}

@@ -1,4 +1,5 @@
 "use client";
+
 // First-party usage analytics for the admin panel (Melvin, 2026-11-09: "whatever data we can store,
 // save it"). Events go to an outbox in localStorage first, so nothing is lost offline, and are sent
 // in batches to /api/collect/ when there's a connection. The allow-list of events and properties is
@@ -7,11 +8,22 @@
 // The install id is a random id made on first open. It is not an advertising id, isn't shared with
 // anyone, and is reset by "Erase this device". The lifter can switch analytics off in Settings;
 // in the EU, EEA, UK and Switzerland it starts off until they switch it on (ePrivacy consent).
+import {
+  cleanProps,
+  MAX_EVENTS,
+  parsePlayReferrer,
+  referrerHost,
+  utmFrom,
+  type Acquisition,
+  type EventName,
+  type InstallContext,
+  type Props,
+  type WireEvent,
+} from "./analyticsSchema";
 import { APP_VERSION } from "./diag";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
-import { cleanProps, MAX_EVENTS, parsePlayReferrer, referrerHost, utmFrom, type Acquisition, type EventName, type InstallContext, type Props, type WireEvent } from "./analyticsSchema";
 
 export const ID_KEY = "liftsmith.installId";
 export const CONSENT_KEY = "liftsmith.analytics";
@@ -43,7 +55,11 @@ function put(key: string, v: string | null) {
 
 /** Time zones where analytics needs an explicit yes (EU, EEA, UK, Switzerland). */
 export function needsOptIn(timeZone: string): boolean {
-  if (/^Europe\//.test(timeZone) && !/^Europe\/(Moscow|Minsk|Istanbul|Kiev|Kyiv|Simferopol|Volgograd|Kirov|Astrakhan|Saratov|Ulyanovsk|Samara)$/.test(timeZone)) return true;
+  if (
+    /^Europe\//.test(timeZone) &&
+    !/^Europe\/(Moscow|Minsk|Istanbul|Kiev|Kyiv|Simferopol|Volgograd|Kirov|Astrakhan|Saratov|Ulyanovsk|Samara)$/.test(timeZone)
+  )
+    return true;
   return /^(Atlantic\/(Reykjavik|Canary|Madeira|Azores|Faroe)|Arctic\/Longyearbyen)$/.test(timeZone);
 }
 
@@ -111,7 +127,10 @@ export function track(name: EventName, props?: Props, at = Date.now()) {
  * On the website, remembers the first visit's source (UTM tags, referrer, landing page) so the web
  * app's install can be credited to it. Called by the public-page beacon and the app.
  */
-export function rememberFirstTouch(loc: Pick<Location, "search" | "pathname" | "hostname"> = location, ref = typeof document !== "undefined" ? document.referrer : "") {
+export function rememberFirstTouch(
+  loc: Pick<Location, "search" | "pathname" | "hostname"> = location,
+  ref = typeof document !== "undefined" ? document.referrer : "",
+) {
   if (get(TOUCH_KEY)) return;
   const utm = utmFrom(loc.search);
   const host = referrerHost(ref, loc.hostname);
@@ -163,7 +182,9 @@ export function context(): Promise<InstallContext> {
       platform,
       appVersion: info?.appVersion ?? APP_VERSION,
       ...(info?.build ? { build: info.build } : {}),
-      ...(native && info ? { os: info.os, osVersion: info.osVersion, manufacturer: info.manufacturer, model: info.model } : fromUserAgent(ua)),
+      ...(native && info
+        ? { os: info.os, osVersion: info.osVersion, manufacturer: info.manufacturer, model: info.model }
+        : fromUserAgent(ua)),
       formFactor: formFactor(),
       locale: navigator.language,
       timeZone: zone(),
@@ -214,7 +235,12 @@ export function flushAnalytics(post: typeof fetch = fetch): Promise<number> {
       while (read().length) {
         const batch = read().slice(0, MAX_EVENTS);
         try {
-          const r = await post(collectUrl(), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ context: await context(), events: batch }), keepalive: true });
+          const r = await post(collectUrl(), {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ context: await context(), events: batch }),
+            keepalive: true,
+          });
           // Rejected outright: drop it so it can't block the queue. Anything else (offline, 404 before the
           // server is deployed, 429, 5xx) keeps it for a later try.
           if (r.ok || REJECTED.has(r.status)) {

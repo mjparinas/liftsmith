@@ -11,6 +11,7 @@
 // right before the SDK answers. The RevenueCat user id is the analytics install id (a random id, never an
 // advertising id), so store server notifications land on the same install in the admin panel.
 import { create } from "zustand";
+
 import { installId, platformStore, track } from "./analytics";
 import { activeCode, CREATOR_OFFERING, creatorHooks } from "./creator";
 import { flag } from "./flags";
@@ -101,7 +102,10 @@ interface EntInfo {
 }
 
 /** The `pro` entitlement out of RevenueCat's CustomerInfo. */
-export function entFromInfo(info: { entitlements: { all: Record<string, EntInfo | undefined> }; managementURL?: string | null }): Entitlement | null {
+export function entFromInfo(info: {
+  entitlements: { all: Record<string, EntInfo | undefined> };
+  managementURL?: string | null;
+}): Entitlement | null {
   const e = info.entitlements.all[ENTITLEMENT];
   if (!e) return null;
   return {
@@ -208,7 +212,9 @@ async function tagCreator(code: string | null): Promise<void> {
 
 // When a code is checked or removed, the attribute and the offers follow.
 creatorHooks.onChecked = (code) => {
-  void tagCreator(code).then(() => loadOffers()).catch(() => {});
+  void tagCreator(code)
+    .then(() => loadOffers())
+    .catch(() => {});
 };
 
 /** Which offering to sell from: a creator code's 30-day trial first, then the trialDays A/B ("trial7"), then the default. */
@@ -228,18 +234,24 @@ export async function loadOffers(): Promise<Offer[] | null> {
   if (platformStore() === "appstore") {
     const ids = Object.values(packages).map((p) => p!.product.identifier);
     const r = await sdk.checkTrialOrIntroductoryPriceEligibility({ productIdentifiers: ids });
-    ineligible = new Set(Object.entries(r).filter(([, v]) => v.status === 1 || v.status === 3).map(([k]) => k));
+    ineligible = new Set(
+      Object.entries(r)
+        .filter(([, v]) => v.status === 1 || v.status === 3)
+        .map(([k]) => k),
+    );
   }
   const offers: Offer[] = (["annual", "monthly"] as Plan[]).flatMap((plan) => {
     const p = packages[plan];
     if (!p) return [];
     const pr = p.product;
-    return [{
-      plan,
-      price: pr.priceString,
-      perMonth: plan === "annual" ? (pr.pricePerMonthString ?? undefined) : undefined,
-      trialDays: ineligible.has(pr.identifier) ? null : trialDaysOf(pr.introPrice),
-    }];
+    return [
+      {
+        plan,
+        price: pr.priceString,
+        perMonth: plan === "annual" ? (pr.pricePerMonthString ?? undefined) : undefined,
+        trialDays: ineligible.has(pr.identifier) ? null : trialDaysOf(pr.introPrice),
+      },
+    ];
   });
   useBilling.setState({ offers });
   return offers;
@@ -262,7 +274,9 @@ export async function buy(plan: Plan, from: string): Promise<BuyResult> {
     track("feature", { name: "pro", detail: from });
     return entActive(ent, Date.now()) ? "ok" : "error";
   } catch (e) {
-    return (e as { userCancelled?: boolean; code?: string })?.userCancelled || (e as { code?: string })?.code === "1" ? "cancelled" : "error";
+    return (e as { userCancelled?: boolean; code?: string })?.userCancelled || (e as { code?: string })?.code === "1"
+      ? "cancelled"
+      : "error";
   } finally {
     useBilling.setState({ busy: false });
   }
@@ -287,7 +301,9 @@ export async function restore(): Promise<boolean> {
 /** Where to cancel or change the plan: the store's own subscriptions page. */
 export function manageUrl(ent: Entitlement | null = useBilling.getState().ent): string {
   if (ent?.manageUrl) return ent.manageUrl;
-  return platformStore() === "appstore" ? "https://apps.apple.com/account/subscriptions" : `https://play.google.com/store/account/subscriptions?package=${APP_ID}`;
+  return platformStore() === "appstore"
+    ? "https://apps.apple.com/account/subscriptions"
+    : `https://play.google.com/store/account/subscriptions?package=${APP_ID}`;
 }
 
 /** How the store sees this lifter, for reminder planning (messages.ts ProState); undefined when the store hasn't said. */

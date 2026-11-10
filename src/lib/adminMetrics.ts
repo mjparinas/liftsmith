@@ -137,8 +137,26 @@ const PAID = new Set(["purchase", "trial_convert", "renew", "billing_recover"]);
 const periodMs = (plan: string | null) => (plan === "annual" ? 365 * DAY : 31 * DAY);
 
 /** Rough USD rates for a realised-price estimate when a store doesn't give USD. Labelled approximate in the panel. */
-export const FX: Record<string, number> = { USD: 1, CAD: 0.72, EUR: 1.08, GBP: 1.27, AUD: 0.66, NZD: 0.6, CHF: 1.13, SEK: 0.095, NOK: 0.093, DKK: 0.145, JPY: 0.0066, INR: 0.012, BRL: 0.18, MXN: 0.055, PLN: 0.25, KRW: 0.00073 };
-export const usdOf = (e: Pick<SubEvent, "usd" | "priceLocal" | "currency">): number | null => e.usd ?? (e.priceLocal != null && e.currency && FX[e.currency] ? e.priceLocal * FX[e.currency] : null);
+export const FX: Record<string, number> = {
+  USD: 1,
+  CAD: 0.72,
+  EUR: 1.08,
+  GBP: 1.27,
+  AUD: 0.66,
+  NZD: 0.6,
+  CHF: 1.13,
+  SEK: 0.095,
+  NOK: 0.093,
+  DKK: 0.145,
+  JPY: 0.0066,
+  INR: 0.012,
+  BRL: 0.18,
+  MXN: 0.055,
+  PLN: 0.25,
+  KRW: 0.00073,
+};
+export const usdOf = (e: Pick<SubEvent, "usd" | "priceLocal" | "currency">): number | null =>
+  e.usd ?? (e.priceLocal != null && e.currency && FX[e.currency] ? e.priceLocal * FX[e.currency] : null);
 
 interface SubState {
   key: string;
@@ -161,7 +179,19 @@ export function replaySubs(subs: SubEvent[], at: number): SubState[] {
   for (const e of [...subs].sort((a, b) => a.at - b.at)) {
     if (e.at > at) break;
     const key = e.subscription ?? e.installId ?? e.id;
-    const s = m.get(key) ?? { key, store: storeOf(null, e.store), plan: e.plan, installId: e.installId, firstPaid: null, trialAt: null, until: 0, ended: null, price: null, renewals: 0, cancelled: false };
+    const s = m.get(key) ?? {
+      key,
+      store: storeOf(null, e.store),
+      plan: e.plan,
+      installId: e.installId,
+      firstPaid: null,
+      trialAt: null,
+      until: 0,
+      ended: null,
+      price: null,
+      renewals: 0,
+      cancelled: false,
+    };
     if (e.plan) s.plan = e.plan;
     if (e.kind === "trial_start") s.trialAt ??= e.at;
     if (PAID.has(e.kind)) {
@@ -184,7 +214,8 @@ export function replaySubs(subs: SubEvent[], at: number): SubState[] {
 }
 
 /** A paying subscription at `at`: paid, not ended. Three days of grace cover a late renewal notice. */
-const payingAt = (s: SubState, at: number) => s.firstPaid != null && s.firstPaid <= at && s.until + 3 * DAY > at && (s.ended == null || s.ended > at);
+const payingAt = (s: SubState, at: number) =>
+  s.firstPaid != null && s.firstPaid <= at && s.until + 3 * DAY > at && (s.ended == null || s.ended > at);
 const monthlyValue = (s: SubState) => (s.plan === "annual" ? (s.price ?? LIST_PRICE.annual) / 12 : (s.price ?? LIST_PRICE.monthly));
 
 export function mrrAt(subs: SubEvent[], at: number): { gross: number; paying: number; byStore: Record<Store, number> } {
@@ -243,12 +274,16 @@ function storeRevenue(store: Store | "all", input: MetricsInput): StoreRevenue {
   const annual = paidStarts.filter((s) => s.plan === "annual").length;
   // Download to paid at day 35: installs at least 35 days old, from the last 180 days.
   const firstPaidByInstall = new Map<string, number>();
-  for (const s of state) if (s.installId && s.firstPaid != null) firstPaidByInstall.set(s.installId, Math.min(firstPaidByInstall.get(s.installId) ?? Infinity, s.firstPaid));
+  for (const s of state)
+    if (s.installId && s.firstPaid != null)
+      firstPaidByInstall.set(s.installId, Math.min(firstPaidByInstall.get(s.installId) ?? Infinity, s.firstPaid));
   const d35 = installs.filter((i) => i.firstSeen <= now - 35 * DAY && i.firstSeen >= now - 215 * DAY);
   const d35Paid = d35.filter((i) => (firstPaidByInstall.get(i.id) ?? Infinity) <= i.firstSeen + 35 * DAY).length;
   // Monthly churn: monthly subscribers paying 30 days ago who aren't now.
   const monthAgo = now - 30 * DAY;
-  const monthlyThen = replaySubs(subs, monthAgo).filter((s) => s.plan !== "annual" && payingAt(s, monthAgo)).map((s) => s.key);
+  const monthlyThen = replaySubs(subs, monthAgo)
+    .filter((s) => s.plan !== "annual" && payingAt(s, monthAgo))
+    .map((s) => s.key);
   const nowByKey = new Map(state.map((s) => [s.key, s]));
   const churned = monthlyThen.filter((k) => !payingAt(nowByKey.get(k)!, now)).length;
   // Annual first renewal: annual subscriptions whose first year ended more than 3 days ago.
@@ -268,11 +303,17 @@ function storeRevenue(store: Store | "all", input: MetricsInput): StoreRevenue {
   const rpi = (d: number) => {
     const cohort = installs.filter((i) => i.firstSeen <= now - d * DAY && i.firstSeen >= now - (d + 180) * DAY);
     if (!cohort.length) return null;
-    const sum = cohort.reduce((s, i) => s + (paidByInstall.get(i.id) ?? []).filter((p) => p.at <= i.firstSeen + d * DAY).reduce((a, p) => a + p.usd, 0), 0);
+    const sum = cohort.reduce(
+      (s, i) => s + (paidByInstall.get(i.id) ?? []).filter((p) => p.at <= i.firstSeen + d * DAY).reduce((a, p) => a + p.usd, 0),
+      0,
+    );
     return round(sum / cohort.length, 2);
   };
   const realised = (plan: string) => {
-    const xs = subs.filter((e) => PAID.has(e.kind) && (e.plan ?? "monthly") === plan && e.at >= now - 180 * DAY).map(usdOf).filter((x): x is number => x != null);
+    const xs = subs
+      .filter((e) => PAID.has(e.kind) && (e.plan ?? "monthly") === plan && e.at >= now - 180 * DAY)
+      .map(usdOf)
+      .filter((x): x is number => x != null);
     return xs.length ? round(xs.reduce((s, x) => s + x, 0) / xs.length, 2) : null;
   };
   const mrr = mrrAt(subs, now);
@@ -318,7 +359,11 @@ export function forecastVsActual(input: MetricsInput) {
     const m = i + 1;
     const end = launch + m * 30.44 * DAY;
     const f = forecastAt(m)!;
-    return { month: m, actual: end <= input.now + 30.44 * DAY && m <= months ? mrrAt(input.subs, Math.min(end, input.now)).gross : null, ...f };
+    return {
+      month: m,
+      actual: end <= input.now + 30.44 * DAY && m <= months ? mrrAt(input.subs, Math.min(end, input.now)).gross : null,
+      ...f,
+    };
   });
 }
 
@@ -373,7 +418,9 @@ export function computeMetrics(input: MetricsInput) {
     { key: "Clicked a call to action", n: input.site.ctaTotal },
     { key: "Web app installs", n: recent.filter((i) => storeOf(i.platform, i.store) === "web").length },
   ];
-  const funnelByStore = Object.fromEntries((["play", "appstore", "web"] as Store[]).map((s) => [s, funnelFor(recent.filter((i) => storeOf(i.platform, i.store) === s))]));
+  const funnelByStore = Object.fromEntries(
+    (["play", "appstore", "web"] as Store[]).map((s) => [s, funnelFor(recent.filter((i) => storeOf(i.platform, i.store) === s))]),
+  );
 
   // Time to value: hours from install to setup and to the first workout (medians).
   const median = (xs: number[]) => {
@@ -396,7 +443,11 @@ export function computeMetrics(input: MetricsInput) {
   const cohortRows = [...cohorts.values()]
     .sort((a, b) => b.start - a.start)
     .slice(0, 12)
-    .map((r) => ({ start: r.start, size: r.size, weeks: r.active.map((n, k) => (r.start + (k + 1) * WEEK <= now + WEEK ? (r.start + k * WEEK <= now ? n / r.size : null) : null)) }));
+    .map((r) => ({
+      start: r.start,
+      size: r.size,
+      weeks: r.active.map((n, k) => (r.start + (k + 1) * WEEK <= now + WEEK ? (r.start + k * WEEK <= now ? n / r.size : null) : null)),
+    }));
   const dayN = (n: number) => {
     const eligible = input.cohortWeeks.filter((c) => c.firstSeen <= now - (n + 1) * DAY);
     if (!eligible.length) return null;
@@ -414,7 +465,10 @@ export function computeMetrics(input: MetricsInput) {
     finished,
     avgMinutes: finished ? round(w.reduce((s, r) => s + r.minutes, 0) / finished) : null,
     avgSets: finished ? round(w.reduce((s, r) => s + r.sets, 0) / finished) : null,
-    autoEnded: pct(w.reduce((s, r) => s + r.auto, 0), finished),
+    autoEnded: pct(
+      w.reduce((s, r) => s + r.auto, 0),
+      finished,
+    ),
     prs: w.reduce((s, r) => s + r.prs, 0),
     perActiveInstall: input.mau ? round(finished / input.mau, 2) : null,
     screens: input.screens,
@@ -427,9 +481,21 @@ export function computeMetrics(input: MetricsInput) {
     platforms: tally(recent, (i) => i.platform),
     stores: tally(recent, (i) => i.store),
     os: tally(recent, (i) => (i.os ? `${i.os} ${(i.osVersion ?? "").split(".")[0]}`.trim() : null)),
-    models: tally(recent, (i) => (i.model ? (i.manufacturer && i.manufacturer !== "Apple" && !i.model.toLowerCase().startsWith(i.manufacturer.toLowerCase()) ? `${i.manufacturer} ${i.model}` : i.model) : null), 20),
+    models: tally(
+      recent,
+      (i) =>
+        i.model
+          ? i.manufacturer && i.manufacturer !== "Apple" && !i.model.toLowerCase().startsWith(i.manufacturer.toLowerCase())
+            ? `${i.manufacturer} ${i.model}`
+            : i.model
+          : null,
+      20,
+    ),
     manufacturers: tally(recent, (i) => i.manufacturer),
-    versions: tally(all.filter((i) => i.lastSeen >= since), (i) => i.appVersion),
+    versions: tally(
+      all.filter((i) => i.lastSeen >= since),
+      (i) => i.appVersion,
+    ),
     formFactors: tally(recent, (i) => i.formFactor),
     locales: tally(recent, (i) => i.locale),
     countries: tally(recent, (i) => i.country, 20),
@@ -456,7 +522,9 @@ export function computeMetrics(input: MetricsInput) {
     assumed: ASSUMED,
     list: LIST_PRICE,
     forecast: forecastVsActual(input),
-    mrrDaily: dayIdx.filter((_, i) => i % Math.max(1, Math.floor(days / 30)) === 0 || i === dayIdx.length - 1).map((d) => ({ day: d, gross: mrrAt(input.subs, Math.min((d + 1) * DAY, now)).gross })),
+    mrrDaily: dayIdx
+      .filter((_, i) => i % Math.max(1, Math.floor(days / 30)) === 0 || i === dayIdx.length - 1)
+      .map((d) => ({ day: d, gross: mrrAt(input.subs, Math.min((d + 1) * DAY, now)).gross })),
     paywallViews: input.daily.filter((r) => r.name === "paywall_view").reduce((s, r) => s + r.n, 0),
   };
 

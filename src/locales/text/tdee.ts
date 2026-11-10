@@ -65,7 +65,10 @@ export const en = {
   "tdee.bmi": "BMI",
   "tdee.byActivity": "At each activity level",
   "tdee.chartEmpty": "Your TDEE is recorded each time your weight, age or training days change. Changes will chart here.",
-  "tdee.chartLabel": { one: "TDEE from {from} on {date} to {to} now, {count} change", other: "TDEE from {from} on {date} to {to} now, {count} changes" },
+  "tdee.chartLabel": {
+    one: "TDEE from {from} on {date} to {to} now, {count} change",
+    other: "TDEE from {from} on {date} to {to} now, {count} changes",
+  },
   "tdee.today": "Today",
 } as const;
 
@@ -95,11 +98,13 @@ export const es: Partial<Record<Key, Message>> = {
   "tdee.on": "Sí",
   "tdee.bodyFatPct": "Grasa corporal",
   "tdee.bodyFat": "Usar la grasa corporal",
-  "tdee.bodyFatNote": "Con la grasa corporal, el metabolismo basal sale de la masa magra (Katch-McArdle), lo que encaja con quien levanta pesas.",
+  "tdee.bodyFatNote":
+    "Con la grasa corporal, el metabolismo basal sale de la masa magra (Katch-McArdle), lo que encaja con quien levanta pesas.",
   "tdee.activity": "Actividad",
   "tdee.auto": "Auto",
   "tdee.autoWorkouts": "Según tus entrenamientos: {days} días de entrenamiento a la semana en las últimas 4 semanas, así que {level}.",
-  "tdee.autoSteps": "Según tus pasos y entrenamientos: unos {steps} pasos al día esta semana y {days} días de entrenamiento a la semana, así que {level}.",
+  "tdee.autoSteps":
+    "Según tus pasos y entrenamientos: unos {steps} pasos al día esta semana y {days} días de entrenamiento a la semana, así que {level}.",
   "tdee.autoPlan": "Según tu objetivo de {days} días a la semana ({level}) hasta que haya dos semanas de entrenamientos.",
   "tdee.manual": "Elegido a mano. Elige Auto para seguir tus entrenamientos.",
   "tdee.missing": "Añade tu {items} para ver tu GET.",
@@ -133,13 +138,17 @@ export const es: Partial<Record<Key, Message>> = {
   "tdee.bmi": "IMC",
   "tdee.byActivity": "En cada nivel de actividad",
   "tdee.chartEmpty": "Tu GET se registra cada vez que cambian tu peso, tu edad o tus días de entrenamiento. Los cambios aparecerán aquí.",
-  "tdee.chartLabel": { one: "GET de {from} el {date} a {to} ahora, {count} cambio", other: "GET de {from} el {date} a {to} ahora, {count} cambios" },
+  "tdee.chartLabel": {
+    one: "GET de {from} el {date} a {to} ahora, {count} cambio",
+    other: "GET de {from} el {date} a {to} ahora, {count} cambios",
+  },
   "tdee.today": "Hoy",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "tdee.title": "Calculateur de DEJ",
-  "tdee.blurb": "Les calories par jour pour garder votre poids. Il se met à jour tout seul à partir de vos pesées, de votre date de naissance et de la fréquence de vos séances.",
+  "tdee.blurb":
+    "Les calories par jour pour garder votre poids. Il se met à jour tout seul à partir de vos pesées, de votre date de naissance et de la fréquence de vos séances.",
   "tdee.hub": "Les calories par jour pour garder votre poids, suivies dans le temps",
   "tdee.hubValue": "{kcal} kcal par jour",
   "tdee.fromHealth": "Remplir depuis {source}",
@@ -161,11 +170,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "tdee.on": "Oui",
   "tdee.bodyFatPct": "Masse grasse",
   "tdee.bodyFat": "Utiliser la masse grasse",
-  "tdee.bodyFatNote": "Avec la masse grasse, le métabolisme de base vient de la masse maigre (Katch-McArdle), ce qui convient aux pratiquants de musculation.",
+  "tdee.bodyFatNote":
+    "Avec la masse grasse, le métabolisme de base vient de la masse maigre (Katch-McArdle), ce qui convient aux pratiquants de musculation.",
   "tdee.activity": "Activité",
   "tdee.auto": "Auto",
   "tdee.autoWorkouts": "D’après vos séances : {days} jours d’entraînement par semaine sur les 4 dernières semaines, donc {level}.",
-  "tdee.autoSteps": "D’après vos pas et vos séances : environ {steps} pas par jour cette semaine et {days} jours d’entraînement par semaine, donc {level}.",
+  "tdee.autoSteps":
+    "D’après vos pas et vos séances : environ {steps} pas par jour cette semaine et {days} jours d’entraînement par semaine, donc {level}.",
   "tdee.autoPlan": "D’après votre objectif de {days} jours par semaine ({level}) jusqu’à deux semaines de séances.",
   "tdee.manual": "Choisi à la main. Choisissez Auto pour suivre vos séances.",
   "tdee.missing": "Ajoutez {items} pour voir votre DEJ.",
@@ -198,7 +209,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "tdee.proteinNote": "1,6 à 2,2 g par kg",
   "tdee.bmi": "IMC",
   "tdee.byActivity": "À chaque niveau d’activité",
-  "tdee.chartEmpty": "Votre DEJ est enregistrée à chaque changement de poids, d’âge ou de jours d’entraînement. Les changements s’afficheront ici.",
-  "tdee.chartLabel": { one: "DEJ de {from} le {date} à {to} maintenant, {count} changement", other: "DEJ de {from} le {date} à {to} maintenant, {count} changements" },
+  "tdee.chartEmpty":
+    "Votre DEJ est enregistrée à chaque changement de poids, d’âge ou de jours d’entraînement. Les changements s’afficheront ici.",
+  "tdee.chartLabel": {
+    one: "DEJ de {from} le {date} à {to} maintenant, {count} changement",
+    other: "DEJ de {from} le {date} à {to} maintenant, {count} changements",
+  },
   "tdee.today": "Aujourd’hui",
 };

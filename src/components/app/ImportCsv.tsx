@@ -1,12 +1,15 @@
 "use client";
+
+import { useMemo, useRef, useState } from "react";
+
 import { track } from "@/lib/analytics";
 import { EXERCISES } from "@/lib/exercises";
+import { t } from "@/lib/i18n";
 import { defaultMapping, importEvents, readImport, type ImportFile, type Mapping } from "@/lib/importCsv";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import type { Unit } from "@/lib/types";
-import { t } from "@/lib/i18n";
-import { useMemo, useRef, useState } from "react";
+
 import { Button, Chip, Sheet } from "./ui";
 
 // Settings › Data › Import workouts: a CSV from Strong, Hevy or Liftsmith's own export. The file is
@@ -49,10 +52,26 @@ export function ImportWorkouts() {
   const totalSets = file?.workouts.reduce((n, w) => n + w.sets.length, 0) ?? 0;
   return (
     <div className="mt-3">
-      <input ref={input} type="file" accept=".csv,text/csv,text/comma-separated-values" className="sr-only" aria-label={t("imp.fileLabel")} onChange={(e) => { void pick(e.target.files?.[0]); e.target.value = ""; }} />
-      <Button kind="ghost" icon="plus" className="w-full" onClick={() => input.current?.click()}>{t("imp.button")}</Button>
+      <input
+        ref={input}
+        type="file"
+        accept=".csv,text/csv,text/comma-separated-values"
+        className="sr-only"
+        aria-label={t("imp.fileLabel")}
+        onChange={(e) => {
+          void pick(e.target.files?.[0]);
+          e.target.value = "";
+        }}
+      />
+      <Button kind="ghost" icon="plus" className="w-full" onClick={() => input.current?.click()}>
+        {t("imp.button")}
+      </Button>
       <p className="mt-2 text-xs text-faint">{t("imp.note")}</p>
-      {note && <p className="mt-2 text-sm text-muted" role="status">{note}</p>}
+      {note && (
+        <p className="mt-2 text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
       <Sheet open={!!file} onClose={() => setFile(null)} title={t("imp.title", { source: file ? FORMAT_NAME[file.format] : "" })}>
         {file && (
           <div>
@@ -64,8 +83,12 @@ export function ImportWorkouts() {
               <div className="mt-4">
                 <p className="text-sm font-medium">{t("imp.unit")}</p>
                 <div className="mt-2 flex gap-2">
-                  <Chip active={unit === "kg"} onClick={() => setUnit("kg")}>kg</Chip>
-                  <Chip active={unit === "lb"} onClick={() => setUnit("lb")}>lb</Chip>
+                  <Chip active={unit === "kg"} onClick={() => setUnit("kg")}>
+                    kg
+                  </Chip>
+                  <Chip active={unit === "lb"} onClick={() => setUnit("lb")}>
+                    lb
+                  </Chip>
                 </div>
               </div>
             )}
@@ -74,7 +97,9 @@ export function ImportWorkouts() {
             <ul className="mt-2 divide-y divide-line/70">
               {names.map((n, i) => (
                 <li key={n} className="py-2">
-                  <label htmlFor={`map-${i}`} className="block truncate text-sm font-medium">{n}</label>
+                  <label htmlFor={`map-${i}`} className="block truncate text-sm font-medium">
+                    {n}
+                  </label>
                   <select
                     id={`map-${i}`}
                     value={mapping[n]}
@@ -82,14 +107,22 @@ export function ImportWorkouts() {
                     className={`mt-1 min-h-11 w-full rounded-xl border bg-raised px-3 text-sm ${mapping[n] === "custom" ? "border-warn/50" : "border-line"}`}
                   >
                     <option value="custom">{t("imp.custom")}</option>
-                    {library.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+                    {library.map((e) => (
+                      <option key={e.id} value={e.id}>
+                        {e.name}
+                      </option>
+                    ))}
                   </select>
                 </li>
               ))}
             </ul>
             <div className="mt-5 grid gap-2">
-              <Button icon="check" className="w-full" onClick={run}>{t("imp.import")}</Button>
-              <Button kind="quiet" className="w-full" onClick={() => setFile(null)}>{t("imp.cancel")}</Button>
+              <Button icon="check" className="w-full" onClick={run}>
+                {t("imp.import")}
+              </Button>
+              <Button kind="quiet" className="w-full" onClick={() => setFile(null)}>
+                {t("imp.cancel")}
+              </Button>
             </div>
           </div>
         )}

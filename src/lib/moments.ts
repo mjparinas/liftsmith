@@ -1,7 +1,7 @@
 import type { Stats } from "./derive";
+import { num, t } from "./i18n";
 import type { Unit } from "./types";
 import { fromKg } from "./units";
-import { num, t } from "./i18n";
 
 // Lifetime tonnage, anniversaries, workout-count milestones and comebacks: small moments derived from
 // the event log, never stored (like game.ts). Celebrations only; the badges for tonnage and comebacks
@@ -106,7 +106,13 @@ export function todayMoments(stats: Stats, now: number): Moment[] {
   if (first) {
     const y = anniversaryYears(first.start, now);
     if (y > 0 && !stats.sessions.some((s) => sameDay(s.start, now) && s !== first)) {
-      out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: t("mom.anniv", { count: y }), detail: t("mom.annivBody", { workouts: num(stats.sessions.length), sets: num(stats.totalSets) }) });
+      out.push({
+        id: `anniversary-${y}`,
+        kind: "anniversary",
+        emoji: "🎂",
+        title: t("mom.anniv", { count: y }),
+        detail: t("mom.annivBody", { workouts: num(stats.sessions.length), sets: num(stats.totalSets) }),
+      });
     }
   }
   const away = daysAway(stats, now);
@@ -125,16 +131,44 @@ export function doneMoments(stats: Stats): Moment[] {
   const s = stats.sessions[0];
   if (!s) return out;
   const n = stats.sessions.length;
-  if (COUNT_MILESTONES.includes(n)) out.push({ id: `count-${n}`, kind: "count", emoji: "🎉", title: t("mom.count", { n }), detail: n >= 100 ? t("mom.count100") : t("mom.countBody") });
+  if (COUNT_MILESTONES.includes(n))
+    out.push({
+      id: `count-${n}`,
+      kind: "count",
+      emoji: "🎉",
+      title: t("mom.count", { n }),
+      detail: n >= 100 ? t("mom.count100") : t("mom.countBody"),
+    });
   const hit = crossed(stats.totalVolume - s.volume, stats.totalVolume);
-  if (hit) out.push({ id: `tonnage-${hit.kg}`, kind: "tonnage", emoji: hit.emoji, title: t("mom.ton", { name: hit.name }), detail: t("mom.tonBody", { kg: fmtTonnage(hit.kg, "kg") }) });
+  if (hit)
+    out.push({
+      id: `tonnage-${hit.kg}`,
+      kind: "tonnage",
+      emoji: hit.emoji,
+      title: t("mom.ton", { name: hit.name }),
+      detail: t("mom.tonBody", { kg: fmtTonnage(hit.kg, "kg") }),
+    });
   const prev = stats.sessions[1];
   if (prev) {
     const gap = Math.floor((s.start - prev.start) / DAY);
-    if (gap >= COMEBACK_DAYS) out.push({ id: "comeback-done", kind: "comeback", emoji: "💪", title: t("mom.comeback"), detail: t("mom.comebackBody", { time: weeksText(gap) }) });
+    if (gap >= COMEBACK_DAYS)
+      out.push({
+        id: "comeback-done",
+        kind: "comeback",
+        emoji: "💪",
+        title: t("mom.comeback"),
+        detail: t("mom.comebackBody", { time: weeksText(gap) }),
+      });
     const first = stats.sessions.at(-1)!;
     const y = anniversaryYears(first.start, s.start);
-    if (y > 0) out.push({ id: `anniversary-${y}`, kind: "anniversary", emoji: "🎂", title: t("mom.years", { count: y }), detail: t("mom.yearsBody") });
+    if (y > 0)
+      out.push({
+        id: `anniversary-${y}`,
+        kind: "anniversary",
+        emoji: "🎂",
+        title: t("mom.years", { count: y }),
+        detail: t("mom.yearsBody"),
+      });
   }
   return out;
 }

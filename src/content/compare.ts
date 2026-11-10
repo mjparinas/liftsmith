@@ -12,7 +12,8 @@ export interface Fact {
   checked: string;
 }
 
-export type Topic = "price" | "free" | "plans" | "recovery" | "blocks" | "plates" | "rest" | "social" | "platforms" | "health" | "data" | "ads";
+export type Topic =
+  "price" | "free" | "plans" | "recovery" | "blocks" | "plates" | "rest" | "social" | "platforms" | "health" | "data" | "ads";
 
 export const TOPIC_LABEL: Record<Topic, string> = {
   price: "Price",
@@ -33,14 +34,17 @@ export const TOPIC_LABEL: Record<Topic, string> = {
 export const OURS: Record<Topic, string> = {
   price: "Free plan. Pro is $6.99 a month or $39.99 a year, with a 14-day free trial.",
   free: "The workout logger, plates, rest timer and lock-screen workout, plus every fixed program (5×5, 3×5 and more), free with no limit on workouts or routines.",
-  plans: "Pro plans every workout: exercises from your gym's equipment, sets, reps and weights, moved forward each session, with a short reason for each.",
+  plans:
+    "Pro plans every workout: exercises from your gym's equipment, sets, reps and weights, moved forward each session, with a short reason for each.",
   recovery: "A 3D recovery map of every muscle, and plans only for muscles that have recovered (Pro).",
-  blocks: "Training blocks with reps-in-reserve targets that step down each week, then a deload week; an early deload is offered when fatigue builds.",
+  blocks:
+    "Training blocks with reps-in-reserve targets that step down each week, then a deload week; an early deload is offered when fatigue builds.",
   plates: "Every barbell weight is one your plates can make, with the plates drawn for each side, free.",
   rest: "Starts itself after each set, counts down on the lock screen (Android notification, iPhone Live Activity) with Log set and +30 s, free.",
   social: "Share a workout as an image or a link someone can open at their own weights. No feed yet.",
   platforms: "Android and iPhone apps (store listings coming soon) and the full app in any browser today. No watch apps yet.",
-  health: "Health Connect and Apple Health for weight, height, body fat and resting heart rate; live heart rate from any Bluetooth strap or watch.",
+  health:
+    "Health Connect and Apple Health for weight, height, body fat and resting heart rate; live heart rate from any Bluetooth strap or watch.",
   data: "CSV export and a full backup, and import from other apps' CSV exports. Works offline with no account.",
   ads: "No ads, ever.",
 };
@@ -82,13 +86,19 @@ export const COMPETITORS: Competitor[] = [
       price: [f("The US App Store lists monthly plans at $12.99 and $15.99 and yearly plans at $79.99 and $95.99.", FB_APP)],
       free: [f("Free to download with in-app purchases; the listing mentions a free trial without giving its length.", FB_APP)],
       plans: [f("Builds workouts based on your equipment, schedule and preferences.", FB_SITE)],
-      recovery: [f("\"Monitored Recovery\" recommends the muscles to train each session.", FB_SITE)],
+      recovery: [f('"Monitored Recovery" recommends the muscles to train each session.', FB_SITE)],
       blocks: [f("Lists non-linear periodization.", FB_APP)],
       platforms: [f("iPhone and Apple Watch.", FB_APP), f("Android, with a Wear OS tile.", FB_PLAY)],
       health: [f("Apple Health, Strava and Fitbit integrations.", FB_APP)],
     },
     theirPick: "you want an established adaptive planner with Apple Watch and Wear OS apps today.",
-    ourPick: ["A free plan with no limit on workouts, plus free fixed programs", "Pro at $39.99 a year", "Plates drawn for every set, and a lock-screen rest timer", "Blocks with reps-in-reserve targets and planned deloads", "A plain-words reason under every weight"],
+    ourPick: [
+      "A free plan with no limit on workouts, plus free fixed programs",
+      "Pro at $39.99 a year",
+      "Plates drawn for every set, and a lock-screen rest timer",
+      "Blocks with reps-in-reserve targets and planned deloads",
+      "A plain-words reason under every weight",
+    ],
   },
   {
     slug: "hevy",
@@ -100,12 +110,22 @@ export const COMPETITORS: Competitor[] = [
       plans: [f("You build your own routines; Pro's Hevy Trainer builds a program from your experience, goal and equipment.", HV_APP)],
       rest: [f("Automatic rest timers.", HV_SITE)],
       social: [f("Follow other lifters, like and comment on workouts, and save their routines.", HV_SITE)],
-      platforms: [f("iPhone, iPad and Apple Watch.", HV_APP), f("Android, with Wear OS.", HV_PLAY), f("A web version at hevy.com.", HV_SITE)],
+      platforms: [
+        f("iPhone, iPad and Apple Watch.", HV_APP),
+        f("Android, with Wear OS.", HV_PLAY),
+        f("A web version at hevy.com.", HV_SITE),
+      ],
       health: [f("Exports workouts to Apple Health, and syncs to Strava.", HV_APP)],
-      ads: [f("\"No ads and free.\"", HV_PLAY)],
+      ads: [f('"No ads and free."', HV_PLAY)],
     },
     theirPick: "following friends and a social feed matter most to you, or you want a low-cost logger with watch apps.",
-    ourPick: ["Workouts planned for you from your equipment and recovery", "Plates drawn for every barbell set", "A 3D recovery map", "Blocks with reps-in-reserve targets and planned deloads", "Import your Hevy CSV export and keep your history"],
+    ourPick: [
+      "Workouts planned for you from your equipment and recovery",
+      "Plates drawn for every barbell set",
+      "A 3D recovery map",
+      "Blocks with reps-in-reserve targets and planned deloads",
+      "Import your Hevy CSV export and keep your history",
+    ],
   },
   {
     slug: "strong",
@@ -122,21 +142,41 @@ export const COMPETITORS: Competitor[] = [
       data: [f("CSV export of all your data.", ST_SITE)],
     },
     theirPick: "you already run your own program and want a simple, proven logger with an Apple Watch app.",
-    ourPick: ["Workouts planned for you, or any fixed program free", "No limit on routines on the free plan", "Plate maths free on every set", "Health Connect on Android", "Import your Strong CSV export and keep your history"],
+    ourPick: [
+      "Workouts planned for you, or any fixed program free",
+      "No limit on routines on the free plan",
+      "Plate maths free on every set",
+      "Health Connect on Android",
+      "Import your Strong CSV export and keep your history",
+    ],
   },
   {
     slug: "gymverse",
     name: "Gymverse",
     summary: "A gym workout planner with personalized plans that adapt as you progress.",
     rows: {
-      price: [f("The US App Store lists a $19.99 monthly plan among several premium purchases.", GV_APP), f("A $199.99 lifetime plan was announced in June 2026.", GV_PR)],
-      plans: [f("Personalized plans built around your goals, equipment, schedule and experience, with suggested weights, sets, reps and rest.", GV_APP)],
+      price: [
+        f("The US App Store lists a $19.99 monthly plan among several premium purchases.", GV_APP),
+        f("A $199.99 lifetime plan was announced in June 2026.", GV_PR),
+      ],
+      plans: [
+        f(
+          "Personalized plans built around your goals, equipment, schedule and experience, with suggested weights, sets, reps and rest.",
+          GV_APP,
+        ),
+      ],
       blocks: [f("Deload weeks and periodization.", GV_APP)],
       platforms: [f("iPhone, iPad and Apple Watch.", GV_APP), f("iOS and Android.", GV_PR)],
       health: [f("Reads age, weight and gender from Apple Health.", GV_APP)],
     },
     theirPick: "you train with an Apple Watch and want its hands-free guidance.",
-    ourPick: ["A free plan with every fixed program", "Pro at $6.99 a month or $39.99 a year", "Plates drawn for every barbell set", "A 3D recovery map", "The full app in any browser, plus Android and iPhone"],
+    ourPick: [
+      "A free plan with every fixed program",
+      "Pro at $6.99 a month or $39.99 a year",
+      "Plates drawn for every barbell set",
+      "A 3D recovery map",
+      "The full app in any browser, plus Android and iPhone",
+    ],
   },
 ];
 

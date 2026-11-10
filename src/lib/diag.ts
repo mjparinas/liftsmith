@@ -1,4 +1,5 @@
 "use client";
+
 // Diagnostics attached to feedback when the lifter allows it: app version, platform, screen, the
 // current screen route and the last few errors. Never workout history, health data or names.
 import { isNative } from "./juice";

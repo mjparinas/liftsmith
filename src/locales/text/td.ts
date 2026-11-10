@@ -75,11 +75,13 @@ export const es: Partial<Record<Key, Message>> = {
   "td.mins": "{n} min",
   "td.injury": "Lesión {n}%",
   "td.ssLinked": "Los ejercicios enlazados se alternan: una serie de cada uno y luego un descanso. Toca un enlace para separarlos.",
-  "td.ssLinkedSaves": "Los ejercicios enlazados se alternan: una serie de cada uno y luego un descanso. Ahorras unos {n} min. Toca un enlace para separarlos.",
+  "td.ssLinkedSaves":
+    "Los ejercicios enlazados se alternan: una serie de cada uno y luego un descanso. Ahorras unos {n} min. Toca un enlace para separarlos.",
   "td.ssHint": "Toca el enlace entre dos ejercicios para hacerlos en superserie.",
   "td.whyMuscles": "Por qué estos músculos",
   "td.programDay": "{day} de {program}. {note}.",
-  "td.programDayAdaptive": "{day} de {program}: músculos recuperados del grupo de hoy, los más lejos del objetivo semanal de {sets} series. {note}.",
+  "td.programDayAdaptive":
+    "{day} de {program}: músculos recuperados del grupo de hoy, los más lejos del objetivo semanal de {sets} series. {note}.",
   "td.routineWorks": "Tu rutina trabaja {muscles}. El mapa muestra lo recuperado que está cada músculo.",
   "td.targets": "Hoy toca {muscles}: recuperados y los más lejos del objetivo semanal de {sets} series.",
   "td.restDay": "Día de descanso",
@@ -117,11 +119,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "td.mins": "{n} min",
   "td.injury": "Blessure {n} %",
   "td.ssLinked": "Les exercices liés alternent : une série de chaque, puis un repos. Touchez un lien pour les séparer.",
-  "td.ssLinkedSaves": "Les exercices liés alternent : une série de chaque, puis un repos. Environ {n} min gagnées. Touchez un lien pour les séparer.",
+  "td.ssLinkedSaves":
+    "Les exercices liés alternent : une série de chaque, puis un repos. Environ {n} min gagnées. Touchez un lien pour les séparer.",
   "td.ssHint": "Touchez le lien entre deux exercices pour les faire en superset.",
   "td.whyMuscles": "Pourquoi ces muscles",
   "td.programDay": "{day} de {program}. {note}.",
-  "td.programDayAdaptive": "{day} de {program} : muscles récupérés du groupe du jour, les plus loin de l’objectif hebdo de {sets} séries. {note}.",
+  "td.programDayAdaptive":
+    "{day} de {program} : muscles récupérés du groupe du jour, les plus loin de l’objectif hebdo de {sets} séries. {note}.",
   "td.routineWorks": "Votre routine travaille {muscles}. La carte montre la récupération de chaque muscle.",
   "td.targets": "Aujourd’hui : {muscles}, récupérés et les plus loin de l’objectif hebdo de {sets} séries.",
   "td.restDay": "Jour de repos",

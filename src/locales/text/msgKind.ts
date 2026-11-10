@@ -41,5 +41,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "msgKind.milestone": "Étapes",
   "msgKind.milestone.blurb": "Votre première séance, et des séries de 4, 8, 12, 26 et 52 semaines.",
   "msgKind.pro": "Essai Pro et offres",
-  "msgKind.pro.blurb": "Quand votre essai se termine bientôt, et de temps en temps ce qu’apporte Pro. Jamais plus d’un toutes les deux semaines.",
+  "msgKind.pro.blurb":
+    "Quand votre essai se termine bientôt, et de temps en temps ce qu’apporte Pro. Jamais plus d’un toutes les deux semaines.",
 };

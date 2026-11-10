@@ -1,6 +1,6 @@
 // POST /api/auth/email/ {email}: emails a six-digit sign-in code (Resend). Server build only.
-import { cleanEmail, limited, resendMail, startEmail } from "@/server/accounts";
 import { hasDb, preflight, readJson, reply } from "@/server/accountHttp";
+import { cleanEmail, limited, resendMail, startEmail } from "@/server/accounts";
 
 export const OPTIONS = preflight;
 

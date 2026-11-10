@@ -1,8 +1,11 @@
 "use client";
+
 // PR replay on the summary: after a new best, the lift plays back with the lifter's own numbers, rep by
 // rep: the 3D figure (LiftDemo) performs the lift that many times, with their bar and plates from their
 // gym shown underneath. Respects reduced motion: the figure holds a still pose and the counter shows the end.
-import { LiftDemo, bodyFor } from "@/components/demo/LiftDemo";
+import { useEffect, useState } from "react";
+
+import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { PlateBar } from "@/components/PlateBar";
 import type { Pr } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
@@ -11,7 +14,7 @@ import { barFor } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
-import { useEffect, useState } from "react";
+
 import { Sheet } from "./ui";
 
 const REP_MS = 1400;
@@ -23,7 +26,15 @@ export function PrReplayButton({ prs }: { prs: Pr[] }) {
     <>
       <div className="mt-3 flex flex-wrap justify-center gap-2">
         {prs.map((p) => (
-          <button key={p.exerciseId} type="button" onClick={() => { haptic("tap"); setOpen(p); }} className="press min-h-11 rounded-full border border-gold/40 bg-gold/10 px-4 text-sm font-semibold text-gold">
+          <button
+            key={p.exerciseId}
+            type="button"
+            onClick={() => {
+              haptic("tap");
+              setOpen(p);
+            }}
+            className="press min-h-11 rounded-full border border-gold/40 bg-gold/10 px-4 text-sm font-semibold text-gold"
+          >
             ▶ Replay {exercise(p.exerciseId).name}
           </button>
         ))}
@@ -64,14 +75,43 @@ function Replay({ pr }: { pr: Pr }) {
     <div className="text-center">
       <p className="text-sm uppercase tracking-wider text-gold">New personal best</p>
       <h3 className="text-2xl font-bold">{ex.name}</h3>
-      <p className="num mt-1 text-4xl font-bold">{fmtNum(fromKg(pr.weight, unit))} {unit} × {pr.reps}</p>
+      <p className="num mt-1 text-4xl font-bold">
+        {fmtNum(fromKg(pr.weight, unit))} {unit} × {pr.reps}
+      </p>
       <div className="mx-auto mt-4 w-full max-w-sm overflow-hidden rounded-2xl bg-raised" aria-hidden>
-        <LiftDemo key={run} exerciseId={pr.exerciseId} body={bodyFor(profile.sex)} reps={pr.reps} still={reduced} label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`} className="h-56" />
-        {loading && bar && <div className="px-4 pb-3"><PlateBar loading={loading} bar={bar.weight} unit={gym!.unit} compact /></div>}
+        <LiftDemo
+          key={run}
+          exerciseId={pr.exerciseId}
+          body={bodyFor(profile.sex)}
+          reps={pr.reps}
+          still={reduced}
+          label={`New best: ${fmtNum(fromKg(pr.weight, unit))} ${unit} × ${pr.reps}`}
+          className="h-56"
+        />
+        {loading && bar && (
+          <div className="px-4 pb-3">
+            <PlateBar loading={loading} bar={bar.weight} unit={gym!.unit} compact />
+          </div>
+        )}
       </div>
-      <p className="num mt-3 text-lg font-semibold" aria-live="polite">{done ? `${pr.reps} reps. Every one of them yours.` : `Rep ${rep}`}</p>
-      <p className="num text-sm text-muted">Estimated max now {fmtNum(Math.round(fromKg(pr.e1rm, unit)))} {unit}</p>
-      {done && !reduced && <button type="button" onClick={() => { setT(0); setRun((r) => r + 1); }} className="press mt-3 min-h-11 rounded-full border border-line px-4 text-sm text-muted">Play again</button>}
+      <p className="num mt-3 text-lg font-semibold" aria-live="polite">
+        {done ? `${pr.reps} reps. Every one of them yours.` : `Rep ${rep}`}
+      </p>
+      <p className="num text-sm text-muted">
+        Estimated max now {fmtNum(Math.round(fromKg(pr.e1rm, unit)))} {unit}
+      </p>
+      {done && !reduced && (
+        <button
+          type="button"
+          onClick={() => {
+            setT(0);
+            setRun((r) => r + 1);
+          }}
+          className="press mt-3 min-h-11 rounded-full border border-line px-4 text-sm text-muted"
+        >
+          Play again
+        </button>
+      )}
     </div>
   );
 }

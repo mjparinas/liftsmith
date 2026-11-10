@@ -54,9 +54,11 @@ export const es: Partial<Record<Key, Message>> = {
   "photos.pose.front": "Frente",
   "photos.pose.side": "Lado",
   "photos.pose.back": "Espalda",
-  "photos.none.front": "Aún no hay foto de frente. El mismo sitio, la misma luz y la misma hora del día hacen que la comparación sea justa.",
+  "photos.none.front":
+    "Aún no hay foto de frente. El mismo sitio, la misma luz y la misma hora del día hacen que la comparación sea justa.",
   "photos.none.side": "Aún no hay foto de lado. El mismo sitio, la misma luz y la misma hora del día hacen que la comparación sea justa.",
-  "photos.none.back": "Aún no hay foto de espalda. El mismo sitio, la misma luz y la misma hora del día hacen que la comparación sea justa.",
+  "photos.none.back":
+    "Aún no hay foto de espalda. El mismo sitio, la misma luz y la misma hora del día hacen que la comparación sea justa.",
   "photos.pick": "Hacer o elegir una foto",
   "photos.saving": "Guardando…",
   "photos.add.front": "Añadir una foto de frente",

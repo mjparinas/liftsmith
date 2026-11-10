@@ -1,5 +1,6 @@
 // Times in the admin panel: a short date and time, and "3 days ago".
-export const when = (t: number) => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+export const when = (t: number) =>
+  new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
 export function ago(t: number, now = Date.now()): string {
   const s = Math.round((now - t) / 1000);

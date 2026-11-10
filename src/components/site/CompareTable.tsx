@@ -3,7 +3,8 @@
 import { OURS, TOPIC_LABEL, type Competitor, type Topic } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
 
-const when = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+const when = (iso: string) =>
+  new Date(`${iso}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
 const host = (url: string) => new URL(url).hostname.replace(/^www\./, "");
 
 export function CompareTable({ c }: { c: Competitor }) {
@@ -28,7 +29,9 @@ export function CompareTable({ c }: { c: Competitor }) {
               {c.rows[t]!.map((x, i) => (
                 <span key={i} className="block">
                   {x.text}{" "}
-                  <a href={x.source} rel="nofollow noopener" className="text-xs whitespace-nowrap underline underline-offset-2">{host(x.source)}, checked {when(x.checked)}</a>
+                  <a href={x.source} rel="nofollow noopener" className="text-xs whitespace-nowrap underline underline-offset-2">
+                    {host(x.source)}, checked {when(x.checked)}
+                  </a>
                 </span>
               ))}
             </dd>

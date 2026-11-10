@@ -1,9 +1,9 @@
 import { available, EXERCISES } from "./exercises";
+import { t } from "./i18n";
 import { smallestJump } from "./plates";
 import { sessionsOf } from "./progression";
 import { EQUIPMENT, EQUIPMENT_LABEL, MUSCLES, type AppEvent, type Equipment, type Gym, type Muscle, type PlateStock } from "./types";
 import { fmtNum, fromKg } from "./units";
-import { t } from "./i18n";
 
 // What to buy next (Melvin picked it, 2026-11-09). Uses the plate solver and the exercise library to
 // say which purchase helps this lifter most: a pair of small plates that makes finer jumps possible,
@@ -90,12 +90,23 @@ export function plateTips(gym: Gym, events: readonly AppEvent[]): PlateTip[] {
     if (jumpTo < jump) parts.push(t("buy.jumps", { to: `${fmtNum(jumpTo)} ${u}`, from: `${fmtNum(jump)} ${u}` }));
     if (gained > 0) parts.push(t("buy.more", { count: gained, hi: `${fmtNum(Math.round(hi))} ${u}` }));
     if (room) parts.push(t("buy.room", { max: `${fmtNum(maxNow)} ${u}` }));
-    tips.push({ weight: w, count: 2, text: t("buy.pair", { w: `${fmtNum(w)} ${u}`, why: parts.join(t("buy.sep")) }), newLoads: gained, jumpFrom: jump, jumpTo, room });
+    tips.push({
+      weight: w,
+      count: 2,
+      text: t("buy.pair", { w: `${fmtNum(w)} ${u}`, why: parts.join(t("buy.sep")) }),
+      newLoads: gained,
+      jumpFrom: jump,
+      jumpTo,
+      room,
+    });
   }
   // Running out of plates matters most, then finer jumps, then sheer variety.
   // A 2.5 kg (5 lb) total jump suits most lifts; much finer only helps once you're already there.
   const ideal = u === "kg" ? 2.5 : 5;
-  const score = (p: PlateTip) => (p.room ? 1000 : 0) + (p.jumpTo < p.jumpFrom ? 100 + (p.jumpFrom - p.jumpTo) * 10 - 40 * Math.abs(Math.log2(p.jumpTo / ideal)) : 0) + p.newLoads;
+  const score = (p: PlateTip) =>
+    (p.room ? 1000 : 0) +
+    (p.jumpTo < p.jumpFrom ? 100 + (p.jumpFrom - p.jumpTo) * 10 - 40 * Math.abs(Math.log2(p.jumpTo / ideal)) : 0) +
+    p.newLoads;
   return tips.sort((a, b) => score(b) - score(a)).slice(0, 3);
 }
 
@@ -114,7 +125,19 @@ export function equipmentTips(gym: Gym): EquipmentTip[] {
   const have = new Set(available(gym.equipment).map((e) => e.id));
   const loaded = (ids: Set<string>) => new Set(EXERCISES.filter((e) => ids.has(e.id) && e.load !== "bodyweight").flatMap((e) => e.primary));
   const coveredNow = loaded(have);
-  const big = new Set<Equipment>(["legPress", "legExtension", "legCurl", "chestPress", "pecDeck", "shoulderPress", "smith", "hackSquat", "calfMachine", "seatedRow", "latPulldown"]);
+  const big = new Set<Equipment>([
+    "legPress",
+    "legExtension",
+    "legCurl",
+    "chestPress",
+    "pecDeck",
+    "shoulderPress",
+    "smith",
+    "hackSquat",
+    "calfMachine",
+    "seatedRow",
+    "latPulldown",
+  ]);
   const out: EquipmentTip[] = [];
   for (const item of EQUIPMENT) {
     if (gym.equipment.includes(item) || big.has(item)) continue;

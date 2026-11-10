@@ -1,14 +1,33 @@
 "use client";
+
 // Optional account: sign in to back up and sync (auth.ts, sync.ts). `AccountPanel` is the sign-in and status
 // block, used on the Account screen (#/account), in Settings and on setup's first step ("Already use
 // Liftsmith? Sign in").
+import { useEffect, useRef, useState } from "react";
+
 import { track } from "@/lib/analytics";
-import { AUTH, AuthError, deleteAccount, finishGoogle, loadScript, makeNonce, methods, platform, sendEmailCode, signInApple, signInGoogle, signOut, useAccount, verifyEmailCode, type Method } from "@/lib/auth";
+import {
+  AUTH,
+  AuthError,
+  deleteAccount,
+  finishGoogle,
+  loadScript,
+  makeNonce,
+  methods,
+  platform,
+  sendEmailCode,
+  signInApple,
+  signInGoogle,
+  signOut,
+  useAccount,
+  verifyEmailCode,
+  type Method,
+} from "@/lib/auth";
 import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
-import { useEffect, useRef, useState } from "react";
+
 import { go } from "./router";
 import { Button, Section } from "./ui";
 
@@ -34,10 +53,16 @@ const AppleLogo = () => (
 
 const GoogleLogo = () => (
   <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden>
-    <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z" />
+    <path
+      fill="#EA4335"
+      d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"
+    />
     <path fill="#4285F4" d="M46.1 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.8c4.3-4 6.9-9.9 6.9-17.2z" />
     <path fill="#FBBC05" d="M10.6 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.9-6.1z" />
-    <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z" />
+    <path
+      fill="#34A853"
+      d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.8c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z"
+    />
   </svg>
 );
 
@@ -63,7 +88,13 @@ function GoogleWebButton({ onDone, onError }: { onDone: () => void; onError: (m:
               .finally(() => useAccount.setState({ busy: false }));
           },
         });
-        window.google.accounts.id.renderButton(box.current, { theme: "filled_black", size: "large", shape: "pill", text: "continue_with", width: Math.min(box.current.clientWidth || 320, 400) });
+        window.google.accounts.id.renderButton(box.current, {
+          theme: "filled_black",
+          size: "large",
+          shape: "pill",
+          text: "continue_with",
+          width: Math.min(box.current.clientWidth || 320, 400),
+        });
       } catch {
         if (live) onError(t("account.offline"));
       }
@@ -106,20 +137,58 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
     <div className="space-y-2">
       {!sent ? (
         <>
-          <label htmlFor="acct-email" className="block text-sm text-muted">{t("account.email.label")}</label>
-          <input id="acct-email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} className="card w-full px-4 py-3" />
-          <Button className="w-full" disabled={busy || !email.includes("@")} onClick={() => void send()}>{t("account.email.send")}</Button>
+          <label htmlFor="acct-email" className="block text-sm text-muted">
+            {t("account.email.label")}
+          </label>
+          <input
+            id="acct-email"
+            type="email"
+            inputMode="email"
+            autoComplete="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="card w-full px-4 py-3"
+          />
+          <Button className="w-full" disabled={busy || !email.includes("@")} onClick={() => void send()}>
+            {t("account.email.send")}
+          </Button>
         </>
       ) : (
         <>
           <p className="text-sm text-muted">{t("account.email.sent", { email: email.trim() })}</p>
-          <label htmlFor="acct-code" className="block text-sm text-muted">{t("account.email.code")}</label>
-          <input id="acct-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]*" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))} className="card display w-full px-4 py-3 text-center text-2xl tracking-[0.4em]" />
-          <Button className="w-full" disabled={busy || code.length !== 6} onClick={() => void verify()}>{t("account.email.verify")}</Button>
-          <Button kind="quiet" className="w-full" onClick={() => { setSent(false); setCode(""); }}>{t("account.email.again")}</Button>
+          <label htmlFor="acct-code" className="block text-sm text-muted">
+            {t("account.email.code")}
+          </label>
+          <input
+            id="acct-code"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]*"
+            maxLength={6}
+            value={code}
+            onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+            className="card display w-full px-4 py-3 text-center text-2xl tracking-[0.4em]"
+          />
+          <Button className="w-full" disabled={busy || code.length !== 6} onClick={() => void verify()}>
+            {t("account.email.verify")}
+          </Button>
+          <Button
+            kind="quiet"
+            className="w-full"
+            onClick={() => {
+              setSent(false);
+              setCode("");
+            }}
+          >
+            {t("account.email.again")}
+          </Button>
         </>
       )}
-      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-bad">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -152,7 +221,12 @@ function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
   return (
     <div className="space-y-2">
       {list.includes("apple") && (
-        <button type="button" disabled={busy} onClick={() => void run("apple", signInApple)()} className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-black px-4 font-semibold text-white ring-1 ring-white/20 disabled:opacity-60">
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => void run("apple", signInApple)()}
+          className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-black px-4 font-semibold text-white ring-1 ring-white/20 disabled:opacity-60"
+        >
           <AppleLogo />
           {t("account.apple")}
         </button>
@@ -161,7 +235,12 @@ function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
         (web ? (
           <GoogleWebButton onDone={onGoogleWeb} onError={onGoogleErr} />
         ) : (
-          <button type="button" disabled={busy} onClick={() => void run("google", signInGoogle)()} className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-4 font-semibold text-[#1f1f1f] ring-1 ring-black/10 disabled:opacity-60">
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => void run("google", signInGoogle)()}
+            className="press flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-white px-4 font-semibold text-[#1f1f1f] ring-1 ring-black/10 disabled:opacity-60"
+          >
             <GoogleLogo />
             {t("account.google")}
           </button>
@@ -169,9 +248,15 @@ function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
       {email ? (
         <EmailSignIn onDone={done("email")} />
       ) : (
-        <Button kind="ghost" className="w-full" onClick={() => setEmail(true)}>{t("account.emailButton")}</Button>
+        <Button kind="ghost" className="w-full" onClick={() => setEmail(true)}>
+          {t("account.emailButton")}
+        </Button>
       )}
-      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-bad">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -193,23 +278,55 @@ function SignedIn() {
     <div className="space-y-3">
       <p className="text-sm">{account.email ? t("account.as", { email: account.email, via }) : t("account.asNoEmail", { via })}</p>
       <p className="text-sm text-muted" aria-live="polite">
-        {busy ? t("account.syncing") : s.lastError ? t("account.syncError") : waiting ? t("account.waiting", { count: waiting }) : s.lastSync ? t("account.synced", { when: ago(s.lastSync) }) : t("account.notSynced")}
+        {busy
+          ? t("account.syncing")
+          : s.lastError
+            ? t("account.syncError")
+            : waiting
+              ? t("account.waiting", { count: waiting })
+              : s.lastSync
+                ? t("account.synced", { when: ago(s.lastSync) })
+                : t("account.notSynced")}
       </p>
       <div className="grid grid-cols-2 gap-2">
-        <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>{t("account.syncNow")}</Button>
-        <Button kind="ghost" onClick={() => void signOut()}>{t("account.signOut")}</Button>
+        <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>
+          {t("account.syncNow")}
+        </Button>
+        <Button kind="ghost" onClick={() => void signOut()}>
+          {t("account.signOut")}
+        </Button>
       </div>
       <p className="text-xs text-faint">{t("account.signOutNote")}</p>
       {confirm ? (
         <div className="space-y-2">
           <p className="text-sm text-muted">{t("account.delete.warn")}</p>
-          <Button kind="danger" className="w-full" disabled={busy} onClick={() => void deleteAccount().then(() => track("feature", { name: "account_delete" }), (e) => setError(message(e)))}>{t("account.delete.confirm")}</Button>
-          <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>{t("settings.cancel")}</Button>
+          <Button
+            kind="danger"
+            className="w-full"
+            disabled={busy}
+            onClick={() =>
+              void deleteAccount().then(
+                () => track("feature", { name: "account_delete" }),
+                (e) => setError(message(e)),
+              )
+            }
+          >
+            {t("account.delete.confirm")}
+          </Button>
+          <Button kind="quiet" className="w-full" onClick={() => setConfirm(false)}>
+            {t("settings.cancel")}
+          </Button>
         </div>
       ) : (
-        <Button kind="quiet" className="w-full text-bad" onClick={() => setConfirm(true)}>{t("account.delete")}</Button>
+        <Button kind="quiet" className="w-full text-bad" onClick={() => setConfirm(true)}>
+          {t("account.delete")}
+        </Button>
       )}
-      {error && <p role="alert" className="text-sm text-bad">{error}</p>}
+      {error && (
+        <p role="alert" className="text-sm text-bad">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -220,7 +337,11 @@ export function AccountPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   const lost = useAccount((s) => s.error === "signedOut");
   return (
     <div className="space-y-3">
-      {lost && !account && <p role="status" className="text-sm text-warn">{t("account.lost")}</p>}
+      {lost && !account && (
+        <p role="status" className="text-sm text-warn">
+          {t("account.lost")}
+        </p>
+      )}
       {account ? <SignedIn /> : <SignedOut onSignedIn={onSignedIn} />}
     </div>
   );
@@ -231,7 +352,9 @@ export function Account() {
   const account = useAccount((s) => s.account);
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">{t("train.back")}</button>
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
+        {t("train.back")}
+      </button>
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("account.title")}</h1>
       <p className="mt-2 text-muted">{account ? t("account.leadIn") : t("account.lead")}</p>
       <Section title={account ? t("account.yours") : t("account.signIn")} icon="lock">

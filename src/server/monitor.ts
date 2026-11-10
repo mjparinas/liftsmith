@@ -18,13 +18,19 @@ export async function trackJob(job: string, fn: () => Promise<Response>, now: ()
   }
   const finish = async (ok: boolean, detail: string) => {
     if (id === null) return;
-    await run("UPDATE job_runs SET finished_at = ?, ok = ?, detail = ? WHERE id = ?", [now(), ok ? 1 : 0, detail.slice(0, 1000), id]).catch((e: Error) =>
-      console.error("[monitor] could not record job end", e.message),
+    await run("UPDATE job_runs SET finished_at = ?, ok = ?, detail = ? WHERE id = ?", [now(), ok ? 1 : 0, detail.slice(0, 1000), id]).catch(
+      (e: Error) => console.error("[monitor] could not record job end", e.message),
     );
   };
   try {
     const res = await fn();
-    await finish(res.ok, await res.clone().text().catch(() => ""));
+    await finish(
+      res.ok,
+      await res
+        .clone()
+        .text()
+        .catch(() => ""),
+    );
     return res;
   } catch (e) {
     await finish(false, (e as Error).message);
@@ -41,7 +47,10 @@ export interface JobRun {
 }
 
 export async function recentJobRuns(job: string, limit = 10): Promise<JobRun[]> {
-  const rows = await query<Record<string, unknown>>("SELECT job, started_at, finished_at, ok, detail FROM job_runs WHERE job = ? ORDER BY started_at DESC LIMIT ?", [job, limit]);
+  const rows = await query<Record<string, unknown>>(
+    "SELECT job, started_at, finished_at, ok, detail FROM job_runs WHERE job = ? ORDER BY started_at DESC LIMIT ?",
+    [job, limit],
+  );
   return rows.map((r) => ({
     job: String(r.job),
     startedAt: Number(r.started_at),

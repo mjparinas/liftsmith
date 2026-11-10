@@ -22,12 +22,16 @@ export const en = {
   "x.checkIn": "👋 Check in",
   "x.warmTitle": "Five-minute warm-up",
   "x.buddyTitle": "Tell your gym buddies",
-  "x.warmIntro": { one: "About {count} minute for the muscles in today's plan. Your first lift still ramps up with warm-up sets.", other: "About {count} minutes for the muscles in today's plan. Your first lift still ramps up with warm-up sets." },
+  "x.warmIntro": {
+    one: "About {count} minute for the muscles in today's plan. Your first lift still ramps up with warm-up sets.",
+    other: "About {count} minutes for the muscles in today's plan. Your first lift still ramps up with warm-up sets.",
+  },
   "x.reps": "{n} reps",
   "x.secs": "{n} s",
   "x.shareFail": "Couldn't open the share sheet.",
   "x.copied": "Copied. Paste it into your group chat.",
-  "x.buddyIntro": "Sends a quick “I’m at the gym” through your usual messaging app. Once accounts arrive, buddies who use the app get a nudge straight to their phone.",
+  "x.buddyIntro":
+    "Sends a quick “I’m at the gym” through your usual messaging app. Once accounts arrive, buddies who use the app get a nudge straight to their phone.",
   "x.removeBuddy": "Remove {name}",
   "x.addBuddy": "Add a buddy's name",
   "x.buddyName": "Buddy's name",
@@ -43,8 +47,10 @@ export const en = {
   "x.photos": "Body and photos",
   "x.private": "Private, on this phone",
   "x.score": "Strength score",
-  "x.scoreBody": "Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight. 50 is typical.",
-  "x.scoreBodyAge": "Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight, adjusted for your age. 50 is typical.",
+  "x.scoreBody":
+    "Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight. 50 is typical.",
+  "x.scoreBodyAge":
+    "Your current estimated maxes (from the last 6 months) against a typical intermediate lifter of your body weight, adjusted for your age. 50 is typical.",
   "x.adjustAge": "Adjust for age",
   "x.addBirth": "Add your birth year in setup to adjust the score for age.",
   "x.twins": "Strength twins",
@@ -54,7 +60,8 @@ export const en = {
   "x.twinsAgeSex": "How you compare with trained lifters of your age, sex and body weight.",
   "x.estMax": "Estimated max {kg}",
   "x.stronger": "Stronger than",
-  "x.twinsNote": "An estimate from typical strength standards, not from other users. Real rankings against lifters like you come with accounts.",
+  "x.twinsNote":
+    "An estimate from typical strength standards, not from other users. Real rankings against lifters like you come with accounts.",
 } as const;
 
 type Key = keyof typeof en;
@@ -78,12 +85,16 @@ export const es: Partial<Record<Key, Message>> = {
   "x.checkIn": "👋 Avisar",
   "x.warmTitle": "Calentamiento de cinco minutos",
   "x.buddyTitle": "Avisa a tus compañeros",
-  "x.warmIntro": { one: "Unos {count} minuto para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento.", other: "Unos {count} minutos para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento." },
+  "x.warmIntro": {
+    one: "Unos {count} minuto para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento.",
+    other: "Unos {count} minutos para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento.",
+  },
   "x.reps": "{n} reps",
   "x.secs": "{n} s",
   "x.shareFail": "No se pudo abrir el menú para compartir.",
   "x.copied": "Copiado. Pégalo en tu chat de grupo.",
-  "x.buddyIntro": "Envía un rápido «Estoy en el gimnasio» por tu app de mensajes habitual. Cuando lleguen las cuentas, los compañeros que usen la app recibirán un aviso directo en su teléfono.",
+  "x.buddyIntro":
+    "Envía un rápido «Estoy en el gimnasio» por tu app de mensajes habitual. Cuando lleguen las cuentas, los compañeros que usen la app recibirán un aviso directo en su teléfono.",
   "x.removeBuddy": "Quitar a {name}",
   "x.addBuddy": "Añade el nombre de un compañero",
   "x.buddyName": "Nombre del compañero",
@@ -99,8 +110,10 @@ export const es: Partial<Record<Key, Message>> = {
   "x.photos": "Cuerpo y fotos",
   "x.private": "Privado, en este teléfono",
   "x.score": "Puntuación de fuerza",
-  "x.scoreBody": "Tus máximos estimados actuales (de los últimos 6 meses) frente a un atleta intermedio típico de tu peso corporal. 50 es lo típico.",
-  "x.scoreBodyAge": "Tus máximos estimados actuales (de los últimos 6 meses) frente a un atleta intermedio típico de tu peso corporal, ajustados a tu edad. 50 es lo típico.",
+  "x.scoreBody":
+    "Tus máximos estimados actuales (de los últimos 6 meses) frente a un atleta intermedio típico de tu peso corporal. 50 es lo típico.",
+  "x.scoreBodyAge":
+    "Tus máximos estimados actuales (de los últimos 6 meses) frente a un atleta intermedio típico de tu peso corporal, ajustados a tu edad. 50 es lo típico.",
   "x.adjustAge": "Ajustar por edad",
   "x.addBirth": "Añade tu año de nacimiento en la configuración para ajustar la puntuación por edad.",
   "x.twins": "Gemelos de fuerza",
@@ -110,7 +123,8 @@ export const es: Partial<Record<Key, Message>> = {
   "x.twinsAgeSex": "Cómo te comparas con atletas entrenados de tu edad, sexo y peso corporal.",
   "x.estMax": "Máximo estimado {kg}",
   "x.stronger": "Más fuerte que",
-  "x.twinsNote": "Una estimación a partir de estándares de fuerza típicos, no de otros usuarios. Las clasificaciones reales frente a atletas como tú llegarán con las cuentas.",
+  "x.twinsNote":
+    "Una estimación a partir de estándares de fuerza típicos, no de otros usuarios. Las clasificaciones reales frente a atletas como tú llegarán con las cuentas.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -132,12 +146,17 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.checkIn": "👋 Prévenir",
   "x.warmTitle": "Échauffement de cinq minutes",
   "x.buddyTitle": "Prévenez vos partenaires",
-  "x.warmIntro": { one: "Environ {count} minute pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement.", other: "Environ {count} minutes pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement." },
+  "x.warmIntro": {
+    one: "Environ {count} minute pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement.",
+    other:
+      "Environ {count} minutes pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement.",
+  },
   "x.reps": "{n} reps",
   "x.secs": "{n} s",
   "x.shareFail": "Impossible d’ouvrir le menu de partage.",
   "x.copied": "Copié. Collez-le dans votre groupe.",
-  "x.buddyIntro": "Envoie un petit « Je suis à la salle » par votre messagerie habituelle. Avec les comptes, les partenaires qui utilisent l’app recevront une notification sur leur téléphone.",
+  "x.buddyIntro":
+    "Envoie un petit « Je suis à la salle » par votre messagerie habituelle. Avec les comptes, les partenaires qui utilisent l’app recevront une notification sur leur téléphone.",
   "x.removeBuddy": "Retirer {name}",
   "x.addBuddy": "Ajouter le nom d’un partenaire",
   "x.buddyName": "Nom du partenaire",
@@ -153,8 +172,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.photos": "Corps et photos",
   "x.private": "Privé, sur ce téléphone",
   "x.score": "Score de force",
-  "x.scoreBody": "Vos max estimés actuels (sur les 6 derniers mois) comparés à un sportif intermédiaire typique de votre poids. 50 est la moyenne.",
-  "x.scoreBodyAge": "Vos max estimés actuels (sur les 6 derniers mois) comparés à un sportif intermédiaire typique de votre poids, ajustés à votre âge. 50 est la moyenne.",
+  "x.scoreBody":
+    "Vos max estimés actuels (sur les 6 derniers mois) comparés à un sportif intermédiaire typique de votre poids. 50 est la moyenne.",
+  "x.scoreBodyAge":
+    "Vos max estimés actuels (sur les 6 derniers mois) comparés à un sportif intermédiaire typique de votre poids, ajustés à votre âge. 50 est la moyenne.",
   "x.adjustAge": "Ajuster selon l’âge",
   "x.addBirth": "Ajoutez votre année de naissance dans la configuration pour ajuster le score selon l’âge.",
   "x.twins": "Jumeaux de force",
@@ -164,5 +185,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.twinsAgeSex": "Comment vous vous situez face aux sportifs entraînés de votre âge, de votre sexe et de votre poids.",
   "x.estMax": "Max estimé {kg}",
   "x.stronger": "Plus fort que",
-  "x.twinsNote": "Une estimation tirée de standards de force typiques, pas d’autres utilisateurs. Les vrais classements face à des sportifs comme vous arriveront avec les comptes.",
+  "x.twinsNote":
+    "Une estimation tirée de standards de force typiques, pas d’autres utilisateurs. Les vrais classements face à des sportifs comme vous arriveront avec les comptes.",
 };

@@ -1,12 +1,13 @@
 // The public SEO pages (exercises, muscles, equipment, muscle + equipment pairs, alternatives, guides, blog,
 // tools) and the one route list the sitemap is built from. Everything comes from the same exercise library the
 // app plans with, so a new exercise gets its pages and its sitemap entry without touching this file.
-import { EXERCISES, EXERCISE_BY_ID } from "./exercises";
-import { alternatives } from "./generator";
-import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { ARTICLES, type Article } from "@/content/articles";
-import { SITE_URL } from "./site";
 import { COMPETITORS } from "@/content/compare";
+
+import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { alternatives } from "./generator";
+import { SITE_URL } from "./site";
+import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 
 /** frontDelts → front-delts. */
 export const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
@@ -20,17 +21,52 @@ export const exerciseBySlug = (s: string) => EXERCISE_BY_ID.get(s) ?? null;
 // English labels for the public site (the app's MUSCLE_LABEL and EQUIPMENT_LABEL follow the phone's language,
 // but the site is English only for now).
 export const MUSCLE_NAME: Record<Muscle, string> = {
-  chest: "Chest", frontDelts: "Front delts", sideDelts: "Side delts", rearDelts: "Rear delts", biceps: "Biceps", triceps: "Triceps",
-  forearms: "Forearms", abs: "Abs", obliques: "Obliques", traps: "Traps", upperBack: "Upper back", lats: "Lats", lowerBack: "Lower back",
-  glutes: "Glutes", quads: "Quads", hamstrings: "Hamstrings", adductors: "Adductors", calves: "Calves",
+  chest: "Chest",
+  frontDelts: "Front delts",
+  sideDelts: "Side delts",
+  rearDelts: "Rear delts",
+  biceps: "Biceps",
+  triceps: "Triceps",
+  forearms: "Forearms",
+  abs: "Abs",
+  obliques: "Obliques",
+  traps: "Traps",
+  upperBack: "Upper back",
+  lats: "Lats",
+  lowerBack: "Lower back",
+  glutes: "Glutes",
+  quads: "Quads",
+  hamstrings: "Hamstrings",
+  adductors: "Adductors",
+  calves: "Calves",
 };
 export const EQUIPMENT_NAME: Record<Equipment, string> = {
-  barbell: "Barbell", ezBar: "EZ curl bar", trapBar: "Trap bar", dumbbells: "Dumbbells", kettlebells: "Kettlebells", bench: "Flat bench",
-  inclineBench: "Adjustable bench", rack: "Squat rack", pullupBar: "Pull-up bar", dipBars: "Dip bars", cable: "Cable machine",
-  latPulldown: "Lat pulldown", seatedRow: "Seated row machine", legPress: "Leg press", legExtension: "Leg extension machine",
-  legCurl: "Leg curl machine", chestPress: "Chest press machine", pecDeck: "Pec deck", shoulderPress: "Shoulder press machine",
-  smith: "Smith machine", hackSquat: "Hack squat machine", calfMachine: "Calf raise machine", bands: "Resistance bands",
-  rings: "Gymnastic rings", box: "Plyo box or step", abWheel: "Ab wheel",
+  barbell: "Barbell",
+  ezBar: "EZ curl bar",
+  trapBar: "Trap bar",
+  dumbbells: "Dumbbells",
+  kettlebells: "Kettlebells",
+  bench: "Flat bench",
+  inclineBench: "Adjustable bench",
+  rack: "Squat rack",
+  pullupBar: "Pull-up bar",
+  dipBars: "Dip bars",
+  cable: "Cable machine",
+  latPulldown: "Lat pulldown",
+  seatedRow: "Seated row machine",
+  legPress: "Leg press",
+  legExtension: "Leg extension machine",
+  legCurl: "Leg curl machine",
+  chestPress: "Chest press machine",
+  pecDeck: "Pec deck",
+  shoulderPress: "Shoulder press machine",
+  smith: "Smith machine",
+  hackSquat: "Hack squat machine",
+  calfMachine: "Calf raise machine",
+  bands: "Resistance bands",
+  rings: "Gymnastic rings",
+  box: "Plyo box or step",
+  abWheel: "Ab wheel",
 };
 
 /** One plain line on what each muscle does, for its page. */
@@ -98,9 +134,21 @@ export const articlesOf = (kind: Article["kind"]) => ARTICLES.filter((a) => a.ki
 export const articlePath = (a: Article) => `/${a.kind === "guide" ? "guides" : "blog"}/${a.slug}/`;
 
 export const TOOL_PAGES = [
-  { path: "/tools/plate-calculator/", name: "Plate calculator", blurb: "Which plates go on each side of the bar for any weight, with the plates you own." },
-  { path: "/tools/one-rep-max-calculator/", name: "One-rep max calculator", blurb: "Your estimated max from any set, with a reps-to-weight table and every formula's answer." },
-  { path: "/tools/tdee-calculator/", name: "TDEE calculator", blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters." },
+  {
+    path: "/tools/plate-calculator/",
+    name: "Plate calculator",
+    blurb: "Which plates go on each side of the bar for any weight, with the plates you own.",
+  },
+  {
+    path: "/tools/one-rep-max-calculator/",
+    name: "One-rep max calculator",
+    blurb: "Your estimated max from any set, with a reps-to-weight table and every formula's answer.",
+  },
+  {
+    path: "/tools/tdee-calculator/",
+    name: "TDEE calculator",
+    blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters.",
+  },
 ] as const;
 
 export interface Route {

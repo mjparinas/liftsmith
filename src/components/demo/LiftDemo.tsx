@@ -1,8 +1,11 @@
 "use client";
-import { EXERCISES } from "@/lib/exercises";
-import type { BodyKey } from "@/lib/demo/rig";
-import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+
+import type { BodyKey } from "@/lib/demo/rig";
+import { EXERCISES } from "@/lib/exercises";
+import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+
 import type { DemoSettings, Loop, View } from "./engine";
 
 // The exercise demo: a procedural 3D hologram figure (three.js, lazy-loaded) performing the lift,
@@ -59,7 +62,8 @@ export function detectMode(): DemoMode {
   detected = "2d";
   try {
     const c = document.createElement("canvas");
-    const gl = "WebGLRenderingContext" in window ? ((c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null) : null;
+    const gl =
+      "WebGLRenderingContext" in window ? ((c.getContext("webgl2") || c.getContext("webgl")) as WebGLRenderingContext | null) : null;
     if (gl) {
       detected = "3d";
       gl.getExtension("WEBGL_lose_context")?.loseContext(); // free the probe context straight away
@@ -68,9 +72,31 @@ export function detectMode(): DemoMode {
   return detected;
 }
 
-const VIEWS: [View, string][] = [["orbit", "Orbit"], ["front", "Front"], ["three", "3/4"], ["side", "Side"]];
+const VIEWS: [View, string][] = [
+  ["orbit", "Orbit"],
+  ["front", "Front"],
+  ["three", "3/4"],
+  ["side", "Side"],
+];
 
-export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyToggle, view: viewProp, still, paused, controls, highlight, bpm, fps, follow, className = "", onDone, onClick }: LiftDemoProps) {
+export function LiftDemo({
+  exerciseId = null,
+  reps,
+  label,
+  body: bodyProp,
+  bodyToggle,
+  view: viewProp,
+  still,
+  paused,
+  controls,
+  highlight,
+  bpm,
+  fps,
+  follow,
+  className = "",
+  onDone,
+  onClick,
+}: LiftDemoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const loopRef = useRef<Loop | null>(null);
   const phaseRef = useRef<HTMLSpanElement>(null);
@@ -88,7 +114,21 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyT
   const [speed, setSpeed] = useState(1);
   const [playing, setPlaying] = useState(!still);
 
-  const settings: DemoSettings = { exerciseId, body, view, skeleton, muscles, path, speed, playing: playing && !paused && !still, reps, highlight, bpm: bpm ?? null, fps: fps ?? (controls ? 60 : 30), follow: follow ?? null };
+  const settings: DemoSettings = {
+    exerciseId,
+    body,
+    view,
+    skeleton,
+    muscles,
+    path,
+    speed,
+    playing: playing && !paused && !still,
+    reps,
+    highlight,
+    bpm: bpm ?? null,
+    fps: fps ?? (controls ? 60 : 30),
+    follow: follow ?? null,
+  };
   const latest = useRef(settings);
   const onDoneRef = useRef(onDone);
   useEffect(() => {
@@ -115,14 +155,26 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyT
         }
       } else {
         const { createScene2D } = await import("./scene2d");
-        if (!canvas.getContext("2d")) { setFailed(true); return; }
+        if (!canvas.getContext("2d")) {
+          setFailed(true);
+          return;
+        }
         scene = createScene2D(canvas);
       }
-      if (cancelled) { scene.dispose(); return; }
-      loopRef.current = startLoop(canvas, scene, latest.current, (l) => {
-        const el = phaseRef.current;
-        if (el && el.textContent !== l.toUpperCase()) el.textContent = l.toUpperCase();
-      }, () => onDoneRef.current?.());
+      if (cancelled) {
+        scene.dispose();
+        return;
+      }
+      loopRef.current = startLoop(
+        canvas,
+        scene,
+        latest.current,
+        (l) => {
+          const el = phaseRef.current;
+          if (el && el.textContent !== l.toUpperCase()) el.textContent = l.toUpperCase();
+        },
+        () => onDoneRef.current?.(),
+      );
     })().catch(() => setFailed(true));
     return () => {
       cancelled = true;
@@ -160,13 +212,20 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyT
             onClick={onClick}
           />
         )}
-        {(mode === "none" || failed) && <div className="absolute inset-0 grid place-items-center p-4 text-center text-sm text-muted">{name}</div>}
+        {(mode === "none" || failed) && (
+          <div className="absolute inset-0 grid place-items-center p-4 text-center text-sm text-muted">{name}</div>
+        )}
         <div className="pointer-events-none absolute inset-x-3 top-2 flex justify-between gap-2 font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
           <span className="truncate">{label ?? (controls ? VIEWS.find((v) => v[0] === view)?.[1] : "")}</span>
           <span ref={phaseRef} className="shrink-0 text-[#5cc8ff]" aria-hidden />
         </div>
         {!!bpm && (
-          <span className="pointer-events-none absolute bottom-2 left-3 font-mono text-[0.6875rem] tabular-nums text-[#ff6b84]" aria-label={`Heart rate ${bpm}`}>♥ {bpm}</span>
+          <span
+            className="pointer-events-none absolute bottom-2 left-3 font-mono text-[0.6875rem] tabular-nums text-[#ff6b84]"
+            aria-label={`Heart rate ${bpm}`}
+          >
+            ♥ {bpm}
+          </span>
         )}
         {controls && (
           <div className="pointer-events-none absolute inset-x-3 bottom-2 flex justify-between font-mono text-[0.6875rem] uppercase tracking-wider text-muted">
@@ -178,21 +237,63 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyT
       {controls && (
         <div className="mt-3 space-y-3">
           <div className="flex flex-wrap items-center gap-2" role="group" aria-label="Demo controls">
-            {bodyToggle && <Seg label="Body" value={body} options={[["male", "Male"], ["female", "Female"]]} onPick={setBodyPick} />}
+            {bodyToggle && (
+              <Seg
+                label="Body"
+                value={body}
+                options={[
+                  ["male", "Male"],
+                  ["female", "Female"],
+                ]}
+                onPick={setBodyPick}
+              />
+            )}
             <Seg label="View" value={view} options={VIEWS} onPick={setView} />
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <Toggle on={skeleton} onClick={() => setSkeleton((v) => !v)} dot="#f3e6d3">Skeleton</Toggle>
-            <Toggle on={muscles} onClick={() => setMuscles((v) => !v)} dot="#ff5b3a">Target muscles</Toggle>
-            <Toggle on={path} onClick={() => setPath((v) => !v)} dot="#d4e0ea">{ex && (ex.load === "barbell") ? "Bar path" : "Hand path"}</Toggle>
-            <Seg label="Tempo" value={String(speed)} options={[["0.5", "0.5×"], ["1", "1×"]]} onPick={(v) => setSpeed(Number(v))} />
-            <button type="button" onClick={() => setPlaying((p) => !p)} aria-pressed={playing} className="press min-h-11 rounded-xl border border-line bg-surface px-3 text-sm">{playing ? "Pause" : "Play"}</button>
+            <Toggle on={skeleton} onClick={() => setSkeleton((v) => !v)} dot="#f3e6d3">
+              Skeleton
+            </Toggle>
+            <Toggle on={muscles} onClick={() => setMuscles((v) => !v)} dot="#ff5b3a">
+              Target muscles
+            </Toggle>
+            <Toggle on={path} onClick={() => setPath((v) => !v)} dot="#d4e0ea">
+              {ex && ex.load === "barbell" ? "Bar path" : "Hand path"}
+            </Toggle>
+            <Seg
+              label="Tempo"
+              value={String(speed)}
+              options={[
+                ["0.5", "0.5×"],
+                ["1", "1×"],
+              ]}
+              onPick={(v) => setSpeed(Number(v))}
+            />
+            <button
+              type="button"
+              onClick={() => setPlaying((p) => !p)}
+              aria-pressed={playing}
+              className="press min-h-11 rounded-xl border border-line bg-surface px-3 text-sm"
+            >
+              {playing ? "Pause" : "Play"}
+            </button>
           </div>
           {ex && (
             <p className="flex flex-wrap items-center gap-1.5 text-sm">
               <span className="font-mono text-[0.6875rem] uppercase tracking-wider text-muted">Works</span>
-              {ex.primary.map((m) => <span key={m} className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[0.8125rem] text-[#ffb3a3]">{MUSCLE_LABEL[m]}</span>)}
-              {ex.secondary.map((m) => <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[0.8125rem] text-muted">{MUSCLE_LABEL[m]}</span>)}
+              {ex.primary.map((m) => (
+                <span
+                  key={m}
+                  className="rounded-full border border-[#ff5b3a]/60 bg-[#ff5b3a]/10 px-2.5 py-0.5 text-[0.8125rem] text-[#ffb3a3]"
+                >
+                  {MUSCLE_LABEL[m]}
+                </span>
+              ))}
+              {ex.secondary.map((m) => (
+                <span key={m} className="rounded-full border border-line px-2.5 py-0.5 text-[0.8125rem] text-muted">
+                  {MUSCLE_LABEL[m]}
+                </span>
+              ))}
             </p>
           )}
         </div>
@@ -201,11 +302,29 @@ export function LiftDemo({ exerciseId = null, reps, label, body: bodyProp, bodyT
   );
 }
 
-function Seg<T extends string>({ label, value, options, onPick }: { label: string; value: T; options: [T, string][]; onPick: (v: T) => void }) {
+function Seg<T extends string>({
+  label,
+  value,
+  options,
+  onPick,
+}: {
+  label: string;
+  value: T;
+  options: [T, string][];
+  onPick: (v: T) => void;
+}) {
   return (
     <div className="inline-flex overflow-hidden rounded-xl border border-line bg-surface" role="group" aria-label={label}>
       {options.map(([v, l], i) => (
-        <button key={v} type="button" aria-pressed={v === value} onClick={() => onPick(v)} className={`press min-h-11 px-3 text-sm ${i ? "border-l border-line" : ""} ${v === value ? "bg-accent/15 text-accent" : "text-ink"}`}>{l}</button>
+        <button
+          key={v}
+          type="button"
+          aria-pressed={v === value}
+          onClick={() => onPick(v)}
+          className={`press min-h-11 px-3 text-sm ${i ? "border-l border-line" : ""} ${v === value ? "bg-accent/15 text-accent" : "text-ink"}`}
+        >
+          {l}
+        </button>
       ))}
     </div>
   );
@@ -213,8 +332,17 @@ function Seg<T extends string>({ label, value, options, onPick }: { label: strin
 
 function Toggle({ on, onClick, dot, children }: { on: boolean; onClick: () => void; dot: string; children: React.ReactNode }) {
   return (
-    <button type="button" aria-pressed={on} onClick={onClick} className={`press inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm ${on ? "border-[#2c3b4b] bg-surface text-ink" : "border-line bg-surface text-muted"}`}>
-      <span className="h-2.5 w-2.5 rounded-full border" style={{ borderColor: on ? dot : "currentColor", background: on ? dot : "transparent", boxShadow: on ? `0 0 8px ${dot}` : "none" }} aria-hidden />
+    <button
+      type="button"
+      aria-pressed={on}
+      onClick={onClick}
+      className={`press inline-flex min-h-11 items-center gap-2 rounded-xl border px-3 text-sm ${on ? "border-[#2c3b4b] bg-surface text-ink" : "border-line bg-surface text-muted"}`}
+    >
+      <span
+        className="h-2.5 w-2.5 rounded-full border"
+        style={{ borderColor: on ? dot : "currentColor", background: on ? dot : "transparent", boxShadow: on ? `0 0 8px ${dot}` : "none" }}
+        aria-hidden
+      />
       {children}
     </button>
   );

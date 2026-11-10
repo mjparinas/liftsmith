@@ -7,6 +7,7 @@
 // RevenueCat sends the Authorization header we set in its dashboard; REVENUECAT_WEBHOOK_SECRET must match.
 // Docs: https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields
 import { timingSafeEqual } from "node:crypto";
+
 import { claimFromStore } from "./creators";
 import { batch } from "./db";
 
@@ -71,7 +72,8 @@ export function planOf(productId: string | undefined): "annual" | "monthly" | nu
   return null;
 }
 
-const storeOf = (s: string | undefined) => (s === "PLAY_STORE" ? "play" : s === "APP_STORE" || s === "MAC_APP_STORE" ? "appstore" : (s ?? "other").toLowerCase());
+const storeOf = (s: string | undefined) =>
+  s === "PLAY_STORE" ? "play" : s === "APP_STORE" || s === "MAC_APP_STORE" ? "appstore" : (s ?? "other").toLowerCase();
 const micros = (x: number | null | undefined) => (typeof x === "number" && Number.isFinite(x) ? Math.round(Math.abs(x) * 1_000_000) : null);
 
 /** Whether the request carries the shared secret. */
@@ -97,9 +99,18 @@ export async function storeRcEvent(e: RcEvent, now = Date.now()): Promise<"store
     stmts.push({
       sql: "INSERT OR IGNORE INTO subscription_events (id, at, install_id, subscription, store, kind, plan, price_micros, currency, usd_micros, country, reason, source) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'store')",
       args: [
-        `rc-${e.id}`, at, user, e.original_transaction_id ?? null, storeOf(e.store), k.kind, planOf(e.product_id),
-        paid ? micros(e.price_in_purchased_currency) : null, paid ? currency : null, paid ? micros(e.price) : null,
-        e.country_code ? e.country_code.toUpperCase().slice(0, 2) : null, k.reason ?? null,
+        `rc-${e.id}`,
+        at,
+        user,
+        e.original_transaction_id ?? null,
+        storeOf(e.store),
+        k.kind,
+        planOf(e.product_id),
+        paid ? micros(e.price_in_purchased_currency) : null,
+        paid ? currency : null,
+        paid ? micros(e.price) : null,
+        e.country_code ? e.country_code.toUpperCase().slice(0, 2) : null,
+        k.reason ?? null,
       ],
     });
   }

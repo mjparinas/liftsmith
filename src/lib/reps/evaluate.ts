@@ -26,7 +26,9 @@ function corr(a: number[], b: number[]) {
   if (n < 3) return NaN;
   const ma = a.reduce((s, x) => s + x, 0) / n;
   const mb = b.reduce((s, x) => s + x, 0) / n;
-  let num = 0, da = 0, db = 0;
+  let num = 0,
+    da = 0,
+    db = 0;
   for (let i = 0; i < n; i++) {
     num += (a[i] - ma) * (b[i] - mb);
     da += (a[i] - ma) ** 2;
@@ -35,8 +37,22 @@ function corr(a: number[], b: number[]) {
   return num / Math.sqrt(da * db);
 }
 
-export function evaluate(source: "camera" | "imu" | "fused", sets: number, profile: MotionProfile, noise: CameraNoise & { imuNoise?: number; hz?: number; romDeg?: number; romM?: number } = {}): Score {
-  const s: Score = { sets, exactReps: 0, repMae: 0, partial: { truth: 0, found: 0, hit: 0 }, failed: { truth: 0, found: 0, hit: 0 }, grinder: { truth: 0, found: 0, hit: 0 }, durationMaeMs: 0, speedCorr: 0 };
+export function evaluate(
+  source: "camera" | "imu" | "fused",
+  sets: number,
+  profile: MotionProfile,
+  noise: CameraNoise & { imuNoise?: number; hz?: number; romDeg?: number; romM?: number } = {},
+): Score {
+  const s: Score = {
+    sets,
+    exactReps: 0,
+    repMae: 0,
+    partial: { truth: 0, found: 0, hit: 0 },
+    failed: { truth: 0, found: 0, hit: 0 },
+    grinder: { truth: 0, found: 0, hit: 0 },
+    durationMaeMs: 0,
+    speedCorr: 0,
+  };
   const ms: number[] = [];
   const ts: number[] = [];
   for (let i = 0; i < sets; i++) {
@@ -45,15 +61,34 @@ export function evaluate(source: "camera" | "imu" | "fused", sets: number, profi
     let sum: SetSummary;
     if (source === "camera") {
       const tr = new RepTracker(profile);
-      for (const x of cameraSamples(sim, 3000 + i, { restDeg: profile.restHigh ? 172 : 60, romDeg: noise.romDeg ?? 85, restHigh: profile.restHigh, barRomM: 0.5, ...noise })) tr.push({ t: x.t, pos: x.pos, bar: Number.isNaN(x.bar) ? undefined : x.bar, conf: x.conf });
+      for (const x of cameraSamples(sim, 3000 + i, {
+        restDeg: profile.restHigh ? 172 : 60,
+        romDeg: noise.romDeg ?? 85,
+        restHigh: profile.restHigh,
+        barRomM: 0.5,
+        ...noise,
+      }))
+        tr.push({ t: x.t, pos: x.pos, bar: Number.isNaN(x.bar) ? undefined : x.bar, conf: x.conf });
       sum = tr.finish();
     } else if (source === "fused") {
       const c = new ImuRepCounter(profile);
-      for (const x of imuSamples(sim, 3000 + i, { romM: noise.romM ?? 0.5, downFirst: profile.restHigh, noise: noise.imuNoise, hz: noise.hz })) c.pushFused(x.t, x.up, x.rot);
+      for (const x of imuSamples(sim, 3000 + i, {
+        romM: noise.romM ?? 0.5,
+        downFirst: profile.restHigh,
+        noise: noise.imuNoise,
+        hz: noise.hz,
+      }))
+        c.pushFused(x.t, x.up, x.rot);
       sum = c.finish();
     } else {
       const c = new ImuRepCounter(profile);
-      for (const x of imuSamples(sim, 3000 + i, { romM: noise.romM ?? 0.5, downFirst: profile.restHigh, noise: noise.imuNoise, hz: noise.hz })) c.push(x.t, x.x, x.y, x.z);
+      for (const x of imuSamples(sim, 3000 + i, {
+        romM: noise.romM ?? 0.5,
+        downFirst: profile.restHigh,
+        noise: noise.imuNoise,
+        hz: noise.hz,
+      }))
+        c.push(x.t, x.x, x.y, x.z);
       sum = c.finish();
     }
     const truthDone = kinds.filter((k) => k === "full" || k === "grinder").length;
@@ -63,7 +98,10 @@ export function evaluate(source: "camera" | "imu" | "fused", sets: number, profi
     s.durationMaeMs += Math.abs((sum.durationMs ?? 0) - (sim.endMs - sim.startMs));
     // Match attempts in order when the attempt counts agree, so kinds can be scored one to one.
     const aligned = sum.reps.length === kinds.length;
-    for (const [k, key] of [["partial", "partial"], ["failed", "failed"]] as const) {
+    for (const [k, key] of [
+      ["partial", "partial"],
+      ["failed", "failed"],
+    ] as const) {
       s[key].truth += kinds.filter((x) => x === k).length;
       s[key].found += sum.reps.filter((r) => r.kind === k).length;
       if (aligned) s[key].hit += kinds.filter((x, j) => x === k && sum.reps[j].kind === k).length;

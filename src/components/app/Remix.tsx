@@ -1,12 +1,15 @@
 "use client";
-import { exercise } from "@/lib/exercises";
+
+import { useMemo, useState } from "react";
+
 import { track } from "@/lib/analytics";
+import { exercise } from "@/lib/exercises";
+import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { adaptRemix, decodeRemix, encodeShared, remixUrl, sharedFromSession } from "@/lib/remix";
-import { useNow } from "@/lib/useNow";
 import { useApp } from "@/lib/store";
-import { t } from "@/lib/i18n";
-import { useMemo, useState } from "react";
+import { useNow } from "@/lib/useNow";
+
 import { loadText, repsText } from "./format";
 import { go } from "./router";
 import { Button } from "./ui";
@@ -26,7 +29,9 @@ export function Remix({ code }: { code?: string }) {
     return (
       <div className="pt-10 text-center">
         <p className="text-muted">{t("remix.broken")}</p>
-        <Button className="mt-4" onClick={() => go("today")}>{t("remix.back")}</Button>
+        <Button className="mt-4" onClick={() => go("today")}>
+          {t("remix.back")}
+        </Button>
       </div>
     );
   }
@@ -37,8 +42,16 @@ export function Remix({ code }: { code?: string }) {
       <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym?.name ?? t("remix.yourGym"), min: plan.estMinutes })}</p>
       {(swapped.length > 0 || missing.length > 0) && (
         <div className="card mt-4 p-4 text-sm">
-          {swapped.map((x) => <p key={x.from} className="text-muted">{exercise(x.from).name} → <span className="text-ink">{exercise(x.to).name}</span> {t("remix.closest")}</p>)}
-          {missing.map((id) => <p key={id} className="text-muted">{t("remix.missing", { name: exercise(id).name })}</p>)}
+          {swapped.map((x) => (
+            <p key={x.from} className="text-muted">
+              {exercise(x.from).name} → <span className="text-ink">{exercise(x.to).name}</span> {t("remix.closest")}
+            </p>
+          ))}
+          {missing.map((id) => (
+            <p key={id} className="text-muted">
+              {t("remix.missing", { name: exercise(id).name })}
+            </p>
+          ))}
         </div>
       )}
       <ol className="card mt-4 divide-y divide-line">
@@ -47,7 +60,9 @@ export function Remix({ code }: { code?: string }) {
           return (
             <li key={it.exerciseId} className="flex items-center justify-between gap-3 px-4 py-3">
               <span className="font-medium">{e.name}</span>
-              <span className="num shrink-0 text-sm text-muted">{it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}</span>
+              <span className="num shrink-0 text-sm text-muted">
+                {it.sets} × {repsText(e, it.target.reps)} · {loadText(e, it.target.weight, profile.unit)}
+              </span>
             </li>
           );
         })}
@@ -55,9 +70,21 @@ export function Remix({ code }: { code?: string }) {
       {active ? (
         <p className="mt-6 text-center text-sm text-muted">{t("remix.finishFirst")}</p>
       ) : (
-        <Button className="mt-6 w-full py-4 text-lg" onClick={() => { haptic("tap"); track("feature", { name: "remix", detail: swapped.length ? "adapted" : "as shared" }); start(plan); go("workout"); }}>{t("remix.start")}</Button>
+        <Button
+          className="mt-6 w-full py-4 text-lg"
+          onClick={() => {
+            haptic("tap");
+            track("feature", { name: "remix", detail: swapped.length ? "adapted" : "as shared" });
+            start(plan);
+            go("workout");
+          }}
+        >
+          {t("remix.start")}
+        </Button>
       )}
-      <Button kind="quiet" className="mt-2 w-full" onClick={() => go("today")}>{t("remix.notNow")}</Button>
+      <Button kind="quiet" className="mt-2 w-full" onClick={() => go("today")}>
+        {t("remix.notNow")}
+      </Button>
     </div>
   );
 }
@@ -85,7 +112,9 @@ export function ShareWorkout({ sessionId }: { sessionId: string }) {
   };
   return (
     <div className="mt-4">
-      <Button kind="ghost" className="w-full" onClick={share}>{t("done.remixShare")}</Button>
+      <Button kind="ghost" className="w-full" onClick={share}>
+        {t("done.remixShare")}
+      </Button>
       <p className="mt-1 text-xs text-faint">{note ?? t("done.remixHint")}</p>
     </div>
   );

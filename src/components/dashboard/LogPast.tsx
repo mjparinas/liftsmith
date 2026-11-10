@@ -1,11 +1,13 @@
 "use client";
+
+import { useState } from "react";
+
 import { pastWorkoutEvents } from "@/lib/dashboard";
-import { EXERCISES, EXERCISE_BY_ID } from "@/lib/exercises";
+import { EXERCISE_BY_ID, EXERCISES } from "@/lib/exercises";
+import { t } from "@/lib/i18n";
 import { appendEvents } from "@/lib/localdb";
 import type { Profile } from "@/lib/types";
 import { toKg } from "@/lib/units";
-import { t } from "@/lib/i18n";
-import { useState } from "react";
 
 // Log a workout after the fact, on a big screen: pick the day, add exercises and sets, save. It writes
 // the same events a live workout does, so stats, PRs, recovery and progression all pick it up.
@@ -50,9 +52,12 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
   };
   const edit = (ri: number, si: number, field: "weight" | "reps", v: string) =>
     setRows((r) => r.map((row, i) => (i !== ri ? row : { ...row, sets: row.sets.map((s, j) => (j === si ? { ...s, [field]: v } : s)) })));
-  const addSet = (ri: number) => setRows((r) => r.map((row, i) => (i !== ri ? row : { ...row, sets: [...row.sets, { ...row.sets.at(-1)! }] })));
+  const addSet = (ri: number) =>
+    setRows((r) => r.map((row, i) => (i !== ri ? row : { ...row, sets: [...row.sets, { ...row.sets.at(-1)! }] })));
   const dropSet = (ri: number, si: number) =>
-    setRows((r) => r.flatMap((row, i) => (i !== ri ? [row] : row.sets.length > 1 ? [{ ...row, sets: row.sets.filter((_, j) => j !== si) }] : [])));
+    setRows((r) =>
+      r.flatMap((row, i) => (i !== ri ? [row] : row.sets.length > 1 ? [{ ...row, sets: row.sets.filter((_, j) => j !== si) }] : [])),
+    );
   const dropRow = (ri: number) => setRows((r) => r.filter((_, i) => i !== ri));
 
   const save = async () => {
@@ -62,7 +67,10 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
         start: new Date(start).getTime(),
         minutes: Number(minutes),
         gymId: profile.activeGymId,
-        exercises: rows.map((r) => ({ exerciseId: r.exerciseId, sets: r.sets.map((s) => ({ weight: toKg(Number(s.weight || 0), unit), reps: Number(s.reps) })) })),
+        exercises: rows.map((r) => ({
+          exerciseId: r.exerciseId,
+          sets: r.sets.map((s) => ({ weight: toKg(Number(s.weight || 0), unit), reps: Number(s.reps) })),
+        })),
       },
       Date.now(),
     );
@@ -88,11 +96,27 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm text-muted">{t("past.started")}</span>
-          <input type="datetime-local" required value={start} max={localInput(now)} onChange={(e) => setStart(e.target.value)} className={`${input} mt-1`} />
+          <input
+            type="datetime-local"
+            required
+            value={start}
+            max={localInput(now)}
+            onChange={(e) => setStart(e.target.value)}
+            className={`${input} mt-1`}
+          />
         </label>
         <label className="block">
           <span className="text-sm text-muted">{t("past.length")}</span>
-          <input type="number" inputMode="numeric" min={1} max={600} required value={minutes} onChange={(e) => setMinutes(e.target.value)} className={`${input} mt-1`} />
+          <input
+            type="number"
+            inputMode="numeric"
+            min={1}
+            max={600}
+            required
+            value={minutes}
+            onChange={(e) => setMinutes(e.target.value)}
+            className={`${input} mt-1`}
+          />
         </label>
       </div>
 
@@ -101,15 +125,25 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
           <li key={row.key} className="card p-4">
             <div className="flex items-center justify-between gap-2">
               <h3 className="font-semibold">{EXERCISE_BY_ID.get(row.exerciseId)?.name}</h3>
-              <button type="button" onClick={() => dropRow(ri)} className="press rounded-xl px-3 py-2 text-sm text-muted">{t("past.remove")}</button>
+              <button type="button" onClick={() => dropRow(ri)} className="press rounded-xl px-3 py-2 text-sm text-muted">
+                {t("past.remove")}
+              </button>
             </div>
             <table className="mt-2 w-full text-sm">
               <thead>
                 <tr className="text-left text-faint">
-                  <th scope="col" className="w-10 font-medium">{t("past.set")}</th>
-                  <th scope="col" className="font-medium">{weightLabel(row.exerciseId, unit)}</th>
-                  <th scope="col" className="font-medium">{t("past.reps")}</th>
-                  <th scope="col" className="w-12"><span className="sr-only">{t("past.remove")}</span></th>
+                  <th scope="col" className="w-10 font-medium">
+                    {t("past.set")}
+                  </th>
+                  <th scope="col" className="font-medium">
+                    {weightLabel(row.exerciseId, unit)}
+                  </th>
+                  <th scope="col" className="font-medium">
+                    {t("past.reps")}
+                  </th>
+                  <th scope="col" className="w-12">
+                    <span className="sr-only">{t("past.remove")}</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -119,20 +153,53 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
                     <tr key={si}>
                       <td className="num py-1 text-muted">{si + 1}</td>
                       <td className="py-1 pr-2">
-                        <input inputMode="decimal" type="number" min={0} step="any" value={s.weight} placeholder="0" aria-label={t("past.setWeight", { name, n: si + 1 })} onChange={(e) => edit(ri, si, "weight", e.target.value)} className={input} />
+                        <input
+                          inputMode="decimal"
+                          type="number"
+                          min={0}
+                          step="any"
+                          value={s.weight}
+                          placeholder="0"
+                          aria-label={t("past.setWeight", { name, n: si + 1 })}
+                          onChange={(e) => edit(ri, si, "weight", e.target.value)}
+                          className={input}
+                        />
                       </td>
                       <td className="py-1 pr-2">
-                        <input inputMode="numeric" type="number" min={1} step={1} required value={s.reps} aria-label={t("past.setReps", { name, n: si + 1 })} onChange={(e) => edit(ri, si, "reps", e.target.value)} className={input} />
+                        <input
+                          inputMode="numeric"
+                          type="number"
+                          min={1}
+                          step={1}
+                          required
+                          value={s.reps}
+                          aria-label={t("past.setReps", { name, n: si + 1 })}
+                          onChange={(e) => edit(ri, si, "reps", e.target.value)}
+                          className={input}
+                        />
                       </td>
                       <td className="py-1 text-right">
-                        <button type="button" aria-label={t("past.removeSet", { name, n: si + 1 })} onClick={() => dropSet(ri, si)} className="press h-11 w-11 rounded-xl text-muted">×</button>
+                        <button
+                          type="button"
+                          aria-label={t("past.removeSet", { name, n: si + 1 })}
+                          onClick={() => dropSet(ri, si)}
+                          className="press h-11 w-11 rounded-xl text-muted"
+                        >
+                          ×
+                        </button>
                       </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
-            <button type="button" onClick={() => addSet(ri)} className="press mt-2 rounded-xl border border-line bg-raised px-4 py-2 text-sm">{t("past.addSet")}</button>
+            <button
+              type="button"
+              onClick={() => addSet(ri)}
+              className="press mt-2 rounded-xl border border-line bg-raised px-4 py-2 text-sm"
+            >
+              {t("past.addSet")}
+            </button>
           </li>
         ))}
       </ol>
@@ -142,14 +209,35 @@ export function LogPast({ profile, now, onSaved }: { profile: Profile; now: numb
           <span className="text-sm text-muted">{t("past.exercise")}</span>
           <select value={pick} onChange={(e) => setPick(e.target.value)} className={`${input} mt-1`}>
             <option value="">{t("past.choose")}</option>
-            {SORTED.map((e) => <option key={e.id} value={e.id}>{e.name}</option>)}
+            {SORTED.map((e) => (
+              <option key={e.id} value={e.id}>
+                {e.name}
+              </option>
+            ))}
           </select>
         </label>
-        <button type="button" onClick={add} disabled={!pick} className="press rounded-2xl border border-line bg-raised px-5 py-3 disabled:opacity-40">{t("past.addExercise")}</button>
+        <button
+          type="button"
+          onClick={add}
+          disabled={!pick}
+          className="press rounded-2xl border border-line bg-raised px-5 py-3 disabled:opacity-40"
+        >
+          {t("past.addExercise")}
+        </button>
       </div>
 
-      {error && <p role="alert" className="mt-4 text-bad">{error}</p>}
-      <button type="submit" disabled={!rows.length || saving} className="press mt-6 rounded-2xl bg-accent px-6 py-3 font-semibold text-accent-ink disabled:opacity-40">{saving ? t("past.saving") : t("past.save")}</button>
+      {error && (
+        <p role="alert" className="mt-4 text-bad">
+          {error}
+        </p>
+      )}
+      <button
+        type="submit"
+        disabled={!rows.length || saving}
+        className="press mt-6 rounded-2xl bg-accent px-6 py-3 font-semibold text-accent-ink disabled:opacity-40"
+      >
+        {saving ? t("past.saving") : t("past.save")}
+      </button>
     </form>
   );
 }

@@ -5,8 +5,10 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "account.title": "Account and sync",
-  "account.lead": "Sign in to back up your workouts and use them on all your devices: phone, tablet and the web. It's optional, and everything stays on this device too.",
-  "account.leadIn": "Your workouts, gyms and settings sync to your account whenever you're online, so they're safe and on every device you sign in on.",
+  "account.lead":
+    "Sign in to back up your workouts and use them on all your devices: phone, tablet and the web. It's optional, and everything stays on this device too.",
+  "account.leadIn":
+    "Your workouts, gyms and settings sync to your account whenever you're online, so they're safe and on every device you sign in on.",
   "account.signIn": "Sign in",
   "account.yours": "Your account",
   "account.apple": "Continue with Apple",
@@ -33,14 +35,16 @@ export const en = {
   "account.signOut": "Sign out",
   "account.signOutNote": "Signing out keeps everything on this device. It just stops syncing.",
   "account.delete": "Delete my account",
-  "account.delete.warn": "This deletes your account and the copy of your data on our server, for good. This device keeps its own copy. Your other devices are signed out and keep theirs.",
+  "account.delete.warn":
+    "This deletes your account and the copy of your data on our server, for good. This device keeps its own copy. Your other devices are signed out and keep theirs.",
   "account.delete.confirm": "Delete my account for good",
   "account.lost": "You were signed out, so this device stopped syncing. Your data is still here. Sign in again to keep syncing.",
   "account.offline": "You're offline. Connect and try again.",
   "account.notReady": "Accounts aren't switched on yet. Your data is safe on this device.",
   "account.failed": "That didn't work. Try again.",
   "account.what": "What syncs",
-  "account.what.body": "Your workouts, sets, notes, body weight, gyms, routines and settings, plus health readings, injuries and cycle logs if you use them. It's your data: it's never used for ads or analytics. Progress photos never leave this device.",
+  "account.what.body":
+    "Your workouts, sets, notes, body weight, gyms, routines and settings, plus health readings, injuries and cycle logs if you use them. It's your data: it's never used for ads or analytics. Progress photos never leave this device.",
   "account.row": "Account and sync",
   "account.row.out": "Sign in to back up and sync",
   "account.row.in": "Signed in as {email}",
@@ -51,8 +55,10 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "account.title": "Cuenta y sincronización",
-  "account.lead": "Inicia sesión para guardar una copia de tus entrenamientos y usarlos en todos tus dispositivos: teléfono, tableta y la web. Es opcional, y todo se queda también en este dispositivo.",
-  "account.leadIn": "Tus entrenamientos, gimnasios y ajustes se sincronizan con tu cuenta cuando tienes conexión, así están seguros y en cada dispositivo donde inicies sesión.",
+  "account.lead":
+    "Inicia sesión para guardar una copia de tus entrenamientos y usarlos en todos tus dispositivos: teléfono, tableta y la web. Es opcional, y todo se queda también en este dispositivo.",
+  "account.leadIn":
+    "Tus entrenamientos, gimnasios y ajustes se sincronizan con tu cuenta cuando tienes conexión, así están seguros y en cada dispositivo donde inicies sesión.",
   "account.signIn": "Iniciar sesión",
   "account.yours": "Tu cuenta",
   "account.apple": "Continuar con Apple",
@@ -79,14 +85,17 @@ export const es: Partial<Record<Key, Message>> = {
   "account.signOut": "Cerrar sesión",
   "account.signOutNote": "Al cerrar sesión todo se queda en este dispositivo. Solo deja de sincronizarse.",
   "account.delete": "Eliminar mi cuenta",
-  "account.delete.warn": "Esto elimina tu cuenta y la copia de tus datos en nuestro servidor, para siempre. Este dispositivo conserva su propia copia. Tus otros dispositivos cierran sesión y conservan la suya.",
+  "account.delete.warn":
+    "Esto elimina tu cuenta y la copia de tus datos en nuestro servidor, para siempre. Este dispositivo conserva su propia copia. Tus otros dispositivos cierran sesión y conservan la suya.",
   "account.delete.confirm": "Eliminar mi cuenta para siempre",
-  "account.lost": "Se cerró tu sesión, así que este dispositivo dejó de sincronizarse. Tus datos siguen aquí. Vuelve a iniciar sesión para seguir sincronizando.",
+  "account.lost":
+    "Se cerró tu sesión, así que este dispositivo dejó de sincronizarse. Tus datos siguen aquí. Vuelve a iniciar sesión para seguir sincronizando.",
   "account.offline": "No tienes conexión. Conéctate e inténtalo de nuevo.",
   "account.notReady": "Las cuentas aún no están activadas. Tus datos están seguros en este dispositivo.",
   "account.failed": "No funcionó. Inténtalo de nuevo.",
   "account.what": "Qué se sincroniza",
-  "account.what.body": "Tus entrenamientos, series, notas, peso corporal, gimnasios, rutinas y ajustes, además de datos de salud, lesiones y registros del ciclo si los usas. Son tus datos: nunca se usan para anuncios ni analítica. Las fotos de progreso nunca salen de este dispositivo.",
+  "account.what.body":
+    "Tus entrenamientos, series, notas, peso corporal, gimnasios, rutinas y ajustes, además de datos de salud, lesiones y registros del ciclo si los usas. Son tus datos: nunca se usan para anuncios ni analítica. Las fotos de progreso nunca salen de este dispositivo.",
   "account.row": "Cuenta y sincronización",
   "account.row.out": "Inicia sesión para guardar y sincronizar",
   "account.row.in": "Sesión iniciada como {email}",
@@ -95,8 +104,10 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "account.title": "Compte et synchronisation",
-  "account.lead": "Connectez-vous pour sauvegarder vos séances et les retrouver sur tous vos appareils : téléphone, tablette et le web. C'est facultatif, et tout reste aussi sur cet appareil.",
-  "account.leadIn": "Vos séances, salles et réglages se synchronisent avec votre compte dès que vous êtes en ligne : ils sont en sécurité et sur chaque appareil où vous vous connectez.",
+  "account.lead":
+    "Connectez-vous pour sauvegarder vos séances et les retrouver sur tous vos appareils : téléphone, tablette et le web. C'est facultatif, et tout reste aussi sur cet appareil.",
+  "account.leadIn":
+    "Vos séances, salles et réglages se synchronisent avec votre compte dès que vous êtes en ligne : ils sont en sécurité et sur chaque appareil où vous vous connectez.",
   "account.signIn": "Se connecter",
   "account.yours": "Votre compte",
   "account.apple": "Continuer avec Apple",
@@ -117,20 +128,26 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.synced": "Synchronisé {when}.",
   "account.justNow": "à l'instant",
   "account.notSynced": "Pas encore synchronisé. La synchronisation se fait quand vous êtes en ligne.",
-  "account.waiting": { one: "{count} modification en attente de synchronisation.", other: "{count} modifications en attente de synchronisation." },
+  "account.waiting": {
+    one: "{count} modification en attente de synchronisation.",
+    other: "{count} modifications en attente de synchronisation.",
+  },
   "account.syncError": "Impossible de joindre le serveur. Nouvel essai dès que vous serez en ligne.",
   "account.syncNow": "Synchroniser",
   "account.signOut": "Se déconnecter",
   "account.signOutNote": "Se déconnecter garde tout sur cet appareil. La synchronisation s'arrête, c'est tout.",
   "account.delete": "Supprimer mon compte",
-  "account.delete.warn": "Cela supprime votre compte et la copie de vos données sur notre serveur, définitivement. Cet appareil garde sa propre copie. Vos autres appareils sont déconnectés et gardent la leur.",
+  "account.delete.warn":
+    "Cela supprime votre compte et la copie de vos données sur notre serveur, définitivement. Cet appareil garde sa propre copie. Vos autres appareils sont déconnectés et gardent la leur.",
   "account.delete.confirm": "Supprimer mon compte définitivement",
-  "account.lost": "Vous avez été déconnecté, cet appareil ne se synchronise plus. Vos données sont toujours là. Reconnectez-vous pour continuer à synchroniser.",
+  "account.lost":
+    "Vous avez été déconnecté, cet appareil ne se synchronise plus. Vos données sont toujours là. Reconnectez-vous pour continuer à synchroniser.",
   "account.offline": "Vous êtes hors ligne. Connectez-vous et réessayez.",
   "account.notReady": "Les comptes ne sont pas encore activés. Vos données sont en sécurité sur cet appareil.",
   "account.failed": "Ça n'a pas marché. Réessayez.",
   "account.what": "Ce qui est synchronisé",
-  "account.what.body": "Vos séances, séries, notes, poids, salles, routines et réglages, ainsi que les données de santé, blessures et suivi du cycle si vous les utilisez. Ce sont vos données : jamais utilisées pour la publicité ni les statistiques. Les photos de progression ne quittent jamais cet appareil.",
+  "account.what.body":
+    "Vos séances, séries, notes, poids, salles, routines et réglages, ainsi que les données de santé, blessures et suivi du cycle si vous les utilisez. Ce sont vos données : jamais utilisées pour la publicité ni les statistiques. Les photos de progression ne quittent jamais cet appareil.",
   "account.row": "Compte et synchronisation",
   "account.row.out": "Connectez-vous pour sauvegarder et synchroniser",
   "account.row.in": "Connecté en tant que {email}",

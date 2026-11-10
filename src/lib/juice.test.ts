@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { feel, haptic, oops, sound } from "./juice";
 
 type Call = [string, unknown];
@@ -9,7 +10,12 @@ function fakeNative() {
     calls.push([name, a]);
     return Promise.resolve();
   };
-  vi.stubGlobal("window", { Capacitor: { isNativePlatform: () => true, Plugins: { Haptics: { impact: rec("impact"), notification: rec("notification"), selectionChanged: rec("selection") } } } });
+  vi.stubGlobal("window", {
+    Capacitor: {
+      isNativePlatform: () => true,
+      Plugins: { Haptics: { impact: rec("impact"), notification: rec("notification"), selectionChanged: rec("selection") } },
+    },
+  });
   return calls;
 }
 

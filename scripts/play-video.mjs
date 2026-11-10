@@ -77,7 +77,10 @@ async function still(html, out) {
 }
 const icon = url(fs.existsSync(`${ROOT}/icon-512.png`) ? `${ROOT}/icon-512.png` : "public/icon.svg");
 const stills = [];
-await still(card(icon, `Your next set, <span class="grad">already planned.</span>`, "Adaptive strength training for Android"), `${TMP}/00.png`);
+await still(
+  card(icon, `Your next set, <span class="grad">already planned.</span>`, "Adaptive strength training for Android"),
+  `${TMP}/00.png`,
+);
 stills.push([`${TMP}/00.png`, CARD_S]);
 for (const [i, [img, k, t, l, pos]] of SCENES.entries()) {
   const out = `${TMP}/${String(i + 1).padStart(2, "0")}.png`;
@@ -103,6 +106,22 @@ for (let i = 1; i < stills.length; i++) {
   parts.push(`[${last}][v${i}]xfade=transition=fade:duration=${FADE}:offset=${offset.toFixed(2)}[x${i}]`);
   last = `x${i}`;
 }
-args.push("-filter_complex", parts.join(";"), "-map", `[${last}]`, "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-movflags", "+faststart", `${ROOT}/promo-video.mp4`);
+args.push(
+  "-filter_complex",
+  parts.join(";"),
+  "-map",
+  `[${last}]`,
+  "-c:v",
+  "libx264",
+  "-preset",
+  "slow",
+  "-crf",
+  "20",
+  "-pix_fmt",
+  "yuv420p",
+  "-movflags",
+  "+faststart",
+  `${ROOT}/promo-video.mp4`,
+);
 execFileSync("ffmpeg", args, { stdio: ["ignore", "ignore", "inherit"] });
 console.log(`  ${ROOT}/promo-video.mp4`);

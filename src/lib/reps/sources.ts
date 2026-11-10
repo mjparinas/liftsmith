@@ -20,7 +20,8 @@ export interface PoseEngine {
 export async function loadPose(model: keyof typeof MODEL = "lite"): Promise<PoseEngine> {
   const { FilesetResolver, PoseLandmarker } = await import("@mediapipe/tasks-vision");
   const files = await FilesetResolver.forVisionTasks(WASM);
-  const make = (delegate: "GPU" | "CPU") => PoseLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath: MODEL[model], delegate }, runningMode: "VIDEO", numPoses: 1 });
+  const make = (delegate: "GPU" | "CPU") =>
+    PoseLandmarker.createFromOptions(files, { baseOptions: { modelAssetPath: MODEL[model], delegate }, runningMode: "VIDEO", numPoses: 1 });
   // The GPU delegate is several times faster on phones; some web views refuse it, so fall back to CPU.
   const pl = await make("GPU").catch(() => make("CPU"));
   return {
@@ -34,7 +35,10 @@ export async function loadPose(model: keyof typeof MODEL = "lite"): Promise<Pose
 
 /** `user` is the screen-side camera, so the lifter can see themselves line up; `environment` the back one. */
 export async function openCamera(video: HTMLVideoElement, facing: "user" | "environment" = "user"): Promise<MediaStream> {
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: false, video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } } });
+  const stream = await navigator.mediaDevices.getUserMedia({
+    audio: false,
+    video: { facingMode: facing, width: { ideal: 640 }, height: { ideal: 480 }, frameRate: { ideal: 30 } },
+  });
   video.srcObject = stream;
   await video.play();
   return stream;
@@ -55,7 +59,9 @@ export async function startMotion(onReading: (r: MotionReading) => void): Promis
     let fused: MotionReading["fused"];
     if (a && a.x != null && a.y != null && a.z != null) {
       // Gravity is what's left after the platform removes linear acceleration; project onto it for "up".
-      const gx = g.x - a.x, gy = g.y - a.y, gz = g.z - a.z;
+      const gx = g.x - a.x,
+        gy = g.y - a.y,
+        gz = g.z - a.z;
       const n = Math.hypot(gx, gy, gz) || 1;
       const up = (a.x * gx + a.y * gy + a.z * gz) / n;
       const rot = r ? (Math.hypot(r.alpha ?? 0, r.beta ?? 0, r.gamma ?? 0) * Math.PI) / 180 : 0;

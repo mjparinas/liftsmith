@@ -14,8 +14,10 @@ export const en = {
   "share.copied": "Link copied.",
   "share.copyFail": "Couldn’t copy. Select the link and copy it.",
   "share.myTraining": "My {brand} training",
-  "share.intro": "Send friends a link to your training summary: level, workouts, streak, badges, best lifts and the days you trained in the last 12 weeks.",
-  "share.privacy": "It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.",
+  "share.intro":
+    "Send friends a link to your training summary: level, workouts, streak, badges, best lifts and the days you trained in the last 12 weeks.",
+  "share.privacy":
+    "It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.",
   "share.withName": "Show my name ({name})",
   "share.noName": "Show my name (add one in the app’s Settings)",
   "share.yourLink": "Your link",
@@ -40,8 +42,10 @@ export const es: Partial<Record<Key, Message>> = {
   "share.copied": "Enlace copiado.",
   "share.copyFail": "No se pudo copiar. Selecciona el enlace y cópialo.",
   "share.myTraining": "Mi entrenamiento en {brand}",
-  "share.intro": "Envía a tus amigos un enlace a tu resumen de entrenamiento: nivel, entrenamientos, racha, insignias, mejores levantamientos y los días que entrenaste en las últimas 12 semanas.",
-  "share.privacy": "Nunca incluye frecuencia cardiaca, peso corporal, datos del ciclo, tus gimnasios ni dónde están. El resumen va dentro del propio enlace, así que no se sube nada; cualquiera con el enlace puede verlo.",
+  "share.intro":
+    "Envía a tus amigos un enlace a tu resumen de entrenamiento: nivel, entrenamientos, racha, insignias, mejores levantamientos y los días que entrenaste en las últimas 12 semanas.",
+  "share.privacy":
+    "Nunca incluye frecuencia cardiaca, peso corporal, datos del ciclo, tus gimnasios ni dónde están. El resumen va dentro del propio enlace, así que no se sube nada; cualquiera con el enlace puede verlo.",
   "share.withName": "Mostrar mi nombre ({name})",
   "share.noName": "Mostrar mi nombre (añade uno en los Ajustes de la app)",
   "share.yourLink": "Tu enlace",
@@ -64,8 +68,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "share.copied": "Lien copié.",
   "share.copyFail": "Copie impossible. Sélectionnez le lien et copiez-le.",
   "share.myTraining": "Mon entraînement {brand}",
-  "share.intro": "Envoyez à vos amis un lien vers votre résumé : niveau, séances, série, badges, meilleurs mouvements et les jours d’entraînement des 12 dernières semaines.",
-  "share.privacy": "Il n’inclut jamais la fréquence cardiaque, le poids, les données de cycle, vos salles ni leur emplacement. Le résumé est contenu dans le lien, donc rien n’est envoyé ; toute personne ayant le lien peut le voir.",
+  "share.intro":
+    "Envoyez à vos amis un lien vers votre résumé : niveau, séances, série, badges, meilleurs mouvements et les jours d’entraînement des 12 dernières semaines.",
+  "share.privacy":
+    "Il n’inclut jamais la fréquence cardiaque, le poids, les données de cycle, vos salles ni leur emplacement. Le résumé est contenu dans le lien, donc rien n’est envoyé ; toute personne ayant le lien peut le voir.",
   "share.withName": "Afficher mon nom ({name})",
   "share.noName": "Afficher mon nom (ajoutez-en un dans les Réglages de l’app)",
   "share.yourLink": "Votre lien",

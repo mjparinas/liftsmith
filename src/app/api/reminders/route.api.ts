@@ -2,8 +2,8 @@
 // DELETE /api/reminders/: stop every email and erase the address.
 // Server build only (Vercel). Needs RESEND_API_KEY, REMINDER_SECRET, MAIL_FROM and MAIL_POSTAL_ADDRESS,
 // plus the database (DATABASE_URL or TURSO_DATABASE_URL). See src/server/reminders.ts.
-import { checkBody, remove, subscribe } from "@/server/reminders";
 import { cors, limited, readJson, setup } from "@/server/reminderHttp";
+import { checkBody, remove, subscribe } from "@/server/reminders";
 
 const json = (status: number, body: unknown, headers: Record<string, string>) => Response.json(body, { status, headers });
 

@@ -41,7 +41,8 @@ export const es: Partial<Record<Key, Message>> = {
   "count.flipToFront": "Usar la cámara frontal",
   "count.useMotion": "Usar el movimiento del teléfono",
   "count.useCamera": "Usar la cámara",
-  "count.err.denied": "El acceso a la cámara está desactivado. Permítelo en los ajustes del teléfono para que Liftsmith cuente tus repeticiones.",
+  "count.err.denied":
+    "El acceso a la cámara está desactivado. Permítelo en los ajustes del teléfono para que Liftsmith cuente tus repeticiones.",
   "count.err.noCamera": "No se encontró una cámara para esto.",
   "count.err.model": "No se pudo iniciar el contador. Revisa tu conexión la primera vez e inténtalo de nuevo.",
   "count.err.motion": "Se rechazó el acceso al movimiento, así que no se pueden contar repeticiones con el teléfono.",
@@ -62,7 +63,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "count.flipToFront": "Utiliser la caméra avant",
   "count.useMotion": "Utiliser les mouvements du téléphone",
   "count.useCamera": "Utiliser la caméra",
-  "count.err.denied": "L’accès à la caméra est désactivé. Autorisez-le dans les réglages du téléphone pour que Liftsmith compte vos répétitions.",
+  "count.err.denied":
+    "L’accès à la caméra est désactivé. Autorisez-le dans les réglages du téléphone pour que Liftsmith compte vos répétitions.",
   "count.err.noCamera": "Aucune caméra trouvée pour cela.",
   "count.err.model": "Impossible de lancer le compteur. Vérifiez votre connexion la première fois et réessayez.",
   "count.err.motion": "L’accès aux mouvements a été refusé, les répétitions ne peuvent donc pas être comptées avec le téléphone.",

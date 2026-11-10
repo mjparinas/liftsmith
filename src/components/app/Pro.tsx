@@ -1,15 +1,18 @@
 "use client";
+
 import { useState } from "react";
-import { billingLive, buy, entActive, loadOffers, manageUrl, restore, useBilling, type BuyResult } from "@/lib/billing";
+
 import { platformStore } from "@/lib/analytics";
+import { billingLive, buy, entActive, loadOffers, manageUrl, restore, useBilling, type BuyResult } from "@/lib/billing";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { SITE_URL } from "@/lib/site";
-import { useNow } from "@/lib/useNow";
 import { useApp } from "@/lib/store";
 import type { Plan } from "@/lib/trial";
-import { go, useRoute, type Route } from "./router";
+import { useNow } from "@/lib/useNow";
+
 import { CreatorCode } from "./CreatorCode";
+import { go, useRoute, type Route } from "./router";
 import { Button } from "./ui";
 
 // The paywall (#/pro, also the last step of first-run setup). AGENTS.md "Money": plain prices from the
@@ -22,7 +25,12 @@ export function ProFeatures() {
   return (
     <ul className="mt-4 space-y-1.5 text-sm">
       {[t("pro.f1"), t("pro.f2"), t("pro.f3"), t("pro.f4"), t("pro.f5")].map((f) => (
-        <li key={f} className="flex gap-2"><span className="text-accent" aria-hidden>✓</span>{f}</li>
+        <li key={f} className="flex gap-2">
+          <span className="text-accent" aria-hidden>
+            ✓
+          </span>
+          {f}
+        </li>
       ))}
     </ul>
   );
@@ -61,9 +69,17 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
     return (
       <div className="mt-6 space-y-3">
         <p className="text-sm text-muted">{t(store === "appstore" ? "pro.offline.appstore" : "pro.offline.play")}</p>
-        <Button kind="ghost" className="w-full" disabled={busy} onClick={() => void loadOffers().catch(() => setNote(t("pro.error")))}>{t("pro.retry")}</Button>
-        <Button kind="quiet" className="w-full" disabled={busy} onClick={() => void doRestore()}>{t("pro.restore")}</Button>
-        {note && <p role="status" className="text-sm text-warn">{note}</p>}
+        <Button kind="ghost" className="w-full" disabled={busy} onClick={() => void loadOffers().catch(() => setNote(t("pro.error")))}>
+          {t("pro.retry")}
+        </Button>
+        <Button kind="quiet" className="w-full" disabled={busy} onClick={() => void doRestore()}>
+          {t("pro.restore")}
+        </Button>
+        {note && (
+          <p role="status" className="text-sm text-warn">
+            {note}
+          </p>
+        )}
       </div>
     );
   }
@@ -83,7 +99,9 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
               className={`press w-full rounded-2xl border p-4 text-left disabled:opacity-60 ${o.plan === "annual" ? "border-accent bg-accent/10" : "border-line bg-surface"}`}
             >
               <div className="flex items-baseline justify-between gap-2">
-                <span className="font-semibold">{o.trialDays ? t("pro.startTrial", { days: o.trialDays, plan: name }) : t("pro.subscribe", { plan: name })}</span>
+                <span className="font-semibold">
+                  {o.trialDays ? t("pro.startTrial", { days: o.trialDays, plan: name }) : t("pro.subscribe", { plan: name })}
+                </span>
                 {o.perMonth && <span className="text-xs font-semibold text-accent">{t("pro.aboutMonth", { price: o.perMonth })}</span>}
               </div>
               <div className="mt-0.5 text-sm text-muted">
@@ -93,13 +111,25 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
           );
         })}
       </div>
-      {note && <p role="status" className="mt-3 text-sm text-warn">{note}</p>}
+      {note && (
+        <p role="status" className="mt-3 text-sm text-warn">
+          {note}
+        </p>
+      )}
       <CreatorCode collapsed />
-      <Button kind="quiet" className="mt-3 w-full" disabled={busy} onClick={() => void doRestore()}>{t("pro.restore")}</Button>
+      <Button kind="quiet" className="mt-3 w-full" disabled={busy} onClick={() => void doRestore()}>
+        {t("pro.restore")}
+      </Button>
       <p className="mt-2 text-xs text-faint">{t(store === "appstore" ? "pro.legal.appstore" : "pro.legal.play")}</p>
       <p className="mt-1 flex gap-4 text-xs">
-        {store === "appstore" && <a className="text-accent underline" href={APPLE_EULA} target="_blank" rel="noreferrer">{t("pro.termsLink")}</a>}
-        <a className="text-accent underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">{t("pro.privacyLink")}</a>
+        {store === "appstore" && (
+          <a className="text-accent underline" href={APPLE_EULA} target="_blank" rel="noreferrer">
+            {t("pro.termsLink")}
+          </a>
+        )}
+        <a className="text-accent underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">
+          {t("pro.privacyLink")}
+        </a>
       </p>
     </>
   );
@@ -116,7 +146,9 @@ export function Pro() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go(back)} className="press -ml-2 min-h-11 pt-2 text-muted">‹ {t("pro.back")}</button>
+      <button type="button" onClick={() => go(back)} className="press -ml-2 min-h-11 pt-2 text-muted">
+        ‹ {t("pro.back")}
+      </button>
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">{active ? t("pro.youHave") : t("pro.title")}</h1>
       <p className="mt-2 text-muted">{t("pro.lead")}</p>
       <ProFeatures />
@@ -128,11 +160,17 @@ export function Pro() {
           <p className="font-semibold">{ent.plan === "monthly" ? t("pro.status.monthly") : t("pro.status.yearly")}</p>
           {ent.expiresAt != null && (
             <p className="text-muted">
-              {ent.trial ? t("pro.status.trial", { date: on(ent.expiresAt) }) : ent.willRenew ? t("pro.status.renews", { date: on(ent.expiresAt) }) : t("pro.status.ends", { date: on(ent.expiresAt) })}
+              {ent.trial
+                ? t("pro.status.trial", { date: on(ent.expiresAt) })
+                : ent.willRenew
+                  ? t("pro.status.renews", { date: on(ent.expiresAt) })
+                  : t("pro.status.ends", { date: on(ent.expiresAt) })}
             </p>
           )}
           {ent.family && <p className="text-muted">{t("pro.status.family")}</p>}
-          <Button kind="ghost" className="mt-3 w-full" onClick={() => window.open(manageUrl(ent), "_blank")}>{t("pro.manage")}</Button>
+          <Button kind="ghost" className="mt-3 w-full" onClick={() => window.open(manageUrl(ent), "_blank")}>
+            {t("pro.manage")}
+          </Button>
         </div>
       ) : (
         <Plans
@@ -140,7 +178,14 @@ export function Pro() {
           onDone={(plan, trial) => {
             const now = Date.now();
             const days = useBilling.getState().offers?.find((o) => o.plan === plan)?.trialDays ?? undefined;
-            setProfile({ pro: { ...profile.pro, offeredAt: profile.pro?.offeredAt ?? now, plan, ...(trial ? { trialStartedAt: now, trialDays: days } : { subscribed: true }) } });
+            setProfile({
+              pro: {
+                ...profile.pro,
+                offeredAt: profile.pro?.offeredAt ?? now,
+                plan,
+                ...(trial ? { trialStartedAt: now, trialDays: days } : { subscribed: true }),
+              },
+            });
             useApp.getState().applyAccess();
             go(back === "pro" ? "today" : back);
           }}

@@ -1,4 +1,5 @@
 "use client";
+
 // The phone side of reminders and lifecycle messages (messages.ts has the rules).
 //  - Push: local notifications scheduled on the phone for the next two weeks, so they work offline and
 //    with no account or server. Rescheduled when the app opens, comes back to the foreground, a
@@ -10,10 +11,11 @@
 //  - Web: browsers can't schedule a notification while the page is closed without a push server, so
 //    the web app offers email reminders only (documented in AGENTS.md).
 import { LocalNotifications } from "@capacitor/local-notifications";
+
+import { storePro } from "./billing";
 import { defaultDays } from "./calendar";
 import type { Stats } from "./derive";
 import { goalStreak } from "./game";
-import { storePro } from "./billing";
 import { isNative } from "./juice";
 import { dayStart, mondayIn, plan, proState, type Message, type MessageKind, type PlanInput } from "./messages";
 import { SITE_URL } from "./site";
@@ -99,7 +101,12 @@ export async function schedulePush(profile: Profile, stats: Stats, now = Date.no
     if (!msgs.length) return [];
     if (!channelMade) {
       // Android only; iOS has no channels and the plugin ignores this there.
-      await LocalNotifications.createChannel({ id: CHANNEL_ID, name: "Reminders", description: "Workout reminders, streak alerts and offers you turned on", importance: 3 }).catch(() => {});
+      await LocalNotifications.createChannel({
+        id: CHANNEL_ID,
+        name: "Reminders",
+        description: "Workout reminders, streak alerts and offers you turned on",
+        importance: 3,
+      }).catch(() => {});
       channelMade = true;
     }
     await LocalNotifications.schedule({
@@ -193,7 +200,11 @@ export function subscriptionBody(profile: Profile, stats: Stats, now: number, su
  * Sends the subscription to the server (creates it, or updates the schedule). Returns the server's
  * status, or null when offline or the server isn't set up (the next sync tries again).
  */
-export async function syncEmail(profile: Profile, stats: Stats, opts: { resubscribe?: boolean; now?: number } = {}): Promise<MailStatus | null> {
+export async function syncEmail(
+  profile: Profile,
+  stats: Stats,
+  opts: { resubscribe?: boolean; now?: number } = {},
+): Promise<MailStatus | null> {
   if (!profile.messages?.email?.address) return null;
   const sub = ensureSub();
   try {

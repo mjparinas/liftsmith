@@ -1,4 +1,5 @@
 "use client";
+
 // The home page hero: the 3D hologram lifter (the app's own demo engine, src/components/demo) working
 // through a short session of squat, deadlift, bench and press, switching between the male and female
 // figures. The working muscles are labelled on the body, and the numbers the app tracks tick up: reps,
@@ -7,16 +8,21 @@
 // three.js loads after the page does; without WebGL the hero shows a real app screenshot instead.
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-import type { Frame, Loop, Scene } from "@/components/demo/engine";
+
+import type { Frame, Loop, Scene, View } from "@/components/demo/engine";
 import { PLATE_SETS } from "@/lib/defaults";
+import { add, cross, lerpV, mul, norm, sub, type BodyKey, type Joints, type Vec } from "@/lib/demo/rig";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { loadBar } from "@/lib/plates";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
-import { add, cross, lerpV, mul, norm, sub, type Joints, type Vec } from "@/lib/demo/rig";
-import type { BodyKey } from "@/lib/demo/rig";
-import type { View } from "@/components/demo/engine";
 
-interface Step { id: string; body: BodyKey; kg: number; reps: number; view: View }
+interface Step {
+  id: string;
+  body: BodyKey;
+  kg: number;
+  reps: number;
+  view: View;
+}
 export const HERO_PROGRAM: Step[] = [
   { id: "back-squat", body: "male", kg: 100, reps: 5, view: "three" },
   { id: "deadlift", body: "female", kg: 100, reps: 5, view: "side" },
@@ -45,24 +51,42 @@ export function muscleAnchor(m: Muscle, J: Joints): Vec {
     return add(add(lerpV(a, b, t), mul(front, f)), [0, 0, z]);
   };
   switch (m) {
-    case "quads": return limb(J.hipR, J.kneeR, 0.45, 0.07);
-    case "hamstrings": return limb(J.hipR, J.kneeR, 0.45, -0.07);
-    case "adductors": return limb(J.hipR, J.kneeR, 0.3, 0, -0.06);
-    case "calves": return limb(J.kneeR, J.ankleR, 0.3, -0.05);
-    case "glutes": return torso(-0.04, -0.13, 0.06);
-    case "lowerBack": return torso(0.3, -0.11);
-    case "upperBack": return torso(0.75, -0.12);
-    case "lats": return torso(0.62, -0.05, 0.13);
-    case "traps": return add(lerpV(J.shC, J.neck, 0.6), mul(fwd, -0.03));
-    case "chest": return torso(0.78, 0.12, 0.06);
-    case "abs": return torso(0.45, 0.11);
-    case "obliques": return torso(0.42, 0.05, 0.13);
-    case "frontDelts": return add(J.shR, mul(fwd, 0.04));
-    case "sideDelts": return add(J.shR, [0, 0, 0.05]);
-    case "rearDelts": return add(J.shR, mul(fwd, -0.04));
-    case "biceps": return limb(J.shR, J.elbowR, 0.55, 0.04);
-    case "triceps": return limb(J.shR, J.elbowR, 0.55, -0.04);
-    case "forearms": return lerpV(J.elbowR, J.handR, 0.5);
+    case "quads":
+      return limb(J.hipR, J.kneeR, 0.45, 0.07);
+    case "hamstrings":
+      return limb(J.hipR, J.kneeR, 0.45, -0.07);
+    case "adductors":
+      return limb(J.hipR, J.kneeR, 0.3, 0, -0.06);
+    case "calves":
+      return limb(J.kneeR, J.ankleR, 0.3, -0.05);
+    case "glutes":
+      return torso(-0.04, -0.13, 0.06);
+    case "lowerBack":
+      return torso(0.3, -0.11);
+    case "upperBack":
+      return torso(0.75, -0.12);
+    case "lats":
+      return torso(0.62, -0.05, 0.13);
+    case "traps":
+      return add(lerpV(J.shC, J.neck, 0.6), mul(fwd, -0.03));
+    case "chest":
+      return torso(0.78, 0.12, 0.06);
+    case "abs":
+      return torso(0.45, 0.11);
+    case "obliques":
+      return torso(0.42, 0.05, 0.13);
+    case "frontDelts":
+      return add(J.shR, mul(fwd, 0.04));
+    case "sideDelts":
+      return add(J.shR, [0, 0, 0.05]);
+    case "rearDelts":
+      return add(J.shR, mul(fwd, -0.04));
+    case "biceps":
+      return limb(J.shR, J.elbowR, 0.55, 0.04);
+    case "triceps":
+      return limb(J.shR, J.elbowR, 0.55, -0.04);
+    case "forearms":
+      return lerpV(J.elbowR, J.handR, 0.5);
   }
 }
 
@@ -91,15 +115,29 @@ export function HeroLift() {
     let next: ReturnType<typeof setTimeout> | undefined;
     const reduced = !!window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     // Session state lives outside React: the HUD updates every frame.
-    let i = 0, reps = reduced ? HERO_PROGRAM[0].reps : 0, banked = 0, shown = 0, prevEffort = 0;
-    let hr = 96, beat = 0, effortS = 0, traceClock = 0, lastNow = performance.now(), lastBpm = 0;
+    let i = 0,
+      reps = reduced ? HERO_PROGRAM[0].reps : 0,
+      banked = 0,
+      shown = 0,
+      prevEffort = 0;
+    let hr = 96,
+      beat = 0,
+      effortS = 0,
+      traceClock = 0,
+      lastNow = performance.now(),
+      lastBpm = 0;
     const trace: number[] = Array(64).fill(96);
 
     void (async () => {
       try {
         const probe = document.createElement("canvas");
         if (!(probe.getContext("webgl2") ?? probe.getContext("webgl"))) throw new Error("no WebGL");
-        const [{ startLoop }, { createScene3D }, { placeVec }, T3] = await Promise.all([import("@/components/demo/engine"), import("@/components/demo/scene3d"), import("@/lib/demo/mesh"), import("three")]);
+        const [{ startLoop }, { createScene3D }, { placeVec }, T3] = await Promise.all([
+          import("@/components/demo/engine"),
+          import("@/components/demo/scene3d"),
+          import("@/lib/demo/mesh"),
+          import("three"),
+        ]);
         if (cancelled || !canvas.current) return;
         const inner = createScene3D(canvas.current);
         const cam = new T3.PerspectiveCamera(32, 1, 0.1, 40);
@@ -142,8 +180,13 @@ export function HeroLift() {
 
           // Muscle labels in two columns either side of the figure, with leader lines to the body.
           const { yaw, pitch, target: tg, distance } = f.cam;
-          const yr = (yaw * Math.PI) / 180, pr = (pitch * Math.PI) / 180;
-          cam.position.set(tg[0] + Math.sin(yr) * Math.cos(pr) * distance, tg[1] + Math.sin(pr) * distance, tg[2] + Math.cos(yr) * Math.cos(pr) * distance);
+          const yr = (yaw * Math.PI) / 180,
+            pr = (pitch * Math.PI) / 180;
+          cam.position.set(
+            tg[0] + Math.sin(yr) * Math.cos(pr) * distance,
+            tg[1] + Math.sin(pr) * distance,
+            tg[2] + Math.cos(yr) * Math.cos(pr) * distance,
+          );
           cam.lookAt(tg[0], tg[1], tg[2]);
           cam.updateMatrixWorld();
           const project = (q: Vec) => {
@@ -169,10 +212,15 @@ export function HeroLift() {
               if (!el) continue;
               const y = Math.min(Math.max(ay, minY), size[1] - 130);
               minY = y + 32;
-              const x = side === "l" ? Math.max(8, Math.min(ax - 36 - LABEL_W, centre.x - 80 - LABEL_W)) : Math.min(size[0] - 8 - LABEL_W, Math.max(ax + 36, centre.x + 80));
+              const x =
+                side === "l"
+                  ? Math.max(8, Math.min(ax - 36 - LABEL_W, centre.x - 80 - LABEL_W))
+                  : Math.min(size[0] - 8 - LABEL_W, Math.max(ax + 36, centre.x + 80));
               el.style.transform = `translate(${x}px, ${y - 12}px)`;
               el.style.opacity = "1";
-              lines.push(`<line x1="${side === "l" ? x + LABEL_W : x}" y1="${y}" x2="${ax}" y2="${ay}" /><circle cx="${ax}" cy="${ay}" r="3" />`);
+              lines.push(
+                `<line x1="${side === "l" ? x + LABEL_W : x}" y1="${y}" x2="${ax}" y2="${ay}" /><circle cx="${ax}" cy="${ay}" r="3" />`,
+              );
             }
           }
           if (svg.current) svg.current.innerHTML = lines.join("");
@@ -196,7 +244,19 @@ export function HeroLift() {
         loop = startLoop(
           canvas.current,
           scene,
-          { exerciseId: first.id, body: first.body, view: first.view, skeleton: false, muscles: true, path: false, speed: 1, playing: true, reps: first.reps, bpm: 96, fps: 60 },
+          {
+            exerciseId: first.id,
+            body: first.body,
+            view: first.view,
+            skeleton: false,
+            muscles: true,
+            path: false,
+            speed: 1,
+            playing: true,
+            reps: first.reps,
+            bpm: 96,
+            fps: 60,
+          },
           (label) => {
             if (phaseEl.current && phaseEl.current.textContent !== label) phaseEl.current.textContent = label;
           },
@@ -237,16 +297,32 @@ export function HeroLift() {
   if (status === "failed") {
     return (
       <div className="mx-auto w-full max-w-[300px]">
-        <Image src="/screens/today.webp" alt="The app's Today screen: the readiness call and the planned exercises" width={780} height={1688} priority className="rounded-[2rem] border border-line shadow-2xl" />
+        <Image
+          src="/screens/today.webp"
+          alt="The app's Today screen: the readiness call and the planned exercises"
+          width={780}
+          height={1688}
+          priority
+          className="rounded-[2rem] border border-line shadow-2xl"
+        />
       </div>
     );
   }
 
   return (
     <figure className="relative">
-      <div ref={stage} className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border border-line sm:aspect-[5/6]" style={{ background: "radial-gradient(ellipse at 50% 42%, #0e2236 0%, #070b11 68%)" }}>
-        {/* eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a labelled picture */}
-        <canvas ref={canvas} className="absolute inset-0 block h-full w-full touch-pan-y" role="img" aria-label={`Animated 3D wireframe figure doing ${ex?.name.toLowerCase() ?? "a lift"}, with the working muscles highlighted and labelled`} />
+      <div
+        ref={stage}
+        className="relative aspect-[4/5] w-full overflow-hidden rounded-[2rem] border border-line sm:aspect-[5/6]"
+        style={{ background: "radial-gradient(ellipse at 50% 42%, #0e2236 0%, #070b11 68%)" }}
+      >
+        <canvas
+          ref={canvas}
+          className="absolute inset-0 block h-full w-full touch-pan-y"
+          // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a labelled picture
+          role="img"
+          aria-label={`Animated 3D wireframe figure doing ${ex?.name.toLowerCase() ?? "a lift"}, with the working muscles highlighted and labelled`}
+        />
 
         <svg ref={svg} className="pointer-events-none absolute inset-0 h-full w-full fill-[#ff8a6f] stroke-[#ff8a6f]/70" aria-hidden />
         {shown.map((m) => (
@@ -276,9 +352,14 @@ export function HeroLift() {
           <div className="shrink-0 rounded-2xl border border-white/10 bg-black/50 px-3 py-2 text-right backdrop-blur">
             <p className="flex items-center justify-end gap-1.5">
               <svg ref={heartEl} width="16" height="16" viewBox="0 0 24 24" aria-hidden>
-                <path fill="#f0605d" d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.1 4.3 2.4.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z" />
+                <path
+                  fill="#f0605d"
+                  d="M12 21s-7.5-4.6-9.6-9.3C.9 8.3 3 4.5 6.7 4.5c2.1 0 3.6 1.1 4.3 2.4.7-1.3 2.2-2.4 4.3-2.4 3.7 0 5.8 3.8 4.3 7.2C19.5 16.4 12 21 12 21z"
+                />
               </svg>
-              <span ref={hrEl} className="num text-xl font-bold">96</span>
+              <span ref={hrEl} className="num text-xl font-bold">
+                96
+              </span>
               <span className="text-xs text-muted">bpm</span>
             </p>
             <svg width="128" height="34" viewBox="0 0 128 34" aria-hidden className="mt-0.5 hidden w-24 sm:block sm:w-32">
@@ -316,7 +397,8 @@ export function HeroLift() {
         {status === "loading" && <p className="absolute inset-0 grid place-items-center text-sm text-muted">Warming up…</p>}
       </div>
       <figcaption className="mt-2 text-center text-xs text-muted">
-        {reduce ? "Paused because your device asks for reduced motion. " : ""}Demo data. In the app, these numbers come from your own sets and heart rate monitor.
+        {reduce ? "Paused because your device asks for reduced motion. " : ""}Demo data. In the app, these numbers come from your own sets
+        and heart rate monitor.
       </figcaption>
     </figure>
   );

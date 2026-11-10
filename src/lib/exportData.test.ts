@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultProfile, makeGym } from "./defaults";
 import { backupJson, CSV_HEADER, setsCsv } from "./exportData";
 import type { AppEvent } from "./types";
@@ -6,9 +7,43 @@ import type { AppEvent } from "./types";
 const at = new Date("2026-11-09T18:30:00").getTime();
 const events: AppEvent[] = [
   { type: "sessionStart", id: "a", at, sessionId: "sess-123456789", gymId: "g", minutes: 45 },
-  { type: "set", id: "b", at: at + 60_000, sessionId: "sess-123456789", exerciseId: "bench-press", weight: 100, reps: 5, targetReps: 5, rir: 2, durationSec: 20, restSec: 120, hrAvg: 130, hrMax: 150 },
-  { type: "set", id: "c", at: at + 240_000, sessionId: "sess-123456789", exerciseId: "bench-press", weight: 100, reps: 4, targetReps: 5, rir: 2 },
-  { type: "set", id: "d", at: at + 480_000, sessionId: "sess-123456789", exerciseId: "db-bench-press", weight: 30, reps: 10, targetReps: 10, rir: 2 },
+  {
+    type: "set",
+    id: "b",
+    at: at + 60_000,
+    sessionId: "sess-123456789",
+    exerciseId: "bench-press",
+    weight: 100,
+    reps: 5,
+    targetReps: 5,
+    rir: 2,
+    durationSec: 20,
+    restSec: 120,
+    hrAvg: 130,
+    hrMax: 150,
+  },
+  {
+    type: "set",
+    id: "c",
+    at: at + 240_000,
+    sessionId: "sess-123456789",
+    exerciseId: "bench-press",
+    weight: 100,
+    reps: 4,
+    targetReps: 5,
+    rir: 2,
+  },
+  {
+    type: "set",
+    id: "d",
+    at: at + 480_000,
+    sessionId: "sess-123456789",
+    exerciseId: "db-bench-press",
+    weight: 30,
+    reps: 10,
+    targetReps: 10,
+    rir: 2,
+  },
   { type: "bodyweight", id: "e", at, kg: 80 },
 ];
 

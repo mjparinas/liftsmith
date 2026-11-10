@@ -5,7 +5,8 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "fix.reset": "Reset and rebuild",
-  "fix.reset.what": "Drop the weight about 10% and build back up over the next sessions. Most lifters pass their old best within three weeks.",
+  "fix.reset.what":
+    "Drop the weight about 10% and build back up over the next sessions. Most lifters pass their old best within three weeks.",
   "fix.reps": "Change the rep range",
   "fix.reps.what": "Three weeks in a different rep range. A new stimulus, with the weight worked out from your current strength.",
   "fix.volume": "More weekly sets",
@@ -20,7 +21,8 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "fix.reset": "Bajar y reconstruir",
-  "fix.reset.what": "Baja el peso un 10% aproximadamente y vuelve a subir en las próximas sesiones. La mayoría supera su mejor marca anterior en tres semanas.",
+  "fix.reset.what":
+    "Baja el peso un 10% aproximadamente y vuelve a subir en las próximas sesiones. La mayoría supera su mejor marca anterior en tres semanas.",
   "fix.reps": "Cambiar el rango de repeticiones",
   "fix.reps.what": "Tres semanas en otro rango de repeticiones. Un estímulo nuevo, con el peso calculado a partir de tu fuerza actual.",
   "fix.volume": "Más series semanales",
@@ -33,9 +35,11 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "fix.reset": "Redescendre et reconstruire",
-  "fix.reset.what": "Baissez la charge d’environ 10 % et remontez au fil des prochaines séances. La plupart dépassent leur ancien record en trois semaines.",
+  "fix.reset.what":
+    "Baissez la charge d’environ 10 % et remontez au fil des prochaines séances. La plupart dépassent leur ancien record en trois semaines.",
   "fix.reps": "Changer la fourchette de répétitions",
-  "fix.reps.what": "Trois semaines dans une autre fourchette de répétitions. Un nouveau stimulus, avec la charge calculée d’après votre force actuelle.",
+  "fix.reps.what":
+    "Trois semaines dans une autre fourchette de répétitions. Un nouveau stimulus, avec la charge calculée d’après votre force actuelle.",
   "fix.volume": "Plus de séries par semaine",
   "fix.volume.what": "Une série de plus à chaque fois pendant trois semaines, pour donner au muscle plus de travail auquel s’adapter.",
   "fix.rest": "Se reposer plus longtemps",

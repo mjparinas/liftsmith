@@ -37,8 +37,10 @@ export const en = {
   "orm.calcResult": "Estimated max",
   "orm.tooMany": "Past {max} reps to failure no formula is reliable. Try a heavier set.",
   "orm.formulas": "How each formula sees it",
-  "orm.formulasNote": "Up to 10 reps to failure the estimate averages Brzycki, Epley and the 2026 weight-based equation; above that, Mayhew, Wathan and the 2026 equation. Highlighted ones are in use.",
-  "orm.method": "Each session's best set counts, with reps in reserve added. Recent, heavy, close-to-failure sets count most, and sets past 20 reps are ignored.",
+  "orm.formulasNote":
+    "Up to 10 reps to failure the estimate averages Brzycki, Epley and the 2026 weight-based equation; above that, Mayhew, Wathan and the 2026 equation. Highlighted ones are in use.",
+  "orm.method":
+    "Each session's best set counts, with reps in reserve added. Recent, heavy, close-to-failure sets count most, and sets past 20 reps are ignored.",
   "orm.pick": "Exercise",
 } as const;
 
@@ -78,8 +80,10 @@ export const es: Partial<Record<Key, Message>> = {
   "orm.calcResult": "Máximo estimado",
   "orm.tooMany": "Pasadas {max} repeticiones al fallo ninguna fórmula es fiable. Prueba una serie más pesada.",
   "orm.formulas": "Qué dice cada fórmula",
-  "orm.formulasNote": "Hasta 10 repeticiones al fallo la estimación promedia Brzycki, Epley y la ecuación de 2026 basada en el peso; por encima, Mayhew, Wathan y la ecuación de 2026. Las resaltadas son las que se usan.",
-  "orm.method": "Cuenta la mejor serie de cada sesión, sumando las repeticiones en reserva. Las series recientes, pesadas y cercanas al fallo cuentan más, y las de más de 20 repeticiones se ignoran.",
+  "orm.formulasNote":
+    "Hasta 10 repeticiones al fallo la estimación promedia Brzycki, Epley y la ecuación de 2026 basada en el peso; por encima, Mayhew, Wathan y la ecuación de 2026. Las resaltadas son las que se usan.",
+  "orm.method":
+    "Cuenta la mejor serie de cada sesión, sumando las repeticiones en reserva. Las series recientes, pesadas y cercanas al fallo cuentan más, y las de más de 20 repeticiones se ignoran.",
   "orm.pick": "Ejercicio",
 };
 
@@ -117,7 +121,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "orm.calcResult": "Maximum estimé",
   "orm.tooMany": "Au-delà de {max} répétitions jusqu’à l’échec, aucune formule n’est fiable. Essayez une série plus lourde.",
   "orm.formulas": "Ce que dit chaque formule",
-  "orm.formulasNote": "Jusqu’à 10 répétitions jusqu’à l’échec, l’estimation fait la moyenne de Brzycki, Epley et de l’équation de 2026 fondée sur la charge ; au-delà, Mayhew, Wathan et l’équation de 2026. Les formules surlignées sont utilisées.",
-  "orm.method": "La meilleure série de chaque séance compte, réserve ajoutée. Les séries récentes, lourdes et proches de l’échec comptent le plus, et celles de plus de 20 répétitions sont ignorées.",
+  "orm.formulasNote":
+    "Jusqu’à 10 répétitions jusqu’à l’échec, l’estimation fait la moyenne de Brzycki, Epley et de l’équation de 2026 fondée sur la charge ; au-delà, Mayhew, Wathan et l’équation de 2026. Les formules surlignées sont utilisées.",
+  "orm.method":
+    "La meilleure série de chaque séance compte, réserve ajoutée. Les séries récentes, lourdes et proches de l’échec comptent le plus, et celles de plus de 20 répétitions sont ignorées.",
   "orm.pick": "Exercice",
 };

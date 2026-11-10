@@ -1,21 +1,23 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { ARTICLES } from "@/content/articles";
+
 import { ArticleView, relatedTo } from "@/components/site/ArticleView";
 import { SitePage } from "@/components/site/SiteChrome";
+import { ARTICLES } from "@/content/articles";
+
+import FitbodAlternatives from "./alternatives/fitbod/page";
 import BlogIndex from "./blog/page";
-import ExercisesIndex from "./exercises/page";
-import ExercisePage from "./exercises/[slug]/page";
-import AlternativesPage from "./exercises/[slug]/alternatives/page";
-import MusclePage from "./muscles/[muscle]/page";
-import PairPage from "./muscles/[muscle]/[equipment]/page";
-import EquipmentPage from "./equipment/[slug]/page";
-import PlatePage from "./tools/plate-calculator/page";
-import OneRmPage from "./tools/one-rep-max-calculator/page";
 import ComparePage from "./compare/[slug]/page";
 import CompareIndex from "./compare/page";
-import FitbodAlternatives from "./alternatives/fitbod/page";
+import EquipmentPage from "./equipment/[slug]/page";
+import AlternativesPage from "./exercises/[slug]/alternatives/page";
+import ExercisePage from "./exercises/[slug]/page";
+import ExercisesIndex from "./exercises/page";
+import PairPage from "./muscles/[muscle]/[equipment]/page";
+import MusclePage from "./muscles/[muscle]/page";
+import OneRmPage from "./tools/one-rep-max-calculator/page";
+import PlatePage from "./tools/plate-calculator/page";
 
 // The pages exist to send readers into the app (Melvin, 2026-11-09: "emphasis on the call to actions").
 const ctas = () => [...document.querySelectorAll("[data-cta]")].map((a) => a.getAttribute("data-cta")!);
@@ -34,9 +36,15 @@ describe("SEO pages", () => {
 
   it("gives every article a top, mid and end call to action into the app", () => {
     for (const a of ARTICLES) {
-      render(<SitePage kind={a.kind}><ArticleView a={a} related={relatedTo(a, ARTICLES)} /></SitePage>);
+      render(
+        <SitePage kind={a.kind}>
+          <ArticleView a={a} related={relatedTo(a, ARTICLES)} />
+        </SitePage>,
+      );
       const names = ctas();
-      expect(names, a.slug).toEqual(expect.arrayContaining([`${a.kind}-top`, `${a.kind}-mid`, `${a.kind}-end`, `sticky-${a.kind}`, "header"]));
+      expect(names, a.slug).toEqual(
+        expect.arrayContaining([`${a.kind}-top`, `${a.kind}-mid`, `${a.kind}-end`, `sticky-${a.kind}`, "header"]),
+      );
       expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(a.title);
       cleanup();
     }

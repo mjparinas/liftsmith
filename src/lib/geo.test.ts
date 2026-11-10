@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
-import { makeGym, defaultProfile } from "./defaults";
+
+import { defaultProfile, makeGym } from "./defaults";
 import { distanceM, gymAt, roundPlace } from "./geo";
 import { useApp } from "./store";
 import type { Gym } from "./types";
@@ -25,7 +26,7 @@ describe("gym by location", () => {
     expect(gymAt([home, club], null)).toBeNull();
     expect(gymAt([home, club], { lat: 47.6063, lon: -122.3322, accuracy: 5_000 })).toBeNull();
     expect(gymAt([home, club], { lat: 48, lon: -122, accuracy: 30 })).toBeNull();
-    const next = at(makeGym("commercial", "kg", "next"), 47.6070, -122.3321);
+    const next = at(makeGym("commercial", "kg", "next"), 47.607, -122.3321);
     expect(gymAt([home, next], { lat: 47.6066, lon: -122.3321, accuracy: 300 })).toBeNull();
   });
 });

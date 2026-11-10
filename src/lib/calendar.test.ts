@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultDays, fitLength, freeMinutes, nextStart, trainingIcs } from "./calendar";
 
 // Calendar (MVP+2): training days written out, and workouts fitted around busy times.
@@ -30,7 +31,10 @@ describe("calendar", () => {
   });
 
   it("measures free time until the next busy block", () => {
-    const busy = [{ start: mon + 50 * MIN, end: mon + 80 * MIN }, { start: mon + 200 * MIN, end: mon + 260 * MIN }];
+    const busy = [
+      { start: mon + 50 * MIN, end: mon + 80 * MIN },
+      { start: mon + 200 * MIN, end: mon + 260 * MIN },
+    ];
     expect(freeMinutes(busy, mon)).toEqual({ minutes: 50, until: mon + 50 * MIN });
     expect(freeMinutes(busy, mon + 60 * MIN).minutes).toBe(0);
     expect(freeMinutes([], mon)).toEqual({ minutes: 180, until: null });

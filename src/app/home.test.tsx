@@ -1,15 +1,17 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { epley, HERO_PROGRAM, labelled, muscleAnchor, perSide } from "@/components/site/HeroLift";
+
 import { DEMO_LIFTS } from "@/components/site/DemoPicker";
-import { visibleQuotes, QUOTES } from "@/content/testimonials";
-import { hasMotion, motionFor } from "@/lib/demo/motions";
+import { epley, HERO_PROGRAM, labelled, muscleAnchor, perSide } from "@/components/site/HeroLift";
+import { QUOTES, visibleQuotes } from "@/content/testimonials";
 import { jointsAt } from "@/lib/demo/mesh";
+import { hasMotion, motionFor } from "@/lib/demo/motions";
 import { BODIES } from "@/lib/demo/rig";
 import { FLAGS } from "@/lib/flags";
 import { PRICES } from "@/lib/trial";
 import { MUSCLES } from "@/lib/types";
+
 import Home from "./page";
 
 describe("home page", () => {
@@ -23,7 +25,11 @@ describe("home page", () => {
     // No store listing exists yet, so the badges say so instead of linking nowhere.
     expect(within(hero).getByRole("img", { name: "Google Play: coming soon" })).toBeInTheDocument();
     expect(within(hero).getByRole("img", { name: "App Store: coming soon" })).toBeInTheDocument();
-    expect(within(hero).getByRole("link", { name: /Use it in your browser today/ }).getAttribute("href")).toMatch(/^\/app\/?$/);
+    expect(
+      within(hero)
+        .getByRole("link", { name: /Use it in your browser today/ })
+        .getAttribute("href"),
+    ).toMatch(/^\/app\/?$/);
   });
 
   it("has plenty of calls to action, each one counted", () => {
@@ -36,7 +42,13 @@ describe("home page", () => {
 
   it("outlines every major feature with a real screenshot", () => {
     render(<Home />);
-    for (const name of ["A plan for today, built from your last workouts", "Big numbers, one tap, plates already worked out", "Your rest timer lives on the lock screen", "See which muscles are ready before you train them", "Numbers that show you're getting stronger"]) {
+    for (const name of [
+      "A plan for today, built from your last workouts",
+      "Big numbers, one tap, plates already worked out",
+      "Your rest timer lives on the lock screen",
+      "See which muscles are ready before you train them",
+      "Numbers that show you're getting stronger",
+    ]) {
       const article = screen.getByRole("heading", { name }).closest("article")!;
       expect(decodeURIComponent(within(article).getByRole("img").getAttribute("src")!)).toMatch(/screens\/\w+\.webp/);
     }

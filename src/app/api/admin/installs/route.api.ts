@@ -22,7 +22,8 @@ export async function POST(req: Request) {
   } catch {
     return json(400, { error: "Not JSON" });
   }
-  if (typeof body.id !== "string" || !/^[A-Za-z0-9_-]{8,64}$/.test(body.id) || typeof body.test !== "boolean") return json(400, { error: "Give an install id and test: true or false." });
+  if (typeof body.id !== "string" || !/^[A-Za-z0-9_-]{8,64}$/.test(body.id) || typeof body.test !== "boolean")
+    return json(400, { error: "Give an install id and test: true or false." });
   const changed = await run("UPDATE installs SET test = ? WHERE id = ?", [body.test ? 1 : 0, body.id]);
   if (!changed) return json(404, { error: "No install with that id." });
   await audit(gate.staff.email, body.test ? "install.test" : "install.real", body.id);

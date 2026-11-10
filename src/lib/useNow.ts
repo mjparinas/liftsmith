@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 
 /** The current time, refreshed every `ms` (or once a minute), so render stays pure. */

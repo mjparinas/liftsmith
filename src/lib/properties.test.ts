@@ -1,6 +1,8 @@
 import fc from "fast-check";
 import { describe, expect, it } from "vitest";
-import { DAY, NOW, makeSet } from "@/test/factories";
+
+import { DAY, makeSet, NOW } from "@/test/factories";
+
 import { decodeShare } from "./dashboard";
 import { EXERCISES } from "./exercises";
 import { parseCsv, readImport } from "./importCsv";
@@ -63,7 +65,8 @@ describe("recovery", () => {
     hoursAgo: fc.double({ min: 0, max: 24 * 10, noNaN: true }),
     rir: fc.integer({ min: 0, max: 5 }),
   });
-  const toEvent = (s: { exerciseId: string; hoursAgo: number; rir: number }) => makeSet({ exerciseId: s.exerciseId, at: NOW - s.hoursAgo * 3600_000, rir: s.rir });
+  const toEvent = (s: { exerciseId: string; hoursAgo: number; rir: number }) =>
+    makeSet({ exerciseId: s.exerciseId, at: NOW - s.hoursAgo * 3600_000, rir: s.rir });
 
   it("every muscle stays between 0 and 100%", () => {
     run(
@@ -105,12 +108,18 @@ describe("units", () => {
 
 describe("links and files from outside never crash the app", () => {
   it("remix links: junk gives a list, never an error", () => {
-    run(fc.property(fc.string({ unit: "binary", maxLength: 300 }), (s) => {
-      expect(Array.isArray(decodeRemix(s))).toBe(true);
-    }), 500);
-    run(fc.property(fc.array(fc.string({ maxLength: 20 }), { maxLength: 30 }), (parts) => {
-      expect(Array.isArray(decodeRemix(["1", ...parts].join("~")))).toBe(true);
-    }), 300);
+    run(
+      fc.property(fc.string({ unit: "binary", maxLength: 300 }), (s) => {
+        expect(Array.isArray(decodeRemix(s))).toBe(true);
+      }),
+      500,
+    );
+    run(
+      fc.property(fc.array(fc.string({ maxLength: 20 }), { maxLength: 30 }), (parts) => {
+        expect(Array.isArray(decodeRemix(["1", ...parts].join("~")))).toBe(true);
+      }),
+      300,
+    );
   });
 
   it("remix links round-trip every valid workout", () => {
@@ -122,34 +131,55 @@ describe("links and files from outside never crash the app", () => {
     });
     run(
       fc.property(fc.array(item, { maxLength: 20 }), (items) => {
-        expect(decodeRemix(encodeRemix(items))).toEqual(items.map((i) => ({ exerciseId: i.exerciseId, sets: i.sets, reps: i.target.reps, restSec: i.restSec })));
+        expect(decodeRemix(encodeRemix(items))).toEqual(
+          items.map((i) => ({ exerciseId: i.exerciseId, sets: i.sets, reps: i.target.reps, restSec: i.restSec })),
+        );
       }),
     );
   });
 
   it("share links: junk gives null or a valid card, never an error", () => {
-    run(fc.property(fc.string({ unit: "binary", maxLength: 500 }), (s) => {
-      expect(() => decodeShare(s)).not.toThrow();
-    }), 500);
+    run(
+      fc.property(fc.string({ unit: "binary", maxLength: 500 }), (s) => {
+        expect(() => decodeShare(s)).not.toThrow();
+      }),
+      500,
+    );
     const b64 = (v: unknown) => Buffer.from(JSON.stringify(v)).toString("base64url");
-    run(fc.property(fc.jsonValue(), (v) => {
-      expect(() => decodeShare(b64(v))).not.toThrow();
-    }), 500);
-    run(fc.property(fc.dictionary(fc.constantFrom("v", "n", "u", "xp", "w", "s", "d0", "t", "l", "d"), fc.jsonValue()), (v) => {
-      expect(() => decodeShare(b64(v))).not.toThrow();
-    }), 500);
+    run(
+      fc.property(fc.jsonValue(), (v) => {
+        expect(() => decodeShare(b64(v))).not.toThrow();
+      }),
+      500,
+    );
+    run(
+      fc.property(fc.dictionary(fc.constantFrom("v", "n", "u", "xp", "w", "s", "d0", "t", "l", "d"), fc.jsonValue()), (v) => {
+        expect(() => decodeShare(b64(v))).not.toThrow();
+      }),
+      500,
+    );
   });
 
   it("CSV import: any text gives rows or null, never an error", () => {
-    run(fc.property(fc.string({ unit: "binary", maxLength: 2000 }), (s) => {
-      expect(Array.isArray(parseCsv(s))).toBe(true);
-      expect(() => readImport(s)).not.toThrow();
-    }), 300);
-    const cell = fc.oneof(fc.string({ maxLength: 12 }), fc.integer().map(String), fc.constantFrom("", "2026-11-02 18:30:00", "kg", "lbs", "1,5"));
+    run(
+      fc.property(fc.string({ unit: "binary", maxLength: 2000 }), (s) => {
+        expect(Array.isArray(parseCsv(s))).toBe(true);
+        expect(() => readImport(s)).not.toThrow();
+      }),
+      300,
+    );
+    const cell = fc.oneof(
+      fc.string({ maxLength: 12 }),
+      fc.integer().map(String),
+      fc.constantFrom("", "2026-11-02 18:30:00", "kg", "lbs", "1,5"),
+    );
     const header = fc.constant(["Date", "Workout Name", "Exercise Name", "Set Order", "Weight", "Reps", "Distance", "Seconds"]);
-    run(fc.property(header, fc.array(fc.array(cell, { minLength: 8, maxLength: 8 }), { maxLength: 20 }), (h, rows) => {
-      const text = [h, ...rows].map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(",")).join("\n");
-      expect(() => readImport(text)).not.toThrow();
-    }), 300);
+    run(
+      fc.property(header, fc.array(fc.array(cell, { minLength: 8, maxLength: 8 }), { maxLength: 20 }), (h, rows) => {
+        const text = [h, ...rows].map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(",")).join("\n");
+        expect(() => readImport(text)).not.toThrow();
+      }),
+      300,
+    );
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { blockWeek } from "./block";
 import { defaultProfile, makeGym } from "./defaults";
 import { exercise } from "./exercises";
@@ -21,7 +22,18 @@ let n = 0;
 /** One session of bench, three sets, all reps hit unless `reps` says otherwise. */
 function session(at: number, weight: number, reps = 5, targetReps = 5, exerciseId = "bench-press"): SetEvent[] {
   const sid = `b${n++}`;
-  return [0, 1, 2].map((i) => ({ type: "set", id: `${sid}-${i}`, at: at + i * 1000, sessionId: sid, exerciseId, weight, reps, targetReps, targetWeight: weight, rir: 2 }));
+  return [0, 1, 2].map((i) => ({
+    type: "set",
+    id: `${sid}-${i}`,
+    at: at + i * 1000,
+    sessionId: sid,
+    exerciseId,
+    weight,
+    reps,
+    targetReps,
+    targetWeight: weight,
+    rir: 2,
+  }));
 }
 /** Bench every three days, ending `daysAgo` before NOW. */
 function history(daysAgo: number, weight = 100): AppEvent[] {
@@ -55,7 +67,13 @@ describe("break detection", () => {
   });
 
   it("leaves bodyweight exercises alone", () => {
-    expect(layoff(exercise("push-up"), history(30).map((e) => ({ ...e, exerciseId: "push-up", weight: 0 }) as AppEvent), NOW)).toBeNull();
+    expect(
+      layoff(
+        exercise("push-up"),
+        history(30).map((e) => ({ ...e, exerciseId: "push-up", weight: 0 }) as AppEvent),
+        NOW,
+      ),
+    ).toBeNull();
   });
 });
 
@@ -95,10 +113,36 @@ describe("fixed programs", () => {
     const play = (now: number) => {
       const plan = programPlan({ src, profile, gym, events, now })!;
       const sid = `p${n++}`;
-      events = [...events, { type: "sessionStart", id: `st-${sid}`, at: now, sessionId: sid, gymId: gym.id, minutes: plan.minutes, program: plan.program && { id: plan.program.id, day: plan.program.day } }];
-      plan.items.forEach((it) => it.setTargets!.forEach((st, i) => {
-        events.push({ type: "set", id: `${sid}-${it.slot}-${i}`, at: now + i * 1000, sessionId: sid, exerciseId: it.exerciseId, weight: st.weight, reps: st.reps, targetReps: st.reps, targetWeight: st.weight, rir: 2, slot: it.slot, comeback: st.comeback });
-      }));
+      events = [
+        ...events,
+        {
+          type: "sessionStart",
+          id: `st-${sid}`,
+          at: now,
+          sessionId: sid,
+          gymId: gym.id,
+          minutes: plan.minutes,
+          program: plan.program && { id: plan.program.id, day: plan.program.day },
+        },
+      ];
+      plan.items.forEach((it) =>
+        it.setTargets!.forEach((st, i) => {
+          events.push({
+            type: "set",
+            id: `${sid}-${it.slot}-${i}`,
+            at: now + i * 1000,
+            sessionId: sid,
+            exerciseId: it.exerciseId,
+            weight: st.weight,
+            reps: st.reps,
+            targetReps: st.reps,
+            targetWeight: st.weight,
+            rir: 2,
+            slot: it.slot,
+            comeback: st.comeback,
+          });
+        }),
+      );
       return plan;
     };
     for (let i = 0; i < 4; i++, at += 2 * D) play(at);

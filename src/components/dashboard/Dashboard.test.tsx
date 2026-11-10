@@ -4,11 +4,13 @@
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { decodeShare } from "@/lib/dashboard";
-import { setLanguage } from "@/lib/i18n";
 import { defaultProfile } from "@/lib/defaults";
+import { setLanguage } from "@/lib/i18n";
 import { appendEvents, eraseAll, load, saveRecord } from "@/lib/localdb";
 import type { AppEvent, SetEvent } from "@/lib/types";
+
 import { Dashboard } from "./Dashboard";
 import { SharedProfile } from "./Share";
 
@@ -21,7 +23,16 @@ vi.mock("@/lib/entitlements", async (orig) => {
 const D = 86400_000;
 let n = 0;
 const set = (at: number, sessionId: string, over: Partial<SetEvent> = {}): SetEvent => ({
-  type: "set", id: `s${n++}`, at, sessionId, exerciseId: "bench-press", weight: 60, reps: 5, targetReps: 5, rir: 2, ...over,
+  type: "set",
+  id: `s${n++}`,
+  at,
+  sessionId,
+  exerciseId: "bench-press",
+  weight: 60,
+  reps: 5,
+  targetReps: 5,
+  rir: 2,
+  ...over,
 });
 const workout = (at: number, id: string, over: Partial<SetEvent> = {}): AppEvent[] => [
   { type: "sessionStart", id: `st-${id}`, at: at - 60_000, sessionId: id, gymId: "g1", minutes: 45 },
@@ -63,9 +74,15 @@ describe("web dashboard", () => {
 
     await user.click(screen.getByRole("link", { name: "Calendar" }));
     expect(await screen.findByRole("heading", { name: "The last year" })).toBeInTheDocument();
-    const yesterday = new Date(Date.now() - D).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    const yesterday = new Date(Date.now() - D).toLocaleDateString([], {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
     // The month calendar starts on this month; yesterday may be in the last one.
-    if (new Date(Date.now() - D).getMonth() !== new Date().getMonth()) await user.click(screen.getByRole("button", { name: "Previous month" }));
+    if (new Date(Date.now() - D).getMonth() !== new Date().getMonth())
+      await user.click(screen.getByRole("button", { name: "Previous month" }));
     await user.click(screen.getByRole("button", { name: new RegExp(`, ${yesterday}: 1 workout, 2 sets, 1 PR`) }));
     expect(await screen.findByRole("button", { name: /^2 sets · .* · 1 PRBarbell bench press$/ })).toBeInTheDocument();
 

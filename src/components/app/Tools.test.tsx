@@ -1,15 +1,20 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
+
 import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+
 import { setLanguage } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
+
 import { Tools } from "./Tools";
 
 beforeEach(async () => {
   await useApp.getState().reset();
-  useApp.getState().setProfile({ onboarded: true, bodyweight: 80, unit: "kg", sex: undefined, birthYear: undefined, heightCm: undefined, daysPerWeek: 3 });
+  useApp
+    .getState()
+    .setProfile({ onboarded: true, bodyweight: 80, unit: "kg", sex: undefined, birthYear: undefined, heightCm: undefined, daysPerWeek: 3 });
 });
 afterEach(() => {
   cleanup();

@@ -1,4 +1,5 @@
 "use client";
+
 import { plateStyle, type Loading } from "@/lib/plates";
 import type { Unit } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
@@ -16,7 +17,19 @@ function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
   return { fill: s.fill, stroke: "#0a0d12", strokeWidth: 1, text: s.text };
 }
 
-export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { loading: Loading; bar: number; unit: Unit; compact?: boolean; finish?: PlateFinish }) {
+export function PlateBar({
+  loading,
+  bar,
+  unit,
+  compact,
+  finish = "classic",
+}: {
+  loading: Loading;
+  bar: number;
+  unit: Unit;
+  compact?: boolean;
+  finish?: PlateFinish;
+}) {
   const plates = loading.perSide;
   const W = 360;
   const cy = 60;
@@ -29,7 +42,12 @@ export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { 
   });
   return (
     <div className="w-full">
-      <svg viewBox={`0 0 ${W} 120`} className="w-full" role="img" aria-label={`Load ${plates.length ? plates.map(fmtNum).join(", ") : "no plates"} ${unit} on each side of a ${fmtNum(bar)} ${unit} bar`}>
+      <svg
+        viewBox={`0 0 ${W} 120`}
+        className="w-full"
+        role="img"
+        aria-label={`Load ${plates.length ? plates.map(fmtNum).join(", ") : "no plates"} ${unit} on each side of a ${fmtNum(bar)} ${unit} bar`}
+      >
         <defs>
           <linearGradient id="steel" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stopColor="#c9d1db" />
@@ -42,7 +60,13 @@ export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { 
             <stop offset="0.55" stopColor="#e2e8ef" />
             <stop offset="1" stopColor="#6b7684" />
           </linearGradient>
-          <filter id="neon" x="-50%" y="-20%" width="200%" height="140%"><feGaussianBlur stdDeviation="2.2" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+          <filter id="neon" x="-50%" y="-20%" width="200%" height="140%">
+            <feGaussianBlur stdDeviation="2.2" result="b" />
+            <feMerge>
+              <feMergeNode in="b" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
         </defs>
         {/* shaft */}
         <rect x={collar} y={cy - 3} width={W - collar * 2} height={6} rx={2} fill="url(#steel)" />
@@ -57,14 +81,32 @@ export function PlateBar({ loading, bar, unit, compact, finish = "classic" }: { 
             {left.map(({ w, s, x }, i) => {
               const f = finished(s, finish);
               return (
-              <g key={i}>
-                <rect x={x} y={cy - s.height / 2} width={s.width} height={s.height} rx={2.5} fill={f.fill} stroke={f.stroke} strokeWidth={f.strokeWidth} filter={"glow" in f ? "url(#neon)" : undefined} />
-                {!mirror && s.height > 48 && (
-                  <text x={x + s.width / 2} y={cy + 3.5} fontSize={9} fontWeight={700} textAnchor="middle" fill={f.text} transform={`rotate(-90 ${x + s.width / 2} ${cy})`}>
-                    {fmtNum(w)}
-                  </text>
-                )}
-              </g>
+                <g key={i}>
+                  <rect
+                    x={x}
+                    y={cy - s.height / 2}
+                    width={s.width}
+                    height={s.height}
+                    rx={2.5}
+                    fill={f.fill}
+                    stroke={f.stroke}
+                    strokeWidth={f.strokeWidth}
+                    filter={"glow" in f ? "url(#neon)" : undefined}
+                  />
+                  {!mirror && s.height > 48 && (
+                    <text
+                      x={x + s.width / 2}
+                      y={cy + 3.5}
+                      fontSize={9}
+                      fontWeight={700}
+                      textAnchor="middle"
+                      fill={f.text}
+                      transform={`rotate(-90 ${x + s.width / 2} ${cy})`}
+                    >
+                      {fmtNum(w)}
+                    </text>
+                  )}
+                </g>
               );
             })}
           </g>

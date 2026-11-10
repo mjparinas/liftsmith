@@ -103,12 +103,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "done.shareFailed": "Le partage a échoué. Réessayez.",
   "done.done": "Terminé",
   "done.remixShare": "Envoyer à un ami",
-  "done.remixHint": "Vos amis la reçoivent adaptée à leur salle et à leurs charges. Le lien ne contient que les exercices, séries et répétitions.",
+  "done.remixHint":
+    "Vos amis la reçoivent adaptée à leur salle et à leurs charges. Le lien ne contient que les exercices, séries et répétitions.",
   "done.remixCopied": "Lien copié.",
   "done.remixText": "Essaie ma séance dans Liftsmith. Elle s’adapte à ta salle et à tes charges.",
   "done.allAchievements": "Voir tous les succès",
   "done.back": "Retour à aujourd’hui",
-  "done.footer": { one: "Niveau {level} · {title} · série de {count} semaine", other: "Niveau {level} · {title} · série de {count} semaines" },
+  "done.footer": {
+    one: "Niveau {level} · {title} · série de {count} semaine",
+    other: "Niveau {level} · {title} · série de {count} semaines",
+  },
   "done.crate": "Vous avez gagné un coffre",
   "done.crateTap": "Touchez pour l’ouvrir",
   "done.crate.accent": "Couleur d’accent · {rarity}",

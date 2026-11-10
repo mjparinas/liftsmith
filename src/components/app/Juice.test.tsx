@@ -3,7 +3,9 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { feel } from "@/lib/juice";
+
 import { burst } from "./burst";
 import { Mascot } from "./Mascot";
 import { EmptyState, SwitchRow, TodaySkeleton } from "./ui";

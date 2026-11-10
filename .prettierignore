@@ -1,0 +1,10 @@
+# Prettier formats code (src/ and scripts/). Docs, data and generated files are left as written.
+*
+!src/
+!src/**/
+!src/**/*.ts
+!src/**/*.tsx
+!scripts/
+!scripts/**/*.mjs
+!*.config.mjs
+!*.config.ts

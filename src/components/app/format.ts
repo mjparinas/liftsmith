@@ -1,9 +1,9 @@
+import { date, relative, t } from "@/lib/i18n";
 import { barFor } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
+import { TIMED } from "@/lib/progression";
 import type { Exercise, Gym, Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
-import { TIMED } from "@/lib/progression";
-import { date, relative, t } from "@/lib/i18n";
 
 export function loadText(ex: Exercise, kg: number, unit: Unit): string {
   if (ex.load === "bodyweight") return kg > 0 ? `+${fmtNum(fromKg(kg, unit))} ${unit}` : "Bodyweight";

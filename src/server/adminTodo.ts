@@ -4,6 +4,7 @@
 // by its key (admin_todo_hidden); it comes back when the snooze ends, or, for one whose key changes with the data
 // (a new message, a new failure), as soon as there's something new.
 import { jobState } from "@/lib/systemHealth";
+
 import { loadCreators } from "./creators";
 import { batch, query, run } from "./db";
 import { inboxConfigured, waitingMail } from "./inbox";
@@ -43,12 +44,38 @@ const env = (name: string) => process.env[name]?.trim() || "";
 export function setupItems(get: (name: string) => string = env): TodoItem[] {
   const items: TodoItem[] = [];
   const add = (name: string, title: string, detail: string, href?: string) =>
-    items.push({ key: `setup:${name}`, kind: "setup", title, detail, at: null, action: href ? { label: "Open", href } : { label: "System", tab: "System" } });
+    items.push({
+      key: `setup:${name}`,
+      kind: "setup",
+      title,
+      detail,
+      at: null,
+      action: href ? { label: "Open", href } : { label: "System", tab: "System" },
+    });
   const vercelEnv = "https://vercel.com/melvins-projects-b69f55c3/liftsmith/settings/environment-variables";
-  if (!get("RESEND_INBOX_API_KEY")) add("RESEND_INBOX_API_KEY", "Let the Inbox read mail", "Create a full-access Resend API key and set it as RESEND_INBOX_API_KEY in Vercel. The sending key can't read received mail.", vercelEnv);
-  if (!get("ANALYTICS_SECRET")) add("ANALYTICS_SECRET", "Set the visitor hash salt", "Set ANALYTICS_SECRET (any long random string) in Vercel, so the cookieless visitor count isn't guessable.", vercelEnv);
-  if (!get("NEXT_PUBLIC_SITE_URL")) add("NEXT_PUBLIC_SITE_URL", "Set the site address", "Set NEXT_PUBLIC_SITE_URL to https://www.getliftsmith.com in Vercel.", vercelEnv);
-  if (!get("UPTIMEROBOT_API_KEY")) add("UPTIMEROBOT_API_KEY", "Watch the site with UptimeRobot", "Add a free UptimeRobot monitor for https://www.getliftsmith.com/api/health/ and set its read-only API key as UPTIMEROBOT_API_KEY.", "https://uptimerobot.com/");
+  if (!get("RESEND_INBOX_API_KEY"))
+    add(
+      "RESEND_INBOX_API_KEY",
+      "Let the Inbox read mail",
+      "Create a full-access Resend API key and set it as RESEND_INBOX_API_KEY in Vercel. The sending key can't read received mail.",
+      vercelEnv,
+    );
+  if (!get("ANALYTICS_SECRET"))
+    add(
+      "ANALYTICS_SECRET",
+      "Set the visitor hash salt",
+      "Set ANALYTICS_SECRET (any long random string) in Vercel, so the cookieless visitor count isn't guessable.",
+      vercelEnv,
+    );
+  if (!get("NEXT_PUBLIC_SITE_URL"))
+    add("NEXT_PUBLIC_SITE_URL", "Set the site address", "Set NEXT_PUBLIC_SITE_URL to https://www.getliftsmith.com in Vercel.", vercelEnv);
+  if (!get("UPTIMEROBOT_API_KEY"))
+    add(
+      "UPTIMEROBOT_API_KEY",
+      "Watch the site with UptimeRobot",
+      "Add a free UptimeRobot monitor for https://www.getliftsmith.com/api/health/ and set its read-only API key as UPTIMEROBOT_API_KEY.",
+      "https://uptimerobot.com/",
+    );
   return items;
 }
 
@@ -109,7 +136,11 @@ async function jobItems(now: number): Promise<TodoItem[]> {
     {
       key: `job:${last?.startedAt ?? "never"}`,
       kind: "job",
-      title: !last ? "The daily reminder job hasn't run yet" : state === "down" ? "The daily reminder job failed" : "The daily reminder job is late",
+      title: !last
+        ? "The daily reminder job hasn't run yet"
+        : state === "down"
+          ? "The daily reminder job failed"
+          : "The daily reminder job is late",
       detail: "Reminder emails go out from it. The System tab shows its last runs.",
       at: last?.startedAt ?? null,
       action: { label: "System", tab: "System" },
@@ -154,7 +185,10 @@ export async function todoList(now = Date.now()): Promise<TodoList> {
 /** Snoozes an item for `days` (1 to 365), or dismisses it for good when `days` is null. */
 export async function hideItem(key: string, days: number | null, now = Date.now()): Promise<void> {
   const until = days == null ? FOREVER : now + days * DAY;
-  await run("INSERT INTO admin_todo_hidden (key, until, at) VALUES (?, ?, ?) ON CONFLICT (key) DO UPDATE SET until = excluded.until, at = excluded.at", [key, until, now]);
+  await run(
+    "INSERT INTO admin_todo_hidden (key, until, at) VALUES (?, ?, ?) ON CONFLICT (key) DO UPDATE SET until = excluded.until, at = excluded.at",
+    [key, until, now],
+  );
 }
 
 /** Brings back every snoozed and dismissed item. */
@@ -185,7 +219,9 @@ export async function listTasks(): Promise<AdminTask[]> {
   return [...open, ...done].map(toTask);
 }
 
-export function checkTask(body: Record<string, unknown>): { ok: true; title: string; note: string | null; due: number | null } | { ok: false; error: string } {
+export function checkTask(
+  body: Record<string, unknown>,
+): { ok: true; title: string; note: string | null; due: number | null } | { ok: false; error: string } {
   const title = typeof body.title === "string" ? body.title.trim() : "";
   if (!title) return { ok: false, error: "Give the task a title." };
   if (title.length > 200) return { ok: false, error: "Keep the title under 200 characters." };
@@ -198,8 +234,18 @@ export function checkTask(body: Record<string, unknown>): { ok: true; title: str
   return { ok: true, title, note, due };
 }
 
-export async function addTask(t: { title: string; note: string | null; due: number | null }, admin: string, now = Date.now()): Promise<number> {
-  await run("INSERT INTO admin_tasks (title, note, due, created_at, created_by) VALUES (?, ?, ?, ?, ?)", [t.title, t.note, t.due, now, admin]);
+export async function addTask(
+  t: { title: string; note: string | null; due: number | null },
+  admin: string,
+  now = Date.now(),
+): Promise<number> {
+  await run("INSERT INTO admin_tasks (title, note, due, created_at, created_by) VALUES (?, ?, ?, ?, ?)", [
+    t.title,
+    t.note,
+    t.due,
+    now,
+    admin,
+  ]);
   const [row] = await query<{ id: number }>("SELECT MAX(id) AS id FROM admin_tasks");
   return Number(row.id);
 }

@@ -2,8 +2,8 @@
 // estimates the phase from their own typical cycle length and turns it into a small, overridable nudge
 // to the day's readiness. Evidence that cycle phase changes strength is mixed and individual, so the
 // effect is deliberately small and worded as "go by feel", never as a rule. Nothing here leaves the device.
-import type { AppEvent, CycleEvent } from "./types";
 import { t } from "./i18n";
+import type { AppEvent, CycleEvent } from "./types";
 
 const DAY = 86_400_000;
 export const DEFAULT_CYCLE = 28;
@@ -53,7 +53,8 @@ export function cycleState(events: readonly AppEvent[], now: number): CycleState
   if (day < 1 || day > length * 2) return null;
   const d = ((day - 1) % length) + 1;
   const ovulation = length - 14;
-  const phase: Phase = d <= 4 ? "period" : d < ovulation - 1 ? "follicular" : d <= ovulation + 1 ? "ovulation" : d > length - 5 ? "late-luteal" : "luteal";
+  const phase: Phase =
+    d <= 4 ? "period" : d < ovulation - 1 ? "follicular" : d <= ovulation + 1 ? "ovulation" : d > length - 5 ? "late-luteal" : "luteal";
   return { day: d, length, phase, next: last + Math.ceil(day / length) * length * DAY };
 }
 

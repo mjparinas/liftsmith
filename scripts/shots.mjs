@@ -2,13 +2,20 @@
 // Runs first-run setup, a short workout, and visits each tab. Phone size, 2x.
 import fs from "node:fs";
 import { chromium } from "playwright";
+
 import { base, onboard } from "./helpers.mjs";
 
 const OUT = process.argv[3] || "shots";
 fs.mkdirSync(OUT, { recursive: true });
 const server = await base();
 const browser = await chromium.launch();
-const ctx = await browser.newContext({ viewport: { width: 412, height: 915 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, reducedMotion: "reduce" });
+const ctx = await browser.newContext({
+  viewport: { width: 412, height: 915 },
+  deviceScaleFactor: 2,
+  isMobile: true,
+  hasTouch: true,
+  reducedMotion: "reduce",
+});
 const page = await ctx.newPage();
 const shot = async (n, full = false) => {
   await page.waitForTimeout(450);
@@ -39,7 +46,11 @@ await page.waitForTimeout(1200);
 await shot("05-done");
 await page.getByRole("button", { name: "Done", exact: true }).click();
 await shot("06-today");
-for (const [tab, n] of [["Body", "07-recovery"], ["Progress", "08-progress"], ["Gyms", "09-gyms"]]) {
+for (const [tab, n] of [
+  ["Body", "07-recovery"],
+  ["Progress", "08-progress"],
+  ["Gyms", "09-gyms"],
+]) {
   await page.getByRole("button", { name: tab, exact: true }).click();
   await shot(n);
 }

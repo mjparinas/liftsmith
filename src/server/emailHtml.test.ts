@@ -9,7 +9,8 @@ const clean = (html: string, images = false) => sanitizeEmailHtml(html, { images
 
 describe("sanitizeEmailHtml", () => {
   it("keeps ordinary formatting, tables and the mail's own styles", () => {
-    const html = '<style>.x{color:red}</style><table width="100%" cellpadding="4"><tr><td align="center" style="color:#333"><h1>Hi</h1><p><b>Bold</b> <i>it</i></p><ul><li>One</li></ul></td></tr></table>';
+    const html =
+      '<style>.x{color:red}</style><table width="100%" cellpadding="4"><tr><td align="center" style="color:#333"><h1>Hi</h1><p><b>Bold</b> <i>it</i></p><ul><li>One</li></ul></td></tr></table>';
     const out = clean(html);
     expect(out).toContain("<style>.x{color:red}</style>");
     expect(out).toContain('<table width="100%" cellpadding="4">');
@@ -20,14 +21,18 @@ describe("sanitizeEmailHtml", () => {
     ["script", "<script>alert(1)</script>", /<script|alert/],
     ["event handler", '<p onclick="alert(1)">x</p><body onload="alert(1)">', /onclick|onload/],
     ["broken-image handler", '<img src=x onerror="alert(1)">', /onerror|alert/],
-    ["javascript link", '<a href="javascript:alert(1)">x</a><a href="JaVaScRiPt:alert(1)">y</a><a href=" javascript:alert(1)">z</a>', /javascript/i],
+    [
+      "javascript link",
+      '<a href="javascript:alert(1)">x</a><a href="JaVaScRiPt:alert(1)">y</a><a href=" javascript:alert(1)">z</a>',
+      /javascript/i,
+    ],
     ["entity-encoded javascript link", '<a href="&#106;avascript:alert(1)">x</a>', /href/],
     ["data: link", '<a href="data:text/html,<script>alert(1)</script>">x</a>', /href|script/],
     ["vbscript link", '<a href="vbscript:msgbox(1)">x</a>', /vbscript/i],
     ["iframe", '<iframe src="https://evil.example"></iframe>', /iframe|evil/],
     ["object and embed", '<object data="x.swf"></object><embed src="x.swf">', /object|embed|swf/],
     ["form", '<form action="https://evil.example"><input name="password"><button>Go</button></form>', /form|input|button|evil/],
-    ["svg with script", "<svg><script>alert(1)</script><a xlink:href=\"javascript:alert(1)\"></a></svg>", /svg|script|javascript/],
+    ["svg with script", '<svg><script>alert(1)</script><a xlink:href="javascript:alert(1)"></a></svg>', /svg|script|javascript/],
     ["math", '<math><mi xlink:href="javascript:alert(1)">x</mi></math>', /math|javascript/],
     ["meta refresh", '<meta http-equiv="refresh" content="0;url=https://evil.example">', /meta|evil/],
     ["base tag", '<base href="https://evil.example/">', /base|evil/],
@@ -49,11 +54,14 @@ describe("sanitizeEmailHtml", () => {
       '<a href="https://example.com/x?a=1&amp;b=2" target="_blank" rel="noopener noreferrer nofollow">x</a><a href="mailto:pat@example.com" target="_blank" rel="noopener noreferrer nofollow">m</a>',
     );
     // A link can't override where it opens.
-    expect(clean('<a href="https://example.com" target="_top" rel="opener">x</a>')).toBe('<a href="https://example.com" target="_blank" rel="noopener noreferrer nofollow">x</a>');
+    expect(clean('<a href="https://example.com" target="_top" rel="opener">x</a>')).toBe(
+      '<a href="https://example.com" target="_blank" rel="noopener noreferrer nofollow">x</a>',
+    );
   });
 
   it("leaves out remote images, CSS backgrounds and imports until images are asked for, keeping alt text", () => {
-    const html = '<style>@import url(https://t.example/a.css); body{background:url("https://t.example/b.png")}</style><p style="background-image:url(https://t.example/c.png)">x</p><img src="https://t.example/p.gif" alt="Logo"><img src="cid:abc" alt="Inline"><img src="data:image/png;base64,iVBORw0KGgo=" alt="ok">';
+    const html =
+      '<style>@import url(https://t.example/a.css); body{background:url("https://t.example/b.png")}</style><p style="background-image:url(https://t.example/c.png)">x</p><img src="https://t.example/p.gif" alt="Logo"><img src="cid:abc" alt="Inline"><img src="data:image/png;base64,iVBORw0KGgo=" alt="ok">';
     const off = clean(html);
     expect(off).not.toContain("t.example");
     expect(off).toContain("<span>Logo</span>");
@@ -70,7 +78,7 @@ describe("sanitizeEmailHtml", () => {
 
   it("knows when a mail has remote images", () => {
     expect(hasRemoteImages('<img src="https://t.example/p.gif">')).toBe(true);
-    expect(hasRemoteImages('<td style="background:url(\'http://t.example/b.png\')">')).toBe(true);
+    expect(hasRemoteImages("<td style=\"background:url('http://t.example/b.png')\">")).toBe(true);
     expect(hasRemoteImages('<img src="data:image/png;base64,AA">')).toBe(false);
   });
 });

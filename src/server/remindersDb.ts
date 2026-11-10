@@ -51,8 +51,6 @@ export function resetRemindersDb() {
   ready = null;
 }
 
-
-
 const toSub = (r: Row): Sub => ({
   id: String(r.id),
   accountId: r.account_id == null ? null : String(r.account_id),
@@ -93,7 +91,21 @@ export function dbStore(): Store {
               ON CONFLICT (id) DO UPDATE SET account_id = excluded.account_id, email = excluded.email, token_hash = excluded.token_hash,
                 confirm_hash = excluded.confirm_hash, status = excluded.status, kinds = excluded.kinds, plan = excluded.plan,
                 consent_at = excluded.consent_at, updated_at = excluded.updated_at, confirmed_at = excluded.confirmed_at, confirm_sends = excluded.confirm_sends`,
-        [s.id, s.accountId, s.email, s.tokenHash, s.confirmHash, s.status, JSON.stringify(s.kinds), JSON.stringify(s.plan), s.consentAt, s.createdAt, s.updatedAt, s.confirmedAt, JSON.stringify(s.confirmSends)],
+        [
+          s.id,
+          s.accountId,
+          s.email,
+          s.tokenHash,
+          s.confirmHash,
+          s.status,
+          JSON.stringify(s.kinds),
+          JSON.stringify(s.plan),
+          s.consentAt,
+          s.createdAt,
+          s.updatedAt,
+          s.confirmedAt,
+          JSON.stringify(s.confirmSends),
+        ],
       );
     },
     async remove(id) {

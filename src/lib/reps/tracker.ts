@@ -240,7 +240,7 @@ export class RepTracker {
     const pts = this.buf;
     const start = this.startT;
     const turn = this.turnT;
-    const end = kind === "failed" ? Math.min(t, (this.lostSince ?? t)) : t;
+    const end = kind === "failed" ? Math.min(t, this.lostSince ?? t) : t;
     const conc = this.profile.concentricFirst ? pts.filter((p) => p.t <= turn) : pts.filter((p) => p.t >= turn);
     const concentricMs = this.profile.concentricFirst ? turn - start : end - turn;
     const eccentricMs = this.profile.concentricFirst ? end - turn : turn - start;

@@ -13,7 +13,8 @@ export const en = {
   "gl.stretchWhen": "A stretch. It’s possible if things go well, but the likely number by then is {kg}, with {goal} around {at}.",
   "gl.unlikely": "Not realistic by {when}. The likely number by then is {kg}.",
   "gl.unlikelyWhen": "Not realistic by {when}. The likely number by then is {kg}, and {goal} is more likely around {at}.",
-  "gl.adviceWeek": "Keep training as planned this week, then go lighter: the last week before the test is about half the sets at your usual weights.",
+  "gl.adviceWeek":
+    "Keep training as planned this week, then go lighter: the last week before the test is about half the sets at your usual weights.",
   "gl.adviceTaper": "Taper week: about half the sets, same weights, nothing to failure. Rest the two days before the test.",
   "gl.st.done": "Reached",
   "gl.st.likely": "Very likely",
@@ -52,8 +53,10 @@ export const es: Partial<Record<Key, Message>> = {
   "gl.stretchWhen": "Ambicioso. Es posible si todo va bien, pero la cifra probable para entonces es {kg}, con {goal} hacia {at}.",
   "gl.unlikely": "No es realista para {when}. La cifra probable para entonces es {kg}.",
   "gl.unlikelyWhen": "No es realista para {when}. La cifra probable para entonces es {kg}, y {goal} es más probable hacia {at}.",
-  "gl.adviceWeek": "Sigue entrenando según el plan esta semana y luego baja: la última semana antes de la prueba lleva más o menos la mitad de series con tus pesos habituales.",
-  "gl.adviceTaper": "Semana de descarga: más o menos la mitad de series, los mismos pesos, nada al fallo. Descansa los dos días antes de la prueba.",
+  "gl.adviceWeek":
+    "Sigue entrenando según el plan esta semana y luego baja: la última semana antes de la prueba lleva más o menos la mitad de series con tus pesos habituales.",
+  "gl.adviceTaper":
+    "Semana de descarga: más o menos la mitad de series, los mismos pesos, nada al fallo. Descansa los dos días antes de la prueba.",
   "gl.st.done": "Conseguido",
   "gl.st.likely": "Muy probable",
   "gl.st.onTrack": "Vas bien",
@@ -62,7 +65,8 @@ export const es: Partial<Record<Key, Message>> = {
   "gl.st.noData": "Faltan datos",
   "gl.title": "Objetivos",
   "gl.add": "+ Añadir objetivo",
-  "gl.empty": "Elige un ejercicio y una fecha, como 100 kg en banca para marzo. Tendrás una previsión honesta y un plan para el día de prueba cuando se acerque.",
+  "gl.empty":
+    "Elige un ejercicio y una fecha, como 100 kg en banca para marzo. Tendrás una previsión honesta y un plan para el día de prueba cuando se acerque.",
   "gl.by": "Para el {date}",
   "gl.nowAbout": " · ahora unos {kg}",
   "gl.pct": "{n}% del objetivo",
@@ -89,8 +93,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "gl.stretchWhen": "Ambitieux. C’est possible si tout va bien, mais le chiffre probable d’ici là est {kg}, avec {goal} vers {at}.",
   "gl.unlikely": "Pas réaliste d’ici {when}. Le chiffre probable d’ici là est {kg}.",
   "gl.unlikelyWhen": "Pas réaliste d’ici {when}. Le chiffre probable d’ici là est {kg}, et {goal} est plus probable vers {at}.",
-  "gl.adviceWeek": "Suivez le plan cette semaine, puis allégez : la dernière semaine avant le test, environ la moitié des séries avec vos charges habituelles.",
-  "gl.adviceTaper": "Semaine d’affûtage : environ la moitié des séries, mêmes charges, rien jusqu’à l’échec. Reposez-vous les deux jours avant le test.",
+  "gl.adviceWeek":
+    "Suivez le plan cette semaine, puis allégez : la dernière semaine avant le test, environ la moitié des séries avec vos charges habituelles.",
+  "gl.adviceTaper":
+    "Semaine d’affûtage : environ la moitié des séries, mêmes charges, rien jusqu’à l’échec. Reposez-vous les deux jours avant le test.",
   "gl.st.done": "Atteint",
   "gl.st.likely": "Très probable",
   "gl.st.onTrack": "En bonne voie",
@@ -99,7 +105,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "gl.st.noData": "Données manquantes",
   "gl.title": "Objectifs",
   "gl.add": "+ Ajouter un objectif",
-  "gl.empty": "Choisissez un mouvement et une date, comme 100 kg au développé couché d’ici mars. Vous aurez une prévision honnête, et un plan pour le jour du test quand il approche.",
+  "gl.empty":
+    "Choisissez un mouvement et une date, comme 100 kg au développé couché d’ici mars. Vous aurez une prévision honnête, et un plan pour le jour du test quand il approche.",
   "gl.by": "D’ici le {date}",
   "gl.nowAbout": " · environ {kg} aujourd’hui",
   "gl.pct": "{n} % de l’objectif",

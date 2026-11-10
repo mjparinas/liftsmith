@@ -54,7 +54,8 @@ export const en = {
   "setup.hr.blurb": "Fitbit Air, Charge 6 or Pixel Watch (turn on heart rate sharing), Polar, Garmin or any Bluetooth strap",
   "setup.notify.blocked": "Notifications are blocked. You can allow them in your phone's settings.",
   "setup.stats.title": "Share anonymous usage stats",
-  "setup.stats.note": "Which screens and features get used, your device model and app version. Never your weights, workouts in detail or health data. Change it any time in Settings.",
+  "setup.stats.note":
+    "Which screens and features get used, your device model and app version. Never your weights, workouts in detail or health data. Change it any time in Settings.",
   "setup.pro.title": "Try Pro free for {days} days",
   "setup.pro.decline": "Not now, keep the free plan",
   "setup.pro.free": "The free plan keeps the workout logger, plate math, rest timer and classic 5x5.",
@@ -110,16 +111,19 @@ export const es: Partial<Record<Key, Message>> = {
   "setup.zone.note": "Ambos son opcionales y puedes cambiarlos más tarde en Ajustes.",
   "setup.notify.on": "Notificaciones de entrenamiento activadas",
   "setup.notify.turnOn": "Activar las notificaciones de entrenamiento",
-  "setup.notify.blurb": "Temporizador de descanso y siguiente serie en la pantalla de bloqueo, y un recordatorio los días de entrenamiento. Cámbialas en Ajustes.",
+  "setup.notify.blurb":
+    "Temporizador de descanso y siguiente serie en la pantalla de bloqueo, y un recordatorio los días de entrenamiento. Cámbialas en Ajustes.",
   "setup.hr.on": "Frecuencia cardiaca: {name}",
   "setup.hr.connect": "Conectar un pulsómetro",
   "setup.hr.blurb": "Fitbit Air, Charge 6 o Pixel Watch (activa compartir frecuencia cardiaca), Polar, Garmin o cualquier banda Bluetooth",
   "setup.notify.blocked": "Las notificaciones están bloqueadas. Puedes permitirlas en los ajustes del teléfono.",
   "setup.stats.title": "Compartir estadísticas de uso anónimas",
-  "setup.stats.note": "Qué pantallas y funciones se usan, el modelo del dispositivo y la versión de la app. Nunca tus pesos, el detalle de tus entrenamientos ni tus datos de salud. Cámbialo cuando quieras en Ajustes.",
+  "setup.stats.note":
+    "Qué pantallas y funciones se usan, el modelo del dispositivo y la versión de la app. Nunca tus pesos, el detalle de tus entrenamientos ni tus datos de salud. Cámbialo cuando quieras en Ajustes.",
   "setup.pro.title": "Prueba Pro gratis durante {days} días",
   "setup.pro.decline": "Ahora no, seguir con el plan gratuito",
-  "setup.pro.free": "El plan gratuito incluye el registro de entrenamientos, el cálculo de discos, el temporizador de descanso y el 5x5 clásico.",
+  "setup.pro.free":
+    "El plan gratuito incluye el registro de entrenamientos, el cálculo de discos, el temporizador de descanso y el 5x5 clásico.",
   "setup.back": "Atrás",
   "setup.continue": "Continuar",
   "setup.save": "Guardar",
@@ -170,13 +174,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "setup.zone.note": "Les deux sont facultatifs et modifiables plus tard dans Réglages.",
   "setup.notify.on": "Notifications de séance activées",
   "setup.notify.turnOn": "Activer les notifications de séance",
-  "setup.notify.blurb": "Minuteur de repos et prochaine série sur l’écran verrouillé, et un rappel les jours d’entraînement. Modifiables dans Réglages.",
+  "setup.notify.blurb":
+    "Minuteur de repos et prochaine série sur l’écran verrouillé, et un rappel les jours d’entraînement. Modifiables dans Réglages.",
   "setup.hr.on": "Fréquence cardiaque : {name}",
   "setup.hr.connect": "Connecter un cardiofréquencemètre",
-  "setup.hr.blurb": "Fitbit Air, Charge 6 ou Pixel Watch (activez le partage de la fréquence cardiaque), Polar, Garmin ou toute ceinture Bluetooth",
+  "setup.hr.blurb":
+    "Fitbit Air, Charge 6 ou Pixel Watch (activez le partage de la fréquence cardiaque), Polar, Garmin ou toute ceinture Bluetooth",
   "setup.notify.blocked": "Les notifications sont bloquées. Vous pouvez les autoriser dans les réglages du téléphone.",
   "setup.stats.title": "Partager des statistiques d’utilisation anonymes",
-  "setup.stats.note": "Les écrans et fonctions utilisés, le modèle de l’appareil et la version de l’app. Jamais vos charges, le détail de vos séances ni vos données de santé. Modifiable à tout moment dans Réglages.",
+  "setup.stats.note":
+    "Les écrans et fonctions utilisés, le modèle de l’appareil et la version de l’app. Jamais vos charges, le détail de vos séances ni vos données de santé. Modifiable à tout moment dans Réglages.",
   "setup.pro.title": "Essayez Pro gratuitement pendant {days} jours",
   "setup.pro.decline": "Pas maintenant, garder l’offre gratuite",
   "setup.pro.free": "L’offre gratuite garde le journal de séances, le calcul des disques, le minuteur de repos et le 5x5 classique.",

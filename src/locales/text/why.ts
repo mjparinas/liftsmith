@@ -16,7 +16,8 @@ export const en = {
   "why.what.normal": "a steady day",
   "why.call.override": "Your call today. We suggested {what} ({score}).",
   "why.call.overrideBecause": "Your call today. We suggested {what} because {reasons} ({score}).",
-  "why.call.deload": "Deload week, so it's lighter with half the sets whatever the score ({score}). You come back fresher for the next block.",
+  "why.call.deload":
+    "Deload week, so it's lighter with half the sets whatever the score ({score}). You come back fresher for the next block.",
   "why.call.push": "Push today: {reasons} ({score}). Your first big lift goes one rep closer to failure.",
   "why.call.fresh": "you're fresh",
   "why.call.easy": "Go easy today: {reasons} ({score}). One set fewer and a step lighter, so you come back stronger.",
@@ -41,7 +42,8 @@ export const es: Partial<Record<Key, Message>> = {
   "why.what.normal": "un día normal",
   "why.call.override": "Hoy decides tú. Sugerimos {what} ({score}).",
   "why.call.overrideBecause": "Hoy decides tú. Sugerimos {what} porque: {reasons} ({score}).",
-  "why.call.deload": "Semana de descarga: más ligera y con la mitad de series sea cual sea la puntuación ({score}). Volverás más fresco para el siguiente bloque.",
+  "why.call.deload":
+    "Semana de descarga: más ligera y con la mitad de series sea cual sea la puntuación ({score}). Volverás más fresco para el siguiente bloque.",
   "why.call.push": "Hoy toca apretar: {reasons} ({score}). Tu primer ejercicio grande va una repetición más cerca del fallo.",
   "why.call.fresh": "estás fresco",
   "why.call.easy": "Hoy, suave: {reasons} ({score}). Una serie menos y un escalón más ligero, para volver más fuerte.",
@@ -64,7 +66,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "why.what.normal": "un jour normal",
   "why.call.override": "C’est votre choix aujourd’hui. Nous proposions {what} ({score}).",
   "why.call.overrideBecause": "C’est votre choix aujourd’hui. Nous proposions {what} car : {reasons} ({score}).",
-  "why.call.deload": "Semaine de décharge : plus légère et moitié moins de séries quel que soit le score ({score}). Vous revenez plus frais pour le bloc suivant.",
+  "why.call.deload":
+    "Semaine de décharge : plus légère et moitié moins de séries quel que soit le score ({score}). Vous revenez plus frais pour le bloc suivant.",
   "why.call.push": "On pousse aujourd’hui : {reasons} ({score}). Votre premier gros exercice va une répétition plus près de l’échec.",
   "why.call.fresh": "vous êtes frais",
   "why.call.easy": "Tranquille aujourd’hui : {reasons} ({score}). Une série de moins et un cran plus léger, pour revenir plus fort.",
