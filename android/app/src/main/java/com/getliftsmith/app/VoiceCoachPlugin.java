@@ -29,7 +29,7 @@ public class VoiceCoachPlugin extends Plugin {
 
     @PluginMethod
     public void speak(PluginCall call) {
-        speak(getContext(), call.getString("text", ""), call.getFloat("rate", 1f));
+        speak(getContext(), call.getString("text", ""), call.getFloat("rate", 1f), call.getString("lang", ""));
         call.resolve();
     }
 
@@ -40,8 +40,12 @@ public class VoiceCoachPlugin extends Plugin {
         call.resolve();
     }
 
-    static synchronized void speak(Context ctx, String text, float rate) {
+    /** The app's language (a BCP 47 tag such as "es-MX"), which can differ from the phone's; empty means the phone's. */
+    private static String lang = "";
+
+    static synchronized void speak(Context ctx, String text, float rate, String language) {
         if (text == null || text.isEmpty()) return;
+        lang = language == null ? "" : language;
         final Context app = ctx.getApplicationContext();
         if (tts == null) {
             pending = text;
@@ -49,7 +53,7 @@ public class VoiceCoachPlugin extends Plugin {
                 synchronized (VoiceCoachPlugin.class) {
                     ready = status == TextToSpeech.SUCCESS;
                     if (!ready) return;
-                    tts.setLanguage(Locale.getDefault());
+                    tts.setLanguage(locale());
                     tts.setAudioAttributes(attrs());
                     tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
                         @Override public void onStart(String id) {}
@@ -67,7 +71,13 @@ public class VoiceCoachPlugin extends Plugin {
             return;
         }
         tts.setSpeechRate(rate);
+        tts.setLanguage(locale());
         say(app, text, rate);
+    }
+
+    /** The cue's language: the app's when it's set, else the phone's. */
+    private static Locale locale() {
+        return lang.isEmpty() ? Locale.getDefault() : Locale.forLanguageTag(lang);
     }
 
     private static AudioAttributes attrs() {

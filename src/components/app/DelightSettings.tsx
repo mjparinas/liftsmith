@@ -39,7 +39,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
             on={!!d.voice}
             set={(voice) => {
               put({ voice });
-              if (voice) say("Voice coach on. I'll call out each set.", true);
+              if (voice) say(t("vc.on"), true);
             }}
             hint={t("delight.voiceHint")}
           />

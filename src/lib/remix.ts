@@ -1,6 +1,7 @@
 import { blockWeek } from "./block";
 import { available, EXERCISE_BY_ID } from "./exercises";
 import { alternatives, itemSeconds, restFor, type Plan, type PlanItem } from "./generator";
+import { t as tr } from "./i18n";
 import { roundLoad } from "./loads";
 import { epley, target, TIMED, weightFor } from "./progression";
 import { APP_PATH, SITE_URL } from "./site";
@@ -85,10 +86,7 @@ export function adaptRemix(shared: readonly SharedItem[], gym: Gym, profile: Pro
     let weight = t.weight;
     if (ex.load !== "bodyweight" && reps !== t.reps && t.weight > 0)
       weight = roundLoad(weightFor(epley(t.weight, t.reps, t.rir), reps, t.rir), ex, gym).kg;
-    const note =
-      id === s.exerciseId
-        ? "From a shared workout, at your weights"
-        : `Swapped in for ${EXERCISE_BY_ID.get(s.exerciseId)!.name} at this gym`;
+    const note = id === s.exerciseId ? tr("remix.noteSame") : tr("remix.noteSwap", { name: EXERCISE_BY_ID.get(s.exerciseId)!.name });
     items.push({ exerciseId: id, sets: s.sets, restSec: s.restSec, focus: ex.primary[0], target: { weight, reps, rir: t.rir, note } });
   }
   const est = items.reduce((sum, i, n) => sum + itemSeconds(i) + (n ? i.restSec : 0), 0);

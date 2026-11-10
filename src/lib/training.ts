@@ -1,3 +1,4 @@
+import { t } from "./i18n";
 import { dayKey } from "./random";
 import type { ExercisePrefs, Muscle, Profile, RestAlert, TrainingPrefs } from "./types";
 
@@ -73,8 +74,8 @@ export function effortLabel(rir: number, scale: TrainingPrefs["effort"]): string
 
 /** The aim under the numbers on the workout screen. */
 export function effortAim(rir: number, scale: TrainingPrefs["effort"]): string {
-  if (scale === "rpe") return `Aim for RPE ${rpeOf(rir)}`;
-  return `Leave ${rir} ${rir === 1 ? "rep" : "reps"} in the tank`;
+  if (scale === "rpe") return t("train.aimRpe", { rpe: rpeOf(rir) });
+  return t("train.aimRir", { count: rir });
 }
 
 /** The choices on the optional "how hard was that set" row, stored as reps in reserve. */

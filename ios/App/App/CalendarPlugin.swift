@@ -46,7 +46,8 @@ public class CalendarPlugin: CAPPlugin, CAPBridgedPlugin {
         let event = EKEvent(eventStore: store)
         event.calendar = calendar
         event.title = call.getString("title") ?? "Liftsmith workout"
-        event.notes = "Open Liftsmith to start today's workout."
+        // Both come from the app in its language (calendar.ts).
+        event.notes = call.getString("notes") ?? "Open Liftsmith to start today's workout."
         event.startDate = nextStart(days: days, hour: hour, minute: minute)
         event.endDate = event.startDate.addingTimeInterval(TimeInterval(minutes * 60))
         event.availability = .busy

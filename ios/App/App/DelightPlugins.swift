@@ -24,6 +24,8 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
     @objc func speak(_ call: CAPPluginCall) {
         let text = call.getString("text") ?? ""
         let rate = call.getFloat("rate") ?? 1
+        // The app's language (it can differ from the phone's), so a Spanish cue gets a Spanish voice.
+        let lang = call.getString("lang") ?? ""
         guard !text.isEmpty else { return call.resolve() }
         DispatchQueue.main.async {
             let session = AVAudioSession.sharedInstance()
@@ -32,7 +34,8 @@ public class VoiceCoachPlugin: CAPPlugin, CAPBridgedPlugin, AVSpeechSynthesizerD
             if self.synth.isSpeaking { self.synth.stopSpeaking(at: .immediate) }
             let u = AVSpeechUtterance(string: text)
             u.rate = AVSpeechUtteranceDefaultSpeechRate * rate
-            u.voice = AVSpeechSynthesisVoice(language: Locale.current.identifier.hasPrefix("en") ? Locale.current.identifier.replacingOccurrences(of: "_", with: "-") : "en-US")
+            u.voice = AVSpeechSynthesisVoice(language: lang.isEmpty ? Locale.current.identifier.replacingOccurrences(of: "_", with: "-") : lang)
+                ?? AVSpeechSynthesisVoice(language: String(lang.prefix(2)))
             self.synth.speak(u)
             call.resolve()
         }

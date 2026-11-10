@@ -19,6 +19,8 @@ export interface SessionState {
   vibrate?: boolean;
   /** Voice coach: said by the Android service when rest ends (voice.ts). iOS and the web say it in the page. */
   speak?: string;
+  /** The cue's language (the app's, which can differ from the phone's), so the speech engine uses the right voice. */
+  speakLang?: string;
   /** A few characters for the Android 16 status bar chip and Now Bar, and iOS's compact Dynamic Island, while lifting
    *  (`chipText`). During rest the chip shows the countdown instead. */
   chip?: string;
