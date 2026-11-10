@@ -19,6 +19,10 @@ export interface FeedbackItem {
   /** A JPEG data URL, already shrunk. */
   screenshot?: string;
   diag?: Diagnostics;
+  /** Set by the website's contact form (/contact/), which has no app or device details to send. */
+  source?: "contact";
+  /** The contact form's topic, one of CONTACT_TOPICS in src/lib/contact.ts. */
+  topic?: string;
 }
 
 export const OUTBOX_KEY = "liftsmith.feedbackOutbox";

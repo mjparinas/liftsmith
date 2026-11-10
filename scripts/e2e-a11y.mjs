@@ -134,7 +134,9 @@ try {
   await page.getByTestId("tdee-value").waitFor();
   await scan("tdee public page");
   // The public SEO pages: one of each kind (exercise with its 3D demo, alternatives, muscle, pair, equipment,
-  // guide, blog post and index, calculators).
+  // guide, blog post and index, calculators), then the pricing, help, contact, terms, what's new, status, about and
+  // accessibility pages. The static build has no API, so the status page's health check is answered here.
+  await page.route("**/api/health/", (r) => r.fulfill({ json: { ok: true } }));
   for (const path of [
     "/exercises/",
     "/exercises/bench-press/",
@@ -150,6 +152,14 @@ try {
     "/compare/",
     "/compare/fitbod/",
     "/alternatives/fitbod/",
+    "/pricing/",
+    "/help/",
+    "/contact/",
+    "/terms/",
+    "/whats-new/",
+    "/status/",
+    "/about/",
+    "/accessibility/",
   ]) {
     await page.goto(`${server.url}${path}`);
     await page.getByRole("heading", { level: 1 }).waitFor();

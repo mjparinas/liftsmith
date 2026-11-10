@@ -11,8 +11,9 @@ import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
-import { FAQS } from "@/lib/faqs";
+import { faqJsonLd, FAQS } from "@/lib/faqs";
 import { FLAGS } from "@/lib/flags";
+import { FREE_FEATURES, PRO_FEATURES } from "@/lib/plans";
 import { MUSCLE_NAME } from "@/lib/seo";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
@@ -237,11 +238,7 @@ export default function Home() {
         { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
       ],
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "FAQPage",
-      mainEntity: FAQS.map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
-    },
+    faqJsonLd(FAQS),
   ];
 
   return (
@@ -523,14 +520,7 @@ export default function Home() {
                 <span className="num text-5xl font-bold">$0</span> <span className="text-muted">forever</span>
               </p>
               <ul className="mt-6 flex-1 space-y-3">
-                {[
-                  "Workout logger with pre-filled sets",
-                  "Plate graphic for every barbell set",
-                  "Automatic rest timer",
-                  "Lock-screen notification and Live Activity",
-                  "Classic 5×5 program (coming soon)",
-                  "Works offline, no account needed",
-                ].map((x) => (
+                {FREE_FEATURES.map((x) => (
                   <li key={x} className="flex gap-2.5">
                     <Check />
                     {x}
@@ -559,14 +549,7 @@ export default function Home() {
                 {PRICES.annual.note}, or {PRICES.monthly.price} {PRICES.monthly.per}
               </p>
               <ul className="mt-6 flex-1 space-y-3">
-                {[
-                  "Everything in Free",
-                  "Adaptive workouts from your gym, time and history",
-                  "Automatic weights and reps, RIR blocks and deloads",
-                  "Daily readiness: push, as planned or go easy",
-                  "Recovery map",
-                  "Advanced stats: one-rep max trends, sets per muscle",
-                ].map((x) => (
+                {PRO_FEATURES.map((x) => (
                   <li key={x} className="flex gap-2.5">
                     <Check />
                     {x}

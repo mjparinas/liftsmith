@@ -1,5 +1,6 @@
 // Server side of in-app feedback: checks a report and turns it into an email. Pure, so it's unit tested;
 // the route (src/app/api/feedback/route.api.ts) only adds HTTP, CORS and Resend.
+import { CONTACT_TOPICS } from "./contact";
 import type { FeedbackItem } from "./feedback";
 
 export const MAX_BODY = 3_000_000;
@@ -22,10 +23,14 @@ export function checkFeedback(body: unknown): Checked {
     (typeof b.screenshot !== "string" || !b.screenshot.startsWith("data:image/jpeg;base64,") || b.screenshot.length > 2_800_000)
   )
     return { ok: false, error: "Bad screenshot" };
+  if (b.source !== undefined && b.source !== "contact") return { ok: false, error: "Bad source" };
+  if (b.topic !== undefined && (b.source !== "contact" || !CONTACT_TOPICS.some((t) => t.id === b.topic)))
+    return { ok: false, error: "Bad topic" };
   return { ok: true, item: b as unknown as FeedbackItem };
 }
 
 const LABEL = { bug: "Bug", idea: "Idea", other: "Feedback" } as const;
+const contact = (item: FeedbackItem) => item.source === "contact";
 
 export function feedbackEmail(item: FeedbackItem) {
   const first = item.message.split("\n")[0].slice(0, 60);
@@ -34,7 +39,8 @@ export function feedbackEmail(item: FeedbackItem) {
     item.message,
     "",
     "---",
-    `Kind: ${LABEL[item.kind]}`,
+    contact(item) ? `From: the website's contact form` : `Kind: ${LABEL[item.kind]}`,
+    ...(item.topic ? [`Topic: ${CONTACT_TOPICS.find((t) => t.id === item.topic)?.label ?? item.topic}`] : []),
     `Sent: ${new Date(item.at).toISOString()}`,
     `Reply to: ${item.email ?? "(no email given)"}`,
     `Report id: ${item.id}`,
@@ -48,14 +54,14 @@ export function feedbackEmail(item: FeedbackItem) {
       `User agent: ${d.userAgent}`,
     );
     lines.push("", d.errors.length ? `Recent errors (${d.errors.length}):` : "No recent errors.", ...d.errors);
-  } else {
+  } else if (!contact(item)) {
     lines.push("", "The sender chose not to include device details.");
   }
   const attachments = item.screenshot
     ? [{ filename: `screenshot-${item.id.slice(0, 8)}.jpg`, content: item.screenshot.slice("data:image/jpeg;base64,".length) }]
     : [];
   return {
-    subject: `[Liftsmith ${LABEL[item.kind]}] ${first}${item.message.length > first.length ? "…" : ""}`,
+    subject: `[Liftsmith ${contact(item) ? "Contact" : LABEL[item.kind]}] ${first}${item.message.length > first.length ? "…" : ""}`,
     text: lines.join("\n"),
     attachments,
   };

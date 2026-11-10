@@ -2,6 +2,8 @@ export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.getlift
 export const APP_PATH = "/app/";
 /** Privacy and support contact, shown on the privacy pages (Play and the App Store need one). */
 export const CONTACT_EMAIL = "hello@getliftsmith.com";
+/** The postal address in email footers (MAIL_POSTAL_ADDRESS in Vercel), also shown on /terms/ and /contact/ when set. */
+export const MAILING_ADDRESS = process.env.MAIL_POSTAL_ADDRESS?.trim() || null;
 
 /**
  * Store listings. Neither app is published yet, so both are null and the badges show "Coming soon".
