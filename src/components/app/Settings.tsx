@@ -172,7 +172,7 @@ export function Settings() {
     data: t("settings.g.data.sum"),
   };
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">
         ‹ {t("nav.back.today")}
       </button>
@@ -231,7 +231,7 @@ function GroupPage({ group }: { group: Group }) {
     data: <DataGroup />,
   };
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
         {t("settings.back")}
       </button>

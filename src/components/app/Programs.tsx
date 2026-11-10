@@ -39,7 +39,7 @@ export function Programs() {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
         {t("train.back")}
       </button>

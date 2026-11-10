@@ -369,7 +369,7 @@ function NameField() {
 export function Account() {
   const account = useAccount((s) => s.account);
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
         {t("settings.back")}
       </button>

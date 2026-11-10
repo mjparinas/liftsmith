@@ -411,7 +411,7 @@ const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.garmin", "conn.la
 
 export function Connections() {
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
         ‹ {t("settings.title")}
       </button>

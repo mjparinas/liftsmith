@@ -73,6 +73,23 @@ for (const { name } of pick()) {
       await noSideScroll(tab);
     }
     await page.screenshot({ path: `${OUT}/${tag}-gyms.png` });
+    // The tab bar never covers the end of a screen, even with Android's three-button bar under it
+    // (a 48 px safe area, faked here because a browser's is 0), and Today's Start button sits above it.
+    const bar = await page.addStyleTag({ content: ".safe-bottom { padding-bottom: 48px !important; }" });
+    for (const tab of ["Today", "Body", "Progress", "Gyms"]) {
+      await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
+      await page.waitForTimeout(150);
+      const gap = await page.evaluate(() => {
+        window.scrollTo(0, document.documentElement.scrollHeight);
+        const nav = document.querySelector("nav")?.getBoundingClientRect().top ?? 0;
+        const end = document.querySelector("main")?.firstElementChild?.getBoundingClientRect().bottom ?? 0;
+        const start = [...document.querySelectorAll("button")].find((b) => b.textContent?.includes("Start workout"));
+        return { content: nav - end, start: start ? nav - start.getBoundingClientRect().bottom : 0 };
+      });
+      check(gap.content >= 0, `${name}: the tab bar covers the end of ${tab} by ${-gap.content}px`, fail);
+      check(gap.start >= 0, `${name}: the tab bar covers Start workout by ${-gap.start}px`, fail);
+    }
+    await bar.evaluate((el) => el.remove());
     await page.goto(`${server.url}/me/`);
     await page.getByRole("heading", { name: /training/ }).waitFor();
     for (const tab of ["Overview", "Calendar", "Lifts", "History", "Log a workout", "Share"]) {

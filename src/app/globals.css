@@ -468,6 +468,11 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
 .safe-bottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 .safe-top { padding-top: max(12px, env(safe-area-inset-top)); }
+/* Screens with the tab bar: room for the bar (its measured height, --nav-h, set by TabBar in App.tsx)
+   plus a little air, so the last card scrolls clear of it. The fallback covers the first paint. */
+.clear-nav { padding-bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 1.5rem); }
+/* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
+.status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }
 
 input[type="range"].slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--grad-a), var(--grad-c)) 0 / var(--fill, 50%) 100% no-repeat, var(--color-line); }
 input[type="range"].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 999px; background: #fff; border: 5px solid var(--color-accent); box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent) 18%, transparent), 0 4px 10px var(--shadow); transition: box-shadow 150ms ease; }

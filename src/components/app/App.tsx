@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
@@ -304,48 +304,80 @@ export function App() {
   if (route === "setup")
     return (
       <>
+        <StatusScrim />
         {screen}
         <ProWelcome />
       </>
     );
   return (
     <>
-      <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">
+      <StatusScrim />
+      <main key={route} className={`aurora safe-top animate-fade mx-auto max-w-lg px-5 ${showNav ? "clear-nav" : ""}`}>
         {screen}
       </main>
       <ProWelcome />
-      {showNav && (
-        <nav
-          className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
-          aria-label={t("nav.main")}
-        >
-          <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
-            {TABS.map((tab) => {
-              const on = route === tab.route;
-              return (
-                <li key={tab.route}>
-                  <button
-                    type="button"
-                    aria-current={on ? "page" : undefined}
-                    onClick={() => {
-                      if (!on) haptic("select");
-                      go(tab.route);
-                    }}
-                    className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
-                  >
-                    <span
-                      className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
-                    >
-                      <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
-                    </span>
-                    {t(tab.label)}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
-      )}
+      {showNav && <TabBar route={route} />}
     </>
+  );
+}
+
+// The status bar sits over the page (Android 15+ draws edge to edge, iOS always does), so scrolled
+// content would show through it. This strip, the height of the status bar, covers it on every screen.
+// It's 0 high in a browser, where the safe area is 0.
+function StatusScrim() {
+  return <div aria-hidden className="status-scrim" />;
+}
+
+// The tab bar publishes its real height (it grows with the text size and the phone's gesture or
+// button bar) as --nav-h, so screens pad their bottom by it (.clear-nav) and Today's Start button
+// sits right above it, rather than guessing a fixed padding the bar can outgrow.
+function TabBar({ route }: { route: Route }) {
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const root = document.documentElement;
+    const set = () => root.style.setProperty("--nav-h", `${el.offsetHeight}px`);
+    set();
+    if (typeof ResizeObserver === "undefined") return () => root.style.removeProperty("--nav-h");
+    const ro = new ResizeObserver(set);
+    ro.observe(el, { box: "border-box" });
+    return () => {
+      ro.disconnect();
+      root.style.removeProperty("--nav-h");
+    };
+  }, []);
+  return (
+    <nav
+      ref={ref}
+      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
+      aria-label={t("nav.main")}
+    >
+      <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
+        {TABS.map((tab) => {
+          const on = route === tab.route;
+          return (
+            <li key={tab.route}>
+              <button
+                type="button"
+                aria-current={on ? "page" : undefined}
+                onClick={() => {
+                  if (!on) haptic("select");
+                  go(tab.route);
+                }}
+                className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
+              >
+                <span
+                  className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
+                >
+                  <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                </span>
+                {t(tab.label)}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
   );
 }

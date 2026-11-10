@@ -67,7 +67,7 @@ export function Stats() {
     ],
   ];
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
       <CoachNotes title={t("progress.next")} />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
