@@ -1,7 +1,8 @@
 // Security headers for every page and API route the website serves (server build only; the native shells
 // load the static export from the device, where these don't apply). AGENTS.md "Security".
 // The CSP here holds what can't break the app: no framing by other sites, no plugins, no <base> or form
-// hijacking. A script policy (hashes, no 'unsafe-inline') is still to do (Open items).
+// hijacking. The script policy is per page (each page's own inline script hashes), so scripts/csp.mjs adds it
+// to the prerendered pages after the build as a <meta>; the browser enforces both.
 export const CSP = ["frame-ancestors 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'"].join("; ");
 
 export const SECURITY_HEADERS: { key: string; value: string }[] = [
