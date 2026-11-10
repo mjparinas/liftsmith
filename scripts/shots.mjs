@@ -16,6 +16,11 @@ const ctx = await browser.newContext({
   hasTouch: true,
   reducedMotion: "reduce",
 });
+// Headless Chromium only has software WebGL, which the site and app treat as no WebGL (src/lib/webgl.ts);
+// this flag keeps the 3D figure in the pictures.
+await ctx.addInitScript(() => {
+  window.__liftsmithForceWebGL = true;
+});
 const page = await ctx.newPage();
 const shot = async (n, full = false) => {
   await page.waitForTimeout(450);

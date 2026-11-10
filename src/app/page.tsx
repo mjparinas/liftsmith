@@ -1,15 +1,18 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 
 import { DemoPicker } from "@/components/site/DemoPicker";
 import { HeroLift } from "@/components/site/HeroLift";
+import { perSide } from "@/components/site/heroPlates";
+import { HERO_PROGRAM } from "@/components/site/heroProgram";
+import { Screenshot } from "@/components/site/Screenshot";
 import { SiteFooter } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
 import { FLAGS } from "@/lib/flags";
+import { MUSCLE_NAME } from "@/lib/seo";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
 
@@ -31,6 +34,7 @@ function Cta({ children, cta, className = "" }: { children: React.ReactNode; cta
   return (
     <Link
       href={APP_PATH}
+      prefetch={false}
       data-cta={cta}
       className={`press inline-flex min-h-14 items-center justify-center rounded-2xl bg-accent px-7 text-lg font-semibold text-accent-ink shadow-[0_10px_40px_-10px_rgb(76_141_255/0.7)] ${className}`}
     >
@@ -56,14 +60,7 @@ function Phone({ src, alt, className = "" }: { src: string; alt: string; classNa
     <div
       className={`relative rounded-[2.4rem] border border-[#2a3442] bg-[#0b0f15] p-2 shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8),0_0_0_1px_rgb(255_255_255/0.03)] ${className}`}
     >
-      <Image
-        src={src}
-        alt={alt}
-        width={780}
-        height={1688}
-        className="h-auto w-full rounded-[2rem]"
-        sizes="(min-width: 1024px) 300px, 70vw"
-      />
+      <Screenshot src={src} alt={alt} sizes="(min-width: 1024px) 300px, 70vw" className="h-auto w-full rounded-[2rem]" />
     </div>
   );
 }
@@ -235,6 +232,7 @@ function Header() {
           </Link>
           <Link
             href={APP_PATH}
+            prefetch={false}
             data-cta="header"
             className="press ml-1 inline-flex min-h-11 items-center rounded-xl bg-accent px-4 text-accent-ink"
           >
@@ -294,7 +292,7 @@ export default function Home() {
               </p>
             </div>
             <div className="lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
-              <HeroLift />
+              <HeroLift labels={MUSCLE_NAME} plates={HERO_PROGRAM.map((s) => perSide(s.kg))} />
             </div>
             <div>
               <div className="flex flex-wrap gap-3">
@@ -400,6 +398,7 @@ export default function Home() {
                 </ul>
                 <Link
                   href={APP_PATH}
+                  prefetch={false}
                   data-cta={`feature-${f.id}`}
                   className="mt-6 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
                 >
@@ -444,7 +443,7 @@ export default function Home() {
               monitor connected the figure&apos;s heart beats with yours. Try it: pick a lift and drag the figure.
             </p>
             <div className="mt-10">
-              <DemoPicker />
+              <DemoPicker labels={MUSCLE_NAME} />
             </div>
             <div className="mt-10 flex justify-center">
               <Cta cta="demos">Learn your lifts free</Cta>
@@ -476,6 +475,7 @@ export default function Home() {
               </p>
               <Link
                 href={APP_PATH}
+                prefetch={false}
                 data-cta="juice"
                 className="mt-5 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
               >
@@ -563,6 +563,7 @@ export default function Home() {
               </ul>
               <Link
                 href={APP_PATH}
+                prefetch={false}
                 data-cta="pricing-free"
                 className="press mt-8 inline-flex min-h-14 items-center justify-center rounded-2xl border border-line bg-raised text-lg font-semibold"
               >
