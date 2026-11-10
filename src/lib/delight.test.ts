@@ -16,12 +16,12 @@ import type { AppEvent, SetEvent } from "./types";
 import { doneCue, exerciseCue, setCue, spokenLoad } from "./voice";
 import { DRILLS, warmupRoutine } from "./warmupRoutine";
 import { breathPhase, plateQuiz } from "@/components/app/WorkoutExtras";
+import { makeSet } from "@/test/factories";
 
 const D = 86400_000;
 const NOW = new Date("2026-11-11T18:00:00").getTime();
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, sessionId = "s1", extra: Partial<SetEvent> = {}): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId, exerciseId, weight, reps, targetReps: reps, rir: 2, ...extra };
+  return makeSet({ at, sessionId, exerciseId, weight, reps, ...extra });
 }
 /** One workout of three bench sets at `kg`, `daysAgo` days before NOW. */
 function workout(daysAgo: number, kg = 60, id = `w${daysAgo}`): SetEvent[] {

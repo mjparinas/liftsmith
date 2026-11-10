@@ -12,6 +12,7 @@ import { target } from "./progression";
 import { adaptRemix, decodeRemix, encodeRemix, encodeShared, remixUrl, sharedFromSession } from "./remix";
 import { doLater, fitToTime, remainingSeconds } from "./replan";
 import type { AppEvent, Profile, SetEvent } from "./types";
+import { makeSet } from "@/test/factories";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
 const DAY = 86400_000;
@@ -22,9 +23,8 @@ function profile(p: Partial<Profile> = {}): Profile {
   return { ...defaultProfile(NOW), onboarded: true, activeGymId: "g", blockStart: NOW - 2 * DAY, ...p };
 }
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, extra: Partial<SetEvent> = {}): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId: `s${at}`, exerciseId, weight, reps, targetReps: reps, rir: 2, ...extra };
+  return makeSet({ at, sessionId: `s${at}`, exerciseId, weight, reps, ...extra });
 }
 /** Three sets per session on the given days ago, with weights from `w(i)`. */
 function sessions(exerciseId: string, daysAgo: number[], w: (i: number) => number, reps = 5, extra: Partial<SetEvent> = {}): SetEvent[] {

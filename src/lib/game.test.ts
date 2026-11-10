@@ -5,6 +5,7 @@ import { derive, weekOf } from "./derive";
 import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUE_LABEL, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
 import { setLanguage } from "./i18n";
 import type { AppEvent, SetEvent } from "./types";
+import { makeSet } from "@/test/factories";
 
 // Wednesday evening.
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -13,9 +14,8 @@ const D = 24 * H;
 const W = 7 * D;
 const profile = (over = {}) => ({ ...defaultProfile(NOW), onboarded: true, activeGymId: "g", daysPerWeek: 3, bodyweight: 80, ...over });
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, sessionId: string, extra: Partial<SetEvent> = {}): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId, exerciseId, weight, reps, targetReps: reps, rir: 2, ...extra };
+  return makeSet({ at, sessionId, exerciseId, weight, reps, ...extra });
 }
 /** A workout of `k` bench sets at `at`. */
 function workout(at: number, id: string, k = 3, weight = 60, reps = 8): SetEvent[] {
