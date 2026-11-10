@@ -19,6 +19,11 @@ enum Brand {
     static let card = Color(red: 22 / 255, green: 27 / 255, blue: 36 / 255)
     static let accent = Color(red: 76 / 255, green: 141 / 255, blue: 255 / 255)
     static let muted = Color(red: 154 / 255, green: 166 / 255, blue: 183 / 255)
+    /// Supporting hues for marks (the app's --color-ember, cyan, mint and violet).
+    static let ember = Color(red: 255 / 255, green: 138 / 255, blue: 61 / 255)
+    static let cyan = Color(red: 56 / 255, green: 214 / 255, blue: 232 / 255)
+    static let mint = Color(red: 52 / 255, green: 211 / 255, blue: 153 / 255)
+    static let violet = Color(red: 167 / 255, green: 139 / 255, blue: 250 / 255)
     static let start = URL(string: "liftsmith://start")!
     static let log = URL(string: "liftsmith://log")!
     static let add30 = URL(string: "liftsmith://add30")!

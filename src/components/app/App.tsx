@@ -33,6 +33,7 @@ import { Achievements } from "./Achievements";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
+import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
 import { Onboarding } from "./Onboarding";
@@ -81,6 +82,8 @@ export function App() {
   // Language (i18n.ts): the phone's language, read again on return in case it changed, or the
   // one picked in Settings. useLang re-renders the whole app when it changes.
   useLang();
+  // The home-screen widget (widget.ts): today's call and why, the weekly goal and the top coach's note.
+  useHomeWidget();
   const language = profile.language;
   useEffect(() => {
     setLanguage(language);

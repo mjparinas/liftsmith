@@ -110,6 +110,14 @@ public class WorkoutSessionPlugin extends Plugin {
         call.resolve();
     }
 
+    /** The home-screen widget's snapshot (src/lib/widget.ts), drawn by WorkoutWidget. */
+    @PluginMethod
+    public void setWidget(PluginCall call) {
+        String json = call.getString("json");
+        if (json != null) WorkoutWidget.save(getContext(), json);
+        call.resolve();
+    }
+
     @PluginMethod
     public void stop(PluginCall call) {
         getContext().stopService(new Intent(getContext(), WorkoutService.class));

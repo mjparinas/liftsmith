@@ -22,6 +22,7 @@ The one exception is a workout in progress: the live notification (Android foreg
 - **Camera rep counting** closes the camera and pose model while the app is hidden and starts fresh on return.
 - **3D figures** (`demo/engine.ts`) already stop rendering when off screen or hidden.
 - **Service worker** only caches and handles notification taps; no background sync or periodic sync.
+- **Home-screen widget** (`widget.ts`, `WorkoutWidget.java`, `QuickStartWidget.swift`, 2026-11-10): never polls. The app sends it a new snapshot only when one of its lines changes, while the app is open. Android's `updatePeriodMillis` is 0 and it sets one inexact, non-waking `RTC` alarm for just after midnight (it fires when the phone next wakes on its own), so yesterday's plan doesn't linger; iOS gets the same from a second timeline entry with a `.never` policy.
 - **Admin panel** (website): System's auto refresh and the maintenance banner don't refresh while the tab is hidden; the banner reads again on return.
 
 `src/lib/visibility.ts` (`isVisible`, `onVisibility`, `useVisible`) is the one place that answers "is the app on screen?". New timers go through `useNow` or check `isVisible()`; a new background behaviour needs a reason as good as the workout's. Tests: `src/lib/background.test.tsx` (an hour hidden leaves no timer and no redraw; auto-end runs from one timer; no timer without a workout).
