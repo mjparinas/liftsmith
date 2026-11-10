@@ -2,12 +2,15 @@
 
 // The admin Inbox tab (as in Gradelings): mail Resend received for getliftsmith.com, read live from Resend. A message
 // opens in a sandboxed frame with remote images blocked until asked for, or as plain text; it can be answered as a
-// plain-text reply, marked done or archived. Support staff can read; only admins change anything.
+// plain-text reply (from a saved reply, or a first draft by Claude that only fills the box), marked done or
+// archived. Support staff can read; only admins change anything.
 import { useEffect, useState } from "react";
 
+import { fillReply, type SavedReply } from "@/lib/savedReplies";
 import type { InboxItem, InboxMessage } from "@/server/inbox";
 
 import { Card } from "./charts";
+import { SavedReplies } from "./SavedReplies";
 import { ago, when } from "./time";
 
 type List = { configured: boolean; items: InboxItem[]; next: string | null; error?: string };
@@ -30,12 +33,26 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
   const [reply, setReply] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
+  const [canDraft, setCanDraft] = useState(false);
+  const [drafting, setDrafting] = useState(false);
+  const [replies, setReplies] = useState<SavedReply[]>([]);
+  useEffect(() => {
+    if (!admin) return;
+    let live = true;
+    fetch("/api/admin/replies/")
+      .then(async (r) => r.ok && live && setReplies(((await r.json()) as { replies: SavedReply[] }).replies))
+      .catch(() => {});
+    return () => {
+      live = false;
+    };
+  }, [admin]);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/inbox/?id=${encodeURIComponent(id)}`)
       .then(async (r) => {
-        const j = (await r.json().catch(() => ({}))) as { message?: InboxMessage; error?: string };
+        const j = (await r.json().catch(() => ({}))) as { message?: InboxMessage; canDraft?: boolean; error?: string };
         if (!live) return;
+        setCanDraft(j.canDraft === true);
         if (j.message) setM(j.message);
         else setError(j.error ?? "The message didn't load.");
       })
@@ -53,6 +70,25 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
       setVersion((v) => v + 1);
       onChange();
     }
+  };
+  const draft = async () => {
+    setDrafting(true);
+    setMsg("Drafting…");
+    const r = await fetch("/api/admin/inbox/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "draft", id }),
+    }).catch(() => null);
+    const j = (await r?.json().catch(() => ({}))) as { draft?: string; error?: string } | undefined;
+    setDrafting(false);
+    if (r?.ok && j?.draft) {
+      setReply(j.draft);
+      setMsg("Draft ready. Read it and change anything before sending.");
+    } else setMsg(j?.error ?? "The draft didn't work.");
+  };
+  const insert = (rid: string) => {
+    const r = replies.find((x) => x.id === rid);
+    if (r) setReply((cur) => (cur.trim() ? `${cur.trimEnd()}\n\n${fillReply(r.body)}` : fillReply(r.body)));
   };
   const send = async () => {
     await act({ action: "reply", text: reply }, "Reply sent.");
@@ -147,6 +183,28 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
           <label htmlFor="inbox-reply" className="text-sm font-semibold">
             Reply to {m.replyTo}
           </label>
+          <div className="mt-1 flex flex-wrap items-center gap-2 text-sm">
+            {replies.length > 0 && (
+              <select aria-label="Insert a saved reply" value="" onChange={(e) => insert(e.target.value)} className="card px-2 py-1.5">
+                <option value="">Insert a saved reply…</option>
+                {replies.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.title}
+                  </option>
+                ))}
+              </select>
+            )}
+            {canDraft && (
+              <button
+                type="button"
+                disabled={drafting}
+                onClick={() => void draft()}
+                className="press rounded-lg border border-line px-3 py-1.5 disabled:opacity-50"
+              >
+                Draft with AI
+              </button>
+            )}
+          </div>
           <textarea
             id="inbox-reply"
             value={reply}
@@ -301,6 +359,7 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
           <p className="hidden text-sm text-muted lg:block">Pick a message to read it.</p>
         )}
       </div>
+      {admin && <SavedReplies />}
     </div>
   );
 }

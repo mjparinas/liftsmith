@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
-const UPDATED = "9 November 2026";
+const UPDATED = "10 November 2026";
 
 export default function Privacy() {
   return (
@@ -149,8 +149,9 @@ export default function Privacy() {
       <h2 className="mt-8 text-xl font-semibold">Who processes it</h2>
       <p className="mt-2">
         Usage stats, site visits, accounts and synced data are stored in our database (Turso), on servers run by Vercel. Emails go through
-        Resend. Subscriptions are checked by RevenueCat. None of them may use the data for their own purposes. We keep usage stats for up to
-        25 months.
+        Resend. Subscriptions are checked by RevenueCat. When you email us, we may ask Anthropic&apos;s Claude for a first draft of our
+        answer; your message is sent for that one request, and a person reads and sends every reply. None of them may use the data for their
+        own purposes. We keep usage stats for up to 25 months.
       </p>
 
       <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

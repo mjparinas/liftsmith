@@ -19,6 +19,7 @@ import {
 
 import { MaintenanceCard, useMaintenance } from "./Maintenance";
 import { ago } from "./time";
+import { TwoFactorCard } from "./TwoFactor";
 
 const AUTO_KEY = "liftsmith.admin.autoRefresh";
 const readAuto = () => {
@@ -274,6 +275,7 @@ export function System({ admin = false, maintenance }: { admin?: boolean; mainte
           <CheckCard key={c.id} id={c.id} title={c.title} round={round} refresh={refresh} report={report} />
         ))}
       </div>
+      <TwoFactorCard />
       {admin && (
         <RestoreDrill
           done={() => {

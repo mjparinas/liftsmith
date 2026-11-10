@@ -39,6 +39,7 @@ import { query } from "./db";
 import { inboxDomains, readKey } from "./inbox";
 import { recentJobRuns } from "./monitor";
 import { getJson as getSettingJson } from "./settings";
+import { enrolledEmails, twoFactorMode } from "./twoFactor";
 
 const DAY = 86_400_000;
 const TIMEOUT = 8_000;
@@ -680,24 +681,27 @@ export async function securityCheck(now = Date.now()): Promise<HealthCheck> {
     [now - DAY, now - 7 * DAY],
   );
   const by = new Map(rows.map((r) => [String(r.email), r]));
+  const enrolled = await enrolledEmails();
+  const required = twoFactorMode() === "required";
+  const without = staff.filter(([e]) => !enrolled.has(e)).length;
   const day = rows.reduce((t, r) => t + Number(r.day), 0);
   const week = rows.reduce((t, r) => t + Number(r.week), 0);
   const lastAlert = Number(await getSettingJson<string | null>("alert-sent:staff-sign-ins", null)) || null;
-  const state: CheckState = !staff.length ? "off" : day >= STAFF_FAILURES_WARN ? "warn" : "ok";
+  const state: CheckState = !staff.length ? "off" : day >= STAFF_FAILURES_WARN || (!required && without) ? "warn" : "ok";
   return {
     id: "security",
     title: "Admin security",
     state,
     summary: !staff.length
       ? "No staff addresses: set ADMIN_EMAILS."
-      : `${plural(staff.length, "staff address")}. ${plural(day, "failed sign-in")} in 24 hours, ${num(week)} in 7 days.`,
+      : `${plural(staff.length, "staff address")}, ${num(staff.length - without)} with two-step sign-in${required ? " (required)" : ""}. ${plural(day, "failed sign-in")} in 24 hours, ${num(week)} in 7 days.`,
     rows: [
       ...staff.map(([e, role]) => {
         const f = by.get(e);
         return {
           label: `${e} (${role})`,
-          value: f ? `${plural(Number(f.week), "failed sign-in")} in 7 days` : "No failed sign-ins in 7 days",
-          state: (f && Number(f.day) >= STAFF_FAILURES_WARN ? "warn" : "ok") as CheckState,
+          value: `${enrolled.has(e) ? "Two-step on" : required ? "Two-step at next sign-in" : "No two-step"} · ${f ? `${plural(Number(f.week), "failed sign-in")} in 7 days` : "no failed sign-ins in 7 days"}`,
+          state: ((f && Number(f.day) >= STAFF_FAILURES_WARN) || (!required && !enrolled.has(e)) ? "warn" : "ok") as CheckState,
           ...(f ? { at: Number(f.last) } : {}),
         };
       }),
