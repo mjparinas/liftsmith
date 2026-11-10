@@ -13,7 +13,7 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 
 import { storePro } from "./billing";
-import { defaultDays } from "./calendar";
+import { trainingDays } from "./calendar";
 import type { Stats } from "./derive";
 import { goalStreak } from "./game";
 import { isNative } from "./juice";
@@ -43,7 +43,7 @@ export function planInput(profile: Profile, stats: Stats, now: number, channel: 
   const prefs = profile.messages;
   return {
     tz,
-    days: profile.calendar?.days ?? defaultDays(profile.daysPerWeek),
+    days: trainingDays(profile),
     time: profile.calendar?.time ?? "18:00",
     daysPerWeek: profile.daysPerWeek,
     startedAt: prefs?.startedAt ?? profile.blockStart,

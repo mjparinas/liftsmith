@@ -9,6 +9,7 @@ import {
   removeTrainingDays,
   requestCalendar,
   saveTrainingDays,
+  trainingDays,
   trainingIcs,
   WEEKDAYS,
 } from "@/lib/calendar";
@@ -19,12 +20,14 @@ import type { CalendarPrefs } from "@/lib/types";
 import { Button, Chip, Section } from "./ui";
 
 /**
- * Settings › Calendar. Writing training days and reading busy times are separate opt-ins. Busy times are
- * only start and end, read on the phone, never sent anywhere.
+ * Settings › Training › Schedule. The weekday chips are the days-a-week goal too (one control, Melvin
+ * approved 2026-11-10): picking days sets `daysPerWeek` to how many are picked, at least one. Writing
+ * training days to the calendar and reading busy times are separate opt-ins. Busy times are only start
+ * and end, read on the phone, never sent anywhere.
  */
 export function CalendarSettings() {
   const { profile, setProfile } = useApp();
-  const prefs = profile.calendar ?? defaultPrefs(profile.daysPerWeek);
+  const prefs = { ...(profile.calendar ?? defaultPrefs(profile.daysPerWeek)), days: trainingDays(profile) };
   const native = calendarNative();
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -63,7 +66,7 @@ export function CalendarSettings() {
   };
 
   return (
-    <Section title={t("cal.title")}>
+    <Section title={t("settings.schedule")}>
       <div className="card space-y-4 p-4">
         <div>
           <p className="text-sm text-muted" id="cal-days">
@@ -74,7 +77,11 @@ export function CalendarSettings() {
               <Chip
                 key={d}
                 active={prefs.days.includes(i)}
-                onClick={() => update({ days: prefs.days.includes(i) ? prefs.days.filter((x) => x !== i) : [...prefs.days, i].sort() })}
+                onClick={() => {
+                  const days = prefs.days.includes(i) ? prefs.days.filter((x) => x !== i) : [...prefs.days, i].sort();
+                  if (!days.length) return; // At least one training day.
+                  setProfile({ calendar: { ...prefs, days }, daysPerWeek: days.length });
+                }}
               >
                 {weekday(i)}
               </Chip>

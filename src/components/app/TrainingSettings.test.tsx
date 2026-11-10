@@ -7,7 +7,7 @@ import { setWeekStart } from "@/lib/derive";
 import { setLanguage } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 
-import { ExercisePrefsEditor, FavouriteButton, TrainingSettings } from "./TrainingSettings";
+import { ExercisePrefsEditor, FavouriteButton, RestTimerSettings, TrainingSettings } from "./TrainingSettings";
 
 beforeEach(async () => {
   await useApp.getState().reset();
@@ -38,8 +38,6 @@ describe("Settings › Workout preferences", () => {
     render(<TrainingSettings />);
     await user.click(screen.getByRole("button", { name: "RPE: 1 to 10" }));
     expect(training()?.effort).toBe("rpe");
-    await user.click(screen.getByRole("button", { name: "Off: I'll tap Start rest" }));
-    expect(training()?.autoRest).toBe(false);
     await user.click(screen.getByRole("button", { name: "Sunday" }));
     expect(training()?.weekStart).toBe(0);
     await user.click(within(screen.getByRole("group", { name: "Muscle priorities" })).getByRole("button", { name: "Calves" }));
@@ -52,6 +50,17 @@ describe("Settings › Workout preferences", () => {
     expect(training()?.sets).toBe(4);
     await user.click(sets.querySelectorAll("button")[0]);
     expect(training()?.sets).toBeUndefined();
+  });
+
+  it("has the rest timer in Settings › Workout, as switches", async () => {
+    const user = userEvent.setup();
+    render(<RestTimerSettings />);
+    await user.click(screen.getByRole("switch", { name: "Start the rest timer by itself after Log set" }));
+    expect(training()?.autoRest).toBe(false);
+    await user.click(screen.getByRole("switch", { name: "Keep the screen on during a workout" }));
+    expect(training()?.keepAwake).toBe(false);
+    await user.click(screen.getByRole("button", { name: "Silent" }));
+    expect(training()?.restAlert).toBe("silent");
   });
 
   it("adds a favourite with taps, no typing", async () => {

@@ -25,6 +25,7 @@ import {
 } from "@/lib/auth";
 import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
@@ -349,18 +350,36 @@ export function AccountPanel({ onSignedIn }: { onSignedIn?: () => void }) {
   );
 }
 
+/** Your name, optional: used to greet you. It lives here with the rest of who you are (moved from Settings, 2026-11-10). */
+function NameField() {
+  const { profile, setProfile } = useApp();
+  return (
+    <input
+      value={profile.name}
+      onChange={(e) => setProfile({ name: e.target.value })}
+      className="card w-full px-4 py-3"
+      placeholder={t("settings.optional")}
+      aria-label={t("settings.name")}
+      autoComplete="given-name"
+    />
+  );
+}
+
 /** Settings › Account (#/account). */
 export function Account() {
   const account = useAccount((s) => s.account);
   return (
     <div className="pb-24">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
-        {t("train.back")}
+        {t("settings.back")}
       </button>
       <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("account.title")}</h1>
       <p className="mt-2 text-muted">{account ? t("account.leadIn") : t("account.lead")}</p>
       <Section title={account ? t("account.yours") : t("account.signIn")} icon="lock">
         <AccountPanel />
+      </Section>
+      <Section title={t("settings.name")}>
+        <NameField />
       </Section>
       <Section title={t("account.what")} icon="info">
         <p className="text-sm text-muted">{t("account.what.body")}</p>

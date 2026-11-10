@@ -208,7 +208,7 @@ try {
   // One-handed controls (right hand), then today's workout at phone and tablet size.
   await page.setViewportSize(PHONE);
   await page.evaluate(() => {
-    location.hash = "#/settings";
+    location.hash = "#/settings/workout";
     window.scrollTo(0, 0);
   });
   await page.getByRole("button", { name: "Right hand", exact: true }).click();
