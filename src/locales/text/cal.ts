@@ -4,7 +4,6 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
-  "cal.title": "Calendar",
   "cal.days": "Training days",
   "cal.time": "Time",
   "cal.download": "Download calendar file",
@@ -26,7 +25,6 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
-  "cal.title": "Calendario",
   "cal.days": "Días de entrenamiento",
   "cal.time": "Hora",
   "cal.download": "Descargar archivo de calendario",
@@ -46,7 +44,6 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "cal.title": "Calendrier",
   "cal.days": "Jours d’entraînement",
   "cal.time": "Heure",
   "cal.download": "Télécharger le fichier de calendrier",

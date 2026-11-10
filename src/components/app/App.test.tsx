@@ -212,11 +212,11 @@ describe("first run to finished workout", () => {
   it("switches language from Settings, for the app and the page", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/look";
     await user.click(await screen.findByRole("button", { name: "Español" }));
     expect(await screen.findByRole("button", { name: "Hoy" })).toBeInTheDocument();
     expect(document.documentElement.lang).toMatch(/^es/);
-    expect(screen.getByRole("heading", { level: 1, name: "Ajustes" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 1, name: "Aspecto" })).toBeInTheDocument();
     expect(screen.getByRole("group", { name: "Tamaño del texto" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Français" }));
     expect(await screen.findByRole("button", { name: "Aujourd’hui" })).toBeInTheDocument();
@@ -301,7 +301,7 @@ describe("first run to finished workout", () => {
   it("imports a Strong export from Settings, once", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/data";
     const csv = [
       "Date,Workout Name,Duration,Exercise Name,Set Order,Weight,Reps,Distance,Seconds,Notes,Workout Notes,RPE",
       "2026-01-05 18:00:00,Push,50m,Bench Press (Barbell),1,100,5,0,0,,,",
@@ -393,7 +393,7 @@ describe("first run to finished workout", () => {
   it("setup can be run again from Settings without losing gyms", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    location.hash = "#/settings";
+    location.hash = "#/settings/training";
     await user.click(await screen.findByRole("button", { name: "Run setup again" }));
     await screen.findByText("What are you training for?");
     await user.click(screen.getByRole("button", { name: /Get stronger/ }));
@@ -454,7 +454,8 @@ describe("programs", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.click(screen.getByRole("button", { name: /Adaptive.*Change/ }));
+    await user.click(await screen.findByRole("button", { name: /^Training/ }));
+    await user.click(await screen.findByRole("button", { name: /Adaptive.*Change/ }));
     await screen.findByText("Programs");
     await user.click(screen.getByRole("button", { name: /Classic 5×5/ }));
     const sheet = await screen.findByRole("dialog");
@@ -594,7 +595,8 @@ describe("game layer", () => {
     const user = userEvent.setup();
     await onboard(user);
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.click(await screen.findByRole("button", { name: "Lean mode" }));
+    await user.click(await screen.findByRole("button", { name: /^Look and feel/ }));
+    await user.click(await screen.findByRole("switch", { name: "Lean mode" }));
     expect(useApp.getState().profile.lean).toBe(true);
     const { juice } = await import("@/lib/juice");
     expect(juice.lean).toBe(true);

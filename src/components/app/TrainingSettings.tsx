@@ -23,10 +23,10 @@ import {
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type RestAlert, type TrainingPrefs } from "@/lib/types";
 
 import { go } from "./router";
-import { Chip, Section } from "./ui";
+import { Chip, Section, SwitchRow } from "./ui";
 
-// Settings › Workout preferences (Melvin, 2026-11-09): rest times, rep ranges and set counts, RIR or
-// RPE, the rest timer, favourite exercises, muscle priorities, the default workout length and the
+// Settings › Workout › Plan details (Melvin, 2026-11-09): rest times, rep ranges and set counts, RIR or
+// RPE, favourite exercises, muscle priorities, the default workout length and the
 // first day of the week. Everything is chips and taps, no typing, so it works one-handed. "Auto" always means the app's own choice, so nothing changes until the
 // lifter picks something. Text lives in the catalogues (train.*).
 
@@ -57,7 +57,37 @@ function ChipRow<V extends string | number>({
 
 const rangeKey = (r?: [number, number]) => (r ? `${r[0]}-${r[1]}` : "auto");
 const parseRange = (k: string): [number, number] | undefined => (k === "auto" ? undefined : (k.split("-").map(Number) as [number, number]));
-const onOff = (v: boolean) => (v ? "on" : "off");
+
+/**
+ * The rest timer: start it by itself, what happens when rest ends, and keeping the screen on. Shown in
+ * Settings › Workout, next to Sounds and Vibration, which "When rest ends" follows by default.
+ */
+export function RestTimerSettings() {
+  const { profile, setProfile } = useApp();
+  const tp = profile.training ?? {};
+  const put = (patch: Partial<TrainingPrefs>) => setProfile({ training: { ...profile.training, ...patch } });
+  return (
+    <>
+      <SwitchRow label={t("train.autoRest")} on={tp.autoRest !== false} onChange={(v) => put({ autoRest: v ? undefined : false })} />
+      <SwitchRow label={t("train.awake")} on={tp.keepAwake !== false} onChange={(v) => put({ keepAwake: v ? undefined : false })} />
+      <Section title={t("train.timer")}>
+        <ChipRow<RestAlert | "app">
+          label={t("train.alert")}
+          value={tp.restAlert ?? "app"}
+          onPick={(v) => put({ restAlert: v === "app" ? undefined : v })}
+          options={[
+            ["app", t("train.alert.app")],
+            ["both", t("train.alert.both")],
+            ["sound", t("train.alert.sound")],
+            ["vibrate", t("train.alert.vibrate")],
+            ["silent", t("train.alert.silent")],
+          ]}
+        />
+        <p className="mt-2 px-1 text-xs text-faint">{t("train.alertNote")}</p>
+      </Section>
+    </>
+  );
+}
 
 export function TrainingSettings() {
   const { profile, setProfile } = useApp();
@@ -68,8 +98,8 @@ export function TrainingSettings() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("train.back")}
+      <button type="button" onClick={() => go("settings", "workout")} className="press -ml-2 min-h-11 pt-2 text-muted">
+        {t("settings.back.workout")}
       </button>
       <h1 className="text-[28px] font-extrabold tracking-tight">{t("train.title")}</h1>
       <p className="mt-1 text-sm text-muted">{t("train.intro")}</p>
@@ -124,40 +154,6 @@ export function TrainingSettings() {
           ]}
         />
         <p className="mt-2 px-1 text-xs text-faint">{t("train.effortNote")}</p>
-      </Section>
-
-      <Section title={t("train.timer")}>
-        <ChipRow<string>
-          label={t("train.autoRest")}
-          value={onOff(tp.autoRest !== false)}
-          onPick={(v) => put({ autoRest: v === "on" ? undefined : false })}
-          options={[
-            ["on", t("train.on")],
-            ["off", t("train.offManual")],
-          ]}
-        />
-        <ChipRow<RestAlert | "app">
-          label={t("train.alert")}
-          value={tp.restAlert ?? "app"}
-          onPick={(v) => put({ restAlert: v === "app" ? undefined : v })}
-          options={[
-            ["app", t("train.alert.app")],
-            ["both", t("train.alert.both")],
-            ["sound", t("train.alert.sound")],
-            ["vibrate", t("train.alert.vibrate")],
-            ["silent", t("train.alert.silent")],
-          ]}
-        />
-        <ChipRow<string>
-          label={t("train.awake")}
-          value={onOff(tp.keepAwake !== false)}
-          onPick={(v) => put({ keepAwake: v === "on" ? undefined : false })}
-          options={[
-            ["on", t("train.on")],
-            ["off", t("train.off")],
-          ]}
-        />
-        <p className="mt-2 px-1 text-xs text-faint">{t("train.alertNote")}</p>
       </Section>
 
       <Section title={t("train.length")}>

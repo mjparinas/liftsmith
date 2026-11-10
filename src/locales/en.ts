@@ -93,6 +93,7 @@ import * as train from "./text/train";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
+import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
 import * as workout from "./text/workout";
@@ -186,6 +187,7 @@ export const en = {
   ...twin.en,
   ...units.en,
   ...variety.en,
+  ...wdg.en,
   ...why.en,
   ...wk.en,
   ...workout.en,

@@ -83,8 +83,11 @@ describe("Play store policy config", () => {
     for (const section of ["cloud-backup", "device-transfer"]) {
       const body = rules.match(new RegExp(`<${section}>([\\s\\S]*?)</${section}>`))?.[1] ?? "";
       expect(body).toContain('<exclude domain="root" path="app_webview/" />');
+      // The home-screen widget's snapshot (today's plan, coach's note) is personal too.
+      expect(body).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
     }
     expect(res("full_backup_content")).toContain('<exclude domain="root" path="app_webview/" />');
+    expect(res("full_backup_content")).toContain('<exclude domain="sharedpref" path="liftsmith_widget.xml" />');
   });
 
   it("keeps the web view's storage out of iCloud backup", () => {

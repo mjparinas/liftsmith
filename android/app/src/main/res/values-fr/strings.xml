@@ -6,7 +6,7 @@
     <string name="shortcut_log_long">Valider la série en cours comme prévu</string>
     <string name="shortcut_rest_short">+30 s de repos</string>
     <string name="shortcut_rest_long">Ajouter 30 secondes au repos</string>
-    <string name="widget_description">Commencez la séance du jour ou validez une série en un geste</string>
+    <string name="widget_description">La séance du jour et pourquoi, votre objectif de la semaine et la note du coach, avec Commencer</string>
     <string name="channel_live">Séance en cours</string>
     <string name="channel_live_desc">Minuteur de repos, série suivante et fréquence cardiaque pendant l’entraînement</string>
     <string name="rest_over">Fin du repos</string>
@@ -17,4 +17,5 @@
     <string name="rest_next">Repos · ensuite : %1$s</string>
     <string name="up_next">Ensuite : %1$s</string>
     <string name="add_30">+30 s</string>
+    <string name="widget_title">Séance du jour</string>
 </resources>

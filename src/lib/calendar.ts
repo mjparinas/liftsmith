@@ -1,7 +1,7 @@
 "use client";
 
 import { isNative } from "./juice";
-import type { CalendarPrefs } from "./types";
+import type { CalendarPrefs, Profile } from "./types";
 
 export type { CalendarPrefs };
 
@@ -38,6 +38,16 @@ export function defaultDays(perWeek: number): number[] {
 
 export function defaultPrefs(perWeek: number): CalendarPrefs {
   return { days: defaultDays(perWeek), time: "18:00", write: false, read: false };
+}
+
+/**
+ * The lifter's training days. Settings › Training sets the days and the days-a-week goal together (one
+ * control, Melvin approved 2026-11-10), so they agree; if they don't (setup was run again with a new
+ * days-a-week), the goal wins and the days are spread out again.
+ */
+export function trainingDays(profile: Pick<Profile, "calendar" | "daysPerWeek">): number[] {
+  const days = profile.calendar?.days;
+  return days?.length && days.length === profile.daysPerWeek ? days : defaultDays(profile.daysPerWeek);
 }
 
 /** The next start of a training session at or after `from`, in local time. */

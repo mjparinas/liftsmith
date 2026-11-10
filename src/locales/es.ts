@@ -91,6 +91,7 @@ import * as train from "./text/train";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
+import * as wdg from "./text/wdg";
 import * as why from "./text/why";
 import * as wk from "./text/wk";
 import * as workout from "./text/workout";
@@ -184,6 +185,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...twin.es,
   ...units.es,
   ...variety.es,
+  ...wdg.es,
   ...why.es,
   ...wk.es,
   ...workout.es,

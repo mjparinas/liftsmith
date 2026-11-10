@@ -178,11 +178,19 @@ try {
   await scan("connections");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
+  // Every group page of Settings (2026-11-10).
+  for (const group of ["training", "workout", "reminders", "look", "body", "data"]) {
+    await page.goto(`${server.url}/app/#/settings/${group}`);
+    await page.getByRole("heading", { level: 1 }).waitFor();
+    await scan(`settings ${group}`);
+  }
+  await page.goto(`${server.url}/app/#/settings/body`);
   await page.getByRole("button", { name: "Set up" }).click();
   await scan("cycle consent");
   await page.getByRole("button", { name: "I agree, turn it on" }).click();
   await page.getByRole("button", { name: "Period started today" }).click();
   await scan("cycle on");
+  await page.goto(`${server.url}/app/#/settings/training`);
   await page.getByRole("button", { name: "Injuries and sore spots" }).click();
   await page.getByRole("button", { name: "Log an injury" }).click();
   await scan("injury picker");
@@ -202,9 +210,11 @@ try {
   await page.getByRole("heading", { name: /Saved, it'll send|Thanks/ }).waitFor();
   await scan("feedback sent");
   // Light mode: every main screen again, so the light tokens pass contrast too.
-  await page.goto(`${server.url}/app/#/settings`);
+  await page.goto(`${server.url}/app/#/settings/look`);
   await page.getByRole("button", { name: "Light", exact: true }).click();
   await page.waitForFunction(() => document.documentElement.dataset.theme === "light");
+  await scan("light settings look");
+  await page.goto(`${server.url}/app/#/settings`);
   await scan("light settings");
   await page.getByRole("button", { name: "‹ Today" }).click();
   await scan("light today");
@@ -223,7 +233,7 @@ try {
     await scan(`light dashboard ${tab}`);
   }
   // Accessibility settings: colour-blind safe colours and more contrast, in both themes.
-  await page.goto(`${server.url}/app/#/settings`);
+  await page.goto(`${server.url}/app/#/settings/look`);
   await page.getByRole("group", { name: "Colours" }).getByRole("button", { name: "Colour-blind safe" }).click();
   await page.getByRole("group", { name: "Contrast" }).getByRole("button", { name: "More" }).click();
   await page.waitForFunction(() => document.documentElement.dataset.cvd === "on" && document.documentElement.dataset.contrast === "more");
@@ -235,7 +245,7 @@ try {
     // The recovery map and its legend mark bands with patterns too, so they don't rely on colour alone.
     if (tab === "recovery" && !(await page.locator("[data-mark]").count())) fail.push("recovery map: no dot or stripe marks");
   }
-  await page.goto(`${server.url}/app/#/settings`);
+  await page.goto(`${server.url}/app/#/settings/look`);
   await page.getByRole("button", { name: "Dark", exact: true }).click();
   await page.waitForFunction(() => document.documentElement.dataset.theme === "dark");
   for (const tab of ["today", "recovery"]) {
@@ -244,7 +254,7 @@ try {
     await scan(`dark ${tab}, colour-blind safe, more contrast`);
   }
   // One-handed controls: the bump buttons docked beside Log set (a workout is still open from above).
-  await page.goto(`${server.url}/app/#/settings`);
+  await page.goto(`${server.url}/app/#/settings/workout`);
   await page.getByRole("group", { name: "One-handed controls" }).getByRole("button", { name: "Right hand" }).click();
   await page.goto(`${server.url}/app/#/workout`);
   await page.getByRole("group", { name: "Adjust this set" }).waitFor();
@@ -273,7 +283,7 @@ const kp = await kctx.newPage();
 try {
   await kp.goto(`${server.url}/app/`);
   await onboard(kp);
-  await kp.goto(`${server.url}/app/#/settings`);
+  await kp.goto(`${server.url}/app/#/settings/look`);
   await kp.getByRole("group", { name: "Text size" }).getByRole("button", { name: "Largest" }).click();
   await kp.waitForFunction(() => document.documentElement.style.fontSize === "150%");
   const sideways = async (where) => {

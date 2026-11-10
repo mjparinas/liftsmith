@@ -429,22 +429,3 @@ export function Connections() {
     </div>
   );
 }
-
-/** The one row in Settings that opens this page. */
-export function ConnectionsRow() {
-  return (
-    <button
-      type="button"
-      onClick={() => go("connections")}
-      className="press card mt-2 flex w-full items-center justify-between gap-3 px-4 py-3 text-left"
-    >
-      <span>
-        <span className="block font-semibold">{t("conn.row")}</span>
-        <span className="block text-sm text-muted">{t("conn.rowNote")}</span>
-      </span>
-      <span aria-hidden className="text-faint">
-        ›
-      </span>
-    </button>
-  );
-}

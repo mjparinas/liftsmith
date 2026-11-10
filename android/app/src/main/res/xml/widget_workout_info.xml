@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- One resizable widget (WorkoutWidget.java): 3x1 is just the buttons, 3x2 adds the call and why, 4x3 adds the weekly
+     goal and the coach's note. No periodic updates: the app pushes changes, plus one non-waking redraw after midnight. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_description"
     android:initialLayout="@layout/widget_workout"
@@ -9,6 +11,6 @@
     android:previewLayout="@layout/widget_workout"
     android:resizeMode="horizontal|vertical"
     android:targetCellWidth="3"
-    android:targetCellHeight="1"
+    android:targetCellHeight="2"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen" />

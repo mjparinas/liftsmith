@@ -8,7 +8,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 | --- | --- | --- | --- | --- |
 | Lock-screen workout | Ongoing foreground-service notification, promoted as a Live Update on Android 16 (status bar chip with the rest countdown or the set, workout progress bar; Samsung One UI 8 shows it in the Now Bar) | Live Activity (lock screen, Dynamic Island with the countdown or the set, workout progress bar) plus a rest-over notification | Service-worker notification and an alert while the page is open; no chip or progress bar | Each platform's own mechanism; browsers have no live or status bar notifications |
 | Quick toggle | Quick Settings tile | Control Center control (iOS 18+) or a Shortcut control | None | No browser equivalent |
-| Widgets | Home-screen widget | Home and lock-screen widgets | Manifest shortcuts | No browser widgets |
+| Widgets | Resizable Today widget: call and why, weekly goal, coach's note, Start / Log set | Same widget plus lock-screen sizes, but it shows the plan only once the App Group `group.com.getliftsmith.app` is set up in the Apple portal; until then, plain Start and Log set | Manifest shortcuts | No browser widgets; iOS widgets can only read app data through an App Group |
 | Voice | App Actions, start workout only | Siri and App Shortcuts, all three actions | None | Custom App Actions intents need Google's review |
 | Calendar | Read and write | Read and write | `.ics` download, no busy times | Browsers can't reach the calendar |
 | AirPods Pro heart rate | None | Yes (planned) | None | Apple only |
