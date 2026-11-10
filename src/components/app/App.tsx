@@ -42,6 +42,7 @@ import { Onboarding } from "./Onboarding";
 import { Photos } from "./Photos";
 import { Pro } from "./Pro";
 import { Programs } from "./Programs";
+import { ProWelcome } from "./ProWelcome";
 import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
@@ -299,12 +300,20 @@ export function App() {
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
-  if (route === "setup") return screen;
+  // The thank-you after buying Pro sits over every screen, setup included (a purchase moves on at once).
+  if (route === "setup")
+    return (
+      <>
+        {screen}
+        <ProWelcome />
+      </>
+    );
   return (
     <>
       <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">
         {screen}
       </main>
+      <ProWelcome />
       {showNav && (
         <nav
           className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"

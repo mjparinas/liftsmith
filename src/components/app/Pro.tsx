@@ -13,6 +13,7 @@ import type { Plan } from "@/lib/trial";
 import { useNow } from "@/lib/useNow";
 
 import { CreatorCode } from "./CreatorCode";
+import { celebratePro } from "./ProWelcome";
 import { go, useRoute, type Route } from "./router";
 import { Button } from "./ui";
 
@@ -46,11 +47,12 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
   const pick = async (plan: Plan) => {
     haptic("tick");
     setNote(null);
-    const trial = !!offers?.find((o) => o.plan === plan)?.trialDays;
+    const trialDays = offers?.find((o) => o.plan === plan)?.trialDays ?? null;
     const r: BuyResult = await buy(plan, from);
     if (r === "ok") {
-      haptic("celebrate");
-      onDone?.(plan, trial);
+      onDone?.(plan, !!trialDays);
+      // Confetti, the celebrate buzz and the thank-you sheet (ProWelcome). Not after Restore purchases.
+      celebratePro(trialDays);
     } else if (r === "error") {
       oops();
       setNote(t("pro.error"));
