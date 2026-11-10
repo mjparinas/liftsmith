@@ -1,0 +1,8 @@
+# In-app feedback (Melvin, 2026-11-09)
+
+Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
+
+- **Settings › Send feedback or report a bug** (`#/feedback`, `Feedback.tsx`): bug / idea / other, a message, an optional email for replies, an optional screenshot (picked from the photo library, shrunk to 1280 px JPEG), and device details that are on by default and shown before sending (app version, platform, screen, language, time zone, current screen, the last 30 errors). It never includes workouts, health data or names.
+- **Offline first:** reports go to an outbox in localStorage (`feedback.ts`) and are sent on open, when the connection returns, and right after writing. Only a 400/413/422 drops a report; 404, 429 and 5xx keep it for later.
+- **Delivery:** `POST /api/feedback/` (`src/app/api/feedback/route.api.ts`) checks the report (`feedbackServer.ts`), rate-limits per address, and emails it to the owner through **Resend** (`RESEND_API_KEY`, `FEEDBACK_TO`, optional `FEEDBACK_FROM` in Vercel). The reply-to is the sender's email, so the owner can answer straight from the inbox. CORS allows only the native shells' origins.
+- It's pure web code, so Android and iOS get it together (platform parity). Once the server has a database, reports are also stored and listed in the admin panel.
