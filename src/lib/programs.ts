@@ -213,6 +213,12 @@ export const PROGRAMS: ProgramInfo[] = [
 
 export const PROGRAM_BY_ID: ReadonlyMap<string, ProgramInfo> = new Map(PROGRAMS.map((p) => [p.id, p]));
 
+/** The order the picker lists programs in: Pro programs first, each group keeping PROGRAMS' order (Melvin, 2026-11-10). */
+export const PICKER_ORDER: readonly ProgramInfo[] = [
+  ...PROGRAMS.filter((p) => p.tier === "pro"),
+  ...PROGRAMS.filter((p) => p.tier !== "pro"),
+];
+
 // ---------------------------------------------------------------------------------------------
 // Shared pieces
 

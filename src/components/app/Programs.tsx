@@ -6,7 +6,7 @@ import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
 import { list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
-import { missingFor, pickProgram, PROGRAM_BY_ID, PROGRAMS, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
+import { missingFor, PICKER_ORDER, pickProgram, PROGRAM_BY_ID, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
@@ -65,7 +65,7 @@ export function Programs() {
             <p className="mt-1 text-sm text-muted">{t("prog.adaptiveBlurb")}</p>
           </button>
         </li>
-        {PROGRAMS.map((p) => (
+        {PICKER_ORDER.map((p) => (
           <li key={p.id}>
             <button
               type="button"
