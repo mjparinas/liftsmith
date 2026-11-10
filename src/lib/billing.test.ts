@@ -2,9 +2,12 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { useAccount } from "./auth";
 import {
+  codeOption,
   entActive,
   entFromInfo,
+  freeDaysOf,
   hasPro,
+  IGNORE_TAG,
   OFFLINE_GRACE_MS,
   planOf,
   setBillingLive,
@@ -132,5 +135,32 @@ describe("errorText", () => {
     expect(errorText("plain")).toBe("plain");
     expect(errorText(null)).toBe("unknown error");
     expect(errorText({ message: "x".repeat(400) })).toHaveLength(300);
+  });
+});
+
+describe("a code's own offer on Google Play", () => {
+  const opt = (id: string, tags: string[], isBasePlan = false) => ({ id, tags, isBasePlan });
+  const options = [
+    opt("monthly", [], true),
+    opt("monthly:trial-14-monthly", []),
+    opt("monthly:trial-30-monthly", [IGNORE_TAG, "creator30"]),
+  ];
+
+  it("picks the offer tagged with the code's offering, never the base plan", () => {
+    expect(codeOption(options, "creator30")?.id).toBe("monthly:trial-30-monthly");
+    expect(codeOption([opt("monthly", ["creator30"], true)], "creator30")).toBeNull();
+  });
+
+  it("keeps the default without a code, or when Play doesn't offer it to this person", () => {
+    expect(codeOption(options, null)).toBeNull();
+    expect(codeOption(options, "promo_half")).toBeNull();
+    expect(codeOption(null, "creator30")).toBeNull();
+  });
+
+  it("reads the free trial's length", () => {
+    expect(freeDaysOf({ freePhase: { billingPeriod: { unit: "DAY", value: 30 } } })).toBe(30);
+    expect(freeDaysOf({ freePhase: { billingPeriod: { unit: "MONTH", value: 1 } } })).toBe(30);
+    expect(freeDaysOf({ freePhase: null })).toBeNull();
+    expect(freeDaysOf(null)).toBeNull();
   });
 });
