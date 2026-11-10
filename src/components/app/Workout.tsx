@@ -20,7 +20,7 @@ import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { chipText, notifyPermission, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -30,6 +30,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
+import { pickBpm, type WatchReading } from "@/lib/watchHr";
 
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
@@ -75,8 +76,10 @@ export function Workout() {
   const hr = useSyncExternalStore(hrLink.subscribe, hrLink.get, hrLink.get);
   const hrBusy = hr.status === "connecting";
   const hrError = hr.error;
-  // A reading only counts while the monitor is connected.
-  const bpm = hr.status === "live" ? lastBpm : null;
+  // Heart rate from our own watch app (Wear OS, Apple Watch), used when no Bluetooth monitor is live (watchHr.ts).
+  const [watchHr, setWatchHr] = useState<WatchReading | null>(null);
+  // A reading only counts while the monitor is connected, or while the watch's is fresh.
+  const bpm = pickBpm(hr.status === "live" ? lastBpm : null, watchHr, now);
   const [popKey, setPopKey] = useState(0);
   // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
   const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
@@ -111,7 +114,17 @@ export function Workout() {
       useApp.getState().pushHr(b);
     });
     if (sessionId && hrSupported()) hrLink.auto(sessionId);
-    return () => hrLink.onBpm(() => {});
+    // The watch's readings go into the workout's log only while no monitor is, so one stream never mixes with another.
+    const offWatch = sessionId
+      ? onWatchHeartRate((b) => {
+          setWatchHr({ bpm: b, at: Date.now() });
+          if (hrLink.get().status !== "live") useApp.getState().pushHr(b);
+        })
+      : () => {};
+    return () => {
+      hrLink.onBpm(() => {});
+      offWatch();
+    };
   }, [sessionId]);
 
   const item = active?.plan.items[active.index];
@@ -222,6 +235,7 @@ export function Workout() {
       chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
+      sessionId: active.sessionId,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 

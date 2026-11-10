@@ -83,7 +83,6 @@ export const en = {
   "conn.later.title": "Coming later",
   "conn.later.what": "On our list, in this order:",
   "conn.later.samsung": "Samsung Health, directly",
-  "conn.later.watch": "Apple Watch and Wear OS apps",
   "conn.later.garmin": "A Garmin watch app",
   "conn.later.velocity": "Bar speed sensors",
 } as const;
@@ -175,7 +174,6 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.later.title": "Más adelante",
   "conn.later.what": "En nuestra lista, en este orden:",
   "conn.later.samsung": "Samsung Health, directamente",
-  "conn.later.watch": "Apps para Apple Watch y Wear OS",
   "conn.later.garmin": "Una app para relojes Garmin",
   "conn.later.velocity": "Sensores de velocidad de la barra",
 };
@@ -266,7 +264,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.later.title": "Plus tard",
   "conn.later.what": "Sur notre liste, dans cet ordre :",
   "conn.later.samsung": "Samsung Health, en direct",
-  "conn.later.watch": "Apps Apple Watch et Wear OS",
   "conn.later.garmin": "Une app pour montres Garmin",
   "conn.later.velocity": "Capteurs de vitesse de barre",
 };

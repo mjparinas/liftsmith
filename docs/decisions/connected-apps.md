@@ -9,7 +9,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
   2. **Heart rate monitor:** what it does, the last monitor used on this device (`ls.hr.last`, saved by `connectHeartRate`), and **Test my monitor**, which connects and shows live bpm so a strap can be checked before the gym. The workout screen's heart button is still where it's paired for a workout. Browsers without Web Bluetooth get a line saying so.
   3. **Fitness services: Strava, Oura, WHOOP.** They need an account (the roadmap's "connecting one explains that it creates a free account"), so a signed-out lifter sees what each does and one **Sign in or create an account** button. Signed in, each row shows connected (Strava shows the athlete's name), not connected, or **Coming soon** when the server has no keys for it yet, with Connect or Disconnect.
   4. **Music:** None, Spotify, Apple Music or YouTube Music (`profile.connections.music`, synced with the profile).
-  5. **Coming later**, in order: Samsung Health directly, Apple Watch and Wear OS apps, a Garmin watch app, bar speed sensors.
+  5. **Coming later**, in order: Samsung Health directly, a Garmin watch app (the Apple Watch and Wear OS apps shipped on 2026-11-10, [Watch apps](watch-apps.md)), bar speed sensors.
 
 ## Strava, Oura and WHOOP: the server
 

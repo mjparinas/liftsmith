@@ -54,6 +54,12 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         // Siri, Shortcuts, the Action button and Control Center (ShortcutIntents.swift).
         NotificationCenter.default.addObserver(self, selector: #selector(shortcut(_:)), name: ShortcutInbox.notification, object: nil)
         if let a = ShortcutInbox.pending { deliverShortcut(a) }
+
+        // The Apple Watch app (WatchLink.swift): its taps work like the Live Activity's buttons, and its heart
+        // rate is used when no Bluetooth monitor is connected.
+        WatchLink.shared.onAction = { [weak self] a in self?.notifyListeners("action", data: ["action": a], retainUntilConsumed: true) }
+        WatchLink.shared.onHeartRate = { [weak self] bpm in self?.notifyListeners("heartRate", data: ["bpm": bpm]) }
+        WatchLink.shared.start()
     }
 
     @objc private func shortcut(_ note: Notification) {
@@ -78,6 +84,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
 
     @objc func update(_ call: CAPPluginCall) {
         if #available(iOS 16.2, *) { updateActivity(call) }
+        WatchLink.shared.update(watchState(call))
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [restId])
         let restUntil = call.getDouble("restUntil") ?? 0
@@ -153,7 +160,25 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         call.resolve()
     }
 
+    /// The fields the watch shows (LiftsmithWatch/WatchState.swift), in the same JSON as Android's.
+    private func watchState(_ call: CAPPluginCall) -> [String: Any] {
+        var s: [String: Any] = [
+            "title": call.getString("title") ?? "Workout",
+            "setLabel": call.getString("setLabel") ?? "",
+            "next": call.getString("next") ?? "",
+            "plates": call.getString("plates") ?? "",
+            "vibrate": call.getBool("vibrate") ?? true,
+            "sessionId": call.getString("sessionId") ?? "",
+        ]
+        if let r = call.getDouble("restUntil"), r > 0 { s["restUntil"] = r }
+        if let hr = call.getInt("hr") { s["hr"] = hr }
+        if let d = call.getInt("done") { s["done"] = d }
+        if let t = call.getInt("total") { s["total"] = t }
+        return s
+    }
+
     @objc func stop(_ call: CAPPluginCall) {
+        WatchLink.shared.stop()
         endActivity()
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [restId])

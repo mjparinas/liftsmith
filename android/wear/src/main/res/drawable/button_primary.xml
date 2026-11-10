@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The app's primary action: the blue-to-violet gradient with dark ink (.btn-primary). -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android" android:color="#33FFFFFF">
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="26dp" />
+            <gradient android:angle="0" android:startColor="#5B9CFF" android:endColor="#9B86FF" />
+        </shape>
+    </item>
+</ripple>

@@ -36,6 +36,13 @@
 		D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E1A0010000000000000002 /* DelightPlugins.swift */; };
 		A1F5E0010000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */; };
 		C1A0B0010000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0010000000000000002 /* InfoPlist.strings */; };
+		E7A1C0DE0000000000000001 /* WatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000002 /* WatchLink.swift */; };
+		E7A1C0DE0000000000000003 /* LiftsmithWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */; };
+		E7A1C0DE0000000000000005 /* WatchModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000006 /* WatchModel.swift */; };
+		E7A1C0DE0000000000000007 /* WatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000008 /* WatchState.swift */; };
+		E7A1C0DE0000000000000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000A /* Assets.xcassets */; };
+		E7A1C0DE000000000000000B /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000C /* Localizable.strings */; };
+		E7A1C0DE000000000000000D /* LiftsmithWatch.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = E7A1C0DE000000000000000E /* LiftsmithWatch.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -45,6 +52,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = F7B0C469AAFC410AA368939D;
 			remoteInfo = LiftsmithWidgets;
+		};
+		E7A1C0DE000000000000000F /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 504EC2FC1FED79650016851F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = E7A1C0DE0000000000000010;
+			remoteInfo = LiftsmithWatch;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -58,6 +72,17 @@
 				48DDA7D2D0A965653FC060C3 /* LiftsmithWidgets.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7A1C0DE0000000000000011 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				E7A1C0DE000000000000000D /* LiftsmithWatch.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -95,6 +120,17 @@
 		EEE098FD721703D4835ADEA3 /* StartWorkoutControl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = StartWorkoutControl.swift; sourceTree = "<group>"; };
 		C1A0B0010000000000000003 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		C1A0B0010000000000000004 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000002 /* WatchLink.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchLink.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiftsmithWatchApp.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000006 /* WatchModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchModel.swift; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000008 /* WatchState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WatchState.swift; sourceTree = "<group>"; };
+		E7A1C0DE000000000000000A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000012 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000013 /* LiftsmithWatch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LiftsmithWatch.entitlements; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000014 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000015 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E7A1C0DE0000000000000016 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
+		E7A1C0DE000000000000000E /* LiftsmithWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LiftsmithWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +152,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E7A1C0DE0000000000000017 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -128,6 +171,7 @@
 				FCC80A55E1B46D7DCA985C0B /* Shared */,
 				F6C7983D12D78D132ECAD923 /* Frameworks */,
 				ABD8D1072A0CEFB112237523 /* LiftsmithWidgets */,
+				E7A1C0DE0000000000000018 /* LiftsmithWatch */,
 			);
 			sourceTree = "<group>";
 		};
@@ -136,6 +180,7 @@
 			children = (
 				504EC3041FED79650016851F /* App.app */,
 				BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */,
+				E7A1C0DE000000000000000E /* LiftsmithWatch.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -147,6 +192,7 @@
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				A1F5E0010000000000000002 /* WorkoutSessionPlugin.swift */,
+				E7A1C0DE0000000000000002 /* WatchLink.swift */,
 				A1F5E0010000000000000005 /* ShortcutIntents.swift */,
 				A1F5E0010000000000000007 /* InstallInfoPlugin.swift */,
 				A1F5E00A0000000000000002 /* AccountSignInPlugin.swift */,
@@ -206,6 +252,20 @@
 			path = Shared;
 			sourceTree = "<group>";
 		};
+		E7A1C0DE0000000000000018 /* LiftsmithWatch */ = {
+			isa = PBXGroup;
+			children = (
+				E7A1C0DE0000000000000004 /* LiftsmithWatchApp.swift */,
+				E7A1C0DE0000000000000006 /* WatchModel.swift */,
+				E7A1C0DE0000000000000008 /* WatchState.swift */,
+				E7A1C0DE000000000000000A /* Assets.xcassets */,
+				E7A1C0DE000000000000000C /* Localizable.strings */,
+				E7A1C0DE0000000000000012 /* Info.plist */,
+				E7A1C0DE0000000000000013 /* LiftsmithWatch.entitlements */,
+			);
+			path = LiftsmithWatch;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -217,11 +277,13 @@
 				504EC3011FED79650016851F /* Frameworks */,
 				504EC3021FED79650016851F /* Resources */,
 				16B0440713ADED6A0D70B4B7 /* Embed Foundation Extensions */,
+				E7A1C0DE0000000000000011 /* Embed Watch Content */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				91A96D79EC9B11E86182E14D /* PBXTargetDependency */,
+				E7A1C0DE0000000000000019 /* PBXTargetDependency */,
 			);
 			name = App;
 			packageProductDependencies = (
@@ -247,6 +309,23 @@
 			productName = LiftsmithWidgets;
 			productReference = BDD91A4289DEE7952063697C /* LiftsmithWidgets.appex */;
 			productType = "com.apple.product-type.app-extension";
+		};
+		E7A1C0DE0000000000000010 /* LiftsmithWatch */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E7A1C0DE000000000000001A /* Build configuration list for PBXNativeTarget "LiftsmithWatch" */;
+			buildPhases = (
+				E7A1C0DE000000000000001B /* Sources */,
+				E7A1C0DE0000000000000017 /* Frameworks */,
+				E7A1C0DE000000000000001C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = LiftsmithWatch;
+			productName = LiftsmithWatch;
+			productReference = E7A1C0DE000000000000000E /* LiftsmithWatch.app */;
+			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
 
@@ -284,6 +363,7 @@
 			targets = (
 				504EC3031FED79650016851F /* App */,
 				F7B0C469AAFC410AA368939D /* LiftsmithWidgets */,
+				E7A1C0DE0000000000000010 /* LiftsmithWatch */,
 			);
 		};
 /* End PBXProject section */
@@ -311,6 +391,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		E7A1C0DE000000000000001C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7A1C0DE0000000000000009 /* Assets.xcassets in Resources */,
+				E7A1C0DE000000000000000B /* Localizable.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -334,6 +423,7 @@
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				A1F5E0010000000000000001 /* WorkoutSessionPlugin.swift in Sources */,
+				E7A1C0DE0000000000000001 /* WatchLink.swift in Sources */,
 				A1F5E0010000000000000004 /* ShortcutIntents.swift in Sources */,
 				9632D695CCD0A9D1A115E9B6 /* WorkoutIntents.swift in Sources */,
 				0E06D6CBC4FBB1D16EC86D9B /* WorkoutActivity.swift in Sources */,
@@ -341,6 +431,16 @@
 				A1F5E0010000000000000006 /* InstallInfoPlugin.swift in Sources */,
 				A1F5E00A0000000000000001 /* AccountSignInPlugin.swift in Sources */,
 				D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E7A1C0DE000000000000001B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E7A1C0DE0000000000000003 /* LiftsmithWatchApp.swift in Sources */,
+				E7A1C0DE0000000000000005 /* WatchModel.swift in Sources */,
+				E7A1C0DE0000000000000007 /* WatchState.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +452,12 @@
 			name = LiftsmithWidgets;
 			target = F7B0C469AAFC410AA368939D /* LiftsmithWidgets */;
 			targetProxy = A6451DD0D29A90A7F045B5C5 /* PBXContainerItemProxy */;
+		};
+		E7A1C0DE0000000000000019 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = LiftsmithWatch;
+			target = E7A1C0DE0000000000000010 /* LiftsmithWatch */;
+			targetProxy = E7A1C0DE000000000000000F /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -379,6 +485,16 @@
 				C1A0B0010000000000000004 /* fr */,
 			);
 			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		E7A1C0DE000000000000000C /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E7A1C0DE0000000000000014 /* en */,
+				E7A1C0DE0000000000000015 /* es */,
+				E7A1C0DE0000000000000016 /* fr */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -590,6 +706,54 @@
 			};
 			name = Release;
 		};
+		E7A1C0DE000000000000001D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LiftsmithWatch/LiftsmithWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+			};
+			name = Debug;
+		};
+		E7A1C0DE000000000000001E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = LiftsmithWatch/LiftsmithWatch.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				INFOPLIST_FILE = LiftsmithWatch/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.getliftsmith.app.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 10.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -616,6 +780,15 @@
 			buildConfigurations = (
 				CB444DE546580AF723EA3B7B /* Release */,
 				15D1518BE6F8EC4236E10A58 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		E7A1C0DE000000000000001A /* Build configuration list for PBXNativeTarget "LiftsmithWatch" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E7A1C0DE000000000000001D /* Debug */,
+				E7A1C0DE000000000000001E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

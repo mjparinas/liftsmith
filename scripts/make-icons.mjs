@@ -222,6 +222,24 @@ async function main() {
     await iosSet(`AppIcon-${name}.appiconset`, "icon", tp);
   }
 
+  // The watch apps use the default icon: the Wear OS app gets the phone's launcher files, the Apple Watch app
+  // the iOS light image (watchOS draws it in a circle and needs it opaque).
+  const WEAR = path.join(ROOT, "android/wear/src/main/res");
+  for (const dens of Object.keys(DENSITY)) {
+    for (const f of ["ic_launcher", "ic_launcher_round", "ic_launcher_foreground", "ic_launcher_monochrome"]) {
+      fs.mkdirSync(path.join(WEAR, `mipmap-${dens}`), { recursive: true });
+      fs.copyFileSync(path.join(RES, `mipmap-${dens}`, `${f}.png`), path.join(WEAR, `mipmap-${dens}`, `${f}.png`));
+    }
+  }
+  fs.mkdirSync(path.join(WEAR, "mipmap-anydpi"), { recursive: true });
+  for (const f of ["ic_launcher", "ic_launcher_round"])
+    fs.copyFileSync(path.join(RES, "mipmap-anydpi-v26", `${f}.xml`), path.join(WEAR, "mipmap-anydpi", `${f}.xml`));
+  fs.copyFileSync(path.join(RES, "drawable/ic_launcher_background.xml"), path.join(WEAR, "drawable/ic_launcher_background.xml"));
+  fs.copyFileSync(
+    path.join(XC, "AppIcon.appiconset/icon.png"),
+    path.join(ROOT, "ios/App/LiftsmithWatch/Assets.xcassets/AppIcon.appiconset/icon.png"),
+  );
+
   // Splash screens: the same files Capacitor made, redrawn in the brand colours.
   for (const dir of fs.readdirSync(RES)) {
     const f = path.join(RES, dir, "splash.png");

@@ -1,0 +1,8 @@
+/* The Apple Watch app's words. Keys are the English text (SwiftUI's own lookup). */
+"No workout running" = "No workout running";
+"Start one on your phone and it shows here." = "Start one on your phone and it shows here.";
+"Next: %@" = "Next: %@";
+"%lld bpm" = "%lld bpm";
+"Heart rate %lld beats per minute" = "Heart rate %lld beats per minute";
+"Log set" = "Log set";
+"+30 s" = "+30 s";

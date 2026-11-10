@@ -57,6 +57,12 @@ dependencies {
     implementation "androidx.credentials:credentials:1.5.0"
     implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
     implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
+    // The Wear OS app (android/wear): the workout goes to the watch and its taps and heart rate come back (WatchLink).
+    implementation "com.google.android.gms:play-services-wearable:$playServicesWearableVersion"
+    // Opens the watch app when a workout starts on the phone (WatchLink.openOnWatch).
+    implementation "androidx.wear:wear-remote-interactions:$wearRemoteInteractionsVersion"
+    // RemoteActivityHelper returns a ListenableFuture; Guava is already in the app through Health Connect.
+    implementation "com.google.guava:guava:32.0.0-jre"
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
     androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
