@@ -247,6 +247,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
+    { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }
