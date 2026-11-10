@@ -188,6 +188,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Today screen](docs/decisions/today-screen.md) (`src/lib/quotes.ts`)
 - [Tools: TDEE calculator](docs/decisions/tools-tdee-calculator.md) (`src/lib/tdee.ts`, `src/components/app/Tools.tsx`, `health.ts`, `App.tsx`)
 - [Training engine](docs/decisions/training-engine.md) (`exercises.ts`, `generator.ts`, `warmup.ts`, `recovery.ts`)
+- [Trust centre](docs/decisions/trust-centre.md) (`src/components/site/TrustCentre.tsx`, `src/app/trust/page.tsx`, `public/.well-known/security.txt`)
 - [Voice and system shortcuts](docs/decisions/voice-and-system-shortcuts.md) (`src/lib/shortcuts.ts`, `ios/App/App/ShortcutIntents.swift`, `WorkoutTileService.java`, `WorkoutWidget.java`)
 - [Web dashboard](docs/decisions/web-dashboard.md) (`src/components/dashboard/`, `src/lib/dashboard.ts`, `src/lib/entitlements.ts`)
 - [Workout data and coaching](docs/decisions/workout-data-and-coaching.md) (`src/lib/readiness.ts`, `progression.ts`)
