@@ -638,3 +638,31 @@ describe("saving your progress", () => {
     expect(await screen.findByText("That file isn't a Liftsmith backup.")).toBeInTheDocument();
   });
 });
+
+describe("camera rep counting without Pro", () => {
+  afterEach(() => setBillingLive(false));
+
+  it("still shows Count reps on the squat, marked Pro, and opens the Pro screen", async () => {
+    setBillingLive(true, null, [{ plan: "annual", price: "$39.99", perMonth: "$3.33", trialDays: 14 }]);
+    localStorage.setItem("liftsmith.autoCount", JSON.stringify({ on: true, facing: "user", source: "camera" }));
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
+    await screen.findByText("What are you training for?");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 4; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(await screen.findByRole("button", { name: "Not now, keep the free plan" }));
+    await screen.findByText("Today's workout");
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    // The free classic 5x5 opens on the squat. A saved "on" from before doesn't start the camera without Pro.
+    expect(screen.queryByRole("button", { name: "Stop counting" })).not.toBeInTheDocument();
+    const b = await screen.findByRole("button", { name: "Count reps with the camera, a Pro feature: see Pro" });
+    expect(b).toHaveTextContent("Pro");
+    await user.click(b);
+    expect(location.hash).toBe("#/pro/count");
+    localStorage.removeItem("liftsmith.autoCount");
+  });
+});

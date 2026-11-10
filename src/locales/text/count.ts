@@ -6,6 +6,7 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "count.toggle": "Count reps with the camera",
   "count.start": "Count reps",
+  "count.locked": "Count reps with the camera, a Pro feature: see Pro",
   "count.reps": "reps",
   "count.stop": "Stop counting",
   "count.off": "Stop counting reps",
@@ -29,6 +30,7 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "count.toggle": "Contar repeticiones con la cámara",
   "count.start": "Contar reps",
+  "count.locked": "Contar repeticiones con la cámara, función Pro: ver Pro",
   "count.reps": "reps",
   "count.stop": "Dejar de contar",
   "count.off": "Dejar de contar repeticiones",
@@ -51,6 +53,7 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "count.toggle": "Compter les répétitions avec la caméra",
   "count.start": "Compter",
+  "count.locked": "Compter les répétitions avec la caméra, fonction Pro : voir Pro",
   "count.reps": "rép.",
   "count.stop": "Arrêter",
   "count.off": "Arrêter de compter les répétitions",

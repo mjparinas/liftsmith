@@ -8,7 +8,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
-import { can } from "@/lib/entitlements";
 import { flag } from "@/lib/flags";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
@@ -20,6 +19,7 @@ import { RepTracker } from "@/lib/reps/tracker";
 import type { Pattern } from "@/lib/types";
 
 import { Icon } from "./icons";
+import { ProTag } from "./ui";
 
 export type Facing = "user" | "environment";
 export type CountSource = "camera" | "motion";
@@ -54,9 +54,11 @@ export function saveCountPrefs(p: CountPrefs) {
   }
 }
 
-/** Whether this exercise can be counted: the camera knows how to read it (and motion, when that's on). */
+/**
+ * Whether this exercise can be counted: the camera knows how to read it (and motion, when that's on).
+ * Not about Pro: free lifters still see the button, marked Pro, so they know counting exists.
+ */
 export function countable(id: string, pattern: Pattern, source: CountSource = "camera"): boolean {
-  if (!can("autoCount")) return false;
   return !!(source === "motion" ? imuProfile(id, pattern) : profileFor(id, pattern));
 }
 
@@ -335,8 +337,21 @@ export function AutoCount({
   );
 }
 
-/** On the exercise demo, opposite "How to": turns camera counting on (the stage's Stop turns it off). */
-export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean; onToggle: () => void; className?: string }) {
+/**
+ * On the exercise demo, opposite "How to": turns camera counting on (the stage's Stop turns it off).
+ * Without Pro (`locked`) it carries a Pro tag and the caller opens the Pro screen instead.
+ */
+export function AutoCountButton({
+  on,
+  onToggle,
+  locked = false,
+  className = "",
+}: {
+  on: boolean;
+  onToggle: () => void;
+  locked?: boolean;
+  className?: string;
+}) {
   return (
     <button
       type="button"
@@ -344,12 +359,13 @@ export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean;
         haptic("toggle");
         onToggle();
       }}
-      aria-pressed={on}
-      aria-label={t("count.toggle")}
+      aria-pressed={locked ? undefined : on}
+      aria-label={locked ? t("count.locked") : t("count.toggle")}
       className={`press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm ${on ? "border-accent bg-accent/15 text-accent" : "border-line bg-bg/70 text-muted hover:text-ink"} ${className}`}
     >
       <Icon name="camera" size={16} className="text-accent" />
       {t("count.start")}
+      {locked && <ProTag />}
     </button>
   );
 }

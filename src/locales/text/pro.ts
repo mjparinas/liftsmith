@@ -66,6 +66,13 @@ export const en = {
   "pro.settings.free": "Free plan",
   "pro.settings.see": "See Pro",
   "pro.settings.unlocked": "Everything unlocked",
+  "pro.welcome.title": "Welcome to Pro",
+  "pro.welcome.trialTitle": "Your free trial has started",
+  "pro.welcome.lead": "You're investing in yourself. That's huge.",
+  "pro.welcome.body": "Thank you for subscribing and for taking your health seriously. Every workout from here adapts to you.",
+  "pro.welcome.unlocked": "Unlocked now",
+  "pro.welcome.trialNote": "Free for {days} days. You can cancel any time in your store account before it ends.",
+  "pro.welcome.go": "Let's train",
 } as const;
 
 type Key = keyof typeof en;
@@ -136,6 +143,13 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.settings.free": "Plan gratuito",
   "pro.settings.see": "Ver Pro",
   "pro.settings.unlocked": "Todo desbloqueado",
+  "pro.welcome.title": "Te damos la bienvenida a Pro",
+  "pro.welcome.trialTitle": "Tu prueba gratis ha empezado",
+  "pro.welcome.lead": "Estás invirtiendo en ti. Eso es enorme.",
+  "pro.welcome.body": "Gracias por suscribirte y por tomarte tu salud en serio. A partir de ahora, cada entrenamiento se adapta a ti.",
+  "pro.welcome.unlocked": "Desbloqueado ahora",
+  "pro.welcome.trialNote": "Gratis durante {days} días. Puedes cancelarla cuando quieras en tu cuenta de la tienda antes de que termine.",
+  "pro.welcome.go": "A entrenar",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -204,4 +218,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.settings.free": "Offre gratuite",
   "pro.settings.see": "Voir Pro",
   "pro.settings.unlocked": "Tout est débloqué",
+  "pro.welcome.title": "Bienvenue dans Pro",
+  "pro.welcome.trialTitle": "Votre essai gratuit a commencé",
+  "pro.welcome.lead": "Vous investissez en vous-même. C’est énorme.",
+  "pro.welcome.body": "Merci pour votre abonnement et de prendre votre santé au sérieux. Désormais, chaque séance s’adapte à vous.",
+  "pro.welcome.unlocked": "Débloqué dès maintenant",
+  "pro.welcome.trialNote":
+    "Gratuit pendant {days} jours. Vous pouvez résilier à tout moment dans votre compte de la boutique avant la fin.",
+  "pro.welcome.go": "À l’entraînement",
 };
