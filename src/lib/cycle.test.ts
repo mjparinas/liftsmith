@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { cycleLength, cycleSignal, cycleState, startOfDay } from "./cycle";
 import { defaultProfile, makeGym } from "./defaults";
 import { readiness } from "./readiness";
@@ -41,7 +42,10 @@ describe("logging and forgetting", () => {
     localStorage.clear();
     await useApp.getState().reset();
     const g = makeGym("commercial", "kg", "g");
-    useApp.setState({ gyms: [g], profile: { ...defaultProfile(), onboarded: true, activeGymId: "g", cycle: { enabled: true, consentAt: 1 } } });
+    useApp.setState({
+      gyms: [g],
+      profile: { ...defaultProfile(), onboarded: true, activeGymId: "g", cycle: { enabled: true, consentAt: 1 } },
+    });
   });
 
   it("logs a period once per day and erases everything on turn-off", async () => {

@@ -1,9 +1,18 @@
 // The creator program on the server (AGENTS.md "Marketing and growth"). The app claims a code for its
 // install (POST /api/creator/), the RevenueCat webhook backs that up from the subscriber attribute, and the
 // admin panel's Creators tab adds creators, shows what each is owed and records payouts.
-import { creatorRows, DEFAULT_MONTHS, DEFAULT_RATE, type Creator, type CreatorInstall, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
-import { normalizeCode } from "@/lib/creatorCode";
 import type { SubEvent } from "@/lib/adminMetrics";
+import { normalizeCode } from "@/lib/creatorCode";
+import {
+  creatorRows,
+  DEFAULT_MONTHS,
+  DEFAULT_RATE,
+  type Creator,
+  type CreatorInstall,
+  type CreatorRow,
+  type Payout,
+} from "@/lib/creatorMetrics";
+
 import { query, run } from "./db";
 
 const n = (v: unknown) => Number(v ?? 0);
@@ -58,7 +67,11 @@ export async function claimFromStore(installId: string | null, raw: string | nul
   if (!installId || !SAFE_ID.test(installId)) return;
   const creator = await findCreator(raw);
   if (!creator) return;
-  await run("INSERT OR IGNORE INTO creator_installs (install_id, code, at, source, platform) VALUES (?, ?, ?, 'store', NULL)", [installId, creator.code, now]);
+  await run("INSERT OR IGNORE INTO creator_installs (install_id, code, at, source, platform) VALUES (?, ?, ?, 'store', NULL)", [
+    installId,
+    creator.code,
+    now,
+  ]);
 }
 
 // ---------- Admin ----------
@@ -100,7 +113,13 @@ export async function saveCreator(c: CreatorInput, now = Date.now()): Promise<vo
 
 export async function recordPayout(code: string, usd: number, admin: string, note: string | null, now = Date.now()): Promise<boolean> {
   if (!(await query("SELECT 1 FROM creators WHERE code = ?", [code])).length) return false;
-  await run("INSERT INTO creator_payouts (code, usd_micros, paid_at, admin, note) VALUES (?, ?, ?, ?, ?)", [code, Math.round(usd * 1e6), now, admin, note]);
+  await run("INSERT INTO creator_payouts (code, usd_micros, paid_at, admin, note) VALUES (?, ?, ?, ?, ?)", [
+    code,
+    Math.round(usd * 1e6),
+    now,
+    admin,
+    note,
+  ]);
   return true;
 }
 
@@ -110,16 +129,52 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
     query("SELECT * FROM creator_installs WHERE install_id NOT IN (SELECT id FROM installs WHERE test = 1)"),
     // Only store-verified events (the RevenueCat webhook) earn commission. The app's own trial_start and purchase
     // events reach /api/collect/ unauthenticated, so anyone could forge one for an install that carries a code.
-    query("SELECT * FROM subscription_events WHERE source = 'store' AND install_id IN (SELECT install_id FROM creator_installs) ORDER BY at"),
+    query(
+      "SELECT * FROM subscription_events WHERE source = 'store' AND install_id IN (SELECT install_id FROM creator_installs) ORDER BY at",
+    ),
     query("SELECT * FROM creator_payouts ORDER BY paid_at DESC"),
   ]);
-  const payoutList = payouts.map((p): Payout => ({ id: n(p.id), code: String(p.code), usd: n(p.usd_micros) / 1e6, paidAt: n(p.paid_at), admin: String(p.admin), note: s(p.note) }));
+  const payoutList = payouts.map((p): Payout => ({
+    id: n(p.id),
+    code: String(p.code),
+    usd: n(p.usd_micros) / 1e6,
+    paidAt: n(p.paid_at),
+    admin: String(p.admin),
+    note: s(p.note),
+  }));
   const rows = creatorRows({
     now,
     since,
-    creators: creators.map((c): Creator => ({ code: String(c.code), name: String(c.name), contact: s(c.contact), rate: n(c.rate), months: n(c.months), active: n(c.active) === 1, note: s(c.note), createdAt: n(c.created_at) })),
-    installs: installs.map((i): CreatorInstall => ({ installId: String(i.install_id), code: String(i.code), at: n(i.at), source: String(i.source), platform: s(i.platform) })),
-    subs: subs.map((e): SubEvent => ({ id: String(e.id), at: n(e.at), installId: s(e.install_id), subscription: s(e.subscription), store: String(e.store), kind: String(e.kind), plan: s(e.plan), usd: e.usd_micros == null ? null : n(e.usd_micros) / 1e6, priceLocal: e.price_micros == null ? null : n(e.price_micros) / 1e6, currency: s(e.currency), reason: s(e.reason) })),
+    creators: creators.map((c): Creator => ({
+      code: String(c.code),
+      name: String(c.name),
+      contact: s(c.contact),
+      rate: n(c.rate),
+      months: n(c.months),
+      active: n(c.active) === 1,
+      note: s(c.note),
+      createdAt: n(c.created_at),
+    })),
+    installs: installs.map((i): CreatorInstall => ({
+      installId: String(i.install_id),
+      code: String(i.code),
+      at: n(i.at),
+      source: String(i.source),
+      platform: s(i.platform),
+    })),
+    subs: subs.map((e): SubEvent => ({
+      id: String(e.id),
+      at: n(e.at),
+      installId: s(e.install_id),
+      subscription: s(e.subscription),
+      store: String(e.store),
+      kind: String(e.kind),
+      plan: s(e.plan),
+      usd: e.usd_micros == null ? null : n(e.usd_micros) / 1e6,
+      priceLocal: e.price_micros == null ? null : n(e.price_micros) / 1e6,
+      currency: s(e.currency),
+      reason: s(e.reason),
+    })),
     payouts: payoutList,
   });
   return { rows, payouts: payoutList };

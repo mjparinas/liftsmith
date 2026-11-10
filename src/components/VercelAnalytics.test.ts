@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { keepEvent } from "./VercelAnalytics";
 
 const ev = (url: string) => ({ type: "pageview" as const, url });

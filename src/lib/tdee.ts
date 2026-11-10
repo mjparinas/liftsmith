@@ -8,9 +8,9 @@
 // Snapshots: whenever an input that matters changes (weight, age, height, sex, body fat, activity), a
 // `tdee` event records the new value with what changed, so the history and the graph survive edits to
 // the profile. The current value is always computed fresh; events are the record of the past.
-import type { AppEvent, Profile, TdeeEvent } from "./types";
 import type { SessionSummary } from "./derive";
 import { t } from "./i18n";
+import type { AppEvent, Profile, TdeeEvent } from "./types";
 
 export type Activity = "sedentary" | "light" | "moderate" | "heavy" | "athlete";
 export const ACTIVITIES: Activity[] = ["sedentary", "light", "moderate", "heavy", "athlete"];
@@ -18,7 +18,18 @@ export const ACTIVITIES: Activity[] = ["sedentary", "light", "moderate", "heavy"
 /** The standard activity factors (Harris-Benedict / Mifflin convention). */
 const FACTOR: Record<Activity, number> = { sedentary: 1.2, light: 1.375, moderate: 1.55, heavy: 1.725, athlete: 1.9 };
 export const ACTIVITY: Record<Activity, { factor: number; label: string; detail: string }> = Object.fromEntries(
-  ACTIVITIES.map((a) => [a, { factor: FACTOR[a], get label() { return t(`activity.${a}`); }, get detail() { return t(`activity.${a}.detail`); } }]),
+  ACTIVITIES.map((a) => [
+    a,
+    {
+      factor: FACTOR[a],
+      get label() {
+        return t(`activity.${a}`);
+      },
+      get detail() {
+        return t(`activity.${a}.detail`);
+      },
+    },
+  ]),
 ) as Record<Activity, { factor: number; label: string; detail: string }>;
 
 export type Sex = "male" | "female";
@@ -49,11 +60,19 @@ export interface TdeeResult {
   protein: [number, number];
 }
 
-export const bmrMifflin = (i: Pick<TdeeInputs, "kg" | "cm" | "age" | "sex">) => 10 * i.kg + 6.25 * i.cm - 5 * i.age + (i.sex === "male" ? 5 : -161);
+export const bmrMifflin = (i: Pick<TdeeInputs, "kg" | "cm" | "age" | "sex">) =>
+  10 * i.kg + 6.25 * i.cm - 5 * i.age + (i.sex === "male" ? 5 : -161);
 export const bmrKatch = (kg: number, bodyFat: number) => 370 + 21.6 * kg * (1 - bodyFat / 100);
 
 export function validInputs(i: Partial<TdeeInputs>): i is TdeeInputs {
-  return !!i.sex && !!i.activity && inRange(i.kg, 25, 350) && inRange(i.cm, 100, 250) && inRange(i.age, 13, 100) && (i.bodyFat === undefined || inRange(i.bodyFat, 3, 60));
+  return (
+    !!i.sex &&
+    !!i.activity &&
+    inRange(i.kg, 25, 350) &&
+    inRange(i.cm, 100, 250) &&
+    inRange(i.age, 13, 100) &&
+    (i.bodyFat === undefined || inRange(i.bodyFat, 3, 60))
+  );
 }
 const inRange = (n: number | undefined, lo: number, hi: number) => typeof n === "number" && Number.isFinite(n) && n >= lo && n <= hi;
 
@@ -116,7 +135,8 @@ export function activityForSteps(steps: number): Activity {
  * two-a-day training level.
  */
 export function withSteps(training: ActivityRead, steps: number): ActivityRead {
-  const s = LEVELS.indexOf(activityForSteps(steps)), t = LEVELS.indexOf(training.activity);
+  const s = LEVELS.indexOf(activityForSteps(steps)),
+    t = LEVELS.indexOf(training.activity);
   let i = Math.max(s, t);
   if (steps >= 7500 && training.perWeek >= 3 && i < 3) i += 1;
   if (training.activity === "athlete") i = 4;
@@ -156,7 +176,8 @@ export function activityForDays(days: number, sessionsPerWeek = days): Activity 
  */
 export function inferActivity(sessions: Pick<SessionSummary, "start">[], daysPerWeek: number, now: number): ActivityRead {
   const first = sessions.reduce((m, s) => Math.min(m, s.start), Infinity);
-  if (!Number.isFinite(first) || now - first < 14 * DAY) return { activity: activityForDays(daysPerWeek), source: "plan", perWeek: daysPerWeek };
+  if (!Number.isFinite(first) || now - first < 14 * DAY)
+    return { activity: activityForDays(daysPerWeek), source: "plan", perWeek: daysPerWeek };
   const from = now - WINDOW_DAYS * DAY;
   const recent = sessions.filter((s) => s.start >= from && s.start <= now);
   // Whole weeks since the window opened (or the first workout), so a weekly lifter whose first workout
@@ -206,7 +227,15 @@ export function currentTdee(events: AppEvent[], sessions: Pick<SessionSummary, "
     activity: activity.activity,
     bodyFat: profile.tdee?.useBodyFat === false ? undefined : currentBodyFat(events, profile),
   };
-  const missing = ([["sex", inputs.sex], ["age", inputs.age], ["height", inputs.cm]] as const).filter(([, v]) => v === undefined).map(([k]) => k);
+  const missing = (
+    [
+      ["sex", inputs.sex],
+      ["age", inputs.age],
+      ["height", inputs.cm],
+    ] as const
+  )
+    .filter(([, v]) => v === undefined)
+    .map(([k]) => k);
   return { inputs, activity, missing, result: validInputs(inputs) ? calcTdee(inputs) : undefined };
 }
 
@@ -223,7 +252,8 @@ export function changesSince(prev: TdeeEvent | undefined, i: TdeeInputs): TdeeCh
   if (Math.abs(prev.cm - i.cm) >= 1) c.push("height");
   if (prev.sex !== i.sex) c.push("sex");
   if (prev.activity !== i.activity) c.push("activity");
-  if ((prev.bodyFat === undefined) !== (i.bodyFat === undefined) || Math.abs((prev.bodyFat ?? 0) - (i.bodyFat ?? 0)) >= 1) c.push("bodyFat");
+  if ((prev.bodyFat === undefined) !== (i.bodyFat === undefined) || Math.abs((prev.bodyFat ?? 0) - (i.bodyFat ?? 0)) >= 1)
+    c.push("bodyFat");
   return c;
 }
 
@@ -234,7 +264,13 @@ export function lastSnapshot(events: AppEvent[]): TdeeEvent | undefined {
 }
 
 /** A new snapshot when the inputs are complete and something that matters changed since the last one. */
-export function snapshotDue(cur: CurrentTdee, events: AppEvent[], now: number, id: string, trigger: TdeeEvent["trigger"] = "auto"): TdeeEvent | null {
+export function snapshotDue(
+  cur: CurrentTdee,
+  events: AppEvent[],
+  now: number,
+  id: string,
+  trigger: TdeeEvent["trigger"] = "auto",
+): TdeeEvent | null {
   if (!cur.result || !validInputs(cur.inputs)) return null;
   const changes = changesSince(lastSnapshot(events), cur.inputs);
   if (!changes.length && trigger === "auto") return null;
@@ -292,13 +328,15 @@ export interface BodyReadings {
  */
 export function bodyUpdates(r: BodyReadings, profile: Profile): Partial<Profile> {
   const p: Partial<Profile> = {};
-  if (r.height && inRange(r.height.value, 100, 250) && Math.abs((profile.heightCm ?? 0) - r.height.value) >= 1) p.heightCm = Math.round(r.height.value);
+  if (r.height && inRange(r.height.value, 100, 250) && Math.abs((profile.heightCm ?? 0) - r.height.value) >= 1)
+    p.heightCm = Math.round(r.height.value);
   return p;
 }
 
 /** Body fat for TDEE: the newer of the latest weigh-in that carries one and the value entered by hand. */
 export function currentBodyFat(events: AppEvent[], profile: Profile): number | undefined {
   let last: { pct: number; at: number } | undefined = profile.bodyFat;
-  for (const e of events) if (e.type === "bodyweight" && e.bodyFat !== undefined && (!last || e.at > last.at)) last = { pct: e.bodyFat, at: e.at };
+  for (const e of events)
+    if (e.type === "bodyweight" && e.bodyFat !== undefined && (!last || e.at > last.at)) last = { pct: e.bodyFat, at: e.at };
   return last ? Math.round(last.pct * 10) / 10 : undefined;
 }

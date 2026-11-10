@@ -71,5 +71,11 @@ export function layoff(ex: Exercise, events: readonly AppEvent[], now: number): 
   if (sessionsSince >= RAMP_SESSIONS) return null;
   const weeks = Math.max(1, Math.floor(away / (7 * DAY)));
   const cut = Math.min(MAX_CUT, CUT_PER_WEEK * weeks);
-  return { weeks, cut, done: sessionsSince, before: Math.max(...prev.map((s) => s.weight)), today: cut * (1 - sessionsSince / RAMP_SESSIONS) };
+  return {
+    weeks,
+    cut,
+    done: sessionsSince,
+    before: Math.max(...prev.map((s) => s.weight)),
+    today: cut * (1 - sessionsSince / RAMP_SESSIONS),
+  };
 }

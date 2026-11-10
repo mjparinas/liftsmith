@@ -11,7 +11,10 @@ export function barFor(ex: Exercise, gym: Gym) {
 
 function nearest(list: number[], v: number): number {
   if (!list.length) return v;
-  return list.reduce((best, x) => (Math.abs(x - v) < Math.abs(best - v) || (Math.abs(x - v) === Math.abs(best - v) && x < best) ? x : best), list[0]);
+  return list.reduce(
+    (best, x) => (Math.abs(x - v) < Math.abs(best - v) || (Math.abs(x - v) === Math.abs(best - v) && x < best) ? x : best),
+    list[0],
+  );
 }
 
 export interface Rounded {

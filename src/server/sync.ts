@@ -46,44 +46,81 @@ export function checkSync(raw: unknown): { ok: true; body: SyncRequest } | { ok:
   if (events.length > MAX_EVENTS || deleted.length > MAX_EVENTS || records.length > 100) return { ok: false, error: "Too many" };
   for (const e of events) {
     const ev = e as { id?: unknown; at?: unknown; type?: unknown };
-    if (!ev || typeof ev !== "object" || typeof ev.id !== "string" || !ID_RE.test(ev.id) || typeof ev.at !== "number" || typeof ev.type !== "string") return { ok: false, error: "Bad event" };
+    if (
+      !ev ||
+      typeof ev !== "object" ||
+      typeof ev.id !== "string" ||
+      !ID_RE.test(ev.id) ||
+      typeof ev.at !== "number" ||
+      typeof ev.type !== "string"
+    )
+      return { ok: false, error: "Bad event" };
   }
   if (deleted.some((d) => typeof d !== "string" || !ID_RE.test(d))) return { ok: false, error: "Bad delete" };
   for (const x of records) {
     const rec = x as Partial<Rec>;
-    if (!rec || typeof rec.key !== "string" || !KEY_RE.test(rec.key) || typeof rec.updatedAt !== "number" || rec.value === undefined) return { ok: false, error: "Bad record" };
+    if (!rec || typeof rec.key !== "string" || !KEY_RE.test(rec.key) || typeof rec.updatedAt !== "number" || rec.value === undefined)
+      return { ok: false, error: "Bad record" };
     if (rec.key === "profile" && rec.value === null) return { ok: false, error: "Bad record" };
   }
-  return { ok: true, body: { cursor, events: events as SyncRequest["events"], deleted: deleted as string[], records: records as Rec[], first: r.first === true } };
+  return {
+    ok: true,
+    body: {
+      cursor,
+      events: events as SyncRequest["events"],
+      deleted: deleted as string[],
+      records: records as Rec[],
+      first: r.first === true,
+    },
+  };
 }
 
 export async function sync(accountId: string, session: string, req: SyncRequest): Promise<SyncResponse> {
   const stmts: { sql: string; args: (string | number | null)[] }[] = [];
   // New events. An id the account already has (or deleted) is left alone, so a tombstone is never undone.
   for (const e of req.events) {
-    stmts.push({ sql: "INSERT OR IGNORE INTO sync_events (account_id, id, at, body, session) VALUES (?, ?, ?, ?, ?)", args: [accountId, e.id, e.at, JSON.stringify(e), session] });
+    stmts.push({
+      sql: "INSERT OR IGNORE INTO sync_events (account_id, id, at, body, session) VALUES (?, ?, ?, ?, ?)",
+      args: [accountId, e.id, e.at, JSON.stringify(e), session],
+    });
   }
   // Deletes: a tombstone gets a new seq, so devices that already pulled the event see the delete.
   for (const id of req.deleted) {
     stmts.push({ sql: "DELETE FROM sync_events WHERE account_id = ? AND id = ?", args: [accountId, id] });
-    stmts.push({ sql: "INSERT INTO sync_events (account_id, id, at, body, session) VALUES (?, ?, 0, NULL, ?)", args: [accountId, id, session] });
+    stmts.push({
+      sql: "INSERT INTO sync_events (account_id, id, at, body, session) VALUES (?, ?, 0, NULL, ?)",
+      args: [accountId, id, session],
+    });
   }
   if (stmts.length) await batch(stmts);
 
   // Records: keep whichever is newer. On a device's first sync the account's profile wins.
-  const have = new Map((await query<{ key: string; body: string | null; updated_at: number }>("SELECT key, body, updated_at FROM sync_records WHERE account_id = ?", [accountId])).map((r) => [String(r.key), r]));
+  const have = new Map(
+    (
+      await query<{ key: string; body: string | null; updated_at: number }>(
+        "SELECT key, body, updated_at FROM sync_records WHERE account_id = ?",
+        [accountId],
+      )
+    ).map((r) => [String(r.key), r]),
+  );
   const writes = [];
   for (const r of req.records) {
     const cur = have.get(r.key);
     if (cur && (Number(cur.updated_at) >= r.updatedAt || (req.first && r.key === "profile"))) continue;
     const body = r.value === null ? null : JSON.stringify(r.value);
-    writes.push({ sql: "INSERT INTO sync_records (account_id, key, body, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT(account_id, key) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at", args: [accountId, r.key, body, r.updatedAt] });
+    writes.push({
+      sql: "INSERT INTO sync_records (account_id, key, body, updated_at) VALUES (?, ?, ?, ?) ON CONFLICT(account_id, key) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at",
+      args: [accountId, r.key, body, r.updatedAt],
+    });
     have.set(r.key, { key: r.key, body, updated_at: r.updatedAt });
   }
   if (writes.length) await batch(writes);
 
   // Pull: what this account has past the cursor, less what this session wrote itself.
-  const rows = await query<{ seq: number; id: string; body: string | null; session: string | null }>("SELECT seq, id, body, session FROM sync_events WHERE account_id = ? AND seq > ? ORDER BY seq LIMIT ?", [accountId, req.cursor, PAGE]);
+  const rows = await query<{ seq: number; id: string; body: string | null; session: string | null }>(
+    "SELECT seq, id, body, session FROM sync_events WHERE account_id = ? AND seq > ? ORDER BY seq LIMIT ?",
+    [accountId, req.cursor, PAGE],
+  );
   const events: unknown[] = [];
   const deleted: string[] = [];
   for (const r of rows) {
@@ -92,6 +129,10 @@ export async function sync(accountId: string, session: string, req: SyncRequest)
     else events.push(JSON.parse(String(r.body)));
   }
   const cursor = rows.length ? Number(rows[rows.length - 1].seq) : req.cursor;
-  const records: Rec[] = [...have.values()].map((r) => ({ key: String(r.key), value: r.body == null ? null : JSON.parse(String(r.body)), updatedAt: Number(r.updated_at) }));
+  const records: Rec[] = [...have.values()].map((r) => ({
+    key: String(r.key),
+    value: r.body == null ? null : JSON.parse(String(r.body)),
+    updatedAt: Number(r.updated_at),
+  }));
   return { cursor, events, deleted, records, more: rows.length === PAGE };
 }

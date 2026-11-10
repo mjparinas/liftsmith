@@ -1,15 +1,23 @@
 // HTTP plumbing shared by the account and sync routes. The native shells call from their own origins with a
 // Bearer token (no cookies), so CORS allows only those origins, and the website calls from its own.
 import { NATIVE_ORIGINS } from "@/lib/feedbackServer";
+
 import { sessionOf } from "./accounts";
 
 export function cors(origin: string | null): Record<string, string> {
   return origin && NATIVE_ORIGINS.has(origin)
-    ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization", "Access-Control-Max-Age": "86400", Vary: "Origin" }
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
+        "Access-Control-Max-Age": "86400",
+        Vary: "Origin",
+      }
     : {};
 }
 
-export const reply = (req: Request, status: number, body: unknown) => Response.json(body, { status, headers: { "Cache-Control": "no-store", ...cors(req.headers.get("origin")) } });
+export const reply = (req: Request, status: number, body: unknown) =>
+  Response.json(body, { status, headers: { "Cache-Control": "no-store", ...cors(req.headers.get("origin")) } });
 
 export const preflight = (req: Request) => new Response(null, { status: 204, headers: cors(req.headers.get("origin")) });
 

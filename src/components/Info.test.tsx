@@ -2,13 +2,20 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
+
 import { GLOSSARY } from "@/lib/glossary";
+
 import { Info } from "./Info";
 
 describe("Info", () => {
   it("explains a term in a labelled dialog, and gives focus back when closed", async () => {
     const user = userEvent.setup();
-    render(<h2>Build weeks before a deload<Info term="deloadWeeks" /></h2>);
+    render(
+      <h2>
+        Build weeks before a deload
+        <Info term="deloadWeeks" />
+      </h2>,
+    );
     const btn = screen.getByRole("button", { name: "What is build weeks before a deload?" });
     await user.click(btn);
     const dialog = screen.getByRole("dialog", { name: GLOSSARY.deloadWeeks.title });

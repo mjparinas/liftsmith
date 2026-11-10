@@ -3,7 +3,16 @@
 // POST `{ action: "handled" | "archive" | "reply", id, ... }`; changes need an admin and are audited.
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
-import { getInboxMessage, InboxError, inboxConfigured, listInbox, markArchived, markHandled, replyToInbox, waitingMail } from "@/server/inbox";
+import {
+  getInboxMessage,
+  inboxConfigured,
+  InboxError,
+  listInbox,
+  markArchived,
+  markHandled,
+  replyToInbox,
+  waitingMail,
+} from "@/server/inbox";
 
 const ID = /^[A-Za-z0-9-]{1,100}$/;
 const fail = (e: unknown) => json(e instanceof InboxError ? e.status : 502, { error: (e as Error).message });

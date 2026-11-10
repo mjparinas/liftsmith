@@ -4,16 +4,23 @@
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useApp } from "@/lib/store";
+
 import { setBillingLive } from "@/lib/billing";
-import { App } from "./App";
 import { exercise } from "@/lib/exercises";
+import { useApp } from "@/lib/store";
+
+import { App } from "./App";
 
 // jsdom has no canvas.
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
 beforeEach(async () => {
-  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  window.matchMedia ??= ((q: string) => ({
+    matches: false,
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  })) as unknown as typeof window.matchMedia;
   window.scrollTo = () => {};
   location.hash = "";
   await useApp.getState().reset();
@@ -87,7 +94,9 @@ describe("Pro trial offer", () => {
     await user.click(screen.getByTestId("body-muscles"));
     expect(await screen.findByText("The recovery map is part of Pro")).toBeInTheDocument();
     // Pro arrives (a purchase, a restore): their adaptive plan comes back.
-    act(() => setBillingLive(true, { active: true, trial: true, plan: "annual", expiresAt: Date.now() + 14 * 86_400_000, willRenew: true }));
+    act(() =>
+      setBillingLive(true, { active: true, trial: true, plan: "annual", expiresAt: Date.now() + 14 * 86_400_000, willRenew: true }),
+    );
     await waitFor(() => expect(useApp.getState().profile.planSource).toEqual({ kind: "adaptive" }));
     expect(useApp.getState().profile.proPlan).toBeUndefined();
   });
@@ -128,7 +137,11 @@ describe("first run to finished workout", () => {
 
     const sets = useApp.getState().events.filter((e) => e.type === "set");
     expect(sets).toHaveLength(1);
-    expect(sets[0]).toMatchObject({ exerciseId: plan.items[0].exerciseId, reps: plan.items[0].target.reps, weight: plan.items[0].target.weight });
+    expect(sets[0]).toMatchObject({
+      exerciseId: plan.items[0].exerciseId,
+      reps: plan.items[0].target.reps,
+      weight: plan.items[0].target.weight,
+    });
 
     await user.click(screen.getByRole("button", { name: "End" }));
     await user.click(screen.getByRole("button", { name: "Finish and save" }));
@@ -307,7 +320,11 @@ describe("first run to finished workout", () => {
     await user.type(name, "Monday");
     // Drop the last exercise and add one from the library.
     const last = plan.items[plan.items.length - 1].exerciseId;
-    await user.click(within(dialog).getAllByRole("button", { name: /^Remove / }).at(-1)!);
+    await user.click(
+      within(dialog)
+        .getAllByRole("button", { name: /^Remove / })
+        .at(-1)!,
+    );
     await user.click(within(dialog).getByRole("button", { name: "Add exercise" }));
     await user.type(within(dialog).getByLabelText("Add exercise"), "lateral raise");
     await user.click(within(dialog).getAllByRole("button", { name: /Lateral raise/i })[0]);
@@ -467,7 +484,12 @@ describe("injury mode", () => {
     expect(useApp.getState().events.find((e) => e.type === "pain")).toMatchObject({ score: 6 });
     expect(screen.getByRole("img", { name: /Knee pain, oldest to newest: 6/ })).toBeInTheDocument();
     await user.selectOptions(screen.getByRole("combobox", { name: "How does it feel today?" }), "4");
-    expect(useApp.getState().events.filter((e) => e.type === "pain").map((e) => e.type === "pain" && e.score)).toEqual([6, 4]);
+    expect(
+      useApp
+        .getState()
+        .events.filter((e) => e.type === "pain")
+        .map((e) => e.type === "pain" && e.score),
+    ).toEqual([6, 4]);
     expect(kneeIn(useApp.getState().preview!.items.map((i) => i.exerciseId))).toEqual([]);
 
     // Choosing to train one lighter needs the risk warning ticked first.
@@ -483,7 +505,12 @@ describe("injury mode", () => {
     await user.click(within(warn).getByRole("button", { name: "60%" }));
     await user.click(within(warn).getByRole("checkbox", { name: "I understand the risks" }));
     await user.click(within(warn).getByRole("button", { name: "Train it at 60%" }));
-    expect(useApp.getState().events.find((e) => e.type === "injuryRule")).toMatchObject({ exerciseId: id, action: "light", pct: 60, ack: true });
+    expect(useApp.getState().events.find((e) => e.type === "injuryRule")).toMatchObject({
+      exerciseId: id,
+      action: "light",
+      pct: 60,
+      ack: true,
+    });
     expect(within(card).getByText("60% load")).toBeInTheDocument();
     const leg = useApp.getState().preview!.items.find((i) => i.exerciseId === id);
     if (leg) expect(leg.injuryPct).toBe(60);
@@ -504,7 +531,9 @@ describe("injury mode", () => {
     const { affects } = await import("@/lib/injury");
     const { exercise } = await import("@/lib/exercises");
     const items = useApp.getState().active!.plan.items;
-    const part = (["shoulder", "knee", "lowerBack", "chest"] as const).find((p) => items.slice(1).some((i) => affects(p, exercise(i.exerciseId))))!;
+    const part = (["shoulder", "knee", "lowerBack", "chest"] as const).find((p) =>
+      items.slice(1).some((i) => affects(p, exercise(i.exerciseId))),
+    )!;
     act(() => void useApp.getState().logInjury(part));
     const after = useApp.getState().active!.plan.items;
     expect(after[0].exerciseId).toBe(items[0].exerciseId);
@@ -569,7 +598,9 @@ describe("saving your progress", () => {
     await onboard(user);
     const { backupJson } = await import("@/lib/exportData");
     const s = useApp.getState();
-    const file = backupJson({ ...s.profile, name: "Restored" }, s.gyms, [{ type: "bodyweight", id: "bw-old", at: Date.now() - 86_400_000, kg: 81 } as never]);
+    const file = backupJson({ ...s.profile, name: "Restored" }, s.gyms, [
+      { type: "bodyweight", id: "bw-old", at: Date.now() - 86_400_000, kg: 81 } as never,
+    ]);
     Element.prototype.scrollIntoView ??= () => {};
     location.hash = "#/settings/saving";
     await screen.findByText("Saving and backup");

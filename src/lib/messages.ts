@@ -1,3 +1,6 @@
+// While billing isn't live everyone has Pro, so the planner sends no Pro offers (billing.ts).
+import { billingLive as billingIsLive } from "./billing";
+
 // Reminders and lifecycle messages (Melvin, 2026-11-09): workout reminders on training days, a nudge
 // after a missed training day, streak alerts, comebacks, milestones and Pro offers, by push
 // notification and by email. One pure planner serves both: the phone schedules local notifications
@@ -18,11 +21,26 @@ export type MessageKind = "reminder" | "missed" | "streak" | "milestone" | "pro"
 export type Channel = "push" | "email";
 
 export const KIND_INFO: Record<MessageKind, { label: string; blurb: string; push: boolean; email: boolean }> = {
-  reminder: { label: "Workout reminders", blurb: "On your training days at your workout time. By email, one note on Monday with your week.", push: true, email: true },
-  missed: { label: "Missed workouts", blurb: "A nudge the day after a missed training day, and a check-in if a week goes by.", push: true, email: true },
+  reminder: {
+    label: "Workout reminders",
+    blurb: "On your training days at your workout time. By email, one note on Monday with your week.",
+    push: true,
+    email: true,
+  },
+  missed: {
+    label: "Missed workouts",
+    blurb: "A nudge the day after a missed training day, and a check-in if a week goes by.",
+    push: true,
+    email: true,
+  },
   streak: { label: "Streak alerts", blurb: "When this week's goal is still reachable but only just.", push: true, email: true },
   milestone: { label: "Milestones", blurb: "Your first workout, and streaks of 4, 8, 12, 26 and 52 weeks.", push: false, email: true },
-  pro: { label: "Pro trial and offers", blurb: "When your trial is about to end, and now and then what Pro adds. Never more than one every two weeks.", push: true, email: true },
+  pro: {
+    label: "Pro trial and offers",
+    blurb: "When your trial is about to end, and now and then what Pro adds. Never more than one every two weeks.",
+    push: true,
+    email: true,
+  },
 };
 
 export const KINDS = Object.keys(KIND_INFO) as MessageKind[];
@@ -31,9 +49,6 @@ export const EMAIL_KINDS = KINDS.filter((k) => KIND_INFO[k].email);
 
 /** On unless the lifter turned them off. Pro offers are off until they turn them on (store rules and GDPR). */
 export const DEFAULT_ON: Record<MessageKind, boolean> = { reminder: true, missed: true, streak: true, milestone: true, pro: false };
-
-// While billing isn't live everyone has Pro, so the planner sends no Pro offers (billing.ts).
-import { billingLive as billingIsLive } from "./billing";
 
 export type ProState =
   | { state: "pro" }
@@ -96,7 +111,16 @@ const fmtCache = new Map<string, Intl.DateTimeFormat>();
 function fmt(tz: string) {
   let f = fmtCache.get(tz);
   if (!f) {
-    f = new Intl.DateTimeFormat("en-US", { timeZone: tz, hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", weekday: "short" });
+    f = new Intl.DateTimeFormat("en-US", {
+      timeZone: tz,
+      hourCycle: "h23",
+      year: "numeric",
+      month: "numeric",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      weekday: "short",
+    });
     fmtCache.set(tz, f);
   }
   return f;
@@ -213,7 +237,10 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
       const needed = goal - done;
       const daysLeft = 7 - ((wd + 6) % 7); // today included
       if (needed > 0 && needed === daysLeft && !trainedToday) {
-        streakLine = needed === 1 ? `One workout today keeps your ${input.streakWeeks}-week streak.` : `${needed} workouts left this week to keep your ${input.streakWeeks}-week streak.`;
+        streakLine =
+          needed === 1
+            ? `One workout today keeps your ${input.streakWeeks}-week streak.`
+            : `${needed} workouts left this week to keep your ${input.streakWeeks}-week streak.`;
       }
     }
 
@@ -224,7 +251,8 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
         "reminder",
         atTime(day, time, tz),
         first ? "Your first workout is ready" : "Today's workout is ready",
-        streakLine ?? (first ? "It's planned around your gym and takes one tap a set." : "Planned from your recovery and last session. Tap to start."),
+        streakLine ??
+          (first ? "It's planned around your gym and takes one tap a set." : "Planned from your recovery and last session. Tap to start."),
       );
     }
     if (email && wd === 1 && input.days.length) {
@@ -251,7 +279,12 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
     }
     const yesterday = addDays(day, -1, tz);
     if (!trainedToday && missedDays[0] === yesterday && missedDays.length === (email ? 2 : 1) && !input.days.includes(wd)) {
-      add("missed", atTime(day, sendHour, tz), email ? "Two training days slipped by" : "Missed yesterday? Today works too", "A short workout today picks your freshest muscles. Your streak counts weeks, so there's still time.");
+      add(
+        "missed",
+        atTime(day, sendHour, tz),
+        email ? "Two training days slipped by" : "Missed yesterday? Today works too",
+        "A short workout today picks your freshest muscles. Your streak counts weeks, so there's still time.",
+      );
     }
 
     // Comebacks: 7, 14 and 30 days with no workout (or since setup, if none yet), then nothing.
@@ -261,18 +294,34 @@ export function plan(input: PlanInput, from: number, to: number, channel: Channe
         "missed",
         atTime(day, sendHour, tz),
         input.firstWorkoutAt ? "Ready when you are" : "Your first workout is still waiting",
-        input.firstWorkoutAt ? `It's been ${quiet} days. Your next workout starts a little lighter so you can ease back in.` : "Pick a length, tap start, and the app does the planning.",
+        input.firstWorkoutAt
+          ? `It's been ${quiet} days. Your next workout starts a little lighter so you can ease back in.`
+          : "Pick a length, tap start, and the app does the planning.",
       );
     }
 
     // Pro: two days before a trial ends, then four offers spread over two months. proState() reports
     // everyone as Pro while billing is off, so none go out until it's live.
     if (input.pro.state === "trial") {
-      if (day === addDays(input.pro.endsAt, -2, tz)) add("pro", atTime(day, "12:00", tz), "Your Pro trial ends in 2 days", "Keep adaptive workouts, the recovery map and full stats, or do nothing and stay on the free plan.", "settings");
+      if (day === addDays(input.pro.endsAt, -2, tz))
+        add(
+          "pro",
+          atTime(day, "12:00", tz),
+          "Your Pro trial ends in 2 days",
+          "Keep adaptive workouts, the recovery map and full stats, or do nothing and stay on the free plan.",
+          "settings",
+        );
     }
     if (input.pro.state === "free") {
       const n = PRO_OFFER_DAYS.indexOf(Math.round((day - dayStart(input.pro.since, tz)) / DAY));
-      if (n >= 0) add("pro", atTime(day, "12:00", tz), PRO_FEATURES[n].title, `${PRO_FEATURES[n].body} Try Pro free, cancel in two taps.`, "settings");
+      if (n >= 0)
+        add(
+          "pro",
+          atTime(day, "12:00", tz),
+          PRO_FEATURES[n].title,
+          `${PRO_FEATURES[n].body} Try Pro free, cancel in two taps.`,
+          "settings",
+        );
     }
 
     // One a day: the reminder (the lifter asked for it) wins, then streak, missed, Pro.
@@ -289,17 +338,34 @@ export function inQuiet(at: number, tz: string): boolean {
 }
 
 /** A milestone email for a change the phone just reported, or null. Sent right away, not scheduled. */
-export function milestone(prev: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks"> | null, next: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks">, now: number): { key: string; title: string; body: string } | null {
+export function milestone(
+  prev: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks"> | null,
+  next: Pick<PlanInput, "firstWorkoutAt" | "streakWeeks">,
+  now: number,
+): { key: string; title: string; body: string } | null {
   if (next.firstWorkoutAt && !prev?.firstWorkoutAt && now - next.firstWorkoutAt < 3 * DAY) {
-    return { key: "milestone:first", title: "Your first workout is in the books", body: "Nice work. Your next workout builds on today's weights and reps, and your recovery map now shows what you trained." };
+    return {
+      key: "milestone:first",
+      title: "Your first workout is in the books",
+      body: "Nice work. Your next workout builds on today's weights and reps, and your recovery map now shows what you trained.",
+    };
   }
   const w = MILESTONE_WEEKS.find((m) => next.streakWeeks >= m && (prev?.streakWeeks ?? 0) < m);
-  if (w) return { key: `milestone:streak${w}`, title: `${w} weeks in a row`, body: `You've hit your training goal ${w} weeks running. That's how strength is built.` };
+  if (w)
+    return {
+      key: `milestone:streak${w}`,
+      title: `${w} weeks in a row`,
+      body: `You've hit your training goal ${w} weeks running. That's how strength is built.`,
+    };
   return null;
 }
 
 /** How a profile's Pro choice reads for messages (trial.ts records it; billing will own it). */
-export function proState(pro: { trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean } | undefined, now: number, billingLive = billingIsLive()): ProState {
+export function proState(
+  pro: { trialStartedAt?: number; trialDays?: number; declinedAt?: number; subscribed?: boolean } | undefined,
+  now: number,
+  billingLive = billingIsLive(),
+): ProState {
   if (!billingLive || pro?.subscribed) return { state: "pro" };
   if (pro?.trialStartedAt && pro.trialDays) {
     const endsAt = pro.trialStartedAt + pro.trialDays * DAY;

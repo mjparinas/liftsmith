@@ -1,9 +1,9 @@
 import { blockWeek } from "./block";
 import { available, exercise, EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import { alternatives, generate, planSeconds, type Plan, type PlanItem, type SetTarget } from "./generator";
-import { roundLoad, stepLoad } from "./loads";
-import { layoff } from "./layoff";
 import { t } from "./i18n";
+import { layoff } from "./layoff";
+import { roundLoad, stepLoad } from "./loads";
 import { epley, sessionsOf, startE1rm, TIMED, weightFor } from "./progression";
 import type { Call } from "./readiness";
 import { MUSCLES, type AppEvent, type Equipment, type Gym, type Muscle, type PlanSource, type Profile, type SetEvent } from "./types";
@@ -25,7 +25,8 @@ import { withWarmups } from "./warmup";
 // Several of the originals are trademarks (Starting Strength, 5/3/1, StrongLifts), so every program
 // has a plain descriptive name and credits the original in its info text.
 
-export type ProgramId = "classic-5x5" | "ramping-5x5" | "5x5-plus" | "novice-3x5" | "tiered" | "waves" | "calisthenics" | "ppl" | "upper-lower";
+export type ProgramId =
+  "classic-5x5" | "ramping-5x5" | "5x5-plus" | "novice-3x5" | "tiered" | "waves" | "calisthenics" | "ppl" | "upper-lower";
 
 export interface ProgramInfo {
   id: ProgramId;
@@ -123,7 +124,8 @@ export const PROGRAMS: ProgramInfo[] = [
     name: "Tiered progression",
     basedOn: "Based on GZCLP by Cody Lefever (the GZCL method).",
     aka: ["GZCLP", "GZCL"],
-    summary: "Three tiers each day: a heavy main lift, a lighter second lift for volume, and a light pump exercise. Each tier has its own plan for stalls.",
+    summary:
+      "Three tiers each day: a heavy main lift, a lighter second lift for volume, and a light pump exercise. Each tier has its own plan for stalls.",
     how: [
       "T1, the main lift: 5×3, last set as many reps as you can. Get them all and add weight. Miss and move to 6×2, then 10×1, then restart 5×3 at 85%.",
       "T2, the second lift: 3×10. Miss and move to 3×8, then 3×6, then back to 3×10 a little heavier than your last 3×10.",
@@ -159,7 +161,8 @@ export const PROGRAMS: ProgramInfo[] = [
     name: "Bodyweight skills",
     basedOn: "Based on the r/bodyweightfitness Recommended Routine.",
     aka: ["Calisthenics", "Recommended Routine", "BWF RR", "bodyweight fitness"],
-    summary: "Full-body bodyweight training, three days a week. Each movement climbs a ladder of harder versions, from wall push-ups to one-leg squats.",
+    summary:
+      "Full-body bodyweight training, three days a week. Each movement climbs a ladder of harder versions, from wall push-ups to one-leg squats.",
     how: [
       "Pairs, done back to back: pull-up with squat, dip with hinge, row with push-up. Then three core exercises.",
       "3 sets of 5 to 8 reps. When you get 3×8, the next session moves you one step up the ladder at 3×5.",
@@ -301,7 +304,8 @@ export function e1Of(exId: string, ctx: Ctx): number {
   return startE1rm(ex, ctx.profile, ctx.now);
 }
 
-const W = (exId: string, ctx: Ctx, reps: number, rir: number) => (exercise(exId).load === "bodyweight" ? 0 : weightFor(e1Of(exId, ctx), reps, rir));
+const W = (exId: string, ctx: Ctx, reps: number, rir: number) =>
+  exercise(exId).load === "bodyweight" ? 0 : weightFor(e1Of(exId, ctx), reps, rir);
 
 /** Every working set hit its target. */
 function allHit(sets: readonly SetEvent[] | undefined, planned: number): boolean {
@@ -351,7 +355,8 @@ function linearNote(l: Lift, limit = 3): string {
   return "First session: starting light on purpose";
 }
 
-const straight = (w: number, sets: number, reps: number, amrapLast = false): SetTarget[] => Array.from({ length: sets }, (_, i) => ({ weight: w, reps, amrap: amrapLast && i === sets - 1 ? true : undefined }));
+const straight = (w: number, sets: number, reps: number, amrapLast = false): SetTarget[] =>
+  Array.from({ length: sets }, (_, i) => ({ weight: w, reps, amrap: amrapLast && i === sets - 1 ? true : undefined }));
 
 function linearSlot(key: string, l: Lift, sets: number, reps: number, rest: number, label?: string): Slot {
   return { key, ex: key, sets: straight(l.w, sets, reps), rest, scheme: `${sets} × ${reps}`, note: linearNote(l), label, rir: 2 };
@@ -383,7 +388,9 @@ function linearEngine(def: LinearDef): Engine {
       return {
         name: d.name,
         note: `Next time: ${def.days[(day + 1) % def.days.length].name}`,
-        slots: liftsOf(s, day).map(([ex, sets, reps]) => linearSlot(ex, lift(ex), sets, reps, def.accessories?.has(ex) ? 90 : 180, def.accessories?.has(ex) ? "Accessory" : undefined)),
+        slots: liftsOf(s, day).map(([ex, sets, reps]) =>
+          linearSlot(ex, lift(ex), sets, reps, def.accessories?.has(ex) ? 90 : 180, def.accessories?.has(ex) ? "Accessory" : undefined),
+        ),
       };
     },
     apply(s, day, sets, lift, ctx) {
@@ -397,26 +404,83 @@ function linearEngine(def: LinearDef): Engine {
 
 const CLASSIC = linearEngine({
   days: [
-    { name: "Workout A", lifts: [["back-squat", 5, 5], ["bench-press", 5, 5], ["barbell-row", 5, 5]] },
-    { name: "Workout B", lifts: [["back-squat", 5, 5], ["overhead-press", 5, 5], ["deadlift", 1, 5]] },
+    {
+      name: "Workout A",
+      lifts: [
+        ["back-squat", 5, 5],
+        ["bench-press", 5, 5],
+        ["barbell-row", 5, 5],
+      ],
+    },
+    {
+      name: "Workout B",
+      lifts: [
+        ["back-squat", 5, 5],
+        ["overhead-press", 5, 5],
+        ["deadlift", 1, 5],
+      ],
+    },
   ],
   big: new Set(["deadlift"]),
 });
 
 const NOVICE = linearEngine({
   days: [
-    { name: "Workout A", lifts: [["back-squat", 3, 5], ["bench-press", 3, 5], ["deadlift", 1, 5]] },
-    { name: "Workout B", lifts: [["back-squat", 3, 5], ["overhead-press", 3, 5], ["deadlift", 1, 5]] },
+    {
+      name: "Workout A",
+      lifts: [
+        ["back-squat", 3, 5],
+        ["bench-press", 3, 5],
+        ["deadlift", 1, 5],
+      ],
+    },
+    {
+      name: "Workout B",
+      lifts: [
+        ["back-squat", 3, 5],
+        ["overhead-press", 3, 5],
+        ["deadlift", 1, 5],
+      ],
+    },
   ],
   big: new Set(["back-squat", "deadlift"]),
   // After six sessions, power cleans take the deadlift's place on B.
-  pick: (s, day) => (day === 1 && s.n >= 6 ? [["back-squat", 3, 5], ["overhead-press", 3, 5], ["power-clean", 5, 3]] : undefined),
+  pick: (s, day) =>
+    day === 1 && s.n >= 6
+      ? [
+          ["back-squat", 3, 5],
+          ["overhead-press", 3, 5],
+          ["power-clean", 5, 3],
+        ]
+      : undefined,
 });
 
 const PLUS = linearEngine({
   days: [
-    { name: "Workout A", lifts: [["back-squat", 5, 5], ["bench-press", 5, 5], ["barbell-row", 5, 5], ["barbell-shrug", 3, 8], ["skull-crusher", 3, 8], ["barbell-curl", 3, 8]] },
-    { name: "Workout B", lifts: [["back-squat", 5, 5], ["deadlift", 1, 5], ["overhead-press", 5, 5], ["barbell-row", 5, 5], ["close-grip-bench", 3, 8], ["barbell-curl", 3, 8], ["back-extension", 2, 10], ["cable-crunch", 3, 10]] },
+    {
+      name: "Workout A",
+      lifts: [
+        ["back-squat", 5, 5],
+        ["bench-press", 5, 5],
+        ["barbell-row", 5, 5],
+        ["barbell-shrug", 3, 8],
+        ["skull-crusher", 3, 8],
+        ["barbell-curl", 3, 8],
+      ],
+    },
+    {
+      name: "Workout B",
+      lifts: [
+        ["back-squat", 5, 5],
+        ["deadlift", 1, 5],
+        ["overhead-press", 5, 5],
+        ["barbell-row", 5, 5],
+        ["close-grip-bench", 3, 8],
+        ["barbell-curl", 3, 8],
+        ["back-extension", 2, 10],
+        ["cable-crunch", 3, 10],
+      ],
+    },
   ],
   big: new Set(["deadlift"]),
   accessories: new Set(["barbell-shrug", "skull-crusher", "barbell-curl", "close-grip-bench", "back-extension", "cable-crunch"]),
@@ -436,13 +500,29 @@ const RAMPING: Engine = {
   startFor: (key, ctx) => W(key, ctx, 5, 1) * 0.93,
   build(s, day, lift) {
     const ramp = (pcts: number[], reps: number, top: number) => pcts.map((p) => ({ weight: top * p, reps }));
-    const slot = (ex: string, sets: SetTarget[], scheme: string, note: string): Slot => ({ key: ex, ex, sets, rest: 180, scheme, note, ramp: true, rir: 1 });
+    const slot = (ex: string, sets: SetTarget[], scheme: string, note: string): Slot => ({
+      key: ex,
+      ex,
+      sets,
+      rest: 180,
+      scheme,
+      note,
+      ramp: true,
+      rir: 1,
+    });
     const week = Math.floor(s.n / 3) + 1;
     if (day === 0) {
       return {
         name: "Heavy day",
         note: `Week ${week}`,
-        slots: ["back-squat", "bench-press", "barbell-row"].map((ex) => slot(ex, ramp(RAMP5, 5, lift(ex).w), "5 sets of 5, up to a top set", lift(ex).last === "up" ? "Top set: last week's triple, now for 5" : "Ramp up 12.5% a set to the top set")),
+        slots: ["back-squat", "bench-press", "barbell-row"].map((ex) =>
+          slot(
+            ex,
+            ramp(RAMP5, 5, lift(ex).w),
+            "5 sets of 5, up to a top set",
+            lift(ex).last === "up" ? "Top set: last week's triple, now for 5" : "Ramp up 12.5% a set to the top set",
+          ),
+        ),
       };
     }
     if (day === 1) {
@@ -451,7 +531,12 @@ const RAMPING: Engine = {
         name: "Light day",
         note: `Week ${week}`,
         slots: [
-          slot("back-squat", [0.5, 0.625, 0.75, 0.75].map((p) => ({ weight: sq * p, reps: 5 })), "4 × 5, light", "Light squats to recover for the top-set day"),
+          slot(
+            "back-squat",
+            [0.5, 0.625, 0.75, 0.75].map((p) => ({ weight: sq * p, reps: 5 })),
+            "4 × 5, light",
+            "Light squats to recover for the top-set day",
+          ),
           slot("overhead-press", ramp(RAMP4, 5, lift("overhead-press").w), "4 sets of 5, up to a top set", "Ramp up to the top set"),
           slot("deadlift", ramp(RAMP4, 5, lift("deadlift").w), "4 sets of 5, up to a top set", "Ramp up to the top set"),
         ],
@@ -462,7 +547,12 @@ const RAMPING: Engine = {
       note: `Week ${week}`,
       slots: ["back-squat", "bench-press", "barbell-row"].map((ex) => {
         const top = lift(ex).w;
-        return slot(ex, [...ramp(RAMP5.slice(0, 4), 5, top), { weight: top * WEEKLY, reps: 3 }, { weight: top * 0.75, reps: 8 }], "4 ramp sets, a triple, a back-off 8", "The triple is a new top weight. Make it and next week starts there");
+        return slot(
+          ex,
+          [...ramp(RAMP5.slice(0, 4), 5, top), { weight: top * WEEKLY, reps: 3 }, { weight: top * 0.75, reps: 8 }],
+          "4 ramp sets, a triple, a back-off 8",
+          "The triple is a new top weight. Make it and next week starts there",
+        );
       }),
     };
   },
@@ -487,8 +577,16 @@ const RAMPING: Engine = {
 // ---------------------------------------------------------------------------------------------
 // Tiered progression
 
-const T1: [sets: number, reps: number][] = [[5, 3], [6, 2], [10, 1]];
-const T2: [sets: number, reps: number][] = [[3, 10], [3, 8], [3, 6]];
+const T1: [sets: number, reps: number][] = [
+  [5, 3],
+  [6, 2],
+  [10, 1],
+];
+const T2: [sets: number, reps: number][] = [
+  [3, 10],
+  [3, 8],
+  [3, 6],
+];
 const TIER_DAYS: { t1: string; t2: string; t3: string }[] = [
   { t1: "back-squat", t2: "bench-press", t3: "lat-pulldown" },
   { t1: "overhead-press", t2: "deadlift", t3: "db-row" },
@@ -512,15 +610,47 @@ const TIERED: Engine = {
     const l3 = lift(`T3:${d.t3}`);
     const [s1, r1] = T1[l1.stage];
     const [s2, r2] = T2[l2.stage];
-    const n1 = l1.last === "up" ? "Got them all: weight up" : l1.last === "step" ? `Stalled: same weight as ${s1}×${r1}` : l1.last === "reset" ? "Fresh start at 85%" : "Last set: as many as you can";
-    const n2 = l2.last === "up" ? "Got them all: weight up" : l2.last === "step" ? `Stalled: same weight as ${s2}×${r2}` : l2.last === "reset" ? "Back to 3×10, heavier than last time" : "Steady reps, a little in reserve";
+    const n1 =
+      l1.last === "up"
+        ? "Got them all: weight up"
+        : l1.last === "step"
+          ? `Stalled: same weight as ${s1}×${r1}`
+          : l1.last === "reset"
+            ? "Fresh start at 85%"
+            : "Last set: as many as you can";
+    const n2 =
+      l2.last === "up"
+        ? "Got them all: weight up"
+        : l2.last === "step"
+          ? `Stalled: same weight as ${s2}×${r2}`
+          : l2.last === "reset"
+            ? "Back to 3×10, heavier than last time"
+            : "Steady reps, a little in reserve";
     return {
       name: `Day ${day + 1}`,
       note: `${exercise(d.t1).name} day`,
       slots: [
-        { key: `T1:${d.t1}`, ex: d.t1, sets: straight(l1.w, s1, r1, true), rest: 180, scheme: `${s1} × ${r1}+`, label: "T1", note: n1, rir: 1 },
+        {
+          key: `T1:${d.t1}`,
+          ex: d.t1,
+          sets: straight(l1.w, s1, r1, true),
+          rest: 180,
+          scheme: `${s1} × ${r1}+`,
+          label: "T1",
+          note: n1,
+          rir: 1,
+        },
         { key: `T2:${d.t2}`, ex: d.t2, sets: straight(l2.w, s2, r2), rest: 120, scheme: `${s2} × ${r2}`, label: "T2", note: n2, rir: 2 },
-        { key: `T3:${d.t3}`, ex: d.t3, sets: straight(l3.w, 3, 15, true), rest: 75, scheme: "3 × 15+", label: "T3", note: l3.last === "up" ? "25+ last time: weight up" : "Weight goes up when the last set reaches 25", rir: 1 },
+        {
+          key: `T3:${d.t3}`,
+          ex: d.t3,
+          sets: straight(l3.w, 3, 15, true),
+          rest: 75,
+          scheme: "3 × 15+",
+          label: "T3",
+          note: l3.last === "up" ? "25+ last time: weight up" : "Weight goes up when the last set reaches 25",
+          rir: 1,
+        },
       ],
     };
   },
@@ -564,8 +694,18 @@ const TIERED: Engine = {
 // Training max waves
 
 const WAVE_LIFTS = ["overhead-press", "deadlift", "bench-press", "squat"] as const;
-const WAVE_EX: Record<(typeof WAVE_LIFTS)[number], string> = { "overhead-press": "overhead-press", deadlift: "deadlift", "bench-press": "bench-press", squat: "back-squat" };
-const WAVE_ASSIST: Record<(typeof WAVE_LIFTS)[number], string> = { "overhead-press": "chin-up", deadlift: "hanging-knee-raise", "bench-press": "db-row", squat: "lying-leg-curl" };
+const WAVE_EX: Record<(typeof WAVE_LIFTS)[number], string> = {
+  "overhead-press": "overhead-press",
+  deadlift: "deadlift",
+  "bench-press": "bench-press",
+  squat: "back-squat",
+};
+const WAVE_ASSIST: Record<(typeof WAVE_LIFTS)[number], string> = {
+  "overhead-press": "chin-up",
+  deadlift: "hanging-knee-raise",
+  "bench-press": "db-row",
+  squat: "lying-leg-curl",
+};
 const WAVES: { name: string; pcts: number[]; reps: number[]; amrap: boolean }[] = [
   { name: "5s week", pcts: [0.65, 0.75, 0.85], reps: [5, 5, 5], amrap: true },
   { name: "3s week", pcts: [0.7, 0.8, 0.9], reps: [3, 3, 3], amrap: true },
@@ -609,11 +749,22 @@ const WAVE: Engine = {
           rest: 180,
           scheme: `${w.reps.join(", ")}${w.amrap ? "+" : ""}${extra.length ? " · 5 × 10" : ""}`,
           label: "Main lift",
-          note: deload ? "Deload: easy sets to recover" : `Training max ${fmtNum(Math.round(fromKg(l.w, ctx.gym.unit)))} ${ctx.gym.unit}. Last heavy set: as many good reps as you can${extra.length ? ", then 5×10 at 50%" : ""}`,
+          note: deload
+            ? "Deload: easy sets to recover"
+            : `Training max ${fmtNum(Math.round(fromKg(l.w, ctx.gym.unit)))} ${ctx.gym.unit}. Last heavy set: as many good reps as you can${extra.length ? ", then 5×10 at 50%" : ""}`,
           ramp: true,
           rir: 1,
         },
-        { key: `acc:${aEx}`, ex: aEx, sets: straight(a.w, deload ? 3 : 5, bw ? a.wk : 10), rest: 90, scheme: `${deload ? 3 : 5} × ${bw ? a.wk : 10}`, label: "Assistance", note: a.last === "up" ? "Got them all: a step up" : "Steady reps", rir: 2 },
+        {
+          key: `acc:${aEx}`,
+          ex: aEx,
+          sets: straight(a.w, deload ? 3 : 5, bw ? a.wk : 10),
+          rest: 90,
+          scheme: `${deload ? 3 : 5} × ${bw ? a.wk : 10}`,
+          label: "Assistance",
+          note: a.last === "up" ? "Got them all: a step up" : "Steady reps",
+          rir: 2,
+        },
       ],
     };
   },
@@ -686,8 +837,27 @@ const LADDER: Engine = {
         if (!ex) return [];
         const timed = TIMED.has(ex);
         const top = lad.steps.indexOf(ex) === lad.steps.length - 1;
-        const note = l.last === "step" ? "New step: start at 3×5" : timed ? `Hold for ${l.wk} s. Up 5 s each time you make all 3` : top ? "Top of the ladder: add reps" : `Get 3×${LADDER_MAX} and you move up a step`;
-        return [{ key: `ladder:${lad.key}`, ex, sets: straight(0, 3, l.wk), rest: lad.key.startsWith("core") ? 60 : 90, scheme: `3 × ${l.wk}${timed ? " s" : ""}`, label: lad.name, note, ladder: true, rir: 2 }];
+        const note =
+          l.last === "step"
+            ? "New step: start at 3×5"
+            : timed
+              ? `Hold for ${l.wk} s. Up 5 s each time you make all 3`
+              : top
+                ? "Top of the ladder: add reps"
+                : `Get 3×${LADDER_MAX} and you move up a step`;
+        return [
+          {
+            key: `ladder:${lad.key}`,
+            ex,
+            sets: straight(0, 3, l.wk),
+            rest: lad.key.startsWith("core") ? 60 : 90,
+            scheme: `3 × ${l.wk}${timed ? " s" : ""}`,
+            label: lad.name,
+            note,
+            ladder: true,
+            rir: 2,
+          },
+        ];
       }),
     };
   },
@@ -863,7 +1033,9 @@ function toItems(day: Day, gym: Gym): PlanItem[] {
     });
   }
   const ramps = new Set(day.slots.filter((s) => s.ramp).map((s) => s.key));
-  return withWarmups(items, gym, exercise).map((i) => (ramps.has(i.slot!) ? { ...i, warmup: i.warmup?.slice(0, 1) } : i)).map((i) => (i.warmup?.length ? i : { ...i, warmup: undefined }));
+  return withWarmups(items, gym, exercise)
+    .map((i) => (ramps.has(i.slot!) ? { ...i, warmup: i.warmup?.slice(0, 1) } : i))
+    .map((i) => (i.warmup?.length ? i : { ...i, warmup: undefined }));
 }
 
 export interface ProgramPlanInput extends Ctx {
@@ -874,7 +1046,16 @@ export interface ProgramPlanInput extends Ctx {
 }
 
 /** Today's plan from the lifter's program. */
-export function programPlan({ src, profile, gym, events, now, call = "normal", challenge = false, exclude }: ProgramPlanInput): Plan | null {
+export function programPlan({
+  src,
+  profile,
+  gym,
+  events,
+  now,
+  call = "normal",
+  challenge = false,
+  exclude,
+}: ProgramPlanInput): Plan | null {
   const info = PROGRAM_BY_ID.get(src.id);
   if (!info) return null;
   const ctx: Ctx = { profile, gym, events, now };
@@ -883,7 +1064,16 @@ export function programPlan({ src, profile, gym, events, now, call = "normal", c
     const done = programSessions(events, src.id, src.startedAt);
     const day = done.length ? (done[done.length - 1].day + 1) % days.length : 0;
     const plan = generate({ gym, profile, events, minutes: profile.minutes, now, call, challenge, exclude, muscles: days[day].muscles });
-    return { ...plan, program: { id: src.id, day, dayName: days[day].name, note: `Next time: ${days[(day + 1) % days.length].name.toLowerCase()}`, fixed: false } };
+    return {
+      ...plan,
+      program: {
+        id: src.id,
+        day,
+        dayName: days[day].name,
+        note: `Next time: ${days[(day + 1) % days.length].name.toLowerCase()}`,
+        fixed: false,
+      },
+    };
   }
   const engine = ENGINES[info.id]!;
   const s = programState(src, ctx);
@@ -914,7 +1104,15 @@ function comebackItem(item: PlanItem, events: readonly AppEvent[], gym: Gym, now
   const lay = layoff(ex, events, now);
   if (!lay || lay.done > 0) return item;
   const setTargets = item.setTargets.map((st) => ({ ...st, weight: roundLoad(st.weight * (1 - lay.cut), ex, gym).kg, comeback: true }));
-  return { ...item, setTargets, target: { ...item.target, weight: setTargets[0].weight, note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }) } };
+  return {
+    ...item,
+    setTargets,
+    target: {
+      ...item.target,
+      weight: setTargets[0].weight,
+      note: t("note.comeback", { count: lay.weeks, pct: Math.round(lay.cut * 100) }),
+    },
+  };
 }
 
 /** Hard sets per muscle in a typical week of the program (secondary muscles count half), for the picker. */
@@ -930,13 +1128,29 @@ export function weeklyPreview(id: ProgramId, ctx: Ctx): Record<Muscle, number> {
   };
   if (info.kind === "split") {
     const days = SPLITS[id as keyof typeof SPLITS];
-    for (let i = 0; i < info.daysPerWeek; i++) add(generate({ gym: ctx.gym, profile: ctx.profile, events: [], minutes: ctx.profile.minutes, now: ctx.now, muscles: days[i % days.length].muscles }).items);
+    for (let i = 0; i < info.daysPerWeek; i++)
+      add(
+        generate({
+          gym: ctx.gym,
+          profile: ctx.profile,
+          events: [],
+          minutes: ctx.profile.minutes,
+          now: ctx.now,
+          muscles: days[i % days.length].muscles,
+        }).items,
+      );
     return out;
   }
   const engine = ENGINES[id]!;
   const src = pickProgram(id, ctx) as Extract<PlanSource, { kind: "program" }>;
   const s = programState(src, { ...ctx, events: [] });
-  for (let i = 0; i < info.daysPerWeek; i++) add(toItems(engine.build(s, i % engine.days, (k) => s.lifts[k], ctx), ctx.gym));
+  for (let i = 0; i < info.daysPerWeek; i++)
+    add(
+      toItems(
+        engine.build(s, i % engine.days, (k) => s.lifts[k], ctx),
+        ctx.gym,
+      ),
+    );
   return out;
 }
 

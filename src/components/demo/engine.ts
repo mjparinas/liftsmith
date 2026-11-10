@@ -1,6 +1,33 @@
-import { boneFrame, bounds, evalPart, partWeights, PARTS, placement, placeVec, jointsAt, REGIONS, skeletonSegments, SKEL_MAX, type Part, type Placement } from "@/lib/demo/mesh";
+import {
+  boneFrame,
+  bounds,
+  evalPart,
+  jointsAt,
+  PARTS,
+  partWeights,
+  placement,
+  placeVec,
+  REGIONS,
+  SKEL_MAX,
+  skeletonSegments,
+  type Part,
+  type Placement,
+} from "@/lib/demo/mesh";
 import { motionFor, targetsFor, type Motion } from "@/lib/demo/motions";
-import { BODIES, add, clamp, cycleLength, interp, lerpV, mul, sample, type Body, type BodyKey, type Joints, type Vec } from "@/lib/demo/rig";
+import {
+  add,
+  BODIES,
+  clamp,
+  cycleLength,
+  interp,
+  lerpV,
+  mul,
+  sample,
+  type Body,
+  type BodyKey,
+  type Joints,
+  type Vec,
+} from "@/lib/demo/rig";
 import type { Muscle } from "@/lib/types";
 
 // The demo loop shared by the WebGL scene and the 2D canvas drawing: time, reps, the camera, drag to
@@ -42,10 +69,22 @@ export interface DemoSettings {
   follow?: (() => number | null) | null;
 }
 
-export interface Camera { yaw: number; pitch: number; target: Vec; distance: number; aspect: number }
+export interface Camera {
+  yaw: number;
+  pitch: number;
+  target: Vec;
+  distance: number;
+  aspect: number;
+}
 
 /** `which` is each vertex's muscle (index into REGIONS, -1 for none), filled when muscles are painted. */
-export interface MeshBuf { P: Part; pos: Float32Array; meta: Float32Array; weights: Float32Array; which: Int8Array }
+export interface MeshBuf {
+  P: Part;
+  pos: Float32Array;
+  meta: Float32Array;
+  weights: Float32Array;
+  which: Int8Array;
+}
 
 export interface Frame {
   J: Joints;
@@ -76,18 +115,42 @@ export interface Loop {
   dispose(): void;
 }
 
-export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: DemoSettings, onPhase?: (label: string) => void, onDone?: () => void, onPick?: (m: Muscle | null) => void): Loop {
+export function startLoop(
+  canvas: HTMLCanvasElement,
+  scene: Scene,
+  initial: DemoSettings,
+  onPhase?: (label: string) => void,
+  onDone?: () => void,
+  onPick?: (m: Muscle | null) => void,
+): Loop {
   let s = { ...initial };
   const reduced = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (reduced) s.playing = false;
-  const meshes: MeshBuf[] = PARTS.map((P) => ({ P, pos: new Float32Array(P.NT * P.M * 3), meta: new Float32Array(P.NT * P.M * 2), weights: new Float32Array(P.NT * P.M), which: new Int8Array(P.NT * P.M) }));
+  const meshes: MeshBuf[] = PARTS.map((P) => ({
+    P,
+    pos: new Float32Array(P.NT * P.M * 3),
+    meta: new Float32Array(P.NT * P.M * 2),
+    weights: new Float32Array(P.NT * P.M),
+    which: new Int8Array(P.NT * P.M),
+  }));
   const skel = { arr: new Float32Array(SKEL_MAX * 6), count: 0 };
-  let motion: Motion, body: Body, place: Placement, frameBox: ReturnType<typeof bounds>, path: Vec[] = [];
+  let motion: Motion,
+    body: Body,
+    place: Placement,
+    frameBox: ReturnType<typeof bounds>,
+    path: Vec[] = [];
   let changed = true;
   let t = reduced ? 1.8 : 0;
-  let yaw = s.view === "orbit" ? 50 : VIEW_YAW[s.view], yawTarget = yaw, pitch = 10;
+  let yaw = s.view === "orbit" ? 50 : VIEW_YAW[s.view],
+    yawTarget = yaw,
+    pitch = 10;
   let drag: { x: number; y: number; yaw: number; pitch: number } | null = null;
-  let visible = true, raf = 0, last = 0, lastDraw = 0, done = false, clock = 0;
+  let visible = true,
+    raf = 0,
+    last = 0,
+    lastDraw = 0,
+    done = false,
+    clock = 0;
   let followD = 0;
 
   const setup = () => {
@@ -113,7 +176,11 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
   setup();
 
   let down: { x: number; y: number } | null = null;
-  const onDown = (e: PointerEvent) => { drag = { x: e.clientX, y: e.clientY, yaw: yawTarget, pitch }; down = { x: e.clientX, y: e.clientY }; canvas.setPointerCapture?.(e.pointerId); };
+  const onDown = (e: PointerEvent) => {
+    drag = { x: e.clientX, y: e.clientY, yaw: yawTarget, pitch };
+    down = { x: e.clientX, y: e.clientY };
+    canvas.setPointerCapture?.(e.pointerId);
+  };
   const onMove = (e: PointerEvent) => {
     if (!drag) return;
     yawTarget = drag.yaw - (e.clientX - drag.x) * 0.45;
@@ -136,7 +203,13 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
   canvas.addEventListener("pointercancel", onUp);
 
   let size = [0, 0];
-  const io = typeof IntersectionObserver !== "undefined" ? new IntersectionObserver((es) => { visible = es.some((e) => e.isIntersecting); kick(); }) : null;
+  const io =
+    typeof IntersectionObserver !== "undefined"
+      ? new IntersectionObserver((es) => {
+          visible = es.some((e) => e.isIntersecting);
+          kick();
+        })
+      : null;
   io?.observe(canvas);
   const onVis = () => kick();
   document.addEventListener("visibilitychange", onVis);
@@ -150,13 +223,18 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
     const cyc = cycleLength(motion.phases);
     if (s.playing && !done) {
       t += dt * s.speed;
-      if (s.reps && t >= cyc * s.reps) { t = cyc * s.reps - 1e-3; done = true; onDone?.(); }
+      if (s.reps && t >= cyc * s.reps) {
+        t = cyc * s.reps - 1e-3;
+        done = true;
+        onDone?.();
+      }
     }
     if (s.view === "orbit" && !drag && s.playing) yawTarget += dt * 18;
     yaw = s.calm ? yawTarget : yaw + (yawTarget - yaw) * Math.min(1, dt * 5);
     const target = s.follow?.() ?? null;
     if (target !== null) followD += (clamp(target, 0, 1) - followD) * Math.min(1, dt * 14);
-    const animating = !!s.follow || (s.playing && !done) || !!s.bpm || !!drag || Math.abs(yawTarget - yaw) > 0.05 || (s.view === "orbit" && s.playing);
+    const animating =
+      !!s.follow || (s.playing && !done) || !!s.bpm || !!drag || Math.abs(yawTarget - yaw) > 0.05 || (s.view === "orbit" && s.playing);
     if (changed || now - lastDraw >= 1000 / s.fps - 4) {
       lastDraw = now;
       const r = canvas.getBoundingClientRect();
@@ -175,13 +253,28 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
       const distance = (frameBox.size * 2.45) / Math.min(1, aspect * 1.15);
       lastCam = { yaw, pitch, target: frameBox.centre, distance, aspect };
       lastRoll = place.roll(smp.d);
-      scene.draw({ J, effort: smp.effort, cam: { yaw, pitch, target: frameBox.centre, distance, aspect }, s, motion, body, place, roll: place.roll(smp.d), meshes, skel, changed, path, heart: s.bpm ? { at: heartAt(J, body), beat: heartBeat(clock, s.bpm) } : null });
+      scene.draw({
+        J,
+        effort: smp.effort,
+        cam: { yaw, pitch, target: frameBox.centre, distance, aspect },
+        s,
+        motion,
+        body,
+        place,
+        roll: place.roll(smp.d),
+        meshes,
+        skel,
+        changed,
+        path,
+        heart: s.bpm ? { at: heartAt(J, body), beat: heartBeat(clock, s.bpm) } : null,
+      });
       changed = false;
       onPhase?.(smp.label);
     }
     if (animating) raf = requestAnimationFrame(frame);
   }
-  let lastCam: Camera | null = null, lastRoll = 0;
+  let lastCam: Camera | null = null,
+    lastRoll = 0;
   /** The painted muscle nearest the camera under a point on the canvas, or null. */
   function pick(x: number, y: number): Muscle | null {
     if (!lastCam || !size[0]) return null;
@@ -205,7 +298,10 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
     return best ? REGIONS[best.m].id : null;
   }
   function kick() {
-    if (!raf && visible && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); }
+    if (!raf && visible && !document.hidden) {
+      last = 0;
+      raf = requestAnimationFrame(frame);
+    }
   }
   kick();
 
@@ -217,7 +313,10 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
       const differs = (k: keyof DemoSettings) => k in p && p[k] !== prev[k];
       if (differs("exerciseId")) t = reduced ? 1.8 : 0;
       if (differs("exerciseId") || differs("body") || differs("highlight") || differs("paint")) setup();
-      if (differs("reps")) { t = 0; done = false; }
+      if (differs("reps")) {
+        t = 0;
+        done = false;
+      }
       if (differs("view")) {
         if (s.view !== "orbit") {
           let target = VIEW_YAW[s.view];
@@ -245,9 +344,18 @@ export function startLoop(canvas: HTMLCanvasElement, scene: Scene, initial: Demo
 
 /** Projects a world point to canvas pixels plus depth, with the same camera both scenes use (32° field of view). */
 export function projector(cam: Camera, W: number, H: number) {
-  const yr = (cam.yaw * Math.PI) / 180, pr = (cam.pitch * Math.PI) / 180, t = cam.target;
-  const eye: Vec = [t[0] + Math.sin(yr) * Math.cos(pr) * cam.distance, t[1] + Math.sin(pr) * cam.distance, t[2] + Math.cos(yr) * Math.cos(pr) * cam.distance];
-  const n = (a: Vec): Vec => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l, a[1] / l, a[2] / l]; };
+  const yr = (cam.yaw * Math.PI) / 180,
+    pr = (cam.pitch * Math.PI) / 180,
+    t = cam.target;
+  const eye: Vec = [
+    t[0] + Math.sin(yr) * Math.cos(pr) * cam.distance,
+    t[1] + Math.sin(pr) * cam.distance,
+    t[2] + Math.cos(yr) * Math.cos(pr) * cam.distance,
+  ];
+  const n = (a: Vec): Vec => {
+    const l = Math.hypot(a[0], a[1], a[2]) || 1;
+    return [a[0] / l, a[1] / l, a[2] / l];
+  };
   const fw = n([t[0] - eye[0], t[1] - eye[1], t[2] - eye[2]]);
   const right = n([-fw[2], 0, fw[0]]); // fw × world up
   const up: Vec = [right[1] * fw[2] - right[2] * fw[1], right[2] * fw[0] - right[0] * fw[2], right[0] * fw[1] - right[1] * fw[0]];
@@ -255,7 +363,11 @@ export function projector(cam: Camera, W: number, H: number) {
   return (p: Vec): [number, number, number] => {
     const v: Vec = [p[0] - eye[0], p[1] - eye[1], p[2] - eye[2]];
     const z = Math.max(0.1, v[0] * fw[0] + v[1] * fw[1] + v[2] * fw[2]);
-    return [W / 2 + ((v[0] * right[0] + v[1] * right[1] + v[2] * right[2]) * focal) / z, H / 2 - ((v[0] * up[0] + v[1] * up[1] + v[2] * up[2]) * focal) / z, z];
+    return [
+      W / 2 + ((v[0] * right[0] + v[1] * right[1] + v[2] * right[2]) * focal) / z,
+      H / 2 - ((v[0] * up[0] + v[1] * up[1] + v[2] * up[2]) * focal) / z,
+      z,
+    ];
   };
 }
 

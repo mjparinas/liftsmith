@@ -1,13 +1,26 @@
 import { beforeEach, describe, expect, it } from "vitest";
+
 import { query, resetDb } from "./db";
 import { authorized, kindOf, storeRcEvent, type RcEvent } from "./revenuecat";
 
 const NOW = Date.UTC(2026, 10, 9);
 const DAY = 86_400_000;
 const ev = (over: Partial<RcEvent>): RcEvent => ({
-  id: "e1", type: "INITIAL_PURCHASE", app_user_id: "install-aaaa-1", product_id: "pro:annual", period_type: "NORMAL", event_timestamp_ms: NOW,
-  expiration_at_ms: NOW + 365 * DAY, store: "PLAY_STORE", environment: "PRODUCTION", price: 39.99, price_in_purchased_currency: 39.99, currency: "USD",
-  country_code: "US", original_transaction_id: "GPA.1", ...over,
+  id: "e1",
+  type: "INITIAL_PURCHASE",
+  app_user_id: "install-aaaa-1",
+  product_id: "pro:annual",
+  period_type: "NORMAL",
+  event_timestamp_ms: NOW,
+  expiration_at_ms: NOW + 365 * DAY,
+  store: "PLAY_STORE",
+  environment: "PRODUCTION",
+  price: 39.99,
+  price_in_purchased_currency: 39.99,
+  currency: "USD",
+  country_code: "US",
+  original_transaction_id: "GPA.1",
+  ...over,
 });
 
 beforeEach(async () => {
@@ -41,8 +54,22 @@ describe("RevenueCat webhook", () => {
     await storeRcEvent(ev({ id: "e2", type: "RENEWAL", is_trial_conversion: true, event_timestamp_ms: NOW + 14 * DAY }), NOW + 14 * DAY);
     const rows = await query("SELECT * FROM subscription_events ORDER BY at");
     expect(rows).toHaveLength(2);
-    expect(rows[0]).toMatchObject({ kind: "trial_start", install_id: "install-aaaa-1", subscription: "GPA.1", store: "play", plan: "annual", usd_micros: null, source: "store" });
-    expect(rows[1]).toMatchObject({ kind: "trial_convert", usd_micros: 39_990_000, price_micros: 39_990_000, currency: "USD", country: "US" });
+    expect(rows[0]).toMatchObject({
+      kind: "trial_start",
+      install_id: "install-aaaa-1",
+      subscription: "GPA.1",
+      store: "play",
+      plan: "annual",
+      usd_micros: null,
+      source: "store",
+    });
+    expect(rows[1]).toMatchObject({
+      kind: "trial_convert",
+      usd_micros: 39_990_000,
+      price_micros: 39_990_000,
+      currency: "USD",
+      country: "US",
+    });
     const [e] = await query("SELECT * FROM entitlements");
     expect(e).toMatchObject({ app_user_id: "install-aaaa-1", active: 1, plan: "annual", store: "play" });
   });
@@ -53,7 +80,10 @@ describe("RevenueCat webhook", () => {
     await storeRcEvent(ev({ id: "f1", app_user_id: "install-bbbb-2", is_family_share: true }), NOW);
     const [fam] = await query("SELECT * FROM subscription_events");
     expect(fam).toMatchObject({ kind: "purchase", usd_micros: null });
-    await storeRcEvent(ev({ id: "x1", type: "EXPIRATION", app_user_id: "install-bbbb-2", expiration_at_ms: NOW, event_timestamp_ms: NOW + DAY }), NOW + DAY);
+    await storeRcEvent(
+      ev({ id: "x1", type: "EXPIRATION", app_user_id: "install-bbbb-2", expiration_at_ms: NOW, event_timestamp_ms: NOW + DAY }),
+      NOW + DAY,
+    );
     const [e] = await query("SELECT active, family FROM entitlements WHERE app_user_id = ?", ["install-bbbb-2"]);
     expect(e).toMatchObject({ active: 0 });
   });

@@ -29,9 +29,12 @@ export function parseBackup(text: string): Backup | null {
   }
   if (!obj(raw) || raw.app !== "liftsmith" || typeof raw.version !== "number" || raw.version < 1) return null;
   if (!obj(raw.profile) || !Array.isArray(raw.gyms) || !Array.isArray(raw.events)) return null;
-  const gyms = raw.gyms.filter((g): g is Gym => obj(g) && typeof g.id === "string" && !!g.id && typeof g.name === "string" && Array.isArray(g.equipment));
+  const gyms = raw.gyms.filter(
+    (g): g is Gym => obj(g) && typeof g.id === "string" && !!g.id && typeof g.name === "string" && Array.isArray(g.equipment),
+  );
   const events = raw.events.filter(
-    (e): e is AppEvent => obj(e) && typeof e.id === "string" && !!e.id && typeof e.type === "string" && typeof e.at === "number" && Number.isFinite(e.at),
+    (e): e is AppEvent =>
+      obj(e) && typeof e.id === "string" && !!e.id && typeof e.type === "string" && typeof e.at === "number" && Number.isFinite(e.at),
   );
   const profile = { ...defaultProfile(), ...(raw.profile as Partial<Profile>) } as Profile;
   if (!gyms.some((g) => g.id === profile.activeGymId)) profile.activeGymId = gyms[0]?.id ?? profile.activeGymId;

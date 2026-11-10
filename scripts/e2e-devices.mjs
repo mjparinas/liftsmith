@@ -3,6 +3,7 @@
 //   npm run build:static && node scripts/e2e-devices.mjs [base-url] [out-dir]
 //   DEVICES=ios|android|full|"Pixel 7,iPad Mini" picks a subset (default: all)
 import fs from "node:fs";
+
 import { closeAll, open, pick } from "./devices.mjs";
 import { base, check, finish, onboard, watchErrors } from "./helpers.mjs";
 
@@ -34,7 +35,11 @@ for (const { name } of pick()) {
     await noSideScroll("today");
     for (const tab of ["Today", "Body", "Progress", "Gyms"]) {
       const b = await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).boundingBox();
-      check(b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1, `${name}: the ${tab} tab is off screen`, fail);
+      check(
+        b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1,
+        `${name}: the ${tab} tab is off screen`,
+        fail,
+      );
     }
     await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
@@ -47,7 +52,11 @@ for (const { name } of pick()) {
     check(log && log.height >= 48, `${name}: Log set is under 48 px tall`, fail);
     for (const label of ["More reps", "Less reps", "Swap exercise", "End"]) {
       const b = await page.getByRole("button", { name: label, exact: true }).boundingBox();
-      check(b && b.height >= TARGET - 8 && b.width >= TARGET - 8, `${name}: "${label}" is too small to tap (${b?.width}×${b?.height})`, fail);
+      check(
+        b && b.height >= TARGET - 8 && b.width >= TARGET - 8,
+        `${name}: "${label}" is too small to tap (${b?.width}×${b?.height})`,
+        fail,
+      );
     }
     await page.screenshot({ path: `${OUT}/${tag}-workout.png` });
     // Skip the warm-ups so the saved workout has a working set.

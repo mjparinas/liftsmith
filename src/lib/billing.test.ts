@@ -1,10 +1,28 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { entActive, entFromInfo, hasPro, OFFLINE_GRACE_MS, planOf, setBillingLive, storePro, trialDaysOf, type Entitlement } from "./billing";
+
+import {
+  entActive,
+  entFromInfo,
+  hasPro,
+  OFFLINE_GRACE_MS,
+  planOf,
+  setBillingLive,
+  storePro,
+  trialDaysOf,
+  type Entitlement,
+} from "./billing";
 import { can } from "./entitlements";
 
 const NOW = Date.UTC(2026, 10, 9);
 const DAY = 86_400_000;
-const ent = (over: Partial<Entitlement> = {}): Entitlement => ({ active: true, trial: false, plan: "annual", expiresAt: NOW + 30 * DAY, willRenew: true, ...over });
+const ent = (over: Partial<Entitlement> = {}): Entitlement => ({
+  active: true,
+  trial: false,
+  plan: "annual",
+  expiresAt: NOW + 30 * DAY,
+  willRenew: true,
+  ...over,
+});
 
 afterEach(() => setBillingLive(false));
 
@@ -42,10 +60,32 @@ describe("Pro from the store", () => {
 
   it("maps RevenueCat's customer info, including a trial and family sharing", () => {
     const info = {
-      entitlements: { all: { pro: { isActive: true, willRenew: true, periodType: "TRIAL", expirationDateMillis: NOW + 14 * DAY, store: "PLAY_STORE", productIdentifier: "pro", productPlanIdentifier: "annual", ownershipType: "FAMILY_SHARED" } } },
+      entitlements: {
+        all: {
+          pro: {
+            isActive: true,
+            willRenew: true,
+            periodType: "TRIAL",
+            expirationDateMillis: NOW + 14 * DAY,
+            store: "PLAY_STORE",
+            productIdentifier: "pro",
+            productPlanIdentifier: "annual",
+            ownershipType: "FAMILY_SHARED",
+          },
+        },
+      },
       managementURL: "https://play.google.com/store/account/subscriptions",
     };
-    expect(entFromInfo(info)).toEqual({ active: true, trial: true, plan: "annual", expiresAt: NOW + 14 * DAY, willRenew: true, store: "PLAY_STORE", family: true, manageUrl: info.managementURL });
+    expect(entFromInfo(info)).toEqual({
+      active: true,
+      trial: true,
+      plan: "annual",
+      expiresAt: NOW + 14 * DAY,
+      willRenew: true,
+      store: "PLAY_STORE",
+      family: true,
+      manageUrl: info.managementURL,
+    });
     expect(entFromInfo({ entitlements: { all: {} } })).toBeNull();
   });
 

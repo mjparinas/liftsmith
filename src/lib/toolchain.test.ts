@@ -15,7 +15,12 @@ describe("toolchain", () => {
     const dir = join(root, ".github/workflows");
     const pins = readdirSync(dir)
       .filter((f) => /\.ya?ml$/.test(f))
-      .flatMap((f) => [...readFileSync(join(dir, f), "utf8").matchAll(/mcr\.microsoft\.com\/playwright:v([\d.]+)/g)].map((m) => ({ file: f, version: m[1] })));
+      .flatMap((f) =>
+        [...readFileSync(join(dir, f), "utf8").matchAll(/mcr\.microsoft\.com\/playwright:v([\d.]+)/g)].map((m) => ({
+          file: f,
+          version: m[1],
+        })),
+      );
     expect(pins.length).toBeGreaterThan(0);
     for (const p of pins) expect(p.version, `${p.file}: set the image to mcr.microsoft.com/playwright:v${installed}-noble`).toBe(installed);
   });

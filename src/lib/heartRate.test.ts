@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { classify, connectHeartRate, HrError, hrMessage, parseHeartRate } from "./heartRate";
 
 const err = (name: string, message: string) => Object.assign(new Error(message), { name });
@@ -11,7 +12,10 @@ type Fake = {
 };
 
 function fakeBluetooth(opts: { pick?: () => Promise<void>; name?: string } = {}): Fake {
-  const ch = Object.assign(new EventTarget(), { startNotifications: vi.fn(async () => undefined), value: undefined as DataView | undefined });
+  const ch = Object.assign(new EventTarget(), {
+    startNotifications: vi.fn(async () => undefined),
+    value: undefined as DataView | undefined,
+  });
   const fake: Fake = {
     connect: vi.fn(),
     getPrimaryService: vi.fn(async () => ({ getCharacteristic: async () => ch })),
@@ -80,7 +84,10 @@ describe("connectHeartRate (Web Bluetooth)", () => {
   it("retries a failed first GATT connect", async () => {
     const fake = fakeBluetooth();
     fake.connect.mockRejectedValueOnce(err("NetworkError", "Connection failed for unknown reason."));
-    const c = await connectHeartRate(() => {}, () => {});
+    const c = await connectHeartRate(
+      () => {},
+      () => {},
+    );
     expect(c.name).toBe("Fitbit Air");
     expect(fake.connect).toHaveBeenCalledTimes(2);
     expect(fake.startNotifications).toHaveBeenCalled();
@@ -90,7 +97,10 @@ describe("connectHeartRate (Web Bluetooth)", () => {
     vi.useFakeTimers();
     const fake = fakeBluetooth();
     fake.connect.mockReturnValue(new Promise(() => {}));
-    const p = connectHeartRate(() => {}, () => {}).catch((e) => e);
+    const p = connectHeartRate(
+      () => {},
+      () => {},
+    ).catch((e) => e);
     await vi.advanceTimersByTimeAsync(60_000);
     const e = await p;
     expect(e).toBeInstanceOf(HrError);
@@ -101,15 +111,25 @@ describe("connectHeartRate (Web Bluetooth)", () => {
   it("says when the device has no standard heart rate service", async () => {
     const fake = fakeBluetooth();
     fake.getPrimaryService.mockRejectedValue(err("NotFoundError", "No Services matching UUID 0000180d found in Device."));
-    const e = await connectHeartRate(() => {}, () => {}).catch((x) => x);
+    const e = await connectHeartRate(
+      () => {},
+      () => {},
+    ).catch((x) => x);
     expect((e as HrError).problem).toBe("noService");
     expect((e as HrError).device).toBe("Fitbit Air");
     expect(fake.disconnect).toHaveBeenCalled();
   });
 
   it("reports a closed picker as cancelled", async () => {
-    fakeBluetooth({ pick: async () => { throw err("NotFoundError", "User cancelled the requestDevice() chooser."); } });
-    const e = await connectHeartRate(() => {}, () => {}).catch((x) => x);
+    fakeBluetooth({
+      pick: async () => {
+        throw err("NotFoundError", "User cancelled the requestDevice() chooser.");
+      },
+    });
+    const e = await connectHeartRate(
+      () => {},
+      () => {},
+    ).catch((x) => x);
     expect((e as HrError).problem).toBe("cancelled");
   });
 });

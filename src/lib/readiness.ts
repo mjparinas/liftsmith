@@ -1,9 +1,9 @@
 import { blockWeek } from "./block";
 import { cycleSignal, cycleState } from "./cycle";
+import { t } from "./i18n";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import type { AppEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
-import { t } from "./i18n";
 
 // "Rest or push today?" (Melvin, 2026-11-09). Everything here comes from the lifter's own
 // logged data, on the device: how recovered the big muscles are, how many target reps they hit
@@ -101,7 +101,10 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   if (streak >= 3) add(-10, t("sig.threeInRow"));
 
   // 3. Target reps hit in the last two workouts.
-  const lastTwo = sessions.slice(0, 2).flatMap((s) => s.sets).filter((s) => !s.challenge);
+  const lastTwo = sessions
+    .slice(0, 2)
+    .flatMap((s) => s.sets)
+    .filter((s) => !s.challenge);
   if (lastTwo.length >= 4) {
     const hit = lastTwo.filter((s) => s.reps >= s.targetReps).length / lastTwo.length;
     if (hit >= 0.95) add(12, t("sig.hitAll"));
@@ -187,4 +190,8 @@ const callText = (c: Call) => ({
     return t(`callText.${c}.blurb`);
   },
 });
-export const CALL_TEXT: Record<Call, { label: string; blurb: string }> = { push: callText("push"), normal: callText("normal"), recover: callText("recover") };
+export const CALL_TEXT: Record<Call, { label: string; blurb: string }> = {
+  push: callText("push"),
+  normal: callText("normal"),
+  recover: callText("recover"),
+};

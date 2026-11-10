@@ -1,20 +1,96 @@
 import { describe, expect, it } from "vitest";
-import { computeMetrics, mrrAt, replaySubs, sourceLabel, storeOf, type InstallFacts, type MetricsInput, type SubEvent } from "./adminMetrics";
-import { forecastAt, FORECAST_QUARTERS } from "./forecast";
+
+import {
+  computeMetrics,
+  mrrAt,
+  replaySubs,
+  sourceLabel,
+  storeOf,
+  type InstallFacts,
+  type MetricsInput,
+  type SubEvent,
+} from "./adminMetrics";
+import { FORECAST_QUARTERS, forecastAt } from "./forecast";
 
 const DAY = 86_400_000;
 const NOW = Date.UTC(2027, 5, 1);
 
 let seq = 0;
 const install = (over: Partial<InstallFacts> = {}): InstallFacts => ({
-  id: `i${seq++}`, firstSeen: NOW - 10 * DAY, lastSeen: NOW - 9 * DAY, platform: "android", store: "play", source: null, medium: null, campaign: null, referrer: null,
-  country: "CA", os: "Android", osVersion: "15", manufacturer: "Google", model: "Pixel 8", appVersion: "0.2.0", formFactor: "phone", locale: "en-CA", asaCampaign: null,
-  onboarded: null, firstWorkout: null, workouts: 0, paywall: null, ...over,
+  id: `i${seq++}`,
+  firstSeen: NOW - 10 * DAY,
+  lastSeen: NOW - 9 * DAY,
+  platform: "android",
+  store: "play",
+  source: null,
+  medium: null,
+  campaign: null,
+  referrer: null,
+  country: "CA",
+  os: "Android",
+  osVersion: "15",
+  manufacturer: "Google",
+  model: "Pixel 8",
+  appVersion: "0.2.0",
+  formFactor: "phone",
+  locale: "en-CA",
+  asaCampaign: null,
+  onboarded: null,
+  firstWorkout: null,
+  workouts: 0,
+  paywall: null,
+  ...over,
 });
-const sub = (over: Partial<SubEvent>): SubEvent => ({ id: `s${seq++}`, at: NOW, installId: null, subscription: null, store: "play", kind: "purchase", plan: "monthly", usd: 6.99, priceLocal: 6.99, currency: "USD", reason: null, ...over });
-const site = (): MetricsInput["site"] => ({ daily: [], visitors: 100, views: 250, prevVisitors: 80, prevViews: 200, pages: [], referrers: [], sources: [], campaigns: [], countries: [], devices: [], browsers: [], os: [], ctas: [], ctaTotal: 20 });
+const sub = (over: Partial<SubEvent>): SubEvent => ({
+  id: `s${seq++}`,
+  at: NOW,
+  installId: null,
+  subscription: null,
+  store: "play",
+  kind: "purchase",
+  plan: "monthly",
+  usd: 6.99,
+  priceLocal: 6.99,
+  currency: "USD",
+  reason: null,
+  ...over,
+});
+const site = (): MetricsInput["site"] => ({
+  daily: [],
+  visitors: 100,
+  views: 250,
+  prevVisitors: 80,
+  prevViews: 200,
+  pages: [],
+  referrers: [],
+  sources: [],
+  campaigns: [],
+  countries: [],
+  devices: [],
+  browsers: [],
+  os: [],
+  ctas: [],
+  ctaTotal: 20,
+});
 const input = (over: Partial<MetricsInput> = {}): MetricsInput => ({
-  now: NOW, days: 28, launchAt: NOW - 90 * DAY, installs: [], active: [], dau: 0, wau: 0, mau: 0, daily: [], steps: [], screens: [], features: [], permissions: [], workouts: [], cohortWeeks: [], subs: [], site: site(), ...over,
+  now: NOW,
+  days: 28,
+  launchAt: NOW - 90 * DAY,
+  installs: [],
+  active: [],
+  dau: 0,
+  wau: 0,
+  mau: 0,
+  daily: [],
+  steps: [],
+  screens: [],
+  features: [],
+  permissions: [],
+  workouts: [],
+  cohortWeeks: [],
+  subs: [],
+  site: site(),
+  ...over,
 });
 
 describe("admin metrics", () => {
@@ -26,10 +102,25 @@ describe("admin metrics", () => {
   });
 
   it("names where an install came from", () => {
-    expect(sourceLabel({ source: "reddit", medium: "social", referrer: null, asaCampaign: null, platform: "android", store: "play" })).toBe("reddit / social");
-    expect(sourceLabel({ source: "google-play", medium: "organic", referrer: "utm_source=google-play&utm_medium=organic", asaCampaign: null, platform: "android", store: "play" })).toBe("Play Store (organic)");
-    expect(sourceLabel({ source: null, medium: null, referrer: null, asaCampaign: "asa:1", platform: "ios", store: "appstore" })).toBe("Apple Search Ads");
-    expect(sourceLabel({ source: null, medium: null, referrer: "google.com", asaCampaign: null, platform: "web", store: "web" })).toBe("google.com");
+    expect(sourceLabel({ source: "reddit", medium: "social", referrer: null, asaCampaign: null, platform: "android", store: "play" })).toBe(
+      "reddit / social",
+    );
+    expect(
+      sourceLabel({
+        source: "google-play",
+        medium: "organic",
+        referrer: "utm_source=google-play&utm_medium=organic",
+        asaCampaign: null,
+        platform: "android",
+        store: "play",
+      }),
+    ).toBe("Play Store (organic)");
+    expect(sourceLabel({ source: null, medium: null, referrer: null, asaCampaign: "asa:1", platform: "ios", store: "appstore" })).toBe(
+      "Apple Search Ads",
+    );
+    expect(sourceLabel({ source: null, medium: null, referrer: "google.com", asaCampaign: null, platform: "web", store: "web" })).toBe(
+      "google.com",
+    );
   });
 
   it("counts MRR from paying subscriptions: monthly in full, annual as a twelfth", () => {
@@ -102,17 +193,29 @@ describe("admin metrics", () => {
 
   it("builds weekly retention cohorts", () => {
     const start = Math.floor((NOW - 21 * DAY) / (7 * DAY)) * 7 * DAY;
-    const m = computeMetrics(input({ cohortWeeks: [
-      { id: "a", firstSeen: start, weeks: [0, 1, 2] },
-      { id: "b", firstSeen: start + DAY, weeks: [0] },
-    ] }));
+    const m = computeMetrics(
+      input({
+        cohortWeeks: [
+          { id: "a", firstSeen: start, weeks: [0, 1, 2] },
+          { id: "b", firstSeen: start + DAY, weeks: [0] },
+        ],
+      }),
+    );
     const row = m.retention.cohorts[0];
     expect(row.size).toBe(2);
     expect(row.weeks.slice(0, 3)).toEqual([1, 0.5, 0.5]);
   });
 
   it("splits devices and versions", () => {
-    const m = computeMetrics(input({ installs: [install({}), install({ model: "SM-S921B", manufacturer: "samsung" }), install({ platform: "ios", store: "appstore", manufacturer: "Apple", model: "iPhone16,2", os: "iOS", osVersion: "18.1" })] }));
+    const m = computeMetrics(
+      input({
+        installs: [
+          install({}),
+          install({ model: "SM-S921B", manufacturer: "samsung" }),
+          install({ platform: "ios", store: "appstore", manufacturer: "Apple", model: "iPhone16,2", os: "iOS", osVersion: "18.1" }),
+        ],
+      }),
+    );
     expect(m.devices.models.map((d) => d.key).sort()).toEqual(["Google Pixel 8", "iPhone16,2", "samsung SM-S921B"].sort());
     expect(m.devices.os.find((o) => o.key === "Android 15")!.n).toBe(2);
   });

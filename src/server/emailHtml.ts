@@ -12,13 +12,95 @@ import sanitizeHtml from "sanitize-html";
 const MAX_HTML = 500_000;
 
 const TAGS = [
-  ...["a", "abbr", "address", "b", "bdi", "bdo", "big", "blockquote", "br", "caption", "center", "cite", "code", "col", "colgroup", "dd", "del", "dfn", "div", "dl", "dt"],
-  ...["em", "figcaption", "figure", "font", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "i", "img", "ins", "kbd", "li", "mark", "ol", "p", "pre", "q", "s", "samp", "small"],
-  ...["span", "strike", "strong", "style", "sub", "sup", "table", "tbody", "td", "tfoot", "th", "thead", "time", "tr", "tt", "u", "ul", "var", "wbr"],
+  ...[
+    "a",
+    "abbr",
+    "address",
+    "b",
+    "bdi",
+    "bdo",
+    "big",
+    "blockquote",
+    "br",
+    "caption",
+    "center",
+    "cite",
+    "code",
+    "col",
+    "colgroup",
+    "dd",
+    "del",
+    "dfn",
+    "div",
+    "dl",
+    "dt",
+  ],
+  ...[
+    "em",
+    "figcaption",
+    "figure",
+    "font",
+    "h1",
+    "h2",
+    "h3",
+    "h4",
+    "h5",
+    "h6",
+    "hr",
+    "i",
+    "img",
+    "ins",
+    "kbd",
+    "li",
+    "mark",
+    "ol",
+    "p",
+    "pre",
+    "q",
+    "s",
+    "samp",
+    "small",
+  ],
+  ...[
+    "span",
+    "strike",
+    "strong",
+    "style",
+    "sub",
+    "sup",
+    "table",
+    "tbody",
+    "td",
+    "tfoot",
+    "th",
+    "thead",
+    "time",
+    "tr",
+    "tt",
+    "u",
+    "ul",
+    "var",
+    "wbr",
+  ],
 ];
 
 // Layout attributes mail apps still use. No event handlers, no `id`/`name` (so the mail can't clobber anything), no `srcset`.
-const LAYOUT = ["align", "valign", "width", "height", "bgcolor", "border", "cellpadding", "cellspacing", "color", "dir", "lang", "title", "style", "class"];
+const LAYOUT = [
+  "align",
+  "valign",
+  "width",
+  "height",
+  "bgcolor",
+  "border",
+  "cellpadding",
+  "cellspacing",
+  "color",
+  "dir",
+  "lang",
+  "title",
+  "style",
+  "class",
+];
 
 /** Drops `url(...)` from CSS when images are off, so a background image can't fetch either (the policy blocks it too). */
 const noRemoteCss = (css: string) => css.replace(/url\s*\([^)]*\)/gi, "none").replace(/@import[^;]*;?/gi, "");
@@ -26,47 +108,55 @@ const noRemoteCss = (css: string) => css.replace(/url\s*\([^)]*\)/gi, "none").re
 /** Turns a received email's HTML into markup that can't run code, with remote images only when `images` is on. */
 export function sanitizeEmailHtml(html: string, opts: { images?: boolean } = {}): string {
   const images = Boolean(opts.images);
-  const css = (attribs: sanitizeHtml.Attributes) => (images || !attribs.style ? attribs : { ...attribs, style: noRemoteCss(attribs.style) });
-  return sanitizeHtml(html.slice(0, MAX_HTML), {
-    allowedTags: TAGS,
-    // <style> keeps a mail's own layout. Its text is raw CSS that a browser never runs as markup, and the frame has no scripts.
-    allowVulnerableTags: true,
-    disallowedTagsMode: "discard",
-    nonTextTags: ["script", "noscript", "textarea", "option", "title", "template", "iframe", "object", "embed", "svg", "math"],
-    allowedAttributes: {
-      "*": LAYOUT,
-      a: ["href", "target", "rel", ...LAYOUT],
-      img: ["src", "alt", ...LAYOUT],
-      td: ["colspan", "rowspan", ...LAYOUT],
-      th: ["colspan", "rowspan", "scope", ...LAYOUT],
-      col: ["span", ...LAYOUT],
-      colgroup: ["span", ...LAYOUT],
-      ol: ["start", "type", ...LAYOUT],
-      font: ["face", "size", ...LAYOUT],
-      time: ["datetime"],
-    },
-    allowedSchemes: ["http", "https", "mailto"],
-    allowedSchemesByTag: { img: images ? ["https", "http", "data"] : ["data"] },
-    allowedSchemesAppliedToAttributes: ["href", "src"],
-    allowProtocolRelative: false,
-    transformTags: {
-      // Links open in a new tab, apart from the panel, and don't tell the site where they came from.
-      "*": (tagName, attribs) => ({ tagName, attribs: css(attribs) }),
-      a: (tag, attribs) => ({ tagName: "a", attribs: { ...css(attribs), target: "_blank", rel: "noopener noreferrer nofollow" } }),
-      // An image left out keeps its alt text, so the mail still reads.
-      img: (tag, attribs) => {
-        const src = attribs.src ?? "";
-        if (/^data:image\/(png|gif|jpe?g|webp);/i.test(src) || (images && /^https?:\/\//i.test(src))) return { tagName: "img", attribs: css(attribs) };
-        return { tagName: "span", attribs: {}, text: attribs.alt ?? "" };
+  const css = (attribs: sanitizeHtml.Attributes) =>
+    images || !attribs.style ? attribs : { ...attribs, style: noRemoteCss(attribs.style) };
+  return (
+    sanitizeHtml(html.slice(0, MAX_HTML), {
+      allowedTags: TAGS,
+      // <style> keeps a mail's own layout. Its text is raw CSS that a browser never runs as markup, and the frame has no scripts.
+      allowVulnerableTags: true,
+      disallowedTagsMode: "discard",
+      nonTextTags: ["script", "noscript", "textarea", "option", "title", "template", "iframe", "object", "embed", "svg", "math"],
+      allowedAttributes: {
+        "*": LAYOUT,
+        a: ["href", "target", "rel", ...LAYOUT],
+        img: ["src", "alt", ...LAYOUT],
+        td: ["colspan", "rowspan", ...LAYOUT],
+        th: ["colspan", "rowspan", "scope", ...LAYOUT],
+        col: ["span", ...LAYOUT],
+        colgroup: ["span", ...LAYOUT],
+        ol: ["start", "type", ...LAYOUT],
+        font: ["face", "size", ...LAYOUT],
+        time: ["datetime"],
       },
-    },
-  })
-    // Text outside <style> has its "<" escaped, so this only ever meets the mail's own style sheets.
-    .replace(/(<style[^>]*>)([\s\S]*?)(<\/style>)/gi, (_, open: string, sheet: string, close: string) => `${open}${images ? sheet : noRemoteCss(sheet)}${close}`);
+      allowedSchemes: ["http", "https", "mailto"],
+      allowedSchemesByTag: { img: images ? ["https", "http", "data"] : ["data"] },
+      allowedSchemesAppliedToAttributes: ["href", "src"],
+      allowProtocolRelative: false,
+      transformTags: {
+        // Links open in a new tab, apart from the panel, and don't tell the site where they came from.
+        "*": (tagName, attribs) => ({ tagName, attribs: css(attribs) }),
+        a: (tag, attribs) => ({ tagName: "a", attribs: { ...css(attribs), target: "_blank", rel: "noopener noreferrer nofollow" } }),
+        // An image left out keeps its alt text, so the mail still reads.
+        img: (tag, attribs) => {
+          const src = attribs.src ?? "";
+          if (/^data:image\/(png|gif|jpe?g|webp);/i.test(src) || (images && /^https?:\/\//i.test(src)))
+            return { tagName: "img", attribs: css(attribs) };
+          return { tagName: "span", attribs: {}, text: attribs.alt ?? "" };
+        },
+      },
+    })
+      // Text outside <style> has its "<" escaped, so this only ever meets the mail's own style sheets.
+      .replace(
+        /(<style[^>]*>)([\s\S]*?)(<\/style>)/gi,
+        (_, open: string, sheet: string, close: string) => `${open}${images ? sheet : noRemoteCss(sheet)}${close}`,
+      )
+  );
 }
 
 /** Whether the mail has remote images the admin could choose to load. */
-export const hasRemoteImages = (html: string) => /<img\b[^>]*\ssrc\s*=\s*["']?\s*https?:/i.test(html) || /url\s*\(\s*["']?\s*https?:/i.test(html);
+export const hasRemoteImages = (html: string) =>
+  /<img\b[^>]*\ssrc\s*=\s*["']?\s*https?:/i.test(html) || /url\s*\(\s*["']?\s*https?:/i.test(html);
 
 /**
  * The policy the email page is served with. `sandbox` without `allow-scripts` or `allow-same-origin` means no code runs

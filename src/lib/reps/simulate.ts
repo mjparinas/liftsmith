@@ -124,7 +124,11 @@ export interface CameraNoise {
 }
 
 /** Camera samples (joint angle and bar height) for a simulated set, as the pose layer would produce them. */
-export function cameraSamples(sim: SimSet, seed: number, opts: { restDeg: number; romDeg: number; restHigh: boolean; barRomM: number } & CameraNoise) {
+export function cameraSamples(
+  sim: SimSet,
+  seed: number,
+  opts: { restDeg: number; romDeg: number; restHigh: boolean; barRomM: number } & CameraNoise,
+) {
   const r = rng(seed);
   const gauss = () => Math.sqrt(-2 * Math.log(r() || 1e-9)) * Math.cos(2 * Math.PI * r());
   const fps = opts.fps ?? 30;
@@ -148,7 +152,11 @@ export function cameraSamples(sim: SimSet, seed: number, opts: { restDeg: number
 }
 
 /** Accelerometer readings (including gravity) for a simulated set, as a watch or phone would report. */
-export function imuSamples(sim: SimSet, seed: number, opts: { romM: number; downFirst: boolean; hz?: number; noise?: number; tiltDeg?: number }) {
+export function imuSamples(
+  sim: SimSet,
+  seed: number,
+  opts: { romM: number; downFirst: boolean; hz?: number; noise?: number; tiltDeg?: number },
+) {
   const r = rng(seed);
   const gauss = () => Math.sqrt(-2 * Math.log(r() || 1e-9)) * Math.cos(2 * Math.PI * r());
   const hz = opts.hz ?? 50;
@@ -165,7 +173,7 @@ export function imuSamples(sim: SimSet, seed: number, opts: { romM: number; down
   let lastTilt = tilt0;
   let lastT = 0;
   for (let t = 0; t < sim.lengthMs; t += 1000 / hz + (r() - 0.5) * 2) {
-    const acc = (z(t + h) - 2 * z(t) + z(t - h)) / ((h / 1000) ** 2);
+    const acc = (z(t + h) - 2 * z(t) + z(t - h)) / (h / 1000) ** 2;
     // The wrist tilts as it moves (a curl turns it the most), so gravity shifts between axes.
     const tilt = tilt0 + (((opts.tiltDeg ?? 20) * Math.PI) / 180) * sim.pos(t);
     const up = 9.81 + acc; // the reading along "up" when accelerating upward
@@ -177,7 +185,14 @@ export function imuSamples(sim: SimSet, seed: number, opts: { romM: number; down
     const rot = Math.abs(tilt - lastTilt) / Math.max(1e-3, (t - lastT) / 1000) + Math.abs(gauss()) * 0.02;
     lastTilt = tilt;
     lastT = t;
-    out.push({ t, x: up * ux + bias[0] + gauss() * n, y: up * uy + bias[1] + gauss() * n, z: up * uz + bias[2] + gauss() * n, up: acc + gauss() * n * 0.5 + bias[2] * 0.3, rot });
+    out.push({
+      t,
+      x: up * ux + bias[0] + gauss() * n,
+      y: up * uy + bias[1] + gauss() * n,
+      z: up * uz + bias[2] + gauss() * n,
+      up: acc + gauss() * n * 0.5 + bias[2] * 0.3,
+      rot,
+    });
   }
   return out;
 }

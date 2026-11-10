@@ -17,7 +17,13 @@ export async function GET(req: Request) {
   const data = await loadCreators(now, now - days * DAY);
   if (q.get("format") === "csv") {
     const day = new Date(now).toISOString().slice(0, 10);
-    return new Response(payoutCsv(data.rows), { headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="liftsmith-creator-payouts-${day}.csv"`, "Cache-Control": "no-store" } });
+    return new Response(payoutCsv(data.rows), {
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="liftsmith-creator-payouts-${day}.csv"`,
+        "Cache-Control": "no-store",
+      },
+    });
   }
   return json(200, { ...data, staff: gate.staff });
 }
@@ -37,7 +43,11 @@ export async function POST(req: Request) {
     const c = checkCreator(body);
     if (!c.ok) return json(400, { error: c.error });
     await saveCreator(c.creator);
-    await audit(gate.staff.email, "creator.save", c.creator.code, { rate: c.creator.rate, months: c.creator.months, active: c.creator.active });
+    await audit(gate.staff.email, "creator.save", c.creator.code, {
+      rate: c.creator.rate,
+      months: c.creator.months,
+      active: c.creator.active,
+    });
     return json(200, { ok: true });
   }
   if (body.action === "payout") {
@@ -45,7 +55,8 @@ export async function POST(req: Request) {
     const code = typeof body.code === "string" ? body.code : "";
     if (!Number.isFinite(usd) || usd <= 0 || usd > 100_000) return json(400, { error: "Give the amount paid in US dollars." });
     const note = typeof body.note === "string" && body.note.trim() ? body.note.trim().slice(0, 200) : null;
-    if (!(await recordPayout(code, Math.round(usd * 100) / 100, gate.staff.email, note))) return json(404, { error: "No creator with that code." });
+    if (!(await recordPayout(code, Math.round(usd * 100) / 100, gate.staff.email, note)))
+      return json(404, { error: "No creator with that code." });
     await audit(gate.staff.email, "creator.payout", code, { usd });
     return json(200, { ok: true });
   }

@@ -1,5 +1,5 @@
 // POST /api/admin/login/ {email}: emails a one-time sign-in link to an admin. GET ?token=: signs in from it.
-import { finishSignIn, json, notFound, adminEmails, sameOrigin, startSignIn, supportEmails } from "@/server/adminAuth";
+import { adminEmails, finishSignIn, json, notFound, sameOrigin, startSignIn, supportEmails } from "@/server/adminAuth";
 
 const off = () => !adminEmails().size && !supportEmails().size;
 

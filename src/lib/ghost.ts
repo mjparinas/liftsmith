@@ -1,8 +1,8 @@
-import { exercise, available } from "./exercises";
+import { available, exercise } from "./exercises";
+import { planSeconds, restFor, type Plan, type PlanItem } from "./generator";
 import { t } from "./i18n";
-import { restFor, planSeconds, type Plan, type PlanItem } from "./generator";
-import { withLinks } from "./superset";
 import { sessionsOf, target } from "./progression";
+import { withLinks } from "./superset";
 import type { AppEvent, Gym, Profile, SetEvent } from "./types";
 
 // Ghost mode and "same as last time". The ghost is the lifter's own last session of the same exercise:
@@ -32,7 +32,12 @@ export function ghostFor(events: readonly AppEvent[], exerciseId: string, curren
   return {
     sessionId: list[0].sessionId,
     at: t0,
-    sets: list.map((s, i) => ({ weight: s.weight, reps: s.reps, restSec: s.restSec ?? restFromGap(list, i), offset: Math.round((s.at - t0) / 1000) })),
+    sets: list.map((s, i) => ({
+      weight: s.weight,
+      reps: s.reps,
+      restSec: s.restSec ?? restFromGap(list, i),
+      offset: Math.round((s.at - t0) / 1000),
+    })),
   };
 }
 
@@ -90,7 +95,15 @@ export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: stri
     count.set(s.exerciseId, (count.get(s.exerciseId) ?? 0) + 1);
     if (s.superset) group.set(s.exerciseId, s.superset);
   }
-  return { sessionId: latest.sessionId, at: own[0].at, items: order.map((exerciseId) => ({ exerciseId, sets: count.get(exerciseId)!, ...(group.has(exerciseId) ? { superset: group.get(exerciseId) } : {}) })) };
+  return {
+    sessionId: latest.sessionId,
+    at: own[0].at,
+    items: order.map((exerciseId) => ({
+      exerciseId,
+      sets: count.get(exerciseId)!,
+      ...(group.has(exerciseId) ? { superset: group.get(exerciseId) } : {}),
+    })),
+  };
 }
 
 /**
@@ -105,13 +118,22 @@ export function repeatPlan(base: Plan, events: readonly AppEvent[], profile: Pro
   const kept = last.items.filter((i) => can.has(i.exerciseId));
   const plain: PlanItem[] = kept.map((i) => {
     const ex = exercise(i.exerciseId);
-    return { exerciseId: ex.id, sets: i.sets, restSec: restFor(ex, profile.goal, profile.training), focus: ex.primary[0], target: target(ex, events, profile, gym, now) };
+    return {
+      exerciseId: ex.id,
+      sets: i.sets,
+      restSec: restFor(ex, profile.goal, profile.training),
+      focus: ex.primary[0],
+      target: target(ex, events, profile, gym, now),
+    };
   });
   if (!plain.length) return null;
   // Supersets come back as they were, where both exercises are still here and next to each other.
-  const items = withLinks(plain, kept.slice(0, -1).map((k, i) => !!k.superset && k.superset === kept[i + 1].superset));
+  const items = withLinks(
+    plain,
+    kept.slice(0, -1).map((k, i) => !!k.superset && k.superset === kept[i + 1].superset),
+  );
   const sec = planSeconds(items);
-  return { ...base, gymId: gym.id, challenge: false, items, estMinutes: Math.round(sec / 60)};
+  return { ...base, gymId: gym.id, challenge: false, items, estMinutes: Math.round(sec / 60) };
 }
 
 /** The numbers from the same set last time, for the one-tap "same as last time" chip. */

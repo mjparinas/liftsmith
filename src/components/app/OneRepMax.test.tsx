@@ -2,9 +2,11 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { useApp } from "@/lib/store";
+
 import { derive } from "@/lib/derive";
+import { useApp } from "@/lib/store";
 import type { AppEvent, SetEvent } from "@/lib/types";
+
 import { DotsCard, OneRmSection } from "./OneRepMax";
 
 const DAY = 86400_000;
@@ -35,11 +37,21 @@ describe("One-rep max calculator", () => {
     expect(within(dialog).getByTestId("onerm-calc")).toHaveTextContent("100 kg");
     // One more rep: 100 × 2 to failure.
     await user.click(within(dialog).getByRole("button", { name: "More reps" }));
-    const two = Number(within(dialog).getByTestId("onerm-calc").textContent!.replace(/[^\d.]/g, ""));
+    const two = Number(
+      within(dialog)
+        .getByTestId("onerm-calc")
+        .textContent!.replace(/[^\d.]/g, ""),
+    );
     expect(two).toBeGreaterThan(100);
     // Two reps left in the tank counts as 4 to failure.
     await user.click(within(dialog).getByRole("button", { name: "2" }));
-    expect(Number(within(dialog).getByTestId("onerm-calc").textContent!.replace(/[^\d.]/g, ""))).toBeGreaterThan(two);
+    expect(
+      Number(
+        within(dialog)
+          .getByTestId("onerm-calc")
+          .textContent!.replace(/[^\d.]/g, ""),
+      ),
+    ).toBeGreaterThan(two);
     expect(within(dialog).queryByRole("textbox")).toBeNull();
   });
 

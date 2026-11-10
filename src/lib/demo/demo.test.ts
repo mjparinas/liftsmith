@@ -1,13 +1,31 @@
 import { describe, expect, it } from "vitest";
+
 import { EXERCISES } from "../exercises";
 import { MUSCLES } from "../types";
-import { bounds, evalPart, jointsAt, partWeights, PARTS, placeVec, placement, REGIONS, skeletonSegments, SKEL_MAX } from "./mesh";
+import { bounds, evalPart, jointsAt, PARTS, partWeights, placement, placeVec, REGIONS, SKEL_MAX, skeletonSegments } from "./mesh";
 import { missingMotions, motionFor, targetsFor } from "./motions";
 import { BODIES, cycleLength, ik, len, sample, solve, sub, V, type BodyKey, type Vec } from "./rig";
 
 const BODY_KEYS: BodyKey[] = ["male", "female"];
 const PHASES = [0, 0.25, 0.5, 0.75, 1];
-const JOINTS = ["hipC", "shC", "neck", "head", "hipL", "kneeL", "ankleL", "shL", "elbowL", "handL", "hipR", "kneeR", "ankleR", "shR", "elbowR", "handR"] as const;
+const JOINTS = [
+  "hipC",
+  "shC",
+  "neck",
+  "head",
+  "hipL",
+  "kneeL",
+  "ankleL",
+  "shL",
+  "elbowL",
+  "handL",
+  "hipR",
+  "kneeR",
+  "ankleR",
+  "shR",
+  "elbowR",
+  "handR",
+] as const;
 
 describe("exercise demos", () => {
   it("has a motion for every exercise in the library", () => {
@@ -15,7 +33,11 @@ describe("exercise demos", () => {
   });
 
   it("paints every app muscle somewhere on the body", () => {
-    for (const m of MUSCLES) expect(REGIONS.some((r) => r.id === m), m).toBe(true);
+    for (const m of MUSCLES)
+      expect(
+        REGIONS.some((r) => r.id === m),
+        m,
+      ).toBe(true);
   });
 
   it("lights primary muscles fully and secondary ones at half", () => {
@@ -62,7 +84,9 @@ describe("exercise demos", () => {
     const J = jointsAt(m, B, 0.5);
     let painted = 0;
     for (const P of PARTS) {
-      const pos = new Float32Array(P.NT * P.M * 3), meta = new Float32Array(P.NT * P.M * 2), w = new Float32Array(P.NT * P.M);
+      const pos = new Float32Array(P.NT * P.M * 3),
+        meta = new Float32Array(P.NT * P.M * 2),
+        w = new Float32Array(P.NT * P.M);
       evalPart(P, J, B, pos, meta);
       expect(pos.every(Number.isFinite), P.name).toBe(true);
       partWeights(P, meta, targetsFor("deadlift"), w);

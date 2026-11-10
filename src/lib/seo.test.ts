@@ -1,14 +1,33 @@
 import { describe, expect, it } from "vitest";
-import { ARTICLES, CTA_COPY, readMinutes, type Block } from "@/content/articles";
-import { linksIn, relatedTo } from "@/components/site/ArticleView";
-import { EXERCISES, EXERCISE_BY_ID } from "./exercises";
-import { absolute, alternativesTo, articlePath, equipmentBySlug, equipmentSlug, equipmentWithPages, exercisesWith, kebab, muscleBySlug, muscleSlug, PAIR_MIN, pairExercises, pairs, siteRoutes, TOOL_PAGES } from "./seo";
+
 import sitemap from "@/app/sitemap";
+import { linksIn, relatedTo } from "@/components/site/ArticleView";
+import { ARTICLES, CTA_COPY, readMinutes, type Block } from "@/content/articles";
 import { allFacts, COMPETITORS, OURS, TOPIC_LABEL } from "@/content/compare";
+
+import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import {
+  absolute,
+  alternativesTo,
+  articlePath,
+  equipmentBySlug,
+  equipmentSlug,
+  equipmentWithPages,
+  exercisesWith,
+  kebab,
+  muscleBySlug,
+  muscleSlug,
+  PAIR_MIN,
+  pairExercises,
+  pairs,
+  siteRoutes,
+  TOOL_PAGES,
+} from "./seo";
 import { EQUIPMENT, MUSCLES } from "./types";
 
 const paths = new Set(siteRoutes().map((r) => r.path));
-const text = (b: Block): string[] => ("p" in b ? [b.p] : "tip" in b ? [b.tip] : "ul" in b ? b.ul : "ol" in b ? b.ol : "h2" in b ? [b.h2] : []);
+const text = (b: Block): string[] =>
+  "p" in b ? [b.p] : "tip" in b ? [b.tip] : "ul" in b ? b.ul : "ol" in b ? b.ol : "h2" in b ? [b.h2] : [];
 
 describe("SEO routes", () => {
   it("has one page per exercise, muscle, equipment item with exercises, pair, article and tool", () => {
@@ -58,7 +77,11 @@ describe("articles", () => {
 
   it("has many blog posts and the three guides", () => {
     expect(ARTICLES.filter((a) => a.kind === "blog").length).toBeGreaterThanOrEqual(20);
-    expect(ARTICLES.filter((a) => a.kind === "guide").map((a) => a.slug).sort()).toEqual(["deload-week", "progressive-overload", "reps-in-reserve"]);
+    expect(
+      ARTICLES.filter((a) => a.kind === "guide")
+        .map((a) => a.slug)
+        .sort(),
+    ).toEqual(["deload-week", "progressive-overload", "reps-in-reserve"]);
   });
 
   it("has unique slugs, short descriptions and past dates", () => {
@@ -131,7 +154,15 @@ describe("comparison pages", () => {
     for (const c of COMPETITORS) {
       expect(Object.keys(c.rows).length).toBeGreaterThanOrEqual(4);
       expect(c.theirPick.length).toBeGreaterThan(20);
-      for (const x of [c.summary, c.theirPick, ...c.ourPick, ...(Object.values(c.rows).flat().map((f) => f!.text))]) expect(x).not.toMatch(harsh);
+      for (const x of [
+        c.summary,
+        c.theirPick,
+        ...c.ourPick,
+        ...Object.values(c.rows)
+          .flat()
+          .map((f) => f!.text),
+      ])
+        expect(x).not.toMatch(harsh);
     }
   });
 });

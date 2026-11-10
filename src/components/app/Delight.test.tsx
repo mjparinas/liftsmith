@@ -4,14 +4,21 @@
 import { cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { useApp } from "@/lib/store";
+
 import { exercise } from "@/lib/exercises";
+import { useApp } from "@/lib/store";
+
 import { App } from "./App";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
 beforeEach(async () => {
-  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  window.matchMedia ??= ((q: string) => ({
+    matches: false,
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  })) as unknown as typeof window.matchMedia;
   window.scrollTo = () => {};
   Element.prototype.scrollIntoView ??= () => {};
   location.hash = "";
@@ -39,7 +46,13 @@ async function onboard(user: ReturnType<typeof userEvent.setup>) {
 /** Puts a barbell exercise first, so plate memory has something to show. */
 function barbellFirst() {
   const p = useApp.getState().preview!;
-  const bench = { ...p.items[0], exerciseId: "bench-press", sets: 3, warmup: undefined, target: { ...p.items[0].target, weight: 60, reps: 8 } };
+  const bench = {
+    ...p.items[0],
+    exerciseId: "bench-press",
+    sets: 3,
+    warmup: undefined,
+    target: { ...p.items[0].target, weight: 60, reps: 8 },
+  };
   useApp.getState().setPlan({ ...p, items: [bench, ...p.items.slice(1).filter((it) => it.exerciseId !== "bench-press")] });
   return useApp.getState().preview!.items[0];
 }
@@ -88,7 +101,10 @@ describe("Today and Progress extras", () => {
     await user.click(screen.getByRole("button", { name: "🔥 Warm up first" }));
     const warm = screen.getByRole("dialog", { name: "Five-minute warm-up" });
     expect(within(warm).getAllByRole("listitem").length).toBeGreaterThan(2);
-    const drill = () => within(warm).getAllByRole("button").filter((b) => b.hasAttribute("aria-pressed"))[0];
+    const drill = () =>
+      within(warm)
+        .getAllByRole("button")
+        .filter((b) => b.hasAttribute("aria-pressed"))[0];
     await user.click(drill());
     expect(drill()).toHaveAttribute("aria-pressed", "true");
     await user.click(warm.parentElement!);

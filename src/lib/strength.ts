@@ -1,6 +1,6 @@
 import { EXERCISE_BY_ID } from "./exercises";
-import { estimate, oneRm } from "./onerm";
 import { t } from "./i18n";
+import { estimate, oneRm } from "./onerm";
 import { LARGE_MUSCLES, MUSCLES, type AppEvent, type Exercise, type Muscle, type Profile } from "./types";
 
 // Strength score and "strength twins". Each exercise's current estimated one-rep max (onerm.ts) is compared
@@ -71,7 +71,12 @@ export interface StrengthReport {
   adjusted: { age: boolean; sex: boolean };
 }
 
-export function strength(events: readonly AppEvent[], profile: Pick<Profile, "bodyweight"> & AgeSex, now: number, opts: { adjustAge?: boolean } = {}): StrengthReport {
+export function strength(
+  events: readonly AppEvent[],
+  profile: Pick<Profile, "bodyweight"> & AgeSex,
+  now: number,
+  opts: { adjustAge?: boolean } = {},
+): StrengthReport {
   const bw = Math.max(30, profile.bodyweight || 75);
   const age = opts.adjustAge === false ? null : ageOf(profile, now);
   const af = ageFactor(age);
@@ -104,7 +109,9 @@ export function strength(events: readonly AppEvent[], profile: Pick<Profile, "bo
   }
   const entries = Object.entries(muscles) as [Muscle, number][];
   const w = (m: Muscle) => (LARGE_MUSCLES.has(m) ? 2 : 1);
-  const overall = entries.length ? Math.round(entries.reduce((s, [m, v]) => s + v * w(m), 0) / entries.reduce((s, [m]) => s + w(m), 0)) : null;
+  const overall = entries.length
+    ? Math.round(entries.reduce((s, [m, v]) => s + v * w(m), 0) / entries.reduce((s, [m]) => s + w(m), 0))
+    : null;
   return { overall, muscles, lifts, adjusted: { age: age !== null, sex: profile.sex === "female" } };
 }
 

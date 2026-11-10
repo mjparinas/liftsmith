@@ -1,4 +1,5 @@
 "use client";
+
 // Gym by location (Melvin, 2026-11-09). Opt-in per gym. When the app opens or comes back to the
 // foreground, it asks the phone for an approximate position (Android coarse location, iOS "when in
 // use", no background tracking) and switches the active gym if exactly one saved gym is nearby. The

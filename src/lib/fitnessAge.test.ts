@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ageForVo2, expectedVo2, fitnessAge, HUNT_REFERENCE, MAX_AGE, MIN_AGE, strengthWeek } from "./fitnessAge";
 import { dayOf } from "./twin";
 import type { AppEvent } from "./types";

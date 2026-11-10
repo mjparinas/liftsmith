@@ -1,6 +1,7 @@
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
+
 import { isNative } from "./juice";
 
 // Languages (Melvin, 2026-11-09: "i18n and l10n, use as much native as possible").
@@ -24,7 +25,7 @@ type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 export type Message = string | Plural;
 const CATALOG: Record<Lang, Partial<Record<MessageKey, Message>>> = { en, es, fr };
 
-let phoneTags: readonly string[] = typeof navigator !== "undefined" ? navigator.languages ?? [navigator.language] : ["en"];
+let phoneTags: readonly string[] = typeof navigator !== "undefined" ? (navigator.languages ?? [navigator.language]) : ["en"];
 let pref: LangPref = "system";
 let lang: Lang = "en";
 let tag = "en";

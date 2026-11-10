@@ -1,20 +1,33 @@
 "use client";
+
+import { useMemo, useState } from "react";
+
 import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
-import { COSMETICS, LEAGUE_LABEL, LEAGUES, RARITY_LABEL, game, type Cosmetic, type Game } from "@/lib/game";
+import { COSMETICS, game, LEAGUE_LABEL, LEAGUES, RARITY_LABEL, type Cosmetic, type Game } from "@/lib/game";
+import { t } from "@/lib/i18n";
 import { applyAccent, sound, type TimerSound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
-import { useNow } from "@/lib/useNow";
 import { fmtNum } from "@/lib/units";
-import { useMemo, useState } from "react";
+import { useNow } from "@/lib/useNow";
+
 import { go } from "./router";
 import { Chip, Section } from "./ui";
-import { t } from "@/lib/i18n";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
 // CSS variables (globals.css), so each has a dark and a light value.
-export const TIER_COLOUR: Record<Tier, string> = { bronze: "var(--tier-bronze)", silver: "var(--tier-silver)", gold: "var(--tier-gold)", platinum: "var(--tier-platinum)" };
-export const RARITY_COLOUR = { common: "var(--rarity-common)", rare: "var(--rarity-rare)", epic: "var(--rarity-epic)", legendary: "var(--rarity-legendary)" } as const;
+export const TIER_COLOUR: Record<Tier, string> = {
+  bronze: "var(--tier-bronze)",
+  silver: "var(--tier-silver)",
+  gold: "var(--tier-gold)",
+  platinum: "var(--tier-platinum)",
+};
+export const RARITY_COLOUR = {
+  common: "var(--rarity-common)",
+  rare: "var(--rarity-rare)",
+  epic: "var(--rarity-epic)",
+  legendary: "var(--rarity-legendary)",
+} as const;
 
 export function useGame(): Game {
   const { events, stats, profile } = useApp();
@@ -30,7 +43,17 @@ export function Badge({ a, size = 56 }: { a: Pick<Achievement, "icon" | "tier" |
     <span
       aria-hidden
       className="grid shrink-0 place-items-center rounded-full"
-      style={{ width: size, height: size, fontSize: size * 0.46, background: a.tier ? `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${c} 33%, transparent), color-mix(in srgb, ${c} 8%, transparent) 70%)` : "var(--color-raised)", boxShadow: `inset 0 0 0 3px ${c}`, filter: a.tier || a.hidden ? undefined : "grayscale(1)", opacity: a.tier ? 1 : 0.55 }}
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.46,
+        background: a.tier
+          ? `radial-gradient(circle at 35% 30%, color-mix(in srgb, ${c} 33%, transparent), color-mix(in srgb, ${c} 8%, transparent) 70%)`
+          : "var(--color-raised)",
+        boxShadow: `inset 0 0 0 3px ${c}`,
+        filter: a.tier || a.hidden ? undefined : "grayscale(1)",
+        opacity: a.tier ? 1 : 0.55,
+      }}
     >
       {a.icon}
     </span>
@@ -40,7 +63,14 @@ export function Badge({ a, size = 56 }: { a: Pick<Achievement, "icon" | "tier" |
 export function Bar({ value, label, colour = "var(--color-accent)" }: { value: number; label: string; colour?: string }) {
   const pct = Math.round(Math.max(0, Math.min(1, value)) * 100);
   return (
-    <div className="h-2 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={pct}>
+    <div
+      className="h-2 overflow-hidden rounded-full bg-raised"
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+    >
       <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${pct}%`, background: colour }} />
     </div>
   );
@@ -60,12 +90,22 @@ export function AchievementRow({ a }: { a: Achievement }) {
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
           <span className="truncate font-semibold">{a.name}</span>
-          {a.tier && <span className="shrink-0 text-xs font-semibold" style={{ color: TIER_COLOUR[a.tier] }}>{TIER_LABEL[a.tier]}</span>}
+          {a.tier && (
+            <span className="shrink-0 text-xs font-semibold" style={{ color: TIER_COLOUR[a.tier] }}>
+              {TIER_LABEL[a.tier]}
+            </span>
+          )}
         </div>
         <p className="truncate text-sm text-muted">{a.next ? a.next.detail : a.detail}</p>
         {!a.hidden && (
           <div className="mt-1.5 flex items-center gap-2">
-            <div className="flex-1"><Bar value={a.progress} label={t("awards.progress", { name: a.name })} colour={a.next ? TIER_COLOUR[a.next.tier] : TIER_COLOUR.platinum} /></div>
+            <div className="flex-1">
+              <Bar
+                value={a.progress}
+                label={t("awards.progress", { name: a.name })}
+                colour={a.next ? TIER_COLOUR[a.next.tier] : TIER_COLOUR.platinum}
+              />
+            </div>
             <span className="num shrink-0 text-xs text-faint">{progressText(a)}</span>
           </div>
         )}
@@ -82,11 +122,16 @@ export function StreakCard({ g }: { g: Game }) {
       <div className="flex items-center justify-between">
         <span className="font-semibold">🔥 {t("awards.streak", { count: s.weeks })}</span>
         <span className="text-sm text-muted" title={t("awards.freezeHelp")}>
-          {"🧊".repeat(s.freezes)}{s.freezes === 0 ? t("awards.noFreezes") : ` ${t("awards.freezes", { count: s.freezes })}`}
+          {"🧊".repeat(s.freezes)}
+          {s.freezes === 0 ? t("awards.noFreezes") : ` ${t("awards.freezes", { count: s.freezes })}`}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted">
-        {s.needed === 0 ? t("awards.goalDone") : s.atRisk ? t(s.freezeReady ? "awards.atRiskFreeze" : "awards.atRisk") : t(s.weeks > 0 ? "awards.needKeep" : "awards.needStart", { count: s.needed })}
+        {s.needed === 0
+          ? t("awards.goalDone")
+          : s.atRisk
+            ? t(s.freezeReady ? "awards.atRiskFreeze" : "awards.atRisk")
+            : t(s.weeks > 0 ? "awards.needKeep" : "awards.needStart", { count: s.needed })}
       </p>
       <p className="mt-1 text-xs text-faint">{t("awards.best", { count: s.best })}</p>
     </div>
@@ -98,15 +143,25 @@ export function QuestsCard({ g }: { g: Game }) {
     <ul className="card divide-y divide-line" aria-label={t("awards.quests")}>
       {g.quests.map((q) => (
         <li key={q.id} className="flex items-center gap-3 px-4 py-3">
-          <span aria-hidden className="text-2xl">{q.done ? "✅" : q.icon}</span>
+          <span aria-hidden className="text-2xl">
+            {q.done ? "✅" : q.icon}
+          </span>
           <div className="min-w-0 flex-1">
             <div className="flex justify-between gap-2">
               <span className={`truncate ${q.done ? "text-muted line-through" : "font-medium"}`}>{q.title}</span>
               <span className="num shrink-0 text-sm text-accent">{t("awards.plusXp", { xp: q.xp })}</span>
             </div>
             <div className="mt-1.5 flex items-center gap-2">
-              <div className="flex-1"><Bar value={q.have / q.goal} label={t("awards.progress", { name: q.title })} colour={q.done ? "var(--color-good)" : undefined} /></div>
-              <span className="num text-xs text-faint">{q.have}/{q.goal}</span>
+              <div className="flex-1">
+                <Bar
+                  value={q.have / q.goal}
+                  label={t("awards.progress", { name: q.title })}
+                  colour={q.done ? "var(--color-good)" : undefined}
+                />
+              </div>
+              <span className="num text-xs text-faint">
+                {q.have}/{q.goal}
+              </span>
             </div>
           </div>
         </li>
@@ -124,14 +179,25 @@ export function LeagueCard({ g }: { g: Game }) {
         <span className="font-semibold">🏅 {t("awards.league", { league: LEAGUE_LABEL[l.league] })}</span>
         <span className="num text-sm text-muted">{t("awards.weekXp", { xp: l.weekXp })}</span>
       </div>
-      <div className="mt-2"><Bar value={pct} label={t("awards.leagueProgress")} /></div>
+      <div className="mt-2">
+        <Bar value={pct} label={t("awards.leagueProgress")} />
+      </div>
       <p className="mt-1.5 text-xs text-faint">
-        {l.promoteAt ? (l.weekXp >= l.promoteAt ? t("awards.moveUp", { league: LEAGUE_LABEL[LEAGUES[l.index + 1]] }) : t("awards.toMoveUp", { xp: l.promoteAt - l.weekXp, league: LEAGUE_LABEL[LEAGUES[l.index + 1]] })) : t("awards.topLeague")}
+        {l.promoteAt
+          ? l.weekXp >= l.promoteAt
+            ? t("awards.moveUp", { league: LEAGUE_LABEL[LEAGUES[l.index + 1]] })
+            : t("awards.toMoveUp", { xp: l.promoteAt - l.weekXp, league: LEAGUE_LABEL[LEAGUES[l.index + 1]] })
+          : t("awards.topLeague")}
         {l.demoteBelow > 0 && l.weekXp < l.demoteBelow ? ` ${t("awards.drop", { xp: l.demoteBelow })}` : ""}
       </p>
       <ol className="mt-3 flex gap-1" aria-label={t("awards.leagues")}>
         {LEAGUES.map((name, i) => (
-          <li key={name} title={LEAGUE_LABEL[name]} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}><span className="sr-only">{LEAGUE_LABEL[name]}{i === l.index ? ` ${t("awards.you")}` : ""}</span></li>
+          <li key={name} title={LEAGUE_LABEL[name]} className={`h-1.5 flex-1 rounded-full ${i <= l.index ? "bg-accent" : "bg-raised"}`}>
+            <span className="sr-only">
+              {LEAGUE_LABEL[name]}
+              {i === l.index ? ` ${t("awards.you")}` : ""}
+            </span>
+          </li>
         ))}
       </ol>
     </div>
@@ -147,7 +213,11 @@ function Locker({ g }: { g: Game }) {
     if (c.kind === "accent") applyAccent(c.value);
     if (c.kind === "sound") sound.preview(c.value as TimerSound);
   };
-  const groups: [Cosmetic["kind"], string, string][] = [["accent", t("awards.locker.accent"), "accent-blue"], ["sound", t("awards.locker.sound"), "sound-classic"], ["plates", t("awards.locker.plates"), "plates-classic"]];
+  const groups: [Cosmetic["kind"], string, string][] = [
+    ["accent", t("awards.locker.accent"), "accent-blue"],
+    ["sound", t("awards.locker.sound"), "sound-classic"],
+    ["plates", t("awards.locker.plates"), "plates-classic"],
+  ];
   return (
     <div className="space-y-4">
       {groups.map(([kind, label, def]) => (
@@ -168,7 +238,9 @@ function Locker({ g }: { g: Game }) {
                 >
                   {kind === "accent" && <span aria-hidden className="h-4 w-4 rounded-full" style={{ background: c.value }} />}
                   <span>{have ? c.name : `🔒 ${c.name}`}</span>
-                  <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>{RARITY_LABEL[c.rarity]}</span>
+                  <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
+                    {RARITY_LABEL[c.rarity]}
+                  </span>
                 </button>
               );
             })}
@@ -180,7 +252,17 @@ function Locker({ g }: { g: Game }) {
   );
 }
 
-const FILTERS: ("all" | "earned" | Category)[] = ["all", "earned", "consistency", "strength", "volume", "records", "explore", "smart", "secret"];
+const FILTERS: ("all" | "earned" | Category)[] = [
+  "all",
+  "earned",
+  "consistency",
+  "strength",
+  "volume",
+  "records",
+  "explore",
+  "smart",
+  "secret",
+];
 
 export function Achievements() {
   const g = useGame();
@@ -190,38 +272,72 @@ export function Achievements() {
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">‹ {t("progress.title")}</button>
+      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
+        ‹ {t("progress.title")}
+      </button>
       <h1 className="text-2xl font-bold">{t("awards.title")}</h1>
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
-          <span className="font-semibold">{t("progress.level", { level: g.level.level })} · {g.level.title}</span>
+          <span className="font-semibold">
+            {t("progress.level", { level: g.level.level })} · {g.level.title}
+          </span>
           <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
         </div>
-        <div className="mt-2"><Bar value={g.level.into / g.level.span} label={t("awards.levelProgress")} /></div>
-        {g.level.next && <p className="num mt-1.5 text-xs text-faint">{t("progress.xpTo", { xp: g.level.span - g.level.into, next: g.level.next })}</p>}
-        <p className="num mt-3 text-sm"><span className="font-semibold">{fmtNum(g.badges.earned)}</span> <span className="text-muted">{t("awards.badgesOf", { total: g.badges.total })}</span></p>
+        <div className="mt-2">
+          <Bar value={g.level.into / g.level.span} label={t("awards.levelProgress")} />
+        </div>
+        {g.level.next && (
+          <p className="num mt-1.5 text-xs text-faint">{t("progress.xpTo", { xp: g.level.span - g.level.into, next: g.level.next })}</p>
+        )}
+        <p className="num mt-3 text-sm">
+          <span className="font-semibold">{fmtNum(g.badges.earned)}</span>{" "}
+          <span className="text-muted">{t("awards.badgesOf", { total: g.badges.total })}</span>
+        </p>
       </div>
-      <Section title={t("awards.weekQuests")}><QuestsCard g={g} /></Section>
-      <Section title={t("awards.leagueTitle")}><LeagueCard g={g} /></Section>
-      <Section title={t("awards.streakTitle")}><StreakCard g={g} /></Section>
+      <Section title={t("awards.weekQuests")}>
+        <QuestsCard g={g} />
+      </Section>
+      <Section title={t("awards.leagueTitle")}>
+        <LeagueCard g={g} />
+      </Section>
+      <Section title={t("awards.streakTitle")}>
+        <StreakCard g={g} />
+      </Section>
       <Section title={t("awards.badges")}>
         <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
-          {FILTERS.map((f) => <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>{f === "all" ? t("awards.all") : f === "earned" ? t("awards.earned") : CATEGORY_LABEL[f]}</Chip>)}
+          {FILTERS.map((f) => (
+            <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
+              {f === "all" ? t("awards.all") : f === "earned" ? t("awards.earned") : CATEGORY_LABEL[f]}
+            </Chip>
+          ))}
         </div>
         <ul className="card divide-y divide-line">
-          {sorted.filter((a) => !a.hidden || filter === "secret").map((a) => <AchievementRow key={a.id} a={a} />)}
+          {sorted
+            .filter((a) => !a.hidden || filter === "secret")
+            .map((a) => (
+              <AchievementRow key={a.id} a={a} />
+            ))}
           {filter !== "secret" && hiddenLeft > 0 && (
             <li>
-              <button type="button" onClick={() => setFilter("secret")} className="press flex w-full items-center gap-3 px-4 py-3 text-left">
+              <button
+                type="button"
+                onClick={() => setFilter("secret")}
+                className="press flex w-full items-center gap-3 px-4 py-3 text-left"
+              >
                 <Badge a={{ icon: "❔", tier: null, hidden: true, name: "" }} />
-                <span><span className="block font-semibold">{t("awards.secretCount", { count: hiddenLeft })}</span><span className="text-sm text-muted">{t("awards.hidden")}</span></span>
+                <span>
+                  <span className="block font-semibold">{t("awards.secretCount", { count: hiddenLeft })}</span>
+                  <span className="text-sm text-muted">{t("awards.hidden")}</span>
+                </span>
               </button>
             </li>
           )}
           {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
-      <Section title={t("awards.locker")}><Locker g={g} /></Section>
+      <Section title={t("awards.locker")}>
+        <Locker g={g} />
+      </Section>
     </div>
   );
 }

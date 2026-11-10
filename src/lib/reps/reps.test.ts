@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
+
 import { EXERCISES } from "../exercises";
 import { describe as describeScore, evaluate } from "./evaluate";
-import { ImuRepCounter, imuProfile } from "./imu";
+import { imuProfile, ImuRepCounter } from "./imu";
 import { angle, BLAZEPOSE, COCO17, PoseSignal, type Keypoint } from "./pose";
 import { profileFor } from "./profiles";
 import { imuSamples, simulateSet } from "./simulate";
@@ -80,7 +81,22 @@ describe("rep tracker", () => {
   });
 
   it("flags slow reps as grinders and estimates reps in reserve from slowdown", () => {
-    const mk = (speed: number, i: number): Rep => ({ index: i, kind: "full", start: i, turn: i, end: i + 1, rom: 90, depth: 1, concentricMs: 1, eccentricMs: 1, speed, speedIsMetres: true, velocityLoss: 0, grinder: false, sticking: false });
+    const mk = (speed: number, i: number): Rep => ({
+      index: i,
+      kind: "full",
+      start: i,
+      turn: i,
+      end: i + 1,
+      rom: 90,
+      depth: 1,
+      concentricMs: 1,
+      eccentricMs: 1,
+      speed,
+      speedIsMetres: true,
+      velocityLoss: 0,
+      grinder: false,
+      sticking: false,
+    });
     const s = summarise([mk(0.6, 0), mk(0.55, 1), mk(0.45, 2), mk(0.28, 3)]);
     expect(s.reps.map((r) => r.grinder)).toEqual([false, false, false, true]);
     expect(s.velocityLoss).toBeCloseTo(0.53, 2);
@@ -182,7 +198,11 @@ describe("motion counter", () => {
 describe("accuracy on simulated sets", () => {
   const cam = (p: MotionProfile, opts = {}) => evaluate("camera", 60, p, opts);
   it("camera, side view", () => {
-    for (const [id, pat] of [["back-squat", "squat"], ["bench-press", "hpush"], ["barbell-curl", "isolation"]] as const) {
+    for (const [id, pat] of [
+      ["back-squat", "squat"],
+      ["bench-press", "hpush"],
+      ["barbell-curl", "isolation"],
+    ] as const) {
       const s = cam(profileFor(id, pat)!);
       expect(s.exactReps / s.sets, id).toBeGreaterThanOrEqual(0.95);
       expect(s.failed.hit / Math.max(1, s.failed.truth), id).toBeGreaterThanOrEqual(0.8);
@@ -203,13 +223,25 @@ describe("accuracy on simulated sets", () => {
 describe.runIf(process.env.REP_ACCURACY)("accuracy report", () => {
   it("prints", { timeout: 300000 }, () => {
     const w = (x: string) => process.stdout.write(`\n${x}`);
-    for (const [id, pat] of [["back-squat", "squat"], ["bench-press", "hpush"], ["deadlift", "hinge"], ["overhead-press", "vpush"], ["barbell-row", "hpull"], ["barbell-curl", "isolation"]] as const) {
+    for (const [id, pat] of [
+      ["back-squat", "squat"],
+      ["bench-press", "hpush"],
+      ["deadlift", "hinge"],
+      ["overhead-press", "vpush"],
+      ["barbell-row", "hpull"],
+      ["barbell-curl", "isolation"],
+    ] as const) {
       const p = profileFor(id, pat)!;
       w(describeScore(`camera ${id} side`, evaluate("camera", 300, p)));
       w(describeScore(`camera ${id} angled`, evaluate("camera", 300, p, { romDeg: 55 })));
       w(describeScore(`camera ${id} poor`, evaluate("camera", 300, p, { jitterDeg: 5, outliers: 0.04, dropouts: 0.08, fps: 15 })));
     }
-    for (const [id, pat, rom] of [["back-squat", "squat", 0.5], ["bench-press", "hpush", 0.35], ["barbell-curl", "isolation", 0.4], ["overhead-press", "vpush", 0.45]] as const) {
+    for (const [id, pat, rom] of [
+      ["back-squat", "squat", 0.5],
+      ["bench-press", "hpush", 0.35],
+      ["barbell-curl", "isolation", 0.4],
+      ["overhead-press", "vpush", 0.45],
+    ] as const) {
       const p = imuProfile(id, pat)!;
       w(describeScore(`fused ${id} 50Hz`, evaluate("fused", 300, p, { romM: rom })));
       w(describeScore(`fused ${id} 25Hz noisy`, evaluate("fused", 300, p, { romM: rom, imuNoise: 0.3, hz: 25 })));

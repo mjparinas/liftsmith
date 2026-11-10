@@ -1,15 +1,18 @@
 import { describe, expect, it } from "vitest";
+
+import { makeSet } from "@/test/factories";
+
 import { blockWeek } from "./block";
-import { makeGym, defaultProfile } from "./defaults";
+import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
-import { EXERCISES, exercise } from "./exercises";
+import { exercise, EXERCISES } from "./exercises";
+import { goalStreak, levelOf } from "./game";
 import { alternatives, generate, itemSeconds } from "./generator";
 import { loadBar, nearestLoads } from "./plates";
 import { epley, target } from "./progression";
 import { recovery } from "./recovery";
 import type { AppEvent, SetEvent } from "./types";
 import { toKg } from "./units";
-import { goalStreak, levelOf } from "./game";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
 const H = 3600_000;
@@ -18,9 +21,8 @@ function profile() {
   return { ...defaultProfile(NOW), onboarded: true, activeGymId: "g" };
 }
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, targetReps = reps, sessionId = "s1"): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId, exerciseId, weight, reps, targetReps, rir: 2 };
+  return makeSet({ at, sessionId, exerciseId, weight, reps, targetReps });
 }
 
 describe("exercise library", () => {
@@ -35,7 +37,10 @@ describe("exercise library", () => {
   it("has bodyweight exercises for every major muscle", () => {
     const bw = EXERCISES.filter((e) => e.needs.length === 0);
     for (const m of ["chest", "quads", "hamstrings", "glutes", "abs", "upperBack", "triceps", "frontDelts"]) {
-      expect(bw.some((e) => e.primary.includes(m as never)), m).toBe(true);
+      expect(
+        bw.some((e) => e.primary.includes(m as never)),
+        m,
+      ).toBe(true);
     }
   });
 });
@@ -48,14 +53,20 @@ describe("plates", () => {
     expect(l.perSide).toEqual([25, 15]);
   });
   it("uses only plates owned", () => {
-    const l = loadBar(140, 20, [{ weight: 20, count: 2 }, { weight: 10, count: 4 }]);
+    const l = loadBar(140, 20, [
+      { weight: 20, count: 2 },
+      { weight: 10, count: 4 },
+    ]);
     expect(l.perSide).toEqual([20, 10, 10]);
     expect(l.total).toBe(100);
     expect(l.exact).toBe(false);
   });
   it("finds combinations a greedy fill misses", () => {
     // 2 x 15 per side makes 80 on a 20 bar; greedy 25 first would get stuck.
-    const l = loadBar(80, 20, [{ weight: 25, count: 2 }, { weight: 15, count: 4 }]);
+    const l = loadBar(80, 20, [
+      { weight: 25, count: 2 },
+      { weight: 15, count: 4 },
+    ]);
     expect(l.exact).toBe(true);
     expect(l.perSide).toEqual([15, 15]);
   });
@@ -164,7 +175,8 @@ describe("stats and game", () => {
   });
   it("streak counts weeks that met the goal", () => {
     const ev: AppEvent[] = [];
-    for (let w = 1; w <= 3; w++) for (let d = 0; d < 3; d++) ev.push(set("plank", NOW - w * 7 * 24 * H + d * 24 * H, 0, 30, 30, `w${w}d${d}`));
+    for (let w = 1; w <= 3; w++)
+      for (let d = 0; d < 3; d++) ev.push(set("plank", NOW - w * 7 * 24 * H + d * 24 * H, 0, 30, 30, `w${w}d${d}`));
     const st = goalStreak(derive(ev, NOW), { daysPerWeek: 3 }, NOW);
     expect(st.weeks).toBe(3);
   });

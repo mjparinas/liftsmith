@@ -6,10 +6,18 @@ import { claimCode, findCreator } from "@/server/creators";
 import { rateLimit } from "@/server/db";
 
 function cors(origin: string | null): Record<string, string> {
-  return origin && NATIVE_ORIGINS.has(origin) ? { "Access-Control-Allow-Origin": origin, "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type", Vary: "Origin" } : {};
+  return origin && NATIVE_ORIGINS.has(origin)
+    ? {
+        "Access-Control-Allow-Origin": origin,
+        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+        "Access-Control-Allow-Headers": "Content-Type",
+        Vary: "Origin",
+      }
+    : {};
 }
 
-const json = (status: number, body: unknown, headers: Record<string, string>) => Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
+const json = (status: number, body: unknown, headers: Record<string, string>) =>
+  Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
 const ipOf = (req: Request) => req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
 
 export function OPTIONS(req: Request) {

@@ -1,7 +1,8 @@
 "use client";
+
+import { list, t } from "./i18n";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
-import { list, t } from "./i18n";
 
 // Gym buddy check-ins. Today: one tap writes the check-in and opens the system share sheet with a short
 // message, so a friend hears about it in whatever app they already use. Once accounts and sync exist the
@@ -12,7 +13,14 @@ export function checkinText(opts: { name?: string; gym?: string; focus?: string[
   const hi = who ? t("buddy.hi", { who }) : "";
   const gym = opts.gym && opts.gym !== "My gym" ? opts.gym : "";
   const focus = opts.focus?.length ? list(opts.focus.map((f) => f.toLowerCase())) : "";
-  const body = gym && focus ? t("buddy.atGymFocus", { gym, focus }) : gym ? t("buddy.atGym", { gym }) : focus ? t("buddy.atFocus", { focus }) : t("buddy.at");
+  const body =
+    gym && focus
+      ? t("buddy.atGymFocus", { gym, focus })
+      : gym
+        ? t("buddy.atGym", { gym })
+        : focus
+          ? t("buddy.atFocus", { focus })
+          : t("buddy.at");
   return hi + body;
 }
 

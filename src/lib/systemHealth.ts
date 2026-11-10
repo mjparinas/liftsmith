@@ -154,20 +154,45 @@ export function runState(r: { status: string; conclusion: string | null }): Chec
  * `recommended` amber, `optional` stays quiet. Keep in step with AGENTS.md ("Server environment" lines).
  */
 export const SETTINGS: { names: string[]; label: string; need: "required" | "recommended" | "optional"; what: string }[] = [
-  { names: ["TURSO_DATABASE_URL", "DATABASE_URL"], label: "Database", need: "required", what: "Analytics, reminders, creators and the admin panel need it." },
+  {
+    names: ["TURSO_DATABASE_URL", "DATABASE_URL"],
+    label: "Database",
+    need: "required",
+    what: "Analytics, reminders, creators and the admin panel need it.",
+  },
   { names: ["RESEND_API_KEY"], label: "Email sending", need: "required", what: "Admin sign-in links, feedback and reminder emails." },
   { names: ["ADMIN_EMAILS"], label: "Admin emails", need: "required", what: "Who can open this panel." },
   { names: ["MAIL_FROM"], label: "Reminder sender", need: "required", what: "The From address for reminder emails." },
-  { names: ["MAIL_POSTAL_ADDRESS"], label: "Postal address", need: "required", what: "Every marketing email must carry it (CAN-SPAM, CASL)." },
+  {
+    names: ["MAIL_POSTAL_ADDRESS"],
+    label: "Postal address",
+    need: "required",
+    what: "Every marketing email must carry it (CAN-SPAM, CASL).",
+  },
   { names: ["REMINDER_SECRET"], label: "Unsubscribe link secret", need: "required", what: "Signs one-click unsubscribe links." },
   { names: ["CRON_SECRET"], label: "Cron secret", need: "required", what: "Vercel Cron sends it to the daily reminder job." },
   { names: ["ANALYTICS_SECRET"], label: "Visitor hash salt", need: "recommended", what: "Salts the cookieless visitor count." },
   { names: ["NEXT_PUBLIC_SITE_URL"], label: "Site address", need: "recommended", what: "Set it to https://www.getliftsmith.com." },
   { names: ["FEEDBACK_TO"], label: "Feedback inbox", need: "recommended", what: "Where in-app feedback is emailed." },
-  { names: ["RESEND_INBOX_API_KEY"], label: "Inbox reading key", need: "recommended", what: "A full-access Resend key, so the Inbox tab can read received mail." },
-  { names: ["REVENUECAT_WEBHOOK_SECRET"], label: "RevenueCat webhook", need: "optional", what: "Store subscription events, once billing is live." },
+  {
+    names: ["RESEND_INBOX_API_KEY"],
+    label: "Inbox reading key",
+    need: "recommended",
+    what: "A full-access Resend key, so the Inbox tab can read received mail.",
+  },
+  {
+    names: ["REVENUECAT_WEBHOOK_SECRET"],
+    label: "RevenueCat webhook",
+    need: "optional",
+    what: "Store subscription events, once billing is live.",
+  },
   { names: ["UPTIMEROBOT_API_KEY"], label: "UptimeRobot", need: "optional", what: "The read-only API key, for the Uptime card." },
-  { names: ["GITHUB_TOKEN"], label: "GitHub token", need: "optional", what: "A read-only Actions token; the Builds card works without one, within GitHub's hourly limit." },
+  {
+    names: ["GITHUB_TOKEN"],
+    label: "GitHub token",
+    need: "optional",
+    what: "A read-only Actions token; the Builds card works without one, within GitHub's hourly limit.",
+  },
   { names: ["VERCEL_TOKEN"], label: "Vercel token", need: "optional", what: "A read-only token, for the Deploys card's history." },
 ];
 
@@ -175,7 +200,11 @@ export const SETTINGS: { names: string[]; label: string; need: "required" | "rec
 export function settingRows(env: (name: string) => string): CheckRow[] {
   return SETTINGS.map((s) => {
     const name = s.names.find((n) => env(n));
-    return { label: s.label, value: name ? `Set (${name})` : `Missing: ${s.names.join(" or ")}. ${s.what}`, state: name ? "ok" : s.need === "required" ? "down" : s.need === "recommended" ? "warn" : undefined };
+    return {
+      label: s.label,
+      value: name ? `Set (${name})` : `Missing: ${s.names.join(" or ")}. ${s.what}`,
+      state: name ? "ok" : s.need === "required" ? "down" : s.need === "recommended" ? "warn" : undefined,
+    };
   });
 }
 

@@ -7,8 +7,8 @@
 // from the subscriber's first payment. Revenue counts once the store's refund window has passed (HOLD_DAYS),
 // so we don't pay out on money that comes back. A refund takes its share back off what's earned.
 // Payouts go out monthly once a creator is owed at least MIN_PAYOUT.
-import { ASSUMED } from "./forecast";
 import type { SubEvent } from "./adminMetrics";
+import { ASSUMED } from "./forecast";
 
 const DAY = 86_400_000;
 export const STORE_FEE = ASSUMED.storeFee;
@@ -86,7 +86,14 @@ export function addMonths(t: number, months: number): number {
   return d.getTime();
 }
 
-export function creatorRows(input: { creators: Creator[]; installs: CreatorInstall[]; subs: SubEvent[]; payouts: Payout[]; now: number; since?: number }): CreatorRow[] {
+export function creatorRows(input: {
+  creators: Creator[];
+  installs: CreatorInstall[];
+  subs: SubEvent[];
+  payouts: Payout[];
+  now: number;
+  since?: number;
+}): CreatorRow[] {
   const { creators, installs, subs, payouts, now } = input;
   const since = input.since ?? 0;
   const codeOf = new Map(installs.map((i) => [i.installId, i.code]));
@@ -155,6 +162,7 @@ const csvCell = (v: string | number) => {
 /** The month's payout list: every creator owed at least MIN_PAYOUT. */
 export function payoutCsv(rows: CreatorRow[]): string {
   const lines = [["code", "name", "contact", "owed_usd", "paying_subscribers", "paid_to_date_usd"].join(",")];
-  for (const r of rows.filter((x) => x.payable)) lines.push([r.code, r.name, r.contact ?? "", r.owed.toFixed(2), r.paying, r.paid.toFixed(2)].map(csvCell).join(","));
+  for (const r of rows.filter((x) => x.payable))
+    lines.push([r.code, r.name, r.contact ?? "", r.owed.toFixed(2), r.paying, r.paid.toFixed(2)].map(csvCell).join(","));
   return lines.join("\n") + "\n";
 }

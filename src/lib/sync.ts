@@ -1,9 +1,10 @@
 "use client";
+
 // Sync with the lifter's account (AGENTS.md "Sync"). Push what this device wrote since the last sync (the
 // outbox in syncOutbox.ts), pull what the account's other devices wrote, by cursor, from POST /api/sync/.
 // Runs on open, when the app comes back to the foreground or online, and a few seconds after a change.
 // Events merge by id, so order and repeats don't matter; the profile and gyms are last write wins.
-import { AuthError, api, forgetAccount, readAccount, useAccount } from "./auth";
+import { api, AuthError, forgetAccount, readAccount, useAccount } from "./auth";
 import { useApp } from "./store";
 import { noteChanged, onOutbox, readSync, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
@@ -35,13 +36,22 @@ export interface Pulled {
 
 /** The records this device sends: its profile, each gym, and a removal for each gym it no longer has. */
 export function localRecords(profile: Profile, gyms: Gym[], known: string[], now: number): Rec[] {
-  const recs: Rec[] = [{ key: "profile", value: profile, updatedAt: profile.updatedAt }, ...gyms.map((g) => ({ key: `gym:${g.id}`, value: g, updatedAt: g.updatedAt }))];
+  const recs: Rec[] = [
+    { key: "profile", value: profile, updatedAt: profile.updatedAt },
+    ...gyms.map((g) => ({ key: `gym:${g.id}`, value: g, updatedAt: g.updatedAt })),
+  ];
   for (const id of known) if (!gyms.some((g) => g.id === id)) recs.push({ key: `gym:${id}`, value: null, updatedAt: now });
   return recs;
 }
 
 /** Applies the account's records to this device's profile and gyms (newer wins; on a first sync the account's profile wins). */
-export function mergeRecords(profile: Profile, gyms: Gym[], recs: Rec[], first: boolean, now = Date.now()): { profile: Profile | null; gyms: Gym[] | null; known: string[]; fixed: boolean } {
+export function mergeRecords(
+  profile: Profile,
+  gyms: Gym[],
+  recs: Rec[],
+  first: boolean,
+  now = Date.now(),
+): { profile: Profile | null; gyms: Gym[] | null; known: string[]; fixed: boolean } {
   let nextProfile: Profile | null = null;
   const p = recs.find((r) => r.key === "profile");
   if (p?.value && (p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt))) nextProfile = p.value as Profile;
@@ -125,7 +135,13 @@ async function run(): Promise<void> {
       const now = Date.now();
       const reply = await api<Reply>("/api/sync/", {
         token: account.token,
-        body: { cursor: s.cursor, events: send, deleted: del, records: s.rev !== s.sentRev || s.first ? localRecords(profile, gyms, s.gyms, now) : [], first: s.first },
+        body: {
+          cursor: s.cursor,
+          events: send,
+          deleted: del,
+          records: s.rev !== s.sentRev || s.first ? localRecords(profile, gyms, s.gyms, now) : [],
+          first: s.first,
+        },
       });
       const merged = mergeRecords(useApp.getState().profile, useApp.getState().gyms, reply.records, s.first);
       useApp.getState().applySynced({ events: reply.events, deleted: reply.deleted, profile: merged.profile, gyms: merged.gyms });

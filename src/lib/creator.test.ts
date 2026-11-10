@@ -1,9 +1,23 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { pickOffering } from "./billing";
-import { activeCode, clearCode, codeFromReferrer, codeFromUrl, CREATOR_KEY, normalizeCode, playLinkWithCode, readClaim, sendClaim, setCode, startCreator } from "./creator";
 
-const res = (status: number, body: unknown = {}) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
+import { pickOffering } from "./billing";
+import {
+  activeCode,
+  clearCode,
+  codeFromReferrer,
+  codeFromUrl,
+  CREATOR_KEY,
+  normalizeCode,
+  playLinkWithCode,
+  readClaim,
+  sendClaim,
+  setCode,
+  startCreator,
+} from "./creator";
+
+const res = (status: number, body: unknown = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 
 beforeEach(() => {
   localStorage.clear();
@@ -42,7 +56,11 @@ describe("creator codes in the app", () => {
 
   it("checks a code with the server: known, unknown, or offline", async () => {
     setCode("LIFT-ALEX", "typed", false);
-    const post = vi.fn().mockResolvedValueOnce(res(503)).mockRejectedValueOnce(new Error("offline")).mockResolvedValueOnce(res(200, { code: "LIFT-ALEX", name: "Alex" }));
+    const post = vi
+      .fn()
+      .mockResolvedValueOnce(res(503))
+      .mockRejectedValueOnce(new Error("offline"))
+      .mockResolvedValueOnce(res(200, { code: "LIFT-ALEX", name: "Alex" }));
     expect(await sendClaim(post)).toBeNull();
     expect(await sendClaim(post)).toBeNull();
     expect(readClaim()?.status).toBe("pending");

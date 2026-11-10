@@ -1,50 +1,52 @@
 "use client";
+
+import { useEffect, type ReactNode } from "react";
+
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
-import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
-import { useLang } from "@/lib/useLang";
-import type { MessageKey } from "@/locales/en";
+import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
+import { useAccount } from "@/lib/auth";
+import { startBilling, useBilling } from "@/lib/billing";
+import { sendClaim, startCreator, useCreator } from "@/lib/creator";
+import { installDiag } from "@/lib/diag";
+import { flushFeedback } from "@/lib/feedback";
+import { COSMETICS, goalStreak } from "@/lib/game";
+import { readHeight } from "@/lib/health";
+import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
+import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { onReminderTap, refreshReminders } from "@/lib/reminders";
+import { keepStorage } from "@/lib/saving";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
-import { useAccount } from "@/lib/auth";
-import { useEffect, type ReactNode } from "react";
-import { keepStorage } from "@/lib/saving";
-import { installDiag } from "@/lib/diag";
-import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
-import { COSMETICS } from "@/lib/game";
-import { flushFeedback } from "@/lib/feedback";
-import { onReminderTap, refreshReminders } from "@/lib/reminders";
-import { startAnalytics, track } from "@/lib/analytics";
+import { startSync } from "@/lib/sync";
+import { activeTheme, applyTheme } from "@/lib/themes";
+import { useLang } from "@/lib/useLang";
+import { useNow } from "@/lib/useNow";
+import type { MessageKey } from "@/locales/en";
+
 import { Account } from "./Account";
 import { Achievements } from "./Achievements";
-import { startSync } from "@/lib/sync";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
 import { Gym } from "./Gym";
+import { Icon, type IconName } from "./icons";
+import { Injuries } from "./Injuries";
 import { Onboarding } from "./Onboarding";
+import { Photos } from "./Photos";
+import { Pro } from "./Pro";
+import { Programs } from "./Programs";
+import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
 import { go, parse, useRoute, type Route } from "./router";
-import { Programs } from "./Programs";
-import { Pro } from "./Pro";
-import { startBilling, useBilling } from "@/lib/billing";
-import { sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { Settings } from "./Settings";
-import { TrainingSettings } from "./TrainingSettings";
-import { Injuries } from "./Injuries";
 import { Stats } from "./Stats";
 import { Today } from "./Today";
-import { Workout } from "./Workout";
-import { Icon, type IconName } from "./icons";
-import { TodaySkeleton } from "./ui";
-import { Photos } from "./Photos";
-import { Recap } from "./Recap";
-import { goalStreak } from "@/lib/game";
-import { useNow } from "@/lib/useNow";
-import { activeTheme, applyTheme } from "@/lib/themes";
-import { readHeight } from "@/lib/health";
 import { Tools } from "./Tools";
+import { TrainingSettings } from "./TrainingSettings";
+import { TodaySkeleton } from "./ui";
+import { Workout } from "./Workout";
 
 const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
   { route: "today", label: "tab.today", icon: "today" },
@@ -248,10 +250,7 @@ export function App() {
     }
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!ready)
-    return (
-      <TodaySkeleton />
-    );
+  if (!ready) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;
 
   const screens: Record<Route, ReactNode> = {
@@ -280,9 +279,14 @@ export function App() {
   if (route === "setup") return screen;
   return (
     <>
-      <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">{screen}</main>
+      <main key={route} className="aurora safe-top animate-fade mx-auto max-w-lg px-5">
+        {screen}
+      </main>
       {showNav && (
-        <nav className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl" aria-label={t("nav.main")}>
+        <nav
+          className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
+          aria-label={t("nav.main")}
+        >
           <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
             {TABS.map((tab) => {
               const on = route === tab.route;
@@ -297,7 +301,9 @@ export function App() {
                     }}
                     className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
                   >
-                    <span className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}>
+                    <span
+                      className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
+                    >
                       <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                     </span>
                     {t(tab.label)}

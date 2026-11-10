@@ -3,9 +3,11 @@
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { blockWeek } from "@/lib/block";
 import { useApp } from "@/lib/store";
 import type { AppEvent } from "@/lib/types";
+
 import { App } from "./App";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
@@ -13,7 +15,12 @@ vi.mock("canvas-confetti", () => ({ default: () => {} }));
 const D = 86_400_000;
 
 beforeEach(async () => {
-  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  window.matchMedia ??= ((q: string) => ({
+    matches: false,
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  })) as unknown as typeof window.matchMedia;
   window.scrollTo = () => {};
   location.hash = "";
   localStorage.clear();
@@ -49,7 +56,17 @@ describe("why and coach's notes", () => {
     // Into the second week of the block, with three short workouts.
     act(() => useApp.getState().setProfile({ blockStart: now - 8 * D }));
     const events: AppEvent[] = [5, 3, 1].flatMap((ago, i) =>
-      [0, 1, 2].map((k) => ({ type: "set" as const, id: `m${i}${k}`, at: now - ago * D + k * 1000, sessionId: `m${i}`, exerciseId: "back-squat", weight: 100, reps: 2, targetReps: 5, rir: 2 })),
+      [0, 1, 2].map((k) => ({
+        type: "set" as const,
+        id: `m${i}${k}`,
+        at: now - ago * D + k * 1000,
+        sessionId: `m${i}`,
+        exerciseId: "back-squat",
+        weight: 100,
+        reps: 2,
+        targetReps: 5,
+        rir: 2,
+      })),
     );
     await act(async () => useApp.getState().importWorkouts(events));
     const notes = await screen.findByRole("list", { name: "Coach's notes" });
@@ -67,7 +84,21 @@ describe("why and coach's notes", () => {
     const p = useApp.getState().profile;
     const build = Math.min(6, Math.max(3, p.blockWeeks));
     act(() => useApp.getState().setProfile({ blockStart: Date.now() - (build - 1) * 7 * D - D }));
-    await act(async () => useApp.getState().importWorkouts([{ type: "set", id: "z1", at: Date.now() - 2 * D, sessionId: "z", exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2 }]));
+    await act(async () =>
+      useApp.getState().importWorkouts([
+        {
+          type: "set",
+          id: "z1",
+          at: Date.now() - 2 * D,
+          sessionId: "z",
+          exerciseId: "back-squat",
+          weight: 100,
+          reps: 5,
+          targetReps: 5,
+          rir: 2,
+        },
+      ]),
+    );
     const notes = await screen.findByRole("list", { name: "Coach's notes" });
     expect(within(notes).getByText("Last hard week of the block")).toBeInTheDocument();
     await user.click(within(notes).getByRole("button", { name: "Got it" }));

@@ -65,6 +65,9 @@ jobs:
       - name: Lint
         if: ${{ !cancelled() }}
         run: npx eslint --max-warnings 0
+      - name: Formatting
+        if: ${{ !cancelled() }}
+        run: npx prettier --check .
       # Production dependencies ship to users, so they gate the build; dev tooling is reported only.
       - name: Dependency audit
         if: ${{ !cancelled() }}

@@ -33,7 +33,12 @@ function open(): Promise<IDBDatabase | null> {
   return dbp;
 }
 
-function tx<T>(db: IDBDatabase, store: string, mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T> | void): Promise<T | undefined> {
+function tx<T>(
+  db: IDBDatabase,
+  store: string,
+  mode: IDBTransactionMode,
+  fn: (s: IDBObjectStore) => IDBRequest<T> | void,
+): Promise<T | undefined> {
   return new Promise((resolve, reject) => {
     const t = db.transaction(store, mode);
     const r = fn(t.objectStore(store));

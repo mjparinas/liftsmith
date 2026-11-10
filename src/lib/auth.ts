@@ -1,4 +1,5 @@
 "use client";
+
 // Optional accounts (AGENTS.md "Accounts and sign-in"). Signing in turns on sync (sync.ts); the app works
 // fully without it. Methods by platform:
 // - Android: Google (Credential Manager, through our AccountSignIn plugin) and an emailed code.
@@ -7,9 +8,10 @@
 // - Web: Google (Google Identity Services), Apple (Sign in with Apple JS) and an emailed code.
 // A provider shows only when the app was built with its public client id. The server checks every token.
 import { create } from "zustand";
+
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
-import { ACCOUNT_KEY, SYNC_KEY, emptySync, writeSync } from "./syncOutbox";
+import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
 
 export interface Account {
   token: string;
@@ -68,7 +70,11 @@ interface AccountState {
   error: string | null;
 }
 
-export const useAccount = create<AccountState>(() => ({ account: typeof window === "undefined" ? null : readAccount(), busy: false, error: null }));
+export const useAccount = create<AccountState>(() => ({
+  account: typeof window === "undefined" ? null : readAccount(),
+  busy: false,
+  error: null,
+}));
 
 export class AuthError extends Error {
   constructor(
@@ -84,7 +90,10 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   try {
     r = await fetch(apiUrl(path), {
       method: init.method ?? (init.body === undefined ? "GET" : "POST"),
-      headers: { ...(init.body === undefined ? {} : { "Content-Type": "application/json" }), ...(init.token ? { Authorization: `Bearer ${init.token}` } : {}) },
+      headers: {
+        ...(init.body === undefined ? {} : { "Content-Type": "application/json" }),
+        ...(init.token ? { Authorization: `Bearer ${init.token}` } : {}),
+      },
       body: init.body === undefined ? undefined : JSON.stringify(init.body),
     });
   } catch {
@@ -146,15 +155,23 @@ export function signInGoogle(): Promise<Account> {
     const plugin = cap()?.Plugins?.AccountSignIn;
     if (!plugin) throw new Error("Google sign-in isn't available here.");
     const n = await makeNonce();
-    const r = await plugin.google({ clientId: platform() === "ios" ? AUTH.googleIos : AUTH.googleWeb, serverClientId: AUTH.googleWeb, nonce: n.hashed });
+    const r = await plugin.google({
+      clientId: platform() === "ios" ? AUTH.googleIos : AUTH.googleWeb,
+      serverClientId: AUTH.googleWeb,
+      nonce: n.hashed,
+    });
     return finishGoogle(r.idToken, n.raw);
   });
 }
 
 declare global {
   interface Window {
-    AppleID?: { auth: { init(o: Record<string, unknown>): void; signIn(): Promise<{ authorization: { id_token: string; code?: string } }> } };
-    google?: { accounts: { id: { initialize(o: Record<string, unknown>): void; renderButton(el: HTMLElement, o: Record<string, unknown>): void } } };
+    AppleID?: {
+      auth: { init(o: Record<string, unknown>): void; signIn(): Promise<{ authorization: { id_token: string; code?: string } }> };
+    };
+    google?: {
+      accounts: { id: { initialize(o: Record<string, unknown>): void; renderButton(el: HTMLElement, o: Record<string, unknown>): void } };
+    };
   }
 }
 
@@ -180,14 +197,23 @@ export function signInApple(): Promise<Account> {
       ({ idToken, code } = await plugin.apple({ nonce: n.hashed }));
     } else {
       await loadScript("https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js");
-      window.AppleID!.auth.init({ clientId: AUTH.appleServices, scope: "email", redirectURI: `${location.origin}/app/`, usePopup: true, nonce: n.hashed });
+      window.AppleID!.auth.init({
+        clientId: AUTH.appleServices,
+        scope: "email",
+        redirectURI: `${location.origin}/app/`,
+        usePopup: true,
+        nonce: n.hashed,
+      });
       const r = await window.AppleID!.auth.signIn().catch((e: { error?: string }) => {
         throw new Error(e?.error === "popup_closed_by_user" ? "cancelled" : "Apple sign-in didn't finish.");
       });
       idToken = r.authorization.id_token;
       code = r.authorization.code;
     }
-    return signedInAs(await api<SessionReply>("/api/auth/apple/", { body: { idToken, nonce: n.raw, code, platform: platform() } }), "apple");
+    return signedInAs(
+      await api<SessionReply>("/api/auth/apple/", { body: { idToken, nonce: n.raw, code, platform: platform() } }),
+      "apple",
+    );
   });
 }
 
@@ -197,7 +223,9 @@ export function sendEmailCode(email: string): Promise<{ devCode?: string }> {
 }
 
 export function verifyEmailCode(email: string, code: string): Promise<Account> {
-  return withBusy(async () => signedInAs(await api<SessionReply>("/api/auth/email/verify/", { body: { email, code, platform: platform() } }), "email"));
+  return withBusy(async () =>
+    signedInAs(await api<SessionReply>("/api/auth/email/verify/", { body: { email, code, platform: platform() } }), "email"),
+  );
 }
 
 /** Signs this device out. Everything stays on the device; it just stops syncing. */

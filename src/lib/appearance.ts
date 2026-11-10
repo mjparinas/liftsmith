@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+
 import { isNative } from "./juice";
 
 // Appearance (Melvin, 2026-11-09): dark (the default, and the brand), light, or match the system.
@@ -49,6 +50,10 @@ function subscribe(on: () => void): () => void {
 
 /** Whether the screen is light, following the phone live when the choice is "Match system". */
 export function useLight(theme: Appearance): boolean {
-  const system = useSyncExternalStore(subscribe, () => typeof matchMedia !== "undefined" && matchMedia(QUERY).matches, () => false);
+  const system = useSyncExternalStore(
+    subscribe,
+    () => typeof matchMedia !== "undefined" && matchMedia(QUERY).matches,
+    () => false,
+  );
   return theme === "light" || (theme === "system" && system);
 }

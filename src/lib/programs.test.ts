@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
+
 import { defaultProfile, makeGym } from "./defaults";
 import { available, exercise, LADDER_ONLY } from "./exercises";
 import { generate, type Plan } from "./generator";
-import { loadBar } from "./plates";
 import { barFor } from "./loads";
+import { loadBar } from "./plates";
 import { missingFor, pickProgram, programPlan, PROGRAMS, SPLITS, weeklyPreview, type Ctx, type ProgramId } from "./programs";
 import type { AppEvent, Gym, PlanSource, Profile, SetEvent } from "./types";
 import { fromKg, toKg } from "./units";
@@ -22,22 +23,58 @@ type Src = Extract<PlanSource, { kind: "program" }>;
 
 let n = 0;
 /** Plays one session of the plan: `reps` decides what was logged for each set (default: the target). */
-function play(events: AppEvent[], plan: Plan, at: number, reps: (slot: string, i: number, target: number, amrap: boolean) => number = (_s, _i, t) => t, weight?: (slot: string, w: number) => number): AppEvent[] {
+function play(
+  events: AppEvent[],
+  plan: Plan,
+  at: number,
+  reps: (slot: string, i: number, target: number, amrap: boolean) => number = (_s, _i, t) => t,
+  weight?: (slot: string, w: number) => number,
+): AppEvent[] {
   const sid = `s${n++}`;
-  const out: AppEvent[] = [...events, { type: "sessionStart", id: `st${sid}`, at, sessionId: sid, gymId: plan.gymId, minutes: plan.minutes, program: plan.program && { id: plan.program.id, day: plan.program.day } }];
+  const out: AppEvent[] = [
+    ...events,
+    {
+      type: "sessionStart",
+      id: `st${sid}`,
+      at,
+      sessionId: sid,
+      gymId: plan.gymId,
+      minutes: plan.minutes,
+      program: plan.program && { id: plan.program.id, day: plan.program.day },
+    },
+  ];
   let t = at;
   for (const it of plan.items) {
-    (it.setTargets ?? Array.from({ length: it.sets }, () => ({ weight: it.target.weight, reps: it.target.reps, amrap: undefined }))).forEach((st, i) => {
+    (
+      it.setTargets ?? Array.from({ length: it.sets }, () => ({ weight: it.target.weight, reps: it.target.reps, amrap: undefined }))
+    ).forEach((st, i) => {
       t += 1000;
       const w = weight ? weight(it.slot ?? it.exerciseId, st.weight) : st.weight;
-      const ev: SetEvent = { type: "set", id: `x${n++}`, at: t, sessionId: sid, exerciseId: it.exerciseId, weight: w, reps: reps(it.slot ?? it.exerciseId, i, st.reps, !!st.amrap), targetReps: st.reps, targetWeight: st.weight, rir: 2, amrap: st.amrap, slot: it.slot };
+      const ev: SetEvent = {
+        type: "set",
+        id: `x${n++}`,
+        at: t,
+        sessionId: sid,
+        exerciseId: it.exerciseId,
+        weight: w,
+        reps: reps(it.slot ?? it.exerciseId, i, st.reps, !!st.amrap),
+        targetReps: st.reps,
+        targetWeight: st.weight,
+        rir: 2,
+        amrap: st.amrap,
+        slot: it.slot,
+      };
       out.push(ev);
     });
   }
   return out;
 }
 
-function run(id: ProgramId, sessions: number, opts: { gym?: Gym; reps?: Parameters<typeof play>[3]; weight?: Parameters<typeof play>[4]; prof?: Profile } = {}) {
+function run(
+  id: ProgramId,
+  sessions: number,
+  opts: { gym?: Gym; reps?: Parameters<typeof play>[3]; weight?: Parameters<typeof play>[4]; prof?: Profile } = {},
+) {
   const gym = opts.gym ?? kgGym;
   const prof = opts.prof ?? profile;
   const ctx: Ctx = { profile: prof, gym, events: [], now: NOW - 60 * D };
@@ -61,7 +98,17 @@ const top = (p: Plan, slot: string) => Math.max(...item(p, slot).setTargets!.map
 
 describe("program list", () => {
   it("has every program Melvin asked for, with a credit and plain steps", () => {
-    expect(PROGRAMS.map((p) => p.id)).toEqual(["classic-5x5", "novice-3x5", "5x5-plus", "ramping-5x5", "tiered", "waves", "calisthenics", "ppl", "upper-lower"]);
+    expect(PROGRAMS.map((p) => p.id)).toEqual([
+      "classic-5x5",
+      "novice-3x5",
+      "5x5-plus",
+      "ramping-5x5",
+      "tiered",
+      "waves",
+      "calisthenics",
+      "ppl",
+      "upper-lower",
+    ]);
     for (const p of PROGRAMS) {
       expect(p.basedOn.length).toBeGreaterThan(10);
       expect(p.how.length).toBeGreaterThanOrEqual(3);
@@ -137,7 +184,9 @@ describe("classic 5×5", () => {
   });
 
   it("starts from the lifter's own logged sets when there are some", () => {
-    const history: AppEvent[] = [{ type: "set", id: "h", at: NOW - 70 * D, sessionId: "h", exerciseId: "back-squat", weight: 140, reps: 5, targetReps: 5, rir: 1 }];
+    const history: AppEvent[] = [
+      { type: "set", id: "h", at: NOW - 70 * D, sessionId: "h", exerciseId: "back-squat", weight: 140, reps: 5, targetReps: 5, rir: 1 },
+    ];
     const src = pickProgram("classic-5x5", { profile, gym: kgGym, events: history, now: NOW }) as Src;
     // e1RM 168 kg; sets of 5 with 3 reps in reserve is about 133 kg.
     expect(src.start["back-squat"]).toBeGreaterThan(128);
@@ -167,7 +216,14 @@ describe("5×5 plus arms", () => {
   it("adds the accessories, and swaps one the gym can't do for the closest match", () => {
     const noCable: Gym = { ...kgGym, equipment: kgGym.equipment.filter((e) => e !== "cable") };
     const { plans } = run("5x5-plus", 3, { gym: noCable });
-    expect(plans[0].items.map((i) => i.exerciseId)).toEqual(["back-squat", "bench-press", "barbell-row", "barbell-shrug", "skull-crusher", "barbell-curl"]);
+    expect(plans[0].items.map((i) => i.exerciseId)).toEqual([
+      "back-squat",
+      "bench-press",
+      "barbell-row",
+      "barbell-shrug",
+      "skull-crusher",
+      "barbell-curl",
+    ]);
     const crunch = item(plans[1], "cable-crunch");
     expect(crunch.exerciseId).not.toBe("cable-crunch");
     expect(crunch.target.note).toMatch(/In place of Cable crunch/);
@@ -207,7 +263,13 @@ describe("tiered progression", () => {
     expect(plans[0].items.map((i) => i.exerciseId)).toEqual(["back-squat", "bench-press", "lat-pulldown"]);
     expect(plans[3].items.map((i) => i.exerciseId)).toEqual(["deadlift", "overhead-press", "db-row"]);
     const t1 = item(plans[0], "T1:back-squat").setTargets!;
-    expect(t1.map((s) => [s.reps, !!s.amrap])).toEqual([[3, false], [3, false], [3, false], [3, false], [3, true]]);
+    expect(t1.map((s) => [s.reps, !!s.amrap])).toEqual([
+      [3, false],
+      [3, false],
+      [3, false],
+      [3, false],
+      [3, true],
+    ]);
   });
 
   it("moves a stalled T1 from 5×3 to 6×2 to 10×1, then restarts at 85%", () => {
@@ -221,9 +283,13 @@ describe("tiered progression", () => {
   });
 
   it("moves a stalled T2 from 3×10 to 3×8, and adds T3 weight once the last set reaches 25", () => {
-    const { plans } = run("tiered", 5, { reps: (slot, i, t, amrap) => (slot === "T2:bench-press" ? t - 2 : slot.startsWith("T3") && amrap ? 25 : t) });
+    const { plans } = run("tiered", 5, {
+      reps: (slot, i, t, amrap) => (slot === "T2:bench-press" ? t - 2 : slot.startsWith("T3") && amrap ? 25 : t),
+    });
     expect(item(plans[4], "T2:bench-press").scheme).toBe("3 × 8");
-    expect(item(plans[4], "T3:lat-pulldown").setTargets![0].weight).toBeGreaterThan(item(plans[0], "T3:lat-pulldown").setTargets![0].weight);
+    expect(item(plans[4], "T3:lat-pulldown").setTargets![0].weight).toBeGreaterThan(
+      item(plans[0], "T3:lat-pulldown").setTargets![0].weight,
+    );
   });
 
   it("adds weight to T1 when every set is made", () => {
@@ -240,10 +306,22 @@ describe("training max waves", () => {
     const tm = src.start["tm:back-squat"];
     const main = (p: Plan) => item(p, "tm:back-squat").setTargets!;
     // Rounded to the plates, so within a couple of kilos.
-    expect(main(squat[0]).slice(0, 3).map((s) => s.weight / tm)).toEqual([expect.closeTo(0.65, 1), expect.closeTo(0.75, 1), expect.closeTo(0.85, 1)]);
+    expect(
+      main(squat[0])
+        .slice(0, 3)
+        .map((s) => s.weight / tm),
+    ).toEqual([expect.closeTo(0.65, 1), expect.closeTo(0.75, 1), expect.closeTo(0.85, 1)]);
     expect(main(squat[0])[2].amrap).toBe(true);
-    expect(main(squat[0]).slice(3).map((s) => s.reps)).toEqual([10, 10, 10, 10, 10]);
-    expect(main(squat[2]).slice(0, 3).map((s) => s.reps)).toEqual([5, 3, 1]);
+    expect(
+      main(squat[0])
+        .slice(3)
+        .map((s) => s.reps),
+    ).toEqual([10, 10, 10, 10, 10]);
+    expect(
+      main(squat[2])
+        .slice(0, 3)
+        .map((s) => s.reps),
+    ).toEqual([5, 3, 1]);
     expect(main(squat[3])).toHaveLength(3);
     expect(squat[3].program!.note).toMatch(/Deload/);
     expect(plans.map((p) => p.items[0].exerciseId).slice(0, 4)).toEqual(["overhead-press", "deadlift", "bench-press", "back-squat"]);

@@ -1,8 +1,9 @@
 import type { MessageKey } from "@/locales/en";
-import { num, t, translated } from "./i18n";
-import { achievementXp, achievements, context, nearest, type Achievement } from "./achievements";
+
+import { achievements, achievementXp, context, nearest, type Achievement } from "./achievements";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
+import { num, t, translated } from "./i18n";
 import { epley, TIMED } from "./progression";
 import { hash, rng } from "./random";
 import type { AppEvent, Profile, SetEvent } from "./types";
@@ -31,7 +32,12 @@ export const levelAt = (n: number) => (n <= 1 ? 0 : Math.round((50 * Math.pow(n 
 /** The level's title in the current language. */
 export const titleOf = (n: number) => t(`lvl.${TITLES.filter(([at]) => n >= at).at(-1)![1]}` as MessageKey);
 /** Kept for older callers: the first level of each title. */
-export const LEVELS = TITLES.map(([n, id]) => ({ at: levelAt(n), get title() { return t(`lvl.${id}` as MessageKey); } }));
+export const LEVELS = TITLES.map(([n, id]) => ({
+  at: levelAt(n),
+  get title() {
+    return t(`lvl.${id}` as MessageKey);
+  },
+}));
 
 export function levelOf(xp: number) {
   let n = 1;
@@ -50,7 +56,12 @@ export function levelOf(xp: number) {
 
 /** XP from sets, sessions and PRs (the base every other bonus adds to). */
 export function xpTotal(stats: Stats): number {
-  return stats.totalSets * XP.set + stats.prs.length * XP.pr + stats.sessions.length * XP.session + stats.sessions.filter((s) => s.sets >= 12).length * XP.fullSession;
+  return (
+    stats.totalSets * XP.set +
+    stats.prs.length * XP.pr +
+    stats.sessions.length * XP.session +
+    stats.sessions.filter((s) => s.sets >= 12).length * XP.fullSession
+  );
 }
 
 export function sessionXp(stats: Stats, sessionId: string): number {
@@ -133,7 +144,17 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
   // Days still free to train: today only counts if not trained yet.
   const free = daysLeft - (trainedToday ? 1 : 0);
   const atRisk = needed > 0 && streak > 0 && free < needed;
-  return { weeks: weeksNow, thisWeek, needed, freezes, frozen, best: Math.max(best, weeksNow), daysLeft, atRisk, freezeReady: needed > 0 && freezes > 0 && streak > 0 };
+  return {
+    weeks: weeksNow,
+    thisWeek,
+    needed,
+    freezes,
+    frozen,
+    best: Math.max(best, weeksNow),
+    daysLeft,
+    atRisk,
+    freezeReady: needed > 0 && freezes > 0 && streak > 0,
+  };
 }
 
 // ---------- Weekly quests: three a week, picked from the week (not from history) so every device agrees.
@@ -149,20 +170,89 @@ export interface Quest {
 }
 
 const q = (id: string, n = 1) => t(`quest.${id}` as MessageKey, { count: n, n: num(n) });
-type QuestDef = { id: string; icon: string; xp: number; title(goal: number): string; goal(p: Profile): number; have(sets: SetEvent[], sessions: Session[], before: SetEvent[]): number };
+type QuestDef = {
+  id: string;
+  icon: string;
+  xp: number;
+  title(goal: number): string;
+  goal(p: Profile): number;
+  have(sets: SetEvent[], sessions: Session[], before: SetEvent[]): number;
+};
 type Session = { id: string; at: number; sets: SetEvent[] };
 
 const QUESTS: QuestDef[] = [
   // Train the goal number of days, never more, so nobody is pushed to train sore.
-  { id: "days", icon: "📆", xp: 150, title: (n) => q("days", n), goal: (p) => Math.max(1, p.daysPerWeek), have: (_s, ss) => new Set(ss.map((s) => new Date(s.at).toDateString())).size },
+  {
+    id: "days",
+    icon: "📆",
+    xp: 150,
+    title: (n) => q("days", n),
+    goal: (p) => Math.max(1, p.daysPerWeek),
+    have: (_s, ss) => new Set(ss.map((s) => new Date(s.at).toDateString())).size,
+  },
   { id: "pr", icon: "🏆", xp: 120, title: () => q("pr"), goal: () => 1, have: (sets, _ss, before) => prsIn(sets, before) },
-  { id: "new-ex", icon: "🧭", xp: 80, title: () => q("new-ex"), goal: () => 1, have: (sets, _ss, before) => { const old = new Set(before.map((s) => s.exerciseId)); return new Set(sets.filter((s) => !old.has(s.exerciseId)).map((s) => s.exerciseId)).size; } },
-  { id: "on-target", icon: "🎯", xp: 100, title: () => q("on-target"), goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)).length },
-  { id: "sets", icon: "✅", xp: 100, title: (n) => q("sets", n), goal: (p) => Math.max(1, p.daysPerWeek) * 14, have: (sets) => sets.length },
-  { id: "legs", icon: "🦵", xp: 80, title: () => q("legs"), goal: () => 1, have: (_s, ss) => ss.filter((s) => s.sets.some((x) => EXERCISE_BY_ID.get(x.exerciseId)?.primary.some((m) => m === "quads" || m === "hamstrings" || m === "glutes"))).length },
-  { id: "muscles", icon: "🫀", xp: 100, title: (n) => q("muscles", n), goal: (p) => Math.min(10, 4 + Math.max(1, p.daysPerWeek) * 2), have: (sets) => new Set(sets.flatMap((s) => EXERCISE_BY_ID.get(s.exerciseId)?.primary ?? [])).size },
-  { id: "reps", icon: "🔁", xp: 100, title: (n) => q("reps", n), goal: (p) => Math.max(1, p.daysPerWeek) * 120, have: (sets) => sets.reduce((t, s) => t + (TIMED.has(s.exerciseId) ? 0 : s.reps), 0) },
-  { id: "rest", icon: "⏳", xp: 60, title: (n) => q("rest", n), goal: (p) => Math.max(1, p.daysPerWeek) * 8, have: (sets) => sets.filter((s) => (s.restSec ?? 0) >= 60).length },
+  {
+    id: "new-ex",
+    icon: "🧭",
+    xp: 80,
+    title: () => q("new-ex"),
+    goal: () => 1,
+    have: (sets, _ss, before) => {
+      const old = new Set(before.map((s) => s.exerciseId));
+      return new Set(sets.filter((s) => !old.has(s.exerciseId)).map((s) => s.exerciseId)).size;
+    },
+  },
+  {
+    id: "on-target",
+    icon: "🎯",
+    xp: 100,
+    title: () => q("on-target"),
+    goal: () => 1,
+    have: (_s, ss) => ss.filter((s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)).length,
+  },
+  {
+    id: "sets",
+    icon: "✅",
+    xp: 100,
+    title: (n) => q("sets", n),
+    goal: (p) => Math.max(1, p.daysPerWeek) * 14,
+    have: (sets) => sets.length,
+  },
+  {
+    id: "legs",
+    icon: "🦵",
+    xp: 80,
+    title: () => q("legs"),
+    goal: () => 1,
+    have: (_s, ss) =>
+      ss.filter((s) =>
+        s.sets.some((x) => EXERCISE_BY_ID.get(x.exerciseId)?.primary.some((m) => m === "quads" || m === "hamstrings" || m === "glutes")),
+      ).length,
+  },
+  {
+    id: "muscles",
+    icon: "🫀",
+    xp: 100,
+    title: (n) => q("muscles", n),
+    goal: (p) => Math.min(10, 4 + Math.max(1, p.daysPerWeek) * 2),
+    have: (sets) => new Set(sets.flatMap((s) => EXERCISE_BY_ID.get(s.exerciseId)?.primary ?? [])).size,
+  },
+  {
+    id: "reps",
+    icon: "🔁",
+    xp: 100,
+    title: (n) => q("reps", n),
+    goal: (p) => Math.max(1, p.daysPerWeek) * 120,
+    have: (sets) => sets.reduce((t, s) => t + (TIMED.has(s.exerciseId) ? 0 : s.reps), 0),
+  },
+  {
+    id: "rest",
+    icon: "⏳",
+    xp: 60,
+    title: (n) => q("rest", n),
+    goal: (p) => Math.max(1, p.daysPerWeek) * 8,
+    have: (sets) => sets.filter((s) => (s.restSec ?? 0) >= 60).length,
+  },
 ];
 
 function prsIn(sets: SetEvent[], before: SetEvent[]): number {
@@ -182,7 +272,11 @@ function prsIn(sets: SetEvent[], before: SetEvent[]): number {
 function setsOf(events: readonly AppEvent[]): SetEvent[] {
   const seen = new Set<string>();
   const out: SetEvent[] = [];
-  for (const e of events) if (e.type === "set" && !seen.has(e.id)) { seen.add(e.id); out.push(e); }
+  for (const e of events)
+    if (e.type === "set" && !seen.has(e.id)) {
+      seen.add(e.id);
+      out.push(e);
+    }
   return out.sort((a, b) => a.at - b.at);
 }
 
@@ -261,7 +355,14 @@ export function league(events: readonly AppEvent[], stats: Stats, profile: Profi
     else if (xp < demoteBelow(i) && !frozen.has(w)) i--;
   }
   history.push([thisWeekStart, i]);
-  return { league: LEAGUES[i], index: i, weekXp: weekXp(events, stats, profile, thisWeekStart), promoteAt: i < LEAGUES.length - 1 ? promoteAt(i) : null, demoteBelow: demoteBelow(i), history };
+  return {
+    league: LEAGUES[i],
+    index: i,
+    weekXp: weekXp(events, stats, profile, thisWeekStart),
+    promoteAt: i < LEAGUES.length - 1 ? promoteAt(i) : null,
+    demoteBelow: demoteBelow(i),
+    history,
+  };
 }
 
 // ---------- Crates: one per finished workout, its prize picked from the session id so every device agrees.
@@ -294,7 +395,12 @@ const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
   { id: "plates-neon", kind: "plates", rarity: "legendary", value: "neon" },
 ];
 /** Cosmetics with their names in the current language (getters, so a language change shows at once). */
-export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({ ...c, get name() { return t(`cos.${c.id}` as MessageKey); } }));
+export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
+  ...c,
+  get name() {
+    return t(`cos.${c.id}` as MessageKey);
+  },
+}));
 export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 60, rare: 28, epic: 10, legendary: 2 };
 export const RARITY_LABEL: Record<Rarity, string> = translated(["common", "rare", "epic", "legendary"], (k) => `rarity.${k}`);
@@ -342,7 +448,9 @@ export function bestBefore(events: readonly AppEvent[], exerciseId: string, at: 
 /** Is this set a new best? Needs history for the exercise, so a first-ever session isn't a parade of PRs. */
 export function isPr(events: readonly AppEvent[], set: SetEvent): boolean {
   if (set.weight <= 0 || TIMED.has(set.exerciseId)) return false;
-  const prevSessions = events.some((e) => e.type === "set" && e.exerciseId === set.exerciseId && e.sessionId !== set.sessionId && e.at < set.at);
+  const prevSessions = events.some(
+    (e) => e.type === "set" && e.exerciseId === set.exerciseId && e.sessionId !== set.sessionId && e.at < set.at,
+  );
   if (!prevSessions) return false;
   const b = bestBefore(events, set.exerciseId, set.at, set.id);
   return b !== null && epley(set.weight, set.reps) > b + 0.01;
@@ -415,7 +523,13 @@ export function trophies(events: readonly AppEvent[], stats: Stats, profile: Pro
   const best = goalStreak(stats, profile, Date.now()).best;
   return achievements(context(events, stats, profile, best))
     .filter((a) => !a.hidden)
-    .map((a) => ({ id: a.id, name: a.name, detail: a.detail, tier: a.tier === "platinum" || a.tier === "gold" ? "gold" : a.tier === "silver" ? "silver" : "bronze", earned: a.level > 0 }));
+    .map((a) => ({
+      id: a.id,
+      name: a.name,
+      detail: a.detail,
+      tier: a.tier === "platinum" || a.tier === "gold" ? "gold" : a.tier === "silver" ? "silver" : "bronze",
+      earned: a.level > 0,
+    }));
 }
 
 export function exerciseName(id: string): string {

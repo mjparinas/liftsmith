@@ -1,4 +1,5 @@
 "use client";
+
 import { isNative } from "./juice";
 import type { CalendarPrefs } from "./types";
 
@@ -17,14 +18,21 @@ export interface Busy {
   end: number;
 }
 
-
 export const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
 const ICS_DAYS = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
 const MIN = 60_000;
 
 /** Spread the days-per-week goal across the week (3 → Mon, Wed, Fri). */
 export function defaultDays(perWeek: number): number[] {
-  const table: Record<number, number[]> = { 1: [1], 2: [1, 4], 3: [1, 3, 5], 4: [1, 2, 4, 5], 5: [1, 2, 3, 4, 5], 6: [1, 2, 3, 4, 5, 6], 7: [0, 1, 2, 3, 4, 5, 6] };
+  const table: Record<number, number[]> = {
+    1: [1],
+    2: [1, 4],
+    3: [1, 3, 5],
+    4: [1, 2, 4, 5],
+    5: [1, 2, 3, 4, 5],
+    6: [1, 2, 3, 4, 5, 6],
+    7: [0, 1, 2, 3, 4, 5, 6],
+  };
   return table[Math.min(7, Math.max(1, Math.round(perWeek)))];
 }
 
@@ -50,12 +58,19 @@ const icsLocal = (t: number) => {
   const d = new Date(t);
   return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}T${pad(d.getHours())}${pad(d.getMinutes())}00`;
 };
-const icsUtc = (t: number) => new Date(t).toISOString().replace(/[-:]/g, "").replace(/\.\d{3}/, "");
+const icsUtc = (t: number) =>
+  new Date(t)
+    .toISOString()
+    .replace(/[-:]/g, "")
+    .replace(/\.\d{3}/, "");
 
 /** A calendar file with one weekly repeating event (floating local time, so it follows the lifter's zone). */
 export function trainingIcs(p: Pick<CalendarPrefs, "days" | "time">, minutes: number, now: number, title = "Liftsmith workout"): string {
   const start = nextStart(p.days, p.time, now) ?? now;
-  const byday = [...p.days].sort().map((d) => ICS_DAYS[d]).join(",");
+  const byday = [...p.days]
+    .sort()
+    .map((d) => ICS_DAYS[d])
+    .join(",");
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
@@ -105,7 +120,9 @@ type Plugin = {
   busy(o: { from: number; to: number }): Promise<{ busy: Busy[] }>;
 };
 const plugin = (): Plugin | undefined =>
-  typeof window !== "undefined" ? (window as unknown as { Capacitor?: { Plugins?: { Calendar?: Plugin } } }).Capacitor?.Plugins?.Calendar : undefined;
+  typeof window !== "undefined"
+    ? (window as unknown as { Capacitor?: { Plugins?: { Calendar?: Plugin } } }).Capacitor?.Plugins?.Calendar
+    : undefined;
 
 export const calendarNative = () => isNative() && !!plugin();
 

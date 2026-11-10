@@ -10,6 +10,9 @@ export const SECURITY_HEADERS: { key: string; value: string }[] = [
   { key: "X-Frame-Options", value: "SAMEORIGIN" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   // The web app uses the camera (rep counting), Web Bluetooth (heart rate) and nothing else from this list.
-  { key: "Permissions-Policy", value: "camera=(self), bluetooth=(self), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()" },
+  {
+    key: "Permissions-Policy",
+    value: "camera=(self), bluetooth=(self), microphone=(), geolocation=(), payment=(), usb=(), browsing-topics=()",
+  },
   { key: "Content-Security-Policy", value: CSP },
 ];

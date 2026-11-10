@@ -1,8 +1,29 @@
 import { describe, expect, it } from "vitest";
-import { ACHIEVEMENTS, BADGE_COUNT, achName, achievements, context, shareIds, shareName, unlocked } from "./achievements";
+
+import { makeSet } from "@/test/factories";
+
+import { ACHIEVEMENTS, achievements, achName, BADGE_COUNT, context, shareIds, shareName, unlocked } from "./achievements";
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
-import { COSMETICS, crateFor, crates, game, goalStreak, isPr, LEAGUE_LABEL, LEAGUES, league, levelAt, levelOf, MAX_FREEZES, owned, questsFor, repsForPr, STARTER, xpTotal } from "./game";
+import {
+  COSMETICS,
+  crateFor,
+  crates,
+  game,
+  goalStreak,
+  isPr,
+  league,
+  LEAGUE_LABEL,
+  LEAGUES,
+  levelAt,
+  levelOf,
+  MAX_FREEZES,
+  owned,
+  questsFor,
+  repsForPr,
+  STARTER,
+  xpTotal,
+} from "./game";
 import { setLanguage } from "./i18n";
 import type { AppEvent, SetEvent } from "./types";
 
@@ -13,9 +34,8 @@ const D = 24 * H;
 const W = 7 * D;
 const profile = (over = {}) => ({ ...defaultProfile(NOW), onboarded: true, activeGymId: "g", daysPerWeek: 3, bodyweight: 80, ...over });
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, sessionId: string, extra: Partial<SetEvent> = {}): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId, exerciseId, weight, reps, targetReps: reps, rir: 2, ...extra };
+  return makeSet({ at, sessionId, exerciseId, weight, reps, ...extra });
 }
 /** A workout of `k` bench sets at `at`. */
 function workout(at: number, id: string, k = 3, weight = 60, reps = 8): SetEvent[] {
@@ -166,7 +186,13 @@ describe("quests", () => {
     expect(q).toHaveLength(3);
     expect(q[0]).toMatchObject({ id: "days", goal: 3, have: 0 });
     expect(questsFor([], profile(), weekOf(NOW)).map((x) => x.id)).toEqual(q.map((x) => x.id));
-    const weeks = new Set(Array.from({ length: 8 }, (_, i) => questsFor([], profile(), weekOf(NOW) - i * W).map((x) => x.id).join()));
+    const weeks = new Set(
+      Array.from({ length: 8 }, (_, i) =>
+        questsFor([], profile(), weekOf(NOW) - i * W)
+          .map((x) => x.id)
+          .join(),
+      ),
+    );
     expect(weeks.size).toBeGreaterThan(1);
   });
   it("track progress and never ask for more days than the goal", () => {

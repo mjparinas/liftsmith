@@ -1,0 +1,78 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "why.", in every language. English is the source: add a key here first,
+// then its Spanish and French. A missing translation falls back to English.
+
+export const en = {
+  "why.pick": "{muscle} {pct}% recovered, {done} of {goal} sets this week",
+  "why.pickPriority": "{muscle} {pct}% recovered, {done} of {goal} sets this week (a priority)",
+  "why.favourite": "{pick}, and a favourite",
+  "why.deloadSets": "half the sets for the deload",
+  "why.easySets": "one set fewer for an easy day",
+  "why.ownSets": { one: "{count} set, your setting", other: "{count} sets, your setting" },
+  "why.score": "readiness {score}",
+  "why.what.push": "a push day",
+  "why.what.recover": "an easy day",
+  "why.what.normal": "a steady day",
+  "why.call.override": "Your call today. We suggested {what} ({score}).",
+  "why.call.overrideBecause": "Your call today. We suggested {what} because {reasons} ({score}).",
+  "why.call.deload":
+    "Deload week, so it's lighter with half the sets whatever the score ({score}). You come back fresher for the next block.",
+  "why.call.push": "Push today: {reasons} ({score}). Your first big lift goes one rep closer to failure.",
+  "why.call.fresh": "you're fresh",
+  "why.call.easy": "Go easy today: {reasons} ({score}). One set fewer and a step lighter, so you come back stronger.",
+  "why.call.needRecovery": "you need the recovery",
+  "why.call.planned": "Train as planned ({score}). Weights follow on from last time.",
+  "why.call.plannedBecause": "Train as planned: {reasons} ({score}). Weights follow on from last time.",
+  "why.call.but": "{up}, but {down}",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "why.pick": "{muscle}: recuperación del {pct}%, {done} de {goal} series esta semana",
+  "why.pickPriority": "{muscle}: recuperación del {pct}%, {done} de {goal} series esta semana (una prioridad)",
+  "why.favourite": "{pick}, y es un favorito",
+  "why.deloadSets": "la mitad de series por la descarga",
+  "why.easySets": "una serie menos por ser día suave",
+  "why.ownSets": { one: "{count} serie, tu ajuste", other: "{count} series, tu ajuste" },
+  "why.score": "preparación {score}",
+  "why.what.push": "un día para apretar",
+  "why.what.recover": "un día suave",
+  "why.what.normal": "un día normal",
+  "why.call.override": "Hoy decides tú. Sugerimos {what} ({score}).",
+  "why.call.overrideBecause": "Hoy decides tú. Sugerimos {what} porque: {reasons} ({score}).",
+  "why.call.deload":
+    "Semana de descarga: más ligera y con la mitad de series sea cual sea la puntuación ({score}). Volverás más fresco para el siguiente bloque.",
+  "why.call.push": "Hoy toca apretar: {reasons} ({score}). Tu primer ejercicio grande va una repetición más cerca del fallo.",
+  "why.call.fresh": "estás fresco",
+  "why.call.easy": "Hoy, suave: {reasons} ({score}). Una serie menos y un escalón más ligero, para volver más fuerte.",
+  "why.call.needRecovery": "necesitas recuperarte",
+  "why.call.planned": "Entrena según el plan ({score}). Los pesos siguen desde la última vez.",
+  "why.call.plannedBecause": "Entrena según el plan: {reasons} ({score}). Los pesos siguen desde la última vez.",
+  "why.call.but": "{up}, pero {down}",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "why.pick": "{muscle} : récupération à {pct} %, {done} séries sur {goal} cette semaine",
+  "why.pickPriority": "{muscle} : récupération à {pct} %, {done} séries sur {goal} cette semaine (une priorité)",
+  "why.favourite": "{pick}, et un favori",
+  "why.deloadSets": "moitié moins de séries pour la décharge",
+  "why.easySets": "une série de moins pour un jour tranquille",
+  "why.ownSets": { one: "{count} série, votre réglage", other: "{count} séries, votre réglage" },
+  "why.score": "forme {score}",
+  "why.what.push": "un jour pour pousser",
+  "why.what.recover": "un jour tranquille",
+  "why.what.normal": "un jour normal",
+  "why.call.override": "C’est votre choix aujourd’hui. Nous proposions {what} ({score}).",
+  "why.call.overrideBecause": "C’est votre choix aujourd’hui. Nous proposions {what} car : {reasons} ({score}).",
+  "why.call.deload":
+    "Semaine de décharge : plus légère et moitié moins de séries quel que soit le score ({score}). Vous revenez plus frais pour le bloc suivant.",
+  "why.call.push": "On pousse aujourd’hui : {reasons} ({score}). Votre premier gros exercice va une répétition plus près de l’échec.",
+  "why.call.fresh": "vous êtes frais",
+  "why.call.easy": "Tranquille aujourd’hui : {reasons} ({score}). Une série de moins et un cran plus léger, pour revenir plus fort.",
+  "why.call.needRecovery": "vous avez besoin de récupérer",
+  "why.call.planned": "Entraînez-vous comme prévu ({score}). Les charges suivent la dernière fois.",
+  "why.call.plannedBecause": "Entraînez-vous comme prévu : {reasons} ({score}). Les charges suivent la dernière fois.",
+  "why.call.but": "{up}, mais {down}",
+};

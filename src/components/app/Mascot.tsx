@@ -1,4 +1,5 @@
 "use client";
+
 // The Liftsmith mascot (juice pass, 2026-11-09): a small, friendly kettlebell, drawn in the brand
 // gradient so it follows the theme and light mode. It appears only where the app is otherwise quiet:
 // empty states, the start of setup and the end of a workout. Never on the workout screen during a set.

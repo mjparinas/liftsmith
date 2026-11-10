@@ -1,5 +1,5 @@
 import { MANUAL_RIR } from "./dashboard";
-import { EXERCISES, EXERCISE_BY_ID } from "./exercises";
+import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { hash } from "./random";
 import type { AppEvent, Exercise, LoadKind, Muscle, SessionEndEvent, SessionStartEvent, SetEvent, Unit, WarmupEvent } from "./types";
 import { toKg } from "./units";
@@ -126,7 +126,17 @@ export function readImport(text: string): ImportFile | null {
     const kg = col("weight_kg");
     const lbs = col("weight_lbs");
     const unit: Unit = kg >= 0 ? "kg" : "lb";
-    const [title, start, end, ex, ss, type, reps, secs, dist] = [col("title"), col("start_time"), col("end_time"), col("exercise_title"), col("superset_id"), col("set_type"), col("reps"), col("duration_seconds"), col("distance_km", "distance_miles")];
+    const [title, start, end, ex, ss, type, reps, secs, dist] = [
+      col("title"),
+      col("start_time"),
+      col("end_time"),
+      col("exercise_title"),
+      col("superset_id"),
+      col("set_type"),
+      col("reps"),
+      col("duration_seconds"),
+      col("distance_km", "distance_miles"),
+    ];
     for (const r of rows.slice(1)) {
       const at = parseDate(get(r, start));
       const n = num(get(r, reps));
@@ -137,14 +147,18 @@ export function readImport(text: string): ImportFile | null {
         continue;
       }
       const fin = parseDate(get(r, end));
-      add(`${at}|${get(r, title)}`, { title: get(r, title) || "Workout", start: at, minutes: fin && fin > at ? Math.round((fin - at) / 60000) : undefined }, {
-        name: get(r, ex),
-        weight: num(get(r, kg >= 0 ? kg : lbs)),
-        reps: n,
-        seconds: n ? undefined : sec,
-        warmup: get(r, type).toLowerCase() === "warmup",
-        superset: get(r, ss) || undefined,
-      });
+      add(
+        `${at}|${get(r, title)}`,
+        { title: get(r, title) || "Workout", start: at, minutes: fin && fin > at ? Math.round((fin - at) / 60000) : undefined },
+        {
+          name: get(r, ex),
+          weight: num(get(r, kg >= 0 ? kg : lbs)),
+          reps: n,
+          seconds: n ? undefined : sec,
+          warmup: get(r, type).toLowerCase() === "warmup",
+          superset: get(r, ss) || undefined,
+        },
+      );
     }
     return { format: "hevy", unit, workouts: [...workouts.values()], skipped };
   }
@@ -154,7 +168,16 @@ export function readImport(text: string): ImportFile | null {
     const w = col("weight");
     const unitHead = head[w]?.match(/\((kg|lbs?)\)/)?.[1];
     const unit: Unit | null = unitHead ? (unitHead === "kg" ? "kg" : "lb") : null;
-    const [date, title, dur, ex, order, reps, secs, dist] = [col("date"), col("workout name"), col("duration"), col("exercise name"), col("set order"), col("reps"), col("seconds"), col("distance")];
+    const [date, title, dur, ex, order, reps, secs, dist] = [
+      col("date"),
+      col("workout name"),
+      col("duration"),
+      col("exercise name"),
+      col("set order"),
+      col("reps"),
+      col("seconds"),
+      col("distance"),
+    ];
     for (const r of rows.slice(1)) {
       const at = parseDate(get(r, date));
       const n = num(get(r, reps));
@@ -165,20 +188,32 @@ export function readImport(text: string): ImportFile | null {
         skipped++;
         continue;
       }
-      add(`${at}|${get(r, title)}`, { title: get(r, title) || "Workout", start: at, minutes: minutesOf(get(r, dur)) }, {
-        name: get(r, ex),
-        weight: num(get(r, w)),
-        reps: n,
-        seconds: n ? undefined : sec,
-        warmup: get(r, order).toUpperCase() === "W",
-      });
+      add(
+        `${at}|${get(r, title)}`,
+        { title: get(r, title) || "Workout", start: at, minutes: minutesOf(get(r, dur)) },
+        {
+          name: get(r, ex),
+          weight: num(get(r, w)),
+          reps: n,
+          seconds: n ? undefined : sec,
+          warmup: get(r, order).toUpperCase() === "W",
+        },
+      );
     }
     return { format: "strong", unit, workouts: [...workouts.values()], skipped };
   }
 
   if (col("exercise") >= 0 && col("per hand") >= 0 && col("unit") >= 0) {
     // Liftsmith's own "Export sets" file: the unit is on every row.
-    const [date, time, workout, ex, weight, unit, reps] = [col("date"), col("time"), col("workout"), col("exercise"), col("weight"), col("unit"), col("reps")];
+    const [date, time, workout, ex, weight, unit, reps] = [
+      col("date"),
+      col("time"),
+      col("workout"),
+      col("exercise"),
+      col("weight"),
+      col("unit"),
+      col("reps"),
+    ];
     const firstAt = new Map<string, number>();
     for (const r of rows.slice(1)) {
       const at = parseDate(get(r, date), get(r, time));
@@ -189,7 +224,11 @@ export function readImport(text: string): ImportFile | null {
       }
       const key = get(r, workout) || get(r, date);
       if (!firstAt.has(key)) firstAt.set(key, at);
-      add(key, { title: "Workout", start: firstAt.get(key)! }, { name: get(r, ex), weight: num(get(r, weight)), reps: n, warmup: false, unit: get(r, unit) === "lb" ? "lb" : "kg" });
+      add(
+        key,
+        { title: "Workout", start: firstAt.get(key)! },
+        { name: get(r, ex), weight: num(get(r, weight)), reps: n, warmup: false, unit: get(r, unit) === "lb" ? "lb" : "kg" },
+      );
     }
     return { format: "liftsmith", unit: "kg", workouts: [...workouts.values()], skipped };
   }
@@ -199,23 +238,67 @@ export function readImport(text: string): ImportFile | null {
 // --- Matching names to the library ---
 
 const SYNONYM: Record<string, string> = {
-  db: "dumbbell", dumbbells: "dumbbell", bb: "barbell", kb: "kettlebell", kettlebells: "kettlebell",
-  cable: "machine", cables: "machine", smith: "machine", lever: "machine", pulley: "machine",
-  bodyweight: "bodyweight", weighted: "", assisted: "", band: "", bands: "",
-  pushup: "push up", pullup: "pull up", chinup: "chin up", situp: "sit up", pulldown: "pulldown", pushdown: "pushdown",
-  flye: "fly", flyes: "fly", flies: "fly", raises: "raise", curls: "curl", rows: "row", presses: "press", extensions: "extension", squats: "squat", lunges: "lunge",
-  rdl: "romanian deadlift", skullcrusher: "skull crusher", skullcrushers: "skull crusher", seated: "", bar: "", straight: "", ohp: "overhead press", tricep: "triceps", bicep: "biceps",
+  db: "dumbbell",
+  dumbbells: "dumbbell",
+  bb: "barbell",
+  kb: "kettlebell",
+  kettlebells: "kettlebell",
+  cable: "machine",
+  cables: "machine",
+  smith: "machine",
+  lever: "machine",
+  pulley: "machine",
+  bodyweight: "bodyweight",
+  weighted: "",
+  assisted: "",
+  band: "",
+  bands: "",
+  pushup: "push up",
+  pullup: "pull up",
+  chinup: "chin up",
+  situp: "sit up",
+  pulldown: "pulldown",
+  pushdown: "pushdown",
+  flye: "fly",
+  flyes: "fly",
+  flies: "fly",
+  raises: "raise",
+  curls: "curl",
+  rows: "row",
+  presses: "press",
+  extensions: "extension",
+  squats: "squat",
+  lunges: "lunge",
+  rdl: "romanian deadlift",
+  skullcrusher: "skull crusher",
+  skullcrushers: "skull crusher",
+  seated: "",
+  bar: "",
+  straight: "",
+  ohp: "overhead press",
+  tricep: "triceps",
+  bicep: "biceps",
 };
 
 /** Lowercase word tokens with the synonyms above (equipment folded to our load kinds). */
 export function tokens(name: string): Set<string> {
-  const words = name.toLowerCase().replace(/[^a-z0-9 ]+/g, " ").split(/\s+/).filter(Boolean);
+  const words = name
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]+/g, " ")
+    .split(/\s+/)
+    .filter(Boolean);
   const out = new Set<string>();
   for (const w of words) for (const x of (SYNONYM[w] ?? w).split(" ")) if (x && x !== "and" && x !== "the" && x !== "with") out.add(x);
   return out;
 }
 
-const LOAD_WORD: Record<LoadKind, string> = { barbell: "barbell", dumbbell: "dumbbell", kettlebell: "kettlebell", machine: "machine", bodyweight: "bodyweight" };
+const LOAD_WORD: Record<LoadKind, string> = {
+  barbell: "barbell",
+  dumbbell: "dumbbell",
+  kettlebell: "kettlebell",
+  machine: "machine",
+  bodyweight: "bodyweight",
+};
 
 function libTokens(e: Exercise): Set<string> {
   const t = tokens(e.name);
@@ -224,7 +307,33 @@ function libTokens(e: Exercise): Set<string> {
 }
 
 /** Words that make a different exercise: a name that has one only matches a library exercise that has it too. */
-const QUALIFIERS = new Set(["incline", "decline", "front", "close", "wide", "single", "one", "reverse", "romanian", "sumo", "hammer", "preacher", "overhead", "bulgarian", "goblet", "hanging", "standing", "zercher", "deficit", "pause", "paused", "pin", "jefferson", "snatch", "clean"]);
+const QUALIFIERS = new Set([
+  "incline",
+  "decline",
+  "front",
+  "close",
+  "wide",
+  "single",
+  "one",
+  "reverse",
+  "romanian",
+  "sumo",
+  "hammer",
+  "preacher",
+  "overhead",
+  "bulgarian",
+  "goblet",
+  "hanging",
+  "standing",
+  "zercher",
+  "deficit",
+  "pause",
+  "paused",
+  "pin",
+  "jefferson",
+  "snatch",
+  "clean",
+]);
 const LOADS = new Set(["barbell", "dumbbell", "kettlebell", "machine", "bodyweight"]);
 const weight = (w: string) => (QUALIFIERS.has(w) ? 2 : 1);
 
@@ -239,10 +348,11 @@ export function matchExercise(name: string, list: readonly Exercise[] = EXERCISE
     if ([...want].some((w) => QUALIFIERS.has(w) && !have.has(w))) continue;
     let both = 0;
     let named = false;
-    for (const w of want) if (have.has(w)) {
-      both += weight(w);
-      if (!LOADS.has(w)) named = true;
-    }
+    for (const w of want)
+      if (have.has(w)) {
+        both += weight(w);
+        if (!LOADS.has(w)) named = true;
+      }
     // Sharing only the equipment isn't a match.
     if (!named) continue;
     const score = (2 * both) / (wantW + [...have].reduce((n, w) => n + weight(w), 0));
@@ -252,12 +362,23 @@ export function matchExercise(name: string, list: readonly Exercise[] = EXERCISE
 }
 
 const MUSCLE_WORDS: [RegExp, Muscle][] = [
-  [/calf|calves/, "calves"], [/lateral raise|side raise|upright/, "sideDelts"], [/rear delt|reverse fly|face pull/, "rearDelts"],
-  [/shrug/, "traps"], [/curl/, "biceps"], [/tricep|pushdown|skull|kickback|dip/, "triceps"], [/wrist|forearm|grip/, "forearms"],
-  [/crunch|sit up|ab |abs|plank|leg raise|hollow/, "abs"], [/twist|oblique|side bend|woodchop/, "obliques"],
-  [/hamstring|leg curl|nordic|romanian|rdl|good morning/, "hamstrings"], [/hip thrust|glute|bridge|kickback/, "glutes"],
-  [/adduct/, "adductors"], [/squat|leg press|lunge|leg extension|step up|split/, "quads"], [/deadlift|back extension|hyperextension/, "lowerBack"],
-  [/pulldown|pull up|chin up|pullover|lat/, "lats"], [/row/, "upperBack"], [/overhead|shoulder|military|arnold/, "frontDelts"],
+  [/calf|calves/, "calves"],
+  [/lateral raise|side raise|upright/, "sideDelts"],
+  [/rear delt|reverse fly|face pull/, "rearDelts"],
+  [/shrug/, "traps"],
+  [/curl/, "biceps"],
+  [/tricep|pushdown|skull|kickback|dip/, "triceps"],
+  [/wrist|forearm|grip/, "forearms"],
+  [/crunch|sit up|ab |abs|plank|leg raise|hollow/, "abs"],
+  [/twist|oblique|side bend|woodchop/, "obliques"],
+  [/hamstring|leg curl|nordic|romanian|rdl|good morning/, "hamstrings"],
+  [/hip thrust|glute|bridge|kickback/, "glutes"],
+  [/adduct/, "adductors"],
+  [/squat|leg press|lunge|leg extension|step up|split/, "quads"],
+  [/deadlift|back extension|hyperextension/, "lowerBack"],
+  [/pulldown|pull up|chin up|pullover|lat/, "lats"],
+  [/row/, "upperBack"],
+  [/overhead|shoulder|military|arnold/, "frontDelts"],
   [/bench|chest|fly|push up|press/, "chest"],
 ];
 
@@ -265,7 +386,15 @@ const MUSCLE_WORDS: [RegExp, Muscle][] = [
 export function guessExercise(name: string): { primary: Muscle; load: LoadKind; compound: boolean } {
   const n = ` ${[...tokens(name)].join(" ")} `;
   const primary = MUSCLE_WORDS.find(([re]) => re.test(n))?.[1] ?? "abs";
-  const load: LoadKind = /barbell|ez/.test(n) ? "barbell" : /dumbbell/.test(n) ? "dumbbell" : /kettlebell/.test(n) ? "kettlebell" : /machine/.test(n) ? "machine" : "bodyweight";
+  const load: LoadKind = /barbell|ez/.test(n)
+    ? "barbell"
+    : /dumbbell/.test(n)
+      ? "dumbbell"
+      : /kettlebell/.test(n)
+        ? "kettlebell"
+        : /machine/.test(n)
+          ? "machine"
+          : "bodyweight";
   const compound = /squat|deadlift|press|row|pull up|chin up|dip|lunge|thrust|clean|snatch/.test(n) && !/leg press calf/.test(n);
   return { primary, load, compound };
 }
@@ -287,7 +416,14 @@ export const customId = (name: string) => `custom-imp-${hash(name.trim().toLower
  * gym the workouts are filed under. Ids come from the file, so `have` (ids already saved) skips
  * anything imported before. Workouts in the future are left out.
  */
-export function importEvents(file: ImportFile, mapping: Mapping, unit: Unit, gymId: string, now: number, have: ReadonlySet<string> = new Set()): { events: AppEvent[]; workouts: number; sets: number } {
+export function importEvents(
+  file: ImportFile,
+  mapping: Mapping,
+  unit: Unit,
+  gymId: string,
+  now: number,
+  have: ReadonlySet<string> = new Set(),
+): { events: AppEvent[]; workouts: number; sets: number } {
   const events: AppEvent[] = [];
   const known = new Set(EXERCISE_BY_ID.keys());
   for (const [name, to] of Object.entries(mapping)) {
@@ -296,7 +432,12 @@ export function importEvents(file: ImportFile, mapping: Mapping, unit: Unit, gym
     if (known.has(id) || have.has(`cx-${id}`)) continue;
     known.add(id);
     const g = guessExercise(name);
-    events.push({ type: "customExercise", id: `cx-${id}`, at: now, exercise: { id, name: name.trim().slice(0, 60), primary: [g.primary], secondary: [], load: g.load, compound: g.compound } });
+    events.push({
+      type: "customExercise",
+      id: `cx-${id}`,
+      at: now,
+      exercise: { id, name: name.trim().slice(0, 60), primary: [g.primary], secondary: [], load: g.load, compound: g.compound },
+    });
   }
   let workouts = 0;
   let sets = 0;
@@ -307,16 +448,43 @@ export function importEvents(file: ImportFile, mapping: Mapping, unit: Unit, gym
     const minutes = Math.min(600, Math.max(1, w.minutes ?? Math.round(w.sets.length * 2.5)));
     const span = Math.min(now, w.start + minutes * 60_000) - w.start;
     const at = (i: number) => Math.round(w.start + (span * (i + 1)) / (w.sets.length + 1));
-    const start: SessionStartEvent = { type: "sessionStart", id: `${sessionId}-start`, at: w.start, sessionId, gymId, minutes, source: "manual" };
+    const start: SessionStartEvent = {
+      type: "sessionStart",
+      id: `${sessionId}-start`,
+      at: w.start,
+      sessionId,
+      gymId,
+      minutes,
+      source: "manual",
+    };
     const body: AppEvent[] = w.sets.map((s, i) => {
       const exerciseId = mapping[s.name] === "custom" || !mapping[s.name] ? customId(s.name) : mapping[s.name];
       const kg = Math.round(toKg(s.weight, s.unit ?? unit) * 1000) / 1000;
       const reps = s.reps || s.seconds || 0;
-      if (s.warmup) return { type: "warmup", id: `${sessionId}-w${i}`, at: at(i), sessionId, exerciseId, weight: kg, reps } satisfies WarmupEvent;
+      if (s.warmup)
+        return { type: "warmup", id: `${sessionId}-w${i}`, at: at(i), sessionId, exerciseId, weight: kg, reps } satisfies WarmupEvent;
       sets++;
-      return { type: "set", id: `${sessionId}-s${i}`, at: at(i), sessionId, exerciseId, weight: kg, reps, targetReps: reps, targetWeight: kg, rir: MANUAL_RIR, ...(s.superset ? { superset: `${sessionId}-${s.superset}` } : {}) } satisfies SetEvent;
+      return {
+        type: "set",
+        id: `${sessionId}-s${i}`,
+        at: at(i),
+        sessionId,
+        exerciseId,
+        weight: kg,
+        reps,
+        targetReps: reps,
+        targetWeight: kg,
+        rir: MANUAL_RIR,
+        ...(s.superset ? { superset: `${sessionId}-${s.superset}` } : {}),
+      } satisfies SetEvent;
     });
-    const end: SessionEndEvent = { type: "sessionEnd", id: `${sessionId}-end`, at: w.start + span, sessionId, seconds: Math.round(span / 1000) };
+    const end: SessionEndEvent = {
+      type: "sessionEnd",
+      id: `${sessionId}-end`,
+      at: w.start + span,
+      sessionId,
+      seconds: Math.round(span / 1000),
+    };
     events.push(start, ...body, end);
     workouts++;
   }

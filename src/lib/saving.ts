@@ -13,7 +13,8 @@ export type Where = "native" | "installed" | "browser";
 export function where(): Where {
   if (isNative()) return "native";
   if (typeof window === "undefined") return "browser";
-  const standalone = window.matchMedia?.("(display-mode: standalone)")?.matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
+  const standalone =
+    window.matchMedia?.("(display-mode: standalone)")?.matches || (navigator as Navigator & { standalone?: boolean }).standalone === true;
   return standalone ? "installed" : "browser";
 }
 

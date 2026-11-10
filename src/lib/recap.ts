@@ -1,8 +1,8 @@
-import { setVolume } from "./sides";
 import { dedupe, derive, weekOf } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { date, weekday } from "./i18n";
 import { tonnage } from "./moments";
+import { setVolume } from "./sides";
 import { type AppEvent, type Muscle, type SetEvent } from "./types";
 
 // The monthly and yearly recap ("your year in lifting"). Derived from events for a period, never
@@ -12,7 +12,11 @@ export type Period = { kind: "month" | "year"; start: number; end: number };
 
 export function monthOf(ms: number): Period {
   const d = new Date(ms);
-  return { kind: "month", start: new Date(d.getFullYear(), d.getMonth(), 1).getTime(), end: new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime() };
+  return {
+    kind: "month",
+    start: new Date(d.getFullYear(), d.getMonth(), 1).getTime(),
+    end: new Date(d.getFullYear(), d.getMonth() + 1, 1).getTime(),
+  };
 }
 
 export function yearOf(ms: number): Period {
@@ -31,12 +35,11 @@ export function periodLabel(p: Period): string {
  */
 export function suggestedPeriod(now: number): Period {
   const d = new Date(now);
-  if ((d.getMonth() === 11 && d.getDate() >= 26)) return yearOf(now);
+  if (d.getMonth() === 11 && d.getDate() >= 26) return yearOf(now);
   if (d.getMonth() === 0 && d.getDate() <= 7) return yearOf(new Date(d.getFullYear() - 1, 6, 1).getTime());
   if (d.getDate() <= 7) return monthOf(new Date(d.getFullYear(), d.getMonth() - 1, 15).getTime());
   return monthOf(now);
 }
-
 
 export interface Recap {
   period: Period;
@@ -81,7 +84,10 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
   const inP = (at: number) => at >= period.start && at < period.end;
   const sets = all.filter((e): e is SetEvent => e.type === "set" && inP(e.at));
   // PRs need the history before the period too, so derive over everything up to its end.
-  const stats = derive(all.filter((e) => e.at < period.end), Math.min(now, period.end - 1));
+  const stats = derive(
+    all.filter((e) => e.at < period.end),
+    Math.min(now, period.end - 1),
+  );
   const sessions = stats.sessions.filter((s) => inP(s.start));
   const prs = stats.prs.filter((p) => inP(p.at));
   const bestPr = new Map<string, (typeof prs)[number]>();
@@ -94,7 +100,8 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
     byEx.set(s.exerciseId, (byEx.get(s.exerciseId) ?? 0) + 1);
     const ex = EXERCISE_BY_ID.get(s.exerciseId);
     for (const m of ex?.primary ?? []) byMuscle.set(m, (byMuscle.get(m) ?? 0) + 1);
-    if (ex && ex.load === "barbell" && (!heaviest || s.weight > heaviest.weight)) heaviest = { exerciseId: s.exerciseId, name: ex.name, weight: s.weight };
+    if (ex && ex.load === "barbell" && (!heaviest || s.weight > heaviest.weight))
+      heaviest = { exerciseId: s.exerciseId, name: ex.name, weight: s.weight };
   }
   const topEx = topOf(byEx);
   const topM = topOf(byMuscle);
@@ -118,7 +125,9 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
   const activeWeeks = new Set(sessions.map((s) => weekOf(s.start))).size;
 
   const prev = shift(period, -1);
-  const prevVol = all.filter((e): e is SetEvent => e.type === "set" && e.at >= prev.start && e.at < prev.end).reduce((v, s) => v + setVolume(s), 0);
+  const prevVol = all
+    .filter((e): e is SetEvent => e.type === "set" && e.at >= prev.start && e.at < prev.end)
+    .reduce((v, s) => v + setVolume(s), 0);
   const volumeKg = sets.reduce((v, s) => v + setVolume(s), 0);
   const hrs = sessions.map((s) => s.avgHr).filter((x): x is number => !!x);
 
@@ -130,7 +139,14 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
     reps: sets.reduce((r, s) => r + s.reps, 0),
     volumeKg,
     seconds: sessions.reduce((t, s) => t + s.seconds, 0),
-    prs: [...bestPr.values()].sort((a, b) => b.e1rm - a.e1rm).map((p) => ({ exerciseId: p.exerciseId, name: EXERCISE_BY_ID.get(p.exerciseId)?.name ?? p.exerciseId, weight: p.weight, reps: p.reps })),
+    prs: [...bestPr.values()]
+      .sort((a, b) => b.e1rm - a.e1rm)
+      .map((p) => ({
+        exerciseId: p.exerciseId,
+        name: EXERCISE_BY_ID.get(p.exerciseId)?.name ?? p.exerciseId,
+        weight: p.weight,
+        reps: p.reps,
+      })),
     topExercise: topEx ? { id: topEx[0], name: EXERCISE_BY_ID.get(topEx[0])?.name ?? topEx[0], sets: topEx[1] } : null,
     topMuscle: topM ? { muscle: topM[0], sets: topM[1] } : null,
     favouriteDay: favDay && sessions.length >= 2 ? weekday(Number(favDay[0]), "long") : null,
@@ -147,10 +163,10 @@ export function recap(events: readonly AppEvent[], period: Period, now: number):
 /** Months with at least one workout, newest first, for the recap picker. */
 export function recapMonths(events: readonly AppEvent[]): Period[] {
   const seen = new Map<number, Period>();
-  for (const e of events) if (e.type === "set") {
-    const p = monthOf(e.at);
-    seen.set(p.start, p);
-  }
+  for (const e of events)
+    if (e.type === "set") {
+      const p = monthOf(e.at);
+      seen.set(p.start, p);
+    }
   return [...seen.values()].sort((a, b) => b.start - a.start);
 }
-

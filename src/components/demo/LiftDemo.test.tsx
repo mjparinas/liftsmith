@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { LiftDemo, bodyFor, detectMode } from "./LiftDemo";
+
+import { bodyFor, detectMode, LiftDemo } from "./LiftDemo";
 
 describe("LiftDemo", () => {
   afterEach(cleanup);

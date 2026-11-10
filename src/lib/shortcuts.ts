@@ -1,4 +1,5 @@
 "use client";
+
 import { useApp } from "./store";
 
 // Voice and system shortcuts (Melvin, 2026-11-09). Every entry point lands here with one of three

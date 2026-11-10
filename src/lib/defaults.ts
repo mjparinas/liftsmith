@@ -43,8 +43,18 @@ export function defaultBars(unit: Unit) {
 export type GymPreset = "commercial" | "home" | "dumbbells" | "bodyweight";
 
 export const PRESETS: { id: GymPreset; name: string; blurb: string; equipment: Equipment[] }[] = [
-  { id: "commercial", name: "Commercial gym", blurb: "Racks, machines and cables", equipment: EQUIPMENT.filter((e) => e !== "rings" && e !== "abWheel") },
-  { id: "home", name: "Home gym", blurb: "Rack, barbell, bench, dumbbells", equipment: ["barbell", "dumbbells", "bench", "inclineBench", "rack", "pullupBar", "bands", "box"] },
+  {
+    id: "commercial",
+    name: "Commercial gym",
+    blurb: "Racks, machines and cables",
+    equipment: EQUIPMENT.filter((e) => e !== "rings" && e !== "abWheel"),
+  },
+  {
+    id: "home",
+    name: "Home gym",
+    blurb: "Rack, barbell, bench, dumbbells",
+    equipment: ["barbell", "dumbbells", "bench", "inclineBench", "rack", "pullupBar", "bands", "box"],
+  },
   { id: "dumbbells", name: "Dumbbells only", blurb: "A set of dumbbells and a bench", equipment: ["dumbbells", "bench", "inclineBench"] },
   { id: "bodyweight", name: "Bodyweight", blurb: "Hotel rooms, parks, travel", equipment: [] },
 ];
@@ -76,7 +86,16 @@ export function switchGymUnit(gym: Gym, unit: Unit): Gym {
   const heaviest = gym.dumbbells.at(-1) ?? 0;
   const big = gym.unit === "kg" ? heaviest > 35 : heaviest > 75;
   const kit = makeGym(big ? "commercial" : "home", unit, gym.id);
-  return { ...gym, unit, bars: kit.bars, plates: kit.plates, dumbbells: gym.dumbbells.length ? kit.dumbbells : [], kettlebells: gym.kettlebells.length ? kit.kettlebells : [], machineStep: kit.machineStep, updatedAt: Date.now() };
+  return {
+    ...gym,
+    unit,
+    bars: kit.bars,
+    plates: kit.plates,
+    dumbbells: gym.dumbbells.length ? kit.dumbbells : [],
+    kettlebells: gym.kettlebells.length ? kit.kettlebells : [],
+    machineStep: kit.machineStep,
+    updatedAt: Date.now(),
+  };
 }
 
 export function defaultProfile(now = Date.now()): Profile {

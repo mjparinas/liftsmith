@@ -1,12 +1,11 @@
-import type { BlockWeek } from "./block";
-import { weekStart } from "./block";
+import { weekStart, type BlockWeek } from "./block";
 import { EXERCISE_BY_ID } from "./exercises";
 import { weeklySets, type Plan, type PlanItem } from "./generator";
+import { currentTag, list, t } from "./i18n";
 import type { Readiness, Signal } from "./readiness";
 import { recovery } from "./recovery";
 import { PRIORITY_VOLUME } from "./training";
 import { MUSCLE_LABEL, type AppEvent, type Muscle, type Profile } from "./types";
-import { currentTag, list, t } from "./i18n";
 
 // Every recommendation says why (Melvin, 2026-11-09: "action-oriented recommendations, not stats
 // for the sake of stats"). Each exercise in a plan gets one short line covering why it was picked,
@@ -88,7 +87,9 @@ export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean): st
   if (chosen !== r.call) {
     const what = t(`why.what.${r.call}`);
     const because = r.call === "recover" ? down : r.call === "push" ? up : [];
-    return because.length ? t("why.call.overrideBecause", { what, reasons: names(because), score }) : t("why.call.override", { what, score });
+    return because.length
+      ? t("why.call.overrideBecause", { what, reasons: names(because), score })
+      : t("why.call.override", { what, score });
   }
   if (deload) return t("why.call.deload", { score });
   if (chosen === "push") return t("why.call.push", { reasons: up.length ? names(up) : t("why.call.fresh"), score });

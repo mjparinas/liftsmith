@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { afterSet, applyLinks, groupRange, groupedSeconds, linksOf, roundRest, supersetLabel, SWITCH_REST, toggleLink, withLinks } from "./superset";
+
+import {
+  afterSet,
+  applyLinks,
+  groupedSeconds,
+  groupRange,
+  linksOf,
+  roundRest,
+  supersetLabel,
+  SWITCH_REST,
+  toggleLink,
+  withLinks,
+} from "./superset";
 
 const it3: { exerciseId: string; sets: number; restSec: number; group?: string }[] = [
   { exerciseId: "a", sets: 3, restSec: 120 },
@@ -51,7 +63,13 @@ describe("supersets", () => {
   });
 
   it("keeps going on the one with sets left when set counts differ", () => {
-    const items = withLinks([{ exerciseId: "a", sets: 1, restSec: 90 }, { exerciseId: "b", sets: 3, restSec: 60 }], [true]);
+    const items = withLinks(
+      [
+        { exerciseId: "a", sets: 1, restSec: 90 },
+        { exerciseId: "b", sets: 3, restSec: 60 },
+      ],
+      [true],
+    );
     const done = new Map<number, number>([[0, 1]]);
     expect(afterSet(items, 0, (k) => done.get(k) ?? 0)).toEqual({ index: 1, rest: SWITCH_REST, finished: true });
     done.set(1, 1);

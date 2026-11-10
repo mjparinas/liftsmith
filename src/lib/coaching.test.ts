@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
-import { setLanguage } from "./i18n";
+
+import { makeSet } from "@/test/factories";
+
 import { equipmentTips, loadableTotals, plateTips } from "./buying";
 import { defaultProfile, makeGym } from "./defaults";
 import { exercise } from "./exercises";
 import { explain } from "./explain";
 import { generate, type PlanItem } from "./generator";
 import { forecast, observedRate, project, testDay, TYPICAL_MONTHLY } from "./goals";
+import { setLanguage } from "./i18n";
 import { presetLabels, settingsLine, withSettings } from "./machineSettings";
 import { applyFixes, findPlateaus, fixResult, startFix } from "./plateau";
 import { target } from "./progression";
@@ -22,9 +25,8 @@ function profile(p: Partial<Profile> = {}): Profile {
   return { ...defaultProfile(NOW), onboarded: true, activeGymId: "g", blockStart: NOW - 2 * DAY, ...p };
 }
 
-let n = 0;
 function set(exerciseId: string, at: number, weight: number, reps: number, extra: Partial<SetEvent> = {}): SetEvent {
-  return { type: "set", id: `e${n++}`, at, sessionId: `s${at}`, exerciseId, weight, reps, targetReps: reps, rir: 2, ...extra };
+  return makeSet({ at, sessionId: `s${at}`, exerciseId, weight, reps, ...extra });
 }
 /** Three sets per session on the given days ago, with weights from `w(i)`. */
 function sessions(exerciseId: string, daysAgo: number[], w: (i: number) => number, reps = 5, extra: Partial<SetEvent> = {}): SetEvent[] {
@@ -133,7 +135,13 @@ describe("plateau detective", () => {
     const p = profile();
     const [stall] = findPlateaus(events, p, NOW);
     const fix = startFix(stall, "volume", gym, NOW);
-    const item: PlanItem = { exerciseId: bench, sets: 3, restSec: 180, focus: "chest", target: { weight: 77.5, reps: 5, rir: 2, note: "Same" } };
+    const item: PlanItem = {
+      exerciseId: bench,
+      sets: 3,
+      restSec: 180,
+      focus: "chest",
+      target: { weight: 77.5, reps: 5, rir: 2, note: "Same" },
+    };
     const plan = { ...generate({ gym, profile: p, events, minutes: 45, now: NOW }), items: [item] };
     expect(applyFixes(plan, [fix], events, p, gym, NOW + DAY).items[0].sets).toBe(4);
     const reset = applyFixes(plan, [startFix(stall, "reset", gym, NOW)], events, p, gym, NOW + DAY).items[0];
@@ -230,19 +238,43 @@ describe("workout remix links", () => {
     expect(r.plan.items[0].target.weight).toBeGreaterThan(60);
   });
   it("shares a finished session in the order it was done", () => {
-    const evs = [set("back-squat", NOW, 100, 5, { sessionId: "z" }), set("back-squat", NOW + 1, 100, 5, { sessionId: "z" }), set("lying-leg-curl", NOW + 2, 40, 12, { sessionId: "z" })];
+    const evs = [
+      set("back-squat", NOW, 100, 5, { sessionId: "z" }),
+      set("back-squat", NOW + 1, 100, 5, { sessionId: "z" }),
+      set("lying-leg-curl", NOW + 2, 40, 12, { sessionId: "z" }),
+    ];
     const shared = sharedFromSession(evs, "z", "strength");
-    expect(shared.map((s) => [s.exerciseId, s.sets, s.reps])).toEqual([["back-squat", 2, 5], ["lying-leg-curl", 1, 12]]);
+    expect(shared.map((s) => [s.exerciseId, s.sets, s.reps])).toEqual([
+      ["back-squat", 2, 5],
+      ["lying-leg-curl", 1, 12],
+    ]);
     expect(encodeShared(shared)).not.toMatch(/100/);
   });
 });
 
 describe("what to buy next", () => {
   it("counts loadable totals from the plates owned", () => {
-    expect(loadableTotals(20, [{ weight: 10, count: 2 }, { weight: 5, count: 2 }], 20, 100)).toEqual([20, 30, 40, 50]);
+    expect(
+      loadableTotals(
+        20,
+        [
+          { weight: 10, count: 2 },
+          { weight: 5, count: 2 },
+        ],
+        20,
+        100,
+      ),
+    ).toEqual([20, 30, 40, 50]);
   });
   it("suggests small plates when the smallest jump is big", () => {
-    const home = { ...makeGym("home", "kg", "h"), plates: [{ weight: 20, count: 4 }, { weight: 10, count: 4 }, { weight: 5, count: 4 }] };
+    const home = {
+      ...makeGym("home", "kg", "h"),
+      plates: [
+        { weight: 20, count: 4 },
+        { weight: 10, count: 4 },
+        { weight: 5, count: 4 },
+      ],
+    };
     const tips = plateTips(home, []);
     expect(tips[0].jumpTo).toBeLessThan(tips[0].jumpFrom);
     expect(tips[0].text).toMatch(/A pair of 2\.5 kg plates|A pair of 1\.25 kg plates/);
@@ -261,7 +293,10 @@ describe("machine settings memory", () => {
     expect(presetLabels("push-up")).toEqual([]);
   });
   it("saves per exercise per gym, trimming empties", () => {
-    const g = withSettings(gym, "leg-press", [{ label: "Back angle", value: " 3 " }, { label: "Foot position", value: "" }]);
+    const g = withSettings(gym, "leg-press", [
+      { label: "Back angle", value: " 3 " },
+      { label: "Foot position", value: "" },
+    ]);
     expect(g.settings?.["leg-press"]).toEqual([{ label: "Back angle", value: "3" }]);
     expect(settingsLine(g.settings!["leg-press"])).toBe("Back angle 3");
     expect(withSettings(g, "leg-press", []).settings?.["leg-press"]).toBeUndefined();

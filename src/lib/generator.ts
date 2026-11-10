@@ -1,16 +1,16 @@
 import { blockWeek, weekStart, type BlockWeek } from "./block";
-import { stepLoad } from "./loads";
-import type { Call } from "./readiness";
 import { available, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "./exercises";
+import { t } from "./i18n";
 import { activeInjuries, effectFor, lighten, skippedIds, type Injury } from "./injury";
+import { stepLoad } from "./loads";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
+import type { Call } from "./readiness";
 import { recovery } from "./recovery";
-import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
 import { groupedSeconds } from "./superset";
-import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 import { PRIORITY_VOLUME } from "./training";
-import { t } from "./i18n";
+import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
 // recovered and furthest below this week's set target, sized to fit the minutes asked for.
@@ -159,14 +159,26 @@ function order(a: Exercise, b: Exercise): number {
   return rank(a) - rank(b);
 }
 
-export function generate({ gym, profile, events, minutes, now, exclude = [], call = "normal", challenge = false, muscles }: GenerateInput): Plan {
+export function generate({
+  gym,
+  profile,
+  events,
+  minutes,
+  now,
+  exclude = [],
+  call = "normal",
+  challenge = false,
+  muscles,
+}: GenerateInput): Plan {
   const day = muscles ? new Set(muscles) : null;
   const week = blockWeek(profile, now);
   const rec = recovery(events, now);
   const done = weeklySets(events, weekStart(profile, now));
   const hurt = activeInjuries(events, now);
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
-  const pool = available(gym.equipment).filter((e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))));
+  const pool = available(gym.equipment).filter(
+    (e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
+  );
   const random = rng(hash(dayKey(now) + gym.id));
   const training = profile.training;
   const favs = new Set(training?.favourites ?? []);
@@ -181,7 +193,11 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
       // Priority muscles (Settings) aim for a third more sets this week and rank ahead.
       const goal = week.setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1);
       const left = Math.max(0, goal - done[m]) / week.setsPerMuscle;
-      const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;
+      const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m)
+        ? 1.25
+        : m === "forearms" || m === "adductors"
+          ? 0.6
+          : 1;
       return { m, score: (rec[m] / 100) * (0.25 + left) * big * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
     })
     .sort((a, b) => b.score - a.score)
@@ -199,7 +215,14 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     // A favourite that fits beats keeping last time's exercise, unless last time's was a favourite too.
     const favHere = cands.some((c) => favs.has(c.id));
     if (prev && (!favHere || favs.has(prev.id)) && random() < KEEP[profile.variability]) return prev;
-    const weighted = cands.map((c) => ({ c, w: (compoundFirst && c.compound ? (c.load === "barbell" ? 4 : 3) : 1) * (c.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) * (favs.has(c.id) ? 6 : 1) * (0.5 + random()) }));
+    const weighted = cands.map((c) => ({
+      c,
+      w:
+        (compoundFirst && c.compound ? (c.load === "barbell" ? 4 : 3) : 1) *
+        (c.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) *
+        (favs.has(c.id) ? 6 : 1) *
+        (0.5 + random()),
+    }));
     weighted.sort((a, b) => b.w - a.w);
     return weighted[0].c;
   };
@@ -213,7 +236,15 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
     const baseSets = chosen ?? (ex.compound && items.length < 2 && minutes >= 45 ? 4 : 3);
     const sets = week.deload ? Math.max(2, Math.round(baseSets * week.volume)) : baseSets;
     const warmup = warmupFor(ex, t.target.weight, gym, warmed);
-    const item: PlanItem = { exerciseId: ex.id, sets, restSec: restFor(ex, profile.goal, training), focus: m, target: t.target, injuryPct: t.injuryPct, warmup: warmup.length ? warmup : undefined };
+    const item: PlanItem = {
+      exerciseId: ex.id,
+      sets,
+      restSec: restFor(ex, profile.goal, training),
+      focus: m,
+      target: t.target,
+      injuryPct: t.injuryPct,
+      warmup: warmup.length ? warmup : undefined,
+    };
     const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
     if (total + cost > budget) return false;
     total += cost;
@@ -252,7 +283,7 @@ export function generate({ gym, profile, events, minutes, now, exclude = [], cal
   // worked out again in the final order. If that tips the plan over the time asked for, extra
   // sets come off the end first.
   const final = withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!);
-  for (let i = final.length - 1; i >= 0 && planSeconds(final) > budget; ) {
+  for (let i = final.length - 1; i >= 0 && planSeconds(final) > budget;) {
     if (final[i].sets > 2) final[i] = { ...final[i], sets: final[i].sets - 1 };
     else i--;
   }
@@ -280,11 +311,22 @@ export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Pro
     let ex = EXERCISE_BY_ID.get(item.exerciseId)!;
     let next: PlanItem = item;
     if (effectFor(ex, hurt)?.action === "skip") {
-      const alt = alternatives(ex.id, gym, [...items, ...plan.items].map((i) => i.exerciseId), hurt).find((e) => !LADDER_ONLY.has(e.id));
+      const alt = alternatives(
+        ex.id,
+        gym,
+        [...items, ...plan.items].map((i) => i.exerciseId),
+        hurt,
+      ).find((e) => !LADDER_ONLY.has(e.id));
       if (!alt) continue;
       ex = alt;
       const t = target(alt, events, profile, gym, now);
-      next = { ...item, exerciseId: alt.id, target: { ...t, reps: item.target.reps, note: item.target.note }, warmup: undefined, setTargets: item.setTargets?.map((x) => ({ ...x, weight: t.weight })) };
+      next = {
+        ...item,
+        exerciseId: alt.id,
+        target: { ...t, reps: item.target.reps, note: item.target.note },
+        warmup: undefined,
+        setTargets: item.setTargets?.map((x) => ({ ...x, weight: t.weight })),
+      };
     }
     const eff = effectFor(ex, hurt);
     if (eff?.action === "light") {
@@ -292,7 +334,12 @@ export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Pro
       next = {
         ...next,
         target: lighten(next.target, ex, eff.pct, gym),
-        setTargets: next.setTargets?.map((x) => ({ ...x, weight: lit(x.weight, x.reps).weight, reps: lit(x.weight, x.reps).reps, amrap: undefined })),
+        setTargets: next.setTargets?.map((x) => ({
+          ...x,
+          weight: lit(x.weight, x.reps).weight,
+          reps: lit(x.weight, x.reps).reps,
+          amrap: undefined,
+        })),
         injuryPct: eff.pct,
         challenge: undefined,
         warmup: undefined,
@@ -310,8 +357,15 @@ function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) 
       const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
       item.sets = Math.max(2, item.sets - 1);
       if (item.injuryPct) continue; // already lighter for the injury
-      if (ex.load === "bodyweight" || TIMED.has(ex.id)) item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
-      else item.target = { ...item.target, weight: stepLoad(item.target.weight, -1, ex, gym), rir: item.target.rir + 1, note: t("note.easyLighter") };
+      if (ex.load === "bodyweight" || TIMED.has(ex.id))
+        item.target = { ...item.target, reps: Math.max(3, item.target.reps - 2), rir: item.target.rir + 1, note: t("note.easyReps") };
+      else
+        item.target = {
+          ...item.target,
+          weight: stepLoad(item.target.weight, -1, ex, gym),
+          rir: item.target.rir + 1,
+          note: t("note.easyLighter"),
+        };
     }
     return;
   }
@@ -338,7 +392,8 @@ export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly
   return pool
     .filter((e) => e.id !== ex.id && !skip.includes(e.id) && e.primary.some((m) => ex.primary.includes(m)) && eff(e)?.action !== "skip")
     .map((e) => {
-      const shared = e.primary.filter((m) => ex.primary.includes(m)).length * 3 + e.secondary.filter((m) => ex.secondary.includes(m)).length;
+      const shared =
+        e.primary.filter((m) => ex.primary.includes(m)).length * 3 + e.secondary.filter((m) => ex.secondary.includes(m)).length;
       const clear = hurt.length && !eff(e) ? 10 : 0;
       return { e, s: shared + (e.pattern === ex.pattern ? 2 : 0) + (e.compound === ex.compound ? 1 : 0) + clear };
     })

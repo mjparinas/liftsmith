@@ -1,6 +1,6 @@
 // POST /api/auth/logout/: ends this device's session. Server build only.
-import { signOut } from "@/server/accounts";
 import { preflight, reply, signedIn } from "@/server/accountHttp";
+import { signOut } from "@/server/accounts";
 
 export const OPTIONS = preflight;
 

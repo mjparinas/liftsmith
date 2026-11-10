@@ -1,0 +1,72 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "coach.", in every language. English is the source: add a key here first,
+// then its Spanish and French. A missing translation falls back to English.
+
+export const en = {
+  "coach.why": "Why?",
+  "coach.changePlan": "Change the plan",
+  "coach.whyTitle": "Why this for {name}",
+  "coach.gotIt": "Got it",
+  "coach.fits": "Done. The rest of the workout now fits.",
+  "coach.back": "Back to the workout",
+  "coach.short": "Short on time",
+  "coach.shortHint": "About {min} min left as planned. The big lifts stay; smaller exercises lose sets first.",
+  "coach.minLeft": "{min} min left",
+  "coach.alreadyShort": "It’s already a short finish from here.",
+  "coach.taken": "{items} taken?",
+  "coach.later": "Do {name} later",
+  "coach.swapOther": "Or swap to something that needs other equipment:",
+  "coach.swap": "Swap",
+  "coach.saveSetup": "Save setup",
+  "coach.setupTitle": "{name} at {gym}",
+  "coach.setupHint": "Shown here next time, so you set it up right the first time.",
+  "coach.save": "Save",
+  "coach.placeholder": "e.g. 4",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "coach.why": "¿Por qué?",
+  "coach.changePlan": "Cambiar el plan",
+  "coach.whyTitle": "Por qué esto en {name}",
+  "coach.gotIt": "Entendido",
+  "coach.fits": "Listo. El resto del entrenamiento ya cabe.",
+  "coach.back": "Volver al entrenamiento",
+  "coach.short": "Poco tiempo",
+  "coach.shortHint": "Quedan unos {min} min según el plan. Los ejercicios grandes se quedan; los pequeños pierden series primero.",
+  "coach.minLeft": "Quedan {min} min",
+  "coach.alreadyShort": "Desde aquí ya queda poco.",
+  "coach.taken": "¿{items} ocupado?",
+  "coach.later": "Hacer {name} más tarde",
+  "coach.swapOther": "O cámbialo por algo que use otro equipo:",
+  "coach.swap": "Cambiar",
+  "coach.saveSetup": "Guardar ajustes",
+  "coach.setupTitle": "{name} en {gym}",
+  "coach.setupHint": "Se mostrará aquí la próxima vez para que lo ajustes bien a la primera.",
+  "coach.save": "Guardar",
+  "coach.placeholder": "p. ej. 4",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "coach.why": "Pourquoi ?",
+  "coach.changePlan": "Modifier le plan",
+  "coach.whyTitle": "Pourquoi ceci pour {name}",
+  "coach.gotIt": "Compris",
+  "coach.fits": "C’est fait. La suite de la séance tient maintenant.",
+  "coach.back": "Retour à la séance",
+  "coach.short": "Peu de temps",
+  "coach.shortHint": "Il reste environ {min} min prévues. Les gros mouvements restent ; les petits exercices perdent des séries d’abord.",
+  "coach.minLeft": "Encore {min} min",
+  "coach.alreadyShort": "La fin est déjà courte d’ici.",
+  "coach.taken": "{items} occupé ?",
+  "coach.later": "Faire {name} plus tard",
+  "coach.swapOther": "Ou remplacez-le par un exercice avec un autre matériel :",
+  "coach.swap": "Remplacer",
+  "coach.saveSetup": "Enregistrer les réglages",
+  "coach.setupTitle": "{name} à {gym}",
+  "coach.setupHint": "Affiché ici la prochaine fois, pour bien régler dès le départ.",
+  "coach.save": "Enregistrer",
+  "coach.placeholder": "ex. 4",
+};

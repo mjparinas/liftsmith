@@ -1,0 +1,7 @@
+# Name
+
+Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
+
+- **Liftsmith** (Melvin chose it, 2026-11-09; the working name before was Setwise). The name is set in `src/lib/brand.ts`.
+- **App id: `com.getliftsmith.app`** for the Android package and the iOS bundle id, with the widget extension at `com.getliftsmith.app.widgets` (Melvin, 2026-11-09). It can never change after the first Play and App Store upload.
+- **Domain: `getliftsmith.com`** (Melvin chose it and bought it on Cloudflare, 2026-11-09; attached to Vercel, which makes production public because custom domains skip Vercel Authentication). **Every URL uses `https://www.getliftsmith.com`** (Melvin, 2026-11-09): the bare domain redirects to www, so canonical links, `metadataBase`, the sitemap, robots, Open Graph tags, email links, store listings and native config all use the www host, never the bare one. Email addresses stay on the bare domain (`hello@getliftsmith.com`). It's the default `SITE_URL` (`src/lib/site.ts`, overridable with `NEXT_PUBLIC_SITE_URL`, which must also include www). When App Links and Universal Links land, serve `assetlinks.json` and `apple-app-site-association` on www and list both hosts in the app's intent filters and associated domains, so old bare links still open the app.

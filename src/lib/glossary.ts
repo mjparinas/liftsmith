@@ -4,12 +4,34 @@
 // catalogues (src/locales, keys gloss.<term>.title and gloss.<term>.body, paragraphs split by a
 // newline), so it follows the app's language; GLOSSARY reads it through getters.
 import type { MessageKey } from "@/locales/en";
+
 import { t } from "./i18n";
 
 const TERMS = [
-  "deloadWeeks", "deload", "rir", "rpe", "blockWeek", "readiness", "call", "volume", "e1rm", "weeklySets",
-  "variety", "recovery", "superset", "warmup", "firstWeights", "healthTwin", "hrv", "restingHr",
-  "breathingRate", "vo2max", "leanMass", "bmi", "restDrop", "fitnessAge",
+  "deloadWeeks",
+  "deload",
+  "rir",
+  "rpe",
+  "blockWeek",
+  "readiness",
+  "call",
+  "volume",
+  "e1rm",
+  "weeklySets",
+  "variety",
+  "recovery",
+  "superset",
+  "warmup",
+  "firstWeights",
+  "healthTwin",
+  "hrv",
+  "restingHr",
+  "breathingRate",
+  "vo2max",
+  "leanMass",
+  "bmi",
+  "restDrop",
+  "fitnessAge",
 ] as const;
 
 export type Term = (typeof TERMS)[number];

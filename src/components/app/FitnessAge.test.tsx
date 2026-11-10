@@ -4,14 +4,21 @@
 import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { useApp } from "@/lib/store";
 import { dayOf } from "@/lib/twin";
+
 import { App } from "./App";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
 beforeEach(async () => {
-  window.matchMedia ??= ((q: string) => ({ matches: false, media: q, addEventListener() {}, removeEventListener() {} })) as unknown as typeof window.matchMedia;
+  window.matchMedia ??= ((q: string) => ({
+    matches: false,
+    media: q,
+    addEventListener() {},
+    removeEventListener() {},
+  })) as unknown as typeof window.matchMedia;
   window.scrollTo = () => {};
   location.hash = "";
   localStorage.clear();
@@ -28,7 +35,10 @@ async function openHealth(user: ReturnType<typeof userEvent.setup>) {
   for (let i = 0; i < 3; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
   await user.click(screen.getByRole("button", { name: "Save" }));
   await screen.findByText("Today's workout");
-  await act(async () => { location.hash = "#/recovery"; window.dispatchEvent(new HashChangeEvent("hashchange")); });
+  await act(async () => {
+    location.hash = "#/recovery";
+    window.dispatchEvent(new HashChangeEvent("hashchange"));
+  });
   await user.click(await screen.findByTestId("body-health"));
   return screen.findByTestId("fitness-age");
 }
@@ -39,7 +49,9 @@ describe("fitness age", () => {
     const now = Date.now();
     await act(async () => {
       useApp.getState().setProfile({ birthYear: new Date(now).getFullYear() - 45, sex: "male" });
-      useApp.getState().importWorkouts([{ type: "health", id: "vo2-1", at: now - 86_400_000, metric: "vo2max", day: dayOf(now - 86_400_000), value: 52 }]);
+      useApp
+        .getState()
+        .importWorkouts([{ type: "health", id: "vo2-1", at: now - 86_400_000, metric: "vo2max", day: dayOf(now - 86_400_000), value: 52 }]);
     });
     const card = await openHealth(user);
     expect(card).toHaveTextContent(/About \d+/);

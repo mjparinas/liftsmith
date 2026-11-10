@@ -1,6 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { addTask, checkTask, deleteTask, hideItem, listTasks, setTaskDone, setupItems, todoList, unhideAll } from "./adminTodo";
-import { run, resetDb } from "./db";
+import { resetDb, run } from "./db";
 import { recentJobRuns, trackJob } from "./monitor";
 
 const NOW = Date.UTC(2026, 10, 9, 12);
@@ -18,13 +19,22 @@ afterEach(() => vi.unstubAllEnvs());
 describe("admin to-do list", () => {
   it("lists setup still to do by setting name", () => {
     const keys = setupItems(() => "").map((i) => i.key);
-    expect(keys).toEqual(["setup:RESEND_INBOX_API_KEY", "setup:ANALYTICS_SECRET", "setup:NEXT_PUBLIC_SITE_URL", "setup:UPTIMEROBOT_API_KEY"]);
+    expect(keys).toEqual([
+      "setup:RESEND_INBOX_API_KEY",
+      "setup:ANALYTICS_SECRET",
+      "setup:NEXT_PUBLIC_SITE_URL",
+      "setup:UPTIMEROBOT_API_KEY",
+    ]);
     expect(setupItems(() => "x")).toEqual([]);
     for (const i of setupItems(() => "")) expect(i.detail).toMatch(/www\.getliftsmith\.com|Vercel|Resend|UptimeRobot/);
   });
 
   it("adds a late or failed reminder job, and snoozes it", async () => {
-    await trackJob("reminders", async () => Response.json({ sent: 3 }), () => NOW - 2 * DAY);
+    await trackJob(
+      "reminders",
+      async () => Response.json({ sent: 3 }),
+      () => NOW - 2 * DAY,
+    );
     let list = await todoList(NOW);
     const job = list.items.find((i) => i.kind === "job")!;
     expect(job.title).toMatch(/late/);
@@ -41,15 +51,29 @@ describe("admin to-do list", () => {
   });
 
   it("records a failed job and says so", async () => {
-    await expect(trackJob("reminders", async () => { throw new Error("Resend down"); }, () => NOW - 3_600_000)).rejects.toThrow("Resend down");
+    await expect(
+      trackJob(
+        "reminders",
+        async () => {
+          throw new Error("Resend down");
+        },
+        () => NOW - 3_600_000,
+      ),
+    ).rejects.toThrow("Resend down");
     const [run0] = await recentJobRuns("reminders");
     expect(run0).toMatchObject({ ok: false, detail: "Resend down" });
     expect((await todoList(NOW)).items.find((i) => i.kind === "job")?.title).toMatch(/failed/);
   });
 
   it("flags payment failures from the store in the last two weeks", async () => {
-    await run("INSERT INTO subscription_events (id, at, store, kind, reason, source) VALUES ('e1', ?, 'play', 'cancel', 'billing', 'store')", [NOW - DAY]);
-    await run("INSERT INTO subscription_events (id, at, store, kind, reason, source) VALUES ('e0', ?, 'play', 'cancel', 'billing', 'store')", [NOW - 30 * DAY]);
+    await run(
+      "INSERT INTO subscription_events (id, at, store, kind, reason, source) VALUES ('e1', ?, 'play', 'cancel', 'billing', 'store')",
+      [NOW - DAY],
+    );
+    await run(
+      "INSERT INTO subscription_events (id, at, store, kind, reason, source) VALUES ('e0', ?, 'play', 'cancel', 'billing', 'store')",
+      [NOW - 30 * DAY],
+    );
     const items = (await todoList(NOW)).items.filter((i) => i.kind === "billing");
     expect(items).toHaveLength(1);
     expect(items[0].title).toMatch(/A subscription lapsed/);

@@ -171,7 +171,10 @@ export class ImuRepCounter {
     // (a sticking point, the bottom of a miss) keeps the measured height.
     const h0 = this.h;
     const hEnd = h0 + p[p.length - 1];
-    const roms = this.tracker.summary().reps.map((r) => r.rom).sort((a, b) => a - b);
+    const roms = this.tracker
+      .summary()
+      .reps.map((r) => r.rom)
+      .sort((a, b) => a - b);
     const typical = roms.length ? roms[roms.length >> 1] : this.minRom * 2.5;
     // A height well past any rep in the set is drift, not movement: reset it too.
     const snap = (endsStill && Math.abs(hEnd) < Math.max(0.6 * this.minRom, 0.35 * typical)) || Math.abs(hEnd) > 1.6 * typical;
@@ -199,4 +202,3 @@ export class ImuRepCounter {
     return this.tracker.finish();
   }
 }
-

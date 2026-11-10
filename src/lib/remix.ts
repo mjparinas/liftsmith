@@ -83,13 +83,21 @@ export function adaptRemix(shared: readonly SharedItem[], gym: Gym, profile: Pro
     // Their reps, our weight: the same effort worked out from this lifter's own strength.
     const reps = id === s.exerciseId || TIMED.has(id) === TIMED.has(s.exerciseId) ? s.reps : t.reps;
     let weight = t.weight;
-    if (ex.load !== "bodyweight" && reps !== t.reps && t.weight > 0) weight = roundLoad(weightFor(epley(t.weight, t.reps, t.rir), reps, t.rir), ex, gym).kg;
-    const note = id === s.exerciseId ? "From a shared workout, at your weights" : `Swapped in for ${EXERCISE_BY_ID.get(s.exerciseId)!.name} at this gym`;
+    if (ex.load !== "bodyweight" && reps !== t.reps && t.weight > 0)
+      weight = roundLoad(weightFor(epley(t.weight, t.reps, t.rir), reps, t.rir), ex, gym).kg;
+    const note =
+      id === s.exerciseId
+        ? "From a shared workout, at your weights"
+        : `Swapped in for ${EXERCISE_BY_ID.get(s.exerciseId)!.name} at this gym`;
     items.push({ exerciseId: id, sets: s.sets, restSec: s.restSec, focus: ex.primary[0], target: { weight, reps, rir: t.rir, note } });
   }
   const est = items.reduce((sum, i, n) => sum + itemSeconds(i) + (n ? i.restSec : 0), 0);
   const minutes = Math.max(15, Math.round(est / 60));
-  return { plan: { gymId: gym.id, minutes, estMinutes: minutes, week: blockWeek(profile, now), call: "normal", challenge: false, items }, swapped, missing };
+  return {
+    plan: { gymId: gym.id, minutes, estMinutes: minutes, week: blockWeek(profile, now), call: "normal", challenge: false, items },
+    swapped,
+    missing,
+  };
 }
 
 /** A finished session as shareable items: exercises in the order done, sets done, the reps aimed for. */

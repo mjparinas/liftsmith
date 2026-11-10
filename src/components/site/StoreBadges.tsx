@@ -1,4 +1,5 @@
 import Link from "next/link";
+
 import { playLinkWithCode } from "@/lib/creatorCode";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
 
@@ -27,7 +28,21 @@ function PlayLogo() {
   );
 }
 
-function Badge({ href, store, small, big, logo, cta }: { href: string | null; store: string; small: string; big: string; logo: React.ReactNode; cta: string }) {
+function Badge({
+  href,
+  store,
+  small,
+  big,
+  logo,
+  cta,
+}: {
+  href: string | null;
+  store: string;
+  small: string;
+  big: string;
+  logo: React.ReactNode;
+  cta: string;
+}) {
   const body = (
     <>
       {logo}
@@ -49,7 +64,10 @@ function Badge({ href, store, small, big, logo, cta }: { href: string | null; st
       <span className={`${cls} opacity-60`} aria-hidden>
         {body}
       </span>
-      <span aria-hidden className="absolute -top-2 -right-2 rounded-full bg-accent px-2 py-0.5 text-[0.625rem] font-bold text-accent-ink uppercase">
+      <span
+        aria-hidden
+        className="absolute -top-2 -right-2 rounded-full bg-accent px-2 py-0.5 text-[0.625rem] font-bold text-accent-ink uppercase"
+      >
         Soon
       </span>
     </span>
@@ -57,16 +75,37 @@ function Badge({ href, store, small, big, logo, cta }: { href: string | null; st
 }
 
 /** `place` names where the badges sit, so the beacon counts each placement separately. */
-export function StoreBadges({ className = "", webLink = true, place, code }: { className?: string; webLink?: boolean; place: string; code?: string }) {
+export function StoreBadges({
+  className = "",
+  webLink = true,
+  place,
+  code,
+}: {
+  className?: string;
+  webLink?: boolean;
+  place: string;
+  code?: string;
+}) {
   const soon = !STORE_LINKS.googlePlay || !STORE_LINKS.appStore;
   // A creator's code rides through the Play install as its referrer (src/lib/creator.ts).
   const play = STORE_LINKS.googlePlay && code ? playLinkWithCode(STORE_LINKS.googlePlay, code) : STORE_LINKS.googlePlay;
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
       <Badge href={play} store="Google Play" small="GET IT ON" big="Google Play" logo={<PlayLogo />} cta={`google-play-${place}`} />
-      <Badge href={STORE_LINKS.appStore} store="App Store" small="Download on the" big="App Store" logo={<AppleLogo />} cta={`app-store-${place}`} />
+      <Badge
+        href={STORE_LINKS.appStore}
+        store="App Store"
+        small="Download on the"
+        big="App Store"
+        logo={<AppleLogo />}
+        cta={`app-store-${place}`}
+      />
       {webLink && soon && (
-        <Link href={APP_PATH} className="text-sm font-semibold text-accent underline-offset-4 hover:underline" data-cta={`open-app-${place}`}>
+        <Link
+          href={APP_PATH}
+          className="text-sm font-semibold text-accent underline-offset-4 hover:underline"
+          data-cta={`open-app-${place}`}
+        >
           The apps are coming soon. Use it in your browser today →
         </Link>
       )}

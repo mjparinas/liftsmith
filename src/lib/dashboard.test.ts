@@ -1,5 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { dayKey, decodeShare, encodeShare, heat, liftBests, MANUAL_RIR, monthGrid, pastWorkoutEvents, sessionDetail, shareCard, trainingDays, weeklyTotals, yearGrid } from "./dashboard";
+
+import {
+  dayKey,
+  decodeShare,
+  encodeShare,
+  heat,
+  liftBests,
+  MANUAL_RIR,
+  monthGrid,
+  pastWorkoutEvents,
+  sessionDetail,
+  shareCard,
+  trainingDays,
+  weeklyTotals,
+  yearGrid,
+} from "./dashboard";
 import { defaultProfile } from "./defaults";
 import { derive } from "./derive";
 import { can } from "./entitlements";
@@ -13,7 +28,16 @@ const D = 86400_000;
 let n = 0;
 const ids = () => `id${n++}`;
 const set = (at: number, sessionId: string, over: Partial<SetEvent> = {}): SetEvent => ({
-  type: "set", id: `s${n++}`, at, sessionId, exerciseId: "back-squat", weight: 100, reps: 5, targetReps: 5, rir: 2, ...over,
+  type: "set",
+  id: `s${n++}`,
+  at,
+  sessionId,
+  exerciseId: "back-squat",
+  weight: 100,
+  reps: 5,
+  targetReps: 5,
+  rir: 2,
+  ...over,
 });
 const workout = (at: number, id: string, over: Partial<SetEvent> = {}, count = 3): AppEvent[] => [
   { type: "sessionStart", id: `st-${id}`, at: at - 60_000, sessionId: id, gymId: "g1", minutes: 45 },
@@ -83,16 +107,37 @@ describe("lift bests and session detail", () => {
   });
 
   it("groups a workout's sets by exercise in order", () => {
-    const ev = [...workout(NOW, "a", {}, 2), set(NOW + 5000, "a", { exerciseId: "bench-press" }), set(NOW + 6000, "a", { exerciseId: "bench-press" })];
+    const ev = [
+      ...workout(NOW, "a", {}, 2),
+      set(NOW + 5000, "a", { exerciseId: "bench-press" }),
+      set(NOW + 6000, "a", { exerciseId: "bench-press" }),
+    ];
     const d = sessionDetail(ev, "a")!;
-    expect(d.exercises.map((g) => [g.exerciseId, g.sets.length])).toEqual([["back-squat", 2], ["bench-press", 2]]);
+    expect(d.exercises.map((g) => [g.exerciseId, g.sets.length])).toEqual([
+      ["back-squat", 2],
+      ["bench-press", 2],
+    ]);
     expect(d.manual).toBe(false);
     expect(sessionDetail(ev, "nope")).toBeNull();
   });
 });
 
 describe("logging a past workout", () => {
-  const base = { start: NOW - 2 * D, minutes: 50, gymId: "g1", exercises: [{ exerciseId: "bench-press", sets: [{ weight: 80, reps: 8 }, { weight: 80, reps: 7 }] }, { exerciseId: "pull-up", sets: [{ weight: 0, reps: 10 }] }] };
+  const base = {
+    start: NOW - 2 * D,
+    minutes: 50,
+    gymId: "g1",
+    exercises: [
+      {
+        exerciseId: "bench-press",
+        sets: [
+          { weight: 80, reps: 8 },
+          { weight: 80, reps: 7 },
+        ],
+      },
+      { exerciseId: "pull-up", sets: [{ weight: 0, reps: 10 }] },
+    ],
+  };
 
   it("writes the same events a live workout does, marked as logged by hand", () => {
     const r = pastWorkoutEvents(base, NOW, ids);
@@ -103,7 +148,12 @@ describe("logging a past workout", () => {
     expect(start).toMatchObject({ type: "sessionStart", at: base.start, source: "manual", gymId: "g1", minutes: 50 });
     expect(end).toMatchObject({ type: "sessionEnd", at: base.start + 50 * 60_000, seconds: 3000 });
     expect(rest).toHaveLength(3);
-    expect(rest.every((s) => s.type === "set" && s.sessionId === (start as { sessionId: string }).sessionId && s.rir === MANUAL_RIR && s.targetReps === s.reps)).toBe(true);
+    expect(
+      rest.every(
+        (s) =>
+          s.type === "set" && s.sessionId === (start as { sessionId: string }).sessionId && s.rir === MANUAL_RIR && s.targetReps === s.reps,
+      ),
+    ).toBe(true);
     const ats = rest.map((s) => s.at);
     expect(ats).toEqual([...ats].sort((a, b) => a - b));
     expect(ats[0]).toBeGreaterThan(base.start);
@@ -148,7 +198,11 @@ describe("logging a past workout", () => {
 
 describe("share links", () => {
   const profile = { ...defaultProfile(NOW), name: "Sam", onboarded: true, bodyweight: 82 };
-  const events: AppEvent[] = [...workout(NOW - 30 * D, "a", { exerciseId: "bench-press", weight: 60, reps: 5 }), ...workout(NOW - D, "b", { exerciseId: "bench-press", weight: 70, reps: 5 }), ...workout(NOW - 200 * D, "old")];
+  const events: AppEvent[] = [
+    ...workout(NOW - 30 * D, "a", { exerciseId: "bench-press", weight: 60, reps: 5 }),
+    ...workout(NOW - D, "b", { exerciseId: "bench-press", weight: 70, reps: 5 }),
+    ...workout(NOW - 200 * D, "old"),
+  ];
   const stats = derive(events, NOW);
 
   it("summarises without any health data", () => {

@@ -1,14 +1,25 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
+
 import { loadBar } from "@/lib/plates";
+import { MUSCLES } from "@/lib/types";
+
 import { BodyMap } from "./BodyMap";
 import { PlateBar } from "./PlateBar";
-import { MUSCLES } from "@/lib/types";
 
 describe("PlateBar", () => {
   it("says which plates go on each side", () => {
-    render(<PlateBar loading={loadBar(140, 20, [{ weight: 25, count: 4 }, { weight: 10, count: 2 }])} bar={20} unit="kg" />);
+    render(
+      <PlateBar
+        loading={loadBar(140, 20, [
+          { weight: 25, count: 4 },
+          { weight: 10, count: 2 },
+        ])}
+        bar={20}
+        unit="kg"
+      />,
+    );
     expect(screen.getByText("25 + 25 + 10")).toBeInTheDocument();
     expect(screen.getByRole("img")).toHaveAccessibleName("Load 25, 25, 10 kg on each side of a 20 kg bar");
   });

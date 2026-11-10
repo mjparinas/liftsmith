@@ -1,12 +1,15 @@
 "use client";
-import { insights, type Insight } from "@/lib/insights";
+
+import { useMemo, useState, type CSSProperties } from "react";
+
 import { t } from "@/lib/i18n";
+import { insights, type Insight } from "@/lib/insights";
 import { haptic } from "@/lib/juice";
 import { dayKey } from "@/lib/random";
 import { useApp } from "@/lib/store";
 import { togglePriority } from "@/lib/training";
 import { useNow } from "@/lib/useNow";
-import { useMemo, useState, type CSSProperties } from "react";
+
 import { useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go, type Route } from "./router";
@@ -37,8 +40,11 @@ export function useInsights(): Insight[] {
   const g = useGame();
   const hour = Math.floor(now / 3_600_000);
   // Recomputed when the log changes or once an hour, not every tick.
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => insights({ events, profile, now, streak: g.streak }), [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks]);
+  return useMemo(
+    () => insights({ events, profile, now, streak: g.streak }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks],
+  );
 }
 
 export function CoachNotes({ limit, title: given }: { limit?: number; title?: string }) {
@@ -93,12 +99,28 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
           <p className="mt-1 text-sm text-ink/90">{i.advice}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             {i.action && !done && (
-              <button type="button" onClick={act} className="press min-h-11 rounded-xl px-3.5 text-sm font-semibold" style={{ background: `color-mix(in srgb, ${tone.hue} 20%, var(--color-surface))`, color: "var(--color-ink)" }}>
+              <button
+                type="button"
+                onClick={act}
+                className="press min-h-11 rounded-xl px-3.5 text-sm font-semibold"
+                style={{ background: `color-mix(in srgb, ${tone.hue} 20%, var(--color-surface))`, color: "var(--color-ink)" }}
+              >
                 {i.action.label}
               </button>
             )}
-            {done && <span className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-mint"><Icon name="check" size={16} strokeWidth={2.6} />{t("notes.done")}</span>}
-            <button type="button" onClick={onDismiss} className="press min-h-11 rounded-xl px-3 text-sm font-medium text-muted hover:text-ink">{t("coach.gotIt")}</button>
+            {done && (
+              <span className="inline-flex min-h-11 items-center gap-1.5 px-1 text-sm font-semibold text-mint">
+                <Icon name="check" size={16} strokeWidth={2.6} />
+                {t("notes.done")}
+              </span>
+            )}
+            <button
+              type="button"
+              onClick={onDismiss}
+              className="press min-h-11 rounded-xl px-3 text-sm font-medium text-muted hover:text-ink"
+            >
+              {t("coach.gotIt")}
+            </button>
           </div>
         </div>
       </div>

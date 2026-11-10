@@ -3,6 +3,7 @@
 // email. Each method is an identity on the account, and methods with the same verified email land on the
 // same account. The device gets a random session token; the server keeps only its hash.
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
+
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 
@@ -28,16 +29,37 @@ export const platformOf = (v: unknown): Platform => (v === "android" || v === "i
 export async function accountInfo(id: string): Promise<AccountInfo | null> {
   const rows = await query<{ email: string | null; created_at: number }>("SELECT email, created_at FROM accounts WHERE id = ?", [id]);
   if (!rows[0]) return null;
-  const ids = await query<{ provider: string }>("SELECT DISTINCT provider FROM account_identities WHERE account_id = ? ORDER BY provider", [id]);
-  return { id, email: rows[0].email ? String(rows[0].email) : null, providers: ids.map((r) => String(r.provider)), createdAt: Number(rows[0].created_at) };
+  const ids = await query<{ provider: string }>("SELECT DISTINCT provider FROM account_identities WHERE account_id = ? ORDER BY provider", [
+    id,
+  ]);
+  return {
+    id,
+    email: rows[0].email ? String(rows[0].email) : null,
+    providers: ids.map((r) => String(r.provider)),
+    createdAt: Number(rows[0].created_at),
+  };
 }
 
 /** Finds or makes the account for an identity, joining accounts by verified email. */
-async function accountFor(provider: string, subject: string, email: string | null, now: number, extra: { appleRefresh?: string | null } = {}): Promise<string> {
-  const known = await query<{ account_id: string }>("SELECT account_id FROM account_identities WHERE provider = ? AND subject = ?", [provider, subject]);
+async function accountFor(
+  provider: string,
+  subject: string,
+  email: string | null,
+  now: number,
+  extra: { appleRefresh?: string | null } = {},
+): Promise<string> {
+  const known = await query<{ account_id: string }>("SELECT account_id FROM account_identities WHERE provider = ? AND subject = ?", [
+    provider,
+    subject,
+  ]);
   if (known[0]) {
     const id = String(known[0].account_id);
-    if (extra.appleRefresh) await run("UPDATE account_identities SET apple_refresh = ? WHERE provider = ? AND subject = ?", [extra.appleRefresh, provider, subject]);
+    if (extra.appleRefresh)
+      await run("UPDATE account_identities SET apple_refresh = ? WHERE provider = ? AND subject = ?", [
+        extra.appleRefresh,
+        provider,
+        subject,
+      ]);
     return id;
   }
   let id: string | null = null;
@@ -50,14 +72,20 @@ async function accountFor(provider: string, subject: string, email: string | nul
     id = newId();
     stmts.push({ sql: "INSERT INTO accounts (id, email, created_at, last_seen) VALUES (?, ?, ?, ?)", args: [id, email, now, now] });
   }
-  stmts.push({ sql: "INSERT INTO account_identities (provider, subject, account_id, email, created_at, apple_refresh) VALUES (?, ?, ?, ?, ?, ?)", args: [provider, subject, id, email, now, extra.appleRefresh ?? null] });
+  stmts.push({
+    sql: "INSERT INTO account_identities (provider, subject, account_id, email, created_at, apple_refresh) VALUES (?, ?, ?, ?, ?, ?)",
+    args: [provider, subject, id, email, now, extra.appleRefresh ?? null],
+  });
   await batch(stmts);
   return id;
 }
 
 async function startSession(accountId: string, platform: Platform, now: number): Promise<{ token: string; account: AccountInfo }> {
   const t = token();
-  await run("INSERT INTO account_sessions (token_hash, account_id, created_at, expires_at, last_seen, platform) VALUES (?, ?, ?, ?, ?, ?)", [hash(t), accountId, now, now + SESSION_MS, now, platform]);
+  await run(
+    "INSERT INTO account_sessions (token_hash, account_id, created_at, expires_at, last_seen, platform) VALUES (?, ?, ?, ?, ?, ?)",
+    [hash(t), accountId, now, now + SESSION_MS, now, platform],
+  );
   await run("UPDATE accounts SET last_seen = ? WHERE id = ?", [now, accountId]);
   return { token: t, account: (await accountInfo(accountId))! };
 }
@@ -81,7 +109,7 @@ export interface Deps {
 export async function signInWith(p: Provider, input: ProviderInput, deps: Deps = {}): Promise<Result> {
   const now = deps.now ?? Date.now();
   const v = await (deps.verify ?? verifyIdToken)(p, input.idToken, input.nonce);
-  if (!v.ok) return { code: 401, body: { error: "That sign-in didn't work. Try again." , reason: v.error } };
+  if (!v.ok) return { code: 401, body: { error: "That sign-in didn't work. Try again.", reason: v.error } };
   const c: Claims = v.claims;
   // Google always has a verified email; Apple gives one (perhaps a private relay address) on first sign-in.
   const email = verifiedEmail(c);
@@ -138,16 +166,26 @@ export async function startEmail(email: string, mail: SendMail | null, now = Dat
 }
 
 export async function verifyEmail(email: string, code: string, platform: Platform, now = Date.now()): Promise<Result> {
-  const rows = await query<{ code_hash: string; expires_at: number; tries: number }>("SELECT code_hash, expires_at, tries FROM account_codes WHERE email = ?", [email]);
+  const rows = await query<{ code_hash: string; expires_at: number; tries: number }>(
+    "SELECT code_hash, expires_at, tries FROM account_codes WHERE email = ?",
+    [email],
+  );
   const r = rows[0];
   const wrong = { code: 401, body: { error: "That code didn't match. Check the latest email, or ask for a new code." } };
-  if (!r || Number(r.expires_at) < now || Number(r.tries) >= CODE_TRIES) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
+  if (!r || Number(r.expires_at) < now || Number(r.tries) >= CODE_TRIES)
+    return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
   // Count the try before comparing, in one statement, so parallel guesses can't all pass the tries check.
-  const counted = await query("UPDATE account_codes SET tries = tries + 1 WHERE email = ? AND tries < ? AND expires_at >= ? RETURNING tries", [email, CODE_TRIES, now]);
+  const counted = await query(
+    "UPDATE account_codes SET tries = tries + 1 WHERE email = ? AND tries < ? AND expires_at >= ? RETURNING tries",
+    [email, CODE_TRIES, now],
+  );
   if (!counted.length) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
   if (hash(`${email}:${code.trim()}`) !== String(r.code_hash)) return wrong;
   // One use only: whoever clears it first gets the session.
-  const used = await query("UPDATE account_codes SET expires_at = 0 WHERE email = ? AND code_hash = ? AND expires_at >= ? RETURNING email", [email, r.code_hash, now]);
+  const used = await query(
+    "UPDATE account_codes SET expires_at = 0 WHERE email = ? AND code_hash = ? AND expires_at >= ? RETURNING email",
+    [email, r.code_hash, now],
+  );
   if (!used.length) return { code: 401, body: { error: "That code has expired. Ask for a new one." } };
   const id = await accountFor("email", email, email, now);
   return { code: 200, body: await startSession(id, platform, now) };
@@ -159,7 +197,10 @@ export async function sessionOf(req: Request, now = Date.now()): Promise<{ accou
   const t = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
   if (!t || t.length > 200) return null;
   const h = hash(t);
-  const rows = await query<{ account_id: string; expires_at: number; last_seen: number }>("SELECT account_id, expires_at, last_seen FROM account_sessions WHERE token_hash = ?", [h]);
+  const rows = await query<{ account_id: string; expires_at: number; last_seen: number }>(
+    "SELECT account_id, expires_at, last_seen FROM account_sessions WHERE token_hash = ?",
+    [h],
+  );
   const s = rows[0];
   if (!s || Number(s.expires_at) < now) return null;
   // Sliding expiry, written at most once a day.
@@ -176,7 +217,10 @@ export async function signOut(session: string): Promise<void> {
 
 /** Deletes the account and everything synced to it, and revokes Apple's token (Apple requires both). */
 export async function deleteAccount(accountId: string, revoke: (refresh: string) => Promise<unknown> = appleRevoke): Promise<void> {
-  const apple = await query<{ apple_refresh: string | null }>("SELECT apple_refresh FROM account_identities WHERE account_id = ? AND provider = 'apple'", [accountId]);
+  const apple = await query<{ apple_refresh: string | null }>(
+    "SELECT apple_refresh FROM account_identities WHERE account_id = ? AND provider = 'apple'",
+    [accountId],
+  );
   for (const a of apple) if (a.apple_refresh) await Promise.resolve(revoke(String(a.apple_refresh))).catch(() => null);
   await batch([
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },

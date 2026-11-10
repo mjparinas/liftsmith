@@ -1,5 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { addDays, atTime, clampTime, dayStart, inQuiet, milestone, mondayIn, parts, plan, proState, zoned, type PlanInput } from "./messages";
+
+import {
+  addDays,
+  atTime,
+  clampTime,
+  dayStart,
+  inQuiet,
+  milestone,
+  mondayIn,
+  parts,
+  plan,
+  proState,
+  zoned,
+  type PlanInput,
+} from "./messages";
 
 const TZ = "America/Toronto";
 // Monday 9 November 2026, local midnight in Toronto.
@@ -71,7 +85,12 @@ describe("push plan", () => {
   });
 
   it("asks for the first workout differently", () => {
-    const msgs = plan(input({ lastWorkoutAt: undefined, firstWorkoutAt: undefined, startedAt: MON - 3600_000 }), MON, addDays(MON, 1, TZ), "push");
+    const msgs = plan(
+      input({ lastWorkoutAt: undefined, firstWorkoutAt: undefined, startedAt: MON - 3600_000 }),
+      MON,
+      addDays(MON, 1, TZ),
+      "push",
+    );
     expect(msgs[0].title).toBe("Your first workout is ready");
   });
 
@@ -146,7 +165,9 @@ describe("email plan", () => {
     const reminders = msgs.filter((m) => m.kind === "reminder");
     expect(reminders).toHaveLength(1);
     expect(parts(reminders[0].at, TZ)).toMatchObject({ wd: 1, h: 8 });
-    expect(reminders[0].body).toBe("This week: Monday, Wednesday, Friday at 18:00. Last week you trained 2 days of 3. Each workout is planned when you open the app.");
+    expect(reminders[0].body).toBe(
+      "This week: Monday, Wednesday, Friday at 18:00. Last week you trained 2 days of 3. Each workout is planned when you open the app.",
+    );
   });
 
   it("only nudges after two missed training days in a row", () => {

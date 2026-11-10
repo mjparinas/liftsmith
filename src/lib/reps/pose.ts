@@ -17,9 +17,35 @@ type Side = "L" | "R";
 export type JointMap = Record<`${Side}${Joint}`, number>;
 
 /** MediaPipe BlazePose / Pose Landmarker (33 landmarks). */
-export const BLAZEPOSE: JointMap = { Lshoulder: 11, Rshoulder: 12, Lelbow: 13, Relbow: 14, Lwrist: 15, Rwrist: 16, Lhip: 23, Rhip: 24, Lknee: 25, Rknee: 26, Lankle: 27, Rankle: 28 };
+export const BLAZEPOSE: JointMap = {
+  Lshoulder: 11,
+  Rshoulder: 12,
+  Lelbow: 13,
+  Relbow: 14,
+  Lwrist: 15,
+  Rwrist: 16,
+  Lhip: 23,
+  Rhip: 24,
+  Lknee: 25,
+  Rknee: 26,
+  Lankle: 27,
+  Rankle: 28,
+};
 /** COCO 17 keypoints (MoveNet, PoseNet, ML Kit's subset order differs and maps here in the plugin). */
-export const COCO17: JointMap = { Lshoulder: 5, Rshoulder: 6, Lelbow: 7, Relbow: 8, Lwrist: 9, Rwrist: 10, Lhip: 11, Rhip: 12, Lknee: 13, Rknee: 14, Lankle: 15, Rankle: 16 };
+export const COCO17: JointMap = {
+  Lshoulder: 5,
+  Rshoulder: 6,
+  Lelbow: 7,
+  Relbow: 8,
+  Lwrist: 9,
+  Rwrist: 10,
+  Lhip: 11,
+  Rhip: 12,
+  Lknee: 13,
+  Rknee: 14,
+  Lankle: 15,
+  Rankle: 16,
+};
 
 const ANGLE: Record<MotionProfile["signal"], [Joint, Joint, Joint]> = {
   knee: ["hip", "knee", "ankle"],
@@ -98,9 +124,14 @@ export class PoseSignal {
     const m = this.map;
     const est: number[] = [];
     for (const s of ["L", "R"] as Side[]) {
-      const hip = kps[m[`${s}hip`]], knee = kps[m[`${s}knee`]], ankle = kps[m[`${s}ankle`]];
-      const sh = kps[m[`${s}shoulder`]], el = kps[m[`${s}elbow`]], wr = kps[m[`${s}wrist`]];
-      if (Math.min(hip?.visibility ?? 1, knee?.visibility ?? 1, ankle?.visibility ?? 1) > 0.6) est.push((len(hip, knee) + len(knee, ankle)) / LEG);
+      const hip = kps[m[`${s}hip`]],
+        knee = kps[m[`${s}knee`]],
+        ankle = kps[m[`${s}ankle`]];
+      const sh = kps[m[`${s}shoulder`]],
+        el = kps[m[`${s}elbow`]],
+        wr = kps[m[`${s}wrist`]];
+      if (Math.min(hip?.visibility ?? 1, knee?.visibility ?? 1, ankle?.visibility ?? 1) > 0.6)
+        est.push((len(hip, knee) + len(knee, ankle)) / LEG);
       if (Math.min(sh?.visibility ?? 1, el?.visibility ?? 1, wr?.visibility ?? 1) > 0.6) est.push((len(sh, el) + len(el, wr)) / ARM);
     }
     // Running max, slowly forgotten so a lifter walking away from the camera doesn't keep a stale scale.

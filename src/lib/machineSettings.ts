@@ -49,7 +49,10 @@ export function settingsFor(gym: Gym, exerciseId: string): Setting[] {
 
 /** One line for the exercise header: "Seat 4 · Back pad 2". */
 export function settingsLine(list: readonly Setting[]): string {
-  return list.filter((s) => s.value.trim()).map((s) => `${s.label} ${s.value.trim()}`).join(" · ");
+  return list
+    .filter((s) => s.value.trim())
+    .map((s) => `${s.label} ${s.value.trim()}`)
+    .join(" · ");
 }
 
 /** Saves the settings for an exercise on a gym, dropping empty values and keeping it small. */

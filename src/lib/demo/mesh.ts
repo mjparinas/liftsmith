@@ -1,8 +1,24 @@
 import type { Muscle } from "../types";
 import type { Motion } from "./motions";
 import {
-  ANKLE_H, V, add, clamp, cross, dot, interp, len, lerp, mul, norm, rad, solve, sub,
-  type Body, type Joints, type Side, type Vec,
+  add,
+  ANKLE_H,
+  clamp,
+  cross,
+  dot,
+  interp,
+  len,
+  lerp,
+  mul,
+  norm,
+  rad,
+  solve,
+  sub,
+  V,
+  type Body,
+  type Joints,
+  type Side,
+  type Vec,
 } from "./rig";
 
 // The hologram body: each limb is a capped tube whose cross-section is an ellipse (front and back
@@ -11,9 +27,22 @@ import {
 // Shared by the three.js renderer and the 2D canvas drawing used when WebGL is missing.
 
 const CAP = 3;
-export interface Part { name: string; kind: "torso" | "head" | "hair" | "limb" | "hand" | "foot"; base?: "thigh" | "shin" | "upper" | "fore"; a?: string; b?: string; side?: Side; NT: number; M: number }
+export interface Part {
+  name: string;
+  kind: "torso" | "head" | "hair" | "limb" | "hand" | "foot";
+  base?: "thigh" | "shin" | "upper" | "fore";
+  a?: string;
+  b?: string;
+  side?: Side;
+  NT: number;
+  M: number;
+}
 
-export const PARTS: Part[] = [{ name: "torso", kind: "torso", NT: 26, M: 30 }, { name: "head", kind: "head", NT: 12, M: 20 }, { name: "hair", kind: "hair", NT: 10, M: 10 }];
+export const PARTS: Part[] = [
+  { name: "torso", kind: "torso", NT: 26, M: 30 },
+  { name: "head", kind: "head", NT: 12, M: 20 },
+  { name: "hair", kind: "hair", NT: 10, M: 10 },
+];
 for (const s of ["L", "R"] as Side[]) {
   PARTS.push(
     { name: "thigh" + s, kind: "limb", base: "thigh", a: "hip" + s, b: "knee" + s, side: s, NT: 18, M: 20 },
@@ -27,7 +56,9 @@ for (const s of ["L", "R"] as Side[]) {
 
 /** Line and triangle indices for a part's grid (rings and longitudes; diagonals; shell). */
 export function partIndices(P: Part) {
-  const lines: number[] = [], diags: number[] = [], tris: number[] = [];
+  const lines: number[] = [],
+    diags: number[] = [],
+    tris: number[] = [];
   const id = (i: number, j: number) => i * P.M + (j % P.M);
   for (let i = 0; i < P.NT; i++)
     for (let j = 0; j < P.M; j++) {
@@ -44,9 +75,18 @@ export function partIndices(P: Part) {
 function capRings(NT: number, e0: number, e1: number) {
   const rings: [number, number, number][] = [];
   const NB = NT - 2 * CAP;
-  for (let c = 0; c < CAP; c++) { const ph = (c / CAP) * Math.PI / 2; rings.push([0, Math.sin(ph), -e0 * Math.cos(ph)]); }
-  for (let i = 0; i < NB; i++) { const t = i / (NB - 1); rings.push([t, 1, t]); }
-  for (let c = CAP - 1; c >= 0; c--) { const ph = (c / CAP) * Math.PI / 2; rings.push([1, Math.sin(ph), 1 + e1 * Math.cos(ph)]); }
+  for (let c = 0; c < CAP; c++) {
+    const ph = ((c / CAP) * Math.PI) / 2;
+    rings.push([0, Math.sin(ph), -e0 * Math.cos(ph)]);
+  }
+  for (let i = 0; i < NB; i++) {
+    const t = i / (NB - 1);
+    rings.push([t, 1, t]);
+  }
+  for (let c = CAP - 1; c >= 0; c--) {
+    const ph = ((c / CAP) * Math.PI) / 2;
+    rings.push([1, Math.sin(ph), 1 + e1 * Math.cos(ph)]);
+  }
   return rings;
 }
 
@@ -64,8 +104,18 @@ export function boneFrame(a: Vec, b: Vec, kind: "limb" | "torso", sideSign: numb
   return { u, f, o };
 }
 
-const FOOT_SIDE = [[0, 0.045, 0.04], [0.35, 0.05, 0.03], [0.7, 0.03, 0.022], [1, 0.018, 0.018]];
-const FOOT_FRONT = [[0, 0.036, 0.036], [0.4, 0.046, 0.042], [0.75, 0.048, 0.045], [1, 0.04, 0.038]];
+const FOOT_SIDE = [
+  [0, 0.045, 0.04],
+  [0.35, 0.05, 0.03],
+  [0.7, 0.03, 0.022],
+  [1, 0.018, 0.018],
+];
+const FOOT_FRONT = [
+  [0, 0.036, 0.036],
+  [0.4, 0.046, 0.042],
+  [0.75, 0.048, 0.045],
+  [1, 0.04, 0.038],
+];
 
 /** Fill one part's vertex grid for a pose; meta (t along, angle around) is filled when given. */
 export function evalPart(P: Part, J: Joints, B: Body, pos: Float32Array, meta?: Float32Array) {
@@ -73,27 +123,41 @@ export function evalPart(P: Part, J: Joints, B: Body, pos: Float32Array, meta?: 
   const j = J as unknown as Record<string, Vec>;
   let k = 0;
   const put = (p: Vec, t: number, ang: number) => {
-    pos[k * 3] = p[0]; pos[k * 3 + 1] = p[1]; pos[k * 3 + 2] = p[2];
-    if (meta) { meta[k * 2] = t; meta[k * 2 + 1] = ang; }
+    pos[k * 3] = p[0];
+    pos[k * 3 + 1] = p[1];
+    pos[k * 3 + 2] = p[2];
+    if (meta) {
+      meta[k * 2] = t;
+      meta[k * 2 + 1] = ang;
+    }
     k++;
   };
-  const section = (c: Vec, F: { f: Vec; o: Vec }, ang: number, rf: number, ro: number) => add(c, add(mul(F.f, Math.cos(ang) * rf), mul(F.o, Math.sin(ang) * ro)));
+  const section = (c: Vec, F: { f: Vec; o: Vec }, ang: number, rf: number, ro: number) =>
+    add(c, add(mul(F.f, Math.cos(ang) * rf), mul(F.o, Math.sin(ang) * ro)));
   if (P.kind === "limb" || P.kind === "foot") {
     const sg = P.side === "L" ? -1 : 1;
     let a: Vec, b: Vec, sideT: number[][], frontT: number[][];
-    if (P.kind === "limb") { a = j[P.a!]; b = j[P.b!]; sideT = B.side[P.base!]; frontT = B.front[P.base!]; }
-    else {
-      const ank = j["ankle" + P.side], heel = j["heel" + P.side], toe = j["toe" + P.side];
+    if (P.kind === "limb") {
+      a = j[P.a!];
+      b = j[P.b!];
+      sideT = B.side[P.base!];
+      frontT = B.front[P.base!];
+    } else {
+      const ank = j["ankle" + P.side],
+        heel = j["heel" + P.side],
+        toe = j["toe" + P.side];
       const fd = norm(sub(toe, heel));
       let fu = sub(sub(ank, heel), mul(fd, dot(sub(ank, heel), fd)));
       fu = len(fu) < 1e-4 ? V(0, 1) : norm(fu);
       a = add(heel, add(mul(fd, 0.02), mul(fu, 0.04)));
       b = add(toe, mul(fu, 0.017));
-      sideT = FOOT_SIDE; frontT = FOOT_FRONT.map((r) => r.map((v, i) => (i ? v * B.s : v)));
+      sideT = FOOT_SIDE;
+      frontT = FOOT_FRONT.map((r) => r.map((v, i) => (i ? v * B.s : v)));
     }
     const L = len(sub(b, a)) || 1e-3;
     const F = boneFrame(a, b, "limb", sg);
-    const w0 = (sideT[0][1] + sideT[0][2]) / 2, w1 = (sideT[sideT.length - 1][1] + sideT[sideT.length - 1][2]) / 2;
+    const w0 = (sideT[0][1] + sideT[0][2]) / 2,
+      w1 = (sideT[sideT.length - 1][1] + sideT[sideT.length - 1][2]) / 2;
     const topCap = P.base === "thigh" ? 0.22 : P.base === "upper" ? 0.8 : 0.5;
     const rings = capRings(NT, Math.min(0.5, (topCap * w0) / L), Math.min(0.5, (0.5 * w1) / L));
     for (const [tw, sc0, tr] of rings) {
@@ -122,14 +186,22 @@ export function evalPart(P: Part, J: Joints, B: Body, pos: Float32Array, meta?: 
   } else if (P.kind === "head" || P.kind === "hand") {
     let c: Vec, up: Vec, fw: Vec, rx: number, ry: number, rz: number;
     if (P.kind === "head") {
-      c = J.head; up = J.headDir; fw = norm([up[1], -up[0], 0]);
-      rx = B.head[0] * 1.1; ry = B.head[1]; rz = B.head[0] * 0.96;
+      c = J.head;
+      up = J.headDir;
+      fw = norm([up[1], -up[0], 0]);
+      rx = B.head[0] * 1.1;
+      ry = B.head[1];
+      rz = B.head[0] * 0.96;
     } else {
       const s = P.side!;
       const d = norm(sub(j["hand" + s], j["elbow" + s]));
-      c = add(j["hand" + s], mul(d, 0.02)); up = d; fw = cross(d, [0, 0, 1]);
+      c = add(j["hand" + s], mul(d, 0.02));
+      up = d;
+      fw = cross(d, [0, 0, 1]);
       fw = len(fw) < 0.1 ? [1, 0, 0] : norm(fw);
-      ry = B.hand * 1.35; rx = B.hand * 0.8; rz = B.hand;
+      ry = B.hand * 1.35;
+      rx = B.hand * 0.8;
+      rz = B.hand;
     }
     const sd = norm(cross(fw, up));
     for (let i = 0; i < NT; i++) {
@@ -137,29 +209,52 @@ export function evalPart(P: Part, J: Joints, B: Body, pos: Float32Array, meta?: 
       for (let m = 0; m < M; m++) {
         const lon = (m / M) * Math.PI * 2;
         let fx = Math.cos(lat) * Math.cos(lon) * rx;
-        const sy = Math.sin(lat) * ry, sz = Math.cos(lat) * Math.sin(lon) * rz;
+        const sy = Math.sin(lat) * ry,
+          sz = Math.cos(lat) * Math.sin(lon) * rz;
         if (P.kind === "head" && lat < 0 && Math.cos(lon) > 0) fx *= 1 + 0.18 * Math.sin(-lat) * Math.cos(lon); // jaw
         put(add(c, add(mul(fw, fx), add(mul(up, sy), mul(sd, sz)))), i / (NT - 1), lon);
       }
     }
   } else {
     // hair: a tapered ponytail tube behind the head (zero radius on bodies without hair)
-    const c = J.head, up = J.headDir, fw = norm([up[1], -up[0], 0]);
+    const c = J.head,
+      up = J.headDir,
+      fw = norm([up[1], -up[0], 0]);
     const H = (u: number, v: number) => add(c, add(mul(fw, u), mul(up, v)));
-    const ctrl = [[-0.06, 0.075, 0.03], [-0.12, 0.045, 0.036], [-0.155, -0.05, 0.03], [-0.15, -0.17, 0.02], [-0.13, -0.22, 0.004]];
+    const ctrl = [
+      [-0.06, 0.075, 0.03],
+      [-0.12, 0.045, 0.036],
+      [-0.155, -0.05, 0.03],
+      [-0.15, -0.17, 0.02],
+      [-0.13, -0.22, 0.004],
+    ];
     for (let i = 0; i < NT; i++) {
-      const s = (i / (NT - 1)) * (ctrl.length - 1), k0 = Math.min(ctrl.length - 2, Math.floor(s)), q = s - k0;
-      const A = ctrl[k0], Bq = ctrl[k0 + 1];
+      const s = (i / (NT - 1)) * (ctrl.length - 1),
+        k0 = Math.min(ctrl.length - 2, Math.floor(s)),
+        q = s - k0;
+      const A = ctrl[k0],
+        Bq = ctrl[k0 + 1];
       const r = lerp(A[2], Bq[2], q) * (B.hair ? 1 : 0);
       const p = H(lerp(A[0], Bq[0], q), lerp(A[1], Bq[1], q));
-      const tan = norm(sub(H(Bq[0], Bq[1]), H(A[0], A[1]))), n1: Vec = [0, 0, 1], n2 = norm(cross(tan, n1));
-      for (let m = 0; m < M; m++) { const ang = (m / M) * Math.PI * 2; put(add(p, add(mul(n1, Math.cos(ang) * r), mul(n2, Math.sin(ang) * r))), 0, 0); }
+      const tan = norm(sub(H(Bq[0], Bq[1]), H(A[0], A[1]))),
+        n1: Vec = [0, 0, 1],
+        n2 = norm(cross(tan, n1));
+      for (let m = 0; m < M; m++) {
+        const ang = (m / M) * Math.PI * 2;
+        put(add(p, add(mul(n1, Math.cos(ang) * r), mul(n2, Math.sin(ang) * r))), 0, 0);
+      }
     }
   }
 }
 
 // ---------- muscles on the mesh: part, t range along it, angle range around it (0 front, 90 outer, 180 back, -90 inner) ----------
-interface Region { id: Muscle; part: "torso" | "thigh" | "shin" | "upper" | "fore"; t: [number, number]; a: [number, number]; mirror?: boolean }
+interface Region {
+  id: Muscle;
+  part: "torso" | "thigh" | "shin" | "upper" | "fore";
+  t: [number, number];
+  a: [number, number];
+  mirror?: boolean;
+}
 export const REGIONS: Region[] = [
   { id: "quads", part: "thigh", t: [0.06, 0.94], a: [-70, 100] },
   { id: "hamstrings", part: "thigh", t: [0.1, 0.9], a: [115, 245] },
@@ -182,7 +277,8 @@ export const REGIONS: Region[] = [
 ];
 
 function angIn(deg: number, a0: number, a1: number) {
-  const x = (((deg - a0) % 360) + 360) % 360, span = a1 - a0;
+  const x = (((deg - a0) % 360) + 360) % 360,
+    span = a1 - a0;
   if (span >= 360 || x <= span) return 0;
   return Math.min(x - span, 360 - x);
 }
@@ -199,8 +295,10 @@ export function partWeights(P: Part, meta: Float32Array, targets: Partial<Record
   const regions = REGIONS.filter((r) => r.part === base && targets[r.id]);
   if (!regions.length) return;
   for (let k = 0; k < out.length; k++) {
-    const t = meta[k * 2], deg = (meta[k * 2 + 1] * 180) / Math.PI;
-    let w = 0, win = -1;
+    const t = meta[k * 2],
+      deg = (meta[k * 2 + 1] * 180) / Math.PI;
+    let w = 0,
+      win = -1;
     for (const r of regions) {
       const u = (t - r.t[0]) / (r.t[1] - r.t[0]);
       if (u < 0 || u > 1) continue;
@@ -208,7 +306,10 @@ export function partWeights(P: Part, meta: Float32Array, targets: Partial<Record
       let off = angIn(deg, r.a[0], r.a[1]);
       if (r.mirror) off = Math.min(off, angIn(-deg, r.a[0], r.a[1]));
       const v = targets[r.id]! * along * clamp(1 - off / 22, 0, 1);
-      if (v > w) { w = v; win = REGIONS.indexOf(r); }
+      if (v > w) {
+        w = v;
+        win = REGIONS.indexOf(r);
+      }
     }
     out[k] = w;
     if (which) which[k] = win;
@@ -221,7 +322,12 @@ export const SKEL_MAX = 1400;
 export function skeletonSegments(J: Joints, B: Body, arr: Float32Array): number {
   let n = 0;
   const j = J as unknown as Record<string, Vec>;
-  const seg = (a: Vec, b: Vec) => { if (n >= SKEL_MAX) return; arr.set(a, n * 6); arr.set(b, n * 6 + 3); n++; };
+  const seg = (a: Vec, b: Vec) => {
+    if (n >= SKEL_MAX) return;
+    arr.set(a, n * 6);
+    arr.set(b, n * 6 + 3);
+    n++;
+  };
   const ring = (c: Vec, a1: Vec, a2: Vec, r1: number, r2: number, N = 16, from = 0, to = Math.PI * 2) => {
     let prev: Vec | null = null;
     for (let i = 0; i <= N; i++) {
@@ -233,44 +339,90 @@ export function skeletonSegments(J: Joints, B: Body, arr: Float32Array): number 
   };
   const boneLine = (a: Vec, b: Vec, r: number) => {
     const F = boneFrame(a, b, "limb", 1);
-    for (const [x, y] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) seg(add(a, add(mul(F.f, x * r * 0.5), mul(F.o, y * r * 0.5))), add(b, add(mul(F.f, x * r * 0.5), mul(F.o, y * r * 0.5))));
-    ring(a, F.f, F.o, r, r, 10); ring(b, F.f, F.o, r * 0.9, r * 0.9, 10);
+    for (const [x, y] of [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ])
+      seg(add(a, add(mul(F.f, x * r * 0.5), mul(F.o, y * r * 0.5))), add(b, add(mul(F.f, x * r * 0.5), mul(F.o, y * r * 0.5))));
+    ring(a, F.f, F.o, r, r, 10);
+    ring(b, F.f, F.o, r * 0.9, r * 0.9, 10);
   };
   for (const s of ["L", "R"]) {
-    boneLine(j["hip" + s], j["knee" + s], 0.028); boneLine(j["knee" + s], j["ankle" + s], 0.024);
-    boneLine(j["sh" + s], j["elbow" + s], 0.022); boneLine(j["elbow" + s], j["hand" + s], 0.018);
-    seg(j["ankle" + s], j["toe" + s]); seg(j["ankle" + s], j["heel" + s]);
+    boneLine(j["hip" + s], j["knee" + s], 0.028);
+    boneLine(j["knee" + s], j["ankle" + s], 0.024);
+    boneLine(j["sh" + s], j["elbow" + s], 0.022);
+    boneLine(j["elbow" + s], j["hand" + s], 0.018);
+    seg(j["ankle" + s], j["toe" + s]);
+    seg(j["ankle" + s], j["heel" + s]);
     seg(add(J.shC, mul(norm(sub(J.shC, J.hipC)), -0.02)), j["sh" + s]);
   }
-  const F = boneFrame(J.hipC, J.shC, "torso", 1), TS = B.torsoSide, TF = B.torsoFront;
+  const F = boneFrame(J.hipC, J.shC, "torso", 1),
+    TS = B.torsoSide,
+    TF = B.torsoFront;
   const at = (t: number, f: number, o: number) => add(add(J.hipC, mul(sub(J.shC, J.hipC), t)), add(mul(F.f, f), mul(F.o, o)));
   const spine: Vec[] = [];
-  for (let i = 0; i <= 16; i++) { const t = -0.04 + i * 0.075; spine.push(at(t, -interp(TS, t, 2) * (0.55 + 0.12 * Math.sin(t * 6)), 0)); }
+  for (let i = 0; i <= 16; i++) {
+    const t = -0.04 + i * 0.075;
+    spine.push(at(t, -interp(TS, t, 2) * (0.55 + 0.12 * Math.sin(t * 6)), 0));
+  }
   for (let i = 0; i < spine.length - 1; i++) seg(spine[i], spine[i + 1]);
   for (const p of spine) ring(p, F.f, F.o, 0.014, 0.022, 6);
   for (const t of [0.56, 0.63, 0.7, 0.77, 0.84, 0.9]) {
-    const c = at(t, (interp(TS, t, 1) - interp(TS, t, 2)) * 0.25, 0), k = 0.78 - (t - 0.56) * 0.3;
+    const c = at(t, (interp(TS, t, 1) - interp(TS, t, 2)) * 0.25, 0),
+      k = 0.78 - (t - 0.56) * 0.3;
     ring(c, F.f, F.o, (interp(TS, t, 1) + interp(TS, t, 2)) * 0.5 * k, interp(TF, t, 1) * k, 22, Math.PI * 0.08, Math.PI * 1.92);
   }
   ring(at(0.06, 0, 0), F.f, F.o, interp(TS, 0.06, 2) * 0.7, interp(TF, 0.06, 1) * 0.72, 20);
   ring(at(-0.02, 0, 0), F.f, F.o, interp(TS, 0, 2) * 0.45, interp(TF, 0, 1) * 0.45, 16);
-  const up = J.headDir, fw = norm([up[1], -up[0], 0]), sd: Vec = [0, 0, 1];
+  const up = J.headDir,
+    fw = norm([up[1], -up[0], 0]),
+    sd: Vec = [0, 0, 1];
   const hc = add(J.head, mul(up, 0.01));
-  ring(hc, fw, up, B.head[0] * 0.82, B.head[1] * 0.8, 20); ring(hc, sd, up, B.head[0] * 0.78, B.head[1] * 0.8, 20); ring(hc, fw, sd, B.head[0] * 0.82, B.head[0] * 0.78, 20);
+  ring(hc, fw, up, B.head[0] * 0.82, B.head[1] * 0.8, 20);
+  ring(hc, sd, up, B.head[0] * 0.78, B.head[1] * 0.8, 20);
+  ring(hc, fw, sd, B.head[0] * 0.82, B.head[0] * 0.78, 20);
   for (const sg of [-1, 1]) ring(add(hc, add(mul(fw, B.head[0] * 0.62), mul(sd, sg * B.head[0] * 0.32))), sd, up, 0.016, 0.016, 8);
   ring(add(hc, mul(up, -B.head[1] * 0.55)), fw, sd, B.head[0] * 0.6, B.head[0] * 0.55, 14, -Math.PI * 0.45, Math.PI * 0.45);
   return n;
 }
 
 // ---------- placing the figure ----------
-export interface Placement { roll: (d: number) => number; lift: number; shiftZ: number }
+export interface Placement {
+  roll: (d: number) => number;
+  lift: number;
+  shiftZ: number;
+}
 
-const JOINT_KEYS = ["hipC", "shC", "neck", "head", "hipL", "kneeL", "ankleL", "heelL", "toeL", "shL", "elbowL", "handL", "hipR", "kneeR", "ankleR", "heelR", "toeR", "shR", "elbowR", "handR"] as const;
+const JOINT_KEYS = [
+  "hipC",
+  "shC",
+  "neck",
+  "head",
+  "hipL",
+  "kneeL",
+  "ankleL",
+  "heelL",
+  "toeL",
+  "shL",
+  "elbowL",
+  "handL",
+  "hipR",
+  "kneeR",
+  "ankleR",
+  "heelR",
+  "toeR",
+  "shR",
+  "elbowR",
+  "handR",
+] as const;
 
 /** Rotate about the forward (x) axis by `deg`, then lift and shift. */
 export function placeVec(p: Vec, deg: number, lift: number, shiftZ: number): Vec {
   if (!deg) return [p[0], p[1] + lift, p[2] + shiftZ];
-  const c = Math.cos(rad(deg)), s = Math.sin(rad(deg));
+  const c = Math.cos(rad(deg)),
+    s = Math.sin(rad(deg));
   return [p[0], p[1] * c - p[2] * s + lift, p[1] * s + p[2] * c + shiftZ];
 }
 
@@ -278,13 +430,17 @@ export function placeVec(p: Vec, deg: number, lift: number, shiftZ: number): Vec
 export function placement(m: Motion, B: Body): Placement {
   const roll = m.roll ?? (() => 0);
   if (!m.roll) return { roll, lift: 0, shiftZ: 0 };
-  let minY = Infinity, minZ = Infinity, maxZ = -Infinity;
+  let minY = Infinity,
+    minZ = Infinity,
+    maxZ = -Infinity;
   for (let i = 0; i <= 8; i++) {
     const d = i / 8;
     const J = solve(m.pose(B, d), B, { stance: m.stance ?? 0.14, grip: m.grip ?? 0.25 }) as unknown as Record<string, Vec>;
     for (const k of JOINT_KEYS) {
       const p = placeVec(J[k], roll(d), 0, 0);
-      minY = Math.min(minY, p[1]); minZ = Math.min(minZ, p[2]); maxZ = Math.max(maxZ, p[2]);
+      minY = Math.min(minY, p[1]);
+      minZ = Math.min(minZ, p[2]);
+      maxZ = Math.max(maxZ, p[2]);
     }
   }
   return { roll, lift: 0.05 - minY, shiftZ: -(minZ + maxZ) / 2 };
@@ -297,14 +453,18 @@ export function jointsAt(m: Motion, B: Body, d: number): Joints {
 
 /** Bounding box of the figure over one rep, for framing the camera. */
 export function bounds(m: Motion, B: Body, pl: Placement) {
-  const lo: Vec = [Infinity, Infinity, Infinity], hi: Vec = [-Infinity, -Infinity, -Infinity];
+  const lo: Vec = [Infinity, Infinity, Infinity],
+    hi: Vec = [-Infinity, -Infinity, -Infinity];
   for (let i = 0; i <= 10; i++) {
     const d = i / 10;
     const J = jointsAt(m, B, d) as unknown as Record<string, Vec>;
     for (const k of [...JOINT_KEYS, "bar"]) {
       if (!J[k]) continue;
       const p = placeVec(J[k], pl.roll(d), pl.lift, pl.shiftZ);
-      for (let a = 0; a < 3; a++) { lo[a] = Math.min(lo[a], p[a]); hi[a] = Math.max(hi[a], p[a]); }
+      for (let a = 0; a < 3; a++) {
+        lo[a] = Math.min(lo[a], p[a]);
+        hi[a] = Math.max(hi[a], p[a]);
+      }
     }
   }
   lo[1] = Math.min(lo[1], 0);

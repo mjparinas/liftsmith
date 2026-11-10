@@ -1,10 +1,13 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
+
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { forgetAccount, readAccount } from "@/lib/auth";
 import { readSync } from "@/lib/syncOutbox";
+
 import { AccountPanel } from "./Account";
 
 describe("signing in with an emailed code", () => {
@@ -17,7 +20,10 @@ describe("signing in with an emailed code", () => {
       const body = init.body ? JSON.parse(String(init.body)) : undefined;
       calls.push({ url, body, auth: (init.headers as Record<string, string>)?.Authorization });
       if (url === "/api/auth/email/") return Response.json({ ok: true });
-      if (url === "/api/auth/email/verify/") return body.code === "123456" ? Response.json({ token: "tok", account: { id: "acc", email: "me@example.com", providers: ["email"] } }) : Response.json({ error: "That code didn't match." }, { status: 401 });
+      if (url === "/api/auth/email/verify/")
+        return body.code === "123456"
+          ? Response.json({ token: "tok", account: { id: "acc", email: "me@example.com", providers: ["email"] } })
+          : Response.json({ error: "That code didn't match." }, { status: 401 });
       if (url === "/api/auth/logout/") return Response.json({ ok: true });
       return Response.json({ cursor: 0, events: [], deleted: [], records: [], more: false });
     });

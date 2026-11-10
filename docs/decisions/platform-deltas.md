@@ -1,0 +1,35 @@
+# Platform deltas
+
+Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
+
+Every place where Android, iOS and the web app differ, and why. Keep this table current, and update it in the same change as the feature.
+
+| Feature | Android | iOS | Web app | Why |
+| --- | --- | --- | --- | --- |
+| Lock-screen workout | Ongoing foreground-service notification | Live Activity plus a rest-over notification | Service-worker notification and an alert while the page is open | Each platform's own mechanism |
+| Quick toggle | Quick Settings tile | Control Center control (iOS 18+) or a Shortcut control | None | No browser equivalent |
+| Widgets | Home-screen widget | Home and lock-screen widgets | Manifest shortcuts | No browser widgets |
+| Voice | App Actions, start workout only | Siri and App Shortcuts, all three actions | None | Custom App Actions intents need Google's review |
+| Calendar | Read and write | Read and write | `.ics` download, no busy times | Browsers can't reach the calendar |
+| AirPods Pro heart rate | None | Yes (planned) | None | Apple only |
+| Volume follows intensity | Yes (planned extra) | None | None | iOS can't set system volume or control other apps. It was skipped before; it can come back as an Android extra |
+| Samsung Health Data SDK | Yes (planned) | None | None | Samsung devices only |
+| Date of birth and sex | Asked in the app | From Apple Health | Asked in the app | Health Connect has neither |
+| Fitbit Air data | Health Connect | Apple Health, one way only | None | Fitbit syncs to Apple Health one way |
+| Health data | Health Connect | Apple Health | None | Browsers have no health store |
+| Health twin | All metrics from Health Connect (HRV is RMSSD); fitness age from its VO₂ max | All metrics from Apple Health (HRV is SDNN, so values run higher; only the lifter's own trend is used); fitness age from its VO₂ max | Weigh-ins, body fat, BMI, TDEE and the rest-time heart rate drop (Web Bluetooth); health-store metrics and fitness age say "On your phone" | Browsers have no health store |
+| Bluetooth heart rate | Yes | Yes | Web Bluetooth, Chrome only | Browser support |
+| Gym by location | Yes | Yes | None | No geofence in the web app |
+| Voice coach | System TextToSpeech; the rest-over cue is said by the workout service, so it's heard with the screen locked | AVSpeechSynthesizer while the app is open (screen stays on in a workout); locked screen gets the rest-over notification only | Web Speech API while the page is open | iOS suspends background apps, so it can't speak from the lock screen without an audio session we don't keep |
+| Earned app icons | Launcher activity-aliases, switched when the app goes to the background | Alternate app icons (iOS shows its own "icon changed" alert) | None | Browsers can't change a home-screen icon |
+| Buddy check-in | Share sheet | Share sheet | Web Share, else copied to the clipboard | Push nudges to buddies wait for accounts and sync (server side, same event) |
+| Reminder notifications | Local notifications on a "Reminders" channel | Local notifications | Email only | Browsers can't schedule a notification while the page is closed without a push server; email covers the web |
+| Camera rep counting | MediaPipe in the web view (CAMERA permission) | MediaPipe in the web view (`NSCameraUsageDescription`) | Same, any browser with a camera | One code path for now; native ML Kit / Vision only if on-device tests show the web view is too slow |
+| Motion rep counting (`repMotion` flag, off) | DeviceMotionEvent (fused linear acceleration and gyro) | DeviceMotionEvent after a permission prompt (`NSMotionUsageDescription`) | Phones only | Watch apps (Wear OS, watchOS) would feed the same counter later |
+| Per-app language | System per-app language on Android 13+ (in-app choice below that for the app, phone language for notifications) | System per-app language in Settings › Liftsmith | Browser language | Each platform's own language setting; Settings › Language overrides it everywhere |
+| Rest-over alert choice (sound, vibration, both, silent) | All four exactly: "both" uses the "Rest over" channel, "sound only" a second "Rest over (sound only)" channel without vibration, the others post silently and buzz (or not) themselves | Sound or silent on the lock screen; "vibration only" posts a silent banner and buzzes in the app when it's open | Notification sound and vibration pattern while the page is open | iOS can't vibrate a local notification without its sound, and Android channel settings can't change once made |
+| Pro subscription | Google Play Billing (through RevenueCat) | StoreKit (through RevenueCat) | Nothing to buy; everything unlocked | The stores require their own billing for digital features in the apps; selling on the web would need Stripe and accounts |
+| Saving your data | Saved in the app's own storage until uninstall | Same | Saved in the browser's storage, which clearing site data, a private window or Safari's 7-day rule can erase; the app asks the browser to keep it and offers Add to home screen | Browsers can clear site storage; the native apps own theirs. Accounts and sync will cover all three |
+| Sign-in | Google (Credential Manager) and an emailed code | Apple and Google (AuthenticationServices) and an emailed code | Google (Google Identity Services), Apple (Sign in with Apple JS) and an emailed code | Apple only requires Sign in with Apple on iOS; on Android it would need a web redirect flow, and an Apple user can use the emailed code with the same address |
+| Workout remix links | Opens in the browser app | Opens in the browser app | Opens in the app | Opening straight into the native app needs App Links and Universal Links on the real domain (`assetlinks.json`, `apple-app-site-association`); added to Open items |
+| Creator codes | Arrive with the install from the link's Play badge (install referrer), or typed | Typed in setup's trial step or Settings, because the App Store passes nothing per install | Saved by the link page on the same site, or typed | Apple has no per-install referrer for ordinary installs |

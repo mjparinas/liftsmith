@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+
 import { SECURITY_HEADERS } from "./src/lib/securityHeaders";
 
 // Two builds from one codebase:

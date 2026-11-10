@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { lastWorked, muscleAdvice, readyAt } from "./muscleAdvice";
 import { recovery } from "./recovery";
 import type { SetEvent } from "./types";
@@ -6,7 +7,17 @@ import type { SetEvent } from "./types";
 const H = 3600_000;
 const NOW = Date.UTC(2026, 10, 9, 18);
 let n = 0;
-const set = (exerciseId: string, at: number): SetEvent => ({ type: "set", id: `e${n++}`, at, sessionId: "s1", exerciseId, weight: 100, reps: 5, targetReps: 5, rir: 1 });
+const set = (exerciseId: string, at: number): SetEvent => ({
+  type: "set",
+  id: `e${n++}`,
+  at,
+  sessionId: "s1",
+  exerciseId,
+  weight: 100,
+  reps: 5,
+  targetReps: 5,
+  rir: 1,
+});
 const squats = Array.from({ length: 6 }, (_, i) => set("back-squat", NOW - 2 * H + i * 60_000));
 
 describe("muscle advice", () => {
@@ -35,7 +46,9 @@ describe("muscle advice", () => {
     expect(a.readyAt).toBeNull();
     expect(a.call).toBe("Good to train. 10 more sets reach this week's 12.");
     expect(a.offerPriority).toBe(true);
-    expect(muscleAdvice({ muscle: "chest", events: squats, now: NOW, rec, done: 2, goal: 12, priorities: ["chest"] }).offerPriority).toBe(false);
+    expect(muscleAdvice({ muscle: "chest", events: squats, now: NOW, rec, done: 2, goal: 12, priorities: ["chest"] }).offerPriority).toBe(
+      false,
+    );
     expect(muscleAdvice({ muscle: "chest", events: squats, now: NOW, rec, done: 9, goal: 12 }).offerPriority).toBe(false);
   });
 

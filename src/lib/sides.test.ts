@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+
 import { defaultProfile } from "./defaults";
 import { derive } from "./derive";
 import { exercise } from "./exercises";
@@ -11,7 +12,18 @@ import type { SetEvent } from "./types";
 
 const NOW = new Date("2026-11-11T18:00:00").getTime();
 let n = 0;
-const set = (exerciseId: string, weight: number, reps: number, over: Partial<SetEvent> = {}): SetEvent => ({ type: "set", id: `v${n++}`, at: NOW - 1000 + n, sessionId: "a", exerciseId, weight, reps, targetReps: reps, rir: 2, ...over });
+const set = (exerciseId: string, weight: number, reps: number, over: Partial<SetEvent> = {}): SetEvent => ({
+  type: "set",
+  id: `v${n++}`,
+  at: NOW - 1000 + n,
+  sessionId: "a",
+  exerciseId,
+  weight,
+  reps,
+  targetReps: reps,
+  rir: 2,
+  ...over,
+});
 
 describe("implements and sides", () => {
   it("knows which exercises use one dumbbell or kettlebell and which use a pair", () => {
@@ -85,7 +97,9 @@ describe("logging sides in a workout", () => {
     s().start();
     const a = s().active!;
     const first = { ...a.plan.items[0], exerciseId: "db-row", warmup: undefined, setTargets: undefined, slot: undefined, group: undefined };
-    useApp.setState({ active: { ...a, plan: { ...a.plan, items: [first, ...a.plan.items.slice(1)] }, warm: undefined, weight: 30, reps: 10 } });
+    useApp.setState({
+      active: { ...a, plan: { ...a.plan, items: [first, ...a.plan.items.slice(1)] }, warm: undefined, weight: 30, reps: 10 },
+    });
     return s;
   }
 

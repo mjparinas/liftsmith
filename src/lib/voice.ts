@@ -1,4 +1,5 @@
 "use client";
+
 import type { Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -43,7 +44,8 @@ const WORDS = ["zero", "one", "two", "three", "four", "five"];
 const n = (x: number) => (x >= 0 && x < WORDS.length ? WORDS[x] : String(x));
 
 export function spokenLoad(kg: number, unit: Unit, load: string): string {
-  if (load === "bodyweight") return kg > 0 ? `bodyweight plus ${fmtNum(fromKg(kg, unit))} ${unit === "kg" ? "kilos" : "pounds"}` : "bodyweight";
+  if (load === "bodyweight")
+    return kg > 0 ? `bodyweight plus ${fmtNum(fromKg(kg, unit))} ${unit === "kg" ? "kilos" : "pounds"}` : "bodyweight";
   const w = `${fmtNum(fromKg(kg, unit))} ${unit === "kg" ? "kilos" : "pounds"}`;
   return load === "dumbbell" || load === "kettlebell" ? `${w} each` : w;
 }

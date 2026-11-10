@@ -1,7 +1,9 @@
 "use client";
-import { bandOf, BANDS, type Band } from "@/lib/recovery";
-import { num, t } from "@/lib/i18n";
+
 import { useId } from "react";
+
+import { num, t } from "@/lib/i18n";
+import { bandOf, BANDS, type Band } from "@/lib/recovery";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 
 // An original front-and-back body map. Each muscle is drawn once for the left half and mirrored.
@@ -61,7 +63,12 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
   const id = useId().replace(/:/g, "");
   return (
     <figure className="flex flex-1 flex-col items-center">
-      <svg viewBox="20 0 160 412" className="keep-colours h-auto w-full max-w-[180px]" role="img" aria-label={t("map.label", { side: label })}>
+      <svg
+        viewBox="20 0 160 412"
+        className="keep-colours h-auto w-full max-w-[180px]"
+        role="img"
+        aria-label={t("map.label", { side: label })}
+      >
         <Marks id={id} />
         <path d={SILHOUETTE} fill="var(--color-raised)" stroke="var(--color-line)" strokeWidth={1.2} />
         {[1, -1].map((side) => (
@@ -73,7 +80,13 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
               const mark = BAND_MARK[b.band];
               return (
                 <g key={s.m}>
-                  <path d={s.d} fill={b.colour} fillOpacity={hot ? 1 : 0.82} stroke={hot ? "var(--color-ink)" : "var(--color-bg)"} strokeWidth={hot ? 1.6 : 1}>
+                  <path
+                    d={s.d}
+                    fill={b.colour}
+                    fillOpacity={hot ? 1 : 0.82}
+                    stroke={hot ? "var(--color-ink)" : "var(--color-bg)"}
+                    strokeWidth={hot ? 1.6 : 1}
+                  >
                     <title>{t("map.muscle", { muscle: MUSCLE_LABEL[s.m], pct: r, band: b.label })}</title>
                   </path>
                   {mark && <path d={s.d} fill={`url(#${id}-${mark})`} pointerEvents="none" aria-hidden="true" data-mark={mark} />}
@@ -121,7 +134,9 @@ export function Legend({ hatchOnly }: { hatchOnly?: boolean } = {}) {
         <li key={b.band} className="flex flex-wrap items-center gap-x-2">
           <Swatch band={b.band} colour={b.colour} hatchOnly={hatchOnly} />
           <span className="text-ink">{b.label}</span>
-          <span className="text-faint num">{b.min === 0 ? `<${num(0.4, { style: "percent" })}` : `${num(b.min / 100, { style: "percent" })}+`}</span>
+          <span className="text-faint num">
+            {b.min === 0 ? `<${num(0.4, { style: "percent" })}` : `${num(b.min / 100, { style: "percent" })}+`}
+          </span>
         </li>
       ))}
     </ul>

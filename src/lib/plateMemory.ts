@@ -39,10 +39,15 @@ export function changeText(c: PlateChange, unit: string, fmt: (n: number) => str
  * What's on the bar now: the plates for the last set of this exercise logged in this session (warm-up
  * sets count too). Derived from events, so nothing extra is stored and a reload keeps it.
  */
-export function lastLoadedKg(events: readonly { type: string; sessionId?: string; exerciseId?: string; weight?: number; at: number }[], sessionId: string, exerciseId: string): number | null {
+export function lastLoadedKg(
+  events: readonly { type: string; sessionId?: string; exerciseId?: string; weight?: number; at: number }[],
+  sessionId: string,
+  exerciseId: string,
+): number | null {
   let best: { at: number; weight: number } | null = null;
   for (const e of events) {
-    if ((e.type !== "set" && e.type !== "warmup") || e.sessionId !== sessionId || e.exerciseId !== exerciseId || e.weight === undefined) continue;
+    if ((e.type !== "set" && e.type !== "warmup") || e.sessionId !== sessionId || e.exerciseId !== exerciseId || e.weight === undefined)
+      continue;
     if (!best || e.at > best.at) best = { at: e.at, weight: e.weight };
   }
   return best?.weight ?? null;
