@@ -10,6 +10,10 @@ name: Promote staging
 # already shows it green. One-time setup: Settings > Actions > General > "Allow GitHub Actions to create and approve
 # pull requests" must be on. If `main` also requires a review, give the merge a token that may bypass it by adding a
 # repository secret PROMOTE_TOKEN (a fine-grained token with Contents and Pull requests write on this repository).
+#
+# After a promotion it starts Release (store builds: Play internal testing and TestFlight). A merge made with the
+# default GITHUB_TOKEN doesn't fire release.yml's `push` trigger (GitHub never chains workflows that way), so the job
+# dispatches it itself. With PROMOTE_TOKEN the push does fire it, so the job leaves it alone and nothing runs twice.
 
 on:
   schedule:
@@ -17,6 +21,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write # start the Release workflow after a promotion
   contents: write
   pull-requests: write
   checks: read
@@ -32,6 +37,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/github-script@v9
+        env:
+          HAS_PROMOTE_TOKEN: ${{ secrets.PROMOTE_TOKEN != '' }}
         with:
           github-token: ${{ secrets.PROMOTE_TOKEN || github.token }}
           script: |
@@ -60,6 +67,11 @@ jobs:
             })).data;
             const merged = await github.rest.pulls.merge({ owner, repo, pull_number: pr.number, merge_method: 'merge', sha: staging, commit_title: `Promote staging to main (${date})` });
             core.notice(`Merged pull request #${pr.number}; main is now ${merged.data.sha.slice(0, 7)}.`);
+            if (process.env.HAS_PROMOTE_TOKEN !== 'true') {
+              // workflow_dispatch is the one way a GITHUB_TOKEN may start another workflow.
+              await github.rest.actions.createWorkflowDispatch({ owner, repo, workflow_id: 'release.yml', ref: 'main' });
+              core.notice('Started Release (Play internal testing and TestFlight) on main.');
+            }
             try {
               await github.rest.repos.merge({ owner, repo, base: 'staging', head: 'main', commit_message: 'Bring main back into staging' });
             } catch (e) {
