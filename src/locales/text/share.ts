@@ -1,0 +1,78 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "share.", in every language. English is the source: add a key here first,
+// then its Spanish and French. A missing translation falls back to English.
+
+export const en = {
+  "share.title": "Shared training summary",
+  "share.anon": "A {brand} lifter",
+  "share.weekStreak": "Week streak",
+  "share.badges": "Badges",
+  "share.last12": "Last 12 weeks",
+  "share.bestLifts": "Best lifts (estimated one-rep max)",
+  "share.made": "Made {date}",
+  "share.copied": "Link copied.",
+  "share.copyFail": "Couldn’t copy. Select the link and copy it.",
+  "share.myTraining": "My {brand} training",
+  "share.intro": "Send friends a link to your training summary: level, workouts, streak, badges, best lifts and the days you trained in the last 12 weeks.",
+  "share.privacy": "It never includes heart rate, body weight, cycle data, your gyms or where they are. The summary lives in the link itself, so nothing is uploaded; anyone with the link can see it.",
+  "share.withName": "Show my name ({name})",
+  "share.noName": "Show my name (add one in the app’s Settings)",
+  "share.yourLink": "Your link",
+  "share.copy": "Copy link",
+  "share.share": "Share…",
+  "share.friends": "Following friends and a shared feed come with accounts.",
+  "share.broken": "This link doesn’t work",
+  "share.brokenBody": "It may have been cut short when it was copied. Ask your friend to send it again.",
+  "share.try": "Try {brand}",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "share.title": "Resumen de entrenamiento compartido",
+  "share.anon": "Un atleta de {brand}",
+  "share.weekStreak": "Racha semanal",
+  "share.badges": "Insignias",
+  "share.last12": "Últimas 12 semanas",
+  "share.bestLifts": "Mejores levantamientos (1RM estimado)",
+  "share.made": "Creado el {date}",
+  "share.copied": "Enlace copiado.",
+  "share.copyFail": "No se pudo copiar. Selecciona el enlace y cópialo.",
+  "share.myTraining": "Mi entrenamiento en {brand}",
+  "share.intro": "Envía a tus amigos un enlace a tu resumen de entrenamiento: nivel, entrenamientos, racha, insignias, mejores levantamientos y los días que entrenaste en las últimas 12 semanas.",
+  "share.privacy": "Nunca incluye frecuencia cardiaca, peso corporal, datos del ciclo, tus gimnasios ni dónde están. El resumen va dentro del propio enlace, así que no se sube nada; cualquiera con el enlace puede verlo.",
+  "share.withName": "Mostrar mi nombre ({name})",
+  "share.noName": "Mostrar mi nombre (añade uno en los Ajustes de la app)",
+  "share.yourLink": "Tu enlace",
+  "share.copy": "Copiar enlace",
+  "share.share": "Compartir…",
+  "share.friends": "Seguir a amigos y un feed compartido llegarán con las cuentas.",
+  "share.broken": "Este enlace no funciona",
+  "share.brokenBody": "Puede que se cortara al copiarlo. Pide a tu amigo que lo envíe de nuevo.",
+  "share.try": "Prueba {brand}",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "share.title": "Résumé d’entraînement partagé",
+  "share.anon": "Un sportif {brand}",
+  "share.weekStreak": "Série de semaines",
+  "share.badges": "Badges",
+  "share.last12": "12 dernières semaines",
+  "share.bestLifts": "Meilleurs mouvements (1RM estimé)",
+  "share.made": "Créé le {date}",
+  "share.copied": "Lien copié.",
+  "share.copyFail": "Copie impossible. Sélectionnez le lien et copiez-le.",
+  "share.myTraining": "Mon entraînement {brand}",
+  "share.intro": "Envoyez à vos amis un lien vers votre résumé : niveau, séances, série, badges, meilleurs mouvements et les jours d’entraînement des 12 dernières semaines.",
+  "share.privacy": "Il n’inclut jamais la fréquence cardiaque, le poids, les données de cycle, vos salles ni leur emplacement. Le résumé est contenu dans le lien, donc rien n’est envoyé ; toute personne ayant le lien peut le voir.",
+  "share.withName": "Afficher mon nom ({name})",
+  "share.noName": "Afficher mon nom (ajoutez-en un dans les Réglages de l’app)",
+  "share.yourLink": "Votre lien",
+  "share.copy": "Copier le lien",
+  "share.share": "Partager…",
+  "share.friends": "Suivre des amis et un fil partagé arriveront avec les comptes.",
+  "share.broken": "Ce lien ne fonctionne pas",
+  "share.brokenBody": "Il a peut-être été coupé lors de la copie. Demandez à votre ami de le renvoyer.",
+  "share.try": "Essayer {brand}",
+};

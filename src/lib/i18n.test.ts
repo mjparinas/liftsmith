@@ -12,6 +12,7 @@ import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
 import { RARITY_LABEL } from "./game";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, MUSCLE_LABEL } from "./types";
 import { bandOf } from "./recovery";
+import { readdirSync, readFileSync } from "node:fs";
 
 const holes = (m: Message) => [...new Set(Object.values(typeof m === "string" ? { m } : m).flatMap((s) => [...s!.matchAll(/\{(\w+)\}/g)].map((x) => x[1])))].sort();
 
@@ -26,6 +27,25 @@ describe("catalogues", () => {
       for (const k of Object.keys(en) as MessageKey[]) expect(holes(cat[k]!), k).toEqual(holes(en[k]));
     });
   }
+});
+
+describe("catalogue files", () => {
+  // Text lives in src/locales/text/<prefix>.ts, one file per key prefix (see en.ts).
+  const dir = new URL("../locales/text/", import.meta.url);
+  const files = readdirSync(dir).filter((f) => f.endsWith(".ts"));
+  it("each file holds only its own prefix, in every language", async () => {
+    for (const f of files) {
+      const prefix = f.replace(/\.ts$/, "");
+      const mod = (await import(`../locales/text/${prefix}.ts`)) as Record<string, object>;
+      for (const lang of ["en", "es", "fr"]) for (const k of Object.keys(mod[lang])) expect(k.split(".")[0], `${f} ${lang}`).toBe(prefix);
+    }
+  });
+  it("every file is part of every language", () => {
+    for (const lang of ["en", "es", "fr"]) {
+      const src = readFileSync(new URL(`../locales/${lang}.ts`, import.meta.url), "utf8");
+      for (const f of files) expect(src, `${lang}.ts`).toContain(`from "./text/${f.replace(/\.ts$/, "")}"`);
+    }
+  });
 });
 
 describe("language", () => {
