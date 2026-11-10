@@ -25,7 +25,7 @@ export const en = {
   "ins.stall.why": "No new best in {weeks} over {sessions} sessions. Your best estimated one-rep max is {best}.",
   "ins.stall.advice":
     "Next time it drops one step and builds back up. Swapping it for a close variation for a few weeks also works: tap Swap during the workout.",
-  "ins.stall.action": "See your lifts",
+  "ins.stall.action": "Find the cause",
   "ins.fixLive.title": "{name}: {fix}",
   "ins.fixLive.why": "A plateau fix is running until {date}.",
   "ins.fixLive.advice": "Your plan already includes it. Train as planned.",
@@ -100,7 +100,7 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.stall.why": "Sin nueva mejor marca en {weeks} y {sessions} sesiones. Tu mejor 1RM estimado es {best}.",
   "ins.stall.advice":
     "La próxima vez baja un escalón y vuelve a subir. También funciona cambiarlo por una variante parecida unas semanas: toca Cambiar durante el entrenamiento.",
-  "ins.stall.action": "Ver tus ejercicios",
+  "ins.stall.action": "Encontrar la causa",
   "ins.fixLive.title": "{name}: {fix}",
   "ins.fixLive.why": "Hay un plan contra el estancamiento en marcha hasta el {date}.",
   "ins.fixLive.advice": "Tu plan ya lo incluye. Entrena según el plan.",
@@ -174,7 +174,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.stall.why": "Pas de nouveau record depuis {weeks}, sur {sessions} séances. Votre meilleur 1RM estimé est {best}.",
   "ins.stall.advice":
     "La prochaine fois, la charge baisse d’un cran puis remonte. Le remplacer par une variante proche pendant quelques semaines marche aussi : touchez Remplacer pendant la séance.",
-  "ins.stall.action": "Voir vos exercices",
+  "ins.stall.action": "Trouver la cause",
   "ins.fixLive.title": "{name} : {fix}",
   "ins.fixLive.why": "Un plan anti-plateau est en cours jusqu’au {date}.",
   "ins.fixLive.advice": "Votre plan l’inclut déjà. Entraînez-vous comme prévu.",

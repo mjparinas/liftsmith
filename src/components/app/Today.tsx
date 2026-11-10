@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Info } from "@/components/Info";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { clockTime, list, t } from "@/lib/i18n";
@@ -34,7 +35,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
-import { Button, Chip, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { Button, Chip, EmptyState, LinkToggle, ProTag, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -189,6 +190,19 @@ export function Today() {
         )}
         {preview && fixed && (
           <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{preview.program!.note}</span>
+        )}
+        {preview?.program && !can("adaptive") && (
+          // Free lifters follow a fixed program; this shows what Pro would plan instead and opens the paywall there.
+          <button
+            type="button"
+            onClick={() => go("pro", "today")}
+            aria-label={t("pro.locked", { what: t("pro.ft.adaptive") })}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted"
+          >
+            <Icon name="sparkle" size={15} className="text-violet" />
+            {t("pro.ft.adaptive")}
+            <ProTag />
+          </button>
         )}
         {preview && !fixed && (
           <span

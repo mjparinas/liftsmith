@@ -30,8 +30,8 @@ export type InsightAction =
   | { kind: "minutes"; minutes: number; label: string }
   /** Start the plateau detective's three-week fix for a lift (store.fixPlateau). */
   | { kind: "plateau"; plateau: Plateau; fix: FixKind; label: string }
-  /** Open a screen. */
-  | { kind: "go"; route: string; label: string };
+  /** Open a screen ("route" or "route/arg"). `pro` marks a button that opens the paywall at a Pro feature. */
+  | { kind: "go"; route: string; label: string; pro?: boolean };
 
 export interface Insight {
   /** Stable for the same finding, so a dismissal sticks until something changes. */
@@ -209,7 +209,8 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       title: t("ins.stalled.title", { name: name(s.exerciseId) }),
       why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }),
       advice: t("ins.stall.advice"),
-      action: { kind: "go", route: "stats", label: t("ins.stall.action") },
+      // Without Pro: the plateau detective would find the cause; its button opens the paywall there.
+      action: { kind: "go", route: "pro/plateau", label: t("ins.stall.action"), pro: true },
     });
   }
 

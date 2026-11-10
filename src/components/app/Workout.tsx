@@ -40,7 +40,7 @@ import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
 import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
@@ -470,16 +470,16 @@ export function Workout() {
                 )}
               </div>
               <div className="flex shrink-0 gap-2">
-                {can("replan") && (
-                  <button
-                    type="button"
-                    onClick={() => setPlanOpen(true)}
-                    className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-                    aria-label={t("coach.changePlan")}
-                  >
-                    <Icon name="clock" size={20} />
-                  </button>
-                )}
+                {/* Changing the plan is Pro: free lifters see the button with a Pro tag, and it opens the paywall. */}
+                <button
+                  type="button"
+                  onClick={() => (can("replan") ? setPlanOpen(true) : go("pro", "replan"))}
+                  className="press relative grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
+                  aria-label={can("replan") ? t("coach.changePlan") : t("pro.locked", { what: t("coach.changePlan") })}
+                >
+                  <Icon name="clock" size={20} />
+                  {!can("replan") && <ProTag className="absolute -right-2 -top-1.5 text-[0.625rem]" />}
+                </button>
                 <button
                   type="button"
                   onClick={() => setSwapOpen(true)}
