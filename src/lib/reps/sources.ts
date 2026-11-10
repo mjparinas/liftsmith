@@ -1,16 +1,16 @@
 // Live inputs for rep counting: the camera through MediaPipe Pose Landmarker (WASM + WebGL in the
 // web view on Android, iOS and desktop browsers), and the phone's own motion sensors through
 // DeviceMotionEvent. Frames are analysed in memory and dropped; nothing is recorded or uploaded.
-// Only the model and its runtime are downloaded, once, then cached by the browser.
+// The runtime and model are our own copies (public/mediapipe/): inside the app on Android and iOS, and
+// from our own site on the web, so no third party can change code that runs next to the lifter's data.
 
 import type { Keypoint } from "./pose";
 
-/** Pinned so the runtime matches the npm types. Self-host both (Open items). */
-const WASM = "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.2.2/wasm";
-const MODEL = {
-  lite: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task",
-  full: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task",
-};
+/** Copied from node_modules by scripts/mediapipe.mjs; the version is in the path so caches can keep it forever.
+ *  mediapipe.test.ts checks it matches the installed package. */
+export const WASM = "/mediapipe/tasks-vision-1.2.2";
+/** Committed; mediapipe.test.ts checks its SHA-256. */
+export const MODEL = { lite: "/mediapipe/pose_landmarker_lite-f16-v1.task" };
 
 export interface PoseEngine {
   detect(video: HTMLVideoElement, t: number): Keypoint[] | undefined;

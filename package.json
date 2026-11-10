@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/mediapipe.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/mediapipe.mjs",
     "build": "next build",
+    "prebuild:static": "node scripts/mediapipe.mjs",
     "build:static": "STATIC_EXPORT=1 next build",
     "lint": "eslint",
     "test": "vitest run",

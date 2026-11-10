@@ -1,4 +1,6 @@
 node_modules/
+# Copied from node_modules by scripts/mediapipe.mjs (the pose model next to it is committed)
+public/mediapipe/tasks-vision-*/
 .next/
 out/
 next-env.d.ts
