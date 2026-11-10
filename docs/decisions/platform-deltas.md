@@ -6,7 +6,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 
 | Feature | Android | iOS | Web app | Why |
 | --- | --- | --- | --- | --- |
-| Lock-screen workout | Ongoing foreground-service notification | Live Activity plus a rest-over notification | Service-worker notification and an alert while the page is open | Each platform's own mechanism |
+| Lock-screen workout | Ongoing foreground-service notification, promoted as a Live Update on Android 16 (status bar chip with the rest countdown or the set, workout progress bar; Samsung One UI 8 shows it in the Now Bar) | Live Activity (lock screen, Dynamic Island with the countdown or the set, workout progress bar) plus a rest-over notification | Service-worker notification and an alert while the page is open; no chip or progress bar | Each platform's own mechanism; browsers have no live or status bar notifications |
 | Quick toggle | Quick Settings tile | Control Center control (iOS 18+) or a Shortcut control | None | No browser equivalent |
 | Widgets | Home-screen widget | Home and lock-screen widgets | Manifest shortcuts | No browser widgets |
 | Voice | App Actions, start workout only | Siri and App Shortcuts, all three actions | None | Custom App Actions intents need Google's review |

@@ -24,6 +24,7 @@ struct WorkoutLiveActivity: Widget {
                         if !context.state.plates.isEmpty {
                             Text(context.state.plates).font(.caption).foregroundStyle(Brand.muted)
                         }
+                        WorkoutProgress(state: context.state)
                         Actions()
                     }
                 }
@@ -39,15 +40,30 @@ struct WorkoutLiveActivity: Widget {
     }
 }
 
-/// The rest countdown while resting (the system ticks it, no updates needed), otherwise "Lift".
+/// The rest countdown while resting (the system ticks it, no updates needed), otherwise the set ("2/4"), or "Lift".
 struct Countdown: View {
     let state: WorkoutAttributes.ContentState
 
     var body: some View {
         if let until = state.restUntil, until > Date() {
             Text(timerInterval: Date()...until, countsDown: true)
+        } else if let chip = state.chip, !chip.isEmpty {
+            Text(chip)
         } else {
             Text("Lift")
+        }
+    }
+}
+
+/// Working sets logged of those planned in the whole workout. Android shows the same bar in its notification.
+struct WorkoutProgress: View {
+    let state: WorkoutAttributes.ContentState
+
+    var body: some View {
+        if let total = state.total, total > 0 {
+            ProgressView(value: Double(min(state.done ?? 0, total)), total: Double(total))
+                .tint(Brand.accent)
+                .accessibilityLabel("\(min(state.done ?? 0, total)) of \(total) sets done")
         }
     }
 }
@@ -92,6 +108,7 @@ struct LockScreenView: View {
             if !state.plates.isEmpty {
                 Text(state.plates).font(.caption).foregroundStyle(Brand.muted)
             }
+            WorkoutProgress(state: state)
             Actions()
         }
         .padding(16)
