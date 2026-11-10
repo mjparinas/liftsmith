@@ -74,6 +74,7 @@ export default function TdeePage() {
         </p>
         <Link
           href={APP_PATH}
+          prefetch={false}
           data-cta="tdee-page"
           className="press mt-4 inline-flex min-h-12 items-center rounded-2xl bg-accent px-6 font-semibold text-accent-ink"
         >
