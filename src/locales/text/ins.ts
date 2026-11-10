@@ -250,7 +250,7 @@ export const de: Partial<Record<Key, Message>> = {
     "Keine neue Bestleistung seit {weeks} über {sessions} Einheiten. Dein bestes geschätztes Einerwiederholungsmaximum ist {best}.",
   "ins.stall.advice":
     "Nächstes Mal geht es einen Schritt runter und baut sich wieder auf. Für ein paar Wochen gegen eine ähnliche Variante zu tauschen hilft auch: Tippe im Training auf Tauschen.",
-  "ins.stall.action": "Deine Übungen ansehen",
+  "ins.stall.action": "Ursache finden",
   "ins.fixLive.title": "{name}: {fix}",
   "ins.fixLive.why": "Eine Plateau-Lösung läuft bis {date}.",
   "ins.fixLive.advice": "Dein Plan enthält sie schon. Trainiere wie geplant.",
@@ -324,7 +324,7 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.stall.why": "Nessun nuovo record da {weeks} in {sessions} sedute. Il tuo miglior massimale stimato è {best}.",
   "ins.stall.advice":
     "La prossima volta scende di un passo e risale. Anche sostituirlo con una variante simile per qualche settimana funziona: tocca Sostituisci durante l’allenamento.",
-  "ins.stall.action": "Vedi i tuoi esercizi",
+  "ins.stall.action": "Trova la causa",
   "ins.fixLive.title": "{name}: {fix}",
   "ins.fixLive.why": "Una soluzione allo stallo è in corso fino al {date}.",
   "ins.fixLive.advice": "Il tuo piano la include già. Allenati come previsto.",
@@ -394,7 +394,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.stall.why": "{sessions}回のセッション、{weeks}ベストが更新されていません。推定1RMの最高は{best}です。",
   "ins.stall.advice":
     "次回は1段階下げてから積み上げ直します。数週間、近いバリエーションに替えるのも効果的です。ワークアウト中に「替える」をタップしてください。",
-  "ins.stall.action": "種目を見る",
+  "ins.stall.action": "原因を探す",
   "ins.fixLive.title": "{name}：{fix}",
   "ins.fixLive.why": "停滞の対策を{date}まで実施中です。",
   "ins.fixLive.advice": "プランにすでに組み込まれています。予定どおりトレーニングしましょう。",
