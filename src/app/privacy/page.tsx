@@ -41,6 +41,11 @@ export default function Privacy() {
           views, trials and purchases with the plan and price.
         </li>
         <li>Your country and region, worked out from your internet address when the stats arrive. The address itself isn&apos;t kept.</li>
+        <li>
+          When the app checks which features are switched on (feature flags), the install id goes with the question, so a feature can reach
+          some installs before others, and we record which version of a feature you were shown when we&apos;re comparing two. With usage
+          stats off, the app still checks, but without the install id, and you get the usual version.
+        </li>
       </ul>
       <p className="mt-2">
         We never collect, in usage stats, the weights or reps you lift, heart rate, body weight, readings from Health Connect or Apple

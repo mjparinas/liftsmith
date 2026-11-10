@@ -8,6 +8,7 @@ import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
+import { Experiments, Flags } from "./Flags";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
@@ -49,6 +50,8 @@ const TABS = [
   "Creators",
   "Users",
   "Installs",
+  "Flags",
+  "A/B Tests",
   "System",
   "Log",
 ] as const;
@@ -875,6 +878,8 @@ export function AdminApp() {
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
+        {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "System" && <System />}
         {tab === "Log" && <Log />}
       </div>

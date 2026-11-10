@@ -15,6 +15,7 @@ import { readHeight } from "@/lib/health";
 import { readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
+import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction, stopSession } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
@@ -109,6 +110,8 @@ export function App() {
     applyA11y(savedA11y());
     installDiag();
     startAnalytics();
+    // Feature flags and A/B tests from the server (remoteFlags.ts); the last answer stays for offline use.
+    startFlags();
     // Feedback written offline goes out as soon as there's a connection.
     void flushFeedback();
     // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
