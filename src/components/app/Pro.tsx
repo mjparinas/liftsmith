@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { platformStore } from "@/lib/analytics";
+import { useAccount } from "@/lib/auth";
 import { billingLive, buy, entActive, loadOffers, manageUrl, restore, useBilling, type BuyResult } from "@/lib/billing";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
@@ -141,7 +142,8 @@ export function Pro() {
   const { profile, setProfile } = useApp();
   const back = (arg as Route | undefined) ?? "settings";
   const now = useNow(60_000);
-  const active = live && entActive(ent, now);
+  const viaAccount = useAccount((s) => !!s.account?.pro);
+  const active = live && (entActive(ent, now) || viaAccount);
   const on = (ms: number) => date(ms, { day: "numeric", month: "long", year: "numeric" });
 
   return (
@@ -155,6 +157,9 @@ export function Pro() {
       {!billingLive() ? (
         // The web app and builds without store billing: nothing to buy here, and everything is on.
         <p className="card mt-6 p-4 text-sm text-muted">{t("pro.notHere")}</p>
+      ) : active && !entActive(ent, now) ? (
+        // Pro that comes with the account (the store review account): nothing to buy or manage.
+        <p className="card mt-6 p-4 text-sm text-muted">{t("pro.status.account")}</p>
       ) : active && ent ? (
         <div className="card mt-6 space-y-1 p-4 text-sm">
           <p className="font-semibold">{ent.plan === "monthly" ? t("pro.status.monthly") : t("pro.status.yearly")}</p>

@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it } from "vitest";
 
+import { useAccount } from "./auth";
 import {
   entActive,
   entFromInfo,
@@ -24,7 +25,10 @@ const ent = (over: Partial<Entitlement> = {}): Entitlement => ({
   ...over,
 });
 
-afterEach(() => setBillingLive(false));
+afterEach(() => {
+  setBillingLive(false);
+  useAccount.setState({ account: null });
+});
 
 describe("Pro from the store", () => {
   it("gives everyone Pro while billing isn't live", () => {
@@ -40,6 +44,16 @@ describe("Pro from the store", () => {
     expect(can("recoveryMap")).toBe(false);
     setBillingLive(true, ent());
     expect(hasPro(NOW)).toBe(true);
+  });
+
+  it("gives Pro to an account the server gives it to (the store review account), without a purchase", () => {
+    setBillingLive(true, null);
+    const account = { token: "t", id: "a", email: "review@getliftsmith.com", providers: ["email"], via: "email" as const };
+    useAccount.setState({ account });
+    expect(hasPro(NOW)).toBe(false);
+    useAccount.setState({ account: { ...account, pro: true } });
+    expect(hasPro(NOW)).toBe(true);
+    expect(can("adaptive")).toBe(true);
   });
 
   it("allows a few days past the last expiry seen, for a renewal the phone hasn't heard about offline", () => {
