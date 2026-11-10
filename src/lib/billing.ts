@@ -56,9 +56,23 @@ interface BillingState {
   ent: Entitlement | null;
   offers: Offer[] | null;
   busy: boolean;
+  /** Why the last attempt to load the plans failed, in the store SDK's own words (shown small on the paywall). */
+  error: string | null;
 }
 
-export const useBilling = create<BillingState>(() => ({ live: false, ent: null, offers: null, busy: false }));
+export const useBilling = create<BillingState>(() => ({ live: false, ent: null, offers: null, busy: false, error: null }));
+
+/** A short, readable reason from a RevenueCat error: its code, message and the store's underlying message. */
+export function errorText(e: unknown): string {
+  if (e == null) return "unknown error";
+  if (typeof e === "string") return e;
+  const o = e as { code?: unknown; message?: unknown; underlyingErrorMessage?: unknown; readableErrorCode?: unknown };
+  const parts = [o.readableErrorCode ?? o.code, o.message, o.underlyingErrorMessage]
+    .filter((x) => x != null && String(x).trim() !== "")
+    .map(String);
+  const uniq = parts.filter((x, i) => parts.indexOf(x) === i);
+  return (uniq.join(" · ") || String(e)).slice(0, 300);
+}
 
 export function billingLive(): boolean {
   return useBilling.getState().live;
@@ -198,8 +212,10 @@ export async function startBilling(): Promise<void> {
     setEnt(entFromInfo(customerInfo as never));
     await tagCreator(activeCode());
     await loadOffers();
-  } catch {
+  } catch (e) {
     // Offline or the store isn't reachable: keep the cached answer, and try again on the next open.
+    useBilling.setState({ error: errorText(e) });
+    console.warn("[billing]", errorText(e));
     started = false;
   }
 }
@@ -226,12 +242,26 @@ export function pickOffering<O>(all: Record<string, O>, current: O | null, code:
   return (code ? all[CREATOR_OFFERING] : undefined) ?? (trialDays === 7 ? all["trial7"] : undefined) ?? current;
 }
 
+/** The paywall's "Try again": starts the SDK again if it never came up, otherwise reloads the plans. */
+export async function retryBilling(): Promise<void> {
+  if (!sdk) return startBilling();
+  try {
+    await loadOffers();
+  } catch (e) {
+    useBilling.setState({ error: errorText(e) });
+    console.warn("[billing]", errorText(e));
+  }
+}
+
 /** The plans for sale, annual first. */
 export async function loadOffers(): Promise<Offer[] | null> {
   if (!sdk) return null;
   const all = await sdk.getOfferings();
   const offering = pickOffering(all.all, all.current, activeCode(), flag("trialDays"));
-  if (!offering) return null;
+  if (!offering) {
+    useBilling.setState({ error: "No current offering in RevenueCat" });
+    return null;
+  }
   packages = { annual: offering.annual ?? undefined, monthly: offering.monthly ?? undefined };
   // iOS knows whether this Apple ID already used the trial; Android only offers a trial to people who can get it.
   let ineligible = new Set<string>();
@@ -257,7 +287,10 @@ export async function loadOffers(): Promise<Offer[] | null> {
       },
     ];
   });
-  useBilling.setState({ offers });
+  useBilling.setState({
+    offers,
+    error: offers.length ? null : `Offering "${offering.identifier}" has no monthly or annual package for this store`,
+  });
   return offers;
 }
 

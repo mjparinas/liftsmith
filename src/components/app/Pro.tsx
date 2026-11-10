@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { platformStore } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
-import { billingLive, buy, entActive, loadOffers, manageUrl, restore, useBilling, type BuyResult } from "@/lib/billing";
+import { billingLive, buy, entActive, manageUrl, restore, retryBilling, useBilling, type BuyResult } from "@/lib/billing";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { SITE_URL } from "@/lib/site";
@@ -39,7 +39,7 @@ export function ProFeatures() {
 
 /** The plan buttons, Restore purchases and the store's terms. `onDone` runs after a purchase that unlocked Pro. */
 export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, trial: boolean) => void }) {
-  const { offers, busy } = useBilling();
+  const { offers, busy, error } = useBilling();
   const [note, setNote] = useState<string | null>(null);
   const store = platformStore() === "appstore" ? "appstore" : "play";
 
@@ -70,7 +70,8 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
     return (
       <div className="mt-6 space-y-3">
         <p className="text-sm text-muted">{t(store === "appstore" ? "pro.offline.appstore" : "pro.offline.play")}</p>
-        <Button kind="ghost" className="w-full" disabled={busy} onClick={() => void loadOffers().catch(() => setNote(t("pro.error")))}>
+        {error && <p className="break-words text-xs text-faint">{t("pro.errorDetail", { detail: error })}</p>}
+        <Button kind="ghost" className="w-full" disabled={busy} onClick={() => void retryBilling()}>
           {t("pro.retry")}
         </Button>
         <Button kind="quiet" className="w-full" disabled={busy} onClick={() => void doRestore()}>

@@ -26,6 +26,7 @@ export const en = {
   "pro.restoreNone": "No Pro subscription was found for this store account.",
   "pro.error": "The purchase didn't go through. You weren't charged. Try again in a moment.",
   "pro.retry": "Try again",
+  "pro.errorDetail": "Details: {detail}",
   "pro.offline.play": "Couldn't reach Google Play. Check your connection and try again.",
   "pro.offline.appstore": "Couldn't reach the App Store. Check your connection and try again.",
   "pro.legal.play":
@@ -74,6 +75,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.restoreNone": "No se encontró ninguna suscripción Pro en esta cuenta de la tienda.",
   "pro.error": "La compra no se completó. No se te ha cobrado. Inténtalo de nuevo en un momento.",
   "pro.retry": "Reintentar",
+  "pro.errorDetail": "Detalles: {detail}",
   "pro.offline.play": "No se pudo conectar con Google Play. Revisa tu conexión e inténtalo de nuevo.",
   "pro.offline.appstore": "No se pudo conectar con el App Store. Revisa tu conexión e inténtalo de nuevo.",
   "pro.legal.play":
@@ -120,6 +122,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.restoreNone": "Aucun abonnement Pro trouvé pour ce compte de la boutique.",
   "pro.error": "L’achat n’a pas abouti. Vous n’avez pas été débité. Réessayez dans un instant.",
   "pro.retry": "Réessayer",
+  "pro.errorDetail": "Détails : {detail}",
   "pro.offline.play": "Impossible de joindre Google Play. Vérifiez votre connexion et réessayez.",
   "pro.offline.appstore": "Impossible de joindre l’App Store. Vérifiez votre connexion et réessayez.",
   "pro.legal.play":

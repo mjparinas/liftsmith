@@ -117,3 +117,20 @@ describe("Pro from the store", () => {
     expect(storePro(NOW, { live: true, ent: ent({ active: false, expiresAt: NOW - DAY }) })).toEqual({ state: "free", since: NOW - DAY });
   });
 });
+
+describe("errorText", () => {
+  it("joins the RevenueCat code, message and the store's reason without repeats", async () => {
+    const { errorText } = await import("./billing");
+    expect(
+      errorText({
+        code: "23",
+        readableErrorCode: "CONFIGURATION_ERROR",
+        message: "There is an issue with your configuration.",
+        underlyingErrorMessage: "None of the products could be fetched",
+      }),
+    ).toBe("CONFIGURATION_ERROR · There is an issue with your configuration. · None of the products could be fetched");
+    expect(errorText("plain")).toBe("plain");
+    expect(errorText(null)).toBe("unknown error");
+    expect(errorText({ message: "x".repeat(400) })).toHaveLength(300);
+  });
+});
