@@ -78,8 +78,8 @@ export function CreatorLanding() {
         </li>
         <li className="card p-4">
           <span className="font-semibold">iPhone:</span> the App Store can&apos;t pass the code along, so type{" "}
-          <code className="font-semibold">{s.code}</code> under &ldquo;Have a creator code?&rdquo; on the last setup step, or in Settings ›
-          Creator code.
+          <code className="font-semibold">{s.code}</code> under &ldquo;Have a code?&rdquo; on the last setup step, or in Settings › Redeem a
+          code.
         </li>
         <li className="card p-4">
           <span className="font-semibold">In your browser:</span> the code is saved.{" "}

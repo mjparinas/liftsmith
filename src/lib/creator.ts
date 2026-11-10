@@ -10,7 +10,7 @@
 // - Android: the link sends people to Play with an install referrer (utm_source=creator, utm_campaign=<code>),
 //   which the InstallInfo plugin already reads;
 // - iPhone: the App Store passes nothing per install, so the link page shows the code to type in setup's
-//   trial step or Settings › Creator code (Platform deltas in AGENTS.md).
+//   trial step or Settings › Redeem a code (Platform deltas in AGENTS.md).
 //
 // The code is sent to POST /api/creator/ with the random install id (never anything else). That claim is
 // how the creator gets paid, so it is sent whatever the usage-stats switch says, and /privacy/ says so.

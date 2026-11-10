@@ -137,7 +137,7 @@ export default function Privacy() {
         If you use a creator&apos;s code or link, we record the code with your random install id, where it came from (a link, the Play
         install, or typed in) and your platform, and RevenueCat keeps the code with your subscription. We do this whether usage stats are on
         or off, because it&apos;s how we pay the creator their share when you subscribe. Anything we tell a creator is totals for their code
-        (sign-ups, trials, subscribers and what they earned), never who you are. You can remove a code in Settings › Creator code until a
+        (sign-ups, trials, subscribers and what they earned), never who you are. You can remove a code in Settings › Redeem a code until a
         trial or subscription starts.
       </p>
       <h2 className="mt-8 text-xl font-semibold">Feedback and bug reports</h2>

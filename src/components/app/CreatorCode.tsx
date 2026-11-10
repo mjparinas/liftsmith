@@ -1,6 +1,6 @@
 "use client";
 
-// Entering a creator code (AGENTS.md "Marketing and growth"): in Settings › Creator code, and under the
+// Entering a creator code (AGENTS.md "Marketing and growth"): in Settings › Redeem a code, and under the
 // plans on the paywall and setup's trial step. A code from a link or the Play install referrer arrives by
 // itself (creator.ts); this is for iPhone, where the App Store passes nothing, and for anyone who was told
 // a code. The code can't change once a trial or subscription has started.
