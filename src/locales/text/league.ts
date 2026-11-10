@@ -34,3 +34,33 @@ export const fr: Partial<Record<Key, Message>> = {
   "league.emerald": "Émeraude",
   "league.diamond": "Diamant",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "league.bronze": "Bronze",
+  "league.silver": "Silber",
+  "league.gold": "Gold",
+  "league.sapphire": "Saphir",
+  "league.ruby": "Rubin",
+  "league.emerald": "Smaragd",
+  "league.diamond": "Diamant",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "league.bronze": "Bronzo",
+  "league.silver": "Argento",
+  "league.gold": "Oro",
+  "league.sapphire": "Zaffiro",
+  "league.ruby": "Rubino",
+  "league.emerald": "Smeraldo",
+  "league.diamond": "Diamante",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "league.bronze": "ブロンズ",
+  "league.silver": "シルバー",
+  "league.gold": "ゴールド",
+  "league.sapphire": "サファイア",
+  "league.ruby": "ルビー",
+  "league.emerald": "エメラルド",
+  "league.diamond": "ダイヤモンド",
+};

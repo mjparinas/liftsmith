@@ -78,3 +78,77 @@ export const fr: Partial<Record<Key, Message>> = {
   "a11y.contrast.note":
     "« Renforcé » accentue le texte secondaire et les contours et retire les halos d’arrière-plan. Pour moins d’animations, utilisez le mode sobre plus bas ou l’option Réduire les animations du téléphone.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "a11y.hand": "Einhandbedienung",
+  "a11y.hand.right": "Rechte Hand",
+  "a11y.hand.left": "Linke Hand",
+  "a11y.hand.note":
+    "Während des Trainings wandern die Gewichts- und Wiederholungstasten neben Satz eintragen, mit Satz eintragen unter dem Daumen der Hand, die das Telefon hält. Halte eine +- oder −-Taste gedrückt, um weiter zu ändern.",
+  "a11y.text": "Textgröße",
+  "a11y.text.system": "Wie mein Telefon",
+  "a11y.text.100": "Standard",
+  "a11y.text.115": "Groß",
+  "a11y.text.130": "Größer",
+  "a11y.text.150": "Am größten",
+  "a11y.text.note":
+    "„Wie mein Telefon“ folgt der Textgröße in den Einstellungen deines Telefons. Jeder Bildschirm passt sich an größeren Text an.",
+  "a11y.colours": "Farben",
+  "a11y.colours.standard": "Standard",
+  "a11y.colours.cvd": "Für Farbenblinde",
+  "a11y.colours.note":
+    "„Für Farbenblinde“ nutzt Blau, Orange und Rosa statt Grün, Gelb und Rot für Erholung und Status, damit sie bei Rot-Grün- oder Blau-Gelb-Schwäche unterscheidbar bleiben. Die Erholungskarte markiert sich erholende Muskeln außerdem mit Punkten und ermüdete mit Streifen.",
+  "a11y.contrast": "Kontrast",
+  "a11y.contrast.more": "Mehr",
+  "a11y.contrast.note":
+    "„Mehr“ macht Nebentexte und Umrisse kräftiger und entfernt Hintergrundleuchten. Für weniger Bewegung nutze unten den Schlank-Modus oder die Einstellung „Bewegung reduzieren“ deines Telefons.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "a11y.hand": "Comandi a una mano",
+  "a11y.hand.right": "Mano destra",
+  "a11y.hand.left": "Mano sinistra",
+  "a11y.hand.note":
+    "Durante l’allenamento, i pulsanti di peso e ripetizioni scendono accanto a Registra serie, con Registra serie sotto il pollice della mano che tiene il telefono. Tieni premuto + o − per continuare a cambiare.",
+  "a11y.text": "Dimensione del testo",
+  "a11y.text.system": "Come il mio telefono",
+  "a11y.text.100": "Predefinita",
+  "a11y.text.115": "Grande",
+  "a11y.text.130": "Più grande",
+  "a11y.text.150": "Massima",
+  "a11y.text.note":
+    "«Come il mio telefono» segue la dimensione del testo nelle impostazioni del telefono. Ogni schermata si adatta al testo più grande.",
+  "a11y.colours": "Colori",
+  "a11y.colours.standard": "Standard",
+  "a11y.colours.cvd": "Adatti al daltonismo",
+  "a11y.colours.note":
+    "«Adatti al daltonismo» usa blu, arancione e rosa invece di verde, ambra e rosso per recupero e stato, così restano distinguibili con daltonismo rosso-verde o blu-giallo. La mappa del recupero segna anche i muscoli in recupero con punti e quelli affaticati con righe.",
+  "a11y.contrast": "Contrasto",
+  "a11y.contrast.more": "Maggiore",
+  "a11y.contrast.note":
+    "«Maggiore» rende più marcati testi secondari e contorni e toglie i bagliori di sfondo. Per meno animazioni usa la modalità Essenziale qui sotto o l’opzione riduci movimento del telefono.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "a11y.hand": "片手操作",
+  "a11y.hand.right": "右手",
+  "a11y.hand.left": "左手",
+  "a11y.hand.note":
+    "ワークアウト中、重量と回数のボタンが「セットを記録」の横に移動し、「セットを記録」がスマホを持つ手の親指の下に来ます。＋や−を長押しすると連続で変わります。",
+  "a11y.text": "文字サイズ",
+  "a11y.text.system": "端末に合わせる",
+  "a11y.text.100": "標準",
+  "a11y.text.115": "大",
+  "a11y.text.130": "特大",
+  "a11y.text.150": "最大",
+  "a11y.text.note": "「端末に合わせる」は端末の設定の文字サイズに従います。どの画面も大きな文字に合わせてレイアウトが変わります。",
+  "a11y.colours": "色",
+  "a11y.colours.standard": "標準",
+  "a11y.colours.cvd": "色覚多様性に配慮",
+  "a11y.colours.note":
+    "「色覚多様性に配慮」では、回復と状態の表示に緑・黄・赤の代わりに青・オレンジ・ピンクを使い、赤緑や青黄の色覚特性でも区別できるようにします。回復マップでは回復中の筋肉をドット、疲労した筋肉をストライプでも示します。",
+  "a11y.contrast": "コントラスト",
+  "a11y.contrast.more": "高",
+  "a11y.contrast.note":
+    "「高」では補足テキストと輪郭を濃くし、背景の光彩をなくします。動きを減らすには、下のリーンモードか端末の「視差効果を減らす」設定を使ってください。",
+};

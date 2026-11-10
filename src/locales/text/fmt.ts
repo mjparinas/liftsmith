@@ -41,3 +41,39 @@ export const fr: Partial<Record<Key, Message>> = {
   "fmt.link": "Enchaîner {second} en superset avec {first}",
   "fmt.unlink": "Séparer {second} de {first}",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "Körpergewicht",
+  "fmt.each": "je {weight}",
+  "fmt.reps": { one: "{n} Wdh.", other: "{n} Wdh." },
+  "fmt.seconds": "{n} s",
+  "fmt.eachSide": "Pro Seite: {plates} {unit}",
+  "fmt.emptyBar": "Leere Stange",
+  "fmt.superset": "Supersatz {letter} · {n} von {total}",
+  "fmt.link": "{second} mit {first} zum Supersatz verbinden",
+  "fmt.unlink": "{second} von {first} trennen",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "Corpo libero",
+  "fmt.each": "{weight} ciascuno",
+  "fmt.reps": { one: "{n} rip.", other: "{n} rip." },
+  "fmt.seconds": "{n} s",
+  "fmt.eachSide": "Per lato: {plates} {unit}",
+  "fmt.emptyBar": "Bilanciere vuoto",
+  "fmt.superset": "Superserie {letter} · {n} di {total}",
+  "fmt.link": "Unisci {second} a {first} in superserie",
+  "fmt.unlink": "Separa {second} da {first}",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "fmt.bodyweight": "自重",
+  "fmt.each": "各{weight}",
+  "fmt.reps": { other: "{n}回" },
+  "fmt.seconds": "{n}秒",
+  "fmt.eachSide": "片側：{plates} {unit}",
+  "fmt.emptyBar": "バーのみ",
+  "fmt.superset": "スーパーセット {letter} · {n}/{total}",
+  "fmt.link": "{second}を{first}とスーパーセットにする",
+  "fmt.unlink": "{second}を{first}から分ける",
+};

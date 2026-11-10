@@ -367,6 +367,17 @@ html, body {
 
 body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
+/* Japanese (2026-11-10): the phone's own Japanese fonts ahead of the Latin stack's fallbacks, so kana and
+   kanji never come out in Chinese glyph shapes, and line breaks between phrases rather than mid-word
+   (auto-phrase where the engine has it, strict kinsoku rules everywhere). German's long compounds may
+   hyphenate rather than overflow a narrow card. In both, a word too long for its box breaks instead of
+   spilling over the next control (overflow-wrap: anywhere). html[lang] is the app language (i18n.ts). */
+:root:lang(ja) {
+  --font-sans: "Inter", "Roboto", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+}
+:lang(ja) body { line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere; }
+:lang(de) body { hyphens: auto; overflow-wrap: anywhere; }
+
 /* A soft light at the top of every app screen, so the dark base has depth without noise. */
 .aurora { position: relative; isolation: isolate; }
 .aurora::before {

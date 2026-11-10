@@ -62,3 +62,63 @@ export const fr: Partial<Record<Key, Message>> = {
   "mom.years": { one: "{count} an d’entraînement", other: "{count} ans d’entraînement" },
   "mom.yearsBody": "Vous vous êtes entraîné le jour de votre anniversaire d’entraînement. Bien vu.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "mom.days": { one: "{count} Tag", other: "{count} Tage" },
+  "mom.weeks": { one: "{count} Woche", other: "{count} Wochen" },
+  "mom.months": { one: "{count} Monat", other: "{count} Monate" },
+  "mom.anniv": { one: "{count} Jahr seit deinem ersten Training", other: "{count} Jahre seit deinem ersten Training" },
+  "mom.annivBody": "Seitdem {workouts} Trainings und {sets} Sätze. Alles Gute zum Lift-Jahrestag.",
+  "mom.back": "Willkommen zurück",
+  "mom.backBody":
+    "Es ist {time} her. Der heutige Plan bringt dich sanft zurück, und deine Serie beginnt diese Woche neu. Nichts nachzuholen.",
+  "mom.count": "Training Nummer {n}",
+  "mom.count100": "Dreistellig. Das ist eine Gewohnheit fürs Leben.",
+  "mom.countBody": "Jedes einzelne hat gezählt.",
+  "mom.ton": "Du hast jetzt {name} gehoben",
+  "mom.tonBody": "Insgesamt etwa {kg}, Satz für Satz.",
+  "mom.comeback": "Comeback geschafft",
+  "mom.comebackBody": "Erstes Training seit {time}. Das schwerste ist geschafft.",
+  "mom.years": { one: "{count} Jahr Training", other: "{count} Jahre Training" },
+  "mom.yearsBody": "Du hast an deinem Lift-Jahrestag trainiert. Passend.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "mom.days": { one: "{count} giorno", other: "{count} giorni" },
+  "mom.weeks": { one: "{count} settimana", other: "{count} settimane" },
+  "mom.months": { one: "{count} mese", other: "{count} mesi" },
+  "mom.anniv": { one: "{count} anno dal tuo primo allenamento", other: "{count} anni dal tuo primo allenamento" },
+  "mom.annivBody": "Da allora {workouts} allenamenti e {sets} serie. Buon anniversario di allenamento.",
+  "mom.back": "Bentornato",
+  "mom.backBody":
+    "È passato {time}. Il piano di oggi ti fa ripartire con calma, e la tua serie riparte questa settimana. Niente da recuperare.",
+  "mom.count": "Allenamento numero {n}",
+  "mom.count100": "Tre cifre. Questa è un’abitudine per la vita.",
+  "mom.countBody": "Ognuno è servito.",
+  "mom.ton": "Ora hai sollevato {name}",
+  "mom.tonBody": "Circa {kg} in totale, una serie alla volta.",
+  "mom.comeback": "Ritorno completato",
+  "mom.comebackBody": "Primo allenamento dopo {time}. Il più difficile è fatto.",
+  "mom.years": { one: "{count} anno di allenamento", other: "{count} anni di allenamento" },
+  "mom.yearsBody": "Ti sei allenato nel tuo anniversario. Perfetto.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "mom.days": { other: "{count}日" },
+  "mom.weeks": { other: "{count}週間" },
+  "mom.months": { other: "{count}か月" },
+  "mom.anniv": { other: "初めてのワークアウトから{count}年" },
+  "mom.annivBody": "それから{workouts}回のワークアウトと{sets}セット。トレーニング記念日おめでとうございます。",
+  "mom.back": "おかえりなさい",
+  "mom.backBody":
+    "{time}ぶりですね。今日のプランは無理なく再開できる内容で、連続記録は今週から新しく始まります。遅れを取り戻す必要はありません。",
+  "mom.count": "{n}回目のワークアウト",
+  "mom.count100": "3桁到達。一生ものの習慣です。",
+  "mom.countBody": "どれもが積み重ねです。",
+  "mom.ton": "これで{name}を持ち上げました",
+  "mom.tonBody": "合計約{kg}、1セットずつ積み重ねて。",
+  "mom.comeback": "カムバック達成",
+  "mom.comebackBody": "{time}ぶりのワークアウト。一番大変な1回が終わりました。",
+  "mom.years": { other: "トレーニング歴{count}年" },
+  "mom.yearsBody": "トレーニング記念日にトレーニング。さすがです。",
+};

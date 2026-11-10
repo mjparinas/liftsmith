@@ -36,7 +36,7 @@ import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
 import { RestTimerSettings } from "./TrainingSettings";
-import { Button, Chip, Section, SwitchRow } from "./ui";
+import { Button, Chip, ProTag, Section, SwitchRow } from "./ui";
 
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
@@ -84,7 +84,7 @@ function Row<T extends string | number>({
 }
 
 /** A row that opens another page: a title, a line saying what's there, and a chevron. The whole row is the one button. */
-function NavRow({ title, sub, icon, tag, onClick }: { title: string; sub?: string; icon?: IconName; tag?: string; onClick: () => void }) {
+function NavRow({ title, sub, icon, pro, onClick }: { title: string; sub?: string; icon?: IconName; pro?: boolean; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
       {icon && (
@@ -95,7 +95,7 @@ function NavRow({ title, sub, icon, tag, onClick }: { title: string; sub?: strin
       <span className="min-w-0 flex-1">
         <span className="flex items-center gap-2 font-semibold">
           {title}
-          {tag && <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{tag}</span>}
+          {pro && <ProTag />}
         </span>
         {sub && <span className="block text-sm text-muted">{sub}</span>}
       </span>
@@ -196,7 +196,7 @@ export function Settings() {
           title={t("lab.row")}
           sub={t("lab.rowNote")}
           icon="sparkle"
-          tag={can("labs") ? undefined : t("prog.pro")}
+          pro={!can("labs")}
           onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
         />
       </div>

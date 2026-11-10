@@ -5,9 +5,10 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 import { Info } from "@/components/Info";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { itemSeconds, planSeconds } from "@/lib/generator";
-import { clockTime, list, t } from "@/lib/i18n";
+import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
@@ -34,7 +35,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
-import { Button, Chip, EmptyState, LinkToggle, Ring, Section } from "./ui";
+import { Button, Chip, EmptyState, LinkToggle, ProTag, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -190,6 +191,19 @@ export function Today() {
         {preview && fixed && (
           <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{preview.program!.note}</span>
         )}
+        {preview?.program && !can("adaptive") && (
+          // Free lifters follow a fixed program; this shows what Pro would plan instead and opens the paywall there.
+          <button
+            type="button"
+            onClick={() => go("pro", "today")}
+            aria-label={t("pro.locked", { what: t("pro.ft.adaptive") })}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted"
+          >
+            <Icon name="sparkle" size={15} className="text-violet" />
+            {t("pro.ft.adaptive")}
+            <ProTag />
+          </button>
+        )}
         {preview && !fixed && (
           <span
             className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${preview.week.deload ? "border-warn/40 bg-warn/12 text-warn" : "border-line bg-surface text-muted"}`}
@@ -221,7 +235,7 @@ export function Today() {
           className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
         >
           {hurt.length
-            ? t("today.trainingAround", { parts: list(hurt.map((i) => PART_LABEL[i.part].toLocaleLowerCase())) })
+            ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
             : t("today.somethingHurts")}
         </button>
       </div>
@@ -293,7 +307,7 @@ export function Today() {
                     sound.tick();
                     setCall(c === readiness.call ? null : c);
                   }}
-                  className={`press inline-flex min-h-11 items-center justify-center gap-1.5 rounded-xl text-sm font-semibold ${on ? "text-ink" : "text-muted"}`}
+                  className={`press inline-flex min-h-11 min-w-0 flex-wrap items-center justify-center gap-x-1.5 rounded-xl px-1 text-center text-sm leading-tight font-semibold ${on ? "text-ink" : "text-muted"}`}
                   style={
                     on
                       ? {
@@ -310,7 +324,7 @@ export function Today() {
             })}
           </div>
           {callOverride && (
-            <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: CALL_TEXT[readiness.call].label.toLocaleLowerCase() })}</p>
+            <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: inSentence(CALL_TEXT[readiness.call].label, true) })}</p>
           )}
         </section>
       )}
@@ -490,9 +504,9 @@ export function Today() {
               ) : (
                 <p className="mt-3 text-sm text-muted">
                   {preview.routineId
-                    ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())) })
+                    ? t("td.routineWorks", { muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))) })
                     : t("td.targets", {
-                        muscles: list(focus.slice(0, 4).map((m) => MUSCLE_LABEL[m].toLocaleLowerCase())),
+                        muscles: list(focus.slice(0, 4).map((m) => inSentence(MUSCLE_LABEL[m], true))),
                         sets: preview.week.setsPerMuscle,
                       })}
                 </p>

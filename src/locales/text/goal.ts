@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "goal.strength": "Gagner en force",
   "goal.general": "Rester en forme",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "goal.muscle": "Muskeln aufbauen",
+  "goal.strength": "Stärker werden",
+  "goal.general": "Fit bleiben",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "goal.muscle": "Mettere massa",
+  "goal.strength": "Diventare più forte",
+  "goal.general": "Restare in forma",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "goal.muscle": "筋肉をつける",
+  "goal.strength": "強くなる",
+  "goal.general": "健康を保つ",
+};

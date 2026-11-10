@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "exp.intermediate": "Un peu",
   "exp.advanced": "Confirmé",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "exp.new": "Neu",
+  "exp.intermediate": "Etwas",
+  "exp.advanced": "Erfahren",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "exp.new": "Principiante",
+  "exp.intermediate": "Un po’",
+  "exp.advanced": "Esperto",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "exp.new": "初心者",
+  "exp.intermediate": "少し経験あり",
+  "exp.advanced": "経験者",
+};

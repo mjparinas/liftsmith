@@ -34,3 +34,33 @@ export const fr: Partial<Record<Key, Message>> = {
   "category.smart": "S’entraîner malin",
   "category.secret": "Secrets",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "category.consistency": "Beständigkeit",
+  "category.strength": "Kraft",
+  "category.volume": "Volumen",
+  "category.records": "Rekorde",
+  "category.explore": "Entdecken",
+  "category.smart": "Klug trainieren",
+  "category.secret": "Geheim",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "category.consistency": "Costanza",
+  "category.strength": "Forza",
+  "category.volume": "Volume",
+  "category.records": "Record",
+  "category.explore": "Esplorazione",
+  "category.smart": "Allenarsi con testa",
+  "category.secret": "Segreto",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "category.consistency": "継続",
+  "category.strength": "筋力",
+  "category.volume": "ボリューム",
+  "category.records": "記録",
+  "category.explore": "探求",
+  "category.smart": "賢いトレーニング",
+  "category.secret": "シークレット",
+};

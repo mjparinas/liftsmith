@@ -3,7 +3,7 @@ import { can } from "./entitlements";
 import { EXERCISE_BY_ID } from "./exercises";
 import type { Streak } from "./game";
 import { weeklySets } from "./generator";
-import { currentTag, date, list, t } from "./i18n";
+import { date, inSentence, list, t } from "./i18n";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { epley, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
@@ -30,8 +30,8 @@ export type InsightAction =
   | { kind: "minutes"; minutes: number; label: string }
   /** Start the plateau detective's three-week fix for a lift (store.fixPlateau). */
   | { kind: "plateau"; plateau: Plateau; fix: FixKind; label: string }
-  /** Open a screen. */
-  | { kind: "go"; route: string; label: string };
+  /** Open a screen ("route" or "route/arg"). `pro` marks a button that opens the paywall at a Pro feature. */
+  | { kind: "go"; route: string; label: string; pro?: boolean };
 
 export interface Insight {
   /** Stable for the same finding, so a dismissal sticks until something changes. */
@@ -56,7 +56,7 @@ export interface InsightInput {
 const name = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
 const weeksText = (n: number) => t("ins.weeks", { count: n });
 /** Exercise names inside a sentence. */
-const lowerName = (id: string) => name(id).toLocaleLowerCase(currentTag());
+const lowerName = (id: string) => inSentence(name(id), true);
 
 /** Best estimated one-rep max per session for a loaded lift, oldest first. */
 function e1Series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
@@ -197,7 +197,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
           kind: "plateau",
           plateau: p,
           fix: p.fix,
-          label: t("ins.plateau.action", { fix: fix.title.toLocaleLowerCase(currentTag()) }),
+          label: t("ins.plateau.action", { fix: inSentence(fix.title, true) }),
         },
       });
     }
@@ -209,7 +209,8 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       title: t("ins.stalled.title", { name: name(s.exerciseId) }),
       why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }),
       advice: t("ins.stall.advice"),
-      action: { kind: "go", route: "stats", label: t("ins.stall.action") },
+      // Without Pro: the plateau detective would find the cause; its button opens the paywall there.
+      action: { kind: "go", route: "pro/plateau", label: t("ins.stall.action"), pro: true },
     });
   }
 
@@ -218,7 +219,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `fix-live-${f.exerciseId}-${f.startedAt}`,
       tone: "info",
-      title: t("ins.fixLive.title", { name: name(f.exerciseId), fix: FIX_TEXT[f.kind].title.toLocaleLowerCase(currentTag()) }),
+      title: t("ins.fixLive.title", { name: name(f.exerciseId), fix: inSentence(FIX_TEXT[f.kind].title, true) }),
       why: t("ins.fixLive.why", { date: date(f.until, { day: "numeric", month: "short" }) }),
       advice: t("ins.fixLive.advice"),
     });
@@ -263,11 +264,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
           tone: "info",
           title: t("ins.volume.title", { muscle: MUSCLE_LABEL[m] }),
           why: t("ins.volume.why", { sets: Math.round(avg), goal: week.setsPerMuscle }),
-          advice: t("ins.volume.advice", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+          advice: t("ins.volume.advice", { muscle: inSentence(MUSCLE_LABEL[m], true) }),
           action: {
             kind: "priority",
             muscle: m,
-            label: t("ins.volume.action", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+            label: t("ins.volume.action", { muscle: inSentence(MUSCLE_LABEL[m], true) }),
           },
         });
       }

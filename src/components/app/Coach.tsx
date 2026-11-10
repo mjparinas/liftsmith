@@ -11,7 +11,8 @@ import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
-import { Button, Section, Sheet } from "./ui";
+import { go } from "./router";
+import { Button, ProTag, Section, Sheet } from "./ui";
 
 // Coaching cards on the Progress screen: lift goals with an honest forecast. The plateau detective's
 // stalls and fixes show as coach's notes (insights.ts).
@@ -35,7 +36,24 @@ export function GoalsCard() {
   const unit = profile.unit;
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const goals = (profile.goals ?? []).filter((g) => !g.doneAt);
-  if (!can("goalPlanner")) return null;
+  // Without Pro the section still shows, marked Pro, and its one button opens the paywall at the planner.
+  if (!can("goalPlanner"))
+    return (
+      <Section title={t("gl.title")}>
+        <button
+          type="button"
+          onClick={() => go("pro", "goals")}
+          aria-label={t("pro.locked", { what: t("pro.ft.goalPlanner") })}
+          className="press card w-full p-4 text-left"
+        >
+          <span className="flex items-center justify-between gap-2">
+            <span className="font-semibold">{t("pro.ft.goalPlanner")}</span>
+            <ProTag />
+          </span>
+          <span className="mt-1 block text-sm text-muted">{t("gl.empty")}</span>
+        </button>
+      </Section>
+    );
   const w = (kg: number) => `${fmtNum(Math.round(fromKg(kg, unit) * 2) / 2)} ${unit}`;
   const remove = (id: string) => setProfile({ goals: (profile.goals ?? []).filter((g) => g.id !== id) });
   return (

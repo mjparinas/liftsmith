@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "variety.balanced": "Équilibré",
   "variety.variable": "Plus varié",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "variety.consistent": "Beständiger",
+  "variety.balanced": "Ausgewogen",
+  "variety.variable": "Mehr Abwechslung",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "variety.consistent": "Più costante",
+  "variety.balanced": "Equilibrato",
+  "variety.variable": "Più varietà",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "variety.consistent": "一定を重視",
+  "variety.balanced": "バランス",
+  "variety.variable": "変化を重視",
+};

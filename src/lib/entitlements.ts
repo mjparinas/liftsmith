@@ -20,7 +20,7 @@ import { hasPro } from "./billing";
 // heart rate and breathing rate changing today's call ("healthReadiness") is Pro.
 // Labs, the experimental features (camera rep counting among them; "labs", 2026-11-10), is Pro.
 // One line per feature, so two changes adding one don't touch the same line. Every feature listed is Pro.
-const PRO_FEATURES = [
+export const PRO_FEATURES = [
   "adaptive",
   "recoveryMap",
   "advancedStats",

@@ -43,3 +43,42 @@ export const fr: Partial<Record<Key, Message>> = {
   "activity.heavy.detail": "6 à 7 jours par semaine",
   "activity.athlete.detail": "Deux fois par jour, ou un travail physique plus l’entraînement",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "Sitzend",
+  "activity.light": "Leichte Bewegung",
+  "activity.moderate": "Mäßige Bewegung",
+  "activity.heavy": "Viel Bewegung",
+  "activity.athlete": "Athlet",
+  "activity.sedentary.detail": "Bürojob, wenig oder keine Bewegung",
+  "activity.light.detail": "1 bis 2 Tage pro Woche",
+  "activity.moderate.detail": "3 bis 5 Tage pro Woche",
+  "activity.heavy.detail": "6 bis 7 Tage pro Woche",
+  "activity.athlete.detail": "Zweimal täglich oder körperliche Arbeit plus Training",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "Sedentario",
+  "activity.light": "Attività leggera",
+  "activity.moderate": "Attività moderata",
+  "activity.heavy": "Attività intensa",
+  "activity.athlete": "Atleta",
+  "activity.sedentary.detail": "Lavoro d’ufficio, poco o nessun esercizio",
+  "activity.light.detail": "Da 1 a 2 giorni a settimana",
+  "activity.moderate.detail": "Da 3 a 5 giorni a settimana",
+  "activity.heavy.detail": "Da 6 a 7 giorni a settimana",
+  "activity.athlete.detail": "Due volte al giorno, o lavoro fisico più allenamento",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "activity.sedentary": "座りがち",
+  "activity.light": "軽い運動",
+  "activity.moderate": "適度な運動",
+  "activity.heavy": "激しい運動",
+  "activity.athlete": "アスリート",
+  "activity.sedentary.detail": "デスクワーク、運動はほぼなし",
+  "activity.light.detail": "週1〜2日",
+  "activity.moderate.detail": "週3〜5日",
+  "activity.heavy.detail": "週6〜7日",
+  "activity.athlete.detail": "1日2回、または肉体労働とトレーニング",
+};

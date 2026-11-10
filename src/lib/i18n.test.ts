@@ -1,14 +1,31 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { de } from "@/locales/de";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
+import { it as itCatalogue } from "@/locales/it";
+import { ja } from "@/locales/ja";
 
 import { CATEGORY_LABEL, TIER_LABEL } from "./achievements";
 import { RARITY_LABEL } from "./game";
 import { GLOSSARY } from "./glossary";
-import { clockTime, currentLang, currentTag, list, num, parseNum, relative, resolve, setLanguage, t, weekday, type Message } from "./i18n";
+import {
+  clockTime,
+  currentLang,
+  currentTag,
+  LANGS,
+  list,
+  num,
+  parseNum,
+  relative,
+  resolve,
+  setLanguage,
+  t,
+  weekday,
+  type Message,
+} from "./i18n";
 import { FIX_TEXT } from "./plateau";
 import { CALL_TEXT } from "./readiness";
 import { bandOf } from "./recovery";
@@ -22,7 +39,7 @@ const holes = (m: Message) =>
 afterEach(() => setLanguage("system"));
 
 describe("catalogues", () => {
-  for (const [name, cat] of Object.entries({ es, fr })) {
+  for (const [name, cat] of Object.entries({ es, fr, de, it: itCatalogue, ja })) {
     it(`${name} has every English key, and no others`, () => {
       expect(Object.keys(cat).sort()).toEqual(Object.keys(en).sort());
     });
@@ -40,11 +57,11 @@ describe("catalogue files", () => {
     for (const f of files) {
       const prefix = f.replace(/\.ts$/, "");
       const mod = (await import(`../locales/text/${prefix}.ts`)) as Record<string, object>;
-      for (const lang of ["en", "es", "fr"]) for (const k of Object.keys(mod[lang])) expect(k.split(".")[0], `${f} ${lang}`).toBe(prefix);
+      for (const lang of LANGS) for (const k of Object.keys(mod[lang])) expect(k.split(".")[0], `${f} ${lang}`).toBe(prefix);
     }
   });
   it("every file is part of every language", () => {
-    for (const lang of ["en", "es", "fr"]) {
+    for (const lang of LANGS) {
       const src = readFileSync(new URL(`../locales/${lang}.ts`, import.meta.url), "utf8");
       for (const f of files) expect(src, `${lang}.ts`).toContain(`from "./text/${f.replace(/\.ts$/, "")}"`);
     }
@@ -53,9 +70,12 @@ describe("catalogue files", () => {
 
 describe("language", () => {
   it("follows the phone's first supported language, keeping its region for formats", () => {
-    expect(resolve(["de-DE", "es-MX", "en-US"])).toEqual({ lang: "es", tag: "es-MX" });
+    expect(resolve(["pt-BR", "es-MX", "en-US"])).toEqual({ lang: "es", tag: "es-MX" });
+    expect(resolve(["de-AT", "en-US"])).toEqual({ lang: "de", tag: "de-AT" });
+    expect(resolve(["it-CH"])).toEqual({ lang: "it", tag: "it-CH" });
+    expect(resolve(["ja-JP"])).toEqual({ lang: "ja", tag: "ja-JP" });
     expect(resolve(["fr-CA"])).toEqual({ lang: "fr", tag: "fr-CA" });
-    expect(resolve(["ja-JP"])).toEqual({ lang: "en", tag: "en" });
+    expect(resolve(["ko-KR"])).toEqual({ lang: "en", tag: "en" });
     expect(resolve(["en-GB", "fr-FR"])).toEqual({ lang: "en", tag: "en-GB" });
   });
 

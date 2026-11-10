@@ -19,3 +19,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "time.today": "Aujourd’hui",
   "time.yesterday": "Hier",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "time.today": "Heute",
+  "time.yesterday": "Gestern",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "time.today": "Oggi",
+  "time.yesterday": "Ieri",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "time.today": "今日",
+  "time.yesterday": "昨日",
+};

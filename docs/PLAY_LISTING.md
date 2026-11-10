@@ -97,7 +97,7 @@ MADE FOR EVERY LIFTER
 • One-handed controls for left or right hand, with hold-to-repeat buttons instead of typing.
 • Text size that follows your phone, colour-blind safe colours, a high-contrast option, and screen reader support.
 • Light and dark themes, and a Lean mode with less motion.
-• English, with Spanish and French translations rolling out.
+• In English, Spanish, French, German, Italian and Japanese.
 
 Liftsmith isn't a medical app. Talk to a doctor before starting a new training program, especially after an injury.
 

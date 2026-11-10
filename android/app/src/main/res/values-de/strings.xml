@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Training starten</string>
+    <string name="shortcut_start_long">Heutiges Training starten</string>
+    <string name="shortcut_log_short">Satz eintragen</string>
+    <string name="shortcut_log_long">Aktuellen Satz wie geplant eintragen</string>
+    <string name="shortcut_rest_short">+30 s Pause</string>
+    <string name="shortcut_rest_long">30 Sekunden zur Pause hinzufügen</string>
+    <string name="widget_description">Dein heutiges Training und warum, dein Wochenziel und der Coach-Tipp, mit Start</string>
+    <string name="channel_live">Training läuft</string>
+    <string name="channel_live_desc">Pausentimer, nächster Satz und Herzfrequenz beim Training</string>
+    <string name="rest_over">Pause vorbei</string>
+    <string name="channel_alert_desc">Klingelt und vibriert, wenn die Pause endet</string>
+    <string name="channel_alert_sound">Pause vorbei (nur Ton)</string>
+    <string name="channel_alert_sound_desc">Klingelt ohne Vibration, wenn die Pause endet</string>
+    <string name="next_prefix">Als Nächstes:</string>
+    <string name="rest_next">Pause · als Nächstes: %1$s</string>
+    <string name="up_next">Als Nächstes: %1$s</string>
+    <string name="add_30">+30 s</string>
+    <string name="widget_title">Heutiges Training</string>
+</resources>
