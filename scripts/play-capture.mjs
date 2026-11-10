@@ -189,12 +189,15 @@ try {
     await page.waitForTimeout(500);
     await shot(`onerm${sfx}`);
     await page.keyboard.press("Escape");
+    // Height lives in Your stats (Settings › Body and units); TDEE reads it from there.
+    await page.evaluate(() => (location.hash = "#/settings/stats"));
+    const height = page.locator("#stats-cm");
+    await height.waitFor();
+    if (!(await height.inputValue())) await height.fill("180");
     await page.evaluate(() => {
       location.hash = "#/tools/tdee";
       window.scrollTo(0, 0);
     });
-    const height = page.getByRole("textbox", { name: /Height/ });
-    if (!(await height.inputValue())) await height.fill("180");
     await page.waitForTimeout(400);
     await shot(`tdee${sfx}`);
     await shotAt(`tdee-result${sfx}`, /^Activity/);
