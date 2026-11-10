@@ -103,7 +103,7 @@ async function creatorItems(now: number): Promise<TodoItem[]> {
       title: `Pay ${r.name} (${r.code})`,
       detail: `$${r.owed.toFixed(2)} owed. Pay by PayPal or Wise, then record the payout.`,
       at: r.lastPayout,
-      action: { label: "Creators", tab: "Creators" },
+      action: { label: "Codes", tab: "Codes" },
     }));
 }
 
