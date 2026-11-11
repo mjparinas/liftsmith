@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
+import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
 const APP_ONLY = /^\/(app|me)\//;
@@ -32,34 +33,48 @@ function Logo() {
   );
 }
 
-export const NAV = [
+export type NavLink = { href: string; label: string };
+
+/**
+ * The one header nav for every public page, the home page included (Melvin, 2026-11-11: the links used to change when you
+ * left the home page). The home page's own sections are /#… links, so they work from any page. Wide screens show them
+ * all; below lg they sit in the menu, beside Sign in and Start free.
+ */
+export const NAV: readonly NavLink[] = [
+  { href: "/#features", label: "Features" },
   { href: "/exercises/", label: "Exercises" },
   { href: "/guides/", label: "Guides" },
   { href: "/blog/", label: "Blog" },
   { href: "/tools/", label: "Tools" },
   { href: "/pricing/", label: "Pricing" },
-] as const;
+  { href: "/#faq", label: "FAQ" },
+];
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/85 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
         <Logo />
-        <nav aria-label="Site" className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
-              {n.label}
-            </Link>
-          ))}
+        <nav aria-label="Site" className="flex items-center gap-0.5 text-sm font-semibold sm:gap-2">
+          <ul className="hidden items-center gap-1 lg:flex">
+            {NAV.map((n) => (
+              <li key={n.href}>
+                <Link href={n.href} className="rounded-lg px-3 py-2 hover:bg-surface">
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
           <SignInLink />
           <Link
             href={APP_PATH}
             prefetch={false}
             data-cta="header"
-            className="press btn-primary ml-1 inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-4"
+            className="press btn-primary inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-3 sm:ml-1 sm:px-4"
           >
             Start free
           </Link>
+          <SiteMenu links={NAV} />
         </nav>
       </div>
     </header>
