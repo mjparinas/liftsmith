@@ -5,8 +5,10 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ArticleView, relatedTo } from "@/components/site/ArticleView";
 import { SitePage } from "@/components/site/SiteChrome";
 import { ARTICLES } from "@/content/articles";
+import { LANDINGS } from "@/content/landings";
 
 import FitbodAlternatives from "./alternatives/fitbod/page";
+import AppLandingPage from "./apps/[slug]/page";
 import BlogIndex from "./blog/page";
 import ComparePage from "./compare/[slug]/page";
 import CompareIndex from "./compare/page";
@@ -14,6 +16,8 @@ import EquipmentPage from "./equipment/[slug]/page";
 import AlternativesPage from "./exercises/[slug]/alternatives/page";
 import ExercisePage from "./exercises/[slug]/page";
 import ExercisesIndex from "./exercises/page";
+import FeaturePage from "./features/[slug]/page";
+import FeaturesIndex from "./features/page";
 import ImportPage from "./import/[slug]/page";
 import PairPage from "./muscles/[muscle]/[equipment]/page";
 import MusclePage from "./muscles/[muscle]/page";
@@ -86,6 +90,20 @@ describe("SEO pages", () => {
       expect(screen.getByText(/trademarks of their owners/)).toBeTruthy();
       cleanup();
     }
+  });
+
+  it("renders every app and feature page with its calls to action and questions", async () => {
+    for (const l of LANDINGS) {
+      const Page = l.group === "apps" ? AppLandingPage : FeaturePage;
+      render(await Page({ params: Promise.resolve({ slug: l.slug }) }));
+      expectCtas();
+      expect(screen.getByRole("heading", { level: 1, name: l.h1 })).toBeTruthy();
+      expect(screen.getByText("Questions")).toBeTruthy();
+      cleanup();
+    }
+    render(<FeaturesIndex />);
+    expect(screen.getAllByRole("link", { name: /Lock-screen rest timer/ }).length).toBeGreaterThan(0);
+    cleanup();
   });
 
   it("renders the comparison pages with sources, the trademark line and calls to action", async () => {

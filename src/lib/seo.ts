@@ -4,6 +4,7 @@
 import { ARTICLES, type Article } from "@/content/articles";
 import { COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
+import { landingPath, LANDINGS } from "@/content/landings";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { alternatives } from "./generator";
@@ -231,6 +232,9 @@ export function siteRoutes(): Route[] {
     { path: "/alternatives/fitbod/", priority: 0.7 },
     ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),
     ...IMPORT_SOURCES.map((s) => ({ path: `/import/${s.slug}/`, priority: 0.7 })),
+    { path: "/apps/", priority: 0.7 },
+    { path: "/features/", priority: 0.7 },
+    ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
