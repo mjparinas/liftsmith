@@ -39,6 +39,7 @@
     "src/lib/superset.ts",
     "src/lib/units.ts",
     "src/lib/warmup.ts",
+    "src/lib/weightSets.ts",
     "src/lib/why.ts"
   ]
 }

@@ -12,6 +12,7 @@ import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types
 import { fmtNum } from "@/lib/units";
 
 import { BuyNext } from "./BuyNext";
+import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
 import { BumpField, Button, Chip, Section, Sheet } from "./ui";
 
@@ -190,18 +191,8 @@ export function Gym() {
         </ul>
       </Section>
 
-      <Section title={t("gym.dumbbells", { unit: gym.unit })}>
-        <div className="card p-4 text-sm text-muted">
-          {gym.dumbbells.length
-            ? t("gym.dumbbells.range", {
-                from: fmtNum(gym.dumbbells[0]),
-                to: fmtNum(gym.dumbbells.at(-1)!),
-                unit: gym.unit,
-                count: gym.dumbbells.length,
-              })
-            : t("gym.dumbbells.none")}
-        </div>
-      </Section>
+      <GymWeights gym={gym} kind="dumbbells" onChange={(dumbbells) => update({ dumbbells })} />
+      <GymWeights gym={gym} kind="kettlebells" onChange={(kettlebells) => update({ kettlebells })} />
 
       <BuyNext gym={gym} />
 
