@@ -19,7 +19,7 @@ import { date, readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
 import { load } from "@/lib/localdb";
 import { APP_PATH } from "@/lib/site";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
-import { fmtNum, fromKg } from "@/lib/units";
+import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useLang } from "@/lib/useLang";
 
 import { LineChart, MonthCalendar, WeekBars, YearHeatmap } from "./Charts";
@@ -53,8 +53,6 @@ function useTab(): [Tab, string | undefined, (t: Tab, arg?: string) => void] {
 }
 
 const kgText = (kg: number, unit: Unit) => `${fmtNum(Math.round(fromKg(kg, unit)))} ${unit}`;
-const tonnes = (kg: number, unit: Unit) =>
-  unit === "kg" ? `${fmtNum(Math.round(kg / 100) / 10)} t` : `${fmtNum(Math.round(fromKg(kg, "lb") / 100) / 10)}k lb`;
 const hours = (sec: number) => `${fmtNum(Math.round(sec / 360) / 10)} h`;
 const dateText = (ms: number) => date(ms, { weekday: "short", month: "short", day: "numeric", year: "numeric" });
 
@@ -198,7 +196,7 @@ function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; pro
     [t("dash.workouts"), fmtNum(stats.sessions.length)],
     [t("dash.goalStreak"), t("dash.weeksShort", { n: streak.weeks })],
     [t("dash.sets"), fmtNum(stats.totalSets)],
-    [t("dash.volume"), tonnes(stats.totalVolume, unit)],
+    [t("dash.volume"), fmtVolume(stats.totalVolume, unit)],
     [t("dash.timeLifting"), hours(stats.totalSeconds)],
     [t("dash.prs"), fmtNum(stats.prs.length)],
   ];
@@ -365,9 +363,11 @@ function CalendarTab({ stats, now, unit, go }: { stats: Stats; now: number; unit
                   className="press w-full rounded-2xl border border-line bg-raised p-3 text-left"
                 >
                   <span className="num block font-medium">
-                    {[t("dash.setsN", { count: s.sets }), tonnes(s.volume, unit), ...(s.prs ? [t("dash.prN", { count: s.prs })] : [])].join(
-                      " · ",
-                    )}
+                    {[
+                      t("dash.setsN", { count: s.sets }),
+                      fmtVolume(s.volume, unit),
+                      ...(s.prs ? [t("dash.prN", { count: s.prs })] : []),
+                    ].join(" · ")}
                   </span>
                   <span className="mt-0.5 block text-sm text-muted">{s.exercises.map(exerciseName).join(", ")}</span>
                 </button>
@@ -562,7 +562,7 @@ function SessionView({
   const facts = [
     t("dash.min", { n: Math.round(summary.seconds / 60) }),
     t("dash.setsN", { count: summary.sets }),
-    tonnes(summary.volume, unit),
+    fmtVolume(summary.volume, unit),
     ...(summary.avgHr ? [t("dash.avgHr", { n: summary.avgHr })] : []),
     ...(summary.prs ? [t("dash.prN", { count: summary.prs })] : []),
   ];
