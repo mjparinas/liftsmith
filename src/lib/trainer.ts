@@ -10,6 +10,7 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { stalls, type Stall } from "./insights";
 import { gradedSet } from "./progression";
+import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
 import type { AppEvent, SetEvent } from "./types";
 
@@ -22,15 +23,28 @@ export interface Invite {
   code: string;
   expiresAt: number;
 }
+/** A routine a coach assigned to a client: `code` is a routine share code (routineShare.ts). */
+export interface Plan {
+  id: string;
+  coachId: string;
+  clientId: string;
+  name: string;
+  code: string;
+  at: number;
+}
 export interface Overview {
   invite: Invite | null;
   clients: Person[];
   coaches: Person[];
+  /** Routines this lifter's coaches gave them. */
+  plans: Plan[];
 }
 export interface ClientView {
   name: string;
   daysPerWeek: number | null;
   events: unknown[];
+  /** Routines this coach gave the client. */
+  plans: Plan[];
 }
 
 const DAY = 86_400_000;
@@ -50,6 +64,9 @@ export const previewCode = async (code: string) =>
   (await api<{ coach: Person }>("/api/coach/", { token: token(), body: { action: "preview", code } })).coach;
 export const joinCode = async (code: string) =>
   (await api<{ coach: Person }>("/api/coach/", { token: token(), body: { action: "join", code } })).coach;
+export const assignPlan = async (client: string, name: string, code: string) =>
+  (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code } })).plan;
+export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
 export const unlinkPerson = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unlink", id } }));
 
 /** A code as it's shown and read out: ABCD-EFGH. */
@@ -115,7 +132,27 @@ export type Flag =
   | { kind: "missing"; pct: number }
   | { kind: "stalled"; exerciseId: string; weeks: number }
   | { kind: "prs"; count: number }
+  | { kind: "planUnused"; name: string }
   | { kind: "onTrack"; done: number; goal: number };
+
+/** How an assigned routine is going: workouts since it was assigned that follow it. */
+export interface PlanProgress {
+  plan: Plan;
+  done: number;
+  lastAt: number | null;
+}
+
+/**
+ * A workout follows a routine when it was done after the routine was assigned and has most of its exercises
+ * (60%+). The client's copy of a routine has its own id on their phone, so it's matched by what was trained.
+ */
+export function planProgress(plan: Plan, sessions: readonly SessionSummary[]): PlanProgress {
+  const want = new Set(decodeRoutine(plan.code)?.items.map((i) => i.exerciseId) ?? []);
+  const hits = want.size
+    ? sessions.filter((s) => s.start >= plan.at && s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6))
+    : [];
+  return { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
+}
 
 export interface Report {
   name: string;
@@ -131,6 +168,8 @@ export interface Report {
   flags: Flag[];
   /** Names for the client's own exercises, which this phone's library doesn't have. */
   names: Map<string, string>;
+  /** The routines this coach assigned, newest first, with how each is going. */
+  plans: PlanProgress[];
 }
 
 export function clientReport(view: ClientView, now: number): Report {
@@ -147,6 +186,7 @@ export function clientReport(view: ClientView, now: number): Report {
   const prs = stats.prs.filter((p) => now - p.at <= 30 * DAY).sort((a, b) => b.at - a.at);
   const stalled = stalls(events, now);
   const flags: Flag[] = [];
+  const plans = (view.plans ?? []).map((p) => planProgress(p, sessions));
 
   if (lastAt === null) flags.push({ kind: "new" });
   else {
@@ -167,10 +207,12 @@ export function clientReport(view: ClientView, now: number): Report {
       if (rates.every((r) => r < 0.7)) flags.push({ kind: "missing", pct: Math.round((rates.reduce((a, b) => a + b, 0) / 3) * 100) });
     }
     for (const s of stalled.slice(0, 2)) flags.push({ kind: "stalled", exerciseId: s.exerciseId, weeks: s.weeks });
+    // A routine given a week ago or more that hasn't been done yet.
+    for (const p of plans) if (!p.done && now - p.plan.at >= WEEK) flags.push({ kind: "planUnused", name: p.plan.name });
     if (prs.length) flags.push({ kind: "prs", count: prs.length });
     if (!flags.some((f) => f.kind !== "prs") && goal) flags.push({ kind: "onTrack", done: weeks[3]!.count, goal });
   }
-  return { name: view.name, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names };
+  return { name: view.name, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans };
 }
 
 /** An exercise's name on the coach's phone: the library's, the client's own, or a plain fallback. */
@@ -184,7 +226,7 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
     case "new":
       return { title: t("trn.f.new"), advice: t("trn.f.newDo"), tone: "info" };
     case "quiet":
-      return { title: t("trn.f.quiet", { days: f.days }), advice: t("trn.f.quietDo"), tone: "warn" };
+      return { title: t("trn.f.quiet", { count: f.days }), advice: t("trn.f.quietDo"), tone: "warn" };
     case "behind":
       return { title: t("trn.f.behind", { done: f.done, goal: f.goal }), advice: t("trn.f.behindDo"), tone: "warn" };
     case "missing":
@@ -197,6 +239,8 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       };
     case "prs":
       return { title: t("trn.f.prs", { count: f.count }), advice: t("trn.f.prsDo"), tone: "good" };
+    case "planUnused":
+      return { title: t("trn.f.planUnused", { name: f.name }), advice: t("trn.f.planUnusedDo"), tone: "warn" };
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }

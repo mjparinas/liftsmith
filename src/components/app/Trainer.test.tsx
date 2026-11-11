@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { forgetAccount, useAccount } from "@/lib/auth";
 import { cacheFlags } from "@/lib/flags";
+import { useApp } from "@/lib/store";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { makeWorkout, NOW } from "@/test/factories";
 
@@ -14,11 +15,14 @@ import { Trainer } from "./Trainer";
 
 const calls: { url: string; body: unknown; auth?: string }[] = [];
 let linked = false;
+let assigned: unknown[] = [];
+const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
   localStorage.clear();
   calls.length = 0;
   linked = false;
+  assigned = [];
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -30,17 +34,24 @@ beforeEach(() => {
         name: "Alex",
         daysPerWeek: 3,
         events: makeWorkout("w1", NOW - 3600_000, [{}, { exerciseId: "custom-sled" }]),
+        plans: assigned,
       });
     if (url === "/api/coach/" && !body)
       return Response.json({
         invite: { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 },
         clients: [{ id: "c1", name: "Alex", since: NOW }],
         coaches: linked ? [{ id: "k1", name: "Sam", since: NOW }] : [],
+        plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
       });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
       linked = true;
       return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
+    }
+    if (body?.action === "assign") {
+      const plan = { id: "p9", coachId: "me", clientId: body.client, name: body.name, code: body.code, at: NOW - 86_400_000 };
+      assigned = [plan];
+      return Response.json({ plan });
     }
     return Response.json({ ok: true });
   });
@@ -97,5 +108,33 @@ describe("trainer mode", () => {
     expect(await screen.findByRole("heading", { name: "Alex" })).toBeInTheDocument();
     expect(screen.getByText("Workouts per week")).toBeInTheDocument();
     expect(screen.getByText(/Their own exercise/)).toBeInTheDocument();
+  });
+
+  it("a client sees the routines their coach gave them, and one opens the routine to save", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: "Open Push day" }));
+    expect(location.hash).toBe(`#/routine/${CODE}`);
+  });
+
+  it("a coach assigns one of their saved routines to a client", async () => {
+    cacheFlags({ labTrainer: true });
+    useApp.getState().setProfile({
+      routines: [{ id: "r1", name: "Push day", items: [{ exerciseId: "bench-press", sets: 4 }], createdAt: NOW, updatedAt: NOW }],
+    });
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    await u.click(await screen.findByRole("button", { name: "Assign a routine" }));
+    await u.click(await screen.findByRole("button", { name: /Push day/ }));
+    expect(await screen.findByText("Sent. It shows on their phone under Coaching.")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "assign")).toMatchObject({
+      body: { client: "c1", name: "Push day", code: "r1~UHVzaCBkYXk~bench-press.4" },
+    });
+    expect(
+      await screen.findByText(
+        "Done 1 time · last " + new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(NOW - 3600_000 + 60_000),
+      ),
+    ).toBeInTheDocument();
   });
 });

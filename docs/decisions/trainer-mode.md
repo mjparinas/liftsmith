@@ -1,6 +1,6 @@
 # Trainer mode
 
-Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for clients and see client results". Built in stages; stage 1 (link a client, see their results) is below. Stage 2 (the coach builds a program and assigns it) follows.
+Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for clients and see client results". Built in two stages: stage 1 (link a client, see their results) and stage 2 (the coach assigns routines and sees how each is going), both below.
 
 ## Pricing
 
@@ -16,4 +16,11 @@ Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for c
 - **The coach's phone checks what it gets** (`cleanEvents`): malformed events from another person's phone are dropped, and the client's own exercises are named from their events without entering the coach's library.
 - **Server:** `GET/POST /api/coach/` (`route.api.ts`, signed in only). Tables `coach_invites` (code, coach, expiry; one live code per coach) and `coach_links` (coach and client). Looking up or using a code is limited to 20 tries an hour per account, so codes can't be guessed. Deleting an account deletes its invite and every link, either side (`coachCleanup`).
 - **Platforms:** pure web code on the server and in the app, so Android, iOS and the web app get it in the same change, with no native code and no platform gap.
-- Analytics: `feature` `trainer` with `invite`, `join`, `leave` and `remove`. No names or ids.
+- Analytics: `feature` `trainer` with `invite`, `join`, `leave`, `remove`, `assign` and `unassign`. No names or ids.
+
+## Routines from the coach (stage 2, built 2026-11-11)
+
+- **The coach builds with the tools already there.** A routine is made the usual way (save a workout as a routine from its summary, or make one in Routines), then on a client's report **Routines for this client › Assign a routine** opens a sheet of the coach's saved routines; one tap sends it. No second routine editor (one control, one destination).
+- **It travels as a routine share code** (`encodeRoutine`, the same `r1~…` code as shared routine links, [Programs](programs.md) and PR #231): exercises in order, set counts and supersets, no weights or reps, because the client's own progression fills those in. The server stores it in `coach_plans` (coach, client, name, code, when), checks it only loosely (`isRoutineCode`; the app decodes it), keeps up to 10 per client, and only for the coach's own clients.
+- **The client** sees **From your coach** at the top of Your coach: each routine with who sent it and when. Tapping it opens the shared routine preview (`#/routine/<code>`, `SharedRoutine.tsx`), where one tap saves it to their routines, and they start it like any other. Saving stays the client's choice, and the routine is theirs to change.
+- **The coach sees how each is going** (`planProgress`): workouts since it was assigned that have 60%+ of its exercises count as done, shown as "Done 3 times · last Nov 9" or "Not done yet". The client's saved copy has its own id on their phone, so the match is by what was trained. A routine given a week or more ago and not done yet becomes a **What to do** item ("Push day not started yet": check they saved it). The trash icon takes a routine back; unlinking either way removes the pair's routines, and so does deleting either account.
