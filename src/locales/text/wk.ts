@@ -59,6 +59,15 @@ export const en = {
   "wk.extraCancel": "Skip the bonus set",
   "wk.failureRir": "0 means you went to failure.",
   "wk.failureRpe": "10 means you went to failure.",
+  "wk.find.search": "Search by name, muscle or equipment",
+  "wk.find.groups": "Main muscle",
+  "wk.find.cardio": "Cardio",
+  "wk.find.here": "Only what this gym has",
+  "wk.find.count": { one: "{n} exercise", other: "{n} exercises" },
+  "wk.find.none": "Nothing matches. Try fewer words, another muscle, or turn off the gym filter.",
+  "wk.find.add": "Add an exercise",
+  "wk.find.all": "Browse every exercise",
+  "wk.find.added": "{name} added at the end",
 } as const;
 
 type Key = keyof typeof en;
@@ -119,6 +128,15 @@ export const es: Partial<Record<Key, Message>> = {
   "wk.extraCancel": "Saltar la serie extra",
   "wk.failureRir": "0 significa que llegaste al fallo.",
   "wk.failureRpe": "10 significa que llegaste al fallo.",
+  "wk.find.search": "Busca por nombre, músculo o equipo",
+  "wk.find.groups": "Músculo principal",
+  "wk.find.cardio": "Cardio",
+  "wk.find.here": "Solo lo que hay en este gimnasio",
+  "wk.find.count": { one: "{n} ejercicio", other: "{n} ejercicios" },
+  "wk.find.none": "No hay coincidencias. Prueba con menos palabras, otro músculo o quita el filtro del gimnasio.",
+  "wk.find.add": "Añadir un ejercicio",
+  "wk.find.all": "Ver todos los ejercicios",
+  "wk.find.added": "{name} añadido al final",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -177,6 +195,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "wk.extraCancel": "Passer la série bonus",
   "wk.failureRir": "0 veut dire que vous êtes allé à l’échec.",
   "wk.failureRpe": "10 veut dire que vous êtes allé à l’échec.",
+  "wk.find.search": "Chercher par nom, muscle ou matériel",
+  "wk.find.groups": "Muscle principal",
+  "wk.find.cardio": "Cardio",
+  "wk.find.here": "Seulement ce qu’a cette salle",
+  "wk.find.count": { one: "{n} exercice", other: "{n} exercices" },
+  "wk.find.none": "Aucun résultat. Essayez moins de mots, un autre muscle, ou retirez le filtre de la salle.",
+  "wk.find.add": "Ajouter un exercice",
+  "wk.find.all": "Voir tous les exercices",
+  "wk.find.added": "{name} ajouté à la fin",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -235,6 +262,15 @@ export const de: Partial<Record<Key, Message>> = {
   "wk.extraCancel": "Bonussatz auslassen",
   "wk.failureRir": "0 heißt, du bist bis zum Muskelversagen gegangen.",
   "wk.failureRpe": "10 heißt, du bist bis zum Muskelversagen gegangen.",
+  "wk.find.search": "Nach Name, Muskel oder Gerät suchen",
+  "wk.find.groups": "Hauptmuskel",
+  "wk.find.cardio": "Cardio",
+  "wk.find.here": "Nur, was dieses Studio hat",
+  "wk.find.count": { one: "{n} Übung", other: "{n} Übungen" },
+  "wk.find.none": "Keine Treffer. Weniger Wörter, einen anderen Muskel oder den Studiofilter ausschalten.",
+  "wk.find.add": "Übung hinzufügen",
+  "wk.find.all": "Alle Übungen durchsuchen",
+  "wk.find.added": "{name} am Ende hinzugefügt",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -293,6 +329,15 @@ export const it: Partial<Record<Key, Message>> = {
   "wk.extraCancel": "Salta la serie bonus",
   "wk.failureRir": "0 vuol dire che sei arrivato a cedimento.",
   "wk.failureRpe": "10 vuol dire che sei arrivato a cedimento.",
+  "wk.find.search": "Cerca per nome, muscolo o attrezzo",
+  "wk.find.groups": "Muscolo principale",
+  "wk.find.cardio": "Cardio",
+  "wk.find.here": "Solo ciò che ha questa palestra",
+  "wk.find.count": { one: "{n} esercizio", other: "{n} esercizi" },
+  "wk.find.none": "Nessun risultato. Prova con meno parole, un altro muscolo o togli il filtro palestra.",
+  "wk.find.add": "Aggiungi un esercizio",
+  "wk.find.all": "Sfoglia tutti gli esercizi",
+  "wk.find.added": "{name} aggiunto alla fine",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -351,4 +396,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "wk.extraCancel": "ボーナスセットをやめる",
   "wk.failureRir": "0 は限界まで追い込んだという意味です。",
   "wk.failureRpe": "10 は限界まで追い込んだという意味です。",
+  "wk.find.search": "名前、筋肉、器具で検索",
+  "wk.find.groups": "主な筋肉",
+  "wk.find.cardio": "有酸素",
+  "wk.find.here": "このジムでできるものだけ",
+  "wk.find.count": { other: "{n}種目" },
+  "wk.find.none": "該当なし。言葉を減らすか、別の筋肉を選ぶか、ジムの絞り込みをオフに。",
+  "wk.find.add": "種目を追加",
+  "wk.find.all": "すべての種目を見る",
+  "wk.find.added": "{name}を最後に追加しました",
 };

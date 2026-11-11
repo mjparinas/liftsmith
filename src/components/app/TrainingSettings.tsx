@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-import { available, exercise, EXERCISE_BY_ID, EXERCISES } from "@/lib/exercises";
+import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { restFor } from "@/lib/generator";
 import { t, weekday } from "@/lib/i18n";
 import { repRange, TIMED } from "@/lib/progression";
@@ -20,8 +20,10 @@ import {
   togglePriority,
   withExercisePrefs,
 } from "@/lib/training";
-import { MUSCLE_LABEL, MUSCLES, type Muscle, type RestAlert, type TrainingPrefs } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type RestAlert, type TrainingPrefs } from "@/lib/types";
 
+import { ExerciseBrowser } from "./ExerciseBrowser";
+import { Icon } from "./icons";
 import { go } from "./router";
 import { Chip, Section, SwitchRow } from "./ui";
 
@@ -215,6 +217,7 @@ export function TrainingSettings() {
           {!tp.favourites?.length && <li className="px-4 py-3 text-sm text-muted">{t("train.none")}</li>}
         </ul>
         <ExercisePicker
+          id="fav"
           label={t("train.findFav")}
           skip={tp.favourites ?? []}
           onPick={(id) => setProfile({ training: toggleFavourite(profile.training, id) })}
@@ -240,7 +243,7 @@ export function TrainingSettings() {
           ))}
           {!overrides.length && <li className="px-4 py-3 text-sm text-muted">{t("train.none")}</li>}
         </ul>
-        <ExercisePicker label={t("train.find")} skip={overrides} onPick={(id) => setOpen(id)} />
+        <ExercisePicker id="prefs" label={t("train.find")} skip={overrides} onPick={(id) => setOpen(id)} />
         {open && !overrides.includes(open) && (
           <div className="card mt-2 px-4 py-2">
             <p className="pt-1 font-medium">{exercise(open).name}</p>
@@ -263,49 +266,22 @@ function summary(p: { rest?: number; reps?: [number, number]; sets?: number }): 
     .join(" · ");
 }
 
-/**
- * Pick an exercise with taps, no typing (Melvin, 2026-11-09: minimal typing, one hand): a muscle
- * chip, then the exercises for it, ones this gym can do first.
- */
-function ExercisePicker({ label, skip, onPick }: { label: string; skip: readonly string[]; onPick: (id: string) => void }) {
+/** Pick an exercise: the shared browser (a muscle chip or a few letters), ones this gym can do first. */
+function ExercisePicker({ id, label, skip, onPick }: { id: string; label: string; skip: readonly string[]; onPick: (id: string) => void }) {
   const { gyms, profile } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
-  const [muscle, setMuscle] = useState<Muscle | null>(null);
-  const hits = useMemo(() => {
-    if (!muscle) return [];
-    const here = new Set(gym ? available(gym.equipment).map((e) => e.id) : []);
-    return EXERCISES.filter((e) => !skip.includes(e.id) && e.primary.includes(muscle)).sort(
-      (a, b) => Number(here.has(b.id)) - Number(here.has(a.id)) || a.name.localeCompare(b.name),
-    );
-  }, [muscle, skip, gym]);
   return (
     <div className="mt-3">
       <p className="mb-1.5 px-1 text-sm text-muted">{label}</p>
-      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
-        {MUSCLES.map((m) => (
-          <Chip key={m} active={muscle === m} onClick={() => setMuscle(muscle === m ? null : m)}>
-            {MUSCLE_LABEL[m]}
-          </Chip>
-        ))}
-      </div>
-      {hits.length > 0 && (
-        <ul className="card mt-2 max-h-80 divide-y divide-line/70 overflow-y-auto">
-          {hits.map((e) => (
-            <li key={e.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  onPick(e.id);
-                  setMuscle(null);
-                }}
-                className="press min-h-12 w-full px-4 py-2 text-left"
-              >
-                {e.name}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <ExerciseBrowser
+        id={id}
+        gym={gym}
+        skip={skip}
+        onPick={onPick}
+        action={<Icon name="plus" size={18} />}
+        waitForFilter
+        groupLabel={label}
+      />
     </div>
   );
 }

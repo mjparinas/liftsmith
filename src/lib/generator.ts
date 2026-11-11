@@ -390,7 +390,15 @@ export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly
   const pool = gym ? available(gym.equipment) : [...EXERCISE_BY_ID.values()];
   const eff = (e: Exercise) => effectFor(e, hurt);
   return pool
-    .filter((e) => e.id !== ex.id && !skip.includes(e.id) && e.primary.some((m) => ex.primary.includes(m)) && eff(e)?.action !== "skip")
+    .filter(
+      (e) =>
+        e.id !== ex.id &&
+        !skip.includes(e.id) &&
+        // Cardio swaps for cardio, strength for strength.
+        !e.cardio === !ex.cardio &&
+        e.primary.some((m) => ex.primary.includes(m)) &&
+        eff(e)?.action !== "skip",
+    )
     .map((e) => {
       const shared =
         e.primary.filter((m) => ex.primary.includes(m)).length * 3 + e.secondary.filter((m) => ex.secondary.includes(m)).length;

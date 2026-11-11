@@ -2,14 +2,15 @@
 
 import { useMemo, useState } from "react";
 
-import { available, exercise, EXERCISES } from "@/lib/exercises";
-import { currentTag, t } from "@/lib/i18n";
+import { available, exercise } from "@/lib/exercises";
+import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { MAX_ITEMS, moveItem, NAME_MAX, routineFrom } from "@/lib/routines";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
-import { MUSCLE_LABEL, type Routine, type RoutineItem } from "@/lib/types";
+import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem } from "@/lib/types";
 
+import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
@@ -323,7 +324,7 @@ function RoutineEditor({
       {items.length < MAX_ITEMS &&
         (adding ? (
           <ExercisePicker
-            gymEquipment={gym?.equipment ?? []}
+            gym={gym}
             skip={items.map((i) => i.exerciseId)}
             onPick={(id) => {
               tick();
@@ -353,53 +354,19 @@ function RoutineEditor({
   );
 }
 
-function ExercisePicker({ gymEquipment, skip, onPick }: { gymEquipment: readonly string[]; skip: string[]; onPick: (id: string) => void }) {
-  const [q, setQ] = useState("");
-  const can = useMemo(() => new Set(available(gymEquipment).map((e) => e.id)), [gymEquipment]);
-  const words = q.toLocaleLowerCase(currentTag()).split(/\s+/).filter(Boolean);
-  const list = EXERCISES.filter(
-    (e) =>
-      !skip.includes(e.id) &&
-      words.every(
-        (w) => e.name.toLowerCase().includes(w) || e.primary.some((m) => MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()).includes(w)),
-      ),
-  )
-    // What this gym can do first.
-    .sort((a, b) => Number(can.has(b.id)) - Number(can.has(a.id)) || a.name.localeCompare(b.name))
-    .slice(0, 12);
+function ExercisePicker({ gym, skip, onPick }: { gym: Gym | undefined; skip: string[]; onPick: (id: string) => void }) {
+  const can = useMemo(() => new Set(available(gym?.equipment ?? []).map((e) => e.id)), [gym]);
   return (
     <div className="mt-4 rounded-2xl border border-line p-3">
-      <label className="block text-sm font-medium" htmlFor="routine-search">
-        {t("rt.add")}
-      </label>
-      <input
-        id="routine-search"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder={t("rt.search")}
-        className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      <p className="mb-2 text-sm font-medium">{t("rt.add")}</p>
+      <ExerciseBrowser
+        id="routine"
+        gym={gym}
+        skip={skip}
+        onPick={onPick}
+        action={<Icon name="plus" size={18} />}
+        note={(e) => (can.has(e.id) ? undefined : t("rt.notHere"))}
       />
-      <ul className="mt-2 divide-y divide-line/70">
-        {list.map((e) => (
-          <li key={e.id}>
-            <button
-              type="button"
-              onClick={() => onPick(e.id)}
-              className="press flex min-h-11 w-full items-center justify-between gap-3 py-2 text-left"
-            >
-              <span className="min-w-0">
-                <span className="block truncate font-medium">{e.name}</span>
-                <span className="text-sm text-muted">
-                  {e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}
-                  {can.has(e.id) ? "" : ` · ${t("rt.notHere")}`}
-                </span>
-              </span>
-              <Icon name="plus" size={18} className="text-accent" />
-            </button>
-          </li>
-        ))}
-        {!list.length && <li className="py-3 text-sm text-muted">{t("rt.noMatch")}</li>}
-      </ul>
     </div>
   );
 }

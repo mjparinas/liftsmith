@@ -68,7 +68,7 @@ describe("Settings › Workout preferences", () => {
     render(<TrainingSettings />);
     const favs = screen.getByRole("group", { name: "Add a favourite: pick a muscle" });
     await user.click([...favs.querySelectorAll("button")].find((b) => b.textContent === "Quads")!);
-    await user.click(screen.getByRole("button", { name: "Back squat" }));
+    await user.click(screen.getByRole("button", { name: /^Back squat/ }));
     expect(training()?.favourites).toEqual(["back-squat"]);
   });
 

@@ -2,7 +2,7 @@ import { track } from "../analytics";
 import { startDistance } from "../cardio";
 import { derive } from "../derive";
 import { exercise } from "../exercises";
-import { injuredTarget, planSeconds, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
+import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
@@ -144,6 +144,8 @@ export interface WorkoutSlice {
   skipWarmup(): void;
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
+  /** Adds an exercise at the end of the workout in progress (the exercise browser's "Add an exercise"). */
+  addExercise(exerciseId: string): void;
   goTo(index: number): void;
   /** Link exercise `index` with the next one as a superset, or split them. Works on Today's plan and mid-workout. */
   toggleSuperset(index: number): void;
@@ -584,6 +586,36 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
       track("feature", { name: "swap", detail: avoid ? "not available here" : "swap" });
       const next = loadItem(get, { ...a, plan: { ...a.plan, items } }, a.index);
+      set({ active: next });
+      persistActive(next);
+    },
+
+    addExercise(exerciseId) {
+      const a = get().active;
+      const g = gym();
+      if (!a || !g) return;
+      const ex = exercise(exerciseId);
+      const { profile, events } = get();
+      const t = injuredTarget(ex, target(ex, events, profile, g, Date.now()), activeInjuries(events), g);
+      // Cardio is one long set; anything else gets the usual three.
+      const sets = ex.cardio ? 1 : 3;
+      const warmed = new Set(a.plan.items.flatMap((i) => exercise(i.exerciseId).primary));
+      const wu = warmupFor(ex, t.target.weight, g, warmed);
+      const item: PlanItem = {
+        exerciseId,
+        sets,
+        restSec: restFor(ex, profile.goal, profile.training),
+        focus: ex.primary[0]!,
+        target: t.target,
+        ...(t.injuryPct ? { injuryPct: t.injuryPct } : {}),
+        ...(wu.length ? { warmup: wu } : {}),
+      };
+      const items = [...a.plan.items, item];
+      track("feature", { name: "add_exercise", detail: ex.cardio ? "cardio" : ex.pattern });
+      // When every planned exercise is done, go straight to the new one.
+      const finished = a.index >= a.plan.items.length;
+      const plan = { ...a.plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
+      const next = finished ? loadItem(get, { ...a, plan, lastAt: Date.now() }, items.length - 1) : { ...a, plan, lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
