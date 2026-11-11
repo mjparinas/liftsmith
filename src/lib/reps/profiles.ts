@@ -13,6 +13,7 @@ const CURL: MotionProfile = { signal: "elbow", restHigh: true, concentricFirst: 
 const EXTENSION: MotionProfile = { signal: "elbow", restHigh: true, concentricFirst: false, minRom: 50, bar: "wrists" };
 const RAISE: MotionProfile = { signal: "shoulder", restHigh: false, concentricFirst: true, minRom: 45, bar: "wrists" };
 const BRIDGE: MotionProfile = { signal: "hip", restHigh: false, concentricFirst: true, minRom: 30, bar: "hips" };
+const LEG_CURL: MotionProfile = { signal: "knee", restHigh: true, concentricFirst: true, minRom: 50, bar: "hips" };
 
 const BY_ID: Record<string, MotionProfile> = {
   "lateral-raise": RAISE,
@@ -27,7 +28,7 @@ const BY_ID: Record<string, MotionProfile> = {
   "cable-pushdown": { ...EXTENSION, restHigh: false, concentricFirst: true },
   "band-pushdown": { ...EXTENSION, restHigh: false, concentricFirst: true },
   "leg-extension": { signal: "knee", restHigh: false, concentricFirst: true, minRom: 50, bar: "hips" },
-  "lying-leg-curl": { signal: "knee", restHigh: true, concentricFirst: true, minRom: 50, bar: "hips" },
+  "lying-leg-curl": LEG_CURL,
   "kb-swing": { ...HINGE, minRom: 35 },
   "nordic-curl": { signal: "knee", restHigh: false, concentricFirst: false, minRom: 30, bar: "shoulders" },
 };
@@ -43,6 +44,7 @@ const BY_PATTERN: Partial<Record<Pattern, MotionProfile>> = {
 };
 
 const NAME_HINTS: [RegExp, MotionProfile][] = [
+  [/leg-curl/, LEG_CURL],
   [/curl/, CURL],
   [/dip/, PRESS],
 ];
@@ -50,8 +52,8 @@ const NAME_HINTS: [RegExp, MotionProfile][] = [
 /** The motion profile for an exercise, or undefined for holds and carries (planks, farmer's carry) that have no reps. */
 export function profileFor(id: string, pattern: Pattern): MotionProfile | undefined {
   if (BY_ID[id]) return BY_ID[id];
-  if (id === "wrist-curl" || id === "shrug") return undefined; // too small a joint movement for the camera
+  if (/wrist|shrug/.test(id)) return undefined; // too small a joint movement for the camera
   for (const [re, p] of NAME_HINTS) if (re.test(id)) return p;
-  if (pattern === "carry" || /plank|carry|hold/.test(id)) return undefined;
+  if (pattern === "carry" || /plank|carry|hold|hang$/.test(id)) return undefined;
   return BY_PATTERN[pattern] ?? (pattern === "isolation" ? CURL : undefined);
 }
