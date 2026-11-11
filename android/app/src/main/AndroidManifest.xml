@@ -31,6 +31,16 @@
                 <data android:scheme="liftsmith" />
             </intent-filter>
 
+            <!-- Android App Links: links into the web app on our domain (shared routines, remix links) open here
+                 (src/lib/appLinks.ts; verified by public/.well-known/assetlinks.json). www only: the bare domain
+                 redirects, and verification doesn't follow redirects. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/app" />
+            </intent-filter>
+
         </activity>
 
         <!-- Earned app icons (src/lib/themes.ts): one launcher alias per icon, exactly one enabled (AppIconPlugin.java).

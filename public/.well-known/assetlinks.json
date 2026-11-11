@@ -1,0 +1,14 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls", "delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.getliftsmith.app",
+      "sha256_cert_fingerprints": [
+        "19:EE:ED:A5:A7:E0:40:CE:1C:D1:97:C0:48:60:D5:2C:7F:F9:7E:8C:EB:41:3B:27:7A:87:3F:70:52:D6:66:9D",
+        "A5:C6:3F:12:5A:DE:E3:D8:90:C1:0D:2E:6A:89:27:3B:EE:77:E7:EC:6B:FC:04:77:66:DB:75:2D:1D:F8:6E:41",
+        "3E:14:E8:39:66:28:29:2C:53:4F:25:BD:7B:A4:ED:BA:E4:C0:FE:1C:4D:99:10:56:75:F4:51:21:44:4F:D1:D6"
+      ]
+    }
+  }
+]

@@ -10,13 +10,12 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.
-- App Links (Android) and Universal Links (iOS) on the real domain, so workout remix links and shared routine links (`/app/#/routine/…`) open in the installed app. Android needs `public/.well-known/assetlinks.json` with the SHA-256 of the Play app signing key (Play Console › Test and release › App integrity) and an `autoVerify` intent filter for `https://www.getliftsmith.com/app/`; the iOS half is under "iOS (deferred)". Until then those links open the web app, and the in-app "Add a routine from a link" (paste) covers the phones.
 - Friends push setup (Melvin; code built 2026-11-11, [Friends](friends.md) "Push notifications"). Until these are done, Activity and the people button's dot carry everything.
   - In the Firebase console, add Firebase to the Google Cloud project `liftsmith-514303`, then add an Android app `com.getliftsmith.app`.
   - Download its `google-services.json` and save the whole file as the GitHub secret `GOOGLE_SERVICES_JSON`.
   - Give a service account (`liftsmith-admin@`, or Firebase's own Admin SDK account) the "Firebase Cloud Messaging API Admin" role, and save its JSON key in Vercel as `FCM_SERVICE_ACCOUNT_JSON` (Production and Preview).
 - Friends store answers (Melvin): retake Play's content rating questionnaire, check Target audience, and add the push token to Data safety, as listed in [Friends](friends.md) under "Store answers". The App Store age rating answers wait with iOS.
-- Profile links (`/app/#/person/<handle>`) open the web app until App Links and Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
+- Profile links (`/app/#/person/<handle>`) open the installed app on Android (App Links) and the web app on iPhone until Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
 
 ## iOS (deferred)
 

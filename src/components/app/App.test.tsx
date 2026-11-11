@@ -298,8 +298,9 @@ describe("first run to finished workout", () => {
     expect(sets.map((e) => e.type === "set" && e.exerciseId)).toEqual([a, b]);
     expect(sets.every((e) => e.type === "set" && e.superset === plan.items[0].group)).toBe(true);
 
-    // Split them mid-workout from the Coming up list.
-    await user.click(screen.getByRole("button", { name: /^Split / }));
+    // Split them mid-workout from the Coming up list. By its full name: an exercise can start with
+    // "Split" too (Split jerk on the progress bar).
+    await user.click(screen.getByRole("button", { name: `Split ${exercise(b).name} from ${exercise(a).name}` }));
     expect(useApp.getState().active!.plan.items[0].group).toBeUndefined();
   });
 

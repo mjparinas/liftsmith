@@ -34,7 +34,12 @@ describe("site header", () => {
   it("links the home page's sections as /#… so they work from any page, and offers every link in the phone menu", () => {
     render(<BlogIndex />);
     expect(NAV.filter((n) => n.href.includes("#")).every((n) => n.href.startsWith("/#"))).toBe(true);
-    const menu = within(screen.getByRole("navigation", { name: "Site menu" })).getAllByRole("link");
+    const all = within(screen.getByRole("navigation", { name: "Site menu" })).getAllByRole("link");
+    // Sign in joins the menu only on narrow phones, where the header has no room for it (CSS shows one or the other).
+    expect(all.filter((a) => a.dataset.cta === "menu-signin").map((a) => a.getAttribute("href")?.replace("/#", "#"))).toEqual([
+      "/app#/account",
+    ]);
+    const menu = all.filter((a) => a.dataset.cta !== "menu-signin");
     const bare = (h: string | null) => (h ?? "").replace(/\/$/, "");
     expect(menu.map((a) => bare(a.getAttribute("href")))).toEqual(NAV.map((n) => bare(n.href)));
   });

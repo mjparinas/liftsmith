@@ -52,7 +52,8 @@ describe("public pages stay light", () => {
 
   it("links from public pages to the app never prefetch its code", () => {
     for (const file of [
-      "src/app/page.tsx",
+      "src/components/site/HomeView.tsx",
+      "src/components/site/PricingView.tsx",
       "src/app/tools/tdee-calculator/page.tsx",
       "src/components/site/SiteChrome.tsx",
       "src/components/site/StoreBadges.tsx",

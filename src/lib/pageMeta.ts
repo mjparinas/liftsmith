@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 
 import { BRAND } from "./brand";
 import { OG_SIZE, ogImage } from "./ogImages";
+import { languageAlternates, localPath, OG_LOCALE, type SiteLang } from "./siteLang";
 
 export interface PageMetaInput {
   title: string;
@@ -18,6 +19,11 @@ export interface PageMetaInput {
   type?: "website" | "article";
   published?: string;
   modified?: string;
+  /**
+   * For a page in every site language (src/lib/siteLang.ts): the language of this copy. `path` stays the English path;
+   * the canonical address becomes this language's, and hreflang tags list every language.
+   */
+  lang?: SiteLang;
 }
 
 /** Search results cut titles at about 60 characters, so " | Liftsmith" is added only when it fits and the title
@@ -28,16 +34,18 @@ const withBrand = (title: string) => !title.includes(BRAND.name) && `${title} | 
 export function pageMeta(o: PageMetaInput): Metadata {
   const image = { url: ogImage(o.path), ...OG_SIZE, alt: o.shareTitle ?? o.title };
   const shareTitle = o.shareTitle ?? o.title;
+  const url = o.lang ? localPath(o.lang, o.path) : o.path;
   return {
     title: o.absoluteTitle || !withBrand(o.title) ? { absolute: o.title } : o.title,
     description: o.description,
-    alternates: { canonical: o.path },
+    alternates: o.lang ? { canonical: url, languages: languageAlternates(o.path) } : { canonical: url },
     openGraph: {
       type: o.type ?? "website",
       siteName: BRAND.name,
       title: shareTitle,
       description: o.description,
-      url: o.path,
+      url,
+      ...(o.lang ? { locale: OG_LOCALE[o.lang] } : {}),
       images: [image],
       ...(o.type === "article" && o.published ? { publishedTime: o.published, modifiedTime: o.modified ?? o.published } : {}),
     },

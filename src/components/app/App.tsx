@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
+import { startAppLinks } from "@/lib/appLinks";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
@@ -239,6 +240,20 @@ export function App() {
       run(fromLink);
     }
     return onSessionAction(run);
+  }, [ready]);
+  // Android App Links (appLinks.ts): a tapped link to the app on our domain opens its screen here. Waits
+  // for the store, like shortcuts, so a cold start's link lands after loading.
+  useEffect(() => {
+    if (!ready) return;
+    let stop = () => {};
+    let gone = false;
+    void startAppLinks((hash) => {
+      if (location.hash !== hash) location.hash = hash;
+    }).then((s) => (gone ? s() : (stop = s)));
+    return () => {
+      gone = true;
+      stop();
+    };
   }, [ready]);
   // Reminders: rescheduled from the latest data on open, on return to the foreground, and whenever
   // the workouts or the profile change (reminders.ts). A tap on one opens the screen it points to.

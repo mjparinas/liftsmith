@@ -99,7 +99,7 @@ export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
       },
       {
         q: "Which languages does it speak?",
-        a: "The app is in English, Spanish and French, and follows your phone's language unless you pick one in Settings.",
+        a: "The app is in English, Spanish, French, German, Italian and Japanese, and follows your phone's language unless you pick one in Settings. This site's home and pricing pages are in all six too.",
       },
     ],
   },
