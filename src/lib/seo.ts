@@ -3,6 +3,7 @@
 // app plans with, so a new exercise gets its pages and its sitemap entry without touching this file.
 import { ARTICLES, type Article } from "@/content/articles";
 import { COMPETITORS } from "@/content/compare";
+import { IMPORT_SOURCES } from "@/content/imports";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { alternatives } from "./generator";
@@ -171,6 +172,26 @@ export const TOOL_PAGES = [
     blurb: "Your estimated max from any set, with a reps-to-weight table and every formula's answer.",
   },
   {
+    path: "/tools/warm-up-calculator/",
+    name: "Warm-up calculator",
+    blurb: "The warm-up sets for any working weight on the squat, bench, deadlift, press or row, with the plates for each.",
+  },
+  {
+    path: "/tools/rpe-chart/",
+    name: "RPE chart",
+    blurb: "The weight for every rep count at every RPE and reps in reserve, from your one-rep max.",
+  },
+  {
+    path: "/tools/strength-standards/",
+    name: "Strength standards",
+    blurb: "How strong am I? One lift against lifters of your body weight, age and sex.",
+  },
+  {
+    path: "/tools/dots-calculator/",
+    name: "DOTS calculator",
+    blurb: "Your powerlifting total scored for body weight, so lifters of any size can compare.",
+  },
+  {
     path: "/tools/tdee-calculator/",
     name: "TDEE calculator",
     blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters.",
@@ -209,6 +230,7 @@ export function siteRoutes(): Route[] {
     { path: "/compare/", priority: 0.6 },
     { path: "/alternatives/fitbod/", priority: 0.7 },
     ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),
+    ...IMPORT_SOURCES.map((s) => ({ path: `/import/${s.slug}/`, priority: 0.7 })),
   ];
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });

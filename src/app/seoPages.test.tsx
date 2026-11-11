@@ -14,10 +14,15 @@ import EquipmentPage from "./equipment/[slug]/page";
 import AlternativesPage from "./exercises/[slug]/alternatives/page";
 import ExercisePage from "./exercises/[slug]/page";
 import ExercisesIndex from "./exercises/page";
+import ImportPage from "./import/[slug]/page";
 import PairPage from "./muscles/[muscle]/[equipment]/page";
 import MusclePage from "./muscles/[muscle]/page";
+import DotsPage from "./tools/dots-calculator/page";
 import OneRmPage from "./tools/one-rep-max-calculator/page";
 import PlatePage from "./tools/plate-calculator/page";
+import RpePage from "./tools/rpe-chart/page";
+import StrengthStandardsPage from "./tools/strength-standards/page";
+import WarmupPage from "./tools/warm-up-calculator/page";
 
 // The pages exist to send readers into the app (Melvin, 2026-11-09: "emphasis on the call to actions").
 const ctas = () => [...document.querySelectorAll("[data-cta]")].map((a) => a.getAttribute("data-cta")!);
@@ -66,9 +71,19 @@ describe("SEO pages", () => {
   });
 
   it("renders the indexes and the calculators", () => {
-    for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage]) {
+    for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage, WarmupPage, RpePage, StrengthStandardsPage, DotsPage]) {
       render(<P />);
       expectCtas();
+      cleanup();
+    }
+  });
+
+  it("renders the switch-from pages with their steps, calls to action and the trademark line", async () => {
+    for (const slug of ["strong", "hevy"]) {
+      render(await ImportPage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getByText(/Import workouts \(CSV\)/)).toBeTruthy();
+      expect(screen.getByText(/trademarks of their owners/)).toBeTruthy();
       cleanup();
     }
   });

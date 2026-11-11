@@ -21,7 +21,7 @@ node scripts/e2e-devices.mjs # layout on 13 phones and tablets (DEVICES=ios|andr
 DEVICE='iPhone 16' node scripts/e2e.mjs  # the playthrough on another device
 node scripts/e2e-a11y.mjs    # axe WCAG 2.2 AA on every screen
 node scripts/site-screenshots.mjs # real app screenshots for the home page (public/screens/)
-STILLS=1 npm run build:static && node scripts/og-images.mjs # social preview cards (public/og/) and exercise stills (public/stills/), after adding pages
+STILLS=1 npm run build:static && node scripts/og-images.mjs --missing # preview cards (public/og/) and exercise stills (public/stills/) for new pages
 node scripts/play-capture.mjs && node scripts/play-compose.mjs && node scripts/play-video.mjs # Google Play art (docs/PLAY_LISTING.md)
 npx cap sync                 # copy out/ into the Android and iOS shells (after npm run build:static)
 ```

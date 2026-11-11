@@ -7,7 +7,7 @@ import { TOOL_PAGES } from "@/lib/seo";
 
 export const metadata: Metadata = pageMeta({
   title: "Free tools for lifters",
-  description: `Free calculators from ${BRAND.name}: plates per side, one-rep max and TDEE. No sign-up, nothing stored.`,
+  description: `Free calculators from ${BRAND.name}: plates per side, warm-up sets, one-rep max, an RPE chart, strength standards, DOTS and TDEE. No sign-up, nothing stored.`,
   path: "/tools/",
 });
 
