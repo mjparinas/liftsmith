@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "lab.barSpeed.title": "Camera bar speed",
+  "lab.barSpeed.body":
+    "While the camera counts reps, it also shows how fast the bar moves, how much it has slowed since your fastest rep, and when it's time to end the set. Add your height in Your stats for speeds in m/s.",
   "lab.row": "Labs",
   "lab.rowNote": "Try experimental features early",
   "lab.title": "Labs",
@@ -20,6 +23,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "lab.barSpeed.title": "Velocidad de la barra con la cámara",
+  "lab.barSpeed.body":
+    "Mientras la cámara cuenta repeticiones, también muestra lo rápido que sube la barra, cuánto se ha frenado desde tu repetición más rápida y cuándo conviene terminar la serie. Añade tu altura en Tus datos para ver la velocidad en m/s.",
   "lab.row": "Labs",
   "lab.rowNote": "Prueba funciones experimentales antes que nadie",
   "lab.title": "Labs",
@@ -34,6 +40,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "lab.barSpeed.title": "Vitesse de barre par la caméra",
+  "lab.barSpeed.body":
+    "Pendant que la caméra compte les répétitions, elle montre aussi la vitesse de la barre, son ralentissement depuis votre répétition la plus rapide et le moment de finir la série. Ajoutez votre taille dans Vos mesures pour des vitesses en m/s.",
   "lab.row": "Labs",
   "lab.rowNote": "Essayez les fonctions expérimentales en avant-première",
   "lab.title": "Labs",
@@ -49,6 +58,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "lab.barSpeed.title": "Stangengeschwindigkeit per Kamera",
+  "lab.barSpeed.body":
+    "Während die Kamera Wiederholungen zählt, zeigt sie auch, wie schnell sich die Stange bewegt, wie stark sie seit deiner schnellsten Wiederholung langsamer wurde und wann du den Satz beenden solltest. Trag deine Größe unter Deine Daten ein, um Geschwindigkeiten in m/s zu sehen.",
   "lab.row": "Labs",
   "lab.rowNote": "Probiere experimentelle Funktionen früher aus",
   "lab.title": "Labs",
@@ -64,6 +76,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "lab.barSpeed.title": "Velocità del bilanciere con la fotocamera",
+  "lab.barSpeed.body":
+    "Mentre la fotocamera conta le ripetizioni, mostra anche quanto velocemente si muove il bilanciere, quanto ha rallentato rispetto alla tua ripetizione più veloce e quando è il momento di chiudere la serie. Aggiungi la tua altezza in I tuoi dati per le velocità in m/s.",
   "lab.row": "Labs",
   "lab.rowNote": "Prova in anteprima le funzioni sperimentali",
   "lab.title": "Labs",
@@ -78,6 +93,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "lab.barSpeed.title": "カメラでバースピード",
+  "lab.barSpeed.body":
+    "カメラがレップを数えている間、バーの速さ、いちばん速いレップからどれだけ落ちたか、セットを終えるタイミングも表示します。m/s で表示するには「あなたのデータ」に身長を入力してください。",
   "lab.row": "Labs",
   "lab.rowNote": "試験中の機能をいち早く試せます",
   "lab.title": "Labs",

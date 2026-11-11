@@ -27,6 +27,13 @@ export const FLAGS = {
     label: "Phone-motion rep counting",
     description: "Counting reps from the phone's motion sensors on the workout screen. Off because it was unreliable in tests.",
   },
+  /** Labs: bar speed from the camera while counting reps, with a stop-or-keep-going line. */
+  labBarSpeed: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: camera bar speed",
+    description: "Bar speed from the camera while counting reps, with how much it has dropped and when to end the set.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

@@ -27,6 +27,7 @@
     "src/lib/recovery.ts",
     "src/lib/reorder.ts",
     "src/lib/replan.ts",
+    "src/lib/reps/barSpeed.ts",
     "src/lib/restReady.ts",
     "src/lib/routines.ts",
     "src/lib/sides.ts",

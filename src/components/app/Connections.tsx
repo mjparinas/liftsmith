@@ -2,7 +2,8 @@
 
 // Settings › Connected apps (#/connections; docs/decisions/connected-apps.md): Health Connect or Apple Health
 // (status, what's allowed, last sync, Sync now), the Bluetooth heart rate monitor (a test before the gym),
-// the Garmin watch app, Strava, Oura and WHOOP (through the account), the music app for Today's playlist, and what's coming later.
+// the Garmin watch app, Strava, Oura and WHOOP (through the account), and the music app for Today's playlist.
+// Samsung Health comes in through Health Connect (a line on the Android card says how); bar speed is a camera lab.
 import { useEffect, useRef, useState } from "react";
 
 import { platform, useAccount } from "@/lib/auth";
@@ -184,6 +185,7 @@ function HealthCard() {
         </>
       )}
       <p className="mt-3 text-xs text-muted">{t("conn.health.via", { store })}</p>
+      {p === "android" && <p className="mt-2 text-xs text-muted">{t("conn.health.samsung")}</p>}
     </div>
   );
 }
@@ -484,8 +486,6 @@ function MusicCard() {
   );
 }
 
-const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.velocity"];
-
 export function Connections() {
   return (
     <div className="pb-2">
@@ -511,16 +511,6 @@ export function Connections() {
       </Section>
       <Section title={t("conn.music.title")} icon="play">
         <MusicCard />
-      </Section>
-      <Section title={t("conn.later.title")} icon="flag">
-        <div className="card px-4 py-3 text-sm">
-          <p className="text-muted">{t("conn.later.what")}</p>
-          <ol className="mt-2 list-decimal space-y-1 pl-5">
-            {LATER.map((k) => (
-              <li key={k}>{t(k)}</li>
-            ))}
-          </ol>
-        </div>
       </Section>
     </div>
   );

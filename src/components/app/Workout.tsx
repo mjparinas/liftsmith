@@ -519,6 +519,7 @@ export function Workout() {
                   exerciseId={ex.id}
                   pattern={ex.pattern}
                   body={bodyFor(profile.sex)}
+                  heightCm={profile.heightCm}
                   bpm={bpm}
                   hrTrend={active.hr}
                   prefs={countPrefs}

@@ -4,6 +4,14 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "count.speed.label": "Bar speed",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct}% of best",
+  "count.speed.stop": "Bar speed is down {loss}% from your fastest rep. A good place to end the set.",
+  "count.speed.left": {
+    one: "About {count} rep left in the tank: bar speed is down {loss}%.",
+    other: "About {count} reps left in the tank: bar speed is down {loss}%.",
+  },
   "count.toggle": "Count reps with the camera",
   "count.start": "Count reps",
   "count.reps": "reps",
@@ -27,6 +35,14 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "count.speed.label": "Velocidad",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct} % del mejor",
+  "count.speed.stop": "La velocidad ha bajado un {loss} % desde tu repetición más rápida. Buen momento para terminar la serie.",
+  "count.speed.left": {
+    one: "Te queda más o menos {count} repetición: la velocidad ha bajado un {loss} %.",
+    other: "Te quedan unas {count} repeticiones: la velocidad ha bajado un {loss} %.",
+  },
   "count.toggle": "Contar repeticiones con la cámara",
   "count.start": "Contar reps",
   "count.reps": "reps",
@@ -49,6 +65,14 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "count.speed.label": "Vitesse",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct} % du meilleur",
+  "count.speed.stop": "La vitesse a baissé de {loss} % depuis votre répétition la plus rapide. C’est le bon moment pour finir la série.",
+  "count.speed.left": {
+    one: "Il vous reste environ {count} répétition : la vitesse a baissé de {loss} %.",
+    other: "Il vous reste environ {count} répétitions : la vitesse a baissé de {loss} %.",
+  },
   "count.toggle": "Compter les répétitions avec la caméra",
   "count.start": "Compter",
   "count.reps": "rép.",
@@ -71,6 +95,14 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "count.speed.label": "Tempo",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct} % vom besten",
+  "count.speed.stop": "Das Tempo ist {loss} % unter deiner schnellsten Wiederholung. Ein guter Moment, den Satz zu beenden.",
+  "count.speed.left": {
+    one: "Noch etwa {count} Wiederholung im Tank: Das Tempo ist {loss} % gesunken.",
+    other: "Noch etwa {count} Wiederholungen im Tank: Das Tempo ist {loss} % gesunken.",
+  },
   "count.toggle": "Wiederholungen mit der Kamera zählen",
   "count.start": "Wdh. zählen",
   "count.reps": "Wdh.",
@@ -93,6 +125,14 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "count.speed.label": "Velocità",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "{pct}% del migliore",
+  "count.speed.stop": "La velocità è scesa del {loss}% rispetto alla ripetizione più veloce. Buon momento per chiudere la serie.",
+  "count.speed.left": {
+    one: "Ti resta circa {count} ripetizione: la velocità è scesa del {loss}%.",
+    other: "Ti restano circa {count} ripetizioni: la velocità è scesa del {loss}%.",
+  },
   "count.toggle": "Conta le ripetizioni con la fotocamera",
   "count.start": "Conta ripetizioni",
   "count.reps": "rip.",
@@ -115,6 +155,11 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "count.speed.label": "バースピード",
+  "count.speed.ms": "{speed} m/s",
+  "count.speed.pct": "最速の {pct}%",
+  "count.speed.stop": "いちばん速いレップよりバースピードが {loss}% 落ちています。ここでセットを終えるのがおすすめです。",
+  "count.speed.left": { other: "あと {count} レップほど余力があります（バースピードは {loss}% 低下）。" },
   "count.toggle": "カメラでレップを数える",
   "count.start": "レップを数える",
   "count.reps": "回",

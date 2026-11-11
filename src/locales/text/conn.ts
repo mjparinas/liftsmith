@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "conn.health.samsung":
+    "Samsung Health: in the Samsung Health app, open Settings › Health Connect and turn on what it shares. Its readings and workouts then come in here.",
   "conn.title": "Connected apps",
   "conn.row": "Connected apps",
   "conn.rowNote": "Health, heart rate, Garmin, Strava, Oura, WHOOP and music",
@@ -99,15 +101,13 @@ export const en = {
   "conn.music.push": "push day",
   "conn.music.normal": "training",
   "conn.music.recover": "easy day",
-  "conn.later.title": "Coming later",
-  "conn.later.what": "On our list, in this order:",
-  "conn.later.samsung": "Samsung Health, directly",
-  "conn.later.velocity": "Bar speed sensors",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "conn.health.samsung":
+    "Samsung Health: en la app Samsung Health, abre Ajustes › Health Connect y activa lo que comparte. Sus datos y entrenamientos llegarán aquí.",
   "conn.title": "Apps conectadas",
   "conn.row": "Apps conectadas",
   "conn.rowNote": "Salud, frecuencia cardiaca, Garmin, Strava, Oura, WHOOP y música",
@@ -209,13 +209,11 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.music.push": "un día fuerte",
   "conn.music.normal": "entrenar",
   "conn.music.recover": "un día fácil",
-  "conn.later.title": "Más adelante",
-  "conn.later.what": "En nuestra lista, en este orden:",
-  "conn.later.samsung": "Samsung Health, directamente",
-  "conn.later.velocity": "Sensores de velocidad de la barra",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "conn.health.samsung":
+    "Samsung Health : dans l’app Samsung Health, ouvrez Paramètres › Health Connect et activez ce qu’elle partage. Ses mesures et séances arrivent alors ici.",
   "conn.title": "Apps connectées",
   "conn.row": "Apps connectées",
   "conn.rowNote": "Santé, fréquence cardiaque, Garmin, Strava, Oura, WHOOP et musique",
@@ -317,13 +315,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.music.push": "un jour fort",
   "conn.music.normal": "s’entraîner",
   "conn.music.recover": "un jour léger",
-  "conn.later.title": "Plus tard",
-  "conn.later.what": "Sur notre liste, dans cet ordre :",
-  "conn.later.samsung": "Samsung Health, en direct",
-  "conn.later.velocity": "Capteurs de vitesse de barre",
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "conn.health.samsung":
+    "Samsung Health: Öffne in der Samsung-Health-App Einstellungen › Health Connect und schalte ein, was geteilt wird. Dann kommen ihre Messwerte und Workouts hier an.",
   "conn.title": "Verbundene Apps",
   "conn.row": "Verbundene Apps",
   "conn.rowNote": "Gesundheit, Herzfrequenz, Garmin, Strava, Oura, WHOOP und Musik",
@@ -425,13 +421,11 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.music.push": "Push-Tag",
   "conn.music.normal": "Training",
   "conn.music.recover": "lockeren Tag",
-  "conn.later.title": "Kommt später",
-  "conn.later.what": "Auf unserer Liste, in dieser Reihenfolge:",
-  "conn.later.samsung": "Samsung Health, direkt",
-  "conn.later.velocity": "Sensoren für die Stangengeschwindigkeit",
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "conn.health.samsung":
+    "Samsung Health: nell’app Samsung Health apri Impostazioni › Health Connect e attiva ciò che condivide. I suoi dati e allenamenti arriveranno qui.",
   "conn.title": "App collegate",
   "conn.row": "App collegate",
   "conn.rowNote": "Salute, frequenza cardiaca, Garmin, Strava, Oura, WHOOP e musica",
@@ -534,13 +528,11 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.music.push": "giorno da spingere",
   "conn.music.normal": "allenamento",
   "conn.music.recover": "giorno leggero",
-  "conn.later.title": "In arrivo",
-  "conn.later.what": "Nella nostra lista, in quest’ordine:",
-  "conn.later.samsung": "Samsung Health, direttamente",
-  "conn.later.velocity": "Sensori di velocità del bilanciere",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "conn.health.samsung":
+    "Samsung Health：Samsung Health アプリで［設定］›［ヘルスコネクト］を開き、共有する項目をオンにしてください。測定値とワークアウトがここに届きます。",
   "conn.title": "連携アプリ",
   "conn.row": "連携アプリ",
   "conn.rowNote": "ヘルスケア、心拍数、Garmin、Strava、Oura、WHOOP、音楽",
@@ -637,8 +629,4 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.music.push": "プッシュデー",
   "conn.music.normal": "トレーニング",
   "conn.music.recover": "軽めの日",
-  "conn.later.title": "今後の予定",
-  "conn.later.what": "予定している連携（この順番で）：",
-  "conn.later.samsung": "Samsung Health との直接連携",
-  "conn.later.velocity": "バースピードセンサー",
 };
