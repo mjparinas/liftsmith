@@ -103,6 +103,18 @@
 				<string>liftsmith</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.getliftsmith.app.garmin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>liftsmith-ciq</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>gcm-ciq</string>
 	</array>
 	<key>NSSupportsLiveActivities</key>
 	<true/>

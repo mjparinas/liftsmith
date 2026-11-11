@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">Aucune séance en cours</string>
+    <string id="NoneBody">Lancez-en une sur votre téléphone et elle s’affichera ici.</string>
+    <string id="Rest">Repos</string>
+    <string id="Next">Ensuite : $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START : noter la série</string>
+    <string id="HintAdd">DOWN : +30 s</string>
+</strings>

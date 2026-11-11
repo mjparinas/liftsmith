@@ -15,6 +15,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(AppIconPlugin())
         bridge?.registerPluginInstance(AccountSignInPlugin())
         bridge?.registerPluginInstance(HealthWorkoutPlugin())
+        bridge?.registerPluginInstance(GarminPlugin())
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true
@@ -61,6 +62,10 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         WatchLink.shared.onAction = { [weak self] a in self?.notifyListeners("action", data: ["action": a], retainUntilConsumed: true) }
         WatchLink.shared.onHeartRate = { [weak self] bpm in self?.notifyListeners("heartRate", data: ["bpm": bpm]) }
         WatchLink.shared.start()
+        // The Garmin watch app (GarminLink.swift, garmin/): the same taps and heart rate.
+        GarminLink.shared.onAction = WatchLink.shared.onAction
+        GarminLink.shared.onHeartRate = WatchLink.shared.onHeartRate
+        GarminLink.shared.restore()
     }
 
     @objc private func shortcut(_ note: Notification) {
@@ -86,6 +91,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
     @objc func update(_ call: CAPPluginCall) {
         if #available(iOS 16.2, *) { updateActivity(call) }
         WatchLink.shared.update(watchState(call))
+        GarminLink.shared.update(watchState(call))
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [restId])
         let restUntil = call.getDouble("restUntil") ?? 0
@@ -180,6 +186,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
 
     @objc func stop(_ call: CAPPluginCall) {
         WatchLink.shared.stop()
+        GarminLink.shared.stop()
         endActivity()
         let center = UNUserNotificationCenter.current()
         center.removePendingNotificationRequests(withIdentifiers: [restId])
