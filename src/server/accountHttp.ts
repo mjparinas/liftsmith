@@ -34,8 +34,19 @@ export async function readJson(req: Request, max = 8_000): Promise<unknown | und
 /** Without a database the account routes answer 503, and the app keeps everything on the device. */
 export const hasDb = () => !!(process.env.DATABASE_URL || process.env.TURSO_DATABASE_URL || process.env.NODE_ENV !== "production");
 
+/** Marks a 401 that means "this session is gone", the only answer that signs a device out (sync.ts). A 401 from
+ *  anything else on the way (a proxy, deployment protection) carries no marker, so the device stays signed in. */
+export const SIGNED_OUT = { error: "Signed out. Sign in again.", signedOut: true } as const;
+
 export async function signedIn(req: Request): Promise<{ accountId: string; session: string } | Response> {
   if (!hasDb()) return reply(req, 503, { error: "Accounts aren't set up yet." });
-  const s = await sessionOf(req).catch(() => null);
-  return s ?? reply(req, 401, { error: "Signed out. Sign in again." });
+  let s: { accountId: string; session: string } | null;
+  try {
+    s = await sessionOf(req);
+  } catch {
+    // The database didn't answer (a timeout, a cold start). That says nothing about the session, so it must not be a
+    // 401: the device would sign itself out. It tries again on the next sync.
+    return reply(req, 503, { error: "Couldn't check your sign-in. Try again in a moment." });
+  }
+  return s ?? reply(req, 401, SIGNED_OUT);
 }
