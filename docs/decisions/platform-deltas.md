@@ -14,7 +14,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 | Calendar | Read and write | Read and write | `.ics` download, no busy times | Browsers can't reach the calendar |
 | AirPods Pro heart rate | None | Yes (planned) | None | Apple only |
 | Volume follows intensity | Yes (planned extra) | None | None | iOS can't set system volume or control other apps. It was skipped before; it can come back as an Android extra |
-| Samsung Health Data SDK | Yes (planned) | None | None | Samsung devices only |
+| Samsung Health | Through Health Connect (a line on the Health Connect card says how to share); no direct Data SDK link (partner approval, nothing extra) | None (Samsung Health on iPhone doesn't share) | None | Samsung devices only |
 | Garmin watch app | Paired watches found through Garmin Connect | The lifter picks the watch once in Garmin Connect (iOS apps can't ask for the list) | None (a page can't reach a Garmin watch) | Garmin's companion SDKs differ per platform |
 | Date of birth and sex | Asked in the app | From Apple Health | Asked in the app | Health Connect has neither |
 | Fitbit Air data | Health Connect | Apple Health, one way only | None | Fitbit syncs to Apple Health one way |

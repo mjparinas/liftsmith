@@ -102,6 +102,30 @@ describe("the counting stage", () => {
     localStorage.removeItem(FLAG_CACHE_KEY);
   });
 
+  it("shows bar speed and when to end the set (camera bar speed lab)", async () => {
+    cacheFlags({ labRepCount: true, repMotion: true, labBarSpeed: true });
+    stage({ prefs: { on: true, facing: "user", source: "motion" } });
+    await act(async () => {});
+    expect(screen.getByTestId("bar-speed")).toHaveTextContent("–");
+    const sim = simulateSet(["full", "full", "full", "full"], 11);
+    act(() => {
+      for (const x of imuSamples(sim, 12, { romM: 0.5, downFirst: true }))
+        motion.cb!({ t: x.t, fused: { up: x.up, rot: x.rot }, raw: [x.x, x.y, x.z] });
+    });
+    expect(screen.getByTestId("bar-speed")).toHaveTextContent(/m\/s|% of best/);
+    expect(screen.getByRole("status")).toHaveTextContent(/end the set|left in the tank/);
+    expect(screen.getByRole("button", { name: /bar speed/i })).toBeInTheDocument();
+    localStorage.removeItem(FLAG_CACHE_KEY);
+  });
+
+  it("shows no bar speed without its lab", async () => {
+    cacheFlags({ labRepCount: true, repMotion: true });
+    stage({ prefs: { on: true, facing: "user", source: "motion" } });
+    await act(async () => {});
+    expect(screen.queryByTestId("bar-speed")).toBeNull();
+    localStorage.removeItem(FLAG_CACHE_KEY);
+  });
+
   it("doesn't count while resting", async () => {
     cacheFlags({ labRepCount: true, repMotion: true });
     const { props } = stage({ prefs: { on: true, facing: "user", source: "motion" }, counting: false });

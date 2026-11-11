@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "gloss.barSpeed.title": "Bar speed",
+  "gloss.barSpeed.body":
+    "How fast the bar goes up on each rep, measured by the camera. As a set gets hard, the bar slows down, even when the reps still feel fine.\nWhen it's about a third slower than your fastest rep, you have roughly one good rep left, so ending the set there keeps the work hard without grinding. It's an estimate: a side-on view and good light help.",
   "gloss.fitnessAge.title": "Fitness age",
   "gloss.fitnessAge.body":
     "The age at which a typical healthy person of your sex has your VO₂ max, from a large Norwegian study of healthy adults.\nIt's a fitness estimate, not a health check. Hard cardio lowers it within weeks.",
@@ -84,6 +87,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "gloss.barSpeed.title": "Velocidad de la barra",
+  "gloss.barSpeed.body":
+    "Lo rápido que sube la barra en cada repetición, medido por la cámara. Cuando la serie se pone dura, la barra se frena, aunque las repeticiones aún se sientan bien.\nCuando va un tercio más lenta que tu repetición más rápida, te queda más o menos una buena repetición, así que terminar ahí mantiene el trabajo duro sin forzar. Es una estimación: ayuda verte de lado y tener buena luz.",
   "gloss.fitnessAge.title": "Edad física",
   "gloss.fitnessAge.body":
     "La edad a la que una persona sana típica de tu sexo tiene tu VO₂ máx, según un gran estudio noruego con adultos sanos.\nEs una estimación de forma física, no un chequeo de salud. El cardio intenso la baja en semanas.",
@@ -162,6 +168,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "gloss.barSpeed.title": "Vitesse de barre",
+  "gloss.barSpeed.body":
+    "La vitesse de montée de la barre à chaque répétition, mesurée par la caméra. Quand une série devient dure, la barre ralentit, même si les répétitions semblent encore faciles.\nQuand elle est environ un tiers plus lente que votre répétition la plus rapide, il vous reste à peu près une bonne répétition : finir là garde l’effort intense sans forcer. C’est une estimation : une vue de profil et une bonne lumière aident.",
   "gloss.fitnessAge.title": "Âge physique",
   "gloss.fitnessAge.body":
     "L’âge auquel une personne en bonne santé typique de votre sexe a votre VO₂ max, d’après une grande étude norvégienne sur des adultes en bonne santé.\nC’est une estimation de la forme physique, pas un bilan de santé. Le cardio intense le fait baisser en quelques semaines.",
@@ -240,6 +249,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "gloss.barSpeed.title": "Stangengeschwindigkeit",
+  "gloss.barSpeed.body":
+    "Wie schnell die Stange bei jeder Wiederholung nach oben geht, gemessen von der Kamera. Wenn ein Satz schwer wird, wird die Stange langsamer, auch wenn sich die Wiederholungen noch gut anfühlen.\nIst sie etwa ein Drittel langsamer als deine schnellste Wiederholung, hast du ungefähr noch eine gute Wiederholung. Wer dort aufhört, trainiert hart, ohne sich zu quälen. Es ist eine Schätzung: Seitenansicht und gutes Licht helfen.",
   "gloss.fitnessAge.title": "Fitnessalter",
   "gloss.fitnessAge.body":
     "Das Alter, in dem ein typischer gesunder Mensch deines Geschlechts deinen VO₂max hat, nach einer großen norwegischen Studie mit gesunden Erwachsenen.\nEs ist eine Fitness-Schätzung, keine Gesundheitsuntersuchung. Hartes Ausdauertraining senkt es innerhalb weniger Wochen.",
@@ -318,6 +330,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "gloss.barSpeed.title": "Velocità del bilanciere",
+  "gloss.barSpeed.body":
+    "Quanto velocemente sale il bilanciere a ogni ripetizione, misurato dalla fotocamera. Quando la serie diventa dura, il bilanciere rallenta, anche se le ripetizioni sembrano ancora facili.\nQuando è circa un terzo più lento della tua ripetizione più veloce, ti resta più o meno una buona ripetizione: fermarti lì mantiene il lavoro intenso senza forzare. È una stima: una vista di lato e una buona luce aiutano.",
   "gloss.fitnessAge.title": "Età fitness",
   "gloss.fitnessAge.body":
     "L’età in cui una persona sana tipica del tuo sesso ha il tuo VO₂ max, secondo un grande studio norvegese su adulti sani.\nÈ una stima della forma fisica, non un controllo medico. Il cardio intenso la abbassa nel giro di qualche settimana.",
@@ -396,6 +411,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "gloss.barSpeed.title": "バースピード",
+  "gloss.barSpeed.body":
+    "各レップでバーが上がる速さを、カメラで測ったものです。セットがきつくなると、まだ楽に感じていてもバーは遅くなります。\nいちばん速いレップより 3 分の 1 ほど遅くなったら、余力はおよそ 1 レップ。そこでセットを終えれば、無理に粘らずしっかり追い込めます。目安の値なので、横から映し、明るい場所で使うと正確になります。",
   "gloss.fitnessAge.title": "フィットネス年齢",
   "gloss.fitnessAge.body":
     "ノルウェーの健康な成人を対象にした大規模な研究にもとづき、同じ性別の健康な人があなたと同じ VO₂max を持つ年齢です。\n健康診断ではなく、体力の目安です。きつめの有酸素運動を続ければ数週間で下がります。",

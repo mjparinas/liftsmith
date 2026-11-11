@@ -10,7 +10,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
   3. **Fitness services: Strava, Oura, WHOOP.** They need an account (the roadmap's "connecting one explains that it creates a free account"), so a signed-out lifter sees what each does and one **Sign in or create an account** button. Signed in, each row shows connected (Strava shows the athlete's name), not connected, or **Coming soon** when the server has no keys for it yet, with Connect or Disconnect.
   4. **Garmin watch** (2026-11-10): each Garmin watch the phone knows, and whether it's ready, needs the Liftsmith watch app, or isn't connected; **Choose my watch** on iOS (Garmin Connect's picker). Details in [Watch apps](watch-apps.md).
   5. **Music:** None, Spotify, Apple Music or YouTube Music (`profile.connections.music`, synced with the profile).
-  6. **Coming later**, in order: Samsung Health directly, bar speed sensors. (The Garmin watch app moved out of this list on 2026-11-10.)
+  6. There is no "Coming later" list any more (2026-11-11): Melvin asked for every item on it to be built, and chose how ("Camera bar speed; Samsung via Health"). The Garmin watch app got its own card; **Samsung Health** keeps coming in through Health Connect, and the Android Health Connect card has a line saying how to switch that on in Samsung Health (`conn.health.samsung`), because Samsung's own Data SDK needs a partner approval and gives nothing Health Connect doesn't already carry; **bar speed** comes from the camera as a lab (Settings › Labs › Camera bar speed, [Camera rep counting](camera-rep-counting.md)) instead of a Bluetooth sensor, because the sensors' protocols are closed and few lifters own one.
 
 ## Workouts saved to Health Connect and Apple Health (2026-11-10)
 

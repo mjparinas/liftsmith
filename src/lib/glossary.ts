@@ -33,6 +33,7 @@ const TERMS = [
   "bmi",
   "restDrop",
   "fitnessAge",
+  "barSpeed",
 ] as const;
 
 export type Term = (typeof TERMS)[number];
