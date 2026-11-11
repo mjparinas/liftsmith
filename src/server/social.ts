@@ -34,7 +34,7 @@ const fail = (code: number, error: string): Result => ({ code, body: { error } }
 export const HIDE_AFTER = 3;
 export const PAGE = 20;
 /** Per account per day, so one account can't flood others. */
-export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300 };
+export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50 };
 /** Handles nobody can take: they'd look official. */
 const RESERVED = new Set([
   "admin",
@@ -207,6 +207,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
+    { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
 }
@@ -350,10 +351,16 @@ export async function people(accountId: string, b: Record<string, unknown>): Pro
         : which === "following"
           ? `SELECT ${PEOPLE}, f.created_at AS at FROM follows f JOIN social_profiles sp ON sp.account_id = f.followee_id
          WHERE f.follower_id = ? AND ${visible} ORDER BY f.accepted, f.created_at DESC LIMIT 500`
-          : which === "blocked"
-            ? `SELECT ${PEOPLE}, bl.created_at AS at FROM blocks bl JOIN social_profiles sp ON sp.account_id = bl.blocked_id
+          : which === "friends"
+            ? // People who follow each other with the lifter: who a workout can be sent to.
+              `SELECT ${PEOPLE}, f.created_at AS at FROM follows f JOIN social_profiles sp ON sp.account_id = f.followee_id
+         WHERE f.follower_id = ?1 AND f.accepted = 1 AND ${visible}
+           AND EXISTS (SELECT 1 FROM follows b WHERE b.follower_id = f.followee_id AND b.followee_id = ?1 AND b.accepted = 1)
+         ORDER BY sp.name LIMIT 500`
+            : which === "blocked"
+              ? `SELECT ${PEOPLE}, bl.created_at AS at FROM blocks bl JOIN social_profiles sp ON sp.account_id = bl.blocked_id
          WHERE bl.blocker_id = ? ORDER BY bl.created_at DESC LIMIT 500`
-            : "";
+              : "";
   if (!sql) return fail(400, "Bad request.");
   const rows = await query(sql, [accountId]);
   return ok({ people: rows.map((r) => ({ handle: s(r.handle), name: s(r.name), at: n(r.at) })) });
@@ -683,7 +690,9 @@ const ACTIVITY = `
     FROM post_likes l JOIN posts p ON p.id = l.post_id WHERE p.account_id = ?1 AND l.account_id != ?1
   UNION ALL
   SELECT 'comment', c.account_id, c.created_at, c.post_id, c.body
-    FROM post_comments c JOIN posts p ON p.id = c.post_id WHERE p.account_id = ?1 AND c.account_id != ?1 AND c.hidden = 0`;
+    FROM post_comments c JOIN posts p ON p.id = c.post_id WHERE p.account_id = ?1 AND c.account_id != ?1 AND c.hidden = 0
+  UNION ALL
+  SELECT 'sent', w.from_id, w.created_at, w.code, w.name FROM sent_workouts w WHERE w.to_id = ?1`;
 const ACTIVITY_VISIBLE = `a JOIN social_profiles sp ON sp.account_id = a.who
   WHERE sp.suspended = 0 AND a.who NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)`;
 
@@ -706,7 +715,8 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
     handle: s(r.handle),
     name: s(r.name),
     at: n(r.at),
-    ...(r.post_id ? { postId: s(r.post_id) } : {}),
+    // A sent workout carries its routine code where a like or comment carries the post.
+    ...(r.post_id ? (s(r.kind) === "sent" ? { code: s(r.post_id) } : { postId: s(r.post_id) }) : {}),
     ...(r.text ? { text: s(r.text) } : {}),
   }));
   const seenAt = n(mine.seen_at);
@@ -717,6 +727,43 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
 // --- The one route ---
 
 type Op = (accountId: string, b: Record<string, unknown>, now?: number) => Promise<Result>;
+// --- Sending a workout to a friend ---
+
+/** A routine share code (routineShare.ts): `r1~<name>~<exercise>.<sets>[.s]~…`. The app checks the exercises when it opens. */
+const CODE_RE = /^r1~[A-Za-z0-9_-]{0,220}(~[A-Za-z0-9_-]{1,80}\.(10|[1-9])(\.s)?){1,20}$/;
+
+/**
+ * Sends a workout (as a routine code, so nothing personal) to someone the lifter and they both follow. It shows in
+ * their Activity with the name, and opening it shows the routine with Save. Blocking either way stops it.
+ */
+export async function send(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const code = s(b.code);
+  if (!CODE_RE.test(code)) return fail(400, "code");
+  // The name is read from the code itself, so what the friend sees when they open it went through the filter too.
+  const raw = Buffer.from(code.split("~")[1] ?? "", "base64url").toString("utf8");
+  const name = raw.trim() ? checkText(raw, SOCIAL_LIMITS.name) : ({ ok: true, text: "" } as const);
+  if (!name.ok) return fail(400, `name.${name.error}`);
+  const p = await byHandle(s(b.handle));
+  const to = p ? s(p.account_id) : "";
+  if (!p || n(p.suspended) || to === accountId || (await blockedEither(accountId, to))) return fail(404, "noOne");
+  const there = await follow(accountId, to);
+  const back = await follow(to, accountId);
+  if (!there?.accepted || !back?.accepted) return fail(403, "notFriends");
+  if (!(await limit(accountId, "send", now))) return fail(429, "slow");
+  await run("INSERT INTO sent_workouts (id, from_id, to_id, name, code, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+    newId(),
+    accountId,
+    to,
+    name.text,
+    code,
+    now,
+  ]);
+  return ok();
+}
+
 export const OPS: Record<string, Op> = {
   me: (a) => me(a),
   join,
@@ -740,6 +787,7 @@ export const OPS: Record<string, Op> = {
   comment,
   uncomment: (a, b) => uncomment(a, b),
   activity: (a, _b, now) => activity(a, now),
+  send,
 };
 
 export async function handle(accountId: string, body: unknown, now = Date.now()): Promise<Result> {

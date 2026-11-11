@@ -16,6 +16,7 @@ import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem } from "@/lib/ty
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { go } from "./router";
+import { SendToFriend } from "./SendToFriend";
 import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
@@ -395,6 +396,7 @@ function RoutineEditor({
           {t("rt.save")}
         </Button>
         {shareable && <ShareRoutine routine={initial} />}
+        {shareable && <SendToFriend name={initial.name} items={initial.items} />}
         {onDelete && (
           <Button kind="danger" className="w-full" onClick={onDelete}>
             {t("rt.delete")}

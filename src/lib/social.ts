@@ -44,6 +44,8 @@ export function socialError(e: unknown): string {
     suspended: "friends.err.suspended",
     off: "friends.err.off",
     old: "friends.err.old",
+    notFriends: "friends.err.notFriends",
+    code: "friends.err.code",
     signedOut: "friends.err.signedOut",
     "Signed out. Sign in again.": "friends.err.signedOut",
   };

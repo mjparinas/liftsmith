@@ -88,15 +88,17 @@ export interface FeedComment {
   canDelete: boolean;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
   name: string;
   at: number;
   postId?: string;
-  /** The comment's text, for comments. */
+  /** The comment's text, for comments; the workout's name, for a sent workout. */
   text?: string;
+  /** A sent workout's routine code (opens #/routine/<code>). */
+  code?: string;
 }
 
 export type ReportKind = "post" | "comment" | "profile";

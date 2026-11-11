@@ -29,6 +29,19 @@ Melvin, 2026-11-11: "make public accounts available on the web through a link an
 - **Sharing:** People › Share my profile shares the web page when the profile is public, the in-app link otherwise; Friends settings has "See my public page" while it's public.
 - Tests: `src/server/publicProfile.test.ts` (private shows nothing, the page and its escaping, the sitemap's rules, suspension, language and units) and the public cases in `social.test.ts`.
 
+## Sending a workout to a friend (stage 2)
+
+The original ask: "sending a workout directly to gym buddies".
+
+- **Send to a friend** sits on Done (this workout) and in a saved routine's editor, next to Share routine. Both appear only once the lifter has joined Friends.
+- It opens a sheet of the lifter's **friends: people they follow who follow them back** (`people` with `list: "friends"`). Tap a name to send. Mutual follows only, so nobody can push workouts at strangers. Blocking either way stops it, and there's a limit of 50 sends a day.
+- **What travels is a routine code**, the same one routine links use (`encodeRoutine`). It holds the exercises, their set counts and supersets, and nothing else: no weights, notes or anything personal. From Done, the name is "Workout on <date>".
+- **The server checks the code's shape** (`CODE_RE`). It reads the name out of the code itself and puts it through the word filter and the link check, so the name the friend sees on opening is the one that was checked. It's stored in `sent_workouts`.
+- **The friend sees it in Activity** as "<name> sent you a workout: <workout>". It counts toward the unread dot. Tapping it opens `#/routine/<code>`, the shared-routine preview with Save.
+- Leaving Friends or deleting the account deletes sends both ways.
+- Analytics: `feature` `social_send`.
+- Tests: the sending cases in `social.test.ts`, and the send-then-Activity flow in `Friends.test.tsx`.
+
 ## Safety
 
 - **Blocking** removes follows both ways; neither sees the other's profile, posts or comments again (lookups answer "no one with that handle"), and the blocked person isn't told. Unblock from People › Blocked.

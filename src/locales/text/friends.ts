@@ -139,6 +139,16 @@ export const en = {
   "friends.publicOff": "Only people who follow you see your workouts.",
   "friends.publicPage": "See my public page",
   "friends.person.public": "Public profile",
+  "friends.send": "Send to a friend",
+  "friends.send.body": "Pick a friend. They get the exercises and sets to save as a routine, never your weights or notes.",
+  "friends.send.none": "No one to send to yet",
+  "friends.send.noneBody": "You can send to people you follow who follow you back.",
+  "friends.send.sent": "Sent to {name}.",
+  "friends.send.to": "Send to {name}",
+  "friends.send.doneName": "Workout on {date}",
+  "friends.act.sent": "{name} sent you a workout: {workout}",
+  "friends.err.notFriends": "You can only send to people you follow who follow you back.",
+  "friends.err.code": "That workout can’t be sent.",
 } as const;
 
 type Key = keyof typeof en;
@@ -282,6 +292,16 @@ export const es: Partial<Record<Key, Message>> = {
   "friends.publicOff": "Solo quienes te siguen ven tus entrenamientos.",
   "friends.publicPage": "Ver mi página pública",
   "friends.person.public": "Perfil público",
+  "friends.send": "Enviar a un amigo",
+  "friends.send.body": "Elige a un amigo. Recibe los ejercicios y las series para guardarlos como rutina, nunca tus pesos ni tus notas.",
+  "friends.send.none": "Aún no hay a quién enviar",
+  "friends.send.noneBody": "Puedes enviar a quienes sigues y te siguen.",
+  "friends.send.sent": "Enviado a {name}.",
+  "friends.send.to": "Enviar a {name}",
+  "friends.send.doneName": "Entrenamiento del {date}",
+  "friends.act.sent": "{name} te envió un entrenamiento: {workout}",
+  "friends.err.notFriends": "Solo puedes enviar a quienes sigues y te siguen.",
+  "friends.err.code": "Ese entrenamiento no se puede enviar.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -422,6 +442,17 @@ export const fr: Partial<Record<Key, Message>> = {
   "friends.publicOff": "Seules les personnes qui te suivent voient tes séances.",
   "friends.publicPage": "Voir ma page publique",
   "friends.person.public": "Profil public",
+  "friends.send": "Envoyer à un ami",
+  "friends.send.body":
+    "Choisis un ami. Il reçoit les exercices et les séries à enregistrer comme routine, jamais tes charges ni tes notes.",
+  "friends.send.none": "Personne à qui envoyer pour l’instant",
+  "friends.send.noneBody": "Tu peux envoyer aux personnes que tu suis et qui te suivent.",
+  "friends.send.sent": "Envoyé à {name}.",
+  "friends.send.to": "Envoyer à {name}",
+  "friends.send.doneName": "Séance du {date}",
+  "friends.act.sent": "{name} t’a envoyé une séance : {workout}",
+  "friends.err.notFriends": "Tu ne peux envoyer qu’aux personnes que tu suis et qui te suivent.",
+  "friends.err.code": "Cette séance ne peut pas être envoyée.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -561,6 +592,16 @@ export const de: Partial<Record<Key, Message>> = {
   "friends.publicOff": "Nur Leute, die dir folgen, sehen deine Workouts.",
   "friends.publicPage": "Meine öffentliche Seite ansehen",
   "friends.person.public": "Öffentliches Profil",
+  "friends.send": "An Freund senden",
+  "friends.send.body": "Wähle einen Freund. Er bekommt die Übungen und Sätze zum Speichern als Routine, nie deine Gewichte oder Notizen.",
+  "friends.send.none": "Noch niemand zum Senden",
+  "friends.send.noneBody": "Du kannst an Leute senden, denen du folgst und die dir folgen.",
+  "friends.send.sent": "An {name} gesendet.",
+  "friends.send.to": "An {name} senden",
+  "friends.send.doneName": "Workout vom {date}",
+  "friends.act.sent": "{name} hat dir ein Workout geschickt: {workout}",
+  "friends.err.notFriends": "Du kannst nur an Leute senden, denen du folgst und die dir folgen.",
+  "friends.err.code": "Dieses Workout kann nicht gesendet werden.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -701,6 +742,16 @@ export const it: Partial<Record<Key, Message>> = {
   "friends.publicOff": "Solo chi ti segue vede i tuoi allenamenti.",
   "friends.publicPage": "Vedi la mia pagina pubblica",
   "friends.person.public": "Profilo pubblico",
+  "friends.send": "Invia a un amico",
+  "friends.send.body": "Scegli un amico. Riceve gli esercizi e le serie da salvare come routine, mai i tuoi pesi o le tue note.",
+  "friends.send.none": "Ancora nessuno a cui inviare",
+  "friends.send.noneBody": "Puoi inviare a chi segui e ti segue.",
+  "friends.send.sent": "Inviato a {name}.",
+  "friends.send.to": "Invia a {name}",
+  "friends.send.doneName": "Allenamento del {date}",
+  "friends.act.sent": "{name} ti ha inviato un allenamento: {workout}",
+  "friends.err.notFriends": "Puoi inviare solo a chi segui e ti segue.",
+  "friends.err.code": "Questo allenamento non può essere inviato.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -841,4 +892,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "friends.publicOff": "ワークアウトはフォロワーだけに表示されます。",
   "friends.publicPage": "公開ページを見る",
   "friends.person.public": "公開プロフィール",
+  "friends.send": "友達に送る",
+  "friends.send.body": "友達を選んでください。種目とセット数がルーティンとして届きます。重量やメモは送られません。",
+  "friends.send.none": "まだ送れる相手がいません",
+  "friends.send.noneBody": "相互フォローの相手に送れます。",
+  "friends.send.sent": "{name} さんに送りました。",
+  "friends.send.to": "{name} さんに送る",
+  "friends.send.doneName": "{date} のワークアウト",
+  "friends.act.sent": "{name} さんからワークアウトが届きました：{workout}",
+  "friends.err.notFriends": "相互フォローの相手にだけ送れます。",
+  "friends.err.code": "このワークアウトは送れません。",
 };

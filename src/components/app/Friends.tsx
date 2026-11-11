@@ -725,7 +725,9 @@ function Activity({ onPeople }: { onPeople: () => void }) {
         ? t("friends.act.request", { name: i.name })
         : i.kind === "like"
           ? t("friends.act.like", { name: i.name })
-          : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+          : i.kind === "sent"
+            ? t("friends.act.sent", { name: i.name, workout: i.text || t("rt.defaultName") })
+            : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (
@@ -734,7 +736,9 @@ function Activity({ onPeople }: { onPeople: () => void }) {
             <li key={`${i.kind}-${i.handle}-${i.at}-${n}`}>
               <button
                 type="button"
-                onClick={() => (i.kind === "request" ? onPeople() : go("person", i.handle))}
+                onClick={() =>
+                  i.kind === "request" ? onPeople() : i.kind === "sent" && i.code ? go("routine", i.code) : go("person", i.handle)
+                }
                 className="press flex w-full items-center gap-3 px-4 py-3 text-left"
               >
                 <Avatar name={i.name} size={36} />

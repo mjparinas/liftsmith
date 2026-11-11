@@ -251,7 +251,12 @@ try {
         { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
       ],
     },
-    activity: { items: [{ kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" }] },
+    activity: {
+      items: [
+        { kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" },
+        { kind: "sent", handle: "blair", name: "Blair", at: Date.now() - 120_000, text: "Leg day", code: "r1~TGVnIGRheQ~back-squat.4" },
+      ],
+    },
     people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
     lookup: {
       person: {

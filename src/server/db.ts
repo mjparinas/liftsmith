@@ -474,6 +474,17 @@ const SCHEMA = [
     UNIQUE (reporter_id, kind, target_id)
   )`,
   `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
+  // A workout sent to a friend (social.ts `send`): a routine code and its name, shown in their Activity.
+  `CREATE TABLE IF NOT EXISTS sent_workouts (
+    id TEXT PRIMARY KEY,
+    from_id TEXT NOT NULL,
+    to_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS sent_workouts_to ON sent_workouts (to_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS sent_workouts_from ON sent_workouts (from_id)`,
   // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
   `CREATE TABLE IF NOT EXISTS coach_invites (
     code TEXT PRIMARY KEY,

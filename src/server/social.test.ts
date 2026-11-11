@@ -131,6 +131,30 @@ describe("public profiles", () => {
   });
 });
 
+describe("sending a workout", () => {
+  const code = (name: string) => `r1~${Buffer.from(name).toString("base64url")}~back-squat.4~bench-press.3.s~barbell-row.3`;
+  it("goes only to someone who follows each other with the sender, and shows in their activity", async () => {
+    await friends(); // blair follows alex
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).body.error).toBe("notFriends");
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    expect((await call("acc-a", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "blair" }]);
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).code).toBe(200);
+    const items = (await call("acc-b", "activity")).body.items as { kind: string; text?: string; code?: string }[];
+    expect(items.find((i) => i.kind === "sent")).toMatchObject({ text: "Leg day", code: code("Leg day") });
+  });
+
+  it("refuses junk codes, links in the name and blocked people", async () => {
+    await friends();
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    expect((await call("acc-a", "send", { handle: "blair", code: "<script>" })).body.error).toBe("code");
+    expect((await call("acc-a", "send", { handle: "blair", code: code("see spam.com") })).body.error).toBe("name.link");
+    await call("acc-b", "block", { handle: "alex" });
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).code).toBe(404);
+  });
+});
+
 describe("posting and the feed", () => {
   it("shows followers the summary only, once per workout", async () => {
     await friends();
@@ -219,7 +243,8 @@ describe("safety", () => {
     await call("acc-b", "like", { id });
     await call("acc-b", "comment", { id, text: "Nice" });
     await deleteAccount("acc-b");
-    for (const table of ["post_likes", "post_comments", "follows"]) expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
+    for (const table of ["post_likes", "post_comments", "follows", "sent_workouts"])
+      expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
     expect(await query("SELECT * FROM social_profiles WHERE account_id = 'acc-b'")).toHaveLength(0);
   });
 });

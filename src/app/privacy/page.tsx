@@ -130,10 +130,11 @@ export default function Privacy() {
           who you&apos;ve blocked, and what you post: the workouts you choose to post (or every workout, if you turn that on), with their
           time, sets, exercises and best sets (weights only if you show them), plus your likes and comments. Your followers see your posts;
           by default you approve each follower first. If you make your profile public, anyone can see it and the workouts you post, in the
-          app and on a web page at your handle that search engines may list; turn Public profile off and the page goes away. A post never
-          includes heart rate, body weight or fat, measurements, cycle data, injuries, gyms or places. If you report something, we keep the
-          report and who made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its
-          settings, or delete your account, and all of this is deleted.
+          app and on a web page at your handle that search engines may list; turn Public profile off and the page goes away. If you send a
+          workout to a friend, we keep its name and exercises (no weights or notes) so it shows in their activity. A post never includes
+          heart rate, body weight or fat, measurements, cycle data, injuries, gyms or places. If you report something, we keep the report
+          and who made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its settings,
+          or delete your account, and all of this is deleted.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
