@@ -21,22 +21,20 @@ export function UndoChip({ now, warmup }: { now: number; warmup: boolean }) {
   const u = s.undoable;
   if (!u || now > u.until || u.prev.sessionId !== s.active?.sessionId) return null;
   return (
-    <div className="mb-2 flex justify-center">
-      <button
-        type="button"
-        onClick={() => {
-          haptic("tick");
-          sound.back();
-          s.undoLast();
-        }}
-        aria-label={warmup ? t("pol.undoWarm") : t("pol.undoLabel")}
-        className="press animate-rise inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface/90 px-4 text-sm font-semibold text-muted backdrop-blur hover:text-ink"
-        data-testid="undo-set"
-      >
-        <Icon name="undo" size={16} />
-        {t("pol.undo")}
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={() => {
+        haptic("tick");
+        sound.back();
+        s.undoLast();
+      }}
+      aria-label={warmup ? t("pol.undoWarm") : t("pol.undoLabel")}
+      className="press animate-rise inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface/90 px-4 text-sm font-semibold text-muted backdrop-blur hover:text-ink"
+      data-testid="undo-set"
+    >
+      <Icon name="undo" size={16} />
+      {t("pol.undo")}
+    </button>
   );
 }
 

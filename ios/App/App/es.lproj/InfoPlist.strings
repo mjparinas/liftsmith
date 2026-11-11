@@ -6,3 +6,5 @@
 "NSHealthUpdateUsageDescription" = "Liftsmith guarda en Salud tus entrenamientos terminados, las calorías y la frecuencia cardiaca.";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith añade tus días de entrenamiento al calendario y, si lo activas, mira cuándo estás ocupado para ofrecerte un entrenamiento que encaje. Solo mira las horas, nunca de qué tratan tus eventos.";
 "NSCalendarsUsageDescription" = "Liftsmith añade tus días de entrenamiento al calendario y, si lo activas, mira cuándo estás ocupado para ofrecerte un entrenamiento que encaje. Solo mira las horas, nunca de qué tratan tus eventos.";
+"NSMicrophoneUsageDescription" = "Si activas el registro de series por voz en Labs, Liftsmith escucha cuando tocas el micrófono para que digas una serie, como «100 por 8». La voz se reconoce en este iPhone y nunca se graba ni se envía.";
+"NSSpeechRecognitionUsageDescription" = "Liftsmith convierte lo que dices en una serie registrada, en este iPhone. Tu voz nunca se graba ni se envía.";

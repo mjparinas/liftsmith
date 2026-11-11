@@ -55,6 +55,13 @@ export const FLAGS = {
     label: "Labs: trainer mode",
     description: "Coaches invite clients and see their workouts in Settings › Coaching. Being someone's client needs no lab.",
   },
+  /** Labs: say a set ("100 for 8", "too easy") on the workout screen, heard by the phone's on-device recognizer. */
+  labVoiceLog: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: voice set logging",
+    description: 'A microphone on the workout screen: say "100 for 8" or "too easy" to log a set, recognized on the device.',
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

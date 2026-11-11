@@ -52,6 +52,7 @@ import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
+import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -288,6 +289,8 @@ export function Workout() {
   const lastOfAll = !warming && !finished && setsLogged + 1 >= totalSets;
   // Undo sits above the big button, so the page leaves room for it while it's there.
   const undoShown = !!s.undoable && now <= s.undoable.until;
+  // Voice set logging is a lab (Settings › Labs, Pro): a microphone above Log set while it's on.
+  const voiceLog = !finished && !!ex && !ex.cardio && labOn("labVoiceLog");
 
   const log = () => {
     haptic("tap");
@@ -405,7 +408,7 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className={docked ? (undoShown ? "pb-[17.5rem]" : "pb-56") : undoShown ? "pb-[14.5rem]" : "pb-44"}>
+    <div className={docked ? (undoShown || voiceLog ? "pb-[17.5rem]" : "pb-56") : undoShown || voiceLog ? "pb-[14.5rem]" : "pb-44"}>
       <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button
@@ -660,7 +663,12 @@ export function Workout() {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
-          <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
+          {(undoShown || voiceLog) && (
+            <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
+              <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
+              {voiceLog && <VoiceLog unit={unit} onLog={log} paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen} />}
+            </div>
+          )}
           {finished ? (
             <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>
               {t("workout.finish")}

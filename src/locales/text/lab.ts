@@ -28,6 +28,9 @@ export const en = {
   "lab.trainer.title": "Trainer mode",
   "lab.trainer.body":
     "Coach other lifters: make an invite code in Settings › Coaching, then see each client's workouts with what to act on first. Your clients don't need Pro.",
+  "lab.voiceLog.title": "Voice set logging",
+  "lab.voiceLog.body":
+    'Adds a microphone above Log set on the workout screen. Tap it and say "100 for 8", "8 reps", "too easy" or "undo". Speech is recognized on your phone and never recorded or sent, so it needs a phone that can do that in your language.',
 };
 
 type Key = keyof typeof en;
@@ -58,6 +61,9 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.trainer.title": "Modo entrenador",
   "lab.trainer.body":
     "Entrena a otras personas: crea un código de invitación en Ajustes › Entrenador y mira los entrenamientos de cada cliente con lo primero que conviene atender. Tus clientes no necesitan Pro.",
+  "lab.voiceLog.title": "Registrar series con la voz",
+  "lab.voiceLog.body":
+    "Añade un micrófono encima de Registrar serie en la pantalla de entrenamiento. Tócalo y di «100 por 8», «8 repeticiones», «demasiado fácil» o «deshacer». La voz se reconoce en tu teléfono y nunca se graba ni se envía, así que necesita un teléfono que pueda hacerlo en tu idioma.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -87,6 +93,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.trainer.title": "Mode coach",
   "lab.trainer.body":
     "Coachez d'autres pratiquants : créez un code d'invitation dans Réglages › Coaching, puis voyez les séances de chaque client avec ce qu'il faut traiter en premier. Vos clients n'ont pas besoin de Pro.",
+  "lab.voiceLog.title": "Saisie des séries à la voix",
+  "lab.voiceLog.body":
+    "Ajoute un micro au-dessus de Valider la série sur l'écran d'entraînement. Touchez-le et dites « 100 pour 8 », « 8 répétitions », « trop facile » ou « annuler ». La parole est reconnue sur votre téléphone et n'est jamais enregistrée ni envoyée, il faut donc un téléphone qui sait le faire dans votre langue.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -116,6 +125,9 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.trainer.title": "Trainermodus",
   "lab.trainer.body":
     "Betreue andere: Erstell unter Einstellungen › Coaching einen Einladungscode und sieh die Trainings jedes Kunden, mit dem, was zuerst zu tun ist. Deine Kunden brauchen kein Pro.",
+  "lab.voiceLog.title": "Sätze per Stimme eintragen",
+  "lab.voiceLog.body":
+    "Fügt auf dem Trainingsbildschirm über Satz eintragen ein Mikrofon hinzu. Tipp darauf und sag „100 für 8“, „8 Wiederholungen“, „zu leicht“ oder „rückgängig“. Die Sprache wird auf deinem Handy erkannt und nie aufgenommen oder gesendet, daher braucht es ein Handy, das das in deiner Sprache kann.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -144,6 +156,9 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.trainer.title": "Modalità coach",
   "lab.trainer.body":
     "Segui altre persone: crea un codice d'invito in Impostazioni › Coaching e guarda gli allenamenti di ogni cliente con la prima cosa da fare. I tuoi clienti non hanno bisogno di Pro.",
+  "lab.voiceLog.title": "Registrare le serie con la voce",
+  "lab.voiceLog.body":
+    "Aggiunge un microfono sopra Registra serie nella schermata dell'allenamento. Toccalo e di' «100 per 8», «8 ripetizioni», «troppo facile» o «annulla». La voce viene riconosciuta sul telefono e non viene mai registrata né inviata, quindi serve un telefono che sappia farlo nella tua lingua.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -172,4 +187,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.trainer.title": "トレーナーモード",
   "lab.trainer.body":
     "ほかの人を指導できます。「設定 › コーチング」で招待コードを作成すると、各クライアントのワークアウトと、まず取り組むべきことが表示されます。クライアントに Pro は必要ありません。",
+  "lab.voiceLog.title": "声でセットを記録",
+  "lab.voiceLog.body":
+    "ワークアウト画面の「セットを記録」の上にマイクを追加します。タップして「100キロで8回」「8回」「簡単すぎ」「取り消し」のように言ってください。音声はスマートフォン上で認識され、録音や送信はされないため、お使いの言語でそれができるスマートフォンが必要です。",
 };

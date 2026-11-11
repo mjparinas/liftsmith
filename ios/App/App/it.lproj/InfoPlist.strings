@@ -6,3 +6,5 @@
 "NSHealthUpdateUsageDescription" = "Liftsmith salva in Salute gli allenamenti completati, con calorie e frequenza cardiaca.";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith aggiunge i tuoi giorni di allenamento al calendario e, se lo attivi, guarda quando sei impegnato per proporti un allenamento che entri nella tua giornata. Legge solo gli orari, mai il contenuto dei tuoi eventi.";
 "NSCalendarsUsageDescription" = "Liftsmith aggiunge i tuoi giorni di allenamento al calendario e, se lo attivi, guarda quando sei impegnato per proporti un allenamento che entri nella tua giornata. Legge solo gli orari, mai il contenuto dei tuoi eventi.";
+"NSMicrophoneUsageDescription" = "Se attivi la registrazione delle serie con la voce in Labs, Liftsmith ascolta quando tocchi il microfono, così puoi dire una serie, come «100 per 8». La voce viene riconosciuta su questo iPhone e non viene mai registrata né inviata.";
+"NSSpeechRecognitionUsageDescription" = "Liftsmith trasforma quello che dici in una serie registrata, su questo iPhone. La tua voce non viene mai registrata né inviata.";
