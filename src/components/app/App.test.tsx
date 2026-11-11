@@ -298,6 +298,23 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().active!.plan.items[0].group).toBeUndefined();
   });
 
+  it("shows the live workout on Today, read-only, and says where to link or reorder it", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Linked from the workout screen: Today's list follows the live workout, not the plan it started from.
+    useApp.getState().toggleSuperset(1);
+    const live = useApp.getState().active!.plan.items;
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    const rows = within(screen.getByTestId("plan-list")).getAllByRole("listitem");
+    expect(rows[1].getAttribute("data-superset")).toBe(live[1].group);
+    expect(rows[2].getAttribute("data-superset")).toBe(live[1].group);
+    // No link or move buttons that would quietly change the workout from here.
+    expect(screen.queryAllByRole("button", { name: /^(Superset|Split) / })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: /\. Move / })).toHaveLength(0);
+    expect(screen.getByTestId("superset-hint").textContent).toMatch(/Your workout is running.*Coming up on the workout screen/);
+  });
+
   it("imports a Strong export from Settings, once", async () => {
     const user = userEvent.setup();
     await onboard(user);

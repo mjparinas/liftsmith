@@ -39,6 +39,7 @@ export const en = {
   "td.ssLinked": "Linked exercises alternate: one set of each, then one rest. Tap a link to split them.",
   "td.ssLinkedSaves": "Linked exercises alternate: one set of each, then one rest. Saves about {n} min. Tap a link to split them.",
   "td.ssHint": "Tap a link between two exercises to do them as a superset.",
+  "td.ssLive": "Your workout is running. To link or reorder what's left, use {section} on the workout screen.",
   "td.whyMuscles": "Why these muscles",
   "td.programDay": "{day} of {program}. {note}.",
   "td.programDayAdaptive": "{day} of {program}: recovered muscles from today’s group, furthest from this week’s {sets}-set goal. {note}.",
@@ -90,6 +91,7 @@ export const es: Partial<Record<Key, Message>> = {
   "td.ssLinkedSaves":
     "Los ejercicios enlazados se alternan: una serie de cada uno y luego un descanso. Ahorras unos {n} min. Toca un enlace para separarlos.",
   "td.ssHint": "Toca el enlace entre dos ejercicios para hacerlos en superserie.",
+  "td.ssLive": "Tu entrenamiento está en curso. Para enlazar o reordenar lo que queda, usa {section} en la pantalla del entrenamiento.",
   "td.whyMuscles": "Por qué estos músculos",
   "td.programDay": "{day} de {program}. {note}.",
   "td.programDayAdaptive":
@@ -140,6 +142,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "td.ssLinkedSaves":
     "Les exercices liés alternent : une série de chaque, puis un repos. Environ {n} min gagnées. Touchez un lien pour les séparer.",
   "td.ssHint": "Touchez le lien entre deux exercices pour les faire en superset.",
+  "td.ssLive": "Votre séance est en cours. Pour lier ou réordonner la suite, utilisez {section} sur l'écran de la séance.",
   "td.whyMuscles": "Pourquoi ces muscles",
   "td.programDay": "{day} de {program}. {note}.",
   "td.programDayAdaptive":
@@ -190,6 +193,7 @@ export const de: Partial<Record<Key, Message>> = {
   "td.ssLinkedSaves":
     "Verbundene Übungen wechseln sich ab: je ein Satz, dann eine Pause. Spart etwa {n} Min. Tippe auf eine Verbindung, um sie zu trennen.",
   "td.ssHint": "Tippe auf eine Verbindung zwischen zwei Übungen, um sie als Supersatz zu machen.",
+  "td.ssLive": "Dein Training läuft. Um den Rest zu verbinden oder umzuordnen, nutze {section} im Trainingsbildschirm.",
   "td.whyMuscles": "Warum diese Muskeln",
   "td.programDay": "{day} von {program}. {note}.",
   "td.programDayAdaptive":
@@ -240,6 +244,7 @@ export const it: Partial<Record<Key, Message>> = {
   "td.ssLinkedSaves":
     "Gli esercizi uniti si alternano: una serie di ciascuno, poi un riposo. Risparmi circa {n} min. Tocca un collegamento per separarli.",
   "td.ssHint": "Tocca il collegamento tra due esercizi per farli in superserie.",
+  "td.ssLive": "L'allenamento è in corso. Per unire o riordinare il resto, usa {section} nella schermata dell'allenamento.",
   "td.whyMuscles": "Perché questi muscoli",
   "td.programDay": "{day} di {program}. {note}.",
   "td.programDayAdaptive":
@@ -289,6 +294,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "td.ssLinked": "つないだ種目は交互に行います。各1セットずつ行ってから1回休憩。リンクをタップすると分けられます。",
   "td.ssLinkedSaves": "つないだ種目は交互に行います。各1セットずつ行ってから1回休憩。約{n}分短縮。リンクをタップすると分けられます。",
   "td.ssHint": "2つの種目の間のリンクをタップすると、スーパーセットにできます。",
+  "td.ssLive": "ワークアウト中です。残りの種目をつないだり並べ替えたりするには、ワークアウト画面の「{section}」を使ってください。",
   "td.whyMuscles": "この筋肉を選んだ理由",
   "td.programDay": "{program}の{day}。{note}。",
   "td.programDayAdaptive": "{program}の{day}：今日のグループのうち回復済みで、今週の目標{sets}セットから最も遠い筋肉。{note}。",

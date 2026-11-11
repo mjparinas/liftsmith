@@ -124,6 +124,10 @@ export function Today() {
   const fixed = !!preview?.program?.fixed;
   // Every recommendation says why (why.ts): one line per exercise, one sentence for the day's call.
   const why = useMemo(() => (preview ? whyContext(preview, events, profile, now) : null), [preview, events, profile, now]);
+  // While a workout runs, the list shows the live workout and can't be changed here: linking and
+  // reordering what's left happen in one place, Coming up on the workout screen.
+  const live = !!active;
+  const items = active?.plan.items ?? preview?.items ?? [];
 
   return (
     <div className="pb-28">
@@ -380,22 +384,22 @@ export function Today() {
 
       {preview && preview.items.length > 0 ? (
         <>
-          <Section title={t("td.planTitle", { count: preview.items.length, min: preview.estMinutes })} icon="dumbbell">
+          <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
             <ol className="stagger card overflow-hidden" data-testid="plan-list">
-              {preview.items.map((it, i) => {
+              {items.map((it, i) => {
                 const ex = exercise(it.exerciseId);
                 const hue = muscleHue(it.focus);
-                const ss = supersetLabel(preview.items, i);
-                const joinsPrev = i > 0 && linkedToNext(preview.items, i - 1);
-                const joinsNext = linkedToNext(preview.items, i);
-                const look = reorder.style(i);
-                const picked = reorder.picked === i;
+                const ss = supersetLabel(items, i);
+                const joinsPrev = i > 0 && linkedToNext(items, i - 1);
+                const joinsNext = linkedToNext(items, i);
+                const look = live ? { className: "", css: {} } : reorder.style(i);
+                const picked = !live && reorder.picked === i;
                 // Supersets read as one block: a shared tint, one accent bracket down the left that runs
                 // across the rows, and a dashed join where the link button sits on the line between them.
                 return (
                   <li
                     key={it.exerciseId}
-                    {...reorder.row(i)}
+                    {...(live ? {} : reorder.row(i))}
                     data-superset={it.group ?? undefined}
                     className={`animate-rise relative flex select-none items-center gap-3 px-4 py-3.5 transition-shadow ${i > 0 ? (joinsPrev ? "border-t border-dashed border-accent/40" : "border-t border-line/70") : ""} ${ss ? "bg-accent/10" : ""} ${look.className}`}
                     style={{ animationDelay: `${i * 40}ms`, ...look.css }}
@@ -406,18 +410,27 @@ export function Today() {
                       aria-hidden
                     />
                     {/* The number is the button for moving this exercise without dragging (and by keyboard). */}
-                    <button
-                      type="button"
-                      data-no-drag
-                      onClick={() => reorder.setPicked(picked ? null : i)}
-                      aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
-                      aria-pressed={picked}
-                      className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
-                      style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
-                    >
-                      {i + 1}
-                    </button>
-                    <div className={`min-w-0 flex-1 ${preview.items.length > 1 ? "max-[389px]:pr-9" : ""}`}>
+                    {live ? (
+                      <span
+                        className="num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold"
+                        style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                      >
+                        {i + 1}
+                      </span>
+                    ) : (
+                      <button
+                        type="button"
+                        data-no-drag
+                        onClick={() => reorder.setPicked(picked ? null : i)}
+                        aria-label={t("pol.moveNumbered", { n: i + 1, name: ex.name })}
+                        aria-pressed={picked}
+                        className={`press num grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-bold ${picked ? "ring-2 ring-accent" : ""}`}
+                        style={{ background: `color-mix(in srgb, ${hue} 16%, transparent)`, color: hue }}
+                      >
+                        {i + 1}
+                      </button>
+                    )}
+                    <div className={`min-w-0 flex-1 ${items.length > 1 && !live ? "max-[389px]:pr-9" : ""}`}>
                       {ss && (
                         <div className="flex items-center gap-1 truncate text-xs font-semibold uppercase tracking-[0.08em] text-accent">
                           <Icon name="link" size={12} />
@@ -444,7 +457,7 @@ export function Today() {
                       <MoveButtons
                         name={ex.name}
                         canUp={i > 0}
-                        canDown={i < preview.items.length - 1}
+                        canDown={i < items.length - 1}
                         onUp={() => reorder.step(i, -1)}
                         onDown={() => reorder.step(i, 1)}
                         onDone={() => reorder.setPicked(null)}
@@ -455,18 +468,18 @@ export function Today() {
                       </span>
                     ) : (
                       <span
-                        className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${preview.items.length > 1 ? "hidden min-[390px]:inline" : ""}`}
+                        className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-medium ${items.length > 1 && !live ? "hidden min-[390px]:inline" : ""}`}
                         style={{ borderColor: `color-mix(in srgb, ${hue} 35%, transparent)`, color: hue }}
                       >
                         {MUSCLE_LABEL[it.focus]}
                       </span>
                     )}
                     {/* Sits on the line between this exercise and the one above, which is the pair it joins. */}
-                    {i > 0 && (
+                    {i > 0 && !live && (
                       <LinkToggle
                         className="absolute -top-[22px] right-3 z-10"
                         on={joinsPrev}
-                        first={exercise(preview.items[i - 1].exerciseId).name}
+                        first={exercise(items[i - 1]!.exerciseId).name}
                         second={ex.name}
                         onToggle={() => toggleSuperset(i - 1)}
                       />
@@ -475,18 +488,24 @@ export function Today() {
                 );
               })}
             </ol>
-            {preview.items.length > 1 &&
+            {items.length > 1 &&
               (() => {
-                const grouped = preview.items.some((x) => x.group);
+                const grouped = items.some((x) => x.group);
                 const saved = grouped
                   ? // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                    Math.round((planSeconds(preview.items.map(({ group: _g, ...x }) => x)) - planSeconds(preview.items)) / 60)
+                    Math.round((planSeconds(items.map(({ group: _g, ...x }) => x)) - planSeconds(items)) / 60)
                   : 0;
                 return (
                   <p className="mt-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="superset-hint">
                     <Icon name="link" size={14} className="mt-[3px] shrink-0" />
                     <span>
-                      {grouped ? (saved > 0 ? t("td.ssLinkedSaves", { n: saved }) : t("td.ssLinked")) : t("td.ssHint")}
+                      {live
+                        ? t("td.ssLive", { section: t("workout.comingUp") })
+                        : grouped
+                          ? saved > 0
+                            ? t("td.ssLinkedSaves", { n: saved })
+                            : t("td.ssLinked")
+                          : t("td.ssHint")}
                       <Info term="superset" />
                     </span>
                   </p>
