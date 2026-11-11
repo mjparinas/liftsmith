@@ -568,12 +568,13 @@ export interface MeasureEvent extends EventBase {
 }
 
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
-export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing";
+export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein";
 
 /**
  * One day's reading of a health measure from Health Connect or Apple Health (the health twin, twin.ts):
  * hours asleep for the night that ended that day, the day's average HRV (ms), resting heart rate (bpm),
- * steps, VO2 max (mL/kg/min) or overnight breathing rate (breaths a minute). The id holds the metric,
+ * steps, VO2 max (mL/kg/min), overnight breathing rate (breaths a minute), or calories (`kcalIn`) and grams of
+ * protein eaten that day, from a food app (finished days only; the food coach's notes, insights.ts). The id holds the metric,
  * day and value, so a re-import of the same number adds nothing; when a day's number changes (more
  * samples came in), the reading with the latest `at` wins. Health data: it stays on the device (and the
  * lifter's own sync), never analytics, feedback or share links.
