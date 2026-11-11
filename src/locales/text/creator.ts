@@ -19,6 +19,10 @@ export const en = {
   "creator.lockedNone": "Codes can only be added before a trial or subscription starts.",
   "creator.okOffer": "Code {code} applied: its price shows on the plans.",
   "creator.ended": "The code {code} has ended.",
+  "creator.lifetimeOk": "Code {code} redeemed: you have Pro for life on this account, on every device you sign in on.",
+  "creator.lifetimeSignIn": "Code {code} gives Pro for life. Sign in so it stays with you on every device.",
+  "creator.lifetimeSignInButton": "Sign in to get Pro for life",
+  "creator.lifetimeHeld": "This account already has Pro for life.",
 } as const;
 
 type Key = keyof typeof en;
@@ -39,6 +43,10 @@ export const es: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "Los códigos solo se pueden añadir antes de empezar una prueba o suscripción.",
   "creator.okOffer": "Código {code} aplicado: su precio aparece en los planes.",
   "creator.ended": "El código {code} ya no está disponible.",
+  "creator.lifetimeOk": "Código {code} canjeado: tienes Pro de por vida en esta cuenta, en cada dispositivo donde inicies sesión.",
+  "creator.lifetimeSignIn": "El código {code} da Pro de por vida. Inicia sesión para que te acompañe en todos tus dispositivos.",
+  "creator.lifetimeSignInButton": "Inicia sesión para obtener Pro de por vida",
+  "creator.lifetimeHeld": "Esta cuenta ya tiene Pro de por vida.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -57,6 +65,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "Un code ne peut être ajouté qu'avant le début d'un essai ou d'un abonnement.",
   "creator.okOffer": "Code {code} appliqué : son prix s'affiche sur les offres.",
   "creator.ended": "Le code {code} n'est plus disponible.",
+  "creator.lifetimeOk": "Code {code} utilisé : vous avez Pro à vie sur ce compte, sur chaque appareil où vous vous connectez.",
+  "creator.lifetimeSignIn": "Le code {code} donne Pro à vie. Connectez-vous pour le garder sur tous vos appareils.",
+  "creator.lifetimeSignInButton": "Se connecter pour obtenir Pro à vie",
+  "creator.lifetimeHeld": "Ce compte a déjà Pro à vie.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -76,6 +88,10 @@ export const de: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "Codes lassen sich nur hinzufügen, bevor eine Testphase oder ein Abo beginnt.",
   "creator.okOffer": "Code {code} eingelöst: Sein Preis wird bei den Tarifen angezeigt.",
   "creator.ended": "Der Code {code} ist abgelaufen.",
+  "creator.lifetimeOk": "Code {code} eingelöst: Du hast Pro auf Lebenszeit mit diesem Konto, auf jedem Gerät, auf dem du dich anmeldest.",
+  "creator.lifetimeSignIn": "Der Code {code} gibt dir Pro auf Lebenszeit. Melde dich an, damit es dir auf jedem Gerät bleibt.",
+  "creator.lifetimeSignInButton": "Anmelden und Pro auf Lebenszeit holen",
+  "creator.lifetimeHeld": "Dieses Konto hat schon Pro auf Lebenszeit.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -94,6 +110,10 @@ export const it: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "I codici si possono aggiungere solo prima che inizi una prova o un abbonamento.",
   "creator.okOffer": "Codice {code} applicato: il suo prezzo compare nei piani.",
   "creator.ended": "Il codice {code} è scaduto.",
+  "creator.lifetimeOk": "Codice {code} riscattato: hai Pro a vita su questo account, su ogni dispositivo in cui accedi.",
+  "creator.lifetimeSignIn": "Il codice {code} dà Pro a vita. Accedi perché resti con te su ogni dispositivo.",
+  "creator.lifetimeSignInButton": "Accedi per avere Pro a vita",
+  "creator.lifetimeHeld": "Questo account ha già Pro a vita.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -112,4 +132,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "コードはお試しやサブスクリプションの開始前にしか追加できません。",
   "creator.okOffer": "コード {code} を適用しました：価格はプランに表示されます。",
   "creator.ended": "コード {code} は終了しました。",
+  "creator.lifetimeOk": "コード {code} を引き換えました：このアカウントは永久に Pro です。サインインしたすべての端末で使えます。",
+  "creator.lifetimeSignIn": "コード {code} で Pro が永久に使えます。すべての端末で使えるよう、サインインしてください。",
+  "creator.lifetimeSignInButton": "サインインして永久 Pro を受け取る",
+  "creator.lifetimeHeld": "このアカウントはすでに永久 Pro です。",
 };

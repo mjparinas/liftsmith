@@ -5,6 +5,7 @@
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
 import { forgetAll } from "./connect";
+import { hasLifetimePro } from "./creators";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
@@ -23,7 +24,7 @@ export interface AccountInfo {
   email: string | null;
   providers: string[];
   createdAt: number;
-  /** Pro that comes with the account, not a store purchase (only the store review account, review.ts). */
+  /** Pro that comes with the account, not a store purchase: the store review account (review.ts) or a lifetime code. */
   pro: boolean;
 }
 
@@ -42,14 +43,14 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
     email,
     providers: ids.map((r) => String(r.provider)),
     createdAt: Number(rows[0].created_at),
-    pro: accountHasPro(email),
+    pro: accountHasPro(email) || (await hasLifetimePro(id)),
   };
 }
 
 /** Whether the account has Pro on the server (not from a store purchase). Sync sends it on every round. */
 export async function accountPro(id: string): Promise<boolean> {
   const rows = await query<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [id]);
-  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null);
+  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null) || (await hasLifetimePro(id));
 }
 
 /** Finds or makes the account for an identity, joining accounts by verified email. */

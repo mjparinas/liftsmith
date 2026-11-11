@@ -140,6 +140,8 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
             {note}
           </p>
         )}
+        {/* Without the store's plans a lifetime code still works: it goes to the account, not the store. */}
+        <CreatorCode collapsed />
       </div>
     );
   }
@@ -218,7 +220,11 @@ export function Pro() {
       <ProFeatures focus={active ? undefined : from.feature} />
       {!billingLive() ? (
         // The web app and builds without store billing: nothing to buy here, and everything is on.
-        <p className="card mt-6 p-4 text-sm text-muted">{t("pro.notHere")}</p>
+        <>
+          <p className="card mt-6 p-4 text-sm text-muted">{t("pro.notHere")}</p>
+          {/* A lifetime code redeemed here gives the account Pro on its phones too (creator.ts). */}
+          {!viaAccount && <CreatorCode collapsed />}
+        </>
       ) : active && !entActive(ent, now) ? (
         // Pro that comes with the account (the store review account): nothing to buy or manage.
         <p className="card mt-6 p-4 text-sm text-muted">{t("pro.status.account")}</p>

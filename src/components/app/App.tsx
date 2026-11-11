@@ -9,7 +9,7 @@ import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling } from "@/lib/billing";
 import { startConnections } from "@/lib/connections";
-import { sendClaim, startCreator, useCreator } from "@/lib/creator";
+import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS, goalStreak } from "@/lib/game";
@@ -162,6 +162,10 @@ export function App() {
   useEffect(() => {
     if (!ready || !signedIn) return;
     return startSync();
+  }, [ready, signedIn]);
+  // A lifetime code typed while signed out is redeemed once the lifter signs in (creator.ts).
+  useEffect(() => {
+    if (ready && signedIn) void redeemSaved();
   }, [ready, signedIn]);
   // Strava, Oura and WHOOP (Connected apps): status, readings in and workouts out, while signed in.
   useEffect(() => {

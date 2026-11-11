@@ -119,6 +119,14 @@ const SCHEMA = [
     platform TEXT
   )`,
   `CREATE INDEX IF NOT EXISTS creator_installs_code ON creator_installs (code)`,
+  // Lifetime codes (src/server/creators.ts): one row per account that redeemed one. The row is the account's Pro,
+  // and the rows for a code are its uses. Kept when the account is deleted, so a deleted account's use stays spent.
+  `CREATE TABLE IF NOT EXISTS pro_grants (
+    account_id TEXT PRIMARY KEY,
+    code TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS pro_grants_code ON pro_grants (code)`,
   // Commission paid out, recorded by an admin after paying (PayPal or Wise, outside the app).
   `CREATE TABLE IF NOT EXISTS creator_payouts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
