@@ -77,6 +77,26 @@ export interface CreatorRow extends Creator {
   /** Owed is at least MIN_PAYOUT. */
   payable: boolean;
   lastPayout: number | null;
+  /** When the code was last used (an install claimed it, or an account redeemed a lifetime code), or null. */
+  lastUsed: number | null;
+  /** Uses left under the limit, or null for no limit. */
+  usesLeft: number | null;
+  /** Whether new people can use it now (codeStatus). */
+  status: CodeStatus;
+}
+
+/**
+ * Whether a code takes new sign-ups (Melvin, 2026-11-11: "what codes are available and their status"): paused
+ * (switched off in the admin form), ended (past its end date), used up (every use taken) or live. Same order
+ * as findCode in src/server/creators.ts, which answers 404 for paused and 410 for ended or used up.
+ */
+export type CodeStatus = "live" | "paused" | "ended" | "used-up";
+
+export function codeStatus(c: Pick<Creator, "active" | "endsAt" | "maxUses">, uses: number, now: number): CodeStatus {
+  if (!c.active) return "paused";
+  if (c.endsAt != null && c.endsAt <= now) return "ended";
+  if (c.maxUses != null && uses >= c.maxUses) return "used-up";
+  return "live";
 }
 
 const round2 = (x: number) => Math.round(x * 100) / 100;
@@ -160,6 +180,9 @@ export function creatorRows(input: {
       owed,
       payable: owed >= MIN_PAYOUT,
       lastPayout: mineOut.length ? Math.max(...mineOut.map((p) => p.paidAt)) : null,
+      lastUsed: mine.length ? Math.max(...mine.map((i) => i.at)) : null,
+      usesLeft: c.maxUses == null ? null : Math.max(0, c.maxUses - mine.length),
+      status: codeStatus(c, mine.length, now),
     };
   });
 }

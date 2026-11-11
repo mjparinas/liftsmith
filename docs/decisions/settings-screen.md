@@ -10,7 +10,7 @@ Melvin asked on 2026-11-10 whether Settings had too much. The audit found one lo
   - *Workout:* one-handed controls first (they only change the workout screen), Sounds, Vibration, the rest timer (start by itself and keep the screen on as switches, then "When rest ends", which follows Sounds and Vibration by default), what shows between sets (voice coach, ghost mode, plate memory, breathing or game), and "Plan details" (the old Workout preferences page, `#/training`: rest, reps, sets, effort scale, length, week start, priorities, favourites, per-exercise).
   - *Reminders:* phone notifications and email (`MessageSettings.tsx`).
   - *Look and feel:* appearance, earned themes and app icon, daily quote, language, and Accessibility (text size, colours, contrast, Lean mode as a switch).
-  - *Body and units:* units, body weight shown from the last weigh-in with a link to log one on Progress (no second place to type it; Health weigh-ins arrive by themselves), cycle-aware readiness.
+  - *Body and units:* units, body weight shown from the last weigh-in with a link to log one on Progress, landing on the weigh-in (no second place to type it; Health weigh-ins arrive by themselves), cycle-aware readiness.
   - *Your data and privacy:* saving and backup, export sets CSV, import, usage stats (a switch, with the privacy link and install id), erase this device.
 - **Old deep links still land:** `#/settings/saving` opens Your data at Saving and backup; `#/settings/themes` and `#/settings/accessibility` open Look and feel at that section (`LEGACY`).
 - **Connected apps** (Health Connect, Apple Health, heart rate monitor, Strava and others) is its own page, `#/connections`, built in its own thread; Settings has one row for it.

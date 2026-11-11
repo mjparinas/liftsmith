@@ -94,4 +94,13 @@ describe("Body › Health buttons", () => {
     expect(into).toHaveBeenCalled();
     expect(into.mock.contexts[0]).toBe(document.getElementById("strength-score"));
   });
+
+  it("#/stats/bodyweight (Settings › Body and units › Body weight) lands on the weigh-in", () => {
+    const into = vi.fn();
+    Element.prototype.scrollIntoView = into;
+    location.hash = "#/stats/bodyweight";
+    render(<Stats />);
+    expect(into.mock.contexts[0]).toBe(document.getElementById("bodyweight"));
+    expect(document.getElementById("bodyweight")).toContainElement(screen.getAllByRole("button", { name: "Log body weight" })[0]!);
+  });
 });

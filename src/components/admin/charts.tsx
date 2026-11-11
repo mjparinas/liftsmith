@@ -48,9 +48,21 @@ export function Tile({
   );
 }
 
-export function Card({ title, subtitle, children, right }: { title: string; subtitle?: string; children: ReactNode; right?: ReactNode }) {
+export function Card({
+  title,
+  subtitle,
+  children,
+  right,
+  id,
+}: {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  right?: ReactNode;
+  id?: string;
+}) {
   return (
-    <section className="card p-4">
+    <section id={id} className="card scroll-mt-4 p-4">
       <div className="mb-3 flex items-start justify-between gap-3">
         <div>
           <h2 className="font-semibold">{title}</h2>
