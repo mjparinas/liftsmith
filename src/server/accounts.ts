@@ -182,7 +182,8 @@ export async function startEmail(email: string, mail: SendMail | null, now = Dat
 
 export async function verifyEmail(email: string, code: string, platform: Platform, now = Date.now()): Promise<Result> {
   // The store review account: its fixed code from Vercel, reusable, for this one address only (review.ts).
-  // Guesses are held back by the verify route's per-address limit and the code's 12+ digits.
+  // Guesses are held back by the verify route's per-network limit and the code's 12+ digits (a trillion or more).
+  // No limit on the address itself, on purpose: anyone could then lock the store reviewers out mid-review.
   if (isReviewEmail(email)) {
     if (!reviewCodeMatches(email, code)) return { code: 401, body: { error: "That code didn't match." } };
     const id = await accountFor("email", email, email, now);
