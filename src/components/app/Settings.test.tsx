@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
@@ -81,5 +81,12 @@ describe("Settings, grouped (2026-11-10)", () => {
     render(<Settings />);
     expect(screen.getByRole("button", { name: /82 kg.*Log a weigh-in/ })).toBeTruthy();
     expect(screen.queryByRole("textbox", { name: /Body weight/ })).toBeNull();
+  });
+
+  it("body weight opens Progress at the weigh-in, not the top", () => {
+    open("#/settings/body");
+    render(<Settings />);
+    fireEvent.click(screen.getByRole("button", { name: /Log a weigh-in/ }));
+    expect(location.hash).toBe("#/stats/bodyweight");
   });
 });

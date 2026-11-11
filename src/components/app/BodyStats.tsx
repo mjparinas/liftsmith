@@ -203,45 +203,44 @@ function StatsFields() {
           start={30}
           min={13}
           max={100}
-          placeholder={t("stats.agePlaceholder")}
         />
       </div>
       {imperial ? (
-        <fieldset>
-          <legend className="font-semibold">{t("stats.height")}</legend>
-          <div className="mt-2 space-y-3">
-            <div className="flex items-center justify-end gap-3">
-              <BumpField
-                className="w-48 max-w-full"
-                label={inSentence(t("stats.feet"), true)}
-                value={ft}
-                onChange={(v) => onFtIn(v, inch === "" && v !== "" ? "0" : inch)}
-                step={1}
-                start={5}
-                min={3}
-                max={8}
-              />
-              <span className="w-5 text-sm text-muted" aria-hidden>
-                {t("stats.ft")}
-              </span>
-            </div>
-            <div className="flex items-center justify-end gap-3">
-              <BumpField
-                className="w-48 max-w-full"
-                label={inSentence(t("stats.inches"), true)}
-                value={inch}
-                onChange={(v) => onFtIn(ft === "" && v !== "" ? "5" : ft, v)}
-                step={1}
-                start={female ? 4 : 10}
-                min={-1}
-                max={12}
-              />
-              <span className="w-5 text-sm text-muted" aria-hidden>
-                {t("stats.in")}
-              </span>
-            </div>
+        // The Height label sits on the feet row, like Age and the centimetre box, with inches under feet. A grid
+        // keeps both boxes in one column; when the card is too narrow for the label beside them (the largest text
+        // sizes) the label goes on its own line above, the way the other rows wrap.
+        <div className="@container" role="group" aria-labelledby="stats-height">
+          <div className="grid grid-cols-[minmax(0,12rem)_1.25rem] items-center gap-x-3 gap-y-3 @min-[17rem]:grid-cols-[auto_minmax(0,12rem)_1.25rem] @min-[17rem]:justify-between">
+            <span id="stats-height" className="col-span-full font-semibold @min-[17rem]:col-span-1">
+              {t("stats.height")}
+            </span>
+            <BumpField
+              label={inSentence(t("stats.feet"), true)}
+              value={ft}
+              onChange={(v) => onFtIn(v, inch === "" && v !== "" ? "0" : inch)}
+              step={1}
+              start={5}
+              min={3}
+              max={8}
+            />
+            <span className="text-sm text-muted" aria-hidden>
+              {t("stats.ft")}
+            </span>
+            <BumpField
+              className="@min-[17rem]:col-start-2"
+              label={inSentence(t("stats.inches"), true)}
+              value={inch}
+              onChange={(v) => onFtIn(ft === "" && v !== "" ? "5" : ft, v)}
+              step={1}
+              start={female ? 4 : 10}
+              min={-1}
+              max={12}
+            />
+            <span className="text-sm text-muted" aria-hidden>
+              {t("stats.in")}
+            </span>
           </div>
-        </fieldset>
+        </div>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
           <label htmlFor="stats-cm" className="shrink-0 font-semibold">

@@ -53,10 +53,12 @@ export function Stats() {
   const g = useGame();
   const streak = g.streak;
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
-  // #/stats/strength (the fitness age card's "See strength score") lands on the strength score, not the top.
+  // #/stats/strength (the fitness age card's "See strength score") lands on the strength score, not the top, and
+  // #/stats/bodyweight (Settings › Body and units › Body weight) on the weigh-in.
   const { arg } = useRoute();
   useEffect(() => {
-    if (arg === "strength") document.getElementById("strength-score")?.scrollIntoView?.({ block: "start" });
+    const id = arg === "strength" ? "strength-score" : arg === "bodyweight" ? "bodyweight" : undefined;
+    if (id) document.getElementById(id)?.scrollIntoView?.({ block: "start" });
   }, [arg]);
   const tiles: [string, string, string, IconName, string][] = [
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
@@ -112,7 +114,9 @@ export function Stats() {
         </div>
       </Section>
 
-      <BodyweightCard />
+      <div id="bodyweight" className="scroll-mt-14">
+        <BodyweightCard />
+      </div>
       <TdeeCard />
 
       <OneRmSection />
