@@ -19,11 +19,15 @@ export interface SyncState {
   /** Counts changes to the profile and gyms; records are sent while it differs from `sentRev`. */
   rev: number;
   sentRev: number;
+  /** Whether everything already on this device was queued once. Signing in starts with it false, so workouts
+   *  logged before signing in reach the account too; a device signed in before this field existed reads it
+   *  as false and pushes its whole history once (the server ignores ids it already has). */
+  seeded: boolean;
   lastSync?: number;
   lastError?: string;
 }
 
-export const emptySync = (): SyncState => ({ cursor: 0, out: [], del: [], gyms: [], first: true, rev: 1, sentRev: 0 });
+export const emptySync = (): SyncState => ({ cursor: 0, out: [], del: [], gyms: [], first: true, rev: 1, sentRev: 0, seeded: false });
 
 const listeners = new Set<() => void>();
 /** sync.ts listens, to sync a few seconds after a change. */
@@ -78,6 +82,14 @@ export function noteDeleted(ids: string[]) {
     s.out = s.out.filter((id) => !gone.has(id));
     for (const id of ids) if (!s.del.includes(id)) s.del.push(id);
   });
+}
+
+/** Queues every event already on this device that isn't queued yet, once per sign-in (see `seeded`). */
+export function seedOutbox(s: SyncState, ids: string[]): SyncState {
+  if (s.seeded) return s;
+  const have = new Set(s.out);
+  const gone = new Set(s.del);
+  return { ...s, out: [...s.out, ...ids.filter((id) => !have.has(id) && !gone.has(id))], seeded: true };
 }
 
 export function noteChanged() {

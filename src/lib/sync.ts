@@ -6,7 +6,7 @@
 // Events merge by id, so order and repeats don't matter; the profile and gyms are last write wins.
 import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount } from "./auth";
 import { useApp } from "./store";
-import { noteChanged, onOutbox, readSync, writeSync, type SyncState } from "./syncOutbox";
+import { noteChanged, onOutbox, readSync, seedOutbox, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
 
 const BATCH = 500;
@@ -133,6 +133,15 @@ async function run(): Promise<void> {
   if (!store.ready) return;
   useAccount.setState({ busy: true });
   try {
+    // The outbox only fills while signed in, so queue what this device logged before (once per sign-in).
+    const start = readSync();
+    if (!start.seeded)
+      writeSync(
+        seedOutbox(
+          start,
+          useApp.getState().events.map((e) => e.id),
+        ),
+      );
     for (let round = 0; round < 100; round++) {
       const s: SyncState = readSync();
       const { profile, gyms, events } = useApp.getState();
