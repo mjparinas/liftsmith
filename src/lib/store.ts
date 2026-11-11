@@ -19,7 +19,7 @@ import { workoutSlice, type Active, type WorkoutSlice } from "./store/workout";
 import { minutesForToday } from "./training";
 import type { AppEvent, Gym, Profile } from "./types";
 
-export { AUTO_END_MS, hrWindow, warmingUp, type Active } from "./store/workout";
+export { AUTO_END_MS, hrWindow, REST_PAUSE_SEC, warmingUp, type Active } from "./store/workout";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,

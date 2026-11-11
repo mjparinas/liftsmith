@@ -9,9 +9,10 @@ import { activeInjuries, effectFor, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
 import { barFor } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
+import { TIMED } from "@/lib/progression";
 import { useApp, type Active } from "@/lib/store";
 import { effortChoices } from "@/lib/training";
-import type { EffortScale, Exercise, Gym, SetEvent } from "@/lib/types";
+import type { EffortScale, Exercise, Gym, SetEvent, SetTag } from "@/lib/types";
 
 import { clock, loadText, repsText } from "../format";
 import { PainSelect } from "../Injuries";
@@ -110,6 +111,7 @@ export function RestCard({
           }}
         />
       )}
+      {lastSet && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
       {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
       {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} />}
       <div className="mt-5 w-full border-t border-line/70 pt-4">
@@ -130,6 +132,39 @@ export function RestCard({
       <RestExtra left={left} gym={gym} />
       <TipCard active={active} setsLogged={setsLogged} />
     </section>
+  );
+}
+
+/**
+ * Optional, during rest: add a bonus set of the exercise just done, a drop set (lighter, straight away)
+ * or a rest-pause set (same weight after a short pause). Never shown during a set.
+ */
+function ExtraSet({ lastSet, onPick }: { lastSet: SetEvent; onPick: (kind: SetTag) => void }) {
+  const ex = exercise(lastSet.exerciseId);
+  const kinds: SetTag[] = ex.load === "bodyweight" || lastSet.weight <= 0 ? ["restPause"] : ["drop", "restPause"];
+  return (
+    <div className="animate-rise mt-4 w-full text-center">
+      <p className="text-sm text-muted">
+        {t("wk.extraAsk")}
+        <Info term="setTypes" />
+      </p>
+      <div className={`mt-1 grid gap-2 ${kinds.length === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
+        {kinds.map((k) => (
+          <button
+            key={k}
+            type="button"
+            onClick={() => {
+              haptic("select");
+              sound.tick();
+              onPick(k);
+            }}
+            className="press min-h-11 rounded-xl border border-line bg-surface px-2 py-2 text-sm font-semibold"
+          >
+            {t(k === "drop" ? "wk.dropSet" : "wk.restPause")}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -173,6 +208,7 @@ function Effort({ target, scale, onPick }: { target: number; scale?: "rir" | "rp
         {rpe ? t("wk.rpeAsk", { aim }) : t("wk.rirAsk", { aim: target })}
         <Info term={rpe ? "rpe" : "rir"} />
       </p>
+      <p className="text-xs text-muted">{t(rpe ? "wk.failureRpe" : "wk.failureRir")}</p>
       <div className="mt-1 grid grid-cols-5 gap-2" role="group" aria-label={rpe ? t("wk.rpeGroup") : t("wk.rirGroup")}>
         {effortChoices(scale).map((c) => (
           <button

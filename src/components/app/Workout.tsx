@@ -134,7 +134,7 @@ export function Workout() {
   const ex = item ? exercise(item.exerciseId) : null;
   const doneSets =
     active && item
-      ? events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === item.exerciseId).length
+      ? events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === item.exerciseId && !e.tag).length
       : 0;
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
@@ -155,15 +155,17 @@ export function Workout() {
     if (!ssLabel || !active || !item) return null;
     const items = active.plan.items;
     const done = (i: number) =>
-      events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId).length +
+      events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId && !e.tag).length +
       (i === active.index ? 1 : 0);
     const step = afterSet(items, active.index, done);
     const [s0, e0] = groupRange(items, active.index);
     return step.index !== active.index && step.index >= s0 && step.index <= e0 ? exercise(items[step.index].exerciseId).name : null;
   })();
-  const setLabel = warming
-    ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal })
-    : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
+  const setLabel = active?.tag
+    ? t(active.tag === "drop" ? "wk.dropSet" : "wk.restPause")
+    : warming
+      ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal })
+      : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
   const voiceOn = !!profile.delight?.voice;
@@ -238,7 +240,7 @@ export function Workout() {
       speakLang: currentTag(),
       // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
       chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
-      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
+      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
       sessionId: active.sessionId,
     });
@@ -260,7 +262,7 @@ export function Workout() {
 
   const elapsed = Math.floor((now - active.startedAt) / 1000);
   const totalSets = active.plan.items.reduce((n, i) => n + i.sets, 0);
-  const setsLogged = events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length;
+  const setsLogged = events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length;
   // The final working set of the whole workout gets its own label and a bigger burst.
   const lastOfAll = !warming && !finished && setsLogged + 1 >= totalSets;
   // Undo sits above the big button, so the page leaves room for it while it's there.

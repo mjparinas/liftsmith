@@ -113,7 +113,21 @@ export function SetCard({
           </button>
         )}
       </div>
-      {warming ? (
+      {active.tag ? (
+        <div className="mt-4 rounded-xl bg-accent/10 px-3 py-2 text-center text-sm">
+          <p className="font-semibold text-accent">{t(active.tag === "drop" ? "wk.dropLine" : "wk.restPauseLine")}</p>
+          <button
+            type="button"
+            onClick={() => {
+              haptic("tick");
+              s.extraSet(undefined);
+            }}
+            className="press min-h-11 px-3 font-semibold text-accent underline underline-offset-2"
+          >
+            {t("wk.extraCancel")}
+          </button>
+        </div>
+      ) : warming ? (
         <div className="mt-4 text-center text-sm text-muted">
           <p>
             {t("wk.warmLine")}

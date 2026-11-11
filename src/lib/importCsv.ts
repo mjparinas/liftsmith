@@ -1,7 +1,18 @@
 import { MANUAL_RIR } from "./dashboard";
 import { englishName, EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { hash } from "./random";
-import type { AppEvent, Exercise, LoadKind, Muscle, SessionEndEvent, SessionStartEvent, SetEvent, Unit, WarmupEvent } from "./types";
+import type {
+  AppEvent,
+  Exercise,
+  LoadKind,
+  Muscle,
+  SessionEndEvent,
+  SessionStartEvent,
+  SetEvent,
+  SetTag,
+  Unit,
+  WarmupEvent,
+} from "./types";
 import { toKg } from "./units";
 
 // CSV import (table stakes, Melvin, 2026-11-09): workouts exported from Strong, Hevy or Liftsmith
@@ -22,6 +33,8 @@ export interface ImportSet {
   /** The row's own unit, when the file says it per row (Liftsmith's export). */
   unit?: Unit;
   superset?: string;
+  /** A drop set (Hevy's "dropset", Strong's "D", Liftsmith's "drop"). */
+  tag?: SetTag;
 }
 
 export interface ImportWorkout {
@@ -156,6 +169,7 @@ export function readImport(text: string): ImportFile | null {
           reps: n,
           seconds: n ? undefined : sec,
           warmup: get(r, type).toLowerCase() === "warmup",
+          tag: get(r, type).toLowerCase() === "dropset" ? "drop" : undefined,
           superset: get(r, ss) || undefined,
         },
       );
@@ -197,6 +211,7 @@ export function readImport(text: string): ImportFile | null {
           reps: n,
           seconds: n ? undefined : sec,
           warmup: get(r, order).toUpperCase() === "W",
+          tag: get(r, order).toUpperCase() === "D" ? "drop" : undefined,
         },
       );
     }
@@ -205,6 +220,7 @@ export function readImport(text: string): ImportFile | null {
 
   if (col("exercise") >= 0 && col("per hand") >= 0 && col("unit") >= 0) {
     // Liftsmith's own "Export sets" file: the unit is on every row.
+    const kind = col("type");
     const [date, time, workout, ex, weight, unit, reps] = [
       col("date"),
       col("time"),
@@ -227,7 +243,14 @@ export function readImport(text: string): ImportFile | null {
       add(
         key,
         { title: "Workout", start: firstAt.get(key)! },
-        { name: get(r, ex), weight: num(get(r, weight)), reps: n, warmup: false, unit: get(r, unit) === "lb" ? "lb" : "kg" },
+        {
+          name: get(r, ex),
+          weight: num(get(r, weight)),
+          reps: n,
+          warmup: false,
+          unit: get(r, unit) === "lb" ? "lb" : "kg",
+          tag: get(r, kind) === "drop" || get(r, kind) === "rest-pause" ? (get(r, kind) === "drop" ? "drop" : "restPause") : undefined,
+        },
       );
     }
     return { format: "liftsmith", unit: "kg", workouts: [...workouts.values()], skipped };
@@ -476,6 +499,7 @@ export function importEvents(
         targetWeight: kg,
         rir: MANUAL_RIR,
         ...(s.superset ? { superset: `${sessionId}-${s.superset}` } : {}),
+        ...(s.tag ? { tag: s.tag } : {}),
       } satisfies SetEvent;
     });
     const end: SessionEndEvent = {

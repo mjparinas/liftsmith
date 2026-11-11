@@ -51,7 +51,8 @@ export interface Target {
 export function sessionsOf(events: readonly AppEvent[], exerciseId: string): SetEvent[][] {
   const by = new Map<string, SetEvent[]>();
   for (const e of events) {
-    if (e.type !== "set" || e.exerciseId !== exerciseId) continue;
+    // Drop and rest-pause sets are bonus work, not the plan's sets: progression reads the planned ones.
+    if (e.type !== "set" || e.exerciseId !== exerciseId || e.tag) continue;
     const list = by.get(e.sessionId) ?? [];
     list.push(e);
     by.set(e.sessionId, list);
