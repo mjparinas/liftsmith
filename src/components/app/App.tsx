@@ -35,6 +35,7 @@ import { Account } from "./Account";
 import { Achievements } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
+import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
 import { Friends, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
@@ -341,6 +342,7 @@ export function App() {
     friends: <Friends />,
     person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
+    exercise: <ExercisePage key={arg ?? ""} id={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
