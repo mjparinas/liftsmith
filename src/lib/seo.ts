@@ -2,7 +2,7 @@
 // tools) and the one route list the sitemap is built from. Everything comes from the same exercise library the
 // app plans with, so a new exercise gets its pages and its sitemap entry without touching this file.
 import { ARTICLES, type Article } from "@/content/articles";
-import { COMPETITORS } from "@/content/compare";
+import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
 
@@ -229,7 +229,8 @@ export function siteRoutes(): Route[] {
     { path: "/whats-new/", priority: 0.5, date: WHATS_NEW[0]?.day },
     { path: "/status/", priority: 0.2 },
     { path: "/compare/", priority: 0.6 },
-    { path: "/alternatives/fitbod/", priority: 0.7 },
+    { path: "/compare/best-workout-apps/", priority: 0.7 },
+    ...ALTERNATIVES.map((a) => ({ path: `/alternatives/${a.slug}/`, priority: 0.7 })),
     ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),
     ...IMPORT_SOURCES.map((s) => ({ path: `/import/${s.slug}/`, priority: 0.7 })),
     { path: "/apps/", priority: 0.7 },
