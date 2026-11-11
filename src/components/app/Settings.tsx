@@ -188,6 +188,9 @@ export function Settings() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
+      <div className="mt-2">
+        <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
+      </div>
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>

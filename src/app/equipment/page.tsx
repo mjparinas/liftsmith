@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { EQUIPMENT_NAME, equipmentSlug, equipmentWithPages, exercisesWith, noEquipment } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Exercises by equipment",
   description:
     "Every exercise you can do with a barbell, dumbbells, kettlebells, cables, machines, bands or no equipment at all, with form cues and 3D demos.",
-  alternates: { canonical: "/equipment/" },
-};
+  path: "/equipment/",
+});
 
 export default function EquipmentIndex() {
   const bw = noEquipment();

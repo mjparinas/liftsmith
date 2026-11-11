@@ -10,6 +10,7 @@ import { useEffect, useMemo, useState } from "react";
 import { bodyFor } from "@/components/demo/LiftDemo";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
+import { useProMember } from "@/lib/billing";
 import { COSMETICS } from "@/lib/game";
 import { t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
@@ -108,13 +109,14 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
 
   const fig = item?.figure && figure?.id === item.figure ? figure.c : null;
   const card = item?.card(opts);
+  const member = useProMember();
   const canvas = useMemo(() => {
     if (!card || typeof document === "undefined") return null;
     const c = document.createElement("canvas");
-    drawCard(c, card, { size: prefs.size, figure: fig });
+    drawCard(c, card, { size: prefs.size, figure: fig, pro: member });
     return c;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [item?.id, prefs.size, prefs.weights, prefs.name, name, fig]);
+  }, [item?.id, prefs.size, prefs.weights, prefs.name, name, fig, member]);
   const src = useMemo(() => {
     try {
       return canvas?.toDataURL("image/png") ?? null;

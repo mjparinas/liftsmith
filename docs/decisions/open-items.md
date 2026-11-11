@@ -16,6 +16,8 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
 
+- **Voice set logging on iPhone** (Labs, `SpeechLogPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check the speech recognition and microphone prompts, that recognition stays on the device for each of the six languages, and that music comes back after listening.
+
 - **Universal Links** for remix and shared routine links: the Associated Domains entitlement (`applinks:www.getliftsmith.com`) on the App ID and in `App.entitlements`, plus `public/.well-known/apple-app-site-association` with the team id and `/app/*`. Until then those links open in Safari, and the in-app paste box (Routines › Add a routine from a link) brings a routine into the app.
 
 - **Sign in with Google on iPhone:** create an iOS OAuth client in Google Cloud (project `liftsmith-514303`, bundle `com.getliftsmith.app`) and put its id in `GOOGLE_IOS_CLIENT_ID` (`src/lib/authIds.ts`). Until then the iPhone app has no Google button.

@@ -5,8 +5,10 @@ import type { Streak } from "./game";
 import { weeklySets } from "./generator";
 import { date, inSentence, list, t } from "./i18n";
 import { fromCm, lengthUnit, measuresOf } from "./measure";
+import { foodDays, proteinShort, weekIntake } from "./nutrition";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
+import { currentKg, currentTdee } from "./tdee";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -341,9 +343,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       });
     }
   }
+  let weightPct: number | undefined;
   if (ins.length >= 3 && ins.at(-1)!.at - ins[0].at >= 3 * WEEK) {
     const perWeek = slopePerWeek(ins.map((e) => ({ at: e.at, v: e.kg })));
     const pct = (perWeek / ins.at(-1)!.kg) * 100;
+    weightPct = pct;
     if (pct <= -1) {
       out.push({
         id: `weight-down-${ins.at(-1)!.at}`,
@@ -361,6 +365,62 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         advice: t("ins.weightUp.advice"),
         action: { kind: "go", route: "stats", label: t("ins.weightUp.action") },
       });
+    }
+  }
+
+  // 4b. Food, from a food app through Health Connect or Apple Health (nutrition.ts). Protein short several logged
+  // days running gets its own note; calories are judged against TDEE and the goal, and when a body note already
+  // tells the story (weight dropping fast, body fat or waist rising) the food numbers join it instead of a second note.
+  const food = foodDays(events, now);
+  if (food.length) {
+    const short = proteinShort(food, currentKg(events as AppEvent[], profile), now);
+    if (short) {
+      out.push({
+        id: `protein-short-${short.last}-${short.days}`,
+        tone: "warn",
+        title: t("ins.proteinShort.title", { count: short.days }),
+        why: t("ins.proteinShort.why", { avg: short.avg, target: short.target }),
+        advice: t("ins.proteinShort.advice", { gap: Math.max(10, Math.round((short.target - short.avg) / 5) * 5) }),
+        action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+      });
+    }
+    const intake = weekIntake(food, now);
+    const tdee =
+      intake &&
+      currentTdee(
+        events as AppEvent[],
+        [...sessions.values()].map((x) => ({ start: x[0]!.at })),
+        profile,
+        now,
+      ).result;
+    if (intake && tdee) {
+      const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
+      const gap = intake.avg - tdee.tdee;
+      const nums = { days: intake.days, avg: kcal(intake.avg), gap: kcal(Math.abs(gap)), tdee: kcal(tdee.tdee) };
+      const body = out.find((x) => /^(weight-down|fat-up|waist-up)-/.test(x.id));
+      if (body?.id.startsWith("weight-down-") && gap <= -300) {
+        body.why += ` ${t("ins.food.why", nums)}`;
+      } else if (body && !body.id.startsWith("weight-down-") && gap >= 150) {
+        body.why += ` ${t("ins.food.overToo", nums)}`;
+      } else if (profile.goal === "muscle" && gap <= -300 && !(weightPct !== undefined && weightPct >= 0.25)) {
+        out.push({
+          id: `eat-low-muscle-${intake.last}`,
+          tone: "warn",
+          title: t("ins.eatLowMuscle.title"),
+          why: t("ins.food.why", nums),
+          advice: t("ins.eatLowMuscle.advice", { bulk: kcal(tdee.bulk) }),
+          action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+        });
+      } else if (profile.goal !== "muscle" && intake.avg < tdee.cut - 250 && !body) {
+        out.push({
+          id: `eat-low-${intake.last}`,
+          tone: "warn",
+          title: t("ins.eatLow.title"),
+          why: t("ins.food.why", nums),
+          advice: t("ins.eatLow.advice", { cut: kcal(tdee.cut), tdee: kcal(tdee.tdee) }),
+          action: { kind: "go", route: "tools/tdee", label: t("ins.food.action") },
+        });
+      }
     }
   }
 

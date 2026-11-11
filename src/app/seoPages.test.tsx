@@ -5,19 +5,29 @@ import { afterEach, describe, expect, it } from "vitest";
 import { ArticleView, relatedTo } from "@/components/site/ArticleView";
 import { SitePage } from "@/components/site/SiteChrome";
 import { ARTICLES } from "@/content/articles";
+import { LANDINGS } from "@/content/landings";
 
-import FitbodAlternatives from "./alternatives/fitbod/page";
+import AppAlternativesPage from "./alternatives/[slug]/page";
+import AppLandingPage from "./apps/[slug]/page";
 import BlogIndex from "./blog/page";
 import ComparePage from "./compare/[slug]/page";
+import BestApps from "./compare/best-workout-apps/page";
 import CompareIndex from "./compare/page";
 import EquipmentPage from "./equipment/[slug]/page";
 import AlternativesPage from "./exercises/[slug]/alternatives/page";
 import ExercisePage from "./exercises/[slug]/page";
 import ExercisesIndex from "./exercises/page";
+import FeaturePage from "./features/[slug]/page";
+import FeaturesIndex from "./features/page";
+import ImportPage from "./import/[slug]/page";
 import PairPage from "./muscles/[muscle]/[equipment]/page";
 import MusclePage from "./muscles/[muscle]/page";
+import DotsPage from "./tools/dots-calculator/page";
 import OneRmPage from "./tools/one-rep-max-calculator/page";
 import PlatePage from "./tools/plate-calculator/page";
+import RpePage from "./tools/rpe-chart/page";
+import StrengthStandardsPage from "./tools/strength-standards/page";
+import WarmupPage from "./tools/warm-up-calculator/page";
 
 // The pages exist to send readers into the app (Melvin, 2026-11-09: "emphasis on the call to actions").
 const ctas = () => [...document.querySelectorAll("[data-cta]")].map((a) => a.getAttribute("data-cta")!);
@@ -66,11 +76,35 @@ describe("SEO pages", () => {
   });
 
   it("renders the indexes and the calculators", () => {
-    for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage]) {
+    for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage, WarmupPage, RpePage, StrengthStandardsPage, DotsPage]) {
       render(<P />);
       expectCtas();
       cleanup();
     }
+  });
+
+  it("renders the switch-from pages with their steps, calls to action and the trademark line", async () => {
+    for (const slug of ["strong", "hevy"]) {
+      render(await ImportPage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getByText(/Import workouts \(CSV\)/)).toBeTruthy();
+      expect(screen.getByText(/trademarks of their owners/)).toBeTruthy();
+      cleanup();
+    }
+  });
+
+  it("renders every app and feature page with its calls to action and questions", async () => {
+    for (const l of LANDINGS) {
+      const Page = l.group === "apps" ? AppLandingPage : FeaturePage;
+      render(await Page({ params: Promise.resolve({ slug: l.slug }) }));
+      expectCtas();
+      expect(screen.getByRole("heading", { level: 1, name: l.h1 })).toBeTruthy();
+      expect(screen.getByText("Questions")).toBeTruthy();
+      cleanup();
+    }
+    render(<FeaturesIndex />);
+    expect(screen.getAllByRole("link", { name: /Lock-screen rest timer/ }).length).toBeGreaterThan(0);
+    cleanup();
   });
 
   it("renders the comparison pages with sources, the trademark line and calls to action", async () => {
@@ -81,9 +115,22 @@ describe("SEO pages", () => {
       expect(screen.getByText(/trademarks of their owners/)).toBeInTheDocument();
       cleanup();
     }
-    for (const P of [CompareIndex, FitbodAlternatives]) {
+    for (const slug of ["stronglifts", "jefit", "alpha-progression", "boostcamp"]) {
+      render(await ComparePage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getAllByText(/checked Nov 11, 2026/).length).toBeGreaterThan(3);
+      cleanup();
+    }
+    for (const P of [CompareIndex, BestApps]) {
       render(<P />);
       expectCtas();
+      expect(screen.getByText(/trademarks of their owners/)).toBeInTheDocument();
+      cleanup();
+    }
+    for (const slug of ["fitbod", "hevy", "strong", "stronglifts"]) {
+      render(await AppAlternativesPage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getByRole("heading", { level: 1 }).textContent).toMatch(/alternatives$/);
       cleanup();
     }
   });

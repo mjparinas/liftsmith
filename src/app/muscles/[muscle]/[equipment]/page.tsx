@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import {
   EQUIPMENT_NAME,
   equipmentBySlug,
   equipmentSlug,
+  exerciseCollection,
+  lowerName,
   MUSCLE_ABOUT,
   MUSCLE_NAME,
   muscleBySlug,
@@ -17,7 +20,6 @@ import {
   pairExercises,
   pairs,
 } from "@/lib/seo";
-import { SITE_URL } from "@/lib/site";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => pairs().map((p) => ({ muscle: muscleSlug(p.muscle), equipment: equipmentSlug(p.equipment) }));
@@ -35,12 +37,12 @@ async function read(params: Props["params"]) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const r = await read(params);
   if (!r) return {};
-  const title = `${r.list.length} ${MUSCLE_NAME[r.m].toLowerCase()} exercises with ${EQUIPMENT_NAME[r.eq].toLowerCase()}`;
-  return {
+  const title = `${r.list.length} ${MUSCLE_NAME[r.m].toLowerCase()} exercises with ${lowerName(EQUIPMENT_NAME[r.eq])}`;
+  return pageMeta({
     title,
     description: `${title}: how to do each one, the muscles it works and a 3D demo, plus how to fit them into your week.`,
-    alternates: { canonical: `/muscles/${muscleSlug(r.m)}/${equipmentSlug(r.eq)}/` },
-  };
+    path: `/muscles/${muscleSlug(r.m)}/${equipmentSlug(r.eq)}/`,
+  });
 }
 
 export default async function PairPage({ params }: Props) {
@@ -48,14 +50,8 @@ export default async function PairPage({ params }: Props) {
   if (!r) notFound();
   const { m, eq, list } = r;
   const mn = MUSCLE_NAME[m].toLowerCase();
-  const en = EQUIPMENT_NAME[eq].toLowerCase();
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `${MUSCLE_NAME[m]} exercises with ${en}`,
-    numberOfItems: list.length,
-    itemListElement: list.map((e, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}/exercises/${e.id}/`, name: e.name })),
-  };
+  const en = lowerName(EQUIPMENT_NAME[eq]);
+  const jsonLd = exerciseCollection(`${MUSCLE_NAME[m]} exercises with ${en}`, `/muscles/${muscleSlug(m)}/${equipmentSlug(eq)}/`, list);
   return (
     <SitePage kind="pair" sticky={`A ${mn} plan for your kit`}>
       <JsonLd data={jsonLd} />

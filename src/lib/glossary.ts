@@ -34,6 +34,8 @@ const TERMS = [
   "restDrop",
   "fitnessAge",
   "barSpeed",
+  "formCheck",
+  "speedMax",
   "setTypes",
   "stretching",
   "crate",

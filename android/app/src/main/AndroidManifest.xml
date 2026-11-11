@@ -170,6 +170,9 @@
     <!-- Rep counter lab: camera frames are analysed on the device and never stored or sent. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <!-- Voice set logging lab: speech is recognized on the device (on-device SpeechRecognizer) and the audio is never stored or sent. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps). -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
@@ -182,7 +185,8 @@
          review rejects any permission the app doesn't visibly use, so the health plugin's long list is cut down here.
          Reads: weight, height and body fat (setup, weigh-ins, TDEE, the health twin), resting heart rate (setup, the
          health twin and readiness), sleep, HRV and respiratory rate (the health twin and readiness), steps (the health
-         twin and TDEE's activity level) and VO2 max (the health twin).
+         twin and TDEE's activity level), VO2 max (the health twin) and nutrition (calories and protein from a food app, for the
+         coach's notes; read by HealthWorkoutPlugin.kt).
          Writes: a finished workout as an exercise session, with its active calories and average heart rate. Add a type here and in health.ts together. -->
     <uses-permission android:name="android.permission.health.READ_BODY_FAT" />
     <uses-permission android:name="android.permission.health.READ_HEIGHT" />
@@ -193,6 +197,7 @@
     <uses-permission android:name="android.permission.health.READ_STEPS" />
     <uses-permission android:name="android.permission.health.READ_VO2_MAX" />
     <uses-permission android:name="android.permission.health.READ_RESPIRATORY_RATE" />
+    <uses-permission android:name="android.permission.health.READ_NUTRITION" />
     <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" />
     <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" />
     <!-- Each finished workout as a strength training session (HealthWorkoutPlugin.kt). -->
@@ -230,7 +235,6 @@
     <uses-permission android:name="android.permission.health.WRITE_MINDFULNESS" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_HYDRATION" tools:node="remove" />
     <uses-permission android:name="android.permission.health.WRITE_HYDRATION" tools:node="remove" />
-    <uses-permission android:name="android.permission.health.READ_NUTRITION" tools:node="remove" />
     <uses-permission android:name="android.permission.health.WRITE_NUTRITION" tools:node="remove" />
     <uses-permission android:name="android.permission.health.READ_EXERCISE" tools:node="remove" />
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />

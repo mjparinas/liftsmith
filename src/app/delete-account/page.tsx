@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Delete your account",
   description: `How to delete your ${BRAND.name} account and its data, what's deleted, what's kept and for how long.`,
-};
+  path: "/delete-account/",
+});
 
 // Google Play's Data safety form links here ("Delete account URL"), so it names the app, puts the steps first and says what's
 // deleted, kept and for how long. Keep in step with /privacy/, docs/PRIVACY_LABELS.md and DELETE /api/account/ (deleteAccount in

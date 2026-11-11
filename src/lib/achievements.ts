@@ -150,6 +150,19 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     tiers: [5, 25],
     value: (c) => countSessions(c, (s) => hourOf(s.at) >= 11 && hourOf(s.at) < 14),
   },
+  {
+    // Pro members (Melvin, 2026-11-11: "that should unlock some kind of badge or achievement or reward"). Counts the
+    // months logged as Pro (ProEvent, store.notePro), so it's kept after a subscription ends. Its bronze badge
+    // unlocks the Pro theme (themes.ts) and its silver badge the Pro accent in the Locker (game.ts BADGE_ITEMS).
+    id: "pro",
+    name: "Pro member",
+    detail: "Have Liftsmith Pro for {n} month(s)",
+    icon: "💎",
+    category: "consistency",
+    tiers: [1, 3, 6, 12],
+    unit: "months",
+    value: (c) => proMonths(c.events),
+  },
 
   // ---- Strength: plate clubs (45 lb plates a side) and body-weight ratios
   {
@@ -627,6 +640,13 @@ export const ACHIEVEMENTS: AchievementDef[] = [
         : 0,
   },
 ];
+
+/** Months logged as Pro (one ProEvent per month; a repeat id counts once). */
+export function proMonths(events: readonly AppEvent[]): number {
+  const months = new Set<string>();
+  for (const e of events) if (e.type === "pro") months.add(e.month);
+  return months.size;
+}
 
 function dm(ms: number) {
   const d = new Date(ms);

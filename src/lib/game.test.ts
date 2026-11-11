@@ -6,6 +6,8 @@ import { ACHIEVEMENTS, achievements, achName, BADGE_COUNT, context, shareIds, sh
 import { defaultProfile } from "./defaults";
 import { derive, weekOf } from "./derive";
 import {
+  BADGE_ITEMS,
+  badgeForItem,
   COSMETICS,
   crateFor,
   crates,
@@ -257,8 +259,8 @@ describe("level rewards", () => {
     expect(levelForItem("accent-gold")).toBe(25);
     expect(levelForItem("accent-teal")).toBeNull();
     expect(levelRewards(50)).toHaveLength(LEVEL_ITEMS.length + TITLE_LEVELS.length);
-    // Every legendary has a sure path.
-    for (const c of COSMETICS.filter((c) => c.rarity === "legendary")) expect(levelForItem(c.id)).not.toBeNull();
+    // Every legendary has a sure path: a level, or a badge.
+    for (const c of COSMETICS.filter((c) => c.rarity === "legendary")) expect(levelForItem(c.id) ?? badgeForItem(c.id)).not.toBeNull();
     expect(nextReward(4)).toMatchObject({ level: 5, source: "item" });
     expect(nextReward(50)).toBeNull();
   });
@@ -279,10 +281,30 @@ describe("level rewards", () => {
   });
 
   it("show the odds of each item per crate", () => {
-    const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
+    const pool = COSMETICS.filter((c) => !STARTER.includes(c.id) && !badgeForItem(c.id));
     expect(pool.reduce((t, c) => t + rarityOdds(c.id), 0)).toBeCloseTo(1);
     expect(rarityOdds("accent-blue")).toBe(0);
     expect(rarityOdds("accent-teal")).toBeGreaterThan(rarityOdds("accent-gold"));
+  });
+});
+
+describe("Pro rewards", () => {
+  const pro = (month: string): AppEvent => ({ type: "pro", id: `pro-${month}`, at: NOW, month });
+  const proAch = (ev: AppEvent[]) => game(ev, derive(ev, NOW), profile(), NOW).achievements.find((a) => a.id === "pro")!;
+
+  it("count the months with Pro, once each, and stay earned after Pro ends", () => {
+    expect(proAch([])).toMatchObject({ level: 0, tier: null, hidden: false });
+    expect(proAch([pro("2026-11"), { ...pro("2026-11") }])).toMatchObject({ value: 1, tier: "bronze" });
+    expect(proAch(["2026-09", "2026-10", "2026-11"].map(pro))).toMatchObject({ value: 3, tier: "silver" });
+  });
+
+  it("bring the Pro accent at silver, never from a crate, so old crates keep what they held", () => {
+    const one = [pro("2026-11")];
+    const three = ["2026-09", "2026-10", "2026-11"].map(pro);
+    expect(game(one, derive(one, NOW), profile(), NOW).owned.has("accent-pro")).toBe(false);
+    expect(game(three, derive(three, NOW), profile(), NOW).owned.has("accent-pro")).toBe(true);
+    for (const b of BADGE_ITEMS) expect(rarityOdds(b.id)).toBe(0);
+    expect(Array.from({ length: 2000 }, (_, i) => crateFor(`s${i}`).id)).not.toContain("accent-pro");
   });
 });
 
