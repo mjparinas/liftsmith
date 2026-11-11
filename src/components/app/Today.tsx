@@ -28,6 +28,7 @@ import type { MessageKey } from "@/locales/en";
 import { useGame } from "./Achievements";
 import { PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText } from "./format";
+import { FriendsButton } from "./Friends";
 import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
 import { programName } from "./Programs";
@@ -138,6 +139,7 @@ export function Today() {
           <p className="min-w-0 truncate text-sm font-medium text-muted">{hello}</p>
           <div className="flex shrink-0 items-center gap-2">
             <Flame weeks={streak.weeks} freezes={streak.freezes} />
+            <FriendsButton />
             <button
               type="button"
               onClick={() => go("achievements")}
