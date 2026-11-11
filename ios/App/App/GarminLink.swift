@@ -50,7 +50,7 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
     }
 
     private func app(_ device: IQDevice) -> IQApp {
-        IQApp(uuid: Self.appId, storeUuid: nil, device: device)
+        IQApp(uuid: Self.appId, store: nil, device: device)
     }
 
     /// Opens Garmin Connect's watch picker (or its App Store page when it's missing).
@@ -82,8 +82,8 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
 
     /// For Connected apps: {app: "missing" | "ready", devices: [{name, connected, installed}]}.
     func status(_ done: @escaping ([String: Any]) -> Void) {
-        let app = garminConnectInstalled ? "ready" : "missing"
-        guard !devices.isEmpty else { return done(["app": app, "devices": []]) }
+        let connect = garminConnectInstalled ? "ready" : "missing"
+        guard !devices.isEmpty else { return done(["app": connect, "devices": []]) }
         start()
         var rows: [[String: Any]] = []
         let group = DispatchGroup()
@@ -108,7 +108,7 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
             ConnectIQ.sharedInstance().getAppStatus(app(d)) { s in finish(s?.isInstalled ?? false) }
             DispatchQueue.main.asyncAfter(deadline: .now() + 4) { finish(false) }
         }
-        group.notify(queue: .main) { done(["app": app, "devices": rows]) }
+        group.notify(queue: .main) { done(["app": connect, "devices": rows]) }
     }
 
     /// The workout as the watch shows it (WorkoutSession.update).
