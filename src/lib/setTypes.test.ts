@@ -133,9 +133,9 @@ describe("set types elsewhere", () => {
       "kg",
     );
     const lines = csv.trim().split("\n");
-    expect(lines[1].endsWith(",failure")).toBe(true);
-    expect(lines[2].endsWith(",drop")).toBe(true);
-    expect(lines[3].endsWith(",rest-pause")).toBe(true);
+    expect(lines[1].endsWith(",failure,")).toBe(true);
+    expect(lines[2].endsWith(",drop,")).toBe(true);
+    expect(lines[3].endsWith(",rest-pause,")).toBe(true);
     const back = readImport(csv);
     expect(back?.workouts[0].sets.map((x) => x.tag)).toEqual([undefined, "drop", "restPause"]);
   });

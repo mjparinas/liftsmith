@@ -177,7 +177,7 @@ export function generate({
   const hurt = activeInjuries(events, now);
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
   const pool = available(gym.equipment).filter(
-    (e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
+    (e) => !skip.has(e.id) && !e.custom && e.pattern !== "cardio" && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
   );
   const random = rng(hash(dayKey(now) + gym.id));
   const training = profile.training;
