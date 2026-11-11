@@ -4,14 +4,15 @@ import Link from "next/link";
 import { PlateCalculator } from "@/components/site/PlateCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Plate calculator: which plates go on each side of the bar",
   description:
     "Enter a weight and see exactly which plates to load on each side of a barbell, in kg or lb, with the plates you have. Finds the nearest weight when it can't be made.",
-  alternates: { canonical: "/tools/plate-calculator/" },
-};
+  path: "/tools/plate-calculator/",
+});
 
 const FAQ: [string, string][] = [
   [

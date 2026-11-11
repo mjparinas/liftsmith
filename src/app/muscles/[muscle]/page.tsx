@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import {
   EQUIPMENT_NAME,
   equipmentSlug,
+  exerciseCollection,
   exercisesFor,
   MUSCLE_ABOUT,
   MUSCLE_NAME,
@@ -15,7 +17,6 @@ import {
   needsText,
   pairsFor,
 } from "@/lib/seo";
-import { SITE_URL } from "@/lib/site";
 import { MUSCLES } from "@/lib/types";
 
 export const dynamicParams = false;
@@ -27,14 +28,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const m = muscleBySlug((await params).muscle);
   if (!m) return {};
   const n = exercisesFor(m).length;
-  return {
+  return pageMeta({
     title: `${n} best ${MUSCLE_NAME[m].toLowerCase()} exercises`,
-    description: `${MUSCLE_ABOUT[m]} Here are ${n} exercises that train it, with form cues, 3D demos and how many sets a week to do.`.slice(
-      0,
-      300,
-    ),
-    alternates: { canonical: `/muscles/${muscleSlug(m)}/` },
-  };
+    description: `${n} ${MUSCLE_NAME[m].toLowerCase()} exercises with form cues, 3D demos and how many sets a week to do: the best compound lifts first, then isolation work.`,
+    path: `/muscles/${muscleSlug(m)}/`,
+  });
 }
 
 export default async function MusclePage({ params }: Props) {
@@ -45,13 +43,7 @@ export default async function MusclePage({ params }: Props) {
   const pairs = pairsFor(m);
   const compound = list.filter((e) => e.compound);
   const iso = list.filter((e) => !e.compound);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `${MUSCLE_NAME[m]} exercises`,
-    numberOfItems: list.length,
-    itemListElement: list.map((e, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}/exercises/${e.id}/`, name: e.name })),
-  };
+  const jsonLd = exerciseCollection(`${MUSCLE_NAME[m]} exercises`, `/muscles/${muscleSlug(m)}/`, list);
   return (
     <SitePage kind="muscle" sticky={`Build ${name} with a plan`}>
       <JsonLd data={jsonLd} />

@@ -4,12 +4,13 @@ import Link from "next/link";
 import { Crumbs, CtaBanner, CtaInline, SitePage } from "@/components/site/SiteChrome";
 import { COMPETITOR_BY_SLUG, COMPETITORS, TRADEMARKS } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Fitbod alternatives: four workout apps compared",
   description: `Looking for a Fitbod alternative? ${BRAND.name}, Hevy, Strong and Gymverse compared on price, free plans and workout planning, with sourced, dated facts.`,
-  alternates: { canonical: "/alternatives/fitbod/" },
-};
+  path: "/alternatives/fitbod/",
+});
 
 const firstText = (slug: string, topic: "price" | "plans") => COMPETITOR_BY_SLUG.get(slug)?.rows[topic]?.[0]?.text;
 

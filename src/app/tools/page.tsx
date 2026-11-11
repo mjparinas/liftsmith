@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { TOOL_PAGES } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Free tools for lifters",
   description: `Free calculators from ${BRAND.name}: plates per side, one-rep max and TDEE. No sign-up, nothing stored.`,
-  alternates: { canonical: "/tools/" },
-};
+  path: "/tools/",
+});
 
 export default function ToolsIndex() {
   return (

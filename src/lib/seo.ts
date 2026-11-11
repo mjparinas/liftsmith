@@ -83,6 +83,18 @@ export const EQUIPMENT_NAME: Record<Equipment, string> = {
   battleRopes: "Battle ropes",
 };
 
+/** The equipment as a word before "exercises": "Kettlebell exercises", not "Kettlebells exercises". */
+const EQUIPMENT_SINGULAR: Partial<Record<Equipment, string>> = {
+  dumbbells: "Dumbbell",
+  kettlebells: "Kettlebell",
+  bands: "Resistance band",
+  rings: "Gymnastic ring",
+  battleRopes: "Battle rope",
+};
+/** "Kettlebell" → "kettlebell", but "EZ curl bar" keeps its capitals. */
+export const lowerName = (s: string) => (/^[A-Z][a-z]/.test(s) ? s[0]!.toLowerCase() + s.slice(1) : s);
+export const equipmentLabel = (eq: Equipment) => EQUIPMENT_SINGULAR[eq] ?? EQUIPMENT_NAME[eq];
+
 /** One plain line on what each muscle does, for its page. */
 export const MUSCLE_ABOUT: Record<Muscle, string> = {
   chest: "Your chest (pectorals) pushes your arms forward and across your body. It drives every press and push-up.",
@@ -210,3 +222,20 @@ export function siteRoutes(): Route[] {
 }
 
 export const absolute = (path: string) => `${SITE_URL}${path}`;
+
+/** Structured data for a hub page of exercises (muscle, equipment, muscle + equipment): a CollectionPage whose
+ * main entity is the list of exercises, each with its own page. */
+export function exerciseCollection(name: string, path: string, list: readonly Exercise[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    url: absolute(path),
+    mainEntity: {
+      "@type": "ItemList",
+      name,
+      numberOfItems: list.length,
+      itemListElement: list.map((e, i) => ({ "@type": "ListItem", position: i + 1, url: absolute(`/exercises/${e.id}/`), name: e.name })),
+    },
+  };
+}

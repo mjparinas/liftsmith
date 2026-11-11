@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { COMPETITORS, TRADEMARKS } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: `${BRAND.name} compared with other workout apps`,
   description: `How ${BRAND.name} compares with Fitbod, Hevy, Strong and Gymverse on price, free plans, workout planning, plates, recovery and platforms, with every fact sourced and dated.`,
-  alternates: { canonical: "/compare/" },
-};
+  path: "/compare/",
+});
 
 export default function CompareIndex() {
   return (

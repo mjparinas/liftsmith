@@ -4,14 +4,15 @@ import Link from "next/link";
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { CtaBanner } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "About us",
   description: `Why ${name} exists, who makes it and what we believe: adaptive strength training that plans every set, explains why, and gets out of the way while you lift.`,
-  alternates: { canonical: "/about/" },
-};
+  path: "/about/",
+});
 
 /** What the product stands for, from the decisions that shape it (AGENTS.md product rules). */
 const BELIEFS: { title: string; body: string }[] = [

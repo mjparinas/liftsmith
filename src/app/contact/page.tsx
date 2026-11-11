@@ -5,15 +5,16 @@ import { ContactForm } from "@/components/site/ContactForm";
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { BRAND } from "@/lib/brand";
 import { REPLY_TIME } from "@/lib/contact";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL, MAILING_ADDRESS } from "@/lib/site";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Contact us",
   description: `Questions, feedback, a bug, a billing question or a privacy request? Send the ${name} team a message or email us.`,
-  alternates: { canonical: "/contact/" },
-};
+  path: "/contact/",
+});
 
 export default function Contact() {
   return (
