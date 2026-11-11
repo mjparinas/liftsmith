@@ -2,23 +2,29 @@
 
 Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that apply to every change and the list of topics. Record decisions about this topic here, in the same change as the code.
 
-- Self-host the MediaPipe runtime and pose model for camera rep counting (today jsDelivr and Google's bucket), and validate counts on real recorded lifts.
-- Accounts setup: Google is done for the web and Android (2026-11-10: consent screen published, web client built in through `src/lib/authIds.ts`, Android clients for the Play app signing key and the upload key). The iPhone part is under "iOS (deferred)" below.
-- Creator program setup (Melvin): 30-day-trial products or offers in Play Console (a second free-trial offer on the `pro` base plans, eligibility "developer determined" or a separate offer tag) and App Store Connect (an offer code or a second product pair with a 30-day intro offer), a RevenueCat offering named `creator30` with `$rc_monthly` and `$rc_annual` pointing at them, then add each creator in /admin/ › Creators. Payouts are sent by hand from the CSV.
-- Billing setup (Melvin): Play Console payments profile and the `pro` subscription (base plans `monthly` $6.99 and `annual` $39.99, 14-day free-trial offers, family sharing on annual); App Store Connect Paid Apps agreement, banking and tax, the "Pro" group (`pro_monthly`, `pro_annual`, 14-day free intro offers, Family Sharing on annual) and sandbox testers; a RevenueCat project with both apps, the `pro` entitlement and offering, Play's RTDN topic and Apple's server notification URL pointed at RevenueCat, and the webhook to `https://www.getliftsmith.com/api/billing/revenuecat/` with an Authorization value. Then GitHub secrets `REVENUECAT_ANDROID_KEY` and `REVENUECAT_IOS_KEY`, and `REVENUECAT_WEBHOOK_SECRET` in Vercel.
-- Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
-- Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
-- Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.
-- Friends push setup (Melvin; code built 2026-11-11, [Friends](friends.md) "Push notifications"). Until these are done, Activity and the people button's dot carry everything.
-  - In the Firebase console, add Firebase to the Google Cloud project `liftsmith-514303`, then add an Android app `com.getliftsmith.app`.
-  - Download its `google-services.json` and save the whole file as the GitHub secret `GOOGLE_SERVICES_JSON`.
-  - Give a service account (`liftsmith-admin@`, or Firebase's own Admin SDK account) the "Firebase Cloud Messaging API Admin" role, and save its JSON key in Vercel as `FCM_SERVICE_ACCOUNT_JSON` (Production and Preview).
-- Friends store answers (Melvin): retake Play's content rating questionnaire, check Target audience, and add the push token to Data safety, as listed in [Friends](friends.md) under "Store answers". The App Store age rating answers wait with iOS.
+## Public launch: web and Android (2026-11-11)
+
+Done before launch: Google sign-in for the web and Android, Android billing (Play `pro` subscription, RevenueCat, the webhook; a test trial went through on version 7), Stripe live payments on the web, Firebase push for Android Friends (`GOOGLE_SERVICES_JSON`, `FCM_SERVICE_ACCOUNT_JSON`), the analytics database and admin variables, the privacy, terms and delete-account pages on www, Vercel Web Analytics, and the MediaPipe runtime and pose model served from our own origin. What's left, in order (Melvin, in the consoles):
+
+1. **Promote staging to main** after "CI passed" is green, so production gets Friends push, App Links (`/.well-known/assetlinks.json`), the site languages and the help pages, and Release uploads a new build to Internal testing. Install that build and check: a Pro trial, sign-in and sync, a Friends push, a shared link opening the app.
+2. **Play Console › App content**, using `docs/PRIVACY_LABELS.md` and [Friends](friends.md) "Store answers": Data safety (add the push token under Device or other IDs), Content rating (retake it for users interacting), Target audience (18 and over), Health apps and the Health Connect declaration (add READ_NUTRITION and WRITE_EXERCISE), the foreground service declaration (special use, with the unlisted YouTube video of the lock-screen workout notification), Sign in details (`review@getliftsmith.com` and the `REVIEW_SIGNIN_CODE` value), Advertising ID: No.
+3. **Main store listing:** paste the text from `docs/PLAY_LISTING.md` (it now covers Pro, Wear OS, sync and Friends), upload the art in `store/play/` and the promo video link, and tick "Contains in-app purchases".
+4. **Production release:** promote the tested build from Internal testing to Production (the Wear OS build to its production track too), pick the countries in [Google Play review](google-play-review.md), and send for review.
+5. **Once the listing is live:** set `NEXT_PUBLIC_GOOGLE_PLAY_URL` in Vercel (Production and Preview) to `https://play.google.com/store/apps/details?id=com.getliftsmith.app` and redeploy, so the site's Google Play badges stop saying "Coming soon"; the App Store badge keeps saying it until iOS ships.
+
+After launch, not blocking it:
+
+- Validate camera rep counting on real recorded lifts.
+- Creator program: add each creator in /admin/ › Creators (Android's 30-day offers exist); payouts are sent by hand from the CSV. The iPhone side is under iOS below.
+- Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials (samples never show on the live site).
+- A dedicated RevenueCat service account in Google Cloud, so `liftsmith-admin@` can drop Pub/Sub Admin.
 - Profile links (`/app/#/person/<handle>`) open the installed app on Android (App Links) and the web app on iPhone until Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
 
 ## iOS (deferred)
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
+
+- **Billing on iPhone:** App Store Connect Paid Apps agreement, banking and tax, the "Pro" group (`pro_monthly`, `pro_annual`, 14-day free intro offers, Family Sharing on annual) and sandbox testers; the App Store app in RevenueCat with Apple's server notification URL; a `creator30` offering with its own products for creator codes; then the GitHub secret `REVENUECAT_IOS_KEY`. App Store App Privacy and age rating answers from `docs/PRIVACY_LABELS.md` and [Friends](friends.md).
 
 - **Voice set logging on iPhone** (Labs, `SpeechLogPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check the speech recognition and microphone prompts, that recognition stays on the device for each of the six languages, and that music comes back after listening.
 
