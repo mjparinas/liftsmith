@@ -88,6 +88,15 @@ export const en = {
   "gloss.bmi.title": "BMI: body mass index",
   "gloss.bmi.body":
     "Weight divided by height squared. It's a rough guide for people who don't lift: it can't tell muscle from fat, so muscular lifters often read as overweight. When you have a body fat reading, trust that instead.",
+  "gloss.liftScores.title": "DOTS, Wilks and IPF GL",
+  "gloss.liftScores.body":
+    "Three ways to score a squat, bench and deadlift total for body weight, so a light lifter and a heavy one can be compared.\nDOTS (2019) and IPF GL (2020) are the newer, fairer formulas; Wilks is the older one many lifters still know. Compare a score only with the same formula.",
+  "gloss.ffmi.title": "FFMI: fat-free mass index",
+  "gloss.ffmi.body":
+    "Your lean mass (everything but fat) divided by your height squared, adjusted to a standard height of 1.8 m. It shows how much muscle you carry, which BMI can't.\nMost men who lift land between 19 and 23, and women about 4 lower. A study of drug-free lifters found few above 25.",
+  "gloss.hrZones.title": "Heart rate zones",
+  "gloss.hrZones.body":
+    "Five bands of effort set from your maximum heart rate, from easy (zone 1) to all-out (zone 5).\nWith a resting heart rate, they use your heart rate reserve (the gap between resting and maximum), which follows your fitness better.",
   "gloss.restDrop.title": "Heart rate drop in rest",
   "gloss.restDrop.body":
     "How many beats a minute your heart rate falls in the first minute after a set, from your heart rate monitor. A bigger drop over the months means a fitter heart; a smaller one than usual can mean you're tired.",
@@ -192,6 +201,15 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.bmi.title": "IMC: índice de masa corporal",
   "gloss.bmi.body":
     "El peso dividido por la altura al cuadrado. Es una guía aproximada para quien no entrena con pesas: no distingue músculo de grasa, así que muchos levantadores musculados salen con sobrepeso. Si tienes una medida de grasa corporal, fíate de ella.",
+  "gloss.liftScores.title": "DOTS, Wilks e IPF GL",
+  "gloss.liftScores.body":
+    "Tres formas de puntuar un total de sentadilla, banca y peso muerto según el peso corporal, para comparar a alguien ligero con alguien pesado.\nDOTS (2019) e IPF GL (2020) son las fórmulas más nuevas y justas; Wilks es la antigua que mucha gente aún conoce. Compara una puntuación solo con la misma fórmula.",
+  "gloss.ffmi.title": "FFMI: índice de masa libre de grasa",
+  "gloss.ffmi.body":
+    "Tu masa magra (todo menos la grasa) dividida por tu altura al cuadrado, ajustada a una altura estándar de 1,8 m. Muestra cuánto músculo tienes, cosa que el IMC no puede.\nLa mayoría de los hombres que entrenan está entre 19 y 23, y las mujeres unos 4 menos. Un estudio con personas sin fármacos encontró pocas por encima de 25.",
+  "gloss.hrZones.title": "Zonas de frecuencia cardiaca",
+  "gloss.hrZones.body":
+    "Cinco franjas de esfuerzo a partir de tu frecuencia máxima, de suave (zona 1) a máximo (zona 5).\nCon la frecuencia en reposo usan tu reserva cardiaca (la diferencia entre reposo y máxima), que sigue mejor tu forma física.",
   "gloss.restDrop.title": "Bajada de pulsaciones en el descanso",
   "gloss.restDrop.body":
     "Cuántas pulsaciones por minuto baja tu frecuencia cardiaca en el primer minuto tras una serie, según tu pulsómetro. Una bajada mayor con los meses indica un corazón más en forma; una menor de lo habitual puede indicar cansancio.",
@@ -294,6 +312,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.bmi.title": "IMC : indice de masse corporelle",
   "gloss.bmi.body":
     "Le poids divisé par la taille au carré. C’est un repère approximatif pour les personnes qui ne font pas de musculation : il ne distingue pas le muscle de la graisse, donc les pratiquants musclés paraissent souvent en surpoids. Si vous avez une mesure de masse grasse, fiez-vous plutôt à elle.",
+  "gloss.liftScores.title": "DOTS, Wilks et IPF GL",
+  "gloss.liftScores.body":
+    "Trois façons de noter un total squat, développé couché et soulevé de terre selon le poids de corps, pour comparer un gabarit léger et un lourd.\nDOTS (2019) et IPF GL (2020) sont les formules récentes et plus justes ; Wilks est l'ancienne que beaucoup connaissent encore. Ne comparez un score qu'avec la même formule.",
+  "gloss.ffmi.title": "FFMI : indice de masse non grasse",
+  "gloss.ffmi.body":
+    "Votre masse maigre (tout sauf le gras) divisée par votre taille au carré, ramenée à une taille standard de 1,8 m. Il montre combien de muscle vous portez, ce que l'IMC ne peut pas faire.\nLa plupart des hommes qui s'entraînent sont entre 19 et 23, les femmes environ 4 de moins. Une étude sur des pratiquants sans dopage en a trouvé peu au-dessus de 25.",
+  "gloss.hrZones.title": "Zones de fréquence cardiaque",
+  "gloss.hrZones.body":
+    "Cinq niveaux d'effort calculés à partir de votre fréquence maximale, du plus facile (zone 1) au maximum (zone 5).\nAvec une fréquence au repos, elles utilisent votre réserve cardiaque (l'écart entre repos et maximum), qui suit mieux votre forme.",
   "gloss.restDrop.title": "Baisse du rythme cardiaque au repos",
   "gloss.restDrop.body":
     "De combien de battements par minute votre fréquence cardiaque baisse dans la première minute après une série, d’après votre cardiofréquencemètre. Une baisse plus grande au fil des mois signifie un cœur plus en forme ; une baisse plus faible que d’habitude peut signaler de la fatigue.",
@@ -396,6 +423,15 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.bmi.title": "BMI: Body-Mass-Index",
   "gloss.bmi.body":
     "Gewicht geteilt durch Größe zum Quadrat. Ein grober Richtwert für Menschen, die kein Krafttraining machen: Er kann Muskeln nicht von Fett unterscheiden, daher gelten muskulöse Kraftsportler oft als übergewichtig. Wenn du einen Körperfettwert hast, verlass dich lieber darauf.",
+  "gloss.liftScores.title": "DOTS, Wilks und IPF GL",
+  "gloss.liftScores.body":
+    "Drei Arten, ein Total aus Kniebeuge, Bankdrücken und Kreuzheben nach Körpergewicht zu bewerten, damit Leichte und Schwere vergleichbar sind.\nDOTS (2019) und IPF GL (2020) sind die neueren, faireren Formeln; Wilks ist die ältere, die viele noch kennen. Vergleich einen Wert nur mit derselben Formel.",
+  "gloss.ffmi.title": "FFMI: fettfreier Masseindex",
+  "gloss.ffmi.body":
+    "Deine Magermasse (alles außer Fett) geteilt durch die Körpergröße zum Quadrat, umgerechnet auf eine Standardgröße von 1,8 m. Er zeigt, wie viel Muskel du trägst, was der BMI nicht kann.\nDie meisten trainierenden Männer liegen zwischen 19 und 23, Frauen etwa 4 darunter. Eine Studie mit Athleten ohne Doping fand kaum jemanden über 25.",
+  "gloss.hrZones.title": "Herzfrequenzzonen",
+  "gloss.hrZones.body":
+    "Fünf Belastungsbereiche aus deiner maximalen Herzfrequenz, von locker (Zone 1) bis Vollgas (Zone 5).\nMit Ruhepuls nutzen sie deine Herzfrequenzreserve (den Abstand zwischen Ruhe und Maximum), die deiner Fitness besser folgt.",
   "gloss.restDrop.title": "Herzfrequenzabfall in der Pause",
   "gloss.restDrop.body":
     "Um wie viele Schläge pro Minute deine Herzfrequenz in der ersten Minute nach einem Satz fällt, gemessen von deinem Herzfrequenzmesser. Ein größerer Abfall über die Monate bedeutet ein fitteres Herz; ein kleinerer als sonst kann heißen, dass du müde bist.",
@@ -498,6 +534,15 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.bmi.title": "IMC: indice di massa corporea",
   "gloss.bmi.body":
     "Il peso diviso per l’altezza al quadrato. È un’indicazione approssimativa per chi non si allena con i pesi: non distingue il muscolo dal grasso, quindi chi è muscoloso risulta spesso in sovrappeso. Se hai una misura del grasso corporeo, fidati di quella.",
+  "gloss.liftScores.title": "DOTS, Wilks e IPF GL",
+  "gloss.liftScores.body":
+    "Tre modi per valutare un totale di squat, panca e stacco in base al peso corporeo, per confrontare chi è leggero con chi è pesante.\nDOTS (2019) e IPF GL (2020) sono le formule più recenti ed eque; Wilks è quella vecchia che molti conoscono ancora. Confronta un punteggio solo con la stessa formula.",
+  "gloss.ffmi.title": "FFMI: indice di massa magra",
+  "gloss.ffmi.body":
+    "La tua massa magra (tutto tranne il grasso) divisa per l'altezza al quadrato, riportata a un'altezza standard di 1,8 m. Mostra quanto muscolo hai, cosa che il BMI non sa fare.\nLa maggior parte degli uomini che si allenano sta tra 19 e 23, le donne circa 4 in meno. Uno studio su atleti senza doping ne ha trovati pochi sopra 25.",
+  "gloss.hrZones.title": "Zone di frequenza cardiaca",
+  "gloss.hrZones.body":
+    "Cinque fasce di sforzo calcolate dalla frequenza massima, da facile (zona 1) a massimo (zona 5).\nCon la frequenza a riposo usano la riserva cardiaca (la differenza tra riposo e massima), che segue meglio la tua forma.",
   "gloss.restDrop.title": "Calo della frequenza cardiaca nel riposo",
   "gloss.restDrop.body":
     "Di quanti battiti al minuto scende la frequenza cardiaca nel primo minuto dopo una serie, dal tuo cardiofrequenzimetro. Un calo più ampio nel corso dei mesi indica un cuore più in forma; uno più piccolo del solito può voler dire che sei stanco.",
@@ -600,6 +645,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.bmi.title": "BMI：体格指数",
   "gloss.bmi.body":
     "体重を身長の2乗で割った値です。筋トレをしない人向けの大まかな目安で、筋肉と脂肪を区別できないため、筋肉量の多い人は肥満と判定されがちです。体脂肪の測定値があれば、そちらを信頼してください。",
+  "gloss.liftScores.title": "DOTS・Wilks・IPF GL",
+  "gloss.liftScores.body":
+    "スクワット・ベンチプレス・デッドリフトのトータルを体重に合わせて採点する3つの方式です。体重の軽い人と重い人を比べられます。\nDOTS（2019年）とIPF GL（2020年）は新しく公平な式で、Wilksは今も知られている古い式です。スコアは同じ式どうしで比べてください。",
+  "gloss.ffmi.title": "FFMI（除脂肪量指数）",
+  "gloss.ffmi.body":
+    "除脂肪量（脂肪以外のすべて）を身長の2乗で割り、標準身長1.8 mに補正した値です。BMIではわからない筋肉の量がわかります。\n筋トレをする男性の多くは19〜23、女性は約4低くなります。薬物を使わない人の研究では、25を超える人はほとんどいませんでした。",
+  "gloss.hrZones.title": "心拍ゾーン",
+  "gloss.hrZones.body":
+    "最大心拍数から決める5段階の強度で、楽なゾーン1から全力のゾーン5まであります。\n安静時心拍数があると予備心拍数（安静時と最大の差）を使うため、体力の変化により合います。",
   "gloss.restDrop.title": "休憩中の心拍数の低下",
   "gloss.restDrop.body":
     "セット後の最初の1分間で心拍数が1分あたり何拍下がるかを、心拍計で測ったものです。数か月かけて下がり幅が大きくなれば心肺が鍛えられた証拠で、いつもより小さければ疲れているのかもしれません。",

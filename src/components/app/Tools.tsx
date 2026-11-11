@@ -1,12 +1,15 @@
 "use client";
 
-// Tools: calculators that use what the app already knows. First up, TDEE (tdee.ts), kept current from
-// Your stats (BodyStats.tsx), weigh-ins, body fat and training days, with a history graph.
+// Tools: calculators that use what the app already knows. TDEE (tdee.ts) is drawn here, kept current from
+// Your stats (BodyStats.tsx), weigh-ins, body fat and training days, with a history graph. The others each have
+// their own file in ./tools/ and an entry in TOOLS, which is the hub's list and the router for #/tools/<arg>.
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { track } from "@/lib/analytics";
+import { ffmi, tanakaMax } from "@/lib/calculators";
 import { date, inSentence, list, num, t } from "@/lib/i18n";
+import { allOneRms, dotsBand, dotsFromData } from "@/lib/onerm";
 import { useApp } from "@/lib/store";
 import { STRETCHES } from "@/lib/stretches";
 import {
@@ -27,7 +30,15 @@ import { useNow } from "@/lib/useNow";
 import { StatsSummary } from "./BodyStats";
 import { Icon, type IconName } from "./icons";
 import { go } from "./router";
+import { HUE } from "./theme";
+import { BodyFatTool } from "./tools/BodyFatTool";
+import { FfmiTool } from "./tools/FfmiTool";
+import { HrZonesTool } from "./tools/HrZonesTool";
+import { IntervalTool } from "./tools/IntervalTool";
+import { MacrosTool } from "./tools/MacrosTool";
+import { OneRmTool } from "./tools/OneRmTool";
 import { PlateTool } from "./tools/PlateTool";
+import { StrengthTool } from "./tools/StrengthTool";
 import { WarmupTool } from "./tools/WarmupTool";
 import { BumpField, Chip, ScreenHeader, Section } from "./ui";
 
@@ -38,72 +49,167 @@ const DAY = 86_400_000;
 
 export function Tools({ arg }: { arg?: string }) {
   if (arg === "tdee") return <TdeeScreen />;
-  if (arg === "plates") return <PlateTool />;
-  if (arg === "warmup") return <WarmupTool />;
+  const tool = TOOLS.find((x) => x.arg === arg);
+  if (tool?.screen) return <tool.screen />;
   return <ToolsHub />;
 }
+
+/** One row on the Tools hub: where it goes, its icon and tint, and a line that's the lifter's own number when there is one. */
+interface ToolEntry {
+  arg: string;
+  icon: IconName;
+  tint: string;
+  title: () => string;
+  line: (ctx: HubCtx) => string;
+  /** The screen at #/tools/<arg>; TDEE is drawn in this file, stretching is its own route. */
+  screen?: () => ReactNode;
+  go?: () => void;
+}
+
+interface HubCtx {
+  tdee: ReturnType<typeof currentTdee>;
+  dots: number | null;
+  maxes: number;
+  ffmi: number | null;
+  hrMax?: number;
+}
+
+// The order lifters reach for them: calories and food, strength numbers, body, then the timer and stretching.
+const TOOLS: ToolEntry[] = [
+  {
+    arg: "tdee",
+    icon: "flame",
+    tint: HUE.ember,
+    title: () => t("tdee.title"),
+    line: ({ tdee }) => (tdee.result ? t("tdee.hubValue", { kcal: kcal(tdee.result.tdee) }) : t("tdee.hub")),
+  },
+  {
+    arg: "macros",
+    icon: "leaf",
+    tint: HUE.mint,
+    title: () => t("calc.mac.title"),
+    line: () => t("calc.mac.hub"),
+    screen: MacrosTool,
+  },
+  {
+    arg: "onerm",
+    icon: "target",
+    tint: HUE.accent,
+    title: () => t("calc.orm.title"),
+    line: ({ maxes }) => (maxes ? t("calc.orm.hubValue", { count: maxes }) : t("calc.orm.hub")),
+    screen: OneRmTool,
+  },
+  {
+    arg: "plates",
+    icon: "dumbbell",
+    tint: HUE.accent,
+    title: () => t("tools.plate.title"),
+    line: () => t("tools.plate.hub"),
+    screen: PlateTool,
+  },
+  {
+    arg: "warmup",
+    icon: "layers",
+    tint: HUE.accent,
+    title: () => t("tools.warm.title"),
+    line: () => t("tools.warm.hub"),
+    screen: WarmupTool,
+  },
+  {
+    arg: "strength",
+    icon: "trophy",
+    tint: HUE.gold,
+    title: () => t("calc.str.title"),
+    line: ({ dots: d }) => (d !== null ? t("calc.str.hubValue", { score: fmtNum(Math.round(d)), band: dotsBand(d) }) : t("calc.str.hub")),
+    screen: StrengthTool,
+  },
+  {
+    arg: "bodyfat",
+    icon: "layers",
+    tint: HUE.violet,
+    title: () => t("calc.bf.title"),
+    line: () => t("calc.bf.hub"),
+    screen: BodyFatTool,
+  },
+  {
+    arg: "ffmi",
+    icon: "dumbbell",
+    tint: HUE.violet,
+    title: () => t("calc.ffmi.title"),
+    line: ({ ffmi: f }) => (f !== null ? t("calc.ffmi.hubValue", { value: fmtNum(Math.round(f * 10) / 10) }) : t("calc.ffmi.hub")),
+    screen: FfmiTool,
+  },
+  {
+    arg: "hrzones",
+    icon: "heart",
+    tint: HUE.ember,
+    title: () => t("calc.hr.title"),
+    line: ({ hrMax }) => (hrMax ? t("calc.hr.hubValue", { bpm: num(hrMax) }) : t("calc.hr.hub")),
+    screen: HrZonesTool,
+  },
+  {
+    arg: "intervals",
+    icon: "clock",
+    tint: HUE.cyan,
+    title: () => t("calc.itv.title"),
+    line: () => t("calc.itv.hub"),
+    screen: IntervalTool,
+  },
+  {
+    arg: "stretch",
+    icon: "stretch",
+    tint: HUE.cyan,
+    title: () => t("str.hub"),
+    line: () => t("str.hubBody", { count: STRETCHES.length }),
+    go: () => go("stretch"),
+  },
+];
 
 function ToolsHub() {
   const { events, stats, profile } = useApp();
   const now = useNow(60_000);
-  const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
+  const ctx = useMemo<HubCtx>(() => {
+    const kg = currentKg(events, profile);
+    const fat = currentBodyFat(events, profile);
+    const f = profile.heightCm && fat !== undefined ? ffmi(kg, profile.heightCm, fat) : null;
+    const age = profile.birthYear ? new Date(now).getFullYear() - profile.birthYear : undefined;
+    return {
+      tdee: currentTdee(events, stats.sessions, profile, now),
+      dots: profile.sex ? dotsFromData(events, profile, now, profile.sex).score : null,
+      maxes: allOneRms(events, now, profile).length,
+      ffmi: f?.normalized ?? null,
+      hrMax: profile.hrMax ?? (age !== undefined ? tanakaMax(age) : undefined),
+    };
+  }, [events, stats.sessions, profile, now]);
   return (
     <div className="pb-2">
       <ScreenHeader back={{ label: t("tools.back"), onClick: () => go("stats") }} title={t("tools.title")} />
       <ul className="mt-4 space-y-3">
-        <li>
-          <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center gap-4 p-4 text-left">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-accent/15 text-accent">
-              <Icon name="flame" size={22} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-semibold">{t("tdee.title")}</span>
-              <span className="block text-sm text-muted">
-                {cur.result ? t("tdee.hubValue", { kcal: kcal(cur.result.tdee) }) : t("tdee.hub")}
+        {TOOLS.map((x) => (
+          <li key={x.arg}>
+            <button
+              type="button"
+              onClick={x.go ?? (() => go("tools", x.arg))}
+              className="press card flex w-full items-center gap-4 p-4 text-left"
+            >
+              <span
+                className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl"
+                style={{ background: `color-mix(in srgb, ${x.tint} 15%, transparent)`, color: x.tint }}
+              >
+                <Icon name={x.icon} size={22} />
               </span>
-            </span>
-            <span className="text-accent" aria-hidden>
-              ›
-            </span>
-          </button>
-        </li>
-        <HubRow icon="dumbbell" title={t("tools.plate.title")} body={t("tools.plate.hub")} onClick={() => go("tools", "plates")} />
-        <HubRow icon="layers" title={t("tools.warm.title")} body={t("tools.warm.hub")} onClick={() => go("tools", "warmup")} />
-        <li>
-          <button type="button" onClick={() => go("stretch")} className="press card flex w-full items-center gap-4 p-4 text-left">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-cyan/15 text-cyan">
-              <Icon name="stretch" size={22} />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block font-semibold">{t("str.hub")}</span>
-              <span className="block text-sm text-muted">{t("str.hubBody", { count: STRETCHES.length })}</span>
-            </span>
-            <span className="text-accent" aria-hidden>
-              ›
-            </span>
-          </button>
-        </li>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold">{x.title()}</span>
+                <span className="block text-sm text-muted">{x.line(ctx)}</span>
+              </span>
+              <span className="text-accent" aria-hidden>
+                ›
+              </span>
+            </button>
+          </li>
+        ))}
       </ul>
     </div>
-  );
-}
-
-function HubRow({ icon, title, body, onClick }: { icon: IconName; title: string; body: string; onClick: () => void }) {
-  return (
-    <li>
-      <button type="button" onClick={onClick} className="press card flex w-full items-center gap-4 p-4 text-left">
-        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-violet/15 text-violet">
-          <Icon name={icon} size={22} />
-        </span>
-        <span className="min-w-0 flex-1">
-          <span className="block font-semibold">{title}</span>
-          <span className="block text-sm text-muted">{body}</span>
-        </span>
-        <span className="text-accent" aria-hidden>
-          ›
-        </span>
-      </button>
-    </li>
   );
 }
 

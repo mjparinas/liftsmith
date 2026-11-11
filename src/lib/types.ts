@@ -267,7 +267,14 @@ export interface Profile {
   /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
   bodyFat?: { pct: number; at: number };
   /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */
-  tdee?: { activity?: "sedentary" | "light" | "moderate" | "heavy" | "athlete"; useBodyFat?: boolean };
+  tdee?: {
+    activity?: "sedentary" | "light" | "moderate" | "heavy" | "athlete";
+    useBodyFat?: boolean;
+    /** Tools › Macros: the goal calories and macros are worked out for (calculators.ts). Missing means maintain. */
+    goal?: "cut" | "maintain" | "bulk";
+  };
+  /** Tools › Heart rate zones: a maximum heart rate the lifter knows (bpm). Missing means estimated from age. */
+  hrMax?: number;
   /** Estimated one-rep maxes (kg) the lifter entered at setup, keyed by exercise id (KNOWN_LIFTS). */
   knownMaxes?: Partial<Record<string, number>>;
   /**
