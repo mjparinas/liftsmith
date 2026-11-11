@@ -8,7 +8,8 @@ import { flag, setLocalFlag } from "./flags";
 // When a lab is ready, its flag and its entry here go, and the feature ships to whoever it belongs to.
 
 /** Flags that are labs: on or off switches. */
-export type LabFlag = "labRepCount" | "repMotion" | "labBarSpeed" | "labHrRest" | "labTrainer" | "labFormCheck" | "labVoiceLog" | "labSpeedMax";
+export type LabFlag =
+  "labRepCount" | "repMotion" | "labBarSpeed" | "labHrRest" | "labTrainer" | "labFormCheck" | "labVoiceLog" | "labSpeedMax";
 
 export interface Lab {
   flag: LabFlag;
