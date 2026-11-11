@@ -37,6 +37,10 @@ export const en = {
   "lab.voiceLog.title": "Voice set logging",
   "lab.voiceLog.body":
     'Adds a microphone above Log set on the workout screen. Tap it and say "100 for 8", "8 reps", "too easy" or "undo". Speech is recognized on your phone and never recorded or sent, so it needs a phone that can do that in your language.',
+  "lab.handsFree.title": "Hands-free sets",
+  "lab.handsFree.body":
+    "While camera, phone motion or watch rep counting is counting, the set logs itself a few seconds after your last rep and rest starts: 4 seconds once your planned reps are in, 8 while you're short of them. Undo puts it back. Needs one of those rep counting labs on.",
+  "lab.handsFree.soon": "Logging this set in {s} s. Do another rep to keep going.",
   "lab.tempo.title": "Tempo coach",
   "lab.tempo.body":
     "On tempo and paused lifts, like a tempo squat or a paused bench, adds Count tempo above Log set. Tap it as you take the weight: after 3, 2, 1 it counts every second of each rep in sound and buzzes, a falling note to lower, a steady one to hold and a rising one to lift, then stops after your reps. Log set is still one tap.",
@@ -79,6 +83,10 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrar series con la voz",
   "lab.voiceLog.body":
     "Añade un micrófono encima de Registrar serie en la pantalla de entrenamiento. Tócalo y di «100 por 8», «8 repeticiones», «demasiado fácil» o «deshacer». La voz se reconoce en tu teléfono y nunca se graba ni se envía, así que necesita un teléfono que pueda hacerlo en tu idioma.",
+  "lab.handsFree.title": "Series sin manos",
+  "lab.handsFree.body":
+    "Mientras se cuentan las repeticiones con la cámara, el movimiento del teléfono o el reloj, la serie se registra sola unos segundos después de tu última repetición y empieza el descanso: 4 segundos si ya hiciste las repeticiones previstas, 8 si te faltan. Deshacer la quita. Necesita uno de esos labs de conteo activado.",
+  "lab.handsFree.soon": "Registrando esta serie en {s} s. Haz otra repetición para seguir.",
   "lab.tempo.title": "Entrenador de tempo",
   "lab.tempo.body":
     "En los ejercicios con tempo o con pausa, como la sentadilla con tempo o el press de banca con pausa, añade Marcar el tempo encima de Registrar serie. Tócalo al coger el peso: tras 3, 2, 1 cuenta cada segundo de cada repetición con sonidos y vibraciones, una nota que baja para bajar, una fija para aguantar y una que sube para subir, y se detiene al terminar tus repeticiones. Registrar la serie sigue siendo un solo toque.",
@@ -120,6 +128,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Saisie des séries à la voix",
   "lab.voiceLog.body":
     "Ajoute un micro au-dessus de Valider la série sur l'écran d'entraînement. Touchez-le et dites « 100 pour 8 », « 8 répétitions », « trop facile » ou « annuler ». La parole est reconnue sur votre téléphone et n'est jamais enregistrée ni envoyée, il faut donc un téléphone qui sait le faire dans votre langue.",
+  "lab.handsFree.title": "Séries sans les mains",
+  "lab.handsFree.body":
+    "Pendant que la caméra, le mouvement du téléphone ou la montre compte vos répétitions, la série s'enregistre seule quelques secondes après votre dernière répétition et le repos commence : 4 secondes une fois les répétitions prévues faites, 8 s'il vous en manque. Annuler la retire. Nécessite l'un de ces labs de comptage activé.",
+  "lab.handsFree.soon": "Enregistrement de cette série dans {s} s. Faites une autre répétition pour continuer.",
   "lab.tempo.title": "Coach de tempo",
   "lab.tempo.body":
     "Sur les exercices avec tempo ou avec pause, comme le squat tempo ou le développé couché avec pause, ajoute Compter le tempo au-dessus de Valider la série. Touche-le en prenant la charge : après 3, 2, 1, il compte chaque seconde de chaque répétition par des sons et des vibrations, une note qui descend pour descendre, une note fixe pour tenir et une note qui monte pour monter, puis s'arrête après tes répétitions. Valider la série reste une seule touche.",
@@ -161,6 +173,10 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Sätze per Stimme eintragen",
   "lab.voiceLog.body":
     "Fügt auf dem Trainingsbildschirm über Satz eintragen ein Mikrofon hinzu. Tipp darauf und sag „100 für 8“, „8 Wiederholungen“, „zu leicht“ oder „rückgängig“. Die Sprache wird auf deinem Handy erkannt und nie aufgenommen oder gesendet, daher braucht es ein Handy, das das in deiner Sprache kann.",
+  "lab.handsFree.title": "Sätze ohne Hände",
+  "lab.handsFree.body":
+    "Während Kamera, Handybewegung oder Uhr deine Wiederholungen zählen, wird der Satz ein paar Sekunden nach der letzten Wiederholung von selbst eingetragen und die Pause beginnt: 4 Sekunden, wenn die geplanten Wiederholungen geschafft sind, 8, solange noch welche fehlen. Rückgängig nimmt ihn zurück. Braucht eines dieser Labs zum Zählen.",
+  "lab.handsFree.soon": "Satz wird in {s} s eingetragen. Mach noch eine Wiederholung, um weiterzumachen.",
   "lab.tempo.title": "Tempo-Coach",
   "lab.tempo.body":
     "Bei Tempo- und Pausenübungen wie Tempo-Kniebeugen oder Bankdrücken mit Pause erscheint über „Satz eintragen“ die Schaltfläche Tempo zählen. Tippe sie an, wenn du das Gewicht aufnimmst: Nach 3, 2, 1 zählt sie jede Sekunde jeder Wiederholung mit Tönen und Vibration, ein fallender Ton zum Ablassen, ein gleichbleibender zum Halten und ein steigender zum Hochdrücken, und hört nach deinen Wiederholungen auf. Satz eintragen bleibt ein Tippen.",
@@ -201,6 +217,10 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrare le serie con la voce",
   "lab.voiceLog.body":
     "Aggiunge un microfono sopra Registra serie nella schermata dell'allenamento. Toccalo e di' «100 per 8», «8 ripetizioni», «troppo facile» o «annulla». La voce viene riconosciuta sul telefono e non viene mai registrata né inviata, quindi serve un telefono che sappia farlo nella tua lingua.",
+  "lab.handsFree.title": "Serie a mani libere",
+  "lab.handsFree.body":
+    "Mentre la fotocamera, il movimento del telefono o l'orologio contano le ripetizioni, la serie si registra da sola pochi secondi dopo l'ultima ripetizione e parte il recupero: 4 secondi quando hai fatto le ripetizioni previste, 8 se ne mancano. Annulla la toglie. Serve uno di questi lab di conteggio attivo.",
+  "lab.handsFree.soon": "Registro questa serie tra {s} s. Fai un'altra ripetizione per continuare.",
   "lab.tempo.title": "Coach del tempo",
   "lab.tempo.body":
     "Negli esercizi a tempo o con fermo, come lo squat a tempo o la panca con fermo, aggiunge Conta il tempo sopra Registra serie. Toccalo mentre prendi il peso: dopo 3, 2, 1 conta ogni secondo di ogni ripetizione con suoni e vibrazioni, una nota che scende per scendere, una ferma per tenere e una che sale per salire, poi si ferma dopo le tue ripetizioni. Registrare la serie resta un solo tocco.",
@@ -241,6 +261,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "声でセットを記録",
   "lab.voiceLog.body":
     "ワークアウト画面の「セットを記録」の上にマイクを追加します。タップして「100キロで8回」「8回」「簡単すぎ」「取り消し」のように言ってください。音声はスマートフォン上で認識され、録音や送信はされないため、お使いの言語でそれができるスマートフォンが必要です。",
+  "lab.handsFree.title": "ハンズフリーセット",
+  "lab.handsFree.body":
+    "カメラ、スマホのモーション、またはウォッチでレップを数えている間、最後のレップから数秒後にセットが自動で記録され、休憩が始まります。予定のレップに届いていれば4秒、足りなければ8秒です。元に戻すで取り消せます。いずれかのレップカウントのラボをオンにしてください。",
+  "lab.handsFree.soon": "{s}秒後にこのセットを記録します。続けるにはもう1レップ。",
   "lab.tempo.title": "テンポコーチ",
   "lab.tempo.body":
     "テンポスクワットや一時停止ベンチプレスなど、テンポや停止のある種目で「セットを記録」の上に「テンポを数える」が出ます。重さを持つときにタップすると、3、2、1のあとに各レップの1秒ごとを音と振動で数えます。下ろすときは下がる音、止めるときは同じ音、上げるときは上がる音で、決めたレップ数が終わると止まります。セットの記録はこれまでどおりワンタップです。",
