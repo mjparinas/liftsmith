@@ -122,6 +122,10 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
+  // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
+  await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
+  await page.getByRole("heading", { name: "Push day" }).waitFor();
+  await scan("shared routine");
   // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
   await page.goto(`${server.url}/app/#/stretch`);
   await page.getByTestId("stretch-list").waitFor();

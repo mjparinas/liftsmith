@@ -11,11 +11,13 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.
-- App Links (Android) and Universal Links (iOS) on the real domain, so workout remix links open in the installed app.
+- App Links (Android) and Universal Links (iOS) on the real domain, so workout remix links and shared routine links (`/app/#/routine/…`) open in the installed app. Android needs `public/.well-known/assetlinks.json` with the SHA-256 of the Play app signing key (Play Console › Test and release › App integrity) and an `autoVerify` intent filter for `https://www.getliftsmith.com/app/`; the iOS half is under "iOS (deferred)". Until then those links open the web app, and the in-app "Add a routine from a link" (paste) covers the phones.
 
 ## iOS (deferred)
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
+
+- **Universal Links** for remix and shared routine links: the Associated Domains entitlement (`applinks:www.getliftsmith.com`) on the App ID and in `App.entitlements`, plus `public/.well-known/apple-app-site-association` with the team id and `/app/*`. Until then those links open in Safari, and the in-app paste box (Routines › Add a routine from a link) brings a routine into the app.
 
 - **Sign in with Google on iPhone:** create an iOS OAuth client in Google Cloud (project `liftsmith-514303`, bundle `com.getliftsmith.app`) and put its id in `GOOGLE_IOS_CLIENT_ID` (`src/lib/authIds.ts`). Until then the iPhone app has no Google button.
 - **Sign in with Apple:** enable Sign in with Apple on the App ID `com.getliftsmith.app`; create the Services ID `com.getliftsmith.web` for the web (domain `www.getliftsmith.com`, return URL `https://www.getliftsmith.com/app/`) and put it in `APPLE_SERVICES_ID`; make a Sign in with Apple key and set `APPLE_TEAM_ID`, `APPLE_KEY_ID` and `APPLE_PRIVATE_KEY` in Vercel (for revoking on account deletion); register `getliftsmith.com` and hello@getliftsmith.com for Apple's private relay email. Until then the iPhone app's Apple button can't finish signing in, and the web has no Apple button. Steps: https://claude.ai/artifact/X4Yunes35tx9ZNYt4FYhxY
