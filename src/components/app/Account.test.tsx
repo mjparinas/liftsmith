@@ -57,6 +57,13 @@ describe("signing in with an emailed code", () => {
     expect(screen.getByRole("button", { name: "Continue with email" })).toBeInTheDocument();
   });
 
+  it("links the terms of use and the privacy policy under the sign-in buttons", () => {
+    render(<AccountPanel />);
+    expect(screen.getByText(/By signing in, you agree to the terms of use/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Terms of use" }).getAttribute("href")).toMatch(/\/terms\/$/);
+    expect(screen.getByRole("link", { name: "Privacy policy" }).getAttribute("href")).toMatch(/\/privacy\/$/);
+  });
+
   it("sends the email and the code with Enter, like the buttons", async () => {
     const u = userEvent.setup();
     render(<AccountPanel />);

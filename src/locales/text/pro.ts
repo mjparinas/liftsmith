@@ -52,6 +52,7 @@ export const en = {
   "pro.legal.appstore":
     "Paid through your Apple Account. The subscription renews automatically unless you cancel it at least 24 hours before the end of the period, in Settings › your name › Subscriptions. Cancel before a free trial ends and you won't be charged.",
   "pro.termsLink": "Terms of use",
+  "pro.eulaLink": "Apple licence agreement",
   "pro.privacyLink": "Privacy policy",
   "pro.notHere": "Pro is sold in the Liftsmith app for Android and iPhone. Everything is unlocked here.",
   "pro.status.yearly": "Pro · Yearly",
@@ -129,6 +130,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Se paga con tu cuenta de Apple. La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del final del periodo, en Ajustes › tu nombre › Suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
   "pro.termsLink": "Términos de uso",
+  "pro.eulaLink": "Contrato de licencia de Apple",
   "pro.privacyLink": "Política de privacidad",
   "pro.notHere": "Pro se vende en la app de Liftsmith para Android y iPhone. Aquí todo está desbloqueado.",
   "pro.status.yearly": "Pro · Anual",
@@ -204,6 +206,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Payé via votre compte Apple. L’abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période, dans Réglages › votre nom › Abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
   "pro.termsLink": "Conditions d’utilisation",
+  "pro.eulaLink": "Contrat de licence d’Apple",
   "pro.privacyLink": "Politique de confidentialité",
   "pro.notHere": "Pro est vendu dans l’app Liftsmith pour Android et iPhone. Tout est débloqué ici.",
   "pro.status.yearly": "Pro · Annuel",
@@ -280,6 +283,7 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Bezahlt über deinen Apple Account. Das Abo verlängert sich automatisch, wenn du es nicht mindestens 24 Stunden vor Ende des Zeitraums kündigst, unter Einstellungen › dein Name › Abonnements. Kündigst du vor dem Ende einer kostenlosen Testphase, wird dir nichts berechnet.",
   "pro.termsLink": "Nutzungsbedingungen",
+  "pro.eulaLink": "Apple-Lizenzvertrag",
   "pro.privacyLink": "Datenschutzerklärung",
   "pro.notHere": "Pro wird in der Liftsmith-App für Android und iPhone verkauft. Hier ist alles freigeschaltet.",
   "pro.status.yearly": "Pro · Jährlich",
@@ -355,6 +359,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Pagato tramite il tuo Apple Account. L’abbonamento si rinnova automaticamente se non lo disdici almeno 24 ore prima della fine del periodo, in Impostazioni › il tuo nome › Abbonamenti. Se disdici prima della fine della prova gratuita, non ti viene addebitato nulla.",
   "pro.termsLink": "Condizioni d’uso",
+  "pro.eulaLink": "Contratto di licenza Apple",
   "pro.privacyLink": "Informativa sulla privacy",
   "pro.notHere": "Pro si acquista nell’app Liftsmith per Android e iPhone. Qui è tutto sbloccato.",
   "pro.status.yearly": "Pro · Annuale",
@@ -427,6 +432,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Apple アカウントで支払います。期間終了の24時間前までに 設定 › ユーザ名 › サブスクリプション で解約しない限り、自動的に更新されます。無料お試しの終了前に解約すれば料金はかかりません。",
   "pro.termsLink": "利用規約",
+  "pro.eulaLink": "Apple の使用許諾契約",
   "pro.privacyLink": "プライバシーポリシー",
   "pro.notHere": "Pro は Android と iPhone の Liftsmith アプリで購入できます。ここではすべての機能が使えます。",
   "pro.status.yearly": "Pro · 年額",

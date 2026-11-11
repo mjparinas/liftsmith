@@ -208,6 +208,11 @@ export function Settings() {
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+      <p className="mt-1 text-center text-xs">
+        <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
+          {t("settings.terms")}
+        </a>
+      </p>
       <BuildLine />
     </div>
   );

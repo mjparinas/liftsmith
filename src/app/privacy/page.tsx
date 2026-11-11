@@ -188,7 +188,11 @@ export default function Privacy() {
           <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>
-          . You can also send feedback from the app (Settings › Send feedback or report a bug).
+          . You can also send feedback from the app (Settings › Send feedback or report a bug). The rules for using {BRAND.name} are in our{" "}
+          <a className="text-accent underline" href="/terms/">
+            terms of use
+          </a>
+          .
         </p>
       </main>
       <SiteFooter />
