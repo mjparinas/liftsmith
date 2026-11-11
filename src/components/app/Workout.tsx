@@ -23,6 +23,7 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
+import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
@@ -223,6 +224,18 @@ export function Workout() {
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Heart-rate rest timer (Labs, restReady.ts): once the heart rate is back down, the rest is cut to a few
+  // seconds left (never under its floor), once per rest; the countdown above then ends it as usual.
+  const hrRest = labOn("labHrRest");
+  const lastStart = lastEv?.type === "set" ? lastEv.startedAt : undefined;
+  useEffect(() => {
+    if (!hrRest || !active || !resting || warming || active.tag || !lastStart) return;
+    if (active.hrCut?.restStart === active.restStart) return;
+    const cut = hrRestCut(active, lastStart, now);
+    if (!cut) return;
+    s.cutRest(cut.until, cut);
+  }, [now, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
   // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.

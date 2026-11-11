@@ -715,4 +715,40 @@ describe("Labs", () => {
     location.hash = "#/workout";
     expect(await screen.findByRole("button", { name: "Count reps with the camera" })).toBeInTheDocument();
   });
+
+  it("heart-rate rest timer: cuts the rest once the heart rate is back down, and says why", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: /Labs/ }));
+    await user.click(await screen.findByRole("switch", { name: /Heart-rate rest timer/ }));
+    await startSquat(user);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    // A minute into a 3-minute rest: 100 bpm when the set started, 150 at its end, 104 now.
+    const now = Date.now();
+    const restStart = now - 60_000;
+    const setStart = restStart - 30_000;
+    const st = useApp.getState();
+    const a = st.active!;
+    const last = [...st.events].reverse().find((e) => e.type === "set")!;
+    act(() => {
+      useApp.setState({
+        events: st.events.map((e) => (e.id === last.id && e.type === "set" ? { ...e, startedAt: setStart } : e)),
+        active: {
+          ...a,
+          startedAt: setStart,
+          restStart,
+          restTotal: 180,
+          restUntil: restStart + 180_000,
+          hr: [100, 150, 104],
+          hrAt: [0, 30_000, now - setStart],
+        },
+      });
+    });
+    const line = await screen.findByTestId("hr-cut");
+    expect(line).toHaveTextContent(/back to 104, near the 100 .* rest is \d+ s shorter/);
+    const b = useApp.getState().active!;
+    expect(b.restUntil).toBe(restStart + 108_000);
+    expect(b.hrCut?.restStart).toBe(restStart);
+  });
 });

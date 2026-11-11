@@ -53,6 +53,8 @@ export interface Active {
   lastAt: number;
   /** Warm-up sets done for the exercise on screen (warmup.ts). Missing in workouts saved before warm-ups. */
   warm?: number;
+  /** The heart-rate rest timer lab cut this rest (`restStart` says which one): the reading and seconds saved. */
+  hrCut?: { restStart: number; bpm: number; start: number; saved: number };
   /** Rest auto-start is off: the rest (seconds) waiting for a tap on Start rest. */
   restReady?: number;
   /**
@@ -138,6 +140,8 @@ export interface WorkoutSlice {
   adjustDistance(m: number): void;
   addRest(sec: number): void;
   skipRest(): void;
+  /** Ends the rest early at `until` (heart-rate rest timer lab), shortening restTotal by the same amount. */
+  cutRest(until: number, why: { bpm: number; start: number }): void;
   /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
   startRest(): void;
   /** Skip the rest of the warm-ups and go to the working weight. */
@@ -529,6 +533,21 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         restReady: undefined,
         setStart: now,
         lastRest: a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
+      };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    cutRest(until, why) {
+      const a = get().active;
+      if (!a?.restUntil || !a.restStart || until >= a.restUntil) return;
+      // restTotal shrinks with restUntil, so the ring and the native rest bar (restUntil - restTotal) stay right.
+      const saved = Math.round((a.restUntil - until) / 1000);
+      const next: Active = {
+        ...a,
+        restUntil: until,
+        restTotal: Math.max(1, a.restTotal - saved),
+        hrCut: { restStart: a.restStart, bpm: why.bpm, start: why.start, saved },
       };
       set({ active: next });
       persistActive(next);

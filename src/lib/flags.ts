@@ -34,6 +34,13 @@ export const FLAGS = {
     label: "Labs: camera bar speed",
     description: "Bar speed from the camera while counting reps, with how much it has dropped and when to end the set.",
   },
+  /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
+  labHrRest: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: heart-rate rest timer",
+    description: "Rest ends early once a heart rate monitor or watch shows the heart rate back near where the set started.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
