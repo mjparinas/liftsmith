@@ -35,6 +35,11 @@ describe("Settings, grouped (2026-11-10)", () => {
     expect(screen.queryByText("Creator code")).toBeNull();
   });
 
+  it("shows the version and the commit the build came from (2026-11-11)", () => {
+    render(<Settings />);
+    expect(screen.getByText(/^Version \S+ · build ([0-9a-f]{7}|dev)$/)).toBeTruthy();
+  });
+
   it("opens a group's page, and old deep links land in the right group", async () => {
     const user = userEvent.setup();
     render(<Settings />);

@@ -4,6 +4,7 @@
 // each area, tiles for the headline numbers and charts below. Sign-in is an emailed one-time link.
 import { useCallback, useEffect, useState } from "react";
 
+import { BuildStamp } from "@/components/BuildStamp";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
@@ -617,7 +618,9 @@ export function AdminApp() {
     <div className="mx-auto max-w-6xl px-4 pb-16">
       <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
-          <h1 className="mr-auto text-lg font-bold">Liftsmith admin</h1>
+          <h1 className="mr-auto text-lg font-bold">
+            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal" />
+          </h1>
           <div className="flex gap-1" role="group" aria-label="Period">
             {PERIODS.map((p) => (
               <button

@@ -1,3 +1,4 @@
+import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
 import { SECURITY_HEADERS } from "./src/lib/securityHeaders";
@@ -9,6 +10,21 @@ import { SECURITY_HEADERS } from "./src/lib/securityHeaders";
 // The static build doesn't count `.api.ts` as a page extension, so those routes are left out of it.
 const isStatic = process.env.STATIC_EXPORT === "1";
 
+// The commit this build is made from, shown in Settings, the admin header and the site footer (src/lib/build.ts).
+// Vercel and GitHub Actions say it themselves (the Android and iOS release builds bundle the web build made in
+// release.yml, so they carry its commit); elsewhere ask git. COMMIT_SHA overrides both.
+function commitSha(): string {
+  const fromEnv = process.env.COMMIT_SHA || process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA;
+  if (fromEnv) return fromEnv;
+  try {
+    return execSync("git rev-parse HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim();
+  } catch {
+    return "";
+  }
+}
+
 const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
   trailingSlash: true,
@@ -18,7 +34,11 @@ const nextConfig: NextConfig = {
   ...(isStatic ? {} : { rewrites: async () => [{ source: "/c/:code/", destination: "/c/" }] }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
   ...(isStatic ? {} : { headers: async () => [{ source: "/:path*", headers: SECURITY_HEADERS }] }),
-  env: { NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev", NEXT_PUBLIC_STATIC: isStatic ? "1" : "" },
+  env: {
+    NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev",
+    NEXT_PUBLIC_COMMIT_SHA: commitSha(),
+    NEXT_PUBLIC_STATIC: isStatic ? "1" : "",
+  },
 };
 
 export default nextConfig;
