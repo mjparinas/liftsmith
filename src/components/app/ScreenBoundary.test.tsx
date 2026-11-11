@@ -43,5 +43,6 @@ describe("a screen that fails to draw", () => {
     );
     expect(screen.getByRole("alert").textContent).toContain("Something went wrong on this screen");
     expect(screen.getByRole("button", { name: "Reload" })).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toContain("Error: broken");
   });
 });
