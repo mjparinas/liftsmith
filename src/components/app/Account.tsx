@@ -31,6 +31,7 @@ import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
 
 import { go, historyDepth } from "./router";
+import { ShareLinks } from "./ShareLinks";
 import { Button, ScreenHeader, Section } from "./ui";
 
 function ago(ms: number): string {
@@ -391,6 +392,11 @@ export function Account() {
       <Section title={t("settings.name")}>
         <NameField />
       </Section>
+      {account && (
+        <Section title={t("link.yours")} icon="link">
+          <ShareLinks />
+        </Section>
+      )}
       <Section title={t("account.what")} icon="info">
         <p className="text-sm text-muted">{t("account.what.body")}</p>
       </Section>

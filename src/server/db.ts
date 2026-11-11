@@ -364,6 +364,20 @@ const SCHEMA = [
     sent_at INTEGER NOT NULL
   )`,
   // Shared across serverless instances, unlike an in-memory counter.
+  // Public share links (shareLinks.ts): the card image the lifter chose to publish, deleted with the account.
+  `CREATE TABLE IF NOT EXISTS share_links (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    lang TEXT NOT NULL DEFAULT 'en',
+    width INTEGER NOT NULL,
+    height INTEGER NOT NULL,
+    image BLOB NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,

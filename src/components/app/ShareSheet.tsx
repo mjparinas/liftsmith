@@ -9,13 +9,16 @@ import { useEffect, useMemo, useState } from "react";
 
 import { bodyFor } from "@/components/demo/LiftDemo";
 import { track } from "@/lib/analytics";
+import { useAccount } from "@/lib/auth";
 import { COSMETICS } from "@/lib/game";
 import { t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { shareText, type Shareable, type ShareContext, type ShareOptions } from "@/lib/shareCards";
-import { drawCard, shareCanvas, type CardSize } from "@/lib/shareImage";
+import { drawCard, shareCanvas, type CardData, type CardSize } from "@/lib/shareImage";
+import { copyText, createLink, deleteLink, linkError, shareUrl, type ShareLink } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 
+import { go } from "./router";
 import { Button, Chip, Sheet, SwitchRow } from "./ui";
 
 const PREFS = "liftsmith.sharePrefs";
@@ -192,7 +195,91 @@ function ShareBody({ items, initial }: { items: Shareable[]; initial?: string })
           {note}
         </p>
       )}
+      <LinkSection key={`${item.id}:${prefs.weights}:${opts.name ?? ""}`} item={item} card={card} figure={fig} />
     </div>
+  );
+}
+
+/** Step 2 of sharing: turn this card into a public link with a preview (signed in only). */
+function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; figure: HTMLCanvasElement | null }) {
+  const account = useAccount((s) => s.account);
+  const [link, setLink] = useState<ShareLink | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const make = async () => {
+    setBusy(true);
+    setNote(null);
+    haptic("tap");
+    try {
+      setLink(await createLink(item.kind, card, figure));
+      track("feature", { name: "share_link", detail: item.kind });
+      sound.done();
+    } catch (e) {
+      oops();
+      setNote(linkError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const remove = async () => {
+    if (!link) return;
+    setBusy(true);
+    try {
+      await deleteLink(link.id);
+      setLink(null);
+      setNote(t("link.deleted"));
+    } catch (e) {
+      oops();
+      setNote(linkError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section className="mt-6 border-t border-line pt-4" aria-labelledby="share-link-title">
+      <h3 id="share-link-title" className="text-xs font-semibold uppercase tracking-wider text-muted">
+        {t("link.title")}
+      </h3>
+      {!account ? (
+        <>
+          <p className="mt-2 text-sm text-muted">{t("link.signInBody")}</p>
+          <Button kind="ghost" className="mt-3 w-full" icon="lock" onClick={() => go("account")}>
+            {t("link.signIn")}
+          </Button>
+        </>
+      ) : link ? (
+        <>
+          <p className="card mt-3 select-all break-all px-4 py-3 text-sm">{link.url}</p>
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <Button
+              kind="ghost"
+              icon="link"
+              onClick={async () => {
+                if (!(await shareUrl(link.url, card.headline))) setNote((await copyText(link.url)) ? t("link.copied") : link.url);
+              }}
+            >
+              {t("link.share")}
+            </Button>
+            <Button kind="ghost" onClick={async () => setNote((await copyText(link.url)) ? t("link.copied") : link.url)}>
+              {t("link.copy")}
+            </Button>
+          </div>
+          <Button kind="quiet" className="mt-2 w-full" disabled={busy} onClick={() => void remove()}>
+            {t("link.delete")}
+          </Button>
+        </>
+      ) : (
+        <Button kind="ghost" className="mt-3 w-full" icon="link" disabled={busy} onClick={() => void make()}>
+          {busy ? t("link.creating") : t("link.create")}
+        </Button>
+      )}
+      {account && <p className="mt-3 text-xs text-muted">{t("link.note")}</p>}
+      {note && (
+        <p className="mt-2 text-center text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
+    </section>
   );
 }
 

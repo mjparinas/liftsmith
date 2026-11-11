@@ -55,6 +55,7 @@ import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
@@ -166,6 +167,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...ins.it,
   ...lab.it,
   ...league.it,
+  ...link.it,
   ...lvl.it,
   ...map.it,
   ...mom.it,
