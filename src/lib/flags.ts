@@ -41,6 +41,13 @@ export const FLAGS = {
     label: "Labs: heart-rate rest timer",
     description: "Rest ends early once a heart rate monitor or watch shows the heart rate back near where the set started.",
   },
+  /** Labs: a form check from the camera while counting reps (depth, short range, lean), with a tip between sets. */
+  labFormCheck: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: camera form check",
+    description: "Squat depth, short reps and a lean to one side, read by the camera while counting reps, with one tip between sets.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

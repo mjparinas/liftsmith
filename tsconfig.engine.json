@@ -32,6 +32,7 @@
     "src/lib/reorder.ts",
     "src/lib/replan.ts",
     "src/lib/reps/barSpeed.ts",
+    "src/lib/reps/form.ts",
     "src/lib/restReady.ts",
     "src/lib/routines.ts",
     "src/lib/sides.ts",
