@@ -18,12 +18,24 @@ export type LabFlag =
   | "labVoiceLog"
   | "labSpeedMax"
   | "labWatchReps"
+  | "labHandsFree"
   | "labBarPath";
 
 export interface Lab {
   flag: LabFlag;
   /** Catalogue keys: `lab.<key>.title` and `lab.<key>.body`. */
-  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "trainer" | "formCheck" | "voiceLog" | "speedMax" | "watchReps" | "barPath";
+  key:
+    | "repCount"
+    | "repMotion"
+    | "barSpeed"
+    | "hrRest"
+    | "trainer"
+    | "formCheck"
+    | "voiceLog"
+    | "speedMax"
+    | "watchReps"
+    | "handsFree"
+    | "barPath";
   /** Another lab this one only works with. */
   needs?: LabFlag;
   /** Only in the Android and iOS apps (it needs something the browser can't reach, like a watch app). */
@@ -41,6 +53,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labVoiceLog", key: "voiceLog" },
   { flag: "labSpeedMax", key: "speedMax", needs: "labBarSpeed" },
   { flag: "labWatchReps", key: "watchReps", native: true },
+  { flag: "labHandsFree", key: "handsFree" },
   { flag: "labBarPath", key: "barPath", needs: "labRepCount" },
 ];
 
