@@ -59,3 +59,9 @@ export function diagnostics(): Diagnostics {
     errors: [...errors],
   };
 }
+
+/** What "See what's included" shows: the same details the report sends, build hash included. */
+export function diagPreview(d: Diagnostics, noErrors: string): string {
+  const build = d.commit ? ` · build ${d.commit}` : "";
+  return `App ${d.version}${build} on ${d.platform}\n${d.screen} · ${d.language} · ${d.timeZone}\n${d.userAgent}\n${d.errors.length ? d.errors.join("\n") : noErrors}`;
+}
