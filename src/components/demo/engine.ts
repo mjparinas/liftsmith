@@ -28,6 +28,7 @@ import {
   type Joints,
   type Vec,
 } from "@/lib/demo/rig";
+import { stretchMotion } from "@/lib/demo/stretchMotions";
 import type { Muscle } from "@/lib/types";
 
 // The demo loop shared by the WebGL scene and the 2D canvas drawing: time, reps, the camera, drag to
@@ -156,7 +157,7 @@ export function startLoop(
   let followD = 0;
 
   const setup = () => {
-    motion = motionFor(s.exerciseId);
+    motion = stretchMotion(s.exerciseId) ?? motionFor(s.exerciseId);
     body = BODIES[s.body];
     place = placement(motion, body);
     frameBox = bounds(motion, body, place);

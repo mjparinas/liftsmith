@@ -192,6 +192,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Settings screen](docs/decisions/settings-screen.md) (`src/components/app/Settings.tsx`, `CalendarSettings.tsx`, `TrainingSettings.tsx`, `DelightSettings.tsx`)
 - [Setup wizard](docs/decisions/setup-wizard.md) (`src/components/app/Onboarding.tsx`)
 - [Stats and recovery map](docs/decisions/stats-and-recovery-map.md) (`RecoveryMap.tsx`, `engine.ts`, `colours.ts`, `src/components/BodyMap.tsx`)
+- [Stretching](docs/decisions/stretching.md) (`src/lib/stretches.ts`, `Stretch.tsx`, `src/lib/demo/stretchMotions.ts`)
 - [Today screen](docs/decisions/today-screen.md) (`src/lib/quotes.ts`)
 - [Tools: TDEE calculator](docs/decisions/tools-tdee-calculator.md) (`src/lib/tdee.ts`, `src/components/app/Tools.tsx`, `health.ts`, `App.tsx`)
 - [Training engine](docs/decisions/training-engine.md) (`exercises.ts`, `generator.ts`, `warmup.ts`, `recovery.ts`)

@@ -15,10 +15,10 @@ import { changeText, lastLoadedKg, plateChange } from "./plateMemory";
 import { monthOf, recap, suggestedPeriod, yearOf } from "./recap";
 import { nextSeasonal, SEASONAL, seasonalChallenges } from "./seasonal";
 import { ageFactor, percentileOf, scoreBand, scoreOf, strength, twins } from "./strength";
+import { STRETCHES, suggest } from "./stretches";
 import { activeTheme, newlyUnlocked, THEMES, unlocked } from "./themes";
 import type { AppEvent, SetEvent } from "./types";
 import { doneCue, exerciseCue, setCue, spokenLoad } from "./voice";
-import { DRILLS, warmupRoutine } from "./warmupRoutine";
 
 const D = 86400_000;
 const NOW = new Date("2026-11-11T18:00:00").getTime();
@@ -276,16 +276,16 @@ describe("strength score and twins", () => {
 
 describe("general warm-up", () => {
   it("starts with a pulse raiser, fits the time and covers today's muscles", () => {
-    const r = warmupRoutine(["quads", "glutes", "hamstrings"], ["barbell", "rack"], NOW, 5);
+    const r = suggest("warm", ["quads", "glutes", "hamstrings"], ["barbell", "rack"], NOW, 5);
     expect(r[0].pulse).toBe(true);
     expect(r.length).toBeGreaterThan(2);
     expect(r.slice(1).some((d) => d.for.includes("quads") || d.for.includes("glutes"))).toBe(true);
-    expect(warmupRoutine(["quads"], [], NOW, 5)).toEqual(warmupRoutine(["quads"], [], NOW, 5));
+    expect(suggest("warm", ["quads"], [], NOW, 5)).toEqual(suggest("warm", ["quads"], [], NOW, 5));
   });
   it("only uses drills the gym can do", () => {
-    const r = warmupRoutine(["upperBack", "lats", "rearDelts"], [], NOW, 8);
+    const r = suggest("warm", ["upperBack", "lats", "rearDelts"], [], NOW, 8);
     expect(r.every((d) => !(d.needs ?? []).length)).toBe(true);
-    expect(DRILLS.filter((d) => d.pulse).length).toBeGreaterThan(1);
+    expect(STRETCHES.filter((d) => d.kind === "warm" && d.pulse).length).toBeGreaterThan(1);
   });
 });
 

@@ -85,6 +85,9 @@ export const en = {
   "gloss.setTypes.title": "Drop sets and rest-pause",
   "gloss.setTypes.body":
     "Bonus sets you can add between sets, once the planned set is logged.\nA drop set takes the weight down by about a quarter and goes again straight away. A rest-pause set keeps the same weight, pauses for 15 seconds, then squeezes out a few more reps.\nBoth add work for the muscle without a full extra set. They count in your volume, but the plan's next weights only read your planned sets.",
+  "gloss.stretching.title": "Warm-up moves and cool-down holds",
+  "gloss.stretching.body":
+    "Warm-up moves are moving stretches and drills. They raise your heart rate and take your joints through their range, so the first sets feel better.\nCool-down holds are still stretches you hold for 30 seconds or more while breathing slowly. They suit the end of a workout or a rest day, when muscles are warm. Stretch to mild tension, never to pain.",
 } as const;
 
 type Key = keyof typeof en;
@@ -171,6 +174,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.setTypes.title": "Series descendentes y rest-pause",
   "gloss.setTypes.body":
     "Series extra que puedes añadir entre series, una vez registrada la serie planificada.\nUna serie descendente baja el peso más o menos una cuarta parte y vuelve a empezar sin descanso. Una serie rest-pause mantiene el peso, descansa 15 segundos y saca unas pocas repeticiones más.\nAmbas suman trabajo para el músculo sin una serie completa más. Cuentan en tu volumen, pero los próximos pesos del plan solo leen tus series planificadas.",
+  "gloss.stretching.title": "Calentamiento y vuelta a la calma",
+  "gloss.stretching.body":
+    "Los movimientos de calentamiento son estiramientos en movimiento y ejercicios suaves. Suben el pulso y llevan las articulaciones por todo su recorrido, así las primeras series se sienten mejor.\nLos estiramientos de vuelta a la calma se mantienen quietos 30 segundos o más, respirando despacio. Van bien al final del entrenamiento o en un día de descanso, con los músculos calientes. Estira hasta notar una tensión suave, nunca dolor.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -255,6 +261,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.setTypes.title": "Séries dégressives et rest-pause",
   "gloss.setTypes.body":
     "Des séries bonus à ajouter entre deux séries, une fois la série prévue enregistrée.\nUne série dégressive baisse la charge d’environ un quart et repart tout de suite. Une série rest-pause garde la même charge, fait une pause de 15 secondes, puis arrache quelques reps de plus.\nLes deux ajoutent du travail au muscle sans une série complète en plus. Elles comptent dans votre volume, mais les prochaines charges du plan ne lisent que vos séries prévues.",
+  "gloss.stretching.title": "Échauffement et retour au calme",
+  "gloss.stretching.body":
+    "Les mouvements d’échauffement sont des étirements en mouvement et des exercices doux. Ils font monter le cœur et font travailler les articulations sur toute leur amplitude, pour que les premières séries passent mieux.\nLes étirements de retour au calme se tiennent immobiles 30 secondes ou plus, en respirant lentement. Ils conviennent à la fin d’une séance ou à un jour de repos, muscles chauds. Étirez jusqu’à une légère tension, jamais jusqu’à la douleur.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -339,6 +348,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.setTypes.title": "Dropsätze und Rest-Pause",
   "gloss.setTypes.body":
     "Bonussätze, die du zwischen den Sätzen anhängen kannst, sobald der geplante Satz eingetragen ist.\nEin Dropsatz senkt das Gewicht um etwa ein Viertel und geht sofort weiter. Ein Rest-Pause-Satz behält das Gewicht, pausiert 15 Sekunden und holt noch ein paar Wiederholungen heraus.\nBeide geben dem Muskel mehr Arbeit ohne einen ganzen Extrasatz. Sie zählen zu deinem Volumen, aber die nächsten Gewichte im Plan lesen nur deine geplanten Sätze.",
+  "gloss.stretching.title": "Aufwärmen und Cool-down",
+  "gloss.stretching.body":
+    "Aufwärmübungen sind Dehnungen in Bewegung und lockere Übungen. Sie bringen den Puls hoch und führen die Gelenke durch ihren Bewegungsumfang, damit sich die ersten Sätze besser anfühlen.\nBeim Cool-down hältst du Dehnungen 30 Sekunden oder länger still und atmest langsam. Das passt ans Ende des Trainings oder an einen Ruhetag, wenn die Muskeln warm sind. Dehn bis zu einer leichten Spannung, nie bis zum Schmerz.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -423,6 +435,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.setTypes.title": "Drop set e rest-pause",
   "gloss.setTypes.body":
     "Serie bonus da aggiungere tra una serie e l’altra, dopo aver registrato la serie prevista.\nUn drop set abbassa il peso di circa un quarto e riparte subito. Una serie rest-pause tiene lo stesso peso, si ferma 15 secondi e poi tira fuori qualche ripetizione in più.\nEntrambe aggiungono lavoro al muscolo senza una serie intera in più. Contano nel tuo volume, ma i prossimi pesi del piano leggono solo le serie previste.",
+  "gloss.stretching.title": "Riscaldamento e defaticamento",
+  "gloss.stretching.body":
+    "I movimenti di riscaldamento sono allungamenti in movimento ed esercizi leggeri. Alzano i battiti e portano le articolazioni lungo tutto il loro movimento, così le prime serie vanno meglio.\nGli allungamenti di defaticamento si tengono fermi per 30 secondi o più, respirando lentamente. Sono adatti alla fine dell’allenamento o a un giorno di riposo, con i muscoli caldi. Allunga fino a una leggera tensione, mai fino al dolore.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -507,4 +522,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.setTypes.title": "ドロップセットとレストポーズ",
   "gloss.setTypes.body":
     "予定のセットを記録したあと、セットの合間に追加できるボーナスセットです。\nドロップセットは重さを約4分の1下げて、休まずにもう一度行います。レストポーズは同じ重さのまま15秒休み、あと数回だけ挙げます。\nどちらもセットを丸ごと増やさずに筋肉への刺激を増やせます。ボリュームには数えますが、プランの次の重さは予定のセットだけを見て決めます。",
+  "gloss.stretching.title": "ウォームアップとクールダウン",
+  "gloss.stretching.body":
+    "ウォームアップの動きは、動きながら行うストレッチや軽いドリルです。心拍数を上げ、関節を大きく動かすので、最初のセットが楽になります。\nクールダウンのストレッチは、ゆっくり呼吸しながら30秒以上静止して保ちます。筋肉が温まっているワークアウトの最後や休養日に向いています。軽く張りを感じるところまでにして、痛みが出るほど伸ばさないでください。",
 };

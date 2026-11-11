@@ -35,6 +35,8 @@ export interface LiftDemoProps {
    */
   autoPlay2d?: boolean;
   exerciseId?: string | null;
+  /** The movement's name for screen readers when it isn't an exercise (stretches pass "stretch:<id>" as the id). */
+  name?: string;
   /** Play this many reps, then hold the last frame. */
   reps?: number;
   /** Shown at the top left of the stage. */
@@ -123,6 +125,7 @@ export function LiftDemoCore({
   maxDpr,
   autoPlay2d,
   exerciseId = null,
+  name: nameProp,
   reps,
   label,
   body: bodyProp,
@@ -238,8 +241,9 @@ export function LiftDemoCore({
   const setView = setViewPick;
 
   const ex = exerciseId ? EXERCISES.find((e) => e.id === exerciseId) : undefined;
-  const name = ex?.name ?? w.figure;
-  const alt = ex ? (controls ? w.altDrag : w.alt).replace("{name}", ex.name) : w.altNone;
+  const shown = ex?.name ?? nameProp;
+  const name = shown ?? w.figure;
+  const alt = shown ? (controls ? w.altDrag : w.alt).replace("{name}", shown) : w.altNone;
 
   return (
     <div className={className}>

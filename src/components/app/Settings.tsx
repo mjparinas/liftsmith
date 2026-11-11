@@ -36,6 +36,7 @@ import { MessageSettings } from "./MessageSettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
+import { StretchSettings } from "./Stretch";
 import { RestTimerSettings } from "./TrainingSettings";
 import { Button, Chip, ProTag, Section, SwitchRow } from "./ui";
 
@@ -384,6 +385,7 @@ function WorkoutGroup() {
         }}
       />
       <RestTimerSettings />
+      <StretchSettings />
       <Section title={t("pol.hf.title")}>
         <HandsFree />
       </Section>

@@ -356,6 +356,10 @@ export interface TrainingPrefs {
   restAlert?: RestAlert;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
+  /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
+  warmFirst?: boolean;
+  /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
+  coolDown?: boolean;
   /** Exercises the planner picks first when they fit. */
   favourites?: string[];
   /** Muscles that get more weekly sets and go first in the plan. */
@@ -612,6 +616,17 @@ export interface TdeeEvent extends EventBase {
  * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
  * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
  */
+/**
+ * Stretches done (src/lib/stretches.ts): the warm-up before a workout, the cool-down after one, a rest-day
+ * stretch, or ones the lifter picked from the library. Stretch ids; `seconds` is how long it took.
+ */
+export interface StretchEvent extends EventBase {
+  type: "stretch";
+  moment: "warm" | "cool" | "rest" | "pick";
+  ids: string[];
+  seconds: number;
+}
+
 export interface CheckinEvent extends EventBase {
   type: "checkin";
   gymId?: string;
@@ -732,6 +747,7 @@ export type AppEvent =
   | HealthEvent
   | TdeeEvent
   | CheckinEvent
+  | StretchEvent
   | FeelEvent
   | SetEvent
   | SessionStartEvent

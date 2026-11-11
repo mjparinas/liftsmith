@@ -30,6 +30,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { CoolDownCard } from "./Stretch";
 import { Button } from "./ui";
 
 function useCountUp(to: number, ms = 900) {
@@ -240,6 +241,7 @@ export function Done() {
       )}
       <PrReplayButton prs={prs} />
       <NextUpCard sessionId={s.sessionId} />
+      <CoolDownCard />
       {!lean(profile) && <DoneMoments />}
 
       {badges.length > 0 && (

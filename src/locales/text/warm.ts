@@ -1,6 +1,6 @@
 import type { Message } from "@/lib/i18n";
 
-// Text for keys starting "warm.": the general warm-up's drills (src/lib/warmupRoutine.ts), in every
+// Text for keys starting "warm.": the warm-up drills in the stretch library (src/lib/stretches.ts), in every
 // language. warm.<id> is the drill's name and warm.<id>.how how to do it. English is the source.
 
 export const en = {
