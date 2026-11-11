@@ -8,7 +8,7 @@ import { checkinText } from "./buddy";
 import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
 import { generate } from "./generator";
-import { ghostFor, lastWorkout, paceDelta, paceText, repeatPlan, sameAsLast } from "./ghost";
+import { ghostFor, lastWorkout, paceDelta, paceText, repeatPlan, sameAsLast, workoutOf } from "./ghost";
 import { setLanguage } from "./i18n";
 import { anniversaryYears, crossed, doneMoments, fmtTonnage, todayMoments, tonnage, TONNAGE } from "./moments";
 import { fitSize, pairFor, type Photo } from "./photos";
@@ -170,6 +170,20 @@ describe("ghost mode and same as last time", () => {
     expect(p.items[0].target.weight).toBeGreaterThan(0);
     const bw = makeGym("bodyweight", "kg", "b");
     expect(repeatPlan(base, evs, profile, bw, NOW)).toBeNull();
+  });
+  it("repeats any past workout from History, leaving out its bonus drop sets", () => {
+    const gym = makeGym("commercial", "kg", "g");
+    const profile = { ...defaultProfile(NOW), activeGymId: "g", onboarded: true };
+    const evs: AppEvent[] = [
+      set("back-squat", NOW - D, 100, 5, "L"),
+      set("leg-press", NOW - 5 * D, 150, 10, "old"),
+      set("leg-press", NOW - 5 * D + 1000, 150, 10, "old"),
+      set("leg-press", NOW - 5 * D + 2000, 110, 12, "old", { tag: "drop" }),
+    ];
+    expect(workoutOf(evs, "old")?.items).toEqual([{ exerciseId: "leg-press", sets: 2 }]);
+    expect(workoutOf(evs, "nope")).toBeNull();
+    const base = generate({ gym, profile, events: evs, minutes: 45, now: NOW });
+    expect(repeatPlan(base, evs, profile, gym, NOW, "old")!.items.map((i) => [i.exerciseId, i.sets])).toEqual([["leg-press", 2]]);
   });
 });
 

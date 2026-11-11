@@ -50,12 +50,14 @@ import * as gloss from "./text/gloss";
 import * as goal from "./text/goal";
 import * as gym from "./text/gym";
 import * as hr from "./text/hr";
+import * as hx from "./text/hx";
 import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as lift from "./text/lift";
 import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -100,6 +102,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
@@ -216,12 +219,15 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...stats.fr,
   ...tab.fr,
   ...td.fr,
+  ...tempo.fr,
   ...tdee.fr,
   ...theme.fr,
   ...tier.fr,
   ...time.fr,
   ...today.fr,
   ...ton.fr,
+  ...hx.fr,
+  ...lift.fr,
   ...tools.fr,
   ...train.fr,
   ...trn.fr,

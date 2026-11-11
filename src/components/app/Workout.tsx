@@ -31,6 +31,7 @@ import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSessio
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
+import { tempoOf } from "@/lib/tempo";
 import { restAlertOf } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -57,6 +58,7 @@ import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
+import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
@@ -348,6 +350,9 @@ export function Workout() {
   const undoShown = !!s.undoable && now <= s.undoable.until;
   // Voice set logging is a lab (Settings › Labs, Pro): a microphone above Log set while it's on.
   const voiceLog = !finished && !!ex && !ex.cardio && labOn("labVoiceLog");
+  // The tempo coach is a lab too: on tempo and paused lifts, a button above Log set that counts each rep out.
+  const tempo = !finished && !resting && ex ? tempoOf(ex.id) : undefined;
+  const tempoCoach = !!tempo && labOn("labTempo");
 
   const log = () => {
     haptic("tap");
@@ -758,10 +763,18 @@ export function Workout() {
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
           {autoLeft !== null && <HandsFree left={autoLeft} onLog={log} />}
-          {(undoShown || voiceLog) && (
+          {(undoShown || voiceLog || tempoCoach) && (
             <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
               <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
               {voiceLog && <VoiceLog unit={unit} onLog={log} paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen} />}
+              {tempoCoach && tempo && (
+                <TempoCoach
+                  key={`${active.index}:${doneSets}`}
+                  tempo={tempo}
+                  reps={active.reps}
+                  paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
+                />
+              )}
             </div>
           )}
           {finished ? (

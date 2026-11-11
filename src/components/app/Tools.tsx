@@ -25,8 +25,10 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { StatsSummary } from "./BodyStats";
-import { Icon } from "./icons";
+import { Icon, type IconName } from "./icons";
 import { go } from "./router";
+import { PlateTool } from "./tools/PlateTool";
+import { WarmupTool } from "./tools/WarmupTool";
 import { BumpField, Chip, ScreenHeader, Section } from "./ui";
 
 const level = (a: Activity) => inSentence(ACTIVITY[a].label, true);
@@ -36,6 +38,8 @@ const DAY = 86_400_000;
 
 export function Tools({ arg }: { arg?: string }) {
   if (arg === "tdee") return <TdeeScreen />;
+  if (arg === "plates") return <PlateTool />;
+  if (arg === "warmup") return <WarmupTool />;
   return <ToolsHub />;
 }
 
@@ -63,6 +67,8 @@ function ToolsHub() {
             </span>
           </button>
         </li>
+        <HubRow icon="dumbbell" title={t("tools.plate.title")} body={t("tools.plate.hub")} onClick={() => go("tools", "plates")} />
+        <HubRow icon="layers" title={t("tools.warm.title")} body={t("tools.warm.hub")} onClick={() => go("tools", "warmup")} />
         <li>
           <button type="button" onClick={() => go("stretch")} className="press card flex w-full items-center gap-4 p-4 text-left">
             <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-cyan/15 text-cyan">
@@ -79,6 +85,25 @@ function ToolsHub() {
         </li>
       </ul>
     </div>
+  );
+}
+
+function HubRow({ icon, title, body, onClick }: { icon: IconName; title: string; body: string; onClick: () => void }) {
+  return (
+    <li>
+      <button type="button" onClick={onClick} className="press card flex w-full items-center gap-4 p-4 text-left">
+        <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-violet/15 text-violet">
+          <Icon name={icon} size={22} />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-semibold">{title}</span>
+          <span className="block text-sm text-muted">{body}</span>
+        </span>
+        <span className="text-accent" aria-hidden>
+          ›
+        </span>
+      </button>
+    </li>
   );
 }
 

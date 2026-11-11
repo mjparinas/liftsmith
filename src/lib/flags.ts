@@ -97,6 +97,14 @@ export const FLAGS = {
     label: "Labs: bar path replay",
     description: "After a camera-counted squat, deadlift or overhead press, replays the bar's path with one cue on where it drifted.",
   },
+  /** Labs: the tempo coach counts each rep's lowering, hold and lifting out in sounds and haptics (src/lib/tempo.ts). */
+  labTempo: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: tempo coach",
+    description:
+      "On tempo and paused lifts, a button above Log set counts every second of each rep's lowering, hold and lift in sound and haptics.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
