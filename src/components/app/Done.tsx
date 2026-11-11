@@ -320,6 +320,7 @@ function PainAfter({ sessionId }: { sessionId: string }) {
         <PainSelect
           key={i.id}
           label={t("done.painAsk", { part: inSentence(PART_LABEL[i.part], true) })}
+          start={i.pain.at(-1)?.score ?? 0}
           onRate={(n) => ratePain(i.id, n, { sessionId })}
         />
       ))}

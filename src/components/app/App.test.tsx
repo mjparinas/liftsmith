@@ -504,10 +504,17 @@ describe("injury mode", () => {
     await user.click(screen.getByRole("button", { name: "Log an injury" }));
     await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Knee" }));
     // Then a 0–10 pain rating, which starts the trend.
-    await user.click(within(screen.getByRole("dialog", { name: "How bad is it right now?" })).getByRole("button", { name: "6" }));
+    const rate = within(screen.getByRole("dialog", { name: "How bad is it right now?" }));
+    fireEvent.change(rate.getByRole("slider", { name: "Pain from 0 to 10" }), { target: { value: "6" } });
+    await user.click(rate.getByRole("button", { name: "Save rating" }));
     expect(useApp.getState().events.find((e) => e.type === "pain")).toMatchObject({ score: 6 });
     expect(screen.getByRole("img", { name: /Knee pain, oldest to newest: 6/ })).toBeInTheDocument();
-    await user.selectOptions(screen.getByRole("combobox", { name: "How does it feel today?" }), "4");
+    // The card's slider starts at the last rating; it records only on Save.
+    const today = screen.getByRole("slider", { name: "How does it feel today?" });
+    expect(today).toHaveValue("6");
+    fireEvent.change(today, { target: { value: "4" } });
+    expect(useApp.getState().events.filter((e) => e.type === "pain")).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "Save rating" }));
     expect(
       useApp
         .getState()
