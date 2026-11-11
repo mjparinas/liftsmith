@@ -1,8 +1,9 @@
 "use client";
 
 // TDEE results and history graph, shared by the app (Tools › TDEE) and the public calculator page.
+import { BmiBar } from "@/components/BmiBar";
 import { date as fmtDate, num, t } from "@/lib/i18n";
-import { ACTIVITIES, ACTIVITY, bmiBand, type Activity, type TdeeResult } from "@/lib/tdee";
+import { ACTIVITIES, ACTIVITY, type Activity, type TdeeResult } from "@/lib/tdee";
 import type { TdeeEvent } from "@/lib/types";
 
 const kcal = (n: number) => num(n);
@@ -22,10 +23,17 @@ export function TdeeResults({ r, activity }: { r: TdeeResult; activity: Activity
             value={`${kcal(r.bmr)} kcal`}
             note={r.formula === "katch" ? t("tdee.formulaKatch") : t("tdee.formulaMifflin")}
           />
-          <Cell label={t("tdee.bmi")} value={num(r.bmi)} note={bmiBand(r.bmi)} />
+          <Cell label={t("tdee.protein")} value={`${r.protein[0]}–${r.protein[1]} g`} note={t("tdee.proteinNote")} />
           <Cell label={t("tdee.cut")} value={`${kcal(r.cut)} kcal`} />
           <Cell label={t("tdee.bulk")} value={`${kcal(r.bulk)} kcal`} />
-          <Cell label={t("tdee.protein")} value={`${r.protein[0]}–${r.protein[1]} g`} note={t("tdee.proteinNote")} />
+          {/* BMI gets the full width for its range bar (Melvin, 2026-11-11). */}
+          <div className="col-span-2 rounded-xl bg-raised px-3 py-2">
+            <div className="flex items-baseline gap-2">
+              <span className="text-xs text-muted">{t("tdee.bmi")}</span>
+              <span className="num font-semibold">{num(r.bmi)}</span>
+            </div>
+            <BmiBar bmi={r.bmi} note />
+          </div>
         </div>
       </div>
       <h2 className="mt-5 mb-2 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("tdee.byActivity")}</h2>
