@@ -185,6 +185,8 @@ try {
     "/compare/",
     "/compare/fitbod/",
     "/alternatives/fitbod/",
+    "/compare/best-workout-apps/",
+    "/compare/boostcamp/",
     "/trust/",
     "/pricing/",
     "/help/",

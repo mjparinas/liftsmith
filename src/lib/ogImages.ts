@@ -85,6 +85,12 @@ export function ogCards(): OgCard[] {
     });
   for (const c of COMPETITORS)
     cards.push({ file: `compare/${c.slug}.jpg`, kicker: "Compare", title: `${BRAND.name} vs ${c.name}`, exercise: DEFAULT_FIGURE });
+  cards.push({
+    file: "compare/best-workout-apps.jpg",
+    kicker: "Compare",
+    title: "Workout tracker apps compared",
+    exercise: DEFAULT_FIGURE,
+  });
   for (const s of IMPORT_SOURCES)
     cards.push({
       file: `import/${s.slug}.jpg`,

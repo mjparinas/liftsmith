@@ -7,10 +7,11 @@ import { SitePage } from "@/components/site/SiteChrome";
 import { ARTICLES } from "@/content/articles";
 import { LANDINGS } from "@/content/landings";
 
-import FitbodAlternatives from "./alternatives/fitbod/page";
+import AppAlternativesPage from "./alternatives/[slug]/page";
 import AppLandingPage from "./apps/[slug]/page";
 import BlogIndex from "./blog/page";
 import ComparePage from "./compare/[slug]/page";
+import BestApps from "./compare/best-workout-apps/page";
 import CompareIndex from "./compare/page";
 import EquipmentPage from "./equipment/[slug]/page";
 import AlternativesPage from "./exercises/[slug]/alternatives/page";
@@ -114,9 +115,22 @@ describe("SEO pages", () => {
       expect(screen.getByText(/trademarks of their owners/)).toBeInTheDocument();
       cleanup();
     }
-    for (const P of [CompareIndex, FitbodAlternatives]) {
+    for (const slug of ["stronglifts", "jefit", "alpha-progression", "boostcamp"]) {
+      render(await ComparePage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getAllByText(/checked Nov 11, 2026/).length).toBeGreaterThan(3);
+      cleanup();
+    }
+    for (const P of [CompareIndex, BestApps]) {
       render(<P />);
       expectCtas();
+      expect(screen.getByText(/trademarks of their owners/)).toBeInTheDocument();
+      cleanup();
+    }
+    for (const slug of ["fitbod", "hevy", "strong", "stronglifts"]) {
+      render(await AppAlternativesPage({ params: Promise.resolve({ slug }) }));
+      expectCtas();
+      expect(screen.getByRole("heading", { level: 1 }).textContent).toMatch(/alternatives$/);
       cleanup();
     }
   });
