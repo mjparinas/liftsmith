@@ -119,7 +119,7 @@ export function Gym() {
                 <li key={p.weight} className="flex items-center gap-3">
                   <span
                     className="grid h-9 w-9 place-items-center rounded-lg text-xs font-bold"
-                    style={{ background: st.fill, color: st.text }}
+                    style={{ background: st.fill, color: st.text, boxShadow: "inset 0 0 0 1px var(--plate-edge)" }}
                   >
                     {fmtNum(p.weight)}
                   </span>
