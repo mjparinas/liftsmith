@@ -131,4 +131,17 @@ describe("exercise demos", () => {
     expect(a.handR[1]).toBeGreaterThan(a.head[1]); // locked out overhead on both
     expect(b.handR[1]).toBeGreaterThan(b.head[1]);
   });
+  it("keeps the female figure's hips and glutes in athletic proportion", () => {
+    const F = BODIES.female,
+      M = BODIES.male;
+    const widest = (tab: number[][], from: number, to: number) =>
+      Math.max(...tab.filter((r) => r[0]! >= from && r[0]! <= to).map((r) => r[1]!));
+    const glutes = (B: typeof F) => Math.max(...B.torsoSide.filter((r) => r[0]! <= 0.2).map((r) => r[2]!));
+    // hips no wider than the chest and shoulders (Melvin, 2026-11-11: the glutes were too big)
+    expect(widest(F.torsoFront, -0.12, 0.2)).toBeLessThanOrEqual(widest(F.torsoFront, 0.7, 1));
+    // glutes stick out no further, for her size, than the male figure's
+    expect(glutes(F) / F.s).toBeLessThanOrEqual(glutes(M));
+    // the hip joints sit no wider apart than the male figure's
+    expect(F.hipW).toBeLessThanOrEqual(M.hipW);
+  });
 });
