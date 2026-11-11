@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
-import { COMPETITORS, TRADEMARKS } from "@/content/compare";
+import { ALTERNATIVES, COMPETITOR_BY_SLUG, COMPETITORS, TRADEMARKS } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: `${BRAND.name} compared with other workout apps`,
-  description: `How ${BRAND.name} compares with Fitbod, Hevy, Strong and Gymverse on price, free plans, workout planning, plates, recovery and platforms, with every fact sourced and dated.`,
-  alternates: { canonical: "/compare/" },
-};
+  description: `How ${BRAND.name} compares with Fitbod, Hevy, Strong and ${COMPETITORS.length - 3} more workout apps on price, free plans, planning, plates and platforms, every fact sourced and dated.`,
+  path: "/compare/",
+});
 
 export default function CompareIndex() {
   return (
@@ -29,10 +30,15 @@ export default function CompareIndex() {
         items={[
           ...COMPETITORS.map((c) => ({ href: `/compare/${c.slug}/`, title: `${BRAND.name} vs ${c.name}`, body: c.summary })),
           {
-            href: "/alternatives/fitbod/",
-            title: "Fitbod alternatives",
-            body: "Four apps compared for lifters looking for something different.",
+            href: "/compare/best-workout-apps/",
+            title: "Workout tracker apps compared",
+            body: `${COMPETITORS.length + 1} apps grouped by what they're for, with a good fit for each.`,
           },
+          ...ALTERNATIVES.map((a) => ({
+            href: `/alternatives/${a.slug}/`,
+            title: `${COMPETITOR_BY_SLUG.get(a.slug)!.name} alternatives`,
+            body: `For lifters who ${a.reason}.`,
+          })),
         ]}
       />
       <CtaBanner

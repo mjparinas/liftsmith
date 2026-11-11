@@ -42,3 +42,32 @@ export function hrReady(a: HrLog, setStart: number, restStart: number, now: numb
   if (peak - start < READY_MIN_RISE) return null;
   return bpm <= start + READY_MARGIN ? { start, peak, bpm } : null;
 }
+
+// Heart-rate rest timer (Labs, `labHrRest`; Melvin, 2026-11-11). With the lab on, the same "ready"
+// reading ends the rest early instead of only saying so: the countdown jumps to a few seconds left, so
+// the usual last-seconds beeps, rest-over chime and alert, and the native notification all follow as if
+// the timer had run out. The planned rest stays the upper limit, and a floor keeps heavy lifts from
+// being rushed: heart rate recovers faster than the muscles do.
+
+/** Never cut the rest below this share of the planned rest. */
+export const HR_REST_FLOOR = 0.6;
+/** Seconds left on the clock once the rest is cut, so the lifter hears it coming. */
+export const HR_REST_LEAD_S = 5;
+/** A cut that saves less than this isn't worth moving the clock for. */
+export const HR_REST_MIN_SAVE_S = 10;
+
+/** When the rest should now end and why, or null to leave it alone. */
+export function hrRestCut(
+  a: HrLog & { restUntil: number | null; restTotal: number; restStart?: number },
+  setStart: number,
+  now: number,
+): { until: number; saved: number; start: number; bpm: number } | null {
+  if (!a.restUntil || !a.restStart || a.restUntil <= now) return null;
+  const r = hrReady(a, setStart, a.restStart, now);
+  if (!r) return null;
+  const floor = a.restStart + a.restTotal * HR_REST_FLOOR * 1000;
+  const until = Math.max(now + HR_REST_LEAD_S * 1000, Math.round(floor));
+  const saved = Math.round((a.restUntil - until) / 1000);
+  if (saved < HR_REST_MIN_SAVE_S) return null;
+  return { until, saved, start: r.start, bpm: r.bpm };
+}

@@ -4,14 +4,15 @@ import Link from "next/link";
 import { OneRmCalculator } from "@/components/site/OneRmCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "One-rep max calculator: estimate your 1RM from any set",
   description:
     "Estimate your one-rep max from weight, reps and reps in reserve, with a reps-to-weight table and the answers from Epley, Brzycki and six other formulas.",
-  alternates: { canonical: "/tools/one-rep-max-calculator/" },
-};
+  path: "/tools/one-rep-max-calculator/",
+});
 
 const FAQ: [string, string][] = [
   [

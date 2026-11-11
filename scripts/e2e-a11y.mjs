@@ -174,9 +174,19 @@ try {
     "/blog/how-long-to-rest-between-sets/",
     "/tools/plate-calculator/",
     "/tools/one-rep-max-calculator/",
+    "/tools/warm-up-calculator/",
+    "/tools/rpe-chart/",
+    "/tools/strength-standards/",
+    "/tools/dots-calculator/",
+    "/import/strong/",
+    "/features/",
+    "/features/rest-timer/",
+    "/apps/5x5/",
     "/compare/",
     "/compare/fitbod/",
     "/alternatives/fitbod/",
+    "/compare/best-workout-apps/",
+    "/compare/boostcamp/",
     "/trust/",
     "/pricing/",
     "/help/",
@@ -281,6 +291,10 @@ try {
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");
+  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against.
+  await page.goto(`${server.url}/app/#/trainer`);
+  await page.getByRole("heading", { name: "Coaching" }).waitFor();
+  await scan("trainer");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   // Every group page of Settings, and Labs (2026-11-10).

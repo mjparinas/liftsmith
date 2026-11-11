@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
+import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
@@ -37,7 +38,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, FEEL_HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
-import { Button, Chip, EmptyState, LinkToggle, ProTag, Ring, Section } from "./ui";
+import { Button, Chip, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
   const lit = weeks > 0;
@@ -115,6 +116,7 @@ export function Today() {
   const now = useNow();
   const rec = useMemo(() => recovery(events, now), [events, now]);
   const g = useGame();
+  const member = useProMember();
   const streak = g.streak;
   const lvl = g.level;
   const focus = [...new Set(preview?.items.map((i) => i.focus) ?? [])] as Muscle[];
@@ -156,7 +158,10 @@ export function Today() {
             </button>
           </div>
         </div>
-        <h1 className={`mt-1 ${SCREEN_TITLE}`}>{t("td.title")}</h1>
+        <div className="mt-1 flex items-center gap-2.5">
+          <h1 className={SCREEN_TITLE}>{t("td.title")}</h1>
+          {member && <ProBadge />}
+        </div>
       </header>
 
       {active && (

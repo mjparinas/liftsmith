@@ -21,8 +21,31 @@ export interface Account {
   providers: string[];
   /** How this device signed in. */
   via: Method;
-  /** Pro that comes with the account rather than a store purchase (the store review account). */
+  /** Pro on the account from any source (the server's access.ts): the review account, a lifetime code, the web or a store. */
   pro?: boolean;
+  /** Where that Pro comes from. */
+  proVia?: ProVia | null;
+  /** The paid subscription behind it, when there is one. */
+  sub?: AccountSub | null;
+}
+
+export type ProVia = "review" | "code" | "web" | "play" | "appstore";
+
+/** The account's paid subscription, as the server sees it (a web one through Stripe, or a phone's store). */
+export interface AccountSub {
+  store: "web" | "play" | "appstore";
+  plan: "monthly" | "annual" | null;
+  trial: boolean;
+  expiresAt: number | null;
+  willRenew: boolean;
+  status: string;
+}
+
+/** The account's Pro as the server sends it (sign-in, GET /api/account/ and every sync). */
+export interface AccountAccess {
+  pro?: boolean;
+  proVia?: ProVia | null;
+  sub?: AccountSub | null;
 }
 
 export type Method = "google" | "apple" | "email";
@@ -120,7 +143,7 @@ export async function makeNonce(): Promise<{ raw: string; hashed: string }> {
 
 interface SessionReply {
   token: string;
-  account: { id: string; email: string | null; providers: string[]; pro?: boolean };
+  account: { id: string; email: string | null; providers: string[] } & AccountAccess;
 }
 
 /** Saves the session and starts this device's sync from scratch: everything on it is pushed once. */
@@ -131,7 +154,7 @@ function signedInAs(r: SessionReply, via: Method): Account {
     email: r.account.email,
     providers: r.account.providers,
     via,
-    ...(r.account.pro ? { pro: true } : {}),
+    ...(r.account.pro ? { pro: true, proVia: r.account.proVia ?? null, sub: r.account.sub ?? null } : {}),
   };
   try {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
@@ -243,15 +266,27 @@ export function accountPro(): boolean {
   return !!useAccount.getState().account?.pro;
 }
 
-/** Records the account's Pro from a sync reply, when it changed. */
-export function setAccountPro(pro: boolean) {
+/** Records the account's Pro (and where it comes from) from a sync or account reply, when it changed. */
+export function setAccountPro(pro: boolean, more: Omit<AccountAccess, "pro"> = {}) {
   const a = readAccount();
-  if (!a || !!a.pro === pro) return;
-  const next: Account = { ...a, pro };
+  if (!a) return;
+  const next: Account = { ...a, pro, proVia: pro ? (more.proVia ?? a.proVia ?? null) : null, sub: pro ? (more.sub ?? null) : null };
+  if (!next.proVia) delete next.proVia;
+  if (!next.sub) delete next.sub;
+  if (JSON.stringify(next) === JSON.stringify(a)) return;
   try {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(next));
   } catch {}
   useAccount.setState({ account: next });
+}
+
+/** Asks the server for the account's Pro again (after a web checkout, or "Restore purchases" on the web). */
+export async function refreshAccountPro(): Promise<boolean> {
+  const a = readAccount();
+  if (!a) return false;
+  const r = await api<{ account: AccountAccess }>("/api/account/", { token: a.token });
+  setAccountPro(!!r.account.pro, r.account);
+  return !!r.account.pro;
 }
 
 /** Signs this device out. Everything stays on the device; it just stops syncing. */

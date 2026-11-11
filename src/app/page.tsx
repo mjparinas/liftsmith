@@ -13,9 +13,10 @@ import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
 import { faqJsonLd, FAQS } from "@/lib/faqs";
 import { FLAGS } from "@/lib/flags";
+import { pageMeta } from "@/lib/pageMeta";
 import { FREE_FEATURES, PRO_FEATURES } from "@/lib/plans";
 import { MUSCLE_NAME } from "@/lib/seo";
-import { APP_PATH, SITE_URL } from "@/lib/site";
+import { APP_PATH, CONTACT_EMAIL, SITE_URL } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
 
 // The public home page. Every name on it comes from BRAND (src/lib/brand.ts), so a rename is one line.
@@ -25,12 +26,14 @@ import { PRICES } from "@/lib/trial";
 const TRIAL_DAYS = FLAGS.trialDays.default;
 const name = BRAND.name;
 
-export const metadata: Metadata = {
-  title: { absolute: `${name}: adaptive strength training for Android and iPhone` },
-  description: `Workouts planned from your equipment, your recovery and your time. Progressive overload, RIR blocks and deloads, plate math for every barbell set, a lock-screen rest timer, and 3D exercise demos. Free to start, no ads, ever.`,
-  alternates: { canonical: "/" },
-  openGraph: { title: `${name}: your next set, already planned`, url: SITE_URL, type: "website" },
-};
+export const metadata: Metadata = pageMeta({
+  title: `${name}: adaptive strength training for Android and iPhone`,
+  absoluteTitle: true,
+  shareTitle: `${name}: your next set, already planned`,
+  description:
+    "Workouts planned from your equipment, recovery and time, with progressive overload, deloads, plate math, a lock-screen rest timer and 3D demos. No ads, ever.",
+  path: "/",
+});
 
 function Cta({ children, cta, className = "" }: { children: React.ReactNode; cta: string; className?: string }) {
   return (
@@ -196,6 +199,15 @@ export default function Home() {
         { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
       ],
     },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name,
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon-512.png`,
+      email: CONTACT_EMAIL,
+    },
+    { "@context": "https://schema.org", "@type": "WebSite", name, url: SITE_URL },
     faqJsonLd(FAQS),
   ];
 
@@ -518,7 +530,8 @@ export default function Home() {
                 Start my {TRIAL_DAYS}-day free trial
               </Cta>
               <p className="mt-3 text-center text-xs text-muted">
-                Billed through Google Play or the App Store. Cancel any time before the trial ends and you pay nothing.
+                Billed through Google Play or the App Store, or by card on the web app. Cancel any time before the trial ends and you pay
+                nothing.
               </p>
             </div>
           </div>

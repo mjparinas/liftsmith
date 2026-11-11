@@ -24,6 +24,7 @@ const PERMISSION: Record<string, string> = {
   steps: "STEPS",
   vo2Max: "VO2_MAX",
   respiratoryRate: "RESPIRATORY_RATE",
+  dietaryEnergyConsumed: "NUTRITION",
   calories: "ACTIVE_CALORIES_BURNED",
 };
 
@@ -45,7 +46,6 @@ describe("Play store policy config", () => {
       "READ_OXYGEN_SATURATION",
       "READ_BLOOD_PRESSURE",
       "READ_BLOOD_GLUCOSE",
-      "READ_NUTRITION",
       "READ_EXERCISE",
       "WRITE_WEIGHT",
     ]) {
@@ -71,9 +71,10 @@ describe("Play store policy config", () => {
       "steps",
       "VO2 max",
       "respiratory rate",
+      "calories and protein",
     ])
       expect(page).toContain(t);
-    expect(page).not.toMatch(/blood|oxygen saturation|nutrition/i);
+    expect(page).not.toMatch(/blood|oxygen saturation/i);
   });
 
   it("keeps the web view's storage out of Google backup and device transfer", () => {

@@ -107,10 +107,12 @@ import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
 import * as train from "./text/train";
+import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
 import * as vc from "./text/vc";
+import * as vl from "./text/vl";
 import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
@@ -220,10 +222,12 @@ export const en = {
   ...ton.en,
   ...tools.en,
   ...train.en,
+  ...trn.en,
   ...twin.en,
   ...units.en,
   ...variety.en,
   ...vc.en,
+  ...vl.en,
   ...warm.en,
   ...wdg.en,
   ...why.en,

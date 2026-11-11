@@ -16,6 +16,7 @@ class MainViewController: CAPBridgeViewController {
         bridge?.registerPluginInstance(AccountSignInPlugin())
         bridge?.registerPluginInstance(HealthWorkoutPlugin())
         bridge?.registerPluginInstance(GarminPlugin())
+        bridge?.registerPluginInstance(SpeechLogPlugin())
         // iOS's back: a swipe in from the left edge goes to the previous screen, through the same history
         // the Android back button and the browser's back use (src/lib/back.ts, router.ts).
         webView?.allowsBackForwardNavigationGestures = true
@@ -61,6 +62,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         // rate is used when no Bluetooth monitor is connected.
         WatchLink.shared.onAction = { [weak self] a in self?.notifyListeners("action", data: ["action": a], retainUntilConsumed: true) }
         WatchLink.shared.onHeartRate = { [weak self] bpm in self?.notifyListeners("heartRate", data: ["bpm": bpm]) }
+        WatchLink.shared.onMotion = { [weak self] m in self?.notifyListeners("watchMotion", data: m) }
         WatchLink.shared.start()
         // The Garmin watch app (GarminLink.swift, garmin/): the same taps and heart rate.
         GarminLink.shared.onAction = WatchLink.shared.onAction
@@ -184,6 +186,7 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if let hr = call.getInt("hr") { s["hr"] = hr }
         if let d = call.getInt("done") { s["done"] = d }
         if let t = call.getInt("total") { s["total"] = t }
+        if call.getBool("motion") == true { s["motion"] = true }
         return s
     }
 

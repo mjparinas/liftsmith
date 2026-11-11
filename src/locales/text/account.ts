@@ -14,6 +14,9 @@ export const en = {
   "account.apple": "Continue with Apple",
   "account.google": "Continue with Google",
   "account.emailButton": "Continue with email",
+  "account.agree": "By signing in, you agree to the terms of use and the privacy policy.",
+  "account.terms": "Terms of use",
+  "account.privacy": "Privacy policy",
   "account.email.label": "Your email",
   "account.email.send": "Email me a code",
   "account.email.sent": "We sent a six-digit code to {email}. It works for 10 minutes.",
@@ -50,6 +53,7 @@ export const en = {
   "account.row": "Account and sync",
   "account.row.out": "Sign in to back up and sync",
   "account.row.in": "Signed in as {email}",
+  "account.delete.webSub": "Your Pro subscription from the website ends now too, and won't be charged again.",
 } as const;
 
 type Key = keyof typeof en;
@@ -65,6 +69,9 @@ export const es: Partial<Record<Key, Message>> = {
   "account.apple": "Continuar con Apple",
   "account.google": "Continuar con Google",
   "account.emailButton": "Continuar con correo",
+  "account.agree": "Al iniciar sesión, aceptas los términos de uso y la política de privacidad.",
+  "account.terms": "Términos de uso",
+  "account.privacy": "Política de privacidad",
   "account.email.label": "Tu correo",
   "account.email.send": "Envíame un código",
   "account.email.sent": "Enviamos un código de seis dígitos a {email}. Sirve durante 10 minutos.",
@@ -102,6 +109,7 @@ export const es: Partial<Record<Key, Message>> = {
   "account.row": "Cuenta y sincronización",
   "account.row.out": "Inicia sesión para guardar y sincronizar",
   "account.row.in": "Sesión iniciada como {email}",
+  "account.delete.webSub": "Tu suscripción Pro del sitio web también termina ahora y no se volverá a cobrar.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -115,6 +123,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.apple": "Continuer avec Apple",
   "account.google": "Continuer avec Google",
   "account.emailButton": "Continuer avec un e-mail",
+  "account.agree": "En vous connectant, vous acceptez les conditions d’utilisation et la politique de confidentialité.",
+  "account.terms": "Conditions d’utilisation",
+  "account.privacy": "Politique de confidentialité",
   "account.email.label": "Votre e-mail",
   "account.email.send": "M'envoyer un code",
   "account.email.sent": "Nous avons envoyé un code à six chiffres à {email}. Il est valable 10 minutes.",
@@ -155,6 +166,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.row": "Compte et synchronisation",
   "account.row.out": "Connectez-vous pour sauvegarder et synchroniser",
   "account.row.in": "Connecté en tant que {email}",
+  "account.delete.webSub": "Votre abonnement Pro pris sur le site prend fin maintenant aussi et ne sera plus facturé.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -168,6 +180,9 @@ export const de: Partial<Record<Key, Message>> = {
   "account.apple": "Weiter mit Apple",
   "account.google": "Weiter mit Google",
   "account.emailButton": "Weiter mit E-Mail",
+  "account.agree": "Wenn du dich anmeldest, stimmst du den Nutzungsbedingungen und der Datenschutzerklärung zu.",
+  "account.terms": "Nutzungsbedingungen",
+  "account.privacy": "Datenschutzerklärung",
   "account.email.label": "Deine E-Mail",
   "account.email.send": "Code per E-Mail senden",
   "account.email.sent": "Wir haben einen sechsstelligen Code an {email} gesendet. Er gilt 10 Minuten.",
@@ -208,6 +223,7 @@ export const de: Partial<Record<Key, Message>> = {
   "account.row": "Konto und Synchronisierung",
   "account.row.out": "Anmelden zum Sichern und Synchronisieren",
   "account.row.in": "Angemeldet als {email}",
+  "account.delete.webSub": "Dein Pro-Abo von der Website endet damit ebenfalls und wird nicht mehr berechnet.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -221,6 +237,9 @@ export const it: Partial<Record<Key, Message>> = {
   "account.apple": "Continua con Apple",
   "account.google": "Continua con Google",
   "account.emailButton": "Continua con l’email",
+  "account.agree": "Accedendo, accetti le condizioni d’uso e l’informativa sulla privacy.",
+  "account.terms": "Condizioni d’uso",
+  "account.privacy": "Informativa sulla privacy",
   "account.email.label": "La tua email",
   "account.email.send": "Inviami un codice via email",
   "account.email.sent": "Abbiamo inviato un codice di sei cifre a {email}. Vale per 10 minuti.",
@@ -258,6 +277,7 @@ export const it: Partial<Record<Key, Message>> = {
   "account.row": "Account e sincronizzazione",
   "account.row.out": "Accedi per backup e sincronizzazione",
   "account.row.in": "Accesso come {email}",
+  "account.delete.webSub": "Anche il tuo abbonamento Pro del sito termina ora e non ti verrà più addebitato.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -271,6 +291,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.apple": "Apple で続ける",
   "account.google": "Google で続ける",
   "account.emailButton": "メールで続ける",
+  "account.agree": "サインインすると、利用規約とプライバシーポリシーに同意したことになります。",
+  "account.terms": "利用規約",
+  "account.privacy": "プライバシーポリシー",
   "account.email.label": "メールアドレス",
   "account.email.send": "コードをメールで受け取る",
   "account.email.sent": "{email}に6桁のコードを送りました。有効期限は10分です。",
@@ -308,4 +331,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.row": "アカウントと同期",
   "account.row.out": "サインインしてバックアップと同期",
   "account.row.in": "{email}でサインイン中",
+  "account.delete.webSub": "ウェブサイトで登録した Pro のサブスクリプションも今すぐ終了し、今後請求されることはありません。",
 };

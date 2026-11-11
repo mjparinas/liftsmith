@@ -4,12 +4,14 @@
 // same account. The device gets a random session token; the server keeps only its hash.
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
+import { accessFor, type Access } from "./access";
+import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
-import { hasLifetimePro } from "./creators";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
-import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
+import { isReviewEmail, reviewCodeMatches } from "./review";
 import { socialDeletes } from "./social";
+import { forgetStripe } from "./stripe";
 
 export const SESSION_MS = 365 * 86_400_000;
 const CODE_MS = 10 * 60_000;
@@ -25,8 +27,10 @@ export interface AccountInfo {
   email: string | null;
   providers: string[];
   createdAt: number;
-  /** Pro that comes with the account, not a store purchase: the store review account (review.ts) or a lifetime code. */
+  /** Pro on the account from any source: the review account, a lifetime code, the web (Stripe) or a linked store subscription (access.ts). */
   pro: boolean;
+  proVia: Access["via"];
+  sub: Access["sub"];
 }
 
 export type Platform = "web" | "android" | "ios";
@@ -44,14 +48,24 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
     email,
     providers: ids.map((r) => String(r.provider)),
     createdAt: Number(rows[0].created_at),
-    pro: accountHasPro(email) || (await hasLifetimePro(id)),
+    ...(await access(id, email)),
   };
 }
 
-/** Whether the account has Pro on the server (not from a store purchase). Sync sends it on every round. */
-export async function accountPro(id: string): Promise<boolean> {
+async function access(id: string, email: string | null): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub">> {
+  const a = await accessFor(id, email);
+  return { pro: a.pro, proVia: a.via, sub: a.sub };
+}
+
+/** The account's Pro and where it comes from (access.ts). Sync sends it on every round. */
+export async function accountAccess(id: string): Promise<Pick<AccountInfo, "pro" | "proVia" | "sub">> {
   const rows = await query<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [id]);
-  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null) || (await hasLifetimePro(id));
+  return access(id, rows[0]?.email ? String(rows[0].email) : null);
+}
+
+/** Whether the account has Pro from any source. */
+export async function accountPro(id: string): Promise<boolean> {
+  return (await accountAccess(id)).pro;
 }
 
 /** Finds or makes the account for an identity, joining accounts by verified email. */
@@ -248,7 +262,10 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
   for (const a of apple) if (a.apple_refresh) await Promise.resolve(revoke(String(a.apple_refresh))).catch(() => null);
   // Connected apps (Strava, Oura, Whoop): revoked at each service and forgotten.
   await forgetAll(accountId).catch(() => null);
+  // A web subscription (Stripe) is cancelled, so a deleted account is never charged again.
+  await forgetStripe(accountId).catch(() => null);
   await batch([
+    { sql: "DELETE FROM account_installs WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_events WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM sync_records WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_sessions WHERE account_id = ?", args: [accountId] },
@@ -256,6 +273,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
     ...socialDeletes(accountId),
+    ...coachCleanup(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

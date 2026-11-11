@@ -116,6 +116,13 @@ const DATA: Omit<Theme, "name" | "how">[] = [
     },
   },
   {
+    // Pro members' own theme (Melvin, 2026-11-11), from the Pro achievement's first badge, kept once earned.
+    id: "pro",
+    icon: null,
+    palette: { bg: "#0d0a16", surface: "#151021", raised: "#1e172e", line: "#2d2342", accent: "#c4a5ff", accentInk: "#1c0c3a" },
+    badge: { id: "pro", tier: "bronze" },
+  },
+  {
     id: "pumpkin",
     icon: null,
     season: [9],

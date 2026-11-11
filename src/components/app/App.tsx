@@ -7,7 +7,7 @@ import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
-import { startBilling, useBilling } from "@/lib/billing";
+import { startBilling, useBilling, useProMember } from "@/lib/billing";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
@@ -55,6 +55,7 @@ import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
+import { Trainer } from "./Trainer";
 import { TrainingSettings } from "./TrainingSettings";
 import { TodaySkeleton } from "./ui";
 import { Workout } from "./Workout";
@@ -182,6 +183,11 @@ export function App() {
   useEffect(() => {
     if (ready && profile.onboarded) useApp.getState().applyAccess();
   }, [ready, profile.onboarded, billing.live, billing.ent, accountPro]);
+  // A month with Pro is logged once (store.notePro), for the Pro achievement and its rewards, which stay earned.
+  const member = useProMember();
+  useEffect(() => {
+    if (ready && profile.onboarded && member) useApp.getState().notePro();
+  }, [ready, profile.onboarded, member]);
   // Sounds, haptics, Lean mode and equipped cosmetics (accent colour, rest timer sound) apply app-wide
   // (juice.ts reads `feel`).
   useEffect(() => {
@@ -311,6 +317,7 @@ export function App() {
     routine: <SharedRoutine code={arg} />,
     friends: <Friends />,
     person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
+    trainer: <Trainer arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

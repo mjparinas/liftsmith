@@ -2,8 +2,9 @@
 
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
-import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
+import { achName, CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
 import {
+  badgeForItem,
   COSMETICS,
   game,
   LEAGUE_LABEL,
@@ -272,6 +273,7 @@ function Locker({ g }: { g: Game }) {
       {groups.map(([kind, label, def]) => {
         const picked = COSMETICS.find((c) => c.id === hint && c.kind === kind);
         const at = picked ? levelForItem(picked.id) : null;
+        const viaBadge = picked ? badgeForItem(picked.id) : null;
         return (
           <div key={kind}>
             <p className="mb-2 text-sm text-muted">{label}</p>
@@ -304,7 +306,9 @@ function Locker({ g }: { g: Game }) {
             <p aria-live="polite" className="text-sm text-muted">
               {picked && (
                 <span className="mt-2 block">
-                  {t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}
+                  {viaBadge
+                    ? t("awards.locker.badge", { name: picked.name, badge: achName(viaBadge.badge), tier: TIER_LABEL[viaBadge.tier] })
+                    : t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}
                   {at !== null && ` ${t("awards.locker.atLevel", { level: at })}`}
                 </span>
               )}

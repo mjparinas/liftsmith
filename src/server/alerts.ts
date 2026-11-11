@@ -88,7 +88,7 @@ export async function sendAlert(
 
 // ---------- Store events (from the RevenueCat webhook) ----------
 
-const STORE: Record<string, string> = { play: "Google Play", appstore: "the App Store" };
+const STORE: Record<string, string> = { play: "Google Play", appstore: "the App Store", web: "the website (Stripe)" };
 const PLAN: Record<string, string> = { monthly: "the monthly plan", annual: "the yearly plan" };
 
 /**

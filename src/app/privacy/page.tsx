@@ -2,9 +2,14 @@ import type { Metadata } from "next";
 
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND.name} collects, why, and how to turn it off.` };
+export const metadata: Metadata = pageMeta({
+  title: "Privacy",
+  description: `What ${BRAND.name} collects, why, and how to turn it off.`,
+  path: "/privacy/",
+});
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
@@ -85,12 +90,13 @@ export default function Privacy() {
           away. Nothing is recorded, saved or sent to us.
         </p>
         <p className="mt-2">
-          With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and
-          respiratory rate from Health Connect or Apple Health to fill in setup, bring in weigh-ins and body fat, keep your TDEE (daily
-          calories) current, show the Health view on the Body tab against your own normal, and (with Pro) adjust how hard today&apos;s
-          workout is, and saves each finished workout back as a strength training workout with its time, title, sets, active calories and
-          average heart rate. These readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re
-          copied to your own account so your other devices have them, and nowhere else.{" "}
+          With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max,
+          respiratory rate and the calories and protein a food app logs from Health Connect or Apple Health to fill in setup, bring in
+          weigh-ins and body fat, keep your TDEE (daily calories) current, show the Health view on the Body tab against your own normal,
+          give coach&apos;s notes about what you eat, and (with Pro) adjust how hard today&apos;s workout is, and saves each finished
+          workout back as a strength training workout with its time, title, sets, active calories and average heart rate. These readings
+          stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your
+          other devices have them, and nowhere else.{" "}
           <a className="text-accent underline" href="/privacypolicy.html">
             More about health data
           </a>
@@ -157,6 +163,13 @@ export default function Privacy() {
           data. The stores also tell us (through RevenueCat) when a subscription starts, renews, is cancelled or refunded, so we can count
           revenue.
         </p>
+        <p className="mt-2">
+          On the web app, Pro is paid by card through Stripe, on Stripe&apos;s own checkout page; we never see your card. A web subscription
+          needs an account, so Stripe receives your account&apos;s email, a random account id, your random install id and any code you used,
+          and tells us when the subscription starts, renews, is cancelled or refunded. If a phone signed in to your account has a store
+          subscription, we link that phone&apos;s install id to your account so Pro works on the web too. Deleting your account cancels a
+          web subscription and removes the link; Stripe keeps its own payment records, as the law requires.
+        </p>
         <h2 className="mt-8 text-xl font-semibold">Codes</h2>
         <p className="mt-2">
           If you use a code or its link, whether a creator&apos;s or one of ours, we record the code with your random install id, where it
@@ -175,9 +188,9 @@ export default function Privacy() {
         <h2 className="mt-8 text-xl font-semibold">Who processes it</h2>
         <p className="mt-2">
           Usage stats, site visits, accounts and synced data are stored in our database (Turso), on servers run by Vercel. Emails go through
-          Resend. Subscriptions are checked by RevenueCat. When you email us, we may ask Anthropic&apos;s Claude for a first draft of our
-          answer; your message is sent for that one request, and a person reads and sends every reply. None of them may use the data for
-          their own purposes. We keep usage stats for up to 25 months.
+          Resend. Subscriptions are checked by RevenueCat, and web payments are taken by Stripe. When you email us, we may ask
+          Anthropic&apos;s Claude for a first draft of our answer; your message is sent for that one request, and a person reads and sends
+          every reply. None of them may use the data for their own purposes. We keep usage stats for up to 25 months.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Your choices</h2>
@@ -198,7 +211,11 @@ export default function Privacy() {
           <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>
-          . You can also send feedback from the app (Settings › Send feedback or report a bug).
+          . You can also send feedback from the app (Settings › Send feedback or report a bug). The rules for using {BRAND.name} are in our{" "}
+          <a className="text-accent underline" href="/terms/">
+            terms of use
+          </a>
+          .
         </p>
       </main>
       <SiteFooter />

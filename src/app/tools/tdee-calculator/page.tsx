@@ -4,14 +4,15 @@ import Link from "next/link";
 import { Crumbs, CtaBanner, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { TdeeCalculator } from "@/components/site/TdeeCalculator";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "TDEE calculator: calories a day to maintain, cut or bulk",
   description:
     "Work out your total daily energy expenditure from age, sex, height, weight and activity, with BMR, BMI, cutting and lean bulk targets and a protein range for lifters.",
-  alternates: { canonical: "/tools/tdee-calculator/" },
-};
+  path: "/tools/tdee-calculator/",
+});
 
 const FAQ: [string, string][] = [
   [

@@ -38,6 +38,8 @@ export interface DrawOptions {
   size?: CardSize;
   /** A still of the 3D figure (figureStill), drawn as the card's art. */
   figure?: HTMLCanvasElement | null;
+  /** A Pro member's card carries a small Pro pill beside the brand (billing.ts proMember). */
+  pro?: boolean;
 }
 
 const INK = "#e8edf3";
@@ -178,6 +180,21 @@ export function drawCard(canvas: HTMLCanvasElement, d: CardData, o: DrawOptions 
   c.fillStyle = accent;
   c.font = font(40, 800);
   c.fillText(BRAND.name.toUpperCase(), PAD, 120);
+  if (o.pro) {
+    const x = PAD + c.measureText(BRAND.name.toUpperCase()).width + 18;
+    const label = "PRO"; // the plan's name, the same in every language
+    c.font = font(26, 800);
+    const w = c.measureText(label).width + 32;
+    const pill = c.createLinearGradient(x, 0, x + w, 0);
+    pill.addColorStop(0, "#5b9cff");
+    pill.addColorStop(1, "#9b86ff");
+    c.fillStyle = pill;
+    c.beginPath();
+    c.roundRect(x, 84, w, 46, 23);
+    c.fill();
+    c.fillStyle = "#06122a";
+    c.fillText(label, x + 16, 117);
+  }
   if (d.name) {
     c.fillStyle = MUTED;
     c.font = font(34, 600);

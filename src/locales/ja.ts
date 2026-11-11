@@ -105,10 +105,12 @@ import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
 import * as train from "./text/train";
+import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
 import * as vc from "./text/vc";
+import * as vl from "./text/vl";
 import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
@@ -218,10 +220,12 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...ton.ja,
   ...tools.ja,
   ...train.ja,
+  ...trn.ja,
   ...twin.ja,
   ...units.ja,
   ...variety.ja,
   ...vc.ja,
+  ...vl.ja,
   ...warm.ja,
   ...wdg.ja,
   ...why.ja,

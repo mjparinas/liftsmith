@@ -170,6 +170,12 @@ describe("profiles", () => {
     expect(profileFor("barbell-curl", "isolation")?.concentricFirst).toBe(true);
     expect(profileFor("overhead-press", "vpush")?.restHigh).toBe(false);
     expect(profileFor("dip", "vpush")?.restHigh).toBe(true);
+    // Leg curls bend the knee, wrist work and shrugs are too small to see, and hangs have no reps.
+    expect(profileFor("single-leg-curl", "isolation")?.signal).toBe("knee");
+    expect(profileFor("reverse-wrist-curl", "isolation")).toBeUndefined();
+    expect(profileFor("smith-shrug", "isolation")).toBeUndefined();
+    expect(profileFor("towel-hang", "isolation")).toBeUndefined();
+    expect(profileFor("hang-clean", "hinge")).toBeDefined();
     expect(EXERCISES.filter((e) => profileFor(e.id, e.pattern)).length).toBeGreaterThan(60);
   });
 

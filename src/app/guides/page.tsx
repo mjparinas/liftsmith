@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { articlePath, articlesOf } from "@/lib/seo";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Training guides: reps in reserve, deloads, progressive overload",
   description:
     "Plain-words guides to the ideas behind good strength training: how hard each set should be, when to take a lighter week, and how to keep getting stronger.",
-  alternates: { canonical: "/guides/" },
-};
+  path: "/guides/",
+});
 
 export default function GuidesIndex() {
   return (

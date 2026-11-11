@@ -4,18 +4,21 @@ import { notFound } from "next/navigation";
 
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import {
   EQUIPMENT_NAME,
   equipmentBySlug,
+  equipmentLabel,
   equipmentSlug,
   equipmentWithPages,
+  exerciseCollection,
   exercisesWith,
+  lowerName,
   MUSCLE_NAME,
   muscleSlug,
   needsText,
   pairsWith,
 } from "@/lib/seo";
-import { SITE_URL } from "@/lib/site";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => equipmentWithPages().map((eq) => ({ slug: equipmentSlug(eq) }));
@@ -26,11 +29,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const eq = equipmentBySlug((await params).slug);
   if (!eq || !exercisesWith(eq).length) return {};
   const n = exercisesWith(eq).length;
-  return {
-    title: `${n} ${EQUIPMENT_NAME[eq].toLowerCase()} exercise${n === 1 ? "" : "s"}`,
-    description: `Exercises you can do with ${EQUIPMENT_NAME[eq].toLowerCase()}, grouped by muscle, with setup, form cues and a 3D demo for each.`,
-    alternates: { canonical: `/equipment/${equipmentSlug(eq)}/` },
-  };
+  return pageMeta({
+    title: `${n} ${lowerName(equipmentLabel(eq))} exercise${n === 1 ? "" : "s"}`,
+    description: `${n} exercises you can do with ${lowerName(EQUIPMENT_NAME[eq])}, grouped by muscle, with setup, form cues and a 3D demo for each.`,
+    path: `/equipment/${equipmentSlug(eq)}/`,
+  });
 }
 
 export default async function EquipmentPage({ params }: Props) {
@@ -38,20 +41,14 @@ export default async function EquipmentPage({ params }: Props) {
   if (!eq) notFound();
   const list = exercisesWith(eq);
   if (!list.length) notFound();
-  const name = EQUIPMENT_NAME[eq].toLowerCase();
+  const name = lowerName(EQUIPMENT_NAME[eq]);
   const pairs = pairsWith(eq);
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: `${EQUIPMENT_NAME[eq]} exercises`,
-    numberOfItems: list.length,
-    itemListElement: list.map((e, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}/exercises/${e.id}/`, name: e.name })),
-  };
+  const jsonLd = exerciseCollection(`${equipmentLabel(eq)} exercises`, `/equipment/${equipmentSlug(eq)}/`, list);
   return (
     <SitePage kind="equipment" sticky={`Workouts for your ${name}`}>
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/equipment/", label: "Equipment" }, { label: EQUIPMENT_NAME[eq] }]} />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">{EQUIPMENT_NAME[eq]} exercises</h1>
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">{equipmentLabel(eq)} exercises</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted">
         {list.length} exercise{list.length === 1 ? "" : "s"} that use {name}, with what else each one needs.
       </p>

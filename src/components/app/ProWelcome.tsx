@@ -3,7 +3,7 @@
 import { create } from "zustand";
 
 import { t } from "@/lib/i18n";
-import { confetti, haptic, sound } from "@/lib/juice";
+import { confetti, haptic, isNative, sound } from "@/lib/juice";
 
 import { Mascot } from "./Mascot";
 import { ProFeatures } from "./Pro";
@@ -40,7 +40,12 @@ export function ProWelcome() {
       </div>
       <p className="mt-5 text-xs font-semibold tracking-wider text-muted uppercase">{t("pro.welcome.unlocked")}</p>
       <ProFeatures compact />
-      {trialDays ? <p className="mt-4 text-sm text-muted">{t("pro.welcome.trialNote", { days: trialDays })}</p> : null}
+      <p className="mt-4 text-sm text-muted">{t("pro.welcome.reward")}</p>
+      {trialDays ? (
+        <p className="mt-4 text-sm text-muted">
+          {t(isNative() ? "pro.welcome.trialNote" : "pro.welcome.trialNote.web", { days: trialDays })}
+        </p>
+      ) : null}
       <Button
         className="mt-6 w-full"
         onClick={() => {

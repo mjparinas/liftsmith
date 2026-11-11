@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
+import { pageMeta } from "@/lib/pageMeta";
 import { alternativesTo, exerciseBySlug, MUSCLE_NAME, needsText } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import type { Exercise } from "@/lib/types";
@@ -18,11 +19,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
   const n = alternativesTo(e.id).length;
-  return {
+  return pageMeta({
     title: `${n} ${e.name.toLowerCase()} alternatives for any gym`,
     description: `The best substitutes for the ${e.name.toLowerCase()} that train the same muscles, for a full gym, a home gym or no equipment at all.`,
-    alternates: { canonical: `/exercises/${e.id}/alternatives/` },
-  };
+    path: `/exercises/${e.id}/alternatives/`,
+  });
 }
 
 /** Why an alternative fits, in a few words. */

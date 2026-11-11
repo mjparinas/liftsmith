@@ -4,15 +4,16 @@ import Link from "next/link";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { readMinutes } from "@/content/articles";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { articlePath, articlesOf } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Blog: strength training, made simple",
   description:
     "Plain-words articles on building muscle and strength: sets, rest, warm-ups, plateaus, recovery, home workouts, nutrition and more.",
-  alternates: { canonical: "/blog/" },
-};
+  path: "/blog/",
+});
 
 export default function BlogIndex() {
   const posts = articlesOf("blog");

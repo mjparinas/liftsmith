@@ -23,6 +23,9 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
+import { fastestMetres } from "@/lib/reps/speedMax";
+import { watchCountable } from "@/lib/reps/watchMotion";
+import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
@@ -51,6 +54,9 @@ import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
+import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
+import { useWatchReps } from "./workout/useWatchReps";
+import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -224,12 +230,39 @@ export function Workout() {
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Watch rep counting (Labs): the watch streams its motion during a set, unless the camera is already counting.
+  const cameraCounting = !!ex && countPrefs.on && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
+  const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !cameraCounting;
+  const watchReps = useWatchReps({
+    on: watchCountOn,
+    exerciseId: ex?.id,
+    pattern: ex?.pattern,
+    setKey: `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`,
+    onCount: (n) => {
+      const a = useApp.getState().active;
+      if (a) s.adjust(a.weight, n);
+    },
+  });
+  const watchMotion = watchCountOn && !!ex && watchCountable(ex.id, ex.pattern);
+
+  // Heart-rate rest timer (Labs, restReady.ts): once the heart rate is back down, the rest is cut to a few
+  // seconds left (never under its floor), once per rest; the countdown above then ends it as usual.
+  const hrRest = labOn("labHrRest");
+  const lastStart = lastEv?.type === "set" ? lastEv.startedAt : undefined;
+  useEffect(() => {
+    if (!hrRest || !active || !resting || warming || active.tag || !lastStart) return;
+    if (active.hrCut?.restStart === active.restStart) return;
+    const cut = hrRestCut(active, lastStart, now);
+    if (!cut) return;
+    s.cutRest(cut.until, cut);
+  }, [now, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
   // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.
   const notified = useRef({ key: "", at: 0 });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -251,8 +284,23 @@ export function Workout() {
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
       sessionId: active.sessionId,
+      motion: watchMotion || undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
+  // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
+  const speedMaxOn = labOn("labSpeedMax");
+  const warmSpeed = useRef<{ key: string; index: number; kg: number; speed: number } | null>(null);
+  const exId = item?.exerciseId;
+  useEffect(() => {
+    if (!sessionId || !exId) return;
+    const w = warmSpeed.current;
+    if (w && w.key === `${sessionId}:${exId}` && w.index === warmDone - 1)
+      recordWarmupSpeed(sessionId, exId, w.index, { kg: w.kg, speed: w.speed });
+    trimWarmupSpeeds(sessionId, exId, warmDone);
+    warmSpeed.current = null;
+  }, [sessionId, exId, warmDone]);
 
   if (!active || !gym) {
     return (
@@ -275,6 +323,8 @@ export function Workout() {
   const lastOfAll = !warming && !finished && setsLogged + 1 >= totalSets;
   // Undo sits above the big button, so the page leaves room for it while it's there.
   const undoShown = !!s.undoable && now <= s.undoable.until;
+  // Voice set logging is a lab (Settings › Labs, Pro): a microphone above Log set while it's on.
+  const voiceLog = !finished && !!ex && !ex.cardio && labOn("labVoiceLog");
 
   const log = () => {
     haptic("tap");
@@ -326,6 +376,11 @@ export function Workout() {
   // Camera rep counting is a lab (Settings › Labs, Pro): offered only while that lab is on.
   const canCount = !!ex && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
   const counting = canCount && countPrefs.on;
+  // The working set the plan wrote, when every set has the same weight (a program's ramp has its own logic).
+  const plannedWork =
+    item && (!item.setTargets || item.setTargets.every((x) => x.weight === item.setTargets![0]!.weight))
+      ? { weight: (item.setTargets?.[0] ?? item.target).weight, reps: (item.setTargets?.[0] ?? item.target).reps, rir: item.target.rir }
+      : null;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
@@ -392,7 +447,7 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className={docked ? (undoShown ? "pb-[17.5rem]" : "pb-56") : undoShown ? "pb-[14.5rem]" : "pb-44"}>
+    <div className={docked ? (undoShown || voiceLog ? "pb-[17.5rem]" : "pb-56") : undoShown || voiceLog ? "pb-[14.5rem]" : "pb-44"}>
       <PrMoment />
       <header className="flex items-center justify-between pt-1">
         <button
@@ -558,6 +613,16 @@ export function Workout() {
                     const a = useApp.getState().active;
                     if (a) s.adjust(a.weight, n);
                   }}
+                  onSummary={
+                    speedMaxOn
+                      ? (sum) => {
+                          const a = useApp.getState().active;
+                          const v = fastestMetres(sum);
+                          if (!a || !warmingUp(a) || v === undefined) return;
+                          warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
+                        }
+                      : undefined
+                  }
                   onClose={() => changeCount({ ...countPrefs, on: false })}
                   paused={infoOpen || swapOpen || endOpen}
                 />
@@ -579,6 +644,15 @@ export function Workout() {
                   {t("workout.howTo")}
                 </span>
               </button>
+              {watchReps !== null && (
+                <span
+                  className="absolute left-2 top-2 inline-flex min-h-8 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm font-semibold tabular-nums"
+                  data-testid="watch-reps"
+                >
+                  <Icon name="watch" size={16} className="text-accent" />
+                  {t("count.watch", { count: watchReps })}
+                </span>
+              )}
               {canCount && (
                 <AutoCountButton
                   on={false}
@@ -599,6 +673,17 @@ export function Workout() {
                 ? t("workout.sr.over", { load: loadText(ex, active.weight, profile.unit), reps: repsText(ex, active.reps) })
                 : ""}
           </p>
+          {speedMaxOn && resting && !warming && warmTotal > 0 && doneSets === 0 && !active.tag && plannedWork && (
+            <SpeedNudge
+              sessionId={active.sessionId}
+              ex={ex}
+              gym={gym}
+              planned={plannedWork}
+              weight={active.weight}
+              reps={active.reps}
+              onUse={(kg, reps) => s.adjust(kg, reps)}
+            />
+          )}
           {resting ? (
             <RestCard
               active={active}
@@ -647,7 +732,12 @@ export function Workout() {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
-          <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
+          {(undoShown || voiceLog) && (
+            <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
+              <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
+              {voiceLog && <VoiceLog unit={unit} onLog={log} paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen} />}
+            </div>
+          )}
           {finished ? (
             <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>
               {t("workout.finish")}

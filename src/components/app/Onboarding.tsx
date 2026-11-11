@@ -6,7 +6,7 @@ import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { useBack } from "@/lib/back";
-import { billingLive, useBilling } from "@/lib/billing";
+import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
@@ -178,7 +178,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [step, setStep] = useState(0);
   // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
   // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
-  const STEPS = rerun || !billingLive() ? 5 : 6;
+  // The web app sells Pro too (Stripe), but only to a signed-in account, so its setup doesn't end on the offer: the
+  // Pro tags and the paywall carry it there (money.md, "Pro on the web").
+  const STEPS = rerun || !billingLive() || webBilling() ? 5 : 6;
   const PRO_STEP = 5;
   const trialDays = flag("trialDays");
   // The store's own trial length for this person (null once they've used a trial), else the flag's.

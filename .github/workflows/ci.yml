@@ -107,7 +107,7 @@ jobs:
 
           # Anything that can change what the Android or iOS compiler sees: the native projects, Capacitor's config,
           # the npm packages (Capacitor plugins carry native code), and CI itself.
-          if grep -qE '^(android/|ios/|capacitor\.config\.|package(-lock)?\.json$|\.github/(workflows/ci\.yml|actions/))' <<< "$files"; then
+          if grep -qE '^(android/|ios/|capacitor\.config\.|scripts/native-web\.mjs$|package(-lock)?\.json$|\.github/(workflows/ci\.yml|actions/))' <<< "$files"; then
             echo "native=true" >> "$GITHUB_OUTPUT"
           else
             echo "native=false" >> "$GITHUB_OUTPUT"

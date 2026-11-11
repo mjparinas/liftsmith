@@ -127,6 +127,36 @@ const SCHEMA = [
     at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS pro_grants_code ON pro_grants (code)`,
+  // Pro on the web (src/server/stripe.ts): the account's Stripe customer, and each subscription's latest state from the
+  // webhook. A row in a Pro status (trialing, active, past_due) whose period hasn't ended is the account's web Pro.
+  `CREATE TABLE IF NOT EXISTS stripe_customers (
+    account_id TEXT PRIMARY KEY,
+    customer_id TEXT NOT NULL UNIQUE,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS stripe_subscriptions (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    customer_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    plan TEXT,
+    period_end INTEGER,
+    trial_end INTEGER,
+    cancel_at_period_end INTEGER NOT NULL DEFAULT 0,
+    install_id TEXT,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS stripe_subscriptions_account ON stripe_subscriptions (account_id)`,
+  `CREATE INDEX IF NOT EXISTS stripe_subscriptions_customer ON stripe_subscriptions (customer_id)`,
+  // Which installs synced under which account (src/server/access.ts), so a phone's store subscription (the
+  // `entitlements` row RevenueCat keeps for that install) gives the account Pro on the web too.
+  `CREATE TABLE IF NOT EXISTS account_installs (
+    account_id TEXT NOT NULL,
+    install_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, install_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_installs_install ON account_installs (install_id)`,
   // Commission paid out, recorded by an admin after paying (PayPal or Wise, outside the app).
   `CREATE TABLE IF NOT EXISTS creator_payouts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -444,6 +474,32 @@ const SCHEMA = [
     UNIQUE (reporter_id, kind, target_id)
   )`,
   `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
+  // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
+  `CREATE TABLE IF NOT EXISTS coach_invites (
+    code TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_invites_coach ON coach_invites (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS coach_links (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_links_client ON coach_links (client_id)`,
+  // Routines a coach assigned to a client (stage 2), as routine share codes (routineShare.ts).
+  `CREATE TABLE IF NOT EXISTS coach_plans (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_plans_pair ON coach_plans (coach_id, client_id)`,
+  `CREATE INDEX IF NOT EXISTS coach_plans_client ON coach_plans (client_id)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,

@@ -18,7 +18,7 @@ import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
-import { feel } from "@/lib/juice";
+import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
@@ -117,14 +117,18 @@ function NavRow({ title, sub, icon, pro, onClick }: { title: string; sub?: strin
 function ProCard() {
   const { live, ent } = useBilling();
   const now = useNow(60_000);
-  const pro = !live || entActive(ent, now);
+  // Pro on the account (a web subscription, a store one from another phone, a lifetime code) counts here too.
+  const viaAccount = useAccount((s) => !!s.account?.pro);
+  const pro = !live || entActive(ent, now) || viaAccount;
   const status = !live
     ? t("pro.settings.unlocked")
     : entActive(ent, now)
       ? ent?.plan === "monthly"
         ? t("pro.status.monthly")
         : t("pro.status.yearly")
-      : t("pro.settings.free");
+      : viaAccount
+        ? t("pro.settings.account")
+        : t("pro.settings.free");
   return (
     <section
       className="card card-tint mt-4 p-4"
@@ -188,6 +192,9 @@ export function Settings() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
+      <div className="mt-2">
+        <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
+      </div>
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>
@@ -208,6 +215,11 @@ export function Settings() {
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+      <p className="mt-1 text-center text-xs">
+        <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
+          {t("settings.terms")}
+        </a>
+      </p>
       <BuildLine />
     </div>
   );
@@ -236,7 +248,7 @@ function LabsPage() {
           </Button>
         </section>
       ) : (
-        LABS.filter((l) => !l.needs || labOn(l.needs)).map((l) => (
+        LABS.filter((l) => (!l.needs || labOn(l.needs)) && (!l.native || isNative())).map((l) => (
           <SwitchRow
             key={l.flag}
             label={t(`lab.${l.key}.title`)}
