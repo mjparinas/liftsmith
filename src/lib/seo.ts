@@ -8,6 +8,7 @@ import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
 import { SITE_URL } from "./site";
 import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
@@ -229,6 +230,7 @@ export function siteRoutes(): Route[] {
     { path: "/accessibility/", priority: 0.3 },
     { path: "/pricing/", priority: 0.8 },
     { path: "/help/", priority: 0.6 },
+    ...HELP.map((t) => ({ path: helpPath(t), priority: 0.5 })),
     { path: "/contact/", priority: 0.4 },
     { path: "/about/", priority: 0.4 },
     { path: "/editorial-standards/", priority: 0.3 },
