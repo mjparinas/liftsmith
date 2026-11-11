@@ -504,7 +504,7 @@ function BodyGroup() {
         <NavRow
           title={t("settings.bw.now", { weight: plainNum(fromKg(profile.bodyweight, profile.unit)), unit: profile.unit })}
           sub={t("settings.bw.log")}
-          onClick={() => go("stats")}
+          onClick={() => go("stats", "bodyweight")}
         />
         <p className="mt-2 px-1 text-xs text-faint">{t("settings.bw.note")}</p>
       </Section>
