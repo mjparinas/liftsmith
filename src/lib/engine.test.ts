@@ -169,6 +169,13 @@ describe("stats and game", () => {
     expect(s.totalSets).toBe(2);
     expect(s.prs).toHaveLength(1);
   });
+  it("never calls a longer carry or sled push a PR: their reps are seconds", () => {
+    const carry = [set("farmers-carry", NOW - 96 * H, 32, 30, 30, "a"), set("farmers-carry", NOW - 24 * H, 32, 60, 60, "b")];
+    const sled = [set("sled-push", NOW - 72 * H, 100, 60, 60, "c"), set("sled-push", NOW - 12 * H, 100, 90, 90, "d")];
+    const s = derive([...carry, ...sled], NOW);
+    expect(s.prs).toEqual([]);
+    expect(s.e1rmSeries.size).toBe(0);
+  });
   it("levels up", () => {
     expect(levelOf(0).title).toBe("Rookie");
     expect(levelOf(600).title).toBe("Regular");

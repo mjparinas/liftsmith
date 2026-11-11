@@ -3,7 +3,7 @@ import type { MessageKey } from "@/locales/en";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
-import { TIMED } from "./progression";
+import { gradedSet, TIMED } from "./progression";
 import { MUSCLES, type AppEvent, type Muscle, type Profile, type SessionStartEvent, type SetEvent } from "./types";
 import { fromKg } from "./units";
 
@@ -473,7 +473,8 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     icon: "🎯",
     category: "smart",
     tiers: [1, 10, 50, 150],
-    value: (c) => countSessions(c, (s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)),
+    value: (c) =>
+      countSessions(c, (s) => s.sets.filter(gradedSet).length >= 6 && s.sets.every((x) => !gradedSet(x) || x.reps >= x.targetReps)),
   },
   {
     id: "rested",

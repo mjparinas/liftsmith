@@ -170,6 +170,21 @@ describe("classic 5×5", () => {
     expect(top(next, "back-squat")).toBe(sq[3]);
   });
 
+  it("still adds weight when a drop set or rest-pause set follows the planned sets", () => {
+    const { src, plans, events } = run("classic-5x5", 1);
+    const last = events.filter((e): e is SetEvent => e.type === "set" && e.slot === "back-squat").at(-1)!;
+    // Bonus sets aim below the plan's reps by design; they're not a miss.
+    const bonus: SetEvent[] = [
+      { ...last, id: "drop1", at: last.at + 100, weight: last.weight * 0.75, reps: 4, tag: "drop" },
+      { ...last, id: "rp1", at: last.at + 200, reps: 2, tag: "restPause" },
+    ];
+    const at = NOW - 60 * D + 4 * D;
+    const next = programPlan({ src, profile, gym: kgGym, events: [...events, ...bonus], now: at })!;
+    const plain = programPlan({ src, profile, gym: kgGym, events, now: at })!;
+    expect(top(next, "back-squat")).toBe(top(plain, "back-squat"));
+    expect(top(next, "back-squat") - top(plans[0], "back-squat")).toBeCloseTo(2.5);
+  });
+
   it("builds on what was lifted when the lifter changes the weight", () => {
     const { plans } = run("classic-5x5", 2, { weight: (slot, w) => (slot === "back-squat" ? w + 10 : w) });
     expect(top(plans[1], "back-squat")).toBeCloseTo(top(plans[0], "back-squat") + 12.5);

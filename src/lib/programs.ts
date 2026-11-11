@@ -1013,6 +1013,8 @@ export function programSessions(events: readonly AppEvent[], id: string, since: 
       for (const x of sets.get(sid)!.sort((a, b) => a.at - b.at)) {
         // Sets done lighter for an injury don't move the program lift (injury.ts).
         if (x.injuryPct) continue;
+        // Drop and rest-pause sets are bonus work: they aim below the plan's reps, so they'd read as a miss.
+        if (x.tag) continue;
         const k = x.slot ?? x.exerciseId;
         by.set(k, [...(by.get(k) ?? []), x]);
       }

@@ -1,5 +1,5 @@
 import { EXERCISE_BY_ID } from "./exercises";
-import { epley } from "./progression";
+import { epley, TIMED } from "./progression";
 import { setVolume } from "./sides";
 import { MUSCLES, type AppEvent, type Muscle, type SetEvent } from "./types";
 
@@ -87,7 +87,8 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
   for (const [sessionId, list] of bySession) {
     const perEx = new Map<string, SetEvent>();
     for (const s of list) {
-      if (s.weight <= 0) continue;
+      // Holds, carries and cardio count seconds, not reps: a longer weighted carry or sled push isn't a stronger lift.
+      if (s.weight <= 0 || TIMED.has(s.exerciseId)) continue;
       const cur = perEx.get(s.exerciseId);
       if (!cur || epley(s.weight, s.reps) > epley(cur.weight, cur.reps)) perEx.set(s.exerciseId, s);
     }

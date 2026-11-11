@@ -1,3 +1,4 @@
+import { distanceText } from "@/lib/cardio";
 import { date, relative, t } from "@/lib/i18n";
 import { barFor } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
@@ -14,6 +15,15 @@ export function loadText(ex: Exercise, kg: number, unit: Unit): string {
 export function repsText(ex: Exercise, reps: number): string {
   if (ex.cardio) return clock(reps);
   return TIMED.has(ex.id) ? t("fmt.seconds", { n: fmtNum(reps) }) : t("fmt.reps", { n: fmtNum(reps), count: reps });
+}
+
+/**
+ * The next set in one line, for the lock-screen notification, the watches and the rest-over alert:
+ * "80 kg × 5 reps", or for cardio its time and distance ("20:00 · 3 km"), with no weight.
+ */
+export function setText(ex: Exercise, kg: number, reps: number, unit: Unit, distanceM?: number): string {
+  if (ex.cardio) return ex.cardio === "distance" && distanceM ? `${clock(reps)} · ${distanceText(distanceM, unit)}` : clock(reps);
+  return `${loadText(ex, kg, unit)} × ${repsText(ex, reps)}`;
 }
 
 export function plateText(ex: Exercise, kg: number, gym: Gym): string | undefined {
