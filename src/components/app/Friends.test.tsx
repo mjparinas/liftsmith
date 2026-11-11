@@ -104,6 +104,10 @@ describe("Friends", () => {
           weights: true,
           public: false,
           push: { follows: true, comments: true, sent: true, likes: false },
+          avatar: "",
+          audience: "all",
+          showLifts: true,
+          lifts: [],
         },
       },
     });
@@ -117,5 +121,46 @@ describe("Friends", () => {
     render(<Friends />);
     await u.click(await screen.findByRole("button", { name: /Activity/ }));
     expect(await screen.findByText("Alex sent you a workout: Leg day")).toBeInTheDocument();
+  });
+
+  it("edits a post's caption and audience, and offers to save a friend's workout as a routine", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-a", {
+      op: "post",
+      workoutId: "s1",
+      at: Date.now() - 3_600_000,
+      body: {
+        seconds: 3000,
+        sets: 5,
+        volume: null,
+        prs: 0,
+        muscles: [],
+        exercises: [{ id: "back-squat", name: "", sets: 5, w: null, r: 5 }],
+      },
+    });
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "More options" }));
+    expect(screen.getByRole("button", { name: "Save as a routine" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Edit post" }));
+    await u.type(screen.getByLabelText("Caption"), "Felt strong");
+    await u.click(screen.getByRole("button", { name: "Only me" }));
+    expect(screen.getByText("Just for you: it stays on your profile, hidden from everyone else.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Felt strong")).toBeInTheDocument();
+    expect(screen.getByText(/· Only me/)).toBeInTheDocument();
+  });
+
+  it("mutes someone from their profile's menu", async () => {
+    const u = userEvent.setup();
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    signIn("tok-a");
+    render(<PersonScreen handle="blair" />);
+    await u.click(await screen.findByRole("button", { name: "Block or report Blair" }));
+    await u.click(screen.getByRole("button", { name: "Mute" }));
+    expect(await screen.findByText("Muted: their workouts don’t show in your feed.")).toBeInTheDocument();
   });
 });

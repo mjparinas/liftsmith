@@ -20,6 +20,17 @@ export const en = {
   "cos.plates-chrome": "Chrome",
   "cos.plates-neon": "Neon",
   "cos.accent-pro": "Ultraviolet",
+  "cos.av-dumbbell": "Dumbbell",
+  "cos.av-bolt": "Bolt",
+  "cos.av-leaf": "Leaf",
+  "cos.av-moon": "Night owl",
+  "cos.av-target": "Bullseye",
+  "cos.av-heart": "Big heart",
+  "cos.av-stretch": "Limber",
+  "cos.av-mascot": "Kettlebell buddy",
+  "cos.av-trophy": "Champion",
+  "cos.av-flame": "On fire",
+  "cos.av-pro": "Pro spark",
 } as const;
 
 type Key = keyof typeof en;
@@ -41,6 +52,17 @@ export const es: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "Cromo",
   "cos.plates-neon": "Neón",
   "cos.accent-pro": "Ultravioleta",
+  "cos.av-dumbbell": "Mancuerna",
+  "cos.av-bolt": "Rayo",
+  "cos.av-leaf": "Hoja",
+  "cos.av-moon": "Búho nocturno",
+  "cos.av-target": "Diana",
+  "cos.av-heart": "Gran corazón",
+  "cos.av-stretch": "Flexible",
+  "cos.av-mascot": "Colega pesa rusa",
+  "cos.av-trophy": "Campeón",
+  "cos.av-flame": "En racha",
+  "cos.av-pro": "Chispa Pro",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -60,6 +82,17 @@ export const fr: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "Chrome",
   "cos.plates-neon": "Néon",
   "cos.accent-pro": "Ultraviolet",
+  "cos.av-dumbbell": "Haltère",
+  "cos.av-bolt": "Éclair",
+  "cos.av-leaf": "Feuille",
+  "cos.av-moon": "Oiseau de nuit",
+  "cos.av-target": "Dans le mille",
+  "cos.av-heart": "Grand cœur",
+  "cos.av-stretch": "Souple",
+  "cos.av-mascot": "Copain kettlebell",
+  "cos.av-trophy": "Champion",
+  "cos.av-flame": "En feu",
+  "cos.av-pro": "Étincelle Pro",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -79,6 +112,17 @@ export const de: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "Chrom",
   "cos.plates-neon": "Neon",
   "cos.accent-pro": "Ultraviolett",
+  "cos.av-dumbbell": "Kurzhantel",
+  "cos.av-bolt": "Blitz",
+  "cos.av-leaf": "Blatt",
+  "cos.av-moon": "Nachteule",
+  "cos.av-target": "Volltreffer",
+  "cos.av-heart": "Großes Herz",
+  "cos.av-stretch": "Gelenkig",
+  "cos.av-mascot": "Kettlebell-Kumpel",
+  "cos.av-trophy": "Champion",
+  "cos.av-flame": "Feuer und Flamme",
+  "cos.av-pro": "Pro-Funke",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -98,6 +142,17 @@ export const it: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "Cromo",
   "cos.plates-neon": "Neon",
   "cos.accent-pro": "Ultravioletto",
+  "cos.av-dumbbell": "Manubrio",
+  "cos.av-bolt": "Fulmine",
+  "cos.av-leaf": "Foglia",
+  "cos.av-moon": "Nottambulo",
+  "cos.av-target": "Centro",
+  "cos.av-heart": "Gran cuore",
+  "cos.av-stretch": "Flessibile",
+  "cos.av-mascot": "Amico kettlebell",
+  "cos.av-trophy": "Campione",
+  "cos.av-flame": "In fiamme",
+  "cos.av-pro": "Scintilla Pro",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -117,4 +172,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "cos.plates-chrome": "クローム",
   "cos.plates-neon": "ネオン",
   "cos.accent-pro": "ウルトラバイオレット",
+  "cos.av-dumbbell": "ダンベル",
+  "cos.av-bolt": "イナズマ",
+  "cos.av-leaf": "リーフ",
+  "cos.av-moon": "夜型",
+  "cos.av-target": "ど真ん中",
+  "cos.av-heart": "ビッグハート",
+  "cos.av-stretch": "しなやか",
+  "cos.av-mascot": "ケトルベル仲間",
+  "cos.av-trophy": "チャンピオン",
+  "cos.av-flame": "燃えてる",
+  "cos.av-pro": "Proスパーク",
 };
