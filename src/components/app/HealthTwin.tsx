@@ -6,26 +6,42 @@
 // 30 days against the lifter's own normal. Free to see; health signals moving today's call is Pro.
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { BMI_COLOUR, BmiBar } from "@/components/BmiBar";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
+import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
+import { useCloud } from "@/lib/connections";
 import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
-import { connectHealth, healthAvailable } from "@/lib/health";
+import { askHealth, healthAvailable, openHealthPermissions, type HealthRead } from "@/lib/health";
 import { date, t } from "@/lib/i18n";
 import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
+import { bmiBand, bmiCategory } from "@/lib/tdee";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 
 import { openStats } from "./BodyStats";
 import { go } from "./router";
-import { Button, ProTag, Section, Sheet } from "./ui";
+import { Button, EmptyState, ProTag, Section, Sheet } from "./ui";
+import { WeighInForm } from "./WeighIn";
 
 const BODY: TwinId[] = ["weight", "leanMass", "bodyFat", "bmi", "tdee", "steps"];
 const HEART: TwinId[] = ["sleep", "hrv", "restingHr", "breathing", "vo2max", "restDrop"];
+/** The Health read each tile is waiting for, so the connect button can tell "not allowed" from "no data". */
+const NEED: Partial<Record<TwinId, HealthRead>> = {
+  weight: "weight",
+  bodyFat: "bodyFat",
+  steps: "steps",
+  sleep: "sleep",
+  hrv: "heartRateVariability",
+  restingHr: "restingHeartRate",
+  breathing: "respiratoryRate",
+  vo2max: "vo2Max",
+};
 const TERM: Partial<Record<TwinId, Term>> = {
   hrv: "hrv",
   restingHr: "restingHr",
@@ -37,12 +53,19 @@ const TERM: Partial<Record<TwinId, Term>> = {
 };
 
 /** Status colours are tokens (good, warn), so they follow the theme and colour-blind safe colours. */
-const TONE: Record<Status, string> = {
-  good: "border-good/50 text-good",
-  watch: "border-warn/60 text-warn",
-  steady: "border-line text-muted",
-  info: "border-line text-muted",
-  missing: "border-line text-faint",
+/**
+ * One colour scale for every status label on Body › Health (Melvin, 2026-11-11: "colour coded based on
+ * what is being displayed"). Calm on purpose, never red: green when it's going well, cyan when it's
+ * normal for you or holding steady, amber when it's worth acting on, plain when it's only information,
+ * and faint with a dashed edge when there's nothing to judge yet. The words always say the same thing,
+ * so colour is never the only cue. BMI's label takes its band's colour from the range bar instead.
+ */
+const TONE: Record<Status, { pill: string; text: string }> = {
+  good: { pill: "border-good/50 bg-good/10 text-good", text: "text-good" },
+  steady: { pill: "border-cyan/45 bg-cyan/10 text-cyan", text: "text-cyan" },
+  watch: { pill: "border-warn/60 bg-warn/10 text-warn", text: "text-warn" },
+  info: { pill: "border-line text-muted", text: "text-muted" },
+  missing: { pill: "border-dashed border-line text-faint", text: "text-faint" },
 };
 
 const noSubscribe = () => () => {};
@@ -61,7 +84,6 @@ export function HealthTwin() {
   const by = new Map(metrics.map((m) => [m.id, m]));
   const [open, setOpen] = useState<TwinId | null>(null);
   const [canHealth, setCanHealth] = useState(false);
-  const [note, setNote] = useState("");
   useEffect(() => {
     void healthAvailable().then(setCanHealth);
   }, []);
@@ -73,14 +95,6 @@ export function HealthTwin() {
     const withHealth = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...healthExternal(events, now) });
     return withHealth.call !== r.call ? withHealth.call : null;
   }, [events, profile, now, pro, r]);
-
-  const connect = async () => {
-    setNote("");
-    if (!(await connectHealth())) return setNote(t("twin.connect.none", { source: store }));
-    const s = useApp.getState();
-    const [a, b] = await Promise.all([s.importHealthDaily(), s.importHealthBody()]);
-    if (!a && !b) setNote(t("twin.connect.none", { source: store }));
-  };
 
   const rhr = by.get("restingHr");
   const watch = metrics.filter((m) => m.status === "watch");
@@ -108,7 +122,7 @@ export function HealthTwin() {
           aria-label={t("twin.today", { call: CALL_TEXT[r.call].label })}
           data-testid="twin-verdict"
         >
-          <h2 className="text-lg font-bold">{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
+          <h2 className={CARD_TITLE}>{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
           <p className="mt-1 text-sm text-muted">
             {(watch.length
               ? watch.slice(0, 2).map((m) => `${m.label}: ${m.chip.toLowerCase()}`)
@@ -132,16 +146,7 @@ export function HealthTwin() {
       {canHealth && !hasHealth && (
         <section className="card mt-3 p-4" data-testid="twin-connect">
           <p className="text-sm text-muted">{t("twin.connect.body")}</p>
-          <div className="mt-3">
-            <Button kind="ghost" icon="heart" onClick={() => void connect()}>
-              {t("twin.connect", { source: store })}
-            </Button>
-          </div>
-          {note && (
-            <p className="mt-2 text-sm text-warn" role="status">
-              {note}
-            </p>
-          )}
+          <HealthConnect store={store} empty={!hasHealth} />
         </section>
       )}
       {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
@@ -177,7 +182,6 @@ export function HealthTwin() {
           <Detail
             m={current}
             store={store}
-            onConnect={() => void connect()}
             onEasy={() => {
               setCall("recover");
               setOpen(null);
@@ -264,8 +268,8 @@ function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
             </Button>
           )}
           {score !== null && (
-            <Button kind="ghost" onClick={() => go("stats")}>
-              {t("fit.seeProgress")}
+            <Button kind="ghost" onClick={() => go("stats", "strength")}>
+              {t("fit.seeStrength")}
             </Button>
           )}
         </div>
@@ -296,9 +300,7 @@ function Pin({ m, className, onOpen }: { m?: TwinMetric; className: string; onOp
         <span className="sr-only">:</span>
       </span>
       <span className="num block text-sm font-bold text-ink">{m.display}</span>
-      <span
-        className={`block truncate text-[0.6875rem] ${m.status === "good" ? "text-good" : m.status === "watch" ? "text-warn" : "text-muted"}`}
-      >
+      <span className={`block truncate text-[0.6875rem] ${TONE[m.status].text}`} style={bmiChip(m, false)}>
         {m.chip}
       </span>
     </button>
@@ -324,7 +326,12 @@ function Tiles({ ids, by, onOpen }: { ids: TwinId[]; by: Map<TwinId, TwinMetric>
                   <span className="block text-xs font-semibold uppercase tracking-wider text-muted">{m.label}</span>
                   <span className="num display block text-xl">{m.display || "—"}</span>
                 </span>
-                <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status]}`}>{m.chip}</span>
+                <span
+                  className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status].pill}`}
+                  style={bmiChip(m)}
+                >
+                  {m.chip}
+                </span>
               </span>
               <span className="mt-1 block text-sm text-muted">{m.why}</span>
               {m.did && <span className="mt-1 block text-sm text-ink">{m.did}</span>}
@@ -335,32 +342,41 @@ function Tiles({ ids, by, onOpen }: { ids: TwinId[]; by: Map<TwinId, TwinMetric>
   );
 }
 
-function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string; onConnect: () => void; onEasy: () => void }) {
+function Detail({ m, store, onEasy }: { m: TwinMetric; store: string; onEasy: () => void }) {
   const term = TERM[m.id];
   return (
     <div>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="num display text-3xl">{m.display || "—"}</span>
-        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status]}`}>{m.chip}</span>
+        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status].pill}`} style={bmiChip(m)}>
+          {m.chip}
+        </span>
         {term && <Info term={term} />}
       </div>
       {m.series.length >= 2 && <Chart m={m} />}
+      {m.id === "bmi" && m.value !== undefined && (
+        <div className="mt-3">
+          <BmiBar bmi={m.value} label={false} />
+        </div>
+      )}
       {m.band && m.id !== "sleep" && (
         <p className="mt-1 text-xs text-faint">{t("twin.normal", { low: fmt(m.band.low), high: fmt(m.band.high) })}</p>
       )}
-      <h3 className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{t("twin.why")}</h3>
+      <h3 className={`mt-4 ${SECTION_LABEL}`}>{t("twin.why")}</h3>
       <p className="mt-1">{m.why}</p>
       {m.did && (
         <>
-          <h3 className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{t("twin.did")}</h3>
+          <h3 className={`mt-4 ${SECTION_LABEL}`}>{t("twin.did")}</h3>
           <p className="mt-1">{m.did}</p>
         </>
       )}
+      {m.action?.kind === "connect" && <HealthConnect key={m.id} id={m.id} store={store} empty={m.status === "missing"} />}
       <div className="mt-4 flex flex-wrap gap-2">
-        {m.action?.kind === "connect" && (
-          <Button kind="ghost" icon="heart" onClick={onConnect}>
-            {t("twin.connect", { source: store })}
-          </Button>
+        {m.action?.kind === "weighIn" && (
+          <section aria-label={m.action.label} className="w-full">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">{m.action.label}</h3>
+            <WeighInForm id={`twin-${m.id}`} className="mt-2" />
+          </section>
         )}
         {m.action?.kind === "route" && (
           <Button
@@ -390,6 +406,111 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
       </p>
     </div>
   );
+}
+
+type Asked = "idle" | "busy" | "unavailable" | "install" | "denied" | "done";
+
+/**
+ * The connect button and what came of it, shown where it was tapped (a tile's sheet, or the card at the top).
+ * Health Connect answers at once without a sheet when Liftsmith already has the permission, or after the lifter
+ * said no twice, so the outcome is always said here: not on this phone (with Google Play), not allowed (with
+ * Health Connect's settings), or allowed but nothing there yet, with what records it (an Oura ring or a watch).
+ */
+function HealthConnect({ id, store, empty }: { id?: TwinId; store: string; empty: boolean }) {
+  const [asked, setAsked] = useState<Asked>("idle");
+  const oura = useCloud((s) => !!s.status?.ready.oura && !s.status.linked.oura);
+  const ios = store === "Apple Health";
+  const what = id && NEED[id] ? t(`twin.what.${id}` as Parameters<typeof t>[0]) : "";
+
+  const ask = async () => {
+    if (asked === "busy") return;
+    setAsked("busy");
+    const need = id ? NEED[id] : undefined;
+    const r = await askHealth(need ? [need] : []);
+    if (r.state === "unavailable") return setAsked(r.install ? "install" : "unavailable");
+    if (r.state === "denied") return setAsked("denied");
+    const s = useApp.getState();
+    await Promise.all([s.importHealthDaily(), s.importHealthBody()]).catch(() => undefined);
+    setAsked("done");
+  };
+
+  const settings = (
+    <Button kind="ghost" onClick={() => void openHealthPermissions()}>
+      {ios ? t("twin.ask.openHealth") : t("conn.health.manage")}
+    </Button>
+  );
+
+  if (asked === "done" && empty) {
+    const body =
+      id === "hrv"
+        ? t(ios ? "twin.empty.hrv.ios" : "twin.empty.hrv.android")
+        : id === "vo2max"
+          ? t(ios ? "twin.empty.vo2.ios" : "twin.empty.vo2.android")
+          : what
+            ? t("twin.empty.other", { source: store, what })
+            : t("twin.connect.none", { source: store });
+    return (
+      <div className="card mt-4" role="status" data-testid="twin-empty">
+        <EmptyState
+          icon="heart"
+          title={what ? t("twin.empty.title", { source: store, what }) : t("twin.empty.titleAll", { source: store })}
+          body={
+            <>
+              <span className="block">{body}</span>
+              {id === "hrv" && oura && <span className="mt-2 block">{t("twin.empty.ouraDirect")}</span>}
+              {ios && <span className="mt-2 block">{t("conn.health.iosManage")}</span>}
+            </>
+          }
+          action={
+            <div className="flex flex-wrap justify-center gap-2">
+              {id === "hrv" && oura && (
+                <Button kind="ghost" onClick={() => go("connections")}>
+                  {t("twin.empty.ouraConnect")}
+                </Button>
+              )}
+              {settings}
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <div className="flex flex-wrap gap-2">
+        {asked === "install" ? (
+          <Button kind="ghost" icon="heart" onClick={() => void openHealthPermissions()}>
+            {t("conn.health.install")}
+          </Button>
+        ) : (
+          <Button kind="ghost" icon="heart" disabled={asked === "busy"} onClick={() => void ask()}>
+            {asked === "busy" ? t("twin.ask.busy", { source: store }) : t("twin.connect", { source: store })}
+          </Button>
+        )}
+        {asked === "denied" && settings}
+      </div>
+      {(asked === "unavailable" || asked === "install" || asked === "denied") && (
+        <p className="mt-2 text-sm text-warn" role="status">
+          {asked === "denied"
+            ? what
+              ? t("twin.ask.denied", { source: store, what })
+              : t("twin.ask.deniedAll", { source: store })
+            : asked === "install"
+              ? t("twin.ask.install")
+              : t("twin.ask.unavailable", { source: store })}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** BMI's chip takes its band's colour from the range bar, unless it says to ignore BMI (a lean lifter). */
+function bmiChip(m: TwinMetric, pill = true): React.CSSProperties | undefined {
+  if (m.id !== "bmi" || m.value === undefined || m.chip !== bmiBand(m.value)) return undefined;
+  const c = BMI_COLOUR[bmiCategory(m.value)];
+  if (!pill) return { color: c };
+  return { color: c, borderColor: `color-mix(in srgb, ${c} 45%, transparent)`, background: `color-mix(in srgb, ${c} 10%, transparent)` };
 }
 
 const fmt = (v: number) => (Math.abs(v) >= 100 ? String(Math.round(v)) : String(Math.round(v * 10) / 10));

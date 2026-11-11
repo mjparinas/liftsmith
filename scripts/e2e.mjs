@@ -72,6 +72,20 @@ try {
   await page.getByRole("button", { name: "Finish workout" }).click();
   await page.getByText(/XP/).first().waitFor();
   await shot("done");
+
+  // Share: the sheet previews the card, switches sizes, and keeps the figure off the main thread's way.
+  await page.getByRole("button", { name: "Share this workout" }).click();
+  const sheet = page.getByRole("dialog", { name: "Share" });
+  await sheet.getByRole("img", { name: /Preview/ }).waitFor();
+  await page.waitForTimeout(600);
+  await shot("share-post");
+  await sheet.getByRole("button", { name: "Story" }).click();
+  await page.waitForTimeout(300);
+  await shot("share-story");
+  check(await sheet.getByRole("button", { name: "Share", exact: true }).isEnabled(), "The share sheet is ready to share", fail);
+  await sheet.getByRole("button", { name: "Post" }).click();
+  await page.keyboard.press("Escape");
+
   await page.getByRole("button", { name: "Done", exact: true }).click();
 
   for (const tab of ["Body", "Progress", "Gyms"]) {

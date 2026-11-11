@@ -160,10 +160,13 @@ export function SiteFooter() {
           { href: "/accessibility/", label: "Accessibility" },
         ])}
       </div>
-      <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted">
-        © {new Date().getFullYear()} {BRAND.name}. Google Play and the Google Play logo are trademarks of Google LLC. Apple, the Apple logo
-        and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc. <BuildStamp />
-      </p>
+      <div className="mx-auto max-w-6xl space-y-1 px-4 pb-8 text-xs text-faint">
+        <p>
+          © {new Date().getFullYear()} {BRAND.name} · <BuildStamp />
+        </p>
+        {/* The store badge guidelines ask for this credit wherever the badges appear. */}
+        <p>Google Play is a trademark of Google LLC. Apple and App Store are trademarks of Apple Inc.</p>
+      </div>
     </footer>
   );
 }

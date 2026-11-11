@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState, type CSSProperties } from "react";
 
+import { CARD_TITLE } from "@/components/titles";
 import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { date, inSentence, list, t } from "@/lib/i18n";
@@ -20,13 +21,13 @@ import {
   type Injury,
   type InjuryAction,
 } from "@/lib/injury";
-import { haptic } from "@/lib/juice";
+import { haptic, sound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { BODY_PARTS, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Chip, Section, Sheet } from "./ui";
+import { Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 // Injury mode (Melvin, 2026-11-09). Wording is neutral and never diagnoses: we say what the app does,
 // that it isn't medical advice, and that a professional can say what's safe.
@@ -60,10 +61,10 @@ export function Injuries() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">
-        {workout ? t("inj.backWorkout") : t("inj.backToday")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("inj.title")}</h1>
+      <ScreenHeader
+        back={{ label: workout ? t("inj.backWorkout") : t("inj.backToday"), onClick: () => go(workout ? "workout" : "today") }}
+        title={t("inj.title")}
+      />
       <p className="mt-2 text-sm text-muted">{t("inj.intro")}</p>
       <p className="mt-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{notAdvice()}</p>
 
@@ -124,22 +125,15 @@ export function Injuries() {
 
       <Sheet open={!!rating} onClose={() => setRating(null)} title={t("inj.rateTitle")}>
         <p className="mb-3 text-sm text-muted">{t("inj.rateBody")}</p>
-        <div className="grid grid-cols-4 gap-2" role="group" aria-label={t("inj.rateGroup")}>
-          {Array.from({ length: 11 }, (_, n) => (
-            <button
-              key={n}
-              type="button"
-              onClick={() => {
-                haptic("tick");
-                if (rating) ratePain(rating, n);
-                setRating(null);
-              }}
-              className="press num min-h-12 rounded-xl border border-line bg-raised text-lg font-semibold"
-            >
-              {n}
-            </button>
-          ))}
-        </div>
+        {rating && (
+          <PainSelect
+            label={t("inj.rateGroup")}
+            onRate={(n) => {
+              ratePain(rating, n);
+              setRating(null);
+            }}
+          />
+        )}
         <Button kind="quiet" className="mt-3 w-full" onClick={() => setRating(null)}>
           {t("inj.skipNow")}
         </Button>
@@ -212,7 +206,7 @@ function InjuryCard({
   return (
     <section className="card mt-6 p-4" aria-label={t("inj.cardLabel", { part: label })}>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-lg font-semibold">{label}</h2>
+        <h2 className={CARD_TITLE}>{label}</h2>
         <span className="num text-sm text-muted">{t("inj.since", { date: day(inj.since) })}</span>
       </div>
       <p className="mt-1 text-sm text-muted">
@@ -397,33 +391,67 @@ function RiskSheet({ warn, onClose, onConfirm }: { warn: Warn | null; onClose: (
   );
 }
 
-/** A 0–10 pain rating as one native picker (one control, big enough to tap, works with screen readers). */
-export function PainSelect({ label, onRate, className = "" }: { label: string; onRate: (n: number) => void; className?: string }) {
+/**
+ * A 0–10 pain rating as one slider with its value shown large, then one Save button (Melvin, 2026-11-11:
+ * a slider instead of a pick list). Dragging only moves the value (a tick per step, like the other
+ * sliders); Save records it, so a drag never logs a reading per step. Starts at the last reading.
+ */
+export function PainSelect({
+  label,
+  onRate,
+  start = 0,
+  className = "",
+}: {
+  label: string;
+  onRate: (n: number) => void;
+  start?: number;
+  className?: string;
+}) {
+  const id = useId();
+  const [value, setValue] = useState(start);
   const [saved, setSaved] = useState<number | null>(null);
+  const word = value === 0 ? t("inj.pain.noneWord") : value === 10 ? t("inj.pain.worstWord") : "";
   return (
-    <label className={`flex items-center justify-between gap-3 rounded-xl bg-raised px-3 py-2 text-sm ${className}`}>
-      <span>{saved === null ? label : t("inj.pain.saved", { n: saved })}</span>
-      <select
-        aria-label={label}
-        value={saved ?? ""}
+    <div className={`rounded-xl bg-raised px-3 py-3 text-sm ${className}`}>
+      <div className="flex items-baseline justify-between gap-3">
+        <label htmlFor={id}>{saved === null ? label : t("inj.pain.saved", { n: saved })}</label>
+        <span className="shrink-0 text-right" aria-hidden>
+          <span className="display text-[1.5rem]">{value}</span>
+          <span className="ml-1 text-xs font-semibold text-muted">{word || "/10"}</span>
+        </span>
+      </div>
+      <input
+        id={id}
+        type="range"
+        min={0}
+        max={10}
+        step={1}
+        value={value}
+        aria-valuetext={word ? t("inj.pain.ofWord", { n: value, word }) : t("inj.pain.of", { n: value })}
         onChange={(e) => {
-          const n = Number(e.target.value);
-          haptic("tick");
-          setSaved(n);
-          onRate(n);
+          haptic("select");
+          sound.tick();
+          setValue(Number(e.target.value));
         }}
-        className="num min-h-11 rounded-lg border border-line bg-surface px-2 text-ink"
+        className="slider mt-3 w-full"
+        style={{ "--fill": `${value * 10}%` } as CSSProperties}
+      />
+      <div className="mt-1.5 flex justify-between text-xs text-faint" aria-hidden>
+        <span>{t("inj.pain.none", { n: 0 })}</span>
+        <span>{t("inj.pain.worst", { n: 10 })}</span>
+      </div>
+      <Button
+        kind="ghost"
+        className="mt-2 w-full"
+        disabled={saved === value}
+        onClick={() => {
+          setSaved(value);
+          onRate(value);
+        }}
       >
-        <option value="" disabled>
-          0–10
-        </option>
-        {Array.from({ length: 11 }, (_, n) => (
-          <option key={n} value={n}>
-            {n === 0 ? t("inj.pain.none", { n }) : n === 10 ? t("inj.pain.worst", { n }) : n}
-          </option>
-        ))}
-      </select>
-    </label>
+        {t("inj.pain.save")}
+      </Button>
+    </div>
   );
 }
 
@@ -453,7 +481,7 @@ function PainBlock({ inj, label }: { inj: Injury; label: string }) {
           </div>
         </div>
       )}
-      <PainSelect key={inj.pain.length} label={t("inj.pain.today")} onRate={(n) => ratePain(inj.id, n)} />
+      <PainSelect key={inj.pain.length} label={t("inj.pain.today")} start={trend.latest ?? 0} onRate={(n) => ratePain(inj.id, n)} />
     </div>
   );
 }

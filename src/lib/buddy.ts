@@ -4,9 +4,10 @@ import { inSentence, list, t } from "./i18n";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 
-// Gym buddy check-ins. Today: one tap writes the check-in and opens the system share sheet with a short
-// message, so a friend hears about it in whatever app they already use. Once accounts and sync exist the
-// same check-in event becomes a push nudge on each buddy's phone (server side), with no change here.
+// Gym buddy check-ins: one tap writes the check-in and opens the system share sheet with a short message,
+// so a friend hears about it in whatever app they already use. Accounts don't link lifters to each other,
+// so there's no in-app delivery; if friends are ever added, the same check-in event could drive a push
+// nudge on each buddy's phone (server side).
 
 export function checkinText(opts: { name?: string; gym?: string; focus?: string[]; buddies: string[] }): string {
   const who = opts.buddies.length === 1 ? opts.buddies[0] : opts.buddies.length ? t("buddy.crew") : "";

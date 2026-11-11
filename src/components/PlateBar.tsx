@@ -23,10 +23,10 @@ const fill = (s: string, v: Record<string, string>) => s.replace(/\{(\w+)\}/g, (
 
 /** Plate finishes won from crates keep the weight colour as a rim, so plates stay easy to tell apart. */
 function finished(s: ReturnType<typeof plateStyle>, finish: PlateFinish) {
-  if (finish === "black") return { fill: "#1b2027", stroke: s.fill, strokeWidth: 2.5, text: s.fill === "#e8e8e8" ? "#e8e8e8" : s.fill };
-  if (finish === "chrome") return { fill: "url(#chrome)", stroke: s.fill, strokeWidth: 2.5, text: "#111" };
-  if (finish === "neon") return { fill: "#0a0d12", stroke: s.fill, strokeWidth: 3, text: s.fill, glow: true };
-  return { fill: s.fill, stroke: "#0a0d12", strokeWidth: 1, text: s.text };
+  if (finish === "black") return { fill: "var(--plate-black)", stroke: s.rim, strokeWidth: 2.5, text: s.rim };
+  if (finish === "chrome") return { fill: "url(#chrome)", stroke: s.rim, strokeWidth: 2.5, text: "var(--plate-ink-dark)" };
+  if (finish === "neon") return { fill: "var(--plate-black)", stroke: s.rim, strokeWidth: 3, text: s.rim, glow: true };
+  return { fill: s.fill, stroke: "var(--plate-edge)", strokeWidth: 1, text: s.text };
 }
 
 export function PlateBar({
@@ -102,8 +102,7 @@ export function PlateBar({
                     width={s.width}
                     height={s.height}
                     rx={2.5}
-                    fill={f.fill}
-                    stroke={f.stroke}
+                    style={{ fill: f.fill, stroke: f.stroke }}
                     strokeWidth={f.strokeWidth}
                     filter={"glow" in f ? "url(#neon)" : undefined}
                   />
@@ -114,7 +113,7 @@ export function PlateBar({
                       fontSize={9}
                       fontWeight={700}
                       textAnchor="middle"
-                      fill={f.text}
+                      style={{ fill: f.text }}
                       transform={`rotate(-90 ${x + s.width / 2} ${cy})`}
                     >
                       {fmtNum(w)}

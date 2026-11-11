@@ -1,26 +1,27 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useEffect } from "react";
 
 import { exercise } from "@/lib/exercises";
-import { list, num, t } from "@/lib/i18n";
+import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { ACTIVITY, currentTdee, parseBodyFat, tdeeHistory } from "@/lib/tdee";
+import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { fmtNum, fmtVolume, fromKg, toKg } from "@/lib/units";
+import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { AchievementRow, useGame } from "./Achievements";
-import { BodyFatField } from "./BodyFatField";
 import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
-import { ago, clock } from "./format";
+import { ago } from "./format";
+import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
-import { go } from "./router";
+import { go, useRoute } from "./router";
 import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
+import { WeighInForm } from "./WeighIn";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -50,10 +51,13 @@ export function Stats() {
   const now = useNow();
   const unit = profile.unit;
   const g = useGame();
-  const xp = g.xp;
-  const lvl = g.level;
   const streak = g.streak;
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
+  // #/stats/strength (the fitness age card's "See strength score") lands on the strength score, not the top.
+  const { arg } = useRoute();
+  useEffect(() => {
+    if (arg === "strength") document.getElementById("strength-score")?.scrollIntoView?.({ block: "start" });
+  }, [arg]);
   const tiles: [string, string, string, IconName, string][] = [
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
     ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
@@ -62,30 +66,17 @@ export function Stats() {
   ];
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <ScreenHeader title={t("progress.title")} />
       <CoachNotes title={t("progress.next")} />
-      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
-        <div className="flex items-baseline justify-between">
-          <span className="font-bold">
-            {t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span>
-          </span>
-          <span className="num text-sm text-muted">{t("progress.xp", { xp })}</span>
-        </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
-            style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }}
-          />
-        </div>
-        {lvl.next && <p className="mt-1.5 text-xs text-faint num">{t("progress.xpTo", { xp: lvl.span - lvl.into, next: lvl.next })}</p>}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(([k, label, v, icon, hue]) => (
           <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
         ))}
       </div>
       <TonnageCard />
-      <StrengthCard />
+      <div id="strength-score" className="scroll-mt-14">
+        <StrengthCard />
+      </div>
 
       <GoalsCard />
 
@@ -167,36 +158,23 @@ export function Stats() {
       </Section>
 
       <Section title={t("progress.history")} icon="calendar">
-        <ul className="card divide-y divide-line">
-          {stats.sessions.slice(0, 20).map((s) => (
-            <li key={s.sessionId} className="px-4 py-3">
-              <div className="flex justify-between">
-                <span className="font-medium">{ago(s.start, now)}</span>
-                <span className="num text-sm text-muted">
-                  {clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}
-                  {s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}
-                  {s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}
-                </span>
-              </div>
-              <div className="mt-0.5 truncate text-sm text-muted">{list(s.exercises.map((e) => exercise(e).name))}</div>
-            </li>
-          ))}
-          {!stats.sessions.length && (
-            <li>
-              <EmptyState
-                icon="calendar"
-                mascot="happy"
-                title={t("progress.noWorkouts")}
-                body={t("progress.noWorkouts.body")}
-                action={
-                  <Button icon="play" onClick={() => go("today")}>
-                    {t("progress.plan")}
-                  </Button>
-                }
-              />
-            </li>
-          )}
-        </ul>
+        {stats.sessions.length ? (
+          <HistoryCalendar />
+        ) : (
+          <div className="card">
+            <EmptyState
+              icon="calendar"
+              mascot="happy"
+              title={t("progress.noWorkouts")}
+              body={t("progress.noWorkouts.body")}
+              action={
+                <Button icon="play" onClick={() => go("today")}>
+                  {t("progress.plan")}
+                </Button>
+              }
+            />
+          </div>
+        )}
       </Section>
     </div>
   );
@@ -243,28 +221,14 @@ function TdeeCard() {
 
 /** Body weight log: one input, a trend line and the change over the last month. */
 function BodyweightCard() {
-  const { events, profile, logBodyweight } = useApp();
+  const { events, profile } = useApp();
   const unit = profile.unit;
   const log = events.filter((e) => e.type === "bodyweight").sort((a, b) => a.at - b.at);
-  const [value, setValue] = useState("");
-  const [fat, setFat] = useState("");
-  const [fatError, setFatError] = useState(false);
   const last = log.at(-1);
   const monthAgo = [...log].reverse().find((e) => !!last && e.type === "bodyweight" && e.at <= last.at - 28 * 86400_000);
   const kg = (e: (typeof log)[number] | undefined) => (e?.type === "bodyweight" ? e.kg : undefined);
   const change = kg(last) !== undefined && kg(monthAgo) !== undefined ? fromKg(kg(last)! - kg(monthAgo)!, unit) : undefined;
   const lastFat = [...log].reverse().find((e) => e.type === "bodyweight" && e.bodyFat !== undefined);
-  // Weight, body fat or both: body fat on its own is logged with the last weight, so the trend lines stay whole.
-  const submit = () => {
-    const n = Number(value);
-    const pct = parseBodyFat(fat);
-    setFatError(fat.trim() !== "" && pct === undefined);
-    if (fat.trim() !== "" && pct === undefined) return;
-    if (!(n > 0) && pct === undefined) return;
-    logBodyweight(n > 0 ? toKg(n, unit) : (kg(last) ?? profile.bodyweight), pct);
-    setValue("");
-    setFat("");
-  };
   return (
     <Section title={t("progress.bw")} icon="heart">
       <div className="card p-4">
@@ -286,34 +250,7 @@ function BodyweightCard() {
           </div>
           <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />
         </div>
-        <form
-          className="mt-3 space-y-2"
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}
-        >
-          <BumpField
-            label={t("progress.bw.label", { unit })}
-            placeholder={t("progress.bw.placeholder", { unit })}
-            value={value}
-            onChange={setValue}
-            step={unit === "lb" ? 0.2 : 0.1}
-            start={Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10}
-            min={1}
-          />
-          <div className="flex flex-wrap items-end gap-2">
-            <BodyFatField id="progress-bf" value={fat} onChange={setFat} />
-            <Button kind="ghost" label={t("progress.bw.logLabel")} onClick={submit}>
-              {t("progress.bw.log")}
-            </Button>
-          </div>
-          {fatError && (
-            <p role="alert" className="text-sm text-bad">
-              {t("body.fat.range")}
-            </p>
-          )}
-        </form>
+        <WeighInForm id="progress" className="mt-3" />
       </div>
     </Section>
   );

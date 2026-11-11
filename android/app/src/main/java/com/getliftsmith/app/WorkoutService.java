@@ -17,6 +17,7 @@ import android.os.Looper;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.service.quicksettings.TileService;
+import android.text.format.DateUtils;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
 
@@ -44,6 +45,10 @@ public class WorkoutService extends Service {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable restOver;
+    /** The latest update from the app, kept so the once-a-second rest tick can redraw the notification. */
+    private Intent last;
+    /** When the current rest started, for the rest bar (kept through +30 s, so the bar grows back rather than resetting). */
+    private long restFrom = 0L;
 
     @Override
     public void onCreate() {
@@ -85,55 +90,20 @@ public class WorkoutService extends Service {
             }
             return START_NOT_STICKY;
         }
-        String title = intent.getStringExtra("title");
-        String setLabel = intent.getStringExtra("setLabel");
-        String next = intent.getStringExtra("next");
-        String plates = intent.getStringExtra("plates");
+        last = intent;
         long restUntil = intent.getLongExtra("restUntil", 0L);
-        int hr = intent.getIntExtra("hr", 0);
-        String chip = intent.getStringExtra("chip");
-        int done = intent.getIntExtra("done", 0);
-        int total = intent.getIntExtra("total", 0);
+        String next = intent.getStringExtra("next");
         boolean resting = restUntil > System.currentTimeMillis();
+        // When this rest started: the app sends its whole length (+30 s included), else keep what we had, else now.
+        long restTotal = intent.getLongExtra("restTotal", 0L) * 1000L;
+        if (!resting) restFrom = 0L;
+        else if (restTotal > 0) restFrom = restUntil - restTotal;
+        else if (restFrom == 0L) restFrom = System.currentTimeMillis();
 
-        StringBuilder body = new StringBuilder();
-        body.append(resting ? getString(R.string.next_prefix) + " " : "").append(next);
-        if (plates != null && !plates.isEmpty()) body.append("\n").append(plates);
-        if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
-
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
-            .setSmallIcon(R.drawable.ic_stat_workout)
-            .setContentTitle(title)
-            .setContentText(resting ? getString(R.string.rest_next, next) : setLabel + " · " + next)
-            .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
-            .setSubText(setLabel)
-            .setOngoing(true)
-            .setOnlyAlertOnce(true)
-            .setCategory(NotificationCompat.CATEGORY_WORKOUT)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setColor(0xFF4C8DFF)
-            .setContentIntent(openApp())
-            .addAction(0, getString(R.string.shortcut_log_short), action("log"))
-            .addAction(0, getString(R.string.add_30), action("add30"))
-            // Android 16 Live Updates: ask for promotion, so the workout gets a chip in the status bar and sits at the
-            // top of the shade and the lock screen. Samsung's One UI 8 shows promoted notifications in its Now Bar too.
-            // Promotion needs an ongoing notification with a title, a standard or BigText style, no custom views and
-            // no colorized background, on a channel above IMPORTANCE_MIN; all true here. Older Android ignores it.
-            .setRequestPromotedOngoing(true);
-        // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
-        if (total > 0) b.setProgress(total, Math.min(done, total), false);
-        if (resting) {
-            // A live countdown drawn by the system: right on the lock screen, and in the status bar chip on Android 16,
-            // without waking the app every second.
-            b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
-        } else {
-            // While lifting the chip shows the set ("2/4"), not a clock.
-            b.setShowWhen(false);
-            if (chip != null && !chip.isEmpty()) b.setShortCriticalText(chip);
-        }
-        Notification n = b.build();
         int type = Build.VERSION.SDK_INT >= 34 ? ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE : 0;
-        ServiceCompat.startForeground(this, ID_LIVE, n, type);
+        ServiceCompat.startForeground(this, ID_LIVE, build(intent), type);
+        handler.removeCallbacks(restTick);
+        if (resting) scheduleTick(restUntil);
 
         if (restOver != null) handler.removeCallbacks(restOver);
         handler.removeCallbacks(countdownTick);
@@ -143,6 +113,10 @@ public class WorkoutService extends Service {
             final String speak = intent.getStringExtra("speak");
             final String speakLang = intent.getStringExtra("speakLang");
             restOver = () -> {
+                handler.removeCallbacks(restTick);
+                restFrom = 0L;
+                // Rest is over: back to the set view (the chip shows "2/4" again) without waiting for the app.
+                if (last != null) getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
                 alertRestOver(next, sound, vibrate);
                 // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
                 if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f, speakLang);
@@ -159,6 +133,84 @@ public class WorkoutService extends Service {
         }
         return START_NOT_STICKY;
     }
+
+    /**
+     * The live notification for the latest update. While resting it says the time left in words ("1:23 left"), in
+     * the status bar chip and the Now Bar, and as a rest bar that empties as rest runs out; the system chronometer in
+     * the header counts down too, but not every surface draws that (Samsung's Now Bar, some lock screens), so the service redraws once a second during rest (restTick) and stops when rest ends.
+     */
+    private Notification build(Intent intent) {
+        String title = intent.getStringExtra("title");
+        String setLabel = intent.getStringExtra("setLabel");
+        String next = intent.getStringExtra("next");
+        String plates = intent.getStringExtra("plates");
+        long restUntil = intent.getLongExtra("restUntil", 0L);
+        int hr = intent.getIntExtra("hr", 0);
+        String chip = intent.getStringExtra("chip");
+        int done = intent.getIntExtra("done", 0);
+        int total = intent.getIntExtra("total", 0);
+        long now = System.currentTimeMillis();
+        boolean resting = restUntil > now;
+        // Whole seconds left, rounded up, so it reads 0:01 in the last second and never 0:00 while still resting.
+        long secLeft = resting ? (restUntil - now + 999) / 1000 : 0;
+        String left = DateUtils.formatElapsedTime(secLeft);
+
+        StringBuilder body = new StringBuilder();
+        if (resting) body.append(getString(R.string.rest_left, left)).append("\n").append(getString(R.string.next_prefix)).append(" ");
+        body.append(next);
+        if (plates != null && !plates.isEmpty()) body.append("\n").append(plates);
+        if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
+
+        NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
+            .setSmallIcon(R.drawable.ic_stat_workout)
+            .setContentTitle(title)
+            .setContentText(resting ? getString(R.string.rest_left_next, left, next) : setLabel + " · " + next)
+            .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
+            .setSubText(setLabel)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setCategory(NotificationCompat.CATEGORY_WORKOUT)
+            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+            .setColor(0xFF4C8DFF)
+            .setContentIntent(openApp())
+            .addAction(0, getString(R.string.shortcut_log_short), action("log"))
+            .addAction(0, getString(R.string.add_30), action("add30"))
+            // Android 16 Live Updates: ask for promotion, so the workout gets a chip in the status bar and sits at the
+            // top of the shade and the lock screen. Samsung's One UI 8 shows promoted notifications in its Now Bar too.
+            // Promotion needs an ongoing notification with a title, a standard or BigText style, no custom views and
+            // no colorized background, on a channel above IMPORTANCE_MIN; all true here. Older Android ignores it.
+            .setRequestPromotedOngoing(true);
+        if (resting) {
+            // The rest bar: time left of the whole rest, emptying as it runs out (in seconds, so +30 s fits).
+            long span = Math.max(1, (restUntil - (restFrom > 0 ? restFrom : now) + 999) / 1000);
+            b.setProgress((int) Math.max(span, secLeft), (int) secLeft, false);
+            // The system's countdown in the header and on the lock screen, plus the time in the chip ("1:23").
+            b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
+            b.setShortCriticalText(left);
+        } else {
+            // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
+            if (total > 0) b.setProgress(total, Math.min(done, total), false);
+            // While lifting the chip shows the set ("2/4"), not a clock.
+            b.setShowWhen(false);
+            if (chip != null && !chip.isEmpty()) b.setShortCriticalText(chip);
+        }
+        return b.build();
+    }
+
+    /** Redraws the notification on the next whole second of rest left, so "1:23 left" and the rest bar stay right. */
+    private void scheduleTick(long restUntil) {
+        long ms = (restUntil - System.currentTimeMillis()) % 1000L;
+        handler.postDelayed(restTick, ms <= 0 ? 1000L : ms);
+    }
+
+    /** Once a second during rest only: there is nothing to redraw while lifting, and it stops when rest ends. */
+    private final Runnable restTick = () -> {
+        if (last == null) return;
+        long restUntil = last.getLongExtra("restUntil", 0L);
+        if (restUntil <= System.currentTimeMillis()) return;
+        getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
+        scheduleTick(restUntil);
+    };
 
     /** One light tick of the rest countdown (posted three times; removeCallbacks cancels all of them). */
     private final Runnable countdownTick = () -> {
@@ -199,6 +251,7 @@ public class WorkoutService extends Service {
     @Override
     public void onDestroy() {
         if (restOver != null) handler.removeCallbacks(restOver);
+        handler.removeCallbacks(restTick);
         handler.removeCallbacks(countdownTick);
         running = false;
         refreshTile();

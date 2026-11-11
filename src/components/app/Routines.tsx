@@ -2,17 +2,21 @@
 
 import { useMemo, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { available, exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
 import { MAX_ITEMS, moveItem, NAME_MAX, routineFrom } from "@/lib/routines";
+import { codeFromLink, encodeRoutine, routineUrl } from "@/lib/routineShare";
+import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
 import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem } from "@/lib/types";
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
-import { Button, EmptyState, LinkToggle, Sheet } from "./ui";
+import { go } from "./router";
+import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
 // one from the exercise library. All of it is optional and happens before or after a workout.
@@ -54,6 +58,7 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
               : undefined
           }
           onCancel={() => setEditing(null)}
+          shareable={routines.some((r) => r.id === editing.id)}
         />
       </Sheet>
     );
@@ -136,6 +141,7 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
         >
           {t("rt.build")}
         </Button>
+        <AddFromLink onOpen={close} />
       </div>
     </Sheet>
   );
@@ -176,16 +182,82 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
   );
 }
 
+/** "Add from a link": paste a routine someone shared, for when the link opened somewhere else. */
+function AddFromLink({ onOpen }: { onOpen: () => void }) {
+  const [open, setOpen] = useState(false);
+  const [text, setText] = useState("");
+  const code = codeFromLink(text);
+  if (!open)
+    return (
+      <Button kind="quiet" icon="link" className="w-full" onClick={() => setOpen(true)}>
+        {t("rt.fromLink")}
+      </Button>
+    );
+  return (
+    <div className="rounded-2xl border border-line p-3">
+      <label className="block text-sm font-medium" htmlFor="routine-link">
+        {t("rt.pasteLink")}
+      </label>
+      <input
+        id="routine-link"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder="getliftsmith.com/app/#/routine/…"
+        autoComplete="off"
+        spellCheck={false}
+        className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      />
+      {text.trim() !== "" && !code && <p className="mt-1 text-sm text-muted">{t("rt.linkBroken")}</p>}
+      <Button
+        className="mt-2 w-full"
+        disabled={!code}
+        onClick={() => {
+          if (!code) return;
+          haptic("tick");
+          onOpen();
+          go("routine", code);
+        }}
+      >
+        {t("rt.openLink")}
+      </Button>
+    </div>
+  );
+}
+
+/** "Share routine": a link to the routine's exercises and sets, nothing personal. */
+function ShareRoutine({ routine }: { routine: Routine }) {
+  const [note, setNote] = useState<string | null>(null);
+  const share = async () => {
+    haptic("tap");
+    const url = routineUrl(encodeRoutine(routine));
+    track("feature", { name: "routine_share", detail: "share" });
+    if (await shareUrl(url, t("rt.shareTitle", { name: routine.name }))) return;
+    setNote((await copyText(url)) ? t("rt.copied") : null);
+  };
+  return (
+    <div>
+      <Button kind="ghost" icon="share" className="w-full" onClick={share}>
+        {t("rt.share")}
+      </Button>
+      <p className="mt-1 text-xs text-faint" role="status">
+        {note ?? t("rt.shareHint")}
+      </p>
+    </div>
+  );
+}
+
 function RoutineEditor({
   initial,
   onSave,
   onDelete,
   onCancel,
+  shareable,
 }: {
   initial: Routine;
   onSave: (r: Routine) => void;
   onDelete?: () => void;
   onCancel: () => void;
+  shareable?: boolean;
 }) {
   const { gyms, profile } = useApp();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
@@ -196,9 +268,14 @@ function RoutineEditor({
     haptic("select");
     sound.tick();
   };
+  // A bump's own hold gives the tick; at 1 or 10 sets the hold stops.
   const setSets = (i: number, d: number) => {
-    tick();
-    setItems(items.map((x, k) => (k === i ? { ...x, sets: Math.min(10, Math.max(1, x.sets + d)) } : x)));
+    const it = items[i];
+    if (!it) return false;
+    const sets = Math.min(10, Math.max(1, it.sets + d));
+    if (sets === it.sets) return false;
+    setItems(items.map((x, k) => (k === i ? { ...x, sets } : x)));
+    return true;
   };
   const remove = (i: number) => {
     tick();
@@ -261,33 +338,9 @@ function RoutineEditor({
                 </div>
                 <div className="mt-1 flex items-center justify-between pl-[52px]">
                   <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setSets(i, -1)}
-                      aria-label={t("rt.fewer", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.6}
-                        strokeLinecap="round"
-                        aria-hidden
-                      >
-                        <path d="M5 12h14" />
-                      </svg>
-                    </button>
+                    <Bump dir={-1} size="sm" aria={t("rt.fewer", { name: ex.name })} onStep={(d) => setSets(i, d)} />
                     <span className="num w-16 text-center text-sm font-semibold">{t("rt.sets", { count: it.sets })}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSets(i, 1)}
-                      aria-label={t("rt.more", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
-                    >
-                      <Icon name="plus" size={16} strokeWidth={2.6} />
-                    </button>
+                    <Bump dir={1} size="sm" aria={t("rt.more", { name: ex.name })} onStep={(d) => setSets(i, d)} />
                   </div>
                   <div className="flex items-center gap-1">
                     <button
@@ -341,6 +394,7 @@ function RoutineEditor({
         <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>
           {t("rt.save")}
         </Button>
+        {shareable && <ShareRoutine routine={initial} />}
         {onDelete && (
           <Button kind="danger" className="w-full" onClick={onDelete}>
             {t("rt.delete")}

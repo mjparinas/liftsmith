@@ -7,7 +7,6 @@
 import { useMemo, useState } from "react";
 
 import { checkinText, shareText } from "@/lib/buddy";
-import { goalStreak } from "@/lib/game";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
 import { date, t as tr } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -16,7 +15,7 @@ import { suggestedPeriod } from "@/lib/recap";
 import { nextSeasonal, seasonalChallenges } from "@/lib/seasonal";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength, twins } from "@/lib/strength";
-import { newlyUnlocked } from "@/lib/themes";
+import { newlyUnlocked, unlockContext } from "@/lib/themes";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -66,8 +65,7 @@ export function TodayMoments() {
   const seen = profile.delight?.seenMoments ?? [];
   const day = new Date(now).toDateString();
   const moments = todayMoments(stats, now).filter((m) => !seen.includes(`${m.id}:${day}`));
-  const goalWeeks = goalStreak(stats, profile, now).weeks;
-  const fresh = newlyUnlocked(profile.delight?.seenThemes ?? [], { stats, goalWeeks, now });
+  const fresh = newlyUnlocked(profile.delight?.seenThemes ?? [], unlockContext(events, stats, profile, now));
   const seasonal = seasonalChallenges(events, now);
   const teaser = seasonal.length ? null : nextSeasonal(now);
   if (active) return null;

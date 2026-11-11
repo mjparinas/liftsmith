@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AchievementRow, Badge, Bar, LeagueCard, QuestsCard, StreakCard, TIER_COLOUR } from "@/components/app/Achievements";
 import { Info } from "@/components/Info";
+import { SCREEN_TITLE, SECTION_LABEL, SHEET_TITLE } from "@/components/titles";
 import { applyA11y, savedA11y } from "@/lib/a11y";
 import { CATEGORY_LABEL, type Category } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
@@ -59,7 +60,7 @@ const dateText = (ms: number) => date(ms, { weekday: "short", month: "short", da
 function Panel({ title, children, className = "", info }: { title: string; children: React.ReactNode; className?: string; info?: Term }) {
   return (
     <section className={`card min-w-0 p-5 ${className}`}>
-      <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted">
+      <h2 className={`mb-3 ${SECTION_LABEL}`}>
         {title}
         {info && <Info term={info} />}
       </h2>
@@ -127,9 +128,7 @@ export function Dashboard() {
       <header className="flex flex-wrap items-center justify-between gap-3 py-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-accent">{BRAND.name}</p>
-          <h1 className="text-2xl font-bold">
-            {profile.name.trim() ? t("dash.titleNamed", { name: profile.name.trim() }) : t("dash.title")}
-          </h1>
+          <h1 className={SCREEN_TITLE}>{profile.name.trim() ? t("dash.titleNamed", { name: profile.name.trim() }) : t("dash.title")}</h1>
         </div>
         <a href={APP_PATH} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
           {t("dash.start")}
@@ -568,7 +567,7 @@ function SessionView({
   ];
   return (
     <>
-      <h2 className="text-lg font-semibold">{dateText(detail.start)}</h2>
+      <h2 className={SHEET_TITLE}>{dateText(detail.start)}</h2>
       <p className="num text-sm text-muted">
         {facts.join(" · ")}
         {detail.manual ? t("dash.byHand") : ""}

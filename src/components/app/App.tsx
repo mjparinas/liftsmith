@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, type ReactNode } from "react";
 
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
@@ -12,7 +12,7 @@ import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
-import { COSMETICS, goalStreak } from "@/lib/game";
+import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
@@ -23,7 +23,7 @@ import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
-import { activeTheme, applyTheme } from "@/lib/themes";
+import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -49,6 +49,7 @@ import { Remix } from "./Remix";
 import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
+import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
 import { Today } from "./Today";
@@ -69,18 +70,20 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
 export function App() {
-  const { ready, init, profile, active, stats } = useApp();
+  const { ready, init, profile, active, stats, events } = useApp();
   const { route, arg } = useRoute();
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
-  const themeId = activeTheme(profile.delight?.theme, { stats, goalWeeks: goalStreak(stats, profile, now).weeks, now }).id;
+  const unlockCtx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
+  const theme = activeTheme(profile.delight?.theme, unlockCtx);
+  const themeId = theme.id;
   // Colours, in order: Appearance (dark, light or match system), then the earned theme (only its
   // accent on a light screen), then an equipped cosmetic accent (game.ts COSMETICS), which wins.
   const appearance = profile.theme ?? "dark";
   const light = useLight(appearance);
   useEffect(() => {
     applyAppearance(appearance);
-    applyTheme(activeTheme(themeId, { stats, goalWeeks: 0, now: Date.now() }), light);
+    applyTheme(theme, light);
     const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
     if (accent) applyAccent(accent, light);
   }, [themeId, profile.cosmetics, appearance, light]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -304,6 +307,7 @@ export function App() {
     account: <Account />,
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
+    routine: <SharedRoutine code={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

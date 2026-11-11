@@ -1,18 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
-import { COSMETICS, game, LEAGUE_LABEL, LEAGUES, RARITY_LABEL, type Cosmetic, type Game } from "@/lib/game";
+import {
+  COSMETICS,
+  game,
+  LEAGUE_LABEL,
+  LEAGUES,
+  levelForItem,
+  RARITY_LABEL,
+  rarityOdds,
+  type Cosmetic,
+  type Game,
+  type LevelReward,
+} from "@/lib/game";
 import { t } from "@/lib/i18n";
-import { applyAccent, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, calm, sound, type TimerSound } from "@/lib/juice";
+import { badgeShare, levelShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
+import { themesForBadge } from "@/lib/themes";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
-import { go } from "./router";
-import { Chip, Section } from "./ui";
+import { Icon } from "./icons";
+import { go, useRoute } from "./router";
+import { ShareSheet, useShareContext } from "./ShareSheet";
+import { HUE } from "./theme";
+import { Chip, ScreenHeader, Section } from "./ui";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
@@ -85,9 +101,12 @@ function progressText(a: Achievement) {
   return t("awards.of", { value: amount(a.value), goal: amount(a.next.at) });
 }
 
-export function AchievementRow({ a }: { a: Achievement }) {
+export function AchievementRow({ a, onShare, lit }: { a: Achievement; onShare?: () => void; lit?: boolean }) {
   return (
-    <li className="flex items-center gap-3 px-4 py-3">
+    <li
+      id={`badge-${a.id}`}
+      className={`flex scroll-my-24 items-center gap-3 py-3 pl-4 transition-colors duration-700 ${onShare ? "pr-1" : "pr-4"} ${lit ? "bg-accent/15" : ""}`}
+    >
       <Badge a={a} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
@@ -99,6 +118,12 @@ export function AchievementRow({ a }: { a: Achievement }) {
           )}
         </div>
         <p className="truncate text-sm text-muted">{a.next ? a.next.detail : a.detail}</p>
+        {!a.hidden &&
+          themesForBadge(a.id).map(({ tier, theme }) => (
+            <p key={theme.id} className="text-xs" style={{ color: TIER_COLOUR[tier] }}>
+              {t("awards.unlocksTheme", { tier: TIER_LABEL[tier], theme: theme.name })}
+            </p>
+          ))}
         {!a.hidden && (
           <div className="mt-1.5 flex items-center gap-2">
             <div className="flex-1">
@@ -113,6 +138,16 @@ export function AchievementRow({ a }: { a: Achievement }) {
         )}
         <span className="sr-only">{t("awards.tiers", { level: a.level, count: a.levels })}</span>
       </div>
+      {onShare && (
+        <button
+          type="button"
+          onClick={onShare}
+          aria-label={t("card.shareBadge", { name: a.name })}
+          className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+        >
+          <Icon name="share" size={20} />
+        </button>
+      )}
     </li>
   );
 }
@@ -206,8 +241,15 @@ export function LeagueCard({ g }: { g: Game }) {
   );
 }
 
+/** A level reward in words: "Chrome (Epic)" or "a bonus crate for your new title". */
+export function rewardText(r: LevelReward): string {
+  if (r.source === "crate") return t("awards.reward.crate");
+  return t("awards.reward.item", { name: r.item.name, rarity: RARITY_LABEL[r.item.rarity] });
+}
+
 function Locker({ g }: { g: Game }) {
   const { profile, setProfile } = useApp();
+  const [hint, setHint] = useState<string | null>(null);
   const eq = profile.cosmetics ?? {};
   const equip = (c: Cosmetic) => {
     const next = { ...eq, [c.kind]: c.id };
@@ -220,36 +262,56 @@ function Locker({ g }: { g: Game }) {
     ["sound", t("awards.locker.sound"), "sound-classic"],
     ["plates", t("awards.locker.plates"), "plates-classic"],
   ];
+  const have = COSMETICS.filter((c) => g.owned.has(c.id)).length;
   return (
     <div className="space-y-4">
-      {groups.map(([kind, label, def]) => (
-        <div key={kind}>
-          <p className="mb-2 text-sm text-muted">{label}</p>
-          <div className="flex flex-wrap gap-2">
-            {COSMETICS.filter((c) => c.kind === kind).map((c) => {
-              const have = g.owned.has(c.id);
-              const on = (eq[kind] ?? def) === c.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  disabled={!have}
-                  aria-pressed={on}
-                  onClick={() => equip(c)}
-                  className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm disabled:opacity-45 ${on ? "border-accent bg-accent/15" : "border-line bg-surface"}`}
-                >
-                  {kind === "accent" && <span aria-hidden className="h-4 w-4 rounded-full" style={{ background: c.value }} />}
-                  <span>{have ? c.name : `🔒 ${c.name}`}</span>
-                  <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
-                    {RARITY_LABEL[c.rarity]}
-                  </span>
-                </button>
-              );
-            })}
+      <p className="num text-sm">
+        <span className="font-semibold">{t("awards.locker.count", { have, total: COSMETICS.length })}</span>{" "}
+        <span className="text-muted">· {t("awards.locker.howTo")}</span>
+      </p>
+      {groups.map(([kind, label, def]) => {
+        const picked = COSMETICS.find((c) => c.id === hint && c.kind === kind);
+        const at = picked ? levelForItem(picked.id) : null;
+        return (
+          <div key={kind}>
+            <p className="mb-2 text-sm text-muted">{label}</p>
+            <div className="flex flex-wrap gap-2">
+              {COSMETICS.filter((c) => c.kind === kind).map((c) => {
+                const mine = g.owned.has(c.id);
+                const on = (eq[kind] ?? def) === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    aria-pressed={mine ? on : undefined}
+                    aria-expanded={mine ? undefined : hint === c.id}
+                    onClick={() => (mine ? equip(c) : setHint(hint === c.id ? null : c.id))}
+                    className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
+                  >
+                    {kind === "accent" && (
+                      <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
+                    )}
+                    {!mine && <Icon name="lock" size={14} />}
+                    {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
+                    <span>{c.name}</span>
+                    <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
+                      {RARITY_LABEL[c.rarity]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p aria-live="polite" className="text-sm text-muted">
+              {picked && (
+                <span className="mt-2 block">
+                  {t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}
+                  {at !== null && ` ${t("awards.locker.atLevel", { level: at })}`}
+                </span>
+              )}
+            </p>
           </div>
-        </div>
-      ))}
-      <p className="text-xs text-faint">{t("awards.locker.note")}</p>
+        );
+      })}
     </div>
   );
 }
@@ -266,30 +328,79 @@ const FILTERS: ("all" | "earned" | Category)[] = [
   "secret",
 ];
 
+/**
+ * `#/achievements/<id>` (Today's "Almost there" row) scrolls to that badge and lights its row for a moment.
+ * The screen opens fresh on All, so the badge is in the list.
+ */
+function useFocusBadge(): string | null {
+  const { arg } = useRoute();
+  const [faded, setFaded] = useState<string | null>(null);
+  useEffect(() => {
+    if (!arg) return;
+    const frame = requestAnimationFrame(() =>
+      document.getElementById(`badge-${arg}`)?.scrollIntoView?.({ block: "center", behavior: calm() ? "auto" : "smooth" }),
+    );
+    const off = setTimeout(() => setFaded(arg), 2400);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(off);
+    };
+  }, [arg]);
+  return arg && faded !== arg ? arg : null;
+}
+
 export function Achievements() {
   const g = useGame();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const focus = useFocusBadge();
   const list = g.achievements.filter((a) => (filter === "all" ? true : filter === "earned" ? a.level > 0 : a.category === filter));
   const hiddenLeft = list.filter((a) => a.hidden).length;
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
+  const { stats } = useApp();
+  const ctx = useShareContext(g);
+  const [sharing, setSharing] = useState<string | null>(null);
+  const shared = g.achievements.find((a) => a.tier && sharing === `badge-${a.id}-${a.tier}`);
+  const shareItems =
+    sharing === "level" ? [levelShare(g, stats.sessions.length, ctx)] : shared?.tier ? [badgeShare(shared, shared.tier, ctx)] : [];
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("progress.title")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("awards.title")}</h1>
-      <div className="card mt-4 p-4">
-        <div className="flex items-baseline justify-between">
-          <span className="font-semibold">
-            {t("progress.level", { level: g.level.level })} · {g.level.title}
+      <ScreenHeader back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }} title={t("awards.title")} />
+      <ShareSheet open={!!shareItems.length} onClose={() => setSharing(null)} items={shareItems} />
+      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-bold">
+            {t("progress.level", { level: g.level.level })} · <span className="text-gradient">{g.level.title}</span>
           </span>
-          <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
+          <span className="flex items-center gap-1">
+            <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
+            <button
+              type="button"
+              onClick={() => setSharing("level")}
+              aria-label={t("card.shareLevel")}
+              className="press -my-2 -mr-2 grid h-11 w-11 place-items-center rounded-xl text-muted hover:text-ink"
+            >
+              <Icon name="share" size={20} />
+            </button>
+          </span>
         </div>
-        <div className="mt-2">
-          <Bar value={g.level.into / g.level.span} label={t("awards.levelProgress")} />
+        <div
+          className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised"
+          role="progressbar"
+          aria-label={t("awards.levelProgress")}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(Math.min(1, g.level.into / g.level.span) * 100)}
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
+            style={{ width: `${Math.min(100, (g.level.into / g.level.span) * 100)}%` }}
+          />
         </div>
         {g.level.next && (
           <p className="num mt-1.5 text-xs text-faint">{t("progress.xpTo", { xp: g.level.span - g.level.into, next: g.level.next })}</p>
+        )}
+        {g.next && (
+          <p className="num mt-1 text-xs text-muted">{t("awards.nextReward", { level: g.next.level, reward: rewardText(g.next) })}</p>
         )}
         <p className="num mt-3 text-sm">
           <span className="font-semibold">{fmtNum(g.badges.earned)}</span>{" "}
@@ -305,7 +416,7 @@ export function Achievements() {
       <Section title={t("awards.streakTitle")}>
         <StreakCard g={g} />
       </Section>
-      <Section title={t("awards.badges")}>
+      <Section title={t("awards.badges")} info="badges">
         <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
           {FILTERS.map((f) => (
             <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
@@ -317,7 +428,12 @@ export function Achievements() {
           {sorted
             .filter((a) => !a.hidden || filter === "secret")
             .map((a) => (
-              <AchievementRow key={a.id} a={a} />
+              <AchievementRow
+                key={a.id}
+                a={a}
+                lit={focus === a.id}
+                onShare={a.tier && !a.hidden ? () => setSharing(`badge-${a.id}-${a.tier}`) : undefined}
+              />
             ))}
           {filter !== "secret" && hiddenLeft > 0 && (
             <li>
@@ -337,7 +453,7 @@ export function Achievements() {
           {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
-      <Section title={t("awards.locker")}>
+      <Section title={t("awards.locker")} info="crate">
         <Locker g={g} />
       </Section>
     </div>

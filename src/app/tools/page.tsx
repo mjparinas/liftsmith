@@ -21,7 +21,7 @@ export default function ToolsIndex() {
       <LinkGrid items={TOOL_PAGES.map((t) => ({ href: t.path, title: t.name, body: t.blurb }))} />
       <CtaBanner
         cta="tools-index-end"
-        title="Let the app do the maths for you"
+        title="Let the app do the math for you"
         body={`In ${BRAND.name} these run on their own: plates drawn for every set, your max estimated from every set you log, and calories that follow your weigh-ins.`}
       />
     </SitePage>

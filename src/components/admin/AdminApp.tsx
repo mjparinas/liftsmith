@@ -180,8 +180,8 @@ function StoreTable({ rows, all, assumed }: { rows: StoreRevenue[]; all: StoreRe
         line("Refund rate (90 days)", (r) => fmtPct(r.refundRate), fmtPct(assumed.refundRate)),
         line("Revenue per install, day 14", (r) => fmtUsd(r.revenuePerInstallD14, 2)),
         line("Revenue per install, day 60", (r) => fmtUsd(r.revenuePerInstallD60, 2), fmtUsd(assumed.revenuePerInstallD60, 2)),
-        line("Realised price, monthly ($6.99)", (r) => fmtUsd(r.realisedMonthly, 2)),
-        line("Realised price, annual ($39.99)", (r) => fmtUsd(r.realisedAnnual, 2), `${fmtPct(assumed.realisedPrice, 0)} of list`),
+        line("Realized price, monthly ($6.99)", (r) => fmtUsd(r.realisedMonthly, 2)),
+        line("Realized price, annual ($39.99)", (r) => fmtUsd(r.realisedAnnual, 2), `${fmtPct(assumed.realisedPrice, 0)} of list`),
         line("Paying subscribers", (r) => fmtInt(r.paying)),
         line("Gross MRR", (r) => fmtUsd(r.grossMrr)),
         line("Net MRR (after 15% fee, refunds, VAT)", (r) => fmtUsd(r.netMrr)),
@@ -619,7 +619,7 @@ export function AdminApp() {
       <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="mr-auto text-lg font-bold">
-            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal" />
+            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
           </h1>
           <div className="flex gap-1" role="group" aria-label="Period">
             {PERIODS.map((p) => (

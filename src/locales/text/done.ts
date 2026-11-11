@@ -19,14 +19,12 @@ export const en = {
   "done.badges": "Badges unlocked",
   "done.quests": "Quests completed",
   "done.share": "Share this workout",
-  "done.saved": "Saved the image.",
-  "done.shareFailed": "Couldn't share that. Try again.",
   "done.done": "Done",
   "done.remixShare": "Send it to a friend to try",
   "done.remixHint": "Friends get it rebuilt for their own gym and weights. Only exercises, sets and reps are in the link.",
   "done.remixCopied": "Link copied.",
   "done.remixText": "Try my workout in Liftsmith. It adapts to your gym and your weights.",
-  "done.allAchievements": "See all achievements",
+  "done.allAchievements": "See all awards",
   "done.back": "Back to today",
   "done.footer": { one: "Level {level} · {title} · {count}-week streak", other: "Level {level} · {title} · {count}-week streak" },
   "done.crate": "You earned a crate",
@@ -40,6 +38,8 @@ export const en = {
   "done.pain": "Pain after this workout",
   "done.painAsk": "How's your {part} after this workout?",
   "done.painNote": "Optional. It feeds the pain trend and the graded return on the Injuries screen.",
+  "done.reward.item": "Level {level} reward",
+  "done.reward.crate": "Bonus crate for your new title, {title}",
 } as const;
 
 type Key = keyof typeof en;
@@ -60,8 +60,6 @@ export const es: Partial<Record<Key, Message>> = {
   "done.badges": "Insignias desbloqueadas",
   "done.quests": "Misiones completadas",
   "done.share": "Compartir este entrenamiento",
-  "done.saved": "Imagen guardada.",
-  "done.shareFailed": "No se pudo compartir. Inténtalo de nuevo.",
   "done.done": "Listo",
   "done.remixShare": "Envíaselo a un amigo",
   "done.remixHint": "Tus amigos lo reciben adaptado a su gimnasio y sus pesos. El enlace solo lleva ejercicios, series y repeticiones.",
@@ -81,6 +79,8 @@ export const es: Partial<Record<Key, Message>> = {
   "done.pain": "Dolor después de este entrenamiento",
   "done.painAsk": "¿Cómo está tu {part} después de este entrenamiento?",
   "done.painNote": "Opcional. Alimenta la tendencia del dolor y la vuelta gradual en la pantalla de lesiones.",
+  "done.reward.item": "Premio del nivel {level}",
+  "done.reward.crate": "Cofre extra por tu nuevo título: {title}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -99,15 +99,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "done.badges": "Badges débloqués",
   "done.quests": "Quêtes terminées",
   "done.share": "Partager cette séance",
-  "done.saved": "Image enregistrée.",
-  "done.shareFailed": "Le partage a échoué. Réessayez.",
   "done.done": "Terminé",
   "done.remixShare": "Envoyer à un ami",
   "done.remixHint":
     "Vos amis la reçoivent adaptée à leur salle et à leurs charges. Le lien ne contient que les exercices, séries et répétitions.",
   "done.remixCopied": "Lien copié.",
   "done.remixText": "Essaie ma séance dans Liftsmith. Elle s’adapte à ta salle et à tes charges.",
-  "done.allAchievements": "Voir tous les succès",
+  "done.allAchievements": "Voir tous les trophées",
   "done.back": "Retour à aujourd’hui",
   "done.footer": {
     one: "Niveau {level} · {title} · série de {count} semaine",
@@ -124,6 +122,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "done.pain": "Douleur après cette séance",
   "done.painAsk": "Comment va votre {part} après cette séance ?",
   "done.painNote": "Facultatif. Cela alimente la courbe de douleur et le retour progressif sur l’écran Blessures.",
+  "done.reward.item": "Récompense du niveau {level}",
+  "done.reward.crate": "Coffre bonus pour votre nouveau titre : {title}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -142,8 +142,6 @@ export const de: Partial<Record<Key, Message>> = {
   "done.badges": "Freigeschaltete Abzeichen",
   "done.quests": "Abgeschlossene Aufgaben",
   "done.share": "Dieses Training teilen",
-  "done.saved": "Bild gespeichert.",
-  "done.shareFailed": "Das ließ sich nicht teilen. Versuch es noch einmal.",
   "done.done": "Fertig",
   "done.remixShare": "An einen Freund zum Ausprobieren schicken",
   "done.remixHint":
@@ -164,6 +162,8 @@ export const de: Partial<Record<Key, Message>> = {
   "done.pain": "Schmerzen nach diesem Training",
   "done.painAsk": "Wie geht es deinem Bereich {part} nach diesem Training?",
   "done.painNote": "Optional. Fließt in den Schmerzverlauf und die schrittweise Rückkehr im Bildschirm Verletzungen ein.",
+  "done.reward.item": "Belohnung für Level {level}",
+  "done.reward.crate": "Bonuskiste für deinen neuen Titel: {title}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -182,15 +182,13 @@ export const it: Partial<Record<Key, Message>> = {
   "done.badges": "Badge sbloccati",
   "done.quests": "Missioni completate",
   "done.share": "Condividi questo allenamento",
-  "done.saved": "Immagine salvata.",
-  "done.shareFailed": "Impossibile condividere. Riprova.",
   "done.done": "Fatto",
   "done.remixShare": "Mandalo a un amico da provare",
   "done.remixHint":
     "Gli amici lo ricevono ricostruito per la loro palestra e i loro pesi. Nel link ci sono solo esercizi, serie e ripetizioni.",
   "done.remixCopied": "Link copiato.",
   "done.remixText": "Prova il mio allenamento su Liftsmith. Si adatta alla tua palestra e ai tuoi pesi.",
-  "done.allAchievements": "Vedi tutti i traguardi",
+  "done.allAchievements": "Vedi tutti i premi",
   "done.back": "Torna a oggi",
   "done.footer": {
     one: "Livello {level} · {title} · serie di {count} settimana",
@@ -207,6 +205,8 @@ export const it: Partial<Record<Key, Message>> = {
   "done.pain": "Dolore dopo questo allenamento",
   "done.painAsk": "Come va {part} dopo questo allenamento?",
   "done.painNote": "Facoltativo. Serve per l’andamento del dolore e il ritorno graduale nella schermata Infortuni.",
+  "done.reward.item": "Premio del livello {level}",
+  "done.reward.crate": "Cassa bonus per il tuo nuovo titolo: {title}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -225,8 +225,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "done.badges": "獲得したバッジ",
   "done.quests": "達成したクエスト",
   "done.share": "このワークアウトを共有",
-  "done.saved": "画像を保存しました。",
-  "done.shareFailed": "共有できませんでした。もう一度お試しください。",
   "done.done": "完了",
   "done.remixShare": "友だちに送って試してもらう",
   "done.remixHint": "友だちのジムと重量に合わせて組み直されます。リンクに含まれるのは種目、セット数、回数だけです。",
@@ -246,4 +244,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "done.pain": "このワークアウト後の痛み",
   "done.painAsk": "ワークアウト後、{part}の具合はどうですか？",
   "done.painNote": "任意です。「ケガ」画面の痛みの推移と段階的な復帰に使われます。",
+  "done.reward.item": "レベル{level}の報酬",
+  "done.reward.crate": "新しい称号「{title}」のボーナスクレート",
 };

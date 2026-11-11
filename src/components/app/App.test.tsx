@@ -201,7 +201,7 @@ describe("first run to finished workout", () => {
     fireEvent.click(more); // keyboard or screen reader: one step
     expect(useApp.getState().active!.reps).toBe(start + 1);
     fireEvent.pointerDown(more, { button: 0 });
-    await act(() => new Promise((r) => setTimeout(r, 900)));
+    await act(() => new Promise((r) => setTimeout(r, 1300)));
     fireEvent.pointerUp(more);
     const held = useApp.getState().active!.reps;
     expect(held).toBeGreaterThanOrEqual(start + 4);
@@ -504,10 +504,17 @@ describe("injury mode", () => {
     await user.click(screen.getByRole("button", { name: "Log an injury" }));
     await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Knee" }));
     // Then a 0–10 pain rating, which starts the trend.
-    await user.click(within(screen.getByRole("dialog", { name: "How bad is it right now?" })).getByRole("button", { name: "6" }));
+    const rate = within(screen.getByRole("dialog", { name: "How bad is it right now?" }));
+    fireEvent.change(rate.getByRole("slider", { name: "Pain from 0 to 10" }), { target: { value: "6" } });
+    await user.click(rate.getByRole("button", { name: "Save rating" }));
     expect(useApp.getState().events.find((e) => e.type === "pain")).toMatchObject({ score: 6 });
     expect(screen.getByRole("img", { name: /Knee pain, oldest to newest: 6/ })).toBeInTheDocument();
-    await user.selectOptions(screen.getByRole("combobox", { name: "How does it feel today?" }), "4");
+    // The card's slider starts at the last rating; it records only on Save.
+    const today = screen.getByRole("slider", { name: "How does it feel today?" });
+    expect(today).toHaveValue("6");
+    fireEvent.change(today, { target: { value: "4" } });
+    expect(useApp.getState().events.filter((e) => e.type === "pain")).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "Save rating" }));
     expect(
       useApp
         .getState()
@@ -582,8 +589,8 @@ describe("game layer", () => {
     expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
     expect(screen.getByText(/-week streak/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "See all achievements" }));
-    expect(await screen.findByRole("heading", { name: "Achievements" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "See all awards" }));
+    expect(await screen.findByRole("heading", { name: "Awards" })).toBeInTheDocument();
     expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
     expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
     expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();

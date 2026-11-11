@@ -27,7 +27,7 @@ import { useNow } from "@/lib/useNow";
 import { StatsSummary } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
-import { BumpField, Chip, Section } from "./ui";
+import { BumpField, Chip, ScreenHeader, Section } from "./ui";
 
 const level = (a: Activity) => inSentence(ACTIVITY[a].label, true);
 const kcal = (n: number) => num(n);
@@ -45,10 +45,7 @@ function ToolsHub() {
   const cur = useMemo(() => currentTdee(events, stats.sessions, profile, now), [events, stats.sessions, profile, now]);
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
-        {t("tools.back")}
-      </button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">{t("tools.title")}</h1>
+      <ScreenHeader back={{ label: t("tools.back"), onClick: () => go("stats") }} title={t("tools.title")} />
       <ul className="mt-4 space-y-3">
         <li>
           <button type="button" onClick={() => go("tools", "tdee")} className="press card flex w-full items-center gap-4 p-4 text-left">
@@ -141,10 +138,7 @@ function TdeeScreen() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("tools")} className="press -ml-2 pt-2 text-muted">
-        {t("tools.backTools")}
-      </button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">{t("tdee.title")}</h1>
+      <ScreenHeader back={{ label: t("tools.backTools"), onClick: () => go("tools") }} title={t("tdee.title")} />
       <p className="mt-1 text-sm text-muted">{t("tdee.blurb")}</p>
 
       <Section title={t("tdee.you")}>

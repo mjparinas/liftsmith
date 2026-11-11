@@ -4,6 +4,7 @@
 // Android finds the watches through Garmin Connect by itself; iOS needs the lifter to pick them once in Garmin
 // Connect (`chooseGarmin`). The web app has no way to reach a Garmin watch.
 import { platform } from "./auth";
+import { unlisten, type ListenerHandle } from "./nativeListen";
 
 export type GarminWatch = { name: string; connected: boolean; installed: boolean };
 /** `missing`: Garmin Connect isn't on this phone (the SDK needs it). */
@@ -12,7 +13,7 @@ export type GarminStatus = { app: "missing" | "ready"; devices: GarminWatch[] };
 type Plugin = {
   status(): Promise<GarminStatus>;
   choose(): Promise<void>;
-  addListener?(event: "change", cb: () => void): Promise<{ remove(): Promise<void> }>;
+  addListener?(event: "change", cb: () => void): ListenerHandle | Promise<ListenerHandle>;
 };
 
 /**
@@ -43,8 +44,7 @@ export async function chooseGarmin(): Promise<void> {
 
 /** Called when the picked watches change (iOS, after Garmin Connect sends the lifter back). */
 export function onGarminChange(cb: () => void): () => void {
-  const sub = plugin()?.addListener?.("change", cb);
-  return () => void sub?.then((s) => s.remove());
+  return unlisten(plugin()?.addListener?.("change", cb));
 }
 
 /** One line per watch for Connected apps: ready, needs our app, or out of reach. */

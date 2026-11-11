@@ -2,18 +2,19 @@
 
 import { useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { t } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
 import { BuyNext } from "./BuyNext";
+import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
-import { BumpField, Button, Chip, Section, Sheet } from "./ui";
+import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -26,7 +27,7 @@ export function Gym() {
 
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("gym.title")}</h1>
+      <ScreenHeader title={t("gym.title")} />
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>
@@ -89,7 +90,7 @@ export function Gym() {
         <div className="card space-y-4 p-4">
           {EQUIPMENT_GROUPS.map((grp) => (
             <div key={grp.title}>
-              <p className="mb-2 text-xs uppercase tracking-wider text-faint">{grp.title}</p>
+              <p className={`mb-2 ${SECTION_LABEL}`}>{grp.title}</p>
               <div className="flex flex-wrap gap-2">
                 {grp.items.map((e) => {
                   const on = gym.equipment.includes(e);
@@ -119,36 +120,32 @@ export function Gym() {
                 <li key={p.weight} className="flex items-center gap-3">
                   <span
                     className="grid h-9 w-9 place-items-center rounded-lg text-xs font-bold"
-                    style={{ background: st.fill, color: st.text }}
+                    style={{ background: st.fill, color: st.text, boxShadow: "inset 0 0 0 1px var(--plate-edge)" }}
                   >
                     {fmtNum(p.weight)}
                   </span>
                   <span className="flex-1 text-sm text-muted">
                     {fmtNum(p.weight)} {gym.unit}
                   </span>
-                  <button
-                    type="button"
-                    aria-label={t("gym.plates.fewer", { weight: fmtNum(p.weight) })}
-                    className="press h-9 w-9 rounded-full border border-line bg-raised"
-                    onClick={() => {
-                      haptic("tick");
+                  <Bump
+                    dir={-1}
+                    size="sm"
+                    aria={t("gym.plates.fewer", { weight: fmtNum(p.weight) })}
+                    onStep={() => {
+                      if (p.count <= 0) return false;
                       update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 2) } : x)) });
+                      return true;
                     }}
-                  >
-                    −
-                  </button>
+                  />
                   <span className="num w-10 text-center font-semibold">{fmtNum(p.count)}</span>
-                  <button
-                    type="button"
-                    aria-label={t("gym.plates.more", { weight: fmtNum(p.weight) })}
-                    className="press h-9 w-9 rounded-full border border-line bg-raised"
-                    onClick={() => {
-                      haptic("tick");
+                  <Bump
+                    dir={1}
+                    size="sm"
+                    aria={t("gym.plates.more", { weight: fmtNum(p.weight) })}
+                    onStep={() => {
                       update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: x.count + 2 } : x)) });
                     }}
-                  >
-                    +
-                  </button>
+                  />
                 </li>
               );
             })}
@@ -190,18 +187,8 @@ export function Gym() {
         </ul>
       </Section>
 
-      <Section title={t("gym.dumbbells", { unit: gym.unit })}>
-        <div className="card p-4 text-sm text-muted">
-          {gym.dumbbells.length
-            ? t("gym.dumbbells.range", {
-                from: fmtNum(gym.dumbbells[0]),
-                to: fmtNum(gym.dumbbells.at(-1)!),
-                unit: gym.unit,
-                count: gym.dumbbells.length,
-              })
-            : t("gym.dumbbells.none")}
-        </div>
-      </Section>
+      <GymWeights gym={gym} kind="dumbbells" onChange={(dumbbells) => update({ dumbbells })} />
+      <GymWeights gym={gym} kind="kettlebells" onChange={(kettlebells) => update({ kettlebells })} />
 
       <BuyNext gym={gym} />
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { SCREEN_TITLE, SECTION_LABEL } from "@/components/titles";
 import { shareName } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { BRAND } from "@/lib/brand";
@@ -65,7 +66,7 @@ export function ShareView({ card }: { card: ShareCard }) {
           </div>
         ))}
       </dl>
-      <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">{t("share.last12")}</h3>
+      <h3 className={`mt-5 ${SECTION_LABEL}`}>{t("share.last12")}</h3>
       <div className="mt-2 flex gap-1" role="img" aria-label={t("dash.trainedOf", { n: trained.size, total: SHARE_DAYS })}>
         {weeks.map((col, i) => (
           <div key={i} className="flex flex-col gap-1">
@@ -77,7 +78,7 @@ export function ShareView({ card }: { card: ShareCard }) {
       </div>
       {card.l.length > 0 && (
         <>
-          <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">{t("share.bestLifts")}</h3>
+          <h3 className={`mt-5 ${SECTION_LABEL}`}>{t("share.bestLifts")}</h3>
           <ul className="mt-2 divide-y divide-line">
             {card.l.map(([id, kg]) => (
               <li key={id} className="flex justify-between py-2">
@@ -92,7 +93,7 @@ export function ShareView({ card }: { card: ShareCard }) {
       )}
       {card.t.length > 0 && (
         <>
-          <h3 className="mt-5 text-sm font-semibold uppercase tracking-wider text-muted">{t("share.badges")}</h3>
+          <h3 className={`mt-5 ${SECTION_LABEL}`}>{t("share.badges")}</h3>
           <ul className="mt-2 flex flex-wrap gap-2">
             {card.t.map((id) => (
               <li key={id} className="rounded-full border border-line px-3 py-1 text-sm">
@@ -198,7 +199,7 @@ export function SharedProfile() {
         <ShareView card={card} />
       ) : (
         <div className="card p-5">
-          <h1 className="text-xl font-bold">{t("share.broken")}</h1>
+          <h1 className={SCREEN_TITLE}>{t("share.broken")}</h1>
           <p className="mt-2 text-muted">{t("share.brokenBody")}</p>
         </div>
       )}

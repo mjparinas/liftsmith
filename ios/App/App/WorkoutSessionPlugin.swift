@@ -115,12 +115,15 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
     @available(iOS 16.2, *)
     private func updateActivity(_ call: CAPPluginCall) {
         let restUntil = call.getDouble("restUntil").flatMap { $0 > 0 ? Date(timeIntervalSince1970: $0 / 1000) : nil }
+        let restTotal = call.getDouble("restTotal") ?? 0
+        let restFrom = restUntil.flatMap { restTotal > 0 ? $0.addingTimeInterval(-restTotal) : nil }
         let state = WorkoutAttributes.ContentState(
             title: call.getString("title") ?? "Workout",
             setLabel: call.getString("setLabel") ?? "",
             next: call.getString("next") ?? "",
             plates: call.getString("plates") ?? "",
             restUntil: restUntil,
+            restFrom: restFrom,
             hr: call.getInt("hr"),
             chip: call.getString("chip"),
             done: call.getInt("done"),

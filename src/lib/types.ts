@@ -613,8 +613,8 @@ export interface TdeeEvent extends EventBase {
 }
 
 /**
- * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
- * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
+ * "I'm at the gym" sent to gym buddies through the share sheet. Accounts don't link lifters to each other, so
+ * nothing is delivered in the app. Buddy names only, never contact details.
  */
 /**
  * Stretches done (src/lib/stretches.ts): the warm-up before a workout, the cool-down after one, a rest-day

@@ -12,6 +12,28 @@ export const en = {
   "twin.connect": "Connect {source}",
   "twin.connect.body": "Allow sleep, HRV, resting heart rate, steps, VO₂ max and breathing rate, and they show up here.",
   "twin.connect.none": "Nothing came through yet. Check what Liftsmith may read in {source}.",
+  "twin.ask.busy": "Asking {source}…",
+  "twin.ask.install": "Health Connect isn't on this phone yet. Get it from Google Play, then tap Connect again.",
+  "twin.ask.unavailable": "{source} isn't available on this device.",
+  "twin.ask.denied":
+    "Liftsmith isn't allowed to read {what} yet. {source} stops asking once you've said no, so turn it on in its settings, then tap Connect again.",
+  "twin.ask.deniedAll":
+    "Liftsmith isn't allowed to read anything yet. {source} stops asking once you've said no, so turn the readings on in its settings, then tap Connect again.",
+  "twin.ask.openHealth": "Open the Health app",
+  "twin.empty.title": "No {what} in {source} yet",
+  "twin.empty.titleAll": "Nothing in {source} yet",
+  "twin.empty.other":
+    "Liftsmith is connected, but nothing has saved {what} to {source} yet. A watch, ring or scale that records it fills this in once its app shares with {source}.",
+  "twin.empty.hrv.android":
+    "Liftsmith is connected, but nothing has saved HRV to Health Connect yet. Have an Oura ring? In the Oura app, open the menu, then Settings › Health Connect, and turn on heart rate variability (it needs an Oura membership). A watch that measures HRV while you sleep works too, once its app shares with Health Connect.",
+  "twin.empty.hrv.ios":
+    "Liftsmith can read Apple Health, but nothing has saved HRV there yet. An Apple Watch saves it on its own, most of all when you wear it to sleep. The Oura app doesn't send HRV to Apple Health.",
+  "twin.empty.vo2.android":
+    "Liftsmith is connected, but nothing has saved VO₂ max to Health Connect yet. It comes from a watch that estimates it on outdoor runs or brisk walks, once that watch's app shares VO₂ max with Health Connect (look in its Health Connect settings). An Oura ring's Cardio Capacity stays in the Oura app.",
+  "twin.empty.vo2.ios":
+    "Liftsmith can read Apple Health, but nothing has saved VO₂ max there yet. An Apple Watch estimates it (Cardio Fitness) on its own during outdoor walks, runs and hikes. Another watch needs its app to share VO₂ max with Apple Health.",
+  "twin.empty.ouraDirect": "Or connect your Oura account to Liftsmith, and its HRV comes straight in.",
+  "twin.empty.ouraConnect": "Connect Oura",
   "twin.group.body": "Body and energy",
   "twin.group.heart": "Heart, sleep and steps",
   "twin.figure": "3D body with your health numbers: {summary}",
@@ -59,7 +81,7 @@ export const en = {
   "twin.w.maint": "Eat about {kcal} to hold it.",
   "twin.c.dropFast": "Dropping fast",
   "twin.w.dropFast": "{rate}. Faster than 1% a week costs muscle and strength. Eat about 300 kcal more a day.",
-  "twin.c.onPace": "On pace",
+  "twin.c.loseSlow": "Losing slowly",
   "twin.w.onPace": "{rate}. A pace that keeps muscle while you lose fat, if losing is the aim.",
   "twin.c.steady": "Steady",
   "twin.w.steadyWeight": "{rate}: holding steady.",
@@ -180,6 +202,28 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.connect": "Conectar {source}",
   "twin.connect.body": "Permite sueño, VFC, frecuencia cardiaca en reposo, pasos, VO₂ máx. y frecuencia respiratoria, y aparecerán aquí.",
   "twin.connect.none": "Aún no ha llegado nada. Revisa qué puede leer Liftsmith en {source}.",
+  "twin.ask.busy": "Preguntando a {source}…",
+  "twin.ask.install": "Health Connect aún no está en este teléfono. Descárgalo de Google Play y vuelve a tocar Conectar.",
+  "twin.ask.unavailable": "{source} no está disponible en este dispositivo.",
+  "twin.ask.denied":
+    "Liftsmith aún no puede leer {what}. {source} deja de preguntar cuando dices que no, así que actívalo en sus ajustes y vuelve a tocar Conectar.",
+  "twin.ask.deniedAll":
+    "Liftsmith aún no puede leer nada. {source} deja de preguntar cuando dices que no, así que activa las lecturas en sus ajustes y vuelve a tocar Conectar.",
+  "twin.ask.openHealth": "Abrir la app Salud",
+  "twin.empty.title": "Aún no hay datos de {what} en {source}",
+  "twin.empty.titleAll": "Aún no hay nada en {source}",
+  "twin.empty.other":
+    "Liftsmith está conectado, pero nada ha guardado {what} en {source} todavía. Un reloj, anillo o báscula que lo registre lo completa cuando su app comparte con {source}.",
+  "twin.empty.hrv.android":
+    "Liftsmith está conectado, pero nada ha guardado la VFC en Health Connect todavía. ¿Tienes un anillo Oura? En la app de Oura, abre el menú, luego Ajustes › Health Connect, y activa la variabilidad de la frecuencia cardiaca (requiere una membresía de Oura). También sirve un reloj que mida la VFC mientras duermes, cuando su app comparte con Health Connect.",
+  "twin.empty.hrv.ios":
+    "Liftsmith puede leer Salud, pero nada ha guardado la VFC allí todavía. Un Apple Watch la guarda por sí solo, sobre todo si duermes con él. La app de Oura no envía la VFC a Salud.",
+  "twin.empty.vo2.android":
+    "Liftsmith está conectado, pero nada ha guardado el VO₂ máx. en Health Connect todavía. Lo calcula un reloj en carreras o caminatas rápidas al aire libre, cuando su app comparte el VO₂ máx. con Health Connect (míralo en sus ajustes de Health Connect). La capacidad cardio de un anillo Oura se queda en la app de Oura.",
+  "twin.empty.vo2.ios":
+    "Liftsmith puede leer Salud, pero nada ha guardado el VO₂ máx. allí todavía. Un Apple Watch lo calcula (capacidad cardiovascular) por sí solo al caminar, correr o hacer senderismo al aire libre. Otro reloj necesita que su app comparta el VO₂ máx. con Salud.",
+  "twin.empty.ouraDirect": "O conecta tu cuenta de Oura a Liftsmith y su VFC llegará directamente.",
+  "twin.empty.ouraConnect": "Conectar Oura",
   "twin.group.body": "Cuerpo y energía",
   "twin.group.heart": "Corazón, sueño y pasos",
   "twin.figure": "Cuerpo en 3D con tus cifras de salud: {summary}",
@@ -228,7 +272,7 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.w.maint": "Come unas {kcal} para mantenerlo.",
   "twin.c.dropFast": "Bajando rápido",
   "twin.w.dropFast": "{rate}. Más rápido del 1 % semanal cuesta músculo y fuerza. Come unas 300 kcal más al día.",
-  "twin.c.onPace": "A buen ritmo",
+  "twin.c.loseSlow": "Bajando despacio",
   "twin.w.onPace": "{rate}. Un ritmo que conserva el músculo mientras pierdes grasa, si perder es el objetivo.",
   "twin.c.steady": "Estable",
   "twin.w.steadyWeight": "{rate}: se mantiene estable.",
@@ -355,6 +399,29 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.connect.body":
     "Autorisez le sommeil, la VFC, la fréquence cardiaque au repos, les pas, la VO₂ max et la fréquence respiratoire, et ils s’afficheront ici.",
   "twin.connect.none": "Rien n’est encore arrivé. Vérifiez ce que Liftsmith peut lire dans {source}.",
+  "twin.ask.busy": "Demande à {source}…",
+  "twin.ask.install":
+    "Health Connect n’est pas encore sur ce téléphone. Installez-le depuis Google Play, puis touchez à nouveau Connecter.",
+  "twin.ask.unavailable": "{source} n’est pas disponible sur cet appareil.",
+  "twin.ask.denied":
+    "Liftsmith n’a pas encore le droit de lire {what}. {source} ne redemande plus après un refus : activez cette donnée dans ses réglages, puis touchez à nouveau Connecter.",
+  "twin.ask.deniedAll":
+    "Liftsmith n’a encore le droit de rien lire. {source} ne redemande plus après un refus : activez les données dans ses réglages, puis touchez à nouveau Connecter.",
+  "twin.ask.openHealth": "Ouvrir l’app Santé",
+  "twin.empty.title": "Aucune donnée pour {what} dans {source}",
+  "twin.empty.titleAll": "Rien dans {source} pour l’instant",
+  "twin.empty.other":
+    "Liftsmith est connecté, mais rien n’a encore enregistré {what} dans {source}. Une montre, une bague ou une balance qui l’enregistre la remplit dès que son app partage avec {source}.",
+  "twin.empty.hrv.android":
+    "Liftsmith est connecté, mais rien n’a encore enregistré de VFC dans Health Connect. Vous avez une bague Oura ? Dans l’app Oura, ouvrez le menu, puis Réglages › Health Connect, et activez la variabilité de la fréquence cardiaque (un abonnement Oura est requis). Une montre qui mesure la VFC pendant le sommeil convient aussi, dès que son app partage avec Health Connect.",
+  "twin.empty.hrv.ios":
+    "Liftsmith peut lire Santé, mais rien n’y a encore enregistré de VFC. Une Apple Watch l’enregistre toute seule, surtout si vous dormez avec. L’app Oura n’envoie pas la VFC à Santé.",
+  "twin.empty.vo2.android":
+    "Liftsmith est connecté, mais rien n’a encore enregistré de VO₂ max dans Health Connect. Elle vient d’une montre qui l’estime pendant les courses ou les marches rapides en extérieur, dès que son app partage la VO₂ max avec Health Connect (voir ses réglages Health Connect). La capacité cardio d’une bague Oura reste dans l’app Oura.",
+  "twin.empty.vo2.ios":
+    "Liftsmith peut lire Santé, mais rien n’y a encore enregistré de VO₂ max. Une Apple Watch l’estime toute seule (forme cardio) pendant les marches, courses et randonnées en extérieur. Une autre montre doit partager la VO₂ max avec Santé depuis son app.",
+  "twin.empty.ouraDirect": "Ou connectez votre compte Oura à Liftsmith, et sa VFC arrive directement.",
+  "twin.empty.ouraConnect": "Connecter Oura",
   "twin.group.body": "Corps et énergie",
   "twin.group.heart": "Cœur, sommeil et pas",
   "twin.figure": "Corps en 3D avec vos chiffres de santé : {summary}",
@@ -403,7 +470,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.w.maint": "Mangez environ {kcal} pour le maintenir.",
   "twin.c.dropFast": "Baisse rapide",
   "twin.w.dropFast": "{rate}. Plus de 1 % par semaine coûte du muscle et de la force. Mangez environ 300 kcal de plus par jour.",
-  "twin.c.onPace": "Bon rythme",
+  "twin.c.loseSlow": "Baisse en douceur",
   "twin.w.onPace": "{rate}. Un rythme qui préserve le muscle pendant que vous perdez du gras, si c’est l’objectif.",
   "twin.c.steady": "Stable",
   "twin.w.steadyWeight": "{rate} : stable.",
@@ -530,6 +597,29 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.connect": "{source} verbinden",
   "twin.connect.body": "Erlaube Schlaf, HRV, Ruhepuls, Schritte, VO₂max und Atemfrequenz, dann erscheinen sie hier.",
   "twin.connect.none": "Noch ist nichts angekommen. Prüfe, was Liftsmith in {source} lesen darf.",
+  "twin.ask.busy": "{source} wird gefragt…",
+  "twin.ask.install":
+    "Health Connect ist noch nicht auf diesem Handy. Hol es dir bei Google Play und tippe dann noch einmal auf Verbinden.",
+  "twin.ask.unavailable": "{source} ist auf diesem Gerät nicht verfügbar.",
+  "twin.ask.denied":
+    "Liftsmith darf {what} noch nicht lesen. Nach einem Nein fragt {source} nicht mehr, also schalte es in den Einstellungen ein und tippe dann noch einmal auf Verbinden.",
+  "twin.ask.deniedAll":
+    "Liftsmith darf noch nichts lesen. Nach einem Nein fragt {source} nicht mehr, also schalte die Daten in den Einstellungen ein und tippe dann noch einmal auf Verbinden.",
+  "twin.ask.openHealth": "Health-App öffnen",
+  "twin.empty.title": "Noch keine Daten zu {what} in {source}",
+  "twin.empty.titleAll": "Noch nichts in {source}",
+  "twin.empty.other":
+    "Liftsmith ist verbunden, aber noch nichts hat {what} in {source} gespeichert. Eine Uhr, ein Ring oder eine Waage, die das aufzeichnen, füllen das aus, sobald ihre App mit {source} teilt.",
+  "twin.empty.hrv.android":
+    "Liftsmith ist verbunden, aber noch nichts hat HRV in Health Connect gespeichert. Du hast einen Oura Ring? Öffne in der Oura-App das Menü, dann Einstellungen › Health Connect, und schalte Herzfrequenzvariabilität ein (dafür brauchst du eine Oura-Mitgliedschaft). Eine Uhr, die HRV im Schlaf misst, geht auch, sobald ihre App mit Health Connect teilt.",
+  "twin.empty.hrv.ios":
+    "Liftsmith kann Apple Health lesen, aber dort hat noch nichts HRV gespeichert. Eine Apple Watch speichert sie von selbst, vor allem, wenn du mit ihr schläfst. Die Oura-App sendet keine HRV an Apple Health.",
+  "twin.empty.vo2.android":
+    "Liftsmith ist verbunden, aber noch nichts hat VO₂max in Health Connect gespeichert. Sie kommt von einer Uhr, die sie beim Laufen oder zügigen Gehen draußen schätzt, sobald ihre App VO₂max mit Health Connect teilt (sieh in ihren Health-Connect-Einstellungen nach). Die Cardio Capacity eines Oura Rings bleibt in der Oura-App.",
+  "twin.empty.vo2.ios":
+    "Liftsmith kann Apple Health lesen, aber dort hat noch nichts VO₂max gespeichert. Eine Apple Watch schätzt sie (Cardiofitness) von selbst beim Gehen, Laufen und Wandern im Freien. Eine andere Uhr muss VO₂max über ihre App mit Apple Health teilen.",
+  "twin.empty.ouraDirect": "Oder verbinde dein Oura-Konto mit Liftsmith, dann kommt die HRV direkt an.",
+  "twin.empty.ouraConnect": "Oura verbinden",
   "twin.group.body": "Körper und Energie",
   "twin.group.heart": "Herz, Schlaf und Schritte",
   "twin.figure": "3D-Körper mit deinen Gesundheitswerten: {summary}",
@@ -578,7 +668,7 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.w.maint": "Iss etwa {kcal}, um es zu halten.",
   "twin.c.dropFast": "Sinkt schnell",
   "twin.w.dropFast": "{rate}. Schneller als 1 % pro Woche kostet Muskeln und Kraft. Iss etwa 300 kcal mehr pro Tag.",
-  "twin.c.onPace": "Im Plan",
+  "twin.c.loseSlow": "Sinkt langsam",
   "twin.w.onPace": "{rate}. Ein Tempo, bei dem du Muskeln behältst, während du Fett verlierst, falls Abnehmen das Ziel ist.",
   "twin.c.steady": "Stabil",
   "twin.w.steadyWeight": "{rate}: stabil.",
@@ -706,6 +796,28 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.connect": "Collega {source}",
   "twin.connect.body": "Consenti sonno, HRV, frequenza cardiaca a riposo, passi, VO₂ max e frequenza respiratoria, e compariranno qui.",
   "twin.connect.none": "Non è ancora arrivato nulla. Controlla cosa può leggere Liftsmith in {source}.",
+  "twin.ask.busy": "Richiesta a {source}…",
+  "twin.ask.install": "Health Connect non è ancora su questo telefono. Scaricalo da Google Play, poi tocca di nuovo Collega.",
+  "twin.ask.unavailable": "{source} non è disponibile su questo dispositivo.",
+  "twin.ask.denied":
+    "Liftsmith non può ancora leggere {what}. Dopo un no {source} non chiede più, quindi attiva questo dato nelle sue impostazioni, poi tocca di nuovo Collega.",
+  "twin.ask.deniedAll":
+    "Liftsmith non può ancora leggere nulla. Dopo un no {source} non chiede più, quindi attiva i dati nelle sue impostazioni, poi tocca di nuovo Collega.",
+  "twin.ask.openHealth": "Apri l’app Salute",
+  "twin.empty.title": "Ancora nessun dato per {what} in {source}",
+  "twin.empty.titleAll": "Ancora niente in {source}",
+  "twin.empty.other":
+    "Liftsmith è collegato, ma niente ha ancora salvato {what} in {source}. Un orologio, un anello o una bilancia che la registri la completa quando la sua app condivide con {source}.",
+  "twin.empty.hrv.android":
+    "Liftsmith è collegato, ma niente ha ancora salvato l’HRV in Health Connect. Hai un anello Oura? Nell’app Oura apri il menu, poi Impostazioni › Health Connect, e attiva la variabilità della frequenza cardiaca (serve un abbonamento Oura). Va bene anche un orologio che misura l’HRV mentre dormi, quando la sua app condivide con Health Connect.",
+  "twin.empty.hrv.ios":
+    "Liftsmith può leggere Salute, ma niente vi ha ancora salvato l’HRV. Un Apple Watch la salva da solo, soprattutto se ci dormi. L’app Oura non invia l’HRV a Salute.",
+  "twin.empty.vo2.android":
+    "Liftsmith è collegato, ma niente ha ancora salvato il VO₂ max in Health Connect. Arriva da un orologio che lo stima durante corse o camminate veloci all’aperto, quando la sua app condivide il VO₂ max con Health Connect (guarda nelle sue impostazioni di Health Connect). La Cardio Capacity di un anello Oura resta nell’app Oura.",
+  "twin.empty.vo2.ios":
+    "Liftsmith può leggere Salute, ma niente vi ha ancora salvato il VO₂ max. Un Apple Watch lo stima da solo (fitness cardio) durante camminate, corse ed escursioni all’aperto. Un altro orologio deve condividere il VO₂ max con Salute dalla sua app.",
+  "twin.empty.ouraDirect": "Oppure collega il tuo account Oura a Liftsmith, e la sua HRV arriva direttamente.",
+  "twin.empty.ouraConnect": "Collega Oura",
   "twin.group.body": "Corpo ed energia",
   "twin.group.heart": "Cuore, sonno e passi",
   "twin.figure": "Corpo 3D con i tuoi dati di salute: {summary}",
@@ -754,7 +866,7 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.w.maint": "Mangia circa {kcal} per mantenerlo.",
   "twin.c.dropFast": "Scende in fretta",
   "twin.w.dropFast": "{rate}. Più dell’1 % a settimana costa muscoli e forza. Mangia circa 300 kcal in più al giorno.",
-  "twin.c.onPace": "Al ritmo giusto",
+  "twin.c.loseSlow": "In lento calo",
   "twin.w.onPace": "{rate}. Un ritmo che conserva i muscoli mentre perdi grasso, se perdere peso è l’obiettivo.",
   "twin.c.steady": "Stabile",
   "twin.w.steadyWeight": "{rate}: stabile.",
@@ -880,6 +992,29 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.connect": "{source}と連携",
   "twin.connect.body": "睡眠、HRV、安静時心拍数、歩数、VO₂max、呼吸数へのアクセスを許可すると、ここに表示されます。",
   "twin.connect.none": "まだデータが届いていません。{source}で Liftsmith が読み取れる項目を確認してください。",
+  "twin.ask.busy": "{source}に確認しています…",
+  "twin.ask.install":
+    "このスマートフォンにはまだヘルスコネクトがありません。Google Play で入手してから、もう一度「連携」をタップしてください。",
+  "twin.ask.unavailable": "この端末では{source}を使えません。",
+  "twin.ask.denied":
+    "Liftsmith はまだ{what}を読み取れません。一度許可しないと{source}は再び確認しないため、設定でオンにしてから、もう一度「連携」をタップしてください。",
+  "twin.ask.deniedAll":
+    "Liftsmith はまだ何も読み取れません。一度許可しないと{source}は再び確認しないため、設定でデータをオンにしてから、もう一度「連携」をタップしてください。",
+  "twin.ask.openHealth": "ヘルスケアアプリを開く",
+  "twin.empty.title": "{source}に{what}のデータがまだありません",
+  "twin.empty.titleAll": "{source}にまだデータがありません",
+  "twin.empty.other":
+    "Liftsmith は連携済みですが、{source}にまだ{what}が保存されていません。記録できるウォッチ、リング、体重計のアプリが{source}と共有すると表示されます。",
+  "twin.empty.hrv.android":
+    "Liftsmith は連携済みですが、ヘルスコネクトにまだ HRV が保存されていません。Oura リングをお持ちなら、Oura アプリでメニューを開き、設定 › ヘルスコネクトで心拍変動をオンにしてください(Oura メンバーシップが必要です)。睡眠中に HRV を測るウォッチでも、そのアプリがヘルスコネクトと共有すれば使えます。",
+  "twin.empty.hrv.ios":
+    "Liftsmith はヘルスケアを読み取れますが、まだ HRV が保存されていません。Apple Watch は、特に着けたまま眠ると HRV を自動で保存します。Oura アプリはヘルスケアに HRV を送りません。",
+  "twin.empty.vo2.android":
+    "Liftsmith は連携済みですが、ヘルスコネクトにまだ VO₂max が保存されていません。屋外のランニングや早歩きで VO₂max を推定するウォッチのアプリが、ヘルスコネクトと VO₂max を共有すると表示されます(そのアプリのヘルスコネクト設定を確認してください)。Oura リングの Cardio Capacity は Oura アプリの中だけです。",
+  "twin.empty.vo2.ios":
+    "Liftsmith はヘルスケアを読み取れますが、まだ VO₂max が保存されていません。Apple Watch は屋外でのウォーキング、ランニング、ハイキング中に VO₂max(心肺機能)を自動で推定します。ほかのウォッチは、そのアプリがヘルスケアと VO₂max を共有する必要があります。",
+  "twin.empty.ouraDirect": "または Oura のアカウントを Liftsmith と連携すれば、HRV が直接届きます。",
+  "twin.empty.ouraConnect": "Oura と連携",
   "twin.group.body": "体とエネルギー",
   "twin.group.heart": "心臓、睡眠、歩数",
   "twin.figure": "ヘルスデータを表示した3Dの体：{summary}",
@@ -927,7 +1062,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.w.maint": "維持するには約{kcal}を目安に食べましょう。",
   "twin.c.dropFast": "急減",
   "twin.w.dropFast": "{rate}。週1%より速い減量は筋肉と筋力を失います。1日あたり約300 kcal多く食べましょう。",
-  "twin.c.onPace": "順調",
+  "twin.c.loseSlow": "ゆるやかに減少",
   "twin.w.onPace": "{rate}。減量が目的なら、筋肉を保ちながら脂肪を落とせるペースです。",
   "twin.c.steady": "安定",
   "twin.w.steadyWeight": "{rate}：安定しています。",

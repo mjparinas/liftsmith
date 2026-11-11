@@ -3,16 +3,17 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Info } from "@/components/Info";
+import { SECTION_LABEL } from "@/components/titles";
 import { TIER_LABEL, unlocked } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
-import { COSMETICS, crates, game, RARITY_LABEL, type Cosmetic } from "@/lib/game";
-import { date, inSentence, t } from "@/lib/i18n";
+import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
+import { inSentence, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
-import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { doneItems } from "@/lib/routines";
-import { shareCard } from "@/lib/shareImage";
+import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -30,6 +31,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
 import { Button } from "./ui";
 
@@ -51,7 +53,7 @@ function useCountUp(to: number, ms = 900) {
 }
 
 /** The post-workout crate: shakes until tapped (never during a set), then shows its prize. */
-function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
+function Crate({ item, duplicate, label }: { item: Cosmetic; duplicate: boolean; label?: string }) {
   const { profile, setProfile } = useApp();
   const [open, setOpen] = useState(juice.lean);
   const rare = item.rarity === "epic" || item.rarity === "legendary";
@@ -75,7 +77,7 @@ function Crate({ item, duplicate }: { item: Cosmetic; duplicate: boolean }) {
           <Icon name="gift" size={30} />
         </span>
         <span>
-          <span className="block font-semibold">{t("done.crate")}</span>
+          <span className="block font-semibold">{label ?? t("done.crate")}</span>
           <span className="text-sm text-muted">{t("done.crateTap")}</span>
         </span>
       </button>
@@ -130,10 +132,28 @@ export function Done() {
   const levelUp = after.level.level > before.level.level;
   const badges = unlocked(before.achievements, after.achievements);
   const questsDone = after.quests.filter((q) => q.done && !before.quests.find((b) => b.id === q.id)?.done);
-  const crate = s ? crates(stats).find((c) => c.sessionId === s.sessionId) : undefined;
+  // This workout's crate, then any level rewards it reached; each is a repeat if it was already owned or came earlier.
+  const prizes = useMemo(() => {
+    const crate = s ? crates(stats).find((c) => c.sessionId === s.sessionId) : undefined;
+    const fresh = after.rewards.filter((r) => !before.rewards.some((b) => b.key === r.key));
+    const seen = new Set(before.owned);
+    const list: { key: string; item: Cosmetic; label?: string }[] = [
+      ...(crate ? [{ key: "crate", item: crate.item }] : []),
+      ...fresh.map((r) => ({
+        key: r.key,
+        item: r.item,
+        label: r.source === "item" ? t("done.reward.item", { level: r.level }) : t("done.reward.crate", { title: titleOf(r.level) }),
+      })),
+    ];
+    return list.map((p) => {
+      const duplicate = seen.has(p.item.id);
+      seen.add(p.item.id);
+      return { ...p, duplicate };
+    });
+  }, [s?.sessionId, after, before]); // eslint-disable-line react-hooks/exhaustive-deps
   const xp = useCountUp(gained);
   const vol = useCountUp(s ? Math.round(fromKg(s.volume, profile.unit)) : 0);
-  const [shared, setShared] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -152,32 +172,13 @@ export function Done() {
       </div>
     );
 
-  const share = async () => {
-    const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
-    const how = await shareCard(
-      {
-        kicker: date(s.start, { weekday: "long", month: "long", day: "numeric" }),
-        headline: prs.length ? t("done.prsShare", { count: prs.length }) : t("done.title"),
-        tiles: [
-          [t("done.time"), clock(s.seconds)],
-          [t("done.sets"), fmtNum(s.sets)],
-          [t("done.volume"), `${fmtNum(Math.round(fromKg(s.volume, profile.unit)))} ${profile.unit}`],
-        ],
-        lines: [
-          ...prs
-            .slice(0, 3)
-            .map((p) => `🏆 ${exercise(p.exerciseId).name} · ${fmtNum(fromKg(p.weight, profile.unit))} ${profile.unit} × ${p.reps}`),
-          ...badges.slice(0, 4).map((b) => `${b.a.icon} ${b.a.name} · ${TIER_LABEL[b.tier]}`),
-        ].slice(0, 4),
-        footer: t("done.footer", { level: after.level.level, title: after.level.title, count: after.streak.weeks }),
-        accent,
-      },
-      `liftsmith-${new Date(s.start).toISOString().slice(0, 10)}`,
-    );
-    track("feature", { name: "share_card", detail: how });
-    if (how === "failed") oops();
-    setShared(how === "download" ? t("done.saved") : how === "failed" ? t("done.shareFailed") : null);
-  };
+  const ctx = { unit: profile.unit, game: after, accent: COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value };
+  const shareItems = [
+    workoutShare(s, prs, badges, ctx),
+    ...prs.map((p) => prShare(p, previousBest(stats.prs, p), ctx)),
+    ...(levelUp ? [levelShare(after, stats.sessions.length, ctx)] : []),
+    ...badges.map((b) => badgeShare(b.a, b.tier, ctx)),
+  ];
 
   return (
     <div className="pb-24 pt-6 text-center">
@@ -193,7 +194,9 @@ export function Done() {
           </span>
         )}
       </div>
-      <h1 className="mt-3 text-3xl font-bold">{prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}</h1>
+      <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight">
+        {prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}
+      </h1>
       <p className="num mt-2 text-4xl font-bold text-accent" aria-label={t("done.xp", { xp: gained })}>
         +{xp} XP
       </p>
@@ -246,7 +249,7 @@ export function Done() {
 
       {badges.length > 0 && (
         <section className="mt-4 text-left" aria-label={t("done.badges")}>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-faint">{t("done.badges")}</h2>
+          <h2 className={`mb-2 ${SECTION_LABEL}`}>{t("done.badges")}</h2>
           <ul className="card divide-y divide-line">
             {badges.map(({ a, tier }, i) => (
               <li
@@ -281,21 +284,19 @@ export function Done() {
 
       <PainAfter sessionId={s.sessionId} />
 
-      {crate && <Crate item={crate.item} duplicate={crate.duplicate} />}
+      {prizes.map((p) => (
+        <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
+      ))}
 
       <div className="mt-4 space-y-3 text-left">
         <StreakCard g={after} />
         <LeagueCard g={after} />
       </div>
 
-      <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>
+      <Button kind="ghost" icon="share" className="mt-6 w-full" onClick={() => setSharing(true)}>
         {t("done.share")}
       </Button>
-      {shared && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {shared}
-        </p>
-      )}
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>
@@ -319,6 +320,7 @@ function PainAfter({ sessionId }: { sessionId: string }) {
         <PainSelect
           key={i.id}
           label={t("done.painAsk", { part: inSentence(PART_LABEL[i.part], true) })}
+          start={i.pain.at(-1)?.score ?? 0}
           onRate={(n) => ratePain(i.id, n, { sessionId })}
         />
       ))}

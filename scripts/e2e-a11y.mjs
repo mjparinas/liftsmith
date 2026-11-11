@@ -102,7 +102,7 @@ try {
   // The web dashboard and a share link, with the workout just saved.
   await page.goto(`${server.url}/me/`);
   await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Achievements", "Log a workout", "Share"]) {
+  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Awards", "Log a workout", "Share"]) {
     await page.getByRole("link", { name: tab, exact: true }).click();
     await scan(`dashboard ${tab}`);
   }
@@ -122,6 +122,10 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
+  // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
+  await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
+  await page.getByRole("heading", { name: "Push day" }).waitFor();
+  await scan("shared routine");
   // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
   await page.goto(`${server.url}/app/#/stretch`);
   await page.getByTestId("stretch-list").waitFor();
@@ -217,7 +221,9 @@ try {
   await scan("injury picker");
   await page.getByRole("button", { name: "Knee" }).click();
   await scan("pain rating");
-  await page.getByRole("button", { name: "6", exact: true }).click();
+  const rate = page.getByRole("dialog", { name: "How bad is it right now?" });
+  await rate.getByRole("slider", { name: "Pain from 0 to 10" }).fill("6");
+  await rate.getByRole("button", { name: "Save rating" }).click();
   await scan("injuries");
   await page.getByRole("button", { name: "Lighter" }).first().click();
   await scan("injury risk warning");

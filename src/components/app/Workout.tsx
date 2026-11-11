@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
+import { SCREEN_TITLE } from "@/components/titles";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
@@ -238,6 +239,7 @@ export function Workout() {
       next: setText(ex, active.weight, active.reps, profile.unit, active.distanceM),
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
+      restTotal: resting ? active.restTotal : undefined,
       hr: bpm ?? undefined,
       sound: alert.sound,
       vibrate: alert.vibrate,
@@ -491,7 +493,7 @@ export function Workout() {
                 <p className="text-sm font-semibold" style={{ color: item.focus ? muscleHue(item.focus) : undefined }}>
                   {item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}
                 </p>
-                <h1 className="mt-0.5 text-[1.75rem] font-extrabold leading-tight tracking-tight">{ex.name}</h1>
+                <h1 className={`mt-0.5 ${SCREEN_TITLE}`}>{ex.name}</h1>
                 {note && (
                   <p className="mt-1 text-sm text-muted">
                     <span className="font-semibold text-ink">{t("wk.yourNote")}</span> {note}

@@ -23,11 +23,11 @@ import {
 import { chooseGarmin, GARMIN_STORE_URL, garminStatus, onGarminChange, watchState, type GarminStatus } from "@/lib/garmin";
 import {
   allowWorkouts,
-  connectHealth,
+  askHealth,
   healthAvailable,
   healthLastSync,
   healthPermissions,
-  openHealthSettings,
+  openHealthPermissions,
   READ,
   workoutsAllowed,
   WRITE,
@@ -40,8 +40,8 @@ import { useApp } from "@/lib/store";
 import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
-import { go } from "./router";
-import { Button, Chip, Section, SwitchRow } from "./ui";
+import { go, useRoute } from "./router";
+import { Button, Chip, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -102,9 +102,12 @@ function HealthCard() {
     setBusy(true);
     setNote(t("conn.syncing"));
     try {
-      if (!connected && !(await connectHealth())) {
-        setNote("");
-        return;
+      if (!connected) {
+        const r = await askHealth();
+        if (r.state !== "granted") {
+          setNote(r.state === "denied" ? t("twin.ask.deniedAll", { source: store }) : t("conn.health.missing"));
+          return;
+        }
       }
       const s = useApp.getState();
       const [a, b] = await Promise.all([s.importHealthDaily(), s.importHealthBody()]);
@@ -128,7 +131,7 @@ function HealthCard() {
         <>
           <Status on={false}>{t("conn.health.missing")}</Status>
           {p === "android" && (
-            <Button kind="ghost" className="mt-3 w-full" onClick={() => void openHealthSettings()}>
+            <Button kind="ghost" className="mt-3 w-full" onClick={() => void openHealthPermissions()}>
               {t("conn.health.install")}
             </Button>
           )}
@@ -176,7 +179,7 @@ function HealthCard() {
             </p>
           )}
           {p === "android" ? (
-            <Button kind="ghost" className="mt-2 w-full" onClick={() => void openHealthSettings().then(() => check())}>
+            <Button kind="ghost" className="mt-2 w-full" onClick={() => void openHealthPermissions().then(() => check())}>
               {t("conn.health.manage")}
             </Button>
           ) : (
@@ -487,12 +490,15 @@ function MusicCard() {
 }
 
 export function Connections() {
+  // #/connections/hr (the health twin's "Pair a monitor") lands on the heart rate monitor. Pairing itself
+  // stays one tap there: the phone's Bluetooth picker only opens from a tap.
+  const { arg } = useRoute();
+  useEffect(() => {
+    if (arg === "hr") document.getElementById("conn-hr")?.scrollIntoView?.({ block: "start" });
+  }, [arg]);
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("settings.title")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("conn.title")}</h1>
+      <ScreenHeader back={{ label: `‹ ${t("settings.title")}`, onClick: () => go("settings") }} title={t("conn.title")} />
       <p className="mt-1 text-sm text-muted">{t("conn.intro")}</p>
       <Section
         title={{ ios: t("conn.health.ios"), android: t("conn.health.android"), web: t("conn.health.web.title") }[platform()]}
@@ -500,9 +506,11 @@ export function Connections() {
       >
         <HealthCard />
       </Section>
-      <Section title={t("conn.hr.title")} icon="bolt">
-        <HeartRateCard />
-      </Section>
+      <div id="conn-hr" className="scroll-mt-14">
+        <Section title={t("conn.hr.title")} icon="bolt">
+          <HeartRateCard />
+        </Section>
+      </div>
       <Section title={t("conn.garmin.title")} icon="watch">
         <GarminCard />
       </Section>

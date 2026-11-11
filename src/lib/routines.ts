@@ -15,7 +15,7 @@ export const MAX_ROUTINES = 50;
 export const MAX_ITEMS = 20;
 export const NAME_MAX = 40;
 
-const clampSets = (n: number) => Math.min(10, Math.max(1, Math.round(n) || 1));
+export const clampSets = (n: number) => Math.min(10, Math.max(1, Math.round(n) || 1));
 
 /** Tidies a routine: a trimmed name, known exercises only, sane set counts, valid supersets. */
 export function cleanRoutine(r: Routine): Routine {

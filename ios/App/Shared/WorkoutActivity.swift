@@ -13,6 +13,8 @@ struct WorkoutAttributes: ActivityAttributes {
         var plates: String
         /// End of the current rest, or nil while lifting.
         var restUntil: Date?
+        /// Start of the current rest (+30 s included), for the rest bar that empties as rest runs out (Android: the same bar).
+        var restFrom: Date?
         var hr: Int?
         /// A few characters for the compact Dynamic Island while lifting ("2/4"); Android's status bar chip shows the same.
         var chip: String?

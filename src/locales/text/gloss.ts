@@ -88,6 +88,12 @@ export const en = {
   "gloss.stretching.title": "Warm-up moves and cool-down holds",
   "gloss.stretching.body":
     "Warm-up moves are moving stretches and drills. They raise your heart rate and take your joints through their range, so the first sets feel better.\nCool-down holds are still stretches you hold for 30 seconds or more while breathing slowly. They suit the end of a workout or a rest day, when muscles are warm. Stretch to mild tension, never to pain.",
+  "gloss.crate.title": "Crates and the Locker",
+  "gloss.crate.body":
+    "Every finished workout gives you a crate on the Done screen. It holds one accent colour, rest timer sound or plate finish, picked at random: commons turn up most often and legendaries least.\nSome levels give a set item, and each new title gives a bonus crate, so even the rarest items have a sure path. Tap a locked item to see how to get it.\nIf you get something you already own, it turns into 25 bonus XP. Pick what you use here in the Locker.",
+  "gloss.badges.title": "Achievements and badges",
+  "gloss.badges.body":
+    "An achievement is a goal, like finishing workouts or setting personal bests. Each one has up to four badges, bronze, silver, gold and platinum, earned at bigger and bigger numbers.\nSome badges also unlock a colour theme for the app; the badge says which. Every badge gives XP, which raises your level.",
 } as const;
 
 type Key = keyof typeof en;
@@ -177,6 +183,12 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.stretching.title": "Calentamiento y vuelta a la calma",
   "gloss.stretching.body":
     "Los movimientos de calentamiento son estiramientos en movimiento y ejercicios suaves. Suben el pulso y llevan las articulaciones por todo su recorrido, así las primeras series se sienten mejor.\nLos estiramientos de vuelta a la calma se mantienen quietos 30 segundos o más, respirando despacio. Van bien al final del entrenamiento o en un día de descanso, con los músculos calientes. Estira hasta notar una tensión suave, nunca dolor.",
+  "gloss.crate.title": "Cofres y la taquilla",
+  "gloss.crate.body":
+    "Cada entrenamiento terminado te da un cofre en la pantalla final. Trae un color de acento, un sonido del temporizador o un acabado de discos al azar: los comunes salen más a menudo y los legendarios menos.\nAlgunos niveles dan un objeto fijo y cada título nuevo da un cofre extra, así que hasta los objetos más raros tienen un camino seguro. Toca un objeto bloqueado para ver cómo conseguirlo.\nSi te toca algo que ya tienes, se convierte en 25 XP extra. Elige lo que usas aquí, en la taquilla.",
+  "gloss.badges.title": "Logros e insignias",
+  "gloss.badges.body":
+    "Un logro es una meta, como terminar entrenamientos o batir marcas personales. Cada uno tiene hasta cuatro insignias, bronce, plata, oro y platino, que se ganan con cifras cada vez mayores.\nAlgunas insignias también desbloquean un tema de color para la app; la insignia dice cuál. Cada insignia da XP, que sube tu nivel.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -264,6 +276,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.stretching.title": "Échauffement et retour au calme",
   "gloss.stretching.body":
     "Les mouvements d’échauffement sont des étirements en mouvement et des exercices doux. Ils font monter le cœur et font travailler les articulations sur toute leur amplitude, pour que les premières séries passent mieux.\nLes étirements de retour au calme se tiennent immobiles 30 secondes ou plus, en respirant lentement. Ils conviennent à la fin d’une séance ou à un jour de repos, muscles chauds. Étirez jusqu’à une légère tension, jamais jusqu’à la douleur.",
+  "gloss.crate.title": "Coffres et vestiaire",
+  "gloss.crate.body":
+    "Chaque séance terminée vous donne un coffre sur l’écran de fin. Il contient une couleur d’accent, un son de minuteur ou une finition de disques, au hasard : les communs sortent le plus souvent, les légendaires le moins.\nCertains niveaux donnent un objet précis et chaque nouveau titre un coffre bonus : même les objets les plus rares ont un chemin sûr. Touchez un objet verrouillé pour voir comment l’obtenir.\nSi vous obtenez un objet que vous avez déjà, il devient 25 XP bonus. Choisissez ce que vous utilisez ici, dans le vestiaire.",
+  "gloss.badges.title": "Succès et badges",
+  "gloss.badges.body":
+    "Un succès est un objectif, comme terminer des séances ou battre des records personnels. Chacun a jusqu’à quatre badges, bronze, argent, or et platine, obtenus à des seuils de plus en plus hauts.\nCertains badges débloquent aussi un thème de couleur pour l’app ; le badge indique lequel. Chaque badge donne de l’XP, qui fait monter votre niveau.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -351,6 +369,12 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.stretching.title": "Aufwärmen und Cool-down",
   "gloss.stretching.body":
     "Aufwärmübungen sind Dehnungen in Bewegung und lockere Übungen. Sie bringen den Puls hoch und führen die Gelenke durch ihren Bewegungsumfang, damit sich die ersten Sätze besser anfühlen.\nBeim Cool-down hältst du Dehnungen 30 Sekunden oder länger still und atmest langsam. Das passt ans Ende des Trainings oder an einen Ruhetag, wenn die Muskeln warm sind. Dehn bis zu einer leichten Spannung, nie bis zum Schmerz.",
+  "gloss.crate.title": "Kisten und Spind",
+  "gloss.crate.body":
+    "Jedes beendete Training gibt dir auf dem Abschlussbildschirm eine Kiste. Darin steckt zufällig eine Akzentfarbe, ein Pausentimer-Ton oder ein Scheiben-Finish: Gewöhnliches kommt am häufigsten, Legendäres am seltensten.\nManche Level geben ein festes Item und jeder neue Titel eine Bonuskiste, so haben auch die seltensten Items einen sicheren Weg. Tippe auf ein gesperrtes Item, um zu sehen, wie du es bekommst.\nBekommst du etwas, das du schon hast, wird es zu 25 Bonus-XP. Was du nutzt, wählst du hier im Spind.",
+  "gloss.badges.title": "Erfolge und Abzeichen",
+  "gloss.badges.body":
+    "Ein Erfolg ist ein Ziel, zum Beispiel Trainings beenden oder persönliche Bestleistungen aufstellen. Jeder hat bis zu vier Abzeichen, Bronze, Silber, Gold und Platin, die du bei immer höheren Zahlen bekommst.\nManche Abzeichen schalten außerdem ein Farbdesign für die App frei; das Abzeichen sagt, welches. Jedes Abzeichen gibt XP, die dein Level erhöhen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -438,6 +462,12 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.stretching.title": "Riscaldamento e defaticamento",
   "gloss.stretching.body":
     "I movimenti di riscaldamento sono allungamenti in movimento ed esercizi leggeri. Alzano i battiti e portano le articolazioni lungo tutto il loro movimento, così le prime serie vanno meglio.\nGli allungamenti di defaticamento si tengono fermi per 30 secondi o più, respirando lentamente. Sono adatti alla fine dell’allenamento o a un giorno di riposo, con i muscoli caldi. Allunga fino a una leggera tensione, mai fino al dolore.",
+  "gloss.crate.title": "Casse e armadietto",
+  "gloss.crate.body":
+    "Ogni allenamento finito ti dà una cassa nella schermata finale. Contiene a caso un colore d’accento, un suono del timer o una finitura dei dischi: i comuni escono più spesso, i leggendari meno.\nAlcuni livelli danno un oggetto preciso e ogni nuovo titolo una cassa bonus, così anche gli oggetti più rari hanno una strada sicura. Tocca un oggetto bloccato per vedere come ottenerlo.\nSe ricevi qualcosa che hai già, diventa 25 XP bonus. Scegli cosa usare qui, nell’armadietto.",
+  "gloss.badges.title": "Traguardi e badge",
+  "gloss.badges.body":
+    "Un traguardo è un obiettivo, come finire allenamenti o battere record personali. Ognuno ha fino a quattro badge, bronzo, argento, oro e platino, che si ottengono con numeri sempre più alti.\nAlcuni badge sbloccano anche un tema di colore per l’app; il badge dice quale. Ogni badge dà XP, che fa salire il tuo livello.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -525,4 +555,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.stretching.title": "ウォームアップとクールダウン",
   "gloss.stretching.body":
     "ウォームアップの動きは、動きながら行うストレッチや軽いドリルです。心拍数を上げ、関節を大きく動かすので、最初のセットが楽になります。\nクールダウンのストレッチは、ゆっくり呼吸しながら30秒以上静止して保ちます。筋肉が温まっているワークアウトの最後や休養日に向いています。軽く張りを感じるところまでにして、痛みが出るほど伸ばさないでください。",
+  "gloss.crate.title": "クレートとロッカー",
+  "gloss.crate.body":
+    "ワークアウトを終えるたびに、完了画面でクレートが1個もらえます。中身はアクセントカラー、休憩タイマーの音、プレートの仕上げのどれかがランダムに入っています。コモンが最も出やすく、レジェンダリーが最も出にくくなっています。\n一部のレベルでは決まったアイテムが、新しい称号ごとにボーナスクレートがもらえるので、いちばん珍しいアイテムにも確実な入手方法があります。ロック中のアイテムをタップすると入手方法がわかります。\nすでに持っているものが出た場合は、25ボーナス XP になります。使うものはこのロッカーで選べます。",
+  "gloss.badges.title": "実績とバッジ",
+  "gloss.badges.body":
+    "実績はワークアウトを終える、自己ベストを出すといった目標です。それぞれにブロンズ、シルバー、ゴールド、プラチナの最大4つのバッジがあり、数字が大きくなるごとにもらえます。\n一部のバッジはアプリのカラーテーマも解除します。どのテーマかはバッジに表示されます。どのバッジも XP がもらえ、レベルが上がります。",
 };

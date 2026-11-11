@@ -2,6 +2,7 @@
 
 import { t } from "./i18n";
 import { isNative } from "./juice";
+import { unlisten, type ListenerHandle } from "./nativeListen";
 
 // The live workout notification. In the Capacitor shell this calls the native WorkoutSession
 // plugin (a foreground service with a lock-screen countdown and Log set / +30 s buttons). On the
@@ -13,6 +14,8 @@ export interface SessionState {
   next: string;
   plates?: string;
   restUntil: number | null;
+  /** The whole rest in seconds (+30 s included), for the rest bar on the Android notification and iOS Live Activity. */
+  restTotal?: number;
   setLabel: string;
   hr?: number;
   /** Whether the native rest-over alert plays a sound and vibrates (Workout preferences › Rest-over alert). */
@@ -40,13 +43,13 @@ export function chipText(warming: boolean, n: number, total: number): string {
 
 /** Notification buttons send log and add30; voice and system shortcuts also send start (shortcuts.ts). */
 export type SessionAction = "log" | "add30" | "start";
-type Handle = { remove(): Promise<void> };
+type Handle = ListenerHandle;
 type Plugin = {
   update(s: SessionState): Promise<void>;
   stop(): Promise<void>;
   requestPermission(): Promise<{ granted: boolean }>;
-  addListener(event: "action", cb: (e: { action: SessionAction }) => void): Promise<Handle>;
-  addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Promise<Handle>;
+  addListener(event: "action", cb: (e: { action: SessionAction }) => void): Handle | Promise<Handle>;
+  addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Handle | Promise<Handle>;
 };
 const plugin = (): Plugin | undefined =>
   typeof window !== "undefined"
@@ -73,7 +76,12 @@ export async function updateSession(s: SessionState) {
     : null;
   await reg.showNotification(s.title, {
     tag: "workout",
-    body: [until ? `Rest until ${until}` : s.setLabel, `Next: ${s.next}`, s.plates, s.hr ? `♥ ${s.hr} bpm` : null]
+    body: [
+      until ? t("workout.notify.until", { time: until }) : s.setLabel,
+      t("workout.notify.next", { next: s.next }),
+      s.plates,
+      s.hr ? `♥ ${s.hr} bpm` : null,
+    ]
       .filter(Boolean)
       .join("\n"),
     silent: true,
@@ -102,16 +110,14 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
 export function onSessionAction(cb: (a: SessionAction) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
-  const handle = p.addListener("action", (e) => cb(e.action));
-  return () => void handle.then((h) => h.remove());
+  return unlisten(p.addListener("action", (e) => cb(e.action)));
 }
 
 /** Heart rate from the watch app's own sensor (Wear OS or Apple Watch), about every 2 s. Returns an unsubscribe function. */
 export function onWatchHeartRate(cb: (bpm: number) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
-  const handle = p.addListener("heartRate", (e) => cb(e.bpm));
-  return () => void handle.then((h) => h.remove());
+  return unlisten(p.addListener("heartRate", (e) => cb(e.bpm)));
 }
 
 export async function stopSession() {

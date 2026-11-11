@@ -19,6 +19,7 @@ import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
 import * as callText from "./text/callText";
+import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as coach from "./text/coach";
@@ -54,6 +55,7 @@ import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
@@ -128,6 +130,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...buddy.fr,
   ...buy.fr,
   ...cal.fr,
+  ...card.fr,
   ...callText.fr,
   ...category.fr,
   ...cause.fr,
@@ -164,6 +167,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...ins.fr,
   ...lab.fr,
   ...league.fr,
+  ...link.fr,
   ...lvl.fr,
   ...map.fr,
   ...mom.fr,

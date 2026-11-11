@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { healthAvailable, readHints, strengthKcal } from "./health";
@@ -26,5 +28,32 @@ describe("native wrappers on the web", () => {
     expect(chipText(true, 1, 2)).toBe("W1/2");
     // Android shows chip text only when it fits; under 7 characters always does.
     expect(chipText(true, 10, 12).length).toBeLessThan(7);
+  });
+});
+
+describe("rest time left on the Android Live Update", () => {
+  const app = join(__dirname, "../../android/app/src/main");
+  const service = readFileSync(join(app, "java/com/getliftsmith/app/WorkoutService.java"), "utf8");
+
+  it("says the time left in the text, the chip and a rest bar, beside the system countdown", () => {
+    const resting = service.slice(service.indexOf("if (resting) {\n            // The rest bar"));
+    expect(resting).toContain("b.setProgress(");
+    expect(resting).toContain("b.setShortCriticalText(left)");
+    expect(resting).toContain("setChronometerCountDown(true)");
+    expect(service).toContain("getString(R.string.rest_left_next, left, next)");
+  });
+
+  it("redraws once a second only while resting, and stops when rest ends or the workout does", () => {
+    expect(service).toMatch(/if \(resting\) scheduleTick\(restUntil\);/);
+    expect(service).toMatch(/restOver = \(\) -> \{\s+handler\.removeCallbacks\(restTick\);/);
+    expect(service.slice(service.indexOf("public void onDestroy()"))).toContain("handler.removeCallbacks(restTick);");
+  });
+
+  it("has the time-left text in every language, with both placeholders", () => {
+    for (const dir of ["values", "values-es", "values-fr", "values-de", "values-it", "values-ja"]) {
+      const xml = readFileSync(join(app, "res", dir, "strings.xml"), "utf8");
+      expect(xml, dir).toMatch(/name="rest_left">[^<]*%1\$s/);
+      expect(xml, dir).toMatch(/name="rest_left_next">[^<]*%1\$s[^<]*%2\$s/);
+    }
   });
 });

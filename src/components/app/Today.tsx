@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
+import { SCREEN_TITLE } from "@/components/titles";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
@@ -33,7 +34,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CALL_STYLE, muscleHue } from "./theme";
+import { CALL_STYLE, FEEL_HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { Button, Chip, EmptyState, LinkToggle, ProTag, Ring, Section } from "./ui";
 
@@ -69,9 +70,9 @@ function FeelCheckIn({ now }: { now: number }) {
   const { events, feel } = useApp();
   const said = todayFeel(events, now);
   const energies = [
-    { v: -1, key: "td.feelLow" },
-    { v: 0, key: "td.feelOk" },
-    { v: 1, key: "td.feelGreat" },
+    { v: -1, key: "td.feelLow", hue: FEEL_HUE.low },
+    { v: 0, key: "td.feelOk", hue: FEEL_HUE.ok },
+    { v: 1, key: "td.feelGreat", hue: FEEL_HUE.great },
   ] as const;
   return (
     <div className="mt-3" role="group" aria-labelledby="feel-title">
@@ -80,14 +81,14 @@ function FeelCheckIn({ now }: { now: number }) {
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
         {energies.map((e) => (
-          <Chip key={e.v} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
+          <Chip key={e.v} hue={e.hue} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
             {t(e.key)}
           </Chip>
         ))}
-        <Chip active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
+        <Chip hue={FEEL_HUE.sore} active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
           {t("td.feelSore")}
         </Chip>
-        <Chip active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
+        <Chip hue={FEEL_HUE.unwell} active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
           {t("td.feelUnwell")}
         </Chip>
       </div>
@@ -149,7 +150,7 @@ export function Today() {
             </button>
           </div>
         </div>
-        <h1 className="mt-1 text-[1.875rem] font-extrabold leading-tight tracking-tight">{t("td.title")}</h1>
+        <h1 className={`mt-1 ${SCREEN_TITLE}`}>{t("td.title")}</h1>
       </header>
 
       {active && (
@@ -232,15 +233,14 @@ export function Today() {
         <button
           type="button"
           onClick={() => go("injuries")}
-          className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
+          className={`press inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
         >
+          <Icon name="bandage" size={15} className={hurt.length ? "" : "text-ember"} />
           {hurt.length
             ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
             : t("today.somethingHurts")}
         </button>
       </div>
-
-      {profile.quotes !== false && <DailyQuote now={now} />}
 
       <TodayMoments />
 
@@ -311,13 +311,15 @@ export function Today() {
                   style={
                     on
                       ? {
-                          background: `color-mix(in srgb, ${hue} 22%, var(--color-surface))`,
-                          boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${hue} 55%, transparent)`,
+                          background: `color-mix(in srgb, ${hue} 30%, var(--color-surface))`,
+                          boxShadow: `inset 0 0 0 1.5px color-mix(in srgb, ${hue} 75%, transparent)`,
                         }
                       : undefined
                   }
                 >
-                  <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} className={on ? "" : "opacity-70"} />
+                  <span className="inline-flex" style={{ color: hue }}>
+                    <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} />
+                  </span>
                   {c === "recover" ? t("td.goEasy") : c === "normal" ? t("td.asPlanned") : t("td.push")}
                 </button>
               );
@@ -328,6 +330,8 @@ export function Today() {
           )}
         </section>
       )}
+
+      {profile.quotes !== false && <DailyQuote now={now} />}
 
       {!active && <CoachNotes limit={2} />}
       {!active && <SaveNudge />}
