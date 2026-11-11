@@ -16,7 +16,7 @@ export const en = {
   "body.meas.title": "Measurements",
   "body.meas.sites": "Body site",
   "body.meas.field": "{site} in {unit}",
-  "body.meas.log": "Log",
+  "body.meas.log": "Log {site}",
   "body.meas.range": "Enter a number between {min} and {max} {unit}.",
   "body.meas.change": "{change} {unit} since your first",
   "body.meas.none":
@@ -47,7 +47,7 @@ export const es: Partial<Record<Key, Message>> = {
   "body.meas.title": "Medidas",
   "body.meas.sites": "Zona del cuerpo",
   "body.meas.field": "{site} en {unit}",
-  "body.meas.log": "Registrar",
+  "body.meas.log": "Registrar {site}",
   "body.meas.range": "Escribe un número entre {min} y {max} {unit}.",
   "body.meas.change": "{change} {unit} desde la primera",
   "body.meas.none":
@@ -76,7 +76,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "body.meas.title": "Mensurations",
   "body.meas.sites": "Zone du corps",
   "body.meas.field": "{site} en {unit}",
-  "body.meas.log": "Enregistrer",
+  "body.meas.log": "Enregistrer : {site}",
   "body.meas.range": "Entrez un nombre entre {min} et {max} {unit}.",
   "body.meas.change": "{change} {unit} depuis la première",
   "body.meas.none":
@@ -105,7 +105,7 @@ export const de: Partial<Record<Key, Message>> = {
   "body.meas.title": "Körpermaße",
   "body.meas.sites": "Körperstelle",
   "body.meas.field": "{site} in {unit}",
-  "body.meas.log": "Eintragen",
+  "body.meas.log": "{site} eintragen",
   "body.meas.range": "Gib eine Zahl zwischen {min} und {max} {unit} ein.",
   "body.meas.change": "{change} {unit} seit der ersten Messung",
   "body.meas.none":
@@ -134,7 +134,7 @@ export const it: Partial<Record<Key, Message>> = {
   "body.meas.title": "Misure",
   "body.meas.sites": "Zona del corpo",
   "body.meas.field": "{site} in {unit}",
-  "body.meas.log": "Registra",
+  "body.meas.log": "Registra {site}",
   "body.meas.range": "Inserisci un numero tra {min} e {max} {unit}.",
   "body.meas.change": "{change} {unit} dalla prima",
   "body.meas.none":
@@ -163,7 +163,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "body.meas.title": "サイズ測定",
   "body.meas.sites": "測る部位",
   "body.meas.field": "{site}（{unit}）",
-  "body.meas.log": "記録",
+  "body.meas.log": "{site}を記録",
   "body.meas.range": "{min}〜{max} {unit} の数字を入力してください。",
   "body.meas.change": "初回から {change} {unit}",
   "body.meas.none":

@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 
-import { date, t } from "@/lib/i18n";
+import { date, inSentence, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { fromCm, lengthUnit, MEASURE_RANGE, MEASURE_START, measureSummary, toCm } from "@/lib/measure";
 import { useApp } from "@/lib/store";
@@ -74,7 +74,7 @@ export function Measurements() {
             max={max}
           />
           <Button onClick={save} disabled={value.trim() === ""}>
-            {t("body.meas.log")}
+            {t("body.meas.log", { site: inSentence(t(`body.meas.site.${site}`)) })}
           </Button>
         </div>
         {error && (
