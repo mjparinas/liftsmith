@@ -104,6 +104,7 @@ import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
 import * as train from "./text/train";
+import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
@@ -216,6 +217,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...ton.fr,
   ...tools.fr,
   ...train.fr,
+  ...trn.fr,
   ...twin.fr,
   ...units.fr,
   ...variety.fr,

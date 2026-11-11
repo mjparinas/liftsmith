@@ -48,6 +48,13 @@ export const FLAGS = {
     label: "Labs: camera form check",
     description: "Squat depth, short reps and a lean to one side, read by the camera while counting reps, with one tip between sets.",
   },
+  /** Labs: trainer mode, coaching clients (invite codes and client reports, src/lib/trainer.ts). Being a client is free. */
+  labTrainer: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: trainer mode",
+    description: "Coaches invite clients and see their workouts in Settings › Coaching. Being someone's client needs no lab.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

@@ -378,6 +378,21 @@ const SCHEMA = [
     image BLOB NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
+  // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
+  `CREATE TABLE IF NOT EXISTS coach_invites (
+    code TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_invites_coach ON coach_invites (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS coach_links (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_links_client ON coach_links (client_id)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,

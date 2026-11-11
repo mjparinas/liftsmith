@@ -201,6 +201,10 @@ try {
   await page.goto(`${server.url}/app/#/connections`);
   await page.getByRole("heading", { name: "Connected apps" }).waitFor();
   await scan("connections");
+  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against.
+  await page.goto(`${server.url}/app/#/trainer`);
+  await page.getByRole("heading", { name: "Coaching" }).waitFor();
+  await scan("trainer");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   // Every group page of Settings, and Labs (2026-11-10).

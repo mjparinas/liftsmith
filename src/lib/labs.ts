@@ -8,12 +8,12 @@ import { flag, setLocalFlag } from "./flags";
 // When a lab is ready, its flag and its entry here go, and the feature ships to whoever it belongs to.
 
 /** Flags that are labs: on or off switches. */
-export type LabFlag = "labRepCount" | "repMotion" | "labBarSpeed" | "labHrRest" | "labFormCheck";
+export type LabFlag = "labRepCount" | "repMotion" | "labBarSpeed" | "labHrRest" | "labTrainer" | "labFormCheck";
 
 export interface Lab {
   flag: LabFlag;
   /** Catalogue keys: `lab.<key>.title` and `lab.<key>.body`. */
-  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "formCheck";
+  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "trainer" | "formCheck";
   /** Another lab this one only works with. */
   needs?: LabFlag;
 }
@@ -24,7 +24,7 @@ export const LABS: readonly Lab[] = [
   { flag: "repMotion", key: "repMotion", needs: "labRepCount" },
   { flag: "labBarSpeed", key: "barSpeed", needs: "labRepCount" },
   { flag: "labHrRest", key: "hrRest" },
-  { flag: "labFormCheck", key: "formCheck", needs: "labRepCount" },
+  { flag: "labTrainer", key: "trainer" },
 ];
 
 /** Whether a lab is on for this lifter: Pro, and its flag on (and the lab it needs, if any). */

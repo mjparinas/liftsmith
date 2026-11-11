@@ -27,6 +27,7 @@ export const ROUTES = [
   "connections",
   "stretch",
   "routine",
+  "trainer",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 

@@ -1,0 +1,232 @@
+// Trainer mode (Melvin, 2026-11-11: "coaches build programs for clients and see client results"). A coach
+// makes an invite code; a client enters it, sees what the coach will see, and agrees. From then on the coach
+// can read the client's workouts from their synced account: sets, sessions, feedback and their own exercises,
+// with every field that isn't training taken out (heart rate, readiness, injuries, notes, gyms). Nothing
+// else in the event log ever leaves (health readings, body weight, measurements, cycle, pain, photos).
+// Either side can unlink at any time, which cuts access at once. Decision record: docs/decisions/trainer-mode.md.
+import { randomBytes } from "node:crypto";
+
+import { batch, query, rateLimit, run } from "./db";
+
+export const COACH_LIMITS = {
+  /** Clients per coach while trainer mode is a lab. */
+  clients: 30,
+  /** Coaches per client. */
+  coaches: 3,
+  /** An invite code lasts a week. */
+  inviteMs: 7 * 86_400_000,
+  /** Codes tried (preview or join) per account per hour, so codes can't be guessed. */
+  triesPerHour: 20,
+  /** How far back a coach sees. */
+  historyMs: 365 * 86_400_000,
+  /** Events sent to a coach at most, newest first. */
+  events: 30_000,
+};
+
+/** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
+const CODE_CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+export function newCode(bytes: Buffer = randomBytes(8)): string {
+  return [...bytes].map((b) => CODE_CHARS[b % CODE_CHARS.length]).join("");
+}
+/** A typed code, tidied: upper case, spaces and dashes gone. Empty when it can't be a code. */
+export function cleanCode(x: unknown): string {
+  if (typeof x !== "string") return "";
+  const c = x.toUpperCase().replace(/[\s-]/g, "");
+  return /^[2-9A-HJ-NP-Z]{8}$/.test(c) ? c : "";
+}
+export const isAccountId = (x: unknown): x is string => typeof x === "string" && /^[\w-]{1,80}$/.test(x);
+
+export interface Person {
+  id: string;
+  name: string;
+  since: number;
+}
+export interface Invite {
+  code: string;
+  expiresAt: number;
+}
+
+/** The name on someone's synced profile, or "" (the app then says "No name yet"). */
+async function nameOf(accountId: string): Promise<string> {
+  const [r] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [accountId]);
+  try {
+    const name = (JSON.parse(String(r?.body ?? "{}")) as { name?: unknown }).name;
+    return typeof name === "string" ? name.trim().slice(0, 60) : "";
+  } catch {
+    return "";
+  }
+}
+
+async function people(rows: { id: string; since: number }[]): Promise<Person[]> {
+  return Promise.all(rows.map(async (r) => ({ id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) })));
+}
+
+export async function overview(
+  accountId: string,
+  now = Date.now(),
+): Promise<{ invite: Invite | null; clients: Person[]; coaches: Person[] }> {
+  const [inv] = await query<{ code: string; expires_at: number }>(
+    "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
+    [accountId, now],
+  );
+  const clients = await query<{ id: string; since: number }>(
+    "SELECT client_id AS id, created_at AS since FROM coach_links WHERE coach_id = ? ORDER BY created_at",
+    [accountId],
+  );
+  const coaches = await query<{ id: string; since: number }>(
+    "SELECT coach_id AS id, created_at AS since FROM coach_links WHERE client_id = ? ORDER BY created_at",
+    [accountId],
+  );
+  return {
+    invite: inv ? { code: String(inv.code), expiresAt: Number(inv.expires_at) } : null,
+    clients: await people(clients),
+    coaches: await people(coaches),
+  };
+}
+
+/** A fresh invite code for this coach. The old one stops working. */
+export async function makeInvite(coachId: string, now = Date.now(), code = newCode()): Promise<Invite> {
+  const expiresAt = now + COACH_LIMITS.inviteMs;
+  await batch([
+    { sql: "DELETE FROM coach_invites WHERE coach_id = ? OR expires_at <= ?", args: [coachId, now] },
+    {
+      sql: "INSERT INTO coach_invites (code, coach_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
+      args: [code, coachId, now, expiresAt],
+    },
+  ]);
+  return { code, expiresAt };
+}
+
+export async function cancelInvite(coachId: string): Promise<void> {
+  await run("DELETE FROM coach_invites WHERE coach_id = ?", [coachId]);
+}
+
+export type JoinError = "slow" | "unknown" | "self" | "full" | "coachFull";
+
+/** Who a code belongs to, so the client can see whose it is before agreeing. Counts as a try. */
+export async function previewInvite(accountId: string, raw: unknown, now = Date.now()): Promise<{ coach: Person } | { error: JoinError }> {
+  if (!(await rateLimit(`coach:${accountId}`, COACH_LIMITS.triesPerHour, 3_600_000, now))) return { error: "slow" };
+  const code = cleanCode(raw);
+  if (!code) return { error: "unknown" };
+  const [inv] = await query<{ coach_id: string }>("SELECT coach_id FROM coach_invites WHERE code = ? AND expires_at > ?", [code, now]);
+  if (!inv) return { error: "unknown" };
+  const coachId = String(inv.coach_id);
+  if (coachId === accountId) return { error: "self" };
+  return { coach: { id: coachId, name: await nameOf(coachId), since: now } };
+}
+
+/** The client agrees: links them to the code's coach. Joining twice is fine. */
+export async function joinCoach(clientId: string, raw: unknown, now = Date.now()): Promise<{ coach: Person } | { error: JoinError }> {
+  const seen = await previewInvite(clientId, raw, now);
+  if ("error" in seen) return seen;
+  const coachId = seen.coach.id;
+  const [had] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ? AND client_id = ?", [
+    coachId,
+    clientId,
+  ]);
+  if (Number(had?.n ?? 0) > 0) return seen;
+  const [mine] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE client_id = ?", [clientId]);
+  if (Number(mine?.n ?? 0) >= COACH_LIMITS.coaches) return { error: "full" };
+  const [theirs] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ?", [coachId]);
+  if (Number(theirs?.n ?? 0) >= COACH_LIMITS.clients) return { error: "coachFull" };
+  await run("INSERT OR IGNORE INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", [coachId, clientId, now]);
+  return { coach: { ...seen.coach, since: now } };
+}
+
+/** Either side ends it: a coach drops a client, or a client leaves a coach. */
+export async function unlink(accountId: string, otherId: string): Promise<void> {
+  await run("DELETE FROM coach_links WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", [
+    accountId,
+    otherId,
+    otherId,
+    accountId,
+  ]);
+}
+
+export async function isClient(coachId: string, clientId: string): Promise<boolean> {
+  const [r] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+  return Number(r?.n ?? 0) > 0;
+}
+
+// What a coach may see of each event, field by field. Anything not listed never leaves the server.
+const KEEP: Record<string, readonly string[]> = {
+  set: [
+    "sessionId",
+    "exerciseId",
+    "weight",
+    "reps",
+    "targetReps",
+    "targetWeight",
+    "distanceM",
+    "rir",
+    "challenge",
+    "amrap",
+    "slot",
+    "superset",
+    "implements",
+    "repsL",
+    "repsR",
+    "tag",
+  ],
+  sessionStart: ["sessionId", "minutes", "source", "program", "routine", "challenge"],
+  sessionEnd: ["sessionId", "seconds", "workSec", "restSec", "auto"],
+  feedback: ["sessionId", "exerciseId", "rating"],
+  effort: ["setId", "rir"],
+  swap: ["sessionId", "from", "to"],
+  customExercise: ["exercise"],
+};
+export const COACH_TYPES = Object.keys(KEEP);
+
+/** The coach's copy of one event: only training fields, or null for anything a coach doesn't see. */
+export function forCoach(e: unknown): Record<string, unknown> | null {
+  if (!e || typeof e !== "object") return null;
+  const ev = e as Record<string, unknown>;
+  const keep = typeof ev.type === "string" ? KEEP[ev.type] : undefined;
+  if (!keep || typeof ev.id !== "string" || typeof ev.at !== "number") return null;
+  // A set done lighter for an injury says there's an injury; the coach sees the set, not why.
+  const out: Record<string, unknown> = { id: ev.id, at: ev.at, type: ev.type };
+  for (const k of keep) if (ev[k] !== undefined) out[k] = ev[k];
+  return out;
+}
+
+export interface ClientView {
+  name: string;
+  daysPerWeek: number | null;
+  events: Record<string, unknown>[];
+}
+
+/** A client's training for their coach, or null when they aren't this coach's client (any more). */
+export async function clientView(coachId: string, clientId: string, now = Date.now()): Promise<ClientView | null> {
+  if (!(await isClient(coachId, clientId))) return null;
+  const rows = await query<{ body: string }>(
+    `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND (at >= ? OR body LIKE '%"type":"customExercise"%')
+     ORDER BY at DESC LIMIT ?`,
+    [clientId, now - COACH_LIMITS.historyMs, COACH_LIMITS.events],
+  );
+  const events: Record<string, unknown>[] = [];
+  for (const r of rows) {
+    let e: unknown;
+    try {
+      e = JSON.parse(String(r.body));
+    } catch {
+      continue;
+    }
+    const kept = forCoach(e);
+    if (kept) events.push(kept);
+  }
+  const [p] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [clientId]);
+  let daysPerWeek: number | null = null;
+  try {
+    const d = (JSON.parse(String(p?.body ?? "{}")) as { daysPerWeek?: unknown }).daysPerWeek;
+    if (typeof d === "number" && d >= 1 && d <= 7) daysPerWeek = d;
+  } catch {
+    /* no profile yet */
+  }
+  return { name: await nameOf(clientId), daysPerWeek, events: events.reverse() };
+}
+
+/** Deleting an account: its invites and every link, as coach or client. */
+export const coachCleanup = (accountId: string) => [
+  { sql: "DELETE FROM coach_invites WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_links WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+];
