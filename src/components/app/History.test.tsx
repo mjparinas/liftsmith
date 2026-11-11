@@ -24,7 +24,9 @@ beforeEach(async () => {
   useApp.getState().setProfile({ onboarded: true, unit: "kg" });
   seed([
     ...makeWorkout("oct", at(9, 5), [{ exerciseId: "bench-press", weight: 50 }]),
-    ...makeWorkout("early", at(10, 10), [{ exerciseId: "barbell-row", weight: 60 }]),
+    ...makeWorkout("early", at(10, 10), [{ exerciseId: "barbell-row", weight: 60 }]).map((e) =>
+      e.type === "sessionStart" ? { ...e, program: { id: "ppl", day: 1 } } : e,
+    ),
     ...makeWorkout("late", at(10, 18), [
       { exerciseId: "back-squat", weight: 100, reps: 5 },
       { exerciseId: "bench-press", weight: 70, reps: 5 },
@@ -57,6 +59,8 @@ describe("history calendar", () => {
     render(<HistoryCalendar />);
     await user.click(screen.getByRole("button", { name: /November 10/ }));
     expect(within(screen.getByRole("article")).getByText("60 kg × 8 reps")).toBeInTheDocument();
+    // A program workout says which program and day it was; an adaptive one (the 18th) has no name.
+    expect(screen.getByTestId("workout-name")).toHaveTextContent(/ · Pull day$/);
   });
 
   it("goes back a month with the button or a swipe, and no further than the first workout", async () => {

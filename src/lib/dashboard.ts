@@ -136,6 +136,9 @@ export interface SessionDetail {
   sessionId: string;
   start: number;
   manual: boolean;
+  /** The program day or saved routine the workout came from, as recorded when it started. */
+  program?: { id: string; day: number };
+  routine?: string;
   exercises: { exerciseId: string; sets: SetEvent[] }[];
 }
 
@@ -151,7 +154,14 @@ export function sessionDetail(events: readonly AppEvent[], sessionId: string): S
     if (g && g.exerciseId === s.exerciseId) g.sets.push(s);
     else groups.push({ exerciseId: s.exerciseId, sets: [s] });
   }
-  return { sessionId, start: start?.at ?? sets[0].at, manual: start?.source === "manual", exercises: groups };
+  return {
+    sessionId,
+    start: start?.at ?? sets[0].at,
+    manual: start?.source === "manual",
+    program: start?.program,
+    routine: start?.routine,
+    exercises: groups,
+  };
 }
 
 /** Workouts, sets and volume for each of the last `weeks` weeks, oldest first. */

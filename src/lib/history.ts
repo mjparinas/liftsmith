@@ -1,6 +1,7 @@
 import { dayKey } from "./dashboard";
 import { dedupe, type Pr, type SessionSummary } from "./derive";
-import type { AppEvent, Exercise, Muscle } from "./types";
+import { programDayLabel } from "./programs";
+import type { AppEvent, Exercise, Muscle, Routine } from "./types";
 
 // Progress › History: the month calendar of past workouts (Melvin, 2026-11-11: "a calendar view of past
 // workouts … where we can review what we did"). Pure views over the event log, never stored (AGENTS.md).
@@ -63,4 +64,24 @@ export function prSetIds(events: readonly AppEvent[], prs: readonly Pr[]): Set<s
     if (e.type === "set" && keys.has(`${e.exerciseId}@${e.at}`)) out.add(e.id);
   }
   return out;
+}
+
+/**
+ * What a past workout was called, from what was recorded when it started: the saved routine's name, or the
+ * program and its day ("Classic 5×5 · Workout A", "Push/pull/legs · Pull day"). Null for an adaptive
+ * workout, or when the routine or program has since been removed.
+ */
+export function workoutName(
+  start: { program?: { id: string; day: number }; routine?: string },
+  routines: readonly Routine[] | undefined,
+): string | null {
+  if (start.routine) {
+    const r = routines?.find((x) => x.id === start.routine);
+    if (r) return r.name;
+  }
+  if (start.program) {
+    const p = programDayLabel(start.program.id, start.program.day);
+    if (p) return `${p.program} · ${p.day}`;
+  }
+  return null;
 }
