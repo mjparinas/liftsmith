@@ -3,6 +3,7 @@
 // alternatives share the exercise's card; a muscle page and its muscle + equipment pages share the
 // muscle's card, so about 450 cards cover all 800 pages. A page with no card of its own gets the default.
 import { ARTICLES } from "@/content/articles";
+import { BLOG_TOPICS, postsIn } from "@/content/blogTopics";
 import { COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { LANDINGS } from "@/content/landings";
@@ -34,6 +35,7 @@ export function ogFile(path: string): string {
   if (kind === "exercises" && EXERCISE_BY_ID.has(a)) return `exercises/${a}.jpg`;
   if (kind === "muscles") return `muscles/${a}.jpg`;
   if (kind === "equipment") return `equipment/${a}.jpg`;
+  if (kind === "blog" && a === "topic" && seg[2]) return `blog-topics/${seg[2]}.jpg`;
   if (kind === "blog" || kind === "guides") return `articles/${a}.jpg`;
   if (kind === "compare") return `compare/${a}.jpg`;
   if (kind === "tools") return `tools/${a}.jpg`;
@@ -83,6 +85,15 @@ export function ogCards(): OgCard[] {
       title: a.title,
       exercise: articleFigure(a.body),
     });
+  for (const t of BLOG_TOPICS) {
+    const first = postsIn(t)[0];
+    cards.push({
+      file: `blog-topics/${t.slug}.jpg`,
+      kicker: "Blog",
+      title: t.title.split(":")[0]!,
+      exercise: first ? articleFigure(first.body) : DEFAULT_FIGURE,
+    });
+  }
   for (const c of COMPETITORS)
     cards.push({ file: `compare/${c.slug}.jpg`, kicker: "Compare", title: `${BRAND.name} vs ${c.name}`, exercise: DEFAULT_FIGURE });
   cards.push({
