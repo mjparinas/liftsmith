@@ -3,7 +3,7 @@
 // Optional account: sign in to back up and sync (auth.ts, sync.ts). `AccountPanel` is the sign-in and status
 // block, used on the Account screen (#/account), in Settings and on the welcome screen before
 // setup ("I already have an account").
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
 import {
@@ -135,10 +135,17 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
       setError(message(e));
     }
   };
+  const canSend = !busy && email.includes("@");
+  const canVerify = !busy && (code.length === 6 || code.length >= 12);
+  // Real forms, so Enter in the email or code box sends it, like the button.
+  const onSubmit = (go: boolean, act: () => Promise<void>) => (e: FormEvent) => {
+    e.preventDefault();
+    if (go) void act();
+  };
   return (
     <div className="space-y-2">
       {!sent ? (
-        <>
+        <form className="space-y-2" onSubmit={onSubmit(canSend, send)}>
           <label htmlFor="acct-email" className="block text-sm text-muted">
             {t("account.email.label")}
           </label>
@@ -151,12 +158,12 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
             onChange={(e) => setEmail(e.target.value)}
             className="card w-full px-4 py-3"
           />
-          <Button className="w-full" disabled={busy || !email.includes("@")} onClick={() => void send()}>
+          <Button className="w-full" disabled={!canSend} submit>
             {t("account.email.send")}
           </Button>
-        </>
+        </form>
       ) : (
-        <>
+        <form className="space-y-2" onSubmit={onSubmit(canVerify, verify)}>
           <p className="text-sm text-muted">{t("account.email.sent", { email: email.trim() })}</p>
           <label htmlFor="acct-code" className="block text-sm text-muted">
             {t("account.email.code")}
@@ -172,7 +179,7 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
             onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 16))}
             className={`card display w-full px-4 py-3 text-center ${code.length > 6 ? "text-xl tracking-wider" : "text-2xl tracking-[0.4em]"}`}
           />
-          <Button className="w-full" disabled={busy || !(code.length === 6 || code.length >= 12)} onClick={() => void verify()}>
+          <Button className="w-full" disabled={!canVerify} submit>
             {t("account.email.verify")}
           </Button>
           <Button
@@ -185,7 +192,7 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
           >
             {t("account.email.again")}
           </Button>
-        </>
+        </form>
       )}
       {error && (
         <p role="alert" className="text-sm text-bad">

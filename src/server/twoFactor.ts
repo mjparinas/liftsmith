@@ -27,8 +27,26 @@ export async function twoFactorState(email: string): Promise<TwoFactorState> {
 /** Whether a session has passed every step: the code if the address has two-step on, else whatever the mode allows. */
 export const passedSecondStep = (enabled: boolean, stepAt: number | null) => (enabled ? stepAt != null : twoFactorMode() === "optional");
 
-/** Starts (or restarts) setup: a fresh secret that only counts once a code from it is confirmed. */
-export async function startEnrolment(email: string): Promise<{ secret: string; uri: string }> {
+/**
+ * Starts setup: a secret that only counts once a code from it is confirmed. A setup that was started but never
+ * confirmed carries on with the same secret, so the entry already scanned into the authenticator app keeps
+ * working at the next sign-in; `restart` ("Start over") makes a fresh one.
+ */
+export async function startEnrolment(email: string, restart = false): Promise<{ secret: string; uri: string }> {
+  if (!restart) {
+    const rows = await query<{ pending: string | null }>("SELECT pending FROM admin_two_factor WHERE email = ? AND enabled_at IS NULL", [
+      email,
+    ]);
+    const pending = rows[0]?.pending;
+    if (pending) {
+      try {
+        const secret = openSecret(pending);
+        return { secret, uri: otpauthUri(secret, email, "Liftsmith admin") };
+      } catch {
+        // Sealed with another TWO_FACTOR_KEY: start again below.
+      }
+    }
+  }
   const secret = newSecret();
   await run(
     `INSERT INTO admin_two_factor (email, pending) VALUES (?, ?)

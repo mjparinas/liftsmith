@@ -3,7 +3,7 @@
 // Two-step sign-in for the admin panel (ported from Gradelings' TwoFactor.tsx; src/server/twoFactor.ts): the
 // screen staff see after the emailed link until they pass the second step (set it up, or enter the code), and
 // the card on the System tab for recovery codes, turning it off and, for admins, resetting someone else's.
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { QrCode } from "./QrCode";
 
@@ -21,6 +21,12 @@ export interface TwoFactorInfo {
 const primary = "press rounded-lg bg-accent px-4 py-2 font-semibold text-accent-ink disabled:opacity-50";
 const quiet = "press rounded-lg border border-line px-4 py-2 disabled:opacity-50";
 const field = "card mt-1 w-full px-3 py-2 font-mono tracking-widest";
+
+/** A form's onSubmit that runs `act` instead of reloading the page, so Enter in a code box submits it. */
+const submitWith = (act: () => Promise<void>) => (e: FormEvent) => {
+  e.preventDefault();
+  void act();
+};
 
 async function post(
   body: Record<string, unknown>,
@@ -102,8 +108,9 @@ function Setup({ onCodes }: { onCodes: (codes: string[]) => void }) {
   const [pending, setPending] = useState<{ secret: string; uri: string } | null>(null);
   const [code, setCode] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
-  const start = async () => {
-    const j = await post({ action: "start" });
+  // Carries on with a setup started before (the entry already in the app still works); "Start over" makes a new one.
+  const start = async (restart = false) => {
+    const j = await post({ action: "start", restart });
     if (j.error || !j.secret || !j.uri) return setMsg(j.error ?? "That didn't work.");
     setPending({ secret: j.secret, uri: j.uri });
     setMsg(null);
@@ -130,21 +137,24 @@ function Setup({ onCodes }: { onCodes: (codes: string[]) => void }) {
     <div className="space-y-3">
       <p className="text-sm">
         Scan this with an authenticator app (Google Authenticator, 1Password, Authy and others), then enter the 6-digit code it shows.
+        Already added it? Enter the code from its “Liftsmith admin” entry.
       </p>
       <QrCode text={pending.uri} label="QR code for your authenticator app" className="size-48 rounded-lg" />
       <p className="text-xs text-muted">
         Can&apos;t scan? Enter this key instead:{" "}
         <span className="font-mono break-all text-ink">{pending.secret.match(/.{1,4}/g)?.join(" ")}</span>
       </p>
-      <CodeField id="tf-confirm" value={code} set={setCode} label="Code from the app" />
-      <div className="flex flex-wrap gap-2">
-        <button type="button" className={primary} onClick={() => void confirm()}>
-          Turn on two-step sign-in
-        </button>
-        <button type="button" className={quiet} onClick={() => void start()}>
-          Start over
-        </button>
-      </div>
+      <form className="space-y-3" onSubmit={submitWith(confirm)}>
+        <CodeField id="tf-confirm" value={code} set={setCode} label="Code from the app" />
+        <div className="flex flex-wrap gap-2">
+          <button type="submit" className={primary}>
+            Turn on two-step sign-in
+          </button>
+          <button type="button" className={quiet} onClick={() => void start(true)}>
+            Start over
+          </button>
+        </div>
+      </form>
       {msg && (
         <p role="status" className="text-sm text-bad">
           {msg}
@@ -177,10 +187,10 @@ export function TwoFactorGate({ info }: { info: TwoFactorInfo }) {
         {codes ? (
           <RecoveryCodes codes={codes} onDone={done} />
         ) : info.enabled ? (
-          <div className="space-y-3">
+          <form className="space-y-3" onSubmit={submitWith(verify)}>
             <p className="text-sm">Enter the 6-digit code from your authenticator app, or one of your recovery codes.</p>
             <CodeField id="tf-verify" value={code} set={setCode} label="Code" />
-            <button type="button" className={primary} onClick={() => void verify()}>
+            <button type="submit" className={primary}>
               Continue
             </button>
             {msg && (
@@ -191,7 +201,7 @@ export function TwoFactorGate({ info }: { info: TwoFactorInfo }) {
             <p className="text-xs text-muted">
               Lost your phone and your recovery codes? Another admin can reset two-step for you on the System tab.
             </p>
-          </div>
+          </form>
         ) : (
           <div className="space-y-3">
             <p className="text-sm">

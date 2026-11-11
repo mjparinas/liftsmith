@@ -1,6 +1,6 @@
 // Two-step sign-in for the signed-in staff member (src/server/twoFactor.ts). Reachable before the second step is
 // passed, since someone who hasn't set it up has no code yet; the rest of the panel is not.
-// GET: the state. POST {action}: "start" (a new secret and QR link), "confirm" {code} (turns it on, returns the
+// GET: the state. POST {action}: "start" {restart?} (the QR link: the unconfirmed one if setup was started before, else or with restart a new one), "confirm" {code} (turns it on, returns the
 // recovery codes once), "verify" {code} (passes the second step for this sign-in), "regenerate" {code} (new
 // recovery codes), "disable" {code}, and for admins "reset" {email} (for someone who lost their phone and codes).
 import { audit, getStaffSession, json, notFound, roleOf, sameOrigin } from "@/server/adminAuth";
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
   if (action === "start") {
     if (s.twoFactor) return json(409, { error: "Two-step sign-in is already on." });
-    return json(200, await startEnrolment(s.email));
+    return json(200, await startEnrolment(s.email, body?.restart === true));
   }
 
   if (action === "confirm") {
