@@ -6,7 +6,7 @@ import { weeklySets } from "./generator";
 import { date, inSentence, list, t } from "./i18n";
 import { fromCm, lengthUnit, measuresOf } from "./measure";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
-import { epley, sessionsOf, TIMED } from "./progression";
+import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -149,7 +149,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
   const lastThree = recent.slice(0, 3);
   if (lastThree.length === 3 && now - lastThree[2].at < 3 * WEEK) {
     const rates = lastThree.map((s) => {
-      const real = s.sets.filter((x) => !x.challenge);
+      const real = s.sets.filter(gradedSet);
       return real.length ? real.filter((x) => x.reps >= x.targetReps).length / real.length : 1;
     });
     if (rates.every((r) => r < 0.7)) {

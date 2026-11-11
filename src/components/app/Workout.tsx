@@ -38,7 +38,7 @@ import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, 
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
-import { clock, loadText, plateText, repsText } from "./format";
+import { clock, loadText, plateText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
@@ -215,7 +215,10 @@ export function Workout() {
       if (!late) sound.restEnd(alert.sound);
       if (alert.vibrate && !late) haptic("thud", true);
       if (!late || !isVisible())
-        void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
+        void restOverAlert(
+          ex ? `${ex.name}, ${setText(ex, active.weight, active.reps, profile.unit, active.distanceM)}` : t("wk.nextSet"),
+          alert,
+        );
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -230,9 +233,9 @@ export function Workout() {
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
     void updateSession({
-      title: resting ? `Rest · ${ex.name}` : ex.name,
+      title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel,
-      next: `${loadText(ex, active.weight, profile.unit)} × ${repsText(ex, active.reps)}`,
+      next: setText(ex, active.weight, active.reps, profile.unit, active.distanceM),
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,

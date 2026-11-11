@@ -4,6 +4,7 @@ import { blockWeek } from "./block";
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
 import { pairBody } from "./health";
+import { t } from "./i18n";
 import { insights, stalls } from "./insights";
 import { readiness } from "./readiness";
 import type { AppEvent, Profile, SetEvent } from "./types";
@@ -145,6 +146,23 @@ describe("insights: coach's notes", () => {
     expect(note.title).toBe("Fatigue is building up");
     expect(note.tone).toBe("warn");
     expect(note.action?.kind).toBe("deload");
+  });
+
+  it("doesn't read bonus sets or shorter cardio as missed reps", () => {
+    const p = { ...base, blockStart: NOW - 2 * W - D };
+    // Every planned set hit; each workout ends with rest-pause and drop sets (fewer reps by design) and a
+    // run shorter than last time's.
+    const extras = (at: number, id: string): AppEvent[] => [
+      ...session(at, id, {}, 2),
+      set(at + 5000, id, { reps: 2, tag: "restPause" }),
+      set(at + 6000, id, { weight: 75, reps: 3, tag: "drop" }),
+      set(at + 7000, id, { reps: 3, tag: "drop" }),
+      set(at + 8000, id, { exerciseId: "treadmill-run", weight: 0, reps: 900, targetReps: 1200 }),
+      set(at + 9000, id, { exerciseId: "treadmill-run", weight: 0, reps: 900, targetReps: 1200 }),
+    ];
+    const ev = [...extras(NOW - 5 * D, "a"), ...extras(NOW - 3 * D, "b"), ...extras(NOW - D, "c")];
+    expect(insights({ events: ev, profile: p, now: NOW }).find((x) => x.id.startsWith("missed-"))).toBeUndefined();
+    expect(readiness(ev, p, NOW).signals.map((x) => x.text)).not.toContain(t("sig.missed"));
   });
 
   it("folds stalled lifts into the fatigue note instead of offering a second deload", () => {

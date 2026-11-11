@@ -31,6 +31,15 @@ export const TIMED = new Set([
   ...EXERCISES.filter((e) => e.cardio).map((e) => e.id),
 ]);
 
+/**
+ * A set that says whether the lifter hit the plan: a planned set, not a bonus drop or rest-pause set (those
+ * aim below the plan's reps by design) and not cardio (its "target" is only last time's, to repeat or beat).
+ * Readiness, coach's notes, quests and achievements count hit or missed reps on these only.
+ */
+export function gradedSet(s: Pick<SetEvent, "exerciseId" | "tag" | "challenge">): boolean {
+  return !s.tag && !s.challenge && !EXERCISE_BY_ID.get(s.exerciseId)?.cardio;
+}
+
 /** A first cardio session's time (seconds), and its range. */
 export const CARDIO_START_SEC = 20 * 60;
 

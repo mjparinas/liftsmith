@@ -1,6 +1,7 @@
 import { blockWeek } from "./block";
 import { cycleSignal, cycleState } from "./cycle";
 import { t } from "./i18n";
+import { gradedSet } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import { recovery } from "./recovery";
 import type { AppEvent, FeelEvent, Muscle, Profile, SessionEndEvent, SetEvent } from "./types";
@@ -131,7 +132,7 @@ export function readiness(events: readonly AppEvent[], profile: Profile, now: nu
   const lastTwo = sessions
     .slice(0, 2)
     .flatMap((s) => s.sets)
-    .filter((s) => !s.challenge);
+    .filter(gradedSet);
   if (lastTwo.length >= 4) {
     const hit = lastTwo.filter((s) => s.reps >= s.targetReps).length / lastTwo.length;
     if (hit >= 0.95) add(12, t("sig.hitAll"));
