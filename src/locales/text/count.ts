@@ -22,6 +22,15 @@ export const en = {
     other: "You leaned about {deg}° to your right on {hit} of {count} reps. Keep your weight even on both feet and your chest square.",
   },
   "count.form.good": { one: "Form check: nothing to fix on that rep.", other: "Form check: nothing to fix on those {count} reps." },
+  "count.max.own": {
+    one: "Measured against your own end-of-set speed for this lift, {speed} m/s, learned from {count} set you took to failure.",
+    other: "Measured against your own end-of-set speed for this lift, {speed} m/s, learned from {count} sets you took to failure.",
+  },
+  "count.max.book": {
+    one: "Measured against the usual end-of-set speed for this lift, {speed} m/s. Take {count} more set to failure while the camera counts and it learns your own.",
+    other:
+      "Measured against the usual end-of-set speed for this lift, {speed} m/s. Take {count} more sets to failure while the camera counts and it learns your own.",
+  },
   "count.max.title": "Warm-up speed",
   "count.max.up":
     "Your warm-ups moved fast: today's max looks like about {max}, {pct}% above what the plan expects. Try {weight} for your working sets.",
@@ -87,6 +96,16 @@ export const es: Partial<Record<Key, Message>> = {
     one: "Revisión de técnica: nada que corregir en esa repetición.",
     other: "Revisión de técnica: nada que corregir en esas {count} repeticiones.",
   },
+  "count.max.own": {
+    one: "Comparado con tu propia velocidad de final de serie en este ejercicio, {speed} m/s, aprendida de {count} serie que llevaste al fallo.",
+    other:
+      "Comparado con tu propia velocidad de final de serie en este ejercicio, {speed} m/s, aprendida de {count} series que llevaste al fallo.",
+  },
+  "count.max.book": {
+    one: "Comparado con la velocidad habitual de final de serie en este ejercicio, {speed} m/s. Lleva {count} serie más al fallo mientras cuenta la cámara y aprenderá la tuya.",
+    other:
+      "Comparado con la velocidad habitual de final de serie en este ejercicio, {speed} m/s. Lleva {count} series más al fallo mientras cuenta la cámara y aprenderá la tuya.",
+  },
   "count.max.title": "Velocidad del calentamiento",
   "count.max.up":
     "Tu calentamiento fue rápido: tu máximo de hoy ronda {max}, un {pct} % más de lo que espera el plan. Prueba {weight} en las series de trabajo.",
@@ -150,6 +169,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "count.form.good": {
     one: "Contrôle de la technique : rien à corriger sur cette répétition.",
     other: "Contrôle de la technique : rien à corriger sur ces {count} répétitions.",
+  },
+  "count.max.own": {
+    one: "Comparé à votre propre vitesse de fin de série sur cet exercice, {speed} m/s, apprise de {count} série menée à l'échec.",
+    other: "Comparé à votre propre vitesse de fin de série sur cet exercice, {speed} m/s, apprise de {count} séries menées à l'échec.",
+  },
+  "count.max.book": {
+    one: "Comparé à la vitesse habituelle de fin de série sur cet exercice, {speed} m/s. Menez encore {count} série à l'échec pendant que la caméra compte, et elle apprendra la vôtre.",
+    other:
+      "Comparé à la vitesse habituelle de fin de série sur cet exercice, {speed} m/s. Menez encore {count} séries à l'échec pendant que la caméra compte, et elle apprendra la vôtre.",
   },
   "count.max.title": "Vitesse de l'échauffement",
   "count.max.up":
@@ -215,6 +243,15 @@ export const de: Partial<Record<Key, Message>> = {
     one: "Technik-Check: an dieser Wiederholung gibt es nichts zu verbessern.",
     other: "Technik-Check: an diesen {count} Wiederholungen gibt es nichts zu verbessern.",
   },
+  "count.max.own": {
+    one: "Gemessen an deinem eigenen Tempo am Satzende bei dieser Übung, {speed} m/s, gelernt aus {count} Satz bis zum Muskelversagen.",
+    other: "Gemessen an deinem eigenen Tempo am Satzende bei dieser Übung, {speed} m/s, gelernt aus {count} Sätzen bis zum Muskelversagen.",
+  },
+  "count.max.book": {
+    one: "Gemessen am üblichen Tempo am Satzende bei dieser Übung, {speed} m/s. Geh noch {count} Satz bis zum Muskelversagen, während die Kamera zählt, dann lernt sie dein eigenes.",
+    other:
+      "Gemessen am üblichen Tempo am Satzende bei dieser Übung, {speed} m/s. Geh noch {count} Sätze bis zum Muskelversagen, während die Kamera zählt, dann lernt sie dein eigenes.",
+  },
   "count.max.title": "Tempo beim Aufwärmen",
   "count.max.up":
     "Dein Aufwärmen ging schnell: Dein Maximum liegt heute bei etwa {max}, {pct} % über dem, was der Plan erwartet. Versuch {weight} für deine Arbeitssätze.",
@@ -279,6 +316,15 @@ export const it: Partial<Record<Key, Message>> = {
     one: "Controllo della tecnica: niente da correggere in quella ripetizione.",
     other: "Controllo della tecnica: niente da correggere in quelle {count} ripetizioni.",
   },
+  "count.max.own": {
+    one: "Confrontato con la tua velocità di fine serie in questo esercizio, {speed} m/s, imparata da {count} serie portata a cedimento.",
+    other: "Confrontato con la tua velocità di fine serie in questo esercizio, {speed} m/s, imparata da {count} serie portate a cedimento.",
+  },
+  "count.max.book": {
+    one: "Confrontato con la velocità di fine serie abituale in questo esercizio, {speed} m/s. Porta a cedimento ancora {count} serie mentre la fotocamera conta e imparerà la tua.",
+    other:
+      "Confrontato con la velocità di fine serie abituale in questo esercizio, {speed} m/s. Porta a cedimento ancora {count} serie mentre la fotocamera conta e imparerà la tua.",
+  },
   "count.max.title": "Velocità del riscaldamento",
   "count.max.up":
     "Il riscaldamento è andato veloce: il massimale di oggi è circa {max}, il {pct}% sopra quanto prevede il piano. Prova {weight} per le serie allenanti.",
@@ -333,6 +379,13 @@ export const ja: Partial<Record<Key, Message>> = {
     other: "{count} レップ中 {hit} レップで右に約 {deg}° 傾いていました。両足に均等に体重を乗せ、胸を正面に向けましょう。",
   },
   "count.form.good": { other: "フォームチェック：この {count} レップに直すところはありません。" },
+  "count.max.own": {
+    other: "この種目でのあなた自身のセット終盤スピード {speed} m/s を基準にしています（限界まで行った {count} セットから学習）。",
+  },
+  "count.max.book": {
+    other:
+      "この種目の一般的なセット終盤スピード {speed} m/s を基準にしています。カメラでカウントしながらあと {count} セット限界まで行うと、あなた自身の値を学習します。",
+  },
   "count.max.title": "ウォームアップのスピード",
   "count.max.up":
     "ウォームアップのバーが速く動いています。今日の最大重量は約 {max} で、プランの想定より {pct}% 上です。メインセットは {weight} を試してみましょう。",
