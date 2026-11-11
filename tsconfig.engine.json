@@ -39,6 +39,7 @@
     "src/lib/sides.ts",
     "src/lib/strength.ts",
     "src/lib/stretches.ts",
+    "src/lib/tempo.ts",
     "src/lib/superset.ts",
     "src/lib/units.ts",
     "src/lib/warmup.ts",
