@@ -113,6 +113,7 @@ export function AutoCount({
   counting,
   setKey,
   onCount,
+  onSummary,
   onClose,
   paused,
 }: {
@@ -129,6 +130,8 @@ export function AutoCount({
   counting: boolean;
   setKey: string;
   onCount: (reps: number) => void;
+  /** Each time the set's full reps change: the tracker's summary (warm-up speeds for today's max). */
+  onSummary?: (s: SetSummary) => void;
   onClose: () => void;
   paused?: boolean;
 }) {
@@ -152,9 +155,9 @@ export function AutoCount({
     return calm() ? r : (r * (1 - Math.cos(((performance.now() % 2400) / 2400) * 2 * Math.PI))) / 2;
   }, []);
   // Read inside the frame loop, so the loop never restarts when they change.
-  const live = useRef({ counting, onCount });
+  const live = useRef({ counting, onCount, onSummary });
   useEffect(() => {
-    live.current = { counting, onCount };
+    live.current = { counting, onCount, onSummary };
   });
   const reset = useRef<() => void>(() => {});
 
@@ -170,6 +173,12 @@ export function AutoCount({
     let base = 0; // reps from earlier parts of this set, when the tracker ended itself after a long pause
     let last = -1;
     let lastSpeed = "";
+    let lastFull = -1;
+    const summarised = (sum: SetSummary) => {
+      if (sum.full === lastFull) return;
+      lastFull = sum.full;
+      live.current.onSummary?.(sum);
+    };
     // Bar speed (its lab): set only when a new rep changes it, so frames don't re-render the stage.
     const showSpeed = (sum: SetSummary) => {
       if (!speedOn) return;
@@ -229,6 +238,7 @@ export function AutoCount({
         last = -1;
         setCount(0);
         clearSpeed();
+        lastFull = -1;
       };
       let raf = 0;
       let lastT = -1;
@@ -285,6 +295,7 @@ export function AutoCount({
           const sum = tracker.summary();
           report(base + sum.full);
           showSpeed(sum);
+          summarised(sum);
         };
         raf = requestAnimationFrame(loop);
       })();
@@ -296,6 +307,7 @@ export function AutoCount({
         last = -1;
         setCount(0);
         clearSpeed();
+        lastFull = -1;
       };
       startMotion((r) => {
         if (!live.current.counting) return;
@@ -309,6 +321,7 @@ export function AutoCount({
         const sum = counter.summary();
         report(base + sum.full);
         showSpeed(sum);
+        summarised(sum);
       }).then((off) => {
         if (stopped) off();
         else {

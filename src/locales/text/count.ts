@@ -22,6 +22,14 @@ export const en = {
     other: "You leaned about {deg}° to your right on {hit} of {count} reps. Keep your weight even on both feet and your chest square.",
   },
   "count.form.good": { one: "Form check: nothing to fix on that rep.", other: "Form check: nothing to fix on those {count} reps." },
+  "count.max.title": "Warm-up speed",
+  "count.max.up":
+    "Your warm-ups moved fast: today's max looks like about {max}, {pct}% above what the plan expects. Try {weight} for your working sets.",
+  "count.max.down":
+    "Your warm-ups moved slowly: today's max looks like about {max}, {pct}% below what the plan expects. Try {weight} for your working sets.",
+  "count.max.hold": "Your warm-ups moved as expected: today's max looks like about {max}. Stay with {weight}.",
+  "count.max.use": "Use {weight}",
+  "count.max.used": "Working weight set to {weight}.",
   "count.speed.label": "Bar speed",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "{pct}% of best",
@@ -77,6 +85,14 @@ export const es: Partial<Record<Key, Message>> = {
     one: "Revisión de técnica: nada que corregir en esa repetición.",
     other: "Revisión de técnica: nada que corregir en esas {count} repeticiones.",
   },
+  "count.max.title": "Velocidad del calentamiento",
+  "count.max.up":
+    "Tu calentamiento fue rápido: tu máximo de hoy ronda {max}, un {pct} % más de lo que espera el plan. Prueba {weight} en las series de trabajo.",
+  "count.max.down":
+    "Tu calentamiento fue lento: tu máximo de hoy ronda {max}, un {pct} % menos de lo que espera el plan. Prueba {weight} en las series de trabajo.",
+  "count.max.hold": "Tu calentamiento fue como se esperaba: tu máximo de hoy ronda {max}. Sigue con {weight}.",
+  "count.max.use": "Usar {weight}",
+  "count.max.used": "Peso de trabajo cambiado a {weight}.",
   "count.speed.label": "Velocidad",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "{pct} % del mejor",
@@ -131,6 +147,14 @@ export const fr: Partial<Record<Key, Message>> = {
     one: "Contrôle de la technique : rien à corriger sur cette répétition.",
     other: "Contrôle de la technique : rien à corriger sur ces {count} répétitions.",
   },
+  "count.max.title": "Vitesse de l'échauffement",
+  "count.max.up":
+    "Votre échauffement est allé vite : votre max du jour tourne autour de {max}, {pct} % au-dessus de ce que prévoit le plan. Essayez {weight} pour vos séries de travail.",
+  "count.max.down":
+    "Votre échauffement est allé lentement : votre max du jour tourne autour de {max}, {pct} % en dessous de ce que prévoit le plan. Essayez {weight} pour vos séries de travail.",
+  "count.max.hold": "Votre échauffement est allé comme prévu : votre max du jour tourne autour de {max}. Restez à {weight}.",
+  "count.max.use": "Passer à {weight}",
+  "count.max.used": "Charge de travail réglée sur {weight}.",
   "count.speed.label": "Vitesse",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "{pct} % du meilleur",
@@ -185,6 +209,14 @@ export const de: Partial<Record<Key, Message>> = {
     one: "Technik-Check: an dieser Wiederholung gibt es nichts zu verbessern.",
     other: "Technik-Check: an diesen {count} Wiederholungen gibt es nichts zu verbessern.",
   },
+  "count.max.title": "Tempo beim Aufwärmen",
+  "count.max.up":
+    "Dein Aufwärmen ging schnell: Dein Maximum liegt heute bei etwa {max}, {pct} % über dem, was der Plan erwartet. Versuch {weight} für deine Arbeitssätze.",
+  "count.max.down":
+    "Dein Aufwärmen ging langsam: Dein Maximum liegt heute bei etwa {max}, {pct} % unter dem, was der Plan erwartet. Versuch {weight} für deine Arbeitssätze.",
+  "count.max.hold": "Dein Aufwärmen lief wie erwartet: Dein Maximum liegt heute bei etwa {max}. Bleib bei {weight}.",
+  "count.max.use": "{weight} nehmen",
+  "count.max.used": "Arbeitsgewicht auf {weight} gesetzt.",
   "count.speed.label": "Tempo",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "{pct} % vom besten",
@@ -239,6 +271,14 @@ export const it: Partial<Record<Key, Message>> = {
     one: "Controllo della tecnica: niente da correggere in quella ripetizione.",
     other: "Controllo della tecnica: niente da correggere in quelle {count} ripetizioni.",
   },
+  "count.max.title": "Velocità del riscaldamento",
+  "count.max.up":
+    "Il riscaldamento è andato veloce: il massimale di oggi è circa {max}, il {pct}% sopra quanto prevede il piano. Prova {weight} per le serie allenanti.",
+  "count.max.down":
+    "Il riscaldamento è andato lento: il massimale di oggi è circa {max}, il {pct}% sotto quanto prevede il piano. Prova {weight} per le serie allenanti.",
+  "count.max.hold": "Il riscaldamento è andato come previsto: il massimale di oggi è circa {max}. Resta su {weight}.",
+  "count.max.use": "Usa {weight}",
+  "count.max.used": "Carico di lavoro impostato su {weight}.",
   "count.speed.label": "Velocità",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "{pct}% del migliore",
@@ -283,6 +323,14 @@ export const ja: Partial<Record<Key, Message>> = {
     other: "{count} レップ中 {hit} レップで右に約 {deg}° 傾いていました。両足に均等に体重を乗せ、胸を正面に向けましょう。",
   },
   "count.form.good": { other: "フォームチェック：この {count} レップに直すところはありません。" },
+  "count.max.title": "ウォームアップのスピード",
+  "count.max.up":
+    "ウォームアップのバーが速く動いています。今日の最大重量は約 {max} で、プランの想定より {pct}% 上です。メインセットは {weight} を試してみましょう。",
+  "count.max.down":
+    "ウォームアップのバーがゆっくりです。今日の最大重量は約 {max} で、プランの想定より {pct}% 下です。メインセットは {weight} を試してみましょう。",
+  "count.max.hold": "ウォームアップは想定どおりです。今日の最大重量は約 {max}。{weight} のままで進めましょう。",
+  "count.max.use": "{weight} にする",
+  "count.max.used": "メイン重量を {weight} にしました。",
   "count.speed.label": "バースピード",
   "count.speed.ms": "{speed} m/s",
   "count.speed.pct": "最速の {pct}%",
