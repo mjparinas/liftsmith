@@ -7,15 +7,21 @@
 // configured. Until then (every build today, the web app, tests) everyone has Pro and no price is shown,
 // because a price with nothing to buy behind it breaks store review and misleads (AGENTS.md "Money").
 //
+// On the web app (Melvin, 2026-11-11) Pro is sold through Stripe instead: billing is live there once the server has
+// Stripe set up (GET /api/billing/stripe/ says so), a plan button opens Stripe Checkout for the signed-in account,
+// and Pro comes from the account (auth.ts accountPro), which also carries a phone's store subscription and lifetime
+// codes. The web needs an account to buy, so Pro follows the lifter to every device ("Pro on the web" in money.md).
+//
 // The last answer is cached in localStorage, so Pro works offline and the first paint after a restart is
 // right before the SDK answers. The RevenueCat user id is the analytics install id (a random id, never an
 // advertising id), so store server notifications land on the same install in the admin panel.
 import { create } from "zustand";
 
-import { installId, platformStore, track } from "./analytics";
-import { accountPro } from "./auth";
-import { activeCode, activeOffering, creatorHooks } from "./creator";
+import { canSend, installId, platformStore, track } from "./analytics";
+import { accountPro, api, AuthError, readAccount, refreshAccountPro, useAccount, type AccountSub } from "./auth";
+import { activeCode, activeOffering, codeTrialDays, creatorHooks } from "./creator";
 import { flag } from "./flags";
+import { currentTag } from "./i18n";
 import { isNative } from "./juice";
 import type { ProState } from "./messages";
 import type { Plan } from "./trial";
@@ -198,7 +204,8 @@ function setEnt(ent: Entitlement | null) {
 
 /** Starts billing on a native app built with a RevenueCat key. Safe to call more than once. */
 export async function startBilling(): Promise<void> {
-  if (started || !isNative()) return;
+  if (!isNative()) return startWebBilling();
+  if (started) return;
   const key = apiKey();
   if (!key) return;
   started = true;
@@ -235,6 +242,10 @@ async function tagCreator(code: string | null): Promise<void> {
 
 // When a code is checked or removed, the attribute and the offers follow.
 creatorHooks.onChecked = (code) => {
+  if (webStarted) {
+    void loadWebOffers().catch(() => {});
+    return;
+  }
   void tagCreator(code)
     .then(() => loadOffers())
     .catch(() => {});
@@ -275,6 +286,15 @@ export function freeDaysOf(o: { freePhase: { billingPeriod: { unit: string; valu
 
 /** The paywall's "Try again": starts the SDK again if it never came up, otherwise reloads the plans. */
 export async function retryBilling(): Promise<void> {
+  if (!isNative()) {
+    if (!webStarted) return startWebBilling();
+    try {
+      await loadWebOffers();
+    } catch (e) {
+      useBilling.setState({ error: errorText(e) });
+    }
+    return;
+  }
   if (!sdk) return startBilling();
   try {
     await loadOffers();
@@ -332,10 +352,12 @@ export async function loadOffers(): Promise<Offer[] | null> {
   return offers;
 }
 
-export type BuyResult = "ok" | "cancelled" | "error";
+/** ok: Pro now. redirect: off to Stripe Checkout (web). signIn: the web needs an account first. already: the account has Pro. */
+export type BuyResult = "ok" | "cancelled" | "error" | "redirect" | "signIn" | "already";
 
-/** Opens the store's own purchase sheet for a plan. */
+/** Opens the store's own purchase sheet for a plan (on the web, Stripe Checkout). */
 export async function buy(plan: Plan, from: string): Promise<BuyResult> {
+  if (webBilling()) return buyWeb(plan, from);
   const p = packages[plan];
   if (!sdk || !p) return "error";
   useBilling.setState({ busy: true });
@@ -358,8 +380,18 @@ export async function buy(plan: Plan, from: string): Promise<BuyResult> {
   }
 }
 
-/** Restore purchases: asks the store again (a new phone, a reinstall, a family member's plan). */
+/** Restore purchases: asks the store again (a new phone, a reinstall, a family member's plan). On the web, the account. */
 export async function restore(): Promise<boolean> {
+  if (webBilling()) {
+    useBilling.setState({ busy: true });
+    try {
+      return await refreshAccountPro();
+    } catch {
+      return false;
+    } finally {
+      useBilling.setState({ busy: false });
+    }
+  }
   if (!sdk) return false;
   useBilling.setState({ busy: true });
   try {
@@ -387,4 +419,194 @@ export function storePro(now: number, s: Pick<BillingState, "live" | "ent"> = us
   if (!s.live || !s.ent) return undefined;
   if (entActive(s.ent, now)) return s.ent.trial && s.ent.expiresAt ? { state: "trial", endsAt: s.ent.expiresAt } : { state: "pro" };
   return s.ent.expiresAt ? { state: "free", since: s.ent.expiresAt } : undefined;
+}
+
+// ---------- The web app: Stripe ----------
+
+const WEB_CACHE_KEY = "liftsmith.webBilling";
+let webStarted = false;
+/** The server (or the last answer cached here) said the web sells Pro. Only then does anything here act as web billing. */
+let webSelling = false;
+
+interface WebPrice {
+  plan: Plan;
+  amount: number;
+  currency: string;
+}
+
+const ZERO_DECIMAL = new Set([
+  "BIF",
+  "CLP",
+  "DJF",
+  "GNF",
+  "JPY",
+  "KMF",
+  "KRW",
+  "MGA",
+  "PYG",
+  "RWF",
+  "UGX",
+  "VND",
+  "VUV",
+  "XAF",
+  "XOF",
+  "XPF",
+]);
+
+/** Stripe's smallest-unit amount as a price in the app's language ("$39.99", "39,99 $US"). */
+export function money(amount: number, currency: string, language: string = currentTag()): string {
+  const major = ZERO_DECIMAL.has(currency.toUpperCase()) ? amount : amount / 100;
+  try {
+    return new Intl.NumberFormat(language, { style: "currency", currency }).format(major);
+  } catch {
+    return `${major.toFixed(2)} ${currency}`;
+  }
+}
+
+/** The web's plans from the server's answer, annual first, with a monthly figure for the annual plan. */
+export function webOffers(prices: WebPrice[], trialDays: number | null, language: string = currentTag()): Offer[] {
+  return (["annual", "monthly"] as Plan[]).flatMap((plan) => {
+    const p = prices.find((x) => x.plan === plan);
+    if (!p) return [];
+    return [
+      {
+        plan,
+        price: money(p.amount, p.currency, language),
+        perMonth: plan === "annual" ? money(Math.floor(p.amount / 12), p.currency, language) : undefined,
+        trialDays,
+      },
+    ];
+  });
+}
+
+/** The account's web subscription as an entitlement, for the Pro screen's status and Manage. */
+export function webEnt(sub: AccountSub | null | undefined): Entitlement | null {
+  if (!sub || sub.store !== "web") return null;
+  return {
+    active: true,
+    trial: sub.trial,
+    plan: sub.plan ?? undefined,
+    expiresAt: sub.expiresAt,
+    willRenew: sub.willRenew,
+    store: "stripe",
+    manageUrl: null,
+  };
+}
+
+function readWebCache(): { live: boolean; prices?: WebPrice[]; trialDays?: number | null } | null {
+  try {
+    const raw = localStorage.getItem(WEB_CACHE_KEY);
+    return raw ? (JSON.parse(raw) as { live: boolean; prices?: WebPrice[]; trialDays?: number | null }) : null;
+  } catch {
+    return null;
+  }
+}
+
+function writeWebCache(v: { live: boolean; prices?: WebPrice[]; trialDays?: number | null }) {
+  try {
+    localStorage.setItem(WEB_CACHE_KEY, JSON.stringify(v));
+  } catch {
+    // Asked again on the next open.
+  }
+}
+
+/** Whether this is the web app selling through Stripe. */
+export const webBilling = () => webSelling && useBilling.getState().live;
+
+/** Starts web billing: asks the server whether the web sells Pro. The static export (CI, tests) has no server, so it stays off. */
+async function startWebBilling(): Promise<void> {
+  if (webStarted || typeof window === "undefined" || !canSend()) return;
+  webStarted = true;
+  const cached = readWebCache();
+  if (cached?.live) webSelling = true;
+  if (cached?.live)
+    useBilling.setState({
+      live: true,
+      ent: webEnt(useAccount.getState().account?.sub),
+      offers: webOffers(cached.prices ?? [], cached.trialDays ?? null),
+    });
+  // The account's Pro decides access on the web; keep the status card and the plans (trial eligibility) in step with it.
+  let last = useAccount.getState().account;
+  useAccount.subscribe((s) => {
+    if (s.account === last) return;
+    const signedInChanged = !!s.account !== !!last || s.account?.id !== last?.id;
+    last = s.account;
+    if (useBilling.getState().live) useBilling.setState({ ent: webEnt(s.account?.sub) });
+    if (signedInChanged) void loadWebOffers().catch(() => {});
+  });
+  try {
+    await loadWebOffers();
+  } catch (e) {
+    // Offline: keep the last answer (or stay off), and ask again on the next open.
+    useBilling.setState({ error: errorText(e) });
+  }
+}
+
+/** Asks the server for the web's plans and the trial this lifter would get (signed in: their own eligibility). */
+export async function loadWebOffers(): Promise<Offer[] | null> {
+  const q = new URLSearchParams({ trial: String(flag("trialDays")) });
+  const code = activeCode();
+  if (code) q.set("code", code);
+  const r = await api<{ live: boolean; prices?: WebPrice[]; trialDays?: number | null }>(`/api/billing/stripe/?${q.toString()}`, {
+    token: readAccount()?.token,
+  });
+  webSelling = r.live;
+  if (!r.live) {
+    writeWebCache({ live: false });
+    useBilling.setState({ live: false, offers: null, ent: null, error: null });
+    return null;
+  }
+  const prices = r.prices ?? [];
+  const trialDays = r.trialDays ?? null;
+  writeWebCache({ live: true, prices, trialDays });
+  const offers = webOffers(prices, trialDays);
+  useBilling.setState({ live: true, offers, ent: webEnt(useAccount.getState().account?.sub), error: offers.length ? null : "No prices" });
+  return offers;
+}
+
+async function buyWeb(plan: Plan, from: string): Promise<BuyResult> {
+  const a = readAccount();
+  if (!a) return "signIn";
+  useBilling.setState({ busy: true });
+  try {
+    const r = await api<{ url: string }>("/api/billing/stripe/", {
+      token: a.token,
+      body: { plan, code: activeCode(), trial: codeTrialDays() ?? flag("trialDays"), installId: installId() },
+    });
+    track("feature", { name: "pro_checkout", detail: from });
+    // Stripe's own page takes the card; it comes back to #/pro/paid (or #/pro/settings when cancelled).
+    window.location.assign(r.url);
+    return "redirect";
+  } catch (e) {
+    if (e instanceof AuthError && e.status === 409) {
+      await refreshAccountPro().catch(() => false);
+      return "already";
+    }
+    if (e instanceof AuthError && e.status === 401) return "signIn";
+    return "error";
+  } finally {
+    useBilling.setState({ busy: false });
+  }
+}
+
+/** Stripe's customer portal for the account's web subscription (change plan, card, cancel). Null when it can't open. */
+export async function openWebPortal(): Promise<boolean> {
+  const a = readAccount();
+  if (!a) return false;
+  try {
+    const r = await api<{ url: string }>("/api/billing/stripe/portal/", { token: a.token, body: {} });
+    window.location.assign(r.url);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/** Back from Stripe Checkout: the webhook may land a moment after the lifter does, so ask the account a few times. */
+export async function waitForWebPro(tries = 6, gapMs = 2000): Promise<boolean> {
+  for (let i = 0; i < tries; i++) {
+    if (await refreshAccountPro().catch(() => false)) return true;
+    await new Promise((r) => setTimeout(r, gapMs));
+  }
+  return false;
 }

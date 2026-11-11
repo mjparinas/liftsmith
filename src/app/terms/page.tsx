@@ -71,22 +71,24 @@ export default function Terms() {
             for what each plan includes.
           </li>
           <li>
-            Pro is bought through Google Play or the App Store, and their terms apply to the payment too. The store takes the payment,
-            renews the subscription automatically each month or year until you cancel, and charges at the start of each period.
+            Pro is bought through Google Play or the App Store in the apps, and their terms apply to the payment too. On the web app it is
+            paid by card through Stripe, and needs a {name} account. Either way the subscription renews automatically each month or year
+            until you cancel, and is charged at the start of each period. Pro bought one way works on the web and in the apps on any device
+            signed in to the same account.
           </li>
           <li>
             New subscribers may get a free trial (currently {TRIAL_DAYS} days). If you cancel before the trial ends, you pay nothing; if you
             don&apos;t, the plan you picked starts when it ends.
           </li>
           <li>
-            Cancel at any time in your Google Play or App Store subscriptions. You keep Pro until the end of the period you&apos;ve paid
-            for, and your workouts and data stay yours on the free plan. Deleting the app or your account doesn&apos;t cancel a
-            subscription.
+            Cancel at any time in your Google Play or App Store subscriptions, or for a web subscription, under Manage subscription in the
+            web app. You keep Pro until the end of the period you&apos;ve paid for, and your workouts and data stay yours on the free plan.
+            Deleting the app doesn&apos;t cancel a store subscription; deleting your account ends a web subscription straight away.
           </li>
           <li>
-            Refunds are handled by the store you paid through, under its own policy. If the store can&apos;t help, write to us and
-            we&apos;ll do what we reasonably can. Consumer laws where you live may give you rights to cancel or get a refund that these
-            terms don&apos;t take away.
+            Refunds are handled by the store you paid through, under its own policy; for a web subscription, write to us. If the store
+            can&apos;t help, write to us and we&apos;ll do what we reasonably can. Consumer laws where you live may give you rights to
+            cancel or get a refund that these terms don&apos;t take away.
           </li>
           <li>
             The annual plan can be shared with your family through Google Play&apos;s or Apple&apos;s family sharing. The monthly plan is

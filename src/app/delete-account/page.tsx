@@ -90,9 +90,10 @@ export default function DeleteAccount() {
             <strong>Feedback you sent</strong> stays in our support inbox until you ask us to delete it.
           </li>
           <li>
-            <strong>Subscriptions:</strong> deleting your account doesn&apos;t cancel Pro. Cancel it in Google Play or the App Store.
-            Google, Apple and RevenueCat (which checks purchases for us) keep purchase records, and we keep our record of subscription
-            events, for as long as tax and accounting law requires. None of these hold your workouts or health data.
+            <strong>Subscriptions:</strong> deleting your account doesn&apos;t cancel Pro bought in Google Play or the App Store; cancel it
+            there. A subscription bought on the web app is cancelled straight away when you delete your account. Google, Apple, Stripe and
+            RevenueCat (which checks purchases for us) keep purchase records, and we keep our record of subscription events, for as long as
+            tax and accounting law requires. None of these hold your workouts or health data.
           </li>
         </ul>
 

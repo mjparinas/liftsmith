@@ -2,7 +2,7 @@
 
 Answers for the Google Play **Data safety** form and the App Store **App Privacy** questions. Keep them in step with `/privacy/` (`src/app/privacy/page.tsx`), `ios/App/App/PrivacyInfo.xcprivacy` and the event allow-list in `src/lib/analyticsSchema.ts`. When any of those change, update this file in the same pull request, and update the answers in both store consoles before the next release.
 
-Last reviewed: 2026-11-10 (feature flag checks and A/B test groups added, under the install id and only with usage stats; Play's Data safety form filled in: photos, other personal info and the install id's second purpose added below). Before that, 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
+Last reviewed: 2026-11-11 (Pro on the web through Stripe: when signed in, sync links the install id to the account so a store subscription gives Pro on the web and a web one on the phones; the install id and purchase history are then linked to the account, below). Before that, 2026-11-10 (feature flag checks and A/B test groups added, under the install id and only with usage stats; Play's Data safety form filled in: photos, other personal info and the install id's second purpose added below). Before that, 2026-11-09 (optional accounts with sync added: email and the synced copy of the lifter's data, linked to the account; subscriptions through RevenueCat added; Health Connect reads cut to weight, height, body fat and resting heart rate; then sleep, HRV, steps, VO2 max and respiratory rate added for the health twin; privacy contact hello@getliftsmith.com).
 
 ## What leaves the device
 
@@ -44,7 +44,7 @@ Collected data types:
 | App activity › App interactions | Yes | No | No | Optional (user can turn off) | Analytics |
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
-| Device or other IDs › Device or other IDs | Yes (random install id; RevenueCat uses it to unlock Pro) | No | No | Optional | Analytics, App functionality |
+| Device or other IDs › Device or other IDs | Yes (random install id; RevenueCat uses it to unlock Pro, and when signed in it's linked to the account so Pro follows the account) | No | No | Optional | Analytics, App functionality |
 | Personal info › Email address | Yes (only if given with feedback, for email reminders, or to sign in to an account) | No | No | Optional | App functionality, Developer communications, Account management |
 | Personal info › User IDs | Yes (account id, Google or Apple account id, only when signed in) | No | No | Optional | App functionality, Account management |
 | Personal info › Other info | Yes, only with an account: birth year and sex in the synced profile | No | No | Optional | App functionality |
@@ -60,7 +60,7 @@ Health Connect: the permissions declaration form still applies to the on-device 
 
 - Do you or your third-party partners collect data from this app? **Yes.**
 - **Data used to track you: none.** No IDFA, no ATT prompt, no data broker or ad network.
-- **Data linked to you** (only when the user signs in, sends feedback or turns on email reminders): Contact Info › Email Address and Identifiers › User ID (signing in; App Functionality); Health & Fitness › Health and Fitness, and User Content › Other User Content (the synced copy of the user's data, with an account only; App Functionality); Contact Info › Email Address (App Functionality; Developer's Advertising or Marketing, for Pro offers the user turns on); User Content › Other User Content (the feedback message and screenshot); Health & Fitness › Fitness (with email reminders only: workout times and counts, for App Functionality).
+- **Data linked to you** (only when the user signs in, sends feedback or turns on email reminders): Contact Info › Email Address and Identifiers › User ID (signing in; App Functionality); Health & Fitness › Health and Fitness, and User Content › Other User Content (the synced copy of the user's data, with an account only; App Functionality); Contact Info › Email Address (App Functionality; Developer's Advertising or Marketing, for Pro offers the user turns on); User Content › Other User Content (the feedback message and screenshot); Health & Fitness › Fitness (with email reminders only: workout times and counts, for App Functionality). Identifiers › Device ID and Purchases › Purchase History (signed in only: sync links the install id to the account, so Pro bought in the store, on the web or with a code follows the account; App Functionality).
 - **Phone reminders** are local notifications scheduled on the device and collect nothing.
 - **Data not linked to you:**
   - Identifiers › Device ID (random install id): Analytics.

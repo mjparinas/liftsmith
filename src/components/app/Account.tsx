@@ -310,6 +310,8 @@ function SignedIn() {
       {confirm ? (
         <div className="space-y-2">
           <p className="text-sm text-muted">{t("account.delete.warn")}</p>
+          {/* A web subscription (Stripe) ends with the account; a store one doesn't, it's the store's (stripe.ts forgetStripe). */}
+          {account.sub?.store === "web" && <p className="text-sm text-warn">{t("account.delete.webSub")}</p>}
           <Button
             kind="danger"
             className="w-full"

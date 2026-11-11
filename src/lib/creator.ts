@@ -226,7 +226,7 @@ export async function redeemLifetime(raw: string): Promise<RedeemStatus> {
   if (!a) return "signedOut";
   try {
     await api<{ ok: boolean }>("/api/creator/redeem/", { body: { code }, token: a.token });
-    setAccountPro(true);
+    setAccountPro(true, { proVia: "code" });
     return "ok";
   } catch (e) {
     const st = e instanceof AuthError ? e.status : 0;

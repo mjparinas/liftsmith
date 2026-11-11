@@ -50,6 +50,7 @@ export const en = {
   "account.row": "Account and sync",
   "account.row.out": "Sign in to back up and sync",
   "account.row.in": "Signed in as {email}",
+  "account.delete.webSub": "Your Pro subscription from the website ends now too, and won't be charged again.",
 } as const;
 
 type Key = keyof typeof en;
@@ -102,6 +103,7 @@ export const es: Partial<Record<Key, Message>> = {
   "account.row": "Cuenta y sincronización",
   "account.row.out": "Inicia sesión para guardar y sincronizar",
   "account.row.in": "Sesión iniciada como {email}",
+  "account.delete.webSub": "Tu suscripción Pro del sitio web también termina ahora y no se volverá a cobrar.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -155,6 +157,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.row": "Compte et synchronisation",
   "account.row.out": "Connectez-vous pour sauvegarder et synchroniser",
   "account.row.in": "Connecté en tant que {email}",
+  "account.delete.webSub": "Votre abonnement Pro pris sur le site prend fin maintenant aussi et ne sera plus facturé.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -208,6 +211,7 @@ export const de: Partial<Record<Key, Message>> = {
   "account.row": "Konto und Synchronisierung",
   "account.row.out": "Anmelden zum Sichern und Synchronisieren",
   "account.row.in": "Angemeldet als {email}",
+  "account.delete.webSub": "Dein Pro-Abo von der Website endet damit ebenfalls und wird nicht mehr berechnet.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -258,6 +262,7 @@ export const it: Partial<Record<Key, Message>> = {
   "account.row": "Account e sincronizzazione",
   "account.row.out": "Accedi per backup e sincronizzazione",
   "account.row.in": "Accesso come {email}",
+  "account.delete.webSub": "Anche il tuo abbonamento Pro del sito termina ora e non ti verrà più addebitato.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -308,4 +313,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.row": "アカウントと同期",
   "account.row.out": "サインインしてバックアップと同期",
   "account.row.in": "{email}でサインイン中",
+  "account.delete.webSub": "ウェブサイトで登録した Pro のサブスクリプションも今すぐ終了し、今後請求されることはありません。",
 };
