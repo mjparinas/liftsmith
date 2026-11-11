@@ -34,6 +34,7 @@ import { Achievements } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
+import { Friends, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -52,6 +53,7 @@ import { Settings } from "./Settings";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
+import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
 import { Trainer } from "./Trainer";
@@ -314,6 +316,8 @@ export function App() {
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
     routine: <SharedRoutine code={arg} />,
+    friends: <Friends />,
+    person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
   };
   const screen = screens[route];
@@ -325,6 +329,7 @@ export function App() {
         <StatusScrim />
         {screen}
         <ProWelcome />
+        <Toaster />
       </>
     );
   return (
@@ -335,6 +340,7 @@ export function App() {
       </main>
       <ProWelcome />
       {showNav && <TabBar route={route} />}
+      <Toaster />
     </>
   );
 }

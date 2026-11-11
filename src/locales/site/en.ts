@@ -225,7 +225,8 @@ export const en: SiteText = {
       perMonth: "a month",
       priceNote: "About {perMonth} a month, or {monthly} a month",
       trialCta: "Start my {days}-day free trial",
-      billed: "Billed through Google Play or the App Store. Cancel any time before the trial ends and you pay nothing.",
+      billed:
+        "Billed through Google Play or the App Store, or by card on the web app. Cancel any time before the trial ends and you pay nothing.",
     },
     faq: { eyebrow: "FAQ", title: "Questions lifters ask" },
     final: {

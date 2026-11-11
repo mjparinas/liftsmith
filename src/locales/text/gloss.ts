@@ -27,7 +27,7 @@ export const en = {
     "How many more reps you could have done when you stop the set. RIR 2 means you finish the set feeling you had about two more good reps in you.\nThe plan starts with more in the tank and moves closer to failure across the block.",
   "gloss.rpe.title": "RPE: rate of perceived exertion",
   "gloss.rpe.body":
-    "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.\nPick this scale or reps in reserve in Settings › Workout preferences. The plan works the same either way.",
+    "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.",
   "gloss.blockWeek.title": "Training block",
   "gloss.blockWeek.body":
     "Where you are in your block: which build week (or the deload), and how many reps to leave in the tank this week. You can change the block length in Settings.",
@@ -128,7 +128,7 @@ export const es: Partial<Record<Key, Message>> = {
     "Cuántas repeticiones más podrías haber hecho al terminar la serie. RIR 2 significa que acabas la serie sintiendo que te quedaban unas dos buenas repeticiones.\nEl plan empieza con más reserva y se acerca al fallo a lo largo del bloque.",
   "gloss.rpe.title": "RPE: esfuerzo percibido",
   "gloss.rpe.body":
-    "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.\nElige esta escala o las repeticiones en reserva en Ajustes › Preferencias de entrenamiento. El plan funciona igual con ambas.",
+    "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.",
   "gloss.blockWeek.title": "Bloque de entrenamiento",
   "gloss.blockWeek.body":
     "En qué punto del bloque estás: qué semana de carga (o la descarga) y cuántas repeticiones dejar en reserva esta semana. Puedes cambiar la duración del bloque en Ajustes.",
@@ -227,7 +227,7 @@ export const fr: Partial<Record<Key, Message>> = {
     "Combien de répétitions de plus vous auriez pu faire en arrêtant la série. RIR 2 signifie que vous terminez la série en sentant qu’il vous restait environ deux bonnes répétitions.\nLe plan commence avec plus de réserve et se rapproche de l’échec au fil du bloc.",
   "gloss.rpe.title": "RPE : effort perçu",
   "gloss.rpe.body":
-    "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.\nChoisissez cette échelle ou les répétitions en réserve dans Réglages › Préférences d’entraînement. Le plan fonctionne de la même façon dans les deux cas.",
+    "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.",
   "gloss.blockWeek.title": "Bloc d’entraînement",
   "gloss.blockWeek.body":
     "Où vous en êtes dans votre bloc : quelle semaine de progression (ou la décharge), et combien de répétitions garder en réserve cette semaine. Vous pouvez changer la durée du bloc dans Réglages.",
@@ -326,7 +326,7 @@ export const de: Partial<Record<Key, Message>> = {
     "Wie viele Wiederholungen du noch geschafft hättest, als du den Satz beendest. RIR 2 heißt: Du beendest den Satz mit dem Gefühl, dass noch etwa zwei saubere Wiederholungen drin gewesen wären.\nDer Plan beginnt mit mehr Reserve und geht im Lauf des Blocks näher ans Muskelversagen.",
   "gloss.rpe.title": "RPE: wahrgenommene Anstrengung",
   "gloss.rpe.body":
-    "Wie schwer sich ein Satz angefühlt hat, auf einer Skala von 1 bis 10, wobei 10 alles ist, was du hattest. Eine 8 heißt, dass noch etwa zwei saubere Wiederholungen drin waren, also dasselbe wie 2 Wiederholungen in Reserve.\nWähle diese Skala oder Wiederholungen in Reserve unter Einstellungen › Trainingsvorlieben. Der Plan funktioniert in beiden Fällen gleich.",
+    "Wie schwer sich ein Satz angefühlt hat, auf einer Skala von 1 bis 10, wobei 10 alles ist, was du hattest. Eine 8 heißt, dass noch etwa zwei saubere Wiederholungen drin waren, also dasselbe wie 2 Wiederholungen in Reserve.",
   "gloss.blockWeek.title": "Trainingsblock",
   "gloss.blockWeek.body":
     "Wo du in deinem Block stehst: welche Aufbauwoche (oder der Deload) und wie viele Wiederholungen du diese Woche in Reserve lassen sollst. Die Blocklänge kannst du in den Einstellungen ändern.",
@@ -425,7 +425,7 @@ export const it: Partial<Record<Key, Message>> = {
     "Quante ripetizioni in più avresti potuto fare quando chiudi la serie. RIR 2 significa che finisci la serie sentendo di avere ancora circa due buone ripetizioni.\nIl piano parte con più riserva e si avvicina al cedimento nel corso del blocco.",
   "gloss.rpe.title": "RPE: sforzo percepito",
   "gloss.rpe.body":
-    "Quanto è stata dura una serie su una scala da 1 a 10, dove 10 è tutto quello che avevi. Un 8 significa che avevi ancora circa due buone ripetizioni, come 2 ripetizioni di riserva.\nScegli questa scala o le ripetizioni di riserva in Impostazioni › Preferenze di allenamento. Il piano funziona allo stesso modo in entrambi i casi.",
+    "Quanto è stata dura una serie su una scala da 1 a 10, dove 10 è tutto quello che avevi. Un 8 significa che avevi ancora circa due buone ripetizioni, come 2 ripetizioni di riserva.",
   "gloss.blockWeek.title": "Blocco di allenamento",
   "gloss.blockWeek.body":
     "A che punto sei del blocco: quale settimana di carico (o lo scarico) e quante ripetizioni lasciare di riserva questa settimana. Puoi cambiare la durata del blocco nelle Impostazioni.",
@@ -524,7 +524,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "セットを終えた時点で、あと何回できたかを表します。RIR 2 は、あと2回ほどきれいにできそうな余力を残してセットを終えるという意味です。\nプランは余力を多めに残して始まり、ブロックが進むにつれて限界に近づいていきます。",
   "gloss.rpe.title": "RPE：主観的運動強度",
   "gloss.rpe.body":
-    "セットのきつさを1〜10で表します。10は出し切った状態です。8なら、あと2回ほどきれいにできる余力があったという意味で、余力レップ数2と同じです。\nこの尺度と余力レップ数のどちらを使うかは、設定 › ワークアウトの設定で選べます。どちらでもプランの動きは同じです。",
+    "セットのきつさを1〜10で表します。10は出し切った状態です。8なら、あと2回ほどきれいにできる余力があったという意味で、余力レップ数2と同じです。",
   "gloss.blockWeek.title": "トレーニングブロック",
   "gloss.blockWeek.body":
     "ブロックの中で今どこにいるかを示します。何週目の強化週か（またはディロード週か）と、今週どれだけ余力を残すかです。ブロックの長さは設定で変更できます。",

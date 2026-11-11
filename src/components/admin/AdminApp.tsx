@@ -17,6 +17,7 @@ import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
 import { MaintenanceBanner, useMaintenance } from "./Maintenance";
+import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
@@ -47,6 +48,7 @@ const TABS = [
   "Overview",
   "To Do",
   "Inbox",
+  "Reports",
   "Traffic",
   "Acquisition",
   "Funnel",
@@ -546,6 +548,7 @@ export function AdminApp() {
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
   const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
+  const reportsCount = useCallback((n: number) => setCount("Reports", n), [setCount]);
   // Each tab (and an open account or install) has its own address, and every move is in the browser history,
   // so Back, Forward, a reload and a shared link all land on the same place (as in Gradelings).
   const navigate = useCallback((next: View) => {
@@ -577,10 +580,13 @@ export function AdminApp() {
         ? j.items.length + (j.tasks as { doneAt: unknown }[]).filter((t) => !t.doneAt).length
         : null,
     ).then((n) => live && n != null && todoCount(n));
+    void read("/api/admin/reports/", (j) => (Array.isArray(j.reports) ? j.reports.length : null)).then(
+      (n) => live && n != null && reportsCount(n),
+    );
     return () => {
       live = false;
     };
-  }, [state, inboxCount, todoCount]);
+  }, [state, inboxCount, todoCount, reportsCount]);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/stats/?days=${days}`)
@@ -977,6 +983,7 @@ export function AdminApp() {
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Reports" && <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}

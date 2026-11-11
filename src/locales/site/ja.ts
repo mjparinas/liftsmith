@@ -235,7 +235,7 @@ export const ja: SiteText = {
       perMonth: "/月",
       priceNote: "月あたり約{perMonth}、または月額{monthly}",
       trialCta: "{days}日間の無料体験を始める",
-      billed: "Google Play または App Store で請求されます。体験期間が終わる前に解約すれば、料金はかかりません。",
+      billed: "Google Play または App Store、Web アプリではカードで請求されます。体験期間が終わる前に解約すれば、料金はかかりません。",
     },
     faq: { eyebrow: "よくある質問", title: "よくいただく質問" },
     final: {

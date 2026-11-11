@@ -44,8 +44,17 @@ Melvin asked for every "coming later" connection to be built (2026-11-10), and G
 - **Words**: six languages in `garmin/resources*/`, checked by `nativeStrings.test.ts`.
 - **Builds**: Garmin's compiler needs device files that only download after a Garmin sign-in, so CI doesn't build the watch app; Melvin builds and uploads `garmin.iq` (steps in `garmin/README.md`). CI builds both phone apps with the SDK.
 
+## Rep counting from the wrist (Labs, 2026-11-11)
+
+Melvin picked it from the Labs ideas (2026-11-11: "Labs ideas 1 to 5").
+
+- **What it does**: with **Settings › Labs › Watch rep counting** on (Pro, like every lab), the Wear OS or Apple Watch app counts reps from wrist motion during each set, and the count fills in the reps for Log set on the phone, exactly as camera counting does. The watch already shows the set's reps (`next`), so it sees the count go up too. A small "Watch: 5 reps" pill sits on the exercise card once the watch has sent anything for the set; nothing changes during rest. No extra tap: logging stays one tap.
+- **The phone counts, the watch measures.** While a set is under way (lab on, not resting, the camera not counting, a lift the wrist moves in: `imuProfile`), the phone puts `motion: true` in the workout state it already sends. The watch then streams its fused vertical acceleration (m/s², up positive, gravity removed) and rotation rate (rad/s) at 50 a second, in batches about every 250 ms: `{"t": first reading's ms, "s": [ms after t, up, rot, …]}`, at most 200 readings. On Wear OS that's `MotionStream` and `MotionBatch` (linear acceleration projected on the gravity sensor, plus the gyroscope) over the message path `/liftsmith/motion`; on Apple Watch it's `MotionStream` in `WatchModel.swift` (Core Motion device motion) as a WatchConnectivity message, only while the phone is reachable. The phones check each batch (`WatchMessages.motion` on both) and hand it to the web app as a `watchMotion` event, where `src/lib/reps/watchMotion.ts` checks it again and feeds the same motion counter phone motion uses (`ImuRepCounter.pushFused`). One counter means both watches count alike and it's tested once, against the simulated sets in `reps.test.ts`.
+- **Why the wrist, not the phone**: the motion research (rep-counter notes, 2026-11-09) found fused motion counted 88 to 100% of simulated reps, and a wrist moves with the bar on most lifts, where a phone in a pocket doesn't. Lifts where the hands stay still (pull-ups, dips, planks, carries, push-ups) aren't counted.
+- **Battery**: the sensors run only during a set with the lab on; between sets and without the lab nothing is read, and nothing is sent when no watch has the app.
+- **Gaps**: Wear OS streams from its workout service, which needs the heart rate permission. Garmin isn't included (Connect IQ messages are too small and slow). The web app has no watch, so the lab only shows in the phone apps. The Apple Watch half hasn't been tried on a watch yet (open items, iOS deferred).
+
 ## Later
 
-- The motion rep counter (`imu.ts`) can take the watch's accelerometer instead of the phone's.
 - A watch face complication or tile with today's call.
 - Build the Garmin watch app in CI once there's a Garmin login for the SDK Manager to use (`GARMIN_*` secrets).

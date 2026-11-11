@@ -13,6 +13,8 @@ final class WatchLink: NSObject, WCSessionDelegate {
     var onAction: ((String) -> Void)?
     /// A reading from the watch's own heart rate sensor.
     var onHeartRate: ((Int) -> Void)?
+    /// A batch of wrist motion (Labs, watch rep counting), counted by the web app.
+    var onMotion: (([String: Any]) -> Void)?
 
     private var launchedFor: String?
     private let health = HKHealthStore()
@@ -62,6 +64,7 @@ final class WatchLink: NSObject, WCSessionDelegate {
         DispatchQueue.main.async {
             if let action = WatchMessages.action(message["action"]) { self.onAction?(action) }
             if let bpm = WatchMessages.bpm(message["hr"]) { self.onHeartRate?(bpm) }
+            if let m = WatchMessages.motion(message["motion"]) { self.onMotion?(m) }
         }
     }
 
@@ -80,6 +83,22 @@ enum WatchMessages {
     static func action(_ value: Any?) -> String? {
         guard let a = value as? String, a == "log" || a == "add30" else { return nil }
         return a
+    }
+
+    /// The most readings one motion batch may carry (src/lib/reps/watchMotion.ts MAX_BATCH).
+    static let maxMotion = 200
+
+    /// A motion batch, ["t": ms, "s": [ms after t, up, rot, ...]], or nil. The web app checks every reading again.
+    static func motion(_ value: Any?) -> [String: Any]? {
+        guard let m = value as? [String: Any], let t = (m["t"] as? NSNumber)?.doubleValue, t.isFinite,
+              let raw = m["s"] as? [Any], raw.count % 3 == 0, raw.count <= maxMotion * 3 else { return nil }
+        var s: [Double] = []
+        s.reserveCapacity(raw.count)
+        for v in raw {
+            guard let d = (v as? NSNumber)?.doubleValue, d.isFinite else { return nil }
+            s.append(d)
+        }
+        return ["t": t, "s": s]
     }
 
     /// A believable heart rate (30 to 240 bpm), or nil.

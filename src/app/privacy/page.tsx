@@ -124,6 +124,16 @@ export default function Privacy() {
           Account and sync, which deletes your account and our copy at once.
         </p>
 
+        <h2 className="mt-8 text-xl font-semibold">Friends</h2>
+        <p className="mt-2">
+          Friends is optional and needs an account. If you join, we keep the handle and name you pick, who you follow and who follows you,
+          who you&apos;ve blocked, and what you post: the workouts you choose to post (or every workout, if you turn that on), with their
+          time, sets, exercises and best sets (weights only if you show them), plus your likes and comments. Your followers see your posts;
+          by default you approve each follower first. A post never includes heart rate, body weight or fat, measurements, cycle data,
+          injuries, gyms or places. If you report something, we keep the report and who made it so we can review it, and the person you
+          reported isn&apos;t told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
+        </p>
+
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};
@@ -153,6 +163,13 @@ export default function Privacy() {
           data. The stores also tell us (through RevenueCat) when a subscription starts, renews, is cancelled or refunded, so we can count
           revenue.
         </p>
+        <p className="mt-2">
+          On the web app, Pro is paid by card through Stripe, on Stripe&apos;s own checkout page; we never see your card. A web subscription
+          needs an account, so Stripe receives your account&apos;s email, a random account id, your random install id and any code you used,
+          and tells us when the subscription starts, renews, is cancelled or refunded. If a phone signed in to your account has a store
+          subscription, we link that phone&apos;s install id to your account so Pro works on the web too. Deleting your account cancels a
+          web subscription and removes the link; Stripe keeps its own payment records, as the law requires.
+        </p>
         <h2 className="mt-8 text-xl font-semibold">Codes</h2>
         <p className="mt-2">
           If you use a code or its link, whether a creator&apos;s or one of ours, we record the code with your random install id, where it
@@ -171,9 +188,9 @@ export default function Privacy() {
         <h2 className="mt-8 text-xl font-semibold">Who processes it</h2>
         <p className="mt-2">
           Usage stats, site visits, accounts and synced data are stored in our database (Turso), on servers run by Vercel. Emails go through
-          Resend. Subscriptions are checked by RevenueCat. When you email us, we may ask Anthropic&apos;s Claude for a first draft of our
-          answer; your message is sent for that one request, and a person reads and sends every reply. None of them may use the data for
-          their own purposes. We keep usage stats for up to 25 months.
+          Resend. Subscriptions are checked by RevenueCat, and web payments are taken by Stripe. When you email us, we may ask
+          Anthropic&apos;s Claude for a first draft of our answer; your message is sent for that one request, and a person reads and sends
+          every reply. None of them may use the data for their own purposes. We keep usage stats for up to 25 months.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Your choices</h2>

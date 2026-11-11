@@ -549,6 +549,9 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
 /* Screens with the tab bar: room for the bar (its measured height, --nav-h, set by TabBar in App.tsx)
    plus a little air, so the last card scrolls clear of it. The fallback covers the first paint. */
 .clear-nav { padding-bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 1.5rem); }
+/* Toasts (Toaster.tsx): above the tab bar on screens, near the bottom over a sheet, never under the phone's bottom bar. */
+.toast-wrap { bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 0.75rem); }
+.toast { background: var(--color-raised); color: var(--color-ink); border: 1px solid var(--color-line); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow); }
 /* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
 .status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }
 

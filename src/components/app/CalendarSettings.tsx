@@ -17,6 +17,7 @@ import { t, weekday } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import type { CalendarPrefs } from "@/lib/types";
 
+import { TimeField } from "./TimeDial";
 import { Button, Chip, Section } from "./ui";
 
 /**
@@ -88,15 +89,7 @@ export function CalendarSettings() {
             ))}
           </div>
         </div>
-        <label className="flex items-center justify-between gap-3 text-sm">
-          <span className="text-muted">{t("cal.time")}</span>
-          <input
-            type="time"
-            value={prefs.time}
-            onChange={(e) => e.target.value && update({ time: e.target.value })}
-            className="num rounded-xl border border-line bg-surface px-3 py-2"
-          />
-        </label>
+        <TimeField label={t("cal.time")} value={prefs.time} onChange={(time) => update({ time })} />
         <Button kind="ghost" className="w-full" disabled={busy || !prefs.days.length} onClick={() => void write()}>
           {t(!native ? "cal.download" : prefs.write ? "cal.update" : "cal.add")}
         </Button>

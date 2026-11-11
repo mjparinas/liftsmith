@@ -127,6 +127,36 @@ const SCHEMA = [
     at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS pro_grants_code ON pro_grants (code)`,
+  // Pro on the web (src/server/stripe.ts): the account's Stripe customer, and each subscription's latest state from the
+  // webhook. A row in a Pro status (trialing, active, past_due) whose period hasn't ended is the account's web Pro.
+  `CREATE TABLE IF NOT EXISTS stripe_customers (
+    account_id TEXT PRIMARY KEY,
+    customer_id TEXT NOT NULL UNIQUE,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS stripe_subscriptions (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    customer_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    plan TEXT,
+    period_end INTEGER,
+    trial_end INTEGER,
+    cancel_at_period_end INTEGER NOT NULL DEFAULT 0,
+    install_id TEXT,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS stripe_subscriptions_account ON stripe_subscriptions (account_id)`,
+  `CREATE INDEX IF NOT EXISTS stripe_subscriptions_customer ON stripe_subscriptions (customer_id)`,
+  // Which installs synced under which account (src/server/access.ts), so a phone's store subscription (the
+  // `entitlements` row RevenueCat keeps for that install) gives the account Pro on the web too.
+  `CREATE TABLE IF NOT EXISTS account_installs (
+    account_id TEXT NOT NULL,
+    install_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, install_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS account_installs_install ON account_installs (install_id)`,
   // Commission paid out, recorded by an admin after paying (PayPal or Wise, outside the app).
   `CREATE TABLE IF NOT EXISTS creator_payouts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -378,6 +408,72 @@ const SCHEMA = [
     image BLOB NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
+  // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
+  `CREATE TABLE IF NOT EXISTS social_profiles (
+    account_id TEXT PRIMARY KEY,
+    handle TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    open INTEGER NOT NULL DEFAULT 0,
+    auto_post INTEGER NOT NULL DEFAULT 0,
+    weights INTEGER NOT NULL DEFAULT 1,
+    agreed_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    seen_at INTEGER NOT NULL DEFAULT 0,
+    suspended INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE TABLE IF NOT EXISTS follows (
+    follower_id TEXT NOT NULL,
+    followee_id TEXT NOT NULL,
+    accepted INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (follower_id, followee_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS follows_followee ON follows (followee_id, accepted)`,
+  `CREATE TABLE IF NOT EXISTS blocks (
+    blocker_id TEXT NOT NULL,
+    blocked_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (blocker_id, blocked_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS blocks_blocked ON blocks (blocked_id)`,
+  `CREATE TABLE IF NOT EXISTS posts (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    workout_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (account_id, workout_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS posts_account_at ON posts (account_id, at)`,
+  `CREATE TABLE IF NOT EXISTS post_likes (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS post_comments (
+    id TEXT PRIMARY KEY,
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS post_comments_post ON post_comments (post_id, created_at)`,
+  `CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reporter_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    UNIQUE (reporter_id, kind, target_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
   // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
   `CREATE TABLE IF NOT EXISTS coach_invites (
     code TEXT PRIMARY KEY,

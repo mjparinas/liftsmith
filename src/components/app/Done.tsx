@@ -23,6 +23,7 @@ import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } fr
 import { burst } from "./burst";
 import { DoneMoments, lean } from "./Extras";
 import { clock } from "./format";
+import { PostToFriends } from "./Friends";
 import { Icon } from "./icons";
 import { PainSelect } from "./Injuries";
 import { Mascot } from "./Mascot";
@@ -296,6 +297,7 @@ export function Done() {
       <Button kind="ghost" icon="share" className="mt-6 w-full" onClick={() => setSharing(true)}>
         {t("done.share")}
       </Button>
+      <PostToFriends summary={s} />
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <ShareWorkout sessionId={s.sessionId} />

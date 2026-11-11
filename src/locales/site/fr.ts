@@ -246,7 +246,8 @@ export const fr: SiteText = {
       perMonth: "par mois",
       priceNote: "Environ {perMonth} par mois, ou {monthly} par mois",
       trialCta: "Commencer mon essai gratuit de {days} jours",
-      billed: "Facturé via Google Play ou l’App Store. Résiliez à tout moment avant la fin de l’essai et vous ne payez rien.",
+      billed:
+        "Facturé via Google Play ou l’App Store, ou par carte dans l’app Web. Résiliez à tout moment avant la fin de l’essai et vous ne payez rien.",
     },
     faq: { eyebrow: "FAQ", title: "Les questions qu’on nous pose" },
     final: {

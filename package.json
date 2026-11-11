@@ -10,6 +10,7 @@
     "postbuild": "node scripts/csp.mjs",
     "prebuild:static": "node scripts/mediapipe.mjs",
     "build:static": "STATIC_EXPORT=1 next build",
+    "capacitor:copy:after": "node scripts/native-web.mjs",
     "lint": "eslint",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

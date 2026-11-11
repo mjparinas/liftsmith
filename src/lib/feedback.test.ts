@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { recordError } from "./diag";
+import { diagnostics, diagPreview, recordError } from "./diag";
 import { buildFeedback, flushFeedback, OUTBOX_KEY, pending, sendFeedback } from "./feedback";
 import { checkFeedback, feedbackEmail } from "./feedbackServer";
 
@@ -57,6 +57,18 @@ describe("in-app feedback", () => {
   it("survives a corrupt outbox", () => {
     localStorage.setItem(OUTBOX_KEY, "{not json");
     expect(pending()).toBe(0);
+  });
+});
+
+describe("what's included preview", () => {
+  it("shows the build hash, as the sent report does", () => {
+    const d = { ...diagnostics(), version: "0.1.0", commit: "3336dee", errors: [] };
+    expect(diagPreview(d, "No errors").split("\n")[0]).toBe("App 0.1.0 · build 3336dee on web");
+    expect(buildFeedback({ kind: "bug", message: "x", includeDiag: true }).diag!.commit).toBeTruthy();
+  });
+
+  it("leaves the build out for reports without one", () => {
+    expect(diagPreview({ ...diagnostics(), version: "0.1.0", commit: undefined, errors: [] }, "No errors")).not.toContain("build");
   });
 });
 

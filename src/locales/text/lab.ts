@@ -28,6 +28,9 @@ export const en = {
     "Adds Count reps to the exercise on the workout screen. The camera watches your set, draws the bones it sees over you and fills in your reps. Video stays on your phone.",
   "lab.repMotion.title": "Phone motion rep counting",
   "lab.repMotion.body": "Count reps from the phone's motion sensors instead of the camera. Less reliable.",
+  "lab.watchReps.title": "Watch rep counting",
+  "lab.watchReps.body":
+    "Your Wear OS watch or Apple Watch counts reps from your wrist during each set and fills them in for Log set on your phone. Needs the Liftsmith watch app open on your wrist. Not for lifts where your hands stay still, like pull-ups.",
   "lab.trainer.title": "Trainer mode",
   "lab.trainer.body":
     "Coach other lifters: make an invite code in Settings › Coaching, then see each client's workouts with what to act on first. Your clients don't need Pro.",
@@ -64,6 +67,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Añade Contar reps al ejercicio en la pantalla de entrenamiento. La cámara mira tu serie, dibuja los huesos que ve sobre ti y rellena tus repeticiones. El vídeo no sale de tu teléfono.",
   "lab.repMotion.title": "Contar repeticiones con el movimiento del teléfono",
   "lab.repMotion.body": "Cuenta repeticiones con los sensores de movimiento del teléfono en lugar de la cámara. Menos fiable.",
+  "lab.watchReps.title": "Contar repeticiones con el reloj",
+  "lab.watchReps.body":
+    "Tu reloj Wear OS o Apple Watch cuenta las repeticiones con el movimiento de la muñeca en cada serie y las rellena en Registrar serie en el teléfono. Necesita la app de Liftsmith abierta en el reloj. No sirve para ejercicios en los que las manos no se mueven, como las dominadas.",
   "lab.trainer.title": "Modo entrenador",
   "lab.trainer.body":
     "Entrena a otras personas: crea un código de invitación en Ajustes › Entrenador y mira los entrenamientos de cada cliente con lo primero que conviene atender. Tus clientes no necesitan Pro.",
@@ -99,6 +105,9 @@ export const fr: Partial<Record<Key, Message>> = {
     "Ajoute Compter à l'exercice sur l'écran d'entraînement. La caméra regarde votre série, dessine les os qu'elle voit sur vous et remplit vos répétitions. La vidéo reste sur votre téléphone.",
   "lab.repMotion.title": "Comptage des répétitions par les mouvements du téléphone",
   "lab.repMotion.body": "Compte les répétitions avec les capteurs de mouvement du téléphone au lieu de la caméra. Moins fiable.",
+  "lab.watchReps.title": "Comptage des répétitions par la montre",
+  "lab.watchReps.body":
+    "Votre montre Wear OS ou Apple Watch compte les répétitions au mouvement du poignet à chaque série et les inscrit dans Valider la série sur le téléphone. Nécessite l'app Liftsmith ouverte sur la montre. Pas pour les exercices où les mains ne bougent pas, comme les tractions.",
   "lab.trainer.title": "Mode coach",
   "lab.trainer.body":
     "Coachez d'autres pratiquants : créez un code d'invitation dans Réglages › Coaching, puis voyez les séances de chaque client avec ce qu'il faut traiter en premier. Vos clients n'ont pas besoin de Pro.",
@@ -134,6 +143,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Fügt der Übung im Trainingsbildschirm Wiederholungen zählen hinzu. Die Kamera beobachtet deinen Satz, zeichnet die erkannten Knochen über dich und trägt deine Wiederholungen ein. Das Video bleibt auf deinem Handy.",
   "lab.repMotion.title": "Wiederholungen per Bewegungssensor zählen",
   "lab.repMotion.body": "Zählt Wiederholungen mit den Bewegungssensoren des Handys statt mit der Kamera. Weniger zuverlässig.",
+  "lab.watchReps.title": "Wiederholungen per Uhr zählen",
+  "lab.watchReps.body":
+    "Deine Wear-OS-Uhr oder Apple Watch zählt bei jedem Satz die Wiederholungen an der Bewegung deines Handgelenks und trägt sie auf dem Handy in Satz eintragen ein. Dafür muss die Liftsmith-App auf der Uhr offen sein. Nicht für Übungen, bei denen die Hände stillstehen, wie Klimmzüge.",
   "lab.trainer.title": "Trainermodus",
   "lab.trainer.body":
     "Betreue andere: Erstell unter Einstellungen › Coaching einen Einladungscode und sieh die Trainings jedes Kunden, mit dem, was zuerst zu tun ist. Deine Kunden brauchen kein Pro.",
@@ -168,6 +180,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Aggiunge Conta ripetizioni all'esercizio nella schermata di allenamento. La fotocamera guarda la tua serie, disegna sopra di te le ossa che vede e inserisce le ripetizioni. Il video resta sul telefono.",
   "lab.repMotion.title": "Conteggio delle ripetizioni con il movimento del telefono",
   "lab.repMotion.body": "Conta le ripetizioni con i sensori di movimento del telefono invece della fotocamera. Meno affidabile.",
+  "lab.watchReps.title": "Conteggio delle ripetizioni con l'orologio",
+  "lab.watchReps.body":
+    "Il tuo orologio Wear OS o Apple Watch conta le ripetizioni dal movimento del polso in ogni serie e le inserisce in Registra serie sul telefono. Serve l'app Liftsmith aperta sull'orologio. Non vale per gli esercizi in cui le mani restano ferme, come le trazioni.",
   "lab.trainer.title": "Modalità coach",
   "lab.trainer.body":
     "Segui altre persone: crea un codice d'invito in Impostazioni › Coaching e guarda gli allenamenti di ogni cliente con la prima cosa da fare. I tuoi clienti non hanno bisogno di Pro.",
@@ -202,6 +217,9 @@ export const ja: Partial<Record<Key, Message>> = {
     "ワークアウト画面の種目にレップカウントを追加します。カメラがセットを見て、認識した骨格をあなたの上に描き、レップ数を入力します。映像はスマートフォンの外に出ません。",
   "lab.repMotion.title": "端末のモーションでレップをカウント",
   "lab.repMotion.body": "カメラの代わりにスマートフォンのモーションセンサーでレップを数えます。精度は低めです。",
+  "lab.watchReps.title": "ウォッチでレップをカウント",
+  "lab.watchReps.body":
+    "Wear OS ウォッチまたは Apple Watch が、各セットで手首の動きからレップを数え、スマートフォンの「セットを記録」に入力します。ウォッチで Liftsmith アプリを開いておく必要があります。懸垂のように手が動かない種目には使えません。",
   "lab.trainer.title": "トレーナーモード",
   "lab.trainer.body":
     "ほかの人を指導できます。「設定 › コーチング」で招待コードを作成すると、各クライアントのワークアウトと、まず取り組むべきことが表示されます。クライアントに Pro は必要ありません。",

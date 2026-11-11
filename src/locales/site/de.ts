@@ -240,7 +240,8 @@ export const de: SiteText = {
       perMonth: "pro Monat",
       priceNote: "Etwa {perMonth} pro Monat, oder {monthly} pro Monat",
       trialCta: "Meine {days} Tage gratis starten",
-      billed: "Abgerechnet über Google Play oder den App Store. Kündige jederzeit vor Ende des Tests und du zahlst nichts.",
+      billed:
+        "Abgerechnet über Google Play oder den App Store oder per Karte in der Web-App. Kündige jederzeit vor Ende des Tests und du zahlst nichts.",
     },
     faq: { eyebrow: "FAQ", title: "Was Trainierende fragen" },
     final: {

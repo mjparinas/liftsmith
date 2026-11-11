@@ -9,7 +9,17 @@ import { cacheFlags, FLAG_CACHE_KEY } from "@/lib/flags";
 import { imuSamples, sideSquat, simulateSet } from "@/lib/reps/simulate";
 import type { MotionReading, PoseEngine } from "@/lib/reps/sources";
 
-import { AutoCount, AutoCountButton, countable, formTip, loadCountPrefs, saveCountPrefs, shownLean, type CountPrefs } from "./AutoCount";
+import {
+  AutoCount,
+  AutoCountButton,
+  countable,
+  countSource,
+  formTip,
+  loadCountPrefs,
+  saveCountPrefs,
+  shownLean,
+  type CountPrefs,
+} from "./AutoCount";
 
 const motion: { cb?: (r: MotionReading) => void } = {};
 const openCamera = vi.fn();
@@ -50,6 +60,20 @@ describe("remembered choices", () => {
     expect(loadCountPrefs().source).toBe("camera");
     cacheFlags({ labRepCount: true, repMotion: true });
     expect(loadCountPrefs().source).toBe("motion");
+    localStorage.removeItem(FLAG_CACHE_KEY);
+  });
+
+  it("counts with phone motion on its own, without the camera lab", () => {
+    expect(countSource("camera")).toBeNull();
+    cacheFlags({ repMotion: true });
+    expect(countSource("camera")).toBe("motion");
+    saveCountPrefs({ on: true, facing: "user", source: "camera" });
+    expect(loadCountPrefs().source).toBe("motion");
+    cacheFlags({ labRepCount: true, repMotion: false });
+    expect(countSource("motion")).toBe("camera");
+    cacheFlags({ labRepCount: true, repMotion: true });
+    expect(countSource("camera")).toBe("camera");
+    expect(countSource("motion")).toBe("motion");
     localStorage.removeItem(FLAG_CACHE_KEY);
   });
 });

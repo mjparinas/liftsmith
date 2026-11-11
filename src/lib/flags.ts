@@ -34,6 +34,20 @@ export const FLAGS = {
     label: "Labs: camera bar speed",
     description: "Bar speed from the camera while counting reps, with how much it has dropped and when to end the set.",
   },
+  /** Friends and the workout feed (docs/decisions/friends.md). Off hides Friends in the app and stops the server answering. */
+  social: {
+    default: true,
+    options: [true, false] as const,
+    label: "Friends and the feed",
+    description: "Follow people, post workouts, likes and comments. Turn off to hide Friends everywhere and stop new posts at once.",
+  },
+  /** Labs: the Wear OS or Apple Watch app counts reps from wrist motion and fills in the phone's live set. */
+  labWatchReps: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: watch rep counting",
+    description: "The Wear OS or Apple Watch app counts reps from wrist motion during a set and fills them in on the phone.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,

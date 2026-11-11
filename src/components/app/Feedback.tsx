@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { SCREEN_TITLE } from "@/components/titles";
 import { track } from "@/lib/analytics";
-import { diagnostics } from "@/lib/diag";
+import { diagnostics, diagPreview } from "@/lib/diag";
 import { buildFeedback, MAX_MESSAGE, sendFeedback, shrinkImage, type FeedbackKind } from "@/lib/feedback";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -119,7 +119,7 @@ export function Feedback() {
           {showDiag ? t("fb.hide") : t("fb.see")}
         </button>
         {showDiag && (
-          <pre className="card mt-2 overflow-x-auto whitespace-pre-wrap p-3 text-xs text-muted">{`App ${d.version} on ${d.platform}\n${d.screen} · ${d.language} · ${d.timeZone}\n${d.userAgent}\n${d.errors.length ? d.errors.join("\n") : t("fb.noErrors")}`}</pre>
+          <pre className="card mt-2 overflow-x-auto whitespace-pre-wrap p-3 text-xs text-muted">{diagPreview(d, t("fb.noErrors"))}</pre>
         )}
         <p className="mt-2 text-xs text-faint">{t("fb.never")}</p>
       </Section>

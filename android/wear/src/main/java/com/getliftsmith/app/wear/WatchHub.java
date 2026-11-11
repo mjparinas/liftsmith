@@ -26,6 +26,8 @@ final class WatchHub {
     static final String PATH_WORKOUT = "/liftsmith/workout";
     static final String PATH_ACTION = "/liftsmith/action";
     static final String PATH_HR = "/liftsmith/hr";
+    /** Wrist motion for watch rep counting (Labs), as MotionBatch packs it. */
+    static final String PATH_MOTION = "/liftsmith/motion";
     /** Heart rate goes to the phone at most this often; the phone keeps about one reading a second. */
     static final long HR_SEND_MS = 2000;
 
@@ -100,6 +102,11 @@ final class WatchHub {
     /** Log set or +30 s, done on the phone exactly like the notification's buttons. */
     static void action(Context context, String action) {
         send(context.getApplicationContext(), PATH_ACTION, action);
+    }
+
+    /** A batch of wrist motion (MotionStream), counted into reps on the phone. */
+    static void motion(Context context, String body) {
+        send(context.getApplicationContext(), PATH_MOTION, body);
     }
 
     private static void send(Context app, String path, String body) {

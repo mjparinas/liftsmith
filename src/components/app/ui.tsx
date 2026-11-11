@@ -430,9 +430,11 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     };
   }, []);
 
-  // Swipe down to close. Native touch listeners, because touchmove must be non-passive to stop the page
-  // scrolling while the sheet follows the finger. A drag only starts downward, at the top of the sheet's
-  // scroll, and not on a control that drags itself.
+  // Swipe down to close, by finger or by mouse (Melvin, 2026-11-11: "cursor or finger"). Fingers use native
+  // touch listeners, because touchmove must be non-passive to stop the page scrolling while the sheet follows
+  // the finger; a touch drag only starts downward, at the top of the sheet's scroll, and not on a control that
+  // drags itself. A mouse or pen drags from the handle or the title row, so pressing in the content still
+  // selects text and works its controls.
   useEffect(() => {
     const el = box.current;
     if (!el) return;
@@ -453,39 +455,35 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
         backdrop.style.opacity = y ? String(Math.max(0.2, 1 - y / (el.offsetHeight || window.innerHeight))) : "";
       }
     };
-    const down = (e: TouchEvent) => {
-      const target = e.target as Element | null;
-      const onHandle = !!target?.closest("[data-sheet-handle]");
-      if (e.touches.length !== 1 || (!onHandle && (el.scrollTop > 0 || target?.closest(NO_SWIPE)))) {
-        start = null;
-        return;
-      }
-      start = { x: e.touches[0].clientX, y: e.touches[0].clientY, t: e.timeStamp || Date.now() };
+    const begin = (x: number, y: number, t: number) => {
+      start = { x, y, t };
       dragging = false;
       dy = 0;
     };
-    const move = (e: TouchEvent) => {
-      if (!start) return;
-      const x = e.touches[0].clientX - start.x;
-      const y = e.touches[0].clientY - start.y;
+    /** Follows the pointer; true while this is a drag of the sheet (so the caller stops the page's own handling). */
+    const follow = (cx: number, cy: number) => {
+      if (!start) return false;
+      const x = cx - start.x;
+      const y = cy - start.y;
       if (!dragging) {
-        if (Math.abs(y) < 8 && Math.abs(x) < 8) return;
+        if (Math.abs(y) < 8 && Math.abs(x) < 8) return false;
         if (y <= 0 || Math.abs(x) > Math.abs(y)) {
           start = null;
-          return;
+          return false;
         } // a scroll up or a sideways drag: leave it alone
         dragging = true;
       }
-      if (e.cancelable) e.preventDefault();
       dy = Math.max(0, y);
       set(dy, false);
+      return true;
     };
-    const up = (e: TouchEvent) => {
+    /** Lets go: closes after a long enough pull or a quick flick, springs back otherwise. True if it was a drag. */
+    const release = (t: number) => {
       if (!start || !dragging) {
         start = null;
-        return;
+        return false;
       }
-      const ms = Math.max(1, (e.timeStamp || Date.now()) - start.t);
+      const ms = Math.max(1, t - start.t);
       start = null;
       dragging = false;
       if (dy >= SWIPE_CLOSE.distance || (dy >= SWIPE_CLOSE.flick && dy / ms >= SWIPE_CLOSE.speed)) {
@@ -493,16 +491,69 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
         haptic("select");
         window.setTimeout(() => closeRef.current(), calm() ? 0 : 160);
       } else set(0, true);
+      return true;
+    };
+    const down = (e: TouchEvent) => {
+      const target = e.target as Element | null;
+      const onHandle = !!target?.closest("[data-sheet-handle]");
+      if (e.touches.length !== 1 || (!onHandle && (el.scrollTop > 0 || target?.closest(NO_SWIPE)))) {
+        start = null;
+        return;
+      }
+      begin(e.touches[0].clientX, e.touches[0].clientY, e.timeStamp || Date.now());
+    };
+    const move = (e: TouchEvent) => {
+      if (follow(e.touches[0].clientX, e.touches[0].clientY) && e.cancelable) e.preventDefault();
+    };
+    const up = (e: TouchEvent) => {
+      release(e.timeStamp || Date.now());
+    };
+    // Mouse and pen. Touch pointers are left to the touch listeners above.
+    let pointer: number | null = null;
+    const pDown = (e: PointerEvent) => {
+      if (e.pointerType === "touch" || e.button !== 0 || pointer !== null) return;
+      const target = e.target as Element | null;
+      if (!target?.closest("[data-sheet-handle]") || target.closest("button, a, input, select, textarea")) return;
+      e.preventDefault(); // no text selection while dragging
+      pointer = e.pointerId;
+      el.setPointerCapture?.(e.pointerId);
+      begin(e.clientX, e.clientY, e.timeStamp || Date.now());
+    };
+    const pMove = (e: PointerEvent) => {
+      if (e.pointerId === pointer) follow(e.clientX, e.clientY);
+    };
+    const swallowClick = (e: MouseEvent) => {
+      e.stopPropagation();
+      e.preventDefault();
+    };
+    const pUp = (e: PointerEvent) => {
+      if (e.pointerId !== pointer) return;
+      pointer = null;
+      if (el.hasPointerCapture?.(e.pointerId)) el.releasePointerCapture(e.pointerId);
+      // The click that follows a drag isn't a tap on the backdrop or a control: swallow it.
+      if (release(e.timeStamp || Date.now())) {
+        window.addEventListener("click", swallowClick, { capture: true, once: true });
+        window.setTimeout(() => window.removeEventListener("click", swallowClick, { capture: true }), 0);
+      }
     };
     el.addEventListener("touchstart", down, { passive: true });
     el.addEventListener("touchmove", move, { passive: false });
     el.addEventListener("touchend", up);
     el.addEventListener("touchcancel", up);
+    el.addEventListener("pointerdown", pDown);
+    el.addEventListener("pointermove", pMove);
+    el.addEventListener("pointerup", pUp);
+    el.addEventListener("pointercancel", pUp);
     return () => {
       el.removeEventListener("touchstart", down);
       el.removeEventListener("touchmove", move);
       el.removeEventListener("touchend", up);
       el.removeEventListener("touchcancel", up);
+      el.removeEventListener("pointerdown", pDown);
+      el.removeEventListener("pointermove", pMove);
+      el.removeEventListener("pointerup", pUp);
+      el.removeEventListener("pointercancel", pUp);
+      window.removeEventListener("click", swallowClick, { capture: true });
     };
   }, []);
 
@@ -523,13 +574,13 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
       >
         <div
           data-sheet-handle
-          className="-mx-5 flex cursor-grab justify-center pb-2 pt-1"
+          className="-mx-5 flex cursor-grab justify-center pb-2 pt-1 active:cursor-grabbing"
           style={{ touchAction: "none" }}
           aria-hidden="true"
         >
           <div className="h-1.5 w-10 rounded-full bg-line" />
         </div>
-        <div className="mb-3 flex items-start gap-2">
+        <div data-sheet-handle className="mb-3 flex items-start gap-2">
           <h2 id={`${id}-t`} className={`min-w-0 flex-1 pt-2 ${SHEET_TITLE}`}>
             {title}
           </h2>
