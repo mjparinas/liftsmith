@@ -1650,6 +1650,913 @@ function bike(): Motion {
   };
 }
 
+// ---------- moves that used to borrow another move's motion (2026-11-11) ----------
+const deg = (r: number) => (r * 180) / Math.PI;
+/** The torso's lean (degrees from upright, forward positive) for a hip and shoulder centre. */
+const leanOf = (hip: Vec, sh: Vec) => deg(Math.atan2(sh[0] - hip[0], sh[1] - hip[1]));
+type Two = { L: Vec; R: Vec };
+/** One side of a per-side value: a single Vec is mirrored (its z is the half-width). */
+function sideOf(v: Pose["hand"] | undefined, s: "L" | "R", fallback: Vec): Vec {
+  const x = v ?? fallback;
+  if (!Array.isArray(x)) return x[s];
+  return V(x[0], x[1], (s === "L" ? -1 : 1) * Math.abs(x[2]));
+}
+const both = (v: Pose["hand"] | undefined, fallback: Vec): Two => ({ L: sideOf(v, "L", fallback), R: sideOf(v, "R", fallback) });
+
+/** A key pose for `keyframes`: hip, torso lean, and where each hand and foot is. */
+interface Key {
+  hip: Vec;
+  lean: number;
+  hand: Two;
+  ankle: Two;
+  foot?: number;
+  kneePole?: Two;
+  elbowPole?: Two;
+  headBlend?: number;
+}
+/** A Key from a family's pose, so a sequence can start from moves that already exist. */
+function keyOf(p: Pose, B: Body, stance = 0.14, grip = 0.25): Key {
+  return {
+    hip: p.hip,
+    lean: leanOf(p.hip, p.sh),
+    hand: both(p.hand, V(0, 0, grip)),
+    ankle: both(p.ankle, V(0, ANKLE_H, stance * B.s)),
+    foot: typeof p.foot === "number" ? p.foot : 0,
+    kneePole: both(p.kneePole, V(1, 0, 0.45)),
+    elbowPole: both(p.elbowPole, V(-1, -0.7, 0.4)),
+    headBlend: p.headBlend ?? 0.45,
+  };
+}
+/**
+ * A sequence of key poses (burpees, box jumps, the get-up), d running 0 to 1 across them. Hands
+ * and feet blend as offsets from their own shoulder and hip, so a limb that reaches in both keys
+ * reaches all the way between them.
+ */
+function keyframes(B: Body, keys: Key[], d: number): Pose {
+  const k = clamp(d, 0, 1) * (keys.length - 1);
+  const i = Math.min(Math.floor(k), keys.length - 2);
+  const t = k - i;
+  const a = keys[i]!,
+    b = keys[i + 1]!;
+  const hip = lerpV(a.hip, b.hip, t);
+  const sh = torsoAt(B, hip, lerp(a.lean, b.lean, t));
+  const shA = torsoAt(B, a.hip, a.lean),
+    shB = torsoAt(B, b.hip, b.lean);
+  const limb = (pa: Vec, pb: Vec, from: Vec, fa: Vec, fb: Vec): Vec =>
+    add(V(from[0], from[1], 0), lerpV(sub(pa, V(fa[0], fa[1], 0)), sub(pb, V(fb[0], fb[1], 0)), t));
+  const pole = (s: "L" | "R", pa?: Two, pb?: Two): Vec => lerpV(pa?.[s] ?? V(1, 0, 0.45), pb?.[s] ?? V(1, 0, 0.45), t);
+  return {
+    hip,
+    sh,
+    hand: per(limb(a.hand.L, b.hand.L, sh, shA, shB), limb(a.hand.R, b.hand.R, sh, shA, shB)),
+    ankle: per(limb(a.ankle.L, b.ankle.L, hip, a.hip, b.hip), limb(a.ankle.R, b.ankle.R, hip, a.hip, b.hip)),
+    foot: lerp(a.foot ?? 0, b.foot ?? 0, t),
+    kneePole: per(pole("L", a.kneePole, b.kneePole), pole("R", a.kneePole, b.kneePole)),
+    elbowPole: per(pole("L", a.elbowPole, b.elbowPole), pole("R", a.elbowPole, b.elbowPole)),
+    headBlend: lerp(a.headBlend ?? 0.45, b.headBlend ?? 0.45, t),
+  };
+}
+
+/** Standing tall, arms hanging: the start and end of many sequences. */
+function standKey(B: Body, lift = 0): Key {
+  const hip = V(0.02, standY(B) + lift);
+  const sh = torsoAt(B, hip, 0);
+  const h = hang(B, sh, 0.06, 0.95);
+  return {
+    hip,
+    lean: 0,
+    hand: both(h, h),
+    ankle: both(V(0.03, ANKLE_H + lift, 0.12), V(0, 0, 0)),
+    foot: lift ? 35 : 0,
+    kneePole: both(V(1, 0, 0.3), V(0, 0, 0)),
+    elbowPole: both(V(-1, 0, 0.4), V(0, 0, 0)),
+    headBlend: 1,
+  };
+}
+
+/**
+ * One-arm ballistic kettlebell lifts from the swing: the clean (to the rack), the snatch (to
+ * overhead) and the high pull (elbow high, bell at the chin). The free arm hangs.
+ */
+function kbFlow(o: { to: "rack" | "overhead" | "chin"; load?: Load }): Motion {
+  const finish = { rack: "Clean to the rack", overhead: "Punch overhead", chin: "Pull, elbow high" }[o.to];
+  return {
+    phases: [
+      [0.8, 1, 0, finish, 1],
+      [0.5, 0, 0, o.to === "chin" ? "Top" : "Lock in", 0.5],
+      [0.9, 0, 1, "Hike back", 0.55],
+    ],
+    load: o.load ?? "kettlebell",
+    hold: "R",
+    stance: 0.2,
+    pose(B, d) {
+      const hinge = clamp((d - 0.4) / 0.6, 0, 1);
+      const lean = lerp(2, 58, hinge);
+      const shX = 0.04 + 0.06 * hinge;
+      const hipX = shX - Math.sin(rad(lean)) * B.torso;
+      const hip = V(hipX, standY(B, hipX, lerp(1, 0.9, hinge)));
+      const sh = torsoAt(B, hip, lean);
+      const r = reach(B);
+      const top = V(sh[0], sh[1], B.shW);
+      const low = add(swing(top, r * 0.95, lerp(30, -25, hinge) + lean * 0.6 * hinge), V(0, 0, -0.08));
+      const target =
+        o.to === "rack"
+          ? V(sh[0] + 0.1, sh[1] - 0.1, 0.08)
+          : o.to === "overhead"
+            ? V(sh[0] + 0.03, sh[1] + r * 0.95, B.shW - 0.02)
+            : V(sh[0] + 0.13, sh[1] + 0.01, 0.1);
+      const targetPole = o.to === "rack" ? V(0.2, -1, 0.3) : o.to === "overhead" ? V(0, -1, 1) : V(-0.3, 1, 1);
+      const k = clamp(d / 0.4, 0, 1);
+      const hand = d < 0.4 ? add(lerpV(target, low, k), V(0.06 * Math.sin(Math.PI * k), 0, 0)) : low;
+      const free = hang(B, sh, 0.04);
+      return {
+        hip,
+        sh,
+        hand: per(V(free[0], free[1], -free[2]), hand),
+        elbowPole: per(V(-1, 0, 0.3), lerpV(targetPole, V(0, 1, 0.2), k)),
+        kneePole: V(1, 0, 0.45),
+        headBlend: 0.5,
+      };
+    },
+  };
+}
+
+/** Thrusters: a front squat with the weights racked, standing straight into a press overhead. */
+function thruster(o: { load: Load }): Motion {
+  const base = squat({ hold: "goblet" });
+  return {
+    phases: [
+      [0.45, 0, 0, "Lockout", 0.5],
+      [0.7, 0, 0.35, "Rack", 0.4],
+      [1.4, 0.35, 1, "Squat · 2s", 0.55],
+      [1.1, 1, 0, "Drive and press", 1],
+    ],
+    load: o.load,
+    hold: "each",
+    stance: 0.19,
+    pose(B, d) {
+      const { hip, sh } = base.pose(B, clamp((d - 0.35) / 0.65, 0, 1));
+      const press = clamp(1 - d / 0.35, 0, 1);
+      const rack = V(sh[0] + 0.1, sh[1] + 0.03, B.shW + 0.03);
+      const up = V(sh[0] + 0.03, sh[1] + reach(B) * 0.95, B.shW - 0.02);
+      return { hip, sh, hand: lerpV(rack, up, press), elbowPole: V(0.4, -1, 0.6), kneePole: V(1, 0, 0.45), headBlend: 0.8 };
+    },
+  };
+}
+
+/** Kettlebell halo: the bell held by the horns, circling the head. */
+function halo(): Motion {
+  return {
+    phases: [[2.4, 0, 1, "Circle the head", 0.6]],
+    load: "kettlebell",
+    hold: "centre",
+    stance: 0.15,
+    pose(B, d) {
+      const hip = V(0.02, standY(B));
+      const sh = torsoAt(B, hip, 0);
+      const th = 2 * Math.PI * d;
+      const c = V(sh[0] + 0.03, sh[1] + 0.17);
+      const at = (dz: number): Vec => V(c[0] + 0.2 * Math.cos(th), c[1], 0.2 * Math.sin(th) + dz);
+      return { hip, sh, hand: per(at(-0.04), at(0.04)), elbowPole: V(0.4 * Math.cos(th), -1, 1), headBlend: 1 };
+    },
+  };
+}
+
+/** Around the world: the bell passed hand to hand around the waist. */
+function aroundWorld(): Motion {
+  return {
+    phases: [[2.2, 0, 1, "Pass it round", 0.6]],
+    load: "kettlebell",
+    hold: "centre",
+    stance: 0.17,
+    pose(B, d) {
+      const hip = V(0.02, standY(B));
+      const sh = torsoAt(B, hip, 0);
+      const th = 2 * Math.PI * d;
+      const rx = Math.cos(th) > 0 ? 0.27 : 0.22;
+      const c = V(hip[0] + rx * Math.cos(th), hip[1] + 0.12, 0.21 * Math.sin(th));
+      return { hip, sh, hand: per(add(c, V(0, 0, -0.035)), add(c, V(0, 0, 0.035))), elbowPole: V(-0.2, -1, 1), headBlend: 1 };
+    },
+  };
+}
+
+/** Lying ab work: crunches, leg raises, V-ups, the hollow hold and bicycle crunches. */
+function floorCore(o: { kind: "crunch" | "legRaise" | "vUp" | "hollow" | "bicycle" }): Motion {
+  const phases =
+    o.kind === "hollow"
+      ? TEMPO.hold("Hold · breathe")
+      : o.kind === "bicycle"
+        ? TEMPO.alternate("Elbow to knee", "Other side")
+        : o.kind === "crunch"
+          ? TEMPO.liftFirst("Curl up · 1s", "Lower · 2s", "Flat", "Squeeze")
+          : o.kind === "legRaise"
+            ? TEMPO.liftFirst("Raise · 1s", "Lower · 2s", "Legs low", "Top")
+            : TEMPO.liftFirst("Fold up · 1s", "Lower · 2s", "Long", "Touch");
+  return {
+    phases,
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const hip = V(0.25, 0.13);
+      const r = reach(B) * 0.93;
+      const L = legMax(B) * 0.97;
+      const arm = (sh: Vec, a: number, z: number): Vec => V(sh[0] + Math.cos(rad(a)) * r, sh[1] + Math.sin(rad(a)) * r, z);
+      const leg = (a: number, z: number): Vec => V(hip[0] + Math.cos(rad(a)) * L, hip[1] + Math.sin(rad(a)) * L, z);
+      const toward = (from: Vec, to: Vec) => deg(Math.atan2(to[1] - from[1], to[0] - from[0]));
+      const zA = B.shW + 0.02;
+      if (o.kind === "crunch") {
+        const sh = torsoAt(B, hip, lerp(-90, -62, d));
+        const a = toward(sh, hip) + 16;
+        return {
+          hip,
+          sh,
+          ankle: V(hip[0] + 0.5, ANKLE_H, 0.13),
+          kneePole: V(0.3, 1, 0.1),
+          hand: per(arm(sh, a, -zA), arm(sh, a, zA)),
+          elbowPole: V(0, 1, 0.5),
+          headBlend: 0,
+        };
+      }
+      if (o.kind === "legRaise") {
+        const sh = torsoAt(B, hip, -90);
+        const a = lerp(6, 85, d);
+        return {
+          hip,
+          sh,
+          ankle: per(leg(a, -0.09), leg(a, 0.09)),
+          kneePole: V(-Math.sin(rad(a)), Math.cos(rad(a)), 0.1),
+          hand: V(hip[0] - 0.08, 0.05, B.shW + 0.1),
+          elbowPole: V(0, 1, 0.5),
+          headBlend: 0,
+        };
+      }
+      const lean = o.kind === "vUp" ? lerp(-90, -48, d) : o.kind === "hollow" ? lerp(-75, -73, d) : -66;
+      const sh = torsoAt(B, hip, lean);
+      if (o.kind === "bicycle") {
+        const up = norm(sub(sh, hip));
+        const front = frontOf(lean);
+        const head = add(add(sh, mul(up, 0.17)), mul(front, -0.05));
+        const tuck = (z: number): Vec => V(hip[0] + 0.3, hip[1] + 0.38, z);
+        const long = (z: number): Vec => leg(14, z);
+        return {
+          hip,
+          sh,
+          ankle: per(lerpV(long(-0.1), tuck(-0.1), d), lerpV(tuck(0.1), long(0.1), d)),
+          kneePole: V(-0.1, 1, 0.1),
+          hand: per(add(head, V(0, 0, -0.1 - 0.03 * (1 - d))), add(head, V(0, 0, 0.1 + 0.03 * d))),
+          elbowPole: V(0.4, 0.4, 1),
+          headBlend: 0.2,
+        };
+      }
+      const legA = o.kind === "vUp" ? lerp(5, 52, d) : lerp(13, 15, d);
+      const ankle = per(leg(legA, -0.08), leg(legA, 0.08));
+      const handA = o.kind === "vUp" ? lerp(172, toward(sh, leg(legA, 0)), d) : 166;
+      return {
+        hip,
+        sh,
+        ankle,
+        kneePole: V(-Math.sin(rad(legA)), Math.cos(rad(legA)), 0.1),
+        hand: per(arm(sh, handA, -0.15), arm(sh, handA, 0.15)),
+        elbowPole: V(0, 1, 0.3),
+        headBlend: 0.2,
+      };
+    },
+  };
+}
+
+/** On hands and knees: bird dogs (opposite arm and leg reach long) and donkey kicks. */
+function allFours(o: { kind: "birdDog" | "donkey" }): Motion {
+  return {
+    phases:
+      o.kind === "birdDog"
+        ? [
+            [0.5, 0.5, 0.5, "All fours", 0.3],
+            [1, 0.5, 1, "Reach long", 0.8],
+            [0.6, 1, 1, "Hold", 0.7],
+            [1, 1, 0.5, "Return", 0.5],
+            [1, 0.5, 0, "Other side", 0.8],
+            [0.6, 0, 0, "Hold", 0.7],
+            [1, 0, 0.5, "Return", 0.5],
+          ]
+        : TEMPO.liftFirst("Kick up · 1s", "Lower · 2s", "All fours", "Squeeze"),
+    load: "none",
+    stance: 0.1,
+    pose(B, d) {
+      const hip = V(0, 0.06 + B.thigh * 0.97);
+      const shY = 0.03 + reach(B) * 0.94;
+      const lean = deg(Math.acos(clamp((shY - hip[1]) / B.torso, -1, 1)));
+      const sh = torsoAt(B, hip, lean);
+      const r = reach(B) * 0.93;
+      const L = legMax(B) * 0.96;
+      const handDown = (z: number): Vec => V(sh[0] + 0.02, 0.03, z);
+      const handLong = (z: number): Vec => V(sh[0] + r * 0.98, sh[1] + r * 0.17, z);
+      const kneel = (z: number): Vec => V(hip[0] - B.shin * 0.96, 0.08, z);
+      const legLong = (z: number): Vec => V(hip[0] - L, hip[1] + 0.05, z);
+      const elbowPole = V(-0.6, 0.3, 0.3);
+      if (o.kind === "birdDog") {
+        const right = clamp((d - 0.5) * 2, 0, 1); // right arm, left leg
+        const left = clamp((0.5 - d) * 2, 0, 1); // left arm, right leg
+        return {
+          hip,
+          sh,
+          hand: per(lerpV(handDown(-0.17), handLong(-0.15), left), lerpV(handDown(0.17), handLong(0.15), right)),
+          ankle: per(lerpV(kneel(-0.1), legLong(-0.1), right), lerpV(kneel(0.1), legLong(0.1), left)),
+          foot: { L: lerp(150, 90, right), R: lerp(150, 90, left) },
+          kneePole: per(lerpV(V(0.4, -1, -0.1), V(0, -1, -0.1), right), lerpV(V(0.4, -1, 0.1), V(0, -1, 0.1), left)),
+          elbowPole,
+          headBlend: 0.2,
+        };
+      }
+      // Donkey kick: the right knee stays bent at a right angle while the thigh drives up behind.
+      const phi = rad(lerp(0, 100, d));
+      const thighDir = V(-Math.sin(phi), -Math.cos(phi));
+      const shinDir = V(thighDir[1], -thighDir[0]);
+      const ankleR = add(add(hip, mul(thighDir, B.thigh * 0.93)), mul(shinDir, B.shin * 0.97));
+      return {
+        hip,
+        sh,
+        hand: handDown(0.17),
+        ankle: per(kneel(-0.1), V(ankleR[0], ankleR[1], 0.1)),
+        foot: { L: 150, R: lerp(150, 60, d) },
+        kneePole: per(V(0.4, -1, -0.1), V(thighDir[0] - shinDir[0], thighDir[1] - shinDir[1], 0.1)),
+        elbowPole,
+        headBlend: 0.2,
+      };
+    },
+  };
+}
+
+/** Standing glute kickback: one straight leg sweeps back against a cable or band. */
+function kickback(o: { band?: boolean }): Motion {
+  const frame = (B: Body) => {
+    const hip = V(0, standY(B, 0.03, 0.99));
+    const sh = torsoAt(B, hip, 12);
+    return { hip, sh, grab: V(sh[0] + 0.32, sh[1] - 0.22) };
+  };
+  return {
+    phases: TEMPO.liftFirst("Kick back · 1s", "Return · 2s", "Set", "Squeeze"),
+    load: "none",
+    stance: 0.11,
+    pose(B, d) {
+      const { hip, sh, grab } = frame(B);
+      const a = rad(lerp(4, 38, d));
+      const L = legMax(B) * 0.97;
+      return {
+        hip,
+        sh,
+        ankle: per(V(0.03, ANKLE_H, -0.11), V(hip[0] - Math.sin(a) * L, hip[1] - Math.cos(a) * L, 0.11)),
+        foot: { L: 0, R: lerp(0, 30, d) },
+        kneePole: V(1, 0, 0.3),
+        hand: o.band ? V(hip[0] + 0.02, hip[1] + 0.06, B.hipW + 0.13) : V(grab[0], grab[1], 0.2),
+        elbowPole: o.band ? V(-0.4, 0, 1) : V(-0.3, -1, 0.4),
+        headBlend: 0.8,
+      };
+    },
+    props: o.band
+      ? () => [cable("ankleL", "ankleR")]
+      : (B) => {
+          const { grab } = frame(B);
+          return [cable(V(-0.8, 0.12, 0.11), "ankleR"), rail(V(grab[0] + 0.02, grab[1], 0), 0.6, "z")];
+        },
+  };
+}
+
+/** Upright rows: the hands rise close to the body to the chest, elbows leading high and wide. */
+function uprightRow(o: { load: Load; cable?: boolean }): Motion {
+  return {
+    phases: TEMPO.liftFirst("Pull up · 1s", "Lower · 2s", "Hang", "Elbows high"),
+    load: o.load,
+    stance: 0.13,
+    grip: 0.11,
+    plates: 0.7,
+    pose(B, d) {
+      const hip = V(0.02, standY(B));
+      const sh = torsoAt(B, hip, 0);
+      const low = V(sh[0] + 0.12, sh[1] - reach(B) * 0.93, 0.11);
+      const high = V(sh[0] + 0.1, sh[1] - 0.06, 0.1);
+      const hand = lerpV(low, high, d);
+      return {
+        hip,
+        sh,
+        shrug: 0.02 * d,
+        hand,
+        bar: o.load === "barbell" ? V(hand[0], hand[1], 0) : undefined,
+        elbowPole: lerpV(V(-1, 0, 0.6), V(-0.2, 1, 1), d),
+        headBlend: 1,
+      };
+    },
+    props: o.cable ? () => [cable(V(0.3, 0.05, 0), "hands")] : undefined,
+  };
+}
+
+/** L-sit on dip bars: arms locked, legs held straight out in front. */
+function lSit(): Motion {
+  return {
+    phases: TEMPO.hold("Hold · legs long"),
+    load: "none",
+    stance: 0.07,
+    pose(B, d) {
+      const barY = 1.3;
+      const sh = V(0.02, barY + reach(B) * 0.97);
+      const hip = sub(sh, V(Math.sin(rad(4)) * B.torso, Math.cos(rad(4)) * B.torso));
+      const a = rad(lerp(-6, 1, d));
+      const L = legMax(B) * 0.97;
+      return {
+        hip,
+        sh,
+        ankle: V(hip[0] + Math.cos(a) * L, hip[1] + Math.sin(a) * L, 0.07),
+        kneePole: V(0, 1, 0.1),
+        hand: V(0.02, barY, 0.26),
+        elbowPole: V(-1, 0, 0.1),
+        headBlend: 0.7,
+      };
+    },
+    props: () => [
+      rail(V(0.05, 1.28, -0.26), 0.8, "x"),
+      rail(V(0.05, 1.28, 0.26), 0.8, "x"),
+      rail(V(0.4, 0.64, -0.26), 1.28, "y"),
+      rail(V(0.4, 0.64, 0.26), 1.28, "y"),
+    ],
+  };
+}
+
+/** Renegade row: a plank on two dumbbells, rowing one to the ribs, then the other. */
+function renegadeRow(): Motion {
+  const base = pushUp({ hands: 0.07, width: 0.2 });
+  return {
+    phases: [
+      [1.3, 0, 0.5, "Row right", 1],
+      [1.3, 0.5, 1, "Row left", 1],
+    ],
+    load: "dumbbell",
+    hold: "each",
+    stance: 0.2,
+    grip: 0.2,
+    pose(B, d) {
+      const p = base.pose(B, 0);
+      const { hip, sh } = p;
+      const lean = leanOf(hip, sh);
+      const floor = (z: number): Vec => V(0.47, 0.1, z);
+      const ribs = (z: number): Vec => {
+        const c = onTorso(hip, sh, lean, 0.72, 0.06);
+        return V(c[0], c[1], z);
+      };
+      const right = Math.max(0, Math.sin(2 * Math.PI * d)),
+        left = Math.max(0, -Math.sin(2 * Math.PI * d));
+      const ankle = sideOf(p.ankle, "R", V(0, 0, 0));
+      return {
+        ...p,
+        hand: per(lerpV(floor(-0.2), ribs(-0.2), left), lerpV(floor(0.2), ribs(0.2), right)),
+        ankle: V(ankle[0], ankle[1], 0.2),
+        elbowPole: per(lerpV(V(-0.7, 0.6, -0.7), V(-0.6, 1, -0.2), left), lerpV(V(-0.7, 0.6, 0.7), V(-0.6, 1, 0.2), right)),
+      };
+    },
+  };
+}
+
+/** Burpee: squat down, hands to the floor, jump back to a plank, jump in, jump up. */
+function burpee(): Motion {
+  return {
+    phases: [
+      [0.5, 2 / 3, 1 / 3, "Hands down", 0.6],
+      [0.35, 1 / 3, 0, "Jump back", 0.9],
+      [0.3, 0, 0, "Plank", 0.6],
+      [0.35, 0, 1 / 3, "Jump in", 0.9],
+      [0.55, 1 / 3, 1, "Jump up", 1],
+      [0.35, 1, 2 / 3, "Land soft", 0.5],
+    ],
+    load: "none",
+    stance: 0.12,
+    pose(B, d) {
+      const plank = keyOf(pushUp({}).pose(B, 0), B, 0.1, 0.22);
+      const hip = V(-0.12, ANKLE_H + B.shin * 0.72);
+      const down: Key = {
+        hip,
+        lean: 72,
+        hand: both(V(0.47, 0.03, 0.22), V(0, 0, 0)),
+        ankle: both(V(0.05, ANKLE_H, 0.13), V(0, 0, 0)),
+        foot: 0,
+        kneePole: both(V(1, 0.2, 0.4), V(0, 0, 0)),
+        elbowPole: both(V(-0.7, 0.6, 0.7), V(0, 0, 0)),
+        headBlend: 0.4,
+      };
+      const jump = standKey(B, 0.14);
+      const sh = torsoAt(B, jump.hip, 0);
+      const up = V(sh[0] + 0.02, sh[1] + reach(B) * 0.95, B.shW);
+      jump.hand = both(up, up);
+      jump.elbowPole = both(V(0, -1, 1), V(0, 0, 0));
+      return keyframes(B, [plank, down, standKey(B), jump], d);
+    },
+  };
+}
+
+/** Jump squat: sit down, explode up off the floor with the arms swinging, land soft. */
+function jumpSquat(): Motion {
+  const base = squat({ hold: "arms" });
+  return {
+    phases: [
+      [0.9, 0.2, 1, "Sit down", 0.55],
+      [0.35, 1, 0.2, "Explode", 1],
+      [0.25, 0.2, 0, "Jump", 0.8],
+      [0.3, 0, 0.2, "Land soft", 0.6],
+      [0.4, 0.2, 0.2, "Reset", 0.3],
+    ],
+    load: "none",
+    stance: 0.19,
+    pose(B, d) {
+      const p = base.pose(B, clamp((d - 0.2) / 0.8, 0, 1));
+      const air = clamp((0.2 - d) / 0.2, 0, 1) * 0.13;
+      const hip = add(p.hip, V(0, air)),
+        sh = add(p.sh, V(0, air));
+      const a = d >= 0.2 ? lerp(60, -30, (d - 0.2) / 0.8) : lerp(150, 60, d / 0.2);
+      const hand = swing(V(sh[0], sh[1], B.shW), reach(B) * 0.95, a);
+      return {
+        hip,
+        sh,
+        hand: V(hand[0], hand[1], B.shW + 0.03),
+        ankle: V(0, ANKLE_H + air, 0.19 * B.s),
+        foot: (air / 0.13) * 35,
+        kneePole: V(1, 0, 0.45),
+        elbowPole: V(-0.3, -1, 0.3),
+        headBlend: 0.7,
+      };
+    },
+  };
+}
+
+/** Box jump: dip, jump onto the box and land in a squat, stand tall, then back down. */
+function boxJump(): Motion {
+  const box = { x: 0.6, top: 0.45 };
+  return {
+    phases: [
+      [0.5, 0, 0.25, "Dip, arms back", 0.6],
+      [0.45, 0.25, 0.75, "Jump", 1],
+      [0.5, 0.75, 1, "Stand tall", 0.6],
+      [0.5, 1, 1, "On top", 0.3],
+      [1.2, 1, 0, "Step down", 0.4],
+    ],
+    load: "none",
+    stance: 0.15,
+    pose(B, d) {
+      const sq = squat({ hold: "arms" });
+      const shift = (k: Key, dx: number, dy: number): Key => {
+        const m = (v: Vec) => add(v, V(dx, dy));
+        return { ...k, hip: m(k.hip), hand: { L: m(k.hand.L), R: m(k.hand.R) }, ankle: { L: m(k.ankle.L), R: m(k.ankle.R) } };
+      };
+      const dip = keyOf(sq.pose(B, 0.45), B, 0.15, 0.16);
+      const dipSh = torsoAt(B, dip.hip, dip.lean);
+      const back = add(swing(V(dipSh[0], dipSh[1], B.shW), reach(B) * 0.95, -35), V(0, 0, 0.03));
+      dip.hand = both(back, back);
+      dip.elbowPole = both(V(-0.3, -1, 0.3), V(0, 0, 0));
+      dip.ankle = both(V(0.03, ANKLE_H, 0.15), V(0, 0, 0));
+      const air: Key = {
+        hip: V(0.32, 1.18),
+        lean: 22,
+        hand: both(V(0.75, 1.55, 0.25), V(0, 0, 0)),
+        ankle: both(V(0.47, 0.67, 0.15), V(0, 0, 0)),
+        foot: 10,
+        kneePole: both(V(1, 0.3, 0.3), V(0, 0, 0)),
+        elbowPole: both(V(-0.3, -1, 0.3), V(0, 0, 0)),
+        headBlend: 0.7,
+      };
+      const land = shift(keyOf(sq.pose(B, 0.7), B, 0.15, 0.16), box.x - 0.03, box.top);
+      land.ankle = both(V(box.x, box.top + ANKLE_H, 0.15), V(0, 0, 0));
+      return keyframes(B, [standKey(B), dip, air, land, shift(standKey(B), box.x - 0.02, box.top)], d);
+    },
+    props: () => [boxP(box.x + 0.03, box.top, 0.6, 0.5)],
+  };
+}
+
+/** Seated hip machine: the knees press out (abduction) or squeeze in (adduction). */
+function seatedHip(o: { out: boolean; band?: boolean }): Motion {
+  return {
+    phases: TEMPO.liftFirst(o.out ? "Press out · 1s" : "Squeeze in · 1s", "Return · 2s", "Set", "Squeeze"),
+    load: "none",
+    pose(B, d) {
+      const { hip, sh } = seated(B, 0.48, -8);
+      const psi = rad(o.out ? lerp(6, 32, d) : lerp(32, 6, d));
+      const leg = (sgn: number) => {
+        const knee = V(hip[0] + Math.cos(psi) * B.thigh * 0.98, hip[1] - 0.02, sgn * (B.hipW + Math.sin(psi) * B.thigh * 0.98));
+        return add(knee, V(0.04, -B.shin * 0.9, 0));
+      };
+      const pole = (sgn: number) => V(Math.cos(psi), 0.2, sgn * Math.sin(psi));
+      return {
+        hip,
+        sh,
+        ankle: per(leg(-1), leg(1)),
+        kneePole: per(pole(-1), pole(1)),
+        hand: V(hip[0] + 0.08, hip[1] - 0.02, B.hipW + 0.17),
+        elbowPole: V(-1, 0, 0.4),
+        headBlend: 1,
+      };
+    },
+    props: o.band ? (B) => [...seatProps(-8, false)(B), cable("kneeL", "kneeR")] : seatProps(-8),
+  };
+}
+
+/** Woodchop: both hands on one handle, chopping from high on one side to low on the other. */
+function woodchop(o: { load: Load; anchor?: boolean }): Motion {
+  return {
+    phases: TEMPO.liftFirst("Chop down · 1s", "Return · 2s", "High", "Low"),
+    load: o.load,
+    hold: "centre",
+    stance: 0.2,
+    pose(B, d) {
+      const hip = V(0.02, standY(B, 0.03, lerp(0.99, 0.93, d)));
+      const sh = torsoAt(B, hip, lerp(0, 18, d));
+      const high = V(sh[0] + 0.3, sh[1] + 0.07, 0.15);
+      const low = V(sh[0] + 0.3, sh[1] - 0.32, -0.15);
+      const c = lerpV(high, low, d);
+      return {
+        hip,
+        sh,
+        hand: per(add(c, V(0, 0, -0.035)), add(c, V(0, 0, 0.035))),
+        kneePole: V(1, 0, 0.45),
+        elbowPole: V(-0.3, -1, 0.6),
+        headBlend: 0.9,
+      };
+    },
+    props: o.anchor ? () => [cable(V(0.5, 2.0, 0.9), "hands")] : undefined,
+  };
+}
+
+/** Sled push: leaning hard into the posts, driving one leg back and then the other. */
+function sledPush(): Motion {
+  const frame = (B: Body) => {
+    const hip = V(0, ANKLE_H + legMax(B) * 0.82);
+    const sh = torsoAt(B, hip, 52);
+    return { hip, sh, grab: V(sh[0] + reach(B) * 0.72, sh[1] - 0.08) };
+  };
+  return {
+    phases: [[0.9, 0, 1, "Drive", 1]],
+    load: "none",
+    stance: 0.13,
+    pose(B, d) {
+      const { hip, sh, grab } = frame(B);
+      const ph = 2 * Math.PI * d;
+      const foot = (s: number): Vec => {
+        const p = ph + (s > 0 ? Math.PI : 0);
+        return V(-0.17 + 0.25 * Math.sin(p), ANKLE_H + Math.max(0, 0.08 * Math.cos(p)), s * 0.13);
+      };
+      return {
+        hip,
+        sh,
+        ankle: per(foot(-1), foot(1)),
+        kneePole: V(1, 0, 0.2),
+        hand: V(grab[0], grab[1], 0.2),
+        elbowPole: V(-0.3, -1, 0.5),
+        headBlend: 0.6,
+      };
+    },
+    props: (B) => {
+      const { grab } = frame(B);
+      return [
+        rail(V(grab[0] + 0.03, grab[1] / 2, -0.2), grab[1], "y"),
+        rail(V(grab[0] + 0.03, grab[1] / 2, 0.2), grab[1], "y"),
+        { kind: "box", at: V(grab[0] + 0.3, 0.12), size: V(0.6, 0.2, 0.6) },
+      ];
+    },
+  };
+}
+
+/** Rowing machine: legs, then body, then arms on the drive; arms, body, legs on the way back. */
+function erg(): Motion {
+  const plate = V(0.78, 0.3);
+  return {
+    phases: [
+      [1, 1, 0, "Drive: legs, body, arms", 1],
+      [1.5, 0, 1, "Arms, body, legs back", 0.4],
+    ],
+    load: "handle",
+    hold: "centre",
+    grip: 0.12,
+    stance: 0.12,
+    pose(B, d) {
+      const s = 1 - d; // 0 at the catch, 1 at the finish
+      const legs = clamp(s / 0.5, 0, 1),
+        body = clamp((s - 0.3) / 0.4, 0, 1),
+        arms = clamp((s - 0.6) / 0.4, 0, 1);
+      const hipY = 0.4;
+      const finishX = plate[0] - Math.sqrt(Math.max(0.01, (legMax(B) * 0.97) ** 2 - (hipY - plate[1]) ** 2));
+      const hip = V(lerp(plate[0] - 0.33, finishX, ease(legs)), hipY);
+      const lean = lerp(30, -25, ease(body));
+      const sh = torsoAt(B, hip, lean);
+      const straight = add(sh, mul(V(Math.cos(rad(-10)), Math.sin(rad(-10))), reach(B) * 0.95));
+      const ribs = onTorso(hip, sh, lean, 0.62, 0.1);
+      const hand = lerpV(straight, ribs, ease(arms));
+      return {
+        hip,
+        sh,
+        ankle: V(plate[0], plate[1], 0.12),
+        foot: -30,
+        kneePole: V(0.3, 1, 0.2),
+        hand: V(hand[0], hand[1], 0.12),
+        elbowPole: V(-1, 0, 0.6),
+        headBlend: 0.8,
+      };
+    },
+    props: () => [
+      { kind: "box", at: V(0, -0.1), size: V(0.3, 0.05, 0.28), follow: "hipC" },
+      { kind: "box", at: V(0.45, 0.22), size: V(1.8, 0.06, 0.12) },
+      { kind: "box", at: V(plate[0] + 0.07, 0.27), size: V(0.05, 0.3, 0.36), tilt: -30 },
+      { kind: "box", at: V(1.45, 0.38), size: V(0.28, 0.5, 0.4) },
+      cable(V(1.32, 0.55, 0), "hands"),
+    ],
+  };
+}
+
+/** Elliptical: feet on pedals travelling an oval, hands pushing and pulling the handles. */
+function elliptical(): Motion {
+  return {
+    phases: [[1.1, 0, 1, "Stride", 0.8]],
+    load: "none",
+    stance: 0.12,
+    pose(B, d) {
+      const hipY = 0.13 + Math.sqrt(Math.max(0.01, (legMax(B) * 0.97) ** 2 - 0.22 ** 2));
+      const hip = V(0.05, hipY);
+      const sh = torsoAt(B, hip, 6);
+      const th = 2 * Math.PI * d;
+      const pedal = (p: number, z: number): Vec => V(0.05 + 0.22 * Math.cos(p), 0.2 + 0.07 * Math.sin(p), z);
+      const handle = (p: number, z: number): Vec => V(sh[0] + 0.3 - 0.1 * Math.cos(p), sh[1] - 0.22, z);
+      return {
+        hip,
+        sh,
+        ankle: per(pedal(th, -0.12), pedal(th + Math.PI, 0.12)),
+        kneePole: V(1, 0.1, 0.2),
+        hand: per(handle(th + Math.PI, -0.25), handle(th, 0.25)),
+        elbowPole: V(-1, -0.6, 0.3),
+        headBlend: 1,
+      };
+    },
+    props: () => [boxP(0.05, 0.05, 0.5, 0.9)],
+  };
+}
+
+/** Walking (an incline treadmill walk): steady strides, arms swinging opposite the legs. */
+function walk(): Motion {
+  const c = carry({ hold: "each", load: "none" });
+  return {
+    ...c,
+    phases: [[1.2, 0, 1, "Walk", 0.6]],
+    pose(B, d) {
+      const p = c.pose(B, d);
+      const ph = 2 * Math.PI * d;
+      const arm = (sgn: number): Vec => {
+        const h = swing(V(p.sh[0], p.sh[1], sgn * B.shW), reach(B) * 0.95, sgn * 22 * Math.sin(ph));
+        return V(h[0], h[1], sgn * (B.shW + 0.05));
+      };
+      return { ...p, hand: per(arm(-1), arm(1)), elbowPole: V(-1, 0, 0.3) };
+    },
+    props: () => [boxP(0.05, 0.03, 0.6, 1.4)],
+  };
+}
+
+/** Turkish get-up: from lying with the bell pressed up, to the elbow, the hand, a kneel, standing, and back down. */
+function turkishGetUp(): Motion {
+  return {
+    phases: [
+      [0.9, 0, 0.25, "Roll to the elbow", 0.8],
+      [0.9, 0.25, 0.5, "Up to the hand", 0.8],
+      [1.2, 0.5, 0.75, "Sweep the leg, kneel", 0.9],
+      [1, 0.75, 1, "Stand up", 1],
+      [0.6, 1, 1, "Stand tall", 0.5],
+      [1, 1, 0.75, "Kneel", 0.7],
+      [1.2, 0.75, 0.5, "Hand down", 0.7],
+      [0.9, 0.5, 0.25, "To the elbow", 0.6],
+      [0.9, 0.25, 0, "Lie down", 0.5],
+      [0.5, 0, 0, "Bell up", 0.3],
+    ],
+    load: "kettlebell",
+    hold: "R",
+    stance: 0.13,
+    pose(B, d) {
+      const L = legMax(B) * 0.95;
+      const floorHip = V(0.25, 0.13);
+      const lying = (lean: number, handL: (sh: Vec) => Vec, poleL: Vec): Key => {
+        const sh = torsoAt(B, floorHip, lean);
+        return {
+          hip: floorHip,
+          lean,
+          hand: { L: handL(sh), R: V(0, 0, 0) },
+          ankle: { L: V(floorHip[0] + L, 0.1, -0.16), R: V(floorHip[0] + 0.45, ANKLE_H, 0.15) },
+          foot: 0,
+          kneePole: { L: V(0, 1, -0.1), R: V(0.3, 1, 0.1) },
+          elbowPole: { L: poleL, R: V(0, 0, 1) },
+          headBlend: 0,
+        };
+      };
+      const lie = lying(-90, (sh) => V(sh[0] + 0.15, 0.04, -(B.shW + 0.25)), V(0, 1, -0.5));
+      const elbow = lying(-55, (sh) => V(sh[0] + 0.25, 0.04, -(B.shW + 0.13)), V(-0.5, -1, -0.5));
+      const hand = lying(-25, (sh) => V(sh[0] - 0.07, 0.05, -(B.shW + 0.1)), V(-1, 0, -0.3));
+      hand.headBlend = 0.5;
+      const kneelHip = V(0, 0.06 + B.thigh * 0.96);
+      const kneelSh = torsoAt(B, kneelHip, 4);
+      const free = hang(B, kneelSh, 0.06, 0.95);
+      const kneel: Key = {
+        hip: kneelHip,
+        lean: 4,
+        hand: { L: V(free[0], free[1], -free[2]), R: V(0, 0, 0) },
+        ankle: { L: V(kneelHip[0] - B.shin * 0.95, 0.08, -0.12), R: V(kneelHip[0] + B.thigh * 0.95, ANKLE_H, 0.14) },
+        foot: 0,
+        kneePole: { L: V(0.4, -1, -0.1), R: V(1, 0.3, 0.2) },
+        elbowPole: { L: V(-1, 0, -0.4), R: V(0, 0, 1) },
+        headBlend: 0.9,
+      };
+      const stood = standKey(B);
+      const p = keyframes(B, [lie, elbow, hand, kneel, stood], d);
+      // The bell arm stays locked and vertical the whole way.
+      const hR = V(p.sh[0], p.sh[1] + reach(B) * 0.95, B.shW);
+      return { ...p, hand: per(sideOf(p.hand, "L", V(0, 0, 0)), hR) };
+    },
+  };
+}
+
+/** Kettlebell windmill (drawn as a hinge: the figure can't bend sideways): the bell stays straight up while the free hand slides down the leg. */
+function windmill(): Motion {
+  return {
+    phases: TEMPO.lowerFirst("Hinge down · 2s", "Stand · 1s", "Bell up", "Bottom"),
+    load: "kettlebell",
+    hold: "R",
+    stance: 0.17,
+    pose(B, d) {
+      const lean = lerp(2, 68, d);
+      const shX = 0.03 + 0.08 * d;
+      const hipX = shX - Math.sin(rad(lean)) * B.torso;
+      const hip = V(hipX, standY(B, hipX, lerp(1, 0.96, d)));
+      const sh = torsoAt(B, hip, lean);
+      const r = reach(B);
+      return {
+        hip,
+        sh,
+        hand: per(V(sh[0] + 0.02, sh[1] - r * 0.95, -(B.shW - 0.02)), V(sh[0], sh[1] + r * 0.95, B.shW)),
+        elbowPole: per(V(-1, 0, -0.3), V(0, 0, 1)),
+        kneePole: V(1, 0, 0.3),
+        headBlend: 0.3,
+      };
+    },
+  };
+}
+
+/** Hang clean: from the hang, jump and shrug, pull under and catch the bar in the front rack. */
+function hangClean(): Motion {
+  return {
+    phases: [
+      [0.5, 1, 1, "Hang", 0.4],
+      [0.45, 1, 0.5, "Jump", 1],
+      [0.45, 0.5, 0, "Pull under, rack", 0.9],
+      [0.5, 0, 0, "Catch", 0.6],
+      [1.2, 0, 1, "Lower to the hang", 0.5],
+    ],
+    load: "barbell",
+    stance: 0.15,
+    grip: 0.22,
+    pose(B, d) {
+      const h = clamp((d - 0.5) / 0.5, 0, 1);
+      const catchDip = 0.07 * clamp(1 - d / 0.3, 0, 1);
+      const lean = lerp(2, 32, h);
+      const shX = 0.04 + 0.05 * h;
+      const hipX = shX - Math.sin(rad(lean)) * B.torso;
+      const hip = V(hipX, standY(B, hipX, lerp(1, 0.93, h)) - catchDip);
+      const sh = torsoAt(B, hip, lean);
+      const r = reach(B);
+      const hangBar = V(sh[0] + 0.03, sh[1] - r * 0.96);
+      const rackBar = add(sh, add(mul(frontOf(lean), 0.12), V(0, 0.02)));
+      const k = clamp(d / 0.5, 0, 1); // 0 racked, 1 at the hips
+      const bar = d >= 0.5 ? hangBar : add(lerpV(rackBar, hangBar, k), V(0.05 * Math.sin(Math.PI * k), 0, 0));
+      return {
+        hip,
+        sh,
+        bar,
+        hand: V(bar[0] - 0.02 * (1 - k), bar[1] - 0.02 * (1 - k), 0.22),
+        shrug: 0.05 * Math.sin(Math.PI * clamp((d - 0.25) / 0.5, 0, 1)),
+        // Elbows lead high on the pull, then whip round to the front for the catch.
+        elbowPole: k > 0.5 ? lerpV(V(-0.3, 1, 0.5), V(-1, 0, 0.3), (k - 0.5) * 2) : lerpV(V(1, -0.1, 0.3), V(-0.3, 1, 0.5), k * 2),
+        kneePole: V(1, 0, 0.45),
+        headBlend: 0.7,
+      };
+    },
+  };
+}
+
+/** Band external rotation: elbows pinned at the sides, forearms swinging out against the band. */
+function externalRotation(): Motion {
+  return {
+    phases: TEMPO.liftFirst("Rotate out · 1s", "Return · 2s", "Set", "Squeeze"),
+    load: "none",
+    stance: 0.13,
+    pose(B, d) {
+      const hip = V(0.02, standY(B));
+      const sh = torsoAt(B, hip, 0);
+      const psi = rad(lerp(5, 60, d));
+      const elbowY = sh[1] - B.upper * 0.97;
+      const at = (sgn: number): Vec =>
+        V(sh[0] + 0.02 + Math.cos(psi) * B.fore * 0.97, elbowY + 0.02, sgn * (B.shW + Math.sin(psi) * B.fore * 0.97));
+      return { hip, sh, hand: per(at(-1), at(1)), elbowPole: V(-0.2, -1, 0), headBlend: 1 };
+    },
+    props: () => [cable("handL", "handR")],
+  };
+}
+
 // ---------- the library ----------
 const MOTIONS: Record<string, () => Motion> = {
   // chest
@@ -1775,23 +2682,23 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-deadlift": () => rdl({ load: "kettlebell", hold: "centre" }),
   "kb-sumo-deadlift": () => rdl({ load: "kettlebell", hold: "centre" }),
   "kb-single-swing": kbSwing,
-  "kb-clean": kbSwing,
-  "kb-snatch": kbSwing,
+  "kb-clean": () => kbFlow({ to: "rack" }),
+  "kb-snatch": () => kbFlow({ to: "overhead" }),
   "kb-press": () => overhead({ load: "kettlebell" }),
   "kb-push-press": () => overhead({ load: "kettlebell" }),
   "kb-front-squat": () => squat({ hold: "goblet", load: "kettlebell", holdKind: "each" }),
   "kb-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
-  "kb-turkish-get-up": () => ({ ...sidePlank({}), props: undefined }),
-  "kb-windmill": () => rdl({ load: "kettlebell", hold: "R" }),
-  "kb-halo": () => ({ ...facePull(), props: undefined }),
+  "kb-turkish-get-up": turkishGetUp,
+  "kb-windmill": windmill,
+  "kb-halo": halo,
   "kb-floor-press": () => benchPress({ load: "kettlebell" }),
   "kb-gorilla-row": () => bentRow({ load: "kettlebell", lean: 62, oneArm: true, grip: 0.18 }),
-  "kb-high-pull": kbSwing,
+  "kb-high-pull": () => kbFlow({ to: "chin" }),
   "kb-rack-carry": () => carry({ hold: "each", load: "kettlebell" }),
   "kb-overhead-carry": () => carry({ hold: "R", load: "kettlebell" }),
   "kb-goblet-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
-  "kb-thruster": () => squat({ hold: "goblet", load: "kettlebell", holdKind: "each" }),
-  "kb-around-the-world": pallof,
+  "kb-thruster": () => thruster({ load: "kettlebell" }),
+  "kb-around-the-world": aroundWorld,
   "kb-bottoms-up-press": () => overhead({ load: "kettlebell" }),
   "band-face-pull": facePull,
   "band-row": seatedRow,
@@ -1800,15 +2707,15 @@ const MOTIONS: Record<string, () => Motion> = {
   "band-squat": () => squat({ hold: "arms" }),
   "band-deadlift": () => rdl({ load: "none" }),
   "band-good-morning": () => rdl({ load: "none" }),
-  "band-glute-kickback": () => bridge({ single: true }),
+  "band-glute-kickback": () => kickback({ band: true }),
   "band-lateral-walk": cossack,
-  "band-hip-abduction": () => bridge({}),
+  "band-hip-abduction": () => seatedHip({ out: true, band: true }),
   "band-triceps-extension": () => overheadExtension({}),
   "band-hammer-curl": () => curl({ load: "none", grip: 0.2, cable: "band" }),
   "band-lat-pulldown": () => pulldown(),
   "band-straight-arm-pulldown": () => pulldown({ straightArm: true }),
-  "band-woodchop": pallof,
-  "band-external-rotation": () => ({ ...facePull(), props: undefined }),
+  "band-woodchop": () => woodchop({ load: "handle", anchor: true }),
+  "band-external-rotation": externalRotation,
   "band-pallof-press": pallof,
   "band-assisted-dip": () => dip({}),
   "band-pull-through": pullThrough,
@@ -1825,25 +2732,25 @@ const MOTIONS: Record<string, () => Motion> = {
   "dead-hang": () => hanging({ grip: 0.34 }),
   "hanging-leg-raise": hangingRaise,
   "toes-to-bar": hangingRaise,
-  "l-sit": () => dip({}),
-  "hollow-hold": deadBug,
-  "v-up": deadBug,
-  crunch: deadBug,
-  "bicycle-crunch": russianTwist,
-  "lying-leg-raise": deadBug,
+  "l-sit": lSit,
+  "hollow-hold": () => floorCore({ kind: "hollow" }),
+  "v-up": () => floorCore({ kind: "vUp" }),
+  crunch: () => floorCore({ kind: "crunch" }),
+  "bicycle-crunch": () => floorCore({ kind: "bicycle" }),
+  "lying-leg-raise": () => floorCore({ kind: "legRaise" }),
   "mountain-climber": mountainClimber,
-  burpee: () => squat({ hold: "arms" }),
+  burpee,
   "jumping-jacks": jumpingJack,
   "high-knees": () => run({ lift: 0.8, lean: 0 }),
-  "jump-squat": () => squat({ hold: "arms" }),
-  "box-jump": stepUp,
+  "jump-squat": jumpSquat,
+  "box-jump": boxJump,
   "jumping-lunge": () => lunge({ step: "back", hands: "hips" }),
   "wall-sit": () => squat({ hold: "arms", depth: 0.8 }),
   "lateral-lunge": cossack,
   "curtsy-lunge": () => lunge({ step: "back", hands: "hips" }),
   "single-leg-glute-bridge": () => bridge({ single: true }),
-  "donkey-kick": () => bridge({ single: true }),
-  "bird-dog": superman,
+  "donkey-kick": () => allFours({ kind: "donkey" }),
+  "bird-dog": () => allFours({ kind: "birdDog" }),
   "bear-crawl": bearCrawl,
   "tricep-dip-floor": () => dip({ bench: true }),
   "sissy-squat": () => squat({ hold: "arms", depth: 0.8 }),
@@ -1856,14 +2763,14 @@ const MOTIONS: Record<string, () => Motion> = {
   "cable-face-pull-rope": facePull,
   "cable-rear-delt-fly": () => fly({ posture: "standing", from: 10, to: 86, load: "handle", first: "lift", cable: "side" }),
   "cable-front-raise": () => fly({ posture: "standing", from: 8, to: 84, load: "handle", first: "lift", cable: "low" }),
-  "cable-upright-row": shrug,
+  "cable-upright-row": () => uprightRow({ load: "handle", cable: true }),
   "cable-overhead-extension": () => overheadExtension({}),
   "rope-pushdown": () => pushdown({}),
   "cable-hammer-curl": () => curl({ load: "handle", grip: 0.14, cable: "low" }),
   "preacher-curl": () => curl({ load: "barbell", grip: 0.17, posture: "seatedThighs" }),
   "machine-preacher-curl": () => curl({ load: "handle", grip: 0.17, posture: "seatedThighs" }),
-  "hip-abduction": () => bridge({}),
-  "hip-adduction": () => bridge({}),
+  "hip-abduction": () => seatedHip({ out: true }),
+  "hip-adduction": () => seatedHip({ out: false }),
   "seated-leg-curl": () => kneeMachine({ extend: false }),
   "single-leg-press": legPress,
   "calf-press": () => calfRaise({ machine: true, load: "none" }),
@@ -1879,8 +2786,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "cable-crossover-high": () => fly({ posture: "standing", from: 78, to: 8, load: "handle", first: "lift", cable: "high" }),
   "assisted-pull-up": () => hanging({ grip: 0.34, band: true }),
   "machine-lateral-raise": () => fly({ posture: "seated", from: 8, to: 84, load: "handle", first: "lift" }),
-  "cable-woodchop": pallof,
-  "cable-kickback": () => bridge({ single: true }),
+  "cable-woodchop": () => woodchop({ load: "handle", anchor: true }),
+  "cable-kickback": () => kickback({}),
   "pendulum-squat": hackSquat,
   "reverse-hack-squat": hackSquat,
   "machine-dip": () => dip({}),
@@ -1900,11 +2807,11 @@ const MOTIONS: Record<string, () => Motion> = {
   "pause-squat": () => squat({ hold: "back" }),
   "barbell-lunge": () => lunge({ step: "back", hands: "hips" }),
   "barbell-hip-thrust-pause": () => bridge({ bench: true, bar: true }),
-  "hang-clean": () => deadlift(),
+  "hang-clean": hangClean,
   "barbell-floor-press": () => benchPress({ load: "barbell" }),
   "decline-bench-press": () => benchPress({ load: "barbell" }),
   "spoto-press": () => benchPress({ load: "barbell" }),
-  "barbell-upright-row": shrug,
+  "barbell-upright-row": () => uprightRow({ load: "barbell" }),
   "drag-curl": () => curl({ load: "barbell", grip: 0.21 }),
   "reverse-curl": () => curl({ load: "barbell", grip: 0.21 }),
   "jm-press": () => benchPress({ load: "barbell", grip: 0.16, close: true }),
@@ -1918,11 +2825,11 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-pullover": () => pulldown({ straightArm: true }),
   "db-arnold-press": () => overhead({ load: "dumbbell", seated: true }),
   "db-front-raise": () => fly({ posture: "standing", from: 8, to: 84, load: "dumbbell", first: "lift" }),
-  "db-upright-row": shrug,
+  "db-upright-row": () => uprightRow({ load: "dumbbell" }),
   "db-shrug": shrug,
   "db-y-raise": () => fly({ posture: "facePad", from: 12, to: 88, load: "dumbbell", first: "lift" }),
   "db-chest-supported-row": chestSupportedRow,
-  "db-renegade-row": () => pushUp({}),
+  "db-renegade-row": renegadeRow,
   "db-concentration-curl": () => curl({ load: "dumbbell", posture: "seatedThighs" }),
   "db-preacher-curl": () => curl({ load: "dumbbell", posture: "seatedThighs" }),
   "zottman-curl": () => curl({ load: "dumbbell", grip: 0.22 }),
@@ -1937,32 +2844,32 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-hip-thrust": () => bridge({ bench: true }),
   "db-single-leg-rdl": () => rdl({ load: "dumbbell", single: true }),
   "db-suitcase-deadlift": () => rdl({ load: "dumbbell", hold: "R" }),
-  "db-snatch": kbSwing,
-  "db-thruster": () => squat({ hold: "goblet", load: "dumbbell", holdKind: "each" }),
+  "db-snatch": () => kbFlow({ to: "overhead", load: "dumbbell" }),
+  "db-thruster": () => thruster({ load: "dumbbell" }),
   "db-farmers-walk-heavy": () => carry({ hold: "each", load: "dumbbell" }),
   "db-reverse-fly-incline": () => fly({ posture: "facePad", from: 12, to: 88, load: "dumbbell", first: "lift" }),
   "db-tate-press": () => overheadExtension({ lying: true }),
-  "db-woodchop": pallof,
+  "db-woodchop": () => woodchop({ load: "dumbbell" }),
   "db-overhead-squat-single": () => squat({ hold: "arms" }),
   "treadmill-run": () => run({}),
   "outdoor-run": () => run({}),
   "brisk-walk": () => run({ lift: 0.2, lean: 2 }),
-  "incline-walk": stepUp,
-  "rowing-machine": seatedRow,
+  "incline-walk": walk,
+  "rowing-machine": erg,
   "stationary-bike": bike,
   "outdoor-cycling": bike,
   "air-bike": bike,
   "ski-erg": () => pulldown({ straightArm: true }),
-  elliptical: stepUp,
-  "stair-climber": stepUp,
+  elliptical,
+  "stair-climber": () => run({ lift: 0.45, lean: 10 }),
   "jump-rope": () => calfRaise({ load: "none" }),
   "double-unders": () => calfRaise({ load: "none" }),
   "battle-ropes": battleRopes,
-  "sled-push": () => lunge({ step: "walk", hands: "hips" }),
+  "sled-push": sledPush,
   "sled-pull": () => bentRow({ load: "handle", lean: 40 }),
   "shuttle-run": () => run({ lift: 0.6, lean: 14 }),
   "med-ball-slam": () => pulldown({ straightArm: true }),
-  "wall-ball": () => squat({ hold: "goblet" }),
+  "wall-ball": () => thruster({ load: "none" }),
   "med-ball-rotational-throw": russianTwist,
 };
 
