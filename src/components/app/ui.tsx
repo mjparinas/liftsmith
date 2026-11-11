@@ -67,7 +67,11 @@ export function Button({
   );
 }
 
-export function Chip({ children, active, onClick }: { children: ReactNode; active?: boolean; onClick?: () => void }) {
+/**
+ * A pick chip. `hue` (a colour token) colour-codes it: a dot before it's picked, then its border,
+ * fill and tick in that colour once picked (Today's "How do you feel?" chips).
+ */
+export function Chip({ children, active, onClick, hue }: { children: ReactNode; active?: boolean; onClick?: () => void; hue?: string }) {
   return (
     <button
       type="button"
@@ -77,10 +81,24 @@ export function Chip({ children, active, onClick }: { children: ReactNode; activ
         sound.tick();
         onClick?.();
       }}
-      className={`press inline-flex items-center gap-1 rounded-full border px-3.5 py-2 text-sm ${active ? "border-accent/70 bg-accent/15 font-medium text-ink shadow-[0_0_0_3px_rgb(76_141_255/0.12)]" : "border-line bg-surface text-muted"}`}
+      className={`press inline-flex items-center gap-1 rounded-full border px-3.5 py-2 text-sm ${active ? `font-medium text-ink ${hue ? "" : "border-accent/70 bg-accent/15 shadow-[0_0_0_3px_rgb(76_141_255/0.12)]"}` : "border-line bg-surface text-muted"}`}
+      style={
+        active && hue
+          ? {
+              borderColor: `color-mix(in srgb, ${hue} 75%, transparent)`,
+              background: `color-mix(in srgb, ${hue} 22%, var(--color-surface))`,
+              boxShadow: `0 0 0 3px color-mix(in srgb, ${hue} 14%, transparent)`,
+            }
+          : undefined
+      }
     >
       {/* A tick as well as the colour, so the picked chip shows without relying on colour (WCAG 1.4.1). */}
-      {active && <Icon name="check" size={14} className="-ml-1 shrink-0 text-accent" />}
+      {active && (
+        <span className={`-ml-1 inline-flex shrink-0 ${hue ? "" : "text-accent"}`} style={hue ? { color: hue } : undefined}>
+          <Icon name="check" size={14} />
+        </span>
+      )}
+      {!active && hue && <span aria-hidden className="-ml-0.5 mr-0.5 size-2 shrink-0 rounded-full" style={{ background: hue }} />}
       {children}
     </button>
   );
