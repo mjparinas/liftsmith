@@ -35,6 +35,9 @@ public class InstallInfoPlugin extends Plugin {
         out.put("manufacturer", Build.MANUFACTURER);
         out.put("model", Build.MODEL);
         out.put("store", store(ctx));
+        // Remote push (Friends) needs Firebase's config, which the release build adds from a secret. Without it,
+        // asking Firebase for a token would crash, so the web layer only registers when this is true.
+        out.put("push", ctx.getResources().getIdentifier("google_app_id", "string", ctx.getPackageName()) != 0);
         try {
             PackageInfo p = ctx.getPackageManager().getPackageInfo(ctx.getPackageName(), 0);
             out.put("appVersion", p.versionName);

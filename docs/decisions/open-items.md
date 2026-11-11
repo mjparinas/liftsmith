@@ -11,13 +11,20 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
 - Analytics server setup in Vercel: a Turso database (Marketplace integration), `ADMIN_EMAILS`, `ANALYTICS_SECRET`, and update the Play Data safety and App Store App Privacy answers from `docs/PRIVACY_LABELS.md` before the first store release.
 - App Links (Android) and Universal Links (iOS) on the real domain, so workout remix links and shared routine links (`/app/#/routine/…`) open in the installed app. Android needs `public/.well-known/assetlinks.json` with the SHA-256 of the Play app signing key (Play Console › Test and release › App integrity) and an `autoVerify` intent filter for `https://www.getliftsmith.com/app/`; the iOS half is under "iOS (deferred)". Until then those links open the web app, and the in-app "Add a routine from a link" (paste) covers the phones.
-- Friends, stage 2 ([Friends](friends.md)): public profiles on the web and sending a workout to a friend are built; still to do: push notifications for follow requests, likes and comments (Android notification and iOS push; today the Today button's dot and the Activity list carry them), sending a workout straight to a gym buddy, and the store listings' user-generated content answers (Play: Content rating questionnaire "users can interact" and "shares user-generated content"; App Store: age rating with user-generated content). Profile links (`/app/#/person/<handle>`) open the web app until App Links and Universal Links exist.
+- Friends push setup (Melvin; code built 2026-11-11, [Friends](friends.md) "Push notifications"). Until these are done, Activity and the people button's dot carry everything.
+  - In the Firebase console, add Firebase to the Google Cloud project `liftsmith-514303`, then add an Android app `com.getliftsmith.app`.
+  - Download its `google-services.json` and save the whole file as the GitHub secret `GOOGLE_SERVICES_JSON`.
+  - Give a service account (`liftsmith-admin@`, or Firebase's own Admin SDK account) the "Firebase Cloud Messaging API Admin" role, and save its JSON key in Vercel as `FCM_SERVICE_ACCOUNT_JSON` (Production and Preview).
+- Friends store answers (Melvin): retake Play's content rating questionnaire, check Target audience, and add the push token to Data safety, as listed in [Friends](friends.md) under "Store answers". The App Store age rating answers wait with iOS.
+- Profile links (`/app/#/person/<handle>`) open the web app until App Links and Universal Links exist. Public profiles' own pages (`/u/<handle>/`) are web pages anyway.
 
 ## iOS (deferred)
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
 
 - **Voice set logging on iPhone** (Labs, `SpeechLogPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check the speech recognition and microphone prompts, that recognition stays on the device for each of the six languages, and that music comes back after listening.
+
+- **Friends push on iPhone** (2026-11-11): turn on the Push Notifications capability for the App ID `com.getliftsmith.app`, and add `aps-environment` (`production`) to `App.entitlements`. Create an APNs auth key (Keys › Apple Push Notifications service), and put it in Vercel as `APNS_KEY_P8` (the .p8 text), `APNS_KEY_ID` and `APNS_TEAM_ID`. Then retake the App Store age rating with the answers in [Friends](friends.md) "Store answers". Until then the iPhone shows Friends activity in the app only.
 
 - **Universal Links** for remix and shared routine links: the Associated Domains entitlement (`applinks:www.getliftsmith.com`) on the App ID and in `App.entitlements`, plus `public/.well-known/apple-app-site-association` with the team id and `/app/*`. Until then those links open in Safari, and the in-app paste box (Routines › Add a routine from a link) brings a routine into the app.
 

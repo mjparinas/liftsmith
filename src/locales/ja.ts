@@ -79,6 +79,7 @@ import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
 import * as pub from "./text/pub";
+import * as push from "./text/push";
 import * as quest from "./text/quest";
 import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
@@ -195,6 +196,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...prog.ja,
   ...progress.ja,
   ...pub.ja,
+  ...push.ja,
   ...quest.ja,
   ...quote.ja,
   ...rarity.ja,

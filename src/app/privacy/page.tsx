@@ -131,10 +131,12 @@ export default function Privacy() {
           time, sets, exercises and best sets (weights only if you show them), plus your likes and comments. Your followers see your posts;
           by default you approve each follower first. If you make your profile public, anyone can see it and the workouts you post, in the
           app and on a web page at your handle that search engines may list; turn Public profile off and the page goes away. If you send a
-          workout to a friend, we keep its name and exercises (no weights or notes) so it shows in their activity. A post never includes
-          heart rate, body weight or fat, measurements, cycle data, injuries, gyms or places. If you report something, we keep the report
-          and who made it so we can review it, and the person you reported isn&apos;t told who reported them. Leave Friends in its settings,
-          or delete your account, and all of this is deleted.
+          workout to a friend, we keep its name and exercises (no weights or notes) so it shows in their activity. If you allow
+          notifications, we keep your phone&apos;s push token with your account and send it through Google&apos;s Firebase Cloud Messaging
+          (Android) or Apple&apos;s push service (iPhone) to tell you about follows, comments and workouts sent to you; signing out or
+          leaving Friends removes it. A post never includes heart rate, body weight or fat, measurements, cycle data, injuries, gyms or
+          places. If you report something, we keep the report and who made it so we can review it, and the person you reported isn&apos;t
+          told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>

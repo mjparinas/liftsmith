@@ -11,7 +11,8 @@ import { useAccount } from "@/lib/auth";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { list as fmtList, t } from "@/lib/i18n";
-import { haptic, oops, sound } from "@/lib/juice";
+import { haptic, isNative, oops, sound } from "@/lib/juice";
+import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   postWorkout,
@@ -33,6 +34,7 @@ import {
   type FeedComment,
   type FeedPost,
   type PersonCard,
+  type PushPrefs,
   type ReportKind,
   type ReportReason,
   type SocialProfile,
@@ -40,6 +42,7 @@ import {
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import type { MessageKey } from "@/locales/en";
 
 import { ago, clock, repsText, setText } from "./format";
 import { Icon } from "./icons";
@@ -490,6 +493,7 @@ function Join() {
     try {
       const me = await social<SocialMe>("join", { handle: h, name, open, autoPost, weights, agree: true });
       useSocial.setState({ me, error: null });
+      void startPush(true);
       haptic("celebrate");
       sound.done();
       track("feature", { name: "social_join", detail: open ? "open" : "approve" });
@@ -597,6 +601,32 @@ function Privacy({
   );
 }
 
+function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<PushPrefs>) => void }) {
+  const [blocked, setBlocked] = useState(false);
+  const change = async (key: keyof PushPrefs, on: boolean) => {
+    set({ [key]: on });
+    if (on) setBlocked(!(await startPush(true)));
+  };
+  const rows: [keyof PushPrefs, MessageKey][] = [
+    ["follows", "friends.notify.follows"],
+    ["comments", "friends.notify.comments"],
+    ["sent", "friends.notify.sent"],
+    ["likes", "friends.notify.likes"],
+  ];
+  return (
+    <Section title={t("friends.notify")}>
+      {rows.map(([key, label]) => (
+        <SwitchRow key={key} label={t(label)} on={prefs[key]} onChange={(v) => void change(key, v)} />
+      ))}
+      {blocked && (
+        <p role="status" className="mt-2 px-1 text-xs text-muted">
+          {t("friends.notify.blocked")}
+        </p>
+      )}
+    </Section>
+  );
+}
+
 function SettingsSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   return open ? <SettingsBody onClose={onClose} /> : null;
 }
@@ -620,6 +650,7 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
   };
   const leave = async () => {
     try {
+      await stopPush();
       await social("leave");
       useSocial.setState({ me: { profile: null } });
       track("feature", { name: "social_leave" });
@@ -665,6 +696,7 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
       </form>
       <Note text={note} />
       <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} set={(c) => void save(c)} />
+      {isNative() && <Notifications prefs={p.push} set={(push) => void save({ push })} />}
       {p.public && (
         <a
           href={publicPageUrl(p.handle)}
@@ -1172,6 +1204,11 @@ export function FriendsButton() {
   useEffect(() => {
     void refreshSocial();
   }, [account?.id]);
+  // Already joined and allowed notifications: keep this phone's push token current (no prompt here).
+  const joinedNow = !!me?.profile;
+  useEffect(() => {
+    if (joinedNow) void startPush(false);
+  }, [joinedNow]);
   if (!socialOn()) return null;
   const waiting = (me?.unread ?? 0) + (me?.requests ?? 0);
   return (

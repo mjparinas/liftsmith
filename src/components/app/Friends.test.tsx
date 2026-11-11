@@ -94,7 +94,19 @@ describe("Friends", () => {
     await handle("acc-a", { op: "follow", handle: "blair" });
     await handle("acc-b", { op: "follow", handle: "alex" });
     signIn("tok-a");
-    useSocial.setState({ me: { profile: { handle: "alex", name: "Alex", open: true, autoPost: false, weights: true, public: false } } });
+    useSocial.setState({
+      me: {
+        profile: {
+          handle: "alex",
+          name: "Alex",
+          open: true,
+          autoPost: false,
+          weights: true,
+          public: false,
+          push: { follows: true, comments: true, sent: true, likes: false },
+        },
+      },
+    });
     render(<SendToFriend name="Leg day" items={[{ exerciseId: "back-squat", sets: 4 }]} />);
     await u.click(screen.getByRole("button", { name: "Send to a friend" }));
     await u.click(await screen.findByRole("button", { name: "Send to Blair" }));

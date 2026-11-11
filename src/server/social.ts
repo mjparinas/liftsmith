@@ -25,6 +25,7 @@ import {
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
+import { dropToken, notify, saveToken } from "./push";
 
 export type Result = { code: number; body: Record<string, unknown> };
 const ok = (body: Record<string, unknown> = { ok: true }): Result => ({ code: 200, body });
@@ -75,6 +76,10 @@ interface ProfileRow extends Row {
   auto_post: number;
   weights: number;
   public: number;
+  push_follows: number;
+  push_comments: number;
+  push_sent: number;
+  push_likes: number;
   suspended: number;
   seen_at: number;
 }
@@ -86,6 +91,7 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   autoPost: !!n(r.auto_post),
   weights: !!n(r.weights),
   public: !!n(r.public),
+  push: { follows: !!n(r.push_follows), comments: !!n(r.push_comments), sent: !!n(r.push_sent), likes: !!n(r.push_likes) },
 });
 
 async function profileOf(accountId: string): Promise<ProfileRow | null> {
@@ -177,15 +183,24 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
   const pub = b.open === false ? 0 : flag(b.public, p.public);
   const open = pub ? 1 : flag(b.open, p.open);
   try {
-    await run("UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ? WHERE account_id = ?", [
-      handle,
-      name,
-      open,
-      flag(b.autoPost, p.auto_post),
-      flag(b.weights, p.weights),
-      pub,
-      accountId,
-    ]);
+    const push = (b.push && typeof b.push === "object" ? b.push : {}) as Record<string, unknown>;
+    await run(
+      `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
+         push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ? WHERE account_id = ?`,
+      [
+        handle,
+        name,
+        open,
+        flag(b.autoPost, p.auto_post),
+        flag(b.weights, p.weights),
+        pub,
+        flag(push.follows, p.push_follows),
+        flag(push.comments, p.push_comments),
+        flag(push.sent, p.push_sent),
+        flag(push.likes, p.push_likes),
+        accountId,
+      ],
+    );
   } catch {
     return fail(409, "handleTaken");
   }
@@ -208,6 +223,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
     { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
+    { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
 }
@@ -315,6 +331,7 @@ export async function followOp(accountId: string, b: Record<string, unknown>, no
     n(p.open) ? 1 : 0,
     now,
   ]);
+  await notify(them, accountId, n(p.open) ? "follow" : "request");
   return lookup(accountId, b, now);
 }
 
@@ -330,8 +347,10 @@ export async function answer(accountId: string, b: Record<string, unknown>): Pro
   const p = await byHandle(s(b.handle));
   if (!p) return fail(404, "noOne");
   const them = s(p.account_id);
-  if (b.accept === true) await run("UPDATE follows SET accepted = 1 WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
-  else await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
+  if (b.accept === true) {
+    const r = await run("UPDATE follows SET accepted = 1 WHERE follower_id = ? AND followee_id = ? AND accepted = 0", [them, accountId]);
+    if (r) await notify(them, accountId, "accept");
+  } else await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
   return ok();
 }
 
@@ -642,7 +661,9 @@ export async function like(accountId: string, b: Record<string, unknown>, now = 
   if (b.on === false) await run("DELETE FROM post_likes WHERE post_id = ? AND account_id = ?", [id, accountId]);
   else {
     if (!(await limit(accountId, "like", now))) return fail(429, "slow");
-    await run("INSERT OR IGNORE INTO post_likes (post_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
+    const added = await run("INSERT OR IGNORE INTO post_likes (post_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
+    const author = await visiblePost(accountId, id);
+    if (added && author) await notify(author.author, accountId, "like");
   }
   const [c] = await query("SELECT COUNT(*) AS n FROM post_likes WHERE post_id = ?", [id]);
   return ok({ likes: n(c?.n), liked: b.on !== false });
@@ -665,6 +686,8 @@ export async function comment(accountId: string, b: Record<string, unknown>, now
     now,
     text.text,
   ]);
+  const post = await visiblePost(accountId, id);
+  if (post) await notify(post.author, accountId, "comment", { text: text.text });
   return ok({ comment: { id: cid, handle: s(mine.handle), name: s(mine.name), at: now, body: text.text, mine: true, canDelete: true } });
 }
 
@@ -761,7 +784,15 @@ export async function send(accountId: string, b: Record<string, unknown>, now = 
     code,
     now,
   ]);
+  await notify(to, accountId, "sent", { workout: name.text, code });
   return ok();
+}
+
+/** A phone's push token, so this account's Friends notifications reach it (push.ts). */
+export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  return (await saveToken(accountId, s(b.token), s(b.platform), s(b.lang), now)) ? ok() : fail(400, "token");
 }
 
 export const OPS: Record<string, Op> = {
@@ -788,6 +819,8 @@ export const OPS: Record<string, Op> = {
   uncomment: (a, b) => uncomment(a, b),
   activity: (a, _b, now) => activity(a, now),
   send,
+  pushToken,
+  pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };
 
 export async function handle(accountId: string, body: unknown, now = Date.now()): Promise<Result> {

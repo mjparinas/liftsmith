@@ -124,6 +124,15 @@
             </intent-filter>
         </service>
 
+        <!-- Friends push notifications (Firebase Cloud Messaging): the status bar icon and the "Friends" channel the
+             app creates (src/lib/push.ts), so a push that arrives while the app is closed looks like the app's own. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_workout" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="friends" />
+
         <!-- Quick Settings tile: Start workout, or Log set while one is running. -->
         <service
             android:name=".WorkoutTileService"

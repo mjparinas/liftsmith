@@ -45,7 +45,7 @@ Collected data types:
 | App activity › App interactions | Yes | No | No | Optional (user can turn off) | Analytics |
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
-| Device or other IDs › Device or other IDs | Yes (random install id; RevenueCat uses it to unlock Pro, and when signed in it's linked to the account so Pro follows the account) | No | No | Optional | Analytics, App functionality |
+| Device or other IDs › Device or other IDs | Yes (random install id; RevenueCat uses it to unlock Pro, and when signed in it's linked to the account so Pro follows the account; with Friends, the phone's push token so follows, comments and sent workouts can be notified) | No | No | Optional | Analytics, App functionality |
 | Personal info › Email address | Yes (only if given with feedback, for email reminders, or to sign in to an account) | No | No | Optional | App functionality, Developer communications, Account management |
 | Personal info › User IDs | Yes (account id, Google or Apple account id, only when signed in) | No | No | Optional | App functionality, Account management |
 | Personal info › Other info | Yes, only with an account: birth year and sex in the synced profile | No | No | Optional | App functionality |

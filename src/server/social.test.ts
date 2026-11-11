@@ -75,7 +75,15 @@ describe("joining", () => {
   it("needs the community rules agreed and a free handle, with private defaults", async () => {
     expect((await call("acc-a", "join", { handle: "alex" })).body.error).toBe("agree");
     const r = await join("acc-a", "alex");
-    expect(r.body.profile).toEqual({ handle: "alex", name: "ALEX", open: false, autoPost: false, weights: true, public: false });
+    expect(r.body.profile).toEqual({
+      handle: "alex",
+      name: "ALEX",
+      open: false,
+      autoPost: false,
+      weights: true,
+      public: false,
+      push: { follows: true, comments: true, sent: true, likes: false },
+    });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
   });

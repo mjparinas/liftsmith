@@ -149,6 +149,12 @@ export const en = {
   "friends.act.sent": "{name} sent you a workout: {workout}",
   "friends.err.notFriends": "You can only send to people you follow who follow you back.",
   "friends.err.code": "That workout can’t be sent.",
+  "friends.notify": "Notifications",
+  "friends.notify.follows": "Follows and requests",
+  "friends.notify.comments": "Comments",
+  "friends.notify.sent": "Workouts sent to you",
+  "friends.notify.likes": "Likes",
+  "friends.notify.blocked": "Notifications are off for Liftsmith in your phone’s settings.",
 } as const;
 
 type Key = keyof typeof en;
@@ -302,6 +308,12 @@ export const es: Partial<Record<Key, Message>> = {
   "friends.act.sent": "{name} te envió un entrenamiento: {workout}",
   "friends.err.notFriends": "Solo puedes enviar a quienes sigues y te siguen.",
   "friends.err.code": "Ese entrenamiento no se puede enviar.",
+  "friends.notify": "Notificaciones",
+  "friends.notify.follows": "Seguidores y solicitudes",
+  "friends.notify.comments": "Comentarios",
+  "friends.notify.sent": "Entrenamientos que te envían",
+  "friends.notify.likes": "Me gusta",
+  "friends.notify.blocked": "Las notificaciones de Liftsmith están desactivadas en los ajustes del teléfono.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -453,6 +465,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "friends.act.sent": "{name} t’a envoyé une séance : {workout}",
   "friends.err.notFriends": "Tu ne peux envoyer qu’aux personnes que tu suis et qui te suivent.",
   "friends.err.code": "Cette séance ne peut pas être envoyée.",
+  "friends.notify": "Notifications",
+  "friends.notify.follows": "Abonnements et demandes",
+  "friends.notify.comments": "Commentaires",
+  "friends.notify.sent": "Séances qu’on t’envoie",
+  "friends.notify.likes": "J’aime",
+  "friends.notify.blocked": "Les notifications de Liftsmith sont désactivées dans les réglages du téléphone.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -602,6 +620,12 @@ export const de: Partial<Record<Key, Message>> = {
   "friends.act.sent": "{name} hat dir ein Workout geschickt: {workout}",
   "friends.err.notFriends": "Du kannst nur an Leute senden, denen du folgst und die dir folgen.",
   "friends.err.code": "Dieses Workout kann nicht gesendet werden.",
+  "friends.notify": "Mitteilungen",
+  "friends.notify.follows": "Follower und Anfragen",
+  "friends.notify.comments": "Kommentare",
+  "friends.notify.sent": "Dir geschickte Workouts",
+  "friends.notify.likes": "Likes",
+  "friends.notify.blocked": "Mitteilungen für Liftsmith sind in den Einstellungen deines Telefons aus.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -752,6 +776,12 @@ export const it: Partial<Record<Key, Message>> = {
   "friends.act.sent": "{name} ti ha inviato un allenamento: {workout}",
   "friends.err.notFriends": "Puoi inviare solo a chi segui e ti segue.",
   "friends.err.code": "Questo allenamento non può essere inviato.",
+  "friends.notify": "Notifiche",
+  "friends.notify.follows": "Follower e richieste",
+  "friends.notify.comments": "Commenti",
+  "friends.notify.sent": "Allenamenti inviati a te",
+  "friends.notify.likes": "Mi piace",
+  "friends.notify.blocked": "Le notifiche di Liftsmith sono disattivate nelle impostazioni del telefono.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -902,4 +932,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "friends.act.sent": "{name} さんからワークアウトが届きました：{workout}",
   "friends.err.notFriends": "相互フォローの相手にだけ送れます。",
   "friends.err.code": "このワークアウトは送れません。",
+  "friends.notify": "通知",
+  "friends.notify.follows": "フォローとリクエスト",
+  "friends.notify.comments": "コメント",
+  "friends.notify.sent": "届いたワークアウト",
+  "friends.notify.likes": "いいね",
+  "friends.notify.blocked": "スマートフォンの設定で Liftsmith の通知がオフになっています。",
 };

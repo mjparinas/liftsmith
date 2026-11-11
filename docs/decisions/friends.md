@@ -42,6 +42,40 @@ The original ask: "sending a workout directly to gym buddies".
 - Analytics: `feature` `social_send`.
 - Tests: the sending cases in `social.test.ts`, and the send-then-Activity flow in `Friends.test.tsx`.
 
+## Push notifications (stage 2)
+
+- **What:** a push when someone follows you or asks to follow, accepts your request, comments on your workout, sends you a workout, and (off by default) likes one. Friends settings › Notifications has a switch for each (follows and requests, comments, workouts sent to you, likes), stored on the profile (`push_*` columns). The Activity list and the people button's dot still carry everything.
+- **Asking:** the permission prompt shows only when the lifter acts. That means joining Friends, or turning a notification switch on. After that, opening the app keeps the token current without asking (`startPush` in `src/lib/push.ts`). If the phone has notifications off, the switches say so.
+- **Server:** `src/server/push.ts`.
+  - The phone registers its token with `pushToken` (`push_tokens`: the token, account, platform and the phone's language; at most 10 per account, newest kept).
+  - `notify` runs after follow, answer, like, comment and send, in the recipient's language (`push.*`, `src/locales/text/push.ts`).
+  - Android goes through **Firebase Cloud Messaging HTTP v1** (a service account JWT for an OAuth token, cached for its hour). iOS goes through **APNs** (an ES256 token JWT over HTTP/2).
+  - A dead token (FCM `UNREGISTERED`, APNs 410 or `BadDeviceToken`) is deleted. Sending never fails or holds up the action: errors are swallowed, and it gives up after 4 s.
+  - **Off until the keys exist** (`pushConfigured`): `FCM_SERVICE_ACCOUNT_JSON` for Android, and `APNS_KEY_P8`, `APNS_KEY_ID` and `APNS_TEAM_ID` for iOS (`APNS_TOPIC` defaults to `com.getliftsmith.app`; set `APNS_SANDBOX=1` only for development builds).
+- **Taps** open the push's route: `#/friends`, or `#/routine/<code>` for a sent workout (`onPushTap`, wired in `App.tsx`).
+- **Removing tokens:** signing out drops the token (`stopPush` before `signOut`). So does leaving Friends or deleting the account (`socialDeletes`).
+- **Android** (`@capacitor/push-notifications`):
+  - The release build writes `android/app/google-services.json` from the `GOOGLE_SERVICES_JSON` secret.
+  - Without it the app builds the same, but `InstallInfo` reports `push: false` (no `google_app_id` resource), so the app never asks Firebase for a token (that would crash).
+  - Pushes use a "Friends" channel (created by the app; its name is `push.channel`) and the app's status bar icon, set as Firebase defaults in `AndroidManifest.xml`.
+- **iOS:** `AppDelegate.swift` hands the APNs token to Capacitor. It needs the Push Notifications capability and the `aps-environment` entitlement, which are under "iOS (deferred)" in Open items. Until then registration fails quietly.
+- **Web app:** no push; the dot and Activity carry it (Platform deltas).
+- **Tests:** `src/server/push.test.ts` covers language, the switches with likes off by default, a sent workout's route, dead tokens, the token limit and sign-out, and staying off without keys.
+
+## Store answers for user-generated content
+
+For Melvin to enter in the consoles (Friends adds content people make and share):
+
+- **Google Play › App content › Content rating:** retake the questionnaire. Answer **Yes** to "Does the app allow users to interact or exchange content with other users?", covering comments, likes, following and posting workouts, and **Yes** to "users can share content". Answer **No** to sharing the user's physical location. Digital purchases stay **Yes** (Pro). The rating normally keeps the same age band and adds the "Users Interact" descriptor.
+- **Google Play › App content › Target audience:** keep it **18 and over** (or 13+ at the youngest). Users interacting is allowed with the safeguards Play's UGC policy asks for, all built: terms agreed before posting, a filter, reporting, blocking, and staff review (the admin Reports tab).
+- **Google Play › Data safety:** the push token counts as **Device or other IDs** for App functionality, collected only from people who join Friends and allow notifications (row added to `docs/PRIVACY_LABELS.md`).
+- **App Store Connect › Age Rating:**
+  - Answer **Yes** to **User-Generated Content**.
+  - Answer **No** to **Messaging and Chat**. There are no private messages; comments sit on posts that followers see.
+  - Answer **No** to Advertising.
+  - The answers to the other questions don't change.
+  - Apple 1.2 asks for the same four safeguards, all in place.
+
 ## Safety
 
 - **Blocking** removes follows both ways; neither sees the other's profile, posts or comments again (lookups answer "no one with that handle"), and the blocked person isn't told. Unblock from People › Blocked.

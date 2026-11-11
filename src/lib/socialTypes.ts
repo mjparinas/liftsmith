@@ -44,6 +44,15 @@ export interface SocialProfile {
    * listed in the people sitemap). Off by default; on also means anyone can follow.
    */
   public: boolean;
+  /** Push notifications by kind (Friends settings › Notifications). Likes start off, the rest on. */
+  push: PushPrefs;
+}
+
+export interface PushPrefs {
+  follows: boolean;
+  comments: boolean;
+  sent: boolean;
+  likes: boolean;
 }
 
 /** How the reader stands with someone. */

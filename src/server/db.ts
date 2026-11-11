@@ -485,6 +485,15 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_to ON sent_workouts (to_id, created_at)`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_from ON sent_workouts (from_id)`,
+  // A phone's push token for Friends notifications (push.ts), in the language it registered with.
+  `CREATE TABLE IF NOT EXISTS push_tokens (
+    token TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    lang TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS push_tokens_account ON push_tokens (account_id, updated_at)`,
   // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
   `CREATE TABLE IF NOT EXISTS coach_invites (
     code TEXT PRIMARY KEY,
@@ -531,6 +540,11 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "max_uses", "INTEGER"],
   // Friends stage 2: a public profile (social.ts, publicProfile.ts).
   ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
+  // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
+  ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "push_sent", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "push_likes", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;
