@@ -19,6 +19,7 @@ import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
 import * as callText from "./text/callText";
+import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as coach from "./text/coach";
@@ -128,6 +129,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...buddy.ja,
   ...buy.ja,
   ...cal.ja,
+  ...card.ja,
   ...callText.ja,
   ...category.ja,
   ...cause.ja,

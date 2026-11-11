@@ -4,17 +4,19 @@
 // cards with the period's highlights, and a share button. Derived from events (recap.ts).
 import { useMemo, useState } from "react";
 
+import { BRAND } from "@/lib/brand";
 import { date, num, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { fmtTonnage } from "@/lib/moments";
 import { monthOf, recap, recapMonths, yearOf, type Period } from "@/lib/recap";
-import { shareCard } from "@/lib/shareImage";
+import type { Shareable } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
+import { ShareSheet } from "./ShareSheet";
 import { Button, Chip } from "./ui";
 
 const cap = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
@@ -37,7 +39,7 @@ export function Recap({ arg }: { arg?: string }) {
   const [period, setPeriod] = useState(() => parsePeriod(arg, now));
   const r = useMemo(() => recap(events, period, now), [events, period, now]);
   const months = useMemo(() => recapMonths(events).slice(0, 12), [events]);
-  const [note, setNote] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
   const unit = profile.unit;
   const hours = Math.round(r.seconds / 360) / 10;
   const cards: { k: string; big: string; small: string }[] = [
@@ -86,31 +88,32 @@ export function Recap({ arg }: { arg?: string }) {
     });
   if (r.avgHr) cards.push({ k: "hr", big: `${num(r.avgHr)} bpm`, small: t("recap.hr") });
 
-  const share = async () => {
-    haptic("tap");
-    const res = await shareCard(
-      {
-        kicker: t(period.kind === "year" ? "recap.year" : "recap.month"),
-        headline: r.label,
-        tiles: [
-          [t("recap.card.workouts"), num(r.workouts)],
-          [t("recap.card.lifted"), fmtTonnage(r.volumeKg, unit)],
-          [t("recap.card.sets"), num(r.sets)],
-          [t("recap.card.prs"), num(r.prs.length)],
-        ] as [string, string][],
-        lines: [
-          r.likeA ? t("recap.card.like", { thing: r.likeA }) : null,
-          r.topExercise ? t("recap.card.top", { name: r.topExercise.name }) : null,
-          r.prs[0]
-            ? t("recap.card.pr", { name: r.prs[0].name, weight: fmtNum(fromKg(r.prs[0].weight, unit)), unit, reps: r.prs[0].reps })
-            : null,
-          r.favouriteDay ? t("recap.card.day", { day: r.favouriteDay }) : null,
-        ].filter((x): x is string => !!x),
-        footer: "Liftsmith",
-      },
-      `liftsmith-recap-${period.kind}`,
-    );
-    setNote(res === "failed" ? t("recap.shareFailed") : res === "download" ? t("recap.saved") : null);
+  const shareItem: Shareable = {
+    id: `recap-${period.kind}`,
+    kind: "recap",
+    label: t(period.kind === "year" ? "recap.year" : "recap.month"),
+    figure: r.topExercise?.id,
+    file: `liftsmith-recap-${period.kind}`,
+    card: (o) => ({
+      kicker: t(period.kind === "year" ? "recap.year" : "recap.month"),
+      headline: r.label,
+      tiles: [
+        [t("recap.card.workouts"), num(r.workouts)],
+        ...(o.weights ? ([[t("recap.card.lifted"), fmtTonnage(r.volumeKg, unit)]] as [string, string][]) : []),
+        [t("recap.card.sets"), num(r.sets)],
+        [t("recap.card.prs"), num(r.prs.length)],
+      ],
+      lines: [
+        o.weights && r.likeA ? t("recap.card.like", { thing: r.likeA }) : null,
+        r.topExercise ? t("recap.card.top", { name: r.topExercise.name }) : null,
+        o.weights && r.prs[0]
+          ? t("recap.card.pr", { name: r.prs[0].name, weight: fmtNum(fromKg(r.prs[0].weight, unit)), unit, reps: r.prs[0].reps })
+          : null,
+        r.favouriteDay ? t("recap.card.day", { day: r.favouriteDay }) : null,
+      ].filter((x): x is string => !!x),
+      footer: BRAND.name,
+      name: o.name,
+    }),
   };
 
   return (
@@ -153,15 +156,18 @@ export function Recap({ arg }: { arg?: string }) {
         </ol>
       )}
       {r.workouts > 0 && (
-        <Button className="mt-5 w-full py-4" onClick={() => void share()}>
+        <Button
+          className="mt-5 w-full py-4"
+          icon="share"
+          onClick={() => {
+            haptic("tap");
+            setSharing(true);
+          }}
+        >
           {t(period.kind === "year" ? "recap.shareYear" : "recap.shareMonth")}
         </Button>
       )}
-      {note && (
-        <p className="mt-2 text-center text-sm text-accent" role="status">
-          {note}
-        </p>
-      )}
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={[shareItem]} />
     </div>
   );
 }

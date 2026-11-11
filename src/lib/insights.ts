@@ -32,7 +32,18 @@ export type InsightAction =
   /** Start the plateau detective's three-week fix for a lift (store.fixPlateau). */
   | { kind: "plateau"; plateau: Plateau; fix: FixKind; label: string }
   /** Open a screen ("route" or "route/arg"). `pro` marks a button that opens the paywall at a Pro feature. */
-  | { kind: "go"; route: string; label: string; pro?: boolean };
+  | { kind: "go"; route: string; label: string; pro?: boolean }
+  /** Open the share sheet with a card of a lift going up (estimated one-rep max in kg, from and to). */
+  | { kind: "share"; trend: Gain; label: string };
+
+/** A lift going up over the last six weeks. */
+export interface Gain {
+  exerciseId: string;
+  pct: number;
+  weeks: number;
+  from: number;
+  to: number;
+}
 
 export interface Insight {
   /** Stable for the same finding, so a dismissal sticks until something changes. */
@@ -99,17 +110,18 @@ export function stalls(events: readonly AppEvent[], now: number): Stall[] {
 }
 
 /** The lift that has gone up the most in the last six weeks (5% or more). */
-function bestGain(events: readonly AppEvent[], now: number): { exerciseId: string; pct: number; weeks: number } | null {
+function bestGain(events: readonly AppEvent[], now: number): Gain | null {
   const ids = new Set(events.filter((e): e is SetEvent => e.type === "set" && now - e.at < 6 * WEEK).map((e) => e.exerciseId));
-  let top: { exerciseId: string; pct: number; weeks: number } | null = null;
+  let top: Gain | null = null;
   for (const id of ids) {
     const ex = EXERCISE_BY_ID.get(id);
     if (!ex || ex.load === "bodyweight" || TIMED.has(id)) continue;
     const s = e1Series(events, id).filter((x) => now - x.at < 6 * WEEK);
     if (s.length < 3) continue;
-    const pct = (Math.max(...s.slice(-2).map((x) => x.e1)) / s[0].e1 - 1) * 100;
+    const to = Math.max(...s.slice(-2).map((x) => x.e1));
+    const pct = (to / s[0].e1 - 1) * 100;
     const weeks = Math.max(1, Math.round((s.at(-1)!.at - s[0].at) / WEEK));
-    if (pct >= 5 && (!top || pct > top.pct)) top = { exerciseId: id, pct, weeks };
+    if (pct >= 5 && (!top || pct > top.pct)) top = { exerciseId: id, pct, weeks, from: s[0].e1, to };
   }
   return top;
 }
@@ -387,6 +399,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       title: t("ins.gain.title", { name: name(gain.exerciseId) }),
       why: t("ins.gain.why", { pct: Math.round(gain.pct), weeks: weeksText(gain.weeks) }),
       advice: t("ins.gain.advice"),
+      action: { kind: "share", trend: gain, label: t("card.shareIt") },
     });
   }
 
