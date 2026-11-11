@@ -311,6 +311,7 @@ function TrainingGroup() {
         ]}
       />
       <Row<Experience>
+        info="experience"
         label={t("settings.experience")}
         value={profile.experience}
         onPick={(experience) => setProfile({ experience })}
