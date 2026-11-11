@@ -664,7 +664,12 @@ export function AdminApp() {
   if (state === "signin") return <SignIn />;
   if (state === "twofactor" && twoFactor) return <TwoFactorGate info={twoFactor} />;
   if (state === "error")
-    return <main className="p-8 text-muted">The stats didn&apos;t load. Is the database set up (DATABASE_URL or TURSO_DATABASE_URL)?</main>;
+    return (
+      <main className="p-8 text-muted">
+        The stats didn&apos;t load. You&apos;re still signed in: reload to try again. If it keeps happening, check the database
+        (DATABASE_URL or TURSO_DATABASE_URL).
+      </main>
+    );
   if (!data) return <main className="p-8 text-muted">Loading…</main>;
   const o = data.overview;
   const rev = data.revenue;

@@ -9,7 +9,11 @@ import { passedSecondStep } from "./twoFactor";
 
 export const COOKIE = "ls_admin";
 const LINK_MS = 15 * 60_000;
-const SESSION_MS = 7 * 86_400_000;
+/** A staff session ends after 30 days without use, and 90 days after its sign-in whatever happens (Melvin,
+ *  2026-11-11: stay signed in for weeks). Each day of use pushes the 30 days forward again. */
+export const ADMIN_IDLE_MS = 30 * 86_400_000;
+export const ADMIN_MAX_MS = 90 * 86_400_000;
+const RENEW_MS = 86_400_000;
 
 const list = (v: string | undefined) =>
   new Set(
@@ -98,11 +102,11 @@ export async function finishSignIn(req: Request, now = Date.now()): Promise<Resp
     hash(s),
     link.email,
     now,
-    now + SESSION_MS,
+    now + ADMIN_IDLE_MS,
   ]);
   await audit(String(link.email), "signin", null);
   const res = back("");
-  res.headers.append("Set-Cookie", `${COOKIE}=${s}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${SESSION_MS / 1000}`);
+  res.headers.append("Set-Cookie", `${COOKIE}=${s}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${ADMIN_MAX_MS / 1000}`);
   return res;
 }
 
@@ -132,8 +136,8 @@ export interface StaffSession extends Staff {
 export async function getStaffSession(req: Request, now = Date.now()): Promise<StaffSession | null> {
   const c = cookie(req);
   if (!c) return null;
-  const rows = await query<{ email: string; expires_at: number; step_at: number | null; enabled_at: number | null }>(
-    `SELECT s.email, s.expires_at, st.at AS step_at, t.enabled_at
+  const rows = await query<{ email: string; created_at: number; expires_at: number; step_at: number | null; enabled_at: number | null }>(
+    `SELECT s.email, s.created_at, s.expires_at, st.at AS step_at, t.enabled_at
      FROM admin_sessions s
      LEFT JOIN admin_session_steps st ON st.token_hash = s.token_hash
      LEFT JOIN admin_two_factor t ON t.email = s.email
@@ -141,10 +145,15 @@ export async function getStaffSession(req: Request, now = Date.now()): Promise<S
     [hash(c)],
   );
   const s = rows[0];
-  if (!s || Number(s.expires_at) < now) return null;
+  if (!s || Number(s.expires_at) < now || Number(s.created_at) + ADMIN_MAX_MS < now) return null;
   // Taking an address off the list in the environment ends its sessions at once.
   const role = roleOf(String(s.email));
   if (!role) return null;
+  // Sliding expiry: use pushes the idle limit forward, written at most once a day (never past the 90-day cap, which
+  // the cookie's own Max-Age matches). A failed write only waits for the next request.
+  const renewed = Math.min(now + ADMIN_IDLE_MS, Number(s.created_at) + ADMIN_MAX_MS);
+  if (renewed - Number(s.expires_at) > RENEW_MS)
+    await run("UPDATE admin_sessions SET expires_at = ? WHERE token_hash = ?", [renewed, hash(c)]).catch(() => 0);
   const twoFactor = s.enabled_at != null;
   return {
     email: String(s.email),
@@ -164,7 +173,13 @@ export async function getStaff(req: Request, now = Date.now()): Promise<Staff | 
 /** Guards an admin route: 404 for anyone else, so the API doesn't advertise itself. Changes need an admin. */
 export async function requireStaff(req: Request, opts: { write?: boolean } = {}): Promise<{ staff: Staff } | { response: Response }> {
   if (req.method !== "GET" && !sameOrigin(req)) return { response: json(403, { error: "Bad origin" }) };
-  const staff = await getStaff(req);
+  let staff: Staff | null;
+  try {
+    staff = await getStaff(req);
+  } catch {
+    // The database didn't answer: say so, rather than a 404 the panel reads as "signed out".
+    return { response: json(503, { error: "The database didn't answer. Try again in a moment." }) };
+  }
   if (!staff || (opts.write && staff.role !== "admin")) return { response: notFound() };
   return { staff };
 }
