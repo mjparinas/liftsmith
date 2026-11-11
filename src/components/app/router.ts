@@ -117,6 +117,39 @@ export function go(route: Route, arg?: string) {
   window.scrollTo(0, 0);
 }
 
+/**
+ * Keeps Next.js's router out of the app's own back and forward steps. The app is one page with hash routes,
+ * so a step between two of its entries changes only the hash and the app follows it from `hashchange`. Next
+ * treated each of those popstates as a history traversal of its own: it restored the entry's copy of its tree
+ * and, once its cached copy of the page had gone stale or been dropped (a few minutes into a workout on a
+ * phone), asked the server for the page again. The Android app's local server answers every path with the
+ * HTML page, so that request failed and Next showed "This page couldn't load" until a reload (the Today and
+ * ‹ Back buttons and the phone's back all step back, Melvin, 2026-11-10). Traversals to another page (a
+ * different path or query) still go to Next.
+ */
+let lastDoc = "";
+const docOf = () => location.pathname + location.search;
+export function onPopState(e: Event) {
+  const doc = docOf();
+  if (doc === lastDoc) e.stopImmediatePropagation();
+  lastDoc = doc;
+}
+export function guardTraversals() {
+  if (typeof window === "undefined" || lastDoc) return;
+  lastDoc = docOf();
+  // Capture on window runs before Next's own listener, which is added later, on hydration.
+  window.addEventListener("popstate", onPopState, { capture: true });
+  // pushState and replaceState change the path without a popstate (Next's own links to the site's pages).
+  for (const k of ["pushState", "replaceState"] as const) {
+    const orig = history[k];
+    history[k] = function (this: History, ...args: Parameters<History["pushState"]>) {
+      orig.apply(this, args);
+      lastDoc = docOf();
+    };
+  }
+}
+guardTraversals();
+
 /** One step back through the app's history; with nothing behind this screen, Today. */
 export function goBack() {
   startTracking();
