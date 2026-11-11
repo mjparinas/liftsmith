@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { demoId, STRETCHES } from "../stretches";
+import { setLanguage } from "../i18n";
+import { demoId, searchStretches, STRETCHES } from "../stretches";
 import { MUSCLES } from "../types";
 import { jointsAt, placement, placeVec } from "./mesh";
 import { BODIES, cycleLength, len, sub, type BodyKey, type Vec } from "./rig";
@@ -84,4 +85,21 @@ describe("stretch demos", () => {
       }
     });
   }
+});
+
+describe("searchStretches", () => {
+  it("matches every word against the name, in the app's language or English, and the muscles", () => {
+    expect(searchStretches({ text: "pigeon" }).map((s) => s.id)).toEqual(["pigeon"]);
+    expect(searchStretches({ text: "quads", kind: "cool" }).every((s) => s.for.includes("quads") || /quad/i.test(s.name))).toBe(true);
+    setLanguage("es");
+    try {
+      // Accents don't matter, and the English name still finds it.
+      expect(searchStretches({ text: "pigeon" }).map((s) => s.id)).toEqual(["pigeon"]);
+      expect(searchStretches({ text: "paloma" }).map((s) => s.id)).toEqual(["pigeon"]);
+      expect(searchStretches({ text: "gluteos" }).every((s) => s.for.includes("glutes"))).toBe(true);
+      expect(searchStretches({ text: "gluteos" }).length).toBeGreaterThan(3);
+    } finally {
+      setLanguage("en");
+    }
+  });
 });

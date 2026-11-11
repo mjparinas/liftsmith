@@ -1,5 +1,6 @@
-import type { MessageKey } from "@/locales/en";
+import { en, type MessageKey } from "@/locales/en";
 
+import { fold } from "./exerciseSearch";
 import { inSentence, list, t } from "./i18n";
 import { dayKey, hash, rng } from "./random";
 import { MUSCLE_LABEL, MUSCLES, type Equipment, type Muscle } from "./types";
@@ -34,9 +35,11 @@ export interface Stretch {
   needs?: Equipment[];
   /** Raises the heart rate: a warm-up starts with one. */
   pulse?: boolean;
+  /** Its name's catalogue key (warm.<id> or str.<id>). */
+  textKey: string;
 }
 
-type Row = Omit<Stretch, "name" | "how"> & { text?: "warm" };
+type Row = Omit<Stretch, "name" | "how" | "textKey"> & { text?: "warm" };
 
 // prettier-ignore
 const ROWS: Row[] = [
@@ -97,6 +100,7 @@ export const STRETCHES: Stretch[] = ROWS.map(({ text, ...r }) => {
   const key = `${text ?? "str"}.${r.id}`;
   return {
     ...r,
+    textKey: key,
     get name() {
       return t(key as MessageKey);
     },
@@ -109,6 +113,23 @@ export const STRETCHES: Stretch[] = ROWS.map(({ text, ...r }) => {
 const BY_ID = new Map(STRETCHES.map((s) => [s.id, s]));
 export function stretch(id: string): Stretch | undefined {
   return BY_ID.get(id);
+}
+
+/**
+ * The library's filter: a kind, a muscle, and words typed (every word must match the name, in the app's
+ * language or English, or a muscle it's for; accents don't matter, as in the exercise browser).
+ */
+export function searchStretches(q: { text?: string; kind?: StretchKind | "all"; muscle?: Muscle | "all" }): Stretch[] {
+  const words = fold(q.text ?? "")
+    .split(/\s+/)
+    .filter(Boolean);
+  return STRETCHES.filter((s) => {
+    if (q.kind && q.kind !== "all" && s.kind !== q.kind) return false;
+    if (q.muscle && q.muscle !== "all" && !s.for.includes(q.muscle)) return false;
+    if (!words.length) return true;
+    const hay = fold([s.name, en[s.textKey as MessageKey], ...s.for.map((m) => MUSCLE_LABEL[m])].join(" "));
+    return words.every((w) => hay.includes(w));
+  });
 }
 
 /** The id the 3D demo knows a stretch by (kept apart from exercise ids: "glute-bridge" is both). */

@@ -37,10 +37,14 @@ Melvin asked on 2026-11-11: "add all kinds of different stretches, this should b
 
 Every suggested stretch says why (AGENTS.md "Every recommendation says why"), from `stretchWhy`: a pulse raiser "raises your heart rate", a warm-up move "readies today's muscles: …", a cool-down hold "worked today: …", a rest-day hold "trained in the last two days: …", and a library stretch "stretches: …". The muscle list goes after a colon so no language needs agreement with it.
 
+## Search
+
+The library has a search box like the exercise browser's (PR #185), using the same `fold()` so accents and case don't matter (`searchStretches` in `stretches.ts`). Every word typed must match the stretch's name in the app's language or English, or a muscle it's for. It combines with the kind and muscle chips, and a search that finds nothing says so. Typing is optional: the chips alone narrow the list.
+
 ## Platforms
 
 Pure web code: Android, iOS and the web app get the same screens. No native code is needed (no notification for a stretch routine; the screen stays on instead).
 
 ## Follow-ups
 
-- The exercise browser (PR #185) has a search box (`fold()` in `exerciseSearch.ts`) and a muscle chip row; once it's merged, pull the chip row into a shared component and give the stretch library the same search.
+- The library's muscle chips and the exercise browser's are two copies of the same row; pull them into one shared component if a third place needs it.

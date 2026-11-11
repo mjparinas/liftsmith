@@ -20,8 +20,8 @@ import { useApp } from "@/lib/store";
 import {
   demoId,
   routineSeconds,
+  searchStretches,
   stretch,
-  STRETCHES,
   stretchSeconds,
   stretchWhy,
   suggest,
@@ -110,7 +110,8 @@ function Library() {
   const [muscle, setMuscle] = useState<Muscle | "all">("all");
   const [picked, setPicked] = useState<string[]>(() => readPick());
   const [open, setOpen] = useState<Stretch | null>(null);
-  const shown = STRETCHES.filter((s) => (kind === "all" || s.kind === kind) && (muscle === "all" || s.for.includes(muscle)));
+  const [text, setText] = useState("");
+  const shown = searchStretches({ text, kind, muscle });
   const toggle = (id: string) => {
     haptic("select");
     sound.tick();
@@ -139,7 +140,19 @@ function Library() {
         <QuickStart icon="leaf" title={t("str.for.rest")} onClick={() => go("stretch", "rest")} />
       </div>
 
-      <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label={t("str.kinds")}>
+      <label className="sr-only" htmlFor="stretch-search">
+        {t("str.search")}
+      </label>
+      <input
+        id="stretch-search"
+        type="search"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        placeholder={t("str.search")}
+        autoComplete="off"
+        className="mt-5 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+      />
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("str.kinds")}>
         {(["all", "warm", "cool"] as const).map((k) => (
           <Chip key={k} active={kind === k} onClick={() => setKind(k)}>
             {t(`str.kind.${k}`)}
@@ -157,7 +170,7 @@ function Library() {
         ))}
       </div>
 
-      <ul className="card mt-4 divide-y divide-line/70 overflow-hidden" data-testid="stretch-list">
+      <ul hidden={!shown.length} className="card mt-4 divide-y divide-line/70 overflow-hidden" data-testid="stretch-list">
         {shown.map((s) => {
           const on = picked.includes(s.id);
           return (
@@ -189,6 +202,7 @@ function Library() {
           );
         })}
       </ul>
+      {!shown.length && <p className="mt-3 text-sm text-muted">{t("str.none")}</p>}
 
       <Sheet open={!!open} onClose={() => setOpen(null)} title={open?.name ?? ""}>
         {open && (

@@ -41,6 +41,23 @@ describe("stretch library", () => {
     expect(names.some((n) => n?.includes("Pigeon"))).toBe(false);
   });
 
+  it("finds stretches by words typed, ignoring accents, in the app's language or English", async () => {
+    const user = userEvent.setup();
+    render(<StretchScreen />);
+    const box = screen.getByRole("searchbox", { name: "Search by name or muscle" });
+    const names = () =>
+      within(screen.getByTestId("stretch-list"))
+        .queryAllByRole("listitem")
+        .map((li) => li.textContent ?? "");
+    await user.type(box, "calf");
+    expect(names().some((n) => n.includes("Wall calf stretch"))).toBe(true);
+    expect(names().some((n) => n.includes("Pigeon"))).toBe(false);
+    await user.clear(box);
+    await user.type(box, "zzz");
+    expect(names()).toEqual([]);
+    expect(screen.getByText(/No stretch matches/)).toBeInTheDocument();
+  });
+
   it("runs picked stretches one at a time, switching sides, and saves them", async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
