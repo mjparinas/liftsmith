@@ -2,6 +2,7 @@
 // variations and questions. Shown on /exercises/<id>/ under the setup and cues from the library.
 // Text supports **bold** and [links](/path/) like the blog.
 import { LOWER_GUIDES } from "./exerciseGuides/lower";
+import { UPPER_GUIDES } from "./exerciseGuides/upper";
 
 export type ExerciseGuide = {
   /** What the exercise is good for, in a sentence or two. */
@@ -15,4 +16,4 @@ export type ExerciseGuide = {
   faq: [string, string][];
 };
 
-export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = { ...LOWER_GUIDES };
+export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = { ...LOWER_GUIDES, ...UPPER_GUIDES };
