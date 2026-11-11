@@ -1,13 +1,15 @@
 "use client";
 
-import type { CSSProperties } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
 import { track } from "@/lib/analytics";
-import { t } from "@/lib/i18n";
+import { EXERCISE_BY_ID } from "@/lib/exercises";
+import { num, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { roundLoad } from "@/lib/loads";
-import { speedMax, type WarmupSpeed } from "@/lib/reps/speedMax";
+import { personalMvt, speedMax, type WarmupSpeed } from "@/lib/reps/speedMax";
+import { useApp } from "@/lib/store";
 import type { Exercise, Gym, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 
@@ -72,8 +74,12 @@ export function SpeedNudge({
   reps: number;
   onUse: (kg: number, reps: number) => void;
 }) {
-  const r = speedMax(warmupSpeeds(sessionId, ex.id), { pattern: ex.pattern, ...planned }, (kg) => roundLoad(kg, ex, gym).kg);
-  if (!r) return null;
+  const events = useApp((st) => st.events);
+  // The lifter's own end-of-set speed for this movement once enough hard sets taught it, else the textbook one.
+  const [now] = useState(() => Date.now());
+  const own = useMemo(() => personalMvt(events, ex.pattern, (id) => EXERCISE_BY_ID.get(id)?.pattern, now), [events, ex.pattern, now]);
+  const r = speedMax(warmupSpeeds(sessionId, ex.id), { pattern: ex.pattern, ...planned, mvt: own?.mvt }, (kg) => roundLoad(kg, ex, gym).kg);
+  if (!r || !own) return null;
   const unit = gym.unit;
   const vars = {
     max: loadText(ex, wholeKg(r.max, unit), unit),
@@ -89,6 +95,13 @@ export function SpeedNudge({
         <Info term="speedMax" />
       </div>
       <p className="mt-1.5 text-sm">{t(`count.max.${r.call}`, vars)}</p>
+      {/* Which threshold the estimate used, and why: learned from the lifter's own hard sets, or the usual one until then. */}
+      <p className="mt-1 text-xs text-muted" data-testid="speed-threshold">
+        {t(own.sets > 0 ? "count.max.own" : "count.max.book", {
+          speed: num(own.mvt, { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+          count: own.sets > 0 ? own.sets : own.needed,
+        })}
+      </p>
       {r.call !== "hold" &&
         (used ? (
           <p className="mt-2 flex items-center gap-1.5 text-sm text-good" role="status">

@@ -25,7 +25,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { fastestMetres } from "@/lib/reps/speedMax";
+import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
@@ -648,8 +648,16 @@ export function Workout() {
                     speedMaxOn
                       ? (sum) => {
                           const a = useApp.getState().active;
+                          if (!a) return;
+                          if (!warmingUp(a)) {
+                            // A working set: its last full rep's speed, and whether a rep failed after it, are
+                            // saved with the set, so sets taken to failure teach the lifter's own threshold.
+                            const last = lastFullMetres(sum);
+                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter);
+                            return;
+                          }
                           const v = fastestMetres(sum);
-                          if (!a || !warmingUp(a) || v === undefined) return;
+                          if (v === undefined) return;
                           warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
                         }
                       : undefined
