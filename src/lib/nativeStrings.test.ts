@@ -60,3 +60,30 @@ describe("app languages", () => {
     for (const l of OTHERS) expect(project, l).toContain(`path = ${l}.lproj/Localizable.strings`);
   });
 });
+
+describe("Garmin watch app", () => {
+  // garmin/ (Connect IQ): English in resources/, every other app language in resources-<Garmin code>/, all
+  // listed in the manifest, each with the same strings as English (the app name stays English).
+  const GARMIN = join(__dirname, "../../garmin");
+  const CODES: Record<string, string> = { es: "spa", fr: "fre", de: "deu", it: "ita", ja: "jpn" };
+  const ids = (path: string) => [...readFileSync(join(GARMIN, path), "utf8").matchAll(/<string id="(\w+)">/g)].map((m) => m[1]!);
+
+  it("has every app language, with every string", () => {
+    expect(Object.keys(CODES).sort()).toEqual([...OTHERS].sort());
+    const manifest = readFileSync(join(GARMIN, "manifest.xml"), "utf8");
+    const english = ids("resources/strings/strings.xml").filter((k) => k !== "AppName");
+    expect(english.length).toBeGreaterThan(0);
+    for (const [l, code] of Object.entries(CODES)) {
+      expect(manifest, l).toContain(`<iq:language>${code}</iq:language>`);
+      expect(ids(`resources-${code}/strings/strings.xml`), l).toEqual(english);
+    }
+  });
+
+  it("uses the same app id as the phone apps", () => {
+    const id = readFileSync(join(GARMIN, "manifest.xml"), "utf8").match(/iq:application id="(\w+)"/)![1]!;
+    const java = readFileSync(join(__dirname, "../../android/app/src/main/java/com/getliftsmith/app/GarminLink.java"), "utf8");
+    const swift = readFileSync(join(IOS, "App/GarminLink.swift"), "utf8");
+    expect(java).toContain(`APP_ID = "${id}"`);
+    expect(swift.replace(/-/g, "")).toContain(`UUID(uuidString: "${id}")`);
+  });
+});

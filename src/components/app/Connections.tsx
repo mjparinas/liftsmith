@@ -2,7 +2,7 @@
 
 // Settings › Connected apps (#/connections; docs/decisions/connected-apps.md): Health Connect or Apple Health
 // (status, what's allowed, last sync, Sync now), the Bluetooth heart rate monitor (a test before the gym),
-// Strava, Oura and WHOOP (through the account), the music app for Today's playlist, and what's coming later.
+// the Garmin watch app, Strava, Oura and WHOOP (through the account), the music app for Today's playlist, and what's coming later.
 import { useEffect, useRef, useState } from "react";
 
 import { platform, useAccount } from "@/lib/auth";
@@ -13,11 +13,13 @@ import {
   disconnectCloud,
   MUSIC_APPS,
   MUSIC_NAME,
+  openOutside,
   pullCloud,
   refreshCloud,
   stravaWaiting,
   useCloud,
 } from "@/lib/connections";
+import { chooseGarmin, GARMIN_STORE_URL, garminStatus, onGarminChange, watchState, type GarminStatus } from "@/lib/garmin";
 import {
   allowWorkouts,
   connectHealth,
@@ -383,6 +385,81 @@ function CloudCards() {
   );
 }
 
+// --- Garmin watch ---
+
+function GarminCard() {
+  const p = platform();
+  const [status, setStatus] = useState<GarminStatus | null | undefined>(undefined);
+  const check = () => garminStatus().then(setStatus);
+  useEffect(() => {
+    if (p === "web") return;
+    void check();
+    // Garmin Connect sends the lifter back after picking a watch or installing our app.
+    const back = () => document.visibilityState === "visible" && void check();
+    document.addEventListener("visibilitychange", back);
+    const off = onGarminChange(() => void check());
+    return () => {
+      document.removeEventListener("visibilitychange", back);
+      off();
+    };
+  }, [p]);
+
+  if (p === "web")
+    return (
+      <div className="card px-4 py-3">
+        <p className="text-sm text-muted">{t("conn.garmin.web")}</p>
+      </div>
+    );
+  if (status === undefined) return <div className="card px-4 py-3 text-sm text-muted">{t("conn.garmin.checking")}</div>;
+
+  const missing = !status || status.app === "missing";
+  const devices = status?.devices ?? [];
+  const needsApp = devices.some((w) => watchState(w) === "install");
+  return (
+    <div className="card px-4 py-3">
+      <p className="text-sm text-muted">{t("conn.garmin.what")}</p>
+      {missing ? (
+        <>
+          <Status on={false}>{t("conn.garmin.missing")}</Status>
+          <Button kind="ghost" className="mt-3 w-full" onClick={() => void chooseGarmin()}>
+            {t("conn.garmin.getConnect")}
+          </Button>
+        </>
+      ) : devices.length === 0 ? (
+        <>
+          <Status on={false}>{p === "ios" ? t("conn.garmin.noneIos") : t("conn.garmin.none")}</Status>
+          <Button kind="ghost" className="mt-3 w-full" onClick={() => void chooseGarmin()}>
+            {p === "ios" ? t("conn.garmin.choose") : t("conn.garmin.openConnect")}
+          </Button>
+        </>
+      ) : (
+        <>
+          <ul className="mt-1">
+            {devices.map((w) => (
+              <li key={w.name}>
+                <Status on={watchState(w) === "ready"}>
+                  {w.name} · {t(`conn.garmin.${watchState(w)}`)}
+                </Status>
+              </li>
+            ))}
+          </ul>
+          {needsApp && !GARMIN_STORE_URL && <p className="mt-2 text-sm text-muted">{t("conn.garmin.soon")}</p>}
+          {needsApp && !!GARMIN_STORE_URL && (
+            <Button kind="ghost" className="mt-3 w-full" onClick={() => openOutside(GARMIN_STORE_URL)}>
+              {t("conn.garmin.getApp")}
+            </Button>
+          )}
+          {p === "ios" && (
+            <Button kind="ghost" className="mt-3 w-full" onClick={() => void chooseGarmin()}>
+              {t("conn.garmin.change")}
+            </Button>
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
 // --- Music ---
 
 function MusicCard() {
@@ -407,7 +484,7 @@ function MusicCard() {
   );
 }
 
-const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.garmin", "conn.later.velocity"];
+const LATER: MessageKey[] = ["conn.later.samsung", "conn.later.velocity"];
 
 export function Connections() {
   return (
@@ -425,6 +502,9 @@ export function Connections() {
       </Section>
       <Section title={t("conn.hr.title")} icon="bolt">
         <HeartRateCard />
+      </Section>
+      <Section title={t("conn.garmin.title")} icon="watch">
+        <GarminCard />
       </Section>
       <Section title={t("conn.cloud.title")} icon="link">
         <CloudCards />

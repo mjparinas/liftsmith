@@ -29,8 +29,23 @@ Melvin approved building them on 2026-11-10 ("Yes to all", after the list of wha
 - **Play Console:** Wear OS has to be added as a form factor once (Test and release › Advanced settings › Form factors › Add Wear OS) before Play takes a Wear bundle. Until then the release's Wear upload step fails on its own (`continue-on-error`) and the phone release goes ahead. Wear OS apps are reviewed against Google's Wear OS quality guidelines, which need watch screenshots in the listing.
 - **App Store Connect:** nothing extra. The archive's automatic signing (`-allowProvisioningUpdates`) registers the watch app's bundle id with HealthKit the first time. If it can't, register `com.getliftsmith.app.watchkitapp` with the HealthKit capability in the Apple Developer portal.
 
+## Garmin (Connect IQ app, 2026-11-10)
+
+Melvin asked for every "coming later" connection to be built (2026-11-10), and Garmin was the first.
+
+- **Same job as the other two watch apps**: the set, weight and reps or the rest countdown, plates or what's next, heart rate, Log set and +30 s, a buzz when rest ends, "No workout running" otherwise. No planning or history on the watch. Code in `garmin/` (Monkey C), with build and store steps in `garmin/README.md`.
+- **Buttons, not on-screen buttons**: Garmin watches are driven by their keys, so START (or a tap on touch watches) is Log set and DOWN (or a swipe up) is +30 s during rest, with a hint line at the bottom saying which. BACK leaves the app.
+- **Phone side**: Garmin's Connect IQ companion SDK on both phones (`com.garmin.connectiq:ciq-companion-app-sdk` on Android, the `connectiq-companion-app-sdk-ios` Swift package on iOS), in `GarminLink.java` / `GarminLink.swift`, called from the same `WorkoutSession.update` and `stop` as the Wear OS and Apple Watch links. Messages use short keys (`t`, `s`, `n`, `p`, `r`, `h`, `v`; `GarminMessages` on both platforms, unit tested on Android) because Connect IQ messages are small and slow. **Rest goes as seconds left**, not a time, so the watch's clock never has to agree with the phone's. Heart-rate-only changes go at most every 10 s; anything else goes straight away.
+- **Taps and heart rate** come back as the same broadcasts (Android) and callbacks (iOS) as the Wear OS and Apple Watch apps, so the web app treats them identically: `log` and `add30` only, heart rate 30 to 240 and sent at most every 5 s.
+- **Opening**: the first update of a workout asks each connected Garmin watch to open the app (the watch asks the lifter, which is Garmin's rule).
+- **Finding the watch**: Android gets the paired watches from Garmin Connect by itself. iOS can't, so Connected apps › Garmin watch has **Choose my watch**, which opens Garmin Connect's picker; it comes back on `liftsmith-ciq://` and the picked watches are kept on the phone. The iOS SDK talks Bluetooth itself, so it only starts once a watch has been picked (lifters without a Garmin never see a Bluetooth prompt from it). Both need the Garmin Connect app.
+- **Connected apps** shows each watch: ready, needs the Liftsmith watch app, or not connected. Until the store listing exists it says the app is on its way; `GARMIN_STORE_URL` in `src/lib/garmin.ts` turns on a "Get the watch app" button. The web app says the Garmin app works with the phone apps.
+- **Watches**: recent ones with Connect IQ 3.2 or later and a heart rate sensor (Forerunner 165 to 970, fēnix 7 and 8, epix 2, Enduro 3, Instinct 3 AMOLED, Venu 2 to 4 and X1, vívoactive 5 and 6). Add more in `garmin/manifest.xml`.
+- **Words**: six languages in `garmin/resources*/`, checked by `nativeStrings.test.ts`.
+- **Builds**: Garmin's compiler needs device files that only download after a Garmin sign-in, so CI doesn't build the watch app; Melvin builds and uploads `garmin.iq` (steps in `garmin/README.md`). CI builds both phone apps with the SDK.
+
 ## Later
 
 - The motion rep counter (`imu.ts`) can take the watch's accelerometer instead of the phone's.
 - A watch face complication or tile with today's call.
-- Garmin is a separate Connect IQ app (Integrations roadmap).
+- Build the Garmin watch app in CI once there's a Garmin login for the SDK Manager to use (`GARMIN_*` secrets).

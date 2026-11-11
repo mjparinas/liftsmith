@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">ワークアウトは実行されていません</string>
+    <string id="NoneBody">スマートフォンで開始すると、ここに表示されます。</string>
+    <string id="Rest">休憩</string>
+    <string id="Next">次：$1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START：セットを記録</string>
+    <string id="HintAdd">DOWN：+30 秒</string>
+</strings>

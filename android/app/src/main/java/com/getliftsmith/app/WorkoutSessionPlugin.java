@@ -124,6 +124,8 @@ public class WorkoutSessionPlugin extends Plugin {
         ContextCompat.startForegroundService(getContext(), i);
         // The same workout on a Wear OS watch (WatchLink, android/wear).
         WatchLink.update(getContext(), call.getData());
+        // And on a Garmin watch (GarminLink, garmin/).
+        GarminLink.update(getContext(), call.getData());
         call.resolve();
     }
 
@@ -139,6 +141,7 @@ public class WorkoutSessionPlugin extends Plugin {
     public void stop(PluginCall call) {
         getContext().stopService(new Intent(getContext(), WorkoutService.class));
         WatchLink.stop(getContext());
+        GarminLink.stop(getContext());
         call.resolve();
     }
 }
