@@ -8,6 +8,7 @@ import { BLOG_B } from "./blog/b";
 import { BLOG_C } from "./blog/c";
 import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
+import { BLOG_F } from "./blog/f";
 import { GUIDES } from "./guides";
 
 export type CtaTopic =
@@ -27,7 +28,11 @@ export type CtaTopic =
   | "comeback"
   | "tdee"
   | "log"
-  | "rir";
+  | "rir"
+  | "labs"
+  | "watch"
+  | "measure"
+  | "health";
 
 export type Block =
   { h2: string } | { p: string } | { ul: string[] } | { ol: string[] } | { tip: string } | { cta: CtaTopic } | { exercises: string[] };
@@ -135,9 +140,29 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     body: "Liftsmith sets how many reps to leave in the tank for each week of your block, and adjusts from what you report.",
     button: "Train by effort",
   },
+  labs: {
+    title: "Let your camera count the reps",
+    body: "With Liftsmith Pro, Labs counts your reps and reads bar speed from your phone's camera, then says when to end the set. Video never leaves your phone.",
+    button: "Try Labs",
+  },
+  watch: {
+    title: "Your workout on your wrist",
+    body: "Liftsmith shows the next set, the rest countdown and your heart rate on Wear OS and Apple Watch, with Log set one tap away.",
+    button: "Lift with your watch",
+  },
+  measure: {
+    title: "Progress the scale can't see",
+    body: "Log weigh-ins, body fat and tape measurements in Liftsmith with a few taps, and get a coach's note when your waist starts to move.",
+    button: "Start tracking free",
+  },
+  health: {
+    title: "Plan around how you slept",
+    body: "Liftsmith reads sleep, HRV, resting heart rate and weigh-ins from Health Connect or Apple Health, and saves every workout back.",
+    button: "Connect your health app",
+  },
 };
 
-export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C, ...BLOG_D, ...BLOG_E];
+export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C, ...BLOG_D, ...BLOG_E, ...BLOG_F];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));
 
