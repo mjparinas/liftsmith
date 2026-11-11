@@ -12,7 +12,7 @@ import { useNow } from "@/lib/useNow";
 
 import { loadText, repsText } from "./format";
 import { go } from "./router";
-import { Button } from "./ui";
+import { Button, ScreenHeader } from "./ui";
 
 // A shared workout opened from a link (#/remix/<code>), rebuilt for this lifter's gym and strength.
 
@@ -38,7 +38,7 @@ export function Remix({ code }: { code?: string }) {
   const { plan, swapped, missing } = remix;
   return (
     <div className="pb-2">
-      <h1 className="pt-2 text-2xl font-bold">{t("remix.title")}</h1>
+      <ScreenHeader title={t("remix.title")} />
       <p className="mt-1 text-muted">{t("remix.rebuilt", { gym: gym?.name ?? t("remix.yourGym"), min: plan.estMinutes })}</p>
       {(swapped.length > 0 || missing.length > 0) && (
         <div className="card mt-4 p-4 text-sm">

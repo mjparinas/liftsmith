@@ -12,7 +12,7 @@ import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
 import { go } from "./router";
-import { Chip, Section } from "./ui";
+import { Chip, ScreenHeader, Section } from "./ui";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
@@ -274,10 +274,7 @@ export function Achievements() {
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("progress.title")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("awards.title")}</h1>
+      <ScreenHeader back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }} title={t("awards.title")} />
       <div className="card mt-4 p-4">
         <div className="flex items-baseline justify-between">
           <span className="font-semibold">

@@ -13,6 +13,7 @@ import {
 import { createPortal } from "react-dom";
 
 import { Info } from "@/components/Info";
+import { SCREEN_TITLE, SECTION_LABEL, SHEET_TITLE } from "@/components/titles";
 import { useBack } from "@/lib/back";
 import type { Term } from "@/lib/glossary";
 import { parseNum, t } from "@/lib/i18n";
@@ -204,6 +205,41 @@ export function Stepper({
   );
 }
 
+/**
+ * The top of a screen: an optional "‹ Back" link, an optional small kicker line, and the title, in the one
+ * shared style (SCREEN_TITLE). Every screen's h1 goes through here, so titles line up the same everywhere.
+ */
+export function ScreenHeader({
+  title,
+  back,
+  kicker,
+  info,
+  className = "",
+}: {
+  title: ReactNode;
+  back?: { label: string; onClick: () => void };
+  kicker?: ReactNode;
+  info?: Term;
+  className?: string;
+}) {
+  return (
+    <header className={className}>
+      {back ? (
+        <button type="button" onClick={back.onClick} className="press -ml-2 min-h-11 px-2 text-muted">
+          {back.label}
+        </button>
+      ) : (
+        <div className="h-3" />
+      )}
+      {kicker && <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">{kicker}</p>}
+      <h1 className={`flex items-center gap-1 ${SCREEN_TITLE}`}>
+        {title}
+        {info && <Info term={info} />}
+      </h1>
+    </header>
+  );
+}
+
 export function Section({
   title,
   children,
@@ -220,7 +256,7 @@ export function Section({
   return (
     <section className="mt-7">
       <div className="mb-2.5 flex flex-wrap items-end justify-between gap-x-2 px-1">
-        <h2 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+        <h2 className={`flex items-center gap-1.5 ${SECTION_LABEL}`}>
           {icon && <Icon name={icon} size={14} className="text-accent" />}
           {title}
           {info && <Info term={info} />}
@@ -392,7 +428,7 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
           <div className="h-1.5 w-10 rounded-full bg-line" />
         </div>
         <div className="mb-3 flex items-start gap-2">
-          <h2 id={`${id}-t`} className="min-w-0 flex-1 pt-2 text-lg font-semibold">
+          <h2 id={`${id}-t`} className={`min-w-0 flex-1 pt-2 ${SHEET_TITLE}`}>
             {title}
           </h2>
           <button

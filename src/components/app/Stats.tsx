@@ -20,7 +20,7 @@ import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
 import { go } from "./router";
 import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -62,7 +62,7 @@ export function Stats() {
   ];
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <ScreenHeader title={t("progress.title")} />
       <CoachNotes title={t("progress.next")} />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">

@@ -1,5 +1,6 @@
 "use client";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
@@ -21,7 +22,7 @@ export function ComingUp() {
   if (!active) return null;
   return (
     <section className="mt-6">
-      <h2 className="mb-2.5 px-1 text-xs font-semibold uppercase tracking-[0.12em] text-muted">{t("workout.comingUp")}</h2>
+      <h2 className={`mb-2.5 px-1 ${SECTION_LABEL}`}>{t("workout.comingUp")}</h2>
       <ol className="card divide-y divide-line/70 overflow-hidden">
         {active.plan.items.slice(active.index + 1).map((it, i) => {
           const e = exercise(it.exerciseId);
