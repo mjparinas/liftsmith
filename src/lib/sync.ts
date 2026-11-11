@@ -6,7 +6,7 @@
 // Events merge by id, so order and repeats don't matter; the profile and gyms are last write wins.
 import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount } from "./auth";
 import { useApp } from "./store";
-import { noteChanged, onOutbox, readSync, writeSync, type SyncState } from "./syncOutbox";
+import { noteChanged, onOutbox, readSync, seedOutbox, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
 
 const BATCH = 500;
@@ -60,7 +60,11 @@ export function mergeRecords(
   const p = recs.find((r) => r.key === "profile");
   // An account profile that never finished setup (pushed by an older version) never replaces a set-up one here.
   const usable = !!p?.value && ((p.value as Profile).onboarded || !profile.onboarded);
-  if (p && usable && (p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt))) nextProfile = p.value as Profile;
+  // A device that hasn't finished setup takes the account's set-up profile whatever the times say: a browser that signed in
+  // under an older version and then answered setup questions has a newer, half-made profile and was stuck in setup for good.
+  const rescue = !!p?.value && (p.value as Profile).onboarded && !profile.onboarded;
+  if (p && usable && (rescue || p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt)))
+    nextProfile = p.value as Profile;
   let list = [...gyms];
   let changed = false;
   const known: string[] = [];
@@ -133,6 +137,15 @@ async function run(): Promise<void> {
   if (!store.ready) return;
   useAccount.setState({ busy: true });
   try {
+    // The outbox only fills while signed in, so queue what this device logged before (once per sign-in).
+    const start = readSync();
+    if (!start.seeded)
+      writeSync(
+        seedOutbox(
+          start,
+          useApp.getState().events.map((e) => e.id),
+        ),
+      );
     for (let round = 0; round < 100; round++) {
       const s: SyncState = readSync();
       const { profile, gyms, events } = useApp.getState();

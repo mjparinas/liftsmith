@@ -14,7 +14,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { AccountPanel } from "./Account";
 import { Icon, type IconName } from "./icons";
-import { go } from "./router";
+import { go, replaceRoute } from "./router";
 import { Button, Sheet } from "./ui";
 
 const POINTS: { icon: IconName; hue: string; key: MessageKey }[] = [
@@ -116,6 +116,10 @@ function useRestore(open: boolean, close: () => void, onStart: (signedIn?: boole
     // Only a sign-in made while the sheet is open counts: a device already signed in restores through App's own sync.
     const off = useAccount.subscribe((now, before) => {
       if (now.account && !before.account) {
+        // Came in through the website's Sign in link (#/account): point the app at Today now. The first sync can bring a
+        // set-up profile back, and App then swaps this screen for the app before the sync's promise settles, so waiting
+        // for it to call go("today") left the lifter on Settings › Account (Melvin, 2026-11-11).
+        if (location.hash.startsWith("#/account")) replaceRoute("today");
         setState("busy");
         void syncNow().then(() => {
           if (!live) return;

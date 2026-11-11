@@ -1,4 +1,4 @@
-import { num } from "./i18n";
+import { num, t } from "./i18n";
 import type { Unit } from "./types";
 
 export const LB = 0.45359237;
@@ -23,6 +23,16 @@ export function plainNum(n: number): string {
  */
 export function fmtNum(n: number): string {
   return num(Math.round(n * 100) / 100, { maximumFractionDigits: 2, useGrouping: false });
+}
+
+/**
+ * Total lifted (volume): the plain number under 1,000 ("0 kg", "640 lb"), then thousands with one decimal
+ * ("12.4k kg", in each language's own way). Rounded before the check, so 999.6 reads "1k", never "1,000".
+ */
+export function fmtVolume(kg: number, unit: Unit): string {
+  const v = Math.max(0, Math.round(fromKg(kg, unit)));
+  if (v < 1000) return `${num(v)} ${unit}`;
+  return t("progress.volumeK", { n: fmtNum(Math.round(v / 100) / 10), unit });
 }
 
 export function fmtWeight(kg: number, unit: Unit): string {

@@ -7,7 +7,7 @@ import { list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { ACTIVITY, currentTdee, parseBodyFat, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { fmtNum, fromKg, toKg } from "@/lib/units";
+import { fmtNum, fmtVolume, fromKg, toKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { AchievementRow, useGame } from "./Achievements";
@@ -58,13 +58,7 @@ export function Stats() {
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
     ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
     ["sets", t("progress.sets"), num(stats.totalSets), "layers", HUE.violet],
-    [
-      "volume",
-      t("progress.volume"),
-      t("progress.volumeK", { n: fmtNum(Math.round(fromKg(stats.totalVolume, unit) / 100) / 10), unit }),
-      "progress",
-      HUE.cyan,
-    ],
+    ["volume", t("progress.volume"), fmtVolume(stats.totalVolume, unit), "progress", HUE.cyan],
   ];
   return (
     <div className="pb-2">
