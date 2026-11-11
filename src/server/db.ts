@@ -485,6 +485,15 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_to ON sent_workouts (to_id, created_at)`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_from ON sent_workouts (from_id)`,
+  // Invite links (social.ts `invite`): accepting one makes the two lifters follow each other. One live code each.
+  `CREATE TABLE IF NOT EXISTS social_invites (
+    code TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    uses INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS social_invites_account ON social_invites (account_id)`,
   // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
   `CREATE TABLE IF NOT EXISTS mutes (
     muter_id TEXT NOT NULL,

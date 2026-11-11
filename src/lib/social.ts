@@ -49,6 +49,8 @@ export function socialError(e: unknown): string {
     old: "friends.err.old",
     notFriends: "friends.err.notFriends",
     code: "friends.err.code",
+    invite: "friends.err.invite",
+    self: "friends.err.inviteSelf",
     signedOut: "friends.err.signedOut",
     "Signed out. Sign in again.": "friends.err.signedOut",
   };
