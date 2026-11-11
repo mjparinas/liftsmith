@@ -2,6 +2,7 @@
 // email or id, see how it signs in, its devices and how much it has synced, and act on it. Synced bodies (sets,
 // health readings, injuries, cycle logs) are never read here, only counted. Private staff notes are kept per
 // account and deleted with it.
+import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
 import { accountHasPro } from "./review";
 
@@ -94,7 +95,7 @@ export async function accountDetail(id: string): Promise<AccountDetail | null> {
   const sy = sync[0] ?? {};
   return {
     ...row,
-    pro: accountHasPro(row.email),
+    pro: accountHasPro(row.email) || (await hasLifetimePro(id)),
     identities: identities.map((r) => ({ provider: String(r.provider), email: s(r.email), createdAt: n(r.created_at) })),
     sessions: sessions.map((r) => ({
       platform: s(r.platform),

@@ -16,10 +16,16 @@
 // how the creator gets paid, so it is sent whatever the usage-stats switch says, and /privacy/ says so.
 // The code also goes to RevenueCat as a subscriber attribute, so the store's purchase webhook carries it too.
 // Once a trial or purchase has started, the code can't be changed: it belongs to that subscription.
+//
+// A lifetime code (Melvin, 2026-11-11) gives Pro for good to the signed-in account that redeems it, on every
+// device and platform that account signs in on, with nothing bought in the store. It needs an account, so
+// that Pro survives a reinstall or a new phone and its use limit counts people: typed while signed out, it's
+// kept and redeemed as soon as the lifter signs in (`redeemSaved`).
 import { create } from "zustand";
 
 import { installId, platformStore } from "./analytics";
-import { DEFAULT_OFFERING, DEFAULT_TRIAL_DAYS, normalizeCode, OFFERING_ID, playLinkWithCode, type CodeKind } from "./creatorCode";
+import { api, AuthError, readAccount, setAccountPro } from "./auth";
+import { codeKind, DEFAULT_OFFERING, DEFAULT_TRIAL_DAYS, normalizeCode, OFFERING_ID, playLinkWithCode, type CodeKind } from "./creatorCode";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
@@ -96,9 +102,9 @@ export const useCreator = create<{ claim: CreatorClaim | null; checking: boolean
 
 const dead = (c: CreatorClaim) => c.status === "unknown" || c.status === "ended";
 
-/** The code that gives the longer trial: one the server knows (or hasn't checked yet, offline). */
+/** The code that gives the longer trial: one the server knows (or hasn't checked yet, offline). A lifetime code gives no trial. */
 export function activeCode(c: CreatorClaim | null = useCreator.getState().claim): string | null {
-  return c && !dead(c) ? c.code : null;
+  return c && !dead(c) && c.kind !== "lifetime" ? c.code : null;
 }
 
 /** The RevenueCat offering to sell from with the active code, or null without one. */
@@ -188,19 +194,58 @@ export async function sendClaim(post: Post = fetch): Promise<CodeStatus | null> 
     writeClaim({
       ...next,
       ...(typeof j.name === "string" && j.name ? { name: j.name.slice(0, 60) } : {}),
-      ...(j.kind === "promo" || j.kind === "creator" ? { kind: j.kind } : {}),
+      ...(typeof j.kind === "string" ? { kind: codeKind(j.kind) } : {}),
       ...(j.trialDays === null || (typeof j.trialDays === "number" && j.trialDays > 0 && j.trialDays <= 90)
         ? { trialDays: j.trialDays }
         : {}),
       ...(typeof j.offering === "string" && OFFERING_ID.test(j.offering) ? { offering: j.offering } : {}),
     });
-    creatorHooks.onChecked?.(code);
+    if (j.kind === "lifetime") {
+      creatorHooks.onChecked?.(null);
+      await redeemSaved();
+    } else creatorHooks.onChecked?.(code);
     return "ok";
   } catch {
     return null; // Offline: keep it pending.
   } finally {
     useCreator.setState({ checking: false });
   }
+}
+
+// ---------- Lifetime codes ----------
+
+/** ok: the account has Pro for good; signedOut: sign in first; notLifetime: a live code of another kind;
+ * held: the account already has Pro from another lifetime code; unknown / ended as for any code; null: offline. */
+export type RedeemStatus = "ok" | "signedOut" | "notLifetime" | "held" | "unknown" | "ended" | null;
+
+/** Redeems a lifetime code for the signed-in account. On success the account has Pro here at once. */
+export async function redeemLifetime(raw: string): Promise<RedeemStatus> {
+  const code = normalizeCode(raw);
+  if (!code) return "unknown";
+  const a = readAccount();
+  if (!a) return "signedOut";
+  try {
+    await api<{ ok: boolean }>("/api/creator/redeem/", { body: { code }, token: a.token });
+    setAccountPro(true);
+    return "ok";
+  } catch (e) {
+    const st = e instanceof AuthError ? e.status : 0;
+    if (st === 404) return "unknown";
+    if (st === 410) return "ended";
+    if (st === 409) return e instanceof AuthError && e.message === "Already Pro" ? "held" : "notLifetime";
+    if (st === 401) return "signedOut";
+    return null;
+  }
+}
+
+/** A lifetime code saved while signed out (or offline) is redeemed once there's an account: on open and on sign-in. */
+export async function redeemSaved(): Promise<RedeemStatus> {
+  const c = readClaim();
+  if (!c || c.kind !== "lifetime" || c.status !== "ok" || readAccount()?.pro) return null;
+  if (!readAccount()) return "signedOut";
+  const r = await redeemLifetime(c.code);
+  if (r === "unknown" || r === "ended") writeClaim({ ...c, status: r });
+  return r;
 }
 
 /** On every open: picks a code up from the link or the Play install referrer, then checks a pending one. */
@@ -216,4 +261,5 @@ export async function startCreator(href = typeof location !== "undefined" ? loca
     }
   }
   if (readClaim()?.status === "pending") await sendClaim();
+  else await redeemSaved();
 }

@@ -33,7 +33,7 @@ export function reviewCodeMatches(email: string, code: string, env: Env = proces
   return timingSafeEqual(h(code.trim()), h(want));
 }
 
-/** Pro that comes with the account rather than a store purchase. Today only the review account has it. */
+/** Pro that comes with the review account. Lifetime codes add Pro per account too (hasLifetimePro in creators.ts). */
 export function accountHasPro(email: string | null | undefined, env: Env = process.env): boolean {
   return isReviewEmail(email, env);
 }

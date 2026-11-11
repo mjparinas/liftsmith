@@ -1,7 +1,11 @@
 // Codes, shared by the app (creator.ts) and the server (src/server/creators.ts). Most come from creators, who
-// earn commission on them; a promo code is one of our own, with no commission (Melvin, 2026-11-10).
+// earn commission on them; a promo code is one of our own, with no commission (Melvin, 2026-11-10). A lifetime
+// code is ours too: it gives the signed-in account Pro for good, with no store purchase (Melvin, 2026-11-11).
 
-export type CodeKind = "creator" | "promo";
+export type CodeKind = "creator" | "promo" | "lifetime";
+
+export const CODE_KINDS: readonly CodeKind[] = ["creator", "promo", "lifetime"];
+export const codeKind = (v: unknown): CodeKind => (v === "promo" || v === "lifetime" ? v : "creator");
 
 /** What a code gives unless it says otherwise: a 30-day trial, sold from the RevenueCat offering "creator30". */
 export const DEFAULT_TRIAL_DAYS = 30;
@@ -16,7 +20,7 @@ export interface CodeInfo {
   kind: CodeKind;
   /** The creator's name; never sent for a promo code, whose name is only a label for the admin panel. */
   name: string | null;
-  /** The free trial it gives, or null when its offering gives a discount instead. */
+  /** The free trial it gives, or null when its offering gives a discount instead (or it's a lifetime code). */
   trialDays: number | null;
   offering: string;
 }

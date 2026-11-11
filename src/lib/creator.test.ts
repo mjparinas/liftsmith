@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useAccount } from "./auth";
 import { pickOffering } from "./billing";
 import {
   activeCode,
@@ -13,6 +14,8 @@ import {
   normalizeCode,
   playLinkWithCode,
   readClaim,
+  redeemLifetime,
+  redeemSaved,
   sendClaim,
   setCode,
   startCreator,
@@ -123,5 +126,69 @@ describe("creator codes in the app", () => {
     expect(activeOffering()).toBeNull();
     // An ended code can be replaced by a link.
     expect(setCode("LIFT-SAM", "link", false)).toBe("ok");
+  });
+});
+
+describe("lifetime Pro codes in the app", () => {
+  const signIn = () => {
+    const a = { token: "tok", id: "acct-1", email: "a@b.c", providers: ["email"], via: "email" as const };
+    localStorage.setItem("liftsmith.account", JSON.stringify(a));
+    useAccount.setState({ account: a });
+  };
+  beforeEach(() => {
+    useAccount.setState({ account: null });
+    vi.unstubAllGlobals();
+  });
+
+  it("redeems for the signed-in account, which then has Pro on this device", async () => {
+    signIn();
+    const fetch = vi.fn(async () => res(200, { ok: true, code: "MARUFA", pro: true }));
+    vi.stubGlobal("fetch", fetch);
+    expect(await redeemLifetime("marufa")).toBe("ok");
+    expect(useAccount.getState().account?.pro).toBe(true);
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toContain("/api/creator/redeem/");
+    expect((init.headers as Record<string, string>).Authorization).toBe("Bearer tok");
+  });
+
+  it("says what went wrong, and lets other codes carry on the usual way", async () => {
+    expect(await redeemLifetime("MARUFA")).toBe("signedOut");
+    signIn();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => res(410, { error: "That code has ended" })),
+    );
+    expect(await redeemLifetime("MARUFA")).toBe("ended");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => res(409, { error: "Not a lifetime code" })),
+    );
+    expect(await redeemLifetime("LIFT-ALEX")).toBe("notLifetime");
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => res(409, { error: "Already Pro", held: "OTHER" })),
+    );
+    expect(await redeemLifetime("MARUFA")).toBe("held");
+    expect(useAccount.getState().account?.pro).toBeFalsy();
+  });
+
+  it("keeps a lifetime code typed while signed out, gives no trial for it, and redeems it after sign-in", async () => {
+    setCode("MARUFA", "typed", false);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => res(200, { code: "MARUFA", kind: "lifetime", name: null, trialDays: null, offering: "creator30" })),
+    );
+    expect(await sendClaim()).toBe("ok");
+    expect(readClaim()).toMatchObject({ code: "MARUFA", kind: "lifetime", status: "ok" });
+    expect(activeCode()).toBeNull();
+    expect(activeOffering()).toBeNull();
+    expect(await redeemSaved()).toBe("signedOut");
+    signIn();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => res(200, { ok: true, code: "MARUFA", pro: true })),
+    );
+    expect(await redeemSaved()).toBe("ok");
+    expect(useAccount.getState().account?.pro).toBe(true);
   });
 });
