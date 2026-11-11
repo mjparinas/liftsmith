@@ -42,6 +42,7 @@ describe("flags for an install", () => {
       labTrainer: false,
       labVoiceLog: false,
       labSpeedMax: false,
+      labBarPath: false,
       labWatchReps: false,
       social: true,
     });
@@ -130,6 +131,7 @@ describe("the flag routes", () => {
         labFormCheck: false,
         labVoiceLog: false,
         labSpeedMax: false,
+        labBarPath: false,
         labWatchReps: false,
         social: true,
       },

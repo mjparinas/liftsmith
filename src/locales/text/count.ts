@@ -21,6 +21,24 @@ export const en = {
     one: "You leaned about {deg}° to your right. Keep your weight even on both feet and your chest square.",
     other: "You leaned about {deg}° to your right on {hit} of {count} reps. Keep your weight even on both feet and your chest square.",
   },
+  "count.path.forwardBottom": {
+    one: "The bar drifted about {cm} cm forward at the bottom. Keep it over the middle of your foot: brace hard and stay tight at the bottom.",
+    other:
+      "The bar drifted about {cm} cm forward at the bottom on {hit} of {count} reps. Keep it over the middle of your foot: brace hard and stay tight at the bottom.",
+  },
+  "count.path.forwardUp": {
+    one: "The bar drifted about {cm} cm forward on the way up. Keep it over the middle of your foot and drive straight up.",
+    other:
+      "The bar drifted about {cm} cm forward on the way up on {hit} of {count} reps. Keep it over the middle of your foot and drive straight up.",
+  },
+  "count.path.back": {
+    one: "The bar drifted about {cm} cm back. Keep your weight over the middle of your foot, not your heels.",
+    other: "The bar drifted about {cm} cm back on {hit} of {count} reps. Keep your weight over the middle of your foot, not your heels.",
+  },
+  "count.path.good": {
+    one: "Bar path: it stayed within {cm} cm of where it started on that rep.",
+    other: "Bar path: it stayed within {cm} cm of where it started on those {count} reps.",
+  },
   "count.form.good": { one: "Form check: nothing to fix on that rep.", other: "Form check: nothing to fix on those {count} reps." },
   "count.max.title": "Warm-up speed",
   "count.max.up":
@@ -82,6 +100,25 @@ export const es: Partial<Record<Key, Message>> = {
     one: "Te inclinaste unos {deg}° hacia tu derecha. Reparte el peso por igual en los dos pies y mantén el pecho de frente.",
     other:
       "Te inclinaste unos {deg}° hacia tu derecha en {hit} de {count} repeticiones. Reparte el peso por igual en los dos pies y mantén el pecho de frente.",
+  },
+  "count.path.forwardBottom": {
+    one: "La barra se fue unos {cm} cm hacia delante abajo. Mantenla sobre el centro del pie: aprieta el abdomen y mantente firme abajo.",
+    other:
+      "La barra se fue unos {cm} cm hacia delante abajo en {hit} de {count} repeticiones. Mantenla sobre el centro del pie: aprieta el abdomen y mantente firme abajo.",
+  },
+  "count.path.forwardUp": {
+    one: "La barra se fue unos {cm} cm hacia delante al subir. Mantenla sobre el centro del pie y empuja recto hacia arriba.",
+    other:
+      "La barra se fue unos {cm} cm hacia delante al subir en {hit} de {count} repeticiones. Mantenla sobre el centro del pie y empuja recto hacia arriba.",
+  },
+  "count.path.back": {
+    one: "La barra se fue unos {cm} cm hacia atrás. Mantén el peso sobre el centro del pie, no sobre los talones.",
+    other:
+      "La barra se fue unos {cm} cm hacia atrás en {hit} de {count} repeticiones. Mantén el peso sobre el centro del pie, no sobre los talones.",
+  },
+  "count.path.good": {
+    one: "Trayectoria de la barra: se mantuvo a menos de {cm} cm de donde empezó en esa repetición.",
+    other: "Trayectoria de la barra: se mantuvo a menos de {cm} cm de donde empezó en esas {count} repeticiones.",
   },
   "count.form.good": {
     one: "Revisión de técnica: nada que corregir en esa repetición.",
@@ -147,6 +184,25 @@ export const fr: Partial<Record<Key, Message>> = {
     other:
       "Vous avez penché d’environ {deg}° vers la droite sur {hit} répétitions sur {count}. Répartissez le poids sur les deux pieds et gardez la poitrine de face.",
   },
+  "count.path.forwardBottom": {
+    one: "La barre a dévié d'environ {cm} cm vers l'avant en bas. Gardez-la au-dessus du milieu du pied : gainez fort et restez serré en bas.",
+    other:
+      "La barre a dévié d'environ {cm} cm vers l'avant en bas sur {hit} répétitions sur {count}. Gardez-la au-dessus du milieu du pied : gainez fort et restez serré en bas.",
+  },
+  "count.path.forwardUp": {
+    one: "La barre a dévié d'environ {cm} cm vers l'avant en montant. Gardez-la au-dessus du milieu du pied et poussez droit vers le haut.",
+    other:
+      "La barre a dévié d'environ {cm} cm vers l'avant en montant sur {hit} répétitions sur {count}. Gardez-la au-dessus du milieu du pied et poussez droit vers le haut.",
+  },
+  "count.path.back": {
+    one: "La barre a dévié d'environ {cm} cm vers l'arrière. Gardez le poids sur le milieu du pied, pas sur les talons.",
+    other:
+      "La barre a dévié d'environ {cm} cm vers l'arrière sur {hit} répétitions sur {count}. Gardez le poids sur le milieu du pied, pas sur les talons.",
+  },
+  "count.path.good": {
+    one: "Trajectoire de la barre : elle est restée à moins de {cm} cm de son départ sur cette répétition.",
+    other: "Trajectoire de la barre : elle est restée à moins de {cm} cm de son départ sur ces {count} répétitions.",
+  },
   "count.form.good": {
     one: "Contrôle de la technique : rien à corriger sur cette répétition.",
     other: "Contrôle de la technique : rien à corriger sur ces {count} répétitions.",
@@ -210,6 +266,25 @@ export const de: Partial<Record<Key, Message>> = {
     one: "Du hast dich um etwa {deg}° nach rechts geneigt. Verteil das Gewicht gleichmäßig auf beide Füße und halte die Brust gerade.",
     other:
       "Du hast dich bei {hit} von {count} Wiederholungen um etwa {deg}° nach rechts geneigt. Verteil das Gewicht gleichmäßig auf beide Füße und halte die Brust gerade.",
+  },
+  "count.path.forwardBottom": {
+    one: "Die Stange ist unten etwa {cm} cm nach vorn gewandert. Halte sie über der Fußmitte: spann den Rumpf fest an und bleib unten stabil.",
+    other:
+      "Die Stange ist bei {hit} von {count} Wiederholungen unten etwa {cm} cm nach vorn gewandert. Halte sie über der Fußmitte: spann den Rumpf fest an und bleib unten stabil.",
+  },
+  "count.path.forwardUp": {
+    one: "Die Stange ist auf dem Weg nach oben etwa {cm} cm nach vorn gewandert. Halte sie über der Fußmitte und drück gerade nach oben.",
+    other:
+      "Die Stange ist bei {hit} von {count} Wiederholungen auf dem Weg nach oben etwa {cm} cm nach vorn gewandert. Halte sie über der Fußmitte und drück gerade nach oben.",
+  },
+  "count.path.back": {
+    one: "Die Stange ist etwa {cm} cm nach hinten gewandert. Halte dein Gewicht über der Fußmitte, nicht auf den Fersen.",
+    other:
+      "Die Stange ist bei {hit} von {count} Wiederholungen etwa {cm} cm nach hinten gewandert. Halte dein Gewicht über der Fußmitte, nicht auf den Fersen.",
+  },
+  "count.path.good": {
+    one: "Stangenweg: Bei dieser Wiederholung blieb die Stange innerhalb von {cm} cm um ihren Startpunkt.",
+    other: "Stangenweg: Bei diesen {count} Wiederholungen blieb die Stange innerhalb von {cm} cm um ihren Startpunkt.",
   },
   "count.form.good": {
     one: "Technik-Check: an dieser Wiederholung gibt es nichts zu verbessern.",
@@ -275,6 +350,25 @@ export const it: Partial<Record<Key, Message>> = {
     other:
       "Hai inclinato il busto di circa {deg}° verso destra in {hit} ripetizioni su {count}. Tieni il peso uguale su entrambi i piedi e il petto dritto.",
   },
+  "count.path.forwardBottom": {
+    one: "Il bilanciere si è spostato di circa {cm} cm in avanti in basso. Tienilo sopra il centro del piede: contrai bene il core e resta compatto in basso.",
+    other:
+      "Il bilanciere si è spostato di circa {cm} cm in avanti in basso in {hit} ripetizioni su {count}. Tienilo sopra il centro del piede: contrai bene il core e resta compatto in basso.",
+  },
+  "count.path.forwardUp": {
+    one: "Il bilanciere si è spostato di circa {cm} cm in avanti in salita. Tienilo sopra il centro del piede e spingi dritto verso l'alto.",
+    other:
+      "Il bilanciere si è spostato di circa {cm} cm in avanti in salita in {hit} ripetizioni su {count}. Tienilo sopra il centro del piede e spingi dritto verso l'alto.",
+  },
+  "count.path.back": {
+    one: "Il bilanciere si è spostato di circa {cm} cm indietro. Tieni il peso sul centro del piede, non sui talloni.",
+    other:
+      "Il bilanciere si è spostato di circa {cm} cm indietro in {hit} ripetizioni su {count}. Tieni il peso sul centro del piede, non sui talloni.",
+  },
+  "count.path.good": {
+    one: "Traiettoria del bilanciere: è rimasto entro {cm} cm dal punto di partenza in quella ripetizione.",
+    other: "Traiettoria del bilanciere: è rimasto entro {cm} cm dal punto di partenza in quelle {count} ripetizioni.",
+  },
   "count.form.good": {
     one: "Controllo della tecnica: niente da correggere in quella ripetizione.",
     other: "Controllo della tecnica: niente da correggere in quelle {count} ripetizioni.",
@@ -332,6 +426,18 @@ export const ja: Partial<Record<Key, Message>> = {
   "count.form.leanRight": {
     other: "{count} レップ中 {hit} レップで右に約 {deg}° 傾いていました。両足に均等に体重を乗せ、胸を正面に向けましょう。",
   },
+  "count.path.forwardBottom": {
+    other:
+      "{count} レップ中 {hit} レップで、ボトムでバーが約 {cm} cm 前にずれました。体幹をしっかり固め、ボトムで力を抜かずに、バーを足の中央の上に保ちましょう。",
+  },
+  "count.path.forwardUp": {
+    other:
+      "{count} レップ中 {hit} レップで、上げる途中でバーが約 {cm} cm 前にずれました。バーを足の中央の上に保ち、まっすぐ上に押し上げましょう。",
+  },
+  "count.path.back": {
+    other: "{count} レップ中 {hit} レップで、バーが約 {cm} cm 後ろにずれました。かかとではなく足の中央に体重を乗せましょう。",
+  },
+  "count.path.good": { other: "バーの軌道：この {count} レップは、スタート位置から {cm} cm 以内に収まりました。" },
   "count.form.good": { other: "フォームチェック：この {count} レップに直すところはありません。" },
   "count.max.title": "ウォームアップのスピード",
   "count.max.up":
