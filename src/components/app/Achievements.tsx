@@ -18,6 +18,7 @@ import {
 import { t } from "@/lib/i18n";
 import { applyAccent, sound, type TimerSound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
+import { themesForBadge } from "@/lib/themes";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
@@ -112,6 +113,12 @@ export function AchievementRow({ a }: { a: Achievement }) {
           )}
         </div>
         <p className="truncate text-sm text-muted">{a.next ? a.next.detail : a.detail}</p>
+        {!a.hidden &&
+          themesForBadge(a.id).map(({ tier, theme }) => (
+            <p key={theme.id} className="text-xs" style={{ color: TIER_COLOUR[tier] }}>
+              {t("awards.unlocksTheme", { tier: TIER_LABEL[tier], theme: theme.name })}
+            </p>
+          ))}
         {!a.hidden && (
           <div className="mt-1.5 flex items-center gap-2">
             <div className="flex-1">
@@ -355,7 +362,7 @@ export function Achievements() {
       <Section title={t("awards.streakTitle")}>
         <StreakCard g={g} />
       </Section>
-      <Section title={t("awards.badges")}>
+      <Section title={t("awards.badges")} info="badges">
         <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
           {FILTERS.map((f) => (
             <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>

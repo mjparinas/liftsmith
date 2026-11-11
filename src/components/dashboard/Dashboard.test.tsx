@@ -90,7 +90,7 @@ describe("web dashboard", () => {
     expect(await screen.findByRole("img", { name: /Barbell bench press estimated one-rep max/ })).toBeInTheDocument();
     expect(screen.getByRole("rowheader", { name: /Bench press/i })).toBeInTheDocument();
 
-    await user.click(screen.getByRole("link", { name: "Achievements" }));
+    await user.click(screen.getByRole("link", { name: "Awards" }));
     expect(await screen.findByText("Showing up")).toBeInTheDocument();
     expect(screen.getAllByText("Secret achievement").length).toBeGreaterThan(5);
   });

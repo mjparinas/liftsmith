@@ -1,11 +1,15 @@
 import type { MessageKey } from "@/locales/en";
 
+import { achievements, achName, context, TIER_LABEL, tierNames, type Tier } from "./achievements";
 import type { Stats } from "./derive";
+import { goalStreak } from "./game";
 import { t } from "./i18n";
 import { anniversaryYears } from "./moments";
+import type { AppEvent, Profile } from "./types";
 
 // Earned themes and app icons. A theme is a full palette (background tint plus accent) unlocked by
-// training milestones derived from stats, never bought and never stored as "earned" (like game.ts).
+// a badge (one tier of an achievement, achievements.ts; Melvin, 2026-11-11: one set of goals, themes
+// are their rewards), derived from events, never bought and never stored as "earned" (like game.ts).
 // Seasonal themes are open to everyone during their season. A cosmetic accent picked in the
 // gamification work (profile.cosmetics.accent) wins over the theme's accent.
 // Icons are drawn by scripts/make-icons.mjs; Android switches launcher aliases and iOS uses
@@ -25,20 +29,34 @@ export interface Theme {
   /** In the app's language (theme.<id> in src/locales/text/theme.ts). */
   readonly name: string;
   palette: ThemePalette;
-  /** How it's earned, shown on the locked tile (theme.<id>.how). */
+  /** How it's earned, shown on the locked tile: the badge that unlocks it, or theme.<id>.how. */
   readonly how: string;
+  /** The badge that unlocks it: an achievement and one of its tiers. */
+  badge?: { id: string; tier: Tier };
   /** Which app icon goes with it (null: none). */
   icon: string | null;
-  earned(ctx: UnlockContext): boolean;
+  /** Unlocked another way than its badge (always open, an anniversary, or kept from an older rule). */
+  earned?(ctx: UnlockContext): boolean;
   /** Months (0-11) when a seasonal theme is open to everyone. */
   season?: number[];
 }
 
 export interface UnlockContext {
   stats: Stats;
-  /** Weeks in a row meeting the weekly goal (game.ts goalStreak). */
-  goalWeeks: number;
+  /** Tiers reached per achievement id (Achievement.level). */
+  badges: ReadonlyMap<string, number>;
   now: number;
+}
+
+/** Everything unlocked() needs, from the event log. */
+export function unlockContext(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): UnlockContext {
+  const list = achievements(context(events, stats, profile, goalStreak(stats, profile, now).best));
+  return { stats, badges: new Map(list.map((a) => [a.id, a.level])), now };
+}
+
+/** Has the lifter reached this tier of this achievement? */
+export function hasBadge(c: UnlockContext, id: string, tier: Tier): boolean {
+  return (c.badges.get(id) ?? 0) >= tierNames(id).indexOf(tier) + 1;
 }
 
 const BASE = { surface: "#11161d", raised: "#18202a", line: "#232d3a" };
@@ -54,37 +72,39 @@ const DATA: Omit<Theme, "name" | "how">[] = [
     id: "forge",
     icon: "forge",
     palette: { bg: "#100b09", surface: "#19120f", raised: "#231a15", line: "#33261f", accent: "#ff7a3d", accentInk: "#2a0e02" },
-    earned: (c) => c.stats.totalVolume >= 12_000,
+    badge: { id: "tonnes", tier: "bronze" },
   },
   {
     id: "glacier",
     icon: "glacier",
     palette: { bg: "#081016", surface: "#0e1922", raised: "#15232e", line: "#1f3240", accent: "#5fd4ff", accentInk: "#022230" },
-    earned: (c) => c.stats.sessions.length >= 25,
+    badge: { id: "workouts", tier: "silver" },
   },
   {
     id: "volt",
     icon: null,
     palette: { bg: "#0b0e0a", surface: "#121810", raised: "#1a2217", line: "#263221", accent: "#b6f23a", accentInk: "#182400" },
-    earned: (c) => c.stats.prs.length >= 10,
+    badge: { id: "prs", tier: "silver" },
   },
   {
     id: "aurora",
     icon: "aurora",
     palette: { bg: "#0a0c14", surface: "#11141f", raised: "#181c2b", line: "#252a3d", accent: "#3ee0a8", accentInk: "#032419" },
-    earned: (c) => c.goalWeeks >= 8,
+    badge: { id: "goal-streak", tier: "silver" },
   },
   {
     id: "rose",
     icon: null,
     palette: { bg: "#120a0e", surface: "#1b1016", raised: "#25171e", line: "#36222c", accent: "#ff6fa5", accentInk: "#2c0616" },
+    badge: { id: "sets", tier: "silver" },
+    // Rose was 50 workouts before themes moved onto badges; anyone who had it keeps it.
     earned: (c) => c.stats.sessions.length >= 50,
   },
   {
     id: "abyss",
     icon: null,
     palette: { bg: "#06100f", surface: "#0b1918", raised: "#112322", line: "#1a3331", accent: "#2ed3c6", accentInk: "#012320" },
-    earned: (c) => c.stats.totalVolume >= 150_000,
+    badge: { id: "tonnes", tier: "silver" },
   },
   {
     id: "royal",
@@ -117,15 +137,22 @@ export const THEMES: Theme[] = DATA.map((d) => ({
     return t(`theme.${d.id}` as MessageKey);
   },
   get how() {
-    return t(`theme.${d.id}.how` as MessageKey);
+    return d.badge
+      ? t("theme.badge", { badge: achName(d.badge.id), tier: TIER_LABEL[d.badge.tier] })
+      : t(`theme.${d.id}.how` as MessageKey);
   },
 }));
 
 export const THEME_BY_ID = new Map(THEMES.map((t) => [t.id, t]));
 
 export function unlocked(t: Theme, c: UnlockContext): boolean {
-  if (t.season) return t.season.includes(new Date(c.now).getMonth()) || t.earned(c);
-  return t.earned(c);
+  if (t.season?.includes(new Date(c.now).getMonth())) return true;
+  return (t.badge !== undefined && hasBadge(c, t.badge.id, t.badge.tier)) || (t.earned?.(c) ?? false);
+}
+
+/** Themes a badge unlocks, for the badge's row on Awards. */
+export function themesForBadge(id: string): { tier: Tier; theme: Theme }[] {
+  return THEMES.filter((t) => t.badge?.id === id).map((t) => ({ tier: t.badge!.tier, theme: t }));
 }
 
 /** The theme to show: the picked one if it's still open (seasons end), otherwise Midnight. */

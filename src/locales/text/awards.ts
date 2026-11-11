@@ -4,7 +4,7 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
-  "awards.title": "Achievements",
+  "awards.title": "Awards",
   "awards.allTiers": "Every tier done",
   "awards.secret": "Secret",
   "awards.of": "{value} of {goal}",
@@ -71,6 +71,7 @@ export const en = {
   "awards.nextReward": "Next reward at level {level}: {reward}",
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "a bonus crate for your new title",
+  "awards.unlocksTheme": "{tier} unlocks the {theme} theme",
 } as const;
 
 type Key = keyof typeof en;
@@ -143,10 +144,11 @@ export const es: Partial<Record<Key, Message>> = {
   "awards.nextReward": "Próximo premio en el nivel {level}: {reward}",
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "un cofre extra por tu nuevo título",
+  "awards.unlocksTheme": "{tier} desbloquea el tema {theme}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
-  "awards.title": "Succès",
+  "awards.title": "Trophées",
   "awards.allTiers": "Tous les paliers atteints",
   "awards.secret": "Secret",
   "awards.of": "{value} sur {goal}",
@@ -214,6 +216,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "awards.nextReward": "Prochaine récompense au niveau {level} : {reward}",
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "un coffre bonus pour votre nouveau titre",
+  "awards.unlocksTheme": "{tier} débloque le thème {theme}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -284,10 +287,11 @@ export const de: Partial<Record<Key, Message>> = {
   "awards.nextReward": "Nächste Belohnung ab Level {level}: {reward}",
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "eine Bonuskiste für deinen neuen Titel",
+  "awards.unlocksTheme": "{tier} schaltet das Design {theme} frei",
 };
 
 export const it: Partial<Record<Key, Message>> = {
-  "awards.title": "Traguardi",
+  "awards.title": "Premi",
   "awards.allTiers": "Tutti i livelli completati",
   "awards.secret": "Segreto",
   "awards.of": "{value} di {goal}",
@@ -354,6 +358,7 @@ export const it: Partial<Record<Key, Message>> = {
   "awards.nextReward": "Prossimo premio al livello {level}: {reward}",
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "una cassa bonus per il tuo nuovo titolo",
+  "awards.unlocksTheme": "{tier} sblocca il tema {theme}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -415,4 +420,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "awards.nextReward": "次の報酬はレベル{level}：{reward}",
   "awards.reward.item": "{name}（{rarity}）",
   "awards.reward.crate": "新しい称号のボーナスクレート",
+  "awards.unlocksTheme": "{tier}でテーマ「{theme}」を解除",
 };
