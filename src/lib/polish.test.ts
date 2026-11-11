@@ -142,7 +142,10 @@ describe("undo the last set", () => {
     vi.setSystemTime(new Date("2026-11-11T18:00:00"));
     localStorage.clear();
     await useApp.getState().reset();
+    // The plan is seeded by the gym's id, so fix it: a random id sometimes gave a plan with no warm-ups.
+    const uuid = vi.spyOn(crypto, "randomUUID").mockReturnValueOnce("00000000-0000-4000-8000-000000000001");
     const id = useApp.getState().addGym("commercial");
+    uuid.mockRestore();
     useApp.getState().setProfile({ ...defaultProfile(Date.now()), onboarded: true, activeGymId: id });
   });
   afterEach(() => vi.useRealTimers());
@@ -175,8 +178,9 @@ describe("undo the last set", () => {
   });
   it("undoes a warm-up too", () => {
     const s = useApp.getState;
-    // The gym's id is random, so the plan is too: put an exercise with warm-ups first.
+    // Put an exercise with warm-ups first.
     const w = s().preview!.items.findIndex((i) => !!i.warmup?.length);
+    expect(w).toBeGreaterThanOrEqual(0);
     if (w > 0) s().moveExercise(w, 0);
     s().start();
     expect(s().active!.plan.items[0]!.warmup?.length).toBeGreaterThan(0);

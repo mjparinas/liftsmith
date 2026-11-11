@@ -7,7 +7,18 @@ import { useEffect, useRef } from "react";
 
 import type { NavLink } from "./SiteChrome";
 
-export function SiteMenu({ links }: { links: readonly NavLink[] }) {
+export function SiteMenu({
+  links,
+  label = "Menu",
+  navLabel = "Site menu",
+  narrowOnly,
+}: {
+  links: readonly NavLink[];
+  label?: string;
+  navLabel?: string;
+  /** A link the header shows beside the menu on wider screens (Sign in), listed here only below 400 px. */
+  narrowOnly?: NavLink;
+}) {
   const ref = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
@@ -37,7 +48,7 @@ export function SiteMenu({ links }: { links: readonly NavLink[] }) {
   return (
     <details ref={ref} className="group relative lg:hidden">
       <summary
-        aria-label="Menu"
+        aria-label={label}
         className="flex min-h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-lg text-muted hover:bg-surface hover:text-ink [&::-webkit-details-marker]:hidden"
       >
         <svg aria-hidden viewBox="0 0 24 24" className="size-6" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
@@ -45,7 +56,7 @@ export function SiteMenu({ links }: { links: readonly NavLink[] }) {
           <path d="M6 6l12 12M18 6L6 18" className="hidden group-open:block" />
         </svg>
       </summary>
-      <nav aria-label="Site menu" className="card absolute right-0 top-full z-40 mt-2 w-56 p-2 shadow-xl">
+      <nav aria-label={navLabel} className="card absolute right-0 top-full z-40 mt-2 w-56 p-2 shadow-xl">
         <ul>
           {links.map((n) => (
             <li key={n.href}>
@@ -54,6 +65,19 @@ export function SiteMenu({ links }: { links: readonly NavLink[] }) {
               </Link>
             </li>
           ))}
+          {narrowOnly && (
+            <li className="min-[400px]:hidden">
+              <Link
+                href={narrowOnly.href}
+                prefetch={false}
+                data-cta="menu-signin"
+                onClick={close}
+                className="flex min-h-11 items-center rounded-lg px-3 text-base text-muted hover:bg-surface hover:text-ink"
+              >
+                {narrowOnly.label}
+              </Link>
+            </li>
+          )}
         </ul>
       </nav>
     </details>

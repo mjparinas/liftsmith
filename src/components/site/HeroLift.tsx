@@ -19,7 +19,7 @@ import { epley, HERO_PROGRAM, labelled, muscleAnchor } from "./heroProgram";
 import { Screenshot } from "./Screenshot";
 
 const lb = (kg: number) => Math.round(kg / 0.45359237);
-const fmt = (n: number) => Math.round(n).toLocaleString("en-US");
+const fmt = (n: number, locale: string) => Math.round(n).toLocaleString(locale);
 
 const LABEL_W = 104;
 
@@ -33,14 +33,37 @@ export function afterLoad(): Promise<void> {
   });
 }
 
+/** The hero's words; the home page passes them in its language (src/locales/site). */
+export interface HeroWords {
+  alt: string;
+  /** "{lift}" is the exercise's name. */
+  figure: string;
+  set: string;
+  eachSide: string;
+  reps: string;
+  volume: string;
+  e1rm: string;
+  total: string;
+  loading: string;
+  paused: string;
+  caption: string;
+  /** The motion's phase labels by their English wording. */
+  phases: Record<string, string>;
+}
+
 export interface HeroLiftProps {
   /** Muscle names, from the server (English), so the page doesn't load the app's language catalogues. */
   labels: Partial<Record<Muscle, string>>;
   /** Plates per side for each step of HERO_PROGRAM, worked out on the server (heroPlates.ts). */
   plates: number[][];
+  words: HeroWords;
+  /** Exercise names for HERO_PROGRAM's lifts, in the page's language. */
+  names: Record<string, string>;
+  /** Locale for numbers ("en-US", "de"). */
+  locale?: string;
 }
 
-export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
+export function HeroLift({ labels, plates: platesByStep, words: w, names, locale = "en-US" }: HeroLiftProps) {
   const stage = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const svg = useRef<SVGSVGElement>(null);
@@ -107,9 +130,9 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
           const total = banked + reps * p.kg;
           shown += (total - shown) * Math.min(1, dt * 6);
           if (repEl.current) repEl.current.textContent = `${reps}`;
-          if (calcEl.current) calcEl.current.textContent = `${reps} × ${p.kg} kg = ${fmt(reps * p.kg)} kg`;
-          if (e1rmEl.current) e1rmEl.current.textContent = reps ? `${p.kg} × (1 + ${reps}/30) = ${fmt(epley(p.kg, reps))} kg` : "—";
-          if (totalEl.current) totalEl.current.textContent = fmt(shown);
+          if (calcEl.current) calcEl.current.textContent = `${reps} × ${p.kg} kg = ${fmt(reps * p.kg, locale)} kg`;
+          if (e1rmEl.current) e1rmEl.current.textContent = reps ? `${p.kg} × (1 + ${reps}/30) = ${fmt(epley(p.kg, reps), locale)} kg` : "—";
+          if (totalEl.current) totalEl.current.textContent = fmt(shown, locale);
 
           // Heart rate: climbs while lifting and with each rep, settles between sets.
           effortS += (f.effort - effortS) * Math.min(1, dt * 1.5);
@@ -210,7 +233,8 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
             fps: 30,
             maxDpr: 1.5,
           },
-          (label) => {
+          (english) => {
+            const label = w.phases[english] ?? english;
             if (phaseEl.current && phaseEl.current.textContent !== label) phaseEl.current.textContent = label;
           },
           () => {
@@ -240,10 +264,12 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
       clearTimeout(next);
       loop?.dispose();
     };
+    // The page's words and number format never change while it is open, so the scene is built once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const p = HERO_PROGRAM[step];
-  const ex = EXERCISE_BY_ID.get(p.id);
+  const exName = names[p.id] ?? EXERCISE_BY_ID.get(p.id)?.name;
   const plates = platesByStep[step] ?? [];
   const shown = labelled(p.id);
 
@@ -252,7 +278,7 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
       <div className="mx-auto w-full max-w-[300px]">
         <Screenshot
           src="/screens/today.webp"
-          alt="The app's Today screen: the readiness call and the planned exercises"
+          alt={w.alt}
           sizes="300px"
           priority
           className="h-auto w-full rounded-[2rem] border border-line shadow-2xl"
@@ -273,7 +299,7 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
           className="absolute inset-0 block h-full w-full touch-pan-y"
           // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- a labelled picture
           role="img"
-          aria-label={`Animated 3D wireframe figure doing ${ex?.name.toLowerCase() ?? "a lift"}, with the working muscles highlighted and labelled`}
+          aria-label={w.figure.replace("{lift}", exName ?? "")}
         />
 
         <svg ref={svg} className="pointer-events-none absolute inset-0 h-full w-full fill-[#ff8a6f] stroke-[#ff8a6f]/70" aria-hidden />
@@ -294,11 +320,11 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
         <div className="pointer-events-none absolute inset-x-3 top-3 flex items-start justify-between gap-2">
           <div className="min-w-0 rounded-2xl border border-white/10 bg-black/50 px-3 py-2 backdrop-blur">
             <p className="font-mono text-[0.625rem] tracking-widest text-holo uppercase">
-              Set 1 · <span ref={phaseEl} />
+              {w.set} · <span ref={phaseEl} />
             </p>
-            <p className="truncate text-base font-bold sm:text-lg">{ex?.name}</p>
+            <p className="truncate text-base font-bold sm:text-lg">{exName}</p>
             <p className="num text-xs text-muted sm:text-sm">
-              <b className="text-ink">{p.kg} kg</b> ({lb(p.kg)} lb) · each side {plates.join(" + ")}
+              <b className="text-ink">{p.kg} kg</b> ({lb(p.kg)} lb) · {w.eachSide} {plates.join(" + ")}
             </p>
           </div>
           <div className="shrink-0 rounded-2xl border border-white/10 bg-black/50 px-3 py-2 text-right backdrop-blur">
@@ -322,7 +348,7 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
 
         <div className="pointer-events-none absolute inset-x-3 bottom-3 grid grid-cols-[auto_1fr] gap-3 rounded-2xl border border-white/10 bg-black/60 p-3 backdrop-blur">
           <div className="pr-1 text-center sm:pr-3">
-            <p className="font-mono text-[0.625rem] tracking-widest text-muted uppercase">Reps</p>
+            <p className="font-mono text-[0.625rem] tracking-widest text-muted uppercase">{w.reps}</p>
             <p className="num text-4xl leading-none font-bold">
               <span ref={repEl}>0</span>
               <span className="text-lg text-muted">/{p.reps}</span>
@@ -330,15 +356,15 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
           </div>
           <div className="min-w-0 border-l border-white/10 pl-3 font-mono text-[0.6875rem] leading-relaxed sm:text-xs">
             <p className="truncate">
-              <span className="text-muted">Volume </span>
+              <span className="text-muted">{w.volume} </span>
               <span ref={calcEl} className="num text-ink" />
             </p>
             <p className="truncate">
-              <span className="text-muted">Est. 1RM </span>
+              <span className="text-muted">{w.e1rm} </span>
               <span ref={e1rmEl} className="num text-ink" />
             </p>
             <p className="mt-0.5 flex items-baseline gap-2 font-sans">
-              <span className="text-xs text-muted">Total lifted</span>
+              <span className="text-xs text-muted">{w.total}</span>
               <span className="num text-2xl font-bold text-accent">
                 <span ref={totalEl}>0</span> kg
               </span>
@@ -346,11 +372,11 @@ export function HeroLift({ labels, plates: platesByStep }: HeroLiftProps) {
           </div>
         </div>
 
-        {status === "loading" && <p className="absolute inset-0 grid place-items-center text-sm text-muted">Warming up…</p>}
+        {status === "loading" && <p className="absolute inset-0 grid place-items-center text-sm text-muted">{w.loading}</p>}
       </div>
       <figcaption className="mt-2 text-center text-xs text-muted">
-        {reduce ? "Paused because your device asks for reduced motion. " : ""}Demo data. In the app, these numbers come from your own sets
-        and heart rate monitor.
+        {reduce ? `${w.paused} ` : ""}
+        {w.caption}
       </figcaption>
     </figure>
   );

@@ -5,19 +5,31 @@
 // names come from the server (`labels`), so the page doesn't load the app's language catalogues.
 import { useState } from "react";
 
-import { LiftDemoCore } from "@/components/demo/LiftDemoCore";
+import { LiftDemoCore, type DemoWords } from "@/components/demo/LiftDemoCore";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import type { Muscle } from "@/lib/types";
 
-export const DEMO_LIFTS = ["back-squat", "deadlift", "bench-press", "overhead-press", "pull-up", "romanian-deadlift"].filter((id) =>
-  EXERCISE_BY_ID.has(id),
-);
+import { DEMO_LIFTS } from "./heroProgram";
 
-export function DemoPicker({ labels }: { labels: Partial<Record<Muscle, string>> }) {
+export { DEMO_LIFTS };
+
+export function DemoPicker({
+  labels,
+  names,
+  words,
+  picker = "Exercise",
+}: {
+  labels: Partial<Record<Muscle, string>>;
+  /** The lifts' names in the page's language; English from the library otherwise. */
+  names?: Record<string, string>;
+  /** The demo's own words (DEMO_WORDS) in the page's language. */
+  words?: DemoWords;
+  picker?: string;
+}) {
   const [id, setId] = useState(DEMO_LIFTS[0]);
   return (
     <div className="mx-auto grid max-w-[720px] gap-4">
-      <div className="flex flex-wrap gap-2" role="group" aria-label="Exercise">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={picker}>
         {DEMO_LIFTS.map((x) => (
           <button
             key={x}
@@ -26,11 +38,21 @@ export function DemoPicker({ labels }: { labels: Partial<Record<Muscle, string>>
             onClick={() => setId(x)}
             className={`press min-h-11 rounded-full border px-4 text-sm font-medium ${x === id ? "border-accent bg-accent/15 text-accent" : "border-line bg-surface text-ink"}`}
           >
-            {EXERCISE_BY_ID.get(x)!.name}
+            {names?.[x] ?? EXERCISE_BY_ID.get(x)!.name}
           </button>
         ))}
       </div>
-      <LiftDemoCore exerciseId={id} controls bodyToggle labels={labels} fps={30} maxDpr={1.5} autoPlay2d={false} />
+      <LiftDemoCore
+        exerciseId={id}
+        controls
+        bodyToggle
+        labels={labels}
+        words={words}
+        name={names?.[id]}
+        fps={30}
+        maxDpr={1.5}
+        autoPlay2d={false}
+      />
     </div>
   );
 }
