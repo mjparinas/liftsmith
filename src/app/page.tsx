@@ -6,7 +6,7 @@ import { HeroLift } from "@/components/site/HeroLift";
 import { perSide } from "@/components/site/heroPlates";
 import { HERO_PROGRAM } from "@/components/site/heroProgram";
 import { Screenshot } from "@/components/site/Screenshot";
-import { SiteFooter } from "@/components/site/SiteChrome";
+import { BrandMark, SiteFooter } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
@@ -184,11 +184,7 @@ function Header() {
     <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/80 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-          <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent text-accent-ink">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M2 10h2V7h3v10H4v-3H2zm20 0h-2V7h-3v10h3v-3h2zM8 11h8v2H8z" />
-            </svg>
-          </span>
+          <BrandMark />
           {name}
         </Link>
         <nav aria-label="Site" className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
