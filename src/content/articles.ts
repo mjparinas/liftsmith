@@ -10,6 +10,7 @@ import { BLOG_D } from "./blog/d";
 import { BLOG_E } from "./blog/e";
 import { BLOG_F } from "./blog/f";
 import { BLOG_G } from "./blog/g";
+import { BLOG_H } from "./blog/h";
 import { GUIDES } from "./guides";
 
 export type CtaTopic =
@@ -33,7 +34,8 @@ export type CtaTopic =
   | "labs"
   | "watch"
   | "measure"
-  | "health";
+  | "health"
+  | "stretch";
 
 export type Block =
   { h2: string } | { p: string } | { ul: string[] } | { ol: string[] } | { tip: string } | { cta: CtaTopic } | { exercises: string[] };
@@ -161,9 +163,14 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     body: "Liftsmith reads sleep, HRV, resting heart rate and weigh-ins from Health Connect or Apple Health, and saves every workout back.",
     button: "Connect your health app",
   },
+  stretch: {
+    title: "Stretches picked for today's muscles",
+    body: "Liftsmith builds a warm-up for today's plan and a cool-down for what you just trained, with a 3D demo and a timer for every stretch.",
+    button: "Try guided stretching",
+  },
 };
 
-export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C, ...BLOG_D, ...BLOG_E, ...BLOG_F, ...BLOG_G];
+export const ARTICLES: Article[] = [...GUIDES, ...BLOG_A, ...BLOG_B, ...BLOG_C, ...BLOG_D, ...BLOG_E, ...BLOG_F, ...BLOG_G, ...BLOG_H];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));
 
