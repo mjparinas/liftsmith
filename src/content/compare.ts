@@ -42,7 +42,8 @@ export const OURS: Record<Topic, string> = {
   plates: "Every barbell weight is one your plates can make, with the plates drawn for each side, free.",
   rest: "Starts itself after each set, counts down on the lock screen (Android notification, iPhone Live Activity) with Log set and +30 s, free.",
   social: "Share a workout as an image or a link someone can open at their own weights. No feed yet.",
-  platforms: "Android and iPhone apps (store listings coming soon) and the full app in any browser today. No watch apps yet.",
+  platforms:
+    "Android and iPhone apps (store listings coming soon), Wear OS and Apple Watch apps for the live workout, and the full app in any browser today.",
   health:
     "Health Connect and Apple Health for weight, height, body fat and resting heart rate; live heart rate from any Bluetooth strap or watch.",
   data: "CSV export and a full backup, and import from other apps' CSV exports. Works offline with no account.",
@@ -62,6 +63,14 @@ export interface Competitor {
 }
 
 const CHECKED = "2026-11-09";
+
+/** The newest check date among a competitor's facts (ISO), for the page's dates. */
+export const lastChecked = (c: Competitor) =>
+  Object.values(c.rows)
+    .flat()
+    .reduce((d, x) => (x && x.checked > d ? x.checked : d), "");
+/** The year in the page title ("Liftsmith vs Hevy (2026)"): the year its facts were last checked. */
+export const checkedYear = (c: Competitor) => lastChecked(c).slice(0, 4);
 const f = (text: string, source: string, checked = CHECKED): Fact => ({ text, source, checked });
 
 const FB_APP = "https://apps.apple.com/us/app/fitbod-gym-fitness-planner/id1041517543";

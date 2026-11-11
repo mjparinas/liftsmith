@@ -4,15 +4,16 @@ import { InfoPage } from "@/components/site/InfoPage";
 import { CtaBanner } from "@/components/site/SiteChrome";
 import { NewsDayCard } from "@/components/site/WhatsNew";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { WHATS_NEW } from "@/lib/whatsNew";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "What's new",
   description: `A day-by-day note on what's new and what we fixed in ${name}, in plain words.`,
-  alternates: { canonical: "/whats-new/" },
-};
+  path: "/whats-new/",
+});
 
 export default function WhatsNew() {
   return (

@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CompareTable } from "@/components/site/CompareTable";
-import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
-import { COMPETITOR_BY_SLUG, COMPETITORS, TRADEMARKS } from "@/content/compare";
+import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { checkedYear, COMPETITOR_BY_SLUG, COMPETITORS, lastChecked, TRADEMARKS } from "@/content/compare";
 import { BRAND } from "@/lib/brand";
+import { ogImage } from "@/lib/ogImages";
+import { pageMeta } from "@/lib/pageMeta";
+import { absolute } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => COMPETITORS.map((c) => ({ slug: c.slug }));
@@ -14,19 +18,33 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const c = COMPETITOR_BY_SLUG.get((await params).slug);
   if (!c) return {};
-  return {
-    title: `${BRAND.name} vs ${c.name}: price, features and which to pick`,
+  return pageMeta({
+    title: `${BRAND.name} vs ${c.name} (${checkedYear(c)}): price, features and which to pick`,
     description: `${BRAND.name} and ${c.name} side by side: price, free plan, workout planning, plates, rest timer, platforms and health apps, with every ${c.name} fact sourced and dated.`,
-    alternates: { canonical: `/compare/${c.slug}/` },
-  };
+    path: `/compare/${c.slug}/`,
+  });
 }
 
 export default async function ComparePage({ params }: Props) {
   const c = COMPETITOR_BY_SLUG.get((await params).slug);
   if (!c) notFound();
   const others = COMPETITORS.filter((x) => x !== c);
+  const checked = lastChecked(c);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${BRAND.name} vs ${c.name}`,
+    description: `${BRAND.name} and ${c.name} side by side, with every ${c.name} fact sourced and dated.`,
+    url: absolute(`/compare/${c.slug}/`),
+    image: absolute(ogImage(`/compare/${c.slug}/`)),
+    datePublished: "2026-11-09",
+    dateModified: checked,
+    author: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
+    publisher: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
+  };
   return (
     <SitePage kind="compare" sticky={`Try ${BRAND.name} free`}>
+      <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/compare/", label: "Compare" }, { label: `${BRAND.name} vs ${c.name}` }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">
         {BRAND.name} vs {c.name}

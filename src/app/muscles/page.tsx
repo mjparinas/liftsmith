@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 
 import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { exercisesFor, MUSCLE_ABOUT, MUSCLE_NAME, muscleSlug } from "@/lib/seo";
 import { MUSCLES } from "@/lib/types";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Exercises by muscle",
   description:
     "Find the best exercises for every muscle: chest, back, shoulders, arms, legs, glutes and core, with form cues and 3D demos.",
-  alternates: { canonical: "/muscles/" },
-};
+  path: "/muscles/",
+});
 
 export default function MusclesIndex() {
   return (

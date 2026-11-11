@@ -2,9 +2,14 @@ import type { Metadata } from "next";
 
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND.name} collects, why, and how to turn it off.` };
+export const metadata: Metadata = pageMeta({
+  title: "Privacy",
+  description: `What ${BRAND.name} collects, why, and how to turn it off.`,
+  path: "/privacy/",
+});
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
