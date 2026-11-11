@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  fatCategory,
   ffmi,
   ffmiBand,
   goalCalories,
@@ -89,6 +90,12 @@ describe("body fat from a tape measure", () => {
   });
   it("goes up with the waist", () => {
     expect(navyBodyFat("male", 180, 95, 38)!).toBeGreaterThan(navyBodyFat("male", 180, 85, 38)!);
+  });
+  it("puts a reading in the usual categories, which start higher for women", () => {
+    expect(fatCategory(12, "male")).toBe("athletic");
+    expect(fatCategory(12, "female")).toBe("essential");
+    expect(fatCategory(26, "female")).toBe("average");
+    expect(fatCategory(30, "male")).toBe("high");
   });
   it("refuses impossible measurements", () => {
     expect(navyBodyFat("male", 180, 38, 40)).toBeNull();

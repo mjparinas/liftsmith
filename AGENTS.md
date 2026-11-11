@@ -204,7 +204,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Stretching](docs/decisions/stretching.md) (`src/lib/stretches.ts`, `Stretch.tsx`, `src/lib/demo/stretchMotions.ts`)
 - [Tempo coach](docs/decisions/tempo-coach.md) (`src/lib/tempo.ts`, `workout/TempoCoach.tsx`, `juice.ts`)
 - [Today screen](docs/decisions/today-screen.md) (`src/lib/quotes.ts`)
-- [Tools: TDEE calculator](docs/decisions/tools-tdee-calculator.md) (`src/lib/tdee.ts`, `src/components/app/Tools.tsx`, `health.ts`, `App.tsx`)
+- [Tools: TDEE calculator and the other tools](docs/decisions/tools-tdee-calculator.md) (`src/lib/tdee.ts`, `src/lib/calculators.ts`, `src/lib/intervals.ts`, `src/components/app/Tools.tsx`, `src/components/app/tools/`, `health.ts`, `App.tsx`)
 - [Trainer mode](docs/decisions/trainer-mode.md) (`Trainer.tsx`, `src/lib/trainer.ts`, `src/server/coach.ts`)
 - [Training engine](docs/decisions/training-engine.md) (`exercises.ts`, `generator.ts`, `warmup.ts`, `recovery.ts`)
 - [Trust centre](docs/decisions/trust-centre.md) (`src/components/site/TrustCentre.tsx`, `src/app/trust/page.tsx`, `public/.well-known/security.txt`)

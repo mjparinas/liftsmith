@@ -124,6 +124,31 @@ export function navyBodyFat(sex: Sex, heightCm: number, waistCm: number, neckCm:
   return Math.round(pct * 10) / 10;
 }
 
+/** The American Council on Exercise's body fat categories, from where each one starts (percent). */
+export type FatCategory = "essential" | "athletic" | "fit" | "average" | "high";
+export const FAT_CATEGORIES: Record<Sex, readonly (readonly [FatCategory, number])[]> = {
+  male: [
+    ["essential", 0],
+    ["athletic", 6],
+    ["fit", 14],
+    ["average", 18],
+    ["high", 25],
+  ],
+  female: [
+    ["essential", 0],
+    ["athletic", 14],
+    ["fit", 21],
+    ["average", 25],
+    ["high", 32],
+  ],
+};
+
+export function fatCategory(pct: number, sex: Sex): FatCategory {
+  let out: FatCategory = "essential";
+  for (const [c, from] of FAT_CATEGORIES[sex]) if (pct >= from) out = c;
+  return out;
+}
+
 // --- FFMI (Kouri 1995) --------------------------------------------------------------------------------------
 // Fat-free mass over height squared, plus the version normalized to 1.8 m. Kouri's drug-free lifters topped out
 // near 25 (men); the bands are rough guides lifters use, about 4 lower for women.

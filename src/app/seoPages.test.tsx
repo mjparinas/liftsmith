@@ -22,12 +22,19 @@ import FeaturesIndex from "./features/page";
 import ImportPage from "./import/[slug]/page";
 import PairPage from "./muscles/[muscle]/[equipment]/page";
 import MusclePage from "./muscles/[muscle]/page";
+import BodyFatPage from "./tools/body-fat-calculator/page";
 import DotsPage from "./tools/dots-calculator/page";
+import FfmiPage from "./tools/ffmi-calculator/page";
+import HrZonesPage from "./tools/heart-rate-zone-calculator/page";
+import IntervalPage from "./tools/interval-timer/page";
+import MacroPage from "./tools/macro-calculator/page";
 import OneRmPage from "./tools/one-rep-max-calculator/page";
 import PlatePage from "./tools/plate-calculator/page";
 import RpePage from "./tools/rpe-chart/page";
 import StrengthStandardsPage from "./tools/strength-standards/page";
+import TrainingMaxPage from "./tools/training-max-calculator/page";
 import WarmupPage from "./tools/warm-up-calculator/page";
+import WilksPage from "./tools/wilks-calculator/page";
 
 // The pages exist to send readers into the app (Melvin, 2026-11-09: "emphasis on the call to actions").
 const ctas = () => [...document.querySelectorAll("[data-cta]")].map((a) => a.getAttribute("data-cta")!);
@@ -76,7 +83,23 @@ describe("SEO pages", () => {
   });
 
   it("renders the indexes and the calculators", () => {
-    for (const P of [BlogIndex, ExercisesIndex, PlatePage, OneRmPage, WarmupPage, RpePage, StrengthStandardsPage, DotsPage]) {
+    for (const P of [
+      BlogIndex,
+      ExercisesIndex,
+      PlatePage,
+      OneRmPage,
+      WarmupPage,
+      RpePage,
+      StrengthStandardsPage,
+      DotsPage,
+      WilksPage,
+      MacroPage,
+      BodyFatPage,
+      FfmiPage,
+      HrZonesPage,
+      IntervalPage,
+      TrainingMaxPage,
+    ]) {
       render(<P />);
       expectCtas();
       cleanup();
