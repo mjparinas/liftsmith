@@ -15,6 +15,8 @@ struct WatchState: Decodable, Equatable {
     var total: Int?
     var at: Double = 0
     var sessionId = ""
+    /// Labs, watch rep counting: the phone wants the wrist's motion for this set.
+    var motion = false
 
     /// A workout the phone stopped talking about this long ago was forgotten (the phone ends those after 3 h).
     static let staleAfter: TimeInterval = 3 * 60 * 60
@@ -37,15 +39,19 @@ struct WatchState: Decodable, Equatable {
         total = try? c.decode(Int.self, forKey: .total)
         at = (try? c.decode(Double.self, forKey: .at)) ?? 0
         sessionId = (try? c.decode(String.self, forKey: .sessionId)) ?? ""
+        motion = (try? c.decode(Bool.self, forKey: .motion)) ?? false
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId
+        case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion
     }
 
     var restEnd: Date? { restUntil.map { Date(timeIntervalSince1970: $0 / 1000) } }
 
     func resting(at now: Date) -> Bool { (restEnd ?? .distantPast) > now }
+
+    /// Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock.
+    func streamMotion(at now: Date) -> Bool { motion && !resting(at: now) }
 
     func stale(at now: Date) -> Bool { at > 0 && now.timeIntervalSince1970 - at / 1000 > Self.staleAfter }
 }

@@ -23,6 +23,7 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
+import { watchCountable } from "@/lib/reps/watchMotion";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
@@ -51,6 +52,7 @@ import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
+import { useWatchReps } from "./workout/useWatchReps";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -224,12 +226,27 @@ export function Workout() {
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Watch rep counting (Labs): the watch streams its motion during a set, unless the camera is already counting.
+  const cameraCounting = !!ex && countPrefs.on && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
+  const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !cameraCounting;
+  const watchReps = useWatchReps({
+    on: watchCountOn,
+    exerciseId: ex?.id,
+    pattern: ex?.pattern,
+    setKey: `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`,
+    onCount: (n) => {
+      const a = useApp.getState().active;
+      if (a) s.adjust(a.weight, n);
+    },
+  });
+  const watchMotion = watchCountOn && !!ex && watchCountable(ex.id, ex.pattern);
+
   // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
   // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.
   const notified = useRef({ key: "", at: 0 });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -251,8 +268,9 @@ export function Workout() {
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
       sessionId: active.sessionId,
+      motion: watchMotion || undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!active || !gym) {
     return (
@@ -579,6 +597,15 @@ export function Workout() {
                   {t("workout.howTo")}
                 </span>
               </button>
+              {watchReps !== null && (
+                <span
+                  className="absolute left-2 top-2 inline-flex min-h-8 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm font-semibold tabular-nums"
+                  data-testid="watch-reps"
+                >
+                  <Icon name="watch" size={16} className="text-accent" />
+                  {t("count.watch", { count: watchReps })}
+                </span>
+              )}
               {canCount && (
                 <AutoCountButton
                   on={false}

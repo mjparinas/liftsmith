@@ -34,6 +34,13 @@ export const FLAGS = {
     label: "Labs: camera bar speed",
     description: "Bar speed from the camera while counting reps, with how much it has dropped and when to end the set.",
   },
+  /** Labs: the Wear OS or Apple Watch app counts reps from wrist motion and fills in the phone's live set. */
+  labWatchReps: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: watch rep counting",
+    description: "The Wear OS or Apple Watch app counts reps from wrist motion during a set and fills them in on the phone.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
