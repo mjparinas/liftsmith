@@ -5,15 +5,16 @@ import { InfoPage, Section } from "@/components/site/InfoPage";
 import { StatusCheck } from "@/components/site/StatusCheck";
 import { BRAND } from "@/lib/brand";
 import { REPLY_TIME } from "@/lib/contact";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Service status",
   description: `Is ${name} working right now? A live check of the website, sign-in and syncing.`,
-  alternates: { canonical: "/status/" },
-};
+  path: "/status/",
+});
 
 // Static, like every page (the script policy needs it): the check runs in the browser against /api/health/.
 export default function Status() {

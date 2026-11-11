@@ -2,7 +2,9 @@
 // tools) and the one route list the sitemap is built from. Everything comes from the same exercise library the
 // app plans with, so a new exercise gets its pages and its sitemap entry without touching this file.
 import { ARTICLES, type Article } from "@/content/articles";
-import { COMPETITORS } from "@/content/compare";
+import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
+import { IMPORT_SOURCES } from "@/content/imports";
+import { landingPath, LANDINGS } from "@/content/landings";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { alternatives } from "./generator";
@@ -83,6 +85,18 @@ export const EQUIPMENT_NAME: Record<Equipment, string> = {
   battleRopes: "Battle ropes",
 };
 
+/** The equipment as a word before "exercises": "Kettlebell exercises", not "Kettlebells exercises". */
+const EQUIPMENT_SINGULAR: Partial<Record<Equipment, string>> = {
+  dumbbells: "Dumbbell",
+  kettlebells: "Kettlebell",
+  bands: "Resistance band",
+  rings: "Gymnastic ring",
+  battleRopes: "Battle rope",
+};
+/** "Kettlebell" → "kettlebell", but "EZ curl bar" keeps its capitals. */
+export const lowerName = (s: string) => (/^[A-Z][a-z]/.test(s) ? s[0]!.toLowerCase() + s.slice(1) : s);
+export const equipmentLabel = (eq: Equipment) => EQUIPMENT_SINGULAR[eq] ?? EQUIPMENT_NAME[eq];
+
 /** One plain line on what each muscle does, for its page. */
 export const MUSCLE_ABOUT: Record<Muscle, string> = {
   chest: "Your chest (pectorals) pushes your arms forward and across your body. It drives every press and push-up.",
@@ -159,6 +173,26 @@ export const TOOL_PAGES = [
     blurb: "Your estimated max from any set, with a reps-to-weight table and every formula's answer.",
   },
   {
+    path: "/tools/warm-up-calculator/",
+    name: "Warm-up calculator",
+    blurb: "The warm-up sets for any working weight on the squat, bench, deadlift, press or row, with the plates for each.",
+  },
+  {
+    path: "/tools/rpe-chart/",
+    name: "RPE chart",
+    blurb: "The weight for every rep count at every RPE and reps in reserve, from your one-rep max.",
+  },
+  {
+    path: "/tools/strength-standards/",
+    name: "Strength standards",
+    blurb: "How strong am I? One lift against lifters of your body weight, age and sex.",
+  },
+  {
+    path: "/tools/dots-calculator/",
+    name: "DOTS calculator",
+    blurb: "Your powerlifting total scored for body weight, so lifters of any size can compare.",
+  },
+  {
     path: "/tools/tdee-calculator/",
     name: "TDEE calculator",
     blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters.",
@@ -195,8 +229,13 @@ export function siteRoutes(): Route[] {
     { path: "/whats-new/", priority: 0.5, date: WHATS_NEW[0]?.day },
     { path: "/status/", priority: 0.2 },
     { path: "/compare/", priority: 0.6 },
-    { path: "/alternatives/fitbod/", priority: 0.7 },
+    { path: "/compare/best-workout-apps/", priority: 0.7 },
+    ...ALTERNATIVES.map((a) => ({ path: `/alternatives/${a.slug}/`, priority: 0.7 })),
     ...COMPETITORS.map((c) => ({ path: `/compare/${c.slug}/`, priority: 0.7 })),
+    ...IMPORT_SOURCES.map((s) => ({ path: `/import/${s.slug}/`, priority: 0.7 })),
+    { path: "/apps/", priority: 0.7 },
+    { path: "/features/", priority: 0.7 },
+    ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
@@ -210,3 +249,20 @@ export function siteRoutes(): Route[] {
 }
 
 export const absolute = (path: string) => `${SITE_URL}${path}`;
+
+/** Structured data for a hub page of exercises (muscle, equipment, muscle + equipment): a CollectionPage whose
+ * main entity is the list of exercises, each with its own page. */
+export function exerciseCollection(name: string, path: string, list: readonly Exercise[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name,
+    url: absolute(path),
+    mainEntity: {
+      "@type": "ItemList",
+      name,
+      numberOfItems: list.length,
+      itemListElement: list.map((e, i) => ({ "@type": "ListItem", position: i + 1, url: absolute(`/exercises/${e.id}/`), name: e.name })),
+    },
+  };
+}

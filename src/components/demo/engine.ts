@@ -76,6 +76,8 @@ export interface DemoSettings {
    * position, 1 the far end), or null to fall back to the demo's own timing. Used by camera rep counting.
    */
   follow?: (() => number | null) | null;
+  /** Tilts the whole figure sideways, in degrees (positive to its right), on top of a motion's own roll. */
+  lean?: number;
 }
 
 export interface Camera {
@@ -261,7 +263,8 @@ export function startLoop(
       const aspect = size[1] ? size[0] / size[1] : 1;
       const distance = (frameBox.size * 2.45) / Math.min(1, aspect * 1.15);
       lastCam = { yaw, pitch, target: frameBox.centre, distance, aspect };
-      lastRoll = place.roll(smp.d);
+      const roll = place.roll(smp.d) + (s.lean ?? 0);
+      lastRoll = roll;
       scene.draw({
         J,
         effort: smp.effort,
@@ -270,7 +273,7 @@ export function startLoop(
         motion,
         body,
         place,
-        roll: place.roll(smp.d),
+        roll,
         meshes,
         skel,
         changed,

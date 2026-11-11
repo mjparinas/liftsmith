@@ -6,7 +6,6 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - Accounts setup: Google is done for the web and Android (2026-11-10: consent screen published, web client built in through `src/lib/authIds.ts`, Android clients for the Play app signing key and the upload key). The iPhone part is under "iOS (deferred)" below.
 - Creator program setup (Melvin): 30-day-trial products or offers in Play Console (a second free-trial offer on the `pro` base plans, eligibility "developer determined" or a separate offer tag) and App Store Connect (an offer code or a second product pair with a 30-day intro offer), a RevenueCat offering named `creator30` with `$rc_monthly` and `$rc_annual` pointing at them, then add each creator in /admin/ › Creators. Payouts are sent by hand from the CSV.
 - Billing setup (Melvin): Play Console payments profile and the `pro` subscription (base plans `monthly` $6.99 and `annual` $39.99, 14-day free-trial offers, family sharing on annual); App Store Connect Paid Apps agreement, banking and tax, the "Pro" group (`pro_monthly`, `pro_annual`, 14-day free intro offers, Family Sharing on annual) and sandbox testers; a RevenueCat project with both apps, the `pro` entitlement and offering, Play's RTDN topic and Apple's server notification URL pointed at RevenueCat, and the webhook to `https://www.getliftsmith.com/api/billing/revenuecat/` with an Authorization value. Then GitHub secrets `REVENUECAT_ANDROID_KEY` and `REVENUECAT_IOS_KEY`, and `REVENUECAT_WEBHOOK_SECRET` in Vercel.
-- Our own terms of use page (the paywall links Apple's standard EULA on iOS and only the privacy policy on Android).
 - Pro on the web app: today everything is unlocked there. Selling or recognising Pro on the web needs accounts (and Stripe for web sales).
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials.
 - Play Console account and the Health Connect permissions declaration form; host the privacy page (`public/privacypolicy.html`) on the real domain.
@@ -16,6 +15,8 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 ## iOS (deferred)
 
 Melvin, 2026-11-10: everything that needs iOS setup is recorded here as an open gap and waits until he picks iOS back up. The code ships on both platforms; these steps turn the iPhone parts on.
+
+- **Voice set logging on iPhone** (Labs, `SpeechLogPlugin.swift`): built and compiled in CI, but not yet tried on an iPhone. Check the speech recognition and microphone prompts, that recognition stays on the device for each of the six languages, and that music comes back after listening.
 
 - **Universal Links** for remix and shared routine links: the Associated Domains entitlement (`applinks:www.getliftsmith.com`) on the App ID and in `App.entitlements`, plus `public/.well-known/apple-app-site-association` with the team id and `/app/*`. Until then those links open in Safari, and the in-app paste box (Routines › Add a routine from a link) brings a routine into the app.
 

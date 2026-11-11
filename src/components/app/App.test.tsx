@@ -106,7 +106,8 @@ describe("Pro trial offer", () => {
     expect(screen.getByRole("button", { name: "Restore purchases" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
     await screen.findByText("Today's workout");
-    // No Pro: Today follows the free classic 5x5, and the recovery map is locked.
+    // No Pro: Today follows the free classic 5x5, the recovery map is locked, and there's no Pro badge.
+    expect(screen.queryByTestId("pro-badge")).not.toBeInTheDocument();
     expect(useApp.getState().profile.pro).toMatchObject({ declinedAt: expect.any(Number) });
     expect(useApp.getState().profile.planSource).toMatchObject({ kind: "program", id: "classic-5x5" });
     expect(useApp.getState().profile.proPlan).toEqual({ kind: "adaptive" });
@@ -121,6 +122,10 @@ describe("Pro trial offer", () => {
     );
     await waitFor(() => expect(useApp.getState().profile.planSource).toEqual({ kind: "adaptive" }));
     expect(useApp.getState().profile.proPlan).toBeUndefined();
+    // A real member: this month is logged for the Pro achievement, and Today shows the Pro badge.
+    await waitFor(() => expect(useApp.getState().events.filter((e) => e.type === "pro")).toHaveLength(1));
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    expect(await screen.findByTestId("pro-badge")).toHaveTextContent("Liftsmith Pro member");
   });
 });
 
@@ -296,6 +301,23 @@ describe("first run to finished workout", () => {
     // Split them mid-workout from the Coming up list.
     await user.click(screen.getByRole("button", { name: /^Split / }));
     expect(useApp.getState().active!.plan.items[0].group).toBeUndefined();
+  });
+
+  it("shows the live workout on Today, read-only, and says where to link or reorder it", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    // Linked from the workout screen: Today's list follows the live workout, not the plan it started from.
+    useApp.getState().toggleSuperset(1);
+    const live = useApp.getState().active!.plan.items;
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    const rows = within(screen.getByTestId("plan-list")).getAllByRole("listitem");
+    expect(rows[1].getAttribute("data-superset")).toBe(live[1].group);
+    expect(rows[2].getAttribute("data-superset")).toBe(live[1].group);
+    // No link or move buttons that would quietly change the workout from here.
+    expect(screen.queryAllByRole("button", { name: /^(Superset|Split) / })).toHaveLength(0);
+    expect(screen.queryAllByRole("button", { name: /\. Move / })).toHaveLength(0);
+    expect(screen.getByTestId("superset-hint").textContent).toMatch(/Your workout is running.*Coming up on the workout screen/);
   });
 
   it("imports a Strong export from Settings, once", async () => {
@@ -697,5 +719,41 @@ describe("Labs", () => {
     expect(screen.getByRole("switch", { name: /Phone motion/ })).toBeInTheDocument();
     location.hash = "#/workout";
     expect(await screen.findByRole("button", { name: "Count reps with the camera" })).toBeInTheDocument();
+  });
+
+  it("heart-rate rest timer: cuts the rest once the heart rate is back down, and says why", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: /Labs/ }));
+    await user.click(await screen.findByRole("switch", { name: /Heart-rate rest timer/ }));
+    await startSquat(user);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    // A minute into a 3-minute rest: 100 bpm when the set started, 150 at its end, 104 now.
+    const now = Date.now();
+    const restStart = now - 60_000;
+    const setStart = restStart - 30_000;
+    const st = useApp.getState();
+    const a = st.active!;
+    const last = [...st.events].reverse().find((e) => e.type === "set")!;
+    act(() => {
+      useApp.setState({
+        events: st.events.map((e) => (e.id === last.id && e.type === "set" ? { ...e, startedAt: setStart } : e)),
+        active: {
+          ...a,
+          startedAt: setStart,
+          restStart,
+          restTotal: 180,
+          restUntil: restStart + 180_000,
+          hr: [100, 150, 104],
+          hrAt: [0, 30_000, now - setStart],
+        },
+      });
+    });
+    const line = await screen.findByTestId("hr-cut");
+    expect(line).toHaveTextContent(/back to 104, near the 100 .* rest is \d+ s shorter/);
+    const b = useApp.getState().active!;
+    expect(b.restUntil).toBe(restStart + 108_000);
+    expect(b.hrCut?.restStart).toBe(restStart);
   });
 });

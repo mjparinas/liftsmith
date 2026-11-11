@@ -4,15 +4,16 @@ import Link from "next/link";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
+import { pageMeta } from "@/lib/pageMeta";
 import { exercisesFor, MUSCLE_NAME, muscleSlug } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import { MUSCLES } from "@/lib/types";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: `Exercise library: ${EXERCISES.length} exercises with 3D demos`,
   description: `How to do ${EXERCISES.length} strength exercises, from barbell lifts to bodyweight moves: setup, form cues, muscles worked, equipment, alternatives and a 3D demo for each.`,
-  alternates: { canonical: "/exercises/" },
-};
+  path: "/exercises/",
+});
 
 export default function ExercisesIndex() {
   const jsonLd = {

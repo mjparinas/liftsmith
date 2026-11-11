@@ -8,8 +8,12 @@ import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSessionRecord
+import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.metadata.Device
 import androidx.health.connect.client.records.metadata.Metadata
+import androidx.health.connect.client.request.AggregateGroupByPeriodRequest
+import androidx.health.connect.client.time.TimeRangeFilter
+import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
 import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
@@ -17,6 +21,8 @@ import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.ActivityCallback
 import com.getcapacitor.annotation.CapacitorPlugin
 import java.time.Instant
+import java.time.LocalDate
+import java.time.Period
 import java.time.ZoneId
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -116,6 +122,49 @@ class HealthWorkoutPlugin : Plugin() {
             }
         }
         answer(call, "opened", false)
+    }
+
+    /**
+     * Calories and protein eaten per day, for the food coach's notes (src/lib/health.ts readNutrition, insights.ts).
+     * Food apps such as MyFitnessPal or Cronometer write nutrition records to Health Connect; this adds them up per
+     * local day (Health Connect's aggregate, so two apps logging the same meal are counted once by its source
+     * priority) for the `days` finished days before today. Today is left out because it's still being logged. The
+     * health plugin can read energy but not protein, so this reads both. READ_NUTRITION is asked for in the health
+     * plugin's sheet (dietaryEnergyConsumed in health.ts READ); without it the answer is empty. `ask` is for iOS.
+     */
+    @PluginMethod
+    fun nutrition(call: PluginCall) {
+        val days = (call.getInt("days") ?: 14).coerceIn(1, 60)
+        val c = client() ?: return call.resolve(JSObject().put("days", JSArray()))
+        scope.launch {
+            val out = JSArray()
+            try {
+                val read = HealthPermission.getReadPermission(NutritionRecord::class)
+                if (c.permissionController.getGrantedPermissions().contains(read)) {
+                    val today = LocalDate.now()
+                    val groups = c.aggregateGroupByPeriod(
+                        AggregateGroupByPeriodRequest(
+                            metrics = setOf(NutritionRecord.ENERGY_TOTAL, NutritionRecord.PROTEIN_TOTAL),
+                            timeRangeFilter = TimeRangeFilter.between(today.minusDays(days.toLong()).atStartOfDay(), today.atStartOfDay()),
+                            timeRangeSlicer = Period.ofDays(1),
+                        ),
+                    )
+                    for (g in groups) {
+                        val kcal = g.result[NutritionRecord.ENERGY_TOTAL]?.inKilocalories
+                        val protein = g.result[NutritionRecord.PROTEIN_TOTAL]?.inGrams
+                        if (kcal == null && protein == null) continue
+                        val day = JSObject()
+                        day.put("day", g.startTime.toLocalDate().toString())
+                        if (kcal != null) day.put("kcal", kcal)
+                        if (protein != null) day.put("protein", protein)
+                        out.put(day)
+                    }
+                }
+            } catch (e: Exception) {
+                // Not allowed, or Health Connect is busy: nothing this time.
+            }
+            call.resolve(JSObject().put("days", out))
+        }
     }
 
     @ActivityCallback

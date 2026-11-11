@@ -2,7 +2,9 @@
 "NSCameraUsageDescription" = "進捗写真を撮るため、またオンにした場合はレップ数を数えるために使います。写真はこの iPhone に保存され、アップロードされることはありません。レップのカウントは映像をこの iPhone 上で解析し、録画や送信は一切しません。";
 "NSBluetoothAlwaysUsageDescription" = "Liftsmith は心拍計ベルトやウォッチに接続し、トレーニング中の心拍数をリアルタイムで表示します。";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith はアプリを開いたときにおおよその位置情報を使い、今いるジムを選びます。バックグラウンドで追跡することはなく、位置情報はこの iPhone から出ません。";
-"NSHealthShareUsageDescription" = "Liftsmith は体重、身長、性別、生年月日、体脂肪率、安静時心拍数、睡眠、心拍変動、歩数、VO2 Max、呼吸数を読み取り、トレーニングの計画、体重記録と1日の消費カロリーの更新、回復状態の表示に使います。";
+"NSHealthShareUsageDescription" = "Liftsmith は体重、身長、性別、生年月日、体脂肪率、安静時心拍数、睡眠、心拍変動、歩数、VO2 Max、呼吸数、食事アプリが記録したカロリーとたんぱく質を読み取り、トレーニングの計画、体重記録と1日の消費カロリーの更新、回復状態の表示、食事についてのアドバイスに使います。";
 "NSHealthUpdateUsageDescription" = "Liftsmith は完了したワークアウトをカロリーと心拍数とともにヘルスケアに保存します。";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith はトレーニング日をカレンダーに追加し、オンにした場合は予定の空き時間を見て、その日に収まるワークアウトを提案します。読み取るのは時間だけで、予定の内容は読みません。";
 "NSCalendarsUsageDescription" = "Liftsmith はトレーニング日をカレンダーに追加し、オンにした場合は予定の空き時間を見て、その日に収まるワークアウトを提案します。読み取るのは時間だけで、予定の内容は読みません。";
+"NSMicrophoneUsageDescription" = "Labs で音声でセットを記録をオンにすると、マイクをタップしたときに Liftsmith が聞き取り、「100キロで8回」のようにセットを言えます。音声はこの iPhone 上で認識され、録音や送信はされません。";
+"NSSpeechRecognitionUsageDescription" = "Liftsmith は話した内容をこの iPhone 上で記録済みのセットにします。音声が録音や送信されることはありません。";

@@ -19,6 +19,7 @@ export const en = {
   "cos.plates-black": "Matte black",
   "cos.plates-chrome": "Chrome",
   "cos.plates-neon": "Neon",
+  "cos.accent-pro": "Ultraviolet",
 } as const;
 
 type Key = keyof typeof en;
@@ -39,6 +40,7 @@ export const es: Partial<Record<Key, Message>> = {
   "cos.plates-black": "Negro mate",
   "cos.plates-chrome": "Cromo",
   "cos.plates-neon": "Neón",
+  "cos.accent-pro": "Ultravioleta",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -57,6 +59,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "cos.plates-black": "Noir mat",
   "cos.plates-chrome": "Chrome",
   "cos.plates-neon": "Néon",
+  "cos.accent-pro": "Ultraviolet",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -75,6 +78,7 @@ export const de: Partial<Record<Key, Message>> = {
   "cos.plates-black": "Mattschwarz",
   "cos.plates-chrome": "Chrom",
   "cos.plates-neon": "Neon",
+  "cos.accent-pro": "Ultraviolett",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -93,6 +97,7 @@ export const it: Partial<Record<Key, Message>> = {
   "cos.plates-black": "Nero opaco",
   "cos.plates-chrome": "Cromo",
   "cos.plates-neon": "Neon",
+  "cos.accent-pro": "Ultravioletto",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -111,4 +116,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "cos.plates-black": "マットブラック",
   "cos.plates-chrome": "クローム",
   "cos.plates-neon": "ネオン",
+  "cos.accent-pro": "ウルトラバイオレット",
 };

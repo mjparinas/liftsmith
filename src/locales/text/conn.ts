@@ -29,7 +29,7 @@ export const en = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Apple Health",
   "conn.health.what":
-    "Reads your weigh-ins, body fat, height, sleep, heart rate variability, resting heart rate, breathing rate, steps and VO2 max. Saves each workout, with its active calories and heart rate.",
+    "Reads your weigh-ins, body fat, height, sleep, heart rate variability, resting heart rate, breathing rate, steps, VO2 max and the calories and protein your food app logs. Saves each workout, with its active calories and heart rate.",
   "conn.health.web.title": "Health",
   "conn.health.web": "Health Connect and Apple Health work in the Liftsmith app for Android and iPhone. A browser can't reach them.",
   "conn.health.missing": "Health Connect isn't on this phone yet.",
@@ -50,6 +50,7 @@ export const en = {
   "conn.perm.steps": "Steps",
   "conn.perm.vo2Max": "VO2 max",
   "conn.perm.respiratoryRate": "Breathing rate",
+  "conn.perm.dietaryEnergyConsumed": "Food: calories and protein",
   "conn.perm.calories": "Active calories (written)",
   "conn.perm.heartRate": "Heart rate (written)",
   "conn.perm.workouts": "Workouts (written)",
@@ -132,7 +133,7 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Salud de Apple",
   "conn.health.what":
-    "Lee tus pesajes, grasa corporal, altura, sueño, variabilidad de la frecuencia cardiaca, frecuencia cardiaca en reposo, frecuencia respiratoria, pasos y VO2 máx. Guarda cada entrenamiento, con sus calorías activas y su frecuencia cardiaca.",
+    "Lee tus pesajes, grasa corporal, altura, sueño, variabilidad de la frecuencia cardiaca, frecuencia cardiaca en reposo, frecuencia respiratoria, pasos, VO2 máx. y las calorías y proteínas de tu app de comidas. Guarda cada entrenamiento, con sus calorías activas y su frecuencia cardiaca.",
   "conn.health.web.title": "Salud",
   "conn.health.web":
     "Health Connect y Salud de Apple funcionan en la app de Liftsmith para Android y iPhone. Un navegador no puede acceder a ellas.",
@@ -154,6 +155,7 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.perm.steps": "Pasos",
   "conn.perm.vo2Max": "VO2 máx",
   "conn.perm.respiratoryRate": "Frecuencia respiratoria",
+  "conn.perm.dietaryEnergyConsumed": "Comida: calorías y proteínas",
   "conn.perm.calories": "Calorías activas (escritura)",
   "conn.perm.heartRate": "Frecuencia cardiaca (escritura)",
   "conn.perm.workouts": "Entrenamientos (escritura)",
@@ -238,7 +240,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Santé d’Apple",
   "conn.health.what":
-    "Lit vos pesées, votre masse grasse, votre taille, votre sommeil, la variabilité de la fréquence cardiaque, la fréquence cardiaque au repos, la fréquence respiratoire, vos pas et votre VO2 max. Enregistre chaque séance, avec ses calories actives et sa fréquence cardiaque.",
+    "Lit vos pesées, votre masse grasse, votre taille, votre sommeil, la variabilité de la fréquence cardiaque, la fréquence cardiaque au repos, la fréquence respiratoire, vos pas, votre VO2 max et les calories et protéines de votre appli de nutrition. Enregistre chaque séance, avec ses calories actives et sa fréquence cardiaque.",
   "conn.health.web.title": "Santé",
   "conn.health.web":
     "Health Connect et Santé d’Apple fonctionnent dans l’app Liftsmith pour Android et iPhone. Un navigateur n’y a pas accès.",
@@ -261,6 +263,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.perm.steps": "Pas",
   "conn.perm.vo2Max": "VO2 max",
   "conn.perm.respiratoryRate": "Fréquence respiratoire",
+  "conn.perm.dietaryEnergyConsumed": "Alimentation : calories et protéines",
   "conn.perm.calories": "Calories actives (écriture)",
   "conn.perm.heartRate": "Fréquence cardiaque (écriture)",
   "conn.perm.workouts": "Séances (écriture)",
@@ -344,7 +347,7 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Apple Health",
   "conn.health.what":
-    "Liest deine Wiegungen, Körperfett, Größe, Schlaf, Herzfrequenzvariabilität, Ruhepuls, Atemfrequenz, Schritte und VO2max. Speichert jedes Training mit seinen aktiven Kalorien und der Herzfrequenz.",
+    "Liest deine Wiegungen, Körperfett, Größe, Schlaf, Herzfrequenzvariabilität, Ruhepuls, Atemfrequenz, Schritte, VO2max sowie Kalorien und Protein aus deiner Ernährungs-App. Speichert jedes Training mit seinen aktiven Kalorien und der Herzfrequenz.",
   "conn.health.web.title": "Gesundheit",
   "conn.health.web":
     "Health Connect und Apple Health funktionieren in der Liftsmith-App für Android und iPhone. Ein Browser kommt nicht an sie heran.",
@@ -367,6 +370,7 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.perm.steps": "Schritte",
   "conn.perm.vo2Max": "VO2max",
   "conn.perm.respiratoryRate": "Atemfrequenz",
+  "conn.perm.dietaryEnergyConsumed": "Ernährung: Kalorien und Protein",
   "conn.perm.calories": "Aktive Kalorien (geschrieben)",
   "conn.perm.heartRate": "Herzfrequenz (geschrieben)",
   "conn.perm.workouts": "Trainings (geschrieben)",
@@ -449,7 +453,7 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.health.android": "Health Connect",
   "conn.health.ios": "Apple Salute",
   "conn.health.what":
-    "Legge pesate, massa grassa, altezza, sonno, variabilità della frequenza cardiaca, frequenza cardiaca a riposo, frequenza respiratoria, passi e VO2 max. Salva ogni allenamento con calorie attive e frequenza cardiaca.",
+    "Legge pesate, massa grassa, altezza, sonno, variabilità della frequenza cardiaca, frequenza cardiaca a riposo, frequenza respiratoria, passi, VO2 max e calorie e proteine della tua app per l’alimentazione. Salva ogni allenamento con calorie attive e frequenza cardiaca.",
   "conn.health.web.title": "Salute",
   "conn.health.web": "Health Connect e Apple Salute funzionano nell’app Liftsmith per Android e iPhone. Un browser non può accedervi.",
   "conn.health.missing": "Health Connect non è ancora su questo telefono.",
@@ -470,6 +474,7 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.perm.steps": "Passi",
   "conn.perm.vo2Max": "VO2 max",
   "conn.perm.respiratoryRate": "Frequenza respiratoria",
+  "conn.perm.dietaryEnergyConsumed": "Alimentazione: calorie e proteine",
   "conn.perm.calories": "Calorie attive (scritte)",
   "conn.perm.heartRate": "Frequenza cardiaca (scritta)",
   "conn.perm.workouts": "Allenamenti (scritti)",
@@ -556,7 +561,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.health.android": "ヘルスコネクト",
   "conn.health.ios": "Apple ヘルスケア",
   "conn.health.what":
-    "体重、体脂肪率、身長、睡眠、心拍変動、安静時心拍数、呼吸数、歩数、VO2 Max を読み取ります。各ワークアウトをアクティブカロリーと心拍数とともに保存します。",
+    "体重、体脂肪率、身長、睡眠、心拍変動、安静時心拍数、呼吸数、歩数、VO2 Max、食事アプリのカロリーとたんぱく質を読み取ります。各ワークアウトをアクティブカロリーと心拍数とともに保存します。",
   "conn.health.web.title": "ヘルスケア",
   "conn.health.web": "ヘルスコネクトと Apple ヘルスケアは Android と iPhone の Liftsmith アプリで使えます。ブラウザからは利用できません。",
   "conn.health.missing": "この端末にはまだヘルスコネクトがありません。",
@@ -578,6 +583,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.perm.steps": "歩数",
   "conn.perm.vo2Max": "VO2 Max",
   "conn.perm.respiratoryRate": "呼吸数",
+  "conn.perm.dietaryEnergyConsumed": "食事：カロリーとたんぱく質",
   "conn.perm.calories": "アクティブカロリー（書き込み）",
   "conn.perm.heartRate": "心拍数（書き込み）",
   "conn.perm.workouts": "ワークアウト（書き込み）",

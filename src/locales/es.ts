@@ -104,10 +104,12 @@ import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
 import * as train from "./text/train";
+import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
 import * as variety from "./text/variety";
 import * as vc from "./text/vc";
+import * as vl from "./text/vl";
 import * as warm from "./text/warm";
 import * as wdg from "./text/wdg";
 import * as why from "./text/why";
@@ -216,10 +218,12 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...ton.es,
   ...tools.es,
   ...train.es,
+  ...trn.es,
   ...twin.es,
   ...units.es,
   ...variety.es,
   ...vc.es,
+  ...vl.es,
   ...warm.es,
   ...wdg.es,
   ...why.es,

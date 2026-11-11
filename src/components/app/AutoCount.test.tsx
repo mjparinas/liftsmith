@@ -6,16 +6,18 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { cacheFlags, FLAG_CACHE_KEY } from "@/lib/flags";
-import { imuSamples, simulateSet } from "@/lib/reps/simulate";
-import type { MotionReading } from "@/lib/reps/sources";
+import { imuSamples, sideSquat, simulateSet } from "@/lib/reps/simulate";
+import type { MotionReading, PoseEngine } from "@/lib/reps/sources";
 
-import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
+import { AutoCount, AutoCountButton, countable, formTip, loadCountPrefs, saveCountPrefs, shownLean, type CountPrefs } from "./AutoCount";
 
 const motion: { cb?: (r: MotionReading) => void } = {};
 const openCamera = vi.fn();
+/** The pose model: none (it can't load in tests) unless a test hands one in. */
+const model: { engine?: PoseEngine } = {};
 vi.mock("@/lib/reps/sources", () => ({
   openCamera: (...a: unknown[]) => openCamera(...a),
-  loadPose: () => Promise.reject(new Error("no network in tests")),
+  loadPose: () => (model.engine ? Promise.resolve(model.engine) : Promise.reject(new Error("no network in tests"))),
   startMotion: async (cb: (r: MotionReading) => void) => {
     motion.cb = cb;
     return () => (motion.cb = undefined);
@@ -137,6 +139,73 @@ describe("the counting stage", () => {
     });
     expect(props.onCount).not.toHaveBeenCalled();
     expect(screen.getByRole("status")).toHaveTextContent("Resting");
+    localStorage.removeItem(FLAG_CACHE_KEY);
+  });
+});
+
+describe("camera form check (its lab)", () => {
+  it("words the tip from the set's main issue, or says the set was clean", () => {
+    expect(formTip({ reps: 5, issues: [{ kind: "depth", hit: 3, of: 5, reach: 0.7 }] }).text).toBe(
+      "3 of 5 reps stopped above parallel. Sit until your hips are level with your knees, and lighten the bar if you need to.",
+    );
+    expect(formTip({ reps: 1, issues: [{ kind: "depth", hit: 1, of: 1 }] }).text).toMatch(/^Your rep stopped above parallel/);
+    expect(formTip({ reps: 4, issues: [{ kind: "lean", hit: 2, of: 4, side: "left", deg: 9 }] }).text).toMatch(
+      /^You leaned about 9° to your left on 2 of 4 reps/,
+    );
+    expect(formTip({ reps: 4, issues: [] })).toEqual({ text: "Form check: nothing to fix on those 4 reps." });
+  });
+
+  it("tips the figure the way the lifter leaned, enough to see", () => {
+    expect(shownLean({ kind: "lean", hit: 2, of: 4, side: "left", deg: 4 })).toBe(-8);
+    expect(shownLean({ kind: "lean", hit: 2, of: 4, side: "right", deg: 30 })).toBe(15);
+    expect(shownLean({ kind: "depth", hit: 2, of: 4 })).toBe(0);
+    expect(shownLean(undefined)).toBe(0);
+  });
+
+  it("watches a set of squats through the camera and gives the tip once it's logged", async () => {
+    cacheFlags({ labRepCount: true, labFormCheck: true });
+    // A camera that plays, a pose model that sees a side-on squat, and frames that run when the test says.
+    let clock = 0;
+    let kps = sideSquat(0, 0);
+    model.engine = { detect: () => kps, close: () => {} };
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => frames.push(cb));
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    vi.spyOn(performance, "now").mockImplementation(() => clock);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    openCamera.mockImplementation(async (v: HTMLVideoElement) => {
+      Object.defineProperties(v, {
+        readyState: { get: () => 4 },
+        currentTime: { get: () => clock },
+        videoWidth: { get: () => 480 },
+        videoHeight: { get: () => 480 },
+      });
+      return { getTracks: () => [] };
+    });
+    const { props, rerender } = stage();
+    await act(async () => {});
+    const frame = (f: number, rom: number) => {
+      clock += 33;
+      kps = sideSquat(f, rom);
+      for (const cb of frames.splice(0)) cb(clock);
+    };
+    act(() => {
+      for (let i = 0; i < 30; i++) frame(0, 0);
+      for (const rom of [120, 75, 75, 120]) {
+        for (let i = 0; i <= 70; i++) frame(Math.sin((Math.PI * i) / 70), rom);
+        for (let i = 0; i < 25; i++) frame(0, 0);
+      }
+    });
+    // The two shallow ones are short of the set's deepest, so they don't count as full reps either.
+    expect(props.onCount).toHaveBeenLastCalledWith(2);
+    rerender(<AutoCount {...props} counting={false} setKey="1" />);
+    expect(screen.getByRole("status")).toHaveTextContent("2 of 4 reps stopped above parallel");
+    expect(screen.getByRole("button", { name: /form check/i })).toBeInTheDocument();
+    // The next set starts clean.
+    rerender(<AutoCount {...props} counting setKey="1" />);
+    expect(screen.getByRole("status")).not.toHaveTextContent("parallel");
+    model.engine = undefined;
+    vi.restoreAllMocks();
     localStorage.removeItem(FLAG_CACHE_KEY);
   });
 });

@@ -4,6 +4,7 @@
 // same account. The device gets a random session token; the server keeps only its hash.
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
+import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
 import { hasLifetimePro } from "./creators";
 import { batch, query, rateLimit, run } from "./db";
@@ -254,6 +255,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
+    ...coachCleanup(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

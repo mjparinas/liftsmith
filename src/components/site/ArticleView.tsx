@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { CTA_COPY, readMinutes, type Article, type Block } from "@/content/articles";
 import { BRAND } from "@/lib/brand";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
+import { ogImage } from "@/lib/ogImages";
 import { articlePath, MUSCLE_NAME } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 
@@ -87,6 +88,9 @@ function BlockView({ b, a, n }: { b: Block; a: Article; n: number }) {
   );
 }
 
+const longDate = (d: string) =>
+  new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" });
+
 export function ArticleView({ a, related }: { a: Article; related: Article[] }) {
   const url = `${SITE_URL}${articlePath(a)}`;
   const section = a.kind === "guide" ? { href: "/guides/", label: "Guides" } : { href: "/blog/", label: "Blog" };
@@ -101,6 +105,7 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       dateModified: a.updated ?? a.date,
       mainEntityOfPage: url,
       url,
+      image: `${SITE_URL}${ogImage(articlePath(a))}`,
       author: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
       publisher: {
         "@type": "Organization",
@@ -125,9 +130,13 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
       <p className="mt-6 text-sm font-semibold tracking-wide text-accent uppercase">{a.tag}</p>
       <h1 className="mt-2 max-w-3xl text-3xl font-extrabold tracking-tight md:text-5xl">{a.title}</h1>
       <p className="mt-3 text-sm text-muted">
-        <time dateTime={a.date}>
-          {new Date(`${a.date}T12:00:00Z`).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", timeZone: "UTC" })}
-        </time>{" "}
+        <time dateTime={a.date}>{longDate(a.date)}</time>
+        {a.updated && a.updated !== a.date ? (
+          <>
+            {" "}
+            · Updated <time dateTime={a.updated}>{longDate(a.updated)}</time>
+          </>
+        ) : null}{" "}
         · {readMinutes(a)} min read
       </p>
       <div className="max-w-3xl">

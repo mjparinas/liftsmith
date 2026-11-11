@@ -75,6 +75,10 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Liftsmith uses the camera to take progress photos and, if you turn it on, to count your reps. Photos stay on this phone and are never uploaded; rep counting analyses video on this iPhone and never records or sends it.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>If you turn on voice set logging in Labs, Liftsmith listens when you tap the microphone so you can say a set, like "100 for 8". Speech is recognized on this iPhone and never recorded or sent.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>Liftsmith turns what you say into a logged set, on this iPhone. Your voice is never recorded or sent.</string>
 	<key>NSMotionUsageDescription</key>
 	<string>Liftsmith can count your reps from this iPhone's motion sensors while you lift.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
@@ -84,7 +88,7 @@
 	<key>NSLocationDefaultAccuracyReduced</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Liftsmith reads your weight, height, sex, date of birth, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and respiratory rate to set up your training, keep your weigh-ins and daily calories current, and show how recovered you are.</string>
+	<string>Liftsmith reads your weight, height, sex, date of birth, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max, respiratory rate and the calories and protein your food app logs to set up your training, keep your weigh-ins and daily calories current, show how recovered you are, and coach you on what you eat.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Liftsmith saves your finished workouts, calories and heart rate to Apple Health.</string>
 	<key>UIBackgroundModes</key>

@@ -34,6 +34,41 @@ export const FLAGS = {
     label: "Labs: camera bar speed",
     description: "Bar speed from the camera while counting reps, with how much it has dropped and when to end the set.",
   },
+  /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
+  labHrRest: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: heart-rate rest timer",
+    description: "Rest ends early once a heart rate monitor or watch shows the heart rate back near where the set started.",
+  },
+  /** Labs: a form check from the camera while counting reps (depth, short range, lean), with a tip between sets. */
+  labFormCheck: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: camera form check",
+    description: "Squat depth, short reps and a lean to one side, read by the camera while counting reps, with one tip between sets.",
+  },
+  /** Labs: trainer mode, coaching clients (invite codes and client reports, src/lib/trainer.ts). Being a client is free. */
+  labTrainer: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: trainer mode",
+    description: "Coaches invite clients and see their workouts in Settings › Coaching. Being someone's client needs no lab.",
+  },
+  /** Labs: say a set ("100 for 8", "too easy") on the workout screen, heard by the phone's on-device recognizer. */
+  labVoiceLog: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: voice set logging",
+    description: 'A microphone on the workout screen: say "100 for 8" or "too easy" to log a set, recognized on the device.',
+  },
+  /** Labs: today's max from warm-up bar speed, and a nudge to the working weight before the first hard set. */
+  labSpeedMax: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: today's max from warm-ups",
+    description: "Estimates today's max from the camera's warm-up bar speeds and suggests a lighter or heavier first working set.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

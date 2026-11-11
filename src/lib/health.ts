@@ -17,7 +17,8 @@ const health = () => (mod ??= import("@capgo/capacitor-health"));
 // visibly use, so keep this list, the manifest's health permissions and the privacy pages in step.
 // Weight, height, body fat and resting HR: setup, weigh-ins, TDEE and the health twin. Sleep, HRV, steps,
 // VO2 max and breathing rate: the health twin (twin.ts), the readiness call (sleep, HRV, resting HR,
-// breathing rate) and TDEE's activity level (steps).
+// breathing rate) and TDEE's activity level (steps). Food (dietaryEnergyConsumed, Health Connect's READ_NUTRITION,
+// which also covers protein): the food coach's notes (insights.ts), read through our own plugin (readNutrition).
 export const READ = [
   "weight",
   "height",
@@ -28,6 +29,7 @@ export const READ = [
   "steps",
   "vo2Max",
   "respiratoryRate",
+  "dietaryEnergyConsumed",
 ] as const;
 export const WRITE = ["calories", "heartRate"] as const;
 
@@ -70,6 +72,11 @@ export async function askHealth(need: readonly HealthRead[] = []): Promise<Healt
   try {
     const r = await (await health()).Health.requestAuthorization({ read: [...READ], write: [...WRITE] });
     const ok = askResult(android, need, r.readAuthorized as string[]);
+    // Protein isn't one of the health plugin's types: on iOS our own plugin asks for it (with food energy).
+    if (!android)
+      await workoutPlugin()
+        ?.nutrition?.({ days: 1, ask: true })
+        .catch(() => undefined);
     // Then saving workouts, which our own plugin asks for (the health plugin can't write them).
     if (ok) await allowWorkouts();
     return { state: ok ? "granted" : "denied" };
@@ -244,6 +251,15 @@ interface WorkoutPlugin {
   characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
   /** Opens where Health permissions are changed (or Google Play for Health Connect). Missing on older app builds. */
   openPermissions?(): Promise<{ opened: boolean }>;
+  /** Calories and protein eaten per finished day (food apps write them). Missing on older app builds. */
+  nutrition?(o: { days: number; ask?: boolean }): Promise<{ days: NutritionDay[] }>;
+}
+
+/** One local day's food totals from Health Connect or Apple Health, as our plugin sends them. */
+export interface NutritionDay {
+  day: string;
+  kcal?: number;
+  protein?: number;
 }
 const workoutPlugin = (): WorkoutPlugin | undefined =>
   isNative()
@@ -397,6 +413,34 @@ export function perDay(
     .sort((a, b) => a.at - b.at);
 }
 
+/**
+ * Food days into daily readings: calories eaten and grams of protein, rounded, with numbers no food log
+ * would hold dropped. A day's `at` is the end of that day, like steps. Exported for tests.
+ */
+export function nutritionReadings(days: readonly NutritionDay[]): DailyReading[] {
+  const out: DailyReading[] = [];
+  for (const d of days) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(d.day)) continue;
+    const [y, m, dd] = d.day.split("-").map(Number) as [number, number, number];
+    const at = new Date(y, m - 1, dd + 1).getTime() - 1;
+    if (typeof d.kcal === "number" && d.kcal > 0 && d.kcal < 15_000)
+      out.push({ metric: "kcalIn", day: d.day, value: Math.round(d.kcal), at });
+    if (typeof d.protein === "number" && d.protein > 0 && d.protein < 600)
+      out.push({ metric: "protein", day: d.day, value: Math.round(d.protein), at });
+  }
+  return out;
+}
+
+/** Calories and protein eaten over the last `days` finished days (food apps write them). Empty on the web. */
+export async function readNutrition(days: number): Promise<DailyReading[]> {
+  try {
+    const r = await workoutPlugin()?.nutrition?.({ days });
+    return nutritionReadings(r?.days ?? []);
+  } catch {
+    return [];
+  }
+}
+
 const SAMPLE_LIMIT = 5000;
 
 /** [start, end) ISO windows of at most a week, oldest first, covering `from` to `to`. Exported for tests. */
@@ -409,7 +453,8 @@ export function weekWindows(from: number, to: number): [string, string][] {
 
 /**
  * The last `days` of sleep, HRV, resting heart rate, steps, VO2 max and overnight breathing rate, one
- * reading per metric per day. Steps only for finished days (today's count is still growing). Empty on
+ * reading per metric per day, plus calories and protein eaten over the last three weeks. Steps and food only
+ * for finished days (today's count is still growing). Empty on
  * the web, and a metric the lifter didn't allow is simply missing.
  */
 export async function readDaily(days: number, now = Date.now()): Promise<DailyReading[]> {
@@ -454,13 +499,14 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
       return [];
     }
   };
-  const [sleep, hrv, rhr, vo2, breath, st] = await Promise.all([
+  const [sleep, hrv, rhr, vo2, breath, st, food] = await Promise.all([
     read("sleep"),
     read("heartRateVariability"),
     read("restingHeartRate"),
     read("vo2Max"),
     read("respiratoryRate"),
     steps(),
+    readNutrition(Math.min(days, 21)),
   ]);
   return [
     ...sleepNights(sleep),
@@ -469,6 +515,7 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
     ...perDay("vo2max", vo2, "latest", (v) => v > 10 && v < 95),
     ...perDay("breathing", breath, "mean", (v) => v > 4 && v < 40),
     ...st,
+    ...food,
   ];
 }
 

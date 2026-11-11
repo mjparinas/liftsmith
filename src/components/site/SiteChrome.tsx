@@ -128,7 +128,8 @@ export function SiteFooter() {
         </div>
         {col("Product", [
           { href: APP_PATH, label: "Open the app" },
-          { href: "/#features", label: "Features" },
+          { href: "/features/", label: "Features" },
+          { href: "/apps/", label: "Who it's for" },
           { href: "/pricing/", label: "Pricing" },
           { href: "/whats-new/", label: "What's new" },
           { href: "/me/", label: "Your dashboard" },
@@ -143,6 +144,10 @@ export function SiteFooter() {
         {col("Tools", [
           { href: "/tools/plate-calculator/", label: "Plate calculator" },
           { href: "/tools/one-rep-max-calculator/", label: "One-rep max calculator" },
+          { href: "/tools/warm-up-calculator/", label: "Warm-up calculator" },
+          { href: "/tools/rpe-chart/", label: "RPE chart" },
+          { href: "/tools/strength-standards/", label: "Strength standards" },
+          { href: "/tools/dots-calculator/", label: "DOTS calculator" },
           { href: "/tools/tdee-calculator/", label: "TDEE calculator" },
         ])}
         {col("Support", [
@@ -154,6 +159,8 @@ export function SiteFooter() {
         {col("Company", [
           { href: "/about/", label: "About us" },
           { href: "/compare/", label: "Compare apps" },
+          { href: "/import/strong/", label: "Switch from Strong" },
+          { href: "/import/hevy/", label: "Switch from Hevy" },
           { href: "/privacy/", label: "Privacy" },
           { href: "/terms/", label: "Terms of use" },
           { href: "/trust/", label: "Trust centre" },

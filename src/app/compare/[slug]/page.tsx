@@ -1,10 +1,16 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CompareTable } from "@/components/site/CompareTable";
-import { Crumbs, CtaBanner, CtaInline, LinkGrid, SitePage } from "@/components/site/SiteChrome";
-import { COMPETITOR_BY_SLUG, COMPETITORS, TRADEMARKS } from "@/content/compare";
+import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
+import { checkedYear, COMPETITOR_BY_SLUG, COMPETITORS, lastChecked, TRADEMARKS } from "@/content/compare";
+import { IMPORT_BY_SLUG } from "@/content/imports";
 import { BRAND } from "@/lib/brand";
+import { ogImage } from "@/lib/ogImages";
+import { pageMeta } from "@/lib/pageMeta";
+import { absolute } from "@/lib/seo";
+import { SITE_URL } from "@/lib/site";
 
 export const dynamicParams = false;
 export const generateStaticParams = () => COMPETITORS.map((c) => ({ slug: c.slug }));
@@ -14,19 +20,33 @@ type Props = { params: Promise<{ slug: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const c = COMPETITOR_BY_SLUG.get((await params).slug);
   if (!c) return {};
-  return {
-    title: `${BRAND.name} vs ${c.name}: price, features and which to pick`,
+  return pageMeta({
+    title: `${BRAND.name} vs ${c.name} (${checkedYear(c)}): price, features and which to pick`,
     description: `${BRAND.name} and ${c.name} side by side: price, free plan, workout planning, plates, rest timer, platforms and health apps, with every ${c.name} fact sourced and dated.`,
-    alternates: { canonical: `/compare/${c.slug}/` },
-  };
+    path: `/compare/${c.slug}/`,
+  });
 }
 
 export default async function ComparePage({ params }: Props) {
   const c = COMPETITOR_BY_SLUG.get((await params).slug);
   if (!c) notFound();
   const others = COMPETITORS.filter((x) => x !== c);
+  const checked = lastChecked(c);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: `${BRAND.name} vs ${c.name}`,
+    description: `${BRAND.name} and ${c.name} side by side, with every ${c.name} fact sourced and dated.`,
+    url: absolute(`/compare/${c.slug}/`),
+    image: absolute(ogImage(`/compare/${c.slug}/`)),
+    datePublished: "2026-11-09",
+    dateModified: checked,
+    author: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
+    publisher: { "@type": "Organization", name: BRAND.name, url: SITE_URL },
+  };
   return (
     <SitePage kind="compare" sticky={`Try ${BRAND.name} free`}>
+      <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/compare/", label: "Compare" }, { label: `${BRAND.name} vs ${c.name}` }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">
         {BRAND.name} vs {c.name}
@@ -55,6 +75,15 @@ export default async function ComparePage({ params }: Props) {
         body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${c.slug === "hevy" || c.slug === "strong" ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`}
         button="Try it free"
       />
+      {IMPORT_BY_SLUG.has(c.slug) ? (
+        <p className="mt-4 text-muted">
+          Moving your history across?{" "}
+          <Link href={`/import/${c.slug}/`} className="text-accent underline underline-offset-2">
+            How to import your {c.name} workouts
+          </Link>
+          .
+        </p>
+      ) : null}
       <h2 className="mt-10 text-2xl font-bold tracking-tight">Side by side</h2>
       <CompareTable c={c} />
       <p className="mt-3 text-xs text-muted">

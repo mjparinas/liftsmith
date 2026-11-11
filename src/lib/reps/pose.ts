@@ -57,7 +57,9 @@ const ANGLE: Record<MotionProfile["signal"], [Joint, Joint, Joint]> = {
 const BAR: Record<MotionProfile["bar"], Joint> = { wrists: "wrist", shoulders: "shoulder", hips: "hip" };
 
 /** Angle at b in degrees, in pixel space (aspect = width / height of the frame). */
-export function angle(a: Keypoint, b: Keypoint, c: Keypoint, aspect = 1): number {
+export function angle(a: Keypoint | undefined, b: Keypoint | undefined, c: Keypoint | undefined, aspect = 1): number {
+  // A model that returns fewer points than the map expects leaves some out: no angle then.
+  if (!a || !b || !c) return NaN;
   const v1x = (a.x - b.x) * aspect;
   const v1y = a.y - b.y;
   const v2x = (c.x - b.x) * aspect;

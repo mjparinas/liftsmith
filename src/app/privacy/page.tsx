@@ -2,9 +2,14 @@ import type { Metadata } from "next";
 
 import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL } from "@/lib/site";
 
-export const metadata: Metadata = { title: "Privacy", description: `What ${BRAND.name} collects, why, and how to turn it off.` };
+export const metadata: Metadata = pageMeta({
+  title: "Privacy",
+  description: `What ${BRAND.name} collects, why, and how to turn it off.`,
+  path: "/privacy/",
+});
 
 // Keep in step with docs/PRIVACY_LABELS.md (Play Data safety and App Store privacy answers),
 // ios/App/App/PrivacyInfo.xcprivacy and public/privacypolicy.html (Health Connect rationale).
@@ -85,12 +90,13 @@ export default function Privacy() {
           away. Nothing is recorded, saved or sent to us.
         </p>
         <p className="mt-2">
-          With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and
-          respiratory rate from Health Connect or Apple Health to fill in setup, bring in weigh-ins and body fat, keep your TDEE (daily
-          calories) current, show the Health view on the Body tab against your own normal, and (with Pro) adjust how hard today&apos;s
-          workout is, and saves each finished workout back as a strength training workout with its time, title, sets, active calories and
-          average heart rate. These readings stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re
-          copied to your own account so your other devices have them, and nowhere else.{" "}
+          With your permission the app reads weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max,
+          respiratory rate and the calories and protein a food app logs from Health Connect or Apple Health to fill in setup, bring in
+          weigh-ins and body fat, keep your TDEE (daily calories) current, show the Health view on the Body tab against your own normal,
+          give coach&apos;s notes about what you eat, and (with Pro) adjust how hard today&apos;s workout is, and saves each finished
+          workout back as a strength training workout with its time, title, sets, active calories and average heart rate. These readings
+          stay on your phone and are never part of usage stats. If you sign in to sync, they&apos;re copied to your own account so your
+          other devices have them, and nowhere else.{" "}
           <a className="text-accent underline" href="/privacypolicy.html">
             More about health data
           </a>
@@ -188,7 +194,11 @@ export default function Privacy() {
           <a className="text-accent underline" href={`mailto:${CONTACT_EMAIL}`}>
             {CONTACT_EMAIL}
           </a>
-          . You can also send feedback from the app (Settings › Send feedback or report a bug).
+          . You can also send feedback from the app (Settings › Send feedback or report a bug). The rules for using {BRAND.name} are in our{" "}
+          <a className="text-accent underline" href="/terms/">
+            terms of use
+          </a>
+          .
         </p>
       </main>
       <SiteFooter />
