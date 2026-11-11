@@ -243,6 +243,7 @@ function PainCheck({ sessionId, exerciseId }: { sessionId: string; exerciseId: s
         <PainSelect
           key={i.id}
           label={t("inj.pain.afterSet", { part: PART_LABEL[i.part] })}
+          start={i.pain.at(-1)?.score ?? 0}
           onRate={(n) => ratePain(i.id, n, { sessionId, exerciseId })}
         />
       ))}

@@ -217,7 +217,9 @@ try {
   await scan("injury picker");
   await page.getByRole("button", { name: "Knee" }).click();
   await scan("pain rating");
-  await page.getByRole("button", { name: "6", exact: true }).click();
+  const rate = page.getByRole("dialog", { name: "How bad is it right now?" });
+  await rate.getByRole("slider", { name: "Pain from 0 to 10" }).fill("6");
+  await rate.getByRole("button", { name: "Save rating" }).click();
   await scan("injuries");
   await page.getByRole("button", { name: "Lighter" }).first().click();
   await scan("injury risk warning");
