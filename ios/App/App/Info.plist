@@ -84,7 +84,7 @@
 	<key>NSLocationDefaultAccuracyReduced</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Liftsmith reads your weight, height, sex, date of birth, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and respiratory rate to set up your training, keep your weigh-ins and daily calories current, and show how recovered you are.</string>
+	<string>Liftsmith reads your weight, height, sex, date of birth, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max, respiratory rate and the calories and protein your food app logs to set up your training, keep your weigh-ins and daily calories current, show how recovered you are, and coach you on what you eat.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Liftsmith saves your finished workouts, calories and heart rate to Apple Health.</string>
 	<key>UIBackgroundModes</key>
