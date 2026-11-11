@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { SubEvent } from "./adminMetrics";
-import { addMonths, commissionOn, creatorRows, HOLD_DAYS, payoutCsv, STORE_FEE, type Creator } from "./creatorMetrics";
+import { addMonths, codeStatus, commissionOn, creatorRows, HOLD_DAYS, payoutCsv, STORE_FEE, type Creator } from "./creatorMetrics";
 
 const DAY = 86_400_000;
 const NOW = Date.UTC(2027, 5, 1);
@@ -115,5 +115,29 @@ describe("creator commission", () => {
     });
     expect(row.cleared).toBe(0);
     expect(row.earned).toBeGreaterThan(0);
+  });
+});
+
+describe("code status", () => {
+  it("is paused, ended, used up or live, in that order", () => {
+    expect(codeStatus(creator({ active: false, endsAt: NOW - DAY, maxUses: 1 }), 5, NOW)).toBe("paused");
+    expect(codeStatus(creator({ endsAt: NOW, maxUses: 1 }), 5, NOW)).toBe("ended");
+    expect(codeStatus(creator({ endsAt: NOW + DAY, maxUses: 3 }), 3, NOW)).toBe("used-up");
+    expect(codeStatus(creator({ endsAt: NOW + DAY, maxUses: 3 }), 2, NOW)).toBe("live");
+    expect(codeStatus(creator(), 10_000, NOW)).toBe("live");
+  });
+
+  it("gives each row its uses left, last use and status", () => {
+    const install = (installId: string, at: number) => ({ installId, code: "LIFT-ALEX", at, source: "typed", platform: null });
+    const [full] = creatorRows({
+      now: NOW,
+      creators: [creator({ maxUses: 2 })],
+      installs: [install("a", NOW - 3 * DAY), install("b", NOW - DAY)],
+      subs: [],
+      payouts: [],
+    });
+    expect(full).toMatchObject({ signups: 2, usesLeft: 0, lastUsed: NOW - DAY, status: "used-up" });
+    const [fresh] = creatorRows({ now: NOW, creators: [creator()], installs: [], subs: [], payouts: [] });
+    expect(fresh).toMatchObject({ signups: 0, usesLeft: null, lastUsed: null, status: "live" });
   });
 });
