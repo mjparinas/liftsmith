@@ -1,3 +1,4 @@
+import { DANCE_ID, danceMotion } from "@/lib/demo/dance";
 import {
   boneFrame,
   bounds,
@@ -157,7 +158,7 @@ export function startLoop(
   let followD = 0;
 
   const setup = () => {
-    motion = stretchMotion(s.exerciseId) ?? motionFor(s.exerciseId);
+    motion = s.exerciseId === DANCE_ID ? danceMotion() : (stretchMotion(s.exerciseId) ?? motionFor(s.exerciseId));
     body = BODIES[s.body];
     place = placement(motion, body);
     frameBox = bounds(motion, body, place);
