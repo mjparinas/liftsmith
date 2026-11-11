@@ -83,6 +83,14 @@ export const FLAGS = {
     label: "Labs: today's max from warm-ups",
     description: "Estimates today's max from the camera's warm-up bar speeds and suggests a lighter or heavier first working set.",
   },
+  /** Labs: bikes, rowers, treadmills and cross trainers over Bluetooth (FTMS) fill in cardio sets (ftms.ts, machine.ts). */
+  labGymMachines: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: Bluetooth gym machines",
+    description:
+      "Bikes, rowers, treadmills and cross trainers that share their data over Bluetooth fill in time, distance and power on cardio.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;

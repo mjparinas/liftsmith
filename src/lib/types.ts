@@ -431,6 +431,8 @@ export interface SetEvent extends EventBase {
   targetReps: number;
   /** Metres covered, for cardio logged with distance (reps are then the seconds it took). */
   distanceM?: number;
+  /** Average watts, for cardio filled in by a Bluetooth gym machine (Labs, `labGymMachines`). */
+  powerW?: number;
   /** Reps in reserve the plan aimed for. */
   rir: number;
   // Captured automatically (Melvin, 2026-11-09: "win on data"). Optional so older events still load.

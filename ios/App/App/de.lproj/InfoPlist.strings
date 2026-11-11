@@ -1,6 +1,6 @@
 /* German permission prompts. Keep in step with Info.plist. */
 "NSCameraUsageDescription" = "Für Fortschrittsfotos und, wenn du es einschaltest, zum Zählen deiner Wiederholungen. Fotos bleiben auf diesem Telefon und werden nie hochgeladen; beim Zählen wird das Video auf diesem iPhone ausgewertet und nie aufgenommen oder gesendet.";
-"NSBluetoothAlwaysUsageDescription" = "Liftsmith verbindet sich mit deinem Brustgurt oder deiner Uhr, um deine Herzfrequenz beim Training live anzuzeigen.";
+"NSBluetoothAlwaysUsageDescription" = "Liftsmith verbindet sich mit deinem Brustgurt oder deiner Uhr, um deine Herzfrequenz beim Training live anzuzeigen, und mit Fitnessgeräten über Bluetooth, um dein Cardio einzutragen.";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith nutzt beim Öffnen der App deinen ungefähren Standort, um das Studio zu wählen, in dem du bist. Er verfolgt dich nie im Hintergrund, und dein Standort bleibt auf deinem Telefon.";
 "NSHealthShareUsageDescription" = "Liftsmith liest Gewicht, Größe, Geschlecht, Geburtsdatum, Körperfett, Ruheherzfrequenz, Schlaf, Herzfrequenzvariabilität, Schritte, VO2max, Atemfrequenz sowie die Kalorien und das Protein aus deiner Ernährungs-App, um dein Training zu planen, deine Wiegungen und deinen täglichen Kalorienbedarf aktuell zu halten, deine Erholung zu zeigen und dir Tipps zur Ernährung zu geben.";
 "NSHealthUpdateUsageDescription" = "Liftsmith speichert deine beendeten Trainings mit Kalorien und Herzfrequenz in Health.";

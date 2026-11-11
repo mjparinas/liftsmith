@@ -36,6 +36,8 @@ export interface Active {
   repsR?: number;
   /** Cardio logged with distance: metres for the next set, editable with a stepper. */
   distanceM?: number;
+  /** Cardio from a Bluetooth gym machine (Labs): average watts for the next set, filled in by the machine. */
+  powerW?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -97,7 +99,7 @@ export function loadItem(get: () => State, a: Active, index: number): Active {
   const first = !started && item.warmup?.[0];
   const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
   const distanceM = startDistance(exercise(item.exerciseId), get().events);
-  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM };
+  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM, powerW: undefined };
 }
 
 /** How long Undo stays offered after Log set when there's no rest to wait through. */
@@ -138,6 +140,8 @@ export interface WorkoutSlice {
   adjustRight(reps: number | undefined): void;
   /** Sets the next cardio set's distance (metres). */
   adjustDistance(m: number): void;
+  /** A Bluetooth gym machine (Labs) filled in the cardio set on screen: seconds, and metres and watts when it has them. */
+  machineSet(v: { seconds: number; distanceM?: number; powerW?: number }): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Ends the rest early at `until` (heart-rate rest timer lab), shortening restTotal by the same amount. */
@@ -371,6 +375,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
           ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
+          ...(ex.cardio && a.powerW !== undefined ? { powerW: a.powerW } : {}),
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
@@ -396,6 +401,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       let next: Active = {
         ...a,
         repsR: undefined,
+        powerW: undefined,
         lastAt: now,
         restStart: now,
         lastRest: undefined,
@@ -485,6 +491,23 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const a = get().active;
       if (!a) return;
       const next = { ...a, distanceM: Math.max(0, Math.round(m)), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    machineSet(v) {
+      const a = get().active;
+      const item = a?.plan.items[a.index];
+      if (!a || !item) return;
+      const ex = exercise(item.exerciseId);
+      if (!ex.cardio) return;
+      const next: Active = {
+        ...a,
+        reps: Math.max(1, Math.round(v.seconds)),
+        ...(ex.cardio === "distance" && v.distanceM !== undefined ? { distanceM: Math.max(0, Math.round(v.distanceM)) } : {}),
+        powerW: v.powerW,
+        lastAt: Date.now(),
+      };
       set({ active: next });
       persistActive(next);
     },

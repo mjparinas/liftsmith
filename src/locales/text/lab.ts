@@ -37,6 +37,21 @@ export const en = {
   "lab.voiceLog.title": "Voice set logging",
   "lab.voiceLog.body":
     'Adds a microphone above Log set on the workout screen. Tap it and say "100 for 8", "8 reps", "too easy" or "undo". Speech is recognized on your phone and never recorded or sent, so it needs a phone that can do that in your language.',
+  "lab.machines.title": "Bluetooth gym machines",
+  "lab.machines.body":
+    "On cardio, connect a bike, rower, treadmill or cross trainer that shares its numbers over Bluetooth (the fitness machine standard most newer machines use). Time, distance and power fill in by themselves, ready for Log set, and the steppers still work if something's off. In the web app it needs Chrome.",
+  "lab.machines.connect": "Connect machine",
+  "lab.machines.device": "the machine",
+  "lab.machines.live": "{name} is filling in this set.",
+  "lab.machines.reconnecting": "Reconnecting to {name}… What it sent so far is kept.",
+  "lab.machines.power": "{watts} W average",
+  "lab.machines.disconnect": "Disconnect",
+  "lab.machines.err.notFound":
+    "No gym machine showed up. Start pedalling or rowing to wake it, keep your phone close, and check it isn't connected to another app.",
+  "lab.machines.err.noService": "{name} doesn't share its numbers the standard way, so it can't connect.",
+  "lab.machines.err.lost": "Lost {name}. What it sent so far is kept. Tap Connect machine to carry on.",
+  "lab.machines.err.failed":
+    "Couldn't connect to {name}. It may be connected to another app or watch: disconnect it there, keep it close, and try again.",
 };
 
 type Key = keyof typeof en;
@@ -76,6 +91,22 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrar series con la voz",
   "lab.voiceLog.body":
     "Añade un micrófono encima de Registrar serie en la pantalla de entrenamiento. Tócalo y di «100 por 8», «8 repeticiones», «demasiado fácil» o «deshacer». La voz se reconoce en tu teléfono y nunca se graba ni se envía, así que necesita un teléfono que pueda hacerlo en tu idioma.",
+  "lab.machines.title": "Máquinas de gimnasio por Bluetooth",
+  "lab.machines.body":
+    "En el cardio, conecta una bici, un remo, una cinta o una elíptica que comparta sus datos por Bluetooth (el estándar de máquinas de fitness que usan la mayoría de las máquinas nuevas). El tiempo, la distancia y la potencia se rellenan solos, listos para Registrar serie, y los botones siguen funcionando si algo no cuadra. En la app web necesita Chrome.",
+  "lab.machines.connect": "Conectar máquina",
+  "lab.machines.device": "la máquina",
+  "lab.machines.live": "{name} está rellenando esta serie.",
+  "lab.machines.reconnecting": "Reconectando con {name}… Se conserva lo que ha enviado hasta ahora.",
+  "lab.machines.power": "{watts} W de media",
+  "lab.machines.disconnect": "Desconectar",
+  "lab.machines.err.notFound":
+    "No apareció ninguna máquina. Empieza a pedalear o remar para activarla, mantén el teléfono cerca y comprueba que no esté conectada a otra app.",
+  "lab.machines.err.noService": "{name} no comparte sus datos de la forma estándar, así que no se puede conectar.",
+  "lab.machines.err.lost":
+    "Se perdió la conexión con {name}. Se conserva lo que ha enviado hasta ahora. Toca Conectar máquina para seguir.",
+  "lab.machines.err.failed":
+    "No se pudo conectar con {name}. Puede que esté conectada a otra app o reloj: desconéctala ahí, mantenla cerca y vuelve a intentarlo.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -114,6 +145,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Saisie des séries à la voix",
   "lab.voiceLog.body":
     "Ajoute un micro au-dessus de Valider la série sur l'écran d'entraînement. Touchez-le et dites « 100 pour 8 », « 8 répétitions », « trop facile » ou « annuler ». La parole est reconnue sur votre téléphone et n'est jamais enregistrée ni envoyée, il faut donc un téléphone qui sait le faire dans votre langue.",
+  "lab.machines.title": "Machines de salle en Bluetooth",
+  "lab.machines.body":
+    "En cardio, connectez un vélo, un rameur, un tapis de course ou un vélo elliptique qui partage ses données en Bluetooth (la norme des machines de fitness qu'utilisent la plupart des machines récentes). Le temps, la distance et la puissance se remplissent tout seuls, prêts pour Valider la série, et les boutons fonctionnent toujours si quelque chose cloche. Dans l'app web, il faut Chrome.",
+  "lab.machines.connect": "Connecter la machine",
+  "lab.machines.device": "la machine",
+  "lab.machines.live": "{name} remplit cette série.",
+  "lab.machines.reconnecting": "Reconnexion à {name}… Ce qu'elle a envoyé est conservé.",
+  "lab.machines.power": "{watts} W en moyenne",
+  "lab.machines.disconnect": "Déconnecter",
+  "lab.machines.err.notFound":
+    "Aucune machine n'est apparue. Commencez à pédaler ou à ramer pour la réveiller, gardez le téléphone près d'elle et vérifiez qu'elle n'est pas connectée à une autre app.",
+  "lab.machines.err.noService": "{name} ne partage pas ses données de la façon standard, la connexion est donc impossible.",
+  "lab.machines.err.lost": "Connexion perdue avec {name}. Ce qu'elle a envoyé est conservé. Touchez Connecter la machine pour continuer.",
+  "lab.machines.err.failed":
+    "Impossible de se connecter à {name}. Elle est peut-être connectée à une autre app ou montre : déconnectez-la, restez à côté et réessayez.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -152,6 +198,22 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Sätze per Stimme eintragen",
   "lab.voiceLog.body":
     "Fügt auf dem Trainingsbildschirm über Satz eintragen ein Mikrofon hinzu. Tipp darauf und sag „100 für 8“, „8 Wiederholungen“, „zu leicht“ oder „rückgängig“. Die Sprache wird auf deinem Handy erkannt und nie aufgenommen oder gesendet, daher braucht es ein Handy, das das in deiner Sprache kann.",
+  "lab.machines.title": "Fitnessgeräte über Bluetooth",
+  "lab.machines.body":
+    "Verbinde beim Cardio ein Rad, ein Rudergerät, ein Laufband oder einen Crosstrainer, der seine Werte über Bluetooth teilt (der Fitnessgeräte-Standard, den die meisten neueren Geräte nutzen). Zeit, Strecke und Leistung füllen sich von selbst aus, bereit für Satz eintragen, und die Tasten funktionieren weiter, falls etwas nicht stimmt. In der Web-App braucht es Chrome.",
+  "lab.machines.connect": "Gerät verbinden",
+  "lab.machines.device": "das Gerät",
+  "lab.machines.live": "{name} füllt diesen Satz aus.",
+  "lab.machines.reconnecting": "Verbindung zu {name} wird wiederhergestellt… Was bisher gesendet wurde, bleibt erhalten.",
+  "lab.machines.power": "{watts} W im Schnitt",
+  "lab.machines.disconnect": "Trennen",
+  "lab.machines.err.notFound":
+    "Kein Fitnessgerät gefunden. Fang an zu treten oder zu rudern, um es aufzuwecken, bleib mit dem Handy in der Nähe und prüf, dass es nicht mit einer anderen App verbunden ist.",
+  "lab.machines.err.noService": "{name} teilt seine Werte nicht auf die übliche Weise und kann daher nicht verbunden werden.",
+  "lab.machines.err.lost":
+    "Verbindung zu {name} verloren. Was bisher gesendet wurde, bleibt erhalten. Tippe auf Gerät verbinden, um weiterzumachen.",
+  "lab.machines.err.failed":
+    "Keine Verbindung zu {name}. Vielleicht ist es mit einer anderen App oder Uhr verbunden: trenn es dort, bleib in der Nähe und versuch es noch einmal.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -189,6 +251,21 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrare le serie con la voce",
   "lab.voiceLog.body":
     "Aggiunge un microfono sopra Registra serie nella schermata dell'allenamento. Toccalo e di' «100 per 8», «8 ripetizioni», «troppo facile» o «annulla». La voce viene riconosciuta sul telefono e non viene mai registrata né inviata, quindi serve un telefono che sappia farlo nella tua lingua.",
+  "lab.machines.title": "Macchine da palestra via Bluetooth",
+  "lab.machines.body":
+    "Nel cardio, collega una bici, un vogatore, un tapis roulant o un'ellittica che condivide i suoi dati via Bluetooth (lo standard per macchine fitness usato dalla maggior parte delle macchine recenti). Tempo, distanza e potenza si compilano da soli, pronti per Registra serie, e i pulsanti funzionano comunque se qualcosa non torna. Nell'app web serve Chrome.",
+  "lab.machines.connect": "Collega macchina",
+  "lab.machines.device": "la macchina",
+  "lab.machines.live": "{name} sta compilando questa serie.",
+  "lab.machines.reconnecting": "Ricollegamento a {name}… Quello che ha inviato finora resta.",
+  "lab.machines.power": "{watts} W di media",
+  "lab.machines.disconnect": "Scollega",
+  "lab.machines.err.notFound":
+    "Non è comparsa nessuna macchina. Inizia a pedalare o remare per attivarla, tieni il telefono vicino e controlla che non sia collegata a un'altra app.",
+  "lab.machines.err.noService": "{name} non condivide i suoi dati nel modo standard, quindi non si può collegare.",
+  "lab.machines.err.lost": "Collegamento con {name} perso. Quello che ha inviato finora resta. Tocca Collega macchina per continuare.",
+  "lab.machines.err.failed":
+    "Impossibile collegarsi a {name}. Potrebbe essere collegata a un'altra app o a un orologio: scollegala lì, resta vicino e riprova.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -226,4 +303,19 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "声でセットを記録",
   "lab.voiceLog.body":
     "ワークアウト画面の「セットを記録」の上にマイクを追加します。タップして「100キロで8回」「8回」「簡単すぎ」「取り消し」のように言ってください。音声はスマートフォン上で認識され、録音や送信はされないため、お使いの言語でそれができるスマートフォンが必要です。",
+  "lab.machines.title": "Bluetooth ジムマシン",
+  "lab.machines.body":
+    "有酸素運動で、Bluetooth でデータを共有するバイク、ローイングマシン、トレッドミル、クロストレーナー（最近のほとんどのマシンが使うフィットネスマシンの標準規格）を接続します。時間、距離、パワーが自動で入力され、そのまま「セットを記録」できます。値がずれていてもボタンで直せます。Web アプリでは Chrome が必要です。",
+  "lab.machines.connect": "マシンを接続",
+  "lab.machines.device": "マシン",
+  "lab.machines.live": "{name}がこのセットを入力しています。",
+  "lab.machines.reconnecting": "{name}に再接続しています… これまでに送られたデータは残ります。",
+  "lab.machines.power": "平均 {watts} W",
+  "lab.machines.disconnect": "切断",
+  "lab.machines.err.notFound":
+    "ジムマシンが見つかりませんでした。ペダルをこぐかローイングを始めてマシンを起動し、スマートフォンを近づけ、ほかのアプリに接続されていないか確認してください。",
+  "lab.machines.err.noService": "{name}は標準の方法でデータを共有していないため、接続できません。",
+  "lab.machines.err.lost": "{name}との接続が切れました。これまでに送られたデータは残ります。「マシンを接続」をタップして続けてください。",
+  "lab.machines.err.failed":
+    "{name}に接続できませんでした。ほかのアプリやウォッチに接続されている可能性があります。そちらで切断し、近くで再度お試しください。",
 };

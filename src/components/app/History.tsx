@@ -241,7 +241,10 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
                 {g.sets.map((s, j) => (
                   <li key={s.id} className="num flex items-center gap-3 border-b border-line/60 py-1 last:border-0">
                     <span className="w-5 text-faint">{j + 1}</span>
-                    <span className="flex-1">{ex ? setText(ex, s.weight, s.reps, unit, s.distanceM) : num(s.reps)}</span>
+                    <span className="flex-1">
+                      {ex ? setText(ex, s.weight, s.reps, unit, s.distanceM) : num(s.reps)}
+                      {s.powerW !== undefined && ` · ${t("lab.machines.power", { watts: s.powerW })}`}
+                    </span>
                     {prIds.has(s.id) && (
                       <span className="flex items-center text-gold">
                         <Icon name="trophy" size={14} />
