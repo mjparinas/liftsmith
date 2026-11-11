@@ -32,7 +32,7 @@ export interface Lab {
 // One line per lab, so two changes adding one don't touch the same line.
 export const LABS: readonly Lab[] = [
   { flag: "labRepCount", key: "repCount" },
-  { flag: "repMotion", key: "repMotion", needs: "labRepCount" },
+  { flag: "repMotion", key: "repMotion" },
   { flag: "labBarSpeed", key: "barSpeed", needs: "labRepCount" },
   { flag: "labHrRest", key: "hrRest" },
   { flag: "labFormCheck", key: "formCheck", needs: "labRepCount" },
