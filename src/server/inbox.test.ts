@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ADMIN_LINK_SUBJECT } from "./adminAuth";
 import { query, resetDb } from "./db";
 import {
   addressOf,
@@ -90,6 +91,42 @@ describe("admin inbox", () => {
     ]);
     await markArchived("archived", true, NOW);
     expect((await waitingMail(NOW, f)).map((m) => m.id)).toEqual(["new"]);
+  });
+
+  it("keeps archived mail archived on the next load, and moves it back on request", async () => {
+    const { f } = fakeResend([{ data: [mail("k1", "hello@getliftsmith.com"), mail("k2", "hello@getliftsmith.com")], has_more: false }]);
+    await markArchived("k1", true, NOW);
+    let items = (await listInbox({}, f)).items;
+    expect(items.find((m) => m.id === "k1")?.archivedAt).toBe(NOW);
+    expect(items.find((m) => m.id === "k2")?.archivedAt).toBeNull();
+    await markArchived("k1", false, NOW);
+    items = (await listInbox({}, f)).items;
+    expect(items.find((m) => m.id === "k1")?.archivedAt).toBeNull();
+  });
+
+  it("leaves the panel's own sign-in emails out, so a new one doesn't look like archived mail coming back", async () => {
+    const us = "Liftsmith <hello@getliftsmith.com>";
+    const link = { ...mail("link1", "hello@getliftsmith.com", us), subject: ADMIN_LINK_SUBJECT };
+    const spoof = { ...mail("spoof", "hello@getliftsmith.com"), subject: ADMIN_LINK_SUBJECT };
+    const { f } = fakeResend([{ data: [link, spoof, mail("p1", "hello@getliftsmith.com")], has_more: false }], { link1: link });
+    expect((await listInbox({}, f)).items.map((m) => m.id)).toEqual(["spoof", "p1"]);
+    await expect(getInboxMessage("link1", f)).rejects.toBeInstanceOf(InboxError);
+  });
+
+  it("files our own robot mail in Archived, but not in-app feedback, and remembers moving it back", async () => {
+    const us = "Liftsmith <hello@getliftsmith.com>";
+    const digest = { ...mail("d1", "hello@getliftsmith.com", us), subject: "Liftsmith today: 4 to do" };
+    const feedback = {
+      ...mail("fb1", "hello@getliftsmith.com", "Liftsmith feedback <hello@getliftsmith.com>"),
+      subject: "[Liftsmith Bug] It broke",
+    };
+    const { f } = fakeResend([{ data: [digest, feedback], has_more: false }]);
+    let items = (await listInbox({}, f)).items;
+    expect(items.find((m) => m.id === "d1")?.archivedAt).toBe(NOW - DAY);
+    expect(items.find((m) => m.id === "fb1")?.archivedAt).toBeNull();
+    await markArchived("d1", false, NOW);
+    items = (await listInbox({}, f)).items;
+    expect(items.find((m) => m.id === "d1")?.archivedAt).toBeNull();
   });
 
   it("won't open another domain's message", async () => {

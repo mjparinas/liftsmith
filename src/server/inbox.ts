@@ -4,6 +4,7 @@
 //
 // One Resend account receives for several domains (Gradelings too), so only mail addressed to our own domain
 // (INBOX_DOMAINS, default getliftsmith.com) is listed or opened here.
+import { ADMIN_LINK_SUBJECT } from "./adminAuth";
 import { query, run } from "./db";
 import { hasRemoteImages } from "./emailHtml";
 
@@ -96,6 +97,24 @@ export function isOurs(m: Pick<ResendReceived, "to" | "cc">, domains = inboxDoma
   return [...(m.to ?? []), ...(m.cc ?? [])].some((a) => domains.some((d) => addressOf(a).endsWith(`@${d}`)));
 }
 
+/**
+ * The panel's own sign-in emails go to an admin address, which is often hello@ itself, so a new one arrived on
+ * every sign-in and looked like the one just archived coming back (Melvin, 2026-11-11). They're one-use links, so
+ * they're never listed or opened here.
+ */
+export function isSignInLink(m: Pick<ResendReceived, "from" | "subject">, domains = inboxDomains()): boolean {
+  const from = addressOf(m.from);
+  return m.subject?.trim() === ADMIN_LINK_SUBJECT && domains.some((d) => from.endsWith(`@${d}`));
+}
+
+/**
+ * Mail our own servers sent to hello@ (the morning digest, alerts) that isn't in-app feedback: it goes straight to
+ * Archived, because nobody answers it and a new one arrives every day. "Move to inbox" still brings one back.
+ */
+export function isRobotMail(m: Pick<InboxItem, "fromEmail" | "subject">, domains = inboxDomains()): boolean {
+  return domains.some((d) => m.fromEmail.endsWith(`@${d}`)) && !/^\[Liftsmith /.test(m.subject);
+}
+
 async function enrich(items: ResendReceived[]): Promise<InboxItem[]> {
   if (!items.length) return [];
   const ids = items.map((i) => i.id);
@@ -111,7 +130,7 @@ async function enrich(items: ResendReceived[]): Promise<InboxItem[]> {
   const num = (v: unknown) => (v == null ? null : Number(v));
   return items.map((i) => {
     const s = state.get(i.id);
-    return {
+    const item: InboxItem = {
       id: i.id,
       from: i.from,
       fromEmail: addressOf(i.from),
@@ -122,8 +141,11 @@ async function enrich(items: ResendReceived[]): Promise<InboxItem[]> {
       handledAt: num(s?.handled_at),
       repliedAt: num(s?.replied_at),
       repliedBy: s?.replied_by == null ? null : String(s.replied_by),
-      archivedAt: num(s?.archived_at),
+      archivedAt: Number(s?.archived_at) || null,
     };
+    // No choice made yet (null; 0 means moved back to the inbox by hand): our own robot mail files itself.
+    if (s?.archived_at == null && isRobotMail(item)) item.archivedAt = item.receivedAt || 1;
+    return item;
   });
 }
 
@@ -143,7 +165,7 @@ export async function listInbox(
     const data = res.data ?? [];
     for (const m of data) {
       after = m.id;
-      if (isOurs(m)) ours.push(m);
+      if (isOurs(m) && !isSignInLink(m)) ours.push(m);
       if (ours.length >= limit) break;
     }
     more = Boolean(res.has_more) && data.length > 0;
@@ -194,7 +216,7 @@ export interface InboxMessage extends InboxItem {
 async function received(id: string, f: typeof fetch = fetch): Promise<ResendReceived> {
   const m = await resend<ResendReceived>(`/emails/receiving/${encodeURIComponent(id)}`, f);
   // Another domain's mail in the same Resend account stays out of this panel.
-  if (!isOurs(m)) throw new InboxError("Resend has no such message.", 404);
+  if (!isOurs(m) || isSignInLink(m)) throw new InboxError("Resend has no such message.", 404);
   return m;
 }
 
@@ -228,11 +250,14 @@ export async function markHandled(id: string, handled: boolean, now = Date.now()
   );
 }
 
-/** Archiving moves a message out of the Inbox list into Archived; it stays in Resend either way. */
+/**
+ * Archiving moves a message out of the Inbox list into Archived; it stays in Resend either way. Moving one back
+ * stores 0 rather than nothing, so robot mail that files itself stays in the inbox once an admin brings it back.
+ */
 export async function markArchived(id: string, archived: boolean, now = Date.now()): Promise<void> {
   await run(
     "INSERT INTO inbox_state (email_id, archived_at) VALUES (?, ?) ON CONFLICT (email_id) DO UPDATE SET archived_at = excluded.archived_at",
-    [id, archived ? now : null],
+    [id, archived ? now : 0],
   );
 }
 
