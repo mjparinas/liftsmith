@@ -177,6 +177,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Delightful extras](docs/decisions/delightful-extras.md) (`achievements.ts`, `moments.ts`, `recap.ts`, `shareImage.ts`)
 - [Engagement and juice](docs/decisions/engagement-and-juice.md) (`game.ts`, `achievements.ts`, `shareImage.ts`)
 - [Fitness age](docs/decisions/fitness-age.md) (`docs/FITNESS_AGE.md`, `src/lib/fitnessAge.ts`, `HealthTwin.tsx`, `health.ts`)
+- [Friends and the workout feed](docs/decisions/friends.md) (`src/server/social.ts`, `src/lib/social.ts`, `Friends.tsx`, `src/server/moderation.ts`)
 - [Google Play review](docs/decisions/google-play-review.md) (`health.ts`, `docs/PRIVACY_LABELS.md`, `site.ts`)
 - [Gym by location](docs/decisions/gym-by-location.md) (`src/lib/geo.ts`)
 - [Health twin](docs/decisions/health-twin.md) (`Recovery.tsx`, `HealthTwin.tsx`, `src/lib/twin.ts`, `readiness.ts`)

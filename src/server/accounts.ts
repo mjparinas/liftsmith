@@ -9,6 +9,7 @@ import { hasLifetimePro } from "./creators";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
+import { socialDeletes } from "./social";
 
 export const SESSION_MS = 365 * 86_400_000;
 const CODE_MS = 10 * 60_000;
@@ -254,6 +255,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
+    ...socialDeletes(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

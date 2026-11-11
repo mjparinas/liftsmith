@@ -201,6 +201,86 @@ try {
   await page.goto(`${server.url}/app/#/connections`);
   await page.getByRole("heading", { name: "Connected apps" }).waitFor();
   await scan("connections");
+  // Friends (docs/decisions/friends.md): signed out, then signed in with the API answered here (the static build has
+  // none): the feed with a post, its comments, activity, people, and a person's page.
+  await page.goto(`${server.url}/app/#/friends`);
+  await page.getByText("Train with friends").waitFor();
+  await scan("friends signed out");
+  const friendsPost = {
+    id: "p1",
+    handle: "blair",
+    name: "Blair",
+    at: Date.now() - 3_600_000,
+    likes: 2,
+    liked: false,
+    comments: 1,
+    mine: false,
+    body: {
+      v: 1,
+      seconds: 3100,
+      sets: 14,
+      volume: 5200,
+      prs: 1,
+      muscles: ["chest", "triceps"],
+      exercises: [{ id: "bench-press", name: "Bench press", sets: 4, w: 100, r: 5 }],
+    },
+  };
+  const friendsApi = {
+    me: {
+      profile: { handle: "alex", name: "Alex", open: false, autoPost: false, weights: true },
+      followers: 1,
+      following: 1,
+      requests: 1,
+      unread: 2,
+    },
+    feed: { posts: [friendsPost], more: false },
+    person: { posts: [friendsPost], more: false },
+    thread: {
+      post: friendsPost,
+      comments: [
+        { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
+      ],
+    },
+    activity: { items: [{ kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" }] },
+    people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
+    lookup: {
+      person: {
+        handle: "blair",
+        name: "Blair",
+        followers: 3,
+        following: 2,
+        posts: 1,
+        relation: "following",
+        followsYou: true,
+        canSee: true,
+        open: false,
+      },
+    },
+  };
+  await page.route("**/api/social/", (r) => r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }));
+  await page.route("**/api/sync/", (r) => r.fulfill({ json: { cursor: 0, events: [], deleted: [], records: [], more: false } }));
+  await page.evaluate(() =>
+    localStorage.setItem("liftsmith.account", JSON.stringify({ token: "t", id: "a", email: null, providers: ["email"], via: "email" })),
+  );
+  await page.reload();
+  await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
+  await scan("friends feed");
+  await page.getByRole("button", { name: /^Comments/ }).click();
+  await page.getByText("Strong work!").waitFor();
+  await scan("friends comments");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /^Activity/ }).click();
+  await page.getByText("Blair liked your workout").waitFor();
+  await scan("friends activity");
+  await page.getByRole("button", { name: /^People/ }).click();
+  await page.getByRole("button", { name: "Accept" }).waitFor();
+  await scan("friends people");
+  await page.goto(`${server.url}/app/#/person/blair`);
+  await page.getByText("Follows you").waitFor();
+  await scan("friends person");
+  await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
+  await page.unroute("**/api/social/");
+  await page.unroute("**/api/sync/");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
   // Every group page of Settings, and Labs (2026-11-10).

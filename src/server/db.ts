@@ -378,6 +378,72 @@ const SCHEMA = [
     image BLOB NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
+  // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
+  `CREATE TABLE IF NOT EXISTS social_profiles (
+    account_id TEXT PRIMARY KEY,
+    handle TEXT NOT NULL UNIQUE,
+    name TEXT NOT NULL,
+    open INTEGER NOT NULL DEFAULT 0,
+    auto_post INTEGER NOT NULL DEFAULT 0,
+    weights INTEGER NOT NULL DEFAULT 1,
+    agreed_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    seen_at INTEGER NOT NULL DEFAULT 0,
+    suspended INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE TABLE IF NOT EXISTS follows (
+    follower_id TEXT NOT NULL,
+    followee_id TEXT NOT NULL,
+    accepted INTEGER NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (follower_id, followee_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS follows_followee ON follows (followee_id, accepted)`,
+  `CREATE TABLE IF NOT EXISTS blocks (
+    blocker_id TEXT NOT NULL,
+    blocked_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (blocker_id, blocked_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS blocks_blocked ON blocks (blocked_id)`,
+  `CREATE TABLE IF NOT EXISTS posts (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    workout_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    UNIQUE (account_id, workout_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS posts_account_at ON posts (account_id, at)`,
+  `CREATE TABLE IF NOT EXISTS post_likes (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS post_comments (
+    id TEXT PRIMARY KEY,
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    body TEXT NOT NULL,
+    hidden INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS post_comments_post ON post_comments (post_id, created_at)`,
+  `CREATE TABLE IF NOT EXISTS reports (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    reporter_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    target_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    UNIQUE (reporter_id, kind, target_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,

@@ -34,6 +34,7 @@ import { Achievements } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { Feedback } from "./Feedback";
+import { Friends, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -308,6 +309,8 @@ export function App() {
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
     routine: <SharedRoutine code={arg} />,
+    friends: <Friends />,
+    person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

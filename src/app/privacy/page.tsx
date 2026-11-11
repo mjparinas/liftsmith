@@ -118,6 +118,16 @@ export default function Privacy() {
           Account and sync, which deletes your account and our copy at once.
         </p>
 
+        <h2 className="mt-8 text-xl font-semibold">Friends</h2>
+        <p className="mt-2">
+          Friends is optional and needs an account. If you join, we keep the handle and name you pick, who you follow and who follows you,
+          who you&apos;ve blocked, and what you post: the workouts you choose to post (or every workout, if you turn that on), with their
+          time, sets, exercises and best sets (weights only if you show them), plus your likes and comments. Your followers see your posts;
+          by default you approve each follower first. A post never includes heart rate, body weight or fat, measurements, cycle data,
+          injuries, gyms or places. If you report something, we keep the report and who made it so we can review it, and the person you
+          reported isn&apos;t told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
+        </p>
+
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};

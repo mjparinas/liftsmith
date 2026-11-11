@@ -1,0 +1,206 @@
+import { createHash } from "node:crypto";
+import { beforeEach, describe, expect, it } from "vitest";
+
+import { deleteAccount } from "./accounts";
+import { query, resetDb } from "./db";
+import { checkText, hasBlockedWord, hasLink, normalize } from "./moderation";
+import { adminReports, checkHandle, handle, HIDE_AFTER, parsePost, resolveReports } from "./social";
+
+const NOW = 1_800_000_000_000;
+const DAY = 86_400_000;
+
+const call = (who: string, op: string, b: Record<string, unknown> = {}, now = NOW) => handle(who, { op, ...b }, now);
+const join = (who: string, handle: string, extra: Record<string, unknown> = {}) =>
+  call(who, "join", { handle, name: handle.toUpperCase(), agree: true, ...extra });
+const workout = (id = "s1", at = NOW - 3_600_000) => ({
+  workoutId: id,
+  at,
+  body: {
+    seconds: 3000,
+    sets: 12,
+    volume: 4200,
+    prs: 1,
+    muscles: ["chest", "triceps"],
+    exercises: [{ id: "bench", name: "Bench press", sets: 4, w: 100, r: 5 }],
+    heartRate: 150, // never kept
+  },
+});
+async function friends(a = "acc-a", b = "acc-b") {
+  await join(a, "alex");
+  await join(b, "blair");
+  await call(b, "follow", { handle: "alex" });
+  await call(a, "answer", { handle: "blair", accept: true });
+}
+const feedOf = async (who: string) =>
+  (await call(who, "feed")).body.posts as { id: string; handle: string; likes: number; comments: number }[];
+
+beforeEach(async () => {
+  await resetDb();
+});
+
+describe("moderation", () => {
+  it("normalizes the usual dodges", () => {
+    expect(normalize("HeLLLo")).toBe("helo");
+    expect(normalize("Çа")).toBe("c"); // Cyrillic а is not a Latin letter, so it's dropped
+    expect(normalize("b4d")).toBe("bad");
+  });
+
+  it("refuses words on the list as whole words only", () => {
+    const list = new Set([createHash("sha256").update(normalize("badword")).digest("hex").slice(0, 16)]);
+    expect(hasBlockedWord("you B4DW0RD", list)).toBe(true);
+    expect(hasBlockedWord("so baaadword!", list)).toBe(true);
+    expect(hasBlockedWord("notbadwordish", list)).toBe(false);
+    expect(hasBlockedWord("Great squat!", list)).toBe(false);
+  });
+
+  it("refuses links", () => {
+    expect(hasLink("see https://x.y")).toBe(true);
+    expect(hasLink("buy at cheap-pills.com")).toBe(true);
+    expect(hasLink("www.example")).toBe(true);
+    expect(hasLink("Nice. 100 kg × 5")).toBe(false);
+    expect(checkText("  ", 10)).toEqual({ ok: false, error: "empty" });
+    expect(checkText("Strong   work‮", 280)).toEqual({ ok: true, text: "Strong work" });
+  });
+
+  it("checks handles", () => {
+    expect(checkHandle("@Alex_99")).toEqual({ ok: true, handle: "alex_99" });
+    expect(checkHandle("ab")).toEqual({ ok: false, error: "handle" });
+    expect(checkHandle("has space")).toEqual({ ok: false, error: "handle" });
+    expect(checkHandle("admin")).toEqual({ ok: false, error: "handleTaken" });
+    expect(checkHandle("realliftsmith")).toEqual({ ok: false, error: "handleTaken" });
+  });
+});
+
+describe("joining", () => {
+  it("needs the community rules agreed and a free handle, with private defaults", async () => {
+    expect((await call("acc-a", "join", { handle: "alex" })).body.error).toBe("agree");
+    const r = await join("acc-a", "alex");
+    expect(r.body.profile).toEqual({ handle: "alex", name: "ALEX", open: false, autoPost: false, weights: true });
+    expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
+    expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
+  });
+
+  it("keeps links out of names", async () => {
+    expect((await join("acc-a", "alex", { name: "visit spam.com" })).body.error).toBe("name.link");
+  });
+});
+
+describe("following", () => {
+  it("asks first by default, and follows at once when the profile is open", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    const r = await call("acc-b", "follow", { handle: "alex" }, NOW + 1000);
+    expect(r.body.person).toMatchObject({ relation: "requested", canSee: false });
+    expect((await call("acc-a", "me")).body).toMatchObject({ requests: 1, unread: 1 });
+    await call("acc-a", "answer", { handle: "blair", accept: true });
+    expect((await call("acc-b", "lookup", { handle: "alex" })).body.person).toMatchObject({
+      relation: "following",
+      canSee: true,
+      followers: 1,
+    });
+
+    await join("acc-c", "casey", { open: true });
+    expect((await call("acc-b", "follow", { handle: "casey" })).body.person).toMatchObject({ relation: "following" });
+  });
+
+  it("opening a profile lets everyone waiting in", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    await call("acc-b", "follow", { handle: "alex" });
+    await call("acc-a", "update", { open: true });
+    expect((await call("acc-b", "lookup", { handle: "alex" })).body.person).toMatchObject({ relation: "following" });
+  });
+});
+
+describe("posting and the feed", () => {
+  it("shows followers the summary only, once per workout", async () => {
+    await friends();
+    const p = await call("acc-a", "post", workout());
+    const again = await call("acc-a", "post", workout());
+    expect(again.body.id).toBe(p.body.id);
+    const feed = await feedOf("acc-b");
+    expect(feed).toHaveLength(1);
+    expect(JSON.stringify(feed[0])).not.toContain("heartRate");
+    // Someone who doesn't follow sees nothing, and can't open the post.
+    await join("acc-c", "casey");
+    expect(await feedOf("acc-c")).toHaveLength(0);
+    expect((await call("acc-c", "thread", { id: p.body.id })).code).toBe(404);
+    expect((await call("acc-c", "like", { id: p.body.id })).code).toBe(404);
+  });
+
+  it("refuses workouts that are too old or empty", () => {
+    expect(parsePost(workout("s1", NOW - 100 * DAY), NOW)).toEqual({ error: "old" });
+    expect(parsePost({ ...workout(), body: { ...workout().body, exercises: [] } }, NOW)).toEqual({ error: "empty" });
+  });
+
+  it("likes and comments, and the author can delete any comment on their post", async () => {
+    await friends();
+    const id = (await call("acc-a", "post", workout())).body.id as string;
+    expect((await call("acc-b", "like", { id })).body).toEqual({ likes: 1, liked: true });
+    const c = await call("acc-b", "comment", { id, text: "Strong!" });
+    expect(c.code).toBe(200);
+    expect((await call("acc-b", "comment", { id, text: "dm me at spam.com" })).body.error).toBe("comment.link");
+    const t = await call("acc-a", "thread", { id });
+    expect(t.body.comments).toMatchObject([{ body: "Strong!", canDelete: true, mine: false }]);
+    const act = await call("acc-a", "activity");
+    expect((act.body.items as { kind: string }[]).map((i) => i.kind).sort()).toEqual(["comment", "follow", "like"]);
+    expect((await call("acc-a", "me")).body.unread).toBe(0);
+    await call("acc-a", "uncomment", { id: (c.body.comment as { id: string }).id });
+    expect((await call("acc-a", "thread", { id })).body.comments).toEqual([]);
+  });
+});
+
+describe("safety", () => {
+  it("blocking removes follows both ways and hides each from the other", async () => {
+    await friends();
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    await call("acc-a", "post", workout());
+    await call("acc-a", "block", { handle: "blair" });
+    expect(await feedOf("acc-b")).toHaveLength(0);
+    expect((await call("acc-b", "lookup", { handle: "alex" })).code).toBe(404);
+    expect((await call("acc-b", "follow", { handle: "alex" })).code).toBe(404);
+    expect(await query("SELECT * FROM follows")).toHaveLength(0);
+    expect((await call("acc-a", "lookup", { handle: "blair" })).body.person).toMatchObject({ relation: "blocked" });
+  });
+
+  it(`hides a post after ${HIDE_AFTER} reports, and staff can bring it back or remove it`, async () => {
+    await join("acc-a", "alex", { open: true });
+    const id = (await call("acc-a", "post", workout())).body.id as string;
+    for (const who of ["r1", "r2", "r3"]) {
+      await join(who, `rep_${who}`);
+      await call(who, "follow", { handle: "alex" });
+      await call(who, "report", { kind: "post", id, reason: "spam" });
+      await call(who, "report", { kind: "post", id, reason: "spam" }); // twice counts once
+    }
+    expect(await feedOf("r1")).toHaveLength(0);
+    const [g] = await adminReports();
+    expect(g).toMatchObject({ kind: "post", targetId: id, reports: 3, reasons: { spam: 3 }, hidden: true, author: { handle: "alex" } });
+    await resolveReports("post", id, "dismiss");
+    expect(await feedOf("r1")).toHaveLength(1);
+    expect(await adminReports()).toEqual([]);
+    await call("r1", "report", { kind: "post", id, reason: "abuse" });
+    await resolveReports("post", id, "remove");
+    expect(await feedOf("r1")).toHaveLength(0);
+  });
+
+  it("a suspended profile disappears and can't post, even after leaving and joining again", async () => {
+    await friends();
+    await call("acc-b", "report", { kind: "profile", id: "alex", reason: "abuse" });
+    await resolveReports("profile", "acc-a", "suspend");
+    expect((await call("acc-b", "lookup", { handle: "alex" })).code).toBe(404);
+    expect((await call("acc-a", "post", workout())).body.error).toBe("suspended");
+    await call("acc-a", "leave");
+    expect((await join("acc-a", "alex2")).body.suspended).toBe(true);
+  });
+
+  it("deleting the account deletes everything on Friends", async () => {
+    await friends();
+    const id = (await call("acc-a", "post", workout())).body.id as string;
+    await call("acc-b", "like", { id });
+    await call("acc-b", "comment", { id, text: "Nice" });
+    await deleteAccount("acc-b");
+    for (const table of ["post_likes", "post_comments", "follows"]) expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
+    expect(await query("SELECT * FROM social_profiles WHERE account_id = 'acc-b'")).toHaveLength(0);
+  });
+});
