@@ -4,6 +4,7 @@ import { useMemo, useRef, useState, type TouchEvent } from "react";
 
 import { dayKey, monthGrid, sessionDetail, weekdayNames } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
+import { sessionNoteOf } from "@/lib/editHistory";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, workoutName, type YearMonth } from "@/lib/history";
 import { date, list, num, t } from "@/lib/i18n";
@@ -15,10 +16,13 @@ import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { useGame } from "./Achievements";
+import { EditWorkoutSheet } from "./EditWorkout";
 import { setText } from "./format";
 import { Icon } from "./icons";
+import { go } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { FAMILY_HUE, familyOf, type Family } from "./theme";
+import { Button } from "./ui";
 
 // Progress › History (Melvin, 2026-11-11: "a calendar view of past workouts … where we can review what we
 // did"). A month grid with each workout day marked by the muscle families it trained; swipe or ‹ › to change
@@ -193,12 +197,21 @@ export function HistoryCalendar() {
 }
 
 function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: Unit; prIds: Set<string> }) {
-  const { events, stats, profile } = useApp();
+  const { events, stats, profile, active, repeatWorkout } = useApp();
   const detail = useMemo(() => sessionDetail(events, summary.sessionId), [events, summary.sessionId]);
   const ctx = useShareContext(useGame());
   const [sharing, setSharing] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [cant, setCant] = useState(false);
   if (!detail) return null;
-  const name = workoutName(detail, profile.routines);
+  const own = sessionNoteOf(events, summary.sessionId);
+  const name = own?.name ?? workoutName(detail, profile.routines);
+  const when = date(summary.start, { weekday: "long", month: "long", day: "numeric" });
+  const again = () => {
+    haptic("tick");
+    if (repeatWorkout(summary.sessionId)) go("today");
+    else setCant(true);
+  };
   const facts = [
     t("dash.min", { n: Math.max(1, Math.round(summary.seconds / 60)) }),
     t("progress.sessionSets", { count: summary.sets }),
@@ -212,14 +225,25 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
         <h3 className="font-bold">
           {date(summary.start, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" })}
         </h3>
-        <button
-          type="button"
-          onClick={() => setSharing(true)}
-          aria-label={t("card.shareWorkout", { when: date(summary.start, { weekday: "long", month: "long", day: "numeric" }) })}
-          className="press -mr-2 -mt-2 grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-        >
-          <Icon name="share" size={20} />
-        </button>
+        <div className="-mr-2 -mt-2 flex shrink-0">
+          <button
+            type="button"
+            onClick={() => setEditing(true)}
+            aria-label={t("hx.editLabel", { when })}
+            aria-haspopup="dialog"
+            className="press grid h-11 w-11 place-items-center rounded-xl text-muted hover:text-ink"
+          >
+            <Icon name="edit" size={20} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setSharing(true)}
+            aria-label={t("card.shareWorkout", { when })}
+            className="press grid h-11 w-11 place-items-center rounded-xl text-muted hover:text-ink"
+          >
+            <Icon name="share" size={20} />
+          </button>
+        </div>
       </div>
       {name && (
         <p className="text-sm font-semibold text-accent" data-testid="workout-name">
@@ -231,12 +255,30 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
         {facts.join(" · ")}
         {detail.manual ? t("dash.byHand") : ""}
       </p>
+      {own?.text && (
+        <p className="mt-2 whitespace-pre-line rounded-xl bg-raised px-3 py-2 text-sm" data-testid="workout-note">
+          {own.text}
+        </p>
+      )}
       <div className="mt-3 space-y-3">
         {detail.exercises.map((g, i) => {
           const ex = EXERCISE_BY_ID.get(g.exerciseId);
           return (
             <div key={i}>
-              <h4 className="font-medium">{exName(g.exerciseId)}</h4>
+              {ex ? (
+                <button
+                  type="button"
+                  onClick={() => go("exercise", g.exerciseId)}
+                  className="press -mx-1 inline-flex min-h-11 items-center gap-1 rounded-lg px-1 text-left font-medium"
+                >
+                  {exName(g.exerciseId)}
+                  <span className="text-accent" aria-hidden>
+                    ›
+                  </span>
+                </button>
+              ) : (
+                <h4 className="font-medium">{exName(g.exerciseId)}</h4>
+              )}
               <ol className="mt-1 text-sm">
                 {g.sets.map((s, j) => (
                   <li key={s.id} className="num flex items-center gap-3 border-b border-line/60 py-1 last:border-0">
@@ -255,6 +297,17 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
           );
         })}
       </div>
+      {!active && (
+        <Button kind="ghost" icon="play" className="mt-4 w-full" onClick={again}>
+          {t("hx.again")}
+        </Button>
+      )}
+      {cant && (
+        <p className="mt-2 text-sm text-muted" role="status">
+          {t("hx.againNone")}
+        </p>
+      )}
+      {editing && <EditWorkoutSheet sessionId={summary.sessionId} onClose={() => setEditing(false)} />}
     </article>
   );
 }

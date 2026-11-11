@@ -122,6 +122,26 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
+  // A finished workout: its edit sheet in History, then an exercise's own page (2026-11-11).
+  await page.goto(`${server.url}/app/#/stats`);
+  await page
+    .getByRole("article")
+    .first()
+    .getByRole("button", { name: /^Edit the workout on/ })
+    .click();
+  await page.getByRole("dialog", { name: "Edit workout" }).waitFor();
+  await scan("edit workout");
+  await page.keyboard.press("Escape");
+  await page.goto(`${server.url}/app/#/exercise/bench-press`);
+  await page.getByRole("heading", { level: 1, name: "Barbell bench press" }).waitFor();
+  await scan("exercise page");
+  // Tools › Plate and warm-up calculators.
+  await page.goto(`${server.url}/app/#/tools/plates`);
+  await page.getByTestId("plate-result").waitFor();
+  await scan("plate calculator");
+  await page.goto(`${server.url}/app/#/tools/warmup`);
+  await page.getByTestId("warmup-result").waitFor();
+  await scan("warm-up calculator");
   // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
   await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
   await page.getByRole("heading", { name: "Push day" }).waitFor();

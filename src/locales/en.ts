@@ -52,12 +52,14 @@ import * as gloss from "./text/gloss";
 import * as goal from "./text/goal";
 import * as gym from "./text/gym";
 import * as hr from "./text/hr";
+import * as hx from "./text/hx";
 import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as lift from "./text/lift";
 import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -224,6 +226,8 @@ export const en = {
   ...time.en,
   ...today.en,
   ...ton.en,
+  ...hx.en,
+  ...lift.en,
   ...tools.en,
   ...train.en,
   ...trn.en,
