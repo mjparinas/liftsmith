@@ -47,6 +47,7 @@ import { Recap } from "./Recap";
 import { Recovery } from "./Recovery";
 import { Remix } from "./Remix";
 import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
+import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
@@ -319,7 +320,7 @@ export function App() {
     <>
       <StatusScrim />
       <main key={route} className={`aurora safe-top animate-fade mx-auto max-w-lg px-5 ${showNav ? "clear-nav" : ""}`}>
-        {screen}
+        <ScreenBoundary>{screen}</ScreenBoundary>
       </main>
       <ProWelcome />
       {showNav && <TabBar route={route} />}
