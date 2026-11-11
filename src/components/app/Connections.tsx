@@ -23,11 +23,11 @@ import {
 import { chooseGarmin, GARMIN_STORE_URL, garminStatus, onGarminChange, watchState, type GarminStatus } from "@/lib/garmin";
 import {
   allowWorkouts,
-  connectHealth,
+  askHealth,
   healthAvailable,
   healthLastSync,
   healthPermissions,
-  openHealthSettings,
+  openHealthPermissions,
   READ,
   workoutsAllowed,
   WRITE,
@@ -102,9 +102,12 @@ function HealthCard() {
     setBusy(true);
     setNote(t("conn.syncing"));
     try {
-      if (!connected && !(await connectHealth())) {
-        setNote("");
-        return;
+      if (!connected) {
+        const r = await askHealth();
+        if (r.state !== "granted") {
+          setNote(r.state === "denied" ? t("twin.ask.deniedAll", { source: store }) : t("conn.health.missing"));
+          return;
+        }
       }
       const s = useApp.getState();
       const [a, b] = await Promise.all([s.importHealthDaily(), s.importHealthBody()]);
@@ -128,7 +131,7 @@ function HealthCard() {
         <>
           <Status on={false}>{t("conn.health.missing")}</Status>
           {p === "android" && (
-            <Button kind="ghost" className="mt-3 w-full" onClick={() => void openHealthSettings()}>
+            <Button kind="ghost" className="mt-3 w-full" onClick={() => void openHealthPermissions()}>
               {t("conn.health.install")}
             </Button>
           )}
@@ -176,7 +179,7 @@ function HealthCard() {
             </p>
           )}
           {p === "android" ? (
-            <Button kind="ghost" className="mt-2 w-full" onClick={() => void openHealthSettings().then(() => check())}>
+            <Button kind="ghost" className="mt-2 w-full" onClick={() => void openHealthPermissions().then(() => check())}>
               {t("conn.health.manage")}
             </Button>
           ) : (

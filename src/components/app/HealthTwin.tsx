@@ -8,10 +8,11 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
+import { useCloud } from "@/lib/connections";
 import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
-import { connectHealth, healthAvailable } from "@/lib/health";
+import { askHealth, healthAvailable, openHealthPermissions, type HealthRead } from "@/lib/health";
 import { date, t } from "@/lib/i18n";
 import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
@@ -22,10 +23,21 @@ import { useNow } from "@/lib/useNow";
 
 import { openStats } from "./BodyStats";
 import { go } from "./router";
-import { Button, ProTag, Section, Sheet } from "./ui";
+import { Button, EmptyState, ProTag, Section, Sheet } from "./ui";
 
 const BODY: TwinId[] = ["weight", "leanMass", "bodyFat", "bmi", "tdee", "steps"];
 const HEART: TwinId[] = ["sleep", "hrv", "restingHr", "breathing", "vo2max", "restDrop"];
+/** The Health read each tile is waiting for, so the connect button can tell "not allowed" from "no data". */
+const NEED: Partial<Record<TwinId, HealthRead>> = {
+  weight: "weight",
+  bodyFat: "bodyFat",
+  steps: "steps",
+  sleep: "sleep",
+  hrv: "heartRateVariability",
+  restingHr: "restingHeartRate",
+  breathing: "respiratoryRate",
+  vo2max: "vo2Max",
+};
 const TERM: Partial<Record<TwinId, Term>> = {
   hrv: "hrv",
   restingHr: "restingHr",
@@ -61,7 +73,6 @@ export function HealthTwin() {
   const by = new Map(metrics.map((m) => [m.id, m]));
   const [open, setOpen] = useState<TwinId | null>(null);
   const [canHealth, setCanHealth] = useState(false);
-  const [note, setNote] = useState("");
   useEffect(() => {
     void healthAvailable().then(setCanHealth);
   }, []);
@@ -73,14 +84,6 @@ export function HealthTwin() {
     const withHealth = readiness(events, profile, now, { cycle: !!profile.cycle?.enabled, ...healthExternal(events, now) });
     return withHealth.call !== r.call ? withHealth.call : null;
   }, [events, profile, now, pro, r]);
-
-  const connect = async () => {
-    setNote("");
-    if (!(await connectHealth())) return setNote(t("twin.connect.none", { source: store }));
-    const s = useApp.getState();
-    const [a, b] = await Promise.all([s.importHealthDaily(), s.importHealthBody()]);
-    if (!a && !b) setNote(t("twin.connect.none", { source: store }));
-  };
 
   const rhr = by.get("restingHr");
   const watch = metrics.filter((m) => m.status === "watch");
@@ -132,16 +135,7 @@ export function HealthTwin() {
       {canHealth && !hasHealth && (
         <section className="card mt-3 p-4" data-testid="twin-connect">
           <p className="text-sm text-muted">{t("twin.connect.body")}</p>
-          <div className="mt-3">
-            <Button kind="ghost" icon="heart" onClick={() => void connect()}>
-              {t("twin.connect", { source: store })}
-            </Button>
-          </div>
-          {note && (
-            <p className="mt-2 text-sm text-warn" role="status">
-              {note}
-            </p>
-          )}
+          <HealthConnect store={store} empty={!hasHealth} />
         </section>
       )}
       {!native && <p className="mt-3 text-sm text-faint">{t("twin.web")}</p>}
@@ -177,7 +171,6 @@ export function HealthTwin() {
           <Detail
             m={current}
             store={store}
-            onConnect={() => void connect()}
             onEasy={() => {
               setCall("recover");
               setOpen(null);
@@ -335,7 +328,7 @@ function Tiles({ ids, by, onOpen }: { ids: TwinId[]; by: Map<TwinId, TwinMetric>
   );
 }
 
-function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string; onConnect: () => void; onEasy: () => void }) {
+function Detail({ m, store, onEasy }: { m: TwinMetric; store: string; onEasy: () => void }) {
   const term = TERM[m.id];
   return (
     <div>
@@ -356,12 +349,8 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
           <p className="mt-1">{m.did}</p>
         </>
       )}
+      {m.action?.kind === "connect" && <HealthConnect key={m.id} id={m.id} store={store} empty={m.status === "missing"} />}
       <div className="mt-4 flex flex-wrap gap-2">
-        {m.action?.kind === "connect" && (
-          <Button kind="ghost" icon="heart" onClick={onConnect}>
-            {t("twin.connect", { source: store })}
-          </Button>
-        )}
         {m.action?.kind === "route" && (
           <Button
             kind="ghost"
@@ -388,6 +377,103 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
       <p className="mt-4 text-xs text-faint">
         {m.source === "health" ? t("twin.from.health", { source: store }) : t("twin.from.app")} · {t("twin.notMedical")}
       </p>
+    </div>
+  );
+}
+
+type Asked = "idle" | "busy" | "unavailable" | "install" | "denied" | "done";
+
+/**
+ * The connect button and what came of it, shown where it was tapped (a tile's sheet, or the card at the top).
+ * Health Connect answers at once without a sheet when Liftsmith already has the permission, or after the lifter
+ * said no twice, so the outcome is always said here: not on this phone (with Google Play), not allowed (with
+ * Health Connect's settings), or allowed but nothing there yet, with what records it (an Oura ring or a watch).
+ */
+function HealthConnect({ id, store, empty }: { id?: TwinId; store: string; empty: boolean }) {
+  const [asked, setAsked] = useState<Asked>("idle");
+  const oura = useCloud((s) => !!s.status?.ready.oura && !s.status.linked.oura);
+  const ios = store === "Apple Health";
+  const what = id && NEED[id] ? t(`twin.what.${id}` as Parameters<typeof t>[0]) : "";
+
+  const ask = async () => {
+    if (asked === "busy") return;
+    setAsked("busy");
+    const need = id ? NEED[id] : undefined;
+    const r = await askHealth(need ? [need] : []);
+    if (r.state === "unavailable") return setAsked(r.install ? "install" : "unavailable");
+    if (r.state === "denied") return setAsked("denied");
+    const s = useApp.getState();
+    await Promise.all([s.importHealthDaily(), s.importHealthBody()]).catch(() => undefined);
+    setAsked("done");
+  };
+
+  const settings = (
+    <Button kind="ghost" onClick={() => void openHealthPermissions()}>
+      {ios ? t("twin.ask.openHealth") : t("conn.health.manage")}
+    </Button>
+  );
+
+  if (asked === "done" && empty) {
+    const body =
+      id === "hrv"
+        ? t(ios ? "twin.empty.hrv.ios" : "twin.empty.hrv.android")
+        : id === "vo2max"
+          ? t(ios ? "twin.empty.vo2.ios" : "twin.empty.vo2.android")
+          : what
+            ? t("twin.empty.other", { source: store, what })
+            : t("twin.connect.none", { source: store });
+    return (
+      <div className="card mt-4" role="status" data-testid="twin-empty">
+        <EmptyState
+          icon="heart"
+          title={what ? t("twin.empty.title", { source: store, what }) : t("twin.empty.titleAll", { source: store })}
+          body={
+            <>
+              <span className="block">{body}</span>
+              {id === "hrv" && oura && <span className="mt-2 block">{t("twin.empty.ouraDirect")}</span>}
+              {ios && <span className="mt-2 block">{t("conn.health.iosManage")}</span>}
+            </>
+          }
+          action={
+            <div className="flex flex-wrap justify-center gap-2">
+              {id === "hrv" && oura && (
+                <Button kind="ghost" onClick={() => go("connections")}>
+                  {t("twin.empty.ouraConnect")}
+                </Button>
+              )}
+              {settings}
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div className="mt-4">
+      <div className="flex flex-wrap gap-2">
+        {asked === "install" ? (
+          <Button kind="ghost" icon="heart" onClick={() => void openHealthPermissions()}>
+            {t("conn.health.install")}
+          </Button>
+        ) : (
+          <Button kind="ghost" icon="heart" disabled={asked === "busy"} onClick={() => void ask()}>
+            {asked === "busy" ? t("twin.ask.busy", { source: store }) : t("twin.connect", { source: store })}
+          </Button>
+        )}
+        {asked === "denied" && settings}
+      </div>
+      {(asked === "unavailable" || asked === "install" || asked === "denied") && (
+        <p className="mt-2 text-sm text-warn" role="status">
+          {asked === "denied"
+            ? what
+              ? t("twin.ask.denied", { source: store, what })
+              : t("twin.ask.deniedAll", { source: store })
+            : asked === "install"
+              ? t("twin.ask.install")
+              : t("twin.ask.unavailable", { source: store })}
+        </p>
+      )}
     </div>
   );
 }

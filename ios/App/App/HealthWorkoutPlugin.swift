@@ -1,5 +1,6 @@
 import Capacitor
 import HealthKit
+import UIKit
 
 /// Finished workouts as real workouts in Apple Health (src/lib/health.ts saveWorkout; Android:
 /// HealthWorkoutPlugin.kt). The health plugin (@capgo/capacitor-health) can't write workouts, so this plugin
@@ -16,6 +17,7 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "save", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "characteristics", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "openPermissions", returnType: CAPPluginReturnPromise),
     ]
 
     private let store = HKHealthStore()
@@ -65,6 +67,22 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
             store.requestAuthorization(toShare: nil, read: read) { _, _ in answer() }
         } else {
             answer()
+        }
+    }
+
+    /// Opens the Health app, where the lifter changes what Liftsmith may read (profile picture › Apps › Liftsmith;
+    /// src/lib/health.ts openHealthPermissions). Apple Health never tells an app a read was denied and won't show
+    /// its sheet twice, so this is the way back. Falls back to Liftsmith's page in Settings.
+    @objc func openPermissions(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            let fallback = {
+                guard let settings = URL(string: UIApplication.openSettingsURLString) else { return call.resolve(["opened": false]) }
+                UIApplication.shared.open(settings) { ok in call.resolve(["opened": ok]) }
+            }
+            guard let health = URL(string: "x-apple-health://") else { return fallback() }
+            UIApplication.shared.open(health) { ok in
+                if ok { call.resolve(["opened": true]) } else { DispatchQueue.main.async { fallback() } }
+            }
         }
     }
 
