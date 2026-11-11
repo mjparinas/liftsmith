@@ -1,5 +1,8 @@
 package com.getliftsmith.app
 
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
@@ -83,6 +86,38 @@ class HealthWorkoutPlugin : Plugin() {
         }
     }
 
+    /**
+     * Opens the place to change what Liftsmith may read (src/lib/health.ts openHealthPermissions): Health Connect's
+     * page for this app on Android 14+, Health Connect's own settings before that, or Google Play when Health
+     * Connect isn't installed (Android 13 and older). Health Connect stops showing its permission sheet after the
+     * lifter says no twice, so this is the only way back once a read was denied.
+     */
+    @PluginMethod
+    fun openPermissions(call: PluginCall) {
+        val status = HealthConnectClient.getSdkStatus(context)
+        val intents = mutableListOf<Intent>()
+        if (status == HealthConnectClient.SDK_AVAILABLE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                intents += Intent("android.health.connect.action.MANAGE_HEALTH_PERMISSIONS")
+                    .putExtra(Intent.EXTRA_PACKAGE_NAME, context.packageName)
+            }
+            intents += Intent(HealthConnectClient.ACTION_HEALTH_CONNECT_SETTINGS)
+        } else {
+            intents += Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$HEALTH_CONNECT"))
+            intents += Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$HEALTH_CONNECT"))
+        }
+        for (intent in intents) {
+            try {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+                return answer(call, "opened", true)
+            } catch (e: Exception) {
+                // Try the next one.
+            }
+        }
+        answer(call, "opened", false)
+    }
+
     @ActivityCallback
     private fun onPermission(call: PluginCall?, result: ActivityResult) {
         if (call == null) return
@@ -119,5 +154,9 @@ class HealthWorkoutPlugin : Plugin() {
                 answer(call, "saved", false)
             }
         }
+    }
+
+    private companion object {
+        const val HEALTH_CONNECT = "com.google.android.apps.healthdata"
     }
 }
