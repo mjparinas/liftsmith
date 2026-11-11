@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
 import {
@@ -16,7 +16,7 @@ import {
   type LevelReward,
 } from "@/lib/game";
 import { t } from "@/lib/i18n";
-import { applyAccent, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, calm, sound, type TimerSound } from "@/lib/juice";
 import { badgeShare, levelShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { themesForBadge } from "@/lib/themes";
@@ -25,7 +25,7 @@ import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
 import { Icon } from "./icons";
-import { go } from "./router";
+import { go, useRoute } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
 import { Chip, ScreenHeader, Section } from "./ui";
@@ -101,9 +101,12 @@ function progressText(a: Achievement) {
   return t("awards.of", { value: amount(a.value), goal: amount(a.next.at) });
 }
 
-export function AchievementRow({ a, onShare }: { a: Achievement; onShare?: () => void }) {
+export function AchievementRow({ a, onShare, lit }: { a: Achievement; onShare?: () => void; lit?: boolean }) {
   return (
-    <li className={`flex items-center gap-3 py-3 pl-4 ${onShare ? "pr-1" : "pr-4"}`}>
+    <li
+      id={`badge-${a.id}`}
+      className={`flex scroll-my-24 items-center gap-3 py-3 pl-4 transition-colors duration-700 ${onShare ? "pr-1" : "pr-4"} ${lit ? "bg-accent/15" : ""}`}
+    >
       <Badge a={a} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
@@ -325,9 +328,31 @@ const FILTERS: ("all" | "earned" | Category)[] = [
   "secret",
 ];
 
+/**
+ * `#/achievements/<id>` (Today's "Almost there" row) scrolls to that badge and lights its row for a moment.
+ * The screen opens fresh on All, so the badge is in the list.
+ */
+function useFocusBadge(): string | null {
+  const { arg } = useRoute();
+  const [faded, setFaded] = useState<string | null>(null);
+  useEffect(() => {
+    if (!arg) return;
+    const frame = requestAnimationFrame(() =>
+      document.getElementById(`badge-${arg}`)?.scrollIntoView?.({ block: "center", behavior: calm() ? "auto" : "smooth" }),
+    );
+    const off = setTimeout(() => setFaded(arg), 2400);
+    return () => {
+      cancelAnimationFrame(frame);
+      clearTimeout(off);
+    };
+  }, [arg]);
+  return arg && faded !== arg ? arg : null;
+}
+
 export function Achievements() {
   const g = useGame();
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const focus = useFocusBadge();
   const list = g.achievements.filter((a) => (filter === "all" ? true : filter === "earned" ? a.level > 0 : a.category === filter));
   const hiddenLeft = list.filter((a) => a.hidden).length;
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
@@ -403,7 +428,12 @@ export function Achievements() {
           {sorted
             .filter((a) => !a.hidden || filter === "secret")
             .map((a) => (
-              <AchievementRow key={a.id} a={a} onShare={a.tier && !a.hidden ? () => setSharing(`badge-${a.id}-${a.tier}`) : undefined} />
+              <AchievementRow
+                key={a.id}
+                a={a}
+                lit={focus === a.id}
+                onShare={a.tier && !a.hidden ? () => setSharing(`badge-${a.id}-${a.tier}`) : undefined}
+              />
             ))}
           {filter !== "secret" && hiddenLeft > 0 && (
             <li>
