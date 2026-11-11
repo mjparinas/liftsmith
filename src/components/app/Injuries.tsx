@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { CARD_TITLE } from "@/components/titles";
 import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
 import { date, inSentence, list, t } from "@/lib/i18n";
@@ -26,7 +27,7 @@ import { BODY_PARTS, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Chip, Section, Sheet } from "./ui";
+import { Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 // Injury mode (Melvin, 2026-11-09). Wording is neutral and never diagnoses: we say what the app does,
 // that it isn't medical advice, and that a professional can say what's safe.
@@ -60,10 +61,10 @@ export function Injuries() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">
-        {workout ? t("inj.backWorkout") : t("inj.backToday")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("inj.title")}</h1>
+      <ScreenHeader
+        back={{ label: workout ? t("inj.backWorkout") : t("inj.backToday"), onClick: () => go(workout ? "workout" : "today") }}
+        title={t("inj.title")}
+      />
       <p className="mt-2 text-sm text-muted">{t("inj.intro")}</p>
       <p className="mt-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm">{notAdvice()}</p>
 
@@ -212,7 +213,7 @@ function InjuryCard({
   return (
     <section className="card mt-6 p-4" aria-label={t("inj.cardLabel", { part: label })}>
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="text-lg font-semibold">{label}</h2>
+        <h2 className={CARD_TITLE}>{label}</h2>
         <span className="num text-sm text-muted">{t("inj.since", { date: day(inj.since) })}</span>
       </div>
       <p className="mt-1 text-sm text-muted">

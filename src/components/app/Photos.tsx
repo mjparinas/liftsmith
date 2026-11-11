@@ -17,7 +17,7 @@ import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 import { BodyFatField } from "./BodyFatField";
 import { Measurements } from "./Measurements";
 import { go } from "./router";
-import { BumpField, Button, Chip, Section } from "./ui";
+import { BumpField, Button, Chip, ScreenHeader, Section } from "./ui";
 
 function useObjectUrl(blob: Blob | undefined): string | undefined {
   const url = useMemo(() => (blob ? URL.createObjectURL(blob) : undefined), [blob]);
@@ -77,10 +77,7 @@ export function Photos() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">
-        {t("photos.back")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("photos.title")}</h1>
+      <ScreenHeader back={{ label: t("photos.back"), onClick: () => go("stats") }} title={t("photos.title")} />
       <p className="mt-1 text-sm text-muted">{t("photos.private")}</p>
 
       <Section title={t("photos.weight", { unit })}>

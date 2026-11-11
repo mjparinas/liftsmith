@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { Info } from "@/components/Info";
+import { SECTION_LABEL } from "@/components/titles";
 import { TIER_LABEL, unlocked } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
@@ -211,7 +212,9 @@ export function Done() {
           </span>
         )}
       </div>
-      <h1 className="mt-3 text-3xl font-bold">{prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}</h1>
+      <h1 className="mt-3 text-3xl font-extrabold leading-tight tracking-tight">
+        {prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}
+      </h1>
       <p className="num mt-2 text-4xl font-bold text-accent" aria-label={t("done.xp", { xp: gained })}>
         +{xp} XP
       </p>
@@ -264,7 +267,7 @@ export function Done() {
 
       {badges.length > 0 && (
         <section className="mt-4 text-left" aria-label={t("done.badges")}>
-          <h2 className="mb-2 text-sm font-semibold uppercase tracking-wider text-faint">{t("done.badges")}</h2>
+          <h2 className={`mb-2 ${SECTION_LABEL}`}>{t("done.badges")}</h2>
           <ul className="card divide-y divide-line">
             {badges.map(({ a, tier }, i) => (
               <li

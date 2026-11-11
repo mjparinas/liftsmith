@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { platformStore } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { billingLive, buy, entActive, manageUrl, restore, retryBilling, useBilling, type BuyResult } from "@/lib/billing";
@@ -17,7 +18,7 @@ import type { MessageKey } from "@/locales/en";
 import { CreatorCode } from "./CreatorCode";
 import { celebratePro } from "./ProWelcome";
 import { go, goBack, historyDepth, ROUTES, useRoute, type Route } from "./router";
-import { Button } from "./ui";
+import { Button, ScreenHeader } from "./ui";
 
 // The paywall (#/pro, also the last step of first-run setup). AGENTS.md "Money": plain prices from the
 // store, annual first, neither plan pre-selected (each is its own button), the trial and renewal terms
@@ -55,7 +56,7 @@ export function ProFeatures({ focus, compact = false }: { focus?: Feature; compa
   const order = focus ? [focus, ...PRO_FEATURES.filter((f) => f !== focus)] : [...PRO_FEATURES];
   return (
     <section className="mt-5" aria-labelledby="pro-unlocks">
-      <h2 id="pro-unlocks" className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">
+      <h2 id="pro-unlocks" className={SECTION_LABEL}>
         {t("pro.unlocks")}
       </h2>
       <ul className={`mt-2 ${compact ? "space-y-1.5 text-sm" : "space-y-2"}`}>
@@ -212,10 +213,7 @@ export function Pro() {
 
   return (
     <div className="pb-24">
-      <button type="button" onClick={leave} className="press -ml-2 min-h-11 pt-2 text-muted">
-        ‹ {t("pro.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{active ? t("pro.youHave") : t("pro.title")}</h1>
+      <ScreenHeader back={{ label: `‹ ${t("pro.back")}`, onClick: leave }} title={active ? t("pro.youHave") : t("pro.title")} />
       <p className="mt-2 text-muted">{t("pro.lead")}</p>
       <ProFeatures focus={active ? undefined : from.feature} />
       {!billingLive() ? (
