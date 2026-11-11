@@ -6,6 +6,7 @@ import { t } from "@/lib/i18n";
 import { insights, type Insight } from "@/lib/insights";
 import { haptic } from "@/lib/juice";
 import { dayKey } from "@/lib/random";
+import { trendShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { togglePriority } from "@/lib/training";
 import { useNow } from "@/lib/useNow";
@@ -13,6 +14,7 @@ import { useNow } from "@/lib/useNow";
 import { useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go, type Route } from "./router";
+import { ShareSheet, useShareContext } from "./ShareSheet";
 import { ProTag, Section } from "./ui";
 
 // Coach's notes: the proactive insights from insights.ts, each with what we saw, what to do and a
@@ -75,6 +77,9 @@ export function CoachNotes({ limit, title: given }: { limit?: number; title?: st
 function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: () => void }) {
   const { setProfile, startDeload, fixPlateau, profile } = useApp();
   const [done, setDone] = useState(false);
+  const [sharing, setSharing] = useState(false);
+  const g = useGame();
+  const ctx = useShareContext(g);
   const tone = TONE[i.tone];
   const act = () => {
     const a = i.action;
@@ -87,7 +92,7 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
     else if (a.kind === "go") {
       const [route, arg] = a.route.split("/");
       return go(route as Route, arg);
-    }
+    } else if (a.kind === "share") return setSharing(true);
     setDone(true);
   };
   return (
@@ -129,6 +134,9 @@ function InsightCard({ insight: i, onDismiss }: { insight: Insight; onDismiss: (
           </div>
         </div>
       </div>
+      {i.action?.kind === "share" && (
+        <ShareSheet open={sharing} onClose={() => setSharing(false)} items={[trendShare(i.action.trend, ctx)]} />
+      )}
     </li>
   );
 }

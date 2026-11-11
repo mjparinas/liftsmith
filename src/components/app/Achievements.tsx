@@ -17,6 +17,7 @@ import {
 } from "@/lib/game";
 import { t } from "@/lib/i18n";
 import { applyAccent, sound, type TimerSound } from "@/lib/juice";
+import { badgeShare, levelShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { themesForBadge } from "@/lib/themes";
 import { fmtNum } from "@/lib/units";
@@ -25,6 +26,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Icon } from "./icons";
 import { go } from "./router";
+import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
 import { Chip, ScreenHeader, Section } from "./ui";
 
@@ -99,9 +101,9 @@ function progressText(a: Achievement) {
   return t("awards.of", { value: amount(a.value), goal: amount(a.next.at) });
 }
 
-export function AchievementRow({ a }: { a: Achievement }) {
+export function AchievementRow({ a, onShare }: { a: Achievement; onShare?: () => void }) {
   return (
-    <li className="flex items-center gap-3 px-4 py-3">
+    <li className={`flex items-center gap-3 py-3 pl-4 ${onShare ? "pr-1" : "pr-4"}`}>
       <Badge a={a} />
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
@@ -133,6 +135,16 @@ export function AchievementRow({ a }: { a: Achievement }) {
         )}
         <span className="sr-only">{t("awards.tiers", { level: a.level, count: a.levels })}</span>
       </div>
+      {onShare && (
+        <button
+          type="button"
+          onClick={onShare}
+          aria-label={t("card.shareBadge", { name: a.name })}
+          className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+        >
+          <Icon name="share" size={20} />
+        </button>
+      )}
     </li>
   );
 }
@@ -319,15 +331,32 @@ export function Achievements() {
   const list = g.achievements.filter((a) => (filter === "all" ? true : filter === "earned" ? a.level > 0 : a.category === filter));
   const hiddenLeft = list.filter((a) => a.hidden).length;
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
+  const { stats } = useApp();
+  const ctx = useShareContext(g);
+  const [sharing, setSharing] = useState<string | null>(null);
+  const shared = g.achievements.find((a) => a.tier && sharing === `badge-${a.id}-${a.tier}`);
+  const shareItems =
+    sharing === "level" ? [levelShare(g, stats.sessions.length, ctx)] : shared?.tier ? [badgeShare(shared, shared.tier, ctx)] : [];
   return (
     <div className="pb-2">
       <ScreenHeader back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }} title={t("awards.title")} />
+      <ShareSheet open={!!shareItems.length} onClose={() => setSharing(null)} items={shareItems} />
       <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
-        <div className="flex items-baseline justify-between">
+        <div className="flex items-center justify-between gap-2">
           <span className="font-bold">
             {t("progress.level", { level: g.level.level })} · <span className="text-gradient">{g.level.title}</span>
           </span>
-          <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
+          <span className="flex items-center gap-1">
+            <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
+            <button
+              type="button"
+              onClick={() => setSharing("level")}
+              aria-label={t("card.shareLevel")}
+              className="press -my-2 -mr-2 grid h-11 w-11 place-items-center rounded-xl text-muted hover:text-ink"
+            >
+              <Icon name="share" size={20} />
+            </button>
+          </span>
         </div>
         <div
           className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised"
@@ -374,7 +403,7 @@ export function Achievements() {
           {sorted
             .filter((a) => !a.hidden || filter === "secret")
             .map((a) => (
-              <AchievementRow key={a.id} a={a} />
+              <AchievementRow key={a.id} a={a} onShare={a.tier && !a.hidden ? () => setSharing(`badge-${a.id}-${a.tier}`) : undefined} />
             ))}
           {filter !== "secret" && hiddenLeft > 0 && (
             <li>

@@ -9,11 +9,11 @@ import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
-import { date, inSentence, t } from "@/lib/i18n";
+import { inSentence, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
-import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { doneItems } from "@/lib/routines";
-import { shareCard } from "@/lib/shareImage";
+import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -31,6 +31,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
 import { Button } from "./ui";
 
@@ -152,7 +153,7 @@ export function Done() {
   }, [s?.sessionId, after, before]); // eslint-disable-line react-hooks/exhaustive-deps
   const xp = useCountUp(gained);
   const vol = useCountUp(s ? Math.round(fromKg(s.volume, profile.unit)) : 0);
-  const [shared, setShared] = useState<string | null>(null);
+  const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -171,32 +172,13 @@ export function Done() {
       </div>
     );
 
-  const share = async () => {
-    const accent = COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value;
-    const how = await shareCard(
-      {
-        kicker: date(s.start, { weekday: "long", month: "long", day: "numeric" }),
-        headline: prs.length ? t("done.prsShare", { count: prs.length }) : t("done.title"),
-        tiles: [
-          [t("done.time"), clock(s.seconds)],
-          [t("done.sets"), fmtNum(s.sets)],
-          [t("done.volume"), `${fmtNum(Math.round(fromKg(s.volume, profile.unit)))} ${profile.unit}`],
-        ],
-        lines: [
-          ...prs
-            .slice(0, 3)
-            .map((p) => `🏆 ${exercise(p.exerciseId).name} · ${fmtNum(fromKg(p.weight, profile.unit))} ${profile.unit} × ${p.reps}`),
-          ...badges.slice(0, 4).map((b) => `${b.a.icon} ${b.a.name} · ${TIER_LABEL[b.tier]}`),
-        ].slice(0, 4),
-        footer: t("done.footer", { level: after.level.level, title: after.level.title, count: after.streak.weeks }),
-        accent,
-      },
-      `liftsmith-${new Date(s.start).toISOString().slice(0, 10)}`,
-    );
-    track("feature", { name: "share_card", detail: how });
-    if (how === "failed") oops();
-    setShared(how === "download" ? t("done.saved") : how === "failed" ? t("done.shareFailed") : null);
-  };
+  const ctx = { unit: profile.unit, game: after, accent: COSMETICS.find((c) => c.id === profile.cosmetics?.accent)?.value };
+  const shareItems = [
+    workoutShare(s, prs, badges, ctx),
+    ...prs.map((p) => prShare(p, previousBest(stats.prs, p), ctx)),
+    ...(levelUp ? [levelShare(after, stats.sessions.length, ctx)] : []),
+    ...badges.map((b) => badgeShare(b.a, b.tier, ctx)),
+  ];
 
   return (
     <div className="pb-24 pt-6 text-center">
@@ -311,14 +293,10 @@ export function Done() {
         <LeagueCard g={after} />
       </div>
 
-      <Button kind="ghost" className="mt-6 w-full" onClick={() => void share()}>
+      <Button kind="ghost" icon="share" className="mt-6 w-full" onClick={() => setSharing(true)}>
         {t("done.share")}
       </Button>
-      {shared && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {shared}
-        </p>
-      )}
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>

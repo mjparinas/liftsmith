@@ -38,8 +38,6 @@ export const en = {
   "recap.card.top": "Most-done lift: {name}",
   "recap.card.pr": "Top PR: {name} {weight} {unit} × {reps}",
   "recap.card.day": "Favourite day: {day}",
-  "recap.shareFailed": "Couldn't share the card.",
-  "recap.saved": "Saved the image.",
   "recap.shareYear": "Share my year",
   "recap.shareMonth": "Share my month",
 } as const;
@@ -81,8 +79,6 @@ export const es: Partial<Record<Key, Message>> = {
   "recap.card.top": "Ejercicio más hecho: {name}",
   "recap.card.pr": "Mejor marca: {name} {weight} {unit} × {reps}",
   "recap.card.day": "Día favorito: {day}",
-  "recap.shareFailed": "No se pudo compartir la tarjeta.",
-  "recap.saved": "Imagen guardada.",
   "recap.shareYear": "Compartir mi año",
   "recap.shareMonth": "Compartir mi mes",
 };
@@ -122,8 +118,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "recap.card.top": "Exercice le plus fait : {name}",
   "recap.card.pr": "Meilleur record : {name} {weight} {unit} × {reps}",
   "recap.card.day": "Jour préféré : {day}",
-  "recap.shareFailed": "Impossible de partager la carte.",
-  "recap.saved": "Image enregistrée.",
   "recap.shareYear": "Partager mon année",
   "recap.shareMonth": "Partager mon mois",
 };
@@ -163,8 +157,6 @@ export const de: Partial<Record<Key, Message>> = {
   "recap.card.top": "Häufigste Übung: {name}",
   "recap.card.pr": "Top-PR: {name} {weight} {unit} × {reps}",
   "recap.card.day": "Lieblingstag: {day}",
-  "recap.shareFailed": "Die Karte ließ sich nicht teilen.",
-  "recap.saved": "Bild gespeichert.",
   "recap.shareYear": "Mein Jahr teilen",
   "recap.shareMonth": "Meinen Monat teilen",
 };
@@ -204,8 +196,6 @@ export const it: Partial<Record<Key, Message>> = {
   "recap.card.top": "Esercizio più fatto: {name}",
   "recap.card.pr": "PR migliore: {name} {weight} {unit} × {reps}",
   "recap.card.day": "Giorno preferito: {day}",
-  "recap.shareFailed": "Impossibile condividere la scheda.",
-  "recap.saved": "Immagine salvata.",
   "recap.shareYear": "Condividi il mio anno",
   "recap.shareMonth": "Condividi il mio mese",
 };
@@ -242,8 +232,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "recap.card.top": "最多の種目：{name}",
   "recap.card.pr": "トップの自己ベスト：{name} {weight} {unit} × {reps}",
   "recap.card.day": "お気に入りの曜日：{day}",
-  "recap.shareFailed": "カードを共有できませんでした。",
-  "recap.saved": "画像を保存しました。",
   "recap.shareYear": "1年を共有",
   "recap.shareMonth": "1か月を共有",
 };
