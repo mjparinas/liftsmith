@@ -17,14 +17,16 @@ export function JsonLd({ data }: { data: object | object[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
 }
 
+/** The app icon (public/icon.svg, drawn by scripts/make-icons.mjs), so the site header matches the favicon. */
+export function BrandMark() {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />;
+}
+
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-      <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent text-accent-ink">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-          <path d="M2 10h2V7h3v10H4v-3H2zm20 0h-2V7h-3v10h3v-3h2zM8 11h8v2H8z" />
-        </svg>
-      </span>
+      <BrandMark />
       {BRAND.name}
     </Link>
   );
