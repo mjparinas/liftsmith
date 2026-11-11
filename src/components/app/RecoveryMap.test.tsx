@@ -79,6 +79,13 @@ describe("recovery map", () => {
     expect(advice).toHaveTextContent(/Rest it\. It's ready in \d+ hours\./);
     expect(advice).toHaveTextContent("Last worked 2 hours ago.");
     expect(within(groups).getByRole("button", { name: "Quads" })).toHaveAttribute("aria-pressed", "true");
+    // the picked muscle is outlined and every other muscle fades back, so even a small one is obvious
+    const picked = document.querySelectorAll("path[data-picked]");
+    expect(picked.length).toBeGreaterThan(0);
+    for (const p of picked) expect(p).toHaveAttribute("stroke-width", "3");
+    const others = [...document.querySelectorAll("path[fill-opacity]")].filter((p) => !p.hasAttribute("data-picked"));
+    expect(others.length).toBeGreaterThan(0);
+    for (const p of others) expect(p).toHaveAttribute("fill-opacity", "0.22");
 
     // a recovered muscle well short of its sets offers to make it a priority, in one tap
     await user.click(within(groups).getByRole("button", { name: "Chest" }));

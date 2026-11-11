@@ -108,13 +108,13 @@ function Muscles() {
                     setPicked(picked === m ? null : m);
                     window.scrollTo?.({ top: 0, behavior: "smooth" });
                   }}
-                  className={`press flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left ${picked === m ? "bg-accent/10" : ""}`}
+                  className={`press flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left ${picked === m ? "picked-row" : ""}`}
                 >
                   <span title={b.label} className="flex">
                     <Swatch band={b.band} colour={b.colour} />
                     <span className="sr-only">{b.label},</span>
                   </span>
-                  <span className="w-28 shrink-0 font-medium">{MUSCLE_LABEL[m]}</span>
+                  <span className={`w-28 shrink-0 ${picked === m ? "font-bold text-ink" : "font-medium"}`}>{MUSCLE_LABEL[m]}</span>
                   <div
                     className="h-2 min-w-20 flex-1 overflow-hidden rounded-full bg-raised"
                     title={t("recovery.setsOf", { done: Math.round(done[m]), goal: wk.setsPerMuscle })}
