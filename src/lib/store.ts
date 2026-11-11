@@ -11,6 +11,7 @@ import { derive, setWeekStart, type Stats } from "./derive";
 import { registerCustom } from "./exercises";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
 import { healthSlice, type HealthSlice } from "./store/health";
+import { historySlice, type HistorySlice } from "./store/history";
 import { injuriesSlice, type InjuriesSlice } from "./store/injuries";
 import { planSlice, type PlanSlice } from "./store/plan";
 import { routinesSlice, type RoutinesSlice } from "./store/routines";
@@ -23,9 +24,9 @@ export { AUTO_END_MS, hrWindow, REST_PAUSE_SEC, warmingUp, type Active } from ".
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,
-// health, routines); this file puts them together and keeps loading, sync, backup and erase.
+// health, routines, history); this file puts them together and keeps loading, sync, backup and erase.
 
-export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSlice, RoutinesSlice {
+export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSlice, RoutinesSlice, HistorySlice {
   ready: boolean;
   events: AppEvent[];
   profile: Profile;
@@ -63,6 +64,7 @@ export const useApp = create<State>((set, get) => {
     ...injuriesSlice(c),
     ...healthSlice(c),
     ...routinesSlice(c),
+    ...historySlice(c),
 
     ready: false,
     events: [],

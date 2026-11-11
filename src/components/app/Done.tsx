@@ -21,6 +21,7 @@ import { doneCue, say, voice } from "@/lib/voice";
 
 import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { burst } from "./burst";
+import { WorkoutNoteCard } from "./EditWorkout";
 import { DoneMoments, lean } from "./Extras";
 import { clock } from "./format";
 import { PostToFriends } from "./Friends";
@@ -285,6 +286,7 @@ export function Done() {
       )}
 
       <PainAfter sessionId={s.sessionId} />
+      <WorkoutNoteCard sessionId={s.sessionId} />
 
       {prizes.map((p) => (
         <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
