@@ -49,6 +49,11 @@ describe("merging records", () => {
     expect(localRecords(profile({ onboarded: false }), [gym("g1")], [], 1).map((r) => r.key)).toEqual(["gym:g1"]);
   });
 
+  it("gives a device stuck in setup the account's set-up profile, even when its own half-made one is newer", () => {
+    const real = { key: "profile", value: profile({ name: "Real", updatedAt: 1000 }), updatedAt: 1000 };
+    expect(mergeRecords(profile({ onboarded: false, updatedAt: 9000 }), [], [real], false).profile?.name).toBe("Real");
+  });
+
   it("adds, updates and removes gyms, and keeps the active gym real", () => {
     const p = profile({ activeGymId: "g1" });
     const r = mergeRecords(

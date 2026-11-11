@@ -150,6 +150,17 @@ export function guardTraversals() {
 }
 guardTraversals();
 
+/** Swaps this history entry's screen for another, without adding a step for back to undo. */
+export function replaceRoute(route: Route) {
+  startTracking();
+  const hash = `#/${route}`;
+  if (hash === location.hash) return;
+  const e = entry();
+  stamp(e?.depth ?? 0, e?.prev ?? "", hash);
+  trackHistory();
+  window.dispatchEvent(new HashChangeEvent("hashchange"));
+}
+
 /** One step back through the app's history; with nothing behind this screen, Today. */
 export function goBack() {
   startTracking();

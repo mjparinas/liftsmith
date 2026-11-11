@@ -60,7 +60,11 @@ export function mergeRecords(
   const p = recs.find((r) => r.key === "profile");
   // An account profile that never finished setup (pushed by an older version) never replaces a set-up one here.
   const usable = !!p?.value && ((p.value as Profile).onboarded || !profile.onboarded);
-  if (p && usable && (p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt))) nextProfile = p.value as Profile;
+  // A device that hasn't finished setup takes the account's set-up profile whatever the times say: a browser that signed in
+  // under an older version and then answered setup questions has a newer, half-made profile and was stuck in setup for good.
+  const rescue = !!p?.value && (p.value as Profile).onboarded && !profile.onboarded;
+  if (p && usable && (rescue || p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt)))
+    nextProfile = p.value as Profile;
   let list = [...gyms];
   let changed = false;
   const known: string[] = [];

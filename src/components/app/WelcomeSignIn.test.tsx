@@ -74,6 +74,21 @@ describe("signing in from the welcome screen", () => {
     expect(useApp.getState().profile.onboarded).toBe(true);
   });
 
+  it("opens Today, not the Account screen, after signing in from the website's Sign in link", async () => {
+    const gym = { ...makeGym("commercial", "kg", "g-acc"), updatedAt: 5 };
+    stubServer([
+      { key: "profile", value: { ...defaultProfile(5), name: "Sam", activeGymId: "g-acc", onboarded: true }, updatedAt: 5 },
+      { key: "gym:g-acc", value: gym, updatedAt: 5 },
+    ]);
+    location.hash = "#/account";
+    render(<App />);
+    expect(await screen.findByRole("dialog", { name: "Sign in" })).toBeInTheDocument();
+    await waitFor(() => expect(gis).not.toBeNull());
+    gis!({ credential: "id-token" });
+    expect(await screen.findByText("Today's workout")).toBeInTheDocument();
+    expect(location.hash).not.toContain("account");
+  });
+
   it("carries on into setup, signed in, when the account has nothing on it yet", async () => {
     stubServer([]);
     const user = userEvent.setup();
