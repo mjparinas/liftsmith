@@ -38,7 +38,7 @@ export interface TwinMetric {
   display: string;
   value?: number;
   status: Status;
-  /** A word or two for the chip: "On pace", "Short", "Above your normal". */
+  /** A word or two for the chip: "Losing slowly", "Short", "Above your normal". */
   chip: string;
   /** What it means for the lifter, in a line. */
   why: string;
@@ -261,8 +261,9 @@ export function twin(input: TwinInput): TwinMetric[] {
         chip = t("twin.c.dropFast");
         why = t("twin.w.dropFast", { rate });
       } else if (perWeek <= -0.25) {
-        status = "good";
-        chip = t("twin.c.onPace");
+        // A healthy pace of loss, but not progress for someone trying to build muscle.
+        status = profile.goal === "muscle" ? "info" : "good";
+        chip = t("twin.c.loseSlow");
         why = t("twin.w.onPace", { rate }) + maint;
       } else if (perWeek < 0.25) {
         status = "steady";

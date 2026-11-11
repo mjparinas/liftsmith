@@ -6,6 +6,7 @@
 // Saving and backup, #/settings/themes and #/settings/accessibility open Look and feel at that section.
 import { useEffect, useState, type ReactNode } from "react";
 
+import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
@@ -40,7 +41,7 @@ import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
 import { StretchSettings } from "./Stretch";
 import { RestTimerSettings } from "./TrainingSettings";
-import { Button, Chip, ProTag, Section, SwitchRow } from "./ui";
+import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
@@ -130,7 +131,7 @@ function ProCard() {
       style={{ "--tint": "var(--color-violet)" } as React.CSSProperties}
       aria-labelledby="pro-card"
     >
-      <h2 id="pro-card" className="text-lg font-bold">
+      <h2 id="pro-card" className={CARD_TITLE}>
         {t("pro.settings")}
       </h2>
       <p className="mt-1 text-sm text-ink">{status}</p>
@@ -181,10 +182,7 @@ export function Settings() {
   };
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("nav.back.today")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("settings.title")}</h1>
+      <ScreenHeader back={{ label: `‹ ${t("nav.back.today")}`, onClick: () => go("today") }} title={t("settings.title")} />
       <ProCard />
       <AccountRow />
       <div className="mt-2">
@@ -228,10 +226,7 @@ function LabsPage() {
   };
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("settings.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("lab.title")}</h1>
+      <ScreenHeader back={{ label: t("settings.back"), onClick: () => go("settings") }} title={t("lab.title")} />
       <p className="mt-2 text-sm text-muted">{t("lab.intro")}</p>
       {!pro ? (
         <section className="card mt-4 p-4">
@@ -275,10 +270,7 @@ function GroupPage({ group }: { group: Group }) {
   };
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("settings.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t(`settings.g.${group}`)}</h1>
+      <ScreenHeader back={{ label: t("settings.back"), onClick: () => go("settings") }} title={t(`settings.g.${group}`)} />
       {body[group]}
     </div>
   );
@@ -438,7 +430,7 @@ function AccessibilitySettings() {
   const set = (p: Partial<typeof a>) => setProfile({ a11y: { ...a, ...p } });
   return (
     <section id="accessibility" className="mt-6 scroll-mt-4">
-      <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">{t("settings.accessibility")}</h2>
+      <h2 className={`mb-2 px-1 ${SECTION_LABEL}`}>{t("settings.accessibility")}</h2>
       <Row<TextSize>
         label={t("a11y.text")}
         value={a.text}

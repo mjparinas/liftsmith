@@ -21,6 +21,7 @@ import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
 import * as callText from "./text/callText";
+import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
 import * as coach from "./text/coach";
@@ -56,6 +57,7 @@ import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
@@ -130,6 +132,7 @@ export const en = {
   ...buddy.en,
   ...buy.en,
   ...cal.en,
+  ...card.en,
   ...callText.en,
   ...category.en,
   ...cause.en,
@@ -166,6 +169,7 @@ export const en = {
   ...ins.en,
   ...lab.en,
   ...league.en,
+  ...link.en,
   ...lvl.en,
   ...map.en,
   ...mom.en,

@@ -26,7 +26,7 @@ import { Button } from "./ui";
 // Devices without WebGL get the 2D map (BodyMap), with the same list and advice.
 
 /** Muscles seen from behind; the camera turns to the back when one is picked. */
-const BACK = new Set<Muscle>(["traps", "rearDelts", "upperBack", "lats", "triceps", "lowerBack", "glutes", "hamstrings"]);
+const BACK = new Set<Muscle>(["traps", "rearDelts", "upperBack", "lats", "triceps", "lowerBack", "glutes", "hamstrings", "calves"]);
 const FRONT = new Set<Muscle>(["frontDelts", "chest", "biceps", "abs", "obliques", "quads", "adductors"]);
 
 const noSubscribe = () => () => {};
@@ -81,7 +81,7 @@ export function RecoveryMap({
           groups={groups}
         />
       ) : (
-        <BodyMap rec={rec} focus={selected ? [selected] : focus} compact={compact} />
+        <BodyMap rec={rec} focus={focus} picked={selected} compact={compact} />
       )}
       {three && <Legend hatchOnly />}
       {chips && (
@@ -98,7 +98,7 @@ export function RecoveryMap({
                   type="button"
                   aria-pressed={selected === m}
                   onClick={() => select(selected === m ? null : m)}
-                  className={`press min-h-11 rounded-full border px-3 text-sm ${selected === m ? "border-accent bg-accent/15 text-ink" : "border-line text-muted"}`}
+                  className={`press min-h-11 rounded-full border px-3 text-sm ${selected === m ? "border-2 border-accent bg-accent/25 font-semibold text-ink" : "border-line text-muted"}`}
                 >
                   {MUSCLE_LABEL[m]}
                 </button>
@@ -219,6 +219,7 @@ function Body3D({
     paint,
     hatch,
     selected: lit,
+    picked: !!selected,
     calm: calm(),
   };
   const latest = useRef(settings);
@@ -258,7 +259,7 @@ function Body3D({
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [view, paint, hatch, lit, settings.body]);
+  }, [view, paint, hatch, lit, settings.picked, settings.body]);
 
   const summary = groups
     .map((g) => t("map.group", { band: g.label, muscles: list(g.muscles.map((m) => MUSCLE_LABEL[m].toLowerCase())) }))

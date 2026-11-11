@@ -6,7 +6,6 @@ import { useMemo, useState } from "react";
 
 import { exercise } from "@/lib/exercises";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
 import {
   allFormulas,
   allOneRms,
@@ -29,7 +28,7 @@ import { useNow } from "@/lib/useNow";
 import { StatsNeeded } from "./BodyStats";
 import { ago } from "./format";
 import { HUE } from "./theme";
-import { Chip, EmptyState, Section, Sheet } from "./ui";
+import { Bump as BumpButton, Chip, EmptyState, Section, Sheet, type BumpStep } from "./ui";
 
 const conf = (c: OneRm["confidence"]) => t(`orm.conf.${c}`);
 const liftName = (k: DotsLift) => t(`dots.lift.${k}`);
@@ -226,26 +225,23 @@ function Bump({
   max?: number;
   suffix?: string;
 }) {
-  const bump = (d: 1 | -1) => {
-    haptic("select");
-    onChange(Math.min(max, Math.max(min, Math.round((value + d * step) / step) * step)));
+  // A long hold moves several steps at once; at either end the hold stops.
+  const bump: BumpStep = (d, size) => {
+    const next = Math.min(max, Math.max(min, Math.round((value + d * step * size) / step) * step));
+    if (next === value) return false;
+    onChange(next);
+    return true;
   };
-  const btn =
-    "press grid h-12 w-12 shrink-0 place-items-center rounded-full border border-line bg-raised text-xl text-ink active:border-accent/60 active:bg-accent/15";
   return (
     <div className="min-w-0">
       <div className="text-xs text-muted">{label}</div>
       <div className="mt-1 flex items-center justify-between gap-1">
-        <button type="button" className={btn} aria-label={t("orm.less", { what: inSentence(label, true) })} onClick={() => bump(-1)}>
-          −
-        </button>
+        <BumpButton dir={-1} size="md" aria={t("orm.less", { what: inSentence(label, true) })} onStep={bump} />
         <span className="num min-w-0 truncate text-center text-lg font-bold" aria-live="polite">
           {fmtNum(Math.round(value * 10) / 10)}
           {suffix ? <span className="text-xs font-normal text-muted"> {suffix}</span> : null}
         </span>
-        <button type="button" className={btn} aria-label={t("orm.more", { what: inSentence(label, true) })} onClick={() => bump(1)}>
-          +
-        </button>
+        <BumpButton dir={1} size="md" aria={t("orm.more", { what: inSentence(label, true) })} onStep={bump} />
       </div>
     </div>
   );
