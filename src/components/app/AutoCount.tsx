@@ -6,15 +6,17 @@
 // in memory and dropped: video never leaves the phone and is never recorded.
 // It's a lab (Settings › Labs, Pro): on the workout screen only while the `labRepCount` lab is on. Phone
 // motion counting is a second lab (`repMotion`), because it was unreliable. Camera bar speed is a third
-// (`labBarSpeed`): the last rep's speed, its drop from the fastest rep, and when to end the set.
+// (`labBarSpeed`): the last rep's speed, its drop from the fastest rep, and when to end the set. Camera form
+// check is a fourth (`labFormCheck`): between sets, one tip on depth, short range or a lean, shown on the figure.
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
 import { num, t } from "@/lib/i18n";
-import { haptic, oops } from "@/lib/juice";
+import { calm, haptic, oops } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { barSpeed, type BarSpeedReadout } from "@/lib/reps/barSpeed";
+import { checksFor, FormCheck, formFrame, mainIssue, type FormIssue, type FormReport } from "@/lib/reps/form";
 import { imuProfile, ImuRepCounter } from "@/lib/reps/imu";
 import { BLAZEPOSE, PoseSignal } from "@/lib/reps/pose";
 import { profileFor } from "@/lib/reps/profiles";
@@ -76,6 +78,24 @@ function poseEngine() {
 
 type Phase = "starting" | "loading" | "ready" | "error";
 
+/** The tip between sets for the set's main form issue, or that nothing needed fixing. */
+export function formTip(report: FormReport): { text: string; issue?: FormIssue } {
+  const issue = mainIssue(report);
+  if (!issue) return { text: t("count.form.good", { count: report.reps }) };
+  const key =
+    issue.kind === "lean"
+      ? issue.side === "left"
+        ? "count.form.leanLeft"
+        : "count.form.leanRight"
+      : issue.kind === "depth"
+        ? "count.form.depth"
+        : "count.form.rom";
+  return { text: t(key, { count: issue.of, hit: issue.hit, deg: issue.deg ?? 0 }), issue };
+}
+
+/** How far the figure leans to show a lean: the lifter's own tilt, kept between 8° and 15° so it reads on a small stage. */
+export const shownLean = (i?: FormIssue) => (i?.kind === "lean" ? (i.side === "left" ? -1 : 1) * Math.min(15, Math.max(8, i.deg ?? 8)) : 0);
+
 /**
  * The stage while counting: the 3D figure following the lifter, a small camera preview in the corner
  * (mirrored for the front camera) with a flip button, and the live count. `counting` is false during rest,
@@ -120,8 +140,17 @@ export function AutoCount({
   const [inView, setInView] = useState(false);
   const [speed, setSpeed] = useState<BarSpeedReadout | undefined>();
   const speedOn = labOn("labBarSpeed");
+  const formOn = labOn("labFormCheck");
+  const [form, setForm] = useState<FormReport | undefined>();
   const progress = useRef<number | null>(null);
-  const follow = useCallback(() => progress.current, []);
+  // Between sets, a depth or range tip replays the lifter's short rep on the figure: down to where it stopped and
+  // back, every 2.4 s (held still in Lean mode).
+  const replay = useRef<number | null>(null);
+  const follow = useCallback(() => {
+    const r = replay.current;
+    if (r === null) return progress.current;
+    return calm() ? r : (r * (1 - Math.cos(((performance.now() % 2400) / 2400) * 2 * Math.PI))) / 2;
+  }, []);
   // Read inside the frame loop, so the loop never restarts when they change.
   const live = useRef({ counting, onCount });
   useEffect(() => {
@@ -186,7 +215,15 @@ export function AutoCount({
       const v = video.current!;
       let tracker = new RepTracker(cameraProfile);
       const signal = new PoseSignal(cameraProfile, BLAZEPOSE, heightCm ? heightCm / 100 : undefined);
+      const check = formOn ? new FormCheck(checksFor(pattern)) : null;
       reset.current = () => {
+        // Form check: a set that just ended gets its tip, kept through rest; the next set clears it.
+        if (check) {
+          const r = check.report(tracker.summary().reps);
+          if (r.reps > 0) setForm(r);
+          else if (live.current.counting) setForm(undefined);
+          check.reset();
+        }
         tracker = new RepTracker(cameraProfile);
         base = 0;
         last = -1;
@@ -226,7 +263,8 @@ export function AutoCount({
           const now = performance.now();
           const kps = pose.detect(v, now);
           drawBones(bones.current, kps, v);
-          const smp = signal.sample(now, kps, v.videoWidth / Math.max(1, v.videoHeight));
+          const aspect = v.videoWidth / Math.max(1, v.videoHeight);
+          const smp = signal.sample(now, kps, aspect);
           const visible = smp.conf >= 0.3;
           if (visible !== seen) {
             seen = visible;
@@ -237,8 +275,10 @@ export function AutoCount({
             return;
           }
           tracker.push(smp);
+          check?.push(formFrame(now, kps, aspect));
           progress.current = visible ? tracker.progress : null;
           if (tracker.over) {
+            check?.keep(tracker.summary().reps);
             base += tracker.summary().full;
             tracker = new RepTracker(cameraProfile);
           }
@@ -290,6 +330,11 @@ export function AutoCount({
     reset.current();
   }, [setKey, counting]);
 
+  const tip = formOn && form && !counting ? formTip(form) : undefined;
+  useEffect(() => {
+    replay.current = tip?.issue?.reach ?? null;
+  });
+
   const mirror = camera && prefs.facing === "user" ? { transform: "scaleX(-1)" } : undefined;
   const status =
     phase === "error"
@@ -299,7 +344,7 @@ export function AutoCount({
         : phase === "loading"
           ? t("count.loading")
           : !counting
-            ? t("count.resting")
+            ? (tip?.text ?? t("count.resting"))
             : !inView
               ? t("count.position")
               : speed?.advice === "stop"
@@ -329,7 +374,8 @@ export function AutoCount({
         <LiftDemo
           exerciseId={exerciseId}
           body={body}
-          view="side"
+          view={tip?.issue?.kind === "lean" ? "front" : "side"}
+          lean={shownLean(tip?.issue)}
           bpm={bpm}
           hrTrend={hrTrend}
           follow={follow}
@@ -367,12 +413,16 @@ export function AutoCount({
         )}
         <div className="absolute inset-x-2 bottom-2 flex items-end gap-1">
           <p
-            className={`min-w-0 flex-1 rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : speed?.advice === "stop" && inView && counting ? "text-warn" : inView || !counting ? "text-muted" : "text-warn"}`}
+            className={`min-w-0 flex-1 rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : tip ? (tip.issue ? "text-warn" : "text-muted") : speed?.advice === "stop" && inView && counting ? "text-warn" : inView || !counting ? "text-muted" : "text-warn"}`}
             role={phase === "error" ? "alert" : "status"}
           >
             {status}
           </p>
-          {speedOn && <Info term="barSpeed" className="shrink-0 rounded-full bg-bg/80" />}
+          {tip ? (
+            <Info term="formCheck" className="shrink-0 rounded-full bg-bg/80" />
+          ) : (
+            speedOn && <Info term="barSpeed" className="shrink-0 rounded-full bg-bg/80" />
+          )}
         </div>
       </div>
       {camera && (

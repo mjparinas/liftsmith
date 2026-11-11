@@ -10,6 +10,8 @@ import {
   IGNORE_TAG,
   OFFLINE_GRACE_MS,
   planOf,
+  proMember,
+  proMonth,
   setBillingLive,
   storePro,
   trialDaysOf,
@@ -118,6 +120,35 @@ describe("Pro from the store", () => {
     expect(storePro(NOW, { live: true, ent: ent({ trial: true, expiresAt: NOW + DAY }) })).toEqual({ state: "trial", endsAt: NOW + DAY });
     expect(storePro(NOW, { live: true, ent: ent() })).toEqual({ state: "pro" });
     expect(storePro(NOW, { live: true, ent: ent({ active: false, expiresAt: NOW - DAY }) })).toEqual({ state: "free", since: NOW - DAY });
+  });
+});
+
+describe("Pro member (the Pro badge and rewards)", () => {
+  it("is never everyone-has-Pro: a build without billing gives no badge", () => {
+    expect(hasPro(NOW)).toBe(true);
+    expect(proMember(NOW)).toBe(false);
+  });
+
+  it("follows a store subscription or trial, with the offline grace", () => {
+    setBillingLive(true, null);
+    expect(proMember(NOW)).toBe(false);
+    setBillingLive(true, ent({ trial: true }));
+    expect(proMember(NOW)).toBe(true);
+    setBillingLive(true, ent({ expiresAt: NOW - OFFLINE_GRACE_MS - 1 }));
+    expect(proMember(NOW)).toBe(false);
+  });
+
+  it("follows Pro on the account (a lifetime code or the web), even where billing isn't live", () => {
+    const account = { token: "t", id: "a", email: "lifter@example.com", providers: ["email"], via: "email" as const };
+    useAccount.setState({ account });
+    expect(proMember(NOW)).toBe(false);
+    useAccount.setState({ account: { ...account, pro: true } });
+    expect(proMember(NOW)).toBe(true);
+  });
+
+  it("logs Pro by calendar month", () => {
+    expect(proMonth(new Date(2026, 0, 31, 23).getTime())).toBe("2026-01");
+    expect(proMonth(new Date(2026, 10, 1, 0, 5).getTime())).toBe("2026-11");
   });
 });
 

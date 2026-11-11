@@ -106,7 +106,8 @@ describe("Pro trial offer", () => {
     expect(screen.getByRole("button", { name: "Restore purchases" })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Not now, keep the free plan" }));
     await screen.findByText("Today's workout");
-    // No Pro: Today follows the free classic 5x5, and the recovery map is locked.
+    // No Pro: Today follows the free classic 5x5, the recovery map is locked, and there's no Pro badge.
+    expect(screen.queryByTestId("pro-badge")).not.toBeInTheDocument();
     expect(useApp.getState().profile.pro).toMatchObject({ declinedAt: expect.any(Number) });
     expect(useApp.getState().profile.planSource).toMatchObject({ kind: "program", id: "classic-5x5" });
     expect(useApp.getState().profile.proPlan).toEqual({ kind: "adaptive" });
@@ -121,6 +122,10 @@ describe("Pro trial offer", () => {
     );
     await waitFor(() => expect(useApp.getState().profile.planSource).toEqual({ kind: "adaptive" }));
     expect(useApp.getState().profile.proPlan).toBeUndefined();
+    // A real member: this month is logged for the Pro achievement, and Today shows the Pro badge.
+    await waitFor(() => expect(useApp.getState().events.filter((e) => e.type === "pro")).toHaveLength(1));
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    expect(await screen.findByTestId("pro-badge")).toHaveTextContent("Liftsmith Pro member");
   });
 });
 

@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "gloss.formCheck.title": "Form check",
+  "gloss.formCheck.body":
+    "While it counts reps, the camera also looks at how each rep moved: on squats, whether your hips got down level with your knees; on every lift, whether some reps were cut short of your best; and on squats, deadlifts and overhead presses, whether you leaned to one side.\nBetween sets it gives the one thing most worth fixing, with how many reps it saw it on, and the figure shows it: where your short reps stopped, or the way you leaned. It's a rough check from one camera, so it stays quiet unless it's clear. Side-on shows depth best; facing the camera shows a lean.",
   "gloss.barSpeed.title": "Bar speed",
   "gloss.barSpeed.body":
     "How fast the bar goes up on each rep, measured by the camera. As a set gets hard, the bar slows down, even when the reps still feel fine.\nWhen it's about a third slower than your fastest rep, you have roughly one good rep left, so ending the set there keeps the work hard without grinding. It's an estimate: a side-on view and good light help.",
@@ -99,6 +102,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "gloss.formCheck.title": "Revisión de técnica",
+  "gloss.formCheck.body":
+    "Mientras cuenta repeticiones, la cámara también mira cómo se movió cada una: en sentadillas, si la cadera bajó hasta la altura de las rodillas; en todos los ejercicios, si algunas repeticiones fueron más cortas que tu mejor; y en sentadillas, pesos muertos y presses por encima de la cabeza, si te inclinaste hacia un lado.\nEntre series te da lo que más vale la pena corregir, con en cuántas repeticiones lo vio, y la figura lo muestra: dónde se quedaron tus repeticiones cortas o hacia dónde te inclinaste. Es una revisión aproximada con una sola cámara, así que solo habla cuando está claro. De lado se ve mejor la profundidad; de frente, la inclinación.",
   "gloss.barSpeed.title": "Velocidad de la barra",
   "gloss.barSpeed.body":
     "Lo rápido que sube la barra en cada repetición, medido por la cámara. Cuando la serie se pone dura, la barra se frena, aunque las repeticiones aún se sientan bien.\nCuando va un tercio más lenta que tu repetición más rápida, te queda más o menos una buena repetición, así que terminar ahí mantiene el trabajo duro sin forzar. Es una estimación: ayuda verte de lado y tener buena luz.",
@@ -192,6 +198,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "gloss.formCheck.title": "Contrôle de la technique",
+  "gloss.formCheck.body":
+    "Pendant qu’elle compte les répétitions, la caméra regarde aussi comment chacune a bougé : au squat, si vos hanches sont descendues au niveau des genoux ; sur tous les exercices, si certaines répétitions étaient plus courtes que votre meilleure ; et au squat, au soulevé de terre et au développé au-dessus de la tête, si vous avez penché d’un côté.\nEntre les séries, elle donne la chose la plus utile à corriger, avec le nombre de répétitions concernées, et la silhouette la montre : où vos répétitions courtes se sont arrêtées, ou de quel côté vous avez penché. C’est un contrôle approximatif avec une seule caméra : elle ne dit rien tant que ce n’est pas net. De profil, on voit mieux la profondeur ; de face, l’inclinaison.",
   "gloss.barSpeed.title": "Vitesse de barre",
   "gloss.barSpeed.body":
     "La vitesse de montée de la barre à chaque répétition, mesurée par la caméra. Quand une série devient dure, la barre ralentit, même si les répétitions semblent encore faciles.\nQuand elle est environ un tiers plus lente que votre répétition la plus rapide, il vous reste à peu près une bonne répétition : finir là garde l’effort intense sans forcer. C’est une estimation : une vue de profil et une bonne lumière aident.",
@@ -285,6 +294,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "gloss.formCheck.title": "Technik-Check",
+  "gloss.formCheck.body":
+    "Während sie Wiederholungen zählt, schaut die Kamera auch, wie jede Wiederholung lief: bei Kniebeugen, ob die Hüfte bis auf Kniehöhe kam; bei jeder Übung, ob manche Wiederholungen kürzer waren als deine beste; und bei Kniebeugen, Kreuzheben und Überkopfdrücken, ob du dich zu einer Seite geneigt hast.\nZwischen den Sätzen nennt sie das, was sich am meisten zu verbessern lohnt, mit der Zahl der betroffenen Wiederholungen, und die Figur zeigt es: wo deine kurzen Wiederholungen endeten oder wohin du dich geneigt hast. Es ist eine grobe Prüfung mit einer Kamera, daher meldet sie sich nur, wenn es eindeutig ist. Von der Seite sieht man die Tiefe am besten, von vorn eine Neigung.",
   "gloss.barSpeed.title": "Stangengeschwindigkeit",
   "gloss.barSpeed.body":
     "Wie schnell die Stange bei jeder Wiederholung nach oben geht, gemessen von der Kamera. Wenn ein Satz schwer wird, wird die Stange langsamer, auch wenn sich die Wiederholungen noch gut anfühlen.\nIst sie etwa ein Drittel langsamer als deine schnellste Wiederholung, hast du ungefähr noch eine gute Wiederholung. Wer dort aufhört, trainiert hart, ohne sich zu quälen. Es ist eine Schätzung: Seitenansicht und gutes Licht helfen.",
@@ -378,6 +390,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "gloss.formCheck.title": "Controllo della tecnica",
+  "gloss.formCheck.body":
+    "Mentre conta le ripetizioni, la fotocamera guarda anche come si è mossa ciascuna: nello squat, se le anche sono scese all’altezza delle ginocchia; in ogni esercizio, se alcune ripetizioni sono state più corte della migliore; e in squat, stacchi e distensioni sopra la testa, se hai inclinato il busto su un lato.\nTra una serie e l’altra ti dice la cosa più utile da correggere, con su quante ripetizioni l’ha vista, e la figura la mostra: dove si sono fermate le ripetizioni corte o da che parte hai inclinato il busto. È un controllo approssimativo con una sola fotocamera, quindi parla solo quando è chiaro. Di lato si vede meglio la profondità, di fronte l’inclinazione.",
   "gloss.barSpeed.title": "Velocità del bilanciere",
   "gloss.barSpeed.body":
     "Quanto velocemente sale il bilanciere a ogni ripetizione, misurato dalla fotocamera. Quando la serie diventa dura, il bilanciere rallenta, anche se le ripetizioni sembrano ancora facili.\nQuando è circa un terzo più lento della tua ripetizione più veloce, ti resta più o meno una buona ripetizione: fermarti lì mantiene il lavoro intenso senza forzare. È una stima: una vista di lato e una buona luce aiutano.",
@@ -471,6 +486,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "gloss.formCheck.title": "フォームチェック",
+  "gloss.formCheck.body":
+    "レップを数えながら、カメラは各レップの動きも見ています。スクワットでは股関節が膝の高さまで下がったか、すべての種目でいちばん深いレップより短いレップがなかったか、スクワット・デッドリフト・オーバーヘッドプレスでは左右に傾いていないかです。\nセット間に、いちばん直す価値のあることを何レップで見つかったかと一緒に伝え、フィギュアで示します（短いレップが止まった位置や傾いた向き）。カメラ 1 台での大まかなチェックなので、はっきりしたときだけ知らせます。深さは横から、傾きは正面からがいちばん見やすくなります。",
   "gloss.barSpeed.title": "バースピード",
   "gloss.barSpeed.body":
     "各レップでバーが上がる速さを、カメラで測ったものです。セットがきつくなると、まだ楽に感じていてもバーは遅くなります。\nいちばん速いレップより 3 分の 1 ほど遅くなったら、余力はおよそ 1 レップ。そこでセットを終えれば、無理に粘らずしっかり追い込めます。目安の値なので、横から映し、明るい場所で使うと正確になります。",
