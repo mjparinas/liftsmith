@@ -367,6 +367,17 @@ html, body {
 
 body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
+/* Japanese (2026-11-10): the phone's own Japanese fonts ahead of the Latin stack's fallbacks, so kana and
+   kanji never come out in Chinese glyph shapes, and line breaks between phrases rather than mid-word
+   (auto-phrase where the engine has it, strict kinsoku rules everywhere). German's long compounds may
+   hyphenate rather than overflow a narrow card. In both, a word too long for its box breaks instead of
+   spilling over the next control (overflow-wrap: anywhere). html[lang] is the app language (i18n.ts). */
+:root:lang(ja) {
+  --font-sans: "Inter", "Roboto", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+}
+:lang(ja) body { line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere; }
+:lang(de) body { hyphens: auto; overflow-wrap: anywhere; }
+
 /* A soft light at the top of every app screen, so the dark base has depth without noise. */
 .aurora { position: relative; isolation: isolate; }
 .aurora::before {
@@ -457,6 +468,11 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 
 .safe-bottom { padding-bottom: max(12px, env(safe-area-inset-bottom)); }
 .safe-top { padding-top: max(12px, env(safe-area-inset-top)); }
+/* Screens with the tab bar: room for the bar (its measured height, --nav-h, set by TabBar in App.tsx)
+   plus a little air, so the last card scrolls clear of it. The fallback covers the first paint. */
+.clear-nav { padding-bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 1.5rem); }
+/* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
+.status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }
 
 input[type="range"].slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--grad-a), var(--grad-c)) 0 / var(--fill, 50%) 100% no-repeat, var(--color-line); }
 input[type="range"].slider::-webkit-slider-thumb { -webkit-appearance: none; width: 28px; height: 28px; border-radius: 999px; background: #fff; border: 5px solid var(--color-accent); box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-accent) 18%, transparent), 0 4px 10px var(--shadow); transition: box-shadow 150ms ease; }

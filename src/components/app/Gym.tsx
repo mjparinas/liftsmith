@@ -25,7 +25,7 @@ export function Gym() {
   const update = (patch: Partial<GymT>) => saveGym({ ...gym, ...patch });
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("gym.title")}</h1>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (

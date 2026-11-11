@@ -56,10 +56,23 @@ export const EQUIPMENT = [
   "smith",
   "hackSquat",
   "calfMachine",
+  "hipMachine",
+  "preacher",
+  "assistedPullup",
   "bands",
   "rings",
   "box",
   "abWheel",
+  "medicineBall",
+  "jumpRope",
+  "treadmill",
+  "rower",
+  "bike",
+  "elliptical",
+  "stairClimber",
+  "skiErg",
+  "sled",
+  "battleRopes",
 ] as const;
 export type Equipment = (typeof EQUIPMENT)[number];
 
@@ -95,20 +108,29 @@ export const EQUIPMENT_GROUPS: { title: string; items: Equipment[] }[] = [
       "smith",
       "hackSquat",
       "calfMachine",
+      "hipMachine",
+      "preacher",
+      "assistedPullup",
     ],
   },
   {
     get title() {
       return t("equipment.group.small");
     },
-    items: ["bands", "rings", "abWheel"],
+    items: ["bands", "rings", "abWheel", "medicineBall", "jumpRope"],
+  },
+  {
+    get title() {
+      return t("equipment.group.cardio");
+    },
+    items: ["treadmill", "rower", "bike", "elliptical", "stairClimber", "skiErg", "sled", "battleRopes"],
   },
 ];
 
 /** How an exercise is loaded decides how its weight is rounded and drawn. */
 export type LoadKind = "barbell" | "dumbbell" | "kettlebell" | "machine" | "bodyweight";
 
-export type Pattern = "squat" | "hinge" | "lunge" | "hpush" | "vpush" | "hpull" | "vpull" | "carry" | "core" | "isolation";
+export type Pattern = "squat" | "hinge" | "lunge" | "hpush" | "vpush" | "hpull" | "vpull" | "carry" | "core" | "isolation" | "cardio";
 
 export interface Exercise {
   id: string;
@@ -126,6 +148,11 @@ export interface Exercise {
   cues: string[];
   /** The lifter made it. Used in swaps and logging, not picked by the generator. */
   custom?: boolean;
+  /**
+   * Cardio (pattern "cardio"): logged as time (reps are seconds), plus distance for "distance". Never
+   * picked by the generator; added to a routine or a workout by the lifter.
+   */
+  cardio?: "distance" | "time";
 }
 
 export interface Bar {
@@ -227,13 +254,16 @@ export interface Profile {
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
   cosmetics?: { accent?: string; sound?: string; plates?: string };
   /**
-   * Optional, asked in setup, only used for first-session starting weights (startLoad in progression.ts).
-   * Health Connect has neither, so the app asks on every platform.
+   * Your stats (Settings › Body and units, BodyStats.tsx): the one place for age, sex and height, which
+   * TDEE, fitness age, DOTS, strength scores and starting weights all read. Also asked in setup. Apple Health
+   * fills age and sex (HealthWorkoutPlugin.swift `characteristics`); Health Connect has neither.
    */
   birthYear?: number;
   sex?: "male" | "female";
-  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Tools › TDEE. */
+  /** Centimetres. From Health Connect or Apple Health when allowed, or entered in Your stats. */
   heightCm?: number;
+  /** When height was entered by hand (ms), so an older health reading doesn't replace it. */
+  heightAt?: number;
   /** Latest body fat reading (percent) from Health Connect or Apple Health, or entered by hand. */
   bodyFat?: { pct: number; at: number };
   /** TDEE settings (tdee.ts). Missing activity means it's read from the lifter's workouts. */
@@ -326,6 +356,10 @@ export interface TrainingPrefs {
   restAlert?: RestAlert;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
+  /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
+  warmFirst?: boolean;
+  /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
+  coolDown?: boolean;
   /** Exercises the planner picks first when they fit. */
   favourites?: string[];
   /** Muscles that get more weekly sets and go first in the plan. */
@@ -395,6 +429,8 @@ export interface SetEvent extends EventBase {
   reps: number;
   /** Reps (or seconds for holds) the plan asked for. */
   targetReps: number;
+  /** Metres covered, for cardio logged with distance (reps are then the seconds it took). */
+  distanceM?: number;
   /** Reps in reserve the plan aimed for. */
   rir: number;
   // Captured automatically (Melvin, 2026-11-09: "win on data"). Optional so older events still load.
@@ -431,7 +467,16 @@ export interface SetEvent extends EventBase {
   /** Per-side exercises (sides.ts) when the two sides differ: reps on each. `reps` is then the lower. */
   repsL?: number;
   repsR?: number;
+  /**
+   * A bonus set added between sets (set types, 2026-11-11): a drop set (lighter, straight after the one
+   * before) or a rest-pause set (same weight after a short pause). Counted in volume and stats; progression,
+   * ghost mode and plateaus read only the planned sets (progression.ts sessionsOf).
+   */
+  tag?: SetTag;
 }
+
+/** Set types the lifter adds between sets. Failure is the reps-left rating of 0 (EffortEvent). */
+export type SetTag = "drop" | "restPause";
 
 export interface SessionStartEvent extends EventBase {
   type: "sessionStart";
@@ -511,6 +556,17 @@ export interface BodyweightEvent extends EventBase {
   bodyFat?: number;
 }
 
+/** Body measurements (competitor gaps, Melvin 2026-11-11), tape-measure sites on the Body and photos screen. */
+export const MEASURE_SITES = ["waist", "hips", "chest", "shoulders", "neck", "arm", "forearm", "thigh", "calf"] as const;
+export type MeasureSite = (typeof MEASURE_SITES)[number];
+
+/** One tape measurement, in centimetres (shown in inches when the lifter uses pounds). */
+export interface MeasureEvent extends EventBase {
+  type: "measure";
+  site: MeasureSite;
+  cm: number;
+}
+
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
 export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing";
 
@@ -560,6 +616,17 @@ export interface TdeeEvent extends EventBase {
  * "I'm at the gym" sent to gym buddies. Today it goes out through the share sheet; once accounts and sync
  * exist the server turns it into a nudge on each buddy's phone. Buddy names only, never contact details.
  */
+/**
+ * Stretches done (src/lib/stretches.ts): the warm-up before a workout, the cool-down after one, a rest-day
+ * stretch, or ones the lifter picked from the library. Stretch ids; `seconds` is how long it took.
+ */
+export interface StretchEvent extends EventBase {
+  type: "stretch";
+  moment: "warm" | "cool" | "rest" | "pick";
+  ids: string[];
+  seconds: number;
+}
+
 export interface CheckinEvent extends EventBase {
   type: "checkin";
   gymId?: string;
@@ -676,9 +743,11 @@ export interface InjuryReturnEvent extends EventBase {
 // Every event kind, one per line so two changes adding an event don't touch the same line.
 export type AppEvent =
   | BodyweightEvent
+  | MeasureEvent
   | HealthEvent
   | TdeeEvent
   | CheckinEvent
+  | StretchEvent
   | FeelEvent
   | SetEvent
   | SessionStartEvent

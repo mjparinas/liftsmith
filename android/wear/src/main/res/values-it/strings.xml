@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel">Allenamento in corso</string>
+    <string name="in_progress">Allenamento in corso</string>
+    <string name="none_title">Nessun allenamento in corso</string>
+    <string name="none_body">Inizialo sul telefono e lo vedrai qui.</string>
+    <string name="log_set">Registra serie</string>
+    <string name="add_30">+30 s</string>
+    <string name="up_next">Prossima: %1$s</string>
+    <string name="rest_left">Riposo, mancano %1$s</string>
+    <string name="bpm">♥ %1$d bpm</string>
+</resources>

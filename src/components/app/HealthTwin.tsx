@@ -20,8 +20,9 @@ import { scoreBand, strength } from "@/lib/strength";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 
+import { openStats } from "./BodyStats";
 import { go } from "./router";
-import { Button, Section, Sheet } from "./ui";
+import { Button, ProTag, Section, Sheet } from "./ui";
 
 const BODY: TwinId[] = ["weight", "leanMass", "bodyFat", "bmi", "tdee", "steps"];
 const HEART: TwinId[] = ["sleep", "hrv", "restingHr", "breathing", "vo2max", "restDrop"];
@@ -258,7 +259,7 @@ function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
             {t("fit.how")}
           </Button>
           {!r.ok && !r.missing.includes("vo2") && (
-            <Button kind="ghost" onClick={() => go("tools", "tdee")}>
+            <Button kind="ghost" onClick={openStats}>
               {t("fit.addProfile")}
             </Button>
           )}
@@ -372,9 +373,15 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
             {m.action.label}
           </Button>
         )}
-        {m.status === "watch" && can("adaptive") && ["sleep", "hrv", "restingHr", "breathing", "restDrop"].includes(m.id) && (
-          <Button kind="ghost" onClick={onEasy}>
+        {m.status === "watch" && ["sleep", "hrv", "restingHr", "breathing", "restDrop"].includes(m.id) && (
+          // Making today easy changes the adaptive plan, so it's Pro: free lifters see it tagged, and it opens the paywall.
+          <Button
+            kind="ghost"
+            onClick={can("adaptive") ? onEasy : () => go("pro", "twin")}
+            label={can("adaptive") ? undefined : t("pro.locked", { what: t("twin.easy") })}
+          >
             {t("twin.easy")}
+            {!can("adaptive") && <ProTag />}
           </Button>
         )}
       </div>

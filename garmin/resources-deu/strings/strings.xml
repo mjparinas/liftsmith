@@ -1,0 +1,9 @@
+<strings>
+    <string id="NoneTitle">Kein Training aktiv</string>
+    <string id="NoneBody">Starte eins auf deinem Handy, dann erscheint es hier.</string>
+    <string id="Rest">Pause</string>
+    <string id="Next">Als Nächstes: $1$</string>
+    <string id="Bpm">$1$ S/min</string>
+    <string id="HintLog">START: Satz eintragen</string>
+    <string id="HintAdd">DOWN: +30 s</string>
+</strings>

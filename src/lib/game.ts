@@ -4,7 +4,7 @@ import { achievements, achievementXp, context, nearest, type Achievement } from 
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
-import { epley, TIMED } from "./progression";
+import { epley, gradedSet, TIMED } from "./progression";
 import { hash, rng } from "./random";
 import type { AppEvent, Profile, SetEvent } from "./types";
 
@@ -208,7 +208,8 @@ const QUESTS: QuestDef[] = [
     xp: 100,
     title: () => q("on-target"),
     goal: () => 1,
-    have: (_s, ss) => ss.filter((s) => s.sets.length >= 6 && s.sets.every((x) => x.challenge || x.reps >= x.targetReps)).length,
+    have: (_s, ss) =>
+      ss.filter((s) => s.sets.filter(gradedSet).length >= 6 && s.sets.every((x) => !gradedSet(x) || x.reps >= x.targetReps)).length,
   },
   {
     id: "sets",
@@ -257,10 +258,12 @@ const QUESTS: QuestDef[] = [
 
 function prsIn(sets: SetEvent[], before: SetEvent[]): number {
   const bestBy = new Map<string, number>();
-  for (const s of before) if (s.weight > 0) bestBy.set(s.exerciseId, Math.max(bestBy.get(s.exerciseId) ?? 0, epley(s.weight, s.reps)));
+  for (const s of before)
+    if (s.weight > 0 && !TIMED.has(s.exerciseId))
+      bestBy.set(s.exerciseId, Math.max(bestBy.get(s.exerciseId) ?? 0, epley(s.weight, s.reps)));
   let n = 0;
   for (const s of [...sets].sort((a, b) => a.at - b.at)) {
-    if (s.weight <= 0) continue;
+    if (s.weight <= 0 || TIMED.has(s.exerciseId)) continue;
     const e = epley(s.weight, s.reps);
     const b = bestBy.get(s.exerciseId);
     if (b !== undefined && e > b + 0.01) n++;

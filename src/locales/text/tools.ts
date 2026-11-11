@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "tools.backTools": "‹ Outils",
   "tools.title": "Outils",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "tools.back": "‹ Fortschritt",
+  "tools.backTools": "‹ Tools",
+  "tools.title": "Tools",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "tools.back": "‹ Progressi",
+  "tools.backTools": "‹ Strumenti",
+  "tools.title": "Strumenti",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "tools.back": "‹ 進捗",
+  "tools.backTools": "‹ ツール",
+  "tools.title": "ツール",
+};

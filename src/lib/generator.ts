@@ -177,7 +177,7 @@ export function generate({
   const hurt = activeInjuries(events, now);
   const skip = new Set([...exclude, ...avoided(events, gym.id, now), ...skippedIds(EXERCISES, hurt)]);
   const pool = available(gym.equipment).filter(
-    (e) => !skip.has(e.id) && !e.custom && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
+    (e) => !skip.has(e.id) && !e.custom && e.pattern !== "cardio" && !LADDER_ONLY.has(e.id) && (!day || e.primary.every((m) => day.has(m))),
   );
   const random = rng(hash(dayKey(now) + gym.id));
   const training = profile.training;
@@ -390,7 +390,15 @@ export function alternatives(exerciseId: string, gym: Gym | null, skip: readonly
   const pool = gym ? available(gym.equipment) : [...EXERCISE_BY_ID.values()];
   const eff = (e: Exercise) => effectFor(e, hurt);
   return pool
-    .filter((e) => e.id !== ex.id && !skip.includes(e.id) && e.primary.some((m) => ex.primary.includes(m)) && eff(e)?.action !== "skip")
+    .filter(
+      (e) =>
+        e.id !== ex.id &&
+        !skip.includes(e.id) &&
+        // Cardio swaps for cardio, strength for strength.
+        !e.cardio === !ex.cardio &&
+        e.primary.some((m) => ex.primary.includes(m)) &&
+        eff(e)?.action !== "skip",
+    )
     .map((e) => {
       const shared =
         e.primary.filter((m) => ex.primary.includes(m)).length * 3 + e.secondary.filter((m) => ex.secondary.includes(m)).length;

@@ -158,6 +158,20 @@ describe("autofill from Health Connect / Apple Health", () => {
     expect(bodyUpdates({ height: { value: 175.4, at: NOW } }, profile({ heightCm: undefined }))).toEqual({ heightCm: 175 });
     expect(bodyUpdates({ height: { value: 12, at: NOW } }, profile())).toEqual({});
   });
+  it("keeps a height typed after the health reading, and takes a newer one", () => {
+    const typed = profile({ heightCm: 180, heightAt: NOW - DAY });
+    expect(bodyUpdates({ height: { value: 175, at: NOW - 2 * DAY } }, typed)).toEqual({});
+    expect(bodyUpdates({ height: { value: 175, at: NOW } }, typed)).toEqual({ heightCm: 175 });
+  });
+  it("fills sex and birth year from Apple Health only when Your stats has none", () => {
+    const year = new Date(NOW).getFullYear();
+    expect(bodyUpdates({ sex: "female", birthYear: year - 34 }, profile({ sex: undefined, birthYear: undefined }), NOW)).toEqual({
+      sex: "female",
+      birthYear: year - 34,
+    });
+    expect(bodyUpdates({ sex: "female", birthYear: year - 34 }, profile({ sex: "male", birthYear: year - 40 }), NOW)).toEqual({});
+    expect(bodyUpdates({ birthYear: year - 3 }, profile({ birthYear: undefined }), NOW)).toEqual({});
+  });
   it("takes body fat from the newest weigh-in that has one, or the value entered by hand if that's newer", () => {
     const ev: AppEvent[] = [
       { type: "bodyweight", id: "a", at: NOW - 2 * DAY, kg: 80, bodyFat: 19.04 },

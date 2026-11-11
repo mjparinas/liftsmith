@@ -85,4 +85,29 @@ describe("heartbeat on the figure", () => {
     expect(h[1]).toBeLessThan(J.shC[1]);
     expect(h[1]).toBeGreaterThan(J.hipC[1]);
   });
+
+  it("speeds up or slows down from where it is when the heart rate changes, without a skipped beat", async () => {
+    const { advanceBeat, heartPulse } = await import("./engine");
+    // a quarter of a second at 60 bpm is a quarter of a beat
+    let ph = advanceBeat(0, 0.25, 60);
+    expect(ph).toBeCloseTo(0.25);
+    // the reading jumps to 150: the next frame carries on from a quarter, it doesn't leap to a new phase
+    const next = advanceBeat(ph, 1 / 60, 150);
+    expect(next - ph).toBeCloseTo(150 / 60 / 60);
+    // a whole second at 120 bpm is two beats, so it lands where it started
+    ph = 0.1;
+    for (let i = 0; i < 60; i++) ph = advanceBeat(ph, 1 / 60, 120);
+    expect(ph).toBeCloseTo(0.1);
+    expect(heartPulse(0.04)).toBeCloseTo(1, 1);
+  });
+
+  it("pulses the heart icon beside the bpm at the live rate, not once a second", async () => {
+    const { beatStyle } = await import("@/lib/beat");
+    expect(beatStyle(120)).toEqual({ animationDuration: "0.500s" });
+    expect(beatStyle(300)).toEqual({ animationDuration: "0.250s" }); // a bad reading is clamped
+    expect(beatStyle(null)).toBeUndefined();
+    render(<LiftDemo exerciseId="back-squat" bpm={150} />);
+    const icon = screen.getByTestId("heart-readout").querySelector(".animate-beat") as HTMLElement;
+    expect(icon.style.animationDuration).toBe("0.4s");
+  });
 });

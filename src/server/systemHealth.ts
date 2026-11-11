@@ -177,12 +177,17 @@ export async function siteCheck(): Promise<HealthCheck> {
 interface RobotMonitor {
   id: number;
   friendly_name: string;
+  url?: string;
   status: number;
   custom_uptime_ratio?: string;
   logs?: { type: number; datetime: number }[];
 }
 
 const ROBOT_LINK = { label: "UptimeRobot dashboard", href: "https://dashboard.uptimerobot.com/monitors" };
+
+/** The UptimeRobot account also watches other products (Gradelings), so the card keeps only monitors whose name or address says Liftsmith. */
+export const isLiftsmithMonitor = (m: Pick<RobotMonitor, "friendly_name" | "url">) =>
+  /liftsmith/i.test(`${m.friendly_name} ${m.url ?? ""}`);
 
 export async function uptimeCheck(): Promise<HealthCheck> {
   const key = env("UPTIMEROBOT_API_KEY");
@@ -206,13 +211,13 @@ export async function uptimeCheck(): Promise<HealthCheck> {
     { method: "POST", body: body.toString() },
   );
   if (res.stat !== "ok") throw new Error(`UptimeRobot refused the request${res.error?.message ? `: ${res.error.message}` : "."}`);
-  const monitors = res.monitors ?? [];
+  const monitors = (res.monitors ?? []).filter(isLiftsmithMonitor);
   if (!monitors.length)
     return {
       id: "uptime",
       title: "Uptime",
       state: "warn",
-      summary: "UptimeRobot has no monitors yet.",
+      summary: res.monitors?.length ? "UptimeRobot has no Liftsmith monitors yet." : "UptimeRobot has no monitors yet.",
       rows: [],
       setup: "Add a monitor for https://www.getliftsmith.com/api/health/.",
       link: ROBOT_LINK,

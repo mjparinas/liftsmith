@@ -52,7 +52,7 @@ describe("export", () => {
     const lines = setsCsv(events, "lb").trim().split("\n");
     expect(lines[0]).toBe(CSV_HEADER.join(","));
     expect(lines).toHaveLength(4);
-    expect(lines[1]).toBe("2026-11-09,18:31,sess-123,Barbell bench press,1,220.46,lb,,5,5,2,20,120,130,150");
+    expect(lines[1]).toBe("2026-11-09,18:31,sess-123,Barbell bench press,1,220.46,lb,,5,5,2,20,120,130,150,,");
     expect(lines[2].split(",")[4]).toBe("2");
     expect(lines[3]).toMatch(/Dumbbell bench press,1,66.14,lb,yes,10/);
   });

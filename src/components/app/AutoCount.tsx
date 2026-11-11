@@ -4,19 +4,24 @@
 // An optional switch beside the exercise: while it's on, the camera watches the set, the 3D figure follows
 // the lifter, and the reps counted fill in the reps for Log set, so logging stays one tap. Frames are read
 // in memory and dropped: video never leaves the phone and is never recorded.
-// Phone motion counting is behind the `repMotion` flag (off by default), because it was unreliable.
+// It's a lab (Settings › Labs, Pro): on the workout screen only while the `labRepCount` lab is on. Phone
+// motion counting is a second lab (`repMotion`), because it was unreliable. Camera bar speed is a third
+// (`labBarSpeed`): the last rep's speed, its drop from the fastest rep, and when to end the set.
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
-import { can } from "@/lib/entitlements";
-import { flag } from "@/lib/flags";
-import { t } from "@/lib/i18n";
+import { Info } from "@/components/Info";
+import { num, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { labOn } from "@/lib/labs";
+import { barSpeed, type BarSpeedReadout } from "@/lib/reps/barSpeed";
 import { imuProfile, ImuRepCounter } from "@/lib/reps/imu";
 import { BLAZEPOSE, PoseSignal } from "@/lib/reps/pose";
 import { profileFor } from "@/lib/reps/profiles";
+import { skeleton } from "@/lib/reps/skeleton";
 import { loadPose, openCamera, startMotion, type PoseEngine } from "@/lib/reps/sources";
 import { RepTracker } from "@/lib/reps/tracker";
+import type { SetSummary } from "@/lib/reps/types";
 import type { Pattern } from "@/lib/types";
 
 import { Icon } from "./icons";
@@ -39,7 +44,7 @@ export function loadCountPrefs(): CountPrefs {
     return {
       on: p.on === true,
       facing: p.facing === "environment" ? "environment" : "user",
-      source: p.source === "motion" && flag("repMotion") ? "motion" : "camera",
+      source: p.source === "motion" && labOn("repMotion") ? "motion" : "camera",
     };
   } catch {
     return DEFAULTS;
@@ -56,7 +61,6 @@ export function saveCountPrefs(p: CountPrefs) {
 
 /** Whether this exercise can be counted: the camera knows how to read it (and motion, when that's on). */
 export function countable(id: string, pattern: Pattern, source: CountSource = "camera"): boolean {
-  if (!can("autoCount")) return false;
   return !!(source === "motion" ? imuProfile(id, pattern) : profileFor(id, pattern));
 }
 
@@ -81,6 +85,7 @@ export function AutoCount({
   exerciseId,
   pattern,
   body,
+  heightCm,
   bpm,
   hrTrend,
   prefs,
@@ -94,6 +99,8 @@ export function AutoCount({
   exerciseId: string;
   pattern: Pattern;
   body: "male" | "female";
+  /** The lifter's height, which gives the camera a scale for bar speed in m/s. */
+  heightCm?: number;
   bpm?: number | null;
   /** Recent heart rate readings for the trend line on the figure. */
   hrTrend?: readonly number[];
@@ -106,10 +113,13 @@ export function AutoCount({
   paused?: boolean;
 }) {
   const video = useRef<HTMLVideoElement>(null);
+  const bones = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("starting");
   const [error, setError] = useState("");
   const [count, setCount] = useState(0);
   const [inView, setInView] = useState(false);
+  const [speed, setSpeed] = useState<BarSpeedReadout | undefined>();
+  const speedOn = labOn("labBarSpeed");
   const progress = useRef<number | null>(null);
   const follow = useCallback(() => progress.current, []);
   // Read inside the frame loop, so the loop never restarts when they change.
@@ -130,6 +140,23 @@ export function AutoCount({
     let stop = () => {};
     let base = 0; // reps from earlier parts of this set, when the tracker ended itself after a long pause
     let last = -1;
+    let lastSpeed = "";
+    // Bar speed (its lab): set only when a new rep changes it, so frames don't re-render the stage.
+    const showSpeed = (sum: SetSummary) => {
+      if (!speedOn) return;
+      const b = barSpeed(sum);
+      if (!b) return;
+      const k = `${sum.full}:${b.speed}`;
+      if (lastSpeed.startsWith(`${k}:`)) return;
+      // One buzz when it's time to end the set: the lifter is lifting, not looking.
+      if (b.advice === "stop" && !lastSpeed.endsWith(":stop")) haptic("warning");
+      lastSpeed = `${k}:${b.advice ?? ""}`;
+      setSpeed(b);
+    };
+    const clearSpeed = () => {
+      lastSpeed = "";
+      setSpeed(undefined);
+    };
     const report = (n: number) => {
       if (n === last) return;
       last = n;
@@ -158,12 +185,13 @@ export function AutoCount({
     if (camera && cameraProfile) {
       const v = video.current!;
       let tracker = new RepTracker(cameraProfile);
-      const signal = new PoseSignal(cameraProfile, BLAZEPOSE);
+      const signal = new PoseSignal(cameraProfile, BLAZEPOSE, heightCm ? heightCm / 100 : undefined);
       reset.current = () => {
         tracker = new RepTracker(cameraProfile);
         base = 0;
         last = -1;
         setCount(0);
+        clearSpeed();
       };
       let raf = 0;
       let lastT = -1;
@@ -196,7 +224,9 @@ export function AutoCount({
           if (v.readyState < 2 || v.currentTime === lastT) return;
           lastT = v.currentTime;
           const now = performance.now();
-          const smp = signal.sample(now, pose.detect(v, now), v.videoWidth / Math.max(1, v.videoHeight));
+          const kps = pose.detect(v, now);
+          drawBones(bones.current, kps, v);
+          const smp = signal.sample(now, kps, v.videoWidth / Math.max(1, v.videoHeight));
           const visible = smp.conf >= 0.3;
           if (visible !== seen) {
             seen = visible;
@@ -212,7 +242,9 @@ export function AutoCount({
             base += tracker.summary().full;
             tracker = new RepTracker(cameraProfile);
           }
-          report(base + tracker.summary().full);
+          const sum = tracker.summary();
+          report(base + sum.full);
+          showSpeed(sum);
         };
         raf = requestAnimationFrame(loop);
       })();
@@ -223,6 +255,7 @@ export function AutoCount({
         base = 0;
         last = -1;
         setCount(0);
+        clearSpeed();
       };
       startMotion((r) => {
         if (!live.current.counting) return;
@@ -233,7 +266,9 @@ export function AutoCount({
           base += counter.summary().full;
           counter = new ImuRepCounter(motionProfile);
         }
-        report(base + counter.summary().full);
+        const sum = counter.summary();
+        report(base + sum.full);
+        showSpeed(sum);
       }).then((off) => {
         if (stopped) off();
         else {
@@ -265,48 +300,87 @@ export function AutoCount({
           ? t("count.loading")
           : !counting
             ? t("count.resting")
-            : inView
-              ? t("count.counting")
-              : t("count.position");
+            : !inView
+              ? t("count.position")
+              : speed?.advice === "stop"
+                ? t("count.speed.stop", { loss: Math.round(speed.loss * 100) })
+                : speed?.advice === "left"
+                  ? t("count.speed.left", { count: speed.rir ?? 0, loss: Math.round(speed.loss * 100) })
+                  : t("count.counting");
 
+  // Stop sits on the camera, opposite the flip, so nothing covers the figure.
+  const stopButton = (
+    <button
+      type="button"
+      onClick={onClose}
+      className={`press absolute inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm text-muted ${camera ? "bottom-1 left-1" : "right-2 top-7"}`}
+      aria-label={t("count.off")}
+    >
+      <Icon name="camera" size={16} className="text-accent" />
+      {t("count.stop")}
+    </button>
+  );
+
+  // The figure on the left and the camera on the right, side by side (Melvin, 2026-11-10: "shift the 3D model
+  // left to make room for the camera"), with the bones the camera reads drawn over the lifter.
   return (
-    <div className="relative h-full" data-testid="auto-count">
-      <LiftDemo
-        exerciseId={exerciseId}
-        body={body}
-        view="side"
-        bpm={bpm}
-        hrTrend={hrTrend}
-        follow={follow}
-        paused={paused}
-        className="h-full"
-      />
-      <div
-        className="absolute left-2 top-2 rounded-2xl border border-line bg-bg/80 px-3 py-1.5 text-center backdrop-blur"
-        aria-live="polite"
-      >
-        <div className="display text-3xl leading-none">{count}</div>
-        <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">{t("count.reps")}</div>
+    <div className="flex h-full gap-2" data-testid="auto-count">
+      <div className="relative h-full min-w-0 flex-1">
+        <LiftDemo
+          exerciseId={exerciseId}
+          body={body}
+          view="side"
+          bpm={bpm}
+          hrTrend={hrTrend}
+          follow={follow}
+          paused={paused}
+          className="h-full"
+        />
+        <div
+          className="absolute left-2 top-2 rounded-2xl border border-line bg-bg/80 px-3 py-1.5 text-center backdrop-blur"
+          aria-live="polite"
+        >
+          <div className="display text-3xl leading-none">{count}</div>
+          <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">{t("count.reps")}</div>
+          {speedOn && (
+            <div className="mt-1.5 border-t border-line pt-1.5" data-testid="bar-speed">
+              <div className={`display text-base leading-none ${speed?.advice === "stop" ? "text-warn" : ""}`}>
+                {!speed
+                  ? "–"
+                  : speed.metres
+                    ? t("count.speed.ms", { speed: num(speed.speed, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) })
+                    : t("count.speed.pct", { pct: Math.round((1 - speed.loss) * 100) })}
+              </div>
+              <div className="text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-muted">{t("count.speed.label")}</div>
+            </div>
+          )}
+        </div>
+        {!camera && stopButton}
+        {labOn("repMotion") && motionProfile && cameraProfile && (
+          <button
+            type="button"
+            onClick={() => onPrefs({ ...prefs, source: camera ? "motion" : "camera" })}
+            className={`press absolute left-2 ${speedOn ? "top-[7.25rem]" : "top-[4.5rem]"} min-h-11 rounded-full border border-line bg-bg/80 px-3 text-xs text-muted`}
+          >
+            {camera ? t("count.useMotion") : t("count.useCamera")}
+          </button>
+        )}
+        <div className="absolute inset-x-2 bottom-2 flex items-end gap-1">
+          <p
+            className={`min-w-0 flex-1 rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : speed?.advice === "stop" && inView && counting ? "text-warn" : inView || !counting ? "text-muted" : "text-warn"}`}
+            role={phase === "error" ? "alert" : "status"}
+          >
+            {status}
+          </p>
+          {speedOn && <Info term="barSpeed" className="shrink-0 rounded-full bg-bg/80" />}
+        </div>
       </div>
-      <p
-        className={`absolute inset-x-2 bottom-2 mr-[36%] rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : inView || !counting ? "text-muted" : "text-warn"}`}
-        role={phase === "error" ? "alert" : "status"}
-      >
-        {status}
-      </p>
-      <button
-        type="button"
-        onClick={onClose}
-        className="press absolute right-2 top-7 inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm text-muted"
-        aria-label={t("count.off")}
-      >
-        <Icon name="camera" size={16} className="text-accent" />
-        {t("count.stop")}
-      </button>
       {camera && (
-        <div className="absolute bottom-2 right-2 aspect-[3/4] w-[32%] overflow-hidden rounded-xl border border-line bg-bg shadow-lg">
+        <div className="relative h-full w-[42%] shrink-0 overflow-hidden rounded-2xl border border-line bg-bg">
           <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" style={mirror} aria-hidden />
-          <span className={`absolute left-1 top-1 h-2.5 w-2.5 rounded-full ${inView ? "bg-good" : "bg-warn"}`} aria-hidden />
+          <canvas ref={bones} className="pointer-events-none absolute inset-0 h-full w-full" style={mirror} aria-hidden />
+          <span className={`absolute left-2 top-2 h-2.5 w-2.5 rounded-full ${inView ? "bg-good" : "bg-warn"}`} aria-hidden />
+          {stopButton}
           <button
             type="button"
             onClick={() => {
@@ -321,15 +395,6 @@ export function AutoCount({
             </span>
           </button>
         </div>
-      )}
-      {flag("repMotion") && motionProfile && cameraProfile && (
-        <button
-          type="button"
-          onClick={() => onPrefs({ ...prefs, source: camera ? "motion" : "camera" })}
-          className="press absolute right-2 top-[4.5rem] min-h-11 rounded-full border border-line bg-bg/80 px-3 text-xs text-muted"
-        >
-          {camera ? t("count.useMotion") : t("count.useCamera")}
-        </button>
       )}
     </div>
   );
@@ -352,4 +417,36 @@ export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean;
       {t("count.start")}
     </button>
   );
+}
+
+/** Draws the bones the camera reads over the preview, in the brand accent with mint joints, sharp on any screen. */
+function drawBones(canvas: HTMLCanvasElement | null, kps: Parameters<typeof skeleton>[0], v: HTMLVideoElement) {
+  const ctx = canvas?.getContext("2d");
+  if (!canvas || !ctx) return;
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+    canvas.width = Math.round(w * dpr);
+    canvas.height = Math.round(h * dpr);
+  }
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const { bones, joints } = skeleton(kps, { w: v.videoWidth, h: v.videoHeight }, { w, h });
+  const css = getComputedStyle(canvas);
+  ctx.lineCap = "round";
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = css.getPropertyValue("--color-accent").trim() || "#4c8dff";
+  ctx.beginPath();
+  for (const [a, b] of bones) {
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+  }
+  ctx.stroke();
+  ctx.fillStyle = css.getPropertyValue("--color-mint").trim() || "#34d399";
+  for (const p of joints) {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+  }
 }

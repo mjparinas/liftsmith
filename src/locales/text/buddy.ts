@@ -34,3 +34,33 @@ export const fr: Partial<Record<Key, Message>> = {
   "buddy.atGymFocus": "Je suis à la salle, à {gym}, au programme aujourd’hui : {focus}. À ton tour 💪",
   "buddy.shareTitle": "Prévenez vos partenaires de salle",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "buddy.crew": "Crew",
+  "buddy.hi": "Hey {who}!",
+  "buddy.at": "Ich bin im Studio. Du bist dran 💪",
+  "buddy.atGym": "Ich bin im Studio {gym}. Du bist dran 💪",
+  "buddy.atFocus": "Ich bin im Studio und trainiere heute {focus}. Du bist dran 💪",
+  "buddy.atGymFocus": "Ich bin im Studio {gym} und trainiere heute {focus}. Du bist dran 💪",
+  "buddy.shareTitle": "Sag es deinen Trainingspartnern",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "buddy.crew": "squadra",
+  "buddy.hi": "Ciao {who}!",
+  "buddy.at": "Sono in palestra. Tocca a te 💪",
+  "buddy.atGym": "Sono in palestra da {gym}. Tocca a te 💪",
+  "buddy.atFocus": "Sono in palestra, oggi alleno {focus}. Tocca a te 💪",
+  "buddy.atGymFocus": "Sono in palestra da {gym}, oggi alleno {focus}. Tocca a te 💪",
+  "buddy.shareTitle": "Dillo ai tuoi compagni di palestra",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "buddy.crew": "仲間",
+  "buddy.hi": "{who}さん、",
+  "buddy.at": "ジムに来たよ。次はあなたの番 💪",
+  "buddy.atGym": "{gym}に来たよ。次はあなたの番 💪",
+  "buddy.atFocus": "ジムで今日は{focus}をトレーニング中。次はあなたの番 💪",
+  "buddy.atGymFocus": "{gym}で今日は{focus}をトレーニング中。次はあなたの番 💪",
+  "buddy.shareTitle": "ジム仲間に知らせる",
+};

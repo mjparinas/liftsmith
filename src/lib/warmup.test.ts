@@ -93,7 +93,8 @@ describe("first-session starting weights", () => {
 });
 
 describe("warm-ups", () => {
-  const gym = makeGym("commercial", "kg");
+  // A fixed id: the plan is seeded by day and gym, so a random id made this test flaky.
+  const gym = makeGym("commercial", "kg", "g");
 
   it("ramps up to a heavy barbell lift on loadable weights, starting with the empty bar", () => {
     const w = warmupFor(exercise("back-squat"), 120, gym, new Set());

@@ -137,3 +137,140 @@ export const fr: Partial<Record<Key, Message>> = {
   "explain.dumbbell": "Arrondi à l’haltère le plus proche de cette salle.",
   "explain.machine": "Arrondi aux paliers de {step} des machines de cette salle.",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "explain.reps": "Wiederholungen",
+  "explain.seconds": "Sekunden",
+  "explain.repsN": { one: "{count} Wiederholung", other: "{count} Wiederholungen" },
+  "explain.secondsN": { one: "{count} Sekunde", other: "{count} Sekunden" },
+  "explain.level.new": "Einsteiger",
+  "explain.level.intermediate": "Fortgeschrittene",
+  "explain.level.advanced": "Erfahrene",
+  "explain.earlierToday": "heute früher",
+  "explain.on": "am {date}",
+  "explain.firstBw": "Das ist dein erstes Mal, also starte mit {target} und finde dein Niveau.",
+  "explain.firstLoad":
+    "Das ist dein erstes Mal, also beginnt es bei etwa {pct} % deines Körpergewichts ({bw}), dem üblichen Start für {level}.",
+  "explain.firstLight":
+    "Es ist absichtlich eher leicht. Wenn es sich leicht anfühlt, sag es nach dem letzten Satz, dann geht es nächstes Mal hoch.",
+  "explain.firstTitle": "Ein vorsichtiger erster Versuch",
+  "explain.last": "Letztes Mal ({when}): {sets}, Ziel {target}.",
+  "explain.feltEasy": "Du fandest es zu leicht, also geht es einen Schritt mehr nach oben.",
+  "explain.feltHard": "Du fandest es zu schwer, also geht es einen Schritt zurück.",
+  "explain.deload": "Es ist die Deload-Woche, also etwa 10 % leichter mit weniger Sätzen, damit du dich vor dem nächsten Block erholst.",
+  "explain.bigMiss":
+    "Ein Satz blieb 2 oder mehr {unit} zurück, also sinkt das Gewicht um einen Schritt und die {unit} gehen zurück auf {lo}.",
+  "explain.top":
+    "Du hast jeden Satz am oberen Ende deines Bereichs von {lo}–{hi} geschafft, also steigt das Gewicht um einen Schritt und die {unit} gehen zurück auf {lo}.",
+  "explain.oneMoreRep":
+    "Du hast jeden Satz geschafft, also bekommst du eine Wiederholung mehr bei gleichem Gewicht. Bei {hi} {unit} steigt das Gewicht.",
+  "explain.oneMoreTimed":
+    "Du hast jeden Satz geschafft, also bekommst du einen Sekundenblock mehr bei gleichem Gewicht. Bei {hi} {unit} steigt das Gewicht.",
+  "explain.oneMoreBw": "Du hast jeden Satz geschafft, also diesmal eine Wiederholung mehr.",
+  "explain.oneMoreBwTimed": "Du hast jeden Satz geschafft, also diesmal eine Stufe mehr.",
+  "explain.same": "Nicht jeder Satz hat {target} erreicht, also bleibt es gleich, bis alle es tun.",
+  "explain.picked": "Heute gewählt: {pick}.",
+  "explain.rir": {
+    one: "{week} dieses Blocks: Lass etwa {count} Wiederholung in Reserve. Die Reserve schrumpft jede Woche, dann setzt ein Deload sie zurück.",
+    other:
+      "{week} dieses Blocks: Lass etwa {count} Wiederholungen in Reserve. Die Reserve schrumpft jede Woche, dann setzt ein Deload sie zurück.",
+  },
+  "explain.easy": "Heute ist ein lockerer Tag: einen Schritt leichter, eine Wiederholung mehr in Reserve und ein Satz weniger.",
+  "explain.easyScore":
+    "Heute ist ein lockerer Tag (Bereitschaft {score}): einen Schritt leichter, eine Wiederholung mehr in Reserve und ein Satz weniger.",
+  "explain.push": "Heute ist ein Push-Tag, also geht die erste große Übung eine Wiederholung näher ans Muskelversagen.",
+  "explain.pushScore":
+    "Heute ist ein Push-Tag (Bereitschaft {score}), also geht die erste große Übung eine Wiederholung näher ans Muskelversagen.",
+  "explain.challenge":
+    "Herausforderung: Mach im letzten Satz so viele saubere Wiederholungen wie möglich und trag ein, was du geschafft hast. Es zählt nicht als Fehlversuch.",
+  "explain.barbell":
+    "Mit deinen Scheiben bewegt sich diese Stange ({bar}) in Schritten von {jump}, und jedes angezeigte Gewicht kannst du tatsächlich laden.",
+  "explain.dumbbell": "Auf die nächste Kurzhantel gerundet, die dieses Studio hat.",
+  "explain.machine": "Auf die Steckstufen von {step} dieses Studios gerundet.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "explain.reps": "ripetizioni",
+  "explain.seconds": "secondi",
+  "explain.repsN": { one: "{count} ripetizione", other: "{count} ripetizioni" },
+  "explain.secondsN": { one: "{count} secondo", other: "{count} secondi" },
+  "explain.level.new": "un principiante",
+  "explain.level.intermediate": "un atleta intermedio",
+  "explain.level.advanced": "un atleta esperto",
+  "explain.earlierToday": "oggi, prima",
+  "explain.on": "il {date}",
+  "explain.firstBw": "È la prima volta, quindi inizia con {target} e trova il tuo livello.",
+  "explain.firstLoad":
+    "È la prima volta, quindi si parte da circa il {pct}% del tuo peso corporeo ({bw}), la partenza abituale per {level}.",
+  "explain.firstLight": "È volutamente leggero. Se ti sembra facile, dillo dopo l’ultima serie e la prossima volta si sale.",
+  "explain.firstTitle": "Un primo tentativo prudente",
+  "explain.last": "L’ultima volta ({when}): {sets}, puntando a {target}.",
+  "explain.feltEasy": "Hai detto che era troppo facile, quindi sale di un passo in più.",
+  "explain.feltHard": "Hai detto che era troppo duro, quindi scende di un passo.",
+  "explain.deload": "È la settimana di scarico, quindi circa il 10% più leggero con meno serie, per recuperare prima del prossimo blocco.",
+  "explain.bigMiss": "Una serie è rimasta corta di 2 o più {unit}, quindi il peso scende di un passo e le {unit} tornano a {lo}.",
+  "explain.top":
+    "Hai completato ogni serie al massimo dell’intervallo {lo}–{hi}, quindi il peso sale di un passo e le {unit} tornano a {lo}.",
+  "explain.oneMoreRep": "Hai completato ogni serie, quindi fai una ripetizione in più con lo stesso peso. A {hi} {unit} il peso sale.",
+  "explain.oneMoreTimed":
+    "Hai completato ogni serie, quindi fai un blocco di secondi in più con lo stesso peso. A {hi} {unit} il peso sale.",
+  "explain.oneMoreBw": "Hai completato ogni serie, quindi stavolta una ripetizione in più.",
+  "explain.oneMoreBwTimed": "Hai completato ogni serie, quindi stavolta un passo in più.",
+  "explain.same": "Non tutte le serie hanno raggiunto {target}, quindi resta uguale finché non ci arrivano tutte.",
+  "explain.picked": "Scelto oggi: {pick}.",
+  "explain.rir": {
+    one: "{week} di questo blocco: tieni circa {count} ripetizione di riserva. La riserva cala ogni settimana, poi uno scarico la azzera.",
+    other:
+      "{week} di questo blocco: tieni circa {count} ripetizioni di riserva. La riserva cala ogni settimana, poi uno scarico la azzera.",
+  },
+  "explain.easy": "Oggi è un giorno leggero: un passo più leggero, una ripetizione in più di riserva e una serie in meno.",
+  "explain.easyScore":
+    "Oggi è un giorno leggero (prontezza {score}): un passo più leggero, una ripetizione in più di riserva e una serie in meno.",
+  "explain.push": "Oggi è un giorno da spingere, quindi il primo grande esercizio va una ripetizione più vicino al cedimento.",
+  "explain.pushScore":
+    "Oggi è un giorno da spingere (prontezza {score}), quindi il primo grande esercizio va una ripetizione più vicino al cedimento.",
+  "explain.challenge":
+    "Sfida: nell’ultima serie fai tutte le ripetizioni buone che riesci e registra quante ne hai fatte. Non conta come mancata.",
+  "explain.barbell":
+    "Con i tuoi dischi, questo bilanciere ({bar}) sale a passi di {jump}, e ogni peso mostrato è uno che puoi davvero caricare.",
+  "explain.dumbbell": "Arrotondato al manubrio più vicino disponibile in questa palestra.",
+  "explain.machine": "Arrotondato ai passi da {step} della macchina di questa palestra.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "explain.reps": "回数",
+  "explain.seconds": "秒数",
+  "explain.repsN": { other: "{count}回" },
+  "explain.secondsN": { other: "{count}秒" },
+  "explain.level.new": "初心者",
+  "explain.level.intermediate": "中級者",
+  "explain.level.advanced": "上級者",
+  "explain.earlierToday": "今日の早い時間",
+  "explain.on": "{date}",
+  "explain.firstBw": "初めてなので、{target}から始めてレベルを確認しましょう。",
+  "explain.firstLoad": "初めてなので、体重（{bw}）の約{pct}%から始めます。{level}の一般的なスタート重量です。",
+  "explain.firstLight": "あえて軽めにしています。楽に感じたら最後のセットの後にそう答えてください。次回は重くなります。",
+  "explain.firstTitle": "慎重な最初の1回",
+  "explain.last": "前回（{when}）：{sets}、目標は{target}。",
+  "explain.feltEasy": "楽すぎたとのことなので、もう1段階上げます。",
+  "explain.feltHard": "きつすぎたとのことなので、1段階下げます。",
+  "explain.deload": "ディロード週なので、約10%軽くセット数も減らし、次のブロックの前に回復します。",
+  "explain.bigMiss": "あるセットが{unit}で2以上届かなかったため、重量を1段階下げ、{unit}は{lo}に戻します。",
+  "explain.top": "すべてのセットで{lo}〜{hi}の上限に達したため、重量を1段階上げ、{unit}は{lo}に戻します。",
+  "explain.oneMoreRep": "すべてのセットを達成したので、同じ重量で1回増やします。{hi}{unit}に達したら重量を上げます。",
+  "explain.oneMoreTimed": "すべてのセットを達成したので、同じ重量で時間を1段階延ばします。{hi}{unit}に達したら重量を上げます。",
+  "explain.oneMoreBw": "すべてのセットを達成したので、今回は1回増やします。",
+  "explain.oneMoreBwTimed": "すべてのセットを達成したので、今回は1段階延ばします。",
+  "explain.same": "{target}に届かなかったセットがあるため、全セット達成まで同じ内容にします。",
+  "explain.picked": "今日選んだ理由：{pick}。",
+  "explain.rir": { other: "このブロックの{week}：余力は約{count}回残します。余力は毎週減っていき、ディロードでリセットされます。" },
+  "explain.easy": "今日は軽めの日です。重量を1段階下げ、余力を1回増やし、セットを1つ減らします。",
+  "explain.easyScore": "今日は軽めの日です（コンディション {score}）。重量を1段階下げ、余力を1回増やし、セットを1つ減らします。",
+  "explain.push": "今日はプッシュデーなので、最初の主要種目は限界まであと1回近づけます。",
+  "explain.pushScore": "今日はプッシュデーなので（コンディション {score}）、最初の主要種目は限界まであと1回近づけます。",
+  "explain.challenge":
+    "チャレンジ：最後のセットはきれいなフォームでできるだけ多く行い、できた回数を記録してください。未達にはカウントされません。",
+  "explain.barbell": "手持ちのプレートでは、このバー（{bar}）は{jump}刻みで、表示される重量はすべて実際に付けられる重さです。",
+  "explain.dumbbell": "このジムにある最も近いダンベルに丸めています。",
+  "explain.machine": "このジムのピン刻み（{step}）に丸めています。",
+};

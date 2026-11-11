@@ -9,7 +9,7 @@ import { billingLive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
-import { connectHealth, healthAvailable, readHints } from "@/lib/health";
+import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -230,6 +230,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     if (h.bodyweight) setBw(Math.round(fromKg(h.bodyweight, unit)));
     // Height isn't asked in setup, but TDEE (Tools) uses it, so keep it when Health has it.
     if (h.height && h.height >= 100 && h.height <= 250) setProfile({ heightCm: Math.round(h.height) });
+    // Apple Health also has sex and date of birth (Health Connect has neither); fill the boxes still empty.
+    const c = await readBodyStats(true);
+    if (c.sex && !sex) setSex(c.sex);
+    const years = c.birthYear ? new Date().getFullYear() - c.birthYear : 0;
+    if (!age && years >= 13 && years <= 100) setAge(String(years));
     setHealthNote(h.bodyweight ? t("setup.health.filled") : t("setup.health.noWeight"));
   };
 
@@ -560,7 +565,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               {offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}
             </h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
-            <ProFeatures />
+            <ProFeatures compact />
             <Plans
               from="setup"
               onDone={(plan, trial) => {

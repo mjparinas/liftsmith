@@ -44,7 +44,7 @@ export function Recovery() {
     } catch {}
   };
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("body.title")}</h1>
       <div className="mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
         {(["muscles", "health"] as const).map((v) => (

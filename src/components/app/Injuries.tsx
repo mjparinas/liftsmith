@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { available } from "@/lib/exercises";
 import { alternatives } from "@/lib/generator";
-import { date, list, t } from "@/lib/i18n";
+import { date, inSentence, list, t } from "@/lib/i18n";
 import {
   affects,
   DEFAULT_PCT,
@@ -37,7 +37,7 @@ export const notAdvice = () => t("inj.notAdvice");
 type Warn = { injuryId: string; exerciseId?: string; name: string; action: "light" | "ok" | "return"; pct: number };
 
 const day = (ms: number) => date(ms, { month: "short", day: "numeric" });
-const lower = (part: Injury["part"]) => PART_LABEL[part].toLocaleLowerCase();
+const lower = (part: Injury["part"]) => inSentence(PART_LABEL[part], true);
 
 export function Injuries() {
   const { events, gyms, profile, logInjury, setInjuryRule, healInjury, ratePain, startReturn, active: workout } = useApp();
@@ -59,7 +59,7 @@ export function Injuries() {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go(workout ? "workout" : "today")} className="press -ml-2 pt-2 text-muted">
         {workout ? t("inj.backWorkout") : t("inj.backToday")}
       </button>
@@ -229,10 +229,10 @@ function InjuryCard({
       <PainBlock inj={inj} label={label} />
       <ReturnBlock inj={inj} label={label} onStart={onReturn} onHeal={onHeal} />
 
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("inj.allGroup", { part: label.toLocaleLowerCase() })}>
+      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("inj.allGroup", { part: inSentence(label, true) })}>
         <Chip
           active={inj.all.action === "skip" && inj.rules.size === 0}
-          onClick={() => onChoose(inj, "skip", undefined, t("inj.every", { part: label.toLocaleLowerCase() }), inj.all.pct)}
+          onClick={() => onChoose(inj, "skip", undefined, t("inj.every", { part: inSentence(label, true) }), inj.all.pct)}
         >
           {t("inj.skipAll")}
         </Chip>
@@ -243,7 +243,7 @@ function InjuryCard({
               inj,
               "light",
               undefined,
-              t("inj.every", { part: label.toLocaleLowerCase() }),
+              t("inj.every", { part: inSentence(label, true) }),
               inj.all.action === "light" ? inj.all.pct : DEFAULT_PCT,
             )
           }
@@ -287,7 +287,7 @@ function InjuryCard({
               <div
                 className="mt-2 grid grid-cols-3 gap-2"
                 role="group"
-                aria-label={t("inj.exGroup", { name: e.name, part: label.toLocaleLowerCase() })}
+                aria-label={t("inj.exGroup", { name: e.name, part: inSentence(label, true) })}
               >
                 {(
                   [
@@ -489,7 +489,7 @@ function ReturnBlock({ inj, label, onStart, onHeal }: { inj: Injury; label: stri
         <p className="font-semibold">{t("inj.ret.step", { step: r.stage + 1, pct: r.pct })}</p>
         <p className="mt-1 text-muted">
           {r.readyToHeal
-            ? t("inj.ret.ready", { pct: RETURN_PCTS[2], part: label.toLocaleLowerCase() })
+            ? t("inj.ret.ready", { pct: RETURN_PCTS[2], part: inSentence(label, true) })
             : t("inj.ret.rules", { low: LOW_PAIN, a: LOW_PAIN + 1, b: STOP_PAIN - 1, stop: STOP_PAIN })}
         </p>
         {r.readyToHeal && (

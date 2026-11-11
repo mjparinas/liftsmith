@@ -64,10 +64,23 @@ export const EQUIPMENT_NAME: Record<Equipment, string> = {
   smith: "Smith machine",
   hackSquat: "Hack squat machine",
   calfMachine: "Calf raise machine",
+  hipMachine: "Hip abduction and adduction machine",
+  preacher: "Preacher curl bench",
+  assistedPullup: "Assisted pull-up machine",
   bands: "Resistance bands",
   rings: "Gymnastic rings",
   box: "Plyo box or step",
   abWheel: "Ab wheel",
+  medicineBall: "Medicine ball",
+  jumpRope: "Jump rope",
+  treadmill: "Treadmill",
+  rower: "Rowing machine",
+  bike: "Exercise bike",
+  elliptical: "Cross trainer",
+  stairClimber: "Stair climber",
+  skiErg: "Ski machine",
+  sled: "Sled",
+  battleRopes: "Battle ropes",
 };
 
 /** One plain line on what each muscle does, for its page. */

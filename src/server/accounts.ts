@@ -5,6 +5,7 @@
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
 import { forgetAll } from "./connect";
+import { hasLifetimePro } from "./creators";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { accountHasPro, isReviewEmail, reviewCodeMatches } from "./review";
@@ -23,7 +24,7 @@ export interface AccountInfo {
   email: string | null;
   providers: string[];
   createdAt: number;
-  /** Pro that comes with the account, not a store purchase (only the store review account, review.ts). */
+  /** Pro that comes with the account, not a store purchase: the store review account (review.ts) or a lifetime code. */
   pro: boolean;
 }
 
@@ -42,14 +43,14 @@ export async function accountInfo(id: string): Promise<AccountInfo | null> {
     email,
     providers: ids.map((r) => String(r.provider)),
     createdAt: Number(rows[0].created_at),
-    pro: accountHasPro(email),
+    pro: accountHasPro(email) || (await hasLifetimePro(id)),
   };
 }
 
 /** Whether the account has Pro on the server (not from a store purchase). Sync sends it on every round. */
 export async function accountPro(id: string): Promise<boolean> {
   const rows = await query<{ email: string | null }>("SELECT email FROM accounts WHERE id = ?", [id]);
-  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null);
+  return accountHasPro(rows[0]?.email ? String(rows[0].email) : null) || (await hasLifetimePro(id));
 }
 
 /** Finds or makes the account for an identity, joining accounts by verified email. */
@@ -181,7 +182,8 @@ export async function startEmail(email: string, mail: SendMail | null, now = Dat
 
 export async function verifyEmail(email: string, code: string, platform: Platform, now = Date.now()): Promise<Result> {
   // The store review account: its fixed code from Vercel, reusable, for this one address only (review.ts).
-  // Guesses are held back by the verify route's per-address limit and the code's 12+ digits.
+  // Guesses are held back by the verify route's per-network limit and the code's 12+ digits (a trillion or more).
+  // No limit on the address itself, on purpose: anyone could then lock the store reviewers out mid-review.
   if (isReviewEmail(email)) {
     if (!reviewCodeMatches(email, code)) return { code: 401, body: { error: "That code didn't match." } };
     const id = await accountFor("email", email, email, now);

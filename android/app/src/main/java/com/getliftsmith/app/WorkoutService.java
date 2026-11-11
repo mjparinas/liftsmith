@@ -29,7 +29,11 @@ public class WorkoutService extends Service {
     static final String ACTION_UPDATE = "com.getliftsmith.app.UPDATE";
     static final String BROADCAST_ACTION = "com.getliftsmith.app.WORKOUT_ACTION";
     static final String EXTRA_ACTION = "action";
-    private static final String CHANNEL_LIVE = "workout-live";
+    // "-v2": the first channel was IMPORTANCE_LOW, which Android files under "Silent" and hides on the lock screen
+    // unless the user shows silent notifications there. An app can't raise a channel's importance once it exists,
+    // so the live notification moved to a new channel and the old one is deleted.
+    private static final String CHANNEL_LIVE = "workout-live-v2";
+    private static final String CHANNEL_LIVE_OLD = "workout-live";
     private static final String CHANNEL_ALERT = "rest-over";
     private static final String CHANNEL_ALERT_SOUND = "rest-over-sound";
     private static final int ID_LIVE = 1;
@@ -47,7 +51,11 @@ public class WorkoutService extends Service {
         running = true;
         refreshTile();
         NotificationManager nm = getSystemService(NotificationManager.class);
-        NotificationChannel live = new NotificationChannel(CHANNEL_LIVE, getString(R.string.channel_live), NotificationManager.IMPORTANCE_LOW);
+        nm.deleteNotificationChannel(CHANNEL_LIVE_OLD);
+        // Default importance so it shows on the lock screen, with no sound or vibration so the countdown never buzzes.
+        NotificationChannel live = new NotificationChannel(CHANNEL_LIVE, getString(R.string.channel_live), NotificationManager.IMPORTANCE_DEFAULT);
+        live.setSound(null, null);
+        live.enableVibration(false);
         live.setDescription(getString(R.string.channel_live_desc));
         live.setShowBadge(false);
         live.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
@@ -101,7 +109,6 @@ public class WorkoutService extends Service {
             .setSubText(setLabel)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
-            .setSilent(true)
             .setCategory(NotificationCompat.CATEGORY_WORKOUT)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setColor(0xFF4C8DFF)

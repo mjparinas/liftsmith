@@ -140,22 +140,33 @@ export interface HealthValue {
 }
 
 /**
- * The newest height (cm), for TDEE autofill (tdee.ts bodyUpdates). Weigh-ins and body fat come in
- * through readBody instead, as bodyweight events, so there is one import path for them.
+ * Your stats from health data (tdee.ts bodyUpdates): the newest height (cm) from Health Connect or Apple
+ * Health, plus sex and birth year from Apple Health (our HealthWorkout plugin's `characteristics`; Health
+ * Connect stores neither, so on Android they're entered in Your stats). `ask` shows Apple Health's sheet for
+ * sex and date of birth the first time; without it, only what's already allowed is read. Weigh-ins and body
+ * fat come in through readBody instead, as bodyweight events, so there is one import path for them.
  */
-export async function readHeight(): Promise<{ height?: HealthValue }> {
+export async function readBodyStats(ask = false): Promise<{ height?: HealthValue; sex?: "male" | "female"; birthYear?: number }> {
   if (!(await healthAvailable())) return {};
+  const out: { height?: HealthValue; sex?: "male" | "female"; birthYear?: number } = {};
   try {
     const { Health } = await health();
     const startDate = new Date(Date.now() - 3650 * 86_400_000).toISOString();
     const s = (await Health.readSamples({ dataType: "height", startDate, limit: 1, ascending: false })).samples[0];
     const at = s ? Date.parse(s.endDate || s.startDate) : NaN;
-    if (!s || !Number.isFinite(s.value) || !Number.isFinite(at)) return {};
     // Height can arrive in metres.
-    return { height: { value: s.value < 3 ? s.value * 100 : s.value, at } };
+    if (s && Number.isFinite(s.value) && Number.isFinite(at)) out.height = { value: s.value < 3 ? s.value * 100 : s.value, at };
   } catch {
-    return {}; // Not allowed yet, or the store is unavailable.
+    // Not allowed yet, or the store is unavailable.
   }
+  try {
+    const c = await workoutPlugin()?.characteristics?.({ ask });
+    if (c?.sex === "male" || c?.sex === "female") out.sex = c.sex;
+    if (typeof c?.birthYear === "number" && Number.isFinite(c.birthYear)) out.birthYear = c.birthYear;
+  } catch {
+    // Android, or an app build from before characteristics existed.
+  }
+  return out;
 }
 
 /** Rough active calories for resistance training: about 5 METs. */
@@ -177,6 +188,8 @@ interface WorkoutPlugin {
     kcal?: number;
     avgHr?: number;
   }): Promise<{ saved: boolean }>;
+  /** Apple Health's sex and birth year (iOS). Android answers with nothing: Health Connect has no such records. */
+  characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
 }
 const workoutPlugin = (): WorkoutPlugin | undefined =>
   isNative()

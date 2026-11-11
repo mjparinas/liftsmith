@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
+import { beatStyle } from "@/lib/beat";
+import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
@@ -16,6 +18,7 @@ import { hrLink } from "@/lib/hrLink";
 import { currentTag, t } from "@/lib/i18n";
 import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
+import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
@@ -34,13 +37,15 @@ import { pickBpm, type WatchReading } from "@/lib/watchHr";
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
-import { clock, loadText, plateText, repsText } from "./format";
+import { ExerciseBrowser } from "./ExerciseBrowser";
+import { clock, loadText, plateText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
+import { AddExercise } from "./workout/AddExercise";
 import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
@@ -132,7 +137,7 @@ export function Workout() {
   const ex = item ? exercise(item.exerciseId) : null;
   const doneSets =
     active && item
-      ? events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === item.exerciseId).length
+      ? events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === item.exerciseId && !e.tag).length
       : 0;
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
@@ -153,15 +158,17 @@ export function Workout() {
     if (!ssLabel || !active || !item) return null;
     const items = active.plan.items;
     const done = (i: number) =>
-      events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId).length +
+      events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === items[i].exerciseId && !e.tag).length +
       (i === active.index ? 1 : 0);
     const step = afterSet(items, active.index, done);
     const [s0, e0] = groupRange(items, active.index);
     return step.index !== active.index && step.index >= s0 && step.index <= e0 ? exercise(items[step.index].exerciseId).name : null;
   })();
-  const setLabel = warming
-    ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal })
-    : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
+  const setLabel = active?.tag
+    ? t(active.tag === "drop" ? "wk.dropSet" : "wk.restPause")
+    : warming
+      ? t("workout.warmupOf", { n: warmDone + 1, total: warmTotal })
+      : t("workout.setOf", { n: Math.min(doneSets + 1, item?.sets ?? 1), total: item?.sets ?? 1 });
   // Delightful extras: ghost mode, "same as last time" and the voice coach (WorkoutExtras.tsx).
   const ghost = useGhost(events, item?.exerciseId, active?.sessionId);
   const voiceOn = !!profile.delight?.voice;
@@ -208,7 +215,10 @@ export function Workout() {
       if (!late) sound.restEnd(alert.sound);
       if (alert.vibrate && !late) haptic("thud", true);
       if (!late || !isVisible())
-        void restOverAlert(ex ? `${ex.name}, ${loadText(ex, active.weight, profile.unit)} × ${active.reps}` : t("wk.nextSet"), alert);
+        void restOverAlert(
+          ex ? `${ex.name}, ${setText(ex, active.weight, active.reps, profile.unit, active.distanceM)}` : t("wk.nextSet"),
+          alert,
+        );
       s.skipRest();
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -223,9 +233,9 @@ export function Workout() {
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
     void updateSession({
-      title: resting ? `Rest · ${ex.name}` : ex.name,
+      title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
       setLabel,
-      next: `${loadText(ex, active.weight, profile.unit)} × ${repsText(ex, active.reps)}`,
+      next: setText(ex, active.weight, active.reps, profile.unit, active.distanceM),
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
       hr: bpm ?? undefined,
@@ -236,7 +246,7 @@ export function Workout() {
       speakLang: currentTag(),
       // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
       chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
-      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length,
+      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
       sessionId: active.sessionId,
     });
@@ -258,7 +268,7 @@ export function Workout() {
 
   const elapsed = Math.floor((now - active.startedAt) / 1000);
   const totalSets = active.plan.items.reduce((n, i) => n + i.sets, 0);
-  const setsLogged = events.filter((e) => e.type === "set" && e.sessionId === active.sessionId).length;
+  const setsLogged = events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length;
   // The final working set of the whole workout gets its own label and a bigger burst.
   const lastOfAll = !warming && !finished && setsLogged + 1 >= totalSets;
   // Undo sits above the big button, so the page leaves room for it while it's there.
@@ -311,7 +321,8 @@ export function Workout() {
   };
 
   const unit = gym.unit;
-  const canCount = !!ex && countable(ex.id, ex.pattern, countPrefs.source);
+  // Camera rep counting is a lab (Settings › Labs, Pro): offered only while that lab is on.
+  const canCount = !!ex && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
   const counting = canCount && countPrefs.on;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
@@ -329,32 +340,50 @@ export function Workout() {
           onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps),
         }
       : null;
+  const cardio = ex?.cardio;
+  const dist = distUnit(profile.unit);
   const repStep =
-    ex && active
+    ex && active && cardio
       ? {
-          label: sidesSplit ? t("workout.left") : t("workout.reps"),
-          suffix: TIMED.has(ex.id)
-            ? t("workout.seconds")
-            : sidesSplit
-              ? t("workout.leftReps")
-              : perSide(ex.id)
-                ? t("workout.repsEachSide")
-                : t("workout.reps"),
-          value: String(active.reps),
-          onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
-          onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+          label: t("workout.time"),
+          suffix: t("workout.minSec"),
+          value: clock(active.reps),
+          onDown: () => s.adjust(active.weight, Math.max(60, active.reps - 60)),
+          onUp: () => s.adjust(active.weight, active.reps + 60),
         }
-      : null;
+      : ex && active
+        ? {
+            label: sidesSplit ? t("workout.left") : t("workout.reps"),
+            suffix: TIMED.has(ex.id)
+              ? t("workout.seconds")
+              : sidesSplit
+                ? t("workout.leftReps")
+                : perSide(ex.id)
+                  ? t("workout.repsEachSide")
+                  : t("workout.reps"),
+            value: String(active.reps),
+            onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
+            onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+          }
+        : null;
   const rightStep =
-    ex && active && sidesSplit
+    ex && active && cardio === "distance"
       ? {
-          label: t("workout.right"),
-          suffix: t("workout.rightReps"),
-          value: String(active.repsR),
-          onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)),
-          onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1),
+          label: t("workout.distance"),
+          suffix: dist,
+          value: fmtNum(fromMetres(active.distanceM ?? 0, dist)),
+          onDown: () => s.adjustDistance(bumpDistance(active.distanceM ?? 0, -1, ex, dist)),
+          onUp: () => s.adjustDistance(bumpDistance(active.distanceM ?? 0, 1, ex, dist)),
         }
-      : null;
+      : ex && active && sidesSplit
+        ? {
+            label: t("workout.right"),
+            suffix: t("workout.rightReps"),
+            value: String(active.repsR),
+            onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)),
+            onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1),
+          }
+        : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;
@@ -381,7 +410,7 @@ export function Workout() {
         <div className="flex items-center gap-2">
           {bpm ? (
             <span className="num flex min-h-9 items-center gap-1 rounded-full border border-heart/40 bg-surface px-2.5 text-sm font-bold text-heart">
-              <span className="animate-beat inline-flex">
+              <span className="animate-beat inline-flex" style={beatStyle(bpm)}>
                 <Icon name="heart" size={14} filled strokeWidth={1.5} />
               </span>{" "}
               {bpm}
@@ -470,16 +499,16 @@ export function Workout() {
                 )}
               </div>
               <div className="flex shrink-0 gap-2">
-                {can("replan") && (
-                  <button
-                    type="button"
-                    onClick={() => setPlanOpen(true)}
-                    className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-                    aria-label={t("coach.changePlan")}
-                  >
-                    <Icon name="clock" size={20} />
-                  </button>
-                )}
+                {/* Changing the plan is Pro: free lifters see the button with a Pro tag, and it opens the paywall. */}
+                <button
+                  type="button"
+                  onClick={() => (can("replan") ? setPlanOpen(true) : go("pro", "replan"))}
+                  className="press relative grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
+                  aria-label={can("replan") ? t("coach.changePlan") : t("pro.locked", { what: t("coach.changePlan") })}
+                >
+                  <Icon name="clock" size={20} />
+                  {!can("replan") && <ProTag className="absolute -right-2 -top-1.5 text-[0.625rem]" />}
+                </button>
                 <button
                   type="button"
                   onClick={() => setSwapOpen(true)}
@@ -516,6 +545,7 @@ export function Workout() {
                   exerciseId={ex.id}
                   pattern={ex.pattern}
                   body={bodyFor(profile.sex)}
+                  heightCm={profile.heightCm}
                   bpm={bpm}
                   hrTrend={active.hr}
                   prefs={countPrefs}
@@ -611,6 +641,7 @@ export function Workout() {
       ) : null}
 
       {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
+      <AddExercise />
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
@@ -767,6 +798,7 @@ function SwapList({
   onPick: (id: string, avoid: boolean) => void;
 }) {
   const [avoid, setAvoid] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
   const list = alternatives(fromId, gymEquipment, skip, hurt).slice(0, 12);
   return (
     <div>
@@ -809,6 +841,23 @@ function SwapList({
         ))}
         {!list.length && <li className="py-3 text-muted">{t("wk.noAlt")}</li>}
       </ul>
+      {/* Anything else in the library, searchable and filtered (the best matches stay above). */}
+      {browsing ? (
+        <div className="mt-3 border-t border-line pt-3">
+          <ExerciseBrowser
+            id="swap"
+            gym={gymEquipment}
+            skip={[fromId, ...skip]}
+            startGroup={exercise(fromId).cardio ? "cardio" : (exercise(fromId).primary[0] ?? null)}
+            onPick={(id) => onPick(id, avoid)}
+            action={<Icon name="swap" size={16} />}
+          />
+        </div>
+      ) : (
+        <Button kind="quiet" className="mt-2 w-full" onClick={() => setBrowsing(true)}>
+          {t("wk.find.all")}
+        </Button>
+      )}
       <button
         type="button"
         onClick={() => go("injuries")}

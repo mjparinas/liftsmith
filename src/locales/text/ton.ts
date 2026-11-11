@@ -49,3 +49,48 @@ export const fr: Partial<Record<Key, Message>> = {
   "ton.million": "un million de kilos",
   "ton.eiffel": "le fer de la tour Eiffel",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "ton.piano": "einen Konzertflügel",
+  "ton.car": "ein Familienauto",
+  "ton.elephant": "einen Afrikanischen Elefanten",
+  "ton.trex": "einen T. rex",
+  "ton.bus": "einen Doppeldeckerbus",
+  "ton.humpback": "einen Buckelwal",
+  "ton.tank": "einen Kampfpanzer",
+  "ton.bluewhale": "einen Blauwal",
+  "ton.liberty": "die Freiheitsstatue",
+  "ton.iss": "die Internationale Raumstation",
+  "ton.million": "eine Million Kilogramm",
+  "ton.eiffel": "das Eisen des Eiffelturms",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "ton.piano": "un pianoforte a coda",
+  "ton.car": "un’auto familiare",
+  "ton.elephant": "un elefante africano",
+  "ton.trex": "un T. rex",
+  "ton.bus": "un autobus a due piani",
+  "ton.humpback": "una megattera",
+  "ton.tank": "un carro armato",
+  "ton.bluewhale": "una balenottera azzurra",
+  "ton.liberty": "la Statua della Libertà",
+  "ton.iss": "la Stazione Spaziale Internazionale",
+  "ton.million": "un milione di chili",
+  "ton.eiffel": "il ferro della Torre Eiffel",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "ton.piano": "グランドピアノ",
+  "ton.car": "ファミリーカー",
+  "ton.elephant": "アフリカゾウ",
+  "ton.trex": "ティラノサウルス",
+  "ton.bus": "2階建てバス",
+  "ton.humpback": "ザトウクジラ",
+  "ton.tank": "戦車",
+  "ton.bluewhale": "シロナガスクジラ",
+  "ton.liberty": "自由の女神",
+  "ton.iss": "国際宇宙ステーション",
+  "ton.million": "100万キログラム",
+  "ton.eiffel": "エッフェル塔の鉄骨",
+};

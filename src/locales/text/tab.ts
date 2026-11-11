@@ -28,3 +28,27 @@ export const fr: Partial<Record<Key, Message>> = {
   "tab.awards": "Trophées",
   "tab.gyms": "Salles",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "tab.today": "Heute",
+  "tab.recovery": "Körper",
+  "tab.progress": "Fortschritt",
+  "tab.awards": "Erfolge",
+  "tab.gyms": "Studios",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "tab.today": "Oggi",
+  "tab.recovery": "Corpo",
+  "tab.progress": "Progressi",
+  "tab.awards": "Premi",
+  "tab.gyms": "Palestre",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "tab.today": "今日",
+  "tab.recovery": "体",
+  "tab.progress": "進捗",
+  "tab.awards": "実績",
+  "tab.gyms": "ジム",
+};

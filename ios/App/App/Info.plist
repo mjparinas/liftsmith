@@ -11,6 +11,9 @@
 		<string>en</string>
 		<string>es</string>
 		<string>fr</string>
+		<string>de</string>
+		<string>it</string>
+		<string>ja</string>
 	</array>
 	<key>CFBundleDisplayName</key>
         <string>Liftsmith</string>
@@ -81,7 +84,7 @@
 	<key>NSLocationDefaultAccuracyReduced</key>
 	<true/>
 	<key>NSHealthShareUsageDescription</key>
-	<string>Liftsmith reads your weight, height, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and respiratory rate to set up your training, keep your weigh-ins and daily calories current, and show how recovered you are.</string>
+	<string>Liftsmith reads your weight, height, sex, date of birth, body fat, resting heart rate, sleep, heart rate variability, steps, VO2 max and respiratory rate to set up your training, keep your weigh-ins and daily calories current, and show how recovered you are.</string>
 	<key>NSHealthUpdateUsageDescription</key>
 	<string>Liftsmith saves your finished workouts, calories and heart rate to Apple Health.</string>
 	<key>UIBackgroundModes</key>
@@ -100,6 +103,18 @@
 				<string>liftsmith</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.getliftsmith.app.garmin</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>liftsmith-ciq</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>gcm-ciq</string>
 	</array>
 	<key>NSSupportsLiveActivities</key>
 	<true/>

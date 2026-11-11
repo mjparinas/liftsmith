@@ -19,3 +19,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "units.kg": "Kilogrammes",
   "units.lb": "Livres",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "units.kg": "Kilogramm",
+  "units.lb": "Pfund",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "units.kg": "Chilogrammi",
+  "units.lb": "Libbre",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "units.kg": "キログラム",
+  "units.lb": "ポンド",
+};

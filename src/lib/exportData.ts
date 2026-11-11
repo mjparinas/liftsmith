@@ -48,6 +48,8 @@ export const CSV_HEADER = [
   "Rest seconds",
   "Avg HR",
   "Max HR",
+  "Type",
+  "Distance km",
 ];
 
 /** Every working set, oldest first. Weights in the lifter's unit; dumbbells are per hand. */
@@ -55,6 +57,8 @@ export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
   const rows = [CSV_HEADER.join(",")];
   const count = new Map<string, number>();
   const sets = events.filter((e) => e.type === "set").sort((a, b) => a.at - b.at);
+  // Sets the lifter said they took to failure (a reps-left rating of 0).
+  const failed = new Set(events.flatMap((e) => (e.type === "effort" && e.rir === 0 ? [e.setId] : [])));
   for (const s of sets) {
     if (s.type !== "set") continue;
     const ex = EXERCISE_BY_ID.get(s.exerciseId);
@@ -79,6 +83,8 @@ export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
         s.restSec,
         s.hrAvg,
         s.hrMax,
+        s.tag === "drop" ? "drop" : s.tag === "restPause" ? "rest-pause" : failed.has(s.id) ? "failure" : "",
+        s.distanceM !== undefined ? Math.round(s.distanceM) / 1000 : "",
       ]
         .map(cell)
         .join(","),

@@ -58,3 +58,57 @@ export const fr: Partial<Record<Key, Message>> = {
   "part.calf": "Mollet",
   "part.ankle": "Cheville ou pied",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "part.neck": "Nacken",
+  "part.shoulder": "Schulter",
+  "part.elbow": "Ellenbogen",
+  "part.wrist": "Handgelenk oder Hand",
+  "part.chest": "Brust",
+  "part.upperBack": "Oberer Rücken",
+  "part.lowerBack": "Unterer Rücken",
+  "part.abs": "Bauch oder Rumpf",
+  "part.hip": "Hüfte",
+  "part.groin": "Leiste",
+  "part.quad": "Oberschenkelvorderseite",
+  "part.hamstring": "Oberschenkelrückseite",
+  "part.knee": "Knie",
+  "part.calf": "Wade",
+  "part.ankle": "Knöchel oder Fuß",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "part.neck": "Collo",
+  "part.shoulder": "Spalla",
+  "part.elbow": "Gomito",
+  "part.wrist": "Polso o mano",
+  "part.chest": "Petto",
+  "part.upperBack": "Parte alta della schiena",
+  "part.lowerBack": "Zona lombare",
+  "part.abs": "Addominali o core",
+  "part.hip": "Anca",
+  "part.groin": "Inguine",
+  "part.quad": "Parte anteriore della coscia",
+  "part.hamstring": "Femorali",
+  "part.knee": "Ginocchio",
+  "part.calf": "Polpaccio",
+  "part.ankle": "Caviglia o piede",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "part.neck": "首",
+  "part.shoulder": "肩",
+  "part.elbow": "肘",
+  "part.wrist": "手首・手",
+  "part.chest": "胸",
+  "part.upperBack": "背中上部",
+  "part.lowerBack": "腰",
+  "part.abs": "腹部・体幹",
+  "part.hip": "股関節",
+  "part.groin": "鼠径部",
+  "part.quad": "太もも前側",
+  "part.hamstring": "ハムストリング",
+  "part.knee": "膝",
+  "part.calf": "ふくらはぎ",
+  "part.ankle": "足首・足",
+};

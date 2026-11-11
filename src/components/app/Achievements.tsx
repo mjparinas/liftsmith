@@ -273,7 +273,7 @@ export function Achievements() {
   const hiddenLeft = list.filter((a) => a.hidden).length;
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
         ‹ {t("progress.title")}
       </button>

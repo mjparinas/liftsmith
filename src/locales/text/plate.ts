@@ -32,3 +32,30 @@ export const fr: Partial<Record<Key, Message>> = {
   "plate.empty": "Barre vide",
   "plate.nearest": "le plus proche possible",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "plate.label": "{plates} {unit} auf jede Seite einer {bar}-{unit}-Stange laden",
+  "plate.noPlates": "keine Scheiben",
+  "plate.bar": "{bar}-{unit}-Stange",
+  "plate.eachSide": "Pro Seite:",
+  "plate.empty": "Leere Stange",
+  "plate.nearest": "das Nächste, was du laden kannst",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "plate.label": "Carica {plates} {unit} per lato su un bilanciere da {bar} {unit}",
+  "plate.noPlates": "nessun disco",
+  "plate.bar": "Bilanciere da {bar} {unit}",
+  "plate.eachSide": "Per lato:",
+  "plate.empty": "Bilanciere vuoto",
+  "plate.nearest": "il più vicino che puoi caricare",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "plate.label": "{bar} {unit}のバーの片側に{plates} {unit}を付ける",
+  "plate.noPlates": "プレートなし",
+  "plate.bar": "{bar} {unit}のバー",
+  "plate.eachSide": "片側：",
+  "plate.empty": "バーのみ",
+  "plate.nearest": "付けられる最も近い重さ",
+};

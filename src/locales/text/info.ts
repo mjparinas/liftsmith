@@ -16,3 +16,15 @@ export const es: Partial<Record<Key, Message>> = {
 export const fr: Partial<Record<Key, Message>> = {
   "info.whatIs": "Qu’est-ce que : {term} ?",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "info.whatIs": "Was ist {term}?",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "info.whatIs": "Che cos’è {term}?",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "info.whatIs": "{term}とは？",
+};

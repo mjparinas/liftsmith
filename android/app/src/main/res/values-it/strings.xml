@@ -1,0 +1,21 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="shortcut_start_short">Inizia allenamento</string>
+    <string name="shortcut_start_long">Inizia l\'allenamento di oggi</string>
+    <string name="shortcut_log_short">Registra serie</string>
+    <string name="shortcut_log_long">Registra la serie in corso come previsto</string>
+    <string name="shortcut_rest_short">+30 s di riposo</string>
+    <string name="shortcut_rest_long">Aggiungi 30 secondi al riposo</string>
+    <string name="widget_description">L\'allenamento di oggi e il perché, il tuo obiettivo settimanale e la nota del coach, con Inizia</string>
+    <string name="channel_live">Allenamento in corso</string>
+    <string name="channel_live_desc">Timer di riposo, serie successiva e frequenza cardiaca mentre ti alleni</string>
+    <string name="rest_over">Riposo finito</string>
+    <string name="channel_alert_desc">Suona e vibra quando finisce il riposo</string>
+    <string name="channel_alert_sound">Riposo finito (solo suono)</string>
+    <string name="channel_alert_sound_desc">Suona senza vibrare quando finisce il riposo</string>
+    <string name="next_prefix">Poi:</string>
+    <string name="rest_next">Riposo · poi: %1$s</string>
+    <string name="up_next">Prossima: %1$s</string>
+    <string name="add_30">+30 s</string>
+    <string name="widget_title">Allenamento di oggi</string>
+</resources>

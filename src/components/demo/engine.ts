@@ -1,3 +1,4 @@
+import { DANCE_ID, danceMotion } from "@/lib/demo/dance";
 import {
   boneFrame,
   bounds,
@@ -28,6 +29,7 @@ import {
   type Joints,
   type Vec,
 } from "@/lib/demo/rig";
+import { stretchMotion } from "@/lib/demo/stretchMotions";
 import type { Muscle } from "@/lib/types";
 
 // The demo loop shared by the WebGL scene and the 2D canvas drawing: time, reps, the camera, drag to
@@ -152,11 +154,11 @@ export function startLoop(
     last = 0,
     lastDraw = 0,
     done = false,
-    clock = 0;
+    beat = 0;
   let followD = 0;
 
   const setup = () => {
-    motion = motionFor(s.exerciseId);
+    motion = s.exerciseId === DANCE_ID ? danceMotion() : (stretchMotion(s.exerciseId) ?? motionFor(s.exerciseId));
     body = BODIES[s.body];
     place = placement(motion, body);
     frameBox = bounds(motion, body, place);
@@ -221,7 +223,7 @@ export function startLoop(
     if (!visible || document.hidden) return;
     const dt = Math.min(0.05, Math.max(0, (now - (last || now)) / 1000));
     last = now;
-    clock += dt;
+    if (s.bpm) beat = advanceBeat(beat, dt, s.bpm);
     const cyc = cycleLength(motion.phases);
     if (s.playing && !done) {
       t += dt * s.speed;
@@ -268,7 +270,7 @@ export function startLoop(
         skel,
         changed,
         path,
-        heart: s.bpm ? { at: heartAt(J, body), beat: heartBeat(clock, s.bpm) } : null,
+        heart: s.bpm ? { at: heartAt(J, body), beat: heartPulse(beat) } : null,
       });
       changed = false;
       onPhase?.(smp.label);
@@ -380,9 +382,23 @@ export function heartAt(J: Joints, B: Body): Vec {
   return add(add(lerpV(J.hipC, J.shC, t), mul(F.f, interp(B.torsoSide, t, 1) * 0.5)), mul(F.o, -0.05));
 }
 
-/** A lub-dub pulse shape at `bpm`: a strong beat, then a softer one, then rest. */
+/**
+ * Moves the heart through its beat: `dt` seconds at `bpm`, from `phase` (0 to 1, one heartbeat).
+ * The phase is carried from frame to frame rather than worked out from the clock, so when the live
+ * heart rate changes the heart simply speeds up or slows down from where it is, with no skipped or
+ * doubled beat.
+ */
+export function advanceBeat(phase: number, dt: number, bpm: number): number {
+  return (phase + (dt * bpm) / 60) % 1;
+}
+
+/** A lub-dub pulse at `bpm`, `seconds` in: a strong beat, then a softer one, then rest. */
 export function heartBeat(seconds: number, bpm: number): number {
-  const ph = ((seconds * bpm) / 60) % 1;
+  return heartPulse(((seconds * bpm) / 60) % 1);
+}
+
+/** The lub-dub shape at a point in one heartbeat (`ph`, 0 to 1): 1 at the strong beat, 0 at rest. */
+export function heartPulse(ph: number): number {
   const g = (x: number, c: number, w: number) => Math.exp(-(((x - c) / w) ** 2));
   return Math.min(1, Math.max(g(ph, 0.04, 0.05), 0.6 * g(ph, 0.3, 0.05), g(ph, 1.04, 0.05)));
 }

@@ -1,0 +1,10 @@
+<strings>
+    <string id="AppName">Liftsmith</string>
+    <string id="NoneTitle">No workout running</string>
+    <string id="NoneBody">Start one on your phone and it shows here.</string>
+    <string id="Rest">Rest</string>
+    <string id="Next">Next: $1$</string>
+    <string id="Bpm">$1$ bpm</string>
+    <string id="HintLog">START: Log set</string>
+    <string id="HintAdd">DOWN: +30 s</string>
+</strings>

@@ -1,6 +1,9 @@
+import { de } from "@/locales/de";
 import { en, type MessageKey } from "@/locales/en";
 import { es } from "@/locales/es";
 import { fr } from "@/locales/fr";
+import { it } from "@/locales/it";
+import { ja } from "@/locales/ja";
 
 import { setExerciseText } from "./exercises";
 import { isNative } from "./juice";
@@ -16,15 +19,24 @@ import { isNative } from "./juice";
 // - Text lives in one catalogue per language (src/locales). English is the source; a missing key
 //   falls back to English, and a test checks every catalogue has the same keys and placeholders.
 
-export const LANGS = ["en", "es", "fr"] as const;
+// The G7 countries' languages plus Spanish (Melvin, 2026-11-10). Keep in step with Android's
+// locales_config.xml, iOS's CFBundleLocalizations and knownRegions, and MSG_LANGS in messageText.ts.
+export const LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
 export type Lang = (typeof LANGS)[number];
 export type LangPref = "system" | Lang;
 /** Each language's name in itself, for the picker. */
-export const LANG_NAME: Record<Lang, string> = { en: "English", es: "Español", fr: "Français" };
+export const LANG_NAME: Record<Lang, string> = {
+  en: "English",
+  es: "Español",
+  fr: "Français",
+  de: "Deutsch",
+  it: "Italiano",
+  ja: "日本語",
+};
 
 type Plural = Partial<Record<Intl.LDMLPluralRule, string>> & { other: string };
 export type Message = string | Plural;
-const CATALOG: Record<Lang, Partial<Record<MessageKey, Message>>> = { en, es, fr };
+const CATALOG: Record<Lang, Partial<Record<MessageKey, Message>>> = { en, es, fr, de, it, ja };
 
 // The exercise library is shared with the public website, so it reads its translations through this
 // lookup rather than importing the catalogues (exercises.ts, `setExerciseText`).
@@ -137,6 +149,16 @@ export function relative(value: number, unit: Intl.RelativeTimeFormatUnit): stri
 /** "squat, bench and deadlift" with the language's own conjunction. */
 export function list(items: string[], type: "conjunction" | "disjunction" = "conjunction"): string {
   return new Intl.ListFormat(tag, { style: "long", type }).format(items);
+}
+
+/**
+ * Text that starts a sentence, lowercased to sit inside one ("Short sleep" in "Go easy today: short sleep").
+ * German capitalises every noun, so lowercasing would misspell "Kniebeuge" or "Herzfrequenz": German text
+ * is left as written (catalogue lines that get spliced in start with a noun where they can).
+ */
+export function inSentence(s: string, whole = false): string {
+  if (lang === "de") return s;
+  return whole ? s.toLocaleLowerCase(tag) : s.charAt(0).toLocaleLowerCase(tag) + s.slice(1);
 }
 
 /** Parses a number typed in any language: a comma decimal (82,5) counts like a point. */

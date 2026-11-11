@@ -22,3 +22,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "nav.back.today": "Aujourd’hui",
   "nav.loading": "Chargement",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "nav.main": "Hauptmenü",
+  "nav.back.today": "Heute",
+  "nav.loading": "Wird geladen",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "nav.main": "Principale",
+  "nav.back.today": "Oggi",
+  "nav.loading": "Caricamento",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "nav.main": "メイン",
+  "nav.back.today": "今日",
+  "nav.loading": "読み込み中",
+};

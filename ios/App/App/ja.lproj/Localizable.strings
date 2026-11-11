@@ -1,0 +1,10 @@
+/* Japanese text drawn by the app's own Swift code: Siri and Shortcuts actions, and the rest-over alert. Follows the phone's language. */
+"Start workout" = "ワークアウト開始";
+"Opens Liftsmith and starts today's workout, or the one already running." = "Liftsmith を開き、今日のワークアウトか実行中のワークアウトを開始します。";
+"Log set" = "セットを記録";
+"Logs the current set as planned. Does nothing when no workout is running." = "今のセットを予定どおり記録します。ワークアウト中でなければ何もしません。";
+"Add 30 seconds of rest" = "休憩を 30 秒追加";
+"Adds 30 seconds to the rest timer." = "休憩タイマーに 30 秒追加します。";
+"+30 s rest" = "休憩 +30 秒";
+"Rest over" = "休憩終了";
+"Up next: %@" = "次：%@";

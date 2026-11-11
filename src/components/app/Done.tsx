@@ -8,7 +8,7 @@ import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, type Cosmetic } from "@/lib/game";
-import { date, t } from "@/lib/i18n";
+import { date, inSentence, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, confetti, haptic, juice, oops, sound, type TimerSound } from "@/lib/juice";
 import { doneItems } from "@/lib/routines";
@@ -30,6 +30,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { CoolDownCard } from "./Stretch";
 import { Button } from "./ui";
 
 function useCountUp(to: number, ms = 900) {
@@ -240,6 +241,7 @@ export function Done() {
       )}
       <PrReplayButton prs={prs} />
       <NextUpCard sessionId={s.sessionId} />
+      <CoolDownCard />
       {!lean(profile) && <DoneMoments />}
 
       {badges.length > 0 && (
@@ -316,7 +318,7 @@ function PainAfter({ sessionId }: { sessionId: string }) {
       {hurt.map((i) => (
         <PainSelect
           key={i.id}
-          label={t("done.painAsk", { part: PART_LABEL[i.part].toLocaleLowerCase() })}
+          label={t("done.painAsk", { part: inSentence(PART_LABEL[i.part], true) })}
           onRate={(n) => ratePain(i.id, n, { sessionId })}
         />
       ))}

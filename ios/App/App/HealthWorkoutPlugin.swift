@@ -15,6 +15,7 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "status", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "save", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "characteristics", returnType: CAPPluginReturnPromise),
     ]
 
     private let store = HKHealthStore()
@@ -36,6 +37,34 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         if granted { return call.resolve(["granted": true]) }
         store.requestAuthorization(toShare: types, read: nil) { [weak self] _, _ in
             call.resolve(["granted": self?.granted ?? false])
+        }
+    }
+
+    /// Sex and birth year for Your stats (src/lib/health.ts readBodyStats). The health plugin can't read
+    /// characteristics, so this asks for them (only when `ask` is true; Apple Health shows its sheet once)
+    /// and answers with whatever Apple Health has. A value the lifter didn't allow simply isn't there.
+    @objc func characteristics(_ call: CAPPluginCall) {
+        guard HKHealthStore.isHealthDataAvailable() else { return call.resolve([:]) }
+        let read: Set<HKObjectType> = [
+            HKObjectType.characteristicType(forIdentifier: .biologicalSex)!,
+            HKObjectType.characteristicType(forIdentifier: .dateOfBirth)!,
+        ]
+        let answer = { [weak self] in
+            var out: [String: Any] = [:]
+            if let sex = try? self?.store.biologicalSex().biologicalSex {
+                switch sex {
+                case .female: out["sex"] = "female"
+                case .male: out["sex"] = "male"
+                default: break
+                }
+            }
+            if let born = try? self?.store.dateOfBirthComponents(), let year = born.year { out["birthYear"] = year }
+            call.resolve(out)
+        }
+        if call.getBool("ask") ?? false {
+            store.requestAuthorization(toShare: nil, read: read) { _, _ in answer() }
+        } else {
+            answer()
         }
     }
 

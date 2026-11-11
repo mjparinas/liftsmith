@@ -13,6 +13,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(AppIconPlugin.class);
         registerPlugin(AccountSignInPlugin.class);
         registerPlugin(HealthWorkoutPlugin.class);
+        registerPlugin(GarminPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

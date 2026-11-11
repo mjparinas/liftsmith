@@ -64,7 +64,7 @@ try {
   await scan("rest plate math");
   await page.getByRole("button", { name: "Breathe" }).click();
   await scan("rest breathing");
-  await page.getByRole("button", { name: "End" }).click();
+  await page.getByRole("button", { name: "End", exact: true }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
@@ -122,12 +122,33 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
-  // Tools › TDEE, filled in with bump buttons, and the public calculator page.
+  // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
+  await page.goto(`${server.url}/app/#/stretch`);
+  await page.getByTestId("stretch-list").waitFor();
+  await page.getByRole("button", { name: "Pick Pigeon" }).click();
+  await scan("stretch library");
+  await page.getByRole("button", { name: /^Cobra/ }).click();
+  await page.getByRole("dialog").waitFor();
+  await scan("stretch demo");
+  await page.keyboard.press("Escape");
+  await page.goto(`${server.url}/app/#/stretch/rest`);
+  await page.getByTestId("stretch-routine").waitFor();
+  await scan("stretch routine");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("timer").waitFor();
+  await scan("stretch player");
+  // Tools › TDEE without stats (it links to Your stats), Your stats filled in with bump buttons, then TDEE
+  // reading them, and the public calculator page.
   await page.goto(`${server.url}/app/#/tools/tdee`);
   await page.getByRole("heading", { name: "TDEE calculator" }).waitFor();
+  await page.getByRole("button", { name: /Add your stats/ }).waitFor();
+  await scan("tdee, stats missing");
+  await page.getByRole("button", { name: /Add your stats/ }).click();
   await page.getByRole("button", { name: "Male", exact: true }).click();
   await page.getByRole("button", { name: "More age" }).click();
   await page.getByRole("button", { name: "More height" }).click();
+  await scan("your stats");
+  await page.goto(`${server.url}/app/#/tools/tdee`);
   await page.getByTestId("tdee-value").waitFor();
   await scan("tdee");
   await page.goto(`${server.url}/tools/tdee-calculator/`);
@@ -178,8 +199,8 @@ try {
   await scan("connections");
   await page.goto(`${server.url}/app/#/settings`);
   await scan("settings");
-  // Every group page of Settings (2026-11-10).
-  for (const group of ["training", "workout", "reminders", "look", "body", "data"]) {
+  // Every group page of Settings, and Labs (2026-11-10).
+  for (const group of ["training", "workout", "reminders", "look", "body", "data", "labs"]) {
     await page.goto(`${server.url}/app/#/settings/${group}`);
     await page.getByRole("heading", { level: 1 }).waitFor();
     await scan(`settings ${group}`);
@@ -330,7 +351,7 @@ try {
     }
   }
   // A sheet: focus moves in, Tab stays in, Escape closes it and focus comes back.
-  await kp.getByRole("button", { name: "End" }).focus();
+  await kp.getByRole("button", { name: "End", exact: true }).focus();
   await kp.keyboard.press("Enter");
   const dialog = kp.getByRole("dialog");
   await dialog.waitFor();

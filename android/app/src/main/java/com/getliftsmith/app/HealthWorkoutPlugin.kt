@@ -42,6 +42,16 @@ class HealthWorkoutPlugin : Plugin() {
         call.resolve(r)
     }
 
+    /**
+     * Sex and birth year for Your stats (src/lib/health.ts readBodyStats; iOS reads them from Apple Health).
+     * Health Connect has no records for either, so Android answers with nothing and the lifter enters them in
+     * Your stats (docs/decisions/platform-deltas.md). Height and weight come from Health Connect as usual.
+     */
+    @PluginMethod
+    fun characteristics(call: PluginCall) {
+        call.resolve(JSObject())
+    }
+
     @PluginMethod
     fun status(call: PluginCall) {
         val c = client() ?: return answer(call, "granted", false)

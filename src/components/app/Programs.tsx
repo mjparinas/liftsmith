@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
-import { list, t } from "@/lib/i18n";
+import { inSentence, list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { missingFor, PICKER_ORDER, pickProgram, PROGRAM_BY_ID, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
@@ -12,7 +12,7 @@ import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Sheet } from "./ui";
+import { Button, ProTag, Sheet } from "./ui";
 
 // Pick how Today's workout is planned: the adaptive engine (the default), a classic fixed program,
 // or a split the adaptive engine fills in. Program details (summary, steps, credit) are still English.
@@ -30,7 +30,8 @@ export function Programs() {
     haptic("tap");
     if (!gym) return;
     // Adaptive plans and splits are Pro: without it, the paywall instead.
-    if (!id ? !can("adaptive") : PROGRAM_BY_ID.get(id)?.tier === "pro" && !can("adaptiveSplits")) return go("pro", "programs");
+    if (!id && !can("adaptive")) return go("pro", "programs");
+    if (id && PROGRAM_BY_ID.get(id)?.tier === "pro" && !can("adaptiveSplits")) return go("pro", "splits");
     setProfile({ planSource: id ? pickProgram(id, { profile, gym, events, now: Date.now() }) : { kind: "adaptive" }, proPlan: undefined });
     track("feature", { name: "program", detail: id ?? "adaptive" });
     setOpen(null);
@@ -38,7 +39,7 @@ export function Programs() {
   };
 
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
         {t("train.back")}
       </button>
@@ -58,9 +59,7 @@ export function Programs() {
               {!currentId && (
                 <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-semibold text-accent">{t("prog.current")}</span>
               )}
-              {!can("adaptive") && (
-                <span className="rounded-full bg-warn/15 px-2 py-0.5 text-xs font-semibold text-warn">{t("prog.pro")}</span>
-              )}
+              {!can("adaptive") && <ProTag />}
             </div>
             <p className="mt-1 text-sm text-muted">{t("prog.adaptiveBlurb")}</p>
           </button>
@@ -126,7 +125,7 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
       </ol>
       {missing.length > 0 && (
         <p className="rounded-xl bg-warn/10 px-3 py-2 text-sm text-warn">
-          {t("prog.needs", { items: list(missing.map((e) => EQUIPMENT_LABEL[e].toLocaleLowerCase())) })}
+          {t("prog.needs", { items: list(missing.map((e) => inSentence(EQUIPMENT_LABEL[e], true))) })}
         </p>
       )}
       <div>

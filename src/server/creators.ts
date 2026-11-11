@@ -5,8 +5,19 @@
 // Two kinds share one table (Melvin, 2026-11-10): a creator's code earns them commission; a promo code is our
 // own, with no commission. Either can set its own trial length and RevenueCat offering (a longer trial, or a
 // discount through the offering's store products), an end date and a limit on how many installs may use it.
+// A third kind, lifetime (Melvin, 2026-11-11: "a coupon code … that gives the user a free lifetime pro account"),
+// is redeemed by a signed-in account and gives that account Pro for good (table pro_grants); its use limit
+// counts accounts, not installs.
 import type { SubEvent } from "@/lib/adminMetrics";
-import { DEFAULT_OFFERING, DEFAULT_TRIAL_DAYS, normalizeCode, OFFERING_ID, type CodeInfo, type CodeKind } from "@/lib/creatorCode";
+import {
+  codeKind,
+  DEFAULT_OFFERING,
+  DEFAULT_TRIAL_DAYS,
+  normalizeCode,
+  OFFERING_ID,
+  type CodeInfo,
+  type CodeKind,
+} from "@/lib/creatorCode";
 import {
   creatorRows,
   DEFAULT_MONTHS,
@@ -23,19 +34,22 @@ const n = (v: unknown) => Number(v ?? 0);
 const s = (v: unknown) => (v == null ? null : String(v));
 const SAFE_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const SOURCES = new Set(["link", "referrer", "typed", "store"]);
+/** Shortest lifetime code the admin form takes, dashes not counted. */
+export const LIFETIME_MIN = 10;
 
 export type ClaimResult = { ok: true; info: CodeInfo } | { ok: false; status: 400 | 404 | 410; error: string };
 
 type Found = { ok: true; info: CodeInfo } | { ok: false; status: 404 | 410 };
 
 const infoOf = (r: Record<string, unknown>): CodeInfo => {
-  const kind: CodeKind = r.kind === "promo" ? "promo" : "creator";
+  const kind = codeKind(r.kind);
   return {
     code: String(r.code),
     kind,
     name: kind === "creator" ? String(r.name) : null,
-    // A creator's code always gives a trial; a promo code without one gives what its offering gives.
-    trialDays: r.trial_days == null ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : n(r.trial_days),
+    // A creator's code always gives a trial; a promo code without one gives what its offering gives; a lifetime
+    // code gives Pro itself, so no trial.
+    trialDays: kind === "lifetime" ? null : r.trial_days == null ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : n(r.trial_days),
     offering: typeof r.offering === "string" && OFFERING_ID.test(r.offering) ? r.offering : DEFAULT_OFFERING,
   };
 };
@@ -45,20 +59,30 @@ const infoOf = (r: Record<string, unknown>): CodeInfo => {
  * An install that already holds the code keeps it past the end date and the limit (`installId`), and the
  * store webhook (`limits: false`) always records the code a purchase was made with.
  */
-export async function findCode(raw: unknown, opts: { now?: number; installId?: string; limits?: boolean } = {}): Promise<Found> {
+export async function findCode(
+  raw: unknown,
+  opts: { now?: number; installId?: string; accountId?: string; limits?: boolean } = {},
+): Promise<Found> {
   const code = typeof raw === "string" ? normalizeCode(raw) : null;
   if (!code) return { ok: false, status: 404 };
   const rows = await query("SELECT * FROM creators WHERE code = ? AND active = 1", [code]);
   const r = rows[0];
   if (!r) return { ok: false, status: 404 };
   if (opts.limits !== false) {
-    const held = opts.installId
-      ? (await query("SELECT 1 FROM creator_installs WHERE install_id = ? AND code = ?", [opts.installId, code])).length > 0
-      : false;
+    // A lifetime code's uses are the accounts that redeemed it; every other code's are the installs that hold it.
+    const lifetime = codeKind(r.kind) === "lifetime";
+    const held = lifetime
+      ? !!opts.accountId && (await query("SELECT 1 FROM pro_grants WHERE account_id = ? AND code = ?", [opts.accountId, code])).length > 0
+      : opts.installId
+        ? (await query("SELECT 1 FROM creator_installs WHERE install_id = ? AND code = ?", [opts.installId, code])).length > 0
+        : false;
     if (!held) {
       if (r.ends_at != null && n(r.ends_at) <= (opts.now ?? Date.now())) return { ok: false, status: 410 };
       if (r.max_uses != null) {
-        const used = await query<{ c: number }>("SELECT COUNT(*) AS c FROM creator_installs WHERE code = ?", [code]);
+        const used = await query<{ c: number }>(
+          lifetime ? "SELECT COUNT(*) AS c FROM pro_grants WHERE code = ?" : "SELECT COUNT(*) AS c FROM creator_installs WHERE code = ?",
+          [code],
+        );
         if (n(used[0]?.c) >= n(r.max_uses)) return { ok: false, status: 410 };
       }
     }
@@ -111,6 +135,40 @@ export async function claimFromStore(installId: string | null, raw: string | nul
   ]);
 }
 
+// ---------- Lifetime codes ----------
+
+export type RedeemResult = { ok: true; code: string } | { ok: false; status: 404 | 409 | 410; error: string; held?: string };
+
+/**
+ * Gives a signed-in account Pro for good with a lifetime code. 404: no such code (or paused); 409: the code is
+ * live but isn't a lifetime code (the app then applies it the usual way), or the account already has Pro from
+ * another lifetime code (`held`); 410: ended or every use taken. Redeeming the same code again is a no-op.
+ *
+ * The use limit holds under parallel redemptions: the insert counts the code's uses in the same statement, so
+ * two accounts racing for the last use can't both get it.
+ */
+export async function redeemLifetime(accountId: string, raw: unknown, now = Date.now()): Promise<RedeemResult> {
+  const found = await findCode(raw, { now, accountId });
+  if (!found.ok) return { ok: false, status: found.status, error: found.status === 410 ? "That code has ended" : "No such code" };
+  if (found.info.kind !== "lifetime") return { ok: false, status: 409, error: "Not a lifetime code" };
+  const code = found.info.code;
+  const mine = await query<{ code: string }>("SELECT code FROM pro_grants WHERE account_id = ?", [accountId]);
+  if (mine[0]) return mine[0].code === code ? { ok: true, code } : { ok: false, status: 409, error: "Already Pro", held: mine[0].code };
+  const r = await query<{ max_uses: number | null }>("SELECT max_uses FROM creators WHERE code = ?", [code]);
+  const max = r[0]?.max_uses;
+  const added = await run(
+    `INSERT OR IGNORE INTO pro_grants (account_id, code, at)
+     SELECT ?, ?, ? WHERE ? IS NULL OR (SELECT COUNT(*) FROM pro_grants WHERE code = ?) < ?`,
+    [accountId, code, now, max ?? null, code, max ?? 0],
+  );
+  return added > 0 ? { ok: true, code } : { ok: false, status: 410, error: "That code has ended" };
+}
+
+/** Whether the account has Pro from a lifetime code. */
+export async function hasLifetimePro(accountId: string): Promise<boolean> {
+  return (await query("SELECT 1 FROM pro_grants WHERE account_id = ?", [accountId])).length > 0;
+}
+
 // ---------- Admin ----------
 
 export interface CreatorInput {
@@ -134,17 +192,28 @@ export function checkCreator(body: unknown): { ok: true; creator: CreatorInput }
   const b = body as Record<string, unknown>;
   const code = normalizeCode(typeof b.code === "string" ? b.code : null);
   if (!code) return { ok: false, error: "A code is 3 to 24 letters, digits or dashes, like LIFT-ALEX." };
-  const kind: CodeKind = b.kind === "promo" ? "promo" : "creator";
+  const kind: CodeKind = codeKind(b.kind);
+  // A lifetime code is Pro for good to whoever types it first, and the code lookup answers without an account, so
+  // it must be too long to guess (security audit, 2026-11-11): 10 or more characters, about 36^10 tries.
+  if (kind === "lifetime" && code.replace(/-/g, "").length < LIFETIME_MIN)
+    return {
+      ok: false,
+      error: "A lifetime code gives Pro for good, so make it hard to guess: 10 or more letters and digits, like FRIENDS-7Q4K.",
+    };
   const name = typeof b.name === "string" ? b.name.trim().slice(0, 60) : "";
   if (!name)
-    return { ok: false, error: kind === "promo" ? "Give the code a label, like Black Friday 2026." : "Give the creator's name or handle." };
-  // A promo code is ours: it never earns commission, whatever the form says.
-  const rate = kind === "promo" ? 0 : b.rate == null ? DEFAULT_RATE : Number(b.rate);
+    return {
+      ok: false,
+      error: kind === "creator" ? "Give the creator's name or handle." : "Give the code a label, like Black Friday 2026.",
+    };
+  // Promo and lifetime codes are ours: they never earn commission, whatever the form says.
+  const rate = kind !== "creator" ? 0 : b.rate == null ? DEFAULT_RATE : Number(b.rate);
   if (!Number.isFinite(rate) || rate < 0 || rate > 0.7) return { ok: false, error: "The rate is a share between 0 and 0.7 (0.3 is 30%)." };
   const months = b.months == null ? DEFAULT_MONTHS : Number(b.months);
   if (!Number.isInteger(months) || months < 1 || months > 60) return { ok: false, error: "Months is a whole number from 1 to 60." };
   const blank = (v: unknown) => v == null || v === "";
-  const trialDays = blank(b.trialDays) ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : Number(b.trialDays);
+  // A lifetime code gives Pro itself, never a trial.
+  const trialDays = kind === "lifetime" || blank(b.trialDays) ? (kind === "creator" ? DEFAULT_TRIAL_DAYS : null) : Number(b.trialDays);
   if (trialDays != null && (!Number.isInteger(trialDays) || trialDays < 1 || trialDays > 90))
     return { ok: false, error: "The trial is a whole number of days from 1 to 90." };
   const offering = blank(b.offering) ? DEFAULT_OFFERING : String(b.offering).trim();
@@ -186,9 +255,10 @@ export async function recordPayout(code: string, usd: number, admin: string, not
 }
 
 export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows: CreatorRow[]; payouts: Payout[] }> {
-  const [creators, installs, subs, payouts] = await Promise.all([
+  const [creators, installs, grants, subs, payouts] = await Promise.all([
     query("SELECT * FROM creators ORDER BY created_at DESC"),
     query("SELECT * FROM creator_installs WHERE install_id NOT IN (SELECT id FROM installs WHERE test = 1)"),
+    query("SELECT * FROM pro_grants"),
     // Only store-verified events (the RevenueCat webhook) earn commission. The app's own trial_start and purchase
     // events reach /api/collect/ unauthenticated, so anyone could forge one for an install that carries a code.
     query(
@@ -196,6 +266,7 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
     ),
     query("SELECT * FROM creator_payouts ORDER BY paid_at DESC"),
   ]);
+  const lifetime = new Set(creators.filter((c) => codeKind(c.kind) === "lifetime").map((c) => String(c.code)));
   const payoutList = payouts.map((p): Payout => ({
     id: n(p.id),
     code: String(p.code),
@@ -209,7 +280,7 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
     since,
     creators: creators.map((c): Creator => ({
       code: String(c.code),
-      kind: c.kind === "promo" ? "promo" : "creator",
+      kind: codeKind(c.kind),
       name: String(c.name),
       contact: s(c.contact),
       rate: n(c.rate),
@@ -222,13 +293,25 @@ export async function loadCreators(now = Date.now(), since = 0): Promise<{ rows:
       endsAt: c.ends_at == null ? null : n(c.ends_at),
       maxUses: c.max_uses == null ? null : n(c.max_uses),
     })),
-    installs: installs.map((i): CreatorInstall => ({
-      installId: String(i.install_id),
-      code: String(i.code),
-      at: n(i.at),
-      source: String(i.source),
-      platform: s(i.platform),
-    })),
+    // A lifetime code's sign-ups are the accounts that redeemed it (its uses), not the installs that typed it.
+    installs: [
+      ...installs
+        .filter((i) => !lifetime.has(String(i.code)))
+        .map((i): CreatorInstall => ({
+          installId: String(i.install_id),
+          code: String(i.code),
+          at: n(i.at),
+          source: String(i.source),
+          platform: s(i.platform),
+        })),
+      ...grants.map((g): CreatorInstall => ({
+        installId: `account:${String(g.account_id)}`,
+        code: String(g.code),
+        at: n(g.at),
+        source: "redeemed",
+        platform: null,
+      })),
+    ],
     subs: subs.map((e): SubEvent => ({
       id: String(e.id),
       at: n(e.at),

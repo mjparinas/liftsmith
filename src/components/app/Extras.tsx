@@ -7,7 +7,6 @@
 import { useMemo, useState } from "react";
 
 import { checkinText, shareText } from "@/lib/buddy";
-import { exercise } from "@/lib/exercises";
 import { goalStreak } from "@/lib/game";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
 import { date, t as tr } from "@/lib/i18n";
@@ -21,9 +20,9 @@ import { newlyUnlocked } from "@/lib/themes";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
-import { drillSeconds, warmupRoutine, type Drill } from "@/lib/warmupRoutine";
 import type { MessageKey } from "@/locales/en";
 
+import { openStats } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { RoutinesSheet } from "./Routines";
@@ -158,7 +157,6 @@ export function PlanExtras() {
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const last = useMemo(() => lastWorkout(events), [events]);
   const [repeating, setRepeating] = useState(false);
-  const [warmOpen, setWarmOpen] = useState(false);
   const [buddyOpen, setBuddyOpen] = useState(false);
   if (active || !preview || !gym) return null;
   const toggleRepeat = () => {
@@ -174,7 +172,6 @@ export function PlanExtras() {
       setRepeating(true);
     }
   };
-  const muscles = [...new Set(preview.items.flatMap((i) => exercise(i.exerciseId).primary))];
   return (
     <div className="mt-3 flex flex-wrap gap-2 text-sm">
       {last && (
@@ -202,7 +199,10 @@ export function PlanExtras() {
       {preview.items.length > 0 && (
         <button
           type="button"
-          onClick={() => setWarmOpen(true)}
+          onClick={() => {
+            haptic("tick");
+            go("stretch", "warmup");
+          }}
           className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted"
         >
           {tr("x.warmUp")}
@@ -216,9 +216,6 @@ export function PlanExtras() {
         {tr("x.checkIn")}
       </button>
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
-      <Sheet open={warmOpen} onClose={() => setWarmOpen(false)} title={tr("x.warmTitle")}>
-        <WarmupList drills={warmupRoutine(muscles, gym.equipment, now, 5)} />
-      </Sheet>
       <Sheet open={buddyOpen} onClose={() => setBuddyOpen(false)} title={tr("x.buddyTitle")}>
         <BuddyCheckin
           focus={[...new Set(preview.items.map((i) => i.focus))] as Muscle[]}
@@ -226,50 +223,6 @@ export function PlanExtras() {
           onDone={() => setBuddyOpen(false)}
         />
       </Sheet>
-    </div>
-  );
-}
-
-function WarmupList({ drills }: { drills: Drill[] }) {
-  const [done, setDone] = useState<string[]>([]);
-  const total = Math.round(drills.reduce((s, d) => s + drillSeconds(d), 0) / 60);
-  return (
-    <div>
-      <p className="text-sm text-muted">{tr("x.warmIntro", { count: total })}</p>
-      <ol className="mt-3 space-y-2">
-        {drills.map((d) => {
-          const on = done.includes(d.id);
-          return (
-            <li key={d.id}>
-              <button
-                type="button"
-                aria-pressed={on}
-                onClick={() => {
-                  haptic("tick");
-                  setDone(on ? done.filter((x) => x !== d.id) : [...done, d.id]);
-                }}
-                className={`press flex w-full items-start gap-3 rounded-2xl border p-3 text-left ${on ? "border-good/40 bg-good/10" : "border-line bg-raised"}`}
-              >
-                <span
-                  className={`mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full border text-sm ${on ? "border-good bg-good text-bg" : "border-line"}`}
-                  aria-hidden
-                >
-                  {on ? "✓" : ""}
-                </span>
-                <span>
-                  <span className="block font-medium">
-                    {d.name}{" "}
-                    <span className="num text-sm font-normal text-muted">
-                      · {d.reps ? tr("x.reps", { n: d.reps }) : tr("x.secs", { n: d.seconds })}
-                    </span>
-                  </span>
-                  <span className="block text-sm text-muted">{d.how}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
     </div>
   );
 }
@@ -471,7 +424,9 @@ export function StrengthCard() {
             {tr("x.adjustAge")}
           </label>
         ) : (
-          <p className="mt-4 text-xs text-faint">{tr("x.addBirth")}</p>
+          <button type="button" onClick={openStats} className="press mt-3 min-h-11 text-left text-sm font-semibold text-accent">
+            {tr("x.addBirth")} ›
+          </button>
         )}
       </div>
       {tw.length > 0 && (

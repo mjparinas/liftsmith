@@ -52,6 +52,7 @@ import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
+import * as lab from "./text/lab";
 import * as league from "./text/league";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -89,6 +90,8 @@ import * as settings from "./text/settings";
 import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
+import * as stats from "./text/stats";
+import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
@@ -159,6 +162,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...info.fr,
   ...inj.fr,
   ...ins.fr,
+  ...lab.fr,
   ...league.fr,
   ...lvl.fr,
   ...map.fr,
@@ -196,6 +200,8 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...setup.fr,
   ...share.fr,
   ...sig.fr,
+  ...str.fr,
+  ...stats.fr,
   ...tab.fr,
   ...td.fr,
   ...tdee.fr,

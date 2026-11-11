@@ -19,6 +19,10 @@ export const en = {
   "creator.lockedNone": "Codes can only be added before a trial or subscription starts.",
   "creator.okOffer": "Code {code} applied: its price shows on the plans.",
   "creator.ended": "The code {code} has ended.",
+  "creator.lifetimeOk": "Code {code} redeemed: you have Pro for life on this account, on every device you sign in on.",
+  "creator.lifetimeSignIn": "Code {code} gives Pro for life. Sign in so it stays with you on every device.",
+  "creator.lifetimeSignInButton": "Sign in to get Pro for life",
+  "creator.lifetimeHeld": "This account already has Pro for life.",
 } as const;
 
 type Key = keyof typeof en;
@@ -39,6 +43,10 @@ export const es: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "Los códigos solo se pueden añadir antes de empezar una prueba o suscripción.",
   "creator.okOffer": "Código {code} aplicado: su precio aparece en los planes.",
   "creator.ended": "El código {code} ya no está disponible.",
+  "creator.lifetimeOk": "Código {code} canjeado: tienes Pro de por vida en esta cuenta, en cada dispositivo donde inicies sesión.",
+  "creator.lifetimeSignIn": "El código {code} da Pro de por vida. Inicia sesión para que te acompañe en todos tus dispositivos.",
+  "creator.lifetimeSignInButton": "Inicia sesión para obtener Pro de por vida",
+  "creator.lifetimeHeld": "Esta cuenta ya tiene Pro de por vida.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -57,4 +65,75 @@ export const fr: Partial<Record<Key, Message>> = {
   "creator.lockedNone": "Un code ne peut être ajouté qu'avant le début d'un essai ou d'un abonnement.",
   "creator.okOffer": "Code {code} appliqué : son prix s'affiche sur les offres.",
   "creator.ended": "Le code {code} n'est plus disponible.",
+  "creator.lifetimeOk": "Code {code} utilisé : vous avez Pro à vie sur ce compte, sur chaque appareil où vous vous connectez.",
+  "creator.lifetimeSignIn": "Le code {code} donne Pro à vie. Connectez-vous pour le garder sur tous vos appareils.",
+  "creator.lifetimeSignInButton": "Se connecter pour obtenir Pro à vie",
+  "creator.lifetimeHeld": "Ce compte a déjà Pro à vie.",
+};
+
+export const de: Partial<Record<Key, Message>> = {
+  "creator.title": "Code einlösen",
+  "creator.have": "Hast du einen Code?",
+  "creator.placeholder": "z. B. LIFT-ALEX",
+  "creator.apply": "Einlösen",
+  "creator.remove": "Code entfernen",
+  "creator.note":
+    "Ein Code von uns oder von einem Creator, dem du folgst, kann dir eine längere Pro-Testphase oder einen günstigeren Preis geben.",
+  "creator.ok": "Code {code} von {name}: Deine Pro-Testphase dauert {days} Tage.",
+  "creator.okNoName": "Code {code} eingelöst: Deine Pro-Testphase dauert {days} Tage.",
+  "creator.pending": "Code {code} gespeichert. Wir prüfen ihn, wenn du das nächste Mal online bist.",
+  "creator.unknown": "Den Code {code} kennen wir nicht. Prüfe die Schreibweise und versuch es noch einmal.",
+  "creator.invalid": "Codes bestehen aus Buchstaben, Ziffern und Bindestrichen, wie LIFT-ALEX.",
+  "creator.locked": "Dein Abo nutzt bereits den Code {code}, deshalb lässt er sich nicht ändern.",
+  "creator.lockedNone": "Codes lassen sich nur hinzufügen, bevor eine Testphase oder ein Abo beginnt.",
+  "creator.okOffer": "Code {code} eingelöst: Sein Preis wird bei den Tarifen angezeigt.",
+  "creator.ended": "Der Code {code} ist abgelaufen.",
+  "creator.lifetimeOk": "Code {code} eingelöst: Du hast Pro auf Lebenszeit mit diesem Konto, auf jedem Gerät, auf dem du dich anmeldest.",
+  "creator.lifetimeSignIn": "Der Code {code} gibt dir Pro auf Lebenszeit. Melde dich an, damit es dir auf jedem Gerät bleibt.",
+  "creator.lifetimeSignInButton": "Anmelden und Pro auf Lebenszeit holen",
+  "creator.lifetimeHeld": "Dieses Konto hat schon Pro auf Lebenszeit.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "creator.title": "Riscatta un codice",
+  "creator.have": "Hai un codice?",
+  "creator.placeholder": "es. LIFT-ALEX",
+  "creator.apply": "Applica",
+  "creator.remove": "Rimuovi codice",
+  "creator.note": "Un codice nostro o di un creator che segui può darti una prova Pro più lunga o un prezzo più basso.",
+  "creator.ok": "Codice {code} di {name}: la tua prova Pro dura {days} giorni.",
+  "creator.okNoName": "Codice {code} applicato: la tua prova Pro dura {days} giorni.",
+  "creator.pending": "Codice {code} salvato. Lo verificheremo la prossima volta che sei online.",
+  "creator.unknown": "Non conosciamo il codice {code}. Controlla come l’hai scritto e riprova.",
+  "creator.invalid": "I codici sono lettere, cifre e trattini, come LIFT-ALEX.",
+  "creator.locked": "Il tuo abbonamento usa già il codice {code}, quindi non si può cambiare.",
+  "creator.lockedNone": "I codici si possono aggiungere solo prima che inizi una prova o un abbonamento.",
+  "creator.okOffer": "Codice {code} applicato: il suo prezzo compare nei piani.",
+  "creator.ended": "Il codice {code} è scaduto.",
+  "creator.lifetimeOk": "Codice {code} riscattato: hai Pro a vita su questo account, su ogni dispositivo in cui accedi.",
+  "creator.lifetimeSignIn": "Il codice {code} dà Pro a vita. Accedi perché resti con te su ogni dispositivo.",
+  "creator.lifetimeSignInButton": "Accedi per avere Pro a vita",
+  "creator.lifetimeHeld": "Questo account ha già Pro a vita.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "creator.title": "コードを使う",
+  "creator.have": "コードをお持ちですか？",
+  "creator.placeholder": "例：LIFT-ALEX",
+  "creator.apply": "適用",
+  "creator.remove": "コードを削除",
+  "creator.note": "私たちやフォローしているクリエイターのコードで、Pro のお試しが長くなったり、価格が安くなったりします。",
+  "creator.ok": "{name}のコード {code}：Pro のお試しは{days}日間です。",
+  "creator.okNoName": "コード {code} を適用しました：Pro のお試しは{days}日間です。",
+  "creator.pending": "コード {code} を保存しました。次にオンラインになったときに確認します。",
+  "creator.unknown": "コード {code} は見つかりません。綴りを確認してもう一度お試しください。",
+  "creator.invalid": "コードは英字、数字、ハイフンでできています（例：LIFT-ALEX）。",
+  "creator.locked": "サブスクリプションにはすでにコード {code} が使われているため、変更できません。",
+  "creator.lockedNone": "コードはお試しやサブスクリプションの開始前にしか追加できません。",
+  "creator.okOffer": "コード {code} を適用しました：価格はプランに表示されます。",
+  "creator.ended": "コード {code} は終了しました。",
+  "creator.lifetimeOk": "コード {code} を引き換えました：このアカウントは永久に Pro です。サインインしたすべての端末で使えます。",
+  "creator.lifetimeSignIn": "コード {code} で Pro が永久に使えます。すべての端末で使えるよう、サインインしてください。",
+  "creator.lifetimeSignInButton": "サインインして永久 Pro を受け取る",
+  "creator.lifetimeHeld": "このアカウントはすでに永久 Pro です。",
 };

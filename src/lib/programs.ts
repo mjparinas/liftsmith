@@ -3,7 +3,7 @@ import type { MessageKey } from "@/locales/en";
 import { blockWeek } from "./block";
 import { available, exercise, EXERCISE_BY_ID, LADDER_ONLY } from "./exercises";
 import { alternatives, generate, planSeconds, type Plan, type PlanItem, type SetTarget } from "./generator";
-import { currentTag, t } from "./i18n";
+import { inSentence, t } from "./i18n";
 import { layoff } from "./layoff";
 import { roundLoad, stepLoad } from "./loads";
 import { epley, sessionsOf, startE1rm, TIMED, weightFor } from "./progression";
@@ -1013,6 +1013,8 @@ export function programSessions(events: readonly AppEvent[], id: string, since: 
       for (const x of sets.get(sid)!.sort((a, b) => a.at - b.at)) {
         // Sets done lighter for an injury don't move the program lift (injury.ts).
         if (x.injuryPct) continue;
+        // Drop and rest-pause sets are bonus work: they aim below the plan's reps, so they'd read as a miss.
+        if (x.tag) continue;
         const k = x.slot ?? x.exerciseId;
         by.set(k, [...(by.get(k) ?? []), x]);
       }
@@ -1121,7 +1123,7 @@ export function programPlan({
         id: src.id,
         day,
         dayName: days[day]!.name,
-        note: t("pgm.next", { day: days[(day + 1) % days.length]!.name.toLocaleLowerCase(currentTag()) }),
+        note: t("pgm.next", { day: inSentence(days[(day + 1) % days.length]!.name, true) }),
         fixed: false,
       },
     };

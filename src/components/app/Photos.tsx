@@ -15,6 +15,7 @@ import type { BodyweightEvent } from "@/lib/types";
 import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 
 import { BodyFatField } from "./BodyFatField";
+import { Measurements } from "./Measurements";
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
 
@@ -75,7 +76,7 @@ export function Photos() {
   const change = first && last && first !== last ? fromKg(last.kg - first.kg, unit) : null;
 
   return (
-    <div className="pb-28">
+    <div className="pb-2">
       <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">
         {t("photos.back")}
       </button>
@@ -113,6 +114,8 @@ export function Photos() {
           )}
         </div>
       </Section>
+
+      <Measurements />
 
       <Section title={t("photos.progress")}>
         <div className="flex gap-2" role="group" aria-label={t("photos.pose")}>

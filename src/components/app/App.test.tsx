@@ -348,7 +348,7 @@ describe("first run to finished workout", () => {
         .at(-1)!,
     );
     await user.click(within(dialog).getByRole("button", { name: "Add exercise" }));
-    await user.type(within(dialog).getByLabelText("Add exercise"), "lateral raise");
+    await user.type(within(dialog).getByLabelText("Search by name, muscle or equipment"), "lateral raise");
     await user.click(within(dialog).getAllByRole("button", { name: /Lateral raise/i })[0]);
     await user.click(within(dialog).getByRole("button", { name: "Save routine" }));
     const saved = useApp.getState().profile.routines!;
@@ -636,5 +636,59 @@ describe("saving your progress", () => {
     expect(useApp.getState().events.some((e) => e.id === "bw-old")).toBe(true);
     await user.upload(screen.getByLabelText("Backup file to restore"), new File(["{}"], "x.json", { type: "application/json" }));
     expect(await screen.findByText("That file isn't a Liftsmith backup.")).toBeInTheDocument();
+  });
+});
+
+describe("Labs", () => {
+  afterEach(() => {
+    setBillingLive(false);
+    localStorage.removeItem("liftsmith.flags.local");
+  });
+
+  async function startSquat(user: ReturnType<typeof userEvent.setup>) {
+    await user.click(screen.getByRole("button", { name: "Today" }));
+    await user.click(await screen.findByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await screen.findByRole("button", { name: /Log set/ });
+  }
+
+  it("is Pro: without it the Labs row is marked Pro and opens Pro, and the workout has no Count reps", async () => {
+    setBillingLive(true, null, [{ plan: "annual", price: "$39.99", perMonth: "$3.33", trialDays: 14 }]);
+    // Switched on before Pro ran out: still off without Pro.
+    localStorage.setItem("liftsmith.flags.local", JSON.stringify({ labRepCount: true }));
+    const user = userEvent.setup();
+    render(<App />);
+    await user.click(await screen.findByRole("button", { name: "Get started" }));
+    await screen.findByText("What are you training for?");
+    await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(screen.getByRole("button", { name: /Commercial gym/ }));
+    for (let i = 0; i < 4; i++) await user.click(screen.getByRole("button", { name: "Continue" }));
+    await user.click(await screen.findByRole("button", { name: "Not now, keep the free plan" }));
+    await screen.findByText("Today's workout");
+    await startSquat(user);
+    expect(screen.queryByRole("button", { name: "Count reps with the camera" })).not.toBeInTheDocument();
+    location.hash = "#/settings";
+    const row = await screen.findByRole("button", { name: /Labs/ });
+    expect(row).toHaveTextContent("Pro");
+    await user.click(row);
+    expect(location.hash).toBe("#/pro/labs");
+  });
+
+  it("switches camera rep counting on, and Count reps appears on the squat", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await startSquat(user);
+    expect(screen.queryByRole("button", { name: "Count reps with the camera" })).not.toBeInTheDocument();
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: /Labs/ }));
+    const sw = await screen.findByRole("switch", { name: /Camera rep counting/ });
+    // Phone motion builds on camera counting, so it shows once that's on.
+    expect(screen.queryByRole("switch", { name: /Phone motion/ })).not.toBeInTheDocument();
+    await user.click(sw);
+    expect(sw).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("switch", { name: /Phone motion/ })).toBeInTheDocument();
+    location.hash = "#/workout";
+    expect(await screen.findByRole("button", { name: "Count reps with the camera" })).toBeInTheDocument();
   });
 });

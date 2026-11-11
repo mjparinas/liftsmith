@@ -1,8 +1,10 @@
 import { track } from "../analytics";
+import { startDistance } from "../cardio";
 import { derive } from "../derive";
 import { exercise } from "../exercises";
-import { injuredTarget, planSeconds, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
+import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
 import { activeInjuries } from "../injury";
+import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
@@ -10,7 +12,7 @@ import { doLater, fitToTime } from "../replan";
 import { implementsFor } from "../sides";
 import type { State } from "../store";
 import { afterSet, linksOf, toggleLink } from "../superset";
-import type { AppEvent, LoadKind, Muscle, Rating } from "../types";
+import type { AppEvent, LoadKind, Muscle, Rating, SetTag } from "../types";
 import { WARMUP_REST, warmupFor } from "../warmup";
 import { persistActive, setsDone, uid, type Ctx } from "./shared";
 
@@ -32,6 +34,8 @@ export interface Active {
    * left. Unset means both sides did `reps`, which keeps logging to one tap.
    */
   repsR?: number;
+  /** Cardio logged with distance: metres for the next set, editable with a stepper. */
+  distanceM?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -51,7 +55,18 @@ export interface Active {
   warm?: number;
   /** Rest auto-start is off: the rest (seconds) waiting for a tap on Start rest. */
   restReady?: number;
+  /**
+   * The set on screen is a bonus drop or rest-pause set (extraSet), and the weight and reps to go back to
+   * afterwards when the exercise has planned sets left.
+   */
+  tag?: SetTag;
+  tagReturn?: { weight: number; reps: number };
+  /** The plan position the lifter had moved on to before a bonus set took them back (for Cancel). */
+  tagFrom?: number;
 }
+
+/** The pause before a rest-pause set. */
+export const REST_PAUSE_SEC = 15;
 
 /** True while the exercise on screen still has warm-up sets to do. */
 export function warmingUp(a: Pick<Active, "plan" | "index" | "warm">): boolean {
@@ -79,7 +94,8 @@ export function loadItem(get: () => State, a: Active, index: number): Active {
   const warm = started ? (item.warmup?.length ?? 0) : 0;
   const first = !started && item.warmup?.[0];
   const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
-  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps };
+  const distanceM = startDistance(exercise(item.exerciseId), get().events);
+  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM };
 }
 
 /** How long Undo stays offered after Log set when there's no rest to wait through. */
@@ -110,9 +126,16 @@ export interface WorkoutSlice {
   /** Moves the current exercise after the next one (equipment busy). */
   later(): void;
   logSet(): void;
+  /**
+   * Between sets: a bonus drop set (about 75% of the set just logged, no rest) or rest-pause set (same
+   * weight after a 15 s pause) of the exercise just done. Undefined cancels one that's on screen.
+   */
+  extraSet(kind: SetTag | undefined): void;
   adjust(weight: number, reps: number): void;
   /** Right side's reps on a per-side exercise; undefined goes back to "both sides the same". */
   adjustRight(reps: number | undefined): void;
+  /** Sets the next cardio set's distance (metres). */
+  adjustDistance(m: number): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
@@ -121,6 +144,8 @@ export interface WorkoutSlice {
   skipWarmup(): void;
   feedback(r: Rating): void;
   swap(toId: string, avoid: boolean): void;
+  /** Adds an exercise at the end of the workout in progress (the exercise browser's "Add an exercise"). */
+  addExercise(exerciseId: string): void;
   goTo(index: number): void;
   /** Link exercise `index` with the next one as a superset, or split them. Works on Today's plan and mid-workout. */
   toggleSuperset(index: number): void;
@@ -341,6 +366,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
           implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
+          ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
@@ -353,22 +379,36 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           challenge: item.challenge && already + 1 === item.sets ? true : undefined,
           injuryPct: item.injuryPct,
           superset: item.group,
+          tag: a.tag,
         },
       ]);
       // Alone, the next set is the same exercise until its sets are done. In a superset it's the
       // next exercise of the round (superset.ts).
       const items = a.plan.items;
+      // A bonus set doesn't move the plan on: the planned set count stays where it was.
       const step = afterSet(items, a.index, (i) =>
-        i === a.index ? already + 1 : setsDone(get().events, a.sessionId, items[i].exerciseId),
+        i === a.index ? already + (a.tag ? 0 : 1) : setsDone(get().events, a.sessionId, items[i].exerciseId),
       );
-      let next: Active = { ...a, repsR: undefined, lastAt: now, restStart: now, lastRest: undefined, setStart: now, restReady: undefined };
+      let next: Active = {
+        ...a,
+        repsR: undefined,
+        lastAt: now,
+        restStart: now,
+        lastRest: undefined,
+        setStart: now,
+        restReady: undefined,
+        tag: undefined,
+        tagReturn: undefined,
+        tagFrom: undefined,
+      };
+      if (a.tag && a.tagReturn) next = { ...next, ...a.tagReturn };
       // Programs with a different target for each set (ramps, percentages) load the next one; straight
       // sets keep whatever the lifter dialled in.
       const nextT = item.setTargets?.[already + 1];
       const prevT = item.setTargets?.[already];
-      if (step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
+      if (!a.tag && step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
         next = { ...next, weight: nextT.weight, reps: nextT.reps };
-      if (step.finished) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
+      if (step.finished && !a.tag) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
       if (step.index !== a.index) next = loadItem(get, next, Math.min(step.index, items.length));
       const last = next.index >= items.length;
       next.restTotal = last ? 0 : step.rest;
@@ -379,10 +419,68 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       persistActive(next);
     },
 
+    extraSet(kind) {
+      const a = get().active;
+      if (!a) return;
+      const now = Date.now();
+      if (!kind) {
+        if (!a.tag) return;
+        const next: Active = { ...a, ...(a.tagReturn ?? {}), tag: undefined, tagReturn: undefined, lastAt: now };
+        // Back to where the plan was: the exercise after the one the bonus set was for, if that one's done.
+        const back = a.tagFrom !== undefined ? loadItem(get, { ...next, index: a.tagFrom }, a.tagFrom) : next;
+        set({ active: { ...back, tagFrom: undefined } });
+        persistActive({ ...back, tagFrom: undefined });
+        return;
+      }
+      const last = [...get().events].reverse().find((e) => e.type === "set" && e.sessionId === a.sessionId);
+      if (last?.type !== "set") return;
+      const index = a.plan.items.findIndex((i) => i.exerciseId === last.exerciseId);
+      if (index < 0) return;
+      const ex = exercise(last.exerciseId);
+      const g = gym();
+      const lighter = last.weight * 0.75;
+      const weight = kind === "drop" && ex.load !== "bodyweight" ? (g ? roundLoad(lighter, ex, g).kg : Math.round(lighter)) : last.weight;
+      const reps = kind === "drop" ? Math.max(1, last.targetReps) : Math.max(2, Math.round(last.reps / 3));
+      const pause = kind === "restPause" ? REST_PAUSE_SEC : 0;
+      const next: Active = {
+        ...a,
+        index,
+        warm: a.plan.items[index]?.warmup?.length ?? 0,
+        weight,
+        reps,
+        repsR: undefined,
+        tag: kind,
+        // Coming back to the same exercise keeps what was dialled in for its next planned set.
+        tagReturn:
+          index === a.index
+            ? { weight: a.tag ? (a.tagReturn?.weight ?? a.weight) : a.weight, reps: a.tag ? (a.tagReturn?.reps ?? a.reps) : a.reps }
+            : undefined,
+        tagFrom: index === a.index ? undefined : (a.tagFrom ?? a.index),
+        askFeedback: null,
+        restTotal: pause,
+        restUntil: pause ? now + pause * 1000 : null,
+        restStart: now,
+        restReady: undefined,
+        setStart: pause ? now + pause * 1000 : now,
+        lastAt: now,
+      };
+      set({ active: next });
+      persistActive(next);
+      track("feature", { name: "set_tag", detail: kind });
+    },
+
     adjust(weight, reps) {
       const a = get().active;
       if (!a) return;
       const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    adjustDistance(m) {
+      const a = get().active;
+      if (!a) return;
+      const next = { ...a, distanceM: Math.max(0, Math.round(m)), lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
@@ -488,6 +586,36 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
       track("feature", { name: "swap", detail: avoid ? "not available here" : "swap" });
       const next = loadItem(get, { ...a, plan: { ...a.plan, items } }, a.index);
+      set({ active: next });
+      persistActive(next);
+    },
+
+    addExercise(exerciseId) {
+      const a = get().active;
+      const g = gym();
+      if (!a || !g) return;
+      const ex = exercise(exerciseId);
+      const { profile, events } = get();
+      const t = injuredTarget(ex, target(ex, events, profile, g, Date.now()), activeInjuries(events), g);
+      // Cardio is one long set; anything else gets the usual three.
+      const sets = ex.cardio ? 1 : 3;
+      const warmed = new Set(a.plan.items.flatMap((i) => exercise(i.exerciseId).primary));
+      const wu = warmupFor(ex, t.target.weight, g, warmed);
+      const item: PlanItem = {
+        exerciseId,
+        sets,
+        restSec: restFor(ex, profile.goal, profile.training),
+        focus: ex.primary[0]!,
+        target: t.target,
+        ...(t.injuryPct ? { injuryPct: t.injuryPct } : {}),
+        ...(wu.length ? { warmup: wu } : {}),
+      };
+      const items = [...a.plan.items, item];
+      track("feature", { name: "add_exercise", detail: ex.cardio ? "cardio" : ex.pattern });
+      // When every planned exercise is done, go straight to the new one.
+      const finished = a.index >= a.plan.items.length;
+      const plan = { ...a.plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
+      const next = finished ? loadItem(get, { ...a, plan, lastAt: Date.now() }, items.length - 1) : { ...a, plan, lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },

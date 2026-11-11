@@ -78,3 +78,77 @@ export const fr: Partial<Record<Key, Message>> = {
   "cycle.agree": "J’accepte, l’activer",
   "cycle.notNow": "Pas maintenant",
 };
+
+export const de: Partial<Record<Key, Message>> = {
+  "cycle.title": "Zyklusbewusste Bereitschaft",
+  "cycle.intro":
+    "Optional. Trag den Tag ein, an dem deine Periode beginnt, und Liftsmith passt die Entscheidung zwischen Gas geben und locker rund um deinen Zyklus ein wenig an.",
+  "cycle.setUp": "Einrichten",
+  "cycle.day": "Zyklustag {day} von etwa {length}.",
+  "cycle.logFirst": "Trag zum Start den ersten Tag deiner nächsten Periode ein.",
+  "cycle.today": "Periode heute begonnen",
+  "cycle.yesterday": "Gestern begonnen",
+  "cycle.offNote": "Damit schaltest du es aus und löschst jede Periode, die du auf diesem Gerät eingetragen hast.",
+  "cycle.offConfirm": "Ausschalten und löschen",
+  "cycle.cancel": "Abbrechen",
+  "cycle.off": "Ausschalten und Zyklusdaten löschen",
+  "cycle.consent1":
+    "Du trägst den ersten Tag jeder Periode ein. Liftsmith schätzt anhand deiner eigenen typischen Zykluslänge, wo du gerade stehst, und passt die Bereitschaft des Tages ein wenig an. Zum Beispiel schlägt es während der Periode vielleicht vor, nach Gefühl zu trainieren. Du kannst die Entscheidung immer überstimmen.",
+  "cycle.consent2a": "Deine Zyklusdaten bleiben auf diesem Telefon.",
+  "cycle.consent2b":
+    "Sie verlassen es nur über deine eigene Sicherung und Synchronisierung, wenn du diese einschaltest. Sie werden nie für Analysen oder Werbung genutzt, nie in Feedback-Berichte aufgenommen und nie weitergegeben oder verkauft.",
+  "cycle.consent3":
+    "Die Forschung zu Zyklusphase und Kraft ist uneinheitlich und von Mensch zu Mensch verschieden, deshalb ist der Effekt klein. Das ist keine medizinische Beratung, keine Verhütung und kein Fruchtbarkeits-Tool.",
+  "cycle.consent4": "Du kannst es jederzeit ausschalten, dann wird alles gelöscht, was du eingetragen hast.",
+  "cycle.agree": "Einverstanden, einschalten",
+  "cycle.notNow": "Nicht jetzt",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "cycle.title": "Prontezza in base al ciclo",
+  "cycle.intro":
+    "Facoltativo. Registra il giorno in cui iniziano le mestruazioni e Liftsmith adatta un po’ la scelta tra spingere e andare leggero in base al tuo ciclo.",
+  "cycle.setUp": "Configura",
+  "cycle.day": "Giorno {day} del ciclo, su circa {length}.",
+  "cycle.logFirst": "Per iniziare, registra il primo giorno delle prossime mestruazioni.",
+  "cycle.today": "Mestruazioni iniziate oggi",
+  "cycle.yesterday": "Iniziate ieri",
+  "cycle.offNote": "Così lo disattivi ed elimini tutte le mestruazioni registrate su questo dispositivo.",
+  "cycle.offConfirm": "Disattiva ed elimina",
+  "cycle.cancel": "Annulla",
+  "cycle.off": "Disattiva ed elimina i dati del ciclo",
+  "cycle.consent1":
+    "Registri il primo giorno di ogni ciclo. Liftsmith stima a che punto sei in base alla tua durata tipica e adatta un po’ la prontezza del giorno. Per esempio, durante le mestruazioni potrebbe suggerirti di andare a sensazione. Puoi sempre cambiare la scelta.",
+  "cycle.consent2a": "I dati del ciclo restano su questo telefono.",
+  "cycle.consent2b":
+    "Escono solo tramite il tuo backup e la sincronizzazione, se li attivi. Non vengono mai usati per statistiche o pubblicità, mai inclusi nelle segnalazioni e mai condivisi o venduti.",
+  "cycle.consent3":
+    "Gli studi su fase del ciclo e forza sono contrastanti e variano da persona a persona, quindi l’effetto è piccolo. Non è un consiglio medico, un contraccettivo né uno strumento per la fertilità.",
+  "cycle.consent4": "Puoi disattivarlo quando vuoi, ed elimina tutto quello che hai registrato.",
+  "cycle.agree": "Accetto, attiva",
+  "cycle.notNow": "Non ora",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "cycle.title": "周期に合わせたコンディション",
+  "cycle.intro": "任意です。生理が始まった日を記録すると、周期に合わせてその日の「攻め」か「軽め」かの判断を少し調整します。",
+  "cycle.setUp": "設定する",
+  "cycle.day": "周期{day}日目（約{length}日周期）。",
+  "cycle.logFirst": "始めるには、次の生理の初日を記録してください。",
+  "cycle.today": "今日生理が始まった",
+  "cycle.yesterday": "昨日始まった",
+  "cycle.offNote": "オフにすると、この端末に記録した生理のデータはすべて削除されます。",
+  "cycle.offConfirm": "オフにして削除",
+  "cycle.cancel": "キャンセル",
+  "cycle.off": "オフにして周期のデータを削除",
+  "cycle.consent1":
+    "生理の初日を毎回記録してください。Liftsmith はあなたの普段の周期の長さから今の時期を推定し、その日のコンディションを少し調整します。たとえば生理中は体調に合わせるよう提案することがあります。判断はいつでも自分で変えられます。",
+  "cycle.consent2a": "周期のデータはこの端末に保存されます。",
+  "cycle.consent2b":
+    "端末の外に出るのは、自分でオンにしたバックアップと同期のときだけです。分析や広告に使われることも、フィードバックに含まれることも、共有・販売されることもありません。",
+  "cycle.consent3":
+    "周期とパフォーマンスの関係についての研究は結果がまちまちで個人差も大きいため、調整はわずかです。医学的な助言、避妊、妊活のためのツールではありません。",
+  "cycle.consent4": "いつでもオフにでき、その場合は記録したデータがすべて削除されます。",
+  "cycle.agree": "同意してオンにする",
+  "cycle.notNow": "今はしない",
+};

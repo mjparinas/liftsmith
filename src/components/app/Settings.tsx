@@ -4,18 +4,19 @@
 // row per group, each opening its own page (#/settings/<group>) with a line saying what's in it. Every
 // setting lives in exactly one group. Old deep links still land: #/settings/saving opens Your data at
 // Saving and backup, #/settings/themes and #/settings/accessibility open Look and feel at that section.
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 import { cleanA11y, TEXT_SIZES, type Colours, type Contrast, type Hand, type TextSize } from "@/lib/a11y";
 import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
+import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
-import { flag, setLocalFlag } from "@/lib/flags";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { feel } from "@/lib/juice";
+import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
@@ -24,6 +25,7 @@ import type { Experience, Goal, Variability } from "@/lib/types";
 import { fromKg, plainNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
+import { BodyStats } from "./BodyStats";
 import { CalendarSettings } from "./CalendarSettings";
 import { CycleSettings } from "./CycleSettings";
 import { DelightSettings } from "./DelightSettings";
@@ -34,8 +36,9 @@ import { MessageSettings } from "./MessageSettings";
 import { programName } from "./Programs";
 import { go, useRoute } from "./router";
 import { SavingSettings } from "./Saving";
+import { StretchSettings } from "./Stretch";
 import { RestTimerSettings } from "./TrainingSettings";
-import { Button, Chip, Section, SwitchRow } from "./ui";
+import { Button, Chip, ProTag, Section, SwitchRow } from "./ui";
 
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
@@ -54,6 +57,8 @@ const LEGACY: Record<string, [Group, string]> = {
   saving: ["data", "saving"],
   themes: ["look", "themes"],
   accessibility: ["look", "accessibility"],
+  // Your stats (BodyStats.tsx): every screen that needs age, sex or height links here.
+  stats: ["body", "stats"],
 };
 
 function Row<T extends string | number>({
@@ -83,7 +88,7 @@ function Row<T extends string | number>({
 }
 
 /** A row that opens another page: a title, a line saying what's there, and a chevron. The whole row is the one button. */
-function NavRow({ title, sub, icon, onClick }: { title: string; sub?: string; icon?: IconName; onClick: () => void }) {
+function NavRow({ title, sub, icon, pro, onClick }: { title: string; sub?: string; icon?: IconName; pro?: boolean; onClick: () => void }) {
   return (
     <button type="button" onClick={onClick} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
       {icon && (
@@ -92,7 +97,10 @@ function NavRow({ title, sub, icon, onClick }: { title: string; sub?: string; ic
         </span>
       )}
       <span className="min-w-0 flex-1">
-        <span className="block font-semibold">{title}</span>
+        <span className="flex items-center gap-2 font-semibold">
+          {title}
+          {pro && <ProTag />}
+        </span>
         {sub && <span className="block text-sm text-muted">{sub}</span>}
       </span>
       <span aria-hidden className="text-faint">
@@ -156,9 +164,7 @@ export function Settings() {
   useEffect(() => {
     if (anchor) document.getElementById(anchor)?.scrollIntoView?.({ block: "start" });
   }, [anchor]);
-  const taps = useRef<number[]>([]);
-  const [motionNote, setMotionNote] = useState("");
-
+  if (arg === "labs") return <LabsPage />;
   if (group) return <GroupPage group={group} />;
 
   const goal = t(`goal.${profile.goal}`);
@@ -172,34 +178,11 @@ export function Settings() {
     data: t("settings.g.data.sum"),
   };
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("today")} className="press -ml-2 pt-2 text-muted">
         ‹ {t("nav.back.today")}
       </button>
-      {/* Five quick taps on the title switch phone-motion rep counting on or off (the `repMotion` flag, for testing; docs/decisions/camera-rep-counting.md). */}
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">
-        <button
-          type="button"
-          className="cursor-default"
-          onClick={() => {
-            const now = Date.now();
-            taps.current = [...taps.current.filter((x) => now - x < 2000), now];
-            if (taps.current.length >= 5) {
-              taps.current = [];
-              const on = !flag("repMotion");
-              setLocalFlag("repMotion", on);
-              setMotionNote(on ? t("settings.motionOn") : t("settings.motionOff"));
-            }
-          }}
-        >
-          {t("settings.title")}
-        </button>
-      </h1>
-      {motionNote && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {motionNote}
-        </p>
-      )}
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("settings.title")}</h1>
       <ProCard />
       <AccountRow />
       <div className="mt-2">
@@ -212,10 +195,67 @@ export function Settings() {
           </li>
         ))}
       </ul>
+      <div className="mt-2">
+        <NavRow
+          title={t("lab.row")}
+          sub={t("lab.rowNote")}
+          icon="sparkle"
+          pro={!can("labs")}
+          onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
+        />
+      </div>
       <Section title={t("settings.g.help")}>
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+    </div>
+  );
+}
+
+/**
+ * Labs (Melvin, 2026-11-10): experimental features, each with its own switch (src/lib/labs.ts). Pro only:
+ * the row on Settings opens Pro without it, and this page says so if reached another way.
+ */
+function LabsPage() {
+  const [, redraw] = useState(0);
+  const pro = can("labs");
+  const title = (f: LabFlag) => {
+    const lab = LABS.find((l) => l.flag === f);
+    return lab ? t(`lab.${lab.key}.title`) : "";
+  };
+  return (
+    <div className="pb-24">
+      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
+        {t("settings.back")}
+      </button>
+      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("lab.title")}</h1>
+      <p className="mt-2 text-sm text-muted">{t("lab.intro")}</p>
+      {!pro ? (
+        <section className="card mt-4 p-4">
+          <p className="text-sm">{t("lab.pro")}</p>
+          <Button className="mt-3 w-full" icon="sparkle" onClick={() => go("pro", "labs")}>
+            {t("pro.settings.see")}
+          </Button>
+        </section>
+      ) : (
+        LABS.filter((l) => !l.needs || labOn(l.needs)).map((l) => (
+          <SwitchRow
+            key={l.flag}
+            label={t(`lab.${l.key}.title`)}
+            hint={
+              <>
+                {t(`lab.${l.key}.body`)}
+                {l.needs && <span className="block">{t("lab.needs", { lab: title(l.needs) })}</span>}
+              </>
+            }
+            on={labOn(l.flag)}
+            onChange={(on) => {
+              setLab(l.flag, on);
+              redraw((n) => n + 1);
+            }}
+          />
+        ))
+      )}
     </div>
   );
 }
@@ -231,7 +271,7 @@ function GroupPage({ group }: { group: Group }) {
     data: <DataGroup />,
   };
   return (
-    <div className="pb-24">
+    <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
         {t("settings.back")}
       </button>
@@ -345,6 +385,7 @@ function WorkoutGroup() {
         }}
       />
       <RestTimerSettings />
+      <StretchSettings />
       <Section title={t("pol.hf.title")}>
         <HandsFree />
       </Section>
@@ -428,11 +469,15 @@ function AccessibilitySettings() {
   );
 }
 
-/** Body and units: units, the body weight the plan uses (from the last weigh-in), and cycle-aware readiness. */
+/**
+ * Body and units: Your stats (sex, age, height: the one place every tool reads them from), units, the body
+ * weight the plan uses (from the last weigh-in), and cycle-aware readiness.
+ */
 function BodyGroup() {
   const { profile, setProfile } = useApp();
   return (
     <>
+      <BodyStats />
       <Section title={t("settings.units")}>
         <div className="flex flex-wrap gap-2" role="group" aria-label={t("settings.units")}>
           {(

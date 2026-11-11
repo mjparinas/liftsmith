@@ -1,5 +1,5 @@
 import { blockWeek } from "./block";
-import { EXERCISE_BY_ID } from "./exercises";
+import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { t } from "./i18n";
 import { layoff } from "./layoff";
 import { roundLoad, stepLoad } from "./loads";
@@ -12,7 +12,36 @@ import type { AppEvent, Exercise, Goal, Gym, Profile, SetEvent, TrainingPrefs } 
 // more reps on any set drops the weight a step. Post-exercise feedback nudges it one step more.
 
 /** Holds and carries are counted in seconds. */
-export const TIMED = new Set(["plank", "side-plank", "superman", "copenhagen-plank", "farmers-carry", "kb-suitcase-carry", "dead-bug"]);
+export const TIMED = new Set([
+  "plank",
+  "side-plank",
+  "superman",
+  "copenhagen-plank",
+  "farmers-carry",
+  "kb-suitcase-carry",
+  "dead-bug",
+  "kb-rack-carry",
+  "kb-overhead-carry",
+  "db-farmers-walk-heavy",
+  "dead-hang",
+  "l-sit",
+  "hollow-hold",
+  "wall-sit",
+  // Cardio is timed too: reps are the seconds it took.
+  ...EXERCISES.filter((e) => e.cardio).map((e) => e.id),
+]);
+
+/**
+ * A set that says whether the lifter hit the plan: a planned set, not a bonus drop or rest-pause set (those
+ * aim below the plan's reps by design) and not cardio (its "target" is only last time's, to repeat or beat).
+ * Readiness, coach's notes, quests and achievements count hit or missed reps on these only.
+ */
+export function gradedSet(s: Pick<SetEvent, "exerciseId" | "tag" | "challenge">): boolean {
+  return !s.tag && !s.challenge && !EXERCISE_BY_ID.get(s.exerciseId)?.cardio;
+}
+
+/** A first cardio session's time (seconds), and its range. */
+export const CARDIO_START_SEC = 20 * 60;
 
 /**
  * The rep range for double progression. The lifter's own range for this exercise wins, then their
@@ -20,6 +49,7 @@ export const TIMED = new Set(["plank", "side-plank", "superman", "copenhagen-pla
  * then the default for their goal. Holds stay in seconds and ignore both.
  */
 export function repRange(ex: Exercise, goal: Goal, training?: TrainingPrefs): [number, number] {
+  if (ex.cardio) return [5 * 60, 90 * 60];
   if (TIMED.has(ex.id)) return [20, 45];
   const own = training?.exercises?.[ex.id]?.reps;
   if (own) return own;
@@ -51,7 +81,8 @@ export interface Target {
 export function sessionsOf(events: readonly AppEvent[], exerciseId: string): SetEvent[][] {
   const by = new Map<string, SetEvent[]>();
   for (const e of events) {
-    if (e.type !== "set" || e.exerciseId !== exerciseId) continue;
+    // Drop and rest-pause sets are bonus work, not the plan's sets: progression reads the planned ones.
+    if (e.type !== "set" || e.exerciseId !== exerciseId || e.tag) continue;
     const list = by.get(e.sessionId) ?? [];
     list.push(e);
     by.set(e.sessionId, list);
@@ -158,6 +189,12 @@ function baseTarget(ex: Exercise, events: readonly AppEvent[], profile: Profile,
   // Sessions done lighter for an injury don't count: the plan picks up from before it.
   const past = sessionsOf(events, ex.id).filter((ss) => !ss.every((x) => x.injuryPct));
   const last = past[0];
+
+  // Cardio repeats what was done last time (the lifter sets the pace); a first session is 20 minutes.
+  if (ex.cardio) {
+    if (!last) return { weight: 0, reps: CARDIO_START_SEC, rir, note: t("note.cardioFirst") };
+    return { weight: Math.max(...last.map((s) => s.weight)), reps: last[0]!.reps, rir, note: t("note.cardioAgain") };
+  }
 
   if (ex.load === "bodyweight") {
     if (!last) return { weight: 0, reps: lo, rir, note: t("note.firstLevel") };

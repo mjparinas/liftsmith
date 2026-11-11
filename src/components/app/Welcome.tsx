@@ -29,8 +29,9 @@ export function Welcome({ onStart }: { onStart: () => void }) {
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="animate-rise flex flex-1 flex-col justify-center py-3">
         {/* The 3D lifter squatting (the exercise demo engine, bare: no frame or readout). Reduced motion holds a still pose;
-            phones without GPU WebGL get the 2D figure, as everywhere else. Decoration only, so hidden from screen readers. */}
-        <div className="keep-colours pointer-events-none relative -mx-5 h-[14rem]" aria-hidden>
+            phones without GPU WebGL get the 2D figure, as everywhere else. Decoration only, so hidden from screen readers;
+            it takes taps only for the easter egg (five quick taps and it dances, lib/demo/dance.ts). */}
+        <div className="keep-colours relative -mx-5 h-[14rem]" aria-hidden>
           <LiftDemo exerciseId="back-squat" className="h-full" fps={30} still={calm()} bare />
         </div>
         <p className="text-gradient mt-2 text-center text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>

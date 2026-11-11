@@ -3,9 +3,10 @@ import { can } from "./entitlements";
 import { EXERCISE_BY_ID } from "./exercises";
 import type { Streak } from "./game";
 import { weeklySets } from "./generator";
-import { currentTag, date, list, t } from "./i18n";
+import { date, inSentence, list, t } from "./i18n";
+import { fromCm, lengthUnit, measuresOf } from "./measure";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
-import { epley, sessionsOf, TIMED } from "./progression";
+import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -30,8 +31,8 @@ export type InsightAction =
   | { kind: "minutes"; minutes: number; label: string }
   /** Start the plateau detective's three-week fix for a lift (store.fixPlateau). */
   | { kind: "plateau"; plateau: Plateau; fix: FixKind; label: string }
-  /** Open a screen. */
-  | { kind: "go"; route: string; label: string };
+  /** Open a screen ("route" or "route/arg"). `pro` marks a button that opens the paywall at a Pro feature. */
+  | { kind: "go"; route: string; label: string; pro?: boolean };
 
 export interface Insight {
   /** Stable for the same finding, so a dismissal sticks until something changes. */
@@ -56,7 +57,7 @@ export interface InsightInput {
 const name = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
 const weeksText = (n: number) => t("ins.weeks", { count: n });
 /** Exercise names inside a sentence. */
-const lowerName = (id: string) => name(id).toLocaleLowerCase(currentTag());
+const lowerName = (id: string) => inSentence(name(id), true);
 
 /** Best estimated one-rep max per session for a loaded lift, oldest first. */
 function e1Series(events: readonly AppEvent[], exerciseId: string): { at: number; e1: number }[] {
@@ -148,7 +149,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
   const lastThree = recent.slice(0, 3);
   if (lastThree.length === 3 && now - lastThree[2].at < 3 * WEEK) {
     const rates = lastThree.map((s) => {
-      const real = s.sets.filter((x) => !x.challenge);
+      const real = s.sets.filter(gradedSet);
       return real.length ? real.filter((x) => x.reps >= x.targetReps).length / real.length : 1;
     });
     if (rates.every((r) => r < 0.7)) {
@@ -197,7 +198,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
           kind: "plateau",
           plateau: p,
           fix: p.fix,
-          label: t("ins.plateau.action", { fix: fix.title.toLocaleLowerCase(currentTag()) }),
+          label: t("ins.plateau.action", { fix: inSentence(fix.title, true) }),
         },
       });
     }
@@ -209,7 +210,8 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
       title: t("ins.stalled.title", { name: name(s.exerciseId) }),
       why: t("ins.stall.why", { weeks: weeksText(s.weeks), sessions: s.sessions, best: w(s.best) }),
       advice: t("ins.stall.advice"),
-      action: { kind: "go", route: "stats", label: t("ins.stall.action") },
+      // Without Pro: the plateau detective would find the cause; its button opens the paywall there.
+      action: { kind: "go", route: "pro/plateau", label: t("ins.stall.action"), pro: true },
     });
   }
 
@@ -218,7 +220,7 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
     out.push({
       id: `fix-live-${f.exerciseId}-${f.startedAt}`,
       tone: "info",
-      title: t("ins.fixLive.title", { name: name(f.exerciseId), fix: FIX_TEXT[f.kind].title.toLocaleLowerCase(currentTag()) }),
+      title: t("ins.fixLive.title", { name: name(f.exerciseId), fix: inSentence(FIX_TEXT[f.kind].title, true) }),
       why: t("ins.fixLive.why", { date: date(f.until, { day: "numeric", month: "short" }) }),
       advice: t("ins.fixLive.advice"),
     });
@@ -263,11 +265,11 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
           tone: "info",
           title: t("ins.volume.title", { muscle: MUSCLE_LABEL[m] }),
           why: t("ins.volume.why", { sets: Math.round(avg), goal: week.setsPerMuscle }),
-          advice: t("ins.volume.advice", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+          advice: t("ins.volume.advice", { muscle: inSentence(MUSCLE_LABEL[m], true) }),
           action: {
             kind: "priority",
             muscle: m,
-            label: t("ins.volume.action", { muscle: MUSCLE_LABEL[m].toLocaleLowerCase(currentTag()) }),
+            label: t("ins.volume.action", { muscle: inSentence(MUSCLE_LABEL[m], true) }),
           },
         });
       }
@@ -299,6 +301,30 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         tone: "good",
         title: t("ins.fatDown.title"),
         why: t("ins.fatDown.why", { change: fmtNum(Math.round(-change * 10) / 10), weeks: weeksText(span) }),
+        advice: t("ins.fatDown.advice"),
+      });
+    }
+  }
+  // Without body fat readings, a growing or shrinking waist tells the same story (body measurements).
+  const waist = measuresOf(events, "waist").filter((e) => now - e.at <= 56 * DAY && e.at <= now);
+  if (fat.length < 3 && waist.length >= 3 && waist.at(-1)!.at - waist[0]!.at >= 3 * WEEK) {
+    const span = Math.max(1, Math.round((waist.at(-1)!.at - waist[0]!.at) / WEEK));
+    const change = slopePerWeek(waist.map((e) => ({ at: e.at, v: e.cm }))) * span;
+    const len = (cm: number) => `${fmtNum(Math.round(fromCm(Math.abs(cm), profile.unit) * 10) / 10)} ${lengthUnit(profile.unit)}`;
+    if (change >= 2) {
+      out.push({
+        id: `waist-up-${waist.at(-1)!.at}`,
+        tone: "warn",
+        title: t("ins.waistUp.title"),
+        why: t("ins.waistUp.why", { change: len(change), weeks: weeksText(span) }),
+        advice: profile.goal === "muscle" ? t("ins.fatUp.adviceMuscle") : t("ins.fatUp.advice"),
+      });
+    } else if (change <= -2 && !stalled.length) {
+      out.push({
+        id: `waist-down-${waist.at(-1)!.at}`,
+        tone: "good",
+        title: t("ins.waistDown.title"),
+        why: t("ins.waistDown.why", { change: len(change), weeks: weeksText(span) }),
         advice: t("ins.fatDown.advice"),
       });
     }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="channel">ワークアウト中</string>
+    <string name="in_progress">ワークアウト中</string>
+    <string name="none_title">ワークアウトは実行されていません</string>
+    <string name="none_body">スマートフォンで開始すると、ここに表示されます。</string>
+    <string name="log_set">セットを記録</string>
+    <string name="add_30">+30 秒</string>
+    <string name="up_next">次：%1$s</string>
+    <string name="rest_left">休憩、残り %1$s</string>
+    <string name="bpm">♥ %1$d bpm</string>
+</resources>

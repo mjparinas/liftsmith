@@ -5,6 +5,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
+import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
 import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
 import { Automations } from "./Automations";
@@ -267,7 +268,7 @@ function Installs({ admin, open, setOpen }: { admin: boolean; open: string | nul
 }
 
 const blank = {
-  kind: "creator" as "creator" | "promo",
+  kind: "creator" as CodeKind,
   code: "",
   name: "",
   contact: "",
@@ -350,7 +351,9 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
   if (!data) return <p className="text-muted">Loading…</p>;
   const rows = data.rows;
   const sum = (f: (r: CreatorRow) => number) => rows.reduce((t, r) => t + f(r), 0);
-  const promo = form.kind === "promo";
+  // Promo and lifetime codes are ours: no creator, contact or commission.
+  const promo = form.kind !== "creator";
+  const lifetime = form.kind === "lifetime";
   const field = (label: string, key: Exclude<keyof typeof blank, "kind" | "active">, hint?: string, type = "text") => (
     <label className="block text-sm">
       <span className="text-xs text-muted">{label}</span>
@@ -369,7 +372,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
         <Tile
           label="Live codes"
           value={fmtInt(rows.filter((r) => r.active).length)}
-          sub={`${rows.filter((r) => r.kind === "creator").length} creators · ${rows.filter((r) => r.kind === "promo").length} promo`}
+          sub={`${rows.filter((r) => r.kind === "creator").length} creators · ${rows.filter((r) => r.kind === "promo").length} promo · ${rows.filter((r) => r.kind === "lifetime").length} lifetime`}
         />
         <Tile
           label={`Code sign-ups, ${days} days`}
@@ -418,8 +421,8 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
               {!r.active && <span className="ml-1 text-xs text-muted">(paused)</span>}
             </span>,
             [
-              r.kind === "promo" ? "Promo" : `${Math.round(r.rate * 100)}% · ${r.months} mo`,
-              r.trialDays == null ? `offer ${r.offering}` : `${r.trialDays}-day trial`,
+              r.kind === "lifetime" ? "Pro for life" : r.kind === "promo" ? "Promo" : `${Math.round(r.rate * 100)}% · ${r.months} mo`,
+              r.kind === "lifetime" ? "" : r.trialDays == null ? `offer ${r.offering}` : `${r.trialDays}-day trial`,
               r.endsAt != null ? `ends ${dayOf(r.endsAt)}` : "",
               r.maxUses != null ? `${fmtInt(r.signups)}/${fmtInt(r.maxUses)} used` : "",
             ]
@@ -459,28 +462,36 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
           subtitle="Its link is www.getliftsmith.com/c/<code>, or people type it under Settings › Redeem a code. The trial and offering decide what it gives: a longer trial through creator30, or a discount through any RevenueCat offering whose store products carry it (set those up in RevenueCat, Play Console and App Store Connect first). On Google Play, tag the code's offer with the offering id and rc-ignore-offer."
         >
           <div className="mb-3 flex gap-2 text-sm" role="group" aria-label="Kind of code">
-            {(["creator", "promo"] as const).map((k) => (
+            {CODE_KINDS.map((k) => (
               <button
                 key={k}
                 type="button"
                 aria-pressed={form.kind === k}
-                onClick={() => setForm({ ...form, kind: k, ...(k === "promo" && form.trialDays === "30" ? { trialDays: "" } : {}) })}
+                onClick={() => setForm({ ...form, kind: k, ...(k !== "creator" && form.trialDays === "30" ? { trialDays: "" } : {}) })}
                 className={`press rounded-xl border px-3 py-1.5 ${form.kind === k ? "border-accent text-accent" : "border-line text-muted"}`}
               >
-                {k === "creator" ? "Creator's code (earns commission)" : "Promo code (ours, no commission)"}
+                {k === "creator"
+                  ? "Creator's code (earns commission)"
+                  : k === "promo"
+                    ? "Promo code (ours, no commission)"
+                    : "Lifetime Pro (free for good, needs sign-in)"}
               </button>
             ))}
           </div>
           <div className="grid gap-3 md:grid-cols-3">
-            {field("Code", "code", promo ? "SUMMER26" : "LIFT-ALEX")}
+            {field(
+              lifetime ? "Code (10+ letters and digits, hard to guess)" : "Code",
+              "code",
+              lifetime ? "PALS-7Q4K-X2M9" : promo ? "SUMMER26" : "LIFT-ALEX",
+            )}
             {field(promo ? "Label (only shown here)" : "Name or handle", "name", promo ? "Summer sale 2026" : "@alexlifts")}
             {!promo && field("Contact (email or handle)", "contact")}
             {!promo && field("Commission %", "rate")}
             {!promo && field("Months per subscriber", "months")}
-            {field("Trial days (blank: the offering's own terms)", "trialDays", promo ? "blank for a discount" : "30")}
-            {field("RevenueCat offering", "offering", "creator30")}
+            {!lifetime && field("Trial days (blank: the offering's own terms)", "trialDays", promo ? "blank for a discount" : "30")}
+            {!lifetime && field("RevenueCat offering", "offering", "creator30")}
             {field("Ends (optional)", "endsAt", "", "date")}
-            {field("Most uses (optional)", "maxUses", "500")}
+            {field(lifetime ? "Most accounts (optional)" : "Most uses (optional)", "maxUses", lifetime ? "3" : "500")}
             {field("Note", "note", promo ? "Newsletter, 2026-12" : "Agreement signed 2026-11-09")}
           </div>
           <label className="mt-3 flex items-center gap-2 text-sm">
