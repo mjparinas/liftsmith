@@ -135,9 +135,9 @@ export const noEquipment = (): Exercise[] => EXERCISES.filter((e) => e.needs.len
 /** Equipment with at least one exercise in the library. */
 export const equipmentWithPages = (): Equipment[] => EQUIPMENT.filter((eq) => exercisesWith(eq).length > 0);
 
-/** A muscle and equipment page only exists when there are 3+ exercises for it, so no page is thin. */
-export const PAIR_MIN = 3;
-export const pairExercises = (m: Muscle, eq: Equipment) => exercisesFor(m).filter((e) => e.needs.includes(eq));
+/** A muscle and equipment page only exists when it has 5+ strength exercises (cardio left out), so no page is thin. */
+export const PAIR_MIN = 5;
+export const pairExercises = (m: Muscle, eq: Equipment) => exercisesFor(m).filter((e) => !e.cardio && e.needs.includes(eq));
 export function pairs(): { muscle: Muscle; equipment: Equipment; count: number }[] {
   const out: { muscle: Muscle; equipment: Equipment; count: number }[] = [];
   for (const muscle of MUSCLES)
