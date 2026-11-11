@@ -102,15 +102,18 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
 
   // Painted muscles (the recovery map) are drawn inside the body as glowing volumes: each muscle's
   // patch of skin pulled in toward its limb's core, under a faint glass skin. Fatigued muscles carry
-  // stripes (aHatch), so their state never rests on colour alone.
-  const innerVert = `attribute vec3 aColor; attribute float aHatch; varying vec3 vC; varying float vRim; varying float vH;
+  // stripes (aHatch), so their state never rests on colour alone. A picked muscle (aSel) glows solid, close
+  // to white at its edge, while the rest fade to dim grey, so even a small muscle stands out (Melvin, 2026-11-11).
+  const innerVert = `attribute vec3 aColor; attribute float aHatch; attribute float aSel; varying vec3 vC; varying float vRim; varying float vH; varying float vS;
     void main(){ vec4 mv = modelViewMatrix * vec4(position, 1.0); vec3 n = normalize(normalMatrix * normal); vec3 v = normalize(-mv.xyz);
-      vRim = 1.0 - abs(dot(n, v)); vC = aColor; vH = aHatch; gl_Position = projectionMatrix * mv; }`;
+      vRim = 1.0 - abs(dot(n, v)); vC = aColor; vH = aHatch; vS = aSel; gl_Position = projectionMatrix * mv; }`;
   const glowMat = keep(
     new ShaderMaterial({
       vertexShader: innerVert,
-      fragmentShader: `varying vec3 vC; varying float vRim; varying float vH;
-      void main(){ float stripe = vH > 0.5 && mod(gl_FragCoord.x + gl_FragCoord.y, 10.0) < 3.5 ? 1.0 : 0.0; float a = 0.16 + 0.9 * pow(vRim, 1.6); a *= 1.0 - 0.7 * stripe; gl_FragColor = vec4(vC * 1.25, a); }`,
+      fragmentShader: `varying vec3 vC; varying float vRim; varying float vH; varying float vS;
+      void main(){ float stripe = vH > 0.5 && mod(gl_FragCoord.x + gl_FragCoord.y, 10.0) < 3.5 ? 1.0 : 0.0;
+        float a = mix(0.16 + 0.9 * pow(vRim, 1.6), 0.75 + 0.6 * pow(vRim, 1.1), vS); a *= 1.0 - 0.7 * stripe;
+        vec3 c = mix(vC * 1.25, mix(vC, vec3(1.0), 0.08 + 0.22 * pow(vRim, 2.0)) * 1.8, vS); gl_FragColor = vec4(c, a); }`,
       transparent: true,
       depthWrite: false,
       blending: AdditiveBlending,
@@ -129,6 +132,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     pos: BufferAttribute;
     col: BufferAttribute;
     hatch: BufferAttribute;
+    sel: BufferAttribute;
     geo: BufferGeometry;
     tris: number[];
     glow: Mesh;
@@ -171,6 +175,9 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       geo.setAttribute("position", iPos);
       geo.setAttribute("aColor", iCol);
       geo.setAttribute("aHatch", iHatch);
+      const iSel = new BufferAttribute(new Float32Array(n), 1);
+      iSel.setUsage(DynamicDrawUsage);
+      geo.setAttribute("aSel", iSel);
       const corePos = new BufferAttribute(new Float32Array(n * 3), 3);
       corePos.setUsage(DynamicDrawUsage);
       const coreGeo = keep(new BufferGeometry());
@@ -178,7 +185,7 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
       coreGeo.setIndex(tris);
       const core = new Mesh(coreGeo, occludeMat);
       core.renderOrder = -3;
-      const inner: Inner = { core, corePos, pos: iPos, col: iCol, hatch: iHatch, geo, tris, glow: new Mesh(geo, glowMat) };
+      const inner: Inner = { core, corePos, pos: iPos, col: iCol, hatch: iHatch, sel: iSel, geo, tris, glow: new Mesh(geo, glowMat) };
       for (const o of [...objs, core, inner.glow]) {
         o.frustumCulled = false;
         fig.add(o);
@@ -412,6 +419,10 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     inner.core.visible = on;
     if (!on) return;
     const { NT, M } = m.P;
+    const picked = (k: number) => {
+      const r = m.which[k]!;
+      return !!s.picked && !!s.selected?.length && r >= 0 && s.selected.includes(REGIONS[r]!.id);
+    };
     const keep = (k: number) => m.which[k] >= 0 && m.weights[k] > 0.25;
     if (innerKey.get(m.P.name) !== s.paint) {
       innerKey.set(m.P.name, s.paint);
@@ -444,7 +455,8 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         const v = i * M + j,
           k = v * 3;
         // a muscle belly: its middle sits just under the skin, its edges sink toward the bone
-        const f = INSET + 0.17 * Math.min(1, m.weights[v]);
+        // a picked muscle swells up to the skin, so a small one reads bigger
+        const f = INSET + 0.17 * Math.min(1, m.weights[v]) + (picked(v) ? 0.09 : 0);
         co[k] = cx + (m.pos[k] - cx) * 0.62;
         co[k + 1] = cy + (m.pos[k + 1] - cy) * 0.62;
         co[k + 2] = cz + (m.pos[k + 2] - cz) * 0.62;
@@ -457,18 +469,35 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     inner.corePos.needsUpdate = true;
     inner.geo.computeVertexNormals();
     const c = inner.col.array as Float32Array,
-      h = inner.hatch.array as Float32Array;
+      h = inner.hatch.array as Float32Array,
+      sel = inner.sel.array as Float32Array;
     for (let k = 0; k < m.weights.length; k++) {
       const r = m.which[k],
         pc = r >= 0 ? paintCols[r] : null;
       const id = r >= 0 ? REGIONS[r].id : null;
-      const lit = s.selected?.length ? (id && s.selected.includes(id) ? 1.3 : 0.35) : 1;
-      c[k * 3] = (pc?.r ?? 0) * lit;
-      c[k * 3 + 1] = (pc?.g ?? 0) * lit;
-      c[k * 3 + 2] = (pc?.b ?? 0) * lit;
+      const on = picked(k);
+      sel[k] = on ? 1 : 0;
+      if (!s.picked) {
+        // Today's focus muscles: brighter, with the rest dimmed but still in their colours
+        const lit = s.selected?.length ? (id && s.selected.includes(id) ? 1.3 : 0.35) : 1;
+        c[k * 3] = (pc?.r ?? 0) * lit;
+        c[k * 3 + 1] = (pc?.g ?? 0) * lit;
+        c[k * 3 + 2] = (pc?.b ?? 0) * lit;
+      } else if (!on) {
+        // the rest fade to a dim grey, so the picked muscle is the only colour on the figure
+        const g = (((pc?.r ?? 0) + (pc?.g ?? 0) + (pc?.b ?? 0)) / 3) * 0.16;
+        c[k * 3] = g;
+        c[k * 3 + 1] = g * 1.05;
+        c[k * 3 + 2] = g * 1.2;
+      } else {
+        c[k * 3] = pc?.r ?? 0;
+        c[k * 3 + 1] = pc?.g ?? 0;
+        c[k * 3 + 2] = pc?.b ?? 0;
+      }
       h[k] = id ? (s.hatch?.[id] ?? 0) : 0;
     }
     inner.col.needsUpdate = true;
+    inner.sel.needsUpdate = true;
     inner.hatch.needsUpdate = true;
   };
 
@@ -518,11 +547,22 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         const c = p.col.array as Float32Array,
           d = p.colD.array as Float32Array;
         if (s.paint) {
-          // glass skin over the muscles: a faint neutral wireframe, no colour on the surface
+          // glass skin over the muscles: a faint neutral wireframe, no colour on the surface, except over a
+          // picked muscle, whose skin lights up in its colour like an outline
           for (let k = 0; k < m.weights.length; k++) {
-            c[k * 3] = cBase.r * 0.32;
-            c[k * 3 + 1] = cBase.g * 0.34;
-            c[k * 3 + 2] = cBase.b * 0.4;
+            const r = m.which[k]!;
+            const pc = r >= 0 && m.weights[k]! > 0.25 && s.picked && s.selected?.includes(REGIONS[r]!.id) ? paintCols[r] : null;
+            if (pc) {
+              c[k * 3] = Math.min(1, pc.r * 1.1);
+              c[k * 3 + 1] = Math.min(1, pc.g * 1.1);
+              c[k * 3 + 2] = Math.min(1, pc.b * 1.1);
+            } else {
+              // with a muscle picked, the rest of the skin steps back too
+              const dim = s.picked && s.selected?.length ? 0.55 : 1;
+              c[k * 3] = cBase.r * 0.32 * dim;
+              c[k * 3 + 1] = cBase.g * 0.34 * dim;
+              c[k * 3 + 2] = cBase.b * 0.4 * dim;
+            }
             d[k * 3] = c[k * 3] * 0.4;
             d[k * 3 + 1] = c[k * 3 + 1] * 0.4;
             d[k * 3 + 2] = c[k * 3 + 2] * 0.4;

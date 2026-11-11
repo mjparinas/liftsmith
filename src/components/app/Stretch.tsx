@@ -11,7 +11,7 @@
 import { useEffect, useEffectEvent, useMemo, useState, type CSSProperties } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
-import { Info } from "@/components/Info";
+import { SCREEN_TITLE } from "@/components/titles";
 import { stretchView } from "@/lib/demo/stretchMotions";
 import { exercise } from "@/lib/exercises";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
@@ -35,7 +35,7 @@ import { useNow } from "@/lib/useNow";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { muscleHue } from "./theme";
-import { Button, Chip, EmptyState, Sheet, SwitchRow } from "./ui";
+import { Button, Chip, EmptyState, ScreenHeader, Sheet, SwitchRow } from "./ui";
 
 type Mode = "warmup" | "cooldown" | "rest" | "picked";
 const MOMENT: Record<Mode, StretchMoment | "pick"> = { warmup: "warm", cooldown: "cool", rest: "rest", picked: "pick" };
@@ -126,13 +126,7 @@ function Library() {
   const planned = !active && !!preview?.items.length;
   return (
     <div className={picked.length ? "pb-28" : "pb-2"}>
-      <button type="button" onClick={goBack} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("str.back")}
-      </button>
-      <h1 className="flex items-center gap-1 text-[1.75rem] font-extrabold tracking-tight">
-        {t("str.title")}
-        <Info term="stretching" />
-      </h1>
+      <ScreenHeader back={{ label: t("str.back"), onClick: goBack }} title={t("str.title")} info="stretching" />
       <p className="mt-1 text-sm text-muted">{t("str.intro")}</p>
 
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -331,10 +325,7 @@ function Routine({ mode }: { mode: Mode }) {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={goBack} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("str.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{TITLE[mode]}</h1>
+      <ScreenHeader back={{ label: t("str.back"), onClick: goBack }} title={TITLE[mode]} />
       <p className="num mt-1 text-sm text-muted">{t("str.length", { count: list.length, min: mins(total) })}</p>
       <ol className="card mt-4 divide-y divide-line/70 overflow-hidden" data-testid="stretch-routine">
         {list.map((s, i) => (
@@ -474,7 +465,7 @@ function Player({
       <div className="card mt-2 overflow-hidden">
         <StretchDemo s={s} className="h-72" paused={paused} />
       </div>
-      <h1 className="mt-4 text-2xl font-extrabold tracking-tight">{s.name}</h1>
+      <h1 className={`mt-4 ${SCREEN_TITLE}`}>{s.name}</h1>
       <p className="mt-1 text-sm text-muted">{stretchWhy(s, moment === "pick" ? "pick" : moment, muscles)}</p>
       <div className="mt-4 flex items-end justify-between gap-3">
         <div>

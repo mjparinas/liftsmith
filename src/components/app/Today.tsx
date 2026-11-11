@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { Info } from "@/components/Info";
+import { SCREEN_TITLE } from "@/components/titles";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
@@ -149,7 +150,7 @@ export function Today() {
             </button>
           </div>
         </div>
-        <h1 className="mt-1 text-[1.875rem] font-extrabold leading-tight tracking-tight">{t("td.title")}</h1>
+        <h1 className={`mt-1 ${SCREEN_TITLE}`}>{t("td.title")}</h1>
       </header>
 
       {active && (

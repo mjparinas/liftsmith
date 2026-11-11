@@ -59,7 +59,19 @@ const BACK: Shape[] = [
 const SILHOUETTE =
   "M100,8 C88,8 82,18 82,30 C82,42 88,50 92,52 L92,60 Q70,62 56,68 Q36,72 32,96 Q28,128 34,156 Q26,190 30,232 L48,232 Q58,192 58,160 Q62,140 62,118 Q60,150 64,196 Q58,212 60,232 Q56,280 64,326 Q58,362 66,404 L88,404 Q94,364 92,330 Q96,290 98,250 L100,240 L102,250 Q104,290 108,330 Q106,364 112,404 L134,404 Q142,362 136,326 Q144,280 140,232 Q142,212 136,196 Q140,150 138,118 Q138,140 142,160 Q142,192 152,232 L170,232 Q174,190 166,156 Q172,128 168,96 Q164,72 144,68 Q130,62 108,60 L108,52 C112,50 118,42 118,30 C118,18 112,8 100,8 Z";
 
-function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Muscle, number>; label: string; focus?: Muscle[] }) {
+function Figure({
+  shapes,
+  rec,
+  label,
+  focus,
+  picked,
+}: {
+  shapes: Shape[];
+  rec: Record<Muscle, number>;
+  label: string;
+  focus?: Muscle[];
+  picked?: Muscle | null;
+}) {
   const id = useId().replace(/:/g, "");
   return (
     <figure className="flex flex-1 flex-col items-center">
@@ -76,20 +88,32 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
             {shapes.map((s) => {
               const r = rec[s.m];
               const b = bandOf(r);
-              const hot = focus?.includes(s.m);
+              const hot = picked ? picked === s.m : focus?.includes(s.m);
+              // a picked muscle gets a thick outline and the rest fade back, so even a small one is obvious
+              const faded = !!picked && !hot;
               const mark = BAND_MARK[b.band];
               return (
                 <g key={s.m}>
                   <path
                     d={s.d}
                     fill={b.colour}
-                    fillOpacity={hot ? 1 : 0.82}
+                    fillOpacity={hot ? 1 : faded ? 0.22 : 0.82}
                     stroke={hot ? "var(--color-ink)" : "var(--color-bg)"}
-                    strokeWidth={hot ? 1.6 : 1}
+                    strokeWidth={hot ? (picked ? 3 : 1.6) : 1}
+                    data-picked={picked === s.m || undefined}
                   >
                     <title>{t("map.muscle", { muscle: MUSCLE_LABEL[s.m], pct: r, band: b.label })}</title>
                   </path>
-                  {mark && <path d={s.d} fill={`url(#${id}-${mark})`} pointerEvents="none" aria-hidden="true" data-mark={mark} />}
+                  {mark && (
+                    <path
+                      d={s.d}
+                      fill={`url(#${id}-${mark})`}
+                      opacity={faded ? 0.3 : 1}
+                      pointerEvents="none"
+                      aria-hidden="true"
+                      data-mark={mark}
+                    />
+                  )}
                 </g>
               );
             })}
@@ -101,12 +125,23 @@ function Figure({ shapes, rec, label, focus }: { shapes: Shape[]; rec: Record<Mu
   );
 }
 
-export function BodyMap({ rec, focus, compact }: { rec: Record<Muscle, number>; focus?: Muscle[]; compact?: boolean }) {
+export function BodyMap({
+  rec,
+  focus,
+  picked,
+  compact,
+}: {
+  rec: Record<Muscle, number>;
+  focus?: Muscle[];
+  /** The muscle the lifter tapped: outlined, with every other muscle faded back. */
+  picked?: Muscle | null;
+  compact?: boolean;
+}) {
   return (
     <div>
       <div className={`flex gap-2 ${compact ? "max-w-[300px]" : "max-w-[380px]"} mx-auto`}>
-        <Figure shapes={FRONT} rec={rec} label={t("map.front")} focus={focus} />
-        <Figure shapes={BACK} rec={rec} label={t("map.back")} focus={focus} />
+        <Figure shapes={FRONT} rec={rec} label={t("map.front")} focus={focus} picked={picked} />
+        <Figure shapes={BACK} rec={rec} label={t("map.back")} focus={focus} picked={picked} />
       </div>
       <Legend />
     </div>

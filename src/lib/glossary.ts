@@ -36,6 +36,7 @@ const TERMS = [
   "barSpeed",
   "setTypes",
   "stretching",
+  "crate",
 ] as const;
 
 export type Term = (typeof TERMS)[number];

@@ -17,7 +17,7 @@ import { useNow } from "@/lib/useNow";
 import { HealthTwin } from "./HealthTwin";
 import { RecoveryMap } from "./RecoveryMap";
 import { go } from "./router";
-import { Button, EmptyState, Section } from "./ui";
+import { Button, EmptyState, ScreenHeader, Section } from "./ui";
 
 const VIEW_KEY = "liftsmith.body.view";
 type BodyView = "muscles" | "health";
@@ -45,7 +45,7 @@ export function Recovery() {
   };
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("body.title")}</h1>
+      <ScreenHeader title={t("body.title")} />
       <div className="mt-3 flex rounded-full border border-line bg-surface p-1" role="group" aria-label={t("body.views")}>
         {(["muscles", "health"] as const).map((v) => (
           <button
@@ -108,13 +108,13 @@ function Muscles() {
                     setPicked(picked === m ? null : m);
                     window.scrollTo?.({ top: 0, behavior: "smooth" });
                   }}
-                  className={`press flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left ${picked === m ? "bg-accent/10" : ""}`}
+                  className={`press flex w-full flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3 text-left ${picked === m ? "picked-row" : ""}`}
                 >
                   <span title={b.label} className="flex">
                     <Swatch band={b.band} colour={b.colour} />
                     <span className="sr-only">{b.label},</span>
                   </span>
-                  <span className="w-28 shrink-0 font-medium">{MUSCLE_LABEL[m]}</span>
+                  <span className={`w-28 shrink-0 ${picked === m ? "font-bold text-ink" : "font-medium"}`}>{MUSCLE_LABEL[m]}</span>
                   <div
                     className="h-2 min-w-20 flex-1 overflow-hidden rounded-full bg-raised"
                     title={t("recovery.setsOf", { done: Math.round(done[m]), goal: wk.setsPerMuscle })}

@@ -2,6 +2,7 @@
 
 import { useMemo, type CSSProperties } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { clockTime, date, inSentence, list, t } from "@/lib/i18n";
 import { nextUp } from "@/lib/nextUp";
 import { useApp } from "@/lib/store";
@@ -45,7 +46,7 @@ export function NextUpCard({ sessionId }: { sessionId: string }) {
         <Icon name="calendar" size={20} />
       </span>
       <div className="min-w-0">
-        <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-faint">{t("pol.next.title")}</h2>
+        <h2 className={SECTION_LABEL}>{t("pol.next.title")}</h2>
         <p className="mt-0.5 font-semibold">
           {t("pol.next.when", { day: date(d, { weekday: "long" }), time: clockTime(d.getHours(), d.getMinutes()) })}
         </p>

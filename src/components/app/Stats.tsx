@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 
 import { exercise } from "@/lib/exercises";
-import { list, num, t } from "@/lib/i18n";
-import { sessionShares } from "@/lib/shareCards";
+import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { ACTIVITY, currentTdee, parseBodyFat, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
@@ -15,14 +14,14 @@ import { AchievementRow, useGame } from "./Achievements";
 import { BodyFatField } from "./BodyFatField";
 import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
-import { ago, clock } from "./format";
+import { ago } from "./format";
+import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
 import { go } from "./router";
-import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -52,14 +51,8 @@ export function Stats() {
   const now = useNow();
   const unit = profile.unit;
   const g = useGame();
-  const xp = g.xp;
-  const lvl = g.level;
   const streak = g.streak;
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
-  const ctx = useShareContext(g);
-  const [shareFor, setShareFor] = useState<string | null>(null);
-  const shareSession = stats.sessions.find((x) => x.sessionId === shareFor);
-  const shareItems = shareSession ? sessionShares(shareSession, stats.prs, ctx) : [];
   const tiles: [string, string, string, IconName, string][] = [
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
     ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
@@ -68,24 +61,9 @@ export function Stats() {
   ];
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <ScreenHeader title={t("progress.title")} />
       <CoachNotes title={t("progress.next")} />
-      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
-        <div className="flex items-baseline justify-between">
-          <span className="font-bold">
-            {t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span>
-          </span>
-          <span className="num text-sm text-muted">{t("progress.xp", { xp })}</span>
-        </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
-            style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }}
-          />
-        </div>
-        {lvl.next && <p className="mt-1.5 text-xs text-faint num">{t("progress.xpTo", { xp: lvl.span - lvl.into, next: lvl.next })}</p>}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(([k, label, v, icon, hue]) => (
           <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
         ))}
@@ -172,48 +150,24 @@ export function Stats() {
         </ul>
       </Section>
 
-      <ShareSheet open={!!shareSession} onClose={() => setShareFor(null)} items={shareItems} />
       <Section title={t("progress.history")} icon="calendar">
-        <ul className="card divide-y divide-line">
-          {stats.sessions.slice(0, 20).map((s) => (
-            <li key={s.sessionId} className="flex items-center gap-2 py-3 pl-4 pr-1">
-              <div className="min-w-0 flex-1">
-                <div className="flex justify-between gap-2">
-                  <span className="font-medium">{ago(s.start, now)}</span>
-                  <span className="num text-sm text-muted">
-                    {clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}
-                    {s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}
-                    {s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}
-                  </span>
-                </div>
-                <div className="mt-0.5 truncate text-sm text-muted">{list(s.exercises.map((e) => exercise(e).name))}</div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShareFor(s.sessionId)}
-                aria-label={t("card.shareWorkout", { when: ago(s.start, now) })}
-                className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-              >
-                <Icon name="share" size={20} />
-              </button>
-            </li>
-          ))}
-          {!stats.sessions.length && (
-            <li>
-              <EmptyState
-                icon="calendar"
-                mascot="happy"
-                title={t("progress.noWorkouts")}
-                body={t("progress.noWorkouts.body")}
-                action={
-                  <Button icon="play" onClick={() => go("today")}>
-                    {t("progress.plan")}
-                  </Button>
-                }
-              />
-            </li>
-          )}
-        </ul>
+        {stats.sessions.length ? (
+          <HistoryCalendar />
+        ) : (
+          <div className="card">
+            <EmptyState
+              icon="calendar"
+              mascot="happy"
+              title={t("progress.noWorkouts")}
+              body={t("progress.noWorkouts.body")}
+              action={
+                <Button icon="play" onClick={() => go("today")}>
+                  {t("progress.plan")}
+                </Button>
+              }
+            />
+          </div>
+        )}
       </Section>
     </div>
   );

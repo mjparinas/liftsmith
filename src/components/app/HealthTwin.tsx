@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
+import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
 import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
@@ -108,7 +109,7 @@ export function HealthTwin() {
           aria-label={t("twin.today", { call: CALL_TEXT[r.call].label })}
           data-testid="twin-verdict"
         >
-          <h2 className="text-lg font-bold">{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
+          <h2 className={CARD_TITLE}>{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
           <p className="mt-1 text-sm text-muted">
             {(watch.length
               ? watch.slice(0, 2).map((m) => `${m.label}: ${m.chip.toLowerCase()}`)
@@ -348,11 +349,11 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
       {m.band && m.id !== "sleep" && (
         <p className="mt-1 text-xs text-faint">{t("twin.normal", { low: fmt(m.band.low), high: fmt(m.band.high) })}</p>
       )}
-      <h3 className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{t("twin.why")}</h3>
+      <h3 className={`mt-4 ${SECTION_LABEL}`}>{t("twin.why")}</h3>
       <p className="mt-1">{m.why}</p>
       {m.did && (
         <>
-          <h3 className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{t("twin.did")}</h3>
+          <h3 className={`mt-4 ${SECTION_LABEL}`}>{t("twin.did")}</h3>
           <p className="mt-1">{m.did}</p>
         </>
       )}

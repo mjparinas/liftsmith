@@ -1,0 +1,254 @@
+"use client";
+
+import { useMemo, useRef, useState, type TouchEvent } from "react";
+
+import { dayKey, monthGrid, sessionDetail, weekdayNames } from "@/lib/dashboard";
+import type { SessionSummary } from "@/lib/derive";
+import { EXERCISE_BY_ID } from "@/lib/exercises";
+import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, type YearMonth } from "@/lib/history";
+import { date, list, num, t } from "@/lib/i18n";
+import { haptic } from "@/lib/juice";
+import { sessionShares } from "@/lib/shareCards";
+import { useApp } from "@/lib/store";
+import type { Unit } from "@/lib/types";
+import { fmtVolume } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
+
+import { useGame } from "./Achievements";
+import { setText } from "./format";
+import { Icon } from "./icons";
+import { ShareSheet, useShareContext } from "./ShareSheet";
+import { FAMILY_HUE, familyOf, type Family } from "./theme";
+
+// Progress › History (Melvin, 2026-11-11: "a calendar view of past workouts … where we can review what we
+// did"). A month grid with each workout day marked by the muscle families it trained; swipe or ‹ › to change
+// month; tap a day and its workouts show in full under the grid. Pure web code: Android, iOS and the web app.
+
+const FAMILIES: Family[] = ["push", "pull", "legs", "core"];
+/** A horizontal swipe this long (px) changes month; touches this close to an edge belong to the phone's back gesture. */
+const SWIPE = { distance: 48, edge: 24 };
+
+const exName = (id: string) => EXERCISE_BY_ID.get(id)?.name ?? id;
+
+export function HistoryCalendar() {
+  const { stats, events, profile } = useApp();
+  const now = useNow(60_000);
+  const sessions = stats.sessions;
+  const thisMonth = monthOf(now);
+  const firstMonth = sessions.length ? monthOf(sessions.at(-1)!.start) : thisMonth;
+  const [ym, setYm] = useState<YearMonth>(() => (sessions.length ? monthOf(sessions[0]!.start) : thisMonth));
+  const inMonth = monthSessions(sessions, ym);
+  const [picked, setPicked] = useState<string | null>(null);
+  // Opens on the month's latest workout day, so the last workout is one glance away.
+  const selected = picked && inMonth.some((s) => dayKey(s.start) === picked) ? picked : inMonth[0] ? dayKey(inMonth[0].start) : null;
+
+  const muscles = useMemo(() => musclesByDay(events, sessions, (id) => EXERCISE_BY_ID.get(id)), [events, sessions]);
+  const prIds = useMemo(() => prSetIds(events, stats.prs), [events, stats.prs]);
+  const byDay = useMemo(() => {
+    const m = new Map<string, SessionSummary[]>();
+    for (const s of sessions) m.set(dayKey(s.start), [...(m.get(dayKey(s.start)) ?? []), s]);
+    return m;
+  }, [sessions]);
+
+  const canBack = monthsBetween(firstMonth, ym) > 0;
+  const canNext = monthsBetween(ym, thisMonth) > 0;
+  const shift = (by: number) => {
+    if ((by < 0 && !canBack) || (by > 0 && !canNext)) return;
+    haptic("select");
+    setYm((cur) => shiftMonth(cur, by));
+    setPicked(null);
+  };
+
+  const touch = useRef<{ x: number; y: number } | null>(null);
+  const onTouchStart = (e: TouchEvent) => {
+    const p = e.touches[0];
+    touch.current = p && p.clientX > SWIPE.edge && p.clientX < window.innerWidth - SWIPE.edge ? { x: p.clientX, y: p.clientY } : null;
+  };
+  const onTouchEnd = (e: TouchEvent) => {
+    const start = touch.current;
+    const p = e.changedTouches[0];
+    touch.current = null;
+    if (!start || !p) return;
+    const dx = p.clientX - start.x;
+    const dy = p.clientY - start.y;
+    if (Math.abs(dx) >= SWIPE.distance && Math.abs(dx) > Math.abs(dy) * 1.5) shift(dx < 0 ? 1 : -1);
+  };
+
+  const month = date(new Date(ym.y, ym.m, 1), { month: "long", year: "numeric" });
+  const todayKey = dayKey(now);
+  const familiesOn = (key: string) => {
+    const set = new Set([...(muscles.get(key) ?? [])].map(familyOf));
+    return FAMILIES.filter((f) => set.has(f));
+  };
+  const daySessions = selected ? [...(byDay.get(selected) ?? [])].reverse() : [];
+
+  return (
+    <>
+      <section className="card p-3" aria-label={month} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd} data-testid="history-calendar">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => shift(-1)}
+            disabled={!canBack}
+            className="press grid h-11 w-11 place-items-center rounded-xl border border-line bg-raised disabled:opacity-40"
+            aria-label={t("dash.prevMonth")}
+          >
+            <Icon name="chevronLeft" size={20} />
+          </button>
+          <h3 className="text-center leading-tight" aria-live="polite">
+            <span className="block font-semibold">{month}</span>{" "}
+            <span className="num block text-sm text-muted">{t("dash.workoutsN", { count: inMonth.length })}</span>
+          </h3>
+          <button
+            type="button"
+            onClick={() => shift(1)}
+            disabled={!canNext}
+            className="press grid h-11 w-11 place-items-center rounded-xl border border-line bg-raised disabled:opacity-40"
+            aria-label={t("dash.nextMonth")}
+          >
+            <Icon name="chevronRight" size={20} />
+          </button>
+        </div>
+        <table key={`${ym.y}-${ym.m}`} className="fade w-full table-fixed border-separate border-spacing-0.5">
+          <thead>
+            <tr>
+              {weekdayNames().map((d) => (
+                <th key={d} scope="col" className="pb-1 text-xs font-medium text-faint">
+                  {d}
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {monthGrid(ym.y, ym.m).map((row, i) => (
+              <tr key={i}>
+                {row.map((d, j) => {
+                  if (!d) return <td key={j} />;
+                  const day = byDay.get(d.key);
+                  const isToday = d.key === todayKey;
+                  const n = new Date(d.ms).getDate();
+                  const ring = isToday ? "ring-2 ring-accent ring-inset" : "";
+                  if (!day)
+                    return (
+                      <td key={d.key}>
+                        <div className={`num grid h-11 place-items-center rounded-xl text-sm text-faint ${ring}`}>{n}</div>
+                      </td>
+                    );
+                  const fams = familiesOn(d.key);
+                  const sets = day.reduce((a, s) => a + s.sets, 0);
+                  const prs = day.reduce((a, s) => a + s.prs, 0);
+                  const on = selected === d.key;
+                  const label = [
+                    date(d.ms, { weekday: "long", month: "long", day: "numeric" }),
+                    t("progress.sessionSets", { count: sets }),
+                    ...(prs ? [t("progress.sessionPrs", { count: prs })] : []),
+                    ...(fams.length ? [list(fams.map((f) => t(`progress.fam.${f}`)))] : []),
+                  ].join(", ");
+                  return (
+                    <td key={d.key}>
+                      <button
+                        type="button"
+                        aria-pressed={on}
+                        aria-label={label}
+                        onClick={() => {
+                          haptic("select");
+                          setPicked(d.key);
+                        }}
+                        className={`press relative flex h-11 w-full flex-col items-center justify-center gap-0.5 rounded-xl border bg-accent/15 ${on ? "border-accent" : "border-transparent"} ${ring}`}
+                      >
+                        <span className="num text-sm font-semibold">{n}</span>
+                        <span aria-hidden className="flex h-1.5 gap-0.5">
+                          {fams.map((f) => (
+                            <span key={f} className="h-1.5 w-1.5 rounded-full" style={{ background: FAMILY_HUE[f] }} />
+                          ))}
+                        </span>
+                        {prs > 0 && (
+                          <span aria-hidden className="absolute right-0.5 top-0.5 text-gold">
+                            <Icon name="trophy" size={10} />
+                          </span>
+                        )}
+                      </button>
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <ul className="mt-2 flex flex-wrap justify-center gap-x-4 gap-y-1 text-xs text-muted" aria-label={t("progress.cal.legend")}>
+          {FAMILIES.map((f) => (
+            <li key={f} className="flex items-center gap-1.5">
+              <span aria-hidden className="h-2 w-2 rounded-full" style={{ background: FAMILY_HUE[f] }} />
+              {t(`progress.fam.${f}`)}
+            </li>
+          ))}
+        </ul>
+      </section>
+      {!inMonth.length && <p className="mt-3 px-1 text-sm text-muted">{t("progress.cal.none")}</p>}
+      {daySessions.map((s) => (
+        <WorkoutCard key={s.sessionId} summary={s} unit={profile.unit} prIds={prIds} />
+      ))}
+    </>
+  );
+}
+
+function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: Unit; prIds: Set<string> }) {
+  const { events, stats } = useApp();
+  const detail = useMemo(() => sessionDetail(events, summary.sessionId), [events, summary.sessionId]);
+  const ctx = useShareContext(useGame());
+  const [sharing, setSharing] = useState(false);
+  if (!detail) return null;
+  const facts = [
+    t("dash.min", { n: Math.max(1, Math.round(summary.seconds / 60)) }),
+    t("progress.sessionSets", { count: summary.sets }),
+    fmtVolume(summary.volume, unit),
+    ...(summary.avgHr ? [`♥ ${num(summary.avgHr)}`] : []),
+    ...(summary.prs ? [t("progress.sessionPrs", { count: summary.prs })] : []),
+  ];
+  return (
+    <article className="card rise mt-3 p-4" aria-label={date(summary.start, { weekday: "long", month: "long", day: "numeric" })}>
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="font-bold">
+          {date(summary.start, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" })}
+        </h3>
+        <button
+          type="button"
+          onClick={() => setSharing(true)}
+          aria-label={t("card.shareWorkout", { when: date(summary.start, { weekday: "long", month: "long", day: "numeric" }) })}
+          className="press -mr-2 -mt-2 grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+        >
+          <Icon name="share" size={20} />
+        </button>
+      </div>
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={sessionShares(summary, stats.prs, ctx)} />
+      <p className="num mt-0.5 text-sm text-muted">
+        {facts.join(" · ")}
+        {detail.manual ? t("dash.byHand") : ""}
+      </p>
+      <div className="mt-3 space-y-3">
+        {detail.exercises.map((g, i) => {
+          const ex = EXERCISE_BY_ID.get(g.exerciseId);
+          return (
+            <div key={i}>
+              <h4 className="font-medium">{exName(g.exerciseId)}</h4>
+              <ol className="mt-1 text-sm">
+                {g.sets.map((s, j) => (
+                  <li key={s.id} className="num flex items-center gap-3 border-b border-line/60 py-1 last:border-0">
+                    <span className="w-5 text-faint">{j + 1}</span>
+                    <span className="flex-1">{ex ? setText(ex, s.weight, s.reps, unit, s.distanceM) : num(s.reps)}</span>
+                    {prIds.has(s.id) && (
+                      <span className="flex items-center text-gold">
+                        <Icon name="trophy" size={14} />
+                        <span className="sr-only">{t("progress.cal.prSet")}</span>
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          );
+        })}
+      </div>
+    </article>
+  );
+}

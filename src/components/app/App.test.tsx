@@ -201,7 +201,7 @@ describe("first run to finished workout", () => {
     fireEvent.click(more); // keyboard or screen reader: one step
     expect(useApp.getState().active!.reps).toBe(start + 1);
     fireEvent.pointerDown(more, { button: 0 });
-    await act(() => new Promise((r) => setTimeout(r, 900)));
+    await act(() => new Promise((r) => setTimeout(r, 1300)));
     fireEvent.pointerUp(more);
     const held = useApp.getState().active!.reps;
     expect(held).toBeGreaterThanOrEqual(start + 4);

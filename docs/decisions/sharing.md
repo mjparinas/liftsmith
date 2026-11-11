@@ -7,7 +7,7 @@ Melvin, 2026-11-11: "There should be opportunities to share workouts and/or mile
 - **One share sheet** (`ShareSheet.tsx`) for every moment. It shows the card exactly as it will go out, then: which moment (chips, when a screen has several), **Post** (1080×1350, 4:5 for feeds) or **Story** (1080×1920, 9:16), **Show weights** (on) and **Show my name** (off; the name is the optional one in Account and sync), a line saying what never goes on a card, and one Share button. The size and switches are remembered on the device (`liftsmith.sharePrefs` in localStorage).
 - **Where to share from**, one control each:
   - *Done:* "Share this workout" opens the sheet with the workout, each new PR, a level-up and each badge just earned.
-  - *Progress › History:* a share icon on every past workout (the workout and its PRs).
+  - *Progress › History:* a share icon on each workout card under the calendar (the workout and its PRs).
   - *Awards:* a share icon on every earned badge, and on the level card.
   - *Coach's notes:* the "what's working" note (a lift up 5%+ in six weeks) has **Share it**, a lift progress card.
   - *Recap:* the month and year recap goes through the same sheet.

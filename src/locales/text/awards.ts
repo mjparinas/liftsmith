@@ -44,7 +44,6 @@ export const en = {
   "awards.locker.accent": "Accent colour",
   "awards.locker.sound": "Rest timer sound",
   "awards.locker.plates": "Plate finish",
-  "awards.locker.note": "Every finished workout opens a crate. Repeats turn into 25 bonus XP.",
   "awards.levelProgress": "Progress to the next level",
   "awards.badgesOf": "of {total} badges earned",
   "awards.weekQuests": "This week's quests",
@@ -64,6 +63,14 @@ export const en = {
   "awards.u.t": "{n} t",
   "awards.u.weeks": { one: "{n} week", other: "{n} weeks" },
   "awards.u.x": "{n}×",
+  "awards.locker.count": "{have} of {total} collected",
+  "awards.locker.howTo": "a crate after every workout, plus level rewards",
+  "awards.locker.locked": "Locked",
+  "awards.locker.odds": "{name} comes from crates: about 1 in {n} workouts.",
+  "awards.locker.atLevel": "Or it’s yours at level {level}.",
+  "awards.nextReward": "Next reward at level {level}: {reward}",
+  "awards.reward.item": "{name} ({rarity})",
+  "awards.reward.crate": "a bonus crate for your new title",
 } as const;
 
 type Key = keyof typeof en;
@@ -109,7 +116,6 @@ export const es: Partial<Record<Key, Message>> = {
   "awards.locker.accent": "Color de acento",
   "awards.locker.sound": "Sonido del temporizador",
   "awards.locker.plates": "Acabado de los discos",
-  "awards.locker.note": "Cada entrenamiento terminado abre un cofre. Los repetidos se convierten en 25 XP extra.",
   "awards.levelProgress": "Progreso hacia el siguiente nivel",
   "awards.badgesOf": "de {total} insignias conseguidas",
   "awards.weekQuests": "Misiones de esta semana",
@@ -129,6 +135,14 @@ export const es: Partial<Record<Key, Message>> = {
   "awards.u.t": "{n} t",
   "awards.u.weeks": { one: "{n} semana", other: "{n} semanas" },
   "awards.u.x": "{n}×",
+  "awards.locker.count": "{have} de {total} conseguidos",
+  "awards.locker.howTo": "un cofre tras cada entrenamiento, más premios de nivel",
+  "awards.locker.locked": "Bloqueado",
+  "awards.locker.odds": "{name} sale de los cofres: más o menos 1 de cada {n} entrenamientos.",
+  "awards.locker.atLevel": "O es tuyo en el nivel {level}.",
+  "awards.nextReward": "Próximo premio en el nivel {level}: {reward}",
+  "awards.reward.item": "{name} ({rarity})",
+  "awards.reward.crate": "un cofre extra por tu nuevo título",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -173,7 +187,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "awards.locker.accent": "Couleur d’accent",
   "awards.locker.sound": "Son du minuteur",
   "awards.locker.plates": "Finition des disques",
-  "awards.locker.note": "Chaque séance terminée ouvre un coffre. Les doublons deviennent 25 XP bonus.",
   "awards.levelProgress": "Progression vers le niveau suivant",
   "awards.badgesOf": "badges obtenus sur {total}",
   "awards.weekQuests": "Quêtes de la semaine",
@@ -193,6 +206,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "awards.u.t": "{n} t",
   "awards.u.weeks": { one: "{n} semaine", other: "{n} semaines" },
   "awards.u.x": "{n}×",
+  "awards.locker.count": "{have} sur {total} obtenus",
+  "awards.locker.howTo": "un coffre après chaque séance, plus les récompenses de niveau",
+  "awards.locker.locked": "Verrouillé",
+  "awards.locker.odds": "{name} sort des coffres : environ 1 séance sur {n}.",
+  "awards.locker.atLevel": "Ou il est à vous au niveau {level}.",
+  "awards.nextReward": "Prochaine récompense au niveau {level} : {reward}",
+  "awards.reward.item": "{name} ({rarity})",
+  "awards.reward.crate": "un coffre bonus pour votre nouveau titre",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -236,7 +257,6 @@ export const de: Partial<Record<Key, Message>> = {
   "awards.locker.accent": "Akzentfarbe",
   "awards.locker.sound": "Pausentimer-Ton",
   "awards.locker.plates": "Scheiben-Finish",
-  "awards.locker.note": "Jedes beendete Training öffnet eine Kiste. Doppelte werden zu 25 Bonus-XP.",
   "awards.levelProgress": "Fortschritt zum nächsten Level",
   "awards.badgesOf": "von {total} Abzeichen verdient",
   "awards.weekQuests": "Aufgaben dieser Woche",
@@ -256,6 +276,14 @@ export const de: Partial<Record<Key, Message>> = {
   "awards.u.t": "{n} t",
   "awards.u.weeks": { one: "{n} Woche", other: "{n} Wochen" },
   "awards.u.x": "{n}×",
+  "awards.locker.count": "{have} von {total} gesammelt",
+  "awards.locker.howTo": "eine Kiste nach jedem Training, dazu Level-Belohnungen",
+  "awards.locker.locked": "Gesperrt",
+  "awards.locker.odds": "{name} kommt aus Kisten: etwa 1 von {n} Trainings.",
+  "awards.locker.atLevel": "Oder es gehört dir ab Level {level}.",
+  "awards.nextReward": "Nächste Belohnung ab Level {level}: {reward}",
+  "awards.reward.item": "{name} ({rarity})",
+  "awards.reward.crate": "eine Bonuskiste für deinen neuen Titel",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -299,7 +327,6 @@ export const it: Partial<Record<Key, Message>> = {
   "awards.locker.accent": "Colore d’accento",
   "awards.locker.sound": "Suono del timer di riposo",
   "awards.locker.plates": "Finitura dei dischi",
-  "awards.locker.note": "Ogni allenamento finito apre una cassa. I doppioni diventano 25 XP bonus.",
   "awards.levelProgress": "Avanzamento verso il prossimo livello",
   "awards.badgesOf": "di {total} badge ottenuti",
   "awards.weekQuests": "Missioni di questa settimana",
@@ -319,6 +346,14 @@ export const it: Partial<Record<Key, Message>> = {
   "awards.u.t": "{n} t",
   "awards.u.weeks": { one: "{n} settimana", other: "{n} settimane" },
   "awards.u.x": "{n}×",
+  "awards.locker.count": "{have} su {total} raccolti",
+  "awards.locker.howTo": "una cassa dopo ogni allenamento, più i premi di livello",
+  "awards.locker.locked": "Bloccato",
+  "awards.locker.odds": "{name} esce dalle casse: circa 1 allenamento su {n}.",
+  "awards.locker.atLevel": "Oppure è tuo al livello {level}.",
+  "awards.nextReward": "Prossimo premio al livello {level}: {reward}",
+  "awards.reward.item": "{name} ({rarity})",
+  "awards.reward.crate": "una cassa bonus per il tuo nuovo titolo",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -353,7 +388,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "awards.locker.accent": "アクセントカラー",
   "awards.locker.sound": "休憩タイマーの音",
   "awards.locker.plates": "プレートの仕上げ",
-  "awards.locker.note": "ワークアウトを終えるたびにクレートが開きます。重複したものは25ボーナス XP になります。",
   "awards.levelProgress": "次のレベルまでの進行状況",
   "awards.badgesOf": "/{total} バッジ獲得",
   "awards.weekQuests": "今週のクエスト",
@@ -373,4 +407,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "awards.u.t": "{n}トン",
   "awards.u.weeks": { other: "{n}週" },
   "awards.u.x": "{n}回",
+  "awards.locker.count": "{total}個中{have}個を入手",
+  "awards.locker.howTo": "ワークアウトごとにクレート1個、さらにレベル報酬",
+  "awards.locker.locked": "ロック中",
+  "awards.locker.odds": "{name}はクレートから出ます。だいたい{n}回のワークアウトに1回です。",
+  "awards.locker.atLevel": "またはレベル{level}で手に入ります。",
+  "awards.nextReward": "次の報酬はレベル{level}：{reward}",
+  "awards.reward.item": "{name}（{rarity}）",
+  "awards.reward.crate": "新しい称号のボーナスクレート",
 };
