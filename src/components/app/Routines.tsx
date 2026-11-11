@@ -12,7 +12,7 @@ import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem } from "@/lib/ty
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
-import { Button, EmptyState, LinkToggle, Sheet } from "./ui";
+import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
 // one from the exercise library. All of it is optional and happens before or after a workout.
@@ -196,9 +196,14 @@ function RoutineEditor({
     haptic("select");
     sound.tick();
   };
+  // A bump's own hold gives the tick; at 1 or 10 sets the hold stops.
   const setSets = (i: number, d: number) => {
-    tick();
-    setItems(items.map((x, k) => (k === i ? { ...x, sets: Math.min(10, Math.max(1, x.sets + d)) } : x)));
+    const it = items[i];
+    if (!it) return false;
+    const sets = Math.min(10, Math.max(1, it.sets + d));
+    if (sets === it.sets) return false;
+    setItems(items.map((x, k) => (k === i ? { ...x, sets } : x)));
+    return true;
   };
   const remove = (i: number) => {
     tick();
@@ -261,33 +266,9 @@ function RoutineEditor({
                 </div>
                 <div className="mt-1 flex items-center justify-between pl-[52px]">
                   <div className="flex items-center gap-1">
-                    <button
-                      type="button"
-                      onClick={() => setSets(i, -1)}
-                      aria-label={t("rt.fewer", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
-                    >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.6}
-                        strokeLinecap="round"
-                        aria-hidden
-                      >
-                        <path d="M5 12h14" />
-                      </svg>
-                    </button>
+                    <Bump dir={-1} size="sm" aria={t("rt.fewer", { name: ex.name })} onStep={(d) => setSets(i, d)} />
                     <span className="num w-16 text-center text-sm font-semibold">{t("rt.sets", { count: it.sets })}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSets(i, 1)}
-                      aria-label={t("rt.more", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full border border-line"
-                    >
-                      <Icon name="plus" size={16} strokeWidth={2.6} />
-                    </button>
+                    <Bump dir={1} size="sm" aria={t("rt.more", { name: ex.name })} onStep={(d) => setSets(i, d)} />
                   </div>
                   <div className="flex items-center gap-1">
                     <button

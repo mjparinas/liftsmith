@@ -6,6 +6,7 @@ import {
   useRef,
   useState,
   type CSSProperties,
+  type KeyboardEvent as ReactKeyboardEvent,
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
   type PointerEvent as ReactPointerEvent,
@@ -15,6 +16,7 @@ import { createPortal } from "react-dom";
 import { Info } from "@/components/Info";
 import { useBack } from "@/lib/back";
 import type { Term } from "@/lib/glossary";
+import { due, HAPTIC_GAP, HOLD_DELAY, MOVE_SLOP, repeatGap, repeatSize, SOUND_GAP } from "@/lib/holdRepeat";
 import { parseNum, t } from "@/lib/i18n";
 import { calm, haptic, sound } from "@/lib/juice";
 
@@ -84,59 +86,141 @@ export function Chip({ children, active, onClick }: { children: ReactNode; activ
 }
 
 /**
- * Hold-to-repeat for a bump button: one step on press, then repeats after a short pause, faster the
- * longer it's held (quick weight and rep changes without typing). Keyboard Enter/Space still step once.
+ * What a bump does with one step: `size` is how many steps at once (1, then 2 and 5 on a long hold;
+ * see `repeatSize`). Return `false` when nothing changed (a limit was reached): the hold stops and
+ * there's no tick for a step that didn't happen.
  */
-function useRepeat(onStep: () => void) {
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+export type BumpStep = (dir: 1 | -1, size: 1 | 2 | 5) => boolean | void;
+
+/**
+ * Hold-to-repeat for a bump button, the one place every − / + gets it (timing in `holdRepeat.ts`). A
+ * tap steps once on release; a press held still for a moment repeats, slow then faster, with the
+ * haptic and tick thinned out at speed. A slide, a scroll (pointer cancel), leaving the button or
+ * losing focus stops it cleanly. Enter or Space held from the keyboard repeats the same way; a
+ * screen reader's click steps once.
+ */
+function useHoldRepeat(dir: 1 | -1, onStep: BumpStep) {
   // The latest handler, so each repeat steps from the value the last one set.
   const latest = useRef(onStep);
   useEffect(() => {
     latest.current = onStep;
   });
-  const step = () => latest.current();
+  const hold = useRef<{ timer: ReturnType<typeof setTimeout> | null; n: number; x: number; y: number; id: number } | null>(null);
+  const fed = useRef<{ haptic: number | null; sound: number | null }>({ haptic: null, sound: null });
+
+  /** One step with its feedback; false when the step changed nothing. */
+  const step = (n: number) => {
+    const size = repeatSize(Math.max(1, n));
+    if (latest.current(dir, size) === false) return false;
+    const now = Date.now();
+    // A tap always ticks. While repeating, the tick and buzz are thinned out once it's fast, and a
+    // change of step size gets its own tick so the lifter feels it.
+    const gear = n > 1 && repeatSize(n) !== repeatSize(n - 1);
+    if (n === 0 || gear || due(fed.current.haptic, now, HAPTIC_GAP)) {
+      haptic(gear ? "tick" : "select");
+      fed.current.haptic = now;
+    }
+    if (n === 0 || due(fed.current.sound, now, SOUND_GAP)) {
+      sound.tick();
+      fed.current.sound = now;
+    }
+    return true;
+  };
   const stop = () => {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = null;
+    if (hold.current?.timer) clearTimeout(hold.current.timer);
+    hold.current = null;
+  };
+  const begin = (x: number, y: number, id: number) => {
+    stop();
+    fed.current = { haptic: null, sound: null };
+    const h = { timer: null as ReturnType<typeof setTimeout> | null, n: 0, x, y, id };
+    const again = () => {
+      h.n += 1;
+      if (!step(h.n)) return stop();
+      h.timer = setTimeout(again, repeatGap(h.n));
+    };
+    h.timer = setTimeout(again, HOLD_DELAY);
+    hold.current = h;
+  };
+  /** Release: a press that never started repeating was a tap, so it steps once now. */
+  const end = () => {
+    const h = hold.current;
+    stop();
+    if (h && h.n === 0) step(0);
   };
   useEffect(() => stop, []);
+
   return {
     onPointerDown: (e: ReactPointerEvent) => {
-      if (e.button !== 0) return;
-      step();
-      let delay = 420;
-      const again = () => {
-        step();
-        delay = Math.max(70, delay * 0.8);
-        timer.current = setTimeout(again, delay);
-      };
-      timer.current = setTimeout(again, delay);
+      // The main button only, and one finger at a time.
+      if (e.button !== 0 || (hold.current && hold.current.id !== e.pointerId)) return;
+      begin(e.clientX, e.clientY, e.pointerId);
     },
-    onPointerUp: stop,
-    onPointerLeave: stop,
+    onPointerMove: (e: ReactPointerEvent) => {
+      const h = hold.current;
+      if (h && e.pointerId === h.id && Math.hypot(e.clientX - h.x, e.clientY - h.y) > MOVE_SLOP) stop();
+    },
+    onPointerUp: (e: ReactPointerEvent) => {
+      if (hold.current?.id === e.pointerId) end();
+    },
+    // The page took the touch for a scroll, or the pointer left: no step, nothing left running.
     onPointerCancel: stop,
+    onPointerLeave: stop,
+    onBlur: stop,
+    onKeyDown: (e: ReactKeyboardEvent) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      // The hold handles it, so the browser's own click (and Enter's auto-repeat) doesn't step again.
+      e.preventDefault();
+      if (!e.repeat) begin(0, 0, -1);
+    },
+    onKeyUp: (e: ReactKeyboardEvent) => {
+      if (e.key !== "Enter" && e.key !== " ") return;
+      e.preventDefault();
+      if (hold.current?.id === -1) end();
+    },
     onContextMenu: (e: ReactMouseEvent) => e.preventDefault(),
-    // A pointer press already stepped; a click from the keyboard or a screen reader (detail 0) steps once.
+    // Pointer and key presses step above; a click with no press behind it (a screen reader, or
+    // detail 0) steps once.
     onClick: (e: ReactMouseEvent) => {
-      if (e.detail === 0) step();
+      if (e.detail === 0 && !hold.current) step(0);
     },
   };
 }
 
-function Bump({ dir, label, size, onStep }: { dir: 1 | -1; label: string; size: "lg" | "md"; onStep: (d: 1 | -1) => void }) {
-  const repeat = useRepeat(() => onStep(dir));
-  const dim = size === "lg" ? "h-14 w-14" : "h-12 w-12";
+const BUMP_SIZE = { lg: "h-14 w-14", md: "h-12 w-12", sm: "h-11 w-11" } as const;
+
+/**
+ * The one − / + button: hold to repeat (`useHoldRepeat`). `label` names what it changes ("More
+ * reps"), or `aria` gives the whole accessible name when the screen words it its own way.
+ */
+export function Bump({
+  dir,
+  label,
+  aria,
+  size,
+  onStep,
+}: {
+  dir: 1 | -1;
+  label?: string;
+  aria?: string;
+  size: keyof typeof BUMP_SIZE;
+  onStep: BumpStep;
+}) {
+  const repeat = useHoldRepeat(dir, onStep);
+  const icon = size === "sm" ? 16 : 22;
   return (
     <button
       type="button"
-      className={`press grid ${dim} shrink-0 touch-none select-none place-items-center rounded-full border border-line bg-raised text-ink active:border-accent/60 active:bg-accent/15`}
-      aria-label={t(dir > 0 ? "workout.more" : "workout.less", { what: label })}
+      // touch-manipulation lets a scroll that starts here still scroll (the hold then cancels);
+      // no callout or selection on a long press.
+      className={`press grid ${BUMP_SIZE[size]} shrink-0 touch-manipulation select-none place-items-center rounded-full border border-line bg-raised text-ink [-webkit-touch-callout:none] active:border-accent/60 active:bg-accent/15`}
+      aria-label={aria ?? t(dir > 0 ? "workout.more" : "workout.less", { what: label ?? "" })}
       {...repeat}
     >
       {dir > 0 ? (
-        <Icon name="plus" size={22} strokeWidth={2.6} />
+        <Icon name="plus" size={icon} strokeWidth={2.6} />
       ) : (
-        <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden>
+        <svg width={icon} height={icon} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.6} strokeLinecap="round" aria-hidden>
           <path d="M5 12h14" />
         </svg>
       )}
@@ -167,9 +251,9 @@ export function Stepper({
 }) {
   // The number lifts for a moment when it changes.
   const [key, setKey] = useState(0);
+  // The workout's own bumps already move by a plate or a rep, so a long hold speeds up but each
+  // step stays one step.
   const step = (d: 1 | -1) => {
-    haptic("select");
-    sound.tick();
     setKey((k) => k + 1);
     if (d > 0) onUp();
     else onDown();
@@ -750,14 +834,17 @@ export function BumpField({
   className?: string;
 }) {
   const decimals = (String(step).split(".")[1] ?? "").length;
-  const bump = (d: 1 | -1) => {
-    haptic("select");
-    sound.tick();
+  const bump: BumpStep = (d, size) => {
     const n = parseNum(value);
-    const from = value.trim() === "" || !Number.isFinite(n) ? start : n;
-    // Snap to the step, so 81.3 bumped by 0.5 goes to 81.5, not 81.8.
-    const next = Math.round((from + d * step) / step) * step;
-    onChange(String(Number(Math.min(max, Math.max(min, value.trim() === "" ? start : next)).toFixed(decimals))));
+    const empty = value.trim() === "" || !Number.isFinite(n);
+    const from = empty ? start : n;
+    // Snap to the step, so 81.3 bumped by 0.5 goes to 81.5, not 81.8. A long hold moves several steps.
+    const next = Math.round((from + d * step * size) / step) * step;
+    const out = String(Number(Math.min(max, Math.max(min, empty ? start : next)).toFixed(decimals)));
+    // At the end of the range: nothing to do, so the hold stops.
+    if (!empty && Number(out) === n) return false;
+    onChange(out);
+    return true;
   };
   return (
     <div className={`flex items-center gap-2 ${className}`}>

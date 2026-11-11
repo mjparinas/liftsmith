@@ -5,7 +5,6 @@ import { useState } from "react";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { t } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
@@ -14,7 +13,7 @@ import { fmtNum } from "@/lib/units";
 import { BuyNext } from "./BuyNext";
 import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
-import { BumpField, Button, Chip, Section, Sheet } from "./ui";
+import { Bump, BumpField, Button, Chip, Section, Sheet } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -127,29 +126,25 @@ export function Gym() {
                   <span className="flex-1 text-sm text-muted">
                     {fmtNum(p.weight)} {gym.unit}
                   </span>
-                  <button
-                    type="button"
-                    aria-label={t("gym.plates.fewer", { weight: fmtNum(p.weight) })}
-                    className="press h-9 w-9 rounded-full border border-line bg-raised"
-                    onClick={() => {
-                      haptic("tick");
+                  <Bump
+                    dir={-1}
+                    size="sm"
+                    aria={t("gym.plates.fewer", { weight: fmtNum(p.weight) })}
+                    onStep={() => {
+                      if (p.count <= 0) return false;
                       update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: Math.max(0, x.count - 2) } : x)) });
+                      return true;
                     }}
-                  >
-                    −
-                  </button>
+                  />
                   <span className="num w-10 text-center font-semibold">{fmtNum(p.count)}</span>
-                  <button
-                    type="button"
-                    aria-label={t("gym.plates.more", { weight: fmtNum(p.weight) })}
-                    className="press h-9 w-9 rounded-full border border-line bg-raised"
-                    onClick={() => {
-                      haptic("tick");
+                  <Bump
+                    dir={1}
+                    size="sm"
+                    aria={t("gym.plates.more", { weight: fmtNum(p.weight) })}
+                    onStep={() => {
                       update({ plates: gym.plates.map((x, j) => (j === i ? { ...x, count: x.count + 2 } : x)) });
                     }}
-                  >
-                    +
-                  </button>
+                  />
                 </li>
               );
             })}
