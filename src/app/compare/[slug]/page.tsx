@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CompareTable } from "@/components/site/CompareTable";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { checkedYear, COMPETITOR_BY_SLUG, COMPETITORS, lastChecked, TRADEMARKS } from "@/content/compare";
+import { IMPORT_BY_SLUG } from "@/content/imports";
 import { BRAND } from "@/lib/brand";
 import { ogImage } from "@/lib/ogImages";
 import { pageMeta } from "@/lib/pageMeta";
@@ -73,6 +75,15 @@ export default async function ComparePage({ params }: Props) {
         body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${c.slug === "hevy" || c.slug === "strong" ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`}
         button="Try it free"
       />
+      {IMPORT_BY_SLUG.has(c.slug) ? (
+        <p className="mt-4 text-muted">
+          Moving your history across?{" "}
+          <Link href={`/import/${c.slug}/`} className="text-accent underline underline-offset-2">
+            How to import your {c.name} workouts
+          </Link>
+          .
+        </p>
+      ) : null}
       <h2 className="mt-10 text-2xl font-bold tracking-tight">Side by side</h2>
       <CompareTable c={c} />
       <p className="mt-3 text-xs text-muted">

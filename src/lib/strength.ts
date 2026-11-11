@@ -44,15 +44,48 @@ export function scoreOf(ratio: number): number {
   return Math.round(100 * (1 - Math.pow(2, -Math.max(0, ratio))));
 }
 
+/** The spread of trained lifters around the standard: the log-normal width percentileOf uses. */
+const SPREAD = 0.35;
+
 /** Rough share of trained lifters a ratio beats: log-normal around the intermediate standard. */
 export function percentileOf(ratio: number): number {
   if (ratio <= 0) return 0;
-  const z = Math.log(ratio) / 0.35;
+  const z = Math.log(ratio) / SPREAD;
   // Abramowitz and Stegun normal CDF.
   const t = 1 / (1 + 0.2316419 * Math.abs(z));
   const d = 0.3989423 * Math.exp((-z * z) / 2);
   const p = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
   return Math.round(100 * (z > 0 ? 1 - p : p));
+}
+
+/** A typical intermediate's estimated max at this body weight: their working load is `start` × body weight
+ * for about 10 reps with 2 in reserve. */
+export const standardMax = (ex: Exercise, bodyweightKg: number) => estimate(ex.start * bodyweightKg, 12);
+
+/** Percentiles the public tool shows, with each one's z-score. */
+export const PERCENTILE_STEPS: readonly (readonly [pct: number, z: number])[] = [
+  [25, -0.6745],
+  [50, 0],
+  [75, 0.6745],
+  [90, 1.2816],
+  [95, 1.6449],
+];
+
+/**
+ * One lift against the standards, for the public strength standards tool: the score, the share of trained
+ * lifters it beats, and the estimated max at each of PERCENTILE_STEPS for this lifter (age and sex adjusted).
+ */
+export function liftStanding(ex: Exercise, e1rm: number, bodyweightKg: number, age: number | null, sex: AgeSex["sex"]) {
+  const adjust = ageFactor(age) * sexFactor(ex, sex);
+  const standard = standardMax(ex, Math.max(30, bodyweightKg));
+  const ratio = (e1rm * adjust) / standard;
+  return {
+    ratio,
+    score: scoreOf(ratio),
+    percentile: percentileOf(ratio),
+    standard: standard / adjust,
+    steps: PERCENTILE_STEPS.map(([pct, z]) => ({ pct, e1rm: (Math.exp(SPREAD * z) * standard) / adjust })),
+  };
 }
 
 export interface LiftScore {
@@ -96,9 +129,7 @@ export function strength(
   const lifts: LiftScore[] = [];
   for (const [id, e1] of best) {
     const ex = EXERCISE_BY_ID.get(id)!;
-    // An intermediate's working load is `start` × body weight for about 10 reps with 2 in reserve.
-    const standard = estimate(ex.start * bw, 12);
-    const ratio = (e1 * af * sexFactor(ex, profile.sex)) / standard;
+    const ratio = (e1 * af * sexFactor(ex, profile.sex)) / standardMax(ex, bw);
     lifts.push({ exerciseId: id, name: ex.name, e1rm: e1, ratio, score: scoreOf(ratio), percentile: percentileOf(ratio) });
   }
   lifts.sort((a, b) => b.score - a.score);

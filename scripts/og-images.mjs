@@ -2,7 +2,8 @@
 // app's own 3D figure. The card list comes from ogCards() in src/lib/ogImages.ts, read from the build-only
 // /stills/ page, so a new exercise, article or tool gets its card the next time this runs:
 //   STILLS=1 npm run build:static && PW_CHROMIUM=/opt/pw-browsers/chromium node scripts/og-images.mjs
-// Run it again after adding pages (seo.test.ts fails when a page's card is missing) or changing the figure.
+// After adding pages, add --missing to draw only the new ones (ogImages.test.ts fails when a page has no card). Run it
+// without --missing after changing the figure or the card design.
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -27,12 +28,17 @@ await page.addInitScript(() => {
 });
 await page.goto(`${server.url}/stills/`);
 await page.waitForFunction(() => window.__still && window.__ogCards, null, { timeout: 30_000 });
-const cards = await page.evaluate(() => window.__ogCards);
+// --missing draws only cards and stills that don't exist yet (after adding pages), so the others stay as they are.
+const missing = process.argv.includes("--missing");
+const cards = (await page.evaluate(() => window.__ogCards)).filter((c) => !missing || !fs.existsSync(path.join(OG, c.file)));
 
 /** Each exercise's figure, drawn once: male and female in turn so both figures appear across the site. */
 const figures = new Map();
 const ids = [...new Set(cards.map((c) => c.exercise))];
-const exerciseIds = cards.filter((c) => c.file.startsWith("exercises/")).map((c) => c.exercise);
+const exerciseIds = cards
+  .filter((c) => c.file.startsWith("exercises/"))
+  .map((c) => c.exercise)
+  .filter((id) => !missing || !fs.existsSync(path.join(STILLS, `${id}.webp`)));
 for (const [i, id] of [...new Set([...exerciseIds, ...ids])].entries()) {
   const url = await page.evaluate(([id, body]) => window.__still(id, body, 900), [id, i % 2 ? "female" : "male"]);
   if (!url) throw new Error(`No figure for ${id}`);

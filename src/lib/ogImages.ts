@@ -4,6 +4,7 @@
 // muscle's card, so about 450 cards cover all 800 pages. A page with no card of its own gets the default.
 import { ARTICLES } from "@/content/articles";
 import { COMPETITORS } from "@/content/compare";
+import { IMPORT_SOURCES } from "@/content/imports";
 
 import { BRAND } from "./brand";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
@@ -35,6 +36,7 @@ export function ogFile(path: string): string {
   if (kind === "blog" || kind === "guides") return `articles/${a}.jpg`;
   if (kind === "compare") return `compare/${a}.jpg`;
   if (kind === "tools") return `tools/${a}.jpg`;
+  if (kind === "import") return `import/${a}.jpg`;
   return "default.jpg";
 }
 
@@ -81,6 +83,13 @@ export function ogCards(): OgCard[] {
     });
   for (const c of COMPETITORS)
     cards.push({ file: `compare/${c.slug}.jpg`, kicker: "Compare", title: `${BRAND.name} vs ${c.name}`, exercise: DEFAULT_FIGURE });
+  for (const s of IMPORT_SOURCES)
+    cards.push({
+      file: `import/${s.slug}.jpg`,
+      kicker: "Switch apps",
+      title: `Switch from ${s.name} to ${BRAND.name}`,
+      exercise: DEFAULT_FIGURE,
+    });
   for (const t of TOOL_PAGES)
     cards.push({
       file: `tools/${t.path.split("/")[2]}.jpg`,
