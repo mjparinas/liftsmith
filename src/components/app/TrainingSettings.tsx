@@ -25,7 +25,7 @@ import { MUSCLE_LABEL, MUSCLES, type RestAlert, type TrainingPrefs } from "@/lib
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { go } from "./router";
-import { Chip, Section, SwitchRow } from "./ui";
+import { Chip, ScreenHeader, Section, SwitchRow } from "./ui";
 
 // Settings › Workout › Plan details (Melvin, 2026-11-09): rest times, rep ranges and set counts, RIR or
 // RPE, favourite exercises, muscle priorities, the default workout length and the
@@ -100,10 +100,7 @@ export function TrainingSettings() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings", "workout")} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("settings.back.workout")}
-      </button>
-      <h1 className="text-[28px] font-extrabold tracking-tight">{t("train.title")}</h1>
+      <ScreenHeader back={{ label: t("settings.back.workout"), onClick: () => go("settings", "workout") }} title={t("train.title")} />
       <p className="mt-1 text-sm text-muted">{t("train.intro")}</p>
 
       <Section title={t("train.rest")}>

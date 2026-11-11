@@ -64,6 +64,11 @@ export interface DemoSettings {
   paint?: Partial<Record<Muscle, string>> | null;
   hatch?: Partial<Record<Muscle, number>> | null;
   selected?: readonly Muscle[] | null;
+  /**
+   * The lifter tapped the `selected` muscle: it glows solid and swells, its skin lights up in its colour, and
+   * every other muscle and the rest of the skin fade to dim grey, so even a small muscle is obvious.
+   */
+  picked?: boolean;
   /** Lean mode or reduced motion: camera turns snap instead of easing. */
   calm?: boolean;
   /**

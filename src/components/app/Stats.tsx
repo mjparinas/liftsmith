@@ -3,7 +3,7 @@
 import { useState } from "react";
 
 import { exercise } from "@/lib/exercises";
-import { list, num, t } from "@/lib/i18n";
+import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
 import { ACTIVITY, currentTdee, parseBodyFat, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
@@ -14,13 +14,14 @@ import { AchievementRow, useGame } from "./Achievements";
 import { BodyFatField } from "./BodyFatField";
 import { GoalsCard } from "./Coach";
 import { StrengthCard, TonnageCard } from "./Extras";
-import { ago, clock } from "./format";
+import { ago } from "./format";
+import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
 import { go } from "./router";
 import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -60,7 +61,7 @@ export function Stats() {
   ];
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <ScreenHeader title={t("progress.title")} />
       <CoachNotes title={t("progress.next")} />
       <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(([k, label, v, icon, hue]) => (
@@ -150,36 +151,23 @@ export function Stats() {
       </Section>
 
       <Section title={t("progress.history")} icon="calendar">
-        <ul className="card divide-y divide-line">
-          {stats.sessions.slice(0, 20).map((s) => (
-            <li key={s.sessionId} className="px-4 py-3">
-              <div className="flex justify-between">
-                <span className="font-medium">{ago(s.start, now)}</span>
-                <span className="num text-sm text-muted">
-                  {clock(s.seconds)} · {t("progress.sessionSets", { count: s.sets })}
-                  {s.avgHr ? ` · ♥ ${num(s.avgHr)}` : ""}
-                  {s.prs ? ` · ${t("progress.sessionPrs", { count: s.prs })}` : ""}
-                </span>
-              </div>
-              <div className="mt-0.5 truncate text-sm text-muted">{list(s.exercises.map((e) => exercise(e).name))}</div>
-            </li>
-          ))}
-          {!stats.sessions.length && (
-            <li>
-              <EmptyState
-                icon="calendar"
-                mascot="happy"
-                title={t("progress.noWorkouts")}
-                body={t("progress.noWorkouts.body")}
-                action={
-                  <Button icon="play" onClick={() => go("today")}>
-                    {t("progress.plan")}
-                  </Button>
-                }
-              />
-            </li>
-          )}
-        </ul>
+        {stats.sessions.length ? (
+          <HistoryCalendar />
+        ) : (
+          <div className="card">
+            <EmptyState
+              icon="calendar"
+              mascot="happy"
+              title={t("progress.noWorkouts")}
+              body={t("progress.noWorkouts.body")}
+              action={
+                <Button icon="play" onClick={() => go("today")}>
+                  {t("progress.plan")}
+                </Button>
+              }
+            />
+          </div>
+        )}
       </Section>
     </div>
   );

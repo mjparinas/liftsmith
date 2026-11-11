@@ -94,11 +94,20 @@ export function calcTdee(i: TdeeInputs): TdeeResult {
   };
 }
 
+export type BmiCategory = "under" | "healthy" | "over" | "obese";
+
+/** The standard adult BMI bands: under 18.5, 18.5 to 25, 25 to 30, 30 and over. */
+export const BMI_CUTS = [18.5, 25, 30] as const;
+
+export function bmiCategory(bmi: number): BmiCategory {
+  if (bmi < 18.5) return "under";
+  if (bmi < 25) return "healthy";
+  if (bmi < 30) return "over";
+  return "obese";
+}
+
 export function bmiBand(bmi: number): string {
-  if (bmi < 18.5) return t("bmi.under");
-  if (bmi < 25) return t("bmi.healthy");
-  if (bmi < 30) return t("bmi.over");
-  return t("bmi.obese");
+  return t(`bmi.${bmiCategory(bmi)}`);
 }
 
 // --- Activity from the lifter's own training ---

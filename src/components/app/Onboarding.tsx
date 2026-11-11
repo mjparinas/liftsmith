@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { Info } from "@/components/Info";
+import { SCREEN_TITLE } from "@/components/titles";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
 import { useBack } from "@/lib/back";
 import { billingLive, useBilling } from "@/lib/billing";
@@ -307,7 +308,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               <Mascot mood="happy" size={64} className="animate-spring-in shrink-0" />
               <div>
                 <p className="text-gradient text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
-                <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{t("setup.goal.title")}</h1>
+                <h1 className={`mt-1 ${SCREEN_TITLE}`}>{t("setup.goal.title")}</h1>
               </div>
             </div>
             {freshAccount && (
@@ -343,7 +344,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 1 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.gym.title")}</h1>
+            <h1 className={SCREEN_TITLE}>{t("setup.gym.title")}</h1>
             <p className="mt-2 text-muted">{t("setup.gym.note")}</p>
             <div className="mt-6 grid grid-cols-2 gap-3">
               {rerun && gyms.length > 0 && (
@@ -385,7 +386,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 2 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.days.title")}</h1>
+            <h1 className={SCREEN_TITLE}>{t("setup.days.title")}</h1>
             <div className="mt-6 grid grid-cols-6 gap-2">
               {[1, 2, 3, 4, 5, 6].map((d) => (
                 <button
@@ -514,7 +515,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         )}
         {step === 3 && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">{t("setup.zone.title")}</h1>
+            <h1 className={SCREEN_TITLE}>{t("setup.zone.title")}</h1>
             <p className="mt-2 text-muted">{t("setup.zone.note")}</p>
             <div className="mt-6 space-y-3">
               <Tile
@@ -577,9 +578,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         {step === 4 && <SaveStep />}
         {step === PRO_STEP && (
           <>
-            <h1 className="text-3xl font-extrabold tracking-tight">
-              {offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}
-            </h1>
+            <h1 className={SCREEN_TITLE}>{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
             <ProFeatures compact />
             <Plans

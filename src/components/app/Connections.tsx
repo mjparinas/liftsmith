@@ -41,7 +41,7 @@ import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
 import { go } from "./router";
-import { Button, Chip, Section, SwitchRow } from "./ui";
+import { Button, Chip, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -492,10 +492,7 @@ function MusicCard() {
 export function Connections() {
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("settings.title")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("conn.title")}</h1>
+      <ScreenHeader back={{ label: `‹ ${t("settings.title")}`, onClick: () => go("settings") }} title={t("conn.title")} />
       <p className="mt-1 text-sm text-muted">{t("conn.intro")}</p>
       <Section
         title={{ ios: t("conn.health.ios"), android: t("conn.health.android"), web: t("conn.health.web.title") }[platform()]}

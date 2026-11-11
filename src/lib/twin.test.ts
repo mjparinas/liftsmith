@@ -125,6 +125,19 @@ describe("the health twin", () => {
     expect(m.why).toMatch(/costs muscle/);
   });
 
+  it("says slow weight loss plainly, and calls it good only when building muscle isn't the goal", () => {
+    // About 0.5% a week down over three weeks.
+    const evs: AppEvent[] = [0, 7, 14, 21].map((d, i) => ({
+      type: "bodyweight",
+      id: `w${i}`,
+      at: NOW - (21 - d) * DAY,
+      kg: 90 - i * 0.45,
+    }));
+    expect(get(evs, "weight").chip).toBe("Losing slowly");
+    expect(get(evs, "weight", { ...profile, goal: "strength" }).status).toBe("good");
+    expect(get(evs, "weight", { ...profile, goal: "muscle" }).status).toBe("info");
+  });
+
   it("marks health metrics missing on the web without offering to connect", () => {
     const m = twin({ events: [], profile, sessions: [], now: NOW, pro: true, native: false }).find((x) => x.id === "sleep")!;
     expect(m.status).toBe("missing");

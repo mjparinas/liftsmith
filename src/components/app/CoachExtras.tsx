@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { exercise } from "@/lib/exercises";
 import { explain } from "@/lib/explain";
 import { alternatives, type PlanItem } from "@/lib/generator";
@@ -104,7 +105,7 @@ export function ReplanSheet({
       ) : (
         <div className="space-y-5">
           <div>
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">{t("coach.short")}</h3>
+            <h3 className={SECTION_LABEL}>{t("coach.short")}</h3>
             <p className="mt-1 text-sm text-faint">{t("coach.shortHint", { min: left })}</p>
             {options.length ? (
               <div className="mt-2 grid grid-cols-3 gap-2">
@@ -128,7 +129,7 @@ export function ReplanSheet({
           </div>
           {item && busy.length > 0 && (
             <div>
-              <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">
+              <h3 className={SECTION_LABEL}>
                 {t("coach.taken", {
                   items: list(
                     busy.map((e) => EQUIPMENT_LABEL[e]),

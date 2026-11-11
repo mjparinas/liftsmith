@@ -201,7 +201,7 @@ describe("first run to finished workout", () => {
     fireEvent.click(more); // keyboard or screen reader: one step
     expect(useApp.getState().active!.reps).toBe(start + 1);
     fireEvent.pointerDown(more, { button: 0 });
-    await act(() => new Promise((r) => setTimeout(r, 900)));
+    await act(() => new Promise((r) => setTimeout(r, 1300)));
     fireEvent.pointerUp(more);
     const held = useApp.getState().active!.reps;
     expect(held).toBeGreaterThanOrEqual(start + 4);
@@ -582,8 +582,8 @@ describe("game layer", () => {
     expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
     expect(screen.getByText(/-week streak/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "See all achievements" }));
-    expect(await screen.findByRole("heading", { name: "Achievements" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "See all awards" }));
+    expect(await screen.findByRole("heading", { name: "Awards" })).toBeInTheDocument();
     expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
     expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
     expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();

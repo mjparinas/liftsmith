@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { breathPhase, plateQuiz } from "@/components/app/WorkoutExtras";
 import { makeSet } from "@/test/factories";
 
+import { ACHIEVEMENTS, achName, tierNames } from "./achievements";
 import { checkinText } from "./buddy";
 import { defaultProfile, makeGym } from "./defaults";
 import { derive } from "./derive";
@@ -16,7 +17,7 @@ import { monthOf, recap, suggestedPeriod, yearOf } from "./recap";
 import { nextSeasonal, SEASONAL, seasonalChallenges } from "./seasonal";
 import { ageFactor, percentileOf, scoreBand, scoreOf, strength, twins } from "./strength";
 import { STRETCHES, suggest } from "./stretches";
-import { activeTheme, newlyUnlocked, THEMES, unlocked } from "./themes";
+import { activeTheme, newlyUnlocked, THEMES, themesForBadge, unlockContext, unlocked } from "./themes";
 import type { AppEvent, SetEvent } from "./types";
 import { doneCue, exerciseCue, setCue, spokenLoad } from "./voice";
 
@@ -311,31 +312,41 @@ describe("seasonal challenges", () => {
 });
 
 describe("earned themes", () => {
-  const ctx = (events: AppEvent[], goalWeeks = 0, now = NOW) => ({ stats: derive(events, now), goalWeeks, now });
-  it("unlocks from milestones, and seasonal themes only in season", () => {
+  const ctx = (events: AppEvent[], now = NOW, badges: Record<string, number> = {}) => {
+    const c = unlockContext(events, derive(events, now), { ...defaultProfile(NOW), activeGymId: "g", onboarded: true }, now);
+    return { ...c, badges: new Map([...c.badges, ...Object.entries(badges)]) };
+  };
+  const theme = (id: string) => THEMES.find((t) => t.id === id)!;
+  it("unlocks from badges, and seasonal themes only in season", () => {
     const empty = ctx([]);
     expect(THEMES.filter((t) => unlocked(t, empty)).map((t) => t.id)).toEqual(["midnight"]);
-    expect(
-      unlocked(
-        THEMES.find((t) => t.id === "frost")!,
-        ctx([], 0, new Date("2026-12-05").getTime()),
-      ),
-    ).toBe(true);
-    expect(
-      unlocked(
-        THEMES.find((t) => t.id === "aurora")!,
-        ctx([], 8),
-      ),
-    ).toBe(true);
+    expect(unlocked(theme("frost"), ctx([], new Date("2026-12-05").getTime()))).toBe(true);
+    // Unbroken silver (8 goal weeks running) unlocks Aurora.
+    expect(unlocked(theme("aurora"), ctx([], NOW, { "goal-streak": 1 }))).toBe(false);
+    expect(unlocked(theme("aurora"), ctx([], NOW, { "goal-streak": 2 }))).toBe(true);
+    // A real 10 t workout earns Tonnage bronze, which unlocks Forge.
     const heavy = [...workout(1, 600)];
-    expect(
-      unlocked(
-        THEMES.find((t) => t.id === "forge")!,
-        ctx(heavy),
-      ),
-    ).toBe(true);
+    expect(unlocked(theme("forge"), ctx(heavy))).toBe(true);
     expect(newlyUnlocked([], ctx(heavy)).map((t) => t.id)).toEqual(["forge"]);
     expect(newlyUnlocked(["forge"], ctx(heavy))).toEqual([]);
+  });
+  it("hangs every milestone theme off a real badge tier, and says which", () => {
+    for (const t of THEMES.filter((t) => t.badge)) {
+      expect(
+        ACHIEVEMENTS.some((a) => a.id === t.badge!.id),
+        t.id,
+      ).toBe(true);
+      expect(tierNames(t.badge!.id), t.id).toContain(t.badge!.tier);
+      expect(t.how).toContain(achName(t.badge!.id));
+    }
+    expect(themesForBadge("workouts").map((x) => [x.tier, x.theme.id])).toEqual([["silver", "glacier"]]);
+    expect(themesForBadge("tonnes").map((x) => x.theme.id)).toEqual(["forge", "abyss"]);
+  });
+  it("keeps Rose for anyone who earned it under the old 50-workout rule", () => {
+    const stats = { ...derive([], NOW), sessions: Array.from({ length: 50 }, () => derive(workout(1, 10), NOW).sessions[0]!) };
+    expect(unlocked(theme("rose"), { stats, badges: new Map(), now: NOW })).toBe(true);
+    expect(unlocked(theme("rose"), ctx([], NOW, { sets: 2 }))).toBe(true);
+    expect(unlocked(theme("rose"), ctx([], NOW, { sets: 1 }))).toBe(false);
   });
   it("falls back to Midnight when a picked theme isn't open", () => {
     expect(activeTheme("frost", ctx([])).id).toBe("midnight");
