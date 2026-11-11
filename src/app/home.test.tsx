@@ -98,7 +98,7 @@ describe("hero lifter", () => {
     expect(new Set(HERO_PROGRAM.map((s) => s.body))).toEqual(new Set(["male", "female"]));
   });
 
-  it("does the maths it shows", () => {
+  it("does the math it shows", () => {
     expect(epley(100, 5)).toBeCloseTo(116.67, 1);
     expect(epley(100, 0)).toBe(0);
     expect(perSide(100)).toEqual([25, 15]); // 20 kg bar + 2 × 40 kg

@@ -81,7 +81,7 @@ export default function Privacy() {
 
         <h2 className="mt-8 text-xl font-semibold">Health data</h2>
         <p className="mt-2">
-          If you try the rep counter, the camera picture and motion sensor readings are analysed on your device as you lift and then thrown
+          If you try the rep counter, the camera picture and motion sensor readings are analyzed on your device as you lift and then thrown
           away. Nothing is recorded, saved or sent to us.
         </p>
         <p className="mt-2">

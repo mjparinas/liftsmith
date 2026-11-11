@@ -21,7 +21,7 @@ export const TOPIC_LABEL: Record<Topic, string> = {
   plans: "Plans your workouts",
   recovery: "Recovery",
   blocks: "Training blocks and deloads",
-  plates: "Plate maths",
+  plates: "Plate math",
   rest: "Rest timer",
   social: "Social",
   platforms: "Platforms",
@@ -145,7 +145,7 @@ export const COMPETITORS: Competitor[] = [
     ourPick: [
       "Workouts planned for you, or any fixed program free",
       "No limit on routines on the free plan",
-      "Plate maths free on every set",
+      "Plate math free on every set",
       "Health Connect on Android",
       "Import your Strong CSV export and keep your history",
     ],

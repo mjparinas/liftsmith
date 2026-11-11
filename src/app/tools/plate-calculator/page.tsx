@@ -63,7 +63,7 @@ export default function PlatePage() {
       </div>
       <CtaInline
         cta="tool-plates-mid"
-        title="Stop doing plate maths between sets"
+        title="Stop doing plate math between sets"
         body={`${BRAND.name} draws the plates for every set and shows what to change for the next one while you rest.`}
         button="Try it free"
       />
