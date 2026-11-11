@@ -40,7 +40,7 @@ import { useApp } from "@/lib/store";
 import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
-import { go } from "./router";
+import { go, useRoute } from "./router";
 import { Button, Chip, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
@@ -490,6 +490,12 @@ function MusicCard() {
 }
 
 export function Connections() {
+  // #/connections/hr (the health twin's "Pair a monitor") lands on the heart rate monitor. Pairing itself
+  // stays one tap there: the phone's Bluetooth picker only opens from a tap.
+  const { arg } = useRoute();
+  useEffect(() => {
+    if (arg === "hr") document.getElementById("conn-hr")?.scrollIntoView?.({ block: "start" });
+  }, [arg]);
   return (
     <div className="pb-2">
       <ScreenHeader back={{ label: `‹ ${t("settings.title")}`, onClick: () => go("settings") }} title={t("conn.title")} />
@@ -500,9 +506,11 @@ export function Connections() {
       >
         <HealthCard />
       </Section>
-      <Section title={t("conn.hr.title")} icon="bolt">
-        <HeartRateCard />
-      </Section>
+      <div id="conn-hr" className="scroll-mt-14">
+        <Section title={t("conn.hr.title")} icon="bolt">
+          <HeartRateCard />
+        </Section>
+      </div>
       <Section title={t("conn.garmin.title")} icon="watch">
         <GarminCard />
       </Section>

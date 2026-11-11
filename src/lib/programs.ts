@@ -223,6 +223,8 @@ interface Day {
 
 interface Engine {
   days: number;
+  /** The name a day is shown with (the same one `build` gives it), for past workouts in the History calendar. */
+  dayName(day: number): string;
   keys(ctx: Ctx): string[];
   startFor(key: string, ctx: Ctx): number;
   /** Lift state before any session, from the frozen start value. */
@@ -332,6 +334,7 @@ function linearEngine(def: LinearDef): Engine {
   const liftsOf = (s: State, day: number) => def.pick?.(s, day) ?? def.days[day]!.lifts;
   return {
     days: def.days.length,
+    dayName: (day) => def.days[day % def.days.length]!.name,
     keys: all,
     startFor(key, ctx) {
       const acc = def.accessories?.has(key);
@@ -468,6 +471,7 @@ const WEEKLY = 1.025;
 
 const RAMPING: Engine = {
   days: 3,
+  dayName: (day) => t(day === 0 ? "pgm.heavy" : day === 1 ? "pgm.light" : "pgm.top"),
   keys: () => ["back-squat", "bench-press", "barbell-row", "overhead-press", "deadlift"],
   // Start a little under a five-rep max, so the first new best comes in about the fourth week.
   startFor: (key, ctx) => W(key, ctx, 5, 1) * 0.93,
@@ -564,6 +568,7 @@ const TIER_DAYS: { t1: string; t2: string; t3: string }[] = [
 
 const TIERED: Engine = {
   days: 4,
+  dayName: (day) => t("pgm.day", { n: day + 1 }),
   keys: () => [...new Set(TIER_DAYS.flatMap((d) => [`T1:${d.t1}`, `T2:${d.t2}`, `T3:${d.t3}`]))],
   startFor(key, ctx) {
     const [tier, ex] = key.split(":") as [string, string];
@@ -681,8 +686,16 @@ const WAVES: { key: MessageKey; pcts: number[]; reps: number[]; amrap: boolean }
   { key: "pgm.wDeload", pcts: [0.4, 0.5, 0.6], reps: [5, 5, 5], amrap: false },
 ];
 
+const WAVE_DAY: Record<(typeof WAVE_LIFTS)[number], MessageKey> = {
+  "overhead-press": "pgm.pressDay",
+  deadlift: "pgm.deadliftDay",
+  "bench-press": "pgm.benchDay",
+  squat: "pgm.squatDay",
+};
+
 const WAVE: Engine = {
   days: 4,
+  dayName: (day) => t(WAVE_DAY[WAVE_LIFTS[day % WAVE_LIFTS.length]!]),
   keys: () => WAVE_LIFTS.flatMap((l) => [`tm:${WAVE_EX[l]}`, `acc:${WAVE_ASSIST[l]}`]),
   startFor(key, ctx) {
     const [kind, ex] = key.split(":") as [string, string];
@@ -707,11 +720,7 @@ const WAVE: Engine = {
     const a = lift(`acc:${aEx}`);
     const bw = exercise(aEx).load === "bodyweight";
     return {
-      name: t(
-        { "overhead-press": "pgm.pressDay", deadlift: "pgm.deadliftDay", "bench-press": "pgm.benchDay", squat: "pgm.squatDay" }[
-          name
-        ] as MessageKey,
-      ),
+      name: t(WAVE_DAY[name]),
       note: t("pgm.cycle", { n: cycle, week: t(w.key) }),
       slots: [
         {
@@ -841,6 +850,7 @@ const HOLD_MAX = 60;
 
 const LADDER: Engine = {
   days: 1,
+  dayName: () => t("pgm.fullBody"),
   keys: () => LADDERS.map((l) => `ladder:${l.key}`),
   startFor(key, ctx) {
     const lad = LADDERS.find((l) => `ladder:${l.key}` === key)!;
@@ -1096,6 +1106,18 @@ export interface ProgramPlanInput extends Ctx {
   call?: Call;
   challenge?: boolean;
   exclude?: readonly string[];
+}
+
+/**
+ * What a past workout from a program was called: "Classic 5×5 · Workout A", "Push/pull/legs · Pull day".
+ * Null for an unknown program (one removed since).
+ */
+export function programDayLabel(id: string, day: number): { program: string; day: string } | null {
+  const info = PROGRAM_BY_ID.get(id);
+  if (!info) return null;
+  const split = info.kind === "split" ? SPLITS[info.id as keyof typeof SPLITS] : undefined;
+  const name = split ? split[day % split.length]?.name : ENGINES[info.id]?.dayName(day);
+  return name ? { program: info.name, day: name } : null;
 }
 
 /** Today's plan from the lifter's program. */

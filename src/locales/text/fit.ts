@@ -27,7 +27,7 @@ export const en = {
       "Strength training in the last 7 days: {count} days, {minutes} min. Guidelines suggest muscle-strengthening work on 2 or more days a week.",
   },
   "fit.score": "Strength score: {score} ({band}), against typical lifters your weight.",
-  "fit.seeProgress": "See Progress",
+  "fit.seeStrength": "See strength score",
   "fit.how": "How is this worked out?",
   "fit.missing.vo2":
     "Needs a VO₂ max reading from a watch (Apple Watch, Fitbit, Pixel Watch or Garmin) through {source}. Watches record it after outdoor walks or runs.",
@@ -71,7 +71,7 @@ export const es: Partial<Record<Key, Message>> = {
     other: "Fuerza en los últimos 7 días: {count} días, {minutes} min. Las guías recomiendan trabajo de fuerza 2 o más días a la semana.",
   },
   "fit.score": "Puntuación de fuerza: {score} ({band}), frente a levantadores típicos de tu peso.",
-  "fit.seeProgress": "Ver Progreso",
+  "fit.seeStrength": "Ver puntuación de fuerza",
   "fit.how": "¿Cómo se calcula?",
   "fit.missing.vo2":
     "Necesita una lectura de VO₂ máx de un reloj (Apple Watch, Fitbit, Pixel Watch o Garmin) a través de {source}. Los relojes la registran tras caminar o correr al aire libre.",
@@ -114,7 +114,7 @@ export const fr: Partial<Record<Key, Message>> = {
       "Musculation sur les 7 derniers jours : {count} jours, {minutes} min. Les recommandations conseillent du renforcement musculaire 2 jours par semaine ou plus.",
   },
   "fit.score": "Score de force : {score} ({band}), par rapport aux pratiquants typiques de votre poids.",
-  "fit.seeProgress": "Voir Progrès",
+  "fit.seeStrength": "Voir le score de force",
   "fit.how": "Comment est-ce calculé ?",
   "fit.missing.vo2":
     "Nécessite une mesure de VO₂ max d’une montre (Apple Watch, Fitbit, Pixel Watch ou Garmin) via {source}. Les montres la mesurent après une marche ou une course en extérieur.",
@@ -157,7 +157,7 @@ export const de: Partial<Record<Key, Message>> = {
       "Krafttraining in den letzten 7 Tagen: {count} Tage, {minutes} Min. Empfehlungen raten zu muskelkräftigendem Training an 2 oder mehr Tagen pro Woche.",
   },
   "fit.score": "Kraftwert: {score} ({band}), im Vergleich zu typischen Liftern mit deinem Gewicht.",
-  "fit.seeProgress": "Fortschritt ansehen",
+  "fit.seeStrength": "Kraftwert ansehen",
   "fit.how": "Wie wird das berechnet?",
   "fit.missing.vo2":
     "Braucht einen VO₂max-Wert von einer Uhr (Apple Watch, Fitbit, Pixel Watch oder Garmin) über {source}. Uhren messen ihn nach Spaziergängen oder Läufen im Freien.",
@@ -200,7 +200,7 @@ export const it: Partial<Record<Key, Message>> = {
       "Allenamento di forza negli ultimi 7 giorni: {count} giorni, {minutes} min. Le linee guida consigliano esercizi di rinforzo muscolare almeno 2 giorni a settimana.",
   },
   "fit.score": "Punteggio di forza: {score} ({band}), rispetto ad atleti tipici del tuo peso.",
-  "fit.seeProgress": "Vedi Progressi",
+  "fit.seeStrength": "Vedi punteggio di forza",
   "fit.how": "Come viene calcolato?",
   "fit.missing.vo2":
     "Serve una misura di VO₂ max da un orologio (Apple Watch, Fitbit, Pixel Watch o Garmin) tramite {source}. Gli orologi la registrano dopo camminate o corse all’aperto.",
@@ -238,7 +238,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "トレーニングで最も早く変わる数値です。インターバル、坂道ウォーキング、ローイングなど、20分のきつめの有酸素運動を週2回行うと、たいてい6〜8週間で VO₂ max が上がります。筋トレではほとんど変わりません。",
   "fit.strength": { other: "直近7日間の筋トレ：{count}日、{minutes}分。ガイドラインでは週2日以上の筋力トレーニングが推奨されています。" },
   "fit.score": "筋力スコア：{score}（{band}）。同じ体重の一般的なリフターとの比較です。",
-  "fit.seeProgress": "進捗を見る",
+  "fit.seeStrength": "筋力スコアを見る",
   "fit.how": "どうやって計算していますか？",
   "fit.missing.vo2":
     "{source}経由で、ウォッチ（Apple Watch、Fitbit、Pixel Watch、Garmin）の VO₂ max の値が必要です。ウォッチは屋外でのウォーキングやランニングの後に記録します。",

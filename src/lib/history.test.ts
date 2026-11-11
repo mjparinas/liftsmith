@@ -4,7 +4,8 @@ import { makeWorkout } from "@/test/factories";
 
 import { derive } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
-import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth } from "./history";
+import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, workoutName } from "./history";
+import { PROGRAM_BY_ID, programDayLabel, PROGRAMS } from "./programs";
 
 const at = (y: number, m: number, d: number) => new Date(y, m, d, 18).getTime();
 
@@ -46,5 +47,22 @@ describe("history calendar", () => {
     const light = events.find((e) => e.type === "set" && e.weight === 50)!;
     expect(ids.has(heavy.id)).toBe(true);
     expect(ids.has(light.id)).toBe(false);
+  });
+
+  it("names a past workout by its routine, else its program day, else nothing", () => {
+    const routines = [{ id: "r1", name: "Garage day", items: [], createdAt: 0, updatedAt: 0 }];
+    expect(workoutName({ routine: "r1", program: { id: "ppl", day: 1 } }, routines)).toBe("Garage day");
+    expect(workoutName({ program: { id: "classic-5x5", day: 0 } }, routines)).toBe(`${PROGRAM_BY_ID.get("classic-5x5")!.name} · Workout A`);
+    expect(workoutName({ program: { id: "ppl", day: 1 } }, [])).toBe(`${PROGRAM_BY_ID.get("ppl")!.name} · Pull day`);
+    // An adaptive workout, a removed routine and an unknown program have no name.
+    expect(workoutName({}, routines)).toBeNull();
+    expect(workoutName({ routine: "gone" }, routines)).toBeNull();
+    expect(workoutName({ program: { id: "nope", day: 0 } }, routines)).toBeNull();
+  });
+
+  it("gives every day of every program a name", () => {
+    for (const p of PROGRAMS) {
+      for (let day = 0; day < 4; day++) expect(programDayLabel(p.id, day)?.day, `${p.id} day ${day}`).toMatch(/\S/);
+    }
   });
 });

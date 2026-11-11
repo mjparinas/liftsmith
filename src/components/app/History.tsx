@@ -5,7 +5,7 @@ import { useMemo, useRef, useState, type TouchEvent } from "react";
 import { dayKey, monthGrid, sessionDetail, weekdayNames } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
-import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, type YearMonth } from "@/lib/history";
+import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, workoutName, type YearMonth } from "@/lib/history";
 import { date, list, num, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { sessionShares } from "@/lib/shareCards";
@@ -193,11 +193,12 @@ export function HistoryCalendar() {
 }
 
 function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: Unit; prIds: Set<string> }) {
-  const { events, stats } = useApp();
+  const { events, stats, profile } = useApp();
   const detail = useMemo(() => sessionDetail(events, summary.sessionId), [events, summary.sessionId]);
   const ctx = useShareContext(useGame());
   const [sharing, setSharing] = useState(false);
   if (!detail) return null;
+  const name = workoutName(detail, profile.routines);
   const facts = [
     t("dash.min", { n: Math.max(1, Math.round(summary.seconds / 60)) }),
     t("progress.sessionSets", { count: summary.sets }),
@@ -220,6 +221,11 @@ function WorkoutCard({ summary, unit, prIds }: { summary: SessionSummary; unit: 
           <Icon name="share" size={20} />
         </button>
       </div>
+      {name && (
+        <p className="text-sm font-semibold text-accent" data-testid="workout-name">
+          {name}
+        </p>
+      )}
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={sessionShares(summary, stats.prs, ctx)} />
       <p className="num mt-0.5 text-sm text-muted">
         {facts.join(" · ")}

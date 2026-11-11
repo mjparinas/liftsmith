@@ -27,6 +27,7 @@ import { useNow } from "@/lib/useNow";
 import { openStats } from "./BodyStats";
 import { go } from "./router";
 import { Button, EmptyState, ProTag, Section, Sheet } from "./ui";
+import { WeighInForm } from "./WeighIn";
 
 const BODY: TwinId[] = ["weight", "leanMass", "bodyFat", "bmi", "tdee", "steps"];
 const HEART: TwinId[] = ["sleep", "hrv", "restingHr", "breathing", "vo2max", "restDrop"];
@@ -267,8 +268,8 @@ function FitnessAgeCard({ native, store }: { native: boolean; store: string }) {
             </Button>
           )}
           {score !== null && (
-            <Button kind="ghost" onClick={() => go("stats")}>
-              {t("fit.seeProgress")}
+            <Button kind="ghost" onClick={() => go("stats", "strength")}>
+              {t("fit.seeStrength")}
             </Button>
           )}
         </div>
@@ -371,6 +372,12 @@ function Detail({ m, store, onEasy }: { m: TwinMetric; store: string; onEasy: ()
       )}
       {m.action?.kind === "connect" && <HealthConnect key={m.id} id={m.id} store={store} empty={m.status === "missing"} />}
       <div className="mt-4 flex flex-wrap gap-2">
+        {m.action?.kind === "weighIn" && (
+          <section aria-label={m.action.label} className="w-full">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">{m.action.label}</h3>
+            <WeighInForm id={`twin-${m.id}`} className="mt-2" />
+          </section>
+        )}
         {m.action?.kind === "route" && (
           <Button
             kind="ghost"
