@@ -6,7 +6,8 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { exercise } from "@/lib/exercises";
-import { makeTestGym } from "@/test/factories";
+import { useApp } from "@/lib/store";
+import { DAY, makeSet, makeTestGym } from "@/test/factories";
 
 import { clearWarmupSpeeds, recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds, warmupSpeeds } from "./SpeedNudge";
 
@@ -19,7 +20,10 @@ function warmUp(max: number) {
   [20, 60, 80].forEach((kg, i) => recordWarmupSpeed("s1", squat.id, i, { kg, speed: 0.3 + 0.006 * (max - kg) }));
 }
 
-beforeEach(clearWarmupSpeeds);
+beforeEach(() => {
+  clearWarmupSpeeds();
+  useApp.setState({ events: [] });
+});
 afterEach(cleanup);
 
 describe("today's max from warm-ups", () => {
@@ -43,6 +47,27 @@ describe("today's max from warm-ups", () => {
     warmUp(125);
     render(<SpeedNudge sessionId="s1" ex={squat} gym={gym} planned={planned} weight={100} reps={5} onUse={() => {}} />);
     expect(screen.getByTestId("speed-nudge").textContent).toMatch(/as expected.*Stay with 100 kg/);
+  });
+
+  it("says it uses the usual end-of-set speed until three sets to failure teach it the lifter's own", () => {
+    warmUp(125);
+    render(<SpeedNudge sessionId="s1" ex={squat} gym={gym} planned={planned} weight={100} reps={5} onUse={() => {}} />);
+    expect(screen.getByTestId("speed-threshold").textContent).toBe(
+      "Measured against the usual end-of-set speed for this lift, 0.30 m/s. Take 3 more sets to failure while the camera counts and it learns your own.",
+    );
+  });
+
+  it("uses the lifter's own end-of-set speed once they have enough hard sets, and says so", () => {
+    // Same warm-ups as "as expected" against the textbook 0.30 m/s, but this lifter's sets end at 0.45 m/s.
+    useApp.setState({
+      events: [1, 2, 3, 4].map((d) => makeSet({ exerciseId: squat.id, endSpeed: 0.45, failedRep: true, at: Date.now() - d * DAY })),
+    });
+    warmUp(125);
+    render(<SpeedNudge sessionId="s1" ex={squat} gym={gym} planned={planned} weight={100} reps={5} onUse={() => {}} />);
+    expect(screen.getByTestId("speed-threshold").textContent).toBe(
+      "Measured against your own end-of-set speed for this lift, 0.40 m/s, learned from 4 sets you took to failure.",
+    );
+    expect(screen.getByTestId("speed-nudge").textContent).toMatch(/below what the plan expects/);
   });
 
   it("shows nothing with one warm-up speed, and an undone warm-up drops its speed", () => {

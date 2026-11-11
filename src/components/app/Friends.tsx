@@ -3,19 +3,25 @@
 // Friends and the workout feed (Melvin, 2026-11-11; docs/decisions/friends.md). One screen (#/friends) with the
 // feed, activity and people, a person's page (#/person/<handle>), a post's comments in a sheet, and the post
 // button on Done. Opened from the people button on Today's header (Melvin chose it over a sixth tab).
-import { useCallback, useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
+import { achName, TIER_LABEL } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
+import { badgeForItem, COSMETICS, levelForItem } from "@/lib/game";
 import { list as fmtList, t } from "@/lib/i18n";
 import { haptic, isNative, oops, sound } from "@/lib/juice";
+import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
+  bestLifts,
+  postRoutineCode,
   postWorkout,
+  profileChanges,
   profileUrl,
   publicPageUrl,
   refreshSocial,
@@ -26,11 +32,13 @@ import {
   type SocialMe,
 } from "@/lib/social";
 import {
+  AUDIENCES,
   cleanHandle,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
   type ActivityItem,
+  type Audience,
   type FeedComment,
   type FeedPost,
   type PersonCard,
@@ -44,31 +52,14 @@ import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import type { MessageKey } from "@/locales/en";
 
+import { useGame } from "./Achievements";
+import { Avatar } from "./AvatarFace";
 import { ago, clock, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
-
-function Avatar({ name, size = 40 }: { name: string; size?: number }) {
-  const letter = [...(name.trim() || "?")][0]!.toLocaleUpperCase();
-  return (
-    <span
-      aria-hidden
-      className="grid shrink-0 place-items-center rounded-full font-bold"
-      style={{
-        width: size,
-        height: size,
-        background:
-          "linear-gradient(135deg, color-mix(in srgb, var(--grad-a) 30%, transparent), color-mix(in srgb, var(--grad-c) 30%, transparent))",
-        color: "var(--color-ink)",
-      }}
-    >
-      {letter}
-    </span>
-  );
-}
 
 function Note({ text }: { text: string | null }) {
   if (!text) return null;
@@ -92,13 +83,120 @@ function bestSet(e: FeedPost["body"]["exercises"][number], unit: Unit): string {
 
 // --- A post ---
 
+/** Who can see a post, in words. */
+const AUDIENCE_LABEL: Record<Audience, MessageKey> = { all: "friends.aud.all", friends: "friends.aud.friends", me: "friends.aud.me" };
+const AUDIENCE_HINT: Record<Audience, MessageKey> = {
+  all: "friends.aud.allHint",
+  friends: "friends.aud.friendsHint",
+  me: "friends.aud.meHint",
+};
+
+function AudienceChips({ value, onChange, publicProfile }: { value: Audience; onChange: (a: Audience) => void; publicProfile: boolean }) {
+  return (
+    <>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.aud.title")}>
+        {AUDIENCES.map((a) => (
+          <Chip key={a} active={value === a} onClick={() => onChange(a)}>
+            {t(AUDIENCE_LABEL[a])}
+          </Chip>
+        ))}
+      </div>
+      <p className="mt-2 text-xs text-muted">{t(value === "all" && publicProfile ? "friends.aud.allPublicHint" : AUDIENCE_HINT[value])}</p>
+    </>
+  );
+}
+
+/**
+ * Writing a post: an optional caption and who sees it. Done's "Post to friends" and a post's "Edit post" both
+ * open it. Mounted only while open, so it starts from what's saved each time.
+ */
+export function ComposeSheet(props: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  submit: string;
+  caption: string;
+  audience: Audience;
+  onSubmit: (v: { caption: string; audience: Audience }) => Promise<string | null>;
+}) {
+  return props.open ? <ComposeBody {...props} /> : null;
+}
+
+function ComposeBody({
+  onClose,
+  title,
+  submit,
+  caption: initialCaption,
+  audience: initialAudience,
+  onSubmit,
+}: Parameters<typeof ComposeSheet>[0]) {
+  const me = useSocial((st) => st.me);
+  const [caption, setCaption] = useState(initialCaption);
+  const [audience, setAudience] = useState<Audience>(initialAudience);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const send = async (e: FormEvent) => {
+    e.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    const err = await onSubmit({ caption: caption.trim(), audience });
+    setBusy(false);
+    if (err) {
+      oops();
+      setError(err);
+    } else {
+      haptic("success");
+      onClose();
+    }
+  };
+  return (
+    <Sheet open onClose={onClose} title={title}>
+      <form onSubmit={(e) => void send(e)}>
+        <label htmlFor="fr-caption" className="block text-sm text-muted">
+          {t("friends.caption")}
+        </label>
+        <textarea
+          id="fr-caption"
+          value={caption}
+          maxLength={SOCIAL_LIMITS.caption}
+          rows={3}
+          onChange={(e) => setCaption(e.target.value)}
+          placeholder={t("friends.captionHint")}
+          className="card mt-1 w-full resize-none px-4 py-3"
+        />
+        <p className={`mb-4 mt-1 ${SECTION_LABEL}`}>{t("friends.aud.title")}</p>
+        <AudienceChips value={audience} onChange={setAudience} publicProfile={!!me?.profile?.public} />
+        <Button submit className="mt-5 w-full" disabled={busy}>
+          {submit}
+        </Button>
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-bad">
+            {error}
+          </p>
+        )}
+      </form>
+    </Sheet>
+  );
+}
+
 function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: FeedPost | null) => void; onOpen?: () => void }) {
   const { profile } = useApp();
   const unit = profile.unit;
   const b = post.body;
   const [more, setMore] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
+  const routine = postRoutineCode(post);
+  const edit = async (v: { caption: string; audience: Audience }) => {
+    try {
+      const r = await social<{ caption: string; audience: Audience }>("editPost", { id: post.id, ...v });
+      onChange({ ...post, caption: r.caption, audience: r.audience });
+      return null;
+    } catch (e) {
+      return socialError(e);
+    }
+  };
   const like = async () => {
     const on = !post.liked;
     haptic(on ? "tap" : "select");
@@ -126,11 +224,12 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
     <article className="card p-4" aria-label={t("friends.post.label", { name: post.name })}>
       <header className="flex items-center gap-3">
         <button type="button" onClick={() => go("person", post.handle)} className="press flex min-w-0 flex-1 items-center gap-3 text-left">
-          <Avatar name={post.name} />
+          <Avatar name={post.name} avatar={post.avatar} />
           <span className="min-w-0">
             <span className="block truncate font-semibold">{post.name}</span>
             <span className="block truncate text-xs text-muted">
               @{post.handle} · {ago(post.at)}
+              {post.mine && post.audience !== "all" ? ` · ${t(AUDIENCE_LABEL[post.audience])}` : ""}
             </span>
           </span>
         </button>
@@ -143,6 +242,7 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           <Icon name="more" size={22} strokeWidth={3} />
         </button>
       </header>
+      {post.caption && <p className="mt-3 whitespace-pre-wrap break-words">{post.caption}</p>}
       <p className="mt-3 text-lg font-bold">{b.prs ? t("friends.post.prs", { count: b.prs }) : t("friends.post.workout")}</p>
       <dl className="mt-2 grid grid-cols-3 gap-2 text-center">
         {[
@@ -194,10 +294,36 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
       <Note text={note} />
       <Sheet open={more} onClose={() => setMore(false)} title={t("friends.post.more")}>
         <div className="space-y-2">
-          {post.mine ? (
-            <Button kind="danger" icon="trash" className="w-full" onClick={() => void remove()}>
-              {t("friends.post.delete")}
+          {routine && (
+            <Button
+              kind="ghost"
+              icon="layers"
+              className="w-full"
+              onClick={() => {
+                setMore(false);
+                track("feature", { name: "social_save_workout" });
+                go("routine", routine);
+              }}
+            >
+              {t("friends.post.save")}
             </Button>
+          )}
+          {post.mine ? (
+            <>
+              <Button
+                kind="ghost"
+                className="w-full"
+                onClick={() => {
+                  setMore(false);
+                  setEditing(true);
+                }}
+              >
+                {t("friends.post.edit")}
+              </Button>
+              <Button kind="danger" icon="trash" className="w-full" onClick={() => void remove()}>
+                {t("friends.post.delete")}
+              </Button>
+            </>
           ) : (
             <Button
               kind="ghost"
@@ -214,6 +340,15 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="post" id={post.id} />
+      <ComposeSheet
+        open={editing}
+        onClose={() => setEditing(false)}
+        title={t("friends.post.edit")}
+        submit={t("friends.save")}
+        caption={post.caption}
+        audience={post.audience}
+        onSubmit={edit}
+      />
     </article>
   );
 }
@@ -277,7 +412,7 @@ function CommentsBody({ post, onClose, onCount }: { post: FeedPost; onClose: () 
         <ul className="space-y-3">
           {comments.map((c) => (
             <li key={c.id} className="flex items-start gap-3">
-              <Avatar name={c.name} size={32} />
+              <Avatar name={c.name} avatar={c.avatar} size={32} />
               <div className="min-w-0 flex-1">
                 <p className="text-sm">
                   <button type="button" className="press font-semibold" onClick={() => go("person", c.handle)}>
@@ -569,6 +704,7 @@ function Privacy({
   autoPost,
   weights,
   pub,
+  joined,
   set,
 }: {
   open: boolean;
@@ -576,6 +712,8 @@ function Privacy({
   weights: boolean;
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
+  /** Once joined: who sees new posts and the best lifts switch. */
+  joined?: Pick<SocialProfile, "audience" | "showLifts">;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
@@ -596,6 +734,18 @@ function Privacy({
       />
       <SwitchRow label={t("friends.autoPost")} hint={t("friends.autoPostHint")} on={autoPost} onChange={(v) => set({ autoPost: v })} />
       <SwitchRow label={t("friends.weights")} hint={t("friends.weightsHint")} on={weights} onChange={(v) => set({ weights: v })} />
+      {joined && (
+        <>
+          <SwitchRow
+            label={t("friends.showLifts")}
+            hint={t(weights ? "friends.showLiftsHint" : "friends.showLiftsNoWeights")}
+            on={joined.showLifts && weights}
+            onChange={(v) => set({ showLifts: v, ...(v ? { weights: true } : {}) })}
+          />
+          <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{t("friends.aud.default")}</p>
+          <AudienceChips value={joined.audience} onChange={(a) => set({ audience: a })} publicProfile={!!pub} />
+        </>
+      )}
       <p className="mt-2 px-1 text-xs text-muted">{t("friends.never")}</p>
     </Section>
   );
@@ -623,6 +773,70 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
           {t("friends.notify.blocked")}
         </p>
       )}
+    </Section>
+  );
+}
+
+/**
+ * Friends settings › Avatar: the four everyone has, then the ones levels and badges bring (the same items as the
+ * Locker on Awards, so picking in either place is one setting, profile.cosmetics.avatar). A locked one says how to
+ * get it.
+ */
+function AvatarPicker() {
+  const { profile, setProfile } = useApp();
+  const g = useGame();
+  const me = useSocial((st) => st.me);
+  const [hint, setHint] = useState<string | null>(null);
+  const current = profile.cosmetics?.avatar ?? "";
+  const avatars = COSMETICS.filter((c) => c.kind === "avatar");
+  const name = me?.profile?.name ?? "";
+  const pick = (id: string) => {
+    haptic("select");
+    setProfile({ cosmetics: { ...(profile.cosmetics ?? {}), avatar: id } });
+  };
+  const locked = avatars.find((c) => c.id === hint);
+  const how = (id: string) => {
+    const badge = badgeForItem(id);
+    if (badge) return t("friends.avatar.badge", { badge: achName(badge.badge), tier: TIER_LABEL[badge.tier] });
+    return t("friends.avatar.level", { level: levelForItem(id) ?? 1 });
+  };
+  return (
+    <Section title={t("friends.avatar")}>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.avatar")}>
+        <button
+          type="button"
+          aria-pressed={!current}
+          aria-label={t("friends.avatar.letter")}
+          onClick={() => pick("")}
+          className={`press grid h-14 w-14 place-items-center rounded-full border-2 ${!current ? "border-accent" : "border-transparent"}`}
+        >
+          <Avatar name={name} size={44} />
+        </button>
+        {avatars.map((c) => {
+          const mine = g.owned.has(c.id);
+          return (
+            <button
+              key={c.id}
+              type="button"
+              aria-pressed={mine ? current === c.id : undefined}
+              aria-expanded={mine ? undefined : hint === c.id}
+              aria-label={mine ? c.name : `${c.name}, ${t("awards.locker.locked")}`}
+              onClick={() => (mine ? pick(c.id) : setHint(hint === c.id ? null : c.id))}
+              className={`press relative grid h-14 w-14 place-items-center rounded-full border-2 ${current === c.id ? "border-accent" : "border-transparent"}`}
+            >
+              <Avatar name={name} avatar={c.id} size={44} dim={!mine} />
+              {!mine && (
+                <span aria-hidden className="absolute bottom-0 right-0 grid h-5 w-5 place-items-center rounded-full bg-raised text-muted">
+                  <Icon name="lock" size={12} />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <p aria-live="polite" className="mt-2 px-1 text-xs text-muted">
+        {locked ? `${locked.name}: ${how(locked.id)}` : t("friends.avatar.hint")}
+      </p>
     </Section>
   );
 }
@@ -695,7 +909,8 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
         </Button>
       </form>
       <Note text={note} />
-      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} set={(c) => void save(c)} />
+      <AvatarPicker />
+      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} joined={p} set={(c) => void save(c)} />
       {isNative() && <Notifications prefs={p.push} set={(push) => void save({ push })} />}
       {p.public && (
         <a
@@ -773,7 +988,7 @@ function Activity({ onPeople }: { onPeople: () => void }) {
                 }
                 className="press flex w-full items-center gap-3 px-4 py-3 text-left"
               >
-                <Avatar name={i.name} size={36} />
+                <Avatar name={i.name} avatar={i.avatar} size={36} />
                 <span className="min-w-0 flex-1">
                   <span className="block break-words text-sm">{line(i)}</span>
                   <span className="block text-xs text-muted">{ago(i.at)}</span>
@@ -791,8 +1006,8 @@ function Activity({ onPeople }: { onPeople: () => void }) {
   );
 }
 
-type Person = { handle: string; name: string; at: number };
-type ListName = "requests" | "following" | "followers" | "blocked";
+type Person = { handle: string; name: string; avatar: string; at: number };
+type ListName = "requests" | "following" | "followers" | "muted" | "blocked";
 
 function PeopleList({ list, reload, onChanged }: { list: ListName; reload: number; onChanged: () => void }) {
   const [rows, setRows] = useState<Person[] | null>(null);
@@ -818,7 +1033,7 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
       setNote(socialError(e));
     }
   };
-  if (rows === null || (!rows.length && list === "requests")) return null;
+  if (rows === null || (!rows.length && (list === "requests" || list === "muted"))) return null;
   return (
     <Section title={t(`friends.list.${list}`)}>
       <ul className="card divide-y divide-line">
@@ -829,7 +1044,7 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
               onClick={() => go("person", p.handle)}
               className="press flex min-w-0 flex-1 items-center gap-3 py-1 text-left"
             >
-              <Avatar name={p.name} size={36} />
+              <Avatar name={p.name} avatar={p.avatar} size={36} />
               <span className="min-w-0">
                 <span className="block truncate font-medium">{p.name}</span>
                 <span className="block truncate text-xs text-muted">@{p.handle}</span>
@@ -853,6 +1068,11 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
                 onClick={() => void act(p, "answer", { accept: false })}
               >
                 {t("friends.remove")}
+              </Button>
+            )}
+            {list === "muted" && (
+              <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => void act(p, "mute", { on: false })}>
+                {t("friends.unmute")}
               </Button>
             )}
             {list === "blocked" && (
@@ -921,6 +1141,7 @@ function People() {
       <PeopleList list="requests" reload={version} onChanged={changed} />
       <PeopleList list="following" reload={version} onChanged={changed} />
       <PeopleList list="followers" reload={version} onChanged={changed} />
+      <PeopleList list="muted" reload={version} onChanged={changed} />
       <PeopleList list="blocked" reload={version} onChanged={changed} />
     </>
   );
@@ -941,6 +1162,7 @@ type Tab = "feed" | "activity" | "people";
 
 export function Friends() {
   const { account, me, error } = useSocialLoaded();
+  useProfileSync();
   const [tab, setTab] = useState<Tab>("feed");
   const [settings, setSettings] = useState(false);
   const header = (
@@ -1037,6 +1259,38 @@ export function Friends() {
   );
 }
 
+/** A profile's best lifts: the exercise, the set and its estimated one-rep max, in the reader's units. */
+function Showcase({ person }: { person: PersonCard }) {
+  const { profile } = useApp();
+  if (!person.lifts.length) return null;
+  const unit = profile.unit;
+  return (
+    <Section title={t("friends.lifts")} info="e1rm">
+      <ul className="card divide-y divide-line">
+        {person.lifts.map((l) => {
+          const ex = EXERCISE_BY_ID.get(l.id);
+          return (
+            <li key={l.id} className="flex items-center justify-between gap-3 px-4 py-3">
+              <span className="min-w-0">
+                <span className="block truncate font-medium">{ex?.name ?? l.id}</span>
+                <span className="num block text-xs text-muted">
+                  {ex ? setText(ex, l.w, l.r, unit) : `${fmtNum(fromKg(l.w, unit))} ${unit} × ${l.r}`}
+                </span>
+              </span>
+              <span className="num shrink-0 text-right">
+                <span className="block font-bold">
+                  {fmtNum(Math.round(fromKg(estimate(l.w, l.r), unit)))} {unit}
+                </span>
+                <span className="block text-xs text-muted">{t("friends.liftsE1rm")}</span>
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
+  );
+}
+
 /** #/person/<handle>: someone's profile, follow, their posts, block and report. */
 export function PersonScreen({ handle }: { handle: string }) {
   const { account, me } = useSocialLoaded();
@@ -1057,10 +1311,10 @@ export function PersonScreen({ handle }: { handle: string }) {
       live = false;
     };
   }, [h, joined]);
-  const act = async (op: string) => {
+  const act = async (op: string, extra: Record<string, unknown> = {}) => {
     haptic("tick");
     try {
-      const r = await social<{ person?: PersonCard }>(op, { handle: h });
+      const r = await social<{ person?: PersonCard }>(op, { handle: h, ...extra });
       if (r.person) setPerson(r.person);
       else {
         const again = await social<{ person: PersonCard }>("lookup", { handle: h }).catch(() => null);
@@ -1122,7 +1376,7 @@ export function PersonScreen({ handle }: { handle: string }) {
         )}
       </div>
       <div className="card mt-4 flex items-center gap-4 p-4">
-        <Avatar name={person.name} size={56} />
+        <Avatar name={person.name} avatar={person.avatar} size={56} />
         <dl className="grid flex-1 grid-cols-3 text-center">
           {[
             [t("friends.person.posts"), person.posts],
@@ -1137,6 +1391,8 @@ export function PersonScreen({ handle }: { handle: string }) {
         </dl>
       </div>
       {person.followsYou && !self && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.followsYou")}</p>}
+      {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}
+      <Showcase person={person} />
       {!self && person.relation !== "blocked" && (
         <Button
           kind={person.relation === "none" ? "primary" : "ghost"}
@@ -1174,9 +1430,15 @@ export function PersonScreen({ handle }: { handle: string }) {
       <Sheet open={menu} onClose={() => setMenu(false)} title={person.name}>
         <div className="space-y-2">
           {person.relation !== "blocked" && (
-            <Button kind="danger" icon="ban" className="w-full" onClick={() => void act("block")}>
-              {t("friends.block")}
-            </Button>
+            <>
+              <Button kind="ghost" icon="moon" className="w-full" onClick={() => void act("mute", { on: !person.muted })}>
+                {person.muted ? t("friends.unmute") : t("friends.mute")}
+              </Button>
+              {!person.muted && <p className="text-xs text-muted">{t("friends.muteHint")}</p>}
+              <Button kind="danger" icon="ban" className="w-full" onClick={() => void act("block")}>
+                {t("friends.block")}
+              </Button>
+            </>
           )}
           <p className="text-xs text-muted">{t("friends.blockHint")}</p>
           <Button
@@ -1197,10 +1459,35 @@ export function PersonScreen({ handle }: { handle: string }) {
   );
 }
 
+let lastSent = "";
+/**
+ * Keeps the server's copy of the avatar (picked in the Locker or Friends settings) and the best lifts in step with
+ * this device, which works both out. Sends only a change, and never the same change twice.
+ */
+function useProfileSync() {
+  const me = useSocial((st) => st.me);
+  const { events, profile } = useApp();
+  const p = me?.profile;
+  const avatar = profile.cosmetics?.avatar ?? "";
+  const lifts = useMemo(() => bestLifts(events), [events]);
+  const suspended = !!me?.suspended;
+  useEffect(() => {
+    if (!p || suspended) return;
+    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : []);
+    const key = JSON.stringify(change);
+    if (!change || key === lastSent) return;
+    lastSent = key;
+    social<SocialMe>("update", change)
+      .then((m) => m.profile && useSocial.setState({ me: m }))
+      .catch(() => undefined);
+  }, [p, avatar, lifts, suspended]);
+}
+
 /** The people button on Today's header, with a dot when someone followed, asked, liked or commented. */
 export function FriendsButton() {
   const account = useAccount((s) => s.account);
   const me = useSocial((s) => s.me);
+  useProfileSync();
   useEffect(() => {
     void refreshSocial();
   }, [account?.id]);
@@ -1224,37 +1511,50 @@ export function FriendsButton() {
   );
 }
 
-/** Done: "Post to friends", or "Posted" once it's out (straight away when the lifter posts every workout). */
+/**
+ * Done: "Post to friends" opens the compose sheet (caption and who sees it), then shows "Posted" with Edit and
+ * Remove. With "Post every workout" on it posts straight away, to the lifter's usual audience.
+ */
 export function PostToFriends({ summary }: { summary: SessionSummary }) {
   const { events } = useApp();
   const me = useSocial((s) => s.me);
   const [postId, setPostId] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
+  const [details, setDetails] = useState<{ caption: string; audience: Audience } | null>(null);
+  const [compose, setCompose] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const p = me?.profile;
-  const post = useCallback(async () => {
-    if (!p) return;
-    setBusy(true);
-    try {
-      setPostId(await postWorkout(events, summary, p.weights));
-      setNote(null);
-      track("feature", { name: "social_post", detail: p.autoPost ? "auto" : "tap" });
-    } catch (e) {
-      setNote(socialError(e));
-    } finally {
-      setBusy(false);
-    }
-  }, [events, summary, p]);
+  const post = useCallback(
+    async (extra: { caption?: string; audience?: Audience } = {}): Promise<string | null> => {
+      if (!p) return null;
+      try {
+        setPostId(await postWorkout(events, summary, p.weights, extra));
+        setDetails({ caption: extra.caption ?? "", audience: extra.audience ?? p.audience });
+        setNote(null);
+        track("feature", { name: "social_post", detail: p.autoPost ? "auto" : "tap" });
+        return null;
+      } catch (e) {
+        return socialError(e);
+      }
+    },
+    [events, summary, p],
+  );
   // Already posted (from another device, or before a reload)? Ask once.
   useEffect(() => {
     if (!p) return;
     let live = true;
-    social<{ posted: Record<string, string> }>("posted", { workoutIds: [summary.sessionId] })
-      .then((r) => {
+    social<{ posted: Record<string, string>; details?: Record<string, { caption: string; audience: Audience }> }>("posted", {
+      workoutIds: [summary.sessionId],
+    })
+      .then(async (r) => {
         if (!live) return;
         const id = r.posted[summary.sessionId];
-        if (id) setPostId(id);
-        else if (p.autoPost && !me?.suspended) void post();
+        if (id) {
+          setPostId(id);
+          setDetails(r.details?.[summary.sessionId] ?? null);
+        } else if (p.autoPost && !me?.suspended) {
+          const err = await post();
+          if (err && live) setNote(err);
+        }
       })
       .catch(() => undefined);
     return () => {
@@ -1266,28 +1566,56 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
     try {
       await social("unpost", { workoutId: summary.sessionId });
       setPostId(null);
+      setDetails(null);
     } catch (e) {
       oops();
       setNote(socialError(e));
     }
   };
+  const edit = async (v: { caption: string; audience: Audience }) => {
+    try {
+      const r = await social<{ caption: string; audience: Audience }>("editPost", { workoutId: summary.sessionId, ...v });
+      setDetails({ caption: r.caption, audience: r.audience });
+      return null;
+    } catch (e) {
+      return socialError(e);
+    }
+  };
   return (
     <div className="mt-3">
       {postId ? (
-        <div className="card flex items-center justify-between gap-3 px-4 py-2 text-left">
-          <span className="flex items-center gap-2 text-sm">
-            <Icon name="check" size={18} className="text-good" /> {t("friends.posted")}
+        <div className="card flex items-center justify-between gap-2 py-1 pl-4 pr-1 text-left">
+          <span className="flex min-w-0 items-center gap-2 text-sm">
+            <Icon name="check" size={18} className="shrink-0 text-good" />
+            <span className="min-w-0">
+              {t("friends.posted")}
+              {details && details.audience !== "all" ? ` · ${t(AUDIENCE_LABEL[details.audience])}` : ""}
+            </span>
           </span>
-          <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => void unpost()}>
-            {t("friends.unpost")}
-          </Button>
+          <span className="flex shrink-0">
+            <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => setCompose(true)}>
+              {t("friends.edit")}
+            </Button>
+            <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => void unpost()}>
+              {t("friends.unpost")}
+            </Button>
+          </span>
         </div>
       ) : (
-        <Button kind="ghost" icon="people" className="w-full" disabled={busy} onClick={() => void post()}>
+        <Button kind="ghost" icon="people" className="w-full" onClick={() => setCompose(true)}>
           {t("friends.postIt")}
         </Button>
       )}
       <Note text={note} />
+      <ComposeSheet
+        open={compose}
+        onClose={() => setCompose(false)}
+        title={postId ? t("friends.post.edit") : t("friends.postIt")}
+        submit={postId ? t("friends.save") : t("friends.post.send")}
+        caption={details?.caption ?? ""}
+        audience={details?.audience ?? p.audience}
+        onSubmit={(v) => (postId ? edit(v) : post(v))}
+      />
     </div>
   );
 }

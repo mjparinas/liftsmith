@@ -252,7 +252,7 @@ export interface Profile {
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
   lean?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
-  cosmetics?: { accent?: string; sound?: string; plates?: string };
+  cosmetics?: { accent?: string; sound?: string; plates?: string; avatar?: string };
   /**
    * Your stats (Settings › Body and units, BodyStats.tsx): the one place for age, sex and height, which
    * TDEE, fitness age, DOTS, strength scores and starting weights all read. Also asked in setup. Apple Health
@@ -473,6 +473,14 @@ export interface SetEvent extends EventBase {
    * ghost mode and plateaus read only the planned sets (progression.ts sessionsOf).
    */
   tag?: SetTag;
+  /**
+   * The last full rep's mean lifting speed (m/s), when the camera counted the set with a scale (the
+   * lifter's height) and today's max lab is on. Sets taken to about failure teach that lab the lifter's
+   * own end-of-set speed (personalMvt in reps/speedMax.ts).
+   */
+  endSpeed?: number;
+  /** The camera saw a rep that didn't make it up after the last full one: the set went to failure. */
+  failedRep?: true;
 }
 
 /** Set types the lifter adds between sets. Failure is the reps-left rating of 0 (EffortEvent). */

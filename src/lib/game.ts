@@ -373,10 +373,10 @@ export function league(events: readonly AppEvent[], stats: Stats, profile: Profi
 export type Rarity = "common" | "rare" | "epic" | "legendary";
 export interface Cosmetic {
   id: string;
-  kind: "accent" | "sound" | "plates";
+  kind: "accent" | "sound" | "plates" | "avatar";
   name: string;
   rarity: Rarity;
-  /** Colour for accents, a sound id for timer sounds, a finish for plates. */
+  /** Colour for accents, a sound id for timer sounds, a finish for plates, the avatar id for avatars. */
   value: string;
 }
 
@@ -398,6 +398,19 @@ const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
   { id: "plates-neon", kind: "plates", rarity: "legendary", value: "neon" },
   // Never in a crate: a badge brings it (BADGE_ITEMS).
   { id: "accent-pro", kind: "accent", rarity: "legendary", value: "#e879f9" },
+  // Avatars for Friends (Melvin, 2026-11-11): four for everyone, the rest from levels and badges, never from a
+  // crate, so every crate already opened still holds what it held.
+  { id: "av-dumbbell", kind: "avatar", rarity: "common", value: "av-dumbbell" },
+  { id: "av-bolt", kind: "avatar", rarity: "common", value: "av-bolt" },
+  { id: "av-leaf", kind: "avatar", rarity: "common", value: "av-leaf" },
+  { id: "av-moon", kind: "avatar", rarity: "common", value: "av-moon" },
+  { id: "av-target", kind: "avatar", rarity: "common", value: "av-target" },
+  { id: "av-heart", kind: "avatar", rarity: "rare", value: "av-heart" },
+  { id: "av-stretch", kind: "avatar", rarity: "rare", value: "av-stretch" },
+  { id: "av-mascot", kind: "avatar", rarity: "epic", value: "av-mascot" },
+  { id: "av-trophy", kind: "avatar", rarity: "legendary", value: "av-trophy" },
+  { id: "av-flame", kind: "avatar", rarity: "epic", value: "av-flame" },
+  { id: "av-pro", kind: "avatar", rarity: "legendary", value: "av-pro" },
 ];
 /** Cosmetics with their names in the current language (getters, so a language change shows at once). */
 export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
@@ -406,16 +419,20 @@ export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
     return t(`cos.${c.id}` as MessageKey);
   },
 }));
-export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
+export const STARTER = ["accent-blue", "sound-classic", "plates-classic", "av-dumbbell", "av-bolt", "av-leaf", "av-moon"];
 
 /**
  * Locker items a badge brings instead of a crate (Melvin, 2026-11-11: Pro "should unlock some kind of badge or
  * achievement or reward"). Kept out of the crate pool, so every crate already opened still holds what it held.
  */
-export const BADGE_ITEMS: readonly { id: string; badge: string; tier: Tier }[] = [{ id: "accent-pro", badge: "pro", tier: "silver" }];
+export const BADGE_ITEMS: readonly { id: string; badge: string; tier: Tier }[] = [
+  { id: "accent-pro", badge: "pro", tier: "silver" },
+  { id: "av-pro", badge: "pro", tier: "silver" },
+  { id: "av-flame", badge: "goal-streak", tier: "silver" },
+];
 export const badgeForItem = (id: string) => BADGE_ITEMS.find((b) => b.id === id) ?? null;
 /** What crates can hold: everything but the starter set and the badge items. */
-const cratePool = () => COSMETICS.filter((c) => !STARTER.includes(c.id) && !badgeForItem(c.id));
+const cratePool = () => COSMETICS.filter((c) => c.kind !== "avatar" && !STARTER.includes(c.id) && !badgeForItem(c.id));
 /** Badge items the lifter's achievements have earned. */
 export function badgeItems(list: readonly Achievement[]): string[] {
   const level = new Map(list.map((a) => [a.id, a.level]));
@@ -469,6 +486,12 @@ export const LEVEL_ITEMS: readonly { level: number; id: string }[] = [
   { level: 18, id: "sound-gong" },
   { level: 25, id: "accent-gold" },
   { level: 40, id: "plates-neon" },
+  // Avatars, on levels of their own so no reward changes for anyone.
+  { level: 3, id: "av-target" },
+  { level: 8, id: "av-heart" },
+  { level: 14, id: "av-stretch" },
+  { level: 22, id: "av-mascot" },
+  { level: 30, id: "av-trophy" },
 ];
 /** Levels that start a new title, each with a bonus crate. */
 export const TITLE_LEVELS: readonly number[] = TITLES.map(([n]) => n).filter((n) => n > 1);
