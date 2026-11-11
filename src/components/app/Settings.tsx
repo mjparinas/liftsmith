@@ -11,10 +11,12 @@ import { analyticsOn, installId, setAnalytics } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { entActive, useBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
+import { COMMIT, versionLabel } from "@/lib/build";
 import { can } from "@/lib/entitlements";
 import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
+import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { erasePhotos } from "@/lib/photos";
@@ -208,6 +210,7 @@ export function Settings() {
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+      <BuildLine />
     </div>
   );
 }
@@ -573,5 +576,18 @@ function DataGroup() {
         )}
       </Section>
     </>
+  );
+}
+
+/** The version and the commit this build was made from, so a release can be matched to its code (src/lib/build.ts). */
+function BuildLine() {
+  const [native, setNative] = useState<InstallInfo | null>(null);
+  useEffect(() => {
+    void installInfo().then(setNative);
+  }, []);
+  return (
+    <p className="mt-1 text-center text-xs text-faint tabular-nums">
+      {t("settings.build", { version: versionLabel(native), commit: COMMIT })}
+    </p>
   );
 }

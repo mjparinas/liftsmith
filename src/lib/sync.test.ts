@@ -156,6 +156,40 @@ describe("syncing the app with the server", () => {
     expect(useApp.getState().events.map((e) => e.id)).toEqual(["mine"]);
   });
 
+  it("pushes workouts logged before signing in, once", async () => {
+    // Logged while signed out: nothing is queued.
+    useApp.setState({ events: [set("before-1"), set("before-2")] });
+    noteEvents(["before-1", "before-2"]);
+    // Signing in starts sync from scratch (as signedInAs does).
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ token: "t", id: "acc", email: null, providers: [], via: "email" }));
+    writeSync(emptySync());
+    await syncNow();
+    expect(readSync().out).toEqual([]);
+    const other = await serverSync("acc", "web", { cursor: 0, events: [], deleted: [], records: [], first: true });
+    expect(other.events.map((e) => (e as AppEvent).id).sort()).toEqual(["before-1", "before-2"]);
+    // A second sync doesn't send them again.
+    let sent = 0;
+    vi.stubGlobal("fetch", async (_url: string, init: RequestInit) => {
+      const body = JSON.parse(String(init.body)) as SyncRequest;
+      sent += body.events.length;
+      return new Response(JSON.stringify(await serverSync("acc", session, body)), { status: 200 });
+    });
+    await syncNow();
+    expect(sent).toBe(0);
+  });
+
+  it("pushes the whole history once from a device that signed in before history was queued", async () => {
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ token: "t", id: "acc", email: null, providers: [], via: "email" }));
+    // Sync state saved by an older app: already synced, no `seeded` field.
+    const old: Partial<ReturnType<typeof emptySync>> = { ...emptySync(), first: false };
+    delete old.seeded;
+    localStorage.setItem("liftsmith.sync", JSON.stringify(old));
+    useApp.setState({ events: [set("old-1")] });
+    await syncNow();
+    const other = await serverSync("acc", "web", { cursor: 0, events: [], deleted: [], records: [], first: true });
+    expect(other.events.map((e) => (e as AppEvent).id)).toEqual(["old-1"]);
+  });
+
   it("keeps the account's set-up profile when a new install signs in before setup, even from an older app", async () => {
     await serverSync("acc", "phone", {
       cursor: 0,

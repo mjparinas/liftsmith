@@ -2,9 +2,10 @@
 
 // Diagnostics attached to feedback when the lifter allows it: app version, platform, screen, the
 // current screen route and the last few errors. Never workout history, health data or names.
+import { APP_VERSION, COMMIT } from "./build";
 import { isNative } from "./juice";
 
-export const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "dev";
+export { APP_VERSION };
 
 const MAX = 30;
 const errors: string[] = [];
@@ -30,6 +31,8 @@ export function installDiag() {
 
 export interface Diagnostics {
   version: string;
+  /** Short commit hash; missing from reports sent by older apps. */
+  commit?: string;
   platform: string;
   userAgent: string;
   screen: string;
@@ -45,6 +48,7 @@ export function diagnostics(): Diagnostics {
   const native = isNative();
   return {
     version: APP_VERSION,
+    commit: COMMIT,
     platform: native ? (/iPhone|iPad/.test(ua) ? "ios" : "android") : "web",
     userAgent: ua,
     screen: typeof screen !== "undefined" ? `${screen.width}x${screen.height}@${window.devicePixelRatio ?? 1}` : "",
