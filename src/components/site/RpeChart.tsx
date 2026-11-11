@@ -67,7 +67,7 @@ export function RpeChart() {
           </button>
         </div>
       </div>
-      <div className="card overflow-x-auto p-2" aria-live="polite">
+      <div className="card overflow-x-auto p-2" aria-live="polite" role="region" aria-label="RPE chart" tabIndex={0}>
         <table className="w-full min-w-[34rem] text-right tabular-nums">
           <caption className="p-3 text-left text-sm text-muted">
             {pct ? "Share of your one-rep max" : `Weight in ${unit}, rounded to the nearest ${unit === "kg" ? "2.5" : "5"}`} for each set
