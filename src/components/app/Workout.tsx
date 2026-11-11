@@ -38,7 +38,7 @@ import { isVisible, useVisible } from "@/lib/visibility";
 import { prCue, say } from "@/lib/voice";
 import { pickBpm, type WatchReading } from "@/lib/watchHr";
 
-import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
+import { AutoCount, AutoCountButton, countable, countSource, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
@@ -95,7 +95,11 @@ export function Workout() {
   const bpm = pickBpm(hr.status === "live" ? lastBpm : null, watchHr, now);
   const [popKey, setPopKey] = useState(0);
   // Camera rep counting (AutoCount.tsx): remembered on this device, front camera by default.
-  const [countPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
+  const [savedCountPrefs, setCountPrefs] = useState<CountPrefs>(loadCountPrefs);
+  // Camera and phone motion are separate labs (Settings › Labs): the source is the one that's on, or the
+  // lifter's choice when both are; with neither on there's no counting.
+  const source = countSource(savedCountPrefs.source);
+  const countPrefs: CountPrefs = source ? { ...savedCountPrefs, source } : savedCountPrefs;
   const changeCount = (p: CountPrefs) => {
     setCountPrefs(p);
     saveCountPrefs(p);
@@ -230,9 +234,9 @@ export function Workout() {
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Watch rep counting (Labs): the watch streams its motion during a set, unless the camera is already counting.
-  const cameraCounting = !!ex && countPrefs.on && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
-  const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !cameraCounting;
+  // Watch rep counting (Labs): the watch streams its motion during a set, unless the phone (camera or motion) is already counting.
+  const phoneCounting = !!ex && countPrefs.on && !!source && countable(ex.id, ex.pattern, countPrefs.source);
+  const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !phoneCounting;
   const watchReps = useWatchReps({
     on: watchCountOn,
     exerciseId: ex?.id,
@@ -373,8 +377,8 @@ export function Workout() {
   };
 
   const unit = gym.unit;
-  // Camera rep counting is a lab (Settings › Labs, Pro): offered only while that lab is on.
-  const canCount = !!ex && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
+  // Rep counting is in Labs (Settings › Labs, Pro): offered only while camera or phone motion counting is on.
+  const canCount = !!ex && !!source && countable(ex.id, ex.pattern, countPrefs.source);
   const counting = canCount && countPrefs.on;
   // The working set the plan wrote, when every set has the same weight (a program's ramp has its own logic).
   const plannedWork =
@@ -657,6 +661,7 @@ export function Workout() {
                 <AutoCountButton
                   on={false}
                   onToggle={() => changeCount({ ...countPrefs, on: true })}
+                  source={countPrefs.source}
                   className="absolute bottom-2 left-2"
                 />
               )}

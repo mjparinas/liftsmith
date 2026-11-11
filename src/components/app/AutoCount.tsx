@@ -5,7 +5,8 @@
 // the lifter, and the reps counted fill in the reps for Log set, so logging stays one tap. Frames are read
 // in memory and dropped: video never leaves the phone and is never recorded.
 // It's a lab (Settings › Labs, Pro): on the workout screen only while the `labRepCount` lab is on. Phone
-// motion counting is a second lab (`repMotion`), because it was unreliable. Camera bar speed is a third
+// motion counting is a second lab (`repMotion`), because it was unreliable; it works on its own, without the
+// camera lab (Melvin, 2026-11-11), and with both on the stage switches between them. Camera bar speed is a third
 // (`labBarSpeed`): the last rep's speed, its drop from the fastest rep, and when to end the set. Camera form
 // check is a fourth (`labFormCheck`): between sets, one tip on depth, short range or a lean, shown on the figure.
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -46,7 +47,7 @@ export function loadCountPrefs(): CountPrefs {
     return {
       on: p.on === true,
       facing: p.facing === "environment" ? "environment" : "user",
-      source: p.source === "motion" && labOn("repMotion") ? "motion" : "camera",
+      source: countSource(p.source) ?? "camera",
     };
   } catch {
     return DEFAULTS;
@@ -59,6 +60,17 @@ export function saveCountPrefs(p: CountPrefs) {
   } catch {
     // Storage blocked: the choice lasts until the screen closes.
   }
+}
+
+/**
+ * The source the lifter's labs allow. Camera counting (`labRepCount`) and phone motion (`repMotion`) are
+ * separate labs: with only one on, that one counts; with both, the lifter's choice; with neither, none.
+ */
+export function countSource(pref: CountSource): CountSource | null {
+  const cam = labOn("labRepCount");
+  const motion = labOn("repMotion");
+  if (cam && motion) return pref;
+  return cam ? "camera" : motion ? "motion" : null;
 }
 
 /** Whether this exercise can be counted: the camera knows how to read it (and motion, when that's on). */
@@ -374,7 +386,7 @@ export function AutoCount({
       className={`press absolute inline-flex min-h-11 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm text-muted ${camera ? "bottom-1 left-1" : "right-2 top-7"}`}
       aria-label={t("count.off")}
     >
-      <Icon name="camera" size={16} className="text-accent" />
+      <Icon name={camera ? "camera" : "phone"} size={16} className="text-accent" />
       {t("count.stop")}
     </button>
   );
@@ -415,7 +427,7 @@ export function AutoCount({
           )}
         </div>
         {!camera && stopButton}
-        {labOn("repMotion") && motionProfile && cameraProfile && (
+        {labOn("repMotion") && labOn("labRepCount") && motionProfile && cameraProfile && (
           <button
             type="button"
             onClick={() => onPrefs({ ...prefs, source: camera ? "motion" : "camera" })}
@@ -463,8 +475,18 @@ export function AutoCount({
   );
 }
 
-/** On the exercise demo, opposite "How to": turns camera counting on (the stage's Stop turns it off). */
-export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean; onToggle: () => void; className?: string }) {
+/** On the exercise demo, opposite "How to": turns rep counting on (the stage's Stop turns it off). */
+export function AutoCountButton({
+  on,
+  onToggle,
+  source = "camera",
+  className = "",
+}: {
+  on: boolean;
+  onToggle: () => void;
+  source?: CountSource;
+  className?: string;
+}) {
   return (
     <button
       type="button"
@@ -473,10 +495,10 @@ export function AutoCountButton({ on, onToggle, className = "" }: { on: boolean;
         onToggle();
       }}
       aria-pressed={on}
-      aria-label={t("count.toggle")}
+      aria-label={source === "motion" ? t("count.toggleMotion") : t("count.toggle")}
       className={`press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3 text-sm ${on ? "border-accent bg-accent/15 text-accent" : "border-line bg-bg/70 text-muted hover:text-ink"} ${className}`}
     >
-      <Icon name="camera" size={16} className="text-accent" />
+      <Icon name={source === "motion" ? "phone" : "camera"} size={16} className="text-accent" />
       {t("count.start")}
     </button>
   );
