@@ -17,7 +17,7 @@ import { routinesSlice, type RoutinesSlice } from "./store/routines";
 import { ACTIVE_KEY, persistActive, uid, type Ctx } from "./store/shared";
 import { workoutSlice, type Active, type WorkoutSlice } from "./store/workout";
 import { minutesForToday } from "./training";
-import type { AppEvent, Gym, Profile } from "./types";
+import type { AppEvent, Gym, Profile, StretchEvent } from "./types";
 
 export { AUTO_END_MS, hrWindow, REST_PAUSE_SEC, warmingUp, type Active } from "./store/workout";
 
@@ -40,6 +40,8 @@ export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSli
   applySynced(p: { events: AppEvent[]; deleted: string[]; profile: Profile | null; gyms: Gym[] | null }): void;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
+  /** Saves a finished stretch routine (Stretch.tsx). */
+  logStretch(moment: StretchEvent["moment"], ids: string[], seconds: number): void;
   reset(): Promise<void>;
 }
 
@@ -141,6 +143,12 @@ export const useApp = create<State>((set, get) => {
     checkin(buddies) {
       commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
       track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
+    },
+
+    logStretch(moment, ids, seconds) {
+      if (!ids.length) return;
+      commit([{ type: "stretch", id: uid(), at: Date.now(), moment, ids, seconds: Math.round(seconds) }]);
+      track("feature", { name: "stretch", detail: `${moment}:${ids.length}` });
     },
 
     async reset() {

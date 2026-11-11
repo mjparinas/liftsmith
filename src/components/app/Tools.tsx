@@ -8,6 +8,7 @@ import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { track } from "@/lib/analytics";
 import { date, inSentence, list, num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
+import { STRETCHES } from "@/lib/stretches";
 import {
   ACTIVITIES,
   ACTIVITY,
@@ -59,6 +60,20 @@ function ToolsHub() {
               <span className="block text-sm text-muted">
                 {cur.result ? t("tdee.hubValue", { kcal: kcal(cur.result.tdee) }) : t("tdee.hub")}
               </span>
+            </span>
+            <span className="text-accent" aria-hidden>
+              ›
+            </span>
+          </button>
+        </li>
+        <li>
+          <button type="button" onClick={() => go("stretch")} className="press card flex w-full items-center gap-4 p-4 text-left">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-cyan/15 text-cyan">
+              <Icon name="stretch" size={22} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block font-semibold">{t("str.hub")}</span>
+              <span className="block text-sm text-muted">{t("str.hubBody", { count: STRETCHES.length })}</span>
             </span>
             <span className="text-accent" aria-hidden>
               ›

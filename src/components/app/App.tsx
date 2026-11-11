@@ -49,6 +49,7 @@ import { Remix } from "./Remix";
 import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { Settings } from "./Settings";
 import { Stats } from "./Stats";
+import { StretchScreen } from "./Stretch";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
 import { TrainingSettings } from "./TrainingSettings";
@@ -297,6 +298,7 @@ export function App() {
     pro: <Pro />,
     account: <Account />,
     connections: <Connections />,
+    stretch: <StretchScreen arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

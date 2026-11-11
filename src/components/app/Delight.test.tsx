@@ -99,16 +99,12 @@ describe("Today and Progress extras", () => {
   it("offers a warm-up and a buddy check-in that records the event", async () => {
     const user = userEvent.setup();
     await onboard(user);
+    // The warm-up chip opens today's warm-up stretches (Stretch.tsx), which can be skipped.
     await user.click(screen.getByRole("button", { name: "🔥 Warm up first" }));
-    const warm = screen.getByRole("dialog", { name: "Five-minute warm-up" });
-    expect(within(warm).getAllByRole("listitem").length).toBeGreaterThan(2);
-    const drill = () =>
-      within(warm)
-        .getAllByRole("button")
-        .filter((b) => b.hasAttribute("aria-pressed"))[0];
-    await user.click(drill());
-    expect(drill()).toHaveAttribute("aria-pressed", "true");
-    await user.click(warm.parentElement!);
+    expect(await screen.findByRole("heading", { name: "Warm-up for today" })).toBeInTheDocument();
+    expect(within(screen.getByTestId("stretch-routine")).getAllByRole("listitem").length).toBeGreaterThan(2);
+    await user.click(screen.getByRole("button", { name: "‹ Back" }));
+    await screen.findByRole("button", { name: "👋 Check in" });
 
     const writeText = vi.fn(async () => {});
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });

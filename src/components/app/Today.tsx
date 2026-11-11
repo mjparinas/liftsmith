@@ -516,7 +516,18 @@ export function Today() {
         </>
       ) : (
         <div className="card mt-6">
-          <EmptyState icon="moon" mascot="sleepy" tint="var(--color-cyan)" title={t("td.restDay")} body={t("td.restBody")} />
+          <EmptyState
+            icon="moon"
+            mascot="sleepy"
+            tint="var(--color-cyan)"
+            title={t("td.restDay")}
+            body={t("td.restBody")}
+            action={
+              <Button kind="ghost" icon="stretch" onClick={() => go("stretch", "rest")}>
+                {t("str.restCard")}
+              </Button>
+            }
+          />
         </div>
       )}
 
@@ -528,6 +539,8 @@ export function Today() {
               className="w-full py-4 text-lg"
               onClick={() => {
                 haptic("tap");
+                // Settings › Workout › "Warm up before every workout": the warm-up comes first, and can be skipped.
+                if (profile.training?.warmFirst) return go("stretch", "warmup");
                 sound.start();
                 start();
                 go("workout");

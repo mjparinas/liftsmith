@@ -122,6 +122,21 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
+  // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
+  await page.goto(`${server.url}/app/#/stretch`);
+  await page.getByTestId("stretch-list").waitFor();
+  await page.getByRole("button", { name: "Pick Pigeon" }).click();
+  await scan("stretch library");
+  await page.getByRole("button", { name: /^Cobra/ }).click();
+  await page.getByRole("dialog").waitFor();
+  await scan("stretch demo");
+  await page.keyboard.press("Escape");
+  await page.goto(`${server.url}/app/#/stretch/rest`);
+  await page.getByTestId("stretch-routine").waitFor();
+  await scan("stretch routine");
+  await page.getByRole("button", { name: "Start", exact: true }).click();
+  await page.getByRole("timer").waitFor();
+  await scan("stretch player");
   // Tools › TDEE without stats (it links to Your stats), Your stats filled in with bump buttons, then TDEE
   // reading them, and the public calculator page.
   await page.goto(`${server.url}/app/#/tools/tdee`);

@@ -20,14 +20,7 @@ export const en = {
   "x.routines": "Routines",
   "x.warmUp": "🔥 Warm up first",
   "x.checkIn": "👋 Check in",
-  "x.warmTitle": "Five-minute warm-up",
   "x.buddyTitle": "Tell your gym buddies",
-  "x.warmIntro": {
-    one: "About {count} minute for the muscles in today's plan. Your first lift still ramps up with warm-up sets.",
-    other: "About {count} minutes for the muscles in today's plan. Your first lift still ramps up with warm-up sets.",
-  },
-  "x.reps": "{n} reps",
-  "x.secs": "{n} s",
   "x.shareFail": "Couldn't open the share sheet.",
   "x.copied": "Copied. Paste it into your group chat.",
   "x.buddyIntro":
@@ -83,14 +76,7 @@ export const es: Partial<Record<Key, Message>> = {
   "x.routines": "Rutinas",
   "x.warmUp": "🔥 Calentar primero",
   "x.checkIn": "👋 Avisar",
-  "x.warmTitle": "Calentamiento de cinco minutos",
   "x.buddyTitle": "Avisa a tus compañeros",
-  "x.warmIntro": {
-    one: "Unos {count} minuto para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento.",
-    other: "Unos {count} minutos para los músculos del plan de hoy. Tu primer ejercicio sigue subiendo con series de calentamiento.",
-  },
-  "x.reps": "{n} reps",
-  "x.secs": "{n} s",
   "x.shareFail": "No se pudo abrir el menú para compartir.",
   "x.copied": "Copiado. Pégalo en tu chat de grupo.",
   "x.buddyIntro":
@@ -144,15 +130,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.routines": "Routines",
   "x.warmUp": "🔥 S’échauffer d’abord",
   "x.checkIn": "👋 Prévenir",
-  "x.warmTitle": "Échauffement de cinq minutes",
   "x.buddyTitle": "Prévenez vos partenaires",
-  "x.warmIntro": {
-    one: "Environ {count} minute pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement.",
-    other:
-      "Environ {count} minutes pour les muscles du plan du jour. Votre premier mouvement monte toujours en charge avec des séries d’échauffement.",
-  },
-  "x.reps": "{n} reps",
-  "x.secs": "{n} s",
   "x.shareFail": "Impossible d’ouvrir le menu de partage.",
   "x.copied": "Copié. Collez-le dans votre groupe.",
   "x.buddyIntro":
@@ -206,14 +184,7 @@ export const de: Partial<Record<Key, Message>> = {
   "x.routines": "Routinen",
   "x.warmUp": "🔥 Zuerst aufwärmen",
   "x.checkIn": "👋 Einchecken",
-  "x.warmTitle": "Fünf-Minuten-Aufwärmen",
   "x.buddyTitle": "Sag es deinen Trainingspartnern",
-  "x.warmIntro": {
-    one: "Etwa {count} Minute für die Muskeln im heutigen Plan. Deine erste Übung steigert sich trotzdem mit Aufwärmsätzen.",
-    other: "Etwa {count} Minuten für die Muskeln im heutigen Plan. Deine erste Übung steigert sich trotzdem mit Aufwärmsätzen.",
-  },
-  "x.reps": "{n} Wdh.",
-  "x.secs": "{n} s",
   "x.shareFail": "Das Teilen-Menü ließ sich nicht öffnen.",
   "x.copied": "Kopiert. Füg es in deinen Gruppenchat ein.",
   "x.buddyIntro":
@@ -267,14 +238,7 @@ export const it: Partial<Record<Key, Message>> = {
   "x.routines": "Routine",
   "x.warmUp": "🔥 Prima riscaldati",
   "x.checkIn": "👋 Check-in",
-  "x.warmTitle": "Riscaldamento di cinque minuti",
   "x.buddyTitle": "Dillo ai tuoi compagni di palestra",
-  "x.warmIntro": {
-    one: "Circa {count} minuto per i muscoli del piano di oggi. Il primo esercizio sale comunque con le serie di riscaldamento.",
-    other: "Circa {count} minuti per i muscoli del piano di oggi. Il primo esercizio sale comunque con le serie di riscaldamento.",
-  },
-  "x.reps": "{n} rip.",
-  "x.secs": "{n} s",
   "x.shareFail": "Impossibile aprire il menu di condivisione.",
   "x.copied": "Copiato. Incollalo nella tua chat di gruppo.",
   "x.buddyIntro":
@@ -328,11 +292,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "x.routines": "ルーティン",
   "x.warmUp": "🔥 まずはウォームアップ",
   "x.checkIn": "👋 チェックイン",
-  "x.warmTitle": "5分間ウォームアップ",
   "x.buddyTitle": "ジム仲間に知らせる",
-  "x.warmIntro": { other: "今日のプランの筋肉に約{count}分。最初の種目はこれとは別にウォームアップセットで重量を上げていきます。" },
-  "x.reps": "{n}回",
-  "x.secs": "{n}秒",
   "x.shareFail": "共有メニューを開けませんでした。",
   "x.copied": "コピーしました。グループチャットに貼り付けてください。",
   "x.buddyIntro":
