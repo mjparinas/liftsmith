@@ -142,9 +142,9 @@ describe("lifetime Pro codes in the app", () => {
 
   it("redeems for the signed-in account, which then has Pro on this device", async () => {
     signIn();
-    const fetch = vi.fn(async () => res(200, { ok: true, code: "MARUFA", pro: true }));
+    const fetch = vi.fn(async () => res(200, { ok: true, code: "TEST-LIFETIME-1", pro: true }));
     vi.stubGlobal("fetch", fetch);
-    expect(await redeemLifetime("marufa")).toBe("ok");
+    expect(await redeemLifetime("test-lifetime-1")).toBe("ok");
     expect(useAccount.getState().account?.pro).toBe(true);
     const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
     expect(url).toContain("/api/creator/redeem/");
@@ -152,13 +152,13 @@ describe("lifetime Pro codes in the app", () => {
   });
 
   it("says what went wrong, and lets other codes carry on the usual way", async () => {
-    expect(await redeemLifetime("MARUFA")).toBe("signedOut");
+    expect(await redeemLifetime("TEST-LIFETIME-1")).toBe("signedOut");
     signIn();
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => res(410, { error: "That code has ended" })),
     );
-    expect(await redeemLifetime("MARUFA")).toBe("ended");
+    expect(await redeemLifetime("TEST-LIFETIME-1")).toBe("ended");
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => res(409, { error: "Not a lifetime code" })),
@@ -168,25 +168,25 @@ describe("lifetime Pro codes in the app", () => {
       "fetch",
       vi.fn(async () => res(409, { error: "Already Pro", held: "OTHER" })),
     );
-    expect(await redeemLifetime("MARUFA")).toBe("held");
+    expect(await redeemLifetime("TEST-LIFETIME-1")).toBe("held");
     expect(useAccount.getState().account?.pro).toBeFalsy();
   });
 
   it("keeps a lifetime code typed while signed out, gives no trial for it, and redeems it after sign-in", async () => {
-    setCode("MARUFA", "typed", false);
+    setCode("TEST-LIFETIME-1", "typed", false);
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => res(200, { code: "MARUFA", kind: "lifetime", name: null, trialDays: null, offering: "creator30" })),
+      vi.fn(async () => res(200, { code: "TEST-LIFETIME-1", kind: "lifetime", name: null, trialDays: null, offering: "creator30" })),
     );
     expect(await sendClaim()).toBe("ok");
-    expect(readClaim()).toMatchObject({ code: "MARUFA", kind: "lifetime", status: "ok" });
+    expect(readClaim()).toMatchObject({ code: "TEST-LIFETIME-1", kind: "lifetime", status: "ok" });
     expect(activeCode()).toBeNull();
     expect(activeOffering()).toBeNull();
     expect(await redeemSaved()).toBe("signedOut");
     signIn();
     vi.stubGlobal(
       "fetch",
-      vi.fn(async () => res(200, { ok: true, code: "MARUFA", pro: true })),
+      vi.fn(async () => res(200, { ok: true, code: "TEST-LIFETIME-1", pro: true })),
     );
     expect(await redeemSaved()).toBe("ok");
     expect(useAccount.getState().account?.pro).toBe(true);

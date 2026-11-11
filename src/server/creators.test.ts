@@ -229,41 +229,51 @@ describe("lifetime Pro codes", () => {
     );
 
   it("checks the admin form: no commission and no trial, whatever the form says", () => {
-    expect(checkCreator({ code: "marufa", kind: "lifetime", name: "Friends", rate: 0.3, trialDays: 30, maxUses: 3 })).toMatchObject({
+    expect(
+      checkCreator({ code: "test-lifetime-2", kind: "lifetime", name: "Friends", rate: 0.3, trialDays: 30, maxUses: 3 }),
+    ).toMatchObject({
       ok: true,
-      creator: { code: "MARUFA", kind: "lifetime", rate: 0, trialDays: null, maxUses: 3 },
+      creator: { code: "TEST-LIFETIME-2", kind: "lifetime", rate: 0, trialDays: null, maxUses: 3 },
     });
   });
 
+  it("refuses a lifetime code short enough to guess, dashes not counted", () => {
+    expect(checkCreator({ code: "pals", kind: "lifetime", name: "Friends" }).ok).toBe(false);
+    expect(checkCreator({ code: "FREE-PRO-1", kind: "lifetime", name: "Friends" }).ok).toBe(false);
+    expect(checkCreator({ code: "FRIENDS-7Q4K", kind: "lifetime", name: "Friends" }).ok).toBe(true);
+    // Other kinds give at most a trial, so short codes stay fine for them.
+    expect(checkCreator({ code: "LIFT", kind: "promo", name: "Short" }).ok).toBe(true);
+  });
+
   it("gives the account Pro for good, and the account's Pro reaches every device through sync", async () => {
-    await addLifetime("MARUFA", 3);
+    await addLifetime("TEST-LIFETIME-1", 3);
     expect(await accountPro("acct-1")).toBe(false);
-    expect(await redeemLifetime("acct-1", "marufa", NOW)).toEqual({ ok: true, code: "MARUFA" });
+    expect(await redeemLifetime("acct-1", "test-lifetime-1", NOW)).toEqual({ ok: true, code: "TEST-LIFETIME-1" });
     expect(await hasLifetimePro("acct-1")).toBe(true);
     expect(await accountPro("acct-1")).toBe(true);
     // Again from another device: still fine, and it doesn't spend another use.
-    expect(await redeemLifetime("acct-1", "MARUFA", NOW)).toEqual({ ok: true, code: "MARUFA" });
-    expect((await loadCreators(NOW)).rows[0]).toMatchObject({ code: "MARUFA", kind: "lifetime", signups: 1, name: "Friends" });
+    expect(await redeemLifetime("acct-1", "TEST-LIFETIME-1", NOW)).toEqual({ ok: true, code: "TEST-LIFETIME-1" });
+    expect((await loadCreators(NOW)).rows[0]).toMatchObject({ code: "TEST-LIFETIME-1", kind: "lifetime", signups: 1, name: "Friends" });
   });
 
   it("stops at its use limit, counting accounts, and the accounts that got it keep it", async () => {
-    await addLifetime("MARUFA", 3);
-    for (const a of ["acct-1", "acct-2", "acct-3"]) expect((await redeemLifetime(a, "MARUFA", NOW)).ok).toBe(true);
-    expect(await redeemLifetime("acct-4", "MARUFA", NOW)).toMatchObject({ ok: false, status: 410 });
+    await addLifetime("TEST-LIFETIME-1", 3);
+    for (const a of ["acct-1", "acct-2", "acct-3"]) expect((await redeemLifetime(a, "TEST-LIFETIME-1", NOW)).ok).toBe(true);
+    expect(await redeemLifetime("acct-4", "TEST-LIFETIME-1", NOW)).toMatchObject({ ok: false, status: 410 });
     expect(await hasLifetimePro("acct-4")).toBe(false);
-    expect(await redeemLifetime("acct-2", "MARUFA", NOW)).toEqual({ ok: true, code: "MARUFA" });
+    expect(await redeemLifetime("acct-2", "TEST-LIFETIME-1", NOW)).toEqual({ ok: true, code: "TEST-LIFETIME-1" });
     // Installs typing it don't use it up: only redemptions count.
-    await claimCode({ installId: "install-0100", code: "MARUFA" }, NOW);
-    expect((await findCode("MARUFA", { accountId: "acct-1" })).ok).toBe(true);
-    expect((await findCode("MARUFA")).ok).toBe(false);
+    await claimCode({ installId: "install-0100", code: "TEST-LIFETIME-1" }, NOW);
+    expect((await findCode("TEST-LIFETIME-1", { accountId: "acct-1" })).ok).toBe(true);
+    expect((await findCode("TEST-LIFETIME-1")).ok).toBe(false);
   });
 
   it("never gives more uses than the limit when accounts redeem at the same moment", async () => {
-    await addLifetime("MARUFA", 3);
+    await addLifetime("TEST-LIFETIME-1", 3);
     const accounts = Array.from({ length: 8 }, (_, i) => `acct-${i}`);
-    const results = await Promise.all(accounts.map((a) => redeemLifetime(a, "MARUFA", NOW)));
+    const results = await Promise.all(accounts.map((a) => redeemLifetime(a, "TEST-LIFETIME-1", NOW)));
     expect(results.filter((r) => r.ok)).toHaveLength(3);
-    expect(await query("SELECT * FROM pro_grants WHERE code = 'MARUFA'")).toHaveLength(3);
+    expect(await query("SELECT * FROM pro_grants WHERE code = 'TEST-LIFETIME-1'")).toHaveLength(3);
   });
 
   it("answers 404 for unknown or paused codes, 409 for other kinds, 410 once ended", async () => {
@@ -276,17 +286,17 @@ describe("lifetime Pro codes", () => {
   });
 
   it("one lifetime code per account", async () => {
-    await addLifetime("MARUFA", 3);
+    await addLifetime("TEST-LIFETIME-1", 3);
     await addLifetime("FRIENDS", null);
-    await redeemLifetime("acct-1", "MARUFA", NOW);
-    expect(await redeemLifetime("acct-1", "FRIENDS", NOW)).toMatchObject({ ok: false, status: 409, held: "MARUFA" });
+    await redeemLifetime("acct-1", "TEST-LIFETIME-1", NOW);
+    expect(await redeemLifetime("acct-1", "FRIENDS", NOW)).toMatchObject({ ok: false, status: 409, held: "TEST-LIFETIME-1" });
   });
 
   it("tells the app it's a lifetime code with no trial", async () => {
-    await addLifetime("MARUFA", 3);
-    expect(await findCode("MARUFA")).toEqual({
+    await addLifetime("TEST-LIFETIME-1", 3);
+    expect(await findCode("TEST-LIFETIME-1")).toEqual({
       ok: true,
-      info: { code: "MARUFA", kind: "lifetime", name: null, trialDays: null, offering: "creator30" },
+      info: { code: "TEST-LIFETIME-1", kind: "lifetime", name: null, trialDays: null, offering: "creator30" },
     });
   });
 });

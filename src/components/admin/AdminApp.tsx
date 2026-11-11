@@ -479,7 +479,11 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
             ))}
           </div>
           <div className="grid gap-3 md:grid-cols-3">
-            {field("Code", "code", promo ? "SUMMER26" : "LIFT-ALEX")}
+            {field(
+              lifetime ? "Code (10+ letters and digits, hard to guess)" : "Code",
+              "code",
+              lifetime ? "PALS-7Q4K-X2M9" : promo ? "SUMMER26" : "LIFT-ALEX",
+            )}
             {field(promo ? "Label (only shown here)" : "Name or handle", "name", promo ? "Summer sale 2026" : "@alexlifts")}
             {!promo && field("Contact (email or handle)", "contact")}
             {!promo && field("Commission %", "rate")}

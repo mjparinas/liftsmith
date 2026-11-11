@@ -88,7 +88,9 @@ export async function finishSignIn(req: Request, now = Date.now()): Promise<Resp
     if (link) await import("./alerts").then((a) => a.reportStaffFailure(String(link.email), "link", { now }));
     return back("?link=expired");
   }
-  await run("UPDATE admin_links SET used_at = ? WHERE token_hash = ?", [now, hash(t)]);
+  // One use only, in one statement: two requests racing with the same link can't both get a session.
+  const used = await query("UPDATE admin_links SET used_at = ? WHERE token_hash = ? AND used_at IS NULL RETURNING email", [now, hash(t)]);
+  if (!used.length) return back("?link=expired");
   const s = token();
   await run("INSERT INTO admin_sessions (token_hash, email, created_at, expires_at) VALUES (?, ?, ?, ?)", [
     hash(s),

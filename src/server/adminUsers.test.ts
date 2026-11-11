@@ -53,6 +53,16 @@ beforeEach(async () => {
 });
 afterEach(() => vi.unstubAllEnvs());
 
+describe("admin sign-in links", () => {
+  it("work once, even when two requests race with the same link", async () => {
+    const r = await startSignIn(new Request(`${SITE}/api/admin/login/`, { method: "POST" }), "owner@example.com");
+    const { devLink } = (await r.json()) as { devLink: string };
+    const both = await Promise.all([finishSignIn(new Request(devLink)), finishSignIn(new Request(devLink))]);
+    expect(both.filter((res) => res.headers.get("set-cookie")?.includes("ls_admin=")).length).toBe(1);
+    expect(await query("SELECT * FROM admin_sessions")).toHaveLength(1);
+  });
+});
+
 describe("finding accounts", () => {
   it("searches by part of an email, by id, and lists the newest first when empty", async () => {
     await seedAccount("acct-aaaa-1111", "lifter@example.com", { events: 3 });

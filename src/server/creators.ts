@@ -34,6 +34,8 @@ const n = (v: unknown) => Number(v ?? 0);
 const s = (v: unknown) => (v == null ? null : String(v));
 const SAFE_ID = /^[A-Za-z0-9_-]{8,64}$/;
 const SOURCES = new Set(["link", "referrer", "typed", "store"]);
+/** Shortest lifetime code the admin form takes, dashes not counted. */
+export const LIFETIME_MIN = 10;
 
 export type ClaimResult = { ok: true; info: CodeInfo } | { ok: false; status: 400 | 404 | 410; error: string };
 
@@ -191,6 +193,13 @@ export function checkCreator(body: unknown): { ok: true; creator: CreatorInput }
   const code = normalizeCode(typeof b.code === "string" ? b.code : null);
   if (!code) return { ok: false, error: "A code is 3 to 24 letters, digits or dashes, like LIFT-ALEX." };
   const kind: CodeKind = codeKind(b.kind);
+  // A lifetime code is Pro for good to whoever types it first, and the code lookup answers without an account, so
+  // it must be too long to guess (security audit, 2026-11-11): 10 or more characters, about 36^10 tries.
+  if (kind === "lifetime" && code.replace(/-/g, "").length < LIFETIME_MIN)
+    return {
+      ok: false,
+      error: "A lifetime code gives Pro for good, so make it hard to guess: 10 or more letters and digits, like FRIENDS-7Q4K.",
+    };
   const name = typeof b.name === "string" ? b.name.trim().slice(0, 60) : "";
   if (!name)
     return {
