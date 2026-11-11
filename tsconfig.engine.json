@@ -18,6 +18,7 @@
     "src/lib/injury.ts",
     "src/lib/layoff.ts",
     "src/lib/loads.ts",
+    "src/lib/measure.ts",
     "src/lib/onerm.ts",
     "src/lib/plateau.ts",
     "src/lib/plates.ts",

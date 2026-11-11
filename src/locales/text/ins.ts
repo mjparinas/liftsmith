@@ -72,6 +72,10 @@ export const en = {
   "ins.gain.title": "{name} is moving",
   "ins.gain.why": "Your estimated one-rep max is up {pct}% in {weeks}.",
   "ins.gain.advice": "Keep the same exercise and rep range while it keeps climbing.",
+  "ins.waistUp.title": "Your waist is growing",
+  "ins.waistUp.why": "Up about {change} in {weeks}.",
+  "ins.waistDown.title": "Waist down, strength holding",
+  "ins.waistDown.why": "Down about {change} in {weeks}, and none of your lifts have stalled.",
 } as const;
 
 type Key = keyof typeof en;
@@ -148,6 +152,10 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.gain.title": "{name} va hacia arriba",
   "ins.gain.why": "Tu 1RM estimado ha subido un {pct}% en {weeks}.",
   "ins.gain.advice": "Mantén el mismo ejercicio y rango de repeticiones mientras siga subiendo.",
+  "ins.waistUp.title": "Tu cintura está creciendo",
+  "ins.waistUp.why": "Ha subido unos {change} en {weeks}.",
+  "ins.waistDown.title": "Cintura menor, fuerza intacta",
+  "ins.waistDown.why": "Ha bajado unos {change} en {weeks}, y ninguno de tus ejercicios se ha estancado.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -223,6 +231,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.gain.title": "{name} progresse",
   "ins.gain.why": "Votre 1RM estimé a gagné {pct} % en {weeks}.",
   "ins.gain.advice": "Gardez le même exercice et la même fourchette de répétitions tant que ça monte.",
+  "ins.waistUp.title": "Votre tour de taille augmente",
+  "ins.waistUp.why": "Environ {change} de plus en {weeks}.",
+  "ins.waistDown.title": "Taille en baisse, force maintenue",
+  "ins.waistDown.why": "Environ {change} de moins en {weeks}, et aucun de vos exercices ne stagne.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -298,6 +310,10 @@ export const de: Partial<Record<Key, Message>> = {
   "ins.gain.title": "{name} geht voran",
   "ins.gain.why": "Dein geschätztes Einerwiederholungsmaximum ist in {weeks} um {pct} % gestiegen.",
   "ins.gain.advice": "Bleib bei derselben Übung und demselben Wiederholungsbereich, solange es weiter steigt.",
+  "ins.waistUp.title": "Dein Bauchumfang nimmt zu",
+  "ins.waistUp.why": "Etwa {change} mehr in {weeks}.",
+  "ins.waistDown.title": "Bauchumfang sinkt, Kraft bleibt",
+  "ins.waistDown.why": "Etwa {change} weniger in {weeks}, und keine deiner Übungen stagniert.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -372,6 +388,10 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.gain.title": "{name} sta salendo",
   "ins.gain.why": "Il tuo massimale stimato è salito del {pct}% in {weeks}.",
   "ins.gain.advice": "Tieni lo stesso esercizio e lo stesso intervallo di ripetizioni finché continua a salire.",
+  "ins.waistUp.title": "La tua vita sta aumentando",
+  "ins.waistUp.why": "Circa {change} in più in {weeks}.",
+  "ins.waistDown.title": "Vita in calo, forza stabile",
+  "ins.waistDown.why": "Circa {change} in meno in {weeks}, e nessuno dei tuoi esercizi si è fermato.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -436,4 +456,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.gain.title": "{name}が伸びています",
   "ins.gain.why": "{weeks}で推定1RMが{pct}%上がりました。",
   "ins.gain.advice": "伸び続けている間は、同じ種目とレップ範囲を続けましょう。",
+  "ins.waistUp.title": "ウエストが増えています",
+  "ins.waistUp.why": "{weeks}で約{change}増えました。",
+  "ins.waistDown.title": "ウエスト減、筋力は維持",
+  "ins.waistDown.why": "{weeks}で約{change}減り、どの種目も停滞していません。",
 };

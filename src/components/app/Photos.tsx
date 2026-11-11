@@ -15,6 +15,7 @@ import type { BodyweightEvent } from "@/lib/types";
 import { fmtNum, fromKg, plainNum, toKg } from "@/lib/units";
 
 import { BodyFatField } from "./BodyFatField";
+import { Measurements } from "./Measurements";
 import { go } from "./router";
 import { BumpField, Button, Chip, Section } from "./ui";
 
@@ -113,6 +114,8 @@ export function Photos() {
           )}
         </div>
       </Section>
+
+      <Measurements />
 
       <Section title={t("photos.progress")}>
         <div className="flex gap-2" role="group" aria-label={t("photos.pose")}>
