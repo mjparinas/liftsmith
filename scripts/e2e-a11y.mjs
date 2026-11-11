@@ -192,6 +192,7 @@ try {
     "/trust/",
     "/pricing/",
     "/help/",
+    "/help/billing/",
     "/contact/",
     "/terms/",
     "/whats-new/",
