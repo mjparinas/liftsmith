@@ -2,7 +2,7 @@ import type { Message } from "@/lib/i18n";
 
 // Text for keys starting "ex.": the built-in exercises' names, setup lines and cues, in every language.
 // English is the source and must match the rows in src/lib/exercises.ts (a test checks); the app reads
-// these through exercises.ts's getters, and the public website stays English (it never loads them).
+// these through exercises.ts's getters; the translated home pages borrow a few names on the server (src/locales/site/fromApp.ts).
 // ex.<id> is the name, ex.<id>.setup the setup line, ex.<id>.cue1 to cue3 the cues.
 
 export const en = {

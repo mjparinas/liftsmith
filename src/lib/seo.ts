@@ -9,6 +9,7 @@ import { landingPath, LANDINGS } from "@/content/landings";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { alternatives } from "./generator";
 import { SITE_URL } from "./site";
+import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { WHATS_NEW } from "./whatsNew";
 
@@ -204,6 +205,8 @@ export interface Route {
   /** ISO date, when the page has one (articles). */
   date?: string;
   priority: number;
+  /** For a page in every site language: each language's path, plus x-default (hreflang in the sitemap). */
+  languages?: Record<string, string>;
 }
 
 /** Every public page, for the sitemap. A new page type adds its paths here. */
@@ -237,6 +240,15 @@ export function siteRoutes(): Route[] {
     { path: "/features/", priority: 0.7 },
     ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
+  // The translated pages (src/lib/siteLang.ts): every language's copy, each listing all of them.
+  for (const path of LOCALIZED_PATHS) {
+    const languages = languageAlternates(path);
+    for (const route of r) if (route.path === path) route.languages = languages;
+    for (const lang of SITE_LANGS) {
+      const english = r.find((x) => x.path === path);
+      if (lang !== "en" && english) r.push({ path: localPath(lang, path), priority: english.priority, languages });
+    }
+  }
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
     if (alternativesTo(e.id).length) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });

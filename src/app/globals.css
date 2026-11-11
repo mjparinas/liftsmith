@@ -441,6 +441,13 @@ body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
 }
 :lang(ja) body { line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere; }
 :lang(de) body { hyphens: auto; overflow-wrap: anywhere; }
+/* The website's translated pages (src/lib/siteLang.ts) carry their language on a wrapper (LangRoot), because the static
+   HTML's <html lang> is English until the page runs, so the same rules apply there too. */
+div[lang="ja"] {
+  --font-sans: "Inter", "Roboto", "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Noto Sans CJK JP", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+  font-family: var(--font-sans); line-break: strict; word-break: auto-phrase; overflow-wrap: anywhere;
+}
+div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
 
 /* A soft light at the top of every app screen, so the dark base has depth without noise. */
 .aurora { position: relative; isolation: isolate; }

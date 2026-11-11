@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { playLinkWithCode } from "@/lib/creatorCode";
 import { APP_PATH, STORE_LINKS } from "@/lib/site";
+import { fill, type SiteLang } from "@/lib/siteLang";
+import { siteText } from "@/locales/site";
 
 // Google Play and App Store badges in the stores' standard black style. Until a listing exists
 // (STORE_LINKS in src/lib/site.ts), the badge is shown dimmed with "Coming soon" and isn't a link,
@@ -35,6 +37,8 @@ function Badge({
   big,
   logo,
   cta,
+  soon,
+  comingSoon,
 }: {
   href: string | null;
   store: string;
@@ -42,6 +46,8 @@ function Badge({
   big: string;
   logo: React.ReactNode;
   cta: string;
+  soon: string;
+  comingSoon: string;
 }) {
   const body = (
     <>
@@ -60,7 +66,7 @@ function Badge({
       </a>
     );
   return (
-    <span className="relative inline-flex" role="img" aria-label={`${store}: coming soon`}>
+    <span className="relative inline-flex" role="img" aria-label={fill(comingSoon, { store })}>
       <span className={`${cls} opacity-60`} aria-hidden>
         {body}
       </span>
@@ -68,7 +74,7 @@ function Badge({
         aria-hidden
         className="absolute -top-2 -right-2 rounded-full bg-accent px-2 py-0.5 text-[0.625rem] font-bold text-accent-ink uppercase"
       >
-        Soon
+        {soon}
       </span>
     </span>
   );
@@ -80,25 +86,39 @@ export function StoreBadges({
   webLink = true,
   place,
   code,
+  lang = "en",
 }: {
   className?: string;
   webLink?: boolean;
   place: string;
   code?: string;
+  lang?: SiteLang;
 }) {
+  const t = siteText(lang).chrome.badges;
   const soon = !STORE_LINKS.googlePlay || !STORE_LINKS.appStore;
   // A creator's code rides through the Play install as its referrer (src/lib/creator.ts).
   const play = STORE_LINKS.googlePlay && code ? playLinkWithCode(STORE_LINKS.googlePlay, code) : STORE_LINKS.googlePlay;
   return (
     <div className={`flex flex-wrap items-center gap-3 ${className}`}>
-      <Badge href={play} store="Google Play" small="GET IT ON" big="Google Play" logo={<PlayLogo />} cta={`google-play-${place}`} />
+      <Badge
+        href={play}
+        store="Google Play"
+        small={t.playSmall}
+        big="Google Play"
+        logo={<PlayLogo />}
+        cta={`google-play-${place}`}
+        soon={t.soon}
+        comingSoon={t.comingSoon}
+      />
       <Badge
         href={STORE_LINKS.appStore}
         store="App Store"
-        small="Download on the"
+        small={t.appleSmall}
         big="App Store"
         logo={<AppleLogo />}
         cta={`app-store-${place}`}
+        soon={t.soon}
+        comingSoon={t.comingSoon}
       />
       {webLink && soon && (
         <Link
@@ -107,7 +127,7 @@ export function StoreBadges({
           className="text-sm font-semibold text-accent underline-offset-4 hover:underline"
           data-cta={`open-app-${place}`}
         >
-          The apps are coming soon. Use it in your browser today →
+          {t.web}
         </Link>
       )}
     </div>

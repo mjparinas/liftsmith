@@ -290,7 +290,7 @@ export function LiftDemoCore({
   const setView = setViewPick;
 
   const ex = exerciseId ? EXERCISES.find((e) => e.id === exerciseId) : undefined;
-  const shown = ex?.name ?? nameProp;
+  const shown = nameProp ?? ex?.name;
   const name = shown ?? w.figure;
   const alt = shown ? (controls ? w.altDrag : w.alt).replace("{name}", shown) : w.altNone;
 
