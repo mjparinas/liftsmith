@@ -397,6 +397,16 @@ export function perDay(
     .sort((a, b) => a.at - b.at);
 }
 
+const SAMPLE_LIMIT = 5000;
+
+/** [start, end) ISO windows of at most a week, oldest first, covering `from` to `to`. Exported for tests. */
+export function weekWindows(from: number, to: number): [string, string][] {
+  const out: [string, string][] = [];
+  for (let a = from; a < to; a += 7 * 86_400_000)
+    out.push([new Date(a).toISOString(), new Date(Math.min(to, a + 7 * 86_400_000)).toISOString()]);
+  return out;
+}
+
 /**
  * The last `days` of sleep, HRV, resting heart rate, steps, VO2 max and overnight breathing rate, one
  * reading per metric per day. Steps only for finished days (today's count is still growing). Empty on
@@ -406,12 +416,20 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
   if (!(await healthAvailable())) return [];
   const { Health } = await health();
   const startDate = new Date(now - days * 86_400_000).toISOString();
+  // One week at a time. Health Connect pages oldest first and the plugin stops at `limit`, so one read of 45
+  // days kept only the oldest samples: a ring that writes HRV every few minutes overnight lost its last few
+  // weeks (the ones the twin shows) never came in (Melvin, 2026-11-11). A week stays well under the limit.
   const read = async (dataType: (typeof READ)[number]): Promise<Sample[]> => {
-    try {
-      return (await Health.readSamples({ dataType, startDate, limit: 2000, ascending: true })).samples as Sample[];
-    } catch {
-      return [];
+    const out: Sample[] = [];
+    for (const [from, to] of weekWindows(now - days * 86_400_000, now)) {
+      try {
+        const r = await Health.readSamples({ dataType, startDate: from, endDate: to, limit: SAMPLE_LIMIT, ascending: true });
+        out.push(...(r.samples as Sample[]));
+      } catch {
+        // Not allowed, or this window failed: keep the rest.
+      }
     }
+    return out;
   };
   const steps = async (): Promise<DailyReading[]> => {
     try {
