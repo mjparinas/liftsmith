@@ -2,8 +2,8 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import { setBillingLive } from "./billing";
-import { cacheFlags } from "./flags";
-import { labOn, setLab } from "./labs";
+import { cacheFlags, FLAGS } from "./flags";
+import { labOn, LABS, setLab } from "./labs";
 
 afterEach(() => {
   localStorage.clear();
@@ -11,6 +11,12 @@ afterEach(() => {
 });
 
 describe("labs", () => {
+  it("lists every lab flag in Settings › Labs, once", () => {
+    // A merge once dropped a lab's line from LABS, which hid its switch while its flag stayed.
+    const flags = Object.keys(FLAGS).filter((f) => f.startsWith("lab") || f === "repMotion");
+    expect(LABS.map((l) => l.flag).sort()).toEqual(flags.sort());
+  });
+
   it("are off until switched on", () => {
     expect(labOn("labRepCount")).toBe(false);
     setLab("labRepCount", true);

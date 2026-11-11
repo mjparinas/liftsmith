@@ -23,6 +23,7 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
+import { fastestMetres } from "@/lib/reps/speedMax";
 import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
@@ -52,6 +53,7 @@ import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
+import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
@@ -268,6 +270,20 @@ export function Workout() {
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
+  // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
+  const speedMaxOn = labOn("labSpeedMax");
+  const warmSpeed = useRef<{ key: string; index: number; kg: number; speed: number } | null>(null);
+  const exId = item?.exerciseId;
+  useEffect(() => {
+    if (!sessionId || !exId) return;
+    const w = warmSpeed.current;
+    if (w && w.key === `${sessionId}:${exId}` && w.index === warmDone - 1)
+      recordWarmupSpeed(sessionId, exId, w.index, { kg: w.kg, speed: w.speed });
+    trimWarmupSpeeds(sessionId, exId, warmDone);
+    warmSpeed.current = null;
+  }, [sessionId, exId, warmDone]);
+
   if (!active || !gym) {
     return (
       <div className="card mt-10">
@@ -342,6 +358,11 @@ export function Workout() {
   // Camera rep counting is a lab (Settings › Labs, Pro): offered only while that lab is on.
   const canCount = !!ex && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
   const counting = canCount && countPrefs.on;
+  // The working set the plan wrote, when every set has the same weight (a program's ramp has its own logic).
+  const plannedWork =
+    item && (!item.setTargets || item.setTargets.every((x) => x.weight === item.setTargets![0]!.weight))
+      ? { weight: (item.setTargets?.[0] ?? item.target).weight, reps: (item.setTargets?.[0] ?? item.target).reps, rir: item.target.rir }
+      : null;
   // One-handed controls (Settings › Accessibility): the bump buttons dock beside Log set.
   const hand = cleanA11y(profile.a11y).hand;
   // Per-side exercises (one-arm rows, split squats): both sides the same is the one-tap default;
@@ -574,6 +595,16 @@ export function Workout() {
                     const a = useApp.getState().active;
                     if (a) s.adjust(a.weight, n);
                   }}
+                  onSummary={
+                    speedMaxOn
+                      ? (sum) => {
+                          const a = useApp.getState().active;
+                          const v = fastestMetres(sum);
+                          if (!a || !warmingUp(a) || v === undefined) return;
+                          warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
+                        }
+                      : undefined
+                  }
                   onClose={() => changeCount({ ...countPrefs, on: false })}
                   paused={infoOpen || swapOpen || endOpen}
                 />
@@ -615,6 +646,17 @@ export function Workout() {
                 ? t("workout.sr.over", { load: loadText(ex, active.weight, profile.unit), reps: repsText(ex, active.reps) })
                 : ""}
           </p>
+          {speedMaxOn && resting && !warming && warmTotal > 0 && doneSets === 0 && !active.tag && plannedWork && (
+            <SpeedNudge
+              sessionId={active.sessionId}
+              ex={ex}
+              gym={gym}
+              planned={plannedWork}
+              weight={active.weight}
+              reps={active.reps}
+              onUse={(kg, reps) => s.adjust(kg, reps)}
+            />
+          )}
           {resting ? (
             <RestCard
               active={active}

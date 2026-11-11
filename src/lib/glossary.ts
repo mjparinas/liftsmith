@@ -35,6 +35,7 @@ const TERMS = [
   "fitnessAge",
   "barSpeed",
   "formCheck",
+  "speedMax",
   "setTypes",
   "stretching",
   "crate",
