@@ -55,12 +55,21 @@ struct Countdown: View {
     }
 }
 
-/// Working sets logged of those planned in the whole workout. Android shows the same bar in its notification.
+/// While resting, a rest bar that empties as rest runs out (the system animates it, no updates needed); otherwise
+/// working sets logged of those planned in the whole workout. Android shows the same bars in its notification.
 struct WorkoutProgress: View {
     let state: WorkoutAttributes.ContentState
 
     var body: some View {
-        if let total = state.total, total > 0 {
+        if let until = state.restUntil, let from = state.restFrom, until > Date(), from < until {
+            ProgressView(timerInterval: from...until, countsDown: true) {
+                EmptyView()
+            } currentValueLabel: {
+                EmptyView()
+            }
+            .tint(Brand.accent)
+            .accessibilityLabel(Text("Rest left"))
+        } else if let total = state.total, total > 0 {
             ProgressView(value: Double(min(state.done ?? 0, total)), total: Double(total))
                 .tint(Brand.accent)
                 .accessibilityLabel("\(min(state.done ?? 0, total)) of \(total) sets done")

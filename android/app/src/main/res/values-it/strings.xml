@@ -14,7 +14,8 @@
     <string name="channel_alert_sound">Riposo finito (solo suono)</string>
     <string name="channel_alert_sound_desc">Suona senza vibrare quando finisce il riposo</string>
     <string name="next_prefix">Poi:</string>
-    <string name="rest_next">Riposo · poi: %1$s</string>
+    <string name="rest_left">Ancora %1$s di riposo</string>
+    <string name="rest_left_next">Ancora %1$s · poi: %2$s</string>
     <string name="up_next">Prossima: %1$s</string>
     <string name="add_30">+30 s</string>
     <string name="widget_title">Allenamento di oggi</string>
