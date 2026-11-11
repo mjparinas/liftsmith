@@ -298,8 +298,9 @@ describe("first run to finished workout", () => {
     expect(sets.map((e) => e.type === "set" && e.exerciseId)).toEqual([a, b]);
     expect(sets.every((e) => e.type === "set" && e.superset === plan.items[0].group)).toBe(true);
 
-    // Split them mid-workout from the Coming up list.
-    await user.click(screen.getByRole("button", { name: /^Split / }));
+    // Split them mid-workout from the Coming up list. By its full name: an exercise can start with
+    // "Split" too (Split jerk on the progress bar).
+    await user.click(screen.getByRole("button", { name: `Split ${exercise(b).name} from ${exercise(a).name}` }));
     expect(useApp.getState().active!.plan.items[0].group).toBeUndefined();
   });
 
@@ -712,13 +713,25 @@ describe("Labs", () => {
     location.hash = "#/settings";
     await user.click(await screen.findByRole("button", { name: /Labs/ }));
     const sw = await screen.findByRole("switch", { name: /Camera rep counting/ });
-    // Phone motion builds on camera counting, so it shows once that's on.
-    expect(screen.queryByRole("switch", { name: /Phone motion/ })).not.toBeInTheDocument();
     await user.click(sw);
     expect(sw).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByRole("switch", { name: /Phone motion/ })).toBeInTheDocument();
     location.hash = "#/workout";
     expect(await screen.findByRole("button", { name: "Count reps with the camera" })).toBeInTheDocument();
+  });
+
+  it("phone motion rep counting works on its own, without camera counting", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/settings";
+    await user.click(await screen.findByRole("button", { name: /Labs/ }));
+    // Its own switch, shown with camera counting off.
+    const sw = await screen.findByRole("switch", { name: /Phone motion/ });
+    expect(screen.getByRole("switch", { name: /Camera rep counting/ })).toHaveAttribute("aria-checked", "false");
+    await user.click(sw);
+    expect(sw).toHaveAttribute("aria-checked", "true");
+    await startSquat(user);
+    expect(await screen.findByRole("button", { name: "Count reps with phone motion" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Count reps with the camera" })).not.toBeInTheDocument();
   });
 
   it("heart-rate rest timer: cuts the rest once the heart rate is back down, and says why", async () => {

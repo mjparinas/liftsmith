@@ -43,6 +43,7 @@ describe("flags for an install", () => {
       labVoiceLog: false,
       labSpeedMax: false,
       labWatchReps: false,
+      social: true,
     });
     await setFlag("repMotion", true, 100, "owner@example.com");
     expect((await flagsFor("install-aaaa-1")).repMotion).toBe(true);
@@ -130,6 +131,7 @@ describe("the flag routes", () => {
         labVoiceLog: false,
         labSpeedMax: false,
         labWatchReps: false,
+        social: true,
       },
     });
     expect(r.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");

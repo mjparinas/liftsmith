@@ -19,6 +19,7 @@ const TERMS = [
   "e1rm",
   "weeklySets",
   "variety",
+  "experience",
   "recovery",
   "superset",
   "warmup",

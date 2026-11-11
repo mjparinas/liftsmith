@@ -27,7 +27,7 @@ export const en = {
     "How many more reps you could have done when you stop the set. RIR 2 means you finish the set feeling you had about two more good reps in you.\nThe plan starts with more in the tank and moves closer to failure across the block.",
   "gloss.rpe.title": "RPE: rate of perceived exertion",
   "gloss.rpe.body":
-    "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.\nPick this scale or reps in reserve in Settings › Workout preferences. The plan works the same either way.",
+    "How hard a set felt on a 1 to 10 scale, where 10 is all you had. An 8 means you had about two more good reps in you, the same as 2 reps in reserve.",
   "gloss.blockWeek.title": "Training block",
   "gloss.blockWeek.body":
     "Where you are in your block: which build week (or the deload), and how many reps to leave in the tank this week. You can change the block length in Settings.",
@@ -46,6 +46,9 @@ export const en = {
   "gloss.weeklySets.title": "Sets per muscle this week",
   "gloss.weeklySets.body":
     "Hard sets that worked each muscle this week. Secondary muscles count as half a set. The green band, 10 to 20, is the range most research supports for growth. The plan aims at the muscles furthest below it.",
+  "gloss.experience.title": "Experience",
+  "gloss.experience.body":
+    "How long you've been lifting regularly. New is under a year, Some is 1 to 3 years, and Experienced is 3 years or more.\nIt sets how many hard sets each muscle gets a week (8 to 12 for New, 10 to 16 for Some, 12 to 20 for Experienced) and how heavy the first weights are on lifts you haven't logged yet. After you log a lift, your own sets set its weights.\nIt also picks the starting step in bodyweight programs and how fast your lift goals are forecast to move. Not sure? Pick the lower one; the plan catches up quickly.",
   "gloss.variety.title": "Exercise variety",
   "gloss.variety.body":
     "How often the plan keeps the same exercise for a muscle. More consistent is better for tracking progress on a lift. More variety keeps things fresh and spreads the stress.",
@@ -128,7 +131,7 @@ export const es: Partial<Record<Key, Message>> = {
     "Cuántas repeticiones más podrías haber hecho al terminar la serie. RIR 2 significa que acabas la serie sintiendo que te quedaban unas dos buenas repeticiones.\nEl plan empieza con más reserva y se acerca al fallo a lo largo del bloque.",
   "gloss.rpe.title": "RPE: esfuerzo percibido",
   "gloss.rpe.body":
-    "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.\nElige esta escala o las repeticiones en reserva en Ajustes › Preferencias de entrenamiento. El plan funciona igual con ambas.",
+    "Lo dura que se sintió una serie en una escala del 1 al 10, donde 10 es todo lo que tenías. Un 8 significa que te quedaban unas dos buenas repeticiones, lo mismo que 2 repeticiones en reserva.",
   "gloss.blockWeek.title": "Bloque de entrenamiento",
   "gloss.blockWeek.body":
     "En qué punto del bloque estás: qué semana de carga (o la descarga) y cuántas repeticiones dejar en reserva esta semana. Puedes cambiar la duración del bloque en Ajustes.",
@@ -147,6 +150,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.weeklySets.title": "Series por músculo esta semana",
   "gloss.weeklySets.body":
     "Series duras que trabajaron cada músculo esta semana. Los músculos secundarios cuentan como media serie. La franja verde, de 10 a 20, es el rango que más respalda la investigación para ganar músculo. El plan se centra en los músculos más alejados de ella.",
+  "gloss.experience.title": "Experiencia",
+  "gloss.experience.body":
+    "Cuánto tiempo llevas entrenando con pesas de forma regular. Principiante es menos de un año, Algo es de 1 a 3 años y Con experiencia es 3 años o más.\nDefine cuántas series duras recibe cada músculo por semana (8 a 12 para Principiante, 10 a 16 para Algo, 12 a 20 para Con experiencia) y qué tan pesados son los primeros pesos en los ejercicios que aún no has registrado. Cuando registras un ejercicio, tus propias series fijan sus pesos.\nTambién elige el paso inicial en los programas con peso corporal y la rapidez con la que se prevé que avancen tus objetivos. ¿No lo tienes claro? Elige el nivel más bajo; el plan se pone al día rápido.",
   "gloss.variety.title": "Variedad de ejercicios",
   "gloss.variety.body":
     "Con qué frecuencia el plan mantiene el mismo ejercicio para un músculo. Más constancia ayuda a seguir el progreso de un ejercicio. Más variedad lo mantiene fresco y reparte el estrés.",
@@ -227,7 +233,7 @@ export const fr: Partial<Record<Key, Message>> = {
     "Combien de répétitions de plus vous auriez pu faire en arrêtant la série. RIR 2 signifie que vous terminez la série en sentant qu’il vous restait environ deux bonnes répétitions.\nLe plan commence avec plus de réserve et se rapproche de l’échec au fil du bloc.",
   "gloss.rpe.title": "RPE : effort perçu",
   "gloss.rpe.body":
-    "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.\nChoisissez cette échelle ou les répétitions en réserve dans Réglages › Préférences d’entraînement. Le plan fonctionne de la même façon dans les deux cas.",
+    "La difficulté ressentie d’une série sur une échelle de 1 à 10, où 10 est tout ce que vous aviez. Un 8 signifie qu’il vous restait environ deux bonnes répétitions, comme 2 répétitions en réserve.",
   "gloss.blockWeek.title": "Bloc d’entraînement",
   "gloss.blockWeek.body":
     "Où vous en êtes dans votre bloc : quelle semaine de progression (ou la décharge), et combien de répétitions garder en réserve cette semaine. Vous pouvez changer la durée du bloc dans Réglages.",
@@ -246,6 +252,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.weeklySets.title": "Séries par muscle cette semaine",
   "gloss.weeklySets.body":
     "Les séries difficiles qui ont travaillé chaque muscle cette semaine. Les muscles secondaires comptent pour une demi-série. La bande verte, de 10 à 20, est la fourchette que la recherche soutient le plus pour la prise de muscle. Le plan vise les muscles les plus en dessous.",
+  "gloss.experience.title": "Expérience",
+  "gloss.experience.body":
+    "Depuis combien de temps tu t’entraînes régulièrement. Débutant, c’est moins d’un an, Un peu, de 1 à 3 ans, et Confirmé, 3 ans ou plus.\nElle fixe le nombre de séries difficiles par muscle et par semaine (8 à 12 pour Débutant, 10 à 16 pour Un peu, 12 à 20 pour Confirmé) et la lourdeur des premières charges sur les exercices que tu n’as pas encore enregistrés. Une fois un exercice enregistré, ce sont tes propres séries qui fixent ses charges.\nElle choisit aussi l’étape de départ des programmes au poids du corps et la vitesse prévue de tes objectifs. Tu hésites ? Choisis le niveau le plus bas ; le plan rattrape vite.",
   "gloss.variety.title": "Variété des exercices",
   "gloss.variety.body":
     "La fréquence à laquelle le plan garde le même exercice pour un muscle. Plus de régularité aide à suivre les progrès sur un exercice. Plus de variété garde les choses fraîches et répartit le stress.",
@@ -326,7 +335,7 @@ export const de: Partial<Record<Key, Message>> = {
     "Wie viele Wiederholungen du noch geschafft hättest, als du den Satz beendest. RIR 2 heißt: Du beendest den Satz mit dem Gefühl, dass noch etwa zwei saubere Wiederholungen drin gewesen wären.\nDer Plan beginnt mit mehr Reserve und geht im Lauf des Blocks näher ans Muskelversagen.",
   "gloss.rpe.title": "RPE: wahrgenommene Anstrengung",
   "gloss.rpe.body":
-    "Wie schwer sich ein Satz angefühlt hat, auf einer Skala von 1 bis 10, wobei 10 alles ist, was du hattest. Eine 8 heißt, dass noch etwa zwei saubere Wiederholungen drin waren, also dasselbe wie 2 Wiederholungen in Reserve.\nWähle diese Skala oder Wiederholungen in Reserve unter Einstellungen › Trainingsvorlieben. Der Plan funktioniert in beiden Fällen gleich.",
+    "Wie schwer sich ein Satz angefühlt hat, auf einer Skala von 1 bis 10, wobei 10 alles ist, was du hattest. Eine 8 heißt, dass noch etwa zwei saubere Wiederholungen drin waren, also dasselbe wie 2 Wiederholungen in Reserve.",
   "gloss.blockWeek.title": "Trainingsblock",
   "gloss.blockWeek.body":
     "Wo du in deinem Block stehst: welche Aufbauwoche (oder der Deload) und wie viele Wiederholungen du diese Woche in Reserve lassen sollst. Die Blocklänge kannst du in den Einstellungen ändern.",
@@ -345,6 +354,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.weeklySets.title": "Sätze pro Muskel diese Woche",
   "gloss.weeklySets.body":
     "Harte Sätze, die diese Woche jeden Muskel trainiert haben. Mitbeteiligte Muskeln zählen als halber Satz. Der grüne Bereich, 10 bis 20, ist die Spanne, die die meiste Forschung für Muskelaufbau stützt. Der Plan zielt auf die Muskeln, die am weitesten darunter liegen.",
+  "gloss.experience.title": "Erfahrung",
+  "gloss.experience.body":
+    "Wie lange du schon regelmäßig Krafttraining machst. Neu heißt unter einem Jahr, Etwas 1 bis 3 Jahre und Erfahren 3 Jahre oder mehr.\nSie legt fest, wie viele harte Sätze jeder Muskel pro Woche bekommt (8 bis 12 bei Neu, 10 bis 16 bei Etwas, 12 bis 20 bei Erfahren) und wie schwer die ersten Gewichte bei Übungen sind, die du noch nicht eingetragen hast. Sobald du eine Übung einträgst, bestimmen deine eigenen Sätze ihre Gewichte.\nSie wählt auch die Startstufe in Programmen mit Körpergewicht und wie schnell deine Ziele voraussichtlich vorankommen. Unsicher? Nimm die niedrigere Stufe; der Plan holt schnell auf.",
   "gloss.variety.title": "Übungsvielfalt",
   "gloss.variety.body":
     "Wie oft der Plan für einen Muskel bei derselben Übung bleibt. Beständiger ist besser, um den Fortschritt bei einer Übung zu verfolgen. Mehr Abwechslung hält das Training frisch und verteilt die Belastung.",
@@ -425,7 +437,7 @@ export const it: Partial<Record<Key, Message>> = {
     "Quante ripetizioni in più avresti potuto fare quando chiudi la serie. RIR 2 significa che finisci la serie sentendo di avere ancora circa due buone ripetizioni.\nIl piano parte con più riserva e si avvicina al cedimento nel corso del blocco.",
   "gloss.rpe.title": "RPE: sforzo percepito",
   "gloss.rpe.body":
-    "Quanto è stata dura una serie su una scala da 1 a 10, dove 10 è tutto quello che avevi. Un 8 significa che avevi ancora circa due buone ripetizioni, come 2 ripetizioni di riserva.\nScegli questa scala o le ripetizioni di riserva in Impostazioni › Preferenze di allenamento. Il piano funziona allo stesso modo in entrambi i casi.",
+    "Quanto è stata dura una serie su una scala da 1 a 10, dove 10 è tutto quello che avevi. Un 8 significa che avevi ancora circa due buone ripetizioni, come 2 ripetizioni di riserva.",
   "gloss.blockWeek.title": "Blocco di allenamento",
   "gloss.blockWeek.body":
     "A che punto sei del blocco: quale settimana di carico (o lo scarico) e quante ripetizioni lasciare di riserva questa settimana. Puoi cambiare la durata del blocco nelle Impostazioni.",
@@ -444,6 +456,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.weeklySets.title": "Serie per muscolo questa settimana",
   "gloss.weeklySets.body":
     "Le serie impegnative che hanno allenato ogni muscolo questa settimana. I muscoli secondari contano mezza serie. La fascia verde, da 10 a 20, è l’intervallo che la maggior parte della ricerca indica per la crescita. Il piano punta ai muscoli più lontani da questa fascia.",
+  "gloss.experience.title": "Esperienza",
+  "gloss.experience.body":
+    "Da quanto tempo ti alleni con i pesi in modo regolare. Principiante è meno di un anno, Un po’ è da 1 a 3 anni ed Esperto è 3 anni o più.\nStabilisce quante serie impegnative riceve ogni muscolo a settimana (da 8 a 12 per Principiante, da 10 a 16 per Un po’, da 12 a 20 per Esperto) e quanto sono pesanti i primi carichi sugli esercizi che non hai ancora registrato. Quando registri un esercizio, sono le tue serie a fissarne i carichi.\nSceglie anche il passo di partenza nei programmi a corpo libero e la velocità prevista dei tuoi obiettivi. Non sei sicuro? Scegli il livello più basso; il piano si adegua in fretta.",
   "gloss.variety.title": "Varietà degli esercizi",
   "gloss.variety.body":
     "Quanto spesso il piano mantiene lo stesso esercizio per un muscolo. Più costanza aiuta a seguire i progressi su un esercizio. Più varietà rende l’allenamento meno monotono e distribuisce lo stress.",
@@ -524,7 +539,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "セットを終えた時点で、あと何回できたかを表します。RIR 2 は、あと2回ほどきれいにできそうな余力を残してセットを終えるという意味です。\nプランは余力を多めに残して始まり、ブロックが進むにつれて限界に近づいていきます。",
   "gloss.rpe.title": "RPE：主観的運動強度",
   "gloss.rpe.body":
-    "セットのきつさを1〜10で表します。10は出し切った状態です。8なら、あと2回ほどきれいにできる余力があったという意味で、余力レップ数2と同じです。\nこの尺度と余力レップ数のどちらを使うかは、設定 › ワークアウトの設定で選べます。どちらでもプランの動きは同じです。",
+    "セットのきつさを1〜10で表します。10は出し切った状態です。8なら、あと2回ほどきれいにできる余力があったという意味で、余力レップ数2と同じです。",
   "gloss.blockWeek.title": "トレーニングブロック",
   "gloss.blockWeek.body":
     "ブロックの中で今どこにいるかを示します。何週目の強化週か（またはディロード週か）と、今週どれだけ余力を残すかです。ブロックの長さは設定で変更できます。",
@@ -543,6 +558,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.weeklySets.title": "今週の部位別セット数",
   "gloss.weeklySets.body":
     "今週、各部位を鍛えたきついセットの数です。補助的に使われた部位は0.5セットとして数えます。緑の帯（10〜20）は、筋肥大に効果的だとする研究が最も多い範囲です。プランはこの範囲から最も下回っている部位を優先します。",
+  "gloss.experience.title": "経験",
+  "gloss.experience.body":
+    "定期的に筋トレを続けている期間です。初心者は1年未満、少し経験ありは1〜3年、経験者は3年以上です。\n各筋肉の1週間のハードセット数（初心者は8〜12、少し経験ありは10〜16、経験者は12〜20）と、まだ記録していない種目の最初の重量を決めます。種目を記録すると、その後はご自身のセットから重量が決まります。\n自重プログラムの開始ステップと、目標の達成ペースの予測にも使われます。迷ったら低いほうを選んでください。プランはすぐに追いつきます。",
   "gloss.variety.title": "種目のバリエーション",
   "gloss.variety.body":
     "ある部位に対して、プランが同じ種目をどのくらい続けるかを決めます。固定するほど種目ごとの進歩を追いやすくなります。変化をつけるほど新鮮さが保たれ、負担も分散します。",

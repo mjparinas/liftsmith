@@ -7,7 +7,7 @@ import { useCallback, useEffect, useState } from "react";
 import { BuildStamp } from "@/components/BuildStamp";
 import type { Metrics, StoreRevenue } from "@/lib/adminMetrics";
 import { CODE_KINDS, type CodeKind } from "@/lib/creatorCode";
-import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
+import { HOLD_DAYS, MIN_PAYOUT, STORE_FEE, type CodeStatus, type CreatorRow, type Payout } from "@/lib/creatorMetrics";
 
 import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
@@ -17,6 +17,7 @@ import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
 import { MaintenanceBanner, useMaintenance } from "./Maintenance";
+import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
@@ -47,6 +48,7 @@ const TABS = [
   "Overview",
   "To Do",
   "Inbox",
+  "Reports",
   "Traffic",
   "Acquisition",
   "Funnel",
@@ -287,6 +289,16 @@ const blank = {
   maxUses: "",
 };
 const dayOf = (ms: number | null) => (ms == null ? "" : new Date(ms).toISOString().slice(0, 10));
+const KIND_LABEL: Record<CodeKind, string> = { creator: "Creator", promo: "Promo", lifetime: "Lifetime Pro" };
+const STATUS: Record<CodeStatus, { label: string; tone: string; order: number }> = {
+  live: { label: "Live", tone: "text-good", order: 0 },
+  "used-up": { label: "Used up", tone: "text-warn", order: 1 },
+  ended: { label: "Ended", tone: "text-bad", order: 2 },
+  paused: { label: "Paused", tone: "text-muted", order: 3 },
+};
+/** What a code gives the person who uses it. */
+const givesOf = (r: CreatorRow) =>
+  r.kind === "lifetime" ? "Pro for life" : r.trialDays == null ? `Offering ${r.offering}` : `${r.trialDays}-day trial`;
 
 /**
  * Codes (docs/decisions/marketing-and-growth.md): creators' codes, with what they brought in and what each creator
@@ -297,13 +309,20 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
   const [version, setVersion] = useState(0);
   const [form, setForm] = useState(blank);
   const [msg, setMsg] = useState<string | null>(null);
+  const [failed, setFailed] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/creators/?days=${days}`)
       .then(async (r) => {
-        if (r.ok && live) setData(await r.json());
+        if (!live) return;
+        if (r.ok) {
+          setData(await r.json());
+          setFailed(null);
+        } else setFailed(`Couldn't load the codes (error ${r.status}). Reload to try again.`);
       })
-      .catch(() => {});
+      .catch(() => {
+        if (live) setFailed("Couldn't load the codes. Check the connection and reload.");
+      });
     return () => {
       live = false;
     };
@@ -332,7 +351,8 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
     };
     if (await post(body)) setForm(blank);
   };
-  const edit = (c: CreatorRow) =>
+  const edit = (c: CreatorRow) => {
+    document.getElementById("code-form")?.scrollIntoView({ behavior: "smooth", block: "start" });
     setForm({
       kind: c.kind,
       code: c.code,
@@ -347,14 +367,25 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       endsAt: dayOf(c.endsAt),
       maxUses: c.maxUses == null ? "" : String(c.maxUses),
     });
+  };
   const pay = async (c: CreatorRow) => {
     const amount = window.prompt(`Record a payout to ${c.name}. Amount paid in USD (owed: ${fmtUsd(c.owed, 2)}):`, c.owed.toFixed(2));
     if (!amount) return;
     const note = window.prompt("Note (PayPal or Wise reference), optional:") ?? "";
     await post({ action: "payout", code: c.code, usd: Number(amount), note });
   };
-  if (!data) return <p className="text-muted">Loading…</p>;
+  if (!data)
+    return failed ? (
+      <p role="alert" className="text-bad">
+        {failed}
+      </p>
+    ) : (
+      <p className="text-muted">Loading…</p>
+    );
   const rows = data.rows;
+  const creators = rows.filter((r) => r.kind === "creator");
+  // Live codes first, then used up, ended and paused; newest first within each.
+  const listed = rows.slice().sort((a, b) => STATUS[a.status].order - STATUS[b.status].order || b.createdAt - a.createdAt);
   const sum = (f: (r: CreatorRow) => number) => rows.reduce((t, r) => t + f(r), 0);
   // Promo and lifetime codes are ours: no creator, contact or commission.
   const promo = form.kind !== "creator";
@@ -376,7 +407,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
         <Tile
           label="Live codes"
-          value={fmtInt(rows.filter((r) => r.active).length)}
+          value={fmtInt(rows.filter((r) => r.status === "live").length)}
           sub={`${rows.filter((r) => r.kind === "creator").length} creators · ${rows.filter((r) => r.kind === "promo").length} promo · ${rows.filter((r) => r.kind === "lifetime").length} lifetime`}
         />
         <Tile
@@ -406,7 +437,40 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
         />
       </div>
       <Card
-        title="Codes"
+        title="All codes"
+        subtitle="Every code, whether people can use it now, and how much of its limit is used. Live codes take new sign-ups; a paused, ended or used-up code doesn't, but people who already used it keep what it gave. Uses are installs that claimed the code, or accounts that redeemed a lifetime code."
+      >
+        <Table
+          columns={["Code", "Kind", "Label or name", "Status", "Gives", "Uses", "Limit", "Left", "Ends", "Created", "Last used", ""]}
+          empty="No codes yet. Add the first one below."
+          rows={listed.map((r) => [
+            <code key="c" className="text-xs">
+              {r.code}
+            </code>,
+            KIND_LABEL[r.kind],
+            r.name,
+            <span key="s" className={`font-semibold ${STATUS[r.status].tone}`}>
+              {STATUS[r.status].label}
+            </span>,
+            givesOf(r),
+            fmtInt(r.signups),
+            r.maxUses == null ? "No limit" : fmtInt(r.maxUses),
+            r.usesLeft == null ? "—" : fmtInt(r.usesLeft),
+            r.endsAt == null ? "Never" : dayOf(r.endsAt),
+            dayOf(r.createdAt),
+            r.lastUsed ? when(r.lastUsed) : "Not yet",
+            admin ? (
+              <button key="e" type="button" className="text-xs text-accent underline" onClick={() => edit(r)}>
+                Edit
+              </button>
+            ) : (
+              ""
+            ),
+          ])}
+        />
+      </Card>
+      <Card
+        title="Creator commission"
         subtitle={`Commission is the rate times our net revenue (the store price less its ${Math.round(STORE_FEE * 100)}% fee) for each subscriber's first months after their first payment. Revenue counts once it's ${HOLD_DAYS} days old, so refunds can't be paid out; a refund takes its share back. Pay monthly once someone is owed ${fmtUsd(MIN_PAYOUT)} or more.`}
         right={
           <a className="text-xs text-accent underline" href="/api/admin/creators/?format=csv">
@@ -415,9 +479,9 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
         }
       >
         <Table
-          columns={["Code", "Name", "Terms", "Sign-ups", "Trials", "Paying", "Refunds", "Gross", "Earned", "Paid", "Owed", "Last paid", ""]}
-          empty="No codes yet. Add the first one below."
-          rows={rows.map((r) => [
+          columns={["Code", "Name", "Share", "Sign-ups", "Trials", "Paying", "Refunds", "Gross", "Earned", "Paid", "Owed", "Last paid", ""]}
+          empty="No creators' codes yet. Add one below."
+          rows={creators.map((r) => [
             <code key="c" className="text-xs">
               {r.code}
             </code>,
@@ -425,14 +489,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
               {r.name}
               {!r.active && <span className="ml-1 text-xs text-muted">(paused)</span>}
             </span>,
-            [
-              r.kind === "lifetime" ? "Pro for life" : r.kind === "promo" ? "Promo" : `${Math.round(r.rate * 100)}% · ${r.months} mo`,
-              r.kind === "lifetime" ? "" : r.trialDays == null ? `offer ${r.offering}` : `${r.trialDays}-day trial`,
-              r.endsAt != null ? `ends ${dayOf(r.endsAt)}` : "",
-              r.maxUses != null ? `${fmtInt(r.signups)}/${fmtInt(r.maxUses)} used` : "",
-            ]
-              .filter(Boolean)
-              .join(" · "),
+            `${Math.round(r.rate * 100)}% · ${r.months} mo`,
             fmtInt(r.signups),
             fmtInt(r.trials),
             fmtInt(r.paying),
@@ -444,17 +501,11 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
               {fmtUsd(r.owed, 2)}
             </span>,
             r.lastPayout ? when(r.lastPayout) : "—",
-            admin ? (
-              <span key="a" className="flex gap-2 text-xs">
-                <button type="button" className="text-accent underline" onClick={() => edit(r)}>
-                  Edit
-                </button>
-                {r.owed > 0 && (
-                  <button type="button" className="text-accent underline" onClick={() => void pay(r)}>
-                    Record payout
-                  </button>
-                )}
-              </span>
+            // Editing is in All codes above; here only the payout.
+            admin && r.owed > 0 ? (
+              <button key="a" type="button" className="text-xs text-accent underline" onClick={() => void pay(r)}>
+                Record payout
+              </button>
             ) : (
               ""
             ),
@@ -463,6 +514,7 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
       </Card>
       {admin && (
         <Card
+          id="code-form"
           title={form.code && rows.some((r) => r.code === form.code.toUpperCase()) ? `Edit ${form.code.toUpperCase()}` : "Add a code"}
           subtitle="Its link is www.getliftsmith.com/c/<code>, or people type it under Settings › Redeem a code. The trial and offering decide what it gives: a longer trial through creator30, or a discount through any RevenueCat offering whose store products carry it (set those up in RevenueCat, Play Console and App Store Connect first). On Google Play, tag the code's offer with the offering id and rc-ignore-offer."
         >
@@ -546,6 +598,7 @@ export function AdminApp() {
   const setCount = useCallback((t: Tab, n: number) => setCounts((c) => (c[t] === n ? c : { ...c, [t]: n })), []);
   const todoCount = useCallback((n: number) => setCount("To Do", n), [setCount]);
   const inboxCount = useCallback((n: number) => setCount("Inbox", n), [setCount]);
+  const reportsCount = useCallback((n: number) => setCount("Reports", n), [setCount]);
   // Each tab (and an open account or install) has its own address, and every move is in the browser history,
   // so Back, Forward, a reload and a shared link all land on the same place (as in Gradelings).
   const navigate = useCallback((next: View) => {
@@ -577,10 +630,13 @@ export function AdminApp() {
         ? j.items.length + (j.tasks as { doneAt: unknown }[]).filter((t) => !t.doneAt).length
         : null,
     ).then((n) => live && n != null && todoCount(n));
+    void read("/api/admin/reports/", (j) => (Array.isArray(j.reports) ? j.reports.length : null)).then(
+      (n) => live && n != null && reportsCount(n),
+    );
     return () => {
       live = false;
     };
-  }, [state, inboxCount, todoCount]);
+  }, [state, inboxCount, todoCount, reportsCount]);
   useEffect(() => {
     let live = true;
     fetch(`/api/admin/stats/?days=${days}`)
@@ -977,6 +1033,7 @@ export function AdminApp() {
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Reports" && <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}

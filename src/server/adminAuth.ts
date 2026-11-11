@@ -31,6 +31,8 @@ const token = () => randomBytes(32).toString("base64url");
 
 const json = (status: number, body: unknown, headers: HeadersInit = {}) =>
   Response.json(body, { status, headers: { "Cache-Control": "no-store", ...headers } });
+/** The sign-in email's subject; the admin Inbox leaves these out (src/server/inbox.ts). */
+export const ADMIN_LINK_SUBJECT = "Your Liftsmith admin sign-in link";
 export const notFound = () => json(404, { error: "Not found" });
 
 /** Requests that change something must come from our own pages. */
@@ -66,7 +68,7 @@ export async function startSignIn(req: Request, email: string, send: typeof fetc
     body: JSON.stringify({
       from: process.env.ADMIN_FROM ?? process.env.FEEDBACK_FROM ?? "Liftsmith admin <onboarding@resend.dev>",
       to: [e],
-      subject: "Your Liftsmith admin sign-in link",
+      subject: ADMIN_LINK_SUBJECT,
       text: `Sign in to the Liftsmith admin panel:\n\n${link}\n\nThe link works once, for 15 minutes. If you didn't ask for it, ignore this email.`,
     }),
   });

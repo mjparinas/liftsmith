@@ -34,10 +34,16 @@ describe("labs", () => {
   });
 
   it("need the lab they build on", () => {
-    setLab("repMotion", true);
-    expect(labOn("repMotion")).toBe(false);
+    setLab("labBarSpeed", true);
+    expect(labOn("labBarSpeed")).toBe(false);
     setLab("labRepCount", true);
+    expect(labOn("labBarSpeed")).toBe(true);
+  });
+
+  it("phone motion counting stands on its own, without camera counting", () => {
+    setLab("repMotion", true);
     expect(labOn("repMotion")).toBe(true);
+    expect(LABS.find((l) => l.flag === "repMotion")?.needs).toBeUndefined();
   });
 
   it("switched on this device win over the server", () => {

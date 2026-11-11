@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { useAccount } from "@/lib/auth";
 import { trainingDays } from "@/lib/calendar";
 import { clockTime, list, t, weekday } from "@/lib/i18n";
 import { oops } from "@/lib/juice";
@@ -54,7 +55,11 @@ export function MessageSettings() {
   const save = (p: Partial<Prefs>) => setProfile({ messages: { ...prefs, startedAt: startedAt(prefs), ...p } });
   const native = pushSupported();
   const [allowed, setAllowed] = useState<boolean | null>(null);
-  const [address, setAddress] = useState(prefs.email?.address ?? "");
+  // The signed-in account's email fills the box (it can still be changed), so nobody types what we know;
+  // signing in with this screen open fills an untouched box too.
+  const accountEmail = useAccount((s) => s.account?.email ?? null);
+  const [typed, setAddress] = useState<string | null>(null);
+  const address = typed ?? prefs.email?.address ?? accountEmail ?? "";
   const [agree, setAgree] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);

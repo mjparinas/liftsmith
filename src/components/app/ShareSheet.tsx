@@ -18,6 +18,7 @@ import { shareText, type Shareable, type ShareContext, type ShareOptions } from 
 import { drawCard, shareCanvas, type CardData, type CardSize } from "@/lib/shareImage";
 import { copyText, createLink, deleteLink, linkError, shareUrl, type ShareLink } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
+import { toast } from "@/lib/toast";
 
 import { go } from "./router";
 import { Button, Chip, Sheet, SwitchRow } from "./ui";
@@ -223,6 +224,18 @@ function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; 
       setBusy(false);
     }
   };
+  // Copied: a toast says so (the sheet's own note sits below the fold). Not copied: show the link to copy by hand.
+  const copy = async () => {
+    if (!link) return;
+    if (await copyText(link.url)) {
+      setNote(null);
+      haptic("success");
+      toast(t("link.copied"));
+    } else {
+      oops();
+      setNote(link.url);
+    }
+  };
   const remove = async () => {
     if (!link) return;
     setBusy(true);
@@ -257,12 +270,12 @@ function LinkSection({ item, card, figure }: { item: Shareable; card: CardData; 
               kind="ghost"
               icon="link"
               onClick={async () => {
-                if (!(await shareUrl(link.url, card.headline))) setNote((await copyText(link.url)) ? t("link.copied") : link.url);
+                if (!(await shareUrl(link.url, card.headline))) await copy();
               }}
             >
               {t("link.share")}
             </Button>
-            <Button kind="ghost" onClick={async () => setNote((await copyText(link.url)) ? t("link.copied") : link.url)}>
+            <Button kind="ghost" onClick={copy}>
               {t("link.copy")}
             </Button>
           </div>
