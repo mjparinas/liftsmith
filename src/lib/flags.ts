@@ -48,6 +48,13 @@ export const FLAGS = {
     label: "Labs: watch rep counting",
     description: "The Wear OS or Apple Watch app counts reps from wrist motion during a set and fills them in on the phone.",
   },
+  /** Labs: the set logs itself a few seconds after the rep counter's last rep (handsFree.ts). */
+  labHandsFree: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: hands-free sets",
+    description: "While a rep counter is counting, the set logs itself a few seconds after the last rep and rest starts.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,
