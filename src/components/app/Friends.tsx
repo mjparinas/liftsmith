@@ -1215,18 +1215,18 @@ function Board({ onPeople }: { onPeople: () => void }) {
   const unit = profile.unit;
   const [week, setWeek] = useState<0 | 1>(0);
   const [metric, setMetric] = useState<BoardMetric>("workouts");
-  const [rows, setRows] = useState<BoardRow[] | null>(null);
+  const [data, setData] = useState<{ week: number; rows: BoardRow[] } | null>(null);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
-    setRows(null);
     social<{ rows: BoardRow[] }>("board", { from: weekStart(Date.now(), week) })
-      .then((r) => live && setRows(r.rows))
-      .catch((e: unknown) => live && (setRows([]), setNote(socialError(e))));
+      .then((r) => live && setData({ week, rows: r.rows }))
+      .catch((e: unknown) => live && (setData({ week, rows: [] }), setNote(socialError(e))));
     return () => {
       live = false;
     };
   }, [week]);
+  const rows = data?.week === week ? data.rows : null;
   if (rows === null) return <Skeleton className="h-48" />;
   if (rows.length < 2)
     return (
