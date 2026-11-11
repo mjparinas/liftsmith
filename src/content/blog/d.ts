@@ -13,7 +13,7 @@ export const BLOG_D: Article[] = [
     cta: "plan",
     body: [
       {
-        p: "A push pull legs split groups your training by movement. **Push** days train the muscles that press away from you, **pull** days the ones that pull towards you, and **legs** days everything below the waist. It's one of the most popular ways to organise a week because each day has a clear job and the muscles from one day rest while you train the next.",
+        p: "A push pull legs split groups your training by movement. **Push** days train the muscles that press away from you, **pull** days the ones that pull towards you, and **legs** days everything below the waist. It's one of the most popular ways to organize a week because each day has a clear job and the muscles from one day rest while you train the next.",
       },
       { h2: "What goes on each day" },
       {

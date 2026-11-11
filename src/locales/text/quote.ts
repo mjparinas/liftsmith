@@ -51,7 +51,7 @@ export const en = {
   "quote.39": "Fatigue makes cowards of us all.",
   "quote.40": "It's not whether you get knocked down, it's whether you get up.",
   "quote.41":
-    "The quality of a person's life is in direct proportion to their commitment to excellence, regardless of their chosen field of endeavor.",
+    "The quality of a person's life is in direct proportion to their commitment to excellence, regardless of their chosen field of endeavour.",
   "quote.42": "Don't let what you cannot do interfere with what you can do.",
   "quote.43": "Be quick, but don't hurry.",
   "quote.44": "Failure is not fatal, but failure to change might be.",

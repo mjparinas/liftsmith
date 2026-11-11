@@ -101,7 +101,7 @@ export const QUOTES: Quote[] = [
   Q("Fatigue makes cowards of us all.", "Vince Lombardi"),
   Q("It's not whether you get knocked down, it's whether you get up.", "Vince Lombardi"),
   Q(
-    "The quality of a person's life is in direct proportion to their commitment to excellence, regardless of their chosen field of endeavor.",
+    "The quality of a person's life is in direct proportion to their commitment to excellence, regardless of their chosen field of endeavour.",
     "Vince Lombardi",
   ),
   Q("Don't let what you cannot do interfere with what you can do.", "John Wooden"),

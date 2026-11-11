@@ -11,7 +11,7 @@ export const en = {
   "pro.unlocks": "What Pro unlocks",
   "pro.youAsked": "You tapped this",
   "pro.free":
-    "Free, always: the workout logger, plate maths, rest timer and lock-screen notification, every fixed program (5×5, 3×5 and more), your own routines, the health twin, “why this weight”, and coach's notes.",
+    "Free, always: the workout logger, plate math, rest timer and lock-screen notification, every fixed program (5×5, 3×5 and more), your own routines, the health twin, “why this weight”, and coach's notes.",
   "pro.ft.adaptive": "Adaptive workouts",
   "pro.fb.adaptive": "Each day planned from your recovery, equipment and training block, with deloads and progression built in.",
   "pro.ft.healthReadiness": "Push or easy-day calls from your health data",
