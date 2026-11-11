@@ -11,6 +11,9 @@ export const en = {
   "setup.welcome.quick": "Set up in under a minute. No account needed.",
   "setup.welcome.start": "Get started",
   "setup.welcome.signIn": "I already have an account",
+  "setup.welcome.restoring": "Bringing back your training…",
+  "setup.welcome.fresh":
+    "You're signed in. There's no training saved on this account yet, so let's set you up. Your answers sync when you're done.",
   "setup.goal.muscle.blurb": "6–12 reps, more volume",
   "setup.goal.strength.blurb": "Heavier, 4–6 reps on the big lifts",
   "setup.goal.general.blurb": "A bit of everything",
@@ -82,6 +85,9 @@ export const es: Partial<Record<Key, Message>> = {
   "setup.welcome.quick": "Configúralo en menos de un minuto. Sin cuenta.",
   "setup.welcome.start": "Empezar",
   "setup.welcome.signIn": "Ya tengo una cuenta",
+  "setup.welcome.restoring": "Recuperando tu entrenamiento…",
+  "setup.welcome.fresh":
+    "Has iniciado sesión. Aún no hay entrenamientos guardados en esta cuenta, así que vamos a configurarla. Tus respuestas se sincronizan al terminar.",
   "setup.goal.muscle.blurb": "6–12 reps, más volumen",
   "setup.goal.strength.blurb": "Más peso, 4–6 reps en los básicos",
   "setup.goal.general.blurb": "Un poco de todo",
@@ -153,6 +159,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "setup.welcome.quick": "Prêt en moins d'une minute. Sans compte.",
   "setup.welcome.start": "Commencer",
   "setup.welcome.signIn": "J'ai déjà un compte",
+  "setup.welcome.restoring": "Récupération de votre entraînement…",
+  "setup.welcome.fresh":
+    "Vous êtes connecté. Aucun entraînement n'est encore enregistré sur ce compte, alors configurons-le. Vos réponses se synchronisent à la fin.",
   "setup.goal.muscle.blurb": "6 à 12 répétitions, plus de volume",
   "setup.goal.strength.blurb": "Plus lourd, 4 à 6 répétitions sur les gros mouvements",
   "setup.goal.general.blurb": "Un peu de tout",
@@ -224,6 +233,9 @@ export const de: Partial<Record<Key, Message>> = {
   "setup.welcome.quick": "In unter einer Minute eingerichtet. Kein Konto nötig.",
   "setup.welcome.start": "Los geht’s",
   "setup.welcome.signIn": "Ich habe schon ein Konto",
+  "setup.welcome.restoring": "Dein Training wird zurückgeholt…",
+  "setup.welcome.fresh":
+    "Du bist angemeldet. Auf diesem Konto ist noch kein Training gespeichert, also richten wir es ein. Deine Antworten werden am Ende synchronisiert.",
   "setup.goal.muscle.blurb": "6–12 Wdh., mehr Volumen",
   "setup.goal.strength.blurb": "Schwerer, 4–6 Wdh. bei den großen Übungen",
   "setup.goal.general.blurb": "Von allem etwas",
@@ -293,6 +305,9 @@ export const it: Partial<Record<Key, Message>> = {
   "setup.welcome.quick": "Pronto in meno di un minuto. Nessun account necessario.",
   "setup.welcome.start": "Iniziamo",
   "setup.welcome.signIn": "Ho già un account",
+  "setup.welcome.restoring": "Recupero del tuo allenamento…",
+  "setup.welcome.fresh":
+    "Hai effettuato l'accesso. Su questo account non c'è ancora nessun allenamento salvato, quindi configuriamolo. Le tue risposte si sincronizzano alla fine.",
   "setup.goal.muscle.blurb": "6–12 ripetizioni, più volume",
   "setup.goal.strength.blurb": "Più pesante, 4–6 ripetizioni sui fondamentali",
   "setup.goal.general.blurb": "Un po’ di tutto",
@@ -364,6 +379,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "setup.welcome.quick": "1分以内に設定完了。アカウントは不要です。",
   "setup.welcome.start": "はじめる",
   "setup.welcome.signIn": "アカウントを持っています",
+  "setup.welcome.restoring": "トレーニングを復元しています…",
+  "setup.welcome.fresh":
+    "サインインしました。このアカウントにはまだトレーニングが保存されていないので、設定を始めましょう。回答は完了後に同期されます。",
   "setup.goal.muscle.blurb": "6〜12回、ボリューム多め",
   "setup.goal.strength.blurb": "主要種目は重めで4〜6回",
   "setup.goal.general.blurb": "バランスよく",

@@ -30,7 +30,7 @@ import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
 
-import { go } from "./router";
+import { go, historyDepth } from "./router";
 import { Button, Section } from "./ui";
 
 function ago(ms: number): string {
@@ -203,7 +203,7 @@ function EmailSignIn({ onDone }: { onDone: () => void }) {
   );
 }
 
-function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
+function SignedOut() {
   const busy = useAccount((s) => s.busy);
   const [email, setEmail] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -211,7 +211,6 @@ function SignedOut({ onSignedIn }: { onSignedIn?: () => void }) {
     haptic("success");
     track("feature", { name: "account_signin", detail: m });
     void syncNow();
-    onSignedIn?.();
   };
   const run = (m: Method, fn: () => Promise<unknown>) => async () => {
     setError(null);
@@ -342,7 +341,7 @@ function SignedIn() {
 }
 
 /** Sign in, or the signed-in account and its sync status. */
-export function AccountPanel({ onSignedIn }: { onSignedIn?: () => void }) {
+export function AccountPanel() {
   const account = useAccount((s) => s.account);
   const lost = useAccount((s) => s.error === "signedOut");
   return (
@@ -352,7 +351,7 @@ export function AccountPanel({ onSignedIn }: { onSignedIn?: () => void }) {
           {t("account.lost")}
         </p>
       )}
-      {account ? <SignedIn /> : <SignedOut onSignedIn={onSignedIn} />}
+      {account ? <SignedIn /> : <SignedOut />}
     </div>
   );
 }
@@ -375,6 +374,13 @@ function NameField() {
 /** Settings › Account (#/account). */
 export function Account() {
   const account = useAccount((s) => s.account);
+  // Opened from outside the app (the website's "Sign in" link): signing in here goes on to Today (Melvin, 2026-11-11).
+  const was = useRef(!!account);
+  useEffect(() => {
+    const before = was.current;
+    was.current = !!account;
+    if (account && !before && historyDepth() === 0) go("today");
+  }, [account]);
   return (
     <div className="pb-2">
       <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">

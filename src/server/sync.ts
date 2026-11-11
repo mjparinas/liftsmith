@@ -139,6 +139,9 @@ export async function sync(accountId: string, session: string, req: SyncRequest,
   );
   const writes = [];
   for (const r of req.records) {
+    // A profile that never finished setup (a new install signing in on its welcome screen, from an app version older
+    // than this rule) is never stored, so it can't replace the account's real one or stand in for it.
+    if (r.key === "profile" && !(r.value as { onboarded?: unknown } | null)?.onboarded) continue;
     const cur = have.get(r.key);
     if (cur && (Number(cur.updated_at) >= r.updatedAt || (req.first && r.key === "profile"))) continue;
     const body = r.value === null ? null : JSON.stringify(r.value);

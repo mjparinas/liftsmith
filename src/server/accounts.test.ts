@@ -290,14 +290,14 @@ describe("sync", () => {
       "phone",
       req({
         records: [
-          { key: "profile", value: { name: "Phone" }, updatedAt: 10 },
+          { key: "profile", value: { name: "Phone", onboarded: true }, updatedAt: 10 },
           { key: "gym:g1", value: { id: "g1" }, updatedAt: 10 },
         ],
       }),
     );
     // Older edits lose.
-    let r = await sync("acc", "web", req({ records: [{ key: "profile", value: { name: "Old" }, updatedAt: 5 }] }));
-    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "Phone" });
+    let r = await sync("acc", "web", req({ records: [{ key: "profile", value: { name: "Old", onboarded: true }, updatedAt: 5 }] }));
+    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "Phone", onboarded: true });
     // A new device's fresh setup doesn't overwrite the account's profile, even if newer.
     r = await sync(
       "acc",
@@ -305,12 +305,12 @@ describe("sync", () => {
       req({
         first: true,
         records: [
-          { key: "profile", value: { name: "Fresh" }, updatedAt: 99 },
+          { key: "profile", value: { name: "Fresh", onboarded: true }, updatedAt: 99 },
           { key: "gym:g2", value: { id: "g2" }, updatedAt: 99 },
         ],
       }),
     );
-    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "Phone" });
+    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "Phone", onboarded: true });
     expect(r.records.map((x) => x.key).sort()).toEqual(["gym:g1", "gym:g2", "profile"]);
     // Newer edits win; a removed gym stays removed.
     r = await sync(
@@ -318,12 +318,12 @@ describe("sync", () => {
       "web",
       req({
         records: [
-          { key: "profile", value: { name: "New" }, updatedAt: 100 },
+          { key: "profile", value: { name: "New", onboarded: true }, updatedAt: 100 },
           { key: "gym:g1", value: null, updatedAt: 100 },
         ],
       }),
     );
-    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "New" });
+    expect(r.records.find((x) => x.key === "profile")?.value).toEqual({ name: "New", onboarded: true });
     expect(r.records.find((x) => x.key === "gym:g1")?.value).toBeNull();
   });
 

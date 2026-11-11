@@ -42,6 +42,13 @@ describe("merging records", () => {
     ).toBe("New");
   });
 
+  it("never lets an account profile that skipped setup replace a set-up one, and never sends one", () => {
+    const half = { key: "profile", value: profile({ name: "Half", onboarded: false, updatedAt: 9000 }), updatedAt: 9000 };
+    expect(mergeRecords(profile(), [], [half], true).profile).toBeNull();
+    expect(mergeRecords(profile({ onboarded: false }), [], [half], true).profile?.name).toBe("Half");
+    expect(localRecords(profile({ onboarded: false }), [gym("g1")], [], 1).map((r) => r.key)).toEqual(["gym:g1"]);
+  });
+
   it("adds, updates and removes gyms, and keeps the active gym real", () => {
     const p = profile({ activeGymId: "g1" });
     const r = mergeRecords(
@@ -142,6 +149,26 @@ describe("syncing the app with the server", () => {
     await serverSync("acc", "phone", { cursor: 0, events: [], deleted: ["theirs"], records: [], first: false });
     await syncNow();
     expect(useApp.getState().events.map((e) => e.id)).toEqual(["mine"]);
+  });
+
+  it("keeps the account's set-up profile when a new install signs in before setup, even from an older app", async () => {
+    await serverSync("acc", "phone", {
+      cursor: 0,
+      events: [],
+      deleted: [],
+      records: [{ key: "profile", value: profile({ name: "Melvin", updatedAt: 1000 }), updatedAt: 1000 }],
+      first: true,
+    });
+    // An older app pushed its welcome-screen profile (not set up, newer) as an ordinary record: the server drops it.
+    await serverSync("acc", "web", {
+      cursor: 0,
+      events: [],
+      deleted: [],
+      records: [{ key: "profile", value: profile({ onboarded: false, updatedAt: 5000 }), updatedAt: 5000 }],
+      first: false,
+    });
+    const back = await serverSync("acc", "web", { cursor: 0, events: [], deleted: [], records: [], first: false });
+    expect(back.records.find((r) => r.key === "profile")?.value).toMatchObject({ name: "Melvin", onboarded: true });
   });
 
   it("signs out on this device, keeping the data, when the server says the session ended", async () => {

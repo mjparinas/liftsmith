@@ -6,7 +6,7 @@ import { HeroLift } from "@/components/site/HeroLift";
 import { perSide } from "@/components/site/heroPlates";
 import { HERO_PROGRAM } from "@/components/site/heroProgram";
 import { Screenshot } from "@/components/site/Screenshot";
-import { BrandMark, SiteFooter } from "@/components/site/SiteChrome";
+import { BrandMark, SignInLink, SiteFooter } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
@@ -203,11 +203,12 @@ function Header() {
           <Link href="/blog/" className="hidden rounded-lg px-3 py-2 hover:bg-surface lg:inline">
             Blog
           </Link>
+          <SignInLink />
           <Link
             href={APP_PATH}
             prefetch={false}
             data-cta="header"
-            className="press ml-1 inline-flex min-h-11 items-center rounded-xl bg-accent px-4 text-accent-ink"
+            className="press ml-1 inline-flex min-h-11 items-center whitespace-nowrap rounded-xl bg-accent px-4 text-accent-ink"
           >
             Start free
           </Link>
