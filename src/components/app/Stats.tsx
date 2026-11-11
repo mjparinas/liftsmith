@@ -125,16 +125,25 @@ export function Stats() {
       <Section title={t("progress.prs")} icon="trophy">
         <ul className="card divide-y divide-line">
           {stats.prs.slice(0, 8).map((p) => (
-            <li key={p.at + p.exerciseId} className="flex justify-between px-4 py-3">
-              <span className="flex items-center gap-2 font-medium">
-                <span className="text-gold">
-                  <Icon name="trophy" size={16} />
+            <li key={p.at + p.exerciseId}>
+              <button
+                type="button"
+                onClick={() => go("exercise", p.exerciseId)}
+                className="press flex w-full flex-wrap items-center justify-between gap-x-3 px-4 py-3 text-left"
+              >
+                <span className="flex items-center gap-2 font-medium">
+                  <span className="text-gold">
+                    <Icon name="trophy" size={16} />
+                  </span>
+                  {exercise(p.exerciseId).name}
                 </span>
-                {exercise(p.exerciseId).name}
-              </span>
-              <span className="num text-muted">
-                {fmtNum(fromKg(p.weight, unit))} {unit} × {p.reps} · {ago(p.at, now)}
-              </span>
+                <span className="num text-muted">
+                  {fmtNum(fromKg(p.weight, unit))} {unit} × {p.reps} · {ago(p.at, now)}{" "}
+                  <span className="text-accent" aria-hidden>
+                    ›
+                  </span>
+                </span>
+              </button>
             </li>
           ))}
           {!stats.prs.length && (

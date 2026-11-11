@@ -252,7 +252,7 @@ export interface Profile {
   /** Lean mode: no confetti, celebration sounds or pop-ups (Settings). */
   lean?: boolean;
   /** Equipped cosmetics, won from crates (game.ts COSMETICS ids). */
-  cosmetics?: { accent?: string; sound?: string; plates?: string };
+  cosmetics?: { accent?: string; sound?: string; plates?: string; avatar?: string };
   /**
    * Your stats (Settings › Body and units, BodyStats.tsx): the one place for age, sex and height, which
    * TDEE, fitness age, DOTS, strength scores and starting weights all read. Also asked in setup. Apple Health
@@ -679,6 +679,17 @@ export interface NoteEvent extends EventBase {
   text: string;
 }
 
+/**
+ * The lifter's own name and note for a whole workout (2026-11-11), written after it ends (the Done screen,
+ * or editing it in History). The latest one wins; saving again deletes the old one (editHistory.ts).
+ */
+export interface SessionNoteEvent extends EventBase {
+  type: "sessionNote";
+  sessionId: string;
+  name?: string;
+  text?: string;
+}
+
 /** How a logged set actually felt: reps the lifter says they had left (0 = failure, 4 = four or more). */
 export interface EffortEvent extends EventBase {
   type: "effort";
@@ -773,6 +784,7 @@ export type AppEvent =
   | CycleEvent
   | WarmupEvent
   | NoteEvent
+  | SessionNoteEvent
   | EffortEvent
   | CustomExerciseEvent
   | InjuryEvent

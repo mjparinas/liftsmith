@@ -30,6 +30,7 @@ export const ROUTES = [
   "friends",
   "person",
   "trainer",
+  "exercise",
 ] as const;
 export type Route = (typeof ROUTES)[number];
 
