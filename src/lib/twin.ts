@@ -21,7 +21,10 @@ export type TwinId =
 /** good: going the right way · watch: worth acting on · steady: normal for you · info: no verdict · missing: no data yet. */
 export type Status = "good" | "watch" | "steady" | "info" | "missing";
 
-export type TwinAction = { kind: "connect" } | { kind: "route"; route: string; label: string } | { kind: "easy" };
+// "weighIn" opens the weigh-in form right in the metric's sheet (Melvin, 2026-11-11: "Log a weigh-in" used to
+// go to Progress); "route" goes to the one screen that holds the input (`screen/arg`).
+export type TwinAction =
+  { kind: "connect" } | { kind: "route"; route: string; label: string } | { kind: "weighIn"; label: string } | { kind: "easy" };
 
 export interface Point {
   day: string;
@@ -289,7 +292,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       series: window30(wSeries, now).map((p) => ({ ...p, value: unit === "lb" ? p.value * 2.20462 : p.value })),
       source: "app",
       fresh: !!lastW && lastW.at >= now - 2 * DAY,
-      action: { kind: "route", route: "stats", label: t("twin.a.weighIn") },
+      action: { kind: "weighIn", label: t("twin.a.weighIn") },
     });
   }
 
@@ -301,7 +304,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       ...missing("bodyFat", t("twin.l.bodyFat"), t("twin.what.bodyFat")),
       why: native ? t("twin.w.fatMissing", { store }) : t("twin.w.fatMissingWeb"),
       chip: t("twin.c.noReading"),
-      action: { kind: "route", route: "stats", label: t("twin.a.logFat") },
+      action: { kind: "weighIn", label: t("twin.a.logFat") },
     });
   } else {
     const then = [...fats].reverse().find((e) => e.at <= lastF.at - 35 * DAY);
@@ -427,7 +430,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       status: "missing",
       chip: t("twin.c.needsHeight"),
       why: t("twin.w.needsHeight"),
-      action: { kind: "route", route: "tools/tdee", label: t("twin.a.addHeight") },
+      action: { kind: "route", route: "settings/stats", label: t("twin.a.addHeight") },
       series: [],
       source: "app",
       fresh: false,
@@ -465,7 +468,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       status: "missing",
       chip: t("twin.c.needsDetails"),
       why: t("twin.w.needsDetails", { missing: list(tdee.missing.map((k) => t(`twin.need.${k}`))) }),
-      action: { kind: "route", route: "tools/tdee", label: t("twin.a.addDetails") },
+      action: { kind: "route", route: "settings/stats", label: t("twin.a.addDetails") },
       series: [],
       source: "app",
       fresh: false,
@@ -720,7 +723,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       status: "missing",
       chip: t("twin.c.needsStrap"),
       why: t("twin.w.needsStrap"),
-      action: { kind: "route", route: "settings", label: t("twin.a.pair") },
+      action: { kind: "route", route: "connections/hr", label: t("twin.a.pair") },
       series: [],
       source: "app",
       fresh: false,
