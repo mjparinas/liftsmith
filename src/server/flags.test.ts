@@ -32,7 +32,14 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("flags for an install", () => {
   it("answers the defaults until an admin changes one, and a test wins over the flag", async () => {
-    expect(await flagsFor(null)).toEqual({ trialDays: 14, labRepCount: false, repMotion: false, labBarSpeed: false, labHrRest: false });
+    expect(await flagsFor(null)).toEqual({
+      trialDays: 14,
+      labRepCount: false,
+      repMotion: false,
+      labBarSpeed: false,
+      labHrRest: false,
+      labTrainer: false,
+    });
     await setFlag("repMotion", true, 100, "owner@example.com");
     expect((await flagsFor("install-aaaa-1")).repMotion).toBe(true);
     await setFlag("trialDays", 7, 100, "owner@example.com");
@@ -108,7 +115,7 @@ describe("the flag routes", () => {
   it("serves flags publicly, with CORS for the native apps", async () => {
     const r = await flagsRoute.GET(new Request(`${SITE}/api/flags/?install=bad id`, { headers: { origin: "capacitor://localhost" } }));
     expect(await r.json()).toEqual({
-      flags: { trialDays: 14, labRepCount: false, repMotion: false, labBarSpeed: false, labHrRest: false },
+      flags: { trialDays: 14, labRepCount: false, repMotion: false, labBarSpeed: false, labHrRest: false, labTrainer: false },
     });
     expect(r.headers.get("access-control-allow-origin")).toBe("capacitor://localhost");
     expect(r.headers.get("cache-control")).toBe("no-store");

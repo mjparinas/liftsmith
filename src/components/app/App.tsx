@@ -54,6 +54,7 @@ import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
+import { Trainer } from "./Trainer";
 import { TrainingSettings } from "./TrainingSettings";
 import { TodaySkeleton } from "./ui";
 import { Workout } from "./Workout";
@@ -308,6 +309,7 @@ export function App() {
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
     routine: <SharedRoutine code={arg} />,
+    trainer: <Trainer arg={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

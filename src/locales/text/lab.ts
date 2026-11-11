@@ -22,6 +22,9 @@ export const en = {
     "Adds Count reps to the exercise on the workout screen. The camera watches your set, draws the bones it sees over you and fills in your reps. Video stays on your phone.",
   "lab.repMotion.title": "Phone motion rep counting",
   "lab.repMotion.body": "Count reps from the phone's motion sensors instead of the camera. Less reliable.",
+  "lab.trainer.title": "Trainer mode",
+  "lab.trainer.body":
+    "Coach other lifters: make an invite code in Settings › Coaching, then see each client's workouts with what to act on first. Your clients don't need Pro.",
 };
 
 type Key = keyof typeof en;
@@ -46,6 +49,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Añade Contar reps al ejercicio en la pantalla de entrenamiento. La cámara mira tu serie, dibuja los huesos que ve sobre ti y rellena tus repeticiones. El vídeo no sale de tu teléfono.",
   "lab.repMotion.title": "Contar repeticiones con el movimiento del teléfono",
   "lab.repMotion.body": "Cuenta repeticiones con los sensores de movimiento del teléfono en lugar de la cámara. Menos fiable.",
+  "lab.trainer.title": "Modo entrenador",
+  "lab.trainer.body":
+    "Entrena a otras personas: crea un código de invitación en Ajustes › Entrenador y mira los entrenamientos de cada cliente con lo primero que conviene atender. Tus clientes no necesitan Pro.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -69,6 +75,9 @@ export const fr: Partial<Record<Key, Message>> = {
     "Ajoute Compter à l'exercice sur l'écran d'entraînement. La caméra regarde votre série, dessine les os qu'elle voit sur vous et remplit vos répétitions. La vidéo reste sur votre téléphone.",
   "lab.repMotion.title": "Comptage des répétitions par les mouvements du téléphone",
   "lab.repMotion.body": "Compte les répétitions avec les capteurs de mouvement du téléphone au lieu de la caméra. Moins fiable.",
+  "lab.trainer.title": "Mode coach",
+  "lab.trainer.body":
+    "Coachez d'autres pratiquants : créez un code d'invitation dans Réglages › Coaching, puis voyez les séances de chaque client avec ce qu'il faut traiter en premier. Vos clients n'ont pas besoin de Pro.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -92,6 +101,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Fügt der Übung im Trainingsbildschirm Wiederholungen zählen hinzu. Die Kamera beobachtet deinen Satz, zeichnet die erkannten Knochen über dich und trägt deine Wiederholungen ein. Das Video bleibt auf deinem Handy.",
   "lab.repMotion.title": "Wiederholungen per Bewegungssensor zählen",
   "lab.repMotion.body": "Zählt Wiederholungen mit den Bewegungssensoren des Handys statt mit der Kamera. Weniger zuverlässig.",
+  "lab.trainer.title": "Trainermodus",
+  "lab.trainer.body":
+    "Betreue andere: Erstell unter Einstellungen › Coaching einen Einladungscode und sieh die Trainings jedes Kunden, mit dem, was zuerst zu tun ist. Deine Kunden brauchen kein Pro.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -114,6 +126,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Aggiunge Conta ripetizioni all'esercizio nella schermata di allenamento. La fotocamera guarda la tua serie, disegna sopra di te le ossa che vede e inserisce le ripetizioni. Il video resta sul telefono.",
   "lab.repMotion.title": "Conteggio delle ripetizioni con il movimento del telefono",
   "lab.repMotion.body": "Conta le ripetizioni con i sensori di movimento del telefono invece della fotocamera. Meno affidabile.",
+  "lab.trainer.title": "Modalità coach",
+  "lab.trainer.body":
+    "Segui altre persone: crea un codice d'invito in Impostazioni › Coaching e guarda gli allenamenti di ogni cliente con la prima cosa da fare. I tuoi clienti non hanno bisogno di Pro.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -136,4 +151,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "ワークアウト画面の種目にレップカウントを追加します。カメラがセットを見て、認識した骨格をあなたの上に描き、レップ数を入力します。映像はスマートフォンの外に出ません。",
   "lab.repMotion.title": "端末のモーションでレップをカウント",
   "lab.repMotion.body": "カメラの代わりにスマートフォンのモーションセンサーでレップを数えます。精度は低めです。",
+  "lab.trainer.title": "トレーナーモード",
+  "lab.trainer.body":
+    "ほかの人を指導できます。「設定 › コーチング」で招待コードを作成すると、各クライアントのワークアウトと、まず取り組むべきことが表示されます。クライアントに Pro は必要ありません。",
 };

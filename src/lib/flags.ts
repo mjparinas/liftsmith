@@ -41,6 +41,13 @@ export const FLAGS = {
     label: "Labs: heart-rate rest timer",
     description: "Rest ends early once a heart rate monitor or watch shows the heart rate back near where the set started.",
   },
+  /** Labs: trainer mode, coaching clients (invite codes and client reports, src/lib/trainer.ts). Being a client is free. */
+  labTrainer: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: trainer mode",
+    description: "Coaches invite clients and see their workouts in Settings › Coaching. Being someone's client needs no lab.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
