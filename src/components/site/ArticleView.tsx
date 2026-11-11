@@ -169,6 +169,9 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
             </dl>
           </section>
         ) : null}
+        <p className="mt-10 text-sm text-muted">
+          How we write and check our articles: <Link href="/editorial-standards/">editorial standards</Link>.
+        </p>
       </div>
       <CtaBanner cta={`${a.kind}-end`} title={top.title} body={top.body} button={top.button} />
       {related.length > 0 && (

@@ -231,6 +231,7 @@ export function siteRoutes(): Route[] {
     { path: "/help/", priority: 0.6 },
     { path: "/contact/", priority: 0.4 },
     { path: "/about/", priority: 0.4 },
+    { path: "/editorial-standards/", priority: 0.3 },
     { path: "/whats-new/", priority: 0.5, date: WHATS_NEW[0]?.day },
     { path: "/status/", priority: 0.2 },
     { path: "/compare/", priority: 0.6 },

@@ -197,6 +197,7 @@ try {
     "/whats-new/",
     "/status/",
     "/about/",
+    "/editorial-standards/",
     "/accessibility/",
   ]) {
     await page.goto(`${server.url}${path}`);
