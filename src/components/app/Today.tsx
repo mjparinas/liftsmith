@@ -241,8 +241,6 @@ export function Today() {
         </button>
       </div>
 
-      {profile.quotes !== false && <DailyQuote now={now} />}
-
       <TodayMoments />
 
       {readiness && preview && call && !active && !fixed && (
@@ -329,6 +327,8 @@ export function Today() {
           )}
         </section>
       )}
+
+      {profile.quotes !== false && <DailyQuote now={now} />}
 
       {!active && <CoachNotes limit={2} />}
       {!active && <SaveNudge />}
