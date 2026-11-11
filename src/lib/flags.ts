@@ -90,6 +90,13 @@ export const FLAGS = {
     label: "Labs: today's max from warm-ups",
     description: "Estimates today's max from the camera's warm-up bar speeds and suggests a lighter or heavier first working set.",
   },
+  /** Labs: after a camera-counted set, a replay of the bar's path from the pose landmarks, with one cue. */
+  labBarPath: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: bar path replay",
+    description: "After a camera-counted squat, deadlift or overhead press, replays the bar's path with one cue on where it drifted.",
+  },
   /** Labs: the tempo coach counts each rep's lowering, hold and lifting out in sounds and haptics (src/lib/tempo.ts). */
   labTempo: {
     default: false,

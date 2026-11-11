@@ -33,6 +33,7 @@
     "src/lib/recovery.ts",
     "src/lib/reorder.ts",
     "src/lib/replan.ts",
+    "src/lib/reps/barPath.ts",
     "src/lib/reps/barSpeed.ts",
     "src/lib/reps/form.ts",
     "src/lib/reps/speedMax.ts",

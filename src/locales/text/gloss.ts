@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "gloss.barPath.title": "Bar path",
+  "gloss.barPath.body":
+    "The line the bar takes on each rep, seen side-on. On squats, deadlifts and overhead presses it works best going about straight up and down over the middle of your foot.\nAfter the set, the replay shows the rep worth seeing: the blue line is the bar, and the dashed line is straight up from where it started. If the bar drifted forward or back on a quarter of your reps or more, you get one cue. It's a rough read from one camera (your shoulders stand in for the bar on a squat, your hands on the other lifts), so it stays quiet unless it's clear.",
   "gloss.formCheck.title": "Form check",
   "gloss.formCheck.body":
     "While it counts reps, the camera also looks at how each rep moved: on squats, whether your hips got down level with your knees; on every lift, whether some reps were cut short of your best; and on squats, deadlifts and overhead presses, whether you leaned to one side.\nBetween sets it gives the one thing most worth fixing, with how many reps it saw it on, and the figure shows it: where your short reps stopped, or the way you leaned. It's a rough check from one camera, so it stays quiet unless it's clear. Side-on shows depth best; facing the camera shows a lean.",
@@ -108,6 +111,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Trayectoria de la barra",
+  "gloss.barPath.body":
+    "La línea que sigue la barra en cada repetición, vista de perfil. En sentadilla, peso muerto y press militar funciona mejor si sube y baja casi recta sobre el centro del pie.\nTras la serie, la repetición muestra la que vale la pena ver: la línea azul es la barra y la discontinua sube recta desde donde empezó. Si la barra se desvió hacia delante o hacia atrás en una cuarta parte de tus repeticiones o más, recibes un consejo. Es una lectura aproximada con una sola cámara (en la sentadilla tus hombros hacen de barra y en los demás ejercicios tus manos), así que no dice nada salvo que esté claro.",
   "gloss.formCheck.title": "Revisión de técnica",
   "gloss.formCheck.body":
     "Mientras cuenta repeticiones, la cámara también mira cómo se movió cada una: en sentadillas, si la cadera bajó hasta la altura de las rodillas; en todos los ejercicios, si algunas repeticiones fueron más cortas que tu mejor; y en sentadillas, pesos muertos y presses por encima de la cabeza, si te inclinaste hacia un lado.\nEntre series te da lo que más vale la pena corregir, con en cuántas repeticiones lo vio, y la figura lo muestra: dónde se quedaron tus repeticiones cortas o hacia dónde te inclinaste. Es una revisión aproximada con una sola cámara, así que solo habla cuando está claro. De lado se ve mejor la profundidad; de frente, la inclinación.",
@@ -210,6 +216,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Trajectoire de la barre",
+  "gloss.barPath.body":
+    "La ligne que suit la barre à chaque répétition, vue de profil. Au squat, au soulevé de terre et au développé militaire, elle fonctionne le mieux en montant et descendant presque droit au-dessus du milieu du pied.\nAprès la série, la relecture montre la répétition qui vaut le coup d'œil : la ligne bleue est la barre, la ligne pointillée monte droit depuis son point de départ. Si la barre a dévié vers l'avant ou l'arrière sur un quart de vos répétitions ou plus, vous recevez un conseil. C'est une lecture approximative avec une seule caméra (vos épaules remplacent la barre au squat, vos mains pour les autres exercices), elle ne dit donc rien sauf si c'est net.",
   "gloss.formCheck.title": "Contrôle de la technique",
   "gloss.formCheck.body":
     "Pendant qu’elle compte les répétitions, la caméra regarde aussi comment chacune a bougé : au squat, si vos hanches sont descendues au niveau des genoux ; sur tous les exercices, si certaines répétitions étaient plus courtes que votre meilleure ; et au squat, au soulevé de terre et au développé au-dessus de la tête, si vous avez penché d’un côté.\nEntre les séries, elle donne la chose la plus utile à corriger, avec le nombre de répétitions concernées, et la silhouette la montre : où vos répétitions courtes se sont arrêtées, ou de quel côté vous avez penché. C’est un contrôle approximatif avec une seule caméra : elle ne dit rien tant que ce n’est pas net. De profil, on voit mieux la profondeur ; de face, l’inclinaison.",
@@ -312,6 +321,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Stangenweg",
+  "gloss.barPath.body":
+    "Die Linie, die die Stange bei jeder Wiederholung nimmt, von der Seite gesehen. Bei Kniebeugen, Kreuzheben und Schulterdrücken läuft sie am besten fast gerade auf und ab über der Fußmitte.\nNach dem Satz zeigt die Wiedergabe die Wiederholung, die sich lohnt: Die blaue Linie ist die Stange, die gestrichelte geht gerade nach oben von dort, wo sie startete. Ist die Stange bei einem Viertel deiner Wiederholungen oder mehr nach vorn oder hinten abgewichen, bekommst du einen Tipp. Es ist eine grobe Messung mit einer Kamera (bei Kniebeugen stehen deine Schultern für die Stange, bei den anderen Übungen deine Hände), deshalb sagt sie nur etwas, wenn es eindeutig ist.",
   "gloss.formCheck.title": "Technik-Check",
   "gloss.formCheck.body":
     "Während sie Wiederholungen zählt, schaut die Kamera auch, wie jede Wiederholung lief: bei Kniebeugen, ob die Hüfte bis auf Kniehöhe kam; bei jeder Übung, ob manche Wiederholungen kürzer waren als deine beste; und bei Kniebeugen, Kreuzheben und Überkopfdrücken, ob du dich zu einer Seite geneigt hast.\nZwischen den Sätzen nennt sie das, was sich am meisten zu verbessern lohnt, mit der Zahl der betroffenen Wiederholungen, und die Figur zeigt es: wo deine kurzen Wiederholungen endeten oder wohin du dich geneigt hast. Es ist eine grobe Prüfung mit einer Kamera, daher meldet sie sich nur, wenn es eindeutig ist. Von der Seite sieht man die Tiefe am besten, von vorn eine Neigung.",
@@ -414,6 +426,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "Traiettoria del bilanciere",
+  "gloss.barPath.body":
+    "La linea che segue il bilanciere a ogni ripetizione, vista di lato. In squat, stacco e lento avanti funziona meglio se sale e scende quasi dritta sopra il centro del piede.\nDopo la serie, il replay mostra la ripetizione da guardare: la linea blu è il bilanciere, quella tratteggiata sale dritta da dove è partito. Se il bilanciere si è spostato in avanti o indietro in un quarto delle ripetizioni o più, ricevi un consiglio. È una lettura approssimativa da una sola fotocamera (nello squat le spalle fanno da bilanciere, negli altri esercizi le mani), quindi resta in silenzio se non è chiaro.",
   "gloss.formCheck.title": "Controllo della tecnica",
   "gloss.formCheck.body":
     "Mentre conta le ripetizioni, la fotocamera guarda anche come si è mossa ciascuna: nello squat, se le anche sono scese all’altezza delle ginocchia; in ogni esercizio, se alcune ripetizioni sono state più corte della migliore; e in squat, stacchi e distensioni sopra la testa, se hai inclinato il busto su un lato.\nTra una serie e l’altra ti dice la cosa più utile da correggere, con su quante ripetizioni l’ha vista, e la figura la mostra: dove si sono fermate le ripetizioni corte o da che parte hai inclinato il busto. È un controllo approssimativo con una sola fotocamera, quindi parla solo quando è chiaro. Di lato si vede meglio la profondità, di fronte l’inclinazione.",
@@ -516,6 +531,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "gloss.barPath.title": "バーの軌道",
+  "gloss.barPath.body":
+    "横から見た、各レップでバーが通るライン。スクワット、デッドリフト、ショルダープレスでは、足の中央の真上をほぼまっすぐ上下するのが理想です。\nセット後のリプレイでは、見ておきたいレップを再生します。青い線がバー、点線はスタート位置からの真上のラインです。レップの4分の1以上でバーが前か後ろにずれていれば、ひとこと助言します。カメラ1台での大まかな読み取りなので（スクワットでは肩、ほかの種目では手をバーとみなします）、はっきりしないときは何も言いません。",
   "gloss.formCheck.title": "フォームチェック",
   "gloss.formCheck.body":
     "レップを数えながら、カメラは各レップの動きも見ています。スクワットでは股関節が膝の高さまで下がったか、すべての種目でいちばん深いレップより短いレップがなかったか、スクワット・デッドリフト・オーバーヘッドプレスでは左右に傾いていないかです。\nセット間に、いちばん直す価値のあることを何レップで見つかったかと一緒に伝え、フィギュアで示します（短いレップが止まった位置や傾いた向き）。カメラ 1 台での大まかなチェックなので、はっきりしたときだけ知らせます。深さは横から、傾きは正面からがいちばん見やすくなります。",

@@ -9,6 +9,8 @@
 // camera lab (Melvin, 2026-11-11), and with both on the stage switches between them. Camera bar speed is a third
 // (`labBarSpeed`): the last rep's speed, its drop from the fastest rep, and when to end the set. Camera form
 // check is a fourth (`labFormCheck`): between sets, one tip on depth, short range or a lean, shown on the figure.
+// Bar path replay is a fifth (`labBarPath`): between sets, the rep worth seeing plays back over the camera preview
+// with the bar's path, and one cue on where it drifted. Landmarks only, kept in memory until the next set.
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
@@ -16,6 +18,7 @@ import { Info } from "@/components/Info";
 import { num, t } from "@/lib/i18n";
 import { calm, haptic, oops } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
+import { BarPath, pathFits, type PathReport } from "@/lib/reps/barPath";
 import { barSpeed, type BarSpeedReadout } from "@/lib/reps/barSpeed";
 import { checksFor, FormCheck, formFrame, mainIssue, type FormIssue, type FormReport } from "@/lib/reps/form";
 import { imuProfile, ImuRepCounter } from "@/lib/reps/imu";
@@ -27,6 +30,7 @@ import { RepTracker } from "@/lib/reps/tracker";
 import type { SetSummary } from "@/lib/reps/types";
 import type { Pattern } from "@/lib/types";
 
+import { BarPathReplay } from "./BarPathReplay";
 import { Icon } from "./icons";
 
 export type Facing = "user" | "environment";
@@ -105,6 +109,13 @@ export function formTip(report: FormReport): { text: string; issue?: FormIssue }
   return { text: t(key, { count: issue.of, hit: issue.hit, deg: issue.deg ?? 0 }), issue };
 }
 
+/** The cue between sets for the set's bar path: where it drifted, or that it stayed on line. */
+export function pathTip(report: PathReport): { text: string; issue: boolean } {
+  const i = report.issue;
+  if (!i) return { text: t("count.path.good", { count: report.reps, cm: Math.max(1, report.maxCm) }), issue: false };
+  return { text: t(`count.path.${i.kind}`, { count: i.of, hit: i.hit, cm: i.cm }), issue: true };
+}
+
 /** How far the figure leans to show a lean: the lifter's own tilt, kept between 8° and 15° so it reads on a small stage. */
 export const shownLean = (i?: FormIssue) => (i?.kind === "lean" ? (i.side === "left" ? -1 : 1) * Math.min(15, Math.max(8, i.deg ?? 8)) : 0);
 
@@ -157,6 +168,8 @@ export function AutoCount({
   const speedOn = labOn("labBarSpeed");
   const formOn = labOn("labFormCheck");
   const [form, setForm] = useState<FormReport | undefined>();
+  const pathOn = labOn("labBarPath") && pathFits(pattern);
+  const [path, setPath] = useState<{ report: PathReport; video: { w: number; h: number } } | undefined>();
   const progress = useRef<number | null>(null);
   // Between sets, a depth or range tip replays the lifter's short rep on the figure: down to where it stopped and
   // back, every 2.4 s (held still in Lean mode).
@@ -239,7 +252,15 @@ export function AutoCount({
       let tracker = new RepTracker(cameraProfile);
       const signal = new PoseSignal(cameraProfile, BLAZEPOSE, heightCm ? heightCm / 100 : undefined);
       const check = formOn ? new FormCheck(checksFor(pattern)) : null;
+      const bar = pathOn ? new BarPath(pattern, heightCm ? heightCm / 100 : undefined) : null;
       reset.current = () => {
+        // Bar path: the set that just ended gets its replay and cue, kept through rest; the next set clears it.
+        if (bar) {
+          const r = bar.report(tracker.summary().reps);
+          if (r.reps > 0 && r.replay) setPath({ report: r, video: { w: v.videoWidth, h: v.videoHeight } });
+          else if (live.current.counting) setPath(undefined);
+          bar.reset();
+        }
         // Form check: a set that just ended gets its tip, kept through rest; the next set clears it.
         if (check) {
           const r = check.report(tracker.summary().reps);
@@ -300,9 +321,11 @@ export function AutoCount({
           }
           tracker.push(smp);
           check?.push(formFrame(now, kps, aspect));
+          bar?.push(now, kps, aspect);
           progress.current = visible ? tracker.progress : null;
           if (tracker.over) {
             check?.keep(tracker.summary().reps);
+            bar?.keep(tracker.summary().reps);
             base += tracker.summary().full;
             tracker = new RepTracker(cameraProfile);
           }
@@ -357,9 +380,19 @@ export function AutoCount({
     reset.current();
   }, [setKey, counting]);
 
-  const tip = formOn && form && !counting ? formTip(form) : undefined;
+  const formTipNow = formOn && form && !counting ? formTip(form) : undefined;
+  const pathNow = pathOn && path && !counting ? path : undefined;
+  const pathCue = pathNow ? pathTip(pathNow.report) : undefined;
+  // One line between sets: a form issue first (safety), then a bar path drift, then whichever says all is well.
+  const tip =
+    formTipNow?.issue || !pathCue
+      ? formTipNow
+      : pathCue.issue || !formTipNow
+        ? { text: pathCue.text, issue: undefined, path: pathCue.issue }
+        : formTipNow;
+  const tipTerm = tip && "path" in tip ? "barPath" : "formCheck";
   useEffect(() => {
-    replay.current = tip?.issue?.reach ?? null;
+    replay.current = formTipNow?.issue?.reach ?? null;
   });
 
   const mirror = camera && prefs.facing === "user" ? { transform: "scaleX(-1)" } : undefined;
@@ -401,8 +434,8 @@ export function AutoCount({
         <LiftDemo
           exerciseId={exerciseId}
           body={body}
-          view={tip?.issue?.kind === "lean" ? "front" : "side"}
-          lean={shownLean(tip?.issue)}
+          view={formTipNow?.issue?.kind === "lean" ? "front" : "side"}
+          lean={shownLean(formTipNow?.issue)}
           bpm={bpm}
           hrTrend={hrTrend}
           follow={follow}
@@ -440,13 +473,13 @@ export function AutoCount({
         )}
         <div className="absolute inset-x-2 bottom-2 flex items-end gap-1">
           <p
-            className={`min-w-0 flex-1 rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : tip ? (tip.issue ? "text-warn" : "text-muted") : speed?.advice === "stop" && inView && counting ? "text-warn" : inView || !counting ? "text-muted" : "text-warn"}`}
+            className={`min-w-0 flex-1 rounded-lg bg-bg/80 px-2 py-1 text-xs ${phase === "error" ? "text-bad" : tip ? (tip.issue || ("path" in tip && tip.path) ? "text-warn" : "text-muted") : speed?.advice === "stop" && inView && counting ? "text-warn" : inView || !counting ? "text-muted" : "text-warn"}`}
             role={phase === "error" ? "alert" : "status"}
           >
             {status}
           </p>
           {tip ? (
-            <Info term="formCheck" className="shrink-0 rounded-full bg-bg/80" />
+            <Info term={tipTerm} className="shrink-0 rounded-full bg-bg/80" />
           ) : (
             speedOn && <Info term="barSpeed" className="shrink-0 rounded-full bg-bg/80" />
           )}
@@ -456,6 +489,7 @@ export function AutoCount({
         <div className="relative h-full w-[42%] shrink-0 overflow-hidden rounded-2xl border border-line bg-bg">
           <video ref={video} playsInline muted className="absolute inset-0 h-full w-full object-cover" style={mirror} aria-hidden />
           <canvas ref={bones} className="pointer-events-none absolute inset-0 h-full w-full" style={mirror} aria-hidden />
+          {pathNow?.report.replay && <BarPathReplay frames={pathNow.report.replay.frames} video={pathNow.video} style={mirror} />}
           <span className={`absolute left-2 top-2 h-2.5 w-2.5 rounded-full ${inView ? "bg-good" : "bg-warn"}`} aria-hidden />
           {stopButton}
           <button
