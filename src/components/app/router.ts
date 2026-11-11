@@ -29,6 +29,7 @@ export const ROUTES = [
   "routine",
   "friends",
   "person",
+  "invite",
   "trainer",
   "exercise",
 ] as const;

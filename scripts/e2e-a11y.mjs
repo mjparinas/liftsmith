@@ -297,6 +297,13 @@ try {
       ],
     },
     people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
+    board: {
+      rows: [
+        { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
+        { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
+      ],
+    },
+    inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
         handle: "blair",
@@ -338,6 +345,9 @@ try {
   await page.getByText("Strong work!").waitFor();
   await scan("friends comments");
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Board" }).click();
+  await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
+  await scan("friends board");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();
   await scan("friends activity");
@@ -348,6 +358,9 @@ try {
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();
   await scan("friends person");
+  await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
+  await page.getByText("Blair invited you").waitFor();
+  await scan("friends invite");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");

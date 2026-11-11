@@ -16,6 +16,7 @@ import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
+import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { onPushTap } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
@@ -37,7 +38,7 @@ import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
-import { Friends, PersonScreen } from "./Friends";
+import { Friends, InviteScreen, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -149,6 +150,8 @@ export function App() {
     void flushFeedback();
     // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
     void startCreator();
+    // An invite that came through the Play install referrer waits for Friends (invite.ts).
+    void startInvite();
     const online = () => {
       void flushFeedback();
       if (useCreator.getState().claim?.status === "pending") void sendClaim();
@@ -341,6 +344,7 @@ export function App() {
     routine: <SharedRoutine code={arg} />,
     friends: <Friends />,
     person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
+    invite: <InviteScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
   };

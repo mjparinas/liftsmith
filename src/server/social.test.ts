@@ -339,3 +339,56 @@ describe("captions, audiences, mutes, avatars and best lifts (stage 3)", () => {
     expect((await call("acc-b", "feed")).body.posts).toEqual([]);
   });
 });
+
+describe("invite links and the leaderboard (stage 4)", () => {
+  it("makes one reusable code, and accepting it makes two lifters follow each other whatever their settings", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair"); // approves follow requests
+    const r = await call("acc-a", "invite");
+    const code = r.body.code as string;
+    expect(code).toMatch(/^[2-9A-HJ-NP-Z]{8}$/);
+    expect((await call("acc-a", "invite")).body.code).toBe(code);
+    expect((await call("acc-b", "inviteInfo", { code: code.toLowerCase() })).body).toMatchObject({
+      inviter: { handle: "alex" },
+      self: false,
+    });
+    expect((await call("acc-a", "acceptInvite", { code })).body.error).toBe("self");
+    expect((await call("acc-b", "acceptInvite", { code })).body).toEqual({ handle: "alex" });
+    expect((await call("acc-a", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "blair" }]);
+    expect((await call("acc-b", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "alex" }]);
+  });
+
+  it("refuses an expired, unknown or blocked invite, and one from a suspended lifter", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    await join("acc-c", "casey");
+    const code = (await call("acc-a", "invite", {}, NOW)).body.code as string;
+    expect((await call("acc-b", "acceptInvite", { code: "ZZZZZZZZ" })).body.error).toBe("invite");
+    expect((await call("acc-b", "acceptInvite", { code }, NOW + 31 * DAY)).body.error).toBe("invite");
+    await call("acc-a", "block", { handle: "casey" });
+    expect((await call("acc-c", "inviteInfo", { code })).code).toBe(404);
+    await resolveReports("profile", "acc-a", "suspend");
+    expect((await call("acc-b", "acceptInvite", { code })).code).toBe(404);
+  });
+
+  it("ranks the lifter and everyone they follow by this week's posts they may see", async () => {
+    await friends(); // blair follows alex
+    await join("acc-c", "casey");
+    const from = NOW - 2 * DAY;
+    await call("acc-a", "post", workout("s1", NOW - DAY));
+    await call("acc-a", "post", workout("s2", NOW - 3 * DAY)); // last week
+    await call("acc-a", "post", { ...workout("s3", NOW - DAY / 2), audience: "me" }); // not for blair
+    await call("acc-b", "post", workout("b1", NOW - DAY));
+    await call("acc-c", "post", workout("c1", NOW - DAY)); // blair doesn't follow casey
+    const rows = (await call("acc-b", "board", { from })).body.rows as { handle: string; workouts: number; sets: number; me: boolean }[];
+    expect(rows.map((r) => [r.handle, r.workouts, r.me]).sort()).toEqual([
+      ["alex", 1, false],
+      ["blair", 1, true],
+    ]);
+    expect(rows.find((r) => r.handle === "alex")).toMatchObject({ sets: 12, minutes: 50, volume: 4200, prs: 1 });
+    expect((await call("acc-a", "board", { from })).body.rows as { handle: string; workouts: number }[]).toMatchObject([
+      { handle: "alex", workouts: 2 },
+    ]);
+    expect((await call("acc-b", "board", { from: NOW - 400 * DAY })).code).toBe(400);
+  });
+});
