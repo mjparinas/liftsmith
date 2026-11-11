@@ -4,6 +4,7 @@
 // The public website uses LiftDemoCore directly with English names from the server, so its pages don't
 // load the catalogues.
 import { t } from "@/lib/i18n";
+import { calm, haptic } from "@/lib/juice";
 import { MUSCLE_LABEL } from "@/lib/types";
 
 import { DEMO_WORDS, LiftDemoCore, type DemoWords, type LiftDemoProps } from "./LiftDemoCore";
@@ -18,5 +19,14 @@ export function demoWords(): DemoWords {
 }
 
 export function LiftDemo(props: LiftDemoProps) {
-  return <LiftDemoCore {...props} labels={MUSCLE_LABEL} words={demoWords()} />;
+  // The dance easter egg: quiet in Lean mode, and a celebrate buzz as it starts (Capacitor Haptics on Android and iOS).
+  return (
+    <LiftDemoCore
+      {...props}
+      dance={props.dance !== false && !calm()}
+      onDance={props.onDance ?? (() => haptic("celebrate"))}
+      labels={MUSCLE_LABEL}
+      words={demoWords()}
+    />
+  );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { DANCE_ID, tapStreak } from "@/lib/demo/dance";
 import type { BodyKey } from "@/lib/demo/rig";
 import { EXERCISES } from "@/lib/exercises";
 import type { Muscle } from "@/lib/types";
@@ -66,6 +67,14 @@ export interface LiftDemoProps {
   bare?: boolean;
   onDone?: () => void;
   onClick?: () => void;
+  /**
+   * The easter egg (on by default): five quick taps on the figure and it dances for ten seconds (lib/demo/dance.ts).
+   * Off while it follows the lifter or replays reps, when still, and with reduced motion (the app's LiftDemo also
+   * turns it off in Lean mode).
+   */
+  dance?: boolean;
+  /** Called as the dance starts (the app's LiftDemo buzzes). */
+  onDance?: () => void;
 }
 
 const noSubscribe = () => () => {};
@@ -143,6 +152,8 @@ export function LiftDemoCore({
   bare = false,
   onDone,
   onClick,
+  dance: danceOn = true,
+  onDance,
 }: LiftDemoProps & { labels: Partial<Record<Muscle, string>>; words?: DemoWords }) {
   const VIEWS = viewsOf(w);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -161,19 +172,33 @@ export function LiftDemoCore({
   const [path, setPath] = useState(false);
   const [speed, setSpeed] = useState(1);
   const [playPick, setPlayPick] = useState<boolean | null>(null);
+  const [dancing, setDancing] = useState(false);
+  const taps = useRef<number[]>([]);
   // The 2D figure is drawn on the main thread; where autoPlay2d is off (the public site), it waits for Play.
-  const playing = playPick ?? (!still && (mode !== "2d" || autoPlay2d !== false));
+  const playing = dancing || (playPick ?? (!still && (mode !== "2d" || autoPlay2d !== false)));
+  const canDance =
+    danceOn && !still && !follow && !reps && !(typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches);
+  const tap = () => {
+    onClick?.();
+    if (!canDance || dancing) return;
+    const r = tapStreak(taps.current, Date.now());
+    taps.current = r.taps;
+    if (r.dance) {
+      setDancing(true);
+      onDance?.();
+    }
+  };
 
   const settings: DemoSettings = {
-    exerciseId,
+    exerciseId: dancing ? DANCE_ID : exerciseId,
     body,
     view,
     skeleton,
     muscles,
     path,
     speed,
-    playing: playing && !paused && !still,
-    reps,
+    playing: playing && !paused && (dancing || !still),
+    reps: dancing ? 1 : reps,
     highlight,
     bpm: bpm ?? null,
     fps: fps ?? (controls ? 60 : 30),
@@ -184,7 +209,8 @@ export function LiftDemoCore({
   const onDoneRef = useRef(onDone);
   useEffect(() => {
     latest.current = settings;
-    onDoneRef.current = onDone;
+    // the dance's one pass ends the dance; the lifter's own onDone is only for their reps
+    onDoneRef.current = dancing ? () => setDancing(false) : onDone;
   });
 
   // start the loop once the mode is known; 3D is imported only now, so three.js stays out of the main bundle
@@ -236,7 +262,7 @@ export function LiftDemoCore({
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps, maxDpr, follow]);
+  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps, maxDpr, follow, dancing]);
 
   const setView = setViewPick;
 
@@ -261,7 +287,7 @@ export function LiftDemoCore({
             aria-label={alt}
             className="absolute inset-0 block h-full w-full"
             style={{ touchAction: controls ? "pan-y" : "auto", cursor: controls ? "grab" : onClick ? "pointer" : "default" }}
-            onClick={onClick}
+            onClick={tap}
           />
         )}
         {(mode === "none" || failed) && (
