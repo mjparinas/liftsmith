@@ -12,7 +12,7 @@ import { Chip, Switch } from "./ui";
 /**
  * The one exercise browser (Melvin, 2026-11-11: "some kind of search or organization or both"): type a
  * few letters, or tap a main muscle (or Cardio), and keep "Only what this gym has" on to see what can be
- * done here. Typing is optional: the chips alone narrow 300 exercises to a short list. Used to add an
+ * done here. Typing is optional: the chips alone narrow 500 exercises to a short list. Used to add an
  * exercise to a routine or a workout, in the swap sheet and in exercise preferences.
  */
 export function ExerciseBrowser({
