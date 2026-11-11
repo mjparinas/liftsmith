@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
+import { useAccount } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
 import { t } from "@/lib/i18n";
 import { calm } from "@/lib/juice";
+import { useApp } from "@/lib/store";
+import { syncNow } from "@/lib/sync";
+import { readSync } from "@/lib/syncOutbox";
 import type { MessageKey } from "@/locales/en";
 
 import { AccountPanel } from "./Account";
 import { Icon, type IconName } from "./icons";
+import { go } from "./router";
 import { Button, Sheet } from "./ui";
 
 const POINTS: { icon: IconName; hue: string; key: MessageKey }[] = [
@@ -23,8 +28,10 @@ const POINTS: { icon: IconName; hue: string; key: MessageKey }[] = [
  * onto "What are you training for?" felt jarring). One screen: the 3D lifter, what the app does, Get started, and sign-in for a lifter
  * who already has an account. Only on the very first run; "Run setup again" in Settings skips it.
  */
-export function Welcome({ onStart }: { onStart: () => void }) {
-  const [signIn, setSignIn] = useState(false);
+export function Welcome({ onStart }: { onStart: (signedIn?: boolean) => void }) {
+  // The website's "Sign in" link opens the app at #/account: on the welcome screen that's the sign-in sheet.
+  const [signIn, setSignIn] = useState(() => typeof location !== "undefined" && location.hash.startsWith("#/account"));
+  const restoring = useRestore(signIn, () => setSignIn(false), onStart);
   return (
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="animate-rise flex flex-1 flex-col justify-center py-3">
@@ -58,9 +65,77 @@ export function Welcome({ onStart }: { onStart: () => void }) {
         </Button>
       </div>
       <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
-        <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
-        <AccountPanel onSignedIn={() => setSignIn(false)} />
+        {restoring === "busy" ? (
+          <p role="status" className="py-6 text-center text-muted">
+            {t("setup.welcome.restoring")}
+          </p>
+        ) : (
+          <>
+            <p className="mb-4 text-sm text-muted">{t("account.lead")}</p>
+            {restoring === "failed" && (
+              <p role="alert" className="mb-3 text-sm text-warn">
+                {t("account.syncError")}
+              </p>
+            )}
+            <AccountPanel />
+          </>
+        )}
       </Sheet>
     </main>
   );
+}
+
+/**
+ * After signing in here (any method: Google, Apple or an emailed code, on the web, Android and iOS), bring the account
+ * back and leave setup (Melvin, 2026-11-11: signing in left him on the sign-in sheet over the welcome screen).
+ * The first sync pulls the account's profile, gyms and workouts; the account's profile wins on a first sync, so a set-up
+ * account ends setup by itself (App shows the app once `profile.onboarded`), and this opens Today. An account with
+ * workouts but no finished profile is treated as set up too. An account with nothing on it yet carries on into the
+ * setup questions, signed in, so what they answer syncs. If the sync fails, the sheet stays with a note and Sync now.
+ */
+function useRestore(open: boolean, close: () => void, onStart: (signedIn?: boolean) => void): "idle" | "busy" | "failed" {
+  const [state, setState] = useState<"idle" | "busy" | "failed">("idle");
+  const last = useRef({ close, onStart });
+  useEffect(() => {
+    last.current = { close, onStart };
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    let live = true;
+    let failed = false;
+    const finish = () => {
+      const app = useApp.getState();
+      if (!app.profile.onboarded && app.events.length > 0 && app.gyms.length > 0) app.setProfile({ onboarded: true });
+      setState("idle");
+      last.current.close();
+      if (useApp.getState().profile.onboarded) go("today");
+      else last.current.onStart(true);
+    };
+    const synced = () => !readSync().lastError && !!useAccount.getState().account;
+    // Only a sign-in made while the sheet is open counts: a device already signed in restores through App's own sync.
+    const off = useAccount.subscribe((now, before) => {
+      if (now.account && !before.account) {
+        setState("busy");
+        void syncNow().then(() => {
+          if (!live) return;
+          failed = !synced();
+          if (failed) setState("failed");
+          else finish();
+        });
+      } else if (!now.account && before.account) {
+        failed = false;
+        setState("idle");
+      } else if (failed && before.busy && !now.busy && synced()) {
+        // After a failed first sync, the panel's Sync now (or the app coming back online) tries again; a good one finishes.
+        failed = false;
+        finish();
+      }
+    });
+    return () => {
+      live = false;
+      off();
+    };
+  }, [open]);
+  return state;
 }

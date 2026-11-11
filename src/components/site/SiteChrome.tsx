@@ -49,17 +49,35 @@ export function SiteHeader() {
               {n.label}
             </Link>
           ))}
+          <SignInLink />
           <Link
             href={APP_PATH}
             prefetch={false}
             data-cta="header"
-            className="press btn-primary ml-1 inline-flex min-h-11 items-center rounded-xl px-4"
+            className="press btn-primary ml-1 inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-4"
           >
             Start free
           </Link>
         </nav>
       </div>
     </header>
+  );
+}
+
+/**
+ * A quieter way in beside "Start free", for lifters who already have an account (Melvin, 2026-11-11). It opens the app on
+ * sign-in (#/account: the welcome screen's sign-in sheet on a new browser), and signing in there lands on Today.
+ */
+export function SignInLink() {
+  return (
+    <Link
+      href={`${APP_PATH}#/account`}
+      prefetch={false}
+      data-cta="header-signin"
+      className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-2 text-muted hover:bg-surface hover:text-ink sm:px-3"
+    >
+      Sign in
+    </Link>
   );
 }
 
