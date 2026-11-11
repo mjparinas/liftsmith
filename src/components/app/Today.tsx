@@ -233,15 +233,14 @@ export function Today() {
         <button
           type="button"
           onClick={() => go("injuries")}
-          className={`press rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
+          className={`press inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
         >
+          <Icon name="bandage" size={15} className={hurt.length ? "" : "text-ember"} />
           {hurt.length
             ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
             : t("today.somethingHurts")}
         </button>
       </div>
-
-      {profile.quotes !== false && <DailyQuote now={now} />}
 
       <TodayMoments />
 
@@ -331,6 +330,8 @@ export function Today() {
           )}
         </section>
       )}
+
+      {profile.quotes !== false && <DailyQuote now={now} />}
 
       {!active && <CoachNotes limit={2} />}
       {!active && <SaveNudge />}

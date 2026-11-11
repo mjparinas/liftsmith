@@ -40,18 +40,70 @@ export async function healthAvailable(): Promise<boolean> {
   }
 }
 
-/** Opens the Health Connect or Apple Health permission sheet. True when any read was granted. */
-export async function connectHealth(): Promise<boolean> {
-  if (!(await healthAvailable())) return false;
+/**
+ * What happened when we asked for Health permissions (the health twin's connect button, Connected apps):
+ * - `unavailable`: no Health Connect or Apple Health here; `install` when Google Play can fix that (Android 13 and
+ *   older ship without Health Connect, or it needs an update).
+ * - `denied`: Health Connect said no to what was needed. After two refusals it stops showing its sheet and answers
+ *   at once, which used to look like a button that does nothing, so the lifter is sent to its settings instead.
+ * - `granted`: allowed. Apple Health never says whether a read was allowed, so on iOS this only means it asked.
+ */
+export type HealthAsk = { state: "unavailable"; install: boolean } | { state: "denied" } | { state: "granted" };
+
+export type HealthRead = (typeof READ)[number];
+
+/**
+ * Opens the Health Connect or Apple Health permission sheet and says what came of it. `need` lists the reads the
+ * caller is here for (HRV for the HRV tile); without it, any read allowed counts.
+ */
+export async function askHealth(need: readonly HealthRead[] = []): Promise<HealthAsk> {
+  if (!isNative()) return { state: "unavailable", install: false };
+  const { Capacitor } = await import("@capacitor/core");
+  const android = Capacitor.getPlatform() === "android";
+  let available = false;
+  try {
+    available = (await (await health()).Health.isAvailable()).available;
+  } catch {
+    available = false;
+  }
+  if (!available) return { state: "unavailable", install: android };
   try {
     const r = await (await health()).Health.requestAuthorization({ read: [...READ], write: [...WRITE] });
+    const ok = askResult(android, need, r.readAuthorized as string[]);
     // Then saving workouts, which our own plugin asks for (the health plugin can't write them).
-    await allowWorkouts();
-    // HealthKit never says whether reads were allowed, so an empty denied list counts as yes.
-    return r.readAuthorized.length > 0 || r.readDenied.length < READ.length;
+    if (ok) await allowWorkouts();
+    return { state: ok ? "granted" : "denied" };
   } catch {
-    return false;
+    // Health Connect couldn't open its sheet (or isn't set up yet): its settings are the way forward.
+    return { state: android ? "denied" : "granted" };
   }
+}
+
+/** Whether a permission answer covers what was needed. iOS hides reads, so it always counts. Exported for tests. */
+export function askResult(android: boolean, need: readonly string[], readAuthorized: readonly string[]): boolean {
+  if (!android) return true;
+  return need.length ? need.every((k) => readAuthorized.includes(k)) : readAuthorized.length > 0;
+}
+
+/** Opens the Health Connect or Apple Health permission sheet. True when any read was granted. */
+export async function connectHealth(): Promise<boolean> {
+  return (await askHealth()).state === "granted";
+}
+
+/**
+ * Where the lifter changes what Liftsmith may read: Health Connect's page for Liftsmith (Android 14+), its settings
+ * (older), Google Play when it isn't installed, or the Health app on iOS. Falls back to the health plugin's
+ * settings call on app builds from before our plugin had this.
+ */
+export async function openHealthPermissions(): Promise<boolean> {
+  if (!isNative()) return false;
+  try {
+    const r = await workoutPlugin()?.openPermissions?.();
+    if (r?.opened) return true;
+  } catch {
+    // Fall through.
+  }
+  return openHealthSettings();
 }
 
 export interface HealthHints {
@@ -190,6 +242,8 @@ interface WorkoutPlugin {
   }): Promise<{ saved: boolean }>;
   /** Apple Health's sex and birth year (iOS). Android answers with nothing: Health Connect has no such records. */
   characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
+  /** Opens where Health permissions are changed (or Google Play for Health Connect). Missing on older app builds. */
+  openPermissions?(): Promise<{ opened: boolean }>;
 }
 const workoutPlugin = (): WorkoutPlugin | undefined =>
   isNative()
@@ -343,6 +397,16 @@ export function perDay(
     .sort((a, b) => a.at - b.at);
 }
 
+const SAMPLE_LIMIT = 5000;
+
+/** [start, end) ISO windows of at most a week, oldest first, covering `from` to `to`. Exported for tests. */
+export function weekWindows(from: number, to: number): [string, string][] {
+  const out: [string, string][] = [];
+  for (let a = from; a < to; a += 7 * 86_400_000)
+    out.push([new Date(a).toISOString(), new Date(Math.min(to, a + 7 * 86_400_000)).toISOString()]);
+  return out;
+}
+
 /**
  * The last `days` of sleep, HRV, resting heart rate, steps, VO2 max and overnight breathing rate, one
  * reading per metric per day. Steps only for finished days (today's count is still growing). Empty on
@@ -352,12 +416,20 @@ export async function readDaily(days: number, now = Date.now()): Promise<DailyRe
   if (!(await healthAvailable())) return [];
   const { Health } = await health();
   const startDate = new Date(now - days * 86_400_000).toISOString();
+  // One week at a time. Health Connect pages oldest first and the plugin stops at `limit`, so one read of 45
+  // days kept only the oldest samples: a ring that writes HRV every few minutes overnight lost its last few
+  // weeks (the ones the twin shows) never came in (Melvin, 2026-11-11). A week stays well under the limit.
   const read = async (dataType: (typeof READ)[number]): Promise<Sample[]> => {
-    try {
-      return (await Health.readSamples({ dataType, startDate, limit: 2000, ascending: true })).samples as Sample[];
-    } catch {
-      return [];
+    const out: Sample[] = [];
+    for (const [from, to] of weekWindows(now - days * 86_400_000, now)) {
+      try {
+        const r = await Health.readSamples({ dataType, startDate: from, endDate: to, limit: SAMPLE_LIMIT, ascending: true });
+        out.push(...(r.samples as Sample[]));
+      } catch {
+        // Not allowed, or this window failed: keep the rest.
+      }
     }
+    return out;
   };
   const steps = async (): Promise<DailyReading[]> => {
     try {

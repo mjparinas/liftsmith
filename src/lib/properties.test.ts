@@ -9,6 +9,8 @@ import { parseCsv, readImport } from "./importCsv";
 import { loadBar, nearestLoads } from "./plates";
 import { recovery } from "./recovery";
 import { decodeRemix, encodeRemix } from "./remix";
+import { decodeRoutine, encodeRoutine } from "./routineShare";
+import { withLinks } from "./superset";
 import { MUSCLES, type PlateStock } from "./types";
 import { fromKg, toKg } from "./units";
 
@@ -119,6 +121,42 @@ describe("links and files from outside never crash the app", () => {
         expect(Array.isArray(decodeRemix(["1", ...parts].join("~")))).toBe(true);
       }),
       300,
+    );
+  });
+
+  it("routine links: junk opens nothing or a routine, never an error", () => {
+    run(
+      fc.property(fc.string({ unit: "binary", maxLength: 300 }), (s) => {
+        const r = decodeRoutine(s);
+        expect(r === null || r.items.length > 0).toBe(true);
+      }),
+      500,
+    );
+    run(
+      fc.property(fc.array(fc.string({ maxLength: 20 }), { maxLength: 30 }), (parts) => {
+        const r = decodeRoutine(["r1", ...parts].join("~"));
+        expect(r === null || r.items.length > 0).toBe(true);
+      }),
+      300,
+    );
+  });
+
+  it("routine links round-trip every valid routine", () => {
+    const routine = fc.record({
+      name: fc.string({ unit: "grapheme", minLength: 1, maxLength: 40 }).filter((n) => n.trim() === n && !/[\u0000-\u001f\u007f]/.test(n)),
+      items: fc.array(fc.record({ exerciseId: fc.constantFrom(...EXERCISES.map((e) => e.id)), sets: fc.integer({ min: 1, max: 10 }) }), {
+        minLength: 1,
+        maxLength: 20,
+      }),
+      links: fc.array(fc.boolean(), { maxLength: 19 }),
+    });
+    run(
+      fc.property(routine, ({ name, items, links }) => {
+        const linked = withLinks(items, links);
+        const back = decodeRoutine(encodeRoutine({ name, items: linked }))!;
+        expect(back.items).toEqual(linked);
+        expect(back.name).toBe(name.slice(0, 40));
+      }),
     );
   });
 
