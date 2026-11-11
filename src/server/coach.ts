@@ -21,6 +21,8 @@ export const COACH_LIMITS = {
   historyMs: 365 * 86_400_000,
   /** Events sent to a coach at most, newest first. */
   events: 30_000,
+  /** Routines a coach can assign to one client at a time. */
+  plans: 10,
 };
 
 /** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
@@ -61,10 +63,29 @@ async function people(rows: { id: string; since: number }[]): Promise<Person[]> 
   return Promise.all(rows.map(async (r) => ({ id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) })));
 }
 
+/** A routine a coach assigned to a client. `code` is a routine share code (src/lib/routineShare.ts). */
+export interface Plan {
+  id: string;
+  coachId: string;
+  clientId: string;
+  name: string;
+  code: string;
+  at: number;
+}
+type PlanRow = { id: string; coach_id: string; client_id: string; name: string; code: string; created_at: number };
+const plan = (r: PlanRow): Plan => ({
+  id: String(r.id),
+  coachId: String(r.coach_id),
+  clientId: String(r.client_id),
+  name: String(r.name),
+  code: String(r.code),
+  at: Number(r.created_at),
+});
+
 export async function overview(
   accountId: string,
   now = Date.now(),
-): Promise<{ invite: Invite | null; clients: Person[]; coaches: Person[] }> {
+): Promise<{ invite: Invite | null; clients: Person[]; coaches: Person[]; plans: Plan[] }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
     [accountId, now],
@@ -77,10 +98,13 @@ export async function overview(
     "SELECT coach_id AS id, created_at AS since FROM coach_links WHERE client_id = ? ORDER BY created_at",
     [accountId],
   );
+  // The routines this lifter's coaches assigned to them.
+  const plans = await query<PlanRow>("SELECT * FROM coach_plans WHERE client_id = ? ORDER BY created_at DESC", [accountId]);
   return {
     invite: inv ? { code: String(inv.code), expiresAt: Number(inv.expires_at) } : null,
     clients: await people(clients),
     coaches: await people(coaches),
+    plans: plans.map(plan),
   };
 }
 
@@ -133,14 +157,54 @@ export async function joinCoach(clientId: string, raw: unknown, now = Date.now()
   return { coach: { ...seen.coach, since: now } };
 }
 
-/** Either side ends it: a coach drops a client, or a client leaves a coach. */
+/** Either side ends it: a coach drops a client, or a client leaves a coach. The coach's routines for them go too. */
 export async function unlink(accountId: string, otherId: string): Promise<void> {
-  await run("DELETE FROM coach_links WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", [
-    accountId,
-    otherId,
-    otherId,
-    accountId,
+  const pair = [accountId, otherId, otherId, accountId];
+  await batch([
+    { sql: "DELETE FROM coach_links WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_plans WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
   ]);
+}
+
+/** A routine share code as the app writes it (r1~name~exercise.sets[.s]~…), checked loosely: the app decodes it. */
+export const isRoutineCode = (x: unknown): x is string => typeof x === "string" && x.length <= 2000 && /^r1~[\w.~-]+$/.test(x);
+
+export type PlanError = "notClient" | "bad" | "full";
+
+/** A coach gives a client a routine. It shows on the client's phone under Coaching, ready to save and start. */
+export async function assignPlan(
+  coachId: string,
+  clientId: unknown,
+  name: unknown,
+  code: unknown,
+  now = Date.now(),
+  id = randomBytes(9).toString("base64url"),
+): Promise<Plan | { error: PlanError }> {
+  if (!isAccountId(clientId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
+  const title =
+    typeof name === "string"
+      ? name
+          .replace(/[\u0000-\u001f\u007f]/g, " ")
+          .trim()
+          .slice(0, 60)
+      : "";
+  if (!title || !isRoutineCode(code)) return { error: "bad" };
+  const [c] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_plans WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+  if (Number(c?.n ?? 0) >= COACH_LIMITS.plans) return { error: "full" };
+  await run("INSERT INTO coach_plans (id, coach_id, client_id, name, code, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+    id,
+    coachId,
+    clientId,
+    title,
+    code,
+    now,
+  ]);
+  return { id, coachId, clientId, name: title, code, at: now };
+}
+
+/** The coach takes a routine back. */
+export async function removePlan(coachId: string, id: unknown): Promise<void> {
+  if (typeof id === "string") await run("DELETE FROM coach_plans WHERE id = ? AND coach_id = ?", [id, coachId]);
 }
 
 export async function isClient(coachId: string, clientId: string): Promise<boolean> {
@@ -193,6 +257,8 @@ export interface ClientView {
   name: string;
   daysPerWeek: number | null;
   events: Record<string, unknown>[];
+  /** The routines this coach assigned to the client. */
+  plans: Plan[];
 }
 
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
@@ -222,11 +288,16 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
   } catch {
     /* no profile yet */
   }
-  return { name: await nameOf(clientId), daysPerWeek, events: events.reverse() };
+  const plans = await query<PlanRow>("SELECT * FROM coach_plans WHERE coach_id = ? AND client_id = ? ORDER BY created_at DESC", [
+    coachId,
+    clientId,
+  ]);
+  return { name: await nameOf(clientId), daysPerWeek, events: events.reverse(), plans: plans.map(plan) };
 }
 
 /** Deleting an account: its invites and every link, as coach or client. */
 export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_invites WHERE coach_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_links WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_plans WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

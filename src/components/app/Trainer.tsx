@@ -12,9 +12,11 @@ import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
+import { encodeRoutine } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import {
+  assignPlan,
   cancelInvite,
   clientReport,
   codeFrom,
@@ -26,18 +28,22 @@ import {
   loadOverview,
   newInvite,
   previewCode,
+  removePlan,
   showCode,
   trainerError,
   unlinkPerson,
   type Overview,
   type Person,
+  type Plan,
+  type PlanProgress,
   type Report,
 } from "@/lib/trainer";
+import type { Routine } from "@/lib/types";
 import { fmtWeight } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { go } from "./router";
-import { Button, EmptyState, ProTag, ScreenHeader, Section } from "./ui";
+import { Button, EmptyState, ProTag, ScreenHeader, Section, Sheet } from "./ui";
 
 const CLIENT = "c.";
 
@@ -66,7 +72,7 @@ function Home({ code }: { code: string }) {
     loadOverview()
       .then(setData)
       .catch((e: unknown) => {
-        setData({ invite: null, clients: [], coaches: [] });
+        setData({ invite: null, clients: [], coaches: [], plans: [] });
         setNote(trainerError(e));
       });
   }, []);
@@ -81,7 +87,7 @@ function Home({ code }: { code: string }) {
         </p>
       )}
       <Section title={t("trn.yourCoach")} icon="flag">
-        <YourCoach coaches={data?.coaches ?? []} code={code} onChange={reload} />
+        <YourCoach coaches={data?.coaches ?? []} plans={data?.plans ?? []} code={code} onChange={reload} />
       </Section>
       <Section title={t("trn.yourClients")} icon="target">
         <YourClients data={data} onChange={reload} />
@@ -92,7 +98,7 @@ function Home({ code }: { code: string }) {
 
 // --- The client's side: free for everyone ---
 
-function YourCoach({ coaches, code, onChange }: { coaches: Person[]; code: string; onChange: () => void }) {
+function YourCoach({ coaches, plans, code, onChange }: { coaches: Person[]; plans: Plan[]; code: string; onChange: () => void }) {
   const [text, setText] = useState(code ? showCode(code) : "");
   const [found, setFound] = useState<Person | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -158,6 +164,36 @@ function YourCoach({ coaches, code, onChange }: { coaches: Person[]; code: strin
   };
   return (
     <div>
+      {plans.length > 0 && (
+        <div className="mb-3">
+          <p className="mb-2 px-1 text-sm font-semibold">{t("trn.fromCoach")}</p>
+          <ul className="space-y-2">
+            {plans.map((p) => {
+              const who = coaches.find((c) => c.id === p.coachId)?.name || t("trn.noName");
+              return (
+                <li key={p.id}>
+                  {/* Opens the shared routine preview, where one tap saves it to this lifter's routines. */}
+                  <button
+                    type="button"
+                    onClick={() => go("routine", p.code)}
+                    aria-label={t("trn.planOpenNamed", { name: p.name })}
+                    className="press card card-tint flex w-full items-center gap-3 px-4 py-3 text-left"
+                    style={{ ["--tint" as string]: "var(--color-accent)" }}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold">{p.name}</span>
+                      <span className="block text-sm text-muted">
+                        {t("trn.planBy", { name: who, date: date(p.at, { month: "short", day: "numeric" }) })}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-accent">{t("trn.planOpen")} ›</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
       {coaches.length > 0 && (
         <ul className="card mb-3 divide-y divide-line">
           {coaches.map((c) => (
@@ -347,6 +383,105 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
   );
 }
 
+/** The coach's routines for one client (stage 2): how each is going, take one back, or assign another. */
+function ClientPlans({ clientId, plans, onChange }: { clientId: string; plans: PlanProgress[]; onChange: () => void }) {
+  const saved = useApp((s) => s.profile.routines);
+  const routines = saved ?? [];
+  const [picking, setPicking] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const give = async (r: Routine) => {
+    try {
+      await assignPlan(clientId, r.name, encodeRoutine(r));
+      haptic("success");
+      sound.done();
+      track("feature", { name: "trainer", detail: "assign" });
+      setPicking(false);
+      setNote(t("trn.assigned"));
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+  };
+  const takeBack = async (p: PlanProgress) => {
+    try {
+      await removePlan(p.plan.id);
+      haptic("toggle");
+      track("feature", { name: "trainer", detail: "unassign" });
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    }
+  };
+  return (
+    <Section title={t("trn.plans")} icon="layers">
+      {plans.length > 0 && (
+        <ul className="card mb-3 divide-y divide-line">
+          {plans.map((p) => (
+            <li key={p.plan.id} className="flex items-center gap-2 py-2 pl-4 pr-1">
+              <span className="min-w-0 flex-1 py-1">
+                <span className="block truncate font-medium">{p.plan.name}</span>
+                <span className="block text-xs text-muted">
+                  {p.done
+                    ? `${t("trn.planDone", { count: p.done })}${p.lastAt ? ` · ${t("trn.planLast", { date: date(p.lastAt, { month: "short", day: "numeric" }) })}` : ""}`
+                    : t("trn.planNotYet")}
+                </span>
+              </span>
+              <button
+                type="button"
+                onClick={() => void takeBack(p)}
+                aria-label={t("trn.unassign", { name: p.plan.name })}
+                className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+              >
+                <Icon name="trash" size={20} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button kind="ghost" icon="plus" className="w-full" onClick={() => setPicking(true)}>
+        {t("trn.assign")}
+      </Button>
+      {note && (
+        <p className="mt-2 text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
+      <Sheet open={picking} onClose={() => setPicking(false)} title={t("trn.assignTitle")}>
+        {routines.length ? (
+          <ul className="space-y-2">
+            {routines.map((r) => (
+              <li key={r.id}>
+                <button
+                  type="button"
+                  onClick={() => void give(r)}
+                  className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
+                >
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-semibold">{r.name}</span>
+                    <span className="block text-sm text-muted">
+                      {t("rt.summary", {
+                        exercises: t("rt.exercises", { count: r.items.length }),
+                        sets: t("rt.sets", { count: r.items.reduce((n, i) => n + i.sets, 0) }),
+                      })}
+                    </span>
+                  </span>
+                  <span aria-hidden className="text-faint">
+                    ›
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="text-sm text-muted">{t("trn.assignNone")}</p>
+        )}
+      </Sheet>
+    </Section>
+  );
+}
+
 const TONE = { warn: "var(--color-warn)", good: "var(--color-good)", info: "var(--color-accent)" } as const;
 
 /** One client's report: what to act on first, their weeks, recent workouts and new bests. */
@@ -355,6 +490,8 @@ function ClientScreen({ id }: { id: string }) {
   const lab = labOn("labTrainer");
   const [report, setReport] = useState<Report | null>(null);
   const [error, setError] = useState<string | null>(null);
+  // Bumped after assigning or taking back a routine, to load the client again.
+  const [version, setVersion] = useState(0);
   useEffect(() => {
     if (!lab) return;
     let live = true;
@@ -364,7 +501,7 @@ function ClientScreen({ id }: { id: string }) {
     return () => {
       live = false;
     };
-  }, [id, lab]);
+  }, [id, lab, version]);
   const back = { label: t("trn.back"), onClick: () => go("trainer") };
   if (!lab)
     return (
@@ -452,6 +589,7 @@ function ClientScreen({ id }: { id: string }) {
           <p className="px-1 text-sm text-muted">{t("trn.noWorkouts")}</p>
         )}
       </Section>
+      <ClientPlans clientId={id} plans={report.plans} onChange={() => setVersion((n) => n + 1)} />
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">
           <ul className="card divide-y divide-line">

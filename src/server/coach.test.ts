@@ -1,7 +1,20 @@
 import { beforeEach, describe, expect, it } from "vitest";
 
 import { deleteAccount } from "./accounts";
-import { cleanCode, clientView, COACH_LIMITS, forCoach, joinCoach, makeInvite, newCode, overview, previewInvite, unlink } from "./coach";
+import {
+  assignPlan,
+  cleanCode,
+  clientView,
+  COACH_LIMITS,
+  forCoach,
+  joinCoach,
+  makeInvite,
+  newCode,
+  overview,
+  previewInvite,
+  removePlan,
+  unlink,
+} from "./coach";
 import { query, resetDb } from "./db";
 import { sync } from "./sync";
 
@@ -202,5 +215,45 @@ describe("what a coach sees", () => {
     expect(v?.daysPerWeek).toBe(4);
     expect(v?.events.map((e) => e.id)).toEqual(["cx", "set1", "set2"]);
     expect(JSON.stringify(v)).not.toMatch(/hrAvg|bodyweight|injuryPct|"kg"/);
+  });
+});
+
+describe("routines a coach assigns", () => {
+  const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3.s~cable-pushdown.3";
+  const linked = async () => {
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  };
+
+  it("only go to the coach's own clients, and only as a routine code", async () => {
+    expect(await assignPlan("coach", "client", "Push", CODE, NOW, "p1")).toEqual({ error: "notClient" });
+    await linked();
+    expect(await assignPlan("coach", "client", "Push", "<script>", NOW, "p1")).toEqual({ error: "bad" });
+    expect(await assignPlan("coach", "client", "  ", CODE, NOW, "p1")).toEqual({ error: "bad" });
+    expect(await assignPlan("coach", "client", "Push\nday", CODE, NOW, "p1")).toMatchObject({ id: "p1", name: "Push day" });
+  });
+
+  it("show on the client's side and in the coach's view, and the coach can take one back", async () => {
+    await linked();
+    await assignPlan("coach", "client", "Push", CODE, NOW, "p1");
+    await assignPlan("coach", "client", "Pull", CODE, NOW + 1, "p2");
+    expect((await overview("client", NOW)).plans.map((p) => p.name)).toEqual(["Pull", "Push"]);
+    expect((await clientView("coach", "client", NOW))?.plans).toHaveLength(2);
+    await removePlan("someone-else", "p1");
+    await removePlan("coach", "p1");
+    expect((await overview("client", NOW)).plans.map((p) => p.id)).toEqual(["p2"]);
+  });
+
+  it("are capped per client", async () => {
+    await linked();
+    for (let i = 0; i < COACH_LIMITS.plans; i++) await assignPlan("coach", "client", `R${i}`, CODE, NOW, `p${i}`);
+    expect(await assignPlan("coach", "client", "One more", CODE, NOW, "px")).toEqual({ error: "full" });
+  });
+
+  it("go when the pair unlinks", async () => {
+    await linked();
+    await assignPlan("coach", "client", "Push", CODE, NOW, "p1");
+    await unlink("client", "coach");
+    expect((await overview("client", NOW)).plans).toEqual([]);
   });
 });
