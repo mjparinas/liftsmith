@@ -17,6 +17,7 @@ import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { onPushTap } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
@@ -274,9 +275,15 @@ export function App() {
     });
     document.addEventListener("visibilitychange", refresh);
     const offTap = onReminderTap((r) => go(parse(`#/${r}`).route));
+    // Friends pushes carry the whole hash (#/friends, #/routine/<code>).
+    const offPush = onPushTap((h) => {
+      const r = parse(h);
+      go(r.route, r.arg);
+    });
     return () => {
       unsub();
       offTap();
+      offPush();
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);

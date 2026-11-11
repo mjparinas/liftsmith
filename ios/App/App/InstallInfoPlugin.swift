@@ -26,6 +26,8 @@ public class InstallInfoPlugin: CAPPlugin, CAPBridgedPlugin {
             "manufacturer": "Apple",
             "model": Self.modelIdentifier(),
             "store": Self.store(),
+            // Remote push (Friends) goes through APNs, which needs no extra config file.
+            "push": true,
         ]
         if let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String { out["appVersion"] = v }
         if let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String { out["build"] = b }

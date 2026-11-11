@@ -1,0 +1,120 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "pub.", in every language: a public profile's web page (www.getliftsmith.com/u/<handle>/,
+// src/server/publicProfile.ts reads this file directly, so keep every value a plain string). English is the source.
+
+export const en = {
+  "pub.title": "{name} (@{handle}) on Liftsmith",
+  "pub.description": "Recent workouts from {name} on Liftsmith, the adaptive strength training app.",
+  "pub.followers": "Followers",
+  "pub.following": "Following",
+  "pub.workouts": "Workouts",
+  "pub.recent": "Recent workouts",
+  "pub.none": "No workouts posted yet.",
+  "pub.time": "Time",
+  "pub.sets": "Sets",
+  "pub.volume": "Volume",
+  "pub.prs": "New bests",
+  "pub.follow": "Follow in the app",
+  "pub.get": "Try Liftsmith",
+  "pub.gone": "This profile isn’t public",
+  "pub.goneBody": "It may be private, or the handle may have changed.",
+  "pub.more": "+{count} more",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "pub.title": "{name} (@{handle}) en Liftsmith",
+  "pub.description": "Entrenamientos recientes de {name} en Liftsmith, la app de fuerza que se adapta a ti.",
+  "pub.followers": "Seguidores",
+  "pub.following": "Siguiendo",
+  "pub.workouts": "Entrenamientos",
+  "pub.recent": "Entrenamientos recientes",
+  "pub.none": "Aún no hay entrenamientos publicados.",
+  "pub.time": "Tiempo",
+  "pub.sets": "Series",
+  "pub.volume": "Volumen",
+  "pub.prs": "Nuevos récords",
+  "pub.follow": "Seguir en la app",
+  "pub.get": "Prueba Liftsmith",
+  "pub.gone": "Este perfil no es público",
+  "pub.goneBody": "Puede que sea privado o que el usuario haya cambiado.",
+  "pub.more": "+{count} más",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "pub.title": "{name} (@{handle}) sur Liftsmith",
+  "pub.description": "Les dernières séances de {name} sur Liftsmith, l’appli de musculation qui s’adapte à toi.",
+  "pub.followers": "Abonnés",
+  "pub.following": "Abonnements",
+  "pub.workouts": "Séances",
+  "pub.recent": "Séances récentes",
+  "pub.none": "Aucune séance publiée pour l’instant.",
+  "pub.time": "Durée",
+  "pub.sets": "Séries",
+  "pub.volume": "Volume",
+  "pub.prs": "Nouveaux records",
+  "pub.follow": "Suivre dans l’appli",
+  "pub.get": "Essaie Liftsmith",
+  "pub.gone": "Ce profil n’est pas public",
+  "pub.goneBody": "Il est peut-être privé, ou l’identifiant a changé.",
+  "pub.more": "+{count} de plus",
+};
+
+export const de: Partial<Record<Key, Message>> = {
+  "pub.title": "{name} (@{handle}) auf Liftsmith",
+  "pub.description": "Die letzten Workouts von {name} auf Liftsmith, der Krafttraining-App, die sich dir anpasst.",
+  "pub.followers": "Follower",
+  "pub.following": "Folgt",
+  "pub.workouts": "Workouts",
+  "pub.recent": "Letzte Workouts",
+  "pub.none": "Noch keine Workouts gepostet.",
+  "pub.time": "Dauer",
+  "pub.sets": "Sätze",
+  "pub.volume": "Volumen",
+  "pub.prs": "Neue Bestwerte",
+  "pub.follow": "In der App folgen",
+  "pub.get": "Liftsmith ausprobieren",
+  "pub.gone": "Dieses Profil ist nicht öffentlich",
+  "pub.goneBody": "Es ist vielleicht privat, oder der Name wurde geändert.",
+  "pub.more": "+{count} weitere",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "pub.title": "{name} (@{handle}) su Liftsmith",
+  "pub.description": "Gli ultimi allenamenti di {name} su Liftsmith, l’app di forza che si adatta a te.",
+  "pub.followers": "Follower",
+  "pub.following": "Seguiti",
+  "pub.workouts": "Allenamenti",
+  "pub.recent": "Allenamenti recenti",
+  "pub.none": "Nessun allenamento pubblicato per ora.",
+  "pub.time": "Durata",
+  "pub.sets": "Serie",
+  "pub.volume": "Volume",
+  "pub.prs": "Nuovi record",
+  "pub.follow": "Segui nell’app",
+  "pub.get": "Prova Liftsmith",
+  "pub.gone": "Questo profilo non è pubblico",
+  "pub.goneBody": "Potrebbe essere privato, oppure il nome utente è cambiato.",
+  "pub.more": "+{count} altri",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "pub.title": "Liftsmith の {name}（@{handle}）",
+  "pub.description": "Liftsmith（あなたに合わせる筋トレアプリ）での {name} の最近のワークアウト。",
+  "pub.followers": "フォロワー",
+  "pub.following": "フォロー中",
+  "pub.workouts": "ワークアウト",
+  "pub.recent": "最近のワークアウト",
+  "pub.none": "まだワークアウトの投稿はありません。",
+  "pub.time": "時間",
+  "pub.sets": "セット",
+  "pub.volume": "ボリューム",
+  "pub.prs": "自己ベスト",
+  "pub.follow": "アプリでフォロー",
+  "pub.get": "Liftsmith を試す",
+  "pub.gone": "このプロフィールは公開されていません",
+  "pub.goneBody": "非公開か、ユーザー名が変わった可能性があります。",
+  "pub.more": "ほか {count} 種目",
+};

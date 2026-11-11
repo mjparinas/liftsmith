@@ -11,9 +11,20 @@ import { useAccount } from "@/lib/auth";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { list as fmtList, t } from "@/lib/i18n";
-import { haptic, oops, sound } from "@/lib/juice";
+import { haptic, isNative, oops, sound } from "@/lib/juice";
+import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
-import { postWorkout, profileUrl, refreshSocial, social, socialError, socialOn, useSocial, type SocialMe } from "@/lib/social";
+import {
+  postWorkout,
+  profileUrl,
+  publicPageUrl,
+  refreshSocial,
+  social,
+  socialError,
+  socialOn,
+  useSocial,
+  type SocialMe,
+} from "@/lib/social";
 import {
   cleanHandle,
   HANDLE_RE,
@@ -23,6 +34,7 @@ import {
   type FeedComment,
   type FeedPost,
   type PersonCard,
+  type PushPrefs,
   type ReportKind,
   type ReportReason,
   type SocialProfile,
@@ -30,6 +42,7 @@ import {
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import type { MessageKey } from "@/locales/en";
 
 import { ago, clock, repsText, setText } from "./format";
 import { Icon } from "./icons";
@@ -480,6 +493,7 @@ function Join() {
     try {
       const me = await social<SocialMe>("join", { handle: h, name, open, autoPost, weights, agree: true });
       useSocial.setState({ me, error: null });
+      void startPush(true);
       haptic("celebrate");
       sound.done();
       track("feature", { name: "social_join", detail: open ? "open" : "approve" });
@@ -554,15 +568,26 @@ function Privacy({
   open,
   autoPost,
   weights,
+  pub,
   set,
 }: {
   open: boolean;
   autoPost: boolean;
   weights: boolean;
+  /** Public profile, offered once joined (undefined while joining, which always starts private). */
+  pub?: boolean;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
     <Section title={t("friends.privacy")}>
+      {pub !== undefined && (
+        <SwitchRow
+          label={t("friends.public")}
+          hint={t(pub ? "friends.publicOn" : "friends.publicOff")}
+          on={pub}
+          onChange={(v) => set({ public: v })}
+        />
+      )}
       <SwitchRow
         label={t("friends.open")}
         hint={t(open ? "friends.openOn" : "friends.openOff")}
@@ -572,6 +597,32 @@ function Privacy({
       <SwitchRow label={t("friends.autoPost")} hint={t("friends.autoPostHint")} on={autoPost} onChange={(v) => set({ autoPost: v })} />
       <SwitchRow label={t("friends.weights")} hint={t("friends.weightsHint")} on={weights} onChange={(v) => set({ weights: v })} />
       <p className="mt-2 px-1 text-xs text-muted">{t("friends.never")}</p>
+    </Section>
+  );
+}
+
+function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<PushPrefs>) => void }) {
+  const [blocked, setBlocked] = useState(false);
+  const change = async (key: keyof PushPrefs, on: boolean) => {
+    set({ [key]: on });
+    if (on) setBlocked(!(await startPush(true)));
+  };
+  const rows: [keyof PushPrefs, MessageKey][] = [
+    ["follows", "friends.notify.follows"],
+    ["comments", "friends.notify.comments"],
+    ["sent", "friends.notify.sent"],
+    ["likes", "friends.notify.likes"],
+  ];
+  return (
+    <Section title={t("friends.notify")}>
+      {rows.map(([key, label]) => (
+        <SwitchRow key={key} label={t(label)} on={prefs[key]} onChange={(v) => void change(key, v)} />
+      ))}
+      {blocked && (
+        <p role="status" className="mt-2 px-1 text-xs text-muted">
+          {t("friends.notify.blocked")}
+        </p>
+      )}
     </Section>
   );
 }
@@ -599,6 +650,7 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
   };
   const leave = async () => {
     try {
+      await stopPush();
       await social("leave");
       useSocial.setState({ me: { profile: null } });
       track("feature", { name: "social_leave" });
@@ -643,7 +695,21 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
         </Button>
       </form>
       <Note text={note} />
-      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} set={(c) => void save(c)} />
+      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} set={(c) => void save(c)} />
+      {isNative() && <Notifications prefs={p.push} set={(push) => void save({ push })} />}
+      {p.public && (
+        <a
+          href={publicPageUrl(p.handle)}
+          target="_blank"
+          rel="noopener"
+          className="press card mt-2 flex min-h-11 items-center justify-between px-4 py-3 text-sm"
+        >
+          <span>{t("friends.publicPage")}</span>
+          <span aria-hidden className="text-muted">
+            ›
+          </span>
+        </a>
+      )}
       <Section title={t("friends.rules.title")}>
         <Rules />
       </Section>
@@ -691,7 +757,9 @@ function Activity({ onPeople }: { onPeople: () => void }) {
         ? t("friends.act.request", { name: i.name })
         : i.kind === "like"
           ? t("friends.act.like", { name: i.name })
-          : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+          : i.kind === "sent"
+            ? t("friends.act.sent", { name: i.name, workout: i.text || t("rt.defaultName") })
+            : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (
@@ -700,7 +768,9 @@ function Activity({ onPeople }: { onPeople: () => void }) {
             <li key={`${i.kind}-${i.handle}-${i.at}-${n}`}>
               <button
                 type="button"
-                onClick={() => (i.kind === "request" ? onPeople() : go("person", i.handle))}
+                onClick={() =>
+                  i.kind === "request" ? onPeople() : i.kind === "sent" && i.code ? go("routine", i.code) : go("person", i.handle)
+                }
                 className="press flex w-full items-center gap-3 px-4 py-3 text-left"
               >
                 <Avatar name={i.name} size={36} />
@@ -814,7 +884,7 @@ function People() {
     go("person", h);
   };
   const share = async () => {
-    const url = profileUrl(handle);
+    const url = profileUrl(handle, !!me?.profile?.public);
     if (await shareUrl(url, t("friends.shareTitle"))) return;
     setNote((await copyText(url)) ? t("link.copied") : url);
   };
@@ -1035,7 +1105,11 @@ export function PersonScreen({ handle }: { handle: string }) {
   return (
     <div className="pb-8">
       <div className="flex items-end justify-between gap-2">
-        <ScreenHeader title={person.name} kicker={`@${person.handle}`} back={back} />
+        <ScreenHeader
+          title={person.name}
+          kicker={person.public ? `@${person.handle} · ${t("friends.person.public")}` : `@${person.handle}`}
+          back={back}
+        />
         {!self && (
           <button
             type="button"
@@ -1130,6 +1204,11 @@ export function FriendsButton() {
   useEffect(() => {
     void refreshSocial();
   }, [account?.id]);
+  // Already joined and allowed notifications: keep this phone's push token current (no prompt here).
+  const joinedNow = !!me?.profile;
+  useEffect(() => {
+    if (joinedNow) void startPush(false);
+  }, [joinedNow]);
   if (!socialOn()) return null;
   const waiting = (me?.unread ?? 0) + (me?.requests ?? 0);
   return (

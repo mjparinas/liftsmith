@@ -12,6 +12,7 @@ import { resetDb } from "@/server/db";
 import { handle } from "@/server/social";
 
 import { Friends, PersonScreen } from "./Friends";
+import { SendToFriend } from "./SendToFriend";
 
 // The app's Friends screens against the real server code (an in-memory database): each fetch to /api/social/
 // runs src/server/social.ts as the account whose token it carries.
@@ -84,5 +85,37 @@ describe("Friends", () => {
     await u.click(screen.getByRole("button", { name: "Spam or scam" }));
     await u.click(screen.getByRole("button", { name: "Send report" }));
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
+  });
+
+  it("sends a routine to a friend, who finds it in Activity", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    signIn("tok-a");
+    useSocial.setState({
+      me: {
+        profile: {
+          handle: "alex",
+          name: "Alex",
+          open: true,
+          autoPost: false,
+          weights: true,
+          public: false,
+          push: { follows: true, comments: true, sent: true, likes: false },
+        },
+      },
+    });
+    render(<SendToFriend name="Leg day" items={[{ exerciseId: "back-squat", sets: 4 }]} />);
+    await u.click(screen.getByRole("button", { name: "Send to a friend" }));
+    await u.click(await screen.findByRole("button", { name: "Send to Blair" }));
+    expect(await screen.findByText("Sent to Blair.")).toBeInTheDocument();
+    cleanup();
+
+    signIn("tok-b");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: /Activity/ }));
+    expect(await screen.findByText("Alex sent you a workout: Leg day")).toBeInTheDocument();
   });
 });

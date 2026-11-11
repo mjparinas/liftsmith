@@ -75,7 +75,15 @@ describe("joining", () => {
   it("needs the community rules agreed and a free handle, with private defaults", async () => {
     expect((await call("acc-a", "join", { handle: "alex" })).body.error).toBe("agree");
     const r = await join("acc-a", "alex");
-    expect(r.body.profile).toEqual({ handle: "alex", name: "ALEX", open: false, autoPost: false, weights: true });
+    expect(r.body.profile).toEqual({
+      handle: "alex",
+      name: "ALEX",
+      open: false,
+      autoPost: false,
+      weights: true,
+      public: false,
+      push: { follows: true, comments: true, sent: true, likes: false },
+    });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
   });
@@ -109,6 +117,49 @@ describe("following", () => {
     await call("acc-b", "follow", { handle: "alex" });
     await call("acc-a", "update", { open: true });
     expect((await call("acc-b", "lookup", { handle: "alex" })).body.person).toMatchObject({ relation: "following" });
+  });
+});
+
+describe("public profiles", () => {
+  it("lets anyone see a public profile's workouts, opens it to follows, and closing it makes it private again", async () => {
+    await join("acc-a", "alex");
+    await call("acc-a", "post", workout());
+    await join("acc-c", "casey");
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: false, public: false });
+    expect((await call("acc-a", "update", { public: true })).body.profile).toMatchObject({ public: true, open: true });
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: true, public: true, relation: "none" });
+    expect((await call("acc-c", "person", { handle: "alex" })).body.posts).toHaveLength(1);
+    // Strangers see it but it isn't in their feed until they follow.
+    expect(await feedOf("acc-c")).toHaveLength(0);
+    await call("acc-a", "block", { handle: "casey" });
+    expect((await call("acc-c", "person", { handle: "alex" })).body.posts).toHaveLength(0);
+    await call("acc-a", "unblock", { handle: "casey" });
+    expect((await call("acc-a", "update", { open: false })).body.profile).toMatchObject({ public: false, open: false });
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: false });
+  });
+});
+
+describe("sending a workout", () => {
+  const code = (name: string) => `r1~${Buffer.from(name).toString("base64url")}~back-squat.4~bench-press.3.s~barbell-row.3`;
+  it("goes only to someone who follows each other with the sender, and shows in their activity", async () => {
+    await friends(); // blair follows alex
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).body.error).toBe("notFriends");
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    expect((await call("acc-a", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "blair" }]);
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).code).toBe(200);
+    const items = (await call("acc-b", "activity")).body.items as { kind: string; text?: string; code?: string }[];
+    expect(items.find((i) => i.kind === "sent")).toMatchObject({ text: "Leg day", code: code("Leg day") });
+  });
+
+  it("refuses junk codes, links in the name and blocked people", async () => {
+    await friends();
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    expect((await call("acc-a", "send", { handle: "blair", code: "<script>" })).body.error).toBe("code");
+    expect((await call("acc-a", "send", { handle: "blair", code: code("see spam.com") })).body.error).toBe("name.link");
+    await call("acc-b", "block", { handle: "alex" });
+    expect((await call("acc-a", "send", { handle: "blair", code: code("Leg day") })).code).toBe(404);
   });
 });
 
@@ -200,7 +251,8 @@ describe("safety", () => {
     await call("acc-b", "like", { id });
     await call("acc-b", "comment", { id, text: "Nice" });
     await deleteAccount("acc-b");
-    for (const table of ["post_likes", "post_comments", "follows"]) expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
+    for (const table of ["post_likes", "post_comments", "follows", "sent_workouts"])
+      expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
     expect(await query("SELECT * FROM social_profiles WHERE account_id = 'acc-b'")).toHaveLength(0);
   });
 });

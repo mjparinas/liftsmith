@@ -39,6 +39,20 @@ export interface SocialProfile {
   autoPost: boolean;
   /** Show weights on posts. On by default, like share cards. */
   weights: boolean;
+  /**
+   * Anyone can see the profile and its workouts, in the app and on the web (www.getliftsmith.com/u/<handle>/,
+   * listed in the people sitemap). Off by default; on also means anyone can follow.
+   */
+  public: boolean;
+  /** Push notifications by kind (Friends settings › Notifications). Likes start off, the rest on. */
+  push: PushPrefs;
+}
+
+export interface PushPrefs {
+  follows: boolean;
+  comments: boolean;
+  sent: boolean;
+  likes: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -56,6 +70,7 @@ export interface PersonCard {
   /** Whether their posts are visible to the reader. */
   canSee: boolean;
   open: boolean;
+  public: boolean;
 }
 
 export interface FeedPost {
@@ -82,15 +97,17 @@ export interface FeedComment {
   canDelete: boolean;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
   name: string;
   at: number;
   postId?: string;
-  /** The comment's text, for comments. */
+  /** The comment's text, for comments; the workout's name, for a sent workout. */
   text?: string;
+  /** A sent workout's routine code (opens #/routine/<code>). */
+  code?: string;
 }
 
 export type ReportKind = "post" | "comment" | "profile";

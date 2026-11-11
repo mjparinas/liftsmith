@@ -25,6 +25,7 @@ import {
 
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
+import { dropToken, notify, saveToken } from "./push";
 
 export type Result = { code: number; body: Record<string, unknown> };
 const ok = (body: Record<string, unknown> = { ok: true }): Result => ({ code: 200, body });
@@ -34,7 +35,7 @@ const fail = (code: number, error: string): Result => ({ code, body: { error } }
 export const HIDE_AFTER = 3;
 export const PAGE = 20;
 /** Per account per day, so one account can't flood others. */
-export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300 };
+export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50 };
 /** Handles nobody can take: they'd look official. */
 const RESERVED = new Set([
   "admin",
@@ -74,6 +75,11 @@ interface ProfileRow extends Row {
   open: number;
   auto_post: number;
   weights: number;
+  public: number;
+  push_follows: number;
+  push_comments: number;
+  push_sent: number;
+  push_likes: number;
   suspended: number;
   seen_at: number;
 }
@@ -84,6 +90,8 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   open: !!n(r.open),
   autoPost: !!n(r.auto_post),
   weights: !!n(r.weights),
+  public: !!n(r.public),
+  push: { follows: !!n(r.push_follows), comments: !!n(r.push_comments), sent: !!n(r.push_sent), likes: !!n(r.push_likes) },
 });
 
 async function profileOf(accountId: string): Promise<ProfileRow | null> {
@@ -171,16 +179,28 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     name = c.name;
   }
   const flag = (v: unknown, was: unknown) => (typeof v === "boolean" ? (v ? 1 : 0) : n(was));
-  const open = flag(b.open, p.open);
+  // Public means anyone can follow too, so turning it on opens the profile and closing the profile makes it private.
+  const pub = b.open === false ? 0 : flag(b.public, p.public);
+  const open = pub ? 1 : flag(b.open, p.open);
   try {
-    await run("UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ? WHERE account_id = ?", [
-      handle,
-      name,
-      open,
-      flag(b.autoPost, p.auto_post),
-      flag(b.weights, p.weights),
-      accountId,
-    ]);
+    const push = (b.push && typeof b.push === "object" ? b.push : {}) as Record<string, unknown>;
+    await run(
+      `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
+         push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ? WHERE account_id = ?`,
+      [
+        handle,
+        name,
+        open,
+        flag(b.autoPost, p.auto_post),
+        flag(b.weights, p.weights),
+        pub,
+        flag(push.follows, p.push_follows),
+        flag(push.comments, p.push_comments),
+        flag(push.sent, p.push_sent),
+        flag(push.likes, p.push_likes),
+        accountId,
+      ],
+    );
   } catch {
     return fail(409, "handleTaken");
   }
@@ -202,6 +222,8 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
+    { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
+    { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
 }
@@ -232,11 +254,16 @@ async function follow(a: string, b: string): Promise<{ accepted: boolean } | nul
   return r ? { accepted: !!n(r.accepted) } : null;
 }
 
-/** Whether `viewer` can see `author`'s posts: their own, or an accepted follow with no block either way. */
+async function isPublic(accountId: string): Promise<boolean> {
+  const [r] = await query("SELECT public FROM social_profiles WHERE account_id = ? AND suspended = 0", [accountId]);
+  return !!n(r?.public);
+}
+
+/** Whether `viewer` can see `author`'s posts: their own, an accepted follow or a public profile, with no block either way. */
 async function canSee(viewer: string, author: string): Promise<boolean> {
   if (viewer === author) return true;
   const f = await follow(viewer, author);
-  return !!f?.accepted && !(await blockedEither(viewer, author));
+  return (!!f?.accepted || (await isPublic(author))) && !(await blockedEither(viewer, author));
 }
 
 /** A profile as `viewer` sees it, or null when it doesn't exist for them (suspended, or either blocked the other). */
@@ -264,8 +291,9 @@ async function card(viewer: string, p: ProfileRow): Promise<PersonCard | null> {
     posts: n(c?.posts),
     relation,
     followsYou: !!theirs?.accepted,
-    canSee: relation === "self" || relation === "following",
+    canSee: relation === "self" || relation === "following" || (relation !== "blocked" && !!n(p.public)),
     open: !!n(p.open),
+    public: !!n(p.public),
   };
 }
 
@@ -303,6 +331,7 @@ export async function followOp(accountId: string, b: Record<string, unknown>, no
     n(p.open) ? 1 : 0,
     now,
   ]);
+  await notify(them, accountId, n(p.open) ? "follow" : "request");
   return lookup(accountId, b, now);
 }
 
@@ -318,8 +347,10 @@ export async function answer(accountId: string, b: Record<string, unknown>): Pro
   const p = await byHandle(s(b.handle));
   if (!p) return fail(404, "noOne");
   const them = s(p.account_id);
-  if (b.accept === true) await run("UPDATE follows SET accepted = 1 WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
-  else await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
+  if (b.accept === true) {
+    const r = await run("UPDATE follows SET accepted = 1 WHERE follower_id = ? AND followee_id = ? AND accepted = 0", [them, accountId]);
+    if (r) await notify(them, accountId, "accept");
+  } else await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
   return ok();
 }
 
@@ -339,10 +370,16 @@ export async function people(accountId: string, b: Record<string, unknown>): Pro
         : which === "following"
           ? `SELECT ${PEOPLE}, f.created_at AS at FROM follows f JOIN social_profiles sp ON sp.account_id = f.followee_id
          WHERE f.follower_id = ? AND ${visible} ORDER BY f.accepted, f.created_at DESC LIMIT 500`
-          : which === "blocked"
-            ? `SELECT ${PEOPLE}, bl.created_at AS at FROM blocks bl JOIN social_profiles sp ON sp.account_id = bl.blocked_id
+          : which === "friends"
+            ? // People who follow each other with the lifter: who a workout can be sent to.
+              `SELECT ${PEOPLE}, f.created_at AS at FROM follows f JOIN social_profiles sp ON sp.account_id = f.followee_id
+         WHERE f.follower_id = ?1 AND f.accepted = 1 AND ${visible}
+           AND EXISTS (SELECT 1 FROM follows b WHERE b.follower_id = f.followee_id AND b.followee_id = ?1 AND b.accepted = 1)
+         ORDER BY sp.name LIMIT 500`
+            : which === "blocked"
+              ? `SELECT ${PEOPLE}, bl.created_at AS at FROM blocks bl JOIN social_profiles sp ON sp.account_id = bl.blocked_id
          WHERE bl.blocker_id = ? ORDER BY bl.created_at DESC LIMIT 500`
-            : "";
+              : "";
   if (!sql) return fail(400, "Bad request.");
   const rows = await query(sql, [accountId]);
   return ok({ people: rows.map((r) => ({ handle: s(r.handle), name: s(r.name), at: n(r.at) })) });
@@ -624,7 +661,9 @@ export async function like(accountId: string, b: Record<string, unknown>, now = 
   if (b.on === false) await run("DELETE FROM post_likes WHERE post_id = ? AND account_id = ?", [id, accountId]);
   else {
     if (!(await limit(accountId, "like", now))) return fail(429, "slow");
-    await run("INSERT OR IGNORE INTO post_likes (post_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
+    const added = await run("INSERT OR IGNORE INTO post_likes (post_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
+    const author = await visiblePost(accountId, id);
+    if (added && author) await notify(author.author, accountId, "like");
   }
   const [c] = await query("SELECT COUNT(*) AS n FROM post_likes WHERE post_id = ?", [id]);
   return ok({ likes: n(c?.n), liked: b.on !== false });
@@ -647,6 +686,8 @@ export async function comment(accountId: string, b: Record<string, unknown>, now
     now,
     text.text,
   ]);
+  const post = await visiblePost(accountId, id);
+  if (post) await notify(post.author, accountId, "comment", { text: text.text });
   return ok({ comment: { id: cid, handle: s(mine.handle), name: s(mine.name), at: now, body: text.text, mine: true, canDelete: true } });
 }
 
@@ -672,7 +713,9 @@ const ACTIVITY = `
     FROM post_likes l JOIN posts p ON p.id = l.post_id WHERE p.account_id = ?1 AND l.account_id != ?1
   UNION ALL
   SELECT 'comment', c.account_id, c.created_at, c.post_id, c.body
-    FROM post_comments c JOIN posts p ON p.id = c.post_id WHERE p.account_id = ?1 AND c.account_id != ?1 AND c.hidden = 0`;
+    FROM post_comments c JOIN posts p ON p.id = c.post_id WHERE p.account_id = ?1 AND c.account_id != ?1 AND c.hidden = 0
+  UNION ALL
+  SELECT 'sent', w.from_id, w.created_at, w.code, w.name FROM sent_workouts w WHERE w.to_id = ?1`;
 const ACTIVITY_VISIBLE = `a JOIN social_profiles sp ON sp.account_id = a.who
   WHERE sp.suspended = 0 AND a.who NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)`;
 
@@ -695,7 +738,8 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
     handle: s(r.handle),
     name: s(r.name),
     at: n(r.at),
-    ...(r.post_id ? { postId: s(r.post_id) } : {}),
+    // A sent workout carries its routine code where a like or comment carries the post.
+    ...(r.post_id ? (s(r.kind) === "sent" ? { code: s(r.post_id) } : { postId: s(r.post_id) }) : {}),
     ...(r.text ? { text: s(r.text) } : {}),
   }));
   const seenAt = n(mine.seen_at);
@@ -706,6 +750,51 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
 // --- The one route ---
 
 type Op = (accountId: string, b: Record<string, unknown>, now?: number) => Promise<Result>;
+// --- Sending a workout to a friend ---
+
+/** A routine share code (routineShare.ts): `r1~<name>~<exercise>.<sets>[.s]~…`. The app checks the exercises when it opens. */
+const CODE_RE = /^r1~[A-Za-z0-9_-]{0,220}(~[A-Za-z0-9_-]{1,80}\.(10|[1-9])(\.s)?){1,20}$/;
+
+/**
+ * Sends a workout (as a routine code, so nothing personal) to someone the lifter and they both follow. It shows in
+ * their Activity with the name, and opening it shows the routine with Save. Blocking either way stops it.
+ */
+export async function send(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const code = s(b.code);
+  if (!CODE_RE.test(code)) return fail(400, "code");
+  // The name is read from the code itself, so what the friend sees when they open it went through the filter too.
+  const raw = Buffer.from(code.split("~")[1] ?? "", "base64url").toString("utf8");
+  const name = raw.trim() ? checkText(raw, SOCIAL_LIMITS.name) : ({ ok: true, text: "" } as const);
+  if (!name.ok) return fail(400, `name.${name.error}`);
+  const p = await byHandle(s(b.handle));
+  const to = p ? s(p.account_id) : "";
+  if (!p || n(p.suspended) || to === accountId || (await blockedEither(accountId, to))) return fail(404, "noOne");
+  const there = await follow(accountId, to);
+  const back = await follow(to, accountId);
+  if (!there?.accepted || !back?.accepted) return fail(403, "notFriends");
+  if (!(await limit(accountId, "send", now))) return fail(429, "slow");
+  await run("INSERT INTO sent_workouts (id, from_id, to_id, name, code, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+    newId(),
+    accountId,
+    to,
+    name.text,
+    code,
+    now,
+  ]);
+  await notify(to, accountId, "sent", { workout: name.text, code });
+  return ok();
+}
+
+/** A phone's push token, so this account's Friends notifications reach it (push.ts). */
+export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  return (await saveToken(accountId, s(b.token), s(b.platform), s(b.lang), now)) ? ok() : fail(400, "token");
+}
+
 export const OPS: Record<string, Op> = {
   me: (a) => me(a),
   join,
@@ -729,6 +818,9 @@ export const OPS: Record<string, Op> = {
   comment,
   uncomment: (a, b) => uncomment(a, b),
   activity: (a, _b, now) => activity(a, now),
+  send,
+  pushToken,
+  pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };
 
 export async function handle(accountId: string, body: unknown, now = Date.now()): Promise<Result> {
