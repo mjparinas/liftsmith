@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -182,5 +182,56 @@ describe("Friends", () => {
     await u.click(await screen.findByRole("button", { name: "Board" }));
     expect(await screen.findByText("blair (you)")).toBeInTheDocument();
     expect(screen.getByText("Post a workout to get on this week’s board.")).toBeInTheDocument();
+  });
+  it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    expect(await screen.findByText(/No challenges yet/)).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Start a challenge" }));
+    const sheet = within(screen.getByRole("dialog"));
+    await u.click(sheet.getByRole("button", { name: "Sets" }));
+    await u.click(sheet.getByRole("button", { name: "2 weeks" }));
+    await u.click(await sheet.findByRole("button", { name: "Blair" }));
+    await u.click(sheet.getByRole("button", { name: "Start" }));
+    expect(await screen.findByText("Most sets")).toBeInTheDocument();
+    expect(screen.getByText("1 invite not answered yet")).toBeInTheDocument();
+    cleanup();
+
+    signIn("tok-b");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: /Activity/ }));
+    await u.click(await screen.findByText("Alex challenged you: Most sets"));
+    expect(await screen.findByText("Alex invited you to this challenge.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Join" }));
+    expect(await screen.findByText("Blair (you)")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument();
+    cleanup();
+
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "b1",
+      at: Date.now() - 3_600_000,
+      partners: ["alex"],
+      body: {
+        seconds: 3000,
+        sets: 5,
+        volume: null,
+        prs: 0,
+        muscles: [],
+        exercises: [{ id: "back-squat", name: "", sets: 5, w: null, r: 5 }],
+      },
+    });
+    signIn("tok-a");
+    render(<Friends />);
+    expect(await screen.findByText("with Alex")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "More options" }));
+    await u.click(screen.getByRole("button", { name: "Remove me from this post" }));
+    await waitFor(() => expect(screen.queryByText("with Alex")).toBeNull());
   });
 });

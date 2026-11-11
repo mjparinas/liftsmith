@@ -51,6 +51,7 @@ export function socialError(e: unknown): string {
     code: "friends.err.code",
     invite: "friends.err.invite",
     self: "friends.err.inviteSelf",
+    tooMany: "friends.err.tooManyChallenges",
     signedOut: "friends.err.signedOut",
     "Signed out. Sign in again.": "friends.err.signedOut",
   };
@@ -138,7 +139,7 @@ export async function postWorkout(
   events: readonly AppEvent[],
   s: SessionSummary,
   weights: boolean,
-  extra: { caption?: string; audience?: Audience } = {},
+  extra: { caption?: string; audience?: Audience; partners?: string[] } = {},
 ): Promise<string> {
   const r = await social<{ id: string }>("post", { workoutId: s.sessionId, at: s.start, body: postBodyFor(events, s, weights), ...extra });
   return r.id;

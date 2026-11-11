@@ -392,3 +392,83 @@ describe("invite links and the leaderboard (stage 4)", () => {
     expect((await call("acc-b", "board", { from: NOW - 400 * DAY })).code).toBe(400);
   });
 });
+
+describe("challenges and training partners (stage 5)", () => {
+  async function mutual() {
+    await friends();
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+  }
+  type Ch = { id: string; status: string; mine: boolean; members: { handle: string; joined: boolean; value: number }[] };
+  const list = async (who: string, now = NOW) => (await call(who, "challenges", {}, now)).body.challenges as Ch[];
+
+  it("invites mutual friends only, scores joined members from their posts in the window, and ends when the starter leaves", async () => {
+    await mutual();
+    await join("acc-c", "casey"); // not a friend of alex
+    const bad = await call("acc-a", "challengeCreate", { name: "Most workouts", metric: "workouts", days: 7, handles: ["casey"] });
+    expect(bad.body.error).toBe("notFriends");
+    expect((await call("acc-a", "challengeCreate", { name: "x", metric: "naps", days: 7, handles: ["blair"] })).code).toBe(400);
+    expect((await call("acc-a", "challengeCreate", { name: "x", metric: "sets", days: 9, handles: ["blair"] })).code).toBe(400);
+    const r = await call("acc-a", "challengeCreate", { name: "Sets race", metric: "sets", days: 7, handles: ["blair", "casey"] });
+    const id = r.body.id as string;
+    expect((await list("acc-c")).length).toBe(0);
+    const act = (await call("acc-b", "activity")).body.items as { kind: string; text?: string }[];
+    expect(act).toContainEqual(expect.objectContaining({ kind: "challenge", text: "Sets race" }));
+
+    await call("acc-a", "post", workout("s1", NOW + DAY));
+    await call("acc-b", "post", workout("b1", NOW + DAY));
+    await call("acc-b", "post", workout("b0", NOW - DAY)); // before it started
+    let [c] = await list("acc-b", NOW + 2 * DAY);
+    expect(c).toMatchObject({ id, status: "invited", mine: false });
+    expect(c!.members.find((m) => m.handle === "blair")).toMatchObject({ joined: false, value: 0 });
+
+    await call("acc-b", "challengeAnswer", { id, accept: true }, NOW + 2 * DAY);
+    await call("acc-b", "post", { ...workout("b2", NOW + 2 * DAY), audience: "me" }); // doesn't count
+    [c] = await list("acc-a", NOW + 3 * DAY);
+    expect(c!.members.map((m) => [m.handle, m.joined, m.value]).sort()).toEqual([
+      ["alex", true, 12],
+      ["blair", true, 12],
+    ]);
+    // Finished challenges stay a while for the result, then go.
+    expect((await list("acc-a", NOW + 10 * DAY)).length).toBe(1);
+    expect((await list("acc-a", NOW + 30 * DAY)).length).toBe(0);
+    expect((await call("acc-b", "challengeAnswer", { id, accept: true }, NOW + 8 * DAY)).code).toBe(404);
+
+    await call("acc-a", "challengeLeave", { id });
+    expect(await list("acc-b")).toEqual([]);
+  });
+
+  it("declining takes the lifter off; caps running challenges", async () => {
+    await mutual();
+    const make = () => call("acc-a", "challengeCreate", { name: "Go", metric: "workouts", days: 14, handles: ["blair"] });
+    const id = (await make()).body.id as string;
+    await call("acc-b", "challengeAnswer", { id, accept: false });
+    expect(await list("acc-b")).toEqual([]);
+    for (let i = 1; i < 10; i++) await make();
+    expect((await make()).body.error).toBe("tooMany");
+  });
+
+  it("tags mutual friends on a post, shows them on it, and lets the tagged lifter remove themselves", async () => {
+    await mutual();
+    await join("acc-c", "casey");
+    await call("acc-a", "post", { ...workout("s1"), partners: ["blair", "casey", "@BLAIR"] });
+    let [p] = (await call("acc-b", "feed")).body.posts as { id: string; partners: { handle: string }[]; tagged: boolean }[];
+    expect(p!.partners.map((x) => x.handle)).toEqual(["blair"]);
+    expect(p!.tagged).toBe(true);
+    expect((await call("acc-b", "activity")).body.items).toContainEqual(expect.objectContaining({ kind: "tag", handle: "alex" }));
+    await call("acc-b", "untag", { id: p!.id });
+    [p] = (await call("acc-a", "feed")).body.posts as (typeof p)[];
+    expect(p!.partners).toEqual([]);
+    // Editing sets them again; a post only the lifter sees has none.
+    expect((await call("acc-a", "editPost", { id: p!.id, partners: ["blair"] })).body.partners).toMatchObject([{ handle: "blair" }]);
+    expect((await call("acc-a", "editPost", { id: p!.id, audience: "me" })).body.partners).toEqual([]);
+  });
+
+  it("deleting an account removes its challenges and tags", async () => {
+    await mutual();
+    await call("acc-a", "challengeCreate", { name: "Go", metric: "workouts", days: 7, handles: ["blair"] });
+    await call("acc-b", "post", { ...workout("b1"), partners: ["alex"] });
+    await call("acc-a", "leave");
+    for (const t of ["challenges", "challenge_members", "post_partners"]) expect(await query(`SELECT * FROM ${t}`), t).toEqual([]);
+  });
+});
