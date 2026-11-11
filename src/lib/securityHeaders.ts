@@ -17,3 +17,11 @@ export const SECURITY_HEADERS: { key: string; value: string }[] = [
   },
   { key: "Content-Security-Policy", value: CSP },
 ];
+
+/**
+ * Public share link pages and their images (/w/<id>/, docs/decisions/sharing.md): plain HTML with no scripts at
+ * all, so they get a policy that allows none, instead of the per-page script hashes. Later header rules in
+ * next.config.ts win, so this replaces the CSP above on those paths.
+ */
+export const SHARE_PAGE_CSP =
+  "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";

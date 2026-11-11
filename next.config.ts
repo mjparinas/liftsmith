@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
-import { SECURITY_HEADERS } from "./src/lib/securityHeaders";
+import { SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
 
 // Two builds from one codebase:
 // - STATIC_EXPORT=1 (npm run build:static): a static export to out/ for the Capacitor shells and the
@@ -31,9 +31,25 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   pageExtensions: isStatic ? ["tsx", "ts"] : ["api.tsx", "api.ts", "tsx", "ts"],
   // Creator links (www.getliftsmith.com/c/<code>/) all open the one /c/ page, which reads the code from the address.
-  ...(isStatic ? {} : { rewrites: async () => [{ source: "/c/:code/", destination: "/c/" }] }),
+  // Public share links (www.getliftsmith.com/w/<id>/ and its card image) are drawn by API routes (src/server/shareLinks.ts).
+  ...(isStatic
+    ? {}
+    : {
+        rewrites: async () => [
+          { source: "/c/:code/", destination: "/c/" },
+          { source: "/w/:id/card.jpg", destination: "/api/share/image/?id=:id" },
+          { source: "/w/:id/", destination: "/api/share/page/?id=:id" },
+        ],
+      }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
-  ...(isStatic ? {} : { headers: async () => [{ source: "/:path*", headers: SECURITY_HEADERS }] }),
+  ...(isStatic
+    ? {}
+    : {
+        headers: async () => [
+          { source: "/:path*", headers: SECURITY_HEADERS },
+          { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+        ],
+      }),
   env: {
     NEXT_PUBLIC_APP_VERSION: process.env.npm_package_version ?? "dev",
     NEXT_PUBLIC_COMMIT_SHA: commitSha(),
