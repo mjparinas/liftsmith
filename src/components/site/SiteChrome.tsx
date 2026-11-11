@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
+import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
 const APP_ONLY = /^\/(app|me)\//;
@@ -17,49 +18,83 @@ export function JsonLd({ data }: { data: object | object[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
 }
 
+/** The app icon (public/icon.svg, drawn by scripts/make-icons.mjs), so the site header matches the favicon. */
+export function BrandMark() {
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />;
+}
+
 function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-      <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent text-accent-ink">
-        <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-          <path d="M2 10h2V7h3v10H4v-3H2zm20 0h-2V7h-3v10h3v-3h2zM8 11h8v2H8z" />
-        </svg>
-      </span>
+      <BrandMark />
       {BRAND.name}
     </Link>
   );
 }
 
-export const NAV = [
+export type NavLink = { href: string; label: string };
+
+/**
+ * The one header nav for every public page, the home page included (Melvin, 2026-11-11: the links used to change when you
+ * left the home page). The home page's own sections are /#… links, so they work from any page. Wide screens show them
+ * all; below lg they sit in the menu, beside Sign in and Start free.
+ */
+export const NAV: readonly NavLink[] = [
+  { href: "/#features", label: "Features" },
   { href: "/exercises/", label: "Exercises" },
   { href: "/guides/", label: "Guides" },
   { href: "/blog/", label: "Blog" },
   { href: "/tools/", label: "Tools" },
   { href: "/pricing/", label: "Pricing" },
-] as const;
+  { href: "/#faq", label: "FAQ" },
+];
 
 export function SiteHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/85 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
         <Logo />
-        <nav aria-label="Site" className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
-          {NAV.map((n) => (
-            <Link key={n.href} href={n.href} className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
-              {n.label}
-            </Link>
-          ))}
+        <nav aria-label="Site" className="flex items-center gap-0.5 text-sm font-semibold sm:gap-2">
+          <ul className="hidden items-center gap-1 lg:flex">
+            {NAV.map((n) => (
+              <li key={n.href}>
+                <Link href={n.href} className="rounded-lg px-3 py-2 hover:bg-surface">
+                  {n.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <SignInLink />
           <Link
             href={APP_PATH}
             prefetch={false}
             data-cta="header"
-            className="press btn-primary ml-1 inline-flex min-h-11 items-center rounded-xl px-4"
+            className="press btn-primary inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-3 sm:ml-1 sm:px-4"
           >
             Start free
           </Link>
+          <SiteMenu links={NAV} />
         </nav>
       </div>
     </header>
+  );
+}
+
+/**
+ * A quieter way in beside "Start free", for lifters who already have an account (Melvin, 2026-11-11). It opens the app on
+ * sign-in (#/account: the welcome screen's sign-in sheet on a new browser), and signing in there lands on Today.
+ */
+export function SignInLink() {
+  return (
+    <Link
+      href={`${APP_PATH}#/account`}
+      prefetch={false}
+      data-cta="header-signin"
+      className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-2 text-muted hover:bg-surface hover:text-ink sm:px-3"
+    >
+      Sign in
+    </Link>
   );
 }
 

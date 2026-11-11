@@ -29,6 +29,7 @@ export function Button({
   disabled,
   label,
   icon,
+  submit,
 }: {
   children: ReactNode;
   onClick?: () => void;
@@ -37,6 +38,8 @@ export function Button({
   disabled?: boolean;
   label?: string;
   icon?: IconName;
+  /** The form's submit button: Enter in a field presses it, and the form's onSubmit does the work (so leave onClick off). */
+  submit?: boolean;
 }) {
   const styles = {
     primary: "btn-primary font-semibold",
@@ -46,7 +49,7 @@ export function Button({
   }[kind];
   return (
     <button
-      type="button"
+      type={submit ? "submit" : "button"}
       aria-label={label}
       disabled={disabled}
       onClick={() => {

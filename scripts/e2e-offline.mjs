@@ -17,7 +17,13 @@ try {
   await page.getByText("Today's workout").waitFor();
   await ctx.setOffline(true);
   await page.reload();
-  check(await page.getByText("Today's workout").isVisible(), "App opens offline", fail);
+  // The page loads before the app has read its data and drawn Today (a skeleton shows meanwhile), so wait for it.
+  const opened = await page
+    .getByText("Today's workout")
+    .waitFor({ timeout: 15_000 })
+    .then(() => true)
+    .catch(() => false);
+  check(opened, "App opens offline", fail);
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
   check(await page.getByText("Rest", { exact: true }).isVisible(), "Sets log offline", fail);

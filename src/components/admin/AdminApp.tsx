@@ -94,7 +94,8 @@ const STORE_LABEL: Record<string, string> = {
 const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
 const when = (t: number) => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
 
-function SignIn() {
+/** The emailed-link sign-in. A real form, so Enter in the email box sends the link. */
+export function SignIn() {
   const [email, setEmail] = useState("");
   const [msg, setMsg] = useState<string | null>(
     typeof location !== "undefined" && location.search.includes("link=expired")
@@ -116,24 +117,27 @@ function SignIn() {
     <main className="mx-auto max-w-sm px-5 py-20">
       <h1 className="text-2xl font-bold">Liftsmith admin</h1>
       <p className="mt-2 text-sm text-muted">We&apos;ll email you a link that signs you in once.</p>
-      <label className="mt-6 block text-sm" htmlFor="admin-email">
-        Email
-      </label>
-      <input
-        id="admin-email"
-        type="email"
-        autoComplete="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        className="card mt-1 w-full px-4 py-3"
-      />
-      <button
-        type="button"
-        onClick={() => void send()}
-        className="press mt-3 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink"
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          void send();
+        }}
       >
-        Email me a link
-      </button>
+        <label className="mt-6 block text-sm" htmlFor="admin-email">
+          Email
+        </label>
+        <input
+          id="admin-email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="card mt-1 w-full px-4 py-3"
+        />
+        <button type="submit" className="press mt-3 w-full rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
+          Email me a link
+        </button>
+      </form>
       {msg && (
         <p className="mt-4 text-sm text-muted" role="status">
           {msg}

@@ -6,7 +6,7 @@ import { HeroLift } from "@/components/site/HeroLift";
 import { perSide } from "@/components/site/heroPlates";
 import { HERO_PROGRAM } from "@/components/site/heroProgram";
 import { Screenshot } from "@/components/site/Screenshot";
-import { SiteFooter } from "@/components/site/SiteChrome";
+import { SiteFooter, SiteHeader } from "@/components/site/SiteChrome";
 import { StoreBadges } from "@/components/site/StoreBadges";
 import { visibleQuotes } from "@/content/testimonials";
 import { BRAND } from "@/lib/brand";
@@ -179,48 +179,6 @@ const MORE = [
   { title: "No account needed", body: "Sign in with Google or Apple only if you want sync and backup." },
 ];
 
-function Header() {
-  return (
-    <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/80 backdrop-blur-lg">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
-          <span aria-hidden className="grid size-8 place-items-center rounded-lg bg-accent text-accent-ink">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M2 10h2V7h3v10H4v-3H2zm20 0h-2V7h-3v10h3v-3h2zM8 11h8v2H8z" />
-            </svg>
-          </span>
-          {name}
-        </Link>
-        <nav aria-label="Site" className="flex items-center gap-1 text-sm font-semibold sm:gap-2">
-          <a href="#features" className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
-            Features
-          </a>
-          <a href="#demos" className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
-            3D demos
-          </a>
-          <a href="#pricing" className="hidden rounded-lg px-3 py-2 hover:bg-surface md:inline">
-            Pricing
-          </a>
-          <a href="#faq" className="hidden rounded-lg px-3 py-2 hover:bg-surface lg:inline">
-            FAQ
-          </a>
-          <Link href="/blog/" className="hidden rounded-lg px-3 py-2 hover:bg-surface lg:inline">
-            Blog
-          </Link>
-          <Link
-            href={APP_PATH}
-            prefetch={false}
-            data-cta="header"
-            className="press ml-1 inline-flex min-h-11 items-center rounded-xl bg-accent px-4 text-accent-ink"
-          >
-            Start free
-          </Link>
-        </nav>
-      </div>
-    </header>
-  );
-}
-
 export default function Home() {
   const quotes = visibleQuotes();
   const jsonLd = [
@@ -244,7 +202,7 @@ export default function Home() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <Header />
+      <SiteHeader />
       <main className="overflow-x-clip">
         {/* Hero */}
         <section className="relative">

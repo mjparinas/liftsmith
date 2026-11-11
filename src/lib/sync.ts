@@ -38,8 +38,10 @@ export interface Pulled {
 
 /** The records this device sends: its profile, each gym, and a removal for each gym it no longer has. */
 export function localRecords(profile: Profile, gyms: Gym[], known: string[], now: number): Rec[] {
+  // A profile that hasn't been through setup isn't sent: signing in on the welcome screen of a new install must never
+  // replace the account's real profile, or put a half-made one on an account that has none yet.
   const recs: Rec[] = [
-    { key: "profile", value: profile, updatedAt: profile.updatedAt },
+    ...(profile.onboarded ? [{ key: "profile", value: profile, updatedAt: profile.updatedAt }] : []),
     ...gyms.map((g) => ({ key: `gym:${g.id}`, value: g, updatedAt: g.updatedAt })),
   ];
   for (const id of known) if (!gyms.some((g) => g.id === id)) recs.push({ key: `gym:${id}`, value: null, updatedAt: now });
@@ -56,7 +58,9 @@ export function mergeRecords(
 ): { profile: Profile | null; gyms: Gym[] | null; known: string[]; fixed: boolean } {
   let nextProfile: Profile | null = null;
   const p = recs.find((r) => r.key === "profile");
-  if (p?.value && (p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt))) nextProfile = p.value as Profile;
+  // An account profile that never finished setup (pushed by an older version) never replaces a set-up one here.
+  const usable = !!p?.value && ((p.value as Profile).onboarded || !profile.onboarded);
+  if (p && usable && (p.updatedAt > profile.updatedAt || (first && p.updatedAt !== profile.updatedAt))) nextProfile = p.value as Profile;
   let list = [...gyms];
   let changed = false;
   const known: string[] = [];

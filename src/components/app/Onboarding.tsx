@@ -185,6 +185,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const offerDays = offers ? (offers.find((o) => o.trialDays)?.trialDays ?? null) : trialDays;
   // First run opens on the welcome screen; a rerun from Settings goes straight to the questions.
   const [welcome, setWelcome] = useState(!rerun);
+  // Signed in on the welcome screen to an account with nothing on it yet: say so on the first question.
+  const [freshAccount, setFreshAccount] = useState(false);
   const [keepGyms, setKeepGyms] = useState(rerun && gyms.length > 0);
   const [hr, setHr] = useState<string | null>(null);
   const [hrBusy, setHrBusy] = useState(false);
@@ -269,7 +271,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       healthPrefill: prefilled,
     });
     haptic("success");
-    if (rerun) go("today");
+    // A first run that came in through the website's "Sign in" link (#/account) ends on Today, not on Account.
+    if (rerun || location.hash.startsWith("#/account")) go("today");
   };
 
   // The Back button and the phone's back button do the same thing: the previous question, then the
@@ -277,7 +280,15 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const stepBack = () => (step > 0 ? setStep(step - 1) : rerun ? go("settings") : setWelcome(true));
   useBack(!welcome && (step > 0 || !rerun), stepBack);
 
-  if (welcome) return <Welcome onStart={() => setWelcome(false)} />;
+  if (welcome)
+    return (
+      <Welcome
+        onStart={(signedIn) => {
+          setFreshAccount(!!signedIn);
+          setWelcome(false);
+        }}
+      />
+    );
 
   return (
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
@@ -299,6 +310,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                 <h1 className="mt-1 text-3xl font-extrabold tracking-tight">{t("setup.goal.title")}</h1>
               </div>
             </div>
+            {freshAccount && (
+              <p role="status" className="card mt-4 px-4 py-3 text-sm text-muted">
+                {t("setup.welcome.fresh")}
+              </p>
+            )}
             <div className="mt-6 space-y-3">
               {GOALS.map((g) => (
                 <Tile key={g.id} title={g.title} blurb={g.blurb} active={goal === g.id} onClick={() => setGoal(g.id)} />

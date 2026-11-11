@@ -60,3 +60,40 @@ describe("screen history (the back button)", () => {
     expect((history.state as { next?: string }).next).toBe("kept");
   });
 });
+
+describe("Next.js stays out of the app's own back steps (the Android 'This page couldn't load')", () => {
+  // Next's router adds its popstate listener on hydration, after ours; it stands in for that one here.
+  it("a back step that changes only the hash never reaches Next's listener", async () => {
+    let next = 0;
+    const nextListener = () => next++;
+    window.addEventListener("popstate", nextListener);
+    try {
+      await step(() => go("workout"));
+      await step(() => go("today")); // the workout screen's "Today": a step back
+      expect(route()).toBe("today");
+      await step(() => go("settings"));
+      await step(() => goBack()); // "‹ Back" and the phone's back
+      expect(route()).toBe("today");
+      expect(next).toBe(0);
+    } finally {
+      window.removeEventListener("popstate", nextListener);
+    }
+  });
+
+  it("a step back to another page (a different path) still goes to Next", async () => {
+    let next = 0;
+    const nextListener = () => next++;
+    window.addEventListener("popstate", nextListener);
+    const here = location.pathname + location.search + location.hash;
+    try {
+      history.pushState(null, "", "/privacy/");
+      const popped = new Promise<void>((r) => window.addEventListener("popstate", () => r(), { once: true }));
+      history.back();
+      await popped;
+      expect(location.pathname + location.search + location.hash).toBe(here);
+      expect(next).toBe(1);
+    } finally {
+      window.removeEventListener("popstate", nextListener);
+    }
+  });
+});
