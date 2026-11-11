@@ -52,6 +52,7 @@ import { Settings } from "./Settings";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
+import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
 import { Trainer } from "./Trainer";
@@ -325,6 +326,7 @@ export function App() {
         <StatusScrim />
         {screen}
         <ProWelcome />
+        <Toaster />
       </>
     );
   return (
@@ -335,6 +337,7 @@ export function App() {
       </main>
       <ProWelcome />
       {showNav && <TabBar route={route} />}
+      <Toaster />
     </>
   );
 }
