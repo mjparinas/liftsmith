@@ -523,6 +523,17 @@ export interface BodyweightEvent extends EventBase {
   bodyFat?: number;
 }
 
+/** Body measurements (competitor gaps, Melvin 2026-11-11), tape-measure sites on the Body and photos screen. */
+export const MEASURE_SITES = ["waist", "hips", "chest", "shoulders", "neck", "arm", "forearm", "thigh", "calf"] as const;
+export type MeasureSite = (typeof MEASURE_SITES)[number];
+
+/** One tape measurement, in centimetres (shown in inches when the lifter uses pounds). */
+export interface MeasureEvent extends EventBase {
+  type: "measure";
+  site: MeasureSite;
+  cm: number;
+}
+
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
 export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing";
 
@@ -688,6 +699,7 @@ export interface InjuryReturnEvent extends EventBase {
 // Every event kind, one per line so two changes adding an event don't touch the same line.
 export type AppEvent =
   | BodyweightEvent
+  | MeasureEvent
   | HealthEvent
   | TdeeEvent
   | CheckinEvent

@@ -4,6 +4,7 @@ import { EXERCISE_BY_ID } from "./exercises";
 import type { Streak } from "./game";
 import { weeklySets } from "./generator";
 import { date, inSentence, list, t } from "./i18n";
+import { fromCm, lengthUnit, measuresOf } from "./measure";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { epley, sessionsOf, TIMED } from "./progression";
 import { MUSCLE_LABEL, type AppEvent, type BodyweightEvent, type Muscle, type Profile, type SetEvent } from "./types";
@@ -300,6 +301,30 @@ export function insights({ events, profile, now, streak }: InsightInput): Insigh
         tone: "good",
         title: t("ins.fatDown.title"),
         why: t("ins.fatDown.why", { change: fmtNum(Math.round(-change * 10) / 10), weeks: weeksText(span) }),
+        advice: t("ins.fatDown.advice"),
+      });
+    }
+  }
+  // Without body fat readings, a growing or shrinking waist tells the same story (body measurements).
+  const waist = measuresOf(events, "waist").filter((e) => now - e.at <= 56 * DAY && e.at <= now);
+  if (fat.length < 3 && waist.length >= 3 && waist.at(-1)!.at - waist[0]!.at >= 3 * WEEK) {
+    const span = Math.max(1, Math.round((waist.at(-1)!.at - waist[0]!.at) / WEEK));
+    const change = slopePerWeek(waist.map((e) => ({ at: e.at, v: e.cm }))) * span;
+    const len = (cm: number) => `${fmtNum(Math.round(fromCm(Math.abs(cm), profile.unit) * 10) / 10)} ${lengthUnit(profile.unit)}`;
+    if (change >= 2) {
+      out.push({
+        id: `waist-up-${waist.at(-1)!.at}`,
+        tone: "warn",
+        title: t("ins.waistUp.title"),
+        why: t("ins.waistUp.why", { change: len(change), weeks: weeksText(span) }),
+        advice: profile.goal === "muscle" ? t("ins.fatUp.adviceMuscle") : t("ins.fatUp.advice"),
+      });
+    } else if (change <= -2 && !stalled.length) {
+      out.push({
+        id: `waist-down-${waist.at(-1)!.at}`,
+        tone: "good",
+        title: t("ins.waistDown.title"),
+        why: t("ins.waistDown.why", { change: len(change), weeks: weeksText(span) }),
         advice: t("ins.fatDown.advice"),
       });
     }
