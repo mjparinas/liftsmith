@@ -56,7 +56,9 @@ describe("exercise demos", () => {
       for (const bk of BODY_KEYS) {
         const B = BODIES[bk];
         const pl = placement(m, B);
-        for (const d of PHASES) {
+        // Every phase's start, middle and end too, so multi-step moves (burpees, the get-up) are checked all the way.
+        const ds = [...new Set([...PHASES, ...m.phases.flatMap(([, a, b]) => [a, (a + b) / 2, b])])];
+        for (const d of ds) {
           const pose = m.pose(B, d);
           const J = jointsAt(m, B, d) as unknown as Record<string, Vec>;
           for (const k of JOINTS) for (const v of J[k]) expect(Number.isFinite(v), `${bk} ${k} at ${d}`).toBe(true);
