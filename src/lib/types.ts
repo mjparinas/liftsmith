@@ -548,6 +548,17 @@ export interface CycleEvent extends EventBase {
   day: number;
 }
 
+/**
+ * A month the lifter had Pro (billing.ts proMember), logged once per calendar month the app sees it, with the id
+ * "pro-YYYY-MM" so every device writes the same one and a repeat is a no-op. The Pro achievement counts them,
+ * so the badge and its rewards stay earned after a subscription ends.
+ */
+export interface ProEvent extends EventBase {
+  type: "pro";
+  /** "YYYY-MM", local time. */
+  month: string;
+}
+
 /** A body weight weigh-in (progress photos screen). Kilograms. */
 export interface BodyweightEvent extends EventBase {
   type: "bodyweight";
@@ -742,6 +753,7 @@ export interface InjuryReturnEvent extends EventBase {
 
 // Every event kind, one per line so two changes adding an event don't touch the same line.
 export type AppEvent =
+  | ProEvent
   | BodyweightEvent
   | MeasureEvent
   | HealthEvent

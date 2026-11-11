@@ -13,12 +13,13 @@
 import { create } from "zustand";
 
 import { installId, platformStore, track } from "./analytics";
-import { accountPro } from "./auth";
+import { accountPro, useAccount } from "./auth";
 import { activeCode, activeOffering, creatorHooks } from "./creator";
 import { flag } from "./flags";
 import { isNative } from "./juice";
 import type { ProState } from "./messages";
 import type { Plan } from "./trial";
+import { useNow } from "./useNow";
 
 const DAY = 86_400_000;
 /** Pro stays on this long past the expiry we last saw, so a renewal the phone hasn't heard about yet (offline) doesn't lock anyone out. */
@@ -96,6 +97,34 @@ export function entActive(ent: Entitlement | null | undefined, now: number): boo
 export function hasPro(now = Date.now()): boolean {
   const s = useBilling.getState();
   return !s.live || entActive(s.ent, now) || accountPro();
+}
+
+/**
+ * Pro the lifter really has: a store subscription or trial, or Pro on the signed-in account (a lifetime
+ * code, the web subscription, the store review account). Unlike hasPro(), a build without billing doesn't
+ * count, so the Pro badge on Today and the Pro rewards (achievements.ts "pro") go only to real members.
+ */
+export function proMember(
+  now = Date.now(),
+  s: Pick<BillingState, "live" | "ent"> = useBilling.getState(),
+  viaAccount = accountPro(),
+): boolean {
+  return (s.live && entActive(s.ent, now)) || viaAccount;
+}
+
+/** The calendar month (local time) a Pro event is logged for: "2026-11". */
+export function proMonth(now: number): string {
+  const d = new Date(now);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+}
+
+/** proMember() for a component: re-renders when the store or the account changes. */
+export function useProMember(): boolean {
+  const now = useNow(60_000);
+  const live = useBilling((s) => s.live);
+  const ent = useBilling((s) => s.ent);
+  const viaAccount = useAccount((s) => !!s.account?.pro);
+  return proMember(now, { live, ent }, viaAccount);
 }
 
 // ---------- Mapping the SDK's answers (pure, tested) ----------
