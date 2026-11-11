@@ -112,6 +112,8 @@ public class WorkoutSessionPlugin extends Plugin {
         i.putExtra("plates", call.getString("plates", ""));
         Double restUntil = call.getDouble("restUntil");
         i.putExtra("restUntil", restUntil == null ? 0L : restUntil.longValue());
+        // The whole rest in seconds (+30 s included), for the rest bar in the notification.
+        i.putExtra("restTotal", (long) call.getInt("restTotal", 0));
         Integer hr = call.getInt("hr");
         i.putExtra("hr", hr == null ? 0 : hr);
         i.putExtra("sound", call.getBoolean("sound", true));

@@ -13,6 +13,8 @@ export interface SessionState {
   next: string;
   plates?: string;
   restUntil: number | null;
+  /** The whole rest in seconds (+30 s included), for the rest bar on the Android notification and iOS Live Activity. */
+  restTotal?: number;
   setLabel: string;
   hr?: number;
   /** Whether the native rest-over alert plays a sound and vibrates (Workout preferences › Rest-over alert). */
@@ -73,7 +75,12 @@ export async function updateSession(s: SessionState) {
     : null;
   await reg.showNotification(s.title, {
     tag: "workout",
-    body: [until ? `Rest until ${until}` : s.setLabel, `Next: ${s.next}`, s.plates, s.hr ? `♥ ${s.hr} bpm` : null]
+    body: [
+      until ? t("workout.notify.until", { time: until }) : s.setLabel,
+      t("workout.notify.next", { next: s.next }),
+      s.plates,
+      s.hr ? `♥ ${s.hr} bpm` : null,
+    ]
       .filter(Boolean)
       .join("\n"),
     silent: true,

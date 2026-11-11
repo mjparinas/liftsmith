@@ -238,6 +238,7 @@ export function Workout() {
       next: setText(ex, active.weight, active.reps, profile.unit, active.distanceM),
       plates: plateText(ex, active.weight, gym),
       restUntil: resting ? active.restUntil : null,
+      restTotal: resting ? active.restTotal : undefined,
       hr: bpm ?? undefined,
       sound: alert.sound,
       vibrate: alert.vibrate,

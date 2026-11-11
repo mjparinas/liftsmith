@@ -29,4 +29,4 @@ The one exception is a workout in progress: the live notification (Android foreg
 
 ## Platforms
 
-Pure web code, so Android, iOS and the web get the same behaviour. The native pieces that legitimately run in the background (the Android foreground service with its chronometer and rest-over alarm, the iOS Live Activity and its scheduled rest-over notification) were checked: both are stopped by `stopSession()` and schedule single alarms, not repeating ones.
+Pure web code, so Android, iOS and the web get the same behaviour. The native pieces that legitimately run in the background (the Android foreground service with its chronometer, its once-a-second redraw of the rest time left that runs only while resting (2026-11-11, workout-screen.md), and rest-over alarm, the iOS Live Activity and its scheduled rest-over notification) were checked: both are stopped by `stopSession()` and schedule single alarms, not repeating ones.

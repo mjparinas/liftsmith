@@ -14,7 +14,8 @@
     <string name="channel_alert_sound">休憩終了（音のみ）</string>
     <string name="channel_alert_sound_desc">休憩が終わるとバイブなしで音でお知らせ</string>
     <string name="next_prefix">次：</string>
-    <string name="rest_next">休憩 · 次：%1$s</string>
+    <string name="rest_left">休憩あと%1$s</string>
+    <string name="rest_left_next">あと%1$s · 次：%2$s</string>
     <string name="up_next">次：%1$s</string>
     <string name="add_30">+30 秒</string>
     <string name="widget_title">今日のワークアウト</string>
