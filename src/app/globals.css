@@ -193,6 +193,21 @@
   --hr-3: #34d399;
   --hr-4: #f5b544;
   --hr-5: #f0605d;
+  /* Plates: one colour per plate size (plates.ts), competition colours for the big ones. The edge
+     outlines every plate so a white one shows on a light card and a black one on a dark card. */
+  --plate-red: #d33b3b;
+  --plate-blue: #2f6fdb;
+  --plate-yellow: #e7b416;
+  --plate-green: #2e9e5b;
+  --plate-white: #ececec;
+  --plate-black: #23282f;
+  --plate-silver: #a7b1bd;
+  --plate-orange: #f07a2a;
+  --plate-purple: #7445e0;
+  --plate-ink-dark: #0b0e12;
+  --plate-ink-light: #ffffff;
+  --plate-edge: #6b7684;
+  --plate-rim-black: #59626e;
 }
 :root[data-theme="light"] {
   color-scheme: light;
@@ -250,6 +265,8 @@
   --hr-4: #8a5100;
   --hr-5: #a82222;
   --color-heart: #c4262b;
+  --plate-white: #f7f8fa;
+  --plate-edge: #2a313b;
 }
 @media (prefers-color-scheme: light) {
   :root[data-theme="system"] {
@@ -308,6 +325,8 @@
     --hr-4: #8a5100;
     --hr-5: #a82222;
     --color-heart: #c4262b;
+    --plate-white: #f7f8fa;
+    --plate-edge: #2a313b;
   }
 }
 

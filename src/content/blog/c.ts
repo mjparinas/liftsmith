@@ -156,7 +156,7 @@ export const BLOG_C: Article[] = [
       { h2: "What you can skip" },
       {
         ul: [
-          "Warm-up sets (useful to plan, not to analyse).",
+          "Warm-up sets (useful to plan, not to analyze).",
           "Total volume charts you never act on.",
           "Long notes about how the session felt, unless something hurt.",
         ],

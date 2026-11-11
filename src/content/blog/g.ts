@@ -128,7 +128,7 @@ export const BLOG_G: Article[] = [
       {
         ul: [
           "**Heavy strength.** Barbell squats, deadlifts and presses let you load the most weight and build whole-body strength.",
-          "**Balance and coordination.** Stabilising the weight trains the small muscles that machines do for you.",
+          "**Balance and coordination.** Stabilizing the weight trains the small muscles that machines do for you.",
           "**Anywhere use.** Dumbbells and a bar work at home, in a hotel or in any gym.",
         ],
       },

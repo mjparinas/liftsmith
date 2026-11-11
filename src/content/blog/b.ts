@@ -57,7 +57,7 @@ export const BLOG_B: Article[] = [
   {
     slug: "how-to-load-a-barbell",
     kind: "blog",
-    title: "How to load a barbell: plate maths made simple",
+    title: "How to load a barbell: plate math made simple",
     description:
       "How to work out which plates go on each side of the bar in kg or lb, bar weights, loading order, and what to do when your plates can't make a weight.",
     date: "2026-11-09",
@@ -65,7 +65,7 @@ export const BLOG_B: Article[] = [
     cta: "plates",
     body: [
       {
-        p: "Plate maths is simple, but it's annoying between sets when you're out of breath. Here's how to do it quickly, and how to stop doing it at all.",
+        p: "Plate math is simple, but it's annoying between sets when you're out of breath. Here's how to do it quickly, and how to stop doing it at all.",
       },
       { h2: "The formula" },
       {
@@ -280,7 +280,7 @@ export const BLOG_B: Article[] = [
         p: "If you lift to build muscle, aim for about **1.6 grams of protein per kilogram of body weight a day** (about 0.7 g per pound). Going up to 2.2 g/kg is fine, and can help on a diet, but most people get the benefit by 1.6.",
       },
       {
-        p: "That figure comes from a 2018 meta-analysis by Morton and colleagues: protein's effect on muscle gain leveled off at about 1.6 g/kg a day, with the upper end of the range near 2.2.",
+        p: "That figure comes from a 2018 meta-analysis by Morton and colleagues: protein's effect on muscle gain levelled off at about 1.6 g/kg a day, with the upper end of the range near 2.2.",
       },
       { h2: "What that looks like" },
       {

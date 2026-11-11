@@ -4,6 +4,7 @@ import { join } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { applyA11y, cleanA11y, savedA11y, textPercent } from "./a11y";
+import { plateStyle } from "./plates";
 
 // Colour checks on the real tokens in globals.css: text contrast (WCAG 1.4.3), graphics contrast
 // (1.4.11), and that the status and recovery colours stay apart when simulated for the three kinds
@@ -161,6 +162,27 @@ describe("colour tokens", () => {
         ),
       ).toBeGreaterThanOrEqual(25);
     });
+  }
+
+  // Every plate size in the gym presets and the plate calculator gets its own colour, readable in both themes.
+  const PLATE_SETS = { kg: [25, 20, 15, 10, 5, 2.5, 1.25, 0.5], lb: [55, 45, 35, 25, 10, 5, 2.5, 1.25] } as const;
+  const tok = (t: Record<string, string>, v: string) => t[v.slice(4, -1)]!;
+  for (const [name, t] of Object.entries(THEMES)) {
+    for (const [unit, sizes] of Object.entries(PLATE_SETS)) {
+      it(`${name}: every ${unit} plate has its own colour, its number is readable and its edge shows on the card`, () => {
+        const styles = sizes.map((w) => plateStyle(w, unit as "kg" | "lb"));
+        expect(new Set(styles.map((s) => s.hue)).size).toBe(sizes.length);
+        expect(
+          closest(
+            styles.map((s) => tok(t, s.fill)),
+            "normal",
+          ),
+        ).toBeGreaterThanOrEqual(20);
+        for (const [i, s] of styles.entries())
+          expect(contrast(tok(t, s.text), tok(t, s.fill)), `${sizes[i]} ${unit}`).toBeGreaterThanOrEqual(4.5);
+        expect(contrast(t["--plate-edge"]!, t["--color-surface"]!)).toBeGreaterThanOrEqual(3);
+      });
+    }
   }
 
   it("picks the set by data-cvd and keeps every status colour behind a token", () => {

@@ -38,7 +38,7 @@ export const en = {
   "ins.volume.title": "{muscle} is getting too little work",
   "ins.volume.why": "About {sets} sets a week for the last 2 weeks, against a goal of {goal}.",
   "ins.volume.advice": "Make it a priority and plans put {muscle} first with a third more sets.",
-  "ins.volume.action": "Prioritise {muscle}",
+  "ins.volume.action": "Prioritize {muscle}",
   "ins.fatUp.title": "Body fat is creeping up",
   "ins.fatUp.why": "Up about {change} points in {weeks} (now {now}%).",
   "ins.fatUp.adviceMuscle":

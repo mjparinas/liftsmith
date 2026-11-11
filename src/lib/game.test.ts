@@ -15,13 +15,19 @@ import {
   league,
   LEAGUE_LABEL,
   LEAGUES,
+  LEVEL_ITEMS,
   levelAt,
+  levelForItem,
   levelOf,
+  levelRewards,
   MAX_FREEZES,
+  nextReward,
   owned,
   questsFor,
+  rarityOdds,
   repsForPr,
   STARTER,
+  TITLE_LEVELS,
   xpTotal,
 } from "./game";
 import { setLanguage } from "./i18n";
@@ -240,6 +246,43 @@ describe("crates", () => {
     expect(list).toHaveLength(30);
     expect(list.some((c) => c.duplicate)).toBe(true);
     expect(owned(stats).size).toBeGreaterThan(STARTER.length);
+  });
+});
+
+describe("level rewards", () => {
+  it("give a set item at some levels and a bonus crate with each new title", () => {
+    expect(levelRewards(4)).toHaveLength(1);
+    expect(levelRewards(4)[0]).toMatchObject({ level: 4, source: "crate" });
+    expect(levelRewards(5).map((r) => r.key)).toEqual(["crate:4", "item:5"]);
+    expect(levelForItem("accent-gold")).toBe(25);
+    expect(levelForItem("accent-teal")).toBeNull();
+    expect(levelRewards(50)).toHaveLength(LEVEL_ITEMS.length + TITLE_LEVELS.length);
+    // Every legendary has a sure path.
+    for (const c of COSMETICS.filter((c) => c.rarity === "legendary")) expect(levelForItem(c.id)).not.toBeNull();
+    expect(nextReward(4)).toMatchObject({ level: 5, source: "item" });
+    expect(nextReward(50)).toBeNull();
+  });
+
+  it("are owned once the level is reached, and a repeat still turns into XP", () => {
+    const ev = Array.from({ length: 40 }, (_, i) => workout(NOW - (i + 1) * D, `r${i}`, 12)).flat();
+    const stats = derive(ev, NOW);
+    const g = game(ev, stats, profile(), NOW);
+    expect(g.level.level).toBeGreaterThanOrEqual(10);
+    expect(g.rewards).toEqual(levelRewards(g.level.level));
+    for (const r of g.rewards) expect(g.owned.has(r.item.id)).toBe(true);
+    expect(g.next?.level).toBeGreaterThan(g.level.level);
+    // XP counts one repeat for every prize beyond the distinct items won.
+    const won = [...crates(stats).map((c) => c.item.id), ...g.rewards.map((r) => r.item.id)];
+    const base = game(ev, stats, profile(), NOW).xp - (won.length - new Set(won).size) * 25;
+    expect(base).toBeGreaterThan(0);
+    expect(g.level).toEqual(levelOf(g.xp));
+  });
+
+  it("show the odds of each item per crate", () => {
+    const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
+    expect(pool.reduce((t, c) => t + rarityOdds(c.id), 0)).toBeCloseTo(1);
+    expect(rarityOdds("accent-blue")).toBe(0);
+    expect(rarityOdds("accent-teal")).toBeGreaterThan(rarityOdds("accent-gold"));
   });
 });
 

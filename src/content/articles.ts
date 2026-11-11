@@ -64,7 +64,7 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     button: "Get today's workout",
   },
   plates: {
-    title: "Never do plate maths again",
+    title: "Never do plate math again",
     body: "Liftsmith shows which plates go on each side for every set, using the plates your gym actually has, and the next set's plates while you rest.",
     button: "Try it free",
   },

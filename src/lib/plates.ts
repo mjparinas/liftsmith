@@ -88,27 +88,85 @@ export function smallestJump(plates: PlateStock[]): number {
   return light ? (light.w * 2) / SCALE : 0;
 }
 
-/** Plate colours follow the common competition convention so they read at a glance. */
-export function plateStyle(weight: number, unit: "kg" | "lb"): { fill: string; text: string; height: number; width: number } {
+type PlateHue = "red" | "blue" | "yellow" | "green" | "white" | "black" | "silver" | "orange" | "purple";
+
+/**
+ * One colour per plate size, so no two plates in a set look alike (Melvin, 2026-11-11: "every plate
+ * should be a different colour"). The big plates use the competition colours (25 kg / 55 lb red,
+ * 20 kg / 45 lb blue, 15 kg / 35 lb yellow, 10 kg / 25 lb green, 5 kg / 10 lb white). The change
+ * plates follow the powerlifting habit of black and chrome instead of repeating red and blue.
+ */
+export const PLATE_HUES: Record<"kg" | "lb", Record<string, PlateHue>> = {
+  kg: {
+    25: "red",
+    20: "blue",
+    15: "yellow",
+    10: "green",
+    5: "white",
+    2.5: "black",
+    2: "purple",
+    1.5: "orange",
+    1.25: "silver",
+    1: "purple",
+    0.5: "orange",
+  },
+  lb: {
+    55: "red",
+    45: "blue",
+    35: "yellow",
+    25: "green",
+    10: "white",
+    5: "black",
+    2.5: "silver",
+    1.25: "orange",
+    1: "purple",
+    0.5: "purple",
+  },
+};
+
+/** Text on each plate: dark on the light plates, white on the dark ones. */
+const INK: Record<PlateHue, "dark" | "light"> = {
+  red: "light",
+  blue: "light",
+  yellow: "dark",
+  green: "dark",
+  white: "dark",
+  black: "light",
+  silver: "dark",
+  orange: "dark",
+  purple: "light",
+};
+
+/** A plate size not in the table (a custom one) gets the colour of the nearest size below it. */
+function hueFor(weight: number, unit: "kg" | "lb"): PlateHue {
+  const table = PLATE_HUES[unit];
+  const exact = table[String(weight)];
+  if (exact) return exact;
+  const below = Object.keys(table)
+    .map(Number)
+    .filter((w) => w <= weight)
+    .sort((a, b) => b - a)[0];
+  return below === undefined ? "silver" : table[String(below)]!;
+}
+
+/** How a plate is drawn: colours are CSS tokens (globals.css), so they follow light and dark mode. */
+export function plateStyle(
+  weight: number,
+  unit: "kg" | "lb",
+): { hue: PlateHue; fill: string; text: string; rim: string; height: number; width: number } {
   const kg = unit === "kg" ? weight : weight * 0.45359237;
   const t = Math.min(1, Math.max(0, kg / 25));
   const height = 34 + Math.round(t * 66);
   const width = kg >= 15 ? 14 : kg >= 5 ? 11 : 8;
-  const colour: [string, string] =
-    kg >= 24
-      ? ["#d33b3b", "#fff"]
-      : kg >= 19
-        ? ["#2f6fdb", "#fff"]
-        : kg >= 14
-          ? ["#e7b416", "#111"]
-          : kg >= 9
-            ? ["#2e9e5b", "#04140b"]
-            : kg >= 4.5
-              ? ["#e8e8e8", "#111"]
-              : kg >= 2
-                ? ["#d33b3b", "#fff"]
-                : kg >= 1.1
-                  ? ["#2f6fdb", "#fff"]
-                  : ["#9aa4b2", "#111"];
-  return { fill: colour[0], text: colour[1], height, width };
+  const hue = hueFor(weight, unit);
+  const fill = `var(--plate-${hue})`;
+  return {
+    hue,
+    fill,
+    text: `var(--plate-ink-${INK[hue]})`,
+    // The rim stands in for the plate's colour on the black, chrome and neon finishes.
+    rim: hue === "black" ? "var(--plate-rim-black)" : fill,
+    height,
+    width,
+  };
 }
