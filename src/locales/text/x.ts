@@ -23,8 +23,7 @@ export const en = {
   "x.buddyTitle": "Tell your gym buddies",
   "x.shareFail": "Couldn't open the share sheet.",
   "x.copied": "Copied. Paste it into your group chat.",
-  "x.buddyIntro":
-    "Sends a quick “I’m at the gym” through your usual messaging app. Once accounts arrive, buddies who use the app get a nudge straight to their phone.",
+  "x.buddyIntro": "Sends a quick “I’m at the gym” through your usual messaging app, so your buddies hear it wherever they already chat.",
   "x.removeBuddy": "Remove {name}",
   "x.addBuddy": "Add a buddy's name",
   "x.buddyName": "Buddy's name",
@@ -80,7 +79,7 @@ export const es: Partial<Record<Key, Message>> = {
   "x.shareFail": "No se pudo abrir el menú para compartir.",
   "x.copied": "Copiado. Pégalo en tu chat de grupo.",
   "x.buddyIntro":
-    "Envía un rápido «Estoy en el gimnasio» por tu app de mensajes habitual. Cuando lleguen las cuentas, los compañeros que usen la app recibirán un aviso directo en su teléfono.",
+    "Envía un rápido «Estoy en el gimnasio» por tu app de mensajes habitual, para que tus compañeros se enteren allí donde ya hablan.",
   "x.removeBuddy": "Quitar a {name}",
   "x.addBuddy": "Añade el nombre de un compañero",
   "x.buddyName": "Nombre del compañero",
@@ -134,7 +133,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "x.shareFail": "Impossible d’ouvrir le menu de partage.",
   "x.copied": "Copié. Collez-le dans votre groupe.",
   "x.buddyIntro":
-    "Envoie un petit « Je suis à la salle » par votre messagerie habituelle. Avec les comptes, les partenaires qui utilisent l’app recevront une notification sur leur téléphone.",
+    "Envoie un petit « Je suis à la salle » par votre messagerie habituelle, pour que vos partenaires le voient là où ils discutent déjà.",
   "x.removeBuddy": "Retirer {name}",
   "x.addBuddy": "Ajouter le nom d’un partenaire",
   "x.buddyName": "Nom du partenaire",
@@ -188,7 +187,7 @@ export const de: Partial<Record<Key, Message>> = {
   "x.shareFail": "Das Teilen-Menü ließ sich nicht öffnen.",
   "x.copied": "Kopiert. Füg es in deinen Gruppenchat ein.",
   "x.buddyIntro":
-    "Schickt ein kurzes „Ich bin im Studio“ über deine übliche Messaging-App. Sobald es Konten gibt, bekommen Trainingspartner, die die App nutzen, einen Stups direkt aufs Telefon.",
+    "Schickt ein kurzes „Ich bin im Studio“ über deine übliche Messaging-App, damit deine Trainingspartner es dort sehen, wo ihr sowieso schreibt.",
   "x.removeBuddy": "{name} entfernen",
   "x.addBuddy": "Namen eines Trainingspartners hinzufügen",
   "x.buddyName": "Name des Trainingspartners",
@@ -241,8 +240,7 @@ export const it: Partial<Record<Key, Message>> = {
   "x.buddyTitle": "Dillo ai tuoi compagni di palestra",
   "x.shareFail": "Impossibile aprire il menu di condivisione.",
   "x.copied": "Copiato. Incollalo nella tua chat di gruppo.",
-  "x.buddyIntro":
-    "Invia un rapido «Sono in palestra» con la tua app di messaggi. Quando arriveranno gli account, i compagni che usano l’app riceveranno un avviso direttamente sul telefono.",
+  "x.buddyIntro": "Invia un rapido «Sono in palestra» con la tua app di messaggi, così i tuoi compagni lo vedono dove già chattate.",
   "x.removeBuddy": "Rimuovi {name}",
   "x.addBuddy": "Aggiungi il nome di un compagno",
   "x.buddyName": "Nome del compagno",
@@ -295,8 +293,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "x.buddyTitle": "ジム仲間に知らせる",
   "x.shareFail": "共有メニューを開けませんでした。",
   "x.copied": "コピーしました。グループチャットに貼り付けてください。",
-  "x.buddyIntro":
-    "いつものメッセージアプリで「ジムに来たよ」と手軽に送れます。アカウント機能が始まれば、アプリを使っている仲間のスマホに直接通知が届きます。",
+  "x.buddyIntro": "いつものメッセージアプリで「ジムに来たよ」と手軽に送れます。仲間はふだん使っているアプリで受け取れます。",
   "x.removeBuddy": "{name}を削除",
   "x.addBuddy": "仲間の名前を追加",
   "x.buddyName": "仲間の名前",
