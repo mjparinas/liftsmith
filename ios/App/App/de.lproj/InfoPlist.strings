@@ -6,3 +6,5 @@
 "NSHealthUpdateUsageDescription" = "Liftsmith speichert deine beendeten Trainings mit Kalorien und Herzfrequenz in Health.";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith trägt deine Trainingstage in deinen Kalender ein und schaut, wenn du es einschaltest, wann du beschäftigt bist, um ein Training vorzuschlagen, das in deinen Tag passt. Es liest nur die Zeiten, nie den Inhalt deiner Termine.";
 "NSCalendarsUsageDescription" = "Liftsmith trägt deine Trainingstage in deinen Kalender ein und schaut, wenn du es einschaltest, wann du beschäftigt bist, um ein Training vorzuschlagen, das in deinen Tag passt. Es liest nur die Zeiten, nie den Inhalt deiner Termine.";
+"NSMicrophoneUsageDescription" = "Wenn du in Labs das Eintragen per Stimme einschaltest, hört Liftsmith zu, sobald du auf das Mikrofon tippst, damit du einen Satz sagen kannst, etwa „100 für 8“. Die Sprache wird auf diesem iPhone erkannt und nie aufgenommen oder gesendet.";
+"NSSpeechRecognitionUsageDescription" = "Liftsmith macht aus dem, was du sagst, einen eingetragenen Satz, auf diesem iPhone. Deine Stimme wird nie aufgenommen oder gesendet.";

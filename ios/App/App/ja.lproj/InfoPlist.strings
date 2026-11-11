@@ -6,3 +6,5 @@
 "NSHealthUpdateUsageDescription" = "Liftsmith は完了したワークアウトをカロリーと心拍数とともにヘルスケアに保存します。";
 "NSCalendarsFullAccessUsageDescription" = "Liftsmith はトレーニング日をカレンダーに追加し、オンにした場合は予定の空き時間を見て、その日に収まるワークアウトを提案します。読み取るのは時間だけで、予定の内容は読みません。";
 "NSCalendarsUsageDescription" = "Liftsmith はトレーニング日をカレンダーに追加し、オンにした場合は予定の空き時間を見て、その日に収まるワークアウトを提案します。読み取るのは時間だけで、予定の内容は読みません。";
+"NSMicrophoneUsageDescription" = "Labs で音声でセットを記録をオンにすると、マイクをタップしたときに Liftsmith が聞き取り、「100キロで8回」のようにセットを言えます。音声はこの iPhone 上で認識され、録音や送信はされません。";
+"NSSpeechRecognitionUsageDescription" = "Liftsmith は話した内容をこの iPhone 上で記録済みのセットにします。音声が録音や送信されることはありません。";
