@@ -9,14 +9,24 @@ import { flag, setLocalFlag } from "./flags";
 
 /** Flags that are labs: on or off switches. */
 export type LabFlag =
-  "labRepCount" | "repMotion" | "labBarSpeed" | "labHrRest" | "labTrainer" | "labFormCheck" | "labVoiceLog" | "labSpeedMax";
+  | "labRepCount"
+  | "repMotion"
+  | "labBarSpeed"
+  | "labHrRest"
+  | "labTrainer"
+  | "labFormCheck"
+  | "labVoiceLog"
+  | "labSpeedMax"
+  | "labWatchReps";
 
 export interface Lab {
   flag: LabFlag;
   /** Catalogue keys: `lab.<key>.title` and `lab.<key>.body`. */
-  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "trainer" | "formCheck" | "voiceLog" | "speedMax";
+  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "trainer" | "formCheck" | "voiceLog" | "speedMax" | "watchReps";
   /** Another lab this one only works with. */
   needs?: LabFlag;
+  /** Only in the Android and iOS apps (it needs something the browser can't reach, like a watch app). */
+  native?: boolean;
 }
 
 // One line per lab, so two changes adding one don't touch the same line.
@@ -29,6 +39,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labTrainer", key: "trainer" },
   { flag: "labVoiceLog", key: "voiceLog" },
   { flag: "labSpeedMax", key: "speedMax", needs: "labBarSpeed" },
+  { flag: "labWatchReps", key: "watchReps", native: true },
 ];
 
 /** Whether a lab is on for this lifter: Pro, and its flag on (and the lab it needs, if any). */

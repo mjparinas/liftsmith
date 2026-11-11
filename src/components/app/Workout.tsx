@@ -24,6 +24,7 @@ import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
 import { fastestMetres } from "@/lib/reps/speedMax";
+import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
@@ -54,6 +55,7 @@ import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
+import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
@@ -228,6 +230,21 @@ export function Workout() {
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Watch rep counting (Labs): the watch streams its motion during a set, unless the camera is already counting.
+  const cameraCounting = !!ex && countPrefs.on && labOn("labRepCount") && countable(ex.id, ex.pattern, countPrefs.source);
+  const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !cameraCounting;
+  const watchReps = useWatchReps({
+    on: watchCountOn,
+    exerciseId: ex?.id,
+    pattern: ex?.pattern,
+    setKey: `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`,
+    onCount: (n) => {
+      const a = useApp.getState().active;
+      if (a) s.adjust(a.weight, n);
+    },
+  });
+  const watchMotion = watchCountOn && !!ex && watchCountable(ex.id, ex.pattern);
+
   // Heart-rate rest timer (Labs, restReady.ts): once the heart rate is back down, the rest is cut to a few
   // seconds left (never under its floor), once per rest; the countdown above then ends it as usual.
   const hrRest = labOn("labHrRest");
@@ -245,7 +262,7 @@ export function Workout() {
   const notified = useRef({ key: "", at: 0 });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -267,8 +284,9 @@ export function Workout() {
       done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
       total: active.plan.items.reduce((n, i) => n + i.sets, 0),
       sessionId: active.sessionId,
+      motion: watchMotion || undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
   // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
@@ -626,6 +644,15 @@ export function Workout() {
                   {t("workout.howTo")}
                 </span>
               </button>
+              {watchReps !== null && (
+                <span
+                  className="absolute left-2 top-2 inline-flex min-h-8 items-center gap-1 rounded-full border border-line bg-bg/80 px-3 text-sm font-semibold tabular-nums"
+                  data-testid="watch-reps"
+                >
+                  <Icon name="watch" size={16} className="text-accent" />
+                  {t("count.watch", { count: watchReps })}
+                </span>
+              )}
               {canCount && (
                 <AutoCountButton
                   on={false}

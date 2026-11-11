@@ -66,4 +66,11 @@ public class WorkoutStateTest {
         assertEquals("10:00", WorkoutState.clock(600));
         assertEquals("0:00", WorkoutState.clock(-5));
     }
+
+    @Test
+    public void motionOnlyWhileThePhoneAsksAndNotResting() {
+        assertFalse(WorkoutState.parse("{\"title\":\"Squat\"}").streamMotion(NOW));
+        assertTrue(WorkoutState.parse("{\"motion\":true}").streamMotion(NOW));
+        assertFalse(WorkoutState.parse("{\"motion\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
+    }
 }

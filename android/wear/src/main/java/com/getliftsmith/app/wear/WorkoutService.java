@@ -24,13 +24,15 @@ import androidx.wear.ongoing.Status;
 /**
  * Runs while a workout is on: keeps the app alive with the screen off, reads the watch's heart rate sensor
  * (sent to the phone through WatchHub, at most every 2 s), keeps the rest buzz on time, and shows the workout
- * as an Ongoing Activity (its icon on the watch face). It stops itself when the phone's workout ends.
+ * as an Ongoing Activity (its icon on the watch face), and streams wrist motion while the phone asks for it (Labs,
+ * watch rep counting: MotionStream). It stops itself when the phone's workout ends.
  */
 public class WorkoutService extends Service implements SensorEventListener, WatchHub.Listener {
 
     private static final String CHANNEL = "workout";
     private static final int ID = 1;
     private SensorManager sensors;
+    private MotionStream motion;
 
     /** Started by the screen once heart rate is allowed, because a health service needs that permission. */
     static void start(Context context) {
@@ -71,6 +73,8 @@ public class WorkoutService extends Service implements SensorEventListener, Watc
             Sensor hr = sensors == null ? null : sensors.getDefaultSensor(Sensor.TYPE_HEART_RATE);
             if (hr != null) sensors.registerListener(this, hr, SensorManager.SENSOR_DELAY_NORMAL);
         }
+        if (motion == null) motion = new MotionStream(this);
+        changed();
         return START_NOT_STICKY;
     }
 
@@ -87,13 +91,16 @@ public class WorkoutService extends Service implements SensorEventListener, Watc
 
     @Override
     public void changed() {
-        if (WatchHub.state() == null) stopSelf();
+        WorkoutState s = WatchHub.state();
+        if (motion != null) motion.set(s != null && s.streamMotion(System.currentTimeMillis()));
+        if (s == null) stopSelf();
     }
 
     @Override
     public void onDestroy() {
         WatchHub.unlisten(this);
         if (sensors != null) sensors.unregisterListener(this);
+        if (motion != null) motion.set(false);
         super.onDestroy();
     }
 

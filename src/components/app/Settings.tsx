@@ -18,7 +18,7 @@ import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
-import { feel } from "@/lib/juice";
+import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
@@ -244,7 +244,7 @@ function LabsPage() {
           </Button>
         </section>
       ) : (
-        LABS.filter((l) => !l.needs || labOn(l.needs)).map((l) => (
+        LABS.filter((l) => (!l.needs || labOn(l.needs)) && (!l.native || isNative())).map((l) => (
           <SwitchRow
             key={l.flag}
             label={t(`lab.${l.key}.title`)}

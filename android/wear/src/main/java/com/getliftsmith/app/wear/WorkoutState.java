@@ -25,6 +25,8 @@ final class WorkoutState {
     final int total;
     final long at;
     final String sessionId;
+    /** Labs, watch rep counting: the phone wants the wrist's motion for this set. */
+    final boolean motion;
 
     private WorkoutState(JSONObject o) {
         title = o.optString("title", "");
@@ -38,6 +40,7 @@ final class WorkoutState {
         total = o.optInt("total", 0);
         at = o.optLong("at", 0L);
         sessionId = o.optString("sessionId", "");
+        motion = o.optBoolean("motion", false);
     }
 
     /** The state in a Data Layer item's "json", or null when there's none or it can't be read. */
@@ -52,6 +55,11 @@ final class WorkoutState {
 
     boolean stale(long now) {
         return at > 0 && now - at > STALE_MS;
+    }
+
+    /** Whether to stream motion now: the phone asked for it, and rest hasn't started on this watch's clock. */
+    boolean streamMotion(long now) {
+        return motion && !resting(now);
     }
 
     boolean resting(long now) {

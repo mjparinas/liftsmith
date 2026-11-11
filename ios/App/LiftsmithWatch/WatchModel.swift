@@ -1,3 +1,4 @@
+import CoreMotion
 import Foundation
 import HealthKit
 import WatchConnectivity
@@ -18,6 +19,7 @@ final class WatchModel: NSObject, ObservableObject {
     private var builder: HKLiveWorkoutBuilder?
     private var lastHrSent = Date.distantPast
     private var restTap: Timer?
+    private let motion = MotionStream()
 
     func start() {
         guard WCSession.isSupported() else { return }
@@ -37,6 +39,7 @@ final class WatchModel: NSObject, ObservableObject {
         state = next
         scheduleRestTap()
         if next == nil { endWorkout() } else { beginWorkout() }
+        motion.set(current?.streamMotion(at: Date()) == true)
     }
 
     // MARK: Taps, sent to the phone
@@ -104,6 +107,7 @@ final class WatchModel: NSObject, ObservableObject {
     /// own copy is dropped rather than saved twice.
     private func endWorkout() {
         bpm = nil
+        motion.set(false)
         guard let s = session, let b = builder else { return }
         session = nil
         builder = nil
@@ -149,3 +153,74 @@ extension WatchModel: HKLiveWorkoutBuilderDelegate {
         Task { @MainActor in self.heartRate(reading) }
     }
 }
+
+/// Wrist motion for watch rep counting (Labs), sent to the phone about four times a second while the phone asks for
+/// it (a set is under way and the lab is on). The phone counts the reps (src/lib/reps/watchMotion.ts), so the watch
+/// only measures. Each batch is ["t": first reading's time in ms, "s": [ms after t, up, rot, ...]], where up is vertical
+/// linear acceleration in m/s² (up positive) and rot the rotation rate in rad/s: the same as Wear OS's MotionBatch.
+/// Only while the phone is reachable: motion that arrives late is no use to a live count.
+final class MotionStream {
+    private let manager = CMMotionManager()
+    private let queue: OperationQueue = {
+        let q = OperationQueue()
+        q.maxConcurrentOperationCount = 1
+        q.name = "liftsmith.motion"
+        return q
+    }()
+    private var on = false
+    // Read and written on `queue` only.
+    private var first: Double = -1
+    private var last: Double = -1
+    private var readings: [Double] = []
+
+    static let sendEvery: Double = 250
+    static let maxReadings = 200
+
+    func set(_ want: Bool) {
+        guard want != on, manager.isDeviceMotionAvailable else { return }
+        on = want
+        if want {
+            manager.deviceMotionUpdateInterval = 1.0 / 50
+            manager.startDeviceMotionUpdates(to: queue) { [weak self] m, _ in
+                guard let self, let m else { return }
+                self.add(m)
+            }
+        } else {
+            manager.stopDeviceMotionUpdates()
+            queue.addOperation { [weak self] in self?.flush() }
+        }
+    }
+
+    private func add(_ m: CMDeviceMotion) {
+        // Motion times count from boot; the phone only needs them to be in order and in ms.
+        let t = (Date().timeIntervalSince1970 - (ProcessInfo.processInfo.systemUptime - m.timestamp)) * 1000
+        if last >= 0, t - last < 18 { return }
+        last = t
+        if first < 0 { first = t }
+        // Core Motion's gravity points down and its user acceleration is the opposite of the push, so their dot product
+        // is the push along up. Both are in g.
+        let a = m.userAcceleration, g = m.gravity
+        let up = (a.x * g.x + a.y * g.y + a.z * g.z) * 9.81
+        let r = m.rotationRate
+        let rot = (r.x * r.x + r.y * r.y + r.z * r.z).squareRoot()
+        readings.append(contentsOf: [(t - first).rounded(), Self.round(up), Self.round(rot)])
+        if readings.count / 3 >= Self.maxReadings || t - first >= Self.sendEvery { flush() }
+    }
+
+    private func flush() {
+        defer {
+            first = -1
+            readings = []
+        }
+        guard !readings.isEmpty else { return }
+        let s = WCSession.default
+        guard s.activationState == .activated, s.isReachable else { return }
+        s.sendMessage(["motion": ["t": first.rounded(), "s": readings]], replyHandler: nil, errorHandler: nil)
+    }
+
+    private static func round(_ v: Double) -> Double {
+        guard v.isFinite else { return 0 }
+        return max(-99, min(99, (v * 1000).rounded() / 1000))
+    }
+}
+

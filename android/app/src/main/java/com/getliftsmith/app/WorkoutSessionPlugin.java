@@ -30,6 +30,7 @@ public class WorkoutSessionPlugin extends Plugin {
 
     private BroadcastReceiver receiver;
     private BroadcastReceiver watchHr;
+    private BroadcastReceiver watchMotion;
 
     @Override
     public void load() {
@@ -52,6 +53,25 @@ public class WorkoutSessionPlugin extends Plugin {
             }
         };
         ContextCompat.registerReceiver(getContext(), watchHr, new IntentFilter(WatchListenerService.BROADCAST_HR), ContextCompat.RECEIVER_NOT_EXPORTED);
+        // Motion batches from the Wear OS app (Labs, watch rep counting), counted by the web app.
+        watchMotion = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                org.json.JSONObject m = WatchMessages.motion(intent.getStringExtra(WatchListenerService.EXTRA_MOTION));
+                if (m == null) return;
+                try {
+                    notifyListeners("watchMotion", JSObject.fromJSONObject(m));
+                } catch (org.json.JSONException ignored) {
+                    // Checked above; nothing to send.
+                }
+            }
+        };
+        ContextCompat.registerReceiver(
+            getContext(),
+            watchMotion,
+            new IntentFilter(WatchListenerService.BROADCAST_MOTION),
+            ContextCompat.RECEIVER_NOT_EXPORTED
+        );
         // A shortcut that cold-started the app. The event is kept until the web app listens for it.
         if (getActivity() != null && deliver(getActivity().getIntent())) getActivity().setIntent(new Intent(Intent.ACTION_MAIN));
     }
@@ -82,6 +102,7 @@ public class WorkoutSessionPlugin extends Plugin {
     protected void handleOnDestroy() {
         if (receiver != null) getContext().unregisterReceiver(receiver);
         if (watchHr != null) getContext().unregisterReceiver(watchHr);
+        if (watchMotion != null) getContext().unregisterReceiver(watchMotion);
     }
 
     @PluginMethod
