@@ -7,6 +7,10 @@ export const en = {
   "lab.barSpeed.title": "Camera bar speed",
   "lab.barSpeed.body":
     "While the camera counts reps, it also shows how fast the bar moves, how much it has slowed since your fastest rep, and when it's time to end the set. Add your height in Your stats for speeds in m/s.",
+  "lab.hrRest.title": "Heart-rate rest timer",
+  "lab.hrRest.body":
+    "With a heart rate monitor or watch connected, rest ends early once your heart rate is back near where it was when the set started. It never cuts more than 40% of the planned rest, and +30 s still adds time.",
+  "lab.hrRest.cut": "Heart rate's back to {bpm}, near the {start} you started that set at, so rest is {saved} s shorter. Get ready.",
   "lab.row": "Labs",
   "lab.rowNote": "Try experimental features early",
   "lab.title": "Labs",
@@ -26,6 +30,11 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.barSpeed.title": "Velocidad de la barra con la cámara",
   "lab.barSpeed.body":
     "Mientras la cámara cuenta repeticiones, también muestra lo rápido que sube la barra, cuánto se ha frenado desde tu repetición más rápida y cuándo conviene terminar la serie. Añade tu altura en Tus datos para ver la velocidad en m/s.",
+  "lab.hrRest.title": "Descanso según el pulso",
+  "lab.hrRest.body":
+    "Con un pulsómetro o un reloj conectado, el descanso termina antes cuando tu pulso vuelve cerca del que tenías al empezar la serie. Nunca recorta más del 40 % del descanso previsto, y +30 s sigue añadiendo tiempo.",
+  "lab.hrRest.cut":
+    "Tu pulso ha vuelto a {bpm}, cerca de los {start} con los que empezaste la serie, así que el descanso es {saved} s más corto. Prepárate.",
   "lab.row": "Labs",
   "lab.rowNote": "Prueba funciones experimentales antes que nadie",
   "lab.title": "Labs",
@@ -43,6 +52,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.barSpeed.title": "Vitesse de barre par la caméra",
   "lab.barSpeed.body":
     "Pendant que la caméra compte les répétitions, elle montre aussi la vitesse de la barre, son ralentissement depuis votre répétition la plus rapide et le moment de finir la série. Ajoutez votre taille dans Vos mesures pour des vitesses en m/s.",
+  "lab.hrRest.title": "Repos selon le pouls",
+  "lab.hrRest.body":
+    "Avec une ceinture cardio ou une montre connectée, le repos se termine plus tôt dès que votre pouls revient près de celui du début de la série. Il ne retire jamais plus de 40 % du repos prévu, et +30 s ajoute toujours du temps.",
+  "lab.hrRest.cut":
+    "Votre pouls est revenu à {bpm}, proche des {start} du début de la série : le repos est raccourci de {saved} s. Préparez-vous.",
   "lab.row": "Labs",
   "lab.rowNote": "Essayez les fonctions expérimentales en avant-première",
   "lab.title": "Labs",
@@ -61,6 +75,11 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.barSpeed.title": "Stangengeschwindigkeit per Kamera",
   "lab.barSpeed.body":
     "Während die Kamera Wiederholungen zählt, zeigt sie auch, wie schnell sich die Stange bewegt, wie stark sie seit deiner schnellsten Wiederholung langsamer wurde und wann du den Satz beenden solltest. Trag deine Größe unter Deine Daten ein, um Geschwindigkeiten in m/s zu sehen.",
+  "lab.hrRest.title": "Pause nach Puls",
+  "lab.hrRest.body":
+    "Mit verbundenem Pulsgurt oder verbundener Uhr endet die Pause früher, sobald dein Puls wieder nahe am Wert vom Satzbeginn ist. Sie wird nie um mehr als 40 % der geplanten Pause gekürzt, und +30 s verlängert weiterhin.",
+  "lab.hrRest.cut":
+    "Dein Puls ist wieder bei {bpm}, nahe den {start} vom Satzbeginn, deshalb ist die Pause {saved} s kürzer. Mach dich bereit.",
   "lab.row": "Labs",
   "lab.rowNote": "Probiere experimentelle Funktionen früher aus",
   "lab.title": "Labs",
@@ -79,6 +98,11 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.barSpeed.title": "Velocità del bilanciere con la fotocamera",
   "lab.barSpeed.body":
     "Mentre la fotocamera conta le ripetizioni, mostra anche quanto velocemente si muove il bilanciere, quanto ha rallentato rispetto alla tua ripetizione più veloce e quando è il momento di chiudere la serie. Aggiungi la tua altezza in I tuoi dati per le velocità in m/s.",
+  "lab.hrRest.title": "Recupero in base al battito",
+  "lab.hrRest.body":
+    "Con una fascia cardio o un orologio collegato, il recupero finisce prima quando la frequenza cardiaca torna vicina a quella di inizio serie. Non toglie mai più del 40% del recupero previsto, e +30 s aggiunge sempre tempo.",
+  "lab.hrRest.cut":
+    "La frequenza cardiaca è tornata a {bpm}, vicino ai {start} di inizio serie, quindi il recupero è più corto di {saved} s. Preparati.",
   "lab.row": "Labs",
   "lab.rowNote": "Prova in anteprima le funzioni sperimentali",
   "lab.title": "Labs",
@@ -96,6 +120,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.barSpeed.title": "カメラでバースピード",
   "lab.barSpeed.body":
     "カメラがレップを数えている間、バーの速さ、いちばん速いレップからどれだけ落ちたか、セットを終えるタイミングも表示します。m/s で表示するには「あなたのデータ」に身長を入力してください。",
+  "lab.hrRest.title": "心拍数で休憩タイマー",
+  "lab.hrRest.body":
+    "心拍計やウォッチを接続していると、心拍数がセット開始時の近くまで戻った時点で休憩を早めに終えます。予定の休憩の40%より多くは短縮せず、+30秒でいつでも延長できます。",
+  "lab.hrRest.cut": "心拍数が{bpm}まで戻り、セット開始時の{start}に近づいたので、休憩を{saved}秒短くしました。準備してください。",
   "lab.row": "Labs",
   "lab.rowNote": "試験中の機能をいち早く試せます",
   "lab.title": "Labs",

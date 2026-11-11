@@ -42,10 +42,12 @@ export function UndoChip({ now, warmup }: { now: number; warmup: boolean }) {
 
 /**
  * Heart-rate-ready rest: once the heart rate is back near where the last set started, one line says so
- * (with a light tick, once). It never ends the rest by itself.
+ * (with a light tick, once). It never ends the rest by itself, unless the heart-rate rest timer lab cut
+ * it (Workout.tsx), and then it says so and by how much.
  */
 export function HrReadyLine({ active, setStart, now }: { active: Active; setStart: number | undefined; now: number }) {
-  const r = setStart && active.restStart ? hrReady(active, setStart, active.restStart, now) : null;
+  const cut = active.hrCut && active.hrCut.restStart === active.restStart ? active.hrCut : null;
+  const r = cut ?? (setStart && active.restStart ? hrReady(active, setStart, active.restStart, now) : null);
   const told = useRef<number | undefined>(undefined);
   useEffect(() => {
     if (r && told.current !== active.restStart) {
@@ -55,9 +57,14 @@ export function HrReadyLine({ active, setStart, now }: { active: Active; setStar
   }, [r, active.restStart]);
   if (!r) return null;
   return (
-    <p className="animate-rise mt-3 flex items-start gap-2 rounded-xl bg-heart/10 px-3 py-2 text-sm text-ink" data-testid="hr-ready">
+    <p
+      className="animate-rise mt-3 flex items-start gap-2 rounded-xl bg-heart/10 px-3 py-2 text-sm text-ink"
+      data-testid={cut ? "hr-cut" : "hr-ready"}
+    >
       <Icon name="heart" size={16} filled strokeWidth={1.5} className="mt-0.5 shrink-0 text-heart" />
-      <span>{t("pol.ready", { bpm: r.bpm, start: r.start })}</span>
+      <span>
+        {cut ? t("lab.hrRest.cut", { bpm: cut.bpm, start: cut.start, saved: cut.saved }) : t("pol.ready", { bpm: r.bpm, start: r.start })}
+      </span>
     </p>
   );
 }
