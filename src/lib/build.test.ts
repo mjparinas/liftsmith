@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { commitUrl, shortCommit, versionLabel } from "./build";
+import { shortCommit, versionLabel } from "./build";
 
 describe("build stamp", () => {
   it("shortens a commit hash to seven characters", () => {
@@ -11,11 +11,6 @@ describe("build stamp", () => {
   it("says dev when the build couldn't tell", () => {
     expect(shortCommit("")).toBe("dev");
     expect(shortCommit("not-a-hash")).toBe("dev");
-    expect(commitUrl("")).toBeNull();
-  });
-
-  it("links the commit on GitHub", () => {
-    expect(commitUrl("3336dee")).toBe("https://github.com/mjparinas/liftsmith/commit/3336dee");
   });
 
   it("adds the store build number on the phone apps", () => {
