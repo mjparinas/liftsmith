@@ -3,7 +3,7 @@
 /*
  * Liftsmith design tokens (design pass, 2026-11-09). Dark navy base, one blue brand accent with a
  * blue-to-violet gradient for primary actions, and a small set of supporting hues used as tints:
- * violet (levels, Pro), cyan (rest, recovery), ember (streaks, push days), mint (done, fresh).
+ * violet (levels, Pro), cyan (rest, recovery), ember (streaks), mint (done, fresh).
  * Green, amber and red still mean status only. Every text pairing passes WCAG AA on --color-surface.
  */
 @theme {
@@ -167,6 +167,21 @@
   --band-ready-cvd: #8fd0ff;
   --band-recovering-cvd: #ffb000;
   --band-fatigued-cvd: #e8467c;
+  /* Today's call and the "How do you feel?" chips share one language (Melvin, 2026-11-11: Go easy in
+     cyan read as As planned's blue, and every feel chip looked the same). Like a traffic light: amber
+     slows down (Go easy, Low), blue is as planned (As planned, Okay), green goes (Push, Great); Sore
+     is red and Unwell violet. Colour-blind safe: amber, blue, teal, pink and lilac. a11y.test.ts
+     checks they stay apart and are readable as text. */
+  --call-easy-std: #f5b544;
+  --call-normal-std: #4c8dff;
+  --call-push-std: #34d399;
+  --feel-sore-std: #f0605d;
+  --feel-unwell-std: #a78bfa;
+  --call-easy-cvd: #ffb000;
+  --call-normal-cvd: #4c8dff;
+  --call-push-cvd: #5ee0d0;
+  --feel-sore-cvd: #ff6b9a;
+  --feel-unwell-cvd: #c9b8ff;
   /* Effects: primary gradient, its ink, the screen glow, card sheen and shadow. */
   --grad-a: #5b9cff;
   --grad-b: #7f8bff;
@@ -250,6 +265,16 @@
   --band-ready-cvd: #3f97d1;
   --band-recovering-cvd: #b36b00;
   --band-fatigued-cvd: #c0254b;
+  --call-easy-std: #8a5100;
+  --call-normal-std: #1d4fc4;
+  --call-push-std: #0a7350;
+  --feel-sore-std: #a82222;
+  --feel-unwell-std: #6b3fc4;
+  --call-easy-cvd: #8a5100;
+  --call-normal-cvd: #3a3fc8;
+  --call-push-cvd: #007a6a;
+  --feel-sore-cvd: #b3245e;
+  --feel-unwell-cvd: #6b4fa0;
   --color-gold: #775600;
   --tier-bronze: #7f4e22;
   --tier-silver: #535f6f;
@@ -310,6 +335,16 @@
     --band-ready-cvd: #3f97d1;
     --band-recovering-cvd: #b36b00;
     --band-fatigued-cvd: #c0254b;
+    --call-easy-std: #8a5100;
+    --call-normal-std: #1d4fc4;
+    --call-push-std: #0a7350;
+    --feel-sore-std: #a82222;
+    --feel-unwell-std: #6b3fc4;
+    --call-easy-cvd: #8a5100;
+    --call-normal-cvd: #3a3fc8;
+    --call-push-cvd: #007a6a;
+    --feel-sore-cvd: #b3245e;
+    --feel-unwell-cvd: #6b4fa0;
     --color-gold: #775600;
     --tier-bronze: #7f4e22;
     --tier-silver: #535f6f;
@@ -339,6 +374,11 @@
   --band-ready: var(--band-ready-std);
   --band-recovering: var(--band-recovering-std);
   --band-fatigued: var(--band-fatigued-std);
+  --call-easy: var(--call-easy-std);
+  --call-normal: var(--call-normal-std);
+  --call-push: var(--call-push-std);
+  --feel-sore: var(--feel-sore-std);
+  --feel-unwell: var(--feel-unwell-std);
 }
 :root[data-cvd="on"] {
   --color-good: var(--good-cvd);
@@ -348,6 +388,11 @@
   --band-ready: var(--band-ready-cvd);
   --band-recovering: var(--band-recovering-cvd);
   --band-fatigued: var(--band-fatigued-cvd);
+  --call-easy: var(--call-easy-cvd);
+  --call-normal: var(--call-normal-cvd);
+  --call-push: var(--call-push-cvd);
+  --feel-sore: var(--feel-sore-cvd);
+  --feel-unwell: var(--feel-unwell-cvd);
 }
 
 /* More contrast (Settings › Accessibility, or the phone's increase-contrast setting when set to

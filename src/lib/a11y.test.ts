@@ -94,6 +94,17 @@ function closest(hexes: string[], kind: string): number {
   return min;
 }
 
+/** The hue angle in OKLab, which follows how people see hue far better than CIE Lab in the blues. */
+function okHue(hex: string): number {
+  const [r, g, b] = rgb(hex);
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+  const a = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+  const bb = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+  return ((Math.atan2(bb, a) * 180) / Math.PI + 360) % 360;
+}
+
 const BANDS = ["fresh", "ready", "recovering", "fatigued"];
 const THEMES = { dark: DARK, light: LIGHT } as const;
 
@@ -162,6 +173,53 @@ describe("colour tokens", () => {
         ),
       ).toBeGreaterThanOrEqual(25);
     });
+
+    // Today's call (Go easy, As planned, Push) and the "How do you feel?" chips (Low, Okay, Great share
+    // the call colours; Sore, Unwell). Go easy used to be cyan beside As planned's blue, only 54° of
+    // hue apart, and read as the same colour (Melvin, 2026-11-11).
+    const CALLS = ["--call-easy", "--call-normal", "--call-push"];
+    const FEELS = [...CALLS, "--feel-sore", "--feel-unwell"];
+    for (const set of ["std", "cvd"]) {
+      it(`${name} ${set}: the readiness call and feel colours are readable text on every surface`, () => {
+        for (const c of FEELS) {
+          for (const bg of ["--color-bg", "--color-surface"])
+            expect(contrast(t[`${c}-${set}`], t[bg]), `${c} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+        }
+      });
+    }
+
+    it(`${name}: the three readiness calls are clearly different hues`, () => {
+      const hues = CALLS.map((c) => okHue(t[`${c}-std`]));
+      for (let i = 0; i < hues.length; i++)
+        for (let j = i + 1; j < hues.length; j++) {
+          const gap = Math.abs(hues[i] - hues[j]);
+          expect(Math.min(gap, 360 - gap), `${CALLS[i]} and ${CALLS[j]}`).toBeGreaterThanOrEqual(75);
+        }
+      expect(
+        closest(
+          FEELS.map((c) => t[`${c}-std`]),
+          "normal",
+        ),
+      ).toBeGreaterThanOrEqual(20);
+    });
+
+    it(`${name}: the colour-blind safe call colours stay apart for every kind of colour vision`, () => {
+      for (const kind of Object.keys(SIM)) {
+        expect(
+          closest(
+            CALLS.map((c) => t[`${c}-cvd`]),
+            kind,
+          ),
+          kind,
+        ).toBeGreaterThanOrEqual(24);
+      }
+      expect(
+        closest(
+          FEELS.map((c) => t[`${c}-cvd`]),
+          "normal",
+        ),
+      ).toBeGreaterThanOrEqual(20);
+    });
   }
 
   // Every plate size in the gym presets and the plate calculator gets its own colour, readable in both themes.
@@ -188,6 +246,7 @@ describe("colour tokens", () => {
   it("picks the set by data-cvd and keeps every status colour behind a token", () => {
     expect(block(":root {\n  --color-good: var(--good-std);")["--band-fatigued"]).toBe("var(--band-fatigued-std)");
     expect(block(':root[data-cvd="on"]')["--color-bad"]).toBe("var(--bad-cvd)");
+    expect(block(':root[data-cvd="on"]')["--call-easy"]).toBe("var(--call-easy-cvd)");
     // The heart stays red with colour-blind safe colours: it's an identity colour, not a status.
     expect(block(':root[data-cvd="on"]')["--color-heart"]).toBeUndefined();
   });

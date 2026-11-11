@@ -34,7 +34,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CALL_STYLE, muscleHue } from "./theme";
+import { CALL_STYLE, FEEL_HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { Button, Chip, EmptyState, LinkToggle, ProTag, Ring, Section } from "./ui";
 
@@ -70,9 +70,9 @@ function FeelCheckIn({ now }: { now: number }) {
   const { events, feel } = useApp();
   const said = todayFeel(events, now);
   const energies = [
-    { v: -1, key: "td.feelLow" },
-    { v: 0, key: "td.feelOk" },
-    { v: 1, key: "td.feelGreat" },
+    { v: -1, key: "td.feelLow", hue: FEEL_HUE.low },
+    { v: 0, key: "td.feelOk", hue: FEEL_HUE.ok },
+    { v: 1, key: "td.feelGreat", hue: FEEL_HUE.great },
   ] as const;
   return (
     <div className="mt-3" role="group" aria-labelledby="feel-title">
@@ -81,14 +81,14 @@ function FeelCheckIn({ now }: { now: number }) {
       </p>
       <div className="mt-2 flex flex-wrap gap-2">
         {energies.map((e) => (
-          <Chip key={e.v} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
+          <Chip key={e.v} hue={e.hue} active={said?.energy === e.v} onClick={() => feel({ energy: e.v })}>
             {t(e.key)}
           </Chip>
         ))}
-        <Chip active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
+        <Chip hue={FEEL_HUE.sore} active={!!said?.sore} onClick={() => feel({ sore: !said?.sore })}>
           {t("td.feelSore")}
         </Chip>
-        <Chip active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
+        <Chip hue={FEEL_HUE.unwell} active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
           {t("td.feelUnwell")}
         </Chip>
       </div>
@@ -311,13 +311,15 @@ export function Today() {
                   style={
                     on
                       ? {
-                          background: `color-mix(in srgb, ${hue} 22%, var(--color-surface))`,
-                          boxShadow: `inset 0 0 0 1px color-mix(in srgb, ${hue} 55%, transparent)`,
+                          background: `color-mix(in srgb, ${hue} 30%, var(--color-surface))`,
+                          boxShadow: `inset 0 0 0 1.5px color-mix(in srgb, ${hue} 75%, transparent)`,
                         }
                       : undefined
                   }
                 >
-                  <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} className={on ? "" : "opacity-70"} />
+                  <span className="inline-flex" style={{ color: hue }}>
+                    <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} />
+                  </span>
                   {c === "recover" ? t("td.goEasy") : c === "normal" ? t("td.asPlanned") : t("td.push")}
                 </button>
               );

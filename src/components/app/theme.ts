@@ -41,9 +41,21 @@ export const FAMILY_HUE: Record<Family, string> = { push: HUE.accent, pull: HUE.
 export const familyOf = (m: Muscle): Family => FAMILY[m];
 export const muscleHue = (m: Muscle): string => FAMILY_HUE[FAMILY[m]];
 
-/** Today's call: push days glow ember, easy days cool cyan, normal days brand blue. */
+/** Today's call, like a traffic light: easy days amber, normal days blue, push days green (their own
+ *  tokens, with a colour-blind safe set, so the three never look alike; Melvin, 2026-11-11). The
+ *  "How do you feel?" chips use the same colours for what they lead to (FEEL_HUE). */
 export const CALL_STYLE: Record<Call, { hue: string; icon: IconName }> = {
-  push: { hue: HUE.ember, icon: "bolt" },
-  normal: { hue: HUE.accent, icon: "target" },
-  recover: { hue: HUE.cyan, icon: "leaf" },
+  push: { hue: "var(--call-push)", icon: "bolt" },
+  normal: { hue: "var(--call-normal)", icon: "target" },
+  recover: { hue: "var(--call-easy)", icon: "leaf" },
 };
+
+/** The "How do you feel?" chips: Low, Okay and Great share the colour of the call they lean toward;
+ *  Sore is red and Unwell violet. */
+export const FEEL_HUE = {
+  low: "var(--call-easy)",
+  ok: "var(--call-normal)",
+  great: "var(--call-push)",
+  sore: "var(--feel-sore)",
+  unwell: "var(--feel-unwell)",
+} as const;
