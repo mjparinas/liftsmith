@@ -124,4 +124,46 @@ describe("Sheet", () => {
     expect(sheet.parentElement!.style.animation).toBe("none");
     fireEvent.touchEnd(handle, { touches: [] });
   });
+
+  it("drags down with a mouse from the handle or the title row, but not from the content", () => {
+    vi.useFakeTimers();
+    const onClose = vi.fn();
+    render(
+      <Sheet open onClose={onClose} title="Cycle-aware readiness">
+        <p>Body</p>
+      </Sheet>,
+    );
+    const sheet = screen.getByRole("dialog");
+    const mouse = (el: Element, dy: number) => {
+      const at = (y: number) => ({ pointerId: 1, pointerType: "mouse", button: 0, clientX: 100, clientY: y });
+      fireEvent.pointerDown(el, at(100));
+      fireEvent.pointerMove(el, at(100 + dy / 2));
+      fireEvent.pointerMove(el, at(100 + dy));
+      fireEvent.pointerUp(el, at(100 + dy));
+    };
+    // From the content, a mouse selects text: no drag.
+    mouse(screen.getByText("Body"), 200);
+    // A short pull from the handle follows the mouse, then springs back.
+    const handle = sheet.querySelector("[data-sheet-handle]")!;
+    fireEvent.pointerDown(handle, { pointerId: 1, pointerType: "mouse", button: 0, clientX: 100, clientY: 100 });
+    fireEvent.pointerMove(handle, { pointerId: 1, pointerType: "mouse", button: 0, clientX: 100, clientY: 130 });
+    expect(sheet.style.transform).toBe("translateY(30px)");
+    fireEvent.pointerUp(handle, { pointerId: 1, pointerType: "mouse", button: 0, clientX: 100, clientY: 130 });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    expect(sheet.style.transform).toBe("");
+    // Pressing the close button isn't a drag; dragging the title row far enough closes.
+    mouse(screen.getByRole("button", { name: "Close" }), 200);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(onClose).not.toHaveBeenCalled();
+    mouse(screen.getByText("Cycle-aware readiness"), 200);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });
