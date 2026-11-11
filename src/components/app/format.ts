@@ -12,6 +12,7 @@ export function loadText(ex: Exercise, kg: number, unit: Unit): string {
 }
 
 export function repsText(ex: Exercise, reps: number): string {
+  if (ex.cardio) return clock(reps);
   return TIMED.has(ex.id) ? t("fmt.seconds", { n: fmtNum(reps) }) : t("fmt.reps", { n: fmtNum(reps), count: reps });
 }
 

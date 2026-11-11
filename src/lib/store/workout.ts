@@ -1,4 +1,5 @@
 import { track } from "../analytics";
+import { startDistance } from "../cardio";
 import { derive } from "../derive";
 import { exercise } from "../exercises";
 import { injuredTarget, planSeconds, setSeconds, type Plan, type PlanItem, type SetTarget } from "../generator";
@@ -33,6 +34,8 @@ export interface Active {
    * left. Unset means both sides did `reps`, which keeps logging to one tap.
    */
   repsR?: number;
+  /** Cardio logged with distance: metres for the next set, editable with a stepper. */
+  distanceM?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -91,7 +94,8 @@ export function loadItem(get: () => State, a: Active, index: number): Active {
   const warm = started ? (item.warmup?.length ?? 0) : 0;
   const first = !started && item.warmup?.[0];
   const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
-  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps };
+  const distanceM = startDistance(exercise(item.exerciseId), get().events);
+  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM };
 }
 
 /** How long Undo stays offered after Log set when there's no rest to wait through. */
@@ -130,6 +134,8 @@ export interface WorkoutSlice {
   adjust(weight: number, reps: number): void;
   /** Right side's reps on a per-side exercise; undefined goes back to "both sides the same". */
   adjustRight(reps: number | undefined): void;
+  /** Sets the next cardio set's distance (metres). */
+  adjustDistance(m: number): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Starts the rest timer by hand (when auto-start is off in Workout preferences). */
@@ -358,6 +364,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
           implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
+          ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
@@ -464,6 +471,14 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const a = get().active;
       if (!a) return;
       const next = { ...a, weight: Math.max(0, weight), reps: Math.max(1, reps), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    adjustDistance(m) {
+      const a = get().active;
+      if (!a) return;
+      const next = { ...a, distanceM: Math.max(0, Math.round(m)), lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },

@@ -175,6 +175,9 @@ describe("undo the last set", () => {
   });
   it("undoes a warm-up too", () => {
     const s = useApp.getState;
+    // The gym's id is random, so the plan is too: put an exercise with warm-ups first.
+    const w = s().preview!.items.findIndex((i) => !!i.warmup?.length);
+    if (w > 0) s().moveExercise(w, 0);
     s().start();
     expect(s().active!.plan.items[0]!.warmup?.length).toBeGreaterThan(0);
     s().logSet();

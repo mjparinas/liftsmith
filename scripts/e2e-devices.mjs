@@ -65,7 +65,7 @@ for (const { name } of pick()) {
     if (await skipWarm.isVisible()) await skipWarm.click();
     await page.getByRole("button", { name: /Log (set|warm-up)/ }).click();
     await noSideScroll("rest");
-    await page.getByRole("button", { name: "End" }).click();
+    await page.getByRole("button", { name: "End", exact: true }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();
     await page.getByRole("button", { name: "Done", exact: true }).click();
     for (const tab of ["Body", "Progress", "Gyms"]) {

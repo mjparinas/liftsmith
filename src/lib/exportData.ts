@@ -49,6 +49,7 @@ export const CSV_HEADER = [
   "Avg HR",
   "Max HR",
   "Type",
+  "Distance km",
 ];
 
 /** Every working set, oldest first. Weights in the lifter's unit; dumbbells are per hand. */
@@ -83,6 +84,7 @@ export function setsCsv(events: readonly AppEvent[], unit: Unit): string {
         s.hrAvg,
         s.hrMax,
         s.tag === "drop" ? "drop" : s.tag === "restPause" ? "rest-pause" : failed.has(s.id) ? "failure" : "",
+        s.distanceM !== undefined ? Math.round(s.distanceM) / 1000 : "",
       ]
         .map(cell)
         .join(","),

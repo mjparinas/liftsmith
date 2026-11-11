@@ -6,6 +6,7 @@ import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
+import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { queueStrava, stravaWorkout } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
@@ -334,32 +335,50 @@ export function Workout() {
           onUp: () => s.adjust(stepLoad(active.weight, 1, ex, gym), active.reps),
         }
       : null;
+  const cardio = ex?.cardio;
+  const dist = distUnit(profile.unit);
   const repStep =
-    ex && active
+    ex && active && cardio
       ? {
-          label: sidesSplit ? t("workout.left") : t("workout.reps"),
-          suffix: TIMED.has(ex.id)
-            ? t("workout.seconds")
-            : sidesSplit
-              ? t("workout.leftReps")
-              : perSide(ex.id)
-                ? t("workout.repsEachSide")
-                : t("workout.reps"),
-          value: String(active.reps),
-          onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
-          onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+          label: t("workout.time"),
+          suffix: t("workout.minSec"),
+          value: clock(active.reps),
+          onDown: () => s.adjust(active.weight, Math.max(60, active.reps - 60)),
+          onUp: () => s.adjust(active.weight, active.reps + 60),
         }
-      : null;
+      : ex && active
+        ? {
+            label: sidesSplit ? t("workout.left") : t("workout.reps"),
+            suffix: TIMED.has(ex.id)
+              ? t("workout.seconds")
+              : sidesSplit
+                ? t("workout.leftReps")
+                : perSide(ex.id)
+                  ? t("workout.repsEachSide")
+                  : t("workout.reps"),
+            value: String(active.reps),
+            onDown: () => s.adjust(active.weight, active.reps - (TIMED.has(ex.id) ? 5 : 1)),
+            onUp: () => s.adjust(active.weight, active.reps + (TIMED.has(ex.id) ? 5 : 1)),
+          }
+        : null;
   const rightStep =
-    ex && active && sidesSplit
+    ex && active && cardio === "distance"
       ? {
-          label: t("workout.right"),
-          suffix: t("workout.rightReps"),
-          value: String(active.repsR),
-          onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)),
-          onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1),
+          label: t("workout.distance"),
+          suffix: dist,
+          value: fmtNum(fromMetres(active.distanceM ?? 0, dist)),
+          onDown: () => s.adjustDistance(bumpDistance(active.distanceM ?? 0, -1, ex, dist)),
+          onUp: () => s.adjustDistance(bumpDistance(active.distanceM ?? 0, 1, ex, dist)),
         }
-      : null;
+      : ex && active && sidesSplit
+        ? {
+            label: t("workout.right"),
+            suffix: t("workout.rightReps"),
+            value: String(active.repsR),
+            onDown: () => s.adjustRight(Math.max(0, (active.repsR ?? active.reps) - 1)),
+            onUp: () => s.adjustRight((active.repsR ?? active.reps) + 1),
+          }
+        : null;
   const barbell = ex?.load === "barbell";
   const bar = ex && barbell ? barFor(ex, gym) : null;
   const loading = ex && bar ? loadBar(fromKg(active.weight, unit), bar.weight, gym.plates) : null;

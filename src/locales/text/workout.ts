@@ -46,6 +46,9 @@ export const en = {
   "workout.tooHard": "Too hard",
   "workout.notify.over": "Rest over",
   "workout.notify.next": "Up next: {next}",
+  "workout.time": "Time",
+  "workout.minSec": "min:sec",
+  "workout.distance": "Distance",
 } as const;
 
 type Key = keyof typeof en;
@@ -93,6 +96,9 @@ export const es: Partial<Record<Key, Message>> = {
   "workout.tooHard": "Demasiado duro",
   "workout.notify.over": "Fin del descanso",
   "workout.notify.next": "Siguiente: {next}",
+  "workout.time": "Tiempo",
+  "workout.minSec": "min:s",
+  "workout.distance": "Distancia",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -138,6 +144,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "workout.tooHard": "Trop dur",
   "workout.notify.over": "Fin du repos",
   "workout.notify.next": "Ensuite : {next}",
+  "workout.time": "Durée",
+  "workout.minSec": "min:s",
+  "workout.distance": "Distance",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -183,6 +192,9 @@ export const de: Partial<Record<Key, Message>> = {
   "workout.tooHard": "Zu schwer",
   "workout.notify.over": "Pause vorbei",
   "workout.notify.next": "Als Nächstes: {next}",
+  "workout.time": "Zeit",
+  "workout.minSec": "Min:Sek",
+  "workout.distance": "Strecke",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -228,6 +240,9 @@ export const it: Partial<Record<Key, Message>> = {
   "workout.tooHard": "Troppo duro",
   "workout.notify.over": "Riposo finito",
   "workout.notify.next": "Prossima: {next}",
+  "workout.time": "Tempo",
+  "workout.minSec": "min:s",
+  "workout.distance": "Distanza",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -273,4 +288,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "workout.tooHard": "きつすぎた",
   "workout.notify.over": "休憩終了",
   "workout.notify.next": "次：{next}",
+  "workout.time": "時間",
+  "workout.minSec": "分:秒",
+  "workout.distance": "距離",
 };

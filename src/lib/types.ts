@@ -56,10 +56,23 @@ export const EQUIPMENT = [
   "smith",
   "hackSquat",
   "calfMachine",
+  "hipMachine",
+  "preacher",
+  "assistedPullup",
   "bands",
   "rings",
   "box",
   "abWheel",
+  "medicineBall",
+  "jumpRope",
+  "treadmill",
+  "rower",
+  "bike",
+  "elliptical",
+  "stairClimber",
+  "skiErg",
+  "sled",
+  "battleRopes",
 ] as const;
 export type Equipment = (typeof EQUIPMENT)[number];
 
@@ -95,20 +108,29 @@ export const EQUIPMENT_GROUPS: { title: string; items: Equipment[] }[] = [
       "smith",
       "hackSquat",
       "calfMachine",
+      "hipMachine",
+      "preacher",
+      "assistedPullup",
     ],
   },
   {
     get title() {
       return t("equipment.group.small");
     },
-    items: ["bands", "rings", "abWheel"],
+    items: ["bands", "rings", "abWheel", "medicineBall", "jumpRope"],
+  },
+  {
+    get title() {
+      return t("equipment.group.cardio");
+    },
+    items: ["treadmill", "rower", "bike", "elliptical", "stairClimber", "skiErg", "sled", "battleRopes"],
   },
 ];
 
 /** How an exercise is loaded decides how its weight is rounded and drawn. */
 export type LoadKind = "barbell" | "dumbbell" | "kettlebell" | "machine" | "bodyweight";
 
-export type Pattern = "squat" | "hinge" | "lunge" | "hpush" | "vpush" | "hpull" | "vpull" | "carry" | "core" | "isolation";
+export type Pattern = "squat" | "hinge" | "lunge" | "hpush" | "vpush" | "hpull" | "vpull" | "carry" | "core" | "isolation" | "cardio";
 
 export interface Exercise {
   id: string;
@@ -126,6 +148,11 @@ export interface Exercise {
   cues: string[];
   /** The lifter made it. Used in swaps and logging, not picked by the generator. */
   custom?: boolean;
+  /**
+   * Cardio (pattern "cardio"): logged as time (reps are seconds), plus distance for "distance". Never
+   * picked by the generator; added to a routine or a workout by the lifter.
+   */
+  cardio?: "distance" | "time";
 }
 
 export interface Bar {
@@ -398,6 +425,8 @@ export interface SetEvent extends EventBase {
   reps: number;
   /** Reps (or seconds for holds) the plan asked for. */
   targetReps: number;
+  /** Metres covered, for cardio logged with distance (reps are then the seconds it took). */
+  distanceM?: number;
   /** Reps in reserve the plan aimed for. */
   rir: number;
   // Captured automatically (Melvin, 2026-11-09: "win on data"). Optional so older events still load.

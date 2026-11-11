@@ -31,6 +31,8 @@ export const en = {
   "note.fixReset": "Plateau fix: about 10% lighter, then build back",
   "note.fixReps": "Plateau fix: {reps} reps for three weeks",
   "note.fixSwap": "Plateau fix: {name} instead of {was} for three weeks",
+  "note.cardioFirst": "First time: 20 minutes at a steady pace, change it to suit you",
+  "note.cardioAgain": "Same as last time; go a little longer or further if it felt easy",
 } as const;
 
 type Key = keyof typeof en;
@@ -63,6 +65,8 @@ export const es: Partial<Record<Key, Message>> = {
   "note.fixReset": "Plan contra el estancamiento: un 10 % menos de peso y volver a subir",
   "note.fixReps": "Plan contra el estancamiento: {reps} repeticiones durante tres semanas",
   "note.fixSwap": "Plan contra el estancamiento: {name} en lugar de {was} durante tres semanas",
+  "note.cardioFirst": "Primera vez: 20 minutos a ritmo constante, ajústalo a tu gusto",
+  "note.cardioAgain": "Igual que la última vez; un poco más de tiempo o distancia si te resultó fácil",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -93,6 +97,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "note.fixReset": "Plan anti-plateau : environ 10 % plus léger, puis on remonte",
   "note.fixReps": "Plan anti-plateau : {reps} répétitions pendant trois semaines",
   "note.fixSwap": "Plan anti-plateau : {name} à la place de {was} pendant trois semaines",
+  "note.cardioFirst": "Première fois : 20 minutes à allure régulière, ajustez selon vous",
+  "note.cardioAgain": "Comme la dernière fois ; un peu plus long ou plus loin si c’était facile",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -123,6 +129,8 @@ export const de: Partial<Record<Key, Message>> = {
   "note.fixReset": "Plateau-Lösung: etwa 10 % leichter, dann wieder aufbauen",
   "note.fixReps": "Plateau-Lösung: {reps} Wdh. für drei Wochen",
   "note.fixSwap": "Plateau-Lösung: {name} statt {was} für drei Wochen",
+  "note.cardioFirst": "Erstes Mal: 20 Minuten in gleichmäßigem Tempo, nach Bedarf anpassen",
+  "note.cardioAgain": "Wie beim letzten Mal; etwas länger oder weiter, wenn es leicht war",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -153,6 +161,8 @@ export const it: Partial<Record<Key, Message>> = {
   "note.fixReset": "Soluzione stallo: circa il 10% più leggero, poi si risale",
   "note.fixReps": "Soluzione stallo: {reps} ripetizioni per tre settimane",
   "note.fixSwap": "Soluzione stallo: {name} al posto di {was} per tre settimane",
+  "note.cardioFirst": "Prima volta: 20 minuti a ritmo costante, adattalo a te",
+  "note.cardioAgain": "Come l’ultima volta; un po’ più a lungo o più lontano se è stato facile",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -180,4 +190,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "note.fixReset": "停滞の対策：約10%軽くしてから積み直す",
   "note.fixReps": "停滞の対策：3週間{reps}回で",
   "note.fixSwap": "停滞の対策：3週間{was}の代わりに{name}",
+  "note.cardioFirst": "初回：一定のペースで20分。自分に合わせて調整",
+  "note.cardioAgain": "前回と同じ。楽だったら少し長く、または遠くへ",
 };

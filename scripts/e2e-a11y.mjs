@@ -64,7 +64,7 @@ try {
   await scan("rest plate math");
   await page.getByRole("button", { name: "Breathe" }).click();
   await scan("rest breathing");
-  await page.getByRole("button", { name: "End" }).click();
+  await page.getByRole("button", { name: "End", exact: true }).click();
   await page.getByRole("button", { name: "Finish and save" }).click();
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
@@ -336,7 +336,7 @@ try {
     }
   }
   // A sheet: focus moves in, Tab stays in, Escape closes it and focus comes back.
-  await kp.getByRole("button", { name: "End" }).focus();
+  await kp.getByRole("button", { name: "End", exact: true }).focus();
   await kp.keyboard.press("Enter");
   const dialog = kp.getByRole("dialog");
   await dialog.waitFor();
