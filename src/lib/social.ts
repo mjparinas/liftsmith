@@ -89,7 +89,10 @@ export function refreshSocial(): Promise<void> {
   return inflight;
 }
 
-export const profileUrl = (handle: string) => `${SITE_URL}/app/#/person/${handle}`;
+/** A public profile's web page (src/server/publicProfile.ts). */
+export const publicPageUrl = (handle: string) => `${SITE_URL}/u/${handle}/`;
+/** The link a lifter shares: their public page when the profile is public, else the profile in the app. */
+export const profileUrl = (handle: string, isPublic = false) => (isPublic ? publicPageUrl(handle) : `${SITE_URL}/app/#/person/${handle}`);
 
 /**
  * The post for a finished workout: per exercise its sets and best set (by estimated one-rep max), the totals,

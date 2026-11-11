@@ -518,6 +518,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "offering", "TEXT"],
   ["creators", "ends_at", "INTEGER"],
   ["creators", "max_uses", "INTEGER"],
+  // Friends stage 2: a public profile (social.ts, publicProfile.ts).
+  ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

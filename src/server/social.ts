@@ -74,6 +74,7 @@ interface ProfileRow extends Row {
   open: number;
   auto_post: number;
   weights: number;
+  public: number;
   suspended: number;
   seen_at: number;
 }
@@ -84,6 +85,7 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   open: !!n(r.open),
   autoPost: !!n(r.auto_post),
   weights: !!n(r.weights),
+  public: !!n(r.public),
 });
 
 async function profileOf(accountId: string): Promise<ProfileRow | null> {
@@ -171,14 +173,17 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     name = c.name;
   }
   const flag = (v: unknown, was: unknown) => (typeof v === "boolean" ? (v ? 1 : 0) : n(was));
-  const open = flag(b.open, p.open);
+  // Public means anyone can follow too, so turning it on opens the profile and closing the profile makes it private.
+  const pub = b.open === false ? 0 : flag(b.public, p.public);
+  const open = pub ? 1 : flag(b.open, p.open);
   try {
-    await run("UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ? WHERE account_id = ?", [
+    await run("UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ? WHERE account_id = ?", [
       handle,
       name,
       open,
       flag(b.autoPost, p.auto_post),
       flag(b.weights, p.weights),
+      pub,
       accountId,
     ]);
   } catch {
@@ -232,11 +237,16 @@ async function follow(a: string, b: string): Promise<{ accepted: boolean } | nul
   return r ? { accepted: !!n(r.accepted) } : null;
 }
 
-/** Whether `viewer` can see `author`'s posts: their own, or an accepted follow with no block either way. */
+async function isPublic(accountId: string): Promise<boolean> {
+  const [r] = await query("SELECT public FROM social_profiles WHERE account_id = ? AND suspended = 0", [accountId]);
+  return !!n(r?.public);
+}
+
+/** Whether `viewer` can see `author`'s posts: their own, an accepted follow or a public profile, with no block either way. */
 async function canSee(viewer: string, author: string): Promise<boolean> {
   if (viewer === author) return true;
   const f = await follow(viewer, author);
-  return !!f?.accepted && !(await blockedEither(viewer, author));
+  return (!!f?.accepted || (await isPublic(author))) && !(await blockedEither(viewer, author));
 }
 
 /** A profile as `viewer` sees it, or null when it doesn't exist for them (suspended, or either blocked the other). */
@@ -264,8 +274,9 @@ async function card(viewer: string, p: ProfileRow): Promise<PersonCard | null> {
     posts: n(c?.posts),
     relation,
     followsYou: !!theirs?.accepted,
-    canSee: relation === "self" || relation === "following",
+    canSee: relation === "self" || relation === "following" || (relation !== "blocked" && !!n(p.public)),
     open: !!n(p.open),
+    public: !!n(p.public),
   };
 }
 

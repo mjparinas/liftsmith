@@ -13,7 +13,17 @@ import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { list as fmtList, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { copyText, shareUrl } from "@/lib/shareLinks";
-import { postWorkout, profileUrl, refreshSocial, social, socialError, socialOn, useSocial, type SocialMe } from "@/lib/social";
+import {
+  postWorkout,
+  profileUrl,
+  publicPageUrl,
+  refreshSocial,
+  social,
+  socialError,
+  socialOn,
+  useSocial,
+  type SocialMe,
+} from "@/lib/social";
 import {
   cleanHandle,
   HANDLE_RE,
@@ -554,15 +564,26 @@ function Privacy({
   open,
   autoPost,
   weights,
+  pub,
   set,
 }: {
   open: boolean;
   autoPost: boolean;
   weights: boolean;
+  /** Public profile, offered once joined (undefined while joining, which always starts private). */
+  pub?: boolean;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
     <Section title={t("friends.privacy")}>
+      {pub !== undefined && (
+        <SwitchRow
+          label={t("friends.public")}
+          hint={t(pub ? "friends.publicOn" : "friends.publicOff")}
+          on={pub}
+          onChange={(v) => set({ public: v })}
+        />
+      )}
       <SwitchRow
         label={t("friends.open")}
         hint={t(open ? "friends.openOn" : "friends.openOff")}
@@ -643,7 +664,20 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
         </Button>
       </form>
       <Note text={note} />
-      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} set={(c) => void save(c)} />
+      <Privacy open={p.open} autoPost={p.autoPost} weights={p.weights} pub={p.public} set={(c) => void save(c)} />
+      {p.public && (
+        <a
+          href={publicPageUrl(p.handle)}
+          target="_blank"
+          rel="noopener"
+          className="press card mt-2 flex min-h-11 items-center justify-between px-4 py-3 text-sm"
+        >
+          <span>{t("friends.publicPage")}</span>
+          <span aria-hidden className="text-muted">
+            ›
+          </span>
+        </a>
+      )}
       <Section title={t("friends.rules.title")}>
         <Rules />
       </Section>
@@ -814,7 +848,7 @@ function People() {
     go("person", h);
   };
   const share = async () => {
-    const url = profileUrl(handle);
+    const url = profileUrl(handle, !!me?.profile?.public);
     if (await shareUrl(url, t("friends.shareTitle"))) return;
     setNote((await copyText(url)) ? t("link.copied") : url);
   };
@@ -1035,7 +1069,11 @@ export function PersonScreen({ handle }: { handle: string }) {
   return (
     <div className="pb-8">
       <div className="flex items-end justify-between gap-2">
-        <ScreenHeader title={person.name} kicker={`@${person.handle}`} back={back} />
+        <ScreenHeader
+          title={person.name}
+          kicker={person.public ? `@${person.handle} · ${t("friends.person.public")}` : `@${person.handle}`}
+          back={back}
+        />
         {!self && (
           <button
             type="button"

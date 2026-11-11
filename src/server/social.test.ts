@@ -75,7 +75,7 @@ describe("joining", () => {
   it("needs the community rules agreed and a free handle, with private defaults", async () => {
     expect((await call("acc-a", "join", { handle: "alex" })).body.error).toBe("agree");
     const r = await join("acc-a", "alex");
-    expect(r.body.profile).toEqual({ handle: "alex", name: "ALEX", open: false, autoPost: false, weights: true });
+    expect(r.body.profile).toEqual({ handle: "alex", name: "ALEX", open: false, autoPost: false, weights: true, public: false });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
   });
@@ -109,6 +109,25 @@ describe("following", () => {
     await call("acc-b", "follow", { handle: "alex" });
     await call("acc-a", "update", { open: true });
     expect((await call("acc-b", "lookup", { handle: "alex" })).body.person).toMatchObject({ relation: "following" });
+  });
+});
+
+describe("public profiles", () => {
+  it("lets anyone see a public profile's workouts, opens it to follows, and closing it makes it private again", async () => {
+    await join("acc-a", "alex");
+    await call("acc-a", "post", workout());
+    await join("acc-c", "casey");
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: false, public: false });
+    expect((await call("acc-a", "update", { public: true })).body.profile).toMatchObject({ public: true, open: true });
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: true, public: true, relation: "none" });
+    expect((await call("acc-c", "person", { handle: "alex" })).body.posts).toHaveLength(1);
+    // Strangers see it but it isn't in their feed until they follow.
+    expect(await feedOf("acc-c")).toHaveLength(0);
+    await call("acc-a", "block", { handle: "casey" });
+    expect((await call("acc-c", "person", { handle: "alex" })).body.posts).toHaveLength(0);
+    await call("acc-a", "unblock", { handle: "casey" });
+    expect((await call("acc-a", "update", { open: false })).body.profile).toMatchObject({ public: false, open: false });
+    expect((await call("acc-c", "lookup", { handle: "alex" })).body.person).toMatchObject({ canSee: false });
   });
 });
 

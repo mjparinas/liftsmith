@@ -133,6 +133,12 @@ export const en = {
   "friends.err.old": "Only workouts from the last 90 days can be posted.",
   "friends.err.signedOut": "Signed out. Sign in again.",
   "friends.err.failed": "That didn’t work. Try again.",
+  "friends.public": "Public profile",
+  "friends.publicOn":
+    "Anyone can see your profile and workouts, on the web too, and search engines can list your page. Anyone can follow you.",
+  "friends.publicOff": "Only people who follow you see your workouts.",
+  "friends.publicPage": "See my public page",
+  "friends.person.public": "Public profile",
 } as const;
 
 type Key = keyof typeof en;
@@ -270,6 +276,12 @@ export const es: Partial<Record<Key, Message>> = {
   "friends.err.old": "Solo se pueden publicar entrenamientos de los últimos 90 días.",
   "friends.err.signedOut": "Sesión cerrada. Vuelve a iniciar sesión.",
   "friends.err.failed": "No funcionó. Inténtalo de nuevo.",
+  "friends.public": "Perfil público",
+  "friends.publicOn":
+    "Cualquiera puede ver tu perfil y tus entrenamientos, también en la web, y los buscadores pueden mostrar tu página. Cualquiera puede seguirte.",
+  "friends.publicOff": "Solo quienes te siguen ven tus entrenamientos.",
+  "friends.publicPage": "Ver mi página pública",
+  "friends.person.public": "Perfil público",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -404,6 +416,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "friends.err.old": "Seules les séances des 90 derniers jours peuvent être publiées.",
   "friends.err.signedOut": "Déconnecté. Reconnectez-vous.",
   "friends.err.failed": "Ça n’a pas marché. Réessayez.",
+  "friends.public": "Profil public",
+  "friends.publicOn":
+    "Tout le monde peut voir ton profil et tes séances, aussi sur le web, et les moteurs de recherche peuvent référencer ta page. Tout le monde peut te suivre.",
+  "friends.publicOff": "Seules les personnes qui te suivent voient tes séances.",
+  "friends.publicPage": "Voir ma page publique",
+  "friends.person.public": "Profil public",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -537,6 +555,12 @@ export const de: Partial<Record<Key, Message>> = {
   "friends.err.old": "Nur Trainings der letzten 90 Tage können gepostet werden.",
   "friends.err.signedOut": "Abgemeldet. Melde dich wieder an.",
   "friends.err.failed": "Das hat nicht geklappt. Versuch es nochmal.",
+  "friends.public": "Öffentliches Profil",
+  "friends.publicOn":
+    "Alle sehen dein Profil und deine Workouts, auch im Web, und Suchmaschinen können deine Seite anzeigen. Alle können dir folgen.",
+  "friends.publicOff": "Nur Leute, die dir folgen, sehen deine Workouts.",
+  "friends.publicPage": "Meine öffentliche Seite ansehen",
+  "friends.person.public": "Öffentliches Profil",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -671,6 +695,12 @@ export const it: Partial<Record<Key, Message>> = {
   "friends.err.old": "Si possono pubblicare solo allenamenti degli ultimi 90 giorni.",
   "friends.err.signedOut": "Disconnesso. Accedi di nuovo.",
   "friends.err.failed": "Non ha funzionato. Riprova.",
+  "friends.public": "Profilo pubblico",
+  "friends.publicOn":
+    "Chiunque può vedere il tuo profilo e i tuoi allenamenti, anche sul web, e i motori di ricerca possono mostrare la tua pagina. Chiunque può seguirti.",
+  "friends.publicOff": "Solo chi ti segue vede i tuoi allenamenti.",
+  "friends.publicPage": "Vedi la mia pagina pubblica",
+  "friends.person.public": "Profilo pubblico",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -805,4 +835,10 @@ export const ja: Partial<Record<Key, Message>> = {
   "friends.err.old": "投稿できるのは過去90日以内のワークアウトだけです。",
   "friends.err.signedOut": "サインアウトしました。もう一度サインインしてください。",
   "friends.err.failed": "うまくいきませんでした。もう一度お試しください。",
+  "friends.public": "公開プロフィール",
+  "friends.publicOn":
+    "誰でもプロフィールとワークアウトを見られます（ウェブでも）。検索エンジンにページが表示されることがあります。誰でもフォローできます。",
+  "friends.publicOff": "ワークアウトはフォロワーだけに表示されます。",
+  "friends.publicPage": "公開ページを見る",
+  "friends.person.public": "公開プロフィール",
 };

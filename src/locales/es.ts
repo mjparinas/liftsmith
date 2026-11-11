@@ -78,6 +78,7 @@ import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as pub from "./text/pub";
 import * as quest from "./text/quest";
 import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
@@ -193,6 +194,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...pro.es,
   ...prog.es,
   ...progress.es,
+  ...pub.es,
   ...quest.es,
   ...quote.es,
   ...rarity.es,

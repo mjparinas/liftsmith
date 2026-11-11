@@ -39,6 +39,11 @@ export interface SocialProfile {
   autoPost: boolean;
   /** Show weights on posts. On by default, like share cards. */
   weights: boolean;
+  /**
+   * Anyone can see the profile and its workouts, in the app and on the web (www.getliftsmith.com/u/<handle>/,
+   * listed in the people sitemap). Off by default; on also means anyone can follow.
+   */
+  public: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -56,6 +61,7 @@ export interface PersonCard {
   /** Whether their posts are visible to the reader. */
   canSee: boolean;
   open: boolean;
+  public: boolean;
 }
 
 export interface FeedPost {
