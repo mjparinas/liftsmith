@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { CTA_COPY, readMinutes, type Article, type Block } from "@/content/articles";
+import { topicOf, topicPath } from "@/content/blogTopics";
 import { BRAND } from "@/lib/brand";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { ogImage } from "@/lib/ogImages";
@@ -93,6 +94,7 @@ const longDate = (d: string) =>
 
 export function ArticleView({ a, related }: { a: Article; related: Article[] }) {
   const url = `${SITE_URL}${articlePath(a)}`;
+  const topic = a.kind === "blog" ? topicOf(a) : undefined;
   const section = a.kind === "guide" ? { href: "/guides/", label: "Guides" } : { href: "/blog/", label: "Blog" };
   const top = CTA_COPY[a.cta];
   const jsonLd: object[] = [
@@ -126,7 +128,9 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
   return (
     <article>
       <JsonLd data={jsonLd} />
-      <Crumbs items={[section, { label: a.title }]} />
+      <Crumbs
+        items={topic ? [section, { href: topicPath(topic), label: topic.name }, { label: a.title }] : [section, { label: a.title }]}
+      />
       <p className="mt-6 text-sm font-semibold tracking-wide text-accent uppercase">{a.tag}</p>
       <h1 className="mt-2 max-w-3xl text-3xl font-extrabold tracking-tight md:text-5xl">{a.title}</h1>
       <p className="mt-3 text-sm text-muted">

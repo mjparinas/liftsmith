@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BlogTopicChips } from "@/components/site/BlogTopicChips";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { readMinutes } from "@/content/articles";
 import { BRAND } from "@/lib/brand";
@@ -34,6 +35,7 @@ export default function BlogIndex() {
         Short, practical articles on lifting: what to do, why it works, and how to stop guessing. Every one ends with a way to put it into
         practice today.
       </p>
+      <BlogTopicChips />
       <CtaInline
         cta="blog-index-top"
         title={`Rather skip the reading? ${BRAND.name} plans it all for you.`}

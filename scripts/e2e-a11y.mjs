@@ -165,6 +165,7 @@ try {
   for (const path of [
     "/exercises/",
     "/exercises/bench-press/",
+    "/blog/topic/recovery/",
     "/exercises/back-squat/",
     "/exercises/bench-press/alternatives/",
     "/muscles/chest/",
