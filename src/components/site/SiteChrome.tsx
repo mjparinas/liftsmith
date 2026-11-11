@@ -6,6 +6,7 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+import { BuildStamp } from "@/components/BuildStamp";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 
@@ -161,7 +162,7 @@ export function SiteFooter() {
       </div>
       <p className="mx-auto max-w-6xl px-4 pb-8 text-xs text-muted">
         © {new Date().getFullYear()} {BRAND.name}. Google Play and the Google Play logo are trademarks of Google LLC. Apple, the Apple logo
-        and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc.
+        and iPhone are trademarks of Apple Inc. App Store is a service mark of Apple Inc. <BuildStamp />
       </p>
     </footer>
   );

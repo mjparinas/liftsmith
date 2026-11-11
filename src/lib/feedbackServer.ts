@@ -1,5 +1,6 @@
 // Server side of in-app feedback: checks a report and turns it into an email. Pure, so it's unit tested;
 // the route (src/app/api/feedback/route.api.ts) only adds HTTP, CORS and Resend.
+import { shortCommit } from "./build";
 import { CONTACT_TOPICS } from "./contact";
 import type { FeedbackItem } from "./feedback";
 
@@ -49,7 +50,7 @@ export function feedbackEmail(item: FeedbackItem) {
     lines.push(
       "",
       "Device",
-      `App ${d.version} on ${d.platform} · ${d.screen} · ${d.language} · ${d.timeZone} · ${d.online ? "online" : "offline"}`,
+      `App ${d.version}${d.commit ? ` (build ${shortCommit(d.commit)})` : ""} on ${d.platform} · ${d.screen} · ${d.language} · ${d.timeZone} · ${d.online ? "online" : "offline"}`,
       `Screen: ${d.route || "#/"}`,
       `User agent: ${d.userAgent}`,
     );
