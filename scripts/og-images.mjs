@@ -62,14 +62,15 @@ function wrap(text, max) {
 }
 
 function titleLines(title) {
-  for (const [size, max] of [
-    [68, 16],
-    [58, 19],
-    [50, 22],
-    [44, 25],
+  // [font size, characters per line, lines that fit above the address]
+  for (const [size, max, rows] of [
+    [68, 16, 3],
+    [58, 19, 4],
+    [50, 22, 4],
+    [44, 25, 5],
   ]) {
     const lines = wrap(title, max);
-    if (lines.length <= 4) return { size, lines };
+    if (lines.length <= rows) return { size, lines };
   }
   return { size: 40, lines: wrap(title, 28).slice(0, 5) };
 }

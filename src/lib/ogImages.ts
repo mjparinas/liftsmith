@@ -5,6 +5,7 @@
 import { ARTICLES } from "@/content/articles";
 import { COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
+import { LANDINGS } from "@/content/landings";
 
 import { BRAND } from "./brand";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
@@ -37,6 +38,7 @@ export function ogFile(path: string): string {
   if (kind === "compare") return `compare/${a}.jpg`;
   if (kind === "tools") return `tools/${a}.jpg`;
   if (kind === "import") return `import/${a}.jpg`;
+  if (kind === "apps" || kind === "features") return `${kind}/${a}.jpg`;
   return "default.jpg";
 }
 
@@ -97,5 +99,27 @@ export function ogCards(): OgCard[] {
       title: t.name,
       exercise: t.path.includes("plate") ? "bench-press" : DEFAULT_FIGURE,
     });
+  for (const l of LANDINGS)
+    cards.push({
+      file: `${l.group}/${l.slug}.jpg`,
+      kicker: l.group === "apps" ? "App guide" : "Feature",
+      title: l.h1,
+      exercise: LANDING_FIGURE[l.slug] ?? DEFAULT_FIGURE,
+    });
   return cards;
 }
+
+/** The figure on a landing page's card, where another lift fits better than the squat. */
+const LANDING_FIGURE: Record<string, string> = {
+  powerlifting: "deadlift",
+  bodybuilding: "barbell-curl",
+  "home-gym": "goblet-squat",
+  calisthenics: "pull-up",
+  beginners: "goblet-squat",
+  "plate-math": "bench-press",
+  "warm-up-sets": "bench-press",
+  "heart-rate": "push-up",
+  "injury-mode": "romanian-deadlift",
+  "rest-timer": "overhead-press",
+  "sets-per-muscle": "barbell-row",
+};

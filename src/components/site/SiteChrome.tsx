@@ -128,7 +128,8 @@ export function SiteFooter() {
         </div>
         {col("Product", [
           { href: APP_PATH, label: "Open the app" },
-          { href: "/#features", label: "Features" },
+          { href: "/features/", label: "Features" },
+          { href: "/apps/", label: "Who it's for" },
           { href: "/pricing/", label: "Pricing" },
           { href: "/whats-new/", label: "What's new" },
           { href: "/me/", label: "Your dashboard" },
