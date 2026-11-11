@@ -485,6 +485,13 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_to ON sent_workouts (to_id, created_at)`,
   `CREATE INDEX IF NOT EXISTS sent_workouts_from ON sent_workouts (from_id)`,
+  // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
+  `CREATE TABLE IF NOT EXISTS mutes (
+    muter_id TEXT NOT NULL,
+    muted_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (muter_id, muted_id)
+  )`,
   // A phone's push token for Friends notifications (push.ts), in the language it registered with.
   `CREATE TABLE IF NOT EXISTS push_tokens (
     token TEXT PRIMARY KEY,
@@ -545,6 +552,14 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_sent", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_likes", "INTEGER NOT NULL DEFAULT 0"],
+  // Friends stage 3: avatar, who sees new posts, and the best lifts showcase (social.ts).
+  ["social_profiles", "avatar", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "audience", "TEXT NOT NULL DEFAULT 'all'"],
+  ["social_profiles", "show_lifts", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "lifts", "TEXT NOT NULL DEFAULT '[]'"],
+  // Friends stage 3: a caption and who sees each post.
+  ["posts", "caption", "TEXT NOT NULL DEFAULT ''"],
+  ["posts", "audience", "TEXT NOT NULL DEFAULT 'all'"],
 ];
 
 let client: Client | null = null;

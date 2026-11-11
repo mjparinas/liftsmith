@@ -229,6 +229,9 @@ try {
     liked: false,
     comments: 1,
     mine: false,
+    avatar: "av-mascot",
+    caption: "New bench best, felt smooth.",
+    audience: "all",
     body: {
       v: 1,
       seconds: 3100,
@@ -241,7 +244,19 @@ try {
   };
   const friendsApi = {
     me: {
-      profile: { handle: "alex", name: "Alex", open: false, autoPost: false, weights: true },
+      profile: {
+        handle: "alex",
+        name: "Alex",
+        open: false,
+        autoPost: false,
+        weights: true,
+        public: false,
+        push: { follows: true, comments: true, sent: true, likes: false },
+        avatar: "",
+        audience: "all",
+        showLifts: true,
+        lifts: [],
+      },
       followers: 1,
       following: 1,
       requests: 1,
@@ -273,6 +288,13 @@ try {
         followsYou: true,
         canSee: true,
         open: false,
+        public: false,
+        avatar: "av-trophy",
+        muted: false,
+        lifts: [
+          { id: "back-squat", w: 140, r: 3, at: Date.now() },
+          { id: "bench-press", w: 100, r: 5, at: Date.now() },
+        ],
       },
     },
   };
@@ -284,6 +306,14 @@ try {
   await page.reload();
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await scan("friends feed");
+  await page.getByRole("button", { name: "More options" }).click();
+  await page.getByRole("button", { name: "Save as a routine" }).waitFor();
+  await scan("friends post menu");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Friends settings" }).click();
+  await page.getByRole("group", { name: "Avatar" }).waitFor();
+  await scan("friends settings");
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Comments/ }).click();
   await page.getByText("Strong work!").waitFor();
   await scan("friends comments");
@@ -296,6 +326,7 @@ try {
   await scan("friends people");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
+  await page.getByText("Best lifts").waitFor();
   await scan("friends person");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");

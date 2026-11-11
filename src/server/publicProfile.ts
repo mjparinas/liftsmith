@@ -26,6 +26,7 @@ export const profilePageUrl = (handle: string) => `${SITE_URL}/u/${handle}/`;
 export interface PublicPost {
   at: number;
   body: PostBody;
+  caption: string;
 }
 export interface PublicProfile {
   handle: string;
@@ -50,17 +51,18 @@ export async function publicProfile(handle: string): Promise<PublicProfile | nul
     `SELECT
       (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 1) AS followers,
       (SELECT COUNT(*) FROM follows WHERE follower_id = ?1 AND accepted = 1) AS following,
-      (SELECT COUNT(*) FROM posts WHERE account_id = ?1 AND hidden = 0) AS posts`,
+      (SELECT COUNT(*) FROM posts WHERE account_id = ?1 AND hidden = 0 AND audience = 'all') AS posts`,
     [id],
   );
-  const rows = await query<{ at: number; body: string }>(
-    `SELECT at, body FROM posts WHERE account_id = ? AND hidden = 0 ORDER BY at DESC LIMIT ${PAGE_POSTS}`,
+  // Only posts for everyone: "friends" and "only me" posts never reach the web.
+  const rows = await query<{ at: number; body: string; caption: string }>(
+    `SELECT at, body, caption FROM posts WHERE account_id = ? AND hidden = 0 AND audience = 'all' ORDER BY at DESC LIMIT ${PAGE_POSTS}`,
     [id],
   );
   const recent: PublicPost[] = [];
   for (const r of rows) {
     try {
-      recent.push({ at: Number(r.at), body: JSON.parse(String(r.body)) as PostBody });
+      recent.push({ at: Number(r.at), body: JSON.parse(String(r.body)) as PostBody, caption: String(r.caption ?? "") });
     } catch {
       // a broken row is left out rather than breaking the page
     }
@@ -153,6 +155,7 @@ time{color:#a3aebd;font-size:14px}
 li.ex{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-top:1px solid #ffffff12}
 li.ex:first-child{border-top:0}li.ex span:last-child{color:#a3aebd;font-variant-numeric:tabular-nums;white-space:nowrap}
 .more{color:#a3aebd;font-size:14px;padding-top:6px}
+.caption{color:inherit;margin:6px 0 0;white-space:pre-wrap;overflow-wrap:anywhere}
 .center{text-align:center}p{color:#a3aebd;margin:6px 0 18px}
 a.cta{display:inline-block;min-height:48px;padding:13px 26px;border-radius:14px;font-weight:700;text-decoration:none;color:#0a0d12;
 background:linear-gradient(135deg,#4c8dff,#a78bfa);margin:22px 0 0}
@@ -175,7 +178,7 @@ function postHtml(p: PublicPost, lang: MsgLang, unit: "kg" | "lb"): string {
   const shown = b.exercises.slice(0, EXERCISES_SHOWN);
   const rest = b.exercises.length - shown.length;
   return `<li><article><time datetime="${new Date(p.at).toISOString().slice(0, 10)}">${esc(day)}</time>
-<dl class="stats">${stats.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
+${p.caption ? `<p class="caption">${esc(p.caption)}</p>` : ""}<dl class="stats">${stats.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${esc(v)}</dd></div>`).join("")}</dl>
 <ul>${shown.map((e) => `<li class="ex"><span>${esc(e.name)}</span><span>${esc(bestSetText(e, unit, lang))}</span></li>`).join("")}</ul>
 ${rest > 0 ? `<div class="more">${esc(say(lang, "pub.more", { count: rest }))}</div>` : ""}</article></li>`;
 }
@@ -227,7 +230,7 @@ export const GONE_HEADERS = { ...PROFILE_HEADERS, "X-Robots-Tag": "noindex" };
 /** Public profiles with at least one workout to show (an empty page would be thin), newest activity first. */
 export async function sitemapPeople(): Promise<{ handle: string; lastModified: number }[]> {
   const rows = await query<{ handle: string; last: number }>(
-    `SELECT sp.handle AS handle, MAX(p.at) AS last FROM social_profiles sp JOIN posts p ON p.account_id = sp.account_id AND p.hidden = 0
+    `SELECT sp.handle AS handle, MAX(p.at) AS last FROM social_profiles sp JOIN posts p ON p.account_id = sp.account_id AND p.hidden = 0 AND p.audience = 'all'
      WHERE sp.public = 1 AND sp.suspended = 0 GROUP BY sp.account_id ORDER BY last DESC LIMIT ${SITEMAP_MAX}`,
   );
   return rows.map((r) => ({ handle: String(r.handle), lastModified: Number(r.last) }));
