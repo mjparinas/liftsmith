@@ -1,4 +1,5 @@
 import { rng } from "../random";
+import { BLAZEPOSE, type Keypoint } from "./pose";
 
 // Synthetic sets for testing and tuning the rep trackers. Each set is a list of planned attempts with
 // realistic tempo, depth and noise: camera keypoint jitter, outlier frames and dropouts, or IMU noise,
@@ -209,4 +210,52 @@ export function randomKinds(seed: number): TruthKind[] {
   }
   if (r() < 0.25) kinds.push("failed");
   return kinds;
+}
+
+const rad = (d: number) => (d * Math.PI) / 180;
+
+/** A 33-point pose with only the joints form check reads, all clearly seen unless `far` hides one side. */
+export function posePoints(pts: Partial<Record<keyof typeof BLAZEPOSE, [number, number]>>, far?: "L" | "R"): Keypoint[] {
+  const kps: Keypoint[] = Array.from({ length: 33 }, () => ({ x: 0.5, y: 0.5, visibility: 0 }));
+  for (const [k, p] of Object.entries(pts)) {
+    if (!p) continue;
+    kps[BLAZEPOSE[k as keyof typeof BLAZEPOSE]] = { x: p[0], y: p[1], visibility: far && k.startsWith(far) ? 0.2 : 0.95 };
+  }
+  return kps;
+}
+
+/**
+ * A side-on squat at `f` (0 standing, 1 the bottom): the shin tips forward, the knee bends by `romDeg` at the
+ * bottom and the torso leans in. Both legs are drawn in the same place, with the far one barely seen.
+ */
+export function sideSquat(f: number, romDeg: number): Keypoint[] {
+  const ankle: [number, number] = [0.5, 0.9];
+  const shin = rad(f * 30);
+  const knee: [number, number] = [ankle[0] + 0.2 * Math.sin(shin), ankle[1] - 0.2 * Math.cos(shin)];
+  // The thigh leaves the knee at the knee angle from the shin (knee to ankle), turned backwards.
+  const bend = rad(175 - f * romDeg);
+  const down = Math.atan2(ankle[1] - knee[1], ankle[0] - knee[0]);
+  const dir = down + bend;
+  const hip: [number, number] = [knee[0] + 0.2 * Math.cos(dir), knee[1] + 0.2 * Math.sin(dir)];
+  const torso = rad(f * 40);
+  const sh: [number, number] = [hip[0] + 0.3 * Math.sin(torso), hip[1] - 0.3 * Math.cos(torso)];
+  const wr: [number, number] = [sh[0], sh[1] + 0.02];
+  const el: [number, number] = [sh[0] - 0.05, sh[1] + 0.05];
+  return posePoints(
+    {
+      Lankle: ankle,
+      Rankle: ankle,
+      Lknee: knee,
+      Rknee: knee,
+      Lhip: hip,
+      Rhip: hip,
+      Lshoulder: sh,
+      Rshoulder: sh,
+      Lelbow: el,
+      Relbow: el,
+      Lwrist: wr,
+      Rwrist: wr,
+    },
+    "R",
+  );
 }
