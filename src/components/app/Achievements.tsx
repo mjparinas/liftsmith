@@ -1,9 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 
 import { CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
-import { COSMETICS, game, LEAGUE_LABEL, LEAGUES, RARITY_LABEL, type Cosmetic, type Game } from "@/lib/game";
+import {
+  COSMETICS,
+  game,
+  LEAGUE_LABEL,
+  LEAGUES,
+  levelForItem,
+  RARITY_LABEL,
+  rarityOdds,
+  type Cosmetic,
+  type Game,
+  type LevelReward,
+} from "@/lib/game";
 import { t } from "@/lib/i18n";
 import { applyAccent, sound, type TimerSound } from "@/lib/juice";
 import { useApp } from "@/lib/store";
@@ -11,8 +22,10 @@ import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
+import { Icon } from "./icons";
 import { go } from "./router";
-import { Chip, Section } from "./ui";
+import { HUE } from "./theme";
+import { Chip, ScreenHeader, Section } from "./ui";
 
 // Achievements, quests, the league, streak freezes and the locker of crate cosmetics, in one place.
 
@@ -206,8 +219,15 @@ export function LeagueCard({ g }: { g: Game }) {
   );
 }
 
+/** A level reward in words: "Chrome (Epic)" or "a bonus crate for your new title". */
+export function rewardText(r: LevelReward): string {
+  if (r.source === "crate") return t("awards.reward.crate");
+  return t("awards.reward.item", { name: r.item.name, rarity: RARITY_LABEL[r.item.rarity] });
+}
+
 function Locker({ g }: { g: Game }) {
   const { profile, setProfile } = useApp();
+  const [hint, setHint] = useState<string | null>(null);
   const eq = profile.cosmetics ?? {};
   const equip = (c: Cosmetic) => {
     const next = { ...eq, [c.kind]: c.id };
@@ -220,36 +240,56 @@ function Locker({ g }: { g: Game }) {
     ["sound", t("awards.locker.sound"), "sound-classic"],
     ["plates", t("awards.locker.plates"), "plates-classic"],
   ];
+  const have = COSMETICS.filter((c) => g.owned.has(c.id)).length;
   return (
     <div className="space-y-4">
-      {groups.map(([kind, label, def]) => (
-        <div key={kind}>
-          <p className="mb-2 text-sm text-muted">{label}</p>
-          <div className="flex flex-wrap gap-2">
-            {COSMETICS.filter((c) => c.kind === kind).map((c) => {
-              const have = g.owned.has(c.id);
-              const on = (eq[kind] ?? def) === c.id;
-              return (
-                <button
-                  key={c.id}
-                  type="button"
-                  disabled={!have}
-                  aria-pressed={on}
-                  onClick={() => equip(c)}
-                  className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm disabled:opacity-45 ${on ? "border-accent bg-accent/15" : "border-line bg-surface"}`}
-                >
-                  {kind === "accent" && <span aria-hidden className="h-4 w-4 rounded-full" style={{ background: c.value }} />}
-                  <span>{have ? c.name : `🔒 ${c.name}`}</span>
-                  <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
-                    {RARITY_LABEL[c.rarity]}
-                  </span>
-                </button>
-              );
-            })}
+      <p className="num text-sm">
+        <span className="font-semibold">{t("awards.locker.count", { have, total: COSMETICS.length })}</span>{" "}
+        <span className="text-muted">· {t("awards.locker.howTo")}</span>
+      </p>
+      {groups.map(([kind, label, def]) => {
+        const picked = COSMETICS.find((c) => c.id === hint && c.kind === kind);
+        const at = picked ? levelForItem(picked.id) : null;
+        return (
+          <div key={kind}>
+            <p className="mb-2 text-sm text-muted">{label}</p>
+            <div className="flex flex-wrap gap-2">
+              {COSMETICS.filter((c) => c.kind === kind).map((c) => {
+                const mine = g.owned.has(c.id);
+                const on = (eq[kind] ?? def) === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    aria-pressed={mine ? on : undefined}
+                    aria-expanded={mine ? undefined : hint === c.id}
+                    onClick={() => (mine ? equip(c) : setHint(hint === c.id ? null : c.id))}
+                    className={`press flex items-center gap-2 rounded-full border px-3 py-2 text-sm ${on ? "border-accent bg-accent/15" : "border-line bg-surface"} ${mine ? "" : "text-muted"}`}
+                  >
+                    {kind === "accent" && (
+                      <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
+                    )}
+                    {!mine && <Icon name="lock" size={14} />}
+                    {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
+                    <span>{c.name}</span>
+                    <span className="text-xs" style={{ color: RARITY_COLOUR[c.rarity] }}>
+                      {RARITY_LABEL[c.rarity]}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p aria-live="polite" className="text-sm text-muted">
+              {picked && (
+                <span className="mt-2 block">
+                  {t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}
+                  {at !== null && ` ${t("awards.locker.atLevel", { level: at })}`}
+                </span>
+              )}
+            </p>
           </div>
-        </div>
-      ))}
-      <p className="text-xs text-faint">{t("awards.locker.note")}</p>
+        );
+      })}
     </div>
   );
 }
@@ -274,22 +314,32 @@ export function Achievements() {
   const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 pt-2 text-muted">
-        ‹ {t("progress.title")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("awards.title")}</h1>
-      <div className="card mt-4 p-4">
+      <ScreenHeader back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }} title={t("awards.title")} />
+      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-baseline justify-between">
-          <span className="font-semibold">
-            {t("progress.level", { level: g.level.level })} · {g.level.title}
+          <span className="font-bold">
+            {t("progress.level", { level: g.level.level })} · <span className="text-gradient">{g.level.title}</span>
           </span>
           <span className="num text-sm text-muted">{t("progress.xp", { xp: g.xp })}</span>
         </div>
-        <div className="mt-2">
-          <Bar value={g.level.into / g.level.span} label={t("awards.levelProgress")} />
+        <div
+          className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised"
+          role="progressbar"
+          aria-label={t("awards.levelProgress")}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(Math.min(1, g.level.into / g.level.span) * 100)}
+        >
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
+            style={{ width: `${Math.min(100, (g.level.into / g.level.span) * 100)}%` }}
+          />
         </div>
         {g.level.next && (
           <p className="num mt-1.5 text-xs text-faint">{t("progress.xpTo", { xp: g.level.span - g.level.into, next: g.level.next })}</p>
+        )}
+        {g.next && (
+          <p className="num mt-1 text-xs text-muted">{t("awards.nextReward", { level: g.next.level, reward: rewardText(g.next) })}</p>
         )}
         <p className="num mt-3 text-sm">
           <span className="font-semibold">{fmtNum(g.badges.earned)}</span>{" "}
@@ -337,7 +387,7 @@ export function Achievements() {
           {!sorted.length && <li className="px-4 py-3 text-muted">{t("awards.none")}</li>}
         </ul>
       </Section>
-      <Section title={t("awards.locker")}>
+      <Section title={t("awards.locker")} info="crate">
         <Locker g={g} />
       </Section>
     </div>

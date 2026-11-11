@@ -12,7 +12,7 @@ import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, ProTag, Sheet } from "./ui";
+import { Button, ProTag, ScreenHeader, Sheet } from "./ui";
 
 // Pick how Today's workout is planned: the adaptive engine (the default), a classic fixed program,
 // or a split the adaptive engine fills in. Program details (summary, steps, credit) are still English.
@@ -40,10 +40,7 @@ export function Programs() {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 min-h-11 pt-2 text-muted">
-        {t("train.back")}
-      </button>
-      <h1 className="text-2xl font-bold">{t("prog.title")}</h1>
+      <ScreenHeader back={{ label: t("train.back"), onClick: () => go("settings") }} title={t("prog.title")} />
       <p className="mt-1 text-sm text-muted">{t("prog.intro")}</p>
 
       <ul className="mt-4 space-y-3">

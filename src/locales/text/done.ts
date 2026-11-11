@@ -40,6 +40,8 @@ export const en = {
   "done.pain": "Pain after this workout",
   "done.painAsk": "How's your {part} after this workout?",
   "done.painNote": "Optional. It feeds the pain trend and the graded return on the Injuries screen.",
+  "done.reward.item": "Level {level} reward",
+  "done.reward.crate": "Bonus crate for your new title, {title}",
 } as const;
 
 type Key = keyof typeof en;
@@ -81,6 +83,8 @@ export const es: Partial<Record<Key, Message>> = {
   "done.pain": "Dolor después de este entrenamiento",
   "done.painAsk": "¿Cómo está tu {part} después de este entrenamiento?",
   "done.painNote": "Opcional. Alimenta la tendencia del dolor y la vuelta gradual en la pantalla de lesiones.",
+  "done.reward.item": "Premio del nivel {level}",
+  "done.reward.crate": "Cofre extra por tu nuevo título: {title}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -124,6 +128,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "done.pain": "Douleur après cette séance",
   "done.painAsk": "Comment va votre {part} après cette séance ?",
   "done.painNote": "Facultatif. Cela alimente la courbe de douleur et le retour progressif sur l’écran Blessures.",
+  "done.reward.item": "Récompense du niveau {level}",
+  "done.reward.crate": "Coffre bonus pour votre nouveau titre : {title}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -164,6 +170,8 @@ export const de: Partial<Record<Key, Message>> = {
   "done.pain": "Schmerzen nach diesem Training",
   "done.painAsk": "Wie geht es deinem Bereich {part} nach diesem Training?",
   "done.painNote": "Optional. Fließt in den Schmerzverlauf und die schrittweise Rückkehr im Bildschirm Verletzungen ein.",
+  "done.reward.item": "Belohnung für Level {level}",
+  "done.reward.crate": "Bonuskiste für deinen neuen Titel: {title}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -207,6 +215,8 @@ export const it: Partial<Record<Key, Message>> = {
   "done.pain": "Dolore dopo questo allenamento",
   "done.painAsk": "Come va {part} dopo questo allenamento?",
   "done.painNote": "Facoltativo. Serve per l’andamento del dolore e il ritorno graduale nella schermata Infortuni.",
+  "done.reward.item": "Premio del livello {level}",
+  "done.reward.crate": "Cassa bonus per il tuo nuovo titolo: {title}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -246,4 +256,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "done.pain": "このワークアウト後の痛み",
   "done.painAsk": "ワークアウト後、{part}の具合はどうですか？",
   "done.painNote": "任意です。「ケガ」画面の痛みの推移と段階的な復帰に使われます。",
+  "done.reward.item": "レベル{level}の報酬",
+  "done.reward.crate": "新しい称号「{title}」のボーナスクレート",
 };

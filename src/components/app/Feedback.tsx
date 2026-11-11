@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { SCREEN_TITLE } from "@/components/titles";
 import { track } from "@/lib/analytics";
 import { diagnostics } from "@/lib/diag";
 import { buildFeedback, MAX_MESSAGE, sendFeedback, shrinkImage, type FeedbackKind } from "@/lib/feedback";
@@ -9,7 +10,7 @@ import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 
 import { go } from "./router";
-import { Button, Chip, Section } from "./ui";
+import { Button, Chip, ScreenHeader, Section } from "./ui";
 
 const KINDS: FeedbackKind[] = ["bug", "idea", "other"];
 
@@ -38,7 +39,7 @@ export function Feedback() {
         <p className="text-4xl" aria-hidden>
           {state === "sent" ? "✓" : "⏳"}
         </p>
-        <h1 className="mt-3 text-2xl font-bold">{state === "sent" ? t("fb.sent") : t("fb.queued")}</h1>
+        <h1 className={`mt-3 ${SCREEN_TITLE}`}>{state === "sent" ? t("fb.sent") : t("fb.queued")}</h1>
         <p className="mt-2 text-muted">{email ? t("fb.replyEmail") : t("fb.read")}</p>
         <Button className="mt-6" onClick={() => go("settings")}>
           {t("fb.backSettings")}
@@ -50,10 +51,7 @@ export function Feedback() {
   const d = diagnostics();
   return (
     <div className="pb-24">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
-        {t("train.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("fb.title")}</h1>
+      <ScreenHeader back={{ label: t("train.back"), onClick: () => go("settings") }} title={t("fb.title")} />
       <div className="mt-4 flex flex-wrap gap-2" role="group" aria-label={t("fb.kind")}>
         {KINDS.map((k) => (
           <Chip key={k} active={kind === k} onClick={() => setKind(k)}>

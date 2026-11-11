@@ -31,7 +31,7 @@ import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
 
 import { go, historyDepth } from "./router";
-import { Button, Section } from "./ui";
+import { Button, ScreenHeader, Section } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -383,10 +383,7 @@ export function Account() {
   }, [account]);
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("settings")} className="press -ml-2 pt-2 text-muted">
-        {t("settings.back")}
-      </button>
-      <h1 className="text-[1.75rem] font-extrabold tracking-tight">{t("account.title")}</h1>
+      <ScreenHeader back={{ label: t("settings.back"), onClick: () => go("settings") }} title={t("account.title")} />
       <p className="mt-2 text-muted">{account ? t("account.leadIn") : t("account.lead")}</p>
       <Section title={account ? t("account.yours") : t("account.signIn")} icon="lock">
         <AccountPanel />

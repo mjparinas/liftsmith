@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
 import { t } from "@/lib/i18n";
@@ -13,7 +14,7 @@ import { fmtNum } from "@/lib/units";
 import { BuyNext } from "./BuyNext";
 import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
-import { Bump, BumpField, Button, Chip, Section, Sheet } from "./ui";
+import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -26,7 +27,7 @@ export function Gym() {
 
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("gym.title")}</h1>
+      <ScreenHeader title={t("gym.title")} />
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>
@@ -89,7 +90,7 @@ export function Gym() {
         <div className="card space-y-4 p-4">
           {EQUIPMENT_GROUPS.map((grp) => (
             <div key={grp.title}>
-              <p className="mb-2 text-xs uppercase tracking-wider text-faint">{grp.title}</p>
+              <p className={`mb-2 ${SECTION_LABEL}`}>{grp.title}</p>
               <div className="flex flex-wrap gap-2">
                 {grp.items.map((e) => {
                   const on = gym.equipment.includes(e);

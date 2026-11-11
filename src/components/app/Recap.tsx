@@ -15,7 +15,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Chip } from "./ui";
+import { Button, Chip, ScreenHeader } from "./ui";
 
 const cap = (s: string) => s.charAt(0).toLocaleUpperCase() + s.slice(1);
 
@@ -115,11 +115,11 @@ export function Recap({ arg }: { arg?: string }) {
 
   return (
     <div className="pb-2">
-      <button type="button" onClick={() => go("stats")} className="press -ml-2 min-h-11 px-2 pt-2 text-muted">
-        {t("recap.back")}
-      </button>
-      <p className="text-sm uppercase tracking-wider text-accent">{t(period.kind === "year" ? "recap.year" : "recap.month")}</p>
-      <h1 className="text-3xl font-bold">{r.label}</h1>
+      <ScreenHeader
+        back={{ label: t("recap.back"), onClick: () => go("stats") }}
+        kicker={t(period.kind === "year" ? "recap.year" : "recap.month")}
+        title={r.label}
+      />
       <div className="mt-3 flex flex-wrap gap-2">
         <Chip active={period.kind === "year"} onClick={() => setPeriod(yearOf(period.start))}>
           {t("recap.wholeYear")}

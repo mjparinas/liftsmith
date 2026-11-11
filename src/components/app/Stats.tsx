@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 
 import { exercise } from "@/lib/exercises";
 import { list, num, t } from "@/lib/i18n";
@@ -20,7 +20,7 @@ import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
 import { go } from "./router";
 import { HUE } from "./theme";
-import { BumpField, Button, EmptyState, Section, StatTile } from "./ui";
+import { BumpField, Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
 
 function Spark({ points, empty }: { points: number[]; empty?: string }) {
   if (points.length < 2) return <div className="h-10 text-xs text-faint">{empty ?? t("progress.spark.empty")}</div>;
@@ -50,8 +50,6 @@ export function Stats() {
   const now = useNow();
   const unit = profile.unit;
   const g = useGame();
-  const xp = g.xp;
-  const lvl = g.level;
   const streak = g.streak;
   const thisWeek = stats.weeklyMuscleSets.at(-1)!;
   const tiles: [string, string, string, IconName, string][] = [
@@ -62,24 +60,9 @@ export function Stats() {
   ];
   return (
     <div className="pb-2">
-      <h1 className="pt-3 text-[1.75rem] font-extrabold tracking-tight">{t("progress.title")}</h1>
+      <ScreenHeader title={t("progress.title")} />
       <CoachNotes title={t("progress.next")} />
-      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
-        <div className="flex items-baseline justify-between">
-          <span className="font-bold">
-            {t("progress.level", { level: lvl.level })} · <span className="text-gradient">{lvl.title}</span>
-          </span>
-          <span className="num text-sm text-muted">{t("progress.xp", { xp })}</span>
-        </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-raised">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-violet shadow-[0_0_12px_rgb(139_123_255/0.6)]"
-            style={{ width: `${Math.min(100, (lvl.into / lvl.span) * 100)}%` }}
-          />
-        </div>
-        {lvl.next && <p className="mt-1.5 text-xs text-faint num">{t("progress.xpTo", { xp: lvl.span - lvl.into, next: lvl.next })}</p>}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
+      <div className="mt-4 grid grid-cols-2 gap-3">
         {tiles.map(([k, label, v, icon, hue]) => (
           <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
         ))}

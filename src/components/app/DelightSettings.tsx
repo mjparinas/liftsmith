@@ -5,6 +5,7 @@
 // icons (part "look").
 import { useState } from "react";
 
+import { SECTION_LABEL } from "@/components/titles";
 import { useLight } from "@/lib/appearance";
 import { goalStreak } from "@/lib/game";
 import { t } from "@/lib/i18n";
@@ -71,7 +72,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
   return (
     <>
       <section id="themes" className="mt-6 scroll-mt-4">
-        <h2 className="mb-2 px-1 text-sm font-semibold uppercase tracking-wider text-muted">{t("delight.themes")}</h2>
+        <h2 className={`mb-2 px-1 ${SECTION_LABEL}`}>{t("delight.themes")}</h2>
         {light && <p className="mb-2 px-1 text-sm text-muted">{t("delight.lightNote")}</p>}
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,9.5rem),1fr))] gap-2">
           {THEMES.map((th) => {

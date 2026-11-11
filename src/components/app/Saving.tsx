@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import { SCREEN_TITLE } from "@/components/titles";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { parseBackup } from "@/lib/backup";
@@ -93,7 +94,7 @@ export function SaveStep() {
   const account = useAccount((s) => s.account);
   return (
     <>
-      <h1 className="text-3xl font-extrabold tracking-tight">{t("save.title")}</h1>
+      <h1 className={SCREEN_TITLE}>{t("save.title")}</h1>
       <div className="card mt-6 p-4">
         <SavedWhere />
       </div>
