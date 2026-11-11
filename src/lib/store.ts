@@ -5,7 +5,7 @@ import { create } from "zustand";
 import { forgetAnalytics, track } from "./analytics";
 import { signOut } from "./auth";
 import { mergeBackup, type Backup } from "./backup";
-import { forgetBilling } from "./billing";
+import { forgetBilling, proMonth } from "./billing";
 import { defaultProfile } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { registerCustom } from "./exercises";
@@ -40,6 +40,8 @@ export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSli
   applySynced(p: { events: AppEvent[]; deleted: string[]; profile: Profile | null; gyms: Gym[] | null }): void;
   /** Record a gym buddy check-in. */
   checkin(buddies: string[]): void;
+  /** Log this month as a Pro month (once a month, while proMember() says so), for the Pro achievement. */
+  notePro(now?: number): void;
   /** Saves a finished stretch routine (Stretch.tsx). */
   logStretch(moment: StretchEvent["moment"], ids: string[], seconds: number): void;
   reset(): Promise<void>;
@@ -143,6 +145,13 @@ export const useApp = create<State>((set, get) => {
     checkin(buddies) {
       commit([{ type: "checkin", id: uid(), at: Date.now(), gymId: get().profile.activeGymId, buddies }]);
       track("feature", { name: "buddy_checkin", detail: String(buddies.length) });
+    },
+
+    notePro(now = Date.now()) {
+      const month = proMonth(now);
+      const id = `pro-${month}`;
+      if (get().events.some((e) => e.id === id)) return;
+      commit([{ type: "pro", id, at: now, month }]);
     },
 
     logStretch(moment, ids, seconds) {

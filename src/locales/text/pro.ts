@@ -73,6 +73,7 @@ export const en = {
   "pro.welcome.body": "Thank you for subscribing and for taking your health seriously. Every workout from here adapts to you.",
   "pro.welcome.unlocked": "Unlocked now",
   "pro.welcome.trialNote": "Free for {days} days. You can cancel any time in your store account before it ends.",
+  "pro.welcome.reward": "Your Pro badge now shows on Today, and the Pro member badge and the Pro theme are waiting in Awards.",
   "pro.welcome.go": "Let's train",
 } as const;
 
@@ -151,6 +152,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Gracias por suscribirte y por tomarte tu salud en serio. A partir de ahora, cada entrenamiento se adapta a ti.",
   "pro.welcome.unlocked": "Desbloqueado ahora",
   "pro.welcome.trialNote": "Gratis durante {days} días. Puedes cancelarla cuando quieras en tu cuenta de la tienda antes de que termine.",
+  "pro.welcome.reward": "Tu insignia Pro ya aparece en Hoy, y la insignia Miembro Pro y el tema Pro te esperan en Logros.",
   "pro.welcome.go": "A entrenar",
 };
 
@@ -228,6 +230,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.welcome.unlocked": "Débloqué dès maintenant",
   "pro.welcome.trialNote":
     "Gratuit pendant {days} jours. Vous pouvez résilier à tout moment dans votre compte de la boutique avant la fin.",
+  "pro.welcome.reward":
+    "Votre badge Pro s’affiche maintenant sur Aujourd’hui, et le badge Membre Pro et le thème Pro vous attendent dans Trophées.",
   "pro.welcome.go": "À l’entraînement",
 };
 
@@ -304,6 +308,8 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Danke für dein Abo und dafür, dass du deine Gesundheit ernst nimmst. Ab jetzt passt sich jedes Training an dich an.",
   "pro.welcome.unlocked": "Jetzt freigeschaltet",
   "pro.welcome.trialNote": "{days} Tage kostenlos. Du kannst jederzeit vor dem Ende in deinem Store-Konto kündigen.",
+  "pro.welcome.reward":
+    "Dein Pro-Abzeichen steht jetzt auf Heute, und das Abzeichen Pro-Mitglied und das Pro-Design warten unter „Erfolge“.",
   "pro.welcome.go": "Los geht’s",
 };
 
@@ -380,6 +386,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Grazie per l’abbonamento e per prendere sul serio la tua salute. Da qui ogni allenamento si adatta a te.",
   "pro.welcome.unlocked": "Sbloccato ora",
   "pro.welcome.trialNote": "Gratis per {days} giorni. Puoi disdire quando vuoi dal tuo account dello store prima della scadenza.",
+  "pro.welcome.reward": "Il tuo badge Pro ora compare in Oggi, e il badge Membro Pro e il tema Pro ti aspettano in Premi.",
   "pro.welcome.go": "Alleniamoci",
 };
 
@@ -454,5 +461,6 @@ export const ja: Partial<Record<Key, Message>> = {
     "ご登録いただき、そして健康に真剣に向き合っていただきありがとうございます。ここからすべてのワークアウトがあなたに合わせて変わります。",
   "pro.welcome.unlocked": "利用可能になった機能",
   "pro.welcome.trialNote": "{days}日間無料。終了前ならいつでもストアのアカウントから解約できます。",
+  "pro.welcome.reward": "Proバッジが「今日」に表示されるようになりました。「Proメンバー」バッジとProテーマは「実績」で受け取れます。",
   "pro.welcome.go": "さあ始めよう",
 };
