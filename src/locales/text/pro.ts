@@ -75,6 +75,23 @@ export const en = {
   "pro.welcome.trialNote": "Free for {days} days. You can cancel any time in your store account before it ends.",
   "pro.welcome.reward": "Your Pro badge now shows on Today, and the Pro member badge and the Pro theme are waiting in Awards.",
   "pro.welcome.go": "Let's train",
+  "pro.web.needsAccount": "Subscribing on the web needs a free Liftsmith account, so Pro follows you to the app on your phone too.",
+  "pro.web.signIn": "Sign in or create an account",
+  "pro.web.signInFirst": "Sign in first, so Pro is saved to your account.",
+  "pro.web.already": "This account already has Pro, so there's nothing more to pay for.",
+  "pro.web.restore": "Already subscribed? Check again",
+  "pro.web.restoreNone": "This account doesn't have Pro yet. If you subscribed with another account, sign in with that one.",
+  "pro.offline.web": "Couldn't load the plans. Check your connection and try again.",
+  "pro.legal.web":
+    "Paid by card through Stripe. The subscription renews automatically until you cancel it under Manage subscription here. Cancel before a free trial ends and you won't be charged. Pro works on the web and in the Liftsmith app on any phone you sign in on.",
+  "pro.web.confirming": "Confirming your subscription…",
+  "pro.web.manageFailed": "Couldn't open your subscription page. Try again in a moment.",
+  "pro.status.web":
+    "Pro comes with your Liftsmith account, from a subscription on the Liftsmith website. Manage or cancel it there, signed in with this account.",
+  "pro.status.play": "Pro comes with your account, from your Google Play subscription. Manage or cancel it in Google Play on your phone.",
+  "pro.status.appstore": "Pro comes with your account, from your App Store subscription. Manage or cancel it in Settings on your iPhone.",
+  "pro.settings.account": "Pro with your account",
+  "pro.welcome.trialNote.web": "Free for {days} days. You can cancel any time under Manage subscription before it ends.",
 } as const;
 
 type Key = keyof typeof en;
@@ -154,6 +171,25 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote": "Gratis durante {days} días. Puedes cancelarla cuando quieras en tu cuenta de la tienda antes de que termine.",
   "pro.welcome.reward": "Tu insignia Pro ya aparece en Hoy, y la insignia Miembro Pro y el tema Pro te esperan en Logros.",
   "pro.welcome.go": "A entrenar",
+  "pro.web.needsAccount":
+    "Para suscribirte en la web necesitas una cuenta gratuita de Liftsmith, así Pro también te acompaña en la app de tu teléfono.",
+  "pro.web.signIn": "Inicia sesión o crea una cuenta",
+  "pro.web.signInFirst": "Inicia sesión primero para que Pro se guarde en tu cuenta.",
+  "pro.web.already": "Esta cuenta ya tiene Pro, así que no hay nada más que pagar.",
+  "pro.web.restore": "¿Ya tienes suscripción? Comprobar de nuevo",
+  "pro.web.restoreNone": "Esta cuenta aún no tiene Pro. Si te suscribiste con otra cuenta, inicia sesión con ella.",
+  "pro.offline.web": "No se pudieron cargar los planes. Revisa tu conexión y vuelve a intentarlo.",
+  "pro.legal.web":
+    "Pago con tarjeta a través de Stripe. La suscripción se renueva automáticamente hasta que la canceles aquí, en Gestionar suscripción. Si cancelas antes de que termine la prueba gratis, no se te cobrará. Pro funciona en la web y en la app de Liftsmith en cualquier teléfono donde inicies sesión.",
+  "pro.web.confirming": "Confirmando tu suscripción…",
+  "pro.web.manageFailed": "No se pudo abrir la página de tu suscripción. Vuelve a intentarlo en un momento.",
+  "pro.status.web":
+    "Pro viene con tu cuenta de Liftsmith, por una suscripción en el sitio web de Liftsmith. Gestiónala o cancélala allí, con esta cuenta.",
+  "pro.status.play": "Pro viene con tu cuenta, por tu suscripción de Google Play. Gestiónala o cancélala en Google Play desde tu teléfono.",
+  "pro.status.appstore": "Pro viene con tu cuenta, por tu suscripción del App Store. Gestiónala o cancélala en Ajustes de tu iPhone.",
+  "pro.settings.account": "Pro con tu cuenta",
+  "pro.welcome.trialNote.web":
+    "Gratis durante {days} días. Puedes cancelarla cuando quieras en Gestionar suscripción antes de que termine.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -233,6 +269,26 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.welcome.reward":
     "Votre badge Pro s’affiche maintenant sur Aujourd’hui, et le badge Membre Pro et le thème Pro vous attendent dans Trophées.",
   "pro.welcome.go": "À l’entraînement",
+  "pro.web.needsAccount":
+    "Pour vous abonner sur le Web, il faut un compte Liftsmith gratuit : Pro vous suit aussi dans l’appli sur votre téléphone.",
+  "pro.web.signIn": "Se connecter ou créer un compte",
+  "pro.web.signInFirst": "Connectez-vous d’abord pour que Pro soit enregistré sur votre compte.",
+  "pro.web.already": "Ce compte a déjà Pro : il n’y a rien de plus à payer.",
+  "pro.web.restore": "Déjà abonné ? Vérifier à nouveau",
+  "pro.web.restoreNone": "Ce compte n’a pas encore Pro. Si vous vous êtes abonné avec un autre compte, connectez-vous avec celui-ci.",
+  "pro.offline.web": "Impossible de charger les formules. Vérifiez votre connexion et réessayez.",
+  "pro.legal.web":
+    "Paiement par carte via Stripe. L’abonnement se renouvelle automatiquement jusqu’à ce que vous l’annuliez ici, dans Gérer l’abonnement. Annulez avant la fin de l’essai gratuit et vous ne serez pas facturé. Pro fonctionne sur le Web et dans l’appli Liftsmith sur tout téléphone où vous vous connectez.",
+  "pro.web.confirming": "Confirmation de votre abonnement…",
+  "pro.web.manageFailed": "Impossible d’ouvrir la page de votre abonnement. Réessayez dans un instant.",
+  "pro.status.web":
+    "Pro est inclus dans votre compte Liftsmith, grâce à un abonnement pris sur le site Liftsmith. Gérez-le ou annulez-le là-bas, connecté avec ce compte.",
+  "pro.status.play":
+    "Pro est inclus dans votre compte, grâce à votre abonnement Google Play. Gérez-le ou annulez-le dans Google Play sur votre téléphone.",
+  "pro.status.appstore":
+    "Pro est inclus dans votre compte, grâce à votre abonnement App Store. Gérez-le ou annulez-le dans les Réglages de votre iPhone.",
+  "pro.settings.account": "Pro avec votre compte",
+  "pro.welcome.trialNote.web": "Gratuit pendant {days} jours. Vous pouvez annuler à tout moment dans Gérer l’abonnement avant la fin.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -311,6 +367,25 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.welcome.reward":
     "Dein Pro-Abzeichen steht jetzt auf Heute, und das Abzeichen Pro-Mitglied und das Pro-Design warten unter „Erfolge“.",
   "pro.welcome.go": "Los geht’s",
+  "pro.web.needsAccount":
+    "Für ein Abo im Web brauchst du ein kostenloses Liftsmith-Konto. So hast du Pro auch in der App auf deinem Handy.",
+  "pro.web.signIn": "Anmelden oder Konto erstellen",
+  "pro.web.signInFirst": "Melde dich zuerst an, damit Pro in deinem Konto gespeichert wird.",
+  "pro.web.already": "Dieses Konto hat bereits Pro. Es gibt nichts weiter zu bezahlen.",
+  "pro.web.restore": "Schon abonniert? Erneut prüfen",
+  "pro.web.restoreNone": "Dieses Konto hat noch kein Pro. Wenn du mit einem anderen Konto abonniert hast, melde dich damit an.",
+  "pro.offline.web": "Die Tarife konnten nicht geladen werden. Prüfe deine Verbindung und versuch es noch einmal.",
+  "pro.legal.web":
+    "Zahlung per Karte über Stripe. Das Abo verlängert sich automatisch, bis du es hier unter „Abo verwalten“ kündigst. Kündigst du vor Ende der Gratis-Testphase, wird nichts berechnet. Pro funktioniert im Web und in der Liftsmith-App auf jedem Handy, auf dem du dich anmeldest.",
+  "pro.web.confirming": "Dein Abo wird bestätigt …",
+  "pro.web.manageFailed": "Die Seite deines Abos konnte nicht geöffnet werden. Versuch es gleich noch einmal.",
+  "pro.status.web":
+    "Pro gehört zu deinem Liftsmith-Konto, über ein Abo auf der Liftsmith-Website. Verwalte oder kündige es dort, angemeldet mit diesem Konto.",
+  "pro.status.play": "Pro gehört zu deinem Konto, über dein Google-Play-Abo. Verwalte oder kündige es in Google Play auf deinem Handy.",
+  "pro.status.appstore":
+    "Pro gehört zu deinem Konto, über dein App-Store-Abo. Verwalte oder kündige es in den Einstellungen deines iPhones.",
+  "pro.settings.account": "Pro über dein Konto",
+  "pro.welcome.trialNote.web": "{days} Tage gratis. Du kannst jederzeit vor dem Ende unter „Abo verwalten“ kündigen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -388,6 +463,25 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote": "Gratis per {days} giorni. Puoi disdire quando vuoi dal tuo account dello store prima della scadenza.",
   "pro.welcome.reward": "Il tuo badge Pro ora compare in Oggi, e il badge Membro Pro e il tema Pro ti aspettano in Premi.",
   "pro.welcome.go": "Alleniamoci",
+  "pro.web.needsAccount": "Per abbonarti sul web serve un account Liftsmith gratuito, così Pro ti segue anche nell’app sul telefono.",
+  "pro.web.signIn": "Accedi o crea un account",
+  "pro.web.signInFirst": "Accedi prima, così Pro viene salvato nel tuo account.",
+  "pro.web.already": "Questo account ha già Pro, quindi non c’è altro da pagare.",
+  "pro.web.restore": "Hai già un abbonamento? Controlla di nuovo",
+  "pro.web.restoreNone": "Questo account non ha ancora Pro. Se ti sei abbonato con un altro account, accedi con quello.",
+  "pro.offline.web": "Impossibile caricare i piani. Controlla la connessione e riprova.",
+  "pro.legal.web":
+    "Pagamento con carta tramite Stripe. L’abbonamento si rinnova automaticamente finché non lo annulli qui, in Gestisci abbonamento. Se annulli prima della fine della prova gratuita, non ti verrà addebitato nulla. Pro funziona sul web e nell’app Liftsmith su qualsiasi telefono in cui accedi.",
+  "pro.web.confirming": "Conferma dell’abbonamento in corso…",
+  "pro.web.manageFailed": "Impossibile aprire la pagina dell’abbonamento. Riprova tra un momento.",
+  "pro.status.web":
+    "Pro è incluso nel tuo account Liftsmith, grazie a un abbonamento sul sito di Liftsmith. Gestiscilo o annullalo lì, con questo account.",
+  "pro.status.play":
+    "Pro è incluso nel tuo account, grazie al tuo abbonamento Google Play. Gestiscilo o annullalo in Google Play sul telefono.",
+  "pro.status.appstore":
+    "Pro è incluso nel tuo account, grazie al tuo abbonamento App Store. Gestiscilo o annullalo in Impostazioni sul tuo iPhone.",
+  "pro.settings.account": "Pro con il tuo account",
+  "pro.welcome.trialNote.web": "Gratis per {days} giorni. Puoi annullare quando vuoi in Gestisci abbonamento prima della fine.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -463,4 +557,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote": "{days}日間無料。終了前ならいつでもストアのアカウントから解約できます。",
   "pro.welcome.reward": "Proバッジが「今日」に表示されるようになりました。「Proメンバー」バッジとProテーマは「実績」で受け取れます。",
   "pro.welcome.go": "さあ始めよう",
+  "pro.web.needsAccount": "ウェブで登録するには無料の Liftsmith アカウントが必要です。スマートフォンのアプリでも Pro を使えます。",
+  "pro.web.signIn": "ログインまたはアカウント作成",
+  "pro.web.signInFirst": "Pro をアカウントに保存するため、先にログインしてください。",
+  "pro.web.already": "このアカウントはすでに Pro です。追加のお支払いはありません。",
+  "pro.web.restore": "登録済みですか？もう一度確認",
+  "pro.web.restoreNone": "このアカウントにはまだ Pro がありません。別のアカウントで登録した場合は、そのアカウントでログインしてください。",
+  "pro.offline.web": "プランを読み込めませんでした。接続を確認して、もう一度お試しください。",
+  "pro.legal.web":
+    "Stripe を通じてカードでお支払いいただきます。ここの「サブスクリプションを管理」で解約するまで自動更新されます。無料体験の終了前に解約すれば料金はかかりません。Pro はウェブと、ログインしたすべてのスマートフォンの Liftsmith アプリで使えます。",
+  "pro.web.confirming": "サブスクリプションを確認しています…",
+  "pro.web.manageFailed": "サブスクリプションのページを開けませんでした。しばらくしてからもう一度お試しください。",
+  "pro.status.web":
+    "Pro は Liftsmith ウェブサイトでのサブスクリプションにより、お使いの Liftsmith アカウントに含まれています。管理や解約は、このアカウントでログインしてウェブサイトで行えます。",
+  "pro.status.play":
+    "Pro は Google Play のサブスクリプションにより、お使いのアカウントに含まれています。管理や解約はスマートフォンの Google Play で行えます。",
+  "pro.status.appstore":
+    "Pro は App Store のサブスクリプションにより、お使いのアカウントに含まれています。管理や解約は iPhone の設定で行えます。",
+  "pro.settings.account": "アカウントの Pro",
+  "pro.welcome.trialNote.web": "{days} 日間無料です。終了前ならいつでも「サブスクリプションを管理」で解約できます。",
 };

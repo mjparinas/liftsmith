@@ -117,14 +117,18 @@ function NavRow({ title, sub, icon, pro, onClick }: { title: string; sub?: strin
 function ProCard() {
   const { live, ent } = useBilling();
   const now = useNow(60_000);
-  const pro = !live || entActive(ent, now);
+  // Pro on the account (a web subscription, a store one from another phone, a lifetime code) counts here too.
+  const viaAccount = useAccount((s) => !!s.account?.pro);
+  const pro = !live || entActive(ent, now) || viaAccount;
   const status = !live
     ? t("pro.settings.unlocked")
     : entActive(ent, now)
       ? ent?.plan === "monthly"
         ? t("pro.status.monthly")
         : t("pro.status.yearly")
-      : t("pro.settings.free");
+      : viaAccount
+        ? t("pro.settings.account")
+        : t("pro.settings.free");
   return (
     <section
       className="card card-tint mt-4 p-4"

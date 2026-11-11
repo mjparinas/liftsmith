@@ -106,7 +106,8 @@ export default function Pricing() {
             </CtaButton>
           </div>
           <p className="mt-3 text-xs text-muted">
-            Billed through Google Play or the App Store. Cancel any time before the trial ends and you pay nothing.
+            Billed through Google Play or the App Store, or by card on the web app. Cancel any time before the trial ends and you pay
+            nothing.
           </p>
         </section>
       </div>
