@@ -1,8 +1,9 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useAccount, type Account } from "@/lib/auth";
 import { SUB_KEY } from "@/lib/reminders";
 import { useApp } from "@/lib/store";
 
@@ -15,6 +16,7 @@ beforeEach(async () => {
 });
 afterEach(() => {
   cleanup();
+  useAccount.setState({ account: null });
   vi.unstubAllGlobals();
 });
 
@@ -113,5 +115,25 @@ describe("Settings › Reminders on the web", () => {
     await user.click(screen.getByRole("checkbox"));
     await user.click(screen.getByRole("button", { name: "Send confirmation email" }));
     await screen.findByText(/Couldn't reach the server/);
+  });
+
+  it("fills the address from the signed-in account, and it can still be changed", async () => {
+    const account: Account = { token: "t", id: "a1", email: "lifter@example.com", providers: ["google"], via: "google" };
+    useAccount.setState({ account });
+    const user = userEvent.setup();
+    render(<MessageSettings />);
+    const box = screen.getByLabelText("Email address");
+    expect(box).toHaveValue("lifter@example.com");
+    await user.clear(box);
+    await user.type(box, "other@example.com");
+    expect(box).toHaveValue("other@example.com");
+  });
+
+  it("fills an untouched box when the lifter signs in with the screen open", () => {
+    render(<MessageSettings />);
+    const box = screen.getByLabelText("Email address");
+    expect(box).toHaveValue("");
+    act(() => useAccount.setState({ account: { token: "t", id: "a1", email: "late@example.com", providers: ["email"], via: "email" } }));
+    expect(box).toHaveValue("late@example.com");
   });
 });
