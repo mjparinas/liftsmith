@@ -619,7 +619,7 @@ export function AdminApp() {
       <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="mr-auto text-lg font-bold">
-            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal" />
+            Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
           </h1>
           <div className="flex gap-1" role="group" aria-label="Period">
             {PERIODS.map((p) => (
