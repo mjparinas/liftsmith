@@ -3,15 +3,14 @@
 // Settings for the delightful extras, in two places: Settings › Workout has the voice coach, ghost mode,
 // plate memory and rest timer extras (part "workout"); Settings › Look and feel has earned themes and app
 // icons (part "look").
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { useLight } from "@/lib/appearance";
-import { goalStreak } from "@/lib/game";
-import { t } from "@/lib/i18n";
+import { inSentence, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
-import { APP_ICONS, appIconSupported, setAppIcon, THEMES, unlocked } from "@/lib/themes";
+import { APP_ICONS, appIconSupported, setAppIcon, THEMES, unlockContext, unlocked } from "@/lib/themes";
 import type { DelightPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { say, voiceSupported } from "@/lib/voice";
@@ -24,12 +23,12 @@ function Toggle({ label, on, set, hint }: { label: string; on: boolean; set: (v:
 }
 
 export function DelightSettings({ part }: { part: "workout" | "look" }) {
-  const { profile, setProfile, stats } = useApp();
+  const { profile, setProfile, stats, events } = useApp();
   const light = useLight(profile.theme ?? "dark");
   const now = useNow(60_000);
   const d = profile.delight ?? {};
   const put = (p: Partial<DelightPrefs>) => setProfile({ delight: { ...d, ...p } });
-  const ctx = { stats, goalWeeks: goalStreak(stats, profile, now).weeks, now };
+  const ctx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
   const [iconNote, setIconNote] = useState<string | null>(null);
   if (part === "workout")
     return (
@@ -121,7 +120,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
                   key={id}
                   active={(d.icon ?? "default") === id}
                   onClick={async () => {
-                    if (!open) return setIconNote(t("delight.iconLocked", { name: theme.name, how: theme.how.toLowerCase() }));
+                    if (!open) return setIconNote(t("delight.iconLocked", { name: theme.name, how: inSentence(theme.how) }));
                     const ok = await setAppIcon(id);
                     if (ok) put({ icon: id });
                     setIconNote(t(ok ? "delight.iconDone" : "delight.iconFailed"));

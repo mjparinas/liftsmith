@@ -582,8 +582,8 @@ describe("game layer", () => {
     expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
     expect(screen.getByText(/-week streak/)).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "See all achievements" }));
-    expect(await screen.findByRole("heading", { name: "Achievements" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "See all awards" }));
+    expect(await screen.findByRole("heading", { name: "Awards" })).toBeInTheDocument();
     expect(screen.getByRole("list", { name: "Weekly quests" }).children).toHaveLength(3);
     expect(screen.getByText(/Bronze league/)).toBeInTheDocument();
     expect(screen.getByText(/of \d+ badges earned/)).toBeInTheDocument();

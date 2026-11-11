@@ -102,7 +102,7 @@ try {
   // The web dashboard and a share link, with the workout just saved.
   await page.goto(`${server.url}/me/`);
   await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Achievements", "Log a workout", "Share"]) {
+  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Awards", "Log a workout", "Share"]) {
     await page.getByRole("link", { name: tab, exact: true }).click();
     await scan(`dashboard ${tab}`);
   }

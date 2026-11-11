@@ -26,7 +26,7 @@ export const en = {
   "done.remixHint": "Friends get it rebuilt for their own gym and weights. Only exercises, sets and reps are in the link.",
   "done.remixCopied": "Link copied.",
   "done.remixText": "Try my workout in Liftsmith. It adapts to your gym and your weights.",
-  "done.allAchievements": "See all achievements",
+  "done.allAchievements": "See all awards",
   "done.back": "Back to today",
   "done.footer": { one: "Level {level} · {title} · {count}-week streak", other: "Level {level} · {title} · {count}-week streak" },
   "done.crate": "You earned a crate",
@@ -111,7 +111,7 @@ export const fr: Partial<Record<Key, Message>> = {
     "Vos amis la reçoivent adaptée à leur salle et à leurs charges. Le lien ne contient que les exercices, séries et répétitions.",
   "done.remixCopied": "Lien copié.",
   "done.remixText": "Essaie ma séance dans Liftsmith. Elle s’adapte à ta salle et à tes charges.",
-  "done.allAchievements": "Voir tous les succès",
+  "done.allAchievements": "Voir tous les trophées",
   "done.back": "Retour à aujourd’hui",
   "done.footer": {
     one: "Niveau {level} · {title} · série de {count} semaine",
@@ -198,7 +198,7 @@ export const it: Partial<Record<Key, Message>> = {
     "Gli amici lo ricevono ricostruito per la loro palestra e i loro pesi. Nel link ci sono solo esercizi, serie e ripetizioni.",
   "done.remixCopied": "Link copiato.",
   "done.remixText": "Prova il mio allenamento su Liftsmith. Si adatta alla tua palestra e ai tuoi pesi.",
-  "done.allAchievements": "Vedi tutti i traguardi",
+  "done.allAchievements": "Vedi tutti i premi",
   "done.back": "Torna a oggi",
   "done.footer": {
     one: "Livello {level} · {title} · serie di {count} settimana",
