@@ -51,6 +51,14 @@ export const en = {
   "wk.equipment": "Equipment",
   "wk.compound": "Works several muscles (a big lift)",
   "wk.addUse": "Add and use it now",
+  "wk.extraAsk": "Add a bonus set?",
+  "wk.dropSet": "Drop set",
+  "wk.restPause": "Rest-pause",
+  "wk.dropLine": "Drop set: lighter, straight away, as many good reps as you can",
+  "wk.restPauseLine": "Rest-pause: same weight after a short pause, a few more good reps",
+  "wk.extraCancel": "Skip the bonus set",
+  "wk.failureRir": "0 means you went to failure.",
+  "wk.failureRpe": "10 means you went to failure.",
 } as const;
 
 type Key = keyof typeof en;
@@ -103,6 +111,14 @@ export const es: Partial<Record<Key, Message>> = {
   "wk.equipment": "Equipo",
   "wk.compound": "Trabaja varios músculos (un ejercicio grande)",
   "wk.addUse": "Añadir y usarlo ya",
+  "wk.extraAsk": "¿Añadir una serie extra?",
+  "wk.dropSet": "Serie descendente",
+  "wk.restPause": "Rest-pause",
+  "wk.dropLine": "Serie descendente: más ligera, sin descanso, todas las repeticiones buenas que puedas",
+  "wk.restPauseLine": "Rest-pause: mismo peso tras una pausa corta, unas pocas repeticiones buenas más",
+  "wk.extraCancel": "Saltar la serie extra",
+  "wk.failureRir": "0 significa que llegaste al fallo.",
+  "wk.failureRpe": "10 significa que llegaste al fallo.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -153,6 +169,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "wk.equipment": "Matériel",
   "wk.compound": "Travaille plusieurs muscles (un gros mouvement)",
   "wk.addUse": "Ajouter et l’utiliser",
+  "wk.extraAsk": "Ajouter une série bonus ?",
+  "wk.dropSet": "Série dégressive",
+  "wk.restPause": "Rest-pause",
+  "wk.dropLine": "Série dégressive : plus léger, tout de suite, autant de bonnes reps que possible",
+  "wk.restPauseLine": "Rest-pause : même charge après une courte pause, encore quelques bonnes reps",
+  "wk.extraCancel": "Passer la série bonus",
+  "wk.failureRir": "0 veut dire que vous êtes allé à l’échec.",
+  "wk.failureRpe": "10 veut dire que vous êtes allé à l’échec.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -203,6 +227,14 @@ export const de: Partial<Record<Key, Message>> = {
   "wk.equipment": "Ausrüstung",
   "wk.compound": "Trainiert mehrere Muskeln (eine große Übung)",
   "wk.addUse": "Hinzufügen und jetzt verwenden",
+  "wk.extraAsk": "Einen Bonussatz anhängen?",
+  "wk.dropSet": "Dropsatz",
+  "wk.restPause": "Rest-Pause",
+  "wk.dropLine": "Dropsatz: leichter, sofort, so viele saubere Wiederholungen wie möglich",
+  "wk.restPauseLine": "Rest-Pause: gleiches Gewicht nach kurzer Pause, noch ein paar saubere Wiederholungen",
+  "wk.extraCancel": "Bonussatz auslassen",
+  "wk.failureRir": "0 heißt, du bist bis zum Muskelversagen gegangen.",
+  "wk.failureRpe": "10 heißt, du bist bis zum Muskelversagen gegangen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -253,6 +285,14 @@ export const it: Partial<Record<Key, Message>> = {
   "wk.equipment": "Attrezzatura",
   "wk.compound": "Lavora più muscoli (un esercizio fondamentale)",
   "wk.addUse": "Aggiungi e usalo ora",
+  "wk.extraAsk": "Aggiungere una serie bonus?",
+  "wk.dropSet": "Drop set",
+  "wk.restPause": "Rest-pause",
+  "wk.dropLine": "Drop set: più leggero, subito, tutte le ripetizioni buone che riesci",
+  "wk.restPauseLine": "Rest-pause: stesso peso dopo una breve pausa, ancora qualche ripetizione buona",
+  "wk.extraCancel": "Salta la serie bonus",
+  "wk.failureRir": "0 vuol dire che sei arrivato a cedimento.",
+  "wk.failureRpe": "10 vuol dire che sei arrivato a cedimento.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -303,4 +343,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "wk.equipment": "器具",
   "wk.compound": "複数の筋肉を使う（主要種目）",
   "wk.addUse": "追加して今すぐ使う",
+  "wk.extraAsk": "ボーナスセットを追加しますか？",
+  "wk.dropSet": "ドロップセット",
+  "wk.restPause": "レストポーズ",
+  "wk.dropLine": "ドロップセット：軽くして休まずに、できるだけ正しいフォームで",
+  "wk.restPauseLine": "レストポーズ：同じ重さで短く休み、あと数回正しいフォームで",
+  "wk.extraCancel": "ボーナスセットをやめる",
+  "wk.failureRir": "0 は限界まで追い込んだという意味です。",
+  "wk.failureRpe": "10 は限界まで追い込んだという意味です。",
 };

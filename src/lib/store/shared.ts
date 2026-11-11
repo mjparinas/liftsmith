@@ -35,5 +35,6 @@ export function persistActive(a: Active | null) {
 }
 
 export function setsDone(events: AppEvent[], sessionId: string, exerciseId: string): number {
-  return events.filter((e) => e.type === "set" && e.sessionId === sessionId && e.exerciseId === exerciseId).length;
+  // Bonus drop and rest-pause sets aren't planned sets, so they don't count toward the plan's set count.
+  return events.filter((e) => e.type === "set" && e.sessionId === sessionId && e.exerciseId === exerciseId && !e.tag).length;
 }

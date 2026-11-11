@@ -82,6 +82,9 @@ export const en = {
   "gloss.restDrop.title": "Heart rate drop in rest",
   "gloss.restDrop.body":
     "How many beats a minute your heart rate falls in the first minute after a set, from your heart rate monitor. A bigger drop over the months means a fitter heart; a smaller one than usual can mean you're tired.",
+  "gloss.setTypes.title": "Drop sets and rest-pause",
+  "gloss.setTypes.body":
+    "Bonus sets you can add between sets, once the planned set is logged.\nA drop set takes the weight down by about a quarter and goes again straight away. A rest-pause set keeps the same weight, pauses for 15 seconds, then squeezes out a few more reps.\nBoth add work for the muscle without a full extra set. They count in your volume, but the plan's next weights only read your planned sets.",
 } as const;
 
 type Key = keyof typeof en;
@@ -165,6 +168,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.restDrop.title": "Bajada de pulsaciones en el descanso",
   "gloss.restDrop.body":
     "Cuántas pulsaciones por minuto baja tu frecuencia cardiaca en el primer minuto tras una serie, según tu pulsómetro. Una bajada mayor con los meses indica un corazón más en forma; una menor de lo habitual puede indicar cansancio.",
+  "gloss.setTypes.title": "Series descendentes y rest-pause",
+  "gloss.setTypes.body":
+    "Series extra que puedes añadir entre series, una vez registrada la serie planificada.\nUna serie descendente baja el peso más o menos una cuarta parte y vuelve a empezar sin descanso. Una serie rest-pause mantiene el peso, descansa 15 segundos y saca unas pocas repeticiones más.\nAmbas suman trabajo para el músculo sin una serie completa más. Cuentan en tu volumen, pero los próximos pesos del plan solo leen tus series planificadas.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -246,6 +252,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.restDrop.title": "Baisse du rythme cardiaque au repos",
   "gloss.restDrop.body":
     "De combien de battements par minute votre fréquence cardiaque baisse dans la première minute après une série, d’après votre cardiofréquencemètre. Une baisse plus grande au fil des mois signifie un cœur plus en forme ; une baisse plus faible que d’habitude peut signaler de la fatigue.",
+  "gloss.setTypes.title": "Séries dégressives et rest-pause",
+  "gloss.setTypes.body":
+    "Des séries bonus à ajouter entre deux séries, une fois la série prévue enregistrée.\nUne série dégressive baisse la charge d’environ un quart et repart tout de suite. Une série rest-pause garde la même charge, fait une pause de 15 secondes, puis arrache quelques reps de plus.\nLes deux ajoutent du travail au muscle sans une série complète en plus. Elles comptent dans votre volume, mais les prochaines charges du plan ne lisent que vos séries prévues.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -327,6 +336,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.restDrop.title": "Herzfrequenzabfall in der Pause",
   "gloss.restDrop.body":
     "Um wie viele Schläge pro Minute deine Herzfrequenz in der ersten Minute nach einem Satz fällt, gemessen von deinem Herzfrequenzmesser. Ein größerer Abfall über die Monate bedeutet ein fitteres Herz; ein kleinerer als sonst kann heißen, dass du müde bist.",
+  "gloss.setTypes.title": "Dropsätze und Rest-Pause",
+  "gloss.setTypes.body":
+    "Bonussätze, die du zwischen den Sätzen anhängen kannst, sobald der geplante Satz eingetragen ist.\nEin Dropsatz senkt das Gewicht um etwa ein Viertel und geht sofort weiter. Ein Rest-Pause-Satz behält das Gewicht, pausiert 15 Sekunden und holt noch ein paar Wiederholungen heraus.\nBeide geben dem Muskel mehr Arbeit ohne einen ganzen Extrasatz. Sie zählen zu deinem Volumen, aber die nächsten Gewichte im Plan lesen nur deine geplanten Sätze.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -408,6 +420,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.restDrop.title": "Calo della frequenza cardiaca nel riposo",
   "gloss.restDrop.body":
     "Di quanti battiti al minuto scende la frequenza cardiaca nel primo minuto dopo una serie, dal tuo cardiofrequenzimetro. Un calo più ampio nel corso dei mesi indica un cuore più in forma; uno più piccolo del solito può voler dire che sei stanco.",
+  "gloss.setTypes.title": "Drop set e rest-pause",
+  "gloss.setTypes.body":
+    "Serie bonus da aggiungere tra una serie e l’altra, dopo aver registrato la serie prevista.\nUn drop set abbassa il peso di circa un quarto e riparte subito. Una serie rest-pause tiene lo stesso peso, si ferma 15 secondi e poi tira fuori qualche ripetizione in più.\nEntrambe aggiungono lavoro al muscolo senza una serie intera in più. Contano nel tuo volume, ma i prossimi pesi del piano leggono solo le serie previste.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -489,4 +504,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.restDrop.title": "休憩中の心拍数の低下",
   "gloss.restDrop.body":
     "セット後の最初の1分間で心拍数が1分あたり何拍下がるかを、心拍計で測ったものです。数か月かけて下がり幅が大きくなれば心肺が鍛えられた証拠で、いつもより小さければ疲れているのかもしれません。",
+  "gloss.setTypes.title": "ドロップセットとレストポーズ",
+  "gloss.setTypes.body":
+    "予定のセットを記録したあと、セットの合間に追加できるボーナスセットです。\nドロップセットは重さを約4分の1下げて、休まずにもう一度行います。レストポーズは同じ重さのまま15秒休み、あと数回だけ挙げます。\nどちらもセットを丸ごと増やさずに筋肉への刺激を増やせます。ボリュームには数えますが、プランの次の重さは予定のセットだけを見て決めます。",
 };

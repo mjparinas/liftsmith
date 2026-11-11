@@ -434,7 +434,16 @@ export interface SetEvent extends EventBase {
   /** Per-side exercises (sides.ts) when the two sides differ: reps on each. `reps` is then the lower. */
   repsL?: number;
   repsR?: number;
+  /**
+   * A bonus set added between sets (set types, 2026-11-11): a drop set (lighter, straight after the one
+   * before) or a rest-pause set (same weight after a short pause). Counted in volume and stats; progression,
+   * ghost mode and plateaus read only the planned sets (progression.ts sessionsOf).
+   */
+  tag?: SetTag;
 }
+
+/** Set types the lifter adds between sets. Failure is the reps-left rating of 0 (EffortEvent). */
+export type SetTag = "drop" | "restPause";
 
 export interface SessionStartEvent extends EventBase {
   type: "sessionStart";
