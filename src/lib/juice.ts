@@ -242,6 +242,28 @@ export const sound = {
   countdown(on = feel.sound) {
     if (on) mallet(NOTE.E5, 0, 0.09, 0.4);
   },
+  /**
+   * The tempo coach (a lab, `labTempo`): one beat a second. A new phase gets its own shape, so it can
+   * be told apart without looking: a falling pair to lower, one middle note to hold, a rising pair to
+   * lift; the lead-in is the rest countdown's tick. Each further second in a phase is a quiet tick at
+   * that phase's pitch, so the count stays steady without crowding the room.
+   */
+  tempo(phase: "lead" | "down" | "hold" | "up", start: boolean) {
+    if (!feel.sound) return;
+    if (phase === "lead") mallet(NOTE.E5, 0, 0.09, 0.35);
+    else if (!start) mallet(phase === "down" ? NOTE.E5 : phase === "hold" ? NOTE.A4 : NOTE.A5, 0, 0.07, 0.22);
+    else if (phase === "down")
+      phrase([
+        [NOTE.A5, 0, 0.1, 0.5],
+        [NOTE.E5, 0.08, 0.18, 0.5],
+      ]);
+    else if (phase === "hold") mallet(NOTE.A4, 0, 0.24, 0.5);
+    else
+      phrase([
+        [NOTE.E5, 0, 0.1, 0.55],
+        [NOTE.A5, 0.07, 0.2, 0.6],
+      ]);
+  },
   /** Rest is over: a clear phrase that cuts through gym music, in the chosen timer sound. */
   restEnd(on = feel.sound) {
     if (!on) return;

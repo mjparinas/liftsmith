@@ -102,6 +102,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
@@ -218,6 +219,7 @@ export const de: Partial<Record<MessageKey, Message>> = {
   ...stats.de,
   ...tab.de,
   ...td.de,
+  ...tempo.de,
   ...tdee.de,
   ...theme.de,
   ...tier.de,
