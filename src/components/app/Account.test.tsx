@@ -56,4 +56,17 @@ describe("signing in with an emailed code", () => {
     expect(calls.at(-1)).toMatchObject({ url: "/api/auth/logout/", auth: "Bearer tok" });
     expect(screen.getByRole("button", { name: "Continue with email" })).toBeInTheDocument();
   });
+
+  it("sends the email and the code with Enter, like the buttons", async () => {
+    const u = userEvent.setup();
+    render(<AccountPanel />);
+    await u.click(screen.getByRole("button", { name: "Continue with email" }));
+    // Enter before the address is complete does nothing.
+    await u.type(screen.getByLabelText("Your email"), "me{Enter}");
+    expect(calls).toHaveLength(0);
+    await u.type(screen.getByLabelText("Your email"), "@example.com{Enter}");
+    expect(calls[0]).toMatchObject({ url: "/api/auth/email/", body: { email: "me@example.com" } });
+    await u.type(await screen.findByLabelText("Code"), "123456{Enter}");
+    expect(await screen.findByText("Signed in as me@example.com with email.")).toBeInTheDocument();
+  });
 });

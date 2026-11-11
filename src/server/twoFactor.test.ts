@@ -103,6 +103,22 @@ describe("two-step sign-in for staff", () => {
     expect(log.map((l) => l.action)).toEqual(["2fa.enable"]);
   });
 
+  it("carries on with an unfinished setup at the next sign-in, so the code already scanned still works", async () => {
+    const first = await cookieFor("owner@example.com");
+    const started = await tf(first, { action: "start" });
+    // Signed in again before confirming: the same secret comes back, not a new one.
+    const next = await cookieFor("owner@example.com");
+    const again = await tf(next, { action: "start" });
+    expect(again.body.secret).toBe(started.body.secret);
+    // Start over makes a new one, and the old one stops counting.
+    const fresh = await tf(next, { action: "start", restart: true });
+    expect(fresh.body.secret).not.toBe(started.body.secret);
+    expect((await tf(next, { action: "confirm", code: codeNow(fresh.body.secret!) })).status).toBe(200);
+    // Once it's on, the next sign-in asks for a code rather than setup.
+    const later = await cookieFor("owner@example.com");
+    expect(await state(later)).toMatchObject({ enabled: true, ready: false });
+  });
+
   it("asks for the code at the next sign-in: wrong and reused codes fail, a recovery code works once", async () => {
     const { secret, codes } = await enrol("owner@example.com");
     const used = codeNow(secret);
