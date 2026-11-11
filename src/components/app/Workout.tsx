@@ -37,6 +37,7 @@ import { pickBpm, type WatchReading } from "@/lib/watchHr";
 import { AutoCount, AutoCountButton, countable, loadCountPrefs, saveCountPrefs, type CountPrefs } from "./AutoCount";
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
+import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, plateText, repsText } from "./format";
 import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
@@ -44,6 +45,7 @@ import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
+import { AddExercise } from "./workout/AddExercise";
 import { ComingUp } from "./workout/ComingUp";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
@@ -636,6 +638,7 @@ export function Workout() {
       ) : null}
 
       {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
+      <AddExercise />
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
@@ -792,6 +795,7 @@ function SwapList({
   onPick: (id: string, avoid: boolean) => void;
 }) {
   const [avoid, setAvoid] = useState(false);
+  const [browsing, setBrowsing] = useState(false);
   const list = alternatives(fromId, gymEquipment, skip, hurt).slice(0, 12);
   return (
     <div>
@@ -834,6 +838,23 @@ function SwapList({
         ))}
         {!list.length && <li className="py-3 text-muted">{t("wk.noAlt")}</li>}
       </ul>
+      {/* Anything else in the library, searchable and filtered (the best matches stay above). */}
+      {browsing ? (
+        <div className="mt-3 border-t border-line pt-3">
+          <ExerciseBrowser
+            id="swap"
+            gym={gymEquipment}
+            skip={[fromId, ...skip]}
+            startGroup={exercise(fromId).cardio ? "cardio" : (exercise(fromId).primary[0] ?? null)}
+            onPick={(id) => onPick(id, avoid)}
+            action={<Icon name="swap" size={16} />}
+          />
+        </div>
+      ) : (
+        <Button kind="quiet" className="mt-2 w-full" onClick={() => setBrowsing(true)}>
+          {t("wk.find.all")}
+        </Button>
+      )}
       <button
         type="button"
         onClick={() => go("injuries")}

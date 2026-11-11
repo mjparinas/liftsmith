@@ -348,7 +348,7 @@ describe("first run to finished workout", () => {
         .at(-1)!,
     );
     await user.click(within(dialog).getByRole("button", { name: "Add exercise" }));
-    await user.type(within(dialog).getByLabelText("Add exercise"), "lateral raise");
+    await user.type(within(dialog).getByLabelText("Search by name, muscle or equipment"), "lateral raise");
     await user.click(within(dialog).getAllByRole("button", { name: /Lateral raise/i })[0]);
     await user.click(within(dialog).getByRole("button", { name: "Save routine" }));
     const saved = useApp.getState().profile.routines!;
