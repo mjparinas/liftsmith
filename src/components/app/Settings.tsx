@@ -18,7 +18,7 @@ import { saveFile, setsCsv, stamp } from "@/lib/exportData";
 import type { Term } from "@/lib/glossary";
 import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
-import { feel } from "@/lib/juice";
+import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
@@ -117,14 +117,18 @@ function NavRow({ title, sub, icon, pro, onClick }: { title: string; sub?: strin
 function ProCard() {
   const { live, ent } = useBilling();
   const now = useNow(60_000);
-  const pro = !live || entActive(ent, now);
+  // Pro on the account (a web subscription, a store one from another phone, a lifetime code) counts here too.
+  const viaAccount = useAccount((s) => !!s.account?.pro);
+  const pro = !live || entActive(ent, now) || viaAccount;
   const status = !live
     ? t("pro.settings.unlocked")
     : entActive(ent, now)
       ? ent?.plan === "monthly"
         ? t("pro.status.monthly")
         : t("pro.status.yearly")
-      : t("pro.settings.free");
+      : viaAccount
+        ? t("pro.settings.account")
+        : t("pro.settings.free");
   return (
     <section
       className="card card-tint mt-4 p-4"
@@ -244,7 +248,7 @@ function LabsPage() {
           </Button>
         </section>
       ) : (
-        LABS.filter((l) => !l.needs || labOn(l.needs)).map((l) => (
+        LABS.filter((l) => (!l.needs || labOn(l.needs)) && (!l.native || isNative())).map((l) => (
           <SwitchRow
             key={l.flag}
             label={t(`lab.${l.key}.title`)}

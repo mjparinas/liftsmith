@@ -33,6 +33,8 @@ export interface SessionState {
   total?: number;
   /** The workout's id: the watch apps open themselves once per workout (watch-apps.md). */
   sessionId?: string;
+  /** Labs, watch rep counting: the Wear OS or Apple Watch app streams its motion for this set (watchMotion.ts). */
+  motion?: boolean;
 }
 
 /** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
@@ -50,6 +52,7 @@ type Plugin = {
   requestPermission(): Promise<{ granted: boolean }>;
   addListener(event: "action", cb: (e: { action: SessionAction }) => void): Handle | Promise<Handle>;
   addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Handle | Promise<Handle>;
+  addListener(event: "watchMotion", cb: (e: unknown) => void): Handle | Promise<Handle>;
 };
 const plugin = (): Plugin | undefined =>
   typeof window !== "undefined"
@@ -118,6 +121,13 @@ export function onWatchHeartRate(cb: (bpm: number) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
   return unlisten(p.addListener("heartRate", (e) => cb(e.bpm)));
+}
+
+/** Motion batches from the watch app while `motion` is on (Labs, watch rep counting), read by parseWatchMotion. */
+export function onWatchMotion(cb: (batch: unknown) => void): () => void {
+  const p = plugin();
+  if (!p || !isNative()) return () => {};
+  return unlisten(p.addListener("watchMotion", cb));
 }
 
 export async function stopSession() {

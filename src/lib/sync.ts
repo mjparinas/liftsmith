@@ -4,7 +4,8 @@
 // outbox in syncOutbox.ts), pull what the account's other devices wrote, by cursor, from POST /api/sync/.
 // Runs on open, when the app comes back to the foreground or online, and a few seconds after a change.
 // Events merge by id, so order and repeats don't matter; the profile and gyms are last write wins.
-import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount } from "./auth";
+import { installId } from "./analytics";
+import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount, type AccountAccess } from "./auth";
 import { useApp } from "./store";
 import { noteChanged, onOutbox, readSync, seedOutbox, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
@@ -19,14 +20,12 @@ interface Rec {
   updatedAt: number;
 }
 
-interface Reply {
+interface Reply extends AccountAccess {
   cursor: number;
   events: AppEvent[];
   deleted: string[];
   records: Rec[];
   more: boolean;
-  /** Pro that comes with the account (the store review account). */
-  pro?: boolean;
 }
 
 export interface Pulled {
@@ -160,9 +159,11 @@ async function run(): Promise<void> {
           deleted: del,
           records: s.rev !== s.sentRev || s.first ? localRecords(profile, gyms, s.gyms, now) : [],
           first: s.first,
+          // So this install's store subscription (if any) counts for the account on the web too (the server's access.ts).
+          installId: installId(),
         },
       });
-      setAccountPro(!!reply.pro);
+      setAccountPro(!!reply.pro, reply);
       const merged = mergeRecords(useApp.getState().profile, useApp.getState().gyms, reply.records, s.first);
       useApp.getState().applySynced({ events: reply.events, deleted: reply.deleted, profile: merged.profile, gyms: merged.gyms });
       // Re-read: the lifter may have logged more while the request was out.
