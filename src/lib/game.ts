@@ -408,6 +408,13 @@ export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 60, rare: 28, epic: 10, legendary: 2 };
 export const RARITY_LABEL: Record<Rarity, string> = translated(["common", "rare", "epic", "legendary"], (k) => `rarity.${k}`);
 
+/** The chance one crate holds this item (0 for a starter item). */
+export function rarityOdds(id: string): number {
+  const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
+  const item = pool.find((c) => c.id === id);
+  return item ? RARITY_WEIGHT[item.rarity] / pool.reduce((t, c) => t + RARITY_WEIGHT[c.rarity], 0) : 0;
+}
+
 export function crateFor(sessionId: string): Cosmetic {
   const r = rng(hash(`crate:${sessionId}`))();
   const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
@@ -431,9 +438,57 @@ export function crates(stats: Stats): { sessionId: string; item: Cosmetic; dupli
   });
 }
 
+/** What the starter set and workout crates alone give (level rewards come on top, in game()). */
 export function owned(stats: Stats): Set<string> {
   return new Set([...STARTER, ...crates(stats).map((c) => c.item.id)]);
 }
+
+// ---------- Level rewards (Melvin, 2026-11-11): a set item at some levels and a bonus crate with each new title,
+// so every rare item has a sure path. Derived from the level, never stored, like crates.
+
+/** The set item each reward level gives; if a crate brought it first, it turns into bonus XP like any repeat. */
+export const LEVEL_ITEMS: readonly { level: number; id: string }[] = [
+  { level: 5, id: "accent-violet" },
+  { level: 10, id: "plates-chrome" },
+  { level: 18, id: "sound-gong" },
+  { level: 25, id: "accent-gold" },
+  { level: 40, id: "plates-neon" },
+];
+/** Levels that start a new title, each with a bonus crate. */
+export const TITLE_LEVELS: readonly number[] = TITLES.map(([n]) => n).filter((n) => n > 1);
+
+export interface LevelReward {
+  level: number;
+  /** "item": the set item for that level; "crate": the bonus crate for a new title. */
+  source: "item" | "crate";
+  item: Cosmetic;
+  /** Stable key, so the Done screen can tell which rewards are new. */
+  key: string;
+}
+
+const COSMETIC_BY_ID = new Map(COSMETICS.map((c) => [c.id, c]));
+
+/** Every reward up to and including this level, lowest level first (a set item before a bonus crate). */
+export function levelRewards(level: number): LevelReward[] {
+  const list: LevelReward[] = [];
+  for (const r of LEVEL_ITEMS) {
+    const item = COSMETIC_BY_ID.get(r.id);
+    if (item && r.level <= level) list.push({ level: r.level, source: "item", item, key: `item:${r.level}` });
+  }
+  for (const n of TITLE_LEVELS) if (n <= level) list.push({ level: n, source: "crate", item: crateFor(`title:${n}`), key: `crate:${n}` });
+  return list.sort((a, b) => a.level - b.level || (a.source === "item" ? -1 : 1));
+}
+
+/** The level a set item comes with, if any (for the Locker's hint). */
+export const levelForItem = (id: string): number | null => LEVEL_ITEMS.find((r) => r.id === id)?.level ?? null;
+
+/** The next reward after this level, or null at the top. */
+export function nextReward(level: number): LevelReward | null {
+  return levelRewards(MAX_LEVEL).find((r) => r.level > level) ?? null;
+}
+
+/** Repeats among everything won (workout crates and level rewards): each is worth bonus XP. Order doesn't matter. */
+const repeats = (ids: readonly string[]) => ids.length - new Set(ids).size;
 
 // ---------- PR moments during a workout
 
@@ -481,7 +536,11 @@ export interface Game {
   badges: { earned: number; total: number };
   /** Closest goals, for "almost there" cards. */
   nearest: Achievement[];
+  /** Starter items, workout crates and level rewards. */
   owned: Set<string>;
+  /** Level rewards earned so far. */
+  rewards: LevelReward[];
+  next: LevelReward | null;
 }
 
 export function questXp(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): number {
@@ -495,19 +554,32 @@ export function questXp(events: readonly AppEvent[], stats: Stats, profile: Prof
 export function game(events: readonly AppEvent[], stats: Stats, profile: Profile, now: number): Game {
   const streak = goalStreak(stats, profile, now);
   const list = achievements(context(events, stats, profile, streak.best));
-  const dupXp = crates(stats).filter((c) => c.duplicate).length * XP.crateDuplicate;
-  const xp = xpTotal(stats) + questXp(events, stats, profile, now) + achievementXp(list) + dupXp;
+  const base = xpTotal(stats) + questXp(events, stats, profile, now) + achievementXp(list);
+  const won = crates(stats).map((c) => c.item.id);
+  // Repeats give XP, and rewards come with levels, so a repeat reward can lift the level and bring the next one.
+  // Each pass only adds rewards, so this settles within a few passes.
+  let xp = base + repeats(won) * XP.crateDuplicate;
+  let rewards = levelRewards(levelOf(xp).level);
+  for (let pass = 0; pass < MAX_LEVEL; pass++) {
+    const next = base + repeats([...won, ...rewards.map((r) => r.item.id)]) * XP.crateDuplicate;
+    if (next === xp) break;
+    xp = next;
+    rewards = levelRewards(levelOf(xp).level);
+  }
+  const level = levelOf(xp);
   const total = list.reduce((n, a) => n + a.levels, 0);
   return {
     xp,
-    level: levelOf(xp),
+    level,
     streak,
     quests: questsFor(events, profile, weekOf(now)),
     league: league(events, stats, profile, now, streak),
     achievements: list,
     badges: { earned: list.reduce((n, a) => n + a.level, 0), total },
     nearest: nearest(list),
-    owned: owned(stats),
+    owned: new Set([...STARTER, ...won, ...rewards.map((r) => r.item.id)]),
+    rewards,
+    next: nextReward(level.level),
   };
 }
 
