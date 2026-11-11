@@ -6,6 +6,7 @@
 // 30 days against the lifter's own normal. Free to see; health signals moving today's call is Pro.
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 
+import { BMI_COLOUR, BmiBar } from "@/components/BmiBar";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
@@ -18,6 +19,7 @@ import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
+import { bmiBand, bmiCategory } from "@/lib/tdee";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { useNow } from "@/lib/useNow";
 
@@ -38,12 +40,19 @@ const TERM: Partial<Record<TwinId, Term>> = {
 };
 
 /** Status colours are tokens (good, warn), so they follow the theme and colour-blind safe colours. */
-const TONE: Record<Status, string> = {
-  good: "border-good/50 text-good",
-  watch: "border-warn/60 text-warn",
-  steady: "border-line text-muted",
-  info: "border-line text-muted",
-  missing: "border-line text-faint",
+/**
+ * One colour scale for every status label on Body › Health (Melvin, 2026-11-11: "colour coded based on
+ * what is being displayed"). Calm on purpose, never red: green when it's going well, cyan when it's
+ * normal for you or holding steady, amber when it's worth acting on, plain when it's only information,
+ * and faint with a dashed edge when there's nothing to judge yet. The words always say the same thing,
+ * so colour is never the only cue. BMI's label takes its band's colour from the range bar instead.
+ */
+const TONE: Record<Status, { pill: string; text: string }> = {
+  good: { pill: "border-good/50 bg-good/10 text-good", text: "text-good" },
+  steady: { pill: "border-cyan/45 bg-cyan/10 text-cyan", text: "text-cyan" },
+  watch: { pill: "border-warn/60 bg-warn/10 text-warn", text: "text-warn" },
+  info: { pill: "border-line text-muted", text: "text-muted" },
+  missing: { pill: "border-dashed border-line text-faint", text: "text-faint" },
 };
 
 const noSubscribe = () => () => {};
@@ -297,9 +306,7 @@ function Pin({ m, className, onOpen }: { m?: TwinMetric; className: string; onOp
         <span className="sr-only">:</span>
       </span>
       <span className="num block text-sm font-bold text-ink">{m.display}</span>
-      <span
-        className={`block truncate text-[0.6875rem] ${m.status === "good" ? "text-good" : m.status === "watch" ? "text-warn" : "text-muted"}`}
-      >
+      <span className={`block truncate text-[0.6875rem] ${TONE[m.status].text}`} style={bmiChip(m, false)}>
         {m.chip}
       </span>
     </button>
@@ -325,7 +332,12 @@ function Tiles({ ids, by, onOpen }: { ids: TwinId[]; by: Map<TwinId, TwinMetric>
                   <span className="block text-xs font-semibold uppercase tracking-wider text-muted">{m.label}</span>
                   <span className="num display block text-xl">{m.display || "—"}</span>
                 </span>
-                <span className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status]}`}>{m.chip}</span>
+                <span
+                  className={`shrink-0 rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status].pill}`}
+                  style={bmiChip(m)}
+                >
+                  {m.chip}
+                </span>
               </span>
               <span className="mt-1 block text-sm text-muted">{m.why}</span>
               {m.did && <span className="mt-1 block text-sm text-ink">{m.did}</span>}
@@ -342,10 +354,17 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
     <div>
       <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
         <span className="num display text-3xl">{m.display || "—"}</span>
-        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status]}`}>{m.chip}</span>
+        <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${TONE[m.status].pill}`} style={bmiChip(m)}>
+          {m.chip}
+        </span>
         {term && <Info term={term} />}
       </div>
       {m.series.length >= 2 && <Chart m={m} />}
+      {m.id === "bmi" && m.value !== undefined && (
+        <div className="mt-3">
+          <BmiBar bmi={m.value} label={false} />
+        </div>
+      )}
       {m.band && m.id !== "sleep" && (
         <p className="mt-1 text-xs text-faint">{t("twin.normal", { low: fmt(m.band.low), high: fmt(m.band.high) })}</p>
       )}
@@ -391,6 +410,14 @@ function Detail({ m, store, onConnect, onEasy }: { m: TwinMetric; store: string;
       </p>
     </div>
   );
+}
+
+/** BMI's chip takes its band's colour from the range bar, unless it says to ignore BMI (a lean lifter). */
+function bmiChip(m: TwinMetric, pill = true): React.CSSProperties | undefined {
+  if (m.id !== "bmi" || m.value === undefined || m.chip !== bmiBand(m.value)) return undefined;
+  const c = BMI_COLOUR[bmiCategory(m.value)];
+  if (!pill) return { color: c };
+  return { color: c, borderColor: `color-mix(in srgb, ${c} 45%, transparent)`, background: `color-mix(in srgb, ${c} 10%, transparent)` };
 }
 
 const fmt = (v: number) => (Math.abs(v) >= 100 ? String(Math.round(v)) : String(Math.round(v * 10) / 10));
