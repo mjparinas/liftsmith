@@ -43,6 +43,7 @@ import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
 import * as friends from "./text/friends";
+import * as ft from "./text/ft";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -159,6 +160,7 @@ export const de: Partial<Record<MessageKey, Message>> = {
   ...fit.de,
   ...fix.de,
   ...fmt.de,
+  ...ft.de,
   ...friends.de,
   ...game.de,
   ...ghost.de,

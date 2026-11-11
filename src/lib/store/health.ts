@@ -1,10 +1,11 @@
 import type { CloudReading } from "../cloud";
 import { derive } from "../derive";
+import { cleanResult } from "../fitTests";
 import { healthAvailable, noteHealthSync, readBody, readDaily } from "../health";
 import { deleteEvents } from "../localdb";
 import { MEASURE_RANGE } from "../measure";
 import { bodyUpdates, currentTdee, snapshotDue, type BodyReadings } from "../tdee";
-import type { AppEvent, MeasureSite } from "../types";
+import type { AppEvent, FitTest, MeasureSite } from "../types";
 import { uid, type Ctx } from "./shared";
 
 // Cycle logs, weigh-ins, readings from Health Connect / Apple Health, and TDEE snapshots.
@@ -19,6 +20,8 @@ export interface HealthSlice {
   logBodyweight(kg: number, bodyFat?: number): void;
   /** Log a tape measurement (cm) at one body site. */
   logMeasure(site: MeasureSite, cm: number): void;
+  /** Log a fitness test result (fitTests.ts): seconds, or stands for the chair stand. Returns false when out of range. */
+  logFitTest(test: FitTest, value: number, eyes?: "open" | "closed"): boolean;
   /** Weigh-ins and body fat from Health Connect or Apple Health (native, when allowed), deduplicated by day. */
   importHealthBody(): Promise<number>;
   /** Sleep, HRV, resting HR, steps, VO2 max and breathing rate from Health, one reading a day (the health twin). */
@@ -63,6 +66,13 @@ export function healthSlice(c: Ctx): HealthSlice {
     logMeasure(site, cm) {
       if (!(cm >= MEASURE_RANGE[0] && cm <= MEASURE_RANGE[1])) return;
       commit([{ type: "measure", id: uid(), at: Date.now(), site, cm: Math.round(cm * 10) / 10 }]);
+    },
+
+    logFitTest(test, value, eyes) {
+      const v = cleanResult(test, value);
+      if (v === null) return false;
+      commit([{ type: "fitTest", id: uid(), at: Date.now(), test, value: v, ...(test === "balance" ? { eyes: eyes ?? "open" } : {}) }]);
+      return true;
     },
 
     async importHealthBody() {

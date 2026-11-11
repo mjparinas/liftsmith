@@ -18,6 +18,7 @@
     "src/lib/injury.ts",
     "src/lib/layoff.ts",
     "src/lib/loads.ts",
+    "src/lib/fitTests.ts",
     "src/lib/measure.ts",
     "src/lib/nutrition.ts",
     "src/lib/cardio.ts",

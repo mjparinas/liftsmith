@@ -89,6 +89,11 @@ try {
       await page.getByRole("dialog").waitFor();
       await scan("fitness age how");
       await page.keyboard.press("Escape");
+      // A fitness test's sheet: steps, timer, result box and reference.
+      await page.getByTestId("ft-hang").click();
+      await page.getByRole("dialog").waitFor();
+      await scan("fitness test");
+      await page.keyboard.press("Escape");
       await page.getByTestId("body-muscles").click();
     }
   }
