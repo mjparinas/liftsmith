@@ -6,14 +6,15 @@ import { CtaBanner, JsonLd } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { REPLY_TIME } from "@/lib/contact";
 import { ALL_FAQS, faqJsonLd, HELP } from "@/lib/faqs";
+import { pageMeta } from "@/lib/pageMeta";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Help and questions",
   description: `Answers about getting started with ${name}: how workouts are planned, your data, accounts and sync, Pro and billing, and fixing common problems.`,
-  alternates: { canonical: "/help/" },
-};
+  path: "/help/",
+});
 
 export default function Help() {
   return (

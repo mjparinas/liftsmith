@@ -17,6 +17,7 @@ export const en = {
   "theme.pumpkin": "Pumpkin",
   "theme.pumpkin.how": "Open to everyone in October",
   "theme.frost": "Frost",
+  "theme.pro": "Pro",
   "theme.frost.how": "Open to everyone in December",
   "theme.badge": "Earn the {badge} · {tier} badge",
 } as const;
@@ -37,6 +38,7 @@ export const es: Partial<Record<Key, Message>> = {
   "theme.pumpkin": "Calabaza",
   "theme.pumpkin.how": "Abierto a todos en octubre",
   "theme.frost": "Escarcha",
+  "theme.pro": "Pro",
   "theme.frost.how": "Abierto a todos en diciembre",
   "theme.badge": "Consigue la insignia {badge} · {tier}",
 };
@@ -55,6 +57,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "theme.pumpkin": "Citrouille",
   "theme.pumpkin.how": "Ouvert à tous en octobre",
   "theme.frost": "Givre",
+  "theme.pro": "Pro",
   "theme.frost.how": "Ouvert à tous en décembre",
   "theme.badge": "Obtenez le badge {badge} · {tier}",
 };
@@ -73,6 +76,7 @@ export const de: Partial<Record<Key, Message>> = {
   "theme.pumpkin": "Kürbis",
   "theme.pumpkin.how": "Im Oktober für alle verfügbar",
   "theme.frost": "Frost",
+  "theme.pro": "Pro",
   "theme.frost.how": "Im Dezember für alle verfügbar",
   "theme.badge": "Hol dir das Abzeichen {badge} · {tier}",
 };
@@ -91,6 +95,7 @@ export const it: Partial<Record<Key, Message>> = {
   "theme.pumpkin": "Zucca",
   "theme.pumpkin.how": "Disponibile per tutti a ottobre",
   "theme.frost": "Gelo",
+  "theme.pro": "Pro",
   "theme.frost.how": "Disponibile per tutti a dicembre",
   "theme.badge": "Ottieni il badge {badge} · {tier}",
 };
@@ -109,6 +114,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "theme.pumpkin": "パンプキン",
   "theme.pumpkin.how": "10月は誰でも使えます",
   "theme.frost": "フロスト",
+  "theme.pro": "Pro",
   "theme.frost.how": "12月は誰でも使えます",
   "theme.badge": "バッジ「{badge} · {tier}」を獲得",
 };

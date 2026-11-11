@@ -29,7 +29,11 @@ const nextConfig: NextConfig = {
   ...(isStatic ? { output: "export" as const } : {}),
   trailingSlash: true,
   images: { unoptimized: true },
-  pageExtensions: isStatic ? ["tsx", "ts"] : ["api.tsx", "api.ts", "tsx", "ts"],
+  // STILLS=1 adds the build-only /stills/ page that scripts/og-images.mjs draws preview images from.
+  pageExtensions: [
+    ...(process.env.STILLS === "1" ? ["stills.tsx"] : []),
+    ...(isStatic ? ["tsx", "ts"] : ["api.tsx", "api.ts", "tsx", "ts"]),
+  ],
   // Creator links (www.getliftsmith.com/c/<code>/) all open the one /c/ page, which reads the code from the address.
   // Public share links (www.getliftsmith.com/w/<id>/ and its card image) are drawn by API routes (src/server/shareLinks.ts).
   ...(isStatic

@@ -1,6 +1,6 @@
 import type { MessageKey } from "@/locales/en";
 
-import { achievements, achievementXp, context, nearest, type Achievement } from "./achievements";
+import { achievements, achievementXp, context, nearest, tierNames, type Achievement, type Tier } from "./achievements";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
@@ -396,6 +396,8 @@ const COSMETIC_ROWS: Omit<Cosmetic, "name">[] = [
   { id: "plates-black", kind: "plates", rarity: "rare", value: "black" },
   { id: "plates-chrome", kind: "plates", rarity: "epic", value: "chrome" },
   { id: "plates-neon", kind: "plates", rarity: "legendary", value: "neon" },
+  // Never in a crate: a badge brings it (BADGE_ITEMS).
+  { id: "accent-pro", kind: "accent", rarity: "legendary", value: "#e879f9" },
 ];
 /** Cosmetics with their names in the current language (getters, so a language change shows at once). */
 export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
@@ -405,19 +407,33 @@ export const COSMETICS: Cosmetic[] = COSMETIC_ROWS.map((c) => ({
   },
 }));
 export const STARTER = ["accent-blue", "sound-classic", "plates-classic"];
+
+/**
+ * Locker items a badge brings instead of a crate (Melvin, 2026-11-11: Pro "should unlock some kind of badge or
+ * achievement or reward"). Kept out of the crate pool, so every crate already opened still holds what it held.
+ */
+export const BADGE_ITEMS: readonly { id: string; badge: string; tier: Tier }[] = [{ id: "accent-pro", badge: "pro", tier: "silver" }];
+export const badgeForItem = (id: string) => BADGE_ITEMS.find((b) => b.id === id) ?? null;
+/** What crates can hold: everything but the starter set and the badge items. */
+const cratePool = () => COSMETICS.filter((c) => !STARTER.includes(c.id) && !badgeForItem(c.id));
+/** Badge items the lifter's achievements have earned. */
+export function badgeItems(list: readonly Achievement[]): string[] {
+  const level = new Map(list.map((a) => [a.id, a.level]));
+  return BADGE_ITEMS.filter((b) => (level.get(b.badge) ?? 0) >= tierNames(b.badge).indexOf(b.tier) + 1).map((b) => b.id);
+}
 const RARITY_WEIGHT: Record<Rarity, number> = { common: 60, rare: 28, epic: 10, legendary: 2 };
 export const RARITY_LABEL: Record<Rarity, string> = translated(["common", "rare", "epic", "legendary"], (k) => `rarity.${k}`);
 
-/** The chance one crate holds this item (0 for a starter item). */
+/** The chance one crate holds this item (0 for a starter or badge item). */
 export function rarityOdds(id: string): number {
-  const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
+  const pool = cratePool();
   const item = pool.find((c) => c.id === id);
   return item ? RARITY_WEIGHT[item.rarity] / pool.reduce((t, c) => t + RARITY_WEIGHT[c.rarity], 0) : 0;
 }
 
 export function crateFor(sessionId: string): Cosmetic {
   const r = rng(hash(`crate:${sessionId}`))();
-  const pool = COSMETICS.filter((c) => !STARTER.includes(c.id));
+  const pool = cratePool();
   const total = pool.reduce((t, c) => t + RARITY_WEIGHT[c.rarity], 0);
   let x = r * total;
   for (const c of pool) {
@@ -536,7 +552,7 @@ export interface Game {
   badges: { earned: number; total: number };
   /** Closest goals, for "almost there" cards. */
   nearest: Achievement[];
-  /** Starter items, workout crates and level rewards. */
+  /** Starter items, workout crates, level rewards and badge items. */
   owned: Set<string>;
   /** Level rewards earned so far. */
   rewards: LevelReward[];
@@ -577,7 +593,7 @@ export function game(events: readonly AppEvent[], stats: Stats, profile: Profile
     achievements: list,
     badges: { earned: list.reduce((n, a) => n + a.level, 0), total },
     nearest: nearest(list),
-    owned: new Set([...STARTER, ...won, ...rewards.map((r) => r.item.id)]),
+    owned: new Set([...STARTER, ...won, ...rewards.map((r) => r.item.id), ...badgeItems(list)]),
     rewards,
     next: nextReward(level.level),
   };

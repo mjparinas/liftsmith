@@ -192,6 +192,9 @@ export function Settings() {
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
+      <div className="mt-2">
+        <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
+      </div>
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>
@@ -212,6 +215,11 @@ export function Settings() {
         <NavRow title={t("settings.feedback")} onClick={() => go("feedback")} />
       </Section>
       <p className="mt-8 text-center text-xs text-faint">{t("settings.footer", { brand: BRAND.name })}</p>
+      <p className="mt-1 text-center text-xs">
+        <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
+          {t("settings.terms")}
+        </a>
+      </p>
       <BuildLine />
     </div>
   );

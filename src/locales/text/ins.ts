@@ -4,6 +4,19 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "ins.proteinShort.title": { one: "Protein short {count} day running", other: "Protein short {count} days running" },
+  "ins.proteinShort.why":
+    "Your food app shows {avg} g of protein a day on average, against at least {target} g for your body weight (1.6 g per kg).",
+  "ins.proteinShort.advice":
+    "Add about {gap} g a day: a protein food at each meal, such as Greek yogurt, eggs, tuna, tofu or a scoop of whey.",
+  "ins.food.action": "See your targets",
+  "ins.food.why": "Your food app shows {avg} a day this past week ({days} days logged), about {gap} under your maintenance of {tdee}.",
+  "ins.food.overToo": "Your food app shows {avg} a day this past week, about {gap} over your maintenance of {tdee}.",
+  "ins.eatLowMuscle.title": "Eating too little to build muscle",
+  "ins.eatLowMuscle.advice":
+    "Muscle grows best on a small surplus. Aim for about {bulk} a day, with the extra from carbs around training and protein.",
+  "ins.eatLow.title": "A very big calorie deficit",
+  "ins.eatLow.advice": "A deficit this big costs strength and muscle. About {cut} a day still loses fat, and {tdee} holds your weight.",
   "ins.weeks": { one: "{count} week", other: "{count} weeks" },
   "ins.deload": "Start a deload week",
   "ins.fatigue.title": "Fatigue is building up",
@@ -81,6 +94,21 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "ins.proteinShort.title": { one: "Proteína corta {count} día seguido", other: "Proteína corta {count} días seguidos" },
+  "ins.proteinShort.why":
+    "Tu app de comidas marca {avg} g de proteína al día de media, frente a al menos {target} g para tu peso (1,6 g por kg).",
+  "ins.proteinShort.advice":
+    "Añade unos {gap} g al día: un alimento proteico en cada comida, como yogur griego, huevos, atún, tofu o un cacito de whey.",
+  "ins.food.action": "Ver tus objetivos",
+  "ins.food.why":
+    "Tu app de comidas marca {avg} al día esta semana ({days} días registrados), unas {gap} por debajo de tu mantenimiento de {tdee}.",
+  "ins.food.overToo": "Tu app de comidas marca {avg} al día esta semana, unas {gap} por encima de tu mantenimiento de {tdee}.",
+  "ins.eatLowMuscle.title": "Comes muy poco para ganar músculo",
+  "ins.eatLowMuscle.advice":
+    "El músculo crece mejor con un pequeño superávit. Apunta a unas {bulk} al día, con el extra en carbohidratos alrededor del entreno y proteína.",
+  "ins.eatLow.title": "Un déficit calórico muy grande",
+  "ins.eatLow.advice":
+    "Un déficit tan grande cuesta fuerza y músculo. Con unas {cut} al día sigues perdiendo grasa, y con {tdee} mantienes el peso.",
   "ins.weeks": { one: "{count} semana", other: "{count} semanas" },
   "ins.deload": "Empezar una semana de descarga",
   "ins.fatigue.title": "Se está acumulando fatiga",
@@ -159,6 +187,21 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "ins.proteinShort.title": { one: "Pas assez de protéines {count} jour de suite", other: "Pas assez de protéines {count} jours de suite" },
+  "ins.proteinShort.why":
+    "Votre appli de nutrition indique {avg} g de protéines par jour en moyenne, pour au moins {target} g selon votre poids (1,6 g par kg).",
+  "ins.proteinShort.advice":
+    "Ajoutez environ {gap} g par jour : un aliment protéiné à chaque repas, comme du yaourt grec, des œufs, du thon, du tofu ou une dose de whey.",
+  "ins.food.action": "Voir vos objectifs",
+  "ins.food.why":
+    "Votre appli de nutrition indique {avg} par jour cette semaine ({days} jours notés), environ {gap} sous votre maintien de {tdee}.",
+  "ins.food.overToo": "Votre appli de nutrition indique {avg} par jour cette semaine, environ {gap} au-dessus de votre maintien de {tdee}.",
+  "ins.eatLowMuscle.title": "Trop peu mangé pour prendre du muscle",
+  "ins.eatLowMuscle.advice":
+    "Le muscle se construit mieux avec un léger surplus. Visez environ {bulk} par jour, le surplus en glucides autour de l’entraînement et en protéines.",
+  "ins.eatLow.title": "Un déficit calorique très important",
+  "ins.eatLow.advice":
+    "Un déficit aussi grand coûte de la force et du muscle. Avec environ {cut} par jour, vous perdez toujours du gras, et {tdee} maintient votre poids.",
   "ins.weeks": { one: "{count} semaine", other: "{count} semaines" },
   "ins.deload": "Commencer une semaine de décharge",
   "ins.fatigue.title": "La fatigue s’accumule",
@@ -238,6 +281,21 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "ins.proteinShort.title": { one: "Zu wenig Protein, {count} Tag in Folge", other: "Zu wenig Protein, {count} Tage in Folge" },
+  "ins.proteinShort.why":
+    "Deine Ernährungs-App zeigt im Schnitt {avg} g Protein am Tag, bei mindestens {target} g für dein Körpergewicht (1,6 g pro kg).",
+  "ins.proteinShort.advice":
+    "Nimm etwa {gap} g mehr am Tag: zu jeder Mahlzeit etwas Eiweißreiches, etwa griechischen Joghurt, Eier, Thunfisch, Tofu oder einen Messlöffel Whey.",
+  "ins.food.action": "Deine Ziele ansehen",
+  "ins.food.why":
+    "Deine Ernährungs-App zeigt diese Woche {avg} am Tag ({days} Tage erfasst), etwa {gap} unter deinem Erhaltungsbedarf von {tdee}.",
+  "ins.food.overToo": "Deine Ernährungs-App zeigt diese Woche {avg} am Tag, etwa {gap} über deinem Erhaltungsbedarf von {tdee}.",
+  "ins.eatLowMuscle.title": "Zu wenig gegessen für Muskelaufbau",
+  "ins.eatLowMuscle.advice":
+    "Muskeln wachsen am besten mit einem kleinen Überschuss. Ziel sind etwa {bulk} am Tag, das Plus aus Kohlenhydraten rund ums Training und aus Protein.",
+  "ins.eatLow.title": "Ein sehr großes Kaloriendefizit",
+  "ins.eatLow.advice":
+    "Ein so großes Defizit kostet Kraft und Muskeln. Mit etwa {cut} am Tag verlierst du weiter Fett, und mit {tdee} hältst du dein Gewicht.",
   "ins.weeks": { one: "{count} Woche", other: "{count} Wochen" },
   "ins.deload": "Deload-Woche starten",
   "ins.fatigue.title": "Die Ermüdung baut sich auf",
@@ -317,6 +375,22 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "ins.proteinShort.title": { one: "Proteine scarse da {count} giorno", other: "Proteine scarse da {count} giorni di fila" },
+  "ins.proteinShort.why":
+    "La tua app per l’alimentazione segna in media {avg} g di proteine al giorno, contro almeno {target} g per il tuo peso (1,6 g per kg).",
+  "ins.proteinShort.advice":
+    "Aggiungi circa {gap} g al giorno: un alimento proteico a ogni pasto, come yogurt greco, uova, tonno, tofu o un misurino di whey.",
+  "ins.food.action": "Vedi i tuoi obiettivi",
+  "ins.food.why":
+    "La tua app per l’alimentazione segna {avg} al giorno questa settimana ({days} giorni registrati), circa {gap} sotto il tuo mantenimento di {tdee}.",
+  "ins.food.overToo":
+    "La tua app per l’alimentazione segna {avg} al giorno questa settimana, circa {gap} sopra il tuo mantenimento di {tdee}.",
+  "ins.eatLowMuscle.title": "Mangi troppo poco per mettere muscolo",
+  "ins.eatLowMuscle.advice":
+    "Il muscolo cresce meglio con un piccolo surplus. Punta a circa {bulk} al giorno, con l’extra da carboidrati intorno all’allenamento e da proteine.",
+  "ins.eatLow.title": "Un deficit calorico molto grande",
+  "ins.eatLow.advice":
+    "Un deficit così grande costa forza e muscolo. Con circa {cut} al giorno perdi comunque grasso, e con {tdee} mantieni il peso.",
   "ins.weeks": { one: "{count} settimana", other: "{count} settimane" },
   "ins.deload": "Inizia una settimana di scarico",
   "ins.fatigue.title": "La fatica si sta accumulando",
@@ -395,6 +469,19 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "ins.proteinShort.title": { other: "たんぱく質不足が{count}日続いています" },
+  "ins.proteinShort.why":
+    "食事アプリの記録では、たんぱく質は1日平均{avg} gです。体重に対する目安は{target} g以上（体重1 kgあたり1.6 g）です。",
+  "ins.proteinShort.advice":
+    "1日あと{gap} gほど増やしましょう。ギリシャヨーグルト、卵、ツナ、豆腐、ホエイ1杯など、毎食たんぱく質の多い食品を1品。",
+  "ins.food.action": "目標を見る",
+  "ins.food.why": "食事アプリの記録では、この1週間は1日{avg}（{days}日分）で、維持カロリー{tdee}より約{gap}少なめです。",
+  "ins.food.overToo": "食事アプリの記録では、この1週間は1日{avg}で、維持カロリー{tdee}より約{gap}多めです。",
+  "ins.eatLowMuscle.title": "筋肉をつけるには食事が少なすぎます",
+  "ins.eatLowMuscle.advice":
+    "筋肉は少しのカロリー余剰で最も育ちます。1日約{bulk}を目指し、増やす分はトレーニング前後の炭水化物とたんぱく質で。",
+  "ins.eatLow.title": "カロリー不足が大きすぎます",
+  "ins.eatLow.advice": "ここまで大きな不足は筋力と筋肉を落とします。1日約{cut}でも脂肪は落ち、{tdee}なら体重を維持できます。",
   "ins.weeks": { other: "{count}週間" },
   "ins.deload": "ディロード週を始める",
   "ins.fatigue.title": "疲労がたまっています",

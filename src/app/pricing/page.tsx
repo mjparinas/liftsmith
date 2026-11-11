@@ -6,6 +6,7 @@ import { CtaBanner, CtaButton, JsonLd } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { faqJsonLd, HELP } from "@/lib/faqs";
 import { FLAGS } from "@/lib/flags";
+import { pageMeta } from "@/lib/pageMeta";
 import { FREE_FEATURES, PLAN_TABLE, PRO_FEATURES } from "@/lib/plans";
 import { APP_PATH, SITE_URL } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
@@ -14,11 +15,11 @@ const name = BRAND.name;
 const TRIAL_DAYS = FLAGS.trialDays.default;
 const BILLING = HELP.find((g) => g.id === "billing")!.faqs;
 
-export const metadata: Metadata = {
-  title: "Pricing",
+export const metadata: Metadata = pageMeta({
+  title: `${name} pricing: free plan, Pro from ${PRICES.annual.note?.replace("About ", "") ?? PRICES.monthly.price}`,
   description: `${name} is free to start, with no ads ever. Pro is ${PRICES.monthly.price} a month or ${PRICES.annual.price} a year, with a ${TRIAL_DAYS}-day free trial and family sharing on the annual plan.`,
-  alternates: { canonical: "/pricing/" },
-};
+  path: "/pricing/",
+});
 
 function Mark({ value }: { value: boolean | string }) {
   if (typeof value === "string") return <span className="text-sm font-semibold">{value}</span>;

@@ -52,6 +52,7 @@ export const en = {
   "pro.legal.appstore":
     "Paid through your Apple Account. The subscription renews automatically unless you cancel it at least 24 hours before the end of the period, in Settings › your name › Subscriptions. Cancel before a free trial ends and you won't be charged.",
   "pro.termsLink": "Terms of use",
+  "pro.eulaLink": "Apple licence agreement",
   "pro.privacyLink": "Privacy policy",
   "pro.notHere": "Pro is sold in the Liftsmith app for Android and iPhone. Everything is unlocked here.",
   "pro.status.yearly": "Pro · Yearly",
@@ -72,6 +73,7 @@ export const en = {
   "pro.welcome.body": "Thank you for subscribing and for taking your health seriously. Every workout from here adapts to you.",
   "pro.welcome.unlocked": "Unlocked now",
   "pro.welcome.trialNote": "Free for {days} days. You can cancel any time in your store account before it ends.",
+  "pro.welcome.reward": "Your Pro badge now shows on Today, and the Pro member badge and the Pro theme are waiting in Awards.",
   "pro.welcome.go": "Let's train",
   "pro.web.needsAccount": "Subscribing on the web needs a free Liftsmith account, so Pro follows you to the app on your phone too.",
   "pro.web.signIn": "Sign in or create an account",
@@ -146,6 +148,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Se paga con tu cuenta de Apple. La suscripción se renueva automáticamente salvo que la canceles al menos 24 horas antes del final del periodo, en Ajustes › tu nombre › Suscripciones. Si cancelas antes de que acabe la prueba gratis, no se te cobrará.",
   "pro.termsLink": "Términos de uso",
+  "pro.eulaLink": "Contrato de licencia de Apple",
   "pro.privacyLink": "Política de privacidad",
   "pro.notHere": "Pro se vende en la app de Liftsmith para Android y iPhone. Aquí todo está desbloqueado.",
   "pro.status.yearly": "Pro · Anual",
@@ -166,6 +169,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Gracias por suscribirte y por tomarte tu salud en serio. A partir de ahora, cada entrenamiento se adapta a ti.",
   "pro.welcome.unlocked": "Desbloqueado ahora",
   "pro.welcome.trialNote": "Gratis durante {days} días. Puedes cancelarla cuando quieras en tu cuenta de la tienda antes de que termine.",
+  "pro.welcome.reward": "Tu insignia Pro ya aparece en Hoy, y la insignia Miembro Pro y el tema Pro te esperan en Logros.",
   "pro.welcome.go": "A entrenar",
   "pro.web.needsAccount":
     "Para suscribirte en la web necesitas una cuenta gratuita de Liftsmith, así Pro también te acompaña en la app de tu teléfono.",
@@ -240,6 +244,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Payé via votre compte Apple. L’abonnement se renouvelle automatiquement sauf résiliation au moins 24 heures avant la fin de la période, dans Réglages › votre nom › Abonnements. Résiliez avant la fin de l’essai gratuit et vous ne serez pas débité.",
   "pro.termsLink": "Conditions d’utilisation",
+  "pro.eulaLink": "Contrat de licence d’Apple",
   "pro.privacyLink": "Politique de confidentialité",
   "pro.notHere": "Pro est vendu dans l’app Liftsmith pour Android et iPhone. Tout est débloqué ici.",
   "pro.status.yearly": "Pro · Annuel",
@@ -261,6 +266,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.welcome.unlocked": "Débloqué dès maintenant",
   "pro.welcome.trialNote":
     "Gratuit pendant {days} jours. Vous pouvez résilier à tout moment dans votre compte de la boutique avant la fin.",
+  "pro.welcome.reward":
+    "Votre badge Pro s’affiche maintenant sur Aujourd’hui, et le badge Membre Pro et le thème Pro vous attendent dans Trophées.",
   "pro.welcome.go": "À l’entraînement",
   "pro.web.needsAccount":
     "Pour vous abonner sur le Web, il faut un compte Liftsmith gratuit : Pro vous suit aussi dans l’appli sur votre téléphone.",
@@ -336,6 +343,7 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Bezahlt über deinen Apple Account. Das Abo verlängert sich automatisch, wenn du es nicht mindestens 24 Stunden vor Ende des Zeitraums kündigst, unter Einstellungen › dein Name › Abonnements. Kündigst du vor dem Ende einer kostenlosen Testphase, wird dir nichts berechnet.",
   "pro.termsLink": "Nutzungsbedingungen",
+  "pro.eulaLink": "Apple-Lizenzvertrag",
   "pro.privacyLink": "Datenschutzerklärung",
   "pro.notHere": "Pro wird in der Liftsmith-App für Android und iPhone verkauft. Hier ist alles freigeschaltet.",
   "pro.status.yearly": "Pro · Jährlich",
@@ -356,6 +364,8 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Danke für dein Abo und dafür, dass du deine Gesundheit ernst nimmst. Ab jetzt passt sich jedes Training an dich an.",
   "pro.welcome.unlocked": "Jetzt freigeschaltet",
   "pro.welcome.trialNote": "{days} Tage kostenlos. Du kannst jederzeit vor dem Ende in deinem Store-Konto kündigen.",
+  "pro.welcome.reward":
+    "Dein Pro-Abzeichen steht jetzt auf Heute, und das Abzeichen Pro-Mitglied und das Pro-Design warten unter „Erfolge“.",
   "pro.welcome.go": "Los geht’s",
   "pro.web.needsAccount":
     "Für ein Abo im Web brauchst du ein kostenloses Liftsmith-Konto. So hast du Pro auch in der App auf deinem Handy.",
@@ -430,6 +440,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Pagato tramite il tuo Apple Account. L’abbonamento si rinnova automaticamente se non lo disdici almeno 24 ore prima della fine del periodo, in Impostazioni › il tuo nome › Abbonamenti. Se disdici prima della fine della prova gratuita, non ti viene addebitato nulla.",
   "pro.termsLink": "Condizioni d’uso",
+  "pro.eulaLink": "Contratto di licenza Apple",
   "pro.privacyLink": "Informativa sulla privacy",
   "pro.notHere": "Pro si acquista nell’app Liftsmith per Android e iPhone. Qui è tutto sbloccato.",
   "pro.status.yearly": "Pro · Annuale",
@@ -450,6 +461,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.welcome.body": "Grazie per l’abbonamento e per prendere sul serio la tua salute. Da qui ogni allenamento si adatta a te.",
   "pro.welcome.unlocked": "Sbloccato ora",
   "pro.welcome.trialNote": "Gratis per {days} giorni. Puoi disdire quando vuoi dal tuo account dello store prima della scadenza.",
+  "pro.welcome.reward": "Il tuo badge Pro ora compare in Oggi, e il badge Membro Pro e il tema Pro ti aspettano in Premi.",
   "pro.welcome.go": "Alleniamoci",
   "pro.web.needsAccount": "Per abbonarti sul web serve un account Liftsmith gratuito, così Pro ti segue anche nell’app sul telefono.",
   "pro.web.signIn": "Accedi o crea un account",
@@ -521,6 +533,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.legal.appstore":
     "Apple アカウントで支払います。期間終了の24時間前までに 設定 › ユーザ名 › サブスクリプション で解約しない限り、自動的に更新されます。無料お試しの終了前に解約すれば料金はかかりません。",
   "pro.termsLink": "利用規約",
+  "pro.eulaLink": "Apple の使用許諾契約",
   "pro.privacyLink": "プライバシーポリシー",
   "pro.notHere": "Pro は Android と iPhone の Liftsmith アプリで購入できます。ここではすべての機能が使えます。",
   "pro.status.yearly": "Pro · 年額",
@@ -542,6 +555,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "ご登録いただき、そして健康に真剣に向き合っていただきありがとうございます。ここからすべてのワークアウトがあなたに合わせて変わります。",
   "pro.welcome.unlocked": "利用可能になった機能",
   "pro.welcome.trialNote": "{days}日間無料。終了前ならいつでもストアのアカウントから解約できます。",
+  "pro.welcome.reward": "Proバッジが「今日」に表示されるようになりました。「Proメンバー」バッジとProテーマは「実績」で受け取れます。",
   "pro.welcome.go": "さあ始めよう",
   "pro.web.needsAccount": "ウェブで登録するには無料の Liftsmith アカウントが必要です。スマートフォンのアプリでも Pro を使えます。",
   "pro.web.signIn": "ログインまたはアカウント作成",

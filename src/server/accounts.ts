@@ -5,6 +5,7 @@
 import { createHash, createPrivateKey, randomBytes, randomInt, sign } from "node:crypto";
 
 import { accessFor, type Access } from "./access";
+import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
@@ -270,6 +271,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM account_identities WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM account_notes WHERE account_id = ?", args: [accountId] },
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
+    ...coachCleanup(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

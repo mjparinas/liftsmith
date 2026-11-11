@@ -4,15 +4,16 @@ import Link from "next/link";
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { BRAND } from "@/lib/brand";
 import { REPLY_TIME } from "@/lib/contact";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL } from "@/lib/site";
 
 const name = BRAND.name;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Accessibility",
   description: `What ${name} does to be usable by every lifter, how we test it against WCAG 2.2 AA, and what we know still needs work.`,
-  alternates: { canonical: "/accessibility/" },
-};
+  path: "/accessibility/",
+});
 
 // Keep in step with the Accessibility rules in AGENTS.md and what scripts/e2e-a11y.mjs checks.
 export const A11Y_UPDATED = "10 November 2026";

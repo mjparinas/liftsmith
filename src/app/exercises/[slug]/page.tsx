@@ -6,6 +6,8 @@ import { ExerciseDemo } from "@/components/site/ExerciseDemo";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, LinkGrid, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
+import { ogImage } from "@/lib/ogImages";
+import { pageMeta } from "@/lib/pageMeta";
 import { alternativesTo, EQUIPMENT_NAME, equipmentSlug, exerciseBySlug, exercisesFor, MUSCLE_NAME, muscleSlug, needsText } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import type { Exercise } from "@/lib/types";
@@ -20,15 +22,11 @@ const muscles = (e: Exercise) => e.primary.map((m) => MUSCLE_NAME[m].toLowerCase
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
-  return {
-    title: `${e.name}: how to do it, muscles worked and alternatives`,
-    description:
-      `How to do the ${e.name.toLowerCase()} with good form: setup, cues, a 3D demo, the muscles it works (${muscles(e)}), equipment and the best alternatives.`.slice(
-        0,
-        300,
-      ),
-    alternates: { canonical: `/exercises/${e.id}/` },
-  };
+  return pageMeta({
+    title: `${e.name}: form, muscles worked and alternatives`,
+    description: `How to do the ${e.name.toLowerCase()} with good form: setup, cues, a 3D demo, the muscles it works (${muscles(e)}), equipment and the best alternatives.`,
+    path: `/exercises/${e.id}/`,
+  });
 }
 
 export default async function ExercisePage({ params }: Props) {
@@ -45,6 +43,7 @@ export default async function ExercisePage({ params }: Props) {
     name: `How to do the ${e.name.toLowerCase()}`,
     description: `${e.name}: a ${e.compound ? "compound" : "isolation"} exercise for the ${muscles(e)}.`,
     url: `${SITE_URL}/exercises/${e.id}/`,
+    image: [`${SITE_URL}/stills/${e.id}.webp`, `${SITE_URL}${ogImage(`/exercises/${e.id}/`)}`],
     tool: e.needs.map((n) => ({ "@type": "HowToTool", name: EQUIPMENT_NAME[n] })),
     step: steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   };
@@ -94,6 +93,16 @@ export default async function ExercisePage({ params }: Props) {
             ))}
           </ol>
           <h2 className="mt-8 text-xl font-bold">Muscles worked</h2>
+          {/* A still of the 3D figure (scripts/og-images.mjs), so the page has a picture search engines can see. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`/stills/${e.id}.webp`}
+            alt={`${e.name}: 3D figure mid-rep with the ${muscles(e)} highlighted`}
+            width={240}
+            height={240}
+            loading="lazy"
+            className="mt-3 size-40 object-contain"
+          />
           <ul className="mt-3 flex flex-wrap gap-2">
             {e.primary.map((m) => (
               <li key={m}>

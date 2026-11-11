@@ -25,6 +25,7 @@ import {
 } from "@/lib/auth";
 import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
@@ -267,6 +268,16 @@ function SignedOut() {
           {error}
         </p>
       )}
+      <p className="pt-1 text-xs text-faint">
+        {t("account.agree")}{" "}
+        <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
+          {t("account.terms")}
+        </a>
+        {" · "}
+        <a className="text-accent underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">
+          {t("account.privacy")}
+        </a>
+      </p>
     </div>
   );
 }

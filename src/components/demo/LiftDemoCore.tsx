@@ -62,6 +62,8 @@ export interface LiftDemoProps {
   fps?: number;
   /** Follow the lifter instead of the demo's timing: 0 at the start position, 1 at the far end, null for the demo. */
   follow?: () => number | null;
+  /** Tilt the whole figure to one side, in degrees (positive to the figure's right): camera form check shows a lean. */
+  lean?: number;
   className?: string;
   /** No frame, backdrop or phase readout: the figure stands on the screen itself (the welcome screen). */
   bare?: boolean;
@@ -148,6 +150,7 @@ export function LiftDemoCore({
   hrTrend,
   fps,
   follow,
+  lean,
   className = "",
   bare = false,
   onDone,
@@ -204,6 +207,7 @@ export function LiftDemoCore({
     fps: fps ?? (controls ? 60 : 30),
     maxDpr,
     follow: follow ?? null,
+    lean: lean ?? 0,
   };
   const latest = useRef(settings);
   const onDoneRef = useRef(onDone);
@@ -262,7 +266,26 @@ export function LiftDemoCore({
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [exerciseId, body, view, skeleton, muscles, path, speed, playing, paused, still, reps, highlight, bpm, fps, maxDpr, follow, dancing]);
+  }, [
+    exerciseId,
+    body,
+    view,
+    skeleton,
+    muscles,
+    path,
+    speed,
+    playing,
+    paused,
+    still,
+    reps,
+    highlight,
+    bpm,
+    fps,
+    maxDpr,
+    follow,
+    lean,
+    dancing,
+  ]);
 
   const setView = setViewPick;
 

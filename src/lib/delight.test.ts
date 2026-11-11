@@ -329,6 +329,10 @@ describe("earned themes", () => {
     expect(unlocked(theme("forge"), ctx(heavy))).toBe(true);
     expect(newlyUnlocked([], ctx(heavy)).map((t) => t.id)).toEqual(["forge"]);
     expect(newlyUnlocked(["forge"], ctx(heavy))).toEqual([]);
+    // A first month with Pro (a ProEvent) unlocks the Pro theme, and it stays once Pro ends.
+    const proMonth: AppEvent = { type: "pro", id: "pro-2026-11", at: NOW, month: "2026-11" };
+    expect(unlocked(theme("pro"), ctx([]))).toBe(false);
+    expect(unlocked(theme("pro"), ctx([proMonth]))).toBe(true);
   });
   it("hangs every milestone theme off a real badge tier, and says which", () => {
     for (const t of THEMES.filter((t) => t.badge)) {

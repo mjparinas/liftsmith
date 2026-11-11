@@ -4,17 +4,18 @@ import Link from "next/link";
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { BRAND } from "@/lib/brand";
 import { FLAGS } from "@/lib/flags";
+import { pageMeta } from "@/lib/pageMeta";
 import { CONTACT_EMAIL, MAILING_ADDRESS } from "@/lib/site";
 import { PRICES } from "@/lib/trial";
 
 const name = BRAND.name;
 const TRIAL_DAYS = FLAGS.trialDays.default;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMeta({
   title: "Terms of use",
   description: `The terms for using ${name}: your account, training safely, Pro, the free trial, cancelling and refunds, and the rules for using the service.`,
-  alternates: { canonical: "/terms/" },
-};
+  path: "/terms/",
+});
 
 // Written from Gradelings' terms and adapted (Melvin, 2026-11-10). Not reviewed by a lawyer (Melvin's call, 2026-11-10).
 // Keep in step with /privacy/, /pricing/ and the paywall's store terms (Pro.tsx).

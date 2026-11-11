@@ -919,6 +919,26 @@ export function BumpField({
 }
 
 /**
+ * The Pro member's badge (Melvin, 2026-11-11: "a pro badge or something on the main page so they can show off").
+ * Shown only to real members (billing.ts useProMember), in the brand gradient with its own ink, so it can't be
+ * mistaken for the amber ProTag that marks a locked feature. Decoration, not a control.
+ */
+export function ProBadge({ className = "" }: { className?: string }) {
+  return (
+    <span
+      data-testid="pro-badge"
+      title={t("td.proBadge")}
+      className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold tracking-wider uppercase ${className}`}
+      style={{ background: "linear-gradient(135deg, var(--grad-a), var(--grad-c))", color: "var(--btn-ink)" }}
+    >
+      <Icon name="sparkle" size={13} strokeWidth={2.6} />
+      <span aria-hidden>{t("prog.pro")}</span>
+      <span className="sr-only">{t("td.proBadge")}</span>
+    </span>
+  );
+}
+
+/**
  * The small "Pro" tag on an entry point a free lifter can see but not use yet (AGENTS.md "Money": Pro
  * features are shown, never hidden). The control it sits on opens the paywall at that feature.
  */
