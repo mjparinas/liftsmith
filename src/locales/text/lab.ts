@@ -52,6 +52,10 @@ export const en = {
   "lab.machines.err.lost": "Lost {name}. What it sent so far is kept. Tap Connect machine to carry on.",
   "lab.machines.err.failed":
     "Couldn't connect to {name}. It may be connected to another app or watch: disconnect it there, keep it close, and try again.",
+  "lab.handsFree.title": "Hands-free sets",
+  "lab.handsFree.body":
+    "While camera, phone motion or watch rep counting is counting, the set logs itself a few seconds after your last rep and rest starts: 4 seconds once your planned reps are in, 8 while you're short of them. Undo puts it back. Needs one of those rep counting labs on.",
+  "lab.handsFree.soon": "Logging this set in {s} s. Do another rep to keep going.",
 };
 
 type Key = keyof typeof en;
@@ -107,6 +111,10 @@ export const es: Partial<Record<Key, Message>> = {
     "Se perdió la conexión con {name}. Se conserva lo que ha enviado hasta ahora. Toca Conectar máquina para seguir.",
   "lab.machines.err.failed":
     "No se pudo conectar con {name}. Puede que esté conectada a otra app o reloj: desconéctala ahí, mantenla cerca y vuelve a intentarlo.",
+  "lab.handsFree.title": "Series sin manos",
+  "lab.handsFree.body":
+    "Mientras se cuentan las repeticiones con la cámara, el movimiento del teléfono o el reloj, la serie se registra sola unos segundos después de tu última repetición y empieza el descanso: 4 segundos si ya hiciste las repeticiones previstas, 8 si te faltan. Deshacer la quita. Necesita uno de esos labs de conteo activado.",
+  "lab.handsFree.soon": "Registrando esta serie en {s} s. Haz otra repetición para seguir.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -160,6 +168,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "Connexion perdue avec {name}. Ce qu'elle a envoyé est conservé. Touchez Connecter la machine pour continuer.",
   "lab.machines.err.failed":
     "Impossible de se connecter à {name}. Elle est peut-être connectée à une autre app ou montre : déconnectez-la, restez à côté et réessayez.",
+  "lab.handsFree.title": "Séries sans les mains",
+  "lab.handsFree.body":
+    "Pendant que la caméra, le mouvement du téléphone ou la montre compte vos répétitions, la série s'enregistre seule quelques secondes après votre dernière répétition et le repos commence : 4 secondes une fois les répétitions prévues faites, 8 s'il vous en manque. Annuler la retire. Nécessite l'un de ces labs de comptage activé.",
+  "lab.handsFree.soon": "Enregistrement de cette série dans {s} s. Faites une autre répétition pour continuer.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -214,6 +226,10 @@ export const de: Partial<Record<Key, Message>> = {
     "Verbindung zu {name} verloren. Was bisher gesendet wurde, bleibt erhalten. Tippe auf Gerät verbinden, um weiterzumachen.",
   "lab.machines.err.failed":
     "Keine Verbindung zu {name}. Vielleicht ist es mit einer anderen App oder Uhr verbunden: trenn es dort, bleib in der Nähe und versuch es noch einmal.",
+  "lab.handsFree.title": "Sätze ohne Hände",
+  "lab.handsFree.body":
+    "Während Kamera, Handybewegung oder Uhr deine Wiederholungen zählen, wird der Satz ein paar Sekunden nach der letzten Wiederholung von selbst eingetragen und die Pause beginnt: 4 Sekunden, wenn die geplanten Wiederholungen geschafft sind, 8, solange noch welche fehlen. Rückgängig nimmt ihn zurück. Braucht eines dieser Labs zum Zählen.",
+  "lab.handsFree.soon": "Satz wird in {s} s eingetragen. Mach noch eine Wiederholung, um weiterzumachen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -266,6 +282,10 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "Collegamento con {name} perso. Quello che ha inviato finora resta. Tocca Collega macchina per continuare.",
   "lab.machines.err.failed":
     "Impossibile collegarsi a {name}. Potrebbe essere collegata a un'altra app o a un orologio: scollegala lì, resta vicino e riprova.",
+  "lab.handsFree.title": "Serie a mani libere",
+  "lab.handsFree.body":
+    "Mentre la fotocamera, il movimento del telefono o l'orologio contano le ripetizioni, la serie si registra da sola pochi secondi dopo l'ultima ripetizione e parte il recupero: 4 secondi quando hai fatto le ripetizioni previste, 8 se ne mancano. Annulla la toglie. Serve uno di questi lab di conteggio attivo.",
+  "lab.handsFree.soon": "Registro questa serie tra {s} s. Fai un'altra ripetizione per continuare.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -318,4 +338,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "{name}との接続が切れました。これまでに送られたデータは残ります。「マシンを接続」をタップして続けてください。",
   "lab.machines.err.failed":
     "{name}に接続できませんでした。ほかのアプリやウォッチに接続されている可能性があります。そちらで切断し、近くで再度お試しください。",
+  "lab.handsFree.title": "ハンズフリーセット",
+  "lab.handsFree.body":
+    "カメラ、スマホのモーション、またはウォッチでレップを数えている間、最後のレップから数秒後にセットが自動で記録され、休憩が始まります。予定のレップに届いていれば4秒、足りなければ8秒です。元に戻すで取り消せます。いずれかのレップカウントのラボをオンにしてください。",
+  "lab.handsFree.soon": "{s}秒後にこのセットを記録します。続けるにはもう1レップ。",
 };

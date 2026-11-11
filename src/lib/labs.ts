@@ -18,12 +18,24 @@ export type LabFlag =
   | "labVoiceLog"
   | "labSpeedMax"
   | "labWatchReps"
-  | "labGymMachines";
+  | "labGymMachines"
+  | "labHandsFree";
 
 export interface Lab {
   flag: LabFlag;
   /** Catalogue keys: `lab.<key>.title` and `lab.<key>.body`. */
-  key: "repCount" | "repMotion" | "barSpeed" | "hrRest" | "trainer" | "formCheck" | "voiceLog" | "speedMax" | "watchReps" | "machines";
+  key:
+    | "repCount"
+    | "repMotion"
+    | "barSpeed"
+    | "hrRest"
+    | "trainer"
+    | "formCheck"
+    | "voiceLog"
+    | "speedMax"
+    | "watchReps"
+    | "machines"
+    | "handsFree";
   /** Another lab this one only works with. */
   needs?: LabFlag;
   /** Only in the Android and iOS apps (it needs something the browser can't reach, like a watch app). */
@@ -42,6 +54,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labSpeedMax", key: "speedMax", needs: "labBarSpeed" },
   { flag: "labWatchReps", key: "watchReps", native: true },
   { flag: "labGymMachines", key: "machines" },
+  { flag: "labHandsFree", key: "handsFree" },
 ];
 
 /** Whether a lab is on for this lifter: Pro, and its flag on (and the lab it needs, if any). */
