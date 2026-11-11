@@ -184,10 +184,13 @@ export function Plans({ from, onDone }: { from: string; onDone?: (plan: Plan, tr
         {t("pro.restore")}
       </Button>
       <p className="mt-2 text-xs text-faint">{t(store === "appstore" ? "pro.legal.appstore" : "pro.legal.play")}</p>
-      <p className="mt-1 flex gap-4 text-xs">
+      <p className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+        <a className="text-accent underline" href={`${SITE_URL}/terms/`} target="_blank" rel="noreferrer">
+          {t("pro.termsLink")}
+        </a>
         {store === "appstore" && (
           <a className="text-accent underline" href={APPLE_EULA} target="_blank" rel="noreferrer">
-            {t("pro.termsLink")}
+            {t("pro.eulaLink")}
           </a>
         )}
         <a className="text-accent underline" href={`${SITE_URL}/privacy/`} target="_blank" rel="noreferrer">
