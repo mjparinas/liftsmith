@@ -31,7 +31,7 @@ struct WorkoutLiveActivity: Widget {
             } compactLeading: {
                 Image(systemName: "dumbbell.fill").foregroundStyle(Brand.accent)
             } compactTrailing: {
-                Countdown(state: context.state).monospacedDigit().frame(maxWidth: 52)
+                Countdown(state: context.state, compact: true).monospacedDigit().frame(maxWidth: 52)
             } minimal: {
                 Image(systemName: "dumbbell.fill").foregroundStyle(Brand.accent)
             }
@@ -40,13 +40,18 @@ struct WorkoutLiveActivity: Widget {
     }
 }
 
-/// The rest countdown while resting (the system ticks it, no updates needed), otherwise the set ("2/4"), or "Lift".
+/// The rest countdown while resting (the system ticks it, no updates needed), then "Rest over" until the next update
+/// (the activity goes stale when rest ends, so the system redraws it; Android says the same in its live card),
+/// otherwise the set ("2/4"), or "Lift". The compact Dynamic Island has room only for the set.
 struct Countdown: View {
     let state: WorkoutAttributes.ContentState
+    var compact = false
 
     var body: some View {
         if let until = state.restUntil, until > Date() {
             Text(timerInterval: Date()...until, countsDown: true)
+        } else if !compact, state.restUntil != nil {
+            Text("Rest over").lineLimit(1).minimumScaleFactor(0.5)
         } else if let chip = state.chip, !chip.isEmpty {
             Text(chip)
         } else {

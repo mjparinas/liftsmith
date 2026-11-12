@@ -187,7 +187,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             if same == state { lastHrPush = Date() }
         }
         lastActivityState = state
-        let content = ActivityContent(state: state, staleDate: nil)
+        // Stale when rest ends, so the system redraws it then and it says "Rest over" without an update from the app.
+        let content = ActivityContent(state: state, staleDate: restUntil)
         // After the app was closed and opened again, carry on with the Live Activity that's still showing.
         if activity == nil { activity = Activity<WorkoutAttributes>.activities.first }
         if let current = activity as? Activity<WorkoutAttributes> {
@@ -405,7 +406,7 @@ enum WorkoutTaps {
     private static func show(_ state: [String: Any], done: @escaping () -> Void) {
         guard #available(iOS 16.2, *) else { return done() }
         guard let activity = Activity<WorkoutAttributes>.activities.first else { return done() }
-        let content = ActivityContent(state: contentState(state), staleDate: nil)
+        let content = ActivityContent(state: contentState(state), staleDate: date(state["restUntil"]))
         Task {
             await activity.update(content)
             done()

@@ -14,9 +14,6 @@
     <string name="channel_live">Workout in progress</string>
     <string name="channel_live_desc">Rest timer, next set and heart rate while you train</string>
     <string name="rest_over">Rest over</string>
-    <string name="channel_alert_desc">Sounds and vibrates when your rest ends</string>
-    <string name="channel_alert_sound">Rest over (sound only)</string>
-    <string name="channel_alert_sound_desc">Sounds without vibrating when your rest ends</string>
     <string name="next_prefix">Next:</string>
     <string name="rest_left">%1$s rest left</string>
     <string name="rest_left_next">%1$s left · next: %2$s</string>
