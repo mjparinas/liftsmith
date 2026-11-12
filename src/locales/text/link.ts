@@ -30,6 +30,8 @@ export const en = {
   "link.goneBody": "Whoever shared it has deleted it.",
   "link.made": "Made with Liftsmith, the strength app that plans every workout around you.",
   "link.get": "Try Liftsmith",
+  "link.kicker": "Shared from Liftsmith",
+  "link.tryTitle": "Get a plan built around you",
 } as const;
 
 type Key = keyof typeof en;
@@ -60,6 +62,8 @@ export const es: Partial<Record<Key, Message>> = {
   "link.goneBody": "Quien lo compartió lo ha eliminado.",
   "link.made": "Hecho con Liftsmith, la app de fuerza que planifica cada entrenamiento para ti.",
   "link.get": "Prueba Liftsmith",
+  "link.kicker": "Compartido desde Liftsmith",
+  "link.tryTitle": "Consigue un plan hecho para ti",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -89,6 +93,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "link.goneBody": "La personne qui l’a partagé l’a supprimé.",
   "link.made": "Fait avec Liftsmith, l’appli de musculation qui planifie chaque séance pour vous.",
   "link.get": "Essayer Liftsmith",
+  "link.kicker": "Partagé depuis Liftsmith",
+  "link.tryTitle": "Obtiens un programme fait pour toi",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -117,6 +123,8 @@ export const de: Partial<Record<Key, Message>> = {
   "link.goneBody": "Wer ihn geteilt hat, hat ihn gelöscht.",
   "link.made": "Erstellt mit Liftsmith, der Kraft-App, die jedes Training für dich plant.",
   "link.get": "Liftsmith ausprobieren",
+  "link.kicker": "Geteilt aus Liftsmith",
+  "link.tryTitle": "Hol dir einen Plan, der zu dir passt",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -145,6 +153,8 @@ export const it: Partial<Record<Key, Message>> = {
   "link.goneBody": "Chi l’ha condiviso l’ha eliminato.",
   "link.made": "Creato con Liftsmith, l’app di forza che pianifica ogni allenamento per te.",
   "link.get": "Prova Liftsmith",
+  "link.kicker": "Condiviso da Liftsmith",
+  "link.tryTitle": "Ottieni un piano fatto su misura per te",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -173,4 +183,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "link.goneBody": "シェアした人が削除しました。",
   "link.made": "Liftsmithで作成。あなたに合わせて毎回のワークアウトを組み立てる筋トレアプリです。",
   "link.get": "Liftsmithを試す",
+  "link.kicker": "Liftsmith からシェア",
+  "link.tryTitle": "あなたに合わせたプランを",
 };
