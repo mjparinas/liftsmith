@@ -186,8 +186,12 @@ describe("Friends", () => {
 
     render(<Friends />);
     await u.click(await screen.findByRole("button", { name: "Board" }));
-    expect(await screen.findByText("blair (you)")).toBeInTheDocument();
+    expect(await within(await screen.findByRole("list", { name: "Friends leaderboard" })).findByText("blair (you)")).toBeInTheDocument();
     expect(screen.getByText("Post a workout to get on this week’s board.")).toBeInTheDocument();
+    // The same people on this month's challenge, for everyone.
+    expect(
+      await within(await screen.findByRole("list", { name: "Friends on this month’s challenge" })).findByText("blair (you)"),
+    ).toBeInTheDocument();
   });
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
     const u = userEvent.setup();
