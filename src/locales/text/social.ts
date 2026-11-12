@@ -139,6 +139,8 @@ export const en = {
   "social.discover.hint": "Recent workouts from public profiles you don’t follow yet. Follow anyone whose training you like.",
   "social.discover.none": "Nothing to discover yet",
   "social.discover.noneBody": "Public profiles’ workouts from the last few weeks show here.",
+  "social.desk.join": "Join in the app",
+  "social.desk.people": "Find and manage people",
 } as const;
 
 type Key = keyof typeof en;
@@ -278,6 +280,8 @@ export const es: Partial<Record<Key, Message>> = {
   "social.discover.hint": "Entrenamientos recientes de perfiles públicos que aún no sigues. Sigue a quien te guste cómo entrena.",
   "social.discover.none": "Aún no hay nada que descubrir",
   "social.discover.noneBody": "Aquí aparecen los entrenamientos de perfiles públicos de las últimas semanas.",
+  "social.desk.join": "Unirse en la app",
+  "social.desk.people": "Buscar y gestionar personas",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -421,6 +425,8 @@ export const fr: Partial<Record<Key, Message>> = {
     "Séances récentes de profils publics que vous ne suivez pas encore. Suivez les personnes dont l’entraînement vous plaît.",
   "social.discover.none": "Rien à découvrir pour l’instant",
   "social.discover.noneBody": "Les séances des profils publics des dernières semaines s’affichent ici.",
+  "social.desk.join": "Rejoindre dans l’app",
+  "social.desk.people": "Trouver et gérer des personnes",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -564,6 +570,8 @@ export const de: Partial<Record<Key, Message>> = {
   "social.discover.hint": "Neue Trainings von öffentlichen Profilen, denen du noch nicht folgst. Folge allen, deren Training dir gefällt.",
   "social.discover.none": "Noch nichts zu entdecken",
   "social.discover.noneBody": "Hier erscheinen Trainings öffentlicher Profile aus den letzten Wochen.",
+  "social.desk.join": "In der App beitreten",
+  "social.desk.people": "Leute finden und verwalten",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -704,6 +712,8 @@ export const it: Partial<Record<Key, Message>> = {
   "social.discover.hint": "Allenamenti recenti di profili pubblici che non segui ancora. Segui chi si allena in un modo che ti piace.",
   "social.discover.none": "Ancora niente da scoprire",
   "social.discover.noneBody": "Qui compaiono gli allenamenti dei profili pubblici delle ultime settimane.",
+  "social.desk.join": "Unisciti nell’app",
+  "social.desk.people": "Trova e gestisci persone",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -829,4 +839,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "social.discover.hint": "まだフォローしていない公開プロフィールの最近のワークアウトです。気になる人をフォローしましょう。",
   "social.discover.none": "まだ見つかるものがありません",
   "social.discover.noneBody": "ここには公開プロフィールの最近数週間のワークアウトが表示されます。",
+  "social.desk.join": "アプリで参加する",
+  "social.desk.people": "人を探す・管理する",
 };

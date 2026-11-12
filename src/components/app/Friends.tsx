@@ -2298,6 +2298,90 @@ function useSocialLoaded() {
   return { account, me, error };
 }
 
+/**
+ * Friends on the web dashboard (/me/ › Friends; gap list 3, item 8): the big-screen view. The feed (Following or
+ * Discover) beside challenges and this week's board, with likes, comments and the whole workout in place. Joining,
+ * settings, people and anything that opens another screen go to the web app, which the dashboard opens for any
+ * route that isn't its own.
+ */
+export function FriendsDesk() {
+  const { account, me, error } = useSocialLoaded();
+  useProfileSync();
+  const [view, setView] = useState<"following" | "discover">("following");
+  const toApp = (route: string) => go(route as Parameters<typeof go>[0]);
+  if (!socialOn()) return <EmptyState icon="people" title={t("friends.err.off")} />;
+  if (!account)
+    return (
+      <EmptyState
+        icon="people"
+        title={t("friends.signIn.title")}
+        body={t("friends.signIn.body")}
+        action={<Button onClick={() => toApp("account")}>{t("friends.signIn.go")}</Button>}
+      />
+    );
+  if (!me)
+    return error ? (
+      <EmptyState icon="people" title={error} action={<Button onClick={() => void refreshSocial()}>{t("friends.retry")}</Button>} />
+    ) : (
+      <Skeleton className="h-48" />
+    );
+  if (!me.profile)
+    return (
+      <EmptyState
+        icon="people"
+        mascot="curious"
+        title={t("friends.join.title")}
+        body={t("friends.join.body")}
+        action={<Button onClick={() => toApp("friends")}>{t("social.desk.join")}</Button>}
+      />
+    );
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+      <section className="min-w-0 lg:col-span-2" aria-label={t("friends.tab.feed")}>
+        <div className="mb-3 flex flex-wrap items-center gap-2" role="group" aria-label={t("social.discover.show")}>
+          <Chip active={view === "following"} onClick={() => setView("following")}>
+            {t("social.discover.following")}
+          </Chip>
+          <Chip active={view === "discover"} onClick={() => setView("discover")}>
+            {t("social.discover.title")}
+          </Chip>
+        </div>
+        {view === "following" ? (
+          <>
+            <TrainingNow />
+            <Posts
+              op="feed"
+              empty={
+                <EmptyState
+                  icon="people"
+                  title={t("friends.feed.none")}
+                  body={t("friends.feed.noneBody")}
+                  action={<Button onClick={() => toApp("friends/people")}>{t("friends.feed.find")}</Button>}
+                />
+              }
+            />
+          </>
+        ) : (
+          <>
+            <p className="mb-3 px-1 text-sm text-muted">{t("social.discover.hint")}</p>
+            <Posts
+              op="discover"
+              empty={<EmptyState icon="sparkle" title={t("social.discover.none")} body={t("social.discover.noneBody")} />}
+            />
+          </>
+        )}
+      </section>
+      <aside className="min-w-0">
+        <Challenges />
+        <Board onPeople={() => toApp("friends/people")} />
+        <Button kind="ghost" icon="people" className="mt-4 w-full" onClick={() => toApp("friends/people")}>
+          {t("social.desk.people")}
+        </Button>
+      </aside>
+    </div>
+  );
+}
+
 const TABS = ["feed", "board", "clubs", "activity", "people"] as const;
 type Tab = (typeof TABS)[number];
 

@@ -5,11 +5,15 @@ import { cleanup, fireEvent, render, screen, within } from "@testing-library/rea
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { useAccount, type Account } from "@/lib/auth";
 import { decodeShare } from "@/lib/dashboard";
 import { defaultProfile } from "@/lib/defaults";
 import { setLanguage } from "@/lib/i18n";
 import { appendEvents, eraseAll, load, saveRecord } from "@/lib/localdb";
+import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import type { AppEvent, SetEvent } from "@/lib/types";
+import { resetDb } from "@/server/db";
+import { handle } from "@/server/social";
 
 import { Dashboard } from "./Dashboard";
 import { SharedProfile } from "./Share";
@@ -176,5 +180,43 @@ describe("web dashboard", () => {
     location.hash = "#broken";
     render(<SharedProfile />);
     expect(await screen.findByText("This link doesn’t work")).toBeInTheDocument();
+  });
+
+  it("shows Friends on the big screen: the feed with Discover beside the board, and other screens open in the app", async () => {
+    await seed();
+    await resetDb();
+    const a: Account = { token: "tok-a", id: "acc-a", email: null, providers: ["email"], via: "email" };
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
+    useAccount.setState({ account: a });
+    const ids: Record<string, string> = { "tok-a": "acc-a" };
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit) => {
+      const token = String((init.headers as Record<string, string>).Authorization ?? "").replace("Bearer ", "");
+      if (url !== "/api/social/" || !ids[token]) return Response.json({ error: "Not found" }, { status: 404 });
+      const r = await handle(ids[token], JSON.parse(String(init.body)));
+      return Response.json(r.body, { status: r.code });
+    });
+    const open = vi.spyOn(window, "open").mockImplementation(() => null);
+    await handle("acc-a", { op: "join", handle: "sam", name: "Sam", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-b", { op: "update", public: true });
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "w1",
+      at: Date.now() - 3_600_000,
+      caption: "Leg day",
+      body: { seconds: 3000, sets: 10, volume: 0, prs: 0, muscles: [], exercises: [{ id: "bench-press", sets: 3, w: 60, r: 8 }] },
+    });
+    location.hash = "#/friends";
+    const u = userEvent.setup();
+    render(<Dashboard />);
+    expect(await screen.findByText("No workouts yet")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Start a challenge" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Discover" }));
+    expect(await screen.findByText("Leg day")).toBeInTheDocument();
+    await u.click(screen.getAllByRole("button", { name: /Blair/ })[0]!);
+    await vi.waitFor(() => expect(open).toHaveBeenCalledWith("/app/#/person/blair", "_self"));
+    vi.unstubAllGlobals();
+    useAccount.setState({ account: null });
+    localStorage.removeItem(ACCOUNT_KEY);
   });
 });

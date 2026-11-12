@@ -111,6 +111,7 @@ export const en = {
   "dash.needTwo": "Needs two sessions to draw a trend.",
   "dash.weekOfShort": "Week of {date}:",
   "dash.prMark": " · PR",
+  "dash.tab.friends": "Friends",
 } as const;
 
 type Key = keyof typeof en;
@@ -224,6 +225,7 @@ export const es: Partial<Record<Key, Message>> = {
   "dash.needTwo": "Hacen falta dos sesiones para trazar una tendencia.",
   "dash.weekOfShort": "Semana del {date}:",
   "dash.prMark": " · récord",
+  "dash.tab.friends": "Amigos",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -335,6 +337,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "dash.needTwo": "Il faut deux séances pour tracer une tendance.",
   "dash.weekOfShort": "Semaine du {date} :",
   "dash.prMark": " · record",
+  "dash.tab.friends": "Amis",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -446,6 +449,7 @@ export const de: Partial<Record<Key, Message>> = {
   "dash.needTwo": "Braucht zwei Einheiten, um einen Trend zu zeichnen.",
   "dash.weekOfShort": "Woche vom {date}:",
   "dash.prMark": " · PR",
+  "dash.tab.friends": "Freunde",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -557,6 +561,7 @@ export const it: Partial<Record<Key, Message>> = {
   "dash.needTwo": "Servono due sedute per tracciare un andamento.",
   "dash.weekOfShort": "Settimana del {date}:",
   "dash.prMark": " · PR",
+  "dash.tab.friends": "Amici",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -663,4 +668,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "dash.needTwo": "推移の表示には2回分のセッションが必要です。",
   "dash.weekOfShort": "{date}の週：",
   "dash.prMark": " · 自己ベスト",
+  "dash.tab.friends": "友達",
 };
