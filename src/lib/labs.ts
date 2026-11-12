@@ -20,6 +20,7 @@ export type LabFlag =
   | "labWatchReps"
   | "labGymMachines"
   | "labHandsFree"
+  | "labBarPath"
   | "labTempo";
 
 export interface Lab {
@@ -37,6 +38,7 @@ export interface Lab {
     | "watchReps"
     | "machines"
     | "handsFree"
+    | "barPath"
     | "tempo";
   /** Another lab this one only works with. */
   needs?: LabFlag;
@@ -57,6 +59,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labWatchReps", key: "watchReps", native: true },
   { flag: "labGymMachines", key: "machines" },
   { flag: "labHandsFree", key: "handsFree" },
+  { flag: "labBarPath", key: "barPath", needs: "labRepCount" },
   { flag: "labTempo", key: "tempo" },
 ];
 

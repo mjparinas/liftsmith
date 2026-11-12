@@ -182,3 +182,27 @@ export const SOCIAL_LIMITS = {
 /** Lowercase letters, digits and underscores. */
 export const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
 export const cleanHandle = (v: unknown) => (typeof v === "string" ? v.trim().replace(/^@/, "").toLowerCase() : "");
+
+/** One person on the friends leaderboard: what they've posted this week that the reader may see. */
+export interface BoardRow {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** The reader's own row. */
+  me: boolean;
+  workouts: number;
+  sets: number;
+  minutes: number;
+  /** Kilograms, from posts that show weights. */
+  volume: number;
+  prs: number;
+}
+export const BOARD_METRICS = ["workouts", "sets", "minutes", "volume"] as const;
+export type BoardMetric = (typeof BOARD_METRICS)[number];
+
+/** Who sent an invite link, as the invite screen shows them. */
+export interface Inviter {
+  handle: string;
+  name: string;
+  avatar: string;
+}

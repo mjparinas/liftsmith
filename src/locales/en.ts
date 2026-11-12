@@ -20,6 +20,7 @@ import * as body from "./text/body";
 import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
+import * as calc from "./text/calc";
 import * as callText from "./text/callText";
 import * as card from "./text/card";
 import * as category from "./text/category";
@@ -140,6 +141,7 @@ export const en = {
   ...buddy.en,
   ...buy.en,
   ...cal.en,
+  ...calc.en,
   ...card.en,
   ...callText.en,
   ...category.en,

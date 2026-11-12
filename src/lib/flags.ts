@@ -90,6 +90,13 @@ export const FLAGS = {
     label: "Labs: today's max from warm-ups",
     description: "Estimates today's max from the camera's warm-up bar speeds and suggests a lighter or heavier first working set.",
   },
+  /** Labs: after a camera-counted set, a replay of the bar's path from the pose landmarks, with one cue. */
+  labBarPath: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: bar path replay",
+    description: "After a camera-counted squat, deadlift or overhead press, replays the bar's path with one cue on where it drifted.",
+  },
   /** Labs: bikes, rowers, treadmills and cross trainers over Bluetooth (FTMS) fill in cardio sets (ftms.ts, machine.ts). */
   labGymMachines: {
     default: false,

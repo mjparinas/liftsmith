@@ -27,6 +27,7 @@ import {
   type SocialProfile,
 } from "@/lib/socialTypes";
 
+import { cleanCode, newCode } from "./coach";
 import { batch, query, rateLimit, run, type Row } from "./db";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
@@ -39,7 +40,9 @@ const fail = (code: number, error: string): Result => ({ code, body: { error } }
 export const HIDE_AFTER = 3;
 export const PAGE = 20;
 /** Per account per day, so one account can't flood others. */
-export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50 };
+export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50, invite: 30 };
+/** An invite link lasts 30 days and works for this many people. */
+export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
 /** Handles nobody can take: they'd look official. */
 const RESERVED = new Set([
   "admin",
@@ -278,6 +281,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM mutes WHERE muter_id = ? OR muted_id = ?", args: [accountId, accountId] },
+    { sql: "DELETE FROM social_invites WHERE account_id = ?", args: a },
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
     { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
@@ -926,6 +930,123 @@ export async function send(accountId: string, b: Record<string, unknown>, now = 
   return ok();
 }
 
+// --- Invite links ---
+
+/** The lifter's invite code: the live one, or a new one. Anyone who accepts it and the lifter follow each other. */
+export async function invite(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const [live] = await query("SELECT code, expires_at FROM social_invites WHERE account_id = ? AND expires_at > ? AND uses < ?", [
+    accountId,
+    now,
+    INVITE.uses,
+  ]);
+  if (live) return ok({ code: s(live.code), expiresAt: n(live.expires_at) });
+  if (!(await limit(accountId, "invite", now))) return fail(429, "slow");
+  const code = newCode();
+  await batch([
+    { sql: "DELETE FROM social_invites WHERE account_id = ?", args: [accountId] },
+    {
+      sql: "INSERT INTO social_invites (code, account_id, created_at, expires_at, uses) VALUES (?, ?, ?, ?, 0)",
+      args: [code, accountId, now, now + INVITE.ttl],
+    },
+  ]);
+  return ok({ code, expiresAt: now + INVITE.ttl });
+}
+
+/** Who an invite is from, or null when it's unknown, used up, expired, or its owner is suspended or blocked. */
+async function inviter(accountId: string, code: string, now: number): Promise<ProfileRow | null> {
+  const c = cleanCode(code);
+  if (!c) return null;
+  const [r] = await query("SELECT account_id FROM social_invites WHERE code = ? AND expires_at > ? AND uses < ?", [c, now, INVITE.uses]);
+  if (!r) return null;
+  const p = await profileOf(s(r.account_id));
+  if (!p || n(p.suspended) || (await blockedEither(accountId, s(p.account_id)))) return null;
+  return p;
+}
+
+/** What the invite screen shows before the lifter accepts. Signed in is enough: they may not have joined yet. */
+export async function inviteInfo(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  if (!(await limit(accountId, "lookup", now))) return fail(429, "slow");
+  const p = await inviter(accountId, s(b.code), now);
+  if (!p) return fail(404, "invite");
+  const self = s(p.account_id) === accountId;
+  return ok({ inviter: { handle: s(p.handle), name: s(p.name), avatar: avatarOf(p.avatar) }, self });
+}
+
+/**
+ * Accepts an invite: the two lifters follow each other, accepted both ways, whatever their follow settings,
+ * because one sent the link and the other chose to open and accept it. The inviter hears they have a new follower.
+ */
+export async function acceptInvite(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const p = await inviter(accountId, s(b.code), now);
+  if (!p) return fail(404, "invite");
+  const them = s(p.account_id);
+  if (them === accountId) return fail(400, "self");
+  if (!(await limit(accountId, "follow", now))) return fail(429, "slow");
+  const had = await follow(accountId, them);
+  await batch([
+    {
+      sql: "INSERT OR REPLACE INTO follows (follower_id, followee_id, accepted, created_at) VALUES (?, ?, 1, ?)",
+      args: [accountId, them, now],
+    },
+    {
+      sql: "INSERT OR REPLACE INTO follows (follower_id, followee_id, accepted, created_at) VALUES (?, ?, 1, ?)",
+      args: [them, accountId, now],
+    },
+    { sql: "UPDATE social_invites SET uses = uses + 1 WHERE code = ?", args: [cleanCode(b.code)] },
+  ]);
+  if (!had?.accepted) await notify(them, accountId, "follow");
+  return ok({ handle: s(p.handle) });
+}
+
+// --- The friends leaderboard ---
+
+/**
+ * This week's board: the lifter and everyone they follow, with the workouts each has posted since `from` (the
+ * week's start in the lifter's own time zone) that the lifter may see, and their sets, minutes and volume.
+ * Built from posts only, so an unposted workout never shows, and each post's audience still holds.
+ */
+export async function board(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const from = Number(b.from);
+  if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
+  const rows = await query(
+    `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
+       COUNT(p.id) AS workouts,
+       COALESCE(SUM(json_extract(p.body, '$.sets')), 0) AS sets,
+       COALESCE(SUM(json_extract(p.body, '$.seconds')), 0) AS seconds,
+       COALESCE(SUM(json_extract(p.body, '$.volume')), 0) AS volume,
+       COALESCE(SUM(json_extract(p.body, '$.prs')), 0) AS prs
+     FROM social_profiles sp
+     LEFT JOIN posts p ON p.account_id = sp.account_id AND p.hidden = 0 AND p.at >= ?2 AND p.at < ?3 AND ${seesPost("?1")}
+     WHERE sp.suspended = 0
+       AND (sp.account_id = ?1 OR sp.account_id IN (SELECT followee_id FROM follows WHERE follower_id = ?1 AND accepted = 1))
+       AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)
+       AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?1)
+     GROUP BY sp.account_id LIMIT 201`,
+    [accountId, from, from + 7 * day],
+  );
+  return ok({
+    rows: rows.map((r) => ({
+      handle: s(r.handle),
+      name: s(r.name),
+      avatar: avatarOf(r.avatar),
+      me: s(r.id) === accountId,
+      workouts: n(r.workouts),
+      sets: n(r.sets),
+      minutes: Math.round(n(r.seconds) / 60),
+      volume: Math.round(n(r.volume)),
+      prs: n(r.prs),
+    })),
+  });
+}
+
 /** A phone's push token, so this account's Friends notifications reach it (push.ts). */
 export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -959,6 +1080,10 @@ export const OPS: Record<string, Op> = {
   uncomment: (a, b) => uncomment(a, b),
   activity: (a, _b, now) => activity(a, now),
   send,
+  invite,
+  inviteInfo,
+  acceptInvite,
+  board,
   pushToken,
   pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };

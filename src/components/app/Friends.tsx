@@ -3,7 +3,7 @@
 // Friends and the workout feed (Melvin, 2026-11-11; docs/decisions/friends.md). One screen (#/friends) with the
 // feed, activity and people, a person's page (#/person/<handle>), a post's comments in a sheet, and the post
 // button on Done. Opened from the people button on Today's header (Melvin chose it over a sixth tab).
-import { useCallback, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { achName, TIER_LABEL } from "@/lib/achievements";
@@ -12,7 +12,18 @@ import { useAccount } from "@/lib/auth";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { badgeForItem, COSMETICS, levelForItem } from "@/lib/game";
-import { list as fmtList, t } from "@/lib/i18n";
+import { list as fmtList, inSentence, t } from "@/lib/i18n";
+import {
+  acceptPending,
+  boardNudge,
+  cleanInvite,
+  inviteUrl,
+  pendingInvite,
+  playInviteUrl,
+  rankBoard,
+  savePendingInvite,
+  weekStart,
+} from "@/lib/invite";
 import { haptic, isNative, oops, sound } from "@/lib/juice";
 import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
@@ -33,14 +44,18 @@ import {
 } from "@/lib/social";
 import {
   AUDIENCES,
+  BOARD_METRICS,
   cleanHandle,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
   type ActivityItem,
   type Audience,
+  type BoardMetric,
+  type BoardRow,
   type FeedComment,
   type FeedPost,
+  type Inviter,
   type PersonCard,
   type PushPrefs,
   type ReportKind,
@@ -610,7 +625,7 @@ function suggestHandle(name: string) {
   return h.length >= 3 ? h : "";
 }
 
-function Join() {
+function Join({ onJoined }: { onJoined?: () => void } = {}) {
   const { profile } = useApp();
   const [handle, setHandle] = useState(() => suggestHandle(profile.name ?? ""));
   const [name, setName] = useState(profile.name ?? "");
@@ -632,6 +647,7 @@ function Join() {
       haptic("celebrate");
       sound.done();
       track("feature", { name: "social_join", detail: open ? "open" : "approve" });
+      onJoined?.();
     } catch (err) {
       oops();
       setError(socialError(err));
@@ -1089,6 +1105,33 @@ function PeopleList({ list, reload, onChanged }: { list: ListName; reload: numbe
   );
 }
 
+/** People › Invite a friend: shares the lifter's invite link. Whoever accepts it and the lifter follow each other. */
+function InviteButton() {
+  const [note, setNote] = useState<string | null>(null);
+  const share = async () => {
+    haptic("tick");
+    try {
+      const r = await social<{ code: string }>("invite");
+      const url = inviteUrl(r.code);
+      track("feature", { name: "social_invite" });
+      if (await shareUrl(url, t("friends.invite.shareTitle"))) return;
+      setNote((await copyText(url)) ? t("link.copied") : url);
+    } catch (e) {
+      oops();
+      setNote(socialError(e));
+    }
+  };
+  return (
+    <>
+      <Button kind="primary" icon="people" className="mt-3 w-full" onClick={() => void share()}>
+        {t("friends.invite")}
+      </Button>
+      <p className="mt-1 px-1 text-xs text-muted">{t("friends.inviteHint")}</p>
+      <Note text={note} />
+    </>
+  );
+}
+
 function People() {
   const me = useSocial((s) => s.me);
   const [q, setQ] = useState("");
@@ -1134,7 +1177,8 @@ function People() {
           <Button submit>{t("friends.findGo")}</Button>
         </div>
       </form>
-      <Button kind="ghost" icon="share" className="mt-3 w-full" onClick={() => void share()}>
+      <InviteButton />
+      <Button kind="ghost" icon="share" className="mt-2 w-full" onClick={() => void share()}>
         {t("friends.shareMe", { handle })}
       </Button>
       <Note text={note} />
@@ -1144,6 +1188,217 @@ function People() {
       <PeopleList list="muted" reload={version} onChanged={changed} />
       <PeopleList list="blocked" reload={version} onChanged={changed} />
     </>
+  );
+}
+
+// --- The leaderboard ---
+
+const METRIC_LABEL: Record<BoardMetric, MessageKey> = {
+  workouts: "friends.board.workouts",
+  sets: "friends.board.sets",
+  minutes: "friends.board.minutes",
+  volume: "friends.board.volume",
+};
+
+function metricText(metric: BoardMetric, v: number, unit: Unit): string {
+  if (metric === "volume") return `${fmtNum(Math.round(fromKg(v, unit)))} ${unit}`;
+  if (metric === "minutes") return t("friends.board.min", { n: fmtNum(v) });
+  return fmtNum(v);
+}
+
+/**
+ * Friends › Board: this week (or last) for the lifter and everyone they follow, from workouts posted to Friends.
+ * One line says what to do about it: how much more passes the person just above.
+ */
+function Board({ onPeople }: { onPeople: () => void }) {
+  const { profile } = useApp();
+  const unit = profile.unit;
+  const [week, setWeek] = useState<0 | 1>(0);
+  const [metric, setMetric] = useState<BoardMetric>("workouts");
+  const [data, setData] = useState<{ week: number; rows: BoardRow[] } | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    social<{ rows: BoardRow[] }>("board", { from: weekStart(Date.now(), week) })
+      .then((r) => live && setData({ week, rows: r.rows }))
+      .catch((e: unknown) => live && (setData({ week, rows: [] }), setNote(socialError(e))));
+    return () => {
+      live = false;
+    };
+  }, [week]);
+  const rows = data?.week === week ? data.rows : null;
+  if (rows === null) return <Skeleton className="h-48" />;
+  if (rows.length < 2)
+    return (
+      <EmptyState
+        icon="trophy"
+        title={t("friends.board.none")}
+        body={t("friends.board.noneBody")}
+        action={<Button onClick={onPeople}>{t("friends.feed.find")}</Button>}
+      />
+    );
+  const ranked = rankBoard(rows, metric);
+  const nudge = week === 0 ? boardNudge(rows, metric) : null;
+  const what = inSentence(t(METRIC_LABEL[metric]));
+  const nudgeText = !nudge
+    ? week === 0
+      ? t("friends.board.start")
+      : null
+    : nudge.kind === "lead"
+      ? t("friends.board.lead", { by: metricText(metric, nudge.by, unit), what })
+      : nudge.kind === "tied"
+        ? t("friends.board.tied", { name: nudge.name })
+        : t("friends.board.chase", { gap: metricText(metric, nudge.gap, unit), what, name: nudge.name });
+  return (
+    <>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.week")}>
+        <Chip active={week === 0} onClick={() => setWeek(0)}>
+          {t("friends.board.thisWeek")}
+        </Chip>
+        <Chip active={week === 1} onClick={() => setWeek(1)}>
+          {t("friends.board.lastWeek")}
+        </Chip>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+        {BOARD_METRICS.map((m) => (
+          <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
+            {t(METRIC_LABEL[m])}
+          </Chip>
+        ))}
+      </div>
+      {nudgeText && (
+        <p className="card card-tint mt-4 p-4 text-sm font-medium" style={{ "--tint": "var(--color-ember)" } as CSSProperties}>
+          {nudgeText}
+        </p>
+      )}
+      <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.board.title")}>
+        {ranked.map((r) => (
+          <li key={r.handle} className={`flex items-center gap-3 px-4 py-2.5 ${r.me ? "bg-accent/10" : ""}`}>
+            <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
+            <button
+              type="button"
+              onClick={() => go("person", r.handle)}
+              className="press flex min-h-11 min-w-0 flex-1 items-center gap-3 text-left"
+            >
+              <Avatar name={r.name} avatar={r.avatar} size={36} />
+              <span className="min-w-0 truncate font-medium">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
+            </button>
+            <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
+          </li>
+        ))}
+      </ol>
+      <p className="mt-2 px-1 text-xs text-muted">{t("friends.board.hint")}</p>
+      <Note text={note} />
+    </>
+  );
+}
+
+// --- Invites ---
+
+/**
+ * #/invite/<code>: someone's invite. Signed out, it asks to sign in (and on the web offers the app); not yet in
+ * Friends, it shows who invited them and the join form, and joining accepts it; in Friends, one tap accepts. The
+ * code waits on the device meanwhile (invite.ts), so signing in on another screen doesn't lose it.
+ */
+export function InviteScreen({ code: raw }: { code: string }) {
+  const { account, me } = useSocialLoaded();
+  const code = cleanInvite(raw);
+  const [who, setWho] = useState<{ inviter: Inviter; self: boolean } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (code) savePendingInvite(code);
+  }, [code]);
+  useEffect(() => {
+    if (!account || !code) return;
+    let live = true;
+    social<{ inviter: Inviter; self: boolean }>("inviteInfo", { code })
+      .then((r) => live && setWho(r))
+      .catch((e: unknown) => {
+        if (!live) return;
+        setError(socialError(e));
+        savePendingInvite("");
+      });
+    return () => {
+      live = false;
+    };
+  }, [account?.id, code]); // eslint-disable-line react-hooks/exhaustive-deps
+  const accept = async () => {
+    setBusy(true);
+    const handle = await acceptPending();
+    setBusy(false);
+    if (handle) {
+      haptic("celebrate");
+      sound.done();
+      track("feature", { name: "social_invite_accept" });
+      void refreshSocial();
+      go("person", handle);
+    } else {
+      oops();
+      setError(t("friends.err.failed"));
+    }
+  };
+  const header = <ScreenHeader title={t("friends.invite.title")} back={{ label: t("friends.back"), onClick: goBack }} />;
+  if (!code || error)
+    return (
+      <div className="pb-8">
+        {header}
+        <EmptyState icon="people" title={error ?? t("friends.err.invite")} />
+      </div>
+    );
+  if (!account)
+    return (
+      <div className="pb-8">
+        {header}
+        <EmptyState
+          icon="people"
+          mascot="cheer"
+          title={t("friends.invite.signedOut")}
+          body={t("friends.invite.signedOutBody")}
+          action={<Button onClick={() => go("account")}>{t("friends.signIn.go")}</Button>}
+        />
+        {!isNative() && (
+          <Section title={t("friends.invite.getApp")}>
+            <a href={playInviteUrl(code)} className="press card flex min-h-11 items-center justify-between px-4 py-3 text-sm">
+              <span>{t("friends.invite.play")}</span>
+              <span aria-hidden className="text-muted">
+                ›
+              </span>
+            </a>
+            <p className="mt-2 px-1 text-xs text-muted">{t("friends.invite.iphone")}</p>
+          </Section>
+        )}
+      </div>
+    );
+  const inviter = who?.inviter;
+  return (
+    <div className="pb-8">
+      {header}
+      {inviter ? (
+        <div className="card mt-4 flex items-center gap-4 p-4">
+          <Avatar name={inviter.name} avatar={inviter.avatar} size={56} />
+          <p className="min-w-0">
+            <span className="block font-semibold">{t("friends.invite.from", { name: inviter.name })}</span>
+            <span className="block text-sm text-muted">{t("friends.invite.body")}</span>
+          </p>
+        </div>
+      ) : (
+        <Skeleton className="mt-4 h-24" />
+      )}
+      {who?.self ? (
+        <p className="mt-4 px-1 text-sm text-muted">{t("friends.invite.self")}</p>
+      ) : me?.profile ? (
+        <Button className="mt-4 w-full" disabled={busy || !inviter || !!me.suspended} onClick={() => void accept()}>
+          {t("friends.invite.accept")}
+        </Button>
+      ) : me ? (
+        <div className="mt-6">
+          <Join onJoined={() => void accept()} />
+        </div>
+      ) : (
+        <Skeleton className="mt-4 h-48" />
+      )}
+    </div>
   );
 }
 
@@ -1158,7 +1413,7 @@ function useSocialLoaded() {
   return { account, me, error };
 }
 
-type Tab = "feed" | "activity" | "people";
+type Tab = "feed" | "board" | "activity" | "people";
 
 export function Friends() {
   const { account, me, error } = useSocialLoaded();
@@ -1226,6 +1481,9 @@ export function Friends() {
         <Chip active={tab === "feed"} onClick={() => setTab("feed")}>
           {t("friends.tab.feed")}
         </Chip>
+        <Chip active={tab === "board"} onClick={() => setTab("board")}>
+          {t("friends.tab.board")}
+        </Chip>
         <Chip active={tab === "activity"} onClick={() => setTab("activity")}>
           {me.unread ? t("friends.tab.activityN", { n: fmtNum(me.unread) }) : t("friends.tab.activity")}
         </Chip>
@@ -1248,6 +1506,7 @@ export function Friends() {
             }
           />
         )}
+        {tab === "board" && <Board onPeople={() => setTab("people")} />}
         {tab === "activity" && <Activity onPeople={() => setTab("people")} />}
         {tab === "people" && <People />}
       </div>
@@ -1471,6 +1730,11 @@ function useProfileSync() {
   const avatar = profile.cosmetics?.avatar ?? "";
   const lifts = useMemo(() => bestLifts(events), [events]);
   const suspended = !!me?.suspended;
+  const joinedNow = !!p;
+  useEffect(() => {
+    if (!joinedNow || suspended || !pendingInvite() || location.hash.startsWith("#/invite/")) return;
+    void acceptPending().then((handle) => (handle ? refreshSocial() : undefined));
+  }, [joinedNow, suspended]);
   useEffect(() => {
     if (!p || suspended) return;
     const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : []);

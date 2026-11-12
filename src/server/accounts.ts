@@ -14,6 +14,8 @@ import { socialDeletes } from "./social";
 import { forgetStripe } from "./stripe";
 
 export const SESSION_MS = 365 * 86_400_000;
+/** How often use pushes the expiry forward again (sliding renewal on every platform: web, Android and iOS). */
+export const RENEW_MS = 86_400_000;
 const CODE_MS = 10 * 60_000;
 const CODE_TRIES = 5;
 const CODES_A_DAY = 5;
@@ -229,7 +231,8 @@ export async function verifyEmail(email: string, code: string, platform: Platfor
   return { code: 200, body: await startSession(id, platform, now) };
 }
 
-/** The signed-in account behind a request's Bearer token. */
+/** The signed-in account behind a request's Bearer token. Null only when the token is unknown or expired; a database
+ *  error throws, so callers can answer "try again" instead of signing the device out. */
 export async function sessionOf(req: Request, now = Date.now()): Promise<{ accountId: string; session: string } | null> {
   const auth = req.headers.get("authorization") ?? "";
   const t = auth.startsWith("Bearer ") ? auth.slice(7).trim() : "";
@@ -241,10 +244,15 @@ export async function sessionOf(req: Request, now = Date.now()): Promise<{ accou
   );
   const s = rows[0];
   if (!s || Number(s.expires_at) < now) return null;
-  // Sliding expiry, written at most once a day.
-  if (now - Number(s.last_seen) > 86_400_000) {
-    await run("UPDATE account_sessions SET last_seen = ?, expires_at = ? WHERE token_hash = ?", [now, now + SESSION_MS, h]);
-    await run("UPDATE accounts SET last_seen = ? WHERE id = ?", [now, s.account_id]);
+  // Sliding expiry, written at most once a day. A failed write only delays the renewal to the next request: the
+  // session is still good, so it must never turn into a sign-out.
+  if (now - Number(s.last_seen) > RENEW_MS) {
+    try {
+      await run("UPDATE account_sessions SET last_seen = ?, expires_at = ? WHERE token_hash = ?", [now, now + SESSION_MS, h]);
+      await run("UPDATE accounts SET last_seen = ? WHERE id = ?", [now, s.account_id]);
+    } catch {
+      // Renewed next time.
+    }
   }
   return { accountId: String(s.account_id), session: h };
 }

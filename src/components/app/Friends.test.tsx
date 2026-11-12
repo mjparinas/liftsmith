@@ -11,7 +11,7 @@ import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { resetDb } from "@/server/db";
 import { handle } from "@/server/social";
 
-import { Friends, PersonScreen } from "./Friends";
+import { Friends, InviteScreen, PersonScreen } from "./Friends";
 import { SendToFriend } from "./SendToFriend";
 
 // The app's Friends screens against the real server code (an in-memory database): each fetch to /api/social/
@@ -162,5 +162,25 @@ describe("Friends", () => {
     await u.click(await screen.findByRole("button", { name: "Block or report Blair" }));
     await u.click(screen.getByRole("button", { name: "Mute" }));
     expect(await screen.findByText("Muted: their workouts don’t show in your feed.")).toBeInTheDocument();
+  });
+
+  it("invites a friend who joins from the link, and both show on the board", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    const code = (await handle("acc-a", { op: "invite" })).body.code as string;
+    signIn("tok-b");
+    render(<InviteScreen code={code} />);
+    expect(await screen.findByText("Alex invited you")).toBeInTheDocument();
+    await u.type(await screen.findByLabelText("Handle"), "blair");
+    await u.click(screen.getByRole("button", { name: "Agree and join" }));
+    await waitFor(async () =>
+      expect((await handle("acc-b", { op: "people", list: "friends" })).body.people).toMatchObject([{ handle: "alex" }]),
+    );
+    cleanup();
+
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    expect(await screen.findByText("blair (you)")).toBeInTheDocument();
+    expect(screen.getByText("Post a workout to get on this week’s board.")).toBeInTheDocument();
   });
 });
