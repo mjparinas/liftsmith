@@ -72,7 +72,7 @@ export default async function ComparePage({ params }: Props) {
       <CtaInline
         cta="compare-top"
         title={`Switching from ${c.name}?`}
-        body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${c.slug === "hevy" || c.slug === "strong" ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`}
+        body={`Start ${BRAND.name} free with no account. Your plan is ready in under a minute${IMPORT_BY_SLUG.has(c.slug) ? `, and you can import your ${c.name} CSV export to keep your history` : ""}.`}
         button="Try it free"
       />
       {IMPORT_BY_SLUG.has(c.slug) ? (
