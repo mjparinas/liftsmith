@@ -54,6 +54,8 @@ dependencies {
     implementation project(':capacitor-android')
     // Play Install Referrer: which tagged Play link brought an install in (InstallInfoPlugin).
     implementation "com.android.installreferrer:installreferrer:2.2"
+    // The Play Store rating prompt (StoreReviewPlugin, docs/decisions/growth.md).
+    implementation "com.google.android.play:review:2.0.2"
     // Sign in with Google for accounts (AccountSignInPlugin): Credential Manager and Google's ID token option.
     implementation "androidx.credentials:credentials:1.5.0"
     implementation "androidx.credentials:credentials-play-services-auth:1.5.0"
