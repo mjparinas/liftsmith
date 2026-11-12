@@ -1,6 +1,7 @@
 package com.getliftsmith.app;
 
 import android.os.Bundle;
+import android.view.KeyEvent;
 import com.getcapacitor.BridgeActivity;
 
 public class MainActivity extends BridgeActivity {
@@ -15,7 +16,15 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(HealthWorkoutPlugin.class);
         registerPlugin(GarminPlugin.class);
         registerPlugin(SpeechLogPlugin.class);
+        registerPlugin(VolumeKeysPlugin.class);
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        // Volume up logs a set while that lab is on during a workout (VolumeKeysPlugin).
+        if (VolumeKeysPlugin.handleKey(event)) return true;
+        return super.dispatchKeyEvent(event);
     }
 
     @Override
