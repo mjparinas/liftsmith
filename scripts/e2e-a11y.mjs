@@ -375,6 +375,20 @@ try {
             { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
           ],
         },
+        {
+          id: "ch3",
+          name: "Leg week",
+          metric: "workouts",
+          startsAt: Date.now() - 8 * 86_400_000,
+          endsAt: Date.now() - 86_400_000,
+          owner: { handle: "alex", name: "Alex" },
+          mine: true,
+          status: "joined",
+          members: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 4 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 3 },
+          ],
+        },
       ],
     },
     clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
@@ -477,6 +491,10 @@ try {
   await scan("friends comments");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Board" }).click();
+  // A challenge that just ended opens its results moment once (gap list 3, item 5).
+  await page.getByRole("dialog", { name: "Leg week" }).getByText("You won!").waitFor();
+  await scan("friends challenge result");
+  await page.keyboard.press("Escape");
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
   await page.getByText("Blair invited you to this challenge.").waitFor();
   await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();

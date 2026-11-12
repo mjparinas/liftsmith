@@ -43,6 +43,15 @@ export const en = {
   "card.shareBadge": "Share {name}",
   "card.shareLevel": "Share your level",
   "card.shareIt": "Share it",
+  "card.pick.challenge": "Challenge result",
+  "card.kicker.challenge": "Friend challenge",
+  "card.challenge.won": "Won it",
+  "card.challenge.tied": "Tied for first",
+  "card.challenge.place": "No. {place}",
+  "card.challenge.of": "out of {n}",
+  "card.challenge.total": "My total",
+  "card.challenge.length": "Length",
+  "card.challenge.weeks": { one: "{n} week", other: "{n} weeks" },
 } as const;
 
 type Key = keyof typeof en;
@@ -87,6 +96,15 @@ export const es: Partial<Record<Key, Message>> = {
   "card.shareBadge": "Compartir {name}",
   "card.shareLevel": "Compartir tu nivel",
   "card.shareIt": "Compartirlo",
+  "card.pick.challenge": "Resultado del reto",
+  "card.kicker.challenge": "Reto entre amigos",
+  "card.challenge.won": "Ganado",
+  "card.challenge.tied": "Empate en el primer puesto",
+  "card.challenge.place": "N.º {place}",
+  "card.challenge.of": "de {n}",
+  "card.challenge.total": "Mi total",
+  "card.challenge.length": "Duración",
+  "card.challenge.weeks": { one: "{n} semana", other: "{n} semanas" },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -130,6 +148,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "card.shareBadge": "Partager {name}",
   "card.shareLevel": "Partager votre niveau",
   "card.shareIt": "Le partager",
+  "card.pick.challenge": "Résultat du défi",
+  "card.kicker.challenge": "Défi entre amis",
+  "card.challenge.won": "Gagné",
+  "card.challenge.tied": "Ex æquo en tête",
+  "card.challenge.place": "N° {place}",
+  "card.challenge.of": "sur {n}",
+  "card.challenge.total": "Mon total",
+  "card.challenge.length": "Durée",
+  "card.challenge.weeks": { one: "{n} semaine", other: "{n} semaines" },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -172,6 +199,15 @@ export const de: Partial<Record<Key, Message>> = {
   "card.shareBadge": "{name} teilen",
   "card.shareLevel": "Dein Level teilen",
   "card.shareIt": "Teilen",
+  "card.pick.challenge": "Ergebnis der Challenge",
+  "card.kicker.challenge": "Challenge unter Freunden",
+  "card.challenge.won": "Gewonnen",
+  "card.challenge.tied": "Gemeinsam auf Platz 1",
+  "card.challenge.place": "Platz {place}",
+  "card.challenge.of": "von {n}",
+  "card.challenge.total": "Meine Summe",
+  "card.challenge.length": "Dauer",
+  "card.challenge.weeks": { one: "{n} Woche", other: "{n} Wochen" },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -214,6 +250,15 @@ export const it: Partial<Record<Key, Message>> = {
   "card.shareBadge": "Condividi {name}",
   "card.shareLevel": "Condividi il tuo livello",
   "card.shareIt": "Condividilo",
+  "card.pick.challenge": "Risultato della sfida",
+  "card.kicker.challenge": "Sfida tra amici",
+  "card.challenge.won": "Vinta",
+  "card.challenge.tied": "Primo posto a pari merito",
+  "card.challenge.place": "N. {place}",
+  "card.challenge.of": "su {n}",
+  "card.challenge.total": "Il mio totale",
+  "card.challenge.length": "Durata",
+  "card.challenge.weeks": { one: "{n} settimana", other: "{n} settimane" },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -256,4 +301,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "card.shareBadge": "{name}をシェア",
   "card.shareLevel": "レベルをシェア",
   "card.shareIt": "シェアする",
+  "card.pick.challenge": "チャレンジの結果",
+  "card.kicker.challenge": "友達とのチャレンジ",
+  "card.challenge.won": "優勝",
+  "card.challenge.tied": "同率1位",
+  "card.challenge.place": "{place}位",
+  "card.challenge.of": "{n}人中",
+  "card.challenge.total": "自分の合計",
+  "card.challenge.length": "期間",
+  "card.challenge.weeks": { other: "{n}週間" },
 };

@@ -11,7 +11,8 @@ import type { MessageKey } from "@/locales/en";
 
 import { readAccount } from "./auth";
 import { daysLeft } from "./challenge";
-import { t } from "./i18n";
+import { challengeResult } from "./challengeResult";
+import { list as fmtList, t } from "./i18n";
 import type { Insight } from "./insights";
 import { boardNudge, weekStart } from "./invite";
 import { social, socialOn, useSocial } from "./social";
@@ -47,8 +48,28 @@ export function friendNotes(
   const out: Insight[] = [];
   const unit = profile.unit;
   // An older server sends none of these.
-  const { week = [], challenges = [], quiet = [] } = s;
+  const { week = [], challenges = [], quiet = [], ended = [] } = s;
   const seeBoard: Insight["action"] = { kind: "go", route: "friends/board", label: t("social.note.seeBoard") };
+
+  // A challenge that just ended (gap list 3, item 5): where the lifter finished, and a rematch or a share.
+  for (const c of ended) {
+    const r = challengeResult(c, now);
+    if (!r) continue;
+    const challenge = c.name || t(CH_NAME[c.metric]);
+    const total = amount(c.metric, r.score, unit);
+    out.push({
+      id: `friend-result-${c.id}`,
+      tone: r.won ? "good" : "info",
+      title: t(r.tie ? "social.res.tie.title" : r.won ? "social.res.won.title" : "social.res.place.title", { challenge }),
+      why: r.won
+        ? t("social.res.won.why", { amount: total, n: fmtNum(r.of) })
+        : r.winners.length
+          ? t("social.res.place.why", { place: fmtNum(r.place), n: fmtNum(r.of), amount: total, names: fmtList(r.winners) })
+          : t("social.res.none.why"),
+      advice: t("social.res.advice"),
+      action: { kind: "go", route: "friends/board", label: t("social.res.go") },
+    });
+  }
 
   // A running challenge about to slip away: someone just ahead, three days or fewer left.
   for (const c of challenges) {

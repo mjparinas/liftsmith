@@ -17,6 +17,7 @@ import {
   CLUB_GOAL,
   HANDLE_RE,
   REPORT_REASONS,
+  RESULT_NOTE_DAYS,
   SOCIAL_LIMITS,
   type ActivityItem,
   type Audience,
@@ -1501,6 +1502,7 @@ export async function nudges(accountId: string, b: Record<string, unknown>, now 
   const week = await board(accountId, { from: b.from }, now);
   if (week.code !== 200) return week;
   const ch = await challenges(accountId, {}, now);
+  const all = (ch.body.challenges as Challenge[] | undefined) ?? [];
   const quietFrom = now - QUIET_DAYS * day;
   const rows = await query(
     `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
@@ -1520,8 +1522,9 @@ export async function nudges(accountId: string, b: Record<string, unknown>, now 
     .map((r) => ({ ...toRow(r), lastAt: n(r.last_at), before: n(r.before) }));
   const signals: FriendSignals = {
     week: week.body.rows as BoardRow[],
-    challenges: ((ch.body.challenges as Challenge[] | undefined) ?? []).filter((c) => c.endsAt > now),
+    challenges: all.filter((c) => c.endsAt > now),
     quiet,
+    ended: all.filter((c) => c.status === "joined" && c.endsAt <= now && c.endsAt > now - RESULT_NOTE_DAYS * day),
   };
   return ok({ ...signals });
 }

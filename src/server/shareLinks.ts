@@ -14,7 +14,7 @@ import * as link from "@/locales/text/link";
 
 import { query, rateLimit, run } from "./db";
 
-export const SHARE_KINDS = ["workout", "pr", "badge", "level", "trend", "recap"] as const;
+export const SHARE_KINDS = ["workout", "pr", "badge", "level", "trend", "recap", "challenge"] as const;
 export type ShareLinkKind = (typeof SHARE_KINDS)[number];
 /** The two card sizes the app draws (shareImage.ts CARD_SIZE). */
 const SIZES = new Set(["1080x1350", "1080x1920"]);
