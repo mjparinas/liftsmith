@@ -9,10 +9,13 @@ import { randomBytes } from "node:crypto";
 
 import { isMsgLang, type MsgLang } from "@/lib/messageText";
 import { SHARE_PAGE_CSP } from "@/lib/securityHeaders";
-import { SITE_URL } from "@/lib/site";
+import { APP_PATH, SITE_URL } from "@/lib/site";
+import { localPath } from "@/lib/siteLang";
+import { siteText } from "@/locales/site";
 import * as link from "@/locales/text/link";
 
 import { query, rateLimit, run } from "./db";
+import { esc, framePage, icon, say as sayPub } from "./siteFrame";
 
 export const SHARE_KINDS = ["workout", "pr", "badge", "level", "trend", "recap", "challenge"] as const;
 export type ShareLinkKind = (typeof SHARE_KINDS)[number];
@@ -175,48 +178,60 @@ const CATALOG: Record<MsgLang, Partial<Record<LinkKey, unknown>>> = {
 const say = (lang: MsgLang, key: LinkKey, vars: Record<string, string> = {}) =>
   String(CATALOG[lang][key] ?? link.en[key]).replace(/\{(\w+)\}/g, (all, k: string) => vars[k] ?? all);
 
-const esc = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
 /** No scripts, nothing from other hosts; images only from our own origin. */
 export const PAGE_CSP = SHARE_PAGE_CSP;
 
-const STYLE = `
-*{box-sizing:border-box}html{color-scheme:dark}body{margin:0;min-height:100vh;background:#0a0d12;color:#e8edf3;
-font:16px/1.5 system-ui,-apple-system,Roboto,sans-serif;display:flex;flex-direction:column;align-items:center;padding:24px 16px 40px;
-background-image:radial-gradient(60% 40% at 50% 0,#4c8dff33,transparent)}
-main{width:100%;max-width:480px;text-align:center}
-.brand{color:#4c8dff;font-weight:800;letter-spacing:.06em;text-decoration:none;font-size:15px}
-img{display:block;width:100%;height:auto;border-radius:20px;border:1px solid #ffffff1a;margin:16px 0;box-shadow:0 20px 60px #0008}
-h1{font-size:22px;margin:4px 0}p{color:#a3aebd;margin:6px 0 18px}
-a.cta{display:inline-block;min-height:48px;padding:13px 26px;border-radius:14px;font-weight:700;text-decoration:none;color:#0a0d12;
-background:linear-gradient(135deg,#4c8dff,#a78bfa)}
-a.cta:focus-visible{outline:3px solid #e8edf3;outline-offset:3px}`;
-
+/**
+ * The page a share link opens (Melvin, 2026-11-12, after the profile redesign: the same site header, footer and calls
+ * to try Liftsmith, siteFrame.ts). The card sits beside its title and a "Get a plan built around you" card on wide
+ * screens and above them on phones. Still noindex (docs/decisions/sharing.md), still no scripts, and links to our own
+ * pages carry no UTM tags.
+ */
 export function pageHtml(l: LinkRow | null): string {
   const lang = l?.lang ?? "en";
-  const home = `${SITE_URL}/?utm_source=share&utm_medium=link&utm_campaign=${l?.kind ?? "missing"}`;
+  const start = siteText(lang).chrome.startFree;
   if (!l) {
-    return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${esc(say(lang, "link.gone"))} · Liftsmith</title><style>${STYLE}</style></head>
-<body><main><a class="brand" href="${home}">LIFTSMITH</a><h1>${esc(say(lang, "link.gone"))}</h1><p>${esc(say(lang, "link.goneBody"))}</p>
-<a class="cta" href="${home}">${esc(say(lang, "link.get"))}</a></main></body></html>`;
+    return framePage(
+      lang,
+      `${say(lang, "link.gone")} · Liftsmith`,
+      '<meta name="robots" content="noindex">',
+      `<main id="main" class="wrap gone"><div class="card center">${icon("link", 28, "gone-icon")}<h1>${esc(say(lang, "link.gone"))}</h1>
+<p class="muted">${esc(say(lang, "link.goneBody"))}</p><a class="btn btn-primary" href="${APP_PATH}">${esc(start)}</a></div></main>`,
+      SHARE_STYLE,
+      "share",
+    );
   }
   const title = `${l.title} · Liftsmith`;
   const desc = l.description || say(lang, "link.made");
   const img = imageUrl(l.id);
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="robots" content="noindex"><title>${esc(title)}</title><meta name="description" content="${esc(desc)}">
+  const meta = `<meta name="robots" content="noindex"><meta name="description" content="${esc(desc)}">
 <meta property="og:type" content="website"><meta property="og:site_name" content="Liftsmith"><meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(desc)}"><meta property="og:url" content="${esc(linkUrl(l.id))}">
 <meta property="og:image" content="${esc(img)}"><meta property="og:image:type" content="image/jpeg">
 <meta property="og:image:width" content="${l.width}"><meta property="og:image:height" content="${l.height}">
 <meta property="og:image:alt" content="${esc(l.title)}"><meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(img)}">
-<style>${STYLE}</style></head>
-<body><main><a class="brand" href="${home}">LIFTSMITH</a>
-<img src="/w/${l.id}/card.jpg" width="${l.width}" height="${l.height}" alt="${esc(l.title)}">
-<h1>${esc(l.title)}</h1><p>${esc(say(lang, "link.made"))}</p><a class="cta" href="${home}">${esc(say(lang, "link.get"))}</a></main></body></html>`;
+<meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${esc(img)}">`;
+  const features = `${localPath(lang, "/")}#features`;
+  return framePage(
+    lang,
+    title,
+    meta,
+    `<main id="main" class="wrap share"><figure class="shot"><img src="/w/${l.id}/card.jpg" width="${l.width}" height="${l.height}" alt="${esc(l.title)}"></figure>
+<div class="share-side"><p class="kicker">${esc(say(lang, "link.kicker"))}</p><h1>${esc(l.title)}</h1>${l.description ? `<p class="muted">${esc(l.description)}</p>` : ""}
+<section class="card try" aria-labelledby="try-h"><h2 id="try-h" class="try-h">${esc(say(lang, "link.tryTitle"))}</h2><p class="muted">${esc(sayPub(lang, "pub.ctaBody"))}</p>
+<a class="btn btn-primary" href="${APP_PATH}">${esc(say(lang, "link.get"))}</a><a class="quiet" href="${esc(features)}">${esc(sayPub(lang, "pub.ctaFeatures"))} ›</a></section></div></main>`,
+    SHARE_STYLE,
+    "share",
+  );
 }
+
+const SHARE_STYLE = `
+.share{display:grid;gap:24px;padding-top:28px;padding-bottom:48px;align-items:start}
+.shot{margin:0}.shot img{display:block;width:100%;height:auto;max-width:560px;margin:0 auto;border-radius:20px;border:1px solid var(--line);box-shadow:0 24px 60px -20px rgb(0 0 0/.7)}
+.share-side{display:grid;gap:12px;align-content:start}
+.share-side h1{font-size:1.75rem;line-height:1.15;font-weight:800;letter-spacing:-.02em;overflow-wrap:anywhere}
+.share-side .try{margin-top:8px}.try .quiet{width:100%;justify-content:center}
+@media (min-width:900px){.share{grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:40px;padding-top:44px}.shot img{margin:0}.share-side{position:sticky;top:96px}}`;
 
 export const PAGE_HEADERS = {
   "Content-Type": "text/html; charset=utf-8",

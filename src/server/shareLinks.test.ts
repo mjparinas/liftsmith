@@ -106,6 +106,10 @@ describe("the public page", () => {
     expect(html).toContain("Essayer Liftsmith");
     expect(html).not.toMatch(/<script/i);
     expect(PAGE_CSP).toContain("default-src 'none'");
+    // The site's own header and footer, with followed links to our pages and no UTM tags on them.
+    expect(html).toContain('href="/fr/pricing/"');
+    expect(html).toContain('href="/privacy/"');
+    expect(html).not.toMatch(/href="\/[^"]*utm_/);
   });
 
   it("escapes what the lifter typed", async () => {
@@ -116,6 +120,9 @@ describe("the public page", () => {
   });
 
   it("says a deleted link is gone", () => {
-    expect(pageHtml(null)).toContain("This link was removed");
+    const gone = pageHtml(null);
+    expect(gone).toContain("This link was removed");
+    expect(gone).toContain('name="robots" content="noindex"');
+    expect(gone).toContain('href="/exercises/"');
   });
 });
