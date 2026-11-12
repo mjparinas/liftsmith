@@ -6,16 +6,17 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { forgetAccount, useAccount } from "@/lib/auth";
-import { cacheFlags } from "@/lib/flags";
+import { setBillingLive } from "@/lib/billing";
 import { useApp } from "@/lib/store";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { makeWorkout, NOW } from "@/test/factories";
 
-import { Trainer } from "./Trainer";
+import { CoachNoteToday, Trainer } from "./Trainer";
 
 const calls: { url: string; body: unknown; auth?: string }[] = [];
 let linked = false;
 let assigned: unknown[] = [];
+let note: unknown = null;
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -23,6 +24,7 @@ beforeEach(() => {
   calls.length = 0;
   linked = false;
   assigned = [];
+  note = null;
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -35,6 +37,7 @@ beforeEach(() => {
         daysPerWeek: 3,
         events: makeWorkout("w1", NOW - 3600_000, [{}, { exerciseId: "custom-sled" }]),
         plans: assigned,
+        note,
       });
     if (url === "/api/coach/" && !body)
       return Response.json({
@@ -42,11 +45,18 @@ beforeEach(() => {
         clients: [{ id: "c1", name: "Alex", since: NOW }],
         coaches: linked ? [{ id: "k1", name: "Sam", since: NOW }] : [],
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
+        notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
+        setup: { days: 3 },
       });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
       linked = true;
       return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
+    }
+    if (body?.action === "setup") return Response.json({ setup: body.setup });
+    if (body?.action === "note") {
+      note = body.text ? { coachId: "me", clientId: body.client, text: body.text, at: NOW } : null;
+      return Response.json({ note });
     }
     if (body?.action === "assign") {
       const plan = { id: "p9", coachId: "me", clientId: body.client, name: body.name, code: body.code, at: NOW - 86_400_000 };
@@ -58,6 +68,7 @@ beforeEach(() => {
 });
 afterEach(() => {
   cleanup();
+  setBillingLive(false);
   vi.unstubAllGlobals();
   forgetAccount();
 });
@@ -92,14 +103,16 @@ describe("trainer mode", () => {
     expect(await screen.findByText("Share your workouts with Sam?")).toBeInTheDocument();
   });
 
-  it("coaching clients waits for the lab", async () => {
+  it("without Pro, coaching clients shows with a Pro tag and opens the paywall", async () => {
+    setBillingLive(true, null, []);
+    const u = userEvent.setup();
     render(<Trainer />);
-    expect(await screen.findByText("Coach clients")).toBeInTheDocument();
+    await u.click(await screen.findByRole("button", { name: /Coach clients/ }));
+    expect(location.hash).toBe("#/pro/coaching");
     expect(screen.queryByText("ABCD-2345")).toBeNull();
   });
 
-  it("with the lab on, a coach sees their invite, their clients and a client's report", async () => {
-    cacheFlags({ labTrainer: true });
+  it("a Pro coach sees their invite, their clients and a client's report", async () => {
     const { unmount } = render(<Trainer />);
     expect(await screen.findByText("ABCD-2345")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Alex/ })).toBeInTheDocument();
@@ -118,8 +131,49 @@ describe("trainer mode", () => {
     expect(location.hash).toBe(`#/routine/${CODE}`);
   });
 
+  it("a coach picks what new clients start setup with", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    expect(await screen.findByText("New clients start with")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "3" })).toHaveAttribute("aria-pressed", "true");
+    await u.click(screen.getByRole("button", { name: "Get stronger" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "setup")).toMatchObject({
+      body: { setup: { days: 3, goal: "strength" } },
+    });
+    // Tapping the picked answer again leaves it to the client.
+    await u.click(screen.getByRole("button", { name: "3" }));
+    expect(calls.filter((c) => (c.body as { action?: string })?.action === "setup").at(-1)).toMatchObject({
+      body: { setup: { goal: "strength" } },
+    });
+  });
+
+  it("a coach leaves a client a note, and can clear it", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    await u.type(await screen.findByLabelText(/They see it at the top of Today/), "Add a set of rows.");
+    await u.click(screen.getByRole("button", { name: "Save note" }));
+    expect(await screen.findByText("Saved. It's at the top of their Today.")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "note")).toMatchObject({
+      body: { client: "c1", text: "Add a set of rows." },
+    });
+    await u.click(await screen.findByRole("button", { name: "Clear note" }));
+    expect(await screen.findByText("Note cleared.")).toBeInTheDocument();
+  });
+
+  it("a client sees their coach's note under Coaching and on Today until Got it", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    const { unmount } = render(<Trainer />);
+    expect(await screen.findByText(/Deload this week/)).toBeInTheDocument();
+    unmount();
+    render(<CoachNoteToday />);
+    expect(screen.getByText(/Deload this week/)).toBeInTheDocument();
+    expect(screen.getByText(/From Sam/)).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Got it" }));
+    expect(screen.queryByText(/Deload this week/)).toBeNull();
+  });
+
   it("a coach assigns one of their saved routines to a client", async () => {
-    cacheFlags({ labTrainer: true });
     useApp.getState().setProfile({
       routines: [{ id: "r1", name: "Push day", items: [{ exerciseId: "bench-press", sets: 4 }], createdAt: NOW, updatedAt: NOW }],
     });

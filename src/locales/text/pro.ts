@@ -96,6 +96,8 @@ export const en = {
   "pro.status.appstore": "Pro comes with your account, from your App Store subscription. Manage or cancel it in Settings on your iPhone.",
   "pro.settings.account": "Pro with your account",
   "pro.welcome.trialNote.web": "Free for {days} days. You can cancel any time under Manage subscription before it ends.",
+  "pro.ft.coaching": "Coach clients",
+  "pro.fb.coaching": "Invite clients, see what each one needs first, and send them routines and notes. Being a client is free.",
 } as const;
 
 type Key = keyof typeof en;
@@ -197,6 +199,8 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.settings.account": "Pro con tu cuenta",
   "pro.welcome.trialNote.web":
     "Gratis durante {days} días. Puedes cancelarla cuando quieras en Gestionar suscripción antes de que termine.",
+  "pro.ft.coaching": "Entrenar a clientes",
+  "pro.fb.coaching": "Invita a clientes, mira qué necesita cada uno primero y envíales rutinas y notas. Ser cliente es gratis.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -299,6 +303,9 @@ export const fr: Partial<Record<Key, Message>> = {
     "Pro est inclus dans votre compte, grâce à votre abonnement App Store. Gérez-le ou annulez-le dans les Réglages de votre iPhone.",
   "pro.settings.account": "Pro avec votre compte",
   "pro.welcome.trialNote.web": "Gratuit pendant {days} jours. Vous pouvez annuler à tout moment dans Gérer l’abonnement avant la fin.",
+  "pro.ft.coaching": "Coacher des clients",
+  "pro.fb.coaching":
+    "Invitez des clients, voyez d'abord ce dont chacun a besoin et envoyez-leur des routines et des notes. Être client est gratuit.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -399,6 +406,8 @@ export const de: Partial<Record<Key, Message>> = {
     "Pro gehört zu deinem Konto, über dein App-Store-Abo. Verwalte oder kündige es in den Einstellungen deines iPhones.",
   "pro.settings.account": "Pro über dein Konto",
   "pro.welcome.trialNote.web": "{days} Tage gratis. Du kannst jederzeit vor dem Ende unter „Abo verwalten“ kündigen.",
+  "pro.ft.coaching": "Kunden coachen",
+  "pro.fb.coaching": "Lade Kunden ein, sieh zuerst, was jeder braucht, und schick ihnen Routinen und Notizen. Kunde sein ist kostenlos.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -498,6 +507,8 @@ export const it: Partial<Record<Key, Message>> = {
     "Pro è incluso nel tuo account, grazie al tuo abbonamento App Store. Gestiscilo o annullalo in Impostazioni sul tuo iPhone.",
   "pro.settings.account": "Pro con il tuo account",
   "pro.welcome.trialNote.web": "Gratis per {days} giorni. Puoi annullare quando vuoi in Gestisci abbonamento prima della fine.",
+  "pro.ft.coaching": "Segui dei clienti",
+  "pro.fb.coaching": "Invita clienti, guarda prima di cosa ha bisogno ciascuno e mandagli routine e note. Essere cliente è gratis.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -595,4 +606,7 @@ export const ja: Partial<Record<Key, Message>> = {
     "Pro は App Store のサブスクリプションにより、お使いのアカウントに含まれています。管理や解約は iPhone の設定で行えます。",
   "pro.settings.account": "アカウントの Pro",
   "pro.welcome.trialNote.web": "{days} 日間無料です。終了前ならいつでも「サブスクリプションを管理」で解約できます。",
+  "pro.ft.coaching": "クライアントの指導",
+  "pro.fb.coaching":
+    "クライアントを招待して、一人ひとりがまず必要なことを確認し、ルーティンやメモを送れます。クライアントになるのは無料です。",
 };

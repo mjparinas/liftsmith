@@ -58,6 +58,8 @@ export const PLAN_TABLE: { group: string; rows: { feature: string; free: boolean
     group: "Everything else",
     rows: [
       { feature: "Sync across devices and the web dashboard", free: true, pro: true },
+      { feature: "Train with a coach who sees your workouts", free: true, pro: true },
+      { feature: "Coach your own clients", free: false, pro: true },
       { feature: "Backup file and CSV export", free: true, pro: true },
       { feature: "Ads", free: "Never", pro: "Never" },
       { feature: "Family sharing", free: false, pro: "Annual plan" },

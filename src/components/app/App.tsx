@@ -9,6 +9,7 @@ import { startAppLinks } from "@/lib/appLinks";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
+import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInvite";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
@@ -30,6 +31,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
+import { forgetNotes, refreshCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -157,6 +159,8 @@ export function App() {
     void startCreator();
     // An invite that came through the Play install referrer waits for Friends (invite.ts).
     void startInvite();
+    // A coach's invite (#/trainer/<code>, or the Play install referrer) waits for setup's coach path (coachInvite.ts).
+    void startCoachInvite();
     const online = () => {
       void flushFeedback();
       if (useCreator.getState().claim?.status === "pending") void sendClaim();
@@ -331,6 +335,31 @@ export function App() {
       go("workout");
     }
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Notes from the lifter's coaches for Today (trainer.ts): on open and on return to the app, at most every 15 minutes;
+  // signing out forgets them. A coach's invite still waiting once the app is set up (an account that was already set
+  // up signed in on the welcome screen) opens Coaching with the code filled in.
+  useEffect(() => {
+    if (!ready || !profile.onboarded) return;
+    const code = pendingCoach();
+    if (code) {
+      savePendingCoach("");
+      if (!location.hash.startsWith("#/trainer")) go("trainer", code);
+    }
+    const look = () => {
+      if (document.visibilityState === "visible") void refreshCoachNotes();
+    };
+    look();
+    document.addEventListener("visibilitychange", look);
+    const off = useAccount.subscribe((now, before) => {
+      if (before.account && !now.account) forgetNotes();
+      if (now.account && !before.account) void refreshCoachNotes(Date.now(), true);
+    });
+    return () => {
+      document.removeEventListener("visibilitychange", look);
+      off();
+    };
+  }, [ready, profile.onboarded]);
 
   if (!ready) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;

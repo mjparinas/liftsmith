@@ -20,6 +20,7 @@ export const en: SiteText = {
       openApp: "Open the app",
       features: "Features",
       whoFor: "Who it's for",
+      coaches: "For coaches",
       pricing: "Pricing",
       whatsNew: "What's new",
       dashboard: "Your dashboard",
@@ -277,5 +278,78 @@ export const en: SiteText = {
     rows: PLAN_TABLE.map((g) => g.rows.map((r) => r.feature)),
     never: "Never",
     annualPlan: "Annual plan",
+  },
+  coaches: {
+    title: "Coach your clients with {name}: reports, routines and notes",
+    description:
+      "Invite clients with one link, see who needs you first, and send them routines and a note while {name} pre-fills every set. Being a client is free.",
+    h1: "Coach your clients in {name}",
+    intro:
+      "Send one invite link. Your clients log every set in the app, and you see who needs a message first, what they trained and what they hit, without a spreadsheet.",
+    cta: "Start coaching",
+    how: {
+      title: "How it works",
+      steps: [
+        {
+          title: "Invite with one link",
+          body: "Make an invite code in Settings › Coaching and send the link. One code works for every client you send it to, for a week.",
+        },
+        {
+          title: "Clients are set up in a minute",
+          body: "They sign in, see exactly what you'll see, and agree. The goal, experience and training days you pick fill in their setup, so they only add their gym and body weight.",
+        },
+        {
+          title: "See who needs you first",
+          body: "Each client's report starts with what to do: gone quiet, behind on their weekly goal, missing reps, a stalled lift, or new bests worth a high five.",
+        },
+        {
+          title: "Send routines and a note",
+          body: "Assign any routine you've saved, and see how often they do it. Leave a note that sits at the top of their Today until you change it.",
+        },
+      ],
+    },
+    see: {
+      title: "What you see, and what you don't",
+      body: "Clients agree before anything is shared, and can stop sharing at any time. You lose access straight away.",
+      seesLabel: "You see",
+      sees: [
+        "Workouts from the last year: exercises, sets, weights and reps",
+        "How long they trained and how hard sets felt",
+        "Their weekly goal and new bests",
+      ],
+      neverLabel: "You never see",
+      never: [
+        "Heart rate, body weight, body fat or measurements",
+        "Health readings, readiness or cycle",
+        "Injuries, notes, gyms or photos",
+      ],
+    },
+    cost: {
+      title: "What it costs",
+      body: "Coaching clients is part of {name} Pro ({annual} a year or {monthly} a month), for up to 30 clients. Being a client is free, so anyone you invite can start without paying.",
+      contactBefore: "Coaching more people than that? ",
+      contactLink: "Tell us what you need.",
+    },
+    faqTitle: "Questions from coaches",
+    faqs: [
+      {
+        q: "Do my clients need to pay?",
+        a: "No. Being a client is free on Android, iPhone and the web. They need a free account, so their workouts reach you.",
+      },
+      {
+        q: "Do my clients need Pro to follow my routines?",
+        a: "No. The routines you assign work on the free plan, and the app pre-fills each set from their own last workout.",
+      },
+      {
+        q: "Can I see their heart rate or body weight?",
+        a: "No. You see their training only. Health readings, body measurements, injuries and notes never leave their account.",
+      },
+      {
+        q: "How do I start?",
+        a: "Open the app, go to Settings › Coaching and make an invite code. If you don't have Pro yet, the app shows you the plans there.",
+      },
+    ],
+    endTitle: "Bring in your first client today",
+    endBody: "Make an invite in Settings › Coaching and send the link. Your client can be set up and training in a few minutes.",
   },
 };
