@@ -1,15 +1,13 @@
 // GET /api/connect/<service>/callback/: the service sends the lifter back here after they allow Liftsmith.
 // The website goes back to the Connected apps page; the phone apps get a page with a button back into the
 // app (liftsmith://connected), which refreshes the page when it comes to the front. Server build only.
-import { isCloud } from "@/lib/cloud";
+import { CLOUD_NAME, isCloud } from "@/lib/cloud";
 import { SITE_URL } from "@/lib/site";
 import { callback } from "@/server/connect";
 
 type Ctx = { params: Promise<{ provider: string }> };
 
 const escapeHtml = (s: string) => s.replace(/[&<>"']/g, (c) => `&#${c.charCodeAt(0)};`);
-
-const NAMES = { strava: "Strava", oura: "Oura", whoop: "WHOOP" } as const;
 
 function page(title: string, line: string, back: string | null): Response {
   const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -22,7 +20,7 @@ export async function GET(req: Request, ctx: Ctx) {
   const { provider } = await ctx.params;
   if (!isCloud(provider)) return new Response("Not found", { status: 404 });
   const q = new URL(req.url).searchParams;
-  const name = NAMES[provider];
+  const name = CLOUD_NAME[provider];
   // The lifter pressed Cancel (or Deny) on the service's page.
   if (q.get("error"))
     return page(`${name} not connected`, "Nothing was shared. You can connect it any time from Connected apps.", "liftsmith://connected");

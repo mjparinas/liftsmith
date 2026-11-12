@@ -2,7 +2,7 @@
 
 // Settings › Connected apps (#/connections; docs/decisions/connected-apps.md): Health Connect or Apple Health
 // (status, what's allowed, last sync, Sync now), the Bluetooth heart rate monitor (a test before the gym),
-// the Garmin watch app, Strava, Oura and WHOOP (through the account), and the music app for Today's playlist.
+// the Garmin watch app, Strava, Oura, WHOOP, Withings, Polar and Concept2 (through the account), and the music app for Today's playlist.
 // Samsung Health comes in through Health Connect (a line on the Android card says how); bar speed is a camera lab.
 import { useEffect, useRef, useState } from "react";
 
@@ -283,7 +283,7 @@ function HeartRateCard() {
   );
 }
 
-// --- Strava, Oura, WHOOP ---
+// --- Strava, Oura, WHOOP, Withings, Polar, Concept2 ---
 
 function CloudRow({ p }: { p: Cloud }) {
   const status = useCloud((s) => s.status);

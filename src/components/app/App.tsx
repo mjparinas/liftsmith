@@ -188,7 +188,7 @@ export function App() {
   useEffect(() => {
     if (ready && signedIn) void redeemSaved();
   }, [ready, signedIn]);
-  // Strava, Oura and WHOOP (Connected apps): status, readings in and workouts out, while signed in.
+  // Strava, Oura, WHOOP, Withings, Polar and Concept2 (Connected apps): status, readings in and workouts out, while signed in.
   useEffect(() => {
     if (!ready || !signedIn) return;
     return startConnections();

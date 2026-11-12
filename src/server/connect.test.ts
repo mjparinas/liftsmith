@@ -5,16 +5,20 @@ import {
   accessToken,
   callback,
   checkWorkout,
+  concept2Cardio,
   dayAt,
   disconnect,
   offsetMinutes,
   ouraReadings,
+  polarReadings,
   postWorkout,
   seal,
   start,
   status,
   unseal,
   whoopReadings,
+  withingsReadings,
+  zonedTime,
 } from "./connect";
 import { query, resetDb, run } from "./db";
 
@@ -24,6 +28,10 @@ const ENV = {
   STRAVA_CLIENT_SECRET: "strava-secret",
   OURA_CLIENT_ID: "oura-id",
   OURA_CLIENT_SECRET: "oura-secret",
+  WITHINGS_CLIENT_ID: "w-id",
+  WITHINGS_CLIENT_SECRET: "w-secret",
+  POLAR_CLIENT_ID: "p-id",
+  POLAR_CLIENT_SECRET: "p-secret",
 } as unknown as NodeJS.ProcessEnv;
 
 type Call = { url: string; init?: RequestInit };
@@ -62,7 +70,7 @@ describe("tokens at rest", () => {
 describe("connecting", () => {
   it("says which services have keys", async () => {
     const s = await status("acc1", ENV);
-    expect(s.ready).toEqual({ strava: true, oura: true, whoop: false });
+    expect(s.ready).toEqual({ strava: true, oura: true, whoop: false, withings: true, polar: true, concept2: false });
     expect(s.linked).toEqual({});
   });
 
@@ -251,6 +259,122 @@ describe("Oura and Whoop readings", () => {
     expect(get("restingHr")).toEqual([
       ["2027-01-13", 50],
       ["2027-01-15", 49],
+    ]);
+  });
+});
+
+describe("Withings, Polar and Concept2", () => {
+  it("Withings: token calls carry action=requesttoken and the tokens come out of its wrapper", async () => {
+    const url = (await start("acc1", "withings", "web", ENV, NOW))!;
+    expect(new URL(url).searchParams.get("scope")).toBe("user.metrics,user.activity");
+    const { f, calls } = fakeFetch({
+      "https://wbsapi.withings.net/v2/oauth2": () => ({
+        body: { status: 0, body: { access_token: "w-acc", refresh_token: "w-ref", expires_in: 10800, userid: 7 } },
+      }),
+    });
+    expect(await callback("withings", stateOf(url), "c", f, ENV, NOW)).toEqual({ platform: "web" });
+    expect(String(calls[0]!.init?.body)).toContain("action=requesttoken");
+    expect(await accessToken("acc1", "withings", f, ENV, NOW)).toBe("w-acc");
+    // A refused code comes back as a non-zero status with HTTP 200.
+    const again = (await start("acc2", "withings", "web", ENV, NOW))!;
+    const bad = fakeFetch({ "https://wbsapi.withings.net/v2/oauth2": () => ({ body: { status: 503, error: "invalid" } }) });
+    expect(await callback("withings", stateOf(again), "c", bad.f, ENV, NOW)).toBeNull();
+  });
+
+  it("Polar: Basic auth on the token call, registers the lifter, and removes them on disconnect", async () => {
+    const url = (await start("acc1", "polar", "ios", ENV, NOW))!;
+    const { f, calls } = fakeFetch({
+      "https://polarremote.com/v2/oauth2/token": () => ({ body: { access_token: "p-acc", expires_in: 315_360_000, x_user_id: 4242 } }),
+      "https://www.polaraccesslink.com/v3/users/4242": () => ({ status: 204, body: {} }),
+      "https://www.polaraccesslink.com/v3/users": () => ({ status: 409, body: {} }),
+    });
+    expect(await callback("polar", stateOf(url), "c", f, ENV, NOW)).toEqual({ platform: "ios" });
+    const tokenCall = calls[0]!;
+    expect((tokenCall.init?.headers as Record<string, string>).Authorization).toBe(
+      `Basic ${Buffer.from("p-id:p-secret").toString("base64")}`,
+    );
+    expect(String(tokenCall.init?.body)).not.toContain("client_secret");
+    const reg = calls[1]!;
+    expect(reg.url).toBe("https://www.polaraccesslink.com/v3/users");
+    expect(String(reg.init?.body)).not.toContain("acc1");
+    await disconnect("acc1", "polar", f, ENV);
+    expect(calls.some((c) => c.url.endsWith("/users/4242") && c.init?.method === "DELETE")).toBe(true);
+    expect(await query("SELECT * FROM connections")).toEqual([]);
+  });
+
+  it("Polar: a failed registration doesn't connect", async () => {
+    const url = (await start("acc1", "polar", "web", ENV, NOW))!;
+    const { f } = fakeFetch({
+      "https://polarremote.com/v2/oauth2/token": () => ({ body: { access_token: "p-acc", x_user_id: 1 } }),
+      "https://www.polaraccesslink.com/v3/users": () => ({ status: 500, body: {} }),
+    });
+    expect(await callback("polar", stateOf(url), "c", f, ENV, NOW)).toBeNull();
+    expect((await status("acc1", ENV)).linked).toEqual({});
+  });
+
+  it("Withings readings: the day's last weigh-in and body fat, finished days' steps, and sleep", () => {
+    const t = (iso: string) => Date.parse(iso) / 1000;
+    const r = withingsReadings(
+      [
+        {
+          date: t("2026-11-10T07:00:00Z"),
+          category: 1,
+          measures: [
+            { value: 81234, type: 1, unit: -3 },
+            { value: 182, type: 6, unit: -1 },
+          ],
+        },
+        { date: t("2026-11-10T20:00:00Z"), category: 1, measures: [{ value: 8200, type: 1, unit: -2 }] },
+        { date: t("2026-11-11T07:00:00Z"), category: 2, measures: [{ value: 75, type: 1, unit: 0 }] },
+        { date: t("2026-11-11T07:00:00Z"), category: 1, measures: [{ value: 9, type: 1, unit: 0 }] },
+      ],
+      [
+        { date: "2026-11-10", steps: 8123 },
+        { date: "2026-11-11", steps: 400 },
+      ],
+      [{ date: "2026-11-10", data: { total_sleep_time: 27000, hr_min: 51, rr_average: 14 } }],
+      0,
+      "2026-11-11",
+    );
+    const by = (m: string) => r.filter((x) => x.metric === m).map((x) => [x.day, x.value]);
+    expect(by("weight")).toEqual([["2026-11-10", 82]]);
+    expect(by("bodyFat")).toEqual([["2026-11-10", 18.2]]);
+    expect(by("steps")).toEqual([["2026-11-10", 8123]]);
+    expect(by("sleep")).toEqual([["2026-11-10", 7.5]]);
+    expect(by("restingHr")).toEqual([["2026-11-10", 51]]);
+    expect(by("breathing")).toEqual([["2026-11-10", 14]]);
+  });
+
+  it("Polar readings: nightly recharge and sleep on the night's date", () => {
+    const r = polarReadings(
+      [{ date: "2026-11-10", heart_rate_avg: 55, heart_rate_variability_avg: 48, breathing_rate_avg: 13.6 }],
+      [{ date: "2026-11-10", light_sleep: 14400, deep_sleep: 5400, rem_sleep: 5400, sleep_end_time: "2026-11-10T06:30:00Z" }],
+    );
+    expect(r.map((x) => [x.metric, x.day, x.value])).toEqual([
+      ["sleep", "2026-11-10", 7],
+      ["hrv", "2026-11-10", 48],
+      ["restingHr", "2026-11-10", 55],
+      ["breathing", "2026-11-10", 13.6],
+    ]);
+    expect(r[0]!.at).toBe(Date.parse("2026-11-10T06:30:00Z"));
+  });
+
+  it("Concept2: rows, ski and bike as cardio, at the logged local time in its zone", () => {
+    expect(zonedTime("2026-11-10 07:30:00", "America/Toronto", 0)).toBe(Date.parse("2026-11-10T12:30:00Z"));
+    expect(zonedTime("2026-11-10 07:30:00", null, -300)).toBe(Date.parse("2026-11-10T12:30:00Z"));
+    expect(zonedTime("not a date", null, 0)).toBeNull();
+    const c = concept2Cardio(
+      [
+        { id: 2, type: "skierg", date: "2026-11-11 18:00:00", timezone: "UTC", distance: 1000, time: 2405 },
+        { id: 1, type: "rower", date: "2026-11-10 07:30:00", timezone: "America/Toronto", distance: 2000, time: 4801 },
+        { id: 3, type: "bike", date: "2026-11-11 19:00:00", timezone: "UTC", distance: 0, time: 6000 },
+        { id: 4, type: "paddle", date: "2026-11-11 19:00:00", timezone: "UTC", distance: 500, time: 1200 },
+      ],
+      0,
+    );
+    expect(c).toEqual([
+      { id: "1", kind: "rower", start: Date.parse("2026-11-10T12:30:00Z"), seconds: 480, distanceM: 2000 },
+      { id: "2", kind: "skierg", start: Date.parse("2026-11-11T18:00:00Z"), seconds: 241, distanceM: 1000 },
     ]);
   });
 });
