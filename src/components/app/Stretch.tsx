@@ -215,7 +215,7 @@ function Library() {
       </Sheet>
 
       {picked.length > 0 && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pb-3 pt-8">
+        <div className="after-side pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pb-3 pt-8">
           <div className="pointer-events-auto mx-auto flex max-w-lg items-center gap-2">
             <Button
               kind="quiet"

@@ -586,7 +586,7 @@ export function Today() {
       )}
 
       {!active && preview && preview.items.length > 0 && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 pb-3 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pt-8">
+        <div className="after-side pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 pb-3 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pt-8">
           <div className="pointer-events-auto mx-auto max-w-lg">
             <Button
               icon="play"
