@@ -873,13 +873,13 @@ async function db(): Promise<Client> {
 }
 
 /** The table or index a schema statement makes. */
-const schemaName = (sql: string) => /IF NOT EXISTS\s+(\w+)/.exec(sql)?.[1] ?? "";
+const schemaName = (sql: string) => /^\s*CREATE\b[^(]*?IF NOT EXISTS\s+(\w+)/i.exec(sql)?.[1] ?? "";
 
 /**
  * Brings the database up to SCHEMA and COLUMNS on a server's first query. Every statement is a network hop to Turso
  * in production, and running all ~150 one by one made each cold start take about four seconds (Friends felt slow,
- * 2026-11-12). Now one read says what's already there, and only what's missing is made, in one batch each: one hop
- * on a database that's up to date.
+ * 2026-11-12). Now one read says what's already there, and only what's missing is made, in one batch: one hop on a
+ * database that's up to date, two while SCHEMA carries a one-off data fix.
  */
 async function migrate(c: Client): Promise<void> {
   let have: Awaited<ReturnType<typeof present>>;
@@ -894,12 +894,12 @@ async function migrate(c: Client): Promise<void> {
     }
     return;
   }
-  const missing = SCHEMA.filter((sql) => !have.names.has(schemaName(sql)));
-  if (missing.length) {
-    await c.batch(missing, "write");
-    // A table made just now may still lack columns added to COLUMNS since it was first written.
-    have = await present(c);
-  }
+  // Tables and indexes that aren't there yet, plus the one-off data fixes (UPDATE … statements, which make nothing
+  // and run on every start because they change nothing once done), in their order in SCHEMA.
+  const todo = SCHEMA.filter((sql) => !schemaName(sql) || !have.names.has(schemaName(sql)));
+  if (todo.length) await c.batch(todo, "write");
+  // A table made just now may still lack columns added to COLUMNS since it was first written.
+  if (todo.some((sql) => schemaName(sql))) have = await present(c);
   const alters = COLUMNS.filter(([table, column]) => !have.columns.has(`${table}.${column}`)).map(
     ([table, column, def]) => `ALTER TABLE ${table} ADD COLUMN ${column} ${def}`,
   );
