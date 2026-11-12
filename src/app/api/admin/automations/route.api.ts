@@ -1,8 +1,10 @@
 // GET /api/admin/automations/: the alert and morning digest switches (staff). PUT {instant, digest} saves them
-// (admins, audited). POST {action: "test"} sends a test alert to every admin now (admins).
+// (admins, audited). POST {action: "test"} sends a test alert to every admin now, and {action: "digest"} today's
+// morning digest (admins).
 import { adminEmails, audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
 import { alertSettings, resendMailer, saveAlertSettings, sendAlert } from "@/server/alerts";
+import { sendDigest } from "@/server/digest";
 
 export const dynamic = "force-dynamic";
 
@@ -27,6 +29,13 @@ export async function POST(req: Request) {
   const gate = await requireStaff(req, { write: true });
   if ("response" in gate) return gate.response;
   const body = await readBody(req);
+  if (body?.action === "digest") {
+    const n = await sendDigest({ force: true });
+    await audit(gate.staff.email, "alerts.digest", null, { sent: n });
+    return n
+      ? json(200, { ok: true })
+      : json(409, { error: "Nothing was sent: email isn't set up (RESEND_API_KEY) or ADMIN_EMAILS is empty." });
+  }
   if (body?.action !== "test") return json(400, { error: "Unknown action" });
   const now = Date.now();
   const sent = await sendAlert(

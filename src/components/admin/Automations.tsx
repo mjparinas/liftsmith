@@ -62,14 +62,20 @@ export function Automations({ admin }: { admin: boolean }) {
     });
     setMsg(r.ok ? "Saved." : "That didn't save.");
   };
-  const test = async () => {
+  const test = async (action: "test" | "digest") => {
     const r = await fetch("/api/admin/automations/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "test" }),
+      body: JSON.stringify({ action }),
     });
     const j = (await r.json().catch(() => ({}))) as { error?: string };
-    setMsg(r.ok ? "Test alert sent. Check your inbox." : (j.error ?? "Nothing was sent."));
+    setMsg(
+      r.ok
+        ? action === "digest"
+          ? "Digest sent. Check your inbox."
+          : "Test alert sent. Check your inbox."
+        : (j.error ?? "Nothing was sent."),
+    );
   };
   const s = data.settings;
   return (
@@ -90,15 +96,20 @@ export function Automations({ admin }: { admin: boolean }) {
         />
         <Toggle
           label="Morning digest"
-          help="Each day at 13:00 UTC: the last 24 hours' installs, workouts, accounts, trials, payments and cancellations, what waits on To Do, and any System problems."
+          help="Each day at 8 AM Pacific: site health (the live site, UptimeRobot and every System check), the last 24 hours' sign-ups and installs by platform (Android, iOS, web), workouts, and Pro trials, new subscribers, payments and cancellations by store (Google Play, App Store, Stripe), plus what waits on To Do."
           on={s.digest}
           disabled={!admin}
           change={(digest) => void save({ ...s, digest })}
         />
         {admin && (
-          <button type="button" className="press mt-3 rounded-lg border border-line px-3 py-1.5 text-sm" onClick={() => void test()}>
-            Send a test alert
-          </button>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button type="button" className="press rounded-lg border border-line px-3 py-1.5 text-sm" onClick={() => void test("test")}>
+              Send a test alert
+            </button>
+            <button type="button" className="press rounded-lg border border-line px-3 py-1.5 text-sm" onClick={() => void test("digest")}>
+              Send today&apos;s digest now
+            </button>
+          </div>
         )}
         {msg && (
           <p role="status" className="mt-2 text-sm text-muted">
@@ -108,7 +119,7 @@ export function Automations({ admin }: { admin: boolean }) {
       </Card>
       <p className="text-xs text-muted">
         Site-down alerts come from UptimeRobot watching /api/health/. The daily check runs from Vercel Cron (/api/cron/admin/), which also
-        records the database size for the Capacity card.
+        records the database size for the Capacity card; the digest has its own (/api/cron/digest/).
       </p>
     </div>
   );
