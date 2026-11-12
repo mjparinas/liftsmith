@@ -27,12 +27,15 @@ import {
   type FeedPost,
   type Partner,
   type PersonCard,
+  type PersonRow,
   type PostBody,
   type PostExercise,
   type Relation,
   type ReportKind,
   type ShowcaseLift,
   type SocialProfile,
+  type Suggestion,
+  type SuggestReason,
 } from "@/lib/socialTypes";
 
 import { cleanCode, newCode } from "./coach";
@@ -112,6 +115,9 @@ interface ProfileRow extends Row {
   audience: string;
   show_lifts: number;
   lifts: string;
+  suggest: number;
+  level: number;
+  streak: number;
 }
 
 const AVATAR_SET = new Set<string>(AVATAR_IDS);
@@ -154,7 +160,16 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   audience: audienceOf(r.audience),
   showLifts: !!n(r.show_lifts),
   lifts: liftsOf(r),
+  suggest: !!n(r.suggest),
+  level: n(r.level),
+  streak: n(r.streak),
 });
+
+/** A level (1 to 50) or a streak in weeks (0 to 520) from the app, or what was there. */
+const clampInt = (v: unknown, lo: number, hi: number, was: unknown) => {
+  const x = Number(v);
+  return Number.isFinite(x) ? Math.max(lo, Math.min(hi, Math.round(x))) : n(was);
+};
 
 async function profileOf(accountId: string): Promise<ProfileRow | null> {
   const [r] = await query<ProfileRow>("SELECT * FROM social_profiles WHERE account_id = ?", [accountId]);
@@ -259,7 +274,8 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     const push = (b.push && typeof b.push === "object" ? b.push : {}) as Record<string, unknown>;
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
-         push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?
+         push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
+         suggest = ?, level = ?, streak = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -276,6 +292,9 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         b.audience === undefined ? s(p.audience) || "all" : audienceOf(b.audience),
         flag(b.showLifts, p.show_lifts),
         b.lifts === undefined ? s(p.lifts) || "[]" : JSON.stringify(parseLifts(b.lifts)),
+        flag(b.suggest, p.suggest ?? 1),
+        clampInt(b.level, 0, 50, p.level),
+        clampInt(b.streak, 0, 520, p.streak),
         accountId,
       ],
     );
@@ -312,6 +331,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
     { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM suggest_hides WHERE account_id = ? OR hidden_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
 }
@@ -364,7 +384,7 @@ const seesPost = (v: string) => `(p.account_id = ${v} OR p.audience = 'all' OR (
 const SEES_POST = seesPost("?2");
 
 /** A profile as `viewer` sees it, or null when it doesn't exist for them (suspended, or either blocked the other). */
-async function card(viewer: string, p: ProfileRow): Promise<PersonCard | null> {
+async function card(viewer: string, p: ProfileRow, now = Date.now()): Promise<PersonCard | null> {
   const id = s(p.account_id);
   if (n(p.suspended) && id !== viewer) return null;
   const [theyBlocked] = await query("SELECT 1 AS x FROM blocks WHERE blocker_id = ? AND blocked_id = ?", [id, viewer]);
@@ -396,7 +416,20 @@ async function card(viewer: string, p: ProfileRow): Promise<PersonCard | null> {
     avatar: avatarOf(p.avatar),
     muted: !!muted,
     lifts: canSeePosts && n(p.show_lifts) && n(p.weights) ? liftsOf(p) : [],
+    level: canSeePosts ? n(p.level) : 0,
+    streak: canSeePosts ? n(p.streak) : 0,
+    trained: canSeePosts ? await trainedDays(viewer, id, now) : [],
   };
+}
+
+/** When each of `author`'s posts the reader may see started, over the training calendar's weeks. */
+async function trainedDays(viewer: string, author: string, now: number): Promise<number[]> {
+  const rows = await query(
+    `SELECT p.at AS at FROM posts p WHERE p.account_id = ?1 AND p.hidden = 0 AND p.at >= ?3 AND ${SEES_POST}
+     ORDER BY p.at LIMIT 200`,
+    [author, viewer, now - (SOCIAL_LIMITS.calendarWeeks * 7 + 7) * day],
+  );
+  return rows.map((r) => n(r.at));
 }
 
 async function joined(accountId: string): Promise<ProfileRow | Result> {
@@ -412,8 +445,139 @@ export async function lookup(accountId: string, b: Record<string, unknown>, now 
   if (isResult(mine)) return mine;
   if (!(await limit(accountId, "lookup", now))) return fail(429, "slow");
   const p = await byHandle(s(b.handle));
-  const c = p ? await card(accountId, p) : null;
+  const c = p ? await card(accountId, p, now) : null;
   return c ? ok({ person: c }) : fail(404, "noOne");
+}
+
+const toRow = (r: Row): PersonRow => ({ handle: s(r.handle), name: s(r.name), avatar: avatarOf(r.avatar) });
+const NOT_BLOCKED = (col: string, v: string) => `${col} NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ${v})
+  AND ${col} NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ${v})`;
+
+/**
+ * Finding people by name: public profiles only (they chose to be found, on the web too), by the start of their
+ * name, a word in it, or their handle, plus whoever has exactly that handle, public or not. Rate-limited like lookups.
+ */
+export async function search(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const q = tidy(b.q, 40).replace(/^@/, "").toLowerCase();
+  if (q.length < SOCIAL_LIMITS.searchMin) return ok({ people: [] });
+  if (!(await limit(accountId, "lookup", now))) return fail(429, "slow");
+  const like = q.replace(/[\\%_]/g, (c) => `\\${c}`);
+  const rows = await query(
+    `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar
+     FROM social_profiles sp
+     WHERE sp.suspended = 0 AND sp.account_id != ?1 AND ${NOT_BLOCKED("sp.account_id", "?1")}
+       AND (sp.handle = ?2 OR (sp.public = 1 AND (sp.handle LIKE ?3 ESCAPE '\\' OR lower(sp.name) LIKE ?3 ESCAPE '\\'
+         OR lower(sp.name) LIKE ?4 ESCAPE '\\')))
+     ORDER BY (sp.handle = ?2) DESC, sp.name LIMIT ${SOCIAL_LIMITS.suggestions}`,
+    [accountId, cleanHandle(q), `${like}%`, `% ${like}%`],
+  );
+  return ok({ people: rows.map(toRow) });
+}
+
+/** Someone's followers or the people they follow, for a reader who may see their posts. Blocked people are left out. */
+export async function personPeople(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const p = await byHandle(s(b.handle));
+  if (!p || (n(p.suspended) && s(p.account_id) !== accountId)) return fail(404, "noOne");
+  const them = s(p.account_id);
+  if (!(await canSee(accountId, them))) return fail(403, "private");
+  const followers = s(b.list) === "followers";
+  const rows = await query(
+    `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar FROM follows f
+     JOIN social_profiles sp ON sp.account_id = ${followers ? "f.follower_id" : "f.followee_id"}
+     WHERE ${followers ? "f.followee_id" : "f.follower_id"} = ?1 AND f.accepted = 1 AND sp.suspended = 0
+       AND ${NOT_BLOCKED("sp.account_id", "?2")}
+     ORDER BY f.created_at DESC LIMIT 500`,
+    [them, accountId],
+  );
+  return ok({ people: rows.map(toRow) });
+}
+
+const SUGGEST_WEIGHT: Record<SuggestReason, number> = { followsYou: 1000, partner: 500, club: 200, mutual: 10 };
+
+/**
+ * People the lifter may know, from real ties only: someone who follows them and they don't follow back, people
+ * they've been tagged with as training partners, club mates, and people followed by several people they follow.
+ * Never people they already follow or asked to, blocked either way, suspended, dismissed, or (except someone who
+ * already follows them) people who turned suggestions off. There's still no list of everyone.
+ */
+export async function suggest(accountId: string): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const a = [accountId];
+  const [followsYou, partners, clubMates, mutuals] = await Promise.all([
+    query("SELECT follower_id AS id FROM follows WHERE followee_id = ? AND accepted = 1", a),
+    query(
+      // Tagged on the lifter's posts, the poster of a post they were tagged on, and anyone tagged alongside them.
+      `SELECT pp.account_id AS id FROM post_partners pp JOIN posts p ON p.id = pp.post_id WHERE p.account_id = ?1
+       UNION SELECT p.account_id FROM post_partners pp JOIN posts p ON p.id = pp.post_id WHERE pp.account_id = ?1
+       UNION SELECT o.account_id FROM post_partners pp JOIN post_partners o ON o.post_id = pp.post_id
+         WHERE pp.account_id = ?1 AND o.account_id != ?1`,
+      a,
+    ),
+    query(
+      `SELECT m.account_id AS id, MIN(c.name) AS via FROM club_members me JOIN club_members m ON m.club_id = me.club_id
+       JOIN clubs c ON c.id = me.club_id WHERE me.account_id = ?1 AND m.account_id != ?1 GROUP BY m.account_id`,
+      a,
+    ),
+    query(
+      `SELECT f2.followee_id AS id, COUNT(*) AS n, MIN(sp.name) AS via FROM follows f1
+       JOIN follows f2 ON f2.follower_id = f1.followee_id AND f2.accepted = 1
+       JOIN social_profiles sp ON sp.account_id = f1.followee_id AND sp.suspended = 0
+       WHERE f1.follower_id = ?1 AND f1.accepted = 1 AND f2.followee_id != ?1 GROUP BY f2.followee_id`,
+      a,
+    ),
+  ]);
+  const best = new Map<string, { reason: SuggestReason; count?: number; via?: string; score: number }>();
+  const offer = (id: string, reason: SuggestReason, extra: { count?: number; via?: string } = {}) => {
+    const score = SUGGEST_WEIGHT[reason] * (extra.count ?? 1);
+    const had = best.get(id);
+    if (!had || score > had.score) best.set(id, { reason, ...extra, score: Math.max(score, had?.score ?? 0) });
+  };
+  for (const r of mutuals) offer(s(r.id), "mutual", { count: n(r.n), via: s(r.via) });
+  for (const r of clubMates) offer(s(r.id), "club", { via: s(r.via) });
+  for (const r of partners) offer(s(r.id), "partner");
+  for (const r of followsYou) offer(s(r.id), "followsYou");
+  best.delete(accountId);
+  if (!best.size) return ok({ people: [] });
+  const ids = [...best.keys()];
+  const rows = await query(
+    `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, sp.open AS open, sp.suggest AS suggest
+     FROM social_profiles sp
+     WHERE sp.account_id IN (${ids.map(() => "?").join(",")}) AND sp.suspended = 0
+       AND sp.account_id NOT IN (SELECT followee_id FROM follows WHERE follower_id = ?)
+       AND sp.account_id NOT IN (SELECT hidden_id FROM suggest_hides WHERE account_id = ?)
+       AND ${NOT_BLOCKED("sp.account_id", "?")}`,
+    [...ids, accountId, accountId, accountId, accountId],
+  );
+  const people: Suggestion[] = rows
+    .map((r) => ({ r, tie: best.get(s(r.id))! }))
+    .filter(({ r, tie }) => tie.reason === "followsYou" || !!n(r.suggest))
+    .sort((x, y) => y.tie.score - x.tie.score || s(x.r.name).localeCompare(s(y.r.name)))
+    .slice(0, SOCIAL_LIMITS.suggestions)
+    .map(({ r, tie }) => ({
+      ...toRow(r),
+      reason: tie.reason,
+      ...(tie.count ? { count: tie.count } : {}),
+      ...(tie.via ? { via: tie.via } : {}),
+      open: !!n(r.open),
+    }));
+  return ok({ people });
+}
+
+/** Dismisses a suggestion: that person isn't suggested to the lifter again. */
+export async function unsuggest(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const p = await byHandle(s(b.handle));
+  if (p)
+    await run("INSERT OR IGNORE INTO suggest_hides (account_id, hidden_id, created_at) VALUES (?, ?, ?)", [
+      accountId,
+      s(p.account_id),
+      now,
+    ]);
+  return ok();
 }
 
 // --- Following ---
@@ -1510,6 +1674,10 @@ export const OPS: Record<string, Op> = {
   update: (a, b) => update(a, b),
   leave: (a) => leave(a),
   lookup,
+  search,
+  suggest: (a) => suggest(a),
+  unsuggest,
+  personPeople: (a, b) => personPeople(a, b),
   follow: followOp,
   unfollow: (a, b) => unfollow(a, b),
   answer: (a, b) => answer(a, b),

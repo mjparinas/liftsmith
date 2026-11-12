@@ -108,6 +108,9 @@ describe("Friends", () => {
           audience: "all",
           showLifts: true,
           lifts: [],
+          suggest: true,
+          level: 0,
+          streak: 0,
         },
       },
     });
