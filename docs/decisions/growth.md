@@ -96,6 +96,10 @@ Ranked by expected growth per hour of Melvin's time and per dollar. Each says wh
 - **Telling the person:** the admin Inbox has a saved reply, **"You asked, we built it"** (`DEFAULT_REPLIES` in `src/lib/savedReplies.ts`), to send the person who asked when it ships: what shipped in one line, update the app, thanks, and a link to What's new. It's a reply from the Inbox, so it goes only to people who wrote to us. (Saved replies already edited in the panel keep their own list; add it there if it's missing.)
 - **The habit:** when a promotion ships something someone asked for, add the What's new item with `asked: true` and reply to them. The page is English only for now, like the rest of What's new.
 
+### Translated store listings (item 7, 2026-11-12)
+
+Melvin: "Do the translations". The Play listing in Spanish, French, German, Italian and Japanese, with phone screenshots of the app and captions in each language, is in `docs/PLAY_LISTING_TRANSLATIONS.md`; Melvin pastes it into Play Console. Listing experiments (item 7) run after it, one language at a time. Doing it showed the workout's big weight breaking between digits in Japanese and German (their `overflow-wrap: anywhere`); a stepper's number now never wraps.
+
 ## How we'll know (no public numbers)
 
 - **Share of installs from people** (`invite`, `share`, `coach`, `creator`, `profile`, gym QR) against search and the store's own browse. Hevy-style growth means this share rises.
