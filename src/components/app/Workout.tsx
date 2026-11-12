@@ -29,6 +29,7 @@ import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
+import { followWorkout, sonosOn } from "@/lib/sonos";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
 import { tempoOf } from "@/lib/tempo";
@@ -49,6 +50,7 @@ import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { SetHints } from "./SetHints";
+import { SonosBar } from "./Sonos";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, InlineSwitch, Sheet, Stepper } from "./ui";
@@ -76,6 +78,8 @@ if (typeof window !== "undefined") {
   useApp.subscribe((st, prev) => {
     if (prev.active && !st.active) void hrLink.stop();
   });
+  // Sonos (a lab): the music follows the workout, louder for sets, quieter for rest (sonos.ts).
+  followWorkout(useApp);
 }
 
 /** How often a heart-rate-only change reaches the live notification (iOS's Live Activity has its own 15 s budget). */
@@ -787,6 +791,7 @@ export function Workout() {
         </>
       ) : null}
 
+      {!finished && sonosOn() && <SonosBar resting={resting} />}
       {!finished && active.plan.items.length > active.index + 1 && <ComingUp />}
       <AddExercise />
 

@@ -1,3 +1,4 @@
+import type { BreathCustom, BreathPatternId } from "./breathing";
 import { t, translated } from "./i18n";
 
 // Core types. Weights are stored in kilograms everywhere; a gym's plates are kept in the gym's
@@ -408,6 +409,10 @@ export interface DelightPrefs {
   plateMemory?: boolean;
   /** A breathing guide or a mini-game on the rest timer. Off by default. */
   restExtra?: "breathe" | "game" | "off";
+  /** The breathing guide's pattern (`breathing.ts`). Box breathing unless picked. */
+  breath?: BreathPatternId;
+  /** Seconds for each side of the lifter's own pattern, when `breath` is "custom". */
+  breathCustom?: BreathCustom;
   /** Earned theme picked in Settings (themes.ts). */
   theme?: string;
   /** Earned app icon picked in Settings (native only). */

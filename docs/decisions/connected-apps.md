@@ -44,6 +44,10 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 - Curated **public** playlists for the day's call (Melvin, 2026-11-09; no Spotify API). Today shows one chip, "Play push day / training / easy day music", next to the gym and week chips, only when a music app is picked and no workout is running. Spotify opens a fixed editorial playlist (Beast Mode for push, Power Workout for normal, Mood Booster for easy; checked by hand on 2026-11-10); Apple Music and YouTube Music open their search for the same kind of playlist, because their playlist links vary by country. Change the picks in `PLAYLISTS` in `connections.ts`.
 
+## Sonos (Labs, 2026-11-12)
+
+Sonos uses the same server flow (provider `sonos`, `SONOS_CLIENT_ID` / `SONOS_CLIENT_SECRET`, scope `playback-control-all`, Basic auth on the token call like Polar, no revoke) but sends commands rather than data. Its card shows only while the `labSonos` lab is on. Everything else is in [Sonos](sonos.md).
+
 ## Keys Melvin creates (set in Vercel, Production and Preview)
 
 - **Strava:** https://www.strava.com/settings/api → create an app (category Training, website https://www.getliftsmith.com, **Authorization Callback Domain `www.getliftsmith.com`**) → `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`. Then ask Strava for more athletes than the starting limit.
@@ -51,4 +55,5 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **Withings:** https://developer.withings.com → Developer Dashboard → create a Public API integration (Liftsmith, callback URL `https://www.getliftsmith.com/api/connect/withings/callback/`) → `WITHINGS_CLIENT_ID`, `WITHINGS_CLIENT_SECRET`. Withings reviews an app before it goes past its own testers.
 - **Polar:** https://admin.polaraccesslink.com → create a client (callback URL `https://www.getliftsmith.com/api/connect/polar/callback/`) → `POLAR_CLIENT_ID`, `POLAR_CLIENT_SECRET`. No partner approval; the AccessLink terms apply.
 - **Concept2:** https://log.concept2.com/developers → register an application (redirect URI `https://www.getliftsmith.com/api/connect/concept2/callback/`, scopes `user:read,results:read`) → `CONCEPT2_CLIENT_ID`, `CONCEPT2_CLIENT_SECRET`. Concept2 starts new apps on its development server; ask them to move it to the live Logbook.
+- **Sonos:** steps in [Sonos](sonos.md) → `SONOS_CLIENT_ID`, `SONOS_CLIENT_SECRET`.
 - **WHOOP:** https://developer-dashboard.whoop.com → create a team and an app, redirect URL `https://www.getliftsmith.com/api/connect/whoop/callback/`, scopes read:recovery, read:sleep and offline → `WHOOP_CLIENT_ID`, `WHOOP_CLIENT_SECRET`.

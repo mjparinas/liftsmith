@@ -25,6 +25,11 @@ const PATHS = {
   chevronUp: "M6 15l6-6 6 6",
   chevronDown: "M6 9l6 6 6-6",
   play: "M7 4.5v15l12-7.5z",
+  // Sonos controls (docs/decisions/sonos.md).
+  pause: "M8 5v14M16 5v14",
+  skipNext: "M5 5.5v13l9.5-6.5zM19 5v14",
+  skipPrev: "M19 5.5v13L9.5 12zM5 5v14",
+  speaker: "M6 3h12v18H6zM12 17.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 7h.01",
   plus: "M12 5v14M5 12h14",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
   bolt: "M13 2 4 14h7l-1 8 9-12h-7z",

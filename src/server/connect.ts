@@ -4,7 +4,8 @@
 // Health Connect's; Concept2 sends rows, ski and bike sessions in as cardio. Readings and sessions pass
 // through and are never stored here. Each service needs its own client id and secret in Vercel
 // (STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET, OURA_…, WHOOP_…, WITHINGS_…, POLAR_…, CONCEPT2_…); without them its
-// row in the app says "Coming soon" and every route for it answers 503.
+// row in the app says "Coming soon" and every route for it answers 503. Sonos (SONOS_…) takes play, skip and volume
+// commands from the workout (src/server/sonos.ts).
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
 import {
@@ -70,6 +71,13 @@ export const PROVIDERS: Record<Cloud, Provider> = {
     token: "https://log.concept2.com/oauth/access_token",
     scope: "user:read,results:read",
   },
+  // Sonos's Control API (a lab, docs/decisions/sonos.md): HTTP Basic auth on the token call, like Polar.
+  sonos: {
+    authorize: "https://api.sonos.com/login/v3/oauth",
+    token: "https://api.sonos.com/login/v3/oauth/access",
+    scope: "playback-control-all",
+    basic: true,
+  },
 };
 
 const ENV: Record<Cloud, string> = {
@@ -79,6 +87,7 @@ const ENV: Record<Cloud, string> = {
   withings: "WITHINGS",
   polar: "POLAR",
   concept2: "CONCEPT2",
+  sonos: "SONOS",
 };
 const STATE_MS = 15 * 60_000;
 
@@ -299,7 +308,7 @@ export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, 
         )[0]?.remote_user
       : null;
   if (token) {
-    // Withings and Concept2 have no plain token revoke; the lifter can remove Liftsmith in their own account.
+    // Withings, Concept2 and Sonos have no plain token revoke; the lifter can remove Liftsmith in their own account.
     const none = () => Promise.resolve();
     const revoke: Record<Cloud, () => Promise<unknown>> = {
       strava: () =>
@@ -318,6 +327,7 @@ export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, 
           : none(),
       withings: none,
       concept2: none,
+      sonos: none,
     };
     await revoke[p]().catch(() => null);
   }
