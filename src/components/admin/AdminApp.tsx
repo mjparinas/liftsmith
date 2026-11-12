@@ -678,7 +678,7 @@ export function AdminApp() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16">
-      <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
+      <header className="z-20 -mx-4 md:sticky md:top-0 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="mr-auto text-lg font-bold">
             Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
@@ -707,7 +707,8 @@ export function AdminApp() {
             Sign out
           </button>
         </div>
-        <nav className="mt-3 flex gap-1 overflow-x-auto" aria-label="Sections">
+        {/* Every section stays in view: the tabs wrap onto more lines instead of scrolling sideways (Melvin, 2026-11-12). */}
+        <nav className="mt-3 flex flex-wrap gap-1" aria-label="Sections">
           {TABS.map((t) => (
             <button
               key={t}
