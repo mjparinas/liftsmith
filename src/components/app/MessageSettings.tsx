@@ -7,10 +7,11 @@ import { trainingDays } from "@/lib/calendar";
 import { clockTime, list, t, weekday } from "@/lib/i18n";
 import { oops } from "@/lib/juice";
 import { clampTime, DEFAULT_ON, EMAIL_KINDS, PUSH_KINDS, type MessageKind } from "@/lib/messages";
-import { askPush, deleteEmail, EMAIL_RE, pushAllowed, pushSupported, syncEmail } from "@/lib/reminders";
+import { askPush, deleteEmail, pushAllowed, pushSupported, syncEmail } from "@/lib/reminders";
 import { useApp } from "@/lib/store";
 import type { Profile } from "@/lib/types";
 
+import { go } from "./router";
 import { Button, Section, Switch } from "./ui";
 
 type Prefs = NonNullable<Profile["messages"]>;
@@ -47,7 +48,8 @@ function Toggle({
 
 /**
  * Settings › Reminders. Push and email each have a switch per kind of message (messages.ts). Push is
- * local to the phone; email is double opt-in and every email has an unsubscribe link.
+ * local to the phone. Email is one switch that sends to the signed-in account's address (already verified,
+ * so nothing to type or confirm); signed out, the switch opens sign-in. Every email has an unsubscribe link.
  */
 export function MessageSettings() {
   const { profile, stats, setProfile } = useApp();
@@ -55,12 +57,8 @@ export function MessageSettings() {
   const save = (p: Partial<Prefs>) => setProfile({ messages: { ...prefs, startedAt: startedAt(prefs), ...p } });
   const native = pushSupported();
   const [allowed, setAllowed] = useState<boolean | null>(null);
-  // The signed-in account's email fills the box (it can still be changed), so nobody types what we know;
-  // signing in with this screen open fills an untouched box too.
-  const accountEmail = useAccount((s) => s.account?.email ?? null);
-  const [typed, setAddress] = useState<string | null>(null);
-  const address = typed ?? prefs.email?.address ?? accountEmail ?? "";
-  const [agree, setAgree] = useState(false);
+  // Email goes to the signed-in account's address, which sign-in already verified: nothing to type.
+  const accountEmail = useAccount((x) => x.account?.email?.trim().toLowerCase() || null);
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -91,14 +89,18 @@ export function MessageSettings() {
     save({ email: { ...email, kinds: { ...email.kinds, [k]: v } } });
   };
 
-  const start = async (resubscribe = false) => {
-    const a = address.trim().toLowerCase();
-    if (!EMAIL_RE.test(a)) return setStatus(t("msg.badEmail"));
+  const emailing = !!email && email.status !== "unsubscribed";
+
+  const start = async (resubscribe: boolean) => {
+    // Signed out there's no address we know, so the switch opens sign-in instead of asking for one.
+    if (!accountEmail) return go("account");
     setBusy(true);
+    setStatus(null);
+    // Turning the switch on, next to the line that says what's sent and where, is the consent.
     const next: Prefs = {
       ...prefs,
       startedAt: startedAt(prefs),
-      email: { address: a, consentAt: Date.now(), status: "pending", kinds: email?.kinds ?? {} },
+      email: { address: accountEmail, consentAt: Date.now(), status: "pending", kinds: email?.kinds ?? {} },
     };
     setProfile({ messages: next });
     const s = await syncEmail({ ...profile, messages: next }, stats, { resubscribe });
@@ -108,7 +110,21 @@ export function MessageSettings() {
       return setStatus(t("msg.offlineRetry"));
     }
     setProfile({ messages: { ...next, email: { ...next.email!, status: s } } });
-    setStatus(s === "confirmed" ? t("msg.updated") : t("msg.check", { email: a }));
+    if (s === "pending") setStatus(t("msg.check", { email: accountEmail }));
+  };
+
+  /** An older subscription still waiting for its confirmation link (typed before email followed the account). */
+  const resend = async () => {
+    if (!email) return;
+    setBusy(true);
+    const s = await syncEmail(profile, stats, { resubscribe: true });
+    setBusy(false);
+    if (!s) {
+      oops();
+      return setStatus(t("msg.offlineRetry"));
+    }
+    setProfile({ messages: { ...prefs, email: { ...email, status: s } } });
+    setStatus(s === "pending" ? t("msg.check", { email: email.address }) : null);
   };
 
   const stop = async () => {
@@ -120,8 +136,6 @@ export function MessageSettings() {
       return setStatus(t("msg.offline"));
     }
     save({ email: undefined });
-    setAddress("");
-    setAgree(false);
     setStatus(t("msg.stopped"));
   };
 
@@ -162,48 +176,30 @@ export function MessageSettings() {
 
         <div className="border-t border-line pt-4">
           <h3 className="text-sm font-semibold">{t("msg.email")}</h3>
-          {!email || email.status === "unsubscribed" ? (
-            <div className="mt-2 space-y-3">
-              {email?.status === "unsubscribed" && <p className="text-xs text-muted">{t("msg.unsubscribed", { email: email.address })}</p>}
-              <input
-                type="email"
-                inputMode="email"
-                autoComplete="email"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                className="card w-full px-4 py-3"
-                placeholder="you@example.com"
-                aria-label={t("msg.address")}
-              />
-              <label className="flex items-start gap-3 text-xs text-muted">
-                <input
-                  type="checkbox"
-                  checked={agree}
-                  onChange={(e) => setAgree(e.target.checked)}
-                  className="mt-0.5 h-5 w-5 shrink-0 accent-[var(--color-accent)]"
-                />
-                <span>{t("msg.consent")}</span>
-              </label>
-              <Button
-                kind="ghost"
-                className="w-full"
-                disabled={busy || !agree || !address.trim()}
-                onClick={() => void start(email?.status === "unsubscribed")}
-              >
-                {t("msg.send")}
-              </Button>
-            </div>
-          ) : (
-            <div className="mt-1">
-              <p className="text-xs text-muted">
-                {t(email.status === "pending" ? "msg.pending" : "msg.sending", { email: email.address })}
-              </p>
+          <Toggle
+            id="email-on"
+            label={t("msg.emailMe")}
+            blurb={
+              emailing
+                ? t(email.status === "pending" ? "msg.pending" : "msg.sending", { email: email.address })
+                : accountEmail
+                  ? t("msg.emailTo", { email: accountEmail })
+                  : t("msg.signInFirst")
+            }
+            on={emailing}
+            onChange={(v) => {
+              if (busy) return;
+              void (v ? start(!!email) : stop());
+            }}
+          />
+          {emailing && (
+            <>
               {email.status === "pending" && (
-                <Button kind="quiet" className="mt-2 w-full" disabled={busy} onClick={() => void start(true)}>
+                <Button kind="quiet" className="w-full" disabled={busy} onClick={() => void resend()}>
                   {t("msg.resend")}
                 </Button>
               )}
-              <div className="mt-1 divide-y divide-line">
+              <div className="mt-1 divide-y divide-line border-t border-line">
                 {EMAIL_KINDS.map((k) => (
                   <Toggle
                     key={k}
@@ -215,10 +211,7 @@ export function MessageSettings() {
                   />
                 ))}
               </div>
-              <Button kind="quiet" className="mt-2 w-full" disabled={busy} onClick={() => void stop()}>
-                {t("msg.stop")}
-              </Button>
-            </div>
+            </>
           )}
         </div>
         {status && (

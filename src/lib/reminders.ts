@@ -5,13 +5,15 @@
 //    with no account or server. Rescheduled when the app opens, comes back to the foreground, a
 //    workout ends, or a setting changes. Android and iOS through @capacitor/local-notifications, on a
 //    separate "Reminders" channel on Android so it can be muted on its own.
-//  - Email: an opt-in subscription on the server (/api/reminders/), confirmed by email (double opt-in).
-//    The phone sends only the fields the planner needs (PlanInput), never workouts or health data.
+//  - Email: an opt-in subscription on the server (/api/reminders/) to the signed-in account's email. The
+//    request carries the account's session, so the server knows the address is verified and starts at once;
+//    an older subscription to another address stays double opt-in. The phone sends only the fields the planner needs (PlanInput), never workouts or health data.
 //    The subscription id and its secret stay in this device's storage.
 //  - Web: browsers can't schedule a notification while the page is closed without a push server, so
 //    the web app offers email reminders only (documented in AGENTS.md).
 import { LocalNotifications } from "@capacitor/local-notifications";
 
+import { useAccount } from "./auth";
 import { storePro } from "./billing";
 import { trainingDays } from "./calendar";
 import type { Stats } from "./derive";
@@ -210,10 +212,12 @@ export async function syncEmail(
 ): Promise<MailStatus | null> {
   if (!profile.messages?.email?.address) return null;
   const sub = ensureSub();
+  // The account's session tells the server the address is the account's own, already verified.
+  const token = useAccount.getState().account?.token;
   try {
     const r = await fetch(remindersUrl(), {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: JSON.stringify(subscriptionBody(profile, stats, opts.now ?? Date.now(), sub, opts.resubscribe)),
     });
     if (!r.ok) return null;
@@ -247,27 +251,38 @@ export type { MessageKind };
 let timer: ReturnType<typeof setTimeout> | undefined;
 let lastEmailBody = "";
 
+/** The signed-in account's email, lower case, or null when signed out or the account has none. */
+export const accountEmail = () => useAccount.getState().account?.email?.trim().toLowerCase() || null;
+
 /**
  * Reschedules push reminders and updates the email subscription a moment after anything changes
  * (debounced, so a burst of logged sets does it once). Email only goes out when the address is
- * confirmed or pending, and only when something the server uses has changed.
+ * confirmed or pending, and only when something the server uses has changed. A subscription still
+ * waiting for confirmation moves to the signed-in account's address, which the server confirms at once.
  */
-export function refreshReminders(get: () => { profile: Profile; stats: Stats }, onStatus?: (s: MailStatus) => void, delay = 1500) {
+export function refreshReminders(
+  get: () => { profile: Profile; stats: Stats },
+  onStatus?: (s: MailStatus, address: string) => void,
+  delay = 1500,
+) {
   clearTimeout(timer);
   const run = async () => {
-    const { profile, stats } = get();
-    await schedulePush(profile, stats);
-    const email = profile.messages?.email;
-    if (!email?.address || email.status === "unsubscribed") return;
+    const { profile: p, stats } = get();
+    await schedulePush(p, stats);
+    const saved = p.messages?.email;
+    if (!saved?.address || saved.status === "unsubscribed") return;
     const sub = mailSub();
     if (!sub) return;
+    const mine = accountEmail();
+    const email = mine && saved.status === "pending" ? { ...saved, address: mine } : saved;
+    const profile = email === saved ? p : { ...p, messages: { ...p.messages!, email } };
     const now = Date.now();
-    const body = JSON.stringify({ ...subscriptionBody(profile, stats, now, sub), consentAt: 0 });
+    const body = JSON.stringify({ ...subscriptionBody(profile, stats, now, sub), consentAt: 0, signedIn: !!mine });
     if (body === lastEmailBody) return;
     const status = await syncEmail(profile, stats, { now });
     if (status) {
       lastEmailBody = body;
-      if (status !== email.status) onStatus?.(status);
+      if (status !== saved.status || email.address !== saved.address) onStatus?.(status, email.address);
     }
   };
   timer = setTimeout(() => void run(), delay);

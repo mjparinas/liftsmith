@@ -283,9 +283,9 @@ export function App() {
       if (document.visibilityState !== "visible") return;
       refreshReminders(
         () => useApp.getState(),
-        (status) => {
+        (status, address) => {
           const { profile: p, setProfile } = useApp.getState();
-          if (p.messages?.email) setProfile({ messages: { ...p.messages, email: { ...p.messages.email, status } } });
+          if (p.messages?.email) setProfile({ messages: { ...p.messages, email: { ...p.messages.email, status, address } } });
         },
       );
     };

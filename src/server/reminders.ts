@@ -206,15 +206,32 @@ async function sendConfirm(sub: Sub, store: Store, mail: Mailer, env: Env, now: 
   return true;
 }
 
+/** The signed-in account behind the request, when there is one. Its email is already verified (Google, Apple or an
+ *  emailed code), so a subscription to that address needs no confirmation email. */
+export interface Verified {
+  accountId: string;
+  email: string;
+}
+
 /** POST /api/reminders/: create or update a subscription. */
-export async function subscribe(body: SubBody, store: Store, mail: Mailer, env: Env, now: number): Promise<Result> {
+export async function subscribe(
+  body: SubBody,
+  store: Store,
+  mail: Mailer,
+  env: Env,
+  now: number,
+  verified: Verified | null = null,
+): Promise<Result> {
   const prev = await store.get(body.id);
   if (prev && !same(prev.tokenHash, sha256(body.token))) return { code: 403, body: { error: "Not yours" } };
+  // The account's own address: the sign-in already proved it's theirs, so there's nothing to confirm.
+  const trusted = !!verified && verified.email.trim().toLowerCase() === body.email;
+  const accountId = trusted ? verified!.accountId : (prev?.accountId ?? null);
 
   if (!prev) {
     const sub: Sub = {
       id: body.id,
-      accountId: null,
+      accountId,
       email: body.email,
       tokenHash: sha256(body.token),
       confirmHash: null,
@@ -227,18 +244,23 @@ export async function subscribe(body: SubBody, store: Store, mail: Mailer, env: 
       confirmedAt: null,
       confirmSends: [],
     };
+    if (trusted) return activate(sub, store, mail, env, now);
     await sendConfirm(sub, store, mail, env, now);
     return { code: 200, body: { status: "pending" } };
   }
 
-  const sub: Sub = { ...prev, kinds: body.kinds, plan: body.plan, updatedAt: now };
-  if (prev.email !== body.email || (prev.status === "unsubscribed" && body.resubscribe)) {
-    // A new address, or someone who unsubscribed turning email back on: confirm again before sending anything.
+  const sub: Sub = { ...prev, accountId, kinds: body.kinds, plan: body.plan, updatedAt: now };
+  const back = prev.status === "unsubscribed" && body.resubscribe;
+  if (prev.email !== body.email || back) {
+    // A new address, or someone who unsubscribed turning email back on: confirm again before sending anything,
+    // unless it's the signed-in account's own address (and, after an unsubscribe, the lifter turned email back on).
     await cancelScheduled(sub, store, mail, now, () => true);
     Object.assign(sub, { email: body.email, status: "pending" as Status, confirmedAt: null, consentAt: body.consentAt });
+    if (trusted && (prev.status !== "unsubscribed" || back)) return activate(sub, store, mail, env, now);
     if (!(await sendConfirm(sub, store, mail, env, now))) await store.put(sub);
     return { code: 200, body: { status: "pending" } };
   }
+  if (prev.status === "pending" && trusted) return activate(sub, store, mail, env, now);
   if (prev.status === "pending" && body.resubscribe) {
     if (!(await sendConfirm(sub, store, mail, env, now))) await store.put(sub);
     return { code: 200, body: { status: "pending" } };
@@ -254,6 +276,24 @@ export async function subscribe(body: SubBody, store: Store, mail: Mailer, env: 
     await schedule(sub, store, mail, env, now);
   }
   return { code: 200, body: { status: sub.status } };
+}
+
+/** Confirms a subscription, sends the welcome once and schedules what's due. */
+async function activate(sub: Sub, store: Store, mail: Mailer, env: Env, now: number): Promise<Result> {
+  Object.assign(sub, { status: "confirmed" as Status, confirmHash: null, confirmedAt: now, updatedAt: now });
+  await store.put(sub);
+  const sends = await store.sends(sub.id, 0);
+  if (!sends.some((s) => s.key === "welcome")) {
+    const r = await mail.send({
+      ...welcomeMail(footer(env, sub.id), sub.plan.lang),
+      to: sub.email,
+      idempotencyKey: `welcome-${sub.id}`,
+      headers: listHeaders(env, sub.id),
+    });
+    await store.putSend({ subId: sub.id, key: "welcome", kind: "welcome", sendAt: now, resendId: r?.id ?? null, status: "sent" });
+  }
+  await schedule(sub, store, mail, env, now);
+  return { code: 200, body: { status: "confirmed" } };
 }
 
 /** DELETE /api/reminders/: the lifter stopped email in the app. Cancels what's scheduled and erases the row. */
@@ -280,19 +320,7 @@ export async function confirm(
   if (!sub) return "invalid";
   if (sub.status === "confirmed") return "already";
   if (!sub.confirmHash || !same(sub.confirmHash, sha256(token))) return "invalid";
-  Object.assign(sub, { status: "confirmed" as Status, confirmHash: null, confirmedAt: now, updatedAt: now });
-  await store.put(sub);
-  const sends = await store.sends(sub.id, 0);
-  if (!sends.some((s) => s.key === "welcome")) {
-    const r = await mail.send({
-      ...welcomeMail(footer(env, sub.id), sub.plan.lang),
-      to: sub.email,
-      idempotencyKey: `welcome-${sub.id}`,
-      headers: listHeaders(env, sub.id),
-    });
-    await store.putSend({ subId: sub.id, key: "welcome", kind: "welcome", sendAt: now, resendId: r?.id ?? null, status: "sent" });
-  }
-  await schedule(sub, store, mail, env, now);
+  await activate(sub, store, mail, env, now);
   return "confirmed";
 }
 

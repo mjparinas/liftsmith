@@ -179,6 +179,45 @@ describe("double opt-in", () => {
   });
 });
 
+describe("the signed-in account's own address", () => {
+  const me = { accountId: "acc1", email: "lifter@example.com" };
+
+  it("starts at once with a welcome, no confirmation email", async () => {
+    const store = memoryStore();
+    const { mail, sent } = fakeMail();
+    const r = await subscribe(ok(body()), store, mail, env, MON - 3600_000, me);
+    expect(r.body.status).toBe("confirmed");
+    expect(sent.some((m) => m.subject.startsWith("Confirm"))).toBe(false);
+    expect(sent.filter((m) => m.subject === "Welcome to Liftsmith")).toHaveLength(1);
+    expect(store.subs.get(ID)).toMatchObject({ status: "confirmed", accountId: "acc1" });
+  });
+
+  it("still asks to confirm any other address", async () => {
+    const store = memoryStore();
+    const { mail, sent } = fakeMail();
+    const r = await subscribe(ok(body({ email: "someone@else.com" })), store, mail, env, MON, me);
+    expect(r.body.status).toBe("pending");
+    expect(sent[0].subject).toBe("Confirm your Liftsmith emails");
+    expect(store.subs.get(ID)!.accountId).toBeNull();
+  });
+
+  it("confirms an older pending subscription to that address on the next sync", async () => {
+    const store = memoryStore();
+    const { mail, sent } = fakeMail();
+    await subscribe(ok(body()), store, mail, env, MON);
+    const r = await subscribe(ok(body()), store, mail, env, MON + 1, me);
+    expect(r.body.status).toBe("confirmed");
+    expect(sent.filter((m) => m.subject === "Welcome to Liftsmith")).toHaveLength(1);
+  });
+
+  it("never turns an unsubscribed address back on from a sync, only when the lifter turns email on", async () => {
+    const { store, mail } = await confirmed();
+    await unsubscribe(ID, unsubToken(ID, env.secret), store, mail, env, MON);
+    expect((await subscribe(ok(body()), store, mail, env, MON, me)).body.status).toBe("unsubscribed");
+    expect((await subscribe(ok(body({ resubscribe: true })), store, mail, env, MON, me)).body.status).toBe("confirmed");
+  });
+});
+
 describe("scheduling", () => {
   it("schedules the Monday email for the lifter's morning, in their time zone", async () => {
     const { sent } = await confirmed(MON - 3600_000);
