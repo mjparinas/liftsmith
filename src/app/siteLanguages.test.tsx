@@ -5,6 +5,7 @@ import { existsSync } from "node:fs";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 
+import { featuresMetadata, FeaturesView } from "@/components/site/FeaturesView";
 import { HERO_PROGRAM } from "@/components/site/heroProgram";
 import { homeMetadata, HomeView } from "@/components/site/HomeView";
 import { pricingMetadata, PricingView } from "@/components/site/PricingView";
@@ -13,6 +14,7 @@ import { PLAN_TABLE } from "@/lib/plans";
 import { siteRoutes } from "@/lib/seo";
 import { fill, languageAlternates, localPath, SITE_LANGS, usd, type SiteLang } from "@/lib/siteLang";
 import { SITE_TEXT } from "@/locales/site";
+import { FEATURES_TEXT } from "@/locales/site/features";
 import { exerciseNames, muscleLabels } from "@/locales/site/fromApp";
 import { siteVars } from "@/locales/site/vars";
 
@@ -127,11 +129,30 @@ describe("translated pages", () => {
   });
 });
 
+describe("the features page in each language", () => {
+  it("renders every feature and connection in the page's language", () => {
+    for (const lang of SITE_LANGS) {
+      const t = FEATURES_TEXT[lang];
+      const { container } = render(<FeaturesView lang={lang} />);
+      expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(fill(t.chrome.h1, { name: "Liftsmith" }));
+      expect(container.querySelectorAll("li[id^='f-']").length, lang).toBe(Object.keys(t.features).length);
+      expect(container.textContent, lang).toContain(t.features.adaptive!.name);
+      expect(container.textContent, lang).toContain(t.connections.oura!.does);
+      expect(container.textContent, lang).not.toMatch(/\{\w+\}/);
+      const pricing = [...container.querySelectorAll("a")].find((a) => a.textContent === t.chrome.pricing);
+      expect(pricing?.getAttribute("href")?.replace(/\/?$/, "/"), lang).toBe(localPath(lang, "/pricing/"));
+      expect(featuresMetadata(lang).alternates?.canonical).toBe(localPath(lang, "/features/"));
+      cleanup();
+    }
+  });
+});
+
 describe("hreflang and the sitemap", () => {
   it("has a page for every translated path in every language", () => {
     // Plain folders rather than a [lang] segment, so no other one-segment path can ever match a language page.
     for (const lang of others)
-      for (const p of ["page.tsx", "pricing/page.tsx"]) expect(existsSync(`src/app/${lang}/${p}`), `${lang} ${p}`).toBe(true);
+      for (const p of ["page.tsx", "features/page.tsx", "pricing/page.tsx"])
+        expect(existsSync(`src/app/${lang}/${p}`), `${lang} ${p}`).toBe(true);
   });
 
   it("lists every language and x-default on each translated page", () => {

@@ -3,8 +3,10 @@ import { describe, expect, it } from "vitest";
 import { CLOUD, CLOUD_NAME } from "@/lib/cloud";
 import { PRO_FEATURES } from "@/lib/entitlements";
 import { LABS } from "@/lib/labs";
+import { SITE_LANGS } from "@/lib/siteLang";
+import { FEATURES_TEXT } from "@/locales/site/features";
 
-import { ALL_CONNECTIONS, ALL_FEATURES, FEATURE_GROUPS, newestFeatures } from "./features";
+import { ALL_CONNECTIONS, ALL_FEATURES, CONNECTION_GROUPS, FEATURE_GROUPS, newestFeatures } from "./features";
 import { IMPORT_SOURCES } from "./imports";
 import { LANDINGS } from "./landings";
 
@@ -65,5 +67,33 @@ describe("the features page list", () => {
       .at(-1);
     const shown = groups.flatMap((g) => g.features);
     for (const f of ALL_FEATURES.filter((x) => x.added === latest)) expect(shown).toContain(f);
+  });
+});
+
+// The page is in every site language (Melvin, 2026-11-12: "Do the header and translations"). A feature or connection
+// added to features.ts fails here until each language has its words.
+describe("the features page in every language", () => {
+  const en = FEATURES_TEXT.en;
+  const holes = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+
+  it.each(SITE_LANGS.filter((l) => l !== "en"))("%s has every group, feature and connection", (lang) => {
+    const t = FEATURES_TEXT[lang];
+    expect(Object.keys(t.groups).sort()).toEqual(FEATURE_GROUPS.map((g) => g.id).sort());
+    expect(Object.keys(t.features).sort()).toEqual(ALL_FEATURES.map((f) => f.id).sort());
+    expect(Object.keys(t.connectionGroups).sort()).toEqual(CONNECTION_GROUPS.map((g) => g.id).sort());
+    expect(Object.keys(t.connections).sort()).toEqual(ALL_CONNECTIONS.map((c) => c.id).sort());
+    for (const f of ALL_FEATURES) {
+      const w = t.features[f.id]!;
+      expect(Boolean(w.proPart), `${lang} ${f.id} proPart`).toBe(Boolean(f.proPart));
+      expect(Boolean(w.note), `${lang} ${f.id} note`).toBe(Boolean(f.note));
+      expect(w.name.trim(), `${lang} ${f.id}`).not.toBe("");
+    }
+    for (const c of ALL_CONNECTIONS) expect(Boolean(t.connections[c.id]!.link), `${lang} ${c.id} link`).toBe(Boolean(c.link));
+  });
+
+  it.each(SITE_LANGS.filter((l) => l !== "en"))("%s keeps the page's placeholders", (lang) => {
+    const t = FEATURES_TEXT[lang].chrome;
+    for (const [k, v] of Object.entries(en.chrome))
+      if (typeof v === "string") expect(holes(t[k as keyof typeof t] as string), `${lang} ${k}`).toEqual(holes(v));
   });
 });

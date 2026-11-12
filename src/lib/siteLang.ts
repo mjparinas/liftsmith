@@ -1,4 +1,4 @@
-// The website's languages (Melvin, 2026-11-11: translate the landing and pricing pages). English pages live at their
+// The website's languages (Melvin, 2026-11-11: translate the landing and pricing pages; 2026-11-12: and the features page). English pages live at their
 // usual paths; the other languages under /<lang>/ (/es/, /fr/pricing/). Only the pages in LOCALIZED_PATHS are translated
 // for now, plus the 50 guided exercise pages (/<lang>/exercises/<id>/, src/content/exerciseGuides/i18n.ts); the rest of the
 // library and the articles wait for the English SEO work, and terms and privacy stay English-first.
@@ -9,7 +9,7 @@ export const SITE_LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
 export type SiteLang = (typeof SITE_LANGS)[number];
 
 /** The translated paths, English form (with the trailing slash). */
-export const LOCALIZED_PATHS = ["/", "/pricing/", "/coaches/"] as const;
+export const LOCALIZED_PATHS = ["/", "/features/", "/pricing/", "/coaches/"] as const;
 
 /** Each language's name in itself, for the language switcher. */
 export const SITE_LANG_NAME: Record<SiteLang, string> = {

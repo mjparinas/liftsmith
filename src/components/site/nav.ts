@@ -12,9 +12,9 @@ export type NavLink = { href: string; label: string };
  */
 export function navFor(lang: SiteLang): NavLink[] {
   const n = siteText(lang).chrome.nav;
-  // The home page and pricing are translated; the library, guides, blog and tools are English for now.
+  // The home page, features and pricing are translated; the library, guides, blog and tools are English for now.
   return [
-    { href: `${localPath(lang, "/")}#features`, label: n.features },
+    { href: localPath(lang, "/features/"), label: n.features },
     { href: "/exercises/", label: n.exercises },
     { href: "/guides/", label: n.guides },
     { href: "/blog/", label: n.blog },

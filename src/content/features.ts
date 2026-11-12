@@ -823,7 +823,7 @@ export const ALL_FEATURES: SiteFeature[] = FEATURE_GROUPS.flatMap((g) => g.featu
  * The newest features: every one added on the latest `days` days that added any, grouped by their category in page
  * order (Melvin, 2026-11-12: "categorize them instead" of dates).
  */
-export function newestFeatures(days = 3): { group: FeatureGroup; features: SiteFeature[] }[] {
+export function newestFeatures(days = 3, groups: FeatureGroup[] = FEATURE_GROUPS): { group: FeatureGroup; features: SiteFeature[] }[] {
   const recent = new Set(
     [...new Set(ALL_FEATURES.map((f) => f.added))]
       .filter((d) => d > LAUNCH)
@@ -831,9 +831,9 @@ export function newestFeatures(days = 3): { group: FeatureGroup; features: SiteF
       .reverse()
       .slice(0, days),
   );
-  return FEATURE_GROUPS.map((group) => ({ group, features: group.features.filter((f) => recent.has(f.added)) })).filter(
-    (g) => g.features.length > 0,
-  );
+  return groups
+    .map((group) => ({ group, features: group.features.filter((f) => recent.has(f.added)) }))
+    .filter((g) => g.features.length > 0);
 }
 
 // --- Connections: what Liftsmith works with ---
