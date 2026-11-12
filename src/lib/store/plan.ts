@@ -3,12 +3,13 @@ import { weekStart } from "../block";
 import { makeGym, type GymPreset } from "../defaults";
 import { derive, setWeekStart } from "../derive";
 import { can } from "../entitlements";
+import { freeAdaptiveLeft } from "../freeAdaptive";
 import { generate, injuryPass, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
-import { pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
+import { freeProgramFor, pickProgram, PROGRAM_BY_ID, programPlan } from "../programs";
 import { readiness, todayFeel, type Call, type Readiness } from "../readiness";
 import { applyOrder } from "../reorder";
 import { planFromRoutine } from "../routines";
@@ -27,6 +28,9 @@ export interface PlanSlice {
   /** The lifter's own call for today, overriding the suggestion. */
   callOverride: Call | null;
   setCall(c: Call | null): void;
+  /** Without Pro: today's plan is this week's one free adaptive workout instead of the free program (freeAdaptive.ts). */
+  tryAdaptive: boolean;
+  setTryAdaptive(on: boolean): void;
   /**
    * The pre-workout check-in on Today: merges the change into today's answer, saves it as a new "feel"
    * event (the newest one today counts) and rebuilds the plan, so the call and the playlist follow.
@@ -66,6 +70,7 @@ export function planSlice(c: Ctx): PlanSlice {
     preview: null,
     readiness: null,
     callOverride: null,
+    tryAdaptive: false,
     pickedByLocation: null,
     links: [],
     order: [],
@@ -134,7 +139,9 @@ export function planSlice(c: Ctx): PlanSlice {
         ...(can("healthReadiness") ? healthExternal(events, now) : {}),
       });
       const call = callOverride ?? r.call;
-      const src = profile.planSource;
+      // This week's free adaptive workout replaces the free program's day (Melvin, 2026-11-12).
+      const trying = get().tryAdaptive && !can("adaptive") && freeAdaptiveLeft(events, now);
+      const src = trying ? undefined : profile.planSource;
       const programDay = src?.kind === "program" ? programPlan({ src, gym: g, profile, events, now, call, challenge: r.challenge }) : null;
       const fromProgram = programDay?.program?.fixed ? injuryPass(programDay, events, profile, g, now) : programDay;
       let plan = fromProgram ?? generate({ gym: g, profile, events, minutes: profile.minutes, now, call, challenge: r.challenge });
@@ -156,8 +163,9 @@ export function planSlice(c: Ctx): PlanSlice {
       const free = src.kind === "program" && PROGRAM_BY_ID.get(src.id)?.tier === "free";
       if (!can("adaptive")) {
         // Adaptive plans and splits are Pro: keep what they had, and plan the free classic 5x5 meanwhile.
+        // The free program fits the gym (freeProgramFor): the 5×5 with a barbell, dumbbell full body, or bodyweight skills.
         if (!free && src.kind !== "routine")
-          get().setProfile({ proPlan: src, planSource: pickProgram("classic-5x5", { profile, gym: g, events, now: Date.now() }) });
+          get().setProfile({ proPlan: src, planSource: pickProgram(freeProgramFor(g), { profile, gym: g, events, now: Date.now() }) });
       } else if (profile.proPlan) {
         // Pro again (a purchase, a restore, a renewal the phone just heard about): back to their own plan.
         get().setProfile({ planSource: profile.proPlan, proPlan: undefined });
@@ -166,6 +174,13 @@ export function planSlice(c: Ctx): PlanSlice {
 
     setCall(c) {
       set({ callOverride: c });
+      get().replan();
+    },
+
+    setTryAdaptive(on) {
+      if (get().active) return;
+      set({ tryAdaptive: on });
+      track("feature", { name: "free_adaptive", detail: on ? "on" : "off" });
       get().replan();
     },
 

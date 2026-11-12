@@ -4,6 +4,7 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "conn.proPaused": "Paused · Resume with",
   "conn.health.samsung":
     "Samsung Health: in the Samsung Health app, open Settings › Health Connect and turn on what it shares. Its readings and workouts then come in here.",
   "conn.title": "Connected apps",
@@ -111,6 +112,7 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "conn.proPaused": "En pausa · Reanudar con",
   "conn.health.samsung":
     "Samsung Health: en la app Samsung Health, abre Ajustes › Health Connect y activa lo que comparte. Sus datos y entrenamientos llegarán aquí.",
   "conn.title": "Apps conectadas",
@@ -223,6 +225,7 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "conn.proPaused": "En pause · Reprendre avec",
   "conn.health.samsung":
     "Samsung Health : dans l’app Samsung Health, ouvrez Paramètres › Health Connect et activez ce qu’elle partage. Ses mesures et séances arrivent alors ici.",
   "conn.title": "Apps connectées",
@@ -335,6 +338,7 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "conn.proPaused": "Pausiert · Weiter mit",
   "conn.health.samsung":
     "Samsung Health: Öffne in der Samsung-Health-App Einstellungen › Health Connect und schalte ein, was geteilt wird. Dann kommen ihre Messwerte und Workouts hier an.",
   "conn.title": "Verbundene Apps",
@@ -446,6 +450,7 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "conn.proPaused": "In pausa · Riprendi con",
   "conn.health.samsung":
     "Samsung Health: nell’app Samsung Health apri Impostazioni › Health Connect e attiva ciò che condivide. I suoi dati e allenamenti arriveranno qui.",
   "conn.title": "App collegate",
@@ -559,6 +564,7 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "conn.proPaused": "一時停止中・再開には",
   "conn.health.samsung":
     "Samsung Health：Samsung Health アプリで［設定］›［ヘルスコネクト］を開き、共有する項目をオンにしてください。測定値とワークアウトがここに届きます。",
   "conn.title": "連携アプリ",

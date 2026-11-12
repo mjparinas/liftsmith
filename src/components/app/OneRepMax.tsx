@@ -4,6 +4,7 @@
 // src/lib/onerm.ts; this file only shows it. Text is in the language catalogues (orm.*, dots.*).
 import { useMemo, useState } from "react";
 
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
 import {
@@ -61,6 +62,7 @@ export function OneRmSection() {
   const [all, setAll] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const shown = all ? list : list.slice(0, 6);
+  const pro = can("advancedStats");
   return (
     <Section
       title={t("orm.title")}
@@ -89,7 +91,8 @@ export function OneRmSection() {
                   {kgTo(r.e1rm, unit)} {unit} <span className="text-faint">· ±{kgTo((r.high - r.low) / 2, unit)}</span>
                 </div>
               </div>
-              <Trend points={r.trend.map((p) => p.e1rm)} />
+              {/* The trend line is an advanced stat (Pro); the estimate and its calculator stay free. */}
+              {pro && <Trend points={r.trend.map((p) => p.e1rm)} />}
             </button>
           </li>
         ))}

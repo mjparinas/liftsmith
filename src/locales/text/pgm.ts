@@ -5,6 +5,14 @@ import type { Message } from "@/lib/i18n";
 // set schemes and notes the programs put on Today and the workout screen. English is the source.
 
 export const en = {
+  "pgm.dumbbell-full-body.name": "Dumbbell full body",
+  "pgm.dumbbell-full-body.basedOn": "A Liftsmith program, with the same simple linear progression as the classic 5×5.",
+  "pgm.dumbbell-full-body.summary": "Two alternating full-body workouts with dumbbells, three days a week. Made for home and hotel gyms.",
+  "pgm.dumbbell-full-body.how1": "Workout A: goblet squat, dumbbell bench press and dumbbell row, 3 sets of 10.",
+  "pgm.dumbbell-full-body.how2": "Workout B: dumbbell Romanian deadlift, dumbbell shoulder press and walking lunge, 3 sets of 10.",
+  "pgm.dumbbell-full-body.how3": "Get every rep and the lift goes up to the next dumbbell next time.",
+  "pgm.dumbbell-full-body.how4":
+    "Miss three sessions in a row on a lift and it drops 10% to build back up. Missing a bench? The closest exercise your gym can do stands in.",
   "pgm.classic-5x5.name": "Classic 5×5",
   "pgm.classic-5x5.basedOn": "Based on the 5×5 programs of Bill Starr and StrongLifts 5×5 by Mehdi Hadim.",
   "pgm.classic-5x5.summary": "Two alternating full-body workouts, three days a week. Add weight every session.",
@@ -147,6 +155,16 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "pgm.dumbbell-full-body.name": "Cuerpo completo con mancuernas",
+  "pgm.dumbbell-full-body.basedOn": "Un programa de Liftsmith, con la misma progresión lineal sencilla que el 5×5 clásico.",
+  "pgm.dumbbell-full-body.summary":
+    "Dos entrenamientos de cuerpo completo con mancuernas que se alternan, tres días a la semana. Pensado para gimnasios en casa y de hotel.",
+  "pgm.dumbbell-full-body.how1": "Entrenamiento A: sentadilla goblet, press de banca con mancuernas y remo con mancuerna, 3 series de 10.",
+  "pgm.dumbbell-full-body.how2":
+    "Entrenamiento B: peso muerto rumano con mancuernas, press de hombros con mancuernas y zancadas caminando, 3 series de 10.",
+  "pgm.dumbbell-full-body.how3": "Haz todas las repeticiones y la próxima vez subes a la siguiente mancuerna.",
+  "pgm.dumbbell-full-body.how4":
+    "Si fallas tres sesiones seguidas en un ejercicio, baja un 10 % para volver a subir. ¿Sin banco? Lo sustituye el ejercicio más parecido que permita tu gimnasio.",
   "pgm.classic-5x5.name": "5×5 clásico",
   "pgm.classic-5x5.basedOn": "Basado en los programas 5×5 de Bill Starr y en StrongLifts 5×5 de Mehdi Hadim.",
   "pgm.classic-5x5.summary": "Dos entrenamientos de cuerpo completo que se alternan, tres días a la semana. Sube peso en cada sesión.",
@@ -294,6 +312,16 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "pgm.dumbbell-full-body.name": "Corps entier aux haltères",
+  "pgm.dumbbell-full-body.basedOn": "Un programme Liftsmith, avec la même progression linéaire simple que le 5×5 classique.",
+  "pgm.dumbbell-full-body.summary":
+    "Deux séances corps entier aux haltères en alternance, trois jours par semaine. Conçu pour la maison et les salles d’hôtel.",
+  "pgm.dumbbell-full-body.how1": "Séance A : squat goblet, développé couché aux haltères et rowing haltère, 3 séries de 10.",
+  "pgm.dumbbell-full-body.how2":
+    "Séance B : soulevé de terre roumain aux haltères, développé épaules aux haltères et fentes marchées, 3 séries de 10.",
+  "pgm.dumbbell-full-body.how3": "Toutes les répétitions faites, et la fois suivante on passe à l’haltère au-dessus.",
+  "pgm.dumbbell-full-body.how4":
+    "Trois séances manquées d’affilée sur un exercice, et il baisse de 10 % pour remonter. Pas de banc ? L’exercice le plus proche que votre salle permet le remplace.",
   "pgm.classic-5x5.name": "5×5 classique",
   "pgm.classic-5x5.basedOn": "Inspiré des programmes 5×5 de Bill Starr et de StrongLifts 5×5 de Mehdi Hadim.",
   "pgm.classic-5x5.summary": "Deux séances corps entier en alternance, trois jours par semaine. On ajoute du poids à chaque séance.",
@@ -446,6 +474,16 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "pgm.dumbbell-full-body.name": "Ganzkörper mit Kurzhanteln",
+  "pgm.dumbbell-full-body.basedOn": "Ein Liftsmith-Programm mit derselben einfachen linearen Steigerung wie das klassische 5×5.",
+  "pgm.dumbbell-full-body.summary":
+    "Zwei abwechselnde Ganzkörpertrainings mit Kurzhanteln, drei Tage pro Woche. Gemacht für Heim- und Hotel-Studios.",
+  "pgm.dumbbell-full-body.how1": "Training A: Goblet-Kniebeuge, Kurzhantel-Bankdrücken und Kurzhantelrudern, 3 Sätze à 10.",
+  "pgm.dumbbell-full-body.how2":
+    "Training B: Rumänisches Kreuzheben mit Kurzhanteln, Kurzhantel-Schulterdrücken und Ausfallschritte im Gehen, 3 Sätze à 10.",
+  "pgm.dumbbell-full-body.how3": "Schaffst du jede Wiederholung, nimmst du beim nächsten Mal die nächste Kurzhantel.",
+  "pgm.dumbbell-full-body.how4":
+    "Verfehlst du eine Übung drei Trainings in Folge, sinkt sie um 10 %, damit du dich wieder hocharbeitest. Keine Bank? Dann springt die ähnlichste Übung ein, die dein Studio erlaubt.",
   "pgm.classic-5x5.name": "Klassisches 5×5",
   "pgm.classic-5x5.basedOn": "Nach den 5×5-Programmen von Bill Starr und StrongLifts 5×5 von Mehdi Hadim.",
   "pgm.classic-5x5.summary": "Zwei abwechselnde Ganzkörpertrainings, drei Tage pro Woche. Jedes Training mehr Gewicht.",
@@ -595,6 +633,15 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "pgm.dumbbell-full-body.name": "Total body con manubri",
+  "pgm.dumbbell-full-body.basedOn": "Un programma Liftsmith, con la stessa semplice progressione lineare del 5×5 classico.",
+  "pgm.dumbbell-full-body.summary":
+    "Due allenamenti total body con manubri alternati, tre giorni a settimana. Pensato per la palestra di casa e quella dell’hotel.",
+  "pgm.dumbbell-full-body.how1": "Allenamento A: goblet squat, panca con manubri e rematore con manubrio, 3 serie da 10.",
+  "pgm.dumbbell-full-body.how2": "Allenamento B: stacco rumeno con manubri, lento con manubri e affondi camminati, 3 serie da 10.",
+  "pgm.dumbbell-full-body.how3": "Completa tutte le ripetizioni e la volta dopo passi al manubrio successivo.",
+  "pgm.dumbbell-full-body.how4":
+    "Se manchi un esercizio per tre sedute di fila, scende del 10 % per poi risalire. Niente panca? Lo sostituisce l’esercizio più simile che la tua palestra permette.",
   "pgm.classic-5x5.name": "5×5 classico",
   "pgm.classic-5x5.basedOn": "Basato sui programmi 5×5 di Bill Starr e su StrongLifts 5×5 di Mehdi Hadim.",
   "pgm.classic-5x5.summary": "Due allenamenti total body alternati, tre giorni a settimana. Aggiungi peso a ogni seduta.",
@@ -743,6 +790,15 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "pgm.dumbbell-full-body.name": "ダンベル全身",
+  "pgm.dumbbell-full-body.basedOn": "Liftsmith のプログラムです。クラシック 5×5 と同じシンプルな直線的プログレッションを使います。",
+  "pgm.dumbbell-full-body.summary": "ダンベルを使う2種類の全身ワークアウトを交互に、週3日行います。自宅やホテルのジム向けです。",
+  "pgm.dumbbell-full-body.how1": "ワークアウト A：ゴブレットスクワット、ダンベルベンチプレス、ダンベルロウを10回×3セット。",
+  "pgm.dumbbell-full-body.how2":
+    "ワークアウト B：ダンベルルーマニアンデッドリフト、ダンベルショルダープレス、ウォーキングランジを10回×3セット。",
+  "pgm.dumbbell-full-body.how3": "すべてのレップを達成したら、次回は1段階重いダンベルにします。",
+  "pgm.dumbbell-full-body.how4":
+    "同じ種目で3回続けて失敗したら、重量を10%下げて積み上げ直します。ベンチがなければ、ジムでできる最も近い種目で代わりに行います。",
   "pgm.classic-5x5.name": "クラシック 5×5",
   "pgm.classic-5x5.basedOn": "Bill Starr の 5×5 プログラムと、Mehdi Hadim の StrongLifts 5×5 にもとづいています。",
   "pgm.classic-5x5.summary": "2種類の全身ワークアウトを交互に、週3日行います。毎回重量を増やします。",

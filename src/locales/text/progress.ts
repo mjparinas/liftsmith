@@ -4,6 +4,7 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "progress.weekSets.lock": "Hard sets for each muscle this week against the range that builds muscle, so you know what to train next.",
   "progress.title": "Progress",
   "progress.next": "What to do next",
   "progress.level": "Level {level}",
@@ -60,6 +61,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "progress.weekSets.lock":
+    "Series duras de cada músculo esta semana frente al rango que hace crecer el músculo, para saber qué entrenar después.",
   "progress.title": "Progreso",
   "progress.next": "Qué hacer ahora",
   "progress.level": "Nivel {level}",
@@ -115,6 +118,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "progress.weekSets.lock":
+    "Les séries difficiles de chaque muscle cette semaine face à la fourchette qui fait progresser, pour savoir quoi entraîner ensuite.",
   "progress.title": "Progrès",
   "progress.next": "Que faire maintenant",
   "progress.level": "Niveau {level}",
@@ -170,6 +175,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "progress.weekSets.lock":
+    "Harte Sätze pro Muskel in dieser Woche im Vergleich zum Bereich, der Muskeln aufbaut, damit du weißt, was du als Nächstes trainierst.",
   "progress.title": "Fortschritt",
   "progress.next": "Was du als Nächstes tun solltest",
   "progress.level": "Level {level}",
@@ -225,6 +232,8 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "progress.weekSets.lock":
+    "Le serie impegnative di ogni muscolo questa settimana rispetto all’intervallo che fa crescere, così sai cosa allenare dopo.",
   "progress.title": "Progressi",
   "progress.next": "Cosa fare adesso",
   "progress.level": "Livello {level}",
@@ -280,6 +289,7 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "progress.weekSets.lock": "今週の部位ごとのハードセット数を筋肥大に効く範囲と比べ、次に何を鍛えるかがわかります。",
   "progress.title": "進捗",
   "progress.next": "次にやること",
   "progress.level": "レベル{level}",

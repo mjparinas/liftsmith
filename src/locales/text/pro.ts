@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "pro.ft.cloudConnections": "Strava, Oura, WHOOP and more",
+  "pro.fb.cloudConnections":
+    "Send workouts to Strava, and bring in sleep, recovery, weigh-ins and rows from Oura, WHOOP, Withings, Polar and Concept2. Health Connect and Apple Health stay free.",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "You have Pro",
   "pro.back": "Back",
@@ -11,7 +14,7 @@ export const en = {
   "pro.unlocks": "What Pro unlocks",
   "pro.youAsked": "You tapped this",
   "pro.free":
-    "Free, always: the workout logger, plate math, rest timer and lock-screen notification, every fixed program (5×5, 3×5 and more), your own routines, the health twin, “why this weight”, and coach's notes.",
+    "Free, always: the workout logger, plate math, rest timer and lock-screen notification, every fixed program (5×5, 3×5, dumbbell full body and more), one adaptive workout a week, your own routines, “Short on time”, the health twin, Health Connect and Apple Health, “why this weight”, and coach's notes.",
   "pro.ft.adaptive": "Adaptive workouts",
   "pro.fb.adaptive": "Each day planned from your recovery, equipment and training block, with deloads and progression built in.",
   "pro.ft.healthReadiness": "Push or easy-day calls from your health data",
@@ -21,13 +24,14 @@ export const en = {
   "pro.ft.adaptiveSplits": "Push/pull/legs and upper/lower splits",
   "pro.fb.adaptiveSplits": "Adaptive splits that plan every day for you.",
   "pro.ft.advancedStats": "Advanced stats",
-  "pro.fb.advancedStats": "One-rep max trends, weekly sets per muscle against your target, and per-exercise detail on the web dashboard.",
+  "pro.fb.advancedStats":
+    "One-rep max trends, weekly sets per muscle against your target, and which way each lift is heading, in the app and on the web dashboard.",
   "pro.ft.plateauDetective": "Plateau detective",
   "pro.fb.plateauDetective": "When a lift stalls, the likely cause and a three-week fix you start in one tap.",
   "pro.ft.goalPlanner": "Goal planner",
   "pro.fb.goalPlanner": "Set a lift and a date. Get an honest forecast and a test-day plan.",
-  "pro.ft.replan": "Change the plan mid-workout",
-  "pro.fb.replan": "Short on time or feeling off? Reshape the rest of today's workout.",
+  "pro.ft.replan": "Work around taken equipment",
+  "pro.fb.replan": "Equipment busy? Do that exercise later or switch to one that's free, and the rest of today's plan follows.",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "Try experiments early, like camera rep counting that fills in your reps for you.",
   "pro.locked": "{what}, a Pro feature: see Pro",
@@ -97,6 +101,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "pro.ft.cloudConnections": "Strava, Oura, WHOOP y más",
+  "pro.fb.cloudConnections":
+    "Envía tus entrenamientos a Strava y trae el sueño, la recuperación, los pesajes y las sesiones de remo desde Oura, WHOOP, Withings, Polar y Concept2. Health Connect y Apple Health siguen siendo gratis.",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "Tienes Pro",
   "pro.back": "Atrás",
@@ -104,7 +111,7 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.unlocks": "Lo que desbloquea Pro",
   "pro.youAsked": "Has tocado esto",
   "pro.free":
-    "Gratis, siempre: el registro de entrenamientos, el cálculo de discos, el temporizador de descanso y la notificación en la pantalla de bloqueo, todos los programas fijos (5×5, 3×5 y más), tus propias rutinas, el gemelo de salud, “por qué este peso” y las notas del entrenador.",
+    "Gratis, siempre: el registro de entrenamientos, el cálculo de discos, el temporizador de descanso y la notificación en la pantalla de bloqueo, todos los programas fijos (5×5, 3×5, cuerpo completo con mancuernas y más), un entrenamiento adaptativo a la semana, tus propias rutinas, “Poco tiempo”, el gemelo de salud, Health Connect y Apple Health, “por qué este peso” y las notas del entrenador.",
   "pro.ft.adaptive": "Entrenamientos adaptativos",
   "pro.fb.adaptive":
     "Cada día se planifica según tu recuperación, tu equipo y tu bloque de entrenamiento, con descargas y progresión incluidas.",
@@ -117,13 +124,13 @@ export const es: Partial<Record<Key, Message>> = {
   "pro.fb.adaptiveSplits": "Divisiones adaptativas que planifican cada día por ti.",
   "pro.ft.advancedStats": "Estadísticas avanzadas",
   "pro.fb.advancedStats":
-    "Tendencias del máximo a una repetición, series semanales por músculo frente a tu objetivo y detalle por ejercicio en el panel web.",
+    "Tendencias del máximo a una repetición, series semanales por músculo frente a tu objetivo y hacia dónde va cada ejercicio, en la app y en el panel web.",
   "pro.ft.plateauDetective": "Detective de estancamientos",
   "pro.fb.plateauDetective": "Cuando un ejercicio se estanca, la causa probable y un arreglo de tres semanas que empiezas con un toque.",
   "pro.ft.goalPlanner": "Planificador de objetivos",
   "pro.fb.goalPlanner": "Elige un ejercicio y una fecha. Recibe un pronóstico honesto y un plan para el día de prueba.",
-  "pro.ft.replan": "Cambiar el plan a mitad del entrenamiento",
-  "pro.fb.replan": "¿Vas justo de tiempo o no te encuentras bien? Ajusta el resto del entrenamiento de hoy.",
+  "pro.ft.replan": "Sortear el equipo ocupado",
+  "pro.fb.replan": "¿Equipo ocupado? Haz ese ejercicio más tarde o cámbialo por uno libre, y el resto del plan de hoy se ajusta.",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "Prueba experimentos antes que nadie, como contar repeticiones con la cámara.",
   "pro.locked": "{what}, función Pro: ver Pro",
@@ -193,6 +200,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "pro.ft.cloudConnections": "Strava, Oura, WHOOP et plus",
+  "pro.fb.cloudConnections":
+    "Envoyez vos séances vers Strava et récupérez le sommeil, la récupération, les pesées et les séances de rameur depuis Oura, WHOOP, Withings, Polar et Concept2. Health Connect et Apple Santé restent gratuits.",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "Vous avez Pro",
   "pro.back": "Retour",
@@ -200,7 +210,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.unlocks": "Ce que Pro débloque",
   "pro.youAsked": "Vous avez touché ceci",
   "pro.free":
-    "Gratuit, toujours : le carnet de séances, le calcul des disques, le minuteur de repos et la notification sur l’écran verrouillé, tous les programmes fixes (5×5, 3×5 et plus), vos propres routines, le jumeau santé, « pourquoi ce poids » et les notes du coach.",
+    "Gratuit, toujours : le carnet de séances, le calcul des disques, le minuteur de repos et la notification sur l’écran verrouillé, tous les programmes fixes (5×5, 3×5, corps entier aux haltères et plus), une séance adaptative par semaine, vos propres routines, « Peu de temps », le jumeau santé, Health Connect et Apple Santé, « pourquoi ce poids » et les notes du coach.",
   "pro.ft.adaptive": "Séances adaptatives",
   "pro.fb.adaptive":
     "Chaque jour planifié selon votre récupération, votre matériel et votre bloc d’entraînement, avec décharges et progression intégrées.",
@@ -213,13 +223,13 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.fb.adaptiveSplits": "Des programmes adaptatifs qui planifient chaque jour pour vous.",
   "pro.ft.advancedStats": "Statistiques avancées",
   "pro.fb.advancedStats":
-    "Évolution du max sur une répétition, séries par muscle et par semaine face à votre objectif, et détail par exercice sur le tableau de bord web.",
+    "Évolution du max sur une répétition, séries par muscle et par semaine face à votre objectif, et la direction de chaque exercice, dans l’app et sur le tableau de bord web.",
   "pro.ft.plateauDetective": "Détective de plateaux",
   "pro.fb.plateauDetective": "Quand un exercice stagne, la cause probable et une correction de trois semaines lancée en un geste.",
   "pro.ft.goalPlanner": "Planificateur d’objectifs",
   "pro.fb.goalPlanner": "Choisissez un exercice et une date. Obtenez une prévision honnête et un plan pour le jour du test.",
-  "pro.ft.replan": "Changer le plan en pleine séance",
-  "pro.fb.replan": "Pressé ou pas en forme ? Remodelez la suite de la séance du jour.",
+  "pro.ft.replan": "Contourner le matériel occupé",
+  "pro.fb.replan": "Matériel occupé ? Faites cet exercice plus tard ou passez à un autre qui est libre, et la suite du plan du jour suit.",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "Essayez les expériences en avant-première, comme le comptage des répétitions par caméra.",
   "pro.locked": "{what}, fonction Pro : voir Pro",
@@ -292,6 +302,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "pro.ft.cloudConnections": "Strava, Oura, WHOOP und mehr",
+  "pro.fb.cloudConnections":
+    "Schick deine Trainings an Strava und hol Schlaf, Erholung, Wiegen und Ruder-Einheiten von Oura, WHOOP, Withings, Polar und Concept2. Health Connect und Apple Health bleiben kostenlos.",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "Du hast Pro",
   "pro.back": "Zurück",
@@ -299,7 +312,7 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.unlocks": "Was Pro freischaltet",
   "pro.youAsked": "Darauf hast du getippt",
   "pro.free":
-    "Immer kostenlos: das Trainingsprotokoll, die Scheibenrechnung, der Pausentimer und die Benachrichtigung auf dem Sperrbildschirm, jedes feste Programm (5×5, 3×5 und mehr), deine eigenen Routinen, der Gesundheitszwilling, „Warum dieses Gewicht“ und die Coach-Notizen.",
+    "Immer kostenlos: das Trainingsprotokoll, die Scheibenrechnung, der Pausentimer und die Benachrichtigung auf dem Sperrbildschirm, jedes feste Programm (5×5, 3×5, Ganzkörper mit Kurzhanteln und mehr), ein adaptives Training pro Woche, deine eigenen Routinen, „Wenig Zeit“, der Gesundheitszwilling, Health Connect und Apple Health, „Warum dieses Gewicht“ und die Coach-Notizen.",
   "pro.ft.adaptive": "Adaptive Trainings",
   "pro.fb.adaptive":
     "Jeder Tag geplant nach deiner Erholung, deiner Ausrüstung und deinem Trainingsblock, mit eingebauten Deloads und Progression.",
@@ -311,14 +324,14 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.fb.adaptiveSplits": "Adaptive Splits, die jeden Tag für dich planen.",
   "pro.ft.advancedStats": "Erweiterte Statistiken",
   "pro.fb.advancedStats":
-    "Verlauf des Einwiederholungsmaximums, wöchentliche Sätze pro Muskel im Vergleich zu deinem Ziel und Details zu jeder Übung im Web-Dashboard.",
+    "Verlauf des Einwiederholungsmaximums, wöchentliche Sätze pro Muskel im Vergleich zu deinem Ziel und wohin jede Übung geht, in der App und im Web-Dashboard.",
   "pro.ft.plateauDetective": "Plateau-Detektiv",
   "pro.fb.plateauDetective":
     "Wenn eine Übung stagniert: die wahrscheinliche Ursache und eine dreiwöchige Lösung, die du mit einem Tippen startest.",
   "pro.ft.goalPlanner": "Zielplaner",
   "pro.fb.goalPlanner": "Wähle eine Übung und ein Datum. Du bekommst eine ehrliche Prognose und einen Plan für den Testtag.",
-  "pro.ft.replan": "Plan mitten im Training ändern",
-  "pro.fb.replan": "Wenig Zeit oder nicht in Form? Passe den Rest des heutigen Trainings an.",
+  "pro.ft.replan": "Belegte Geräte umgehen",
+  "pro.fb.replan": "Gerät belegt? Mach die Übung später oder wechsle zu einer freien, und der Rest des heutigen Plans passt sich an.",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "Probiere Experimente früher aus, etwa Wiederholungen per Kamera zählen.",
   "pro.locked": "{what}, eine Pro-Funktion: Pro ansehen",
@@ -389,6 +402,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "pro.ft.cloudConnections": "Strava, Oura, WHOOP e altro",
+  "pro.fb.cloudConnections":
+    "Invia gli allenamenti a Strava e importa sonno, recupero, pesate e sessioni di vogatore da Oura, WHOOP, Withings, Polar e Concept2. Health Connect e Apple Salute restano gratis.",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "Hai Pro",
   "pro.back": "Indietro",
@@ -396,7 +412,7 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.unlocks": "Cosa sblocca Pro",
   "pro.youAsked": "Hai toccato questo",
   "pro.free":
-    "Sempre gratis: il registro degli allenamenti, il calcolo dei dischi, il timer di riposo e la notifica sulla schermata di blocco, ogni programma fisso (5×5, 3×5 e altri), le tue routine, il gemello della salute, «perché questo peso» e le note del coach.",
+    "Sempre gratis: il registro degli allenamenti, il calcolo dei dischi, il timer di riposo e la notifica sulla schermata di blocco, ogni programma fisso (5×5, 3×5, total body con manubri e altri), un allenamento adattivo a settimana, le tue routine, «Poco tempo», il gemello della salute, Health Connect e Apple Salute, «perché questo peso» e le note del coach.",
   "pro.ft.adaptive": "Allenamenti adattivi",
   "pro.fb.adaptive":
     "Ogni giorno pianificato in base a recupero, attrezzatura e blocco di allenamento, con scarichi e progressione già inclusi.",
@@ -409,13 +425,13 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.fb.adaptiveSplits": "Divisioni adattive che pianificano ogni giorno per te.",
   "pro.ft.advancedStats": "Statistiche avanzate",
   "pro.fb.advancedStats":
-    "Andamento del massimale, serie settimanali per muscolo rispetto al tuo obiettivo e dettagli per esercizio nella dashboard web.",
+    "Andamento del massimale, serie settimanali per muscolo rispetto al tuo obiettivo e la direzione di ogni esercizio, nell’app e nella dashboard web.",
   "pro.ft.plateauDetective": "Detective degli stalli",
   "pro.fb.plateauDetective": "Quando un esercizio si blocca: la causa probabile e una soluzione di tre settimane da avviare con un tocco.",
   "pro.ft.goalPlanner": "Pianificatore di obiettivi",
   "pro.fb.goalPlanner": "Scegli un esercizio e una data. Ricevi una previsione onesta e un piano per il giorno del test.",
-  "pro.ft.replan": "Cambia il piano a metà allenamento",
-  "pro.fb.replan": "Poco tempo o non in forma? Rimodella il resto dell’allenamento di oggi.",
+  "pro.ft.replan": "Aggirare l’attrezzatura occupata",
+  "pro.fb.replan": "Attrezzo occupato? Fai quell’esercizio più tardi o passa a uno libero, e il resto del piano di oggi si adegua.",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "Prova in anteprima gli esperimenti, come il conteggio delle ripetizioni con la fotocamera.",
   "pro.locked": "{what}, una funzione Pro: scopri Pro",
@@ -485,6 +501,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "pro.ft.cloudConnections": "Strava、Oura、WHOOP など",
+  "pro.fb.cloudConnections":
+    "ワークアウトを Strava に送り、Oura、WHOOP、Withings、Polar、Concept2 から睡眠、回復、体重、ローイングを取り込みます。Health Connect と Apple ヘルスケアは引き続き無料です。",
   "pro.title": "Liftsmith Pro",
   "pro.youHave": "Pro をご利用中です",
   "pro.back": "戻る",
@@ -492,7 +511,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.unlocks": "Pro で使えるようになる機能",
   "pro.youAsked": "タップした機能",
   "pro.free":
-    "ずっと無料：ワークアウトの記録、プレート計算、休憩タイマーとロック画面の通知、すべての固定プログラム（5×5、3×5 など）、自分のルーティン、ヘルスツイン、「この重量の理由」、コーチのメモ。",
+    "ずっと無料：ワークアウトの記録、プレート計算、休憩タイマーとロック画面の通知、すべての固定プログラム（5×5、3×5、ダンベル全身など）、週1回のアダプティブワークアウト、自分のルーティン、「時間がない」、ヘルスツイン、Health Connect と Apple ヘルスケア、「この重量の理由」、コーチのメモ。",
   "pro.ft.adaptive": "アダプティブなワークアウト",
   "pro.fb.adaptive": "回復状態、器具、トレーニングブロックから毎日のメニューを組み立て、ディロードと漸進的な負荷アップも組み込みます。",
   "pro.ft.healthReadiness": "ヘルスデータにもとづく攻める日・軽めの日の判断",
@@ -502,13 +521,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.ft.adaptiveSplits": "プッシュ／プル／レッグと上半身／下半身の分割法",
   "pro.fb.adaptiveSplits": "毎日のメニューを自動で組むアダプティブな分割法です。",
   "pro.ft.advancedStats": "詳細な統計",
-  "pro.fb.advancedStats": "1RM の推移、目標に対する部位別の週間セット数、ウェブダッシュボードでの種目ごとの詳細。",
+  "pro.fb.advancedStats": "1RM の推移、目標に対する部位別の週間セット数、各種目の伸び具合を、アプリとウェブダッシュボードで。",
   "pro.ft.plateauDetective": "停滞ディテクティブ",
   "pro.fb.plateauDetective": "種目が停滞したら、考えられる原因と、ワンタップで始められる3週間の改善プランを示します。",
   "pro.ft.goalPlanner": "目標プランナー",
   "pro.fb.goalPlanner": "種目と日付を決めると、正直な予測とテスト当日のプランが届きます。",
-  "pro.ft.replan": "ワークアウト中にプランを変更",
-  "pro.fb.replan": "時間がない、調子が出ない、そんなときは今日の残りのメニューを組み直せます。",
+  "pro.ft.replan": "使用中の器具をよけてプランを調整",
+  "pro.fb.replan": "器具が使用中なら、その種目を後回しにするか空いている種目に替えると、今日の残りのプランもそれに合わせて変わります。",
   "pro.ft.labs": "Labs",
   "pro.fb.labs": "カメラでのレップカウントなど、試験中の機能を先に試せます。",
   "pro.locked": "{what}（Pro の機能）：Pro を見る",
