@@ -207,6 +207,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Public pages and SEO](docs/decisions/public-pages-and-seo.md) (`src/lib/seo.ts`, `src/app/sitemap.ts`, `plates.ts`, `onerm.ts`)
 - [Reminders and lifecycle messages](docs/decisions/reminders-and-lifecycle-messages.md) (`src/lib/messages.ts`, `src/lib/reminders.ts`, `src/server/reminders.ts`, `MessageSettings.tsx`)
 - [Saving and backup](docs/decisions/saving-and-backup.md) (`Saving.tsx`, `src/lib/saving.ts`, `src/lib/backup.ts`)
+- [Set timer for holds, carries and hangs](docs/decisions/set-timer.md) (`src/lib/setTimer.ts`, `workout/SetTimer.tsx`)
 - [Settings screen](docs/decisions/settings-screen.md) (`src/components/app/Settings.tsx`, `CalendarSettings.tsx`, `TrainingSettings.tsx`, `DelightSettings.tsx`)
 - [Setup wizard](docs/decisions/setup-wizard.md) (`src/components/app/Onboarding.tsx`)
 - [Sharing](docs/decisions/sharing.md) (`ShareSheet.tsx`, `src/lib/shareCards.ts`, `shareImage.ts`, `src/components/demo/still.ts`)
