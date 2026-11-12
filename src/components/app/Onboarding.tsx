@@ -32,7 +32,7 @@ import { NearbyGyms } from "./NearbyGyms";
 import { Plans, ProFeatures } from "./Pro";
 import { go } from "./router";
 import { SaveStep } from "./Saving";
-import { BumpField, Button } from "./ui";
+import { BumpField, Button, InlineSwitch } from "./ui";
 import { Welcome } from "./Welcome";
 
 function Tile({ title, blurb, active, onClick }: { title: string; blurb?: string; active: boolean; onClick: () => void }) {
@@ -651,18 +651,14 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
               </p>
             )}
             {notify === false && <p className="mt-3 text-sm text-warn">{t("setup.notify.blocked")}</p>}
-            <label className="card mt-3 flex items-start gap-3 p-4">
-              <input
-                type="checkbox"
-                className="mt-1 h-5 w-5 accent-[var(--color-accent)]"
-                checked={stats}
-                onChange={(e) => setStats(e.target.checked)}
+            <div className="card mt-3 p-4">
+              <InlineSwitch
+                label={<span className="font-semibold">{t("setup.stats.title")}</span>}
+                hint={t("setup.stats.note")}
+                on={stats}
+                onChange={setStats}
               />
-              <span>
-                <span className="block font-semibold">{t("setup.stats.title")}</span>
-                <span className="block text-sm text-muted">{t("setup.stats.note")}</span>
-              </span>
-            </label>
+            </div>
           </>
         )}
         {cur === "save" && <SaveStep />}

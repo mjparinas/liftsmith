@@ -52,7 +52,15 @@ export function Recap({ arg }: { arg?: string }) {
           : t("recap.workouts", { count: r.workouts }),
     },
     { k: "volume", big: fmtTonnage(r.volumeKg, unit), small: r.likeA ? t("recap.liftedLike", { thing: r.likeA }) : t("recap.lifted") },
-    { k: "sets", big: num(r.sets), small: t("recap.sets", { reps: num(r.reps), hours: num(hours) }) },
+    {
+      k: "sets",
+      big: num(r.sets),
+      // Under an hour in all reads in minutes ("in 6 min"), never "in 0 hours".
+      small:
+        r.seconds < 3600
+          ? t("recap.setsMin", { reps: num(r.reps), min: num(Math.max(1, Math.round(r.seconds / 60))) })
+          : t("recap.sets", { reps: num(r.reps), hours: num(hours) }),
+    },
   ];
   if (r.prs.length)
     cards.push({

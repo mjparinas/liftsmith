@@ -28,3 +28,4 @@ Melvin asked for these after a check against the table stakes of other lifting a
 ## Plate and warm-up calculators
 
 In [Tools](tools-tdee-calculator.md); recorded there.
+- **Log a past workout without typing** (polish pass, 2026-11-12): the day is a chip (Today, Yesterday, 2 days ago, or Earlier, which opens the phone's date picker) and the start time a − / + stepper in quarter hours, replacing the typed date-and-time box.

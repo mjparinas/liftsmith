@@ -6,7 +6,6 @@ import type { Message } from "@/lib/i18n";
 export const en = {
   "past.intro":
     "Forgot to track a workout, or trained without your phone? Add it here and it counts towards your stats, PRs, streak and next workouts.",
-  "past.started": "Started",
   "past.length": "Length (minutes)",
   "past.remove": "Remove",
   "past.set": "Set",
@@ -33,6 +32,11 @@ export const en = {
   "past.err.many": "That’s more than 200 sets.",
   "past.title": "Log a past workout",
   "past.saved": "Workout saved",
+  "past.day": "Day",
+  "past.earlier": "Earlier",
+  "past.at": "Start time",
+  "past.earlierTime": "Earlier start",
+  "past.laterTime": "Later start",
 } as const;
 
 type Key = keyof typeof en;
@@ -40,7 +44,6 @@ type Key = keyof typeof en;
 export const es: Partial<Record<Key, Message>> = {
   "past.intro":
     "¿Olvidaste registrar un entrenamiento o entrenaste sin el teléfono? Añádelo aquí y contará para tus estadísticas, récords, racha y próximos entrenamientos.",
-  "past.started": "Empezó",
   "past.length": "Duración (minutos)",
   "past.remove": "Quitar",
   "past.set": "Serie",
@@ -67,12 +70,16 @@ export const es: Partial<Record<Key, Message>> = {
   "past.err.many": "Son más de 200 series.",
   "past.title": "Registrar un entrenamiento pasado",
   "past.saved": "Entrenamiento guardado",
+  "past.day": "Día",
+  "past.earlier": "Antes",
+  "past.at": "Hora de inicio",
+  "past.earlierTime": "Empezar antes",
+  "past.laterTime": "Empezar más tarde",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "past.intro":
     "Vous avez oublié d’enregistrer une séance, ou vous vous êtes entraîné sans téléphone ? Ajoutez-la ici : elle compte pour vos stats, records, série et prochaines séances.",
-  "past.started": "Début",
   "past.length": "Durée (minutes)",
   "past.remove": "Retirer",
   "past.set": "Série",
@@ -99,12 +106,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "past.err.many": "Cela fait plus de 200 séries.",
   "past.title": "Ajouter une séance passée",
   "past.saved": "Séance enregistrée",
+  "past.day": "Jour",
+  "past.earlier": "Plus tôt",
+  "past.at": "Heure de début",
+  "past.earlierTime": "Commencer plus tôt",
+  "past.laterTime": "Commencer plus tard",
 };
 
 export const de: Partial<Record<Key, Message>> = {
   "past.intro":
     "Ein Training vergessen oder ohne Telefon trainiert? Trag es hier nach, dann zählt es für deine Statistiken, PRs, Serie und nächsten Trainings.",
-  "past.started": "Begonnen",
   "past.length": "Dauer (Minuten)",
   "past.remove": "Entfernen",
   "past.set": "Satz",
@@ -131,12 +142,16 @@ export const de: Partial<Record<Key, Message>> = {
   "past.err.many": "Das sind mehr als 200 Sätze.",
   "past.title": "Vergangenes Training eintragen",
   "past.saved": "Training gespeichert",
+  "past.day": "Tag",
+  "past.earlier": "Früher",
+  "past.at": "Startzeit",
+  "past.earlierTime": "Früher starten",
+  "past.laterTime": "Später starten",
 };
 
 export const it: Partial<Record<Key, Message>> = {
   "past.intro":
     "Hai dimenticato di registrare un allenamento, o ti sei allenato senza telefono? Aggiungilo qui e conterà per statistiche, record, serie e prossimi allenamenti.",
-  "past.started": "Iniziato",
   "past.length": "Durata (minuti)",
   "past.remove": "Rimuovi",
   "past.set": "Serie",
@@ -163,12 +178,16 @@ export const it: Partial<Record<Key, Message>> = {
   "past.err.many": "Sono più di 200 serie.",
   "past.title": "Registra un allenamento passato",
   "past.saved": "Allenamento salvato",
+  "past.day": "Giorno",
+  "past.earlier": "Prima",
+  "past.at": "Ora di inizio",
+  "past.earlierTime": "Inizio prima",
+  "past.laterTime": "Inizio dopo",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
   "past.intro":
     "記録し忘れたり、スマホなしでトレーニングしたりしましたか？ここで追加すれば、統計、自己ベスト、連続記録、次のワークアウトに反映されます。",
-  "past.started": "開始",
   "past.length": "時間（分）",
   "past.remove": "削除",
   "past.set": "セット",
@@ -195,4 +214,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "past.err.many": "200セットを超えています。",
   "past.title": "過去のワークアウトを記録",
   "past.saved": "ワークアウトを保存しました",
+  "past.day": "日付",
+  "past.earlier": "それ以前",
+  "past.at": "開始時刻",
+  "past.earlierTime": "開始を早める",
+  "past.laterTime": "開始を遅らせる",
 };

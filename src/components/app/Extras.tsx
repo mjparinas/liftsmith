@@ -10,14 +10,14 @@ import { checkinText, shareText } from "@/lib/buddy";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
 import { date, t as tr } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
-import { doneMoments, fmtTonnage, todayMoments, tonnage, type Moment } from "@/lib/moments";
+import { doneMoments, todayMoments, tonnage, type Moment } from "@/lib/moments";
 import { suggestedPeriod } from "@/lib/recap";
 import { nextSeasonal, seasonalChallenges } from "@/lib/seasonal";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength, twins } from "@/lib/strength";
 import { newlyUnlocked, unlockContext } from "@/lib/themes";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
-import { fmtNum, fromKg } from "@/lib/units";
+import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
@@ -25,7 +25,7 @@ import { openStats } from "./BodyStats";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { RoutinesSheet } from "./Routines";
-import { Button, Section, Sheet } from "./ui";
+import { Badge, Button, InlineSwitch, Section, Sheet } from "./ui";
 
 /** Lean mode (Settings › Celebrations): no extra pop-ups. */
 export function lean(p: { lean?: boolean }): boolean {
@@ -177,8 +177,9 @@ export function PlanExtras() {
           type="button"
           aria-pressed={repeating}
           onClick={toggleRepeat}
-          className={`press min-h-11 rounded-full border px-3.5 ${repeating ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
+          className={`press inline-flex min-h-11 items-center gap-1.5 rounded-full border px-3.5 ${repeating ? "border-accent bg-accent/15" : "border-line bg-surface text-muted"}`}
         >
+          <Icon name={repeating ? "check" : "repeat"} size={15} />
           {repeating ? tr("x.sameOn") : tr("x.sameOff")}
         </button>
       )}
@@ -201,16 +202,18 @@ export function PlanExtras() {
             haptic("tick");
             go("stretch", "warmup");
           }}
-          className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted"
+          className="press inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-muted"
         >
+          <Icon name="stretch" size={15} />
           {tr("x.warmUp")}
         </button>
       )}
       <button
         type="button"
         onClick={() => setBuddyOpen(true)}
-        className="press min-h-11 rounded-full border border-line bg-surface px-3.5 text-muted"
+        className="press inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-muted"
       >
+        <Icon name="chat" size={15} />
         {tr("x.checkIn")}
       </button>
       <RoutinesSheet open={routinesOpen} onClose={() => setRoutinesOpen(false)} />
@@ -336,10 +339,8 @@ export function TonnageCard() {
   return (
     <>
       <div className="card mt-3 p-4">
-        <div className="flex items-baseline justify-between gap-3">
-          <span className="text-xs uppercase tracking-wider text-faint">{tr("x.total")}</span>
-          <span className="num text-2xl font-bold">{fmtTonnage(stats.totalVolume, profile.unit)}</span>
-        </div>
+        {/* The total itself is the Volume tile above it, in the same units (fmtVolume); this card says what it's like. */}
+        <span className="text-xs uppercase tracking-wider text-faint">{tr("x.total")}</span>
         <p className="mt-1 text-sm text-muted">
           {t.last ? tr("x.moreThan", { emoji: t.last.emoji, name: t.last.name }) : tr("x.firstMilestone")}
         </p>
@@ -349,7 +350,7 @@ export function TonnageCard() {
               <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${t.progress * 100}%` }} />
             </div>
             <p className="num mt-1.5 text-xs text-faint">
-              {tr("x.toGo", { left: fmtTonnage(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}
+              {tr("x.toGo", { left: fmtVolume(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}
             </p>
           </>
         )}
@@ -360,17 +361,13 @@ export function TonnageCard() {
           onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)}
           className="press card p-4 text-left"
         >
-          <span className="block text-2xl" aria-hidden>
-            {p.kind === "year" ? "🏆" : "📅"}
-          </span>
-          <span className="mt-1 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
+          <Badge icon={p.kind === "year" ? "trophy" : "calendar"} tint="var(--color-violet)" />
+          <span className="mt-2 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
           <span className="block text-xs text-muted">{tr("x.highlights")}</span>
         </button>
         <button type="button" onClick={() => go("photos")} className="press card p-4 text-left">
-          <span className="block text-2xl" aria-hidden>
-            📸
-          </span>
-          <span className="mt-1 block font-semibold">{tr("x.photos")}</span>
+          <Badge icon="camera" tint="var(--color-cyan)" />
+          <span className="mt-2 block font-semibold">{tr("x.photos")}</span>
           <span className="block text-xs text-muted">{tr("x.private")}</span>
         </button>
       </div>
@@ -412,15 +409,12 @@ export function StrengthCard() {
           ))}
         </ul>
         {p.birthYear ? (
-          <label className="mt-4 flex items-center gap-3 text-sm">
-            <input
-              type="checkbox"
-              checked={adjustAge}
-              onChange={(e) => setProfile({ delight: { ...profile.delight, ageAdjust: e.target.checked } })}
-              className="h-5 w-5 accent-[var(--color-accent)]"
-            />
-            {tr("x.adjustAge")}
-          </label>
+          <InlineSwitch
+            className="mt-3 text-sm"
+            label={tr("x.adjustAge")}
+            on={adjustAge}
+            onChange={(v) => setProfile({ delight: { ...profile.delight, ageAdjust: v } })}
+          />
         ) : (
           <button type="button" onClick={openStats} className="press mt-3 min-h-11 text-left text-sm font-semibold text-accent">
             {tr("x.addBirth")} ›

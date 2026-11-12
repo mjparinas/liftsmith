@@ -10,7 +10,7 @@ import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 
 import { go } from "./router";
-import { Button, Chip, ScreenHeader, Section } from "./ui";
+import { Button, Chip, InlineSwitch, ScreenHeader, Section } from "./ui";
 
 const KINDS: FeedbackKind[] = ["bug", "idea", "other"];
 
@@ -106,15 +106,7 @@ export function Feedback() {
         )}
       </Section>
       <Section title={t("fb.device")}>
-        <label className="flex min-h-11 items-center gap-3">
-          <input
-            type="checkbox"
-            checked={includeDiag}
-            onChange={(e) => setIncludeDiag(e.target.checked)}
-            className="size-5 accent-[var(--color-accent)]"
-          />
-          <span>{t("fb.include")}</span>
-        </label>
+        <InlineSwitch label={t("fb.include")} on={includeDiag} onChange={setIncludeDiag} />
         <button type="button" onClick={() => setShowDiag(!showDiag)} className="press mt-1 min-h-11 text-sm text-muted underline">
           {showDiag ? t("fb.hide") : t("fb.see")}
         </button>

@@ -882,6 +882,39 @@ export function SwitchRow({
   );
 }
 
+/**
+ * An on/off choice inside a card or sheet (no card of its own, unlike SwitchRow): the words, then the switch.
+ * Replaces the plain checkboxes that were left for on/off choices (polish pass, 2026-11-12).
+ */
+export function InlineSwitch({
+  label,
+  hint,
+  on,
+  onChange,
+  className = "",
+}: {
+  label: ReactNode;
+  hint?: ReactNode;
+  on: boolean;
+  onChange: (v: boolean) => void;
+  className?: string;
+}) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className={`flex min-h-11 items-center justify-between gap-4 ${className}`}>
+      <div className="min-w-0">
+        <p id={`${id}-l`}>{label}</p>
+        {hint && (
+          <p id={`${id}-d`} className="mt-0.5 text-sm text-muted">
+            {hint}
+          </p>
+        )}
+      </div>
+      <Switch on={on} onChange={onChange} labelledBy={`${id}-l`} describedBy={hint ? `${id}-d` : undefined} />
+    </div>
+  );
+}
+
 /** A placeholder line or block that shimmers while content loads. */
 export function Skeleton({ className = "" }: { className?: string }) {
   return <div className={`skeleton rounded-xl ${className}`} aria-hidden />;

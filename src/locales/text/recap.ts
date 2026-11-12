@@ -40,6 +40,7 @@ export const en = {
   "recap.card.day": "Favourite day: {day}",
   "recap.shareYear": "Share my year",
   "recap.shareMonth": "Share my month",
+  "recap.setsMin": "sets and {reps} reps in {min} min",
 } as const;
 
 type Key = keyof typeof en;
@@ -81,6 +82,7 @@ export const es: Partial<Record<Key, Message>> = {
   "recap.card.day": "Día favorito: {day}",
   "recap.shareYear": "Compartir mi año",
   "recap.shareMonth": "Compartir mi mes",
+  "recap.setsMin": "series y {reps} repeticiones en {min} min",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -120,6 +122,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "recap.card.day": "Jour préféré : {day}",
   "recap.shareYear": "Partager mon année",
   "recap.shareMonth": "Partager mon mois",
+  "recap.setsMin": "séries et {reps} répétitions en {min} min",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -159,6 +162,7 @@ export const de: Partial<Record<Key, Message>> = {
   "recap.card.day": "Lieblingstag: {day}",
   "recap.shareYear": "Mein Jahr teilen",
   "recap.shareMonth": "Meinen Monat teilen",
+  "recap.setsMin": "Sätze und {reps} Wiederholungen in {min} Min.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -198,6 +202,7 @@ export const it: Partial<Record<Key, Message>> = {
   "recap.card.day": "Giorno preferito: {day}",
   "recap.shareYear": "Condividi il mio anno",
   "recap.shareMonth": "Condividi il mio mese",
+  "recap.setsMin": "serie e {reps} ripetizioni in {min} min",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -234,4 +239,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "recap.card.day": "お気に入りの曜日：{day}",
   "recap.shareYear": "1年を共有",
   "recap.shareMonth": "1か月を共有",
+  "recap.setsMin": "セット、{min}分で{reps}レップ",
 };

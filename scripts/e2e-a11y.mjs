@@ -73,7 +73,7 @@ try {
   await page.getByTestId("done-today").waitFor();
   await scan("done for today");
   await page.getByRole("button", { name: "Train again" }).click();
-  await page.getByRole("button", { name: "🔥 Warm up first" }).click();
+  await page.getByRole("button", { name: "Warm up first" }).click();
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
