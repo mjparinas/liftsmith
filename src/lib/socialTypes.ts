@@ -13,6 +13,17 @@ export interface PostExercise {
   r: number;
   /** Metres, for cardio logged with distance. */
   d?: number;
+  /** Every set in order (weights null while the poster hides them), for the whole-workout view. Older posts have none. */
+  log?: PostSet[];
+  /** A new best (estimated one-rep max) on this exercise in this workout. */
+  pr?: boolean;
+}
+
+/** One set in a posted workout: kilograms (or null), reps or seconds, and metres for cardio. */
+export interface PostSet {
+  w: number | null;
+  r: number;
+  d?: number;
 }
 
 /**
@@ -192,9 +203,11 @@ export interface FeedComment {
   mine: boolean;
   /** The reader may delete it: their own comment, or any comment on their own post. */
   canDelete: boolean;
+  /** For a reply, the top comment it answers (replies sit one level deep). */
+  replyTo?: string;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
@@ -231,6 +244,8 @@ export const SOCIAL_LIMITS = {
   /** Clubs one lifter can be in. */
   clubsEach: 10,
   exercises: 20,
+  /** Sets kept per exercise in a post's log. */
+  setsEach: 30,
   muscles: 6,
   /** People suggested at once, and search results. */
   suggestions: 20,

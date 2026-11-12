@@ -30,6 +30,7 @@ import {
   type PersonRow,
   type PostBody,
   type PostExercise,
+  type PostSet,
   type Relation,
   type ReportKind,
   type ShowcaseLift,
@@ -311,6 +312,9 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
   const a = [accountId];
   const mine = "SELECT id FROM posts WHERE account_id = ?";
   return [
+    { sql: `DELETE FROM comment_mentions WHERE post_id IN (${mine})`, args: a },
+    { sql: "DELETE FROM comment_mentions WHERE comment_id IN (SELECT id FROM post_comments WHERE account_id = ?)", args: a },
+    { sql: "DELETE FROM comment_mentions WHERE account_id = ?", args: a },
     { sql: `DELETE FROM post_likes WHERE post_id IN (${mine})`, args: a },
     { sql: `DELETE FROM post_comments WHERE post_id IN (${mine})`, args: a },
     { sql: `DELETE FROM post_partners WHERE post_id IN (${mine})`, args: a },
@@ -729,6 +733,21 @@ const num = (v: unknown, max: number) => {
   return Number.isFinite(x) && x >= 0 && x <= max ? x : null;
 };
 
+/** Each set of an exercise, checked: kilograms (dropped when the post hides weights), reps or seconds, metres. */
+export function parseLog(v: unknown, weights: boolean): PostSet[] {
+  const out: PostSet[] = [];
+  for (const raw of (Array.isArray(v) ? v : []).slice(0, SOCIAL_LIMITS.setsEach)) {
+    if (!raw || typeof raw !== "object") continue;
+    const e = raw as Record<string, unknown>;
+    const r = num(e.r, 100_000);
+    if (r == null) continue;
+    const w = weights && e.w != null ? num(e.w, 2_000) : null;
+    const d = e.d == null ? undefined : (num(e.d, 1_000_000) ?? undefined);
+    out.push({ w: w == null ? null : Math.round(w * 100) / 100, r: Math.round(r), ...(d ? { d: Math.round(d) } : {}) });
+  }
+  return out;
+}
+
 /** Checks a workout someone wants to post. Only the summary fields are kept; anything else is dropped. */
 export function parsePost(
   v: unknown,
@@ -763,7 +782,17 @@ export function parsePost(
     if (r == null || setCount == null) continue;
     const kg = e.w == null ? null : num(e.w, 2_000);
     const d = e.d == null ? undefined : (num(e.d, 1_000_000) ?? undefined);
-    exercises.push({ id, name: name.ok ? name.text : "", sets: Math.round(setCount), w: kg, r: Math.round(r), ...(d ? { d } : {}) });
+    const log = parseLog(e.log, kg !== null);
+    exercises.push({
+      id,
+      name: name.ok ? name.text : "",
+      sets: Math.round(setCount),
+      w: kg,
+      r: Math.round(r),
+      ...(d ? { d } : {}),
+      ...(log.length ? { log } : {}),
+      ...(e.pr === true ? { pr: true } : {}),
+    });
   }
   if (!exercises.length) return { error: "empty" };
   const caption = parseCaption(b.caption);
@@ -1051,7 +1080,7 @@ export async function thread(accountId: string, b: Record<string, unknown>): Pro
   ]);
   const rows = await query(
     `SELECT c.id AS id, c.account_id AS author, c.created_at AS at, c.body AS body, sp.handle AS handle, sp.name AS name,
-       sp.avatar AS avatar
+       sp.avatar AS avatar, c.reply_to AS reply_to
      FROM post_comments c JOIN social_profiles sp ON sp.account_id = c.account_id
      WHERE c.post_id = ? AND c.hidden = 0 AND sp.suspended = 0
        AND c.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
@@ -1068,6 +1097,7 @@ export async function thread(accountId: string, b: Record<string, unknown>): Pro
     body: s(r.body),
     mine: s(r.author) === accountId,
     canDelete: s(r.author) === accountId || vis.author === accountId,
+    ...(s(r.reply_to) ? { replyTo: s(r.reply_to) } : {}),
   }));
   const one = row ? toPost(accountId, row) : null;
   return ok({ post: one ? (await withPartners(accountId, [one]))[0] : null, comments });
@@ -1089,25 +1119,74 @@ export async function like(accountId: string, b: Record<string, unknown>, now = 
   return ok({ likes: n(c?.n), liked: b.on !== false });
 }
 
+/** The handles named with @ in a comment, at most five, each once. */
+export function mentionsIn(text: string): string[] {
+  const out: string[] = [];
+  for (const m of text.matchAll(/(?:^|[^\w@])@([a-z0-9_]{3,20})(?![\w])/gi)) {
+    const h = m[1]!.toLowerCase();
+    if (!out.includes(h)) out.push(h);
+    if (out.length === 5) break;
+  }
+  return out;
+}
+
+/**
+ * Adds a comment, or (with `replyTo`) a reply to a comment on the same post. Replies sit one level deep: a reply
+ * to a reply joins the same top comment. People named with @handle who may see the post get an Activity line and
+ * a push; so does the author of the comment replied to. Nobody is told twice about one comment.
+ */
 export async function comment(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
   if (n(mine.suspended)) return fail(403, "suspended");
   const id = s(b.id);
-  if (!(await visiblePost(accountId, id))) return fail(404, "gone");
+  const post = await visiblePost(accountId, id);
+  if (!post) return fail(404, "gone");
   const text = checkText(b.text, SOCIAL_LIMITS.comment);
   if (!text.ok) return fail(400, `comment.${text.error}`);
+  let replyTo = "";
+  let parentAuthor = "";
+  if (b.replyTo) {
+    const [parent] = await query(
+      `SELECT c.id AS id, c.reply_to AS reply_to, c.account_id AS author FROM post_comments c
+       JOIN social_profiles sp ON sp.account_id = c.account_id
+       WHERE c.id = ? AND c.post_id = ? AND c.hidden = 0 AND sp.suspended = 0`,
+      [s(b.replyTo), id],
+    );
+    if (!parent || (await blockedEither(accountId, s(parent.author)))) return fail(404, "gone");
+    replyTo = s(parent.reply_to) || s(parent.id);
+    parentAuthor = s(parent.author);
+  }
   if (!(await limit(accountId, "comment", now))) return fail(429, "slow");
   const cid = newId();
-  await run("INSERT INTO post_comments (id, post_id, account_id, created_at, body, hidden) VALUES (?, ?, ?, ?, ?, 0)", [
+  await run("INSERT INTO post_comments (id, post_id, account_id, created_at, body, hidden, reply_to) VALUES (?, ?, ?, ?, ?, 0, ?)", [
     cid,
     id,
     accountId,
     now,
     text.text,
+    replyTo,
   ]);
-  const post = await visiblePost(accountId, id);
-  if (post) await notify(post.author, accountId, "comment", { text: text.text });
+  const told = new Set([accountId]);
+  if (!told.has(post.author)) {
+    told.add(post.author);
+    await notify(post.author, accountId, "comment", { text: text.text });
+  }
+  for (const h of mentionsIn(text.text)) {
+    const p = await byHandle(h);
+    const them = p ? s(p.account_id) : "";
+    if (!p || told.has(them) || n(p.suspended) || (await blockedEither(accountId, them)) || !(await visiblePost(them, id))) continue;
+    told.add(them);
+    await run("INSERT OR IGNORE INTO comment_mentions (comment_id, post_id, account_id, created_at) VALUES (?, ?, ?, ?)", [
+      cid,
+      id,
+      them,
+      now,
+    ]);
+    await notify(them, accountId, "mention", { text: text.text });
+  }
+  if (parentAuthor && !told.has(parentAuthor) && (await visiblePost(parentAuthor, id)))
+    await notify(parentAuthor, accountId, "reply", { text: text.text });
   return ok({
     comment: {
       id: cid,
@@ -1118,17 +1197,34 @@ export async function comment(accountId: string, b: Record<string, unknown>, now
       body: text.text,
       mine: true,
       canDelete: true,
+      ...(replyTo ? { replyTo } : {}),
     },
   });
 }
 
+/** Who liked a post the lifter may see, newest first, without anyone blocked either way. */
+export async function likers(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const id = s(b.id);
+  if (!(await visiblePost(accountId, id))) return fail(404, "gone");
+  const rows = await query(
+    `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar FROM post_likes l
+     JOIN social_profiles sp ON sp.account_id = l.account_id
+     WHERE l.post_id = ?1 AND sp.suspended = 0 AND ${NOT_BLOCKED("sp.account_id", "?2")}
+     ORDER BY l.created_at DESC LIMIT 500`,
+    [id, accountId],
+  );
+  return ok({ people: rows.map(toRow) });
+}
+
 /** Deletes a comment: the lifter's own, or any comment on their own post. */
 export async function uncomment(accountId: string, b: Record<string, unknown>): Promise<Result> {
-  await run(`DELETE FROM post_comments WHERE id = ? AND (account_id = ? OR post_id IN (SELECT id FROM posts WHERE account_id = ?))`, [
-    s(b.id),
-    accountId,
-    accountId,
-  ]);
+  const gone = await run(
+    `DELETE FROM post_comments WHERE id = ? AND (account_id = ? OR post_id IN (SELECT id FROM posts WHERE account_id = ?))`,
+    [s(b.id), accountId, accountId],
+  );
+  if (gone) await run("DELETE FROM comment_mentions WHERE comment_id = ?", [s(b.id)]);
   return ok();
 }
 
@@ -1150,6 +1246,14 @@ const ACTIVITY = `
   UNION ALL
   SELECT 'tag', p.account_id, pp.created_at, p.id, NULL
     FROM post_partners pp JOIN posts p ON p.id = pp.post_id WHERE pp.account_id = ?1 AND p.hidden = 0
+  UNION ALL
+  SELECT 'mention', c.account_id, m.created_at, m.post_id, c.body
+    FROM comment_mentions m JOIN post_comments c ON c.id = m.comment_id WHERE m.account_id = ?1 AND c.hidden = 0
+  UNION ALL
+  SELECT 'reply', c.account_id, c.created_at, c.post_id, c.body
+    FROM post_comments c JOIN post_comments pc ON pc.id = c.reply_to JOIN posts p ON p.id = c.post_id
+    WHERE pc.account_id = ?1 AND c.account_id != ?1 AND p.account_id != ?1 AND c.hidden = 0
+      AND NOT EXISTS (SELECT 1 FROM comment_mentions m WHERE m.comment_id = c.id AND m.account_id = ?1)
   UNION ALL
   SELECT 'challenge', c.owner_id, cm.created_at, NULL, c.name
     FROM challenge_members cm JOIN challenges c ON c.id = cm.challenge_id
@@ -1678,6 +1782,7 @@ export const OPS: Record<string, Op> = {
   suggest: (a) => suggest(a),
   unsuggest,
   personPeople: (a, b) => personPeople(a, b),
+  likers: (a, b) => likers(a, b),
   follow: followOp,
   unfollow: (a, b) => unfollow(a, b),
   answer: (a, b) => answer(a, b),

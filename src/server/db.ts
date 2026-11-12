@@ -546,6 +546,15 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // People named with @handle in a comment who could see the post (social.ts comment), for their Activity.
+  `CREATE TABLE IF NOT EXISTS comment_mentions (
+    comment_id TEXT NOT NULL,
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (comment_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS comment_mentions_account ON comment_mentions (account_id, created_at)`,
   // Suggestions the lifter dismissed (social.ts `suggest`): that person isn't suggested to them again.
   `CREATE TABLE IF NOT EXISTS suggest_hides (
     account_id TEXT NOT NULL,
@@ -627,6 +636,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "suggest", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "level", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "streak", "INTEGER NOT NULL DEFAULT 0"],
+  // Friends gap list 2: a reply's top comment ('' for a comment on the post itself).
+  ["post_comments", "reply_to", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 let client: Client | null = null;

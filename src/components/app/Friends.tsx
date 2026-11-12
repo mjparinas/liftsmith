@@ -32,7 +32,6 @@ import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   bestLifts,
-  postRoutineCode,
   postWorkout,
   profileChanges,
   profileUrl,
@@ -61,7 +60,6 @@ import {
   type ClubDetail,
   type ClubPreview,
   type ClubSummary,
-  type FeedComment,
   type FeedPost,
   type Inviter,
   type Partner,
@@ -79,9 +77,11 @@ import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { Avatar } from "./AvatarFace";
+import { CommentsSheet, LikersSheet } from "./Comments";
 import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { Icon } from "./icons";
+import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
@@ -281,7 +281,8 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
   const [reporting, setReporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const routine = postRoutineCode(post);
+  const [detail, setDetail] = useState(false);
+  const [likers, setLikers] = useState(false);
   const edit = async (v: ComposeValue) => {
     try {
       const r = await social<{ caption: string; audience: Audience; partners: Partner[] }>("editPost", { id: post.id, ...v });
@@ -366,17 +367,26 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           </div>
         ))}
       </dl>
-      <ul className="mt-3 space-y-1 text-sm">
-        {b.exercises.slice(0, 5).map((e) => (
-          <li key={e.id} className="flex justify-between gap-3">
-            <span className="min-w-0 truncate">
-              {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
-            </span>
-            <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
-          </li>
-        ))}
-        {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
-      </ul>
+      <button
+        type="button"
+        onClick={() => setDetail(true)}
+        className="press -mx-2 mt-1 block w-[calc(100%+1rem)] rounded-xl px-2 py-2 text-left hover:bg-raised"
+      >
+        {/* Named by its words (so a voice command matching what's on screen works), led by what it opens. */}
+        <span className="sr-only">{t("social.post.open", { name: post.name })}: </span>
+        <ul className="space-y-1 text-sm">
+          {b.exercises.slice(0, 5).map((e) => (
+            <li key={e.id} className="flex justify-between gap-3">
+              <span className="min-w-0 truncate">
+                {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
+              </span>
+              <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
+            </li>
+          ))}
+          {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
+        </ul>
+        <span className="mt-1 block text-sm font-medium text-accent">{t("social.post.see")}</span>
+      </button>
       {muscles.length > 0 && <p className="mt-2 text-xs text-muted">{fmtList(muscles.map((m) => MUSCLE_LABEL[m]))}</p>}
       <div className="mt-3 flex items-center gap-2 border-t border-line pt-2">
         <button
@@ -387,8 +397,18 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           className={`press inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 ${post.liked ? "text-bad" : "text-muted hover:text-ink"}`}
         >
           <Icon name="heart" size={20} filled={post.liked} />
-          <span className="num text-sm">{fmtNum(post.likes)}</span>
+          {post.likes === 0 && <span className="num text-sm">{fmtNum(0)}</span>}
         </button>
+        {post.likes > 0 && (
+          <button
+            type="button"
+            aria-label={t("social.likers", { count: post.likes })}
+            onClick={() => setLikers(true)}
+            className="press -ml-2 inline-flex min-h-11 min-w-11 items-center rounded-xl px-2 text-sm text-muted hover:text-ink"
+          >
+            <span className="num">{fmtNum(post.likes)}</span>
+          </button>
+        )}
         {onOpen && (
           <button
             type="button"
@@ -404,20 +424,6 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
       <Note text={note} />
       <Sheet open={more} onClose={() => setMore(false)} title={t("friends.post.more")}>
         <div className="space-y-2">
-          {routine && (
-            <Button
-              kind="ghost"
-              icon="layers"
-              className="w-full"
-              onClick={() => {
-                setMore(false);
-                track("feature", { name: "social_save_workout" });
-                go("routine", routine);
-              }}
-            >
-              {t("friends.post.save")}
-            </Button>
-          )}
           {post.mine ? (
             <>
               <Button
@@ -457,6 +463,8 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="post" id={post.id} />
+      <PostDetailSheet post={detail ? post : null} onClose={() => setDetail(false)} />
+      <LikersSheet postId={likers ? post.id : null} onClose={() => setLikers(false)} />
       <ComposeSheet
         open={editing}
         onClose={() => setEditing(false)}
@@ -468,122 +476,6 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         onSubmit={edit}
       />
     </article>
-  );
-}
-
-/** A post's comments, and the box to add one. */
-function CommentsSheet(props: { post: FeedPost | null; onClose: () => void; onCount: (n: number) => void }) {
-  return props.post ? <CommentsBody key={props.post.id} {...props} post={props.post} /> : null;
-}
-
-function CommentsBody({ post, onClose, onCount }: { post: FeedPost; onClose: () => void; onCount: (n: number) => void }) {
-  const [comments, setComments] = useState<FeedComment[] | null>(null);
-  const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
-  const [reporting, setReporting] = useState<string | null>(null);
-  const id = post.id;
-  useEffect(() => {
-    let live = true;
-    social<{ comments: FeedComment[] }>("thread", { id })
-      .then((r) => live && setComments(r.comments))
-      .catch((e: unknown) => live && (setComments([]), setNote(socialError(e))));
-    return () => {
-      live = false;
-    };
-  }, [id]);
-  const send = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!text.trim() || busy) return;
-    setBusy(true);
-    try {
-      const r = await social<{ comment: FeedComment }>("comment", { id, text });
-      const next = [...(comments ?? []), r.comment];
-      setComments(next);
-      onCount(next.length);
-      setText("");
-      setNote(null);
-      haptic("success");
-    } catch (err) {
-      oops();
-      setNote(socialError(err));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const remove = async (c: FeedComment) => {
-    try {
-      await social("uncomment", { id: c.id });
-      const next = (comments ?? []).filter((x) => x.id !== c.id);
-      setComments(next);
-      onCount(next.length);
-    } catch (err) {
-      oops();
-      setNote(socialError(err));
-    }
-  };
-  return (
-    <Sheet open onClose={onClose} title={t("friends.comments.title")}>
-      {comments === null ? (
-        <Skeleton className="h-16" />
-      ) : (
-        <ul className="space-y-3">
-          {comments.map((c) => (
-            <li key={c.id} className="flex items-start gap-3">
-              <Avatar name={c.name} avatar={c.avatar} size={32} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm">
-                  <button type="button" className="press font-semibold" onClick={() => go("person", c.handle)}>
-                    {c.name}
-                  </button>{" "}
-                  <span className="text-xs text-muted">{ago(c.at)}</span>
-                </p>
-                <p className="break-words text-sm">{c.body}</p>
-              </div>
-              {c.canDelete ? (
-                <button
-                  type="button"
-                  aria-label={t("friends.comments.delete")}
-                  onClick={() => void remove(c)}
-                  className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                >
-                  <Icon name="trash" size={18} />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  aria-label={t("friends.report.comment")}
-                  onClick={() => setReporting(c.id)}
-                  className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                >
-                  <Icon name="flag" size={18} />
-                </button>
-              )}
-            </li>
-          ))}
-          {!comments.length && <li className="text-sm text-muted">{t("friends.comments.none")}</li>}
-        </ul>
-      )}
-      <form className="mt-4 flex gap-2" onSubmit={(e) => void send(e)}>
-        <label htmlFor="fr-comment" className="sr-only">
-          {t("friends.comments.add")}
-        </label>
-        <input
-          id="fr-comment"
-          value={text}
-          maxLength={SOCIAL_LIMITS.comment}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={t("friends.comments.add")}
-          className="card min-w-0 flex-1 px-4 py-3"
-          enterKeyHint="send"
-        />
-        <Button submit disabled={busy || !text.trim()}>
-          {t("friends.comments.send")}
-        </Button>
-      </form>
-      <Note text={note} />
-      <ReportSheet open={!!reporting} onClose={() => setReporting(null)} kind="comment" id={reporting ?? ""} />
-    </Sheet>
   );
 }
 
@@ -643,6 +535,7 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
   const [more, setMore] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<FeedPost | null>(null);
+  const [reporting, setReporting] = useState<string | null>(null);
   const load = useCallback(
     async (before: number) => {
       try {
@@ -698,7 +591,9 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
         post={open}
         onClose={() => setOpen(null)}
         onCount={(n) => open && setPosts((ps) => (ps ?? []).map((x) => (x.id === open.id ? { ...x, comments: n } : x)))}
+        onReport={setReporting}
       />
+      <ReportSheet open={!!reporting} onClose={() => setReporting(null)} kind="comment" id={reporting ?? ""} />
     </div>
   );
 }
@@ -1103,7 +998,11 @@ function Activity({ onPeople, onBoard }: { onPeople: () => void; onBoard: () => 
               ? t("friends.act.challenge", { name: i.name, challenge: i.text ?? "" })
               : i.kind === "tag"
                 ? t("friends.act.tag", { name: i.name })
-                : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+                : i.kind === "mention"
+                  ? t("social.act.mention", { name: i.name, text: i.text ?? "" })
+                  : i.kind === "reply"
+                    ? t("social.act.reply", { name: i.name, text: i.text ?? "" })
+                    : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (

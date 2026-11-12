@@ -144,8 +144,10 @@ describe("Friends", () => {
     });
     signIn("tok-a");
     render(<Friends />);
-    await u.click(await screen.findByRole("button", { name: "More options" }));
-    expect(screen.getByRole("button", { name: "Save as a routine" })).toBeInTheDocument();
+    await u.click(await screen.findByRole("button", { name: /^See Alex’s whole workout/ }));
+    expect(await screen.findByRole("button", { name: "Do this workout" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Close" }));
+    await u.click(screen.getByRole("button", { name: "More options" }));
     await u.click(screen.getByRole("button", { name: "Edit post" }));
     await u.type(screen.getByLabelText("Caption"), "Felt strong");
     await u.click(screen.getByRole("button", { name: "Only me" }));
