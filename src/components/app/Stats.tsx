@@ -195,6 +195,10 @@ export function Stats() {
             />
           </div>
         )}
+        {/* Trained without the phone? Add it after the fact (LogPast.tsx; moved here from the /me/ dashboard). */}
+        <Button kind="ghost" className="mt-3 w-full" icon="plus" onClick={() => go("log")}>
+          {t("past.title")}
+        </Button>
       </Section>
     </div>
   );

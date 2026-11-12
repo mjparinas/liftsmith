@@ -87,7 +87,6 @@ ${col(t.cols.product, [
   ["/apps/", l.whoFor],
   [localPath(lang, "/pricing/"), l.pricing],
   ["/whats-new/", l.whatsNew],
-  ["/me/", l.dashboard],
 ])}
 ${col(t.cols.learn, [
   ["/exercises/", l.exercises],

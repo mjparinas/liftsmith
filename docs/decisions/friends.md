@@ -236,14 +236,10 @@ Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not tra
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/server/socialDiscover.test.ts` (public and `all` only, newest per person, the window, following, mutes and blocks, joining first) and the discover-then-profile flow in `Friends.test.tsx`. The accessibility run scans Discover.
 
-## Friends on the web dashboard (gap list 3, item 8)
+## Friends on a big screen (gap list 3, item 8)
 
-- **`/me/` › Friends** (a tab between History and Trophies, hidden while the `social` flag is off): the big-screen view. The feed on the left (Following with Training now, or Discover) and, beside it, the lifter's challenges and this week's board, with a "Find and manage people" button under them. Likes, comments, replies, who liked, the whole workout and challenge results all work in place, because they are the app's own components (`FriendsDesk` in `Friends.tsx`), not a second copy.
-- **Everything else opens in the web app**: a profile, a shared routine, an invite, Account, joining Friends, People and Friends settings. The dashboard treats any route that isn't one of its tabs as the app's and opens `/app/#/<route>` (a full page load, because the app is its own static page). So there's one place for each screen (the one control, one destination rule).
-- **Signed out** it asks to sign in (in the app); **not joined** it offers "Join in the app". The dashboard reads the same account from the browser as the web app, so signing in once covers both.
-- The app's screens read units and the lifter's own lifts from the app's store; the dashboard hands it the log it already loaded (`useApp.setState`), without the app's start-up (no workout restore, Health import or replanning).
-- Website only, by nature (the phones already have the Friends tab). Docs in [Web dashboard](web-dashboard.md) too.
-- Tests: the Friends case in `src/components/dashboard/Dashboard.test.tsx` (the feed and the board side by side, Discover, a profile opening in the app).
+- **Moved into the app** (2026-11-12, [Desktop layout](desktop-layout.md) stage 2). It began as a Friends tab on the `/me/` dashboard (`FriendsDesk`); when `/me/` was retired into the app, the same layout became the app's own Friends feed on the desktop layout: the feed (Following with Training now, or Discover) on the left and the lifter's challenges and this week's board beside it. Everything else (profiles, joining, People, Friends settings, likes and comments) is the app's Friends screen as on a phone, so there is one place for each. Old `/me/#/friends` links open `#/friends` in the app.
+- Phones and tablets keep the single-column feed (the board is its own chip there).
 
 ## Monthly finishers (gap list 3, item 10)
 

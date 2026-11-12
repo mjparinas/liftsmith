@@ -30,7 +30,6 @@ export interface SiteText {
       coaches: string;
       pricing: string;
       whatsNew: string;
-      dashboard: string;
       exercises: string;
       muscles: string;
       equipment: string;

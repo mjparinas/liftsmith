@@ -23,7 +23,6 @@ export const en: SiteText = {
       coaches: "For coaches",
       pricing: "Pricing",
       whatsNew: "What's new",
-      dashboard: "Your dashboard",
       exercises: "Exercise library",
       muscles: "Exercises by muscle",
       equipment: "Exercises by equipment",

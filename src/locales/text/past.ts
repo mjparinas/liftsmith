@@ -31,6 +31,8 @@ export const en = {
   "past.err.weight": "Weight must be 0 to 1000 kg.",
   "past.err.none": "Add at least one set.",
   "past.err.many": "That’s more than 200 sets.",
+  "past.title": "Log a past workout",
+  "past.saved": "Workout saved",
 } as const;
 
 type Key = keyof typeof en;
@@ -63,6 +65,8 @@ export const es: Partial<Record<Key, Message>> = {
   "past.err.weight": "El peso debe ser de 0 a 1000 kg.",
   "past.err.none": "Añade al menos una serie.",
   "past.err.many": "Son más de 200 series.",
+  "past.title": "Registrar un entrenamiento pasado",
+  "past.saved": "Entrenamiento guardado",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -93,6 +97,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "past.err.weight": "Le poids doit être de 0 à 1000 kg.",
   "past.err.none": "Ajoutez au moins une série.",
   "past.err.many": "Cela fait plus de 200 séries.",
+  "past.title": "Ajouter une séance passée",
+  "past.saved": "Séance enregistrée",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -123,6 +129,8 @@ export const de: Partial<Record<Key, Message>> = {
   "past.err.weight": "Das Gewicht muss zwischen 0 und 1000 kg liegen.",
   "past.err.none": "Füge mindestens einen Satz hinzu.",
   "past.err.many": "Das sind mehr als 200 Sätze.",
+  "past.title": "Vergangenes Training eintragen",
+  "past.saved": "Training gespeichert",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -153,6 +161,8 @@ export const it: Partial<Record<Key, Message>> = {
   "past.err.weight": "Il peso deve essere tra 0 e 1000 kg.",
   "past.err.none": "Aggiungi almeno una serie.",
   "past.err.many": "Sono più di 200 serie.",
+  "past.title": "Registra un allenamento passato",
+  "past.saved": "Allenamento salvato",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -183,4 +193,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "past.err.weight": "重量は0〜1000 kgにしてください。",
   "past.err.none": "少なくとも1セット追加してください。",
   "past.err.many": "200セットを超えています。",
+  "past.title": "過去のワークアウトを記録",
+  "past.saved": "ワークアウトを保存しました",
 };

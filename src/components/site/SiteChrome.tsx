@@ -100,7 +100,7 @@ export function SignInLink({ label = "Sign in", className = "inline-flex" }: { l
 export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: string }) {
   const t = siteText(lang).chrome;
   const l = t.links;
-  // The app (/app/) and the dashboard (/me/) are big client-only pages: never prefetch their code from a public page,
+  // The app (/app/) is a big client-only page: never prefetch their code from a public page,
   // or every visitor downloads it whether they open it or not.
   const col = (title: string, links: { href: string; label: string }[]) => (
     <nav aria-label={title}>
@@ -133,7 +133,6 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: localPath(lang, "/coaches/"), label: l.coaches },
           { href: localPath(lang, "/pricing/"), label: l.pricing },
           { href: "/whats-new/", label: l.whatsNew },
-          { href: "/me/", label: l.dashboard },
         ])}
         {col(t.cols.learn, [
           { href: "/exercises/", label: l.exercises },
