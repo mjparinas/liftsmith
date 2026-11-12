@@ -115,6 +115,9 @@ export const en = {
   "gloss.badges.title": "Achievements and badges",
   "gloss.badges.body":
     "An achievement is a goal, like finishing workouts or setting personal bests. Each one has up to four badges, bronze, silver, gold and platinum, earned at bigger and bigger numbers.\nSome badges also unlock a colour theme for the app; the badge says which. Every badge gives XP, which raises your level.",
+  "gloss.monthly.title": "The monthly challenge",
+  "gloss.monthly.body":
+    "Every lifter gets the same challenge each month: a number of workouts, sets or minutes, rotating month to month. Your own finished workouts count, so it works offline.\nFinish it before the month ends to earn that month's medal. Each finished month counts toward the Monthly challenger badge. Friends › Board shows how the people you follow are doing.",
 } as const;
 
 type Key = keyof typeof en;
@@ -231,6 +234,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.badges.title": "Logros e insignias",
   "gloss.badges.body":
     "Un logro es una meta, como terminar entrenamientos o batir marcas personales. Cada uno tiene hasta cuatro insignias, bronce, plata, oro y platino, que se ganan con cifras cada vez mayores.\nAlgunas insignias también desbloquean un tema de color para la app; la insignia dice cuál. Cada insignia da XP, que sube tu nivel.",
+  "gloss.monthly.title": "El reto del mes",
+  "gloss.monthly.body":
+    "Todos reciben el mismo reto cada mes: un número de entrenamientos, series o minutos, que va cambiando de mes en mes. Cuentan tus entrenamientos terminados, así que funciona sin conexión.\nTermínalo antes de que acabe el mes para ganar la medalla de ese mes. Cada mes terminado cuenta para la insignia Reto del mes. Amigos › Clasificación muestra cómo van las personas que sigues.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -345,6 +351,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.badges.title": "Succès et badges",
   "gloss.badges.body":
     "Un succès est un objectif, comme terminer des séances ou battre des records personnels. Chacun a jusqu’à quatre badges, bronze, argent, or et platine, obtenus à des seuils de plus en plus hauts.\nCertains badges débloquent aussi un thème de couleur pour l’app ; le badge indique lequel. Chaque badge donne de l’XP, qui fait monter votre niveau.",
+  "gloss.monthly.title": "Le défi du mois",
+  "gloss.monthly.body":
+    "Chaque mois, tout le monde a le même défi : un nombre de séances, de séries ou de minutes, qui change d’un mois à l’autre. Vos séances terminées comptent, donc ça marche hors ligne.\nRéussissez-le avant la fin du mois pour gagner la médaille du mois. Chaque mois réussi compte pour le badge Défi du mois. Amis › Classement montre où en sont les personnes que vous suivez.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -459,6 +468,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.badges.title": "Erfolge und Abzeichen",
   "gloss.badges.body":
     "Ein Erfolg ist ein Ziel, zum Beispiel Trainings beenden oder persönliche Bestleistungen aufstellen. Jeder hat bis zu vier Abzeichen, Bronze, Silber, Gold und Platin, die du bei immer höheren Zahlen bekommst.\nManche Abzeichen schalten außerdem ein Farbdesign für die App frei; das Abzeichen sagt, welches. Jedes Abzeichen gibt XP, die dein Level erhöhen.",
+  "gloss.monthly.title": "Die Challenge des Monats",
+  "gloss.monthly.body":
+    "Jeden Monat haben alle dieselbe Challenge: eine Zahl an Trainings, Sätzen oder Minuten, die von Monat zu Monat wechselt. Deine abgeschlossenen Trainings zählen, also klappt es auch offline.\nSchaffe sie vor Monatsende, um die Medaille des Monats zu bekommen. Jeder geschaffte Monat zählt für das Abzeichen Monatschallenge. Unter Freunde › Rangliste siehst du, wie es bei den Leuten läuft, denen du folgst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -573,6 +585,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.badges.title": "Traguardi e badge",
   "gloss.badges.body":
     "Un traguardo è un obiettivo, come finire allenamenti o battere record personali. Ognuno ha fino a quattro badge, bronzo, argento, oro e platino, che si ottengono con numeri sempre più alti.\nAlcuni badge sbloccano anche un tema di colore per l’app; il badge dice quale. Ogni badge dà XP, che fa salire il tuo livello.",
+  "gloss.monthly.title": "La sfida del mese",
+  "gloss.monthly.body":
+    "Ogni mese tutti hanno la stessa sfida: un numero di allenamenti, serie o minuti, che cambia di mese in mese. Contano i tuoi allenamenti completati, quindi funziona anche offline.\nCompletala prima della fine del mese per vincere la medaglia del mese. Ogni mese completato conta per il badge Sfida del mese. Amici › Classifica mostra come vanno le persone che segui.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -687,4 +702,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.badges.title": "実績とバッジ",
   "gloss.badges.body":
     "実績はワークアウトを終える、自己ベストを出すといった目標です。それぞれにブロンズ、シルバー、ゴールド、プラチナの最大4つのバッジがあり、数字が大きくなるごとにもらえます。\n一部のバッジはアプリのカラーテーマも解除します。どのテーマかはバッジに表示されます。どのバッジも XP がもらえ、レベルが上がります。",
+  "gloss.monthly.title": "今月のチャレンジ",
+  "gloss.monthly.body":
+    "毎月、全員に同じチャレンジが用意されます。ワークアウト回数、セット数、トレーニング時間のいずれかで、月ごとに入れ替わります。完了したワークアウトが加算されるので、オフラインでも使えます。\n月末までに達成するとその月のメダルがもらえます。達成した月はマンスリーチャレンジャーのバッジに加算されます。フレンド › ランキングで、フォローしている人の進み具合が見られます。",
 };

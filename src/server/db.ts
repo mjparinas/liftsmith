@@ -661,6 +661,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
+  ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
+  ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

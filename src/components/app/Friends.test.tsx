@@ -186,8 +186,12 @@ describe("Friends", () => {
 
     render(<Friends />);
     await u.click(await screen.findByRole("button", { name: "Board" }));
-    expect(await screen.findByText("blair (you)")).toBeInTheDocument();
+    expect(await within(await screen.findByRole("list", { name: "Friends leaderboard" })).findByText("blair (you)")).toBeInTheDocument();
     expect(screen.getByText("Post a workout to get on this week’s board.")).toBeInTheDocument();
+    // The same people on this month's challenge, for everyone.
+    expect(
+      await within(await screen.findByRole("list", { name: "Friends on this month’s challenge" })).findByText("blair (you)"),
+    ).toBeInTheDocument();
   });
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
     const u = userEvent.setup();
@@ -263,5 +267,39 @@ describe("Friends", () => {
     expect(screen.getByText("1 member · run by Alex")).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "Join the club" }));
     await waitFor(async () => expect(((await handle("acc-b", { op: "clubs" })).body.clubs as unknown[]).length).toBe(1));
+  });
+  it("lets the starter set a crew goal with − and +, shows everyone's progress, and the club's posts", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-b", { op: "update", public: true });
+    const { code } = (await handle("acc-a", { op: "clubCreate", name: "Iron Barn crew" })).body as { code: string };
+    await handle("acc-b", { op: "clubJoin", code });
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "w1",
+      at: Date.now() - 60_000,
+      body: {
+        seconds: 3000,
+        sets: 12,
+        volume: 4200,
+        prs: 0,
+        muscles: ["chest"],
+        exercises: [{ id: "bench", name: "Bench", sets: 4, w: 100, r: 5 }],
+      },
+    });
+    signIn("tok-a");
+    render(<Friends tab="clubs" />);
+    await u.click(await screen.findByRole("button", { name: /Iron Barn crew/ }));
+    const sheet = within(await screen.findByRole("dialog", { name: "Iron Barn crew" }));
+    await u.click(await sheet.findByRole("button", { name: "Set a crew goal" }));
+    // Two members, three workouts each to start; one tap of − makes it five.
+    expect(sheet.getByText("6 workouts")).toBeInTheDocument();
+    await u.click(sheet.getByRole("button", { name: "Less weekly target" }));
+    await u.click(sheet.getByRole("button", { name: "Save goal" }));
+    expect(await sheet.findByText("This week as a crew: 5 workouts")).toBeInTheDocument();
+    expect(sheet.getByText("4 workouts to go as a crew. You’ve put in 0 workouts.")).toBeInTheDocument();
+    await u.click(sheet.getByRole("button", { name: "Posts" }));
+    expect(await sheet.findByRole("article", { name: "Workout from Blair" })).toBeInTheDocument();
   });
 });

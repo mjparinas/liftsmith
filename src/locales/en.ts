@@ -66,6 +66,7 @@ import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
+import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
 import * as muscle from "./text/muscle";
@@ -187,6 +188,7 @@ export const en = {
   ...lvl.en,
   ...map.en,
   ...mom.en,
+  ...month.en,
   ...msg.en,
   ...msgKind.en,
   ...muscle.en,

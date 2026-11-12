@@ -64,6 +64,7 @@ import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
+import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
 import * as muscle from "./text/muscle";
@@ -185,6 +186,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...lvl.it,
   ...map.it,
   ...mom.it,
+  ...month.it,
   ...msg.it,
   ...msgKind.it,
   ...muscle.it,

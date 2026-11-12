@@ -14,6 +14,7 @@ import {
   CHALLENGE_DAYS,
   CHEERS,
   cleanHandle,
+  CLUB_GOAL,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
@@ -24,6 +25,8 @@ import {
   type Cheer,
   type CheerIn,
   type ClubDetail,
+  type ClubGoal,
+  type ClubGoalMetric,
   type ClubPreview,
   type ClubSummary,
   type FeedComment,
@@ -1548,6 +1551,9 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
   if (isResult(mine)) return mine;
   const from = Number(b.from);
   if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
+  // A week by default; up to a calendar month for the monthly challenge (monthly.ts).
+  const to = b.to === undefined ? from + 7 * day : Number(b.to);
+  if (!Number.isFinite(to) || to <= from || to > from + 32 * day) return fail(400, "Bad request.");
   const rows = await query(
     `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
        COUNT(p.id) AS workouts,
@@ -1562,7 +1568,7 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?1)
      GROUP BY sp.account_id LIMIT 201`,
-    [accountId, from, from + 7 * day],
+    [accountId, from, to],
   );
   return ok({
     rows: rows.map((r) => ({
@@ -1777,7 +1783,8 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
   const from = Number(b.from);
   if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
   const [c] = await query(
-    `SELECT c.id AS id, c.name AS name, c.code AS code, c.owner_id AS owner_id, op.handle AS owner_handle, op.name AS owner_name
+    `SELECT c.id AS id, c.name AS name, c.code AS code, c.owner_id AS owner_id, op.handle AS owner_handle, op.name AS owner_name,
+       c.goal_metric AS goal_metric, c.goal_target AS goal_target
      FROM clubs c JOIN club_members cm ON cm.club_id = c.id AND cm.account_id = ? JOIN social_profiles op ON op.account_id = c.owner_id
      WHERE c.id = ?`,
     [accountId, s(b.id)],
@@ -1805,6 +1812,7 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
     mine: s(c.owner_id) === accountId,
     owner: { handle: s(c.owner_handle), name: s(c.owner_name) },
     members: rows.length,
+    goal: goalOf(c.goal_metric, c.goal_target),
     rows: rows.map((r) => ({
       handle: s(r.handle),
       name: s(r.name),
@@ -1818,6 +1826,44 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
     })),
   };
   return ok({ club: detail });
+}
+
+const CLUB_GOAL_METRICS = Object.keys(CLUB_GOAL) as ClubGoalMetric[];
+function goalOf(metric: unknown, target: unknown): ClubGoal | null {
+  const m = CLUB_GOAL_METRICS.find((x) => x === metric);
+  const v = Math.round(Number(target));
+  return m && v >= 1 && v <= CLUB_GOAL[m].max ? { metric: m, target: v } : null;
+}
+
+/**
+ * A club's feed: posts by its members that the reader could see anyway (their own, a public profile's, or someone
+ * they follow, each by the post's audience). Joining a club never widens who sees a post; the board shows totals.
+ */
+export async function clubFeed(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const id = s(b.id);
+  const [member] = await query("SELECT 1 AS x FROM club_members WHERE club_id = ? AND account_id = ?", [id, accountId]);
+  if (!member) return fail(404, "gone");
+  const [cols, viewer] = POST_COLS(accountId);
+  const rows = await query(
+    `SELECT ${cols} FROM posts p JOIN social_profiles sp ON sp.account_id = p.account_id
+       JOIN club_members cm ON cm.account_id = p.account_id AND cm.club_id = ?
+     WHERE p.hidden = 0 AND sp.suspended = 0 AND p.at < ?
+       AND (p.account_id = ? OR sp.public = 1
+         OR EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = ? AND f.followee_id = p.account_id AND f.accepted = 1))
+       AND p.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
+       AND p.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)
+       AND p.account_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?)
+       AND ${seesPost("?")}
+     ORDER BY p.at DESC LIMIT ${PAGE}`,
+    [viewer!, id, cursor(b.before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
+  );
+  const posts = await withPartners(
+    accountId,
+    rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p),
+  );
+  return ok({ posts, more: rows.length === PAGE });
 }
 
 async function clubByCode(code: unknown): Promise<Row | null> {
@@ -1885,6 +1931,14 @@ export async function clubManage(accountId: string, b: Record<string, unknown>):
   const id = s(b.id);
   const [c] = await query("SELECT owner_id FROM clubs WHERE id = ?", [id]);
   if (!c || s(c.owner_id) !== accountId) return fail(404, "gone");
+  if ("goal" in b) {
+    // The crew goal: a measure and a weekly target, or null to clear it.
+    const g = b.goal && typeof b.goal === "object" ? (b.goal as Record<string, unknown>) : null;
+    const goal = g ? goalOf(g.metric, g.target) : null;
+    if (g && !goal) return fail(400, "Bad request.");
+    await run("UPDATE clubs SET goal_metric = ?, goal_target = ? WHERE id = ?", [goal?.metric ?? "", goal?.target ?? 0, id]);
+    return ok({ goal });
+  }
   if (b.newCode === true) {
     const code = await freeClubCode();
     await run("UPDATE clubs SET code = ? WHERE id = ?", [code, id]);
@@ -1932,6 +1986,7 @@ export const OPS: Record<string, Op> = {
   posted: (a, b) => posted(a, b),
   feed: (a, b) => feed(a, b),
   person: (a, b) => personPosts(a, b),
+  clubFeed: (a, b) => clubFeed(a, b),
   thread: (a, b) => thread(a, b),
   like,
   comment,

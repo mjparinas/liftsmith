@@ -330,7 +330,22 @@ export interface ClubDetail extends ClubSummary {
   code: string;
   owner: { handle: string; name: string };
   rows: BoardRow[];
+  /** The crew's goal for the week, everyone's posted workouts added up; null when the starter hasn't set one. */
+  goal?: ClubGoal | null;
 }
+
+/** What a club's members add up to each week. */
+export type ClubGoalMetric = "workouts" | "sets" | "minutes";
+export interface ClubGoal {
+  metric: ClubGoalMetric;
+  target: number;
+}
+/** The biggest weekly goal for each measure, and the step the − and + buttons move it by. */
+export const CLUB_GOAL: Record<ClubGoalMetric, { max: number; step: number; each: number }> = {
+  workouts: { max: 500, step: 1, each: 3 },
+  sets: { max: 20_000, step: 10, each: 60 },
+  minutes: { max: 50_000, step: 30, each: 150 },
+};
 
 /** What the join screen shows before the lifter joins. */
 export interface ClubPreview {

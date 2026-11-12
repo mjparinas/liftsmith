@@ -27,6 +27,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { Avatar } from "./AvatarFace";
 import { Icon } from "./icons";
+import { MonthCard } from "./MonthChallenge";
 import { go, useRoute } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
 import { HUE } from "./theme";
@@ -415,6 +416,7 @@ export function Achievements() {
           <span className="text-muted">{t("awards.badgesOf", { total: g.badges.total })}</span>
         </p>
       </div>
+      <MonthCard />
       <Section title={t("awards.weekQuests")}>
         <QuestsCard g={g} />
       </Section>

@@ -64,6 +64,7 @@ import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
+import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
 import * as muscle from "./text/muscle";
@@ -185,6 +186,7 @@ export const de: Partial<Record<MessageKey, Message>> = {
   ...lvl.de,
   ...map.de,
   ...mom.de,
+  ...month.de,
   ...msg.de,
   ...msgKind.de,
   ...muscle.de,
