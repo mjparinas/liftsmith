@@ -10,9 +10,6 @@
     <string name="channel_live">Training läuft</string>
     <string name="channel_live_desc">Pausentimer, nächster Satz und Herzfrequenz beim Training</string>
     <string name="rest_over">Pause vorbei</string>
-    <string name="channel_alert_desc">Klingelt und vibriert, wenn die Pause endet</string>
-    <string name="channel_alert_sound">Pause vorbei (nur Ton)</string>
-    <string name="channel_alert_sound_desc">Klingelt ohne Vibration, wenn die Pause endet</string>
     <string name="next_prefix">Als Nächstes:</string>
     <string name="rest_left">Noch %1$s Pause</string>
     <string name="rest_left_next">Noch %1$s · als Nächstes: %2$s</string>

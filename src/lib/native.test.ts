@@ -45,6 +45,19 @@ describe("rest time left on the Android Live Update", () => {
     expect(service).toContain("getString(R.string.rest_left_next, left, next)");
   });
 
+  it("says rest is over in the live card itself, not in a second notification", () => {
+    expect(service).toContain('putExtra("restDone", true)');
+    expect(service).toContain("getString(R.string.rest_over)");
+    expect(service).not.toContain("ID_ALERT");
+    expect(service).toContain("nm.deleteNotificationChannel(CHANNEL_ALERT);");
+    // A set logged from the card starts fresh, without the last rest's "Rest over".
+    expect(service).toContain('putExtra("restDone", false)');
+    const ios = readFileSync(join(__dirname, "../../ios/App/App/WorkoutSessionPlugin.swift"), "utf8");
+    expect(ios).toContain("staleDate: restUntil");
+    const live = readFileSync(join(__dirname, "../../ios/App/LiftsmithWidgets/WorkoutLiveActivity.swift"), "utf8");
+    expect(live).toContain('Text("Rest over")');
+  });
+
   it("redraws once a second only while resting, and stops when rest ends or the workout does", () => {
     expect(service).toMatch(/if \(resting\) scheduleTick\(restUntil\);/);
     expect(service).toMatch(/restOver = \(\) -> \{\s+handler\.removeCallbacks\(restTick\);/);

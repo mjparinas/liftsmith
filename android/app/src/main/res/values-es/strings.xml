@@ -10,9 +10,6 @@
     <string name="channel_live">Entrenamiento en curso</string>
     <string name="channel_live_desc">Descanso, siguiente serie y frecuencia cardiaca mientras entrenas</string>
     <string name="rest_over">Fin del descanso</string>
-    <string name="channel_alert_desc">Suena y vibra al terminar el descanso</string>
-    <string name="channel_alert_sound">Fin del descanso (solo sonido)</string>
-    <string name="channel_alert_sound_desc">Suena sin vibrar al terminar el descanso</string>
     <string name="next_prefix">Siguiente:</string>
     <string name="rest_left">Quedan %1$s de descanso</string>
     <string name="rest_left_next">Quedan %1$s · siguiente: %2$s</string>

@@ -10,9 +10,6 @@
     <string name="channel_live">Allenamento in corso</string>
     <string name="channel_live_desc">Timer di riposo, serie successiva e frequenza cardiaca mentre ti alleni</string>
     <string name="rest_over">Riposo finito</string>
-    <string name="channel_alert_desc">Suona e vibra quando finisce il riposo</string>
-    <string name="channel_alert_sound">Riposo finito (solo suono)</string>
-    <string name="channel_alert_sound_desc">Suona senza vibrare quando finisce il riposo</string>
     <string name="next_prefix">Poi:</string>
     <string name="rest_left">Ancora %1$s di riposo</string>
     <string name="rest_left_next">Ancora %1$s · poi: %2$s</string>
