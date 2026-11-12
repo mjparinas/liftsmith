@@ -25,6 +25,34 @@ const HEVY = `"title","start_time","end_time","description","exercise_title","su
 "Future","20 Dec 2026, 17:00","20 Dec 2026, 18:00","","Deadlift (Barbell)","","","0","normal","315","5","","",""
 `;
 
+const FITBOD = `Date,Exercise,Reps,Weight(kg),Duration(s),Distance(m),Incline,Resistance,isWarmup,Note,multiplier
+2026-11-03 17:00:00 +0000,Barbell Bench Press,8,40,0,0,0,0,true,,1
+2026-11-03 17:05:00 +0000,Barbell Bench Press,8,80,0,0,0,0,false,,1
+2026-11-03 17:40:00 +0000,Plank,0,0,45,0,0,0,false,,1
+2026-11-03 17:45:00 +0000,Running,0,0,600,1500,0,0,false,,1
+2026-11-05 17:00:00 +0000,Barbell Back Squat,5,120,0,0,0,0,false,,1
+`;
+
+const STRONGLIFTS = `Workout #,Date,Workout,Duration,Exercise,Sets x Reps,Weight (lb),Set 1,Set 2,Set 3,Set 4,Set 5,Notes
+1,2026-11-02 18:00,Workout A,45m,Squat,5x5,135,5,5,5,5,5,
+1,2026-11-02 18:00,Workout A,45m,Bench Press,5x5,95,5,5,4,3,,
+1,2026-11-02 18:00,Workout A,45m,Barbell Row,5x5,95,,,,,,
+2,2026-11-04 18:00,Workout B,40m,Deadlift,1x5,185,185x5,,,,,
+`;
+
+const JEFIT = `### MY PROFILE ###
+_id,username
+1,someone
+### EXERCISE LOGS ###
+_id,belongSys,mydate,ename,logs,record
+1,1,2026-11-03,Barbell Bench Press,"60x10,80x8,80x7",80
+2,1,2026-11-03,Dumbbell Curl,"12.5x12",12.5
+3,1,2026-11-04,Pull Up,"",0
+### WORKOUT SESSIONS ###
+_id,mydate,starttime
+1,2026-11-03,1762189200
+`;
+
 describe("CSV parsing", () => {
   it("handles quotes, escaped quotes, CRLF, a BOM and semicolons", () => {
     expect(parseCsv('﻿a,b\r\n"x, ""y""",2\r\n')).toEqual([
@@ -42,6 +70,10 @@ describe("CSV parsing", () => {
     expect(parseDate("2026-11-02", "07:30")).toBe(new Date(2026, 10, 2, 7, 30).getTime());
     expect(parseDate("5 Nov 2026, 17:00")).toBe(new Date(2026, 10, 5, 17).getTime());
     expect(parseDate("yesterday")).toBeNull();
+    // A time with an offset is that moment (Fitbod writes UTC).
+    expect(parseDate("2026-11-02 18:05:00 +0000")).toBe(Date.UTC(2026, 10, 2, 18, 5));
+    expect(parseDate("2026-11-02T18:05:00-05:00")).toBe(Date.UTC(2026, 10, 2, 23, 5));
+    expect(parseDate("2026-11-02T18:05:00.000Z")).toBe(Date.UTC(2026, 10, 2, 18, 5));
   });
 });
 
@@ -95,6 +127,51 @@ describe("reading exports", () => {
     const set = out.events.find((e) => e.type === "set")!;
     expect(set.type === "set" && set.exerciseId).toBe("bench-press");
     expect(set.type === "set" && Math.round(set.weight)).toBe(100);
+  });
+
+  it("reads Fitbod: sets grouped into workouts by time, warm-ups, and cardio left out", () => {
+    const f = readImport(FITBOD)!;
+    expect(f.format).toBe("fitbod");
+    expect(f.unit).toBe("kg");
+    expect(f.workouts).toHaveLength(2);
+    expect(f.workouts[0].start).toBe(Date.UTC(2026, 10, 3, 17));
+    expect(f.workouts[0].minutes).toBe(42);
+    expect(f.workouts[0].sets.map((s) => [s.name, s.weight, s.reps, s.warmup])).toEqual([
+      ["Barbell Bench Press", 40, 8, true],
+      ["Barbell Bench Press", 80, 8, false],
+      ["Plank", 0, 0, false],
+    ]);
+    expect(f.workouts[0].sets[2].seconds).toBe(45);
+    expect(f.skipped).toBe(1);
+  });
+
+  it("reads StrongLifts: one set per filled Set column, a set's own weight, and empty rows skipped", () => {
+    const f = readImport(STRONGLIFTS)!;
+    expect(f.format).toBe("stronglifts");
+    expect(f.unit).toBe("lb");
+    expect(f.workouts).toHaveLength(2);
+    expect(f.workouts[0]).toMatchObject({ title: "Workout A", minutes: 45 });
+    expect(f.workouts[0].sets.filter((s) => s.name === "Squat")).toHaveLength(5);
+    expect(f.workouts[0].sets.filter((s) => s.name === "Bench Press").map((s) => s.reps)).toEqual([5, 5, 4, 3]);
+    expect(f.workouts[1].sets).toEqual([{ name: "Deadlift", weight: 185, reps: 5, warmup: false }]);
+    expect(f.skipped).toBe(1);
+  });
+
+  it("reads JEFIT's exercise logs section and asks for the unit", () => {
+    const f = readImport(JEFIT)!;
+    expect(f.format).toBe("jefit");
+    expect(f.unit).toBeNull();
+    expect(f.workouts).toHaveLength(1);
+    expect(f.workouts[0].sets.map((s) => [s.name, s.weight, s.reps])).toEqual([
+      ["Barbell Bench Press", 60, 10],
+      ["Barbell Bench Press", 80, 8],
+      ["Barbell Bench Press", 80, 7],
+      ["Dumbbell Curl", 12.5, 12],
+    ]);
+    expect(f.skipped).toBe(1);
+    const out = importEvents(f, defaultMapping(f), "kg", "g", NOW);
+    expect(out).toMatchObject({ workouts: 1, sets: 4 });
+    expect(out.events.find((e) => e.type === "sessionStart")!.id).toMatch(/^imp-jefit-/);
   });
 
   it("returns null for a file it doesn't know", () => {

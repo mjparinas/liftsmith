@@ -5,12 +5,12 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "imp.tooBig": "That file is too big to import (over 20 MB).",
-  "imp.notExport": "That file doesn't look like a workout export from Strong, Hevy or Liftsmith.",
+  "imp.notExport": "That file doesn't look like a workout export from Strong, Hevy, Fitbod, StrongLifts, JEFIT or Liftsmith.",
   "imp.done": { one: "Imported {count} workout with {sets} sets.", other: "Imported {count} workouts with {sets} sets." },
   "imp.already": "Those workouts are already here.",
   "imp.fileLabel": "CSV file to import",
   "imp.button": "Import workouts (CSV)",
-  "imp.note": "From Strong, Hevy, or a Liftsmith export. The file is read on this device and never uploaded.",
+  "imp.note": "From Strong, Hevy, Fitbod, StrongLifts, JEFIT, or a Liftsmith export. The file is read on this device and never uploaded.",
   "imp.title": "Import from {source}",
   "imp.summary": { one: "{count} workout, {sets} sets", other: "{count} workouts, {sets} sets" },
   "imp.skipped": {
@@ -30,12 +30,13 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Ese archivo es demasiado grande para importarlo (más de 20 MB).",
-  "imp.notExport": "Ese archivo no parece una exportación de entrenamientos de Strong, Hevy o Liftsmith.",
+  "imp.notExport": "Ese archivo no parece una exportación de entrenamientos de Strong, Hevy, Fitbod, StrongLifts, JEFIT o Liftsmith.",
   "imp.done": { one: "Importado {count} entrenamiento con {sets} series.", other: "Importados {count} entrenamientos con {sets} series." },
   "imp.already": "Esos entrenamientos ya están aquí.",
   "imp.fileLabel": "Archivo CSV para importar",
   "imp.button": "Importar entrenamientos (CSV)",
-  "imp.note": "De Strong, Hevy o una exportación de Liftsmith. El archivo se lee en este dispositivo y nunca se sube.",
+  "imp.note":
+    "De Strong, Hevy, Fitbod, StrongLifts, JEFIT o una exportación de Liftsmith. El archivo se lee en este dispositivo y nunca se sube.",
   "imp.title": "Importar de {source}",
   "imp.summary": { one: "{count} entrenamiento, {sets} series", other: "{count} entrenamientos, {sets} series" },
   "imp.skipped": {
@@ -53,12 +54,13 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Ce fichier est trop gros pour être importé (plus de 20 Mo).",
-  "imp.notExport": "Ce fichier ne ressemble pas à un export de séances de Strong, Hevy ou Liftsmith.",
+  "imp.notExport": "Ce fichier ne ressemble pas à un export de séances de Strong, Hevy, Fitbod, StrongLifts, JEFIT ou Liftsmith.",
   "imp.done": { one: "{count} séance importée avec {sets} séries.", other: "{count} séances importées avec {sets} séries." },
   "imp.already": "Ces séances sont déjà là.",
   "imp.fileLabel": "Fichier CSV à importer",
   "imp.button": "Importer des séances (CSV)",
-  "imp.note": "Depuis Strong, Hevy ou un export Liftsmith. Le fichier est lu sur cet appareil et n’est jamais envoyé.",
+  "imp.note":
+    "Depuis Strong, Hevy, Fitbod, StrongLifts, JEFIT ou un export Liftsmith. Le fichier est lu sur cet appareil et n’est jamais envoyé.",
   "imp.title": "Importer depuis {source}",
   "imp.summary": { one: "{count} séance, {sets} séries", other: "{count} séances, {sets} séries" },
   "imp.skipped": {
@@ -76,12 +78,13 @@ export const fr: Partial<Record<Key, Message>> = {
 
 export const de: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Diese Datei ist zu groß für den Import (über 20 MB).",
-  "imp.notExport": "Diese Datei sieht nicht nach einem Trainingsexport aus Strong, Hevy oder Liftsmith aus.",
+  "imp.notExport": "Diese Datei sieht nicht nach einem Trainingsexport aus Strong, Hevy, Fitbod, StrongLifts, JEFIT oder Liftsmith aus.",
   "imp.done": { one: "{count} Training mit {sets} Sätzen importiert.", other: "{count} Trainings mit {sets} Sätzen importiert." },
   "imp.already": "Diese Trainings sind schon da.",
   "imp.fileLabel": "CSV-Datei zum Importieren",
   "imp.button": "Trainings importieren (CSV)",
-  "imp.note": "Aus Strong, Hevy oder einem Liftsmith-Export. Die Datei wird auf diesem Gerät gelesen und nie hochgeladen.",
+  "imp.note":
+    "Aus Strong, Hevy, Fitbod, StrongLifts, JEFIT oder einem Liftsmith-Export. Die Datei wird auf diesem Gerät gelesen und nie hochgeladen.",
   "imp.title": "Import aus {source}",
   "imp.summary": { one: "{count} Training, {sets} Sätze", other: "{count} Trainings, {sets} Sätze" },
   "imp.skipped": {
@@ -99,12 +102,13 @@ export const de: Partial<Record<Key, Message>> = {
 
 export const it: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Il file è troppo grande da importare (oltre 20 MB).",
-  "imp.notExport": "Questo file non sembra un’esportazione di allenamenti da Strong, Hevy o Liftsmith.",
+  "imp.notExport": "Questo file non sembra un’esportazione di allenamenti da Strong, Hevy, Fitbod, StrongLifts, JEFIT o Liftsmith.",
   "imp.done": { one: "Importato {count} allenamento con {sets} serie.", other: "Importati {count} allenamenti con {sets} serie." },
   "imp.already": "Questi allenamenti ci sono già.",
   "imp.fileLabel": "File CSV da importare",
   "imp.button": "Importa allenamenti (CSV)",
-  "imp.note": "Da Strong, Hevy o un’esportazione di Liftsmith. Il file viene letto su questo dispositivo e mai caricato.",
+  "imp.note":
+    "Da Strong, Hevy, Fitbod, StrongLifts, JEFIT o un’esportazione di Liftsmith. Il file viene letto su questo dispositivo e mai caricato.",
   "imp.title": "Importa da {source}",
   "imp.summary": { one: "{count} allenamento, {sets} serie", other: "{count} allenamenti, {sets} serie" },
   "imp.skipped": {
@@ -122,12 +126,13 @@ export const it: Partial<Record<Key, Message>> = {
 
 export const ja: Partial<Record<Key, Message>> = {
   "imp.tooBig": "ファイルが大きすぎて読み込めません（20 MB 超）。",
-  "imp.notExport": "このファイルは Strong、Hevy、Liftsmith のワークアウト書き出しではないようです。",
+  "imp.notExport": "このファイルは Strong、Hevy、Fitbod、StrongLifts、JEFIT、Liftsmith のワークアウト書き出しではないようです。",
   "imp.done": { other: "{count}回のワークアウト（{sets}セット）を読み込みました。" },
   "imp.already": "これらのワークアウトはすでにあります。",
   "imp.fileLabel": "読み込む CSV ファイル",
   "imp.button": "ワークアウトを読み込む（CSV）",
-  "imp.note": "Strong、Hevy、または Liftsmith の書き出しから。ファイルはこの端末で読み取り、アップロードしません。",
+  "imp.note":
+    "Strong、Hevy、Fitbod、StrongLifts、JEFIT、または Liftsmith の書き出しから。ファイルはこの端末で読み取り、アップロードしません。",
   "imp.title": "{source}から読み込む",
   "imp.summary": { other: "ワークアウト{count}回、{sets}セット" },
   "imp.skipped": { other: "{count}行を除外（有酸素、休憩タイマー、空のセット）" },
