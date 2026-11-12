@@ -2,7 +2,17 @@
 // names or internals, and only things a lifter would notice in the app or on the site. Newest day first; one
 // entry per day that had such changes. Add a day when a promotion to main ships something a lifter will see.
 
-export type NewsItem = { kind: "new" | "better" | "fixed"; title: string; body: string };
+export type NewsItem = {
+  kind: "new" | "better" | "fixed";
+  title: string;
+  body: string;
+  /**
+   * Lifters asked for it (in-app feedback or the Inbox): the card says "You asked for this" (growth plan item 6,
+   * docs/decisions/growth.md). Only when someone really asked, and reply to them with the Inbox's "You asked, we
+   * built it" saved reply when it ships.
+   */
+  asked?: boolean;
+};
 export type NewsDay = {
   /** ISO day, e.g. 2026-11-09 (Pacific time). Used as the anchor. */ day: string;
   headline: string;
@@ -10,6 +20,7 @@ export type NewsDay = {
 };
 
 export const NEWS_KIND_LABEL: Record<NewsItem["kind"], string> = { new: "New", better: "Better", fixed: "Fixed" };
+export const NEWS_ASKED_LABEL = "You asked for this";
 
 export const WHATS_NEW: NewsDay[] = [
   {

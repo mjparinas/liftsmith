@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // docs/decisions/friends.md). English is the source: add a key here first.
 
 export const en = {
+  "friends.invite.reward": "When a friend joins with your link and finishes three workouts, you both get a month of Pro.",
+  "friends.invite.rewardFriend": "New here? Finish three workouts and you both get a month of Pro.",
   "friends.backPerson": "‹ Back",
   "friends.person.menu": "Block or report {name}",
   "friends.title": "Friends",
@@ -295,6 +297,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "friends.invite.reward": "Cuando un amigo se une con tu enlace y completa tres entrenamientos, los dos recibís un mes de Pro.",
+  "friends.invite.rewardFriend": "¿Eres nuevo? Completa tres entrenamientos y los dos recibiréis un mes de Pro.",
   "friends.backPerson": "‹ Atrás",
   "friends.person.menu": "Bloquear o denunciar a {name}",
   "friends.title": "Amigos",
@@ -588,6 +592,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "friends.invite.reward": "Quand un ami vous rejoint avec votre lien et termine trois séances, vous recevez tous les deux un mois de Pro.",
+  "friends.invite.rewardFriend": "Nouveau ici ? Terminez trois séances et vous recevrez tous les deux un mois de Pro.",
   "friends.backPerson": "‹ Retour",
   "friends.person.menu": "Bloquer ou signaler {name}",
   "friends.title": "Amis",
@@ -883,6 +889,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "friends.invite.reward": "Wenn jemand über deinen Link beitritt und drei Workouts abschließt, bekommt ihr beide einen Monat Pro.",
+  "friends.invite.rewardFriend": "Neu hier? Schließ drei Workouts ab, dann bekommt ihr beide einen Monat Pro.",
   "friends.backPerson": "‹ Zurück",
   "friends.person.menu": "{name} blockieren oder melden",
   "friends.title": "Freunde",
@@ -1174,6 +1182,8 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "friends.invite.reward": "Quando un amico si unisce con il tuo link e completa tre allenamenti, ricevete entrambi un mese di Pro.",
+  "friends.invite.rewardFriend": "Sei nuovo? Completa tre allenamenti e riceverete entrambi un mese di Pro.",
   "friends.backPerson": "‹ Indietro",
   "friends.person.menu": "Blocca o segnala {name}",
   "friends.title": "Amici",
@@ -1465,6 +1475,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "friends.invite.reward": "友だちがあなたのリンクから参加してワークアウトを3回終えると、2人とも Pro を1か月もらえます。",
+  "friends.invite.rewardFriend": "はじめての方へ: ワークアウトを3回終えると、2人とも Pro を1か月もらえます。",
   "friends.backPerson": "‹ 戻る",
   "friends.person.menu": "{name}さんをブロック・報告",
   "friends.title": "フレンド",

@@ -73,6 +73,29 @@ Ranked by expected growth per hour of Melvin's time and per dollar. Each says wh
 - **How:** the stores' own prompt only. Android: Play In-App Review (`StoreReviewPlugin.java`, `com.google.android.play:review`); iOS: `SKStoreReviewController.requestReview(in:)` (`StoreReviewPlugin` in `DelightPlugins.swift`). The stores decide whether it really appears (Apple at most three times a year) and never tell us, so nothing else depends on it. The web has no store and skips it.
 - **The words are the store's,** so there's no text of ours to translate and nothing that asks for a good rating or rewards one (Google Play and App Store rules; [Marketing and growth](marketing-and-growth.md)).
 
+### Give a month, get a month (item 2, 2026-11-12)
+
+- **The deal:** when a friend joins through a lifter's invite link (Friends › People › Invite a friend, or Scan to follow) and then finishes three workouts, both get a month of Pro. People sees "When a friend joins with your link and finishes three workouts, you both get a month of Pro." under Invite a friend, and the invite screen tells the friend the same.
+- **Guards** (`EARNED` in `src/server/earnedPro.ts`): only an account made in the 30 days before it accepts counts, and only its first accepted invite (`invite_accepts`, one row per friend). Only workouts finished after accepting count (`sessionEnd` events synced to the account). A lifter earns at most 12 months in any 365 days from invites; every friend still gets theirs. Settled when the friend syncs a finished workout (`settleReferral`, called by `/api/sync/`), claimed in one statement so two syncs can't pay twice.
+- **Where the Pro lives:** on the account, like lifetime codes: rows in `earned_pro` (30 days each), laid end to end from when each was earned (`earnedUntil`). `accessFor` gives `via: "referral"` after the paid sources, so every device and the web learn it on the next sync, with no store offer. The Pro screen says "Pro comes with your account, earned by inviting friends." Deleting the account deletes its earned months and any invite still waiting to pay out.
+- **No push or email yet** when a month lands; the Pro screen and the unlocked features show it. A note could come later.
+
+### Coaches with 3+ active clients get Pro free (item 3, 2026-11-12)
+
+- A coach (`coach_links`) with 3 or more clients who each finished a workout in the last 14 days has Pro for as long as that holds (`coachEarnsPro`, worked out on every access check, nothing stored). `via: "coach"`; the Pro screen says "Pro comes with your account while 3 or more of your clients are training." Coaching (Settings › Coaching) says so under the invite code: "Pro is free for you while 3 or more of your clients are training (each with a workout in the last 14 days)."
+- A coach needs Pro to start coaching, so the first clients come during the trial or a paid month; after that, three training clients keep it free. Being a client stays free ([Trainer mode](trainer-mode.md)).
+
+### Year in lifting as story cards (item 5, 2026-11-12)
+
+- The recap's share sheet (`Recap.tsx`, month or year) now offers the **summary** card plus one **highlight card** each, picked with the sheet's chips: **Workouts** (the count, "Trained in 40 of 52 weeks"), **Lifted** (the total, "More than …"; sets instead when Show weights is off), **PRs** (the top best, weight × reps; the count without weights) and **Most-done lift** (its sets), each with the lift's 3D figure as art. Each uses the card's big number, so it reads at story size; the size chip still offers Post or Story. Same privacy as every card ([Sharing](sharing.md)).
+- **The moment:** Today already offers the year from 26 December to 7 January (`suggestedPeriod` in `recap.ts`), so the cards are ready for late December with no new prompt. Pure web code: Android, iOS and the web app get it together.
+
+### "You asked, we built it" (item 6, 2026-11-12)
+
+- **On What's new** (`/whats-new/`, `src/lib/whatsNew.ts`): an item lifters asked for carries `asked: true` and shows a violet "You asked for this" chip beside its kind. Only when someone really asked (in-app feedback, the contact form or the Inbox); never for our own ideas.
+- **Telling the person:** the admin Inbox has a saved reply, **"You asked, we built it"** (`DEFAULT_REPLIES` in `src/lib/savedReplies.ts`), to send the person who asked when it ships: what shipped in one line, update the app, thanks, and a link to What's new. It's a reply from the Inbox, so it goes only to people who wrote to us. (Saved replies already edited in the panel keep their own list; add it there if it's missing.)
+- **The habit:** when a promotion ships something someone asked for, add the What's new item with `asked: true` and reply to them. The page is English only for now, like the rest of What's new.
+
 ## How we'll know (no public numbers)
 
 - **Share of installs from people** (`invite`, `share`, `coach`, `creator`, `profile`, gym QR) against search and the store's own browse. Hevy-style growth means this share rises.

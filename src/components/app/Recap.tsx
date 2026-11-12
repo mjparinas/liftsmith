@@ -96,14 +96,18 @@ export function Recap({ arg }: { arg?: string }) {
     });
   if (r.avgHr) cards.push({ k: "hr", big: `${num(r.avgHr)} bpm`, small: t("recap.hr") });
 
-  const shareItem: Shareable = {
+  // What can be shared: the summary card, then one highlight per card ("Wrapped" for the year, growth plan item 5),
+  // each built for a story (big number, one line) so a lifter can post their year a card at a time.
+  const kicker = t(period.kind === "year" ? "recap.year" : "recap.month");
+  const base = { kicker, footer: BRAND.name, tiles: [] as [string, string][], lines: [] as string[] };
+  const summary: Shareable = {
     id: `recap-${period.kind}`,
     kind: "recap",
-    label: t(period.kind === "year" ? "recap.year" : "recap.month"),
+    label: t("recap.card.summary"),
     figure: r.topExercise?.id,
     file: `liftsmith-recap-${period.kind}`,
     card: (o) => ({
-      kicker: t(period.kind === "year" ? "recap.year" : "recap.month"),
+      kicker,
       headline: r.label,
       tiles: [
         [t("recap.card.workouts"), num(r.workouts)],
@@ -123,6 +127,79 @@ export function Recap({ arg }: { arg?: string }) {
       name: o.name,
     }),
   };
+  const highlights: Shareable[] = [
+    {
+      id: `recap-${period.kind}-workouts`,
+      kind: "recap",
+      label: t("recap.card.workouts"),
+      figure: r.topExercise?.id,
+      file: `liftsmith-recap-${period.kind}-workouts`,
+      card: (o) => ({
+        ...base,
+        headline: r.label,
+        big: { value: num(r.workouts), label: t("recap.card.workouts") },
+        lines: r.weeks > 1 ? [t("recap.card.weeks", { active: num(r.activeWeeks), weeks: num(r.weeks) })] : [],
+        name: o.name,
+      }),
+    },
+    {
+      id: `recap-${period.kind}-lifted`,
+      kind: "recap",
+      label: t("recap.card.lifted"),
+      figure: r.topExercise?.id,
+      file: `liftsmith-recap-${period.kind}-lifted`,
+      // Without weights it shows the sets instead, so the card still says something.
+      card: (o) => ({
+        ...base,
+        headline: r.label,
+        big: o.weights
+          ? { value: fmtTonnage(r.volumeKg, unit), label: t("recap.card.lifted") }
+          : { value: num(r.sets), label: t("recap.card.sets") },
+        lines: o.weights && r.likeA ? [t("recap.card.like", { thing: r.likeA })] : [],
+        name: o.name,
+      }),
+    },
+    ...(r.prs[0]
+      ? [
+          {
+            id: `recap-${period.kind}-pr`,
+            kind: "recap" as const,
+            label: t("recap.card.prs"),
+            figure: r.prs[0].exerciseId,
+            file: `liftsmith-recap-${period.kind}-pr`,
+            card: (o: { weights: boolean; name: string | null }) => ({
+              ...base,
+              headline: r.prs[0]!.name,
+              big: o.weights
+                ? { value: `${fmtNum(fromKg(r.prs[0]!.weight, unit))} ${unit} × ${r.prs[0]!.reps}`, label: r.label }
+                : { value: num(r.prs.length), label: t("recap.card.prs") },
+              name: o.name,
+            }),
+          },
+        ]
+      : []),
+    ...(r.topExercise
+      ? [
+          {
+            id: `recap-${period.kind}-top`,
+            kind: "recap" as const,
+            label: t("recap.card.topLift"),
+            figure: r.topExercise.id,
+            file: `liftsmith-recap-${period.kind}-top`,
+            card: (o: { weights: boolean; name: string | null }) => ({
+              ...base,
+              headline: r.topExercise!.name,
+              big: {
+                value: t("recap.card.setsOf", { count: r.topExercise!.sets, n: num(r.topExercise!.sets) }),
+                label: t("recap.card.topLift"),
+              },
+              name: o.name,
+            }),
+          },
+        ]
+      : []),
+  ];
+  const shareItems = [summary, ...highlights];
 
   return (
     <div className="pb-2">
@@ -175,7 +252,7 @@ export function Recap({ arg }: { arg?: string }) {
           {t(period.kind === "year" ? "recap.shareYear" : "recap.shareMonth")}
         </Button>
       )}
-      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={[shareItem]} />
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
     </div>
   );
 }

@@ -8,6 +8,7 @@ import { accessFor, type Access } from "./access";
 import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
+import { earnedDeletes } from "./earnedPro";
 import { claimDeletes } from "./gymClaims";
 import { gymDeletes } from "./gymDirectory";
 import { placeDeletes } from "./gymPlaces";
@@ -285,6 +286,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     { sql: "DELETE FROM share_links WHERE account_id = ?", args: [accountId] },
     ...socialDeletes(accountId),
     ...coachCleanup(accountId),
+    ...earnedDeletes(accountId),
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),
     ...claimDeletes(accountId),

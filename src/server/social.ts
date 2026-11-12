@@ -52,6 +52,7 @@ import {
 
 import { cleanCode, newCode } from "./coach";
 import { batch, query, rateLimit, run, type Row } from "./db";
+import { recordAccept } from "./earnedPro";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
 
@@ -1677,6 +1678,8 @@ export async function acceptInvite(accountId: string, b: Record<string, unknown>
     },
     { sql: "UPDATE social_invites SET uses = uses + 1 WHERE code = ?", args: [cleanCode(b.code)] },
   ]);
+  // Give a month, get a month (earnedPro.ts): a new account joining through an invite starts the count.
+  await recordAccept(accountId, them, now);
   if (!had?.accepted) await notify(them, accountId, "follow");
   return ok({ handle: s(p.handle) });
 }
