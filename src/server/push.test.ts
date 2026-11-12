@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { query, resetDb } from "./db";
 import { MAX_TOKENS, pushConfigured, setPushSender, type PushMessage } from "./push";
@@ -81,6 +81,25 @@ describe("Friends push notifications", () => {
     await call("acc-a", "pushOff", { token: TOKEN(`p${MAX_TOKENS + 1}`) });
     expect(await query("SELECT * FROM push_tokens WHERE account_id = 'acc-a'")).toHaveLength(MAX_TOKENS - 1);
     expect((await call("acc-a", "pushToken", { token: "short", platform: "android" })).body.error).toBe("token");
+  });
+
+  it("logs where a push stopped, without ids or tokens", async () => {
+    const info = vi.spyOn(console, "info").mockImplementation(() => {});
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    try {
+      await call("acc-b", "follow", { handle: "alex" });
+      expect(info).toHaveBeenCalledWith("push request: recipient has no registered phone");
+      setPushSender(async () => "error");
+      await call("acc-a", "pushToken", { token: TOKEN("a"), platform: "android", lang: "en" });
+      await call("acc-b", "unfollow", { handle: "alex" });
+      await call("acc-b", "follow", { handle: "alex" });
+      expect(warn).toHaveBeenCalledWith("push request to android: error");
+      const logged = [...info.mock.calls, ...warn.mock.calls].flat().join(" ");
+      expect(logged).not.toMatch(/tok-|acc-/);
+    } finally {
+      info.mockRestore();
+      warn.mockRestore();
+    }
   });
 
   it("stays off until the keys are set", () => {

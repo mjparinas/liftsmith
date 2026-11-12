@@ -98,8 +98,9 @@ export async function notify(to: string, from: string, kind: PushKind, vars: { t
   if (!sender || to === from) return;
   try {
     await Promise.race([send(sender, to, from, kind, vars), new Promise((r) => setTimeout(r, TIMEOUT_MS))]);
-  } catch {
+  } catch (e) {
     // a push is a nicety; the Activity list still has it
+    console.warn(`push ${kind}: ${e instanceof Error ? e.message : "failed"}`);
   }
 }
 
@@ -120,6 +121,8 @@ async function send(
     "SELECT token, platform, lang FROM push_tokens WHERE account_id = ?",
     [to],
   );
+  // No ids or tokens in the logs: the kind and the outcome are enough to see where a push stopped.
+  if (!tokens.length) console.info(`push ${kind}: recipient has no registered phone`);
   const name = String(who.name);
   const route = kind === "sent" && vars.code ? `#/routine/${vars.code}` : "#/friends";
   const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
@@ -128,6 +131,7 @@ async function send(
       const lang: MsgLang = isMsgLang(t.lang) ? t.lang : "en";
       const body = pushText(lang, `push.${kind}`, { name, text: short(vars.text), workout: vars.workout ?? "" });
       const r = await sender({ token: String(t.token), platform: t.platform, body, route, kind });
+      if (r !== "ok") console.warn(`push ${kind} to ${t.platform}: ${r}`);
       if (r === "gone") await run("DELETE FROM push_tokens WHERE token = ?", [t.token]);
     }),
   );
@@ -157,7 +161,10 @@ async function fcmAccessToken(sa: { client_email: string; private_key: string })
     body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: jwt }),
   });
   const j = (await r.json()) as { access_token?: string; expires_in?: number };
-  if (!j.access_token) throw new Error("FCM auth failed");
+  if (!j.access_token) {
+    console.warn(`push: FCM sign-in refused (${r.status})`);
+    throw new Error("FCM auth failed");
+  }
   fcmAuth = { token: j.access_token, until: Date.now() + (j.expires_in ?? 3600) * 1000 };
   return j.access_token;
 }
@@ -181,6 +188,7 @@ async function sendFcm(m: PushMessage): Promise<"ok" | "gone" | "error"> {
   if (r.ok) return "ok";
   const err = (await r.json().catch(() => ({}))) as { error?: { status?: string; details?: { errorCode?: string }[] } };
   const code = err.error?.details?.find((d) => d.errorCode)?.errorCode ?? err.error?.status;
+  if (code !== "UNREGISTERED" && r.status !== 404) console.warn(`push: FCM refused a message (${r.status} ${code ?? ""})`);
   return code === "UNREGISTERED" || r.status === 404 ? "gone" : "error";
 }
 
