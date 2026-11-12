@@ -289,6 +289,7 @@ export function siteRoutes(): Route[] {
     ...IMPORT_SOURCES.map((s) => ({ path: `/import/${s.slug}/`, priority: 0.7 })),
     { path: "/apps/", priority: 0.7 },
     { path: "/features/", priority: 0.7 },
+    { path: "/works-with/scales/", priority: 0.5 },
     ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
   // The translated pages (src/lib/siteLang.ts, and the translated tools): every language's copy, each listing all of them.

@@ -56,6 +56,7 @@ export const en = {
   "lab.scale.body":
     "Under the weigh-in on Progress and Body, a button connects a scale that shares its reading over Bluetooth the standard way (the weight scale and body composition standards). Step on, and your weight and body fat fill in, ready to log. Many cheap scales use their own app's protocol instead and won't show up. In the web app it needs Chrome.",
   "lab.scale.button": "Weigh in on my scale",
+  "lab.scale.which": "Which scales work?",
   "lab.scale.device": "the scale",
   "lab.scale.connecting": "Looking for your scale…",
   "lab.scale.waiting": "Step on {name} now.",
@@ -137,6 +138,7 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Bajo el registro de peso en Progreso y Cuerpo, un botón conecta una báscula que comparte su lectura por Bluetooth de la forma estándar (los estándares de báscula y de composición corporal). Súbete y tu peso y tu grasa corporal se rellenan, listos para registrar. Muchas básculas baratas usan el protocolo de su propia app y no aparecerán. En la app web necesita Chrome.",
   "lab.scale.button": "Pesarme en mi báscula",
+  "lab.scale.which": "¿Qué básculas funcionan?",
   "lab.scale.device": "la báscula",
   "lab.scale.connecting": "Buscando tu báscula…",
   "lab.scale.waiting": "Súbete a {name} ahora.",
@@ -216,6 +218,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Sous la pesée dans Progrès et Corps, un bouton connecte une balance qui partage sa mesure en Bluetooth de façon standard (les normes de pèse-personne et de composition corporelle). Montez dessus : votre poids et votre masse grasse se remplissent, prêts à enregistrer. Beaucoup de balances bon marché utilisent le protocole de leur propre app et n’apparaîtront pas. Dans l’app web, il faut Chrome.",
   "lab.scale.button": "Me peser sur ma balance",
+  "lab.scale.which": "Quelles balances fonctionnent ?",
   "lab.scale.device": "la balance",
   "lab.scale.connecting": "Recherche de votre balance…",
   "lab.scale.waiting": "Montez sur {name} maintenant.",
@@ -296,6 +299,7 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Unter dem Wiegen bei Fortschritt und Körper verbindet ein Button eine Waage, die ihren Messwert standardmäßig über Bluetooth teilt (die Standards für Personenwaagen und Körperzusammensetzung). Stell dich drauf, und dein Gewicht und Körperfett werden eingetragen, bereit zum Speichern. Viele günstige Waagen nutzen stattdessen das Protokoll ihrer eigenen App und erscheinen nicht. In der Web-App braucht es Chrome.",
   "lab.scale.button": "Auf meiner Waage wiegen",
+  "lab.scale.which": "Welche Waagen funktionieren?",
   "lab.scale.device": "die Waage",
   "lab.scale.connecting": "Suche deine Waage …",
   "lab.scale.waiting": "Stell dich jetzt auf {name}.",
@@ -375,6 +379,7 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Sotto la pesata in Progressi e Corpo, un pulsante collega una bilancia che condivide la sua misura via Bluetooth in modo standard (gli standard per bilance pesapersone e composizione corporea). Sali e il tuo peso e la massa grassa si compilano, pronti da registrare. Molte bilance economiche usano il protocollo della propria app e non compariranno. Nell’app web serve Chrome.",
   "lab.scale.button": "Pesami sulla mia bilancia",
+  "lab.scale.which": "Quali bilance funzionano?",
   "lab.scale.device": "la bilancia",
   "lab.scale.connecting": "Cerco la tua bilancia…",
   "lab.scale.waiting": "Sali su {name} adesso.",
@@ -453,6 +458,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "「進捗」と「からだ」の体重記録の下に、Bluetooth の標準規格（体重計と体組成の規格）で測定値を共有する体重計に接続するボタンが出ます。乗ると体重と体脂肪率が入力され、そのまま記録できます。安価な体重計の多くは独自アプリの方式を使うため表示されません。Web アプリでは Chrome が必要です。",
   "lab.scale.button": "体重計で測る",
+  "lab.scale.which": "使える体重計",
   "lab.scale.device": "体重計",
   "lab.scale.connecting": "体重計を探しています…",
   "lab.scale.waiting": "{name}に乗ってください。",
