@@ -5,7 +5,8 @@ import { useEffect, useRef, useSyncExternalStore } from "react";
 import { track } from "@/lib/analytics";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
-import { cueKey, SWITCH_SEC, timerAt, timerHeld, type TimerSpec, type TimerState } from "@/lib/setTimer";
+import type { TimerSegment } from "@/lib/sessionNotify";
+import { cueKey, SWITCH_SEC, timerAt, timerHeld, timerPhases, type TimerSpec, type TimerState } from "@/lib/setTimer";
 import { restCue, say } from "@/lib/voice";
 
 import { clock } from "../format";
@@ -112,6 +113,25 @@ function useCues(run: TimerRun, state: TimerState, now: number, onDone: (at: num
 function beep() {
   sound.countdown();
   haptic("select");
+}
+
+/** The running timer for the lock screen and the watches, each phase labelled as on screen. */
+export function sessionTimer(run: TimerRun): TimerSegment[] {
+  const { spec } = run;
+  return timerPhases(spec, run.startAt).map((x) => ({
+    from: x.from,
+    ...(x.to !== undefined ? { to: x.to } : {}),
+    label:
+      x.phase === "lead"
+        ? t("timer.getSet")
+        : x.phase === "switch"
+          ? t("timer.switch")
+          : spec.sides === 2
+            ? t(x.side === 1 ? "timer.side1" : "timer.side2")
+            : spec.up
+              ? t("timer.target", { time: clock(spec.target) })
+              : t("timer.left"),
+  }));
 }
 
 /** The Start button above Log set. */

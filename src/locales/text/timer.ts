@@ -16,6 +16,7 @@ export const en = {
   "timer.logPlan": "Log set saves the planned time",
   "timer.cancel": "Cancel",
   "timer.cancelLabel": "Cancel the timer without logging the set",
+  "timer.over": "Time’s up",
   "timer.vc.switch": "Switch sides.",
 };
 
@@ -35,6 +36,7 @@ export const es: Partial<Record<Key, Message>> = {
   "timer.logPlan": "Registrar serie guarda el tiempo previsto",
   "timer.cancel": "Cancelar",
   "timer.cancelLabel": "Cancelar el temporizador sin registrar la serie",
+  "timer.over": "Se acabó el tiempo",
   "timer.vc.switch": "Cambia de lado.",
 };
 
@@ -52,6 +54,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "timer.logPlan": "Valider la série enregistre le temps prévu",
   "timer.cancel": "Annuler",
   "timer.cancelLabel": "Annuler le minuteur sans enregistrer la série",
+  "timer.over": "Temps écoulé",
   "timer.vc.switch": "Change de côté.",
 };
 
@@ -69,6 +72,7 @@ export const de: Partial<Record<Key, Message>> = {
   "timer.logPlan": "Satz eintragen speichert die geplante Zeit",
   "timer.cancel": "Abbrechen",
   "timer.cancelLabel": "Timer abbrechen, ohne den Satz einzutragen",
+  "timer.over": "Zeit um",
   "timer.vc.switch": "Seite wechseln.",
 };
 
@@ -86,6 +90,7 @@ export const it: Partial<Record<Key, Message>> = {
   "timer.logPlan": "Registra serie salva il tempo previsto",
   "timer.cancel": "Annulla",
   "timer.cancelLabel": "Annulla il timer senza registrare la serie",
+  "timer.over": "Tempo scaduto",
   "timer.vc.switch": "Cambia lato.",
 };
 
@@ -103,5 +108,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "timer.logPlan": "セットを記録で予定の時間を保存します",
   "timer.cancel": "キャンセル",
   "timer.cancelLabel": "セットを記録せずにタイマーをキャンセル",
+  "timer.over": "時間です",
   "timer.vc.switch": "反対側に替えてください。",
 };

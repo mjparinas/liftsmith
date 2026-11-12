@@ -146,7 +146,10 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         center.removePendingNotificationRequests(withIdentifiers: [restId])
         let restUntil = call.getDouble("restUntil") ?? 0
         let delay = restUntil / 1000 - Date().timeIntervalSince1970
-        guard delay > 0.5 else { return call.resolve() }
+        guard delay > 0.5 else {
+            timerOverAlert(call)
+            return call.resolve()
+        }
 
         let content = UNMutableNotificationContent()
         content.title = NSLocalizedString("Rest over", comment: "Rest-over alert title")
@@ -160,6 +163,22 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
         center.add(UNNotificationRequest(identifier: restId, content: content, trigger: trigger))
         call.resolve()
+    }
+
+    /// The set timer's end (a hold or carry) while the app may be asleep: the same time-sensitive alert as rest over,
+    /// in the same slot (the timer only runs while lifting), saying "Time's up" with its Log set button.
+    private func timerOverAlert(_ call: CAPPluginCall) {
+        guard let last = (call.getArray("timer") ?? []).last as? [String: Any], let to = (last["to"] as? NSNumber)?.doubleValue else { return }
+        let delay = to / 1000 - Date().timeIntervalSince1970
+        guard delay > 0.5 else { return }
+        let content = UNMutableNotificationContent()
+        content.title = call.getString("timerOver") ?? ""
+        content.body = [call.getString("title"), call.getString("setLabel")].compactMap { $0 }.filter { !$0.isEmpty }.joined(separator: " · ")
+        content.categoryIdentifier = category
+        content.sound = (call.getBool("sound") ?? true) ? UNNotificationSound.default : nil
+        if #available(iOS 15.0, *) { content.interruptionLevel = .timeSensitive }
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: delay, repeats: false)
+        UNUserNotificationCenter.current().add(UNNotificationRequest(identifier: restId, content: content, trigger: trigger))
     }
 
     @available(iOS 16.2, *)
@@ -177,7 +196,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             hr: call.getInt("hr"),
             chip: call.getString("chip"),
             done: call.getInt("done"),
-            total: call.getInt("total")
+            total: call.getInt("total"),
+            timer: restUntil == nil ? WorkoutAttributes.TimerPhase.parse(call.getArray("timer")) : nil,
+            timerOver: call.getString("timerOver")
         )
         // Heart rate arrives about once a second; the system budgets updates, so a change in heart rate alone is
         // pushed at most every 15 s. Anything else (a set logged, rest added) goes out straight away.
@@ -188,8 +209,9 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
             if same == state { lastHrPush = Date() }
         }
         lastActivityState = state
-        // Stale when rest ends, so the system redraws it then and it says "Rest over" without an update from the app.
-        let content = ActivityContent(state: state, staleDate: restUntil)
+        // Stale when rest ends (or the set timer moves on), so the system redraws it then and it says "Rest over"
+        // (or "Switch sides", "Time's up") without an update from the app.
+        let content = ActivityContent(state: state, staleDate: state.nextChange(after: Date()))
         // After the app was closed and opened again, carry on with the Live Activity that's still showing.
         if activity == nil { activity = Activity<WorkoutAttributes>.activities.first }
         if let current = activity as? Activity<WorkoutAttributes> {
@@ -238,6 +260,8 @@ public class WorkoutSessionPlugin: CAPPlugin, CAPBridgedPlugin, UNUserNotificati
         if let d = call.getInt("done") { s["done"] = d }
         if let t = call.getInt("total") { s["total"] = t }
         if call.getBool("motion") == true { s["motion"] = true }
+        // The set timer (holds, carries, cardio): the watch counts its phases on its own clock (WatchState.timer).
+        if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }
         return s
     }
 

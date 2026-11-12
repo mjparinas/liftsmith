@@ -19,6 +19,7 @@ final class WatchModel: NSObject, ObservableObject {
     private var builder: HKLiveWorkoutBuilder?
     private var lastHrSent = Date.distantPast
     private var restTap: Timer?
+    private var timerTaps: [Timer] = []
     private let motion = MotionStream()
 
     func start() {
@@ -66,6 +67,17 @@ final class WatchModel: NSObject, ObservableObject {
     private func scheduleRestTap() {
         restTap?.invalidate()
         restTap = nil
+        timerTaps.forEach { $0.invalidate() }
+        // The set timer: a tap on the wrist as each phase ends (go, switch sides, time's up).
+        if let s = current, s.vibrate, !s.resting(at: Date()) {
+            timerTaps = s.timer.compactMap(\.end).filter { $0 > Date() }.map { end in
+                Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { _ in
+                    WKInterfaceDevice.current().play(.notification)
+                }
+            }
+        } else {
+            timerTaps = []
+        }
         guard let s = current, s.vibrate, let end = s.restEnd, end > Date() else { return }
         restTap = Timer.scheduledTimer(withTimeInterval: end.timeIntervalSinceNow, repeats: false) { _ in
             WKInterfaceDevice.current().play(.stop)

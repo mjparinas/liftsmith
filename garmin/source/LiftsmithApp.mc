@@ -16,6 +16,8 @@ class LiftsmithApp extends Application.AppBase {
     var workout as WorkoutState;
     private var _timer as Timer.Timer?;
     private var _wasResting as Boolean = false;
+    //! The set timer phase last seen (its label), to buzz when it moves on; null with no timer.
+    private var _timerPhase as String? = null;
     private var _hrSentAt as Number = 0;
 
     function initialize() {
@@ -49,6 +51,8 @@ class LiftsmithApp extends Application.AppBase {
     function onPhone(msg as Communications.PhoneAppMessage) as Void {
         workout.apply(msg.data);
         _wasResting = workout.resting();
+        var phase = workout.phase();
+        _timerPhase = phase == null ? null : (phase as Array)[2] as String;
         WatchUi.requestUpdate();
     }
 
@@ -74,6 +78,13 @@ class LiftsmithApp extends Application.AppBase {
             buzz(400);
         }
         _wasResting = resting;
+        // The set timer: a buzz as each phase ends (go, switch sides, time's up).
+        var phase = workout.phase();
+        var label = phase == null ? "" : (phase as Array)[2] as String;
+        if (_timerPhase != null && !_timerPhase.equals(label) && workout.active() && workout.vibrate) {
+            buzz(250);
+        }
+        _timerPhase = phase == null && workout.timer.size() == 0 ? null : label;
         WatchUi.requestUpdate();
     }
 

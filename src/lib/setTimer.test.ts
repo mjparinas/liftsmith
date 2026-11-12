@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import { cueKey, LEAD_SEC, SWITCH_SEC, timerAt, timerHeld, timerLength, type TimerSpec } from "./setTimer";
+import { timerSegmentAt } from "./sessionNotify";
+import { cueKey, LEAD_SEC, SWITCH_SEC, timerAt, timerHeld, timerLength, timerPhases, type TimerSpec } from "./setTimer";
 
 // The set timer for holds, carries, hangs and cardio: a lead-in, then a countdown (each side in turn) or a count-up.
 
@@ -58,5 +59,31 @@ describe("cueKey", () => {
   it("changes once a second, so each beep plays once", () => {
     expect(cueKey(timerAt(plank, s(LEAD_SEC + 1.1)))).toBe(cueKey(timerAt(plank, s(LEAD_SEC + 1.9))));
     expect(cueKey(timerAt(plank, s(LEAD_SEC + 1.1)))).not.toBe(cueKey(timerAt(plank, s(LEAD_SEC + 2.1))));
+  });
+});
+
+describe("timerPhases", () => {
+  it("lays the timer out in wall-clock time for the lock screen and the watches", () => {
+    const t0 = 1_800_000_000_000;
+    expect(timerPhases(plank, t0)).toEqual([
+      { phase: "lead", from: t0, to: t0 + s(LEAD_SEC) },
+      { phase: "work", side: 1, from: t0 + s(LEAD_SEC), to: t0 + s(LEAD_SEC + 30) },
+    ]);
+    const sides = timerPhases(suitcase, t0);
+    expect(sides.map((x) => x.phase)).toEqual(["lead", "work", "switch", "work"]);
+    expect(sides.at(-1)).toEqual({ phase: "work", side: 2, from: t0 + s(LEAD_SEC + 20 + SWITCH_SEC), to: t0 + timerLength(suitcase)! });
+    expect(timerPhases(row, t0).at(-1)).toEqual({ phase: "work", side: 1, from: t0 + s(LEAD_SEC) });
+  });
+
+  it("agrees with the app's own clock at every second", () => {
+    const t0 = 1_800_000_000_000;
+    const segs = timerPhases(suitcase, t0).map((x) => ({ ...x, label: x.phase }));
+    for (let ms = 0; ms < timerLength(suitcase)!; ms += 500) {
+      const here = timerAt(suitcase, ms);
+      expect(timerSegmentAt(segs, t0 + ms)?.label).toBe(here.phase);
+    }
+    expect(timerSegmentAt(segs, t0 + timerLength(suitcase)!)).toBeNull();
+    expect(timerSegmentAt(segs, t0 - 1)).toBeNull();
+    expect(timerSegmentAt(undefined, t0)).toBeNull();
   });
 });

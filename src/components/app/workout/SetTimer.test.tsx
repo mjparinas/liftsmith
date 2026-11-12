@@ -10,7 +10,7 @@ import { useApp } from "@/lib/store";
 import * as voice from "@/lib/voice";
 
 import { App } from "../App";
-import { cancelTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./SetTimer";
+import { cancelTimer, sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./SetTimer";
 
 vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
@@ -93,6 +93,16 @@ describe("SetTimerClock", () => {
     expect(screen.getByText("idle")).toBeTruthy();
     expect(takeTimer("set-1")).toBeNull();
     expect(onDone).not.toHaveBeenCalled();
+  });
+});
+
+describe("sessionTimer", () => {
+  it("labels each phase for the lock screen and the watches as the screen does", () => {
+    const run = { key: "k", startAt: 1_000_000, spec: { target: 20, sides: 2 as const, up: false } };
+    expect(sessionTimer(run).map((x) => x.label)).toEqual(["Get set", "First side", "Switch sides", "Second side"]);
+    expect(sessionTimer({ ...run, spec: plank }).map((x) => x.label)).toEqual(["Get set", "Time left"]);
+    const up = sessionTimer({ ...run, spec: { target: 1200, sides: 1, up: true } });
+    expect(up.at(-1)).toEqual({ from: 1_000_000 + s(LEAD_SEC), label: "Target 20:00" });
   });
 });
 

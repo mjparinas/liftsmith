@@ -64,7 +64,7 @@ import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { aheadSteps, sessionFields } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
-import { SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
+import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
@@ -311,7 +311,7 @@ export function Workout() {
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -339,8 +339,11 @@ export function Workout() {
       sessionId: active.sessionId,
       motion: watchMotion || undefined,
       ahead: ahead.current.steps,
+      // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
+      timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
+      timerOver: timerRun && !resting ? t("timer.over") : undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion, timerRun?.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
   // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).

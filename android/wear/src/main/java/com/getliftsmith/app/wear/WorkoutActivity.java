@@ -112,13 +112,22 @@ public class WorkoutActivity extends Activity implements WatchHub.Listener {
             return;
         }
         boolean resting = s.resting(now);
+        // The set timer (holds, carries, cardio): its clock in the big line and what it's counting under it.
+        WorkoutState.Phase phase = s.phase(now);
         set.setVisibility(s.setLabel.isEmpty() ? View.GONE : View.VISIBLE);
         set.setText(s.setLabel);
         title.setText(s.title);
         big.setVisibility(View.VISIBLE);
-        big.setText(resting ? WorkoutState.clock(s.restLeft(now)) : s.next);
-        big.setContentDescription(resting ? getString(R.string.rest_left, WorkoutState.clock(s.restLeft(now))) : s.next);
-        sub.setText(resting ? getString(R.string.up_next, s.next) : s.plates);
+        if (phase != null) {
+            String clock = WorkoutState.clock(phase.seconds(now));
+            big.setText(clock);
+            big.setContentDescription(phase.label + " " + clock);
+            sub.setText(phase.label);
+        } else {
+            big.setText(resting ? WorkoutState.clock(s.restLeft(now)) : s.next);
+            big.setContentDescription(resting ? getString(R.string.rest_left, WorkoutState.clock(s.restLeft(now))) : s.next);
+            sub.setText(resting ? getString(R.string.up_next, s.next) : s.plates);
+        }
         sub.setVisibility(sub.getText().length() == 0 ? View.GONE : View.VISIBLE);
         int bpm = WatchHub.bpm() > 0 ? WatchHub.bpm() : s.hr;
         hr.setVisibility(bpm > 0 ? View.VISIBLE : View.GONE);

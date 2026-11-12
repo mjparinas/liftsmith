@@ -73,4 +73,28 @@ public class WorkoutStateTest {
         assertTrue(WorkoutState.parse("{\"motion\":true}").streamMotion(NOW));
         assertFalse(WorkoutState.parse("{\"motion\":true,\"restUntil\":" + (NOW + 60_000) + "}").streamMotion(NOW));
     }
+
+    @Test
+    public void setTimerStepsThroughItsPhases() {
+        WorkoutState s = WorkoutState.parse(
+            "{\"timer\":[{\"from\":" + NOW + ",\"to\":" + (NOW + 5000) + ",\"label\":\"Get set\"},"
+                + "{\"from\":" + (NOW + 5000) + ",\"to\":" + (NOW + 35_000) + ",\"label\":\"Time left\"}]}"
+        );
+        assertEquals("Get set", s.phase(NOW).label);
+        assertEquals(5, s.phase(NOW).seconds(NOW));
+        assertEquals("Time left", s.phase(NOW + 5000).label);
+        assertEquals(1, s.phase(NOW + 34_500).seconds(NOW + 34_500));
+        assertNull(s.phase(NOW + 35_000));
+        assertNull(WorkoutState.parse("{\"title\":\"Plank\"}").phase(NOW));
+    }
+
+    @Test
+    public void setTimerCountsCardioUpAndHidesWhileResting() {
+        WorkoutState up = WorkoutState.parse("{\"timer\":[{\"from\":" + NOW + ",\"label\":\"Target 20:00\"}]}");
+        assertEquals(85, up.phase(NOW + 85_400).seconds(NOW + 85_400));
+        WorkoutState rest = WorkoutState.parse(
+            "{\"restUntil\":" + (NOW + 60_000) + ",\"timer\":[{\"from\":" + NOW + ",\"label\":\"x\"}]}"
+        );
+        assertNull(rest.phase(NOW + 1000));
+    }
 }

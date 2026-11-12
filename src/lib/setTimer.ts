@@ -90,3 +90,28 @@ export function cueKey(state: TimerState): string {
       return "done";
   }
 }
+
+/** One stretch of a running timer, as the lock screen and the watches show it: counts down to `to`, or up from `from`. */
+export interface TimerPhase {
+  phase: "lead" | "switch" | "work";
+  side?: 1 | 2;
+  from: number;
+  /** Absent for a count-up, which runs until the set is logged. */
+  to?: number;
+}
+
+/**
+ * The whole timer started at `startAt`, phase by phase in wall-clock time, so the live notification, the Live
+ * Activity and the watches can step through it on their own clocks while the app is asleep (sessionNotify.ts).
+ */
+export function timerPhases(spec: TimerSpec, startAt: number): TimerPhase[] {
+  const target = Math.max(1, Math.round(spec.target)) * SEC;
+  const lead = startAt + LEAD_SEC * SEC;
+  const out: TimerPhase[] = [{ phase: "lead", from: startAt, to: lead }];
+  if (spec.up) return [...out, { phase: "work", side: 1, from: lead }];
+  out.push({ phase: "work", side: 1, from: lead, to: lead + target });
+  if (spec.sides === 1) return out;
+  const sw = lead + target + SWITCH_SEC * SEC;
+  out.push({ phase: "switch", from: lead + target, to: sw }, { phase: "work", side: 2, from: sw, to: sw + target });
+  return out;
+}

@@ -83,4 +83,22 @@ public class GarminMessagesTest {
         assertEquals(0, GarminMessages.bpm(msg("hr", "142")));
         assertEquals(0, GarminMessages.bpm(Arrays.asList("x", 1)));
     }
+
+    @Test
+    public void setTimerGoesAsSecondsFromNow() throws Exception {
+        JSONObject plank = lifting().put(
+            "timer",
+            new org.json.JSONArray(
+                "[{\"from\":" + (NOW - 2000) + ",\"to\":" + (NOW + 3000) + ",\"label\":\"Get set\"},"
+                    + "{\"from\":" + (NOW + 3000) + ",\"to\":" + (NOW + 33_000) + ",\"label\":\"Time left\"}]"
+            )
+        );
+        Map<String, Object> m = GarminMessages.state(plank, NOW);
+        assertEquals(java.util.Arrays.asList(java.util.Arrays.asList(-2, 3, "Get set"), java.util.Arrays.asList(3, 33, "Time left")), m.get("k"));
+        assertEquals(String.valueOf(NOW - 2000), m.get("ki"));
+        // A new timer is worth a message; the same one a second later isn't.
+        assertTrue(GarminMessages.worthSending(GarminMessages.state(lifting(), NOW), m, 500));
+        assertFalse(GarminMessages.worthSending(m, GarminMessages.state(plank, NOW + 1000), 1000));
+        assertEquals(java.util.Collections.emptyList(), GarminMessages.state(lifting(), NOW).get("k"));
+    }
 }
