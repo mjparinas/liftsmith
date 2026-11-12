@@ -10,6 +10,7 @@ import {
   previousBest,
   prShare,
   sessionShares,
+  shareText,
   trendShare,
   workoutShare,
   type ShareContext,
@@ -99,5 +100,12 @@ describe("wrap", () => {
   });
   it("breaks text without spaces by character", () => {
     expect(wrap(measure, "あいうえおかきくけこ", 50, 3)).toEqual(["あいうえお", "かきくけこ"]);
+  });
+});
+
+describe("share text", () => {
+  it("ends with the site's address on its own line, so a shared card carries a link", () => {
+    const text = shareText({ headline: "Workout done", footer: "Level 3" } as unknown as CardData);
+    expect(text).toBe("Workout done · Level 3\nhttps://www.getliftsmith.com/");
   });
 });

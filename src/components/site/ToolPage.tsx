@@ -4,8 +4,10 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 
 import { BRAND } from "@/lib/brand";
+import { embedFor } from "@/lib/embeds";
 import { SITE_URL } from "@/lib/site";
 
+import { EmbedCode } from "./EmbedCode";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "./SiteChrome";
 
 export interface ToolPageProps {
@@ -26,6 +28,7 @@ export interface ToolPageProps {
 
 export function ToolPage(p: ToolPageProps) {
   const short = p.slug.replace(/-calculator$/, "");
+  const embed = embedFor(p.slug);
   const jsonLd = [
     {
       "@context": "https://schema.org",
@@ -74,6 +77,7 @@ export function ToolPage(p: ToolPageProps) {
           .
         </p>
       </section>
+      {embed ? <EmbedCode embed={embed} /> : null}
       <CtaBanner cta={`tool-${short}-end`} title={p.end.title} body={p.end.body} />
     </SitePage>
   );

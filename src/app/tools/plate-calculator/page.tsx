@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EmbedCode } from "@/components/site/EmbedCode";
 import { PlateCalculator } from "@/components/site/PlateCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { embedFor } from "@/lib/embeds";
 import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
@@ -86,6 +88,7 @@ export default function PlatePage() {
           .
         </p>
       </section>
+      <EmbedCode embed={embedFor("plate-calculator")!} />
       <CtaBanner
         cta="tool-plates-end"
         title="Every set loaded for you"
