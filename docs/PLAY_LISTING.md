@@ -10,7 +10,7 @@ node scripts/play-video.mjs     # store/play/promo-video.mp4 (not committed; upl
 ```
 
 Rules for this text (Play's metadata policy plus our own):
-- Only features that ship on Android today. Wear OS, optional accounts with sync, Friends and Pro are in (2026-11-11, for the public launch); Strava, Oura and Whoop stay out until they leave "Coming soon", and anything iPhone-only (Apple Watch) stays out of the Play listing. No prices: Play shows them on the listing itself.
+- Only features that ship on Android today. Wear OS, optional accounts with sync, Friends and Pro are in (2026-11-11, for the public launch); Strava, Oura, Whoop, Withings, Polar and Concept2 stay out until they leave "Coming soon", and anything iPhone-only (Apple Watch) stays out of the Play listing. No prices: Play shows them on the listing itself.
 - No other apps' names, no "best" or "#1", no testimonials, no emoji, no all caps.
 - Every URL uses `www` (Melvin, 2026-11-09).
 

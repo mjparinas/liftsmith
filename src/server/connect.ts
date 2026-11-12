@@ -1,12 +1,21 @@
 // Connected cloud services (docs/decisions/connected-apps.md): the OAuth exchange, token storage and the
-// few API calls each service needs. Strava receives finished workouts; Oura and Whoop send sleep, HRV,
-// resting heart rate, breathing rate and steps in, which the app stores as health readings like Health
-// Connect's. Health readings pass through and are never stored here. Each service needs its own client id
-// and secret in Vercel (STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET, OURA_…, WHOOP_…); without them its row in the
-// app says "Coming soon" and every route for it answers 503.
+// few API calls each service needs. Strava receives finished workouts; Oura, Whoop, Withings and Polar send
+// sleep, HRV, resting heart rate, breathing rate, steps and (Withings) weigh-ins in, which the app stores like
+// Health Connect's; Concept2 sends rows, ski and bike sessions in as cardio. Readings and sessions pass
+// through and are never stored here. Each service needs its own client id and secret in Vercel
+// (STRAVA_CLIENT_ID / STRAVA_CLIENT_SECRET, OURA_…, WHOOP_…, WITHINGS_…, POLAR_…, CONCEPT2_…); without them its
+// row in the app says "Coming soon" and every route for it answers 503.
 import { createCipheriv, createDecipheriv, createHash, randomBytes } from "node:crypto";
 
-import { CLOUD, type Cloud, type CloudReading, type CloudStatus, type CloudWorkout } from "@/lib/cloud";
+import {
+  CLOUD,
+  type Cloud,
+  type CloudCardio,
+  type CloudReading,
+  type CloudStatus,
+  type CloudWorkout,
+  type ReadingCloud,
+} from "@/lib/cloud";
 import { SITE_URL } from "@/lib/site";
 import type { HealthMetric } from "@/lib/types";
 
@@ -20,6 +29,10 @@ interface Provider {
   scope: string;
   /** Strava wants its scopes comma-separated; the others space-separated (already in `scope`). */
   extra?: Record<string, string>;
+  /** Polar takes the client id and secret as HTTP Basic auth on the token call, not in the body. */
+  basic?: boolean;
+  /** Withings: every token call carries action=requesttoken, and the reply is wrapped in { status, body }. */
+  withings?: boolean;
 }
 
 export const PROVIDERS: Record<Cloud, Provider> = {
@@ -39,9 +52,34 @@ export const PROVIDERS: Record<Cloud, Provider> = {
     token: "https://api.prod.whoop.com/oauth/oauth2/token",
     scope: "offline read:recovery read:sleep",
   },
+  withings: {
+    authorize: "https://account.withings.com/oauth2_user/authorize2",
+    token: "https://wbsapi.withings.net/v2/oauth2",
+    // Withings separates scopes with commas.
+    scope: "user.metrics,user.activity",
+    withings: true,
+  },
+  polar: {
+    authorize: "https://flow.polar.com/oauth2/authorization",
+    token: "https://polarremote.com/v2/oauth2/token",
+    scope: "accesslink.read_all",
+    basic: true,
+  },
+  concept2: {
+    authorize: "https://log.concept2.com/oauth/authorize",
+    token: "https://log.concept2.com/oauth/access_token",
+    scope: "user:read,results:read",
+  },
 };
 
-const ENV: Record<Cloud, string> = { strava: "STRAVA", oura: "OURA", whoop: "WHOOP" };
+const ENV: Record<Cloud, string> = {
+  strava: "STRAVA",
+  oura: "OURA",
+  whoop: "WHOOP",
+  withings: "WITHINGS",
+  polar: "POLAR",
+  concept2: "CONCEPT2",
+};
 const STATE_MS = 15 * 60_000;
 
 export function keys(p: Cloud, env: NodeJS.ProcessEnv = process.env): { id: string; secret: string } | null {
@@ -131,17 +169,25 @@ interface TokenReply {
   /** Unix seconds (Strava). */
   expires_at?: number;
   athlete?: { firstname?: string; lastname?: string };
+  /** Polar's user id, needed to register and later remove the lifter at AccessLink. */
+  x_user_id?: number | string;
 }
 
 async function tokenCall(p: Cloud, body: Record<string, string>, f: Fetch, env: NodeJS.ProcessEnv): Promise<TokenReply> {
   const k = keys(p, env);
   if (!k) throw new Error("not set up");
-  const r = await f(PROVIDERS[p].token, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
-    body: new URLSearchParams({ client_id: k.id, client_secret: k.secret, ...body }).toString(),
-  });
-  const j = (await r.json().catch(() => ({}))) as TokenReply;
+  const cfg = PROVIDERS[p];
+  const headers: Record<string, string> = { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" };
+  if (cfg.basic) headers.Authorization = `Basic ${Buffer.from(`${k.id}:${k.secret}`).toString("base64")}`;
+  const form = {
+    ...(cfg.basic ? {} : { client_id: k.id, client_secret: k.secret }),
+    ...(cfg.withings ? { action: "requesttoken" } : {}),
+    ...body,
+  };
+  const r = await f(cfg.token, { method: "POST", headers, body: new URLSearchParams(form).toString() });
+  const raw = (await r.json().catch(() => ({}))) as TokenReply & { status?: number; body?: TokenReply };
+  // Withings answers 200 with its own status, 0 when it worked, and the tokens under `body`.
+  const j = cfg.withings ? (raw.status === 0 ? (raw.body ?? {}) : {}) : raw;
   if (!r.ok || !j.access_token) throw new Error(`${p} token ${r.status}`);
   return j;
 }
@@ -151,14 +197,40 @@ const expiry = (j: TokenReply, now: number) =>
 
 async function save(accountId: string, p: Cloud, j: TokenReply, who: string | null, env: NodeJS.ProcessEnv, now: number) {
   const k = keys(p, env)!;
+  const remote = j.x_user_id === undefined ? null : String(j.x_user_id);
   await run(
-    `INSERT INTO connections (account_id, provider, access_token, refresh_token, expires_at, who, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO connections (account_id, provider, access_token, refresh_token, expires_at, who, created_at, remote_user)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(account_id, provider) DO UPDATE SET access_token = excluded.access_token,
        refresh_token = COALESCE(excluded.refresh_token, connections.refresh_token), expires_at = excluded.expires_at,
-       who = COALESCE(excluded.who, connections.who)`,
-    [accountId, p, seal(j.access_token!, k.secret), j.refresh_token ? seal(j.refresh_token, k.secret) : null, expiry(j, now), who, now],
+       who = COALESCE(excluded.who, connections.who), remote_user = COALESCE(excluded.remote_user, connections.remote_user)`,
+    [
+      accountId,
+      p,
+      seal(j.access_token!, k.secret),
+      j.refresh_token ? seal(j.refresh_token, k.secret) : null,
+      expiry(j, now),
+      who,
+      now,
+      remote,
+    ],
   );
+}
+
+const POLAR = "https://www.polaraccesslink.com/v3";
+
+/**
+ * Polar's AccessLink only shares a lifter's data once the app registers them, once, after they allow it. A
+ * 409 means they were registered before (connected, removed here, connected again), which is fine.
+ */
+async function registerPolar(accountId: string, token: string, f: Fetch): Promise<boolean> {
+  const r = await f(`${POLAR}/users`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json", Accept: "application/json" },
+    // Polar asks for our own id for the member; a hash keeps the account id itself out of Polar.
+    body: JSON.stringify({ "member-id": createHash("sha256").update(`liftsmith-polar:${accountId}`).digest("hex").slice(0, 32) }),
+  }).catch(() => null);
+  return !!r && (r.ok || r.status === 409);
 }
 
 /**
@@ -183,6 +255,7 @@ export async function callback(
   const j = await tokenCall(p, { code, grant_type: "authorization_code", redirect_uri: redirectUri(p) }, f, env).catch(() => null);
   if (!j) return null;
   const who = p === "strava" ? [j.athlete?.firstname, j.athlete?.lastname].filter(Boolean).join(" ") || null : null;
+  if (p === "polar" && !(await registerPolar(String(s.account_id), j.access_token!, f))) return null;
   await save(String(s.account_id), p, j, who, env, now);
   return { platform: String(s.platform) };
 }
@@ -216,7 +289,18 @@ export async function accessToken(
 /** Revokes the token at the service (best effort) and forgets it here. */
 export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, env: NodeJS.ProcessEnv = process.env): Promise<void> {
   const token = await accessToken(accountId, p, f, env).catch(() => null);
+  const remote =
+    p === "polar"
+      ? (
+          await query<{ remote_user: string | null }>("SELECT remote_user FROM connections WHERE account_id = ? AND provider = ?", [
+            accountId,
+            p,
+          ])
+        )[0]?.remote_user
+      : null;
   if (token) {
+    // Withings and Concept2 have no plain token revoke; the lifter can remove Liftsmith in their own account.
+    const none = () => Promise.resolve();
     const revoke: Record<Cloud, () => Promise<unknown>> = {
       strava: () =>
         f("https://www.strava.com/oauth/deauthorize", {
@@ -227,6 +311,13 @@ export async function disconnect(accountId: string, p: Cloud, f: Fetch = fetch, 
       oura: () => f(`https://api.ouraring.com/oauth/revoke?access_token=${encodeURIComponent(token)}`),
       whoop: () =>
         f("https://api.prod.whoop.com/developer/v2/user/access", { method: "DELETE", headers: { Authorization: `Bearer ${token}` } }),
+      // Removing the user at AccessLink ends Liftsmith's access to their Polar data.
+      polar: () =>
+        remote
+          ? f(`${POLAR}/users/${encodeURIComponent(remote)}`, { method: "DELETE", headers: { Authorization: `Bearer ${token}` } })
+          : none(),
+      withings: none,
+      concept2: none,
     };
     await revoke[p]().catch(() => null);
   }
@@ -418,19 +509,230 @@ export function whoopReadings(sleeps: readonly WhoopSleep[], recoveries: readonl
   return out.sort((a, b) => a.at - b.at);
 }
 
-async function getJson<T>(url: string, token: string, f: Fetch): Promise<T> {
-  const r = await f(url, { headers: { Authorization: `Bearer ${token}`, Accept: "application/json" } });
+// --- Withings: weigh-ins, body fat, steps and sleep ---
+
+interface WithingsGroup {
+  date?: number;
+  category?: number;
+  measures?: { value?: number; type?: number; unit?: number }[];
+}
+interface WithingsSleep {
+  date?: string;
+  data?: { total_sleep_time?: number; hr_min?: number; rr_average?: number };
+}
+
+/**
+ * Withings' measure groups (weight type 1, fat ratio type 6; value × 10^unit), finished days' steps, and
+ * nights' sleep, as one reading per metric per day. The last weigh-in of a day wins. Exported for tests.
+ */
+export function withingsReadings(
+  groups: readonly WithingsGroup[],
+  activity: readonly { date?: string; steps?: number }[],
+  sleep: readonly WithingsSleep[],
+  tzMin: number,
+  today: string,
+): CloudReading[] {
+  const out: CloudReading[] = [];
+  const last = new Map<string, CloudReading>();
+  for (const g of groups) {
+    // Category 1 is a real measurement; 2 is a goal the lifter typed.
+    if (!g.date || (g.category !== undefined && g.category !== 1)) continue;
+    const at = g.date * 1000;
+    const day = dayAt(at, tzMin);
+    for (const m of g.measures ?? []) {
+      if (typeof m.value !== "number" || typeof m.unit !== "number") continue;
+      const v = m.value * 10 ** m.unit;
+      const metric = m.type === 1 ? "weight" : m.type === 6 ? "bodyFat" : null;
+      if (!metric) continue;
+      if (metric === "weight" ? v < 25 || v > 350 : v < 2 || v > 70) continue;
+      const key = `${metric}|${day}`;
+      const prev = last.get(key);
+      if (!prev || prev.at <= at) last.set(key, { metric, day, value: round(v, metric === "weight" ? 2 : 1), at });
+    }
+  }
+  out.push(...last.values());
+  for (const a of activity)
+    if (a.date && a.date < today && typeof a.steps === "number" && a.steps > 0 && a.steps < 100_000)
+      out.push({ metric: "steps", day: a.date, value: Math.round(a.steps), at: Date.parse(`${a.date}T23:59:00Z`) });
+  for (const n of sleep) {
+    if (!n.date) continue;
+    const at = Date.parse(`${n.date}T08:00:00Z`);
+    const d = n.data ?? {};
+    const h = (d.total_sleep_time ?? 0) / 3600;
+    if (h >= 1 && h <= 16) out.push({ metric: "sleep", day: n.date, value: round(h, 2), at });
+    if (d.hr_min && d.hr_min > 25 && d.hr_min < 130) out.push({ metric: "restingHr", day: n.date, value: round(d.hr_min, 1), at });
+    if (d.rr_average && d.rr_average > 4 && d.rr_average < 40)
+      out.push({ metric: "breathing", day: n.date, value: round(d.rr_average, 1), at });
+  }
+  return out.sort((a, b) => a.at - b.at);
+}
+
+/** Withings' API answers 200 with its own status: 0 worked, 401 the token is no good. */
+async function withingsCall<T>(url: string, params: Record<string, string>, token: string, f: Fetch): Promise<T> {
+  const r = await f(url, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams(params).toString(),
+  });
   if (r.status === 401) throw new Unlinked();
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = (await r.json()) as { status?: number; body?: T };
+  if (j.status === 401) throw new Unlinked();
+  if (j.status !== 0 || !j.body) throw new Error(`Withings ${j.status}`);
+  return j.body;
+}
+
+// --- Polar: nightly recharge and sleep ---
+
+interface PolarRecharge {
+  date?: string;
+  heart_rate_avg?: number;
+  heart_rate_variability_avg?: number;
+  breathing_rate_avg?: number;
+}
+interface PolarNight {
+  date?: string;
+  light_sleep?: number;
+  deep_sleep?: number;
+  rem_sleep?: number;
+  sleep_end_time?: string;
+}
+
+/**
+ * Polar's nightly recharge (the night's average HRV and breathing rate; its average heart rate stands in for
+ * resting heart rate, as Polar gives no lowest) and sleep (light + deep + REM seconds), one reading per metric
+ * per day, the day the night ended. Exported for tests.
+ */
+export function polarReadings(recharges: readonly PolarRecharge[], nights: readonly PolarNight[]): CloudReading[] {
+  const out: CloudReading[] = [];
+  const endOf = new Map<string, number>();
+  for (const n of nights) {
+    if (!n.date) continue;
+    const at = Date.parse(n.sleep_end_time ?? "") || Date.parse(`${n.date}T08:00:00Z`);
+    endOf.set(n.date, at);
+    const h = ((n.light_sleep ?? 0) + (n.deep_sleep ?? 0) + (n.rem_sleep ?? 0)) / 3600;
+    if (h >= 1 && h <= 16) out.push({ metric: "sleep", day: n.date, value: round(h, 2), at });
+  }
+  for (const r of recharges) {
+    if (!r.date) continue;
+    const at = endOf.get(r.date) ?? Date.parse(`${r.date}T08:00:00Z`);
+    const hrv = r.heart_rate_variability_avg;
+    const hr = r.heart_rate_avg;
+    const br = r.breathing_rate_avg;
+    if (hrv && hrv > 5 && hrv < 300) out.push({ metric: "hrv", day: r.date, value: round(hrv, 1), at });
+    if (hr && hr > 25 && hr < 130) out.push({ metric: "restingHr", day: r.date, value: round(hr, 1), at });
+    if (br && br > 4 && br < 40) out.push({ metric: "breathing", day: r.date, value: round(br, 1), at });
+  }
+  return out.sort((a, b) => a.at - b.at);
+}
+
+// --- Concept2: rows, ski and bike sessions ---
+
+interface C2Result {
+  id?: number | string;
+  type?: string;
+  date?: string;
+  timezone?: string | null;
+  /** Metres. */
+  distance?: number;
+  /** Tenths of a second. */
+  time?: number;
+}
+
+/** UTC ms for a wall-clock "YYYY-MM-DD HH:MM:SS" in an IANA zone (Concept2 logs local time with its zone). */
+export function zonedTime(local: string, zone: string | null | undefined, fallbackMin: number): number | null {
+  const m = /^(\d{4})-(\d\d)-(\d\d)[ T](\d\d):(\d\d)(?::(\d\d))?/.exec(local);
+  if (!m) return null;
+  const asUtc = Date.UTC(+m[1]!, +m[2]! - 1, +m[3]!, +m[4]!, +m[5]!, +(m[6] ?? 0));
+  let offset = fallbackMin;
+  if (zone)
+    try {
+      const parts = new Intl.DateTimeFormat("en-US", {
+        timeZone: zone,
+        hourCycle: "h23",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      }).formatToParts(new Date(asUtc));
+      const get = (t: string) => Number(parts.find((p) => p.type === t)?.value);
+      offset = Math.round(
+        (Date.UTC(get("year"), get("month") - 1, get("day"), get("hour"), get("minute"), get("second")) - asUtc) / 60_000,
+      );
+    } catch {
+      // An unknown zone: the phone's offset.
+    }
+  return asUtc - offset * 60_000;
+}
+
+/** The Logbook's results as cardio sessions: rower (and its slides and dynamic models), SkiErg and BikeErg. Exported for tests. */
+export function concept2Cardio(results: readonly C2Result[], tzMin: number): CloudCardio[] {
+  const out: CloudCardio[] = [];
+  for (const r of results) {
+    const kind =
+      r.type === "skierg"
+        ? "skierg"
+        : r.type === "bike"
+          ? "bike"
+          : r.type === "rower" || r.type === "dynamic" || r.type === "slides"
+            ? "rower"
+            : null;
+    const start = r.date ? zonedTime(r.date, r.timezone, tzMin) : null;
+    const seconds = Math.round((r.time ?? 0) / 10);
+    const distanceM = Math.round(r.distance ?? 0);
+    if (!kind || r.id === undefined || start === null || seconds < 30 || seconds > 86_400 || distanceM <= 0 || distanceM > 1_000_000)
+      continue;
+    out.push({ id: String(r.id), kind, start, seconds, distanceM });
+  }
+  return out.sort((a, b) => a.start - b.start);
+}
+
+/** The last `days` of Concept2 Logbook sessions. Throws Unlinked when Concept2 refused the token. */
+export async function concept2Results(
+  accountId: string,
+  days: number,
+  tzMin: number,
+  f: Fetch = fetch,
+  env: NodeJS.ProcessEnv = process.env,
+  now = Date.now(),
+): Promise<CloudCardio[]> {
+  const token = await accessToken(accountId, "concept2", f, env, now);
+  if (!token) throw new Unlinked();
+  const out: C2Result[] = [];
+  for (let page = 1; page <= 5; page++) {
+    const q = new URLSearchParams({
+      from: dayAt(now - days * 86_400_000, tzMin),
+      to: dayAt(now + 86_400_000, tzMin),
+      number: "250",
+      page: String(page),
+    });
+    const j = await getJson<{ data?: C2Result[]; meta?: { pagination?: { total_pages?: number } } }>(
+      `https://log.concept2.com/api/users/me/results?${q}`,
+      token,
+      f,
+      "application/vnd.c2logbook.v1+json",
+    );
+    out.push(...(j.data ?? []));
+    if ((j.meta?.pagination?.total_pages ?? 1) <= page) break;
+  }
+  return concept2Cardio(out, tzMin);
+}
+
+async function getJson<T>(url: string, token: string, f: Fetch, accept = "application/json"): Promise<T> {
+  const r = await f(url, { headers: { Authorization: `Bearer ${token}`, Accept: accept } });
+  if (r.status === 401 || r.status === 403) throw new Unlinked();
   if (!r.ok) throw new Error(`HTTP ${r.status}`);
   return (await r.json()) as T;
 }
 
 export class Unlinked extends Error {}
 
-/** The last `days` of readings from Oura or Whoop. Throws Unlinked when the service refused the token. */
+/** The last `days` of readings from Oura, Whoop, Withings or Polar. Throws Unlinked when the service refused the token. */
 export async function dailyReadings(
   accountId: string,
-  p: "oura" | "whoop",
+  p: ReadingCloud,
   days: number,
   tzMin: number,
   f: Fetch = fetch,
@@ -440,6 +742,45 @@ export async function dailyReadings(
   const token = await accessToken(accountId, p, f, env, now);
   if (!token) throw new Unlinked();
   const from = now - days * 86_400_000;
+  if (p === "withings") {
+    const ymd = { startdateymd: dayAt(from, tzMin), enddateymd: dayAt(now, tzMin) };
+    const [meas, act, sleep] = await Promise.all([
+      withingsCall<{ measuregrps?: WithingsGroup[] }>(
+        "https://wbsapi.withings.net/measure",
+        {
+          action: "getmeas",
+          meastypes: "1,6",
+          category: "1",
+          startdate: String(Math.floor(from / 1000)),
+          enddate: String(Math.floor(now / 1000)),
+        },
+        token,
+        f,
+      ),
+      withingsCall<{ activities?: { date?: string; steps?: number }[] }>(
+        "https://wbsapi.withings.net/v2/measure",
+        { action: "getactivity", data_fields: "steps", ...ymd },
+        token,
+        f,
+      ),
+      withingsCall<{ series?: WithingsSleep[] }>(
+        "https://wbsapi.withings.net/v2/sleep",
+        { action: "getsummary", data_fields: "total_sleep_time,hr_min,rr_average", ...ymd },
+        token,
+        f,
+      ),
+    ]);
+    return withingsReadings(meas.measuregrps ?? [], act.activities ?? [], sleep.series ?? [], tzMin, dayAt(now, tzMin));
+  }
+  if (p === "polar") {
+    // AccessLink keeps the last 28 days of each.
+    const [rech, sleep] = await Promise.all([
+      getJson<{ recharges?: PolarRecharge[] }>(`${POLAR}/users/nightly-recharge`, token, f),
+      getJson<{ nights?: PolarNight[] }>(`${POLAR}/users/sleep`, token, f),
+    ]);
+    const since = dayAt(from, tzMin);
+    return polarReadings(rech.recharges ?? [], sleep.nights ?? []).filter((r) => r.day >= since);
+  }
   if (p === "oura") {
     const q = `start_date=${dayAt(from, tzMin)}&end_date=${dayAt(now + 86_400_000, tzMin)}`;
     const [sleep, act] = await Promise.all([

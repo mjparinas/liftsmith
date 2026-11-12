@@ -15,12 +15,12 @@ import type {
 } from "./types";
 import { toKg } from "./units";
 
-// CSV import (table stakes, Melvin, 2026-11-09): workouts exported from Strong, Hevy or Liftsmith
-// itself become the same events a hand-logged past workout writes (dashboard.ts pastWorkoutEvents):
+// CSV import (table stakes, Melvin, 2026-11-09): workouts exported from Strong, Hevy, Fitbod, StrongLifts,
+// JEFIT (Melvin, 2026-11-12) or Liftsmith itself become the same events a hand-logged past workout writes (dashboard.ts pastWorkoutEvents):
 // a sessionStart marked `source: "manual"`, the sets, and a sessionEnd. Every id is derived from the
 // file's own data, so importing the same file twice adds nothing. Everything runs on the device.
 
-export type ImportFormat = "strong" | "hevy" | "liftsmith";
+export type ImportFormat = "strong" | "hevy" | "fitbod" | "stronglifts" | "jefit" | "liftsmith";
 
 export interface ImportSet {
   name: string;
@@ -95,8 +95,16 @@ const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "
 /** Local time from "2026-11-09 18:05:00", "2026-11-09T18:05", "2026-11-09" + "18:05", or "9 Nov 2026, 18:05". */
 export function parseDate(s: string, time = ""): number | null {
   const t = `${s} ${time}`.trim();
-  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
-  if (m) return new Date(+m[1], +m[2] - 1, +m[3], +(m[4] ?? 0), +(m[5] ?? 0), +(m[6] ?? 0)).getTime();
+  let m = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?(?:\.\d+)?\s*(Z|[+-]\d{2}:?\d{2})?)?/);
+  if (m) {
+    const [y, mo, d, h, mi, se] = [+m[1], +m[2] - 1, +m[3], +(m[4] ?? 0), +(m[5] ?? 0), +(m[6] ?? 0)];
+    // Fitbod writes "2026-11-02 18:05:00 +0000": a time with an offset is that moment, not local time.
+    const off = m[7];
+    if (!off) return new Date(y, mo, d, h, mi, se).getTime();
+    const sign = off[0] === "-" ? -1 : 1;
+    const mins = off === "Z" ? 0 : sign * (+off.slice(1, 3) * 60 + +off.slice(-2));
+    return Date.UTC(y, mo, d, h, mi, se) - mins * 60_000;
+  }
   m = t.match(/^(\d{1,2}) ([A-Za-z]{3})[a-z]* (\d{4}),? ?(\d{1,2})?:?(\d{2})?/);
   if (m) {
     const mon = MONTHS.indexOf(m[2].toLowerCase());
@@ -119,10 +127,12 @@ const num = (s: string | undefined) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-/** Reads a file exported by Strong, Hevy or Liftsmith. Null when it's none of them. */
+/** Reads a file exported by Strong, Hevy, Fitbod, StrongLifts, JEFIT or Liftsmith. Null when it's none of them. */
 export function readImport(text: string): ImportFile | null {
   const rows = parseCsv(text);
   if (rows.length < 2) return null;
+  const jefit = readJefit(rows);
+  if (jefit) return jefit;
   const head = rows[0].map((h) => h.trim().toLowerCase());
   const col = (...names: string[]) => head.findIndex((h) => names.some((n) => h === n || h.startsWith(`${n} (`)));
   const get = (r: string[], i: number) => (i >= 0 ? (r[i] ?? "").trim() : "");
@@ -255,7 +265,116 @@ export function readImport(text: string): ImportFile | null {
     }
     return { format: "liftsmith", unit: "kg", workouts: [...workouts.values()], skipped };
   }
+
+  if (col("exercise") >= 0 && col("date") >= 0 && (col("weight(kg)") >= 0 || col("weight(lbs)") >= 0) && col("iswarmup") >= 0) {
+    // Fitbod: one row per set with a timestamp, no workout id. Sets less than three hours apart are one workout.
+    const w = col("weight(kg)") >= 0 ? col("weight(kg)") : col("weight(lbs)");
+    const unit: Unit = col("weight(kg)") >= 0 ? "kg" : "lb";
+    const [date, ex, reps, secs, dist, warm] = [
+      col("date"),
+      col("exercise"),
+      col("reps"),
+      col("duration(s)"),
+      col("distance(m)"),
+      col("iswarmup"),
+    ];
+    const sets: { at: number; set: ImportSet }[] = [];
+    for (const r of rows.slice(1)) {
+      const at = parseDate(get(r, date));
+      const n = num(get(r, reps));
+      const sec = num(get(r, secs));
+      if (at === null || !get(r, ex) || num(get(r, dist)) > 0 || !keep(n, sec)) {
+        skipped++;
+        continue;
+      }
+      const set: ImportSet = {
+        name: get(r, ex),
+        weight: num(get(r, w)),
+        reps: n,
+        seconds: n ? undefined : sec,
+        warmup: /^(true|1|yes)$/i.test(get(r, warm)),
+      };
+      sets.push({ at, set });
+    }
+    sets.sort((a, b) => a.at - b.at);
+    let key = "";
+    let last = -Infinity;
+    for (const { at, set } of sets) {
+      if (at - last > 3 * 3_600_000) key = `${at}`;
+      last = at;
+      add(key, { title: "Workout", start: +key }, set);
+    }
+    for (const wk of workouts.values()) {
+      const end = sets.filter((x) => x.at >= wk.start && x.at - wk.start < 12 * 3_600_000).at(-1)?.at ?? wk.start;
+      if (end > wk.start) wk.minutes = Math.round((end - wk.start) / 60_000) + 2;
+    }
+    return { format: "fitbod", unit, workouts: [...workouts.values()], skipped };
+  }
+
+  const setCols = head.map((h, i) => (/^set ?\d+$/.test(h) ? i : -1)).filter((i) => i >= 0);
+  if (col("exercise") >= 0 && col("date") >= 0 && setCols.length) {
+    // StrongLifts: one row per exercise, with each set's reps in "Set 1", "Set 2"… The unit is in the weight header.
+    const w = col("weight");
+    const unitHead = head[w]?.match(/\((kg|lbs?)\)/)?.[1];
+    const unit: Unit | null = unitHead ? (unitHead === "kg" ? "kg" : "lb") : null;
+    const [date, title, ex, dur] = [col("date"), col("workout", "workout name"), col("exercise"), col("duration")];
+    for (const r of rows.slice(1)) {
+      const at = parseDate(get(r, date));
+      if (at === null || !get(r, ex)) {
+        skipped++;
+        continue;
+      }
+      const weight = num(get(r, w));
+      let any = false;
+      for (const c of setCols) {
+        const cell = get(r, c);
+        // A cell is the reps ("5"), or weight and reps ("100x5") when the set's weight differs.
+        const pair = cell.match(/^(\d+(?:[.,]\d+)?)\s*[x×]\s*(\d+)/i);
+        const reps = pair ? num(pair[2]) : num(cell);
+        if (reps <= 0) continue;
+        any = true;
+        add(
+          `${at}|${get(r, title)}`,
+          { title: get(r, title) || "Workout", start: at, minutes: minutesOf(get(r, dur)) },
+          { name: get(r, ex), weight: pair ? num(pair[1]) : weight, reps, warmup: false },
+        );
+      }
+      if (!any) skipped++;
+    }
+    return { format: "stronglifts", unit, workouts: [...workouts.values()], skipped };
+  }
   return null;
+}
+
+/**
+ * JEFIT: a file of sections ("### EXERCISE LOGS ###" and others), each with its own header. The exercise
+ * logs have one row per exercise per day with every set in one cell: "135x10,155x8". The unit isn't stated.
+ */
+function readJefit(rows: string[][]): ImportFile | null {
+  const start = rows.findIndex((r) => {
+    const h = r.map((x) => x.trim().toLowerCase());
+    return h.includes("logs") && (h.includes("ename") || h.includes("exercise name")) && (h.includes("mydate") || h.includes("date"));
+  });
+  if (start < 0) return null;
+  const head = rows[start].map((h) => h.trim().toLowerCase());
+  const at = (...names: string[]) => head.findIndex((h) => names.includes(h));
+  const [date, ex, logs] = [at("mydate", "date"), at("ename", "exercise name"), at("logs")];
+  const workouts = new Map<string, ImportWorkout>();
+  let skipped = 0;
+  for (const r of rows.slice(start + 1)) {
+    if ((r[0] ?? "").trim().startsWith("###")) break;
+    const day = (r[date] ?? "").trim();
+    const when = parseDate(day);
+    const name = (r[ex] ?? "").trim();
+    const sets = [...(r[logs] ?? "").matchAll(/(\d+(?:\.\d+)?)\s*x\s*(\d+)/gi)];
+    if (when === null || !name || !sets.length) {
+      skipped++;
+      continue;
+    }
+    if (!workouts.has(day)) workouts.set(day, { key: day, title: "Workout", start: when, sets: [] });
+    for (const s of sets) if (+s[2]! > 0) workouts.get(day)!.sets.push({ name, weight: +s[1]!, reps: +s[2]!, warmup: false });
+  }
+  return { format: "jefit", unit: null, workouts: [...workouts.values()], skipped };
 }
 
 // --- Matching names to the library ---

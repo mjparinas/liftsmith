@@ -268,7 +268,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     [accountId],
   );
   for (const a of apple) if (a.apple_refresh) await Promise.resolve(revoke(String(a.apple_refresh))).catch(() => null);
-  // Connected apps (Strava, Oura, Whoop): revoked at each service and forgotten.
+  // Connected apps (Strava, Oura, Whoop, Withings, Polar, Concept2): revoked at each service and forgotten.
   await forgetAll(accountId).catch(() => null);
   // A web subscription (Stripe) is cancelled, so a deleted account is never charged again.
   await forgetStripe(accountId).catch(() => null);

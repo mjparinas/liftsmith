@@ -1,5 +1,6 @@
-// GET /api/connect/<oura|whoop>/daily/?days=45&tz=-300: the last days of sleep, HRV, resting heart rate,
-// breathing rate and steps, one reading per metric per day. Passed through, never stored. Server build only.
+// GET /api/connect/<oura|whoop|withings|polar>/daily/?days=45&tz=-300: the last days of sleep, HRV, resting heart rate,
+// breathing rate, steps and (Withings) weigh-ins, one reading per metric per day. Passed through, never stored. Server build only.
+import { isReadingCloud } from "@/lib/cloud";
 import { preflight, reply, signedIn } from "@/server/accountHttp";
 import { dailyReadings, Unlinked } from "@/server/connect";
 import { rateLimit } from "@/server/db";
@@ -10,7 +11,7 @@ type Ctx = { params: Promise<{ provider: string }> };
 
 export async function GET(req: Request, ctx: Ctx) {
   const { provider } = await ctx.params;
-  if (provider !== "oura" && provider !== "whoop") return reply(req, 404, { error: "Unknown service" });
+  if (!isReadingCloud(provider)) return reply(req, 404, { error: "Unknown service" });
   const s = await signedIn(req);
   if (s instanceof Response) return s;
   if (!(await rateLimit(`daily:${s.accountId}:${provider}`, 60, 3_600_000).catch(() => true)))

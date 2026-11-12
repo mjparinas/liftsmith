@@ -105,6 +105,13 @@ export const FLAGS = {
     description:
       "Bikes, rowers, treadmills and cross trainers that share their data over Bluetooth fill in time, distance and power on cardio.",
   },
+  /** Labs: a Bluetooth scale (Weight Scale or Body Composition Service) fills in the weigh-in (scale.ts). */
+  labScale: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: Bluetooth smart scale",
+    description: "A scale that shares its reading over Bluetooth the standard way fills in weight and body fat on the weigh-in.",
+  },
   /** Labs: the tempo coach counts each rep's lowering, hold and lifting out in sounds and haptics (src/lib/tempo.ts). */
   labTempo: {
     default: false,

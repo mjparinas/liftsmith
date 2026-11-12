@@ -1,4 +1,5 @@
-import type { CloudReading } from "../cloud";
+import type { CloudCardio, CloudReading } from "../cloud";
+import { cloudCardioEvents, cloudReadingEvents } from "../cloudImport";
 import { derive } from "../derive";
 import { cleanResult } from "../fitTests";
 import { healthAvailable, noteHealthSync, readBody, readDaily } from "../health";
@@ -27,10 +28,13 @@ export interface HealthSlice {
   /** Sleep, HRV, resting HR, steps, VO2 max and breathing rate from Health, one reading a day (the health twin). */
   importHealthDaily(): Promise<number>;
   /**
-   * Readings from a connected cloud service (Oura, Whoop: connections.ts), stored like Health's so the health
-   * twin and the readiness call use them. Ids start with the service, so a re-import adds nothing.
+   * Readings from a connected cloud service (Oura, Whoop, Withings, Polar: connections.ts), stored like Health's
+   * so the health twin and the readiness call use them; a scale's weight and body fat become a weigh-in. Ids
+   * start with the service, so a re-import adds nothing.
    */
   importCloudReadings(source: string, readings: readonly CloudReading[]): number;
+  /** Concept2 Logbook sessions as finished cardio workouts under the active gym (cloudImport.ts). */
+  importCloudCardio(sessions: readonly CloudCardio[], now?: number): number;
   /** Records a TDEE snapshot when an input that matters changed since the last one (tdee.ts). */
   refreshTdee(trigger?: "auto" | "manual", now?: number): AppEvent | null;
   /** Applies height read from Health Connect or Apple Health, then refreshes TDEE. */
@@ -123,22 +127,29 @@ export function healthSlice(c: Ctx): HealthSlice {
 
     importCloudReadings(source, readings) {
       const have = new Set(get().events.map((e) => e.id));
-      const fresh = readings
-        .map((r) => ({
-          type: "health" as const,
-          id: `${source}-${r.metric}-${r.day}-${Math.round(r.value * 10)}`,
-          at: r.at,
-          metric: r.metric,
-          day: r.day,
-          value: r.value,
-        }))
-        .filter((e) => !have.has(e.id));
+      const fresh = cloudReadingEvents(source, readings, have);
+      if (fresh.length) {
+        commit(fresh);
+        const weighIns = fresh.filter((e) => e.type === "bodyweight");
+        const newest = weighIns.reduce<(typeof weighIns)[number] | null>((a, b) => (!a || b.at > a.at ? b : a), null);
+        const last = get()
+          .events.filter((e) => e.type === "bodyweight" && !fresh.includes(e))
+          .reduce((t, e) => Math.max(t, e.at), 0);
+        if (newest && newest.type === "bodyweight" && newest.at >= last) get().setProfile({ bodyweight: newest.kg });
+        if (!get().active) get().replan();
+        if (fresh.some((e) => (e.type === "health" && e.metric === "steps") || e.type === "bodyweight")) get().refreshTdee();
+      }
+      return fresh.length;
+    },
+
+    importCloudCardio(sessions, now = Date.now()) {
+      const have = new Set(get().events.map((e) => e.id));
+      const fresh = cloudCardioEvents(sessions, get().profile.activeGymId, now, have);
       if (fresh.length) {
         commit(fresh);
         if (!get().active) get().replan();
-        if (fresh.some((e) => e.metric === "steps")) get().refreshTdee();
       }
-      return fresh.length;
+      return fresh.filter((e) => e.type === "sessionStart").length;
     },
 
     refreshTdee(trigger = "auto", now = Date.now()) {

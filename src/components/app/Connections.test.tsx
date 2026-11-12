@@ -23,7 +23,7 @@ afterEach(() => {
 });
 
 describe("Connected apps on the web", () => {
-  it("explains Health is in the phone apps, and asks to sign in before Strava, Oura and WHOOP", () => {
+  it("explains Health is in the phone apps, and asks to sign in before the fitness services", () => {
     render(<Connections />);
     expect(screen.getByRole("heading", { name: "Connected apps" })).toBeInTheDocument();
     expect(screen.getByText(/A browser can't reach them/)).toBeInTheDocument();
@@ -48,13 +48,16 @@ describe("Connected apps on the web", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async () =>
-        Response.json({ ready: { strava: true, oura: true, whoop: false }, linked: { strava: { since: Date.now(), who: "Sam Lee" } } }),
+        Response.json({
+          ready: { strava: true, oura: true, whoop: false, withings: false, polar: false, concept2: false },
+          linked: { strava: { since: Date.now(), who: "Sam Lee" } },
+        }),
       ),
     );
     render(<Connections />);
     expect(await screen.findByText("Connected as Sam Lee")).toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Post my workouts to Strava" })).toBeChecked();
-    expect(screen.getByText("Coming soon")).toBeInTheDocument();
+    expect(screen.getAllByText("Coming soon")).toHaveLength(4);
     expect(screen.getByRole("button", { name: "Disconnect" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
   });

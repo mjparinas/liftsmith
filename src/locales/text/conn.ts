@@ -83,13 +83,17 @@ export const en = {
   "conn.garmin.getApp": "Get the watch app",
   "conn.garmin.change": "Change watches",
   "conn.cloud.title": "Fitness services",
-  "conn.cloud.signIn": "Connecting Strava, Oura or WHOOP needs a free Liftsmith account, so the link stays with you on every device.",
+  "conn.cloud.signIn": "Connecting a fitness service needs a free Liftsmith account, so the link stays with you on every device.",
   "conn.cloud.signInButton": "Sign in or create an account",
   "conn.strava.what": "Posts each finished workout to Strava, with your sets in the description.",
   "conn.strava.post": "Post my workouts to Strava",
   "conn.strava.waiting": { one: "{count} workout waiting to post.", other: "{count} workouts waiting to post." },
   "conn.oura.what": "Sends sleep, heart rate variability, resting heart rate, breathing rate and steps in for Today's readiness call.",
   "conn.whoop.what": "Sends sleep, recovery heart rate variability, resting heart rate and breathing rate in for Today's readiness call.",
+  "conn.withings.what":
+    "Sends weigh-ins, body fat, sleep, resting heart rate, breathing rate and steps in from your Withings scale and watch.",
+  "conn.polar.what": "Sends sleep, overnight heart rate variability, heart rate and breathing rate in for Today's readiness call.",
+  "conn.concept2.what": "Rows, ski and bike sessions from your Concept2 Logbook come in as cardio workouts.",
   "conn.strava.title": "Strength training",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
@@ -190,7 +194,7 @@ export const es: Partial<Record<Key, Message>> = {
   "conn.garmin.change": "Cambiar de reloj",
   "conn.cloud.title": "Servicios de fitness",
   "conn.cloud.signIn":
-    "Para conectar Strava, Oura o WHOOP necesitas una cuenta gratuita de Liftsmith, así la conexión te sigue en todos tus dispositivos.",
+    "Para conectar un servicio de fitness necesitas una cuenta gratuita de Liftsmith, así la conexión te sigue en todos tus dispositivos.",
   "conn.cloud.signInButton": "Inicia sesión o crea una cuenta",
   "conn.strava.what": "Publica cada entrenamiento terminado en Strava, con tus series en la descripción.",
   "conn.strava.post": "Publicar mis entrenamientos en Strava",
@@ -199,6 +203,11 @@ export const es: Partial<Record<Key, Message>> = {
     "Envía sueño, variabilidad de la frecuencia cardiaca, frecuencia cardiaca en reposo, frecuencia respiratoria y pasos para la recomendación de Hoy.",
   "conn.whoop.what":
     "Envía sueño, variabilidad de la frecuencia cardiaca de recuperación, frecuencia cardiaca en reposo y frecuencia respiratoria para la recomendación de Hoy.",
+  "conn.withings.what":
+    "Envía pesajes, grasa corporal, sueño, frecuencia cardiaca en reposo, frecuencia respiratoria y pasos desde tu báscula y reloj Withings.",
+  "conn.polar.what":
+    "Envía sueño, variabilidad de la frecuencia cardiaca nocturna, frecuencia cardiaca y frecuencia respiratoria para la recomendación de Hoy.",
+  "conn.concept2.what": "Las sesiones de remo, esquí y bici de tu Concept2 Logbook llegan como entrenamientos de cardio.",
   "conn.strava.title": "Entrenamiento de fuerza",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
@@ -297,7 +306,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "conn.garmin.change": "Changer de montre",
   "conn.cloud.title": "Services de fitness",
   "conn.cloud.signIn":
-    "Pour connecter Strava, Oura ou WHOOP, il faut un compte Liftsmith gratuit : la connexion vous suit sur tous vos appareils.",
+    "Pour connecter un service de fitness, il faut un compte Liftsmith gratuit : la connexion vous suit sur tous vos appareils.",
   "conn.cloud.signInButton": "Se connecter ou créer un compte",
   "conn.strava.what": "Publie chaque séance terminée sur Strava, avec vos séries dans la description.",
   "conn.strava.post": "Publier mes séances sur Strava",
@@ -306,6 +315,11 @@ export const fr: Partial<Record<Key, Message>> = {
     "Envoie le sommeil, la variabilité de la fréquence cardiaque, la fréquence cardiaque au repos, la fréquence respiratoire et les pas pour la recommandation du jour.",
   "conn.whoop.what":
     "Envoie le sommeil, la variabilité de la fréquence cardiaque de récupération, la fréquence cardiaque au repos et la fréquence respiratoire pour la recommandation du jour.",
+  "conn.withings.what":
+    "Envoie les pesées, la masse grasse, le sommeil, la fréquence cardiaque au repos, la fréquence respiratoire et les pas de votre balance et montre Withings.",
+  "conn.polar.what":
+    "Envoie le sommeil, la variabilité de la fréquence cardiaque nocturne, la fréquence cardiaque et la fréquence respiratoire pour la recommandation du jour.",
+  "conn.concept2.what": "Les séances de rameur, de ski et de vélo de votre Concept2 Logbook arrivent comme séances de cardio.",
   "conn.strava.title": "Musculation",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name} : {sets}",
@@ -404,7 +418,7 @@ export const de: Partial<Record<Key, Message>> = {
   "conn.garmin.change": "Uhr wechseln",
   "conn.cloud.title": "Fitnessdienste",
   "conn.cloud.signIn":
-    "Um Strava, Oura oder WHOOP zu verbinden, brauchst du ein kostenloses Liftsmith-Konto, damit die Verbindung auf jedem Gerät bei dir bleibt.",
+    "Um einen Fitnessdienst zu verbinden, brauchst du ein kostenloses Liftsmith-Konto, damit die Verbindung auf jedem Gerät bei dir bleibt.",
   "conn.cloud.signInButton": "Anmelden oder Konto erstellen",
   "conn.strava.what": "Postet jedes beendete Training auf Strava, mit deinen Sätzen in der Beschreibung.",
   "conn.strava.post": "Meine Trainings auf Strava posten",
@@ -413,6 +427,10 @@ export const de: Partial<Record<Key, Message>> = {
     "Schickt Schlaf, Herzfrequenzvariabilität, Ruhepuls, Atemfrequenz und Schritte für die heutige Bereitschafts-Entscheidung.",
   "conn.whoop.what":
     "Schickt Schlaf, Erholungs-Herzfrequenzvariabilität, Ruhepuls und Atemfrequenz für die heutige Bereitschafts-Entscheidung.",
+  "conn.withings.what": "Schickt Wiegungen, Körperfett, Schlaf, Ruhepuls, Atemfrequenz und Schritte von deiner Withings-Waage und -Uhr.",
+  "conn.polar.what":
+    "Schickt Schlaf, nächtliche Herzfrequenzvariabilität, Herzfrequenz und Atemfrequenz für die heutige Bereitschafts-Entscheidung.",
+  "conn.concept2.what": "Ruder-, Ski- und Rad-Einheiten aus deinem Concept2 Logbook kommen als Cardio-Trainings an.",
   "conn.strava.title": "Krafttraining",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
@@ -509,7 +527,7 @@ export const it: Partial<Record<Key, Message>> = {
   "conn.garmin.change": "Cambia orologio",
   "conn.cloud.title": "Servizi fitness",
   "conn.cloud.signIn":
-    "Per collegare Strava, Oura o WHOOP serve un account Liftsmith gratuito, così il collegamento resta con te su ogni dispositivo.",
+    "Per collegare un servizio fitness serve un account Liftsmith gratuito, così il collegamento resta con te su ogni dispositivo.",
   "conn.cloud.signInButton": "Accedi o crea un account",
   "conn.strava.what": "Pubblica ogni allenamento finito su Strava, con le serie nella descrizione.",
   "conn.strava.post": "Pubblica i miei allenamenti su Strava",
@@ -521,6 +539,11 @@ export const it: Partial<Record<Key, Message>> = {
     "Invia sonno, variabilità della frequenza cardiaca, frequenza cardiaca a riposo, frequenza respiratoria e passi per la prontezza di oggi.",
   "conn.whoop.what":
     "Invia sonno, variabilità della frequenza cardiaca di recupero, frequenza cardiaca a riposo e frequenza respiratoria per la prontezza di oggi.",
+  "conn.withings.what":
+    "Invia pesate, massa grassa, sonno, frequenza cardiaca a riposo, frequenza respiratoria e passi dalla tua bilancia e dal tuo orologio Withings.",
+  "conn.polar.what":
+    "Invia sonno, variabilità della frequenza cardiaca notturna, frequenza cardiaca e frequenza respiratoria per la prontezza di oggi.",
+  "conn.concept2.what": "Le sessioni di vogatore, sci e bici del tuo Concept2 Logbook arrivano come allenamenti cardio.",
   "conn.strava.title": "Allenamento di forza",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}: {sets}",
@@ -616,13 +639,16 @@ export const ja: Partial<Record<Key, Message>> = {
   "conn.garmin.getApp": "ウォッチアプリを入手",
   "conn.garmin.change": "ウォッチを変更",
   "conn.cloud.title": "フィットネスサービス",
-  "conn.cloud.signIn": "Strava、Oura、WHOOP との連携には無料の Liftsmith アカウントが必要です。連携がどの端末でも引き継がれます。",
+  "conn.cloud.signIn": "フィットネスサービスの接続には無料の Liftsmith アカウントが必要です。接続はどの端末でも引き継がれます。",
   "conn.cloud.signInButton": "サインインまたはアカウント作成",
   "conn.strava.what": "終えたワークアウトを、セット内容を説明に入れて Strava に投稿します。",
   "conn.strava.post": "ワークアウトを Strava に投稿",
   "conn.strava.waiting": { other: "{count}件のワークアウトが投稿待ちです。" },
   "conn.oura.what": "睡眠、心拍変動、安静時心拍数、呼吸数、歩数を送り、今日のコンディション判断に使います。",
   "conn.whoop.what": "睡眠、リカバリーの心拍変動、安静時心拍数、呼吸数を送り、今日のコンディション判断に使います。",
+  "conn.withings.what": "Withings の体重計や時計から、体重、体脂肪率、睡眠、安静時心拍数、呼吸数、歩数を送ります。",
+  "conn.polar.what": "睡眠、夜間の心拍変動、心拍数、呼吸数を送り、今日のコンディション判断に使います。",
+  "conn.concept2.what": "Concept2 Logbook のローイング、スキー、バイクのセッションを有酸素運動のワークアウトとして取り込みます。",
   "conn.strava.title": "筋力トレーニング",
   "conn.strava.set": "{weight} {unit} × {reps}",
   "conn.strava.line": "{name}：{sets}",
