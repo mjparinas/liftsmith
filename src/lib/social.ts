@@ -123,7 +123,12 @@ export function loadHome(): Promise<void> {
         account,
         HOME_PARTS,
         () => social<{ me?: SocialMe; feed?: unknown; training?: unknown; suggest?: unknown } & SocialMe>("home"),
-        (r) => (r.me ? { me: r.me, feed: r.feed, training: r.training, suggest: r.suggest } : { me: r }),
+        (r) => {
+          if (r.me) return { me: r.me, feed: r.feed, training: r.training, suggest: r.suggest };
+          // Not joined yet: the answer is `me` itself. Anything else is a server that doesn't know "home".
+          if ("profile" in r) return { me: r };
+          throw new AuthError("Unknown op.", 400);
+        },
       );
       useSocial.setState({ me: (r?.me as SocialMe | undefined) ?? null, error: null });
     } catch (e) {
