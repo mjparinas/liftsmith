@@ -23,6 +23,7 @@ import {
   type Prop,
   type Vec,
 } from "./rig";
+import { tempoPhases } from "./tempoMotion";
 
 // One motion per exercise in the library. Motions are built from a few families (squat, hinge,
 // press, bench, row, pull, curl, push-up, ...) with parameters, so the same family covers its
@@ -3595,7 +3596,12 @@ export function motionFor(id?: string | null): Motion {
   const key = id && MOTIONS[id] ? id : "__stand";
   let m = cache.get(key);
   if (!m) {
-    m = key === "__stand" ? stand() : MOTIONS[key]();
+    if (key === "__stand") m = stand();
+    else {
+      const base = MOTIONS[key]();
+      // tempo and paused lifts play their own tempo, so they don't look like the plain lift (tempoMotion.ts)
+      m = { ...base, phases: tempoPhases(key, base.phases) };
+    }
     cache.set(key, m);
   }
   return m;
