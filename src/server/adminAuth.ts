@@ -54,7 +54,8 @@ export function sameOrigin(req: Request): boolean {
 export async function startSignIn(req: Request, email: string, send: typeof fetch = fetch, now = Date.now()): Promise<Response> {
   const e = email.trim().toLowerCase();
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "?";
-  if (!(await rateLimit(`admin-login:${ip}`, 5, 3_600_000, now))) return json(429, { error: "Too many tries, wait an hour." });
+  if (!(await rateLimit(`admin-login:${ip}`, 10, 15 * 60_000, now)))
+    return json(429, { error: "Too many tries. Wait 15 minutes and try again." });
   const sent = { ok: true, message: "If that address is an admin, a sign-in link is on its way. It works once, for 15 minutes." };
   if (!roleOf(e)) return json(200, sent);
   const t = token();
