@@ -284,7 +284,7 @@ export const ANKLE_H = 0.08;
 export type PerSide<T> = T | { L: T; R: T };
 
 /** What the lifter holds: a barbell at `bar`, a weight in each hand (or one, or one held in both), a cable handle, an ab wheel. */
-export type Load = "barbell" | "trapbar" | "dumbbell" | "kettlebell" | "handle" | "wheel" | "none";
+export type Load = "barbell" | "trapbar" | "dumbbell" | "kettlebell" | "ball" | "handle" | "wheel" | "none";
 export type Hold = "each" | "centre" | "R";
 
 /** A joint name, the midpoint of the hands ("hands"), or a fixed point. */
