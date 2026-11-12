@@ -82,6 +82,7 @@ import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { TrainingNow } from "./FriendsLive";
 import { Icon } from "./icons";
+import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
@@ -2132,6 +2133,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
         {tab === "board" && (
           <>
             <Challenges />
+            <MonthFriends />
             <Board onPeople={() => setTab("people")} />
           </>
         )}

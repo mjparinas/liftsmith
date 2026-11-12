@@ -470,6 +470,7 @@ try {
   await page.getByRole("button", { name: "Board" }).click();
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
   await page.getByText("Blair invited you to this challenge.").waitFor();
+  await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
   await scan("friends board");
   await page.getByRole("button", { name: "Start a challenge" }).click();
   await page.getByRole("group", { name: "Challenge" }).waitFor();

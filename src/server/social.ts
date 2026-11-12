@@ -1548,6 +1548,9 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
   if (isResult(mine)) return mine;
   const from = Number(b.from);
   if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
+  // A week by default; up to a calendar month for the monthly challenge (monthly.ts).
+  const to = b.to === undefined ? from + 7 * day : Number(b.to);
+  if (!Number.isFinite(to) || to <= from || to > from + 32 * day) return fail(400, "Bad request.");
   const rows = await query(
     `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
        COUNT(p.id) AS workouts,
@@ -1562,7 +1565,7 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?1)
      GROUP BY sp.account_id LIMIT 201`,
-    [accountId, from, from + 7 * day],
+    [accountId, from, to],
   );
   return ok({
     rows: rows.map((r) => ({
