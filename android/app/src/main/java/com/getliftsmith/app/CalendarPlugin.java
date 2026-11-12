@@ -1,13 +1,16 @@
 package com.getliftsmith.app;
 
 import android.Manifest;
+import android.accounts.Account;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.CalendarContract;
 import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
@@ -77,8 +80,8 @@ public class CalendarPlugin extends Plugin {
                 call.reject("No days");
                 return;
             }
-            long calendarId = primaryCalendar();
-            if (calendarId < 0) {
+            Target target = pickCalendar();
+            if (target == null) {
                 call.reject("No writable calendar");
                 return;
             }
@@ -90,10 +93,11 @@ public class CalendarPlugin extends Plugin {
                 byday.append(BYDAY[d]);
             }
             ContentValues v = new ContentValues();
-            v.put(CalendarContract.Events.CALENDAR_ID, calendarId);
+            v.put(CalendarContract.Events.CALENDAR_ID, target.id);
             v.put(CalendarContract.Events.TITLE, title);
             v.put(CalendarContract.Events.DESCRIPTION, notes);
-            v.put(CalendarContract.Events.DTSTART, nextStart(days, hour, minute));
+            long start = nextStart(days, hour, minute);
+            v.put(CalendarContract.Events.DTSTART, start);
             v.put(CalendarContract.Events.DURATION, "PT" + minutes + "M");
             v.put(CalendarContract.Events.RRULE, "FREQ=WEEKLY;BYDAY=" + byday);
             v.put(CalendarContract.Events.EVENT_TIMEZONE, TimeZone.getDefault().getID());
@@ -101,10 +105,41 @@ public class CalendarPlugin extends Plugin {
             Uri uri = getContext().getContentResolver().insert(CalendarContract.Events.CONTENT_URI, v);
             JSObject r = new JSObject();
             r.put("saved", uri != null);
-            if (uri != null) prefs().edit().putLong(KEY_EVENT, ContentUris.parseId(uri)).apply();
+            if (uri != null) {
+                prefs().edit().putLong(KEY_EVENT, ContentUris.parseId(uri)).apply();
+                r.put("calendar", target.name);
+                r.put("start", start);
+                // Push it to the account now, so it shows in the calendar app and on the lifter's other devices
+                // without waiting for the next scheduled sync.
+                if (target.account != null && target.accountType != null) {
+                    Bundle extras = new Bundle();
+                    extras.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+                    extras.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+                    try {
+                        ContentResolver.requestSync(new Account(target.account, target.accountType), CalendarContract.AUTHORITY, extras);
+                    } catch (RuntimeException ignored) {
+                        // The calendar app syncs it later.
+                    }
+                }
+            }
             call.resolve(r);
         } catch (JSONException | RuntimeException e) {
             call.reject("Couldn't save", e);
+        }
+    }
+
+    /** Opens the phone's calendar app at a time (the first training event), so the lifter sees where it went. */
+    @PluginMethod
+    public void show(PluginCall call) {
+        long at = call.getLong("at", System.currentTimeMillis());
+        Uri.Builder b = CalendarContract.CONTENT_URI.buildUpon().appendPath("time");
+        ContentUris.appendId(b, at);
+        Intent i = new Intent(Intent.ACTION_VIEW).setData(b.build()).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            getContext().startActivity(i);
+            call.resolve();
+        } catch (RuntimeException e) {
+            call.reject("No calendar app", e);
         }
     }
 
@@ -164,19 +199,51 @@ public class CalendarPlugin extends Plugin {
         prefs().edit().remove(KEY_EVENT).apply();
     }
 
-    /** The primary visible calendar the lifter can write to, or the first writable one. */
-    private long primaryCalendar() {
+    private static final class Target {
+        long id;
+        String name;
+        String account;
+        String accountType;
+    }
+
+    /**
+     * The calendar the lifter actually looks at. The first writable calendar is often a phone-only one (Samsung's
+     * "My calendar", a local account) that Google Calendar never shows, so the event was saved but nowhere to be
+     * seen (Melvin, 2026-11-12). Ranked: the primary calendar of a Google account, then any account's primary
+     * calendar, then any synced calendar, then a phone-only one.
+     */
+    private Target pickCalendar() {
         ContentResolver cr = getContext().getContentResolver();
-        String[] projection = { CalendarContract.Calendars._ID, CalendarContract.Calendars.IS_PRIMARY };
+        String[] projection = {
+            CalendarContract.Calendars._ID,
+            CalendarContract.Calendars.IS_PRIMARY,
+            CalendarContract.Calendars.ACCOUNT_NAME,
+            CalendarContract.Calendars.ACCOUNT_TYPE,
+            CalendarContract.Calendars.OWNER_ACCOUNT,
+            CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+            CalendarContract.Calendars.SYNC_EVENTS,
+        };
         String where = CalendarContract.Calendars.VISIBLE + " = 1 AND " + CalendarContract.Calendars.CALENDAR_ACCESS_LEVEL + " >= " + CalendarContract.Calendars.CAL_ACCESS_CONTRIBUTOR;
-        long first = -1;
+        Target best = null;
+        int bestScore = -1;
         try (Cursor c = cr.query(CalendarContract.Calendars.CONTENT_URI, projection, where, null, null)) {
             while (c != null && c.moveToNext()) {
-                if (first < 0) first = c.getLong(0);
-                if (c.getInt(1) == 1) return c.getLong(0);
+                String account = c.getString(2);
+                String type = c.getString(3);
+                String owner = c.getString(4);
+                boolean primary = c.getInt(1) == 1 || (account != null && account.equals(owner));
+                int score = CalendarPick.score(type, primary, c.getInt(6) == 1);
+                if (score > bestScore) {
+                    bestScore = score;
+                    best = new Target();
+                    best.id = c.getLong(0);
+                    best.name = c.getString(5) != null ? c.getString(5) : account;
+                    best.account = account;
+                    best.accountType = type;
+                }
             }
         }
-        return first;
+        return best;
     }
 
     static long nextStart(List<Integer> days, int hour, int minute) {

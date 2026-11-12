@@ -1,6 +1,6 @@
 "use client";
 
-import { t } from "./i18n";
+import { date, t } from "./i18n";
 import { isNative } from "./juice";
 import type { CalendarPrefs, Profile } from "./types";
 
@@ -133,8 +133,9 @@ type Plugin = {
     minutes: number;
     title: string;
     notes: string;
-  }): Promise<{ saved: boolean }>;
+  }): Promise<{ saved: boolean; calendar?: string; start?: number }>;
   removeTrainingDays(): Promise<void>;
+  show(o: { at: number }): Promise<void>;
   busy(o: { from: number; to: number }): Promise<{ busy: Busy[] }>;
 };
 const plugin = (): Plugin | undefined =>
@@ -154,14 +155,42 @@ export async function requestCalendar(): Promise<boolean> {
   }
 }
 
-/** Writes (or rewrites) the weekly training event. Replaces the one written before. */
-export async function saveTrainingDays(prefs: Pick<CalendarPrefs, "days" | "time">, minutes: number): Promise<boolean> {
+/** Where the training event went: the calendar's name and the first event's start, when the phone says. */
+export interface SavedEvent {
+  calendar?: string;
+  start?: number;
+}
+
+/** Writes (or rewrites) the weekly training event. Replaces the one written before. Null when nothing was saved. */
+export async function saveTrainingDays(prefs: Pick<CalendarPrefs, "days" | "time">, minutes: number): Promise<SavedEvent | null> {
   const p = plugin();
-  if (!p || !isNative() || !prefs.days.length) return false;
+  if (!p || !isNative() || !prefs.days.length) return null;
   const [hour, minute] = prefs.time.split(":").map(Number);
   try {
-    return (await p.saveTrainingDays({ days: prefs.days, hour, minute, minutes, title: t("cal.eventTitle"), notes: t("cal.eventNote") }))
-      .saved;
+    const r = await p.saveTrainingDays({ days: prefs.days, hour, minute, minutes, title: t("cal.eventTitle"), notes: t("cal.eventNote") });
+    return r.saved ? { calendar: r.calendar || undefined, start: typeof r.start === "number" ? r.start : undefined } : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * What to say after saving: which calendar and when the first one is, so the lifter knows where to look
+ * (Melvin, 2026-11-12: "the button changes to update my calendar but i dont see it anywhere").
+ */
+export function savedMessage(saved: SavedEvent): string {
+  if (!saved.calendar || saved.start === undefined) return t("cal.saved");
+  const when = date(saved.start, { weekday: "long", month: "long", day: "numeric", hour: "numeric", minute: "2-digit" });
+  return t("cal.savedTo", { calendar: saved.calendar, when });
+}
+
+/** Opens the phone's calendar app at `at` (the first training event). False when it couldn't. */
+export async function showInCalendar(at: number): Promise<boolean> {
+  const p = plugin();
+  if (!p || !isNative()) return false;
+  try {
+    await p.show({ at: Math.round(at) });
+    return true;
   } catch {
     return false;
   }

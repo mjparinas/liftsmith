@@ -1,4 +1,5 @@
 import Capacitor
+import UIKit
 import EventKit
 
 /// Calendar (src/lib/calendar.ts), iOS side (Android: CalendarPlugin.java). Writes the training days as one weekly
@@ -12,6 +13,7 @@ public class CalendarPlugin: CAPPlugin, CAPBridgedPlugin {
         CAPPluginMethod(name: "requestAccess", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "saveTrainingDays", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "removeTrainingDays", returnType: CAPPluginReturnPromise),
+        CAPPluginMethod(name: "show", returnType: CAPPluginReturnPromise),
         CAPPluginMethod(name: "busy", returnType: CAPPluginReturnPromise),
     ]
 
@@ -57,9 +59,19 @@ public class CalendarPlugin: CAPPlugin, CAPBridgedPlugin {
         do {
             try store.save(event, span: .futureEvents, commit: true)
             UserDefaults.standard.set(event.eventIdentifier, forKey: savedKey)
-            call.resolve(["saved": true])
+            // Which calendar it went into and when the first one is, so the app can say where to look.
+            call.resolve(["saved": true, "calendar": calendar.title, "start": event.startDate.timeIntervalSince1970 * 1000])
         } catch {
             call.reject("Couldn't save", nil, error)
+        }
+    }
+
+    /// Opens the Calendar app at a time (the first training event), so the lifter sees where it went.
+    @objc func show(_ call: CAPPluginCall) {
+        let at = Date(timeIntervalSince1970: (call.getDouble("at") ?? Date().timeIntervalSince1970 * 1000) / 1000)
+        guard let url = URL(string: "calshow:\(Int(at.timeIntervalSinceReferenceDate))") else { return call.reject("No calendar app") }
+        DispatchQueue.main.async {
+            UIApplication.shared.open(url) { ok in ok ? call.resolve() : call.reject("No calendar app") }
         }
     }
 
