@@ -99,6 +99,7 @@ import * as settings from "./text/settings";
 import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
+import * as social from "./text/social";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -219,6 +220,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...setup.it,
   ...share.it,
   ...sig.it,
+  ...social.it,
   ...str.it,
   ...stats.it,
   ...tab.it,

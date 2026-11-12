@@ -12,7 +12,7 @@ import { useAccount } from "@/lib/auth";
 import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
-import { badgeForItem, COSMETICS, levelForItem } from "@/lib/game";
+import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
 import { list as fmtList, inSentence, t } from "@/lib/i18n";
 import {
   acceptPending,
@@ -74,11 +74,13 @@ import {
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { Avatar } from "./AvatarFace";
 import { ago, clock, repsText, setText } from "./format";
+import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
@@ -830,7 +832,7 @@ function Privacy({
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
   /** Once joined: who sees new posts and the best lifts switch. */
-  joined?: Pick<SocialProfile, "audience" | "showLifts">;
+  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest">;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
@@ -858,6 +860,12 @@ function Privacy({
             hint={t(weights ? "friends.showLiftsHint" : "friends.showLiftsNoWeights")}
             on={joined.showLifts && weights}
             onChange={(v) => set({ showLifts: v, ...(v ? { weights: true } : {}) })}
+          />
+          <SwitchRow
+            label={t("social.suggestMe")}
+            hint={t("social.suggestMeHint")}
+            on={joined.suggest !== false}
+            onChange={(v) => set({ suggest: v })}
           />
           <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{t("friends.aud.default")}</p>
           <AudienceChips value={joined.audience} onChange={(a) => set({ audience: a })} publicProfile={!!pub} />
@@ -1254,7 +1262,7 @@ function People() {
   const find = (e: FormEvent) => {
     e.preventDefault();
     const h = cleanHandle(q);
-    if (!HANDLE_RE.test(h)) return setNote(t("friends.err.handle"));
+    if (!HANDLE_RE.test(h)) return setNote(t("social.findHelp"));
     go("person", h);
   };
   const share = async () => {
@@ -1288,12 +1296,14 @@ function People() {
           <Button submit>{t("friends.findGo")}</Button>
         </div>
       </form>
+      <SearchResults q={q} />
       <InviteButton />
       <Button kind="ghost" icon="share" className="mt-2 w-full" onClick={() => void share()}>
         {t("friends.shareMe", { handle })}
       </Button>
       <Note text={note} />
       <PeopleList list="requests" reload={version} onChanged={changed} />
+      <Suggestions reload={version} onFollowed={changed} />
       <PeopleList list="following" reload={version} onChanged={changed} />
       <PeopleList list="followers" reload={version} onChanged={changed} />
       <PeopleList list="muted" reload={version} onChanged={changed} />
@@ -2208,6 +2218,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
             }
           />
         )}
+        {tab === "feed" && (me.following ?? 0) < 5 && <Suggestions />}
         {tab === "board" && (
           <>
             <Challenges />
@@ -2265,6 +2276,7 @@ export function PersonScreen({ handle }: { handle: string }) {
   const [missing, setMissing] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [peopleList, setPeopleList] = useState<"followers" | "following" | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const joined = !!me?.profile;
   const h = cleanHandle(handle);
@@ -2344,19 +2356,31 @@ export function PersonScreen({ handle }: { handle: string }) {
       </div>
       <div className="card mt-4 flex items-center gap-4 p-4">
         <Avatar name={person.name} avatar={person.avatar} size={56} />
-        <dl className="grid flex-1 grid-cols-3 text-center">
-          {[
-            [t("friends.person.posts"), person.posts],
-            [t("friends.person.followers"), person.followers],
-            [t("friends.person.following"), person.following],
-          ].map(([k, v]) => (
-            <div key={String(k)}>
-              <dd className="num text-lg font-bold">{fmtNum(Number(v))}</dd>
-              <dt className="text-xs text-muted">{k}</dt>
-            </div>
-          ))}
-        </dl>
+        <div className="grid flex-1 grid-cols-3 text-center">
+          <div>
+            <span className="num block text-lg font-bold">{fmtNum(person.posts)}</span>
+            <span className="block text-xs text-muted">{t("friends.person.posts")}</span>
+          </div>
+          {(["followers", "following"] as const).map((k) => {
+            const inner = (
+              <>
+                <span className="num block text-lg font-bold">{fmtNum(person[k])}</span>
+                <span className="block text-xs text-muted">
+                  {t(k === "followers" ? "friends.person.followers" : "friends.person.following")}
+                </span>
+              </>
+            );
+            return person.canSee && person.relation !== "blocked" ? (
+              <button key={k} type="button" onClick={() => setPeopleList(k)} className="press min-h-11 rounded-xl">
+                {inner}
+              </button>
+            ) : (
+              <div key={k}>{inner}</div>
+            );
+          })}
+        </div>
       </div>
+      <ProfileStats person={person} />
       {person.followsYou && !self && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.followsYou")}</p>}
       {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}
       <Showcase person={person} />
@@ -2422,8 +2446,21 @@ export function PersonScreen({ handle }: { handle: string }) {
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="profile" id={person.handle} />
+      <PersonPeopleSheet handle={person.handle} list={peopleList} onClose={() => setPeopleList(null)} />
     </div>
   );
+}
+
+/** The level and training-week streak for the profile, worked out only once the lifter has joined Friends. */
+function useGameStats(on: boolean): { level: number; streak: number } | null {
+  const { events, stats, profile } = useApp();
+  const now = useNow();
+  const hour = Math.floor(now / 3_600_000);
+  return useMemo(() => {
+    if (!on) return null;
+    const g = game(events, stats, profile, hour * 3_600_000);
+    return { level: g.level.level, streak: g.streak.weeks };
+  }, [on, events, stats, profile, hour]);
 }
 
 let lastSent = "";
@@ -2439,20 +2476,21 @@ function useProfileSync() {
   const lifts = useMemo(() => bestLifts(events), [events]);
   const suspended = !!me?.suspended;
   const joinedNow = !!p;
+  const stats = useGameStats(joinedNow);
   useEffect(() => {
     if (!joinedNow || suspended || !pendingInvite() || location.hash.startsWith("#/invite/")) return;
     void acceptPending().then((handle) => (handle ? refreshSocial() : undefined));
   }, [joinedNow, suspended]);
   useEffect(() => {
     if (!p || suspended) return;
-    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : []);
+    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : [], stats);
     const key = JSON.stringify(change);
     if (!change || key === lastSent) return;
     lastSent = key;
     social<SocialMe>("update", change)
       .then((m) => m.profile && useSocial.setState({ me: m }))
       .catch(() => undefined);
-  }, [p, avatar, lifts, suspended]);
+  }, [p, avatar, lifts, suspended, stats]);
 }
 
 /**

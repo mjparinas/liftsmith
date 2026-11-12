@@ -546,6 +546,13 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // Suggestions the lifter dismissed (social.ts `suggest`): that person isn't suggested to them again.
+  `CREATE TABLE IF NOT EXISTS suggest_hides (
+    account_id TEXT NOT NULL,
+    hidden_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, hidden_id)
+  )`,
   // A phone's push token for Friends notifications (push.ts), in the language it registered with.
   `CREATE TABLE IF NOT EXISTS push_tokens (
     token TEXT PRIMARY KEY,
@@ -616,6 +623,10 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends stage 3: a caption and who sees each post.
   ["posts", "caption", "TEXT NOT NULL DEFAULT ''"],
   ["posts", "audience", "TEXT NOT NULL DEFAULT 'all'"],
+  // Friends gap list 2: suggested to people the lifter may know (on to start), and the level and streak the app sends.
+  ["social_profiles", "suggest", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "level", "INTEGER NOT NULL DEFAULT 0"],
+  ["social_profiles", "streak", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

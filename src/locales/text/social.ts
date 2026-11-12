@@ -1,0 +1,205 @@
+import type { Message } from "@/lib/i18n";
+
+// Text for keys starting "social.", in every language: the second round of Friends features (people you may know,
+// richer profiles, and what follows; src/components/app/FriendsFind.tsx and friends, docs/decisions/friends.md).
+// English is the source: add a key here first.
+
+export const en = {
+  "social.suggest": "People you may know",
+  "social.ask": "Ask",
+  "social.hide": "Hide",
+  "social.hideNamed": "Hide {name}",
+  "social.why.followsYou": "Follows you",
+  "social.why.partner": "You've trained together",
+  "social.why.club": "In {club} with you",
+  "social.why.mutual": "Followed by {name}",
+  "social.why.mutualMany": {
+    one: "Followed by {name} and {count} other you follow",
+    other: "Followed by {name} and {count} others you follow",
+  },
+  "social.results": "Search results",
+  "social.noResults": "No public profile matches. Private profiles are found by their exact handle.",
+  "social.findHelp": "Type a name, or a handle of 3 to 20 letters, numbers or _.",
+  "social.level": "Level {level}",
+  "social.streak": { one: "{count}-week streak", other: "{count}-week streak" },
+  "social.calendar": "Training, last 12 weeks",
+  "social.calendarLabel": {
+    one: "{count} workout posted in the last 12 weeks",
+    other: "{count} workouts posted in the last 12 weeks",
+  },
+  "social.usual": "Usually trains on {days}. Pick one of those to train together.",
+  "social.usualNone": "No regular training days yet.",
+  "social.calendarEmpty": "No workouts posted in the last 12 weeks.",
+  "social.calendarEmptySelf": "Workouts you post to Friends show here.",
+  "social.loading": "Loading…",
+  "social.listNone": "No one yet.",
+  "social.suggestMe": "Suggest me to people I may know",
+  "social.suggestMeHint":
+    "People who follow someone you follow, share a club with you or trained with you may see you under People you may know.",
+} as const;
+
+type Key = keyof typeof en;
+
+export const es: Partial<Record<Key, Message>> = {
+  "social.suggest": "Personas que quizá conozcas",
+  "social.ask": "Pedir",
+  "social.hide": "Ocultar",
+  "social.hideNamed": "Ocultar a {name}",
+  "social.why.followsYou": "Te sigue",
+  "social.why.partner": "Habéis entrenado juntos",
+  "social.why.club": "En {club} contigo",
+  "social.why.mutual": "Le sigue {name}",
+  "social.why.mutualMany": {
+    one: "Le siguen {name} y {count} persona más a quien sigues",
+    other: "Le siguen {name} y {count} personas más a quienes sigues",
+  },
+  "social.results": "Resultados de búsqueda",
+  "social.noResults": "Ningún perfil público coincide. Los perfiles privados se encuentran por su usuario exacto.",
+  "social.findHelp": "Escribe un nombre o un usuario de 3 a 20 letras, números o _.",
+  "social.level": "Nivel {level}",
+  "social.streak": { one: "Racha de {count} semana", other: "Racha de {count} semanas" },
+  "social.calendar": "Entrenamiento, últimas 12 semanas",
+  "social.calendarLabel": {
+    one: "{count} entrenamiento publicado en las últimas 12 semanas",
+    other: "{count} entrenamientos publicados en las últimas 12 semanas",
+  },
+  "social.usual": "Suele entrenar el {days}. Elige uno de esos días para entrenar juntos.",
+  "social.usualNone": "Aún no tiene días fijos de entrenamiento.",
+  "social.calendarEmpty": "No ha publicado entrenamientos en las últimas 12 semanas.",
+  "social.calendarEmptySelf": "Aquí aparecen los entrenamientos que publicas en Amigos.",
+  "social.loading": "Cargando…",
+  "social.listNone": "Nadie todavía.",
+  "social.suggestMe": "Sugerirme a personas que quizá me conozcan",
+  "social.suggestMeHint":
+    "Quienes siguen a alguien a quien sigues, comparten un club contigo o entrenaron contigo pueden verte en Personas que quizá conozcas.",
+};
+
+export const fr: Partial<Record<Key, Message>> = {
+  "social.suggest": "Personnes que vous connaissez peut-être",
+  "social.ask": "Demander",
+  "social.hide": "Masquer",
+  "social.hideNamed": "Masquer {name}",
+  "social.why.followsYou": "Vous suit",
+  "social.why.partner": "Vous vous êtes entraînés ensemble",
+  "social.why.club": "Avec vous dans {club}",
+  "social.why.mutual": "Suivi par {name}",
+  "social.why.mutualMany": {
+    one: "Suivi par {name} et {count} autre personne que vous suivez",
+    other: "Suivi par {name} et {count} autres personnes que vous suivez",
+  },
+  "social.results": "Résultats de recherche",
+  "social.noResults": "Aucun profil public ne correspond. Les profils privés se trouvent par leur identifiant exact.",
+  "social.findHelp": "Tapez un nom, ou un identifiant de 3 à 20 lettres, chiffres ou _.",
+  "social.level": "Niveau {level}",
+  "social.streak": { one: "Série de {count} semaine", other: "Série de {count} semaines" },
+  "social.calendar": "Entraînement, 12 dernières semaines",
+  "social.calendarLabel": {
+    one: "{count} séance publiée ces 12 dernières semaines",
+    other: "{count} séances publiées ces 12 dernières semaines",
+  },
+  "social.usual": "S'entraîne d'habitude le {days}. Choisissez l'un de ces jours pour vous entraîner ensemble.",
+  "social.usualNone": "Pas encore de jours d'entraînement réguliers.",
+  "social.calendarEmpty": "Aucune séance publiée ces 12 dernières semaines.",
+  "social.calendarEmptySelf": "Les séances que vous publiez dans Amis s'affichent ici.",
+  "social.loading": "Chargement…",
+  "social.listNone": "Personne pour l'instant.",
+  "social.suggestMe": "Me suggérer aux personnes qui me connaissent peut-être",
+  "social.suggestMeHint":
+    "Les personnes qui suivent quelqu'un que vous suivez, partagent un club avec vous ou se sont entraînées avec vous peuvent vous voir dans Personnes que vous connaissez peut-être.",
+};
+
+export const de: Partial<Record<Key, Message>> = {
+  "social.suggest": "Leute, die du vielleicht kennst",
+  "social.ask": "Anfragen",
+  "social.hide": "Ausblenden",
+  "social.hideNamed": "{name} ausblenden",
+  "social.why.followsYou": "Folgt dir",
+  "social.why.partner": "Ihr habt zusammen trainiert",
+  "social.why.club": "Mit dir in {club}",
+  "social.why.mutual": "{name} folgt dieser Person",
+  "social.why.mutualMany": {
+    one: "{name} und {count} weitere Person, der du folgst, folgen dieser Person",
+    other: "{name} und {count} weitere Personen, denen du folgst, folgen dieser Person",
+  },
+  "social.results": "Suchergebnisse",
+  "social.noResults": "Kein öffentliches Profil passt. Private Profile findest du über den genauen Benutzernamen.",
+  "social.findHelp": "Gib einen Namen ein oder einen Benutzernamen aus 3 bis 20 Buchstaben, Ziffern oder _.",
+  "social.level": "Level {level}",
+  "social.streak": { one: "{count} Woche in Folge", other: "{count} Wochen in Folge" },
+  "social.calendar": "Training, letzte 12 Wochen",
+  "social.calendarLabel": {
+    one: "{count} Training in den letzten 12 Wochen gepostet",
+    other: "{count} Trainings in den letzten 12 Wochen gepostet",
+  },
+  "social.usual": "Trainiert meist am {days}. Such dir einen dieser Tage aus, um zusammen zu trainieren.",
+  "social.usualNone": "Noch keine festen Trainingstage.",
+  "social.calendarEmpty": "In den letzten 12 Wochen keine Trainings gepostet.",
+  "social.calendarEmptySelf": "Hier erscheinen die Trainings, die du in Freunde postest.",
+  "social.loading": "Wird geladen …",
+  "social.listNone": "Noch niemand.",
+  "social.suggestMe": "Mich Leuten vorschlagen, die mich vielleicht kennen",
+  "social.suggestMeHint":
+    "Wer jemandem folgt, dem du folgst, mit dir in einem Club ist oder mit dir trainiert hat, kann dich unter „Leute, die du vielleicht kennst“ sehen.",
+};
+
+export const it: Partial<Record<Key, Message>> = {
+  "social.suggest": "Persone che potresti conoscere",
+  "social.ask": "Chiedi",
+  "social.hide": "Nascondi",
+  "social.hideNamed": "Nascondi {name}",
+  "social.why.followsYou": "Ti segue",
+  "social.why.partner": "Vi siete allenati insieme",
+  "social.why.club": "In {club} con te",
+  "social.why.mutual": "Seguito da {name}",
+  "social.why.mutualMany": {
+    one: "Seguito da {name} e da {count} altra persona che segui",
+    other: "Seguito da {name} e da altre {count} persone che segui",
+  },
+  "social.results": "Risultati della ricerca",
+  "social.noResults": "Nessun profilo pubblico corrisponde. I profili privati si trovano con il nome utente esatto.",
+  "social.findHelp": "Scrivi un nome, o un nome utente di 3-20 lettere, numeri o _.",
+  "social.level": "Livello {level}",
+  "social.streak": { one: "Serie di {count} settimana", other: "Serie di {count} settimane" },
+  "social.calendar": "Allenamento, ultime 12 settimane",
+  "social.calendarLabel": {
+    one: "{count} allenamento pubblicato nelle ultime 12 settimane",
+    other: "{count} allenamenti pubblicati nelle ultime 12 settimane",
+  },
+  "social.usual": "Di solito si allena il {days}. Scegli uno di questi giorni per allenarvi insieme.",
+  "social.usualNone": "Ancora nessun giorno fisso di allenamento.",
+  "social.calendarEmpty": "Nessun allenamento pubblicato nelle ultime 12 settimane.",
+  "social.calendarEmptySelf": "Qui compaiono gli allenamenti che pubblichi in Amici.",
+  "social.loading": "Caricamento…",
+  "social.listNone": "Ancora nessuno.",
+  "social.suggestMe": "Suggeriscimi alle persone che potrebbero conoscermi",
+  "social.suggestMeHint":
+    "Chi segue qualcuno che segui, è in un club con te o si è allenato con te può vederti in Persone che potresti conoscere.",
+};
+
+export const ja: Partial<Record<Key, Message>> = {
+  "social.suggest": "知り合いかも",
+  "social.ask": "リクエスト",
+  "social.hide": "非表示",
+  "social.hideNamed": "{name}さんを非表示",
+  "social.why.followsYou": "あなたをフォロー中",
+  "social.why.partner": "一緒にトレーニングしました",
+  "social.why.club": "{club}のメンバー",
+  "social.why.mutual": "{name}さんがフォロー中",
+  "social.why.mutualMany": { other: "{name}さんほか、あなたがフォローしている{count}人がフォロー中" },
+  "social.results": "検索結果",
+  "social.noResults": "一致する公開プロフィールはありません。非公開のプロフィールは正確なユーザー名で見つかります。",
+  "social.findHelp": "名前、または3〜20文字の英小文字・数字・_のユーザー名を入力してください。",
+  "social.level": "レベル{level}",
+  "social.streak": { other: "{count}週連続" },
+  "social.calendar": "トレーニング(過去12週間)",
+  "social.calendarLabel": { other: "過去12週間に{count}回のトレーニングを投稿" },
+  "social.usual": "よくトレーニングする曜日:{days}。一緒にトレーニングするならこの日がおすすめです。",
+  "social.usualNone": "決まったトレーニング日はまだありません。",
+  "social.calendarEmpty": "過去12週間に投稿されたトレーニングはありません。",
+  "social.calendarEmptySelf": "フレンドに投稿したトレーニングがここに表示されます。",
+  "social.loading": "読み込み中…",
+  "social.listNone": "まだいません。",
+  "social.suggestMe": "知り合いかもしれない人に自分をおすすめする",
+  "social.suggestMeHint":
+    "あなたがフォローしている人をフォローしている人、同じクラブの人、一緒にトレーニングした人の「知り合いかも」にあなたが表示されることがあります。",
+};

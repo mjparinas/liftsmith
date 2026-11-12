@@ -87,6 +87,9 @@ describe("joining", () => {
       audience: "all",
       showLifts: true,
       lifts: [],
+      suggest: true,
+      level: 0,
+      streak: 0,
     });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");

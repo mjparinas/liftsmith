@@ -18,6 +18,9 @@ const profile = (over: Partial<SocialProfile> = {}): SocialProfile => ({
   audience: "all",
   showLifts: true,
   lifts: [],
+  suggest: true,
+  level: 0,
+  streak: 0,
   ...over,
 });
 

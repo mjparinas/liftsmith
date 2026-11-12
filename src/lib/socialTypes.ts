@@ -54,6 +54,11 @@ export interface SocialProfile {
   showLifts: boolean;
   /** The best lifts last sent by the app, for the profile's showcase. */
   lifts: ShowcaseLift[];
+  /** Can be suggested to people with a tie to the lifter (a mutual follow, a club, a tagged workout). On to start. */
+  suggest: boolean;
+  /** The level and the training-week streak last sent by the app, shown on the profile to people who see the posts. */
+  level: number;
+  streak: number;
 }
 
 /**
@@ -119,6 +124,34 @@ export interface PersonCard {
   muted: boolean;
   /** Their best lifts, when they show them and the reader can see their posts. */
   lifts: ShowcaseLift[];
+  /** Their level and training-week streak (0 when the reader can't see their posts, or not sent yet). */
+  level: number;
+  streak: number;
+  /** When each workout they posted in the last 12 weeks started (ms), from posts the reader may see. */
+  trained: number[];
+}
+
+/** Why someone is suggested: they follow the lifter, they're followed by people the lifter follows, a club, a tag. */
+export type SuggestReason = "followsYou" | "mutual" | "club" | "partner";
+
+/** Someone the lifter may know, with the strongest tie as the reason. */
+export interface Suggestion {
+  handle: string;
+  name: string;
+  avatar: string;
+  reason: SuggestReason;
+  /** For "mutual": how many people the lifter follows also follow them, and one of their names. For "club": its name. */
+  count?: number;
+  via?: string;
+  open: boolean;
+}
+
+/** One person in a list: followers, following, search results. */
+export interface PersonRow {
+  handle: string;
+  name: string;
+  avatar: string;
+  at?: number;
 }
 
 export interface FeedPost {
@@ -199,6 +232,12 @@ export const SOCIAL_LIMITS = {
   clubsEach: 10,
   exercises: 20,
   muscles: 6,
+  /** People suggested at once, and search results. */
+  suggestions: 20,
+  /** Letters needed before a name search runs. */
+  searchMin: 2,
+  /** Weeks of a profile's training calendar. */
+  calendarWeeks: 12,
 };
 
 /** Lowercase letters, digits and underscores. */

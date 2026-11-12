@@ -174,12 +174,19 @@ const sameLifts = (a: readonly ShowcaseLift[], b: readonly ShowcaseLift[]) =>
 
 /**
  * What the server should hold for this lifter but doesn't yet: the avatar picked in the Locker (or Friends
- * settings) and the best lifts, both worked out on the device. Null when nothing changed, so nothing is sent.
+ * settings), the best lifts, and the level and streak, all worked out on the device. Null when nothing changed, so nothing is sent.
  */
-export function profileChanges(p: SocialProfile, avatar: string, lifts: readonly ShowcaseLift[]): Record<string, unknown> | null {
+export function profileChanges(
+  p: SocialProfile,
+  avatar: string,
+  lifts: readonly ShowcaseLift[],
+  stats: { level: number; streak: number } | null = null,
+): Record<string, unknown> | null {
   const out: Record<string, unknown> = {};
   if ((avatar || "") !== (p.avatar || "")) out.avatar = avatar;
   if (!sameLifts(p.lifts, lifts)) out.lifts = lifts;
+  if (stats && stats.level !== (p.level ?? 0)) out.level = stats.level;
+  if (stats && stats.streak !== (p.streak ?? 0)) out.streak = stats.streak;
   return Object.keys(out).length ? out : null;
 }
 
