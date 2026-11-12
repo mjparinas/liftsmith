@@ -20,6 +20,7 @@ import {
   stravaWaiting,
   useCloud,
 } from "@/lib/connections";
+import { can } from "@/lib/entitlements";
 import { chooseGarmin, GARMIN_STORE_URL, garminStatus, onGarminChange, watchState, type GarminStatus } from "@/lib/garmin";
 import {
   allowWorkouts,
@@ -41,7 +42,7 @@ import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
 import { go, useRoute } from "./router";
-import { Button, Chip, ScreenHeader, Section, SwitchRow } from "./ui";
+import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -294,6 +295,9 @@ function CloudRow({ p }: { p: Cloud }) {
   const [note, setNote] = useState("");
   const link = status?.linked[p];
   const ready = status?.ready[p] ?? false;
+  // The cloud connections are Pro (Melvin, 2026-11-12); Health Connect and Apple Health stay free. Without Pro
+  // the card still shows, and its connect or sync button opens the paywall. Disconnecting always works.
+  const pro = can("cloudConnections");
   const waiting = p === "strava" && link ? stravaWaiting() : 0;
 
   const sync = async () => {
@@ -325,9 +329,18 @@ function CloudRow({ p }: { p: Cloud }) {
           onChange={(v) => setProfile({ connections: { ...profile.connections, stravaPost: v } })}
         />
       )}
-      {link && p !== "strava" && (
+      {link && p !== "strava" && pro && (
         <Button className="mt-3 w-full" onClick={() => void sync()}>
           {t("conn.syncNow")}
+        </Button>
+      )}
+      {link && !pro && (
+        <Button
+          className="mt-3 w-full"
+          onClick={() => go("pro", "connections")}
+          label={t("pro.locked", { what: t("pro.ft.cloudConnections") })}
+        >
+          {t("conn.proPaused")} <ProTag className="ml-1" />
         </Button>
       )}
       {note && (
@@ -340,9 +353,11 @@ function CloudRow({ p }: { p: Cloud }) {
           kind={link ? "ghost" : "primary"}
           className="mt-3 w-full"
           disabled={busy === p}
-          onClick={() => void (link ? disconnectCloud(p) : connectCloud(p))}
+          onClick={() => (link ? void disconnectCloud(p) : pro ? void connectCloud(p) : go("pro", "connections"))}
+          label={!link && !pro ? t("pro.locked", { what: `${t("conn.connect")} ${CLOUD_NAME[p]}` }) : undefined}
         >
           {link ? t("conn.disconnect") : t("conn.connect")}
+          {!link && !pro && <ProTag className="ml-1" />}
         </Button>
       )}
     </div>

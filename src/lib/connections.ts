@@ -11,6 +11,7 @@ import { create } from "zustand";
 
 import { api, AuthError, platform, readAccount } from "./auth";
 import { localIso, READS, type Cloud, type CloudCardio, type CloudReading, type CloudStatus, type CloudWorkout } from "./cloud";
+import { can } from "./entitlements";
 import { exerciseName } from "./game";
 import { t } from "./i18n";
 import { isNative } from "./juice";
@@ -93,7 +94,8 @@ function errorText(e: unknown): string {
 /** Opens the service's own page to allow Liftsmith. The lifter comes back to Connected apps. */
 export async function connectCloud(p: Cloud): Promise<void> {
   const account = readAccount();
-  if (!account) return;
+  // The cloud connections are Pro (Melvin, 2026-11-12): Connections.tsx sends free lifters to the paywall instead.
+  if (!account || !can("cloudConnections")) return;
   useCloud.setState({ busy: p, error: null });
   try {
     const { url } = await api<{ url: string }>(`/api/connect/${p}/`, { token: account.token, body: { platform: platform() } });
@@ -125,7 +127,8 @@ export async function disconnectCloud(p: Cloud): Promise<void> {
 /** Pulls the last 45 days from each connected service that sends readings, and Concept2 sessions. Returns how many were new. */
 export async function pullCloud(force = false, now = Date.now()): Promise<number> {
   const account = readAccount();
-  if (!account) return 0;
+  // Without Pro a connection stays linked but pauses; it picks up the missed days (45 back) when Pro returns.
+  if (!account || !can("cloudConnections")) return 0;
   let added = 0;
   for (const p of READS) {
     if (!linked(p)) continue;
@@ -206,7 +209,7 @@ function writeOutbox(list: CloudWorkout[]): void {
 /** Called when a workout ends: queues it for Strava when Strava is connected and posting is on, then sends. */
 export function queueStrava(sessionId: string): void {
   const { events, profile } = useApp.getState();
-  if (!readAccount() || !linked("strava") || profile.connections?.stravaPost === false) return;
+  if (!readAccount() || !can("cloudConnections") || !linked("strava") || profile.connections?.stravaPost === false) return;
   const w = stravaWorkout(events, sessionId, profile.unit);
   if (!w) return;
   writeOutbox([...readOutbox().filter((x) => x.sessionId !== w.sessionId), w]);

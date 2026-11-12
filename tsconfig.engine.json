@@ -21,6 +21,7 @@
     "src/lib/liftPage.ts",
     "src/lib/loads.ts",
     "src/lib/fitTests.ts",
+    "src/lib/freeAdaptive.ts",
     "src/lib/measure.ts",
     "src/lib/nutrition.ts",
     "src/lib/cardio.ts",

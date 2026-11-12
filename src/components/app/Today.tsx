@@ -9,6 +9,7 @@ import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
+import { freeAdaptiveLeft } from "@/lib/freeAdaptive";
 import { itemSeconds, planSeconds } from "@/lib/generator";
 import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
@@ -124,6 +125,9 @@ export function Today() {
   const call = preview ? CALL_STYLE[preview.call] : null;
   const fill = `${((profile.minutes - 15) / 75) * 100}%`;
   const fixed = !!preview?.program?.fixed;
+  const tryAdaptive = useApp((st) => st.tryAdaptive);
+  const setTryAdaptive = useApp((st) => st.setTryAdaptive);
+  const freeLeft = useMemo(() => freeAdaptiveLeft(events, now), [events, now]);
   // Every recommendation says why (why.ts): one line per exercise, one sentence for the day's call.
   const why = useMemo(() => (preview ? whyContext(preview, events, profile, now) : null), [preview, events, profile, now]);
   // While a workout runs, the list shows the live workout and can't be changed here: linking and
@@ -201,7 +205,29 @@ export function Today() {
         {preview && fixed && (
           <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-muted">{preview.program!.note}</span>
         )}
-        {preview?.program && !can("adaptive") && (
+        {!can("adaptive") && tryAdaptive && preview && !preview.program && profile.planSource?.kind === "program" && (
+          // This week's free adaptive workout is on: one tap goes back to the free program's day.
+          <button
+            type="button"
+            onClick={() => setTryAdaptive(false)}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1.5"
+          >
+            <Icon name="sparkle" size={15} className="text-violet" />
+            {t("td.freeAdaptive.back", { name: programName(profile.planSource.id) ?? "" })}
+          </button>
+        )}
+        {preview?.program && !can("adaptive") && freeLeft && (
+          // One adaptive workout a week is free (freeAdaptive.ts): it swaps today's program day for the adaptive plan.
+          <button
+            type="button"
+            onClick={() => setTryAdaptive(true)}
+            className="press inline-flex items-center gap-1.5 rounded-full border border-violet/40 bg-violet/10 px-3 py-1.5"
+          >
+            <Icon name="sparkle" size={15} className="text-violet" />
+            {t("td.freeAdaptive.try")}
+          </button>
+        )}
+        {preview?.program && !can("adaptive") && !freeLeft && (
           // Free lifters follow a fixed program; this shows what Pro would plan instead and opens the paywall there.
           <button
             type="button"

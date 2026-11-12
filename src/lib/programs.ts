@@ -28,7 +28,16 @@ import { withWarmups } from "./warmup";
 // has a plain descriptive name and credits the original in its info text.
 
 export type ProgramId =
-  "classic-5x5" | "ramping-5x5" | "5x5-plus" | "novice-3x5" | "tiered" | "waves" | "calisthenics" | "ppl" | "upper-lower";
+  | "classic-5x5"
+  | "ramping-5x5"
+  | "5x5-plus"
+  | "novice-3x5"
+  | "tiered"
+  | "waves"
+  | "calisthenics"
+  | "dumbbell-full-body"
+  | "ppl"
+  | "upper-lower";
 
 export interface ProgramInfo {
   id: ProgramId;
@@ -47,6 +56,8 @@ export interface ProgramInfo {
   kind: "fixed" | "split";
   /** What the main lifts need. Missing accessories are swapped for the closest match. */
   needs: Equipment[];
+  /** Our own program, not based on someone else's (no "names belong to their owners" line). */
+  own?: true;
 }
 
 const DATA: (Omit<ProgramInfo, "name" | "basedOn" | "summary" | "how"> & { steps: number })[] = [
@@ -119,6 +130,18 @@ const DATA: (Omit<ProgramInfo, "name" | "basedOn" | "summary" | "how"> & { steps
     tier: "free",
     kind: "fixed",
     needs: ["pullupBar"],
+  },
+  {
+    // The free plan for a gym without a barbell, rack and bench (Melvin, 2026-11-12: "a free plan that fits the gym").
+    id: "dumbbell-full-body",
+    aka: ["dumbbell workout", "dumbbell full body", "home dumbbell program"],
+    steps: 4,
+    daysPerWeek: 3,
+    level: "Beginner",
+    tier: "free",
+    kind: "fixed",
+    needs: ["dumbbells"],
+    own: true,
   },
   {
     id: "ppl",
@@ -323,6 +346,10 @@ function linearSlot(key: string, l: Lift, sets: number, reps: number, rest: numb
 
 interface LinearDef {
   days: { name: string; lifts: [ex: string, sets: number, reps: number][] }[];
+  /** Reps the starting weights are worked out for (5 unless the program's sets are longer). */
+  startReps?: number;
+  /** Rest between sets of a main lift, in seconds (180 by default). */
+  rest?: number;
   big: ReadonlySet<string>;
   /** Day index → lifts, when it changes with time (novice power cleans). */
   pick?: (s: State, day: number) => [string, number, number][] | undefined;
@@ -338,7 +365,7 @@ function linearEngine(def: LinearDef): Engine {
     keys: all,
     startFor(key, ctx) {
       const acc = def.accessories?.has(key);
-      return W(key, ctx, acc ? 8 : 5, 3);
+      return W(key, ctx, acc ? 8 : (def.startReps ?? 5), 3);
     },
     build(s, day, lift) {
       const d = def.days[day]!;
@@ -351,7 +378,7 @@ function linearEngine(def: LinearDef): Engine {
             lift(ex),
             sets,
             reps,
-            def.accessories?.has(ex) ? 90 : 180,
+            def.accessories?.has(ex) ? 90 : (def.rest ?? 180),
             def.accessories?.has(ex) ? t("pgm.accessory") : undefined,
           ),
         ),
@@ -990,6 +1017,46 @@ export const SPLITS: Record<"ppl" | "upper-lower", { name: string; muscles: Musc
   ],
 };
 
+// Dumbbell full body: two alternating workouts, 3 × 10, one dumbbell step up when every rep is there.
+const DUMBBELL = linearEngine({
+  days: [
+    {
+      get name() {
+        return t("pgm.workoutA");
+      },
+      lifts: [
+        ["goblet-squat", 3, 10],
+        ["db-bench-press", 3, 10],
+        ["db-row", 3, 10],
+      ],
+    },
+    {
+      get name() {
+        return t("pgm.workoutB");
+      },
+      lifts: [
+        ["db-rdl", 3, 10],
+        ["db-shoulder-press", 3, 10],
+        ["walking-lunge", 3, 10],
+      ],
+    },
+  ],
+  big: new Set(),
+  startReps: 10,
+  rest: 120,
+});
+
+/**
+ * The free program a lifter without Pro follows (store.applyAccess): the classic 5×5 where the gym has a
+ * barbell, rack and bench, dumbbell full body where it has dumbbells, and bodyweight skills otherwise.
+ */
+export function freeProgramFor(gym: Pick<Gym, "equipment">): ProgramId {
+  const has = (e: Equipment) => gym.equipment.includes(e);
+  if (has("barbell") && has("rack") && has("bench")) return "classic-5x5";
+  if (has("dumbbells")) return "dumbbell-full-body";
+  return "calisthenics";
+}
+
 const ENGINES: Partial<Record<ProgramId, Engine>> = {
   "classic-5x5": CLASSIC,
   "novice-3x5": NOVICE,
@@ -998,6 +1065,7 @@ const ENGINES: Partial<Record<ProgramId, Engine>> = {
   tiered: TIERED,
   waves: WAVE,
   calisthenics: LADDER,
+  "dumbbell-full-body": DUMBBELL,
 };
 
 // ---------------------------------------------------------------------------------------------

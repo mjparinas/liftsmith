@@ -9,7 +9,6 @@ import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { queueStrava, stravaWorkout } from "@/lib/connections";
-import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
@@ -51,7 +50,7 @@ import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
 import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
@@ -587,15 +586,14 @@ export function Workout() {
                 )}
               </div>
               <div className="flex shrink-0 gap-2">
-                {/* Changing the plan is Pro: free lifters see the button with a Pro tag, and it opens the paywall. */}
+                {/* "Short on time" is free; working around taken equipment inside the sheet is Pro (Melvin, 2026-11-12). */}
                 <button
                   type="button"
-                  onClick={() => (can("replan") ? setPlanOpen(true) : go("pro", "replan"))}
+                  onClick={() => setPlanOpen(true)}
                   className="press relative grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-                  aria-label={can("replan") ? t("coach.changePlan") : t("pro.locked", { what: t("coach.changePlan") })}
+                  aria-label={t("coach.changePlan")}
                 >
                   <Icon name="clock" size={20} />
-                  {!can("replan") && <ProTag className="absolute -right-2 -top-1.5 text-[0.625rem]" />}
                 </button>
                 <button
                   type="button"

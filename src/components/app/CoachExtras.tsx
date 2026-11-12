@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { explain } from "@/lib/explain";
 import { alternatives, type PlanItem } from "@/lib/generator";
@@ -15,7 +16,8 @@ import { EQUIPMENT_LABEL, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 import { itemWhy, whyContext } from "@/lib/why";
 
-import { Button, Sheet } from "./ui";
+import { go } from "./router";
+import { Button, ProTag, Sheet } from "./ui";
 
 // Optional workout helpers that live between sets: "why this weight", changing the plan when time or
 // equipment runs out, and machine settings. None of them adds a tap to logging a set.
@@ -127,7 +129,31 @@ export function ReplanSheet({
               <p className="mt-2 text-sm text-muted">{t("coach.alreadyShort")}</p>
             )}
           </div>
-          {item && busy.length > 0 && (
+          {item && busy.length > 0 && !can("replan") && (
+            // Working around taken equipment is Pro: the section shows, and its one button opens the paywall.
+            <div>
+              <h3 className={SECTION_LABEL}>
+                {t("coach.taken", {
+                  items: list(
+                    busy.map((e) => EQUIPMENT_LABEL[e]),
+                    "disjunction",
+                  ),
+                })}
+              </h3>
+              <Button
+                kind="ghost"
+                className="mt-2 w-full"
+                label={t("pro.locked", { what: t("pro.ft.replan") })}
+                onClick={() => {
+                  close();
+                  go("pro", "replan");
+                }}
+              >
+                {t("pro.ft.replan")} <ProTag className="ml-1" />
+              </Button>
+            </div>
+          )}
+          {item && busy.length > 0 && can("replan") && (
             <div>
               <h3 className={SECTION_LABEL}>
                 {t("coach.taken", {

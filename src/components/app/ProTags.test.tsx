@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 // Pro features are shown, never hidden (Melvin, 2026-11-10): without Pro, each entry point carries a Pro
 // tag and opens the paywall at that feature, and the paywall lists everything Pro unlocks.
-import { cleanup, render, screen, within } from "@testing-library/react";
+import { act, cleanup, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -9,6 +9,7 @@ import { setBillingLive } from "@/lib/billing";
 import { PRO_FEATURES } from "@/lib/entitlements";
 import { t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
+import type { AppEvent } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
 import { App } from "./App";
@@ -56,9 +57,31 @@ describe("the paywall", () => {
 });
 
 describe("Pro features without Pro", () => {
-  it("shows adaptive workouts on Today, tagged Pro, and opens the paywall with it first", async () => {
+  it("offers this week's free adaptive workout on Today, and one tap goes back to the program", async () => {
     const user = userEvent.setup();
     await onboardFree(user);
+    expect(screen.queryByRole("button", { name: "Adaptive workouts, a Pro feature: see Pro" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Try adaptive today · 1 free this week" }));
+    expect(useApp.getState().preview?.program).toBeUndefined();
+    await user.click(await screen.findByRole("button", { name: "Adaptive today, free this week · Back to Classic 5×5" }));
+    expect(useApp.getState().preview?.program?.id).toBe("classic-5x5");
+    expect(screen.getByRole("button", { name: "Try adaptive today · 1 free this week" })).toBeInTheDocument();
+  });
+
+  it("tags adaptive workouts Pro once this week's free one is used, and opens the paywall with it first", async () => {
+    const user = userEvent.setup();
+    await onboardFree(user);
+    const s = useApp.getState();
+    const used: AppEvent = {
+      type: "sessionStart",
+      id: "free-1",
+      at: Date.now() - 60_000,
+      sessionId: "free-1",
+      gymId: s.profile.activeGymId!,
+      minutes: 45,
+    };
+    act(() => useApp.setState({ events: [...s.events, used] }));
+    expect(screen.queryByRole("button", { name: "Try adaptive today · 1 free this week" })).toBeNull();
     const chip = screen.getByRole("button", { name: "Adaptive workouts, a Pro feature: see Pro" });
     expect(chip).toHaveTextContent("Pro");
     await user.click(chip);
@@ -72,16 +95,25 @@ describe("Pro features without Pro", () => {
     expect(within(list).getByText(/Free, always/)).toBeInTheDocument();
   });
 
-  it("keeps Change the plan on the workout screen, tagged Pro", async () => {
+  it("keeps Short on time free during a workout", async () => {
     const user = userEvent.setup();
     await onboardFree(user);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     const skip = screen.queryByRole("button", { name: "Skip warm-up" });
     if (skip) await user.click(skip);
-    const b = await screen.findByRole("button", { name: "Change the plan, a Pro feature: see Pro" });
-    expect(b).toHaveTextContent("Pro");
+    await user.click(await screen.findByRole("button", { name: "Change the plan" }));
+    const sheet = await screen.findByRole("dialog", { name: "Change the plan" });
+    expect(within(sheet).getByText("Short on time")).toBeInTheDocument();
+    expect(location.hash).not.toContain("pro");
+  });
+
+  it("shows weekly sets per muscle on Progress, tagged Pro", async () => {
+    const user = userEvent.setup();
+    await onboardFree(user);
+    go("stats");
+    const b = await screen.findByRole("button", { name: "Advanced stats, a Pro feature: see Pro" });
     await user.click(b);
-    expect(location.hash).toBe("#/pro/replan");
+    expect(location.hash).toBe("#/pro/stats");
   });
 
   it("shows the goal planner on Progress, tagged Pro", async () => {

@@ -317,7 +317,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           routine: plan.routineId,
         },
       ]);
-      set({ callOverride: null, links: [], order: [], routineId: null, undoable: null });
+      set({ callOverride: null, links: [], order: [], routineId: null, undoable: null, tryAdaptive: false });
       set({ active: a });
       persistActive(a);
       track("workout_start", {
