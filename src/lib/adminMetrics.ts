@@ -4,6 +4,8 @@ import { ASSUMED, forecastAt, LIST_PRICE } from "./forecast";
 
 const DAY = 86_400_000;
 const WEEK = 7 * DAY;
+/** How long a trial is taken to run when splitting trials by what happened in them (the default trial). */
+const TRIAL_MS = 14 * DAY;
 
 export type Store = "play" | "appstore" | "web" | "other";
 export const STORES: Store[] = ["play", "appstore", "web", "other"];
@@ -40,6 +42,10 @@ export interface InstallFacts {
   firstWorkout: number | null;
   workouts: number;
   paywall: number | null;
+  /** Workouts finished in the 14 days after the install's first trial start (0 without a trial). */
+  trialWorkouts: number;
+  /** When the lifter first saw what Pro did in their trial (the trial_recap event), if they did. */
+  recap: number | null;
 }
 
 export interface SubEvent {
@@ -411,6 +417,34 @@ export function computeMetrics(input: MetricsInput) {
     { key: "Started a trial", n: xs.filter((i) => trialInstalls.has(i.id)).length },
     { key: "Paid", n: xs.filter((i) => paidInstalls.has(i.id)).length },
   ];
+  // The first two weeks (docs/decisions/money.md): did the trial get used, did the lifter see what Pro did for
+  // them, and did that pay? Trials that have run their 14 days, by what happened in them.
+  const byId = new Map(all.map((i) => [i.id, i]));
+  const trialFunnel = (() => {
+    const xs = recent.filter((i) => trialInstalls.has(i.id));
+    return [
+      { key: "Started a trial", n: xs.length },
+      { key: "Trained in the trial", n: xs.filter((i) => i.trialWorkouts >= 1).length },
+      { key: "Three or more workouts in it", n: xs.filter((i) => i.trialWorkouts >= 3).length },
+      { key: "Paid", n: xs.filter((i) => paidInstalls.has(i.id)).length },
+    ];
+  })();
+  const ended = subsState.filter((s) => s.trialAt != null && s.trialAt + TRIAL_MS < now && s.trialAt >= since - TRIAL_MS);
+  const trialGroups: { key: string; test: (i: InstallFacts) => boolean }[] = [
+    { key: "No workouts in the trial", test: (i) => i.trialWorkouts === 0 },
+    { key: "1 or 2 workouts", test: (i) => i.trialWorkouts >= 1 && i.trialWorkouts < 3 },
+    { key: "3 or more workouts", test: (i) => i.trialWorkouts >= 3 },
+    { key: "Saw what Pro did", test: (i) => i.recap != null },
+    { key: "Didn't see it", test: (i) => i.recap == null },
+  ];
+  const trialSplit = trialGroups.map((g) => {
+    const xs = ended.filter((s) => {
+      const i = s.installId ? byId.get(s.installId) : undefined;
+      return !!i && g.test(i);
+    });
+    const paid = xs.filter((s) => s.firstPaid != null && s.firstPaid >= (s.trialAt ?? 0)).length;
+    return { key: g.key, trials: xs.length, paid, rate: pct(paid, xs.length) };
+  });
   // Store installs mostly don't come through the site, so the site's own steps are kept apart.
   const funnel = funnelFor(recent);
   const siteFunnel = [
@@ -556,6 +590,8 @@ export function computeMetrics(input: MetricsInput) {
     funnel,
     siteFunnel,
     funnelByStore,
+    trialFunnel,
+    trialSplit,
     onboarding,
     retention: { cohorts: cohortRows, d1: dayN(1), d7: dayN(7), d30: dayN(30) },
     engagement,

@@ -36,6 +36,7 @@ import { SaveDoneAsRoutine } from "./Routines";
 import { SendToFriend } from "./SendToFriend";
 import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
+import { TrialDone } from "./TrialMoments";
 import { Button } from "./ui";
 
 function useCountUp(to: number, ms = 900) {
@@ -246,6 +247,7 @@ export function Done() {
         </ul>
       )}
       <PrReplayButton prs={prs} />
+      <TrialDone sessionId={s.sessionId} />
       <NextUpCard sessionId={s.sessionId} />
       <CoolDownCard />
       {!lean(profile) && <DoneMoments />}
