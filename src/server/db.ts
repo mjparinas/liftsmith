@@ -522,6 +522,23 @@ const SCHEMA = [
     PRIMARY KEY (post_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS post_partners_account ON post_partners (account_id)`,
+  // Clubs and gym crews (social.ts `clubCreate`): a named group anyone with its code can join, with a weekly board
+  // of what its members posted. The starter runs it (can remove members, change the code, delete it).
+  `CREATE TABLE IF NOT EXISTS clubs (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS clubs_owner ON clubs (owner_id)`,
+  `CREATE TABLE IF NOT EXISTS club_members (
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (club_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS club_members_account ON club_members (account_id)`,
   // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
   `CREATE TABLE IF NOT EXISTS mutes (
     muter_id TEXT NOT NULL,

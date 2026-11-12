@@ -18,6 +18,7 @@ import {
   acceptPending,
   boardNudge,
   cleanInvite,
+  clubUrl,
   inviteUrl,
   pendingInvite,
   playInviteUrl,
@@ -57,6 +58,9 @@ import {
   type BoardRow,
   type Challenge,
   type ChallengeDays,
+  type ClubDetail,
+  type ClubPreview,
+  type ClubSummary,
   type FeedComment,
   type FeedPost,
   type Inviter,
@@ -1634,6 +1638,359 @@ function StartChallengeBody({ onClose, onStarted }: { onClose: () => void; onSta
   );
 }
 
+// --- Clubs and gym crews ---
+
+/**
+ * Friends › Clubs: the lifter's clubs and gym crews. Each opens to this week's board of its members, the join
+ * link to share and, for the starter, removing members and a new link. Start one, or join with a code.
+ */
+function Clubs() {
+  const [list, setList] = useState<ClubSummary[] | null>(null);
+  const [reload, setReload] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
+  const [starting, setStarting] = useState(false);
+  const [code, setCode] = useState("");
+  const [note, setNote] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    social<{ clubs: ClubSummary[] }>("clubs")
+      .then((r) => live && setList(r.clubs))
+      .catch((e: unknown) => live && (setList([]), setNote(socialError(e))));
+    return () => {
+      live = false;
+    };
+  }, [reload]);
+  const changed = () => setReload((r) => r + 1);
+  const joinCode = (e: FormEvent) => {
+    e.preventDefault();
+    const c = cleanInvite(code);
+    if (!c) {
+      oops();
+      setNote(t("friends.err.club"));
+      return;
+    }
+    go("club", c);
+  };
+  if (list === null) return <Skeleton className="h-40" />;
+  return (
+    <>
+      {list.length ? (
+        <ul className="card divide-y divide-line">
+          {list.map((c) => (
+            <li key={c.id}>
+              <button type="button" onClick={() => setOpen(c.id)} className="press flex w-full items-center gap-3 px-4 py-3 text-left">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-raised text-accent">
+                  <Icon name="people" size={20} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate font-semibold">{c.name}</span>
+                  <span className="block text-xs text-muted">
+                    {t("friends.club.members", { count: c.members })}
+                    {c.mine ? ` · ${t("friends.club.yours")}` : ""}
+                  </span>
+                </span>
+                <Icon name="chevronRight" size={18} className="text-faint" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <EmptyState icon="people" title={t("friends.club.none")} body={t("friends.club.noneBody")} />
+      )}
+      <Button kind={list.length ? "ghost" : "primary"} icon="plus" className="mt-3 w-full" onClick={() => setStarting(true)}>
+        {t("friends.club.start")}
+      </Button>
+      <form onSubmit={joinCode} className="mt-4">
+        <label htmlFor="fr-club-code" className="block text-sm text-muted">
+          {t("friends.club.haveCode")}
+        </label>
+        <div className="mt-1 flex gap-2">
+          <input
+            id="fr-club-code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            autoCapitalize="characters"
+            autoComplete="off"
+            spellCheck={false}
+            maxLength={12}
+            placeholder="ABCD2345"
+            className="card min-w-0 flex-1 px-4 py-3 uppercase"
+          />
+          <Button submit kind="ghost" disabled={!code.trim()}>
+            {t("friends.club.join")}
+          </Button>
+        </div>
+      </form>
+      <Note text={note} />
+      <StartClub open={starting} onClose={() => setStarting(false)} onStarted={(id) => (changed(), setOpen(id))} />
+      <ClubSheet id={open} onClose={() => setOpen(null)} onChanged={changed} />
+    </>
+  );
+}
+
+function StartClub(props: { open: boolean; onClose: () => void; onStarted: (id: string) => void }) {
+  return props.open ? <StartClubBody {...props} /> : null;
+}
+
+function StartClubBody({ onClose, onStarted }: { onClose: () => void; onStarted: (id: string) => void }) {
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const start = async (e: FormEvent) => {
+    e.preventDefault();
+    if (busy || !name.trim()) return;
+    setBusy(true);
+    try {
+      const r = await social<{ id: string }>("clubCreate", { name: name.trim() });
+      haptic("success");
+      sound.done();
+      track("feature", { name: "social_club_start" });
+      onClose();
+      onStarted(r.id);
+    } catch (err) {
+      oops();
+      setError(socialError(err));
+      setBusy(false);
+    }
+  };
+  return (
+    <Sheet open onClose={onClose} title={t("friends.club.start")}>
+      <form onSubmit={(e) => void start(e)}>
+        <label htmlFor="fr-club-name" className="block text-sm text-muted">
+          {t("friends.club.name")}
+        </label>
+        <input
+          id="fr-club-name"
+          value={name}
+          maxLength={SOCIAL_LIMITS.clubName}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t("friends.club.namePlaceholder")}
+          className="card mt-1 w-full px-4 py-3"
+        />
+        <p className="mt-2 text-xs text-muted">{t("friends.club.startHint")}</p>
+        <Button submit className="mt-5 w-full" disabled={busy || !name.trim()}>
+          {t("friends.club.create")}
+        </Button>
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-bad">
+            {error}
+          </p>
+        )}
+      </form>
+    </Sheet>
+  );
+}
+
+function ClubSheet({ id, onClose, onChanged }: { id: string | null; onClose: () => void; onChanged: () => void }) {
+  return id ? <ClubBody key={id} id={id} onClose={onClose} onChanged={onChanged} /> : null;
+}
+
+function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void; onChanged: () => void }) {
+  const { profile } = useApp();
+  const unit = profile.unit;
+  const [club, setClub] = useState<ClubDetail | null>(null);
+  const [metric, setMetric] = useState<BoardMetric>("workouts");
+  const [reload, setReload] = useState(0);
+  const [note, setNote] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    social<{ club: ClubDetail }>("club", { id, from: weekStart(Date.now()) })
+      .then((r) => live && setClub(r.club))
+      .catch((e: unknown) => live && setNote(socialError(e)));
+    return () => {
+      live = false;
+    };
+  }, [id, reload]);
+  const act = async (b: Record<string, unknown>, op: "clubManage" | "clubLeave") => {
+    try {
+      const r = await social<{ code?: string }>(op, { id, ...b });
+      haptic("select");
+      if (op === "clubLeave") {
+        onChanged();
+        onClose();
+        return;
+      }
+      if (r.code) setNote(t("friends.club.newCodeDone"));
+      setReload((x) => x + 1);
+      onChanged();
+    } catch (e) {
+      oops();
+      setNote(socialError(e));
+    }
+  };
+  const share = async () => {
+    if (!club) return;
+    haptic("tick");
+    const url = clubUrl(club.code);
+    track("feature", { name: "social_club_invite" });
+    if (await shareUrl(url, t("friends.club.shareTitle", { name: club.name }))) return;
+    setNote((await copyText(url)) ? t("link.copied") : url);
+  };
+  const ranked = club ? rankBoard(club.rows, metric) : [];
+  const nudge = club ? boardNudge(club.rows, metric) : null;
+  const what = inSentence(t(METRIC_LABEL[metric]));
+  const nudgeText = !nudge
+    ? club && club.rows.length > 1
+      ? t("friends.board.start")
+      : null
+    : nudge.kind === "lead"
+      ? t("friends.board.lead", { by: metricText(metric, nudge.by, unit), what })
+      : nudge.kind === "tied"
+        ? t("friends.board.tied", { name: nudge.name })
+        : t("friends.board.chase", { gap: metricText(metric, nudge.gap, unit), what, name: nudge.name });
+  return (
+    <Sheet open onClose={onClose} title={club?.name ?? t("friends.tab.clubs")}>
+      {!club ? (
+        note ? (
+          <Note text={note} />
+        ) : (
+          <Skeleton className="h-48" />
+        )
+      ) : (
+        <>
+          <p className="text-sm text-muted">
+            {t("friends.club.members", { count: club.members })} ·{" "}
+            {club.mine ? t("friends.club.yours") : t("friends.club.by", { name: club.owner.name })}
+          </p>
+          <Button icon="people" className="mt-3 w-full" onClick={() => void share()}>
+            {t("friends.club.invite")}
+          </Button>
+          <p className="mt-1 px-1 text-xs text-muted">{t("friends.club.inviteHint", { code: club.code })}</p>
+          <p className={`mb-2 mt-5 ${SECTION_LABEL}`}>{t("friends.club.thisWeek")}</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+            {BOARD_METRICS.map((m) => (
+              <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
+                {t(METRIC_LABEL[m])}
+              </Chip>
+            ))}
+          </div>
+          {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
+          <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.club.thisWeek")}>
+            {ranked.map((r) => (
+              <li key={r.handle} className={`flex items-center gap-3 px-4 py-2 ${r.me ? "bg-accent/10" : ""}`}>
+                <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
+                <Avatar name={r.name} avatar={r.avatar} size={32} />
+                <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
+                <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
+                {club.mine && !r.me && (
+                  <button
+                    type="button"
+                    aria-label={t("friends.club.remove", { name: r.name })}
+                    onClick={() => void act({ remove: r.handle }, "clubManage")}
+                    className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+                  >
+                    <Icon name="trash" size={18} />
+                  </button>
+                )}
+              </li>
+            ))}
+          </ol>
+          <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.hint")}</p>
+          <div className="mt-4 space-y-2">
+            {club.mine && (
+              <Button kind="ghost" className="w-full" onClick={() => void act({ newCode: true }, "clubManage")}>
+                {t("friends.club.newCode")}
+              </Button>
+            )}
+            <Button kind={club.mine ? "danger" : "ghost"} className="w-full" onClick={() => void act({}, "clubLeave")}>
+              {club.mine ? t("friends.club.delete") : t("friends.club.leave")}
+            </Button>
+          </div>
+          <Note text={note} />
+        </>
+      )}
+    </Sheet>
+  );
+}
+
+/**
+ * #/club/<code>: a club's join link. Signed out, it asks to sign in; not yet in Friends, the join form is right
+ * there and joining also joins the club; in Friends, one tap joins and opens Friends › Clubs.
+ */
+export function ClubScreen({ code: raw }: { code: string }) {
+  const { account, me } = useSocialLoaded();
+  const code = cleanInvite(raw);
+  const [club, setClub] = useState<ClubPreview | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!account || !code) return;
+    let live = true;
+    social<{ club: ClubPreview }>("clubInfo", { code })
+      .then((r) => live && setClub(r.club))
+      .catch((e: unknown) => live && setError(socialError(e)));
+    return () => {
+      live = false;
+    };
+  }, [account?.id, code]); // eslint-disable-line react-hooks/exhaustive-deps
+  const joinClub = async () => {
+    setBusy(true);
+    try {
+      await social("clubJoin", { code });
+      haptic("celebrate");
+      sound.done();
+      track("feature", { name: "social_club_join" });
+      go("friends", "clubs");
+    } catch (e) {
+      oops();
+      setError(socialError(e));
+      setBusy(false);
+    }
+  };
+  const header = <ScreenHeader title={t("friends.club.title")} back={{ label: t("friends.back"), onClick: goBack }} />;
+  if (!code || error)
+    return (
+      <div className="pb-8">
+        {header}
+        <EmptyState icon="people" title={error ?? t("friends.err.club")} />
+      </div>
+    );
+  if (!account)
+    return (
+      <div className="pb-8">
+        {header}
+        <EmptyState
+          icon="people"
+          mascot="cheer"
+          title={t("friends.club.signedOut")}
+          body={t("friends.club.signedOutBody")}
+          action={<Button onClick={() => go("account")}>{t("friends.signIn.go")}</Button>}
+        />
+      </div>
+    );
+  return (
+    <div className="pb-8">
+      {header}
+      {club ? (
+        <div className="card card-tint mt-4 p-4" style={{ "--tint": "var(--color-ember)" } as CSSProperties}>
+          <p className="text-lg font-bold">{club.name}</p>
+          <p className="text-sm text-muted">
+            {t("friends.club.members", { count: club.members })} · {t("friends.club.by", { name: club.owner.name })}
+          </p>
+          <p className="mt-2 text-sm">{t("friends.club.joinNote")}</p>
+        </div>
+      ) : (
+        <Skeleton className="mt-4 h-28" />
+      )}
+      {club?.joined ? (
+        <Button className="mt-4 w-full" onClick={() => go("friends", "clubs")}>
+          {t("friends.club.open")}
+        </Button>
+      ) : me?.profile ? (
+        <Button className="mt-4 w-full" disabled={busy || !club || !!me.suspended} onClick={() => void joinClub()}>
+          {t("friends.club.joinIt")}
+        </Button>
+      ) : me ? (
+        <div className="mt-6">
+          <Join onJoined={() => void joinClub()} />
+        </div>
+      ) : (
+        <Skeleton className="mt-4 h-48" />
+      )}
+    </div>
+  );
+}
+
 // --- Invites ---
 
 /**
@@ -1754,12 +2111,13 @@ function useSocialLoaded() {
   return { account, me, error };
 }
 
-type Tab = "feed" | "board" | "activity" | "people";
+const TABS = ["feed", "board", "clubs", "activity", "people"] as const;
+type Tab = (typeof TABS)[number];
 
-export function Friends() {
+export function Friends({ tab: start }: { tab?: string } = {}) {
   const { account, me, error } = useSocialLoaded();
   useProfileSync();
-  const [tab, setTab] = useState<Tab>("feed");
+  const [tab, setTab] = useState<Tab>(TABS.find((x) => x === start) ?? "feed");
   const [settings, setSettings] = useState(false);
   const header = (
     <div className="flex items-end justify-between gap-2">
@@ -1825,6 +2183,9 @@ export function Friends() {
         <Chip active={tab === "board"} onClick={() => setTab("board")}>
           {t("friends.tab.board")}
         </Chip>
+        <Chip active={tab === "clubs"} onClick={() => setTab("clubs")}>
+          {t("friends.tab.clubs")}
+        </Chip>
         <Chip active={tab === "activity"} onClick={() => setTab("activity")}>
           {me.unread ? t("friends.tab.activityN", { n: fmtNum(me.unread) }) : t("friends.tab.activity")}
         </Chip>
@@ -1853,6 +2214,7 @@ export function Friends() {
             <Board onPeople={() => setTab("people")} />
           </>
         )}
+        {tab === "clubs" && <Clubs />}
         {tab === "activity" && <Activity onPeople={() => setTab("people")} onBoard={() => setTab("board")} />}
         {tab === "people" && <People />}
       </div>

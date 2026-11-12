@@ -38,7 +38,7 @@ import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
-import { Friends, InviteScreen, PersonScreen } from "./Friends";
+import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -342,9 +342,10 @@ export function App() {
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
     routine: <SharedRoutine code={arg} />,
-    friends: <Friends />,
+    friends: <Friends key={arg ?? ""} tab={arg} />,
     person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
     invite: <InviteScreen key={arg ?? ""} code={arg ?? ""} />,
+    club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
   };

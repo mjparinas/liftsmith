@@ -30,6 +30,7 @@ export const ROUTES = [
   "friends",
   "person",
   "invite",
+  "club",
   "trainer",
   "exercise",
 ] as const;
