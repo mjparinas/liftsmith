@@ -19,7 +19,7 @@ export function LandingIndex({ group, h1, intro }: { group: Landing["group"]; h1
       <p className="mt-8 text-muted">
         See also{" "}
         <Link href={`/${other}/`} className="text-accent underline underline-offset-2">
-          {other === "apps" ? "what Liftsmith is built for" : "every feature, one page each"}
+          {other === "apps" ? "what Liftsmith is built for" : "every feature and what it works with"}
         </Link>{" "}
         and the{" "}
         <Link href="/tools/" className="text-accent underline underline-offset-2">

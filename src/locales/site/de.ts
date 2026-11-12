@@ -197,6 +197,7 @@ export const de: SiteText = {
     more: {
       eyebrow: "Und außerdem",
       title: "Kleinigkeiten, die sich summieren",
+      all: "Alle Funktionen und die Apps und Geräte, mit denen sie funktionieren",
       items: [
         { title: "Funktioniert offline", body: "Alles läuft auf deinem Handy. Kein Empfang im Kellerstudio? Kein Problem." },
         {

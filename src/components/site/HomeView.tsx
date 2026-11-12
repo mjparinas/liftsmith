@@ -328,6 +328,13 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               </div>
             ))}
           </div>
+          <Link
+            href="/features/"
+            data-cta="home-all-features"
+            className="mt-6 inline-flex min-h-11 items-center gap-1 font-semibold text-accent hover:underline"
+          >
+            {h.more.all} <span aria-hidden>→</span>
+          </Link>
           <div className="mt-10 grid items-center gap-8 rounded-3xl border border-line bg-surface p-6 sm:p-10 md:grid-cols-[1fr_260px]">
             <div>
               <Eyebrow>{h.juice.eyebrow}</Eyebrow>

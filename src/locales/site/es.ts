@@ -196,6 +196,7 @@ export const es: SiteText = {
     more: {
       eyebrow: "Y además",
       title: "Pequeños detalles que suman",
+      all: "Todas las funciones y las apps y dispositivos compatibles",
       items: [
         {
           title: "Funciona sin conexión",

@@ -38,6 +38,10 @@ There is no Android SDK in cloud sessions; APKs and AABs build in GitHub Actions
 - Native code registered by the app: Android `MainActivity.registerPlugin`, iOS `MainViewController.capacitorDidLoad` (Capacitor 8 with SPM doesn't auto-register app-target plugins). `InstallInfo` (device and install source for analytics) is registered on both.
 - Native apps open straight into the app (`server.appStartPath: /app/index.html`); the landing page is for the website.
 
+## Features page (rule, Melvin, 2026-11-12)
+
+- **The website's `/features/` lists every feature, a compatibility table of every connection and the newest features, and stays current** (Melvin, 2026-11-12: "keep it up to date with all new features"). It comes from one file, `src/content/features.ts`. A change that adds, removes or renames a feature a lifter would notice, moves one between Free, Pro and Labs, or adds a connection, device or platform updates that file in the same change (a new feature with today's `added` day, which puts it under Newest). A connection that isn't live yet says Coming soon. `features.test.ts` fails when a lab, Pro feature, cloud service, import source or feature page is missing. Details in [Features page](docs/decisions/features-page.md).
+
 ## Product rules (apply to every screen)
 
 ### Action over stats (rule, Melvin, 2026-11-09)
@@ -183,6 +187,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Desktop layout](docs/decisions/desktop-layout.md) (`src/lib/layout.ts`, `App.tsx` `Sidebar`, `globals.css` `desk:`)
 - [Delightful extras](docs/decisions/delightful-extras.md) (`achievements.ts`, `moments.ts`, `recap.ts`, `shareImage.ts`)
 - [Engagement and juice](docs/decisions/engagement-and-juice.md) (`game.ts`, `achievements.ts`, `shareImage.ts`)
+- [Features page](docs/decisions/features-page.md) (`src/content/features.ts`, `FeaturesView.tsx`, `features.test.ts`)
 - [Fitness age](docs/decisions/fitness-age.md) (`docs/FITNESS_AGE.md`, `src/lib/fitnessAge.ts`, `HealthTwin.tsx`, `health.ts`)
 - [Fitness tests](docs/decisions/fitness-tests.md) (`src/lib/fitTests.ts`, `FitTests.tsx`, `HealthTwin.tsx`)
 - [Food from Health](docs/decisions/food-from-health.md) (`src/lib/nutrition.ts`, `insights.ts`, `health.ts`, `HealthWorkoutPlugin.kt`, `HealthWorkoutPlugin.swift`)
