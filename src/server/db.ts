@@ -494,6 +494,34 @@ const SCHEMA = [
     uses INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE INDEX IF NOT EXISTS social_invites_account ON social_invites (account_id)`,
+  // Friend challenges (social.ts `challengeCreate`): a few friends race on one measure for 1, 2 or 4 weeks, scored
+  // from what each joined member posts in that window. Members are invited, then joined; declining deletes the row.
+  `CREATE TABLE IF NOT EXISTS challenges (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    metric TEXT NOT NULL,
+    starts_at INTEGER NOT NULL,
+    ends_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS challenges_owner ON challenges (owner_id)`,
+  `CREATE TABLE IF NOT EXISTS challenge_members (
+    challenge_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (challenge_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS challenge_members_account ON challenge_members (account_id)`,
+  // Training partners tagged on a post (social.ts `post`): mutual friends only, and a tagged lifter can remove themselves.
+  `CREATE TABLE IF NOT EXISTS post_partners (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS post_partners_account ON post_partners (account_id)`,
   // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
   `CREATE TABLE IF NOT EXISTS mutes (
     muter_id TEXT NOT NULL,

@@ -10,14 +10,19 @@ import { randomBytes } from "node:crypto";
 import {
   AUDIENCES,
   AVATAR_IDS,
+  BOARD_METRICS,
+  CHALLENGE_DAYS,
   cleanHandle,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
   type ActivityItem,
   type Audience,
+  type BoardMetric,
+  type Challenge,
   type FeedComment,
   type FeedPost,
+  type Partner,
   type PersonCard,
   type PostBody,
   type PostExercise,
@@ -40,7 +45,7 @@ const fail = (code: number, error: string): Result => ({ code, body: { error } }
 export const HIDE_AFTER = 3;
 export const PAGE = 20;
 /** Per account per day, so one account can't flood others. */
-export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50, invite: 30 };
+export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50, invite: 30, challenge: 10 };
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
 /** Handles nobody can take: they'd look official. */
@@ -275,7 +280,12 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
   return [
     { sql: `DELETE FROM post_likes WHERE post_id IN (${mine})`, args: a },
     { sql: `DELETE FROM post_comments WHERE post_id IN (${mine})`, args: a },
+    { sql: `DELETE FROM post_partners WHERE post_id IN (${mine})`, args: a },
     { sql: "DELETE FROM posts WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM post_partners WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM challenge_members WHERE challenge_id IN (SELECT id FROM challenges WHERE owner_id = ?)", args: a },
+    { sql: "DELETE FROM challenges WHERE owner_id = ?", args: a },
+    { sql: "DELETE FROM challenge_members WHERE account_id = ?", args: a },
     { sql: "DELETE FROM post_likes WHERE account_id = ?", args: a },
     { sql: "DELETE FROM post_comments WHERE account_id = ?", args: a },
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
@@ -609,7 +619,50 @@ export async function post(accountId: string, b: Record<string, unknown>, now = 
     [id, accountId, p.workoutId, now, p.at, JSON.stringify(p.body), p.caption, p.audience ?? audienceOf(mine.audience)],
   );
   const [row] = await query("SELECT id FROM posts WHERE account_id = ? AND workout_id = ?", [accountId, p.workoutId]);
-  return ok({ id: s(row?.id ?? id) });
+  const postId = s(row?.id ?? id);
+  const audience = p.audience ?? audienceOf(mine.audience);
+  if (audience !== "me") await tagPartners(accountId, postId, b.partners, now);
+  return ok({ id: postId });
+}
+
+/** Handles of the lifter's mutual friends among `v` (up to five), as account ids. Anyone else is dropped. */
+async function friendIds(accountId: string, v: unknown, max: number): Promise<string[]> {
+  const handles = [...new Set((Array.isArray(v) ? v : []).map(cleanHandle).filter((h) => HANDLE_RE.test(h)))].slice(0, max);
+  if (!handles.length) return [];
+  const rows = await query(
+    `SELECT sp.account_id AS id FROM social_profiles sp
+     WHERE sp.handle IN (${handles.map((_, i) => `?${i + 2}`).join(",")}) AND sp.suspended = 0 AND sp.account_id != ?1
+       AND EXISTS (SELECT 1 FROM follows a WHERE a.follower_id = ?1 AND a.followee_id = sp.account_id AND a.accepted = 1)
+       AND EXISTS (SELECT 1 FROM follows b WHERE b.follower_id = sp.account_id AND b.followee_id = ?1 AND b.accepted = 1)
+       AND NOT EXISTS (SELECT 1 FROM blocks bl WHERE (bl.blocker_id = ?1 AND bl.blocked_id = sp.account_id)
+         OR (bl.blocker_id = sp.account_id AND bl.blocked_id = ?1))`,
+    [accountId, ...handles],
+  );
+  return rows.map((r) => s(r.id));
+}
+
+/**
+ * Sets who the lifter trained with on one of their posts: mutual friends only, up to five. Someone newly tagged
+ * hears about it; someone left out is untagged. `undefined` leaves the tags as they are.
+ */
+async function tagPartners(accountId: string, postId: string, v: unknown, now: number) {
+  if (v === undefined) return;
+  const ids = await friendIds(accountId, v, SOCIAL_LIMITS.partners);
+  const had = new Set((await query("SELECT account_id FROM post_partners WHERE post_id = ?", [postId])).map((r) => s(r.account_id)));
+  await batch([
+    { sql: "DELETE FROM post_partners WHERE post_id = ?", args: [postId] },
+    ...ids.map((id) => ({
+      sql: "INSERT OR IGNORE INTO post_partners (post_id, account_id, created_at) VALUES (?, ?, ?)",
+      args: [postId, id, now] as (string | number)[],
+    })),
+  ]);
+  for (const id of ids) if (!had.has(id)) await notify(id, accountId, "tag");
+}
+
+/** A tagged lifter takes themselves off someone's post. */
+export async function untag(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  await run("DELETE FROM post_partners WHERE post_id = ? AND account_id = ?", [s(b.id), accountId]);
+  return ok();
 }
 
 /** Changes the caption or who sees one of the lifter's own posts. */
@@ -627,7 +680,10 @@ export async function editPost(accountId: string, b: Record<string, unknown>): P
   if ("error" in caption) return fail(400, caption.error);
   const audience = b.audience === undefined ? audienceOf(row.audience) : audienceOf(b.audience);
   await run("UPDATE posts SET caption = ?, audience = ? WHERE id = ?", [caption.text, audience, s(row.id)]);
-  return ok({ id: s(row.id), caption: caption.text, audience });
+  // A post only the lifter sees has no one to tag.
+  await tagPartners(accountId, s(row.id), audience === "me" ? [] : b.partners, Date.now());
+  const partners = await partnersOf(accountId, s(row.id));
+  return ok({ id: s(row.id), caption: caption.text, audience, partners });
 }
 
 /** Deletes one of the lifter's own posts, by its id or the workout it came from. */
@@ -639,6 +695,7 @@ export async function unpost(accountId: string, b: Record<string, unknown>): Pro
     await batch([
       { sql: "DELETE FROM post_likes WHERE post_id = ?", args: [id] },
       { sql: "DELETE FROM post_comments WHERE post_id = ?", args: [id] },
+      { sql: "DELETE FROM post_partners WHERE post_id = ?", args: [id] },
       { sql: "DELETE FROM posts WHERE id = ?", args: [id] },
     ]);
   return ok();
@@ -655,10 +712,25 @@ export async function posted(accountId: string, b: Record<string, unknown>): Pro
     `SELECT id, workout_id, caption, audience FROM posts WHERE account_id = ? AND workout_id IN (${ids.map(() => "?").join(",")})`,
     [accountId, ...ids],
   );
+  const tags = await withPartners(
+    accountId,
+    rows.map((r) => ({ id: s(r.id) })),
+  );
+  const partners = new Map(tags.map((x) => [x.id, x.partners.map((pt) => pt.handle)]));
   return ok({
     posted: Object.fromEntries(rows.map((r) => [s(r.workout_id), s(r.id)])),
-    details: Object.fromEntries(rows.map((r) => [s(r.workout_id), { caption: s(r.caption), audience: audienceOf(r.audience) }])),
+    details: Object.fromEntries(
+      rows.map((r) => [
+        s(r.workout_id),
+        { caption: s(r.caption), audience: audienceOf(r.audience), partners: partners.get(s(r.id)) ?? [] },
+      ]),
+    ),
   });
+}
+
+async function partnersOf(viewer: string, postId: string): Promise<Partner[]> {
+  const [p] = await withPartners(viewer, [{ id: postId }]);
+  return p?.partners ?? [];
 }
 
 const POST_COLS = (viewer: string) => [
@@ -691,7 +763,36 @@ function toPost(viewer: string, r: Row): FeedPost | null {
     avatar: avatarOf(r.avatar),
     caption: s(r.caption),
     audience: audienceOf(r.audience),
+    partners: [],
+    tagged: false,
   };
+}
+
+/** Fills in each post's training partners (one query for the page) and whether the reader is one of them. */
+async function withPartners<T extends { id: string }>(
+  viewer: string,
+  posts: T[],
+): Promise<(T & { partners: Partner[]; tagged: boolean })[]> {
+  if (!posts.length) return [];
+  const rows = await query(
+    `SELECT pp.post_id AS post_id, pp.account_id AS id, tp.handle AS handle, tp.name AS name, tp.avatar AS avatar
+     FROM post_partners pp JOIN social_profiles tp ON tp.account_id = pp.account_id
+     WHERE pp.post_id IN (${posts.map(() => "?").join(",")}) AND tp.suspended = 0
+       AND pp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)
+       AND pp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
+     ORDER BY pp.created_at, tp.name`,
+    [...posts.map((p) => p.id), viewer, viewer],
+  );
+  const by = new Map<string, Row[]>();
+  for (const r of rows) by.set(s(r.post_id), [...(by.get(s(r.post_id)) ?? []), r]);
+  return posts.map((p) => {
+    const mine = by.get(p.id) ?? [];
+    return {
+      ...p,
+      partners: mine.map((r) => ({ handle: s(r.handle), name: s(r.name), avatar: avatarOf(r.avatar) })),
+      tagged: mine.some((r) => s(r.id) === viewer),
+    };
+  });
 }
 
 const cursor = (v: unknown) => {
@@ -715,7 +816,10 @@ export async function feed(accountId: string, b: Record<string, unknown>): Promi
      ORDER BY p.at DESC LIMIT ${PAGE}`,
     [viewer!, cursor(b.before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
   );
-  const posts = rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p);
+  const posts = await withPartners(
+    accountId,
+    rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p),
+  );
   return ok({ posts, more: rows.length === PAGE });
 }
 
@@ -733,7 +837,11 @@ export async function personPosts(accountId: string, b: Record<string, unknown>)
      WHERE p.account_id = ? AND p.hidden = 0 AND p.at < ? AND ${seesPost("?")} ORDER BY p.at DESC LIMIT ${PAGE}`,
     [viewer!, author, cursor(b.before), accountId, accountId, accountId],
   );
-  return ok({ posts: rows.map((r) => toPost(accountId, r)).filter(Boolean), more: rows.length === PAGE });
+  const posts = await withPartners(
+    accountId,
+    rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p),
+  );
+  return ok({ posts, more: rows.length === PAGE });
 }
 
 /** A post the lifter may see, with its author's id, or null. */
@@ -780,7 +888,8 @@ export async function thread(accountId: string, b: Record<string, unknown>): Pro
     mine: s(r.author) === accountId,
     canDelete: s(r.author) === accountId || vis.author === accountId,
   }));
-  return ok({ post: row ? toPost(accountId, row) : null, comments });
+  const one = row ? toPost(accountId, row) : null;
+  return ok({ post: one ? (await withPartners(accountId, [one]))[0] : null, comments });
 }
 
 export async function like(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
@@ -856,7 +965,14 @@ const ACTIVITY = `
   SELECT 'comment', c.account_id, c.created_at, c.post_id, c.body
     FROM post_comments c JOIN posts p ON p.id = c.post_id WHERE p.account_id = ?1 AND c.account_id != ?1 AND c.hidden = 0
   UNION ALL
-  SELECT 'sent', w.from_id, w.created_at, w.code, w.name FROM sent_workouts w WHERE w.to_id = ?1`;
+  SELECT 'sent', w.from_id, w.created_at, w.code, w.name FROM sent_workouts w WHERE w.to_id = ?1
+  UNION ALL
+  SELECT 'tag', p.account_id, pp.created_at, p.id, NULL
+    FROM post_partners pp JOIN posts p ON p.id = pp.post_id WHERE pp.account_id = ?1 AND p.hidden = 0
+  UNION ALL
+  SELECT 'challenge', c.owner_id, cm.created_at, NULL, c.name
+    FROM challenge_members cm JOIN challenges c ON c.id = cm.challenge_id
+    WHERE cm.account_id = ?1 AND cm.status = 'invited' AND c.owner_id != ?1`;
 const ACTIVITY_VISIBLE = `a JOIN social_profiles sp ON sp.account_id = a.who
   WHERE sp.suspended = 0 AND a.who NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)`;
 
@@ -1047,6 +1163,137 @@ export async function board(accountId: string, b: Record<string, unknown>, now =
   });
 }
 
+// --- Friend challenges ---
+
+/** How each measure is scored from a member's posts in the window (the same sums as the board). */
+const SCORE: Record<BoardMetric, string> = {
+  workouts: "COUNT(p.id)",
+  sets: "COALESCE(SUM(json_extract(p.body, '$.sets')), 0)",
+  minutes: "COALESCE(SUM(json_extract(p.body, '$.seconds')), 0) / 60",
+  volume: "COALESCE(SUM(json_extract(p.body, '$.volume')), 0)",
+};
+/** Finished challenges stay on the list this long, so everyone sees who won. */
+export const CHALLENGE_KEEP = 14 * day;
+
+/**
+ * Starts a challenge: a name, one measure, 1, 2 or 4 weeks from now, and mutual friends to invite (up to 19).
+ * The starter is in it from the start; the others are invited and score once they join.
+ */
+export async function challengeCreate(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const name = checkText(b.name, SOCIAL_LIMITS.challengeName);
+  if (!name.ok) return fail(400, `name.${name.error}`);
+  if (!name.text) return fail(400, "Bad request.");
+  const metric = BOARD_METRICS.find((m) => m === b.metric);
+  const days = CHALLENGE_DAYS.find((d) => d === Number(b.days));
+  if (!metric || !days) return fail(400, "Bad request.");
+  const ids = await friendIds(accountId, b.handles, SOCIAL_LIMITS.challengeMembers - 1);
+  if (!ids.length) return fail(400, "notFriends");
+  const [running] = await query("SELECT COUNT(*) AS n FROM challenges WHERE owner_id = ? AND ends_at > ?", [accountId, now]);
+  if (n(running?.n) >= SOCIAL_LIMITS.challengesActive) return fail(429, "tooMany");
+  if (!(await limit(accountId, "challenge", now))) return fail(429, "slow");
+  const id = newId();
+  await batch([
+    {
+      sql: "INSERT INTO challenges (id, owner_id, name, metric, starts_at, ends_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      args: [id, accountId, name.text, metric, now, now + days * day, now],
+    },
+    {
+      sql: "INSERT INTO challenge_members (challenge_id, account_id, status, created_at) VALUES (?, ?, 'joined', ?)",
+      args: [id, accountId, now],
+    },
+    ...ids.map((m) => ({
+      sql: "INSERT INTO challenge_members (challenge_id, account_id, status, created_at) VALUES (?, ?, 'invited', ?)",
+      args: [id, m, now] as (string | number)[],
+    })),
+  ]);
+  for (const m of ids) await notify(m, accountId, "challenge", { workout: name.text });
+  return ok({ id });
+}
+
+/**
+ * The lifter's challenges, running and lately finished, with everyone's score so far. A joined member's score
+ * comes from the workouts they posted in the window to anyone but themselves; joining says the totals are
+ * shown to the other members (never the posts themselves). Someone blocked either way is left out.
+ */
+export async function challenges(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const list = await query(
+    `SELECT c.id AS id, c.name AS name, c.metric AS metric, c.starts_at AS starts_at, c.ends_at AS ends_at, c.owner_id AS owner_id,
+       op.handle AS owner_handle, op.name AS owner_name, cm.status AS status
+     FROM challenge_members cm JOIN challenges c ON c.id = cm.challenge_id JOIN social_profiles op ON op.account_id = c.owner_id
+     WHERE cm.account_id = ? AND c.ends_at > ? AND op.suspended = 0
+     ORDER BY c.ends_at LIMIT 30`,
+    [accountId, now - CHALLENGE_KEEP],
+  );
+  const out: Challenge[] = [];
+  for (const c of list) {
+    const metric = BOARD_METRICS.find((m) => m === c.metric) ?? "workouts";
+    const rows = await query(
+      `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, cm.status AS status,
+         CASE WHEN cm.status = 'joined' THEN (SELECT ${SCORE[metric]} FROM posts p
+           WHERE p.account_id = cm.account_id AND p.hidden = 0 AND p.audience != 'me' AND p.at >= ?2 AND p.at < ?3) ELSE 0 END AS value
+       FROM challenge_members cm JOIN social_profiles sp ON sp.account_id = cm.account_id
+       WHERE cm.challenge_id = ?1 AND sp.suspended = 0
+         AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?4)
+         AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?4)`,
+      [s(c.id), n(c.starts_at), n(c.ends_at), accountId],
+    );
+    out.push({
+      id: s(c.id),
+      name: s(c.name),
+      metric,
+      startsAt: n(c.starts_at),
+      endsAt: n(c.ends_at),
+      owner: { handle: s(c.owner_handle), name: s(c.owner_name) },
+      mine: s(c.owner_id) === accountId,
+      status: s(c.status) === "joined" ? "joined" : "invited",
+      members: rows.map((r) => ({
+        handle: s(r.handle),
+        name: s(r.name),
+        avatar: avatarOf(r.avatar),
+        me: s(r.id) === accountId,
+        joined: s(r.status) === "joined",
+        value: Math.round(n(r.value)),
+      })),
+    });
+  }
+  return ok({ challenges: out });
+}
+
+/** Joins a challenge the lifter was invited to, or declines it (which takes them off it). */
+export async function challengeAnswer(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const [c] = await query(
+    `SELECT c.ends_at AS ends_at FROM challenge_members cm JOIN challenges c ON c.id = cm.challenge_id
+     WHERE cm.challenge_id = ? AND cm.account_id = ? AND cm.status = 'invited'`,
+    [s(b.id), accountId],
+  );
+  if (!c || n(c.ends_at) <= now) return fail(404, "gone");
+  if (b.accept === true)
+    await run("UPDATE challenge_members SET status = 'joined' WHERE challenge_id = ? AND account_id = ?", [s(b.id), accountId]);
+  else await run("DELETE FROM challenge_members WHERE challenge_id = ? AND account_id = ?", [s(b.id), accountId]);
+  return ok();
+}
+
+/** Leaves a challenge. The starter leaving ends it for everyone. */
+export async function challengeLeave(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const id = s(b.id);
+  const [c] = await query("SELECT owner_id FROM challenges WHERE id = ?", [id]);
+  if (!c) return ok();
+  if (s(c.owner_id) === accountId)
+    await batch([
+      { sql: "DELETE FROM challenge_members WHERE challenge_id = ?", args: [id] },
+      { sql: "DELETE FROM challenges WHERE id = ?", args: [id] },
+    ]);
+  else await run("DELETE FROM challenge_members WHERE challenge_id = ? AND account_id = ?", [id, accountId]);
+  return ok();
+}
+
 /** A phone's push token, so this account's Friends notifications reach it (push.ts). */
 export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -1084,6 +1331,11 @@ export const OPS: Record<string, Op> = {
   inviteInfo,
   acceptInvite,
   board,
+  challengeCreate,
+  challenges,
+  challengeAnswer,
+  challengeLeave: (a, b) => challengeLeave(a, b),
+  untag: (a, b) => untag(a, b),
   pushToken,
   pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };
