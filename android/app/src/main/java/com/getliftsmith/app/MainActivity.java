@@ -17,6 +17,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(GarminPlugin.class);
         registerPlugin(SpeechLogPlugin.class);
         registerPlugin(VolumeKeysPlugin.class);
+        registerPlugin(StoreReviewPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

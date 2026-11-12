@@ -6,6 +6,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 - **Follow Hevy's model** (Melvin, 2026-11-12: "Can we try to follow Hevy's growth strategy? Organic growth, minimal spend, customer delight"). Growth comes from the product and the people who use it, not from buying installs. Still no paid ads and no ads in the app, ever ([Marketing and growth](marketing-and-growth.md), [Money](money.md)).
 - **Who we grow through** (Melvin, 2026-11-12): regular gym users, trainers and their clients, and gyms themselves. The other groups below are Claude's suggestions until Melvin picks.
+- **What to build and do** (Melvin, 2026-11-12: "do 1, 2, 3, agree with 4, 5, 6, 7, 8"): items 1, 2, 3, 5 and 6 of the ranked list below are built (each has its own section under "Built"), 4 is the gym thread's with the spend suggestion agreed, and 7 and 8 are drafted for Melvin to do in the store consoles and partner sites. 9 and 10 wait.
 - **Gyms: claimed gyms, a gym finder and gym pages, with a poster and QR stand** (Melvin, 2026-11-12). Being built in its own thread ("Let gyms claim their page and find gyms"); its decisions go in that thread's own topic file, not here. This file only says how it fits the growth plan (below).
 
 ## What Hevy did (sources, read 2026-11-12)
@@ -63,6 +64,14 @@ Ranked by expected growth per hour of Melvin's time and per dollar. Each says wh
 8. **Partner directories (do, after Play approval).** Garmin Connect IQ store, Health Connect and Apple Health app lists, Oura and Withings partner pages, AlternativeTo, SaaSHub, Product Hunt. Each is a free, permanent link from a page lifters already visit.
 9. **A public routine library (build, larger, later).** Shared routines become indexable pages (`/routines/<slug>/`), opt-in, with the builder's handle, like Hevy's explore. Good for search and for creators, but it needs moderation first, so it waits until Friends has real users.
 10. **Campus clubs (do, later).** Free Pro for the club leader (a promo code) in exchange for running their club in a Liftsmith club. Only after the gym program shows the club board works in the wild.
+
+## Built
+
+### Store rating at a happy moment (item 1, 2026-11-12)
+
+- **When** (`shouldAskRating` in `src/lib/rateApp.ts`): on the Done screen, 3.5 s after the celebration starts, when this workout brought a new best, a level-up or a badge, the lifter has finished at least 3 workouts, the first was at least 7 days ago, and we haven't asked in the last 90 days (`liftsmith.ratingAsked` in localStorage; without storage we never ask). Never during a set.
+- **How:** the stores' own prompt only. Android: Play In-App Review (`StoreReviewPlugin.java`, `com.google.android.play:review`); iOS: `SKStoreReviewController.requestReview(in:)` (`StoreReviewPlugin` in `DelightPlugins.swift`). The stores decide whether it really appears (Apple at most three times a year) and never tell us, so nothing else depends on it. The web has no store and skips it.
+- **The words are the store's,** so there's no text of ours to translate and nothing that asks for a good rating or rewards one (Google Play and App Store rules; [Marketing and growth](marketing-and-growth.md)).
 
 ## How we'll know (no public numbers)
 

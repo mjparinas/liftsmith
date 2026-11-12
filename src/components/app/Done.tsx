@@ -12,6 +12,7 @@ import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@
 import { date, inSentence, num, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
@@ -168,6 +169,21 @@ export function Done() {
     if (badges.length) setTimeout(() => sound.badge(), 1100);
     else if (questsDone.length) setTimeout(() => sound.done(), 1100);
     if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
+    // A store rating prompt at a happy moment, once the celebration has played (src/lib/rateApp.ts).
+    const first = stats.sessions[stats.sessions.length - 1];
+    const ask = first
+      ? setTimeout(() => {
+          void maybeAskRating({
+            workouts: stats.sessions.length,
+            firstAt: first.start,
+            prs: prs.length,
+            levelUp,
+            badges: badges.length,
+            now: Date.now(),
+          });
+        }, 3500)
+      : undefined;
+    return () => clearTimeout(ask);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!s)
