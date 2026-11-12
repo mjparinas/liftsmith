@@ -252,6 +252,8 @@ try {
     avatar: "av-mascot",
     caption: "New bench best, felt smooth.",
     audience: "all",
+    partners: [{ handle: "casey", name: "Casey", avatar: "av-leaf" }],
+    tagged: false,
     body: {
       v: 1,
       seconds: 3100,
@@ -303,6 +305,39 @@ try {
         { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
       ],
     },
+    challenges: {
+      challenges: [
+        {
+          id: "ch1",
+          name: "Most sets",
+          metric: "sets",
+          startsAt: Date.now() - 86_400_000,
+          endsAt: Date.now() + 6 * 86_400_000,
+          owner: { handle: "blair", name: "Blair" },
+          mine: false,
+          status: "invited",
+          members: [
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 41 },
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: false, value: 0 },
+          ],
+        },
+        {
+          id: "ch2",
+          name: "Spring minutes",
+          metric: "minutes",
+          startsAt: Date.now() - 3 * 86_400_000,
+          endsAt: Date.now() + 11 * 86_400_000,
+          owner: { handle: "alex", name: "Alex" },
+          mine: true,
+          status: "joined",
+          members: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 95 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 140 },
+            { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
+          ],
+        },
+      ],
+    },
     inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
@@ -347,7 +382,12 @@ try {
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Board" }).click();
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
+  await page.getByText("Blair invited you to this challenge.").waitFor();
   await scan("friends board");
+  await page.getByRole("button", { name: "Start a challenge" }).click();
+  await page.getByRole("group", { name: "Challenge" }).waitFor();
+  await scan("friends start challenge");
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();
   await scan("friends activity");

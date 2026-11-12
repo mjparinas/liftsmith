@@ -12,6 +12,8 @@ export const en = {
   "push.comment": "{name} commented: “{text}”",
   "push.sent": "{name} sent you a workout: {workout}",
   "push.channel": "Friends",
+  "push.challenge": "{name} challenged you: {workout}",
+  "push.tag": "{name} tagged you as a training partner.",
 } as const;
 
 type Key = keyof typeof en;
@@ -24,6 +26,8 @@ export const es: Partial<Record<Key, Message>> = {
   "push.comment": "{name} comentó: «{text}»",
   "push.sent": "{name} te envió un entrenamiento: {workout}",
   "push.channel": "Amigos",
+  "push.challenge": "{name} te retó: {workout}",
+  "push.tag": "{name} te etiquetó como compañero de entrenamiento.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -34,6 +38,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.comment": "{name} a commenté : « {text} »",
   "push.sent": "{name} t’a envoyé une séance : {workout}",
   "push.channel": "Amis",
+  "push.challenge": "{name} te lance un défi : {workout}",
+  "push.tag": "{name} t’a identifié comme partenaire d’entraînement.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -44,6 +50,8 @@ export const de: Partial<Record<Key, Message>> = {
   "push.comment": "{name} hat kommentiert: „{text}“",
   "push.sent": "{name} hat dir ein Workout geschickt: {workout}",
   "push.channel": "Freunde",
+  "push.challenge": "{name} fordert dich heraus: {workout}",
+  "push.tag": "{name} hat dich als Trainingspartner markiert.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -54,6 +62,8 @@ export const it: Partial<Record<Key, Message>> = {
   "push.comment": "{name} ha commentato: «{text}»",
   "push.sent": "{name} ti ha inviato un allenamento: {workout}",
   "push.channel": "Amici",
+  "push.challenge": "{name} ti ha sfidato: {workout}",
+  "push.tag": "{name} ti ha taggato come compagno di allenamento.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -64,4 +74,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.comment": "{name} さんがコメントしました：「{text}」",
   "push.sent": "{name} さんからワークアウトが届きました：{workout}",
   "push.channel": "友達",
+  "push.challenge": "{name}さんからチャレンジが届きました：{workout}",
+  "push.tag": "{name}さんがあなたをトレーニング仲間としてタグ付けしました。",
 };

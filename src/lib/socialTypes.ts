@@ -136,6 +136,17 @@ export interface FeedPost {
   /** The poster's own words about the workout, or "". */
   caption: string;
   audience: Audience;
+  /** Training partners the poster tagged (mutual friends). */
+  partners: Partner[];
+  /** The reader is one of them (they can remove themselves). */
+  tagged: boolean;
+}
+
+/** A training partner tagged on a post. */
+export interface Partner {
+  handle: string;
+  name: string;
+  avatar: string;
 }
 
 export interface FeedComment {
@@ -150,7 +161,7 @@ export interface FeedComment {
   canDelete: boolean;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
@@ -175,6 +186,12 @@ export const SOCIAL_LIMITS = {
   comment: 280,
   caption: 280,
   lifts: 3,
+  partners: 5,
+  challengeName: 40,
+  /** People in one challenge, the starter included. */
+  challengeMembers: 20,
+  /** Challenges one lifter can have running that they started. */
+  challengesActive: 10,
   exercises: 20,
   muscles: 6,
 };
@@ -205,4 +222,33 @@ export interface Inviter {
   handle: string;
   name: string;
   avatar: string;
+}
+
+/** How long a friend challenge runs, in days. */
+export const CHALLENGE_DAYS = [7, 14, 28] as const;
+export type ChallengeDays = (typeof CHALLENGE_DAYS)[number];
+
+/** One person in a challenge, with their score so far (joined members only score). */
+export interface ChallengeMember {
+  handle: string;
+  name: string;
+  avatar: string;
+  me: boolean;
+  joined: boolean;
+  value: number;
+}
+
+/** A friend challenge as one member sees it. */
+export interface Challenge {
+  id: string;
+  /** The starter's name for it, or "" (the app names it after the measure). */
+  name: string;
+  metric: BoardMetric;
+  startsAt: number;
+  endsAt: number;
+  owner: { handle: string; name: string };
+  /** The reader started it (leaving ends it for everyone). */
+  mine: boolean;
+  status: "invited" | "joined";
+  members: ChallengeMember[];
 }

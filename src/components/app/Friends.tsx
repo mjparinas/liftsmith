@@ -9,6 +9,7 @@ import { SECTION_LABEL } from "@/components/titles";
 import { achName, TIER_LABEL } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
+import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { badgeForItem, COSMETICS, levelForItem } from "@/lib/game";
@@ -45,6 +46,7 @@ import {
 import {
   AUDIENCES,
   BOARD_METRICS,
+  CHALLENGE_DAYS,
   cleanHandle,
   HANDLE_RE,
   REPORT_REASONS,
@@ -53,9 +55,12 @@ import {
   type Audience,
   type BoardMetric,
   type BoardRow,
+  type Challenge,
+  type ChallengeDays,
   type FeedComment,
   type FeedPost,
   type Inviter,
+  type Partner,
   type PersonCard,
   type PushPrefs,
   type ReportKind,
@@ -121,9 +126,62 @@ function AudienceChips({ value, onChange, publicProfile }: { value: Audience; on
   );
 }
 
+/** What the compose sheet sends: the caption, who sees it and the handles of the friends trained with. */
+export type ComposeValue = { caption: string; audience: Audience; partners: string[] };
+
+/** The lifter's mutual friends, for tagging and challenges; loaded once per sheet. */
+function useFriendList(on = true): Person[] | null {
+  const [list, setList] = useState<Person[] | null>(null);
+  useEffect(() => {
+    if (!on) return;
+    let live = true;
+    social<{ people: Person[] }>("people", { list: "friends" })
+      .then((r) => live && setList(r.people))
+      .catch(() => live && setList([]));
+    return () => {
+      live = false;
+    };
+  }, [on]);
+  return list;
+}
+
+/** Friends to pick as chips, up to `max`. Nothing shows without friends. */
+function FriendPicker({
+  label,
+  hint,
+  friends,
+  value,
+  onChange,
+  max,
+}: {
+  label: string;
+  hint: string;
+  friends: Person[] | null;
+  value: string[];
+  onChange: (v: string[]) => void;
+  max: number;
+}) {
+  if (!friends?.length) return null;
+  const toggle = (h: string) => onChange(value.includes(h) ? value.filter((x) => x !== h) : value.length < max ? [...value, h] : value);
+  return (
+    <>
+      <p className={`mb-1 mt-4 ${SECTION_LABEL}`}>{label}</p>
+      <p className="mb-2 text-xs text-muted">{hint}</p>
+      <div className="flex flex-wrap gap-2" role="group" aria-label={label}>
+        {friends.map((f) => (
+          <Chip key={f.handle} active={value.includes(f.handle)} onClick={() => toggle(f.handle)}>
+            {value.includes(f.handle) && <Icon name="check" size={14} />}
+            {f.name}
+          </Chip>
+        ))}
+      </div>
+    </>
+  );
+}
+
 /**
- * Writing a post: an optional caption and who sees it. Done's "Post to friends" and a post's "Edit post" both
- * open it. Mounted only while open, so it starts from what's saved each time.
+ * Writing a post: an optional caption, who sees it and who the lifter trained with. Done's "Post to friends" and
+ * a post's "Edit post" both open it. Mounted only while open, so it starts from what's saved each time.
  */
 export function ComposeSheet(props: {
   open: boolean;
@@ -132,7 +190,8 @@ export function ComposeSheet(props: {
   submit: string;
   caption: string;
   audience: Audience;
-  onSubmit: (v: { caption: string; audience: Audience }) => Promise<string | null>;
+  partners: string[];
+  onSubmit: (v: ComposeValue) => Promise<string | null>;
 }) {
   return props.open ? <ComposeBody {...props} /> : null;
 }
@@ -143,18 +202,21 @@ function ComposeBody({
   submit,
   caption: initialCaption,
   audience: initialAudience,
+  partners: initialPartners,
   onSubmit,
 }: Parameters<typeof ComposeSheet>[0]) {
   const me = useSocial((st) => st.me);
   const [caption, setCaption] = useState(initialCaption);
   const [audience, setAudience] = useState<Audience>(initialAudience);
+  const [partners, setPartners] = useState<string[]>(initialPartners);
+  const friends = useFriendList();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const send = async (e: FormEvent) => {
     e.preventDefault();
     if (busy) return;
     setBusy(true);
-    const err = await onSubmit({ caption: caption.trim(), audience });
+    const err = await onSubmit({ caption: caption.trim(), audience, partners: audience === "me" ? [] : partners });
     setBusy(false);
     if (err) {
       oops();
@@ -181,6 +243,16 @@ function ComposeBody({
         />
         <p className={`mb-4 mt-1 ${SECTION_LABEL}`}>{t("friends.aud.title")}</p>
         <AudienceChips value={audience} onChange={setAudience} publicProfile={!!me?.profile?.public} />
+        {audience !== "me" && (
+          <FriendPicker
+            label={t("friends.partners")}
+            hint={t("friends.partnersHint", { count: SOCIAL_LIMITS.partners })}
+            friends={friends}
+            value={partners}
+            onChange={setPartners}
+            max={SOCIAL_LIMITS.partners}
+          />
+        )}
         <Button submit className="mt-5 w-full" disabled={busy}>
           {submit}
         </Button>
@@ -196,6 +268,7 @@ function ComposeBody({
 
 function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: FeedPost | null) => void; onOpen?: () => void }) {
   const { profile } = useApp();
+  const myHandle = useSocial((st) => st.me?.profile?.handle);
   const unit = profile.unit;
   const b = post.body;
   const [more, setMore] = useState(false);
@@ -203,10 +276,10 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const routine = postRoutineCode(post);
-  const edit = async (v: { caption: string; audience: Audience }) => {
+  const edit = async (v: ComposeValue) => {
     try {
-      const r = await social<{ caption: string; audience: Audience }>("editPost", { id: post.id, ...v });
-      onChange({ ...post, caption: r.caption, audience: r.audience });
+      const r = await social<{ caption: string; audience: Audience; partners: Partner[] }>("editPost", { id: post.id, ...v });
+      onChange({ ...post, caption: r.caption, audience: r.audience, partners: r.partners });
       return null;
     } catch (e) {
       return socialError(e);
@@ -229,6 +302,16 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
     try {
       await social("unpost", { id: post.id });
       onChange(null);
+    } catch (e) {
+      oops();
+      setNote(socialError(e));
+    }
+  };
+  const untag = async () => {
+    setMore(false);
+    try {
+      await social("untag", { id: post.id });
+      onChange({ ...post, tagged: false, partners: post.partners.filter((x) => x.handle !== myHandle) });
     } catch (e) {
       oops();
       setNote(socialError(e));
@@ -257,6 +340,12 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           <Icon name="more" size={22} strokeWidth={3} />
         </button>
       </header>
+      {post.partners.length > 0 && (
+        <p className="mt-2 flex items-center gap-1.5 text-sm text-muted">
+          <Icon name="people" size={16} className="shrink-0" />
+          <span className="min-w-0">{t("friends.with", { names: fmtList(post.partners.map((x) => x.name)) })}</span>
+        </p>
+      )}
       {post.caption && <p className="mt-3 whitespace-pre-wrap break-words">{post.caption}</p>}
       <p className="mt-3 text-lg font-bold">{b.prs ? t("friends.post.prs", { count: b.prs }) : t("friends.post.workout")}</p>
       <dl className="mt-2 grid grid-cols-3 gap-2 text-center">
@@ -340,17 +429,24 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
               </Button>
             </>
           ) : (
-            <Button
-              kind="ghost"
-              icon="flag"
-              className="w-full"
-              onClick={() => {
-                setMore(false);
-                setReporting(true);
-              }}
-            >
-              {t("friends.report.post")}
-            </Button>
+            <>
+              {post.tagged && (
+                <Button kind="ghost" className="w-full" onClick={() => void untag()}>
+                  {t("friends.untag")}
+                </Button>
+              )}
+              <Button
+                kind="ghost"
+                icon="flag"
+                className="w-full"
+                onClick={() => {
+                  setMore(false);
+                  setReporting(true);
+                }}
+              >
+                {t("friends.report.post")}
+              </Button>
+            </>
           )}
         </div>
       </Sheet>
@@ -362,6 +458,7 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         submit={t("friends.save")}
         caption={post.caption}
         audience={post.audience}
+        partners={post.partners.map((x) => x.handle)}
         onSubmit={edit}
       />
     </article>
@@ -964,7 +1061,7 @@ function SettingsBody({ onClose }: { onClose: () => void }) {
 
 // --- Activity and people ---
 
-function Activity({ onPeople }: { onPeople: () => void }) {
+function Activity({ onPeople, onBoard }: { onPeople: () => void; onBoard: () => void }) {
   const [items, setItems] = useState<ActivityItem[] | null>(null);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
@@ -990,7 +1087,11 @@ function Activity({ onPeople }: { onPeople: () => void }) {
           ? t("friends.act.like", { name: i.name })
           : i.kind === "sent"
             ? t("friends.act.sent", { name: i.name, workout: i.text || t("rt.defaultName") })
-            : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+            : i.kind === "challenge"
+              ? t("friends.act.challenge", { name: i.name, challenge: i.text ?? "" })
+              : i.kind === "tag"
+                ? t("friends.act.tag", { name: i.name })
+                : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (
@@ -1000,7 +1101,13 @@ function Activity({ onPeople }: { onPeople: () => void }) {
               <button
                 type="button"
                 onClick={() =>
-                  i.kind === "request" ? onPeople() : i.kind === "sent" && i.code ? go("routine", i.code) : go("person", i.handle)
+                  i.kind === "request"
+                    ? onPeople()
+                    : i.kind === "challenge"
+                      ? onBoard()
+                      : i.kind === "sent" && i.code
+                        ? go("routine", i.code)
+                        : go("person", i.handle)
                 }
                 className="press flex w-full items-center gap-3 px-4 py-3 text-left"
               >
@@ -1293,6 +1400,240 @@ function Board({ onPeople }: { onPeople: () => void }) {
   );
 }
 
+// --- Challenges ---
+
+const CHALLENGE_LEN: Record<ChallengeDays, MessageKey> = { 7: "friends.ch.len7", 14: "friends.ch.len14", 28: "friends.ch.len28" };
+const CHALLENGE_NAME: Record<BoardMetric, MessageKey> = {
+  workouts: "friends.ch.name.workouts",
+  sets: "friends.ch.name.sets",
+  minutes: "friends.ch.name.minutes",
+  volume: "friends.ch.name.volume",
+};
+
+/**
+ * Friends › Board, above the board: the lifter's challenges. Invitations to answer, running ones with what to do
+ * to move up, and finished ones with who won. "Start a challenge" picks a measure, a length and friends.
+ */
+function Challenges() {
+  const [list, setList] = useState<Challenge[] | null>(null);
+  const [reload, setReload] = useState(0);
+  const [starting, setStarting] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  useEffect(() => {
+    let live = true;
+    social<{ challenges: Challenge[] }>("challenges")
+      .then((r) => live && setList(r.challenges))
+      .catch((e: unknown) => live && (setList([]), setNote(socialError(e))));
+    return () => {
+      live = false;
+    };
+  }, [reload]);
+  const changed = () => setReload((r) => r + 1);
+  return (
+    <div className="mb-6">
+      <Section
+        title={t("friends.ch.title")}
+        icon="flag"
+        right={
+          <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => setStarting(true)}>
+            {t("friends.ch.start")}
+          </Button>
+        }
+      >
+        {list === null ? (
+          <Skeleton className="h-24" />
+        ) : list.length ? (
+          <ul className="space-y-3">
+            {list.map((c) => (
+              <ChallengeCard key={c.id} c={c} onChanged={changed} />
+            ))}
+          </ul>
+        ) : (
+          <p className="card p-4 text-sm text-muted">{t("friends.ch.none")}</p>
+        )}
+        <Note text={note} />
+      </Section>
+      <StartChallenge open={starting} onClose={() => setStarting(false)} onStarted={changed} />
+    </div>
+  );
+}
+
+function ChallengeCard({ c, onChanged }: { c: Challenge; onChanged: () => void }) {
+  const { profile } = useApp();
+  const unit = profile.unit;
+  const [note, setNote] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [now] = useState(() => Date.now());
+  const over = isOver(c, now);
+  const ranked = standings(c);
+  const waiting = c.members.filter((m) => !m.joined).length;
+  const won = over ? winners(c) : [];
+  const nudge = over ? null : challengeNudge(c);
+  const what = inSentence(t(METRIC_LABEL[c.metric]));
+  const nudgeText = !nudge
+    ? null
+    : nudge.kind === "lead"
+      ? t("friends.board.lead", { by: metricText(c.metric, nudge.by, unit), what })
+      : nudge.kind === "tied"
+        ? t("friends.board.tied", { name: nudge.name })
+        : t("friends.board.chase", { gap: metricText(c.metric, nudge.gap, unit), what, name: nudge.name });
+  const act = async (op: "challengeAnswer" | "challengeLeave", b: Record<string, unknown>) => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await social(op, { id: c.id, ...b });
+      haptic(op === "challengeAnswer" && b.accept ? "success" : "select");
+      if (op === "challengeAnswer" && b.accept) track("feature", { name: "social_challenge_join" });
+      onChanged();
+    } catch (e) {
+      oops();
+      setNote(socialError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <li className="card p-4" aria-label={c.name}>
+      <p className="font-semibold">{c.name}</p>
+      <p className="text-xs text-muted">
+        {t(METRIC_LABEL[c.metric])} ·{" "}
+        {over
+          ? won.length
+            ? t("friends.ch.won", { names: fmtList(won), count: won.length })
+            : t("friends.ch.ended")
+          : t("friends.ch.left", { count: daysLeft(c, now) })}
+        {c.mine ? "" : ` · ${t("friends.ch.by", { name: c.owner.name })}`}
+      </p>
+      {c.status === "invited" && !over && (
+        <div className="mt-3">
+          <p className="text-sm">{t("friends.ch.invited", { name: c.owner.name })}</p>
+          <p className="mt-1 text-xs text-muted">{t("friends.ch.joinNote")}</p>
+          <div className="mt-2 flex gap-2">
+            <Button
+              kind="ghost"
+              icon="check"
+              className="flex-1"
+              disabled={busy}
+              onClick={() => void act("challengeAnswer", { accept: true })}
+            >
+              {t("friends.ch.join")}
+            </Button>
+            <Button kind="quiet" disabled={busy} onClick={() => void act("challengeAnswer", { accept: false })}>
+              {t("friends.ch.decline")}
+            </Button>
+          </div>
+        </div>
+      )}
+      {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
+      <ol className="mt-2 divide-y divide-line" aria-label={t("friends.ch.standings")}>
+        {ranked.map((r) => (
+          <li key={r.handle} className={`flex items-center gap-3 py-2 ${r.me ? "font-semibold" : ""}`}>
+            <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
+            <Avatar name={r.name} avatar={r.avatar} size={32} />
+            <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
+            <span className="num shrink-0 font-bold">{metricText(c.metric, r[c.metric], unit)}</span>
+          </li>
+        ))}
+      </ol>
+      {waiting > 0 && !over && <p className="mt-1 text-xs text-muted">{t("friends.ch.waiting", { count: waiting })}</p>}
+      {c.status === "joined" && (
+        <Button kind="quiet" className="mt-2 px-3 py-2 text-sm" disabled={busy} onClick={() => void act("challengeLeave", {})}>
+          {c.mine ? (over ? t("friends.ch.clear") : t("friends.ch.end")) : t("friends.ch.leave")}
+        </Button>
+      )}
+      <Note text={note} />
+    </li>
+  );
+}
+
+function StartChallenge(props: { open: boolean; onClose: () => void; onStarted: () => void }) {
+  return props.open ? <StartChallengeBody {...props} /> : null;
+}
+
+function StartChallengeBody({ onClose, onStarted }: { onClose: () => void; onStarted: () => void }) {
+  const friends = useFriendList();
+  const [metric, setMetric] = useState<BoardMetric>("workouts");
+  const [days, setDays] = useState<ChallengeDays>(7);
+  const [picked, setPicked] = useState<string[]>([]);
+  const [name, setName] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fallback = t(CHALLENGE_NAME[metric]);
+  const start = async (e: FormEvent) => {
+    e.preventDefault();
+    if (busy || !picked.length) return;
+    setBusy(true);
+    try {
+      await social("challengeCreate", { name: name.trim() || fallback, metric, days, handles: picked });
+      haptic("success");
+      sound.done();
+      track("feature", { name: "social_challenge_start", detail: metric });
+      onStarted();
+      onClose();
+    } catch (err) {
+      oops();
+      setError(socialError(err));
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Sheet open onClose={onClose} title={t("friends.ch.start")}>
+      <form onSubmit={(e) => void start(e)}>
+        <label htmlFor="fr-ch-name" className="block text-sm text-muted">
+          {t("friends.ch.nameLabel")}
+        </label>
+        <input
+          id="fr-ch-name"
+          value={name}
+          maxLength={SOCIAL_LIMITS.challengeName}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={fallback}
+          className="card mt-1 w-full px-4 py-3"
+        />
+        <p className={`mb-2 mt-4 ${SECTION_LABEL}`}>{t("friends.ch.measure")}</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.ch.measure")}>
+          {BOARD_METRICS.map((m) => (
+            <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
+              {t(METRIC_LABEL[m])}
+            </Chip>
+          ))}
+        </div>
+        <p className={`mb-2 mt-4 ${SECTION_LABEL}`}>{t("friends.ch.length")}</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.ch.length")}>
+          {CHALLENGE_DAYS.map((d) => (
+            <Chip key={d} active={days === d} onClick={() => setDays(d)}>
+              {t(CHALLENGE_LEN[d])}
+            </Chip>
+          ))}
+        </div>
+        {friends === null ? (
+          <Skeleton className="mt-4 h-12" />
+        ) : friends.length ? (
+          <FriendPicker
+            label={t("friends.ch.who")}
+            hint={t("friends.ch.whoHint")}
+            friends={friends}
+            value={picked}
+            onChange={setPicked}
+            max={SOCIAL_LIMITS.challengeMembers - 1}
+          />
+        ) : (
+          <p className="mt-4 text-sm text-muted">{t("friends.ch.noFriends")}</p>
+        )}
+        <Button submit className="mt-5 w-full" disabled={busy || !picked.length}>
+          {t("friends.ch.go")}
+        </Button>
+        {error && (
+          <p role="alert" className="mt-2 text-sm text-bad">
+            {error}
+          </p>
+        )}
+      </form>
+    </Sheet>
+  );
+}
+
 // --- Invites ---
 
 /**
@@ -1506,8 +1847,13 @@ export function Friends() {
             }
           />
         )}
-        {tab === "board" && <Board onPeople={() => setTab("people")} />}
-        {tab === "activity" && <Activity onPeople={() => setTab("people")} />}
+        {tab === "board" && (
+          <>
+            <Challenges />
+            <Board onPeople={() => setTab("people")} />
+          </>
+        )}
+        {tab === "activity" && <Activity onPeople={() => setTab("people")} onBoard={() => setTab("board")} />}
         {tab === "people" && <People />}
       </div>
       <span className="sr-only" aria-live="polite">
@@ -1783,16 +2129,16 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
   const { events } = useApp();
   const me = useSocial((s) => s.me);
   const [postId, setPostId] = useState<string | null>(null);
-  const [details, setDetails] = useState<{ caption: string; audience: Audience } | null>(null);
+  const [details, setDetails] = useState<(Omit<ComposeValue, "partners"> & { partners?: string[] }) | null>(null);
   const [compose, setCompose] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const p = me?.profile;
   const post = useCallback(
-    async (extra: { caption?: string; audience?: Audience } = {}): Promise<string | null> => {
+    async (extra: Partial<ComposeValue> = {}): Promise<string | null> => {
       if (!p) return null;
       try {
         setPostId(await postWorkout(events, summary, p.weights, extra));
-        setDetails({ caption: extra.caption ?? "", audience: extra.audience ?? p.audience });
+        setDetails({ caption: extra.caption ?? "", audience: extra.audience ?? p.audience, partners: extra.partners ?? [] });
         setNote(null);
         track("feature", { name: "social_post", detail: p.autoPost ? "auto" : "tap" });
         return null;
@@ -1806,7 +2152,7 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
   useEffect(() => {
     if (!p) return;
     let live = true;
-    social<{ posted: Record<string, string>; details?: Record<string, { caption: string; audience: Audience }> }>("posted", {
+    social<{ posted: Record<string, string>; details?: Record<string, ComposeValue> }>("posted", {
       workoutIds: [summary.sessionId],
     })
       .then(async (r) => {
@@ -1836,10 +2182,13 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
       setNote(socialError(e));
     }
   };
-  const edit = async (v: { caption: string; audience: Audience }) => {
+  const edit = async (v: ComposeValue) => {
     try {
-      const r = await social<{ caption: string; audience: Audience }>("editPost", { workoutId: summary.sessionId, ...v });
-      setDetails({ caption: r.caption, audience: r.audience });
+      const r = await social<{ caption: string; audience: Audience; partners: Partner[] }>("editPost", {
+        workoutId: summary.sessionId,
+        ...v,
+      });
+      setDetails({ caption: r.caption, audience: r.audience, partners: r.partners.map((x) => x.handle) });
       return null;
     } catch (e) {
       return socialError(e);
@@ -1878,6 +2227,7 @@ export function PostToFriends({ summary }: { summary: SessionSummary }) {
         submit={postId ? t("friends.save") : t("friends.post.send")}
         caption={details?.caption ?? ""}
         audience={details?.audience ?? p.audience}
+        partners={details?.partners ?? []}
         onSubmit={(v) => (postId ? edit(v) : post(v))}
       />
     </div>
