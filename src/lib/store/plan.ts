@@ -6,6 +6,7 @@ import { can } from "../entitlements";
 import { freeAdaptiveLeft } from "../freeAdaptive";
 import { generate, injuryPass, type Plan } from "../generator";
 import { gymAt, locate, wantsLocation, type Fix } from "../geo";
+import type { GymKit } from "../gymShare";
 import { saveRecord } from "../localdb";
 import { withSettings, type Setting } from "../machineSettings";
 import { applyFixes, startFix, type FixKind, type Plateau } from "../plateau";
@@ -50,6 +51,8 @@ export interface PlanSlice {
   setProfile(p: Partial<Profile>): void;
   saveGym(g: Gym): void;
   addGym(preset: GymPreset): string;
+  /** Adds a gym someone shared (gymShare.ts) and returns its id. */
+  importGym(kit: GymKit): string;
   removeGym(id: string): void;
   replan(): void;
   /** Keeps the plan source in step with Pro: free lifters follow a free fixed program, and Pro brings back what they had. */
@@ -115,6 +118,14 @@ export function planSlice(c: Ctx): PlanSlice {
 
     addGym(preset) {
       const g = makeGym(preset, get().profile.unit);
+      const gyms = [...get().gyms, g];
+      set({ gyms });
+      void saveRecord("gyms", gyms);
+      return g.id;
+    },
+
+    importGym(kit) {
+      const g: Gym = { ...kit, id: crypto.randomUUID(), updatedAt: Date.now() };
       const gyms = [...get().gyms, g];
       set({ gyms });
       void saveRecord("gyms", gyms);
