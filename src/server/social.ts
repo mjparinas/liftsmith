@@ -30,6 +30,7 @@ import {
   type PersonRow,
   type PostBody,
   type PostExercise,
+  type PostSet,
   type Relation,
   type ReportKind,
   type ShowcaseLift,
@@ -729,6 +730,21 @@ const num = (v: unknown, max: number) => {
   return Number.isFinite(x) && x >= 0 && x <= max ? x : null;
 };
 
+/** Each set of an exercise, checked: kilograms (dropped when the post hides weights), reps or seconds, metres. */
+export function parseLog(v: unknown, weights: boolean): PostSet[] {
+  const out: PostSet[] = [];
+  for (const raw of (Array.isArray(v) ? v : []).slice(0, SOCIAL_LIMITS.setsEach)) {
+    if (!raw || typeof raw !== "object") continue;
+    const e = raw as Record<string, unknown>;
+    const r = num(e.r, 100_000);
+    if (r == null) continue;
+    const w = weights && e.w != null ? num(e.w, 2_000) : null;
+    const d = e.d == null ? undefined : (num(e.d, 1_000_000) ?? undefined);
+    out.push({ w: w == null ? null : Math.round(w * 100) / 100, r: Math.round(r), ...(d ? { d: Math.round(d) } : {}) });
+  }
+  return out;
+}
+
 /** Checks a workout someone wants to post. Only the summary fields are kept; anything else is dropped. */
 export function parsePost(
   v: unknown,
@@ -763,7 +779,17 @@ export function parsePost(
     if (r == null || setCount == null) continue;
     const kg = e.w == null ? null : num(e.w, 2_000);
     const d = e.d == null ? undefined : (num(e.d, 1_000_000) ?? undefined);
-    exercises.push({ id, name: name.ok ? name.text : "", sets: Math.round(setCount), w: kg, r: Math.round(r), ...(d ? { d } : {}) });
+    const log = parseLog(e.log, kg !== null);
+    exercises.push({
+      id,
+      name: name.ok ? name.text : "",
+      sets: Math.round(setCount),
+      w: kg,
+      r: Math.round(r),
+      ...(d ? { d } : {}),
+      ...(log.length ? { log } : {}),
+      ...(e.pr === true ? { pr: true } : {}),
+    });
   }
   if (!exercises.length) return { error: "empty" };
   const caption = parseCaption(b.caption);

@@ -32,7 +32,6 @@ import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   bestLifts,
-  postRoutineCode,
   postWorkout,
   profileChanges,
   profileUrl,
@@ -82,6 +81,7 @@ import { Avatar } from "./AvatarFace";
 import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
 import { Icon } from "./icons";
+import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
@@ -281,7 +281,7 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
   const [reporting, setReporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const routine = postRoutineCode(post);
+  const [detail, setDetail] = useState(false);
   const edit = async (v: ComposeValue) => {
     try {
       const r = await social<{ caption: string; audience: Audience; partners: Partner[] }>("editPost", { id: post.id, ...v });
@@ -366,17 +366,25 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           </div>
         ))}
       </dl>
-      <ul className="mt-3 space-y-1 text-sm">
-        {b.exercises.slice(0, 5).map((e) => (
-          <li key={e.id} className="flex justify-between gap-3">
-            <span className="min-w-0 truncate">
-              {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
-            </span>
-            <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
-          </li>
-        ))}
-        {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
-      </ul>
+      <button
+        type="button"
+        onClick={() => setDetail(true)}
+        aria-label={t("social.post.open", { name: post.name })}
+        className="press -mx-2 mt-1 block w-[calc(100%+1rem)] rounded-xl px-2 py-2 text-left hover:bg-raised"
+      >
+        <ul className="space-y-1 text-sm">
+          {b.exercises.slice(0, 5).map((e) => (
+            <li key={e.id} className="flex justify-between gap-3">
+              <span className="min-w-0 truncate">
+                {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
+              </span>
+              <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
+            </li>
+          ))}
+          {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
+        </ul>
+        <span className="mt-1 block text-sm font-medium text-accent">{t("social.post.see")}</span>
+      </button>
       {muscles.length > 0 && <p className="mt-2 text-xs text-muted">{fmtList(muscles.map((m) => MUSCLE_LABEL[m]))}</p>}
       <div className="mt-3 flex items-center gap-2 border-t border-line pt-2">
         <button
@@ -404,20 +412,6 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
       <Note text={note} />
       <Sheet open={more} onClose={() => setMore(false)} title={t("friends.post.more")}>
         <div className="space-y-2">
-          {routine && (
-            <Button
-              kind="ghost"
-              icon="layers"
-              className="w-full"
-              onClick={() => {
-                setMore(false);
-                track("feature", { name: "social_save_workout" });
-                go("routine", routine);
-              }}
-            >
-              {t("friends.post.save")}
-            </Button>
-          )}
           {post.mine ? (
             <>
               <Button
@@ -457,6 +451,7 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="post" id={post.id} />
+      <PostDetailSheet post={detail ? post : null} onClose={() => setDetail(false)} />
       <ComposeSheet
         open={editing}
         onClose={() => setEditing(false)}

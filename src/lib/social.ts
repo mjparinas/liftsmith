@@ -13,10 +13,20 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { flag } from "./flags";
 import { t } from "./i18n";
 import { estimate } from "./onerm";
+import { epley, TIMED } from "./progression";
 import { encodeRoutine } from "./routineShare";
 import { musclesWorked } from "./shareCards";
 import { SITE_URL } from "./site";
-import type { Audience, FeedPost, PostBody, PostExercise, ShowcaseLift, SocialProfile } from "./socialTypes";
+import {
+  SOCIAL_LIMITS,
+  type Audience,
+  type FeedPost,
+  type PostBody,
+  type PostExercise,
+  type PostSet,
+  type ShowcaseLift,
+  type SocialProfile,
+} from "./socialTypes";
 import type { AppEvent } from "./types";
 
 export async function social<T = Record<string, unknown>>(op: string, body: Record<string, unknown> = {}): Promise<T> {
@@ -106,27 +116,46 @@ export const publicPageUrl = (handle: string) => `${SITE_URL}/u/${handle}/`;
 export const profileUrl = (handle: string, isPublic = false) => (isPublic ? publicPageUrl(handle) : `${SITE_URL}/app/#/person/${handle}`);
 
 /**
- * The post for a finished workout: per exercise its sets and best set (by estimated one-rep max), the totals,
- * and the muscles worked. Weights only while the lifter shows weights. Nothing else from the log goes on it.
+ * The post for a finished workout: per exercise every set, the best set (by estimated one-rep max) and whether it
+ * was a new best, the totals, and the muscles worked. Weights only while the lifter shows weights. Nothing else
+ * from the log goes on it.
  */
 export function postBodyFor(events: readonly AppEvent[], s: SessionSummary, weights: boolean): PostBody {
-  const by = new Map<string, { sets: number; best: { w: number; r: number; d?: number; score: number } | null }>();
+  const by = new Map<
+    string,
+    { n: number; sets: PostSet[]; best: { w: number; r: number; d?: number; score: number } | null; top: number }
+  >();
+  // The best estimated one-rep max on each exercise before this workout, the same rule Progress uses for new bests.
+  const before = new Map<string, number>();
+  for (const e of events) {
+    if (e.type !== "set" || e.weight <= 0 || TIMED.has(e.exerciseId)) continue;
+    if (e.sessionId === s.sessionId || e.at >= s.start) continue;
+    before.set(e.exerciseId, Math.max(before.get(e.exerciseId) ?? 0, epley(e.weight, e.reps)));
+  }
   for (const e of events) {
     if (e.type !== "set" || e.sessionId !== s.sessionId) continue;
-    const row = by.get(e.exerciseId) ?? { sets: 0, best: null };
-    row.sets++;
+    const row = by.get(e.exerciseId) ?? { n: 0, sets: [], best: null, top: 0 };
+    row.n++;
+    if (row.sets.length < SOCIAL_LIMITS.setsEach)
+      row.sets.push({ w: weights ? e.weight : null, r: e.reps, ...(e.distanceM ? { d: e.distanceM } : {}) });
     const score = e.distanceM ?? (e.weight > 0 ? estimate(e.weight, e.reps) : e.reps);
     if (!row.best || score > row.best.score) row.best = { w: e.weight, r: e.reps, ...(e.distanceM ? { d: e.distanceM } : {}), score };
+    if (e.weight > 0 && !TIMED.has(e.exerciseId)) row.top = Math.max(row.top, epley(e.weight, e.reps));
     by.set(e.exerciseId, row);
   }
-  const exercises: PostExercise[] = [...by.entries()].slice(0, 20).map(([id, row]) => ({
-    id,
-    name: (EXERCISE_BY_ID.get(id)?.name ?? id).slice(0, 60),
-    sets: row.sets,
-    w: weights ? (row.best?.w ?? 0) : null,
-    r: row.best?.r ?? 0,
-    ...(row.best?.d ? { d: row.best.d } : {}),
-  }));
+  const exercises: PostExercise[] = [...by.entries()].slice(0, SOCIAL_LIMITS.exercises).map(([id, row]) => {
+    const prev = before.get(id);
+    return {
+      id,
+      name: (EXERCISE_BY_ID.get(id)?.name ?? id).slice(0, 60),
+      sets: row.n,
+      w: weights ? (row.best?.w ?? 0) : null,
+      r: row.best?.r ?? 0,
+      ...(row.best?.d ? { d: row.best.d } : {}),
+      log: row.sets,
+      ...(prev !== undefined && row.top > prev + 0.01 ? { pr: true } : {}),
+    };
+  });
   return {
     v: 1,
     seconds: Math.round(s.seconds),
