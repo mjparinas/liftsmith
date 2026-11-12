@@ -12,6 +12,7 @@ import { EQUIPMENT_LABEL } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
 import { Icon } from "./icons";
+import { PlaceDetails } from "./PlaceDetails";
 import { go } from "./router";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
@@ -80,6 +81,7 @@ export function SharedGym({ code }: { code?: string }) {
         <p className="mt-2 text-sm text-muted">{!place ? t("gym.sharedWhy") : place.code ? t("gym.place.why") : t("gym.place.typical")}</p>
         {place?.official && <p className="mt-2 text-sm text-muted">{t("gym.place.officialNote")}</p>}
       </section>
+      {place && <PlaceDetails place={place} />}
 
       <Section title={t("gym.equipment")}>
         <div className="card p-4">

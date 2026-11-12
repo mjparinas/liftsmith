@@ -106,6 +106,8 @@ export const en = {
   "gym.place.typical":
     "Nobody has set up this gym’s equipment yet, so this starts as a typical gym. Add it and change what’s different. Then list it in Gyms so the next lifter here can skip this.",
   "gym.place.officialNote": "Official: the gym itself keeps these details up to date.",
+  "gym.place.page": "See this gym’s page",
+  "gym.place.retry": "Try again",
   "gym.list.label": "List this gym nearby",
   "gym.list.hint":
     "Lifters near this gym can find it and add its setup in one tap. Only list a gym open to the public, never a home gym. Only its name, kit and area (about 1 km) are shared.",
@@ -235,6 +237,8 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.place.typical":
     "Nadie ha configurado aún el equipamiento de este gimnasio, así que empieza como un gimnasio típico. Añádelo y cambia lo que sea diferente. Luego publícalo en Gimnasios para que la próxima persona se lo ahorre.",
   "gym.place.officialNote": "Oficial: el propio gimnasio mantiene estos datos al día.",
+  "gym.place.page": "Ver la página del gimnasio",
+  "gym.place.retry": "Reintentar",
   "gym.list.label": "Publicar este gimnasio",
   "gym.list.hint":
     "Quien entrene cerca podrá encontrarlo y añadir su configuración con un toque. Publica solo gimnasios abiertos al público, nunca uno en casa. Solo se comparten el nombre, el equipamiento y la zona (unos 1 km).",
@@ -365,6 +369,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.place.typical":
     "Personne n’a encore configuré l’équipement de cette salle, elle part donc d’une salle type. Ajoutez-la et modifiez ce qui diffère. Publiez-la ensuite dans Salles pour que la prochaine personne n’ait pas à le faire.",
   "gym.place.officialNote": "Officielle : la salle elle-même tient ces informations à jour.",
+  "gym.place.page": "Voir la page de la salle",
+  "gym.place.retry": "Réessayer",
   "gym.list.label": "Publier cette salle",
   "gym.list.hint":
     "Les sportifs proches pourront la trouver et ajouter sa configuration d’un geste. Ne publiez qu’une salle ouverte au public, jamais une salle à domicile. Seuls le nom, l’équipement et le secteur (environ 1 km) sont partagés.",
@@ -497,6 +503,8 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.place.typical":
     "Die Geräte dieses Studios hat noch niemand eingerichtet, daher startet es als typisches Studio. Füge es hinzu und ändere, was anders ist. Trag es danach unter Studios ein, damit die nächste Person sich das spart.",
   "gym.place.officialNote": "Offiziell: Das Studio selbst hält diese Angaben aktuell.",
+  "gym.place.page": "Seite des Studios ansehen",
+  "gym.place.retry": "Erneut versuchen",
   "gym.list.label": "Studio in der Nähe eintragen",
   "gym.list.hint":
     "Wer in der Nähe trainiert, findet es und übernimmt das Setup mit einem Tippen. Trag nur öffentliche Studios ein, nie ein Heimstudio. Geteilt werden nur Name, Ausstattung und Gegend (etwa 1 km).",
@@ -627,6 +635,8 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.place.typical":
     "Nessuno ha ancora impostato gli attrezzi di questa palestra, quindi parte come una palestra tipica. Aggiungila e cambia ciò che è diverso. Poi pubblicala in Palestre così la prossima persona può saltare questo passaggio.",
   "gym.place.officialNote": "Ufficiale: è la palestra stessa a tenere aggiornati questi dati.",
+  "gym.place.page": "Vedi la pagina della palestra",
+  "gym.place.retry": "Riprova",
   "gym.list.label": "Pubblica questa palestra",
   "gym.list.hint":
     "Chi si allena vicino potrà trovarla e aggiungerne la configurazione con un tocco. Pubblica solo palestre aperte al pubblico, mai una di casa. Si condividono solo nome, attrezzi e zona (circa 1 km).",
@@ -750,6 +760,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.place.typical":
     "このジムの器具はまだだれも設定していないため、一般的なジムとして始まります。追加して違うところを変更し、ジム画面で公開すると次の人が設定を省けます。",
   "gym.place.officialNote": "公式：ジム自身がこの情報を最新に保っています。",
+  "gym.place.page": "ジムのページを見る",
+  "gym.place.retry": "もう一度試す",
   "gym.list.label": "このジムを近くに公開",
   "gym.list.hint":
     "近くでトレーニングする人がこのジムを見つけ、設定をワンタップで追加できます。一般に開かれたジムだけを公開し、自宅のジムは公開しないでください。共有されるのは名前、器具、おおよその場所（約 1 km）だけです。",

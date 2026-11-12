@@ -6,7 +6,7 @@ import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHtt
 import { sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
-import { joinPlace, nearbyPlaces } from "@/server/gymPlaces";
+import { joinPlace, nearbyPlaces, placeById } from "@/server/gymPlaces";
 
 export const OPTIONS = preflight;
 
@@ -16,6 +16,11 @@ export async function GET(req: Request) {
   if (!hasDb()) return reply(req, 503, { error: "The gym list isn't set up yet." });
   if (!(await rateLimit(`gyms:search:${ipOf(req)}`, LIMITS.searchesPerHour, 3_600_000))) return reply(req, 429, { error: "slow" });
   const u = new URL(req.url).searchParams;
+  // ?place=<id>: one real gym, for its page in the app (GymPlace.tsx, the QR code's target).
+  if (u.has("place")) {
+    const place = await placeById(u.get("place"));
+    return place ? reply(req, 200, { place }) : reply(req, 404, { error: "gone" });
+  }
   const lat = Number(u.get("lat") ?? NaN);
   const lon = Number(u.get("lon") ?? NaN);
   const gyms = await nearby(lat, lon);

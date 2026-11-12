@@ -50,6 +50,7 @@ import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
 import * as gloss from "./text/gloss";
 import * as goal from "./text/goal";
+import * as gp from "./text/gp";
 import * as gym from "./text/gym";
 import * as hr from "./text/hr";
 import * as hx from "./text/hx";
@@ -175,6 +176,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...gl.fr,
   ...gloss.fr,
   ...goal.fr,
+  ...gp.fr,
   ...gym.fr,
   ...hr.fr,
   ...imp.fr,

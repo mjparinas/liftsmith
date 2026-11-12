@@ -14,7 +14,7 @@ import { siteText } from "@/locales/site";
 import * as pub from "@/locales/text/pub";
 
 /** Which page the frame is on, for the store links' referrer (the only links that carry a source). */
-export type FrameSource = "profile" | "share";
+export type FrameSource = "profile" | "share" | "gym";
 
 type PubKey = keyof typeof pub.en;
 const CATALOG: Record<MsgLang, Partial<Record<PubKey, unknown>>> = {
@@ -36,7 +36,7 @@ export function icon(name: IconName, size = 20, cls = ""): string {
 
 export function storeBadges(lang: MsgLang, source: FrameSource): string {
   const b = siteText(lang).chrome.badges;
-  const referrer = `utm_source=${source}&utm_medium=${source}_page&utm_campaign=${source === "profile" ? "public_profile" : "share_link"}`;
+  const referrer = `utm_source=${source}&utm_medium=${source}_page&utm_campaign=${source === "profile" ? "public_profile" : source === "gym" ? "gym_page" : "share_link"}`;
   const badge = (href: string | null, store: string, small: string, big: string, logo: string) => {
     const body = `${logo}<span class="b-text"><span class="b-small">${esc(small)}</span><span class="b-big">${esc(big)}</span></span>`;
     if (href) return `<a class="badge" href="${esc(href)}" rel="noopener">${body}</a>`;

@@ -7,7 +7,7 @@ Melvin, 2026-11-12, as part of following Hevy's growth playbook (organic growth,
 This builds on [Gym sharing](gym-sharing.md): lifters' own shared and listed **setups** (equipment and weights, about 1 km) stay as they are. This topic adds the **gyms themselves**. Built in four steps:
 
 1. Gym directory and finder (built, below).
-2. Gym pages in the app and on the website, plus city pages (next).
+2. Gym pages in the app and on the website, plus city pages (built, below).
 3. Claiming: the owner proves the gym is theirs and edits its details; the check mark (waiting on Melvin's pick of a verification method).
 4. Per-gym QR links, a printable poster and table stand from admin, and a shipping queue. Shipping is Melvin's job.
 
@@ -21,3 +21,12 @@ This builds on [Gym sharing](gym-sharing.md): lifters' own shared and listed **s
 - **Picking a real gym** opens the same preview as a shared gym (`SharedGym.tsx`) with the gym's name, address and check mark. A gym offers one setup: its owner's once claimed, else the most-added setup lifters listed for it. When nobody has set one up it starts as a typical commercial gym ("Nobody has set up this gym's equipment yet…"), so the lifter changes what's different and can list it. The new gym remembers which real gym it is (`Gym.placeId`), so "You already have this gym" means that gym, not a matching kit, and listing it later ties the listed setup to the real gym (`public_gyms.place_id`). A setup tied to a real gym shows under that gym, not on its own.
 - **Lifters here:** adding a real gym counts the lifter once (`gym_place_lifters`: account, else the same one-way address code as reports). Only the total is shown. Deleting the account takes the lifter out of the totals. The privacy policy ("Gyms you share or list") and `docs/PRIVACY_LABELS.md` say so.
 - Pure web code, so Android, iOS and the web app get it together.
+
+## Step 2: gym pages (built)
+
+- **On the website** (`src/server/gymPage.ts`, `/api/gyms/page/`, rewritten from `/gyms/…` in `next.config.ts`; server build only): `/gyms/` lists every city with gyms, `/gyms/<city>/` ("Gyms in Langley, BC") lists its gyms (official first, then the most lifters, then by name) with studios in their own section, and `/gyms/<city>/<gym>/` is one gym. Addresses use the city and region (`langley-bc`) and the gym's name, unique within its city, and never change on a re-import, so links and posters keep working.
+- **A gym's page** shows the facts first: name and check mark, address, Directions (Google Maps) and Open in OpenStreetMap links, the website and phone, opening hours by weekday (`src/lib/openingHours.ts` reads OSM's common forms; anything else is shown as written), the equipment its setup has, and "N Liftsmith lifters train here". Then **Add this gym to your Liftsmith**, which opens the app on the gym (`#/gymplace/<id>`), a "claim it" card on unofficial gyms (claiming is step 3), and up to eight more gyms in the city.
+- Like public profiles, they're **plain HTML with no scripts** in the site's header and footer (`siteFrame.ts`, store links tagged `gym_page`), under `SHARE_PAGE_CSP`, in the reader's language from Accept-Language (text in `gp.*`, six languages), cached for 5 minutes in the browser and 15 at the edge. Each carries `ExerciseGym` (or `ItemList`) structured data. A studio's page and an unknown address are `noindex`.
+- **`/sitemap-gyms.xml`** (listed in `robots.ts`) has `/gyms/`, every city and every gym that isn't hidden or a studio.
+- **No map picture yet.** The pages' CSP allows images only from our own site, and drawing map tiles on our server would lean on OpenStreetMap's tile servers, which their policy discourages. The page links out to directions and the map instead. A static map from a provider with an API key is the upgrade if Melvin wants one.
+- **In the app** (`GymPlace.tsx`, route `gymplace`): loads the gym (`GET /api/gyms/?place=<id>`) and shows the same preview as the finder, now with the lifters line, opening hours in the app's language and clock, and links to directions, the website and the gym's web page (`PlaceDetails.tsx`). A gym the lifter added from the finder has **See this gym's page** in Gyms. Pure web code, so Android, iOS and the web app get it together.

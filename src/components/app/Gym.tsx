@@ -200,6 +200,19 @@ export function Gym() {
 
       <BuyNext gym={gym} />
 
+      {gym.placeId && (
+        <button
+          type="button"
+          className="press card mt-6 flex min-h-11 w-full items-center justify-between px-4 py-3 text-left text-sm"
+          onClick={() => go("gymplace", gym.placeId)}
+        >
+          <span>{t("gym.place.page")}</span>
+          <span aria-hidden className="text-muted">
+            ›
+          </span>
+        </button>
+      )}
+
       <ShareGym gym={gym} />
 
       {gyms.length > 1 && (
