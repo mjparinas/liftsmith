@@ -447,7 +447,7 @@ try {
   await page.getByText("Level 12").waitFor();
   await scan("friends person");
   await page.getByRole("button", { name: /Followers/ }).click();
-  await page.getByRole("dialog").getByText("Alex").waitFor();
+  await page.getByRole("dialog").getByText("Alex", { exact: true }).waitFor();
   await scan("friends followers");
   await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
