@@ -35,7 +35,13 @@ class WorkoutView extends WatchUi.View {
         var resting = _w.resting();
         line(dc, cx, h * 0.16, _w.setLabel, Graphics.FONT_XTINY, BLUE, w * 0.6, 1);
         line(dc, cx, h * 0.28, _w.title, Graphics.FONT_SMALL, INK, w * 0.82, 1);
-        if (resting) {
+        var phase = _w.phase();
+        if (phase != null) {
+            // The set timer (holds, carries, cardio): its clock, and what it's counting under it.
+            dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
+            dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(_w.phaseSeconds(phase as Array)), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
+            line(dc, cx, h * 0.64, (phase as Array)[2] as String, Graphics.FONT_XTINY, MUTED, w * 0.86, 1);
+        } else if (resting) {
             dc.setColor(CYAN, Graphics.COLOR_TRANSPARENT);
             dc.drawText(cx, h * 0.47, Graphics.FONT_NUMBER_MEDIUM, clock(_w.restLeft()), Graphics.TEXT_JUSTIFY_CENTER | Graphics.TEXT_JUSTIFY_VCENTER);
             line(dc, cx, h * 0.64, Lang.format(WatchUi.loadResource(Rez.Strings.Next) as String, [_w.next]), Graphics.FONT_XTINY, MUTED, w * 0.86, 1);

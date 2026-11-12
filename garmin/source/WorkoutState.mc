@@ -3,7 +3,8 @@ import Toybox.Time;
 
 //! The workout the phone is running, as GarminLink sends it: {"t" title, "s" set label, "n" the set (weight and
 //! reps), "p" plates, "r" seconds of rest left, "h" heart rate the phone has, "v" vibrate when rest ends}, or
-//! {"end" => true} when it ended. Rest is sent as seconds left rather than a time, so the watch's clock and the
+//! {"end" => true} when it ended. "k" is the set timer for holds, carries and cardio: its phases as [seconds from now
+//! to the start, to the end or -1 for a count-up, label]. Rest is sent as seconds left rather than a time, so the watch's clock and the
 //! phone's never have to agree.
 class WorkoutState {
     //! A workout the phone stopped updating this long ago was forgotten (the phone ends those after 3 hours).
@@ -20,6 +21,8 @@ class WorkoutState {
     var restEnds as Number = 0;
     //! When the last update arrived (seconds), or 0 when no workout is running.
     var at as Number = 0;
+    //! The set timer's phases on the watch's clock: [start, end or -1, label], oldest first.
+    var timer as Array = [];
 
     function initialize() {}
 
@@ -28,6 +31,7 @@ class WorkoutState {
             at = 0;
             restEnds = 0;
             watchHr = 0;
+            timer = [];
             return;
         }
         var now = Time.now().value();
@@ -39,6 +43,17 @@ class WorkoutState {
         vibrate = data.get("v") != false;
         var rest = whole(data.get("r"));
         restEnds = rest > 0 ? now + rest : 0;
+        timer = [];
+        var k = data.get("k");
+        if (k instanceof Array) {
+            for (var i = 0; i < k.size() && i < 8; i++) {
+                var p = k[i];
+                if (p instanceof Array && p.size() == 3) {
+                    var end = whole(p[1]);
+                    timer.add([now + whole(p[0]), end < 0 ? -1 : now + end, text(p[2])]);
+                }
+            }
+        }
         at = now;
     }
 
@@ -53,6 +68,29 @@ class WorkoutState {
 
     function resting() as Boolean {
         return restLeft() > 0;
+    }
+
+    //! The set timer's phase now (started, not ended), or null; never while resting.
+    function phase() {
+        if (resting()) {
+            return null;
+        }
+        var now = Time.now().value();
+        for (var i = 0; i < timer.size(); i++) {
+            var p = timer[i] as Array;
+            if ((p[0] as Number) <= now && ((p[1] as Number) < 0 || now < (p[1] as Number))) {
+                return p;
+            }
+        }
+        return null;
+    }
+
+    //! Seconds left in a countdown phase, or seconds so far in a count-up.
+    function phaseSeconds(p as Array) as Number {
+        var now = Time.now().value();
+        var end = p[1] as Number;
+        var s = end < 0 ? now - (p[0] as Number) : end - now;
+        return s > 0 ? s : 0;
     }
 
     //! The phone's monitor wins; otherwise the watch's own reading.

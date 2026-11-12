@@ -37,6 +37,27 @@ export interface SessionState {
   motion?: boolean;
   /** The notification after each of the next Log sets (sessionAhead.ts), so Log set works with the app closed. */
   ahead?: AheadStep[];
+  /**
+   * The set timer for holds, carries and cardio, phase by phase in wall-clock time (setTimer.ts timerPhases), so the
+   * lock screen and the watches count it down on their own clocks while the app is asleep. Only while lifting.
+   */
+  timer?: TimerSegment[];
+  /** What the lock screen and watches say when the last phase runs out ("Time's up"). */
+  timerOver?: string;
+}
+
+/** One phase of the set timer: a countdown to `to` labelled "Time left", "Switch sides"…, or a count-up from `from`. */
+export interface TimerSegment {
+  from: number;
+  /** Absent for a count-up (cardio), which runs until the set is logged. */
+  to?: number;
+  label: string;
+}
+
+/** The phase showing at `now` (the last one that has started and not ended), or null. Every platform uses the same rule. */
+export function timerSegmentAt(timer: readonly TimerSegment[] | undefined, now: number): TimerSegment | null {
+  for (const x of timer ?? []) if (x.from <= now && (x.to === undefined || now < x.to)) return x;
+  return null;
 }
 
 /** What the notification shows after one more Log set, worked out by the app ahead of time (sessionAhead.ts). */

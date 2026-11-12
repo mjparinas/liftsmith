@@ -58,7 +58,18 @@ struct WorkoutView: View {
                     Text(s.setLabel.uppercased()).font(.caption2.bold()).foregroundStyle(Color.brand)
                 }
                 Text(s.title).font(.headline).lineLimit(2).multilineTextAlignment(.center)
-                if resting, let end = s.restEnd {
+                if let p = s.phase(at: now) {
+                    // The set timer (holds, carries, cardio), counted on the watch's own clock.
+                    Text(p.label).font(.footnote).foregroundStyle(.secondary)
+                    Group {
+                        if let end = p.end {
+                            Text(timerInterval: now...end, countsDown: true)
+                        } else {
+                            Text(p.start, style: .timer)
+                        }
+                    }
+                    .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
+                } else if resting, let end = s.restEnd {
                     Text(timerInterval: now...end, countsDown: true)
                         .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
                     Text("Next: \(s.next)").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)

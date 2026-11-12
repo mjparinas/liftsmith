@@ -41,6 +41,12 @@ final class WatchHub {
     private static int bpm;
     private static long lastHrSent;
     private static Runnable restBuzz;
+    private static Context appContext;
+    /** One buzz as a phase of the set timer ends (posted once per phase; removeCallbacks cancels them all). */
+    private static final Runnable timerBuzz = () -> {
+        Vibrator v = appContext == null ? null : appContext.getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 200, 120, 200 }, -1));
+    };
     private static List<String> phones = new ArrayList<>();
 
     private WatchHub() {}
@@ -82,6 +88,7 @@ final class WatchHub {
         main.post(() -> {
             state = next;
             if (next == null) bpm = 0;
+            appContext = app;
             scheduleBuzz(app, next);
             for (Listener l : listeners) l.changed();
         });
@@ -139,7 +146,12 @@ final class WatchHub {
     private static void scheduleBuzz(Context app, WorkoutState s) {
         if (restBuzz != null) main.removeCallbacks(restBuzz);
         restBuzz = null;
+        main.removeCallbacks(timerBuzz);
         long now = System.currentTimeMillis();
+        // The set timer: a buzz as each phase ends (go, switch sides, time's up), felt with the phone in a bag.
+        if (s != null && s.vibrate && !s.resting(now)) {
+            for (WorkoutState.Phase p : s.timer) if (p.to > now) main.postDelayed(timerBuzz, p.to - now);
+        }
         if (s == null || !s.vibrate || !s.resting(now)) return;
         restBuzz = () -> {
             Vibrator v = app.getSystemService(Vibrator.class);

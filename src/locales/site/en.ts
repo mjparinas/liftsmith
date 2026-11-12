@@ -191,6 +191,7 @@ export const en: SiteText = {
     more: {
       eyebrow: "And the rest",
       title: "Small things that add up",
+      all: "Every feature, and the apps and devices it works with",
       items: [
         { title: "Works offline", body: "Everything runs on your phone. No signal in the basement gym is fine." },
         { title: "Any gym, even none", body: "{n} exercises, with bodyweight options for every major muscle for hotels and parks." },

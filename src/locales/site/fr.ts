@@ -197,6 +197,7 @@ export const fr: SiteText = {
     more: {
       eyebrow: "Et le reste",
       title: "Des petits détails qui comptent",
+      all: "Toutes les fonctionnalités, et les apps et appareils compatibles",
       items: [
         { title: "Fonctionne hors ligne", body: "Tout tourne sur votre téléphone. Pas de réseau dans la salle au sous-sol ? Aucun souci." },
         {

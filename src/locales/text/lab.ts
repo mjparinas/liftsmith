@@ -56,6 +56,7 @@ export const en = {
   "lab.scale.body":
     "Under the weigh-in on Progress and Body, a button connects a scale that shares its reading over Bluetooth the standard way (the weight scale and body composition standards). Step on, and your weight and body fat fill in, ready to log. Many cheap scales use their own app's protocol instead and won't show up. In the web app it needs Chrome.",
   "lab.scale.button": "Weigh in on my scale",
+  "lab.scale.which": "Which scales work?",
   "lab.scale.device": "the scale",
   "lab.scale.connecting": "Looking for your scale…",
   "lab.scale.waiting": "Step on {name} now.",
@@ -77,7 +78,7 @@ export const en = {
     "During a workout, press volume up on your phone or Bluetooth earbuds to log the set as planned, the same as tapping Log set. Pressed during rest, it logs the next set. The volume goes straight back and your music keeps playing; volume down still turns it down. Works while Liftsmith is on screen.",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "Control a Sonos speaker from the workout: what's playing, skip, pause and volume. It can also follow the workout, turning the music up for sets and down for rest, starting a Sonos favourite and pausing at the end. Connect Sonos in Connected apps (it needs a Liftsmith account).",
+    "Control a Sonos speaker from the workout: what's playing, skip, pause and volume. It can also follow the workout, turning the music up for sets and down for rest, starting a Sonos favourite and pausing at the end. Connect Sonos in Connected apps.",
 };
 
 type Key = keyof typeof en;
@@ -137,6 +138,7 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Bajo el registro de peso en Progreso y Cuerpo, un botón conecta una báscula que comparte su lectura por Bluetooth de la forma estándar (los estándares de báscula y de composición corporal). Súbete y tu peso y tu grasa corporal se rellenan, listos para registrar. Muchas básculas baratas usan el protocolo de su propia app y no aparecerán. En la app web necesita Chrome.",
   "lab.scale.button": "Pesarme en mi báscula",
+  "lab.scale.which": "¿Qué básculas funcionan?",
   "lab.scale.device": "la báscula",
   "lab.scale.connecting": "Buscando tu báscula…",
   "lab.scale.waiting": "Súbete a {name} ahora.",
@@ -158,7 +160,7 @@ export const es: Partial<Record<Key, Message>> = {
     "Durante un entrenamiento, pulsa subir volumen en el teléfono o en los auriculares Bluetooth para registrar la serie como estaba prevista, igual que al tocar Registrar serie. Si lo pulsas durante el descanso, registra la serie siguiente. El volumen vuelve enseguida a su nivel y tu música sigue sonando; bajar volumen sigue bajándolo. Funciona mientras Liftsmith está en pantalla.",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "Controla un altavoz Sonos desde el entrenamiento: qué suena, saltar, pausar y volumen. También puede seguir el entrenamiento, subiendo la música en las series y bajándola en el descanso, empezando un favorito de Sonos y pausando al final. Conecta Sonos en Apps conectadas (necesita una cuenta de Liftsmith).",
+    "Controla un altavoz Sonos desde el entrenamiento: qué suena, saltar, pausar y volumen. También puede seguir el entrenamiento, subiendo la música en las series y bajándola en el descanso, empezando un favorito de Sonos y pausando al final. Conecta Sonos en Apps conectadas.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -216,6 +218,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Sous la pesée dans Progrès et Corps, un bouton connecte une balance qui partage sa mesure en Bluetooth de façon standard (les normes de pèse-personne et de composition corporelle). Montez dessus : votre poids et votre masse grasse se remplissent, prêts à enregistrer. Beaucoup de balances bon marché utilisent le protocole de leur propre app et n’apparaîtront pas. Dans l’app web, il faut Chrome.",
   "lab.scale.button": "Me peser sur ma balance",
+  "lab.scale.which": "Quelles balances fonctionnent ?",
   "lab.scale.device": "la balance",
   "lab.scale.connecting": "Recherche de votre balance…",
   "lab.scale.waiting": "Montez sur {name} maintenant.",
@@ -237,7 +240,7 @@ export const fr: Partial<Record<Key, Message>> = {
     "Pendant une séance, appuyez sur volume + du téléphone ou des écouteurs Bluetooth pour valider la série comme prévu, comme en touchant Valider la série. Pendant le repos, il valide la série suivante. Le volume revient aussitôt et votre musique continue ; volume − baisse toujours le son. Fonctionne tant que Liftsmith est à l'écran.",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "Contrôlez une enceinte Sonos depuis la séance : ce qui joue, titre suivant, pause et volume. Elle peut aussi suivre la séance, monter le son pendant les séries et le baisser au repos, lancer un favori Sonos et se mettre en pause à la fin. Connectez Sonos dans Apps connectées (un compte Liftsmith est nécessaire).",
+    "Contrôlez une enceinte Sonos depuis la séance : ce qui joue, titre suivant, pause et volume. Elle peut aussi suivre la séance, monter le son pendant les séries et le baisser au repos, lancer un favori Sonos et se mettre en pause à la fin. Connectez Sonos dans Apps connectées.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -296,6 +299,7 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Unter dem Wiegen bei Fortschritt und Körper verbindet ein Button eine Waage, die ihren Messwert standardmäßig über Bluetooth teilt (die Standards für Personenwaagen und Körperzusammensetzung). Stell dich drauf, und dein Gewicht und Körperfett werden eingetragen, bereit zum Speichern. Viele günstige Waagen nutzen stattdessen das Protokoll ihrer eigenen App und erscheinen nicht. In der Web-App braucht es Chrome.",
   "lab.scale.button": "Auf meiner Waage wiegen",
+  "lab.scale.which": "Welche Waagen funktionieren?",
   "lab.scale.device": "die Waage",
   "lab.scale.connecting": "Suche deine Waage …",
   "lab.scale.waiting": "Stell dich jetzt auf {name}.",
@@ -318,7 +322,7 @@ export const de: Partial<Record<Key, Message>> = {
     "Drück während des Trainings am Handy oder an den Bluetooth-Kopfhörern auf „Lauter“, um den Satz wie geplant einzutragen, genau wie mit „Satz eintragen“. In der Pause trägt sie den nächsten Satz ein. Die Lautstärke springt sofort zurück und deine Musik läuft weiter; „Leiser“ macht weiterhin leiser. Funktioniert, solange Liftsmith auf dem Bildschirm ist.",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "Steuere einen Sonos-Lautsprecher aus dem Training: was läuft, überspringen, pausieren und Lautstärke. Die Musik kann auch dem Training folgen, lauter in den Sätzen und leiser in der Pause, einen Sonos-Favoriten starten und am Ende pausieren. Verbinde Sonos in Verbundene Apps (dafür brauchst du ein Liftsmith-Konto).",
+    "Steuere einen Sonos-Lautsprecher aus dem Training: was läuft, überspringen, pausieren und Lautstärke. Die Musik kann auch dem Training folgen, lauter in den Sätzen und leiser in der Pause, einen Sonos-Favoriten starten und am Ende pausieren. Verbinde Sonos in Verbundene Apps.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -375,6 +379,7 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "Sotto la pesata in Progressi e Corpo, un pulsante collega una bilancia che condivide la sua misura via Bluetooth in modo standard (gli standard per bilance pesapersone e composizione corporea). Sali e il tuo peso e la massa grassa si compilano, pronti da registrare. Molte bilance economiche usano il protocollo della propria app e non compariranno. Nell’app web serve Chrome.",
   "lab.scale.button": "Pesami sulla mia bilancia",
+  "lab.scale.which": "Quali bilance funzionano?",
   "lab.scale.device": "la bilancia",
   "lab.scale.connecting": "Cerco la tua bilancia…",
   "lab.scale.waiting": "Sali su {name} adesso.",
@@ -396,7 +401,7 @@ export const it: Partial<Record<Key, Message>> = {
     "Durante l'allenamento, premi volume su del telefono o degli auricolari Bluetooth per registrare la serie come prevista, come toccare Registra serie. Se lo premi durante il recupero, registra la serie successiva. Il volume torna subito com'era e la musica continua; volume giù continua ad abbassarlo. Funziona mentre Liftsmith è sullo schermo.",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "Controlla un altoparlante Sonos dall'allenamento: cosa suona, salta, pausa e volume. Può anche seguire l'allenamento, alzando la musica nelle serie e abbassandola nel recupero, avviando un preferito Sonos e mettendo in pausa alla fine. Collega Sonos in App collegate (serve un account Liftsmith).",
+    "Controlla un altoparlante Sonos dall'allenamento: cosa suona, salta, pausa e volume. Può anche seguire l'allenamento, alzando la musica nelle serie e abbassandola nel recupero, avviando un preferito Sonos e mettendo in pausa alla fine. Collega Sonos in App collegate.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -453,6 +458,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.scale.body":
     "「進捗」と「からだ」の体重記録の下に、Bluetooth の標準規格（体重計と体組成の規格）で測定値を共有する体重計に接続するボタンが出ます。乗ると体重と体脂肪率が入力され、そのまま記録できます。安価な体重計の多くは独自アプリの方式を使うため表示されません。Web アプリでは Chrome が必要です。",
   "lab.scale.button": "体重計で測る",
+  "lab.scale.which": "使える体重計",
   "lab.scale.device": "体重計",
   "lab.scale.connecting": "体重計を探しています…",
   "lab.scale.waiting": "{name}に乗ってください。",
@@ -474,5 +480,5 @@ export const ja: Partial<Record<Key, Message>> = {
     "ワークアウト中にスマホまたはBluetoothイヤホンの音量アップを押すと、「セットを記録」をタップしたのと同じく予定どおりにセットを記録します。休憩中に押すと次のセットを記録します。音量はすぐ元に戻り、音楽はそのまま流れます。音量ダウンはこれまでどおり音量を下げます。Liftsmithが画面に表示されている間に使えます。",
   "lab.sonos.title": "Sonos",
   "lab.sonos.body":
-    "ワークアウト中に Sonos スピーカーを操作します。再生中の曲、スキップ、一時停止、音量。ワークアウトに合わせて、セット中は音楽を大きく、休憩中は小さくし、Sonos のお気に入りで始めて、終了時に一時停止することもできます。連携アプリで Sonos を接続してください（Liftsmith アカウントが必要です）。",
+    "ワークアウト中に Sonos スピーカーを操作します。再生中の曲、スキップ、一時停止、音量。ワークアウトに合わせて、セット中は音楽を大きく、休憩中は小さくし、Sonos のお気に入りで始めて、終了時に一時停止することもできます。連携アプリで Sonos を接続してください。",
 };

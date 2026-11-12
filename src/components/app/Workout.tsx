@@ -28,6 +28,7 @@ import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
+import { timerLength, type TimerSpec } from "@/lib/setTimer";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
 import { useApp, warmingUp } from "@/lib/store";
@@ -64,6 +65,7 @@ import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { aheadSteps, sessionFields } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
+import { sessionTimer, SetTimerClock, SetTimerStart, startTimer, takeTimer, useTimerRun, type Held } from "./workout/SetTimer";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
@@ -218,6 +220,16 @@ export function Workout() {
       : null;
   useVoiceCoach(voiceState, voiceOn);
 
+  // The set timer (SetTimer.tsx): holds, carries and hangs count down from the seconds dialled in (each side, one
+  // after the other, for a hold done on each side) and log the set when they run out; cardio counts up.
+  const timerSpec: TimerSpec | null =
+    active && ex && !finished && !resting && !warming && TIMED.has(ex.id)
+      ? { target: active.reps, sides: perSide(ex.id) && !ex.cardio ? 2 : 1, up: !!ex.cardio }
+      : null;
+  const timerKey = `${active?.sessionId}:${active?.index}:${doneSets}:${active?.tag ?? ""}`;
+  const timerRun = useTimerRun(timerKey);
+  const timing = !!timerRun && (!!timerRun.spec.up || now - timerRun.startAt < timerLength(timerRun.spec)!);
+
   // Rest countdown: beeps in the last 3 seconds, then the alert.
   useEffect(() => {
     if (!active?.restUntil) {
@@ -301,7 +313,7 @@ export function Workout() {
   const ahead = useRef({ key: "", steps: [] as AheadStep[] });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}:${timerRun?.startAt ?? ""}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
@@ -329,8 +341,11 @@ export function Workout() {
       sessionId: active.sessionId,
       motion: watchMotion || undefined,
       ahead: ahead.current.steps,
+      // The set timer (holds, carries, cardio): the lock screen and the watches count it down on their own clocks.
+      timer: timerRun && !resting ? sessionTimer(timerRun) : undefined,
+      timerOver: timerRun && !resting ? t("timer.over") : undefined,
     });
-  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion, timerRun?.startAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Today's max from warm-ups (its lab): each warm-up's fastest rep while the camera counts it, kept by its
   // place in the ramp. Recorded when the warm-up is logged, whichever way (here, the dock or the notification).
@@ -372,8 +387,16 @@ export function Workout() {
   // The tempo coach is a lab too: on tempo and paused lifts, a button above Log set that counts each rep out.
   const tempo = !finished && !resting && ex ? tempoOf(ex.id) : undefined;
   const tempoCoach = !!tempo && labOn("labTempo");
+  // The set timer's Start sits with them; once running, its clock takes the row.
+  const timerStart = !!timerSpec && !timing;
 
-  const log = () => {
+  // Log set saves the seconds the timer counted, when it's running; a countdown that ran out logs at its end.
+  const logAt = (at?: number, held: Held = null) => {
+    if (held) {
+      const a = useApp.getState().active;
+      if (a) s.adjust(a.weight, held.reps);
+      if (held.repsR !== undefined) s.adjustRight(held.repsR);
+    }
     haptic("tap");
     sound.log();
     if (voiceOn && ex && active.weight > 0) {
@@ -388,8 +411,9 @@ export function Workout() {
         { x: r.left + r.width / 2, y: r.top },
         lastOfAll ? { check: true, count: 24, reach: 130 } : { check: true, count: 12, reach: 80 },
       );
-    s.logSet();
+    s.logSet(at);
   };
+  const log = () => logAt(undefined, takeTimer(timerKey));
 
   const end = () => {
     const startedAt = active.startedAt;
@@ -496,7 +520,18 @@ export function Workout() {
   const finish = (COSMETICS.find((c) => c.id === profile.cosmetics?.plates)?.value ?? "classic") as PlateFinish;
 
   return (
-    <div className={docked ? (undoShown || voiceLog ? "pb-[17.5rem]" : "pb-56") : undoShown || voiceLog ? "pb-[14.5rem]" : "pb-44"}>
+    <div
+      className={
+        docked
+          ? undoShown || voiceLog || timerStart
+            ? "pb-[17.5rem]"
+            : "pb-56"
+          : undoShown || voiceLog || timerStart
+            ? "pb-[14.5rem]"
+            : "pb-44"
+      }
+      style={timing ? { paddingBottom: docked ? "24rem" : "21rem" } : undefined}
+    >
       <PrMoment />
       <CheerRain sessionId={active.sessionId} startedAt={active.startedAt} />
       <header className="flex items-center justify-between pt-1">
@@ -805,7 +840,13 @@ export function Workout() {
               paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
             />
           )}
-          {((undoShown && !resting) || voiceLog || tempoCoach) && (
+          {/* Mounted while a timer runs for this set, so a countdown that ran out (even while the app was away) logs the set. */}
+          {timerRun && (
+            <div className={timing ? "mb-2" : ""}>
+              <SetTimerClock run={timerRun} now={now} onDone={logAt} />
+            </div>
+          )}
+          {((undoShown && !resting) || voiceLog || tempoCoach || timerStart) && (
             <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
               {/* While resting, Undo sits beside Log set now instead, clear of the rest card (polish pass, 2026-11-12). */}
               {!resting && <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />}
@@ -818,6 +859,7 @@ export function Workout() {
                   paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
                 />
               )}
+              {timerStart && timerSpec && <SetTimerStart spec={timerSpec} onStart={() => startTimer(timerKey, timerSpec)} />}
             </div>
           )}
           {finished ? (

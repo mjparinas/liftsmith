@@ -10,6 +10,7 @@ import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { ScaleError, scaleMessage, scaleSupported, weighOnScale } from "@/lib/scale";
+import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { parseBodyFat } from "@/lib/tdee";
 import { fromKg, toKg } from "@/lib/units";
@@ -72,6 +73,14 @@ export function WeighInForm({ id, className = "" }: { id: string; className?: st
               {scale.note}
             </p>
           )}
+          <a
+            className="mt-1 inline-block py-2 text-sm text-accent underline"
+            href={`${SITE_URL}/works-with/scales/`}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t("lab.scale.which")}
+          </a>
         </div>
       )}
       <BumpField
