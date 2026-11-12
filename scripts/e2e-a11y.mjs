@@ -436,7 +436,7 @@ try {
     .waitFor();
   await scan("friends post menu");
   await page.keyboard.press("Escape");
-  await page.getByRole("button", { name: "See Blair’s whole workout" }).click();
+  await page.getByRole("button", { name: /^See Blair’s whole workout/ }).click();
   await page.getByRole("button", { name: "Do this workout" }).waitFor();
   await scan("friends whole workout");
   await page.keyboard.press("Escape");

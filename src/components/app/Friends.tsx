@@ -370,9 +370,10 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
       <button
         type="button"
         onClick={() => setDetail(true)}
-        aria-label={t("social.post.open", { name: post.name })}
         className="press -mx-2 mt-1 block w-[calc(100%+1rem)] rounded-xl px-2 py-2 text-left hover:bg-raised"
       >
+        {/* Named by its words (so a voice command matching what's on screen works), led by what it opens. */}
+        <span className="sr-only">{t("social.post.open", { name: post.name })}: </span>
         <ul className="space-y-1 text-sm">
           {b.exercises.slice(0, 5).map((e) => (
             <li key={e.id} className="flex justify-between gap-3">

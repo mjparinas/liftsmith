@@ -144,7 +144,7 @@ describe("Friends", () => {
     });
     signIn("tok-a");
     render(<Friends />);
-    await u.click(await screen.findByRole("button", { name: "See Alex’s whole workout" }));
+    await u.click(await screen.findByRole("button", { name: /^See Alex’s whole workout/ }));
     expect(await screen.findByRole("button", { name: "Do this workout" })).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "Close" }));
     await u.click(screen.getByRole("button", { name: "More options" }));
