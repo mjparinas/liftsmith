@@ -7,7 +7,9 @@
 // device or a platform, updates this file in the same change. `features.test.ts` fails when a lab, a Pro
 // feature, a cloud service or an import source has no entry here.
 //
-// Only what a lifter can use today, in plain words. A connection whose keys aren't set yet is "soon", never
+// Only what a lifter can use today, in plain words. A connection we've built but can't switch on yet (keys, the other
+// company's approval) is "investigating" (Melvin, 2026-11-12: not even sure we'll get approval); one waiting only on
+// a store listing is "soon". Never
 // "yes" (docs/decisions/connected-apps.md), and nothing names an app's internals.
 import type { Feature as ProKey } from "@/lib/entitlements";
 import type { LabFlag } from "@/lib/labs";
@@ -579,7 +581,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "cloud",
         name: "Fitness service connections",
-        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. Strava, WHOOP, Withings, Polar and Concept2 are built and coming soon.",
+        body: "Oura sends sleep, HRV, resting heart rate and steps in, through a free account. We're investigating Strava, WHOOP, Withings, Polar and Concept2.",
         tier: "pro",
         pro: "cloudConnections",
         added: "2026-11-10",
@@ -817,27 +819,33 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
 /** Every feature, in page order. */
 export const ALL_FEATURES: SiteFeature[] = FEATURE_GROUPS.flatMap((g) => g.features);
 
-/** The newest features: every one added on the latest `count` days that added any, newest first. */
-export function newestFeatures(days = 3): { day: string; features: SiteFeature[] }[] {
-  const byDay = new Map<string, SiteFeature[]>();
-  for (const f of ALL_FEATURES) byDay.set(f.added, [...(byDay.get(f.added) ?? []), f]);
-  return [...byDay.keys()]
-    .sort()
-    .reverse()
-    .filter((d) => d > LAUNCH)
-    .slice(0, days)
-    .map((day) => ({ day, features: byDay.get(day)! }));
+/**
+ * The newest features: every one added on the latest `days` days that added any, grouped by their category in page
+ * order (Melvin, 2026-11-12: "categorize them instead" of dates).
+ */
+export function newestFeatures(days = 3): { group: FeatureGroup; features: SiteFeature[] }[] {
+  const recent = new Set(
+    [...new Set(ALL_FEATURES.map((f) => f.added))]
+      .filter((d) => d > LAUNCH)
+      .sort()
+      .reverse()
+      .slice(0, days),
+  );
+  return FEATURE_GROUPS.map((group) => ({ group, features: group.features.filter((f) => recent.has(f.added)) })).filter(
+    (g) => g.features.length > 0,
+  );
 }
 
 // --- Connections: what Liftsmith works with ---
 
-/** Yes; not on this platform; through the phone's health app; or not yet (keys or a store listing pending). */
-export type Support = "yes" | "no" | "soon" | "chrome" | "health";
+/** Yes; not on this platform; through the phone's health app; coming soon (a store listing pending); or investigating (built, but approval and keys aren't certain). */
+export type Support = "yes" | "no" | "soon" | "investigating" | "chrome" | "health";
 
 export const SUPPORT_LABEL: Record<Support, string> = {
   yes: "Yes",
   no: "No",
   soon: "Coming soon",
+  investigating: "Investigating",
   chrome: "Chrome",
   health: "Through Health",
 };
@@ -988,37 +996,45 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
         id: "strava",
         name: "Strava",
         does: "Each finished workout posted to Strava",
-        android: "soon",
-        ios: "soon",
-        web: "soon",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
         tier: "pro",
       },
       {
         id: "whoop",
         name: "WHOOP",
         does: "Sleep, recovery, HRV and resting heart rate in",
-        android: "soon",
-        ios: "soon",
-        web: "soon",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
         tier: "pro",
       },
       {
         id: "withings",
         name: "Withings",
         does: "Weigh-ins, body fat, sleep and steps in",
-        android: "soon",
-        ios: "soon",
-        web: "soon",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
         tier: "pro",
       },
-      { id: "polar", name: "Polar", does: "Nightly recharge, HRV and sleep in", android: "soon", ios: "soon", web: "soon", tier: "pro" },
+      {
+        id: "polar",
+        name: "Polar",
+        does: "Nightly recharge, HRV and sleep in",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
+        tier: "pro",
+      },
       {
         id: "concept2",
         name: "Concept2 Logbook",
         does: "RowErg, SkiErg and BikeErg sessions in as cardio workouts",
-        android: "soon",
-        ios: "soon",
-        web: "soon",
+        android: "investigating",
+        ios: "investigating",
+        web: "investigating",
         tier: "pro",
       },
     ],
