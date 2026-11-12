@@ -546,6 +546,15 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // Bells (social.ts `bell`, Friends gap list 3): the watcher gets a push when someone they follow posts a workout
+  // they may see. Only while the follow stands; unfollowing, blocking or leaving deletes it.
+  `CREATE TABLE IF NOT EXISTS bells (
+    watcher_id TEXT NOT NULL,
+    watched_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (watcher_id, watched_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS bells_watched ON bells (watched_id)`,
   // People named with @handle in a comment who could see the post (social.ts comment), for their Activity.
   `CREATE TABLE IF NOT EXISTS comment_mentions (
     comment_id TEXT NOT NULL,
@@ -661,6 +670,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // The switch for workouts from people the lifter rang the bell for (Friends gap list 3).
+  ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],

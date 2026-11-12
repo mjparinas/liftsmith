@@ -794,6 +794,7 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
     ["sent", "friends.notify.sent"],
     ["likes", "friends.notify.likes"],
     ["cheers", "social.notify.cheers"],
+    ["posts", "social.notify.posts"],
   ];
   return (
     <Section title={t("friends.notify")}>
@@ -2431,20 +2432,40 @@ export function PersonScreen({ handle }: { handle: string }) {
       {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}
       <Showcase person={person} />
       {!self && person.relation !== "blocked" && (
-        <Button
-          kind={person.relation === "none" ? "primary" : "ghost"}
-          className="mt-3 w-full"
-          onClick={() => void act(person.relation === "none" ? "follow" : "unfollow")}
-        >
-          {person.relation === "none"
-            ? person.open
-              ? t("friends.follow")
-              : t("friends.requestFollow")
-            : person.relation === "requested"
-              ? t("friends.requested")
-              : t("friends.unfollow")}
-        </Button>
+        <div className="mt-3 flex gap-2">
+          <Button
+            kind={person.relation === "none" ? "primary" : "ghost"}
+            className="flex-1"
+            onClick={() => void act(person.relation === "none" ? "follow" : "unfollow")}
+          >
+            {person.relation === "none"
+              ? person.open
+                ? t("friends.follow")
+                : t("friends.requestFollow")
+              : person.relation === "requested"
+                ? t("friends.requested")
+                : t("friends.unfollow")}
+          </Button>
+          {person.relation === "following" && (
+            // The bell: a push when they post (only while following). One tap, and the line below says what it does.
+            <button
+              type="button"
+              aria-pressed={person.bell}
+              aria-label={t(person.bell ? "social.bell.off" : "social.bell.on", { name: person.name })}
+              onClick={() => {
+                const on = !person.bell;
+                void act("bell", { on }).then(() => on && void startPush(true));
+              }}
+              className={`press grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${
+                person.bell ? "border-accent bg-accent/15 text-accent" : "border-line bg-surface text-muted hover:text-ink"
+              }`}
+            >
+              <Icon name={person.bell ? "bellOn" : "bell"} size={22} />
+            </button>
+          )}
+        </div>
       )}
+      {person.bell && <p className="mt-2 px-1 text-sm text-muted">{t("social.bell.line", { name: person.name })}</p>}
       {person.relation === "blocked" && (
         <Button kind="ghost" className="mt-3 w-full" onClick={() => void act("unblock")}>
           {t("friends.unblock")}

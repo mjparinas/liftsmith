@@ -187,6 +187,17 @@ Melvin, 2026-11-12: "it should also show the celebration emoji animation on thei
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/lib/friendNotes.test.ts` (each note's rule, wording and action, the cap of two) and a `nudges` case in `src/server/socialLive.test.ts` (quiet friends: mutual only, back once they post).
 
+## Alerts when a friend posts (gap list 3, item 3)
+
+Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not train together, buddy streaks, translated comments or head-to-head). Each is its own change; this is 3.
+
+- **The bell** sits beside Unfollow on a person's page, only while the lifter follows them (an accepted follow). One tap turns it on (`bell` op, `bells` table) and a line under it says what it does ("You'll get a notification when Blair posts a workout."). Tapping it again turns it off. Turning one on asks for notification permission if it hasn't been asked yet, like the Notifications switches.
+- **The push**: when someone posts, everyone who rang their bell and **may see that post** gets "Blair just posted a workout.", or "Blair just set a new best. Send them a like." when the post has a new best in it (kinds `posted` and `best`). The same `seesPost` rule as the feed, so an "only me" post reaches no one and a friends-only post reaches only mutual friends; blocked or muted people get nothing. A tap opens the poster's profile, with the workout on top. Up to 500 per post. Reposting the same workout is one post, so it never pushes twice.
+- **One switch** in Notifications, "Workouts from people I get alerts for" (`push_posts`, on to start; nothing comes until a bell is on).
+- **It goes away with the follow**: unfollowing, being removed as a follower, a block either way, and leaving Friends or deleting the account all delete the bell (`socialDeletes`).
+- Pure web code plus the existing push plumbing, so Android and iOS get it together; the web app has no push (Platform deltas), so there the bell only shows (the post is in the feed as before).
+- Tests: the bell cases in `src/server/push.test.ts` (following first, both kinds and their route, audiences, mute, the switch, unfollow, block and leaving) and the bell flow in `Friends.test.tsx`.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):
