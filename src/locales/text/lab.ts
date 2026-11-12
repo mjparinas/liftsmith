@@ -75,6 +75,9 @@ export const en = {
   "lab.volumeLog.title": "Volume button logs a set",
   "lab.volumeLog.body":
     "During a workout, press volume up on your phone or Bluetooth earbuds to log the set as planned, the same as tapping Log set. Pressed during rest, it logs the next set. The volume goes straight back and your music keeps playing; volume down still turns it down. Works while Liftsmith is on screen.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Control a Sonos speaker from the workout: what's playing, skip, pause and volume. It can also follow the workout, turning the music up for sets and down for rest, starting a Sonos favourite and pausing at the end. Connect Sonos in Connected apps (it needs a Liftsmith account).",
 };
 
 type Key = keyof typeof en;
@@ -153,6 +156,9 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.volumeLog.title": "El botón de volumen registra la serie",
   "lab.volumeLog.body":
     "Durante un entrenamiento, pulsa subir volumen en el teléfono o en los auriculares Bluetooth para registrar la serie como estaba prevista, igual que al tocar Registrar serie. Si lo pulsas durante el descanso, registra la serie siguiente. El volumen vuelve enseguida a su nivel y tu música sigue sonando; bajar volumen sigue bajándolo. Funciona mientras Liftsmith está en pantalla.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Controla un altavoz Sonos desde el entrenamiento: qué suena, saltar, pausar y volumen. También puede seguir el entrenamiento, subiendo la música en las series y bajándola en el descanso, empezando un favorito de Sonos y pausando al final. Conecta Sonos en Apps conectadas (necesita una cuenta de Liftsmith).",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -229,6 +235,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.volumeLog.title": "Le bouton de volume valide la série",
   "lab.volumeLog.body":
     "Pendant une séance, appuyez sur volume + du téléphone ou des écouteurs Bluetooth pour valider la série comme prévu, comme en touchant Valider la série. Pendant le repos, il valide la série suivante. Le volume revient aussitôt et votre musique continue ; volume − baisse toujours le son. Fonctionne tant que Liftsmith est à l'écran.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Contrôlez une enceinte Sonos depuis la séance : ce qui joue, titre suivant, pause et volume. Elle peut aussi suivre la séance, monter le son pendant les séries et le baisser au repos, lancer un favori Sonos et se mettre en pause à la fin. Connectez Sonos dans Apps connectées (un compte Liftsmith est nécessaire).",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -307,6 +316,9 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.volumeLog.title": "Lautstärketaste trägt den Satz ein",
   "lab.volumeLog.body":
     "Drück während des Trainings am Handy oder an den Bluetooth-Kopfhörern auf „Lauter“, um den Satz wie geplant einzutragen, genau wie mit „Satz eintragen“. In der Pause trägt sie den nächsten Satz ein. Die Lautstärke springt sofort zurück und deine Musik läuft weiter; „Leiser“ macht weiterhin leiser. Funktioniert, solange Liftsmith auf dem Bildschirm ist.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Steuere einen Sonos-Lautsprecher aus dem Training: was läuft, überspringen, pausieren und Lautstärke. Die Musik kann auch dem Training folgen, lauter in den Sätzen und leiser in der Pause, einen Sonos-Favoriten starten und am Ende pausieren. Verbinde Sonos in Verbundene Apps (dafür brauchst du ein Liftsmith-Konto).",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -382,6 +394,9 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.volumeLog.title": "Il tasto del volume registra la serie",
   "lab.volumeLog.body":
     "Durante l'allenamento, premi volume su del telefono o degli auricolari Bluetooth per registrare la serie come prevista, come toccare Registra serie. Se lo premi durante il recupero, registra la serie successiva. Il volume torna subito com'era e la musica continua; volume giù continua ad abbassarlo. Funziona mentre Liftsmith è sullo schermo.",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "Controlla un altoparlante Sonos dall'allenamento: cosa suona, salta, pausa e volume. Può anche seguire l'allenamento, alzando la musica nelle serie e abbassandola nel recupero, avviando un preferito Sonos e mettendo in pausa alla fine. Collega Sonos in App collegate (serve un account Liftsmith).",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -457,4 +472,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.volumeLog.title": "音量ボタンでセットを記録",
   "lab.volumeLog.body":
     "ワークアウト中にスマホまたはBluetoothイヤホンの音量アップを押すと、「セットを記録」をタップしたのと同じく予定どおりにセットを記録します。休憩中に押すと次のセットを記録します。音量はすぐ元に戻り、音楽はそのまま流れます。音量ダウンはこれまでどおり音量を下げます。Liftsmithが画面に表示されている間に使えます。",
+  "lab.sonos.title": "Sonos",
+  "lab.sonos.body":
+    "ワークアウト中に Sonos スピーカーを操作します。再生中の曲、スキップ、一時停止、音量。ワークアウトに合わせて、セット中は音楽を大きく、休憩中は小さくし、Sonos のお気に入りで始めて、終了時に一時停止することもできます。連携アプリで Sonos を接続してください（Liftsmith アカウントが必要です）。",
 };

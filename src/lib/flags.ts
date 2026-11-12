@@ -121,6 +121,13 @@ export const FLAGS = {
     description:
       "In the Android and iOS apps, volume up on the phone or Bluetooth earbuds logs the set as planned while the workout is on screen.",
   },
+  /** Labs: Sonos speakers controlled from the workout, and music that follows it (src/lib/sonos.ts, docs/decisions/sonos.md). */
+  labSonos: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: Sonos",
+    description: "Play, pause, skip and change the volume of a Sonos speaker from the workout; louder for sets, quieter for rest.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
