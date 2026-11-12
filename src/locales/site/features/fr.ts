@@ -205,6 +205,10 @@ export const fr: FeaturesText = {
       name: "Mensurations",
       body: "Neuf zones en centimètres ou en pouces. Un tour de taille qui augmente ou diminue devient une note du coach quand il n’y a pas de mesure de masse grasse.",
     },
+    "body-figure": {
+      name: "Une silhouette 3D à votre forme",
+      body: "Activez-la et la silhouette de Santé prend votre gabarit d'après votre taille, poids, masse grasse et mensurations.",
+    },
     "health-twin": {
       name: "Jumeau santé et âge physique",
       body: "Sommeil, VFC, pouls au repos, pas, fréquence respiratoire et VO₂ max au même endroit, avec votre tendance et un âge physique tiré de votre VO₂ max.",
@@ -272,6 +276,11 @@ export const fr: FeaturesText = {
     coaching: {
       name: "Coacher des clients",
       body: "Associez des clients, voyez leurs résultats et attribuez-leur des routines, sur le téléphone ou sur grand écran.",
+    },
+    "coach-chat": {
+      name: "Messages, alertes et données corporelles",
+      body: "Écrivez à chaque client, recevez une notification quand il s'entraîne ou n'a pas fait de séance depuis une semaine, et voyez ses pesées, mensurations et une silhouette 3D à sa forme s'il choisit de les partager.",
+      note: "Les notifications sont sur Android et iPhone. L'app web affiche les nouveaux messages quand elle est ouverte.",
     },
     awards: {
       name: "Succès, niveaux et séries de jours",

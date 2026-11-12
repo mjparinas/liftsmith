@@ -189,6 +189,9 @@ export const en = {
   "twin.did.free": "{signal}: with Pro, today's plan would take this into account.",
   "twin.did.easier": "{signal}: counted in today's call, so the plan leans easier.",
   "twin.did.push": "{signal}: counted in today's call, so the plan can push a little.",
+  "twin.shape.label": "Shape the figure like me",
+  "twin.shape.hint": "From your height, latest weigh-in, body fat and tape measurements. An approximate shape, not a scan.",
+  "twin.shape.need": "Add your height and a weigh-in, or a body fat reading or tape measurements, and the figure can take your shape.",
 } as const;
 
 type Key = keyof typeof en;
@@ -387,6 +390,9 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.did.free": "{signal}: con Pro, el plan de hoy lo tendría en cuenta.",
   "twin.did.easier": "{signal}: cuenta en la decisión de hoy, así que el plan va más suave.",
   "twin.did.push": "{signal}: cuenta en la decisión de hoy, así que el plan puede apretar un poco.",
+  "twin.shape.label": "Dar mi forma a la figura",
+  "twin.shape.hint": "A partir de tu estatura, tu último peso, tu grasa corporal y tus medidas. Una forma aproximada, no un escáner.",
+  "twin.shape.need": "Añade tu estatura y un pesaje, o tu grasa corporal o tus medidas, y la figura tomará tu forma.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -586,6 +592,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.did.free": "{signal} : avec Pro, le plan du jour en tiendrait compte.",
   "twin.did.easier": "{signal} : pris en compte dans l’avis du jour, donc le plan est plus léger.",
   "twin.did.push": "{signal} : pris en compte dans l’avis du jour, donc le plan peut pousser un peu.",
+  "twin.shape.label": "Donner ma silhouette à la figure",
+  "twin.shape.hint":
+    "D'après votre taille, votre dernière pesée, votre masse grasse et vos mensurations. Une forme approximative, pas un scan.",
+  "twin.shape.need": "Ajoutez votre taille et une pesée, ou votre masse grasse ou vos mensurations, et la figure prendra votre silhouette.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -785,6 +795,9 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.did.free": "{signal}: Mit Pro würde der Plan für heute das berücksichtigen.",
   "twin.did.easier": "{signal}: in der heutigen Empfehlung berücksichtigt, daher fällt der Plan lockerer aus.",
   "twin.did.push": "{signal}: in der heutigen Empfehlung berücksichtigt, daher kann der Plan etwas mehr Gas geben.",
+  "twin.shape.label": "Figur nach meinen Maßen formen",
+  "twin.shape.hint": "Aus deiner Größe, dem letzten Wiegen, deinem Körperfett und deinen Umfangsmaßen. Eine ungefähre Form, kein Scan.",
+  "twin.shape.need": "Trag deine Größe und ein Gewicht ein, oder dein Körperfett oder Umfangsmaße, dann nimmt die Figur deine Form an.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -981,6 +994,10 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.did.free": "{signal}: con Pro, il piano di oggi ne terrebbe conto.",
   "twin.did.easier": "{signal}: incluso nella scelta di oggi, quindi il piano è più leggero.",
   "twin.did.push": "{signal}: incluso nella scelta di oggi, quindi il piano può spingere un po’.",
+  "twin.shape.label": "Dai alla figura la mia forma",
+  "twin.shape.hint":
+    "In base alla tua altezza, all'ultima pesata, alla massa grassa e alle misure. Una forma approssimativa, non una scansione.",
+  "twin.shape.need": "Aggiungi la tua altezza e una pesata, oppure la massa grassa o le misure, e la figura prenderà la tua forma.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1170,4 +1187,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.did.free": "{signal}：Pro なら今日のプランに反映されます。",
   "twin.did.easier": "{signal}：今日の判断に反映され、プランは軽めになっています。",
   "twin.did.push": "{signal}：今日の判断に反映され、プランは少し攻めた内容になっています。",
+  "twin.shape.label": "フィギュアを自分の体型にする",
+  "twin.shape.hint": "身長、最新の体重、体脂肪率、採寸の値から作ります。おおよその体型で、スキャンではありません。",
+  "twin.shape.need": "身長と体重、または体脂肪率や採寸の値を追加すると、フィギュアがあなたの体型になります。",
 };

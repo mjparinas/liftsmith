@@ -198,6 +198,10 @@ export const it: FeaturesText = {
       name: "Misure con il metro",
       body: "Nove punti in centimetri o pollici. Un girovita che cresce o cala diventa una nota del coach quando manca la massa grassa.",
     },
+    "body-figure": {
+      name: "Una figura 3D con la tua forma",
+      body: "Attivala e la figura in Salute prende la tua corporatura da altezza, peso, grasso corporeo e circonferenze.",
+    },
     "health-twin": {
       name: "Gemello della salute ed età fitness",
       body: "Sonno, HRV, battito a riposo, passi, frequenza respiratoria e VO₂ max in un unico posto, con il tuo andamento e un’età fitness dal tuo VO₂ max.",
@@ -265,6 +269,11 @@ export const it: FeaturesText = {
     coaching: {
       name: "Segui i clienti",
       body: "Collega i clienti, vedi i loro risultati e assegna loro routine, sul telefono o su un grande schermo.",
+    },
+    "coach-chat": {
+      name: "Chat, avvisi e dati corporei",
+      body: "Scrivi a ogni cliente, ricevi una notifica quando si allena o non si allena da una settimana, e vedi pesate, circonferenze e una figura 3D modellata su di lui quando sceglie di condividerle.",
+      note: "Le notifiche sono su Android e iPhone. L'app web mostra i nuovi messaggi quando è aperta.",
     },
     awards: {
       name: "Obiettivi, livelli e serie di giorni",

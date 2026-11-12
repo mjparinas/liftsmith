@@ -10,6 +10,7 @@ import { BMI_COLOUR, BmiBar } from "@/components/BmiBar";
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { Info } from "@/components/Info";
 import { CARD_TITLE, SECTION_LABEL } from "@/components/titles";
+import { canShape, shapeBody, statsFrom } from "@/lib/bodyShape";
 import { useCloud } from "@/lib/connections";
 import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
@@ -27,7 +28,7 @@ import { useNow } from "@/lib/useNow";
 import { openStats } from "./BodyStats";
 import { FitTestsCard } from "./FitTests";
 import { go } from "./router";
-import { Button, EmptyState, ProTag, Section, Sheet } from "./ui";
+import { Button, EmptyState, ProTag, Section, Sheet, SwitchRow } from "./ui";
 import { WeighInForm } from "./WeighIn";
 
 const BODY: TwinId[] = ["weight", "leanMass", "bodyFat", "bmi", "tdee", "steps"];
@@ -73,7 +74,14 @@ const noSubscribe = () => () => {};
 const storeName = () => (typeof navigator !== "undefined" && /iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect");
 
 export function HealthTwin() {
-  const { events, profile, stats, readiness: r, setCall } = useApp();
+  const { events, profile, stats, readiness: r, setCall, setProfile } = useApp();
+  // The figure shaped from the lifter's own numbers, when they turned it on (bodyShape.ts).
+  const own = useMemo(() => statsFrom(profile, events), [profile, events]);
+  const shapeable = canShape(own);
+  const shape = useMemo(
+    () => (profile.shapeFigure && shapeable ? shapeBody(bodyFor(profile.sex), own) : undefined),
+    [profile.shapeFigure, profile.sex, shapeable, own],
+  );
   const now = useNow(60_000);
   const native = useSyncExternalStore(noSubscribe, isNative, () => false);
   const pro = isPro();
@@ -156,6 +164,7 @@ export function HealthTwin() {
         <LiftDemo
           className="h-full"
           body={bodyFor(profile.sex)}
+          shape={shape}
           view="front"
           bpm={rhr?.value ? Math.round(rhr.value) : null}
           label={t("body.health")}
@@ -167,6 +176,13 @@ export function HealthTwin() {
         <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
         <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
       </div>
+
+      <SwitchRow
+        label={t("twin.shape.label")}
+        hint={shapeable ? t("twin.shape.hint") : t("twin.shape.need")}
+        on={!!profile.shapeFigure}
+        onChange={(v) => setProfile({ shapeFigure: v })}
+      />
 
       <FitnessAgeCard native={native} store={store} />
       <FitTestsCard />

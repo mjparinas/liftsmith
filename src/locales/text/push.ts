@@ -19,6 +19,10 @@ export const en = {
   "push.cheer": "{name} cheered you on {text}",
   "push.posted": "{name} just posted a workout.",
   "push.best": "{name} just set a new best. Send them a like.",
+  "push.coachMsg": "{name}: “{text}”",
+  "push.coachTrained": "{name} finished a workout.",
+  "push.coachQuiet": "{name} hasn't trained for a week. A quick message might help.",
+  "push.someone": "Your coach",
 } as const;
 
 type Key = keyof typeof en;
@@ -38,6 +42,10 @@ export const es: Partial<Record<Key, Message>> = {
   "push.cheer": "{name} te anima {text}",
   "push.posted": "{name} acaba de publicar un entrenamiento.",
   "push.best": "{name} acaba de batir su mejor marca. Dale un me gusta.",
+  "push.coachMsg": "{name}: «{text}»",
+  "push.coachTrained": "{name} terminó un entrenamiento.",
+  "push.coachQuiet": "{name} lleva una semana sin entrenar. Un mensaje rápido puede ayudar.",
+  "push.someone": "Tu entrenador",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -55,6 +63,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.cheer": "{name} vous encourage {text}",
   "push.posted": "{name} vient de publier un entraînement.",
   "push.best": "{name} vient de battre son record. Envoie-lui un j’aime.",
+  "push.coachMsg": "{name} : « {text} »",
+  "push.coachTrained": "{name} a terminé une séance.",
+  "push.coachQuiet": "{name} n'a pas fait de séance depuis une semaine. Un petit message peut aider.",
+  "push.someone": "Votre coach",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -72,6 +84,10 @@ export const de: Partial<Record<Key, Message>> = {
   "push.cheer": "{name} feuert dich an {text}",
   "push.posted": "{name} hat gerade ein Training gepostet.",
   "push.best": "{name} hat gerade eine neue Bestleistung geschafft. Schick ein Like.",
+  "push.coachMsg": "{name}: „{text}“",
+  "push.coachTrained": "{name} hat ein Workout beendet.",
+  "push.coachQuiet": "{name} hat seit einer Woche nicht trainiert. Eine kurze Nachricht kann helfen.",
+  "push.someone": "Dein Coach",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -89,6 +105,10 @@ export const it: Partial<Record<Key, Message>> = {
   "push.cheer": "{name} fa il tifo per te {text}",
   "push.posted": "{name} ha appena pubblicato un allenamento.",
   "push.best": "{name} ha appena fatto un nuovo record. Mandagli un mi piace.",
+  "push.coachMsg": "{name}: «{text}»",
+  "push.coachTrained": "{name} ha finito un allenamento.",
+  "push.coachQuiet": "{name} non si allena da una settimana. Un breve messaggio può aiutare.",
+  "push.someone": "Il tuo coach",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -106,4 +126,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.cheer": "{name}さんが応援しています {text}",
   "push.posted": "{name}さんがワークアウトを投稿しました。",
   "push.best": "{name}さんが自己ベストを更新しました。いいねを送りましょう。",
+  "push.coachMsg": "{name}：「{text}」",
+  "push.coachTrained": "{name}さんがワークアウトを終えました。",
+  "push.coachQuiet": "{name}さんは1週間トレーニングしていません。短いメッセージが助けになるかもしれません。",
+  "push.someone": "コーチ",
 };

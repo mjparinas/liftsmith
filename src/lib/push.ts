@@ -6,12 +6,15 @@
 // asking Firebase without it crashes) and APNs on iOS. The permission prompt shows only when the lifter acts:
 // joining Friends, or turning a notification switch on. A tap opens the screen the push points to. Signing out or
 // leaving Friends drops the token. The web app has none (the people button's dot carries it; Platform deltas).
+// Coaching (trainer-mode.md) uses the same token for chat messages and a coach's alerts: the Coaching screen registers
+// it once the lifter has a coach or a client, asking for permission when they send their first message.
 import { PushNotifications, type Token } from "@capacitor/push-notifications";
 
 import { currentLang, t } from "./i18n";
 import { installInfo } from "./installInfo";
 import { isNative } from "./juice";
 import { social } from "./social";
+import { coachPushToken } from "./trainer";
 
 const TOKEN_KEY = "liftsmith.pushToken";
 
@@ -49,13 +52,17 @@ function listen() {
   void PushNotifications.addListener("registration", (tok: Token) => {
     const platform =
       (window as unknown as { Capacitor?: { getPlatform?: () => string } }).Capacitor?.getPlatform?.() === "ios" ? "ios" : "android";
-    void social("pushToken", { token: tok.value, platform, lang: currentLang() })
-      .then(() => {
+    // Friends takes it only after joining; coaching takes it from any signed-in account (trainer-mode.md), so a coach
+    // or client who never joined Friends still gets messages and alerts.
+    const lang = currentLang();
+    void Promise.allSettled([social("pushToken", { token: tok.value, platform, lang }), coachPushToken(tok.value, platform, lang)]).then(
+      (r) => {
+        if (!r.some((x) => x.status === "fulfilled")) return;
         try {
           localStorage.setItem(TOKEN_KEY, tok.value);
         } catch {}
-      })
-      .catch(() => undefined);
+      },
+    );
   });
 }
 

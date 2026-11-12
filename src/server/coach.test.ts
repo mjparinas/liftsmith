@@ -2,22 +2,31 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { deleteAccount } from "./accounts";
 import {
+  alertQuiet,
+  alertTrained,
   assignPlan,
   cleanCode,
   clientView,
   COACH_LIMITS,
+  coachCleanup,
   forCoach,
   joinCoach,
   makeInvite,
+  messages,
   newCode,
   overview,
   previewInvite,
   removePlan,
   saveSetup,
+  sendMessage,
+  setAlerts,
   setNote,
+  setShare,
   unlink,
+  unreadFrom,
 } from "./coach";
 import { query, resetDb } from "./db";
+import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
 
 const NOW = 1_800_000_000_000;
@@ -25,6 +34,7 @@ const DAY = 86_400_000;
 
 beforeEach(async () => {
   await resetDb();
+  setPushSender(null);
 });
 
 const push = (account: string, events: Record<string, unknown>[], profile?: Record<string, unknown>) =>
@@ -313,5 +323,152 @@ describe("a coach's note to a client", () => {
     expect(await query("SELECT * FROM coach_notes")).toEqual([]);
     await deleteAccount("coach");
     expect(await query("SELECT * FROM coach_defaults")).toEqual([]);
+  });
+});
+
+describe("chat between a coach and a client", () => {
+  const sent: PushMessage[] = [];
+  beforeEach(async () => {
+    sent.length = 0;
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await push("coach", [], { name: "Sam" });
+    await push("client", [], { name: "Alex" });
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("only goes between a linked pair, either way, and empty text sends nothing", async () => {
+    expect(await sendMessage("stranger", "client", "hi", NOW)).toEqual({ error: "notLinked" });
+    expect(await sendMessage("coach", "client", "  \n ", NOW)).toEqual({ error: "empty" });
+    expect(await sendMessage("coach", "client", "How did squats feel?", NOW, "m1")).toMatchObject({ id: "m1", from: "coach" });
+    expect(await sendMessage("client", "coach", "Heavy but good", NOW + 1, "m2")).toMatchObject({ id: "m2", from: "client" });
+    const r = await messages("client", "coach", undefined, NOW + 2);
+    expect(r).toMatchObject({ name: "Sam", more: false });
+    expect("messages" in r && r.messages.map((m) => m.text)).toEqual(["How did squats feel?", "Heavy but good"]);
+    expect(await messages("stranger", "coach", undefined, NOW)).toEqual({ error: "notLinked" });
+  });
+
+  it("counts unread messages until the thread is opened", async () => {
+    await sendMessage("coach", "client", "One", NOW, "m1");
+    await sendMessage("coach", "client", "Two", NOW + 1, "m2");
+    expect(await unreadFrom("client")).toEqual({ coach: 2 });
+    expect(await unreadFrom("coach")).toEqual({});
+    await messages("client", "coach", undefined, NOW + 2);
+    expect(await unreadFrom("client")).toEqual({});
+  });
+
+  it("pages older messages", async () => {
+    for (let i = 0; i < COACH_LIMITS.page + 3; i++) await sendMessage("coach", "client", `m${i}`, NOW + i, `id${i}`);
+    const first = await messages("client", "coach", undefined, NOW + 1000);
+    if (!("messages" in first)) throw new Error("not linked");
+    expect(first.more).toBe(true);
+    expect(first.messages).toHaveLength(COACH_LIMITS.page);
+    const older = await messages("client", "coach", first.messages[0]!.at, NOW + 1000);
+    expect("messages" in older && older.messages.map((m) => m.text)).toEqual(["m0", "m1", "m2"]);
+  });
+
+  it("pushes the message to the other side's phones, with the sender's name and a link to the thread", async () => {
+    await saveToken("client", "tok-client-0123456789abcdef", "android", "en", NOW);
+    await sendMessage("coach", "client", "See you Monday", NOW, "m1");
+    expect(sent).toHaveLength(1);
+    expect(sent[0]).toMatchObject({ token: "tok-client-0123456789abcdef", kind: "coachMsg", route: "#/trainer/m.coach" });
+    expect(sent[0]!.body).toContain("Sam");
+  });
+
+  it("goes when the pair unlinks or an account is deleted", async () => {
+    await sendMessage("coach", "client", "Hi", NOW, "m1");
+    await unlink("client", "coach");
+    expect(await query("SELECT * FROM coach_messages")).toEqual([]);
+    expect(await query("SELECT * FROM coach_reads")).toEqual([]);
+    expect(
+      coachCleanup("x")
+        .map((q) => q.sql)
+        .join(" "),
+    ).toMatch(/coach_messages.*coach_reads.*coach_shares.*coach_alerts.*coach_prefs/);
+  });
+});
+
+describe("body data a client shares", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "w1", at: NOW - 40 * DAY, type: "bodyweight", kg: 82 },
+        { id: "w2", at: NOW - DAY, type: "bodyweight", kg: 80, bodyFat: 18.5 },
+        { id: "m1", at: NOW - DAY, type: "measure", site: "waist", cm: 84 },
+        { id: "p1", at: NOW - DAY, type: "photo", note: "private" },
+      ],
+      { name: "Alex", sex: "female", heightCm: 168 },
+    );
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("is off until the client turns it on, and only for their own coach", async () => {
+    expect((await clientView("coach", "client", NOW))?.body).toBeNull();
+    expect(await setShare("client", "stranger", true, NOW)).toEqual({ error: "notClient" });
+    expect(await setShare("client", "coach", true, NOW)).toBe(true);
+    const body = (await clientView("coach", "client", NOW))?.body;
+    expect(body).toEqual({
+      sex: "female",
+      heightCm: 168,
+      weights: [
+        { at: NOW - 40 * DAY, kg: 82 },
+        { at: NOW - DAY, kg: 80, bodyFat: 18.5 },
+      ],
+      measures: [{ at: NOW - DAY, site: "waist", cm: 84 }],
+    });
+    expect(JSON.stringify(body)).not.toContain("private");
+    expect((await overview("client", NOW)).bodyShared).toEqual(["coach"]);
+    expect((await overview("coach", NOW)).sharesBody).toEqual(["client"]);
+    expect(await setShare("client", "coach", false, NOW)).toBe(false);
+    expect((await clientView("coach", "client", NOW))?.body).toBeNull();
+  });
+
+  it("stops when the pair unlinks", async () => {
+    await setShare("client", "coach", true, NOW);
+    await unlink("coach", "client");
+    expect(await query("SELECT * FROM coach_shares")).toEqual([]);
+  });
+});
+
+describe("alerts to a coach", () => {
+  const sent: PushMessage[] = [];
+  beforeEach(async () => {
+    sent.length = 0;
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await push("client", [], { name: "Alex" });
+    await makeInvite("coach", NOW - 10 * DAY, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW - 10 * DAY);
+    await saveToken("coach", "tok-coach-0123456789abcdef", "ios", "en", NOW);
+  });
+
+  it("tell the coach once per finished workout, and never about old ones", async () => {
+    await alertTrained("client", [{ type: "sessionEnd", at: NOW - 60_000 }], NOW);
+    await alertTrained("client", [{ type: "sessionEnd", at: NOW - 60_000 }], NOW + 1000);
+    await alertTrained("client", [{ type: "sessionEnd", at: NOW - 3 * DAY }], NOW);
+    expect(sent.map((m) => [m.kind, m.route])).toEqual([["coachTrained", "#/trainer/c.client"]]);
+  });
+
+  it("tell the coach once when a client goes a week without training, and again after they train", async () => {
+    expect(await alertQuiet(NOW)).toBe(1);
+    expect(await alertQuiet(NOW + DAY)).toBe(0);
+    expect(sent.map((m) => m.kind)).toEqual(["coachQuiet"]);
+    await alertTrained("client", [{ type: "sessionEnd", at: NOW + DAY }], NOW + DAY);
+    expect(await alertQuiet(NOW + DAY + 2 * 7 * DAY)).toBe(1);
+  });
+
+  it("stay quiet when the coach turns them off", async () => {
+    await setAlerts("coach", false, NOW);
+    await alertTrained("client", [{ type: "sessionEnd", at: NOW - 60_000 }], NOW);
+    expect(await alertQuiet(NOW)).toBe(0);
+    expect(sent).toEqual([]);
+    expect((await overview("coach", NOW)).alerts).toBe(false);
   });
 });
