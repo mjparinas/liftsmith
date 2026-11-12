@@ -116,6 +116,8 @@ export interface PushPrefs {
   likes: boolean;
   /** A friend's cheer during a workout (on to start). */
   cheers: boolean;
+  /** A workout from someone the lifter rang the bell for (on to start; nothing comes until a bell is on). */
+  posts: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -137,6 +139,8 @@ export interface PersonCard {
   avatar: string;
   /** The reader has muted them: their posts stay out of the reader's feed. */
   muted: boolean;
+  /** The reader rang the bell: a push when they post a workout the reader may see (only while following). */
+  bell: boolean;
   /** Their best lifts, when they show them and the reader can see their posts. */
   lifts: ShowcaseLift[];
   /** Their level and training-week streak (0 when the reader can't see their posts, or not sent yet). */
@@ -257,6 +261,8 @@ export const SOCIAL_LIMITS = {
   searchMin: 2,
   /** Weeks of a profile's training calendar. */
   calendarWeeks: 12,
+  /** Bell pushes sent for one post (people who rang the bell for the poster). */
+  bellsPerPost: 500,
 };
 
 /** Lowercase letters, digits and underscores. */

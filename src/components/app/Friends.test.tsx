@@ -87,6 +87,22 @@ describe("Friends", () => {
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
   });
 
+  it("rings the bell for someone the lifter follows, and silences it again", async () => {
+    const u = userEvent.setup();
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    signIn("tok-a");
+    render(<PersonScreen handle="blair" />);
+    // No bell before following: there's nothing to be told about yet.
+    await u.click(await screen.findByRole("button", { name: "Follow" }));
+    const bell = await screen.findByRole("button", { name: "Get alerts when Blair posts" });
+    expect(bell).toHaveAttribute("aria-pressed", "false");
+    await u.click(bell);
+    expect(await screen.findByText("You’ll get a notification when Blair posts a workout.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Stop alerts when Blair posts" }));
+    await waitFor(() => expect(screen.queryByText("You’ll get a notification when Blair posts a workout.")).toBeNull());
+  });
+
   it("sends a routine to a friend, who finds it in Activity", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
@@ -103,7 +119,7 @@ describe("Friends", () => {
           autoPost: false,
           weights: true,
           public: false,
-          push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
+          push: { follows: true, comments: true, sent: true, likes: false, cheers: true, posts: true },
           avatar: "",
           audience: "all",
           showLifts: true,

@@ -110,3 +110,73 @@ describe("Friends push notifications", () => {
     });
   });
 });
+
+describe("bells (Friends gap list 3)", () => {
+  const postAs = (who: string, id: string, prs = 0, audience?: string) =>
+    call(who, "post", {
+      workoutId: id,
+      at: NOW - 3_600_000,
+      ...(audience ? { audience } : {}),
+      body: { seconds: 3000, sets: 12, volume: 4200, prs, muscles: ["chest"], exercises: [{ id: "bench-press", sets: 4, w: 100, r: 5 }] },
+    });
+  const follows = async () => {
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+  };
+  const bell = (on = true) => call("acc-a", "bell", { handle: "blair", on });
+
+  it("is only for someone the lifter follows, and shows on their profile", async () => {
+    expect((await bell()).body.error).toBe("followFirst");
+    await follows();
+    expect((await bell()).body.person).toMatchObject({ bell: true });
+    expect((await bell(false)).body.person).toMatchObject({ bell: false });
+  });
+
+  it("pushes each post, says when it holds a new best, and opens the poster's profile", async () => {
+    await follows();
+    await bell();
+    await call("acc-a", "pushToken", { token: TOKEN("a"), platform: "android", lang: "en" });
+    sent = [];
+    await postAs("acc-b", "s1");
+    await postAs("acc-b", "s2", 2);
+    expect(sent.map((m) => [m.kind, m.body, m.route])).toEqual([
+      ["posted", "Blair just posted a workout.", "#/person/blair"],
+      ["best", "Blair just set a new best. Send them a like.", "#/person/blair"],
+    ]);
+    // The same workout posted again is one post, so no second push.
+    await postAs("acc-b", "s2", 2);
+    expect(sent).toHaveLength(2);
+  });
+
+  it("respects the post's audience, mutes, the switch, and goes when the follow does", async () => {
+    await follows();
+    await bell();
+    await call("acc-a", "pushToken", { token: TOKEN("a"), platform: "android", lang: "en" });
+    sent = [];
+    await postAs("acc-b", "me1", 0, "me");
+    await postAs("acc-b", "fr1", 0, "friends"); // alex follows blair, but blair doesn't follow back
+    expect(sent).toEqual([]);
+    await call("acc-a", "mute", { handle: "blair" });
+    await postAs("acc-b", "m1");
+    expect(sent).toEqual([]);
+    await call("acc-a", "mute", { handle: "blair", on: false });
+    await call("acc-a", "update", { push: { posts: false } });
+    await postAs("acc-b", "m2");
+    expect(sent).toEqual([]);
+    await call("acc-a", "update", { push: { posts: true } });
+    await call("acc-a", "unfollow", { handle: "blair" });
+    expect(await query("SELECT * FROM bells")).toEqual([]);
+  });
+
+  it("goes with a block and with leaving Friends", async () => {
+    await follows();
+    await bell();
+    await call("acc-b", "block", { handle: "alex" });
+    expect(await query("SELECT * FROM bells")).toEqual([]);
+    await call("acc-b", "unblock", { handle: "alex" });
+    await follows();
+    await bell();
+    await call("acc-b", "leave");
+    expect(await query("SELECT * FROM bells")).toEqual([]);
+  });
+});
