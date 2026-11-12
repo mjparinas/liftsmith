@@ -7,10 +7,10 @@ import { handle } from "@/server/social";
 export const OPTIONS = preflight;
 
 export async function POST(req: Request) {
-  const s = await signedIn(req);
+  // The sign-in and the admin panel's switch (which turns Friends off for everyone at once) are read side by side:
+  // each is a hop to the database, and Friends opens faster without one waiting for the other.
+  const [s, flags] = await Promise.all([signedIn(req), flagsFor(null).catch(() => null)]);
   if (s instanceof Response) return s;
-  // The admin panel's switch turns Friends off for everyone at once.
-  const flags = await flagsFor(null).catch(() => null);
   if (flags && flags.social === false) return reply(req, 503, { error: "off" });
   const body = await readJson(req, 16_000);
   if (body === undefined) return reply(req, 413, { error: "Too big." });

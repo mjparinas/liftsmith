@@ -547,6 +547,8 @@ const SCHEMA = [
     UNIQUE (account_id, workout_id)
   )`,
   `CREATE INDEX IF NOT EXISTS posts_account_at ON posts (account_id, at)`,
+  // Discover reads the newest public posts from everyone, by time (Friends speed pass, 2026-11-12).
+  `CREATE INDEX IF NOT EXISTS posts_at ON posts (at)`,
   `CREATE TABLE IF NOT EXISTS post_likes (
     post_id TEXT NOT NULL,
     account_id TEXT NOT NULL,
@@ -853,15 +855,62 @@ async function db(): Promise<Client> {
     client = createClient(cfg);
   }
   const c = client;
-  ready ??= (async () => {
-    for (const s of SCHEMA) await c.execute(s);
-    for (const [table, column, def] of COLUMNS) {
-      const have = await c.execute(`PRAGMA table_info(${table})`);
-      if (!have.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
-    }
-  })();
+  ready ??= migrate(c).catch((e: unknown) => {
+    // Try again on the next request rather than failing every request until the server restarts.
+    ready = null;
+    throw e;
+  });
   await ready;
   return c;
+}
+
+/** The table or index a schema statement makes. */
+const schemaName = (sql: string) => /IF NOT EXISTS\s+(\w+)/.exec(sql)?.[1] ?? "";
+
+/**
+ * Brings the database up to SCHEMA and COLUMNS on a server's first query. Every statement is a network hop to Turso
+ * in production, and running all ~150 one by one made each cold start take about four seconds (Friends felt slow,
+ * 2026-11-12). Now one read says what's already there, and only what's missing is made, in one batch each: one hop
+ * on a database that's up to date.
+ */
+async function migrate(c: Client): Promise<void> {
+  let have: Awaited<ReturnType<typeof present>>;
+  try {
+    have = await present(c);
+  } catch {
+    // A database that can't list its own columns this way: the slow path, one statement at a time.
+    for (const s of SCHEMA) await c.execute(s);
+    for (const [table, column, def] of COLUMNS) {
+      const cols = await c.execute(`PRAGMA table_info(${table})`);
+      if (!cols.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
+    }
+    return;
+  }
+  const missing = SCHEMA.filter((sql) => !have.names.has(schemaName(sql)));
+  if (missing.length) {
+    await c.batch(missing, "write");
+    // A table made just now may still lack columns added to COLUMNS since it was first written.
+    have = await present(c);
+  }
+  const alters = COLUMNS.filter(([table, column]) => !have.columns.has(`${table}.${column}`)).map(
+    ([table, column, def]) => `ALTER TABLE ${table} ADD COLUMN ${column} ${def}`,
+  );
+  if (alters.length) await c.batch(alters, "write");
+}
+
+/** Every table and index in the database, and each table's columns as `table.column`, in one read. */
+async function present(c: Client): Promise<{ names: Set<string>; columns: Set<string> }> {
+  const r = await c.execute(
+    `SELECT m.name AS name, p.name AS col FROM sqlite_master m LEFT JOIN pragma_table_info(m.name) p
+     WHERE m.type IN ('table', 'index')`,
+  );
+  const names = new Set<string>();
+  const columns = new Set<string>();
+  for (const row of r.rows) {
+    names.add(String(row.name));
+    if (row.col != null) columns.add(`${String(row.name)}.${String(row.col)}`);
+  }
+  return { names, columns };
 }
 
 export type Row = Record<string, unknown>;

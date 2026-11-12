@@ -6,10 +6,12 @@
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { readAccount } from "@/lib/auth";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { social, socialError } from "@/lib/social";
+import { cached, fetchPart, fresh } from "@/lib/socialCache";
 import { CHEERS, type Cheer, type TrainingNow as Live } from "@/lib/socialTypes";
 import { useNow } from "@/lib/useNow";
 
@@ -19,17 +21,20 @@ import { Section } from "./ui";
 
 export function TrainingNow() {
   const tick = useNow(60_000);
-  const [rows, setRows] = useState<Live[]>([]);
+  // Usually comes with the tab's one "home" request (socialCache.ts), then again each minute.
+  const account = readAccount()?.id ?? "";
+  const [rows, setRows] = useState<Live[]>(() => cached<Live[]>(account, "training") ?? []);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
+    if (fresh(account, "training")) return;
     let live = true;
-    social<{ people: Live[] }>("training")
-      .then((r) => live && setRows(r.people))
+    fetchPart(account, "training", () => social<{ people: Live[] }>("training").then((r) => r.people))
+      .then((people) => live && setRows(people))
       .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [tick]);
+  }, [account, tick]);
   const send = async (p: Live, emoji: Cheer) => {
     haptic("tick");
     try {

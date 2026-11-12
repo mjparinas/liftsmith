@@ -12,6 +12,7 @@ import { create } from "zustand";
 import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
+import { forgetFriends } from "./socialCache";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
 
 export interface Account {
@@ -304,6 +305,8 @@ export function forgetAccount() {
     localStorage.removeItem(ACCOUNT_KEY);
     localStorage.removeItem(SYNC_KEY);
   } catch {}
+  // Friends' last feed belongs to the account (socialCache.ts).
+  forgetFriends();
   useAccount.setState({ account: null, error: null });
 }
 

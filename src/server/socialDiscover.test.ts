@@ -32,7 +32,8 @@ describe("discover", () => {
     await post("acc-b", "b1");
     await post("acc-c", "c1");
     await call("acc-a", "update", { public: true });
-    await post("acc-a", "a1");
+    // An hour older than Blair's, so the order doesn't hang on a tie.
+    await post("acc-a", "a1", NOW - 7_200_000);
     expect(await discover()).toEqual(["blair"]);
     // A friends-only or only-me post from a public profile stays out.
     await post("acc-b", "b2", NOW - 1_000, "friends");

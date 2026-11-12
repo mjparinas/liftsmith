@@ -17,6 +17,7 @@ import { epley, TIMED } from "./progression";
 import { encodeRoutine } from "./routineShare";
 import { musclesWorked } from "./shareCards";
 import { SITE_URL } from "./site";
+import { cached, fetchPart, fetchParts, keep } from "./socialCache";
 import {
   SOCIAL_LIMITS,
   type Audience,
@@ -91,17 +92,61 @@ interface SocialState {
 
 export const useSocial = create<SocialState>(() => ({ me: null, error: null, loading: false }));
 
+// Whatever changes the lifter's own state (joining, a setting, leaving) is kept for the next launch too.
+useSocial.subscribe((st, prev) => {
+  const account = st.me !== prev.me && st.me ? readAccount() : null;
+  if (account) keep(account.id, "me", st.me);
+});
+
 let inflight: Promise<void> | null = null;
-/** Reads the lifter's own Friends state. Signed out, it's simply nothing. */
+/**
+ * Reads the lifter's own Friends state. Signed out, it's simply nothing. The copy from last time (socialCache.ts)
+ * shows at once while it's asked for again.
+ */
 export function refreshSocial(): Promise<void> {
-  if (!readAccount() || !socialOn()) {
+  return refreshWith(async (account) => {
+    const me = await fetchPart(account, "me", () => social<SocialMe>("me"));
+    useSocial.setState({ me, error: null });
+  });
+}
+
+/**
+ * Opening the Friends tab: the lifter's own state, the first page of the feed, training now and suggestions in one
+ * request ("home", src/server/social.ts), so nothing waits for anything else. Each part of the tab joins this
+ * request instead of asking for itself. Before joining it's only `me`; a server without "home" gets `me` alone and
+ * each part fetches itself.
+ */
+export function loadHome(): Promise<void> {
+  return refreshWith(async (account) => {
+    try {
+      const r = await fetchParts(
+        account,
+        HOME_PARTS,
+        () => social<{ me?: SocialMe; feed?: unknown; training?: unknown; suggest?: unknown } & SocialMe>("home"),
+        (r) => (r.me ? { me: r.me, feed: r.feed, training: r.training, suggest: r.suggest } : { me: r }),
+      );
+      useSocial.setState({ me: (r?.me as SocialMe | undefined) ?? null, error: null });
+    } catch (e) {
+      if (!(e instanceof AuthError) || e.message !== "Unknown op.") throw e;
+      const me = await fetchPart(account, "me", () => social<SocialMe>("me"));
+      useSocial.setState({ me, error: null });
+    }
+  });
+}
+const HOME_PARTS = ["me", "feed", "training", "suggest"];
+
+function refreshWith(load: (account: string) => Promise<void>): Promise<void> {
+  const account = readAccount();
+  if (!account || !socialOn()) {
     useSocial.setState({ me: null, error: null, loading: false });
     return Promise.resolve();
   }
+  const kept = cached<SocialMe>(account.id, "me");
+  if (kept && !useSocial.getState().me) useSocial.setState({ me: kept });
   inflight ??= (async () => {
     useSocial.setState({ loading: true });
     try {
-      useSocial.setState({ me: await social<SocialMe>("me"), error: null });
+      await load(account.id);
     } catch (e) {
       useSocial.setState({ error: socialError(e) });
     } finally {
