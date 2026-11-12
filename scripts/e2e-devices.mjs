@@ -1,4 +1,4 @@
-// Layout on the phones and tablets in scripts/devices.mjs: no sideways scroll, the main buttons on screen,
+// Layout on the phones, tablets and desktop browsers in scripts/devices.mjs: no sideways scroll, the main buttons on screen,
 // big targets, and a set logged and saved on each one.
 //   npm run build:static && node scripts/e2e-devices.mjs [base-url] [out-dir]
 //   DEVICES=ios|android|full|"Pixel 7,iPad Mini" picks a subset (default: all)
@@ -42,6 +42,9 @@ for (const { name } of pick()) {
         fail,
       );
     }
+    // Desktop browsers get the sidebar; phones and tablets (touch) keep the bottom tab bar.
+    const desktop = await page.evaluate(() => document.documentElement.dataset.layout === "desktop");
+    check(desktop === name.startsWith("Desktop"), `${name}: ${desktop ? "has" : "lacks"} the desktop layout`, fail);
     await page.screenshot({ path: `${OUT}/${tag}-today.png` });
     const start = await page.getByRole("button", { name: "Start workout" }).boundingBox();
     check(start && start.y + start.height <= opts.viewport.height, `${name}: Start workout is below the fold`, fail);
@@ -81,6 +84,13 @@ for (const { name } of pick()) {
       await page.waitForTimeout(150);
       const gap = await page.evaluate(() => {
         window.scrollTo(0, document.documentElement.scrollHeight);
+        // The desktop layout (layout.ts) has a sidebar instead: it must sit beside the page, never over it.
+        if (document.documentElement.dataset.layout === "desktop") {
+          const side = document.querySelector("nav")?.getBoundingClientRect().right ?? 0;
+          const page = document.querySelector("main")?.firstElementChild?.getBoundingClientRect().left ?? 0;
+          const start = [...document.querySelectorAll("button")].find((b) => b.textContent?.includes("Start workout"));
+          return { content: page - side, start: start ? start.getBoundingClientRect().left - side : 0 };
+        }
         const nav = document.querySelector("nav")?.getBoundingClientRect().top ?? 0;
         const end = document.querySelector("main")?.firstElementChild?.getBoundingClientRect().bottom ?? 0;
         const start = [...document.querySelectorAll("button")].find((b) => b.textContent?.includes("Start workout"));
@@ -90,14 +100,14 @@ for (const { name } of pick()) {
       check(gap.start >= 0, `${name}: the tab bar covers Start workout by ${-gap.start}px`, fail);
     }
     await bar.evaluate((el) => el.remove());
-    await page.goto(`${server.url}/me/`);
-    await page.getByRole("heading", { name: /training/ }).waitFor();
-    for (const tab of ["Overview", "Calendar", "Lifts", "History", "Log a workout", "Share"]) {
-      await page.getByRole("link", { name: tab, exact: true }).click();
-      await noSideScroll(`dashboard ${tab}`);
-    }
-    await page.getByRole("link", { name: "Overview", exact: true }).click();
-    await page.screenshot({ path: `${OUT}/${tag}-dashboard.png` });
+    // The retired /me/ dashboard sends old links into the app; its Log a workout tab is a screen there now.
+    await page.goto(`${server.url}/me/#/log`);
+    await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+    await page.getByRole("button", { name: "Add exercise" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
+    await noSideScroll("log a past workout");
+    await page.screenshot({ path: `${OUT}/${tag}-log-past.png` });
   } catch (e) {
     fail.push(`${name}: ${e}`);
   }

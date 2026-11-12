@@ -6,6 +6,8 @@ import { track } from "@/lib/analytics";
 import { available, exercise } from "@/lib/exercises";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
+import { useDesktop } from "@/lib/layout";
+import { moveItem as moveTo } from "@/lib/reorder";
 import { MAX_ITEMS, moveItem, NAME_MAX, routineFrom } from "@/lib/routines";
 import { codeFromLink, encodeRoutine, routineUrl } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
@@ -40,7 +42,7 @@ export function RoutinesSheet({ open, onClose }: { open: boolean; onClose: () =>
   };
   if (editing) {
     return (
-      <Sheet open={open} onClose={close} title={routines.some((r) => r.id === editing.id) ? t("rt.edit") : t("rt.new")}>
+      <Sheet wide open={open} onClose={close} title={routines.some((r) => r.id === editing.id) ? t("rt.edit") : t("rt.new")}>
         <RoutineEditor
           initial={editing}
           onSave={(r) => {
@@ -165,7 +167,7 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
       >
         {saved ? t("rt.saved") : t("rt.saveAs")}
       </Button>
-      <Sheet open={!!editing} onClose={() => setEditing(null)} title={t("rt.saveAs")}>
+      <Sheet wide open={!!editing} onClose={() => setEditing(null)} title={t("rt.saveAs")}>
         {editing && (
           <RoutineEditor
             initial={editing}
@@ -265,6 +267,10 @@ function RoutineEditor({
   const [name, setName] = useState(initial.name);
   const [items, setItems] = useState<RoutineItem[]>(initial.items);
   const [adding, setAdding] = useState(initial.items.length === 0);
+  // Desktop layout (layout.ts): the exercise browser stays open beside the routine, and rows drag to a new place
+  // (the up and down buttons still work, for the keyboard).
+  const desktop = useDesktop();
+  const [dragging, setDragging] = useState<number | null>(null);
   const tick = () => {
     haptic("select");
     sound.tick();
@@ -284,128 +290,152 @@ function RoutineEditor({
     // Keep the supersets that don't involve the removed exercise; a lone leftover loses its link.
     setItems(withLinks(left, linksOf(left)));
   };
+  const add = (id: string) => {
+    tick();
+    setItems([...items, { exerciseId: id, sets: 3 }]);
+    setAdding(false);
+  };
+  const picker = <ExercisePicker gym={gym} skip={items.map((i) => i.exerciseId)} onPick={add} />;
   return (
-    <div>
-      <label className="block text-sm font-medium" htmlFor="routine-name">
-        {t("rt.name")}
-      </label>
-      <input
-        id="routine-name"
-        value={name}
-        maxLength={NAME_MAX}
-        onChange={(e) => setName(e.target.value)}
-        placeholder={t("rt.namePlaceholder")}
-        className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
-      />
-      {items.length > 0 && (
-        <ol className="mt-4 divide-y divide-line/70 overflow-hidden rounded-2xl border border-line">
-          {items.map((it, i) => {
-            const ex = exercise(it.exerciseId);
-            return (
-              <li key={`${it.exerciseId}-${i}`} className={`px-3 py-2 ${it.group ? "bg-accent/5" : ""}`}>
-                <div className="flex items-center gap-2">
-                  {i > 0 ? (
-                    <LinkToggle
-                      on={linkedToNext(items, i - 1)}
-                      first={exercise(items[i - 1].exerciseId).name}
-                      second={ex.name}
-                      onToggle={() => setItems(toggleLink(items, i - 1))}
-                    />
-                  ) : (
-                    <span className="w-11 shrink-0" aria-hidden />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className="truncate font-medium">{ex.name}</div>
-                    <div className="text-xs text-muted">{ex.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}</div>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => remove(i)}
-                    aria-label={t("rt.remove", { name: ex.name })}
-                    className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:text-bad"
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2.2}
-                      strokeLinecap="round"
-                      aria-hidden
-                    >
-                      <path d="M6 6l12 12M18 6 6 18" />
-                    </svg>
-                  </button>
-                </div>
-                <div className="mt-1 flex items-center justify-between pl-[52px]">
-                  <div className="flex items-center gap-1">
-                    <Bump dir={-1} size="sm" aria={t("rt.fewer", { name: ex.name })} onStep={(d) => setSets(i, d)} />
-                    <span className="num w-16 text-center text-sm font-semibold">{t("rt.sets", { count: it.sets })}</span>
-                    <Bump dir={1} size="sm" aria={t("rt.more", { name: ex.name })} onStep={(d) => setSets(i, d)} />
-                  </div>
-                  <div className="flex items-center gap-1">
+    <div className={desktop ? "grid grid-cols-2 items-start gap-6" : undefined}>
+      <div className="min-w-0">
+        <label className="block text-sm font-medium" htmlFor="routine-name">
+          {t("rt.name")}
+        </label>
+        <input
+          id="routine-name"
+          value={name}
+          maxLength={NAME_MAX}
+          onChange={(e) => setName(e.target.value)}
+          placeholder={t("rt.namePlaceholder")}
+          className="mt-1 w-full rounded-xl border border-line bg-raised px-3 py-3 text-base outline-none focus:border-accent"
+        />
+        {items.length > 0 && (
+          <ol className="mt-4 divide-y divide-line/70 overflow-hidden rounded-2xl border border-line">
+            {items.map((it, i) => {
+              const ex = exercise(it.exerciseId);
+              return (
+                // Dragging is a mouse convenience on desktop; the up and down buttons do the same from the keyboard.
+                // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+                <li
+                  key={`${it.exerciseId}-${i}`}
+                  className={`px-3 py-2 ${it.group ? "bg-accent/5" : ""} ${desktop ? "cursor-grab" : ""} ${dragging === i ? "opacity-50" : ""}`}
+                  draggable={desktop}
+                  onDragStart={(e) => {
+                    e.dataTransfer.effectAllowed = "move";
+                    setDragging(i);
+                  }}
+                  onDragOver={(e) => {
+                    if (dragging !== null) e.preventDefault();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    if (dragging !== null && dragging !== i) {
+                      tick();
+                      setItems(moveTo(items, dragging, i));
+                    }
+                    setDragging(null);
+                  }}
+                  onDragEnd={() => setDragging(null)}
+                >
+                  <div className="flex items-center gap-2">
+                    {i > 0 ? (
+                      <LinkToggle
+                        on={linkedToNext(items, i - 1)}
+                        first={exercise(items[i - 1].exerciseId).name}
+                        second={ex.name}
+                        onToggle={() => setItems(toggleLink(items, i - 1))}
+                      />
+                    ) : (
+                      <span className="w-11 shrink-0" aria-hidden />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate font-medium">{ex.name}</div>
+                      <div className="text-xs text-muted">{ex.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}</div>
+                    </div>
                     <button
                       type="button"
-                      disabled={i === 0}
-                      onClick={() => {
-                        tick();
-                        setItems(moveItem(items, i, -1));
-                      }}
-                      aria-label={t("rt.up", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
+                      onClick={() => remove(i)}
+                      aria-label={t("rt.remove", { name: ex.name })}
+                      className="press grid h-11 w-11 shrink-0 place-items-center rounded-full text-muted hover:text-bad"
                     >
-                      <Icon name="chevronLeft" size={18} className="rotate-90" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={i === items.length - 1}
-                      onClick={() => {
-                        tick();
-                        setItems(moveItem(items, i, 1));
-                      }}
-                      aria-label={t("rt.down", { name: ex.name })}
-                      className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
-                    >
-                      <Icon name="chevronRight" size={18} className="rotate-90" />
+                      <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.2}
+                        strokeLinecap="round"
+                        aria-hidden
+                      >
+                        <path d="M6 6l12 12M18 6 6 18" />
+                      </svg>
                     </button>
                   </div>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      )}
-      {items.length < MAX_ITEMS &&
-        (adding ? (
-          <ExercisePicker
-            gym={gym}
-            skip={items.map((i) => i.exerciseId)}
-            onPick={(id) => {
-              tick();
-              setItems([...items, { exerciseId: id, sets: 3 }]);
-              setAdding(false);
-            }}
-          />
-        ) : (
-          <Button kind="quiet" icon="plus" className="mt-3 w-full" onClick={() => setAdding(true)}>
-            {t("rt.add")}
-          </Button>
-        ))}
-      <div className="mt-5 grid gap-2">
-        <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>
-          {t("rt.save")}
-        </Button>
-        {shareable && <ShareRoutine routine={initial} />}
-        {shareable && <SendToFriend name={initial.name} items={initial.items} />}
-        {onDelete && (
-          <Button kind="danger" className="w-full" onClick={onDelete}>
-            {t("rt.delete")}
-          </Button>
+                  <div className="mt-1 flex items-center justify-between pl-[52px]">
+                    <div className="flex items-center gap-1">
+                      <Bump dir={-1} size="sm" aria={t("rt.fewer", { name: ex.name })} onStep={(d) => setSets(i, d)} />
+                      <span className="num w-16 text-center text-sm font-semibold">{t("rt.sets", { count: it.sets })}</span>
+                      <Bump dir={1} size="sm" aria={t("rt.more", { name: ex.name })} onStep={(d) => setSets(i, d)} />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={i === 0}
+                        onClick={() => {
+                          tick();
+                          setItems(moveItem(items, i, -1));
+                        }}
+                        aria-label={t("rt.up", { name: ex.name })}
+                        className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
+                      >
+                        <Icon name="chevronLeft" size={18} className="rotate-90" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={i === items.length - 1}
+                        onClick={() => {
+                          tick();
+                          setItems(moveItem(items, i, 1));
+                        }}
+                        aria-label={t("rt.down", { name: ex.name })}
+                        className="press grid h-11 w-11 place-items-center rounded-full text-muted disabled:opacity-30"
+                      >
+                        <Icon name="chevronRight" size={18} className="rotate-90" />
+                      </button>
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ol>
         )}
-        <Button kind="quiet" className="w-full" onClick={onCancel}>
-          {t("rt.cancel")}
-        </Button>
+        {items.length < MAX_ITEMS &&
+          !desktop &&
+          (adding ? (
+            picker
+          ) : (
+            <Button kind="quiet" icon="plus" className="mt-3 w-full" onClick={() => setAdding(true)}>
+              {t("rt.add")}
+            </Button>
+          ))}
+        <div className="mt-5 grid gap-2">
+          <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>
+            {t("rt.save")}
+          </Button>
+          {shareable && <ShareRoutine routine={initial} />}
+          {shareable && <SendToFriend name={initial.name} items={initial.items} />}
+          {onDelete && (
+            <Button kind="danger" className="w-full" onClick={onDelete}>
+              {t("rt.delete")}
+            </Button>
+          )}
+          <Button kind="quiet" className="w-full" onClick={onCancel}>
+            {t("rt.cancel")}
+          </Button>
+        </div>
       </div>
+      {desktop && items.length < MAX_ITEMS && <div className="min-w-0 [&>div]:mt-0">{picker}</div>}
     </div>
   );
 }

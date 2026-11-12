@@ -28,7 +28,10 @@ export async function loadMetricsInput(days: number, now = Date.now()): Promise<
          (SELECT MIN(at) FROM events e WHERE e.install_id = i.id AND e.name = 'onboarding_complete') AS onboarded,
          (SELECT MIN(at) FROM events e WHERE e.install_id = i.id AND e.name = 'workout_start') AS first_workout,
          (SELECT COUNT(*) FROM events e WHERE e.install_id = i.id AND e.name = 'workout_finish') AS workouts,
-         (SELECT MIN(at) FROM events e WHERE e.install_id = i.id AND e.name = 'paywall_view') AS paywall
+         (SELECT MIN(at) FROM events e WHERE e.install_id = i.id AND e.name = 'paywall_view') AS paywall,
+         (SELECT MIN(at) FROM events e WHERE e.install_id = i.id AND e.name = 'trial_recap') AS recap,
+         (SELECT COUNT(*) FROM events e, (SELECT MIN(at) AS t FROM subscription_events s WHERE s.install_id = i.id AND s.kind = 'trial_start') ts
+           WHERE e.install_id = i.id AND e.name = 'workout_finish' AND ts.t IS NOT NULL AND e.at >= ts.t AND e.at < ts.t + ${14 * DAY}) AS trial_workouts
        FROM installs i WHERE i.test = 0 AND (i.first_seen >= ? OR i.last_seen >= ?)`,
         [Math.min(prevSince, now - 400 * DAY), since],
       ),
@@ -116,6 +119,8 @@ export async function loadMetricsInput(days: number, now = Date.now()): Promise<
       firstWorkout: i.first_workout == null ? null : n(i.first_workout),
       workouts: n(i.workouts),
       paywall: i.paywall == null ? null : n(i.paywall),
+      trialWorkouts: n(i.trial_workouts),
+      recap: i.recap == null ? null : n(i.recap),
     })),
     active: active.map((r) => ({ day: n(r.day), platform: String(r.platform), n: n(r.n) })),
     dau: n(dau[0]?.n),

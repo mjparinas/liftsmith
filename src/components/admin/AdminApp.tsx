@@ -13,6 +13,7 @@ import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
+import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
@@ -677,7 +678,7 @@ export function AdminApp() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16">
-      <header className="sticky top-0 z-20 -mx-4 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
+      <header className="z-20 -mx-4 md:sticky md:top-0 border-b border-line bg-bg/95 px-4 py-3 backdrop-blur">
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="mr-auto text-lg font-bold">
             Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
@@ -706,7 +707,8 @@ export function AdminApp() {
             Sign out
           </button>
         </div>
-        <nav className="mt-3 flex gap-1 overflow-x-auto" aria-label="Sections">
+        {/* Every section stays in view: the tabs wrap onto more lines instead of scrolling sideways (Melvin, 2026-11-12). */}
+        <nav className="mt-3 flex flex-wrap gap-1" aria-label="Sections">
           {TABS.map((t) => (
             <button
               key={t}
@@ -893,6 +895,21 @@ export function AdminApp() {
                 </Card>
               ))}
             </div>
+            <Card
+              title="The first two weeks: trial to paid"
+              subtitle="Trials started by the period's installs, and whether they trained in the 14 days after."
+            >
+              <Funnel steps={data.trialFunnel} />
+            </Card>
+            <Card
+              title="Trials that ended, by what happened in them"
+              subtitle="Did training in the trial, and seeing what Pro did (the trial notes and the paywall recap), lead to paying?"
+            >
+              <Table
+                columns={["", "Trials", "Paid", "Trial to paid"]}
+                rows={data.trialSplit.map((r) => [r.key, fmtInt(r.trials), fmtInt(r.paid), fmtPct(r.rate, 0)])}
+              />
+            </Card>
             <Card title="Setup wizard, step by step" subtitle="Installs that reached each step.">
               <Funnel steps={data.onboarding.map((s) => ({ key: `${s.step + 1}. ${s.name}`, n: s.n }))} />
             </Card>
@@ -1038,7 +1055,12 @@ export function AdminApp() {
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
-        {tab === "Reports" && <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />}
+        {tab === "Reports" && (
+          <>
+            <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
+            <GymReports admin={data.staff.role === "admin"} />
+          </>
+        )}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}

@@ -68,6 +68,15 @@ describe("training now", () => {
     await waitFor(() => expect(screen.getByTestId("cheer-rain")).toHaveTextContent("🔥"));
   });
 
+  it("leaves out the cheer buttons for a friend who turned cheers off", async () => {
+    await handle("acc-b", { op: "update", cheers: false });
+    await handle("acc-b", { op: "live", sessionId: "s1", exercise: "bench", done: 3, total: 12 });
+    await signIn("tok-a");
+    render(<TrainingNow />);
+    expect(await screen.findByText(/3 of 12 sets done/)).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "🔥 Cheer Blair on" })).not.toBeInTheDocument();
+  });
+
   it("shows nothing when no friend is training", async () => {
     await signIn("tok-a");
     const { container } = render(<TrainingNow />);

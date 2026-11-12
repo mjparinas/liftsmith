@@ -55,6 +55,7 @@ import { AddExercise } from "./workout/AddExercise";
 import { CheerRain } from "./workout/CheerRain";
 import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
+import { KeyboardLog } from "./workout/KeyboardLog";
 import { MachineCard } from "./workout/MachineCard";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
@@ -854,6 +855,14 @@ export function Workout() {
                 </Button>
               </div>
             </div>
+          )}
+          {!finished && !!ex && (
+            <KeyboardLog
+              onLog={log}
+              weight={ex.load !== "bodyweight" ? weightStep : null}
+              reps={repStep}
+              paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
+            />
           )}
         </div>
       </div>

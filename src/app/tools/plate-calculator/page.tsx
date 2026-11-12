@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EmbedCode } from "@/components/site/EmbedCode";
 import { PlateCalculator } from "@/components/site/PlateCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { embedFor } from "@/lib/embeds";
 import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
@@ -12,6 +14,7 @@ export const metadata: Metadata = pageMeta({
   description:
     "Enter a weight and see exactly which plates to load on each side of a barbell, in kg or lb, with the plates you have. Finds the nearest weight when it can't be made.",
   path: "/tools/plate-calculator/",
+  translated: true,
 });
 
 const FAQ: [string, string][] = [
@@ -52,7 +55,7 @@ const jsonLd = [
 
 export default function PlatePage() {
   return (
-    <SitePage kind="tool" sticky="Plates drawn for every set">
+    <SitePage kind="tool" sticky="Plates drawn for every set" path="/tools/plate-calculator/">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "Plate calculator" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Plate calculator</h1>
@@ -86,6 +89,7 @@ export default function PlatePage() {
           .
         </p>
       </section>
+      <EmbedCode embed={embedFor("plate-calculator")!} />
       <CtaBanner
         cta="tool-plates-end"
         title="Every set loaded for you"

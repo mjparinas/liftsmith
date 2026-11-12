@@ -30,6 +30,7 @@ import type { MessageKey } from "@/locales/en";
 import { CreatorCode } from "./CreatorCode";
 import { celebratePro } from "./ProWelcome";
 import { go, goBack, historyDepth, ROUTES, useRoute, type Route } from "./router";
+import { TrialRecap } from "./TrialMoments";
 import { Button, ScreenHeader } from "./ui";
 
 // The paywall (#/pro, also the last step of first-run setup). AGENTS.md "Money": plain prices from the
@@ -53,10 +54,15 @@ const FROM: Record<string, { feature?: Feature; back: Route }> = {
   stats: { feature: "advancedStats", back: "stats" },
   lift: { feature: "advancedStats", back: "stats" },
   connections: { feature: "cloudConnections", back: "connections" },
+  coaching: { feature: "coaching", back: "trainer" },
   settings: { back: "settings" },
   // Back from Stripe Checkout on the web (src/server/stripe.ts RETURN_URLS).
   paid: { back: "today" },
   setup: { back: "today" },
+  // The trial's coach's notes (trialNotes.ts): halfway, a cancelled trial's last two days, and after it lapsed.
+  trial: { back: "today" },
+  trialEnd: { back: "today" },
+  trialEnded: { feature: "adaptive", back: "today" },
 };
 
 /** Where #/pro/<arg> came from: the feature to mark on the paywall and the screen behind it. */
@@ -296,6 +302,8 @@ export function Pro() {
     <div className="pb-24">
       <ScreenHeader back={{ label: `‹ ${t("pro.back")}`, onClick: leave }} title={active ? t("pro.youHave") : t("pro.title")} />
       <p className="mt-2 text-muted">{t("pro.lead")}</p>
+      {/* In the trial and the two weeks after: what Pro did for this lifter, before what it could do. */}
+      <TrialRecap />
       <ProFeatures focus={active ? undefined : from.feature} />
       {confirming ? (
         <p role="status" className="card mt-6 p-4 text-sm text-muted">

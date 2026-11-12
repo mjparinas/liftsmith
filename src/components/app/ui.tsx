@@ -370,10 +370,23 @@ export function Section({
   );
 }
 
-export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+export function Sheet({
+  open,
+  onClose,
+  title,
+  children,
+  wide,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  /** On the desktop layout, a wide dialog (the routine builder's two columns); phones are unchanged. */
+  wide?: boolean;
+}) {
   if (!open) return null;
   return (
-    <SheetBody onClose={onClose} title={title}>
+    <SheetBody onClose={onClose} title={title} wide={wide}>
       {children}
     </SheetBody>
   );
@@ -390,9 +403,10 @@ const NO_SWIPE = "canvas, input[type=range], [data-no-swipe]";
  * closes; Escape closes it, and Tab stays inside it (keyboard and switch access, WCAG 2.1.2, 2.4.3).
  * It closes four ways, so it's always clear how to get out (Melvin, 2026-11-09): the ✕ button in its
  * header, swiping it down (from the handle, or anywhere while it's scrolled to the top), tapping
- * outside, and Escape.
+ * outside, and Escape. On the desktop layout (layout.ts) it opens as a centred dialog instead, without
+ * the handle, and closes by the ✕, clicking outside and Escape.
  */
-function SheetBody({ onClose, title, children }: { onClose: () => void; title: string; children: ReactNode }) {
+function SheetBody({ onClose, title, children, wide }: { onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const id = useId();
   const closeRef = useRef(onClose);
@@ -512,6 +526,8 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
     let pointer: number | null = null;
     const pDown = (e: PointerEvent) => {
       if (e.pointerType === "touch" || e.button !== 0 || pointer !== null) return;
+      // On the desktop layout the sheet is a centred dialog (layout.ts): no handle, and dragging it down means nothing.
+      if (document.documentElement.dataset.layout === "desktop") return;
       const target = e.target as Element | null;
       if (!target?.closest("[data-sheet-handle]") || target.closest("button, a, input, select, textarea")) return;
       e.preventDefault(); // no text selection while dragging
@@ -560,7 +576,10 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
   return createPortal(
     // Tapping outside closes it too: a pointer convenience, since Escape and the sheet's own buttons cover the keyboard.
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    <div className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px]" onClick={onClose}>
+    <div
+      className="animate-fade fixed inset-0 z-50 flex items-end justify-center bg-black/60 backdrop-blur-[2px] desk:items-center desk:p-8"
+      onClick={onClose}
+    >
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
       <div
         ref={box}
@@ -569,12 +588,12 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
         aria-modal="true"
         aria-labelledby={`${id}-t`}
         data-testid="sheet"
-        className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none"
+        className={`animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg ${wide ? "desk:max-w-4xl" : ""} overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none desk:max-h-[85dvh] desk:rounded-3xl desk:border desk:pt-4 desk:shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div
           data-sheet-handle
-          className="-mx-5 flex cursor-grab justify-center pb-2 pt-1 active:cursor-grabbing"
+          className="-mx-5 flex cursor-grab justify-center pb-2 pt-1 active:cursor-grabbing desk:hidden"
           style={{ touchAction: "none" }}
           aria-hidden="true"
         >

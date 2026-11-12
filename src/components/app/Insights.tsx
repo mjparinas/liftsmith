@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { friendNotes, useFriendSignals } from "@/lib/friendNotes";
 import { t } from "@/lib/i18n";
@@ -11,12 +11,14 @@ import { dayKey } from "@/lib/random";
 import { trendShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { togglePriority } from "@/lib/training";
+import { trialNote } from "@/lib/trialNotes";
 import { useNow } from "@/lib/useNow";
 
 import { useGame } from "./Achievements";
 import { Icon } from "./icons";
 import { go, type Route } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
+import { trackRecap, useTrial } from "./TrialMoments";
 import { ProTag, Section } from "./ui";
 
 // Coach's notes: the proactive insights from insights.ts, each with what we saw, what to do and a
@@ -46,6 +48,7 @@ export function useInsights(): Insight[] {
   const g = useGame();
   const hour = Math.floor(now / 3_600_000);
   const friends = useFriendSignals(now);
+  const trial = useTrial();
   // Recomputed when the log changes or once an hour, not every tick.
   const own = useMemo(
     () => insights({ events, profile, now, streak: g.streak }),
@@ -53,13 +56,21 @@ export function useInsights(): Insight[] {
     [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks],
   );
   // Friend nudges (friendNotes.ts) join by tone, after the lifter's own notes of the same tone.
-  return useMemo(() => {
+  const notes = useMemo(() => {
     if (!friends) return own;
     const monday = weekStart(now);
     const mine = stats.sessions.filter((s) => s.start >= monday).length;
     return [...own, ...friendNotes(friends, { profile, now, mine })].sort((a, b) => RANK[a.tone] - RANK[b.tone]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [own, friends, stats.sessions, hour]);
+  // The trial's note (halfway, last two days, after it lapsed) goes first: it only lasts a few days
+  // (docs/decisions/money.md "The first two weeks").
+  return useMemo(() => {
+    const note = trial && trialNote({ ...trial, unit: profile.unit, now });
+    if (!note || !trial) return notes;
+    return [{ ...note, onShow: () => trackRecap("note", note.stage, trial.win, trial.impact) }, ...notes];
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [notes, trial, profile.unit, hour]);
 }
 
 export function CoachNotes({ limit, title: given }: { limit?: number; title?: string }) {
@@ -67,6 +78,10 @@ export function CoachNotes({ limit, title: given }: { limit?: number; title?: st
   const all = useInsights();
   const [dismissed, setDismissed] = useState<string[]>(readDismissed);
   const shown = all.filter((i) => !dismissed.includes(i.id)).slice(0, limit);
+  const ids = shown.map((i) => i.id).join(" ");
+  useEffect(() => {
+    for (const i of shown) i.onShow?.();
+  }, [ids]); // eslint-disable-line react-hooks/exhaustive-deps
   if (!shown.length) return null;
   const dismiss = (id: string) => {
     haptic("tick");

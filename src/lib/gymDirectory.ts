@@ -1,0 +1,108 @@
+"use client";
+
+// Find a gym near you, the app side (server: src/server/gymDirectory.ts; docs/decisions/gym-sharing.md).
+// Positions are rounded to 0.01° (about 1 km) here, before anything is sent, so the precise position never
+// leaves the phone. Listing a gym needs an account; finding, adding and reporting don't.
+import { api, AuthError, readAccount } from "./auth";
+import { locate } from "./geo";
+import { encodeGym, kitOf } from "./gymShare";
+import type { Gym } from "./types";
+
+export interface Listing {
+  id: string;
+  name: string;
+  code: string;
+  unit: "kg" | "lb";
+  km: number;
+  adds: number;
+}
+
+export interface MyListing {
+  id: string;
+  localId: string;
+  name: string;
+  hidden: boolean;
+}
+
+export const REPORT_REASONS = ["wrong", "private", "spam", "offensive"] as const;
+export type ReportReason = (typeof REPORT_REASONS)[number];
+
+const cell = (x: number) => Math.round(x * 100) / 100;
+const token = () => readAccount()?.token;
+
+export type FindResult = { gyms: Listing[] } | { error: "location" | "offline" | "slow" | "failed" };
+
+/** Gyms listed near where the lifter is now (one approximate position, asked for the first time). */
+export async function findNearby(): Promise<FindResult> {
+  const fix = await locate();
+  if (!fix) return { error: "location" };
+  try {
+    const r = await api<{ gyms: Listing[] }>(`/api/gyms/?lat=${cell(fix.lat)}&lon=${cell(fix.lon)}`);
+    return { gyms: r.gyms };
+  } catch (e) {
+    return { error: problem(e) };
+  }
+}
+
+const problem = (e: unknown): "offline" | "slow" | "failed" =>
+  e instanceof AuthError && e.message === "offline" ? "offline" : e instanceof AuthError && e.status === 429 ? "slow" : "failed";
+
+export type ListError = "signedOut" | "location" | "offline" | "slow" | "full" | "link" | "words" | "empty" | "failed";
+
+/** Lists a gym at its saved place, else where the lifter is now. */
+export async function listGym(gym: Gym): Promise<{ id: string } | { error: ListError }> {
+  const t = token();
+  if (!t) return { error: "signedOut" };
+  const at = gym.place ?? (await locate());
+  if (!at) return { error: "location" };
+  try {
+    const r = await api<{ id: string }>("/api/gyms/", {
+      token: t,
+      body: { op: "publish", localId: gym.id, name: gym.name, code: encodeGym(kitOf(gym)), lat: cell(at.lat), lon: cell(at.lon) },
+    });
+    return { id: r.id };
+  } catch (e) {
+    const m = e instanceof AuthError ? e.message : "";
+    if (m === "full" || m === "link" || m === "words" || m === "empty") return { error: m };
+    return { error: problem(e) };
+  }
+}
+
+export async function unlistGym(localId: string): Promise<boolean> {
+  const t = token();
+  if (!t) return false;
+  try {
+    await api("/api/gyms/", { token: t, body: { op: "unpublish", localId } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function myListings(): Promise<MyListing[] | null> {
+  const t = token();
+  if (!t) return null;
+  try {
+    return (await api<{ gyms: MyListing[] }>("/api/gyms/", { token: t, body: { op: "mine" } })).gyms;
+  } catch {
+    return null;
+  }
+}
+
+export async function reportGym(id: string, reason: ReportReason): Promise<boolean> {
+  try {
+    await api("/api/gyms/", { token: token(), body: { op: "report", id, reason } });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+// The listing a gym link was opened from, so adding it counts toward the listing and the preview can offer a report.
+let picked: { id: string; code: string } | null = null;
+export const pickListing = (l: Pick<Listing, "id" | "code">) => void (picked = { id: l.id, code: l.code });
+export const listingFor = (code: string | undefined) => (code && picked?.code === code ? picked.id : null);
+
+export function markAdded(id: string): void {
+  void api("/api/gyms/", { token: token(), body: { op: "added", id } }).catch(() => null);
+}

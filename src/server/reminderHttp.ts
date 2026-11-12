@@ -2,8 +2,9 @@
 // and the store and mailer for this server.
 import { NATIVE_ORIGINS } from "@/lib/feedbackServer";
 
+import { accountInfo, sessionOf } from "./accounts";
 import { rateLimit } from "./db";
-import { reminderEnv, resendMailer, type Env, type Mailer, type Store } from "./reminders";
+import { reminderEnv, resendMailer, type Env, type Mailer, type Store, type Verified } from "./reminders";
 import { dbStore } from "./remindersDb";
 
 export const MAX_BODY = 8_000;
@@ -13,7 +14,7 @@ export function cors(origin: string | null): Record<string, string> {
     ? {
         "Access-Control-Allow-Origin": origin,
         "Access-Control-Allow-Methods": "POST, DELETE, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
+        "Access-Control-Allow-Headers": "Content-Type, Authorization",
         Vary: "Origin",
       }
     : {};
@@ -63,3 +64,17 @@ export const html = (body: string, status = 200) =>
     status,
     headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store", "X-Robots-Tag": "noindex" },
   });
+
+/** The signed-in account's verified email, when the request carries its session (Bearer token). Anything that
+ *  goes wrong reads as signed out, which only means the address gets a confirmation email instead. */
+export async function verifiedAccount(req: Request): Promise<Verified | null> {
+  if (!req.headers.get("authorization")) return null;
+  try {
+    const s = await sessionOf(req);
+    if (!s) return null;
+    const a = await accountInfo(s.accountId);
+    return a?.email ? { accountId: a.id, email: a.email } : null;
+  } catch {
+    return null;
+  }
+}

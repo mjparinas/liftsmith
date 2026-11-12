@@ -4,8 +4,10 @@
 import { ARTICLES, type Article } from "@/content/articles";
 import { BLOG_TOPICS, topicPath } from "@/content/blogTopics";
 import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
+import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
+import { LOCAL_TOOL_PATHS } from "@/locales/site/tools/types";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { HELP, helpPath } from "./faqs";
@@ -154,6 +156,14 @@ export const pairsWith = (eq: Equipment) => pairs().filter((p) => p.equipment ==
 /** Alternatives for any gym (the app's own swap ranking, without a gym's equipment limit). */
 export const alternativesTo = (id: string, n = 12): Exercise[] => alternatives(id, null).slice(0, n);
 
+/**
+ * Whether an exercise's alternatives page is offered to search engines. Only the most searched lifts (the ones with
+ * a full guide, EXERCISE_GUIDES) are; the other ~950 pages read as near-copies of each other, which on a new domain
+ * can slow how much of the site gets crawled and indexed. Those stay up for visitors, `noindex, follow`, out of the
+ * sitemap (2026-11-12).
+ */
+export const indexAlternatives = (id: string): boolean => id in EXERCISE_GUIDES && alternativesTo(id).length > 0;
+
 /** "Barbell, flat bench and squat rack", or "No equipment". */
 export function needsText(e: Exercise): string {
   if (!e.needs.length) return "No equipment";
@@ -264,6 +274,7 @@ export function siteRoutes(): Route[] {
     { path: "/terms/", priority: 0.2 },
     { path: "/accessibility/", priority: 0.3 },
     { path: "/pricing/", priority: 0.8 },
+    { path: "/coaches/", priority: 0.7 },
     { path: "/help/", priority: 0.6 },
     ...HELP.map((t) => ({ path: helpPath(t), priority: 0.5 })),
     { path: "/contact/", priority: 0.4 },
@@ -280,8 +291,8 @@ export function siteRoutes(): Route[] {
     { path: "/features/", priority: 0.7 },
     ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
-  // The translated pages (src/lib/siteLang.ts): every language's copy, each listing all of them.
-  for (const path of LOCALIZED_PATHS) {
+  // The translated pages (src/lib/siteLang.ts, and the translated tools): every language's copy, each listing all of them.
+  for (const path of [...LOCALIZED_PATHS, ...LOCAL_TOOL_PATHS]) {
     const languages = languageAlternates(path);
     for (const route of r) if (route.path === path) route.languages = languages;
     for (const lang of SITE_LANGS) {
@@ -290,8 +301,17 @@ export function siteRoutes(): Route[] {
     }
   }
   for (const e of EXERCISES) {
+    if (e.id in EXERCISE_GUIDES) {
+      // The guided lifts also have a page in every other site language (src/content/exerciseGuides/i18n.ts).
+      const path = `/exercises/${e.id}/`;
+      const languages = languageAlternates(path);
+      r.push({ path, priority: 0.7, languages });
+      for (const lang of SITE_LANGS) if (lang !== "en") r.push({ path: localPath(lang, path), priority: 0.6, languages });
+      if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
+      continue;
+    }
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
-    if (alternativesTo(e.id).length) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
+    if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
   }
   for (const m of MUSCLES) if (exercisesFor(m).length) r.push({ path: `/muscles/${muscleSlug(m)}/`, priority: 0.7 });
   for (const p of pairs()) r.push({ path: `/muscles/${muscleSlug(p.muscle)}/${equipmentSlug(p.equipment)}/`, priority: 0.6 });

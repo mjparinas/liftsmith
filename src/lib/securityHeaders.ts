@@ -25,3 +25,18 @@ export const SECURITY_HEADERS: { key: string; value: string }[] = [
  */
 export const SHARE_PAGE_CSP =
   "default-src 'none'; img-src 'self'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+
+/**
+ * The free calculators other sites embed (/embed/<slug>/, src/lib/embeds.ts): the same policy, except that any site
+ * may frame them, so X-Frame-Options is left off and frame-ancestors allows every https origin. They hold no account
+ * state and no action worth tricking a click onto, so framing them is safe. next.config.ts keeps the rules above
+ * off these paths.
+ */
+export const EMBED_CSP = ["frame-ancestors https: 'self'", "object-src 'none'", "base-uri 'self'", "form-action 'self'"].join("; ");
+export const EMBED_HEADERS: { key: string; value: string }[] = [
+  ...SECURITY_HEADERS.filter((h) => h.key !== "X-Frame-Options" && h.key !== "Content-Security-Policy"),
+  { key: "Content-Security-Policy", value: EMBED_CSP },
+];
+
+/** Every path except the embeds (path-to-regexp, as next.config.ts headers take it). */
+export const NOT_EMBED = "/:path((?!embed/).*)";

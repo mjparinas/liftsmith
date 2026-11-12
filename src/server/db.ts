@@ -408,6 +408,32 @@ const SCHEMA = [
     image BLOB NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
+  // Gyms lifters chose to list so others nearby can add their setup (gymDirectory.ts). Position kept at 0.01°
+  // (about 1 km) only. Deleted with the account.
+  `CREATE TABLE IF NOT EXISTS public_gyms (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    local_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    lat REAL NOT NULL,
+    lon REAL NOT NULL,
+    adds INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE (account_id, local_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS public_gyms_place ON public_gyms (lat, lon)`,
+  `CREATE TABLE IF NOT EXISTS gym_reports (
+    reporter TEXT NOT NULL,
+    gym_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    PRIMARY KEY (reporter, gym_id)
+  )`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -546,6 +572,24 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // Monthly challenge finishers (monthly.ts, Friends gap list 3 item 10): one row per device that finished a
+  // month's challenge, for the app-wide count on the Awards card. A random id the device makes for this alone (not
+  // the usage-stats install id or an account), so a row says nothing about who finished.
+  `CREATE TABLE IF NOT EXISTS month_finishers (
+    month TEXT NOT NULL,
+    device TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (month, device)
+  )`,
+  // Bells (social.ts `bell`, Friends gap list 3): the watcher gets a push when someone they follow posts a workout
+  // they may see. Only while the follow stands; unfollowing, blocking or leaving deletes it.
+  `CREATE TABLE IF NOT EXISTS bells (
+    watcher_id TEXT NOT NULL,
+    watched_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (watcher_id, watched_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS bells_watched ON bells (watched_id)`,
   // People named with @handle in a comment who could see the post (social.ts comment), for their Activity.
   `CREATE TABLE IF NOT EXISTS comment_mentions (
     comment_id TEXT NOT NULL,
@@ -599,6 +643,13 @@ const SCHEMA = [
     expires_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS coach_invites_coach ON coach_invites (coach_id)`,
+  // Who coaches (Melvin, 2026-11-12: "track whether someone is a user vs a coach"): an account becomes a coach when it
+  // makes its first invite; via is "coaches" when it came in through the website's coaches page, else "app".
+  `CREATE TABLE IF NOT EXISTS coach_accounts (
+    account_id TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL,
+    via TEXT NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS coach_links (
     coach_id TEXT NOT NULL,
     client_id TEXT NOT NULL,
@@ -617,6 +668,22 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS coach_plans_pair ON coach_plans (coach_id, client_id)`,
   `CREATE INDEX IF NOT EXISTS coach_plans_client ON coach_plans (client_id)`,
+  // Trainer mode out of Labs (2026-11-12): what a coach's new clients start setup with, and one note from a coach to each client.
+  `CREATE TABLE IF NOT EXISTS coach_defaults (
+    coach_id TEXT PRIMARY KEY,
+    goal TEXT,
+    experience TEXT,
+    days INTEGER,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS coach_notes (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_notes_client ON coach_notes (client_id)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,
@@ -661,6 +728,10 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // "Let friends cheer me on" (on to start; Melvin, 2026-11-12).
+  ["social_profiles", "cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // The switch for workouts from people the lifter rang the bell for (Friends gap list 3).
+  ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],

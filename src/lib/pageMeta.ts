@@ -24,6 +24,10 @@ export interface PageMetaInput {
    * the canonical address becomes this language's, and hreflang tags list every language.
    */
   lang?: SiteLang;
+  /** Keep the page out of search results while its links are still followed (a page for visitors, not for search). */
+  noindex?: boolean;
+  /** An English page that also has a copy in every site language (an exercise guide): list them all in hreflang. */
+  translated?: boolean;
 }
 
 /** Search results cut titles at about 60 characters, so " | Liftsmith" is added only when it fits and the title
@@ -38,7 +42,8 @@ export function pageMeta(o: PageMetaInput): Metadata {
   return {
     title: o.absoluteTitle || !withBrand(o.title) ? { absolute: o.title } : o.title,
     description: o.description,
-    alternates: o.lang ? { canonical: url, languages: languageAlternates(o.path) } : { canonical: url },
+    ...(o.noindex ? { robots: { index: false, follow: true } } : {}),
+    alternates: o.lang || o.translated ? { canonical: url, languages: languageAlternates(o.path) } : { canonical: url },
     openGraph: {
       type: o.type ?? "website",
       siteName: BRAND.name,

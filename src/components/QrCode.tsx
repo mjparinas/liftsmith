@@ -1,6 +1,6 @@
 import qrcode from "qrcode-generator";
 
-// Ported from Gradelings (src/components/teachers/QrCode.tsx); used for the two-step sign-in setup.
+// Ported from Gradelings (src/components/teachers/QrCode.tsx); used for the two-step sign-in setup and Friends' scan to follow.
 
 // A QR code drawn as one inline SVG path (no image files or scripts at print time). Always black on white, whatever the
 // theme, because a code in other colours may not scan.

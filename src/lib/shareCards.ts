@@ -4,6 +4,7 @@ import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
 import { date, t } from "./i18n";
 import type { CardData } from "./shareImage";
+import { SITE_URL } from "./site";
 import { MUSCLE_LABEL, type Muscle, type Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -13,7 +14,7 @@ import { fmtNum, fromKg } from "./units";
 // - weights (kg or lb) appear only while the lifter leaves "Show weights" on;
 // - the name appears only when they turn "Show my name" on (off by default).
 
-export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap";
+export type ShareKind = "workout" | "pr" | "badge" | "level" | "trend" | "recap" | "challenge";
 
 export interface ShareOptions {
   /** Show weights lifted (kg or lb). On by default. */
@@ -206,6 +207,43 @@ export function trendShare(tr: { exerciseId: string; pct: number; weeks: number;
   };
 }
 
+/**
+ * A finished friend challenge (Friends gap list 3, item 5). Only the lifter's own place and total go on it, never a
+ * friend's name or score: they didn't choose to share. `total` is the total already in words ("42 sets").
+ */
+export function challengeShare(
+  ch: { id: string; name: string; days: number },
+  r: { place: number; of: number; won: boolean; tie: boolean },
+  total: string,
+  ctx: ShareContext,
+): Shareable {
+  const medal = r.place === 1 ? TIER_HEX.gold : r.place === 2 ? TIER_HEX.silver : r.place === 3 ? TIER_HEX.bronze : "#a78bfa";
+  const weeks = Math.round(ch.days / 7);
+  return {
+    id: `challenge-${ch.id}`,
+    kind: "challenge",
+    label: t("card.pick.challenge"),
+    file: `liftsmith-challenge-${ch.id}`,
+    card: (o) => ({
+      kicker: t("card.kicker.challenge"),
+      headline: ch.name,
+      big: {
+        value: r.won ? t(r.tie ? "card.challenge.tied" : "card.challenge.won") : t("card.challenge.place", { place: fmtNum(r.place) }),
+        label: t("card.challenge.of", { n: fmtNum(r.of) }),
+      },
+      medal: { icon: String(r.place), colour: medal },
+      tiles: [
+        [t("card.challenge.total"), total],
+        [t("card.challenge.length"), t("card.challenge.weeks", { count: weeks, n: fmtNum(weeks) })],
+      ],
+      lines: [],
+      footer: footer(ctx.game),
+      accent: ctx.accent,
+      name: o.name,
+    }),
+  };
+}
+
 /** The best before this one on the same lift (by estimated one-rep max), or null for a first best. */
 export function previousBest(all: readonly Pr[], p: Pr): Pr | null {
   let best: Pr | null = null;
@@ -213,9 +251,12 @@ export function previousBest(all: readonly Pr[], p: Pr): Pr | null {
   return best;
 }
 
-/** Text sent with the image, for apps that take a caption. */
+/**
+ * Text sent with the image, for apps that take a caption: what it shows, then the site's address on its own line, so a post on X,
+ * Reddit or a group chat carries a link people can tap (the card itself only names the site; 2026-11-12, traffic plan).
+ */
 export function shareText(c: CardData): string {
-  return [c.headline, c.big?.value, c.footer].filter(Boolean).join(" · ");
+  return `${[c.headline, c.big?.value, c.footer].filter(Boolean).join(" · ")}\n${SITE_URL}/`;
 }
 
 /** A past workout and each personal best set in it, for the share sheet on Progress › History. */

@@ -499,4 +499,60 @@ export const LANDINGS_FEATURES: Landing[] = [
       { href: "/blog/upper-lower-split/", label: "upper lower" },
     ],
   },
+  {
+    slug: "coaching",
+    group: "features",
+    name: "Coaching",
+    title: "Coach clients with their real workouts in one app",
+    description:
+      "Invite clients with one link, see who trained and who needs you first, and give them routines and a note. Coaching is Pro; being a client is free.",
+    h1: "Coach clients from their real training",
+    intro:
+      "Send a client one invite link. Once they accept, you see **the workouts they actually logged**, set by set, and who needs your attention first.",
+    screen: "progress",
+    screenAlt: "A lifter's progress screen with recent workouts and lifts going up",
+    plan: "Pro",
+    sections: [
+      {
+        h2: "One link, and they're set up",
+        p: [
+          "Share your invite link or code. A new client signs in, accepts, picks their gym and training days, and they're training: you can pre-set their goal, level and days so setup takes under a minute.",
+          "Clients choose what you see, and can stop sharing at any time from their settings. Being coached is free for them.",
+        ],
+      },
+      {
+        h2: "Know who needs you first",
+        p: [
+          "Your client list is sorted by who needs attention: missed workouts, missed reps, stalled lifts, or a quiet week. Open a client to see their recent workouts, best lifts and how hard their sets felt.",
+        ],
+        ul: [
+          "Give a client a routine, and it shows up on their Today screen",
+          "Leave a short note they see the next time they open the app",
+          "Their plan still adapts to their recovery between your check-ins",
+        ],
+      },
+    ],
+    mid: {
+      title: "See how coaching works",
+      body: "The invite link, the client list and what your clients see.",
+      button: "Coaching in Liftsmith",
+      href: "/coaches/",
+    },
+    end: {
+      title: "Bring your clients into Liftsmith",
+      body: "Coaching is part of Pro, and your clients train free on Android, iPhone or the web. Open the app and go to Coaching to send your first invite.",
+    },
+    faq: [
+      ["Do my clients need to pay?", "No. Being a client is free; coaching your own clients is part of Pro."],
+      ["What can I see?", "The workouts a client logged, their best lifts and how hard their sets felt, for as long as they share them."],
+      ["Can I write a client's program?", "Yes. Give them one of your routines and it shows up on their Today screen, with your note."],
+      ["How many clients can I have?", "As many as you coach. Each one accepts your invite on their own account."],
+    ],
+    links: [
+      { href: "/coaches/", label: "Liftsmith for coaches" },
+      { href: "/apps/personal-trainer-app/", label: "an app for personal trainers" },
+      { href: "/blog/how-to-track-client-workouts/", label: "how to track client workouts" },
+      { href: "/blog/keep-personal-training-clients-consistent/", label: "keeping clients consistent" },
+    ],
+  },
 ];

@@ -86,12 +86,13 @@ function Muscles() {
     );
   }
   return (
-    <div>
-      <p className="mt-3 text-muted">
+    // Desktop layout: the map on the left stays in view while the muscle list scrolls beside it.
+    <div className="desk:grid desk:grid-cols-2 desk:items-start desk:gap-x-6">
+      <p className="mt-3 text-muted desk:col-span-2">
         {t("recovery.lead")} {t("map.pick")}
         <Info term="recovery" />
       </p>
-      <div className="card mt-4 p-4">
+      <div className="card mt-4 p-4 desk:sticky desk:top-6">
         <RecoveryMap rec={rec} chips={false} selected={picked} onSelect={setPicked} />
       </div>
       <Section title={t("recovery.muscles", { goal: wk.setsPerMuscle })} icon="target">

@@ -13,6 +13,8 @@ import {
   overview,
   previewInvite,
   removePlan,
+  saveSetup,
+  setNote,
   unlink,
 } from "./coach";
 import { query, resetDb } from "./db";
@@ -255,5 +257,61 @@ describe("routines a coach assigns", () => {
     await assignPlan("coach", "client", "Push", CODE, NOW, "p1");
     await unlink("client", "coach");
     expect((await overview("client", NOW)).plans).toEqual([]);
+  });
+});
+
+describe("what a coach's new clients start with", () => {
+  it("comes with the code, keeps only known answers, and survives a new code", async () => {
+    expect(await saveSetup("coach", { goal: "strength", experience: "expert", days: 9 }, NOW)).toEqual({ goal: "strength" });
+    await saveSetup("coach", { goal: "muscle", experience: "new", days: 3 }, NOW);
+    await makeInvite("coach", NOW, "AAAABBBB");
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    expect(await previewInvite("client", "CCCCDDDD", NOW)).toMatchObject({ setup: { goal: "muscle", experience: "new", days: 3 } });
+    expect(await joinCoach("client", "CCCCDDDD", NOW)).toMatchObject({ setup: { days: 3 } });
+    expect((await overview("coach", NOW)).setup).toEqual({ goal: "muscle", experience: "new", days: 3 });
+  });
+
+  it("is empty until the coach picks something", async () => {
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    expect(await previewInvite("client", "CCCCDDDD", NOW)).toMatchObject({ setup: {} });
+  });
+});
+
+describe("a coach's note to a client", () => {
+  const linked = async () => {
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  };
+
+  it("only goes to the coach's own clients", async () => {
+    expect(await setNote("coach", "client", "Hi", NOW)).toEqual({ error: "notClient" });
+    expect(await query("SELECT * FROM coach_notes")).toEqual([]);
+  });
+
+  it("shows on the client's side and in the coach's view, tidied and capped, and empty text clears it", async () => {
+    await linked();
+    await setNote("coach", "client", "  Squat day:\r\n\n\n\nkeep\u0007 it easy  ", NOW);
+    const [n] = (await overview("client", NOW)).notes;
+    expect(n).toEqual({ coachId: "coach", clientId: "client", text: "Squat day:\n\nkeep  it easy", at: NOW });
+    expect((await clientView("coach", "client", NOW))?.note?.text).toBe("Squat day:\n\nkeep  it easy");
+    await setNote("coach", "client", "x".repeat(900), NOW + 1);
+    expect((await overview("client", NOW)).notes[0]?.text).toHaveLength(COACH_LIMITS.note);
+    expect((await overview("client", NOW)).notes[0]?.at).toBe(NOW + 1);
+    expect(await setNote("coach", "client", "   ", NOW + 2)).toBeNull();
+    expect((await overview("client", NOW)).notes).toEqual([]);
+  });
+
+  it("goes when the pair unlinks or an account is deleted", async () => {
+    await linked();
+    await setNote("coach", "client", "Hi", NOW);
+    await unlink("client", "coach");
+    expect(await query("SELECT * FROM coach_notes")).toEqual([]);
+    await joinCoach("client", "CCCCDDDD", NOW);
+    await setNote("coach", "client", "Hi again", NOW);
+    await saveSetup("coach", { days: 4 }, NOW);
+    await deleteAccount("client");
+    expect(await query("SELECT * FROM coach_notes")).toEqual([]);
+    await deleteAccount("coach");
+    expect(await query("SELECT * FROM coach_defaults")).toEqual([]);
   });
 });

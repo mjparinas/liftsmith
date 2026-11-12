@@ -53,6 +53,7 @@ export function socialError(e: unknown): string {
     "caption.link": "friends.err.link",
     "caption.words": "friends.err.words",
     noOne: "friends.err.noOne",
+    cheersOff: "social.err.cheersOff",
     gone: "friends.err.gone",
     suspended: "friends.err.suspended",
     off: "friends.err.off",

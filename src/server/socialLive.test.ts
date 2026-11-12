@@ -101,6 +101,24 @@ describe("cheers", () => {
     expect((await call("acc-b", "cheer", { handle: "blair", emoji: "🔥" })).code).toBe(403);
   });
 
+  it("stop when the lifter turns cheers off, and the cheer buttons go with them", async () => {
+    await friends();
+    await call("acc-b", "update", { live: true });
+    await call("acc-b", "live", { sessionId: "s1", done: 1, total: 10 });
+    expect(await training("acc-a")).toMatchObject([{ handle: "blair", cheers: true }]);
+    await call("acc-a", "cheer", { handle: "blair", emoji: "🔥" });
+    await call("acc-b", "update", { cheers: false });
+    expect((await call("acc-b", "me")).body).toMatchObject({ profile: { cheers: false, live: true } });
+    expect(await training("acc-a")).toMatchObject([{ handle: "blair", cheers: false }]);
+    expect((await call("acc-a", "cheer", { handle: "blair", emoji: "💪" }, NOW + CHEER_GAP + 1)).body).toMatchObject({
+      error: "cheersOff",
+    });
+    // The workout screen reads none, not even the one sent before.
+    expect((await call("acc-b", "cheers", { sessionId: "s1", since: 0 })).body.cheers).toEqual([]);
+    await call("acc-b", "update", { cheers: true });
+    expect((await call("acc-a", "cheer", { handle: "blair", emoji: "💪" }, NOW + CHEER_GAP + 1)).code).toBe(200);
+  });
+
   it("are deleted with the account", async () => {
     await friends();
     await call("acc-b", "update", { live: true });

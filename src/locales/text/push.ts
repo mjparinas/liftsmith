@@ -17,6 +17,8 @@ export const en = {
   "push.mention": "{name} mentioned you: “{text}”",
   "push.reply": "{name} replied: “{text}”",
   "push.cheer": "{name} cheered you on {text}",
+  "push.posted": "{name} just posted a workout.",
+  "push.best": "{name} just set a new best. Send them a like.",
 } as const;
 
 type Key = keyof typeof en;
@@ -34,6 +36,8 @@ export const es: Partial<Record<Key, Message>> = {
   "push.mention": "{name} te mencionó: «{text}»",
   "push.reply": "{name} respondió: «{text}»",
   "push.cheer": "{name} te anima {text}",
+  "push.posted": "{name} acaba de publicar un entrenamiento.",
+  "push.best": "{name} acaba de batir su mejor marca. Dale un me gusta.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -49,6 +53,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.mention": "{name} vous a mentionné : « {text} »",
   "push.reply": "{name} a répondu : « {text} »",
   "push.cheer": "{name} vous encourage {text}",
+  "push.posted": "{name} vient de publier un entraînement.",
+  "push.best": "{name} vient de battre son record. Envoie-lui un j’aime.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -64,6 +70,8 @@ export const de: Partial<Record<Key, Message>> = {
   "push.mention": "{name} hat dich erwähnt: „{text}“",
   "push.reply": "{name} hat geantwortet: „{text}“",
   "push.cheer": "{name} feuert dich an {text}",
+  "push.posted": "{name} hat gerade ein Training gepostet.",
+  "push.best": "{name} hat gerade eine neue Bestleistung geschafft. Schick ein Like.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -79,6 +87,8 @@ export const it: Partial<Record<Key, Message>> = {
   "push.mention": "{name} ti ha menzionato: «{text}»",
   "push.reply": "{name} ha risposto: «{text}»",
   "push.cheer": "{name} fa il tifo per te {text}",
+  "push.posted": "{name} ha appena pubblicato un allenamento.",
+  "push.best": "{name} ha appena fatto un nuovo record. Mandagli un mi piace.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -94,4 +104,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.mention": "{name}さんがあなたをメンションしました:「{text}」",
   "push.reply": "{name}さんが返信しました:「{text}」",
   "push.cheer": "{name}さんが応援しています {text}",
+  "push.posted": "{name}さんがワークアウトを投稿しました。",
+  "push.best": "{name}さんが自己ベストを更新しました。いいねを送りましょう。",
 };

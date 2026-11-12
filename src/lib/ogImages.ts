@@ -11,6 +11,7 @@ import { LANDINGS } from "@/content/landings";
 import { BRAND } from "./brand";
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { equipmentLabel, equipmentSlug, equipmentWithPages, exercisesFor, exercisesWith, MUSCLE_NAME, muscleSlug, TOOL_PAGES } from "./seo";
+import { isSiteLang } from "./siteLang";
 import { MUSCLES } from "./types";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -29,7 +30,9 @@ export interface OgCard {
 
 /** The card file for a public path ("/exercises/back-squat/alternatives/" → "exercises/back-squat.jpg"). */
 export function ogFile(path: string): string {
-  const seg = path.split("/").filter(Boolean);
+  const all = path.split("/").filter(Boolean);
+  // A page in another language shares its English page's card (/es/exercises/<id>/ → the exercise's card).
+  const seg = all.length > 1 && isSiteLang(all[0]!) ? all.slice(1) : all;
   const [kind, a] = seg;
   if (!kind || !a) return "default.jpg";
   if (kind === "exercises" && EXERCISE_BY_ID.has(a)) return `exercises/${a}.jpg`;

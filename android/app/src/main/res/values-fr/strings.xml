@@ -10,9 +10,6 @@
     <string name="channel_live">Séance en cours</string>
     <string name="channel_live_desc">Minuteur de repos, série suivante et fréquence cardiaque pendant l’entraînement</string>
     <string name="rest_over">Fin du repos</string>
-    <string name="channel_alert_desc">Sonne et vibre à la fin du repos</string>
-    <string name="channel_alert_sound">Fin du repos (son seulement)</string>
-    <string name="channel_alert_sound_desc">Sonne sans vibrer à la fin du repos</string>
     <string name="next_prefix">Ensuite :</string>
     <string name="rest_left">Encore %1$s de repos</string>
     <string name="rest_left_next">Encore %1$s · ensuite : %2$s</string>

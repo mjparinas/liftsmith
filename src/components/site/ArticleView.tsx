@@ -77,7 +77,7 @@ function BlockView({ b, a, n }: { b: Block; a: Article; n: number }) {
     );
   if ("cta" in b) {
     const c = CTA_COPY[b.cta];
-    return <CtaInline cta={`${a.kind}-mid${n ? `-${n + 1}` : ""}`} title={c.title} body={c.body} button={c.button} />;
+    return <CtaInline cta={`${a.kind}-mid${n ? `-${n + 1}` : ""}`} title={c.title} body={c.body} button={c.button} href={c.href} />;
   }
   return (
     <LinkGrid
@@ -150,7 +150,9 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
           <p className="min-w-0 flex-1 text-sm">
             <span className="font-semibold">{top.title}.</span> <span className="text-muted">Free to start, no account needed.</span>
           </p>
-          <CtaButton cta={`${a.kind}-top`}>{top.button}</CtaButton>
+          <CtaButton cta={`${a.kind}-top`} href={top.href}>
+            {top.button}
+          </CtaButton>
         </div>
         {rest.map((b, i) => {
           const n = "cta" in b ? ctas++ : 0;
@@ -173,7 +175,7 @@ export function ArticleView({ a, related }: { a: Article; related: Article[] }) 
           How we write and check our articles: <Link href="/editorial-standards/">editorial standards</Link>.
         </p>
       </div>
-      <CtaBanner cta={`${a.kind}-end`} title={top.title} body={top.body} button={top.button} />
+      <CtaBanner cta={`${a.kind}-end`} title={top.title} body={top.body} button={top.button} href={top.href} />
       {related.length > 0 && (
         <section className="mt-12">
           <h2 className="text-2xl font-bold tracking-tight">Keep reading</h2>

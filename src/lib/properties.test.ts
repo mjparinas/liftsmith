@@ -5,6 +5,7 @@ import { DAY, makeSet, NOW } from "@/test/factories";
 
 import { decodeShare } from "./dashboard";
 import { EXERCISES } from "./exercises";
+import { decodeGym } from "./gymShare";
 import { parseCsv, readImport } from "./importCsv";
 import { loadBar, nearestLoads } from "./plates";
 import { recovery } from "./recovery";
@@ -119,6 +120,25 @@ describe("links and files from outside never crash the app", () => {
     run(
       fc.property(fc.array(fc.string({ maxLength: 20 }), { maxLength: 30 }), (parts) => {
         expect(Array.isArray(decodeRemix(["1", ...parts].join("~")))).toBe(true);
+      }),
+      300,
+    );
+  });
+
+  it("gym links: junk opens nothing or a gym, never an error", () => {
+    run(
+      fc.property(fc.string({ unit: "binary", maxLength: 300 }), (s) => {
+        const g = decodeGym(s);
+        expect(g === null || g.unit === "kg" || g.unit === "lb").toBe(true);
+      }),
+      500,
+    );
+    run(
+      fc.property(fc.jsonValue({ maxDepth: 3 }), (v) => {
+        let bin = "";
+        for (const b of new TextEncoder().encode(JSON.stringify(v) ?? "null")) bin += String.fromCharCode(b);
+        const g = decodeGym(`g1~${btoa(bin)}`);
+        expect(g === null || (Array.isArray(g.equipment) && Array.isArray(g.plates))).toBe(true);
       }),
       300,
     );

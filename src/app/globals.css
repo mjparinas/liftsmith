@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* The desktop layout (src/lib/layout.ts, docs/decisions/desktop-layout.md): `desk:` classes apply only
+   when <html data-layout="desktop">, which is set on the web on a wide window with a mouse or trackpad. */
+@custom-variant desk (&:where([data-layout="desktop"], [data-layout="desktop"] *));
+
 /*
  * Liftsmith design tokens (design pass, 2026-11-09). Dark navy base, one blue brand accent with a
  * blue-to-violet gradient for primary actions, and a small set of supporting hues used as tints:
@@ -559,6 +563,18 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
 .clear-nav { padding-bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 1.5rem); }
 /* Toasts (Toaster.tsx): above the tab bar on screens, near the bottom over a sheet, never under the phone's bottom bar. */
 .toast-wrap { bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 0.75rem); }
+/* Desktop: the sidebar (App.tsx Sidebar) publishes its width as --side-w while it's on screen; bars pinned
+   to the bottom of a screen and toasts start after it, so they centre on the page rather than the window. */
+.toast-wrap { left: var(--side-w, 0px); }
+.after-side { left: var(--side-w, 0px); }
+/* A screen whose cards flow into two columns on the desktop layout (stage 3), read down the first column then the
+   second, so the phone's order is kept. A card never splits; .desk-span runs across both (the header, say). */
+:root[data-layout="desktop"] .desk-cols { column-count: 2; column-gap: 1.5rem; }
+:root[data-layout="desktop"] .desk-cols > * { break-inside: avoid; }
+:root[data-layout="desktop"] .desk-cols > .desk-span { column-span: all; }
+/* A column's top margin is dropped at a column break, so both columns start the same distance under the last full-width part. */
+:root[data-layout="desktop"] .desk-cols > .desk-span:has(+ :not(.desk-span)) { margin-bottom: 1.5rem; }
+:root[data-layout="desktop"] .desk-cols > .desk-span + :not(.desk-span) { margin-top: 0; }
 .toast { background: var(--color-raised); color: var(--color-ink); border: 1px solid var(--color-line); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow); }
 /* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
 .status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }

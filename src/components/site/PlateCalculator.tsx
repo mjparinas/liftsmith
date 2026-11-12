@@ -7,8 +7,10 @@ import { useState } from "react";
 import { BumpField } from "@/components/app/ui";
 import { PlateBar } from "@/components/PlateBar";
 import { loadBar, nearestLoads } from "@/lib/plates";
+import { fill } from "@/lib/siteLang";
 import type { Unit } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
+import type { PlateUi } from "@/locales/site/tools/types";
 
 const chip = (on: boolean) =>
   `press min-h-11 rounded-full border px-4 text-sm ${on ? "border-accent/70 bg-accent/15 font-medium text-ink" : "border-line bg-surface text-muted"}`;
@@ -16,7 +18,22 @@ const BARS: Record<Unit, number[]> = { kg: [20, 15, 10], lb: [45, 35, 25] };
 /** Plates a typical gym has, in pairs per size; the lifter can switch sizes off. */
 const SIZES: Record<Unit, number[]> = { kg: [25, 20, 15, 10, 5, 2.5, 1.25], lb: [45, 35, 25, 10, 5, 2.5] };
 
-export function PlateCalculator() {
+/** The calculator's words in English; translated pages pass their own (src/locales/site/tools/). */
+export const PLATE_EN: PlateUi = {
+  units: "Units",
+  weight: "Weight on the bar ({unit})",
+  weightAria: "weight",
+  bar: "Bar",
+  plates: "Plates you have",
+  loadThis: "Load this",
+  cantMake: "{want} can't be made with these plates. Nearest:",
+  eachSide: "Each side: {plates}",
+  justBar: "nothing, just the bar",
+  closestOne: "Closest you can make: {below}. Going lighter is the safer miss.",
+  closestTwo: "Closest you can make: {below} or {above}. Going lighter is the safer miss.",
+};
+
+export function PlateCalculator({ t = PLATE_EN }: { t?: PlateUi }) {
   const [unit, setUnit] = useState<Unit>("kg");
   const [bar, setBar] = useState(20);
   const [target, setTarget] = useState("100");
@@ -34,7 +51,7 @@ export function PlateCalculator() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 [&>*]:min-w-0">
       <div className="card space-y-5 p-5">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Units">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t.units}>
           {(["kg", "lb"] as const).map((u) => (
             <button key={u} type="button" aria-pressed={unit === u} className={chip(unit === u)} onClick={() => switchUnit(u)}>
               {u}
@@ -43,11 +60,11 @@ export function PlateCalculator() {
         </div>
         <div>
           <label htmlFor="target" className="font-semibold">
-            Weight on the bar ({unit})
+            {fill(t.weight, { unit })}
           </label>
           <BumpField
             id="target"
-            label="weight"
+            label={t.weightAria}
             className="mt-2"
             size="lg"
             value={target}
@@ -60,7 +77,7 @@ export function PlateCalculator() {
         </div>
         <div>
           <span className="font-semibold" id="bar-l">
-            Bar
+            {t.bar}
           </span>
           <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="bar-l">
             {BARS[unit].map((b) => (
@@ -72,7 +89,7 @@ export function PlateCalculator() {
         </div>
         <div>
           <span className="font-semibold" id="plates-l">
-            Plates you have
+            {t.plates}
           </span>
           <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="plates-l">
             {SIZES[unit].map((w) => {
@@ -94,20 +111,21 @@ export function PlateCalculator() {
         </div>
       </div>
       <div className="card p-5" aria-live="polite">
-        <p className="text-sm text-muted">
-          {loading.exact ? "Load this" : `${fmtNum(want)} ${unit} can't be made with these plates. Nearest:`}
-        </p>
+        <p className="text-sm text-muted">{loading.exact ? t.loadThis : fill(t.cantMake, { want: `${fmtNum(want)} ${unit}` })}</p>
         <p className="display mt-1 text-5xl font-extrabold">
           {fmtNum(loading.total)} <span className="text-2xl text-muted">{unit}</span>
         </p>
         <div className="mt-4">
           <PlateBar loading={loading} bar={bar} unit={unit} />
         </div>
-        <p className="mt-4 font-semibold">{`Each side: ${loading.perSide.length ? loading.perSide.map((w) => fmtNum(w)).join(" + ") : "nothing, just the bar"}`}</p>
+        <p className="mt-4 font-semibold">
+          {fill(t.eachSide, { plates: loading.perSide.length ? loading.perSide.map((w) => fmtNum(w)).join(" + ") : t.justBar })}
+        </p>
         {!loading.exact && (
           <p className="mt-2 text-sm text-muted">
-            Closest you can make: {fmtNum(near.below)} {unit}
-            {near.above != null ? ` or ${fmtNum(near.above)} ${unit}` : ""}. Going lighter is the safer miss.
+            {near.above != null
+              ? fill(t.closestTwo, { below: `${fmtNum(near.below)} ${unit}`, above: `${fmtNum(near.above)} ${unit}` })
+              : fill(t.closestOne, { below: `${fmtNum(near.below)} ${unit}` })}
           </p>
         )}
       </div>

@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from "react";
 
 import { LiftDemo } from "@/components/demo/LiftDemo";
 import { useAccount } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
+import { coachCode, playCoachSignupUrl, playCoachUrl } from "@/lib/coachInvite";
 import { t } from "@/lib/i18n";
-import { calm } from "@/lib/juice";
+import { calm, isNative } from "@/lib/juice";
 import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
@@ -27,11 +28,36 @@ const POINTS: { icon: IconName; hue: string; key: MessageKey }[] = [
  * The first thing a new install sees, before the setup wizard's first question (Melvin, 2026-11-10: opening straight
  * onto "What are you training for?" felt jarring). One screen: the 3D lifter, what the app does, Get started, and sign-in for a lifter
  * who already has an account. Only on the very first run; "Run setup again" in Settings skips it.
+ *
+ * Opened with a coach's invite (`coach`, trainer mode 2026-11-12), it says so and asks to sign in first, because sharing
+ * workouts with a coach goes through the account; setup then takes the short coach path. Without one, a quiet "Got a
+ * code from a coach?" takes the code typed in (the App Store has no install referrer, and links get lost).
+ *
+ * Opened from the website's coaches page (`coaching`, 2026-11-12), it's the coach's way in: sign in first (clients find
+ * a coach through the account), then setup skips the save step and ends on the coaching screen. "I'm here to train"
+ * goes back to the usual setup.
  */
-export function Welcome({ onStart }: { onStart: (signedIn?: boolean) => void }) {
+export function Welcome({
+  onStart,
+  coach = "",
+  onCoach = () => {},
+  coaching = false,
+  onCoaching = () => {},
+}: {
+  onStart: (signedIn?: boolean) => void;
+  coach?: string;
+  onCoach?: (code: string) => void;
+  /** Came in through the website's coaches page (coachInvite.ts, coachSignup): signing up as a coach. */
+  coaching?: boolean;
+  onCoaching?: (on: boolean) => void;
+}) {
+  // Which welcome: a client's invite, a coach signing up, or the usual one.
+  const kind = coach ? "coach" : coaching ? "coaching" : null;
   // The website's "Sign in" link opens the app at #/account: on the welcome screen that's the sign-in sheet.
   const [signIn, setSignIn] = useState(() => typeof location !== "undefined" && location.hash.startsWith("#/account"));
+  const [asking, setAsking] = useState(false);
   const restoring = useRestore(signIn, () => setSignIn(false), onStart);
+  const signedIn = useAccount((s) => !!s.account);
   return (
     <main className="aurora safe-top safe-bottom mx-auto flex min-h-dvh max-w-lg flex-col px-5">
       <div className="animate-rise flex flex-1 flex-col justify-center py-3">
@@ -41,10 +67,15 @@ export function Welcome({ onStart }: { onStart: (signedIn?: boolean) => void }) 
         <div className="keep-colours relative -mx-5 h-[14rem]" aria-hidden>
           <LiftDemo exerciseId="back-squat" className="h-full" fps={30} still={calm()} bare />
         </div>
-        <p className="text-gradient mt-2 text-center text-sm font-bold uppercase tracking-[0.16em]">{BRAND.name}</p>
-        <h1 className="mt-2 text-center text-3xl font-extrabold tracking-tight">{t("setup.welcome.title")}</h1>
-        <p className="mt-3 text-center text-muted">{t("setup.welcome.lead")}</p>
-        <ul className="stagger mt-6 space-y-2.5">
+        <p className="text-gradient mt-2 text-center text-sm font-bold uppercase tracking-[0.16em]">
+          {kind ? t(`setup.${kind}.kicker`) : BRAND.name}
+        </p>
+        <h1 className="mt-2 text-center text-3xl font-extrabold tracking-tight">
+          {kind ? t(`setup.${kind}.title`) : t("setup.welcome.title")}
+        </h1>
+        <p className="mt-3 text-center text-muted">{kind ? t(`setup.${kind}.lead`) : t("setup.welcome.lead")}</p>
+        {/* Not for a coach or a coach's client: "No account needed" would contradict signing in first. */}
+        <ul className={`stagger mt-6 space-y-2.5 ${kind ? "hidden" : ""}`}>
           {POINTS.map((p) => (
             <li key={p.key} className="card-tint flex items-center gap-3 px-4 py-3" style={{ "--tint": p.hue } as CSSProperties}>
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface" style={{ color: p.hue }}>
@@ -55,15 +86,54 @@ export function Welcome({ onStart }: { onStart: (signedIn?: boolean) => void }) 
           ))}
         </ul>
       </div>
-      <div className="space-y-2 pb-2">
-        <Button className="w-full py-4 text-lg" onClick={onStart}>
-          {t("setup.welcome.start")}
-        </Button>
-        {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
-        <Button kind="quiet" className="w-full" onClick={() => setSignIn(true)}>
-          {t("setup.welcome.signIn")}
-        </Button>
-      </div>
+      {kind ? (
+        <div className="space-y-2 pb-2">
+          <Button className="w-full py-4 text-lg" onClick={() => (signedIn ? onStart() : setSignIn(true))}>
+            {signedIn ? t("setup.welcome.start") : t("setup.coach.signIn")}
+          </Button>
+          {/* On an Android phone in the browser: the app, with the code as the install referrer so it arrives there too. */}
+          {!isNative() && /Android/i.test(typeof navigator === "undefined" ? "" : navigator.userAgent) && (
+            <a
+              href={coach ? playCoachUrl(coach) : playCoachSignupUrl()}
+              className="press flex min-h-11 w-full items-center justify-center rounded-2xl border border-line bg-surface px-4 text-sm font-semibold"
+            >
+              {t("setup.coach.getApp")}
+            </a>
+          )}
+          <Button
+            kind="quiet"
+            className="w-full"
+            onClick={() => {
+              if (coach) onCoach("");
+              else onCoaching(false);
+              onStart();
+            }}
+          >
+            {coach ? t("setup.coach.own") : t("setup.coaching.train")}
+          </Button>
+        </div>
+      ) : (
+        <div className="space-y-2 pb-2">
+          <Button className="w-full py-4 text-lg" onClick={() => onStart()}>
+            {t("setup.welcome.start")}
+          </Button>
+          {/* A lifter with an account signs in instead: sync brings their profile back and setup ends. */}
+          <Button kind="quiet" className="w-full" onClick={() => setSignIn(true)}>
+            {t("setup.welcome.signIn")}
+          </Button>
+          <Button kind="quiet" className="w-full" onClick={() => setAsking(true)}>
+            {t("setup.coach.have")}
+          </Button>
+        </div>
+      )}
+      <CodeSheet
+        open={asking}
+        onClose={() => setAsking(false)}
+        onCode={(c) => {
+          setAsking(false);
+          onCoach(c);
+        }}
+      />
       <Sheet open={signIn} onClose={() => setSignIn(false)} title={t("account.signIn")}>
         {restoring === "busy" ? (
           <p role="status" className="py-6 text-center text-muted">
@@ -82,6 +152,49 @@ export function Welcome({ onStart }: { onStart: (signedIn?: boolean) => void }) 
         )}
       </Sheet>
     </main>
+  );
+}
+
+/** "Got a code from a coach?": the code typed in, or their invite link pasted. */
+function CodeSheet({ open, onClose, onCode }: { open: boolean; onClose: () => void; onCode: (code: string) => void }) {
+  const [text, setText] = useState("");
+  const [bad, setBad] = useState(false);
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    const c = coachCode(text);
+    if (!c) return setBad(true);
+    setBad(false);
+    setText("");
+    onCode(c);
+  };
+  return (
+    <Sheet open={open} onClose={onClose} title={t("setup.coach.enter")}>
+      <form onSubmit={submit}>
+        <label htmlFor="welcome-coach-code" className="block text-sm text-muted">
+          {t("setup.coach.enterHint")}
+        </label>
+        <div className="mt-3 flex gap-2">
+          <input
+            id="welcome-coach-code"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            className="num min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2 uppercase tracking-widest"
+            placeholder="ABCD-EFGH"
+            autoComplete="off"
+            autoCapitalize="characters"
+            spellCheck={false}
+          />
+          <Button submit disabled={!text.trim()}>
+            {t("setup.coach.use")}
+          </Button>
+        </div>
+        {bad && (
+          <p role="alert" className="mt-2 text-sm text-warn">
+            {t("trn.err.unknown")}
+          </p>
+        )}
+      </form>
+    </Sheet>
   );
 }
 

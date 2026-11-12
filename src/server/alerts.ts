@@ -1,12 +1,11 @@
 // Email to the admins (Gradelings' src/server/alerts.ts): instant alerts when something goes wrong (a store payment
 // failed, the reminder job failed, a System check went down or came back, repeated failed staff sign-ins), good news
-// (a new paying customer), and a morning digest. They go only to ADMIN_EMAILS, never support. The same alert goes
+// (a new paying customer). The morning digest is in digest.ts. They go only to ADMIN_EMAILS, never support. The same alert goes
 // out at most once every 6 hours, so a flapping service doesn't flood the inbox. Counts and ids only: never a
 // lifter's email, training or health data. Nothing here ever throws into the webhook or job that raised it.
 import { CHECKS, type CheckId } from "@/lib/systemHealth";
 
 import { adminEmails, supportEmails } from "./adminAuth";
-import { todoList } from "./adminTodo";
 import { query, run } from "./db";
 import { getJson, getSetting, setSetting } from "./settings";
 import { runCheck } from "./systemHealth";
@@ -34,18 +33,19 @@ export const saveAlertSettings = (s: AlertSettings) => setSetting("alerts", JSON
 
 export const siteOrigin = () => (process.env.NEXT_PUBLIC_SITE_URL || "https://www.getliftsmith.com").replace(/\/$/, "");
 
-export type Mailer = (to: string, subject: string, text: string) => Promise<boolean>;
+/** Sends one email; `html` is an optional HTML twin of the text (the morning digest has one). */
+export type Mailer = (to: string, subject: string, text: string, html?: string) => Promise<boolean>;
 
 /** Sends through Resend with the sending key. Null without one. */
 export function resendMailer(env: NodeJS.ProcessEnv = process.env, send: typeof fetch = fetch): Mailer | null {
   const key = env.RESEND_API_KEY;
   if (!key) return null;
   const from = env.ADMIN_FROM ?? env.FEEDBACK_FROM ?? env.MAIL_FROM ?? "Liftsmith admin <onboarding@resend.dev>";
-  return async (to, subject, text) => {
+  return async (to, subject, text, html) => {
     const r = await send("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from, to: [to], subject, text }),
+      body: JSON.stringify({ from, to: [to], subject, text, ...(html ? { html } : {}) }),
     });
     return r.ok;
   };
@@ -229,61 +229,4 @@ export async function watchSystem(opts: { now?: number; mail?: Mailer | null } =
       )) || alerted;
   }
   return { down: [...ids], alerted };
-}
-
-/** What the morning digest says: the last 24 hours in counts, what waits on To Do, and System problems. */
-export async function digestLines(now = Date.now()): Promise<{ subject: string; lines: string[] }> {
-  const since = now - DAY;
-  const [todo, checks, counts] = await Promise.all([
-    todoList(now).catch(() => null),
-    Promise.all(WATCHED.map((id) => runCheck(id, { now }).then((r) => r.result))).catch(() => null),
-    query<Record<string, number | null>>(
-      `SELECT
-         (SELECT COUNT(*) FROM installs WHERE test = 0 AND first_seen > ?) AS installs,
-         (SELECT COUNT(DISTINCT install_id) FROM events WHERE at > ? AND name = 'workout_finish' AND install_id NOT IN (SELECT id FROM installs WHERE test = 1)) AS lifters,
-         (SELECT COUNT(*) FROM subscription_events WHERE at > ? AND kind = 'trial_start') AS trials,
-         (SELECT COUNT(*) FROM subscription_events WHERE at > ? AND kind IN ('purchase', 'trial_convert', 'renew')) AS payments,
-         (SELECT SUM(usd_micros) FROM subscription_events WHERE at > ? AND kind IN ('purchase', 'trial_convert', 'renew')) AS usd,
-         (SELECT COUNT(*) FROM subscription_events WHERE at > ? AND kind IN ('cancel', 'refund')) AS cancels,
-         (SELECT COUNT(*) FROM accounts WHERE created_at > ?) AS accounts`,
-      [since, since, since, since, since, since, since],
-    ),
-  ]);
-  const c = counts[0] ?? {};
-  const v = (k: string) => Number(c[k] ?? 0);
-  const items = todo?.items ?? [];
-  const tasks = todo?.tasks.filter((t) => !t.doneAt) ?? [];
-  const problems = checks?.filter((x) => x.state === "down" || x.state === "warn") ?? [];
-  const lines = [
-    `Last 24 hours: ${v("installs")} new installs, ${v("lifters")} lifters worked out, ${v("accounts")} new accounts.`,
-    `Money: ${v("trials")} trials started, ${v("payments")} payments ($${(v("usd") / 1e6).toFixed(2)} US before store fees), ${v("cancels")} cancellations or refunds.`,
-    todo
-      ? items.length + tasks.length
-        ? `To do: ${items.length + tasks.length} waiting.`
-        : "To do: nothing waiting."
-      : "To do: couldn't be read.",
-    ...items.slice(0, 8).map((i) => `• ${i.title}`),
-    checks
-      ? problems.length
-        ? `System: ${problems.map((p) => `${p.title} (${p.state === "down" ? "down" : "needs a look"})`).join(", ")}.`
-        : "System: everything is working."
-      : "System: couldn't be checked.",
-  ];
-  const n = items.length + tasks.length;
-  return {
-    subject: `${n} to do${problems.length ? `, ${problems.length} system ${problems.length === 1 ? "problem" : "problems"}` : ""}`,
-    lines,
-  };
-}
-
-/** The morning digest to every admin, unless it's switched off. Returns how many went out. */
-export async function sendDigest(opts: { now?: number; mail?: Mailer | null } = {}): Promise<number> {
-  if (!(await alertSettings()).digest) return 0;
-  const mail = opts.mail === undefined ? resendMailer() : opts.mail;
-  const to = [...adminEmails()];
-  if (!mail || !to.length) return 0;
-  const d = await digestLines(opts.now);
-  let sent = 0;
-  for (const t of to) if (await mail(t, `Liftsmith today: ${d.subject}`, body(d.lines, "/admin/?tab=To%20Do"))) sent++;
-  return sent;
 }

@@ -13,6 +13,7 @@ import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/li
 import { siteText } from "@/locales/site";
 
 import { DocLang } from "./DocLang";
+import { navFor, type NavLink } from "./nav";
 import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
@@ -37,26 +38,7 @@ function Logo({ lang }: { lang: SiteLang }) {
   );
 }
 
-export type NavLink = { href: string; label: string };
-
-/**
- * The one header nav for every public page, the home page included (Melvin, 2026-11-11: the links used to change when you
- * left the home page). The home page's own sections are /#… links, so they work from any page. Wide screens show them
- * all; below lg they sit in the menu, beside Sign in and Start free.
- */
-export function navFor(lang: SiteLang): NavLink[] {
-  const n = siteText(lang).chrome.nav;
-  // The home page and pricing are translated; the library, guides, blog and tools are English for now.
-  return [
-    { href: `${localPath(lang, "/")}#features`, label: n.features },
-    { href: "/exercises/", label: n.exercises },
-    { href: "/guides/", label: n.guides },
-    { href: "/blog/", label: n.blog },
-    { href: "/tools/", label: n.tools },
-    { href: localPath(lang, "/pricing/"), label: n.pricing },
-    { href: `${localPath(lang, "/")}#faq`, label: n.faq },
-  ];
-}
+export { navFor, type NavLink } from "./nav";
 
 export const NAV: readonly NavLink[] = navFor("en");
 
@@ -118,7 +100,7 @@ export function SignInLink({ label = "Sign in", className = "inline-flex" }: { l
 export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: string }) {
   const t = siteText(lang).chrome;
   const l = t.links;
-  // The app (/app/) and the dashboard (/me/) are big client-only pages: never prefetch their code from a public page,
+  // The app (/app/) is a big client-only page: never prefetch their code from a public page,
   // or every visitor downloads it whether they open it or not.
   const col = (title: string, links: { href: string; label: string }[]) => (
     <nav aria-label={title}>
@@ -148,9 +130,9 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: APP_PATH, label: l.openApp },
           { href: "/features/", label: l.features },
           { href: "/apps/", label: l.whoFor },
+          { href: localPath(lang, "/coaches/"), label: l.coaches },
           { href: localPath(lang, "/pricing/"), label: l.pricing },
           { href: "/whats-new/", label: l.whatsNew },
-          { href: "/me/", label: l.dashboard },
         ])}
         {col(t.cols.learn, [
           { href: "/exercises/", label: l.exercises },
@@ -268,10 +250,21 @@ export function Crumbs({ items, lang = "en" }: { items: Crumb[]; lang?: SiteLang
 }
 
 /** The main button into the app. */
-export function CtaButton({ cta, children = siteText().chrome.startFree, big }: { cta: string; children?: ReactNode; big?: boolean }) {
+export function CtaButton({
+  cta,
+  children = siteText().chrome.startFree,
+  big,
+  href = APP_PATH,
+}: {
+  cta: string;
+  children?: ReactNode;
+  big?: boolean;
+  /** Where it goes: the app by default, or a page for a particular reader (the coach page). */
+  href?: string;
+}) {
   return (
     <Link
-      href={APP_PATH}
+      href={href}
       prefetch={false}
       data-cta={cta}
       className={`press btn-primary inline-flex items-center justify-center rounded-2xl font-semibold ${big ? "min-h-14 px-7 text-lg" : "min-h-12 px-6"}`}
@@ -288,12 +281,14 @@ export function CtaBanner({
   body,
   button,
   lang = "en",
+  href,
 }: {
   cta: string;
   title: string;
   body: string;
   button?: string;
   lang?: SiteLang;
+  href?: string;
 }) {
   const t = siteText(lang).chrome.banner;
   return (
@@ -306,7 +301,7 @@ export function CtaBanner({
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <CtaButton cta={cta} big>
+        <CtaButton cta={cta} big href={href}>
           {button ?? t.button}
         </CtaButton>
         <StoreBadges webLink={false} place={`${cta}-badges`} lang={lang} />
@@ -316,7 +311,19 @@ export function CtaBanner({
 }
 
 /** A slim prompt inside the content. */
-export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: string; title: string; body: string; button?: string }) {
+export function CtaInline({
+  cta,
+  title,
+  body,
+  button = "Try it free",
+  href,
+}: {
+  cta: string;
+  title: string;
+  body: string;
+  button?: string;
+  href?: string;
+}) {
   return (
     <aside className="card-tint my-8 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between" aria-label="Try the app">
       <div>
@@ -324,7 +331,9 @@ export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: s
         <p className="mt-1 text-sm text-muted">{body}</p>
       </div>
       <div className="shrink-0">
-        <CtaButton cta={cta}>{button}</CtaButton>
+        <CtaButton cta={cta} href={href}>
+          {button}
+        </CtaButton>
       </div>
     </aside>
   );

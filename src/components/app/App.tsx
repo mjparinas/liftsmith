@@ -9,6 +9,8 @@ import { startAppLinks } from "@/lib/appLinks";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
+import { BRAND } from "@/lib/brand";
+import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInvite";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
 import { installDiag } from "@/lib/diag";
@@ -19,6 +21,7 @@ import { startHealthRefresh } from "@/lib/healthRefresh";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { applyLayout, useDesktop } from "@/lib/layout";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -30,6 +33,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
+import { forgetNotes, refreshCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -46,6 +50,7 @@ import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
 import { Photos } from "./Photos";
 import { Pro } from "./Pro";
@@ -57,6 +62,7 @@ import { Remix } from "./Remix";
 import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
+import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
@@ -78,12 +84,18 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 // Friends took Gyms' place in the bar (2026-11-12, docs/decisions/friends.md): gyms are set up once and switched
 // from Today's gym chip, so Gyms lives in Settings now. With the social flag off the bar has four tabs.
 
+// Screens with a desktop layout of their own (two columns or more, docs/decisions/desktop-layout.md stage 3): they get
+// the full width on the desktop layout. Every other screen keeps a comfortable single column.
+const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise", "trainer"]);
+
 // Screens that hide the tab bar.
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
 export function App() {
   const { ready, init, profile, active, stats, events } = useApp();
   const { route, arg } = useRoute();
+  const desktop = useDesktop();
+  useEffect(() => applyLayout(desktop), [desktop]);
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
   const unlockCtx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
@@ -157,6 +169,8 @@ export function App() {
     void startCreator();
     // An invite that came through the Play install referrer waits for Friends (invite.ts).
     void startInvite();
+    // A coach's invite (#/trainer/<code>, or the Play install referrer) waits for setup's coach path (coachInvite.ts).
+    void startCoachInvite();
     const online = () => {
       void flushFeedback();
       if (useCreator.getState().claim?.status === "pending") void sendClaim();
@@ -278,9 +292,9 @@ export function App() {
       if (document.visibilityState !== "visible") return;
       refreshReminders(
         () => useApp.getState(),
-        (status) => {
+        (status, address) => {
           const { profile: p, setProfile } = useApp.getState();
-          if (p.messages?.email) setProfile({ messages: { ...p.messages, email: { ...p.messages.email, status } } });
+          if (p.messages?.email) setProfile({ messages: { ...p.messages, email: { ...p.messages.email, status, address } } });
         },
       );
     };
@@ -332,6 +346,31 @@ export function App() {
     }
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Notes from the lifter's coaches for Today (trainer.ts): on open and on return to the app, at most every 15 minutes;
+  // signing out forgets them. A coach's invite still waiting once the app is set up (an account that was already set
+  // up signed in on the welcome screen) opens Coaching with the code filled in.
+  useEffect(() => {
+    if (!ready || !profile.onboarded) return;
+    const code = pendingCoach();
+    if (code) {
+      savePendingCoach("");
+      if (!location.hash.startsWith("#/trainer")) go("trainer", code);
+    }
+    const look = () => {
+      if (document.visibilityState === "visible") void refreshCoachNotes();
+    };
+    look();
+    document.addEventListener("visibilitychange", look);
+    const off = useAccount.subscribe((now, before) => {
+      if (before.account && !now.account) forgetNotes();
+      if (now.account && !before.account) void refreshCoachNotes(Date.now(), true);
+    });
+    return () => {
+      document.removeEventListener("visibilitychange", look);
+      off();
+    };
+  }, [ready, profile.onboarded]);
+
   if (!ready) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;
 
@@ -364,9 +403,14 @@ export function App() {
     club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
+    gymlink: <SharedGym key={arg ?? ""} code={arg} />,
+    log: <LogPast />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
+  // Desktop layout (layout.ts): a sidebar instead of the tab bar and a wider page. Full-screen screens (the
+  // workout among them) stay a focused, phone-width panel in the middle of the window, with no sidebar.
+  const sidebar = desktop && showNav;
   // The thank-you after buying Pro sits over every screen, setup included (a purchase moves on at once).
   if (route === "setup")
     return (
@@ -380,11 +424,16 @@ export function App() {
   return (
     <>
       <StatusScrim />
-      <main key={route} className={`aurora safe-top animate-fade mx-auto max-w-lg px-5 ${showNav ? "clear-nav" : ""}`}>
-        <ScreenBoundary>{screen}</ScreenBoundary>
-      </main>
+      <div className={sidebar ? "pl-60" : undefined}>
+        <main
+          key={route}
+          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
+        >
+          <ScreenBoundary>{screen}</ScreenBoundary>
+        </main>
+      </div>
       <ProWelcome />
-      {showNav && <TabBar route={route} />}
+      {sidebar ? <Sidebar route={route} /> : showNav && <TabBar route={route} />}
       <Toaster />
     </>
   );
@@ -417,7 +466,7 @@ function TabBar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
-  const tabs = TABS.filter((tab) => tab.route !== "friends" || socialOn());
+  const tabs = visibleTabs();
   return (
     <nav
       ref={ref}
@@ -446,6 +495,67 @@ function TabBar({ route }: { route: Route }) {
                 >
                   <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                   {dot && <span aria-hidden className="absolute right-2 top-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+                </span>
+                {t(tab.label)}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+/** The tabs on screen: Friends hides while the social flag is off. */
+function visibleTabs() {
+  return TABS.filter((tab) => tab.route !== "friends" || socialOn());
+}
+
+// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the same five tabs as the
+// phone's tab bar, down the left side, so it is the tab bar and nothing else is added to it (one control, one
+// destination). It sets --nav-h to 0 (nothing covers the bottom of the page) and --side-w to its width, so bars
+// pinned to the bottom of a screen and toasts start after it.
+function Sidebar({ route }: { route: Route }) {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--nav-h", "0px");
+    root.style.setProperty("--side-w", "15rem");
+    return () => {
+      root.style.removeProperty("--nav-h");
+      root.style.removeProperty("--side-w");
+    };
+  }, []);
+  const waiting = useFriendsWaiting();
+  return (
+    <nav
+      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
+      aria-label={t("nav.main")}
+    >
+      <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
+        {/* The app icon, like the site header's (SiteChrome BrandMark). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />
+        {BRAND.name}
+      </div>
+      <ul className="flex flex-col gap-1">
+        {visibleTabs().map((tab) => {
+          const on = route === tab.route;
+          const dot = tab.route === "friends" && waiting > 0;
+          return (
+            <li key={tab.route}>
+              <button
+                type="button"
+                aria-current={on ? "page" : undefined}
+                aria-label={dot ? t("friends.openWaiting", { count: waiting }) : undefined}
+                onClick={() => {
+                  if (!on) haptic("select");
+                  go(tab.route);
+                }}
+                className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
+              >
+                <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
+                  <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                  {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
                 </span>
                 {t(tab.label)}
               </button>

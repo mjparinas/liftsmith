@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.os.Build;
 import android.os.Handler;
@@ -42,7 +44,6 @@ public class WorkoutService extends Service {
     private static final String CHANNEL_ALERT = "rest-over";
     private static final String CHANNEL_ALERT_SOUND = "rest-over-sound";
     private static final int ID_LIVE = 1;
-    private static final int ID_ALERT = 2;
 
     /** Whether a workout is running, for the Quick Settings tile (WorkoutTileService). */
     static volatile boolean running = false;
@@ -85,21 +86,10 @@ public class WorkoutService extends Service {
         live.setDescription(getString(R.string.channel_live_desc));
         live.setShowBadge(false);
         live.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        NotificationChannel alert = new NotificationChannel(CHANNEL_ALERT, getString(R.string.rest_over), NotificationManager.IMPORTANCE_HIGH);
-        alert.setDescription(getString(R.string.channel_alert_desc));
-        alert.enableVibration(true);
-        alert.setVibrationPattern(new long[] { 0, 250, 120, 250 });
-        alert.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
-        alert.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         nm.createNotificationChannel(live);
-        nm.createNotificationChannel(alert);
-        // The same alert without vibration, for lifters who pick "sound only" (channel settings can't change once made).
-        NotificationChannel soundOnly = new NotificationChannel(CHANNEL_ALERT_SOUND, getString(R.string.channel_alert_sound), NotificationManager.IMPORTANCE_HIGH);
-        soundOnly.setDescription(getString(R.string.channel_alert_sound_desc));
-        soundOnly.enableVibration(false);
-        soundOnly.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
-        soundOnly.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-        nm.createNotificationChannel(soundOnly);
+        // Rest over is said in the live card itself now (Melvin, 2026-11-12), so the separate alert channels go.
+        nm.deleteNotificationChannel(CHANNEL_ALERT);
+        nm.deleteNotificationChannel(CHANNEL_ALERT_SOUND);
     }
 
     @Override
@@ -154,7 +144,9 @@ public class WorkoutService extends Service {
                 // The voice coach's cue was for the rest just gone; the app writes the next one.
                 .putExtra("speak", "")
                 // Heart rate came from the app, which isn't running to update it.
-                .putExtra("hr", 0);
+                .putExtra("hr", 0)
+                // A new set: the last rest's "Rest over" is done with.
+                .putExtra("restDone", false);
             show(n);
             watches(n);
         } else if ("add30".equals(action)) {
@@ -193,7 +185,6 @@ public class WorkoutService extends Service {
     private void show(Intent intent) {
         last = intent;
         long restUntil = intent.getLongExtra("restUntil", 0L);
-        String next = intent.getStringExtra("next");
         boolean resting = restUntil > System.currentTimeMillis();
         // When this rest started: the app sends its whole length (+30 s included), else keep what we had, else now.
         long restTotal = intent.getLongExtra("restTotal", 0L) * 1000L;
@@ -216,9 +207,13 @@ public class WorkoutService extends Service {
             restOver = () -> {
                 handler.removeCallbacks(restTick);
                 restFrom = 0L;
-                // Rest is over: back to the set view (the chip shows "2/4" again) without waiting for the app.
-                if (last != null) getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
-                alertRestOver(next, sound, vibrate);
+                // Rest is over: the live card says so ("Rest over", "Up next: 70 lb × 6 reps") and the chip shows the
+                // set ("2/4") again, without waiting for the app; no second notification.
+                if (last != null) {
+                    last = new Intent(last).putExtra("restDone", true);
+                    getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
+                }
+                alertRestOver(sound, vibrate);
                 // Voice coach: said here, not in the web layer, so it's heard with the screen locked.
                 if (speak != null && !speak.isEmpty()) VoiceCoachPlugin.speak(this, speak, 1f, speakLang);
             };
@@ -236,8 +231,9 @@ public class WorkoutService extends Service {
 
     /**
      * The live notification for the latest update. While resting it says the time left in words ("1:23 left"), in
-     * the status bar chip and the Now Bar, and as a rest bar that empties as rest runs out; the system chronometer in
-     * the header counts down too, but not every surface draws that (Samsung's Now Bar, some lock screens), so the service redraws once a second during rest (restTick) and stops when rest ends.
+     * the status bar chip and the Now Bar, and as a rest bar that empties as rest runs out. There is no system
+     * chronometer in the header, so the time shows once; the service redraws once a second during rest (restTick) and
+     * stops when rest ends.
      */
     private Notification build(Intent intent) {
         String title = intent.getStringExtra("title");
@@ -261,10 +257,24 @@ public class WorkoutService extends Service {
         if (plates != null && !plates.isEmpty()) body.append("\n").append(plates);
         if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
 
+        // Rest just ran out with no update from the app yet: the card itself says so, in place of a second notification.
+        boolean restDone = !resting && intent.getBooleanExtra("restDone", false);
+        if (restDone) {
+            title = getString(R.string.rest_over);
+            body.setLength(0);
+            body.append(getString(R.string.up_next, next));
+            if (plates != null && !plates.isEmpty()) body.append("\n").append(plates);
+            if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
+        }
+
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
             .setSmallIcon(R.drawable.ic_stat_workout)
             .setContentTitle(title)
-            .setContentText(resting ? getString(R.string.rest_left_next, left, next) : setLabel == null || setLabel.isEmpty() ? next : setLabel + " · " + next)
+            .setContentText(
+                resting ? getString(R.string.rest_left_next, left, next)
+                    : restDone ? getString(R.string.up_next, next)
+                    : setLabel == null || setLabel.isEmpty() ? next : setLabel + " · " + next
+            )
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
             .setSubText(setLabel)
             .setOngoing(true)
@@ -284,8 +294,9 @@ public class WorkoutService extends Service {
             // The rest bar: time left of the whole rest, emptying as it runs out (in seconds, so +30 s fits).
             long span = Math.max(1, (restUntil - (restFrom > 0 ? restFrom : now) + 999) / 1000);
             b.setProgress((int) Math.max(span, secLeft), (int) secLeft, false);
-            // The system's countdown in the header and on the lock screen, plus the time in the chip ("1:23").
-            b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
+            // The time in the chip ("1:23"). No system chronometer in the header: the text already says the time left,
+            // and the header clock showed it a second time beside the title (Melvin, 2026-11-12).
+            b.setShowWhen(false);
             b.setShortCriticalText(left);
         } else {
             // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
@@ -318,24 +329,33 @@ public class WorkoutService extends Service {
         if (v != null) v.vibrate(VibrationEffect.createOneShot(30, 120));
     };
 
-    /** The rest-over alert: sound, vibration, both or neither, as picked in Workout preferences. */
-    private void alertRestOver(String next, boolean sound, boolean vibrate) {
-        NotificationManager nm = getSystemService(NotificationManager.class);
-        NotificationCompat.Builder b = new NotificationCompat.Builder(this, sound && !vibrate ? CHANNEL_ALERT_SOUND : CHANNEL_ALERT)
-            .setSmallIcon(R.drawable.ic_stat_workout)
-            .setContentTitle(getString(R.string.rest_over))
-            .setContentText(getString(R.string.up_next, next))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_ALARM)
-            .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setAutoCancel(true)
-            .setTimeoutAfter(15000)
-            .setContentIntent(openApp());
-        if (!sound) b.setSilent(true);
-        nm.notify(ID_ALERT, b.build());
+    /**
+     * The rest-over alert: sound, vibration, both or neither, as picked in Workout preferences. The live card shows the
+     * words, so this only plays the phone's notification sound (not in silent, vibrate or Do Not Disturb) and buzzes.
+     */
+    private void alertRestOver(boolean sound, boolean vibrate) {
+        if (sound && soundAllowed()) {
+            try {
+                Ringtone r = RingtoneManager.getRingtone(this, RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                if (r != null) {
+                    r.setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
+                    r.play();
+                }
+            } catch (RuntimeException ignored) {
+                // No notification sound on this phone; the card and the buzz still say rest is over.
+            }
+        }
         if (!vibrate) return;
         Vibrator v = getSystemService(Vibrator.class);
         if (v != null) v.vibrate(VibrationEffect.createWaveform(new long[] { 0, 250, 120, 250 }, -1));
+    }
+
+    /** A notification sound may play: the ringer is on and Do Not Disturb isn't holding notifications back. */
+    private boolean soundAllowed() {
+        AudioManager am = getSystemService(AudioManager.class);
+        if (am != null && am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) return false;
+        NotificationManager nm = getSystemService(NotificationManager.class);
+        return nm == null || nm.getCurrentInterruptionFilter() <= NotificationManager.INTERRUPTION_FILTER_ALL;
     }
 
     private PendingIntent openApp() {

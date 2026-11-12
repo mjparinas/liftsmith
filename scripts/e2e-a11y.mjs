@@ -1,6 +1,6 @@
 // axe-core WCAG 2.2 A/AA on every screen, failing on serious and critical problems. Then the
 // accessibility settings (colour-blind safe colours, more contrast, the largest text), Windows-style
-// forced colours, and a keyboard-only run: every stop has a visible focus ring, a workout can be
+// forced colours, the desktop layout in dark and light, and a keyboard-only run: every stop has a visible focus ring, a workout can be
 // started and a set logged without a pointer, and sheets close on Escape with focus returned.
 //   npm run build:static && node scripts/e2e-a11y.mjs [base-url]
 import AxeBuilder from "@axe-core/playwright";
@@ -108,17 +108,13 @@ try {
   await page.goto(`${server.url}/app/#/photos`);
   await page.getByRole("heading", { name: "Body and photos" }).waitFor();
   await scan("photos");
-  // The web dashboard and a share link, with the workout just saved.
-  await page.goto(`${server.url}/me/`);
-  await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Awards", "Log a workout", "Share"]) {
-    await page.getByRole("link", { name: tab, exact: true }).click();
-    await scan(`dashboard ${tab}`);
-  }
-  const link = await page.getByLabel("Your link").inputValue();
-  await page.goto(link);
-  await page.getByRole("article", { name: "Shared training summary" }).waitFor();
-  await scan("shared summary");
+  // Log a past workout (moved from the retired /me/ dashboard), with an exercise added from the browser.
+  await page.goto(`${server.url}/me/#/log`);
+  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+  await page.getByRole("button", { name: "Add exercise" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
+  await scan("log a past workout");
   await page.goto(`${server.url}/app/#/programs`);
   await page.getByRole("heading", { name: "Programs" }).waitFor();
   await scan("programs");
@@ -155,6 +151,12 @@ try {
   await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
   await page.getByRole("heading", { name: "Push day" }).waitFor();
   await scan("shared routine");
+  // A shared gym link (gymShare.ts): "Iron Works", a barbell, plates, dumbbells and kettlebells.
+  await page.goto(
+    `${server.url}/app/#/gymlink/g1~eyJuIjoiSXJvbiBXb3JrcyIsInUiOiJrZyIsImUiOlsiYmFyYmVsbCIsImR1bWJiZWxscyIsImNhYmxlcyJdLCJiIjpbWyJPbHltcGljIGJhciIsMjBdXSwicCI6W1syMCw0XSxbMTAsNF0sWzUsNF1dLCJkIjpbMiw0LDYsOCwxMF0sImsiOls4LDEyLDE2XSwibSI6NX0`,
+  );
+  await page.getByRole("heading", { name: "Iron Works" }).waitFor();
+  await scan("shared gym");
   // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
   await page.goto(`${server.url}/app/#/stretch`);
   await page.getByTestId("stretch-list").waitFor();
@@ -307,6 +309,7 @@ try {
       unread: 2,
     },
     feed: { posts: [friendsPost], more: false },
+    discover: { posts: [{ ...friendsPost, id: "pd1", handle: "casey", name: "Casey", mine: false }], more: false },
     clubFeed: { posts: [friendsPost], more: false },
     person: { posts: [friendsPost], more: false },
     thread: {
@@ -369,6 +372,20 @@ try {
             { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
           ],
         },
+        {
+          id: "ch3",
+          name: "Leg week",
+          metric: "workouts",
+          startsAt: Date.now() - 8 * 86_400_000,
+          endsAt: Date.now() - 86_400_000,
+          owner: { handle: "alex", name: "Alex" },
+          mine: true,
+          status: "joined",
+          members: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 4 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 3 },
+          ],
+        },
       ],
     },
     clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
@@ -389,6 +406,7 @@ try {
       },
     },
     clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
+    invite: { code: "ABCD2345" },
     inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
@@ -445,6 +463,11 @@ try {
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
   await scan("friends feed");
+  await page.getByRole("button", { name: "Discover" }).click();
+  await page.getByRole("article", { name: "Workout from Casey" }).waitFor();
+  await scan("friends discover");
+  await page.getByRole("button", { name: "Following" }).click();
+  await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await page.getByRole("button", { name: "More options" }).click();
   await page
     .getByRole("button", { name: "Edit post" })
@@ -457,6 +480,8 @@ try {
   await page.getByRole("button", { name: "Do this workout" }).waitFor();
   await scan("friends whole workout");
   await page.keyboard.press("Escape");
+  // Let the closed sheet's history step land first, or it closes the next sheet as it opens.
+  await page.waitForTimeout(1000);
   await page.getByRole("button", { name: /likes: see who/ }).click();
   await page.getByRole("dialog", { name: "Liked by" }).waitFor();
   await scan("friends likers");
@@ -470,6 +495,10 @@ try {
   await scan("friends comments");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Board" }).click();
+  // A challenge that just ended opens its results moment once (gap list 3, item 5).
+  await page.getByRole("dialog", { name: "Leg week" }).getByText("You won!").waitFor();
+  await scan("friends challenge result");
+  await page.keyboard.press("Escape");
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
   await page.getByText("Blair invited you to this challenge.").waitFor();
   await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
@@ -502,6 +531,10 @@ try {
   await page.getByLabel("Find a friend").fill("stone");
   await page.getByRole("list", { name: "Search results" }).waitFor();
   await scan("friends people");
+  await page.getByRole("button", { name: "Scan to follow" }).click();
+  await page.getByRole("img", { name: "Your Liftsmith code" }).waitFor();
+  await scan("friends scan to follow");
+  await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();
@@ -581,12 +614,9 @@ try {
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("light workout");
-  await page.goto(`${server.url}/me/`);
-  await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Lifts"]) {
-    await page.getByRole("link", { name: tab, exact: true }).click();
-    await scan(`light dashboard ${tab}`);
-  }
+  await page.goto(`${server.url}/app/#/log`);
+  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+  await scan("light log a past workout");
   // Accessibility settings: colour-blind safe colours and more contrast, in both themes.
   await page.goto(`${server.url}/app/#/settings/look`);
   await page.getByRole("group", { name: "Colours" }).getByRole("button", { name: "Colour-blind safe" }).click();
@@ -700,6 +730,99 @@ try {
   if (back !== "End") fail.push(`keyboard: focus went to "${back}" after closing the sheet, not back to End`);
 } catch (e) {
   fail.push(`keyboard and large text: ${String(e)}`);
+}
+await kctx.close();
+
+// The desktop layout (layout.ts, docs/decisions/desktop-layout.md): the sidebar and the main screens in dark
+// and light, a sheet opening as a centred dialog, and the sidebar reachable and ringed from the keyboard.
+const dctx = await browser.newContext({ ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } });
+await stubSignIn(dctx);
+const dp = await dctx.newPage();
+const dscan = async (where) => {
+  const r = await new AxeBuilder({ page: dp }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical"))
+    fail.push(
+      `desktop ${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(" "))
+        .join(", ")}`,
+    );
+};
+const settle = () =>
+  dp.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
+try {
+  await dp.goto(`${server.url}/app/`);
+  await onboard(dp);
+  if ((await dp.evaluate(() => document.documentElement.dataset.layout)) !== "desktop")
+    fail.push("desktop: no desktop layout at 1440 wide");
+  for (const theme of ["Dark", "Light"]) {
+    await dp.goto(`${server.url}/app/#/settings/look`);
+    await dp.getByRole("button", { name: theme, exact: true }).click();
+    for (const tab of ["today", "recovery", "stats", "friends", "achievements", "settings"]) {
+      await dp.goto(`${server.url}/app/#/${tab}`);
+      await dp.getByRole("heading", { level: 1 }).first().waitFor();
+      await dp.waitForTimeout(300);
+      await settle();
+      await dscan(`${theme.toLowerCase()} ${tab}`);
+    }
+  }
+  // The routine builder: a wide dialog with the exercise browser open beside the routine.
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("button", { name: "Routines" }).click();
+  await dp.getByRole("button", { name: "Build a new routine" }).click();
+  await dp.getByRole("searchbox").fill("bench press");
+  await dp
+    .getByRole("dialog")
+    .getByRole("button")
+    .filter({ hasText: /bench press/i })
+    .first()
+    .click();
+  await dp.waitForTimeout(300);
+  await settle();
+  await dscan("routine builder");
+  await dp.keyboard.press("Escape");
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("button", { name: "Start workout" }).click();
+  await dp.getByRole("button", { name: "Swap exercise", exact: true }).click();
+  await dp.getByRole("dialog").waitFor();
+  await dp.waitForTimeout(300);
+  await settle();
+  await dscan("dialog");
+  const box = await dp.getByRole("dialog").boundingBox();
+  if (!box || box.y + box.height >= 899) fail.push("desktop: the sheet didn't open as a centred dialog");
+  await dp.keyboard.press("Escape");
+  // The sidebar from the keyboard: Tab reaches Progress with a focus ring, and Enter opens it.
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("heading", { level: 1 }).first().waitFor();
+  let reached = false;
+  for (let i = 0; i < 12 && !reached; i++) {
+    await dp.keyboard.press("Tab");
+    const f = await dp.evaluate(() => {
+      const el = document.activeElement;
+      const cs = el && getComputedStyle(el);
+      return {
+        side: !!el?.closest("nav"),
+        name: el?.textContent?.trim(),
+        ring: !!cs && ((cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none"),
+      };
+    });
+    if (f.side && !f.ring) fail.push(`desktop keyboard: no focus ring on sidebar "${f.name}"`);
+    if (f.side && f.name === "Progress") {
+      reached = true;
+      await dp.keyboard.press("Enter");
+      await dp.waitForURL(/#\/stats/);
+    }
+  }
+  if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");
+} catch (e) {
+  fail.push(`desktop: ${String(e)}`);
 }
 await browser.close();
 server.close();

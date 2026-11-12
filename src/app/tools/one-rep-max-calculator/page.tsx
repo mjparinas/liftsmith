@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EmbedCode } from "@/components/site/EmbedCode";
 import { OneRmCalculator } from "@/components/site/OneRmCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { embedFor } from "@/lib/embeds";
 import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
@@ -12,6 +14,7 @@ export const metadata: Metadata = pageMeta({
   description:
     "Estimate your one-rep max from weight, reps and reps in reserve, with a reps-to-weight table and the answers from Epley, Brzycki and six other formulas.",
   path: "/tools/one-rep-max-calculator/",
+  translated: true,
 });
 
 const FAQ: [string, string][] = [
@@ -52,7 +55,7 @@ const jsonLd = [
 
 export default function OneRmPage() {
   return (
-    <SitePage kind="tool" sticky="Your max, tracked from every set">
+    <SitePage kind="tool" sticky="Your max, tracked from every set" path="/tools/one-rep-max-calculator/">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "One-rep max calculator" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">One-rep max calculator</h1>
@@ -90,6 +93,7 @@ export default function OneRmPage() {
           .
         </p>
       </section>
+      <EmbedCode embed={embedFor("one-rep-max-calculator")!} />
       <CtaBanner
         cta="tool-onerm-end"
         title="Get stronger without guessing"

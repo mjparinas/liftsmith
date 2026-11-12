@@ -26,7 +26,8 @@ export interface Landing {
   /** Free, Pro, or "Free, some parts Pro": shown as a tag. */
   plan: "Free" | "Pro" | "Free and Pro";
   sections: { h2: string; p: string[]; ul?: string[] }[];
-  mid: { title: string; body: string; button: string };
+  /** href: where the button goes (the app by default). */
+  mid: { title: string; body: string; button: string; href?: string };
   end: { title: string; body: string };
   faq: [string, string][];
   /** Further reading: other pages on the site. */

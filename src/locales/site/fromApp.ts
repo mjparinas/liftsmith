@@ -3,10 +3,11 @@
 // client components as props, so no catalogue reaches the browser.
 import type { DemoWords } from "@/components/demo/LiftDemoCore";
 import type { Message } from "@/lib/i18n";
-import { MUSCLE_NAME } from "@/lib/seo";
+import { EQUIPMENT_NAME, MUSCLE_NAME } from "@/lib/seo";
 import type { SiteLang } from "@/lib/siteLang";
-import type { Muscle } from "@/lib/types";
+import type { Equipment, Exercise, Muscle } from "@/lib/types";
 import * as demo from "@/locales/text/demo";
+import * as equipment from "@/locales/text/equipment";
 import * as ex from "@/locales/text/ex";
 import * as muscle from "@/locales/text/muscle";
 
@@ -42,4 +43,20 @@ export function demoWords(lang: SiteLang): DemoWords {
   const out: Record<string, string> = {};
   for (const key of Object.keys(demo.en)) out[key.slice("demo.".length)] = line(demo, lang, key) ?? "";
   return out as DemoWords;
+}
+
+/** Equipment names, for a translated page's equipment line and chips. */
+export function equipmentLabels(lang: SiteLang): Record<Equipment, string> {
+  const out = { ...EQUIPMENT_NAME };
+  for (const q of Object.keys(out) as Equipment[]) out[q] = line(equipment, lang, `equipment.${q}`) ?? out[q];
+  return out;
+}
+
+/** A lift's name, setup line and cues as the app shows them in that language (English where a line is missing). */
+export function exerciseWords(lang: SiteLang, e: Exercise): { name: string; setup: string; cues: string[] } {
+  return {
+    name: line(ex, lang, `ex.${e.id}`) ?? e.name,
+    setup: line(ex, lang, `ex.${e.id}.setup`) ?? e.setup,
+    cues: e.cues.map((c, i) => line(ex, lang, `ex.${e.id}.cue${i + 1}`) ?? c),
+  };
 }

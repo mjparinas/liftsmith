@@ -1,21 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
+import { track } from "@/lib/analytics";
+import { useAccount } from "@/lib/auth";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
+import { listGym, myListings, pickListing, unlistGym, type ListError } from "@/lib/gymDirectory";
+import { encodeGym, gymCodeFromLink, gymUrl, kitOf } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
+import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
+import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
 import { BuyNext } from "./BuyNext";
 import { GymWeights } from "./GymWeights";
+import { NearbyGyms } from "./NearbyGyms";
 import { PlateBar } from "./Plates";
-import { goBack } from "./router";
-import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
+import { go, goBack } from "./router";
+import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
 
 export function Gym() {
   const { gyms, profile, setProfile, saveGym, addGym, removeGym } = useApp();
@@ -193,6 +200,8 @@ export function Gym() {
 
       <BuyNext gym={gym} />
 
+      <ShareGym gym={gym} />
+
       {gyms.length > 1 && (
         <Button kind="danger" className="mt-6 w-full" onClick={() => removeGym(gym.id)}>
           {t("gym.remove")}
@@ -217,7 +226,147 @@ export function Gym() {
             </button>
           ))}
         </div>
+        <div className="mt-5 border-t border-line pt-4">
+          <p className={`mb-2 ${SECTION_LABEL}`}>{t("gym.near.title")}</p>
+          <NearbyGyms
+            onPick={(l) => {
+              pickListing(l);
+              setAdding(false);
+              go("gymlink", l.code);
+            }}
+          />
+        </div>
+        <PasteGym onOpen={() => setAdding(false)} />
       </Sheet>
+    </div>
+  );
+}
+
+/** "Share this gym": a link to the gym's equipment and weights, never where it is or machine settings. */
+function ShareGym({ gym }: { gym: GymT }) {
+  const [note, setNote] = useState<string | null>(null);
+  const share = async () => {
+    haptic("tap");
+    const url = gymUrl(encodeGym(kitOf(gym)));
+    track("feature", { name: "gym_share", detail: "share" });
+    if (await shareUrl(url, t("gym.shareTitle", { name: gym.name }))) return;
+    setNote((await copyText(url)) ? t("gym.copied") : null);
+  };
+  return (
+    <Section title={t("gym.shareSection")}>
+      <Button kind="ghost" icon="share" className="w-full" onClick={share}>
+        {t("gym.share")}
+      </Button>
+      <p className="mt-1 text-xs text-faint" role="status">
+        {note ?? t("gym.shareHint")}
+      </p>
+      <ListGym gym={gym} />
+    </Section>
+  );
+}
+
+const LIST_ERRORS: Record<ListError, Parameters<typeof t>[0]> = {
+  signedOut: "gym.list.signIn",
+  location: "gym.list.location",
+  offline: "gym.near.offline",
+  slow: "gym.list.slow",
+  full: "gym.list.full",
+  link: "gym.list.link",
+  words: "gym.list.words",
+  empty: "gym.list.empty",
+  failed: "gym.near.failed",
+};
+
+/** "List this gym": others nearby can find it and add its setup (gymDirectory.ts). Needs an account. */
+function ListGym({ gym }: { gym: GymT }) {
+  const account = useAccount((s) => s.account);
+  const [listed, setListed] = useState<boolean | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  useEffect(() => {
+    if (!account) return;
+    let live = true;
+    void myListings().then((l) => live && setListed(!!l?.some((x) => x.localId === gym.id)));
+    return () => {
+      live = false;
+    };
+  }, [account, gym.id]);
+  if (!account)
+    return (
+      <div className="mt-4 rounded-2xl border border-line p-3 text-sm">
+        <p className="text-muted">{t("gym.list.signIn")}</p>
+        <Button kind="quiet" className="mt-2" onClick={() => go("account")}>
+          {t("gym.list.signInGo")}
+        </Button>
+      </div>
+    );
+  const set = async (on: boolean) => {
+    setBusy(true);
+    setNote(null);
+    if (on) {
+      const r = await listGym(gym);
+      if ("error" in r) setNote(t(LIST_ERRORS[r.error]));
+      else {
+        setListed(true);
+        track("feature", { name: "gym_list", detail: "on" });
+      }
+    } else if (await unlistGym(gym.id)) setListed(false);
+    else setNote(t("gym.near.failed"));
+    setBusy(false);
+  };
+  return (
+    <div className="mt-4">
+      <SwitchRow
+        label={t("gym.list.label")}
+        hint={listed ? t("gym.list.on") : t("gym.list.hint")}
+        on={!!listed}
+        onChange={(v) => !busy && listed !== null && void set(v)}
+      />
+      {note && (
+        <p className="mt-2 text-sm text-warn" role="alert">
+          {note}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** "Add from a link": a gym link someone sent, for when it opened somewhere else. */
+function PasteGym({ onOpen }: { onOpen: () => void }) {
+  const [text, setText] = useState("");
+  const [bad, setBad] = useState(false);
+  const open = () => {
+    const code = gymCodeFromLink(text);
+    if (!code) return setBad(true);
+    onOpen();
+    go("gymlink", code);
+  };
+  return (
+    <div className="mt-5 border-t border-line pt-4">
+      <label htmlFor="gym-paste" className="text-sm text-muted">
+        {t("gym.paste")}
+      </label>
+      <div className="mt-2 flex gap-2">
+        <input
+          id="gym-paste"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setBad(false);
+          }}
+          className="card min-w-0 flex-1 px-3 py-2"
+          inputMode="url"
+          autoComplete="off"
+        />
+        <Button kind="ghost" onClick={open} disabled={!text.trim()}>
+          {t("gym.pasteOpen")}
+        </Button>
+      </div>
+      {bad && (
+        <p className="mt-2 text-sm text-warn" role="alert">
+          {t("gym.pasteBad")}
+        </p>
+      )}
     </div>
   );
 }

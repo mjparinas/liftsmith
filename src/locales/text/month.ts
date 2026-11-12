@@ -21,6 +21,8 @@ export const en = {
   "month.friends": "Friends on this month’s challenge",
   "month.friendsHint": "From workouts posted to Friends, so it can trail what’s on your phone.",
   "month.finished": "Finished",
+  "month.finishers": { one: "{n} lifter has finished it so far.", other: "{n} lifters have finished it so far." },
+  "month.finishersDone": { one: "{n} lifter has finished it, you included.", other: "{n} lifters have finished it, you included." },
 } as const;
 
 type Key = keyof typeof en;
@@ -42,6 +44,8 @@ export const es: Partial<Record<Key, Message>> = {
   "month.friends": "Amigos en el reto de este mes",
   "month.friendsHint": "Según los entrenamientos publicados en Amigos, así que puede ir por detrás de lo que hay en tu teléfono.",
   "month.finished": "Terminado",
+  "month.finishers": { one: "{n} persona lo ha completado hasta ahora.", other: "{n} personas lo han completado hasta ahora." },
+  "month.finishersDone": { one: "{n} persona lo ha completado, tú incluido.", other: "{n} personas lo han completado, tú incluido." },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -62,6 +66,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "month.friends": "Vos amis sur le défi du mois",
   "month.friendsHint": "D’après les séances publiées dans Amis, donc parfois en retard sur votre téléphone.",
   "month.finished": "Réussi",
+  "month.finishers": { one: "{n} personne l’a terminé pour l’instant.", other: "{n} personnes l’ont terminé pour l’instant." },
+  "month.finishersDone": { one: "{n} personne l’a terminé, vous compris.", other: "{n} personnes l’ont terminé, vous compris." },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -82,6 +88,11 @@ export const de: Partial<Record<Key, Message>> = {
   "month.friends": "Freunde bei der Challenge des Monats",
   "month.friendsHint": "Aus den Trainings, die in Freunde gepostet wurden, daher manchmal hinter deinem Handy.",
   "month.finished": "Geschafft",
+  "month.finishers": { one: "{n} Person hat es bisher geschafft.", other: "{n} Leute haben es bisher geschafft." },
+  "month.finishersDone": {
+    one: "{n} Person hat es geschafft, du eingeschlossen.",
+    other: "{n} Leute haben es geschafft, du eingeschlossen.",
+  },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -102,6 +113,8 @@ export const it: Partial<Record<Key, Message>> = {
   "month.friends": "Amici nella sfida di questo mese",
   "month.friendsHint": "Dagli allenamenti pubblicati in Amici, quindi può restare indietro rispetto al telefono.",
   "month.finished": "Completata",
+  "month.finishers": { one: "{n} persona l’ha completata finora.", other: "{n} persone l’hanno completata finora." },
+  "month.finishersDone": { one: "{n} persona l’ha completata, tu compreso.", other: "{n} persone l’hanno completata, tu compreso." },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -122,4 +135,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "month.friends": "今月のチャレンジに挑む友達",
   "month.friendsHint": "フレンドに投稿されたワークアウトから集計するため、スマホの記録より遅れることがあります。",
   "month.finished": "達成",
+  "month.finishers": { other: "これまでに{n}人が達成しました。" },
+  "month.finishersDone": { other: "あなたを含め{n}人が達成しました。" },
 };

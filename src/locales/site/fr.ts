@@ -26,9 +26,9 @@ export const fr: SiteText = {
       openApp: "Ouvrir l’app",
       features: "Fonctions",
       whoFor: "Pour qui",
+      coaches: "Pour les coachs",
       pricing: "Tarifs",
       whatsNew: "Nouveautés",
-      dashboard: "Votre tableau de bord",
       exercises: "Bibliothèque d’exercices",
       muscles: "Exercices par muscle",
       equipment: "Exercices par matériel",
@@ -246,6 +246,10 @@ export const fr: SiteText = {
       perMonth: "par mois",
       priceNote: "Environ {perMonth} par mois, ou {monthly} par mois",
       trialCta: "Commencer mon essai gratuit de {days} jours",
+      coachLead: "Vous coachez des clients ?",
+      coachRest:
+        "Vos clients s’entraînent gratuitement, et avec Pro vous voyez leurs séances, leur envoyez des routines et leur laissez des notes.",
+      coachCta: "Liftsmith pour les coachs",
       billed:
         "Facturé via Google Play ou l’App Store, ou par carte dans l’app Web. Résiliez à tout moment avant la fin de l’essai et vous ne payez rien.",
     },
@@ -395,9 +399,90 @@ export const fr: SiteText = {
         "Statistiques avancées : tendances du 1RM, séries par muscle",
         "Détective de plateau et planificateur d’objectif daté",
       ],
-      ["Synchronisation entre appareils et tableau de bord Web", "Fichier de sauvegarde et export CSV", "Publicité", "Partage familial"],
+      [
+        "Synchronisation entre appareils et tableau de bord Web",
+        "Entraînement avec un coach qui voit vos séances",
+        "Coaching de vos propres clients",
+        "Fichier de sauvegarde et export CSV",
+        "Publicité",
+        "Partage familial",
+      ],
     ],
     never: "Jamais",
     annualPlan: "Formule annuelle",
+  },
+  coaches: {
+    title: "Coachez vos clients avec {name} : rapports, routines et notes",
+    description:
+      "Invitez vos clients avec un seul lien, voyez qui a besoin de vous en premier et envoyez-leur des routines et une note pendant que {name} préremplit chaque série. Être client est gratuit.",
+    h1: "Coachez vos clients dans {name}",
+    intro:
+      "Envoyez un lien d'invitation. Vos clients enregistrent chaque série dans l'app, et vous voyez à qui écrire en premier, ce qu'ils ont fait et ce qu'ils ont réussi, sans tableur.",
+    cta: "Commencer à coacher",
+    how: {
+      title: "Comment ça marche",
+      steps: [
+        {
+          title: "Invitez avec un lien",
+          body: "Créez un code d'invitation dans Réglages › Coaching et envoyez le lien. Un même code sert à tous les clients à qui vous l'envoyez, pendant une semaine.",
+        },
+        {
+          title: "Vos clients sont prêts en une minute",
+          body: "Ils se connectent, voient exactement ce que vous verrez et acceptent. L'objectif, l'expérience et les jours que vous choisissez remplissent leur configuration : il ne leur reste que leur salle et leur poids.",
+        },
+        {
+          title: "Voyez qui a besoin de vous en premier",
+          body: "Le rapport de chaque client commence par ce qu'il faut faire : plus de séance depuis des jours, en retard sur son objectif de la semaine, des répétitions manquées, un exercice qui stagne ou de nouveaux records à saluer.",
+        },
+        {
+          title: "Envoyez des routines et une note",
+          body: "Attribuez n'importe quelle routine enregistrée et voyez à quelle fréquence ils la font. Laissez une note qui reste en haut de leur écran Aujourd'hui jusqu'à ce que vous la changiez.",
+        },
+      ],
+    },
+    see: {
+      title: "Ce que vous voyez, et ce que vous ne voyez pas",
+      body: "Vos clients acceptent avant tout partage et peuvent arrêter quand ils veulent. Vous perdez l'accès aussitôt.",
+      seesLabel: "Vous voyez",
+      sees: [
+        "Les séances de la dernière année : exercices, séries, charges et répétitions",
+        "La durée des séances et la difficulté ressentie des séries",
+        "Leur objectif hebdomadaire et leurs nouveaux records",
+      ],
+      neverLabel: "Vous ne voyez jamais",
+      never: [
+        "Fréquence cardiaque, poids, masse grasse ou mensurations",
+        "Données de santé, forme du jour ou cycle",
+        "Blessures, notes, salles ou photos",
+      ],
+    },
+    cost: {
+      title: "Combien ça coûte",
+      body: "Coacher des clients fait partie de {name} Pro ({annual} par an ou {monthly} par mois), jusqu'à 30 clients. Être client est gratuit : toute personne que vous invitez peut commencer sans payer.",
+      contactBefore: "Vous coachez plus de monde ? ",
+      contactLink: "Dites-nous ce dont vous avez besoin.",
+    },
+    faqTitle: "Questions de coachs",
+    faqs: [
+      {
+        q: "Mes clients doivent-ils payer ?",
+        a: "Non. Être client est gratuit sur Android, iPhone et le Web. Ils ont besoin d'un compte gratuit pour que leurs séances vous parviennent.",
+      },
+      {
+        q: "Mes clients ont-ils besoin de Pro pour suivre mes routines ?",
+        a: "Non. Les routines que vous attribuez fonctionnent avec l'offre gratuite, et l'app préremplit chaque série à partir de leur dernière séance.",
+      },
+      {
+        q: "Puis-je voir leur fréquence cardiaque ou leur poids ?",
+        a: "Non. Vous ne voyez que leur entraînement. Les données de santé, les mensurations, les blessures et les notes ne quittent jamais leur compte.",
+      },
+      {
+        q: "Comment commencer ?",
+        a: "Ouvrez l'app, allez dans Réglages › Coaching et créez un code d'invitation. Si vous n'avez pas encore Pro, l'app vous montre les offres à cet endroit.",
+      },
+    ],
+    endTitle: "Faites venir votre premier client aujourd'hui",
+    endBody:
+      "Créez une invitation dans Réglages › Coaching et envoyez le lien. Votre client peut être prêt et s'entraîner en quelques minutes.",
   },
 };

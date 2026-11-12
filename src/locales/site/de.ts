@@ -26,9 +26,9 @@ export const de: SiteText = {
       openApp: "App öffnen",
       features: "Funktionen",
       whoFor: "Für wen",
+      coaches: "Für Coaches",
       pricing: "Preise",
       whatsNew: "Neuigkeiten",
-      dashboard: "Dein Dashboard",
       exercises: "Übungsbibliothek",
       muscles: "Übungen nach Muskel",
       equipment: "Übungen nach Ausrüstung",
@@ -240,6 +240,9 @@ export const de: SiteText = {
       perMonth: "pro Monat",
       priceNote: "Etwa {perMonth} pro Monat, oder {monthly} pro Monat",
       trialCta: "Meine {days} Tage gratis starten",
+      coachLead: "Du coachst Kundinnen und Kunden?",
+      coachRest: "Deine Kundschaft trainiert kostenlos, und mit Pro siehst du ihre Workouts, schickst Routinen und hinterlässt Notizen.",
+      coachCta: "Liftsmith für Coaches",
       billed:
         "Abgerechnet über Google Play oder den App Store oder per Karte in der Web-App. Kündige jederzeit vor Ende des Tests und du zahlst nichts.",
     },
@@ -385,9 +388,90 @@ export const de: SiteText = {
         "Erweiterte Statistiken: 1RM-Verläufe, Sätze pro Muskel",
         "Plateau-Detektiv und Zieldatum-Planer",
       ],
-      ["Sync zwischen Geräten und Web-Dashboard", "Backup-Datei und CSV-Export", "Werbung", "Familienfreigabe"],
+      [
+        "Sync zwischen Geräten und Web-Dashboard",
+        "Training mit einem Coach, der deine Workouts sieht",
+        "Eigene Kunden coachen",
+        "Backup-Datei und CSV-Export",
+        "Werbung",
+        "Familienfreigabe",
+      ],
     ],
     never: "Nie",
     annualPlan: "Jahrestarif",
+  },
+  coaches: {
+    title: "Coache deine Kunden mit {name}: Berichte, Routinen und Notizen",
+    description:
+      "Lade Kunden mit einem Link ein, sieh, wer dich zuerst braucht, und schick ihnen Routinen und eine Notiz, während {name} jeden Satz vorausfüllt. Kunde sein ist kostenlos.",
+    h1: "Coache deine Kunden in {name}",
+    intro:
+      "Schick einen Einladungslink. Deine Kunden tragen jeden Satz in der App ein, und du siehst, wem du zuerst schreiben solltest, was sie trainiert und was sie geschafft haben, ganz ohne Tabelle.",
+    cta: "Mit dem Coaching starten",
+    how: {
+      title: "So funktioniert es",
+      steps: [
+        {
+          title: "Mit einem Link einladen",
+          body: "Erstelle unter Einstellungen › Coaching einen Einladungscode und schick den Link. Ein Code gilt eine Woche lang für alle Kunden, denen du ihn schickst.",
+        },
+        {
+          title: "Kunden sind in einer Minute startklar",
+          body: "Sie melden sich an, sehen genau, was du sehen wirst, und stimmen zu. Ziel, Erfahrung und Trainingstage, die du wählst, füllen ihre Einrichtung aus, sodass sie nur noch Studio und Körpergewicht angeben.",
+        },
+        {
+          title: "Sieh, wer dich zuerst braucht",
+          body: "Der Bericht jedes Kunden beginnt mit dem, was zu tun ist: seit Tagen kein Training, hinter dem Wochenziel, verfehlte Wiederholungen, eine stagnierende Übung oder neue Bestwerte, die ein Lob verdienen.",
+        },
+        {
+          title: "Routinen und eine Notiz schicken",
+          body: "Weise jede gespeicherte Routine zu und sieh, wie oft sie gemacht wird. Hinterlass eine Notiz, die oben auf ihrem Heute-Bildschirm bleibt, bis du sie änderst.",
+        },
+      ],
+    },
+    see: {
+      title: "Was du siehst und was nicht",
+      body: "Kunden stimmen zu, bevor etwas geteilt wird, und können das Teilen jederzeit beenden. Dann verlierst du sofort den Zugriff.",
+      seesLabel: "Du siehst",
+      sees: [
+        "Workouts des letzten Jahres: Übungen, Sätze, Gewichte und Wiederholungen",
+        "Wie lange sie trainiert haben und wie schwer sich Sätze anfühlten",
+        "Ihr Wochenziel und neue Bestwerte",
+      ],
+      neverLabel: "Du siehst nie",
+      never: [
+        "Herzfrequenz, Körpergewicht, Körperfett oder Maße",
+        "Gesundheitswerte, Bereitschaft oder Zyklus",
+        "Verletzungen, Notizen, Studios oder Fotos",
+      ],
+    },
+    cost: {
+      title: "Was es kostet",
+      body: "Kunden coachen ist Teil von {name} Pro ({annual} im Jahr oder {monthly} im Monat), für bis zu 30 Kunden. Kunde sein ist kostenlos, also kann jeder, den du einlädst, ohne zu zahlen starten.",
+      contactBefore: "Du coachst mehr Leute? ",
+      contactLink: "Sag uns, was du brauchst.",
+    },
+    faqTitle: "Fragen von Coaches",
+    faqs: [
+      {
+        q: "Müssen meine Kunden zahlen?",
+        a: "Nein. Kunde sein ist auf Android, iPhone und im Web kostenlos. Sie brauchen ein kostenloses Konto, damit ihre Workouts bei dir ankommen.",
+      },
+      {
+        q: "Brauchen meine Kunden Pro, um meinen Routinen zu folgen?",
+        a: "Nein. Die Routinen, die du zuweist, funktionieren im kostenlosen Plan, und die App füllt jeden Satz aus ihrem letzten Workout vor.",
+      },
+      {
+        q: "Kann ich ihre Herzfrequenz oder ihr Körpergewicht sehen?",
+        a: "Nein. Du siehst nur ihr Training. Gesundheitswerte, Körpermaße, Verletzungen und Notizen verlassen ihr Konto nie.",
+      },
+      {
+        q: "Wie fange ich an?",
+        a: "Öffne die App, geh zu Einstellungen › Coaching und erstelle einen Einladungscode. Wenn du noch kein Pro hast, zeigt dir die App dort die Pläne.",
+      },
+    ],
+    endTitle: "Hol heute deinen ersten Kunden dazu",
+    endBody:
+      "Erstelle unter Einstellungen › Coaching eine Einladung und schick den Link. Dein Kunde kann in wenigen Minuten eingerichtet sein und trainieren.",
   },
 };

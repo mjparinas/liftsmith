@@ -4,13 +4,16 @@ import "fake-indexeddb/auto";
 import { cleanup, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GET, POST } from "@/app/api/monthly/route.api";
 import { useAccount, type Account } from "@/lib/auth";
 import type { SessionSummary } from "@/lib/derive";
 import { monthChallenge } from "@/lib/monthly";
+import { resetMonthFinishers } from "@/lib/monthlyCount";
 import { useSocial } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { resetDb } from "@/server/db";
+import { recordFinish } from "@/server/monthly";
 import { handle } from "@/server/social";
 
 import { MonthCard, MonthFriends } from "./MonthChallenge";
@@ -35,6 +38,7 @@ beforeEach(async () => {
   vi.useFakeTimers({ toFake: ["Date"], now });
   await resetDb();
   localStorage.clear();
+  resetMonthFinishers();
 });
 afterEach(() => {
   vi.useRealTimers();
@@ -55,6 +59,49 @@ describe("the month card on Awards", () => {
     expect(screen.getByText(/to go: about .* a week finishes it\./)).toBeInTheDocument();
     expect(screen.getByText("Medals")).toBeInTheDocument();
     expect(screen.getAllByRole("listitem")[0]).toHaveAccessibleName(/, finished$/);
+  });
+});
+
+describe("everyone who finished this month", () => {
+  const api = () => {
+    const calls: string[] = [];
+    vi.stubGlobal("fetch", async (url: string, init?: RequestInit) => {
+      calls.push(`${init?.method ?? "GET"} ${url}`);
+      const req = new Request(`https://www.getliftsmith.com${url}`, init);
+      return init?.method === "POST" ? POST(req) : GET(req);
+    });
+    return calls;
+  };
+
+  it("shows how many lifters finished so far, without reporting this device before it finishes", async () => {
+    const calls = api();
+    await recordFinish(ch.key, "someone-else-xxxxxxxx");
+    await recordFinish(ch.key, "another-one-xxxxxxxx");
+    setSessions([session(ch.start + 1000)]);
+    render(<MonthCard />);
+    expect(await screen.findByText("2 lifters have finished it so far.")).toBeInTheDocument();
+    expect(calls).toEqual([`GET /api/monthly/?month=${ch.key}`]);
+  });
+
+  it("reports once when the lifter finishes, and counts them in", async () => {
+    const calls = api();
+    await recordFinish(ch.key, "someone-else-xxxxxxxx");
+    setSessions(Array.from({ length: 60 }, (_, i) => session(ch.start + i * 3_600_000)));
+    render(<MonthCard />);
+    expect(await screen.findByText("2 lifters have finished it, you included.")).toBeInTheDocument();
+    cleanup();
+    resetMonthFinishers();
+    render(<MonthCard />);
+    expect(await screen.findByText("2 lifters have finished it, you included.")).toBeInTheDocument();
+    expect(calls.filter((c) => c.startsWith("POST"))).toHaveLength(1);
+  });
+
+  it("leaves the line out when the count can't be reached", async () => {
+    vi.stubGlobal("fetch", async () => Promise.reject(new Error("offline")));
+    setSessions([session(ch.start + 1000)]);
+    render(<MonthCard />);
+    expect(await screen.findByText("Challenge of the month")).toBeInTheDocument();
+    expect(screen.queryByText(/lifters? ha(s|ve) finished/)).toBeNull();
   });
 });
 

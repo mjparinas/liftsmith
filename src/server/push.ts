@@ -16,9 +16,10 @@ import * as text from "@/locales/text/push";
 
 import { query, run } from "./db";
 
-export type PushKind = "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer";
+export type PushKind =
+  "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer" | "posted" | "best";
 /** Which Friends settings switch covers each kind (the columns on social_profiles). */
-export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent" | "push_cheers"> = {
+export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent" | "push_cheers" | "push_posts"> = {
   follow: "push_follows",
   request: "push_follows",
   accept: "push_follows",
@@ -32,6 +33,9 @@ export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_c
   mention: "push_comments",
   reply: "push_comments",
   cheer: "push_cheers",
+  // A workout from someone the lifter rang the bell for; "best" when it has a new best in it.
+  posted: "push_posts",
+  best: "push_posts",
 };
 /** Tokens kept per account (phones and tablets); the oldest go first. */
 export const MAX_TOKENS = 10;
@@ -129,7 +133,15 @@ async function send(
   if (!tokens.length) console.info(`push ${kind}: recipient has no registered phone`);
   const name = String(who.name);
   // A cheer opens the workout it was for; everything else opens its routine or Friends.
-  const route = kind === "sent" && vars.code ? `#/routine/${vars.code}` : kind === "cheer" ? "#/workout" : "#/friends";
+  // A bell's push opens the poster's profile, where the workout is on top.
+  const route =
+    kind === "sent" && vars.code
+      ? `#/routine/${vars.code}`
+      : kind === "cheer"
+        ? "#/workout"
+        : (kind === "posted" || kind === "best") && vars.code
+          ? `#/person/${vars.code}`
+          : "#/friends";
   const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
   await Promise.all(
     tokens.map(async (t) => {
