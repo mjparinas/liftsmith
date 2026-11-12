@@ -242,8 +242,8 @@ export function App() {
   // and web manifest shortcuts). Registered once the store is ready, so a cold start's action waits for it.
   useEffect(() => {
     if (!ready) return;
-    const run = (a: ShortcutAction) => {
-      const to = runShortcut(a);
+    const run = (a: ShortcutAction, at?: number) => {
+      const to = runShortcut(a, at);
       if (!location.hash.startsWith(`#/${to}`)) go(to);
     };
     const fromLink = linkAction(location.search);

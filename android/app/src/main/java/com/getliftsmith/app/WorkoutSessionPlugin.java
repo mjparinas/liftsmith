@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.ContextCompat;
+import com.getcapacitor.JSArray;
 import com.getcapacitor.JSObject;
 import com.getcapacitor.PermissionState;
 import com.getcapacitor.Plugin;
@@ -28,9 +29,17 @@ import com.getcapacitor.annotation.PermissionCallback;
 @CapacitorPlugin(name = "WorkoutSession", permissions = { @Permission(alias = "notifications", strings = { Manifest.permission.POST_NOTIFICATIONS }) })
 public class WorkoutSessionPlugin extends Plugin {
 
+    /** The plugin of the app's open screen, if any: while there is none, the web app can't hear a notification tap. */
+    private static volatile WorkoutSessionPlugin current;
+
     private BroadcastReceiver receiver;
     private BroadcastReceiver watchHr;
     private BroadcastReceiver watchMotion;
+
+    /** Whether the web app is there to take a notification tap (WorkoutService.tapped). */
+    static boolean isLive() {
+        return current != null;
+    }
 
     @Override
     public void load() {
@@ -39,6 +48,9 @@ public class WorkoutSessionPlugin extends Plugin {
             public void onReceive(Context context, Intent intent) {
                 JSObject data = new JSObject();
                 data.put("action", intent.getStringExtra(WorkoutService.EXTRA_ACTION));
+                // When it was tapped, so a set is logged at its own time even if the web app is slow to hear it.
+                long at = intent.getLongExtra("at", 0L);
+                if (at > 0) data.put("at", at);
                 notifyListeners("action", data, true);
             }
         };
@@ -72,6 +84,15 @@ public class WorkoutSessionPlugin extends Plugin {
             new IntentFilter(WatchListenerService.BROADCAST_MOTION),
             ContextCompat.RECEIVER_NOT_EXPORTED
         );
+        // Notification taps made while the app was closed, oldest first, with the time of each (WorkoutTaps).
+        // Kept until the web app listens, which logs each at its own time.
+        for (org.json.JSONObject tap : WorkoutTaps.drain(getContext())) {
+            JSObject data = new JSObject();
+            data.put("action", tap.optString("action"));
+            data.put("at", tap.optLong("at", 0L));
+            notifyListeners("action", data, true);
+        }
+        current = this;
         // A shortcut that cold-started the app. The event is kept until the web app listens for it.
         if (getActivity() != null && deliver(getActivity().getIntent())) getActivity().setIntent(new Intent(Intent.ACTION_MAIN));
     }
@@ -100,6 +121,7 @@ public class WorkoutSessionPlugin extends Plugin {
 
     @Override
     protected void handleOnDestroy() {
+        if (current == this) current = null;
         if (receiver != null) getContext().unregisterReceiver(receiver);
         if (watchHr != null) getContext().unregisterReceiver(watchHr);
         if (watchMotion != null) getContext().unregisterReceiver(watchMotion);
@@ -144,6 +166,9 @@ public class WorkoutSessionPlugin extends Plugin {
         i.putExtra("chip", call.getString("chip", ""));
         i.putExtra("done", call.getInt("done", 0));
         i.putExtra("total", call.getInt("total", 0));
+        // The notification after each of the next Log sets, so its Log set works with the app closed (sessionAhead.ts).
+        JSArray ahead = call.getArray("ahead");
+        i.putExtra("ahead", ahead == null ? "[]" : ahead.toString());
         ContextCompat.startForegroundService(getContext(), i);
         // The same workout on a Wear OS watch (WatchLink, android/wear).
         WatchLink.update(getContext(), call.getData());

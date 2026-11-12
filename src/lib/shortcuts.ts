@@ -20,9 +20,10 @@ export const isShortcut = (a: unknown): a is ShortcutAction => typeof a === "str
 /**
  * Runs a shortcut against the store and returns the screen to show. "start" begins today's planned
  * workout (or reopens the one running); "log" and "add30" act on the workout in progress and do
- * nothing without one, so a stray tap can never log a set nobody did.
+ * nothing without one, so a stray tap can never log a set nobody did. `at` is when a notification button was
+ * tapped (sessionNotify.ts `onSessionAction`), so a tap made with the app closed is logged at its own time.
  */
-export function runShortcut(action: ShortcutAction): "workout" | "today" {
+export function runShortcut(action: ShortcutAction, at?: number): "workout" | "today" {
   const s = useApp.getState();
   if (!s.ready || !s.profile.onboarded) return "today";
   if (action === "start") {
@@ -30,7 +31,7 @@ export function runShortcut(action: ShortcutAction): "workout" | "today" {
     return useApp.getState().active ? "workout" : "today";
   }
   if (!s.active) return "today";
-  if (action === "log") s.logSet();
+  if (action === "log") s.logSet(at);
   else s.addRest(30);
   return "workout";
 }

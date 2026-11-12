@@ -104,9 +104,7 @@ final class GarminLink {
         if (status != ConnectIQ.IQMessageStatus.SUCCESS || context == null) return;
         String action = GarminMessages.action(message);
         if (action != null) {
-            context.sendBroadcast(
-                new Intent(WorkoutService.BROADCAST_ACTION).setPackage(context.getPackageName()).putExtra(WorkoutService.EXTRA_ACTION, action)
-            );
+            WorkoutService.tap(context, action);
         }
         int bpm = GarminMessages.bpm(message);
         if (bpm > 0) {

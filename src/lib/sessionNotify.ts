@@ -35,6 +35,23 @@ export interface SessionState {
   sessionId?: string;
   /** Labs, watch rep counting: the Wear OS or Apple Watch app streams its motion for this set (watchMotion.ts). */
   motion?: boolean;
+  /** The notification after each of the next Log sets (sessionAhead.ts), so Log set works with the app closed. */
+  ahead?: AheadStep[];
+}
+
+/** What the notification shows after one more Log set, worked out by the app ahead of time (sessionAhead.ts). */
+export interface AheadStep {
+  title: string;
+  setLabel: string;
+  next: string;
+  plates?: string;
+  /** The rest that starts at the tap, in seconds; 0 for none (the last set, or auto-start rest is off). */
+  rest: number;
+  chip?: string;
+  done: number;
+  total: number;
+  /** Every planned set is logged: the notification says so and further taps do nothing. */
+  end?: boolean;
 }
 
 /** The status bar chip while lifting: "2/4" for set 2 of 4, "W1/2" for a warm-up. Numbers only, so it fits the
@@ -50,7 +67,7 @@ type Plugin = {
   update(s: SessionState): Promise<void>;
   stop(): Promise<void>;
   requestPermission(): Promise<{ granted: boolean }>;
-  addListener(event: "action", cb: (e: { action: SessionAction }) => void): Handle | Promise<Handle>;
+  addListener(event: "action", cb: (e: { action: SessionAction; at?: number }) => void): Handle | Promise<Handle>;
   addListener(event: "heartRate", cb: (e: { bpm: number }) => void): Handle | Promise<Handle>;
   addListener(event: "watchMotion", cb: (e: unknown) => void): Handle | Promise<Handle>;
 };
@@ -109,11 +126,20 @@ export async function restOverAlert(next: string, alert: { sound: boolean; vibra
   } as NotificationOptions);
 }
 
-/** Log set / +30 s on the native notification, and the voice and system shortcuts. Returns an unsubscribe function. */
-export function onSessionAction(cb: (a: SessionAction) => void): () => void {
+/**
+ * Log set / +30 s on the native notification, and the voice and system shortcuts. `at` is when it was tapped: a tap
+ * made with the app closed (or asleep in the background) reaches the app when it next runs, and is logged at its own
+ * time, not then. Returns an unsubscribe function.
+ */
+export function onSessionAction(cb: (a: SessionAction, at?: number) => void): () => void {
   const p = plugin();
   if (!p || !isNative()) return () => {};
-  return unlisten(p.addListener("action", (e) => cb(e.action)));
+  return unlisten(p.addListener("action", (e) => cb(e.action, tapTime(e.at))));
+}
+
+/** A tap's time from the native side: a real past moment (not in the future, not over a day old), else undefined (now). */
+export function tapTime(at: unknown, now = Date.now()): number | undefined {
+  return typeof at === "number" && Number.isFinite(at) && at <= now && at > now - 86400_000 ? Math.round(at) : undefined;
 }
 
 /** Heart rate from the watch app's own sensor (Wear OS or Apple Watch), about every 2 s. Returns an unsubscribe function. */

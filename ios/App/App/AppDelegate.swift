@@ -1,5 +1,6 @@
 import UIKit
 import Capacitor
+import UserNotifications
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -8,6 +9,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         excludeWebStorageFromBackup()
+        // A Log set or +30 s on the rest-over alert can launch the app in the background, before any web view exists;
+        // this delegate catches it (WorkoutTaps) until Capacitor's bridge sets its own.
+        UNUserNotificationCenter.current().delegate = EarlyNotifications.shared
+        // The same for Log set and +30 s from the Apple Watch, which can wake the app before there's a web view.
+        // The plugin takes these over when it loads (WorkoutSessionPlugin.load).
+        WatchLink.shared.onAction = { a in DispatchQueue.main.async { WorkoutTaps.tapped(a) } }
+        WatchLink.shared.start()
         return true
     }
 
