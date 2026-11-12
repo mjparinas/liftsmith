@@ -52,6 +52,9 @@ export function socialError(e: unknown): string {
     invite: "friends.err.invite",
     self: "friends.err.inviteSelf",
     tooMany: "friends.err.tooManyChallenges",
+    club: "friends.err.club",
+    clubs: "friends.err.clubs",
+    clubFull: "friends.err.clubFull",
     signedOut: "friends.err.signedOut",
     "Signed out. Sign in again.": "friends.err.signedOut",
   };

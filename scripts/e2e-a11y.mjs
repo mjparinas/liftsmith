@@ -343,6 +343,23 @@ try {
         },
       ],
     },
+    clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
+    club: {
+      club: {
+        id: "cl1",
+        name: "Iron Barn crew",
+        members: 3,
+        mine: true,
+        code: "ABCD2345",
+        owner: { handle: "alex", name: "Alex" },
+        rows: [
+          { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
+          { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
+          { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, workouts: 1, sets: 12, minutes: 40, volume: 3000, prs: 0 },
+        ],
+      },
+    },
+    clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
     inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
@@ -393,6 +410,13 @@ try {
   await page.getByRole("group", { name: "Challenge" }).waitFor();
   await scan("friends start challenge");
   await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Clubs" }).click();
+  await page.getByRole("button", { name: /Iron Barn crew/ }).waitFor();
+  await scan("friends clubs");
+  await page.getByRole("button", { name: /Iron Barn crew/ }).click();
+  await page.getByRole("button", { name: "Invite to the club" }).waitFor();
+  await scan("friends club");
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();
   await scan("friends activity");
@@ -406,6 +430,9 @@ try {
   await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
   await page.getByText("Blair invited you").waitFor();
   await scan("friends invite");
+  await page.goto(`${server.url}/app/#/club/ABCD2345`);
+  await page.getByRole("button", { name: "Join the club" }).waitFor();
+  await scan("friends club link");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");

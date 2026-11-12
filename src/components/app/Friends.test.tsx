@@ -11,7 +11,7 @@ import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { resetDb } from "@/server/db";
 import { handle } from "@/server/social";
 
-import { Friends, InviteScreen, PersonScreen } from "./Friends";
+import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { SendToFriend } from "./SendToFriend";
 
 // The app's Friends screens against the real server code (an in-memory database): each fetch to /api/social/
@@ -233,5 +233,28 @@ describe("Friends", () => {
     await u.click(screen.getByRole("button", { name: "More options" }));
     await u.click(screen.getByRole("button", { name: "Remove me from this post" }));
     await waitFor(() => expect(screen.queryByText("with Alex")).toBeNull());
+  });
+  it("starts a club, and someone joins it from its link and sees the week's board", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true });
+    signIn("tok-a");
+    render(<Friends tab="clubs" />);
+    expect(await screen.findByText("No clubs yet")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Start a club" }));
+    await u.type(screen.getByLabelText("Club name"), "Iron Barn crew");
+    await u.click(screen.getByRole("button", { name: "Start the club" }));
+    const sheet = within(await screen.findByRole("dialog", { name: "Iron Barn crew" }));
+    expect(await sheet.findByText("Alex (you)")).toBeInTheDocument();
+    cleanup();
+
+    const [club] = (await handle("acc-a", { op: "clubs" })).body.clubs as { id: string }[];
+    const { code } = (await handle("acc-a", { op: "club", id: club!.id, from: Date.now() - 86_400_000 })).body.club as { code: string };
+    signIn("tok-b");
+    render(<ClubScreen code={code} />);
+    expect(await screen.findByText("Iron Barn crew")).toBeInTheDocument();
+    expect(screen.getByText("1 member · run by Alex")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Join the club" }));
+    await waitFor(async () => expect(((await handle("acc-b", { op: "clubs" })).body.clubs as unknown[]).length).toBe(1));
   });
 });

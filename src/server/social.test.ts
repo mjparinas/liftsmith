@@ -472,3 +472,71 @@ describe("challenges and training partners (stage 5)", () => {
     for (const t of ["challenges", "challenge_members", "post_partners"]) expect(await query(`SELECT * FROM ${t}`), t).toEqual([]);
   });
 });
+
+describe("clubs and gym crews (stage 6)", () => {
+  type Club = { id: string; code: string; mine: boolean; members: number; rows: { handle: string; workouts: number; me: boolean }[] };
+  const from = NOW - 2 * DAY;
+  const open = async (who: string, id: string) => (await call(who, "club", { id, from })).body.club as Club;
+
+  it("starts a club anyone with its code can join, with a weekly board of what members posted", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    await join("acc-c", "casey");
+    const { id, code } = (await call("acc-a", "clubCreate", { name: "Iron Barn crew" })).body as { id: string; code: string };
+    expect(code).toMatch(/^[2-9A-HJ-NP-Z]{8}$/);
+    expect((await call("acc-b", "clubInfo", { code: code.toLowerCase() })).body.club).toMatchObject({
+      name: "Iron Barn crew",
+      members: 1,
+      owner: { handle: "alex" },
+      joined: false,
+    });
+    expect((await call("acc-b", "club", { id, from })).code).toBe(404); // not a member yet
+    await call("acc-b", "clubJoin", { code });
+    await call("acc-b", "clubJoin", { code }); // twice is once
+    await call("acc-a", "post", workout("s1", NOW - DAY));
+    await call("acc-b", "post", workout("b1", NOW - DAY));
+    await call("acc-b", "post", { ...workout("b2", NOW - DAY / 2), audience: "me" }); // never counts
+    await call("acc-c", "post", workout("c1", NOW - DAY)); // not in it
+    const c = await open("acc-b", id);
+    expect(c.members).toBe(2);
+    expect(c.rows.map((r) => [r.handle, r.workouts, r.me]).sort()).toEqual([
+      ["alex", 1, false],
+      ["blair", 1, true],
+    ]);
+    expect(((await call("acc-b", "clubs")).body.clubs as Club[])[0]).toMatchObject({ id, members: 2, mine: false });
+  });
+
+  it("lets the starter remove members and change the code, and deletes the club when they leave", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    const { id, code } = (await call("acc-a", "clubCreate", { name: "Crew" })).body as { id: string; code: string };
+    await call("acc-b", "clubJoin", { code });
+    expect((await call("acc-b", "clubManage", { id, remove: "alex" })).code).toBe(404); // only the starter
+    await call("acc-a", "clubManage", { id, remove: "blair" });
+    expect((await open("acc-a", id)).members).toBe(1);
+    const fresh = (await call("acc-a", "clubManage", { id, newCode: true })).body.code as string;
+    expect(fresh).not.toBe(code);
+    expect((await call("acc-b", "clubJoin", { code })).body.error).toBe("club");
+    await call("acc-b", "clubJoin", { code: fresh });
+    await call("acc-b", "clubLeave", { id });
+    expect((await open("acc-a", id)).members).toBe(1);
+    await call("acc-a", "clubLeave", { id });
+    expect(await query("SELECT * FROM clubs")).toEqual([]);
+  });
+
+  it("keeps blocked people out, caps clubs per lifter, and deleting the account removes its clubs", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    const { code } = (await call("acc-a", "clubCreate", { name: "Crew" })).body as { code: string };
+    await call("acc-a", "block", { handle: "blair" });
+    expect((await call("acc-b", "clubInfo", { code })).code).toBe(404);
+    expect((await call("acc-b", "clubJoin", { code })).body.error).toBe("club");
+    expect((await call("acc-a", "clubCreate", { name: "http://spam.example" })).body.error).toBe("name.link");
+    for (let i = 0; i < 10; i++) await call("acc-b", "clubCreate", { name: `Crew ${i}` }, NOW + i * DAY);
+    expect((await call("acc-b", "clubCreate", { name: "One more" }, NOW + 20 * DAY)).body.error).toBe("clubs");
+    await call("acc-a", "leave");
+    await call("acc-b", "leave");
+    expect(await query("SELECT * FROM clubs")).toEqual([]);
+    expect(await query("SELECT * FROM club_members")).toEqual([]);
+  });
+});

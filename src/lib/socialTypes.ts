@@ -192,6 +192,11 @@ export const SOCIAL_LIMITS = {
   challengeMembers: 20,
   /** Challenges one lifter can have running that they started. */
   challengesActive: 10,
+  clubName: 40,
+  /** People in one club, the starter included. */
+  clubMembers: 100,
+  /** Clubs one lifter can be in. */
+  clubsEach: 10,
   exercises: 20,
   muscles: 6,
 };
@@ -251,4 +256,30 @@ export interface Challenge {
   mine: boolean;
   status: "invited" | "joined";
   members: ChallengeMember[];
+}
+
+/** A club or gym crew in the lifter's list. */
+export interface ClubSummary {
+  id: string;
+  name: string;
+  members: number;
+  /** The reader started it (they run it). */
+  mine: boolean;
+}
+
+/** One club as a member sees it: its members, this week's board from their posts, and its join code. */
+export interface ClubDetail extends ClubSummary {
+  code: string;
+  owner: { handle: string; name: string };
+  rows: BoardRow[];
+}
+
+/** What the join screen shows before the lifter joins. */
+export interface ClubPreview {
+  id: string;
+  name: string;
+  members: number;
+  owner: { handle: string; name: string };
+  /** Already a member. */
+  joined: boolean;
 }
