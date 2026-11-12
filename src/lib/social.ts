@@ -65,6 +65,7 @@ export function socialError(e: unknown): string {
     club: "friends.err.club",
     clubs: "friends.err.clubs",
     clubFull: "friends.err.clubFull",
+    notTraining: "social.err.notTraining",
     signedOut: "friends.err.signedOut",
     "Signed out. Sign in again.": "friends.err.signedOut",
   };

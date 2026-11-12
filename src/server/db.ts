@@ -555,6 +555,26 @@ const SCHEMA = [
     PRIMARY KEY (comment_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS comment_mentions_account ON comment_mentions (account_id, created_at)`,
+  // Training now (social.ts live): the workout a lifter is doing, for mutual friends to see and cheer. A row
+  // older than LIVE_FOR counts as over; the app clears it when the workout ends.
+  `CREATE TABLE IF NOT EXISTS live_sessions (
+    account_id TEXT PRIMARY KEY,
+    session_id TEXT NOT NULL,
+    started_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    exercise_id TEXT NOT NULL DEFAULT '',
+    done INTEGER NOT NULL DEFAULT 0,
+    total INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE TABLE IF NOT EXISTS cheers (
+    id TEXT PRIMARY KEY,
+    from_id TEXT NOT NULL,
+    to_id TEXT NOT NULL,
+    session_id TEXT NOT NULL,
+    emoji TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS cheers_to ON cheers (to_id, created_at)`,
   // Suggestions the lifter dismissed (social.ts `suggest`): that person isn't suggested to them again.
   `CREATE TABLE IF NOT EXISTS suggest_hides (
     account_id TEXT NOT NULL,
@@ -638,6 +658,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "streak", "INTEGER NOT NULL DEFAULT 0"],
   // Friends gap list 2: a reply's top comment ('' for a comment on the post itself).
   ["post_comments", "reply_to", "TEXT NOT NULL DEFAULT ''"],
+  // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
+  ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
+  ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
 ];
 
 let client: Client | null = null;

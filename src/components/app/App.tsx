@@ -26,6 +26,7 @@ import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
 import { refreshSocial, socialOn } from "@/lib/social";
+import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
@@ -295,7 +296,10 @@ export function App() {
       go(r.route, r.arg);
     });
     const offOpen = onPushWhileOpen(() => void refreshSocial());
+    // Training now (Friends): the workout in progress, for mutual friends, while the lifter has it on.
+    const offLive = startLive();
     return () => {
+      offLive();
       unsub();
       offTap();
       offPush();

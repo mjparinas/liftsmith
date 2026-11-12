@@ -80,6 +80,7 @@ import { Avatar } from "./AvatarFace";
 import { CommentsSheet, LikersSheet } from "./Comments";
 import { ago, clock, repsText, setText } from "./format";
 import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
+import { TrainingNow } from "./FriendsLive";
 import { Icon } from "./icons";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
@@ -727,7 +728,7 @@ function Privacy({
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
   /** Once joined: who sees new posts and the best lifts switch. */
-  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest">;
+  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest" | "live">;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
@@ -762,6 +763,12 @@ function Privacy({
             on={joined.suggest !== false}
             onChange={(v) => set({ suggest: v })}
           />
+          <SwitchRow
+            label={t("social.live.share")}
+            hint={t("social.live.shareHint")}
+            on={!!joined.live}
+            onChange={(v) => set({ live: v })}
+          />
           <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{t("friends.aud.default")}</p>
           <AudienceChips value={joined.audience} onChange={(a) => set({ audience: a })} publicProfile={!!pub} />
         </>
@@ -782,6 +789,7 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
     ["comments", "friends.notify.comments"],
     ["sent", "friends.notify.sent"],
     ["likes", "friends.notify.likes"],
+    ["cheers", "social.notify.cheers"],
   ];
   return (
     <Section title={t("friends.notify")}>
@@ -1002,7 +1010,9 @@ function Activity({ onPeople, onBoard }: { onPeople: () => void; onBoard: () => 
                   ? t("social.act.mention", { name: i.name, text: i.text ?? "" })
                   : i.kind === "reply"
                     ? t("social.act.reply", { name: i.name, text: i.text ?? "" })
-                    : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+                    : i.kind === "cheer"
+                      ? t("social.act.cheer", { name: i.name, text: i.text ?? "" })
+                      : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (
@@ -2103,6 +2113,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
         </Chip>
       </div>
       <div className="mt-4">
+        {tab === "feed" && <TrainingNow />}
         {tab === "feed" && (
           <Posts
             op="feed"
