@@ -67,6 +67,8 @@ export interface SocialProfile {
   lifts: ShowcaseLift[];
   /** Can be suggested to people with a tie to the lifter (a mutual follow, a club, a tagged workout). On to start. */
   suggest: boolean;
+  /** Mutual friends see when the lifter is mid-workout and can cheer (off to start; Friends gap list 2, item 4). */
+  live: boolean;
   /** The level and the training-week streak last sent by the app, shown on the profile to people who see the posts. */
   level: number;
   streak: number;
@@ -112,6 +114,8 @@ export interface PushPrefs {
   comments: boolean;
   sent: boolean;
   likes: boolean;
+  /** A friend's cheer during a workout (on to start). */
+  cheers: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -207,7 +211,7 @@ export interface FeedComment {
   replyTo?: string;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
@@ -336,4 +340,31 @@ export interface ClubPreview {
   owner: { handle: string; name: string };
   /** Already a member. */
   joined: boolean;
+}
+
+/** The cheers a friend can send mid-workout, like a video call's reactions. */
+export const CHEERS = ["🔥", "💪", "👏", "🎉", "⚡"] as const;
+export type Cheer = (typeof CHEERS)[number];
+
+/** A mutual friend who is training right now. */
+export interface TrainingNow {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** The exercise they're on, its id (the reader's app names it), and sets done of the workout's total. */
+  exercise: string;
+  done: number;
+  total: number;
+  startedAt: number;
+  updatedAt: number;
+}
+
+/** A cheer that reached the lifter during their workout. */
+export interface CheerIn {
+  id: string;
+  handle: string;
+  name: string;
+  avatar: string;
+  emoji: Cheer;
+  at: number;
 }

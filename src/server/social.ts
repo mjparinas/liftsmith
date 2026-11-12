@@ -12,6 +12,7 @@ import {
   AVATAR_IDS,
   BOARD_METRICS,
   CHALLENGE_DAYS,
+  CHEERS,
   cleanHandle,
   HANDLE_RE,
   REPORT_REASONS,
@@ -20,6 +21,8 @@ import {
   type Audience,
   type BoardMetric,
   type Challenge,
+  type Cheer,
+  type CheerIn,
   type ClubDetail,
   type ClubPreview,
   type ClubSummary,
@@ -37,6 +40,7 @@ import {
   type SocialProfile,
   type Suggestion,
   type SuggestReason,
+  type TrainingNow,
 } from "@/lib/socialTypes";
 
 import { cleanCode, newCode } from "./coach";
@@ -63,6 +67,7 @@ export const DAILY = {
   invite: 30,
   challenge: 10,
   club: 5,
+  cheer: 300,
 };
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
@@ -110,6 +115,8 @@ interface ProfileRow extends Row {
   push_comments: number;
   push_sent: number;
   push_likes: number;
+  push_cheers: number;
+  live: number;
   suspended: number;
   seen_at: number;
   avatar: string;
@@ -156,12 +163,19 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   autoPost: !!n(r.auto_post),
   weights: !!n(r.weights),
   public: !!n(r.public),
-  push: { follows: !!n(r.push_follows), comments: !!n(r.push_comments), sent: !!n(r.push_sent), likes: !!n(r.push_likes) },
+  push: {
+    follows: !!n(r.push_follows),
+    comments: !!n(r.push_comments),
+    sent: !!n(r.push_sent),
+    likes: !!n(r.push_likes),
+    cheers: !!n(r.push_cheers ?? 1),
+  },
   avatar: avatarOf(r.avatar),
   audience: audienceOf(r.audience),
   showLifts: !!n(r.show_lifts),
   lifts: liftsOf(r),
   suggest: !!n(r.suggest),
+  live: !!n(r.live),
   level: n(r.level),
   streak: n(r.streak),
 });
@@ -276,7 +290,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
-         suggest = ?, level = ?, streak = ?
+         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -296,6 +310,8 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         flag(b.suggest, p.suggest ?? 1),
         clampInt(b.level, 0, 50, p.level),
         clampInt(b.streak, 0, 520, p.streak),
+        flag(b.live, p.live),
+        flag(push.cheers, p.push_cheers ?? 1),
         accountId,
       ],
     );
@@ -335,6 +351,8 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
     { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM push_tokens WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM live_sessions WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM cheers WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM suggest_hides WHERE account_id = ? OR hidden_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM social_profiles WHERE account_id = ?", args: a },
   ];
@@ -1255,6 +1273,8 @@ const ACTIVITY = `
     WHERE pc.account_id = ?1 AND c.account_id != ?1 AND p.account_id != ?1 AND c.hidden = 0
       AND NOT EXISTS (SELECT 1 FROM comment_mentions m WHERE m.comment_id = c.id AND m.account_id = ?1)
   UNION ALL
+  SELECT 'cheer', ch.from_id, ch.created_at, NULL, ch.emoji FROM cheers ch WHERE ch.to_id = ?1
+  UNION ALL
   SELECT 'challenge', c.owner_id, cm.created_at, NULL, c.name
     FROM challenge_members cm JOIN challenges c ON c.id = cm.challenge_id
     WHERE cm.account_id = ?1 AND cm.status = 'invited' AND c.owner_id != ?1`;
@@ -1288,6 +1308,117 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
   const seenAt = n(mine.seen_at);
   await run("UPDATE social_profiles SET seen_at = ? WHERE account_id = ?", [now, accountId]);
   return ok({ items, seenAt });
+}
+
+// --- Training now and cheers (gap list 2, item 4) ---
+
+/** A workout counts as live this long after its last update (a set logged, or the start). */
+export const LIVE_FOR = 20 * 60_000;
+/** One cheer per friend this often, so a tap-happy friend can't flood a workout. */
+export const CHEER_GAP = 5_000;
+
+/** Both follow each other (accepted), with no block either way. */
+async function mutual(a: string, b: string): Promise<boolean> {
+  const [r] = await query(
+    `SELECT 1 AS x FROM follows f1 JOIN follows f2 ON f2.follower_id = f1.followee_id AND f2.followee_id = f1.follower_id AND f2.accepted = 1
+     WHERE f1.follower_id = ? AND f1.followee_id = ? AND f1.accepted = 1`,
+    [a, b],
+  );
+  return !!r && !(await blockedEither(a, b));
+}
+
+/**
+ * The app says what the lifter is doing: the workout started, a set logged (exercise, sets done of the total), or
+ * (`on: false`) the workout ended. Kept only while "Show friends when I'm training" is on.
+ */
+export async function live(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const sessionId = s(b.sessionId);
+  if (b.on === false || !n(mine.live) || n(mine.suspended) || !/^[\w.:-]{1,80}$/.test(sessionId)) {
+    await run("DELETE FROM live_sessions WHERE account_id = ?", [accountId]);
+    return ok({ live: false });
+  }
+  const exercise = /^[\w.:-]{1,64}$/.test(s(b.exercise)) ? s(b.exercise) : "";
+  const done = Math.max(0, Math.min(500, Math.round(Number(b.done) || 0)));
+  const total = Math.max(done, Math.min(500, Math.round(Number(b.total) || 0)));
+  await run(
+    `INSERT INTO live_sessions (account_id, session_id, started_at, updated_at, exercise_id, done, total) VALUES (?1, ?2, ?3, ?3, ?4, ?5, ?6)
+     ON CONFLICT (account_id) DO UPDATE SET
+       started_at = CASE WHEN live_sessions.session_id = ?2 THEN live_sessions.started_at ELSE ?3 END,
+       session_id = ?2, updated_at = ?3, exercise_id = ?4, done = ?5, total = ?6`,
+    [accountId, sessionId, now, exercise, done, total],
+  );
+  return ok({ live: true });
+}
+
+/** Mutual friends training right now, most recently active first. */
+export async function training(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const rows = await query(
+    `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, l.exercise_id AS exercise, l.done AS done, l.total AS total,
+       l.started_at AS started_at, l.updated_at AS updated_at
+     FROM live_sessions l JOIN social_profiles sp ON sp.account_id = l.account_id
+     WHERE l.updated_at > ?2 AND sp.live = 1 AND sp.suspended = 0 AND l.account_id != ?1
+       AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = ?1 AND f.followee_id = l.account_id AND f.accepted = 1)
+       AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = l.account_id AND f.followee_id = ?1 AND f.accepted = 1)
+       AND ${NOT_BLOCKED("l.account_id", "?1")}
+     ORDER BY l.updated_at DESC LIMIT 50`,
+    [accountId, now - LIVE_FOR],
+  );
+  const people: TrainingNow[] = rows.map((r) => ({
+    ...toRow(r),
+    exercise: s(r.exercise),
+    done: n(r.done),
+    total: n(r.total),
+    startedAt: n(r.started_at),
+    updatedAt: n(r.updated_at),
+  }));
+  return ok({ people });
+}
+
+/** Sends a cheer to a mutual friend who is training right now: it shows on their workout screen and as a push. */
+export async function cheer(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const emoji = CHEERS.find((c) => c === b.emoji);
+  const p = await byHandle(s(b.handle));
+  if (!emoji || !p) return fail(404, "noOne");
+  const them = s(p.account_id);
+  if (them === accountId || n(p.suspended) || !(await mutual(accountId, them))) return fail(403, "notFriends");
+  const [l] = await query("SELECT session_id FROM live_sessions WHERE account_id = ? AND updated_at > ?", [them, now - LIVE_FOR]);
+  if (!l || !n(p.live)) return fail(404, "notTraining");
+  const [last] = await query("SELECT MAX(created_at) AS at FROM cheers WHERE from_id = ? AND to_id = ?", [accountId, them]);
+  if (n(last?.at) > now - CHEER_GAP) return fail(429, "slow");
+  if (!(await limit(accountId, "cheer", now))) return fail(429, "slow");
+  await run("INSERT INTO cheers (id, from_id, to_id, session_id, emoji, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
+    newId(),
+    accountId,
+    them,
+    s(l.session_id),
+    emoji,
+    now,
+  ]);
+  await notify(them, accountId, "cheer", { text: emoji });
+  return ok();
+}
+
+/** Cheers for the lifter's workout in progress since `since` (ms), oldest first, for the workout screen. */
+export async function cheers(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const since = Math.max(Number(b.since) || 0, now - LIVE_FOR);
+  const rows = await query(
+    `SELECT ch.id AS id, ch.emoji AS emoji, ch.created_at AS at, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar
+     FROM cheers ch JOIN social_profiles sp ON sp.account_id = ch.from_id
+     WHERE ch.to_id = ?1 AND ch.created_at > ?2 AND ch.session_id = ?3 AND sp.suspended = 0 AND ${NOT_BLOCKED("ch.from_id", "?1")}
+     ORDER BY ch.created_at LIMIT 50`,
+    [accountId, since, s(b.sessionId)],
+  );
+  const list: CheerIn[] = rows.map((r) => ({ ...toRow(r), id: s(r.id), emoji: s(r.emoji) as Cheer, at: n(r.at) }));
+  return ok({ cheers: list });
 }
 
 // --- The one route ---
@@ -1783,6 +1914,10 @@ export const OPS: Record<string, Op> = {
   unsuggest,
   personPeople: (a, b) => personPeople(a, b),
   likers: (a, b) => likers(a, b),
+  live,
+  training,
+  cheer,
+  cheers,
   follow: followOp,
   unfollow: (a, b) => unfollow(a, b),
   answer: (a, b) => answer(a, b),

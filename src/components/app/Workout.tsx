@@ -52,6 +52,7 @@ import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
+import { CheerRain } from "./workout/CheerRain";
 import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
 import { MachineCard } from "./workout/MachineCard";
@@ -488,6 +489,7 @@ export function Workout() {
   return (
     <div className={docked ? (undoShown || voiceLog ? "pb-[17.5rem]" : "pb-56") : undoShown || voiceLog ? "pb-[14.5rem]" : "pb-44"}>
       <PrMoment />
+      <CheerRain sessionId={active.sessionId} startedAt={active.startedAt} />
       <header className="flex items-center justify-between pt-1">
         <button
           type="button"

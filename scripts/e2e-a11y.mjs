@@ -295,7 +295,7 @@ try {
         autoPost: false,
         weights: true,
         public: false,
-        push: { follows: true, comments: true, sent: true, likes: false },
+        push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
         avatar: "",
         audience: "all",
         showLifts: true,
@@ -419,6 +419,20 @@ try {
     },
     search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
     personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
+    training: {
+      people: [
+        {
+          handle: "blair",
+          name: "Blair",
+          avatar: "av-trophy",
+          exercise: "back-squat",
+          done: 4,
+          total: 15,
+          startedAt: Date.now() - 1_800_000,
+          updatedAt: Date.now() - 60_000,
+        },
+      ],
+    },
   };
   await page.route("**/api/social/", (r) => r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }));
   await page.route("**/api/sync/", (r) => r.fulfill({ json: { cursor: 0, events: [], deleted: [], records: [], more: false } }));
@@ -427,6 +441,7 @@ try {
   );
   await page.reload();
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
+  await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
   await scan("friends feed");
   await page.getByRole("button", { name: "More options" }).click();
   await page

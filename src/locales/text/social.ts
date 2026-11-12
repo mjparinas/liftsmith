@@ -10,7 +10,7 @@ export const en = {
   "social.hide": "Hide",
   "social.hideNamed": "Hide {name}",
   "social.why.followsYou": "Follows you",
-  "social.why.partner": "You've trained together",
+  "social.why.partner": "You’ve trained together",
   "social.why.club": "In {club} with you",
   "social.why.mutual": "Followed by {name}",
   "social.why.mutualMany": {
@@ -60,6 +60,18 @@ export const en = {
   "social.mentionHint": "Type @ to mention someone. They’re told if they can see this workout.",
   "social.likers": { one: "{count} like: see who", other: "{count} likes: see who" },
   "social.likersTitle": "Liked by",
+  "social.live.title": "Training now",
+  "social.live.progress": { one: "{exercise} · {count} of {total} sets done", other: "{exercise} · {count} of {total} sets done" },
+  "social.live.cheer": "{emoji} Cheer {name} on",
+  "social.live.sent": "Cheer sent to {name}.",
+  "social.live.share": "Show friends when I’m training",
+  "social.live.shareHint":
+    "Friends who follow you back see the exercise you’re on and can send a cheer to your workout screen. Gone when the workout ends.",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name} cheered you on {emoji}",
+  "social.act.cheer": "{name} cheered you on {text}",
+  "social.notify.cheers": "Cheers while I train",
+  "social.err.notTraining": "They’ve finished their workout.",
 } as const;
 
 type Key = keyof typeof en;
@@ -123,6 +135,18 @@ export const es: Partial<Record<Key, Message>> = {
   "social.mentionHint": "Escribe @ para mencionar a alguien. Se le avisa si puede ver este entrenamiento.",
   "social.likers": { one: "{count} me gusta: ver quién", other: "{count} me gusta: ver quién" },
   "social.likersTitle": "Les gusta a",
+  "social.live.title": "Entrenando ahora",
+  "social.live.progress": { one: "{exercise} · {count} de {total} series hechas", other: "{exercise} · {count} de {total} series hechas" },
+  "social.live.cheer": "{emoji} Animar a {name}",
+  "social.live.sent": "Ánimo enviado a {name}.",
+  "social.live.share": "Mostrar a mis amigos cuando entreno",
+  "social.live.shareHint":
+    "Los amigos que te siguen de vuelta ven el ejercicio que haces y pueden mandarte ánimos a la pantalla del entrenamiento. Desaparece al terminar.",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name} te animó {emoji}",
+  "social.act.cheer": "{name} te animó {text}",
+  "social.notify.cheers": "Ánimos mientras entreno",
+  "social.err.notTraining": "Ya terminó su entrenamiento.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -148,15 +172,15 @@ export const fr: Partial<Record<Key, Message>> = {
     one: "{count} séance publiée ces 12 dernières semaines",
     other: "{count} séances publiées ces 12 dernières semaines",
   },
-  "social.usual": "S'entraîne d'habitude le {days}. Choisissez l'un de ces jours pour vous entraîner ensemble.",
-  "social.usualNone": "Pas encore de jours d'entraînement réguliers.",
+  "social.usual": "S’entraîne d’habitude le {days}. Choisissez l’un de ces jours pour vous entraîner ensemble.",
+  "social.usualNone": "Pas encore de jours d’entraînement réguliers.",
   "social.calendarEmpty": "Aucune séance publiée ces 12 dernières semaines.",
-  "social.calendarEmptySelf": "Les séances que vous publiez dans Amis s'affichent ici.",
+  "social.calendarEmptySelf": "Les séances que vous publiez dans Amis s’affichent ici.",
   "social.loading": "Chargement…",
-  "social.listNone": "Personne pour l'instant.",
+  "social.listNone": "Personne pour l’instant.",
   "social.suggestMe": "Me suggérer aux personnes qui me connaissent peut-être",
   "social.suggestMeHint":
-    "Les personnes qui suivent quelqu'un que vous suivez, partagent un club avec vous ou se sont entraînées avec vous peuvent vous voir dans Personnes que vous connaissez peut-être.",
+    "Les personnes qui suivent quelqu’un que vous suivez, partagent un club avec vous ou se sont entraînées avec vous peuvent vous voir dans Personnes que vous connaissez peut-être.",
   "social.post.title": "Séance de {name}",
   "social.post.sets": { one: "{count} série", other: "{count} séries" },
   "social.post.bests": "Nouveau record : {lifts}",
@@ -171,7 +195,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "social.post.yoursAbove": "Vous : {set}, {when}. La vôtre dépasse sa meilleure série de {pct} %.",
   "social.post.yoursSame": "Vous : {set}, {when}. À égalité avec sa meilleure série.",
   "social.post.doIt": "Faire cette séance",
-  "social.post.doItHint": "Elle est enregistrée comme routine. Vos propres charges et répétitions s'ajoutent quand vous la lancez.",
+  "social.post.doItHint": "Elle est enregistrée comme routine. Vos propres charges et répétitions s’ajoutent quand vous la lancez.",
   "social.post.open": "Voir toute la séance de {name}",
   "social.post.see": "Voir toutes les séries ›",
   "social.act.mention": "{name} vous a mentionné : « {text} »",
@@ -180,10 +204,22 @@ export const fr: Partial<Record<Key, Message>> = {
   "social.replyTo": "Répondre à {name}",
   "social.replying": "Réponse à {name}",
   "social.replyCancel": "Annuler",
-  "social.mention": "Mentionner quelqu'un",
-  "social.mentionHint": "Tapez @ pour mentionner quelqu'un. La personne est prévenue si elle peut voir cette séance.",
-  "social.likers": { one: "{count} j'aime : voir qui", other: "{count} j'aime : voir qui" },
+  "social.mention": "Mentionner quelqu’un",
+  "social.mentionHint": "Tapez @ pour mentionner quelqu’un. La personne est prévenue si elle peut voir cette séance.",
+  "social.likers": { one: "{count} j’aime : voir qui", other: "{count} j’aime : voir qui" },
   "social.likersTitle": "Aimé par",
+  "social.live.title": "À l’entraînement",
+  "social.live.progress": { one: "{exercise} · {count} série sur {total} faite", other: "{exercise} · {count} séries sur {total} faites" },
+  "social.live.cheer": "{emoji} Encourager {name}",
+  "social.live.sent": "Encouragement envoyé à {name}.",
+  "social.live.share": "Montrer à mes amis quand je m’entraîne",
+  "social.live.shareHint":
+    "Les amis qui vous suivent aussi voient l’exercice en cours et peuvent envoyer un encouragement sur votre écran d’entraînement. Disparaît à la fin de la séance.",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name} vous encourage {emoji}",
+  "social.act.cheer": "{name} vous a encouragé {text}",
+  "social.notify.cheers": "Encouragements pendant l’entraînement",
+  "social.err.notTraining": "Sa séance est terminée.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -242,6 +278,21 @@ export const de: Partial<Record<Key, Message>> = {
   "social.mentionHint": "Tippe @, um jemanden zu erwähnen. Die Person erfährt es, wenn sie dieses Training sehen kann.",
   "social.likers": { one: "{count} Like: wer?", other: "{count} Likes: wer?" },
   "social.likersTitle": "Gefällt",
+  "social.live.title": "Trainiert gerade",
+  "social.live.progress": {
+    one: "{exercise} · {count} von {total} Sätzen geschafft",
+    other: "{exercise} · {count} von {total} Sätzen geschafft",
+  },
+  "social.live.cheer": "{emoji} {name} anfeuern",
+  "social.live.sent": "Anfeuerung an {name} gesendet.",
+  "social.live.share": "Freunden zeigen, wenn ich trainiere",
+  "social.live.shareHint":
+    "Freunde, denen du auch folgst, sehen deine aktuelle Übung und können dich auf deinem Trainingsbildschirm anfeuern. Verschwindet, wenn das Training endet.",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name} feuert dich an {emoji}",
+  "social.act.cheer": "{name} hat dich angefeuert {text}",
+  "social.notify.cheers": "Anfeuerungen beim Training",
+  "social.err.notTraining": "Das Training ist schon vorbei.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -291,7 +342,7 @@ export const it: Partial<Record<Key, Message>> = {
   "social.post.yoursSame": "Tu: {set}, {when}. Pari alla sua serie migliore.",
   "social.post.doIt": "Fai questo allenamento",
   "social.post.doItHint": "Viene salvato come routine. I tuoi pesi e ripetizioni si compilano quando lo inizi.",
-  "social.post.open": "Vedi tutto l'allenamento di {name}",
+  "social.post.open": "Vedi tutto l’allenamento di {name}",
   "social.post.see": "Vedi tutte le serie ›",
   "social.act.mention": "{name} ti ha menzionato: «{text}»",
   "social.act.reply": "{name} ha risposto al tuo commento: «{text}»",
@@ -303,6 +354,18 @@ export const it: Partial<Record<Key, Message>> = {
   "social.mentionHint": "Scrivi @ per menzionare qualcuno. Viene avvisato se può vedere questo allenamento.",
   "social.likers": { one: "{count} mi piace: vedi chi", other: "{count} mi piace: vedi chi" },
   "social.likersTitle": "Piace a",
+  "social.live.title": "Si allena ora",
+  "social.live.progress": { one: "{exercise} · {count} serie su {total} fatta", other: "{exercise} · {count} serie su {total} fatte" },
+  "social.live.cheer": "{emoji} Fai il tifo per {name}",
+  "social.live.sent": "Tifo inviato a {name}.",
+  "social.live.share": "Mostra agli amici quando mi alleno",
+  "social.live.shareHint":
+    "Gli amici che ti seguono a loro volta vedono l’esercizio che stai facendo e possono mandarti un incoraggiamento sullo schermo dell’allenamento. Sparisce a fine allenamento.",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name} fa il tifo per te {emoji}",
+  "social.act.cheer": "{name} ha fatto il tifo per te {text}",
+  "social.notify.cheers": "Tifo mentre mi alleno",
+  "social.err.notTraining": "Ha già finito l’allenamento.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -355,4 +418,16 @@ export const ja: Partial<Record<Key, Message>> = {
   "social.mentionHint": "@を入力するとメンションできます。このトレーニングを見られる人に通知されます。",
   "social.likers": { other: "いいね{count}件:誰か見る" },
   "social.likersTitle": "いいねした人",
+  "social.live.title": "トレーニング中",
+  "social.live.progress": { other: "{exercise} · {total}セット中{count}セット完了" },
+  "social.live.cheer": "{emoji} {name}さんを応援",
+  "social.live.sent": "{name}さんに応援を送りました。",
+  "social.live.share": "トレーニング中であることを友達に表示",
+  "social.live.shareHint":
+    "相互フォローの友達に今の種目が表示され、あなたのワークアウト画面に応援を送れます。ワークアウトが終わると消えます。",
+  "social.cheer.from": "{name} {emoji}",
+  "social.cheer.said": "{name}さんが応援しています {emoji}",
+  "social.act.cheer": "{name}さんがあなたを応援しました {text}",
+  "social.notify.cheers": "トレーニング中の応援",
+  "social.err.notTraining": "ワークアウトはもう終わりました。",
 };
