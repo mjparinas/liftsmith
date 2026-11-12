@@ -1,6 +1,6 @@
 "use client";
 
-// Sonos (a lab, `labSonos`; docs/decisions/sonos.md). `SonosSettings` is the speaker, the volumes and Follow my
+// Sonos (a lab, `labSonos`; docs/decisions/sonos.md). `SonosSettings` is the speaker, the volume sliders and Follow my
 // workout, shown in Connected apps under Sonos and in the workout's Sonos sheet. `SonosBar` sits on the workout
 // screen under the set or rest card: what's playing, previous, play or pause, next, and a speaker icon with a volume slider.
 import { useEffect, useRef, useState, type CSSProperties } from "react";
@@ -11,7 +11,7 @@ import { clampVol, refreshSonos, setSonosPrefs, sonosSend, useSonos } from "@/li
 import { useVisible } from "@/lib/visibility";
 
 import { Icon, type IconName } from "./icons";
-import { BumpField, Chip, InlineSwitch, Sheet } from "./ui";
+import { Chip, InlineSwitch, Sheet } from "./ui";
 
 function SonosError() {
   const error = useSonos((s) => s.error);
@@ -20,6 +20,37 @@ function SonosError() {
     <p className="mt-2 text-sm text-warn" role="alert">
       {error === "unlinked" ? t("conn.sonos.unlinked") : error === "offline" ? t("conn.offline") : t("conn.sonos.failed")}
     </p>
+  );
+}
+
+/** A speaker icon, a 0 to 100 slider and the number: the set and rest volumes and the live volume on the workout card. */
+function VolumeSlider({ value, label, onChange }: { value: number; label: string; onChange: (v: number) => void }) {
+  return (
+    <div className="mt-1 flex min-h-11 items-center gap-3 px-1">
+      <Icon name="volume" size={20} className="shrink-0 text-muted" />
+      <input
+        type="range"
+        min={0}
+        max={100}
+        step={1}
+        value={value}
+        aria-label={label}
+        onChange={(e) => {
+          const next = clampVol(Number(e.target.value));
+          // A light tick every 5 steps, like the other sliders, not on every one.
+          if (Math.floor(next / 5) !== Math.floor(value / 5)) {
+            haptic("select");
+            sound.tick();
+          }
+          onChange(next);
+        }}
+        className="slider min-w-0 flex-1"
+        style={{ "--fill": `${value}%` } as CSSProperties}
+      />
+      <span className="num w-8 text-right text-sm font-semibold" aria-hidden>
+        {value}
+      </span>
+    </div>
   );
 }
 
@@ -68,27 +99,11 @@ export function SonosSettings() {
         <>
           <div>
             <p className="text-sm font-semibold">{t("conn.sonos.setVolume")}</p>
-            <BumpField
-              className="mt-1"
-              value={String(prefs.setVolume)}
-              onChange={(v) => setSonosPrefs({ setVolume: Number(v) })}
-              step={5}
-              start={40}
-              max={100}
-              label={t("conn.sonos.setVolume")}
-            />
+            <VolumeSlider value={prefs.setVolume} label={t("conn.sonos.setVolume")} onChange={(v) => setSonosPrefs({ setVolume: v })} />
           </div>
           <div>
             <p className="text-sm font-semibold">{t("conn.sonos.restVolume")}</p>
-            <BumpField
-              className="mt-1"
-              value={String(prefs.restVolume)}
-              onChange={(v) => setSonosPrefs({ restVolume: Number(v) })}
-              step={5}
-              start={25}
-              max={100}
-              label={t("conn.sonos.restVolume")}
-            />
+            <VolumeSlider value={prefs.restVolume} label={t("conn.sonos.restVolume")} onChange={(v) => setSonosPrefs({ restVolume: v })} />
           </div>
           <div>
             <p className="text-sm font-semibold">{t("conn.sonos.start")}</p>
@@ -143,13 +158,7 @@ export function SonosBar({ resting }: { resting: boolean }) {
   const group = state?.groups.find((g) => g.id === prefs.group);
   const shown = vol ?? now?.volume ?? null;
 
-  const slide = (raw: number) => {
-    const next = clampVol(raw);
-    // A light tick every 5 steps, like the other sliders, not on every one.
-    if (shown !== null && Math.floor(next / 5) !== Math.floor(shown / 5)) {
-      haptic("select");
-      sound.tick();
-    }
+  const slide = (next: number) => {
     setVol(next);
     clearTimeout(wait.current);
     wait.current = setTimeout(() => {
@@ -187,31 +196,15 @@ export function SonosBar({ resting }: { resting: boolean }) {
         />
         <Round icon="skipNext" label={t("conn.sonos.next")} onClick={() => void sonosSend({ do: "next" })} />
       </div>
-      {now && (
-        <div className="mt-1 flex min-h-11 items-center gap-3 px-1">
-          <Icon name="volume" size={20} className="shrink-0 text-muted" />
-          {shown === null ? (
+      {now &&
+        (shown === null ? (
+          <div className="mt-1 flex min-h-11 items-center gap-3 px-1">
+            <Icon name="volume" size={20} className="shrink-0 text-muted" />
             <span className="text-sm text-muted">{t("conn.sonos.fixed")}</span>
-          ) : (
-            <>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                step={1}
-                value={shown}
-                aria-label={t("conn.sonos.volume")}
-                onChange={(e) => slide(Number(e.target.value))}
-                className="slider min-w-0 flex-1"
-                style={{ "--fill": `${shown}%` } as CSSProperties}
-              />
-              <span className="num w-8 text-right text-sm font-semibold" aria-hidden>
-                {shown}
-              </span>
-            </>
-          )}
-        </div>
-      )}
+          </div>
+        ) : (
+          <VolumeSlider value={shown} label={t("conn.sonos.volume")} onChange={slide} />
+        ))}
       <SonosError />
       <Sheet open={open} onClose={() => setOpen(false)} title={t("conn.sonos.settings")}>
         <SonosSettings />
