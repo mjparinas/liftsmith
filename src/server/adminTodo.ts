@@ -1,5 +1,5 @@
 // The admin To Do tab (modelled on Gradelings' src/server/adminQueue.ts): one list of what needs a person.
-// Items worked out from the data (mail waiting for an answer, creators owed a payout, payment failures, a late or
+// Items worked out from the data (mail waiting for an answer, reports waiting for a decision, creators owed a payout, payment failures, a late or
 // failed reminder job, setup still to do) plus the admins' own tasks. A worked-out item can be snoozed or dismissed
 // by its key (admin_todo_hidden); it comes back when the snooze ends, or, for one whose key changes with the data
 // (a new message, a new failure), as soon as there's something new.
@@ -14,7 +14,7 @@ const DAY = 86_400_000;
 /** "Dismiss" hides an item for good, stored as a far-off date so one column covers both. */
 const FOREVER = 8_640_000_000_000_000;
 
-export type TodoKind = "inbox" | "creator" | "billing" | "job" | "setup";
+export type TodoKind = "inbox" | "reports" | "creator" | "billing" | "job" | "setup";
 
 export interface TodoItem {
   key: string;
@@ -90,6 +90,32 @@ async function inboxItems(now: number): Promise<TodoItem[]> {
     at: m.receivedAt,
     action: { label: "Open in Inbox", tab: "Inbox" },
   }));
+}
+
+/** Reports on Friends and on listed gyms that wait for a decision on the Reports tab. */
+async function reportItems(): Promise<TodoItem[]> {
+  const [friends, gyms] = await Promise.all([
+    query<{ n: number; last: number | null }>(
+      "SELECT COUNT(DISTINCT kind || ':' || target_id) AS n, MAX(created_at) AS last FROM reports WHERE status = 'open'",
+    ),
+    query<{ n: number; last: number | null }>(
+      "SELECT COUNT(DISTINCT gym_id) AS n, MAX(created_at) AS last FROM gym_reports WHERE status = 'open'",
+    ),
+  ]);
+  const n = Number(friends[0]?.n ?? 0) + Number(gyms[0]?.n ?? 0);
+  if (!n) return [];
+  const last = Math.max(Number(friends[0]?.last ?? 0), Number(gyms[0]?.last ?? 0));
+  return [
+    {
+      // The newest report is in the key, so a new one brings a dismissed item back.
+      key: `reports:${last}`,
+      kind: "reports",
+      title: n === 1 ? "1 report waiting for a decision" : `${n} reports waiting for a decision`,
+      detail: "Posts, comments, profiles or gym listings lifters reported. Three reports hide a post until it's decided.",
+      at: last || null,
+      action: { label: "Open Reports", tab: "Reports" },
+    },
+  ];
 }
 
 async function creatorItems(now: number): Promise<TodoItem[]> {
@@ -170,6 +196,7 @@ export async function todoList(now = Date.now()): Promise<TodoList> {
   const problems: string[] = [];
   const groups = await Promise.all([
     from("Inbox", () => inboxItems(now), problems),
+    from("Reports", () => reportItems(), problems),
     from("Creators", () => creatorItems(now), problems),
     from("Billing", () => billingItems(now), problems),
     from("Reminder job", () => jobItems(now), problems),

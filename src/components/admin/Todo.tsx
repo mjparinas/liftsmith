@@ -10,7 +10,14 @@ import type { AdminTask, TodoItem, TodoKind, TodoList } from "@/server/adminTodo
 import { Card } from "./charts";
 import { ago } from "./time";
 
-const KIND_LABEL: Record<TodoKind, string> = { inbox: "Inbox", creator: "Codes", billing: "Billing", job: "System", setup: "Setup" };
+const KIND_LABEL: Record<TodoKind, string> = {
+  inbox: "Inbox",
+  reports: "Reports",
+  creator: "Codes",
+  billing: "Billing",
+  job: "System",
+  setup: "Setup",
+};
 const post = async (body: Record<string, unknown>) => {
   const r = await fetch("/api/admin/todo/", {
     method: "POST",

@@ -3,7 +3,7 @@
 // Small SVG charts for the admin panel. No chart library: thin marks, one axis, a legend for two or more
 // series plus direct end labels, and a hover tooltip on every chart. The categorical colours were checked
 // with the dataviz validator against the panel's surface (#11161d): all pass in dark mode.
-import { useId, useRef, useState, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
 export const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"] as const;
 const DAY = 86_400_000;
@@ -12,6 +12,25 @@ export const fmtInt = (n: number) => Math.round(n).toLocaleString("en-US");
 export const fmtPct = (x: number | null | undefined, d = 1) => (x == null ? "—" : `${(x * 100).toFixed(d)}%`);
 export const fmtUsd = (x: number | null | undefined, d = 0) =>
   x == null ? "—" : `$${x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d })}`;
+/**
+ * The width a chart draws at: its box's real width (in CSS pixels), so the 11px labels stay 11px on a phone
+ * instead of shrinking with a fixed 960-wide drawing, and the chart never scrolls sideways.
+ */
+function useChartWidth(): [React.RefObject<HTMLElement | null>, number] {
+  const ref = useRef<HTMLElement | null>(null);
+  const [w, setW] = useState(960);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === "undefined") return;
+    const read = () => setW(Math.max(280, Math.round(el.clientWidth)) || 960);
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return [ref, w];
+}
+
 export const fmtDay = (day: number) => new Date(day * DAY).toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 
 export function Tile({
@@ -19,20 +38,33 @@ export function Tile({
   value,
   sub,
   delta,
+  points,
   hint,
 }: {
   label: string;
   value: string;
   sub?: string;
+  /** Change against the period before, as a share of it (0.1 is up 10%). */
   delta?: number | null;
+  /** For a rate: the change in percentage points against the period before (0.03 is up 3 points). */
+  points?: number | null;
   hint?: string;
 }) {
+  const pts = points != null && Number.isFinite(points) ? Math.round(points * 100) : null;
   return (
     <div className="card p-4" title={hint}>
       <div className="text-xs uppercase tracking-wider text-muted">{label}</div>
       <div className="num mt-1 text-2xl font-bold">{value}</div>
-      {(sub || delta != null) && (
+      {(sub || delta != null || pts != null) && (
         <div className="mt-1 text-xs text-muted">
+          {pts != null && (
+            <span
+              className={pts >= 0 ? "text-good" : "text-bad"}
+              aria-label={`${pts >= 0 ? "up" : "down"} ${Math.abs(pts)} points on the period before`}
+            >
+              {pts >= 0 ? "▲" : "▼"} {Math.abs(pts)} pts{" "}
+            </span>
+          )}
           {delta != null && Number.isFinite(delta) && (
             <span
               className={delta >= 0 ? "text-good" : "text-bad"}
@@ -155,10 +187,11 @@ export function LineChart({
 }) {
   const [hover, setHover] = useState<number | null>(null);
   const ref = useRef<SVGSVGElement>(null);
-  const W = 960;
+  const [box, W] = useChartWidth();
   const H = height;
-  const L = 64;
-  const R = 96;
+  const narrow = W < 560;
+  const L = narrow ? 44 : 64;
+  const R = colorsShown(lines.length) ? (narrow ? 72 : 96) : 12;
   const T = 8;
   const B = 22;
   const top = Math.max(0, ...rows.flatMap((r) => lines.map((l) => r[l.key] ?? 0)));
@@ -191,14 +224,14 @@ export function LineChart({
     const i = Math.round(((px - L) / (W - L - R)) * (rows.length - 1));
     setHover(Math.max(0, Math.min(rows.length - 1, i)));
   };
-  const step = Math.max(1, Math.ceil(rows.length / 6));
+  const step = Math.max(1, Math.ceil(rows.length / (narrow ? 3 : 6)));
   const last = rows.length - 1;
   return (
-    <figure className="relative overflow-x-auto">
+    <figure ref={box} className="relative">
       <svg
         ref={ref}
         viewBox={`0 0 ${W} ${H}`}
-        className="w-full min-w-[560px]"
+        className="w-full"
         role="img"
         aria-label={label}
         onPointerMove={onMove}
@@ -282,6 +315,9 @@ export function LineChart({
   );
 }
 
+/** End labels are drawn for up to four lines (see LineChart), and they need room on the right. */
+const colorsShown = (n: number) => n <= 4;
+
 /** Stacked bars per day. */
 export function StackedBars({
   rows,
@@ -299,7 +335,7 @@ export function StackedBars({
   label: string;
 }) {
   const [hover, setHover] = useState<number | null>(null);
-  const W = 960;
+  const [box, W] = useChartWidth();
   const H = height;
   const L = 40;
   const T = 6;
@@ -308,11 +344,11 @@ export function StackedBars({
   const max = niceMax(Math.max(0, ...totals));
   const bw = (W - L) / Math.max(1, rows.length);
   const ys = (v: number) => ((H - T - B) * v) / max;
-  const step = Math.max(1, Math.ceil(rows.length / 6));
+  const step = Math.max(1, Math.ceil(rows.length / (W < 560 ? 3 : 6)));
   const shown = keys.filter((k) => rows.some((r) => (r[k] ?? 0) > 0));
   return (
-    <figure className="relative overflow-x-auto">
-      <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[560px]" role="img" aria-label={label} onPointerLeave={() => setHover(null)}>
+    <figure ref={box} className="relative">
+      <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={label} onPointerLeave={() => setHover(null)}>
         {[0, max / 2, max].map((t) => (
           <g key={t}>
             <line x1={L} x2={W} y1={H - B - ys(t)} y2={H - B - ys(t)} stroke="var(--color-line)" />
@@ -496,8 +532,55 @@ export function CohortTable({ rows }: { rows: { start: number; size: number; wee
   );
 }
 
+/**
+ * A table on wide screens. On a phone each row becomes a small card (the first column as its title, the rest as
+ * label and value pairs), so nothing is cut off on the right or squeezed to a word a line.
+ */
 export function Table({ columns, rows, empty = "Nothing yet." }: { columns: string[]; rows: ReactNode[][]; empty?: string }) {
+  const narrow = useNarrow();
   if (!rows.length) return <p className="text-sm text-muted">{empty}</p>;
+  if (!narrow) return <TableWide columns={columns} rows={rows} />;
+  return (
+    <ul className="space-y-2">
+      {rows.map((r, i) => (
+        <li key={i} className="rounded-xl border border-line/70 px-3 py-2 text-sm">
+          <div className="num break-words font-semibold">{r[0]}</div>
+          <dl className="num mt-1 grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5">
+            {r.slice(1).map((c, j) =>
+              columns[j + 1] ? (
+                <div key={j} className="contents">
+                  <dt className="text-xs leading-5 text-muted">{columns[j + 1]}</dt>
+                  <dd className="min-w-0 break-words">{c}</dd>
+                </div>
+              ) : null,
+            )}
+          </dl>
+          {r.slice(1).some((_, j) => !columns[j + 1]) && (
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {r.slice(1).map((c, j) => (columns[j + 1] ? null : <span key={j}>{c}</span>))}
+            </div>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** True below Tailwind's `md` breakpoint (768px), where tables turn into cards. Wide until the browser says. */
+function useNarrow(): boolean {
+  const [narrow, setNarrow] = useState(false);
+  useEffect(() => {
+    if (typeof matchMedia === "undefined") return;
+    const mq = matchMedia("(max-width: 767.98px)");
+    const read = () => setNarrow(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+  return narrow;
+}
+
+function TableWide({ columns, rows }: { columns: string[]; rows: ReactNode[][] }) {
   return (
     <div className="overflow-x-auto">
       <table className="num w-full text-sm">

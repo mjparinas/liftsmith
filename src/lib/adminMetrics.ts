@@ -84,6 +84,8 @@ export interface MetricsInput {
   features: Counted[];
   permissions: { key: string; granted: number; denied: number }[];
   workouts: { day: number; n: number; minutes: number; sets: number; auto: number; prs: number }[];
+  /** Workouts finished in the period before, for Overview's "vs the period before". */
+  prevWorkouts?: number;
   /** Install id → the weeks after install in which it did anything (for cohorts). */
   cohortWeeks: { id: string; firstSeen: number; weeks: number[] }[];
   subs: SubEvent[];
@@ -574,14 +576,18 @@ export function computeMetrics(input: MetricsInput) {
       mau: input.mau,
       stickiness: pct(input.dau, input.mau),
       setupRate: pct(recent.filter((i) => i.onboarded != null).length, recent.length),
+      prevSetupRate: pct(prev.filter((i) => i.onboarded != null).length, prev.length),
       firstWorkoutRate: pct(recent.filter((i) => i.firstWorkout != null).length, recent.length),
+      prevFirstWorkoutRate: pct(prev.filter((i) => i.firstWorkout != null).length, prev.length),
       workouts: finished,
+      prevWorkouts: input.prevWorkouts ?? null,
       visitors: site.visitors,
       prevVisitors: site.prevVisitors,
       grossMrr: revenue.all.grossMrr,
       netMrr: revenue.all.netMrr,
       paying: revenue.all.paying,
       trialStarts: revenue.all.trialStarts,
+      prevTrialStarts: input.subs.filter((e) => e.kind === "trial_start" && e.at >= prevSince && e.at < since).length,
       minutesToSetup: toSetup == null ? null : round(toSetup),
       hoursToFirstWorkout: toWorkout == null ? null : round(toWorkout),
     },
