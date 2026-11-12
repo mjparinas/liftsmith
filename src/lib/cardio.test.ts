@@ -79,7 +79,7 @@ describe("logging cardio in a workout", () => {
       target: { weight: 0, reps: 1200, rir: 2, note: "" },
     };
     const plan = { ...a.plan, items: [row, ...a.plan.items] };
-    useApp.setState({ active: loadItem(s, { ...a, plan, warm: undefined }, 0) });
+    useApp.setState({ active: loadItem(s().events, { ...a, plan, warm: undefined }, 0) });
     expect(s().active!.distanceM).toBe(2000);
     s().adjust(0, 480);
     s().adjustDistance(2100);
@@ -96,7 +96,7 @@ describe("logging cardio in a workout", () => {
     const a = s().active!;
     const row = { ...a.plan.items[0]!, exerciseId: "rowing-machine", sets: 2, warmup: undefined, setTargets: undefined };
     const plan = { ...a.plan, items: [row, ...a.plan.items] };
-    useApp.setState({ active: loadItem(s, { ...a, plan, warm: undefined }, 0) });
+    useApp.setState({ active: loadItem(s().events, { ...a, plan, warm: undefined }, 0) });
     s().machineSet({ seconds: 301.4, distanceM: 1250.6, powerW: 182 });
     expect(s().active).toMatchObject({ reps: 301, distanceM: 1251, powerW: 182 });
     s().logSet();

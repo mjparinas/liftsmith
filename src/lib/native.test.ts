@@ -57,3 +57,41 @@ describe("rest time left on the Android Live Update", () => {
     }
   });
 });
+
+describe("Log set on the notification with the app closed", () => {
+  const java = (f: string) => readFileSync(join(__dirname, "../../android/app/src/main/java/com/getliftsmith/app", f), "utf8");
+  const ios = (f: string) => readFileSync(join(__dirname, "../../ios/App/App", f), "utf8");
+
+  it("Android keeps the tap with its time and moves the notification on when no web app can hear it", () => {
+    const service = java("WorkoutService.java");
+    const tapped = service.slice(service.indexOf("private void tapped("));
+    expect(tapped).toMatch(/if \(WorkoutSessionPlugin\.isLive\(\)\) \{\s+sendBroadcast\([^;]*putExtra\("at", at\)\);\s+return;/);
+    expect(tapped).toContain("WorkoutTaps.add(this, action, at);");
+    expect(tapped).toContain("ahead.optJSONObject(aheadAt)");
+    expect(tapped).toContain('putExtra("restUntil", rest > 0 ? at + rest * 1000L : 0L)');
+    // A fresh update from the app starts the look-ahead again.
+    expect(service).toMatch(/ahead = WorkoutTaps\.parse\(intent\.getStringExtra\("ahead"\)\);\s+aheadAt = 0;/);
+  });
+
+  it("Android hands kept taps to the web app on load, and watch taps go the same way", () => {
+    const plugin = java("WorkoutSessionPlugin.java");
+    expect(plugin).toMatch(/WorkoutTaps\.drain\(getContext\(\)\)[\s\S]*?notifyListeners\("action", data, true\);[\s\S]*?current = this;/);
+    expect(plugin).toContain("if (current == this) current = null;");
+    expect(plugin).toContain('i.putExtra("ahead"');
+    expect(java("WatchListenerService.java")).toContain("WorkoutService.tap(this, action);");
+    expect(java("GarminLink.java")).toContain("WorkoutService.tap(context, action);");
+  });
+
+  it("iOS catches the rest-over alert's buttons from launch and hands them over when the app comes back", () => {
+    const app = ios("AppDelegate.swift");
+    expect(app).toMatch(
+      /didFinishLaunchingWithOptions[\s\S]*?UNUserNotificationCenter\.current\(\)\.delegate = EarlyNotifications\.shared/,
+    );
+    const plugin = ios("WorkoutSessionPlugin.swift");
+    expect(plugin).toContain("EarlyNotifications.shared.handOff(to: next)");
+    expect(plugin).toContain("UIApplication.didBecomeActiveNotification");
+    expect(plugin).toMatch(/if action == "log" \|\| action == "add30" \{ return tap\(action, done: completionHandler\) \}/);
+    expect(plugin).toContain("WorkoutTaps.remember(state: state, ahead:");
+    expect(plugin).toContain("values.isExcludedFromBackup = true");
+  });
+});

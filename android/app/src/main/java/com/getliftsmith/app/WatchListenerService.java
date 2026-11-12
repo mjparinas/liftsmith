@@ -27,7 +27,7 @@ public class WatchListenerService extends WearableListenerService {
         if (PATH_ACTION.equals(event.getPath())) {
             String action = WatchMessages.action(body);
             if (action == null) return;
-            sendBroadcast(new Intent(WorkoutService.BROADCAST_ACTION).setPackage(getPackageName()).putExtra(WorkoutService.EXTRA_ACTION, action));
+            WorkoutService.tap(this, action);
         } else if (PATH_HR.equals(event.getPath())) {
             int bpm = WatchMessages.bpm(body);
             if (bpm <= 0) return;

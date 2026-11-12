@@ -10,7 +10,6 @@ import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
 import { implementsFor } from "../sides";
-import type { State } from "../store";
 import { afterSet, linksOf, toggleLink } from "../superset";
 import type { AppEvent, LoadKind, Muscle, Rating, SetTag } from "../types";
 import { WARMUP_REST, warmupFor } from "../warmup";
@@ -94,21 +93,144 @@ export function hrWindow(a: Pick<Active, "hr" | "hrAt" | "startedAt">, from: num
 }
 
 /** Puts the plan item at `index` on screen: its warm-ups (unless started) and its first set's weight and reps. */
-export function loadItem(get: () => State, a: Active, index: number): Active {
+export function loadItem(events: AppEvent[], a: Active, index: number): Active {
   const item = a.plan.items[index];
   if (!item) return { ...a, index, warm: 0 };
   // Coming back to an exercise that's already started skips its warm-ups.
-  const done = setsDone(get().events, a.sessionId, item.exerciseId);
+  const done = setsDone(events, a.sessionId, item.exerciseId);
   const started = done > 0;
   const warm = started ? (item.warmup?.length ?? 0) : 0;
   const first = !started && item.warmup?.[0];
   const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
-  const distanceM = startDistance(exercise(item.exerciseId), get().events);
+  const distanceM = startDistance(exercise(item.exerciseId), events);
   return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM, powerW: undefined };
 }
 
 /** How long Undo stays offered after Log set when there's no rest to wait through. */
 export const UNDO_MS = 10_000;
+
+/** What one Log set writes and where the workout goes next. */
+export interface Logged {
+  evs: AppEvent[];
+  next: Active;
+}
+
+/**
+ * Log set without the store: the event it writes and the workout after it, at `now`. The store's logSet uses it, and
+ * so does the lock-screen notification's look-ahead (sessionAhead.ts), which runs it on a copy to know what the next
+ * sets are before the lifter taps Log set with the app closed.
+ */
+export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: number, newId: () => string = uid): Logged | null {
+  const item = a.plan.items[a.index];
+  if (!item) return null;
+  const ex = exercise(item.exerciseId);
+  if (warmingUp(a)) {
+    // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
+    const wid = newId();
+    const warmEv: AppEvent = {
+      type: "warmup",
+      id: wid,
+      at: now,
+      sessionId: a.sessionId,
+      exerciseId: item.exerciseId,
+      weight: a.weight,
+      reps: a.reps,
+    };
+    const warm = (a.warm ?? 0) + 1;
+    const nextWarm = item.warmup![warm];
+    const next: Active = {
+      ...a,
+      setSpeed: undefined,
+      warm,
+      weight: nextWarm ? nextWarm.weight : item.target.weight,
+      reps: nextWarm ? nextWarm.reps : item.target.reps,
+      lastAt: now,
+      restStart: now,
+      lastRest: undefined,
+      setStart: now,
+      restTotal: WARMUP_REST,
+      restUntil: autoRest ? now + WARMUP_REST * 1000 : null,
+      restReady: autoRest ? undefined : WARMUP_REST,
+    };
+    return { evs: [warmEv], next };
+  }
+  const already = setsDone(events, a.sessionId, item.exerciseId);
+  const planned: SetTarget = item.setTargets?.[Math.min(already, item.setTargets.length - 1)] ?? item.target;
+  // A set takes seconds to a couple of minutes; a longer gap means the lifter rested past the
+  // timer, so the duration is left out rather than guessed.
+  const duration = (now - a.setStart) / 1000;
+  // Logged before the rest timer ran out: the set started at some unknown point during the rest.
+  const earlyLog = !!a.restUntil && a.restUntil > now;
+  const plausible = !earlyLog && duration >= 3 && duration <= Math.max(180, 3 * setSeconds(ex, a.reps));
+  const sid = newId();
+  const setEv: AppEvent = {
+    type: "set",
+    id: sid,
+    at: now,
+    sessionId: a.sessionId,
+    exerciseId: item.exerciseId,
+    weight: a.weight,
+    reps: a.repsR !== undefined ? Math.min(a.reps, a.repsR) : a.reps,
+    ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
+    implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
+    targetReps: planned.reps,
+    ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
+    ...(ex.cardio && a.powerW !== undefined ? { powerW: a.powerW } : {}),
+    rir: planned.amrap ? 0 : item.target.rir,
+    targetWeight: planned.weight,
+    amrap: planned.amrap,
+    comeback: planned.comeback,
+    slot: item.slot,
+    startedAt: a.setStart,
+    durationSec: plausible ? Math.round(duration) : undefined,
+    restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
+    ...hrWindow(a, a.setStart, now),
+    challenge: item.challenge && already + 1 === item.sets ? true : undefined,
+    injuryPct: item.injuryPct,
+    superset: item.group,
+    tag: a.tag,
+    ...(a.setSpeed?.exerciseId === item.exerciseId
+      ? { endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000, failedRep: a.setSpeed.failed ? (true as const) : undefined }
+      : {}),
+  };
+  const all = [...events, setEv];
+  // Alone, the next set is the same exercise until its sets are done. In a superset it's the
+  // next exercise of the round (superset.ts).
+  const items = a.plan.items;
+  // A bonus set doesn't move the plan on: the planned set count stays where it was.
+  const step = afterSet(items, a.index, (i) =>
+    i === a.index ? already + (a.tag ? 0 : 1) : setsDone(all, a.sessionId, items[i].exerciseId),
+  );
+  let next: Active = {
+    ...a,
+    setSpeed: undefined,
+    repsR: undefined,
+    powerW: undefined,
+    lastAt: now,
+    restStart: now,
+    lastRest: undefined,
+    setStart: now,
+    restReady: undefined,
+    tag: undefined,
+    tagReturn: undefined,
+    tagFrom: undefined,
+  };
+  if (a.tag && a.tagReturn) next = { ...next, ...a.tagReturn };
+  // Programs with a different target for each set (ramps, percentages) load the next one; straight
+  // sets keep whatever the lifter dialled in.
+  const nextT = item.setTargets?.[already + 1];
+  const prevT = item.setTargets?.[already];
+  if (!a.tag && step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
+    next = { ...next, weight: nextT.weight, reps: nextT.reps };
+  if (step.finished && !a.tag) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
+  if (step.index !== a.index) next = loadItem(all, next, Math.min(step.index, items.length));
+  const last = next.index >= items.length;
+  next.restTotal = last ? 0 : step.rest;
+  next.restUntil = last || !autoRest ? null : now + step.rest * 1000;
+  // Auto-start off: the rest waits for Start rest. The set's clock still runs from Log set.
+  if (!last && !autoRest && step.rest > 0) next.restReady = step.rest;
+  return { evs: [setEv], next };
+}
 
 export interface WorkoutSlice {
   active: Active | null;
@@ -134,7 +256,8 @@ export interface WorkoutSlice {
   shortOnTime(minutes: number): string[];
   /** Moves the current exercise after the next one (equipment busy). */
   later(): void;
-  logSet(): void;
+  /** Logs the set on screen; `at` is when it was tapped (a lock-screen tap replayed when the app opens), else now. */
+  logSet(at?: number): void;
   /** What the camera saw on the set being done (today's max lab), saved with it at Log set. */
   noteSetSpeed(exerciseId: string, speed: number, failed: boolean): void;
   /**
@@ -268,7 +391,11 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const item = a.plan.items[a.index];
       // Only before its first set: once started, finishing it is quicker than coming back.
       if (!item || setsDone(get().events, a.sessionId, item.exerciseId) > 0) return;
-      const next = loadItem(get, { ...a, plan: { ...a.plan, items: doLater(a.plan.items, a.index) }, lastAt: Date.now() }, a.index);
+      const next = loadItem(
+        get().events,
+        { ...a, plan: { ...a.plan, items: doLater(a.plan.items, a.index) }, lastAt: Date.now() },
+        a.index,
+      );
       set({ active: next });
       persistActive(next);
       track("feature", { name: "replan", detail: "later" });
@@ -283,7 +410,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const r = get().readiness;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem(
-        get,
+        get().events,
         {
           sessionId,
           startedAt: now,
@@ -337,116 +464,15 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       persistActive(next);
     },
 
-    logSet() {
+    logSet(at) {
       const a = get().active;
       if (!a) return;
-      const item = a.plan.items[a.index];
-      if (!item) return;
-      const now = Date.now();
-      const ex = exercise(item.exerciseId);
-      const autoRest = get().profile.training?.autoRest !== false;
-      if (warmingUp(a)) {
-        // A warm-up set: its own event, a short rest, then the next warm-up or the working weight.
-        const wid = uid();
-        commit([{ type: "warmup", id: wid, at: now, sessionId: a.sessionId, exerciseId: item.exerciseId, weight: a.weight, reps: a.reps }]);
-        const warm = (a.warm ?? 0) + 1;
-        const nextWarm = item.warmup![warm];
-        const next: Active = {
-          ...a,
-          setSpeed: undefined,
-          warm,
-          weight: nextWarm ? nextWarm.weight : item.target.weight,
-          reps: nextWarm ? nextWarm.reps : item.target.reps,
-          lastAt: now,
-          restStart: now,
-          lastRest: undefined,
-          setStart: now,
-          restTotal: WARMUP_REST,
-          restUntil: autoRest ? now + WARMUP_REST * 1000 : null,
-          restReady: autoRest ? undefined : WARMUP_REST,
-        };
-        set({ active: next, undoable: { prev: a, ids: [wid], until: Math.max(now + UNDO_MS, next.restUntil ?? 0) } });
-        persistActive(next);
-        return;
-      }
-      const already = setsDone(get().events, a.sessionId, item.exerciseId);
-      const planned: SetTarget = item.setTargets?.[Math.min(already, item.setTargets.length - 1)] ?? item.target;
-      // A set takes seconds to a couple of minutes; a longer gap means the lifter rested past the
-      // timer, so the duration is left out rather than guessed.
-      const duration = (now - a.setStart) / 1000;
-      // Logged before the rest timer ran out: the set started at some unknown point during the rest.
-      const earlyLog = !!a.restUntil && a.restUntil > now;
-      const plausible = !earlyLog && duration >= 3 && duration <= Math.max(180, 3 * setSeconds(ex, a.reps));
-      const sid = uid();
-      commit([
-        {
-          type: "set",
-          id: sid,
-          at: now,
-          sessionId: a.sessionId,
-          exerciseId: item.exerciseId,
-          weight: a.weight,
-          reps: a.repsR !== undefined ? Math.min(a.reps, a.repsR) : a.reps,
-          ...(a.repsR !== undefined && a.repsR !== a.reps ? { repsL: a.reps, repsR: a.repsR } : {}),
-          implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
-          targetReps: planned.reps,
-          ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
-          ...(ex.cardio && a.powerW !== undefined ? { powerW: a.powerW } : {}),
-          rir: planned.amrap ? 0 : item.target.rir,
-          targetWeight: planned.weight,
-          amrap: planned.amrap,
-          comeback: planned.comeback,
-          slot: item.slot,
-          startedAt: a.setStart,
-          durationSec: plausible ? Math.round(duration) : undefined,
-          restSec: earlyLog && a.restStart ? Math.round((now - a.restStart) / 1000) : a.lastRest,
-          ...hrWindow(a, a.setStart, now),
-          challenge: item.challenge && already + 1 === item.sets ? true : undefined,
-          injuryPct: item.injuryPct,
-          superset: item.group,
-          tag: a.tag,
-          ...(a.setSpeed?.exerciseId === item.exerciseId
-            ? { endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000, failedRep: a.setSpeed.failed ? (true as const) : undefined }
-            : {}),
-        },
-      ]);
-      // Alone, the next set is the same exercise until its sets are done. In a superset it's the
-      // next exercise of the round (superset.ts).
-      const items = a.plan.items;
-      // A bonus set doesn't move the plan on: the planned set count stays where it was.
-      const step = afterSet(items, a.index, (i) =>
-        i === a.index ? already + (a.tag ? 0 : 1) : setsDone(get().events, a.sessionId, items[i].exerciseId),
-      );
-      let next: Active = {
-        ...a,
-        setSpeed: undefined,
-        repsR: undefined,
-        powerW: undefined,
-        lastAt: now,
-        restStart: now,
-        lastRest: undefined,
-        setStart: now,
-        restReady: undefined,
-        tag: undefined,
-        tagReturn: undefined,
-        tagFrom: undefined,
-      };
-      if (a.tag && a.tagReturn) next = { ...next, ...a.tagReturn };
-      // Programs with a different target for each set (ramps, percentages) load the next one; straight
-      // sets keep whatever the lifter dialled in.
-      const nextT = item.setTargets?.[already + 1];
-      const prevT = item.setTargets?.[already];
-      if (!a.tag && step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
-        next = { ...next, weight: nextT.weight, reps: nextT.reps };
-      if (step.finished && !a.tag) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
-      if (step.index !== a.index) next = loadItem(get, next, Math.min(step.index, items.length));
-      const last = next.index >= items.length;
-      next.restTotal = last ? 0 : step.rest;
-      next.restUntil = last || !autoRest ? null : now + step.rest * 1000;
-      // Auto-start off: the rest waits for Start rest. The set's clock still runs from Log set.
-      if (!last && !autoRest && step.rest > 0) next.restReady = step.rest;
-      set({ active: next, undoable: { prev: a, ids: [sid], until: Math.max(now + UNDO_MS, next.restUntil ?? 0) } });
-      persistActive(next);
+      const now = at ?? Date.now();
+      const r = afterLog(a, get().events, get().profile.training?.autoRest !== false, now);
+      if (!r) return;
+      commit(r.evs);
+      set({ active: r.next, undoable: { prev: a, ids: r.evs.map((e) => e.id), until: Math.max(now + UNDO_MS, r.next.restUntil ?? 0) } });
+      persistActive(r.next);
     },
 
     extraSet(kind) {
@@ -457,7 +483,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         if (!a.tag) return;
         const next: Active = { ...a, ...(a.tagReturn ?? {}), tag: undefined, tagReturn: undefined, lastAt: now };
         // Back to where the plan was: the exercise after the one the bonus set was for, if that one's done.
-        const back = a.tagFrom !== undefined ? loadItem(get, { ...next, index: a.tagFrom }, a.tagFrom) : next;
+        const back = a.tagFrom !== undefined ? loadItem(get().events, { ...next, index: a.tagFrom }, a.tagFrom) : next;
         set({ active: { ...back, tagFrom: undefined } });
         persistActive({ ...back, tagFrom: undefined });
         return;
@@ -647,7 +673,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       items[a.index] = newItem;
       commit([{ type: "swap", id: uid(), at: Date.now(), sessionId: a.sessionId, from: item.exerciseId, to: toId, avoid }]);
       track("feature", { name: "swap", detail: avoid ? "not available here" : "swap" });
-      const next = loadItem(get, { ...a, plan: { ...a.plan, items } }, a.index);
+      const next = loadItem(get().events, { ...a, plan: { ...a.plan, items } }, a.index);
       set({ active: next });
       persistActive(next);
     },
@@ -677,7 +703,9 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       // When every planned exercise is done, go straight to the new one.
       const finished = a.index >= a.plan.items.length;
       const plan = { ...a.plan, items, estMinutes: Math.round(planSeconds(items) / 60) };
-      const next = finished ? loadItem(get, { ...a, plan, lastAt: Date.now() }, items.length - 1) : { ...a, plan, lastAt: Date.now() };
+      const next = finished
+        ? loadItem(get().events, { ...a, plan, lastAt: Date.now() }, items.length - 1)
+        : { ...a, plan, lastAt: Date.now() };
       set({ active: next });
       persistActive(next);
     },
@@ -705,7 +733,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
     goTo(index) {
       const a = get().active;
       if (!a) return;
-      const next = loadItem(get, a, index);
+      const next = loadItem(get().events, a, index);
       set({ active: next });
       persistActive(next);
     },
