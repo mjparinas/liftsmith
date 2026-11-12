@@ -2,8 +2,10 @@
 
 import { useMemo, useState, type CSSProperties } from "react";
 
+import { friendNotes, useFriendSignals } from "@/lib/friendNotes";
 import { t } from "@/lib/i18n";
 import { insights, type Insight } from "@/lib/insights";
+import { weekStart } from "@/lib/invite";
 import { haptic } from "@/lib/juice";
 import { dayKey } from "@/lib/random";
 import { trendShare } from "@/lib/shareCards";
@@ -36,17 +38,28 @@ export function readDismissed(): string[] {
   }
 }
 
+const RANK = { warn: 0, info: 1, good: 2 } as const;
+
 export function useInsights(): Insight[] {
-  const { events, profile } = useApp();
+  const { events, profile, stats } = useApp();
   const now = useNow(60_000);
   const g = useGame();
   const hour = Math.floor(now / 3_600_000);
+  const friends = useFriendSignals(now);
   // Recomputed when the log changes or once an hour, not every tick.
-  return useMemo(
+  const own = useMemo(
     () => insights({ events, profile, now, streak: g.streak }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [events, profile, hour, g.streak.needed, g.streak.atRisk, g.streak.weeks],
   );
+  // Friend nudges (friendNotes.ts) join by tone, after the lifter's own notes of the same tone.
+  return useMemo(() => {
+    if (!friends) return own;
+    const monday = weekStart(now);
+    const mine = stats.sessions.filter((s) => s.start >= monday).length;
+    return [...own, ...friendNotes(friends, { profile, now, mine })].sort((a, b) => RANK[a.tone] - RANK[b.tone]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [own, friends, stats.sessions, hour]);
 }
 
 export function CoachNotes({ limit, title: given }: { limit?: number; title?: string }) {

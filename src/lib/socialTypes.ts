@@ -334,6 +334,24 @@ export interface ClubDetail extends ClubSummary {
   goal?: ClubGoal | null;
 }
 
+/** A mutual friend who has gone quiet: no post lately after training regularly before (coach's notes). */
+export interface QuietFriend {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** Their last post (ms). */
+  lastAt: number;
+  /** Workouts posted in the six weeks before they went quiet. */
+  before: number;
+}
+
+/** Everything the coach's friend notes need, in one call (`nudges` op). */
+export interface FriendSignals {
+  week: BoardRow[];
+  challenges: Challenge[];
+  quiet: QuietFriend[];
+}
+
 /** What a club's members add up to each week. */
 export type ClubGoalMetric = "workouts" | "sets" | "minutes";
 export interface ClubGoal {
