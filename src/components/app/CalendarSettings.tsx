@@ -8,7 +8,9 @@ import {
   downloadIcs,
   removeTrainingDays,
   requestCalendar,
+  savedMessage,
   saveTrainingDays,
+  showInCalendar,
   trainingDays,
   trainingIcs,
   WEEKDAYS,
@@ -32,6 +34,8 @@ export function CalendarSettings() {
   const native = calendarNative();
   const [status, setStatus] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  // The first training event's start after a save, for "Show in my calendar".
+  const [firstAt, setFirstAt] = useState<number | null>(null);
   const update = (p: Partial<CalendarPrefs>) => setProfile({ calendar: { ...prefs, ...p } });
 
   const write = async () => {
@@ -46,9 +50,10 @@ export function CalendarSettings() {
         setStatus(t("cal.denied"));
         return;
       }
-      const ok = await saveTrainingDays(prefs, profile.minutes);
-      if (ok) update({ write: true });
-      setStatus(t(ok ? "cal.saved" : "cal.failed"));
+      const saved = await saveTrainingDays(prefs, profile.minutes);
+      if (saved) update({ write: true });
+      setFirstAt(saved?.start ?? null);
+      setStatus(saved ? savedMessage(saved) : t("cal.failed"));
     } finally {
       setBusy(false);
     }
@@ -57,6 +62,7 @@ export function CalendarSettings() {
   const remove = async () => {
     await removeTrainingDays();
     update({ write: false });
+    setFirstAt(null);
     setStatus(t("cal.removed"));
   };
 
@@ -111,6 +117,11 @@ export function CalendarSettings() {
           <p className="text-sm text-muted" role="status">
             {status}
           </p>
+        )}
+        {native && prefs.write && firstAt !== null && (
+          <Button kind="quiet" className="w-full" onClick={() => void showInCalendar(firstAt)}>
+            {t("cal.show")}
+          </Button>
         )}
       </div>
     </Section>
