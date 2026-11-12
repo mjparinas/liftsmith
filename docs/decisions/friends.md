@@ -99,6 +99,19 @@ Items 2 and 7 of the same list.
 - Pure web code calling the server, so Android, iOS and the web app get it together.
 - Tests: the stage 5 cases in `social.test.ts` (mutual friends only, scoring in the window, audiences, invites and declining, the running cap, ending, tags and untagging, deletion), `challenge.test.ts` (standings, the nudge, days left, winners) and the challenge-and-tag flow in `Friends.test.tsx`. The accessibility run adds the board with challenges, the start sheet and a post with partners.
 
+## Clubs and gym crews (stage 6)
+
+Item 8 of the same list.
+
+- **Friends › Clubs** (a fifth chip, also `#/friends/clubs`): the lifter's clubs, each with its member count. **Start a club** takes a name (the filter applies, no links); the starter is its first member and runs it. **Have a club code?** takes the 8-character code. Up to 10 clubs per lifter (`SOCIAL_LIMITS.clubsEach`), 100 people per club, 5 new clubs a day.
+- **Joining:** anyone with the club's link (`www.getliftsmith.com/app/#/club/<code>`, `ClubScreen`) or code can join, including people who don't follow each other. That's the point of a gym crew, and it's why a club shows only totals. Signed out, the link asks to sign in; not yet in Friends, the join form is right there and joining also joins the club. Someone the starter blocked (or who blocked the starter) can't see or join it.
+- **The club sheet:** **Invite to the club** (share the link, with the code under it), then **this week's board** of every member from workouts they posted to Friends (anyone but themselves; "only me" never counts), by workouts, sets, minutes or volume, with the board's one-line nudge (action over stats). Members see each other's **totals only, never the posts**; the join screen says so ("Joining shows your weekly totals from posted workouts to everyone in the club"). Someone blocked either way is left off the reader's view.
+- **Running it:** the starter can remove a member (the bin button on their row), make a **New link** (the old code stops working, for a link that spread too far) and **Delete the club**. Members can **Leave**.
+- Server: ops `clubCreate`, `clubs`, `club`, `clubInfo`, `clubJoin`, `clubLeave`, `clubManage`; tables `clubs` and `club_members`. Leaving Friends or deleting the account deletes the clubs the lifter started and their memberships (`socialDeletes`). No push: joining a club isn't news anyone needs on their lock screen.
+- Analytics: `feature` `social_club_start`, `social_club_invite`, `social_club_join`.
+- Pure web code calling the server, so Android, iOS and the web app get it together. Club links open the app through the same `/app` App Links filter on Android and the web app on iPhone (Platform deltas, like invite links).
+- Tests: the stage 6 cases in `social.test.ts` (codes, the board, audiences, the starter's tools, blocks, the cap, deletion) and the start-and-join flow in `Friends.test.tsx`. The accessibility run adds the clubs list, a club and a club link.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):

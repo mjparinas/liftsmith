@@ -22,6 +22,8 @@ export const cleanInvite = (x: unknown) => {
 };
 
 export const inviteUrl = (code: string) => `${SITE_URL}${APP_PATH}#/invite/${code}`;
+/** A club's join link (clubs use the same code alphabet as invites). */
+export const clubUrl = (code: string) => `${SITE_URL}${APP_PATH}#/club/${code}`;
 
 /** Google Play with the invite as the install referrer, for Android phones opening the link without the app. */
 export const PLAY_ID = "com.getliftsmith.app";

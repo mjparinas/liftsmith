@@ -20,6 +20,9 @@ import {
   type Audience,
   type BoardMetric,
   type Challenge,
+  type ClubDetail,
+  type ClubPreview,
+  type ClubSummary,
   type FeedComment,
   type FeedPost,
   type Partner,
@@ -45,7 +48,18 @@ const fail = (code: number, error: string): Result => ({ code, body: { error } }
 export const HIDE_AFTER = 3;
 export const PAGE = 20;
 /** Per account per day, so one account can't flood others. */
-export const DAILY = { follow: 100, post: 20, comment: 100, like: 500, report: 30, lookup: 300, send: 50, invite: 30, challenge: 10 };
+export const DAILY = {
+  follow: 100,
+  post: 20,
+  comment: 100,
+  like: 500,
+  report: 30,
+  lookup: 300,
+  send: 50,
+  invite: 30,
+  challenge: 10,
+  club: 5,
+};
 /** An invite link lasts 30 days and works for this many people. */
 export const INVITE = { ttl: 30 * 86_400_000, uses: 50 };
 /** Handles nobody can take: they'd look official. */
@@ -286,6 +300,9 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM challenge_members WHERE challenge_id IN (SELECT id FROM challenges WHERE owner_id = ?)", args: a },
     { sql: "DELETE FROM challenges WHERE owner_id = ?", args: a },
     { sql: "DELETE FROM challenge_members WHERE account_id = ?", args: a },
+    { sql: "DELETE FROM club_members WHERE club_id IN (SELECT id FROM clubs WHERE owner_id = ?)", args: a },
+    { sql: "DELETE FROM clubs WHERE owner_id = ?", args: a },
+    { sql: "DELETE FROM club_members WHERE account_id = ?", args: a },
     { sql: "DELETE FROM post_likes WHERE account_id = ?", args: a },
     { sql: "DELETE FROM post_comments WHERE account_id = ?", args: a },
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
@@ -1294,6 +1311,192 @@ export async function challengeLeave(accountId: string, b: Record<string, unknow
   return ok();
 }
 
+// --- Clubs and gym crews ---
+
+/** A free club code (8 characters, the same alphabet as invites), tried a few times in case of a clash. */
+async function freeClubCode(): Promise<string> {
+  for (let i = 0; i < 5; i++) {
+    const code = newCode();
+    const [had] = await query("SELECT 1 AS x FROM clubs WHERE code = ?", [code]);
+    if (!had) return code;
+  }
+  return newCode();
+}
+
+async function clubCount(accountId: string): Promise<number> {
+  const [r] = await query("SELECT COUNT(*) AS n FROM club_members WHERE account_id = ?", [accountId]);
+  return n(r?.n);
+}
+
+/** Starts a club: a name, and the lifter is its first member and runs it. */
+export async function clubCreate(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const name = checkText(b.name, SOCIAL_LIMITS.clubName);
+  if (!name.ok) return fail(400, `name.${name.error}`);
+  if (!name.text) return fail(400, "Bad request.");
+  if ((await clubCount(accountId)) >= SOCIAL_LIMITS.clubsEach) return fail(429, "clubs");
+  if (!(await limit(accountId, "club", now))) return fail(429, "slow");
+  const id = newId();
+  const code = await freeClubCode();
+  await batch([
+    { sql: "INSERT INTO clubs (id, owner_id, name, code, created_at) VALUES (?, ?, ?, ?, ?)", args: [id, accountId, name.text, code, now] },
+    { sql: "INSERT INTO club_members (club_id, account_id, created_at) VALUES (?, ?, ?)", args: [id, accountId, now] },
+  ]);
+  return ok({ id, code });
+}
+
+/** The lifter's clubs, with how many are in each. */
+export async function clubs(accountId: string): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const rows = await query(
+    `SELECT c.id AS id, c.name AS name, c.owner_id AS owner_id,
+       (SELECT COUNT(*) FROM club_members m JOIN social_profiles sp ON sp.account_id = m.account_id
+         WHERE m.club_id = c.id AND sp.suspended = 0) AS members
+     FROM club_members cm JOIN clubs c ON c.id = cm.club_id WHERE cm.account_id = ? ORDER BY c.name LIMIT 50`,
+    [accountId],
+  );
+  const list: ClubSummary[] = rows.map((r) => ({
+    id: s(r.id),
+    name: s(r.name),
+    members: n(r.members),
+    mine: s(r.owner_id) === accountId,
+  }));
+  return ok({ clubs: list });
+}
+
+/**
+ * One club, for a member: who's in it and this week's board from what each member posted to anyone but
+ * themselves since `from` (the week's start in the lifter's time zone). Totals only, like a challenge; the
+ * join screen says so. Someone blocked either way is left off the reader's view.
+ */
+export async function club(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const from = Number(b.from);
+  if (!Number.isFinite(from) || from > now + day || from < now - 60 * day) return fail(400, "Bad request.");
+  const [c] = await query(
+    `SELECT c.id AS id, c.name AS name, c.code AS code, c.owner_id AS owner_id, op.handle AS owner_handle, op.name AS owner_name
+     FROM clubs c JOIN club_members cm ON cm.club_id = c.id AND cm.account_id = ? JOIN social_profiles op ON op.account_id = c.owner_id
+     WHERE c.id = ?`,
+    [accountId, s(b.id)],
+  );
+  if (!c) return fail(404, "gone");
+  const rows = await query(
+    `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
+       COUNT(p.id) AS workouts,
+       COALESCE(SUM(json_extract(p.body, '$.sets')), 0) AS sets,
+       COALESCE(SUM(json_extract(p.body, '$.seconds')), 0) AS seconds,
+       COALESCE(SUM(json_extract(p.body, '$.volume')), 0) AS volume,
+       COALESCE(SUM(json_extract(p.body, '$.prs')), 0) AS prs
+     FROM club_members cm JOIN social_profiles sp ON sp.account_id = cm.account_id
+     LEFT JOIN posts p ON p.account_id = cm.account_id AND p.hidden = 0 AND p.audience != 'me' AND p.at >= ?3 AND p.at < ?4
+     WHERE cm.club_id = ?1 AND sp.suspended = 0
+       AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?2)
+       AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?2)
+     GROUP BY sp.account_id LIMIT ${SOCIAL_LIMITS.clubMembers + 1}`,
+    [s(c.id), accountId, from, from + 7 * day],
+  );
+  const detail: ClubDetail = {
+    id: s(c.id),
+    name: s(c.name),
+    code: s(c.code),
+    mine: s(c.owner_id) === accountId,
+    owner: { handle: s(c.owner_handle), name: s(c.owner_name) },
+    members: rows.length,
+    rows: rows.map((r) => ({
+      handle: s(r.handle),
+      name: s(r.name),
+      avatar: avatarOf(r.avatar),
+      me: s(r.id) === accountId,
+      workouts: n(r.workouts),
+      sets: n(r.sets),
+      minutes: Math.round(n(r.seconds) / 60),
+      volume: Math.round(n(r.volume)),
+      prs: n(r.prs),
+    })),
+  };
+  return ok({ club: detail });
+}
+
+async function clubByCode(code: unknown): Promise<Row | null> {
+  const c = cleanCode(code);
+  if (!c) return null;
+  const [r] = await query("SELECT id, name, owner_id FROM clubs WHERE code = ?", [c]);
+  return r ?? null;
+}
+
+/** What a club link shows before joining. */
+export async function clubInfo(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  if (!(await limit(accountId, "lookup", now))) return fail(429, "slow");
+  const c = await clubByCode(b.code);
+  const owner = c ? await profileOf(s(c.owner_id)) : null;
+  if (!c || !owner || n(owner.suspended) || (await blockedEither(accountId, s(c.owner_id)))) return fail(404, "club");
+  const [m] = await query(
+    `SELECT COUNT(*) AS n, SUM(CASE WHEN cm.account_id = ? THEN 1 ELSE 0 END) AS me
+     FROM club_members cm JOIN social_profiles sp ON sp.account_id = cm.account_id WHERE cm.club_id = ? AND sp.suspended = 0`,
+    [accountId, s(c.id)],
+  );
+  const preview: ClubPreview = {
+    id: s(c.id),
+    name: s(c.name),
+    members: n(m?.n),
+    owner: { handle: s(owner.handle), name: s(owner.name) },
+    joined: n(m?.me) > 0,
+  };
+  return ok({ club: preview });
+}
+
+/** Joins a club by its code. A club the lifter is blocked from (by its starter) can't be joined. */
+export async function clubJoin(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const c = await clubByCode(b.code);
+  if (!c || (await blockedEither(accountId, s(c.owner_id)))) return fail(404, "club");
+  const id = s(c.id);
+  const [had] = await query("SELECT 1 AS x FROM club_members WHERE club_id = ? AND account_id = ?", [id, accountId]);
+  if (had) return ok({ id });
+  if ((await clubCount(accountId)) >= SOCIAL_LIMITS.clubsEach) return fail(429, "clubs");
+  const [size] = await query("SELECT COUNT(*) AS n FROM club_members WHERE club_id = ?", [id]);
+  if (n(size?.n) >= SOCIAL_LIMITS.clubMembers) return fail(403, "clubFull");
+  if (!(await limit(accountId, "follow", now))) return fail(429, "slow");
+  await run("INSERT OR IGNORE INTO club_members (club_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
+  return ok({ id });
+}
+
+/** Leaves a club. The starter leaving deletes it for everyone. */
+export async function clubLeave(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const id = s(b.id);
+  const [c] = await query("SELECT owner_id FROM clubs WHERE id = ?", [id]);
+  if (!c) return ok();
+  if (s(c.owner_id) === accountId)
+    await batch([
+      { sql: "DELETE FROM club_members WHERE club_id = ?", args: [id] },
+      { sql: "DELETE FROM clubs WHERE id = ?", args: [id] },
+    ]);
+  else await run("DELETE FROM club_members WHERE club_id = ? AND account_id = ?", [id, accountId]);
+  return ok();
+}
+
+/** The starter's tools: remove a member, or give the club a new code (the old link stops working). */
+export async function clubManage(accountId: string, b: Record<string, unknown>): Promise<Result> {
+  const id = s(b.id);
+  const [c] = await query("SELECT owner_id FROM clubs WHERE id = ?", [id]);
+  if (!c || s(c.owner_id) !== accountId) return fail(404, "gone");
+  if (b.newCode === true) {
+    const code = await freeClubCode();
+    await run("UPDATE clubs SET code = ? WHERE id = ?", [code, id]);
+    return ok({ code });
+  }
+  const p = await byHandle(s(b.remove));
+  if (!p || s(p.account_id) === accountId) return fail(404, "noOne");
+  await run("DELETE FROM club_members WHERE club_id = ? AND account_id = ?", [id, s(p.account_id)]);
+  return ok();
+}
+
 /** A phone's push token, so this account's Friends notifications reach it (push.ts). */
 export async function pushToken(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -1336,6 +1539,13 @@ export const OPS: Record<string, Op> = {
   challengeAnswer,
   challengeLeave: (a, b) => challengeLeave(a, b),
   untag: (a, b) => untag(a, b),
+  clubCreate,
+  clubs: (a) => clubs(a),
+  club,
+  clubInfo,
+  clubJoin,
+  clubLeave: (a, b) => clubLeave(a, b),
+  clubManage: (a, b) => clubManage(a, b),
   pushToken,
   pushOff: async (a, b) => (await dropToken(a, s(b.token)), ok()),
 };
