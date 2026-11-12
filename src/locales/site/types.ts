@@ -27,6 +27,8 @@ export interface SiteText {
       openApp: string;
       features: string;
       whoFor: string;
+      /** The gym finder's pages (/gyms/). */
+      gyms: string;
       coaches: string;
       pricing: string;
       whatsNew: string;
@@ -76,7 +78,13 @@ export interface SiteText {
     checks: [string, string, string, string];
     glance: string;
     facts: { value: string; label: string }[];
-    how: { eyebrow: string; title: string; steps: Titled[]; cta: string };
+    how: {
+      eyebrow: string;
+      title: string;
+      /** A link under the first step to the gym finder (/gyms/). */ findGym: string;
+      steps: Titled[];
+      cta: string;
+    };
     features: {
       eyebrow: string;
       title: string;

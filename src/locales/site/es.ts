@@ -25,6 +25,7 @@ export const es: SiteText = {
       openApp: "Abrir la app",
       features: "Funciones",
       whoFor: "Para quién es",
+      gyms: "Buscar gimnasio",
       coaches: "Para entrenadores",
       pricing: "Precios",
       whatsNew: "Novedades",
@@ -97,6 +98,7 @@ export const es: SiteText = {
     how: {
       eyebrow: "Cómo funciona",
       title: "Tres pasos y solo te queda entrenar",
+      findGym: "Busca tu gimnasio y su equipamiento",
       steps: [
         {
           title: "Cuéntale cómo es tu gimnasio",
