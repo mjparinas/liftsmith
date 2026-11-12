@@ -89,6 +89,7 @@ describe("joining", () => {
       lifts: [],
       suggest: true,
       live: false,
+      cheers: true,
       level: 0,
       streak: 0,
     });

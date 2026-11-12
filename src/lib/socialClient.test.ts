@@ -20,6 +20,7 @@ const profile = (over: Partial<SocialProfile> = {}): SocialProfile => ({
   lifts: [],
   suggest: true,
   live: false,
+  cheers: true,
   level: 0,
   streak: 0,
   ...over,

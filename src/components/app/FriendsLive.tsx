@@ -65,23 +65,25 @@ export function TrainingNow() {
                   </span>
                 </span>
               </button>
-              <div
-                className="mt-2 flex flex-wrap gap-2"
-                role="group"
-                aria-label={t("social.live.cheer", { emoji: "", name: p.name }).trim()}
-              >
-                {CHEERS.map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    aria-label={t("social.live.cheer", { emoji: c, name: p.name })}
-                    onClick={() => void send(p, c)}
-                    className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-raised text-xl"
-                  >
-                    {c}
-                  </button>
-                ))}
-              </div>
+              {p.cheers !== false && (
+                <div
+                  className="mt-2 flex flex-wrap gap-2"
+                  role="group"
+                  aria-label={t("social.live.cheer", { emoji: "", name: p.name }).trim()}
+                >
+                  {CHEERS.map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      aria-label={t("social.live.cheer", { emoji: c, name: p.name })}
+                      onClick={() => void send(p, c)}
+                      className="press grid h-11 w-11 place-items-center rounded-full border border-line bg-raised text-xl"
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              )}
             </li>
           );
         })}

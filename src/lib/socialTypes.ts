@@ -69,6 +69,11 @@ export interface SocialProfile {
   suggest: boolean;
   /** Mutual friends see when the lifter is mid-workout and can cheer (off to start; Friends gap list 2, item 4). */
   live: boolean;
+  /**
+   * Friends can cheer while the lifter shares their training (on to start; Melvin, 2026-11-12: "disable cheers in
+   * settings"). Off hides the cheer buttons from friends, refuses new cheers and shows none on the workout screen.
+   */
+  cheers: boolean;
   /** The level and the training-week streak last sent by the app, shown on the profile to people who see the posts. */
   level: number;
   streak: number;
@@ -400,6 +405,8 @@ export interface TrainingNow {
   total: number;
   startedAt: number;
   updatedAt: number;
+  /** They take cheers (their "Let friends cheer me on" switch); false hides the cheer buttons. */
+  cheers: boolean;
 }
 
 /** A cheer that reached the lifter during their workout. */
