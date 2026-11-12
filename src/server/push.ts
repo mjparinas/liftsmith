@@ -16,7 +16,7 @@ import * as text from "@/locales/text/push";
 
 import { query, run } from "./db";
 
-export type PushKind = "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag";
+export type PushKind = "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply";
 /** Which Friends settings switch covers each kind (the columns on social_profiles). */
 export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent"> = {
   follow: "push_follows",
@@ -28,6 +28,9 @@ export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_c
   // A challenge invite is someone reaching out, like a follow; a tag is a reply to a workout, like a comment.
   challenge: "push_follows",
   tag: "push_comments",
+  // Someone naming you in a comment, or answering yours, is part of a conversation: the comments switch.
+  mention: "push_comments",
+  reply: "push_comments",
 };
 /** Tokens kept per account (phones and tablets); the oldest go first. */
 export const MAX_TOKENS = 10;

@@ -203,9 +203,11 @@ export interface FeedComment {
   mine: boolean;
   /** The reader may delete it: their own comment, or any comment on their own post. */
   canDelete: boolean;
+  /** For a reply, the top comment it answers (replies sit one level deep). */
+  replyTo?: string;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;

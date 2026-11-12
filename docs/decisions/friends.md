@@ -134,6 +134,16 @@ Melvin, 2026-11-12: "Are there missing friends features? Seems a bit light, no?"
 - Posts made before this show the best set only, with "Best of 4 sets. Older posts show only the best set."
 - Tests: `src/lib/postDetail.test.ts` (the log, new bests, hidden weights, your last time, the comparison), the log cases in `social.test.ts`, and the open-then-do flow in `Friends.test.tsx`.
 
+## Replies, mentions and who liked (gap list 2, item 5)
+
+- **Replies** (each comment's **Reply**): one level deep, like the big apps, so threads stay readable on a phone. A reply to a reply joins the same top comment (`post_comments.reply_to`), and the box says "Replying to Blair" with Cancel. Replying to someone else's comment starts the text with their @handle. A reply whose top comment was deleted shows on its own.
+- **@mentions**: typing "@" offers people as chips (the poster, everyone in the thread, then the people the lifter follows, filtered as they type), so a name is tapped, not typed (the minimal-typing rule). In a comment, each @handle is a link to that person. Up to five per comment (`mentionsIn`). A mentioned person gets an Activity line ("Blair mentioned you: …", `comment_mentions`) and a push **only if they can see the post** (the same `seesPost` and block rules), so a mention can't pull someone into a post that isn't for them or reveal it.
+- **Nobody is told twice about one comment**: the poster gets the comment as before, then each mentioned person, then the author of the comment replied to ("Blair replied to your comment: …"). Push kinds `mention` and `reply`, under the comments switch.
+- **Who liked**: the like count beside the heart is its own button that opens **Liked by** (`likers` op): newest first, blocked people left out, only for readers who can see the post. The heart still likes in one tap.
+- Deleting a comment deletes its mentions; leaving Friends or deleting the account deletes mentions of and by the lifter.
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/server/socialComments.test.ts` (mentions only for people who can see the post, blocks, replies one deep, who's told, likers, deletion) and `src/components/app/Comments.test.tsx` (threading, the @ chips, a reply). The accessibility run adds the whole workout, a reply with a mention, and Liked by.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):

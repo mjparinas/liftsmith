@@ -270,7 +270,20 @@ try {
       volume: 5200,
       prs: 1,
       muscles: ["chest", "triceps"],
-      exercises: [{ id: "bench-press", name: "Bench press", sets: 4, w: 100, r: 5 }],
+      exercises: [
+        {
+          id: "bench-press",
+          name: "Bench press",
+          sets: 2,
+          w: 100,
+          r: 5,
+          pr: true,
+          log: [
+            { w: 95, r: 5 },
+            { w: 100, r: 5 },
+          ],
+        },
+      ],
     },
   };
   const friendsApi = {
@@ -299,6 +312,16 @@ try {
       post: friendsPost,
       comments: [
         { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
+        {
+          id: "c2",
+          handle: "blair",
+          name: "Blair",
+          at: Date.now() - 30_000,
+          body: "Thanks @casey",
+          mine: false,
+          canDelete: false,
+          replyTo: "c1",
+        },
       ],
     },
     activity: {
@@ -406,8 +429,20 @@ try {
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await scan("friends feed");
   await page.getByRole("button", { name: "More options" }).click();
-  await page.getByRole("button", { name: "Save as a routine" }).waitFor();
+  await page
+    .getByRole("button", { name: "Edit post" })
+    .or(page.getByRole("button", { name: /^Report/ }))
+    .first()
+    .waitFor();
   await scan("friends post menu");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "See Blair’s whole workout" }).click();
+  await page.getByRole("button", { name: "Do this workout" }).waitFor();
+  await scan("friends whole workout");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /likes: see who/ }).click();
+  await page.getByRole("dialog", { name: "Liked by" }).waitFor();
+  await scan("friends likers");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Friends settings" }).click();
   await page.getByRole("group", { name: "Avatar" }).waitFor();

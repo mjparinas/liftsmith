@@ -50,6 +50,16 @@ export const en = {
   "social.post.doItHint": "Saves it as a routine. Your own weights and reps fill in when you start it.",
   "social.post.open": "See {name}’s whole workout",
   "social.post.see": "See every set ›",
+  "social.act.mention": "{name} mentioned you: “{text}”",
+  "social.act.reply": "{name} replied to your comment: “{text}”",
+  "social.reply": "Reply",
+  "social.replyTo": "Reply to {name}",
+  "social.replying": "Replying to {name}",
+  "social.replyCancel": "Cancel",
+  "social.mention": "Mention someone",
+  "social.mentionHint": "Type @ to mention someone. They’re told if they can see this workout.",
+  "social.likers": { one: "{count} like: see who", other: "{count} likes: see who" },
+  "social.likersTitle": "Liked by",
 } as const;
 
 type Key = keyof typeof en;
@@ -103,6 +113,16 @@ export const es: Partial<Record<Key, Message>> = {
   "social.post.doItHint": "Se guarda como rutina. Tus propios pesos y repeticiones se rellenan al empezarla.",
   "social.post.open": "Ver el entrenamiento completo de {name}",
   "social.post.see": "Ver todas las series ›",
+  "social.act.mention": "{name} te mencionó: «{text}»",
+  "social.act.reply": "{name} respondió a tu comentario: «{text}»",
+  "social.reply": "Responder",
+  "social.replyTo": "Responder a {name}",
+  "social.replying": "Respondiendo a {name}",
+  "social.replyCancel": "Cancelar",
+  "social.mention": "Mencionar a alguien",
+  "social.mentionHint": "Escribe @ para mencionar a alguien. Se le avisa si puede ver este entrenamiento.",
+  "social.likers": { one: "{count} me gusta: ver quién", other: "{count} me gusta: ver quién" },
+  "social.likersTitle": "Les gusta a",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -154,6 +174,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "social.post.doItHint": "Elle est enregistrée comme routine. Vos propres charges et répétitions s'ajoutent quand vous la lancez.",
   "social.post.open": "Voir toute la séance de {name}",
   "social.post.see": "Voir toutes les séries ›",
+  "social.act.mention": "{name} vous a mentionné : « {text} »",
+  "social.act.reply": "{name} a répondu à votre commentaire : « {text} »",
+  "social.reply": "Répondre",
+  "social.replyTo": "Répondre à {name}",
+  "social.replying": "Réponse à {name}",
+  "social.replyCancel": "Annuler",
+  "social.mention": "Mentionner quelqu'un",
+  "social.mentionHint": "Tapez @ pour mentionner quelqu'un. La personne est prévenue si elle peut voir cette séance.",
+  "social.likers": { one: "{count} j'aime : voir qui", other: "{count} j'aime : voir qui" },
+  "social.likersTitle": "Aimé par",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -202,6 +232,16 @@ export const de: Partial<Record<Key, Message>> = {
   "social.post.doItHint": "Wird als Routine gespeichert. Deine eigenen Gewichte und Wiederholungen kommen beim Start dazu.",
   "social.post.open": "Ganzes Training von {name} ansehen",
   "social.post.see": "Alle Sätze ansehen ›",
+  "social.act.mention": "{name} hat dich erwähnt: „{text}“",
+  "social.act.reply": "{name} hat auf deinen Kommentar geantwortet: „{text}“",
+  "social.reply": "Antworten",
+  "social.replyTo": "{name} antworten",
+  "social.replying": "Antwort an {name}",
+  "social.replyCancel": "Abbrechen",
+  "social.mention": "Jemanden erwähnen",
+  "social.mentionHint": "Tippe @, um jemanden zu erwähnen. Die Person erfährt es, wenn sie dieses Training sehen kann.",
+  "social.likers": { one: "{count} Like: wer?", other: "{count} Likes: wer?" },
+  "social.likersTitle": "Gefällt",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -253,6 +293,16 @@ export const it: Partial<Record<Key, Message>> = {
   "social.post.doItHint": "Viene salvato come routine. I tuoi pesi e ripetizioni si compilano quando lo inizi.",
   "social.post.open": "Vedi tutto l'allenamento di {name}",
   "social.post.see": "Vedi tutte le serie ›",
+  "social.act.mention": "{name} ti ha menzionato: «{text}»",
+  "social.act.reply": "{name} ha risposto al tuo commento: «{text}»",
+  "social.reply": "Rispondi",
+  "social.replyTo": "Rispondi a {name}",
+  "social.replying": "Risposta a {name}",
+  "social.replyCancel": "Annulla",
+  "social.mention": "Menziona qualcuno",
+  "social.mentionHint": "Scrivi @ per menzionare qualcuno. Viene avvisato se può vedere questo allenamento.",
+  "social.likers": { one: "{count} mi piace: vedi chi", other: "{count} mi piace: vedi chi" },
+  "social.likersTitle": "Piace a",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -295,4 +345,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "social.post.doItHint": "ルーティンとして保存されます。始めるとあなた自身の重量と回数が入ります。",
   "social.post.open": "{name}さんのトレーニングをすべて見る",
   "social.post.see": "すべてのセットを見る ›",
+  "social.act.mention": "{name}さんがあなたをメンションしました:「{text}」",
+  "social.act.reply": "{name}さんがあなたのコメントに返信しました:「{text}」",
+  "social.reply": "返信",
+  "social.replyTo": "{name}さんに返信",
+  "social.replying": "{name}さんに返信中",
+  "social.replyCancel": "キャンセル",
+  "social.mention": "メンションする",
+  "social.mentionHint": "@を入力するとメンションできます。このトレーニングを見られる人に通知されます。",
+  "social.likers": { other: "いいね{count}件:誰か見る" },
+  "social.likersTitle": "いいねした人",
 };
