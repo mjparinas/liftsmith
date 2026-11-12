@@ -59,6 +59,7 @@ import { Remix } from "./Remix";
 import { go, goBack, historyDepth, parse, useRoute, type Route } from "./router";
 import { ScreenBoundary } from "./ScreenBoundary";
 import { Settings } from "./Settings";
+import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
@@ -393,6 +394,7 @@ export function App() {
     club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
+    gymlink: <SharedGym key={arg ?? ""} code={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

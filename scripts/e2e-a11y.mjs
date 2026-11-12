@@ -155,6 +155,12 @@ try {
   await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
   await page.getByRole("heading", { name: "Push day" }).waitFor();
   await scan("shared routine");
+  // A shared gym link (gymShare.ts): "Iron Works", a barbell, plates, dumbbells and kettlebells.
+  await page.goto(
+    `${server.url}/app/#/gymlink/g1~eyJuIjoiSXJvbiBXb3JrcyIsInUiOiJrZyIsImUiOlsiYmFyYmVsbCIsImR1bWJiZWxscyIsImNhYmxlcyJdLCJiIjpbWyJPbHltcGljIGJhciIsMjBdXSwicCI6W1syMCw0XSxbMTAsNF0sWzUsNF1dLCJkIjpbMiw0LDYsOCwxMF0sImsiOls4LDEyLDE2XSwibSI6NX0`,
+  );
+  await page.getByRole("heading", { name: "Iron Works" }).waitFor();
+  await scan("shared gym");
   // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
   await page.goto(`${server.url}/app/#/stretch`);
   await page.getByTestId("stretch-list").waitFor();
