@@ -56,6 +56,8 @@ export const en = {
   "progress.bw.placeholder": "Today, {unit}",
   "progress.bw.logLabel": "Log body weight",
   "progress.bw.log": "Log",
+  "progress.thisWeek": "This week",
+  "progress.ofGoal": "{n} of {goal}",
 } as const;
 
 type Key = keyof typeof en;
@@ -115,6 +117,8 @@ export const es: Partial<Record<Key, Message>> = {
   "progress.bw.placeholder": "Hoy, {unit}",
   "progress.bw.logLabel": "Registrar peso corporal",
   "progress.bw.log": "Registrar",
+  "progress.thisWeek": "Esta semana",
+  "progress.ofGoal": "{n} de {goal}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -172,6 +176,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "progress.bw.placeholder": "Aujourd’hui, {unit}",
   "progress.bw.logLabel": "Enregistrer le poids corporel",
   "progress.bw.log": "Enregistrer",
+  "progress.thisWeek": "Cette semaine",
+  "progress.ofGoal": "{n} sur {goal}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -229,6 +235,8 @@ export const de: Partial<Record<Key, Message>> = {
   "progress.bw.placeholder": "Heute, {unit}",
   "progress.bw.logLabel": "Körpergewicht eintragen",
   "progress.bw.log": "Eintragen",
+  "progress.thisWeek": "Diese Woche",
+  "progress.ofGoal": "{n} von {goal}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -286,6 +294,8 @@ export const it: Partial<Record<Key, Message>> = {
   "progress.bw.placeholder": "Oggi, {unit}",
   "progress.bw.logLabel": "Registra peso corporeo",
   "progress.bw.log": "Registra",
+  "progress.thisWeek": "Questa settimana",
+  "progress.ofGoal": "{n} su {goal}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -341,4 +351,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "progress.bw.placeholder": "今日、{unit}",
   "progress.bw.logLabel": "体重を記録",
   "progress.bw.log": "記録",
+  "progress.thisWeek": "今週",
+  "progress.ofGoal": "{goal}回中{n}回",
 };

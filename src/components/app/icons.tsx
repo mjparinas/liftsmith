@@ -55,6 +55,13 @@ const PATHS = {
   ban: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM5 5l14 14",
   send: "M21 3L10 14M21 3l-7 18-4-7-7-4z",
   mic: "M12 3a3 3 0 0 0-3 3v6a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3zM5 11a7 7 0 0 0 14 0M12 18v3M8 21h8",
+  // Polish pass 2026-11-12: these replace the emoji that were left in the app chrome (quests, streaks, leagues).
+  snowflake: "M12 2v20M4.5 6.5l15 11M19.5 6.5l-15 11M9.5 3.5 12 6l2.5-2.5M9.5 20.5 12 18l2.5 2.5",
+  medal: "M8 3h3l1.5 5M16 3h-3l-1.5 5M12 21a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM12 12.5v5",
+  repeat: "M17 2l3 3-3 3M4 11V9a4 4 0 0 1 4-4h12M7 22l-3-3 3-3M20 13v2a4 4 0 0 1-4 4H4",
+  compass: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15.5 8.5l-2 5-5 2 2-5z",
+  hourglass: "M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9",
+  image: "M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M15.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z",
 } as const;
 
 export type IconName = keyof typeof PATHS;

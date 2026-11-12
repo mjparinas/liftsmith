@@ -12,7 +12,8 @@ import { currentLang, t } from "@/lib/i18n";
 // dashboard. A 44 px tap target with a small visible circle, a labelled dialog, Escape or Got it to
 // close, and focus returns to the button.
 
-export function Info({ term, className = "" }: { term: Term; className?: string }) {
+/** `also` adds a second term's explanation under the first, so two related labels side by side share one "i". */
+export function Info({ term, also, className = "" }: { term: Term; also?: Term; className?: string }) {
   const [open, setOpen] = useState(false);
   const btn = useRef<HTMLButtonElement>(null);
   const ok = useRef<HTMLButtonElement>(null);
@@ -68,7 +69,7 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
               role="dialog"
               aria-modal="true"
               aria-labelledby={`${id}-t`}
-              className="animate-rise safe-bottom w-full max-w-md rounded-3xl border border-line bg-surface p-5 text-left normal-case tracking-normal text-ink"
+              className="animate-rise safe-bottom max-h-[85vh] w-full max-w-md overflow-y-auto rounded-3xl border border-line bg-surface p-5 text-left normal-case tracking-normal text-ink"
               onClick={(e) => e.stopPropagation()}
             >
               <h2 id={`${id}-t`} className="text-lg font-semibold">
@@ -79,6 +80,16 @@ export function Info({ term, className = "" }: { term: Term; className?: string 
                   <p key={p}>{p}</p>
                 ))}
               </div>
+              {also && (
+                <>
+                  <h3 className="mt-4 font-semibold">{GLOSSARY[also].title}</h3>
+                  <div className="mt-1 space-y-2 text-[0.9375rem] leading-relaxed text-muted">
+                    {GLOSSARY[also].body.map((p) => (
+                      <p key={p}>{p}</p>
+                    ))}
+                  </div>
+                </>
+              )}
               <button
                 ref={ok}
                 type="button"

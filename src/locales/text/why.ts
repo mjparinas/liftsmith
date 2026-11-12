@@ -25,6 +25,9 @@ export const en = {
   "why.call.planned": "Train as planned ({score}). Weights follow on from last time.",
   "why.call.plannedBecause": "Train as planned: {reasons} ({score}). Weights follow on from last time.",
   "why.call.but": "{up}, but {down}",
+  "why.short.planned": "Weights follow on from last time.",
+  "why.short.push": "Your first big lift goes one rep closer to failure.",
+  "why.short.easy": "One set fewer and a step lighter, so you come back stronger.",
 } as const;
 
 type Key = keyof typeof en;
@@ -51,6 +54,9 @@ export const es: Partial<Record<Key, Message>> = {
   "why.call.planned": "Entrena según el plan ({score}). Los pesos siguen desde la última vez.",
   "why.call.plannedBecause": "Entrena según el plan: {reasons} ({score}). Los pesos siguen desde la última vez.",
   "why.call.but": "{up}, pero {down}",
+  "why.short.planned": "Los pesos siguen desde la última vez.",
+  "why.short.push": "Tu primer ejercicio grande va una repetición más cerca del fallo.",
+  "why.short.easy": "Una serie menos y un escalón más ligero, para volver más fuerte.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -75,6 +81,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "why.call.planned": "Entraînez-vous comme prévu ({score}). Les charges suivent la dernière fois.",
   "why.call.plannedBecause": "Entraînez-vous comme prévu : {reasons} ({score}). Les charges suivent la dernière fois.",
   "why.call.but": "{up}, mais {down}",
+  "why.short.planned": "Les charges suivent la dernière fois.",
+  "why.short.push": "Votre premier gros exercice va une répétition plus près de l’échec.",
+  "why.short.easy": "Une série de moins et un cran plus léger, pour revenir plus fort.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -99,6 +108,9 @@ export const de: Partial<Record<Key, Message>> = {
   "why.call.planned": "Wie geplant trainieren ({score}). Die Gewichte schließen an letztes Mal an.",
   "why.call.plannedBecause": "Wie geplant trainieren: {reasons} ({score}). Die Gewichte schließen an letztes Mal an.",
   "why.call.but": "{up}, aber {down}",
+  "why.short.planned": "Die Gewichte schließen an letztes Mal an.",
+  "why.short.push": "Deine erste große Übung geht eine Wiederholung näher ans Muskelversagen.",
+  "why.short.easy": "Ein Satz weniger und etwas leichter, damit du stärker zurückkommst.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -123,6 +135,9 @@ export const it: Partial<Record<Key, Message>> = {
   "why.call.planned": "Allenati come previsto ({score}). I pesi partono dall’ultima volta.",
   "why.call.plannedBecause": "Allenati come previsto: {reasons} ({score}). I pesi partono dall’ultima volta.",
   "why.call.but": "{up}, ma {down}",
+  "why.short.planned": "I pesi partono dall’ultima volta.",
+  "why.short.push": "Il primo grande esercizio va una ripetizione più vicino al cedimento.",
+  "why.short.easy": "Una serie in meno e un po’ più leggero, così torni più forte.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -146,4 +161,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "why.call.planned": "予定どおりトレーニング（{score}）。重量は前回から引き継ぎます。",
   "why.call.plannedBecause": "予定どおりトレーニング：{reasons}（{score}）。重量は前回から引き継ぎます。",
   "why.call.but": "{up}が、{down}",
+  "why.short.planned": "重量は前回から引き継ぎます。",
+  "why.short.push": "最初の主要種目は限界まであと1回近づけます。",
+  "why.short.easy": "セットを1つ減らして少し軽くし、次はもっと強くなって戻りましょう。",
 };
