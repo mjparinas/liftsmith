@@ -1,6 +1,6 @@
 /* Italian permission prompts. Keep in step with Info.plist. */
 "NSCameraUsageDescription" = "Per scattare foto dei progressi e, se lo attivi, contare le tue ripetizioni. Le foto restano su questo telefono e non vengono mai caricate; il conteggio analizza il video su questo iPhone senza mai registrarlo né inviarlo.";
-"NSBluetoothAlwaysUsageDescription" = "Liftsmith si collega alla tua fascia cardio o al tuo orologio per mostrare la frequenza cardiaca in tempo reale durante gli allenamenti.";
+"NSBluetoothAlwaysUsageDescription" = "Liftsmith si collega alla tua fascia cardio o al tuo orologio per mostrare la frequenza cardiaca in tempo reale durante gli allenamenti, e alle macchine da palestra Bluetooth per compilare il tuo cardio.";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith usa la tua posizione approssimativa all'apertura dell'app per scegliere la palestra in cui ti trovi. Non ti segue mai in background e la tua posizione resta sul telefono.";
 "NSHealthShareUsageDescription" = "Liftsmith legge peso, altezza, sesso, data di nascita, massa grassa, frequenza cardiaca a riposo, sonno, variabilità della frequenza cardiaca, passi, VO2 max, frequenza respiratoria e le calorie e proteine registrate dalla tua app per l'alimentazione per pianificare l'allenamento, tenere aggiornati le pesate e il fabbisogno calorico giornaliero, mostrare il tuo recupero e darti consigli su cosa mangi.";
 "NSHealthUpdateUsageDescription" = "Liftsmith salva in Salute gli allenamenti completati, con calorie e frequenza cardiaca.";

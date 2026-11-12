@@ -18,6 +18,7 @@ export type LabFlag =
   | "labVoiceLog"
   | "labSpeedMax"
   | "labWatchReps"
+  | "labGymMachines"
   | "labHandsFree"
   | "labBarPath"
   | "labTempo";
@@ -35,6 +36,7 @@ export interface Lab {
     | "voiceLog"
     | "speedMax"
     | "watchReps"
+    | "machines"
     | "handsFree"
     | "barPath"
     | "tempo";
@@ -55,6 +57,7 @@ export const LABS: readonly Lab[] = [
   { flag: "labVoiceLog", key: "voiceLog" },
   { flag: "labSpeedMax", key: "speedMax", needs: "labBarSpeed" },
   { flag: "labWatchReps", key: "watchReps", native: true },
+  { flag: "labGymMachines", key: "machines" },
   { flag: "labHandsFree", key: "handsFree" },
   { flag: "labBarPath", key: "barPath", needs: "labRepCount" },
   { flag: "labTempo", key: "tempo" },
