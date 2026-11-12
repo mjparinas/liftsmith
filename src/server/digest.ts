@@ -8,6 +8,7 @@ import { CHECKS, type CheckState, type HealthCheck } from "@/lib/systemHealth";
 
 import { adminEmails } from "./adminAuth";
 import { todoList, type TodoKind, type TodoList } from "./adminTodo";
+import { coachTotals, type CoachTotals } from "./adminUsers";
 import { alertSettings, resendMailer, siteOrigin, type Mailer } from "./alerts";
 import { query } from "./db";
 import { getSetting, setSetting } from "./settings";
@@ -50,6 +51,8 @@ export interface DigestData {
   total: Money;
   todo: TodoList | null;
   checks: HealthCheck[] | null;
+  /** Coaching in the last 24 hours plus the totals (null when it couldn't be read). */
+  coaching: CoachTotals | null;
 }
 
 const zero = (): Money => ({ trials: 0, started: 0, renewals: 0, payments: 0, usdMicros: 0, cancels: 0, refunds: 0, failed: 0 });
@@ -63,7 +66,7 @@ const REAL = "(install_id IS NULL OR install_id NOT IN (SELECT id FROM installs 
 /** Reads the last 24 hours. Each part that can't be read is null or zero, so the digest still goes out. */
 export async function digestData(now = Date.now()): Promise<DigestData> {
   const since = now - DAY;
-  const [todo, checks, signupRows, installRows, lifterRows, moneyRows] = await Promise.all([
+  const [todo, checks, signupRows, installRows, lifterRows, moneyRows, coaching] = await Promise.all([
     todoList(now).catch(() => null),
     Promise.all(CHECKS.map((c) => runCheck(c.id, { now }).then((r) => r.result))).catch(() => null),
     // An account's platform is where it first signed in: its first session.
@@ -83,6 +86,7 @@ export async function digestData(now = Date.now()): Promise<DigestData> {
       `SELECT store, kind, reason, COUNT(*) AS n, SUM(usd_micros) AS usd FROM subscription_events WHERE at > ? AND ${REAL} GROUP BY store, kind, reason`,
       [since],
     ).catch(() => []),
+    coachTotals(now, since).catch(() => null),
   ]);
   const signups = byPlatform();
   for (const r of signupRows) signups[platformOf(r.platform)] += Number(r.n);
@@ -106,7 +110,7 @@ export async function digestData(now = Date.now()): Promise<DigestData> {
   }
   const total = zero();
   for (const s of STORES) for (const k of Object.keys(total) as (keyof Money)[]) total[k] += money[s][k];
-  return { signups, installs, lifters: Number(lifterRows[0]?.n ?? 0), money, total, todo, checks };
+  return { signups, installs, lifters: Number(lifterRows[0]?.n ?? 0), money, total, todo, checks, coaching };
 }
 
 // ---------- Wording ----------
@@ -144,6 +148,14 @@ export function digestFrom(d: DigestData): Digest {
     `New installs: ${sum(d.installs)} (${split(d.installs)}).`,
     `${plural(d.lifters, "lifter", "lifters")} finished a workout.`,
   ];
+
+  const c = d.coaching;
+  const coaching = c
+    ? [
+        `${plural(c.coachesNew, "new coach", "new coaches")} (${c.coachesNewFromPage} from the coaches page), ${plural(c.clientsNew, "new client", "new clients")}.`,
+        `All time: ${plural(c.coaches, "coach", "coaches")} (${c.coachesWithClients} with clients), ${plural(c.clients, "client", "clients")}.`,
+      ]
+    : ["Coaching couldn't be read."];
 
   const pro = [
     `${plural(t.trials, "trial", "trials")} started, ${plural(t.started, "new subscriber", "new subscribers")}, ${plural(t.renewals, "renewal", "renewals")}.`,
@@ -198,6 +210,7 @@ export function digestFrom(d: DigestData): Digest {
     sections: [
       { title: "Site health", lines: health },
       { title: "Lifters", lines: people },
+      { title: "Coaching", lines: coaching },
       { title: "Pro", lines: pro, bullets: stores.length ? stores : undefined },
       todo,
     ],

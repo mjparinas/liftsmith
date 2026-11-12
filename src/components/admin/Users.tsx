@@ -5,13 +5,14 @@
 // for admins, sign it out everywhere or delete it. Plus the CSV downloads.
 import { useCallback, useEffect, useState } from "react";
 
-import type { AccountDetail, AccountRow } from "@/server/adminUsers";
+import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/adminUsers";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
 import { ago, when } from "./time";
 
 const PROVIDER: Record<string, string> = { google: "Google", apple: "Apple", email: "Email code" };
 const providers = (p: string[]) => p.map((x) => PROVIDER[x] ?? x).join(", ") || "—";
+const ROLE_NAME: Record<Role, string> = { lifter: "Lifter", coach: "Coach", client: "Client", both: "Coach and client" };
 const kb = (b: number) => (b < 1024 ? `${b} B` : b < 1_048_576 ? `${(b / 1024).toFixed(1)} KB` : `${(b / 1_048_576).toFixed(1)} MB`);
 
 async function post(body: Record<string, unknown>): Promise<string | null> {
@@ -187,7 +188,10 @@ export function Users({
 }) {
   const [q, setQ] = useState("");
   const [search, setSearch] = useState("");
-  const [data, setData] = useState<{ accounts: AccountRow[]; totals: { total: number; new30: number; active30: number } } | null>(null);
+  const [data, setData] = useState<{
+    accounts: AccountRow[];
+    totals: { total: number; new30: number; active30: number } & Partial<CoachTotals>;
+  } | null>(null);
   const load = useCallback((term: string) => {
     fetch(`/api/admin/users/?q=${encodeURIComponent(term)}`)
       .then(async (r) => r.ok && setData(await r.json()))
@@ -202,6 +206,17 @@ export function Users({
           <Tile label="Accounts" value={fmtInt(data.totals.total)} />
           <Tile label="New in 30 days" value={fmtInt(data.totals.new30)} />
           <Tile label="Seen in 30 days" value={fmtInt(data.totals.active30)} />
+        </div>
+      )}
+      {data && data.totals.coaches != null && (
+        <div className="grid grid-cols-3 gap-3">
+          <Tile
+            label="Coaches"
+            value={fmtInt(data.totals.coaches)}
+            sub={`${fmtInt(data.totals.coachesFromPage ?? 0)} from the coaches page, ${fmtInt(data.totals.coachesNew ?? 0)} new in 30 days`}
+          />
+          <Tile label="Coaches with clients" value={fmtInt(data.totals.coachesWithClients ?? 0)} />
+          <Tile label="Clients" value={fmtInt(data.totals.clients ?? 0)} sub={`${fmtInt(data.totals.clientsNew ?? 0)} new in 30 days`} />
         </div>
       )}
       <Card title="Accounts" subtitle="An account exists only for sync. Most lifters never make one, so installs are under Installs.">
@@ -231,9 +246,10 @@ export function Users({
           <p className="text-sm text-muted">Loading…</p>
         ) : (
           <Table
-            columns={["Email", "Signed up", "Last seen", "Sign-in", "Devices", "Synced events", ""]}
+            columns={["Email", "Role", "Signed up", "Last seen", "Sign-in", "Devices", "Synced events", ""]}
             rows={data.accounts.map((a) => [
               a.email ?? "—",
+              ROLE_NAME[a.role],
               when(a.createdAt),
               ago(a.lastSeen),
               providers(a.providers),

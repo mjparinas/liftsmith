@@ -96,7 +96,7 @@ export function Automations({ admin }: { admin: boolean }) {
         />
         <Toggle
           label="Morning digest"
-          help="Each day at 8 AM Pacific: site health (the live site, UptimeRobot and every System check), the last 24 hours' sign-ups and installs by platform (Android, iOS, web), workouts, and Pro trials, new subscribers, payments and cancellations by store (Google Play, App Store, Stripe), plus what waits on To Do."
+          help="Each day at 8 AM Pacific: site health (the live site, UptimeRobot and every System check), the last 24 hours' sign-ups and installs by platform (Android, iOS, web), workouts, new coaches and clients, and Pro trials, new subscribers, payments and cancellations by store (Google Play, App Store, Stripe), plus what waits on To Do."
           on={s.digest}
           disabled={!admin}
           change={(digest) => void save({ ...s, digest })}

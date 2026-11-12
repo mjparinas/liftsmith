@@ -72,6 +72,11 @@ export const en = {
   "setup.back": "Back",
   "setup.continue": "Continue",
   "setup.save": "Save",
+  "setup.coaching.kicker": "For coaches",
+  "setup.coaching.title": "Coach your clients",
+  "setup.coaching.lead":
+    "Sign in first: your clients find you through your account. Then a few quick questions set up your own training, and you're on the coaching screen.",
+  "setup.coaching.train": "I'm here to train",
   "setup.coach.kicker": "Invited by your coach",
   "setup.coach.title": "Train with your coach",
   "setup.coach.lead":
@@ -163,6 +168,11 @@ export const es: Partial<Record<Key, Message>> = {
   "setup.back": "Atrás",
   "setup.continue": "Continuar",
   "setup.save": "Guardar",
+  "setup.coaching.kicker": "Para entrenadores",
+  "setup.coaching.title": "Entrena a tus clientes",
+  "setup.coaching.lead":
+    "Primero inicia sesión: tus clientes te encuentran a través de tu cuenta. Luego, unas preguntas rápidas preparan tu propio entrenamiento y llegas a la pantalla de entrenador.",
+  "setup.coaching.train": "Vengo a entrenar",
   "setup.coach.kicker": "Invitación de tu entrenador",
   "setup.coach.title": "Entrena con tu entrenador",
   "setup.coach.lead":
@@ -252,6 +262,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "setup.back": "Retour",
   "setup.continue": "Continuer",
   "setup.save": "Enregistrer",
+  "setup.coaching.kicker": "Pour les coachs",
+  "setup.coaching.title": "Coachez vos clients",
+  "setup.coaching.lead":
+    "Connectez-vous d'abord : vos clients vous trouvent grâce à votre compte. Ensuite, quelques questions rapides préparent votre propre entraînement et vous arrivez sur l'écran de coaching.",
+  "setup.coaching.train": "Je viens m'entraîner",
   "setup.coach.kicker": "Invitation de votre coach",
   "setup.coach.title": "Entraînez-vous avec votre coach",
   "setup.coach.lead":
@@ -341,6 +356,11 @@ export const de: Partial<Record<Key, Message>> = {
   "setup.back": "Zurück",
   "setup.continue": "Weiter",
   "setup.save": "Speichern",
+  "setup.coaching.kicker": "Für Coaches",
+  "setup.coaching.title": "Coache deine Kundschaft",
+  "setup.coaching.lead":
+    "Melde dich zuerst an: Deine Kundschaft findet dich über dein Konto. Danach richten ein paar kurze Fragen dein eigenes Training ein, und du landest beim Coaching.",
+  "setup.coaching.train": "Ich will trainieren",
   "setup.coach.kicker": "Einladung von deinem Coach",
   "setup.coach.title": "Trainiere mit deinem Coach",
   "setup.coach.lead":
@@ -430,6 +450,11 @@ export const it: Partial<Record<Key, Message>> = {
   "setup.back": "Indietro",
   "setup.continue": "Continua",
   "setup.save": "Salva",
+  "setup.coaching.kicker": "Per i coach",
+  "setup.coaching.title": "Allena i tuoi clienti",
+  "setup.coaching.lead":
+    "Prima accedi: i tuoi clienti ti trovano tramite il tuo account. Poi qualche domanda veloce imposta il tuo allenamento e arrivi alla schermata coach.",
+  "setup.coaching.train": "Sono qui per allenarmi",
   "setup.coach.kicker": "Invito del tuo coach",
   "setup.coach.title": "Allenati con il tuo coach",
   "setup.coach.lead":
@@ -516,6 +541,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "setup.back": "戻る",
   "setup.continue": "次へ",
   "setup.save": "保存",
+  "setup.coaching.kicker": "コーチの方へ",
+  "setup.coaching.title": "クライアントを指導する",
+  "setup.coaching.lead":
+    "まずサインインしてください。クライアントはあなたのアカウントであなたを見つけます。そのあと、いくつかの質問でご自身のトレーニングを設定すると、コーチング画面に移ります。",
+  "setup.coaching.train": "トレーニングしに来た",
   "setup.coach.kicker": "コーチからの招待",
   "setup.coach.title": "コーチと一緒にトレーニング",
   "setup.coach.lead":

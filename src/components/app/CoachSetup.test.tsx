@@ -6,7 +6,15 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { forgetAccount } from "@/lib/auth";
-import { coachCode, coachFromReferrer, pendingCoach, playCoachUrl } from "@/lib/coachInvite";
+import {
+  coachCode,
+  coachFromReferrer,
+  coachSignup,
+  isCoachSignupHash,
+  pendingCoach,
+  playCoachSignupUrl,
+  playCoachUrl,
+} from "@/lib/coachInvite";
 import { useApp } from "@/lib/store";
 
 import { App } from "./App";
@@ -104,6 +112,46 @@ describe("a coach's invite on a new install", () => {
     render(<App />);
     await u.click(await screen.findByRole("button", { name: "Set up on my own instead" }));
     expect(await screen.findByRole("heading", { name: "What are you training for?" })).toBeInTheDocument();
+  });
+});
+
+describe("a coach signing up from the coaches page", () => {
+  it("signs in, sets up their own training without the save step, and lands on the coaching screen", async () => {
+    location.hash = "#/trainer";
+    const u = userEvent.setup();
+    render(<App />);
+    expect(await screen.findByRole("heading", { name: "Coach your clients" })).toBeInTheDocument();
+    expect(coachSignup()).toBe(true);
+    await u.click(screen.getByRole("button", { name: "Sign in to start" }));
+    await waitFor(() => expect(gis).not.toBeNull());
+    gis!({ credential: "id-token" });
+    expect(await screen.findByRole("heading", { name: "What are you training for?" })).toBeInTheDocument();
+    const steps = [];
+    while (!useApp.getState().profile.onboarded) {
+      steps.push(screen.getAllByRole("heading")[0]!.textContent);
+      const next = screen.queryByRole("button", { name: "Continue" }) ?? screen.getByRole("button", { name: /Save|Finish|Done/ });
+      await u.click(next);
+      if (steps.length > 6) throw new Error(`stuck: ${steps.join(" / ")}`);
+    }
+    expect(steps.join(" / ")).not.toMatch(/Save your progress/i);
+    await waitFor(() => expect(location.hash).toBe("#/trainer"));
+  });
+
+  it("I'm here to train goes back to the usual welcome and forgets it", async () => {
+    location.hash = "#/trainer";
+    const u = userEvent.setup();
+    render(<App />);
+    await u.click(await screen.findByRole("button", { name: "I'm here to train" }));
+    expect(await screen.findByRole("heading", { name: "What are you training for?" })).toBeInTheDocument();
+    location.hash = "";
+    expect(coachSignup()).toBe(false);
+  });
+
+  it("knows the coaches page's link and Play referrer", () => {
+    expect(isCoachSignupHash("#/trainer")).toBe(true);
+    expect(isCoachSignupHash("#/trainer/")).toBe(true);
+    expect(isCoachSignupHash("#/trainer/ABCD2345")).toBe(false);
+    expect(decodeURIComponent(playCoachSignupUrl())).toContain("referrer=utm_source=coaches");
   });
 });
 

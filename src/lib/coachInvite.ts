@@ -53,18 +53,55 @@ export function coachFromReferrer(raw: string | null | undefined): string {
   return q.get("utm_source") === "coach" ? coachCode(q.get("utm_campaign")) : "";
 }
 
+// Signing up as a coach (Melvin, 2026-11-12: one account for everyone, but coaches get their own way in). The website's
+// coaches page opens the app at #/trainer with no code; before setup that means "I'm a coach", so the welcome screen asks
+// to sign in (coaching goes through the account) and setup ends on the coaching screen. It's also how the admin panel
+// tells coaches who came from that page (the first invite is sent with via "coaches"). The Play listing link from that
+// page carries utm_source=coaches, so it survives an install on Android too.
+const SIGNUP = "liftsmith.coachSignup";
+
+/** Opened as #/trainer (or #/trainer/) with no code: the coaches page's way in. */
+export const isCoachSignupHash = (hash: string) => /^#\/trainer\/?$/.test(hash);
+
+/** Whether this device came in through the coaches page and hasn't sent its first invite yet. */
+export function coachSignup(): boolean {
+  if (typeof location !== "undefined" && isCoachSignupHash(location.hash)) return true;
+  try {
+    return localStorage.getItem(SIGNUP) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function saveCoachSignup(on: boolean): void {
+  try {
+    if (on) localStorage.setItem(SIGNUP, "1");
+    else localStorage.removeItem(SIGNUP);
+  } catch {
+    // private mode: it still works while the page is open
+  }
+}
+
+/** Google Play for coaches from the coaches page, marked so the app knows on its first launch. */
+export const playCoachSignupUrl = () =>
+  `https://play.google.com/store/apps/details?id=com.getliftsmith.app&referrer=${encodeURIComponent("utm_source=coaches")}`;
+
 let checked = false;
 /** On open, once: keeps a code from the link, or from the Play install referrer on the first launch after install. */
 export async function startCoachInvite(): Promise<void> {
   if (checked) return;
   checked = true;
-  const fromLink = typeof location !== "undefined" ? coachCode(location.hash) : "";
+  const hash = typeof location !== "undefined" ? location.hash : "";
+  const fromLink = coachCode(hash);
   if (fromLink) return savePendingCoach(fromLink);
+  if (isCoachSignupHash(hash)) return saveCoachSignup(true);
   if (!isNative()) return;
-  const code = coachFromReferrer((await installInfo())?.installReferrer);
+  const referrer = (await installInfo())?.installReferrer;
+  const code = coachFromReferrer(referrer);
   try {
-    if (code && !localStorage.getItem(`${PENDING}.seen`)) {
-      savePendingCoach(code);
+    if (!localStorage.getItem(`${PENDING}.seen`)) {
+      if (code) savePendingCoach(code);
+      else if (new URLSearchParams(referrer ?? "").get("utm_source") === "coaches") saveCoachSignup(true);
       localStorage.setItem(`${PENDING}.seen`, "1");
     }
   } catch {
