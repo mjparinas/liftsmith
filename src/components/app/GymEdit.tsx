@@ -9,6 +9,7 @@ import {
   releaseGym,
   STAND_MIN_LIFTERS,
   standOrder,
+  startGymClub,
   type OwnedGym,
   type StandOrder,
 } from "@/lib/gymClaims";
@@ -134,6 +135,7 @@ export function GymEdit({ id }: { id?: string }) {
       <ScreenHeader title={t("gym.edit.title")} kicker={gym.name} back={{ label: t("gym.back"), onClick: goBack }} />
 
       <Results gym={gym} />
+      <ClubSection gym={gym} />
 
       <Section title={t("gp.hours")}>
         <SwitchRow label={t("gp.allDay")} on={allDay} onChange={setAllDay} />
@@ -286,6 +288,56 @@ function Results({ gym }: { gym: OwnedGym }) {
       <p className="card card-tint mt-3 p-3 text-sm" style={{ ["--tint" as string]: "var(--color-accent)" }}>
         {next}
       </p>
+    </Section>
+  );
+}
+
+/** The gym's own club, with its weekly leaderboard and crew goal (social.ts gymClubStart). It runs in Friends. */
+function ClubSection({ gym }: { gym: OwnedGym }) {
+  const [code, setCode] = useState(gym.club);
+  const [problem, setProblem] = useState<"friends" | string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const start = async () => {
+    if (busy) return;
+    setBusy(true);
+    const r = await startGymClub(gym.id);
+    setBusy(false);
+    if ("code" in r) {
+      haptic("success");
+      setCode(r.code);
+      return go("club", r.code);
+    }
+    oops();
+    setProblem(r.error === "notJoined" ? "friends" : errorText(r.error));
+  };
+  return (
+    <Section title={t("gym.edit.club")}>
+      <p className="mb-2 text-sm text-muted">{t("gym.edit.clubNote")}</p>
+      {code ? (
+        <Button kind="ghost" icon="trophy" className="w-full" onClick={() => go("club", code)}>
+          {t("gym.edit.clubOpen")}
+        </Button>
+      ) : problem === "friends" ? (
+        <div className="grid gap-2">
+          <p className="text-sm" role="alert">
+            {t("gym.edit.clubFriends")}
+          </p>
+          <Button kind="ghost" icon="people" className="w-full" onClick={() => go("friends")}>
+            {t("gym.edit.clubGoFriends")}
+          </Button>
+        </div>
+      ) : (
+        <>
+          <Button kind="ghost" icon="trophy" className="w-full" disabled={busy} onClick={() => void start()}>
+            {t("gym.edit.clubStart")}
+          </Button>
+          {problem && (
+            <p className="mt-2 text-sm text-bad" role="alert">
+              {problem}
+            </p>
+          )}
+        </>
+      )}
     </Section>
   );
 }

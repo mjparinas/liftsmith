@@ -6,7 +6,8 @@ import { allDay, parseHours } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
 
 import { Icon, type IconName } from "./icons";
-import { Section } from "./ui";
+import { go } from "./router";
+import { Button, Section } from "./ui";
 
 // A real gym's details in its preview (SharedGym.tsx, docs/decisions/gyms.md): how many lifters train there, its
 // opening hours, and links to directions, its website and its page on our website. Text is shared with the website's
@@ -64,6 +65,16 @@ export function PlaceDetails({ place }: { place: Place }) {
         {place.website && link(place.website, "link", t("gp.website"))}
         {place.citySlug && place.slug && link(`${SITE_URL}/gyms/${place.citySlug}/${place.slug}/`, "gym", t("gym.place.page"))}
       </div>
+      {place.club && (
+        <Section title={t("gp.clubTitle")}>
+          <div className="card p-4">
+            <p className="text-sm text-muted">{t("gp.clubBody")}</p>
+            <Button kind="ghost" icon="trophy" className="mt-3 w-full" onClick={() => go("club", place.club)}>
+              {t("gp.clubJoin")}
+            </Button>
+          </div>
+        </Section>
+      )}
     </>
   );
 }

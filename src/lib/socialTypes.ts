@@ -254,6 +254,8 @@ export const SOCIAL_LIMITS = {
   clubName: 40,
   /** People in one club, the starter included. */
   clubMembers: 100,
+  /** People in an official gym's club (docs/decisions/gyms.md): a whole gym's members, not a crew. */
+  gymClubMembers: 1000,
   /** Clubs one lifter can be in. */
   clubsEach: 10,
   exercises: 20,

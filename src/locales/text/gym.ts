@@ -221,6 +221,13 @@ export const en = {
     other: "Next: {count} more lifters and we'll mail you a free table stand.",
   },
   "gym.edit.next.keep": "Keep the poster and stand where members check in, and ask new members to scan it when they join.",
+  "gym.edit.club": "Your gym's club",
+  "gym.edit.clubNote":
+    "A club for your members, with a weekly leaderboard and a crew goal you set. Lifters join from your gym's page, and you run it in Friends.",
+  "gym.edit.clubStart": "Start the club",
+  "gym.edit.clubOpen": "Open the club",
+  "gym.edit.clubFriends": "Turn on Friends first, then start the club.",
+  "gym.edit.clubGoFriends": "Open Friends",
 } as const;
 
 type Key = keyof typeof en;
@@ -449,6 +456,13 @@ export const es: Partial<Record<Key, Message>> = {
   },
   "gym.edit.next.keep":
     "Deja el cartel y el expositor donde los socios registran su entrada, y pide a los nuevos que lo escaneen al apuntarse.",
+  "gym.edit.club": "El club de tu gimnasio",
+  "gym.edit.clubNote":
+    "Un club para tus socios, con una clasificación semanal y un objetivo de grupo que tú eliges. Se unen desde la página de tu gimnasio y lo gestionas en Amigos.",
+  "gym.edit.clubStart": "Crear el club",
+  "gym.edit.clubOpen": "Abrir el club",
+  "gym.edit.clubFriends": "Activa Amigos primero y luego crea el club.",
+  "gym.edit.clubGoFriends": "Abrir Amigos",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -683,6 +697,13 @@ export const fr: Partial<Record<Key, Message>> = {
   },
   "gym.edit.next.keep":
     "Gardez l’affiche et le présentoir là où les membres arrivent, et demandez aux nouveaux de le scanner à l’inscription.",
+  "gym.edit.club": "Le club de votre salle",
+  "gym.edit.clubNote":
+    "Un club pour vos membres, avec un classement hebdomadaire et un objectif d’équipe que vous fixez. Ils le rejoignent depuis la page de votre salle, et vous le gérez dans Amis.",
+  "gym.edit.clubStart": "Créer le club",
+  "gym.edit.clubOpen": "Ouvrir le club",
+  "gym.edit.clubFriends": "Activez d’abord Amis, puis créez le club.",
+  "gym.edit.clubGoFriends": "Ouvrir Amis",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -919,6 +940,13 @@ export const de: Partial<Record<Key, Message>> = {
   },
   "gym.edit.next.keep":
     "Lass Plakat und Aufsteller dort, wo Mitglieder einchecken, und bitte neue Mitglieder, ihn bei der Anmeldung zu scannen.",
+  "gym.edit.club": "Der Club deines Studios",
+  "gym.edit.clubNote":
+    "Ein Club für deine Mitglieder, mit wöchentlicher Rangliste und einem gemeinsamen Ziel, das du festlegst. Sportler treten über die Seite deines Studios bei, und du verwaltest ihn in Freunde.",
+  "gym.edit.clubStart": "Club gründen",
+  "gym.edit.clubOpen": "Club öffnen",
+  "gym.edit.clubFriends": "Aktiviere zuerst Freunde, dann gründe den Club.",
+  "gym.edit.clubGoFriends": "Freunde öffnen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1148,6 +1176,13 @@ export const it: Partial<Record<Key, Message>> = {
     other: "Prossimo passo: ancora {count} atleti e ti spediremo un espositore da tavolo gratis.",
   },
   "gym.edit.next.keep": "Tieni poster ed espositore dove i soci fanno il check-in, e chiedi ai nuovi di scansionarlo quando si iscrivono.",
+  "gym.edit.club": "Il club della tua palestra",
+  "gym.edit.clubNote":
+    "Un club per i tuoi iscritti, con una classifica settimanale e un obiettivo di gruppo che scegli tu. Si uniscono dalla pagina della palestra e lo gestisci in Amici.",
+  "gym.edit.clubStart": "Crea il club",
+  "gym.edit.clubOpen": "Apri il club",
+  "gym.edit.clubFriends": "Attiva prima Amici, poi crea il club.",
+  "gym.edit.clubGoFriends": "Apri Amici",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1361,4 +1396,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.edit.next.poster": "次のステップ：ポスターを印刷して受付の近くに貼りましょう。利用者がスキャンしてジムを追加します。",
   "gym.edit.next.stand": { other: "次のステップ：あと{count}人で、卓上スタンドを無料でお送りします。" },
   "gym.edit.next.keep": "ポスターとスタンドは会員がチェックインする場所に置き、新しい会員に入会時にスキャンしてもらいましょう。",
+  "gym.edit.club": "ジムのクラブ",
+  "gym.edit.clubNote":
+    "会員向けのクラブで、週間ランキングとあなたが決めるチーム目標があります。利用者はジムのページから参加し、管理はフレンドで行います。",
+  "gym.edit.clubStart": "クラブを作成",
+  "gym.edit.clubOpen": "クラブを開く",
+  "gym.edit.clubFriends": "先にフレンドをオンにしてから、クラブを作成してください。",
+  "gym.edit.clubGoFriends": "フレンドを開く",
 };

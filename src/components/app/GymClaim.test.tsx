@@ -49,6 +49,7 @@ const OWNED = {
   newLifters: 5,
   scans: 12,
   scans30: 7,
+  club: "",
 };
 const ops: Record<string, unknown>[] = [];
 let claimed = false;
@@ -79,6 +80,8 @@ beforeEach(async () => {
           return claimed ? Response.json({ place: PLACE.id }) : Response.json({ error: "wrong" }, { status: 400 });
         case "posterStatus":
           return Response.json({ order: null });
+        case "gymClub":
+          return Response.json({ error: "notJoined" }, { status: 403 });
         case "owned":
           return Response.json({ gyms: claimed ? [OWNED] : [] });
         default:
@@ -145,6 +148,10 @@ describe("claiming a gym", () => {
     expect(screen.getByText("New lifters").previousSibling).toHaveTextContent("5");
     expect(screen.getByText("Poster scans").previousSibling).toHaveTextContent("7");
     expect(screen.getByText(/^Next: add your opening hours/)).toBeInTheDocument();
+    // The gym's club runs in Friends, so an owner not in Friends is sent there first.
+    await user.click(screen.getByRole("button", { name: "Start the club" }));
+    expect(await screen.findByText("Turn on Friends first, then start the club.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Open Friends" })).toBeInTheDocument();
     await user.click(screen.getByRole("switch", { name: "Open 24 hours, every day" }));
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(await screen.findByText(/^Saved/)).toBeInTheDocument();

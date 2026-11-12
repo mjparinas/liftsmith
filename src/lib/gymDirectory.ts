@@ -39,7 +39,9 @@ export interface Place {
   lifters: number;
   /** The setup it offers (gymShare.ts code), empty when nobody has set one up yet. */
   code: string;
-  source: "osm" | "staff" | "owner";
+  source: "osm" | "staff" | "owner" | "lifter";
+  /** The code of the gym's own club and weekly leaderboard (#/club/<code>); missing or '' when it has none. */
+  club?: string;
 }
 
 export interface MyListing {

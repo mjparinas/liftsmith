@@ -75,6 +75,9 @@ export const en = {
   "gp.posterBody": "Print a free poster and table stand card so lifters can add this gym with one scan.",
   "gp.posterLink": "Print a free poster",
   "gp.missing": "Gym not listed? Add it in the app",
+  "gp.clubTitle": "Gym club",
+  "gp.clubBody": "Members get a weekly leaderboard and a crew goal. Joining shares your weekly totals from workouts you post to Friends.",
+  "gp.clubJoin": "Join the club",
 } as const;
 
 type Key = keyof typeof en;
@@ -153,6 +156,10 @@ export const es: Partial<Record<Key, Message>> = {
     "Imprime gratis un póster y una tarjeta para el expositor de mesa, para que la gente añada este gimnasio con un escaneo.",
   "gp.posterLink": "Imprimir un póster gratis",
   "gp.missing": "¿Falta un gimnasio? Añádelo en la app",
+  "gp.clubTitle": "Club del gimnasio",
+  "gp.clubBody":
+    "Los miembros tienen una clasificación semanal y un objetivo de grupo. Al unirte compartes tus totales semanales de los entrenamientos que publicas en Amigos.",
+  "gp.clubJoin": "Unirme al club",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -230,6 +237,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.posterBody": "Imprimez gratuitement une affiche et une carte de présentoir pour que les gens ajoutent cette salle en un scan.",
   "gp.posterLink": "Imprimer une affiche gratuite",
   "gp.missing": "Une salle manque ? Ajoutez-la dans l'app",
+  "gp.clubTitle": "Club de la salle",
+  "gp.clubBody":
+    "Les membres ont un classement hebdomadaire et un objectif d’équipe. En rejoignant, vous partagez vos totaux de la semaine des séances publiées dans Amis.",
+  "gp.clubJoin": "Rejoindre le club",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -308,6 +319,10 @@ export const de: Partial<Record<Key, Message>> = {
     "Drucke kostenlos ein Poster und eine Karte für den Tischaufsteller, damit Trainierende dieses Studio mit einem Scan hinzufügen.",
   "gp.posterLink": "Kostenloses Poster drucken",
   "gp.missing": "Studio fehlt? Füge es in der App hinzu",
+  "gp.clubTitle": "Studio-Club",
+  "gp.clubBody":
+    "Mitglieder bekommen eine wöchentliche Rangliste und ein gemeinsames Ziel. Wenn du beitrittst, teilst du deine Wochensummen aus Workouts, die du in Freunde postest.",
+  "gp.clubJoin": "Club beitreten",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -384,6 +399,10 @@ export const it: Partial<Record<Key, Message>> = {
     "Stampa gratis un poster e una scheda per l’espositore da tavolo, così chi si allena aggiunge questa palestra con una scansione.",
   "gp.posterLink": "Stampa un poster gratis",
   "gp.missing": "Manca una palestra? Aggiungila nell'app",
+  "gp.clubTitle": "Club della palestra",
+  "gp.clubBody":
+    "I membri hanno una classifica settimanale e un obiettivo di gruppo. Unendoti condividi i tuoi totali settimanali degli allenamenti che pubblichi in Amici.",
+  "gp.clubJoin": "Unisciti al club",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -457,4 +476,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.posterBody": "無料のポスターと卓上スタンド用カードを印刷すれば、利用者はスキャンひとつでこのジムを追加できます。",
   "gp.posterLink": "無料ポスターを印刷",
   "gp.missing": "ジムが載っていない場合はアプリで追加",
+  "gp.clubTitle": "ジムのクラブ",
+  "gp.clubBody": "メンバーには週間ランキングとチーム目標があります。参加すると、フレンドに投稿したワークアウトの週間合計が共有されます。",
+  "gp.clubJoin": "クラブに参加",
 };

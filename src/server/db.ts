@@ -849,6 +849,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
   // A gym a lifter added (gymPlaces.ts suggestPlace): who, and whether it still waits for staff.
   ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
+  // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
+  ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
 ];
 

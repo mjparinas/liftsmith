@@ -51,6 +51,8 @@ export interface Place {
   code: string;
   /** Where its details came from, for the map credit. */
   source: "osm" | "staff" | "owner" | "lifter";
+  /** The code of the gym's own club and weekly leaderboard (social.ts gymClubStart), '' when it has none. */
+  club: string;
 }
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
@@ -425,7 +427,8 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
   p.source, p.claimed_by, p.lifters, p.code, p.updated_at,
-  (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed`;
+  (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
+  (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club`;
 
 const toPlace = (r: Row, km: number): Place => ({
   id: s(r.id),
@@ -448,6 +451,7 @@ const toPlace = (r: Row, km: number): Place => ({
   lifters: n(r.lifters),
   code: s(r.code) || s(r.listed),
   source: (["staff", "owner", "lifter"] as const).find((x) => x === s(r.source)) ?? "osm",
+  club: s(r.club),
 });
 
 /** Gyms within `PLACE_LIMITS.radiusKm`: official ones first, then nearest. Studios only when asked for. */
@@ -659,6 +663,7 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
       await batch([
         { sql: "UPDATE public_gyms SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
+        { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_places WHERE id = ?", args: [id] },
       ]);
       return true;

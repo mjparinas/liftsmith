@@ -23,6 +23,8 @@ export interface OwnedGym {
   newLifters: number;
   scans: number;
   scans30: number;
+  /** The gym's own club's code (social.ts gymClubStart), '' before the owner starts it. */
+  club: string;
 }
 
 /** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */
@@ -150,6 +152,17 @@ export async function suggestGym(body: { name: string; address: string; city: st
   if (!t) return { error: "signedOut" };
   try {
     return await api<{ place: string }>("/api/gyms/", { token: t, body: { op: "suggest", ...body } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}
+
+/** The owner starts their gym's club, or gets its code if it has one (server: gymClubStart in social.ts). */
+export async function startGymClub(place: string): Promise<{ code: string } | { error: string }> {
+  const t = token();
+  if (!t) return { error: "signedOut" };
+  try {
+    return await api<{ code: string }>("/api/gyms/", { token: t, body: { op: "gymClub", place } });
   } catch (e) {
     return { error: err(e) };
   }

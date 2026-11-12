@@ -222,6 +222,8 @@ export interface OwnedGym {
   newLifters: number;
   scans: number;
   scans30: number;
+  /** The gym's own club's code (social.ts gymClubStart), '' before the owner starts it. */
+  club: string;
 }
 
 export async function ownedGyms(accountId: string, now = Date.now()): Promise<OwnedGym[]> {
@@ -231,7 +233,8 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
     `SELECT p.id, p.name, p.city_slug, p.slug, p.address, p.city, p.region, p.hours, p.website, p.phone, p.description, p.code, p.lifters,
        p.qr_scans,
        (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
-       (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30
+       (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30,
+       (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club
      FROM gym_places p WHERE p.claimed_by = ? ORDER BY p.name`,
     [since, Math.floor(since / 86_400_000), accountId],
   );
@@ -250,6 +253,7 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
     newLifters: n(r.new_lifters),
     scans: n(r.qr_scans),
     scans30: n(r.scans_30),
+    club: s(r.club),
   }));
 }
 
@@ -303,13 +307,15 @@ export async function editGym(accountId: string, body: Record<string, unknown>, 
 /** The owner gives the gym up: it goes back to unofficial, with the details they set. */
 export async function releaseGym(accountId: string, placeId: unknown, now = Date.now()): Promise<boolean> {
   if (!isPlaceId(placeId)) return false;
-  return (
+  const gone =
     (await run("UPDATE gym_places SET claimed_by = '', claimed_at = 0, updated_at = ? WHERE id = ? AND claimed_by = ?", [
       now,
       placeId,
       accountId,
-    ])) > 0
-  );
+    ])) > 0;
+  // The gym's club stays with its members as an ordinary club; the next owner starts the gym's own.
+  if (gone) await run("UPDATE clubs SET place_id = '' WHERE place_id = ?", [placeId]);
+  return gone;
 }
 
 // --- Staff: claims waiting on the Gyms tab ---
