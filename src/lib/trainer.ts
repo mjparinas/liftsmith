@@ -7,7 +7,7 @@
 import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
-import { coachCode } from "./coachInvite";
+import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
@@ -82,7 +82,13 @@ function token(): string {
 
 export const loadOverview = async () => api<Overview>("/api/coach/", { token: token() });
 export const loadClient = async (id: string) => api<ClientView>(`/api/coach/?client=${encodeURIComponent(id)}`, { token: token() });
-export const newInvite = async () => (await api<{ invite: Invite }>("/api/coach/", { token: token(), body: { action: "invite" } })).invite;
+/** A fresh invite. The first one from a coach who came in through the coaches page says so, for the admin panel's counts. */
+export async function newInvite(): Promise<Invite> {
+  const via = coachSignup() ? "coaches" : undefined;
+  const { invite } = await api<{ invite: Invite }>("/api/coach/", { token: token(), body: { action: "invite", via } });
+  saveCoachSignup(false);
+  return invite;
+}
 export const cancelInvite = async () => void (await api("/api/coach/", { token: token(), body: { action: "cancel" } }));
 /** Whose a code is, and what their new clients start setup with. Links nothing. */
 export const previewInvite = async (code: string) =>

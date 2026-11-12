@@ -643,6 +643,13 @@ const SCHEMA = [
     expires_at INTEGER NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS coach_invites_coach ON coach_invites (coach_id)`,
+  // Who coaches (Melvin, 2026-11-12: "track whether someone is a user vs a coach"): an account becomes a coach when it
+  // makes its first invite; via is "coaches" when it came in through the website's coaches page, else "app".
+  `CREATE TABLE IF NOT EXISTS coach_accounts (
+    account_id TEXT PRIMARY KEY,
+    created_at INTEGER NOT NULL,
+    via TEXT NOT NULL
+  )`,
   `CREATE TABLE IF NOT EXISTS coach_links (
     coach_id TEXT NOT NULL,
     client_id TEXT NOT NULL,

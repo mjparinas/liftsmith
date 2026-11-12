@@ -9,7 +9,7 @@ import { readAccount } from "@/lib/auth";
 import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
-import { pendingCoach, savePendingCoach } from "@/lib/coachInvite";
+import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
 import { markAdded } from "@/lib/gymDirectory";
@@ -142,6 +142,9 @@ const FULL: StepId[] = ["goal", "gym", "days", "zone", "save", "pro"];
 // starting setup answers the goal, experience and days; signing in already saves the workouts; and a client doesn't
 // need Pro, so there's no trial offer. Everything skipped can be changed later in Settings.
 const COACH: StepId[] = ["coach", "gym", "days"];
+// Signing up as a coach from the website's coaches page, signed in (2026-11-12): the usual questions for their own
+// training, minus "Save your progress" (the account already does), then the coaching screen.
+const COACHING = (steps: StepId[]) => steps.filter((s) => s !== "save");
 
 const KNOWN = [
   {
@@ -199,7 +202,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [coachPath, setCoachPath] = useState(false);
   // The code as of the latest tap (the welcome screen's "Set up on my own" clears it and starts in the same tap).
   const coachNow = useRef(coach);
-  const flow = coachPath ? COACH : FULL.slice(0, fullSteps);
+  // Came in through the coaches page to coach (coachSignup); the coach's own path starts once they're signed in.
+  const [coaching, setCoaching] = useState(() => !rerun && !coach && coachSignup());
+  const [coachingPath, setCoachingPath] = useState(false);
+  const coachingNow = useRef(coaching);
+  const flow = coachPath ? COACH : coachingPath ? COACHING(FULL.slice(0, fullSteps)) : FULL.slice(0, fullSteps);
   const STEPS = flow.length;
   const cur = flow[step] ?? "goal";
   const trialDays = flag("trialDays");
@@ -301,9 +308,15 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       savePendingCoach("");
       track("feature", { name: "trainer", detail: "setup" });
     }
+    // A coach signing up from the coaches page lands on the coaching screen, ready to send the first invite.
+    if (coachingPath) {
+      track("feature", { name: "trainer", detail: "coachSetup" });
+      return go("trainer");
+    }
     // A first run that came in through the website's "Sign in" link (#/account), or a coach's invite link (#/trainer/<code>)
     // on the coach path, ends on Today, not on that screen.
-    if (rerun || coachPath || location.hash.startsWith("#/account")) go("today");
+    // So does a coach's sign-up (#/trainer) turned into the usual setup with "I'm here to train".
+    if (rerun || coachPath || location.hash.startsWith("#/account") || isCoachSignupHash(location.hash)) go("today");
   };
 
   // The coach path: agreed, so take the coach's starting answers and go on to the gym.
@@ -336,9 +349,16 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
           coachNow.current = c;
           setCoach(c);
         }}
+        coaching={coaching}
+        onCoaching={(on) => {
+          saveCoachSignup(on);
+          coachingNow.current = on;
+          setCoaching(on);
+        }}
         onStart={(signedIn) => {
           setFreshAccount(!!signedIn);
           setCoachPath(!!coachNow.current && !!readAccount());
+          setCoachingPath(!coachNow.current && coachingNow.current && !!readAccount());
           setStep(0);
           setWelcome(false);
         }}

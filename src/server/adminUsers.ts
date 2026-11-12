@@ -17,7 +17,11 @@ export interface AccountRow {
   providers: string[];
   devices: number;
   events: number;
+  /** Coach (made an invite or has clients), client (linked to a coach), both, or neither: an ordinary lifter. */
+  role: Role;
 }
+
+export type Role = "lifter" | "coach" | "client" | "both";
 
 export interface AccountDetail extends AccountRow {
   pro: boolean;
@@ -39,8 +43,13 @@ export const NOTE_MAX = 1000;
 const ROW_SQL = `SELECT a.id, a.email, a.created_at, a.last_seen,
     (SELECT GROUP_CONCAT(DISTINCT provider) FROM account_identities i WHERE i.account_id = a.id) AS providers,
     (SELECT COUNT(*) FROM account_sessions x WHERE x.account_id = a.id) AS devices,
-    (SELECT COUNT(*) FROM sync_events e WHERE e.account_id = a.id AND e.body IS NOT NULL) AS events
+    (SELECT COUNT(*) FROM sync_events e WHERE e.account_id = a.id AND e.body IS NOT NULL) AS events,
+    (EXISTS (SELECT 1 FROM coach_accounts c WHERE c.account_id = a.id) OR EXISTS (SELECT 1 FROM coach_links l WHERE l.coach_id = a.id)) AS coach,
+    EXISTS (SELECT 1 FROM coach_links l WHERE l.client_id = a.id) AS client
   FROM accounts a`;
+
+const roleOf = (coach: unknown, client: unknown): Role =>
+  n(coach) && n(client) ? "both" : n(coach) ? "coach" : n(client) ? "client" : "lifter";
 
 const toRow = (r: Record<string, unknown>): AccountRow => ({
   id: String(r.id),
@@ -50,6 +59,7 @@ const toRow = (r: Record<string, unknown>): AccountRow => ({
   providers: s(r.providers)?.split(",").sort() ?? [],
   devices: n(r.devices),
   events: n(r.events),
+  role: roleOf(r.coach, r.client),
 });
 
 /** Accounts matching an email (part of one) or an account id; the newest first. Empty search: the latest. */
@@ -71,7 +81,49 @@ export async function accountTotals(now = Date.now()) {
     `SELECT COUNT(*) AS total, SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS new30, SUM(CASE WHEN last_seen >= ? THEN 1 ELSE 0 END) AS active30 FROM accounts`,
     [now - 30 * day, now - 30 * day],
   );
-  return { total: n(rows[0]?.total), new30: n(rows[0]?.new30), active30: n(rows[0]?.active30) };
+  return { total: n(rows[0]?.total), new30: n(rows[0]?.new30), active30: n(rows[0]?.active30), ...(await coachTotals(now)) };
+}
+
+export interface CoachTotals {
+  /** Accounts that coach: made an invite, or have clients from before coaches were counted. */
+  coaches: number;
+  /** Of those, how many came in through the website's coaches page. */
+  coachesFromPage: number;
+  /** Coaches with at least one client. */
+  coachesWithClients: number;
+  /** Accounts linked to at least one coach. */
+  clients: number;
+  /** New since `since` (30 days by default), and of the new coaches, how many came from the coaches page. */
+  coachesNew: number;
+  coachesNewFromPage: number;
+  clientsNew: number;
+}
+
+/** Coach and client counts for the Users tab and the morning digest (Melvin, 2026-11-12). */
+export async function coachTotals(now = Date.now(), since = now - 30 * 86_400_000): Promise<CoachTotals> {
+  const [c] = await query(
+    `SELECT COUNT(*) AS coaches, SUM(CASE WHEN via = 'coaches' THEN 1 ELSE 0 END) AS from_page,
+        SUM(CASE WHEN EXISTS (SELECT 1 FROM coach_links l WHERE l.coach_id = x.id) THEN 1 ELSE 0 END) AS with_clients,
+        SUM(CASE WHEN created_at >= ? THEN 1 ELSE 0 END) AS new_coaches,
+        SUM(CASE WHEN created_at >= ? AND via = 'coaches' THEN 1 ELSE 0 END) AS new_from_page
+      FROM (SELECT account_id AS id, created_at, via FROM coach_accounts
+            UNION SELECT coach_id AS id, MIN(created_at) AS created_at, 'app' AS via FROM coach_links
+              WHERE coach_id NOT IN (SELECT account_id FROM coach_accounts) GROUP BY coach_id) x`,
+    [since, since],
+  );
+  const [k] = await query(
+    "SELECT COUNT(*) AS clients, SUM(CASE WHEN first_at >= ? THEN 1 ELSE 0 END) AS new_clients FROM (SELECT client_id, MIN(created_at) AS first_at FROM coach_links GROUP BY client_id)",
+    [since],
+  );
+  return {
+    coaches: n(c?.coaches),
+    coachesFromPage: n(c?.from_page),
+    coachesWithClients: n(c?.with_clients),
+    clients: n(k?.clients),
+    coachesNew: n(c?.new_coaches),
+    coachesNewFromPage: n(c?.new_from_page),
+    clientsNew: n(k?.new_clients),
+  };
 }
 
 export async function accountDetail(id: string): Promise<AccountDetail | null> {

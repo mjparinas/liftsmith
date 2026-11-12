@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 
 import { LiftDemo } from "@/components/demo/LiftDemo";
 import { useAccount } from "@/lib/auth";
 import { BRAND } from "@/lib/brand";
-import { coachCode, playCoachUrl } from "@/lib/coachInvite";
+import { coachCode, playCoachSignupUrl, playCoachUrl } from "@/lib/coachInvite";
 import { t } from "@/lib/i18n";
 import { calm, isNative } from "@/lib/juice";
 import { useApp } from "@/lib/store";
@@ -32,16 +32,27 @@ const POINTS: { icon: IconName; hue: string; key: MessageKey }[] = [
  * Opened with a coach's invite (`coach`, trainer mode 2026-11-12), it says so and asks to sign in first, because sharing
  * workouts with a coach goes through the account; setup then takes the short coach path. Without one, a quiet "Got a
  * code from a coach?" takes the code typed in (the App Store has no install referrer, and links get lost).
+ *
+ * Opened from the website's coaches page (`coaching`, 2026-11-12), it's the coach's way in: sign in first (clients find
+ * a coach through the account), then setup skips the save step and ends on the coaching screen. "I'm here to train"
+ * goes back to the usual setup.
  */
 export function Welcome({
   onStart,
   coach = "",
   onCoach = () => {},
+  coaching = false,
+  onCoaching = () => {},
 }: {
   onStart: (signedIn?: boolean) => void;
   coach?: string;
   onCoach?: (code: string) => void;
+  /** Came in through the website's coaches page (coachInvite.ts, coachSignup): signing up as a coach. */
+  coaching?: boolean;
+  onCoaching?: (on: boolean) => void;
 }) {
+  // Which welcome: a client's invite, a coach signing up, or the usual one.
+  const kind = coach ? "coach" : coaching ? "coaching" : null;
   // The website's "Sign in" link opens the app at #/account: on the welcome screen that's the sign-in sheet.
   const [signIn, setSignIn] = useState(() => typeof location !== "undefined" && location.hash.startsWith("#/account"));
   const [asking, setAsking] = useState(false);
@@ -57,14 +68,14 @@ export function Welcome({
           <LiftDemo exerciseId="back-squat" className="h-full" fps={30} still={calm()} bare />
         </div>
         <p className="text-gradient mt-2 text-center text-sm font-bold uppercase tracking-[0.16em]">
-          {coach ? t("setup.coach.kicker") : BRAND.name}
+          {kind ? t(`setup.${kind}.kicker`) : BRAND.name}
         </p>
         <h1 className="mt-2 text-center text-3xl font-extrabold tracking-tight">
-          {coach ? t("setup.coach.title") : t("setup.welcome.title")}
+          {kind ? t(`setup.${kind}.title`) : t("setup.welcome.title")}
         </h1>
-        <p className="mt-3 text-center text-muted">{coach ? t("setup.coach.lead") : t("setup.welcome.lead")}</p>
-        {/* Not on a coach's invite: "No account needed" would contradict signing in first. */}
-        <ul className={`stagger mt-6 space-y-2.5 ${coach ? "hidden" : ""}`}>
+        <p className="mt-3 text-center text-muted">{kind ? t(`setup.${kind}.lead`) : t("setup.welcome.lead")}</p>
+        {/* Not for a coach or a coach's client: "No account needed" would contradict signing in first. */}
+        <ul className={`stagger mt-6 space-y-2.5 ${kind ? "hidden" : ""}`}>
           {POINTS.map((p) => (
             <li key={p.key} className="card-tint flex items-center gap-3 px-4 py-3" style={{ "--tint": p.hue } as CSSProperties}>
               <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-surface" style={{ color: p.hue }}>
@@ -75,7 +86,7 @@ export function Welcome({
           ))}
         </ul>
       </div>
-      {coach ? (
+      {kind ? (
         <div className="space-y-2 pb-2">
           <Button className="w-full py-4 text-lg" onClick={() => (signedIn ? onStart() : setSignIn(true))}>
             {signedIn ? t("setup.welcome.start") : t("setup.coach.signIn")}
@@ -83,7 +94,7 @@ export function Welcome({
           {/* On an Android phone in the browser: the app, with the code as the install referrer so it arrives there too. */}
           {!isNative() && /Android/i.test(typeof navigator === "undefined" ? "" : navigator.userAgent) && (
             <a
-              href={playCoachUrl(coach)}
+              href={coach ? playCoachUrl(coach) : playCoachSignupUrl()}
               className="press flex min-h-11 w-full items-center justify-center rounded-2xl border border-line bg-surface px-4 text-sm font-semibold"
             >
               {t("setup.coach.getApp")}
@@ -93,11 +104,12 @@ export function Welcome({
             kind="quiet"
             className="w-full"
             onClick={() => {
-              onCoach("");
+              if (coach) onCoach("");
+              else onCoaching(false);
               onStart();
             }}
           >
-            {t("setup.coach.own")}
+            {coach ? t("setup.coach.own") : t("setup.coaching.train")}
           </Button>
         </div>
       ) : (

@@ -204,9 +204,14 @@ export async function overview(
 }
 
 /** A fresh invite code for this coach. The old one stops working. */
-export async function makeInvite(coachId: string, now = Date.now(), code = newCode()): Promise<Invite> {
+export async function makeInvite(coachId: string, now = Date.now(), code = newCode(), via: unknown = "app"): Promise<Invite> {
   const expiresAt = now + COACH_LIMITS.inviteMs;
   await batch([
+    // The first invite makes the account a coach, for the admin panel's counts; later ones leave it as it was.
+    {
+      sql: "INSERT OR IGNORE INTO coach_accounts (account_id, created_at, via) VALUES (?, ?, ?)",
+      args: [coachId, now, via === "coaches" ? "coaches" : "app"],
+    },
     { sql: "DELETE FROM coach_invites WHERE coach_id = ? OR expires_at <= ?", args: [coachId, now] },
     {
       sql: "INSERT INTO coach_invites (code, coach_id, created_at, expires_at) VALUES (?, ?, ?, ?)",
@@ -409,6 +414,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
 /** Deleting an account: its invites, setup and every link, routine and note, as coach or client. */
 export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_invites WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_accounts WHERE account_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_links WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_plans WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_defaults WHERE coach_id = ?", args: [accountId] },

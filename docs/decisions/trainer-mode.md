@@ -16,6 +16,13 @@ Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for c
 - **A note to each client.** On a client's report, **Your note** (up to 500 characters, plain text, `coach_notes`, one per coach and client; Clear note removes it). The client sees it at the top of Today ("From your coach", `CoachNoteToday`, above the coach's notes) with Open coaching and Got it, which hides it on the device until the coach changes it, and under Coaching › Your coach. Today's copy is fetched on open, on return to the app (at most every 15 minutes) and on sign-in, kept in localStorage, and forgotten on sign-out. Notes go when the pair unlinks or either account is deleted.
 - Analytics adds `feature` `trainer` details `note`, `unnote` and `setup` (finished setup on the coach path). Pure web code, so Android, iOS and the web app get it together; no platform gap.
 
+## Coaches' own way in, and counting coaches (built 2026-11-12)
+
+Melvin asked whether coaches should have a separate sign-up and whether we should track lifter vs coach. He chose **one account for everyone** (many coaches lift, and a client can start coaching later), with coaches getting their own way in and the admin panel counting them:
+
+- **The way in.** The coaches page's buttons open the app at `#/trainer`. Before setup that means "I'm a coach" (`coachSignup` in `coachInvite.ts`, kept in localStorage; on Android the Play link from that welcome screen carries `utm_source=coaches` as the install referrer). The welcome screen says "Coach your clients" and asks to sign in first, since clients find a coach through the account. Setup then asks the usual questions for the coach's own training without "Save your progress" and ends on the coaching screen. "I'm here to train" goes back to the usual setup and ends on Today.
+- **Counting.** An account becomes a coach with its first invite (`coach_accounts`: account, time, and `via` = `coaches` when the app still has the coaches-page mark, else `app`). Clients are the accounts in `coach_links`. The Users tab shows the counts and each account's role, and the morning digest has a Coaching card ([Analytics and the admin panel](analytics-and-the-admin-panel.md)). Deleting an account deletes its row.
+
 ## Coach copy on the website (built 2026-11-12)
 
 Melvin asked whether the site had any coach copy, posts or calls to action (2026-11-12); it had only the `/coaches/` page, and that page wasn't in the sitemap. Now:

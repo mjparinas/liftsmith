@@ -36,11 +36,12 @@ export async function POST(req: Request) {
   const s = await signedIn(req);
   if (s instanceof Response) return s;
   const body = (await readJson(req)) as
-    { action?: unknown; code?: unknown; id?: unknown; client?: unknown; name?: unknown; setup?: unknown; text?: unknown } | undefined;
+    | { action?: unknown; code?: unknown; id?: unknown; client?: unknown; name?: unknown; setup?: unknown; text?: unknown; via?: unknown }
+    | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
   switch (body.action) {
     case "invite":
-      return reply(req, 200, { invite: await makeInvite(s.accountId) });
+      return reply(req, 200, { invite: await makeInvite(s.accountId, Date.now(), undefined, body.via) });
     case "cancel":
       await cancelInvite(s.accountId);
       return reply(req, 200, { ok: true });
