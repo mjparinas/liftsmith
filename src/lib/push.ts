@@ -59,6 +59,23 @@ function listen() {
   });
 }
 
+/**
+ * A push that arrives while the app is open isn't drawn by the system (Android hands it to the app; iOS does too
+ * without presentation options), so refresh Friends instead: the tab badge and Activity show it straight away.
+ */
+export function onPushWhileOpen(cb: () => void): () => void {
+  if (!isNative()) return () => {};
+  let remove: (() => void) | null = null;
+  let gone = false;
+  void PushNotifications.addListener("pushNotificationReceived", () => cb())
+    .then((h) => (gone ? void h.remove() : (remove = () => void h.remove())))
+    .catch(() => undefined);
+  return () => {
+    gone = true;
+    remove?.();
+  };
+}
+
 /** Taps on a Friends push open its screen (`#/friends`, `#/routine/<code>`). Returns an unsubscribe function. */
 export function onPushTap(cb: (route: string) => void): () => void {
   if (!isNative()) return () => {};
