@@ -187,8 +187,9 @@ async function run(): Promise<void> {
       if (!reply.more && !left.out.length && !left.del.length && left.rev === left.sentRev) break;
     }
   } catch (e) {
-    if (e instanceof AuthError && e.status === 401) {
-      // The session ended (signed out elsewhere, or the account was deleted). Data stays on the device.
+    if (e instanceof AuthError && e.signedOut) {
+      // The server says the session ended (signed out elsewhere, the account deleted, or a year unused). Data stays on
+      // the device. Any other failure, a 401 without the server's marker included, keeps the sign-in and retries.
       forgetAccount();
       useAccount.setState({ error: "signedOut" });
     } else {

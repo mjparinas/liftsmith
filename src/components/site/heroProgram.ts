@@ -75,3 +75,8 @@ export function muscleAnchor(m: Muscle, J: Joints): Vec {
       return lerpV(J.elbowR, J.handR, 0.5);
   }
 }
+
+/** The lifts the home page's 3D demo picker offers. Here rather than in the client DemoPicker, so the server can read it. */
+export const DEMO_LIFTS = ["back-squat", "deadlift", "bench-press", "overhead-press", "pull-up", "romanian-deadlift"].filter((id) =>
+  EXERCISE_BY_ID.has(id),
+);

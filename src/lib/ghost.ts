@@ -86,7 +86,13 @@ export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: stri
   const sets = events.filter((e): e is SetEvent => e.type === "set" && e.sessionId !== excludeSessionId);
   if (!sets.length) return null;
   const latest = sets.reduce((a, b) => (b.at > a.at ? b : a));
-  const own = sets.filter((s) => s.sessionId === latest.sessionId).sort((a, b) => a.at - b.at);
+  return workoutOf(events, latest.sessionId);
+}
+
+/** One past workout's exercises in the order done, with their set counts (bonus drop and rest-pause sets left out). */
+export function workoutOf(events: readonly AppEvent[], sessionId: string): LastWorkout | null {
+  const own = events.filter((e): e is SetEvent => e.type === "set" && e.sessionId === sessionId && !e.tag).sort((a, b) => a.at - b.at);
+  if (!own.length) return null;
   const order: string[] = [];
   const count = new Map<string, number>();
   const group = new Map<string, string>();
@@ -96,8 +102,8 @@ export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: stri
     if (s.superset) group.set(s.exerciseId, s.superset);
   }
   return {
-    sessionId: latest.sessionId,
-    at: own[0].at,
+    sessionId,
+    at: own[0]!.at,
     items: order.map((exerciseId) => ({
       exerciseId,
       sets: count.get(exerciseId)!,
@@ -107,12 +113,19 @@ export function lastWorkout(events: readonly AppEvent[], excludeSessionId?: stri
 }
 
 /**
- * Today's plan with the last workout's exercises and set counts, in the same order. Weights and reps
+ * Today's plan with the last workout's (or the given past workout's) exercises and set counts, in the same order. Weights and reps
  * still come from progression (so it keeps moving forward), and exercises the gym can't do are left
  * out. Null when nothing from last time can be done here.
  */
-export function repeatPlan(base: Plan, events: readonly AppEvent[], profile: Profile, gym: Gym, now: number): Plan | null {
-  const last = lastWorkout(events);
+export function repeatPlan(
+  base: Plan,
+  events: readonly AppEvent[],
+  profile: Profile,
+  gym: Gym,
+  now: number,
+  sessionId?: string,
+): Plan | null {
+  const last = sessionId ? workoutOf(events, sessionId) : lastWorkout(events);
   if (!last) return null;
   const can = new Set(available(gym.equipment).map((e) => e.id));
   const kept = last.items.filter((i) => can.has(i.exerciseId));

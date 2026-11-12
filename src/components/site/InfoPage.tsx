@@ -3,7 +3,9 @@
 // and sections with readable prose.
 import type { ReactNode } from "react";
 
-import { Crumbs, SitePage } from "./SiteChrome";
+import type { SiteLang } from "@/lib/siteLang";
+
+import { Crumbs, SitePage, type Crumb } from "./SiteChrome";
 
 export function InfoPage({
   kind,
@@ -12,6 +14,9 @@ export function InfoPage({
   updated,
   wide,
   children,
+  lang,
+  path,
+  crumbs = [],
 }: {
   /** Names the page for the sticky bar's data-cta (sticky-<kind>). */
   kind: string;
@@ -20,10 +25,15 @@ export function InfoPage({
   updated?: string;
   wide?: boolean;
   children: ReactNode;
+  /** For a page in every language (src/lib/siteLang.ts): its language and English path. */
+  lang?: SiteLang;
+  path?: string;
+  /** Crumbs between the home page and this one, e.g. Help on a help topic. */
+  crumbs?: Crumb[];
 }) {
   return (
-    <SitePage kind={kind}>
-      <Crumbs items={[{ label: title }]} />
+    <SitePage kind={kind} lang={lang} path={path}>
+      <Crumbs items={[...crumbs, { label: title }]} lang={lang} />
       <article className={`mx-auto mt-6 ${wide ? "max-w-5xl" : "max-w-3xl"}`}>
         <h1 className="text-4xl font-extrabold tracking-tight">{title}</h1>
         {updated && <p className="mt-2 text-sm text-muted">Last updated {updated}</p>}

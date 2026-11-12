@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
 
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -11,7 +11,8 @@ import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { resetDb } from "@/server/db";
 import { handle } from "@/server/social";
 
-import { Friends, PersonScreen } from "./Friends";
+import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
+import { SendToFriend } from "./SendToFriend";
 
 // The app's Friends screens against the real server code (an in-memory database): each fetch to /api/social/
 // runs src/server/social.ts as the account whose token it carries.
@@ -84,5 +85,177 @@ describe("Friends", () => {
     await u.click(screen.getByRole("button", { name: "Spam or scam" }));
     await u.click(screen.getByRole("button", { name: "Send report" }));
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
+  });
+
+  it("sends a routine to a friend, who finds it in Activity", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    signIn("tok-a");
+    useSocial.setState({
+      me: {
+        profile: {
+          handle: "alex",
+          name: "Alex",
+          open: true,
+          autoPost: false,
+          weights: true,
+          public: false,
+          push: { follows: true, comments: true, sent: true, likes: false },
+          avatar: "",
+          audience: "all",
+          showLifts: true,
+          lifts: [],
+        },
+      },
+    });
+    render(<SendToFriend name="Leg day" items={[{ exerciseId: "back-squat", sets: 4 }]} />);
+    await u.click(screen.getByRole("button", { name: "Send to a friend" }));
+    await u.click(await screen.findByRole("button", { name: "Send to Blair" }));
+    expect(await screen.findByText("Sent to Blair.")).toBeInTheDocument();
+    cleanup();
+
+    signIn("tok-b");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: /Activity/ }));
+    expect(await screen.findByText("Alex sent you a workout: Leg day")).toBeInTheDocument();
+  });
+
+  it("edits a post's caption and audience, and offers to save a friend's workout as a routine", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-a", {
+      op: "post",
+      workoutId: "s1",
+      at: Date.now() - 3_600_000,
+      body: {
+        seconds: 3000,
+        sets: 5,
+        volume: null,
+        prs: 0,
+        muscles: [],
+        exercises: [{ id: "back-squat", name: "", sets: 5, w: null, r: 5 }],
+      },
+    });
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "More options" }));
+    expect(screen.getByRole("button", { name: "Save as a routine" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Edit post" }));
+    await u.type(screen.getByLabelText("Caption"), "Felt strong");
+    await u.click(screen.getByRole("button", { name: "Only me" }));
+    expect(screen.getByText("Just for you: it stays on your profile, hidden from everyone else.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Save" }));
+    expect(await screen.findByText("Felt strong")).toBeInTheDocument();
+    expect(screen.getByText(/· Only me/)).toBeInTheDocument();
+  });
+
+  it("mutes someone from their profile's menu", async () => {
+    const u = userEvent.setup();
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    signIn("tok-a");
+    render(<PersonScreen handle="blair" />);
+    await u.click(await screen.findByRole("button", { name: "Block or report Blair" }));
+    await u.click(screen.getByRole("button", { name: "Mute" }));
+    expect(await screen.findByText("Muted: their workouts don’t show in your feed.")).toBeInTheDocument();
+  });
+
+  it("invites a friend who joins from the link, and both show on the board", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    const code = (await handle("acc-a", { op: "invite" })).body.code as string;
+    signIn("tok-b");
+    render(<InviteScreen code={code} />);
+    expect(await screen.findByText("Alex invited you")).toBeInTheDocument();
+    await u.type(await screen.findByLabelText("Handle"), "blair");
+    await u.click(screen.getByRole("button", { name: "Agree and join" }));
+    await waitFor(async () =>
+      expect((await handle("acc-b", { op: "people", list: "friends" })).body.people).toMatchObject([{ handle: "alex" }]),
+    );
+    cleanup();
+
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    expect(await screen.findByText("blair (you)")).toBeInTheDocument();
+    expect(screen.getByText("Post a workout to get on this week’s board.")).toBeInTheDocument();
+  });
+  it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    expect(await screen.findByText(/No challenges yet/)).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Start a challenge" }));
+    const sheet = within(screen.getByRole("dialog"));
+    await u.click(sheet.getByRole("button", { name: "Sets" }));
+    await u.click(sheet.getByRole("button", { name: "2 weeks" }));
+    await u.click(await sheet.findByRole("button", { name: "Blair" }));
+    await u.click(sheet.getByRole("button", { name: "Start" }));
+    expect(await screen.findByText("Most sets")).toBeInTheDocument();
+    expect(screen.getByText("1 invite not answered yet")).toBeInTheDocument();
+    cleanup();
+
+    signIn("tok-b");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: /Activity/ }));
+    await u.click(await screen.findByText("Alex challenged you: Most sets"));
+    expect(await screen.findByText("Alex invited you to this challenge.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Join" }));
+    // Blair shows on the challenge, and on the weekly board too once that has loaded, so there can be two.
+    expect((await screen.findAllByText("Blair (you)")).length).toBeGreaterThan(0);
+    expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument();
+    cleanup();
+
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "b1",
+      at: Date.now() - 3_600_000,
+      partners: ["alex"],
+      body: {
+        seconds: 3000,
+        sets: 5,
+        volume: null,
+        prs: 0,
+        muscles: [],
+        exercises: [{ id: "back-squat", name: "", sets: 5, w: null, r: 5 }],
+      },
+    });
+    signIn("tok-a");
+    render(<Friends />);
+    expect(await screen.findByText("with Alex")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "More options" }));
+    await u.click(screen.getByRole("button", { name: "Remove me from this post" }));
+    await waitFor(() => expect(screen.queryByText("with Alex")).toBeNull());
+  });
+  it("starts a club, and someone joins it from its link and sees the week's board", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true });
+    signIn("tok-a");
+    render(<Friends tab="clubs" />);
+    expect(await screen.findByText("No clubs yet")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Start a club" }));
+    await u.type(screen.getByLabelText("Club name"), "Iron Barn crew");
+    await u.click(screen.getByRole("button", { name: "Start the club" }));
+    const sheet = within(await screen.findByRole("dialog", { name: "Iron Barn crew" }));
+    expect(await sheet.findByText("Alex (you)")).toBeInTheDocument();
+    cleanup();
+
+    const [club] = (await handle("acc-a", { op: "clubs" })).body.clubs as { id: string }[];
+    const { code } = (await handle("acc-a", { op: "club", id: club!.id, from: Date.now() - 86_400_000 })).body.club as { code: string };
+    signIn("tok-b");
+    render(<ClubScreen code={code} />);
+    expect(await screen.findByText("Iron Barn crew")).toBeInTheDocument();
+    expect(screen.getByText("1 member · run by Alex")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Join the club" }));
+    await waitFor(async () => expect(((await handle("acc-b", { op: "clubs" })).body.clubs as unknown[]).length).toBe(1));
   });
 });

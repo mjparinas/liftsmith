@@ -2,13 +2,16 @@
 // tools) and the one route list the sitemap is built from. Everything comes from the same exercise library the
 // app plans with, so a new exercise gets its pages and its sitemap entry without touching this file.
 import { ARTICLES, type Article } from "@/content/articles";
+import { BLOG_TOPICS, topicPath } from "@/content/blogTopics";
 import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
+import { HELP, helpPath } from "./faqs";
 import { alternatives } from "./generator";
 import { SITE_URL } from "./site";
+import { languageAlternates, LOCALIZED_PATHS, localPath, SITE_LANGS } from "./siteLang";
 import { EQUIPMENT, MUSCLES, type Equipment, type Exercise, type Muscle } from "./types";
 import { WHATS_NEW } from "./whatsNew";
 
@@ -133,9 +136,9 @@ export const noEquipment = (): Exercise[] => EXERCISES.filter((e) => e.needs.len
 /** Equipment with at least one exercise in the library. */
 export const equipmentWithPages = (): Equipment[] => EQUIPMENT.filter((eq) => exercisesWith(eq).length > 0);
 
-/** A muscle and equipment page only exists when there are 3+ exercises for it, so no page is thin. */
-export const PAIR_MIN = 3;
-export const pairExercises = (m: Muscle, eq: Equipment) => exercisesFor(m).filter((e) => e.needs.includes(eq));
+/** A muscle and equipment page only exists when it has 5+ strength exercises (cardio left out), so no page is thin. */
+export const PAIR_MIN = 5;
+export const pairExercises = (m: Muscle, eq: Equipment) => exercisesFor(m).filter((e) => !e.cardio && e.needs.includes(eq));
 export function pairs(): { muscle: Muscle; equipment: Equipment; count: number }[] {
   const out: { muscle: Muscle; equipment: Equipment; count: number }[] = [];
   for (const muscle of MUSCLES)
@@ -197,6 +200,41 @@ export const TOOL_PAGES = [
     name: "TDEE calculator",
     blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters.",
   },
+  {
+    path: "/tools/wilks-calculator/",
+    name: "Wilks calculator",
+    blurb: "Your total scored with Wilks, IPF GL points and DOTS, and how far the next level is.",
+  },
+  {
+    path: "/tools/macro-calculator/",
+    name: "Macro calculator",
+    blurb: "Protein, fat and carbs to lose fat, maintain or build muscle, with protein set for lifters.",
+  },
+  {
+    path: "/tools/body-fat-calculator/",
+    name: "Body fat calculator",
+    blurb: "Your body fat from a tape measure and your height, with the US Navy method.",
+  },
+  {
+    path: "/tools/ffmi-calculator/",
+    name: "FFMI calculator",
+    blurb: "How much muscle you carry for your height, and the lean mass to the next band.",
+  },
+  {
+    path: "/tools/heart-rate-zone-calculator/",
+    name: "Heart rate zone calculator",
+    blurb: "Your maximum heart rate and five zones, from your age and resting heart rate.",
+  },
+  {
+    path: "/tools/interval-timer/",
+    name: "Interval timer",
+    blurb: "EMOM, Tabata or your own work and rest rounds, with a count before every change.",
+  },
+  {
+    path: "/tools/training-max-calculator/",
+    name: "Training max calculator",
+    blurb: "Every main set for four-week waves on the squat, bench, deadlift and press.",
+  },
 ] as const;
 
 export interface Route {
@@ -204,6 +242,8 @@ export interface Route {
   /** ISO date, when the page has one (articles). */
   date?: string;
   priority: number;
+  /** For a page in every site language: each language's path, plus x-default (hreflang in the sitemap). */
+  languages?: Record<string, string>;
 }
 
 /** Every public page, for the sitemap. A new page type adds its paths here. */
@@ -215,6 +255,7 @@ export function siteRoutes(): Route[] {
     { path: "/equipment/", priority: 0.7 },
     { path: "/guides/", priority: 0.7 },
     { path: "/blog/", priority: 0.8 },
+    ...BLOG_TOPICS.map((t) => ({ path: topicPath(t), priority: 0.6 })),
     { path: "/tools/", priority: 0.7 },
     ...TOOL_PAGES.map((t) => ({ path: t.path, priority: 0.8 })),
     { path: "/privacy/", priority: 0.2 },
@@ -224,8 +265,10 @@ export function siteRoutes(): Route[] {
     { path: "/accessibility/", priority: 0.3 },
     { path: "/pricing/", priority: 0.8 },
     { path: "/help/", priority: 0.6 },
+    ...HELP.map((t) => ({ path: helpPath(t), priority: 0.5 })),
     { path: "/contact/", priority: 0.4 },
     { path: "/about/", priority: 0.4 },
+    { path: "/editorial-standards/", priority: 0.3 },
     { path: "/whats-new/", priority: 0.5, date: WHATS_NEW[0]?.day },
     { path: "/status/", priority: 0.2 },
     { path: "/compare/", priority: 0.6 },
@@ -237,6 +280,15 @@ export function siteRoutes(): Route[] {
     { path: "/features/", priority: 0.7 },
     ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
+  // The translated pages (src/lib/siteLang.ts): every language's copy, each listing all of them.
+  for (const path of LOCALIZED_PATHS) {
+    const languages = languageAlternates(path);
+    for (const route of r) if (route.path === path) route.languages = languages;
+    for (const lang of SITE_LANGS) {
+      const english = r.find((x) => x.path === path);
+      if (lang !== "en" && english) r.push({ path: localPath(lang, path), priority: english.priority, languages });
+    }
+  }
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
     if (alternativesTo(e.id).length) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });

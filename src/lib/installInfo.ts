@@ -22,6 +22,8 @@ export interface InstallInfo {
   installReferrer?: string;
   /** iOS only: Apple Search Ads attribution token, resolved by the server. */
   asaToken?: string;
+  /** Remote push can be registered (Android: the build has Firebase's config; iOS: always). Missing on older shells. */
+  push?: boolean;
 }
 
 type Plugin = { get(): Promise<InstallInfo> };

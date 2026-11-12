@@ -20,6 +20,7 @@ import * as body from "./text/body";
 import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
+import * as calc from "./text/calc";
 import * as callText from "./text/callText";
 import * as card from "./text/card";
 import * as category from "./text/category";
@@ -45,6 +46,7 @@ import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
 import * as friends from "./text/friends";
+import * as ft from "./text/ft";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -52,12 +54,14 @@ import * as gloss from "./text/gloss";
 import * as goal from "./text/goal";
 import * as gym from "./text/gym";
 import * as hr from "./text/hr";
+import * as hx from "./text/hx";
 import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as lift from "./text/lift";
 import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -80,6 +84,8 @@ import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as pub from "./text/pub";
+import * as push from "./text/push";
 import * as quest from "./text/quest";
 import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
@@ -100,6 +106,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
@@ -135,6 +142,7 @@ export const en = {
   ...buddy.en,
   ...buy.en,
   ...cal.en,
+  ...calc.en,
   ...card.en,
   ...callText.en,
   ...category.en,
@@ -159,6 +167,7 @@ export const en = {
   ...fit.en,
   ...fix.en,
   ...fmt.en,
+  ...ft.en,
   ...friends.en,
   ...game.en,
   ...ghost.en,
@@ -195,6 +204,8 @@ export const en = {
   ...pro.en,
   ...prog.en,
   ...progress.en,
+  ...pub.en,
+  ...push.en,
   ...quest.en,
   ...quote.en,
   ...rarity.en,
@@ -214,12 +225,15 @@ export const en = {
   ...stats.en,
   ...tab.en,
   ...td.en,
+  ...tempo.en,
   ...tdee.en,
   ...theme.en,
   ...tier.en,
   ...time.en,
   ...today.en,
   ...ton.en,
+  ...hx.en,
+  ...lift.en,
   ...tools.en,
   ...train.en,
   ...trn.en,

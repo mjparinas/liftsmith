@@ -90,6 +90,14 @@ jobs:
           cache: gradle
       - if: env.HAS_KEY == 'true'
         run: npx cap sync android
+      # Friends push notifications (docs/decisions/friends.md): Firebase's app config, when it's been added as a
+      # secret. Without it the app builds the same and simply never asks for a push token.
+      - name: Firebase config for push
+        if: env.HAS_KEY == 'true'
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          if [ -n "$GOOGLE_SERVICES_JSON" ]; then printf '%s' "$GOOGLE_SERVICES_JSON" > android/app/google-services.json; else echo "::notice::GOOGLE_SERVICES_JSON is not set, so Android push stays off."; fi
       - name: Signed app bundle
         if: env.HAS_KEY == 'true'
         working-directory: android

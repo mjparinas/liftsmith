@@ -39,6 +39,63 @@ export interface SocialProfile {
   autoPost: boolean;
   /** Show weights on posts. On by default, like share cards. */
   weights: boolean;
+  /**
+   * Anyone can see the profile and its workouts, in the app and on the web (www.getliftsmith.com/u/<handle>/,
+   * listed in the people sitemap). Off by default; on also means anyone can follow.
+   */
+  public: boolean;
+  /** Push notifications by kind (Friends settings › Notifications). Likes start off, the rest on. */
+  push: PushPrefs;
+  /** The picture beside the name (an AVATAR_IDS id), or "" for the name's first letter. */
+  avatar: string;
+  /** Who sees a new post unless the lifter picks otherwise when posting. */
+  audience: Audience;
+  /** Show the best lifts on the profile (only to people who can see the posts, and only while weights show). */
+  showLifts: boolean;
+  /** The best lifts last sent by the app, for the profile's showcase. */
+  lifts: ShowcaseLift[];
+}
+
+/**
+ * Who sees a post: "all" is everyone who can see the profile (accepted followers, or anyone while it's public),
+ * "friends" only people the lifter and they both follow, "me" only the lifter.
+ */
+export const AUDIENCES = ["all", "friends", "me"] as const;
+export type Audience = (typeof AUDIENCES)[number];
+
+/** One lift on a profile's showcase: the exercise id, its best set (kilograms and reps) and when it was done. */
+export interface ShowcaseLift {
+  id: string;
+  w: number;
+  r: number;
+  at: number;
+}
+
+/**
+ * Avatars (Melvin, 2026-11-11: "unlock different avatars through locker but have a few default ones"). The first
+ * four are everyone's; the rest come from levels and badges (game.ts) and show in the Locker. The server only
+ * checks the id is one of these, because unlocks are worked out from the lifter's own event log on the device.
+ */
+export const AVATAR_IDS = [
+  "av-dumbbell",
+  "av-bolt",
+  "av-leaf",
+  "av-moon",
+  "av-target",
+  "av-heart",
+  "av-stretch",
+  "av-mascot",
+  "av-trophy",
+  "av-flame",
+  "av-pro",
+] as const;
+export type AvatarId = (typeof AVATAR_IDS)[number];
+
+export interface PushPrefs {
+  follows: boolean;
+  comments: boolean;
+  sent: boolean;
+  likes: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -56,6 +113,12 @@ export interface PersonCard {
   /** Whether their posts are visible to the reader. */
   canSee: boolean;
   open: boolean;
+  public: boolean;
+  avatar: string;
+  /** The reader has muted them: their posts stay out of the reader's feed. */
+  muted: boolean;
+  /** Their best lifts, when they show them and the reader can see their posts. */
+  lifts: ShowcaseLift[];
 }
 
 export interface FeedPost {
@@ -69,12 +132,28 @@ export interface FeedPost {
   liked: boolean;
   comments: number;
   mine: boolean;
+  avatar: string;
+  /** The poster's own words about the workout, or "". */
+  caption: string;
+  audience: Audience;
+  /** Training partners the poster tagged (mutual friends). */
+  partners: Partner[];
+  /** The reader is one of them (they can remove themselves). */
+  tagged: boolean;
+}
+
+/** A training partner tagged on a post. */
+export interface Partner {
+  handle: string;
+  name: string;
+  avatar: string;
 }
 
 export interface FeedComment {
   id: string;
   handle: string;
   name: string;
+  avatar: string;
   at: number;
   body: string;
   mine: boolean;
@@ -82,15 +161,18 @@ export interface FeedComment {
   canDelete: boolean;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
   name: string;
+  avatar: string;
   at: number;
   postId?: string;
-  /** The comment's text, for comments. */
+  /** The comment's text, for comments; the workout's name, for a sent workout. */
   text?: string;
+  /** A sent workout's routine code (opens #/routine/<code>). */
+  code?: string;
 }
 
 export type ReportKind = "post" | "comment" | "profile";
@@ -102,6 +184,19 @@ export const SOCIAL_LIMITS = {
   handleMax: 20,
   name: 40,
   comment: 280,
+  caption: 280,
+  lifts: 3,
+  partners: 5,
+  challengeName: 40,
+  /** People in one challenge, the starter included. */
+  challengeMembers: 20,
+  /** Challenges one lifter can have running that they started. */
+  challengesActive: 10,
+  clubName: 40,
+  /** People in one club, the starter included. */
+  clubMembers: 100,
+  /** Clubs one lifter can be in. */
+  clubsEach: 10,
   exercises: 20,
   muscles: 6,
 };
@@ -109,3 +204,82 @@ export const SOCIAL_LIMITS = {
 /** Lowercase letters, digits and underscores. */
 export const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
 export const cleanHandle = (v: unknown) => (typeof v === "string" ? v.trim().replace(/^@/, "").toLowerCase() : "");
+
+/** One person on the friends leaderboard: what they've posted this week that the reader may see. */
+export interface BoardRow {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** The reader's own row. */
+  me: boolean;
+  workouts: number;
+  sets: number;
+  minutes: number;
+  /** Kilograms, from posts that show weights. */
+  volume: number;
+  prs: number;
+}
+export const BOARD_METRICS = ["workouts", "sets", "minutes", "volume"] as const;
+export type BoardMetric = (typeof BOARD_METRICS)[number];
+
+/** Who sent an invite link, as the invite screen shows them. */
+export interface Inviter {
+  handle: string;
+  name: string;
+  avatar: string;
+}
+
+/** How long a friend challenge runs, in days. */
+export const CHALLENGE_DAYS = [7, 14, 28] as const;
+export type ChallengeDays = (typeof CHALLENGE_DAYS)[number];
+
+/** One person in a challenge, with their score so far (joined members only score). */
+export interface ChallengeMember {
+  handle: string;
+  name: string;
+  avatar: string;
+  me: boolean;
+  joined: boolean;
+  value: number;
+}
+
+/** A friend challenge as one member sees it. */
+export interface Challenge {
+  id: string;
+  /** The starter's name for it, or "" (the app names it after the measure). */
+  name: string;
+  metric: BoardMetric;
+  startsAt: number;
+  endsAt: number;
+  owner: { handle: string; name: string };
+  /** The reader started it (leaving ends it for everyone). */
+  mine: boolean;
+  status: "invited" | "joined";
+  members: ChallengeMember[];
+}
+
+/** A club or gym crew in the lifter's list. */
+export interface ClubSummary {
+  id: string;
+  name: string;
+  members: number;
+  /** The reader started it (they run it). */
+  mine: boolean;
+}
+
+/** One club as a member sees it: its members, this week's board from their posts, and its join code. */
+export interface ClubDetail extends ClubSummary {
+  code: string;
+  owner: { handle: string; name: string };
+  rows: BoardRow[];
+}
+
+/** What the join screen shows before the lifter joins. */
+export interface ClubPreview {
+  id: string;
+  name: string;
+  members: number;
+  owner: { handle: string; name: string };
+  /** Already a member. */
+  joined: boolean;
+}

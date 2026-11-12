@@ -2,14 +2,15 @@
 
 // Connected apps (Settings › Connected apps, Connections.tsx; docs/decisions/connected-apps.md).
 // - Health Connect / Apple Health: health.ts, on the device.
-// - Strava, Oura and Whoop: through our server (src/server/connect.ts), which keeps the OAuth tokens, so they
-//   need a Liftsmith account. Strava gets each finished workout (an outbox here, so a workout finished offline
-//   goes up later); Oura and Whoop readings come in as health events, like Health's.
+// - Strava, Oura, Whoop, Withings, Polar and Concept2: through our server (src/server/connect.ts), which keeps
+//   the OAuth tokens, so they need a Liftsmith account. Strava gets each finished workout (an outbox here, so a
+//   workout finished offline goes up later); Oura, Whoop, Withings and Polar readings come in as health events
+//   and weigh-ins, like Health's; Concept2 sessions come in as cardio workouts.
 // - Music: a curated playlist for the day's call, opened in the lifter's music app. No account, no API.
 import { create } from "zustand";
 
 import { api, AuthError, platform, readAccount } from "./auth";
-import { localIso, READS, type Cloud, type CloudReading, type CloudStatus, type CloudWorkout } from "./cloud";
+import { localIso, READS, type Cloud, type CloudCardio, type CloudReading, type CloudStatus, type CloudWorkout } from "./cloud";
 import { exerciseName } from "./game";
 import { t } from "./i18n";
 import { isNative } from "./juice";
@@ -18,7 +19,7 @@ import { useApp } from "./store";
 import type { AppEvent, MusicApp, Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
-export const CLOUD_NAME: Record<Cloud, string> = { strava: "Strava", oura: "Oura", whoop: "WHOOP" };
+export { CLOUD_NAME } from "./cloud";
 
 // --- Opening links outside the app ---
 
@@ -119,9 +120,9 @@ export async function disconnectCloud(p: Cloud): Promise<void> {
   }
 }
 
-// --- Oura and Whoop: readings in ---
+// --- Oura, Whoop, Withings and Polar: readings in; Concept2: sessions in ---
 
-/** Pulls the last 45 days from each connected service that sends readings. Returns how many were new. */
+/** Pulls the last 45 days from each connected service that sends readings, and Concept2 sessions. Returns how many were new. */
 export async function pullCloud(force = false, now = Date.now()): Promise<number> {
   const account = readAccount();
   if (!account) return 0;
@@ -139,6 +140,20 @@ export async function pullCloud(force = false, now = Date.now()): Promise<number
       writeJson(PULLED_KEY, pulled);
     } catch (e) {
       // 409: the lifter removed Liftsmith at the service's end. Show it as not connected.
+      if (e instanceof AuthError && e.status === 409) await refreshCloud();
+    }
+  }
+  if (linked("concept2") && (force || now - (useCloud.getState().pulled.concept2 ?? 0) >= 3 * 3_600_000)) {
+    try {
+      const tz = -new Date(now).getTimezoneOffset();
+      // The first pull brings the last year of sessions; later ones the last 30 days.
+      const days = useCloud.getState().pulled.concept2 ? 30 : 365;
+      const r = await api<{ sessions: CloudCardio[] }>(`/api/connect/concept2/results/?days=${days}&tz=${tz}`, { token: account.token });
+      added += useApp.getState().importCloudCardio(r.sessions, now);
+      const pulled = { ...useCloud.getState().pulled, concept2: now };
+      useCloud.setState({ pulled });
+      writeJson(PULLED_KEY, pulled);
+    } catch (e) {
       if (e instanceof AuthError && e.status === 409) await refreshCloud();
     }
   }

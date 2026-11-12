@@ -48,6 +48,13 @@ export const FLAGS = {
     label: "Labs: watch rep counting",
     description: "The Wear OS or Apple Watch app counts reps from wrist motion during a set and fills them in on the phone.",
   },
+  /** Labs: the set logs itself a few seconds after the rep counter's last rep (handsFree.ts). */
+  labHandsFree: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: hands-free sets",
+    description: "While a rep counter is counting, the set logs itself a few seconds after the last rep and rest starts.",
+  },
   /** Labs: rest ends early once the heart rate is back down (restReady.ts, hrRestCut). */
   labHrRest: {
     default: false,
@@ -82,6 +89,36 @@ export const FLAGS = {
     options: [false, true] as const,
     label: "Labs: today's max from warm-ups",
     description: "Estimates today's max from the camera's warm-up bar speeds and suggests a lighter or heavier first working set.",
+  },
+  /** Labs: after a camera-counted set, a replay of the bar's path from the pose landmarks, with one cue. */
+  labBarPath: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: bar path replay",
+    description: "After a camera-counted squat, deadlift or overhead press, replays the bar's path with one cue on where it drifted.",
+  },
+  /** Labs: bikes, rowers, treadmills and cross trainers over Bluetooth (FTMS) fill in cardio sets (ftms.ts, machine.ts). */
+  labGymMachines: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: Bluetooth gym machines",
+    description:
+      "Bikes, rowers, treadmills and cross trainers that share their data over Bluetooth fill in time, distance and power on cardio.",
+  },
+  /** Labs: a Bluetooth scale (Weight Scale or Body Composition Service) fills in the weigh-in (scale.ts). */
+  labScale: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: Bluetooth smart scale",
+    description: "A scale that shares its reading over Bluetooth the standard way fills in weight and body fat on the weigh-in.",
+  },
+  /** Labs: the tempo coach counts each rep's lowering, hold and lifting out in sounds and haptics (src/lib/tempo.ts). */
+  labTempo: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: tempo coach",
+    description:
+      "On tempo and paused lifts, a button above Log set counts every second of each rep's lowering, hold and lift in sound and haptics.",
   },
 } as const;
 

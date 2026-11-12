@@ -25,6 +25,7 @@ import {
 } from "@/lib/auth";
 import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { stopPush } from "@/lib/push";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
@@ -313,7 +314,7 @@ function SignedIn() {
         <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>
           {t("account.syncNow")}
         </Button>
-        <Button kind="ghost" onClick={() => void signOut()}>
+        <Button kind="ghost" onClick={() => void stopPush().then(signOut)}>
           {t("account.signOut")}
         </Button>
       </div>

@@ -89,6 +89,11 @@ try {
       await page.getByRole("dialog").waitFor();
       await scan("fitness age how");
       await page.keyboard.press("Escape");
+      // A fitness test's sheet: steps, timer, result box and reference.
+      await page.getByTestId("ft-hang").click();
+      await page.getByRole("dialog").waitFor();
+      await scan("fitness test");
+      await page.keyboard.press("Escape");
       await page.getByTestId("body-muscles").click();
     }
   }
@@ -122,6 +127,26 @@ try {
   await page.goto(`${server.url}/app/#/training`);
   await page.getByRole("heading", { name: "Workout preferences" }).waitFor();
   await scan("workout preferences");
+  // A finished workout: its edit sheet in History, then an exercise's own page (2026-11-11).
+  await page.goto(`${server.url}/app/#/stats`);
+  await page
+    .getByRole("article")
+    .first()
+    .getByRole("button", { name: /^Edit the workout on/ })
+    .click();
+  await page.getByRole("dialog", { name: "Edit workout" }).waitFor();
+  await scan("edit workout");
+  await page.keyboard.press("Escape");
+  await page.goto(`${server.url}/app/#/exercise/bench-press`);
+  await page.getByRole("heading", { level: 1, name: "Barbell bench press" }).waitFor();
+  await scan("exercise page");
+  // Tools › Plate and warm-up calculators.
+  await page.goto(`${server.url}/app/#/tools/plates`);
+  await page.getByTestId("plate-result").waitFor();
+  await scan("plate calculator");
+  await page.goto(`${server.url}/app/#/tools/warmup`);
+  await page.getByTestId("warmup-result").waitFor();
+  await scan("warm-up calculator");
   // A shared routine link (routineShare.ts): "Push day", bench press, then a lateral raise and pushdown superset.
   await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
   await page.getByRole("heading", { name: "Push day" }).waitFor();
@@ -165,6 +190,7 @@ try {
   for (const path of [
     "/exercises/",
     "/exercises/bench-press/",
+    "/blog/topic/recovery/",
     "/exercises/back-squat/",
     "/exercises/bench-press/alternatives/",
     "/muscles/chest/",
@@ -191,11 +217,13 @@ try {
     "/trust/",
     "/pricing/",
     "/help/",
+    "/help/billing/",
     "/contact/",
     "/terms/",
     "/whats-new/",
     "/status/",
     "/about/",
+    "/editorial-standards/",
     "/accessibility/",
   ]) {
     await page.goto(`${server.url}${path}`);
@@ -226,6 +254,11 @@ try {
     liked: false,
     comments: 1,
     mine: false,
+    avatar: "av-mascot",
+    caption: "New bench best, felt smooth.",
+    audience: "all",
+    partners: [{ handle: "casey", name: "Casey", avatar: "av-leaf" }],
+    tagged: false,
     body: {
       v: 1,
       seconds: 3100,
@@ -238,7 +271,19 @@ try {
   };
   const friendsApi = {
     me: {
-      profile: { handle: "alex", name: "Alex", open: false, autoPost: false, weights: true },
+      profile: {
+        handle: "alex",
+        name: "Alex",
+        open: false,
+        autoPost: false,
+        weights: true,
+        public: false,
+        push: { follows: true, comments: true, sent: true, likes: false },
+        avatar: "",
+        audience: "all",
+        showLifts: true,
+        lifts: [],
+      },
       followers: 1,
       following: 1,
       requests: 1,
@@ -252,8 +297,70 @@ try {
         { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
       ],
     },
-    activity: { items: [{ kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" }] },
+    activity: {
+      items: [
+        { kind: "like", handle: "blair", name: "Blair", at: Date.now() - 60_000, postId: "p1" },
+        { kind: "sent", handle: "blair", name: "Blair", at: Date.now() - 120_000, text: "Leg day", code: "r1~TGVnIGRheQ~back-squat.4" },
+      ],
+    },
     people: { people: [{ handle: "blair", name: "Blair", at: Date.now() }] },
+    board: {
+      rows: [
+        { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
+        { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
+      ],
+    },
+    challenges: {
+      challenges: [
+        {
+          id: "ch1",
+          name: "Most sets",
+          metric: "sets",
+          startsAt: Date.now() - 86_400_000,
+          endsAt: Date.now() + 6 * 86_400_000,
+          owner: { handle: "blair", name: "Blair" },
+          mine: false,
+          status: "invited",
+          members: [
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 41 },
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: false, value: 0 },
+          ],
+        },
+        {
+          id: "ch2",
+          name: "Spring minutes",
+          metric: "minutes",
+          startsAt: Date.now() - 3 * 86_400_000,
+          endsAt: Date.now() + 11 * 86_400_000,
+          owner: { handle: "alex", name: "Alex" },
+          mine: true,
+          status: "joined",
+          members: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 95 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 140 },
+            { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
+          ],
+        },
+      ],
+    },
+    clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
+    club: {
+      club: {
+        id: "cl1",
+        name: "Iron Barn crew",
+        members: 3,
+        mine: true,
+        code: "ABCD2345",
+        owner: { handle: "alex", name: "Alex" },
+        rows: [
+          { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
+          { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
+          { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, workouts: 1, sets: 12, minutes: 40, volume: 3000, prs: 0 },
+        ],
+      },
+    },
+    clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
+    inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
         handle: "blair",
@@ -265,6 +372,13 @@ try {
         followsYou: true,
         canSee: true,
         open: false,
+        public: false,
+        avatar: "av-trophy",
+        muted: false,
+        lifts: [
+          { id: "back-squat", w: 140, r: 3, at: Date.now() },
+          { id: "bench-press", w: 100, r: 5, at: Date.now() },
+        ],
       },
     },
   };
@@ -276,9 +390,32 @@ try {
   await page.reload();
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await scan("friends feed");
+  await page.getByRole("button", { name: "More options" }).click();
+  await page.getByRole("button", { name: "Save as a routine" }).waitFor();
+  await scan("friends post menu");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Friends settings" }).click();
+  await page.getByRole("group", { name: "Avatar" }).waitFor();
+  await scan("friends settings");
+  await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Comments/ }).click();
   await page.getByText("Strong work!").waitFor();
   await scan("friends comments");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Board" }).click();
+  await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
+  await page.getByText("Blair invited you to this challenge.").waitFor();
+  await scan("friends board");
+  await page.getByRole("button", { name: "Start a challenge" }).click();
+  await page.getByRole("group", { name: "Challenge" }).waitFor();
+  await scan("friends start challenge");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Clubs" }).click();
+  await page.getByRole("button", { name: /Iron Barn crew/ }).waitFor();
+  await scan("friends clubs");
+  await page.getByRole("button", { name: /Iron Barn crew/ }).click();
+  await page.getByRole("button", { name: "Invite to the club" }).waitFor();
+  await scan("friends club");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();
@@ -288,7 +425,14 @@ try {
   await scan("friends people");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
+  await page.getByText("Best lifts").waitFor();
   await scan("friends person");
+  await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
+  await page.getByText("Blair invited you").waitFor();
+  await scan("friends invite");
+  await page.goto(`${server.url}/app/#/club/ABCD2345`);
+  await page.getByRole("button", { name: "Join the club" }).waitFor();
+  await scan("friends club link");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");

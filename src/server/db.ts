@@ -474,6 +474,87 @@ const SCHEMA = [
     UNIQUE (reporter_id, kind, target_id)
   )`,
   `CREATE INDEX IF NOT EXISTS reports_status ON reports (status, kind, target_id)`,
+  // A workout sent to a friend (social.ts `send`): a routine code and its name, shown in their Activity.
+  `CREATE TABLE IF NOT EXISTS sent_workouts (
+    id TEXT PRIMARY KEY,
+    from_id TEXT NOT NULL,
+    to_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS sent_workouts_to ON sent_workouts (to_id, created_at)`,
+  `CREATE INDEX IF NOT EXISTS sent_workouts_from ON sent_workouts (from_id)`,
+  // Invite links (social.ts `invite`): accepting one makes the two lifters follow each other. One live code each.
+  `CREATE TABLE IF NOT EXISTS social_invites (
+    code TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    expires_at INTEGER NOT NULL,
+    uses INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS social_invites_account ON social_invites (account_id)`,
+  // Friend challenges (social.ts `challengeCreate`): a few friends race on one measure for 1, 2 or 4 weeks, scored
+  // from what each joined member posts in that window. Members are invited, then joined; declining deletes the row.
+  `CREATE TABLE IF NOT EXISTS challenges (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    name TEXT NOT NULL DEFAULT '',
+    metric TEXT NOT NULL,
+    starts_at INTEGER NOT NULL,
+    ends_at INTEGER NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS challenges_owner ON challenges (owner_id)`,
+  `CREATE TABLE IF NOT EXISTS challenge_members (
+    challenge_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (challenge_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS challenge_members_account ON challenge_members (account_id)`,
+  // Training partners tagged on a post (social.ts `post`): mutual friends only, and a tagged lifter can remove themselves.
+  `CREATE TABLE IF NOT EXISTS post_partners (
+    post_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (post_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS post_partners_account ON post_partners (account_id)`,
+  // Clubs and gym crews (social.ts `clubCreate`): a named group anyone with its code can join, with a weekly board
+  // of what its members posted. The starter runs it (can remove members, change the code, delete it).
+  `CREATE TABLE IF NOT EXISTS clubs (
+    id TEXT PRIMARY KEY,
+    owner_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS clubs_owner ON clubs (owner_id)`,
+  `CREATE TABLE IF NOT EXISTS club_members (
+    club_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (club_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS club_members_account ON club_members (account_id)`,
+  // Muted people (social.ts): their posts stay out of the muter's feed. They aren't told, and nothing else changes.
+  `CREATE TABLE IF NOT EXISTS mutes (
+    muter_id TEXT NOT NULL,
+    muted_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (muter_id, muted_id)
+  )`,
+  // A phone's push token for Friends notifications (push.ts), in the language it registered with.
+  `CREATE TABLE IF NOT EXISTS push_tokens (
+    token TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    platform TEXT NOT NULL,
+    lang TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS push_tokens_account ON push_tokens (account_id, updated_at)`,
   // Trainer mode (src/server/coach.ts): a coach's invite code, and each coach and client pair the client agreed to.
   `CREATE TABLE IF NOT EXISTS coach_invites (
     code TEXT PRIMARY KEY,
@@ -518,6 +599,23 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "offering", "TEXT"],
   ["creators", "ends_at", "INTEGER"],
   ["creators", "max_uses", "INTEGER"],
+  // Friends stage 2: a public profile (social.ts, publicProfile.ts).
+  ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
+  // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
+  ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "push_sent", "INTEGER NOT NULL DEFAULT 1"],
+  // Connected apps: the service's own id for the lifter, where removing access needs it (Polar AccessLink).
+  ["connections", "remote_user", "TEXT"],
+  ["social_profiles", "push_likes", "INTEGER NOT NULL DEFAULT 0"],
+  // Friends stage 3: avatar, who sees new posts, and the best lifts showcase (social.ts).
+  ["social_profiles", "avatar", "TEXT NOT NULL DEFAULT ''"],
+  ["social_profiles", "audience", "TEXT NOT NULL DEFAULT 'all'"],
+  ["social_profiles", "show_lifts", "INTEGER NOT NULL DEFAULT 1"],
+  ["social_profiles", "lifts", "TEXT NOT NULL DEFAULT '[]'"],
+  // Friends stage 3: a caption and who sees each post.
+  ["posts", "caption", "TEXT NOT NULL DEFAULT ''"],
+  ["posts", "audience", "TEXT NOT NULL DEFAULT 'all'"],
 ];
 
 let client: Client | null = null;

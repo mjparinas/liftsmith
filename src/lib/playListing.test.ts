@@ -23,7 +23,7 @@ describe("Play listing", () => {
       expect(text).not.toMatch(/\b(best|#1|number one)\b/i);
       expect(text).not.toMatch(/\p{Extended_Pictographic}/u);
       // No other apps' names, and nothing that isn't built yet.
-      expect(text).not.toMatch(/fitbod|hevy|strong app|stronglifts|gymverse|strava|oura|whoop|apple watch|wear os|\$\d/i);
+      expect(text).not.toMatch(/fitbod|hevy|strong app|stronglifts|gymverse|strava|oura|whoop|apple watch|\$\d/i);
     }
   });
 

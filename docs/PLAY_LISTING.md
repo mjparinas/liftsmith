@@ -10,7 +10,7 @@ node scripts/play-video.mjs     # store/play/promo-video.mp4 (not committed; upl
 ```
 
 Rules for this text (Play's metadata policy plus our own):
-- Only features that ship today. No watch apps, no Strava/Oura/Whoop, no sync or accounts, no prices or "Pro" until billing is live.
+- Only features that ship on Android today. Wear OS, optional accounts with sync, Friends and Pro are in (2026-11-11, for the public launch); Strava, Oura, Whoop, Withings, Polar and Concept2 stay out until they leave "Coming soon", and anything iPhone-only (Apple Watch) stays out of the Play listing. No prices: Play shows them on the listing itself.
 - No other apps' names, no "best" or "#1", no testimonials, no emoji, no all caps.
 - Every URL uses `www` (Melvin, 2026-11-09).
 
@@ -71,7 +71,6 @@ BUILT FOR THE GYM FLOOR
 • Rest countdown, next set and Log set button on your lock screen and in the notification.
 • A 3D demo of every exercise, with the muscles it works.
 • Supersets, warm-up sets, exercise swaps, notes and your own custom exercises.
-• Change the plan mid-workout when time runs short or the bench is taken.
 • Injury mode skips or lightens exercises that load a sore area, and eases you back in.
 
 RECOVERY AND PROGRESS
@@ -85,12 +84,17 @@ STAY CONSISTENT
 • Streaks count weeks that meet your goal, so rest days never break them.
 • Levels, weekly quests, 150+ badges and a crate after every workout.
 • Workout reminders on your training days, and a home-screen widget and quick settings tile to start a workout.
+• Friends if you want them: post a workout for followers you approve.
+
+ON YOUR WRIST
+• A Wear OS app shows the set, weight and reps or the rest countdown, reads heart rate from the watch, and logs the set with one tap.
 
 YOUR DATA, YOUR PHONE
 • Works fully offline. No account needed.
+• Sign in with Google or email to back up and sync with the web app, if you like.
 • Reads weight, height and body fat from Health Connect, and saves each workout's active calories there.
 • Live heart rate from any Bluetooth heart rate monitor or watch that shares heart rate.
-• Import your history from a CSV export of another workout app, and export your sets or a full backup any time.
+• Import your history from another app's CSV, and export your sets or a full backup any time.
 • No ads, ever.
 
 MADE FOR EVERY LIFTER
@@ -99,6 +103,9 @@ MADE FOR EVERY LIFTER
 • Light and dark themes, and a Lean mode with less motion.
 • In English, Spanish, French, German, Italian and Japanese.
 
+LIFTSMITH PRO
+The logger, plate math, rest timer, lock-screen controls, fixed programs and coaching reasons are free. Liftsmith Pro adds adaptive programming, adaptive splits, the recovery map, advanced stats, mid-workout re-planning, the plateau detective and the goal-date planner. Try it free for 14 days.
+
 Liftsmith isn't a medical app. Talk to a doctor before starting a new training program, especially after an injury.
 
 Questions or ideas? Send feedback from Settings or write to hello@getliftsmith.com.
@@ -106,12 +113,7 @@ Questions or ideas? Send feedback from Settings or write to hello@getliftsmith.c
 
 Length: checked by `src/lib/playListing.test.ts`.
 
-When billing goes live, add this paragraph before "Liftsmith isn't a medical app", tick "Contains in-app purchases" in Play Console, and update the test:
-
-```text
-LIFTSMITH PRO
-The logger, plate math, rest timer, lock-screen controls, fixed programs and coaching reasons are free. Liftsmith Pro adds adaptive programming, adaptive splits, the recovery map, advanced stats, mid-workout re-planning, the plateau detective and the goal-date planner. Try it free for 14 days.
-```
+Play Console › Monetization setup: "Contains in-app purchases" is ticked, because Pro is a subscription.
 
 ## Phone screenshots (8, 1080×1920)
 

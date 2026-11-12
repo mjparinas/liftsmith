@@ -44,7 +44,7 @@ export default function Contact() {
           </li>
           <li>
             <strong>Billing and refunds:</strong> Pro is bought through Google Play or the App Store, so refunds go through them first. See{" "}
-            <Link href="/help/#billing">Pro, trials and billing</Link>.
+            <Link href="/help/billing/">Pro, trials and billing</Link>.
           </li>
           <li>
             <strong>Your data:</strong> you can export or delete it yourself in the app. The <Link href="/privacy/">privacy policy</Link>{" "}

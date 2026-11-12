@@ -40,12 +40,28 @@ export const FAQS: Faq[] = [
   { q: "How do I cancel?", a: "In two taps, from your Google Play or App Store subscriptions. No tricks and no countdowns." },
 ];
 
-/** The help page's groups, in the order shown. Each group has its own anchor (`#<id>`). */
-export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
-  { id: "basics", title: "The basics", faqs: FAQS },
+export interface HelpTopic {
+  /** Its page is /help/<id>/. */
+  id: string;
+  title: string;
+  /** The page's meta description and the line under the topic on /help/, 70 to 160 characters. */
+  blurb: string;
+  faqs: Faq[];
+}
+
+/** The help topics, in the order shown. /help/ lists them with their questions; each has its own page with the answers. */
+export const HELP: HelpTopic[] = [
+  {
+    id: "basics",
+    title: "The basics",
+    blurb: `What ${name} costs, whether there are ads, which phones it runs on, the equipment you need, heart rate monitors, accounts and cancelling.`,
+    faqs: FAQS,
+  },
   {
     id: "training",
     title: "How the training works",
+    blurb:
+      "How the app picks your workout, exercises and weights, what RIR and today's call mean, fixed programs, and training around an injury.",
     faqs: [
       {
         q: `How does ${name} pick my workout?`,
@@ -76,6 +92,8 @@ export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
   {
     id: "data",
     title: "Your data, accounts and sync",
+    blurb:
+      "Where your workouts are kept, moving to a new phone, Health Connect and Apple Health, exporting your data, deleting your account and the app's languages.",
     faqs: [
       {
         q: "Where are my workouts kept?",
@@ -99,13 +117,15 @@ export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
       },
       {
         q: "Which languages does it speak?",
-        a: "The app is in English, Spanish and French, and follows your phone's language unless you pick one in Settings.",
+        a: "The app is in English, Spanish, French, German, Italian and Japanese, and follows your phone's language unless you pick one in Settings. This site's home and pricing pages are in all six too.",
       },
     ],
   },
   {
     id: "billing",
     title: "Pro, trials and billing",
+    blurb:
+      "What Pro costs, how the free trial works, sharing Pro with your family, refunds, and what to do when Pro doesn't show after you buy it.",
     faqs: [
       {
         q: "What does Pro cost?",
@@ -132,6 +152,8 @@ export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
   {
     id: "trouble",
     title: "Something isn't working",
+    blurb:
+      "Fixes for a rest timer missing from your lock screen and a heart rate monitor that won't connect, plus how to report a bug to us.",
     faqs: [
       {
         q: "The rest timer doesn't show on my lock screen.",
@@ -148,6 +170,18 @@ export const HELP: { id: string; title: string; faqs: Faq[] }[] = [
     ],
   },
 ];
+
+export const helpPath = (t: HelpTopic) => `/help/${t.id}/`;
+export const HELP_BY_ID = new Map(HELP.map((t) => [t.id, t]));
+
+/** A question's anchor on its topic page: "How do I cancel?" → "how-do-i-cancel". */
+export const faqAnchor = (q: string) =>
+  q
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
 
 /** Every question on the site, home page and help page together, each once. */
 export const ALL_FAQS: Faq[] = HELP.flatMap((g) => g.faqs);

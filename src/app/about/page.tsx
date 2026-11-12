@@ -59,7 +59,8 @@ export default function About() {
       <Section title="Who makes it">
         <p>
           {name} is made by Melvin, an independent developer. It isn&apos;t part of a gym chain, a supplement brand or an equipment maker,
-          so nothing in it is there to sell you something else.
+          so nothing in it is there to sell you something else. Our <Link href="/editorial-standards/">editorial standards</Link> say how we
+          write and check the articles and guides on this site.
         </p>
       </Section>
       <section aria-labelledby="beliefs-h">

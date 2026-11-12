@@ -9,7 +9,7 @@ import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
-import { inSentence, t } from "@/lib/i18n";
+import { date, inSentence, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { doneItems } from "@/lib/routines";
@@ -21,6 +21,7 @@ import { doneCue, say, voice } from "@/lib/voice";
 
 import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { burst } from "./burst";
+import { WorkoutNoteCard } from "./EditWorkout";
 import { DoneMoments, lean } from "./Extras";
 import { clock } from "./format";
 import { PostToFriends } from "./Friends";
@@ -32,6 +33,7 @@ import { PrReplayButton } from "./PrReplay";
 import { ShareWorkout } from "./Remix";
 import { go } from "./router";
 import { SaveDoneAsRoutine } from "./Routines";
+import { SendToFriend } from "./SendToFriend";
 import { ShareSheet } from "./ShareSheet";
 import { CoolDownCard } from "./Stretch";
 import { Button } from "./ui";
@@ -284,6 +286,7 @@ export function Done() {
       )}
 
       <PainAfter sessionId={s.sessionId} />
+      <WorkoutNoteCard sessionId={s.sessionId} />
 
       {prizes.map((p) => (
         <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
@@ -298,6 +301,11 @@ export function Done() {
         {t("done.share")}
       </Button>
       <PostToFriends summary={s} />
+      <SendToFriend
+        className="mt-2"
+        name={t("friends.send.doneName", { date: date(s.start, { month: "short", day: "numeric" }) })}
+        items={doneItems(events, s.sessionId)}
+      />
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
       <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
       <ShareWorkout sessionId={s.sessionId} />

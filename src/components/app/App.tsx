@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, type ReactNode } from "react";
 import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
+import { startAppLinks } from "@/lib/appLinks";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
@@ -14,8 +15,11 @@ import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
+import { startHealthRefresh } from "@/lib/healthRefresh";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
+import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { onPushTap } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
@@ -33,8 +37,9 @@ import { Account } from "./Account";
 import { Achievements } from "./Achievements";
 import { Connections } from "./Connections";
 import { Done } from "./Done";
+import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
-import { Friends, PersonScreen } from "./Friends";
+import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -146,6 +151,8 @@ export function App() {
     void flushFeedback();
     // A creator code from a link or the Play install referrer (creator.ts); one saved offline is checked when online.
     void startCreator();
+    // An invite that came through the Play install referrer waits for Friends (invite.ts).
+    void startInvite();
     const online = () => {
       void flushFeedback();
       if (useCreator.getState().claim?.status === "pending") void sendClaim();
@@ -165,6 +172,12 @@ export function App() {
   useEffect(() => {
     if (ready && profile.onboarded) void keepStorage();
   }, [ready, profile.onboarded]);
+  // Health Connect / Apple Health: read on open (store.ts) and again on return to the app, at most every 15
+  // minutes (healthRefresh.ts), so an app left in memory overnight still sees last night's sleep and HRV.
+  useEffect(() => {
+    if (!ready) return;
+    return startHealthRefresh(() => useApp.getState());
+  }, [ready]);
   // Sync with the lifter's account, when signed in (sync.ts): on open, on return, when online, after changes.
   const signedIn = useAccount((s) => !!s.account);
   useEffect(() => {
@@ -175,7 +188,7 @@ export function App() {
   useEffect(() => {
     if (ready && signedIn) void redeemSaved();
   }, [ready, signedIn]);
-  // Strava, Oura and WHOOP (Connected apps): status, readings in and workouts out, while signed in.
+  // Strava, Oura, WHOOP, Withings, Polar and Concept2 (Connected apps): status, readings in and workouts out, while signed in.
   useEffect(() => {
     if (!ready || !signedIn) return;
     return startConnections();
@@ -239,6 +252,20 @@ export function App() {
     }
     return onSessionAction(run);
   }, [ready]);
+  // Android App Links (appLinks.ts): a tapped link to the app on our domain opens its screen here. Waits
+  // for the store, like shortcuts, so a cold start's link lands after loading.
+  useEffect(() => {
+    if (!ready) return;
+    let stop = () => {};
+    let gone = false;
+    void startAppLinks((hash) => {
+      if (location.hash !== hash) location.hash = hash;
+    }).then((s) => (gone ? s() : (stop = s)));
+    return () => {
+      gone = true;
+      stop();
+    };
+  }, [ready]);
   // Reminders: rescheduled from the latest data on open, on return to the foreground, and whenever
   // the workouts or the profile change (reminders.ts). A tap on one opens the screen it points to.
   useEffect(() => {
@@ -259,9 +286,15 @@ export function App() {
     });
     document.addEventListener("visibilitychange", refresh);
     const offTap = onReminderTap((r) => go(parse(`#/${r}`).route));
+    // Friends pushes carry the whole hash (#/friends, #/routine/<code>).
+    const offPush = onPushTap((h) => {
+      const r = parse(h);
+      go(r.route, r.arg);
+    });
     return () => {
       unsub();
       offTap();
+      offPush();
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);
@@ -316,9 +349,12 @@ export function App() {
     connections: <Connections />,
     stretch: <StretchScreen arg={arg} />,
     routine: <SharedRoutine code={arg} />,
-    friends: <Friends />,
+    friends: <Friends key={arg ?? ""} tab={arg} />,
     person: <PersonScreen key={arg ?? ""} handle={arg ?? ""} />,
+    invite: <InviteScreen key={arg ?? ""} code={arg ?? ""} />,
+    club: <ClubScreen key={arg ?? ""} code={arg ?? ""} />,
     trainer: <Trainer arg={arg} />,
+    exercise: <ExercisePage key={arg ?? ""} id={arg} />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

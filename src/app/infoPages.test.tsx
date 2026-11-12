@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { ContactForm } from "@/components/site/ContactForm";
 import { CONTACT_TOPICS } from "@/lib/contact";
-import { ALL_FAQS, FAQS, HELP } from "@/lib/faqs";
+import { ALL_FAQS, faqAnchor, FAQS, HELP, helpPath } from "@/lib/faqs";
 import { checkFeedback, feedbackEmail } from "@/lib/feedbackServer";
 import { PLAN_TABLE } from "@/lib/plans";
 import { siteRoutes } from "@/lib/seo";
@@ -14,6 +14,7 @@ import { WHATS_NEW } from "@/lib/whatsNew";
 import About from "./about/page";
 import Accessibility from "./accessibility/page";
 import Contact from "./contact/page";
+import HelpTopic from "./help/[topic]/page";
 import Help from "./help/page";
 import Pricing from "./pricing/page";
 import Status from "./status/page";
@@ -60,16 +61,38 @@ describe("info pages", () => {
     for (const { path } of PAGES) expect(footer.querySelector(`a[href="${path.slice(0, -1)}"]`), path).not.toBeNull();
   });
 
-  it("puts every help question on the help page and in its FAQPage data, the home page's ones included", () => {
+  it("lists every help question on /help/, linked to its answer on its topic page", () => {
     render(<Help />);
     for (const f of FAQS) expect(ALL_FAQS).toContainEqual(f);
-    for (const f of ALL_FAQS) expect(screen.getByText(f.q)).toBeTruthy();
-    const data = [...document.querySelectorAll('script[type="application/ld+json"]')]
-      .map((el) => JSON.parse(el.textContent!) as { "@type": string; mainEntity: unknown[] })
-      .find((d) => d["@type"] === "FAQPage")!;
-    expect(data.mainEntity).toHaveLength(ALL_FAQS.length);
     expect(new Set(ALL_FAQS.map((f) => f.q)).size).toBe(ALL_FAQS.length);
-    for (const g of HELP) expect(document.getElementById(g.id)).not.toBeNull();
+    expect(new Set(ALL_FAQS.map((f) => faqAnchor(f.q))).size).toBe(ALL_FAQS.length);
+    const paths = new Set(siteRoutes().map((r) => r.path));
+    for (const t of HELP) {
+      expect(document.getElementById(t.id)).not.toBeNull();
+      expect(paths.has(helpPath(t)), t.id).toBe(true);
+      expect(t.blurb.length, t.id).toBeGreaterThanOrEqual(70);
+      expect(t.blurb.length, t.id).toBeLessThanOrEqual(160);
+      for (const f of t.faqs) {
+        const link = screen.getByRole("link", { name: new RegExp(`^${f.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`) });
+        expect(link.getAttribute("href")).toBe(`${helpPath(t).slice(0, -1)}#${faqAnchor(f.q)}`);
+      }
+    }
+  });
+
+  it("puts each topic's answers on its own page, with FAQPage data for that topic only", async () => {
+    for (const t of HELP) {
+      render(await HelpTopic({ params: Promise.resolve({ topic: t.id }) }));
+      expect(screen.getByRole("heading", { level: 1 }).textContent).toBe(t.title);
+      for (const f of t.faqs) {
+        expect(document.getElementById(faqAnchor(f.q))).not.toBeNull();
+        expect(screen.getByText(f.a)).toBeTruthy();
+      }
+      const data = [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((el) => JSON.parse(el.textContent!) as { "@type": string; mainEntity: unknown[] })
+        .find((d) => d["@type"] === "FAQPage")!;
+      expect(data.mainEntity, t.id).toHaveLength(t.faqs.length);
+      cleanup();
+    }
   });
 
   it("shows both plans and every row of the comparison table on the pricing page", () => {

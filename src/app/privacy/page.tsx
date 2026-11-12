@@ -129,21 +129,30 @@ export default function Privacy() {
           Friends is optional and needs an account. If you join, we keep the handle and name you pick, who you follow and who follows you,
           who you&apos;ve blocked, and what you post: the workouts you choose to post (or every workout, if you turn that on), with their
           time, sets, exercises and best sets (weights only if you show them), plus your likes and comments. Your followers see your posts;
-          by default you approve each follower first. A post never includes heart rate, body weight or fat, measurements, cycle data,
-          injuries, gyms or places. If you report something, we keep the report and who made it so we can review it, and the person you
-          reported isn&apos;t told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
+          by default you approve each follower first. If you make your profile public, anyone can see it and the workouts you post, in the
+          app and on a web page at your handle that search engines may list; turn Public profile off and the page goes away. If you send a
+          workout to a friend, we keep its name and exercises (no weights or notes) so it shows in their activity. If you allow
+          notifications, we keep your phone&apos;s push token with your account and send it through Google&apos;s Firebase Cloud Messaging
+          (Android) or Apple&apos;s push service (iPhone) to tell you about follows, comments and workouts sent to you; signing out or
+          leaving Friends removes it. A post never includes heart rate, body weight or fat, measurements, cycle data, injuries, gyms or
+          places. If you report something, we keep the report and who made it so we can review it, and the person you reported isn&apos;t
+          told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
         </p>
 
-        <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura and WHOOP</h2>
+        <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};
           we keep the access it gives us (encrypted) with your account, plus your name on Strava to show who&apos;s connected. With Strava
           connected, each finished workout (its start time, length and your sets) is posted to your Strava account, unless you turn that
           off. With Oura or WHOOP connected, the app asks our server for your last few weeks of sleep, heart rate variability, resting heart
-          rate, breathing rate and (Oura) steps; our server fetches them from the service and passes them straight to your phone without
-          keeping them, and they&apos;re then treated like readings from Health Connect or Apple Health. Disconnect in Settings › Connected
-          apps, or delete your account, and we withdraw our access at the service and delete what we kept. Music links open your music app
-          with a public playlist and send nothing to us.
+          rate, breathing rate and (Oura) steps; with Withings connected, the same plus your weigh-ins and body fat; with Polar connected,
+          your sleep and nightly heart rate, heart rate variability and breathing rate; with Concept2 connected, your Logbook&apos;s rowing,
+          ski and bike sessions (when, how long and how far), which are saved as cardio workouts. Our server fetches them from the service
+          and passes them straight to your phone without keeping them, and they&apos;re then treated like readings from Health Connect or
+          Apple Health, or like workouts you logged yourself. For Polar we also keep the user number Polar gives us, so we can remove our
+          access when you disconnect. Disconnect in Settings › Connected apps, or delete your account, and we withdraw our access at the
+          service where it lets us (Withings and Concept2 have no way for us to do this, so you can also remove {BRAND.name} in your account
+          there) and delete what we kept. Music links open your music app with a public playlist and send nothing to us.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Reminders</h2>

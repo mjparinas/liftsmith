@@ -18,6 +18,7 @@ import * as body from "./text/body";
 import * as buddy from "./text/buddy";
 import * as buy from "./text/buy";
 import * as cal from "./text/cal";
+import * as calc from "./text/calc";
 import * as callText from "./text/callText";
 import * as card from "./text/card";
 import * as category from "./text/category";
@@ -43,6 +44,7 @@ import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
 import * as friends from "./text/friends";
+import * as ft from "./text/ft";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -50,12 +52,14 @@ import * as gloss from "./text/gloss";
 import * as goal from "./text/goal";
 import * as gym from "./text/gym";
 import * as hr from "./text/hr";
+import * as hx from "./text/hx";
 import * as imp from "./text/imp";
 import * as info from "./text/info";
 import * as inj from "./text/inj";
 import * as ins from "./text/ins";
 import * as lab from "./text/lab";
 import * as league from "./text/league";
+import * as lift from "./text/lift";
 import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
@@ -78,6 +82,8 @@ import * as pr from "./text/pr";
 import * as pro from "./text/pro";
 import * as prog from "./text/prog";
 import * as progress from "./text/progress";
+import * as pub from "./text/pub";
+import * as push from "./text/push";
 import * as quest from "./text/quest";
 import * as quote from "./text/quote";
 import * as rarity from "./text/rarity";
@@ -98,6 +104,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
@@ -133,6 +140,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...buddy.fr,
   ...buy.fr,
   ...cal.fr,
+  ...calc.fr,
   ...card.fr,
   ...callText.fr,
   ...category.fr,
@@ -157,6 +165,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...fit.fr,
   ...fix.fr,
   ...fmt.fr,
+  ...ft.fr,
   ...friends.fr,
   ...game.fr,
   ...ghost.fr,
@@ -193,6 +202,8 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...pro.fr,
   ...prog.fr,
   ...progress.fr,
+  ...pub.fr,
+  ...push.fr,
   ...quest.fr,
   ...quote.fr,
   ...rarity.fr,
@@ -212,12 +223,15 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...stats.fr,
   ...tab.fr,
   ...td.fr,
+  ...tempo.fr,
   ...tdee.fr,
   ...theme.fr,
   ...tier.fr,
   ...time.fr,
   ...today.fr,
   ...ton.fr,
+  ...hx.fr,
+  ...lift.fr,
   ...tools.fr,
   ...train.fr,
   ...trn.fr,

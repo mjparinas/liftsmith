@@ -36,6 +36,8 @@ export interface Active {
   repsR?: number;
   /** Cardio logged with distance: metres for the next set, editable with a stepper. */
   distanceM?: number;
+  /** Cardio from a Bluetooth gym machine (Labs): average watts for the next set, filled in by the machine. */
+  powerW?: number;
   restUntil: number | null;
   restTotal: number;
   /** Exercise whose feedback chip is showing. */
@@ -57,6 +59,11 @@ export interface Active {
   hrCut?: { restStart: number; bpm: number; start: number; saved: number };
   /** Rest auto-start is off: the rest (seconds) waiting for a tap on Start rest. */
   restReady?: number;
+  /**
+   * Today's max lab: what the camera saw on the set being done (its last full rep's speed in m/s, and a
+   * failed attempt after it), written onto the set at Log set. Cleared by every Log set.
+   */
+  setSpeed?: { exerciseId: string; speed: number; failed: boolean };
   /**
    * The set on screen is a bonus drop or rest-pause set (extraSet), and the weight and reps to go back to
    * afterwards when the exercise has planned sets left.
@@ -97,7 +104,7 @@ export function loadItem(get: () => State, a: Active, index: number): Active {
   const first = !started && item.warmup?.[0];
   const t = item.setTargets?.[Math.min(done, item.setTargets.length - 1)] ?? item.target;
   const distanceM = startDistance(exercise(item.exerciseId), get().events);
-  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM };
+  return { ...a, index, warm, weight: first ? first.weight : t.weight, reps: first ? first.reps : t.reps, distanceM, powerW: undefined };
 }
 
 /** How long Undo stays offered after Log set when there's no rest to wait through. */
@@ -128,6 +135,8 @@ export interface WorkoutSlice {
   /** Moves the current exercise after the next one (equipment busy). */
   later(): void;
   logSet(): void;
+  /** What the camera saw on the set being done (today's max lab), saved with it at Log set. */
+  noteSetSpeed(exerciseId: string, speed: number, failed: boolean): void;
   /**
    * Between sets: a bonus drop set (about 75% of the set just logged, no rest) or rest-pause set (same
    * weight after a 15 s pause) of the exercise just done. Undefined cancels one that's on screen.
@@ -138,6 +147,8 @@ export interface WorkoutSlice {
   adjustRight(reps: number | undefined): void;
   /** Sets the next cardio set's distance (metres). */
   adjustDistance(m: number): void;
+  /** A Bluetooth gym machine (Labs) filled in the cardio set on screen: seconds, and metres and watts when it has them. */
+  machineSet(v: { seconds: number; distanceM?: number; powerW?: number }): void;
   addRest(sec: number): void;
   skipRest(): void;
   /** Ends the rest early at `until` (heart-rate rest timer lab), shortening restTotal by the same amount. */
@@ -318,6 +329,14 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       });
     },
 
+    noteSetSpeed(exerciseId, speed, failed) {
+      const a = get().active;
+      if (!a || !(speed > 0) || warmingUp(a)) return;
+      const next = { ...a, setSpeed: { exerciseId, speed, failed } };
+      set({ active: next });
+      persistActive(next);
+    },
+
     logSet() {
       const a = get().active;
       if (!a) return;
@@ -334,6 +353,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         const nextWarm = item.warmup![warm];
         const next: Active = {
           ...a,
+          setSpeed: undefined,
           warm,
           weight: nextWarm ? nextWarm.weight : item.target.weight,
           reps: nextWarm ? nextWarm.reps : item.target.reps,
@@ -371,6 +391,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           implements: ex.load === "dumbbell" || ex.load === "kettlebell" ? implementsFor(ex) : undefined,
           targetReps: planned.reps,
           ...(ex.cardio === "distance" && a.distanceM !== undefined ? { distanceM: a.distanceM } : {}),
+          ...(ex.cardio && a.powerW !== undefined ? { powerW: a.powerW } : {}),
           rir: planned.amrap ? 0 : item.target.rir,
           targetWeight: planned.weight,
           amrap: planned.amrap,
@@ -384,6 +405,9 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           injuryPct: item.injuryPct,
           superset: item.group,
           tag: a.tag,
+          ...(a.setSpeed?.exerciseId === item.exerciseId
+            ? { endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000, failedRep: a.setSpeed.failed ? (true as const) : undefined }
+            : {}),
         },
       ]);
       // Alone, the next set is the same exercise until its sets are done. In a superset it's the
@@ -395,7 +419,9 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       );
       let next: Active = {
         ...a,
+        setSpeed: undefined,
         repsR: undefined,
+        powerW: undefined,
         lastAt: now,
         restStart: now,
         lastRest: undefined,
@@ -485,6 +511,23 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const a = get().active;
       if (!a) return;
       const next = { ...a, distanceM: Math.max(0, Math.round(m)), lastAt: Date.now() };
+      set({ active: next });
+      persistActive(next);
+    },
+
+    machineSet(v) {
+      const a = get().active;
+      const item = a?.plan.items[a.index];
+      if (!a || !item) return;
+      const ex = exercise(item.exerciseId);
+      if (!ex.cardio) return;
+      const next: Active = {
+        ...a,
+        reps: Math.max(1, Math.round(v.seconds)),
+        ...(ex.cardio === "distance" && v.distanceM !== undefined ? { distanceM: Math.max(0, Math.round(v.distanceM)) } : {}),
+        powerW: v.powerW,
+        lastAt: Date.now(),
+      };
       set({ active: next });
       persistActive(next);
     },

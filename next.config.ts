@@ -43,6 +43,9 @@ const nextConfig: NextConfig = {
           { source: "/c/:code/", destination: "/c/" },
           { source: "/w/:id/card.jpg", destination: "/api/share/image/?id=:id" },
           { source: "/w/:id/", destination: "/api/share/page/?id=:id" },
+          // Public profiles (www.getliftsmith.com/u/<handle>/) and the sitemap of them (src/server/publicProfile.ts).
+          { source: "/u/:handle/", destination: "/api/people/page/?handle=:handle" },
+          { source: "/sitemap-people.xml", destination: "/api/people/sitemap/" },
         ],
       }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
@@ -52,6 +55,7 @@ const nextConfig: NextConfig = {
         headers: async () => [
           { source: "/:path*", headers: SECURITY_HEADERS },
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),
   env: {

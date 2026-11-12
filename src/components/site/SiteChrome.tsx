@@ -9,7 +9,10 @@ import type { ReactNode } from "react";
 import { BuildStamp } from "@/components/BuildStamp";
 import { BRAND } from "@/lib/brand";
 import { APP_PATH, SITE_URL } from "@/lib/site";
+import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/lib/siteLang";
+import { siteText } from "@/locales/site";
 
+import { DocLang } from "./DocLang";
 import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
@@ -25,9 +28,9 @@ export function BrandMark() {
   return <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />;
 }
 
-function Logo() {
+function Logo({ lang }: { lang: SiteLang }) {
   return (
-    <Link href="/" className="flex items-center gap-2 text-xl font-bold tracking-tight">
+    <Link href={localPath(lang, "/")} className="flex items-center gap-2 text-xl font-bold tracking-tight">
       <BrandMark />
       {BRAND.name}
     </Link>
@@ -41,24 +44,32 @@ export type NavLink = { href: string; label: string };
  * left the home page). The home page's own sections are /#… links, so they work from any page. Wide screens show them
  * all; below lg they sit in the menu, beside Sign in and Start free.
  */
-export const NAV: readonly NavLink[] = [
-  { href: "/#features", label: "Features" },
-  { href: "/exercises/", label: "Exercises" },
-  { href: "/guides/", label: "Guides" },
-  { href: "/blog/", label: "Blog" },
-  { href: "/tools/", label: "Tools" },
-  { href: "/pricing/", label: "Pricing" },
-  { href: "/#faq", label: "FAQ" },
-];
+export function navFor(lang: SiteLang): NavLink[] {
+  const n = siteText(lang).chrome.nav;
+  // The home page and pricing are translated; the library, guides, blog and tools are English for now.
+  return [
+    { href: `${localPath(lang, "/")}#features`, label: n.features },
+    { href: "/exercises/", label: n.exercises },
+    { href: "/guides/", label: n.guides },
+    { href: "/blog/", label: n.blog },
+    { href: "/tools/", label: n.tools },
+    { href: localPath(lang, "/pricing/"), label: n.pricing },
+    { href: `${localPath(lang, "/")}#faq`, label: n.faq },
+  ];
+}
 
-export function SiteHeader() {
+export const NAV: readonly NavLink[] = navFor("en");
+
+export function SiteHeader({ lang = "en" }: { lang?: SiteLang }) {
+  const t = siteText(lang).chrome;
+  const nav = navFor(lang);
   return (
     <header className="sticky top-0 z-30 border-b border-line/60 bg-bg/85 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
-        <Logo />
-        <nav aria-label="Site" className="flex items-center gap-0.5 text-sm font-semibold sm:gap-2">
+        <Logo lang={lang} />
+        <nav aria-label={t.siteNav} className="flex items-center gap-0.5 text-sm font-semibold sm:gap-2">
           <ul className="hidden items-center gap-1 lg:flex">
-            {NAV.map((n) => (
+            {nav.map((n) => (
               <li key={n.href}>
                 <Link href={n.href} className="rounded-lg px-3 py-2 hover:bg-surface">
                   {n.label}
@@ -66,16 +77,17 @@ export function SiteHeader() {
               </li>
             ))}
           </ul>
-          <SignInLink />
+          {/* Below 400 px there's no room beside the logo, so Sign in moves into the menu (one or the other shows). */}
+          <SignInLink label={t.signIn} className="hidden min-[400px]:inline-flex" />
           <Link
             href={APP_PATH}
             prefetch={false}
             data-cta="header"
             className="press btn-primary inline-flex min-h-11 items-center whitespace-nowrap rounded-xl px-3 sm:ml-1 sm:px-4"
           >
-            Start free
+            {t.startFree}
           </Link>
-          <SiteMenu links={NAV} />
+          <SiteMenu links={nav} label={t.menu} navLabel={t.siteMenu} narrowOnly={{ href: `${APP_PATH}#/account`, label: t.signIn }} />
         </nav>
       </div>
     </header>
@@ -86,20 +98,26 @@ export function SiteHeader() {
  * A quieter way in beside "Start free", for lifters who already have an account (Melvin, 2026-11-11). It opens the app on
  * sign-in (#/account: the welcome screen's sign-in sheet on a new browser), and signing in there lands on Today.
  */
-export function SignInLink() {
+export function SignInLink({ label = "Sign in", className = "inline-flex" }: { label?: string; className?: string }) {
   return (
     <Link
       href={`${APP_PATH}#/account`}
       prefetch={false}
       data-cta="header-signin"
-      className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-2 text-muted hover:bg-surface hover:text-ink sm:px-3"
+      className={`${className} min-h-11 items-center whitespace-nowrap rounded-lg px-2 text-muted hover:bg-surface hover:text-ink sm:px-3`}
     >
-      Sign in
+      {label}
     </Link>
   );
 }
 
-export function SiteFooter() {
+/**
+ * `lang` is the page's language; `path` (the English path) is set on a page that exists in every language, and adds the
+ * language switcher.
+ */
+export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: string }) {
+  const t = siteText(lang).chrome;
+  const l = t.links;
   // The app (/app/) and the dashboard (/me/) are big client-only pages: never prefetch their code from a public page,
   // or every visitor downloads it whether they open it or not.
   const col = (title: string, links: { href: string; label: string }[]) => (
@@ -122,59 +140,89 @@ export function SiteFooter() {
         <div>
           <p className="text-lg font-bold">{BRAND.name}</p>
           <p className="mt-2 max-w-sm text-sm text-muted">
-            {BRAND.tagline} Adaptive strength training for Android, iPhone and the web. No ads, ever.
+            {t.tagline} {t.footerBlurb}
           </p>
-          <StoreBadges className="mt-4" webLink={false} place="footer" />
+          <StoreBadges className="mt-4" webLink={false} place="footer" lang={lang} />
         </div>
-        {col("Product", [
-          { href: APP_PATH, label: "Open the app" },
-          { href: "/features/", label: "Features" },
-          { href: "/apps/", label: "Who it's for" },
-          { href: "/pricing/", label: "Pricing" },
-          { href: "/whats-new/", label: "What's new" },
-          { href: "/me/", label: "Your dashboard" },
+        {col(t.cols.product, [
+          { href: APP_PATH, label: l.openApp },
+          { href: "/features/", label: l.features },
+          { href: "/apps/", label: l.whoFor },
+          { href: localPath(lang, "/pricing/"), label: l.pricing },
+          { href: "/whats-new/", label: l.whatsNew },
+          { href: "/me/", label: l.dashboard },
         ])}
-        {col("Learn", [
-          { href: "/exercises/", label: "Exercise library" },
-          { href: "/muscles/", label: "Exercises by muscle" },
-          { href: "/equipment/", label: "Exercises by equipment" },
-          { href: "/guides/", label: "Training guides" },
-          { href: "/blog/", label: "Blog" },
+        {col(t.cols.learn, [
+          { href: "/exercises/", label: l.exercises },
+          { href: "/muscles/", label: l.muscles },
+          { href: "/equipment/", label: l.equipment },
+          { href: "/guides/", label: l.guides },
+          { href: "/blog/", label: l.blog },
         ])}
-        {col("Tools", [
-          { href: "/tools/plate-calculator/", label: "Plate calculator" },
-          { href: "/tools/one-rep-max-calculator/", label: "One-rep max calculator" },
-          { href: "/tools/warm-up-calculator/", label: "Warm-up calculator" },
-          { href: "/tools/rpe-chart/", label: "RPE chart" },
-          { href: "/tools/strength-standards/", label: "Strength standards" },
-          { href: "/tools/dots-calculator/", label: "DOTS calculator" },
-          { href: "/tools/tdee-calculator/", label: "TDEE calculator" },
+        {col(t.cols.tools, [
+          { href: "/tools/plate-calculator/", label: l.plates },
+          { href: "/tools/one-rep-max-calculator/", label: l.oneRm },
+          { href: "/tools/warm-up-calculator/", label: l.warmUp },
+          { href: "/tools/rpe-chart/", label: l.rpe },
+          { href: "/tools/strength-standards/", label: l.standards },
+          { href: "/tools/dots-calculator/", label: l.dots },
+          { href: "/tools/tdee-calculator/", label: l.tdee },
         ])}
-        {col("Support", [
-          { href: "/help/", label: "Help and questions" },
-          { href: "/contact/", label: "Contact us" },
-          { href: "/status/", label: "Service status" },
-          { href: "/delete-account/", label: "Delete your account" },
+        {col(t.cols.support, [
+          { href: "/help/", label: l.help },
+          { href: "/contact/", label: l.contact },
+          { href: "/status/", label: l.status },
+          { href: "/delete-account/", label: l.deleteAccount },
         ])}
-        {col("Company", [
-          { href: "/about/", label: "About us" },
-          { href: "/compare/", label: "Compare apps" },
-          { href: "/import/strong/", label: "Switch from Strong" },
-          { href: "/import/hevy/", label: "Switch from Hevy" },
-          { href: "/privacy/", label: "Privacy" },
-          { href: "/terms/", label: "Terms of use" },
-          { href: "/trust/", label: "Trust centre" },
-          { href: "/accessibility/", label: "Accessibility" },
+        {col(t.cols.company, [
+          { href: "/about/", label: l.about },
+          { href: "/compare/", label: l.compare },
+          { href: "/import/strong/", label: l.fromStrong },
+          { href: "/import/hevy/", label: l.fromHevy },
+          { href: "/privacy/", label: l.privacy },
+          { href: "/terms/", label: l.terms },
+          { href: "/trust/", label: l.trust },
+          { href: "/accessibility/", label: l.accessibility },
         ])}
       </div>
+      {path && <LanguageSwitcher lang={lang} path={path} label={t.language} />}
       <div className="mx-auto max-w-6xl space-y-1 px-4 pb-8 text-xs text-faint">
         <p>
           © {new Date().getFullYear()} {BRAND.name} · <BuildStamp />
         </p>
         {/* The store badge guidelines ask for this credit wherever the badges appear. */}
-        <p>Google Play is a trademark of Google LLC. Apple and App Store are trademarks of Apple Inc.</p>
+        <p>{t.trademarks}</p>
       </div>
     </footer>
+  );
+}
+
+/** Links to the same page in every language, each named in its own language. */
+function LanguageSwitcher({ lang, path, label }: { lang: SiteLang; path: string; label: string }) {
+  return (
+    <nav aria-label={label} className="mx-auto max-w-6xl px-4 pb-6">
+      <ul className="flex flex-wrap items-center gap-x-1 gap-y-1 text-sm">
+        <li aria-hidden className="mr-1 text-muted">
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M3 12h18M12 3c2.5 2.7 3.6 5.7 3.6 9s-1.1 6.3-3.6 9c-2.5-2.7-3.6-5.7-3.6-9S9.5 5.7 12 3z" />
+          </svg>
+        </li>
+        {SITE_LANGS.map((l) => (
+          <li key={l}>
+            <Link
+              href={localPath(l, path)}
+              hrefLang={l}
+              lang={l}
+              aria-current={l === lang ? "page" : undefined}
+              className={`inline-flex min-h-11 items-center rounded-lg px-2.5 hover:bg-surface ${l === lang ? "font-semibold text-ink" : "text-muted hover:text-ink"}`}
+            >
+              {SITE_LANG_NAME[l]}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -184,8 +232,8 @@ export interface Crumb {
 }
 
 /** Breadcrumbs plus their BreadcrumbList data. The last crumb is the current page. */
-export function Crumbs({ items }: { items: Crumb[] }) {
-  const all: Crumb[] = [{ href: "/", label: BRAND.name }, ...items];
+export function Crumbs({ items, lang = "en" }: { items: Crumb[]; lang?: SiteLang }) {
+  const all: Crumb[] = [{ href: localPath(lang, "/"), label: BRAND.name }, ...items];
   const data = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -199,7 +247,7 @@ export function Crumbs({ items }: { items: Crumb[] }) {
   return (
     <>
       <JsonLd data={data} />
-      <nav className="text-sm text-muted" aria-label="Breadcrumb">
+      <nav className="text-sm text-muted" aria-label={siteText(lang).chrome.breadcrumb}>
         <ol className="flex flex-wrap gap-x-1.5">
           {all.map((c, i) => (
             <li key={i} className="flex gap-x-1.5">
@@ -220,7 +268,7 @@ export function Crumbs({ items }: { items: Crumb[] }) {
 }
 
 /** The main button into the app. */
-export function CtaButton({ cta, children = "Start free", big }: { cta: string; children?: ReactNode; big?: boolean }) {
+export function CtaButton({ cta, children = siteText().chrome.startFree, big }: { cta: string; children?: ReactNode; big?: boolean }) {
   return (
     <Link
       href={APP_PATH}
@@ -238,28 +286,30 @@ export function CtaBanner({
   cta,
   title,
   body,
-  button = "Start free in your browser",
+  button,
+  lang = "en",
 }: {
   cta: string;
   title: string;
   body: string;
   button?: string;
+  lang?: SiteLang;
 }) {
+  const t = siteText(lang).chrome.banner;
   return (
-    <section className="card-tint mt-12 p-6 md:p-10" style={{ ["--tint" as string]: "var(--color-violet)" }} aria-label="Get the app">
+    <section className="card-tint mt-12 p-6 md:p-10" style={{ ["--tint" as string]: "var(--color-violet)" }} aria-label={t.label}>
       <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">{title}</h2>
       <p className="mt-3 max-w-2xl text-lg text-muted">{body}</p>
       <ul className="mt-4 grid gap-1.5 text-sm text-muted sm:grid-cols-2">
-        <li>✓ Free to start, no account needed</li>
-        <li>✓ Plans every set, rep and weight for you</li>
-        <li>✓ Works offline, on Android, iPhone and the web</li>
-        <li>✓ No ads, ever</li>
+        {t.points.map((p) => (
+          <li key={p}>✓ {p}</li>
+        ))}
       </ul>
       <div className="mt-6 flex flex-wrap items-center gap-4">
         <CtaButton cta={cta} big>
-          {button}
+          {button ?? t.button}
         </CtaButton>
-        <StoreBadges webLink={false} place={`${cta}-badges`} />
+        <StoreBadges webLink={false} place={`${cta}-badges`} lang={lang} />
       </div>
     </section>
   );
@@ -281,34 +331,65 @@ export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: s
 }
 
 /** A bar pinned to the bottom of the screen on phones, so the next step is always one tap away. */
-export function StickyCta({ cta, text = `Get your plan in ${BRAND.name}` }: { cta: string; text?: string }) {
+export function StickyCta({ cta, text, lang = "en" }: { cta: string; text?: string; lang?: SiteLang }) {
+  const t = siteText(lang).chrome;
   return (
     <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line/70 bg-bg/90 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-lg md:hidden">
       <div className="mx-auto flex max-w-xl items-center justify-between gap-3">
-        <p className="text-sm font-semibold">{text}</p>
+        <p className="text-sm font-semibold">{text ?? fill(t.sticky, { name: BRAND.name })}</p>
         <Link
           href={APP_PATH}
           prefetch={false}
           data-cta={cta}
           className="press btn-primary inline-flex min-h-11 shrink-0 items-center rounded-xl px-4 font-semibold"
         >
-          Start free
+          {t.startFree}
         </Link>
       </div>
     </div>
   );
 }
 
-/** Header, content, footer and the sticky bar. `kind` names the page type for the sticky bar's data-cta. */
-export function SitePage({ kind, children, sticky }: { kind: string; children: ReactNode; sticky?: string }) {
+/**
+ * Wraps a page that isn't in English in an element carrying its language, because the root layout's <html lang> is
+ * fixed at build time for the whole site. It also sets <html lang> once the page runs, so screen readers and the
+ * browser's translate offer read it right, and puts it back on the way out (DocLang).
+ */
+export function LangRoot({ lang, children }: { lang: SiteLang; children: ReactNode }) {
+  if (lang === "en") return <>{children}</>;
   return (
-    <>
-      <SiteHeader />
+    <div lang={lang}>
+      <DocLang lang={lang} />
+      {children}
+    </div>
+  );
+}
+
+/**
+ * Header, content, footer and the sticky bar. `kind` names the page type for the sticky bar's data-cta. `lang` and
+ * `path` (the English path) are for pages that exist in every language.
+ */
+export function SitePage({
+  kind,
+  children,
+  sticky,
+  lang = "en",
+  path,
+}: {
+  kind: string;
+  children: ReactNode;
+  sticky?: string;
+  lang?: SiteLang;
+  path?: string;
+}) {
+  return (
+    <LangRoot lang={lang}>
+      <SiteHeader lang={lang} />
       <main className="mx-auto max-w-5xl px-4 pt-8 pb-28 md:pb-16">{children}</main>
-      <SiteFooter />
+      <SiteFooter lang={lang} path={path} />
       <div className="h-16 md:hidden" aria-hidden />
-      <StickyCta cta={`sticky-${kind}`} text={sticky} />
-    </>
+      <StickyCta cta={`sticky-${kind}`} text={sticky} lang={lang} />
+    </LangRoot>
   );
 }
 

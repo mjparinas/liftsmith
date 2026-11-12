@@ -31,6 +31,16 @@
                 <data android:scheme="liftsmith" />
             </intent-filter>
 
+            <!-- Android App Links: links into the web app on our domain (shared routines, remix links) open here
+                 (src/lib/appLinks.ts; verified by public/.well-known/assetlinks.json). www only: the bare domain
+                 redirects, and verification doesn't follow redirects. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="www.getliftsmith.com" android:pathPrefix="/app" />
+            </intent-filter>
+
         </activity>
 
         <!-- Earned app icons (src/lib/themes.ts): one launcher alias per icon, exactly one enabled (AppIconPlugin.java).
@@ -124,6 +134,15 @@
             </intent-filter>
         </service>
 
+        <!-- Friends push notifications (Firebase Cloud Messaging): the status bar icon and the "Friends" channel the
+             app creates (src/lib/push.ts), so a push that arrives while the app is closed looks like the app's own. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_stat_workout" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="friends" />
+
         <!-- Quick Settings tile: Start workout, or Log set while one is running. -->
         <service
             android:name=".WorkoutTileService"
@@ -174,7 +193,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps). -->
+    <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps), Bluetooth gym machines (FTMS) and smart scales (Weight Scale and Body Composition services) in Labs. -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
     <!-- Gym by location: approximate only, while the app is open (no background or precise location). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
