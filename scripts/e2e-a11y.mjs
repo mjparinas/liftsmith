@@ -108,17 +108,13 @@ try {
   await page.goto(`${server.url}/app/#/photos`);
   await page.getByRole("heading", { name: "Body and photos" }).waitFor();
   await scan("photos");
-  // The web dashboard and a share link, with the workout just saved.
-  await page.goto(`${server.url}/me/`);
-  await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Calendar", "Lifts", "History", "Awards", "Log a workout", "Share"]) {
-    await page.getByRole("link", { name: tab, exact: true }).click();
-    await scan(`dashboard ${tab}`);
-  }
-  const link = await page.getByLabel("Your link").inputValue();
-  await page.goto(link);
-  await page.getByRole("article", { name: "Shared training summary" }).waitFor();
-  await scan("shared summary");
+  // Log a past workout (moved from the retired /me/ dashboard), with an exercise added from the browser.
+  await page.goto(`${server.url}/me/#/log`);
+  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+  await page.getByRole("button", { name: "Add exercise" }).click();
+  await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
+  await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
+  await scan("log a past workout");
   await page.goto(`${server.url}/app/#/programs`);
   await page.getByRole("heading", { name: "Programs" }).waitFor();
   await scan("programs");
@@ -616,12 +612,9 @@ try {
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("light workout");
-  await page.goto(`${server.url}/me/`);
-  await page.getByRole("heading", { name: /training/ }).waitFor();
-  for (const tab of ["Overview", "Lifts"]) {
-    await page.getByRole("link", { name: tab, exact: true }).click();
-    await scan(`light dashboard ${tab}`);
-  }
+  await page.goto(`${server.url}/app/#/log`);
+  await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+  await scan("light log a past workout");
   // Accessibility settings: colour-blind safe colours and more contrast, in both themes.
   await page.goto(`${server.url}/app/#/settings/look`);
   await page.getByRole("group", { name: "Colours" }).getByRole("button", { name: "Colour-blind safe" }).click();

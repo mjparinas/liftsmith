@@ -29,7 +29,6 @@ export const de: SiteText = {
       coaches: "Für Coaches",
       pricing: "Preise",
       whatsNew: "Neuigkeiten",
-      dashboard: "Dein Dashboard",
       exercises: "Übungsbibliothek",
       muscles: "Übungen nach Muskel",
       equipment: "Übungen nach Ausrüstung",

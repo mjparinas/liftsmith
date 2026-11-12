@@ -1,22 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
+import { useEffect, useMemo, useSyncExternalStore } from "react";
 
 import { SCREEN_TITLE, SECTION_LABEL } from "@/components/titles";
 import { shareName } from "@/lib/achievements";
-import { track } from "@/lib/analytics";
 import { BRAND } from "@/lib/brand";
-import { decodeShare, encodeShare, SHARE_DAYS, shareCard, shareLevel, type ShareCard } from "@/lib/dashboard";
-import { weekOf, type Stats } from "@/lib/derive";
+import { decodeShare, SHARE_DAYS, shareLevel, type ShareCard } from "@/lib/dashboard";
+import { weekOf } from "@/lib/derive";
 import { exerciseName } from "@/lib/game";
 import { date, readPhoneLanguage, t } from "@/lib/i18n";
-import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useLang } from "@/lib/useLang";
 
-// Sharing with friends, before accounts exist: the summary travels in the link's #fragment, which
-// browsers never send to a server, so nobody but the people given the link can read it.
+// A summary shared from the old /me/ dashboard, before accounts existed: it travels in the link's #fragment,
+// which browsers never send to a server. The dashboard is gone (docs/decisions/desktop-layout.md), so no new
+// links are made; this page keeps the ones already sent working.
 
 /** Names for trophy ids in links made before achievements. */
 const TROPHY_NAME: Record<string, string> = {
@@ -107,73 +106,6 @@ export function ShareView({ card }: { card: ShareCard }) {
         {t("share.made", { date: date(card.d0, { month: "short", day: "numeric", year: "numeric" }) })}
       </p>
     </article>
-  );
-}
-
-export function SharePanel({ events, stats, profile, now }: { events: AppEvent[]; stats: Stats; profile: Profile; now: number }) {
-  const [withName, setWithName] = useState(false);
-  const [note, setNote] = useState("");
-  const card = useMemo(() => shareCard(events, stats, profile, now, { name: withName }), [events, stats, profile, now, withName]);
-  const url = typeof location === "undefined" ? "" : `${location.origin}/share/#${encodeShare(card)}`;
-  const copy = async () => {
-    try {
-      await navigator.clipboard.writeText(url);
-      setNote(t("share.copied"));
-      track("feature", { name: "share_profile", detail: "copy" });
-    } catch {
-      setNote(t("share.copyFail"));
-    }
-  };
-  const share = async () => {
-    try {
-      await navigator.share({ title: t("share.myTraining", { brand: BRAND.name }), url });
-      track("feature", { name: "share_profile", detail: "native" });
-    } catch {
-      // Closed the share sheet: nothing to do.
-    }
-  };
-  return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-      <div>
-        <p className="text-muted">{t("share.intro")}</p>
-        <p className="mt-2 text-sm text-faint">{t("share.privacy")}</p>
-        <label className="mt-4 flex items-center gap-3">
-          <input
-            type="checkbox"
-            checked={withName}
-            onChange={(e) => setWithName(e.target.checked)}
-            className="h-5 w-5 accent-[var(--color-accent)]"
-            disabled={!profile.name.trim()}
-          />
-          <span>{profile.name.trim() ? t("share.withName", { name: profile.name.trim() }) : t("share.noName")}</span>
-        </label>
-        <label className="mt-4 block text-sm text-muted" htmlFor="share-url">
-          {t("share.yourLink")}
-        </label>
-        <input
-          id="share-url"
-          readOnly
-          value={url}
-          onFocus={(e) => e.currentTarget.select()}
-          className="card num mt-1 w-full px-3 py-2 text-sm"
-        />
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button type="button" onClick={() => void copy()} className="press rounded-2xl bg-accent px-5 py-3 font-semibold text-accent-ink">
-            {t("share.copy")}
-          </button>
-          {typeof navigator !== "undefined" && "share" in navigator && (
-            <button type="button" onClick={() => void share()} className="press rounded-2xl border border-line bg-raised px-5 py-3">
-              {t("share.share")}
-            </button>
-          )}
-        </div>
-        <p className="mt-2 min-h-5 text-sm text-good" aria-live="polite">
-          {note}
-        </p>
-        <p className="mt-4 text-sm text-faint">{t("share.friends")}</p>
-      </div>
-      <ShareView card={card} />
-    </div>
   );
 }
 

@@ -100,14 +100,14 @@ for (const { name } of pick()) {
       check(gap.start >= 0, `${name}: the tab bar covers Start workout by ${-gap.start}px`, fail);
     }
     await bar.evaluate((el) => el.remove());
-    await page.goto(`${server.url}/me/`);
-    await page.getByRole("heading", { name: /training/ }).waitFor();
-    for (const tab of ["Overview", "Calendar", "Lifts", "History", "Log a workout", "Share"]) {
-      await page.getByRole("link", { name: tab, exact: true }).click();
-      await noSideScroll(`dashboard ${tab}`);
-    }
-    await page.getByRole("link", { name: "Overview", exact: true }).click();
-    await page.screenshot({ path: `${OUT}/${tag}-dashboard.png` });
+    // The retired /me/ dashboard sends old links into the app; its Log a workout tab is a screen there now.
+    await page.goto(`${server.url}/me/#/log`);
+    await page.getByRole("heading", { name: "Log a past workout" }).waitFor();
+    await page.getByRole("button", { name: "Add exercise" }).click();
+    await page.getByRole("dialog").getByRole("button", { name: "Chest", exact: true }).click();
+    await page.getByRole("dialog").getByRole("button").filter({ hasText: /press/i }).first().click();
+    await noSideScroll("log a past workout");
+    await page.screenshot({ path: `${OUT}/${tag}-log-past.png` });
   } catch (e) {
     fail.push(`${name}: ${e}`);
   }

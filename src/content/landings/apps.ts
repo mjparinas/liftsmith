@@ -44,7 +44,7 @@ export const LANDINGS_APPS: Landing[] = [
       {
         h2: "Your history, your data",
         p: [
-          "Everything works offline with no account. Sign in to sync between your phone, tablet and the [web dashboard](/me/). Export a CSV or a full backup any time, and bring your history in from another tracker's CSV export ([see how to switch](/compare/)).",
+          "Everything works offline with no account. Sign in to sync between your phone, tablet and the [web app](/app/). Export a CSV or a full backup any time, and bring your history in from another tracker's CSV export ([see how to switch](/compare/)).",
         ],
       },
     ],

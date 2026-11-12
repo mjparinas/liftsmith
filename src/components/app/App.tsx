@@ -50,6 +50,7 @@ import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
+import { LogPast } from "./LogPast";
 import { Onboarding } from "./Onboarding";
 import { Photos } from "./Photos";
 import { Pro } from "./Pro";
@@ -399,6 +400,7 @@ export function App() {
     trainer: <Trainer arg={arg} />,
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
+    log: <LogPast />,
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);

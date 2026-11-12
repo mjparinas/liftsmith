@@ -29,7 +29,6 @@ export const fr: SiteText = {
       coaches: "Pour les coachs",
       pricing: "Tarifs",
       whatsNew: "Nouveautés",
-      dashboard: "Votre tableau de bord",
       exercises: "Bibliothèque d’exercices",
       muscles: "Exercices par muscle",
       equipment: "Exercices par matériel",

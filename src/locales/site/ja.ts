@@ -30,7 +30,6 @@ export const ja: SiteText = {
       coaches: "コーチの方へ",
       pricing: "料金",
       whatsNew: "最新情報",
-      dashboard: "ダッシュボード",
       exercises: "種目ライブラリ",
       muscles: "部位別の種目",
       equipment: "器具別の種目",
