@@ -1,7 +1,7 @@
 // Find a gym near you (src/server/gymDirectory.ts, docs/decisions/gym-sharing.md). Server build only.
 // GET ?lat=&lon=[&studios=1]: real gyms (gymPlaces.ts, official ones first) and listed setups near a position the
 // app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
-// POST {op}: publish, unpublish, mine, the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release) and
+// POST {op}: publish, unpublish, mine, suggest (add a gym the map doesn't have), the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release) and
 // the poster ops (posters, posterStatus)
 // need a signed-in account; added and report work signed out too.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
@@ -9,7 +9,7 @@ import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
-import { joinPlace, nearbyPlaces, placeById } from "@/server/gymPlaces";
+import { joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
 
 export const OPTIONS = preflight;
@@ -62,6 +62,12 @@ export async function POST(req: Request) {
       return reply(req, 200, { ok: true });
     case "mine":
       return reply(req, 200, { gyms: await mine(s.accountId) });
+    // A gym the map doesn't have, checked by staff before it shows (gymPlaces.ts suggestPlace).
+    case "suggest": {
+      const r = await suggestPlace(s.accountId, b);
+      if (r.ok) return reply(req, 200, r);
+      return reply(req, r.error === "slow" ? 429 : r.error === "exists" ? 409 : 400, { error: r.error });
+    }
     // Claiming a gym and keeping its details (src/server/gymClaims.ts, docs/decisions/gyms.md step 3).
     case "claimStart": {
       const r = await startClaim(s.accountId, b, resendMail());

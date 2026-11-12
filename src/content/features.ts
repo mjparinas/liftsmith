@@ -440,7 +440,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym.",
+        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym. Missing a gym? Add it.",
         tier: "free",
         added: "2026-11-12",
       },

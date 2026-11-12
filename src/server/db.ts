@@ -840,6 +840,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
   ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
+  // A gym a lifter added (gymPlaces.ts suggestPlace): who, and whether it still waits for staff.
+  ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

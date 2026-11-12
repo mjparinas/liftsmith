@@ -191,6 +191,24 @@ export const en = {
   "gym.edit.standAsked": "We’ve got your request. We’ll print your stand and mail it soon.",
   "gym.edit.standShipped": "Your stand is in the mail.",
   "gym.edit.standErr": "That address doesn’t look complete.",
+  "gym.new.link": "Can't find your gym? Add it",
+  "gym.new.title": "Add a gym",
+  "gym.new.why":
+    "Tell us the gym's name and address. We find it on the map and check it, usually within a day. Then anyone can find it and add it.",
+  "gym.new.name": "Gym name",
+  "gym.new.address": "Street address",
+  "gym.new.city": "City, and province or state",
+  "gym.new.send": "Add this gym",
+  "gym.new.signInTitle": "Sign in to add a gym",
+  "gym.new.signIn": "Adding a gym needs an account, so the gym list stays free of spam.",
+  "gym.new.doneTitle": "Thanks, we'll check it",
+  "gym.new.doneBody":
+    "{name} shows in Find gyms near you once we've checked it, usually within a day. If it's your gym, you can claim it then.",
+  "gym.new.err.name": "Type the gym's name.",
+  "gym.new.err.address": "Type the street address and the city.",
+  "gym.new.err.where": "We couldn't find that address on the map. Check the spelling, or add the province or state.",
+  "gym.new.err.exists": "That gym is already on Liftsmith, or waiting for us to check it. Try Find gyms near you.",
+  "gym.new.err.slow": "You've added a few gyms today. Try again tomorrow.",
 } as const;
 
 type Key = keyof typeof en;
@@ -387,6 +405,24 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.edit.standAsked": "Hemos recibido tu pedido. Lo imprimimos y te lo enviamos pronto.",
   "gym.edit.standShipped": "Tu expositor ya está en camino.",
   "gym.edit.standErr": "Esa dirección no parece completa.",
+  "gym.new.link": "¿No encuentras tu gimnasio? Añádelo",
+  "gym.new.title": "Añadir un gimnasio",
+  "gym.new.why":
+    "Dinos el nombre y la dirección del gimnasio. Lo buscamos en el mapa y lo revisamos, normalmente en un día. Después cualquiera podrá encontrarlo y añadirlo.",
+  "gym.new.name": "Nombre del gimnasio",
+  "gym.new.address": "Dirección",
+  "gym.new.city": "Ciudad y provincia o estado",
+  "gym.new.send": "Añadir este gimnasio",
+  "gym.new.signInTitle": "Inicia sesión para añadir un gimnasio",
+  "gym.new.signIn": "Para añadir un gimnasio necesitas una cuenta; así la lista se mantiene libre de spam.",
+  "gym.new.doneTitle": "Gracias, lo revisaremos",
+  "gym.new.doneBody":
+    "{name} aparecerá en Buscar gimnasios cerca cuando lo hayamos revisado, normalmente en un día. Si es tu gimnasio, podrás reclamarlo entonces.",
+  "gym.new.err.name": "Escribe el nombre del gimnasio.",
+  "gym.new.err.address": "Escribe la dirección y la ciudad.",
+  "gym.new.err.where": "No encontramos esa dirección en el mapa. Revisa cómo está escrita o añade la provincia o el estado.",
+  "gym.new.err.exists": "Ese gimnasio ya está en Liftsmith o pendiente de revisión. Prueba con Buscar gimnasios cerca.",
+  "gym.new.err.slow": "Hoy ya has añadido varios gimnasios. Vuelve a intentarlo mañana.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -588,6 +624,24 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.edit.standAsked": "Nous avons reçu votre demande. Nous l’imprimons et la postons bientôt.",
   "gym.edit.standShipped": "Votre présentoir est à la poste.",
   "gym.edit.standErr": "Cette adresse semble incomplète.",
+  "gym.new.link": "Votre salle n'y est pas ? Ajoutez-la",
+  "gym.new.title": "Ajouter une salle",
+  "gym.new.why":
+    "Indiquez le nom et l'adresse de la salle. Nous la trouvons sur la carte et la vérifions, en général sous un jour. Ensuite, tout le monde peut la trouver et l'ajouter.",
+  "gym.new.name": "Nom de la salle",
+  "gym.new.address": "Adresse",
+  "gym.new.city": "Ville, et province ou État",
+  "gym.new.send": "Ajouter cette salle",
+  "gym.new.signInTitle": "Connectez-vous pour ajouter une salle",
+  "gym.new.signIn": "Ajouter une salle demande un compte, pour garder la liste sans spam.",
+  "gym.new.doneTitle": "Merci, nous allons la vérifier",
+  "gym.new.doneBody":
+    "{name} apparaîtra dans Trouver des salles à proximité une fois vérifiée, en général sous un jour. Si c'est votre salle, vous pourrez alors la revendiquer.",
+  "gym.new.err.name": "Saisissez le nom de la salle.",
+  "gym.new.err.address": "Saisissez l'adresse et la ville.",
+  "gym.new.err.where": "Cette adresse est introuvable sur la carte. Vérifiez l'orthographe ou ajoutez la province ou l'État.",
+  "gym.new.err.exists": "Cette salle est déjà sur Liftsmith, ou en attente de vérification. Essayez Trouver des salles à proximité.",
+  "gym.new.err.slow": "Vous avez déjà ajouté plusieurs salles aujourd'hui. Réessayez demain.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -790,6 +844,25 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.edit.standAsked": "Deine Anfrage ist da. Wir drucken den Aufsteller und schicken ihn bald los.",
   "gym.edit.standShipped": "Dein Aufsteller ist unterwegs.",
   "gym.edit.standErr": "Die Anschrift scheint unvollständig.",
+  "gym.new.link": "Dein Studio fehlt? Füge es hinzu",
+  "gym.new.title": "Studio hinzufügen",
+  "gym.new.why":
+    "Nenne uns Name und Adresse des Studios. Wir suchen es auf der Karte und prüfen es, meist innerhalb eines Tages. Danach kann es jeder finden und hinzufügen.",
+  "gym.new.name": "Name des Studios",
+  "gym.new.address": "Straße und Hausnummer",
+  "gym.new.city": "Stadt und Bundesland",
+  "gym.new.send": "Studio hinzufügen",
+  "gym.new.signInTitle": "Melde dich an, um ein Studio hinzuzufügen",
+  "gym.new.signIn": "Zum Hinzufügen brauchst du ein Konto, damit die Liste frei von Spam bleibt.",
+  "gym.new.doneTitle": "Danke, wir prüfen es",
+  "gym.new.doneBody":
+    "{name} erscheint unter „Studios in der Nähe finden“, sobald wir es geprüft haben, meist innerhalb eines Tages. Ist es dein Studio, kannst du es dann beanspruchen.",
+  "gym.new.err.name": "Gib den Namen des Studios ein.",
+  "gym.new.err.address": "Gib Straße und Stadt ein.",
+  "gym.new.err.where": "Diese Adresse haben wir auf der Karte nicht gefunden. Prüfe die Schreibweise oder ergänze das Bundesland.",
+  "gym.new.err.exists":
+    "Dieses Studio ist schon bei Liftsmith oder wartet auf unsere Prüfung. Versuch es mit „Studios in der Nähe finden“.",
+  "gym.new.err.slow": "Du hast heute schon einige Studios hinzugefügt. Versuch es morgen wieder.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -987,6 +1060,24 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.edit.standAsked": "Abbiamo ricevuto la richiesta. Lo stampiamo e lo spediamo presto.",
   "gym.edit.standShipped": "Il tuo espositore è in viaggio.",
   "gym.edit.standErr": "L’indirizzo non sembra completo.",
+  "gym.new.link": "Non trovi la tua palestra? Aggiungila",
+  "gym.new.title": "Aggiungi una palestra",
+  "gym.new.why":
+    "Dicci nome e indirizzo della palestra. La troviamo sulla mappa e la controlliamo, di solito entro un giorno. Poi chiunque potrà trovarla e aggiungerla.",
+  "gym.new.name": "Nome della palestra",
+  "gym.new.address": "Indirizzo",
+  "gym.new.city": "Città e provincia o stato",
+  "gym.new.send": "Aggiungi questa palestra",
+  "gym.new.signInTitle": "Accedi per aggiungere una palestra",
+  "gym.new.signIn": "Per aggiungere una palestra serve un account, così l'elenco resta senza spam.",
+  "gym.new.doneTitle": "Grazie, la controlleremo",
+  "gym.new.doneBody":
+    "{name} comparirà in Trova palestre vicine dopo il nostro controllo, di solito entro un giorno. Se è la tua palestra, potrai rivendicarla allora.",
+  "gym.new.err.name": "Scrivi il nome della palestra.",
+  "gym.new.err.address": "Scrivi l'indirizzo e la città.",
+  "gym.new.err.where": "Non troviamo quell'indirizzo sulla mappa. Controlla come è scritto o aggiungi la provincia o lo stato.",
+  "gym.new.err.exists": "Quella palestra è già su Liftsmith o in attesa del nostro controllo. Prova con Trova palestre vicine.",
+  "gym.new.err.slow": "Oggi hai già aggiunto diverse palestre. Riprova domani.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1175,4 +1266,20 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.edit.standAsked": "ご依頼を受け付けました。印刷してまもなく発送します。",
   "gym.edit.standShipped": "スタンドを発送しました。",
   "gym.edit.standErr": "住所が不完全なようです。",
+  "gym.new.link": "ジムが見つからない場合は追加",
+  "gym.new.title": "ジムを追加",
+  "gym.new.why": "ジムの名前と住所を教えてください。地図で場所を確認し、通常1日以内にチェックします。その後は誰でも見つけて追加できます。",
+  "gym.new.name": "ジム名",
+  "gym.new.address": "番地・通り",
+  "gym.new.city": "市区町村と都道府県（州）",
+  "gym.new.send": "このジムを追加",
+  "gym.new.signInTitle": "ジムを追加するにはサインイン",
+  "gym.new.signIn": "スパムを防ぐため、ジムの追加にはアカウントが必要です。",
+  "gym.new.doneTitle": "ありがとうございます。確認します",
+  "gym.new.doneBody": "{name}は確認後（通常1日以内）に「近くのジムを探す」に表示されます。あなたのジムなら、その後に登録申請できます。",
+  "gym.new.err.name": "ジム名を入力してください。",
+  "gym.new.err.address": "住所と市区町村を入力してください。",
+  "gym.new.err.where": "その住所が地図で見つかりませんでした。表記を確認するか、都道府県（州）を加えてください。",
+  "gym.new.err.exists": "そのジムはすでにLiftsmithにあるか、確認待ちです。「近くのジムを探す」をお試しください。",
+  "gym.new.err.slow": "今日はすでにいくつかジムを追加しています。明日もう一度お試しください。",
 };

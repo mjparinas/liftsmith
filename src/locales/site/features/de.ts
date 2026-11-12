@@ -245,7 +245,7 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen.",
+      body: "Finde Studios in deiner Nähe, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen. Ein Studio fehlt? Füge es hinzu.",
     },
     "buy-next": {
       name: "Was du als Nächstes kaufst",

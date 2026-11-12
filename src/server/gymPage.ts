@@ -219,9 +219,12 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     [city, null],
   ])}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
-${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${credit}</main>`;
+${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
 }
+
+/** "Gym not listed? Add it in the app": the app's add form (GymAdd.tsx), which staff check. */
+const missing = (lang: MsgLang) => `<p><a class="quiet" href="/app/#/gymadd">${esc(say(lang, "gp.missing"))} ›</a></p>`;
 
 // --- Every city ---
 
@@ -240,7 +243,7 @@ export function indexHtml(list: City[], lang: MsgLang): string {
     .join("");
   const body = `<main id="main" class="wrap page narrow">
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.indexTitle"))}</h1><p class="muted">${esc(say(lang, "gp.indexBody"))}</p></header>
-${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
+${list.length ? `<section class="card"><ul class="list">${items}</ul></section>` : ""}${missing(lang)}<p class="credit">${esc(say(lang, "gp.osm"))}</p></main>`;
   return framePage(lang, title, metaTags(title, desc, "/gyms/", ld), body, GYM_STYLE, "gym");
 }
 

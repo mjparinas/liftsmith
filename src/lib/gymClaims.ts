@@ -136,3 +136,17 @@ export function siteDomain(website: string): string | null {
     return null;
   }
 }
+
+/**
+ * Adds a gym the map doesn't have (server: suggestPlace in gymPlaces.ts). Staff check it before it shows. Errors:
+ * name, address, where (not found on the map), exists, slow, words, link, offline, signedOut, failed.
+ */
+export async function suggestGym(body: { name: string; address: string; city: string }): Promise<{ place: string } | { error: string }> {
+  const t = token();
+  if (!t) return { error: "signedOut" };
+  try {
+    return await api<{ place: string }>("/api/gyms/", { token: t, body: { op: "suggest", ...body } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}

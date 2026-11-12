@@ -241,7 +241,7 @@ export const es: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador y páginas de gimnasios",
-      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio.",
+      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio. ¿Falta un gimnasio? Añádelo.",
     },
     "buy-next": {
       name: "Qué comprar después",

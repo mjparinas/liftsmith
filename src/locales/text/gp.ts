@@ -74,6 +74,7 @@ export const en = {
   "gp.posterTitle": "Work here?",
   "gp.posterBody": "Print a free poster and table stand card so lifters can add this gym with one scan.",
   "gp.posterLink": "Print a free poster",
+  "gp.missing": "Gym not listed? Add it in the app",
 } as const;
 
 type Key = keyof typeof en;
@@ -151,6 +152,7 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.posterBody":
     "Imprime gratis un póster y una tarjeta para el expositor de mesa, para que la gente añada este gimnasio con un escaneo.",
   "gp.posterLink": "Imprimir un póster gratis",
+  "gp.missing": "¿Falta un gimnasio? Añádelo en la app",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -227,6 +229,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.posterTitle": "Vous travaillez ici ?",
   "gp.posterBody": "Imprimez gratuitement une affiche et une carte de présentoir pour que les gens ajoutent cette salle en un scan.",
   "gp.posterLink": "Imprimer une affiche gratuite",
+  "gp.missing": "Une salle manque ? Ajoutez-la dans l'app",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -304,6 +307,7 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.posterBody":
     "Drucke kostenlos ein Poster und eine Karte für den Tischaufsteller, damit Trainierende dieses Studio mit einem Scan hinzufügen.",
   "gp.posterLink": "Kostenloses Poster drucken",
+  "gp.missing": "Studio fehlt? Füge es in der App hinzu",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -379,6 +383,7 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.posterBody":
     "Stampa gratis un poster e una scheda per l’espositore da tavolo, così chi si allena aggiunge questa palestra con una scansione.",
   "gp.posterLink": "Stampa un poster gratis",
+  "gp.missing": "Manca una palestra? Aggiungila nell'app",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -451,4 +456,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.posterTitle": "ここで働いていますか？",
   "gp.posterBody": "無料のポスターと卓上スタンド用カードを印刷すれば、利用者はスキャンひとつでこのジムを追加できます。",
   "gp.posterLink": "無料ポスターを印刷",
+  "gp.missing": "ジムが載っていない場合はアプリで追加",
 };

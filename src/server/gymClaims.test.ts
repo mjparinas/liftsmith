@@ -39,8 +39,20 @@ beforeEach(async () => {
   await savePlaces(
     placesFromOsm(
       [
-        { type: "node", id: 1, lat: 49.1, lon: -122.6, tags: { name: "Iron Works", website: "https://www.ironworks.ca/langley" } },
-        { type: "node", id: 2, lat: 49.1, lon: -122.61, tags: { name: "Side Street Gym", website: "https://facebook.com/sidestreet" } },
+        {
+          type: "node",
+          id: 1,
+          lat: 49.1,
+          lon: -122.6,
+          tags: { leisure: "fitness_centre", name: "Iron Works", website: "https://www.ironworks.ca/langley" },
+        },
+        {
+          type: "node",
+          id: 2,
+          lat: 49.1,
+          lon: -122.61,
+          tags: { leisure: "fitness_centre", name: "Side Street Gym", website: "https://facebook.com/sidestreet" },
+        },
       ],
       { city: "Langley", region: "BC", country: "CA" },
     ),

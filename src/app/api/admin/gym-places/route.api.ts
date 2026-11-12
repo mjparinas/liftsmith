@@ -1,19 +1,24 @@
-// GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page (staff). POST (admins, audited):
-// {action: "import", where: "Langley, BC"} seeds an area from OpenStreetMap; {id, action: hide | show | gym | studio | delete}
-// changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
+// GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page, and the gyms lifters added that
+// wait for a check (staff). ?cities=CA|US: the major cities to import in one go (majorCities.ts). POST (admins, audited):
+// {action: "import", where: "Langley, BC"} seeds an area from OpenStreetMap; {id, action: hide | show | gym | studio |
+// delete | approve | reject} changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
 import { audit, json, requireStaff } from "@/server/adminAuth";
 import { readBody } from "@/server/adminBody";
-import { actOnPlace, adminPlaces, importArea } from "@/server/gymPlaces";
+import { actOnPlace, adminPlaces, importArea, pendingPlaces } from "@/server/gymPlaces";
+import { isImportCountry, MAJOR_CITIES } from "@/server/majorCities";
 
 export const dynamic = "force-dynamic";
-// An OpenStreetMap import can take a while on a busy map server.
-export const maxDuration = 120;
+// An OpenStreetMap import of a big city can take a few minutes on a busy map server.
+export const maxDuration = 300;
 
 export async function GET(req: Request) {
   const gate = await requireStaff(req);
   if ("response" in gate) return gate.response;
   const u = new URL(req.url).searchParams;
-  return json(200, await adminPlaces(u.get("q"), u.get("page")));
+  const country = u.get("cities");
+  if (country !== null) return isImportCountry(country) ? json(200, { cities: MAJOR_CITIES[country] }) : json(400, { error: "CA or US." });
+  const [list, pending] = await Promise.all([adminPlaces(u.get("q"), u.get("page")), pendingPlaces()]);
+  return json(200, { ...list, pending });
 }
 
 export async function POST(req: Request) {
