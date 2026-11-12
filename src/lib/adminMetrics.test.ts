@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  biggestDrop,
   computeMetrics,
   mrrAt,
   replaySubs,
@@ -186,11 +187,39 @@ describe("admin metrics", () => {
       install({ firstSeen: NOW - 40 * DAY }), // the period before
     ];
     const m = computeMetrics(input({ installs }));
-    expect(m.funnel.map((s) => s.n)).toEqual([4, 3, 2, 1, 1, 0, 0]);
+    expect(m.funnel.map((s) => s.n)).toEqual([4, 3, 2, 1]);
+    expect(m.moneyFunnel.map((s) => s.n)).toEqual([4, 1, 0, 0]);
     expect(m.siteFunnel.map((s) => s.n)).toEqual([100, 20, 0]);
     expect(m.overview.installs).toBe(4);
     expect(m.overview.prevInstalls).toBe(1);
     expect(m.overview.setupRate).toBe(0.75);
+  });
+
+  it("nests every funnel step inside the one before, so no step is over 100% of it", () => {
+    // Saw the paywall without finishing setup: counted in the paying chain, not as a second-workout lifter.
+    const installs = [install({ paywall: NOW - 8 * DAY }), install({ onboarded: NOW - 9 * DAY, workouts: 2 })];
+    const m = computeMetrics(input({ installs }));
+    expect(m.funnel.map((s) => s.n)).toEqual([2, 1, 0, 0]);
+    expect(m.moneyFunnel.map((s) => s.n)).toEqual([2, 1, 0, 0]);
+    for (const f of [m.funnel, m.moneyFunnel]) for (let i = 1; i < f.length; i++) expect(f[i]!.n).toBeLessThanOrEqual(f[i - 1]!.n);
+  });
+
+  it("finds the step that loses the most, ignoring steps too small to say", () => {
+    const steps = [
+      { key: "Installed", n: 100 },
+      { key: "Setup", n: 80 },
+      { key: "Workout", n: 10 },
+      { key: "Two", n: 4 },
+      { key: "Three", n: 0 },
+    ];
+    expect(biggestDrop(steps)).toEqual({ from: "Setup", to: "Workout", kept: 0.125 });
+    expect(biggestDrop(steps.slice(0, 2), 200)).toBeNull();
+    expect(
+      biggestDrop([
+        { key: "a", n: 10 },
+        { key: "b", n: 10 },
+      ]),
+    ).toBeNull();
   });
 
   it("splits ended trials by what happened in them: training, and seeing what Pro did", () => {

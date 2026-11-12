@@ -12,6 +12,7 @@ import { ago } from "./time";
 
 const KIND_LABEL: Record<TodoKind, string> = {
   inbox: "Inbox",
+  reports: "Reports",
   creator: "Codes",
   billing: "Billing",
   job: "System",
