@@ -1,5 +1,6 @@
 import { EXERCISES } from "../exercises";
 import type { Muscle } from "../types";
+import { withGear } from "./equipmentMotion";
 import {
   add,
   ANKLE_H,
@@ -24,6 +25,7 @@ import {
   type Vec,
 } from "./rig";
 import { tempoPhases } from "./tempoMotion";
+import { withVariant } from "./variantMotion";
 
 // One motion per exercise in the library. Motions are built from a few families (squat, hinge,
 // press, bench, row, pull, curl, push-up, ...) with parameters, so the same family covers its
@@ -3683,8 +3685,10 @@ export function motionFor(id?: string | null): Motion {
     if (key === "__stand") m = stand();
     else {
       const base = MOTIONS[key]();
-      // tempo and paused lifts play their own tempo, so they don't look like the plain lift (tempoMotion.ts)
-      m = { ...base, phases: tempoPhases(key, base.phases) };
+      // tempo and paused lifts play their own tempo (tempoMotion.ts), and every lift holds its own gear
+      // (equipmentMotion.ts), so a swap to a cousin never looks like nothing happened
+      const e = EXERCISES.find((x) => x.id === key);
+      m = withGear(key, withVariant(key, { ...base, phases: tempoPhases(key, base.phases) }, e?.pattern));
     }
     cache.set(key, m);
   }
