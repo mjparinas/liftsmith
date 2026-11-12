@@ -307,6 +307,7 @@ try {
       unread: 2,
     },
     feed: { posts: [friendsPost], more: false },
+    clubFeed: { posts: [friendsPost], more: false },
     person: { posts: [friendsPost], more: false },
     thread: {
       post: friendsPost,
@@ -379,6 +380,7 @@ try {
         mine: true,
         code: "ABCD2345",
         owner: { handle: "alex", name: "Alex" },
+        goal: { metric: "workouts", target: 9 },
         rows: [
           { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
           { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
@@ -481,7 +483,15 @@ try {
   await scan("friends clubs");
   await page.getByRole("button", { name: /Iron Barn crew/ }).click();
   await page.getByRole("button", { name: "Invite to the club" }).waitFor();
+  await page.getByText("This week as a crew: 9 workouts").waitFor();
   await scan("friends club");
+  await page.getByRole("button", { name: "Change goal" }).click();
+  await page.getByRole("button", { name: "Save goal" }).waitFor();
+  await scan("friends club goal");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Posts" }).click();
+  await page.getByRole("article", { name: "Workout from Blair" }).last().waitFor();
+  await scan("friends club posts");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();

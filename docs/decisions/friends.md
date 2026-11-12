@@ -158,6 +158,13 @@ Melvin, 2026-11-12: "it should also show the celebration emoji animation on thei
 - Pure web code plus the existing push plumbing, so Android, iOS and the web app get it together.
 - Tests: `src/server/socialLive.test.ts` (off by default, mutual friends only, the 20-minute window, the end, blocks and suspension, the 5-second gap, emoji list, deletion) and `src/components/app/FriendsLive.test.tsx` (Training now, a cheer in one tap reaching the friend's workout screen, `liveNow`). The accessibility run scans the Feed with Training now.
 
+## Club feed and crew goals (gap list 2, item 6)
+
+- **Crew goal**: the club's starter can set one weekly goal for the whole crew (`clubs.goal_metric` and `goal_target`, through `clubManage` `{goal}`; `null` clears it): workouts, sets or minutes, picked with chips and a − / + target (no typing; it starts at about three workouts, 60 sets or 150 minutes for each member, `CLUB_GOAL`). Everyone's posted workouts that week add up, the same totals as the club's board. The card at the top of the club says the goal, a progress bar and the action: "4 workouts to go as a crew. You've put in 1 workout." Reached, it says so. Members who didn't start the club see it but can't change it.
+- **Club feed**: the club sheet switches between **This week** (the board) and **Posts** (`clubFeed` op): members' posts **that the reader could see anyway** (their own, a public profile's, or someone they follow, each by the post's audience), with blocked and muted people left out and only members able to read it. Joining a club never widens who sees a post; the board and the goal only use totals, as the join screen already says.
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/server/socialClub.test.ts` (who's in the feed, blocks and mutes, members only, the goal's rules) and a case in `Friends.test.tsx` (setting a goal with −, the crew's progress line, the Posts view). The accessibility run scans the club with its goal, the goal editor and the Posts view.
+
 ## Monthly challenges for everyone (gap list 2, item 7)
 
 - **One challenge a month, the same for every lifter** (`src/lib/monthly.ts`), so friends chase the same thing without anyone setting it up. The goal rotates by calendar month: 12 workouts, then 200 sets, then 600 minutes, sized so about three workouts a week finishes with a little to spare. Months are in the lifter's own time zone.

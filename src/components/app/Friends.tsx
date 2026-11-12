@@ -48,6 +48,7 @@ import {
   BOARD_METRICS,
   CHALLENGE_DAYS,
   cleanHandle,
+  CLUB_GOAL,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
@@ -58,6 +59,8 @@ import {
   type Challenge,
   type ChallengeDays,
   type ClubDetail,
+  type ClubGoal,
+  type ClubGoalMetric,
   type ClubPreview,
   type ClubSummary,
   type FeedPost,
@@ -75,7 +78,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
-import { useGame } from "./Achievements";
+import { Bar, useGame } from "./Achievements";
 import { Avatar } from "./AvatarFace";
 import { CommentsSheet, LikersSheet } from "./Comments";
 import { ago, clock, repsText, setText } from "./format";
@@ -85,7 +88,7 @@ import { Icon } from "./icons";
 import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
-import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
+import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
 
@@ -531,8 +534,8 @@ function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () =>
   );
 }
 
-/** A list of posts with comments and "Load more". `op` is feed or person. */
-function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; empty: ReactNode }) {
+/** A list of posts with comments and "Load more". `op` is feed, person (with `handle`) or clubFeed (with `club`). */
+function Posts({ op, handle, club, empty }: { op: "feed" | "person" | "clubFeed"; handle?: string; club?: string; empty: ReactNode }) {
   const [posts, setPosts] = useState<FeedPost[] | null>(null);
   const [more, setMore] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -541,7 +544,7 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
   const load = useCallback(
     async (before: number) => {
       try {
-        const r = await social<{ posts: FeedPost[]; more: boolean }>(op, { handle, before });
+        const r = await social<{ posts: FeedPost[]; more: boolean }>(op, { handle, id: club, before });
         setPosts((p) => [...(p ?? []), ...r.posts]);
         setMore(r.more);
         setNote(null);
@@ -550,11 +553,11 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
         setNote(socialError(e));
       }
     },
-    [op, handle],
+    [op, handle, club],
   );
   useEffect(() => {
     let live = true;
-    social<{ posts: FeedPost[]; more: boolean }>(op, { handle })
+    social<{ posts: FeedPost[]; more: boolean }>(op, { handle, id: club })
       .then((r) => {
         if (!live) return;
         setPosts(r.posts);
@@ -568,7 +571,7 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
     return () => {
       live = false;
     };
-  }, [op, handle]);
+  }, [op, handle, club]);
   const change = (id: string) => (p: FeedPost | null) => setPosts((ps) => (ps ?? []).flatMap((x) => (x.id !== id ? [x] : p ? [p] : [])));
   if (posts === null)
     return (
@@ -1710,6 +1713,7 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
   const unit = profile.unit;
   const [club, setClub] = useState<ClubDetail | null>(null);
   const [metric, setMetric] = useState<BoardMetric>("workouts");
+  const [view, setView] = useState<"week" | "posts">("week");
   const [reload, setReload] = useState(0);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
@@ -1776,36 +1780,56 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
             {t("friends.club.invite")}
           </Button>
           <p className="mt-1 px-1 text-xs text-muted">{t("friends.club.inviteHint", { code: club.code })}</p>
-          <p className={`mb-2 mt-5 ${SECTION_LABEL}`}>{t("friends.club.thisWeek")}</p>
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
-            {BOARD_METRICS.map((m) => (
-              <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
-                {t(METRIC_LABEL[m])}
-              </Chip>
-            ))}
+          <ClubGoalCard club={club} onSave={(goal) => void act({ goal }, "clubManage")} />
+          <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label={t("social.club.view")}>
+            <Chip active={view === "week"} onClick={() => setView("week")}>
+              {t("friends.club.thisWeek")}
+            </Chip>
+            <Chip active={view === "posts"} onClick={() => setView("posts")}>
+              {t("social.club.posts")}
+            </Chip>
           </div>
-          {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
-          <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.club.thisWeek")}>
-            {ranked.map((r) => (
-              <li key={r.handle} className={`flex items-center gap-3 px-4 py-2 ${r.me ? "bg-accent/10" : ""}`}>
-                <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
-                <Avatar name={r.name} avatar={r.avatar} size={32} />
-                <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
-                <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
-                {club.mine && !r.me && (
-                  <button
-                    type="button"
-                    aria-label={t("friends.club.remove", { name: r.name })}
-                    onClick={() => void act({ remove: r.handle }, "clubManage")}
-                    className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                  >
-                    <Icon name="trash" size={18} />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.hint")}</p>
+          {view === "posts" ? (
+            <div className="mt-3">
+              <Posts
+                op="clubFeed"
+                club={club.id}
+                empty={<EmptyState icon="people" title={t("social.club.postsNone")} body={t("social.club.postsHint")} />}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+                {BOARD_METRICS.map((m) => (
+                  <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
+                    {t(METRIC_LABEL[m])}
+                  </Chip>
+                ))}
+              </div>
+              {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
+              <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.club.thisWeek")}>
+                {ranked.map((r) => (
+                  <li key={r.handle} className={`flex items-center gap-3 px-4 py-2 ${r.me ? "bg-accent/10" : ""}`}>
+                    <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
+                    <Avatar name={r.name} avatar={r.avatar} size={32} />
+                    <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
+                    <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
+                    {club.mine && !r.me && (
+                      <button
+                        type="button"
+                        aria-label={t("friends.club.remove", { name: r.name })}
+                        onClick={() => void act({ remove: r.handle }, "clubManage")}
+                        className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+                      >
+                        <Icon name="trash" size={18} />
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.hint")}</p>
+            </>
+          )}
           <div className="mt-4 space-y-2">
             {club.mine && (
               <Button kind="ghost" className="w-full" onClick={() => void act({ newCode: true }, "clubManage")}>
@@ -1820,6 +1844,116 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
         </>
       )}
     </Sheet>
+  );
+}
+
+const GOAL_METRICS = Object.keys(CLUB_GOAL) as ClubGoalMetric[];
+const GOAL_UNIT: Record<ClubGoalMetric, MessageKey> = {
+  workouts: "month.unit.workouts",
+  sets: "month.unit.sets",
+  minutes: "month.unit.minutes",
+};
+const goalAmount = (metric: ClubGoalMetric, count: number) => t(GOAL_UNIT[metric], { count, n: fmtNum(count) });
+
+/**
+ * A club's crew goal for the week (gap list 2, item 6): everyone's posted workouts added up, with what's left and
+ * the lifter's own part. The starter sets it with a measure and a − / + target (no typing); others just see it.
+ */
+function ClubGoalCard({ club, onSave }: { club: ClubDetail; onSave: (goal: ClubGoal | null) => void }) {
+  const goal = club.goal ?? null;
+  const [editing, setEditing] = useState(false);
+  const [metric, setMetric] = useState<ClubGoalMetric>(goal?.metric ?? "workouts");
+  const [target, setTarget] = useState(goal?.target ?? Math.max(1, club.members) * CLUB_GOAL.workouts.each);
+  const pick = (m: ClubGoalMetric) => {
+    setMetric(m);
+    setTarget(goal?.metric === m ? goal.target : Math.max(1, club.members) * CLUB_GOAL[m].each);
+  };
+  if (editing && club.mine) {
+    const { step, max } = CLUB_GOAL[metric];
+    const bump = (dir: 1 | -1, size: 1 | 2 | 5) => {
+      const next = Math.max(step, Math.min(max, target + dir * size * step));
+      if (next === target) return false;
+      setTarget(next);
+      return true;
+    };
+    return (
+      <div className="card mt-4 p-4">
+        <p className={`mb-2 ${SECTION_LABEL}`}>{t("social.club.goal")}</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+          {GOAL_METRICS.map((m) => (
+            <Chip key={m} active={metric === m} onClick={() => pick(m)}>
+              {t(METRIC_LABEL[m])}
+            </Chip>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <Bump dir={-1} size="sm" label={t("social.club.target")} onStep={bump} />
+          <span className="num text-center font-semibold" aria-live="polite">
+            {goalAmount(metric, target)}
+          </span>
+          <Bump dir={1} size="sm" label={t("social.club.target")} onStep={bump} />
+        </div>
+        <p className="mt-2 text-xs text-muted">{t("social.club.goalHint")}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button
+            className="flex-1"
+            onClick={() => {
+              onSave({ metric, target });
+              setEditing(false);
+            }}
+          >
+            {t("social.club.goalSave")}
+          </Button>
+          {goal && (
+            <Button
+              kind="ghost"
+              onClick={() => {
+                onSave(null);
+                setEditing(false);
+              }}
+            >
+              {t("social.club.clearGoal")}
+            </Button>
+          )}
+          <Button kind="quiet" onClick={() => setEditing(false)}>
+            {t("social.club.cancel")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  if (!goal)
+    return club.mine ? (
+      <Button kind="ghost" icon="target" className="mt-3 w-full" onClick={() => setEditing(true)}>
+        {t("social.club.setGoal")}
+      </Button>
+    ) : null;
+  const total = club.rows.reduce((sum, r) => sum + r[goal.metric], 0);
+  const mine = club.rows.find((r) => r.me)?.[goal.metric] ?? 0;
+  const left = Math.max(0, goal.target - total);
+  const title = t("social.club.goalTitle", { amount: goalAmount(goal.metric, goal.target) });
+  return (
+    <div className="card-tint mt-4 p-4" style={{ "--tint": "var(--color-mint)" } as CSSProperties}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="min-w-0 font-semibold">{title}</span>
+        <span className="num shrink-0 text-sm text-muted">
+          {fmtNum(Math.min(total, goal.target))}/{fmtNum(goal.target)}
+        </span>
+      </div>
+      <div className="mt-2">
+        <Bar value={total / goal.target} label={t("awards.progress", { name: title })} colour={left ? undefined : "var(--color-good)"} />
+      </div>
+      <p className="mt-2 text-sm">
+        {left
+          ? t("social.club.goalLeft", { left: goalAmount(goal.metric, left), mine: goalAmount(goal.metric, mine) })
+          : t("social.club.goalDone")}
+      </p>
+      {club.mine && (
+        <button type="button" onClick={() => setEditing(true)} className="press mt-2 min-h-11 text-sm font-medium text-accent">
+          {t("social.club.changeGoal")}
+        </button>
+      )}
+    </div>
   );
 }
 
