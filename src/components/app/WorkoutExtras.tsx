@@ -5,9 +5,10 @@
 // guide or plate-math mini-game on the rest timer.
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { breathAt, breathPattern, DEFAULT_PATTERN, patternCounts } from "@/lib/breathing";
 import { ghostFor, paceDelta, paceText, sameAsLast, type Ghost } from "@/lib/ghost";
 import { t } from "@/lib/i18n";
-import { haptic } from "@/lib/juice";
+import { haptic, sound } from "@/lib/juice";
 import { barFor } from "@/lib/loads";
 import { changeText, lastLoadedKg, plateChange } from "@/lib/plateMemory";
 import { loadBar } from "@/lib/plates";
@@ -249,35 +250,77 @@ export function RestExtra({ left, gym }: { left: number; gym: Gym }) {
   );
 }
 
-/** Slow breathing paced to the rest: in 4 s, out 6 s, which helps the heart rate come down between sets. */
-export const BREATH = { in: 4, out: 6 } as const;
-
-export function breathPhase(secs: number): { phase: "in" | "out"; p: number } {
-  const cyc = BREATH.in + BREATH.out;
-  const x = ((secs % cyc) + cyc) % cyc;
-  return x < BREATH.in ? { phase: "in", p: x / BREATH.in } : { phase: "out", p: 1 - (x - BREATH.in) / BREATH.out };
-}
-
+/** The breathing guide: box breathing unless the lifter picked another pattern (`breathing.ts`). */
 function Breathe({ left }: { left: number }) {
-  // Paced by useNow, so the animation stops while the app is in the background.
+  const { profile } = useApp();
+  const id = profile.delight?.breath ?? DEFAULT_PATTERN;
+  const phases = useMemo(() => breathPattern(id, profile.delight?.breathCustom), [id, profile.delight?.breathCustom]);
+  // Paced by useNow, so the animation stops while the app is in the background. The pattern is picked
+  // in Settings, so it doesn't change while the guide is on screen.
   const [t0] = useState(() => Date.now());
+  const key = patternCounts(phases);
   const secs = (useNow(100) - t0) / 1000;
-  const { phase, p } = breathPhase(secs);
-  const scale = 0.55 + 0.45 * p;
+  const m = breathAt(phases, secs);
+  // A soft cue at each change of step, so the guide can be followed with eyes closed. Not on the
+  // first one: the lifter just picked it.
+  const lastStep = useRef<number | null>(null);
+  useEffect(() => {
+    if (lastStep.current !== null && lastStep.current !== m.index) {
+      haptic("select");
+      sound.breath(m.step === "in" || m.step === "sip" ? "up" : m.step === "out" ? "down" : "hold");
+    }
+    lastStep.current = m.index;
+  }, [m.index, m.step]);
+  const scale = 0.3 + 0.7 * m.size;
+  const dot = boxPoint(m.cycle);
   return (
-    <div className="flex flex-col items-center rounded-2xl bg-raised py-4">
-      <div className="grid h-28 w-28 place-items-center">
+    <div className="flex flex-col items-center rounded-2xl bg-raised py-4 text-center">
+      <div className="relative grid h-32 w-32 place-items-center text-accent">
+        <svg viewBox="0 0 100 100" className="absolute inset-0 h-full w-full" aria-hidden>
+          <path d={BOX_PATH} fill="none" stroke="currentColor" strokeOpacity={0.25} strokeWidth={3} strokeLinejoin="round" />
+          <path
+            d={BOX_PATH}
+            pathLength={1}
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={3}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+            strokeDasharray={`${m.cycle} 1`}
+          />
+          <circle cx={dot.x} cy={dot.y} r={5} fill="currentColor" />
+        </svg>
         <div
-          className="rounded-full bg-accent/25 ring-2 ring-accent/60 motion-reduce:transition-none"
-          style={{ width: `${scale * 100}%`, height: `${scale * 100}%`, transition: "width 100ms linear, height 100ms linear" }}
+          className="absolute rounded-2xl bg-accent/25 motion-reduce:transition-none"
+          style={{ width: `${scale * 62}%`, height: `${scale * 62}%`, transition: "width 100ms linear, height 100ms linear" }}
         />
+        <span className="display relative text-3xl text-ink" aria-hidden>
+          {m.left}
+        </span>
       </div>
-      <p className="text-sm font-semibold" aria-live="polite">
-        {t(phase === "in" ? "extra.in" : "extra.out")}
+      <p className="mt-2 text-sm font-semibold" aria-live="polite">
+        {t(STEP_TEXT[m.step])}
       </p>
-      {left > 0 && <p className="text-xs text-faint">{t("extra.why")}</p>}
+      <p className="text-xs text-muted">{t("extra.patternLine", { name: t(`extra.p.${id}`), counts: key })}</p>
+      {left > 0 && <p className="mt-1 px-4 text-xs text-faint">{t(`extra.why.${id}`)}</p>}
     </div>
   );
+}
+
+const STEP_TEXT = { in: "extra.in", sip: "extra.sip", hold: "extra.hold", out: "extra.out", holdOut: "extra.holdOut" } as const;
+
+/** The box, drawn from the bottom left: up the left side, across the top, down the right, back along the bottom. */
+const BOX_PATH = "M10 90 L10 10 L90 10 L90 90 Z";
+
+/** The point `cycle` (0 to 1) of the way round the box; for box breathing each side is one step. */
+export function boxPoint(cycle: number): { x: number; y: number } {
+  const d = (((cycle % 1) + 1) % 1) * 4;
+  const side = Math.floor(d);
+  const f = d - side;
+  if (side === 0) return { x: 10, y: 90 - 80 * f };
+  if (side === 1) return { x: 10 + 80 * f, y: 10 };
+  if (side === 2) return { x: 90, y: 10 + 80 * f };
+  return { x: 90 - 80 * f, y: 90 };
 }
 
 export interface PlateQuiz {

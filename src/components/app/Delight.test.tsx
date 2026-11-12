@@ -70,7 +70,8 @@ describe("workout extras", () => {
     // Resting: the next set is the same weight, so no plates change.
     expect(await screen.findByText("Same plates: no change")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Breathe" }));
-    expect(screen.getByText(/Breathe in|Long breath out/)).toBeInTheDocument();
+    expect(screen.getByText("Breathe in through the nose")).toBeInTheDocument();
+    expect(screen.getByText("Box breathing · 4-4-4-4")).toBeInTheDocument();
     expect(useApp.getState().profile.delight?.restExtra).toBe("breathe");
     await user.click(screen.getByRole("button", { name: "Skip rest" }));
     // A heavier next set: only the change is shown.
@@ -141,5 +142,12 @@ describe("Today and Progress extras", () => {
     location.hash = "#/settings/workout";
     await user.click(await screen.findByRole("switch", { name: "Ghost mode" }));
     expect(useApp.getState().profile.delight?.ghost).toBe(false);
+    // The breathing guide's pattern: box breathing by default, or the lifter's own with steppers.
+    await user.click(screen.getByRole("button", { name: "Breathing guide" }));
+    expect(screen.getByRole("button", { name: /Box breathing/ })).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: /Your own/ }));
+    await user.click(screen.getByRole("button", { name: "Longer: Breathe out" }));
+    await user.click(screen.getByRole("button", { name: "Shorter: Hold, empty" }));
+    expect(useApp.getState().profile.delight).toMatchObject({ breath: "custom", breathCustom: { in: 4, hold: 4, out: 5, holdOut: 3 } });
   });
 });
