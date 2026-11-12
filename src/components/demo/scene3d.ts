@@ -283,11 +283,13 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
     wheel.add(w);
     wheel.add(cylZ(0.012, 0.36, 6, 0));
   }
+  // a medicine ball held in both hands
+  const ball = edges(new IcosahedronGeometry(0.12, 1));
   const handleGeo = keep(new BufferGeometry());
   handleGeo.setAttribute("position", new BufferAttribute(new Float32Array(6), 3));
   const handle = new LineSegments(handleGeo, steelMat);
   handle.frustumCulled = false;
-  for (const o of [barbell, smallBar, trapbar, ...bells, ...kbs, wheel, handle]) {
+  for (const o of [barbell, smallBar, trapbar, ...bells, ...kbs, wheel, ball, handle]) {
     o.visible = false;
     fig.add(o);
   }
@@ -602,6 +604,8 @@ export function createScene3D(canvas: HTMLCanvasElement): Scene {
         });
       set(bells, load === "dumbbell");
       set(kbs, load === "kettlebell");
+      ball.visible = load === "ball";
+      place(ball, mid);
       wheel.visible = load === "wheel";
       place(wheel, [mid[0], 0.1, mid[2]]);
       handle.visible = load === "handle";

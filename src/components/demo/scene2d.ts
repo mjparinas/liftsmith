@@ -171,6 +171,10 @@ export function createScene2D(canvas: HTMLCanvasElement): Scene {
         }
       }
       if (load === "handle") line(J.handL, J.handR);
+      if (load === "ball") {
+        ring(mid, 0.12, "z");
+        ring(mid, 0.12, "y");
+      }
       if (load === "wheel") ring([mid[0], 0.1, mid[2]], 0.09, "z");
       for (const p of f.motion.props?.(f.body) ?? []) drawProp(p, J, line);
       ctx.stroke();
