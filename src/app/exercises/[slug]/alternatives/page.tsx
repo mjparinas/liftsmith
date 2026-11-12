@@ -6,7 +6,7 @@ import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/sit
 import { BRAND } from "@/lib/brand";
 import { EXERCISES } from "@/lib/exercises";
 import { pageMeta } from "@/lib/pageMeta";
-import { alternativesTo, exerciseBySlug, MUSCLE_NAME, needsText } from "@/lib/seo";
+import { alternativesTo, exerciseBySlug, indexAlternatives, MUSCLE_NAME, needsText } from "@/lib/seo";
 import { SITE_URL } from "@/lib/site";
 import type { Exercise } from "@/lib/types";
 
@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${n} ${e.name.toLowerCase()} alternatives for any gym`,
     description: `The best substitutes for the ${e.name.toLowerCase()} that train the same muscles, for a full gym, a home gym or no equipment at all.`,
     path: `/exercises/${e.id}/alternatives/`,
+    noindex: !indexAlternatives(e.id),
   });
 }
 
