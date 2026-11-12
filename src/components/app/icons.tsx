@@ -29,6 +29,7 @@ const PATHS = {
   pause: "M8 5v14M16 5v14",
   skipNext: "M5 5.5v13l9.5-6.5zM19 5v14",
   skipPrev: "M19 5.5v13L9.5 12zM5 5v14",
+  volume: "M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13",
   speaker: "M6 3h12v18H6zM12 17.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 7h.01",
   plus: "M12 5v14M5 12h14",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
