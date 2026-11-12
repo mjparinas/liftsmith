@@ -20,6 +20,23 @@ export const en = {
   "pub.gone": "This profile isn’t public",
   "pub.goneBody": "It may be private, or the handle may have changed.",
   "pub.more": "+{count} more",
+  "pub.kicker": "Public profile",
+  "pub.level": "Level {level}",
+  "pub.streak": "Week streak",
+  "pub.lifts": "Best lifts",
+  "pub.calendar": "Last 12 weeks",
+  "pub.calendarLabel": "Workouts posted in the last 12 weeks: {count}",
+  "pub.usual": "Usually trains {days}",
+  "pub.usualNone": "No set training days yet.",
+  "pub.calendarEmpty": "No workouts posted in the last 12 weeks.",
+  "pub.newBest": "New best",
+  "pub.ctaTitle": "Train with a plan, like {name}",
+  "pub.ctaBody":
+    "Liftsmith plans every workout from your equipment, recovery and time, then logs each set in one tap. Free to start, no ads, ever.",
+  "pub.ctaFeatures": "See how it works",
+  "pub.strip": "{name} trains with Liftsmith, the app that plans your next set.",
+  "pub.tools": "Free lifting calculators",
+  "pub.skip": "Skip to the profile",
 } as const;
 
 type Key = keyof typeof en;
@@ -41,6 +58,23 @@ export const es: Partial<Record<Key, Message>> = {
   "pub.gone": "Este perfil no es público",
   "pub.goneBody": "Puede que sea privado o que el usuario haya cambiado.",
   "pub.more": "+{count} más",
+  "pub.kicker": "Perfil público",
+  "pub.level": "Nivel {level}",
+  "pub.streak": "Racha semanal",
+  "pub.lifts": "Mejores levantamientos",
+  "pub.calendar": "Últimas 12 semanas",
+  "pub.calendarLabel": "Entrenamientos publicados en las últimas 12 semanas: {count}",
+  "pub.usual": "Suele entrenar: {days}",
+  "pub.usualNone": "Aún no tiene días fijos de entrenamiento.",
+  "pub.calendarEmpty": "No hay entrenamientos publicados en las últimas 12 semanas.",
+  "pub.newBest": "Nuevo récord",
+  "pub.ctaTitle": "Entrena con un plan, como {name}",
+  "pub.ctaBody":
+    "Liftsmith planifica cada entrenamiento según tu equipo, tu recuperación y tu tiempo, y registra cada serie con un toque. Gratis para empezar, sin anuncios, nunca.",
+  "pub.ctaFeatures": "Mira cómo funciona",
+  "pub.strip": "{name} entrena con Liftsmith, la app que planifica tu próxima serie.",
+  "pub.tools": "Calculadoras de fuerza gratis",
+  "pub.skip": "Ir al perfil",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -60,6 +94,23 @@ export const fr: Partial<Record<Key, Message>> = {
   "pub.gone": "Ce profil n’est pas public",
   "pub.goneBody": "Il est peut-être privé, ou l’identifiant a changé.",
   "pub.more": "+{count} de plus",
+  "pub.kicker": "Profil public",
+  "pub.level": "Niveau {level}",
+  "pub.streak": "Série de semaines",
+  "pub.lifts": "Meilleures charges",
+  "pub.calendar": "12 dernières semaines",
+  "pub.calendarLabel": "Séances publiées ces 12 dernières semaines : {count}",
+  "pub.usual": "S’entraîne d’habitude : {days}",
+  "pub.usualNone": "Pas encore de jours d’entraînement fixes.",
+  "pub.calendarEmpty": "Aucune séance publiée ces 12 dernières semaines.",
+  "pub.newBest": "Nouveau record",
+  "pub.ctaTitle": "Entraîne-toi avec un plan, comme {name}",
+  "pub.ctaBody":
+    "Liftsmith planifie chaque séance selon ton matériel, ta récupération et ton temps, puis enregistre chaque série en un geste. Gratuit pour commencer, sans pub, jamais.",
+  "pub.ctaFeatures": "Voir comment ça marche",
+  "pub.strip": "{name} s’entraîne avec Liftsmith, l’appli qui planifie ta prochaine série.",
+  "pub.tools": "Calculateurs de musculation gratuits",
+  "pub.skip": "Aller au profil",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -79,6 +130,23 @@ export const de: Partial<Record<Key, Message>> = {
   "pub.gone": "Dieses Profil ist nicht öffentlich",
   "pub.goneBody": "Es ist vielleicht privat, oder der Name wurde geändert.",
   "pub.more": "+{count} weitere",
+  "pub.kicker": "Öffentliches Profil",
+  "pub.level": "Level {level}",
+  "pub.streak": "Wochenserie",
+  "pub.lifts": "Beste Lifts",
+  "pub.calendar": "Letzte 12 Wochen",
+  "pub.calendarLabel": "Gepostete Workouts in den letzten 12 Wochen: {count}",
+  "pub.usual": "Trainiert meist {days}",
+  "pub.usualNone": "Noch keine festen Trainingstage.",
+  "pub.calendarEmpty": "In den letzten 12 Wochen keine Workouts gepostet.",
+  "pub.newBest": "Neuer Bestwert",
+  "pub.ctaTitle": "Trainiere mit Plan, wie {name}",
+  "pub.ctaBody":
+    "Liftsmith plant jedes Workout nach deiner Ausrüstung, Erholung und Zeit und speichert jeden Satz mit einem Tipp. Kostenlos starten, nie Werbung.",
+  "pub.ctaFeatures": "So funktioniert’s",
+  "pub.strip": "{name} trainiert mit Liftsmith, der App, die deinen nächsten Satz plant.",
+  "pub.tools": "Kostenlose Kraftrechner",
+  "pub.skip": "Zum Profil springen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -98,6 +166,23 @@ export const it: Partial<Record<Key, Message>> = {
   "pub.gone": "Questo profilo non è pubblico",
   "pub.goneBody": "Potrebbe essere privato, oppure il nome utente è cambiato.",
   "pub.more": "+{count} altri",
+  "pub.kicker": "Profilo pubblico",
+  "pub.level": "Livello {level}",
+  "pub.streak": "Serie di settimane",
+  "pub.lifts": "Migliori alzate",
+  "pub.calendar": "Ultime 12 settimane",
+  "pub.calendarLabel": "Allenamenti pubblicati nelle ultime 12 settimane: {count}",
+  "pub.usual": "Di solito si allena {days}",
+  "pub.usualNone": "Ancora nessun giorno fisso di allenamento.",
+  "pub.calendarEmpty": "Nessun allenamento pubblicato nelle ultime 12 settimane.",
+  "pub.newBest": "Nuovo record",
+  "pub.ctaTitle": "Allenati con un piano, come {name}",
+  "pub.ctaBody":
+    "Liftsmith pianifica ogni allenamento in base alla tua attrezzatura, al recupero e al tempo, poi registra ogni serie con un tocco. Gratis per iniziare, mai pubblicità.",
+  "pub.ctaFeatures": "Scopri come funziona",
+  "pub.strip": "{name} si allena con Liftsmith, l’app che pianifica la tua prossima serie.",
+  "pub.tools": "Calcolatori di forza gratuiti",
+  "pub.skip": "Vai al profilo",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -117,4 +202,21 @@ export const ja: Partial<Record<Key, Message>> = {
   "pub.gone": "このプロフィールは公開されていません",
   "pub.goneBody": "非公開か、ユーザー名が変わった可能性があります。",
   "pub.more": "ほか {count} 種目",
+  "pub.kicker": "公開プロフィール",
+  "pub.level": "レベル {level}",
+  "pub.streak": "連続トレーニング週",
+  "pub.lifts": "ベストリフト",
+  "pub.calendar": "過去 12 週間",
+  "pub.calendarLabel": "過去 12 週間に投稿したワークアウト：{count}",
+  "pub.usual": "主なトレーニング日：{days}",
+  "pub.usualNone": "決まったトレーニング日はまだありません。",
+  "pub.calendarEmpty": "過去 12 週間にワークアウトの投稿はありません。",
+  "pub.newBest": "自己ベスト",
+  "pub.ctaTitle": "{name} のように、プランでトレーニング",
+  "pub.ctaBody":
+    "Liftsmith は器具・回復・時間に合わせて毎回のワークアウトを組み、各セットをワンタップで記録します。無料で始められ、広告は一切ありません。",
+  "pub.ctaFeatures": "使い方を見る",
+  "pub.strip": "{name} は Liftsmith でトレーニングしています。次のセットを組んでくれるアプリです。",
+  "pub.tools": "無料の筋トレ計算ツール",
+  "pub.skip": "プロフィールへ移動",
 };

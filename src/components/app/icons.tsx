@@ -56,6 +56,8 @@ const PATHS = {
 } as const;
 
 export type IconName = keyof typeof PATHS;
+/** The raw path data, for server-drawn pages with no React (the public profile page, src/server/profilePage.ts). */
+export const ICON_PATHS: Readonly<Record<IconName, string>> = PATHS;
 
 export function Icon({
   name,
