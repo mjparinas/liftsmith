@@ -52,6 +52,8 @@ The original ask: "sending a workout directly to gym buddies".
   - Android goes through **Firebase Cloud Messaging HTTP v1** (a service account JWT for an OAuth token, cached for its hour). iOS goes through **APNs** (an ES256 token JWT over HTTP/2).
   - A dead token (FCM `UNREGISTERED`, APNs 410 or `BadDeviceToken`) is deleted. Sending never fails or holds up the action: errors are swallowed, and it gives up after 4 s.
   - **Off until the keys exist** (`pushConfigured`): `FCM_SERVICE_ACCOUNT_JSON` for Android, and `APNS_KEY_P8`, `APNS_KEY_ID` and `APNS_TEAM_ID` for iOS (`APNS_TOPIC` defaults to `com.getliftsmith.app`; set `APNS_SANDBOX=1` only for development builds).
+- **While the app is open** (2026-11-12, found when a follow showed no push during testing): the system doesn't draw a push for an app in the foreground (Android hands it to the app; iOS does too without presentation options), so the app refreshes Friends when one arrives (`onPushWhileOpen`), and the tab badge and Activity show it at once. Test pushes with the app in the background.
+- **Logs** (2026-11-12): `notify` logs, without ids or tokens, when the recipient has no registered phone, when FCM sign-in is refused, and when a message comes back as anything but ok, so a missing push can be traced in Vercel's runtime logs.
 - **Taps** open the push's route: `#/friends`, or `#/routine/<code>` for a sent workout (`onPushTap`, wired in `App.tsx`).
 - **Removing tokens:** signing out drops the token (`stopPush` before `signOut`). So does leaving Friends or deleting the account (`socialDeletes`).
 - **Android** (`@capacitor/push-notifications`):

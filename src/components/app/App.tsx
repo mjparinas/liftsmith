@@ -19,13 +19,13 @@ import { startHealthRefresh } from "@/lib/healthRefresh";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
-import { onPushTap } from "@/lib/push";
+import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
-import { socialOn } from "@/lib/social";
+import { refreshSocial, socialOn } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
@@ -294,10 +294,12 @@ export function App() {
       const r = parse(h);
       go(r.route, r.arg);
     });
+    const offOpen = onPushWhileOpen(() => void refreshSocial());
     return () => {
       unsub();
       offTap();
       offPush();
+      offOpen();
       document.removeEventListener("visibilitychange", refresh);
     };
   }, [ready]);
