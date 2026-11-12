@@ -136,7 +136,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
         </div>
         {col(t.cols.product, [
           { href: APP_PATH, label: l.openApp },
-          { href: "/features/", label: l.features },
+          { href: localPath(lang, "/features/"), label: l.features },
           { href: "/apps/", label: l.whoFor },
           { href: "/gyms/", label: l.gyms },
           { href: localPath(lang, "/coaches/"), label: l.coaches },

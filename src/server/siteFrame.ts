@@ -83,7 +83,7 @@ function siteFooter(lang: MsgLang, source: FrameSource): string {
 <div><p class="foot-brand">Liftsmith</p><p class="muted small">${esc(t.tagline)} ${esc(t.footerBlurb)}</p>${storeBadges(lang, source)}</div>
 ${col(t.cols.product, [
   [APP_PATH, l.openApp],
-  ["/features/", l.features],
+  [localPath(lang, "/features/"), l.features],
   ["/apps/", l.whoFor],
   ["/gyms/", l.gyms],
   [localPath(lang, "/pricing/"), l.pricing],

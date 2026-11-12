@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 
-import { FeaturesView } from "@/components/site/FeaturesView";
-import { SitePage } from "@/components/site/SiteChrome";
-import { BRAND } from "@/lib/brand";
-import { pageMeta } from "@/lib/pageMeta";
+import { featuresMetadata, FeaturesPage } from "@/components/site/FeaturesView";
 
-export const metadata: Metadata = pageMeta({
-  title: `${BRAND.name} features and what it works with`,
-  description: `Every ${BRAND.name} feature, which are free, the newest ones, and a table of the watches, health apps, scales and services it works with on Android, iPhone and the web.`,
-  path: "/features/",
-});
+// The features page in English; the other languages are src/app/<lang>/features/page.tsx (src/lib/siteLang.ts).
+
+export const metadata: Metadata = featuresMetadata("en");
 
 export default function FeaturesIndex() {
-  return (
-    <SitePage kind="features-index">
-      <FeaturesView />
-    </SitePage>
-  );
+  return <FeaturesPage />;
 }
