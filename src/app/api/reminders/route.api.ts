@@ -1,8 +1,9 @@
-// POST /api/reminders/: create or update an email reminder subscription (double opt-in).
+// POST /api/reminders/: create or update an email reminder subscription. The signed-in account's own (verified)
+// address is confirmed at once; any other address is double opt-in.
 // DELETE /api/reminders/: stop every email and erase the address.
 // Server build only (Vercel). Needs RESEND_API_KEY, REMINDER_SECRET, MAIL_FROM and MAIL_POSTAL_ADDRESS,
 // plus the database (DATABASE_URL or TURSO_DATABASE_URL). See src/server/reminders.ts.
-import { cors, limited, readJson, setup } from "@/server/reminderHttp";
+import { cors, limited, readJson, setup, verifiedAccount } from "@/server/reminderHttp";
 import { checkBody, remove, subscribe } from "@/server/reminders";
 
 const json = (status: number, body: unknown, headers: Record<string, string>) => Response.json(body, { status, headers });
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
   if (raw === undefined) return json(400, { error: "Not JSON" }, h);
   const checked = checkBody(raw);
   if (!checked.ok) return json(400, { error: checked.error }, h);
-  const r = await subscribe(checked.body, s.store, s.mail, s.env, Date.now());
+  const r = await subscribe(checked.body, s.store, s.mail, s.env, Date.now(), await verifiedAccount(req));
   return json(r.code, r.body, h);
 }
 
