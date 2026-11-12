@@ -89,4 +89,29 @@ describe("logging cardio in a workout", () => {
     expect(set.reps).toBe(480);
     expect(set.distanceM).toBe(2100);
   });
+
+  it("takes time, distance and average power from a Bluetooth gym machine (Labs)", () => {
+    const s = useApp.getState;
+    s().start();
+    const a = s().active!;
+    const row = { ...a.plan.items[0]!, exerciseId: "rowing-machine", sets: 2, warmup: undefined, setTargets: undefined };
+    const plan = { ...a.plan, items: [row, ...a.plan.items] };
+    useApp.setState({ active: loadItem(s, { ...a, plan, warm: undefined }, 0) });
+    s().machineSet({ seconds: 301.4, distanceM: 1250.6, powerW: 182 });
+    expect(s().active).toMatchObject({ reps: 301, distanceM: 1251, powerW: 182 });
+    s().logSet();
+    const set = s().events.find((e): e is SetEvent => e.type === "set")!;
+    expect(set).toMatchObject({ reps: 301, distanceM: 1251, powerW: 182 });
+    // The next set starts with no power until the machine sends some.
+    expect(s().active!.powerW).toBeUndefined();
+  });
+
+  it("leaves a strength set alone if a machine reading arrives", () => {
+    const s = useApp.getState;
+    s().start();
+    const before = s().active!;
+    expect(exercise(before.plan.items[before.index]!.exerciseId).cardio).toBeUndefined();
+    s().machineSet({ seconds: 600, distanceM: 3000, powerW: 200 });
+    expect(s().active).toEqual(before);
+  });
 });

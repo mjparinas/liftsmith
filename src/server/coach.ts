@@ -222,6 +222,7 @@ const KEEP: Record<string, readonly string[]> = {
     "targetReps",
     "targetWeight",
     "distanceM",
+    "powerW",
     "rir",
     "challenge",
     "amrap",

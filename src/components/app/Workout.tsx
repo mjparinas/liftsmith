@@ -22,6 +22,7 @@ import { activeInjuries, effectFor, type Injury } from "@/lib/injury";
 import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
+import { machineSupported } from "@/lib/machine";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
@@ -54,6 +55,7 @@ import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
 import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
+import { MachineCard } from "./workout/MachineCard";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
@@ -722,6 +724,7 @@ export function Workout() {
               onUse={(kg, reps) => s.adjust(kg, reps)}
             />
           )}
+          {!!ex.cardio && !finished && labOn("labGymMachines") && machineSupported() && <MachineCard />}
           {resting ? (
             <RestCard
               active={active}
