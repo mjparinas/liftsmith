@@ -960,11 +960,20 @@ function behindBack(o: { move: "shrug" | "wrists" }): Motion {
   };
 }
 
-function carry(o: { hold: Hold; load: Load }): Motion {
+type CarryAt = "side" | "rack" | "overhead" | "goblet" | "zercher" | "mixed";
+/**
+ * Walking with a load: at the sides (farmer's), racked at the shoulders, locked out overhead, hugged
+ * at the chest (goblet) or a barbell in the crook of the elbows (Zercher). A barbell carry sets `bar`,
+ * so the bar and its plates are drawn.
+ */
+function carry(o: { hold: Hold; load: Load; at?: CarryAt }): Motion {
+  const at = o.at ?? "side";
   return {
     phases: TEMPO.walk(),
     load: o.load,
     hold: o.hold,
+    grip:
+      at === "zercher" ? 0.09 : at === "overhead" && o.load === "barbell" ? 0.3 : at === "rack" && o.load === "barbell" ? 0.2 : undefined,
     pose(B, d) {
       const ph = d * Math.PI * 2;
       const stride = 0.17;
@@ -974,21 +983,56 @@ function carry(o: { hold: Hold; load: Load }): Motion {
       };
       const hipY = standY(B, 0.05, 0.97) - 0.015 * Math.abs(Math.cos(ph));
       const hip = V(0.05, hipY);
-      const sh = torsoAt(B, hip, 0);
-      const h = hang(B, sh, 0.06);
-      const free = hang(B, sh, 0.03);
-      const hand = o.hold === "R" ? per(V(free[0] + 0.04 * Math.sin(ph), free[1], -free[2]), h) : h;
+      const sh = torsoAt(B, hip, at === "zercher" ? -4 : 0);
       const L = foot(-1),
         R = foot(1);
-      return {
+      const base = {
         hip,
         sh,
         ankle: per(L, R),
         foot: { L: L[1] > ANKLE_H + 0.01 ? 12 : 0, R: R[1] > ANKLE_H + 0.01 ? 12 : 0 },
-        hand,
-        elbowPole: V(-1, 0, 0.3),
         headBlend: 1,
       };
+      const free = hang(B, sh, 0.03);
+      const freeL = V(free[0] + 0.04 * Math.sin(ph), free[1], -free[2]);
+      const overhead = V(sh[0] + 0.01, sh[1] + reach(B) * 0.97, B.shW + 0.04);
+      if (o.load === "barbell" && at === "overhead") {
+        const bar = V(sh[0] + 0.01, sh[1] + reach(B) * 0.97);
+        return { ...base, bar, hand: bar, elbowPole: V(0.3, -1, 1) };
+      }
+      if (o.load === "barbell" && at === "rack") {
+        const bar = add(sh, V(0.12, 0.02));
+        return { ...base, bar, hand: V(bar[0] - 0.02, bar[1] - 0.02, 0.2), elbowPole: V(1, -0.1, 0.3) };
+      }
+      if (at === "zercher") {
+        // upper arms angled forward, forearms folded up, hands clasped in front of the chest:
+        // the bar rests in the crook of the elbows
+        const shJ = V(sh[0], sh[1] - B.shDrop);
+        const elbow = swing(shJ, B.upper * 0.98, 28);
+        const hand = swing(elbow, B.fore * 0.95, 160);
+        const bar = add(elbow, V(0.025, 0.045));
+        return { ...base, bar: o.load === "barbell" ? bar : undefined, hand: V(hand[0], hand[1], 0.09), elbowPole: V(1, -1, 0.5) };
+      }
+      if (at === "goblet") {
+        const c = onTorso(hip, sh, 0, 0.88, 0.2);
+        return { ...base, hand: V(c[0], c[1] - 0.04, 0.06), elbowPole: V(0.2, -1, 0.3) };
+      }
+      if (at === "rack") {
+        const rack = V(sh[0] + 0.1, sh[1] - 0.02, B.shW - 0.04);
+        return { ...base, hand: o.hold === "R" ? per(freeL, rack) : rack, elbowPole: V(0.2, -1, 0.3) };
+      }
+      if (at === "mixed") {
+        // one racked at the shoulder, one at the side
+        const side = hang(B, sh, 0.06);
+        return {
+          ...base,
+          hand: per(V(side[0], side[1], -side[2]), V(sh[0] + 0.1, sh[1] - 0.02, B.shW - 0.04)),
+          elbowPole: per(V(-1, 0, -0.3), V(0.2, -1, 0.3)),
+        };
+      }
+      if (at === "overhead") return { ...base, hand: o.hold === "R" ? per(freeL, overhead) : overhead, elbowPole: V(0, -1, 1) };
+      const h = hang(B, sh, 0.06);
+      return { ...base, hand: o.hold === "R" ? per(freeL, h) : h, elbowPole: V(-1, 0, 0.3) };
     },
   };
 }
@@ -2734,8 +2778,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-floor-press": () => benchPress({ load: "kettlebell" }),
   "kb-gorilla-row": () => bentRow({ load: "kettlebell", lean: 62, oneArm: true, grip: 0.18 }),
   "kb-high-pull": () => kbFlow({ to: "chin" }),
-  "kb-rack-carry": () => carry({ hold: "each", load: "kettlebell" }),
-  "kb-overhead-carry": () => carry({ hold: "R", load: "kettlebell" }),
+  "kb-rack-carry": () => carry({ hold: "each", load: "kettlebell", at: "rack" }),
+  "kb-overhead-carry": () => carry({ hold: "R", load: "kettlebell", at: "overhead" }),
   "kb-goblet-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   "kb-thruster": () => thruster({ load: "kettlebell" }),
   "kb-around-the-world": aroundWorld,
@@ -3134,7 +3178,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "parallel-bar-support-hold": () => dip({}),
   "feet-up-bench-dip": () => dip({ bench: true }),
   "kb-half-kneeling-press": () => overhead({ load: "kettlebell" }),
-  "kb-waiter-carry": () => carry({ hold: "R", load: "kettlebell" }),
+  "kb-waiter-carry": () => carry({ hold: "R", load: "kettlebell", at: "overhead" }),
   "db-push-press": () => overhead({ load: "dumbbell" }),
   "db-scaption": () => fly({ posture: "standing", from: 8, to: 84, load: "dumbbell", first: "lift" }),
   "cable-single-rear-delt": () =>
@@ -3300,12 +3344,12 @@ const MOTIONS: Record<string, () => Motion> = {
   "hanging-l-hold": hangingRaise,
   "suitcase-hold": () => carry({ hold: "R", load: "dumbbell" }),
   "db-suitcase-carry": () => carry({ hold: "R", load: "dumbbell" }),
-  "db-rack-carry": () => carry({ hold: "each", load: "dumbbell" }),
-  "db-overhead-carry": () => carry({ hold: "each", load: "dumbbell" }),
+  "db-rack-carry": () => carry({ hold: "each", load: "dumbbell", at: "rack" }),
+  "db-overhead-carry": () => carry({ hold: "each", load: "dumbbell", at: "overhead" }),
   "db-farmers-march": () => carry({ hold: "each", load: "dumbbell" }),
-  "kb-crossbody-carry": () => carry({ hold: "each", load: "kettlebell" }),
-  "goblet-carry": () => carry({ hold: "centre", load: "dumbbell" }),
-  "kb-goblet-carry": () => carry({ hold: "centre", load: "kettlebell" }),
+  "kb-crossbody-carry": () => carry({ hold: "each", load: "kettlebell", at: "mixed" }),
+  "goblet-carry": () => carry({ hold: "centre", load: "dumbbell", at: "goblet" }),
+  "kb-goblet-carry": () => carry({ hold: "centre", load: "kettlebell", at: "goblet" }),
   "trap-bar-carry": () => carry({ hold: "each", load: "trapbar" }),
   "med-ball-scoop-toss": kbSwing,
   "med-ball-sit-up-throw": () => floorCore({ kind: "crunch" }),
@@ -3543,8 +3587,8 @@ const MOTIONS: Record<string, () => Motion> = {
   "pallof-reverse-lunge": pallof,
   "pallof-squat": pallof,
   "db-dead-bug-pullover": deadBug,
-  "kb-mixed-carry": () => carry({ hold: "each", load: "kettlebell" }),
-  "db-mixed-carry": () => carry({ hold: "each", load: "dumbbell" }),
+  "kb-mixed-carry": () => carry({ hold: "each", load: "kettlebell", at: "mixed" }),
+  "db-mixed-carry": () => carry({ hold: "each", load: "dumbbell", at: "mixed" }),
   "kb-double-swing": kbSwing,
   "kb-dead-clean": () => kbFlow({ to: "rack" }),
   "kb-hand-to-hand-swing": kbSwing,
@@ -3553,10 +3597,10 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-overhead-swing": kbSwing,
   "sled-row": () => bentRow({ load: "handle", lean: 40 }),
   "sled-lateral-drag": cossack,
-  "zercher-carry": () => carry({ hold: "centre", load: "barbell" }),
-  "front-rack-barbell-carry": () => carry({ hold: "centre", load: "barbell" }),
-  "overhead-barbell-carry": () => carry({ hold: "centre", load: "barbell" }),
-  "med-ball-bear-hug-carry": () => carry({ hold: "centre", load: "none" }),
+  "zercher-carry": () => carry({ hold: "centre", load: "barbell", at: "zercher" }),
+  "front-rack-barbell-carry": () => carry({ hold: "centre", load: "barbell", at: "rack" }),
+  "overhead-barbell-carry": () => carry({ hold: "centre", load: "barbell", at: "overhead" }),
+  "med-ball-bear-hug-carry": () => carry({ hold: "centre", load: "none", at: "goblet" }),
   "band-y-raise": () => fly({ posture: "standing", from: 12, to: 88, load: "none", first: "lift" }),
   "scap-push-up": () => pushUp({}),
   "landmine-thruster": () => thruster({ load: "barbell" }),
@@ -3570,7 +3614,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "med-ball-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),
   "med-ball-lateral-lunge": cossack,
   "kb-lunge-pass-through": () => lunge({ hands: "hips" }),
-  "kb-goblet-march": () => carry({ hold: "centre", load: "kettlebell" }),
+  "kb-goblet-march": () => carry({ hold: "centre", load: "kettlebell", at: "goblet" }),
   "db-suitcase-lunge": () => lunge({ step: "back", hands: "dumbbells" }),
   "db-offset-squat": () => squat({ hold: "goblet", load: "dumbbell" }),
   "kb-front-rack-reverse-lunge": () => lunge({ step: "back", hands: "hips" }),

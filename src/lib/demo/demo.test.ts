@@ -151,6 +151,23 @@ describe("exercise demos", () => {
       }
     }
   });
+  it("draws the bar on barbell carries, in the right place", () => {
+    for (const bk of BODY_KEYS) {
+      const B = BODIES[bk];
+      for (const d of [0, 0.25, 0.5, 0.75]) {
+        // Bar-in-elbows carry: the bar sits in the crook of the elbows, in front of the body (Melvin, 2026-11-12)
+        const Z = jointsAt(motionFor("zercher-carry"), B, d);
+        expect(Z.bar, `${bk} zercher at ${d}`).toBeDefined();
+        expect(Math.hypot(Z.bar![0] - Z.elbowR[0], Z.bar![1] - Z.elbowR[1]), `${bk} zercher bar to elbow`).toBeLessThan(0.08);
+        expect(Z.bar![0]).toBeGreaterThan(Z.shC[0] + 0.05);
+        expect(Z.handR[1]).toBeGreaterThan(Z.elbowR[1]);
+        const O = jointsAt(motionFor("overhead-barbell-carry"), B, d);
+        expect(O.bar![1], `${bk} overhead carry`).toBeGreaterThan(O.head[1]);
+        const F = jointsAt(motionFor("front-rack-barbell-carry"), B, d);
+        expect(F.bar![0], `${bk} front rack carry`).toBeGreaterThan(F.shC[0]);
+      }
+    }
+  });
   it("keeps the female figure's hips and glutes in athletic proportion", () => {
     const F = BODIES.female,
       M = BODIES.male;
