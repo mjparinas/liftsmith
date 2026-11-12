@@ -9,6 +9,8 @@ node scripts/play-compose.mjs   # store/play/phone, tablet-7, tablet-10, chromeb
 node scripts/play-video.mjs     # store/play/promo-video.mp4 (not committed; upload to YouTube)
 ```
 
+The same listing in Spanish, French, German, Italian and Japanese, with its own phone screenshots, is in [PLAY_LISTING_TRANSLATIONS.md](PLAY_LISTING_TRANSLATIONS.md).
+
 Rules for this text (Play's metadata policy plus our own):
 - Only features that ship on Android today. Wear OS, optional accounts with sync, Friends and Pro are in (2026-11-11, for the public launch); Strava, Oura, Whoop, Withings, Polar and Concept2 stay out until they leave "Coming soon", and anything iPhone-only (Apple Watch) stays out of the Play listing. No prices: Play shows them on the listing itself.
 - No other apps' names, no "best" or "#1", no testimonials, no emoji, no all caps.

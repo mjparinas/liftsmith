@@ -282,7 +282,7 @@ export function Stepper({
       <div className="flex items-center justify-between gap-1.5">
         <Bump dir={-1} label={label} size="md" onStep={step} />
         <div className="min-w-0 text-center leading-none">
-          <div key={key} className={`display text-[1.75rem] ${key ? "animate-nudge" : ""}`}>
+          <div key={key} className={`display whitespace-nowrap text-[1.75rem] ${key ? "animate-nudge" : ""}`}>
             {value}
           </div>
           <div className="mt-1 truncate text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-faint">{suffix ?? label}</div>
@@ -296,7 +296,7 @@ export function Stepper({
       <div className="flex items-center gap-6">
         {!display && <Bump dir={-1} label={label} size="lg" onStep={step} />}
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
+          <div key={key} className={`display whitespace-nowrap text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
             {value}
           </div>
         </div>
