@@ -79,6 +79,20 @@ describe("admin to-do list", () => {
     expect(items[0].title).toMatch(/A subscription lapsed/);
   });
 
+  it("lists reports on Friends and gyms waiting for a decision, and brings a dismissed one back on a new report", async () => {
+    expect((await todoList(NOW)).items.some((i) => i.kind === "reports")).toBe(false);
+    await run("INSERT INTO reports (reporter_id, kind, target_id, reason, created_at) VALUES ('r1', 'post', 'p1', 'spam', ?)", [NOW - DAY]);
+    await run("INSERT INTO reports (reporter_id, kind, target_id, reason, created_at) VALUES ('r2', 'post', 'p1', 'spam', ?)", [NOW - DAY]);
+    await run("INSERT INTO gym_reports (reporter, gym_id, reason, created_at) VALUES ('r1', 'g1', 'fake', ?)", [NOW - 2 * DAY]);
+    const item = (await todoList(NOW)).items.find((i) => i.kind === "reports")!;
+    expect(item.title).toBe("2 reports waiting for a decision");
+    expect(item.action.tab).toBe("Reports");
+    await hideItem(item.key, null, NOW);
+    expect((await todoList(NOW)).items.some((i) => i.kind === "reports")).toBe(false);
+    await run("INSERT INTO reports (reporter_id, kind, target_id, reason, created_at) VALUES ('r3', 'comment', 'c1', 'abuse', ?)", [NOW]);
+    expect((await todoList(NOW)).items.find((i) => i.kind === "reports")?.title).toBe("3 reports waiting for a decision");
+  });
+
   it("keeps the admins' own tasks", async () => {
     expect(checkTask({ title: " " }).ok).toBe(false);
     expect(checkTask({ title: "x", due: "not a date" }).ok).toBe(false);

@@ -87,7 +87,7 @@ export function BingSearch({ days }: { days: number }) {
     };
   }, [days, round]);
   return (
-    <section aria-labelledby="bing-h" aria-busy={!part} className="space-y-4 pt-4">
+    <section aria-labelledby="bing-h" aria-busy={!part} className={`space-y-4 pt-4 ${part?.state === "setup" ? "order-last" : ""}`}>
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h2 id="bing-h" className="text-lg font-bold">
