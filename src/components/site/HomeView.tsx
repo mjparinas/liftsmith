@@ -434,6 +434,14 @@ export function HomeView({ lang }: { lang: SiteLang }) {
               <p className="mt-3 text-center text-xs text-muted">{p.billed}</p>
             </div>
           </div>
+          <div className="mx-auto mt-6 flex max-w-4xl flex-col items-start gap-4 rounded-3xl border border-dashed border-line p-6 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-muted">
+              <b className="text-ink">{p.coachLead}</b> {p.coachRest}
+            </p>
+            <Ghost href={localPath(lang, "/coaches/")} cta="pricing-coach">
+              {p.coachCta}
+            </Ghost>
+          </div>
         </section>
 
         {/* FAQ */}

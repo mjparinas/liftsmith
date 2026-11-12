@@ -247,6 +247,10 @@ export const fr: SiteText = {
       perMonth: "par mois",
       priceNote: "Environ {perMonth} par mois, ou {monthly} par mois",
       trialCta: "Commencer mon essai gratuit de {days} jours",
+      coachLead: "Vous coachez des clients ?",
+      coachRest:
+        "Vos clients s’entraînent gratuitement, et avec Pro vous voyez leurs séances, leur envoyez des routines et leur laissez des notes.",
+      coachCta: "Liftsmith pour les coachs",
       billed:
         "Facturé via Google Play ou l’App Store, ou par carte dans l’app Web. Résiliez à tout moment avant la fin de l’essai et vous ne payez rien.",
     },

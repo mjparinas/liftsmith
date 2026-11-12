@@ -273,6 +273,7 @@ export function siteRoutes(): Route[] {
     { path: "/terms/", priority: 0.2 },
     { path: "/accessibility/", priority: 0.3 },
     { path: "/pricing/", priority: 0.8 },
+    { path: "/coaches/", priority: 0.7 },
     { path: "/help/", priority: 0.6 },
     ...HELP.map((t) => ({ path: helpPath(t), priority: 0.5 })),
     { path: "/contact/", priority: 0.4 },

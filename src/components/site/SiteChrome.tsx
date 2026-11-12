@@ -251,10 +251,21 @@ export function Crumbs({ items, lang = "en" }: { items: Crumb[]; lang?: SiteLang
 }
 
 /** The main button into the app. */
-export function CtaButton({ cta, children = siteText().chrome.startFree, big }: { cta: string; children?: ReactNode; big?: boolean }) {
+export function CtaButton({
+  cta,
+  children = siteText().chrome.startFree,
+  big,
+  href = APP_PATH,
+}: {
+  cta: string;
+  children?: ReactNode;
+  big?: boolean;
+  /** Where it goes: the app by default, or a page for a particular reader (the coach page). */
+  href?: string;
+}) {
   return (
     <Link
-      href={APP_PATH}
+      href={href}
       prefetch={false}
       data-cta={cta}
       className={`press btn-primary inline-flex items-center justify-center rounded-2xl font-semibold ${big ? "min-h-14 px-7 text-lg" : "min-h-12 px-6"}`}
@@ -271,12 +282,14 @@ export function CtaBanner({
   body,
   button,
   lang = "en",
+  href,
 }: {
   cta: string;
   title: string;
   body: string;
   button?: string;
   lang?: SiteLang;
+  href?: string;
 }) {
   const t = siteText(lang).chrome.banner;
   return (
@@ -289,7 +302,7 @@ export function CtaBanner({
         ))}
       </ul>
       <div className="mt-6 flex flex-wrap items-center gap-4">
-        <CtaButton cta={cta} big>
+        <CtaButton cta={cta} big href={href}>
           {button ?? t.button}
         </CtaButton>
         <StoreBadges webLink={false} place={`${cta}-badges`} lang={lang} />
@@ -299,7 +312,19 @@ export function CtaBanner({
 }
 
 /** A slim prompt inside the content. */
-export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: string; title: string; body: string; button?: string }) {
+export function CtaInline({
+  cta,
+  title,
+  body,
+  button = "Try it free",
+  href,
+}: {
+  cta: string;
+  title: string;
+  body: string;
+  button?: string;
+  href?: string;
+}) {
   return (
     <aside className="card-tint my-8 flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between" aria-label="Try the app">
       <div>
@@ -307,7 +332,9 @@ export function CtaInline({ cta, title, body, button = "Try it free" }: { cta: s
         <p className="mt-1 text-sm text-muted">{body}</p>
       </div>
       <div className="shrink-0">
-        <CtaButton cta={cta}>{button}</CtaButton>
+        <CtaButton cta={cta} href={href}>
+          {button}
+        </CtaButton>
       </div>
     </aside>
   );
