@@ -186,6 +186,8 @@ export interface Gym {
    * device (and in the user's own sync). Rounded to about 100 m when saved.
    */
   place?: { lat: number; lon: number; radiusM: number };
+  /** The real gym this is (gymPlaces.ts on the server), when the lifter added it from Find gyms near you. */
+  placeId?: string;
   /** Machine settings per exercise ("Seat 4", "Back pad 2"), machineSettings.ts. */
   settings?: Record<string, { label: string; value: string }[]>;
   updatedAt: number;

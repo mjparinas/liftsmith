@@ -9,6 +9,7 @@ import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
 import { gymDeletes } from "./gymDirectory";
+import { placeDeletes } from "./gymPlaces";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { isReviewEmail, reviewCodeMatches } from "./review";
 import { socialDeletes } from "./social";
@@ -284,6 +285,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...socialDeletes(accountId),
     ...coachCleanup(accountId),
     ...gymDeletes(accountId),
+    ...placeDeletes(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

@@ -4,9 +4,10 @@
 // Positions are rounded to 0.01° (about 1 km) here, before anything is sent, so the precise position never
 // leaves the phone. Listing a gym needs an account; finding, adding and reporting don't.
 import { api, AuthError, readAccount } from "./auth";
+import { makeGym } from "./defaults";
 import { locate } from "./geo";
-import { encodeGym, kitOf } from "./gymShare";
-import type { Gym } from "./types";
+import { decodeGym, encodeGym, kitOf, type GymKit } from "./gymShare";
+import type { Gym, Unit } from "./types";
 
 export interface Listing {
   id: string;
@@ -15,6 +16,28 @@ export interface Listing {
   unit: "kg" | "lb";
   km: number;
   adds: number;
+}
+
+/** A real gym (server: gymPlaces.ts). Official means its owner claimed it. */
+export interface Place {
+  id: string;
+  citySlug: string;
+  slug: string;
+  name: string;
+  kind: "gym" | "studio";
+  address: string;
+  city: string;
+  region: string;
+  lat: number;
+  lon: number;
+  km: number;
+  hours: string;
+  website: string;
+  official: boolean;
+  lifters: number;
+  /** The setup it offers (gymShare.ts code), empty when nobody has set one up yet. */
+  code: string;
+  source: "osm" | "staff" | "owner";
 }
 
 export interface MyListing {
@@ -30,15 +53,15 @@ export type ReportReason = (typeof REPORT_REASONS)[number];
 const cell = (x: number) => Math.round(x * 100) / 100;
 const token = () => readAccount()?.token;
 
-export type FindResult = { gyms: Listing[] } | { error: "location" | "offline" | "slow" | "failed" };
+export type FindResult = { gyms: Listing[]; places: Place[] } | { error: "location" | "offline" | "slow" | "failed" };
 
-/** Gyms listed near where the lifter is now (one approximate position, asked for the first time). */
+/** Real gyms and listed setups near where the lifter is now (one approximate position, asked for the first time). */
 export async function findNearby(): Promise<FindResult> {
   const fix = await locate();
   if (!fix) return { error: "location" };
   try {
-    const r = await api<{ gyms: Listing[] }>(`/api/gyms/?lat=${cell(fix.lat)}&lon=${cell(fix.lon)}`);
-    return { gyms: r.gyms };
+    const r = await api<{ gyms: Listing[]; places?: Place[] }>(`/api/gyms/?lat=${cell(fix.lat)}&lon=${cell(fix.lon)}`);
+    return { gyms: r.gyms, places: r.places ?? [] };
   } catch (e) {
     return { error: problem(e) };
   }
@@ -58,7 +81,15 @@ export async function listGym(gym: Gym): Promise<{ id: string } | { error: ListE
   try {
     const r = await api<{ id: string }>("/api/gyms/", {
       token: t,
-      body: { op: "publish", localId: gym.id, name: gym.name, code: encodeGym(kitOf(gym)), lat: cell(at.lat), lon: cell(at.lon) },
+      body: {
+        op: "publish",
+        localId: gym.id,
+        name: gym.name,
+        code: encodeGym(kitOf(gym)),
+        lat: cell(at.lat),
+        lon: cell(at.lon),
+        ...(gym.placeId ? { placeId: gym.placeId } : {}),
+      },
     });
     return { id: r.id };
   } catch (e) {
@@ -98,11 +129,29 @@ export async function reportGym(id: string, reason: ReportReason): Promise<boole
   }
 }
 
-// The listing a gym link was opened from, so adding it counts toward the listing and the preview can offer a report.
-let picked: { id: string; code: string } | null = null;
-export const pickListing = (l: Pick<Listing, "id" | "code">) => void (picked = { id: l.id, code: l.code });
+// The listing or real gym a gym link was opened from, so adding it counts toward it, the new gym remembers which
+// real gym it is, and the preview can offer a report (listings only).
+let picked: { id: string | null; place: Place | null; code: string } | null = null;
+export const pickListing = (l: Pick<Listing, "id" | "code">) => void (picked = { id: l.id, place: null, code: l.code });
+export const pickPlace = (p: Place, code: string) => void (picked = { id: null, place: p, code });
 export const listingFor = (code: string | undefined) => (code && picked?.code === code ? picked.id : null);
+export const placeFor = (code: string | undefined) => (code && picked?.code === code ? picked.place : null);
 
-export function markAdded(id: string): void {
-  void api("/api/gyms/", { token: token(), body: { op: "added", id } }).catch(() => null);
+/** Counts an add toward a listing, a real gym, or both. */
+export function markAdded(id: string | null, place?: string | null): void {
+  if (!id && !place) return;
+  void api("/api/gyms/", { token: token(), body: { op: "added", ...(id ? { id } : {}), ...(place ? { place } : {}) } }).catch(() => null);
 }
+
+/**
+ * The setup a real gym brings: the one it offers, else a typical commercial gym under its name, so picking a gym
+ * nobody has set up still gives a sensible start the lifter can change.
+ */
+export function placeKit(p: Place, unit: Unit): { kit: GymKit; typical: boolean } {
+  const offered = p.code ? decodeGym(p.code) : null;
+  if (offered) return { kit: { ...offered, name: p.name }, typical: false };
+  return { kit: { ...kitOf(makeGym("commercial", unit)), name: p.name }, typical: true };
+}
+
+/** "20236 Fraser Highway, Langley, BC" */
+export const placeLine = (p: Pick<Place, "address" | "city" | "region">) => [p.address, p.city, p.region].filter(Boolean).join(", ");

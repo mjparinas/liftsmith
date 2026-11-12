@@ -22,6 +22,34 @@ const LISTED = {
   km: 1.5,
   adds: 4,
 };
+// Real gyms (gymPlaces.ts): one official with a setup, one nobody set up yet.
+const PLACE = {
+  id: "fedcba9876543210",
+  citySlug: "langley-bc",
+  slug: "steve-nash-fitness-world",
+  name: "Steve Nash Fitness World",
+  kind: "gym",
+  address: "19925 Willowbrook Drive",
+  city: "Langley",
+  region: "BC",
+  lat: 49.11734,
+  lon: -122.67041,
+  km: 0.8,
+  hours: "",
+  website: "",
+  official: false,
+  lifters: 3,
+  code: "",
+  source: "osm",
+};
+const OFFICIAL = {
+  ...PLACE,
+  id: "aaaaaaaaaaaaaaaa",
+  slug: "planet-fitness",
+  name: "Planet Fitness",
+  official: true,
+  code: encodeGym({ ...kitOf(makeGym("commercial", "kg", "y")), name: "PF" }),
+};
 const calls: { url: string; body: unknown }[] = [];
 
 beforeEach(async () => {
@@ -46,7 +74,7 @@ beforeEach(async () => {
     vi.fn(async (url: string, init?: RequestInit) => {
       const body = init?.body ? (JSON.parse(String(init.body)) as unknown) : undefined;
       calls.push({ url, body });
-      if (url.startsWith("/api/gyms/?")) return Response.json({ gyms: [LISTED] });
+      if (url.startsWith("/api/gyms/?")) return Response.json({ gyms: [LISTED], places: [OFFICIAL, PLACE] });
       if (url === "/api/gyms/") return Response.json({ ok: true });
       return Response.json({}, { status: 404 });
     }),
@@ -95,6 +123,26 @@ describe("gyms near you", () => {
     await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "It’s a home or private gym" }));
     expect(calls.at(-1)!.body).toEqual({ op: "report", id: LISTED.id, reason: "private" });
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
+  });
+
+  it("lists real gyms first, the official one with its mark, and adds one nobody set up as a typical gym", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = "#/gym";
+    await user.click(await screen.findByRole("button", { name: "+ Add gym" }));
+    const sheet = within(screen.getByRole("dialog"));
+    await user.click(sheet.getByRole("button", { name: "Find gyms near you" }));
+    const buttons = (await sheet.findAllByRole("button", { pressed: false })).map((b) => b.textContent ?? "");
+    expect(buttons[0]).toMatch(/^Planet Fitness\s*Official gym/);
+    expect(buttons[0]).toContain("equipment set up");
+    expect(buttons[1]).toContain("19925 Willowbrook Drive, Langley");
+    expect(buttons[1]).toContain("3 lifters here");
+    expect(sheet.getByText("Gym details © OpenStreetMap contributors")).toBeInTheDocument();
+    await user.click(sheet.getByRole("button", { name: /Steve Nash/ }));
+    expect(await screen.findByText(/Nobody has set up this gym’s equipment yet/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Add this gym" }));
+    expect(useApp.getState().gyms.at(-1)).toMatchObject({ name: "Steve Nash Fitness World", placeId: PLACE.id });
+    expect(calls.at(-1)!.body).toEqual({ op: "added", place: PLACE.id });
   });
 
   it("takes a nearby gym in setup instead of a preset", async () => {

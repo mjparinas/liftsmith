@@ -189,6 +189,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Google Play review](docs/decisions/google-play-review.md) (`health.ts`, `docs/PRIVACY_LABELS.md`, `site.ts`)
 - [Gym by location](docs/decisions/gym-by-location.md) (`src/lib/geo.ts`)
 - [Gym sharing](docs/decisions/gym-sharing.md) (`src/lib/gymShare.ts`, `SharedGym.tsx`, `Gym.tsx`, `src/lib/gymDirectory.ts`, `src/server/gymDirectory.ts`, `NearbyGyms.tsx`)
+- [Gyms: official gyms, the finder, gym pages and posters](docs/decisions/gyms.md) (`src/server/gymPlaces.ts`, `NearbyGyms.tsx`, `GymPlaces.tsx`)
 - [Gym machines](docs/decisions/gym-machines.md) (`src/lib/ftms.ts`, `machine.ts`, `machineLink.ts`, `workout/MachineCard.tsx`)
 - [Health twin](docs/decisions/health-twin.md) (`Recovery.tsx`, `HealthTwin.tsx`, `src/lib/twin.ts`, `readiness.ts`)
 - [Heart rate and health](docs/decisions/heart-rate-and-health.md) (`heartRate.ts`, `src/lib/health.ts`)

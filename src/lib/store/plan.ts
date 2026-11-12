@@ -51,8 +51,8 @@ export interface PlanSlice {
   setProfile(p: Partial<Profile>): void;
   saveGym(g: Gym): void;
   addGym(preset: GymPreset): string;
-  /** Adds a gym someone shared (gymShare.ts) and returns its id. */
-  importGym(kit: GymKit): string;
+  /** Adds a gym someone shared (gymShare.ts), or a real gym from the finder (`placeId`), and returns its id. */
+  importGym(kit: GymKit, placeId?: string): string;
   removeGym(id: string): void;
   replan(): void;
   /** Keeps the plan source in step with Pro: free lifters follow a free fixed program, and Pro brings back what they had. */
@@ -124,8 +124,8 @@ export function planSlice(c: Ctx): PlanSlice {
       return g.id;
     },
 
-    importGym(kit) {
-      const g: Gym = { ...kit, id: crypto.randomUUID(), updatedAt: Date.now() };
+    importGym(kit, placeId) {
+      const g: Gym = { ...kit, ...(placeId ? { placeId } : {}), id: crypto.randomUUID(), updatedAt: Date.now() };
       const gyms = [...get().gyms, g];
       set({ gyms });
       void saveRecord("gyms", gyms);

@@ -88,7 +88,7 @@ export const en = {
   "gym.near.find": "Find gyms near you",
   "gym.near.looking": "Looking…",
   "gym.near.note":
-    "Gyms other lifters listed nearby, with their equipment and weights already set up. Uses your approximate location once.",
+    "Gyms around you, and setups other lifters listed with their equipment and weights. Uses your approximate location once.",
   "gym.near.location": "Location is off or not allowed. You can allow approximate location in your phone’s settings.",
   "gym.near.offline": "You’re offline. Try again when you’re connected.",
   "gym.near.failed": "That didn’t work. Try again in a moment.",
@@ -96,6 +96,16 @@ export const en = {
   "gym.near.away": "{km} km away",
   "gym.near.kit": { one: "{count} type of equipment", other: "{count} types of equipment" },
   "gym.near.adds": { one: "added by {count} lifter", other: "added by {count} lifters" },
+  "gym.place.official": "Official gym",
+  "gym.place.kitReady": "equipment set up",
+  "gym.place.lifters": { one: "{count} lifter here", other: "{count} lifters here" },
+  "gym.place.setups": "Setups other lifters listed",
+  "gym.place.osm": "Gym details © OpenStreetMap contributors",
+  "gym.place.title": "A gym near you",
+  "gym.place.why": "Its equipment and weights are already set up. Add it, then change anything that’s different.",
+  "gym.place.typical":
+    "Nobody has set up this gym’s equipment yet, so this starts as a typical gym. Add it and change what’s different. Then list it in Gyms so the next lifter here can skip this.",
+  "gym.place.officialNote": "Official: the gym itself keeps these details up to date.",
   "gym.list.label": "List this gym nearby",
   "gym.list.hint":
     "Lifters near this gym can find it and add its setup in one tap. Only list a gym open to the public, never a home gym. Only its name, kit and area (about 1 km) are shared.",
@@ -206,7 +216,7 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.near.find": "Buscar gimnasios cerca",
   "gym.near.looking": "Buscando…",
   "gym.near.note":
-    "Gimnasios que otras personas publicaron cerca, con el equipamiento y los pesos ya configurados. Usa tu ubicación aproximada una vez.",
+    "Gimnasios a tu alrededor y configuraciones que otras personas publicaron, con su equipamiento y pesos. Usa tu ubicación aproximada una vez.",
   "gym.near.location": "La ubicación está desactivada o no permitida. Puedes permitir la ubicación aproximada en los ajustes del teléfono.",
   "gym.near.offline": "No tienes conexión. Inténtalo de nuevo cuando estés conectado.",
   "gym.near.failed": "No funcionó. Inténtalo de nuevo en un momento.",
@@ -215,6 +225,16 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.near.away": "a {km} km",
   "gym.near.kit": { one: "{count} tipo de equipamiento", other: "{count} tipos de equipamiento" },
   "gym.near.adds": { one: "añadido por {count} persona", other: "añadido por {count} personas" },
+  "gym.place.official": "Gimnasio oficial",
+  "gym.place.kitReady": "equipamiento configurado",
+  "gym.place.lifters": { one: "{count} persona entrena aquí", other: "{count} personas entrenan aquí" },
+  "gym.place.setups": "Configuraciones publicadas por otras personas",
+  "gym.place.osm": "Datos de gimnasios © colaboradores de OpenStreetMap",
+  "gym.place.title": "Un gimnasio cerca de ti",
+  "gym.place.why": "Su equipamiento y sus pesos ya están configurados. Añádelo y cambia lo que sea diferente.",
+  "gym.place.typical":
+    "Nadie ha configurado aún el equipamiento de este gimnasio, así que empieza como un gimnasio típico. Añádelo y cambia lo que sea diferente. Luego publícalo en Gimnasios para que la próxima persona se lo ahorre.",
+  "gym.place.officialNote": "Oficial: el propio gimnasio mantiene estos datos al día.",
   "gym.list.label": "Publicar este gimnasio",
   "gym.list.hint":
     "Quien entrene cerca podrá encontrarlo y añadir su configuración con un toque. Publica solo gimnasios abiertos al público, nunca uno en casa. Solo se comparten el nombre, el equipamiento y la zona (unos 1 km).",
@@ -325,7 +345,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.near.find": "Trouver des salles à proximité",
   "gym.near.looking": "Recherche…",
   "gym.near.note":
-    "Des salles publiées par d’autres sportifs près d’ici, avec l’équipement et les poids déjà configurés. Utilise votre position approximative une fois.",
+    "Les salles autour de vous, et les configurations publiées par d’autres sportifs avec leur équipement et leurs poids. Utilise votre position approximative une fois.",
   "gym.near.location":
     "La localisation est désactivée ou refusée. Vous pouvez autoriser la position approximative dans les réglages du téléphone.",
   "gym.near.offline": "Vous êtes hors ligne. Réessayez une fois connecté.",
@@ -335,6 +355,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.near.away": "à {km} km",
   "gym.near.kit": { one: "{count} type d’équipement", other: "{count} types d’équipement" },
   "gym.near.adds": { one: "ajoutée par {count} personne", other: "ajoutée par {count} personnes" },
+  "gym.place.official": "Salle officielle",
+  "gym.place.kitReady": "équipement configuré",
+  "gym.place.lifters": { one: "{count} personne s’entraîne ici", other: "{count} personnes s’entraînent ici" },
+  "gym.place.setups": "Configurations publiées par d’autres sportifs",
+  "gym.place.osm": "Données des salles © contributeurs OpenStreetMap",
+  "gym.place.title": "Une salle près de vous",
+  "gym.place.why": "Son équipement et ses poids sont déjà configurés. Ajoutez-la, puis modifiez ce qui diffère.",
+  "gym.place.typical":
+    "Personne n’a encore configuré l’équipement de cette salle, elle part donc d’une salle type. Ajoutez-la et modifiez ce qui diffère. Publiez-la ensuite dans Salles pour que la prochaine personne n’ait pas à le faire.",
+  "gym.place.officialNote": "Officielle : la salle elle-même tient ces informations à jour.",
   "gym.list.label": "Publier cette salle",
   "gym.list.hint":
     "Les sportifs proches pourront la trouver et ajouter sa configuration d’un geste. Ne publiez qu’une salle ouverte au public, jamais une salle à domicile. Seuls le nom, l’équipement et le secteur (environ 1 km) sont partagés.",
@@ -447,7 +477,7 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.near.find": "Studios in der Nähe finden",
   "gym.near.looking": "Suche…",
   "gym.near.note":
-    "Studios, die andere in der Nähe eingetragen haben, mit Geräten und Gewichten schon eingerichtet. Nutzt einmal deinen ungefähren Standort.",
+    "Studios in deiner Umgebung und Einrichtungen, die andere mit Geräten und Gewichten eingetragen haben. Nutzt einmal deinen ungefähren Standort.",
   "gym.near.location":
     "Standort ist aus oder nicht erlaubt. Du kannst den ungefähren Standort in den Einstellungen deines Handys erlauben.",
   "gym.near.offline": "Du bist offline. Versuch es noch einmal, wenn du verbunden bist.",
@@ -457,6 +487,16 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.near.away": "{km} km entfernt",
   "gym.near.kit": { one: "{count} Geräteart", other: "{count} Gerätearten" },
   "gym.near.adds": { one: "von {count} Person hinzugefügt", other: "von {count} Personen hinzugefügt" },
+  "gym.place.official": "Offizielles Studio",
+  "gym.place.kitReady": "Geräte eingerichtet",
+  "gym.place.lifters": { one: "{count} Person trainiert hier", other: "{count} Personen trainieren hier" },
+  "gym.place.setups": "Von anderen eingetragene Einrichtungen",
+  "gym.place.osm": "Studiodaten © OpenStreetMap-Mitwirkende",
+  "gym.place.title": "Ein Studio in deiner Nähe",
+  "gym.place.why": "Geräte und Gewichte sind schon eingerichtet. Füge es hinzu und ändere, was anders ist.",
+  "gym.place.typical":
+    "Die Geräte dieses Studios hat noch niemand eingerichtet, daher startet es als typisches Studio. Füge es hinzu und ändere, was anders ist. Trag es danach unter Studios ein, damit die nächste Person sich das spart.",
+  "gym.place.officialNote": "Offiziell: Das Studio selbst hält diese Angaben aktuell.",
   "gym.list.label": "Studio in der Nähe eintragen",
   "gym.list.hint":
     "Wer in der Nähe trainiert, findet es und übernimmt das Setup mit einem Tippen. Trag nur öffentliche Studios ein, nie ein Heimstudio. Geteilt werden nur Name, Ausstattung und Gegend (etwa 1 km).",
@@ -567,7 +607,7 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.near.find": "Trova palestre vicine",
   "gym.near.looking": "Cerco…",
   "gym.near.note":
-    "Palestre che altri hanno pubblicato qui vicino, con attrezzi e pesi già impostati. Usa una volta la tua posizione approssimativa.",
+    "Le palestre intorno a te e le configurazioni che altri hanno pubblicato, con attrezzi e pesi. Usa una volta la tua posizione approssimativa.",
   "gym.near.location":
     "La posizione è disattivata o non consentita. Puoi consentire la posizione approssimativa nelle impostazioni del telefono.",
   "gym.near.offline": "Sei offline. Riprova quando sei connesso.",
@@ -577,6 +617,16 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.near.away": "a {km} km",
   "gym.near.kit": { one: "{count} tipo di attrezzo", other: "{count} tipi di attrezzi" },
   "gym.near.adds": { one: "aggiunta da {count} persona", other: "aggiunta da {count} persone" },
+  "gym.place.official": "Palestra ufficiale",
+  "gym.place.kitReady": "attrezzi impostati",
+  "gym.place.lifters": { one: "{count} persona si allena qui", other: "{count} persone si allenano qui" },
+  "gym.place.setups": "Configurazioni pubblicate da altri",
+  "gym.place.osm": "Dati delle palestre © contributori di OpenStreetMap",
+  "gym.place.title": "Una palestra vicino a te",
+  "gym.place.why": "Attrezzi e pesi sono già impostati. Aggiungila e cambia ciò che è diverso.",
+  "gym.place.typical":
+    "Nessuno ha ancora impostato gli attrezzi di questa palestra, quindi parte come una palestra tipica. Aggiungila e cambia ciò che è diverso. Poi pubblicala in Palestre così la prossima persona può saltare questo passaggio.",
+  "gym.place.officialNote": "Ufficiale: è la palestra stessa a tenere aggiornati questi dati.",
   "gym.list.label": "Pubblica questa palestra",
   "gym.list.hint":
     "Chi si allena vicino potrà trovarla e aggiungerne la configurazione con un tocco. Pubblica solo palestre aperte al pubblico, mai una di casa. Si condividono solo nome, attrezzi e zona (circa 1 km).",
@@ -682,7 +732,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.near.title": "近くのジム",
   "gym.near.find": "近くのジムを探す",
   "gym.near.looking": "検索中…",
-  "gym.near.note": "近くでほかの人が公開したジムです。器具と重量が設定済みです。おおよその位置情報を一度だけ使います。",
+  "gym.near.note": "近くのジムと、ほかの人が器具と重量つきで公開した設定です。おおよその位置情報を一度だけ使います。",
   "gym.near.location": "位置情報がオフか、許可されていません。スマートフォンの設定でおおよその位置情報を許可できます。",
   "gym.near.offline": "オフラインです。接続してからもう一度お試しください。",
   "gym.near.failed": "うまくいきませんでした。少ししてからもう一度お試しください。",
@@ -690,6 +740,16 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.near.away": "{km} km 先",
   "gym.near.kit": { other: "器具 {count} 種類" },
   "gym.near.adds": { other: "{count} 人が追加" },
+  "gym.place.official": "公式ジム",
+  "gym.place.kitReady": "器具設定済み",
+  "gym.place.lifters": { other: "{count} 人がここでトレーニング" },
+  "gym.place.setups": "ほかの人が公開した設定",
+  "gym.place.osm": "ジム情報 © OpenStreetMap contributors",
+  "gym.place.title": "近くのジム",
+  "gym.place.why": "器具と重量はすでに設定済みです。追加して、違うところだけ変更してください。",
+  "gym.place.typical":
+    "このジムの器具はまだだれも設定していないため、一般的なジムとして始まります。追加して違うところを変更し、ジム画面で公開すると次の人が設定を省けます。",
+  "gym.place.officialNote": "公式：ジム自身がこの情報を最新に保っています。",
   "gym.list.label": "このジムを近くに公開",
   "gym.list.hint":
     "近くでトレーニングする人がこのジムを見つけ、設定をワンタップで追加できます。一般に開かれたジムだけを公開し、自宅のジムは公開しないでください。共有されるのは名前、器具、おおよその場所（約 1 km）だけです。",

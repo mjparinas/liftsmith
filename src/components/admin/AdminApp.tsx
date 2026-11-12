@@ -13,6 +13,7 @@ import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
+import { GymPlaces } from "./GymPlaces";
 import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
@@ -50,6 +51,7 @@ const TABS = [
   "To Do",
   "Inbox",
   "Reports",
+  "Gyms",
   "Traffic",
   "Acquisition",
   "Funnel",
@@ -1061,6 +1063,7 @@ export function AdminApp() {
             <GymReports admin={data.staff.role === "admin"} />
           </>
         )}
+        {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
