@@ -53,9 +53,29 @@ describe("rest time left on the Android Live Update", () => {
     // A set logged from the card starts fresh, without the last rest's "Rest over".
     expect(service).toContain('putExtra("restDone", false)');
     const ios = readFileSync(join(__dirname, "../../ios/App/App/WorkoutSessionPlugin.swift"), "utf8");
-    expect(ios).toContain("staleDate: restUntil");
+    // Stale when rest ends (or the set timer moves to its next phase), so the system redraws it by itself.
+    expect(ios).toContain("staleDate: state.nextChange(after: Date())");
+    const shared = readFileSync(join(__dirname, "../../ios/App/Shared/WorkoutActivity.swift"), "utf8");
+    expect(shared).toContain("let bounds = [restUntil].compactMap { $0 } + (timer ?? []).compactMap { $0.to }");
     const live = readFileSync(join(__dirname, "../../ios/App/LiftsmithWidgets/WorkoutLiveActivity.swift"), "utf8");
     expect(live).toContain('Text("Rest over")');
+  });
+
+  it("counts the set timer down on the lock screen and the watches with the app asleep (set-timer.md)", () => {
+    const plugin = readFileSync(join(__dirname, "../../android/app/src/main/java/com/getliftsmith/app/WorkoutSessionPlugin.java"), "utf8");
+    expect(plugin).toContain('i.putExtra("timer", timer == null ? "[]" : timer.toString());');
+    expect(service).toContain('TimerPhases.at(TimerPhases.parse(intent.getStringExtra("timer")), now)');
+    // A set logged from the card with the app closed leaves the timer behind.
+    expect(service).toContain('.putExtra("timer", "[]")');
+    const ios = readFileSync(join(__dirname, "../../ios/App/App/WorkoutSessionPlugin.swift"), "utf8");
+    expect(ios).toContain('if let timer = call.getArray("timer"), !timer.isEmpty { s["timer"] = timer }');
+    expect(ios).toContain("timerOverAlert(call)");
+    const live = readFileSync(join(__dirname, "../../ios/App/LiftsmithWidgets/WorkoutLiveActivity.swift"), "utf8");
+    expect(live).toContain("state.phase(at: now)");
+    const watch = readFileSync(join(__dirname, "../../ios/App/LiftsmithWatch/WatchState.swift"), "utf8");
+    expect(watch).toContain("case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion, timer");
+    const garmin = readFileSync(join(__dirname, "../../garmin/source/WorkoutState.mc"), "utf8");
+    expect(garmin).toContain('var k = data.get("k");');
   });
 
   it("redraws once a second only while resting, and stops when rest ends or the workout does", () => {

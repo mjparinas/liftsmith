@@ -169,6 +169,10 @@ public class WorkoutSessionPlugin extends Plugin {
         // The notification after each of the next Log sets, so its Log set works with the app closed (sessionAhead.ts).
         JSArray ahead = call.getArray("ahead");
         i.putExtra("ahead", ahead == null ? "[]" : ahead.toString());
+        // The set timer (holds, carries, cardio), phase by phase, counted down by the service on its own (TimerPhases).
+        JSArray timer = call.getArray("timer");
+        i.putExtra("timer", timer == null ? "[]" : timer.toString());
+        i.putExtra("timerOver", call.getString("timerOver", ""));
         ContextCompat.startForegroundService(getContext(), i);
         // The same workout on a Wear OS watch (WatchLink, android/wear).
         WatchLink.update(getContext(), call.getData());

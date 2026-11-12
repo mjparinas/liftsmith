@@ -1,5 +1,9 @@
 package com.getliftsmith.app.wear;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -27,6 +31,26 @@ final class WorkoutState {
     final String sessionId;
     /** Labs, watch rep counting: the phone wants the wrist's motion for this set. */
     final boolean motion;
+    /** The set timer for holds, carries and cardio, phase by phase in wall-clock time (sessionNotify.ts TimerSegment). */
+    final List<Phase> timer;
+
+    /** One phase of the set timer: counts down to `to`, or up from `from` when `to` is 0. */
+    static final class Phase {
+        final long from;
+        final long to;
+        final String label;
+
+        Phase(long from, long to, String label) {
+            this.from = from;
+            this.to = to;
+            this.label = label;
+        }
+
+        /** Whole seconds left (rounded up), or seconds so far for a count-up. */
+        long seconds(long now) {
+            return to > 0 ? Math.max(0, (to - now + 999) / 1000) : Math.max(0, (now - from) / 1000);
+        }
+    }
 
     private WorkoutState(JSONObject o) {
         title = o.optString("title", "");
@@ -41,6 +65,28 @@ final class WorkoutState {
         at = o.optLong("at", 0L);
         sessionId = o.optString("sessionId", "");
         motion = o.optBoolean("motion", false);
+        timer = phases(o.optJSONArray("timer"));
+    }
+
+    private static List<Phase> phases(JSONArray a) {
+        if (a == null) return Collections.emptyList();
+        List<Phase> out = new ArrayList<>();
+        for (int i = 0; i < a.length() && i < 8; i++) {
+            JSONObject p = a.optJSONObject(i);
+            if (p == null) continue;
+            long from = p.optLong("from", 0L);
+            long to = p.isNull("to") ? 0L : p.optLong("to", 0L);
+            if (from <= 0 || (to > 0 && to <= from)) continue;
+            out.add(new Phase(from, to, p.optString("label", "")));
+        }
+        return out;
+    }
+
+    /** The set timer's phase at `now` (started, not ended), or null; never while resting. Same rule as the phone's. */
+    Phase phase(long now) {
+        if (resting(now)) return null;
+        for (Phase p : timer) if (p.from <= now && (p.to == 0 || now < p.to)) return p;
+        return null;
     }
 
     /** The state in a Data Layer item's "json", or null when there's none or it can't be read. */

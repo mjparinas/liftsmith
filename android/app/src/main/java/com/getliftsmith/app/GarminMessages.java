@@ -1,15 +1,19 @@
 package com.getliftsmith.app;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
  * What goes to and comes from the Garmin watch app (garmin/source). Plain data, so it's tested without a watch.
  * The phone sends short keys because Connect IQ messages are small and slow: "t" title, "s" set label, "n" the set,
  * "p" plates, "r" seconds of rest left (not a time, so the two clocks never have to agree), "h" heart rate from a
- * Bluetooth monitor, "v" vibrate when rest ends. The watch sends {"a": "log" | "add30"} or {"hr": bpm}.
+ * Bluetooth monitor, "v" vibrate when rest ends, "k" the set timer's phases as [seconds from now to its start, to its
+ * end or -1 for a count-up, label] and "ki" which timer that is. The watch sends {"a": "log" | "add30"} or {"hr": bpm}.
  * iOS counterpart: GarminLink.swift (GarminMessages).
  */
 final class GarminMessages {
@@ -30,6 +34,25 @@ final class GarminMessages {
         m.put("r", restUntil > now ? (int) ((restUntil - now + 999) / 1000) : 0);
         m.put("h", s.optInt("hr", 0));
         m.put("v", s.optBoolean("vibrate", true));
+        // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
+        List<Object> k = new ArrayList<>();
+        JSONArray timer = restUntil > now ? null : s.optJSONArray("timer");
+        long first = 0L;
+        for (int i = 0; timer != null && i < timer.length() && i < 8; i++) {
+            JSONObject p = timer.optJSONObject(i);
+            if (p == null) continue;
+            long from = p.optLong("from", 0L);
+            long to = p.isNull("to") ? 0L : p.optLong("to", 0L);
+            if (from <= 0 || (to > 0 && to <= from)) continue;
+            if (first == 0L) first = from;
+            k.add(Arrays.asList(
+                (int) Math.floorDiv(from - now, 1000L),
+                to > 0 ? (int) ((to - now + 999) / 1000) : -1,
+                p.optString("label", "")
+            ));
+        }
+        m.put("k", k);
+        m.put("ki", first > 0 ? String.valueOf(first) : "");
         return m;
     }
 
@@ -46,7 +69,7 @@ final class GarminMessages {
      */
     static boolean worthSending(Map<String, Object> last, Map<String, Object> next, long sinceLastMs) {
         if (last == null) return true;
-        for (String k : new String[] { "t", "s", "n", "p", "v" }) {
+        for (String k : new String[] { "t", "s", "n", "p", "v", "ki" }) {
             Object a = last.get(k);
             if (a == null ? next.get(k) != null : !a.equals(next.get(k))) return true;
         }

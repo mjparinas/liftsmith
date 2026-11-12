@@ -111,6 +111,7 @@ import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
 import * as time from "./text/time";
+import * as timer from "./text/timer";
 import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
@@ -231,6 +232,7 @@ export const it: Partial<Record<MessageKey, Message>> = {
   ...tab.it,
   ...td.it,
   ...tempo.it,
+  ...timer.it,
   ...tdee.it,
   ...theme.it,
   ...tier.it,

@@ -17,6 +17,19 @@ struct WatchState: Decodable, Equatable {
     var sessionId = ""
     /// Labs, watch rep counting: the phone wants the wrist's motion for this set.
     var motion = false
+    /// The set timer for holds, carries and cardio, phase by phase (src/lib/sessionNotify.ts TimerSegment).
+    var timer: [Phase] = []
+
+    /// One phase of the set timer: counts down to `to` ("Time left", "Switch sides"…), or up from `from` with no end.
+    struct Phase: Decodable, Equatable {
+        /// ms since 1970, as the phone sends them.
+        var from: Double
+        var to: Double?
+        var label: String
+
+        var start: Date { Date(timeIntervalSince1970: from / 1000) }
+        var end: Date? { to.map { Date(timeIntervalSince1970: $0 / 1000) } }
+    }
 
     /// A workout the phone stopped talking about this long ago was forgotten (the phone ends those after 3 h).
     static let staleAfter: TimeInterval = 3 * 60 * 60
@@ -40,10 +53,18 @@ struct WatchState: Decodable, Equatable {
         at = (try? c.decode(Double.self, forKey: .at)) ?? 0
         sessionId = (try? c.decode(String.self, forKey: .sessionId)) ?? ""
         motion = (try? c.decode(Bool.self, forKey: .motion)) ?? false
+        let phases = (try? c.decode([Phase].self, forKey: .timer)) ?? []
+        timer = Array(phases.filter { p in p.from > 0 && (p.to.map { to in to > p.from } ?? true) }.prefix(8))
     }
 
     private enum CodingKeys: String, CodingKey {
-        case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion
+        case title, setLabel, next, plates, restUntil, hr, vibrate, done, total, at, sessionId, motion, timer
+    }
+
+    /// The set timer's phase at `now` (started, not ended); never while resting. Same rule as the phone's.
+    func phase(at now: Date) -> Phase? {
+        if resting(at: now) { return nil }
+        return timer.first { $0.start <= now && ($0.end.map { now < $0 } ?? true) }
     }
 
     var restEnd: Date? { restUntil.map { Date(timeIntervalSince1970: $0 / 1000) } }

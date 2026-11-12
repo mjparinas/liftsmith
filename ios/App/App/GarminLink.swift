@@ -173,14 +173,31 @@ final class GarminLink: NSObject, IQAppMessageDelegate, IQUIOverrideDelegate {
 }
 
 /// What goes to and comes from the Garmin watch (same keys as GarminMessages.java): "t" title, "s" set label, "n"
-/// the set, "p" plates, "r" seconds of rest left, "h" heart rate from a Bluetooth monitor, "v" vibrate when rest ends.
+/// the set, "p" plates, "r" seconds of rest left, "h" heart rate from a Bluetooth monitor, "v" vibrate when rest ends,
+/// "k" the set timer's phases as [seconds from now to its start, to its end or -1 for a count-up, label], "ki" which timer.
 enum GarminMessages {
     static let hrOnly: TimeInterval = 10
 
     static func state(_ s: [String: Any], now: Date) -> [String: Any] {
         let restUntil = (s["restUntil"] as? Double ?? 0) / 1000
         let left = restUntil - now.timeIntervalSince1970
+        // The set timer (holds, carries, cardio), in seconds from now like rest, so the two clocks never have to agree.
+        var k: [[Any]] = []
+        var first = 0.0
+        if left <= 0 {
+            for case let p as [String: Any] in (s["timer"] as? [Any] ?? []).prefix(8) {
+                guard let from = (p["from"] as? NSNumber)?.doubleValue, from > 0 else { continue }
+                let to = (p["to"] as? NSNumber)?.doubleValue
+                if let to, to <= from { continue }
+                if first == 0 { first = from }
+                let start = Int(((from / 1000) - now.timeIntervalSince1970).rounded(.down))
+                let end = to.map { Int((($0 / 1000) - now.timeIntervalSince1970).rounded(.up)) } ?? -1
+                k.append([start, end, p["label"] as? String ?? ""])
+            }
+        }
         return [
+            "k": k,
+            "ki": first > 0 ? String(Int64(first)) : "",
             "t": s["title"] as? String ?? "",
             "s": s["setLabel"] as? String ?? "",
             "n": s["next"] as? String ?? "",
@@ -193,7 +210,7 @@ enum GarminMessages {
 
     static func worthSending(_ last: [String: Any]?, _ next: [String: Any], since: TimeInterval) -> Bool {
         guard let last else { return true }
-        for k in ["t", "s", "n", "p"] where last[k] as? String != next[k] as? String { return true }
+        for k in ["t", "s", "n", "p", "ki"] where last[k] as? String != next[k] as? String { return true }
         if last["v"] as? Bool != next["v"] as? Bool { return true }
         let a = last["r"] as? Int ?? 0, b = next["r"] as? Int ?? 0
         if (a > 0) != (b > 0) || (b > 0 && abs(Double(b) + since - Double(a)) > 1.5) { return true }

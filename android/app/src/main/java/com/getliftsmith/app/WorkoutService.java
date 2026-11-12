@@ -71,6 +71,8 @@ public class WorkoutService extends Service {
     private int aheadAt = 0;
     /** The last planned set has been logged from the notification with the app closed. */
     private boolean ended = false;
+    /** The set timer for holds, carries and cardio (TimerPhases), counted here so it runs with the app asleep. */
+    private java.util.List<TimerPhases.Phase> timer = java.util.Collections.emptyList();
 
     @Override
     public void onCreate() {
@@ -145,8 +147,10 @@ public class WorkoutService extends Service {
                 .putExtra("speak", "")
                 // Heart rate came from the app, which isn't running to update it.
                 .putExtra("hr", 0)
-                // A new set: the last rest's "Rest over" is done with.
-                .putExtra("restDone", false);
+                // A new set: the last rest's "Rest over" is done with, and so is the set timer.
+                .putExtra("restDone", false)
+                .putExtra("timer", "[]")
+                .putExtra("timerDone", false);
             show(n);
             watches(n);
         } else if ("add30".equals(action)) {
@@ -196,6 +200,7 @@ public class WorkoutService extends Service {
         ServiceCompat.startForeground(this, ID_LIVE, build(intent), type);
         handler.removeCallbacks(restTick);
         if (resting) scheduleTick(restUntil);
+        scheduleTimer(intent, resting);
 
         if (restOver != null) handler.removeCallbacks(restOver);
         handler.removeCallbacks(countdownTick);
@@ -247,6 +252,10 @@ public class WorkoutService extends Service {
         int total = intent.getIntExtra("total", 0);
         long now = System.currentTimeMillis();
         boolean resting = restUntil > now;
+        // The set timer while lifting: "Time left 0:23" in place of the set, in the chip and as a bar.
+        TimerPhases.Phase phase = resting ? null : TimerPhases.at(TimerPhases.parse(intent.getStringExtra("timer")), now);
+        // The hold ran out with no update from the app yet: the card says so ("Time's up") until it logs the set.
+        String overText = !resting && phase == null && intent.getBooleanExtra("timerDone", false) ? intent.getStringExtra("timerOver") : null;
         // Whole seconds left, rounded up, so it reads 0:01 in the last second and never 0:00 while still resting.
         long secLeft = resting ? (restUntil - now + 999) / 1000 : 0;
         String left = DateUtils.formatElapsedTime(secLeft);
@@ -267,12 +276,17 @@ public class WorkoutService extends Service {
             if (hr > 0) body.append("\n♥ ").append(hr).append(" bpm");
         }
 
+        if (phase != null) body.insert(0, phase.text(now) + "\n");
+        else if (overText != null && !overText.isEmpty()) body.insert(0, overText + "\n");
+
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
             .setSmallIcon(R.drawable.ic_stat_workout)
             .setContentTitle(title)
             .setContentText(
                 resting ? getString(R.string.rest_left_next, left, next)
                     : restDone ? getString(R.string.up_next, next)
+                    : phase != null ? phase.text(now)
+                    : overText != null && !overText.isEmpty() ? overText
                     : setLabel == null || setLabel.isEmpty() ? next : setLabel + " · " + next
             )
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
@@ -298,6 +312,14 @@ public class WorkoutService extends Service {
             // and the header clock showed it a second time beside the title (Melvin, 2026-11-12).
             b.setShowWhen(false);
             b.setShortCriticalText(left);
+        } else if (phase != null) {
+            // The timer's bar: how far through this phase (a count-up has no end, so it shows the workout's bar).
+            if (phase.to > 0) {
+                long span = Math.max(1, (phase.to - phase.from) / 1000);
+                b.setProgress((int) span, (int) Math.min(span, (now - phase.from) / 1000), false);
+            } else if (total > 0) b.setProgress(total, Math.min(done, total), false);
+            b.setShowWhen(false);
+            b.setShortCriticalText(TimerPhases.clock(phase.seconds(now)));
         } else {
             // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
             if (total > 0) b.setProgress(total, Math.min(done, total), false);
@@ -307,6 +329,57 @@ public class WorkoutService extends Service {
         }
         return b.build();
     }
+
+    /**
+     * The set timer: redraws once a second while a phase runs, a buzz as each phase ends (go, switch sides), and the
+     * rest-over sound and buzz when the hold is over, so it's heard and felt with the phone locked. Nothing while resting.
+     */
+    private void scheduleTimer(Intent intent, boolean resting) {
+        handler.removeCallbacks(timerTick);
+        handler.removeCallbacks(timerStep);
+        handler.removeCallbacks(timerOver);
+        timer = resting ? java.util.Collections.emptyList() : TimerPhases.parse(intent.getStringExtra("timer"));
+        if (timer.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        handler.postDelayed(timerTick, 1000L - (now % 1000L));
+        for (int i = 0; i < timer.size() - 1; i++) {
+            long at = timer.get(i).to - now;
+            if (at > 0) handler.postDelayed(timerStep, at);
+        }
+        long end = TimerPhases.end(timer);
+        if (end > now) {
+            final boolean sound = intent.getBooleanExtra("sound", true);
+            final boolean vibrate = intent.getBooleanExtra("vibrate", true);
+            timerOverAlert = () -> {
+                if (last != null) {
+                    last = new Intent(last).putExtra("timerDone", true);
+                    getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
+                }
+                alertRestOver(sound, vibrate);
+            };
+            handler.postDelayed(timerOver, end - now);
+        }
+    }
+
+    private Runnable timerOverAlert;
+    private final Runnable timerOver = () -> {
+        if (timerOverAlert != null) timerOverAlert.run();
+    };
+
+    /** One buzz as a phase of the set timer ends (posted once per phase; removeCallbacks cancels all of them). */
+    private final Runnable timerStep = () -> {
+        Vibrator v = getSystemService(Vibrator.class);
+        if (v != null) v.vibrate(VibrationEffect.createOneShot(120, 200));
+    };
+
+    /** Once a second while the set timer runs, so "Time left 0:23", the chip and the bar stay right. */
+    private final Runnable timerTick = () -> {
+        if (last == null || timer.isEmpty()) return;
+        long now = System.currentTimeMillis();
+        if (TimerPhases.at(timer, now) == null && now >= TimerPhases.end(timer) && TimerPhases.end(timer) > 0) return;
+        getSystemService(NotificationManager.class).notify(ID_LIVE, build(last));
+        handler.postDelayed(this.timerTick, 1000L - (now % 1000L));
+    };
 
     /** Redraws the notification on the next whole second of rest left, so "1:23 left" and the rest bar stay right. */
     private void scheduleTick(long restUntil) {
@@ -373,6 +446,9 @@ public class WorkoutService extends Service {
         if (restOver != null) handler.removeCallbacks(restOver);
         handler.removeCallbacks(restTick);
         handler.removeCallbacks(countdownTick);
+        handler.removeCallbacks(timerTick);
+        handler.removeCallbacks(timerStep);
+        handler.removeCallbacks(timerOver);
         running = false;
         refreshTile();
         super.onDestroy();

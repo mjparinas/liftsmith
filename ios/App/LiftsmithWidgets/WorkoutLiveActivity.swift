@@ -48,8 +48,18 @@ struct Countdown: View {
     var compact = false
 
     var body: some View {
-        if let until = state.restUntil, until > Date() {
-            Text(timerInterval: Date()...until, countsDown: true)
+        let now = Date()
+        if let until = state.restUntil, until > now {
+            Text(timerInterval: now...until, countsDown: true)
+        } else if let p = state.phase(at: now) {
+            // The set timer (holds, carries, cardio): the system ticks it, and the activity goes stale at the next phase.
+            if let to = p.to {
+                Text(timerInterval: now...to, countsDown: true)
+            } else {
+                Text(p.from, style: .timer)
+            }
+        } else if !compact, state.timerDone(at: now), let over = state.timerOver, !over.isEmpty {
+            Text(over).lineLimit(1).minimumScaleFactor(0.5)
         } else if !compact, state.restUntil != nil {
             Text("Rest over").lineLimit(1).minimumScaleFactor(0.5)
         } else if let chip = state.chip, !chip.isEmpty {
@@ -66,7 +76,15 @@ struct WorkoutProgress: View {
     let state: WorkoutAttributes.ContentState
 
     var body: some View {
-        if let until = state.restUntil, let from = state.restFrom, until > Date(), from < until {
+        if let p = state.phase(at: Date()), let to = p.to {
+            ProgressView(timerInterval: p.from...to, countsDown: false) {
+                EmptyView()
+            } currentValueLabel: {
+                EmptyView()
+            }
+            .tint(Brand.accent)
+            .accessibilityLabel(Text(p.label))
+        } else if let until = state.restUntil, let from = state.restFrom, until > Date(), from < until {
             ProgressView(timerInterval: from...until, countsDown: true) {
                 EmptyView()
             } currentValueLabel: {
@@ -106,7 +124,8 @@ struct LockScreenView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(state.title).font(.headline).foregroundStyle(.white).lineLimit(1)
-                    Text(state.setLabel).font(.caption).foregroundStyle(Brand.muted)
+                    // While the set timer runs, what it's counting ("Time left", "Switch sides") in place of the set.
+                    Text(state.phase(at: Date())?.label ?? state.setLabel).font(.caption).foregroundStyle(Brand.muted)
                 }
                 Spacer()
                 Countdown(state: state).font(.title.monospacedDigit().bold()).foregroundStyle(Brand.accent)
