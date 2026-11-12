@@ -37,11 +37,13 @@ import {
 import { connectHeartRate, HrError, hrMessage, hrSupported, savedHr, saveHr, type HrConnection } from "@/lib/heartRate";
 import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { labOn } from "@/lib/labs";
 import { useApp } from "@/lib/store";
 import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
 import { go, useRoute } from "./router";
+import { SonosSettings } from "./Sonos";
 import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
@@ -315,7 +317,7 @@ function CloudRow({ p }: { p: Cloud }) {
       {link ? (
         <Status on>
           {link.who ? t("conn.as", { who: link.who }) : t("conn.since", { when: ago(link.since) })}
-          {p !== "strava" && pulled ? ` · ${t("conn.lastSync", { when: ago(pulled) })}` : ""}
+          {p !== "strava" && p !== "sonos" && pulled ? ` · ${t("conn.lastSync", { when: ago(pulled) })}` : ""}
         </Status>
       ) : (
         ready && <Status on={false}>{t("conn.notConnected")}</Status>
@@ -329,11 +331,12 @@ function CloudRow({ p }: { p: Cloud }) {
           onChange={(v) => setProfile({ connections: { ...profile.connections, stravaPost: v } })}
         />
       )}
-      {link && p !== "strava" && pro && (
+      {link && p !== "strava" && p !== "sonos" && pro && (
         <Button className="mt-3 w-full" onClick={() => void sync()}>
           {t("conn.syncNow")}
         </Button>
       )}
+      {link && p === "sonos" && pro && <SonosSettings />}
       {link && !pro && (
         <Button
           className="mt-3 w-full"
@@ -364,9 +367,13 @@ function CloudRow({ p }: { p: Cloud }) {
   );
 }
 
+/** Sonos is a lab (labSonos): its card shows once the lab is on, or while it's still connected, so it can be removed. */
+const shownClouds = (sonosLinked: boolean) => CLOUD.filter((p) => p !== "sonos" || labOn("labSonos") || sonosLinked);
+
 function CloudCards() {
   const account = useAccount((s) => s.account);
   const error = useCloud((s) => s.error);
+  const sonosLinked = useCloud((s) => !!s.status?.linked.sonos);
   useEffect(() => {
     void refreshCloud();
     const back = () => {
@@ -391,10 +398,10 @@ function CloudCards() {
         </p>
       )}
       {account ? (
-        CLOUD.map((p) => <CloudRow key={p} p={p} />)
+        shownClouds(sonosLinked).map((p) => <CloudRow key={p} p={p} />)
       ) : (
         <ul className="mt-3 space-y-1 px-1 text-sm text-muted">
-          {CLOUD.map((p) => (
+          {shownClouds(sonosLinked).map((p) => (
             <li key={p}>
               <span className="font-semibold text-ink">{CLOUD_NAME[p]}</span> · {t(`conn.${p}.what` as MessageKey)}
             </li>

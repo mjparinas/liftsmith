@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { breathPhase, plateQuiz } from "@/components/app/WorkoutExtras";
+import { boxPoint, plateQuiz } from "@/components/app/WorkoutExtras";
 import { makeSet } from "@/test/factories";
 
 import { ACHIEVEMENTS, achName, tierNames } from "./achievements";
@@ -390,11 +390,12 @@ describe("earned themes", () => {
 });
 
 describe("rest extras", () => {
-  it("paces breathing in for 4 s and out for 6 s", () => {
-    expect(breathPhase(0)).toEqual({ phase: "in", p: 0 });
-    expect(breathPhase(2).phase).toBe("in");
-    expect(breathPhase(4)).toEqual({ phase: "out", p: 1 });
-    expect(breathPhase(10)).toEqual({ phase: "in", p: 0 });
+  it("moves the box breathing dot one side per quarter of the cycle", () => {
+    expect(boxPoint(0)).toEqual({ x: 10, y: 90 });
+    expect(boxPoint(0.25)).toEqual({ x: 10, y: 10 });
+    expect(boxPoint(0.5)).toEqual({ x: 90, y: 10 });
+    expect(boxPoint(0.75)).toEqual({ x: 90, y: 90 });
+    expect(boxPoint(1)).toEqual({ x: 10, y: 90 });
   });
   it("builds plate-math questions from the gym's own plates with one right answer", () => {
     const gym = makeGym("commercial", "kg", "g");

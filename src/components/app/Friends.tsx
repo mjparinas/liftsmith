@@ -3,12 +3,12 @@
 // Friends and the workout feed (Melvin, 2026-11-11; docs/decisions/friends.md). One screen (#/friends) with the
 // feed, activity and people, a person's page (#/person/<handle>), a post's comments in a sheet, and the post
 // button on Done. Opened from the people button on Today's header (Melvin chose it over a sixth tab).
-import { useCallback, useEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type CSSProperties, type FormEvent, type ReactNode } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { achName, TIER_LABEL } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
-import { useAccount } from "@/lib/auth";
+import { readAccount, useAccount } from "@/lib/auth";
 import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
 import { challengeDays, challengeResult, markResultSeen, rematchHandles, unseenResult } from "@/lib/challengeResult";
 import type { SessionSummary } from "@/lib/derive";
@@ -35,6 +35,7 @@ import { challengeShare } from "@/lib/shareCards";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   bestLifts,
+  loadHome,
   postWorkout,
   profileChanges,
   profileUrl,
@@ -46,6 +47,7 @@ import {
   useSocial,
   type SocialMe,
 } from "@/lib/social";
+import { cached, fetchPart, fresh, keep } from "@/lib/socialCache";
 import {
   AUDIENCES,
   BOARD_METRICS,
@@ -540,6 +542,8 @@ function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () =>
 }
 
 /** A list of posts with comments and "Load more". `op` is feed, person (with `handle`) or clubFeed (with `club`). */
+type Page = { posts: FeedPost[]; more: boolean };
+
 function Posts({
   op,
   handle,
@@ -551,11 +555,19 @@ function Posts({
   club?: string;
   empty: ReactNode;
 }) {
-  const [posts, setPosts] = useState<FeedPost[] | null>(null);
-  const [more, setMore] = useState(false);
+  // The last copy shows at once (socialCache.ts); the feed itself usually comes with the tab's one "home" request.
+  const account = readAccount()?.id ?? "";
+  const key = op === "feed" ? "feed" : `${op}:${handle ?? ""}:${club ?? ""}`;
+  const [kept] = useState(() => cached<Page>(account, key));
+  const [posts, setPosts] = useState<FeedPost[] | null>(kept?.posts ?? null);
+  const [more, setMore] = useState(kept?.more ?? false);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<FeedPost | null>(null);
   const [reporting, setReporting] = useState<string | null>(null);
+  // A like, a removed post or another page is kept too, so coming back shows it as the lifter left it.
+  useEffect(() => {
+    if (posts) keep(account, key, { posts, more });
+  }, [account, key, posts, more]);
   const load = useCallback(
     async (before: number) => {
       try {
@@ -571,8 +583,9 @@ function Posts({
     [op, handle, club],
   );
   useEffect(() => {
+    if (fresh(account, key)) return;
     let live = true;
-    social<{ posts: FeedPost[]; more: boolean }>(op, { handle, id: club })
+    fetchPart(account, key, () => social<Page>(op, { handle, id: club }))
       .then((r) => {
         if (!live) return;
         setPosts(r.posts);
@@ -580,13 +593,14 @@ function Posts({
       })
       .catch((e: unknown) => {
         if (!live) return;
-        setPosts([]);
+        // Offline with a copy from last time: keep showing it, with the reason it didn't refresh.
+        setPosts((p) => p ?? []);
         setNote(socialError(e));
       });
     return () => {
       live = false;
     };
-  }, [op, handle, club]);
+  }, [account, key, op, handle, club]);
   const change = (id: string) => (p: FeedPost | null) => setPosts((ps) => (ps ?? []).flatMap((x) => (x.id !== id ? [x] : p ? [p] : [])));
   if (posts === null)
     return (
@@ -2300,12 +2314,14 @@ export function InviteScreen({ code: raw }: { code: string }) {
 
 // --- Screens ---
 
-function useSocialLoaded() {
+/** Opening a Friends screen asks for the whole tab at once ("home"). A layout effect, so it's on its way before any
+ *  part of the tab (the feed, training now, suggestions) mounts and asks for itself: they join it instead. */
+function useSocialLoaded(home = false) {
   const account = useAccount((s) => s.account);
   const { me, error } = useSocial();
-  useEffect(() => {
-    void refreshSocial();
-  }, [account?.id]);
+  useLayoutEffect(() => {
+    void (home ? loadHome() : refreshSocial());
+  }, [account?.id, home]);
   return { account, me, error };
 }
 
@@ -2313,7 +2329,7 @@ const TABS = ["feed", "board", "clubs", "activity", "people"] as const;
 type Tab = (typeof TABS)[number];
 
 export function Friends({ tab: start }: { tab?: string } = {}) {
-  const { account, me, error } = useSocialLoaded();
+  const { account, me, error } = useSocialLoaded(true);
   useProfileSync();
   const [tab, setTab] = useState<Tab>(TABS.find((x) => x === start) ?? "feed");
   const [view, setView] = useState<"following" | "discover">("following");

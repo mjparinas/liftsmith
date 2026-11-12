@@ -28,6 +28,7 @@ const TERMS = [
   "hrv",
   "restingHr",
   "breathingRate",
+  "breathPattern",
   "vo2max",
   "bodyFat",
   "leanMass",

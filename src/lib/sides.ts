@@ -55,6 +55,12 @@ const ONE_DUMBBELL: ReadonlySet<string> = new Set([
   "db-overhead-extension",
   "goblet-squat",
   "db-calf-raise",
+  "db-concentration-curl",
+  "db-suitcase-deadlift",
+  "db-woodchop",
+  "db-overhead-squat-single",
+  "db-single-leg-rdl",
+  "db-lateral-lunge",
 ]);
 /** Exercises done one side at a time, with reps logged per side. */
 const PER_SIDE: ReadonlySet<string> = new Set([
@@ -242,6 +248,60 @@ const PER_SIDE: ReadonlySet<string> = new Set([
   "bulgarian-split-squat",
   "walking-lunge",
   "db-calf-raise",
+  "bw-split-squat",
+  "reverse-lunge",
+  "step-up",
+  "split-squat",
+  "pistol-squat",
+  "single-leg-rdl",
+  "single-leg-hip-thrust",
+  "copenhagen-plank",
+  "short-copenhagen-plank",
+  "cossack-squat",
+  "side-plank",
+  "pallof-press",
+  "band-pallof-press",
+  "band-pallof-hold",
+  "pallof-squat",
+  "kb-suitcase-carry",
+  "suitcase-march",
+  "kb-single-swing",
+  "kb-lunge",
+  "kb-goblet-reverse-lunge",
+  "kb-walking-lunge",
+  "kb-lunge-pass-through",
+  "kb-turkish-get-up",
+  "kb-windmill",
+  "band-glute-kickback",
+  "band-woodchop",
+  "cable-woodchop",
+  "db-woodchop",
+  "archer-push-up",
+  "archer-pull-up",
+  "one-arm-hang",
+  "jumping-lunge",
+  "lateral-lunge",
+  "curtsy-lunge",
+  "single-leg-glute-bridge",
+  "marching-glute-bridge",
+  "bird-dog",
+  "single-arm-cable-row",
+  "single-leg-press",
+  "smith-split-squat",
+  "cable-kickback",
+  "barbell-lunge",
+  "barbell-front-rack-lunge",
+  "db-walking-lunge",
+  "db-concentration-curl",
+  "db-step-up",
+  "db-lateral-lunge",
+  "db-single-leg-rdl",
+  "db-suitcase-deadlift",
+  "db-overhead-squat-single",
+  "plank-leg-lift",
+  "single-leg-lower",
+  "prone-leg-lift",
+  "med-ball-lunge-twist",
 ]);
 
 /** How many dumbbells or kettlebells are held at once: 1 or 2. Barbells, machines and bodyweight count as 1. */
@@ -253,6 +313,14 @@ export function implementsFor(ex: Pick<Exercise, "id" | "load">): 1 | 2 {
 /** Reps are done one side, then the other, and logged per side. */
 export function perSide(exerciseId: string): boolean {
   return PER_SIDE.has(exerciseId);
+}
+
+/**
+ * Reps a rep counter (camera, phone motion or watch) saw, as the set's reps: on a per-side move it
+ * sees both sides, so half of them (rounded up) is the count for each side.
+ */
+export function countedReps(exerciseId: string, seen: number): number {
+  return perSide(exerciseId) ? Math.ceil(seen / 2) : seen;
 }
 
 /** Reps of a set across both sides (left plus right, or twice the per-side reps). */

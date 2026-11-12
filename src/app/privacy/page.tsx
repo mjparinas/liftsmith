@@ -169,7 +169,7 @@ export default function Privacy() {
           is kept.
         </p>
 
-        <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
+        <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar, Concept2 and Sonos</h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};
           we keep the access it gives us (encrypted) with your account, plus your name on Strava to show who&apos;s connected. With Strava
@@ -181,8 +181,10 @@ export default function Privacy() {
           and passes them straight to your phone without keeping them, and they&apos;re then treated like readings from Health Connect or
           Apple Health, or like workouts you logged yourself. For Polar we also keep the user number Polar gives us, so we can remove our
           access when you disconnect. Disconnect in Settings › Connected apps, or delete your account, and we withdraw our access at the
-          service where it lets us (Withings and Concept2 have no way for us to do this, so you can also remove {BRAND.name} in your account
-          there) and delete what we kept. Music links open your music app with a public playlist and send nothing to us.
+          service where it lets us (Withings, Concept2 and Sonos have no way for us to do this, so you can also remove {BRAND.name} in your
+          account there) and delete what we kept. With Sonos connected (an experiment in Labs), the app asks our server to list your Sonos
+          speakers and favourites, read what one is playing and its volume, and send play, pause, skip and volume commands to it; nothing
+          from Sonos is kept. Music links open your music app with a public playlist and send nothing to us.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Reminders</h2>

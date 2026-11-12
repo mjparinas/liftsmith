@@ -280,6 +280,42 @@ describe("Friends", () => {
     await waitFor(() => expect(location.hash).toBe("#/person/blair"));
   });
 
+  it("opens with one request, and shows the last feed at once when opened again", async () => {
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "follow", handle: "blair" });
+    await handle("acc-b", { op: "follow", handle: "alex" });
+    await handle("acc-a", { op: "answer", handle: "blair", accept: true });
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "w1",
+      at: Date.now() - 3_600_000,
+      caption: "Pull day",
+      body: { seconds: 3000, sets: 10, volume: 0, prs: 0, muscles: [], exercises: [{ id: "bench-press", sets: 3, w: 60, r: 8 }] },
+    });
+    const ops: string[] = [];
+    const real = fetch;
+    vi.stubGlobal("fetch", (url: string, init: RequestInit) => {
+      ops.push(String((JSON.parse(String(init.body)) as { op: string }).op));
+      return real(url, init);
+    });
+    signIn("tok-a");
+    const first = render(<Friends />);
+    expect(await screen.findByText("Pull day")).toBeInTheDocument();
+    // The whole tab (own state, feed, training now, suggestions) came in the one "home" request.
+    await new Promise((r) => setTimeout(r, 50));
+    expect(ops.filter((o) => o !== "update")).toEqual(["home"]);
+    first.unmount();
+
+    // Back on the tab, even offline, the feed is there at once.
+    vi.stubGlobal("fetch", () => Promise.reject(new TypeError("offline")));
+    useSocial.setState({ me: null });
+    render(<Friends />);
+    expect(screen.getByText("Pull day")).toBeInTheDocument();
+    await waitFor(() => expect(useSocial.getState().loading).toBe(false));
+    expect(screen.getByText("Pull day")).toBeInTheDocument();
+  });
+
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });

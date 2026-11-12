@@ -1,4 +1,4 @@
-// GET /api/admin/gym-places/?q=: real gyms for the admin Gyms tab (staff). POST (admins, audited):
+// GET /api/admin/gym-places/?q=&page=: real gyms for the admin Gyms tab, 50 a page (staff). POST (admins, audited):
 // {action: "import", where: "Langley, BC"} seeds an area from OpenStreetMap; {id, action: hide | show | gym | studio | delete}
 // changes one gym (src/server/gymPlaces.ts, docs/decisions/gyms.md).
 import { audit, json, requireStaff } from "@/server/adminAuth";
@@ -12,7 +12,8 @@ export const maxDuration = 120;
 export async function GET(req: Request) {
   const gate = await requireStaff(req);
   if ("response" in gate) return gate.response;
-  return json(200, await adminPlaces(new URL(req.url).searchParams.get("q")));
+  const u = new URL(req.url).searchParams;
+  return json(200, await adminPlaces(u.get("q"), u.get("page")));
 }
 
 export async function POST(req: Request) {

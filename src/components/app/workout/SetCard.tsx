@@ -94,8 +94,10 @@ export function SetCard({
         {ex.load !== "bodyweight" && unit !== profile.unit && active.weight > 0 && (
           // This gym's plates are in the other unit: show the weight in the lifter's unit too.
           <p className="num -mt-3 text-sm text-muted">
-            ≈ {fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} {profile.unit}
-            {ex.load === "dumbbell" && implementsFor(ex) === 2 ? " each" : ""}
+            ≈{" "}
+            {((w) => (ex.load === "dumbbell" && implementsFor(ex) === 2 ? t("fmt.each", { weight: w }) : w))(
+              `${fmtNum(Math.round(fromKg(active.weight, profile.unit) * 10) / 10)} ${profile.unit}`,
+            )}
           </p>
         )}
         {repStep && <Stepper display={docked} {...repStep} />}

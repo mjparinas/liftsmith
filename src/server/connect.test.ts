@@ -70,7 +70,7 @@ describe("tokens at rest", () => {
 describe("connecting", () => {
   it("says which services have keys", async () => {
     const s = await status("acc1", ENV);
-    expect(s.ready).toEqual({ strava: true, oura: true, whoop: false, withings: true, polar: true, concept2: false });
+    expect(s.ready).toEqual({ strava: true, oura: true, whoop: false, withings: true, polar: true, concept2: false, sonos: false });
     expect(s.linked).toEqual({});
   });
 

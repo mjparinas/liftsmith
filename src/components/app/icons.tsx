@@ -25,6 +25,12 @@ const PATHS = {
   chevronUp: "M6 15l6-6 6 6",
   chevronDown: "M6 9l6 6 6-6",
   play: "M7 4.5v15l12-7.5z",
+  // Sonos controls (docs/decisions/sonos.md).
+  pause: "M8 5v14M16 5v14",
+  skipNext: "M5 5.5v13l9.5-6.5zM19 5v14",
+  skipPrev: "M19 5.5v13L9.5 12zM5 5v14",
+  volume: "M4 9h4l5-4v14l-5-4H4zM16.5 8.5a5 5 0 0 1 0 7M19.5 5.5a9 9 0 0 1 0 13",
+  speaker: "M6 3h12v18H6zM12 17.5a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM12 7h.01",
   plus: "M12 5v14M5 12h14",
   clock: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM12 7v5l3 2",
   bolt: "M13 2 4 14h7l-1 8 9-12h-7z",
@@ -64,6 +70,8 @@ const PATHS = {
   compass: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15.5 8.5l-2 5-5 2 2-5z",
   hourglass: "M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9",
   image: "M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M15.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z",
+  // One side, then the other: a midline with an arrow out to each side.
+  sides: "M12 3v18M8.5 8 4.5 12l4 4M4.5 12H9M15.5 8l4 4-4 4M19.5 12H15",
 } as const;
 
 export type IconName = keyof typeof PATHS;

@@ -6,9 +6,11 @@
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { readAccount } from "@/lib/auth";
 import { date, t, weekday } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { refreshSocial, social, socialError } from "@/lib/social";
+import { cached, fetchPart, fresh, keep } from "@/lib/socialCache";
 import { suggestionWhy, trainingCalendar, usualDaysLine } from "@/lib/socialProfile";
 import { SOCIAL_LIMITS, type PersonCard, type PersonRow, type Suggestion } from "@/lib/socialTypes";
 import { fmtNum } from "@/lib/units";
@@ -41,17 +43,23 @@ export function PersonLine({ p, line, children }: { p: PersonRow; line?: string;
  * there's no one to suggest.
  */
 export function Suggestions({ reload = 0, onFollowed }: { reload?: number; onFollowed?: () => void }) {
-  const [rows, setRows] = useState<Suggestion[] | null>(null);
+  // Usually comes with the tab's one "home" request (socialCache.ts); `reload` asks again.
+  const account = readAccount()?.id ?? "";
+  const [rows, setRows] = useState<Suggestion[] | null>(() => cached<Suggestion[]>(account, "suggest") ?? null);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
+    if (!reload && fresh(account, "suggest")) return;
     let live = true;
-    social<{ people: Suggestion[] }>("suggest")
-      .then((r) => live && setRows(r.people))
-      .catch(() => live && setRows([]));
+    fetchPart(account, "suggest", () => social<{ people: Suggestion[] }>("suggest").then((r) => r.people))
+      .then((people) => live && setRows(people))
+      .catch(() => live && setRows((r) => r ?? []));
     return () => {
       live = false;
     };
-  }, [reload]);
+  }, [account, reload]);
+  useEffect(() => {
+    if (rows) keep(account, "suggest", rows);
+  }, [account, rows]);
   const act = async (p: Suggestion, op: "follow" | "unsuggest") => {
     haptic("tick");
     try {

@@ -133,6 +133,41 @@ describe("exercise demos", () => {
     expect(a.handR[1]).toBeGreaterThan(a.head[1]); // locked out overhead on both
     expect(b.handR[1]).toBeGreaterThan(b.head[1]);
   });
+  it("keeps behind-the-neck and behind-the-back bars behind the body", () => {
+    for (const bk of BODY_KEYS) {
+      const B = BODIES[bk];
+      for (let d = 0; d <= 1; d += 0.05) {
+        // behind-the-neck press: below the top of the head, the bar passes behind it (Melvin, 2026-11-12)
+        const J = jointsAt(motionFor("behind-neck-press"), B, d);
+        if (J.bar![1] < J.head[1] + B.head[1]) expect(J.bar![0], `${bk} press at ${d}`).toBeLessThan(J.head[0] - B.head[0]);
+        const F = jointsAt(motionFor("overhead-press"), B, d);
+        if (F.bar![1] < F.head[1]) expect(F.bar![0], `${bk} front press at ${d}`).toBeGreaterThan(F.head[0]);
+        for (const id of ["behind-back-shrug", "behind-back-wrist-curl"]) {
+          const K = jointsAt(motionFor(id), B, d);
+          expect(K.bar![0], `${bk} ${id} at ${d}`).toBeLessThan(K.hipC[0] - 0.12);
+        }
+        const C = jointsAt(motionFor("behind-body-cable-curl"), B, d);
+        expect(C.elbowR[0], `${bk} cable curl elbow at ${d}`).toBeLessThan(C.shC[0] - 0.05);
+      }
+    }
+  });
+  it("draws the bar on barbell carries, in the right place", () => {
+    for (const bk of BODY_KEYS) {
+      const B = BODIES[bk];
+      for (const d of [0, 0.25, 0.5, 0.75]) {
+        // Bar-in-elbows carry: the bar sits in the crook of the elbows, in front of the body (Melvin, 2026-11-12)
+        const Z = jointsAt(motionFor("zercher-carry"), B, d);
+        expect(Z.bar, `${bk} zercher at ${d}`).toBeDefined();
+        expect(Math.hypot(Z.bar![0] - Z.elbowR[0], Z.bar![1] - Z.elbowR[1]), `${bk} zercher bar to elbow`).toBeLessThan(0.08);
+        expect(Z.bar![0]).toBeGreaterThan(Z.shC[0] + 0.05);
+        expect(Z.handR[1]).toBeGreaterThan(Z.elbowR[1]);
+        const O = jointsAt(motionFor("overhead-barbell-carry"), B, d);
+        expect(O.bar![1], `${bk} overhead carry`).toBeGreaterThan(O.head[1]);
+        const F = jointsAt(motionFor("front-rack-barbell-carry"), B, d);
+        expect(F.bar![0], `${bk} front rack carry`).toBeGreaterThan(F.shC[0]);
+      }
+    }
+  });
   it("keeps the female figure's hips and glutes in athletic proportion", () => {
     const F = BODIES.female,
       M = BODIES.male;

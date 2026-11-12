@@ -27,6 +27,7 @@ export const ja: SiteText = {
       openApp: "アプリを開く",
       features: "機能",
       whoFor: "こんな人に",
+      gyms: "ジムを探す",
       coaches: "コーチの方へ",
       pricing: "料金",
       whatsNew: "最新情報",
@@ -99,6 +100,7 @@ export const ja: SiteText = {
     how: {
       eyebrow: "使い方",
       title: "3ステップで、あとは挙げるだけ",
+      findGym: "ジムと器具を探す",
       steps: [
         {
           title: "ジムを登録",

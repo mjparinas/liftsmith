@@ -7,6 +7,15 @@ import { useMemo, useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
 import { useLight } from "@/lib/appearance";
+import {
+  BREATH_PATTERNS,
+  breathPattern,
+  clampCustom,
+  CUSTOM_LIMITS,
+  DEFAULT_PATTERN,
+  patternCounts,
+  type BreathCustom,
+} from "@/lib/breathing";
 import { inSentence, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
 import { useApp } from "@/lib/store";
@@ -16,7 +25,7 @@ import { useNow } from "@/lib/useNow";
 import { say, voiceSupported } from "@/lib/voice";
 
 import { Icon } from "./icons";
-import { Chip, Section, SwitchRow } from "./ui";
+import { Bump, Chip, Section, SwitchRow } from "./ui";
 
 function Toggle({ label, on, set, hint }: { label: string; on: boolean; set: (v: boolean) => void; hint?: string }) {
   return <SwitchRow label={label} hint={hint} on={on} onChange={set} />;
@@ -66,6 +75,7 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
             ))}
           </div>
         </Section>
+        {d.restExtra === "breathe" && <BreathSettings />}
       </>
     );
   return (
@@ -140,5 +150,51 @@ export function DelightSettings({ part }: { part: "workout" | "look" }) {
         </Section>
       )}
     </>
+  );
+}
+
+/** The breathing guide's pattern: box breathing, 4-7-8, the double sigh, slow breaths or the lifter's own. */
+function BreathSettings() {
+  const { profile, setProfile } = useApp();
+  const d = profile.delight ?? {};
+  const id = d.breath ?? DEFAULT_PATTERN;
+  const custom = clampCustom(d.breathCustom);
+  const put = (p: Partial<DelightPrefs>) => setProfile({ delight: { ...d, ...p } });
+  const bump = (k: keyof BreathCustom, dir: 1 | -1, size: number) => {
+    const next = clampCustom({ ...custom, [k]: custom[k] + dir * size });
+    if (next[k] === custom[k]) return false;
+    put({ breathCustom: next });
+    return true;
+  };
+  return (
+    <Section title={t("delight.pattern")} info="breathPattern">
+      <div className="flex flex-wrap gap-2">
+        {BREATH_PATTERNS.map((p) => (
+          <Chip key={p} active={id === p} onClick={() => put({ breath: p })}>
+            {t(`extra.p.${p}`)}
+            {p !== "custom" && p !== "relax" && <span className="text-faint tabular-nums">{patternCounts(breathPattern(p))}</span>}
+          </Chip>
+        ))}
+      </div>
+      {id === "custom" && (
+        <ul className="mt-3 divide-y divide-line rounded-2xl border border-line bg-surface">
+          {(Object.keys(CUSTOM_LIMITS) as (keyof BreathCustom)[]).map((k) => {
+            const what = t(`delight.side.${k}`);
+            return (
+              <li key={k} className="flex items-center justify-between gap-3 px-3 py-2">
+                <span className="text-sm">{what}</span>
+                <span className="flex items-center gap-2">
+                  <Bump dir={-1} size="sm" aria={t("delight.shorter", { what })} onStep={(dir, n) => bump(k, dir, n)} />
+                  <span className="display w-12 text-center text-lg" aria-live="polite">
+                    {t("delight.secs", { n: custom[k] })}
+                  </span>
+                  <Bump dir={1} size="sm" aria={t("delight.longer", { what })} onStep={(dir, n) => bump(k, dir, n)} />
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </Section>
   );
 }
