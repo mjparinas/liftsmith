@@ -480,6 +480,8 @@ try {
   await page.getByRole("button", { name: "Do this workout" }).waitFor();
   await scan("friends whole workout");
   await page.keyboard.press("Escape");
+  // Let the closed sheet's history step land first, or it closes the next sheet as it opens.
+  await page.waitForTimeout(1000);
   await page.getByRole("button", { name: /likes: see who/ }).click();
   await page.getByRole("dialog", { name: "Liked by" }).waitFor();
   await scan("friends likers");
@@ -771,6 +773,21 @@ try {
       await dscan(`${theme.toLowerCase()} ${tab}`);
     }
   }
+  // The routine builder: a wide dialog with the exercise browser open beside the routine.
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("button", { name: "Routines" }).click();
+  await dp.getByRole("button", { name: "Build a new routine" }).click();
+  await dp.getByRole("searchbox").fill("bench press");
+  await dp
+    .getByRole("dialog")
+    .getByRole("button")
+    .filter({ hasText: /bench press/i })
+    .first()
+    .click();
+  await dp.waitForTimeout(300);
+  await settle();
+  await dscan("routine builder");
+  await dp.keyboard.press("Escape");
   await dp.goto(`${server.url}/app/#/today`);
   await dp.getByRole("button", { name: "Start workout" }).click();
   await dp.getByRole("button", { name: "Swap exercise", exact: true }).click();

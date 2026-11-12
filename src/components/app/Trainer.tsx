@@ -423,7 +423,8 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       {data.clients.length ? (
-        <ul className="mt-3 space-y-2">
+        // Desktop layout: the client list is a grid of cards, so a coach sees more clients at once.
+        <ul className="mt-3 space-y-2 desk:grid desk:grid-cols-2 desk:gap-3 desk:space-y-0 xl:desk:grid-cols-3">
           {data.clients.map((c) => (
             <li key={c.id}>
               <button
@@ -747,8 +748,9 @@ function ClientScreen({ id }: { id: string }) {
   };
   const names = report.names;
   return (
-    <div className="pb-2">
-      <ScreenHeader back={back} kicker={t("trn.client")} title={report.name || t("trn.noName")} />
+    // Desktop layout: the report flows into two columns (.desk-cols), what to do first.
+    <div className="desk-cols pb-2">
+      <ScreenHeader className="desk-span" back={back} kicker={t("trn.client")} title={report.name || t("trn.noName")} />
       <Section title={t("trn.todo")} icon="flag">
         <ul className="space-y-2">
           {report.flags.map((f, i) => {
