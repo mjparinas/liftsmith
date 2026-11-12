@@ -26,6 +26,7 @@ export const fr: SiteText = {
       openApp: "Ouvrir l’app",
       features: "Fonctions",
       whoFor: "Pour qui",
+      gyms: "Trouver une salle",
       coaches: "Pour les coachs",
       pricing: "Tarifs",
       whatsNew: "Nouveautés",
@@ -98,6 +99,7 @@ export const fr: SiteText = {
     how: {
       eyebrow: "Comment ça marche",
       title: "Trois étapes, ensuite vous n’avez plus qu’à soulever",
+      findGym: "Trouvez votre salle et son équipement",
       steps: [
         {
           title: "Décrivez votre salle",

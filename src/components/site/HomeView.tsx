@@ -216,6 +216,11 @@ export function HomeView({ lang }: { lang: SiteLang }) {
                 </span>
                 <h3 className="mt-4 text-xl font-semibold">{s.title}</h3>
                 <p className="mt-2 text-muted">{s.body}</p>
+                {i === 0 && (
+                  <a href="/gyms/" className="mt-3 inline-block font-semibold text-accent hover:underline">
+                    {h.how.findGym} ›
+                  </a>
+                )}
               </li>
             ))}
           </ol>

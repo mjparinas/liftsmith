@@ -18,6 +18,8 @@ import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
 const APP_ONLY = /^\/(app|me)\//;
+// Pages the server draws as plain HTML (the gym finder, gymPage.ts): a normal link, never a client-side Next navigation.
+const SERVER_PAGE = /^\/gyms\//;
 
 export function JsonLd({ data }: { data: object | object[] }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data).replace(/</g, "\\u003c") }} />;
@@ -108,9 +110,15 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
       <ul className="mt-2 space-y-2 text-sm text-muted">
         {links.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} prefetch={APP_ONLY.test(l.href) ? false : undefined} className="hover:text-ink">
-              {l.label}
-            </Link>
+            {SERVER_PAGE.test(l.href) ? (
+              <a href={l.href} className="hover:text-ink">
+                {l.label}
+              </a>
+            ) : (
+              <Link href={l.href} prefetch={APP_ONLY.test(l.href) ? false : undefined} className="hover:text-ink">
+                {l.label}
+              </Link>
+            )}
           </li>
         ))}
       </ul>
@@ -130,6 +138,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: APP_PATH, label: l.openApp },
           { href: "/features/", label: l.features },
           { href: "/apps/", label: l.whoFor },
+          { href: "/gyms/", label: l.gyms },
           { href: localPath(lang, "/coaches/"), label: l.coaches },
           { href: localPath(lang, "/pricing/"), label: l.pricing },
           { href: "/whats-new/", label: l.whatsNew },

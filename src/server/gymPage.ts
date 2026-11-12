@@ -43,7 +43,8 @@ export const GYM_PAGE_HEADERS = {
   "Content-Type": "text/html; charset=utf-8",
   "Content-Security-Policy": SHARE_PAGE_CSP,
   Vary: "Accept-Language",
-  "Cache-Control": "public, max-age=300, s-maxage=900",
+  // Short, so a city imported in admin or an owner's edit shows within two minutes.
+  "Cache-Control": "public, max-age=60, s-maxage=120",
 };
 export const GYM_GONE_HEADERS = { ...GYM_PAGE_HEADERS, "X-Robots-Tag": "noindex" };
 

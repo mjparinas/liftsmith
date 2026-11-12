@@ -85,6 +85,7 @@ ${col(t.cols.product, [
   [APP_PATH, l.openApp],
   ["/features/", l.features],
   ["/apps/", l.whoFor],
+  ["/gyms/", l.gyms],
   [localPath(lang, "/pricing/"), l.pricing],
   ["/whats-new/", l.whatsNew],
 ])}
