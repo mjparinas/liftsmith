@@ -373,7 +373,7 @@ function bridge(o: { bench?: boolean; bar?: boolean; single?: boolean }): Motion
 }
 
 // ---------- presses ----------
-function overhead(o: { load: Load; seated?: boolean; machine?: boolean }): Motion {
+function overhead(o: { load: Load; seated?: boolean; machine?: boolean; behind?: boolean }): Motion {
   return {
     phases: [
       [0.5, 1, 1, "Rack", 0.35],
@@ -383,7 +383,7 @@ function overhead(o: { load: Load; seated?: boolean; machine?: boolean }): Motio
     ],
     load: o.load,
     stance: 0.13,
-    grip: 0.27,
+    grip: o.behind ? 0.33 : 0.27,
     pose(B, d) {
       const s = 1 - d;
       let hip: Vec, sh: Vec, ankle: Vec | undefined, kneePole: Vec | undefined;
@@ -393,6 +393,16 @@ function overhead(o: { load: Load; seated?: boolean; machine?: boolean }): Motio
         sh = torsoAt(B, hip, -3);
       }
       const r = reach(B) * 0.985;
+      if (o.load === "barbell" && o.behind) {
+        // Behind the neck: the bar starts on the upper traps behind the neck, travels up behind the
+        // head (which nods forward to let it by) and locks out over the back of the head.
+        const y = sh[1] + 0.06 + (r - 0.06) * s;
+        const pastHead = clamp((s - 0.6) / 0.4, 0, 1);
+        const x = sh[0] + lerp(-0.09 - 0.03 * Math.sin(Math.PI * clamp(s / 0.6, 0, 1)), -0.015, ease(pastHead));
+        const hand = V(x, y);
+        const headBack = 0.035 * (1 - pastHead) + 0.02 * Math.sin(Math.PI * clamp(s / 0.6, 0, 1));
+        return { hip, sh, ankle, kneePole, bar: hand, hand, elbowPole: V(-0.15, -1, 1), headBlend: 1, headBack };
+      }
       if (o.load === "barbell") {
         const hand = V(sh[0] + 0.035 + 0.12 * (1 - Math.pow(s, 4)), sh[1] - 0.01 + r * s);
         const headBack = -0.045 * Math.sin(Math.PI * clamp(s * 1.3, 0, 1));
@@ -924,6 +934,32 @@ function shrug(): Motion {
   };
 }
 
+/**
+ * A barbell held behind the hips with straight arms: the behind-the-back shrug (the shoulders rise)
+ * and the behind-the-back wrist curl (only the hands curl the bar up).
+ */
+function behindBack(o: { move: "shrug" | "wrists" }): Motion {
+  return {
+    phases:
+      o.move === "shrug"
+        ? TEMPO.liftFirst("Shrug · 1s", "Lower · 2s", "Hang", "Hold")
+        : TEMPO.liftFirst("Curl · 1s", "Lower · 2s", "Hang", "Squeeze"),
+    load: "barbell",
+    plates: o.move === "wrists" ? 0.55 : undefined,
+    stance: 0.13,
+    grip: o.move === "shrug" ? 0.24 : 0.2,
+    pose(B, d) {
+      const hip = V(0.03, standY(B));
+      const sh = torsoAt(B, hip, 4);
+      const up = o.move === "shrug" ? 0.065 * d : 0;
+      const curl = o.move === "wrists" ? 0.05 * d : 0;
+      // behind the glutes, arms long
+      const bar = V(hip[0] - B.s * 0.17, sh[1] - B.shDrop - reach(B) * 0.92 + up + curl);
+      return { hip, sh, shrug: up, bar, hand: bar, elbowPole: V(-1, 0, 0.4), headBlend: 1 };
+    },
+  };
+}
+
 function carry(o: { hold: Hold; load: Load }): Motion {
   return {
     phases: TEMPO.walk(),
@@ -959,7 +995,7 @@ function carry(o: { hold: Hold; load: Load }): Motion {
 
 // ---------- arms ----------
 type ArmPosture = "stand" | "incline" | "seatedThighs";
-function curl(o: { load: Load; grip?: number; posture?: ArmPosture; hold?: Hold; cable?: "low" | "band" }): Motion {
+function curl(o: { load: Load; grip?: number; posture?: ArmPosture; hold?: Hold; cable?: "low" | "band"; behind?: boolean }): Motion {
   const posture = o.posture ?? "stand";
   return {
     plates: 0.55,
@@ -982,8 +1018,12 @@ function curl(o: { load: Load; grip?: number; posture?: ArmPosture; hold?: Hold;
         sh = torsoAt(B, hip, 0);
       }
       const z = o.grip ?? 0.21;
-      const elbow = V(sh[0] - (posture === "incline" ? 0.0 : 0.02), sh[1] - B.upper * 0.98);
-      const a = lerp(8, 135, d);
+      // Behind the body: facing away from a low pulley, the upper arm angled back behind the torso.
+      const back = o.behind ? 22 : 0;
+      const elbow = o.behind
+        ? swing(V(sh[0], sh[1] - B.shDrop), B.upper * 0.98, -back)
+        : V(sh[0] - (posture === "incline" ? 0.0 : 0.02), sh[1] - B.upper * 0.98);
+      const a = lerp(8 - back, 135 - back, d);
       const h = swing(elbow, B.fore * 0.98, a);
       return {
         hip,
@@ -1000,7 +1040,7 @@ function curl(o: { load: Load; grip?: number; posture?: ArmPosture; hold?: Hold;
       const p: Prop[] = [];
       if (posture === "incline") p.push(...seatProps(-42)(B));
       if (posture === "seatedThighs") p.push(bench(-0.25, 0.3, 0.45, 0.34));
-      if (o.cable === "low") p.push(cable(V(0.55, 0.12), "hands"));
+      if (o.cable === "low") p.push(cable(V(o.behind ? -0.55 : 0.55, 0.12), "hands"));
       if (o.cable === "band") p.push(cable("ankleL", "handL"), cable("ankleR", "handR"));
       return p;
     },
@@ -2901,7 +2941,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "kb-arnold-press": () => overhead({ load: "kettlebell" }),
   "half-kneeling-landmine-press": () => overhead({ load: "barbell" }),
   "floor-seated-press": () => overhead({ load: "barbell", seated: true }),
-  "behind-neck-press": () => overhead({ load: "barbell", seated: true }),
+  "behind-neck-press": () => overhead({ load: "barbell", seated: true, behind: true }),
   "db-single-arm-press": () => overhead({ load: "dumbbell" }),
   "band-upright-row": () => uprightRow({ load: "handle", cable: true }),
   "band-rear-delt-fly": () => fly({ posture: "bent", from: 5, to: 80, load: "none", first: "lift" }),
@@ -2953,13 +2993,13 @@ const MOTIONS: Record<string, () => Motion> = {
   "cable-shrug": shrug,
   "smith-shrug": shrug,
   "trap-bar-shrug": shrug,
-  "behind-back-shrug": shrug,
+  "behind-back-shrug": () => behindBack({ move: "shrug" }),
   "towel-pull-up": () => hanging({ grip: 0.3 }),
   "kb-dead-stop-row": () => bentRow({ load: "kettlebell", lean: 62, oneArm: true, grip: 0.18 }),
   "spider-curl": () => curl({ load: "barbell", grip: 0.17 }),
   "db-spider-curl": () => curl({ load: "dumbbell", grip: 0.22 }),
   "db-cross-body-curl": () => curl({ load: "dumbbell", grip: 0.23 }),
-  "behind-body-cable-curl": () => curl({ load: "handle", grip: 0.18, cable: "low" }),
+  "behind-body-cable-curl": () => curl({ load: "handle", grip: 0.18, cable: "low", behind: true }),
   "high-cable-curl": () => curl({ load: "handle", grip: 0.18, cable: "low" }),
   "rope-hammer-curl": () => curl({ load: "handle", grip: 0.14, cable: "low" }),
   "db-21s": () => curl({ load: "dumbbell", grip: 0.22 }),
@@ -3392,7 +3432,7 @@ const MOTIONS: Record<string, () => Motion> = {
   "db-biceps-hold": () => curl({ load: "dumbbell", grip: 0.22 }),
   "db-wrist-curl": () => curl({ load: "dumbbell", posture: "seatedThighs" }),
   "cable-wrist-curl": () => curl({ load: "handle", posture: "seatedThighs" }),
-  "behind-back-wrist-curl": () => curl({ load: "barbell", posture: "seatedThighs" }),
+  "behind-back-wrist-curl": () => behindBack({ move: "wrists" }),
   "kb-bottoms-up-hold": () => kbFlow({ to: "rack" }),
   "db-floor-skull-crusher": () => overheadExtension({ lying: true }),
   "db-cross-body-extension": () => overheadExtension({ lying: true }),
