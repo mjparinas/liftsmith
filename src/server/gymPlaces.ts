@@ -7,6 +7,8 @@
 // These are businesses on a public map, not anything about a lifter, so the position is kept as the map has it.
 import { randomBytes } from "node:crypto";
 
+import { SHORT_REGION } from "@/lib/regions";
+
 import { batch, query, run, type Row } from "./db";
 import { distanceKm } from "./gymDirectory";
 
@@ -227,23 +229,6 @@ interface Found {
   address?: Record<string, string>;
 }
 
-/** Province or state codes for the countries most lifters are in, so pages read "Langley, BC". */
-const SHORT_REGION: Record<string, string> = {
-  "British Columbia": "BC",
-  Alberta: "AB",
-  Saskatchewan: "SK",
-  Manitoba: "MB",
-  Ontario: "ON",
-  Quebec: "QC",
-  "New Brunswick": "NB",
-  "Nova Scotia": "NS",
-  "Prince Edward Island": "PE",
-  "Newfoundland and Labrador": "NL",
-  Yukon: "YT",
-  "Northwest Territories": "NT",
-  Nunavut: "NU",
-};
-
 export type ImportResult =
   { ok: true; area: string; found: number; added: number; updated: number } | { ok: false; error: "where" | "map" };
 
@@ -259,9 +244,11 @@ export async function importArea(where: string, fetcher: typeof fetch = fetch, n
   if (!hit) return { ok: false, error: "where" };
   const a = hit.address ?? {};
   const regionName = a.state ?? a.province ?? "";
+  // "CA-BC": the province or state code, whatever language or spelling the name came back in.
+  const isoRegion = /^(?:CA|US|AU)-([A-Z]{2,3})$/.exec(a["ISO3166-2-lvl4"] ?? "")?.[1];
   const area: Area = {
     city: clean(a.city ?? a.town ?? a.village ?? a.municipality ?? hit.name, 60),
-    region: SHORT_REGION[regionName] ?? clean(regionName, 60),
+    region: isoRegion ?? SHORT_REGION[regionName] ?? clean(regionName, 60),
     country: clean(a.country_code, 2).toUpperCase(),
   };
   const filter = `nwr["leisure"="fitness_centre"]`;
@@ -436,20 +423,44 @@ export interface AdminPlace {
   qrScans: number;
 }
 
-export async function adminPlaces(q: unknown): Promise<{ places: AdminPlace[]; total: number; official: number }> {
+/** Gyms per page in the admin list (a country can have thousands). */
+export const ADMIN_PAGE = 50;
+
+export interface AdminPlaceList {
+  places: AdminPlace[];
+  /** Every gym, and the official ones, whatever the search. */
+  total: number;
+  official: number;
+  /** Gyms matching the search, and this page of them (from 1). */
+  matches: number;
+  page: number;
+  pages: number;
+}
+
+/** One page of the admin gym list, official first, then most lifters; searchable by name, city or region. */
+export async function adminPlaces(q: unknown, pageAsked: unknown = 1): Promise<AdminPlaceList> {
   const term = typeof q === "string" ? q.trim().slice(0, 80) : "";
   const like = `%${term.replace(/[%_]/g, "")}%`;
+  const where = term ? "WHERE p.name LIKE ? OR p.city LIKE ? OR p.region LIKE ?" : "";
+  const args = term ? [like, like, like] : [];
+  const [m] = await query(`SELECT COUNT(*) AS n FROM gym_places p ${where}`, args);
+  const matches = n(m?.n);
+  const pages = Math.max(1, Math.ceil(matches / ADMIN_PAGE));
+  const page = Math.min(pages, Math.max(1, Math.floor(Number(pageAsked) || 1)));
   const rows = await query(
     `SELECT p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.source, p.claimed_by, p.lifters, p.hidden, p.code, p.qr_scans,
        (SELECT COUNT(*) FROM public_gyms g WHERE g.place_id = p.id) AS setups
-     FROM gym_places p ${term ? "WHERE p.name LIKE ? OR p.city LIKE ?" : ""}
-     ORDER BY p.claimed_by = '' , p.lifters DESC, p.city, p.name LIMIT 300`,
-    term ? [like, like] : [],
+     FROM gym_places p ${where}
+     ORDER BY p.claimed_by = '' , p.lifters DESC, p.city, p.name, p.id LIMIT ? OFFSET ?`,
+    [...args, ADMIN_PAGE, (page - 1) * ADMIN_PAGE],
   );
   const [c] = await query("SELECT COUNT(*) AS total, SUM(claimed_by <> '') AS official FROM gym_places");
   return {
     total: n(c?.total),
     official: n(c?.official),
+    matches,
+    page,
+    pages,
     places: rows.map((r) => ({
       id: s(r.id),
       citySlug: s(r.city_slug),

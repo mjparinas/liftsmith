@@ -4,17 +4,16 @@
 // marked as a gym, a closed gym to hide). Support staff can read; only admins import or change a gym.
 import { useEffect, useState } from "react";
 
-import type { AdminPlace, PlaceAction } from "@/server/gymPlaces";
+import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces";
 
 import { Card } from "./charts";
 import { GymClaims } from "./GymClaims";
 import { GymPosters } from "./GymPosters";
 
-type Data = { places: AdminPlace[]; total: number; official: number };
-
 export function GymPlaces({ admin }: { admin: boolean }) {
-  const [data, setData] = useState<Data | null>(null);
+  const [data, setData] = useState<AdminPlaceList | null>(null);
   const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
   const [where, setWhere] = useState("");
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -23,10 +22,10 @@ export function GymPlaces({ admin }: { admin: boolean }) {
   useEffect(() => {
     let live = true;
     const t = setTimeout(() => {
-      fetch(`/api/admin/gym-places/?q=${encodeURIComponent(q)}`)
+      fetch(`/api/admin/gym-places/?q=${encodeURIComponent(q)}&page=${page}`)
         .then(async (r) => {
           if (!r.ok) throw new Error();
-          const j = (await r.json()) as Data;
+          const j = (await r.json()) as AdminPlaceList;
           if (live) setData(j);
         })
         .catch(() => live && setNote("The gym list didn't load."));
@@ -35,7 +34,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
       live = false;
       clearTimeout(t);
     };
-  }, [q, version]);
+  }, [q, page, version]);
   const post = async (body: Record<string, unknown>, url = "/api/admin/gym-places/") => {
     const r = await fetch(url, {
       method: "POST",
@@ -103,7 +102,10 @@ export function GymPlaces({ admin }: { admin: boolean }) {
           <input
             aria-label="Search gyms"
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => {
+              setQ(e.target.value);
+              setPage(1);
+            }}
             placeholder="Search"
             className="w-40 rounded-lg border border-line bg-raised px-3 py-1.5 text-sm"
           />
@@ -112,67 +114,94 @@ export function GymPlaces({ admin }: { admin: boolean }) {
         {data === null ? (
           <p className="text-sm text-muted">Loading…</p>
         ) : data.places.length === 0 ? (
-          <p className="text-sm text-muted">No gyms yet. Import a city above.</p>
+          <p className="text-sm text-muted">{q.trim() ? "No gyms match that search." : "No gyms yet. Import a city above."}</p>
         ) : (
-          <ul className="divide-y divide-line">
-            {data.places.map((p) => (
-              <li key={p.id} className={`flex flex-wrap items-start gap-3 py-3 ${p.hidden ? "opacity-60" : ""}`}>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold break-words">
-                    {p.name}
-                    {p.official ? " ✓" : ""}
-                  </p>
-                  <p className="text-sm text-muted">
-                    {[p.address, [p.city, p.region].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
-                  </p>
-                  <p className="text-xs text-faint">
-                    {p.kind} · {p.official ? "official" : "unofficial"} · {p.lifters} {p.lifters === 1 ? "lifter" : "lifters"} · {p.setups}{" "}
-                    {p.setups === 1 ? "setup" : "setups"} listed{p.hasKit ? "" : " · no equipment yet"}
-                    {p.hidden ? " · hidden" : ""}
-                    {p.qrScans ? ` · ${p.qrScans} QR ${p.qrScans === 1 ? "scan" : "scans"}` : ""}
-                  </p>
-                  {ordering === p.id && (
-                    <PosterForm
-                      place={p}
-                      done={(error) => {
-                        setNote(error ?? `Posters for ${p.name} are in the queue above.`);
-                        if (!error) setOrdering(null);
-                      }}
-                      post={post}
-                    />
-                  )}
-                </div>
-                {admin && (
-                  <div className="flex flex-wrap gap-2 text-sm">
-                    <button
-                      type="button"
-                      onClick={() => act(p, p.kind === "gym" ? "studio" : "gym")}
-                      className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-                    >
-                      {p.kind === "gym" ? "Mark studio" : "Mark gym"}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setOrdering(ordering === p.id ? null : p.id)}
-                      className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-                    >
-                      Send posters
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => act(p, p.hidden ? "show" : "hide")}
-                      className="press rounded-lg border border-line px-3 py-1.5 text-muted"
-                    >
-                      {p.hidden ? "Show" : "Hide"}
-                    </button>
+          <>
+            <ul className="divide-y divide-line">
+              {data.places.map((p) => (
+                <li key={p.id} className={`flex flex-wrap items-start gap-3 py-3 ${p.hidden ? "opacity-60" : ""}`}>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold break-words">
+                      <a href={`/gyms/${p.citySlug}/${p.slug}/`} target="_blank" rel="noopener" className="hover:underline">
+                        {p.name}
+                      </a>
+                      {p.official ? " ✓" : ""}
+                    </p>
+                    <p className="text-sm text-muted">
+                      {[p.address, [p.city, p.region].filter(Boolean).join(", ")].filter(Boolean).join(" · ")}
+                    </p>
+                    <p className="text-xs text-faint">
+                      {p.kind} · {p.official ? "official" : "unofficial"} · {p.lifters} {p.lifters === 1 ? "lifter" : "lifters"} ·{" "}
+                      {p.setups} {p.setups === 1 ? "setup" : "setups"} listed{p.hasKit ? "" : " · no equipment yet"}
+                      {p.hidden ? " · hidden" : ""}
+                      {p.qrScans ? ` · ${p.qrScans} QR ${p.qrScans === 1 ? "scan" : "scans"}` : ""}
+                    </p>
+                    {ordering === p.id && (
+                      <PosterForm
+                        place={p}
+                        done={(error) => {
+                          setNote(error ?? `Posters for ${p.name} are in the queue above.`);
+                          if (!error) setOrdering(null);
+                        }}
+                        post={post}
+                      />
+                    )}
                   </div>
-                )}
-              </li>
-            ))}
-          </ul>
+                  {admin && (
+                    <div className="flex flex-wrap gap-2 text-sm">
+                      <button
+                        type="button"
+                        onClick={() => act(p, p.kind === "gym" ? "studio" : "gym")}
+                        className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                      >
+                        {p.kind === "gym" ? "Mark studio" : "Mark gym"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOrdering(ordering === p.id ? null : p.id)}
+                        className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                      >
+                        Send posters
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => act(p, p.hidden ? "show" : "hide")}
+                        className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                      >
+                        {p.hidden ? "Show" : "Hide"}
+                      </button>
+                    </div>
+                  )}
+                </li>
+              ))}
+            </ul>
+            <Pager list={data} go={setPage} />
+          </>
         )}
       </Card>
     </div>
+  );
+}
+
+/** Page x of y, with Previous and Next, under the gym list (50 a page; a country can have thousands). */
+function Pager({ list, go }: { list: AdminPlaceList; go: (page: number) => void }) {
+  const btn = "press rounded-lg border border-line px-3 py-1.5 text-sm text-muted disabled:opacity-40";
+  return (
+    <nav aria-label="Gym pages" className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
+      <p className="text-sm text-muted">
+        Page {list.page} of {list.pages} · {list.matches} {list.matches === 1 ? "gym" : "gyms"}
+      </p>
+      {list.pages > 1 && (
+        <div className="flex gap-2">
+          <button type="button" className={btn} disabled={list.page <= 1} onClick={() => go(list.page - 1)}>
+            ‹ Previous
+          </button>
+          <button type="button" className={btn} disabled={list.page >= list.pages} onClick={() => go(list.page + 1)}>
+            Next ›
+          </button>
+        </div>
+      )}
+    </nav>
   );
 }
 

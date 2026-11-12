@@ -8,6 +8,7 @@ import { query, resetDb, run } from "./db";
 import { nearby, publish } from "./gymDirectory";
 import {
   actOnPlace,
+  ADMIN_PAGE,
   adminPlaces,
   importArea,
   joinPlace,
@@ -151,6 +152,28 @@ describe("staff", () => {
     expect(await actOnPlace(planet.id, "explode")).toBe(false);
   });
 
+  it("pages the gym list 50 at a time", async () => {
+    const many: OsmElement[] = Array.from({ length: 120 }, (_, i) => ({
+      type: "node",
+      id: 1000 + i,
+      lat: 49.1 + i / 10_000,
+      lon: -122.6,
+      tags: { leisure: "fitness_centre", name: `Gym ${String(i).padStart(3, "0")}` },
+    }));
+    await savePlaces(placesFromOsm(many, AREA), NOW);
+    const first = await adminPlaces("", 1);
+    expect(first).toMatchObject({ total: 120, matches: 120, page: 1, pages: 3 });
+    expect(first.places).toHaveLength(ADMIN_PAGE);
+    const last = await adminPlaces("", 3);
+    expect(last.places).toHaveLength(20);
+    const all = new Set([...first.places, ...(await adminPlaces("", 2)).places, ...last.places].map((p) => p.id));
+    expect(all.size).toBe(120);
+    expect((await adminPlaces("", 99)).page).toBe(3);
+    expect((await adminPlaces("", "junk")).page).toBe(1);
+    expect(await adminPlaces("Gym 11", 1)).toMatchObject({ total: 120, matches: 10, pages: 1 });
+    expect(first.places[0]).toMatchObject({ citySlug: "langley-bc", slug: expect.any(String) });
+  });
+
   it("imports an area by name through the map services", async () => {
     const calls: string[] = [];
     const fake = (async (url: string | URL | Request) => {
@@ -174,5 +197,19 @@ describe("staff", () => {
     expect(await importArea("  ", fake, NOW)).toEqual({ ok: false, error: "where" });
     const none = (async () => Response.json([])) as unknown as typeof fetch;
     expect(await importArea("Nowhere", none, NOW)).toEqual({ ok: false, error: "where" });
+
+    // The province's ISO code wins over its name, in whatever language or spelling the name comes back.
+    const french = (async (url: string | URL | Request) =>
+      String(url).includes("nominatim")
+        ? Response.json([
+            {
+              osm_type: "relation",
+              osm_id: 2_000_001,
+              name: "Abbotsford",
+              address: { city: "Abbotsford", state: "Colombie-Britannique", "ISO3166-2-lvl4": "CA-BC", country_code: "ca" },
+            },
+          ])
+        : Response.json({ elements: [] })) as typeof fetch;
+    expect(await importArea("Abbotsford", french, NOW)).toMatchObject({ ok: true, area: "Abbotsford, BC" });
   });
 });

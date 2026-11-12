@@ -20,6 +20,7 @@ export const en: SiteText = {
       openApp: "Open the app",
       features: "Features",
       whoFor: "Who it's for",
+      gyms: "Find a gym",
       coaches: "For coaches",
       pricing: "Pricing",
       whatsNew: "What's new",
@@ -92,6 +93,7 @@ export const en: SiteText = {
     how: {
       eyebrow: "How it works",
       title: "Three steps, then you just lift",
+      findGym: "Find your gym and its equipment",
       steps: [
         {
           title: "Tell it your gym",

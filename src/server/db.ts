@@ -3,6 +3,8 @@
 // TURSO_AUTH_TOKEN pair the Vercel Marketplace integration creates), and memory in tests.
 import { createClient, type Client, type InValue } from "@libsql/client";
 
+import { regionSlug, SHORT_REGION } from "@/lib/regions";
+
 const SCHEMA = [
   // One row per install (a random id made on first open; not an advertising id). Latest device details win.
   `CREATE TABLE IF NOT EXISTS installs (
@@ -501,6 +503,12 @@ const SCHEMA = [
     shipped_at INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE INDEX IF NOT EXISTS gym_posters_status ON gym_posters (status, created_at)`,
+  // Gyms imported with the province's full name ("Langley, British Columbia", 2026-11-12) get its code and the shorter
+  // web address ("langley-bc"). OR IGNORE leaves a gym whose new address is taken where it is.
+  ...Object.entries(SHORT_REGION).map(
+    ([name, code]) =>
+      `UPDATE OR IGNORE gym_places SET region = '${code}', city_slug = substr(city_slug, 1, length(city_slug) - ${regionSlug(name).length}) || '${code.toLowerCase()}' WHERE region = '${name}' AND city_slug LIKE '%-${regionSlug(name)}'`,
+  ),
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
