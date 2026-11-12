@@ -741,6 +741,22 @@ const SCHEMA = [
     PRIMARY KEY (coach_id, client_id)
   )`,
   `CREATE INDEX IF NOT EXISTS coach_notes_client ON coach_notes (client_id)`,
+  // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
+  // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
+  `CREATE TABLE IF NOT EXISTS invite_accepts (
+    friend_id TEXT PRIMARY KEY,
+    inviter_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    rewarded_at INTEGER
+  )`,
+  `CREATE INDEX IF NOT EXISTS invite_accepts_inviter ON invite_accepts (inviter_id)`,
+  `CREATE TABLE IF NOT EXISTS earned_pro (
+    account_id TEXT NOT NULL,
+    friend_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    days INTEGER NOT NULL,
+    PRIMARY KEY (account_id, friend_id)
+  )`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,

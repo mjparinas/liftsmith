@@ -414,6 +414,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
             </Button>
           </>
         )}
+        <p className="mt-3 text-xs text-muted">{t("trn.proFree")}</p>
       </section>
       {note && (
         <p className="mt-2 text-sm text-muted" role="status">

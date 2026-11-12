@@ -4,6 +4,7 @@ import type { Message } from "@/lib/i18n";
 // English is the source: add a key here first, then the other five languages.
 
 export const en = {
+  "trn.proFree": "Pro is free for you while 3 or more of your clients are training (each with a workout in the last 14 days).",
   "trn.row": "Coaching",
   "trn.rowNote": "Work with a coach, or coach your own clients",
   "trn.title": "Coaching",
@@ -117,6 +118,7 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "trn.proFree": "Pro es gratis para ti mientras 3 o más de tus clientes entrenen (cada uno con un entrenamiento en los últimos 14 días).",
   "trn.row": "Entrenador",
   "trn.rowNote": "Trabaja con un entrenador o entrena a tus propios clientes",
   "trn.title": "Entrenador",
@@ -229,6 +231,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "trn.proFree":
+    "Pro est gratuit pour vous tant que 3 de vos clients ou plus s’entraînent (chacun avec une séance dans les 14 derniers jours).",
   "trn.row": "Coaching",
   "trn.rowNote": "Travaillez avec un coach, ou coachez vos propres clients",
   "trn.title": "Coaching",
@@ -342,6 +346,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "trn.proFree":
+    "Pro ist für dich kostenlos, solange 3 oder mehr deiner Klienten trainieren (jeweils mit einem Workout in den letzten 14 Tagen).",
   "trn.row": "Coaching",
   "trn.rowNote": "Mit einem Coach trainieren oder eigene Kunden betreuen",
   "trn.title": "Coaching",
@@ -454,6 +460,7 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "trn.proFree": "Pro è gratis per te finché 3 o più dei tuoi clienti si allenano (ognuno con un allenamento negli ultimi 14 giorni).",
   "trn.row": "Coaching",
   "trn.rowNote": "Allenati con un coach o segui i tuoi clienti",
   "trn.title": "Coaching",
@@ -565,6 +572,7 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "trn.proFree": "クライアントが3人以上トレーニングを続けている間 (それぞれ直近14日以内にワークアウトあり)、Pro は無料です。",
   "trn.row": "コーチング",
   "trn.rowNote": "コーチと一緒にトレーニング、または自分のクライアントを指導",
   "trn.title": "コーチング",
