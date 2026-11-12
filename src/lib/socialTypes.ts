@@ -295,6 +295,8 @@ export interface Inviter {
 
 /** How long a friend challenge runs, in days. */
 export const CHALLENGE_DAYS = [7, 14, 28] as const;
+/** How many days after a challenge ends its result still shows as a coach's note (gap list 3, item 5). */
+export const RESULT_NOTE_DAYS = 3;
 export type ChallengeDays = (typeof CHALLENGE_DAYS)[number];
 
 /** One person in a challenge, with their score so far (joined members only score). */
@@ -356,6 +358,8 @@ export interface FriendSignals {
   week: BoardRow[];
   challenges: Challenge[];
   quiet: QuietFriend[];
+  /** Challenges the lifter joined that ended in the last few days, for the result note (gap list 3, item 5). */
+  ended?: Challenge[];
 }
 
 /** What a club's members add up to each week. */

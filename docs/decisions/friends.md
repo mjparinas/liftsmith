@@ -210,6 +210,17 @@ Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not tra
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/lib/scanLink.test.ts` (our links, the build's host, everything else ignored) and `src/components/app/ScanToFollow.test.tsx` (the lifter's code is their invite, a scanned invite opens and the camera stops, a foreign code and a refused camera). The accessibility run scans the sheet.
 
+## Challenge results (gap list 3, item 5)
+
+- **The results moment.** When a friend challenge the lifter joined is over, Friends › Board opens its results once on that device (`unseenResult`, remembered in `liftsmith.challengeResults`): a trophy, the headline ("You won!", "Tied for first!", "Number 2 of 4", or "No winner this time" when nobody posted), the lifter's total, and the standings. A win gets the celebration haptic, the done sound and confetti (none in Lean mode or with reduced motion). The finished card's **Results** button opens it again. Worked out from the challenge list the app already loads (`challengeResult` in `src/lib/challengeResult.ts`); nothing new is stored on the server.
+- **Rematch** (the sheet's primary button, when anyone else joined): opens Start a challenge already filled in with the same measure, length (rounded to 1, 2 or 4 weeks), name and the friends who joined, so it's one tap on Start. They're invited as usual.
+- **Share my result**: a share card (`challengeShare`, kind `challenge`, also as a share link) with the challenge's name, the lifter's place ("No. 2 out of 4", or "Won it"), a medal in gold, silver or bronze, their total and the length. **No friend's name or score goes on it**, because they didn't choose to share; Show my name works as on every card.
+- **A coach's note** for three days after the end (`RESULT_NOTE_DAYS`): "You won Most sets · 42 sets put you first of 4." or "Most sets is over · You finished number 2 of 4 with 30 sets. Blair won.", with "Start a rematch while the habit is fresh, or share how it went." and **See results** (Friends › Board). Good tone for a win, info otherwise. The `nudges` call now also returns the challenges the lifter joined that ended in that window (`ended`).
+- No push: the coach's note and the board carry it, and the server has no job that runs at each challenge's end.
+- Analytics: `feature` `social_challenge_rematch` (with the measure); the card goes through `share_card` and `share_link` like the others.
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/lib/challengeResult.test.ts` (places, ties, no winner, once per device, the rematch's length and friends, a card without friends' names), the result note in `friendNotes.test.ts`, and the results-then-rematch flow in `Friends.test.tsx`. The accessibility run scans the results sheet.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):
