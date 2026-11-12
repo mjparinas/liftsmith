@@ -383,8 +383,19 @@ try {
           { id: "back-squat", w: 140, r: 3, at: Date.now() },
           { id: "bench-press", w: 100, r: 5, at: Date.now() },
         ],
+        level: 12,
+        streak: 4,
+        trained: [1, 3, 8, 10, 15, 17].map((d) => Date.now() - d * 86_400_000),
       },
     },
+    suggest: {
+      people: [
+        { handle: "drew", name: "Drew", avatar: "av-bolt", reason: "followsYou", open: false },
+        { handle: "emery", name: "Emery", avatar: "", reason: "mutual", count: 2, via: "Blair", open: true },
+      ],
+    },
+    search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
+    personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
   };
   await page.route("**/api/social/", (r) => r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }));
   await page.route("**/api/sync/", (r) => r.fulfill({ json: { cursor: 0, events: [], deleted: [], records: [], more: false } }));
@@ -426,11 +437,19 @@ try {
   await scan("friends activity");
   await page.getByRole("button", { name: /^People/ }).click();
   await page.getByRole("button", { name: "Accept" }).waitFor();
+  await page.getByText("People you may know").waitFor();
+  await page.getByLabel("Find a friend").fill("stone");
+  await page.getByRole("list", { name: "Search results" }).waitFor();
   await scan("friends people");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();
+  await page.getByText("Level 12").waitFor();
   await scan("friends person");
+  await page.getByRole("button", { name: /Followers/ }).click();
+  await page.getByRole("dialog").getByText("Alex").waitFor();
+  await scan("friends followers");
+  await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
   await page.getByText("Blair invited you").waitFor();
   await scan("friends invite");

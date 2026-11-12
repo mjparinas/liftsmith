@@ -129,23 +129,27 @@ export function SearchResults({ q }: { q: string }) {
 export function ProfileStats({ person }: { person: PersonCard }) {
   const now = useNow();
   if (!person.canSee) return null;
-  const weeks = trainingCalendar(person.trained, now);
-  const usual = usualDaysLine(person.trained);
+  // An older server sends none of these.
+  const trained = person.trained ?? [];
+  const level = person.level ?? 0;
+  const streak = person.streak ?? 0;
+  const weeks = trainingCalendar(trained, now);
+  const usual = usualDaysLine(trained);
   const self = person.relation === "self";
   return (
     <>
-      {(person.level > 0 || person.streak > 0) && (
+      {(level > 0 || streak > 0) && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {person.level > 0 && (
+          {level > 0 && (
             <span className="card inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
               <Icon name="sparkle" size={16} className="text-violet" />
-              {t("social.level", { level: fmtNum(person.level) })}
+              {t("social.level", { level: fmtNum(level) })}
             </span>
           )}
-          {person.streak > 0 && (
+          {streak > 0 && (
             <span className="card inline-flex items-center gap-1.5 px-3 py-1.5 text-sm">
               <Icon name="flame" size={16} className="text-ember" />
-              {t("social.streak", { count: person.streak })}
+              {t("social.streak", { count: streak })}
             </span>
           )}
         </div>
@@ -162,7 +166,7 @@ export function ProfileStats({ person }: { person: PersonCard }) {
             </div>
             <ol
               className="grid grid-flow-col grid-rows-7 justify-between gap-1"
-              aria-label={t("social.calendarLabel", { count: person.trained.length })}
+              aria-label={t("social.calendarLabel", { count: trained.length })}
             >
               {weeks.flatMap((w) =>
                 w.days.map((on, i) => (
@@ -176,7 +180,7 @@ export function ProfileStats({ person }: { person: PersonCard }) {
             </ol>
           </div>
           <p className="mt-3 text-sm text-muted">
-            {usual ?? (person.trained.length ? t("social.usualNone") : self ? t("social.calendarEmptySelf") : t("social.calendarEmpty"))}
+            {usual ?? (trained.length ? t("social.usualNone") : self ? t("social.calendarEmptySelf") : t("social.calendarEmpty"))}
           </p>
         </div>
       </Section>
