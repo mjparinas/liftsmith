@@ -7,6 +7,7 @@ import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
 import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
+import { LOCAL_TOOL_PATHS } from "@/locales/site/tools/types";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { HELP, helpPath } from "./faqs";
@@ -290,8 +291,8 @@ export function siteRoutes(): Route[] {
     { path: "/features/", priority: 0.7 },
     ...LANDINGS.map((l) => ({ path: landingPath(l), priority: 0.7 })),
   ];
-  // The translated pages (src/lib/siteLang.ts): every language's copy, each listing all of them.
-  for (const path of LOCALIZED_PATHS) {
+  // The translated pages (src/lib/siteLang.ts, and the translated tools): every language's copy, each listing all of them.
+  for (const path of [...LOCALIZED_PATHS, ...LOCAL_TOOL_PATHS]) {
     const languages = languageAlternates(path);
     for (const route of r) if (route.path === path) route.languages = languages;
     for (const lang of SITE_LANGS) {
