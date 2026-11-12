@@ -78,8 +78,11 @@ const joinAnd = (xs: string[]) => list(xs);
 /**
  * One sentence on why today is a push, steady or easy day, naming the strongest signals that point
  * that way. When the lifter overrode the call, it says what we'd suggested and why.
+ *
+ * `short` is for Today's readiness card, which already shows the call as its headline, the score in its ring
+ * and the signals as a list: there the line says only what the call does to the plan, so nothing is said twice.
  */
-export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean): string {
+export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean, short = false): string {
   const up = r.signals.filter((s) => s.points > 0);
   const down = r.signals.filter((s) => s.points < 0);
   const names = (xs: Signal[]) => joinAnd(xs.slice(0, 2).map((s) => lower(s.text)));
@@ -92,6 +95,7 @@ export function callWhy(r: Readiness, chosen: Plan["call"], deload: boolean): st
       : t("why.call.override", { what, score });
   }
   if (deload) return t("why.call.deload", { score });
+  if (short) return t(chosen === "push" ? "why.short.push" : chosen === "recover" ? "why.short.easy" : "why.short.planned");
   if (chosen === "push") return t("why.call.push", { reasons: up.length ? names(up) : t("why.call.fresh"), score });
   if (chosen === "recover") return t("why.call.easy", { reasons: down.length ? names(down) : t("why.call.needRecovery"), score });
   if (!r.signals.length || (up.length === 0 && down.length === 0)) return t("why.call.planned", { score });

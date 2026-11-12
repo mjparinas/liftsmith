@@ -69,6 +69,10 @@ try {
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
   await page.getByRole("button", { name: "Done", exact: true }).click();
+  // Today after the workout says the day's done; Train again brings the plan (and its warm-up chip) back.
+  await page.getByTestId("done-today").waitFor();
+  await scan("done for today");
+  await page.getByRole("button", { name: "Train again" }).click();
   await page.getByRole("button", { name: "🔥 Warm up first" }).click();
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
@@ -611,6 +615,8 @@ try {
   await scan("light Gyms");
   await page.getByRole("button", { name: "‹ Back" }).click();
   await page.getByRole("button", { name: "Today" }).click();
+  const again = page.getByRole("button", { name: "Train again" });
+  if (await again.isVisible()) await again.click();
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();
   await scan("light workout");

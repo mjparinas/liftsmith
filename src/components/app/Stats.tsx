@@ -64,7 +64,16 @@ export function Stats() {
   }, [arg]);
   const tiles: [string, string, string, IconName, string][] = [
     ["workouts", t("progress.workouts"), num(stats.sessions.length), "dumbbell", HUE.accent],
-    ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
+    // Before the first goal week is met, a flat "0" streak reads like a telling-off: show this week's days toward it.
+    streak.weeks === 0 && streak.thisWeek > 0
+      ? [
+          "streak",
+          t("progress.thisWeek"),
+          t("progress.ofGoal", { n: streak.thisWeek, goal: Math.max(1, profile.daysPerWeek) }),
+          "flame",
+          HUE.ember,
+        ]
+      : ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
     ["sets", t("progress.sets"), num(stats.totalSets), "layers", HUE.violet],
     ["volume", t("progress.volume"), fmtVolume(stats.totalVolume, unit), "progress", HUE.cyan],
   ];

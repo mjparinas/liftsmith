@@ -86,6 +86,15 @@ describe("why: every recommendation explains itself", () => {
     expect(inDeload.call).toBe("normal");
     expect(callWhy(inDeload, "normal", true)).toMatch(/^Deload week/);
   });
+
+  it("the short line for Today's card says only what the call does, since the card shows the call, score and signals", () => {
+    const r = readiness([...session(NOW - 6 * D, "a", {}, 4), ...session(NOW - 3 * D, "b", {}, 4)], base, NOW);
+    expect(callWhy({ ...r, call: "push" }, "push", false, true)).toBe("Your first big lift goes one rep closer to failure.");
+    expect(callWhy({ ...r, call: "recover" }, "recover", false, true)).toBe("One set fewer and a step lighter, so you come back stronger.");
+    expect(callWhy({ ...r, call: "normal" }, "normal", false, true)).toBe("Weights follow on from last time.");
+    // An override still says what we'd suggested.
+    expect(callWhy({ ...r, call: "normal" }, "push", false, true)).toMatch(/^Your call today/);
+  });
 });
 
 describe("insights: coach's notes", () => {

@@ -7,6 +7,7 @@ import { SCREEN_TITLE } from "@/components/titles";
 import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
 import { musicLink, openOutside } from "@/lib/connections";
+import type { SessionSummary } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { freeAdaptiveLeft } from "@/lib/freeAdaptive";
@@ -22,6 +23,7 @@ import { useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
+import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { callWhy, itemWhy, whyContext } from "@/lib/why";
 import type { MessageKey } from "@/locales/en";
@@ -31,12 +33,15 @@ import { PlanExtras, TodayMoments } from "./Extras";
 import { loadText, repsText } from "./format";
 import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
+import { Mascot } from "./Mascot";
+import { NextUpCard } from "./NextUp";
 import { programName } from "./Programs";
 import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CALL_STYLE, FEEL_HUE, muscleHue } from "./theme";
+import { CoolDownCard } from "./Stretch";
+import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
 import { Button, Chip, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
@@ -55,8 +60,8 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
       <Icon name="flame" size={16} filled={lit} strokeWidth={1.6} className={lit ? "drop-shadow-[0_0_6px_rgb(255_138_61/0.7)]" : ""} />
       {weeks}
       {freezes > 0 && (
-        <span aria-label={t("td.freezeLabel", { count: freezes })}>
-          {" 🧊"}
+        <span className="ml-0.5 inline-flex items-center gap-0.5 text-cyan" aria-label={t("td.freezeLabel", { count: freezes })}>
+          <Icon name="snowflake" size={14} strokeWidth={2} />
           {freezes > 1 ? freezes : ""}
         </span>
       )}
@@ -69,7 +74,7 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
  * unwell take today easier (unwell makes it an easy day outright), great nudges it up; the call above, the
  * plan and the playlist follow at once. Optional, and changeable all day.
  */
-function FeelCheckIn({ now }: { now: number }) {
+function FeelCheckIn({ now, hurts }: { now: number; hurts: boolean }) {
   const { events, feel } = useApp();
   const said = todayFeel(events, now);
   const energies = [
@@ -94,6 +99,16 @@ function FeelCheckIn({ now }: { now: number }) {
         <Chip hue={FEEL_HUE.unwell} active={!!said?.unwell} onClick={() => feel({ unwell: !said?.unwell })}>
           {t("td.feelUnwell")}
         </Chip>
+        {hurts && (
+          <button
+            type="button"
+            onClick={() => go("injuries")}
+            className="press inline-flex min-h-11 items-center gap-1.5 rounded-full px-2 text-sm font-medium text-muted underline-offset-2 hover:underline"
+          >
+            <Icon name="bandage" size={15} className="text-ember" />
+            {t("today.somethingHurts")}
+          </button>
+        )}
       </div>
     </div>
   );
@@ -107,9 +122,26 @@ export function greeting(hour: number, name: string): string {
 }
 
 export function Today() {
-  const { profile, gyms, preview, events, setProfile, start, active, readiness, callOverride, setCall, pickedByLocation, toggleSuperset } =
-    useApp();
+  const {
+    profile,
+    gyms,
+    preview,
+    events,
+    stats,
+    setProfile,
+    start,
+    active,
+    readiness,
+    callOverride,
+    setCall,
+    pickedByLocation,
+    toggleSuperset,
+  } = useApp();
   const [lenKey, setLenKey] = useState(0);
+  // Once today's workout is done, Today says so instead of offering the same plan again (polish pass, 2026-11-12).
+  // "Train again", or picking a plan (a routine, "Same as last time", a past workout), brings the plan back.
+  const againAt = useApp((st) => st.againAt);
+  const trainAgain = useApp((st) => st.trainAgain);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const moveExercise = useApp((st) => st.moveExercise);
   // Press and hold an exercise to drag it, or tap its number to move it with buttons (Reorder.tsx).
@@ -135,6 +167,11 @@ export function Today() {
   // reordering what's left happen in one place, Coming up on the workout screen.
   const live = !!active;
   const items = active?.plan.items ?? preview?.items ?? [];
+  const last = stats.sessions[0];
+  const doneToday = !active && !!last && new Date(last.start).toDateString() === new Date(now).toDateString() ? last : null;
+  const resting = !!doneToday && doneToday.start > againAt;
+  // Readiness card: shown on adaptive days before the workout starts.
+  const showCall = !!(readiness && preview && call && !active && !fixed && !resting);
 
   return (
     <div className="pb-28">
@@ -142,7 +179,8 @@ export function Today() {
         <div className="flex items-center justify-between gap-3">
           <p className="min-w-0 truncate text-sm font-medium text-muted">{hello}</p>
           <div className="flex shrink-0 items-center gap-2">
-            <Flame weeks={streak.weeks} freezes={streak.freezes} />
+            {/* No streak yet: the goal chip below says how many more days start one, rather than a flat 0 here. */}
+            {(streak.weeks > 0 || streak.freezes > 0) && <Flame weeks={streak.weeks} freezes={streak.freezes} />}
             <button
               type="button"
               onClick={() => go("achievements")}
@@ -162,7 +200,7 @@ export function Today() {
           </div>
         </div>
         <div className="mt-1 flex items-center gap-2.5">
-          <h1 className={SCREEN_TITLE}>{t("td.title")}</h1>
+          <h1 className={SCREEN_TITLE}>{resting ? t("today.doneTitle") : t("td.title")}</h1>
           {member && <ProBadge />}
         </div>
       </header>
@@ -247,13 +285,13 @@ export function Today() {
           >
             <Icon name="layers" size={15} className={preview.week.deload ? "" : "text-violet"} />
             {preview.week.label} · {effortLabel(preview.week.rir, profile.training?.effort)}
-            <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-mr-3" />
+            <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-ml-1.5 -mr-3.5" />
           </span>
         )}
         {streak.needed > 0 && (
           <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted">
             <Icon name="target" size={15} className="text-ember" />
-            {t("today.goalMore", { count: streak.needed })}
+            {streak.weeks > 0 ? t("today.goalMore", { count: streak.needed }) : t("today.streakStart", { count: streak.needed })}
           </span>
         )}
         {preview && !active && profile.connections?.music && (
@@ -266,16 +304,20 @@ export function Today() {
             {t("conn.music.play", { mood: t(`conn.music.${preview.call}`) })}
           </button>
         )}
-        <button
-          type="button"
-          onClick={() => go("injuries")}
-          className={`press inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
-        >
-          <Icon name="bandage" size={15} className={hurt.length ? "" : "text-ember"} />
-          {hurt.length
-            ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
-            : t("today.somethingHurts")}
-        </button>
+        {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
+            being trained around stays up here, where it reads as today's status. */}
+        {(hurt.length > 0 || !showCall) && (
+          <button
+            type="button"
+            onClick={() => go("injuries")}
+            className={`press inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 ${hurt.length ? "border-warn/40 bg-warn/15 text-warn" : "border-line bg-surface text-muted"}`}
+          >
+            <Icon name="bandage" size={15} className={hurt.length ? "" : "text-ember"} />
+            {hurt.length
+              ? t("today.trainingAround", { parts: list(hurt.map((i) => inSentence(PART_LABEL[i.part], true))) })
+              : t("today.somethingHurts")}
+          </button>
+        )}
       </div>
 
       <TodayMoments />
@@ -284,7 +326,8 @@ export function Today() {
           phone the two groups stack in this order, as before. */}
       <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-6">
         <div className="desk:order-2 desk:col-span-2">
-          {readiness && preview && call && !active && !fixed && (
+          {doneToday && resting && <DoneToday session={doneToday} onAgain={trainAgain} />}
+          {showCall && readiness && preview && call && (
             <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
               <div className="flex items-center gap-4">
                 <Ring
@@ -306,16 +349,16 @@ export function Today() {
                   >
                     <Icon name={call.icon} size={14} strokeWidth={2.4} />
                     <span>{t("td.readiness")}</span>
-                    <Info term="readiness" />
                   </div>
+                  {/* One "i" for the score and the call: they're explained together. */}
                   <h2 id="call-title" className="mt-0.5 text-xl font-bold">
                     {CALL_TEXT[preview.call].label}
-                    <Info term="call" />
+                    <Info term="call" also="readiness" />
                   </h2>
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted">
-                {preview.challenge ? t("td.challenge") : callWhy(readiness, preview.call, preview.week.deload)}
+                {preview.challenge ? t("td.challenge") : callWhy(readiness, preview.call, preview.week.deload, true)}
               </p>
               {readiness.signals.length > 0 && (
                 <ul className="mt-2 space-y-1 text-sm">
@@ -332,7 +375,7 @@ export function Today() {
                   ))}
                 </ul>
               )}
-              <FeelCheckIn now={now} />
+              <FeelCheckIn now={now} hurts={!hurt.length} />
               <div
                 className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1"
                 role="group"
@@ -384,7 +427,7 @@ export function Today() {
           {!active && <TodayGame />}
         </div>
         <div className="desk:order-1 desk:col-span-3">
-          {!fixed && (
+          {!fixed && !resting && (
             <div className="card mt-4 p-4">
               <div className="flex items-baseline justify-between">
                 <label htmlFor="len" className="flex items-center gap-1.5 text-sm font-medium text-muted">
@@ -422,9 +465,9 @@ export function Today() {
               <FitAroundCalendar />
             </div>
           )}
-          {!fixed && <PlanExtras />}
+          {!fixed && !resting && <PlanExtras />}
 
-          {preview && preview.items.length > 0 ? (
+          {resting ? null : preview && preview.items.length > 0 ? (
             <>
               <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
                 <ol className="stagger card overflow-hidden" data-testid="plan-list">
@@ -598,7 +641,7 @@ export function Today() {
         </div>
       </div>
 
-      {!active && preview && preview.items.length > 0 && (
+      {!active && !resting && preview && preview.items.length > 0 && (
         <div className="after-side pointer-events-none fixed inset-x-0 bottom-[var(--nav-h,4rem)] z-30 pb-3 bg-gradient-to-t from-bg via-bg/90 to-transparent px-5 pt-8">
           <div className="pointer-events-auto mx-auto max-w-lg">
             <Button
@@ -619,6 +662,41 @@ export function Today() {
         </div>
       )}
     </div>
+  );
+}
+
+/**
+ * Today once today's workout is done (polish pass, Melvin 2026-11-12): what was done, when the next one is and
+ * why, and the cool-down while the muscles are warm, instead of the same plan and a Start button. "Train again"
+ * brings the plan back for anyone doing a second session.
+ */
+function DoneToday({ session, onAgain }: { session: SessionSummary; onAgain: () => void }) {
+  const { profile } = useApp();
+  const now = useNow(60_000);
+  const min = Math.max(1, Math.round(session.seconds / 60));
+  // The cool-down only makes sense soon after the workout.
+  const warm = now - (session.start + session.seconds * 1000) < 3 * 3600_000;
+  return (
+    <>
+      <section
+        className="card-tint animate-rise mt-4 flex items-start gap-4 p-4"
+        style={{ "--tint": HUE.mint } as CSSProperties}
+        data-testid="done-today"
+      >
+        <Mascot mood="happy" size={56} className="-my-1 shrink-0" />
+        <div className="min-w-0">
+          <p className="num font-semibold">
+            {t("today.doneLine", { count: session.sets, min, volume: fmtVolume(session.volume, profile.unit) })}
+          </p>
+          <p className="mt-1 text-sm text-muted">{t("today.doneRest")}</p>
+        </div>
+      </section>
+      <NextUpCard sessionId={session.sessionId} />
+      {warm && <CoolDownCard />}
+      <Button kind="ghost" icon="play" className="mt-4 w-full" onClick={onAgain}>
+        {t("today.again")}
+      </Button>
+    </>
   );
 }
 
