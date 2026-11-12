@@ -109,7 +109,7 @@ export function CoachesView({ lang }: { lang: SiteLang }) {
         </div>
       </Section>
 
-      <CtaBanner cta="coaches-end" title={c.endTitle} body={c.endBody} lang={lang} />
+      <CtaBanner cta="coaches-end" title={c.endTitle} body={c.endBody} button={c.cta} href={COACH_APP} lang={lang} />
     </InfoPage>
   );
 }

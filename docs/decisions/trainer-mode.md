@@ -16,6 +16,14 @@ Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for c
 - **A note to each client.** On a client's report, **Your note** (up to 500 characters, plain text, `coach_notes`, one per coach and client; Clear note removes it). The client sees it at the top of Today ("From your coach", `CoachNoteToday`, above the coach's notes) with Open coaching and Got it, which hides it on the device until the coach changes it, and under Coaching › Your coach. Today's copy is fetched on open, on return to the app (at most every 15 minutes) and on sign-in, kept in localStorage, and forgotten on sign-out. Notes go when the pair unlinks or either account is deleted.
 - Analytics adds `feature` `trainer` details `note`, `unnote` and `setup` (finished setup on the coach path). Pure web code, so Android, iOS and the web app get it together; no platform gap.
 
+## Coach copy on the website (built 2026-11-12)
+
+Melvin asked whether the site had any coach copy, posts or calls to action (2026-11-12); it had only the `/coaches/` page, and that page wasn't in the sitemap. Now:
+
+- **Blog:** a Coaching topic (`/blog/topic/coaching/`) with three posts in `src/content/blog/m.ts`: how to track client workouts, keeping personal training clients consistent, and what to share with your coach (for clients).
+- **Landing pages:** `/apps/personal-trainer-app/` and `/features/coaching/`. Their middle call to action goes to `/coaches/`; the others go into the app, like every landing.
+- **Calls to action:** a `coach` article call to action (`CTA_COPY.coach`, its button goes to `/coaches/`; `CtaButton`, `CtaInline` and `CtaBanner` take an `href`), a coach band under the plans on the home page in all six languages (`home.pricing.coachLead`/`coachRest`/`coachCta`), and `/coaches/` in the sitemap with its translations.
+
 ## How it works (stage 1, built 2026-11-11)
 
 - **One screen, Settings › Coaching** (`#/trainer`, `Trainer.tsx`; one row on Settings under Connected apps). Signed out, it asks to sign in, because everything goes through the account and the client's synced events.

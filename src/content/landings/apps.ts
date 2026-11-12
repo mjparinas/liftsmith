@@ -598,4 +598,61 @@ export const LANDINGS_APPS: Landing[] = [
       { href: "/blog/strength-training-for-women/", label: "strength training for women" },
     ],
   },
+  {
+    slug: "personal-trainer-app",
+    group: "apps",
+    name: "Personal trainer app",
+    title: "Personal trainer app for coaching clients",
+    description:
+      "An app for personal trainers and online coaches: invite clients with a link, see their logged workouts, sort who needs you first, and send routines and notes.",
+    h1: "The app your clients already train with",
+    intro:
+      "Your clients log their workouts in Liftsmith, set by set. You **see what they did, not what they remember**, and spend your time on the ones who need you.",
+    screen: "workout",
+    screenAlt: "The workout screen with the set, weight, reps and a Log set button",
+    plan: "Free and Pro",
+    sections: [
+      {
+        h2: "For trainers and online coaches",
+        p: [
+          "In-person trainers see what clients did between sessions; online coaches get every workout without chasing spreadsheets or screenshots. Clients get a full adaptive training app, free, that plans the weight and reps for each set and times their rest.",
+        ],
+        ul: [
+          "Invite clients with one link or code, and pre-set their goal, level and days",
+          "A client list sorted by who needs attention first",
+          "Routines you give appear on the client's Today screen",
+          "A short note from you on their Today screen",
+        ],
+      },
+      {
+        h2: "Clients stay in charge of their data",
+        p: [
+          "A client accepts your invite, sees exactly what you'll be able to see, and can stop sharing whenever they like. Nothing is shared until they say yes.",
+          "Want to keep clients training? See [how to keep personal training clients consistent](/blog/keep-personal-training-clients-consistent/).",
+        ],
+      },
+    ],
+    mid: {
+      title: "Coaching in Liftsmith",
+      body: "See the invite, the client list and what your clients get.",
+      button: "See how it works",
+      href: "/coaches/",
+    },
+    end: {
+      title: "Coach in the app your clients will use",
+      body: "Coaching is part of Pro, and clients train free on Android, iPhone and the web.",
+    },
+    faq: [
+      ["Is it free for clients?", "Yes. Clients use Liftsmith free, and accepting a coach's invite costs nothing."],
+      ["What does a coach pay?", "Coaching your own clients is part of Liftsmith Pro."],
+      ["Does it work for online coaching?", "Yes. Clients log wherever they train, and you see each workout once it syncs."],
+      ["Can clients use their own gym?", "Yes. Each client sets up their own equipment, and their plan fits what they have."],
+    ],
+    links: [
+      { href: "/coaches/", label: "Liftsmith for coaches" },
+      { href: "/features/coaching/", label: "the coaching features" },
+      { href: "/blog/how-to-track-client-workouts/", label: "how to track client workouts" },
+      { href: "/apps/workout-tracker/", label: "the workout tracker" },
+    ],
+  },
 ];

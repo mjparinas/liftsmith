@@ -15,6 +15,7 @@ import { BLOG_I } from "./blog/i";
 import { BLOG_J } from "./blog/j";
 import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
+import { BLOG_M } from "./blog/m";
 import { GUIDES } from "./guides";
 
 export type CtaTopic =
@@ -39,7 +40,8 @@ export type CtaTopic =
   | "watch"
   | "measure"
   | "health"
-  | "stretch";
+  | "stretch"
+  | "coach";
 
 export type Block =
   { h2: string } | { p: string } | { ul: string[] } | { ol: string[] } | { tip: string } | { cta: CtaTopic } | { exercises: string[] };
@@ -61,7 +63,7 @@ export interface Article {
 }
 
 /** What each call to action says: specific to what the reader just read, always one tap into the app. */
-export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: string }> = {
+export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: string; href?: string }> = {
   plan: {
     title: "Get a workout planned for you today",
     body: "Liftsmith picks your exercises, sets, reps and weights from your equipment and recovery, then moves them forward every session.",
@@ -172,6 +174,13 @@ export const CTA_COPY: Record<CtaTopic, { title: string; body: string; button: s
     body: "Liftsmith builds a warm-up for today's plan and a cool-down for what you just trained, with a 3D demo and a timer for every stretch.",
     button: "Try guided stretching",
   },
+  // For coaches: goes to the coach page (/coaches/), not straight into the app.
+  coach: {
+    title: "Coach your clients in Liftsmith",
+    body: "Send one invite link, see which client needs you first, and give them routines and a note. Being your client is free.",
+    button: "See how coaching works",
+    href: "/coaches/",
+  },
 };
 
 export const ARTICLES: Article[] = [
@@ -188,6 +197,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_J,
   ...BLOG_K,
   ...BLOG_L,
+  ...BLOG_M,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

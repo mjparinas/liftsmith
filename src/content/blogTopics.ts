@@ -88,6 +88,15 @@ export const BLOG_TOPICS: BlogTopic[] = [
     intro: "How to log your training and tell whether it's working.",
     tags: ["Tracking", "Progress"],
   },
+  {
+    slug: "coaching",
+    name: "Coaching",
+    title: "Coaching: training clients and working with a coach",
+    description:
+      "For personal trainers and online coaches, and for lifters who work with one: tracking clients, keeping them consistent, and what to share.",
+    intro: "How to coach lifters between sessions, and what to expect when you train with a coach.",
+    tags: ["Coaching"],
+  },
 ];
 
 export const BLOG_TOPIC_BY_SLUG = new Map(BLOG_TOPICS.map((t) => [t.slug, t]));

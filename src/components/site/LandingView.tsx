@@ -67,7 +67,7 @@ export function LandingView({ l, related }: { l: Landing; related: Landing[] }) 
       </div>
       <div className="max-w-3xl">
         {first ? <Section s={first} /> : null}
-        <CtaInline cta={`${l.group}-mid`} title={l.mid.title} body={l.mid.body} button={l.mid.button} />
+        <CtaInline cta={`${l.group}-mid`} title={l.mid.title} body={l.mid.body} button={l.mid.button} href={l.mid.href} />
         {rest.map((s) => (
           <Section key={s.h2} s={s} />
         ))}

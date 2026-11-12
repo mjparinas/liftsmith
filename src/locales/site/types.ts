@@ -102,6 +102,10 @@ export interface SiteText {
       /** "About $3.33 a month, or $6.99 a month" */
       priceNote: string;
       trialCta: string;
+      /** The coach band under the plans, linking to /coaches/. */
+      coachLead: string;
+      coachRest: string;
+      coachCta: string;
       billed: string;
     };
     faq: { eyebrow: string; title: string };
