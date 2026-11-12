@@ -139,6 +139,17 @@ export default function Privacy() {
           told who reported them. Leave Friends in its settings, or delete your account, and all of this is deleted.
         </p>
 
+        <h2 className="mt-8 text-xl font-semibold">Gyms you share or list</h2>
+        <p className="mt-2">
+          Sharing a gym as a link puts its name, equipment and weights in the link itself; nothing is sent to us. Listing a gym so lifters
+          nearby can find it is optional and needs an account. If you list one, we keep its name, equipment and weights with your account,
+          and its area rounded to about 1 km, never your exact position or your machine settings. Anyone looking for gyms near them sees the
+          name, equipment and distance, but not who listed it. When you look for gyms near you, the app sends your area rounded the same
+          way, and we don&apos;t keep it. Only list a gym open to the public, never your home. If someone reports a listing, we keep a
+          one-way code made from their internet address (or their account) so each person counts once. Turn the listing off in Gyms, or
+          delete your account, and it&apos;s deleted.
+        </p>
+
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
         <p className="mt-2">
           These are optional and need an account. When you connect one, you sign in on that service&apos;s own page and allow {BRAND.name};

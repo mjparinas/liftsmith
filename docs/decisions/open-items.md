@@ -13,6 +13,8 @@ Done before launch: Google sign-in for the web and Android, Android billing (Pla
 
 After launch, not blocking it:
 
+- **Play Data safety, gym listings** (2026-11-12, [Gym sharing](gym-sharing.md)): in App content › Data safety, add App functionality to Location › Approximate location's purposes, because a listed gym's area (about 1 km) is kept with the account. Do it before the release that carries gym listings reaches production.
+
 - Validate camera rep counting on real recorded lifts.
 - Creator program: add each creator in /admin/ › Creators (Android's 30-day offers exist); payouts are sent by hand from the CSV. The iPhone side is under iOS below.
 - Official Google Play and App Store badge artwork for the home page, and real beta-tester quotes to replace the sample testimonials (samples never show on the live site).

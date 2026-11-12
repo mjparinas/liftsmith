@@ -12,6 +12,8 @@ import { BRAND } from "@/lib/brand";
 import { pendingCoach, savePendingCoach } from "@/lib/coachInvite";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
+import { markAdded } from "@/lib/gymDirectory";
+import { decodeGym, type GymKit } from "@/lib/gymShare";
 import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
 import { t } from "@/lib/i18n";
@@ -26,6 +28,7 @@ import { fromKg, toKg } from "@/lib/units";
 
 import { CoachJoin } from "./CoachJoin";
 import { Mascot } from "./Mascot";
+import { NearbyGyms } from "./NearbyGyms";
 import { Plans, ProFeatures } from "./Pro";
 import { go } from "./router";
 import { SaveStep } from "./Saving";
@@ -184,7 +187,7 @@ export function knownMaxes(
 
 /** The setup wizard: first run, and again from Settings ("Run setup again"). */
 export function Onboarding({ rerun = false }: { rerun?: boolean }) {
-  const { profile, setProfile, addGym, gyms } = useApp();
+  const { profile, setProfile, addGym, importGym, gyms } = useApp();
   const [step, setStep] = useState(0);
   // First run ends with the Pro trial offer once billing is live; a rerun from Settings doesn't show it again.
   // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
@@ -216,6 +219,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [goal, setGoal] = useState<Goal>(profile.goal);
   const [exp, setExp] = useState<Experience>(profile.experience);
   const [preset, setPreset] = useState<GymPreset>("commercial");
+  // A gym another lifter listed nearby (gymDirectory.ts), taken instead of a preset.
+  const [found, setFound] = useState<{ id: string; kit: GymKit } | null>(null);
   const [unit, setUnit] = useState<Unit>(profile.unit);
   const [days, setDays] = useState(profile.daysPerWeek);
   const [bw, setBw] = useState(Math.round(fromKg(profile.bodyweight, profile.unit)));
@@ -262,7 +267,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
 
   const finish = (pro?: Profile["pro"]) => {
     setProfile({ unit });
-    const id = keepGyms ? profile.activeGymId : addGym(preset);
+    const id = keepGyms ? profile.activeGymId : found ? importGym(found.kit) : addGym(preset);
+    if (!keepGyms && found) markAdded(found.id);
     const years = Number(age);
     setProfile({
       name: name.trim(),
@@ -286,7 +292,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       goal,
       experience: exp,
       days,
-      preset: keepGyms ? "kept" : preset,
+      preset: keepGyms ? "kept" : found ? "nearby" : preset,
       unit,
       healthPrefill: prefilled,
     });
@@ -401,7 +407,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                   title={t("setup.gym.keep")}
                   blurb={gyms.map((g) => g.name).join(", ")}
                   active={keepGyms}
-                  onClick={() => setKeepGyms(true)}
+                  onClick={() => {
+                    setKeepGyms(true);
+                    setFound(null);
+                  }}
                 />
               )}
               {PRESETS.map((p) => (
@@ -409,13 +418,25 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                   key={p.id}
                   title={rerun ? t("setup.gym.add", { name: p.name }) : p.name}
                   blurb={p.blurb}
-                  active={!keepGyms && preset === p.id}
+                  active={!keepGyms && !found && preset === p.id}
                   onClick={() => {
                     setKeepGyms(false);
+                    setFound(null);
                     setPreset(p.id);
                   }}
                 />
               ))}
+            </div>
+            <div className="mt-4">
+              <NearbyGyms
+                picked={found?.id ?? null}
+                onPick={(l) => {
+                  const kit = decodeGym(l.code);
+                  if (!kit) return;
+                  setKeepGyms(false);
+                  setFound({ id: l.id, kit: { ...kit, name: l.name } });
+                }}
+              />
             </div>
             <h2 className="mt-8 text-lg font-semibold">{t("setup.plates")}</h2>
             <div className="mt-3 grid grid-cols-2 gap-3">

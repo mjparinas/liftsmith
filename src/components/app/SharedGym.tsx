@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { listingFor, markAdded, REPORT_REASONS, reportGym } from "@/lib/gymDirectory";
 import { decodeGym, sameKit } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
@@ -11,7 +12,7 @@ import { EQUIPMENT_LABEL } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
 import { go } from "./router";
-import { Button, EmptyState, ScreenHeader, Section } from "./ui";
+import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
 // A gym someone shared (#/gymlink/<code>, gymShare.ts): a preview of its equipment, plates and
 // weights, then one tap adds it to this lifter's gyms and trains there.
@@ -23,6 +24,9 @@ export function SharedGym({ code }: { code?: string }) {
   const { gyms, active, importGym, setProfile } = useApp();
   const kit = useMemo(() => (code ? decodeGym(code) : null), [code]);
   const [addedId, setAddedId] = useState<string | null>(null);
+  const listing = useMemo(() => listingFor(code), [code]);
+  const [reporting, setReporting] = useState(false);
+  const [reported, setReported] = useState(false);
   if (!kit) {
     return (
       <div className="pt-10">
@@ -47,7 +51,8 @@ export function SharedGym({ code }: { code?: string }) {
     haptic("success");
     sound.tick();
     const id = importGym({ ...kit, name });
-    track("feature", { name: "gym_share", detail: "import" });
+    track("feature", { name: "gym_share", detail: listing ? "nearby" : "import" });
+    if (listing) markAdded(listing);
     setAddedId(id);
   };
   return (
@@ -121,7 +126,35 @@ export function SharedGym({ code }: { code?: string }) {
         <Button kind="quiet" className="w-full" onClick={() => go("today")}>
           {existing ? t("remix.back") : t("remix.notNow")}
         </Button>
+        {listing &&
+          (reported ? (
+            <p className="text-center text-sm text-muted" role="status">
+              {t("gym.report.thanks")}
+            </p>
+          ) : (
+            <Button kind="quiet" className="w-full" onClick={() => setReporting(true)}>
+              {t("gym.report.open")}
+            </Button>
+          ))}
       </div>
+      <Sheet open={reporting} onClose={() => setReporting(false)} title={t("gym.report.title")}>
+        <p className="text-sm text-muted">{t("gym.report.note")}</p>
+        <div className="mt-4 grid gap-2">
+          {REPORT_REASONS.map((r) => (
+            <Button
+              key={r}
+              kind="ghost"
+              className="w-full"
+              onClick={async () => {
+                if (listing && (await reportGym(listing, r))) setReported(true);
+                setReporting(false);
+              }}
+            >
+              {t(`gym.report.${r}`)}
+            </Button>
+          ))}
+        </div>
+      </Sheet>
     </div>
   );
 }

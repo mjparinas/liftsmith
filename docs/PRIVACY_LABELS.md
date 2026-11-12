@@ -24,7 +24,8 @@ Last reviewed: 2026-11-11 (Friends added: handle, name, follows, posted workout 
 | Synced copy: workouts and sets, notes, body weight, gyms, routines, settings and profile (including birth year and sex), and if used Health Connect / Apple Health readings, injuries and cycle logs | Only when the user signs in (optional); deleted with the account | App functionality (backup and sync to the user's own devices) | Yes, to the user's own account. Never in usage stats, never shared |
 | Friends (optional, account only): handle, display name, follows, blocks, posted workout summaries (time, sets, exercises, best sets; weights only if shown), workouts sent to friends (name, exercises, sets), likes, comments, reports the user made | Only when the user joins Friends; deleted when they leave Friends or delete the account | App functionality (shown to the followers the user approves) | Yes. Shown to other users only at the user's direction; never in usage stats, never used for ads |
 | Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data | **No** without an account (stays on the device) | | |
-| Location, progress photos | **Never** | | |
+| Gym listings (optional, account only): gym name, equipment and weights, area rounded to about 1 km; reports on listings (account id or a one-way code from the address) | Only when the user lists a gym for lifters nearby; deleted when they unlist it or delete the account | App functionality (others nearby find the gym and add its setup) | Yes, to the account, but shown to others without who listed it |
+| Location (beyond a listed gym's 1 km area), progress photos | **Never** | | |
 | Advertising id (IDFA, Android advertising id) | **Never** (`AD_ID` permission removed in the manifest; no ATT prompt) | | |
 
 Usage stats are on by default outside the EU, EEA, UK and Switzerland, and off until switched on inside them. They can be switched off in Settings › Usage stats and in the setup wizard.
@@ -41,7 +42,7 @@ Collected data types:
 
 | Category › type | Collected | Shared | Ephemeral | Required or optional | Purposes |
 |---|---|---|---|---|---|
-| Location › Approximate location | Yes (country and region from IP) | No | No | Required | Analytics |
+| Location › Approximate location | Yes (country and region from IP; a listed gym's area at about 1 km, only if the user lists a gym) | No | No | Required | Analytics, App functionality |
 | App activity › App interactions | Yes | No | No | Optional (user can turn off) | Analytics |
 | App activity › Other user-generated content | Yes (feedback message) | No | No | Optional | App functionality |
 | App info and performance › Diagnostics | Yes (device details on feedback, app version) | No | No | Optional | Analytics, App functionality |
