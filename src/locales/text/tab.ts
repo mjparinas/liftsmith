@@ -8,7 +8,7 @@ export const en = {
   "tab.recovery": "Body",
   "tab.progress": "Progress",
   "tab.awards": "Awards",
-  "tab.gyms": "Gyms",
+  "tab.friends": "Friends",
 } as const;
 
 type Key = keyof typeof en;
@@ -18,7 +18,7 @@ export const es: Partial<Record<Key, Message>> = {
   "tab.recovery": "Cuerpo",
   "tab.progress": "Progreso",
   "tab.awards": "Logros",
-  "tab.gyms": "Gimnasios",
+  "tab.friends": "Amigos",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -26,7 +26,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "tab.recovery": "Corps",
   "tab.progress": "Progrès",
   "tab.awards": "Trophées",
-  "tab.gyms": "Salles",
+  "tab.friends": "Amis",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -34,7 +34,7 @@ export const de: Partial<Record<Key, Message>> = {
   "tab.recovery": "Körper",
   "tab.progress": "Fortschritt",
   "tab.awards": "Erfolge",
-  "tab.gyms": "Studios",
+  "tab.friends": "Freunde",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -42,7 +42,7 @@ export const it: Partial<Record<Key, Message>> = {
   "tab.recovery": "Corpo",
   "tab.progress": "Progressi",
   "tab.awards": "Premi",
-  "tab.gyms": "Palestre",
+  "tab.friends": "Amici",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -50,5 +50,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "tab.recovery": "体",
   "tab.progress": "進捗",
   "tab.awards": "実績",
-  "tab.gyms": "ジム",
+  "tab.friends": "フレンド",
 };

@@ -190,6 +190,9 @@ export function Settings() {
       <ProCard />
       <AccountRow />
       <div className="mt-2">
+        <NavRow title={t("gym.row")} sub={t("gym.rowNote")} icon="gym" onClick={() => go("gym")} />
+      </div>
+      <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
       <div className="mt-2">

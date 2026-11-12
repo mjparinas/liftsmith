@@ -72,7 +72,7 @@ try {
   await page.getByRole("button", { name: "🔥 Warm up first" }).click();
   await scan("warm-up");
   await page.mouse.click(10, 10); // tap outside the sheet to close it
-  for (const tab of ["Body", "Progress", "Awards", "Gyms"]) {
+  for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);
     if (tab === "Body") {
@@ -97,6 +97,10 @@ try {
       await page.getByTestId("body-muscles").click();
     }
   }
+  // Gyms (in Settings and behind Today's gym chip since 2026-11-12).
+  await page.goto(`${server.url}/app/#/gym`);
+  await page.getByRole("heading", { name: "Gyms" }).waitFor();
+  await scan("Gyms");
   // Delightful extras: recap and body/photos.
   await page.goto(`${server.url}/app/#/recap`);
   await page.getByRole("heading", { level: 1 }).waitFor();
@@ -484,10 +488,15 @@ try {
   await scan("light settings");
   await page.getByRole("button", { name: "‹ Today" }).click();
   await scan("light today");
-  for (const tab of ["Body", "Progress", "Awards", "Gyms"]) {
+  for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(`light ${tab}`);
   }
+  // Gyms left the tab bar for Settings (and Today's gym chip) on 2026-11-12, so it's opened by its link here.
+  await page.evaluate(() => (location.hash = "#/gym"));
+  await page.getByRole("heading", { name: "Gyms" }).waitFor();
+  await scan("light Gyms");
+  await page.getByRole("button", { name: "‹ Back" }).click();
   await page.getByRole("button", { name: "Today" }).click();
   await page.getByRole("button", { name: "Start workout" }).click();
   await page.getByRole("button", { name: /Log (set|warm-up)/ }).waitFor();

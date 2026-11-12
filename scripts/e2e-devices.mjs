@@ -34,7 +34,7 @@ for (const { name } of pick()) {
     await noSideScroll("welcome");
     await onboard(page);
     await noSideScroll("today");
-    for (const tab of ["Today", "Body", "Progress", "Gyms"]) {
+    for (const tab of ["Today", "Body", "Progress", "Friends"]) {
       const b = await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).boundingBox();
       check(
         b && b.y >= 0 && b.y + b.height <= opts.viewport.height && b.x + b.width <= opts.viewport.width + 1,
@@ -68,15 +68,15 @@ for (const { name } of pick()) {
     await page.getByRole("button", { name: "End", exact: true }).click();
     await page.getByRole("button", { name: "Finish and save" }).click();
     await page.getByRole("button", { name: "Done", exact: true }).click();
-    for (const tab of ["Body", "Progress", "Gyms"]) {
+    for (const tab of ["Body", "Progress", "Friends"]) {
       await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
       await noSideScroll(tab);
     }
-    await page.screenshot({ path: `${OUT}/${tag}-gyms.png` });
+    await page.screenshot({ path: `${OUT}/${tag}-friends.png` });
     // The tab bar never covers the end of a screen, even with Android's three-button bar under it
     // (a 48 px safe area, faked here because a browser's is 0), and Today's Start button sits above it.
     const bar = await page.addStyleTag({ content: ".safe-bottom { padding-bottom: 48px !important; }" });
-    for (const tab of ["Today", "Body", "Progress", "Gyms"]) {
+    for (const tab of ["Today", "Body", "Progress", "Friends"]) {
       await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
       await page.waitForTimeout(150);
       const gap = await page.evaluate(() => {
