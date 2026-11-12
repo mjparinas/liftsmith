@@ -87,6 +87,11 @@ describe("desktop layout", () => {
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     await screen.findByRole("button", { name: /Log (set|warm-up)/ });
     expect(screen.queryByRole("navigation", { name: "Main" })).toBeNull();
+    // Keyboard: L logs the set, and the shortcuts are named under Log set.
+    expect(screen.getByText(/Keyboard: L logs the set/)).toBeInTheDocument();
+    const before = useApp.getState().events.length;
+    await user.keyboard("l");
+    expect(useApp.getState().events.length).toBe(before + 1);
     expect(document.querySelector("main")?.className).toContain("max-w-lg");
     expect(document.documentElement.style.getPropertyValue("--side-w")).toBe("");
   });

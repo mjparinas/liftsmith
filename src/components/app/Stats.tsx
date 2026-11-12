@@ -69,10 +69,13 @@ export function Stats() {
     ["volume", t("progress.volume"), fmtVolume(stats.totalVolume, unit), "progress", HUE.cyan],
   ];
   return (
-    <div className="pb-2">
-      <ScreenHeader title={t("progress.title")} />
-      <CoachNotes title={t("progress.next")} />
-      <div className="mt-4 grid grid-cols-2 gap-3">
+    // Desktop layout: the cards flow into two columns (.desk-cols); the header, next steps and the totals run across.
+    <div className="desk-cols pb-2">
+      <ScreenHeader className="desk-span" title={t("progress.title")} />
+      <div className="desk-span">
+        <CoachNotes title={t("progress.next")} />
+      </div>
+      <div className="desk-span mt-4 grid grid-cols-2 gap-3 desk:grid-cols-4">
         {tiles.map(([k, label, v, icon, hue]) => (
           <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
         ))}

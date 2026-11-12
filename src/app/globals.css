@@ -567,6 +567,14 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
    to the bottom of a screen and toasts start after it, so they centre on the page rather than the window. */
 .toast-wrap { left: var(--side-w, 0px); }
 .after-side { left: var(--side-w, 0px); }
+/* A screen whose cards flow into two columns on the desktop layout (stage 3), read down the first column then the
+   second, so the phone's order is kept. A card never splits; .desk-span runs across both (the header, say). */
+:root[data-layout="desktop"] .desk-cols { column-count: 2; column-gap: 1.5rem; }
+:root[data-layout="desktop"] .desk-cols > * { break-inside: avoid; }
+:root[data-layout="desktop"] .desk-cols > .desk-span { column-span: all; }
+/* A column's top margin is dropped at a column break, so both columns start the same distance under the last full-width part. */
+:root[data-layout="desktop"] .desk-cols > .desk-span:has(+ :not(.desk-span)) { margin-bottom: 1.5rem; }
+:root[data-layout="desktop"] .desk-cols > .desk-span + :not(.desk-span) { margin-top: 0; }
 .toast { background: var(--color-raised); color: var(--color-ink); border: 1px solid var(--color-line); border-radius: 999px; box-shadow: 0 8px 24px var(--shadow); }
 /* Covers the status bar so scrolled content doesn't run under the clock and icons (App.tsx StatusScrim). */
 .status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }

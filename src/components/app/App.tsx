@@ -84,6 +84,10 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 // Friends took Gyms' place in the bar (2026-11-12, docs/decisions/friends.md): gyms are set up once and switched
 // from Today's gym chip, so Gyms lives in Settings now. With the social flag off the bar has four tabs.
 
+// Screens with a desktop layout of their own (two columns or more, docs/decisions/desktop-layout.md stage 3): they get
+// the full width on the desktop layout. Every other screen keeps a comfortable single column.
+const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise"]);
+
 // Screens that hide the tab bar.
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
 
@@ -423,7 +427,7 @@ export function App() {
       <div className={sidebar ? "pl-60" : undefined}>
         <main
           key={route}
-          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? "max-w-3xl px-10 pt-8" : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
+          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? `${WIDE.has(route) ? "max-w-6xl" : "max-w-3xl"} px-10 pt-8` : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
         >
           <ScreenBoundary>{screen}</ScreenBoundary>
         </main>
