@@ -55,6 +55,19 @@ export const en = {
   "lab.machines.err.lost": "Lost {name}. What it sent so far is kept. Tap Connect machine to carry on.",
   "lab.machines.err.failed":
     "Couldn't connect to {name}. It may be connected to another app or watch: disconnect it there, keep it close, and try again.",
+  "lab.scale.title": "Bluetooth smart scale",
+  "lab.scale.body":
+    "Under the weigh-in on Progress and Body, a button connects a scale that shares its reading over Bluetooth the standard way (the weight scale and body composition standards). Step on, and your weight and body fat fill in, ready to log. Many cheap scales use their own app's protocol instead and won't show up. In the web app it needs Chrome.",
+  "lab.scale.button": "Weigh in on my scale",
+  "lab.scale.device": "the scale",
+  "lab.scale.connecting": "Looking for your scale…",
+  "lab.scale.waiting": "Step on {name} now.",
+  "lab.scale.got": "{name} read it. Check it and tap {log}.",
+  "lab.scale.err.notFound":
+    "No scale showed up. Step on it to wake it, keep your phone close, and check it isn't connected to its own app right now.",
+  "lab.scale.err.noService": "{name} doesn't share its reading the standard way, so it can't connect.",
+  "lab.scale.err.timeout": "{name} didn't send a weight. Step on it again and stand still until it settles.",
+  "lab.scale.err.failed": "Couldn't connect to {name}. Close its own app, keep your phone close, and try again.",
   "lab.handsFree.title": "Hands-free sets",
   "lab.handsFree.body":
     "While camera, phone motion or watch rep counting is counting, the set logs itself a few seconds after your last rep and rest starts: 4 seconds once your planned reps are in, 8 while you're short of them. Undo puts it back. Needs one of those rep counting labs on.",
@@ -120,6 +133,19 @@ export const es: Partial<Record<Key, Message>> = {
     "Se perdió la conexión con {name}. Se conserva lo que ha enviado hasta ahora. Toca Conectar máquina para seguir.",
   "lab.machines.err.failed":
     "No se pudo conectar con {name}. Puede que esté conectada a otra app o reloj: desconéctala ahí, mantenla cerca y vuelve a intentarlo.",
+  "lab.scale.title": "Báscula inteligente Bluetooth",
+  "lab.scale.body":
+    "Bajo el registro de peso en Progreso y Cuerpo, un botón conecta una báscula que comparte su lectura por Bluetooth de la forma estándar (los estándares de báscula y de composición corporal). Súbete y tu peso y tu grasa corporal se rellenan, listos para registrar. Muchas básculas baratas usan el protocolo de su propia app y no aparecerán. En la app web necesita Chrome.",
+  "lab.scale.button": "Pesarme en mi báscula",
+  "lab.scale.device": "la báscula",
+  "lab.scale.connecting": "Buscando tu báscula…",
+  "lab.scale.waiting": "Súbete a {name} ahora.",
+  "lab.scale.got": "{name} ha tomado la lectura. Revísala y toca {log}.",
+  "lab.scale.err.notFound":
+    "No apareció ninguna báscula. Súbete para despertarla, mantén el teléfono cerca y comprueba que no esté conectada ahora a su propia app.",
+  "lab.scale.err.noService": "{name} no comparte su lectura de la forma estándar, así que no se puede conectar.",
+  "lab.scale.err.timeout": "{name} no envió ningún peso. Vuelve a subirte y quédate quieto hasta que se estabilice.",
+  "lab.scale.err.failed": "No se pudo conectar con {name}. Cierra su propia app, mantén el teléfono cerca y vuelve a intentarlo.",
   "lab.handsFree.title": "Series sin manos",
   "lab.handsFree.body":
     "Mientras se cuentan las repeticiones con la cámara, el movimiento del teléfono o el reloj, la serie se registra sola unos segundos después de tu última repetición y empieza el descanso: 4 segundos si ya hiciste las repeticiones previstas, 8 si te faltan. Deshacer la quita. Necesita uno de esos labs de conteo activado.",
@@ -183,6 +209,19 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "Connexion perdue avec {name}. Ce qu'elle a envoyé est conservé. Touchez Connecter la machine pour continuer.",
   "lab.machines.err.failed":
     "Impossible de se connecter à {name}. Elle est peut-être connectée à une autre app ou montre : déconnectez-la, restez à côté et réessayez.",
+  "lab.scale.title": "Balance connectée Bluetooth",
+  "lab.scale.body":
+    "Sous la pesée dans Progrès et Corps, un bouton connecte une balance qui partage sa mesure en Bluetooth de façon standard (les normes de pèse-personne et de composition corporelle). Montez dessus : votre poids et votre masse grasse se remplissent, prêts à enregistrer. Beaucoup de balances bon marché utilisent le protocole de leur propre app et n’apparaîtront pas. Dans l’app web, il faut Chrome.",
+  "lab.scale.button": "Me peser sur ma balance",
+  "lab.scale.device": "la balance",
+  "lab.scale.connecting": "Recherche de votre balance…",
+  "lab.scale.waiting": "Montez sur {name} maintenant.",
+  "lab.scale.got": "{name} a pris la mesure. Vérifiez-la et touchez {log}.",
+  "lab.scale.err.notFound":
+    "Aucune balance n’est apparue. Montez dessus pour la réveiller, gardez le téléphone à proximité et vérifiez qu’elle n’est pas connectée à sa propre app en ce moment.",
+  "lab.scale.err.noService": "{name} ne partage pas sa mesure de façon standard, la connexion est donc impossible.",
+  "lab.scale.err.timeout": "{name} n’a envoyé aucun poids. Remontez dessus et restez immobile jusqu’à ce qu’elle se stabilise.",
+  "lab.scale.err.failed": "Impossible de se connecter à {name}. Fermez sa propre app, gardez le téléphone à proximité et réessayez.",
   "lab.handsFree.title": "Séries sans les mains",
   "lab.handsFree.body":
     "Pendant que la caméra, le mouvement du téléphone ou la montre compte vos répétitions, la série s'enregistre seule quelques secondes après votre dernière répétition et le repos commence : 4 secondes une fois les répétitions prévues faites, 8 s'il vous en manque. Annuler la retire. Nécessite l'un de ces labs de comptage activé.",
@@ -247,6 +286,20 @@ export const de: Partial<Record<Key, Message>> = {
     "Verbindung zu {name} verloren. Was bisher gesendet wurde, bleibt erhalten. Tippe auf Gerät verbinden, um weiterzumachen.",
   "lab.machines.err.failed":
     "Keine Verbindung zu {name}. Vielleicht ist es mit einer anderen App oder Uhr verbunden: trenn es dort, bleib in der Nähe und versuch es noch einmal.",
+  "lab.scale.title": "Bluetooth-Waage",
+  "lab.scale.body":
+    "Unter dem Wiegen bei Fortschritt und Körper verbindet ein Button eine Waage, die ihren Messwert standardmäßig über Bluetooth teilt (die Standards für Personenwaagen und Körperzusammensetzung). Stell dich drauf, und dein Gewicht und Körperfett werden eingetragen, bereit zum Speichern. Viele günstige Waagen nutzen stattdessen das Protokoll ihrer eigenen App und erscheinen nicht. In der Web-App braucht es Chrome.",
+  "lab.scale.button": "Auf meiner Waage wiegen",
+  "lab.scale.device": "die Waage",
+  "lab.scale.connecting": "Suche deine Waage …",
+  "lab.scale.waiting": "Stell dich jetzt auf {name}.",
+  "lab.scale.got": "{name} hat gemessen. Prüf den Wert und tippe auf {log}.",
+  "lab.scale.err.notFound":
+    "Keine Waage gefunden. Stell dich drauf, um sie aufzuwecken, halte das Handy in der Nähe und prüfe, dass sie gerade nicht mit ihrer eigenen App verbunden ist.",
+  "lab.scale.err.noService": "{name} teilt ihren Messwert nicht standardmäßig, deshalb klappt die Verbindung nicht.",
+  "lab.scale.err.timeout": "{name} hat kein Gewicht geschickt. Stell dich noch einmal drauf und steh still, bis sie sich einpendelt.",
+  "lab.scale.err.failed":
+    "Verbindung zu {name} fehlgeschlagen. Schließ ihre eigene App, halte das Handy in der Nähe und versuch es noch einmal.",
   "lab.handsFree.title": "Sätze ohne Hände",
   "lab.handsFree.body":
     "Während Kamera, Handybewegung oder Uhr deine Wiederholungen zählen, wird der Satz ein paar Sekunden nach der letzten Wiederholung von selbst eingetragen und die Pause beginnt: 4 Sekunden, wenn die geplanten Wiederholungen geschafft sind, 8, solange noch welche fehlen. Rückgängig nimmt ihn zurück. Braucht eines dieser Labs zum Zählen.",
@@ -309,6 +362,19 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "Collegamento con {name} perso. Quello che ha inviato finora resta. Tocca Collega macchina per continuare.",
   "lab.machines.err.failed":
     "Impossibile collegarsi a {name}. Potrebbe essere collegata a un'altra app o a un orologio: scollegala lì, resta vicino e riprova.",
+  "lab.scale.title": "Bilancia smart Bluetooth",
+  "lab.scale.body":
+    "Sotto la pesata in Progressi e Corpo, un pulsante collega una bilancia che condivide la sua misura via Bluetooth in modo standard (gli standard per bilance pesapersone e composizione corporea). Sali e il tuo peso e la massa grassa si compilano, pronti da registrare. Molte bilance economiche usano il protocollo della propria app e non compariranno. Nell’app web serve Chrome.",
+  "lab.scale.button": "Pesami sulla mia bilancia",
+  "lab.scale.device": "la bilancia",
+  "lab.scale.connecting": "Cerco la tua bilancia…",
+  "lab.scale.waiting": "Sali su {name} adesso.",
+  "lab.scale.got": "{name} ha preso la misura. Controllala e tocca {log}.",
+  "lab.scale.err.notFound":
+    "Nessuna bilancia trovata. Salici sopra per svegliarla, tieni il telefono vicino e controlla che non sia collegata alla sua app in questo momento.",
+  "lab.scale.err.noService": "{name} non condivide la sua misura in modo standard, quindi non si può collegare.",
+  "lab.scale.err.timeout": "{name} non ha inviato nessun peso. Risali e resta fermo finché non si stabilizza.",
+  "lab.scale.err.failed": "Impossibile collegarsi a {name}. Chiudi la sua app, tieni il telefono vicino e riprova.",
   "lab.handsFree.title": "Serie a mani libere",
   "lab.handsFree.body":
     "Mentre la fotocamera, il movimento del telefono o l'orologio contano le ripetizioni, la serie si registra da sola pochi secondi dopo l'ultima ripetizione e parte il recupero: 4 secondi quando hai fatto le ripetizioni previste, 8 se ne mancano. Annulla la toglie. Serve uno di questi lab di conteggio attivo.",
@@ -371,6 +437,19 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.machines.err.lost": "{name}との接続が切れました。これまでに送られたデータは残ります。「マシンを接続」をタップして続けてください。",
   "lab.machines.err.failed":
     "{name}に接続できませんでした。ほかのアプリやウォッチに接続されている可能性があります。そちらで切断し、近くで再度お試しください。",
+  "lab.scale.title": "Bluetooth 体重計",
+  "lab.scale.body":
+    "「進捗」と「からだ」の体重記録の下に、Bluetooth の標準規格（体重計と体組成の規格）で測定値を共有する体重計に接続するボタンが出ます。乗ると体重と体脂肪率が入力され、そのまま記録できます。安価な体重計の多くは独自アプリの方式を使うため表示されません。Web アプリでは Chrome が必要です。",
+  "lab.scale.button": "体重計で測る",
+  "lab.scale.device": "体重計",
+  "lab.scale.connecting": "体重計を探しています…",
+  "lab.scale.waiting": "{name}に乗ってください。",
+  "lab.scale.got": "{name}で測定しました。確認して「{log}」をタップしてください。",
+  "lab.scale.err.notFound":
+    "体重計が見つかりません。乗って起動し、スマホを近くに置き、体重計の専用アプリにつながっていないか確認してください。",
+  "lab.scale.err.noService": "{name}は標準の方式で測定値を共有しないため、接続できません。",
+  "lab.scale.err.timeout": "{name}から体重が届きませんでした。もう一度乗り、表示が安定するまで動かないでください。",
+  "lab.scale.err.failed": "{name}に接続できませんでした。専用アプリを閉じ、スマホを近くに置いてもう一度お試しください。",
   "lab.handsFree.title": "ハンズフリーセット",
   "lab.handsFree.body":
     "カメラ、スマホのモーション、またはウォッチでレップを数えている間、最後のレップから数秒後にセットが自動で記録され、休憩が始まります。予定のレップに届いていれば4秒、足りなければ8秒です。元に戻すで取り消せます。いずれかのレップカウントのラボをオンにしてください。",

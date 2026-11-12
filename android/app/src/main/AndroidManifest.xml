@@ -193,7 +193,7 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-feature android:name="android.hardware.microphone" android:required="false" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps), and Bluetooth gym machines (FTMS) in Labs. -->
+    <!-- Live heart rate from Bluetooth monitors (Fitbit Charge 6 and Pixel Watch heart rate sharing, straps), Bluetooth gym machines (FTMS) and smart scales (Weight Scale and Body Composition services) in Labs. -->
     <uses-permission android:name="android.permission.BLUETOOTH_SCAN" android:usesPermissionFlags="neverForLocation" />
     <!-- Gym by location: approximate only, while the app is open (no background or precise location). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />

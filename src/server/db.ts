@@ -605,6 +605,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_sent", "INTEGER NOT NULL DEFAULT 1"],
+  // Connected apps: the service's own id for the lifter, where removing access needs it (Polar AccessLink).
+  ["connections", "remote_user", "TEXT"],
   ["social_profiles", "push_likes", "INTEGER NOT NULL DEFAULT 0"],
   // Friends stage 3: avatar, who sees new posts, and the best lifts showcase (social.ts).
   ["social_profiles", "avatar", "TEXT NOT NULL DEFAULT ''"],
