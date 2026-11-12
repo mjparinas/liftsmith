@@ -10,6 +10,8 @@ import { useApp } from "@/lib/store";
 import type { SetEvent } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 
+import { Icon } from "./icons";
+
 // Moments during a workout that never add a tap: a PR banner the instant a record set is logged, and an
 // "almost there" line during rest when the next set could beat the best.
 
@@ -48,8 +50,8 @@ export function PrMoment() {
         className={`${juice.lean ? "" : "animate-bump"} flex items-center gap-3 rounded-2xl border border-gold/50 bg-surface px-4 py-3 shadow-xl`}
         style={{ boxShadow: "0 10px 40px rgb(0 0 0 / 0.5), inset 0 0 0 1px var(--color-gold)" }}
       >
-        <span aria-hidden className="text-3xl">
-          🏆
+        <span aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-gold/15 text-gold">
+          <Icon name="trophy" size={22} />
         </span>
         <div>
           <p className="text-xs font-semibold uppercase tracking-wider text-gold">{t("pr.banner")}</p>

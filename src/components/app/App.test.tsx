@@ -572,7 +572,7 @@ describe("injury mode", () => {
     await user.click(within(card).getByRole("button", { name: "I'm fully healed" }));
     await user.click(screen.getByRole("button", { name: "Yes, it's fully healed" }));
     expect(screen.queryByRole("region", { name: "Knee injury" })).not.toBeInTheDocument();
-    expect(screen.getByText(/Nothing logged/)).toBeInTheDocument();
+    expect(screen.getByText("Nothing hurts")).toBeInTheDocument();
   });
 
   it("an injury logged mid-workout swaps the exercises not started yet", async () => {

@@ -27,7 +27,7 @@ import { BODY_PARTS, type Gym } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { go } from "./router";
-import { Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
+import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
 // Injury mode (Melvin, 2026-11-09). Wording is neutral and never diagnoses: we say what the app does,
 // that it isn't medical advice, and that a professional can say what's safe.
@@ -88,7 +88,11 @@ export function Injuries() {
             />
           ),
       )}
-      {!active.length && <p className="card mt-6 p-5 text-muted">{t("inj.none")}</p>}
+      {!active.length && (
+        <div className="card mt-6">
+          <EmptyState icon="bandage" tint="var(--color-mint)" title={t("inj.noneTitle")} body={t("inj.noneBody")} />
+        </div>
+      )}
 
       {past.length > 0 && (
         <Section title={t("inj.healed")}>

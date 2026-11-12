@@ -13,7 +13,6 @@ export const en = {
     "Tell Liftsmith what hurts and it plans around it. Exercises that load that area are left out until you say it's healed, or you can choose to keep some of them lighter.",
   "inj.log": "Log an injury",
   "inj.returnName": "the {part} exercises you skipped",
-  "inj.none": "Nothing logged. Your plans use every exercise your gym allows.",
   "inj.healed": "Healed",
   "inj.range": "{from} to {to}",
   "inj.whatHurts": "What hurts?",
@@ -96,6 +95,8 @@ export const en = {
   "inj.ret.lowSince": "Your pain has been {low} or lower for about a week since the last return stopped.",
   "inj.ret.start": "Start a graded return",
   "inj.ret.stopped": "The graded return stopped when pain reached {score}. Skipped exercises stay out until it settles again.",
+  "inj.noneTitle": "Nothing hurts",
+  "inj.noneBody": "Your plans use every exercise your gym allows.",
 } as const;
 
 type Key = keyof typeof en;
@@ -110,7 +111,6 @@ export const es: Partial<Record<Key, Message>> = {
     "Dile a Liftsmith qué te duele y planificará en torno a ello. Los ejercicios que cargan esa zona se quedan fuera hasta que digas que está curada, o puedes elegir mantener algunos más ligeros.",
   "inj.log": "Registrar una lesión",
   "inj.returnName": "los ejercicios de {part} que omitiste",
-  "inj.none": "Nada registrado. Tus planes usan todos los ejercicios que permite tu gimnasio.",
   "inj.healed": "Curadas",
   "inj.range": "Del {from} al {to}",
   "inj.whatHurts": "¿Qué te duele?",
@@ -194,6 +194,8 @@ export const es: Partial<Record<Key, Message>> = {
   "inj.ret.start": "Empezar una vuelta gradual",
   "inj.ret.stopped":
     "La vuelta gradual se detuvo cuando el dolor llegó a {score}. Los ejercicios omitidos siguen fuera hasta que se calme de nuevo.",
+  "inj.noneTitle": "Nada te duele",
+  "inj.noneBody": "Tus planes usan todos los ejercicios que permite tu gimnasio.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -206,7 +208,6 @@ export const fr: Partial<Record<Key, Message>> = {
     "Dites à Liftsmith ce qui vous fait mal et il planifie en conséquence. Les exercices qui sollicitent cette zone sont écartés jusqu’à ce que vous la déclariez guérie, ou vous pouvez en garder certains plus légers.",
   "inj.log": "Signaler une blessure",
   "inj.returnName": "les exercices ignorés pour la zone {part}",
-  "inj.none": "Rien de signalé. Vos plans utilisent tous les exercices que votre salle permet.",
   "inj.healed": "Guéries",
   "inj.range": "Du {from} au {to}",
   "inj.whatHurts": "Qu’est-ce qui vous fait mal ?",
@@ -291,6 +292,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "inj.ret.start": "Commencer une reprise progressive",
   "inj.ret.stopped":
     "La reprise progressive s’est arrêtée quand la douleur a atteint {score}. Les exercices ignorés restent écartés jusqu’à ce que ça se calme.",
+  "inj.noneTitle": "Rien ne fait mal",
+  "inj.noneBody": "Vos plans utilisent tous les exercices que votre salle permet.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -303,7 +306,6 @@ export const de: Partial<Record<Key, Message>> = {
     "Sag Liftsmith, was wehtut, dann plant es darum herum. Übungen, die diesen Bereich belasten, bleiben weg, bis du sagst, dass es verheilt ist, oder du entscheidest, einige davon leichter zu machen.",
   "inj.log": "Verletzung eintragen",
   "inj.returnName": "die übersprungenen Übungen für {part}",
-  "inj.none": "Nichts eingetragen. Deine Pläne nutzen jede Übung, die dein Studio erlaubt.",
   "inj.healed": "Verheilt",
   "inj.range": "{from} bis {to}",
   "inj.whatHurts": "Was tut weh?",
@@ -389,6 +391,8 @@ export const de: Partial<Record<Key, Message>> = {
   "inj.ret.start": "Schrittweise Rückkehr starten",
   "inj.ret.stopped":
     "Die schrittweise Rückkehr wurde gestoppt, als der Schmerz {score} erreichte. Übersprungene Übungen bleiben weg, bis es wieder abklingt.",
+  "inj.noneTitle": "Nichts tut weh",
+  "inj.noneBody": "Deine Pläne nutzen jede Übung, die dein Studio erlaubt.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -401,7 +405,6 @@ export const it: Partial<Record<Key, Message>> = {
     "Di’ a Liftsmith cosa ti fa male e pianificherà di conseguenza. Gli esercizi che caricano quella zona restano fuori finché non dici che è guarita, oppure puoi scegliere di farne alcuni più leggeri.",
   "inj.log": "Registra un infortunio",
   "inj.returnName": "gli esercizi per {part} che hai saltato",
-  "inj.none": "Niente registrato. I tuoi piani usano tutti gli esercizi che la palestra consente.",
   "inj.healed": "Guarito",
   "inj.range": "Dal {from} al {to}",
   "inj.whatHurts": "Cosa ti fa male?",
@@ -486,6 +489,8 @@ export const it: Partial<Record<Key, Message>> = {
   "inj.ret.start": "Inizia un ritorno graduale",
   "inj.ret.stopped":
     "Il ritorno graduale si è interrotto quando il dolore ha raggiunto {score}. Gli esercizi saltati restano fuori finché non si calma di nuovo.",
+  "inj.noneTitle": "Nessun dolore",
+  "inj.noneBody": "I tuoi piani usano tutti gli esercizi che la palestra consente.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -498,7 +503,6 @@ export const ja: Partial<Record<Key, Message>> = {
     "痛む場所を伝えると、Liftsmith はそこを避けてプランを組みます。その部位に負荷がかかる種目は治ったと記録するまで外れます。一部を軽めにして続けることもできます。",
   "inj.log": "ケガを記録",
   "inj.returnName": "スキップした{part}の種目",
-  "inj.none": "記録はありません。プランではジムで可能なすべての種目を使います。",
   "inj.healed": "治った",
   "inj.range": "{from}〜{to}",
   "inj.whatHurts": "どこが痛みますか？",
@@ -580,4 +584,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "inj.ret.lowSince": "前回の復帰を中止してから約1週間、痛みが{low}以下です。",
   "inj.ret.start": "段階的な復帰を開始",
   "inj.ret.stopped": "痛みが{score}に達したため、段階的な復帰を中止しました。落ち着くまで、スキップした種目は外したままにします。",
+  "inj.noneTitle": "痛みはありません",
+  "inj.noneBody": "プランではジムで可能なすべての種目を使います。",
 };

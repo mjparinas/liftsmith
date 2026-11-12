@@ -26,7 +26,7 @@ import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
 import { Avatar } from "./AvatarFace";
-import { Icon } from "./icons";
+import { Icon, type IconName } from "./icons";
 import { MonthCard } from "./MonthChallenge";
 import { go, useRoute } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
@@ -160,10 +160,13 @@ export function StreakCard({ g }: { g: Game }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-semibold">🔥 {t("awards.streak", { count: s.weeks })}</span>
-        <span className="text-sm text-muted" title={t("awards.freezeHelp")}>
-          {"🧊".repeat(s.freezes)}
-          {s.freezes === 0 ? t("awards.noFreezes") : ` ${t("awards.freezes", { count: s.freezes })}`}
+        <span className="inline-flex items-center gap-1.5 font-semibold">
+          <Icon name="flame" size={18} className="text-ember" />
+          {t("awards.streak", { count: s.weeks })}
+        </span>
+        <span className="inline-flex items-center gap-1 text-sm text-muted" title={t("awards.freezeHelp")}>
+          {s.freezes > 0 && <Icon name="snowflake" size={15} className="text-cyan" />}
+          {s.freezes === 0 ? t("awards.noFreezes") : t("awards.freezes", { count: s.freezes })}
         </span>
       </div>
       <p className="mt-1 text-sm text-muted">
@@ -178,14 +181,26 @@ export function StreakCard({ g }: { g: Game }) {
   );
 }
 
+/** A quest's own icon in a tinted tile, or a tick once it's done (no emoji in the chrome). */
+export function QuestMark({ icon, done, size = 36 }: { icon: IconName; done: boolean; size?: number }) {
+  const tint = done ? "var(--color-good)" : "var(--color-accent)";
+  return (
+    <span
+      aria-hidden
+      className="grid shrink-0 place-items-center rounded-xl"
+      style={{ width: size, height: size, background: `color-mix(in srgb, ${tint} 16%, transparent)`, color: tint }}
+    >
+      <Icon name={done ? "check" : icon} size={Math.round(size * 0.5)} strokeWidth={done ? 2.6 : 2} />
+    </span>
+  );
+}
+
 export function QuestsCard({ g }: { g: Game }) {
   return (
     <ul className="card divide-y divide-line" aria-label={t("awards.quests")}>
       {g.quests.map((q) => (
         <li key={q.id} className="flex items-center gap-3 px-4 py-3">
-          <span aria-hidden className="text-2xl">
-            {q.done ? "✅" : q.icon}
-          </span>
+          <QuestMark icon={q.icon} done={q.done} />
           <div className="min-w-0 flex-1">
             <div className="flex justify-between gap-2">
               <span className={`truncate ${q.done ? "text-muted line-through" : "font-medium"}`}>{q.title}</span>
@@ -216,7 +231,10 @@ export function LeagueCard({ g }: { g: Game }) {
   return (
     <div className="card p-4">
       <div className="flex items-center justify-between">
-        <span className="font-semibold">🏅 {t("awards.league", { league: LEAGUE_LABEL[l.league] })}</span>
+        <span className="inline-flex items-center gap-1.5 font-semibold">
+          <Icon name="medal" size={18} className="text-gold" />
+          {t("awards.league", { league: LEAGUE_LABEL[l.league] })}
+        </span>
         <span className="num text-sm text-muted">{t("awards.weekXp", { xp: l.weekXp })}</span>
       </div>
       <div className="mt-2">

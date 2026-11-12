@@ -16,7 +16,7 @@ import { Icon } from "../icons";
 // rate "ready" line and one tip per workout on the rest card. None of them adds a tap during a set.
 
 /** "Undo" above Log set, for as long as the last Log set can be taken back. */
-export function UndoChip({ now, warmup }: { now: number; warmup: boolean }) {
+export function UndoChip({ now, warmup, className = "" }: { now: number; warmup: boolean; className?: string }) {
   const s = useApp();
   const u = s.undoable;
   if (!u || now > u.until || u.prev.sessionId !== s.active?.sessionId) return null;
@@ -29,7 +29,7 @@ export function UndoChip({ now, warmup }: { now: number; warmup: boolean }) {
         s.undoLast();
       }}
       aria-label={warmup ? t("pol.undoWarm") : t("pol.undoLabel")}
-      className="press animate-rise inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface/90 px-4 text-sm font-semibold text-muted backdrop-blur hover:text-ink"
+      className={`press animate-rise inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border border-line bg-surface/90 px-4 text-sm font-semibold text-muted backdrop-blur hover:text-ink ${className}`}
       data-testid="undo-set"
     >
       <Icon name="undo" size={16} />
