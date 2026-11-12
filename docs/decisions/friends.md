@@ -227,6 +227,14 @@ Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not tra
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/lib/challengeResult.test.ts` (places, ties, no winner, once per device, the rematch's length and friends, a card without friends' names), the result note in `friendNotes.test.ts`, and the results-then-rematch flow in `Friends.test.tsx`. The accessibility run scans the results sheet.
 
+## Discover (gap list 3, item 6)
+
+- **Friends › Feed** has two chips at the top: **Following** (the feed as before, with Training now and people you may know) and **Discover**. Discover lists recent workouts from **public profiles the lifter doesn't follow yet** (`discover` op), so a new lifter has something to look at and people to follow from day one. One line above it says so: "Recent workouts from public profiles you don't follow yet. Follow anyone whose training you like."
+- **What qualifies:** only posts for everyone (`all`) on a public, unsuspended profile, from the last 30 days (`DISCOVER_DAYS`), newest first, and **each person's newest workout only**, so a few busy posters can't fill it. Never a private profile, a friends-only or only-me post, the lifter's own, a hidden (reported) post, or anyone blocked either way or muted. This is what a public profile already allows (its web page and the people sitemap show the same workouts), so it shares nothing new; private profiles stay unfindable as before.
+- Posts on Discover are the usual cards: the name opens the profile with Follow, and likes and comments work as on any public profile.
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/server/socialDiscover.test.ts` (public and `all` only, newest per person, the window, following, mutes and blocks, joining first) and the discover-then-profile flow in `Friends.test.tsx`. The accessibility run scans Discover.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):

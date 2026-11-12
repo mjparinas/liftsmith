@@ -258,6 +258,27 @@ describe("Friends", () => {
     expect(await screen.findByText("You won!")).toBeInTheDocument();
   });
 
+  it("discovers a public profile's workout and opens it to follow", async () => {
+    const u = userEvent.setup();
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-b", { op: "update", public: true });
+    await handle("acc-b", {
+      op: "post",
+      workoutId: "w1",
+      at: Date.now() - 3_600_000,
+      caption: "Leg day",
+      body: { seconds: 3000, sets: 10, volume: 0, prs: 0, muscles: [], exercises: [{ id: "bench-press", sets: 3, w: 60, r: 8 }] },
+    });
+    signIn("tok-a");
+    render(<Friends />);
+    expect(await screen.findByText("No workouts yet")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Discover" }));
+    expect(await screen.findByText("Leg day")).toBeInTheDocument();
+    await u.click(screen.getAllByRole("button", { name: /Blair/ })[0]!);
+    await waitFor(() => expect(location.hash).toBe("#/person/blair"));
+  });
+
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });

@@ -539,7 +539,17 @@ function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () =>
 }
 
 /** A list of posts with comments and "Load more". `op` is feed, person (with `handle`) or clubFeed (with `club`). */
-function Posts({ op, handle, club, empty }: { op: "feed" | "person" | "clubFeed"; handle?: string; club?: string; empty: ReactNode }) {
+function Posts({
+  op,
+  handle,
+  club,
+  empty,
+}: {
+  op: "feed" | "person" | "clubFeed" | "discover";
+  handle?: string;
+  club?: string;
+  empty: ReactNode;
+}) {
   const [posts, setPosts] = useState<FeedPost[] | null>(null);
   const [more, setMore] = useState(false);
   const [note, setNote] = useState<string | null>(null);
@@ -2295,6 +2305,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
   const { account, me, error } = useSocialLoaded();
   useProfileSync();
   const [tab, setTab] = useState<Tab>(TABS.find((x) => x === start) ?? "feed");
+  const [view, setView] = useState<"following" | "discover">("following");
   const [settings, setSettings] = useState(false);
   const header = (
     <div className="flex items-end justify-between gap-2">
@@ -2371,8 +2382,19 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
         </Chip>
       </div>
       <div className="mt-4">
-        {tab === "feed" && <TrainingNow />}
         {tab === "feed" && (
+          // Following (people the lifter follows) or Discover (public workouts from anyone else; gap list 3, item 6).
+          <div className="mb-3 flex gap-2" role="group" aria-label={t("social.discover.show")}>
+            <Chip active={view === "following"} onClick={() => setView("following")}>
+              {t("social.discover.following")}
+            </Chip>
+            <Chip active={view === "discover"} onClick={() => setView("discover")}>
+              {t("social.discover.title")}
+            </Chip>
+          </div>
+        )}
+        {tab === "feed" && view === "following" && <TrainingNow />}
+        {tab === "feed" && view === "following" && (
           <Posts
             op="feed"
             empty={
@@ -2386,7 +2408,16 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
             }
           />
         )}
-        {tab === "feed" && (me.following ?? 0) < 5 && <Suggestions />}
+        {tab === "feed" && view === "following" && (me.following ?? 0) < 5 && <Suggestions />}
+        {tab === "feed" && view === "discover" && (
+          <>
+            <p className="mb-3 px-1 text-sm text-muted">{t("social.discover.hint")}</p>
+            <Posts
+              op="discover"
+              empty={<EmptyState icon="sparkle" title={t("social.discover.none")} body={t("social.discover.noneBody")} />}
+            />
+          </>
+        )}
         {tab === "board" && (
           <>
             <Challenges />

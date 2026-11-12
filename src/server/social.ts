@@ -1117,6 +1117,37 @@ export async function feed(accountId: string, b: Record<string, unknown>): Promi
   return ok({ posts, more: rows.length === PAGE });
 }
 
+/** How far back Discover looks. */
+export const DISCOVER_DAYS = 30;
+
+/**
+ * Discover (gap list 3, item 6): recent workouts from public profiles the lifter doesn't follow yet, each person's
+ * newest one only, so a few busy posters can't fill it. Only posts for everyone (`all`) on a public, unsuspended
+ * profile; blocks either way, mutes and hidden posts are left out. Private profiles never show.
+ */
+export async function discover(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const [cols, viewer] = POST_COLS(accountId);
+  const rows = await query(
+    `SELECT ${cols} FROM posts p JOIN social_profiles sp ON sp.account_id = p.account_id
+     WHERE p.hidden = 0 AND sp.suspended = 0 AND sp.public = 1 AND p.audience = 'all' AND p.at < ? AND p.at >= ?
+       AND p.at = (SELECT MAX(p2.at) FROM posts p2 WHERE p2.account_id = p.account_id AND p2.hidden = 0 AND p2.audience = 'all')
+       AND p.account_id != ?
+       AND p.account_id NOT IN (SELECT followee_id FROM follows WHERE follower_id = ? AND accepted = 1)
+       AND p.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?)
+       AND p.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?)
+       AND p.account_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?)
+     ORDER BY p.at DESC LIMIT ${PAGE}`,
+    [viewer!, cursor(b.before), now - DISCOVER_DAYS * day, accountId, accountId, accountId, accountId, accountId],
+  );
+  const posts = await withPartners(
+    accountId,
+    rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p),
+  );
+  return ok({ posts, more: rows.length === PAGE });
+}
+
 /** One person's posts, when the lifter may see them. */
 export async function personPosts(accountId: string, b: Record<string, unknown>): Promise<Result> {
   const mine = await joined(accountId);
@@ -2092,6 +2123,7 @@ export const OPS: Record<string, Op> = {
   editPost: (a, b) => editPost(a, b),
   posted: (a, b) => posted(a, b),
   feed: (a, b) => feed(a, b),
+  discover,
   person: (a, b) => personPosts(a, b),
   clubFeed: (a, b) => clubFeed(a, b),
   thread: (a, b) => thread(a, b),
