@@ -84,6 +84,8 @@ export interface MetricsInput {
   features: Counted[];
   permissions: { key: string; granted: number; denied: number }[];
   workouts: { day: number; n: number; minutes: number; sets: number; auto: number; prs: number }[];
+  /** Workouts finished in the period before, for Overview's "vs the period before". */
+  prevWorkouts?: number;
   /** Install id → the weeks after install in which it did anything (for cohorts). */
   cohortWeeks: { id: string; firstSeen: number; weeks: number[] }[];
   subs: SubEvent[];
@@ -373,6 +375,34 @@ export function forecastVsActual(input: MetricsInput) {
   });
 }
 
+// ---------- Funnels ----------
+
+export type FunnelStep = { key: string; n: number };
+
+/** A funnel where each step counts only what also passed every step before it. */
+function nested<T>(xs: T[], steps: [string, (x: T) => boolean][]): FunnelStep[] {
+  let left = xs;
+  return steps.map(([key, test]) => {
+    left = left.filter(test);
+    return { key, n: left.length };
+  });
+}
+
+/**
+ * Where a funnel loses the most: the step with the smallest share of the one before, once that one has at least
+ * `min` installs (fewer is noise). Null when no step qualifies or nothing is lost.
+ */
+export function biggestDrop(steps: FunnelStep[], min = 5): { from: string; to: string; kept: number } | null {
+  let best: { from: string; to: string; kept: number } | null = null;
+  for (let i = 1; i < steps.length; i++) {
+    const prev = steps[i - 1]!;
+    if (prev.n < min) continue;
+    const kept = steps[i]!.n / prev.n;
+    if (kept < 1 && (!best || kept < best.kept)) best = { from: prev.key, to: steps[i]!.key, kept };
+  }
+  return best;
+}
+
 // ---------- Everything ----------
 
 export function computeMetrics(input: MetricsInput) {
@@ -408,15 +438,23 @@ export function computeMetrics(input: MetricsInput) {
   const subsState = replaySubs(input.subs, now);
   const trialInstalls = new Set(subsState.filter((s) => s.trialAt != null).map((s) => s.installId));
   const paidInstalls = new Set(subsState.filter((s) => s.firstPaid != null).map((s) => s.installId));
-  const funnelFor = (xs: InstallFacts[]) => [
-    { key: "Installed (first open)", n: xs.length },
-    { key: "Finished setup", n: xs.filter((i) => i.onboarded != null).length },
-    { key: "Started a workout", n: xs.filter((i) => i.firstWorkout != null).length },
-    { key: "Two or more workouts", n: xs.filter((i) => i.workouts >= 2).length },
-    { key: "Saw the paywall", n: xs.filter((i) => i.paywall != null).length },
-    { key: "Started a trial", n: xs.filter((i) => trialInstalls.has(i.id)).length },
-    { key: "Paid", n: xs.filter((i) => paidInstalls.has(i.id)).length },
-  ];
+  // Two funnels, each nested (a step counts only installs that also passed every step before it, so no step is
+  // over 100% of the one before). They're kept apart because the trial is offered at the end of setup, before
+  // any workout: one chain for getting going, one for paying.
+  const funnelFor = (xs: InstallFacts[]) =>
+    nested(xs, [
+      ["Installed (first open)", () => true],
+      ["Finished setup", (i) => i.onboarded != null],
+      ["Started a workout", (i) => i.firstWorkout != null],
+      ["Two or more workouts", (i) => i.workouts >= 2],
+    ]);
+  const moneyFor = (xs: InstallFacts[]) =>
+    nested(xs, [
+      ["Installed (first open)", () => true],
+      ["Saw the paywall", (i) => i.paywall != null || trialInstalls.has(i.id) || paidInstalls.has(i.id)],
+      ["Started a trial", (i) => trialInstalls.has(i.id) || paidInstalls.has(i.id)],
+      ["Paid", (i) => paidInstalls.has(i.id)],
+    ]);
   // The first two weeks (docs/decisions/money.md): did the trial get used, did the lifter see what Pro did for
   // them, and did that pay? Trials that have run their 14 days, by what happened in them.
   const byId = new Map(all.map((i) => [i.id, i]));
@@ -452,8 +490,12 @@ export function computeMetrics(input: MetricsInput) {
     { key: "Clicked a call to action", n: input.site.ctaTotal },
     { key: "Web app installs", n: recent.filter((i) => storeOf(i.platform, i.store) === "web").length },
   ];
+  const moneyFunnel = moneyFor(recent);
   const funnelByStore = Object.fromEntries(
-    (["play", "appstore", "web"] as Store[]).map((s) => [s, funnelFor(recent.filter((i) => storeOf(i.platform, i.store) === s))]),
+    (["play", "appstore", "web"] as Store[]).map((s) => {
+      const xs = recent.filter((i) => storeOf(i.platform, i.store) === s);
+      return [s, { activation: funnelFor(xs), money: moneyFor(xs) }];
+    }),
   );
 
   // Time to value: hours from install to setup and to the first workout (medians).
@@ -574,14 +616,18 @@ export function computeMetrics(input: MetricsInput) {
       mau: input.mau,
       stickiness: pct(input.dau, input.mau),
       setupRate: pct(recent.filter((i) => i.onboarded != null).length, recent.length),
+      prevSetupRate: pct(prev.filter((i) => i.onboarded != null).length, prev.length),
       firstWorkoutRate: pct(recent.filter((i) => i.firstWorkout != null).length, recent.length),
+      prevFirstWorkoutRate: pct(prev.filter((i) => i.firstWorkout != null).length, prev.length),
       workouts: finished,
+      prevWorkouts: input.prevWorkouts ?? null,
       visitors: site.visitors,
       prevVisitors: site.prevVisitors,
       grossMrr: revenue.all.grossMrr,
       netMrr: revenue.all.netMrr,
       paying: revenue.all.paying,
       trialStarts: revenue.all.trialStarts,
+      prevTrialStarts: input.subs.filter((e) => e.kind === "trial_start" && e.at >= prevSince && e.at < since).length,
       minutesToSetup: toSetup == null ? null : round(toSetup),
       hoursToFirstWorkout: toWorkout == null ? null : round(toWorkout),
     },
@@ -589,6 +635,7 @@ export function computeMetrics(input: MetricsInput) {
     activeDaily,
     funnel,
     siteFunnel,
+    moneyFunnel,
     funnelByStore,
     trialFunnel,
     trialSplit,

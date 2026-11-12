@@ -1,4 +1,5 @@
 import AVFoundation
+import StoreKit
 import Capacitor
 import UIKit
 
@@ -93,6 +94,28 @@ public class AppIconPlugin: CAPPlugin, CAPBridgedPlugin {
         DispatchQueue.main.async {
             let n = UIApplication.shared.alternateIconName?.replacingOccurrences(of: "AppIcon-", with: "") ?? "default"
             call.resolve(["name": n])
+        }
+    }
+}
+
+/// The App Store's own rating prompt, shown at a happy moment after a workout (src/lib/rateApp.ts decides when;
+/// docs/decisions/growth.md). iOS decides whether it appears (at most three times a year) and never says, so this
+/// always resolves. Android counterpart: StoreReviewPlugin.java (Play In-App Review).
+@objc(StoreReviewPlugin)
+public class StoreReviewPlugin: CAPPlugin, CAPBridgedPlugin {
+    public let identifier = "StoreReviewPlugin"
+    public let jsName = "StoreReview"
+    public let pluginMethods: [CAPPluginMethod] = [
+        CAPPluginMethod(name: "request", returnType: CAPPluginReturnPromise),
+    ]
+
+    @objc func request(_ call: CAPPluginCall) {
+        DispatchQueue.main.async {
+            if let scene = UIApplication.shared.connectedScenes
+                .first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                SKStoreReviewController.requestReview(in: scene)
+            }
+            call.resolve()
         }
     }
 }

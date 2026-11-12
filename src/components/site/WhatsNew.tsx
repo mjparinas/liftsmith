@@ -1,4 +1,4 @@
-import { dayLabel, NEWS_KIND_LABEL, type NewsDay } from "@/lib/whatsNew";
+import { dayLabel, NEWS_ASKED_LABEL, NEWS_KIND_LABEL, type NewsDay } from "@/lib/whatsNew";
 
 // Each kind's chip is a tint from the palette; the label says the kind in words.
 const TINT = { new: "var(--color-mint)", better: "var(--color-accent)", fixed: "var(--color-ember)" } as const;
@@ -25,6 +25,17 @@ export function NewsDayCard({ entry }: { entry: NewsDay }) {
             >
               {NEWS_KIND_LABEL[item.kind]}
             </span>
+            {item.asked && (
+              <span
+                className="ml-2 rounded-full border px-2.5 py-0.5 text-xs font-bold text-ink"
+                style={{
+                  borderColor: "color-mix(in srgb, var(--color-violet) 50%, transparent)",
+                  background: "color-mix(in srgb, var(--color-violet) 16%, transparent)",
+                }}
+              >
+                {NEWS_ASKED_LABEL}
+              </span>
+            )}
             <h3 className="mt-2 text-lg font-semibold">{item.title}</h3>
             <p className="mt-1 leading-relaxed text-muted">{item.body}</p>
           </li>

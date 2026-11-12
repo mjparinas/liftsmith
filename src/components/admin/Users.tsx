@@ -180,14 +180,17 @@ export function Users({
   me,
   open,
   setOpen,
+  initialQuery = "",
 }: {
   admin: boolean;
   me: string;
   open: string | null;
   setOpen: (id: string | null) => void;
+  /** A search to start with, from the header's search box. */
+  initialQuery?: string;
 }) {
-  const [q, setQ] = useState("");
-  const [search, setSearch] = useState("");
+  const [q, setQ] = useState(initialQuery);
+  const [search, setSearch] = useState(initialQuery);
   const [data, setData] = useState<{
     accounts: AccountRow[];
     totals: { total: number; new30: number; active30: number } & Partial<CoachTotals>;

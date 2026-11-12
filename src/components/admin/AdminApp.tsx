@@ -13,43 +13,31 @@ import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
+import { GymPlaces } from "./GymPlaces";
 import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
-import { InstallDetail } from "./InstallDetail";
+import { Installs } from "./Installs";
 import { Log } from "./Log";
 import { MaintenanceBanner, useMaintenance } from "./Maintenance";
+import { NeedsYou } from "./NeedsYou";
 import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
+import { countryName } from "./time";
 import { Todo } from "./Todo";
 import { loadTwoFactor, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
 type Data = Metrics & { staff: Staff };
-type Install = {
-  id: string;
-  firstSeen: number;
-  lastSeen: number;
-  platform: string;
-  store: string | null;
-  appVersion: string | null;
-  device: string | null;
-  os: string | null;
-  country: string | null;
-  locale: string | null;
-  source: string | null;
-  test: boolean;
-  events: number;
-  workouts: number;
-};
 
 const TABS = [
   "Overview",
   "To Do",
   "Inbox",
   "Reports",
+  "Gyms",
   "Traffic",
   "Acquisition",
   "Funnel",
@@ -68,9 +56,11 @@ const TABS = [
 ] as const;
 type Tab = (typeof TABS)[number];
 const PERIODS = [7, 28, 90, 365] as const;
+/** The tabs whose numbers follow the period picker; the picker is hidden on the rest, where it would do nothing. */
+const PERIOD_TABS = new Set<Tab>(["Overview", "Traffic", "Acquisition", "Funnel", "Engagement", "Devices", "Revenue", "Codes"]);
 
 /** Where the panel is: a tab, and an account (Users) or install (Installs) open on it. In the address as ?tab=&open=. */
-type View = { tab: Tab; open: string | null };
+type View = { tab: Tab; open: string | null; q?: string };
 const isTab = (t: string | null): t is Tab => t != null && (TABS as readonly string[]).includes(t);
 function readView(): View {
   if (typeof location === "undefined") return { tab: "Overview", open: null };
@@ -78,12 +68,18 @@ function readView(): View {
   const t = q.get("tab");
   const tab = isTab(t) ? t : "Overview";
   const open = q.get("open");
-  return { tab, open: open && /^[A-Za-z0-9_-]{8,64}$/.test(open) && (tab === "Users" || tab === "Installs") ? open : null };
+  const search = tab === "Users" ? q.get("q")?.slice(0, 200) || undefined : undefined;
+  return {
+    tab,
+    open: open && /^[A-Za-z0-9_-]{8,64}$/.test(open) && (tab === "Users" || tab === "Installs" || tab === "Inbox") ? open : null,
+    ...(search ? { q: search } : {}),
+  };
 }
 export function viewUrl(v: View): string {
   const q = new URLSearchParams();
   if (v.tab !== "Overview") q.set("tab", v.tab);
   if (v.open) q.set("open", v.open);
+  if (v.q && v.tab === "Users") q.set("q", v.q);
   const s = q.toString();
   return `/admin/${s ? `?${s}` : ""}`;
 }
@@ -96,7 +92,57 @@ const STORE_LABEL: Record<string, string> = {
   ios: "iOS",
 };
 const delta = (a: number, b: number) => (b > 0 ? (a - b) / b : null);
+/** A rate's change in points against the period before, when both periods have one. */
+const pts = (a: number | null, b: number | null) => (a == null || b == null ? null : a - b);
 const when = (t: number) => new Date(t).toLocaleString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" });
+
+/**
+ * One search box for the whole panel: an email (or part of one) opens Users with that search; an install id or an
+ * account id opens its page.
+ */
+function HeaderSearch({ navigate }: { navigate: (v: View) => void }) {
+  const [q, setQ] = useState("");
+  const [busy, setBusy] = useState(false);
+  const find = async () => {
+    const term = q.trim();
+    if (!term) return;
+    setBusy(true);
+    try {
+      if (!term.includes("@") && /^[A-Za-z0-9_-]{8,64}$/.test(term)) {
+        const id = encodeURIComponent(term);
+        if ((await fetch(`/api/admin/installs/?id=${id}`)).ok) return navigate({ tab: "Installs", open: term });
+        if ((await fetch(`/api/admin/users/?id=${id}`)).ok) return navigate({ tab: "Users", open: term });
+      }
+      navigate({ tab: "Users", open: null, q: term });
+    } finally {
+      setBusy(false);
+      setQ("");
+    }
+  };
+  return (
+    <form
+      role="search"
+      className="order-last w-full sm:order-none sm:w-auto"
+      onSubmit={(e) => {
+        e.preventDefault();
+        void find();
+      }}
+    >
+      <label htmlFor="admin-find" className="sr-only">
+        Find an email, account or install
+      </label>
+      <input
+        id="admin-find"
+        type="search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        disabled={busy}
+        placeholder="Find an email, account or install id"
+        className="card w-full px-3 py-1.5 text-sm sm:w-72"
+      />
+    </form>
+  );
+}
 
 /** The emailed-link sign-in. A real form, so Enter in the email box sends the link. */
 export function SignIn() {
@@ -198,80 +244,6 @@ function StoreTable({ rows, all, assumed }: { rows: StoreRevenue[]; all: StoreRe
         ],
       ]}
     />
-  );
-}
-
-function Installs({ admin, open, setOpen }: { admin: boolean; open: string | null; setOpen: (id: string | null) => void }) {
-  const [data, setData] = useState<{ installs: Install[] } | null>(null);
-  const [version, setVersion] = useState(0);
-  useEffect(() => {
-    let live = true;
-    fetch("/api/admin/installs/")
-      .then(async (r) => {
-        if (r.ok && live) setData(await r.json());
-      })
-      .catch(() => {});
-    return () => {
-      live = false;
-    };
-  }, [version]);
-  const mark = async (id: string, test: boolean) => {
-    await fetch("/api/admin/installs/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id, test }),
-    });
-    setVersion((v) => v + 1);
-  };
-  if (!data) return <p className="text-muted">Loading…</p>;
-  return (
-    <div className="space-y-4">
-      {open && <InstallDetail id={open} close={() => setOpen(null)} />}
-      <Card
-        title="Latest installs"
-        subtitle="Device and source only. Mark your own phones and CI devices as test so they're left out of every number. The install id is shown in the app under Settings › Usage stats."
-      >
-        <Table
-          columns={["Id", "First seen", "Last seen", "Platform", "Device", "OS", "Version", "Country", "Source", "Workouts", "Events", ""]}
-          rows={data.installs.map((i) => [
-            <button
-              key="id"
-              type="button"
-              className="text-xs text-accent underline"
-              title="Open this install"
-              onClick={() => setOpen(i.id)}
-            >
-              <code>{i.id.slice(0, 8)}</code>
-            </button>,
-            when(i.firstSeen),
-            when(i.lastSeen),
-            STORE_LABEL[i.store ?? ""] ?? i.platform,
-            i.device ?? "—",
-            i.os ?? "—",
-            i.appVersion ?? "—",
-            i.country ?? "—",
-            i.source ?? "—",
-            i.workouts,
-            i.events,
-            admin ? (
-              <button
-                key={i.id}
-                type="button"
-                className="text-xs text-accent underline"
-                title={i.id}
-                onClick={() => void mark(i.id, !i.test)}
-              >
-                {i.test ? "Count it" : "Mark test"}
-              </button>
-            ) : i.test ? (
-              "test"
-            ) : (
-              ""
-            ),
-          ])}
-        />
-      </Card>
-    </div>
   );
 }
 
@@ -683,19 +655,22 @@ export function AdminApp() {
           <h1 className="mr-auto text-lg font-bold">
             Liftsmith admin <BuildStamp className="ml-1 align-middle text-xs font-normal text-muted" />
           </h1>
-          <div className="flex gap-1" role="group" aria-label="Period">
-            {PERIODS.map((p) => (
-              <button
-                key={p}
-                type="button"
-                aria-pressed={days === p}
-                onClick={() => setDays(p)}
-                className={`press rounded-full border px-3 py-1.5 text-sm ${days === p ? "border-accent bg-accent/15" : "border-line text-muted"}`}
-              >
-                {p === 365 ? "1 year" : `${p} days`}
-              </button>
-            ))}
-          </div>
+          <HeaderSearch navigate={navigate} />
+          {PERIOD_TABS.has(tab) && (
+            <div className="flex gap-1" role="group" aria-label="Period">
+              {PERIODS.map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  aria-pressed={days === p}
+                  onClick={() => setDays(p)}
+                  className={`press rounded-full border px-3 py-1.5 text-sm ${days === p ? "border-accent bg-accent/15" : "border-line text-muted"}`}
+                >
+                  {p === 365 ? "1 year" : `${p} days`}
+                </button>
+              ))}
+            </div>
+          )}
           <span className="text-xs text-muted">
             {data.staff.email} ({data.staff.role})
           </span>
@@ -735,6 +710,7 @@ export function AdminApp() {
         <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
         {tab === "Overview" && (
           <>
+            <NeedsYou go={go} />
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="New installs" value={fmtInt(o.installs)} delta={delta(o.installs, o.prevInstalls)} sub="vs the period before" />
               <Tile label="Site visitors" value={fmtInt(o.visitors)} delta={delta(o.visitors, o.prevVisitors)} sub="daily unique, summed" />
@@ -743,18 +719,20 @@ export function AdminApp() {
                 value={`${fmtInt(o.dau)} / ${fmtInt(o.wau)} / ${fmtInt(o.mau)}`}
                 sub={`stickiness ${fmtPct(o.stickiness, 0)} (DAU/MAU)`}
               />
-              <Tile label="Workouts finished" value={fmtInt(o.workouts)} />
+              <Tile label="Workouts finished" value={fmtInt(o.workouts)} delta={delta(o.workouts, o.prevWorkouts ?? 0)} />
               <Tile
                 label="Finished setup"
                 value={fmtPct(o.setupRate, 0)}
+                points={pts(o.setupRate, o.prevSetupRate)}
                 sub={o.minutesToSetup != null ? `median ${o.minutesToSetup} min after install` : undefined}
               />
               <Tile
                 label="Started a workout"
                 value={fmtPct(o.firstWorkoutRate, 0)}
+                points={pts(o.firstWorkoutRate, o.prevFirstWorkoutRate)}
                 sub={o.hoursToFirstWorkout != null ? `median ${o.hoursToFirstWorkout} h after install` : undefined}
               />
-              <Tile label="Trial starts" value={fmtInt(o.trialStarts)} />
+              <Tile label="Trial starts" value={fmtInt(o.trialStarts)} delta={delta(o.trialStarts, o.prevTrialStarts)} />
               <Tile label="MRR gross / net" value={`${fmtUsd(o.grossMrr)} / ${fmtUsd(o.netMrr)}`} sub={`${fmtInt(o.paying)} paying`} />
             </div>
             <Card title="New installs a day" subtitle="By store.">
@@ -782,7 +760,9 @@ export function AdminApp() {
         )}
 
         {tab === "Traffic" && (
-          <>
+          // A search section that isn't set up yet moves below the site's own numbers (order-last), so the setup
+          // steps don't push what's there off the screen.
+          <div className="flex flex-col gap-4">
             <SearchConsole days={days} />
             <BingSearch days={days} />
             <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
@@ -818,7 +798,7 @@ export function AdminApp() {
                 <BarList rows={site.campaigns} empty="No tagged campaigns yet." />
               </Card>
               <Card title="Countries">
-                <BarList rows={site.countries} />
+                <BarList rows={site.countries.map((c) => ({ ...c, key: countryName(c.key) }))} />
               </Card>
               <Card title="Devices">
                 <BarList rows={site.devices} />
@@ -837,7 +817,7 @@ export function AdminApp() {
                 empty="No clicks yet."
               />
             </Card>
-          </>
+          </div>
         )}
 
         {tab === "Acquisition" && (
@@ -865,7 +845,7 @@ export function AdminApp() {
                 <BarList rows={data.acquisition.referrers} />
               </Card>
               <Card title="Countries">
-                <BarList rows={data.devices.countries} />
+                <BarList rows={data.devices.countries.map((c) => ({ ...c, key: countryName(c.key) }))} />
               </Card>
               <Card title="Stores">
                 <BarList rows={data.devices.stores.map((s) => ({ ...s, key: STORE_LABEL[s.key] ?? s.key }))} />
@@ -879,9 +859,17 @@ export function AdminApp() {
 
         {tab === "Funnel" && (
           <>
-            <Card title="From install to paid" subtitle="The installs made in the period, and how far each got.">
-              <Funnel steps={data.funnel} />
-            </Card>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card
+                title="Getting going"
+                subtitle="The installs made in the period, and how far each got. Each step counts only those that passed the one before."
+              >
+                <Funnel steps={data.funnel} />
+              </Card>
+              <Card title="Paying" subtitle="The same installs: saw the paywall (it's offered at the end of setup), started a trial, paid.">
+                <Funnel steps={data.moneyFunnel} />
+              </Card>
+            </div>
             <Card
               title="Website to web app"
               subtitle="Visitors in the period. Store installs are credited by their store link's tags instead (Acquisition)."
@@ -889,9 +877,11 @@ export function AdminApp() {
               <Funnel steps={data.siteFunnel} />
             </Card>
             <div className="grid gap-4 md:grid-cols-3">
-              {Object.entries(data.funnelByStore).map(([s, steps]) => (
+              {Object.entries(data.funnelByStore).map(([s, f]) => (
                 <Card key={s} title={STORE_LABEL[s]}>
-                  <Funnel steps={steps} />
+                  <Funnel steps={f.activation} />
+                  <div className="my-4 border-t border-line" />
+                  <Funnel steps={f.money.slice(1)} />
                 </Card>
               ))}
             </div>
@@ -1051,16 +1041,26 @@ export function AdminApp() {
         )}
 
         {tab === "Codes" && <Creators admin={data.staff.role === "admin"} days={days} />}
-        {tab === "Users" && <Users admin={data.staff.role === "admin"} me={data.staff.email} open={view.open} setOpen={openIn("Users")} />}
+        {tab === "Users" && (
+          <Users
+            key={view.q ?? ""}
+            admin={data.staff.role === "admin"}
+            me={data.staff.email}
+            open={view.open}
+            setOpen={openIn("Users")}
+            initialQuery={view.q}
+          />
+        )}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
-        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} open={view.open} setOpen={openIn("Inbox")} />}
         {tab === "Reports" && (
           <>
             <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
             <GymReports admin={data.staff.role === "admin"} />
           </>
         )}
+        {tab === "Gyms" && <GymPlaces admin={data.staff.role === "admin"} />}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}

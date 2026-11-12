@@ -29,7 +29,7 @@ export interface Account {
   sub?: AccountSub | null;
 }
 
-export type ProVia = "review" | "code" | "web" | "play" | "appstore";
+export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach";
 
 /** The account's paid subscription, as the server sees it (a web one through Stripe, or a phone's store). */
 export interface AccountSub {

@@ -9,13 +9,14 @@ import { track } from "@/lib/analytics";
 import { derive } from "@/lib/derive";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
-import { date, inSentence, t } from "@/lib/i18n";
+import { date, inSentence, num, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
-import { fmtNum, fromKg } from "@/lib/units";
+import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { doneCue, say, voice } from "@/lib/voice";
 
@@ -156,7 +157,8 @@ export function Done() {
     });
   }, [s?.sessionId, after, before]); // eslint-disable-line react-hooks/exhaustive-deps
   const xp = useCountUp(gained);
-  const vol = useCountUp(s ? Math.round(fromKg(s.volume, profile.unit)) : 0);
+  // Counts up in kg and reads like the volume everywhere else (fmtVolume: "2.9k kg").
+  const vol = useCountUp(s ? Math.round(s.volume) : 0);
   const [sharing, setSharing] = useState(false);
 
   useEffect(() => {
@@ -167,6 +169,21 @@ export function Done() {
     if (badges.length) setTimeout(() => sound.badge(), 1100);
     else if (questsDone.length) setTimeout(() => sound.done(), 1100);
     if (voice.enabled && s) say(doneCue(s.sets, s.volume, profile.unit));
+    // A store rating prompt at a happy moment, once the celebration has played (src/lib/rateApp.ts).
+    const first = stats.sessions[stats.sessions.length - 1];
+    const ask = first
+      ? setTimeout(() => {
+          void maybeAskRating({
+            workouts: stats.sessions.length,
+            firstAt: first.start,
+            prs: prs.length,
+            levelUp,
+            badges: badges.length,
+            now: Date.now(),
+          });
+        }, 3500)
+      : undefined;
+    return () => clearTimeout(ask);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!s)
@@ -202,18 +219,15 @@ export function Done() {
         {prs.length ? t("done.prs", { count: prs.length }) : t("done.title")}
       </h1>
       <p className="num mt-2 text-4xl font-bold text-accent" aria-label={t("done.xp", { xp: gained })}>
-        +{xp} XP
+        +{num(xp)} XP
       </p>
-      <p className="mt-1 text-sm text-muted">{t("done.level", { level: after.level.level, title: after.level.title })}</p>
+      {/* A level-up says the level in its own card below, so it isn't said twice. */}
+      {!levelUp && <p className="mt-1 text-sm text-muted">{t("done.level", { level: after.level.level, title: after.level.title })}</p>}
 
       {levelUp && (
         <div className="card animate-bump mt-4 border-accent p-4" role="status" style={{ boxShadow: "0 0 0 2px var(--color-accent)" }}>
           <p className="text-xs font-semibold uppercase tracking-wider text-accent">{t("done.levelUp")}</p>
-          <p className="mt-1 text-2xl font-bold">
-            {after.level.title !== before.level.title
-              ? t("done.level", { level: after.level.level, title: after.level.title })
-              : t("done.levelOnly", { level: after.level.level })}
-          </p>
+          <p className="mt-1 text-2xl font-bold">{t("done.level", { level: after.level.level, title: after.level.title })}</p>
           {after.level.title !== before.level.title && <p className="text-sm text-muted">{t("done.newTitle")}</p>}
         </div>
       )}
@@ -222,12 +236,12 @@ export function Done() {
         {[
           [t("done.time"), clock(s.seconds), ""],
           [t("done.sets"), fmtNum(s.sets), ""],
-          [t("done.volume"), `${fmtNum(vol)} ${profile.unit}`, "volume"],
+          [t("done.volume"), fmtVolume(vol, profile.unit), "volume"],
         ].map(([k, v, term]) => (
           <div key={k} className="card animate-rise p-3">
-            <div className="text-xs uppercase tracking-wider text-faint">
+            <div className="flex items-center justify-center text-xs uppercase tracking-wider text-faint">
               {k}
-              {term === "volume" && <Info term="volume" />}
+              {term === "volume" && <Info term="volume" className="-mx-2.5" />}
             </div>
             <div className="num mt-1 text-xl font-bold">{v}</div>
           </div>
@@ -238,7 +252,10 @@ export function Done() {
         <ul className="card mt-4 divide-y divide-line text-left">
           {prs.map((p) => (
             <li key={p.exerciseId} className="flex justify-between px-4 py-3">
-              <span>🏆 {exercise(p.exerciseId).name}</span>
+              <span className="inline-flex min-w-0 items-center gap-2">
+                <Icon name="trophy" size={16} className="shrink-0 text-gold" />
+                <span className="truncate">{exercise(p.exerciseId).name}</span>
+              </span>
               <span className="num text-muted">
                 {fmtNum(fromKg(p.weight, profile.unit))} {profile.unit} × {p.reps}
               </span>
@@ -280,7 +297,10 @@ export function Done() {
         <ul className="card mt-4 divide-y divide-line text-left" aria-label={t("done.quests")}>
           {questsDone.map((q) => (
             <li key={q.id} className="flex justify-between px-4 py-3">
-              <span>✅ {q.title}</span>
+              <span className="inline-flex min-w-0 items-center gap-2">
+                <Icon name="check" size={16} strokeWidth={2.6} className="shrink-0 text-good" />
+                <span className="truncate">{q.title}</span>
+              </span>
               <span className="num text-accent">+{q.xp} XP</span>
             </li>
           ))}

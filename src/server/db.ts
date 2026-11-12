@@ -434,6 +434,80 @@ const SCHEMA = [
     status TEXT NOT NULL DEFAULT 'open',
     PRIMARY KEY (reporter, gym_id)
   )`,
+  // Real gyms (gymPlaces.ts, docs/decisions/gyms.md): seeded from OpenStreetMap by staff, official once an owner
+  // claims one. Business places, not lifter data, so the position is kept as the map has it.
+  `CREATE TABLE IF NOT EXISTS gym_places (
+    id TEXT PRIMARY KEY,
+    city_slug TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'gym',
+    address TEXT NOT NULL DEFAULT '',
+    city TEXT NOT NULL DEFAULT '',
+    region TEXT NOT NULL DEFAULT '',
+    country TEXT NOT NULL DEFAULT '',
+    lat REAL NOT NULL,
+    lon REAL NOT NULL,
+    hours TEXT NOT NULL DEFAULT '',
+    website TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL,
+    source_ref TEXT NOT NULL DEFAULT '',
+    code TEXT NOT NULL DEFAULT '',
+    claimed_by TEXT NOT NULL DEFAULT '',
+    claimed_at INTEGER NOT NULL DEFAULT 0,
+    description TEXT NOT NULL DEFAULT '',
+    lifters INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE (city_slug, slug)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
+  `CREATE TABLE IF NOT EXISTS gym_claims (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    method TEXT NOT NULL,
+    status TEXT NOT NULL,
+    code_hash TEXT NOT NULL DEFAULT '',
+    expires_at INTEGER NOT NULL DEFAULT 0,
+    tries INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    decided_at INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_claims_status ON gym_claims (status, created_at)`,
+  // Posters and table stands to print and mail to gyms (gymPosters.ts). The claim code is kept as written until the
+  // order ships, so a reprint shows the same one; the gym itself keeps only its hash.
+  `CREATE TABLE IF NOT EXISTS gym_posters (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    items TEXT NOT NULL,
+    ship_to TEXT NOT NULL DEFAULT '',
+    address TEXT NOT NULL,
+    lang TEXT NOT NULL DEFAULT 'en',
+    status TEXT NOT NULL,
+    claim_code TEXT NOT NULL DEFAULT '',
+    requested_by TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    printed_at INTEGER NOT NULL DEFAULT 0,
+    shipped_at INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_posters_status ON gym_posters (status, created_at)`,
+  // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
+  `CREATE TABLE IF NOT EXISTS gym_place_lifters (
+    place_id TEXT NOT NULL,
+    who TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (place_id, who)
+  )`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -684,6 +758,22 @@ const SCHEMA = [
     PRIMARY KEY (coach_id, client_id)
   )`,
   `CREATE INDEX IF NOT EXISTS coach_notes_client ON coach_notes (client_id)`,
+  // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
+  // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
+  `CREATE TABLE IF NOT EXISTS invite_accepts (
+    friend_id TEXT PRIMARY KEY,
+    inviter_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    rewarded_at INTEGER
+  )`,
+  `CREATE INDEX IF NOT EXISTS invite_accepts_inviter ON invite_accepts (inviter_id)`,
+  `CREATE TABLE IF NOT EXISTS earned_pro (
+    account_id TEXT NOT NULL,
+    friend_id TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    days INTEGER NOT NULL,
+    PRIMARY KEY (account_id, friend_id)
+  )`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,
@@ -735,6 +825,11 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
+  // A listed setup can say which real gym it is (gymPlaces.ts); the gym then offers that setup.
+  ["public_gyms", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
+  ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

@@ -1183,6 +1183,7 @@ function InviteButton() {
         {t("friends.invite")}
       </Button>
       <p className="mt-1 px-1 text-xs text-muted">{t("friends.inviteHint")}</p>
+      <p className="mt-1 px-1 text-xs text-muted">{t("friends.invite.reward")}</p>
       <Note text={note} />
     </>
   );
@@ -2274,6 +2275,7 @@ export function InviteScreen({ code: raw }: { code: string }) {
           <p className="min-w-0">
             <span className="block font-semibold">{t("friends.invite.from", { name: inviter.name })}</span>
             <span className="block text-sm text-muted">{t("friends.invite.body")}</span>
+            <span className="mt-1 block text-sm text-muted">{t("friends.invite.rewardFriend")}</span>
           </p>
         </div>
       ) : (

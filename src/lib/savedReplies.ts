@@ -30,6 +30,11 @@ export const DEFAULT_REPLIES: SavedReply[] = [
     title: "Thanks for the feedback",
     body: "Thank you for taking the time to write. I read every message, and feedback like yours shapes what we build next in {app}.",
   },
+  {
+    id: "shipped",
+    title: "You asked, we built it",
+    body: "You asked for this a while ago, and it's now in {app}: [what shipped, in one line]. Update the app to get it (the web app has it already). Thank you for the idea; it's on our What's new page as one lifters asked for: getliftsmith.com/whats-new/\n\nIf it isn't quite what you had in mind, just reply and tell me.",
+  },
 ];
 
 export const REPLY_LIMITS = { count: 30, title: 60, body: 5000 };

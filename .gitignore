@@ -10,7 +10,7 @@ android/app/build/
 android/.gradle/
 *.keystore
 *.jks
-reports/
+/reports/
 .stryker-tmp/
 coverage/
 e2e-shots/

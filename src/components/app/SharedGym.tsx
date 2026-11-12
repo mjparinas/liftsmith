@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
-import { listingFor, markAdded, REPORT_REASONS, reportGym } from "@/lib/gymDirectory";
+import { ownedGyms } from "@/lib/gymClaims";
+import { listingFor, markAdded, placeFor, placeLine, REPORT_REASONS, reportGym } from "@/lib/gymDirectory";
 import { decodeGym, sameKit } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic, sound } from "@/lib/juice";
@@ -11,6 +12,8 @@ import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 
+import { Icon } from "./icons";
+import { PlaceDetails } from "./PlaceDetails";
 import { go } from "./router";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
@@ -25,6 +28,18 @@ export function SharedGym({ code }: { code?: string }) {
   const kit = useMemo(() => (code ? decodeGym(code) : null), [code]);
   const [addedId, setAddedId] = useState<string | null>(null);
   const listing = useMemo(() => listingFor(code), [code]);
+  // A real gym picked from Find gyms near you (gymPlaces.ts): its name, address and check mark.
+  const place = useMemo(() => placeFor(code), [code]);
+  // Whether this lifter manages the gym (gymClaims.ts), to offer its page's settings instead of a claim.
+  const [mine, setMine] = useState(false);
+  useEffect(() => {
+    if (!place?.official) return;
+    let live = true;
+    void ownedGyms().then((list) => live && setMine(!!list?.some((g) => g.id === place.id)));
+    return () => {
+      live = false;
+    };
+  }, [place]);
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(false);
   if (!kit) {
@@ -40,7 +55,12 @@ export function SharedGym({ code }: { code?: string }) {
     );
   }
   const name = kit.name || t("gym.sharedName");
-  const existing = addedId ? gyms.find((g) => g.id === addedId) : gyms.find((g) => sameKit(g, kit));
+  // A real gym is "already yours" when one of your gyms is that gym, whatever its kit; a shared setup when the kit matches.
+  const existing = addedId
+    ? gyms.find((g) => g.id === addedId)
+    : place
+      ? gyms.find((g) => g.placeId === place.id)
+      : gyms.find((g) => sameKit(g, kit));
   const plates = kit.plates.filter((p) => p.count > 0);
   const train = (id: string) => {
     haptic("tap");
@@ -50,18 +70,29 @@ export function SharedGym({ code }: { code?: string }) {
   const add = () => {
     haptic("success");
     sound.tick();
-    const id = importGym({ ...kit, name });
-    track("feature", { name: "gym_share", detail: listing ? "nearby" : "import" });
-    if (listing) markAdded(listing);
+    const id = importGym({ ...kit, name }, place?.id);
+    track("feature", { name: "gym_share", detail: place ? (place.official ? "official" : "place") : listing ? "nearby" : "import" });
+    markAdded(listing, place?.id);
     setAddedId(id);
   };
   return (
     <div className="pb-2">
-      <ScreenHeader title={t("gym.sharedTitle")} kicker={t("gym.sharedKicker")} />
+      <ScreenHeader title={place ? t("gym.place.title") : t("gym.sharedTitle")} kicker={place ? undefined : t("gym.sharedKicker")} />
       <section className="card card-tint mt-4 p-4" style={{ ["--tint" as string]: "var(--color-accent)" }}>
-        <h2 className="text-xl font-bold break-words">{name}</h2>
-        <p className="mt-2 text-sm text-muted">{t("gym.sharedWhy")}</p>
+        <h2 className="flex items-center gap-1.5 text-xl font-bold break-words">
+          <span className="min-w-0 break-words">{name}</span>
+          {place?.official && (
+            <span className="inline-flex shrink-0 text-accent">
+              <Icon name="verified" size={22} />
+              <span className="sr-only">{t("gym.place.official")}</span>
+            </span>
+          )}
+        </h2>
+        {place && placeLine(place) && <p className="mt-1 text-sm text-muted">{placeLine(place)}</p>}
+        <p className="mt-2 text-sm text-muted">{!place ? t("gym.sharedWhy") : place.code ? t("gym.place.why") : t("gym.place.typical")}</p>
+        {place?.official && <p className="mt-2 text-sm text-muted">{t("gym.place.officialNote")}</p>}
       </section>
+      {place && <PlaceDetails place={place} />}
 
       <Section title={t("gym.equipment")}>
         <div className="card p-4">
@@ -126,6 +157,18 @@ export function SharedGym({ code }: { code?: string }) {
         <Button kind="quiet" className="w-full" onClick={() => go("today")}>
           {existing ? t("remix.back") : t("remix.notNow")}
         </Button>
+        {place &&
+          (mine ? (
+            <Button kind="ghost" icon="edit" className="w-full" onClick={() => go("gymedit", place.id)}>
+              {t("gym.claim.manage")}
+            </Button>
+          ) : (
+            !place.official && (
+              <Button kind="quiet" icon="verified" className="w-full" onClick={() => go("gymclaim", place.id)}>
+                {t("gym.claim.open")}
+              </Button>
+            )
+          ))}
         {listing &&
           (reported ? (
             <p className="text-center text-sm text-muted" role="status">

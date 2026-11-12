@@ -34,6 +34,9 @@ export const ROUTES = [
   "trainer",
   "exercise",
   "gymlink",
+  "gymplace",
+  "gymclaim",
+  "gymedit",
   "log",
 ] as const;
 export type Route = (typeof ROUTES)[number];

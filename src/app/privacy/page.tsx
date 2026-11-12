@@ -149,6 +149,25 @@ export default function Privacy() {
           one-way code made from their internet address (or their account) so each person counts once. Turn the listing off in Gyms, or
           delete your account, and it&apos;s deleted.
         </p>
+        <p className="mt-2">
+          The gyms you can find near you also include real gyms from OpenStreetMap, a public map. Adding one of them counts you once toward
+          how many lifters train there: we keep that you added it with your account (or a one-way code from your internet address), and show
+          only the total. If you list a gym you added this way, the listing says which real gym it is. Deleting your account removes you
+          from those totals.
+        </p>
+        <p className="mt-2">
+          If you claim a gym as its owner, manager or staff, we keep your name, role, the work email you give, and optionally a phone number
+          and a note, with your account, so we can check the claim. A claim from an address at the gym&apos;s own website gets a code by
+          email; any other claim is read by our team. The gym&apos;s details you then set (hours, website, phone, a description and its
+          equipment) are public on its page; your name and email are never shown. Stop managing the gym, or delete your account, and the gym
+          goes back to unofficial and your claims are deleted.
+        </p>
+        <p className="mt-2">
+          If you ask us to mail your gym a table stand, we keep the mailing address you give and the name on it with your account until
+          it&apos;s sent, and the gym&apos;s address afterwards as our mailing record. Deleting your account takes your name off it. Visits
+          from the QR code on a gym&apos;s poster are counted with a one-way code from your internet address, once a day, and only the total
+          is kept.
+        </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
         <p className="mt-2">

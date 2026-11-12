@@ -46,6 +46,12 @@ const nextConfig: NextConfig = {
           // Public profiles (www.getliftsmith.com/u/<handle>/) and the sitemap of them (src/server/publicProfile.ts).
           { source: "/u/:handle/", destination: "/api/people/page/?handle=:handle" },
           { source: "/sitemap-people.xml", destination: "/api/people/sitemap/" },
+          // The gym finder's pages and their sitemap (src/server/gymPage.ts, docs/decisions/gyms.md).
+          { source: "/gyms/", destination: "/api/gyms/page/" },
+          { source: "/gyms/:city/", destination: "/api/gyms/page/?city=:city" },
+          { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
+          { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
+          { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
         ],
       }),
   // Security headers on every response from the website (AGENTS.md "Security"). Not in the static export.
@@ -57,6 +63,7 @@ const nextConfig: NextConfig = {
           { source: "/embed/:path*", headers: EMBED_HEADERS },
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
+          { source: "/gyms/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],
       }),
   env: {

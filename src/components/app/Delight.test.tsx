@@ -82,9 +82,12 @@ describe("workout extras", () => {
     await screen.findByText(/Workout done|new PR/);
     await user.click(screen.getByRole("button", { name: "Done" }));
 
-    // Next time: same as last time puts the same exercise first, and the ghost shows on the set card.
+    // Next time: same as last time puts the same exercise first, and the ghost shows on the set card. Today says
+    // the day's done first; Train again brings the plan back.
+    await screen.findByText("Done for today");
+    await user.click(screen.getByRole("button", { name: "Train again" }));
     await screen.findByText("Today's workout");
-    await user.click(screen.getByRole("button", { name: "↻ Same as last time" }));
+    await user.click(screen.getByRole("button", { name: "Same as last time" }));
     expect(useApp.getState().preview!.items.map((i) => i.exerciseId)).toEqual([first.exerciseId]);
     await user.click(screen.getByRole("button", { name: "Start workout" }));
     await skipWarmups(user);
@@ -100,15 +103,15 @@ describe("Today and Progress extras", () => {
     const user = userEvent.setup();
     await onboard(user);
     // The warm-up chip opens today's warm-up stretches (Stretch.tsx), which can be skipped.
-    await user.click(screen.getByRole("button", { name: "🔥 Warm up first" }));
+    await user.click(screen.getByRole("button", { name: "Warm up first" }));
     expect(await screen.findByRole("heading", { name: "Warm-up for today" })).toBeInTheDocument();
     expect(within(screen.getByTestId("stretch-routine")).getAllByRole("listitem").length).toBeGreaterThan(2);
     await user.click(screen.getByRole("button", { name: "‹ Back" }));
-    await screen.findByRole("button", { name: "👋 Check in" });
+    await screen.findByRole("button", { name: "Check in" });
 
     const writeText = vi.fn(async () => {});
     Object.defineProperty(navigator, "clipboard", { value: { writeText }, configurable: true });
-    await user.click(screen.getByRole("button", { name: "👋 Check in" }));
+    await user.click(screen.getByRole("button", { name: "Check in" }));
     const sheet = screen.getByRole("dialog", { name: "Tell your gym buddies" });
     await user.type(within(sheet).getByLabelText("Buddy's name"), "Sam");
     await user.click(within(sheet).getByRole("button", { name: "Add" }));

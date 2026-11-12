@@ -7,7 +7,7 @@ import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
-import { listGym, myListings, pickListing, unlistGym, type ListError } from "@/lib/gymDirectory";
+import { listGym, myListings, pickListing, pickPlace, placeKit, unlistGym, type ListError } from "@/lib/gymDirectory";
 import { encodeGym, gymCodeFromLink, gymUrl, kitOf } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
@@ -200,6 +200,19 @@ export function Gym() {
 
       <BuyNext gym={gym} />
 
+      {gym.placeId && (
+        <button
+          type="button"
+          className="press card mt-6 flex min-h-11 w-full items-center justify-between px-4 py-3 text-left text-sm"
+          onClick={() => go("gymplace", gym.placeId)}
+        >
+          <span>{t("gym.place.page")}</span>
+          <span aria-hidden className="text-muted">
+            ›
+          </span>
+        </button>
+      )}
+
       <ShareGym gym={gym} />
 
       {gyms.length > 1 && (
@@ -233,6 +246,12 @@ export function Gym() {
               pickListing(l);
               setAdding(false);
               go("gymlink", l.code);
+            }}
+            onPickPlace={(p) => {
+              const code = encodeGym(placeKit(p, profile.unit).kit);
+              pickPlace(p, code);
+              setAdding(false);
+              go("gymlink", code);
             }}
           />
         </div>

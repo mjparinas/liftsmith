@@ -43,6 +43,28 @@ describe("log a past workout", () => {
     expect(events.filter((e) => e.type === "set")).toHaveLength(1);
   });
 
+  it("picks the day with a chip and the start time with a stepper, no typing", async () => {
+    const user = userEvent.setup();
+    render(<LogPast />);
+    await user.click(screen.getByRole("button", { name: "Yesterday" }));
+    const shown = screen.getByRole("status").textContent;
+    await user.click(screen.getByRole("button", { name: "Earlier start" }));
+    expect(screen.getByRole("status").textContent).not.toBe(shown);
+    await user.click(screen.getByRole("button", { name: "Add exercise" }));
+    await user.type(within(screen.getByRole("dialog")).getByRole("searchbox"), "barbell bench press");
+    await user.click(
+      within(screen.getByRole("dialog"))
+        .getAllByRole("button")
+        .find((b) => /^Barbell bench press/.test(b.textContent ?? ""))!,
+    );
+    await user.click(screen.getByRole("button", { name: /More.*Barbell bench press set 1 reps/ }));
+    await user.click(screen.getByRole("button", { name: "Save workout" }));
+    const start = useApp.getState().stats.sessions[0]!.start;
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    expect(new Date(start).toDateString()).toBe(yesterday.toDateString());
+  });
+
   it("says what's wrong instead of saving a set without reps", async () => {
     const user = userEvent.setup();
     render(<LogPast />);

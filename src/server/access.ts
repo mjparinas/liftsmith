@@ -2,15 +2,17 @@
 // platform"). Pro can come from:
 // - the store review account (review.ts) or a lifetime code (pro_grants, creators.ts): Pro with nothing to manage;
 // - a web subscription through Stripe (stripe.ts), managed in Stripe's customer portal;
+// - months earned from invites, or coaching 3+ training clients (earnedPro.ts);
 // - a Google Play or App Store subscription (RevenueCat's webhook keeps `entitlements` per install), once a phone that
 //   holds it has synced while signed in to the account (account_installs, written by the sync route).
 // Sync sends the answer on every round, so a web subscription unlocks the phones and a store one unlocks the web app.
 import { hasLifetimePro } from "./creators";
 import { query, run } from "./db";
+import { coachEarnsPro, earnedUntil } from "./earnedPro";
 import { accountHasPro } from "./review";
 import { webSub, type WebSub } from "./stripe";
 
-export type ProVia = "review" | "code" | "web" | "play" | "appstore";
+export type ProVia = "review" | "code" | "web" | "play" | "appstore" | "referral" | "coach";
 
 export interface AccountSub extends WebSub {
   store: "web" | "play" | "appstore";
@@ -61,6 +63,10 @@ export async function accessFor(accountId: string, email: string | null, now = D
   if (web) return { pro: true, via: "web", sub: { ...web, store: "web" } };
   const store = await storeSub(accountId, now);
   if (store) return { pro: true, via: store.store, sub: store };
+  // Earned, not bought (earnedPro.ts): months from friends' invites, then coaching 3+ clients who are training.
+  const until = await earnedUntil(accountId);
+  if (until != null && until > now) return { pro: true, via: "referral", sub: null };
+  if (await coachEarnsPro(accountId, now)) return { pro: true, via: "coach", sub: null };
   return { pro: false, via: null, sub: null };
 }
 

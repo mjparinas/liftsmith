@@ -51,8 +51,8 @@ export interface PlanSlice {
   setProfile(p: Partial<Profile>): void;
   saveGym(g: Gym): void;
   addGym(preset: GymPreset): string;
-  /** Adds a gym someone shared (gymShare.ts) and returns its id. */
-  importGym(kit: GymKit): string;
+  /** Adds a gym someone shared (gymShare.ts), or a real gym from the finder (`placeId`), and returns its id. */
+  importGym(kit: GymKit, placeId?: string): string;
   removeGym(id: string): void;
   replan(): void;
   /** Keeps the plan source in step with Pro: free lifters follow a free fixed program, and Pro brings back what they had. */
@@ -63,6 +63,12 @@ export interface PlanSlice {
   fixPlateau(p: Plateau, kind: FixKind): void;
   /** Use this plan for today instead of the generated one ("same as last time"). Null goes back. */
   setPlan(plan: Plan | null): void;
+  /**
+   * When the lifter last asked for another workout today (Today's "Train again", or picking a plan). Today shows
+   * "Done for today" after a workout that started later than this, and the plan otherwise. Not saved.
+   */
+  againAt: number;
+  trainAgain(): void;
   /** Make the current week the deload week (a coach's note action). The next block starts after it. */
   startDeload(): void;
 }
@@ -77,6 +83,10 @@ export function planSlice(c: Ctx): PlanSlice {
     pickedByLocation: null,
     links: [],
     order: [],
+    againAt: 0,
+    trainAgain() {
+      set({ againAt: Date.now() });
+    },
 
     async pickGymByLocation(fix) {
       const { gyms, active, profile } = get();
@@ -124,8 +134,8 @@ export function planSlice(c: Ctx): PlanSlice {
       return g.id;
     },
 
-    importGym(kit) {
-      const g: Gym = { ...kit, id: crypto.randomUUID(), updatedAt: Date.now() };
+    importGym(kit, placeId) {
+      const g: Gym = { ...kit, ...(placeId ? { placeId } : {}), id: crypto.randomUUID(), updatedAt: Date.now() };
       const gyms = [...get().gyms, g];
       set({ gyms });
       void saveRecord("gyms", gyms);
@@ -232,7 +242,7 @@ export function planSlice(c: Ctx): PlanSlice {
 
     setPlan(plan) {
       if (get().active) return;
-      if (plan) set({ preview: plan });
+      if (plan) set({ preview: plan, againAt: Date.now() });
       else get().replan();
     },
 

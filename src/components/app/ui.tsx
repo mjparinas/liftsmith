@@ -282,7 +282,7 @@ export function Stepper({
       <div className="flex items-center justify-between gap-1.5">
         <Bump dir={-1} label={label} size="md" onStep={step} />
         <div className="min-w-0 text-center leading-none">
-          <div key={key} className={`display text-[1.75rem] ${key ? "animate-nudge" : ""}`}>
+          <div key={key} className={`display whitespace-nowrap text-[1.75rem] ${key ? "animate-nudge" : ""}`}>
             {value}
           </div>
           <div className="mt-1 truncate text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-faint">{suffix ?? label}</div>
@@ -296,7 +296,7 @@ export function Stepper({
       <div className="flex items-center gap-6">
         {!display && <Bump dir={-1} label={label} size="lg" onStep={step} />}
         <div className="min-w-[3.6ch] text-center">
-          <div key={key} className={`display text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
+          <div key={key} className={`display whitespace-nowrap text-[3.5rem] ${key ? "animate-nudge" : ""}`}>
             {value}
           </div>
         </div>
@@ -873,6 +873,39 @@ export function SwitchRow({
         </p>
         {hint && (
           <p id={`${id}-d`} className="mt-0.5 text-xs text-muted">
+            {hint}
+          </p>
+        )}
+      </div>
+      <Switch on={on} onChange={onChange} labelledBy={`${id}-l`} describedBy={hint ? `${id}-d` : undefined} />
+    </div>
+  );
+}
+
+/**
+ * An on/off choice inside a card or sheet (no card of its own, unlike SwitchRow): the words, then the switch.
+ * Replaces the plain checkboxes that were left for on/off choices (polish pass, 2026-11-12).
+ */
+export function InlineSwitch({
+  label,
+  hint,
+  on,
+  onChange,
+  className = "",
+}: {
+  label: ReactNode;
+  hint?: ReactNode;
+  on: boolean;
+  onChange: (v: boolean) => void;
+  className?: string;
+}) {
+  const id = useId().replace(/:/g, "");
+  return (
+    <div className={`flex min-h-11 items-center justify-between gap-4 ${className}`}>
+      <div className="min-w-0">
+        <p id={`${id}-l`}>{label}</p>
+        {hint && (
+          <p id={`${id}-d`} className="mt-0.5 text-sm text-muted">
             {hint}
           </p>
         )}

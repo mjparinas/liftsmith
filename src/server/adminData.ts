@@ -21,7 +21,7 @@ export async function loadMetricsInput(days: number, now = Date.now()): Promise<
   const today = Math.floor(now / DAY);
   const firstDay = today - days + 1;
 
-  const [installs, active, dau, wau, mau, daily, steps, screens, features, permissions, workouts, cohortRows, subs, launch] =
+  const [installs, active, dau, wau, mau, daily, steps, screens, features, permissions, workouts, cohortRows, subs, launch, prevWorkouts] =
     await Promise.all([
       query(
         `SELECT i.*,
@@ -78,6 +78,10 @@ export async function loadMetricsInput(days: number, now = Date.now()): Promise<
       ),
       query(`SELECT * FROM subscription_events WHERE install_id IS NULL OR ${REAL} ORDER BY at`),
       query<{ at: number | null }>("SELECT MIN(first_seen) AS at FROM installs WHERE test = 0 AND store IN ('play', 'appstore')"),
+      query<{ n: number }>(`SELECT COUNT(*) AS n FROM events WHERE name = 'workout_finish' AND at >= ? AND at < ? AND ${REAL}`, [
+        prevSince,
+        since,
+      ]),
     ]);
 
   const byInstall = new Map<string, { firstSeen: number; weeks: number[] }>();
@@ -132,6 +136,7 @@ export async function loadMetricsInput(days: number, now = Date.now()): Promise<
     features: counted(features as { key: unknown; n: unknown }[]),
     permissions: permissions.map((r) => ({ key: s(r.key) ?? "(none)", granted: n(r.granted), denied: n(r.denied) })),
     workouts: workouts.map((r) => ({ day: n(r.day), n: n(r.n), minutes: n(r.minutes), sets: n(r.sets), auto: n(r.auto), prs: n(r.prs) })),
+    prevWorkouts: n(prevWorkouts[0]?.n),
     cohortWeeks: [...byInstall.entries()].map(([id, v]) => ({ id, ...v })),
     subs: subs.map((e): SubEvent => ({
       id: String(e.id),
@@ -211,15 +216,55 @@ export async function adminMetrics(days: number, now = Date.now()) {
 }
 
 /** The latest installs, for the Installs tab (device and source, never anything the lifter typed). */
-export async function recentInstalls(limit = 100) {
+export interface InstallFilter {
+  /** Part of an install id, a device, a source or a campaign. */
+  q?: string;
+  /** play, appstore or web (the store an install came from). */
+  store?: string;
+  /** Two-letter country code. */
+  country?: string;
+  /** Real installs only, test devices only, or both (the default). */
+  test?: "real" | "test";
+  /** Only installs that finished at least one workout. */
+  worked?: boolean;
+  /** Paging: installs first seen before this time. */
+  before?: number;
+  limit?: number;
+}
+
+/** The latest installs, newest first, filtered for the Installs tab; `next` is the cursor for "Load more". */
+export async function recentInstalls(f: InstallFilter = {}) {
+  const limit = Math.min(Math.max(f.limit ?? 100, 1), 200);
+  const where: string[] = [];
+  const args: (string | number)[] = [];
+  if (f.q) {
+    const like = `%${f.q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`;
+    where.push(
+      "(i.id LIKE ? ESCAPE '\\' OR i.model LIKE ? ESCAPE '\\' OR i.manufacturer LIKE ? ESCAPE '\\' OR i.source LIKE ? ESCAPE '\\' OR i.campaign LIKE ? ESCAPE '\\' OR i.referrer LIKE ? ESCAPE '\\')",
+    );
+    args.push(like, like, like, like, like, like);
+  }
+  if (f.store === "web") where.push("(i.store = 'web' OR (i.store IS NULL AND i.platform = 'web'))");
+  else if (f.store === "play") where.push("(i.store = 'play' OR (i.store IS NULL AND i.platform = 'android'))");
+  else if (f.store === "appstore") where.push("(i.store IN ('appstore', 'testflight') OR (i.store IS NULL AND i.platform = 'ios'))");
+  if (f.country) {
+    where.push("i.country = ?");
+    args.push(f.country);
+  }
+  if (f.test) where.push(f.test === "test" ? "i.test = 1" : "i.test = 0");
+  if (f.worked) where.push("EXISTS (SELECT 1 FROM events e WHERE e.install_id = i.id AND e.name = 'workout_finish')");
+  if (f.before != null) {
+    where.push("i.first_seen < ?");
+    args.push(f.before);
+  }
   const rows = await query(
     `SELECT i.id, i.first_seen, i.last_seen, i.platform, i.store, i.app_version, i.os, i.os_version, i.manufacturer, i.model, i.country, i.locale, i.source, i.medium, i.campaign, i.referrer, i.asa_campaign, i.test,
        (SELECT COUNT(*) FROM events e WHERE e.install_id = i.id) AS events,
        (SELECT COUNT(*) FROM events e WHERE e.install_id = i.id AND e.name = 'workout_finish') AS workouts
-     FROM installs i ORDER BY i.first_seen DESC LIMIT ?`,
-    [limit],
+     FROM installs i ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY i.first_seen DESC LIMIT ?`,
+    [...args, limit + 1],
   );
-  return rows.map((r) => ({
+  const installs = rows.slice(0, limit).map((r) => ({
     id: String(r.id),
     firstSeen: n(r.first_seen),
     lastSeen: n(r.last_seen),
@@ -238,11 +283,51 @@ export async function recentInstalls(limit = 100) {
     events: n(r.events),
     workouts: n(r.workouts),
   }));
+  return { installs, next: rows.length > limit ? installs[installs.length - 1]!.firstSeen : null };
 }
 
-export async function auditLog(limit = 100) {
-  const rows = await query("SELECT id, at, admin, action, target, detail FROM admin_audit ORDER BY id DESC LIMIT ?", [limit]);
-  return rows.map((r) => ({
+/** The countries installs came from, most first, for the Installs tab's filter. */
+export async function installCountries(): Promise<string[]> {
+  const rows = await query("SELECT country FROM installs WHERE country IS NOT NULL GROUP BY country ORDER BY COUNT(*) DESC LIMIT 60");
+  return rows.map((r) => String(r.country));
+}
+
+export interface AuditFilter {
+  /** Staff email. */
+  who?: string;
+  /** An action, or the start of one ("2fa" matches 2fa.enable and 2fa.verify). */
+  action?: string;
+  /** Paging: entries older than this id. */
+  before?: number;
+  limit?: number;
+}
+
+/** The change log, newest first, with `next` for "Load more"; `people` and `actions` fill the filters. */
+export async function auditLog(f: AuditFilter = {}) {
+  const limit = Math.min(Math.max(f.limit ?? 100, 1), 500);
+  const where: string[] = [];
+  const args: (string | number)[] = [];
+  if (f.who) {
+    where.push("admin = ?");
+    args.push(f.who);
+  }
+  if (f.action) {
+    where.push("(action = ? OR action LIKE ? ESCAPE '\\')");
+    args.push(f.action, `${f.action.replace(/[%_\\]/g, (c) => `\\${c}`)}.%`);
+  }
+  if (f.before != null) {
+    where.push("id < ?");
+    args.push(f.before);
+  }
+  const [rows, people, actions] = await Promise.all([
+    query(
+      `SELECT id, at, admin, action, target, detail FROM admin_audit ${where.length ? `WHERE ${where.join(" AND ")}` : ""} ORDER BY id DESC LIMIT ?`,
+      [...args, limit + 1],
+    ),
+    query("SELECT admin FROM admin_audit GROUP BY admin ORDER BY MAX(id) DESC LIMIT 50"),
+    query("SELECT action FROM admin_audit GROUP BY action ORDER BY action LIMIT 200"),
+  ]);
+  const audit = rows.slice(0, limit).map((r) => ({
     id: n(r.id),
     at: n(r.at),
     admin: String(r.admin),
@@ -250,4 +335,10 @@ export async function auditLog(limit = 100) {
     target: s(r.target),
     detail: s(r.detail),
   }));
+  return {
+    audit,
+    next: rows.length > limit ? audit[audit.length - 1]!.id : null,
+    people: people.map((r) => String(r.admin)),
+    actions: actions.map((r) => String(r.action)),
+  };
 }

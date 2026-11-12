@@ -50,7 +50,7 @@ import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, InlineSwitch, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
 import { CheerRain } from "./workout/CheerRain";
 import { ComingUp } from "./workout/ComingUp";
@@ -563,7 +563,9 @@ export function Workout() {
 
       {finished ? (
         <div className="card animate-pop mt-6 p-6 text-center">
-          <div className="text-4xl">🏁</div>
+          <span aria-hidden className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-mint/15 text-mint">
+            <Icon name="flag" size={28} />
+          </span>
           <h2 className="mt-2 text-2xl font-bold">{t("wk.allDone")}</h2>
           <p className="mt-1 text-muted">{t("wk.allDoneBody")}</p>
           {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
@@ -792,9 +794,10 @@ export function Workout() {
               paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
             />
           )}
-          {(undoShown || voiceLog || tempoCoach) && (
+          {((undoShown && !resting) || voiceLog || tempoCoach) && (
             <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
-              <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
+              {/* While resting, Undo sits beside Log set now instead, clear of the rest card (polish pass, 2026-11-12). */}
+              {!resting && <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />}
               {voiceLog && <VoiceLog unit={unit} onLog={log} paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen} />}
               {tempoCoach && tempo && (
                 <TempoCoach
@@ -811,16 +814,23 @@ export function Workout() {
               {t("workout.finish")}
             </Button>
           ) : resting ? (
-            <Button
-              kind="ghost"
-              className="w-full py-5 text-xl"
-              onClick={() => {
-                s.skipRest();
-                log();
-              }}
-            >
-              {t("workout.logNow")}
-            </Button>
+            <div className="flex items-stretch gap-2">
+              <UndoChip
+                now={now}
+                className="rounded-2xl"
+                warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)}
+              />
+              <Button
+                kind="ghost"
+                className="min-w-0 flex-1 py-5 text-xl"
+                onClick={() => {
+                  s.skipRest();
+                  log();
+                }}
+              >
+                {t("workout.logNow")}
+              </Button>
+            </div>
           ) : (
             <div className={docked ? `flex items-stretch gap-3 ${hand === "left" ? "flex-row-reverse" : ""}` : ""}>
               {docked && repStep && (
@@ -970,15 +980,7 @@ function SwapList({
   const list = alternatives(fromId, gymEquipment, skip, hurt).slice(0, 12);
   return (
     <div>
-      <label className="mb-3 flex items-center gap-3 rounded-xl bg-raised p-3 text-sm">
-        <input
-          type="checkbox"
-          checked={avoid}
-          onChange={(e) => setAvoid(e.target.checked)}
-          className="h-5 w-5 accent-[var(--color-accent)]"
-        />
-        {t("wk.notHere")}
-      </label>
+      <InlineSwitch className="mb-3 rounded-xl bg-raised px-3 py-1.5 text-sm" label={t("wk.notHere")} on={avoid} onChange={setAvoid} />
       <ul className="divide-y divide-line">
         {list.map((e) => (
           <li key={e.id}>
@@ -1129,15 +1131,7 @@ function CustomExercise({
           ))}
         </select>
       </label>
-      <label className="flex items-center gap-3 text-sm">
-        <input
-          type="checkbox"
-          checked={compound}
-          onChange={(e) => setCompound(e.target.checked)}
-          className="h-5 w-5 accent-[var(--color-accent)]"
-        />
-        {t("wk.compound")}
-      </label>
+      <InlineSwitch className="text-sm" label={t("wk.compound")} on={compound} onChange={setCompound} />
       <button
         type="submit"
         disabled={!name.trim()}

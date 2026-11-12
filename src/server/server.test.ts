@@ -236,11 +236,17 @@ describe("the admin numbers end to end", () => {
     expect(m.overview.installs).toBe(1);
     expect(m.overview.setupRate).toBe(1);
     expect(m.overview.workouts).toBe(1);
+    expect(m.overview.prevWorkouts).toBe(0);
     expect(m.overview.mau).toBe(1);
     expect(m.site.visitors).toBe(1);
     expect(m.acquisition.sources[0].key).toBe("reddit / social");
     expect(m.engagement.avgMinutes).toBe(40);
-    const list = await recentInstalls();
+    const { installs: list } = await recentInstalls();
     expect(list.find((i) => i.id === "install-owner-1")?.test).toBe(true);
+    // The Installs tab's filters: test devices only, and a search on part of the id.
+    expect((await recentInstalls({ test: "test" })).installs.map((i) => i.id)).toEqual(["install-owner-1"]);
+    expect((await recentInstalls({ test: "real" })).installs.some((i) => i.id === "install-owner-1")).toBe(false);
+    expect((await recentInstalls({ q: "owner-1" })).installs.map((i) => i.id)).toEqual(["install-owner-1"]);
+    expect((await recentInstalls({ q: "%" })).installs).toEqual([]);
   });
 });

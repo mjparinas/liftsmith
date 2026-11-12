@@ -122,9 +122,11 @@ const split = (r: Record<Platform, number>) => PLATFORMS.map((p) => `${PLATFORM_
 
 const TODO_GROUP: Record<TodoKind, string> = {
   inbox: "Email waiting for an answer",
+  reports: "Reports waiting for a decision",
   creator: "Creator payouts",
   billing: "Billing problems",
   job: "Scheduled jobs",
+  gyms: "Gym claims and posters",
   setup: "Setup steps",
 };
 

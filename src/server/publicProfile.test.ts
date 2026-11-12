@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { navFor } from "@/components/site/nav";
 
-import { resetDb } from "./db";
+import { query, resetDb } from "./db";
 import { calendarUtc, usualDaysUtc } from "./profilePage";
-import { bestSetText, langFrom, profileHtml, publicProfile, sitemapPeople, sitemapXml, unitFrom } from "./publicProfile";
+import { bestSetText, langFrom, PAGE_COMMENTS, profileHtml, publicProfile, sitemapPeople, sitemapXml, unitFrom } from "./publicProfile";
 import { handle, resolveReports } from "./social";
 
 const NOW = Date.now();
@@ -98,6 +98,74 @@ describe("public profiles on the web", () => {
     expect(html).not.toContain("nofollow");
     expect(html.match(/href="\/app\/"/g)!.length).toBeGreaterThanOrEqual(4);
     expect(html).toContain("Workouts posted in the last 12 weeks: 1");
+  });
+
+  it("shows likes, cheers and comments read-only, without the try card", async () => {
+    await call("acc-a", "update", { public: true });
+    await call("acc-b", "join", { handle: "blair", name: "Blair", agree: true });
+    await call("acc-b", "update", { public: true });
+    await call("acc-c", "join", { handle: "casey", name: "Casey", agree: true }); // private
+    await call("acc-d", "join", { handle: "dana", name: "Dana", agree: true });
+    await call("acc-e", "join", { handle: "eli", name: "Eli", agree: true });
+    for (const who of ["acc-b", "acc-c", "acc-d", "acc-e"]) await call(who, "update", { public: true });
+    await call("acc-c", "update", { public: false });
+    const [post] = await query<{ id: string }>("SELECT id FROM posts WHERE account_id = 'acc-a'");
+    const id = String(post!.id);
+    await call("acc-b", "like", { id });
+    await call("acc-c", "like", { id });
+    const first = await call("acc-b", "comment", { id, text: "Strong <session>" });
+    await call("acc-c", "comment", { id, text: "Nice bench", replyTo: (first.body.comment as { id: string }).id });
+    await call("acc-d", "comment", { id, text: "Suspended later" });
+    await call("acc-e", "comment", { id, text: "Blocked later" });
+    await query("UPDATE social_profiles SET suspended = 1 WHERE account_id = 'acc-d'");
+    await call("acc-a", "block", { handle: "eli" });
+    // Two cheers during this workout (its session id is the post's workout id), one during another.
+    for (const [cid, session] of [
+      ["c1", "s1"],
+      ["c2", "s1"],
+      ["c3", "s9"],
+    ])
+      await query("INSERT INTO cheers (id, from_id, to_id, session_id, emoji, created_at) VALUES (?, 'acc-b', 'acc-a', ?, '🔥', ?)", [
+        cid,
+        session,
+        NOW,
+      ]);
+    const p = await publicProfile("alex", NOW);
+    expect(p!.recent[0]).toMatchObject({ likes: 2, cheers: 2, commentCount: 2 });
+    expect(p!.recent[0]!.comments.map(({ c, reply }) => [c.name, c.handle, reply])).toEqual([
+      ["Blair", "blair", false],
+      ["Casey", "", true], // a private writer keeps their name, without a handle or a link
+    ]);
+    const html = profileHtml(p, "en", "kg", NOW);
+    expect(html).toContain("Strong &#60;session&#62;");
+    expect(html).toContain('<a href="/u/blair/">Blair</a>');
+    expect(html).not.toContain("/u/casey/");
+    expect(html).not.toContain("Suspended later");
+    expect(html).not.toContain("Blocked later");
+    expect(html).toMatch(/title="Likes">.*?<span class="n">2<\/span><span class="sr"> Likes<\/span>/);
+    expect(html).toMatch(/title="Cheers">.*?<span class="n">2<\/span><span class="sr"> Cheers<\/span>/);
+    // Read-only, and the extra "Train with a plan" card is gone.
+    expect(html).not.toContain("<form");
+    expect(html).not.toContain("<button");
+    expect(html).not.toContain("Train with a plan");
+    expect(html).not.toContain("See all");
+  });
+
+  it("links to the app when a workout has more comments than the page shows", async () => {
+    await call("acc-a", "update", { public: true });
+    const [post] = await query<{ id: string }>("SELECT id FROM posts WHERE account_id = 'acc-a'");
+    for (let i = 0; i < PAGE_COMMENTS + 2; i++)
+      await query("INSERT INTO post_comments (id, post_id, account_id, created_at, body, hidden) VALUES (?, ?, 'acc-a', ?, ?, 0)", [
+        `k${i}`,
+        String(post!.id),
+        NOW + i,
+        `Note ${i}`,
+      ]);
+    const p = await publicProfile("alex", NOW);
+    expect(p!.recent[0]!.comments).toHaveLength(PAGE_COMMENTS);
+    const html = profileHtml(p, "en", "kg", NOW);
+    expect(html).toContain(`See all ${PAGE_COMMENTS + 2} comments in the app`);
+    expect(html).toContain('href="/app/#/person/alex"');
   });
 
   it("hides the best lifts while weights are hidden, and draws the not-public page in the site frame", async () => {

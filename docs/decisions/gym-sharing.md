@@ -21,3 +21,7 @@ Melvin picked "share and find gym setups" on 2026-11-12. Typing in a gym's kit (
 - **Reports:** the preview of a listed gym has **Report this listing** (wrong or made-up equipment, a home or private gym, spam, an offensive name). Three different reporters hide it. Staff see reported listings on the admin **Reports** tab ("Reported gym listings", `GymReports.tsx`, `/api/admin/gyms/`): Remove deletes it, Dismiss shows it again; audited, admins only.
 - **The rule in [Gym by location](gym-by-location.md) changed** (Melvin picked this feature, 2026-11-12): a gym's place still never leaves the phone on its own, but a gym the lifter lists goes to the server at about 1 km. The privacy policy ("Gyms you share or list") and `docs/PRIVACY_LABELS.md` say so; Play's Data safety form needs Approximate location's purposes to include App functionality (open-items.md).
 - Pure web code, so Android, iOS and the web app get it together.
+
+## Real gyms (2026-11-12)
+
+Find gyms near you also lists real gyms (from OpenStreetMap, official once claimed), and a setup listed for one of them shows under that gym. See [Gyms](gyms.md).

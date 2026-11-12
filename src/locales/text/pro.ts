@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "pro.status.referral": "Pro comes with your account, earned by inviting friends. There is nothing to buy or manage.",
+  "pro.status.coach": "Pro comes with your account while 3 or more of your clients are training. There is nothing to buy or manage.",
   "pro.ft.cloudConnections": "Strava, Oura, WHOOP and more",
   "pro.fb.cloudConnections":
     "Send workouts to Strava, and bring in sleep, recovery, weigh-ins and rows from Oura, WHOOP, Withings, Polar and Concept2. Health Connect and Apple Health stay free.",
@@ -103,6 +105,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "pro.status.referral": "Pro viene con tu cuenta, ganado al invitar a amigos. No hay nada que comprar ni gestionar.",
+  "pro.status.coach": "Pro viene con tu cuenta mientras 3 o más de tus clientes entrenen. No hay nada que comprar ni gestionar.",
   "pro.ft.cloudConnections": "Strava, Oura, WHOOP y más",
   "pro.fb.cloudConnections":
     "Envía tus entrenamientos a Strava y trae el sueño, la recuperación, los pesajes y las sesiones de remo desde Oura, WHOOP, Withings, Polar y Concept2. Health Connect y Apple Health siguen siendo gratis.",
@@ -204,6 +208,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "pro.status.referral": "Pro est inclus avec votre compte, gagné en invitant des amis. Il n’y a rien à acheter ni à gérer.",
+  "pro.status.coach":
+    "Pro est inclus avec votre compte tant que 3 de vos clients ou plus s’entraînent. Il n’y a rien à acheter ni à gérer.",
   "pro.ft.cloudConnections": "Strava, Oura, WHOOP et plus",
   "pro.fb.cloudConnections":
     "Envoyez vos séances vers Strava et récupérez le sommeil, la récupération, les pesées et les séances de rameur depuis Oura, WHOOP, Withings, Polar et Concept2. Health Connect et Apple Santé restent gratuits.",
@@ -309,6 +316,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "pro.status.referral": "Pro gehört zu deinem Konto, verdient durch Einladungen an Freunde. Es gibt nichts zu kaufen oder zu verwalten.",
+  "pro.status.coach":
+    "Pro gehört zu deinem Konto, solange 3 oder mehr deiner Klienten trainieren. Es gibt nichts zu kaufen oder zu verwalten.",
   "pro.ft.cloudConnections": "Strava, Oura, WHOOP und mehr",
   "pro.fb.cloudConnections":
     "Schick deine Trainings an Strava und hol Schlaf, Erholung, Wiegen und Ruder-Einheiten von Oura, WHOOP, Withings, Polar und Concept2. Health Connect und Apple Health bleiben kostenlos.",
@@ -411,6 +421,8 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "pro.status.referral": "Pro è incluso nel tuo account, guadagnato invitando amici. Non c’è nulla da comprare o gestire.",
+  "pro.status.coach": "Pro è incluso nel tuo account finché 3 o più dei tuoi clienti si allenano. Non c’è nulla da comprare o gestire.",
   "pro.ft.cloudConnections": "Strava, Oura, WHOOP e altro",
   "pro.fb.cloudConnections":
     "Invia gli allenamenti a Strava e importa sonno, recupero, pesate e sessioni di vogatore da Oura, WHOOP, Withings, Polar e Concept2. Health Connect e Apple Salute restano gratis.",
@@ -512,6 +524,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "pro.status.referral": "友だちを招待して獲得した Pro がアカウントに含まれています。購入や管理は不要です。",
+  "pro.status.coach": "クライアントが3人以上トレーニングを続けている間、アカウントに Pro が含まれます。購入や管理は不要です。",
   "pro.ft.cloudConnections": "Strava、Oura、WHOOP など",
   "pro.fb.cloudConnections":
     "ワークアウトを Strava に送り、Oura、WHOOP、Withings、Polar、Concept2 から睡眠、回復、体重、ローイングを取り込みます。Health Connect と Apple ヘルスケアは引き続き無料です。",

@@ -170,3 +170,22 @@ describe("contact form", () => {
     expect(checkFeedback({ ...base, source: "elsewhere" }).ok).toBe(false);
   });
 });
+
+describe("what's new credits lifters' asks", () => {
+  it("marks an item lifters asked for, and only that one", async () => {
+    const { NewsDayCard } = await import("@/components/site/WhatsNew");
+    render(
+      <NewsDayCard
+        entry={{
+          day: "2026-11-12",
+          headline: "Two changes",
+          items: [
+            { kind: "new", title: "Asked", body: "Someone asked.", asked: true },
+            { kind: "better", title: "Ours", body: "Our idea." },
+          ],
+        }}
+      />,
+    );
+    expect(screen.getAllByText("You asked for this")).toHaveLength(1);
+  });
+});

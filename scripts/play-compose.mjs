@@ -6,8 +6,11 @@
 //   tablet-10/NN-name.jpg 1440×2560
 //   chromebook/NN-name.jpg 1920×1080 (16:9 landscape, Chromebook screenshots)
 //   feature-graphic.png   1024×500
-// Captions live in SHOTS below and in docs/PLAY_LISTING.md; keep them the same.
-//   node scripts/play-compose.mjs
+//   phone-<lang>/NN-name.jpg the phone shots for a translated listing, from store/play/raw/<lang>/
+// Captions live in SHOTS below and in docs/PLAY_LISTING.md; keep them the same. The translated captions live
+// in play-captions.json and docs/PLAY_LISTING_TRANSLATIONS.md (playListing.test.ts checks they match).
+//   node scripts/play-compose.mjs                   # English, plus every language whose raw shots exist
+//   PLAY_LANG=es,ja node scripts/play-compose.mjs   # only those translations
 import fs from "node:fs";
 import path from "node:path";
 import { chromium } from "playwright";
@@ -57,9 +60,11 @@ const TOKENS = `
   .grad { background:linear-gradient(100deg,#5b9cff,#9b86ff); -webkit-background-clip:text; background-clip:text; color:transparent; }
 `;
 
-function frameHtml(img, title, sub, { tablet = false, pos = "top" } = {}) {
+function frameHtml(img, title, sub, { tablet = false, pos = "top", lang = "en" } = {}) {
   const w = tablet ? 860 : 800;
-  return `<!doctype html><html><head><meta charset="utf-8"><style>${TOKENS}
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><style>${TOKENS}
+    :lang(ja) body { font-family:"Inter","Roboto","Hiragino Sans","Noto Sans CJK JP","Noto Sans JP","Yu Gothic",system-ui,sans-serif; }
+    :lang(ja) h1, :lang(ja) p { line-break:strict; word-break:auto-phrase; }
     .cap { position:absolute; left:72px; right:72px; top:110px; text-align:center; }
     h1 { font-size:68px; line-height:1.05; font-weight:800; letter-spacing:-0.02em; }
     p { margin-top:26px; font-size:36px; line-height:1.3; color:var(--muted); }
@@ -133,6 +138,25 @@ async function render(html, out, { width, height, scale = 1 }) {
 }
 
 const n = (i) => String(i + 1).padStart(2, "0");
+const CAPTIONS = JSON.parse(fs.readFileSync(new URL("./play-captions.json", import.meta.url), "utf8"));
+const only = process.env.PLAY_LANG?.split(",").filter(Boolean);
+for (const lang of only ?? Object.keys(CAPTIONS)) {
+  if (!fs.existsSync(`${RAW}/${lang}/today.png`)) {
+    if (only) throw new Error(`no raw shots for ${lang}: run PLAY_LANG=${lang} node scripts/play-capture.mjs first`);
+    continue;
+  }
+  for (const [i, [name, , , pos]] of PHONE_SHOTS.entries()) {
+    const [title, sub] = CAPTIONS[lang][i];
+    await render(frameHtml(url(`${RAW}/${lang}/${name}.png`), title, sub, { pos, lang }), `${ROOT}/phone-${lang}/${n(i)}-${name}.jpg`, {
+      width: 1080,
+      height: 1920,
+    });
+  }
+}
+if (only) {
+  await browser.close();
+  process.exit(0);
+}
 for (const [i, [name, title, sub, pos]] of PHONE_SHOTS.entries()) {
   await render(frameHtml(url(`${RAW}/${name}.png`), title, sub, { pos }), `${ROOT}/phone/${n(i)}-${name}.jpg`, {
     width: 1080,

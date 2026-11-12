@@ -130,9 +130,10 @@ export function SetCard({
       ) : warming ? (
         <div className="mt-4 text-center text-sm text-muted">
           <p>
+            {/* The "i" goes after the whole sentence, so it never splits it ("reps (i) . Working weight"). */}
             {t("wk.warmLine")}
-            <Info term="warmup" />
             {t("wk.working", { load: loadText(ex, item.target.weight, profile.unit) })}
+            <Info term="warmup" className="-my-3 -ml-1" />
           </p>
           <button
             type="button"

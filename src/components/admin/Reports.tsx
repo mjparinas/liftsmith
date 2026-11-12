@@ -54,7 +54,7 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
-        <p className="mt-3 text-sm text-muted">Loading…</p>
+        !error && <p className="mt-3 text-sm text-muted">Loading…</p>
       ) : rows.length === 0 ? (
         <p className="mt-3 text-sm text-muted">Nothing waiting.</p>
       ) : (

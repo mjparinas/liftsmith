@@ -4,6 +4,10 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "recap.card.weeks": "Trained in {active} of {weeks} weeks",
+  "recap.card.topLift": "Most-done lift",
+  "recap.card.summary": "Summary",
+  "recap.card.setsOf": { one: "{n} set", other: "{n} sets" },
   "recap.back": "‹ Progress",
   "recap.year": "Year in lifting",
   "recap.month": "Monthly recap",
@@ -40,11 +44,16 @@ export const en = {
   "recap.card.day": "Favourite day: {day}",
   "recap.shareYear": "Share my year",
   "recap.shareMonth": "Share my month",
+  "recap.setsMin": "sets and {reps} reps in {min} min",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "recap.card.weeks": "Entrenaste {active} de {weeks} semanas",
+  "recap.card.topLift": "Ejercicio más hecho",
+  "recap.card.summary": "Resumen",
+  "recap.card.setsOf": { one: "{n} serie", other: "{n} series" },
   "recap.back": "‹ Progreso",
   "recap.year": "Tu año entrenando",
   "recap.month": "Resumen del mes",
@@ -81,9 +90,14 @@ export const es: Partial<Record<Key, Message>> = {
   "recap.card.day": "Día favorito: {day}",
   "recap.shareYear": "Compartir mi año",
   "recap.shareMonth": "Compartir mi mes",
+  "recap.setsMin": "series y {reps} repeticiones en {min} min",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "recap.card.weeks": "Entraîné {active} semaines sur {weeks}",
+  "recap.card.topLift": "Exercice le plus fait",
+  "recap.card.summary": "Résumé",
+  "recap.card.setsOf": { one: "{n} série", other: "{n} séries" },
   "recap.back": "‹ Progrès",
   "recap.year": "Votre année de muscu",
   "recap.month": "Bilan du mois",
@@ -120,9 +134,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "recap.card.day": "Jour préféré : {day}",
   "recap.shareYear": "Partager mon année",
   "recap.shareMonth": "Partager mon mois",
+  "recap.setsMin": "séries et {reps} répétitions en {min} min",
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "recap.card.weeks": "In {active} von {weeks} Wochen trainiert",
+  "recap.card.topLift": "Häufigste Übung",
+  "recap.card.summary": "Überblick",
+  "recap.card.setsOf": { one: "{n} Satz", other: "{n} Sätze" },
   "recap.back": "‹ Fortschritt",
   "recap.year": "Dein Trainingsjahr",
   "recap.month": "Monatsrückblick",
@@ -159,9 +178,14 @@ export const de: Partial<Record<Key, Message>> = {
   "recap.card.day": "Lieblingstag: {day}",
   "recap.shareYear": "Mein Jahr teilen",
   "recap.shareMonth": "Meinen Monat teilen",
+  "recap.setsMin": "Sätze und {reps} Wiederholungen in {min} Min.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "recap.card.weeks": "Allenato in {active} settimane su {weeks}",
+  "recap.card.topLift": "Esercizio più fatto",
+  "recap.card.summary": "Riepilogo",
+  "recap.card.setsOf": { one: "{n} serie", other: "{n} serie" },
   "recap.back": "‹ Progressi",
   "recap.year": "Un anno di allenamento",
   "recap.month": "Riepilogo del mese",
@@ -198,9 +222,14 @@ export const it: Partial<Record<Key, Message>> = {
   "recap.card.day": "Giorno preferito: {day}",
   "recap.shareYear": "Condividi il mio anno",
   "recap.shareMonth": "Condividi il mio mese",
+  "recap.setsMin": "serie e {reps} ripetizioni in {min} min",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "recap.card.weeks": "{weeks}週のうち{active}週トレーニング",
+  "recap.card.topLift": "いちばん多くやった種目",
+  "recap.card.summary": "まとめ",
+  "recap.card.setsOf": { other: "{n}セット" },
   "recap.back": "‹ 進捗",
   "recap.year": "トレーニングの1年",
   "recap.month": "月間まとめ",
@@ -234,4 +263,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "recap.card.day": "お気に入りの曜日：{day}",
   "recap.shareYear": "1年を共有",
   "recap.shareMonth": "1か月を共有",
+  "recap.setsMin": "セット、{min}分で{reps}レップ",
 };

@@ -296,7 +296,11 @@ export function Pro() {
         ? t("pro.status.play")
         : proVia === "appstore"
           ? t("pro.status.appstore")
-          : t("pro.status.account");
+          : proVia === "referral"
+            ? t("pro.status.referral")
+            : proVia === "coach"
+              ? t("pro.status.coach")
+              : t("pro.status.account");
 
   return (
     <div className="pb-24">

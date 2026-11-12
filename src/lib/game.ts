@@ -1,3 +1,4 @@
+import type { IconName } from "@/components/app/icons";
 import type { MessageKey } from "@/locales/en";
 
 import { achievements, achievementXp, context, nearest, tierNames, type Achievement, type Tier } from "./achievements";
@@ -162,7 +163,7 @@ export function goalStreak(stats: Stats, profile: Pick<Profile, "daysPerWeek">, 
 export interface Quest {
   id: string;
   title: string;
-  icon: string;
+  icon: IconName;
   goal: number;
   have: number;
   xp: number;
@@ -172,7 +173,7 @@ export interface Quest {
 const q = (id: string, n = 1) => t(`quest.${id}` as MessageKey, { count: n, n: num(n) });
 type QuestDef = {
   id: string;
-  icon: string;
+  icon: IconName;
   xp: number;
   title(goal: number): string;
   goal(p: Profile): number;
@@ -184,16 +185,16 @@ const QUESTS: QuestDef[] = [
   // Train the goal number of days, never more, so nobody is pushed to train sore.
   {
     id: "days",
-    icon: "📆",
+    icon: "calendar",
     xp: 150,
     title: (n) => q("days", n),
     goal: (p) => Math.max(1, p.daysPerWeek),
     have: (_s, ss) => new Set(ss.map((s) => new Date(s.at).toDateString())).size,
   },
-  { id: "pr", icon: "🏆", xp: 120, title: () => q("pr"), goal: () => 1, have: (sets, _ss, before) => prsIn(sets, before) },
+  { id: "pr", icon: "trophy", xp: 120, title: () => q("pr"), goal: () => 1, have: (sets, _ss, before) => prsIn(sets, before) },
   {
     id: "new-ex",
-    icon: "🧭",
+    icon: "compass",
     xp: 80,
     title: () => q("new-ex"),
     goal: () => 1,
@@ -204,7 +205,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "on-target",
-    icon: "🎯",
+    icon: "target",
     xp: 100,
     title: () => q("on-target"),
     goal: () => 1,
@@ -213,7 +214,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "sets",
-    icon: "✅",
+    icon: "check",
     xp: 100,
     title: (n) => q("sets", n),
     goal: (p) => Math.max(1, p.daysPerWeek) * 14,
@@ -221,7 +222,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "legs",
-    icon: "🦵",
+    icon: "bolt",
     xp: 80,
     title: () => q("legs"),
     goal: () => 1,
@@ -232,7 +233,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "muscles",
-    icon: "🫀",
+    icon: "heart",
     xp: 100,
     title: (n) => q("muscles", n),
     goal: (p) => Math.min(10, 4 + Math.max(1, p.daysPerWeek) * 2),
@@ -240,7 +241,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "reps",
-    icon: "🔁",
+    icon: "repeat",
     xp: 100,
     title: (n) => q("reps", n),
     goal: (p) => Math.max(1, p.daysPerWeek) * 120,
@@ -248,7 +249,7 @@ const QUESTS: QuestDef[] = [
   },
   {
     id: "rest",
-    icon: "⏳",
+    icon: "hourglass",
     xp: 60,
     title: (n) => q("rest", n),
     goal: (p) => Math.max(1, p.daysPerWeek) * 8,
