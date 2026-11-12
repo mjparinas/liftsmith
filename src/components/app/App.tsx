@@ -15,6 +15,7 @@ import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
 import { readBodyStats } from "@/lib/health";
+import { startHealthRefresh } from "@/lib/healthRefresh";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
@@ -171,6 +172,12 @@ export function App() {
   useEffect(() => {
     if (ready && profile.onboarded) void keepStorage();
   }, [ready, profile.onboarded]);
+  // Health Connect / Apple Health: read on open (store.ts) and again on return to the app, at most every 15
+  // minutes (healthRefresh.ts), so an app left in memory overnight still sees last night's sleep and HRV.
+  useEffect(() => {
+    if (!ready) return;
+    return startHealthRefresh(() => useApp.getState());
+  }, [ready]);
   // Sync with the lifter's account, when signed in (sync.ts): on open, on return, when online, after changes.
   const signedIn = useAccount((s) => !!s.account);
   useEffect(() => {
