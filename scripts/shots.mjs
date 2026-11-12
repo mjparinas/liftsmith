@@ -58,7 +58,7 @@ await shot("06-today");
 for (const [tab, n] of [
   ["Body", "07-recovery"],
   ["Progress", "08-progress"],
-  ["Gyms", "09-gyms"],
+  ["Friends", "09-friends"],
 ]) {
   await page.getByRole("button", { name: tab, exact: true }).click();
   await shot(n);

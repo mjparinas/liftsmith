@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { defaultDays, fitLength, freeMinutes, nextStart, trainingIcs } from "./calendar";
+import { defaultDays, fitLength, freeMinutes, nextStart, savedMessage, trainingIcs } from "./calendar";
 
 // Calendar (MVP+2): training days written out, and workouts fitted around busy times.
 const MIN = 60_000;
@@ -47,5 +47,14 @@ describe("calendar", () => {
     expect(fitLength(42, 60)).toBe(30);
     expect(fitLength(20, 45)).toBeNull(); // nothing worth doing
     expect(fitLength(0, 45)).toBeNull();
+  });
+
+  it("says which calendar the training days went into and when the first one is", () => {
+    // Melvin, 2026-11-12: the button turned into "Update my calendar" but he couldn't find the event.
+    const msg = savedMessage({ calendar: "lifter@example.com", start: new Date(2026, 10, 11, 18, 0).getTime() });
+    expect(msg).toContain("lifter@example.com");
+    expect(msg).toContain("Wednesday");
+    expect(msg).toContain("November 11");
+    expect(savedMessage({})).toBe("Your training days are in your calendar.");
   });
 });

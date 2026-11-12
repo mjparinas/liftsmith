@@ -63,6 +63,7 @@ import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/Speed
 import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
+import { VolumeLog } from "./workout/VolumeLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
 import { PrMoment } from "./WorkoutJuice";
 
@@ -774,6 +775,13 @@ export function Workout() {
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
           {autoLeft !== null && <HandsFree left={autoLeft} onLog={log} />}
+          {!finished && !!ex && !ex.cardio && labOn("labVolumeLog") && (
+            <VolumeLog
+              setKey={`${active.index}:${doneSets}`}
+              onLog={log}
+              paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
+            />
+          )}
           {(undoShown || voiceLog || tempoCoach) && (
             <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
               <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />

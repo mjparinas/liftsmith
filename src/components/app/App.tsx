@@ -25,6 +25,7 @@ import { startFlags } from "@/lib/remoteFlags";
 import { keepStorage } from "@/lib/saving";
 import { onSessionAction } from "@/lib/sessionNotify";
 import { linkAction, runShortcut, type ShortcutAction } from "@/lib/shortcuts";
+import { socialOn } from "@/lib/social";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockContext } from "@/lib/themes";
@@ -39,7 +40,7 @@ import { Connections } from "./Connections";
 import { Done } from "./Done";
 import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
-import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
+import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
 import { Gym } from "./Gym";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -70,9 +71,11 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
   { route: "today", label: "tab.today", icon: "today" },
   { route: "recovery", label: "tab.recovery", icon: "recovery" },
   { route: "stats", label: "tab.progress", icon: "progress" },
+  { route: "friends", label: "tab.friends", icon: "people" },
   { route: "achievements", label: "tab.awards", icon: "trophy" },
-  { route: "gym", label: "tab.gyms", icon: "gym" },
 ];
+// Friends took Gyms' place in the bar (2026-11-12, docs/decisions/friends.md): gyms are set up once and switched
+// from Today's gym chip, so Gyms lives in Settings now. With the social flag off the bar has four tabs.
 
 // Screens that hide the tab bar.
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);
@@ -407,20 +410,25 @@ function TabBar({ route }: { route: Route }) {
       root.style.removeProperty("--nav-h");
     };
   }, []);
+  const waiting = useFriendsWaiting();
+  const tabs = TABS.filter((tab) => tab.route !== "friends" || socialOn());
   return (
     <nav
       ref={ref}
       className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
-      <ul className="mx-auto grid max-w-lg grid-cols-5 px-1 pt-1.5">
-        {TABS.map((tab) => {
+      <ul className={`mx-auto grid max-w-lg px-1 pt-1.5 ${tabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>
+        {tabs.map((tab) => {
           const on = route === tab.route;
+          // Friends carries a dot while follows, requests, likes or comments are waiting, and says so to screen readers.
+          const dot = tab.route === "friends" && waiting > 0;
           return (
             <li key={tab.route}>
               <button
                 type="button"
                 aria-current={on ? "page" : undefined}
+                aria-label={dot ? t("friends.openWaiting", { count: waiting }) : undefined}
                 onClick={() => {
                   if (!on) haptic("select");
                   go(tab.route);
@@ -428,9 +436,10 @@ function TabBar({ route }: { route: Route }) {
                 className={`press flex w-full flex-col items-center gap-1 py-1.5 text-[0.6875rem] font-medium ${on ? "text-ink" : "text-faint"}`}
               >
                 <span
-                  className={`grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
+                  className={`relative grid h-8 w-12 place-items-center rounded-full transition-colors duration-200 ${on ? "bg-accent/18 text-accent shadow-[0_0_18px_-4px_rgb(76_141_255/0.6)]" : ""}`}
                 >
                   <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                  {dot && <span aria-hidden className="absolute right-2 top-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
                 </span>
                 {t(tab.label)}
               </button>
