@@ -200,6 +200,41 @@ export const TOOL_PAGES = [
     name: "TDEE calculator",
     blurb: "Calories a day to maintain, cut or lean bulk, with a protein range for lifters.",
   },
+  {
+    path: "/tools/wilks-calculator/",
+    name: "Wilks calculator",
+    blurb: "Your total scored with Wilks, IPF GL points and DOTS, and how far the next level is.",
+  },
+  {
+    path: "/tools/macro-calculator/",
+    name: "Macro calculator",
+    blurb: "Protein, fat and carbs to lose fat, maintain or build muscle, with protein set for lifters.",
+  },
+  {
+    path: "/tools/body-fat-calculator/",
+    name: "Body fat calculator",
+    blurb: "Your body fat from a tape measure and your height, with the US Navy method.",
+  },
+  {
+    path: "/tools/ffmi-calculator/",
+    name: "FFMI calculator",
+    blurb: "How much muscle you carry for your height, and the lean mass to the next band.",
+  },
+  {
+    path: "/tools/heart-rate-zone-calculator/",
+    name: "Heart rate zone calculator",
+    blurb: "Your maximum heart rate and five zones, from your age and resting heart rate.",
+  },
+  {
+    path: "/tools/interval-timer/",
+    name: "Interval timer",
+    blurb: "EMOM, Tabata or your own work and rest rounds, with a count before every change.",
+  },
+  {
+    path: "/tools/training-max-calculator/",
+    name: "Training max calculator",
+    blurb: "Every main set for four-week waves on the squat, bench, deadlift and press.",
+  },
 ] as const;
 
 export interface Route {
