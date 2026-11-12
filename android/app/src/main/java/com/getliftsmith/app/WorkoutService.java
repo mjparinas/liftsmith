@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
 import android.media.AudioAttributes;
@@ -20,6 +21,9 @@ import android.service.quicksettings.TileService;
 import android.text.format.DateUtils;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 /**
  * Foreground service behind the live workout notification. While it runs, Android keeps the app alive with the
@@ -43,12 +47,29 @@ public class WorkoutService extends Service {
     /** Whether a workout is running, for the Quick Settings tile (WorkoutTileService). */
     static volatile boolean running = false;
 
+    /**
+     * A Log set or +30 s from a watch (Wear OS, Garmin): handled like the notification's own buttons, so it works with
+     * the app closed too. Without a workout running there's nothing to log, and the web app ignores it anyway.
+     */
+    static void tap(Context context, String action) {
+        if (running) {
+            context.startService(new Intent(context, WorkoutService.class).putExtra(EXTRA_ACTION, action));
+        } else {
+            context.sendBroadcast(new Intent(BROADCAST_ACTION).setPackage(context.getPackageName()).putExtra(EXTRA_ACTION, action));
+        }
+    }
+
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable restOver;
     /** The latest update from the app, kept so the once-a-second rest tick can redraw the notification. */
     private Intent last;
     /** When the current rest started, for the rest bar (kept through +30 s, so the bar grows back rather than resetting). */
     private long restFrom = 0L;
+    /** The notification after each of the next Log sets, from the app (sessionAhead.ts), and how many are used. */
+    private JSONArray ahead = new JSONArray();
+    private int aheadAt = 0;
+    /** The last planned set has been logged from the notification with the app closed. */
+    private boolean ended = false;
 
     @Override
     public void onCreate() {
@@ -84,12 +105,92 @@ public class WorkoutService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent == null || !ACTION_UPDATE.equals(intent.getAction())) {
-            if (intent != null && intent.getStringExtra(EXTRA_ACTION) != null) {
-                Intent b = new Intent(BROADCAST_ACTION).setPackage(getPackageName()).putExtra(EXTRA_ACTION, intent.getStringExtra(EXTRA_ACTION));
-                sendBroadcast(b);
-            }
+            String action = intent == null ? null : intent.getStringExtra(EXTRA_ACTION);
+            if (action != null) tapped(action, System.currentTimeMillis());
             return START_NOT_STICKY;
         }
+        // A fresh update from the app: the sets ahead start again from the set it's on.
+        ahead = WorkoutTaps.parse(intent.getStringExtra("ahead"));
+        aheadAt = 0;
+        ended = false;
+        show(intent);
+        return START_NOT_STICKY;
+    }
+
+    /**
+     * A Log set or +30 s tap. With the app's screen open (or in the background) it goes to the web app, which logs it
+     * and sends a new update. With the app closed nothing could hear it, so the tap is kept with its time (WorkoutTaps)
+     * for the app to log when it opens, and the notification moves on by itself: to the next set the app worked out
+     * ahead of time (sessionAhead.ts), with its rest counting down and the rest-over alert at the end.
+     */
+    private void tapped(String action, long at) {
+        if (WorkoutSessionPlugin.isLive()) {
+            sendBroadcast(new Intent(BROADCAST_ACTION).setPackage(getPackageName()).putExtra(EXTRA_ACTION, action).putExtra("at", at));
+            return;
+        }
+        if (last == null) {
+            WorkoutTaps.add(this, action, at);
+            return;
+        }
+        if ("log".equals(action)) {
+            // Every planned set is logged: further taps would log nothing, so they aren't kept either.
+            if (ended) return;
+            WorkoutTaps.add(this, action, at);
+            JSONObject step = ahead.optJSONObject(aheadAt);
+            if (step == null) return;
+            aheadAt++;
+            ended = step.optBoolean("end", false);
+            long rest = step.optLong("rest", 0L);
+            Intent n = new Intent(last)
+                .putExtra("title", step.optString("title", ""))
+                .putExtra("setLabel", step.optString("setLabel", ""))
+                .putExtra("next", step.optString("next", ""))
+                .putExtra("plates", step.optString("plates", ""))
+                .putExtra("chip", step.optString("chip", ""))
+                .putExtra("done", step.optInt("done", 0))
+                .putExtra("total", step.optInt("total", 0))
+                .putExtra("restUntil", rest > 0 ? at + rest * 1000L : 0L)
+                .putExtra("restTotal", rest)
+                // The voice coach's cue was for the rest just gone; the app writes the next one.
+                .putExtra("speak", "")
+                // Heart rate came from the app, which isn't running to update it.
+                .putExtra("hr", 0);
+            show(n);
+            watches(n);
+        } else if ("add30".equals(action)) {
+            long restUntil = last.getLongExtra("restUntil", 0L);
+            // Like the app's +30 s: only while resting.
+            if (restUntil <= at) return;
+            WorkoutTaps.add(this, action, at);
+            long total = restFrom > 0 ? (restUntil - restFrom + 999) / 1000 : 0;
+            Intent n = new Intent(last).putExtra("restUntil", restUntil + 30_000L).putExtra("restTotal", total + 30);
+            show(n);
+            watches(n);
+        }
+    }
+
+    /** The watch apps follow the notification while the app is closed (the app sends them its own updates otherwise). */
+    private void watches(Intent n) {
+        JSONObject w = new JSONObject();
+        try {
+            w.put("title", n.getStringExtra("title"));
+            w.put("setLabel", n.getStringExtra("setLabel"));
+            w.put("next", n.getStringExtra("next"));
+            w.put("plates", n.getStringExtra("plates"));
+            w.put("vibrate", n.getBooleanExtra("vibrate", true));
+            w.put("done", n.getIntExtra("done", 0));
+            w.put("total", n.getIntExtra("total", 0));
+            long restUntil = n.getLongExtra("restUntil", 0L);
+            if (restUntil > 0) w.put("restUntil", restUntil);
+        } catch (JSONException ignored) {
+            return;
+        }
+        WatchLink.update(this, w);
+        GarminLink.update(this, w);
+    }
+
+    /** Draws the notification for `intent` and schedules its rest: the countdown redraws, the ticks and the alert. */
+    private void show(Intent intent) {
         last = intent;
         long restUntil = intent.getLongExtra("restUntil", 0L);
         String next = intent.getStringExtra("next");
@@ -131,7 +232,6 @@ public class WorkoutService extends Service {
                 }
             }
         }
-        return START_NOT_STICKY;
     }
 
     /**
@@ -164,7 +264,7 @@ public class WorkoutService extends Service {
         NotificationCompat.Builder b = new NotificationCompat.Builder(this, CHANNEL_LIVE)
             .setSmallIcon(R.drawable.ic_stat_workout)
             .setContentTitle(title)
-            .setContentText(resting ? getString(R.string.rest_left_next, left, next) : setLabel + " · " + next)
+            .setContentText(resting ? getString(R.string.rest_left_next, left, next) : setLabel == null || setLabel.isEmpty() ? next : setLabel + " · " + next)
             .setStyle(new NotificationCompat.BigTextStyle().bigText(body.toString()))
             .setSubText(setLabel)
             .setOngoing(true)

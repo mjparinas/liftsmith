@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
@@ -18,6 +19,7 @@ import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
 import { DotsCard, OneRmSection } from "./OneRepMax";
+import { ProLocked } from "./ProLocked";
 import { go, useRoute } from "./router";
 import { HUE } from "./theme";
 import { Button, EmptyState, ScreenHeader, Section, StatTile } from "./ui";
@@ -83,35 +85,40 @@ export function Stats() {
       <GoalsCard />
 
       <Section title={t("progress.weekSets")} icon="target" info="weeklySets">
-        <div className="card p-4">
-          <ul className="space-y-2">
-            {MUSCLES.filter((m) => thisWeek.sets[m] > 0)
-              .sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a])
-              .map((m) => (
-                <li key={m} className="flex items-center gap-3 text-sm">
-                  <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
-                  <div className="relative h-2.5 flex-1 rounded-full bg-raised">
-                    <div
-                      className="absolute inset-y-0 rounded-full bg-good/15"
-                      style={{ left: "50%", width: "50%" }}
-                      title={t("progress.band")}
-                    />
-                    <div
-                      className="relative h-full rounded-full bg-gradient-to-r from-accent to-accent-2"
-                      style={{ width: `${Math.min(100, (thisWeek.sets[m] / 20) * 100)}%` }}
-                    />
-                  </div>
-                  <span className="num w-8 text-right">{fmtNum(thisWeek.sets[m])}</span>
+        {/* Advanced stats are Pro (Melvin, 2026-11-12): free lifters see the card, marked Pro. */}
+        {!can("advancedStats") ? (
+          <ProLocked from="stats" title={t("pro.ft.advancedStats")} body={t("progress.weekSets.lock")} />
+        ) : (
+          <div className="card p-4">
+            <ul className="space-y-2">
+              {MUSCLES.filter((m) => thisWeek.sets[m] > 0)
+                .sort((a, b) => thisWeek.sets[b] - thisWeek.sets[a])
+                .map((m) => (
+                  <li key={m} className="flex items-center gap-3 text-sm">
+                    <span className="w-24 shrink-0 text-muted">{MUSCLE_LABEL[m]}</span>
+                    <div className="relative h-2.5 flex-1 rounded-full bg-raised">
+                      <div
+                        className="absolute inset-y-0 rounded-full bg-good/15"
+                        style={{ left: "50%", width: "50%" }}
+                        title={t("progress.band")}
+                      />
+                      <div
+                        className="relative h-full rounded-full bg-gradient-to-r from-accent to-accent-2"
+                        style={{ width: `${Math.min(100, (thisWeek.sets[m] / 20) * 100)}%` }}
+                      />
+                    </div>
+                    <span className="num w-8 text-right">{fmtNum(thisWeek.sets[m])}</span>
+                  </li>
+                ))}
+              {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && (
+                <li>
+                  <EmptyState icon="target" title={t("progress.noSets")} body={t("progress.noSets.body")} />
                 </li>
-              ))}
-            {!MUSCLES.some((m) => thisWeek.sets[m] > 0) && (
-              <li>
-                <EmptyState icon="target" title={t("progress.noSets")} body={t("progress.noSets.body")} />
-              </li>
-            )}
-          </ul>
-          <p className="mt-3 text-xs text-faint">{t("progress.bandNote")}</p>
-        </div>
+              )}
+            </ul>
+            <p className="mt-3 text-xs text-faint">{t("progress.bandNote")}</p>
+          </div>
+        )}
       </Section>
 
       <div id="bodyweight" className="scroll-mt-14">

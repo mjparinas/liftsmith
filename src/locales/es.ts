@@ -64,6 +64,7 @@ import * as link from "./text/link";
 import * as lvl from "./text/lvl";
 import * as map from "./text/map";
 import * as mom from "./text/mom";
+import * as month from "./text/month";
 import * as msg from "./text/msg";
 import * as msgKind from "./text/msgKind";
 import * as muscle from "./text/muscle";
@@ -99,6 +100,7 @@ import * as settings from "./text/settings";
 import * as setup from "./text/setup";
 import * as share from "./text/share";
 import * as sig from "./text/sig";
+import * as social from "./text/social";
 import * as stats from "./text/stats";
 import * as str from "./text/str";
 import * as tab from "./text/tab";
@@ -184,6 +186,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...lvl.es,
   ...map.es,
   ...mom.es,
+  ...month.es,
   ...msg.es,
   ...msgKind.es,
   ...muscle.es,
@@ -219,6 +222,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...setup.es,
   ...share.es,
   ...sig.es,
+  ...social.es,
   ...str.es,
   ...stats.es,
   ...tab.es,

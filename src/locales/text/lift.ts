@@ -4,6 +4,7 @@ import type { Message } from "@/lib/i18n";
 // then every other language. A missing translation falls back to English.
 
 export const en = {
+  "lift.trend.lock": "Your estimated max over time, and whether this lift is climbing, steady or stalled.",
   "lift.back": "‹ Back",
   "lift.missing": "Exercise not found",
   "lift.missingBody": "It may have been removed. Go back and pick another one.",
@@ -34,6 +35,7 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "lift.trend.lock": "Tu máximo estimado con el tiempo y si este ejercicio sube, se mantiene o se ha estancado.",
   "lift.back": "‹ Atrás",
   "lift.missing": "Ejercicio no encontrado",
   "lift.missingBody": "Puede que se haya eliminado. Vuelve y elige otro.",
@@ -62,6 +64,7 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "lift.trend.lock": "Ton max estimé au fil du temps, et si cet exercice progresse, se maintient ou stagne.",
   "lift.back": "‹ Retour",
   "lift.missing": "Exercice introuvable",
   "lift.missingBody": "Il a peut-être été supprimé. Reviens et choisis-en un autre.",
@@ -90,6 +93,7 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "lift.trend.lock": "Dein geschätztes Maximum im Verlauf und ob diese Übung steigt, gleich bleibt oder stagniert.",
   "lift.back": "‹ Zurück",
   "lift.missing": "Übung nicht gefunden",
   "lift.missingBody": "Sie wurde vielleicht entfernt. Geh zurück und wähle eine andere.",
@@ -118,6 +122,7 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "lift.trend.lock": "Il tuo massimale stimato nel tempo, e se questo esercizio sta salendo, è stabile o fermo.",
   "lift.back": "‹ Indietro",
   "lift.missing": "Esercizio non trovato",
   "lift.missingBody": "Forse è stato rimosso. Torna indietro e scegline un altro.",
@@ -146,6 +151,7 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "lift.trend.lock": "推定最大重量の推移と、この種目が伸びているか、横ばいか、停滞しているかがわかります。",
   "lift.back": "‹ 戻る",
   "lift.missing": "種目が見つかりません",
   "lift.missingBody": "削除された可能性があります。戻って別の種目を選んでください。",

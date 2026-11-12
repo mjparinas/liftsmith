@@ -3,6 +3,7 @@ import type { MessageKey } from "@/locales/en";
 import { weekOf, type Stats } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { num, t, translated } from "./i18n";
+import { monthsFinished } from "./monthly";
 import { gradedSet, TIMED } from "./progression";
 import { MUSCLES, type AppEvent, type Muscle, type Profile, type SessionStartEvent, type SetEvent } from "./types";
 import { fromKg } from "./units";
@@ -112,6 +113,16 @@ export const ACHIEVEMENTS: AchievementDef[] = [
     tiers: [4, 26, 52, 156],
     unit: "weeks",
     value: (c) => new Set(c.sessions.map((s) => weekOf(s.at))).size,
+  },
+  {
+    // Monthly challenges for everyone (monthly.ts; docs/decisions/friends.md, gap list 2 item 7).
+    id: "monthly",
+    name: "Monthly challenger",
+    detail: "Finish {n} monthly challenge(s)",
+    icon: "🗓️",
+    category: "consistency",
+    tiers: [1, 3, 6, 12],
+    value: (c) => monthsFinished(c.stats.sessions),
   },
   {
     id: "hours",

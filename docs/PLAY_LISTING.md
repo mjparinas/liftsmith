@@ -104,7 +104,7 @@ MADE FOR EVERY LIFTER
 • In English, Spanish, French, German, Italian and Japanese.
 
 LIFTSMITH PRO
-The logger, plate math, rest timer, lock-screen controls, fixed programs and coaching reasons are free. Liftsmith Pro adds adaptive programming, adaptive splits, the recovery map, advanced stats, mid-workout re-planning, the plateau detective and the goal-date planner. Try it free for 14 days.
+The logger, plate math, rest timer, lock-screen controls, fixed programs, one adaptive workout a week and coaching reasons are free. Pro adds daily adaptive programming, splits, the recovery map, advanced stats, cloud connections, the plateau detective and the goal planner. Try it free for 14 days.
 
 Liftsmith isn't a medical app. Talk to a doctor before starting a new training program, especially after an injury.
 

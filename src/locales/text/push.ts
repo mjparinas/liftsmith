@@ -14,6 +14,9 @@ export const en = {
   "push.channel": "Friends",
   "push.challenge": "{name} challenged you: {workout}",
   "push.tag": "{name} tagged you as a training partner.",
+  "push.mention": "{name} mentioned you: “{text}”",
+  "push.reply": "{name} replied: “{text}”",
+  "push.cheer": "{name} cheered you on {text}",
 } as const;
 
 type Key = keyof typeof en;
@@ -28,6 +31,9 @@ export const es: Partial<Record<Key, Message>> = {
   "push.channel": "Amigos",
   "push.challenge": "{name} te retó: {workout}",
   "push.tag": "{name} te etiquetó como compañero de entrenamiento.",
+  "push.mention": "{name} te mencionó: «{text}»",
+  "push.reply": "{name} respondió: «{text}»",
+  "push.cheer": "{name} te anima {text}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -40,6 +46,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.channel": "Amis",
   "push.challenge": "{name} te lance un défi : {workout}",
   "push.tag": "{name} t’a identifié comme partenaire d’entraînement.",
+  "push.mention": "{name} vous a mentionné : « {text} »",
+  "push.reply": "{name} a répondu : « {text} »",
+  "push.cheer": "{name} vous encourage {text}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -52,6 +61,9 @@ export const de: Partial<Record<Key, Message>> = {
   "push.channel": "Freunde",
   "push.challenge": "{name} fordert dich heraus: {workout}",
   "push.tag": "{name} hat dich als Trainingspartner markiert.",
+  "push.mention": "{name} hat dich erwähnt: „{text}“",
+  "push.reply": "{name} hat geantwortet: „{text}“",
+  "push.cheer": "{name} feuert dich an {text}",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -64,6 +76,9 @@ export const it: Partial<Record<Key, Message>> = {
   "push.channel": "Amici",
   "push.challenge": "{name} ti ha sfidato: {workout}",
   "push.tag": "{name} ti ha taggato come compagno di allenamento.",
+  "push.mention": "{name} ti ha menzionato: «{text}»",
+  "push.reply": "{name} ha risposto: «{text}»",
+  "push.cheer": "{name} fa il tifo per te {text}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -76,4 +91,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.channel": "友達",
   "push.challenge": "{name}さんからチャレンジが届きました：{workout}",
   "push.tag": "{name}さんがあなたをトレーニング仲間としてタグ付けしました。",
+  "push.mention": "{name}さんがあなたをメンションしました:「{text}」",
+  "push.reply": "{name}さんが返信しました:「{text}」",
+  "push.cheer": "{name}さんが応援しています {text}",
 };

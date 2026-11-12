@@ -50,6 +50,9 @@ const FROM: Record<string, { feature?: Feature; back: Route }> = {
   replan: { feature: "replan", back: "workout" },
   goals: { feature: "goalPlanner", back: "stats" },
   plateau: { feature: "plateauDetective", back: "stats" },
+  stats: { feature: "advancedStats", back: "stats" },
+  lift: { feature: "advancedStats", back: "stats" },
+  connections: { feature: "cloudConnections", back: "connections" },
   settings: { back: "settings" },
   // Back from Stripe Checkout on the web (src/server/stripe.ts RETURN_URLS).
   paid: { back: "today" },

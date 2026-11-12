@@ -82,11 +82,15 @@ describe("joining", () => {
       autoPost: false,
       weights: true,
       public: false,
-      push: { follows: true, comments: true, sent: true, likes: false },
+      push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
       avatar: "",
       audience: "all",
       showLifts: true,
       lifts: [],
+      suggest: true,
+      live: false,
+      level: 0,
+      streak: 0,
     });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
@@ -185,6 +189,27 @@ describe("posting and the feed", () => {
 
   it("refuses workouts that are too old or empty", () => {
     expect(parsePost(workout("s1", NOW - 100 * DAY), NOW)).toEqual({ error: "old" });
+    // Every set travels for the whole-workout view, checked, and without weights when the post hides them.
+    const logged = (w: number | null) => ({
+      ...workout(),
+      body: {
+        ...workout().body,
+        exercises: [{ id: "bench", name: "", sets: 2, w, r: 5, pr: true, log: [{ w: 100, r: 5 }, { w: 9999, r: 5 }, { r: -1 }, "x"] }],
+      },
+    });
+    const kept = parsePost(logged(100), NOW);
+    expect("body" in kept && kept.body.exercises[0]).toMatchObject({
+      pr: true,
+      log: [
+        { w: 100, r: 5 },
+        { w: null, r: 5 },
+      ],
+    });
+    const hidden = parsePost(logged(null), NOW);
+    expect("body" in hidden && hidden.body.exercises[0]!.log).toEqual([
+      { w: null, r: 5 },
+      { w: null, r: 5 },
+    ]);
     expect(parsePost({ ...workout(), body: { ...workout().body, exercises: [] } }, NOW)).toEqual({ error: "empty" });
   });
 

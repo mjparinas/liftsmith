@@ -138,7 +138,8 @@ function Detail({ p, current, onStart }: { p: ProgramInfo; current: boolean; onS
         </ul>
       </div>
       <p className="text-xs text-faint">
-        {p.basedOn} {t("prog.owners")}
+        {p.basedOn}
+        {!p.own && ` ${t("prog.owners")}`}
       </p>
       <Button className="w-full" onClick={onStart}>
         {!allowed ? t("prog.unlock") : current ? t("prog.restart") : t("prog.start")}

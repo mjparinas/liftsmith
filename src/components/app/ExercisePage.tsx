@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 
+import { can } from "@/lib/entitlements";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { date, list, num, t } from "@/lib/i18n";
 import { liftSessions, liftTrend, repBests, type LiftTrend } from "@/lib/liftPage";
@@ -12,6 +13,7 @@ import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { plateText, setText } from "./format";
+import { ProLocked } from "./ProLocked";
 import { goBack } from "./router";
 import { HUE } from "./theme";
 import { EmptyState, ScreenHeader, Section } from "./ui";
@@ -84,7 +86,12 @@ export function ExercisePage({ id }: { id?: string }) {
         </section>
       )}
 
-      {trend && (
+      {trend && !can("advancedStats") && (
+        <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
+          <ProLocked from="lift" title={t("pro.ft.advancedStats")} body={t("lift.trend.lock")} />
+        </Section>
+      )}
+      {trend && can("advancedStats") && (
         <Section title={t("lift.trendTitle")} icon="progress" info="e1rm">
           <div className="card p-4">
             {best > 0 && (

@@ -61,13 +61,17 @@ function listen() {
 
 /**
  * A push that arrives while the app is open isn't drawn by the system (Android hands it to the app; iOS does too
- * without presentation options), so refresh Friends instead: the tab badge and Activity show it straight away.
+ * without presentation options), so refresh Friends instead: the tab badge and Activity show it straight away. A
+ * cheer also rains on the workout screen (`kind` is the push's kind, "cheer").
  */
-export function onPushWhileOpen(cb: () => void): () => void {
+export function onPushWhileOpen(cb: (kind: string) => void): () => void {
   if (!isNative()) return () => {};
   let remove: (() => void) | null = null;
   let gone = false;
-  void PushNotifications.addListener("pushNotificationReceived", () => cb())
+  void PushNotifications.addListener("pushNotificationReceived", (n) => {
+    const kind = (n.data as { kind?: unknown } | undefined)?.kind;
+    cb(typeof kind === "string" ? kind : "");
+  })
     .then((h) => (gone ? void h.remove() : (remove = () => void h.remove())))
     .catch(() => undefined);
   return () => {

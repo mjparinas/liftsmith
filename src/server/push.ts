@@ -16,9 +16,9 @@ import * as text from "@/locales/text/push";
 
 import { query, run } from "./db";
 
-export type PushKind = "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag";
+export type PushKind = "follow" | "request" | "accept" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer";
 /** Which Friends settings switch covers each kind (the columns on social_profiles). */
-export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent"> = {
+export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_comments" | "push_sent" | "push_cheers"> = {
   follow: "push_follows",
   request: "push_follows",
   accept: "push_follows",
@@ -28,6 +28,10 @@ export const PUSH_PREF: Record<PushKind, "push_follows" | "push_likes" | "push_c
   // A challenge invite is someone reaching out, like a follow; a tag is a reply to a workout, like a comment.
   challenge: "push_follows",
   tag: "push_comments",
+  // Someone naming you in a comment, or answering yours, is part of a conversation: the comments switch.
+  mention: "push_comments",
+  reply: "push_comments",
+  cheer: "push_cheers",
 };
 /** Tokens kept per account (phones and tablets); the oldest go first. */
 export const MAX_TOKENS = 10;
@@ -124,7 +128,8 @@ async function send(
   // No ids or tokens in the logs: the kind and the outcome are enough to see where a push stopped.
   if (!tokens.length) console.info(`push ${kind}: recipient has no registered phone`);
   const name = String(who.name);
-  const route = kind === "sent" && vars.code ? `#/routine/${vars.code}` : "#/friends";
+  // A cheer opens the workout it was for; everything else opens its routine or Friends.
+  const route = kind === "sent" && vars.code ? `#/routine/${vars.code}` : kind === "cheer" ? "#/workout" : "#/friends";
   const short = (s = "") => (s.length > 120 ? `${s.slice(0, 119)}…` : s);
   await Promise.all(
     tokens.map(async (t) => {
@@ -181,7 +186,13 @@ async function sendFcm(m: PushMessage): Promise<"ok" | "gone" | "error"> {
         token: m.token,
         notification: { body: m.body },
         data: { route: m.route, kind: m.kind },
-        android: { priority: "high", notification: { channel_id: "friends", tag: m.kind === "like" ? "friends-like" : undefined } },
+        android: {
+          priority: "high",
+          notification: {
+            channel_id: "friends",
+            tag: m.kind === "like" ? "friends-like" : m.kind === "cheer" ? "friends-cheer" : undefined,
+          },
+        },
       },
     }),
   });
@@ -245,6 +256,12 @@ function sendApns(m: PushMessage): Promise<"ok" | "gone" | "error"> {
       resolve(status === 200 ? "ok" : status === 410 || reason === "BadDeviceToken" || reason === "Unregistered" ? "gone" : "error");
     });
     req.on("error", () => resolve("error"));
-    req.end(JSON.stringify({ aps: { alert: { body: m.body }, sound: "default", "thread-id": `friends-${m.kind}` }, route: m.route }));
+    req.end(
+      JSON.stringify({
+        aps: { alert: { body: m.body }, sound: "default", "thread-id": `friends-${m.kind}` },
+        route: m.route,
+        kind: m.kind,
+      }),
+    );
   });
 }

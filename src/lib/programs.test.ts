@@ -5,7 +5,18 @@ import { available, exercise, LADDER_ONLY } from "./exercises";
 import { generate, type Plan } from "./generator";
 import { barFor } from "./loads";
 import { loadBar } from "./plates";
-import { missingFor, PICKER_ORDER, pickProgram, programPlan, PROGRAMS, SPLITS, weeklyPreview, type Ctx, type ProgramId } from "./programs";
+import {
+  freeProgramFor,
+  missingFor,
+  PICKER_ORDER,
+  pickProgram,
+  programPlan,
+  PROGRAMS,
+  SPLITS,
+  weeklyPreview,
+  type Ctx,
+  type ProgramId,
+} from "./programs";
 import type { AppEvent, Gym, PlanSource, Profile, SetEvent } from "./types";
 import { fromKg, toKg } from "./units";
 
@@ -106,6 +117,7 @@ describe("program list", () => {
       "tiered",
       "waves",
       "calisthenics",
+      "dumbbell-full-body",
       "ppl",
       "upper-lower",
     ]);
@@ -126,6 +138,7 @@ describe("program list", () => {
       "tiered",
       "waves",
       "calisthenics",
+      "dumbbell-full-body",
     ]);
   });
 
@@ -412,6 +425,29 @@ describe("bodyweight skills", () => {
       const plan = generate({ gym: homeGym, profile: p, events: [], minutes: 60, now: NOW });
       for (const it of plan.items) expect(LADDER_ONLY.has(it.exerciseId)).toBe(false);
     }
+  });
+});
+
+describe("dumbbell full body", () => {
+  const dbGym = makeGym("dumbbells", "kg", "g4");
+
+  it("alternates A and B at 3 × 10 with dumbbells, and goes up a dumbbell when every rep is there", () => {
+    const { plans } = run("dumbbell-full-body", 3, { gym: dbGym });
+    expect(plans.map((p) => p.program!.dayName)).toEqual(["Workout A", "Workout B", "Workout A"]);
+    expect(plans[0].items.map((i) => i.slot)).toEqual(["goblet-squat", "db-bench-press", "db-row"]);
+    expect(plans[1].items.map((i) => i.slot)).toEqual(["db-rdl", "db-shoulder-press", "walking-lunge"]);
+    for (const it of plans[0].items) expect(it.setTargets!.map((s) => s.reps)).toEqual([10, 10, 10]);
+    expect(top(plans[2], "goblet-squat")).toBeGreaterThan(top(plans[0], "goblet-squat"));
+  });
+});
+
+describe("the free program for a gym (no Pro)", () => {
+  it("is the classic 5×5 with a barbell, rack and bench, dumbbell full body with dumbbells, bodyweight skills otherwise", () => {
+    expect(freeProgramFor(kgGym)).toBe("classic-5x5");
+    expect(freeProgramFor(makeGym("dumbbells", "kg", "x"))).toBe("dumbbell-full-body");
+    expect(freeProgramFor({ equipment: ["dumbbells", "bench"] })).toBe("dumbbell-full-body");
+    expect(freeProgramFor(homeGym)).toBe("calisthenics");
+    expect(freeProgramFor({ equipment: [] })).toBe("calisthenics");
   });
 });
 

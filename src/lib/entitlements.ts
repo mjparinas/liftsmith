@@ -19,6 +19,11 @@ import { hasPro } from "./billing";
 // Health twin (Melvin, 2026-11-09): seeing every number, trend and reason is free; sleep, HRV, resting
 // heart rate and breathing rate changing today's call ("healthReadiness") is Pro.
 // Labs, the experimental features (camera rep counting among them; "labs", 2026-11-10), is Pro.
+// Free vs Pro rebalance (Melvin picked it, 2026-11-12; docs/decisions/money.md): advanced stats are Pro in the
+// app too (weekly sets per muscle, one-rep max trend lines, an exercise's trend); the cloud connections (Strava,
+// Oura, Whoop, Withings, Polar, Concept2) are Pro, while Health Connect and Apple Health stay free; "Short on
+// time" is free, the rest of changing the plan mid-workout stays Pro; free lifters get one adaptive workout a
+// week (freeAdaptive.ts) and a free program that fits their gym (freeProgramFor in programs.ts).
 // One line per feature, so two changes adding one don't touch the same line. Every feature listed is Pro.
 export const PRO_FEATURES = [
   "adaptive",
@@ -30,6 +35,7 @@ export const PRO_FEATURES = [
   "goalPlanner",
   "healthReadiness",
   "labs",
+  "cloudConnections",
 ] as const;
 export type Feature = (typeof PRO_FEATURES)[number];
 const PRO: ReadonlySet<Feature> = new Set(PRO_FEATURES);

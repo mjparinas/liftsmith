@@ -270,7 +270,20 @@ try {
       volume: 5200,
       prs: 1,
       muscles: ["chest", "triceps"],
-      exercises: [{ id: "bench-press", name: "Bench press", sets: 4, w: 100, r: 5 }],
+      exercises: [
+        {
+          id: "bench-press",
+          name: "Bench press",
+          sets: 2,
+          w: 100,
+          r: 5,
+          pr: true,
+          log: [
+            { w: 95, r: 5 },
+            { w: 100, r: 5 },
+          ],
+        },
+      ],
     },
   };
   const friendsApi = {
@@ -282,7 +295,7 @@ try {
         autoPost: false,
         weights: true,
         public: false,
-        push: { follows: true, comments: true, sent: true, likes: false },
+        push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
         avatar: "",
         audience: "all",
         showLifts: true,
@@ -294,11 +307,22 @@ try {
       unread: 2,
     },
     feed: { posts: [friendsPost], more: false },
+    clubFeed: { posts: [friendsPost], more: false },
     person: { posts: [friendsPost], more: false },
     thread: {
       post: friendsPost,
       comments: [
         { id: "c1", handle: "casey", name: "Casey", at: Date.now() - 60_000, body: "Strong work!", mine: false, canDelete: false },
+        {
+          id: "c2",
+          handle: "blair",
+          name: "Blair",
+          at: Date.now() - 30_000,
+          body: "Thanks @casey",
+          mine: false,
+          canDelete: false,
+          replyTo: "c1",
+        },
       ],
     },
     activity: {
@@ -356,6 +380,7 @@ try {
         mine: true,
         code: "ABCD2345",
         owner: { handle: "alex", name: "Alex" },
+        goal: { metric: "workouts", target: 9 },
         rows: [
           { handle: "alex", name: "Alex", avatar: "", me: true, workouts: 2, sets: 30, minutes: 95, volume: 8000, prs: 1 },
           { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, workouts: 3, sets: 41, minutes: 140, volume: 10400, prs: 2 },
@@ -383,7 +408,32 @@ try {
           { id: "back-squat", w: 140, r: 3, at: Date.now() },
           { id: "bench-press", w: 100, r: 5, at: Date.now() },
         ],
+        level: 12,
+        streak: 4,
+        trained: [1, 3, 8, 10, 15, 17].map((d) => Date.now() - d * 86_400_000),
       },
+    },
+    suggest: {
+      people: [
+        { handle: "drew", name: "Drew", avatar: "av-bolt", reason: "followsYou", open: false },
+        { handle: "emery", name: "Emery", avatar: "", reason: "mutual", count: 2, via: "Blair", open: true },
+      ],
+    },
+    search: { people: [{ handle: "casey", name: "Casey Stone", avatar: "av-leaf" }] },
+    personPeople: { people: [{ handle: "alex", name: "Alex", avatar: "" }] },
+    training: {
+      people: [
+        {
+          handle: "blair",
+          name: "Blair",
+          avatar: "av-trophy",
+          exercise: "back-squat",
+          done: 4,
+          total: 15,
+          startedAt: Date.now() - 1_800_000,
+          updatedAt: Date.now() - 60_000,
+        },
+      ],
     },
   };
   await page.route("**/api/social/", (r) => r.fulfill({ json: friendsApi[JSON.parse(r.request().postData() ?? "{}").op] ?? { ok: true } }));
@@ -393,10 +443,23 @@ try {
   );
   await page.reload();
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
+  await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
   await scan("friends feed");
   await page.getByRole("button", { name: "More options" }).click();
-  await page.getByRole("button", { name: "Save as a routine" }).waitFor();
+  await page
+    .getByRole("button", { name: "Edit post" })
+    .or(page.getByRole("button", { name: /^Report/ }))
+    .first()
+    .waitFor();
   await scan("friends post menu");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /^See Blair’s whole workout/ }).click();
+  await page.getByRole("button", { name: "Do this workout" }).waitFor();
+  await scan("friends whole workout");
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: /likes: see who/ }).click();
+  await page.getByRole("dialog", { name: "Liked by" }).waitFor();
+  await scan("friends likers");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Friends settings" }).click();
   await page.getByRole("group", { name: "Avatar" }).waitFor();
@@ -409,6 +472,7 @@ try {
   await page.getByRole("button", { name: "Board" }).click();
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
   await page.getByText("Blair invited you to this challenge.").waitFor();
+  await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
   await scan("friends board");
   await page.getByRole("button", { name: "Start a challenge" }).click();
   await page.getByRole("group", { name: "Challenge" }).waitFor();
@@ -419,18 +483,34 @@ try {
   await scan("friends clubs");
   await page.getByRole("button", { name: /Iron Barn crew/ }).click();
   await page.getByRole("button", { name: "Invite to the club" }).waitFor();
+  await page.getByText("This week as a crew: 9 workouts").waitFor();
   await scan("friends club");
+  await page.getByRole("button", { name: "Change goal" }).click();
+  await page.getByRole("button", { name: "Save goal" }).waitFor();
+  await scan("friends club goal");
+  await page.getByRole("button", { name: "Cancel" }).click();
+  await page.getByRole("button", { name: "Posts" }).click();
+  await page.getByRole("article", { name: "Workout from Blair" }).last().waitFor();
+  await scan("friends club posts");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: /^Activity/ }).click();
   await page.getByText("Blair liked your workout").waitFor();
   await scan("friends activity");
   await page.getByRole("button", { name: /^People/ }).click();
   await page.getByRole("button", { name: "Accept" }).waitFor();
+  await page.getByText("People you may know").waitFor();
+  await page.getByLabel("Find a friend").fill("stone");
+  await page.getByRole("list", { name: "Search results" }).waitFor();
   await scan("friends people");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();
+  await page.getByText("Level 12").waitFor();
   await scan("friends person");
+  await page.getByRole("button", { name: /Followers/ }).click();
+  await page.getByRole("dialog").getByText("Alex", { exact: true }).waitFor();
+  await scan("friends followers");
+  await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/invite/ABCDEFGH`);
   await page.getByText("Blair invited you").waitFor();
   await scan("friends invite");

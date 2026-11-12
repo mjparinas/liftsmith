@@ -4,6 +4,8 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "td.freeAdaptive.try": "Try adaptive today · 1 free this week",
+  "td.freeAdaptive.back": "Adaptive today, free this week · Back to {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} streak freeze", other: "{count} streak freezes" },
   "td.lvlTitle": "{title}: {into} of {span} XP to {next}",
@@ -56,6 +58,8 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "td.freeAdaptive.try": "Prueba el adaptativo hoy · 1 gratis esta semana",
+  "td.freeAdaptive.back": "Adaptativo hoy, gratis esta semana · Volver a {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} protector de racha", other: "{count} protectores de racha" },
   "td.lvlTitle": "{title}: {into} de {span} XP para {next}",
@@ -108,6 +112,8 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "td.freeAdaptive.try": "Essayer l’adaptatif aujourd’hui · 1 gratuit cette semaine",
+  "td.freeAdaptive.back": "Adaptatif aujourd’hui, gratuit cette semaine · Revenir à {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} gel de série", other: "{count} gels de série" },
   "td.lvlTitle": "{title} : {into} sur {span} XP avant {next}",
@@ -160,6 +166,8 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "td.freeAdaptive.try": "Heute adaptiv testen · 1 gratis diese Woche",
+  "td.freeAdaptive.back": "Heute adaptiv, gratis diese Woche · Zurück zu {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} Serien-Freeze", other: "{count} Serien-Freezes" },
   "td.lvlTitle": "{title}: {into} von {span} XP bis {next}",
@@ -212,6 +220,8 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "td.freeAdaptive.try": "Prova l’adattivo oggi · 1 gratis questa settimana",
+  "td.freeAdaptive.back": "Adattivo oggi, gratis questa settimana · Torna a {name}",
   "td.streakTitle": "{streak}, {freezes}",
   "td.freezeLabel": { one: "{count} freeze della serie", other: "{count} freeze della serie" },
   "td.lvlTitle": "{title}: {into} di {span} XP per {next}",
@@ -264,6 +274,8 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "td.freeAdaptive.try": "今日はアダプティブを試す・今週1回無料",
+  "td.freeAdaptive.back": "今日はアダプティブ（今週は無料）・{name} に戻す",
   "td.streakTitle": "{streak}、{freezes}",
   "td.freezeLabel": { other: "連続記録フリーズ{count}個" },
   "td.lvlTitle": "{title}：{next}まで{span} XP中{into} XP",

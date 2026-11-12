@@ -40,6 +40,18 @@ describe("shortcuts", () => {
     expect(useApp.getState().active!.restUntil).toBe(until + 30_000);
   });
 
+  it("logs a lock-screen tap made with the app closed at the time it was tapped, not when the app opens", () => {
+    runShortcut("start");
+    const tapped = Date.now() - 90_000;
+    runShortcut("log", tapped);
+    const ev = useApp.getState().events.find((e) => e.type === "set" || e.type === "warmup")!;
+    expect(ev.at).toBe(tapped);
+    // The rest started at the tap, so by now it has (partly) run.
+    const a = useApp.getState().active!;
+    expect(a.restStart).toBe(tapped);
+    if (a.restUntil) expect(a.restUntil).toBe(tapped + a.restTotal * 1000);
+  });
+
   it("does nothing before setup is done", () => {
     useApp.getState().setProfile({ ...useApp.getState().profile, onboarded: false });
     expect(runShortcut("start")).toBe("today");

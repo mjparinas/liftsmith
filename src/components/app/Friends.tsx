@@ -12,7 +12,7 @@ import { useAccount } from "@/lib/auth";
 import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
-import { badgeForItem, COSMETICS, levelForItem } from "@/lib/game";
+import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
 import { list as fmtList, inSentence, t } from "@/lib/i18n";
 import {
   acceptPending,
@@ -32,7 +32,6 @@ import { startPush, stopPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   bestLifts,
-  postRoutineCode,
   postWorkout,
   profileChanges,
   profileUrl,
@@ -49,6 +48,7 @@ import {
   BOARD_METRICS,
   CHALLENGE_DAYS,
   cleanHandle,
+  CLUB_GOAL,
   HANDLE_RE,
   REPORT_REASONS,
   SOCIAL_LIMITS,
@@ -59,9 +59,10 @@ import {
   type Challenge,
   type ChallengeDays,
   type ClubDetail,
+  type ClubGoal,
+  type ClubGoalMetric,
   type ClubPreview,
   type ClubSummary,
-  type FeedComment,
   type FeedPost,
   type Inviter,
   type Partner,
@@ -74,14 +75,20 @@ import {
 import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
+import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
-import { useGame } from "./Achievements";
+import { Bar, useGame } from "./Achievements";
 import { Avatar } from "./AvatarFace";
+import { CommentsSheet, LikersSheet } from "./Comments";
 import { ago, clock, repsText, setText } from "./format";
+import { PersonPeopleSheet, ProfileStats, SearchResults, Suggestions } from "./FriendsFind";
+import { TrainingNow } from "./FriendsLive";
 import { Icon } from "./icons";
+import { MonthFriends } from "./MonthChallenge";
+import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
-import { Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
+import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
 
@@ -279,7 +286,8 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
   const [reporting, setReporting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [note, setNote] = useState<string | null>(null);
-  const routine = postRoutineCode(post);
+  const [detail, setDetail] = useState(false);
+  const [likers, setLikers] = useState(false);
   const edit = async (v: ComposeValue) => {
     try {
       const r = await social<{ caption: string; audience: Audience; partners: Partner[] }>("editPost", { id: post.id, ...v });
@@ -364,17 +372,26 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           </div>
         ))}
       </dl>
-      <ul className="mt-3 space-y-1 text-sm">
-        {b.exercises.slice(0, 5).map((e) => (
-          <li key={e.id} className="flex justify-between gap-3">
-            <span className="min-w-0 truncate">
-              {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
-            </span>
-            <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
-          </li>
-        ))}
-        {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
-      </ul>
+      <button
+        type="button"
+        onClick={() => setDetail(true)}
+        className="press -mx-2 mt-1 block w-[calc(100%+1rem)] rounded-xl px-2 py-2 text-left hover:bg-raised"
+      >
+        {/* Named by its words (so a voice command matching what's on screen works), led by what it opens. */}
+        <span className="sr-only">{t("social.post.open", { name: post.name })}: </span>
+        <ul className="space-y-1 text-sm">
+          {b.exercises.slice(0, 5).map((e) => (
+            <li key={e.id} className="flex justify-between gap-3">
+              <span className="min-w-0 truncate">
+                {e.sets} × {EXERCISE_BY_ID.get(e.id)?.name ?? (e.name || e.id)}
+              </span>
+              <span className="num shrink-0 text-muted">{bestSet(e, unit)}</span>
+            </li>
+          ))}
+          {b.exercises.length > 5 && <li className="text-muted">{t("friends.post.moreExercises", { count: b.exercises.length - 5 })}</li>}
+        </ul>
+        <span className="mt-1 block text-sm font-medium text-accent">{t("social.post.see")}</span>
+      </button>
       {muscles.length > 0 && <p className="mt-2 text-xs text-muted">{fmtList(muscles.map((m) => MUSCLE_LABEL[m]))}</p>}
       <div className="mt-3 flex items-center gap-2 border-t border-line pt-2">
         <button
@@ -385,8 +402,18 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
           className={`press inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 ${post.liked ? "text-bad" : "text-muted hover:text-ink"}`}
         >
           <Icon name="heart" size={20} filled={post.liked} />
-          <span className="num text-sm">{fmtNum(post.likes)}</span>
+          {post.likes === 0 && <span className="num text-sm">{fmtNum(0)}</span>}
         </button>
+        {post.likes > 0 && (
+          <button
+            type="button"
+            aria-label={t("social.likers", { count: post.likes })}
+            onClick={() => setLikers(true)}
+            className="press -ml-2 inline-flex min-h-11 min-w-11 items-center rounded-xl px-2 text-sm text-muted hover:text-ink"
+          >
+            <span className="num">{fmtNum(post.likes)}</span>
+          </button>
+        )}
         {onOpen && (
           <button
             type="button"
@@ -402,20 +429,6 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
       <Note text={note} />
       <Sheet open={more} onClose={() => setMore(false)} title={t("friends.post.more")}>
         <div className="space-y-2">
-          {routine && (
-            <Button
-              kind="ghost"
-              icon="layers"
-              className="w-full"
-              onClick={() => {
-                setMore(false);
-                track("feature", { name: "social_save_workout" });
-                go("routine", routine);
-              }}
-            >
-              {t("friends.post.save")}
-            </Button>
-          )}
           {post.mine ? (
             <>
               <Button
@@ -455,6 +468,8 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="post" id={post.id} />
+      <PostDetailSheet post={detail ? post : null} onClose={() => setDetail(false)} />
+      <LikersSheet postId={likers ? post.id : null} onClose={() => setLikers(false)} />
       <ComposeSheet
         open={editing}
         onClose={() => setEditing(false)}
@@ -466,122 +481,6 @@ function PostCard({ post, onChange, onOpen }: { post: FeedPost; onChange: (p: Fe
         onSubmit={edit}
       />
     </article>
-  );
-}
-
-/** A post's comments, and the box to add one. */
-function CommentsSheet(props: { post: FeedPost | null; onClose: () => void; onCount: (n: number) => void }) {
-  return props.post ? <CommentsBody key={props.post.id} {...props} post={props.post} /> : null;
-}
-
-function CommentsBody({ post, onClose, onCount }: { post: FeedPost; onClose: () => void; onCount: (n: number) => void }) {
-  const [comments, setComments] = useState<FeedComment[] | null>(null);
-  const [text, setText] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [note, setNote] = useState<string | null>(null);
-  const [reporting, setReporting] = useState<string | null>(null);
-  const id = post.id;
-  useEffect(() => {
-    let live = true;
-    social<{ comments: FeedComment[] }>("thread", { id })
-      .then((r) => live && setComments(r.comments))
-      .catch((e: unknown) => live && (setComments([]), setNote(socialError(e))));
-    return () => {
-      live = false;
-    };
-  }, [id]);
-  const send = async (e: FormEvent) => {
-    e.preventDefault();
-    if (!text.trim() || busy) return;
-    setBusy(true);
-    try {
-      const r = await social<{ comment: FeedComment }>("comment", { id, text });
-      const next = [...(comments ?? []), r.comment];
-      setComments(next);
-      onCount(next.length);
-      setText("");
-      setNote(null);
-      haptic("success");
-    } catch (err) {
-      oops();
-      setNote(socialError(err));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const remove = async (c: FeedComment) => {
-    try {
-      await social("uncomment", { id: c.id });
-      const next = (comments ?? []).filter((x) => x.id !== c.id);
-      setComments(next);
-      onCount(next.length);
-    } catch (err) {
-      oops();
-      setNote(socialError(err));
-    }
-  };
-  return (
-    <Sheet open onClose={onClose} title={t("friends.comments.title")}>
-      {comments === null ? (
-        <Skeleton className="h-16" />
-      ) : (
-        <ul className="space-y-3">
-          {comments.map((c) => (
-            <li key={c.id} className="flex items-start gap-3">
-              <Avatar name={c.name} avatar={c.avatar} size={32} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm">
-                  <button type="button" className="press font-semibold" onClick={() => go("person", c.handle)}>
-                    {c.name}
-                  </button>{" "}
-                  <span className="text-xs text-muted">{ago(c.at)}</span>
-                </p>
-                <p className="break-words text-sm">{c.body}</p>
-              </div>
-              {c.canDelete ? (
-                <button
-                  type="button"
-                  aria-label={t("friends.comments.delete")}
-                  onClick={() => void remove(c)}
-                  className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                >
-                  <Icon name="trash" size={18} />
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  aria-label={t("friends.report.comment")}
-                  onClick={() => setReporting(c.id)}
-                  className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                >
-                  <Icon name="flag" size={18} />
-                </button>
-              )}
-            </li>
-          ))}
-          {!comments.length && <li className="text-sm text-muted">{t("friends.comments.none")}</li>}
-        </ul>
-      )}
-      <form className="mt-4 flex gap-2" onSubmit={(e) => void send(e)}>
-        <label htmlFor="fr-comment" className="sr-only">
-          {t("friends.comments.add")}
-        </label>
-        <input
-          id="fr-comment"
-          value={text}
-          maxLength={SOCIAL_LIMITS.comment}
-          onChange={(e) => setText(e.target.value)}
-          placeholder={t("friends.comments.add")}
-          className="card min-w-0 flex-1 px-4 py-3"
-          enterKeyHint="send"
-        />
-        <Button submit disabled={busy || !text.trim()}>
-          {t("friends.comments.send")}
-        </Button>
-      </form>
-      <Note text={note} />
-      <ReportSheet open={!!reporting} onClose={() => setReporting(null)} kind="comment" id={reporting ?? ""} />
-    </Sheet>
   );
 }
 
@@ -635,16 +534,17 @@ function ReportBody({ open, onClose, kind, id }: { open: boolean; onClose: () =>
   );
 }
 
-/** A list of posts with comments and "Load more". `op` is feed or person. */
-function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; empty: ReactNode }) {
+/** A list of posts with comments and "Load more". `op` is feed, person (with `handle`) or clubFeed (with `club`). */
+function Posts({ op, handle, club, empty }: { op: "feed" | "person" | "clubFeed"; handle?: string; club?: string; empty: ReactNode }) {
   const [posts, setPosts] = useState<FeedPost[] | null>(null);
   const [more, setMore] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const [open, setOpen] = useState<FeedPost | null>(null);
+  const [reporting, setReporting] = useState<string | null>(null);
   const load = useCallback(
     async (before: number) => {
       try {
-        const r = await social<{ posts: FeedPost[]; more: boolean }>(op, { handle, before });
+        const r = await social<{ posts: FeedPost[]; more: boolean }>(op, { handle, id: club, before });
         setPosts((p) => [...(p ?? []), ...r.posts]);
         setMore(r.more);
         setNote(null);
@@ -653,11 +553,11 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
         setNote(socialError(e));
       }
     },
-    [op, handle],
+    [op, handle, club],
   );
   useEffect(() => {
     let live = true;
-    social<{ posts: FeedPost[]; more: boolean }>(op, { handle })
+    social<{ posts: FeedPost[]; more: boolean }>(op, { handle, id: club })
       .then((r) => {
         if (!live) return;
         setPosts(r.posts);
@@ -671,7 +571,7 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
     return () => {
       live = false;
     };
-  }, [op, handle]);
+  }, [op, handle, club]);
   const change = (id: string) => (p: FeedPost | null) => setPosts((ps) => (ps ?? []).flatMap((x) => (x.id !== id ? [x] : p ? [p] : [])));
   if (posts === null)
     return (
@@ -696,7 +596,9 @@ function Posts({ op, handle, empty }: { op: "feed" | "person"; handle?: string; 
         post={open}
         onClose={() => setOpen(null)}
         onCount={(n) => open && setPosts((ps) => (ps ?? []).map((x) => (x.id === open.id ? { ...x, comments: n } : x)))}
+        onReport={setReporting}
       />
+      <ReportSheet open={!!reporting} onClose={() => setReporting(null)} kind="comment" id={reporting ?? ""} />
     </div>
   );
 }
@@ -830,7 +732,7 @@ function Privacy({
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
   /** Once joined: who sees new posts and the best lifts switch. */
-  joined?: Pick<SocialProfile, "audience" | "showLifts">;
+  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest" | "live">;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
@@ -859,6 +761,18 @@ function Privacy({
             on={joined.showLifts && weights}
             onChange={(v) => set({ showLifts: v, ...(v ? { weights: true } : {}) })}
           />
+          <SwitchRow
+            label={t("social.suggestMe")}
+            hint={t("social.suggestMeHint")}
+            on={joined.suggest !== false}
+            onChange={(v) => set({ suggest: v })}
+          />
+          <SwitchRow
+            label={t("social.live.share")}
+            hint={t("social.live.shareHint")}
+            on={!!joined.live}
+            onChange={(v) => set({ live: v })}
+          />
           <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{t("friends.aud.default")}</p>
           <AudienceChips value={joined.audience} onChange={(a) => set({ audience: a })} publicProfile={!!pub} />
         </>
@@ -879,6 +793,7 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
     ["comments", "friends.notify.comments"],
     ["sent", "friends.notify.sent"],
     ["likes", "friends.notify.likes"],
+    ["cheers", "social.notify.cheers"],
   ];
   return (
     <Section title={t("friends.notify")}>
@@ -1095,7 +1010,13 @@ function Activity({ onPeople, onBoard }: { onPeople: () => void; onBoard: () => 
               ? t("friends.act.challenge", { name: i.name, challenge: i.text ?? "" })
               : i.kind === "tag"
                 ? t("friends.act.tag", { name: i.name })
-                : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
+                : i.kind === "mention"
+                  ? t("social.act.mention", { name: i.name, text: i.text ?? "" })
+                  : i.kind === "reply"
+                    ? t("social.act.reply", { name: i.name, text: i.text ?? "" })
+                    : i.kind === "cheer"
+                      ? t("social.act.cheer", { name: i.name, text: i.text ?? "" })
+                      : t("friends.act.comment", { name: i.name, text: i.text ?? "" });
   return (
     <>
       {items.length ? (
@@ -1254,7 +1175,7 @@ function People() {
   const find = (e: FormEvent) => {
     e.preventDefault();
     const h = cleanHandle(q);
-    if (!HANDLE_RE.test(h)) return setNote(t("friends.err.handle"));
+    if (!HANDLE_RE.test(h)) return setNote(t("social.findHelp"));
     go("person", h);
   };
   const share = async () => {
@@ -1288,12 +1209,14 @@ function People() {
           <Button submit>{t("friends.findGo")}</Button>
         </div>
       </form>
+      <SearchResults q={q} />
       <InviteButton />
       <Button kind="ghost" icon="share" className="mt-2 w-full" onClick={() => void share()}>
         {t("friends.shareMe", { handle })}
       </Button>
       <Note text={note} />
       <PeopleList list="requests" reload={version} onChanged={changed} />
+      <Suggestions reload={version} onFollowed={changed} />
       <PeopleList list="following" reload={version} onChanged={changed} />
       <PeopleList list="followers" reload={version} onChanged={changed} />
       <PeopleList list="muted" reload={version} onChanged={changed} />
@@ -1790,6 +1713,7 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
   const unit = profile.unit;
   const [club, setClub] = useState<ClubDetail | null>(null);
   const [metric, setMetric] = useState<BoardMetric>("workouts");
+  const [view, setView] = useState<"week" | "posts">("week");
   const [reload, setReload] = useState(0);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
@@ -1856,36 +1780,56 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
             {t("friends.club.invite")}
           </Button>
           <p className="mt-1 px-1 text-xs text-muted">{t("friends.club.inviteHint", { code: club.code })}</p>
-          <p className={`mb-2 mt-5 ${SECTION_LABEL}`}>{t("friends.club.thisWeek")}</p>
-          <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
-            {BOARD_METRICS.map((m) => (
-              <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
-                {t(METRIC_LABEL[m])}
-              </Chip>
-            ))}
+          <ClubGoalCard club={club} onSave={(goal) => void act({ goal }, "clubManage")} />
+          <div className="mt-5 flex flex-wrap gap-2" role="group" aria-label={t("social.club.view")}>
+            <Chip active={view === "week"} onClick={() => setView("week")}>
+              {t("friends.club.thisWeek")}
+            </Chip>
+            <Chip active={view === "posts"} onClick={() => setView("posts")}>
+              {t("social.club.posts")}
+            </Chip>
           </div>
-          {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
-          <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.club.thisWeek")}>
-            {ranked.map((r) => (
-              <li key={r.handle} className={`flex items-center gap-3 px-4 py-2 ${r.me ? "bg-accent/10" : ""}`}>
-                <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
-                <Avatar name={r.name} avatar={r.avatar} size={32} />
-                <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
-                <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
-                {club.mine && !r.me && (
-                  <button
-                    type="button"
-                    aria-label={t("friends.club.remove", { name: r.name })}
-                    onClick={() => void act({ remove: r.handle }, "clubManage")}
-                    className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
-                  >
-                    <Icon name="trash" size={18} />
-                  </button>
-                )}
-              </li>
-            ))}
-          </ol>
-          <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.hint")}</p>
+          {view === "posts" ? (
+            <div className="mt-3">
+              <Posts
+                op="clubFeed"
+                club={club.id}
+                empty={<EmptyState icon="people" title={t("social.club.postsNone")} body={t("social.club.postsHint")} />}
+              />
+            </div>
+          ) : (
+            <>
+              <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+                {BOARD_METRICS.map((m) => (
+                  <Chip key={m} active={metric === m} onClick={() => setMetric(m)}>
+                    {t(METRIC_LABEL[m])}
+                  </Chip>
+                ))}
+              </div>
+              {nudgeText && <p className="mt-3 text-sm font-medium">{nudgeText}</p>}
+              <ol className="card mt-3 divide-y divide-line" aria-label={t("friends.club.thisWeek")}>
+                {ranked.map((r) => (
+                  <li key={r.handle} className={`flex items-center gap-3 px-4 py-2 ${r.me ? "bg-accent/10" : ""}`}>
+                    <span className="num w-6 shrink-0 text-center font-bold text-muted">{r.place}</span>
+                    <Avatar name={r.name} avatar={r.avatar} size={32} />
+                    <span className="min-w-0 flex-1 truncate">{r.me ? t("friends.board.you", { name: r.name }) : r.name}</span>
+                    <span className="num shrink-0 font-bold">{metricText(metric, r[metric], unit)}</span>
+                    {club.mine && !r.me && (
+                      <button
+                        type="button"
+                        aria-label={t("friends.club.remove", { name: r.name })}
+                        onClick={() => void act({ remove: r.handle }, "clubManage")}
+                        className="press grid h-11 w-11 shrink-0 place-items-center rounded-xl text-muted hover:text-ink"
+                      >
+                        <Icon name="trash" size={18} />
+                      </button>
+                    )}
+                  </li>
+                ))}
+              </ol>
+              <p className="mt-2 px-1 text-xs text-muted">{t("friends.club.hint")}</p>
+            </>
+          )}
           <div className="mt-4 space-y-2">
             {club.mine && (
               <Button kind="ghost" className="w-full" onClick={() => void act({ newCode: true }, "clubManage")}>
@@ -1900,6 +1844,116 @@ function ClubBody({ id, onClose, onChanged }: { id: string; onClose: () => void;
         </>
       )}
     </Sheet>
+  );
+}
+
+const GOAL_METRICS = Object.keys(CLUB_GOAL) as ClubGoalMetric[];
+const GOAL_UNIT: Record<ClubGoalMetric, MessageKey> = {
+  workouts: "month.unit.workouts",
+  sets: "month.unit.sets",
+  minutes: "month.unit.minutes",
+};
+const goalAmount = (metric: ClubGoalMetric, count: number) => t(GOAL_UNIT[metric], { count, n: fmtNum(count) });
+
+/**
+ * A club's crew goal for the week (gap list 2, item 6): everyone's posted workouts added up, with what's left and
+ * the lifter's own part. The starter sets it with a measure and a − / + target (no typing); others just see it.
+ */
+function ClubGoalCard({ club, onSave }: { club: ClubDetail; onSave: (goal: ClubGoal | null) => void }) {
+  const goal = club.goal ?? null;
+  const [editing, setEditing] = useState(false);
+  const [metric, setMetric] = useState<ClubGoalMetric>(goal?.metric ?? "workouts");
+  const [target, setTarget] = useState(goal?.target ?? Math.max(1, club.members) * CLUB_GOAL.workouts.each);
+  const pick = (m: ClubGoalMetric) => {
+    setMetric(m);
+    setTarget(goal?.metric === m ? goal.target : Math.max(1, club.members) * CLUB_GOAL[m].each);
+  };
+  if (editing && club.mine) {
+    const { step, max } = CLUB_GOAL[metric];
+    const bump = (dir: 1 | -1, size: 1 | 2 | 5) => {
+      const next = Math.max(step, Math.min(max, target + dir * size * step));
+      if (next === target) return false;
+      setTarget(next);
+      return true;
+    };
+    return (
+      <div className="card mt-4 p-4">
+        <p className={`mb-2 ${SECTION_LABEL}`}>{t("social.club.goal")}</p>
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t("friends.board.by")}>
+          {GOAL_METRICS.map((m) => (
+            <Chip key={m} active={metric === m} onClick={() => pick(m)}>
+              {t(METRIC_LABEL[m])}
+            </Chip>
+          ))}
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <Bump dir={-1} size="sm" label={t("social.club.target")} onStep={bump} />
+          <span className="num text-center font-semibold" aria-live="polite">
+            {goalAmount(metric, target)}
+          </span>
+          <Bump dir={1} size="sm" label={t("social.club.target")} onStep={bump} />
+        </div>
+        <p className="mt-2 text-xs text-muted">{t("social.club.goalHint")}</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button
+            className="flex-1"
+            onClick={() => {
+              onSave({ metric, target });
+              setEditing(false);
+            }}
+          >
+            {t("social.club.goalSave")}
+          </Button>
+          {goal && (
+            <Button
+              kind="ghost"
+              onClick={() => {
+                onSave(null);
+                setEditing(false);
+              }}
+            >
+              {t("social.club.clearGoal")}
+            </Button>
+          )}
+          <Button kind="quiet" onClick={() => setEditing(false)}>
+            {t("social.club.cancel")}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+  if (!goal)
+    return club.mine ? (
+      <Button kind="ghost" icon="target" className="mt-3 w-full" onClick={() => setEditing(true)}>
+        {t("social.club.setGoal")}
+      </Button>
+    ) : null;
+  const total = club.rows.reduce((sum, r) => sum + r[goal.metric], 0);
+  const mine = club.rows.find((r) => r.me)?.[goal.metric] ?? 0;
+  const left = Math.max(0, goal.target - total);
+  const title = t("social.club.goalTitle", { amount: goalAmount(goal.metric, goal.target) });
+  return (
+    <div className="card-tint mt-4 p-4" style={{ "--tint": "var(--color-mint)" } as CSSProperties}>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="min-w-0 font-semibold">{title}</span>
+        <span className="num shrink-0 text-sm text-muted">
+          {fmtNum(Math.min(total, goal.target))}/{fmtNum(goal.target)}
+        </span>
+      </div>
+      <div className="mt-2">
+        <Bar value={total / goal.target} label={t("awards.progress", { name: title })} colour={left ? undefined : "var(--color-good)"} />
+      </div>
+      <p className="mt-2 text-sm">
+        {left
+          ? t("social.club.goalLeft", { left: goalAmount(goal.metric, left), mine: goalAmount(goal.metric, mine) })
+          : t("social.club.goalDone")}
+      </p>
+      {club.mine && (
+        <button type="button" onClick={() => setEditing(true)} className="press mt-2 min-h-11 text-sm font-medium text-accent">
+          {t("social.club.changeGoal")}
+        </button>
+      )}
+    </div>
   );
 }
 
@@ -2194,6 +2248,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
         </Chip>
       </div>
       <div className="mt-4">
+        {tab === "feed" && <TrainingNow />}
         {tab === "feed" && (
           <Posts
             op="feed"
@@ -2208,9 +2263,11 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
             }
           />
         )}
+        {tab === "feed" && (me.following ?? 0) < 5 && <Suggestions />}
         {tab === "board" && (
           <>
             <Challenges />
+            <MonthFriends />
             <Board onPeople={() => setTab("people")} />
           </>
         )}
@@ -2265,6 +2322,7 @@ export function PersonScreen({ handle }: { handle: string }) {
   const [missing, setMissing] = useState<string | null>(null);
   const [menu, setMenu] = useState(false);
   const [reporting, setReporting] = useState(false);
+  const [peopleList, setPeopleList] = useState<"followers" | "following" | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const joined = !!me?.profile;
   const h = cleanHandle(handle);
@@ -2344,19 +2402,31 @@ export function PersonScreen({ handle }: { handle: string }) {
       </div>
       <div className="card mt-4 flex items-center gap-4 p-4">
         <Avatar name={person.name} avatar={person.avatar} size={56} />
-        <dl className="grid flex-1 grid-cols-3 text-center">
-          {[
-            [t("friends.person.posts"), person.posts],
-            [t("friends.person.followers"), person.followers],
-            [t("friends.person.following"), person.following],
-          ].map(([k, v]) => (
-            <div key={String(k)}>
-              <dd className="num text-lg font-bold">{fmtNum(Number(v))}</dd>
-              <dt className="text-xs text-muted">{k}</dt>
-            </div>
-          ))}
-        </dl>
+        <div className="grid flex-1 grid-cols-3 text-center">
+          <div>
+            <span className="num block text-lg font-bold">{fmtNum(person.posts)}</span>
+            <span className="block text-xs text-muted">{t("friends.person.posts")}</span>
+          </div>
+          {(["followers", "following"] as const).map((k) => {
+            const inner = (
+              <>
+                <span className="num block text-lg font-bold">{fmtNum(person[k])}</span>
+                <span className="block text-xs text-muted">
+                  {t(k === "followers" ? "friends.person.followers" : "friends.person.following")}
+                </span>
+              </>
+            );
+            return person.canSee && person.relation !== "blocked" ? (
+              <button key={k} type="button" onClick={() => setPeopleList(k)} className="press min-h-11 rounded-xl">
+                {inner}
+              </button>
+            ) : (
+              <div key={k}>{inner}</div>
+            );
+          })}
+        </div>
       </div>
+      <ProfileStats person={person} />
       {person.followsYou && !self && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.followsYou")}</p>}
       {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}
       <Showcase person={person} />
@@ -2422,8 +2492,21 @@ export function PersonScreen({ handle }: { handle: string }) {
         </div>
       </Sheet>
       <ReportSheet open={reporting} onClose={() => setReporting(false)} kind="profile" id={person.handle} />
+      <PersonPeopleSheet handle={person.handle} list={peopleList} onClose={() => setPeopleList(null)} />
     </div>
   );
+}
+
+/** The level and training-week streak for the profile, worked out only once the lifter has joined Friends. */
+function useGameStats(on: boolean): { level: number; streak: number } | null {
+  const { events, stats, profile } = useApp();
+  const now = useNow();
+  const hour = Math.floor(now / 3_600_000);
+  return useMemo(() => {
+    if (!on) return null;
+    const g = game(events, stats, profile, hour * 3_600_000);
+    return { level: g.level.level, streak: g.streak.weeks };
+  }, [on, events, stats, profile, hour]);
 }
 
 let lastSent = "";
@@ -2439,20 +2522,21 @@ function useProfileSync() {
   const lifts = useMemo(() => bestLifts(events), [events]);
   const suspended = !!me?.suspended;
   const joinedNow = !!p;
+  const stats = useGameStats(joinedNow);
   useEffect(() => {
     if (!joinedNow || suspended || !pendingInvite() || location.hash.startsWith("#/invite/")) return;
     void acceptPending().then((handle) => (handle ? refreshSocial() : undefined));
   }, [joinedNow, suspended]);
   useEffect(() => {
     if (!p || suspended) return;
-    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : []);
+    const change = profileChanges(p, avatar, p.showLifts && p.weights ? lifts : [], stats);
     const key = JSON.stringify(change);
     if (!change || key === lastSent) return;
     lastSent = key;
     social<SocialMe>("update", change)
       .then((m) => m.profile && useSocial.setState({ me: m }))
       .catch(() => undefined);
-  }, [p, avatar, lifts, suspended]);
+  }, [p, avatar, lifts, suspended, stats]);
 }
 
 /**

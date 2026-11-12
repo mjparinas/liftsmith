@@ -13,6 +13,17 @@ export interface PostExercise {
   r: number;
   /** Metres, for cardio logged with distance. */
   d?: number;
+  /** Every set in order (weights null while the poster hides them), for the whole-workout view. Older posts have none. */
+  log?: PostSet[];
+  /** A new best (estimated one-rep max) on this exercise in this workout. */
+  pr?: boolean;
+}
+
+/** One set in a posted workout: kilograms (or null), reps or seconds, and metres for cardio. */
+export interface PostSet {
+  w: number | null;
+  r: number;
+  d?: number;
 }
 
 /**
@@ -54,6 +65,13 @@ export interface SocialProfile {
   showLifts: boolean;
   /** The best lifts last sent by the app, for the profile's showcase. */
   lifts: ShowcaseLift[];
+  /** Can be suggested to people with a tie to the lifter (a mutual follow, a club, a tagged workout). On to start. */
+  suggest: boolean;
+  /** Mutual friends see when the lifter is mid-workout and can cheer (off to start; Friends gap list 2, item 4). */
+  live: boolean;
+  /** The level and the training-week streak last sent by the app, shown on the profile to people who see the posts. */
+  level: number;
+  streak: number;
 }
 
 /**
@@ -96,6 +114,8 @@ export interface PushPrefs {
   comments: boolean;
   sent: boolean;
   likes: boolean;
+  /** A friend's cheer during a workout (on to start). */
+  cheers: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -119,6 +139,34 @@ export interface PersonCard {
   muted: boolean;
   /** Their best lifts, when they show them and the reader can see their posts. */
   lifts: ShowcaseLift[];
+  /** Their level and training-week streak (0 when the reader can't see their posts, or not sent yet). */
+  level: number;
+  streak: number;
+  /** When each workout they posted in the last 12 weeks started (ms), from posts the reader may see. */
+  trained: number[];
+}
+
+/** Why someone is suggested: they follow the lifter, they're followed by people the lifter follows, a club, a tag. */
+export type SuggestReason = "followsYou" | "mutual" | "club" | "partner";
+
+/** Someone the lifter may know, with the strongest tie as the reason. */
+export interface Suggestion {
+  handle: string;
+  name: string;
+  avatar: string;
+  reason: SuggestReason;
+  /** For "mutual": how many people the lifter follows also follow them, and one of their names. For "club": its name. */
+  count?: number;
+  via?: string;
+  open: boolean;
+}
+
+/** One person in a list: followers, following, search results. */
+export interface PersonRow {
+  handle: string;
+  name: string;
+  avatar: string;
+  at?: number;
 }
 
 export interface FeedPost {
@@ -159,9 +207,11 @@ export interface FeedComment {
   mine: boolean;
   /** The reader may delete it: their own comment, or any comment on their own post. */
   canDelete: boolean;
+  /** For a reply, the top comment it answers (replies sit one level deep). */
+  replyTo?: string;
 }
 
-export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag";
+export type ActivityKind = "follow" | "request" | "like" | "comment" | "sent" | "challenge" | "tag" | "mention" | "reply" | "cheer";
 export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
@@ -198,7 +248,15 @@ export const SOCIAL_LIMITS = {
   /** Clubs one lifter can be in. */
   clubsEach: 10,
   exercises: 20,
+  /** Sets kept per exercise in a post's log. */
+  setsEach: 30,
   muscles: 6,
+  /** People suggested at once, and search results. */
+  suggestions: 20,
+  /** Letters needed before a name search runs. */
+  searchMin: 2,
+  /** Weeks of a profile's training calendar. */
+  calendarWeeks: 12,
 };
 
 /** Lowercase letters, digits and underscores. */
@@ -272,7 +330,40 @@ export interface ClubDetail extends ClubSummary {
   code: string;
   owner: { handle: string; name: string };
   rows: BoardRow[];
+  /** The crew's goal for the week, everyone's posted workouts added up; null when the starter hasn't set one. */
+  goal?: ClubGoal | null;
 }
+
+/** A mutual friend who has gone quiet: no post lately after training regularly before (coach's notes). */
+export interface QuietFriend {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** Their last post (ms). */
+  lastAt: number;
+  /** Workouts posted in the six weeks before they went quiet. */
+  before: number;
+}
+
+/** Everything the coach's friend notes need, in one call (`nudges` op). */
+export interface FriendSignals {
+  week: BoardRow[];
+  challenges: Challenge[];
+  quiet: QuietFriend[];
+}
+
+/** What a club's members add up to each week. */
+export type ClubGoalMetric = "workouts" | "sets" | "minutes";
+export interface ClubGoal {
+  metric: ClubGoalMetric;
+  target: number;
+}
+/** The biggest weekly goal for each measure, and the step the − and + buttons move it by. */
+export const CLUB_GOAL: Record<ClubGoalMetric, { max: number; step: number; each: number }> = {
+  workouts: { max: 500, step: 1, each: 3 },
+  sets: { max: 20_000, step: 10, each: 60 },
+  minutes: { max: 50_000, step: 30, each: 150 },
+};
 
 /** What the join screen shows before the lifter joins. */
 export interface ClubPreview {
@@ -282,4 +373,31 @@ export interface ClubPreview {
   owner: { handle: string; name: string };
   /** Already a member. */
   joined: boolean;
+}
+
+/** The cheers a friend can send mid-workout, like a video call's reactions. */
+export const CHEERS = ["🔥", "💪", "👏", "🎉", "⚡"] as const;
+export type Cheer = (typeof CHEERS)[number];
+
+/** A mutual friend who is training right now. */
+export interface TrainingNow {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** The exercise they're on, its id (the reader's app names it), and sets done of the workout's total. */
+  exercise: string;
+  done: number;
+  total: number;
+  startedAt: number;
+  updatedAt: number;
+}
+
+/** A cheer that reached the lifter during their workout. */
+export interface CheerIn {
+  id: string;
+  handle: string;
+  name: string;
+  avatar: string;
+  emoji: Cheer;
+  at: number;
 }

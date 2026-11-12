@@ -13,11 +13,15 @@ const profile = (over: Partial<SocialProfile> = {}): SocialProfile => ({
   autoPost: false,
   weights: true,
   public: false,
-  push: { follows: true, comments: true, sent: true, likes: false },
+  push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
   avatar: "",
   audience: "all",
   showLifts: true,
   lifts: [],
+  suggest: true,
+  live: false,
+  level: 0,
+  streak: 0,
   ...over,
 });
 

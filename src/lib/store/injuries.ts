@@ -57,7 +57,7 @@ function afterInjuryChange(c: Ctx) {
         warmup: wu.length ? wu : undefined,
       });
     }
-    const next = loadItem(get, { ...a, plan: { ...a.plan, items } }, Math.min(a.index, items.length));
+    const next = loadItem(get().events, { ...a, plan: { ...a.plan, items } }, Math.min(a.index, items.length));
     set({ active: next });
     persistActive(next);
   }

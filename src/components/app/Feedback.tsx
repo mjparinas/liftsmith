@@ -119,7 +119,9 @@ export function Feedback() {
           {showDiag ? t("fb.hide") : t("fb.see")}
         </button>
         {showDiag && (
-          <pre className="card mt-2 overflow-x-auto whitespace-pre-wrap p-3 text-xs text-muted">{diagPreview(d, t("fb.noErrors"))}</pre>
+          <pre className="card mt-2 whitespace-pre-wrap p-3 text-xs [overflow-wrap:anywhere] text-muted">
+            {diagPreview(d, t("fb.noErrors"))}
+          </pre>
         )}
         <p className="mt-2 text-xs text-faint">{t("fb.never")}</p>
       </Section>

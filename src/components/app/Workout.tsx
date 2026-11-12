@@ -9,7 +9,6 @@ import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
 import { queueStrava, stravaWorkout } from "@/lib/connections";
-import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
@@ -28,7 +27,7 @@ import { epley, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
-import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
+import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -45,19 +44,21 @@ import { AutoCount, AutoCountButton, countable, countSource, loadCountPrefs, sav
 import { burst } from "./burst";
 import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
-import { clock, loadText, plateText, repsText, setText } from "./format";
+import { clock, loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
-import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
+import { Button, EmptyState, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
+import { CheerRain } from "./workout/CheerRain";
 import { ComingUp } from "./workout/ComingUp";
 import { HandsFree } from "./workout/HandsFree";
 import { MachineCard } from "./workout/MachineCard";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
+import { aheadSteps, sessionFields } from "./workout/sessionAhead";
 import { SetCard } from "./workout/SetCard";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
 import { TempoCoach } from "./workout/TempoCoach";
@@ -288,17 +289,24 @@ export function Workout() {
   // Keep the live notification in step. A new heart rate reading alone (about one a second) updates it at
   // most every HR_NOTIFY_MS, so a locked phone isn't redrawing its notification every second.
   const notified = useRef({ key: "", at: 0 });
+  // The sets after this one, for Log set on the notification with the app closed (sessionAhead.ts). Worked out
+  // again only when the workout moves, not on every heart rate reading.
+  const ahead = useRef({ key: "", steps: [] as AheadStep[] });
   useEffect(() => {
     if (!active || !ex || !gym) return;
-    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}`;
+    const key = `${active.index}:${active.restUntil}:${active.weight}:${active.reps}:${doneSets}:${warmDone}:${watchMotion}:${ex.id}:${active.tag ?? ""}:${active.plan.items.length}`;
     const t0 = Date.now();
     if (key === notified.current.key && t0 - notified.current.at < HR_NOTIFY_MS) return;
     notified.current = { key, at: t0 };
+    const f = sessionFields(active, events, profile.unit, gym);
+    if (!f) return;
+    if (ahead.current.key !== key)
+      ahead.current = { key, steps: aheadSteps(active, events, profile.unit, gym, profile.training?.autoRest !== false) };
     void updateSession({
       title: resting ? t("workout.restTitle", { name: ex.name }) : ex.name,
-      setLabel,
-      next: setText(ex, active.weight, active.reps, profile.unit, active.distanceM),
-      plates: plateText(ex, active.weight, gym),
+      setLabel: f.setLabel,
+      next: f.next,
+      plates: f.plates,
       restUntil: resting ? active.restUntil : null,
       restTotal: resting ? active.restTotal : undefined,
       hr: bpm ?? undefined,
@@ -308,11 +316,12 @@ export function Workout() {
       speak: voiceOn && resting && voiceState ? restEndCue(voiceState) : undefined,
       speakLang: currentTag(),
       // Android 16 Live Updates (status bar chip, Samsung's Now Bar) and the iOS Live Activity.
-      chip: warming ? chipText(true, warmDone + 1, warmTotal) : chipText(false, Math.min(doneSets + 1, item?.sets ?? 1), item?.sets ?? 1),
-      done: events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && !e.tag).length,
-      total: active.plan.items.reduce((n, i) => n + i.sets, 0),
+      chip: f.chip,
+      done: f.done,
+      total: f.total,
       sessionId: active.sessionId,
       motion: watchMotion || undefined,
+      ahead: ahead.current.steps,
     });
   }, [active?.index, active?.restUntil, active?.weight, active?.reps, doneSets, warmDone, bpm, watchMotion]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -480,6 +489,7 @@ export function Workout() {
   return (
     <div className={docked ? (undoShown || voiceLog ? "pb-[17.5rem]" : "pb-56") : undoShown || voiceLog ? "pb-[14.5rem]" : "pb-44"}>
       <PrMoment />
+      <CheerRain sessionId={active.sessionId} startedAt={active.startedAt} />
       <header className="flex items-center justify-between pt-1">
         <button
           type="button"
@@ -587,15 +597,14 @@ export function Workout() {
                 )}
               </div>
               <div className="flex shrink-0 gap-2">
-                {/* Changing the plan is Pro: free lifters see the button with a Pro tag, and it opens the paywall. */}
+                {/* "Short on time" is free; working around taken equipment inside the sheet is Pro (Melvin, 2026-11-12). */}
                 <button
                   type="button"
-                  onClick={() => (can("replan") ? setPlanOpen(true) : go("pro", "replan"))}
+                  onClick={() => setPlanOpen(true)}
                   className="press relative grid h-11 w-11 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-                  aria-label={can("replan") ? t("coach.changePlan") : t("pro.locked", { what: t("coach.changePlan") })}
+                  aria-label={t("coach.changePlan")}
                 >
                   <Icon name="clock" size={20} />
-                  {!can("replan") && <ProTag className="absolute -right-2 -top-1.5 text-[0.625rem]" />}
                 </button>
                 <button
                   type="button"
