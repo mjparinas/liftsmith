@@ -5,6 +5,7 @@
 // ones and unknown handles all get the same "isn't public" page with noindex, so the page never tells anyone
 // whether a private handle exists. Like the share link page, it's plain HTML with no scripts and its own strict
 // CSP (SHARE_PAGE_CSP), and everything the lifter typed is escaped. Decision record: docs/decisions/friends.md.
+import { threaded } from "@/lib/commentThread";
 import { isMsgLang, MSG_LANGS, type MsgLang } from "@/lib/messageText";
 import { SHARE_PAGE_CSP } from "@/lib/securityHeaders";
 import { SITE_URL } from "@/lib/site";
@@ -23,10 +24,28 @@ export const SITEMAP_MAX = 45_000;
 
 export const profilePageUrl = (handle: string) => `${SITE_URL}/u/${handle}/`;
 
+/** Comments shown under each workout on the web page; the rest are counted, and read in the app. */
+export const PAGE_COMMENTS = 20;
+
+/** A comment as the web page shows it: read-only, and linked to its writer only while their profile is public too. */
+export interface PublicComment {
+  id: string;
+  name: string;
+  /** The writer's handle while their own profile is public, else "" (no handle and no link). */
+  handle: string;
+  at: number;
+  body: string;
+  replyTo?: string;
+}
 export interface PublicPost {
   at: number;
   body: PostBody;
   caption: string;
+  likes: number;
+  cheers: number;
+  /** Every visible comment, of which `comments` holds the first PAGE_COMMENTS in thread order. */
+  commentCount: number;
+  comments: { c: PublicComment; reply: boolean }[];
 }
 export interface PublicProfile {
   handle: string;
@@ -45,6 +64,9 @@ export interface PublicProfile {
   /** When each workout posted for everyone in the calendar's weeks started (ms). */
   trained: number[];
 }
+
+/** A comment the page shows (`c` the comment, `cp` its writer, ?1 the profile's account). */
+const SHOWN_COMMENT = "c.hidden = 0 AND cp.suspended = 0 AND c.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)";
 
 /** A public, unsuspended profile and its recent workouts, or null for anything else. */
 export async function publicProfile(handle: string, now = Date.now()): Promise<PublicProfile | null> {
@@ -75,10 +97,51 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
     [id],
   );
   // Only posts for everyone: "friends" and "only me" posts never reach the web.
-  const rows = await query<{ at: number; body: string; caption: string }>(
-    `SELECT at, body, caption FROM posts WHERE account_id = ? AND hidden = 0 AND audience = 'all' ORDER BY at DESC LIMIT ${PAGE_POSTS}`,
+  // Counts are the app's (likes, visible comments) plus the cheers sent during that workout: a cheer carries the
+  // workout's session id, which is the post's workout_id. Comments by suspended people, or people the lifter blocked,
+  // are left out of both the count and the list.
+  const rows = await query<{ id: string; at: number; body: string; caption: string; likes: number; cheers: number; comments: number }>(
+    `SELECT p.id AS id, p.at AS at, p.body AS body, p.caption AS caption,
+       (SELECT COUNT(*) FROM post_likes l WHERE l.post_id = p.id) AS likes,
+       (SELECT COUNT(*) FROM cheers ch WHERE ch.to_id = p.account_id AND ch.session_id = p.workout_id) AS cheers,
+       (SELECT COUNT(*) FROM post_comments c JOIN social_profiles cp ON cp.account_id = c.account_id
+         WHERE c.post_id = p.id AND ${SHOWN_COMMENT}) AS comments
+     FROM posts p WHERE p.account_id = ?1 AND p.hidden = 0 AND p.audience = 'all' ORDER BY p.at DESC LIMIT ${PAGE_POSTS}`,
     [id],
   );
+  const ids = rows.map((r) => String(r.id));
+  const said = ids.length
+    ? await query<{
+        id: string;
+        post_id: string;
+        at: number;
+        body: string;
+        handle: string;
+        name: string;
+        public: number;
+        reply_to: string;
+      }>(
+        `SELECT c.id AS id, c.post_id AS post_id, c.created_at AS at, c.body AS body, cp.handle AS handle, cp.name AS name,
+           cp.public AS public, c.reply_to AS reply_to
+         FROM post_comments c JOIN social_profiles cp ON cp.account_id = c.account_id
+         WHERE c.post_id IN (${ids.map(() => "?").join(", ")}) AND ${SHOWN_COMMENT.replace(/\?1/g, "?")}
+         ORDER BY c.created_at LIMIT 2000`,
+        [...ids, id],
+      )
+    : [];
+  const byPost = new Map<string, PublicComment[]>();
+  for (const c of said) {
+    const list = byPost.get(String(c.post_id)) ?? [];
+    list.push({
+      id: String(c.id),
+      name: String(c.name),
+      handle: Number(c.public) ? String(c.handle) : "",
+      at: Number(c.at),
+      body: String(c.body),
+      ...(c.reply_to ? { replyTo: String(c.reply_to) } : {}),
+    });
+    byPost.set(String(c.post_id), list);
+  }
   const days = await query<{ at: number }>(
     `SELECT at FROM posts WHERE account_id = ? AND hidden = 0 AND audience = 'all' AND at >= ? ORDER BY at LIMIT 200`,
     [id, now - (SOCIAL_LIMITS.calendarWeeks * 7 + 7) * DAY],
@@ -94,7 +157,15 @@ export async function publicProfile(handle: string, now = Date.now()): Promise<P
   const recent: PublicPost[] = [];
   for (const r of rows) {
     try {
-      recent.push({ at: Number(r.at), body: JSON.parse(String(r.body)) as PostBody, caption: String(r.caption ?? "") });
+      recent.push({
+        at: Number(r.at),
+        body: JSON.parse(String(r.body)) as PostBody,
+        caption: String(r.caption ?? ""),
+        likes: Number(r.likes ?? 0),
+        cheers: Number(r.cheers ?? 0),
+        commentCount: Number(r.comments ?? 0),
+        comments: threaded(byPost.get(String(r.id)) ?? []).slice(0, PAGE_COMMENTS),
+      });
     } catch {
       // a broken row is left out rather than breaking the page
     }

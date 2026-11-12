@@ -5,6 +5,7 @@
 // Friends gap list 2, item 5 (Melvin, 2026-11-12).
 import { Fragment, useEffect, useMemo, useState, type FormEvent, type ReactNode } from "react";
 
+import { threaded } from "@/lib/commentThread";
 import { t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { social, socialError } from "@/lib/social";
@@ -37,19 +38,7 @@ export function mentionQuery(text: string): string | null {
   return m ? m[1]!.toLowerCase() : null;
 }
 
-/** Comments in order, each top comment followed by its replies. A reply whose top comment is gone stands alone. */
-export function threaded(comments: readonly FeedComment[]): { c: FeedComment; reply: boolean }[] {
-  const ids = new Set(comments.map((c) => c.id));
-  const replies = new Map<string, FeedComment[]>();
-  for (const c of comments) if (c.replyTo && ids.has(c.replyTo)) replies.set(c.replyTo, [...(replies.get(c.replyTo) ?? []), c]);
-  const out: { c: FeedComment; reply: boolean }[] = [];
-  for (const c of comments) {
-    if (c.replyTo && ids.has(c.replyTo)) continue;
-    out.push({ c, reply: false });
-    for (const r of replies.get(c.id) ?? []) out.push({ c: r, reply: true });
-  }
-  return out;
-}
+export { threaded };
 
 export function CommentsSheet(props: {
   post: FeedPost | null;
