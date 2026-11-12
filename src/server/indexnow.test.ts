@@ -5,7 +5,8 @@ import { INDEXNOW_ENDPOINT, INDEXNOW_KEY, INDEXNOW_KEY_LOCATION } from "@/lib/in
 import type { Route } from "@/lib/seo";
 
 import { resetDb } from "./db";
-import { pingIndexNow } from "./indexnow";
+import { peopleRoutes, pingIndexNow } from "./indexnow";
+import { handle } from "./social";
 
 // IndexNow pings from the daily admin job: new and changed public pages go once, nothing else, and only from
 // production. The key file must be served from our own host for IndexNow to trust the pings.
@@ -77,5 +78,34 @@ describe("IndexNow", () => {
       vi.fn(async () => new Response("", { status: 202 })),
     );
     expect(await pingIndexNow({ routes: ROUTES, now: NOW, force: true })).toEqual({ sent: 2 });
+  });
+
+  it("sends public profiles when they go public or post, and once more when they stop being public", async () => {
+    const call = (who: string, op: string, b: Record<string, unknown> = {}) => handle(who, { op, ...b }, NOW);
+    const post = (id: string, at: number) => ({
+      workoutId: id,
+      at,
+      body: {
+        seconds: 1800,
+        sets: 6,
+        volume: 1000,
+        prs: 0,
+        muscles: [],
+        exercises: [{ id: "bench-press", name: "Bench press", sets: 3, w: 60, r: 8 }],
+      },
+    });
+    await call("acc-a", "join", { handle: "alex", name: "Alex", agree: true });
+    await call("acc-a", "post", post("s1", NOW - 3 * 86_400_000));
+    expect(await peopleRoutes()).toEqual([]); // private: never sent
+    await call("acc-a", "update", { public: true });
+    expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 1 });
+    expect(bodies.at(-1)!.urlList).toEqual(["https://www.getliftsmith.com/u/alex/"]);
+    expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 0 });
+    await call("acc-a", "post", post("s2", NOW - 86_400_000));
+    expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 1 });
+    await call("acc-a", "update", { public: false });
+    expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 1 });
+    expect(bodies.at(-1)!.urlList).toEqual(["https://www.getliftsmith.com/u/alex/"]);
+    expect(await pingIndexNow({ routes: [], now: NOW, force: true })).toEqual({ sent: 0 });
   });
 });
