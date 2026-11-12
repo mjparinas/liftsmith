@@ -6,7 +6,7 @@ Melvin, 2026-11-12: "I use sonos at home, would be cool to have the app adjust m
 
 - **Connect once** in Settings › Connected apps › Sonos (the card shows only while the lab is on, or while Sonos is still connected so it can be removed). It uses the same OAuth flow as Strava and Oura (`connect.ts`, provider `sonos`), so it needs a Liftsmith account; the tokens stay on our server, sealed like the others.
 - **Pick a speaker** (a Sonos group: one speaker or several playing together) on the same card.
-- **On the workout screen**, a Sonos card under the set or rest card (`SonosBar` in `Sonos.tsx`): album art, the song and artist, which speaker, previous, play or pause, next, and volume − / + (the shared `Bump`, so it holds to repeat; the new level is sent 350 ms after the last press, so a held button sends one change). Its gear opens the same settings in a sheet. It's not on the screen once the workout is finished, and nothing in it is needed to log a set.
+- **On the workout screen**, a Sonos card under the set or rest card (`SonosBar` in `Sonos.tsx`): album art, the song and artist, which speaker, previous, play or pause, next, and a speaker icon with a volume slider (Melvin, 2026-11-12: "volume should be a speaker icon with a slider"; the new level is sent 300 ms after the slider stops, so a drag sends one change, with a light tick every 5 steps). Its gear opens the same settings in a sheet. It's not on the screen once the workout is finished, and nothing in it is needed to log a set.
 - **Follow my workout** (on by default): the **set volume** (40) when a workout starts and when rest ends, the **rest volume** (25) when rest starts, optionally a **Sonos favourite** to start the workout with (otherwise it just presses play), and **pause when the workout ends** (on). Rest is never louder than sets. +30 s during rest changes nothing; skipping rest turns it back up straight away.
 - Settings are kept on the device (`ls.sonos` in localStorage), not synced: the speakers belong to one home.
 
@@ -18,7 +18,10 @@ Melvin, 2026-11-12: "I use sonos at home, would be cool to have the app adjust m
 - **Following the workout** is `followWorkout` in `src/lib/sonos.ts`, subscribed to the store from `Workout.tsx`'s module (like the heart rate release), so it runs however the workout starts or ends. The rules are the pure `musicSteps` (tested). A workout coming back from storage on a reload (started more than a minute ago) doesn't restart the music. The natural end of rest is one timeout set for that moment, during a workout only ([Battery](battery.md)). If the app is in the background when rest runs out, the phone may hold that timeout until the app is back; the volume then goes up on return or with the next set. Nothing else polls: the card reads Sonos when it opens, when the app comes back to the front, when rest starts or ends, and 1.2 s after a skip or a favourite.
 - **Platforms:** pure web code, so Android, iOS and the web app get it together. Sonos's sign-in page opens in the browser and comes back through `liftsmith://connected` on the phones, like the other connections.
 
-## What Melvin needs to do
+## Setting up the keys
+
+**Done 2026-11-12:** Melvin created the Control Integration (display name Liftsmith, key name `liftsmith`, the redirect URI below) and set `SONOS_CLIENT_ID` and `SONOS_CLIENT_SECRET` in Vercel for Production and Preview. The steps, for a new key:
+
 
 1. Sign in at https://developer.sonos.com and create a free Sonos developer account and open **My Account › Integrations › New Control Integration**.
 2. Name it Liftsmith, add a short description and a support email (hello@getliftsmith.com), and create a key (name it `liftsmith`). The **Key** is the client id and the **Secret** is the client secret.
@@ -30,5 +33,6 @@ Sonos's Control API only reaches speakers on the **Sonos S2** app; S1-only speak
 
 ## Open
 
-- Not yet tried against real speakers (no keys when it was built).
+- Not yet tried against real speakers. The keys exist (2026-11-12); the first real connect happens once the lab reaches production.
+- Whether the integration needs Sonos's review (the portal's Submit) before it works for anyone besides its developer account.
 - Sonos can push changes to an event callback URL; we read on events instead, so the song name can lag until the next read.
