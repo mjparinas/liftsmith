@@ -15,6 +15,7 @@ import { useNow } from "@/lib/useNow";
 import { plateText, setText } from "./format";
 import { ProLocked } from "./ProLocked";
 import { goBack } from "./router";
+import { SetHints } from "./SetHints";
 import { HUE } from "./theme";
 import { EmptyState, ScreenHeader, Section } from "./ui";
 
@@ -71,6 +72,7 @@ export function ExercisePage({ id }: { id?: string }) {
     // Desktop layout: the cards flow into two columns (.desk-cols), what to do next first.
     <div className="desk-cols pb-2">
       <ScreenHeader className="desk-span" back={back} kicker={list(ex.primary.map((m) => MUSCLE_LABEL[m]))} title={ex.name} />
+      <SetHints ex={ex} className="desk-span mt-2" />
 
       {next && (
         <section

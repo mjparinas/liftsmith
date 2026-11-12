@@ -4,6 +4,7 @@ import { useMemo, useState, type ReactNode } from "react";
 
 import { searchExercises } from "@/lib/exerciseSearch";
 import { t } from "@/lib/i18n";
+import { perSide } from "@/lib/sides";
 import { MUSCLE_LABEL, MUSCLES, type Exercise, type Gym, type Muscle } from "@/lib/types";
 
 import { muscleHue } from "./theme";
@@ -103,6 +104,7 @@ export function ExerciseBrowser({
                           <span className="block font-medium">{e.name}</span>
                           <span className="block text-sm text-muted">
                             {e.primary.map((m) => MUSCLE_LABEL[m]).join(", ")}
+                            {!e.cardio && perSide(e.id) ? ` · ${t("fmt.perSide")}` : ""}
                             {extra ? ` · ${extra}` : ""}
                           </span>
                         </span>

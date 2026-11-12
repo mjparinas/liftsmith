@@ -3,8 +3,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { defaultProfile } from "./defaults";
 import { derive } from "./derive";
-import { exercise } from "./exercises";
-import { implementsFor, perSide, setVolume, totalReps, workingReps } from "./sides";
+import { exercise, EXERCISES } from "./exercises";
+import { countedReps, implementsFor, perSide, setVolume, totalReps, workingReps } from "./sides";
 import { useApp } from "./store";
 import type { SetEvent } from "./types";
 
@@ -41,6 +41,33 @@ describe("implements and sides", () => {
     expect(perSide("bulgarian-split-squat")).toBe(true);
     expect(perSide("db-bench-press")).toBe(false);
     expect(perSide("back-squat")).toBe(false);
+  });
+
+  // Melvin, 2026-11-12: "make it clear that certain exercises require you to do one side and then the other".
+  // The common one-side moves were missing (split squat, step-up, side plank, single-leg RDL, …), so they
+  // showed plain "8 reps". Any move whose name says it's one-sided is flagged; the exceptions are listed.
+  it("flags every move whose name says it's one side at a time", () => {
+    const oneSided =
+      /\b(single|one)[- ](arm|leg)\b|^one-|split squat|lunge|step-up|step-down|side plank|pistol|cossack|side-to-side squat|suitcase|archer|get-up|windmill|woodchop|pallof|anti-rotation|bird dog|kickstand|concentration|curtsy|copenhagen/i;
+    const notOneSided = new Set([
+      "one-and-a-half-squat", // "one-and-a-half" reps, both legs
+    ]);
+    const missing = EXERCISES.filter((e) => !e.cardio && oneSided.test(e.name) && !perSide(e.id) && !notOneSided.has(e.id)).map(
+      (e) => `${e.id} (${e.name})`,
+    );
+    expect(missing).toEqual([]);
+  });
+
+  it("halves what a rep counter saw on a one-side move, because it sees both sides", () => {
+    expect(countedReps("split-squat", 16)).toBe(8);
+    expect(countedReps("split-squat", 15)).toBe(8);
+    expect(countedReps("back-squat", 5)).toBe(5);
+  });
+
+  it("flags the everyday one-side moves", () => {
+    for (const id of ["split-squat", "reverse-lunge", "step-up", "single-leg-rdl", "side-plank", "bird-dog", "db-concentration-curl"])
+      expect(perSide(id), id).toBe(true);
+    expect(implementsFor(exercise("db-concentration-curl"))).toBe(1);
   });
 });
 
