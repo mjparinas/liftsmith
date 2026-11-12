@@ -546,6 +546,15 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // Monthly challenge finishers (monthly.ts, Friends gap list 3 item 10): one row per device that finished a
+  // month's challenge, for the app-wide count on the Awards card. A random id the device makes for this alone (not
+  // the usage-stats install id or an account), so a row says nothing about who finished.
+  `CREATE TABLE IF NOT EXISTS month_finishers (
+    month TEXT NOT NULL,
+    device TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (month, device)
+  )`,
   // Bells (social.ts `bell`, Friends gap list 3): the watcher gets a push when someone they follow posts a workout
   // they may see. Only while the follow stands; unfollowing, blocking or leaving deletes it.
   `CREATE TABLE IF NOT EXISTS bells (

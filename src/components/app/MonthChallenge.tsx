@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import { date, t } from "@/lib/i18n";
 import { monthChallenge, monthHistory, thisMonth, type MonthMetric } from "@/lib/monthly";
+import { useMonthFinishers } from "@/lib/monthlyCount";
 import { social } from "@/lib/social";
 import type { BoardRow } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
@@ -38,6 +39,8 @@ export function MonthCard() {
   const left = Math.max(0, m.goal - m.value);
   // Spread what's left over the weeks left, so the line says what to do this week.
   const per = Math.ceil(left / Math.max(1, m.daysLeft / 7));
+  // Everyone on the same challenge: how many lifters finished this month so far (this device counts once it has).
+  const finishers = useMonthFinishers(m.key, m.done);
   return (
     <Section title={t("month.title")} icon="calendar" info="monthly">
       <div className="card p-4">
@@ -60,6 +63,11 @@ export function MonthCard() {
             : t("month.toGo", { left: amount(m.metric, left), per: amount(m.metric, per) })}
         </p>
         {!m.done && <p className="mt-1 text-xs text-muted">{t("month.left", { count: m.daysLeft })}</p>}
+        {!!finishers && (
+          <p className="mt-1 text-xs text-muted">
+            {t(m.done ? "month.finishersDone" : "month.finishers", { count: finishers, n: fmtNum(finishers) })}
+          </p>
+        )}
         {!!medals.length && (
           <>
             <p className="mt-4 text-xs font-semibold uppercase tracking-wider text-muted">{t("month.medals")}</p>

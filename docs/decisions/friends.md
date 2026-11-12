@@ -178,7 +178,7 @@ Melvin, 2026-11-12: "it should also show the celebration emoji animation on thei
 - **Awards** shows it first (`MonthCard`, above the weekly quests, with the `monthly` glossary "i"): the goal ("November: log 200 sets"), a progress bar, and the action, per the action-over-stats rule: what's left and about how much a week finishes it ("60 sets to go: about 20 sets a week finishes it."), then the days left. Finished, it says the month's medal is theirs. Below that, the **medals** from finished months (the last 12).
 - **The badge:** a new consistency achievement, **Monthly challenger** (`monthly`: finish 1, 3, 6 and 12 monthly challenges), so finishing gets the usual badge moment and XP.
 - **Friends › Board** adds "Friends on this month's challenge" (`MonthFriends`) between challenges and the weekly board: the lifter and everyone they follow, furthest first, "Finished" with a tick or "140/200". Friends' numbers come from their posts (the `board` op now takes an optional `to`, up to 32 days), the lifter's own line from the phone (whichever is higher), and a hint says the posted numbers can trail. Hidden with fewer than two people.
-- No join step and no app-wide count of finishers for now: everyone is in by training, which is the point of "for everyone". A count would need each phone to report finishing; worth adding if Melvin wants a "4,210 lifters finished" line.
+- No join step: everyone is in by training, which is the point of "for everyone". The app-wide count of finishers came later (below, "Monthly finishers").
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/lib/monthly.test.ts` (rotation, month bounds, counting by measure, medals, days left) and `src/components/app/MonthChallenge.test.tsx` (the Awards card's action line and medals, friends ranked with Finished, the board's month window). The accessibility run scans the board with the month list.
 
@@ -243,6 +243,15 @@ Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not tra
 - The app's screens read units and the lifter's own lifts from the app's store; the dashboard hands it the log it already loaded (`useApp.setState`), without the app's start-up (no workout restore, Health import or replanning).
 - Website only, by nature (the phones already have the Friends tab). Docs in [Web dashboard](web-dashboard.md) too.
 - Tests: the Friends case in `src/components/dashboard/Dashboard.test.tsx` (the feed and the board side by side, Discover, a profile opening in the app).
+
+## Monthly finishers (gap list 3, item 10)
+
+- **The Awards card** for this month's challenge adds one line under the days left: "2,410 lifters have finished it so far." or, once the lifter has, "2,410 lifters have finished it, you included." It's the one number everyone shares, so friends (and strangers) chasing the same goal can see they're not alone; the card's action line stays first. Hidden while the count can't be reached (offline, or the static web build with no API) and while it's zero.
+- **Reporting:** when the lifter's own workouts finish the month (worked out on the phone as before), the phone sends `POST /api/monthly/ {month, device}` once (`liftsmith.monthReported`). `device` is a random id made for this alone and kept on the phone (`liftsmith.monthDevice`), not the usage-stats install id or the account, so a row says nothing about who finished, and it works with usage stats off and without signing in. The server keeps one row per month and device (`month_finishers`), so a repeat counts once.
+- **Reading:** `GET /api/monthly/?month=2026-11` returns the count (cached up to 5 minutes), read when the card is on screen and at most every 10 minutes (`useMonthFinishers`).
+- **Limits:** only the month that's on can be reported, with a day or three of slack at the edges for time zones and a late sync (`openMonths`); 120 requests an hour per address. Nothing checks that the workouts were real: it's a friendly count, not a prize, and anyone faking it only moves one number by one per id.
+- Pure web code calling the server, so Android, iOS and the web app get it together.
+- Tests: `src/server/monthly.test.ts` (once per device, the open month, junk) and the finishers cases in `MonthChallenge.test.tsx` (the count before finishing with no report, one report on finishing, nothing shown offline).
 
 ## Store answers for user-generated content
 
