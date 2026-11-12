@@ -112,3 +112,33 @@ describe("cheers", () => {
     expect(await query("SELECT * FROM live_sessions")).toEqual([]);
   });
 });
+
+describe("friend nudges", () => {
+  it("lists mutual friends who trained regularly and went quiet, with the week's board and running challenges", async () => {
+    const DAY = 86_400_000;
+    await friends();
+    await join("acc-c", "casey");
+    await follow("acc-a", "acc-c", "casey", "alex"); // one way only: never listed
+    const body = {
+      seconds: 3000,
+      sets: 12,
+      volume: 4200,
+      prs: 0,
+      muscles: ["chest"],
+      exercises: [{ id: "bench", name: "Bench", sets: 4, w: 100, r: 5 }],
+    };
+    for (let i = 0; i < 5; i++) {
+      await call("acc-b", "post", { workoutId: `b${i}`, at: NOW - (15 + i * 5) * DAY, body }, NOW - (15 + i * 5) * DAY);
+      await call("acc-c", "post", { workoutId: `c${i}`, at: NOW - (15 + i * 5) * DAY, body }, NOW - (15 + i * 5) * DAY);
+    }
+    const r = (await call("acc-a", "nudges", { from: NOW - 2 * DAY })).body as {
+      quiet: { handle: string; before: number }[];
+      week: unknown[];
+    };
+    expect(r.quiet).toMatchObject([{ handle: "blair", before: 5 }]);
+    expect(r.week.length).toBe(3);
+    // A fresh post means they're back.
+    await call("acc-b", "post", { workoutId: "b9", at: NOW - DAY, body }, NOW - DAY);
+    expect(((await call("acc-a", "nudges", { from: NOW - 2 * DAY })).body.quiet as unknown[]).length).toBe(0);
+  });
+});

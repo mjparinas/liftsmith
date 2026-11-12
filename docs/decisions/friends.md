@@ -176,6 +176,17 @@ Melvin, 2026-11-12: "it should also show the celebration emoji animation on thei
 - Pure web code, so Android, iOS and the web app get it together.
 - Tests: `src/lib/monthly.test.ts` (rotation, month bounds, counting by measure, medals, days left) and `src/components/app/MonthChallenge.test.tsx` (the Awards card's action line and medals, friends ranked with Finished, the board's month window). The accessibility run scans the board with the month list.
 
+## Friend nudges in coach's notes (gap list 2, item 9)
+
+- Coach's notes (Today's top two, Progress' "What to do next") can include up to **two notes from friends** (`src/lib/friendNotes.ts`), each with the numbers and one thing to do, like every other note:
+  - **A challenge slipping away** (warn): a running friend challenge the lifter joined, three days or fewer left, someone just ahead. "Catch Blair in Most workouts. Blair is 2 workouts ahead, with 2 days left. One more workout before it ends could close the gap." Button: See the board.
+  - **A friend pulling ahead this week** (info), only while the lifter is short of their weekly goal (`daysPerWeek`), so it never nags someone who's on track: the friend with the most workouts this week, at least two ahead. The lifter's own count comes from the phone.
+  - **A friend who's gone quiet** (info): a mutual friend with no post in 10 days after at least 4 in the six weeks before (`QUIET_DAYS`, `QUIET_BEFORE`; muted people left out). "Check in on Drew." Button: their profile. This one is about helping a friend, which is what training together is for.
+- They join the list by tone after the lifter's own notes of the same tone, so notes about the lifter's training come first. "Got it" works the same (the id changes when the numbers do).
+- One server call (`nudges`: this week's board, running challenges, quiet friends), made only by lifters in Friends, at most every 15 minutes while the app is open (`useFriendSignals`), never on a timer. Nothing is stored; the notes are worked out on the phone each time, like the rest.
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/lib/friendNotes.test.ts` (each note's rule, wording and action, the cap of two) and a `nudges` case in `src/server/socialLive.test.ts` (quiet friends: mutual only, back once they post).
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):

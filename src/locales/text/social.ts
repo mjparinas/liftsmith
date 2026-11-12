@@ -87,6 +87,23 @@ export const en = {
   "social.club.goalTitle": "This week as a crew: {amount}",
   "social.club.goalLeft": "{left} to go as a crew. You’ve put in {mine}.",
   "social.club.goalDone": "Goal reached this week. Nice work, crew.",
+  "social.note.seeBoard": "See the board",
+  "social.note.chase.title": "Catch {name} in {challenge}",
+  "social.note.chase.why": {
+    one: "{name} is {gap} ahead, with {count} day left.",
+    other: "{name} is {gap} ahead, with {count} days left.",
+  },
+  "social.note.chase.advice": "One more workout before it ends could close the gap.",
+  "social.note.pace.title": "{name} is ahead this week",
+  "social.note.pace.why": "{name} has {theirs} this week; you have {mine}.",
+  "social.note.pace.advice": "A workout today keeps pace with them and gets you closer to your weekly goal.",
+  "social.note.quiet.title": "Check in on {name}",
+  "social.note.quiet.why": {
+    one: "{name} hasn’t posted a workout in {days} days, after {count} in the six weeks before.",
+    other: "{name} hasn’t posted a workout in {days} days, after {count} in the six weeks before.",
+  },
+  "social.note.quiet.advice": "A quick message, or a cheer next time they train, can help them get back to it.",
+  "social.note.quiet.go": "See their profile",
 } as const;
 
 type Key = keyof typeof en;
@@ -177,6 +194,20 @@ export const es: Partial<Record<Key, Message>> = {
   "social.club.goalTitle": "Esta semana en grupo: {amount}",
   "social.club.goalLeft": "Faltan {left} entre todos. Tú llevas {mine}.",
   "social.club.goalDone": "Meta cumplida esta semana. ¡Buen trabajo, equipo!",
+  "social.note.seeBoard": "Ver la clasificación",
+  "social.note.chase.title": "Alcanza a {name} en {challenge}",
+  "social.note.chase.why": { one: "{name} te saca {gap} y queda {count} día.", other: "{name} te saca {gap} y quedan {count} días." },
+  "social.note.chase.advice": "Un entrenamiento más antes de que acabe podría cerrar la distancia.",
+  "social.note.pace.title": "{name} va por delante esta semana",
+  "social.note.pace.why": "{name} lleva {theirs} esta semana; tú llevas {mine}.",
+  "social.note.pace.advice": "Entrenar hoy te mantiene a su ritmo y te acerca a tu meta semanal.",
+  "social.note.quiet.title": "Pregunta cómo está {name}",
+  "social.note.quiet.why": {
+    one: "{name} no publica un entrenamiento desde hace {days} días, tras {count} en las seis semanas anteriores.",
+    other: "{name} no publica un entrenamiento desde hace {days} días, tras {count} en las seis semanas anteriores.",
+  },
+  "social.note.quiet.advice": "Un mensaje rápido, o un ánimo la próxima vez que entrene, puede ayudarle a retomarlo.",
+  "social.note.quiet.go": "Ver su perfil",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -265,6 +296,23 @@ export const fr: Partial<Record<Key, Message>> = {
   "social.club.goalTitle": "Cette semaine en équipe : {amount}",
   "social.club.goalLeft": "Encore {left} pour l’équipe. Vous en avez fait {mine}.",
   "social.club.goalDone": "Objectif atteint cette semaine. Bravo l’équipe !",
+  "social.note.seeBoard": "Voir le classement",
+  "social.note.chase.title": "Rattrapez {name} dans {challenge}",
+  "social.note.chase.why": {
+    one: "{name} a {gap} d’avance, et il reste {count} jour.",
+    other: "{name} a {gap} d’avance, et il reste {count} jours.",
+  },
+  "social.note.chase.advice": "Une séance de plus avant la fin pourrait combler l’écart.",
+  "social.note.pace.title": "{name} est devant cette semaine",
+  "social.note.pace.why": "{name} en est à {theirs} cette semaine ; vous, à {mine}.",
+  "social.note.pace.advice": "Une séance aujourd’hui vous garde dans le rythme et vous rapproche de votre objectif de la semaine.",
+  "social.note.quiet.title": "Prenez des nouvelles de {name}",
+  "social.note.quiet.why": {
+    one: "{name} n’a rien publié depuis {days} jours, après {count} séance les six semaines d’avant.",
+    other: "{name} n’a rien publié depuis {days} jours, après {count} séances les six semaines d’avant.",
+  },
+  "social.note.quiet.advice": "Un petit message, ou un encouragement à sa prochaine séance, peut l’aider à s’y remettre.",
+  "social.note.quiet.go": "Voir son profil",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -354,6 +402,23 @@ export const de: Partial<Record<Key, Message>> = {
   "social.club.goalTitle": "Diese Woche als Crew: {amount}",
   "social.club.goalLeft": "Noch {left} für die Crew. Dein Beitrag: {mine}.",
   "social.club.goalDone": "Ziel für diese Woche erreicht. Starke Leistung, Crew!",
+  "social.note.seeBoard": "Zur Rangliste",
+  "social.note.chase.title": "Hol {name} bei {challenge} ein",
+  "social.note.chase.why": {
+    one: "{name} liegt {gap} vorn, und es bleibt {count} Tag.",
+    other: "{name} liegt {gap} vorn, und es bleiben {count} Tage.",
+  },
+  "social.note.chase.advice": "Ein Training mehr vor dem Ende könnte den Abstand schließen.",
+  "social.note.pace.title": "{name} liegt diese Woche vorn",
+  "social.note.pace.why": "{name} hat diese Woche {theirs}, du {mine}.",
+  "social.note.pace.advice": "Ein Training heute hält mit und bringt dich deinem Wochenziel näher.",
+  "social.note.quiet.title": "Frag mal bei {name} nach",
+  "social.note.quiet.why": {
+    one: "{name} hat seit {days} Tagen kein Training gepostet, nach {count} in den sechs Wochen davor.",
+    other: "{name} hat seit {days} Tagen kein Training gepostet, nach {count} in den sechs Wochen davor.",
+  },
+  "social.note.quiet.advice": "Eine kurze Nachricht oder eine Anfeuerung beim nächsten Training kann helfen, wieder reinzukommen.",
+  "social.note.quiet.go": "Profil ansehen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -442,6 +507,23 @@ export const it: Partial<Record<Key, Message>> = {
   "social.club.goalTitle": "Questa settimana in gruppo: {amount}",
   "social.club.goalLeft": "Mancano {left} al gruppo. Il tuo contributo: {mine}.",
   "social.club.goalDone": "Obiettivo raggiunto questa settimana. Ottimo lavoro, gruppo!",
+  "social.note.seeBoard": "Vedi la classifica",
+  "social.note.chase.title": "Raggiungi {name} in {challenge}",
+  "social.note.chase.why": {
+    one: "{name} è avanti di {gap} e manca {count} giorno.",
+    other: "{name} è avanti di {gap} e mancano {count} giorni.",
+  },
+  "social.note.chase.advice": "Un allenamento in più prima della fine potrebbe colmare il distacco.",
+  "social.note.pace.title": "{name} è avanti questa settimana",
+  "social.note.pace.why": "{name} ha {theirs} questa settimana; tu {mine}.",
+  "social.note.pace.advice": "Allenarti oggi ti tiene al suo passo e ti avvicina all’obiettivo della settimana.",
+  "social.note.quiet.title": "Senti come sta {name}",
+  "social.note.quiet.why": {
+    one: "{name} non pubblica un allenamento da {days} giorni, dopo {count} nelle sei settimane prima.",
+    other: "{name} non pubblica un allenamento da {days} giorni, dopo {count} nelle sei settimane prima.",
+  },
+  "social.note.quiet.advice": "Un messaggio veloce, o un incoraggiamento al prossimo allenamento, può aiutarlo a riprendere.",
+  "social.note.quiet.go": "Vedi il profilo",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -521,4 +603,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "social.club.goalTitle": "今週のチーム目標:{amount}",
   "social.club.goalLeft": "チームであと{left}。あなたの分は{mine}です。",
   "social.club.goalDone": "今週の目標を達成しました。チームのみんな、お見事!",
+  "social.note.seeBoard": "ランキングを見る",
+  "social.note.chase.title": "{challenge}で{name}さんに追いつこう",
+  "social.note.chase.why": { other: "{name}さんが{gap}リードしていて、残りは{count}日です。" },
+  "social.note.chase.advice": "終わる前にもう1回ワークアウトすれば、差を詰められるかもしれません。",
+  "social.note.pace.title": "今週は{name}さんがリード",
+  "social.note.pace.why": "今週、{name}さんは{theirs}、あなたは{mine}です。",
+  "social.note.pace.advice": "今日ワークアウトすれば遅れを取らず、週の目標にも近づきます。",
+  "social.note.quiet.title": "{name}さんに声をかけてみよう",
+  "social.note.quiet.why": { other: "{name}さんは{days}日間ワークアウトを投稿していません。その前の6週間は{count}回でした。" },
+  "social.note.quiet.advice": "ひと言メッセージを送ったり、次のトレーニング中に応援したりすると、再開のきっかけになります。",
+  "social.note.quiet.go": "プロフィールを見る",
 };

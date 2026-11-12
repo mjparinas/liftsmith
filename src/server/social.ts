@@ -21,6 +21,7 @@ import {
   type ActivityItem,
   type Audience,
   type BoardMetric,
+  type BoardRow,
   type Challenge,
   type Cheer,
   type CheerIn,
@@ -31,12 +32,14 @@ import {
   type ClubSummary,
   type FeedComment,
   type FeedPost,
+  type FriendSignals,
   type Partner,
   type PersonCard,
   type PersonRow,
   type PostBody,
   type PostExercise,
   type PostSet,
+  type QuietFriend,
   type Relation,
   type ReportKind,
   type ShowcaseLift,
@@ -1424,6 +1427,46 @@ export async function cheers(accountId: string, b: Record<string, unknown>, now 
   return ok({ cheers: list });
 }
 
+// --- Friend nudges for coach's notes (gap list 2, item 9) ---
+
+/** A friend counts as quiet after this long without a post, if they posted at least QUIET_BEFORE in the six weeks before. */
+export const QUIET_DAYS = 10;
+export const QUIET_BEFORE = 4;
+
+/**
+ * What the coach's friend notes are built from, in one call: this week's board (from `from`, the week's start on
+ * the lifter's phone), the lifter's running challenges, and mutual friends who've gone quiet. The notes themselves
+ * are worked out on the phone (src/lib/friendNotes.ts) and never stored.
+ */
+export async function nudges(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const week = await board(accountId, { from: b.from }, now);
+  if (week.code !== 200) return week;
+  const ch = await challenges(accountId, {}, now);
+  const quietFrom = now - QUIET_DAYS * day;
+  const rows = await query(
+    `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
+       (SELECT MAX(p.at) FROM posts p WHERE p.account_id = sp.account_id AND p.hidden = 0 AND p.audience != 'me') AS last_at,
+       (SELECT COUNT(*) FROM posts p WHERE p.account_id = sp.account_id AND p.hidden = 0 AND p.audience != 'me'
+          AND p.at >= ?3 AND p.at < ?2) AS before
+     FROM follows f1 JOIN follows f2 ON f2.follower_id = f1.followee_id AND f2.followee_id = f1.follower_id AND f2.accepted = 1
+       JOIN social_profiles sp ON sp.account_id = f1.followee_id
+     WHERE f1.follower_id = ?1 AND f1.accepted = 1 AND sp.suspended = 0 AND ${NOT_BLOCKED("sp.account_id", "?1")}
+       AND sp.account_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?1)`,
+    [accountId, quietFrom, quietFrom - 42 * day],
+  );
+  const quiet: QuietFriend[] = rows
+    .filter((r) => n(r.last_at) > 0 && n(r.last_at) < quietFrom && n(r.before) >= QUIET_BEFORE)
+    .sort((x, y) => n(y.before) - n(x.before))
+    .slice(0, 3)
+    .map((r) => ({ ...toRow(r), lastAt: n(r.last_at), before: n(r.before) }));
+  const signals: FriendSignals = {
+    week: week.body.rows as BoardRow[],
+    challenges: ((ch.body.challenges as Challenge[] | undefined) ?? []).filter((c) => c.endsAt > now),
+    quiet,
+  };
+  return ok({ ...signals });
+}
+
 // --- The one route ---
 
 type Op = (accountId: string, b: Record<string, unknown>, now?: number) => Promise<Result>;
@@ -1968,6 +2011,7 @@ export const OPS: Record<string, Op> = {
   unsuggest,
   personPeople: (a, b) => personPeople(a, b),
   likers: (a, b) => likers(a, b),
+  nudges,
   live,
   training,
   cheer,
