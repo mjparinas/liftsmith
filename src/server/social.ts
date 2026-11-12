@@ -225,24 +225,31 @@ function checkName(v: unknown, fallback: string): { ok: true; name: string } | {
   return c.ok ? { ok: true, name: c.text } : { ok: false, error: `name.${c.error}` };
 }
 
-/** The lifter's own state: their profile (null before joining), unread activity and waiting follow requests. */
+/**
+ * The lifter's own state: their profile (null before joining), unread activity and waiting follow requests. The
+ * profile and the counts are read side by side (the unread count reads `seen_at` itself), so this is one hop.
+ */
 export async function me(accountId: string): Promise<Result> {
-  const p = await profileOf(accountId);
+  const [p, [counts]] = await Promise.all([
+    profileOf(accountId),
+    query(
+      `SELECT
+        (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 1) AS followers,
+        (SELECT COUNT(*) FROM follows WHERE follower_id = ?1 AND accepted = 1) AS following,
+        (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 0) AS requests,
+        (SELECT COUNT(*) FROM (${ACTIVITY}) ${ACTIVITY_VISIBLE}
+          AND a.at > COALESCE((SELECT seen_at FROM social_profiles WHERE account_id = ?1), 0)) AS unread`,
+      [accountId],
+    ),
+  ]);
   if (!p) return ok({ profile: null });
-  const [counts] = await query(
-    `SELECT
-      (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 1) AS followers,
-      (SELECT COUNT(*) FROM follows WHERE follower_id = ?1 AND accepted = 1) AS following,
-      (SELECT COUNT(*) FROM follows WHERE followee_id = ?1 AND accepted = 0) AS requests`,
-    [accountId],
-  );
   return ok({
     profile: toProfile(p),
     suspended: !!n(p.suspended),
     followers: n(counts?.followers),
     following: n(counts?.following),
     requests: n(counts?.requests),
-    unread: await unreadCount(accountId, n(p.seen_at)),
+    unread: n(counts?.unread),
   });
 }
 
@@ -544,8 +551,11 @@ const SUGGEST_WEIGHT: Record<SuggestReason, number> = { followsYou: 1000, partne
  * already follows them) people who turned suggestions off. There's still no list of everyone.
  */
 export async function suggest(accountId: string): Promise<Result> {
-  const mine = await joined(accountId);
-  if (isResult(mine)) return mine;
+  const [mine, people] = await Promise.all([joined(accountId), suggestPeople(accountId)]);
+  return isResult(mine) ? mine : ok({ people });
+}
+
+async function suggestPeople(accountId: string): Promise<Suggestion[]> {
   const a = [accountId];
   const [followsYou, partners, clubMates, mutuals] = await Promise.all([
     query("SELECT follower_id AS id FROM follows WHERE followee_id = ? AND accepted = 1", a),
@@ -581,7 +591,7 @@ export async function suggest(accountId: string): Promise<Result> {
   for (const r of partners) offer(s(r.id), "partner");
   for (const r of followsYou) offer(s(r.id), "followsYou");
   best.delete(accountId);
-  if (!best.size) return ok({ people: [] });
+  if (!best.size) return [];
   const ids = [...best.keys()];
   const rows = await query(
     `SELECT sp.account_id AS id, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, sp.open AS open, sp.suggest AS suggest
@@ -604,7 +614,7 @@ export async function suggest(accountId: string): Promise<Result> {
       ...(tie.via ? { via: tie.via } : {}),
       open: !!n(r.open),
     }));
-  return ok({ people });
+  return people;
 }
 
 /** Dismisses a suggestion: that person isn't suggested to the lifter again. */
@@ -1100,8 +1110,12 @@ const cursor = (v: unknown) => {
 
 /** Workouts from people the lifter follows, and their own, newest first, 20 at a time (`before` is the last `at`). */
 export async function feed(accountId: string, b: Record<string, unknown>): Promise<Result> {
-  const mine = await joined(accountId);
-  if (isResult(mine)) return mine;
+  // The check that they've joined and the page are read side by side: one hop fewer before the feed shows.
+  const [mine, page] = await Promise.all([joined(accountId), feedPage(accountId, b.before)]);
+  return isResult(mine) ? mine : ok(page);
+}
+
+async function feedPage(accountId: string, before: unknown): Promise<{ posts: FeedPost[]; more: boolean }> {
   const [cols, viewer] = POST_COLS(accountId);
   const rows = await query(
     `SELECT ${cols} FROM posts p JOIN social_profiles sp ON sp.account_id = p.account_id
@@ -1112,13 +1126,13 @@ export async function feed(accountId: string, b: Record<string, unknown>): Promi
        AND p.account_id NOT IN (SELECT muted_id FROM mutes WHERE muter_id = ?)
        AND ${seesPost("?")}
      ORDER BY p.at DESC LIMIT ${PAGE}`,
-    [viewer!, cursor(b.before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
+    [viewer!, cursor(before), accountId, accountId, accountId, accountId, accountId, accountId, accountId, accountId],
   );
   const posts = await withPartners(
     accountId,
     rows.map((r) => toPost(accountId, r)).filter((p): p is FeedPost => !!p),
   );
-  return ok({ posts, more: rows.length === PAGE });
+  return { posts, more: rows.length === PAGE };
 }
 
 /** How far back Discover looks. */
@@ -1382,11 +1396,6 @@ const ACTIVITY = `
 const ACTIVITY_VISIBLE = `a JOIN social_profiles sp ON sp.account_id = a.who
   WHERE sp.suspended = 0 AND a.who NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?1)`;
 
-async function unreadCount(accountId: string, seenAt: number): Promise<number> {
-  const [r] = await query(`SELECT COUNT(*) AS n FROM (${ACTIVITY}) ${ACTIVITY_VISIBLE} AND a.at > ?2`, [accountId, seenAt]);
-  return n(r?.n);
-}
-
 /** What happened to the lifter lately (new followers, requests, likes, comments), and marks it all seen. */
 export async function activity(accountId: string, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
@@ -1455,8 +1464,11 @@ export async function live(accountId: string, b: Record<string, unknown>, now = 
 
 /** Mutual friends training right now, most recently active first. */
 export async function training(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
-  const mine = await joined(accountId);
-  if (isResult(mine)) return mine;
+  const [mine, people] = await Promise.all([joined(accountId), trainingPeople(accountId, now)]);
+  return isResult(mine) ? mine : ok({ people });
+}
+
+async function trainingPeople(accountId: string, now: number): Promise<TrainingNow[]> {
   const rows = await query(
     `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, l.exercise_id AS exercise, l.done AS done, l.total AS total,
        l.started_at AS started_at, l.updated_at AS updated_at, sp.cheers AS cheers
@@ -1477,7 +1489,7 @@ export async function training(accountId: string, _b: Record<string, unknown>, n
     updatedAt: n(r.updated_at),
     cheers: !!n(r.cheers ?? 1),
   }));
-  return ok({ people });
+  return people;
 }
 
 /** Sends a cheer to a mutual friend who is training right now: it shows on their workout screen and as a push. */
@@ -2102,8 +2114,26 @@ export async function pushToken(accountId: string, b: Record<string, unknown>, n
   return (await saveToken(accountId, s(b.token), s(b.platform), s(b.lang), now)) ? ok() : fail(400, "token");
 }
 
+/**
+ * Everything the Friends tab shows first, in one request (2026-11-12, "the friends screen takes a while to load"):
+ * the lifter's own state (`me`), the first page of the feed, friends training now and people they may know. Each
+ * part is read side by side, so the tab waits for one request of about two hops instead of `me` and then three more
+ * requests. Before joining it's only `me`. The single ops stay for older apps and for refreshing one part.
+ */
+export async function home(accountId: string, _b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const [mine, page, people, suggestions] = await Promise.all([
+    me(accountId),
+    feedPage(accountId, undefined),
+    trainingPeople(accountId, now),
+    suggestPeople(accountId),
+  ]);
+  if (!(mine.body as { profile?: unknown }).profile) return mine;
+  return ok({ me: mine.body, feed: page, training: people, suggest: suggestions });
+}
+
 export const OPS: Record<string, Op> = {
   me: (a) => me(a),
+  home,
   join,
   update: (a, b) => update(a, b),
   leave: (a) => leave(a),

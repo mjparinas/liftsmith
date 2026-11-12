@@ -188,6 +188,20 @@ describe("posting and the feed", () => {
     expect((await call("acc-c", "like", { id: p.body.id })).code).toBe(404);
   });
 
+  it("answers the whole Friends tab in one request, the same as asking for each part", async () => {
+    // Before joining it's the lifter's own state only.
+    expect((await call("acc-a", "home")).body).toEqual({ profile: null });
+    await friends();
+    await call("acc-a", "post", workout());
+    await call("acc-b", "live", { sessionId: "s9", exercise: "bench", done: 2, total: 9 });
+    const home = (await call("acc-b", "home")).body;
+    expect(home.me).toEqual((await call("acc-b", "me")).body);
+    expect(home.feed).toEqual((await call("acc-b", "feed")).body);
+    expect(home.training).toEqual((await call("acc-b", "training")).body.people);
+    expect(home.suggest).toEqual((await call("acc-b", "suggest")).body.people);
+    expect((home.feed as { posts: unknown[] }).posts).toHaveLength(1);
+  });
+
   it("refuses workouts that are too old or empty", () => {
     expect(parsePost(workout("s1", NOW - 100 * DAY), NOW)).toEqual({ error: "old" });
     // Every set travels for the whole-workout view, checked, and without weights when the post hides them.
