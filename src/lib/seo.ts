@@ -4,6 +4,7 @@
 import { ARTICLES, type Article } from "@/content/articles";
 import { BLOG_TOPICS, topicPath } from "@/content/blogTopics";
 import { ALTERNATIVES, COMPETITORS } from "@/content/compare";
+import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 import { IMPORT_SOURCES } from "@/content/imports";
 import { landingPath, LANDINGS } from "@/content/landings";
 
@@ -154,6 +155,14 @@ export const pairsWith = (eq: Equipment) => pairs().filter((p) => p.equipment ==
 /** Alternatives for any gym (the app's own swap ranking, without a gym's equipment limit). */
 export const alternativesTo = (id: string, n = 12): Exercise[] => alternatives(id, null).slice(0, n);
 
+/**
+ * Whether an exercise's alternatives page is offered to search engines. Only the most searched lifts (the ones with
+ * a full guide, EXERCISE_GUIDES) are; the other ~950 pages read as near-copies of each other, which on a new domain
+ * can slow how much of the site gets crawled and indexed. Those stay up for visitors, `noindex, follow`, out of the
+ * sitemap (2026-11-12).
+ */
+export const indexAlternatives = (id: string): boolean => id in EXERCISE_GUIDES && alternativesTo(id).length > 0;
+
 /** "Barbell, flat bench and squat rack", or "No equipment". */
 export function needsText(e: Exercise): string {
   if (!e.needs.length) return "No equipment";
@@ -291,7 +300,7 @@ export function siteRoutes(): Route[] {
   }
   for (const e of EXERCISES) {
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
-    if (alternativesTo(e.id).length) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
+    if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
   }
   for (const m of MUSCLES) if (exercisesFor(m).length) r.push({ path: `/muscles/${muscleSlug(m)}/`, priority: 0.7 });
   for (const p of pairs()) r.push({ path: `/muscles/${muscleSlug(p.muscle)}/${equipmentSlug(p.equipment)}/`, priority: 0.6 });
