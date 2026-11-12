@@ -8,7 +8,7 @@ This builds on [Gym sharing](gym-sharing.md): lifters' own shared and listed **s
 
 1. Gym directory and finder (built, below).
 2. Gym pages in the app and on the website, plus city pages (built, below).
-3. Claiming: the owner proves the gym is theirs and edits its details; the check mark (waiting on Melvin's pick of a verification method).
+3. Claiming: the owner proves the gym is theirs and edits its details; the check mark (built, below).
 4. Per-gym QR links, a printable poster and table stand from admin, and a shipping queue. Shipping is Melvin's job.
 
 ## Step 1: the gym directory (built)
@@ -25,8 +25,22 @@ This builds on [Gym sharing](gym-sharing.md): lifters' own shared and listed **s
 ## Step 2: gym pages (built)
 
 - **On the website** (`src/server/gymPage.ts`, `/api/gyms/page/`, rewritten from `/gyms/…` in `next.config.ts`; server build only): `/gyms/` lists every city with gyms, `/gyms/<city>/` ("Gyms in Langley, BC") lists its gyms (official first, then the most lifters, then by name) with studios in their own section, and `/gyms/<city>/<gym>/` is one gym. Addresses use the city and region (`langley-bc`) and the gym's name, unique within its city, and never change on a re-import, so links and posters keep working.
-- **A gym's page** shows the facts first: name and check mark, address, Directions (Google Maps) and Open in OpenStreetMap links, the website and phone, opening hours by weekday (`src/lib/openingHours.ts` reads OSM's common forms; anything else is shown as written), the equipment its setup has, and "N Liftsmith lifters train here". Then **Add this gym to your Liftsmith**, which opens the app on the gym (`#/gymplace/<id>`), a "claim it" card on unofficial gyms (claiming is step 3), and up to eight more gyms in the city.
+- **A gym's page** shows the facts first: name and check mark, address, Directions (Google Maps) and Open in OpenStreetMap links, the website and phone, opening hours by weekday (`src/lib/openingHours.ts` reads OSM's common forms; anything else is shown as written), the equipment its setup has, and "N Liftsmith lifters train here". Then **Add this gym to your Liftsmith**, which opens the app on the gym (`#/gymplace/<id>`), a "claim it" card on unofficial gyms (step 3), and up to eight more gyms in the city.
 - Like public profiles, they're **plain HTML with no scripts** in the site's header and footer (`siteFrame.ts`, store links tagged `gym_page`), under `SHARE_PAGE_CSP`, in the reader's language from Accept-Language (text in `gp.*`, six languages), cached for 5 minutes in the browser and 15 at the edge. Each carries `ExerciseGym` (or `ItemList`) structured data. A studio's page and an unknown address are `noindex`.
 - **`/sitemap-gyms.xml`** (listed in `robots.ts`) has `/gyms/`, every city and every gym that isn't hidden or a studio.
 - **No map picture yet.** The pages' CSP allows images only from our own site, and drawing map tiles on our server would lean on OpenStreetMap's tile servers, which their policy discourages. The page links out to directions and the map instead. A static map from a provider with an API key is the upgrade if Melvin wants one.
 - **In the app** (`GymPlace.tsx`, route `gymplace`): loads the gym (`GET /api/gyms/?place=<id>`) and shows the same preview as the finder, now with the lifters line, opening hours in the app's language and clock, and links to directions, the website and the gym's web page (`PlaceDetails.tsx`). A gym the lifter added from the finder has **See this gym's page** in Gyms. Pure web code, so Android, iOS and the web app get it together.
+
+## Step 3: claiming (built)
+
+Melvin, 2026-11-12, picked **"Website email, else code on stand"**: a code to an email at the gym's own website domain makes the gym official at once; otherwise the claim code on the stand or poster we mail does it; and staff can still approve a claim by hand in admin.
+
+- **Claim this gym** (`GymClaim.tsx`, route `gymclaim`, from "Is this your gym? Claim it" on the gym's preview and its web page). Needs an account. The form asks for name, role (owner, manager or staff), work email, and optionally a phone and a note. Server: `src/server/gymClaims.ts`, through `POST /api/gyms/` ops `claimStart`, `claimVerify`, `claimPoster`, `owned`, `edit` and `release`.
+- **Website email:** when the email's domain is the gym's website domain or a subdomain of it (`emailMatchesSite`), we email a six-digit code (30 minutes, five wrong tries, used up in one conditional update, so parallel guesses can't pass the limit). Shared hosts never count (Facebook, Instagram, Linktree, Google sites, Wix, Squarespace and the like, `SHARED_HOSTS`), so a gym whose "website" is a social page can't be claimed by anyone with an address there.
+- **Code on the stand:** each poster or stand carries a claim code (`XXXX-XXXX`, letters and digits without look-alikes), stored only as a hash in `gym_places.claim_code` and used up by the first correct claim. Ten wrong tries per account a day. Codes are made in step 4 when a poster is printed (`newPosterCode`).
+- **Anything else goes to staff:** the claim is saved as pending and shows at the top of **Admin › Gyms** (Claims to check, with the gym, name, role, email, phone and note), where staff approve or reject it. The lifter sees "Thanks, we'll check". Five claims per account a day, ten gyms per account.
+- **Official** means `gym_places.claimed_by` is set: the check mark everywhere, first in the finder and on city pages, and a re-import from OpenStreetMap never touches it. A gym already claimed says so ("This gym already has an owner"); a mistaken owner is fixed through feedback and staff.
+- **The owner's page** (`GymEdit.tsx`, route `gymedit`, from "Manage this gym's page" on the gym's preview): opening hours per weekday with a switch and two times (or Open 24 hours), website (https only), phone, a short description (500 characters, through the same word and link check as the rest of the app), and the equipment lifters get when they add the gym, picked from one of the owner's own gyms in Liftsmith. Saved hours are written in OpenStreetMap's form (`formatHours`), so the web page reads them like any other. Saving marks the gym's details as the owner's (`source = 'owner'`).
+- **Letting go:** Stop managing this gym, or deleting the account, makes the gym unofficial again and keeps the details the owner set. The account's claims are deleted with it (`claimDeletes`). The privacy policy and `docs/PRIVACY_LABELS.md` cover claims.
+- Pure web code, so Android, iOS and the web app get it together.
+

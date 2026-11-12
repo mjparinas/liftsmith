@@ -8,6 +8,7 @@ import { accessFor, type Access } from "./access";
 import { coachCleanup } from "./coach";
 import { forgetAll } from "./connect";
 import { batch, query, rateLimit, run } from "./db";
+import { claimDeletes } from "./gymClaims";
 import { gymDeletes } from "./gymDirectory";
 import { placeDeletes } from "./gymPlaces";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
@@ -286,6 +287,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...coachCleanup(accountId),
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),
+    ...claimDeletes(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

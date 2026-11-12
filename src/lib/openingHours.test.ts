@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { allDay, parseHours } from "./openingHours";
+import { allDay, formatHours, parseHours } from "./openingHours";
 
 describe("opening hours", () => {
   it("reads day ranges, lists and several time ranges, and skips holidays", () => {
@@ -22,5 +22,20 @@ describe("opening hours", () => {
     expect(parseHours("sunrise-sunset")).toBeNull();
     expect(parseHours('Mo-Fr 08:00-12:00 open "by appointment"')).toBeNull();
     expect(parseHours("Jan-Mar Mo 08:00-12:00")).toBeNull();
+  });
+});
+
+describe("writing opening hours", () => {
+  it("joins runs of days and round-trips", () => {
+    const raw = "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00";
+    expect(formatHours(parseHours(raw)!)).toBe(raw);
+    expect(formatHours(parseHours("Mo,We,Fr 06:00-12:00")!)).toBe("Mo,We,Fr 06:00-12:00");
+    expect(formatHours(parseHours("Mo-Th 05:00-22:00; Fr 05:00-21:00; Su 08:00-18:00")!)).toBe(
+      "Mo-Th 05:00-22:00; Fr 05:00-21:00; Su 08:00-18:00",
+    );
+    expect(formatHours(parseHours("24/7")!)).toBe("24/7");
+    expect(formatHours([[], [], [], [], [], [], []])).toBe("");
+    const odd = parseHours("Mo 06:00-12:00,14:00-20:00; Tu 06:00-12:00,14:00-20:00")!;
+    expect(parseHours(formatHours(odd))).toEqual(odd);
   });
 });
