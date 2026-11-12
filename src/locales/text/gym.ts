@@ -5,6 +5,9 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "gym.title": "Gyms",
+  "gym.back": "‹ Back",
+  "gym.row": "Gyms and equipment",
+  "gym.rowNote": "Your gyms, bars, plates, dumbbells and machines",
   "gym.add": "+ Add gym",
   "gym.addTitle": "Add a gym",
   "gym.name": "Name",
@@ -62,6 +65,9 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "gym.title": "Gimnasios",
+  "gym.back": "‹ Atrás",
+  "gym.row": "Gimnasios y equipo",
+  "gym.rowNote": "Tus gimnasios, barras, discos, mancuernas y máquinas",
   "gym.add": "+ Añadir gimnasio",
   "gym.addTitle": "Añadir un gimnasio",
   "gym.name": "Nombre",
@@ -118,6 +124,9 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "gym.title": "Salles",
+  "gym.back": "‹ Retour",
+  "gym.row": "Salles et matériel",
+  "gym.rowNote": "Tes salles, barres, disques, haltères et machines",
   "gym.add": "+ Ajouter une salle",
   "gym.addTitle": "Ajouter une salle",
   "gym.name": "Nom",
@@ -175,6 +184,9 @@ export const fr: Partial<Record<Key, Message>> = {
 
 export const de: Partial<Record<Key, Message>> = {
   "gym.title": "Studios",
+  "gym.back": "‹ Zurück",
+  "gym.row": "Studios und Ausrüstung",
+  "gym.rowNote": "Deine Studios, Stangen, Scheiben, Kurzhanteln und Geräte",
   "gym.add": "+ Studio hinzufügen",
   "gym.addTitle": "Studio hinzufügen",
   "gym.name": "Name",
@@ -232,6 +244,9 @@ export const de: Partial<Record<Key, Message>> = {
 
 export const it: Partial<Record<Key, Message>> = {
   "gym.title": "Palestre",
+  "gym.back": "‹ Indietro",
+  "gym.row": "Palestre e attrezzatura",
+  "gym.rowNote": "Le tue palestre, bilancieri, dischi, manubri e macchine",
   "gym.add": "+ Aggiungi palestra",
   "gym.addTitle": "Aggiungi una palestra",
   "gym.name": "Nome",
@@ -288,6 +303,9 @@ export const it: Partial<Record<Key, Message>> = {
 
 export const ja: Partial<Record<Key, Message>> = {
   "gym.title": "ジム",
+  "gym.back": "‹ 戻る",
+  "gym.row": "ジムと器具",
+  "gym.rowNote": "ジム、バー、プレート、ダンベル、マシン",
   "gym.add": "＋ ジムを追加",
   "gym.addTitle": "ジムを追加",
   "gym.name": "名前",

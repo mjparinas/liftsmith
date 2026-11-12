@@ -14,6 +14,7 @@ import { fmtNum } from "@/lib/units";
 import { BuyNext } from "./BuyNext";
 import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
+import { goBack } from "./router";
 import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 export function Gym() {
@@ -27,7 +28,7 @@ export function Gym() {
 
   return (
     <div className="pb-2">
-      <ScreenHeader title={t("gym.title")} />
+      <ScreenHeader title={t("gym.title")} back={{ label: t("gym.back"), onClick: goBack }} />
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
         {gyms.map((g) => (
           <Chip key={g.id} active={g.id === gym.id} onClick={() => setProfile({ activeGymId: g.id })}>

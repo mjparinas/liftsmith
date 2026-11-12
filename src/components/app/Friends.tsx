@@ -2121,7 +2121,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
   const [settings, setSettings] = useState(false);
   const header = (
     <div className="flex items-end justify-between gap-2">
-      <ScreenHeader title={t("friends.title")} back={{ label: t("friends.back"), onClick: goBack }} />
+      <ScreenHeader title={t("friends.title")} />
       {me?.profile && (
         <button
           type="button"
@@ -2455,32 +2455,24 @@ function useProfileSync() {
   }, [p, avatar, lifts, suspended]);
 }
 
-/** The people button on Today's header, with a dot when someone followed, asked, liked or commented. */
-export function FriendsButton() {
+/**
+ * The Friends tab's badge (App.tsx): how many follows, requests, likes and comments are waiting. It also keeps the
+ * social state fresh for the signed-in account and, once joined with notifications allowed, this phone's push token
+ * current (no prompt here). 0 while Friends is switched off.
+ */
+export function useFriendsWaiting(): number {
   const account = useAccount((s) => s.account);
   const me = useSocial((s) => s.me);
   useProfileSync();
   useEffect(() => {
     void refreshSocial();
   }, [account?.id]);
-  // Already joined and allowed notifications: keep this phone's push token current (no prompt here).
   const joinedNow = !!me?.profile;
   useEffect(() => {
     if (joinedNow) void startPush(false);
   }, [joinedNow]);
-  if (!socialOn()) return null;
-  const waiting = (me?.unread ?? 0) + (me?.requests ?? 0);
-  return (
-    <button
-      type="button"
-      aria-label={waiting ? t("friends.openWaiting", { count: waiting }) : t("friends.openFriends")}
-      onClick={() => go("friends")}
-      className="press relative grid h-9 w-9 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-    >
-      <Icon name="people" size={18} />
-      {waiting > 0 && <span aria-hidden className="absolute -right-0.5 -top-0.5 h-3 w-3 rounded-full border-2 border-bg bg-accent" />}
-    </button>
-  );
+  if (!socialOn()) return 0;
+  return (me?.unread ?? 0) + (me?.requests ?? 0);
 }
 
 /**

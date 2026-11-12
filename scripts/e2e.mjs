@@ -88,7 +88,7 @@ try {
 
   await page.getByRole("button", { name: "Done", exact: true }).click();
 
-  for (const tab of ["Body", "Progress", "Gyms"]) {
+  for (const tab of ["Body", "Progress", "Friends"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await page.waitForTimeout(200);
     await shot(tab.toLowerCase());
