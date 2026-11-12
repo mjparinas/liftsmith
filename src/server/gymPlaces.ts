@@ -37,6 +37,9 @@ export interface Place {
   km: number;
   hours: string;
   website: string;
+  phone: string;
+  country: string;
+  updatedAt: number;
   /** Claimed by its owner. */
   official: boolean;
   /** Lifters who added it. */
@@ -287,8 +290,8 @@ export async function importArea(where: string, fetcher: typeof fetch = fetch, n
 
 // --- The finder ---
 
-const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.lat, p.lon, p.hours, p.website, p.source,
-  p.claimed_by, p.lifters, p.code,
+const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
+  p.source, p.claimed_by, p.lifters, p.code, p.updated_at,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed`;
 
 const toPlace = (r: Row, km: number): Place => ({
@@ -305,6 +308,9 @@ const toPlace = (r: Row, km: number): Place => ({
   km: Math.round(km * 10) / 10,
   hours: s(r.hours),
   website: s(r.website),
+  phone: s(r.phone),
+  country: s(r.country),
+  updatedAt: n(r.updated_at),
   official: !!s(r.claimed_by),
   lifters: n(r.lifters),
   code: s(r.code) || s(r.listed),
@@ -334,6 +340,61 @@ export async function placeById(id: unknown): Promise<Place | null> {
   if (!isPlaceId(id)) return null;
   const [r] = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.id = ? AND p.hidden = 0`, [id]);
   return r ? toPlace(r, 0) : null;
+}
+
+// --- Gym pages (gymPage.ts): /gyms/, /gyms/<city>/, /gyms/<city>/<gym>/ ---
+
+const isSlug = (x: unknown): x is string => typeof x === "string" && /^[a-z0-9-]{1,90}$/.test(x);
+
+export async function placeBySlug(citySlug: unknown, slug: unknown): Promise<Place | null> {
+  if (!isSlug(citySlug) || !isSlug(slug)) return null;
+  const [r] = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.city_slug = ? AND p.slug = ? AND p.hidden = 0`, [
+    citySlug,
+    slug,
+  ]);
+  return r ? toPlace(r, 0) : null;
+}
+
+/** Every gym in a city: official first, then the most lifters, then by name. */
+export async function cityPlaces(citySlug: unknown): Promise<Place[]> {
+  if (!isSlug(citySlug)) return [];
+  const rows = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.city_slug = ? AND p.hidden = 0 LIMIT 2000`, [citySlug]);
+  return rows
+    .map((r) => toPlace(r, 0))
+    .sort((a, b) => Number(b.official) - Number(a.official) || b.lifters - a.lifters || a.name.localeCompare(b.name));
+}
+
+export interface City {
+  citySlug: string;
+  city: string;
+  region: string;
+  country: string;
+  gyms: number;
+  updatedAt: number;
+}
+
+/** Cities with at least one gym (studios aside), most gyms first. */
+export async function cities(): Promise<City[]> {
+  const rows = await query(
+    `SELECT city_slug, MAX(city) AS city, MAX(region) AS region, MAX(country) AS country, COUNT(*) AS n, MAX(updated_at) AS at
+     FROM gym_places WHERE hidden = 0 AND kind = 'gym' GROUP BY city_slug ORDER BY n DESC, city LIMIT 5000`,
+  );
+  return rows.map((r) => ({
+    citySlug: s(r.city_slug),
+    city: s(r.city),
+    region: s(r.region),
+    country: s(r.country),
+    gyms: n(r.n),
+    updatedAt: n(r.at),
+  }));
+}
+
+/** Every gym page worth indexing: gyms (not studios) that aren't hidden. */
+export async function sitemapGyms(): Promise<{ path: string; lastModified: number }[]> {
+  const rows = await query(
+    "SELECT city_slug, slug, updated_at FROM gym_places WHERE hidden = 0 AND kind = 'gym' ORDER BY updated_at DESC LIMIT 45000",
+  );
+  return rows.map((r) => ({ path: `/gyms/${s(r.city_slug)}/${s(r.slug)}/`, lastModified: n(r.updated_at) }));
 }
 
 /** A lifter added this gym: counted once per lifter. */

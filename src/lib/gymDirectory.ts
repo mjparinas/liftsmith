@@ -33,6 +33,8 @@ export interface Place {
   km: number;
   hours: string;
   website: string;
+  phone?: string;
+  updatedAt?: number;
   official: boolean;
   lifters: number;
   /** The setup it offers (gymShare.ts code), empty when nobody has set one up yet. */
@@ -64,6 +66,15 @@ export async function findNearby(): Promise<FindResult> {
     return { gyms: r.gyms, places: r.places ?? [] };
   } catch (e) {
     return { error: problem(e) };
+  }
+}
+
+/** One real gym by id (its page in the app, and the QR code's target). */
+export async function fetchPlace(id: string): Promise<Place | "gone" | "offline"> {
+  try {
+    return (await api<{ place: Place }>(`/api/gyms/?place=${encodeURIComponent(id)}`)).place;
+  } catch (e) {
+    return e instanceof AuthError && e.status === 404 ? "gone" : "offline";
   }
 }
 

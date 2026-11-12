@@ -74,6 +74,9 @@ beforeEach(async () => {
     vi.fn(async (url: string, init?: RequestInit) => {
       const body = init?.body ? (JSON.parse(String(init.body)) as unknown) : undefined;
       calls.push({ url, body });
+      if (url === `/api/gyms/?place=${OFFICIAL.id}`)
+        return Response.json({ place: { ...OFFICIAL, hours: "Mo-Fr 05:00-23:00; Sa,Su off" } });
+      if (url.startsWith("/api/gyms/?place=")) return Response.json({ error: "gone" }, { status: 404 });
       if (url.startsWith("/api/gyms/?")) return Response.json({ gyms: [LISTED], places: [OFFICIAL, PLACE] });
       if (url === "/api/gyms/") return Response.json({ ok: true });
       return Response.json({}, { status: 404 });
@@ -143,6 +146,27 @@ describe("gyms near you", () => {
     await user.click(screen.getByRole("button", { name: "Add this gym" }));
     expect(useApp.getState().gyms.at(-1)).toMatchObject({ name: "Steve Nash Fitness World", placeId: PLACE.id });
     expect(calls.at(-1)!.body).toEqual({ op: "added", place: PLACE.id });
+  });
+
+  it("opens a gym's page from its link, with its hours, and adds it with its equipment", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    location.hash = `#/gymplace/${OFFICIAL.id}`;
+    expect(await screen.findByRole("heading", { name: /Planet Fitness/ })).toBeInTheDocument();
+    expect(screen.getAllByText("Official gym").length).toBeGreaterThan(0);
+    expect(screen.getByText("3 Liftsmith lifters train here")).toBeInTheDocument();
+    expect(screen.getByText("Monday")).toBeInTheDocument();
+    expect(screen.getAllByText("Closed")).toHaveLength(2);
+    expect(screen.getByRole("link", { name: /See this gym’s page/ })).toHaveAttribute(
+      "href",
+      "https://www.getliftsmith.com/gyms/langley-bc/planet-fitness/",
+    );
+    await user.click(screen.getByRole("button", { name: "Add this gym" }));
+    expect(useApp.getState().gyms.at(-1)).toMatchObject({ name: "Planet Fitness", placeId: OFFICIAL.id });
+    expect(calls.at(-1)!.body).toEqual({ op: "added", place: OFFICIAL.id });
+
+    location.hash = "#/gymplace/0000000000000000";
+    expect(await screen.findByText("This gym isn’t listed")).toBeInTheDocument();
   });
 
   it("takes a nearby gym in setup instead of a preset", async () => {
