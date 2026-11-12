@@ -209,7 +209,8 @@ describe("Friends", () => {
     await u.click(await screen.findByText("Alex challenged you: Most sets"));
     expect(await screen.findByText("Alex invited you to this challenge.")).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "Join" }));
-    expect(await screen.findByText("Blair (you)")).toBeInTheDocument();
+    // Blair shows on the challenge, and on the weekly board too once that has loaded, so there can be two.
+    expect((await screen.findAllByText("Blair (you)")).length).toBeGreaterThan(0);
     expect(screen.getByRole("button", { name: "Leave" })).toBeInTheDocument();
     cleanup();
 
