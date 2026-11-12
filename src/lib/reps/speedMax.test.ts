@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 
-import { fastestMetres, MAX_DOWN, speedMax, type WarmupSpeed } from "./speedMax";
+import { DAY, makeSet, NOW } from "@/test/factories";
+
+import type { AppEvent, SetEvent } from "../types";
+import { fastestMetres, lastFullMetres, MAX_DOWN, MVT_RANGE, personalMvt, speedMax, type WarmupSpeed } from "./speedMax";
 import { summarise } from "./tracker";
 import type { Rep } from "./types";
 
@@ -127,5 +130,95 @@ describe("a warm-up's fastest rep", () => {
   it("has nothing without a scale or a full rep", () => {
     expect(fastestMetres(summarise([rep(40, 0, false)]))).toBeUndefined();
     expect(fastestMetres(summarise([]))).toBeUndefined();
+  });
+});
+
+describe("each lifter's own threshold from sets taken to failure", () => {
+  const SQ = (id: string) => (id === "back-squat" ? ("squat" as const) : id === "bench-press" ? ("hpush" as const) : undefined);
+  const hard = (endSpeed: number, over: Partial<SetEvent> = {}) =>
+    makeSet({ exerciseId: "back-squat", endSpeed, failedRep: true, at: NOW - DAY, ...over });
+
+  it("uses the textbook speed, and says how many hard sets it still needs, until it has three", () => {
+    const r = personalMvt([hard(0.4), hard(0.4)], "squat", SQ, NOW)!;
+    expect(r).toEqual({ mvt: 0.3, book: 0.3, sets: 0, needed: 1 });
+  });
+
+  it("learns the median end speed, pulled a little towards the textbook", () => {
+    const r = personalMvt([hard(0.38), hard(0.4), hard(0.42), hard(0.9)], "squat", SQ, NOW)!;
+    // Median 0.41 over 4 sets, textbook 0.30 counted as 2: (0.41·4 + 0.3·2) / 6.
+    expect(r.sets).toBe(4);
+    expect(r.mvt).toBeCloseTo(0.37, 2);
+  });
+
+  it("counts a set as hard from a failed rep, no reps left, an AMRAP set or missed reps, and nothing else", () => {
+    const easy = makeSet({ exerciseId: "back-squat", endSpeed: 0.5, reps: 5, targetReps: 5, at: NOW - DAY });
+    const noneLeft = makeSet({ exerciseId: "back-squat", endSpeed: 0.4, at: NOW - DAY });
+    const effort: AppEvent = { type: "effort", id: "e1", at: NOW - DAY, setId: noneLeft.id, rir: 0 };
+    const amrap = makeSet({ exerciseId: "back-squat", endSpeed: 0.4, amrap: true, at: NOW - DAY });
+    const missed = makeSet({ exerciseId: "back-squat", endSpeed: 0.4, reps: 3, targetReps: 5, at: NOW - DAY });
+    const injured = hard(0.9, { injuryPct: 0.7 });
+    const r = personalMvt([easy, noneLeft, effort, amrap, missed, injured], "squat", SQ, NOW)!;
+    expect(r.sets).toBe(3);
+    expect(r.mvt).toBeCloseTo((0.4 * 3 + 0.3 * 2) / 5, 2);
+  });
+
+  it("keeps to the same movement, recent sets and believable speeds", () => {
+    const events = [hard(0.4), hard(0.4), hard(0.4, { exerciseId: "bench-press" }), hard(0.4, { at: NOW - 200 * DAY }), hard(5)];
+    expect(personalMvt(events, "squat", SQ, NOW)!.sets).toBe(0);
+  });
+
+  it("uses only the latest eight hard sets", () => {
+    const old = Array.from({ length: 8 }, (_, i) => hard(0.6, { at: NOW - 30 * DAY - i }));
+    const recent = Array.from({ length: 8 }, (_, i) => hard(0.33, { at: NOW - DAY - i }));
+    expect(personalMvt([...old, ...recent], "squat", SQ, NOW)!.mvt).toBeCloseTo((0.33 * 8 + 0.3 * 2) / 10, 2);
+  });
+
+  it("never strays past the allowed range of the textbook speed", () => {
+    const fast = Array.from({ length: 8 }, () => hard(2.5));
+    expect(personalMvt(fast, "squat", SQ, NOW)!.mvt).toBeCloseTo(0.3 * MVT_RANGE.high, 6);
+  });
+
+  it("has nothing for a movement without a known threshold", () => {
+    expect(personalMvt([], "carry", SQ, NOW)).toBeUndefined();
+  });
+
+  it("moves today's max: a lifter whose own threshold is faster gets a lower max from the same warm-ups", () => {
+    const book = speedMax(warmups(123), SQUAT, plate)!;
+    const own = speedMax(warmups(123), { ...SQUAT, mvt: 0.36 }, plate)!;
+    expect(book.call).toBe("hold");
+    expect(own.max).toBeCloseTo(113, 0);
+    expect(own.call).toBe("down");
+  });
+});
+
+describe("a working set's last full rep", () => {
+  const rep = (index: number, kind: Rep["kind"], speed: number): Rep => ({
+    index,
+    kind,
+    start: index * 3000,
+    turn: index * 3000 + 1000,
+    end: index * 3000 + 2000,
+    rom: 90,
+    depth: 1,
+    concentricMs: 1000,
+    eccentricMs: 1000,
+    speed,
+    speedIsMetres: true,
+    velocityLoss: 0,
+    grinder: false,
+    sticking: false,
+  });
+
+  it("gives its speed, and whether a rep failed after it", () => {
+    const base = { full: 2, partial: 0, failed: 1, grinders: 0, timeUnderLoadMs: 0 };
+    expect(lastFullMetres({ ...base, reps: [rep(0, "full", 0.6), rep(1, "full", 0.35), rep(2, "failed", 0.1)] })).toEqual({
+      speed: 0.35,
+      failedAfter: true,
+    });
+    expect(lastFullMetres({ ...base, failed: 0, reps: [rep(0, "full", 0.6), rep(1, "full", 0.35)] })).toEqual({
+      speed: 0.35,
+      failedAfter: false,
+    });
+    expect(lastFullMetres({ ...base, reps: [] })).toBeUndefined();
   });
 });

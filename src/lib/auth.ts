@@ -106,6 +106,8 @@ export class AuthError extends Error {
   constructor(
     message: string,
     public status = 0,
+    /** The server said this session is gone (accountHttp.ts SIGNED_OUT). Only this signs the device out. */
+    public signedOut = false,
   ) {
     super(message);
   }
@@ -125,8 +127,8 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
   } catch {
     throw new AuthError("offline");
   }
-  const body = (await r.json().catch(() => ({}))) as T & { error?: string };
-  if (!r.ok) throw new AuthError(body.error ?? `HTTP ${r.status}`, r.status);
+  const body = (await r.json().catch(() => ({}))) as T & { error?: string; signedOut?: boolean };
+  if (!r.ok) throw new AuthError(body.error ?? `HTTP ${r.status}`, r.status, r.status === 401 && body.signedOut === true);
   return body;
 }
 

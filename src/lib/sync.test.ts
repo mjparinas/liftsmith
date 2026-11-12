@@ -212,11 +212,27 @@ describe("syncing the app with the server", () => {
 
   it("signs out on this device, keeping the data, when the server says the session ended", async () => {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify({ token: "t", id: "acc", email: null, providers: [], via: "email" }));
-    vi.stubGlobal("fetch", async () => new Response(JSON.stringify({ error: "Signed out" }), { status: 401 }));
+    vi.stubGlobal("fetch", async () => new Response(JSON.stringify({ error: "Signed out", signedOut: true }), { status: 401 }));
     useApp.setState({ events: [set("mine")] });
     await syncNow();
     expect(localStorage.getItem(ACCOUNT_KEY)).toBeNull();
     expect(useAccount.getState().error).toBe("signedOut");
     expect(useApp.getState().events.length).toBe(1);
+  });
+
+  it.each([
+    ["the database is down", 503, { error: "Couldn't check your sign-in. Try again in a moment." }],
+    ["a 401 from something other than our server", 401, {}],
+    ["a server error", 500, { error: "boom" }],
+  ])("stays signed in when %s", async (_why, status, body) => {
+    const account = { token: "t", id: "acc", email: null, providers: [], via: "google" };
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+    useAccount.setState({ account: account as never, error: null });
+    vi.stubGlobal("fetch", async () => new Response(JSON.stringify(body), { status }));
+    useApp.setState({ events: [set("mine")] });
+    await syncNow();
+    expect(localStorage.getItem(ACCOUNT_KEY)).not.toBeNull();
+    expect(useAccount.getState().account).not.toBeNull();
+    expect(useAccount.getState().error).toBeNull();
   });
 });

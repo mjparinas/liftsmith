@@ -33,6 +33,7 @@ import {
   xpTotal,
 } from "./game";
 import { setLanguage } from "./i18n";
+import { AVATAR_IDS } from "./socialTypes";
 import type { AppEvent, SetEvent } from "./types";
 
 // Wednesday evening.
@@ -253,9 +254,10 @@ describe("crates", () => {
 
 describe("level rewards", () => {
   it("give a set item at some levels and a bonus crate with each new title", () => {
-    expect(levelRewards(4)).toHaveLength(1);
-    expect(levelRewards(4)[0]).toMatchObject({ level: 4, source: "crate" });
-    expect(levelRewards(5).map((r) => r.key)).toEqual(["crate:4", "item:5"]);
+    expect(levelRewards(2)).toHaveLength(0);
+    expect(levelRewards(4).map((r) => r.key)).toEqual(["item:3", "crate:4"]);
+    expect(levelRewards(4)[0]!.item.id).toBe("av-target");
+    expect(levelRewards(5).map((r) => r.key)).toEqual(["item:3", "crate:4", "item:5"]);
     expect(levelForItem("accent-gold")).toBe(25);
     expect(levelForItem("accent-teal")).toBeNull();
     expect(levelRewards(50)).toHaveLength(LEVEL_ITEMS.length + TITLE_LEVELS.length);
@@ -263,6 +265,17 @@ describe("level rewards", () => {
     for (const c of COSMETICS.filter((c) => c.rarity === "legendary")) expect(levelForItem(c.id) ?? badgeForItem(c.id)).not.toBeNull();
     expect(nextReward(4)).toMatchObject({ level: 5, source: "item" });
     expect(nextReward(50)).toBeNull();
+  });
+
+  it("give Friends avatars from levels and badges, never from a crate, with four for everyone", () => {
+    const avatars = COSMETICS.filter((c) => c.kind === "avatar");
+    expect(avatars.map((c) => c.id)).toEqual([...AVATAR_IDS]);
+    for (const id of ["av-dumbbell", "av-bolt", "av-leaf", "av-moon"]) expect(owned(derive([], NOW)).has(id)).toBe(true);
+    for (const c of avatars) {
+      expect(rarityOdds(c.id)).toBe(0);
+      if (!STARTER.includes(c.id)) expect(levelForItem(c.id) ?? badgeForItem(c.id)).not.toBeNull();
+    }
+    for (let i = 0; i < 200; i++) expect(crateFor(`s${i}`).kind).not.toBe("avatar");
   });
 
   it("are owned once the level is reached, and a repeat still turns into XP", () => {

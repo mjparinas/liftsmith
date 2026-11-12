@@ -25,6 +25,7 @@ import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
+import { Avatar } from "./AvatarFace";
 import { Icon } from "./icons";
 import { go, useRoute } from "./router";
 import { ShareSheet, useShareContext } from "./ShareSheet";
@@ -262,6 +263,7 @@ function Locker({ g }: { g: Game }) {
     ["accent", t("awards.locker.accent"), "accent-blue"],
     ["sound", t("awards.locker.sound"), "sound-classic"],
     ["plates", t("awards.locker.plates"), "plates-classic"],
+    ["avatar", t("awards.locker.avatar"), ""],
   ];
   const have = COSMETICS.filter((c) => g.owned.has(c.id)).length;
   return (
@@ -280,7 +282,7 @@ function Locker({ g }: { g: Game }) {
             <div className="flex flex-wrap gap-2">
               {COSMETICS.filter((c) => c.kind === kind).map((c) => {
                 const mine = g.owned.has(c.id);
-                const on = (eq[kind] ?? def) === c.id;
+                const on = (eq[kind] || def) === c.id;
                 return (
                   <button
                     key={c.id}
@@ -293,6 +295,7 @@ function Locker({ g }: { g: Game }) {
                     {kind === "accent" && (
                       <span aria-hidden className={`h-4 w-4 rounded-full ${mine ? "" : "opacity-45"}`} style={{ background: c.value }} />
                     )}
+                    {kind === "avatar" && <Avatar name={c.name} avatar={c.id} size={24} dim={!mine} />}
                     {!mine && <Icon name="lock" size={14} />}
                     {!mine && <span className="sr-only">{t("awards.locker.locked")}</span>}
                     <span>{c.name}</span>
@@ -308,8 +311,9 @@ function Locker({ g }: { g: Game }) {
                 <span className="mt-2 block">
                   {viaBadge
                     ? t("awards.locker.badge", { name: picked.name, badge: achName(viaBadge.badge), tier: TIER_LABEL[viaBadge.tier] })
-                    : t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}
-                  {at !== null && ` ${t("awards.locker.atLevel", { level: at })}`}
+                    : rarityOdds(picked.id) > 0
+                      ? `${t("awards.locker.odds", { name: picked.name, n: Math.round(1 / rarityOdds(picked.id)) })}${at !== null ? ` ${t("awards.locker.atLevel", { level: at })}` : ""}`
+                      : at !== null && t("awards.locker.levelOnly", { name: picked.name, level: at })}
                 </span>
               )}
             </p>

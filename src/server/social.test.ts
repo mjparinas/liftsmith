@@ -83,6 +83,10 @@ describe("joining", () => {
       weights: true,
       public: false,
       push: { follows: true, comments: true, sent: true, likes: false },
+      avatar: "",
+      audience: "all",
+      showLifts: true,
+      lifts: [],
     });
     expect((await join("acc-b", "Alex")).body.error).toBe("handleTaken");
     expect((await call("acc-c", "feed")).body.error).toBe("notJoined");
@@ -254,5 +258,137 @@ describe("safety", () => {
     for (const table of ["post_likes", "post_comments", "follows", "sent_workouts"])
       expect(await query(`SELECT * FROM ${table}`)).toHaveLength(0);
     expect(await query("SELECT * FROM social_profiles WHERE account_id = 'acc-b'")).toHaveLength(0);
+  });
+});
+
+describe("captions, audiences, mutes, avatars and best lifts (stage 3)", () => {
+  const ids = async (who: string) => (await feedOf(who)).map((p) => p.id);
+  const personOf = async (who: string, handle: string) =>
+    (await call(who, "lookup", { handle })).body.person as { avatar: string; muted: boolean; lifts: unknown[]; posts: number };
+
+  it("keeps a caption through the filter, and refuses one with a link", async () => {
+    await join("acc-a", "alex");
+    expect((await call("acc-a", "post", { ...workout(), caption: "see www.spam.example" })).body.error).toBe("caption.link");
+    const id = (await call("acc-a", "post", { ...workout(), caption: "  New squat best!  " })).body.id as string;
+    expect((await call("acc-a", "feed")).body.posts).toMatchObject([{ id, caption: "New squat best!", audience: "all" }]);
+    expect((await call("acc-a", "editPost", { id, caption: "" })).body).toMatchObject({ caption: "", audience: "all" });
+  });
+
+  it("shows a friends-only post only to people who follow each other, and an only-me post to no one else", async () => {
+    await friends(); // blair follows alex; alex doesn't follow blair back yet
+    await join("acc-c", "casey", { open: true });
+    await call("acc-a", "update", { public: true });
+    await call("acc-c", "follow", { handle: "alex" });
+    const all = (await call("acc-a", "post", workout("s1"))).body.id as string;
+    const friendsOnly = (await call("acc-a", "post", { ...workout("s2", NOW - 7_200_000), audience: "friends" })).body.id as string;
+    const mine = (await call("acc-a", "post", { ...workout("s3", NOW - 10_800_000), audience: "me" })).body.id as string;
+    expect(await ids("acc-a")).toEqual([all, friendsOnly, mine]);
+    expect(await ids("acc-b")).toEqual([all]);
+    expect((await call("acc-b", "thread", { id: friendsOnly })).code).toBe(404);
+    expect((await call("acc-b", "like", { id: mine })).code).toBe(404);
+
+    await call("acc-a", "follow", { handle: "blair" });
+    await call("acc-b", "answer", { handle: "alex", accept: true });
+    expect(await ids("acc-b")).toEqual([all, friendsOnly]);
+    expect(await ids("acc-c")).toEqual([all]); // casey follows alex, alex doesn't follow casey
+    expect((await personOf("acc-b", "alex")).posts).toBe(2);
+
+    // The web page shows posts for everyone only.
+    const { publicProfile } = await import("./publicProfile");
+    expect((await publicProfile("alex"))?.recent).toHaveLength(1);
+    expect((await publicProfile("alex"))?.posts).toBe(1);
+  });
+
+  it("uses the lifter's usual audience for a post that doesn't pick one", async () => {
+    await friends();
+    await call("acc-a", "update", { audience: "me" });
+    await call("acc-a", "post", workout());
+    expect(await ids("acc-b")).toEqual([]);
+    expect(((await call("acc-a", "me")).body.profile as { audience: string }).audience).toBe("me");
+  });
+
+  it("mutes someone out of the feed without unfollowing, and unmutes", async () => {
+    await friends();
+    await call("acc-a", "post", workout());
+    expect((await call("acc-b", "mute", { handle: "alex" })).body.person).toMatchObject({ muted: true, relation: "following" });
+    expect(await ids("acc-b")).toEqual([]);
+    expect(((await call("acc-b", "person", { handle: "alex" })).body.posts as unknown[]).length).toBe(1);
+    expect((await call("acc-b", "people", { list: "muted" })).body.people).toMatchObject([{ handle: "alex" }]);
+    await call("acc-b", "mute", { handle: "alex", on: false });
+    expect(await ids("acc-b")).toHaveLength(1);
+  });
+
+  it("keeps only known avatars, and shows best lifts only to people who can see the posts", async () => {
+    await friends();
+    await join("acc-c", "casey");
+    const lifts = [
+      { id: "back-squat", w: 140, r: 3, at: NOW },
+      { id: "bench", w: 100, r: 5, at: NOW },
+      { id: "x", w: 9999, r: 1, at: NOW }, // refused
+    ];
+    await call("acc-a", "update", { avatar: "av-trophy", lifts });
+    await call("acc-c", "update", { avatar: "not-an-avatar" });
+    expect((await personOf("acc-b", "alex")).avatar).toBe("av-trophy");
+    expect((await personOf("acc-b", "casey")).avatar).toBe("");
+    expect((await personOf("acc-b", "alex")).lifts).toHaveLength(2);
+    expect((await personOf("acc-c", "alex")).lifts).toEqual([]); // casey doesn't follow
+    await call("acc-a", "update", { showLifts: false });
+    expect((await personOf("acc-b", "alex")).lifts).toEqual([]);
+    await call("acc-a", "update", { showLifts: true, weights: false });
+    expect((await personOf("acc-b", "alex")).lifts).toEqual([]);
+    expect((await call("acc-b", "feed")).body.posts).toEqual([]);
+  });
+});
+
+describe("invite links and the leaderboard (stage 4)", () => {
+  it("makes one reusable code, and accepting it makes two lifters follow each other whatever their settings", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair"); // approves follow requests
+    const r = await call("acc-a", "invite");
+    const code = r.body.code as string;
+    expect(code).toMatch(/^[2-9A-HJ-NP-Z]{8}$/);
+    expect((await call("acc-a", "invite")).body.code).toBe(code);
+    expect((await call("acc-b", "inviteInfo", { code: code.toLowerCase() })).body).toMatchObject({
+      inviter: { handle: "alex" },
+      self: false,
+    });
+    expect((await call("acc-a", "acceptInvite", { code })).body.error).toBe("self");
+    expect((await call("acc-b", "acceptInvite", { code })).body).toEqual({ handle: "alex" });
+    expect((await call("acc-a", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "blair" }]);
+    expect((await call("acc-b", "people", { list: "friends" })).body.people).toMatchObject([{ handle: "alex" }]);
+  });
+
+  it("refuses an expired, unknown or blocked invite, and one from a suspended lifter", async () => {
+    await join("acc-a", "alex");
+    await join("acc-b", "blair");
+    await join("acc-c", "casey");
+    const code = (await call("acc-a", "invite", {}, NOW)).body.code as string;
+    expect((await call("acc-b", "acceptInvite", { code: "ZZZZZZZZ" })).body.error).toBe("invite");
+    expect((await call("acc-b", "acceptInvite", { code }, NOW + 31 * DAY)).body.error).toBe("invite");
+    await call("acc-a", "block", { handle: "casey" });
+    expect((await call("acc-c", "inviteInfo", { code })).code).toBe(404);
+    await resolveReports("profile", "acc-a", "suspend");
+    expect((await call("acc-b", "acceptInvite", { code })).code).toBe(404);
+  });
+
+  it("ranks the lifter and everyone they follow by this week's posts they may see", async () => {
+    await friends(); // blair follows alex
+    await join("acc-c", "casey");
+    const from = NOW - 2 * DAY;
+    await call("acc-a", "post", workout("s1", NOW - DAY));
+    await call("acc-a", "post", workout("s2", NOW - 3 * DAY)); // last week
+    await call("acc-a", "post", { ...workout("s3", NOW - DAY / 2), audience: "me" }); // not for blair
+    await call("acc-b", "post", workout("b1", NOW - DAY));
+    await call("acc-c", "post", workout("c1", NOW - DAY)); // blair doesn't follow casey
+    const rows = (await call("acc-b", "board", { from })).body.rows as { handle: string; workouts: number; sets: number; me: boolean }[];
+    expect(rows.map((r) => [r.handle, r.workouts, r.me]).sort()).toEqual([
+      ["alex", 1, false],
+      ["blair", 1, true],
+    ]);
+    expect(rows.find((r) => r.handle === "alex")).toMatchObject({ sets: 12, minutes: 50, volume: 4200, prs: 1 });
+    expect((await call("acc-a", "board", { from })).body.rows as { handle: string; workouts: number }[]).toMatchObject([
+      { handle: "alex", workouts: 2 },
+    ]);
+    expect((await call("acc-b", "board", { from: NOW - 400 * DAY })).code).toBe(400);
   });
 });

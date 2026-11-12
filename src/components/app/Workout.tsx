@@ -13,6 +13,7 @@ import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
+import { msLeft, nextCount, type Counted } from "@/lib/handsFree";
 import { saveWorkout } from "@/lib/health";
 import { hrSupported } from "@/lib/heartRate";
 import { hrLink } from "@/lib/hrLink";
@@ -23,13 +24,14 @@ import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
-import { fastestMetres } from "@/lib/reps/speedMax";
+import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
 import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { chipText, notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession } from "@/lib/sessionNotify";
 import { implementsFor, perSide } from "@/lib/sides";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
+import { tempoOf } from "@/lib/tempo";
 import { restAlertOf } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type LoadKind, type Muscle } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
@@ -51,10 +53,12 @@ import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, ProTag, Sheet, Stepper } from "./ui";
 import { AddExercise } from "./workout/AddExercise";
 import { ComingUp } from "./workout/ComingUp";
+import { HandsFree } from "./workout/HandsFree";
 import { countdownTick, UndoChip } from "./workout/Polish";
 import { Feedback, RestCard } from "./workout/RestCard";
 import { SetCard } from "./workout/SetCard";
 import { recordWarmupSpeed, SpeedNudge, trimWarmupSpeeds } from "./workout/SpeedNudge";
+import { TempoCoach } from "./workout/TempoCoach";
 import { useWatchReps } from "./workout/useWatchReps";
 import { VoiceLog } from "./workout/VoiceLog";
 import { restEndCue, useGhost, useVoiceCoach, type VoiceState } from "./WorkoutExtras";
@@ -234,6 +238,22 @@ export function Workout() {
     }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Hands-free sets (Labs, handsFree.ts): whichever counter is counting reports here too, and the set logs
+  // itself once the reps stop. The key is the set being counted, so a new set starts from nothing.
+  const countKey = `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`;
+  const [counted, setCounted] = useState<Counted | null>(null);
+  const noteCount = (n: number) => setCounted((c) => nextCount(c, countKey, n, Date.now()));
+  const planReps = !item
+    ? undefined
+    : warming
+      ? item.warmup?.[warmDone]?.reps
+      : item.setTargets?.[doneSets]?.amrap || (item.challenge && doneSets + 1 >= item.sets)
+        ? undefined
+        : (item.setTargets?.[doneSets]?.reps ?? item.target.reps);
+  const handsFree =
+    labOn("labHandsFree") && !!ex && !ex.cardio && !resting && !finished && !infoOpen && !swapOpen && !endOpen && !whyOpen && !planOpen;
+  const autoLeft = handsFree ? msLeft(counted, countKey, planReps, now) : null;
+
   // Watch rep counting (Labs): the watch streams its motion during a set, unless the phone (camera or motion) is already counting.
   const phoneCounting = !!ex && countPrefs.on && !!source && countable(ex.id, ex.pattern, countPrefs.source);
   const watchCountOn = !!ex && !!active && labOn("labWatchReps") && !resting && !finished && !phoneCounting;
@@ -245,6 +265,7 @@ export function Workout() {
     onCount: (n) => {
       const a = useApp.getState().active;
       if (a) s.adjust(a.weight, n);
+      noteCount(n);
     },
   });
   const watchMotion = watchCountOn && !!ex && watchCountable(ex.id, ex.pattern);
@@ -329,6 +350,9 @@ export function Workout() {
   const undoShown = !!s.undoable && now <= s.undoable.until;
   // Voice set logging is a lab (Settings › Labs, Pro): a microphone above Log set while it's on.
   const voiceLog = !finished && !!ex && !ex.cardio && labOn("labVoiceLog");
+  // The tempo coach is a lab too: on tempo and paused lifts, a button above Log set that counts each rep out.
+  const tempo = !finished && !resting && ex ? tempoOf(ex.id) : undefined;
+  const tempoCoach = !!tempo && labOn("labTempo");
 
   const log = () => {
     haptic("tap");
@@ -616,13 +640,22 @@ export function Workout() {
                   onCount={(n) => {
                     const a = useApp.getState().active;
                     if (a) s.adjust(a.weight, n);
+                    noteCount(n);
                   }}
                   onSummary={
                     speedMaxOn
                       ? (sum) => {
                           const a = useApp.getState().active;
+                          if (!a) return;
+                          if (!warmingUp(a)) {
+                            // A working set: its last full rep's speed, and whether a rep failed after it, are
+                            // saved with the set, so sets taken to failure teach the lifter's own threshold.
+                            const last = lastFullMetres(sum);
+                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter);
+                            return;
+                          }
                           const v = fastestMetres(sum);
-                          if (!a || !warmingUp(a) || v === undefined) return;
+                          if (v === undefined) return;
                           warmSpeed.current = { key: `${a.sessionId}:${ex.id}`, index: a.warm ?? 0, kg: a.weight, speed: v };
                         }
                       : undefined
@@ -737,10 +770,19 @@ export function Workout() {
 
       <div className="safe-bottom fixed inset-x-0 bottom-0 z-40 bg-gradient-to-t from-bg via-bg to-transparent px-5 pt-8">
         <div className="mx-auto max-w-lg">
-          {(undoShown || voiceLog) && (
+          {autoLeft !== null && <HandsFree left={autoLeft} onLog={log} />}
+          {(undoShown || voiceLog || tempoCoach) && (
             <div className="mb-2 flex flex-wrap items-start justify-center gap-2">
               <UndoChip now={now} warmup={!!s.undoable && s.undoable.prev.warm !== undefined && warmingUp(s.undoable.prev)} />
               {voiceLog && <VoiceLog unit={unit} onLog={log} paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen} />}
+              {tempoCoach && tempo && (
+                <TempoCoach
+                  key={`${active.index}:${doneSets}`}
+                  tempo={tempo}
+                  reps={active.reps}
+                  paused={!visible || infoOpen || swapOpen || endOpen || whyOpen || planOpen}
+                />
+              )}
             </div>
           )}
           {finished ? (

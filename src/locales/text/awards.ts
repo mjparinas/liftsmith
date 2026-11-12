@@ -74,6 +74,8 @@ export const en = {
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "a bonus crate for your new title",
   "awards.unlocksTheme": "{tier} unlocks the {theme} theme",
+  "awards.locker.avatar": "Friends avatar",
+  "awards.locker.levelOnly": "{name} is yours at level {level}.",
 } as const;
 
 type Key = keyof typeof en;
@@ -149,6 +151,8 @@ export const es: Partial<Record<Key, Message>> = {
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "un cofre extra por tu nuevo título",
   "awards.unlocksTheme": "{tier} desbloquea el tema {theme}",
+  "awards.locker.avatar": "Avatar de Amigos",
+  "awards.locker.levelOnly": "{name} es tuyo en el nivel {level}.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -223,6 +227,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "un coffre bonus pour votre nouveau titre",
   "awards.unlocksTheme": "{tier} débloque le thème {theme}",
+  "awards.locker.avatar": "Avatar Amis",
+  "awards.locker.levelOnly": "{name} est à vous au niveau {level}.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -296,6 +302,8 @@ export const de: Partial<Record<Key, Message>> = {
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "eine Bonuskiste für deinen neuen Titel",
   "awards.unlocksTheme": "{tier} schaltet das Design {theme} frei",
+  "awards.locker.avatar": "Avatar für Freunde",
+  "awards.locker.levelOnly": "{name} gehört dir ab Level {level}.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -369,6 +377,8 @@ export const it: Partial<Record<Key, Message>> = {
   "awards.reward.item": "{name} ({rarity})",
   "awards.reward.crate": "una cassa bonus per il tuo nuovo titolo",
   "awards.unlocksTheme": "{tier} sblocca il tema {theme}",
+  "awards.locker.avatar": "Avatar per Amici",
+  "awards.locker.levelOnly": "{name} è tuo al livello {level}.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -433,4 +443,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "awards.reward.item": "{name}（{rarity}）",
   "awards.reward.crate": "新しい称号のボーナスクレート",
   "awards.unlocksTheme": "{tier}でテーマ「{theme}」を解除",
+  "awards.locker.avatar": "友達のアバター",
+  "awards.locker.levelOnly": "{name}はレベル{level}で手に入ります。",
 };

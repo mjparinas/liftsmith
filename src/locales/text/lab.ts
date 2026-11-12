@@ -4,12 +4,15 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "lab.barPath.title": "Bar path replay",
+  "lab.barPath.body":
+    "After a camera-counted squat, deadlift or overhead press, replays one rep with the bar's path drawn over a stick figure, and gives one cue if the bar drifted. Side-on works best. Only the points the camera read are kept, until your next set; no video is recorded.",
   "lab.formCheck.title": "Camera form check",
   "lab.formCheck.body":
     "While the camera counts reps, it also watches how they move: squats that stop above parallel, reps cut short, and leaning to one side. Between sets it gives one tip and shows it on the figure. Side-on is best for depth; face the camera to check for a lean.",
   "lab.speedMax.title": "Today's max from warm-ups",
   "lab.speedMax.body":
-    "Uses the bar speed of your warm-ups to estimate today's max, then suggests a slightly heavier or lighter working weight before your first hard set. Works on squats, hinges, presses, rows and pull-ups, and needs your height in Your stats.",
+    "Uses the bar speed of your warm-ups to estimate today's max, then suggests a slightly heavier or lighter working weight before your first hard set. Works on squats, hinges, presses, rows and pull-ups, and needs your height in Your stats. Sets you take to failure while the camera counts teach it your own end-of-set speed.",
   "lab.barSpeed.title": "Camera bar speed",
   "lab.barSpeed.body":
     "While the camera counts reps, it also shows how fast the bar moves, how much it has slowed since your fastest rep, and when it's time to end the set. Add your height in Your stats for speeds in m/s.",
@@ -37,17 +40,27 @@ export const en = {
   "lab.voiceLog.title": "Voice set logging",
   "lab.voiceLog.body":
     'Adds a microphone above Log set on the workout screen. Tap it and say "100 for 8", "8 reps", "too easy" or "undo". Speech is recognized on your phone and never recorded or sent, so it needs a phone that can do that in your language.',
+  "lab.handsFree.title": "Hands-free sets",
+  "lab.handsFree.body":
+    "While camera, phone motion or watch rep counting is counting, the set logs itself a few seconds after your last rep and rest starts: 4 seconds once your planned reps are in, 8 while you're short of them. Undo puts it back. Needs one of those rep counting labs on.",
+  "lab.handsFree.soon": "Logging this set in {s} s. Do another rep to keep going.",
+  "lab.tempo.title": "Tempo coach",
+  "lab.tempo.body":
+    "On tempo and paused lifts, like a tempo squat or a paused bench, adds Count tempo above Log set. Tap it as you take the weight: after 3, 2, 1 it counts every second of each rep in sound and buzzes, a falling note to lower, a steady one to hold and a rising one to lift, then stops after your reps. Log set is still one tap.",
 };
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Repetición de la trayectoria de la barra",
+  "lab.barPath.body":
+    "Tras una sentadilla, un peso muerto o un press militar contados con la cámara, repite una repetición con la trayectoria de la barra dibujada sobre una figura, y te da un consejo si la barra se desvió. Funciona mejor de perfil. Solo se guardan los puntos que leyó la cámara, hasta tu siguiente serie; no se graba vídeo.",
   "lab.formCheck.title": "Revisión de técnica con la cámara",
   "lab.formCheck.body":
     "Mientras la cámara cuenta repeticiones, también mira cómo se mueven: sentadillas que se quedan por encima del paralelo, repeticiones cortas e inclinarse hacia un lado. Entre series da un consejo y lo muestra en la figura. De lado se ve mejor la profundidad; ponte de frente para revisar si te inclinas.",
   "lab.speedMax.title": "Tu máximo de hoy según el calentamiento",
   "lab.speedMax.body":
-    "Usa la velocidad de la barra en tus series de calentamiento para estimar tu máximo de hoy y, antes de la primera serie dura, sugiere un peso de trabajo un poco más alto o más bajo. Funciona en sentadillas, bisagras, presses, remos y dominadas, y necesita tu altura en Tus datos.",
+    "Usa la velocidad de la barra en tus series de calentamiento para estimar tu máximo de hoy y, antes de la primera serie dura, sugiere un peso de trabajo un poco más alto o más bajo. Funciona en sentadillas, bisagras, presses, remos y dominadas, y necesita tu altura en Tus datos. Las series que llevas al fallo mientras cuenta la cámara le enseñan tu propia velocidad de final de serie.",
   "lab.barSpeed.title": "Velocidad de la barra con la cámara",
   "lab.barSpeed.body":
     "Mientras la cámara cuenta repeticiones, también muestra lo rápido que sube la barra, cuánto se ha frenado desde tu repetición más rápida y cuándo conviene terminar la serie. Añade tu altura en Tus datos para ver la velocidad en m/s.",
@@ -76,15 +89,25 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrar series con la voz",
   "lab.voiceLog.body":
     "Añade un micrófono encima de Registrar serie en la pantalla de entrenamiento. Tócalo y di «100 por 8», «8 repeticiones», «demasiado fácil» o «deshacer». La voz se reconoce en tu teléfono y nunca se graba ni se envía, así que necesita un teléfono que pueda hacerlo en tu idioma.",
+  "lab.handsFree.title": "Series sin manos",
+  "lab.handsFree.body":
+    "Mientras se cuentan las repeticiones con la cámara, el movimiento del teléfono o el reloj, la serie se registra sola unos segundos después de tu última repetición y empieza el descanso: 4 segundos si ya hiciste las repeticiones previstas, 8 si te faltan. Deshacer la quita. Necesita uno de esos labs de conteo activado.",
+  "lab.handsFree.soon": "Registrando esta serie en {s} s. Haz otra repetición para seguir.",
+  "lab.tempo.title": "Entrenador de tempo",
+  "lab.tempo.body":
+    "En los ejercicios con tempo o con pausa, como la sentadilla con tempo o el press de banca con pausa, añade Marcar el tempo encima de Registrar serie. Tócalo al coger el peso: tras 3, 2, 1 cuenta cada segundo de cada repetición con sonidos y vibraciones, una nota que baja para bajar, una fija para aguantar y una que sube para subir, y se detiene al terminar tus repeticiones. Registrar la serie sigue siendo un solo toque.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Rejouer la trajectoire de la barre",
+  "lab.barPath.body":
+    "Après un squat, un soulevé de terre ou un développé militaire comptés par la caméra, rejoue une répétition avec la trajectoire de la barre tracée sur une silhouette, et donne un conseil si la barre a dévié. De profil, c'est mieux. Seuls les points lus par la caméra sont gardés, jusqu'à votre série suivante ; aucune vidéo n'est enregistrée.",
   "lab.formCheck.title": "Contrôle de la technique par la caméra",
   "lab.formCheck.body":
     "Pendant que la caméra compte les répétitions, elle regarde aussi comment elles bougent : squats arrêtés au-dessus de la parallèle, répétitions écourtées et inclinaison d’un côté. Entre les séries, elle donne un conseil et le montre sur la silhouette. De profil, c’est mieux pour la profondeur ; de face, pour voir si vous penchez.",
   "lab.speedMax.title": "Votre max du jour d'après l'échauffement",
   "lab.speedMax.body":
-    "Utilise la vitesse de barre de vos séries d'échauffement pour estimer votre max du jour, puis propose une charge de travail un peu plus lourde ou plus légère avant votre première série difficile. Fonctionne sur les squats, les charnières, les développés, les tirages et les tractions, et nécessite votre taille dans Vos mesures.",
+    "Utilise la vitesse de barre de vos séries d'échauffement pour estimer votre max du jour, puis propose une charge de travail un peu plus lourde ou plus légère avant votre première série difficile. Fonctionne sur les squats, les charnières, les développés, les tirages et les tractions, et nécessite votre taille dans Vos mesures. Les séries menées à l'échec pendant que la caméra compte lui apprennent votre propre vitesse de fin de série.",
   "lab.barSpeed.title": "Vitesse de barre par la caméra",
   "lab.barSpeed.body":
     "Pendant que la caméra compte les répétitions, elle montre aussi la vitesse de la barre, son ralentissement depuis votre répétition la plus rapide et le moment de finir la série. Ajoutez votre taille dans Vos mesures pour des vitesses en m/s.",
@@ -114,15 +137,25 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Saisie des séries à la voix",
   "lab.voiceLog.body":
     "Ajoute un micro au-dessus de Valider la série sur l'écran d'entraînement. Touchez-le et dites « 100 pour 8 », « 8 répétitions », « trop facile » ou « annuler ». La parole est reconnue sur votre téléphone et n'est jamais enregistrée ni envoyée, il faut donc un téléphone qui sait le faire dans votre langue.",
+  "lab.handsFree.title": "Séries sans les mains",
+  "lab.handsFree.body":
+    "Pendant que la caméra, le mouvement du téléphone ou la montre compte vos répétitions, la série s'enregistre seule quelques secondes après votre dernière répétition et le repos commence : 4 secondes une fois les répétitions prévues faites, 8 s'il vous en manque. Annuler la retire. Nécessite l'un de ces labs de comptage activé.",
+  "lab.handsFree.soon": "Enregistrement de cette série dans {s} s. Faites une autre répétition pour continuer.",
+  "lab.tempo.title": "Coach de tempo",
+  "lab.tempo.body":
+    "Sur les exercices avec tempo ou avec pause, comme le squat tempo ou le développé couché avec pause, ajoute Compter le tempo au-dessus de Valider la série. Touche-le en prenant la charge : après 3, 2, 1, il compte chaque seconde de chaque répétition par des sons et des vibrations, une note qui descend pour descendre, une note fixe pour tenir et une note qui monte pour monter, puis s'arrête après tes répétitions. Valider la série reste une seule touche.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Stangenweg als Wiedergabe",
+  "lab.barPath.body":
+    "Nach Kniebeugen, Kreuzheben oder Schulterdrücken, die die Kamera zählt, spielt sie eine Wiederholung mit dem Weg der Stange über einer Strichfigur ab und gibt dir einen Tipp, wenn die Stange abgewichen ist. Von der Seite klappt es am besten. Nur die Punkte, die die Kamera gelesen hat, bleiben bis zu deinem nächsten Satz; es wird kein Video aufgenommen.",
   "lab.formCheck.title": "Technik-Check per Kamera",
   "lab.formCheck.body":
     "Während die Kamera Wiederholungen zählt, achtet sie auch darauf, wie sie laufen: Kniebeugen über der Parallele, verkürzte Wiederholungen und Neigen zu einer Seite. Zwischen den Sätzen gibt sie einen Tipp und zeigt ihn an der Figur. Für die Tiefe ist die Seitenansicht am besten; stell dich frontal zur Kamera, um eine Neigung zu prüfen.",
   "lab.speedMax.title": "Tagesmaximum aus dem Aufwärmen",
   "lab.speedMax.body":
-    "Schätzt aus dem Stangentempo deiner Aufwärmsätze dein heutiges Maximum und schlägt vor dem ersten harten Satz ein etwas schwereres oder leichteres Arbeitsgewicht vor. Funktioniert bei Kniebeugen, Hüftbeugen, Drücken, Rudern und Klimmzügen und braucht deine Größe in Deine Daten.",
+    "Schätzt aus dem Stangentempo deiner Aufwärmsätze dein heutiges Maximum und schlägt vor dem ersten harten Satz ein etwas schwereres oder leichteres Arbeitsgewicht vor. Funktioniert bei Kniebeugen, Hüftbeugen, Drücken, Rudern und Klimmzügen und braucht deine Größe in Deine Daten. Sätze bis zum Muskelversagen, während die Kamera zählt, bringen ihm dein eigenes Tempo am Satzende bei.",
   "lab.barSpeed.title": "Stangengeschwindigkeit per Kamera",
   "lab.barSpeed.body":
     "Während die Kamera Wiederholungen zählt, zeigt sie auch, wie schnell sich die Stange bewegt, wie stark sie seit deiner schnellsten Wiederholung langsamer wurde und wann du den Satz beenden solltest. Trag deine Größe unter Deine Daten ein, um Geschwindigkeiten in m/s zu sehen.",
@@ -152,15 +185,25 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Sätze per Stimme eintragen",
   "lab.voiceLog.body":
     "Fügt auf dem Trainingsbildschirm über Satz eintragen ein Mikrofon hinzu. Tipp darauf und sag „100 für 8“, „8 Wiederholungen“, „zu leicht“ oder „rückgängig“. Die Sprache wird auf deinem Handy erkannt und nie aufgenommen oder gesendet, daher braucht es ein Handy, das das in deiner Sprache kann.",
+  "lab.handsFree.title": "Sätze ohne Hände",
+  "lab.handsFree.body":
+    "Während Kamera, Handybewegung oder Uhr deine Wiederholungen zählen, wird der Satz ein paar Sekunden nach der letzten Wiederholung von selbst eingetragen und die Pause beginnt: 4 Sekunden, wenn die geplanten Wiederholungen geschafft sind, 8, solange noch welche fehlen. Rückgängig nimmt ihn zurück. Braucht eines dieser Labs zum Zählen.",
+  "lab.handsFree.soon": "Satz wird in {s} s eingetragen. Mach noch eine Wiederholung, um weiterzumachen.",
+  "lab.tempo.title": "Tempo-Coach",
+  "lab.tempo.body":
+    "Bei Tempo- und Pausenübungen wie Tempo-Kniebeugen oder Bankdrücken mit Pause erscheint über „Satz eintragen“ die Schaltfläche Tempo zählen. Tippe sie an, wenn du das Gewicht aufnimmst: Nach 3, 2, 1 zählt sie jede Sekunde jeder Wiederholung mit Tönen und Vibration, ein fallender Ton zum Ablassen, ein gleichbleibender zum Halten und ein steigender zum Hochdrücken, und hört nach deinen Wiederholungen auf. Satz eintragen bleibt ein Tippen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Replay della traiettoria del bilanciere",
+  "lab.barPath.body":
+    "Dopo uno squat, uno stacco o una lento avanti contati con la fotocamera, riproduce una ripetizione con la traiettoria del bilanciere disegnata su una figura stilizzata, e ti dà un consiglio se il bilanciere si è spostato. Di lato funziona meglio. Si tengono solo i punti letti dalla fotocamera, fino alla serie successiva; nessun video viene registrato.",
   "lab.formCheck.title": "Controllo della tecnica con la fotocamera",
   "lab.formCheck.body":
     "Mentre la fotocamera conta le ripetizioni, guarda anche come si muovono: squat che si fermano sopra il parallelo, ripetizioni accorciate e inclinazioni su un lato. Tra una serie e l’altra dà un consiglio e lo mostra sulla figura. Di lato è meglio per la profondità; mettiti di fronte per controllare se ti inclini.",
   "lab.speedMax.title": "Il massimale di oggi dal riscaldamento",
   "lab.speedMax.body":
-    "Usa la velocità del bilanciere nelle serie di riscaldamento per stimare il massimale di oggi e, prima della prima serie pesante, suggerisce un carico di lavoro un po' più alto o più basso. Funziona su squat, hip hinge, distensioni, rematori e trazioni, e richiede la tua altezza in I tuoi dati.",
+    "Usa la velocità del bilanciere nelle serie di riscaldamento per stimare il massimale di oggi e, prima della prima serie pesante, suggerisce un carico di lavoro un po' più alto o più basso. Funziona su squat, hip hinge, distensioni, rematori e trazioni, e richiede la tua altezza in I tuoi dati. Le serie portate a cedimento mentre la fotocamera conta le insegnano la tua velocità di fine serie.",
   "lab.barSpeed.title": "Velocità del bilanciere con la fotocamera",
   "lab.barSpeed.body":
     "Mentre la fotocamera conta le ripetizioni, mostra anche quanto velocemente si muove il bilanciere, quanto ha rallentato rispetto alla tua ripetizione più veloce e quando è il momento di chiudere la serie. Aggiungi la tua altezza in I tuoi dati per le velocità in m/s.",
@@ -189,15 +232,25 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "Registrare le serie con la voce",
   "lab.voiceLog.body":
     "Aggiunge un microfono sopra Registra serie nella schermata dell'allenamento. Toccalo e di' «100 per 8», «8 ripetizioni», «troppo facile» o «annulla». La voce viene riconosciuta sul telefono e non viene mai registrata né inviata, quindi serve un telefono che sappia farlo nella tua lingua.",
+  "lab.handsFree.title": "Serie a mani libere",
+  "lab.handsFree.body":
+    "Mentre la fotocamera, il movimento del telefono o l'orologio contano le ripetizioni, la serie si registra da sola pochi secondi dopo l'ultima ripetizione e parte il recupero: 4 secondi quando hai fatto le ripetizioni previste, 8 se ne mancano. Annulla la toglie. Serve uno di questi lab di conteggio attivo.",
+  "lab.handsFree.soon": "Registro questa serie tra {s} s. Fai un'altra ripetizione per continuare.",
+  "lab.tempo.title": "Coach del tempo",
+  "lab.tempo.body":
+    "Negli esercizi a tempo o con fermo, come lo squat a tempo o la panca con fermo, aggiunge Conta il tempo sopra Registra serie. Toccalo mentre prendi il peso: dopo 3, 2, 1 conta ogni secondo di ogni ripetizione con suoni e vibrazioni, una nota che scende per scendere, una ferma per tenere e una che sale per salire, poi si ferma dopo le tue ripetizioni. Registrare la serie resta un solo tocco.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "バーの軌道リプレイ",
+  "lab.barPath.body":
+    "カメラでカウントしたスクワット、デッドリフト、ショルダープレスのあと、棒人間の上にバーの軌道を描いて1レップを再生し、バーがずれていればひとこと助言します。横からの撮影がいちばんです。保存されるのはカメラが読んだ点だけで、次のセットまでです。動画は記録しません。",
   "lab.formCheck.title": "カメラでフォームチェック",
   "lab.formCheck.body":
     "カメラがレップを数えている間、動き方もチェックします。パラレルより浅いスクワット、短くなったレップ、左右への傾きです。セット間にひとつだけアドバイスを出し、フィギュアで示します。深さは横から、傾きはカメラの正面に立つと確認できます。",
   "lab.speedMax.title": "ウォームアップから今日の最大重量",
   "lab.speedMax.body":
-    "ウォームアップのバースピードから今日の最大重量を推定し、最初のきついセットの前に少し重め・軽めのメイン重量を提案します。スクワット、ヒンジ、プレス、ロウ、懸垂に対応。「あなたのデータ」に身長の入力が必要です。",
+    "ウォームアップのバースピードから今日の最大重量を推定し、最初のきついセットの前に少し重め・軽めのメイン重量を提案します。スクワット、ヒンジ、プレス、ロウ、懸垂に対応。「あなたのデータ」に身長の入力が必要です。カメラでカウントしながら限界まで行ったセットから、あなた自身のセット終盤スピードを学習します。",
   "lab.barSpeed.title": "カメラでバースピード",
   "lab.barSpeed.body":
     "カメラがレップを数えている間、バーの速さ、いちばん速いレップからどれだけ落ちたか、セットを終えるタイミングも表示します。m/s で表示するには「あなたのデータ」に身長を入力してください。",
@@ -226,4 +279,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.voiceLog.title": "声でセットを記録",
   "lab.voiceLog.body":
     "ワークアウト画面の「セットを記録」の上にマイクを追加します。タップして「100キロで8回」「8回」「簡単すぎ」「取り消し」のように言ってください。音声はスマートフォン上で認識され、録音や送信はされないため、お使いの言語でそれができるスマートフォンが必要です。",
+  "lab.handsFree.title": "ハンズフリーセット",
+  "lab.handsFree.body":
+    "カメラ、スマホのモーション、またはウォッチでレップを数えている間、最後のレップから数秒後にセットが自動で記録され、休憩が始まります。予定のレップに届いていれば4秒、足りなければ8秒です。元に戻すで取り消せます。いずれかのレップカウントのラボをオンにしてください。",
+  "lab.handsFree.soon": "{s}秒後にこのセットを記録します。続けるにはもう1レップ。",
+  "lab.tempo.title": "テンポコーチ",
+  "lab.tempo.body":
+    "テンポスクワットや一時停止ベンチプレスなど、テンポや停止のある種目で「セットを記録」の上に「テンポを数える」が出ます。重さを持つときにタップすると、3、2、1のあとに各レップの1秒ごとを音と振動で数えます。下ろすときは下がる音、止めるときは同じ音、上げるときは上がる音で、決めたレップ数が終わると止まります。セットの記録はこれまでどおりワンタップです。",
 };

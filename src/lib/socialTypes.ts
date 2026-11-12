@@ -46,7 +46,50 @@ export interface SocialProfile {
   public: boolean;
   /** Push notifications by kind (Friends settings › Notifications). Likes start off, the rest on. */
   push: PushPrefs;
+  /** The picture beside the name (an AVATAR_IDS id), or "" for the name's first letter. */
+  avatar: string;
+  /** Who sees a new post unless the lifter picks otherwise when posting. */
+  audience: Audience;
+  /** Show the best lifts on the profile (only to people who can see the posts, and only while weights show). */
+  showLifts: boolean;
+  /** The best lifts last sent by the app, for the profile's showcase. */
+  lifts: ShowcaseLift[];
 }
+
+/**
+ * Who sees a post: "all" is everyone who can see the profile (accepted followers, or anyone while it's public),
+ * "friends" only people the lifter and they both follow, "me" only the lifter.
+ */
+export const AUDIENCES = ["all", "friends", "me"] as const;
+export type Audience = (typeof AUDIENCES)[number];
+
+/** One lift on a profile's showcase: the exercise id, its best set (kilograms and reps) and when it was done. */
+export interface ShowcaseLift {
+  id: string;
+  w: number;
+  r: number;
+  at: number;
+}
+
+/**
+ * Avatars (Melvin, 2026-11-11: "unlock different avatars through locker but have a few default ones"). The first
+ * four are everyone's; the rest come from levels and badges (game.ts) and show in the Locker. The server only
+ * checks the id is one of these, because unlocks are worked out from the lifter's own event log on the device.
+ */
+export const AVATAR_IDS = [
+  "av-dumbbell",
+  "av-bolt",
+  "av-leaf",
+  "av-moon",
+  "av-target",
+  "av-heart",
+  "av-stretch",
+  "av-mascot",
+  "av-trophy",
+  "av-flame",
+  "av-pro",
+] as const;
+export type AvatarId = (typeof AVATAR_IDS)[number];
 
 export interface PushPrefs {
   follows: boolean;
@@ -71,6 +114,11 @@ export interface PersonCard {
   canSee: boolean;
   open: boolean;
   public: boolean;
+  avatar: string;
+  /** The reader has muted them: their posts stay out of the reader's feed. */
+  muted: boolean;
+  /** Their best lifts, when they show them and the reader can see their posts. */
+  lifts: ShowcaseLift[];
 }
 
 export interface FeedPost {
@@ -84,12 +132,17 @@ export interface FeedPost {
   liked: boolean;
   comments: number;
   mine: boolean;
+  avatar: string;
+  /** The poster's own words about the workout, or "". */
+  caption: string;
+  audience: Audience;
 }
 
 export interface FeedComment {
   id: string;
   handle: string;
   name: string;
+  avatar: string;
   at: number;
   body: string;
   mine: boolean;
@@ -102,6 +155,7 @@ export interface ActivityItem {
   kind: ActivityKind;
   handle: string;
   name: string;
+  avatar: string;
   at: number;
   postId?: string;
   /** The comment's text, for comments; the workout's name, for a sent workout. */
@@ -119,6 +173,8 @@ export const SOCIAL_LIMITS = {
   handleMax: 20,
   name: 40,
   comment: 280,
+  caption: 280,
+  lifts: 3,
   exercises: 20,
   muscles: 6,
 };
@@ -126,3 +182,27 @@ export const SOCIAL_LIMITS = {
 /** Lowercase letters, digits and underscores. */
 export const HANDLE_RE = /^[a-z0-9_]{3,20}$/;
 export const cleanHandle = (v: unknown) => (typeof v === "string" ? v.trim().replace(/^@/, "").toLowerCase() : "");
+
+/** One person on the friends leaderboard: what they've posted this week that the reader may see. */
+export interface BoardRow {
+  handle: string;
+  name: string;
+  avatar: string;
+  /** The reader's own row. */
+  me: boolean;
+  workouts: number;
+  sets: number;
+  minutes: number;
+  /** Kilograms, from posts that show weights. */
+  volume: number;
+  prs: number;
+}
+export const BOARD_METRICS = ["workouts", "sets", "minutes", "volume"] as const;
+export type BoardMetric = (typeof BOARD_METRICS)[number];
+
+/** Who sent an invite link, as the invite screen shows them. */
+export interface Inviter {
+  handle: string;
+  name: string;
+  avatar: string;
+}
