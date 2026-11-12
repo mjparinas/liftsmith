@@ -39,6 +39,8 @@ const install = (over: Partial<InstallFacts> = {}): InstallFacts => ({
   firstWorkout: null,
   workouts: 0,
   paywall: null,
+  trialWorkouts: 0,
+  recap: null,
   ...over,
 });
 const sub = (over: Partial<SubEvent>): SubEvent => ({
@@ -189,6 +191,27 @@ describe("admin metrics", () => {
     expect(m.overview.installs).toBe(4);
     expect(m.overview.prevInstalls).toBe(1);
     expect(m.overview.setupRate).toBe(0.75);
+  });
+
+  it("splits ended trials by what happened in them: training, and seeing what Pro did", () => {
+    const at = NOW - 28 * DAY;
+    const installs = [
+      install({ id: "t1", firstSeen: at, trialWorkouts: 5, recap: at + 7 * DAY }),
+      install({ id: "t2", firstSeen: at, trialWorkouts: 3, recap: at + 7 * DAY }),
+      install({ id: "t3", firstSeen: at, trialWorkouts: 1 }),
+      install({ id: "t4", firstSeen: at }),
+    ];
+    const subs = ["t1", "t2", "t3", "t4"].map((id) =>
+      sub({ installId: id, subscription: id, at, kind: "trial_start", plan: "annual", usd: null }),
+    );
+    subs.push(sub({ installId: "t1", subscription: "t1", at: at + 14 * DAY, kind: "trial_convert", plan: "annual", usd: 39.99 }));
+    const m = computeMetrics(input({ installs, subs }));
+    expect(m.trialFunnel.map((s) => s.n)).toEqual([4, 3, 2, 1]);
+    const row = (k: string) => m.trialSplit.find((r) => r.key === k)!;
+    expect(row("3 or more workouts")).toMatchObject({ trials: 2, paid: 1, rate: 0.5 });
+    expect(row("No workouts in the trial")).toMatchObject({ trials: 1, paid: 0, rate: 0 });
+    expect(row("Saw what Pro did")).toMatchObject({ trials: 2, paid: 1 });
+    expect(row("Didn't see it")).toMatchObject({ trials: 2, paid: 0 });
   });
 
   it("builds weekly retention cohorts", () => {

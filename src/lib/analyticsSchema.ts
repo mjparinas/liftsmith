@@ -37,6 +37,9 @@ export const EVENTS = {
   trial_start: { plan: str, store: str },
   purchase: { plan: str, store: str, price: num, currency: str, trial: bool },
   restore: { store: str },
+  // What Pro did in the trial, shown to the lifter (trialRecap.ts): where (note, paywall, done), the trial stage,
+  // and the counts behind it (adaptive workouts, weights raised, days adjusted). Once per stage and place per trial.
+  trial_recap: { where: str, stage: str, workouts: num, raised: num, adjusted: num },
 } as const satisfies Record<string, Record<string, Kind>>;
 
 export type EventName = keyof typeof EVENTS;

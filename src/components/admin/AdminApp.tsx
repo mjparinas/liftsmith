@@ -893,6 +893,21 @@ export function AdminApp() {
                 </Card>
               ))}
             </div>
+            <Card
+              title="The first two weeks: trial to paid"
+              subtitle="Trials started by the period's installs, and whether they trained in the 14 days after."
+            >
+              <Funnel steps={data.trialFunnel} />
+            </Card>
+            <Card
+              title="Trials that ended, by what happened in them"
+              subtitle="Did training in the trial, and seeing what Pro did (the trial notes and the paywall recap), lead to paying?"
+            >
+              <Table
+                columns={["", "Trials", "Paid", "Trial to paid"]}
+                rows={data.trialSplit.map((r) => [r.key, fmtInt(r.trials), fmtInt(r.paid), fmtPct(r.rate, 0)])}
+              />
+            </Card>
             <Card title="Setup wizard, step by step" subtitle="Installs that reached each step.">
               <Funnel steps={data.onboarding.map((s) => ({ key: `${s.step + 1}. ${s.name}`, n: s.n }))} />
             </Card>

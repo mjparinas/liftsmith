@@ -116,6 +116,7 @@ import * as today from "./text/today";
 import * as ton from "./text/ton";
 import * as tools from "./text/tools";
 import * as train from "./text/train";
+import * as trl from "./text/trl";
 import * as trn from "./text/trn";
 import * as twin from "./text/twin";
 import * as units from "./text/units";
@@ -240,6 +241,7 @@ export const en = {
   ...lift.en,
   ...tools.en,
   ...train.en,
+  ...trl.en,
   ...trn.en,
   ...twin.en,
   ...units.en,
