@@ -4,6 +4,7 @@ import { exercise, EXERCISE_BY_ID } from "./exercises";
 import type { Game } from "./game";
 import { date, t } from "./i18n";
 import type { CardData } from "./shareImage";
+import { SITE_URL } from "./site";
 import { MUSCLE_LABEL, type Muscle, type Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
@@ -250,9 +251,12 @@ export function previousBest(all: readonly Pr[], p: Pr): Pr | null {
   return best;
 }
 
-/** Text sent with the image, for apps that take a caption. */
+/**
+ * Text sent with the image, for apps that take a caption: what it shows, then the site's address on its own line, so a post on X,
+ * Reddit or a group chat carries a link people can tap (the card itself only names the site; 2026-11-12, traffic plan).
+ */
 export function shareText(c: CardData): string {
-  return [c.headline, c.big?.value, c.footer].filter(Boolean).join(" · ");
+  return `${[c.headline, c.big?.value, c.footer].filter(Boolean).join(" · ")}\n${SITE_URL}/`;
 }
 
 /** A past workout and each personal best set in it, for the share sheet on Progress › History. */

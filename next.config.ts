@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process";
 import type { NextConfig } from "next";
 
-import { SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
+import { EMBED_HEADERS, NOT_EMBED, SECURITY_HEADERS, SHARE_PAGE_CSP } from "./src/lib/securityHeaders";
 
 // Two builds from one codebase:
 // - STATIC_EXPORT=1 (npm run build:static): a static export to out/ for the Capacitor shells and the
@@ -53,7 +53,8 @@ const nextConfig: NextConfig = {
     ? {}
     : {
         headers: async () => [
-          { source: "/:path*", headers: SECURITY_HEADERS },
+          { source: NOT_EMBED, headers: SECURITY_HEADERS },
+          { source: "/embed/:path*", headers: EMBED_HEADERS },
           { source: "/w/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
           { source: "/u/:path*", headers: [{ key: "Content-Security-Policy", value: SHARE_PAGE_CSP }] },
         ],

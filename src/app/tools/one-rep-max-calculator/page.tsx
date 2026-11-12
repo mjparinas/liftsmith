@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { EmbedCode } from "@/components/site/EmbedCode";
 import { OneRmCalculator } from "@/components/site/OneRmCalculator";
 import { Crumbs, CtaBanner, CtaInline, JsonLd, SitePage } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { embedFor } from "@/lib/embeds";
 import { pageMeta } from "@/lib/pageMeta";
 import { SITE_URL } from "@/lib/site";
 
@@ -90,6 +92,7 @@ export default function OneRmPage() {
           .
         </p>
       </section>
+      <EmbedCode embed={embedFor("one-rep-max-calculator")!} />
       <CtaBanner
         cta="tool-onerm-end"
         title="Get stronger without guessing"
