@@ -408,6 +408,32 @@ const SCHEMA = [
     image BLOB NOT NULL
   )`,
   `CREATE INDEX IF NOT EXISTS share_links_account ON share_links (account_id, created_at)`,
+  // Gyms lifters chose to list so others nearby can add their setup (gymDirectory.ts). Position kept at 0.01°
+  // (about 1 km) only. Deleted with the account.
+  `CREATE TABLE IF NOT EXISTS public_gyms (
+    id TEXT PRIMARY KEY,
+    account_id TEXT NOT NULL,
+    local_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    code TEXT NOT NULL,
+    unit TEXT NOT NULL,
+    lat REAL NOT NULL,
+    lon REAL NOT NULL,
+    adds INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE (account_id, local_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS public_gyms_place ON public_gyms (lat, lon)`,
+  `CREATE TABLE IF NOT EXISTS gym_reports (
+    reporter TEXT NOT NULL,
+    gym_id TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open',
+    PRIMARY KEY (reporter, gym_id)
+  )`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,

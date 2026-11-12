@@ -13,6 +13,7 @@ import { Automations } from "./Automations";
 import { BingSearch } from "./BingSearch";
 import { BarList, Card, CohortTable, fmtDay, fmtInt, fmtPct, fmtUsd, Funnel, LineChart, StackedBars, Table, Tile } from "./charts";
 import { Experiments, Flags } from "./Flags";
+import { GymReports } from "./GymReports";
 import { Inbox } from "./Inbox";
 import { InstallDetail } from "./InstallDetail";
 import { Log } from "./Log";
@@ -1053,7 +1054,12 @@ export function AdminApp() {
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
         {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
-        {tab === "Reports" && <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />}
+        {tab === "Reports" && (
+          <>
+            <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />
+            <GymReports admin={data.staff.role === "admin"} />
+          </>
+        )}
         {tab === "Flags" && <Flags admin={data.staff.role === "admin"} />}
         {tab === "A/B Tests" && <Experiments admin={data.staff.role === "admin"} />}
         {tab === "Automations" && <Automations admin={data.staff.role === "admin"} />}
