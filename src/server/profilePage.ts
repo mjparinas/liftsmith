@@ -163,7 +163,37 @@ function liftsHtml(lifts: ShowcaseLift[], lang: MsgLang, unit: "kg" | "lb"): str
   return `<section class="card" aria-labelledby="lifts-h"><h2 id="lifts-h">${icon("trophy", 16)}${esc(say(lang, "pub.lifts"))}</h2><ul class="lifts">${rows}</ul></section>`;
 }
 
-function postHtml(p: PublicPost, lang: MsgLang, unit: "kg" | "lb"): string {
+/** Likes, cheers and comments on a workout, then its comments: read-only (no forms, no scripts). Liking, cheering and
+ * commenting happen in the app; the one link goes to the lifter's profile there when there are more comments than shown. */
+function reactionsHtml(p: PublicPost, lang: MsgLang, appLink: string): string {
+  const n = new Intl.NumberFormat(lang);
+  const counts: [IconName, string, number, string][] = [
+    ["heart", say(lang, "pub.likes"), p.likes, "bad"],
+    ["flame", say(lang, "pub.cheers"), p.cheers, "ember"],
+    ["chat", say(lang, "pub.comments"), p.commentCount, "cyan"],
+  ];
+  const row = `<ul class="reacts">${counts
+    .map(
+      ([i, label, v, tint]) =>
+        `<li class="${v ? "" : "zero"}" title="${esc(label)}">${icon(i, 18, tint)}<span class="n">${n.format(v)}</span><span class="sr"> ${esc(label)}</span></li>`,
+    )
+    .join("")}</ul>`;
+  if (!p.comments.length) return row;
+  const when = new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", timeZone: "UTC" });
+  const list = p.comments
+    .map(({ c, reply }) => {
+      const who = c.handle ? `<a href="/u/${esc(c.handle)}/">${esc(c.name)}</a>` : esc(c.name);
+      return `<li${reply ? ' class="reply"' : ""}><p class="c-head"><strong>${who}</strong> <time datetime="${new Date(c.at).toISOString().slice(0, 10)}">${esc(when.format(c.at))}</time></p><p class="c-body">${esc(c.body)}</p></li>`;
+    })
+    .join("");
+  const more =
+    p.commentCount > p.comments.length
+      ? `<p class="more"><a class="quiet" href="${esc(appLink)}">${esc(say(lang, "pub.allComments", { count: n.format(p.commentCount) }))} ›</a></p>`
+      : "";
+  return `${row}<ul class="comments" aria-label="${esc(say(lang, "pub.comments"))}">${list}</ul>${more}`;
+}
+
+function postHtml(p: PublicPost, lang: MsgLang, unit: "kg" | "lb", appLink: string): string {
   const b = p.body;
   const day = new Intl.DateTimeFormat(lang, { weekday: "long", month: "long", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
     p.at,
@@ -186,7 +216,7 @@ ${p.caption ? `<p class="caption">${esc(p.caption)}</p>` : ""}<dl class="stats">
         `<li><span class="ex-name">${exerciseLink(e.id, e.name)}${e.pr ? ` <span class="tag">${best}</span>` : ""}</span><span class="ex-best">${esc(bestSetText(e, unit, lang))}</span></li>`,
     )
     .join("")}</ul>
-${rest > 0 ? `<p class="more">${esc(say(lang, "pub.more", { count: rest }))}</p>` : ""}</article></li>`;
+${rest > 0 ? `<p class="more">${esc(say(lang, "pub.more", { count: rest }))}</p>` : ""}${reactionsHtml(p, lang, appLink)}</article></li>`;
 }
 
 export function profileHtml(p: PublicProfile | null, lang: MsgLang, unit: "kg" | "lb" = "kg", now = Date.now()): string {
@@ -242,18 +272,16 @@ export function profileHtml(p: PublicProfile | null, lang: MsgLang, unit: "kg" |
 <dl class="counts">${counts.map(([k, v]) => `<div><dt>${esc(k)}</dt><dd>${n.format(v)}</dd></div>`).join("")}</dl>
 ${level || streak ? `<ul class="chips">${level}${streak}</ul>` : ""}
 <a class="btn btn-ghost" href="${esc(follow)}">${icon("plus", 18)}${esc(say(lang, "pub.follow"))}</a></section>`;
-  const tryCard = `<section class="card try" aria-labelledby="try-h"><h2 id="try-h" class="try-h">${esc(say(lang, "pub.ctaTitle", { name: p.name }))}</h2>
-<p class="muted">${esc(say(lang, "pub.ctaBody"))}</p><a class="btn btn-primary" href="${APP_PATH}">${esc(t.startFree)}</a></section>`;
   const feed = p.recent.length
-    ? `<ul class="feed">${p.recent.map((x) => postHtml(x, lang, unit)).join("")}</ul>`
+    ? `<ul class="feed">${p.recent.map((x) => postHtml(x, lang, unit, follow)).join("")}</ul>`
     : `<div class="card center empty">${icon("dumbbell", 28, "gone-icon")}<p class="muted">${esc(say(lang, "pub.none"))}</p></div>`;
   return framePage(
     lang,
     title,
     meta,
     `<div class="strip"><div class="wrap row strip-row"><p>${esc(say(lang, "pub.strip", { name: p.name }))}</p><a class="quiet strip-link" href="${esc(localPath(lang, "/"))}#features">${esc(say(lang, "pub.ctaFeatures"))} ›</a></div></div>
-<main id="main" class="wrap layout"><aside class="side">${profileCard}${liftsHtml(p.lifts, lang, unit)}${calendarHtml(p, lang, now)}<div class="try-wide">${tryCard}</div></aside>
-<section class="main-col" aria-labelledby="recent-h"><h2 id="recent-h" class="section-h">${icon("progress", 16)}${esc(say(lang, "pub.recent"))}</h2>${feed}<div class="try-narrow">${tryCard.replace(/(id|aria-labelledby)="try-h"/g, '$1="try-h2"')}</div></section></main>`,
+<main id="main" class="wrap layout"><aside class="side">${profileCard}${liftsHtml(p.lifts, lang, unit)}${calendarHtml(p, lang, now)}</aside>
+<section class="main-col" aria-labelledby="recent-h"><h2 id="recent-h" class="section-h">${icon("progress", 16)}${esc(say(lang, "pub.recent"))}</h2>${feed}</section></main>`,
     PROFILE_STYLE,
   );
 }
@@ -263,7 +291,7 @@ const PROFILE_STYLE = `
 .layout{display:grid;gap:16px;padding-top:24px;padding-bottom:48px}
 .side{display:grid;gap:16px;align-content:start}
 .main-col{min-width:0}
-@media (min-width:960px){.layout{grid-template-columns:360px minmax(0,1fr);gap:28px;padding-top:36px}.try-wide{display:block}.try-narrow{display:none}
+@media (min-width:960px){.layout{grid-template-columns:360px minmax(0,1fr);gap:28px;padding-top:36px}
 .side{position:sticky;top:88px}}
 .hero{text-align:center;padding:28px 20px}
 .avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:2.5rem;font-weight:800;color:var(--ink);
@@ -291,4 +319,11 @@ dt{font-size:.8125rem;color:var(--muted)}dd{margin:0;font-weight:800;font-size:1
 .exs{list-style:none;padding:0;margin:14px 0 0}.exs li{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-top:1px solid var(--line)}
 .ex-name a{text-decoration:none}.ex-name a:hover{text-decoration:underline}.ex-best{color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
 .tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;font-size:.6875rem;font-weight:700;color:var(--gold);background:rgb(242 193 78/.12);vertical-align:1px}
-.more{color:var(--muted);font-size:.875rem;padding-top:8px}`;
+.more{color:var(--muted);font-size:.875rem;padding-top:8px}
+.reacts{display:flex;flex-wrap:wrap;gap:6px 22px;list-style:none;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line)}
+.reacts li{display:inline-flex;align-items:center;gap:6px;font-size:.875rem;color:var(--muted)}.reacts .n{font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums}
+.reacts li.zero svg{opacity:.5}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}.bad{color:var(--bad)}.cyan{color:var(--cyan)}
+.comments{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:10px}
+.comments li{background:var(--raised);border-radius:14px;padding:10px 14px}.comments li.reply{margin-left:28px}
+.c-head{font-size:.875rem}.c-head a{text-decoration:none}.c-head a:hover{text-decoration:underline}.c-head time{color:var(--muted);font-size:.8125rem;margin-left:4px}
+.c-body{margin-top:2px;white-space:pre-wrap;overflow-wrap:anywhere}`;
