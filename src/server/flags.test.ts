@@ -48,6 +48,7 @@ describe("flags for an install", () => {
       labScale: false,
       labHandsFree: false,
       labTempo: false,
+      labVolumeLog: false,
       social: true,
     });
     await setFlag("repMotion", true, 100, "owner@example.com");
@@ -141,6 +142,7 @@ describe("the flag routes", () => {
         labScale: false,
         labHandsFree: false,
         labTempo: false,
+        labVolumeLog: false,
         social: true,
       },
     });

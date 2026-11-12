@@ -120,6 +120,14 @@ export const FLAGS = {
     description:
       "On tempo and paused lifts, a button above Log set counts every second of each rep's lowering, hold and lift in sound and haptics.",
   },
+  /** Labs: volume up on the phone or earbuds logs the set (volumeKeys.ts, VolumeKeysPlugin on both phones). */
+  labVolumeLog: {
+    default: false,
+    options: [false, true] as const,
+    label: "Labs: volume button logs a set",
+    description:
+      "In the Android and iOS apps, volume up on the phone or Bluetooth earbuds logs the set as planned while the workout is on screen.",
+  },
 } as const;
 
 export type FlagName = keyof typeof FLAGS;
