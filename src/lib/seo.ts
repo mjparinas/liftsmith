@@ -300,6 +300,15 @@ export function siteRoutes(): Route[] {
     }
   }
   for (const e of EXERCISES) {
+    if (e.id in EXERCISE_GUIDES) {
+      // The guided lifts also have a page in every other site language (src/content/exerciseGuides/i18n.ts).
+      const path = `/exercises/${e.id}/`;
+      const languages = languageAlternates(path);
+      r.push({ path, priority: 0.7, languages });
+      for (const lang of SITE_LANGS) if (lang !== "en") r.push({ path: localPath(lang, path), priority: 0.6, languages });
+      if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
+      continue;
+    }
     r.push({ path: `/exercises/${e.id}/`, priority: 0.6 });
     if (indexAlternatives(e.id)) r.push({ path: `/exercises/${e.id}/alternatives/`, priority: 0.5 });
   }

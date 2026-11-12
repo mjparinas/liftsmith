@@ -1,6 +1,7 @@
 // The website's languages (Melvin, 2026-11-11: translate the landing and pricing pages). English pages live at their
 // usual paths; the other languages under /<lang>/ (/es/, /fr/pricing/). Only the pages in LOCALIZED_PATHS are translated
-// for now: the exercise library and articles wait for the English SEO work, and terms and privacy stay English-first.
+// for now, plus the 50 guided exercise pages (/<lang>/exercises/<id>/, src/content/exerciseGuides/i18n.ts); the rest of the
+// library and the articles wait for the English SEO work, and terms and privacy stay English-first.
 // Every translated page lists all its languages in hreflang tags (`languageAlternates`), and the sitemap does too.
 // Kept apart from src/lib/i18n.ts so site pages never load the app's catalogues.
 
