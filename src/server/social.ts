@@ -124,6 +124,7 @@ interface ProfileRow extends Row {
   push_cheers: number;
   push_posts: number;
   live: number;
+  cheers: number;
   suspended: number;
   seen_at: number;
   avatar: string;
@@ -184,6 +185,7 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
   lifts: liftsOf(r),
   suggest: !!n(r.suggest),
   live: !!n(r.live),
+  cheers: !!n(r.cheers ?? 1),
   level: n(r.level),
   streak: n(r.streak),
 });
@@ -298,7 +300,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
-         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?
+         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?, cheers = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -321,6 +323,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         flag(b.live, p.live),
         flag(push.cheers, p.push_cheers ?? 1),
         flag(push.posts, p.push_posts ?? 1),
+        flag(b.cheers, p.cheers ?? 1),
         accountId,
       ],
     );
@@ -1423,7 +1426,7 @@ export async function training(accountId: string, _b: Record<string, unknown>, n
   if (isResult(mine)) return mine;
   const rows = await query(
     `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar, l.exercise_id AS exercise, l.done AS done, l.total AS total,
-       l.started_at AS started_at, l.updated_at AS updated_at
+       l.started_at AS started_at, l.updated_at AS updated_at, sp.cheers AS cheers
      FROM live_sessions l JOIN social_profiles sp ON sp.account_id = l.account_id
      WHERE l.updated_at > ?2 AND sp.live = 1 AND sp.suspended = 0 AND l.account_id != ?1
        AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = ?1 AND f.followee_id = l.account_id AND f.accepted = 1)
@@ -1439,6 +1442,7 @@ export async function training(accountId: string, _b: Record<string, unknown>, n
     total: n(r.total),
     startedAt: n(r.started_at),
     updatedAt: n(r.updated_at),
+    cheers: !!n(r.cheers ?? 1),
   }));
   return ok({ people });
 }
@@ -1455,6 +1459,7 @@ export async function cheer(accountId: string, b: Record<string, unknown>, now =
   if (them === accountId || n(p.suspended) || !(await mutual(accountId, them))) return fail(403, "notFriends");
   const [l] = await query("SELECT session_id FROM live_sessions WHERE account_id = ? AND updated_at > ?", [them, now - LIVE_FOR]);
   if (!l || !n(p.live)) return fail(404, "notTraining");
+  if (!n(p.cheers ?? 1)) return fail(403, "cheersOff");
   const [last] = await query("SELECT MAX(created_at) AS at FROM cheers WHERE from_id = ? AND to_id = ?", [accountId, them]);
   if (n(last?.at) > now - CHEER_GAP) return fail(429, "slow");
   if (!(await limit(accountId, "cheer", now))) return fail(429, "slow");
@@ -1474,6 +1479,7 @@ export async function cheer(accountId: string, b: Record<string, unknown>, now =
 export async function cheers(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
   const mine = await joined(accountId);
   if (isResult(mine)) return mine;
+  if (!n(mine.cheers ?? 1)) return ok({ cheers: [] });
   const since = Math.max(Number(b.since) || 0, now - LIVE_FOR);
   const rows = await query(
     `SELECT ch.id AS id, ch.emoji AS emoji, ch.created_at AS at, sp.handle AS handle, sp.name AS name, sp.avatar AS avatar

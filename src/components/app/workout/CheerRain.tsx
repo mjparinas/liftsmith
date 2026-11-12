@@ -60,7 +60,7 @@ function drain(queue: CheerIn[], timers: ReturnType<typeof setTimeout>[], setSho
 }
 
 export function CheerRain({ sessionId, startedAt }: { sessionId: string; startedAt: number }) {
-  const sharing = useSocial((s) => !!s.me?.profile?.live);
+  const sharing = useSocial((s) => !!s.me?.profile?.live && s.me.profile.cheers !== false);
   const setsDone = useApp((s) => s.events.length);
   const tick = useNow(30_000);
   const [shown, setShown] = useState<Shown[]>([]);

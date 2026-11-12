@@ -686,6 +686,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // "Let friends cheer me on" (on to start; Melvin, 2026-11-12).
+  ["social_profiles", "cheers", "INTEGER NOT NULL DEFAULT 1"],
   // The switch for workouts from people the lifter rang the bell for (Friends gap list 3).
   ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).

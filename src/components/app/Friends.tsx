@@ -733,7 +733,7 @@ function Privacy({
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
   /** Once joined: who sees new posts and the best lifts switch. */
-  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest" | "live">;
+  joined?: Pick<SocialProfile, "audience" | "showLifts" | "suggest" | "live" | "cheers">;
   set: (p: Partial<SocialProfile>) => void;
 }) {
   return (
@@ -774,6 +774,14 @@ function Privacy({
             on={!!joined.live}
             onChange={(v) => set({ live: v })}
           />
+          {joined.live && (
+            <SwitchRow
+              label={t("social.cheer.allow")}
+              hint={t("social.cheer.allowHint")}
+              on={joined.cheers !== false}
+              onChange={(v) => set({ cheers: v })}
+            />
+          )}
           <p className={`mb-2 mt-4 px-1 ${SECTION_LABEL}`}>{t("friends.aud.default")}</p>
           <AudienceChips value={joined.audience} onChange={(a) => set({ audience: a })} publicProfile={!!pub} />
         </>
