@@ -198,6 +198,18 @@ Melvin, 2026-11-12, picked 3, 4, 5, 6, 8 and 10 from the third gap list (not tra
 - Pure web code plus the existing push plumbing, so Android and iOS get it together; the web app has no push (Platform deltas), so there the bell only shows (the post is in the feed as before).
 - Tests: the bell cases in `src/server/push.test.ts` (following first, both kinds and their route, audiences, mute, the switch, unfollow, block and leaving) and the bell flow in `Friends.test.tsx`.
 
+## Scan to follow (gap list 3, item 4)
+
+- **People › Scan to follow** (under Invite a friend) opens one sheet with the lifter's **own code**: a QR code of their invite link (`inviteUrl`, the same code as Invite a friend: 30 days, up to 50 people), so whoever scans it and the lifter **follow each other**, as an accepted invite does. Black on white whatever the theme, because a coloured code may not scan (`src/components/QrCode.tsx`, moved there from the admin panel's two-step setup, which uses it too).
+- **Scan their code** turns the same sheet into a viewfinder on the back camera (`ScanToFollow.tsx`). It reads a frame five times a second, with the browser's own `BarcodeDetector` where there is one (Android) and `jsqr` otherwise (iPhone and most desktops; bundled from npm, nothing from a CDN), all on the device; no frame is kept or sent. It only checks while the sheet is open and the app is on screen, and the camera stops when the sheet closes (docs/decisions/battery.md).
+- **Only our links open anything** (`scanTarget` in `src/lib/scanLink.ts`): an invite or club link, a person's in-app link, or a public profile page (`/u/<handle>/`), on www.getliftsmith.com (or the build's own host). Anything else says "That code isn't a Liftsmith link." and keeps looking. A code opens its usual screen (`#/invite/<code>` follows each other in one tap, a club's join screen, a profile), so the scanner adds no new way in.
+- **Without the scanner**, the phone's own camera app reads the code too: on Android the link opens the app (App Links), elsewhere the web app, which works the same.
+- **No camera** (refused, or no camera at all): it says so and offers the code again; sharing the invite link still works.
+- The iPhone's camera permission text now mentions scanning a friend's code, in all six languages (`Info.plist`, `InfoPlist.strings`). Android already has the camera permission for progress photos and rep counting.
+- Analytics: `feature` `social_scan` (with what it opened).
+- Pure web code, so Android, iOS and the web app get it together.
+- Tests: `src/lib/scanLink.test.ts` (our links, the build's host, everything else ignored) and `src/components/app/ScanToFollow.test.tsx` (the lifter's code is their invite, a scanned invite opens and the camera stops, a foreign code and a refused camera). The accessibility run scans the sheet.
+
 ## Store answers for user-generated content
 
 For Melvin to enter in the consoles (Friends adds content people make and share):

@@ -389,6 +389,7 @@ try {
       },
     },
     clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
+    invite: { code: "ABCD2345" },
     inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
@@ -502,6 +503,10 @@ try {
   await page.getByLabel("Find a friend").fill("stone");
   await page.getByRole("list", { name: "Search results" }).waitFor();
   await scan("friends people");
+  await page.getByRole("button", { name: "Scan to follow" }).click();
+  await page.getByRole("img", { name: "Your Liftsmith code" }).waitFor();
+  await scan("friends scan to follow");
+  await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();

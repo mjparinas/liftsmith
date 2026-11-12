@@ -88,6 +88,7 @@ import { Icon } from "./icons";
 import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
+import { ScanToFollow } from "./ScanToFollow";
 import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
@@ -1172,6 +1173,7 @@ function People() {
   const [version, setVersion] = useState(0);
   const changed = () => setVersion((v) => v + 1);
   const [note, setNote] = useState<string | null>(null);
+  const [scan, setScan] = useState(false);
   const handle = me?.profile?.handle ?? "";
   const find = (e: FormEvent) => {
     e.preventDefault();
@@ -1212,6 +1214,10 @@ function People() {
       </form>
       <SearchResults q={q} />
       <InviteButton />
+      <Button kind="ghost" icon="camera" className="mt-2 w-full" onClick={() => setScan(true)}>
+        {t("social.scan.title")}
+      </Button>
+      {scan && <ScanToFollow onClose={() => setScan(false)} />}
       <Button kind="ghost" icon="share" className="mt-2 w-full" onClick={() => void share()}>
         {t("friends.shareMe", { handle })}
       </Button>
