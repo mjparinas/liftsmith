@@ -11,6 +11,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { decodeGym, encodeGym, GYM_NAME_MAX } from "@/lib/gymShare";
 
 import { batch, query, rateLimit, run, type Row } from "./db";
+import { placeExists } from "./gymPlaces";
 import { checkText } from "./moderation";
 
 export const LIMITS = {
@@ -78,6 +79,8 @@ export async function publish(accountId: string, body: Record<string, unknown>, 
   if (!kit || !isLocalId(body.localId)) return { ok: false, error: "code" };
   if (!validLat(body.lat) || !validLon(body.lon)) return { ok: false, error: "place" };
   const name = checkText(body.name ?? kit.name, GYM_NAME_MAX);
+  // Which real gym this setup is for (gymPlaces.ts), when the lifter added it from one. Anything else is dropped.
+  const placeId = (await placeExists(body.placeId)) ? (body.placeId as string) : "";
   if (!name.ok) return { ok: false, error: name.error };
   const [had] = await query("SELECT id FROM public_gyms WHERE account_id = ? AND local_id = ?", [accountId, body.localId]);
   if (!had) {
@@ -90,12 +93,13 @@ export async function publish(accountId: string, body: Record<string, unknown>, 
   const lat = cell(body.lat);
   const lon = cell(body.lon);
   if (had) {
-    await run("UPDATE public_gyms SET name = ?, code = ?, unit = ?, lat = ?, lon = ?, updated_at = ? WHERE id = ?", [
+    await run("UPDATE public_gyms SET name = ?, code = ?, unit = ?, lat = ?, lon = ?, place_id = ?, updated_at = ? WHERE id = ?", [
       name.text,
       code,
       kit.unit,
       lat,
       lon,
+      placeId,
       now,
       s(had.id),
     ]);
@@ -103,9 +107,9 @@ export async function publish(accountId: string, body: Record<string, unknown>, 
   }
   const id = randomBytes(8).toString("hex");
   await run(
-    `INSERT INTO public_gyms (id, account_id, local_id, name, code, unit, lat, lon, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [id, accountId, body.localId, name.text, code, kit.unit, lat, lon, now, now],
+    `INSERT INTO public_gyms (id, account_id, local_id, name, code, unit, lat, lon, place_id, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    [id, accountId, body.localId, name.text, code, kit.unit, lat, lon, placeId, now, now],
   );
   return { ok: true, id };
 }
@@ -125,7 +129,7 @@ export async function mine(accountId: string): Promise<Mine[]> {
   return rows.map((r) => ({ id: s(r.id), localId: s(r.local_id), name: s(r.name), hidden: !!n(r.hidden) }));
 }
 
-/** Gyms listed within `LIMITS.radiusKm` of a position, nearest first. */
+/** Gyms listed within `LIMITS.radiusKm` of a position, nearest first. Setups listed for a real gym show under that gym instead. */
 export async function nearby(lat: unknown, lon: unknown): Promise<Listing[] | null> {
   if (!validLat(lat) || !validLon(lon)) return null;
   const here = { lat: cell(lat), lon: cell(lon) };
@@ -133,7 +137,7 @@ export async function nearby(lat: unknown, lon: unknown): Promise<Listing[] | nu
   const dLon = LIMITS.radiusKm / (111 * Math.max(0.05, Math.cos((here.lat * Math.PI) / 180)));
   const rows = await query(
     `SELECT id, name, code, unit, lat, lon, adds FROM public_gyms
-     WHERE hidden = 0 AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? LIMIT 500`,
+     WHERE hidden = 0 AND place_id = '' AND lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? LIMIT 500`,
     [here.lat - dLat, here.lat + dLat, here.lon - dLon, here.lon + dLon],
   );
   return rows

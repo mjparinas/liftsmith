@@ -149,6 +149,12 @@ export default function Privacy() {
           one-way code made from their internet address (or their account) so each person counts once. Turn the listing off in Gyms, or
           delete your account, and it&apos;s deleted.
         </p>
+        <p className="mt-2">
+          The gyms you can find near you also include real gyms from OpenStreetMap, a public map. Adding one of them counts you once toward
+          how many lifters train there: we keep that you added it with your account (or a one-way code from your internet address), and show
+          only the total. If you list a gym you added this way, the listing says which real gym it is. Deleting your account removes you
+          from those totals.
+        </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
         <p className="mt-2">

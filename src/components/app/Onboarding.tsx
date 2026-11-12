@@ -12,7 +12,7 @@ import { BRAND } from "@/lib/brand";
 import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
-import { markAdded } from "@/lib/gymDirectory";
+import { markAdded, placeKit } from "@/lib/gymDirectory";
 import { decodeGym, type GymKit } from "@/lib/gymShare";
 import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/health";
 import { connectHeartRate, HrError, hrMessage, hrSupported } from "@/lib/heartRate";
@@ -227,7 +227,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [exp, setExp] = useState<Experience>(profile.experience);
   const [preset, setPreset] = useState<GymPreset>("commercial");
   // A gym another lifter listed nearby (gymDirectory.ts), taken instead of a preset.
-  const [found, setFound] = useState<{ id: string; kit: GymKit } | null>(null);
+  const [found, setFound] = useState<{ id: string; kit: GymKit; place?: string } | null>(null);
   const [unit, setUnit] = useState<Unit>(profile.unit);
   const [days, setDays] = useState(profile.daysPerWeek);
   const [bw, setBw] = useState(Math.round(fromKg(profile.bodyweight, profile.unit)));
@@ -274,8 +274,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
 
   const finish = (pro?: Profile["pro"]) => {
     setProfile({ unit });
-    const id = keepGyms ? profile.activeGymId : found ? importGym(found.kit) : addGym(preset);
-    if (!keepGyms && found) markAdded(found.id);
+    const id = keepGyms ? profile.activeGymId : found ? importGym(found.kit, found.place) : addGym(preset);
+    if (!keepGyms && found) markAdded(found.place ? null : found.id, found.place);
     const years = Number(age);
     setProfile({
       name: name.trim(),
@@ -455,6 +455,10 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
                   if (!kit) return;
                   setKeepGyms(false);
                   setFound({ id: l.id, kit: { ...kit, name: l.name } });
+                }}
+                onPickPlace={(p) => {
+                  setKeepGyms(false);
+                  setFound({ id: p.id, kit: placeKit(p, unit).kit, place: p.id });
                 }}
               />
             </div>

@@ -434,6 +434,44 @@ const SCHEMA = [
     status TEXT NOT NULL DEFAULT 'open',
     PRIMARY KEY (reporter, gym_id)
   )`,
+  // Real gyms (gymPlaces.ts, docs/decisions/gyms.md): seeded from OpenStreetMap by staff, official once an owner
+  // claims one. Business places, not lifter data, so the position is kept as the map has it.
+  `CREATE TABLE IF NOT EXISTS gym_places (
+    id TEXT PRIMARY KEY,
+    city_slug TEXT NOT NULL,
+    slug TEXT NOT NULL,
+    name TEXT NOT NULL,
+    kind TEXT NOT NULL DEFAULT 'gym',
+    address TEXT NOT NULL DEFAULT '',
+    city TEXT NOT NULL DEFAULT '',
+    region TEXT NOT NULL DEFAULT '',
+    country TEXT NOT NULL DEFAULT '',
+    lat REAL NOT NULL,
+    lon REAL NOT NULL,
+    hours TEXT NOT NULL DEFAULT '',
+    website TEXT NOT NULL DEFAULT '',
+    phone TEXT NOT NULL DEFAULT '',
+    source TEXT NOT NULL,
+    source_ref TEXT NOT NULL DEFAULT '',
+    code TEXT NOT NULL DEFAULT '',
+    claimed_by TEXT NOT NULL DEFAULT '',
+    claimed_at INTEGER NOT NULL DEFAULT 0,
+    description TEXT NOT NULL DEFAULT '',
+    lifters INTEGER NOT NULL DEFAULT 0,
+    hidden INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    updated_at INTEGER NOT NULL,
+    UNIQUE (city_slug, slug)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
+  `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
+  `CREATE TABLE IF NOT EXISTS gym_place_lifters (
+    place_id TEXT NOT NULL,
+    who TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (place_id, who)
+  )`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -735,6 +773,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
+  // A listed setup can say which real gym it is (gymPlaces.ts); the gym then offers that setup.
+  ["public_gyms", "place_id", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 let client: Client | null = null;

@@ -1,10 +1,12 @@
 // Find a gym near you (src/server/gymDirectory.ts, docs/decisions/gym-sharing.md). Server build only.
-// GET ?lat=&lon=: listed gyms near a position the app already rounded to about 1 km. Anyone, rate-limited.
+// GET ?lat=&lon=[&studios=1]: real gyms (gymPlaces.ts, official ones first) and listed setups near a position the
+// app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
 // POST {op}: publish, unpublish and mine need a signed-in account; added and report work signed out too.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
+import { joinPlace, nearbyPlaces } from "@/server/gymPlaces";
 
 export const OPTIONS = preflight;
 
@@ -14,9 +16,12 @@ export async function GET(req: Request) {
   if (!hasDb()) return reply(req, 503, { error: "The gym list isn't set up yet." });
   if (!(await rateLimit(`gyms:search:${ipOf(req)}`, LIMITS.searchesPerHour, 3_600_000))) return reply(req, 429, { error: "slow" });
   const u = new URL(req.url).searchParams;
-  const gyms = await nearby(Number(u.get("lat") ?? NaN), Number(u.get("lon") ?? NaN));
-  if (!gyms) return reply(req, 400, { error: "Bad request." });
-  return reply(req, 200, { gyms });
+  const lat = Number(u.get("lat") ?? NaN);
+  const lon = Number(u.get("lon") ?? NaN);
+  const gyms = await nearby(lat, lon);
+  const places = await nearbyPlaces(lat, lon, { studios: u.get("studios") === "1" });
+  if (!gyms || !places) return reply(req, 400, { error: "Bad request." });
+  return reply(req, 200, { gyms, places });
 }
 
 export async function POST(req: Request) {
@@ -29,7 +34,8 @@ export async function POST(req: Request) {
     const who = s ? `acc:${s.accountId}` : addressKey(ipOf(req));
     if (!(await rateLimit(`gyms:${b.op}:${who}`, 30, 3_600_000))) return reply(req, 429, { error: "slow" });
     if (b.op === "added") {
-      await added(who, b.id);
+      if (b.id !== undefined) await added(who, b.id);
+      if (b.place !== undefined) await joinPlace(who, b.place);
       return reply(req, 200, { ok: true });
     }
     return (await report(who, b.id, b.reason)) ? reply(req, 200, { ok: true }) : reply(req, 400, { error: "Bad request." });
