@@ -86,7 +86,7 @@ const TABS: { route: Route; label: MessageKey; icon: IconName }[] = [
 
 // Screens with a desktop layout of their own (two columns or more, docs/decisions/desktop-layout.md stage 3): they get
 // the full width on the desktop layout. Every other screen keeps a comfortable single column.
-const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise"]);
+const WIDE: ReadonlySet<Route> = new Set<Route>(["today", "recovery", "stats", "friends", "achievements", "exercise", "trainer"]);
 
 // Screens that hide the tab bar.
 const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setup", "feedback", "pro"]);

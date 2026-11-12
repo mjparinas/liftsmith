@@ -370,10 +370,23 @@ export function Section({
   );
 }
 
-export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
+export function Sheet({
+  open,
+  onClose,
+  title,
+  children,
+  wide,
+}: {
+  open: boolean;
+  onClose: () => void;
+  title: string;
+  children: ReactNode;
+  /** On the desktop layout, a wide dialog (the routine builder's two columns); phones are unchanged. */
+  wide?: boolean;
+}) {
   if (!open) return null;
   return (
-    <SheetBody onClose={onClose} title={title}>
+    <SheetBody onClose={onClose} title={title} wide={wide}>
       {children}
     </SheetBody>
   );
@@ -393,7 +406,7 @@ const NO_SWIPE = "canvas, input[type=range], [data-no-swipe]";
  * outside, and Escape. On the desktop layout (layout.ts) it opens as a centred dialog instead, without
  * the handle, and closes by the ✕, clicking outside and Escape.
  */
-function SheetBody({ onClose, title, children }: { onClose: () => void; title: string; children: ReactNode }) {
+function SheetBody({ onClose, title, children, wide }: { onClose: () => void; title: string; children: ReactNode; wide?: boolean }) {
   const box = useRef<HTMLDivElement>(null);
   const id = useId();
   const closeRef = useRef(onClose);
@@ -575,7 +588,7 @@ function SheetBody({ onClose, title, children }: { onClose: () => void; title: s
         aria-modal="true"
         aria-labelledby={`${id}-t`}
         data-testid="sheet"
-        className="animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none desk:max-h-[85dvh] desk:rounded-3xl desk:border desk:pt-4 desk:shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)]"
+        className={`animate-rise safe-bottom max-h-[85dvh] w-full max-w-lg ${wide ? "desk:max-w-4xl" : ""} overflow-y-auto overscroll-contain rounded-t-3xl border-t border-line bg-surface px-5 pb-5 pt-2 shadow-[0_-20px_60px_-20px_rgb(0_0_0/0.8)] outline-none desk:max-h-[85dvh] desk:rounded-3xl desk:border desk:pt-4 desk:shadow-[0_30px_80px_-20px_rgb(0_0_0/0.8)]`}
         onClick={(e) => e.stopPropagation()}
       >
         <div
