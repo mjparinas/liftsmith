@@ -1,7 +1,18 @@
 import { generateKeyPairSync, sign } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { accountInfo, accountPro, appleClientSecret, deleteAccount, sessionOf, signInWith, startEmail, verifyEmail } from "./accounts";
+import {
+  accountInfo,
+  accountPro,
+  appleClientSecret,
+  deleteAccount,
+  RENEW_MS,
+  SESSION_MS,
+  sessionOf,
+  signInWith,
+  startEmail,
+  verifyEmail,
+} from "./accounts";
 import { query, resetDb } from "./db";
 import { clearKeys, sha256hex, verifiedEmail, verifyIdToken, type Claims } from "./idToken";
 import { REVIEW_EMAIL, reviewCode, reviewCodeMatches } from "./review";
@@ -219,6 +230,24 @@ describe("accounts", () => {
     expect(await sessionOf(req(token), NOW)).toBeNull();
     expect((await query("SELECT * FROM sync_events")).length).toBe(0);
     expect(revoked).toBe(0);
+  });
+
+  it("renews a session with use, and a failed renewal doesn't end it", async () => {
+    const r = await signInWith("google", { idToken: "t", nonce: "n", platform: "android" }, { verify: verify("g-1", "x@y.co"), now: NOW });
+    const req = new Request("https://x/api/sync/", { headers: { Authorization: `Bearer ${String(r.body.token)}` } });
+    const expiry = async () => Number((await query<{ expires_at: number }>("SELECT expires_at FROM account_sessions"))[0]!.expires_at);
+    // Used every few weeks, it never runs out: each use pushes the year forward again.
+    let at = NOW;
+    for (let i = 0; i < 20; i++) {
+      at += 40 * 86_400_000;
+      expect(await sessionOf(req, at)).not.toBeNull();
+    }
+    expect(await expiry()).toBe(at + SESSION_MS);
+    // The database refuses the renewal write: the session is still good.
+    await query("CREATE TRIGGER no_renew BEFORE UPDATE ON account_sessions BEGIN SELECT RAISE(FAIL, 'down'); END");
+    expect(await sessionOf(req, at + 2 * RENEW_MS)).not.toBeNull();
+    // Unused for longer than a year, it ends.
+    expect(await sessionOf(req, at + SESSION_MS + 1)).toBeNull();
   });
 
   it("makes an Apple client secret only when the key is configured", () => {

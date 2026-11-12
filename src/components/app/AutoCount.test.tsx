@@ -6,6 +6,7 @@ import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { cacheFlags, FLAG_CACHE_KEY } from "@/lib/flags";
+import type { Keypoint } from "@/lib/reps/pose";
 import { imuSamples, sideSquat, simulateSet } from "@/lib/reps/simulate";
 import type { MotionReading, PoseEngine } from "@/lib/reps/sources";
 
@@ -16,6 +17,7 @@ import {
   countSource,
   formTip,
   loadCountPrefs,
+  pathTip,
   saveCountPrefs,
   shownLean,
   type CountPrefs,
@@ -25,6 +27,9 @@ const motion: { cb?: (r: MotionReading) => void } = {};
 const openCamera = vi.fn();
 /** The pose model: none (it can't load in tests) unless a test hands one in. */
 const model: { engine?: PoseEngine } = {};
+/** What the pose model sees. The stage keeps the first model it loads for the whole run, so every test's model
+ *  reads from here rather than from a variable of its own. */
+const view: { kps?: Keypoint[] } = {};
 vi.mock("@/lib/reps/sources", () => ({
   openCamera: (...a: unknown[]) => openCamera(...a),
   loadPose: () => (model.engine ? Promise.resolve(model.engine) : Promise.reject(new Error("no network in tests"))),
@@ -190,8 +195,8 @@ describe("camera form check (its lab)", () => {
     cacheFlags({ labRepCount: true, labFormCheck: true });
     // A camera that plays, a pose model that sees a side-on squat, and frames that run when the test says.
     let clock = 0;
-    let kps = sideSquat(0, 0);
-    model.engine = { detect: () => kps, close: () => {} };
+    view.kps = sideSquat(0, 0);
+    model.engine = { detect: () => view.kps, close: () => {} };
     const frames: FrameRequestCallback[] = [];
     vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => frames.push(cb));
     vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
@@ -210,7 +215,7 @@ describe("camera form check (its lab)", () => {
     await act(async () => {});
     const frame = (f: number, rom: number) => {
       clock += 33;
-      kps = sideSquat(f, rom);
+      view.kps = sideSquat(f, rom);
       for (const cb of frames.splice(0)) cb(clock);
     };
     act(() => {
@@ -228,6 +233,74 @@ describe("camera form check (its lab)", () => {
     // The next set starts clean.
     rerender(<AutoCount {...props} counting setKey="1" />);
     expect(screen.getByRole("status")).not.toHaveTextContent("parallel");
+    model.engine = undefined;
+    vi.restoreAllMocks();
+    localStorage.removeItem(FLAG_CACHE_KEY);
+  });
+});
+
+describe("bar path replay (its lab)", () => {
+  it("words the cue from where the bar drifted, or says it stayed on line", () => {
+    expect(pathTip({ reps: 5, maxCm: 9, issue: { kind: "forwardBottom", hit: 3, of: 5, cm: 8 } })).toEqual({
+      text: "The bar drifted about 8 cm forward at the bottom on 3 of 5 reps. Keep it over the middle of your foot: brace hard and stay tight at the bottom.",
+      issue: true,
+    });
+    expect(pathTip({ reps: 1, maxCm: 7, issue: { kind: "back", hit: 1, of: 1, cm: 7 } }).text).toMatch(
+      /^The bar drifted about 7 cm back\./,
+    );
+    expect(pathTip({ reps: 4, maxCm: 0 })).toEqual({
+      text: "Bar path: it stayed within 1 cm of where it started on those 4 reps.",
+      issue: false,
+    });
+  });
+
+  it("replays a camera-counted squat once it's logged, and clears for the next set", async () => {
+    cacheFlags({ labRepCount: true, labBarPath: true });
+    let clock = 0;
+    // Side-on squats with the feet in view, so the camera knows where the mid-foot is and which way the lifter faces.
+    const withFeet = (k: ReturnType<typeof sideSquat>) => {
+      k[29] = { x: 0.46, y: 0.92, visibility: 0.9 };
+      k[31] = { x: 0.56, y: 0.92, visibility: 0.9 };
+      return k;
+    };
+    view.kps = withFeet(sideSquat(0, 0));
+    model.engine = { detect: () => view.kps, close: () => {} };
+    const frames: FrameRequestCallback[] = [];
+    vi.spyOn(window, "requestAnimationFrame").mockImplementation((cb) => frames.push(cb));
+    vi.spyOn(window, "cancelAnimationFrame").mockImplementation(() => {});
+    vi.spyOn(performance, "now").mockImplementation(() => clock);
+    vi.spyOn(HTMLCanvasElement.prototype, "getContext").mockReturnValue(null);
+    openCamera.mockImplementation(async (v: HTMLVideoElement) => {
+      Object.defineProperties(v, {
+        readyState: { get: () => 4 },
+        currentTime: { get: () => clock },
+        videoWidth: { get: () => 480 },
+        videoHeight: { get: () => 480 },
+      });
+      return { getTracks: () => [] };
+    });
+    const { props, rerender } = stage();
+    await act(async () => {});
+    const frame = (f: number, rom: number) => {
+      clock += 33;
+      view.kps = withFeet(sideSquat(f, rom));
+      for (const cb of frames.splice(0)) cb(clock);
+    };
+    act(() => {
+      for (let i = 0; i < 30; i++) frame(0, 0);
+      for (let r = 0; r < 3; r++) {
+        for (let i = 0; i <= 70; i++) frame(Math.sin((Math.PI * i) / 70), 120);
+        for (let i = 0; i < 25; i++) frame(0, 0);
+      }
+    });
+    expect(props.onCount).toHaveBeenLastCalledWith(3);
+    expect(screen.queryByTestId("bar-path-replay")).toBeNull();
+    rerender(<AutoCount {...props} counting={false} setKey="1" />);
+    expect(screen.getByTestId("bar-path-replay")).toBeInTheDocument();
+    expect(screen.getByRole("status")).toHaveTextContent(/bar path|the bar drifted/i);
+    expect(screen.getByRole("button", { name: /bar path/i })).toBeInTheDocument();
+    rerender(<AutoCount {...props} counting setKey="1" />);
+    expect(screen.queryByTestId("bar-path-replay")).toBeNull();
     model.engine = undefined;
     vi.restoreAllMocks();
     localStorage.removeItem(FLAG_CACHE_KEY);

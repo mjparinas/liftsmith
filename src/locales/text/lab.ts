@@ -4,6 +4,9 @@ import type { Message } from "@/lib/i18n";
 // then its Spanish and French. A missing translation falls back to English.
 
 export const en = {
+  "lab.barPath.title": "Bar path replay",
+  "lab.barPath.body":
+    "After a camera-counted squat, deadlift or overhead press, replays one rep with the bar's path drawn over a stick figure, and gives one cue if the bar drifted. Side-on works best. Only the points the camera read are kept, until your next set; no video is recorded.",
   "lab.formCheck.title": "Camera form check",
   "lab.formCheck.body":
     "While the camera counts reps, it also watches how they move: squats that stop above parallel, reps cut short, and leaning to one side. Between sets it gives one tip and shows it on the figure. Side-on is best for depth; face the camera to check for a lean.",
@@ -49,6 +52,9 @@ export const en = {
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Repetición de la trayectoria de la barra",
+  "lab.barPath.body":
+    "Tras una sentadilla, un peso muerto o un press militar contados con la cámara, repite una repetición con la trayectoria de la barra dibujada sobre una figura, y te da un consejo si la barra se desvió. Funciona mejor de perfil. Solo se guardan los puntos que leyó la cámara, hasta tu siguiente serie; no se graba vídeo.",
   "lab.formCheck.title": "Revisión de técnica con la cámara",
   "lab.formCheck.body":
     "Mientras la cámara cuenta repeticiones, también mira cómo se mueven: sentadillas que se quedan por encima del paralelo, repeticiones cortas e inclinarse hacia un lado. Entre series da un consejo y lo muestra en la figura. De lado se ve mejor la profundidad; ponte de frente para revisar si te inclinas.",
@@ -93,6 +99,9 @@ export const es: Partial<Record<Key, Message>> = {
 };
 
 export const fr: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Rejouer la trajectoire de la barre",
+  "lab.barPath.body":
+    "Après un squat, un soulevé de terre ou un développé militaire comptés par la caméra, rejoue une répétition avec la trajectoire de la barre tracée sur une silhouette, et donne un conseil si la barre a dévié. De profil, c'est mieux. Seuls les points lus par la caméra sont gardés, jusqu'à votre série suivante ; aucune vidéo n'est enregistrée.",
   "lab.formCheck.title": "Contrôle de la technique par la caméra",
   "lab.formCheck.body":
     "Pendant que la caméra compte les répétitions, elle regarde aussi comment elles bougent : squats arrêtés au-dessus de la parallèle, répétitions écourtées et inclinaison d’un côté. Entre les séries, elle donne un conseil et le montre sur la silhouette. De profil, c’est mieux pour la profondeur ; de face, pour voir si vous penchez.",
@@ -138,6 +147,9 @@ export const fr: Partial<Record<Key, Message>> = {
 };
 
 export const de: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Stangenweg als Wiedergabe",
+  "lab.barPath.body":
+    "Nach Kniebeugen, Kreuzheben oder Schulterdrücken, die die Kamera zählt, spielt sie eine Wiederholung mit dem Weg der Stange über einer Strichfigur ab und gibt dir einen Tipp, wenn die Stange abgewichen ist. Von der Seite klappt es am besten. Nur die Punkte, die die Kamera gelesen hat, bleiben bis zu deinem nächsten Satz; es wird kein Video aufgenommen.",
   "lab.formCheck.title": "Technik-Check per Kamera",
   "lab.formCheck.body":
     "Während die Kamera Wiederholungen zählt, achtet sie auch darauf, wie sie laufen: Kniebeugen über der Parallele, verkürzte Wiederholungen und Neigen zu einer Seite. Zwischen den Sätzen gibt sie einen Tipp und zeigt ihn an der Figur. Für die Tiefe ist die Seitenansicht am besten; stell dich frontal zur Kamera, um eine Neigung zu prüfen.",
@@ -183,6 +195,9 @@ export const de: Partial<Record<Key, Message>> = {
 };
 
 export const it: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "Replay della traiettoria del bilanciere",
+  "lab.barPath.body":
+    "Dopo uno squat, uno stacco o una lento avanti contati con la fotocamera, riproduce una ripetizione con la traiettoria del bilanciere disegnata su una figura stilizzata, e ti dà un consiglio se il bilanciere si è spostato. Di lato funziona meglio. Si tengono solo i punti letti dalla fotocamera, fino alla serie successiva; nessun video viene registrato.",
   "lab.formCheck.title": "Controllo della tecnica con la fotocamera",
   "lab.formCheck.body":
     "Mentre la fotocamera conta le ripetizioni, guarda anche come si muovono: squat che si fermano sopra il parallelo, ripetizioni accorciate e inclinazioni su un lato. Tra una serie e l’altra dà un consiglio e lo mostra sulla figura. Di lato è meglio per la profondità; mettiti di fronte per controllare se ti inclini.",
@@ -227,6 +242,9 @@ export const it: Partial<Record<Key, Message>> = {
 };
 
 export const ja: Partial<Record<Key, Message>> = {
+  "lab.barPath.title": "バーの軌道リプレイ",
+  "lab.barPath.body":
+    "カメラでカウントしたスクワット、デッドリフト、ショルダープレスのあと、棒人間の上にバーの軌道を描いて1レップを再生し、バーがずれていればひとこと助言します。横からの撮影がいちばんです。保存されるのはカメラが読んだ点だけで、次のセットまでです。動画は記録しません。",
   "lab.formCheck.title": "カメラでフォームチェック",
   "lab.formCheck.body":
     "カメラがレップを数えている間、動き方もチェックします。パラレルより浅いスクワット、短くなったレップ、左右への傾きです。セット間にひとつだけアドバイスを出し、フィギュアで示します。深さは横から、傾きはカメラの正面に立つと確認できます。",

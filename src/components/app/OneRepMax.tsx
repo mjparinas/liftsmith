@@ -383,3 +383,6 @@ export function DotsCard() {
     </Section>
   );
 }
+
+// Shared with Tools (src/components/app/tools/): the stepper, the weight step and the set calculator.
+export { Bump as StepValue, SetCalculator, weightStep };
