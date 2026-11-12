@@ -187,6 +187,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Food from Health](docs/decisions/food-from-health.md) (`src/lib/nutrition.ts`, `insights.ts`, `health.ts`, `HealthWorkoutPlugin.kt`, `HealthWorkoutPlugin.swift`)
 - [Friends and the workout feed](docs/decisions/friends.md) (`src/server/social.ts`, `src/lib/social.ts`, `Friends.tsx`, `src/server/moderation.ts`)
 - [Google Play review](docs/decisions/google-play-review.md) (`health.ts`, `docs/PRIVACY_LABELS.md`, `site.ts`)
+- [Growth: organic, the Hevy way](docs/decisions/growth.md) (strategy, segments and the ranked list of growth work; channels in Marketing and growth)
 - [Gym by location](docs/decisions/gym-by-location.md) (`src/lib/geo.ts`)
 - [Gym sharing](docs/decisions/gym-sharing.md) (`src/lib/gymShare.ts`, `SharedGym.tsx`, `Gym.tsx`, `src/lib/gymDirectory.ts`, `src/server/gymDirectory.ts`, `NearbyGyms.tsx`)
 - [Gym machines](docs/decisions/gym-machines.md) (`src/lib/ftms.ts`, `machine.ts`, `machineLink.ts`, `workout/MachineCard.tsx`)
