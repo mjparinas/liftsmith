@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { AchievementRow, Badge, Bar, LeagueCard, QuestsCard, StreakCard, TIER_COLOUR } from "@/components/app/Achievements";
+import { FriendsDesk } from "@/components/app/Friends";
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE, SECTION_LABEL, SHEET_TITLE } from "@/components/titles";
 import { applyA11y, savedA11y } from "@/lib/a11y";
@@ -19,6 +20,8 @@ import type { Term } from "@/lib/glossary";
 import { date, readPhoneLanguage, setLanguage, t } from "@/lib/i18n";
 import { load } from "@/lib/localdb";
 import { APP_PATH } from "@/lib/site";
+import { socialOn } from "@/lib/social";
+import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL, MUSCLES, type AppEvent, type Profile, type Unit } from "@/lib/types";
 import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useLang } from "@/lib/useLang";
@@ -31,10 +34,11 @@ import { SharePanel } from "./Share";
 // days you trained, lift progress, history, achievements, logging a past workout, and a share link.
 // It reads the same on-device event log as the app. Workouts from other devices arrive with sync.
 
-const TABS = ["overview", "calendar", "lifts", "history", "trophies", "log", "share"] as const;
-type Tab = (typeof TABS)[number];
-
-const isTab = (s: string): s is Tab => (TABS as readonly string[]).includes(s);
+const ALL_TABS = ["overview", "calendar", "lifts", "history", "friends", "trophies", "log", "share"] as const;
+type Tab = (typeof ALL_TABS)[number];
+/** Friends shows while the admin switch (`social`) is on. */
+const tabs = (): readonly Tab[] => (socialOn() ? ALL_TABS : ALL_TABS.filter((x) => x !== "friends"));
+const isTab = (s: string): s is Tab => (ALL_TABS as readonly string[]).includes(s);
 
 function useTab(): [Tab, string | undefined, (t: Tab, arg?: string) => void] {
   const read = () => {
@@ -43,7 +47,14 @@ function useTab(): [Tab, string | undefined, (t: Tab, arg?: string) => void] {
   };
   const [st, setSt] = useState(read);
   useEffect(() => {
-    const on = () => setSt(read());
+    const on = () => {
+      // The Friends tab shares the app's screens: a route that isn't the dashboard's own (a profile, a shared
+      // routine, an invite, Account) opens in the web app.
+      const [route] = location.hash.replace(/^#\/?/, "").split("/");
+      // A full page load on purpose: the app is its own static page with its own start-up.
+      if (route && !isTab(route)) return void window.open(`${APP_PATH}${location.hash}`, "_self");
+      setSt(read());
+    };
     window.addEventListener("hashchange", on);
     return () => window.removeEventListener("hashchange", on);
   }, []);
@@ -136,7 +147,7 @@ export function Dashboard() {
       </header>
       <nav aria-label={t("dash.nav")} className="-mx-1 overflow-x-auto border-b border-line">
         <ul className="flex min-w-max gap-1 px-1">
-          {TABS.map((id) => (
+          {tabs().map((id) => (
             <li key={id}>
               <a
                 href={`#/${id}`}
@@ -156,6 +167,7 @@ export function Dashboard() {
         {tab === "calendar" && <CalendarTab stats={stats} now={now} unit={unit} go={go} />}
         {tab === "lifts" && <Lifts events={events} stats={stats} unit={unit} />}
         {tab === "history" && <History events={events} stats={stats} unit={unit} open={arg} go={go} />}
+        {tab === "friends" && <FriendsTab events={events} profile={profile} now={now} />}
         {tab === "trophies" && <Trophies events={events} stats={stats} profile={profile} now={now} />}
         {tab === "log" && <LogPast profile={profile} now={now} onSaved={(sid) => void reload().then(() => go("history", sid))} />}
         {tab === "share" && <SharePanel events={events} stats={stats} profile={profile} now={now} />}
@@ -165,6 +177,19 @@ export function Dashboard() {
 }
 
 type Stats = ReturnType<typeof derive>;
+
+/**
+ * Friends on the big screen (gap list 3, item 8). The shared screens read the lifter's units and own lifts from the
+ * app's store, so the dashboard hands it the log it already loaded (no second load, no workout or Health start-up).
+ */
+function FriendsTab({ events, profile, now }: { events: AppEvent[]; profile: Profile; now: number }) {
+  // Before the first draw (nothing else on the dashboard reads the store), then whenever the log reloads.
+  useState(() => useApp.setState({ events, profile, stats: derive(events, now) }));
+  useEffect(() => {
+    useApp.setState({ events, profile, stats: derive(events, now) });
+  }, [events, profile, now]);
+  return <FriendsDesk />;
+}
 type Go = (t: Tab, arg?: string) => void;
 
 function Overview({ events, profile, stats, now, go }: { events: AppEvent[]; profile: Profile; stats: Stats; now: number; go: Go }) {

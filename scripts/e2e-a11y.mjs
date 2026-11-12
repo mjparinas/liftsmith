@@ -313,6 +313,7 @@ try {
       unread: 2,
     },
     feed: { posts: [friendsPost], more: false },
+    discover: { posts: [{ ...friendsPost, id: "pd1", handle: "casey", name: "Casey", mine: false }], more: false },
     clubFeed: { posts: [friendsPost], more: false },
     person: { posts: [friendsPost], more: false },
     thread: {
@@ -466,6 +467,11 @@ try {
   await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await page.getByRole("button", { name: "🔥 Cheer Blair on" }).waitFor();
   await scan("friends feed");
+  await page.getByRole("button", { name: "Discover" }).click();
+  await page.getByRole("article", { name: "Workout from Casey" }).waitFor();
+  await scan("friends discover");
+  await page.getByRole("button", { name: "Following" }).click();
+  await page.getByRole("article", { name: "Workout from Blair" }).waitFor();
   await page.getByRole("button", { name: "More options" }).click();
   await page
     .getByRole("button", { name: "Edit post" })
