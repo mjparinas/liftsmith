@@ -55,13 +55,15 @@ describe("the features page list", () => {
       expect(LANDINGS.some((l) => l.group === "features" && l.slug === f.landing)).toBe(true);
   });
 
-  it("shows the newest days first, after the launch", () => {
-    const days = newestFeatures().map((d) => d.day);
-    expect(days.length).toBeGreaterThan(0);
-    expect([...days].sort().reverse()).toEqual(days);
+  it("shows the latest features, grouped by category in page order", () => {
+    const groups = newestFeatures();
+    expect(groups.length).toBeGreaterThan(0);
+    const order = FEATURE_GROUPS.map((g) => g.id);
+    expect(groups.map((g) => order.indexOf(g.group.id))).toEqual(groups.map((g) => order.indexOf(g.group.id)).sort((a, b) => a - b));
     const latest = ALL_FEATURES.map((f) => f.added)
       .sort()
       .at(-1);
-    expect(days[0]).toBe(latest);
+    const shown = groups.flatMap((g) => g.features);
+    for (const f of ALL_FEATURES.filter((x) => x.added === latest)) expect(shown).toContain(f);
   });
 });

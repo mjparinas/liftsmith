@@ -16,7 +16,6 @@ import {
 } from "@/content/features";
 import { landingPath, LANDINGS } from "@/content/landings";
 import { BRAND } from "@/lib/brand";
-import { dayLabel } from "@/lib/whatsNew";
 
 import { Crumbs, CtaBanner, CtaInline } from "./SiteChrome";
 
@@ -69,12 +68,12 @@ function FeatureCard({ f }: { f: SiteFeature }) {
   );
 }
 
-const MARK: Record<Support, string> = { yes: "✓", no: "–", soon: "…", chrome: "✓", health: "✓" };
+const MARK: Record<Support, string> = { yes: "✓", no: "–", soon: "…", investigating: "…", chrome: "✓", health: "✓" };
 
 function SupportCell({ s }: { s: Support }) {
   return (
     <td
-      className={`px-2 py-3 text-sm md:px-3 md:whitespace-nowrap ${s === "no" ? "text-muted" : s === "soon" ? "text-muted italic" : "text-ink"}`}
+      className={`px-2 py-3 text-sm md:px-3 md:whitespace-nowrap ${s === "no" ? "text-muted" : s === "soon" || s === "investigating" ? "text-muted italic" : "text-ink"}`}
     >
       <span aria-hidden className="mr-1">
         {MARK[s]}
@@ -118,17 +117,19 @@ export function FeaturesView() {
           Newest features
         </h2>
         <p className="mt-2 text-muted">
-          Added lately, newest first. Every change, fixes included, is on{" "}
+          Added lately, by category. Every change, fixes included, is on{" "}
           <Link href="/whats-new/" className="text-accent underline underline-offset-2">
             What&apos;s new
           </Link>
           .
         </p>
-        <div className="mt-4 grid gap-4 md:grid-cols-3">
-          {newest.map(({ day, features }) => (
-            <div key={day} className="card p-5">
-              <h3 className="text-sm text-muted">
-                <time dateTime={day}>{dayLabel(day)}</time>
+        <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          {newest.map(({ group, features }) => (
+            <div key={group.id} className="card p-5">
+              <h3 className="text-sm font-semibold text-muted">
+                <a href={`#${group.id}`} className="hover:text-accent hover:underline">
+                  {group.title}
+                </a>
               </h3>
               <ul className="mt-2 flex flex-col gap-2">
                 {features.map((f) => (
@@ -235,9 +236,10 @@ export function FeaturesView() {
           </table>
         </div>
         <p className="mt-3 text-sm text-muted">
-          &ldquo;Coming soon&rdquo; means it&apos;s built and waiting on the other company&apos;s approval or store listing. Fitness
-          services connect through a free {BRAND.name} account. Labs are experiments in Pro you switch on in Settings › Labs. Product names
-          are trademarks of their owners.
+          &ldquo;Coming soon&rdquo; means it&apos;s built and waiting on its store listing. &ldquo;Investigating&rdquo; means we&apos;re
+          working on it but can&apos;t promise it yet, because it depends on the other company&apos;s approval. Fitness services connect
+          through a free {BRAND.name} account. Labs are experiments in Pro you switch on in Settings › Labs. Product names are trademarks of
+          their owners.
         </p>
       </section>
 
