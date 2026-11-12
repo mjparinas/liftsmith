@@ -546,6 +546,15 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (muter_id, muted_id)
   )`,
+  // Bells (social.ts `bell`, Friends gap list 3): the watcher gets a push when someone they follow posts a workout
+  // they may see. Only while the follow stands; unfollowing, blocking or leaving deletes it.
+  `CREATE TABLE IF NOT EXISTS bells (
+    watcher_id TEXT NOT NULL,
+    watched_id TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (watcher_id, watched_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS bells_watched ON bells (watched_id)`,
   // People named with @handle in a comment who could see the post (social.ts comment), for their Activity.
   `CREATE TABLE IF NOT EXISTS comment_mentions (
     comment_id TEXT NOT NULL,
@@ -617,6 +626,22 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS coach_plans_pair ON coach_plans (coach_id, client_id)`,
   `CREATE INDEX IF NOT EXISTS coach_plans_client ON coach_plans (client_id)`,
+  // Trainer mode out of Labs (2026-11-12): what a coach's new clients start setup with, and one note from a coach to each client.
+  `CREATE TABLE IF NOT EXISTS coach_defaults (
+    coach_id TEXT PRIMARY KEY,
+    goal TEXT,
+    experience TEXT,
+    days INTEGER,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE TABLE IF NOT EXISTS coach_notes (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_notes_client ON coach_notes (client_id)`,
   `CREATE TABLE IF NOT EXISTS rate_limits (
     key TEXT PRIMARY KEY,
     count INTEGER NOT NULL,
@@ -661,6 +686,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
+  // The switch for workouts from people the lifter rang the bell for (Friends gap list 3).
+  ["social_profiles", "push_posts", "INTEGER NOT NULL DEFAULT 1"],
   // Friends gap list 2: a club's weekly crew goal, set by its starter ('' and 0 for none).
   ["clubs", "goal_metric", "TEXT NOT NULL DEFAULT ''"],
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],

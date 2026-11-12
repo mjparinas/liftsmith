@@ -14,6 +14,8 @@ import { handle } from "@/server/social";
 import { ClubScreen, Friends, InviteScreen, PersonScreen } from "./Friends";
 import { SendToFriend } from "./SendToFriend";
 
+vi.mock("canvas-confetti", () => ({ default: () => {} }));
+
 // The app's Friends screens against the real server code (an in-memory database): each fetch to /api/social/
 // runs src/server/social.ts as the account whose token it carries.
 const accounts: Record<string, string> = { "tok-a": "acc-a", "tok-b": "acc-b" };
@@ -87,6 +89,22 @@ describe("Friends", () => {
     expect(await screen.findByText("Thanks. We’ll take a look.")).toBeInTheDocument();
   });
 
+  it("rings the bell for someone the lifter follows, and silences it again", async () => {
+    const u = userEvent.setup();
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true });
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true });
+    signIn("tok-a");
+    render(<PersonScreen handle="blair" />);
+    // No bell before following: there's nothing to be told about yet.
+    await u.click(await screen.findByRole("button", { name: "Follow" }));
+    const bell = await screen.findByRole("button", { name: "Get alerts when Blair posts" });
+    expect(bell).toHaveAttribute("aria-pressed", "false");
+    await u.click(bell);
+    expect(await screen.findByText("You’ll get a notification when Blair posts a workout.")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Stop alerts when Blair posts" }));
+    await waitFor(() => expect(screen.queryByText("You’ll get a notification when Blair posts a workout.")).toBeNull());
+  });
+
   it("sends a routine to a friend, who finds it in Activity", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });
@@ -103,7 +121,7 @@ describe("Friends", () => {
           autoPost: false,
           weights: true,
           public: false,
-          push: { follows: true, comments: true, sent: true, likes: false, cheers: true },
+          push: { follows: true, comments: true, sent: true, likes: false, cheers: true, posts: true },
           avatar: "",
           audience: "all",
           showLifts: true,
@@ -193,6 +211,53 @@ describe("Friends", () => {
       await within(await screen.findByRole("list", { name: "Friends on this month’s challenge" })).findByText("blair (you)"),
     ).toBeInTheDocument();
   });
+  it("shows a finished challenge's result once, with a share and a rematch with the same friends", async () => {
+    const u = userEvent.setup();
+    const then = Date.now() - 20 * 86_400_000;
+    await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true }, then);
+    await handle("acc-b", { op: "join", handle: "blair", name: "Blair", agree: true, open: true }, then);
+    await handle("acc-a", { op: "follow", handle: "blair" }, then);
+    await handle("acc-b", { op: "follow", handle: "alex" }, then);
+    const made = await handle(
+      "acc-a",
+      { op: "challengeCreate", name: "Most workouts", metric: "workouts", days: 14, handles: ["blair"] },
+      then,
+    );
+    const ch = String(made.body.id);
+    await handle("acc-b", { op: "challengeAnswer", id: ch, accept: true }, then);
+    const post = (who: string, w: string) =>
+      handle(
+        who,
+        {
+          op: "post",
+          workoutId: w,
+          at: then + 3_600_000,
+          body: { seconds: 3000, sets: 10, volume: 0, prs: 0, muscles: [], exercises: [{ id: "bench-press", sets: 3, w: 60, r: 8 }] },
+        },
+        then + 7_200_000,
+      );
+    await post("acc-a", "w1");
+    await post("acc-a", "w2");
+    await post("acc-b", "w3");
+    signIn("tok-a");
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    const sheet = within(await screen.findByRole("dialog"));
+    expect(sheet.getByText("You won!")).toBeInTheDocument();
+    expect(sheet.getByText("Your total: 2 workouts")).toBeInTheDocument();
+    await u.click(sheet.getByRole("button", { name: "Start a rematch" }));
+    const start = within(await screen.findByRole("dialog"));
+    expect(start.getByRole("button", { name: "2 weeks" })).toHaveAttribute("aria-pressed", "true");
+    expect(await start.findByRole("button", { name: "Blair" })).toHaveAttribute("aria-pressed", "true");
+    cleanup();
+
+    // Seen once on this device: opening the board again doesn't pop it up, but Results does.
+    render(<Friends />);
+    await u.click(await screen.findByRole("button", { name: "Board" }));
+    await u.click(await screen.findByRole("button", { name: "Results" }));
+    expect(await screen.findByText("You won!")).toBeInTheDocument();
+  });
+
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {
     const u = userEvent.setup();
     await handle("acc-a", { op: "join", handle: "alex", name: "Alex", agree: true, open: true });

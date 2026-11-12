@@ -10,6 +10,7 @@ import { achName, TIER_LABEL } from "@/lib/achievements";
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { challengeNudge, daysLeft, isOver, standings, winners } from "@/lib/challenge";
+import { challengeDays, challengeResult, markResultSeen, rematchHandles, unseenResult } from "@/lib/challengeResult";
 import type { SessionSummary } from "@/lib/derive";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { badgeForItem, COSMETICS, game, levelForItem } from "@/lib/game";
@@ -26,9 +27,10 @@ import {
   savePendingInvite,
   weekStart,
 } from "@/lib/invite";
-import { haptic, isNative, oops, sound } from "@/lib/juice";
+import { confetti, haptic, isNative, oops, sound } from "@/lib/juice";
 import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
+import { challengeShare } from "@/lib/shareCards";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import {
   bestLifts,
@@ -88,6 +90,8 @@ import { Icon } from "./icons";
 import { MonthFriends } from "./MonthChallenge";
 import { PostDetailSheet } from "./PostDetail";
 import { go, goBack } from "./router";
+import { ScanToFollow } from "./ScanToFollow";
+import { ShareSheet, useShareContext } from "./ShareSheet";
 import { Bump, Button, Chip, EmptyState, ScreenHeader, Section, Sheet, Skeleton, SwitchRow } from "./ui";
 
 // --- Small pieces ---
@@ -794,6 +798,7 @@ function Notifications({ prefs, set }: { prefs: PushPrefs; set: (p: Partial<Push
     ["sent", "friends.notify.sent"],
     ["likes", "friends.notify.likes"],
     ["cheers", "social.notify.cheers"],
+    ["posts", "social.notify.posts"],
   ];
   return (
     <Section title={t("friends.notify")}>
@@ -1171,6 +1176,7 @@ function People() {
   const [version, setVersion] = useState(0);
   const changed = () => setVersion((v) => v + 1);
   const [note, setNote] = useState<string | null>(null);
+  const [scan, setScan] = useState(false);
   const handle = me?.profile?.handle ?? "";
   const find = (e: FormEvent) => {
     e.preventDefault();
@@ -1211,6 +1217,10 @@ function People() {
       </form>
       <SearchResults q={q} />
       <InviteButton />
+      <Button kind="ghost" icon="camera" className="mt-2 w-full" onClick={() => setScan(true)}>
+        {t("social.scan.title")}
+      </Button>
+      {scan && <ScanToFollow onClose={() => setScan(false)} />}
       <Button kind="ghost" icon="share" className="mt-2 w-full" onClick={() => void share()}>
         {t("friends.shareMe", { handle })}
       </Button>
@@ -1344,12 +1354,19 @@ const CHALLENGE_NAME: Record<BoardMetric, MessageKey> = {
 function Challenges() {
   const [list, setList] = useState<Challenge[] | null>(null);
   const [reload, setReload] = useState(0);
-  const [starting, setStarting] = useState(false);
+  const [starting, setStarting] = useState<RematchOf | null | false>(false);
+  const [results, setResults] = useState<Challenge | null>(null);
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
     social<{ challenges: Challenge[] }>("challenges")
-      .then((r) => live && setList(r.challenges))
+      .then((r) => {
+        if (!live) return;
+        setList(r.challenges);
+        // A challenge that ended since the lifter last looked gets its results moment, once per device.
+        const fresh = unseenResult(r.challenges, Date.now());
+        if (fresh) setResults(fresh);
+      })
       .catch((e: unknown) => live && (setList([]), setNote(socialError(e))));
     return () => {
       live = false;
@@ -1362,7 +1379,7 @@ function Challenges() {
         title={t("friends.ch.title")}
         icon="flag"
         right={
-          <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => setStarting(true)}>
+          <Button kind="quiet" className="px-3 py-2 text-sm" onClick={() => setStarting(null)}>
             {t("friends.ch.start")}
           </Button>
         }
@@ -1372,7 +1389,7 @@ function Challenges() {
         ) : list.length ? (
           <ul className="space-y-3">
             {list.map((c) => (
-              <ChallengeCard key={c.id} c={c} onChanged={changed} />
+              <ChallengeCard key={c.id} c={c} onChanged={changed} onResults={() => setResults(c)} />
             ))}
           </ul>
         ) : (
@@ -1380,12 +1397,22 @@ function Challenges() {
         )}
         <Note text={note} />
       </Section>
-      <StartChallenge open={starting} onClose={() => setStarting(false)} onStarted={changed} />
+      <StartChallenge open={starting !== false} rematch={starting || null} onClose={() => setStarting(false)} onStarted={changed} />
+      {results && (
+        <ChallengeResultSheet
+          c={results}
+          onClose={() => setResults(null)}
+          onRematch={() => {
+            setStarting({ metric: results.metric, days: challengeDays(results), handles: rematchHandles(results), name: results.name });
+            setResults(null);
+          }}
+        />
+      )}
     </div>
   );
 }
 
-function ChallengeCard({ c, onChanged }: { c: Challenge; onChanged: () => void }) {
+function ChallengeCard({ c, onChanged, onResults }: { c: Challenge; onChanged: () => void; onResults: () => void }) {
   const { profile } = useApp();
   const unit = profile.unit;
   const [note, setNote] = useState<string | null>(null);
@@ -1464,25 +1491,121 @@ function ChallengeCard({ c, onChanged }: { c: Challenge; onChanged: () => void }
       </ol>
       {waiting > 0 && !over && <p className="mt-1 text-xs text-muted">{t("friends.ch.waiting", { count: waiting })}</p>}
       {c.status === "joined" && (
-        <Button kind="quiet" className="mt-2 px-3 py-2 text-sm" disabled={busy} onClick={() => void act("challengeLeave", {})}>
-          {c.mine ? (over ? t("friends.ch.clear") : t("friends.ch.end")) : t("friends.ch.leave")}
-        </Button>
+        <div className="mt-2 flex flex-wrap gap-2">
+          {over && (
+            <Button kind="ghost" icon="trophy" className="px-3 py-2 text-sm" onClick={onResults}>
+              {t("social.res.see")}
+            </Button>
+          )}
+          <Button kind="quiet" className="px-3 py-2 text-sm" disabled={busy} onClick={() => void act("challengeLeave", {})}>
+            {c.mine ? (over ? t("friends.ch.clear") : t("friends.ch.end")) : t("friends.ch.leave")}
+          </Button>
+        </div>
       )}
       <Note text={note} />
     </li>
   );
 }
 
-function StartChallenge(props: { open: boolean; onClose: () => void; onStarted: () => void }) {
+/**
+ * The results moment (gap list 3, item 5): opens by itself once per device when a challenge the lifter joined ends,
+ * and again from the card's Results. Where they finished and the standings, then Share (only their own place and
+ * total go on the card) and a one-tap rematch.
+ */
+function ChallengeResultSheet({ c, onClose, onRematch }: { c: Challenge; onClose: () => void; onRematch: () => void }) {
+  const { profile } = useApp();
+  const unit = profile.unit;
+  const ctx = useShareContext(useGame());
+  const [sharing, setSharing] = useState(false);
+  const [now] = useState(() => Date.now());
+  const r = challengeResult(c, now);
+  useEffect(() => {
+    markResultSeen(c.id);
+    if (r?.won) {
+      haptic("celebrate");
+      sound.done();
+      void confetti(true);
+    }
+    // Once, when it opens.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c.id]);
+  if (!r) return null;
+  const title = c.name || t(CHALLENGE_NAME[c.metric]);
+  const total =
+    c.metric === "workouts" || c.metric === "sets"
+      ? t(c.metric === "workouts" ? "month.unit.workouts" : "month.unit.sets", { count: r.score, n: fmtNum(r.score) })
+      : metricText(c.metric, r.score, unit);
+  const headline = r.tie
+    ? t("social.res.headline.tie")
+    : r.won
+      ? t("social.res.headline.won")
+      : r.winners.length
+        ? t("social.res.headline.place", { place: fmtNum(r.place), n: fmtNum(r.of) })
+        : t("social.res.headline.none");
+  const item = challengeShare({ id: c.id, name: title, days: challengeDays(c) }, r, total, ctx);
+  const canRematch = rematchHandles(c).length > 0;
+  return (
+    <>
+      <Sheet open={!sharing} onClose={onClose} title={title}>
+        <div className="text-center">
+          <span
+            aria-hidden
+            className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-accent/15 text-accent"
+            style={
+              r.won
+                ? ({ color: "var(--tier-gold)", background: "color-mix(in srgb, var(--tier-gold) 18%, transparent)" } as CSSProperties)
+                : undefined
+            }
+          >
+            <Icon name="trophy" size={30} />
+          </span>
+          <p className="display mt-3 text-2xl">{headline}</p>
+          <p className="mt-1 text-sm text-muted">{t("social.res.total", { amount: total })}</p>
+        </div>
+        <ol className="mt-4 divide-y divide-line" aria-label={t("friends.ch.standings")}>
+          {standings(c).map((row) => (
+            <li key={row.handle} className={`flex items-center gap-3 py-2 ${row.me ? "font-semibold" : ""}`}>
+              <span className="num w-6 shrink-0 text-center font-bold text-muted">{row.place}</span>
+              <Avatar name={row.name} avatar={row.avatar} size={32} />
+              <span className="min-w-0 flex-1 truncate">{row.me ? t("friends.board.you", { name: row.name }) : row.name}</span>
+              <span className="num shrink-0 font-bold">{metricText(c.metric, row[c.metric], unit)}</span>
+            </li>
+          ))}
+        </ol>
+        <div className="mt-4 space-y-2">
+          {canRematch && (
+            <Button kind="primary" icon="flag" className="w-full" onClick={onRematch}>
+              {t("social.res.rematch")}
+            </Button>
+          )}
+          <Button kind={canRematch ? "ghost" : "primary"} icon="share" className="w-full" onClick={() => setSharing(true)}>
+            {t("social.res.share")}
+          </Button>
+        </div>
+      </Sheet>
+      <ShareSheet open={sharing} onClose={() => setSharing(false)} items={[item]} />
+    </>
+  );
+}
+
+/** A rematch starts from the finished challenge: the same measure, length, friends and name. */
+interface RematchOf {
+  metric: BoardMetric;
+  days: ChallengeDays;
+  handles: string[];
+  name: string;
+}
+
+function StartChallenge(props: { open: boolean; rematch?: RematchOf | null; onClose: () => void; onStarted: () => void }) {
   return props.open ? <StartChallengeBody {...props} /> : null;
 }
 
-function StartChallengeBody({ onClose, onStarted }: { onClose: () => void; onStarted: () => void }) {
+function StartChallengeBody({ rematch, onClose, onStarted }: { rematch?: RematchOf | null; onClose: () => void; onStarted: () => void }) {
   const friends = useFriendList();
-  const [metric, setMetric] = useState<BoardMetric>("workouts");
-  const [days, setDays] = useState<ChallengeDays>(7);
-  const [picked, setPicked] = useState<string[]>([]);
-  const [name, setName] = useState("");
+  const [metric, setMetric] = useState<BoardMetric>(rematch?.metric ?? "workouts");
+  const [days, setDays] = useState<ChallengeDays>(rematch?.days ?? 7);
+  const [picked, setPicked] = useState<string[]>(rematch?.handles ?? []);
+  const [name, setName] = useState(rematch?.name ?? "");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fallback = t(CHALLENGE_NAME[metric]);
@@ -1494,7 +1617,7 @@ function StartChallengeBody({ onClose, onStarted }: { onClose: () => void; onSta
       await social("challengeCreate", { name: name.trim() || fallback, metric, days, handles: picked });
       haptic("success");
       sound.done();
-      track("feature", { name: "social_challenge_start", detail: metric });
+      track("feature", { name: rematch ? "social_challenge_rematch" : "social_challenge_start", detail: metric });
       onStarted();
       onClose();
     } catch (err) {
@@ -2431,20 +2554,40 @@ export function PersonScreen({ handle }: { handle: string }) {
       {person.muted && <p className="mt-2 px-1 text-sm text-muted">{t("friends.person.muted")}</p>}
       <Showcase person={person} />
       {!self && person.relation !== "blocked" && (
-        <Button
-          kind={person.relation === "none" ? "primary" : "ghost"}
-          className="mt-3 w-full"
-          onClick={() => void act(person.relation === "none" ? "follow" : "unfollow")}
-        >
-          {person.relation === "none"
-            ? person.open
-              ? t("friends.follow")
-              : t("friends.requestFollow")
-            : person.relation === "requested"
-              ? t("friends.requested")
-              : t("friends.unfollow")}
-        </Button>
+        <div className="mt-3 flex gap-2">
+          <Button
+            kind={person.relation === "none" ? "primary" : "ghost"}
+            className="flex-1"
+            onClick={() => void act(person.relation === "none" ? "follow" : "unfollow")}
+          >
+            {person.relation === "none"
+              ? person.open
+                ? t("friends.follow")
+                : t("friends.requestFollow")
+              : person.relation === "requested"
+                ? t("friends.requested")
+                : t("friends.unfollow")}
+          </Button>
+          {person.relation === "following" && (
+            // The bell: a push when they post (only while following). One tap, and the line below says what it does.
+            <button
+              type="button"
+              aria-pressed={person.bell}
+              aria-label={t(person.bell ? "social.bell.off" : "social.bell.on", { name: person.name })}
+              onClick={() => {
+                const on = !person.bell;
+                void act("bell", { on }).then(() => on && void startPush(true));
+              }}
+              className={`press grid h-12 w-12 shrink-0 place-items-center rounded-2xl border ${
+                person.bell ? "border-accent bg-accent/15 text-accent" : "border-line bg-surface text-muted hover:text-ink"
+              }`}
+            >
+              <Icon name={person.bell ? "bellOn" : "bell"} size={22} />
+            </button>
+          )}
+        </div>
       )}
+      {person.bell && <p className="mt-2 px-1 text-sm text-muted">{t("social.bell.line", { name: person.name })}</p>}
       {person.relation === "blocked" && (
         <Button kind="ghost" className="mt-3 w-full" onClick={() => void act("unblock")}>
           {t("friends.unblock")}

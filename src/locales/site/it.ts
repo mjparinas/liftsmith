@@ -26,6 +26,7 @@ export const it: SiteText = {
       openApp: "Apri l’app",
       features: "Funzioni",
       whoFor: "Per chi è",
+      coaches: "Per i coach",
       pricing: "Prezzi",
       whatsNew: "Novità",
       dashboard: "La tua dashboard",
@@ -385,9 +386,89 @@ export const it: SiteText = {
         "Statistiche avanzate: andamento del massimale, serie per muscolo",
         "Detective dello stallo e pianificatore dell’obiettivo con data",
       ],
-      ["Sincronizzazione tra dispositivi e dashboard web", "File di backup ed esportazione CSV", "Pubblicità", "Condivisione in famiglia"],
+      [
+        "Sincronizzazione tra dispositivi e dashboard web",
+        "Allenati con un coach che vede i tuoi allenamenti",
+        "Segui i tuoi clienti come coach",
+        "File di backup ed esportazione CSV",
+        "Pubblicità",
+        "Condivisione in famiglia",
+      ],
     ],
     never: "Mai",
     annualPlan: "Piano annuale",
+  },
+  coaches: {
+    title: "Segui i tuoi clienti con {name}: report, routine e note",
+    description:
+      "Invita i clienti con un solo link, guarda chi ha bisogno di te per primo e mandagli routine e una nota mentre {name} precompila ogni serie. Essere cliente è gratis.",
+    h1: "Segui i tuoi clienti in {name}",
+    intro:
+      "Manda un link d'invito. I tuoi clienti registrano ogni serie nell'app e tu vedi a chi scrivere per primo, cosa hanno allenato e cosa hanno ottenuto, senza fogli di calcolo.",
+    cta: "Inizia a fare il coach",
+    how: {
+      title: "Come funziona",
+      steps: [
+        {
+          title: "Invita con un link",
+          body: "Crea un codice d'invito in Impostazioni › Coaching e manda il link. Lo stesso codice vale per tutti i clienti a cui lo mandi, per una settimana.",
+        },
+        {
+          title: "I clienti sono pronti in un minuto",
+          body: "Accedono, vedono esattamente cosa vedrai e accettano. L'obiettivo, l'esperienza e i giorni che scegli compilano la loro configurazione, così aggiungono solo la palestra e il peso.",
+        },
+        {
+          title: "Guarda chi ha bisogno di te per primo",
+          body: "Il report di ogni cliente parte da cosa fare: fermo da giorni, indietro sull'obiettivo settimanale, ripetizioni mancate, un esercizio fermo o nuovi record da festeggiare.",
+        },
+        {
+          title: "Manda routine e una nota",
+          body: "Assegna qualsiasi routine salvata e guarda quanto spesso la fanno. Lascia una nota che resta in cima alla loro schermata Oggi finché non la cambi.",
+        },
+      ],
+    },
+    see: {
+      title: "Cosa vedi e cosa no",
+      body: "I clienti accettano prima che venga condiviso qualcosa e possono smettere quando vogliono. Perdi l'accesso subito.",
+      seesLabel: "Vedi",
+      sees: [
+        "Allenamenti dell'ultimo anno: esercizi, serie, carichi e ripetizioni",
+        "Quanto si sono allenati e quanto sono state dure le serie",
+        "Il loro obiettivo settimanale e i nuovi record",
+      ],
+      neverLabel: "Non vedi mai",
+      never: [
+        "Frequenza cardiaca, peso, massa grassa o misure",
+        "Dati sulla salute, prontezza o ciclo",
+        "Infortuni, note, palestre o foto",
+      ],
+    },
+    cost: {
+      title: "Quanto costa",
+      body: "Seguire clienti fa parte di {name} Pro ({annual} all'anno o {monthly} al mese), fino a 30 clienti. Essere cliente è gratis, quindi chiunque inviti può iniziare senza pagare.",
+      contactBefore: "Segui più persone di così? ",
+      contactLink: "Dicci di cosa hai bisogno.",
+    },
+    faqTitle: "Domande dei coach",
+    faqs: [
+      {
+        q: "I miei clienti devono pagare?",
+        a: "No. Essere cliente è gratis su Android, iPhone e sul web. Serve un account gratuito, così i loro allenamenti arrivano a te.",
+      },
+      {
+        q: "I miei clienti hanno bisogno di Pro per seguire le mie routine?",
+        a: "No. Le routine che assegni funzionano con il piano gratuito, e l'app precompila ogni serie dal loro ultimo allenamento.",
+      },
+      {
+        q: "Posso vedere la loro frequenza cardiaca o il loro peso?",
+        a: "No. Vedi solo il loro allenamento. Dati sulla salute, misure, infortuni e note non lasciano mai il loro account.",
+      },
+      {
+        q: "Come inizio?",
+        a: "Apri l'app, vai in Impostazioni › Coaching e crea un codice d'invito. Se non hai ancora Pro, l'app ti mostra lì i piani.",
+      },
+    ],
+    endTitle: "Porta oggi il tuo primo cliente",
+    endBody: "Crea un invito in Impostazioni › Coaching e manda il link. Il tuo cliente può essere pronto e allenarsi in pochi minuti.",
   },
 };

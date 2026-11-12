@@ -4,6 +4,7 @@ import sitemap from "@/app/sitemap";
 import { linksIn, relatedTo } from "@/components/site/ArticleView";
 import { ARTICLES, CTA_COPY, readMinutes, type Block } from "@/content/articles";
 import { allFacts, COMPETITORS, OURS, TOPIC_LABEL } from "@/content/compare";
+import { EXERCISE_GUIDES } from "@/content/exerciseGuides";
 
 import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import {
@@ -14,6 +15,7 @@ import {
   equipmentSlug,
   equipmentWithPages,
   exercisesWith,
+  indexAlternatives,
   kebab,
   muscleBySlug,
   muscleSlug,
@@ -56,6 +58,15 @@ describe("SEO routes", () => {
     const alts = alternativesTo("bench-press");
     expect(alts.length).toBeGreaterThan(3);
     for (const a of alts) expect(a.primary.some((m) => EXERCISE_BY_ID.get("bench-press")!.primary.includes(m))).toBe(true);
+  });
+
+  it("lists alternatives pages only for the lifts with a full guide", () => {
+    const listed = EXERCISES.filter((e) => paths.has(`/exercises/${e.id}/alternatives/`)).map((e) => e.id);
+    expect(listed.length).toBeGreaterThan(30);
+    for (const id of listed) expect(id in EXERCISE_GUIDES).toBe(true);
+    expect(indexAlternatives("back-squat")).toBe(true);
+    const plain = EXERCISES.find((e) => !(e.id in EXERCISE_GUIDES) && alternativesTo(e.id).length)!;
+    expect(indexAlternatives(plain.id)).toBe(false);
   });
 
   it("builds the sitemap on the www host with trailing slashes, and leaves private pages out", () => {

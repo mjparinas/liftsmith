@@ -13,6 +13,7 @@ import { fill, localPath, SITE_LANG_NAME, SITE_LANGS, type SiteLang } from "@/li
 import { siteText } from "@/locales/site";
 
 import { DocLang } from "./DocLang";
+import { navFor, type NavLink } from "./nav";
 import { SiteMenu } from "./SiteMenu";
 import { StoreBadges } from "./StoreBadges";
 
@@ -37,26 +38,7 @@ function Logo({ lang }: { lang: SiteLang }) {
   );
 }
 
-export type NavLink = { href: string; label: string };
-
-/**
- * The one header nav for every public page, the home page included (Melvin, 2026-11-11: the links used to change when you
- * left the home page). The home page's own sections are /#… links, so they work from any page. Wide screens show them
- * all; below lg they sit in the menu, beside Sign in and Start free.
- */
-export function navFor(lang: SiteLang): NavLink[] {
-  const n = siteText(lang).chrome.nav;
-  // The home page and pricing are translated; the library, guides, blog and tools are English for now.
-  return [
-    { href: `${localPath(lang, "/")}#features`, label: n.features },
-    { href: "/exercises/", label: n.exercises },
-    { href: "/guides/", label: n.guides },
-    { href: "/blog/", label: n.blog },
-    { href: "/tools/", label: n.tools },
-    { href: localPath(lang, "/pricing/"), label: n.pricing },
-    { href: `${localPath(lang, "/")}#faq`, label: n.faq },
-  ];
-}
+export { navFor, type NavLink } from "./nav";
 
 export const NAV: readonly NavLink[] = navFor("en");
 
@@ -148,6 +130,7 @@ export function SiteFooter({ lang = "en", path }: { lang?: SiteLang; path?: stri
           { href: APP_PATH, label: l.openApp },
           { href: "/features/", label: l.features },
           { href: "/apps/", label: l.whoFor },
+          { href: localPath(lang, "/coaches/"), label: l.coaches },
           { href: localPath(lang, "/pricing/"), label: l.pricing },
           { href: "/whats-new/", label: l.whatsNew },
           { href: "/me/", label: l.dashboard },

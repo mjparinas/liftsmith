@@ -29,9 +29,6 @@ export const en = {
   "trn.since": "Since {date}",
   "trn.noName": "No name yet",
   "trn.coachRow": "Coach clients",
-  "trn.coachRowLab": "Switch on Trainer mode in Labs to invite clients.",
-  "trn.coachRowPro": "Invite clients and see how their training is going. Part of Labs in Pro.",
-  "trn.inviteHint": "Clients enter this code under Coaching › Your coach, or open your invite link. It works for a week.",
   "trn.codeIs": "Invite code {code}",
   "trn.expires": "Works until {date}",
   "trn.sendInvite": "Send invite",
@@ -96,6 +93,25 @@ export const en = {
   "trn.err.coachFull": "This coach already has as many clients as trainer mode allows for now.",
   "trn.err.gone": "This client stopped sharing with you.",
   "trn.err.failed": "Something went wrong. Try again.",
+  "trn.coachRowPro": "Invite clients, see what each one needs, and send them routines and notes. Part of Pro.",
+  "trn.inviteHint":
+    "New clients open your invite link, or enter this code when they set up the app or under Coaching › Your coach. It works for a week.",
+  "trn.setupTitle": "New clients start with",
+  "trn.setupHint":
+    "Pick what fits most of your clients. They skip these questions when they set up the app, and can change them later in Settings. Tap a picked answer again to let them choose.",
+  "trn.setupGoal": "Goal",
+  "trn.setupLevel": "Experience",
+  "trn.setupDays": "Days a week",
+  "trn.setupSaved": "Saved. New clients start with this.",
+  "trn.note": "Your note",
+  "trn.noteHint": "They see it at the top of Today and under Coaching. One thing to do this week works best.",
+  "trn.notePlaceholder": "Keep squats two reps short of failure this week, and add a set of rows.",
+  "trn.noteWhen": "Saved {date}",
+  "trn.noteSave": "Save note",
+  "trn.noteClear": "Clear note",
+  "trn.noteSaved": "Saved. It's at the top of their Today.",
+  "trn.noteCleared": "Note cleared.",
+  "trn.noteOpen": "Open coaching",
 };
 
 type Key = keyof typeof en;
@@ -126,10 +142,6 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.since": "Desde el {date}",
   "trn.noName": "Sin nombre todavía",
   "trn.coachRow": "Entrenar a clientes",
-  "trn.coachRowLab": "Activa Modo entrenador en Labs para invitar a clientes.",
-  "trn.coachRowPro": "Invita a clientes y mira cómo va su entrenamiento. Forma parte de Labs en Pro.",
-  "trn.inviteHint":
-    "Tus clientes escriben este código en Entrenador › Tu entrenador, o abren tu enlace de invitación. Sirve durante una semana.",
   "trn.codeIs": "Código de invitación {code}",
   "trn.expires": "Válido hasta el {date}",
   "trn.sendInvite": "Enviar invitación",
@@ -195,6 +207,25 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.err.coachFull": "Este entrenador ya tiene todos los clientes que permite el modo entrenador por ahora.",
   "trn.err.gone": "Este cliente dejó de compartir contigo.",
   "trn.err.failed": "Algo salió mal. Inténtalo de nuevo.",
+  "trn.coachRowPro": "Invita a clientes, mira qué necesita cada uno y envíales rutinas y notas. Forma parte de Pro.",
+  "trn.inviteHint":
+    "Los clientes nuevos abren tu enlace de invitación o escriben este código al configurar la app o en Entrenador › Tu entrenador. Sirve durante una semana.",
+  "trn.setupTitle": "Los clientes nuevos empiezan con",
+  "trn.setupHint":
+    "Elige lo que encaja con la mayoría de tus clientes. Se saltan estas preguntas al configurar la app y pueden cambiarlas luego en Ajustes. Vuelve a tocar una respuesta elegida para dejar que la elijan ellos.",
+  "trn.setupGoal": "Objetivo",
+  "trn.setupLevel": "Experiencia",
+  "trn.setupDays": "Días por semana",
+  "trn.setupSaved": "Guardado. Los clientes nuevos empiezan con esto.",
+  "trn.note": "Tu nota",
+  "trn.noteHint": "La ven arriba en Hoy y en Entrenador. Funciona mejor una sola cosa que hacer esta semana.",
+  "trn.notePlaceholder": "Esta semana, deja dos repeticiones en reserva en las sentadillas y añade una serie de remo.",
+  "trn.noteWhen": "Guardada el {date}",
+  "trn.noteSave": "Guardar nota",
+  "trn.noteClear": "Borrar nota",
+  "trn.noteSaved": "Guardada. Está arriba en su pantalla Hoy.",
+  "trn.noteCleared": "Nota borrada.",
+  "trn.noteOpen": "Abrir Entrenador",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -223,10 +254,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.since": "Depuis le {date}",
   "trn.noName": "Pas encore de nom",
   "trn.coachRow": "Coacher des clients",
-  "trn.coachRowLab": "Activez Mode coach dans Labs pour inviter des clients.",
-  "trn.coachRowPro": "Invitez des clients et suivez leur entraînement. Fait partie de Labs dans Pro.",
-  "trn.inviteHint":
-    "Vos clients saisissent ce code dans Coaching › Votre coach, ou ouvrent votre lien d'invitation. Il est valable une semaine.",
   "trn.codeIs": "Code d'invitation {code}",
   "trn.expires": "Valable jusqu'au {date}",
   "trn.sendInvite": "Envoyer l'invitation",
@@ -292,6 +319,26 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.err.coachFull": "Ce coach a déjà autant de clients que le mode coach le permet pour l'instant.",
   "trn.err.gone": "Ce client ne partage plus avec vous.",
   "trn.err.failed": "Un problème est survenu. Réessayez.",
+  "trn.coachRowPro": "Invitez des clients, voyez ce dont chacun a besoin et envoyez-leur des routines et des notes. Fait partie de Pro.",
+  "trn.inviteHint":
+    "Les nouveaux clients ouvrent votre lien d'invitation, ou saisissent ce code en configurant l'app ou dans Coaching › Votre coach. Il est valable une semaine.",
+  "trn.setupTitle": "Les nouveaux clients commencent avec",
+  "trn.setupHint":
+    "Choisissez ce qui convient à la plupart de vos clients. Ils sautent ces questions en configurant l'app et pourront les modifier plus tard dans Réglages. Touchez de nouveau une réponse choisie pour les laisser choisir.",
+  "trn.setupGoal": "Objectif",
+  "trn.setupLevel": "Expérience",
+  "trn.setupDays": "Jours par semaine",
+  "trn.setupSaved": "Enregistré. Les nouveaux clients commencent avec ces choix.",
+  "trn.note": "Votre note",
+  "trn.noteHint":
+    "Ils la voient en haut d'Aujourd'hui et dans Coaching. Une seule chose à faire cette semaine, c'est ce qui marche le mieux.",
+  "trn.notePlaceholder": "Cette semaine, gardez deux répétitions en réserve au squat et ajoutez une série de rowing.",
+  "trn.noteWhen": "Enregistrée le {date}",
+  "trn.noteSave": "Enregistrer la note",
+  "trn.noteClear": "Effacer la note",
+  "trn.noteSaved": "Enregistrée. Elle est en haut de leur écran Aujourd'hui.",
+  "trn.noteCleared": "Note effacée.",
+  "trn.noteOpen": "Ouvrir Coaching",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -320,9 +367,6 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.since": "Seit {date}",
   "trn.noName": "Noch kein Name",
   "trn.coachRow": "Kunden betreuen",
-  "trn.coachRowLab": "Schalte den Trainermodus in Labs ein, um Kunden einzuladen.",
-  "trn.coachRowPro": "Lade Kunden ein und sieh, wie ihr Training läuft. Teil von Labs in Pro.",
-  "trn.inviteHint": "Deine Kunden geben diesen Code unter Coaching › Dein Coach ein oder öffnen deinen Einladungslink. Er gilt eine Woche.",
   "trn.codeIs": "Einladungscode {code}",
   "trn.expires": "Gültig bis {date}",
   "trn.sendInvite": "Einladung senden",
@@ -388,6 +432,25 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.err.coachFull": "Dieser Coach hat schon so viele Kunden, wie der Trainermodus im Moment erlaubt.",
   "trn.err.gone": "Dieser Kunde teilt nicht mehr mit dir.",
   "trn.err.failed": "Etwas ist schiefgelaufen. Versuch es noch einmal.",
+  "trn.coachRowPro": "Lade Kunden ein, sieh, was jeder braucht, und schick ihnen Routinen und Notizen. Teil von Pro.",
+  "trn.inviteHint":
+    "Neue Kunden öffnen deinen Einladungslink oder geben diesen Code beim Einrichten der App oder unter Coaching › Dein Coach ein. Er gilt eine Woche.",
+  "trn.setupTitle": "Neue Kunden starten mit",
+  "trn.setupHint":
+    "Wähle, was zu den meisten deiner Kunden passt. Sie überspringen diese Fragen beim Einrichten der App und können sie später in den Einstellungen ändern. Tippe eine gewählte Antwort noch einmal an, damit sie selbst wählen.",
+  "trn.setupGoal": "Ziel",
+  "trn.setupLevel": "Erfahrung",
+  "trn.setupDays": "Tage pro Woche",
+  "trn.setupSaved": "Gespeichert. Neue Kunden starten damit.",
+  "trn.note": "Deine Notiz",
+  "trn.noteHint": "Sie sehen sie oben auf Heute und unter Coaching. Am besten wirkt eine Sache für diese Woche.",
+  "trn.notePlaceholder": "Lass diese Woche bei den Kniebeugen zwei Wiederholungen im Tank und mach einen Satz Rudern mehr.",
+  "trn.noteWhen": "Gespeichert am {date}",
+  "trn.noteSave": "Notiz speichern",
+  "trn.noteClear": "Notiz löschen",
+  "trn.noteSaved": "Gespeichert. Sie steht oben auf ihrem Heute-Bildschirm.",
+  "trn.noteCleared": "Notiz gelöscht.",
+  "trn.noteOpen": "Coaching öffnen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -416,10 +479,6 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.since": "Dal {date}",
   "trn.noName": "Ancora senza nome",
   "trn.coachRow": "Segui dei clienti",
-  "trn.coachRowLab": "Attiva Modalità coach in Labs per invitare clienti.",
-  "trn.coachRowPro": "Invita clienti e guarda come vanno i loro allenamenti. Fa parte di Labs in Pro.",
-  "trn.inviteHint":
-    "I clienti inseriscono questo codice in Coaching › Il tuo coach, oppure aprono il tuo link d'invito. Vale per una settimana.",
   "trn.codeIs": "Codice d'invito {code}",
   "trn.expires": "Valido fino al {date}",
   "trn.sendInvite": "Invia l'invito",
@@ -484,6 +543,25 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.err.coachFull": "Questo coach ha già tutti i clienti che la modalità coach consente per ora.",
   "trn.err.gone": "Questo cliente non condivide più con te.",
   "trn.err.failed": "Qualcosa è andato storto. Riprova.",
+  "trn.coachRowPro": "Invita clienti, guarda di cosa ha bisogno ciascuno e mandagli routine e note. Fa parte di Pro.",
+  "trn.inviteHint":
+    "I nuovi clienti aprono il tuo link d'invito, oppure inseriscono questo codice quando configurano l'app o in Coaching › Il tuo coach. Vale per una settimana.",
+  "trn.setupTitle": "I nuovi clienti partono con",
+  "trn.setupHint":
+    "Scegli cosa va bene per la maggior parte dei tuoi clienti. Saltano queste domande quando configurano l'app e potranno cambiarle più tardi in Impostazioni. Tocca di nuovo una risposta scelta per lasciarla scegliere a loro.",
+  "trn.setupGoal": "Obiettivo",
+  "trn.setupLevel": "Esperienza",
+  "trn.setupDays": "Giorni a settimana",
+  "trn.setupSaved": "Salvato. I nuovi clienti partono da qui.",
+  "trn.note": "La tua nota",
+  "trn.noteHint": "La vedono in cima a Oggi e in Coaching. Funziona meglio una sola cosa da fare questa settimana.",
+  "trn.notePlaceholder": "Questa settimana tieni due ripetizioni di margine sullo squat e aggiungi una serie di rematore.",
+  "trn.noteWhen": "Salvata il {date}",
+  "trn.noteSave": "Salva nota",
+  "trn.noteClear": "Cancella nota",
+  "trn.noteSaved": "Salvata. È in cima alla loro schermata Oggi.",
+  "trn.noteCleared": "Nota cancellata.",
+  "trn.noteOpen": "Apri Coaching",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -510,9 +588,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.since": "{date}から",
   "trn.noName": "名前はまだありません",
   "trn.coachRow": "クライアントを指導",
-  "trn.coachRowLab": "クライアントを招待するには Labs でトレーナーモードをオンにしてください。",
-  "trn.coachRowPro": "クライアントを招待して、トレーニングの様子を確認できます。Pro の Labs の機能です。",
-  "trn.inviteHint": "クライアントは「コーチング › あなたのコーチ」でこのコードを入力するか、招待リンクを開きます。1週間有効です。",
   "trn.codeIs": "招待コード {code}",
   "trn.expires": "{date}まで有効",
   "trn.sendInvite": "招待を送る",
@@ -577,4 +652,23 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.err.coachFull": "このコーチは、トレーナーモードで現在受け入れられる上限のクライアントを抱えています。",
   "trn.err.gone": "このクライアントはあなたとの共有を止めました。",
   "trn.err.failed": "問題が発生しました。もう一度お試しください。",
+  "trn.coachRowPro": "クライアントを招待して、一人ひとりに必要なことを確認し、ルーティンやメモを送れます。Pro の機能です。",
+  "trn.inviteHint":
+    "新しいクライアントは招待リンクを開くか、アプリの初期設定中または「コーチング › あなたのコーチ」でこのコードを入力します。1週間有効です。",
+  "trn.setupTitle": "新しいクライアントの初期設定",
+  "trn.setupHint":
+    "多くのクライアントに合う内容を選んでください。クライアントは初期設定でこれらの質問を省略でき、あとから設定で変更できます。選んだ答えをもう一度タップすると、クライアントが自分で選びます。",
+  "trn.setupGoal": "目標",
+  "trn.setupLevel": "経験",
+  "trn.setupDays": "週の日数",
+  "trn.setupSaved": "保存しました。新しいクライアントはこの内容で始まります。",
+  "trn.note": "あなたのメモ",
+  "trn.noteHint": "クライアントの「今日」の一番上と「コーチング」に表示されます。今週やることを一つに絞ると効果的です。",
+  "trn.notePlaceholder": "今週のスクワットは限界の2回手前で止めて、ロウを1セット追加しましょう。",
+  "trn.noteWhen": "{date}に保存",
+  "trn.noteSave": "メモを保存",
+  "trn.noteClear": "メモを消去",
+  "trn.noteSaved": "保存しました。クライアントの「今日」の一番上に表示されます。",
+  "trn.noteCleared": "メモを消去しました。",
+  "trn.noteOpen": "コーチングを開く",
 };

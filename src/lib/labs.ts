@@ -13,7 +13,6 @@ export type LabFlag =
   | "repMotion"
   | "labBarSpeed"
   | "labHrRest"
-  | "labTrainer"
   | "labFormCheck"
   | "labVoiceLog"
   | "labSpeedMax"
@@ -33,7 +32,6 @@ export interface Lab {
     | "repMotion"
     | "barSpeed"
     | "hrRest"
-    | "trainer"
     | "formCheck"
     | "voiceLog"
     | "speedMax"
@@ -57,7 +55,6 @@ export const LABS: readonly Lab[] = [
   { flag: "labBarSpeed", key: "barSpeed", needs: "labRepCount" },
   { flag: "labHrRest", key: "hrRest" },
   { flag: "labFormCheck", key: "formCheck", needs: "labRepCount" },
-  { flag: "labTrainer", key: "trainer" },
   { flag: "labVoiceLog", key: "voiceLog" },
   { flag: "labSpeedMax", key: "speedMax", needs: "labBarSpeed" },
   { flag: "labWatchReps", key: "watchReps", native: true },

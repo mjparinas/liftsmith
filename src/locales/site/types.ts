@@ -27,6 +27,7 @@ export interface SiteText {
       openApp: string;
       features: string;
       whoFor: string;
+      coaches: string;
       pricing: string;
       whatsNew: string;
       dashboard: string;
@@ -136,6 +137,21 @@ export interface SiteText {
     termsBefore: string;
     termsLink: string;
     termsAfter: string;
+    endTitle: string;
+    endBody: string;
+  };
+  /** The page for coaches (/coaches/, CoachesView): trainer mode, what clients share, and what it costs. */
+  coaches: {
+    title: string;
+    description: string;
+    h1: string;
+    intro: string;
+    cta: string;
+    how: { title: string; steps: Titled[] };
+    see: { title: string; body: string; seesLabel: string; sees: string[]; neverLabel: string; never: string[] };
+    cost: { title: string; body: string; contactBefore: string; contactLink: string };
+    faqTitle: string;
+    faqs: Faq[];
     endTitle: string;
     endBody: string;
   };

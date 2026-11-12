@@ -64,4 +64,20 @@ describe("friend notes", () => {
     const all = friendNotes({ week: [row("blair", 3)], challenges: [challenge()], quiet }, { profile, now: NOW, mine: 0 });
     expect(all.map((x) => x.id.split("-")[1])).toEqual(["chase", "pace"]);
   });
+
+  it("gives a challenge's result for a few days after it ends, with a rematch on the board", () => {
+    const over = challenge({
+      endsAt: NOW - DAY,
+      members: [
+        { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 5 },
+        { handle: "blair", name: "Blair", avatar: "", me: false, joined: true, value: 4 },
+      ],
+    });
+    const [won] = friendNotes({ ...none, ended: [over] }, { profile, now: NOW, mine: 3 });
+    expect(won).toMatchObject({ id: "friend-result-ch1", tone: "good", action: { kind: "go", route: "friends/board" } });
+    expect(won?.why).toBe("5 workouts put you first of 2.");
+    const [lost] = friendNotes({ ...none, ended: [challenge({ endsAt: NOW - DAY })] }, { profile, now: NOW, mine: 3 });
+    expect(lost).toMatchObject({ tone: "info" });
+    expect(lost?.why).toBe("You finished number 2 of 2 with 2 workouts. Blair won.");
+  });
 });

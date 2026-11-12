@@ -116,6 +116,8 @@ export interface PushPrefs {
   likes: boolean;
   /** A friend's cheer during a workout (on to start). */
   cheers: boolean;
+  /** A workout from someone the lifter rang the bell for (on to start; nothing comes until a bell is on). */
+  posts: boolean;
 }
 
 /** How the reader stands with someone. */
@@ -137,6 +139,8 @@ export interface PersonCard {
   avatar: string;
   /** The reader has muted them: their posts stay out of the reader's feed. */
   muted: boolean;
+  /** The reader rang the bell: a push when they post a workout the reader may see (only while following). */
+  bell: boolean;
   /** Their best lifts, when they show them and the reader can see their posts. */
   lifts: ShowcaseLift[];
   /** Their level and training-week streak (0 when the reader can't see their posts, or not sent yet). */
@@ -257,6 +261,8 @@ export const SOCIAL_LIMITS = {
   searchMin: 2,
   /** Weeks of a profile's training calendar. */
   calendarWeeks: 12,
+  /** Bell pushes sent for one post (people who rang the bell for the poster). */
+  bellsPerPost: 500,
 };
 
 /** Lowercase letters, digits and underscores. */
@@ -289,6 +295,8 @@ export interface Inviter {
 
 /** How long a friend challenge runs, in days. */
 export const CHALLENGE_DAYS = [7, 14, 28] as const;
+/** How many days after a challenge ends its result still shows as a coach's note (gap list 3, item 5). */
+export const RESULT_NOTE_DAYS = 3;
 export type ChallengeDays = (typeof CHALLENGE_DAYS)[number];
 
 /** One person in a challenge, with their score so far (joined members only score). */
@@ -350,6 +358,8 @@ export interface FriendSignals {
   week: BoardRow[];
   challenges: Challenge[];
   quiet: QuietFriend[];
+  /** Challenges the lifter joined that ended in the last few days, for the result note (gap list 3, item 5). */
+  ended?: Challenge[];
 }
 
 /** What a club's members add up to each week. */

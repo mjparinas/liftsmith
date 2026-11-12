@@ -17,6 +17,7 @@ import {
   CLUB_GOAL,
   HANDLE_RE,
   REPORT_REASONS,
+  RESULT_NOTE_DAYS,
   SOCIAL_LIMITS,
   type ActivityItem,
   type Audience,
@@ -122,6 +123,7 @@ interface ProfileRow extends Row {
   push_sent: number;
   push_likes: number;
   push_cheers: number;
+  push_posts: number;
   live: number;
   suspended: number;
   seen_at: number;
@@ -175,6 +177,7 @@ const toProfile = (r: ProfileRow): SocialProfile => ({
     sent: !!n(r.push_sent),
     likes: !!n(r.push_likes),
     cheers: !!n(r.push_cheers ?? 1),
+    posts: !!n(r.push_posts ?? 1),
   },
   avatar: avatarOf(r.avatar),
   audience: audienceOf(r.audience),
@@ -296,7 +299,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
     await run(
       `UPDATE social_profiles SET handle = ?, name = ?, open = ?, auto_post = ?, weights = ?, public = ?,
          push_follows = ?, push_comments = ?, push_sent = ?, push_likes = ?, avatar = ?, audience = ?, show_lifts = ?, lifts = ?,
-         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?
+         suggest = ?, level = ?, streak = ?, live = ?, push_cheers = ?, push_posts = ?
        WHERE account_id = ?`,
       [
         handle,
@@ -318,6 +321,7 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
         clampInt(b.streak, 0, 520, p.streak),
         flag(b.live, p.live),
         flag(push.cheers, p.push_cheers ?? 1),
+        flag(push.posts, p.push_posts ?? 1),
         accountId,
       ],
     );
@@ -353,6 +357,7 @@ export function socialDeletes(accountId: string): { sql: string; args: string[] 
     { sql: "DELETE FROM follows WHERE follower_id = ? OR followee_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM mutes WHERE muter_id = ? OR muted_id = ?", args: [accountId, accountId] },
+    { sql: "DELETE FROM bells WHERE watcher_id = ? OR watched_id = ?", args: [accountId, accountId] },
     { sql: "DELETE FROM social_invites WHERE account_id = ?", args: a },
     { sql: "DELETE FROM reports WHERE reporter_id = ?", args: a },
     { sql: "DELETE FROM sent_workouts WHERE from_id = ? OR to_id = ?", args: [accountId, accountId] },
@@ -426,6 +431,7 @@ async function card(viewer: string, p: ProfileRow, now = Date.now()): Promise<Pe
     [id, viewer],
   );
   const [muted] = await query("SELECT 1 AS x FROM mutes WHERE muter_id = ? AND muted_id = ?", [viewer, id]);
+  const [bell] = await query("SELECT 1 AS x FROM bells WHERE watcher_id = ? AND watched_id = ?", [viewer, id]);
   const mine = await follow(viewer, id);
   const theirs = await follow(id, viewer);
   const relation: Relation = id === viewer ? "self" : iBlocked ? "blocked" : mine?.accepted ? "following" : mine ? "requested" : "none";
@@ -443,6 +449,7 @@ async function card(viewer: string, p: ProfileRow, now = Date.now()): Promise<Pe
     public: !!n(p.public),
     avatar: avatarOf(p.avatar),
     muted: !!muted,
+    bell: !!bell && relation === "following",
     lifts: canSeePosts && n(p.show_lifts) && n(p.weights) ? liftsOf(p) : [],
     level: canSeePosts ? n(p.level) : 0,
     streak: canSeePosts ? n(p.streak) : 0,
@@ -632,7 +639,11 @@ export async function followOp(accountId: string, b: Record<string, unknown>, no
 /** Stops following, or takes back a request. */
 export async function unfollow(accountId: string, b: Record<string, unknown>): Promise<Result> {
   const p = await byHandle(s(b.handle));
-  if (p) await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [accountId, s(p.account_id)]);
+  if (p)
+    await batch([
+      { sql: "DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", args: [accountId, s(p.account_id)] },
+      { sql: "DELETE FROM bells WHERE watcher_id = ? AND watched_id = ?", args: [accountId, s(p.account_id)] },
+    ]);
   return ok();
 }
 
@@ -644,7 +655,11 @@ export async function answer(accountId: string, b: Record<string, unknown>): Pro
   if (b.accept === true) {
     const r = await run("UPDATE follows SET accepted = 1 WHERE follower_id = ? AND followee_id = ? AND accepted = 0", [them, accountId]);
     if (r) await notify(them, accountId, "accept");
-  } else await run("DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", [them, accountId]);
+  } else
+    await batch([
+      { sql: "DELETE FROM follows WHERE follower_id = ? AND followee_id = ?", args: [them, accountId] },
+      { sql: "DELETE FROM bells WHERE watcher_id = ? AND watched_id = ?", args: [them, accountId] },
+    ]);
   return ok();
 }
 
@@ -694,8 +709,50 @@ export async function block(accountId: string, b: Record<string, unknown>, now =
       sql: "DELETE FROM follows WHERE (follower_id = ? AND followee_id = ?) OR (follower_id = ? AND followee_id = ?)",
       args: [accountId, them, them, accountId],
     },
+    {
+      sql: "DELETE FROM bells WHERE (watcher_id = ? AND watched_id = ?) OR (watcher_id = ? AND watched_id = ?)",
+      args: [accountId, them, them, accountId],
+    },
   ]);
   return ok();
+}
+
+/**
+ * Rings (or, with `on: false`, silences) the bell for someone the lifter follows: a push each time they post a
+ * workout the lifter may see. Only for an accepted follow, so it can't reach past what following already shows.
+ */
+export async function bell(accountId: string, b: Record<string, unknown>, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  const p = await byHandle(s(b.handle));
+  const them = p ? s(p.account_id) : "";
+  if (!p || them === accountId || n(p.suspended) || (await blockedEither(accountId, them))) return fail(404, "noOne");
+  if (b.on === false) await run("DELETE FROM bells WHERE watcher_id = ? AND watched_id = ?", [accountId, them]);
+  else {
+    if (!(await follow(accountId, them))?.accepted) return fail(403, "followFirst");
+    if (!(await limit(accountId, "follow", now))) return fail(429, "slow");
+    await run("INSERT OR IGNORE INTO bells (watcher_id, watched_id, created_at) VALUES (?, ?, ?)", [accountId, them, now]);
+  }
+  return lookup(accountId, b, now);
+}
+
+/**
+ * Tells everyone who rang the bell for the poster about a new post, if they may see it: an accepted follow, no
+ * block either way, not muted, and the post's audience (so an "only me" or friends-only post reaches no one else).
+ */
+async function ringBells(author: string, handle: string, postId: string, prs: number) {
+  const rows = await query(
+    `SELECT b.watcher_id AS id FROM bells b JOIN posts p ON p.id = ?1
+     WHERE b.watched_id = p.account_id AND p.hidden = 0
+       AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = b.watcher_id AND f.followee_id = p.account_id AND f.accepted = 1)
+       AND NOT EXISTS (SELECT 1 FROM blocks bl WHERE (bl.blocker_id = b.watcher_id AND bl.blocked_id = p.account_id)
+         OR (bl.blocker_id = p.account_id AND bl.blocked_id = b.watcher_id))
+       AND NOT EXISTS (SELECT 1 FROM mutes m WHERE m.muter_id = b.watcher_id AND m.muted_id = p.account_id)
+       AND ${seesPost("b.watcher_id")}
+     LIMIT ${SOCIAL_LIMITS.bellsPerPost}`,
+    [postId],
+  );
+  await Promise.all(rows.map((r) => notify(s(r.id), author, prs > 0 ? "best" : "posted", { code: handle })));
 }
 
 export async function unblock(accountId: string, b: Record<string, unknown>): Promise<Result> {
@@ -855,7 +912,10 @@ export async function post(accountId: string, b: Record<string, unknown>, now = 
   const [row] = await query("SELECT id FROM posts WHERE account_id = ? AND workout_id = ?", [accountId, p.workoutId]);
   const postId = s(row?.id ?? id);
   const audience = p.audience ?? audienceOf(mine.audience);
-  if (audience !== "me") await tagPartners(accountId, postId, b.partners, now);
+  if (audience !== "me") {
+    await tagPartners(accountId, postId, b.partners, now);
+    await ringBells(accountId, s(mine.handle), postId, p.body.prs);
+  }
   return ok({ id: postId });
 }
 
@@ -1442,6 +1502,7 @@ export async function nudges(accountId: string, b: Record<string, unknown>, now 
   const week = await board(accountId, { from: b.from }, now);
   if (week.code !== 200) return week;
   const ch = await challenges(accountId, {}, now);
+  const all = (ch.body.challenges as Challenge[] | undefined) ?? [];
   const quietFrom = now - QUIET_DAYS * day;
   const rows = await query(
     `SELECT sp.handle AS handle, sp.name AS name, sp.avatar AS avatar,
@@ -1461,8 +1522,9 @@ export async function nudges(accountId: string, b: Record<string, unknown>, now 
     .map((r) => ({ ...toRow(r), lastAt: n(r.last_at), before: n(r.before) }));
   const signals: FriendSignals = {
     week: week.body.rows as BoardRow[],
-    challenges: ((ch.body.challenges as Challenge[] | undefined) ?? []).filter((c) => c.endsAt > now),
+    challenges: all.filter((c) => c.endsAt > now),
     quiet,
+    ended: all.filter((c) => c.status === "joined" && c.endsAt <= now && c.endsAt > now - RESULT_NOTE_DAYS * day),
   };
   return ok({ ...signals });
 }
@@ -2023,6 +2085,7 @@ export const OPS: Record<string, Op> = {
   block,
   unblock: (a, b) => unblock(a, b),
   mute,
+  bell,
   report,
   post,
   unpost: (a, b) => unpost(a, b),

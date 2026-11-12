@@ -38,6 +38,7 @@ import { go } from "./router";
 import { SaveNudge } from "./Saving";
 import { CALL_STYLE, FEEL_HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
+import { CoachNoteToday } from "./Trainer";
 import { Button, Chip, EmptyState, LinkToggle, ProBadge, ProTag, Ring, Section } from "./ui";
 
 export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number }) {
@@ -368,6 +369,7 @@ export function Today() {
 
       {profile.quotes !== false && <DailyQuote now={now} />}
 
+      {!active && <CoachNoteToday />}
       {!active && <CoachNotes limit={2} />}
       {!active && <SaveNudge />}
 

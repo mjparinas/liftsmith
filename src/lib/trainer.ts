@@ -4,7 +4,10 @@
 // A coach shares an invite code; a client enters it, sees what the coach will see and agrees; the coach then
 // reads the client's training from their synced account and gets a short report that says what to act on
 // first (action over stats): a client gone quiet, behind on their weekly goal, missing reps, or stalled.
+import { create } from "zustand";
+
 import { api, AuthError, readAccount } from "./auth";
+import { coachCode } from "./coachInvite";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
@@ -12,7 +15,7 @@ import { stalls, type Stall } from "./insights";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
-import type { AppEvent, SetEvent } from "./types";
+import type { AppEvent, Experience, Goal, SetEvent } from "./types";
 
 export interface Person {
   id: string;
@@ -32,12 +35,29 @@ export interface Plan {
   code: string;
   at: number;
 }
+/** What a coach's new clients start setup with (any part may be unset). */
+export interface Setup {
+  goal?: Goal;
+  experience?: Experience;
+  days?: number;
+}
+/** A coach's note to a client. */
+export interface Note {
+  coachId: string;
+  clientId: string;
+  text: string;
+  at: number;
+}
 export interface Overview {
   invite: Invite | null;
   clients: Person[];
   coaches: Person[];
   /** Routines this lifter's coaches gave them. */
   plans: Plan[];
+  /** Notes this lifter's coaches left them, newest first. */
+  notes?: Note[];
+  /** What this coach's new clients start setup with. */
+  setup?: Setup;
 }
 export interface ClientView {
   name: string;
@@ -45,7 +65,11 @@ export interface ClientView {
   events: unknown[];
   /** Routines this coach gave the client. */
   plans: Plan[];
+  /** This coach's note to the client. */
+  note?: Note | null;
 }
+/** The longest note a coach can leave (the server's COACH_LIMITS.note). */
+export const NOTE_MAX = 500;
 
 const DAY = 86_400_000;
 const WEEK = 7 * DAY;
@@ -60,10 +84,17 @@ export const loadOverview = async () => api<Overview>("/api/coach/", { token: to
 export const loadClient = async (id: string) => api<ClientView>(`/api/coach/?client=${encodeURIComponent(id)}`, { token: token() });
 export const newInvite = async () => (await api<{ invite: Invite }>("/api/coach/", { token: token(), body: { action: "invite" } })).invite;
 export const cancelInvite = async () => void (await api("/api/coach/", { token: token(), body: { action: "cancel" } }));
-export const previewCode = async (code: string) =>
-  (await api<{ coach: Person }>("/api/coach/", { token: token(), body: { action: "preview", code } })).coach;
-export const joinCode = async (code: string) =>
-  (await api<{ coach: Person }>("/api/coach/", { token: token(), body: { action: "join", code } })).coach;
+/** Whose a code is, and what their new clients start setup with. Links nothing. */
+export const previewInvite = async (code: string) =>
+  api<{ coach: Person; setup?: Setup }>("/api/coach/", { token: token(), body: { action: "preview", code } });
+export const previewCode = async (code: string) => (await previewInvite(code)).coach;
+export const joinInvite = async (code: string) =>
+  api<{ coach: Person; setup?: Setup }>("/api/coach/", { token: token(), body: { action: "join", code } });
+export const joinCode = async (code: string) => (await joinInvite(code)).coach;
+export const saveSetup = async (setup: Setup) =>
+  (await api<{ setup: Setup }>("/api/coach/", { token: token(), body: { action: "setup", setup } })).setup;
+export const saveNote = async (client: string, text: string) =>
+  (await api<{ note: Note | null }>("/api/coach/", { token: token(), body: { action: "note", client, text } })).note;
 export const assignPlan = async (client: string, name: string, code: string) =>
   (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code } })).plan;
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
@@ -74,11 +105,7 @@ export const showCode = (code: string) => (code.length === 8 ? `${code.slice(0, 
 /** The link a coach sends: it opens Coaching in the app with the code filled in. */
 export const inviteUrl = (code: string, base = SITE_URL) => `${base.replace(/\/$/, "")}${APP_PATH}#/trainer/${code}`;
 /** The code in a pasted invite link, or the typed code itself, tidied. Empty when it can't be one. */
-export function codeFrom(text: string): string {
-  const m = /#\/trainer\/([\w-]+)/.exec(text);
-  const c = (m ? m[1]! : text).toUpperCase().replace(/[\s-]/g, "");
-  return /^[2-9A-HJ-NP-Z]{8}$/.test(c) ? c : "";
-}
+export const codeFrom = (text: string) => coachCode(text);
 
 export function trainerError(e: unknown): string {
   if (e instanceof AuthError) {
@@ -244,4 +271,81 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }
+}
+
+// --- The client's side between visits: notes from their coaches, for Today ---
+
+const CACHE = "liftsmith.coachNotes";
+const SEEN = "liftsmith.coachNotes.seen";
+/** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
+const EVERY = 15 * 60_000;
+
+/** A note to show, with the coach's name. */
+export interface ShownNote extends Note {
+  coach: string;
+}
+interface NotesState {
+  notes: ShownNote[];
+  /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
+  seen: string[];
+}
+
+function readJson<T>(key: string, fallback: T): T {
+  try {
+    const v = JSON.parse(localStorage.getItem(key) ?? "null") as T | null;
+    return v ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+function writeJson(key: string, v: unknown) {
+  try {
+    localStorage.setItem(key, JSON.stringify(v));
+  } catch {
+    // private mode: notes still show while the app is open
+  }
+}
+
+export const useCoachNotes = create<NotesState>(() => ({
+  notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
+  seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
+}));
+
+export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
+
+/** The notes from an overview, with each coach's name. */
+export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] {
+  return (o.notes ?? []).map((n) => ({ ...n, coach: o.coaches.find((c) => c.id === n.coachId)?.name ?? "" }));
+}
+
+/** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
+export function keepNotes(o: Pick<Overview, "notes" | "coaches">): void {
+  const notes = shownNotes(o);
+  writeJson(CACHE, notes);
+  useCoachNotes.setState({ notes });
+}
+
+let lastLook = 0;
+/** Signed in: looks for new notes from the lifter's coaches, at most every 15 minutes. Quiet on any failure. */
+export async function refreshCoachNotes(now = Date.now(), force = false): Promise<void> {
+  if (!readAccount() || (!force && now - lastLook < EVERY)) return;
+  lastLook = now;
+  try {
+    keepNotes(await loadOverview());
+  } catch {
+    // offline or signed out: keep what was there
+  }
+}
+
+/** "Got it": hides this note on the device until the coach changes it. */
+export function dismissNote(n: Note): void {
+  const seen = [...useCoachNotes.getState().seen.filter((id) => id !== noteId(n)), noteId(n)].slice(-50);
+  writeJson(SEEN, seen);
+  useCoachNotes.setState({ seen });
+}
+
+/** Signed out, or the lifter erased their data: nothing from a coach stays on the device. */
+export function forgetNotes(): void {
+  writeJson(CACHE, []);
+  useCoachNotes.setState({ notes: [] });
 }

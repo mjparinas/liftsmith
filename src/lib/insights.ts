@@ -57,6 +57,8 @@ export interface Insight {
   /** What to do about it. */
   advice: string;
   action?: InsightAction;
+  /** Called once the note is on screen (the trial's notes record it for the admin Funnel tab). */
+  onShow?: () => void;
 }
 
 export interface InsightInput {

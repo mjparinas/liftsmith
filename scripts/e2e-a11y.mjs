@@ -155,6 +155,12 @@ try {
   await page.goto(`${server.url}/app/#/routine/r1~UHVzaCBkYXk~bench-press.4~lateral-raise.3.s~cable-pushdown.3`);
   await page.getByRole("heading", { name: "Push day" }).waitFor();
   await scan("shared routine");
+  // A shared gym link (gymShare.ts): "Iron Works", a barbell, plates, dumbbells and kettlebells.
+  await page.goto(
+    `${server.url}/app/#/gymlink/g1~eyJuIjoiSXJvbiBXb3JrcyIsInUiOiJrZyIsImUiOlsiYmFyYmVsbCIsImR1bWJiZWxscyIsImNhYmxlcyJdLCJiIjpbWyJPbHltcGljIGJhciIsMjBdXSwicCI6W1syMCw0XSxbMTAsNF0sWzUsNF1dLCJkIjpbMiw0LDYsOCwxMF0sImsiOls4LDEyLDE2XSwibSI6NX0`,
+  );
+  await page.getByRole("heading", { name: "Iron Works" }).waitFor();
+  await scan("shared gym");
   // Stretching: the library, a stretch's demo sheet, a rest-day routine and the player.
   await page.goto(`${server.url}/app/#/stretch`);
   await page.getByTestId("stretch-list").waitFor();
@@ -369,6 +375,20 @@ try {
             { handle: "casey", name: "Casey", avatar: "av-leaf", me: false, joined: false, value: 0 },
           ],
         },
+        {
+          id: "ch3",
+          name: "Leg week",
+          metric: "workouts",
+          startsAt: Date.now() - 8 * 86_400_000,
+          endsAt: Date.now() - 86_400_000,
+          owner: { handle: "alex", name: "Alex" },
+          mine: true,
+          status: "joined",
+          members: [
+            { handle: "alex", name: "Alex", avatar: "", me: true, joined: true, value: 4 },
+            { handle: "blair", name: "Blair", avatar: "av-mascot", me: false, joined: true, value: 3 },
+          ],
+        },
       ],
     },
     clubs: { clubs: [{ id: "cl1", name: "Iron Barn crew", members: 3, mine: true }] },
@@ -389,6 +409,7 @@ try {
       },
     },
     clubInfo: { club: { id: "cl1", name: "Iron Barn crew", members: 3, owner: { handle: "blair", name: "Blair" }, joined: false } },
+    invite: { code: "ABCD2345" },
     inviteInfo: { inviter: { handle: "blair", name: "Blair", avatar: "av-trophy" }, self: false },
     lookup: {
       person: {
@@ -470,6 +491,10 @@ try {
   await scan("friends comments");
   await page.keyboard.press("Escape");
   await page.getByRole("button", { name: "Board" }).click();
+  // A challenge that just ended opens its results moment once (gap list 3, item 5).
+  await page.getByRole("dialog", { name: "Leg week" }).getByText("You won!").waitFor();
+  await scan("friends challenge result");
+  await page.keyboard.press("Escape");
   await page.getByText("Blair is 1 ahead in workouts. Your next workout closes the gap.").waitFor();
   await page.getByText("Blair invited you to this challenge.").waitFor();
   await page.getByRole("list", { name: "Friends on this month’s challenge" }).waitFor();
@@ -502,6 +527,10 @@ try {
   await page.getByLabel("Find a friend").fill("stone");
   await page.getByRole("list", { name: "Search results" }).waitFor();
   await scan("friends people");
+  await page.getByRole("button", { name: "Scan to follow" }).click();
+  await page.getByRole("img", { name: "Your Liftsmith code" }).waitFor();
+  await scan("friends scan to follow");
+  await page.keyboard.press("Escape");
   await page.goto(`${server.url}/app/#/person/blair`);
   await page.getByText("Follows you").waitFor();
   await page.getByText("Best lifts").waitFor();

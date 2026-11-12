@@ -3,10 +3,14 @@
 import { useState } from "react";
 
 import { SECTION_LABEL } from "@/components/titles";
+import { track } from "@/lib/analytics";
 import { PRESETS, switchGymUnit, type GymPreset } from "@/lib/defaults";
 import { DEFAULT_RADIUS_M, locate, roundPlace } from "@/lib/geo";
+import { encodeGym, gymCodeFromLink, gymUrl, kitOf } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
+import { haptic } from "@/lib/juice";
 import { loadBar, plateStyle } from "@/lib/plates";
+import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
@@ -14,7 +18,7 @@ import { fmtNum } from "@/lib/units";
 import { BuyNext } from "./BuyNext";
 import { GymWeights } from "./GymWeights";
 import { PlateBar } from "./Plates";
-import { goBack } from "./router";
+import { go, goBack } from "./router";
 import { Bump, BumpField, Button, Chip, ScreenHeader, Section, Sheet } from "./ui";
 
 export function Gym() {
@@ -193,6 +197,8 @@ export function Gym() {
 
       <BuyNext gym={gym} />
 
+      <ShareGym gym={gym} />
+
       {gyms.length > 1 && (
         <Button kind="danger" className="mt-6 w-full" onClick={() => removeGym(gym.id)}>
           {t("gym.remove")}
@@ -217,7 +223,70 @@ export function Gym() {
             </button>
           ))}
         </div>
+        <PasteGym onOpen={() => setAdding(false)} />
       </Sheet>
+    </div>
+  );
+}
+
+/** "Share this gym": a link to the gym's equipment and weights, never where it is or machine settings. */
+function ShareGym({ gym }: { gym: GymT }) {
+  const [note, setNote] = useState<string | null>(null);
+  const share = async () => {
+    haptic("tap");
+    const url = gymUrl(encodeGym(kitOf(gym)));
+    track("feature", { name: "gym_share", detail: "share" });
+    if (await shareUrl(url, t("gym.shareTitle", { name: gym.name }))) return;
+    setNote((await copyText(url)) ? t("gym.copied") : null);
+  };
+  return (
+    <Section title={t("gym.shareSection")}>
+      <Button kind="ghost" icon="share" className="w-full" onClick={share}>
+        {t("gym.share")}
+      </Button>
+      <p className="mt-1 text-xs text-faint" role="status">
+        {note ?? t("gym.shareHint")}
+      </p>
+    </Section>
+  );
+}
+
+/** "Add from a link": a gym link someone sent, for when it opened somewhere else. */
+function PasteGym({ onOpen }: { onOpen: () => void }) {
+  const [text, setText] = useState("");
+  const [bad, setBad] = useState(false);
+  const open = () => {
+    const code = gymCodeFromLink(text);
+    if (!code) return setBad(true);
+    onOpen();
+    go("gymlink", code);
+  };
+  return (
+    <div className="mt-5 border-t border-line pt-4">
+      <label htmlFor="gym-paste" className="text-sm text-muted">
+        {t("gym.paste")}
+      </label>
+      <div className="mt-2 flex gap-2">
+        <input
+          id="gym-paste"
+          value={text}
+          onChange={(e) => {
+            setText(e.target.value);
+            setBad(false);
+          }}
+          className="card min-w-0 flex-1 px-3 py-2"
+          inputMode="url"
+          autoComplete="off"
+        />
+        <Button kind="ghost" onClick={open} disabled={!text.trim()}>
+          {t("gym.pasteOpen")}
+        </Button>
+      </div>
+      {bad && (
+        <p className="mt-2 text-sm text-warn" role="alert">
+          {t("gym.pasteBad")}
+        </p>
+      )}
     </div>
   );
 }

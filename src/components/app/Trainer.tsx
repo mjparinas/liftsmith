@@ -2,7 +2,8 @@
 
 // Trainer mode (#/trainer, docs/decisions/trainer-mode.md). One screen for both sides: "Your coach", where
 // a lifter enters a coach's code, sees exactly what the coach will see and agrees (free for everyone), and
-// "Your clients", where a coach shares an invite and opens each client's report (a Labs feature, so Pro).
+// "Your clients", where a coach shares an invite, picks what new clients start setup with, and opens each
+// client's report (Pro: out of Labs on 2026-11-12). The client's report also holds the coach's note to them.
 // A client's report is #/trainer/c.<id>; an invite link is #/trainer/<code>, which fills in the code.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
@@ -11,7 +12,6 @@ import { useAccount } from "@/lib/auth";
 import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
-import { labOn } from "@/lib/labs";
 import { encodeRoutine } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
@@ -20,30 +20,39 @@ import {
   cancelInvite,
   clientReport,
   codeFrom,
+  dismissNote,
   flagText,
   inviteUrl,
   joinCode,
+  keepNotes,
   liftName,
   loadClient,
   loadOverview,
   newInvite,
+  NOTE_MAX,
+  noteId,
   previewCode,
   removePlan,
+  saveNote,
+  saveSetup,
   showCode,
   trainerError,
   unlinkPerson,
+  useCoachNotes,
+  type Note,
   type Overview,
   type Person,
   type Plan,
   type PlanProgress,
   type Report,
+  type Setup,
 } from "@/lib/trainer";
-import type { Routine } from "@/lib/types";
+import type { Experience, Goal, Routine } from "@/lib/types";
 import { fmtWeight } from "@/lib/units";
 
 import { Icon } from "./icons";
 import { go } from "./router";
-import { Button, EmptyState, ProTag, ScreenHeader, Section, Sheet } from "./ui";
+import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet } from "./ui";
 
 const CLIENT = "c.";
 
@@ -70,7 +79,11 @@ function Home({ code }: { code: string }) {
   const [note, setNote] = useState<string | null>(null);
   const reload = useCallback(() => {
     loadOverview()
-      .then(setData)
+      .then((o) => {
+        setData(o);
+        // Today shows the newest note from a coach; keep it in step with what this screen loaded.
+        keepNotes(o);
+      })
       .catch((e: unknown) => {
         setData({ invite: null, clients: [], coaches: [], plans: [] });
         setNote(trainerError(e));
@@ -87,7 +100,7 @@ function Home({ code }: { code: string }) {
         </p>
       )}
       <Section title={t("trn.yourCoach")} icon="flag">
-        <YourCoach coaches={data?.coaches ?? []} plans={data?.plans ?? []} code={code} onChange={reload} />
+        <YourCoach coaches={data?.coaches ?? []} plans={data?.plans ?? []} notes={data?.notes ?? []} code={code} onChange={reload} />
       </Section>
       <Section title={t("trn.yourClients")} icon="target">
         <YourClients data={data} onChange={reload} />
@@ -98,7 +111,19 @@ function Home({ code }: { code: string }) {
 
 // --- The client's side: free for everyone ---
 
-function YourCoach({ coaches, plans, code, onChange }: { coaches: Person[]; plans: Plan[]; code: string; onChange: () => void }) {
+function YourCoach({
+  coaches,
+  plans,
+  notes,
+  code,
+  onChange,
+}: {
+  coaches: Person[];
+  plans: Plan[];
+  notes: Note[];
+  code: string;
+  onChange: () => void;
+}) {
   const [text, setText] = useState(code ? showCode(code) : "");
   const [found, setFound] = useState<Person | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -164,9 +189,12 @@ function YourCoach({ coaches, plans, code, onChange }: { coaches: Person[]; plan
   };
   return (
     <div>
-      {plans.length > 0 && (
+      {(plans.length > 0 || notes.length > 0) && (
         <div className="mb-3">
           <p className="mb-2 px-1 text-sm font-semibold">{t("trn.fromCoach")}</p>
+          {notes.map((n) => (
+            <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
+          ))}
           <ul className="space-y-2">
             {plans.map((p) => {
               const who = coaches.find((c) => c.id === p.coachId)?.name || t("trn.noName");
@@ -257,24 +285,62 @@ function YourCoach({ coaches, plans, code, onChange }: { coaches: Person[]; plan
   );
 }
 
-// --- The coach's side: a lab, so Pro ---
+/** A note from a coach: their words, who and when. Plain text, line breaks kept. */
+export function NoteCard({ note, coach }: { note: Note; coach: string }) {
+  return (
+    <div className="card card-tint mb-2 p-4" style={{ ["--tint" as string]: "var(--color-violet)" }}>
+      <p className="whitespace-pre-line break-words">{note.text}</p>
+      <p className="mt-2 text-sm text-muted">
+        {t("trn.planBy", { name: coach || t("trn.noName"), date: date(note.at, { month: "short", day: "numeric" }) })}
+      </p>
+    </div>
+  );
+}
+
+/**
+ * Today: the newest note from the lifter's coach, until "Got it" (it shows again when the coach changes it). Loaded on
+ * open and on return to the app (refreshCoachNotes), so nothing is fetched by this card.
+ */
+export function CoachNoteToday() {
+  const notes = useCoachNotes((s) => s.notes);
+  const seen = useCoachNotes((s) => s.seen);
+  const n = notes.find((x) => !seen.includes(noteId(x)));
+  if (!n) return null;
+  return (
+    <Section title={t("trn.fromCoach")} icon="chat">
+      <NoteCard note={n} coach={n.coach} />
+      <div className="flex flex-wrap gap-2">
+        <Button kind="ghost" className="flex-1" onClick={() => go("trainer")}>
+          {t("trn.noteOpen")}
+        </Button>
+        <Button
+          kind="quiet"
+          onClick={() => {
+            haptic("tick");
+            dismissNote(n);
+          }}
+        >
+          {t("coach.gotIt")}
+        </Button>
+      </div>
+    </Section>
+  );
+}
+
+// --- The coach's side: Pro ---
 
 function YourClients({ data, onChange }: { data: Overview | null; onChange: () => void }) {
   const [note, setNote] = useState<string | null>(null);
-  if (!labOn("labTrainer")) {
-    const pro = can("labs");
+  if (!can("coaching")) {
+    // Never hidden: the row says what it is, with the Pro tag, and opens the paywall (AGENTS.md "Free vs Pro").
     return (
-      <button
-        type="button"
-        onClick={() => (pro ? go("settings", "labs") : go("pro", "labs"))}
-        className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
-      >
+      <button type="button" onClick={() => go("pro", "coaching")} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
         <span className="min-w-0 flex-1">
           <span className="flex items-center gap-2 font-semibold">
             {t("trn.coachRow")}
-            {!pro && <ProTag />}
+            <ProTag />
           </span>
-          <span className="block text-sm text-muted">{pro ? t("trn.coachRowLab") : t("trn.coachRowPro")}</span>
+          <span className="block text-sm text-muted">{t("trn.coachRowPro")}</span>
         </span>
         <span aria-hidden className="text-faint">
           ›
@@ -354,6 +420,8 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
           {note}
         </p>
       )}
+      {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
+      <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       {data.clients.length ? (
         <ul className="mt-3 space-y-2">
           {data.clients.map((c) => (
@@ -380,6 +448,144 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
         <p className="mt-3 px-1 text-sm text-muted">{t("trn.noClients")}</p>
       )}
     </div>
+  );
+}
+
+const GOAL_CHOICES: Goal[] = ["muscle", "strength", "general"];
+const LEVEL_CHOICES: { id: Experience; key: "setup.exp.new" | "setup.exp.intermediate" | "exp.advanced" }[] = [
+  { id: "new", key: "setup.exp.new" },
+  { id: "intermediate", key: "setup.exp.intermediate" },
+  { id: "advanced", key: "exp.advanced" },
+];
+
+/**
+ * What the coach's new clients start setup with: goal, experience and days a week. An invited client skips those
+ * questions in setup (Onboarding's coach path) and can change them later in Settings. Tapping the picked chip again
+ * leaves that question to the client. Saved on each tap.
+ */
+function StartSetup({ setup: saved }: { setup: Setup }) {
+  const [setup, setSetup] = useState<Setup>(saved);
+  const [note, setNote] = useState<string | null>(null);
+  const pick = async (next: Setup) => {
+    const before = setup;
+    setSetup(next);
+    try {
+      setSetup(await saveSetup(next));
+      setNote(t("trn.setupSaved"));
+    } catch (e) {
+      oops();
+      setSetup(before);
+      setNote(trainerError(e));
+    }
+  };
+  const toggle = <K extends keyof Setup>(key: K, value: Setup[K]) => {
+    const next = { ...setup };
+    if (next[key] === value) delete next[key];
+    else next[key] = value;
+    void pick(next);
+  };
+  return (
+    <section className="card mt-3 p-4" aria-labelledby="trn-setup">
+      <p id="trn-setup" className="font-semibold">
+        {t("trn.setupTitle")}
+      </p>
+      <p className="mt-1 text-sm text-muted">{t("trn.setupHint")}</p>
+      <p className="mt-3 text-sm font-medium" id="trn-setup-goal">
+        {t("trn.setupGoal")}
+      </p>
+      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-goal">
+        {GOAL_CHOICES.map((g) => (
+          <Chip key={g} active={setup.goal === g} onClick={() => toggle("goal", g)}>
+            {t(`goal.${g}`)}
+          </Chip>
+        ))}
+      </div>
+      <p className="mt-3 text-sm font-medium" id="trn-setup-level">
+        {t("trn.setupLevel")}
+      </p>
+      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-level">
+        {LEVEL_CHOICES.map((l) => (
+          <Chip key={l.id} active={setup.experience === l.id} onClick={() => toggle("experience", l.id)}>
+            {t(l.key)}
+          </Chip>
+        ))}
+      </div>
+      <p className="mt-3 text-sm font-medium" id="trn-setup-days">
+        {t("trn.setupDays")}
+      </p>
+      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-days">
+        {[1, 2, 3, 4, 5, 6].map((d) => (
+          <Chip key={d} active={setup.days === d} onClick={() => toggle("days", d)}>
+            <span className="num">{d}</span>
+          </Chip>
+        ))}
+      </div>
+      {note && (
+        <p className="mt-2 text-sm text-muted" role="status">
+          {note}
+        </p>
+      )}
+    </section>
+  );
+}
+
+/** The coach's note to one client: shown on the client's Today and under Coaching until the coach changes it. */
+function NoteToClient({ clientId, saved, onChange }: { clientId: string; saved: Note | null; onChange: () => void }) {
+  const [text, setText] = useState(saved?.text ?? "");
+  const [busy, setBusy] = useState(false);
+  const [note, setNote] = useState<string | null>(null);
+  const save = async (value: string) => {
+    setBusy(true);
+    try {
+      const n = await saveNote(clientId, value);
+      if (!n) setText("");
+      haptic("success");
+      track("feature", { name: "trainer", detail: n ? "note" : "unnote" });
+      setNote(n ? t("trn.noteSaved") : t("trn.noteCleared"));
+      onChange();
+    } catch (e) {
+      oops();
+      setNote(trainerError(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+  const changed = text.trim() !== (saved?.text ?? "");
+  return (
+    <Section title={t("trn.note")} icon="chat">
+      <div className="card p-4">
+        <label htmlFor="trn-note" className="block text-sm text-muted">
+          {t("trn.noteHint")}
+        </label>
+        <textarea
+          id="trn-note"
+          value={text}
+          onChange={(e) => setText(e.target.value.slice(0, NOTE_MAX))}
+          maxLength={NOTE_MAX}
+          rows={4}
+          placeholder={t("trn.notePlaceholder")}
+          className="mt-2 w-full rounded-xl border border-line bg-raised px-3 py-2"
+        />
+        {saved && (
+          <p className="mt-1 text-xs text-muted">{t("trn.noteWhen", { date: date(saved.at, { month: "short", day: "numeric" }) })}</p>
+        )}
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Button className="flex-1" disabled={busy || !changed || !text.trim()} onClick={() => void save(text)}>
+            {t("trn.noteSave")}
+          </Button>
+          {saved && (
+            <Button kind="ghost" disabled={busy} onClick={() => void save("")}>
+              {t("trn.noteClear")}
+            </Button>
+          )}
+        </div>
+        {note && (
+          <p className="mt-2 text-sm text-muted" role="status">
+            {note}
+          </p>
+        )}
+      </div>
+    </Section>
   );
 }
 
@@ -487,8 +693,9 @@ const TONE = { warn: "var(--color-warn)", good: "var(--color-good)", info: "var(
 /** One client's report: what to act on first, their weeks, recent workouts and new bests. */
 function ClientScreen({ id }: { id: string }) {
   const unit = useApp((s) => s.profile.unit);
-  const lab = labOn("labTrainer");
+  const lab = can("coaching");
   const [report, setReport] = useState<Report | null>(null);
+  const [saved, setSaved] = useState<Note | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -496,7 +703,11 @@ function ClientScreen({ id }: { id: string }) {
     if (!lab) return;
     let live = true;
     loadClient(id)
-      .then((v) => live && setReport(clientReport(v, Date.now())))
+      .then((v) => {
+        if (!live) return;
+        setReport(clientReport(v, Date.now()));
+        setSaved(v.note ?? null);
+      })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
       live = false;
@@ -508,9 +719,10 @@ function ClientScreen({ id }: { id: string }) {
       <div className="pb-2">
         <ScreenHeader back={back} title={t("trn.title")} />
         <EmptyState
-          icon="sparkle"
-          title={t("trn.coachRowLab")}
-          action={<Button onClick={() => go("settings", "labs")}>{t("lab.title")}</Button>}
+          icon="lock"
+          title={t("trn.coachRow")}
+          body={t("trn.coachRowPro")}
+          action={<Button onClick={() => go("pro", "coaching")}>{t("pro.settings.see")}</Button>}
         />
       </div>
     );
@@ -550,6 +762,7 @@ function ClientScreen({ id }: { id: string }) {
           })}
         </ul>
       </Section>
+      <NoteToClient clientId={id} saved={saved} onChange={() => setVersion((n) => n + 1)} />
       <Section title={t("trn.weeks")} icon="calendar">
         <div className="grid grid-cols-4 gap-2">
           {report.weeks.map((w, i) => (

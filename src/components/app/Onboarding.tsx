@@ -1,13 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { analyticsOn, setAnalytics, track } from "@/lib/analytics";
+import { readAccount } from "@/lib/auth";
 import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
+import { pendingCoach, savePendingCoach } from "@/lib/coachInvite";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
 import { connectHealth, healthAvailable, readBodyStats, readHints } from "@/lib/health";
@@ -22,6 +24,7 @@ import { declineTrial, startTrial } from "@/lib/trial";
 import type { Experience, Goal, Profile, Unit } from "@/lib/types";
 import { fromKg, toKg } from "@/lib/units";
 
+import { CoachJoin } from "./CoachJoin";
 import { Mascot } from "./Mascot";
 import { Plans, ProFeatures } from "./Pro";
 import { go } from "./router";
@@ -121,14 +124,21 @@ const LEVELS: { id: Experience; title: string; blurb: string }[] = [
   },
 ];
 
-const STEP_NAMES = [
-  "Goal and experience",
-  "Gym and units",
-  "Days and body weight",
-  "Notifications and heart rate",
-  "Save your progress",
-  "Pro trial offer",
-];
+type StepId = "goal" | "gym" | "days" | "zone" | "save" | "pro" | "coach";
+const STEP_NAMES: Record<StepId, string> = {
+  goal: "Goal and experience",
+  gym: "Gym and units",
+  days: "Days and body weight",
+  zone: "Notifications and heart rate",
+  save: "Save your progress",
+  pro: "Pro trial offer",
+  coach: "Coach invite",
+};
+const FULL: StepId[] = ["goal", "gym", "days", "zone", "save", "pro"];
+// Invited by a coach and signed in (trainer mode, 2026-11-12): agree to share, then only the gym and the body. The coach's
+// starting setup answers the goal, experience and days; signing in already saves the workouts; and a client doesn't
+// need Pro, so there's no trial offer. Everything skipped can be changed later in Settings.
+const COACH: StepId[] = ["coach", "gym", "days"];
 
 const KNOWN = [
   {
@@ -180,8 +190,15 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // Until then there's nothing to buy, so no priced offer is shown (store review, AGENTS.md "Money").
   // The web app sells Pro too (Stripe), but only to a signed-in account, so its setup doesn't end on the offer: the
   // Pro tags and the paywall carry it there (money.md, "Pro on the web").
-  const STEPS = rerun || !billingLive() || webBilling() ? 5 : 6;
-  const PRO_STEP = 5;
+  const fullSteps = rerun || !billingLive() || webBilling() ? 5 : 6;
+  // A coach's invite waiting on this device (coachInvite.ts); the coach path starts once the lifter is signed in.
+  const [coach, setCoach] = useState(() => (rerun ? "" : pendingCoach()));
+  const [coachPath, setCoachPath] = useState(false);
+  // The code as of the latest tap (the welcome screen's "Set up on my own" clears it and starts in the same tap).
+  const coachNow = useRef(coach);
+  const flow = coachPath ? COACH : FULL.slice(0, fullSteps);
+  const STEPS = flow.length;
+  const cur = flow[step] ?? "goal";
   const trialDays = flag("trialDays");
   // The store's own trial length for this person (null once they've used a trial), else the flag's.
   const offers = useBilling((b) => b.offers);
@@ -222,9 +239,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   // The setup funnel: which step each install reached.
   useEffect(() => {
     if (welcome) return track("onboarding_step", { step: -1, name: "Welcome" });
-    track("onboarding_step", { step, name: STEP_NAMES[step] });
-    if (step === PRO_STEP) track("paywall_view", { from: "setup" });
-  }, [step, welcome]);
+    track("onboarding_step", { step, name: STEP_NAMES[cur] });
+    if (cur === "pro") track("paywall_view", { from: "setup" });
+  }, [step, welcome, cur]);
 
   const fillFromHealth = async () => {
     const ok = await connectHealth();
@@ -274,8 +291,29 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
       healthPrefill: prefilled,
     });
     haptic("success");
-    // A first run that came in through the website's "Sign in" link (#/account) ends on Today, not on Account.
-    if (rerun || location.hash.startsWith("#/account")) go("today");
+    if (coachPath) {
+      savePendingCoach("");
+      track("feature", { name: "trainer", detail: "setup" });
+    }
+    // A first run that came in through the website's "Sign in" link (#/account), or a coach's invite link (#/trainer/<code>)
+    // on the coach path, ends on Today, not on that screen.
+    if (rerun || coachPath || location.hash.startsWith("#/account")) go("today");
+  };
+
+  // The coach path: agreed, so take the coach's starting answers and go on to the gym.
+  const joined = (s: { goal?: Goal; experience?: Experience; days?: number }) => {
+    if (s.goal) setGoal(s.goal);
+    if (s.experience) setExp(s.experience);
+    if (s.days) setDays(s.days);
+    setStep(1);
+  };
+  // Not joining after all (or the code no longer works): the usual setup, and the code is forgotten.
+  const ownWay = () => {
+    savePendingCoach("");
+    coachNow.current = "";
+    setCoach("");
+    setCoachPath(false);
+    setStep(0);
   };
 
   // The Back button and the phone's back button do the same thing: the previous question, then the
@@ -286,8 +324,16 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   if (welcome)
     return (
       <Welcome
+        coach={coach}
+        onCoach={(c) => {
+          savePendingCoach(c);
+          coachNow.current = c;
+          setCoach(c);
+        }}
         onStart={(signedIn) => {
           setFreshAccount(!!signedIn);
+          setCoachPath(!!coachNow.current && !!readAccount());
+          setStep(0);
           setWelcome(false);
         }}
       />
@@ -304,7 +350,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         ))}
       </div>
       <div key={step} className="animate-rise flex-1 py-8">
-        {step === 0 && (
+        {cur === "coach" && <CoachJoin code={coach} name={name} onName={setName} onJoined={joined} onOwn={ownWay} />}
+        {cur === "goal" && (
           <>
             <div className="flex items-center gap-3">
               <Mascot mood="happy" size={64} className="animate-spring-in shrink-0" />
@@ -344,7 +391,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             />
           </>
         )}
-        {step === 1 && (
+        {cur === "gym" && (
           <>
             <h1 className={SCREEN_TITLE}>{t("setup.gym.title")}</h1>
             <p className="mt-2 text-muted">{t("setup.gym.note")}</p>
@@ -386,7 +433,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             </div>
           </>
         )}
-        {step === 2 && (
+        {cur === "days" && (
           <>
             <h1 className={SCREEN_TITLE}>{t("setup.days.title")}</h1>
             <div className="mt-6 grid grid-cols-6 gap-2">
@@ -515,7 +562,7 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             )}
           </>
         )}
-        {step === 3 && (
+        {cur === "zone" && (
           <>
             <h1 className={SCREEN_TITLE}>{t("setup.zone.title")}</h1>
             <p className="mt-2 text-muted">{t("setup.zone.note")}</p>
@@ -577,8 +624,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
             </label>
           </>
         )}
-        {step === 4 && <SaveStep />}
-        {step === PRO_STEP && (
+        {cur === "save" && <SaveStep />}
+        {cur === "pro" && (
           <>
             <h1 className={SCREEN_TITLE}>{offerDays ? t("setup.pro.title", { days: offerDays }) : t("pro.title")}</h1>
             <p className="mt-2 text-muted">{t("pro.lead")}</p>
@@ -608,11 +655,11 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
         <Button kind="ghost" onClick={stepBack}>
           {t("setup.back")}
         </Button>
-        {step < PRO_STEP && (
+        {cur !== "pro" && cur !== "coach" && (
           <Button
             className="flex-1 py-4 text-lg"
             onClick={() => (step < STEPS - 1 ? setStep(step + 1) : finish())}
-            disabled={step === 2 && bw < 25}
+            disabled={cur === "days" && bw < 25}
           >
             {step < STEPS - 1 ? t("setup.continue") : t("setup.save")}
           </Button>

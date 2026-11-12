@@ -22,6 +22,7 @@
     "src/lib/loads.ts",
     "src/lib/fitTests.ts",
     "src/lib/freeAdaptive.ts",
+    "src/lib/trialRecap.ts",
     "src/lib/measure.ts",
     "src/lib/monthly.ts",
     "src/lib/nutrition.ts",

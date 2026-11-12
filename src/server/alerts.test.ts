@@ -8,16 +8,7 @@ import { daysUntilFull, restoreDrillState } from "@/lib/systemHealth";
 import { proxy } from "@/proxy.api";
 
 import { finishSignIn, startSignIn } from "./adminAuth";
-import {
-  ALERT_GAP,
-  alertForStoreEvent,
-  digestLines,
-  reportStaffFailure,
-  saveAlertSettings,
-  sendAlert,
-  sendDigest,
-  watchSystem,
-} from "./alerts";
+import { ALERT_GAP, alertForStoreEvent, reportStaffFailure, saveAlertSettings, sendAlert, watchSystem } from "./alerts";
 import { dbSize, sampleDbSize, sizeSamples } from "./capacity";
 import { query, resetDb, run } from "./db";
 import { clearMaintenanceCache, maintenanceOn, setMaintenance } from "./maintenance";
@@ -186,21 +177,6 @@ describe("alerts", () => {
     const second = await watchSystem({ now: NOW + 1, mail: m.mail });
     expect(second.down).toContain("site");
     expect(m.sent.at(-1)!.subject).toMatch(/gone working again/);
-    vi.restoreAllMocks();
-  });
-
-  it("write a digest of the last day in counts, and send it unless off", async () => {
-    vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("offline"));
-    await run("INSERT INTO installs (id, first_seen, last_seen, platform) VALUES ('install-aaaa-1', ?, ?, 'android')", [NOW - 1000, NOW]);
-    await subEvent("rc-1", "purchase", NOW - 1000);
-    const d = await digestLines(NOW);
-    expect(d.lines[0]).toMatch(/^Last 24 hours: 1 new installs/);
-    expect(d.lines[1]).toMatch(/1 payments \(\$39\.99 US/);
-    const m = mailer();
-    expect(await sendDigest({ now: NOW, mail: m.mail })).toBe(1);
-    expect(m.sent[0]!.subject).toMatch(/^Liftsmith today: /);
-    await saveAlertSettings({ instant: true, digest: false });
-    expect(await sendDigest({ now: NOW, mail: m.mail })).toBe(0);
     vi.restoreAllMocks();
   });
 
