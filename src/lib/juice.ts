@@ -191,6 +191,23 @@ export const sound = {
             ],
       );
   },
+  /** The breathing guide's cue at each step: a soft rising pair to breathe in, falling to breathe out, one note to hold. */
+  breath(kind: "up" | "down" | "hold") {
+    if (!feel.sound) return;
+    if (kind === "hold") mallet(NOTE.A4, 0, 0.12, 0.16);
+    else
+      phrase(
+        kind === "up"
+          ? [
+              [NOTE.Cs5, 0, 0.1, 0.16],
+              [NOTE.E5, 0.08, 0.16, 0.16],
+            ]
+          : [
+              [NOTE.E5, 0, 0.1, 0.16],
+              [NOTE.Cs5, 0.08, 0.16, 0.16],
+            ],
+      );
+  },
   /** A small pop: a sheet opening, a card flipping, a crate lid. */
   pop() {
     if (feel.sound) mallet(NOTE.A5, 0, 0.07, 0.3);

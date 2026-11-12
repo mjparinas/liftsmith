@@ -79,6 +79,9 @@ export const en = {
   "gloss.breathingRate.title": "Breathing rate",
   "gloss.breathingRate.body":
     "Breaths a minute while you sleep, from a watch or ring. It stays very steady, so a jump of two or more over your normal is often one of the first signs of getting ill.",
+  "gloss.breathPattern.title": "Breathing patterns",
+  "gloss.breathPattern.body":
+    "A guide for the rest between sets: follow the dot round the box, and the square as it grows and shrinks. Each change of step gives a soft sound and a light buzz, so you can follow it with your eyes closed.\nBox breathing: in, hold, out and hold, 4 seconds each. Steady and calming.\n4-7-8: in for 4, hold for 7, out for 8. The long breath out slows the heart the most.\nDouble sigh: a breath in, a short second sip on top, then a long breath out. The quickest way to settle.\nSlow breaths: in for 4, out for 6.\nYour own: set each side of the box yourself. A hold of 0 leaves it out.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "How much oxygen your body can use at full effort, in millilitres per kilogram a minute. Watches estimate it from walks and runs. It's the best single measure of heart fitness.\nLifting barely moves it. Two 20-minute hard cardio sessions a week do.",
@@ -198,6 +201,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.breathingRate.title": "Frecuencia respiratoria",
   "gloss.breathingRate.body":
     "Respiraciones por minuto mientras duermes, de un reloj o un anillo. Es muy estable, así que un salto de dos o más sobre tu normalidad suele ser una de las primeras señales de que te estás poniendo enfermo.",
+  "gloss.breathPattern.title": "Patrones de respiración",
+  "gloss.breathPattern.body":
+    "Una guía para el descanso entre series: sigue el punto alrededor del cuadrado y el cuadrado que crece y se encoge. Cada cambio de paso suena suave y vibra un poco, para que puedas seguirla con los ojos cerrados.\nRespiración cuadrada: inspira, mantén, espira y mantén, 4 segundos cada uno. Constante y calmante.\n4-7-8: inspira 4, mantén 7, espira 8. La espiración larga es lo que más frena el corazón.\nDoble suspiro: una inspiración, un segundo sorbo corto encima y luego una espiración larga. La forma más rápida de calmarte.\nRespiración lenta: inspira 4, espira 6.\nPersonalizada: elige tú cada lado del cuadrado. Un 0 en una pausa la quita.",
   "gloss.vo2max.title": "VO₂ máx",
   "gloss.vo2max.body":
     "Cuánto oxígeno puede usar tu cuerpo al máximo esfuerzo, en mililitros por kilo y minuto. Los relojes lo estiman a partir de paseos y carreras. Es la mejor medida única de la forma del corazón.\nLevantar pesas apenas lo mueve. Dos sesiones de cardio intenso de 20 minutos a la semana, sí.",
@@ -315,6 +321,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.breathingRate.title": "Fréquence respiratoire",
   "gloss.breathingRate.body":
     "Le nombre de respirations par minute pendant le sommeil, mesuré par une montre ou une bague. Elle est très stable, donc une hausse de deux ou plus au-dessus de votre normale est souvent l’un des premiers signes d’une maladie.",
+  "gloss.breathPattern.title": "Rythmes de respiration",
+  "gloss.breathPattern.body":
+    "Un guide pour le repos entre les séries : suivez le point autour du carré, et le carré qui grandit et rétrécit. Chaque changement d’étape donne un son doux et une légère vibration, pour le suivre les yeux fermés.\nRespiration carrée : inspirez, retenez, expirez et retenez, 4 secondes chacun. Régulière et apaisante.\n4-7-8 : inspirez 4, retenez 7, expirez 8. La longue expiration ralentit le plus le cœur.\nDouble soupir : une inspiration, une deuxième petite gorgée d’air, puis une longue expiration. Le moyen le plus rapide de se calmer.\nRespiration lente : inspirez 4, expirez 6.\nPersonnalisée : réglez vous-même chaque côté du carré. Une pause à 0 est retirée.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "La quantité d’oxygène que votre corps peut utiliser à l’effort maximal, en millilitres par kilo et par minute. Les montres l’estiment à partir de la marche et de la course. C’est la meilleure mesure unique de la forme cardiaque.\nLa musculation la fait à peine bouger. Deux séances de cardio intense de 20 minutes par semaine, si.",
@@ -432,6 +441,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.breathingRate.title": "Atemfrequenz",
   "gloss.breathingRate.body":
     "Atemzüge pro Minute im Schlaf, gemessen von einer Uhr oder einem Ring. Sie ist sehr stabil, daher ist ein Anstieg um zwei oder mehr über deinen Normalwert oft eines der ersten Anzeichen einer Erkrankung.",
+  "gloss.breathPattern.title": "Atemmuster",
+  "gloss.breathPattern.body":
+    "Eine Anleitung für die Pause zwischen den Sätzen: Folge dem Punkt um das Quadrat und dem Quadrat, das wächst und schrumpft. Jeder Schrittwechsel gibt einen leisen Ton und ein leichtes Vibrieren, so kannst du mit geschlossenen Augen folgen.\nBox-Atmung: einatmen, halten, ausatmen und halten, je 4 Sekunden. Gleichmäßig und beruhigend.\n4-7-8: 4 ein, 7 halten, 8 aus. Das lange Ausatmen verlangsamt das Herz am stärksten.\nDoppelseufzer: einatmen, kurz nachatmen, dann lange ausatmen. Der schnellste Weg zur Ruhe.\nLangsames Atmen: 4 ein, 6 aus.\nEigenes Muster: Stell jede Seite des Quadrats selbst ein. Eine Pause von 0 fällt weg.",
   "gloss.vo2max.title": "VO₂max",
   "gloss.vo2max.body":
     "Wie viel Sauerstoff dein Körper bei voller Anstrengung nutzen kann, in Millilitern pro Kilogramm und Minute. Uhren schätzen ihn aus Spaziergängen und Läufen. Er ist das beste Einzelmaß für die Fitness deines Herzens.\nKrafttraining bewegt ihn kaum. Zwei harte Ausdauereinheiten von 20 Minuten pro Woche schon.",
@@ -549,6 +561,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.breathingRate.title": "Frequenza respiratoria",
   "gloss.breathingRate.body":
     "Respiri al minuto mentre dormi, da un orologio o un anello. È molto stabile, quindi un aumento di due o più rispetto alla tua normalità è spesso uno dei primi segnali di una malattia in arrivo.",
+  "gloss.breathPattern.title": "Schemi di respirazione",
+  "gloss.breathPattern.body":
+    "Una guida per il riposo tra le serie: segui il punto lungo il quadrato e il quadrato che cresce e si restringe. Ogni cambio di fase dà un suono leggero e una breve vibrazione, così puoi seguirla a occhi chiusi.\nRespirazione quadrata: inspira, trattieni, espira e trattieni, 4 secondi ciascuno. Regolare e calmante.\n4-7-8: inspira 4, trattieni 7, espira 8. La lunga espirazione rallenta di più il cuore.\nDoppio sospiro: un’inspirazione, un secondo piccolo sorso d’aria, poi una lunga espirazione. Il modo più rapido per calmarti.\nRespiro lento: inspira 4, espira 6.\nPersonalizzata: imposta tu ogni lato del quadrato. Una pausa a 0 viene tolta.",
   "gloss.vo2max.title": "VO₂ max",
   "gloss.vo2max.body":
     "Quanto ossigeno il corpo riesce a usare al massimo sforzo, in millilitri per chilo al minuto. Gli orologi lo stimano da camminate e corse. È la migliore misura singola della forma del cuore.\nI pesi lo spostano appena. Due sessioni di cardio intenso da 20 minuti a settimana sì.",
@@ -666,6 +681,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.breathingRate.title": "呼吸数",
   "gloss.breathingRate.body":
     "睡眠中の1分あたりの呼吸数で、ウォッチやリングで測ります。とても安定した値なので、普段より2回以上増えたら、体調を崩す最初のサインであることがよくあります。",
+  "gloss.breathPattern.title": "呼吸パターン",
+  "gloss.breathPattern.body":
+    "セット間の休憩のガイドです。四角を回る点と、大きくなったり小さくなったりする四角に合わせて呼吸します。段階が変わるたびにやさしい音と軽い振動があるので、目を閉じても続けられます。\nボックス呼吸：吸う、止める、吐く、止めるを各4秒。一定のリズムで落ち着きます。\n4-7-8：4秒吸って、7秒止めて、8秒吐きます。長く吐くことが心拍を最も下げます。\n生理的ため息：吸ったあと、もう少しだけ吸い足し、長く吐きます。最も早く落ち着く方法です。\nゆっくり呼吸：4秒吸って、6秒吐きます。\nカスタム：四角の各辺を自分で決めます。止める時間を0にするとその段階はなくなります。",
   "gloss.vo2max.title": "VO₂max",
   "gloss.vo2max.body":
     "全力を出したときに体が使える酸素の量で、体重1kgあたり1分間のミリリットルで表します。ウォッチがウォーキングやランニングから推定します。心肺の体力を表す最も優れた単一の指標です。\n筋トレではほとんど変わりません。週2回、20分のきつめの有酸素運動なら変わります。",
