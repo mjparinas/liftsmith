@@ -35,11 +35,13 @@ describe("rest time left on the Android Live Update", () => {
   const app = join(__dirname, "../../android/app/src/main");
   const service = readFileSync(join(app, "java/com/getliftsmith/app/WorkoutService.java"), "utf8");
 
-  it("says the time left in the text, the chip and a rest bar, beside the system countdown", () => {
+  it("says the time left once, in the text, the chip and a rest bar, with no second clock beside the title", () => {
     const resting = service.slice(service.indexOf("if (resting) {\n            // The rest bar"));
     expect(resting).toContain("b.setProgress(");
     expect(resting).toContain("b.setShortCriticalText(left)");
-    expect(resting).toContain("setChronometerCountDown(true)");
+    // The header chronometer showed the rest time a second time to the right of the title (2026-11-12).
+    expect(service).not.toContain("setUsesChronometer(true)");
+    expect(resting.slice(0, resting.indexOf("} else {"))).toContain("b.setShowWhen(false)");
     expect(service).toContain("getString(R.string.rest_left_next, left, next)");
   });
 

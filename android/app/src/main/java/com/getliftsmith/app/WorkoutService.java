@@ -236,8 +236,9 @@ public class WorkoutService extends Service {
 
     /**
      * The live notification for the latest update. While resting it says the time left in words ("1:23 left"), in
-     * the status bar chip and the Now Bar, and as a rest bar that empties as rest runs out; the system chronometer in
-     * the header counts down too, but not every surface draws that (Samsung's Now Bar, some lock screens), so the service redraws once a second during rest (restTick) and stops when rest ends.
+     * the status bar chip and the Now Bar, and as a rest bar that empties as rest runs out. There is no system
+     * chronometer in the header, so the time shows once; the service redraws once a second during rest (restTick) and
+     * stops when rest ends.
      */
     private Notification build(Intent intent) {
         String title = intent.getStringExtra("title");
@@ -284,8 +285,9 @@ public class WorkoutService extends Service {
             // The rest bar: time left of the whole rest, emptying as it runs out (in seconds, so +30 s fits).
             long span = Math.max(1, (restUntil - (restFrom > 0 ? restFrom : now) + 999) / 1000);
             b.setProgress((int) Math.max(span, secLeft), (int) secLeft, false);
-            // The system's countdown in the header and on the lock screen, plus the time in the chip ("1:23").
-            b.setUsesChronometer(true).setChronometerCountDown(true).setWhen(restUntil).setShowWhen(true);
+            // The time in the chip ("1:23"). No system chronometer in the header: the text already says the time left,
+            // and the header clock showed it a second time beside the title (Melvin, 2026-11-12).
+            b.setShowWhen(false);
             b.setShortCriticalText(left);
         } else {
             // Progress through the whole workout (working sets logged of those planned): a bar in the notification and the Now Bar.
