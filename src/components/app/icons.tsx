@@ -69,6 +69,8 @@ const PATHS = {
   compass: "M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20zM15.5 8.5l-2 5-5 2 2-5z",
   hourglass: "M6 3h12M6 21h12M7 3c0 5 10 5 10 9s-10 4-10 9M17 3c0 5-10 5-10 9s10 4 10 9",
   image: "M3 5h18v14H3zM3 16l5-5 4 4 3-3 6 6M15.5 10a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z",
+  // One side, then the other: a midline with an arrow out to each side.
+  sides: "M12 3v18M8.5 8 4.5 12l4 4M4.5 12H9M15.5 8l4 4-4 4M19.5 12H15",
 } as const;
 
 export type IconName = keyof typeof PATHS;
