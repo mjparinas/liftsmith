@@ -38,7 +38,7 @@ function StartWeight({ c, unit }: { c: StartCell; unit: string }) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const e = exerciseBySlug((await params).slug);
   if (!e) return {};
-  return pageMeta({ ...exerciseMeta(e), path: `/exercises/${e.id}/` });
+  return pageMeta({ ...exerciseMeta(e), path: `/exercises/${e.id}/`, translated: e.id in EXERCISE_GUIDES });
 }
 
 export default async function ExercisePage({ params }: Props) {
@@ -63,7 +63,7 @@ export default async function ExercisePage({ params }: Props) {
     step: steps.map((s, i) => ({ "@type": "HowToStep", position: i + 1, text: s })),
   };
   return (
-    <SitePage kind="exercise" sticky={`Get ${e.name.toLowerCase()} in your plan`}>
+    <SitePage kind="exercise" sticky={`Get ${e.name.toLowerCase()} in your plan`} path={guide ? `/exercises/${e.id}/` : undefined}>
       <JsonLd data={jsonLd} />
       {guide && (
         <JsonLd
