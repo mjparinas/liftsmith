@@ -47,10 +47,13 @@ function useLoad<T>(url: string): [T | null, () => void] {
   return [data, useCallback(() => setVersion((v) => v + 1), [])];
 }
 
-function FlagCard({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: () => void }) {
-  const [value, setValue] = useState(String(f.state?.value ?? f.default));
-  const [rollout, setRollout] = useState(String(f.state?.rollout ?? 100));
+/** One flag as a compact row: what it is and what it's set to, with the controls beside it. */
+function FlagLine({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: () => void }) {
+  const was = { value: String(f.state?.value ?? f.default), rollout: String(f.state?.rollout ?? 100) };
+  const [value, setValue] = useState(was.value);
+  const [rollout, setRollout] = useState(was.rollout);
   const [msg, setMsg] = useState<string | null>(null);
+  const dirty = value !== was.value || rollout !== was.rollout;
   const save = async (body: Record<string, unknown>) => {
     const err = await post("/api/admin/flags/", { name: f.name, ...body });
     setMsg(err ?? "Saved. Apps pick it up next time they open.");
@@ -59,72 +62,90 @@ function FlagCard({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: 
   const now = f.state
     ? f.state.rollout >= 100
       ? `${show(f.state.value)} for everyone`
-      : `${show(f.state.value)} for ${f.state.rollout}% of installs, ${show(f.default)} for the rest`
-    : `${show(f.default)} (the default)`;
+      : `${show(f.state.value)} for ${f.state.rollout}%, ${show(f.default)} for the rest`
+    : `${show(f.default)} (default)`;
+  const id = `flag-${f.name}`;
   return (
-    <Card title={f.label} subtitle={f.description}>
-      <p className="text-sm">
-        Now: <strong>{now}</strong>
+    <li className="flex flex-wrap items-start gap-x-4 gap-y-2 py-3">
+      <div className="min-w-0 flex-1 basis-72">
+        <p className="font-semibold" id={id}>
+          {f.label.replace(/^Labs: /, "")}
+          <span className={`ml-2 text-sm font-normal ${f.state ? "text-accent" : "text-muted"}`}>{now}</span>
+        </p>
+        <p className="text-sm text-muted">{f.description}</p>
         {f.state && (
-          <span className="text-muted">
-            {" "}
-            · changed by {f.state.updatedBy} {ago(f.state.updatedAt)}
-          </span>
+          <p className="text-xs text-faint">
+            Changed by {f.state.updatedBy} {ago(f.state.updatedAt)}
+          </p>
         )}
-      </p>
-      {f.experiment && (
-        <p className="mt-1 text-sm text-warn">An A/B test on this flag is {f.experiment}, so the test decides what installs get.</p>
-      )}
+        {f.experiment && (
+          <p className="mt-1 text-sm text-warn">An A/B test on this flag is {f.experiment}, so the test decides what installs get.</p>
+        )}
+        {msg && (
+          <p role="status" className="mt-1 text-sm text-muted">
+            {msg}
+          </p>
+        )}
+      </div>
       {admin && (
-        <div className="mt-3 flex flex-wrap items-end gap-3 text-sm">
-          <label className="block">
-            <span className="block text-xs text-muted">Value</span>
-            <select value={value} onChange={(e) => setValue(e.target.value)} className="card mt-1 px-2 py-1.5">
-              {f.options.map((o) => (
-                <option key={String(o)} value={String(o)}>
-                  {show(o)}
-                  {o === f.default ? " (default)" : ""}
-                </option>
-              ))}
-            </select>
+        <div className="flex flex-wrap items-center gap-2 text-sm" role="group" aria-labelledby={id}>
+          <label className="sr-only" htmlFor={`${id}-v`}>
+            Value
           </label>
-          <label className="block">
-            <span className="block text-xs text-muted">Share of installs (%)</span>
+          <select id={`${id}-v`} value={value} onChange={(e) => setValue(e.target.value)} className="card px-2 py-1.5">
+            {f.options.map((o) => (
+              <option key={String(o)} value={String(o)}>
+                {show(o)}
+                {o === f.default ? " (default)" : ""}
+              </option>
+            ))}
+          </select>
+          <label className="flex items-center gap-1 text-muted" htmlFor={`${id}-r`}>
+            for
             <input
+              id={`${id}-r`}
               type="number"
               min={0}
               max={100}
               value={rollout}
               onChange={(e) => setRollout(e.target.value)}
-              className="card mt-1 w-24 px-2 py-1.5"
+              className="card w-16 px-2 py-1.5 text-ink"
             />
+            % of installs
           </label>
           <button
             type="button"
-            className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
+            disabled={!dirty}
+            className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink disabled:opacity-40"
             onClick={() => void save({ value: parse(value, f.options), rollout: Number(rollout) })}
           >
             Save
           </button>
           {f.state && (
             <button type="button" className="press rounded-lg border border-line px-3 py-1.5" onClick={() => void save({ reset: true })}>
-              Back to the default
+              Reset
             </button>
           )}
         </div>
       )}
-      {msg && (
-        <p role="status" className="mt-2 text-sm text-muted">
-          {msg}
-        </p>
-      )}
-    </Card>
+    </li>
   );
 }
 
 export function Flags({ admin }: { admin: boolean }) {
   const [data, reload] = useLoad<{ flags: FlagRow[] }>("/api/admin/flags/");
   if (!data) return <p className="text-muted">Loading…</p>;
+  // Changed flags first, since they're what's different from the code; then the app's own, then Labs together.
+  const isLab = (f: FlagRow) => f.label.startsWith("Labs:");
+  const groups: [string, string, FlagRow[]][] = [
+    ["Changed from the default", "Set here for everyone or a share of installs.", data.flags.filter((f) => f.state)],
+    ["App", "Switches for features in the app.", data.flags.filter((f) => !f.state && !isLab(f))],
+    [
+      "Labs",
+      "Experiments Pro lifters switch on in Settings › Labs. Turning one on here turns it on for every Pro lifter.",
+      data.flags.filter((f) => !f.state && isLab(f)),
+    ],
+  ];
   return (
     <div className="space-y-4">
       <p className="text-sm text-muted">
@@ -132,9 +153,17 @@ export function Flags({ admin }: { admin: boolean }) {
         come back to the front, and keep the last answer offline. A partial rollout picks installs by a stable hash, so raising it only adds
         installs. Installs with usage stats off get the default.
       </p>
-      {data.flags.map((f) => (
-        <FlagCard key={`${f.name}:${f.state?.updatedAt ?? 0}`} f={f} admin={admin} changed={reload} />
-      ))}
+      {groups
+        .filter(([, , xs]) => xs.length)
+        .map(([title, subtitle, xs]) => (
+          <Card key={title} title={`${title} (${xs.length})`} subtitle={subtitle}>
+            <ul className="divide-y divide-line">
+              {xs.map((f) => (
+                <FlagLine key={`${f.name}:${f.state?.updatedAt ?? 0}`} f={f} admin={admin} changed={reload} />
+              ))}
+            </ul>
+          </Card>
+        ))}
     </div>
   );
 }

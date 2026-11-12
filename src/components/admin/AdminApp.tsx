@@ -71,7 +71,7 @@ function readView(): View {
   const search = tab === "Users" ? q.get("q")?.slice(0, 200) || undefined : undefined;
   return {
     tab,
-    open: open && /^[A-Za-z0-9_-]{8,64}$/.test(open) && (tab === "Users" || tab === "Installs") ? open : null,
+    open: open && /^[A-Za-z0-9_-]{8,64}$/.test(open) && (tab === "Users" || tab === "Installs" || tab === "Inbox") ? open : null,
     ...(search ? { q: search } : {}),
   };
 }
@@ -760,7 +760,9 @@ export function AdminApp() {
         )}
 
         {tab === "Traffic" && (
-          <>
+          // A search section that isn't set up yet moves below the site's own numbers (order-last), so the setup
+          // steps don't push what's there off the screen.
+          <div className="flex flex-col gap-4">
             <SearchConsole days={days} />
             <BingSearch days={days} />
             <h2 className="pt-4 text-lg font-bold">Visits to the website</h2>
@@ -815,7 +817,7 @@ export function AdminApp() {
                 empty="No clicks yet."
               />
             </Card>
-          </>
+          </div>
         )}
 
         {tab === "Acquisition" && (
@@ -857,9 +859,17 @@ export function AdminApp() {
 
         {tab === "Funnel" && (
           <>
-            <Card title="From install to paid" subtitle="The installs made in the period, and how far each got.">
-              <Funnel steps={data.funnel} />
-            </Card>
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card
+                title="Getting going"
+                subtitle="The installs made in the period, and how far each got. Each step counts only those that passed the one before."
+              >
+                <Funnel steps={data.funnel} />
+              </Card>
+              <Card title="Paying" subtitle="The same installs: saw the paywall (it's offered at the end of setup), started a trial, paid.">
+                <Funnel steps={data.moneyFunnel} />
+              </Card>
+            </div>
             <Card
               title="Website to web app"
               subtitle="Visitors in the period. Store installs are credited by their store link's tags instead (Acquisition)."
@@ -867,9 +877,11 @@ export function AdminApp() {
               <Funnel steps={data.siteFunnel} />
             </Card>
             <div className="grid gap-4 md:grid-cols-3">
-              {Object.entries(data.funnelByStore).map(([s, steps]) => (
+              {Object.entries(data.funnelByStore).map(([s, f]) => (
                 <Card key={s} title={STORE_LABEL[s]}>
-                  <Funnel steps={steps} />
+                  <Funnel steps={f.activation} />
+                  <div className="my-4 border-t border-line" />
+                  <Funnel steps={f.money.slice(1)} />
                 </Card>
               ))}
             </div>
@@ -1041,7 +1053,7 @@ export function AdminApp() {
         )}
         {tab === "Installs" && <Installs admin={data.staff.role === "admin"} open={view.open} setOpen={openIn("Installs")} />}
         {tab === "To Do" && <Todo admin={data.staff.role === "admin"} go={go} onCount={todoCount} />}
-        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} />}
+        {tab === "Inbox" && <Inbox admin={data.staff.role === "admin"} onCount={inboxCount} open={view.open} setOpen={openIn("Inbox")} />}
         {tab === "Reports" && (
           <>
             <Reports admin={data.staff.role === "admin"} onCount={reportsCount} />

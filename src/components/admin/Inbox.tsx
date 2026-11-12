@@ -24,8 +24,35 @@ const post = async (body: Record<string, unknown>) => {
   return r.ok ? null : (j.error ?? "That didn't work.");
 };
 const waiting = (m: InboxItem) => !m.handledAt && !m.repliedAt && !m.archivedAt;
+/** True while the person is typing in a field, so single-letter keys are left alone. */
+const typing = (t: EventTarget | null) =>
+  t instanceof HTMLElement && (t.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(t.tagName));
+type Folder = "waiting" | "inbox" | "archived";
+const FOLDER_LABEL: Record<Folder, string> = { waiting: "Waiting", inbox: "Everything", archived: "Archived" };
+/** Mail in a folder that matches a search on the sender or subject. */
+export function inFolder(items: InboxItem[], folder: Folder, search: string): InboxItem[] {
+  const q = search.trim().toLowerCase();
+  return items.filter(
+    (m) =>
+      (folder === "archived" ? !!m.archivedAt : folder === "waiting" ? waiting(m) : !m.archivedAt) &&
+      (!q || `${m.from} ${m.fromEmail} ${m.subject}`.toLowerCase().includes(q)),
+  );
+}
 
-function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean; onChange: () => void; onClose: () => void }) {
+function Message({
+  id,
+  admin,
+  onChange,
+  onClose,
+  onNext,
+}: {
+  id: string;
+  admin: boolean;
+  onChange: () => void;
+  onClose: () => void;
+  /** Opens the next message in the list, after "Archive and next" or "Done and next". */
+  onNext?: () => void;
+}) {
   const [m, setM] = useState<InboxMessage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [plain, setPlain] = useState(false);
@@ -70,7 +97,31 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
       setVersion((v) => v + 1);
       onChange();
     }
+    return !err;
   };
+  const thenNext = async (body: Record<string, unknown>, done: string) => {
+    if ((await act(body, done)) && onNext) onNext();
+  };
+  // Keys while reading (not while typing): e archives and opens the next, d marks done and opens the next,
+  // r jumps to the reply box.
+  useEffect(() => {
+    if (!m) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey || typing(e.target)) return;
+      if (admin && e.key === "e" && !m.archivedAt) {
+        e.preventDefault();
+        void thenNext({ action: "archive", archived: true }, "Archived.");
+      } else if (admin && e.key === "d" && !m.handledAt) {
+        e.preventDefault();
+        void thenNext({ action: "handled", handled: true }, "Marked as done.");
+      } else if (admin && e.key === "r") {
+        e.preventDefault();
+        document.getElementById("inbox-reply")?.focus();
+      }
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  });
   const draft = async () => {
     setDrafting(true);
     setMsg("Drafting…");
@@ -135,6 +186,26 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
         )}
         {admin && (
           <>
+            {!m.archivedAt && onNext && (
+              <button
+                type="button"
+                title="Key: e"
+                onClick={() => void thenNext({ action: "archive", archived: true }, "Archived.")}
+                className="press rounded-lg bg-accent px-3 py-1.5 font-semibold text-accent-ink"
+              >
+                Archive and next
+              </button>
+            )}
+            {!m.handledAt && onNext && (
+              <button
+                type="button"
+                title="Key: d"
+                onClick={() => void thenNext({ action: "handled", handled: true }, "Marked as done.")}
+                className="press rounded-lg border border-line px-3 py-1.5"
+              >
+                Done and next
+              </button>
+            )}
             <button
               type="button"
               onClick={() => void act({ action: "handled", handled: !m.handledAt }, m.handledAt ? "Marked as waiting." : "Marked as done.")}
@@ -232,12 +303,23 @@ function Message({ id, admin, onChange, onClose }: { id: string; admin: boolean;
   );
 }
 
-export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number) => void }) {
-  const [view, setView] = useState<"inbox" | "archived">("inbox");
+export function Inbox({
+  admin,
+  onCount,
+  open = null,
+  setOpen = () => {},
+}: {
+  admin: boolean;
+  onCount?: (n: number) => void;
+  /** The open message, kept in the address (?tab=Inbox&open=<id>) so a link or a reload lands on it. */
+  open?: string | null;
+  setOpen?: (id: string | null) => void;
+}) {
+  const [view, setView] = useState<Folder>("waiting");
+  const [search, setSearch] = useState("");
   const [list, setList] = useState<List | null>(null);
   const [more, setMore] = useState<InboxItem[]>([]);
   const [next, setNext] = useState<string | null>(null);
-  const [open, setOpen] = useState<string | null>(null);
   const [version, setVersion] = useState(0);
   useEffect(() => {
     let live = true;
@@ -289,7 +371,15 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
         </ol>
       </Card>
     );
-  const shown = all.filter((m) => (view === "archived" ? m.archivedAt : !m.archivedAt));
+  const shown = inFolder(all, view, search);
+  const at = open ? shown.findIndex((m) => m.id === open) : -1;
+  // After archiving or marking done, the message may leave the list, so "next" is the one after it in the list
+  // as it was, or the first still shown.
+  const after = (id: string) => {
+    const i = shown.findIndex((m) => m.id === id);
+    const rest = shown.filter((m) => m.id !== id);
+    setOpen(rest[Math.max(0, i)]?.id ?? null);
+  };
   return (
     <div className="space-y-4">
       {list.error && (
@@ -297,8 +387,9 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
           {list.error}
         </p>
       )}
+      <InboxKeys shown={shown} at={at} setOpen={setOpen} />
       <div className="flex flex-wrap items-center gap-2">
-        {(["inbox", "archived"] as const).map((v) => (
+        {(["waiting", "inbox", "archived"] as const).map((v) => (
           <button
             key={v}
             type="button"
@@ -306,16 +397,32 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
             onClick={() => setView(v)}
             className={`press rounded-full border px-3 py-1.5 text-sm ${view === v ? "border-accent bg-accent/15" : "border-line text-muted"}`}
           >
-            {v === "inbox" ? `Inbox (${waitingCount} waiting)` : "Archived"}
+            {FOLDER_LABEL[v]}
+            {v === "waiting" ? ` (${waitingCount})` : ""}
           </button>
         ))}
+        <label htmlFor="inbox-search" className="sr-only">
+          Search mail
+        </label>
+        <input
+          id="inbox-search"
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search sender or subject  /"
+          className="card w-full px-3 py-1.5 text-sm sm:w-64"
+        />
         <button type="button" onClick={() => setVersion((v) => v + 1)} className="press ml-auto text-sm text-muted underline">
           Refresh
         </button>
       </div>
+      <p className="hidden text-xs text-faint md:block">
+        Keys: j and k move through the list, e archives and opens the next, d marks done and opens the next, r replies, / searches, Esc
+        closes.
+      </p>
       <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <Card
-          title={view === "inbox" ? "Mail" : "Archived mail"}
+          title={view === "archived" ? "Archived mail" : view === "waiting" ? "Waiting for an answer" : "Mail"}
           subtitle="Mail to @getliftsmith.com, newest first. In-app feedback arrives here too."
         >
           {shown.length ? (
@@ -345,7 +452,15 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
               ))}
             </ul>
           ) : (
-            <p className="text-sm text-muted">{view === "inbox" ? "No mail yet." : "Nothing archived."}</p>
+            <p className="text-sm text-muted">
+              {search
+                ? "Nothing matches."
+                : view === "waiting"
+                  ? "Nothing waiting. All caught up."
+                  : view === "inbox"
+                    ? "No mail yet."
+                    : "Nothing archived."}
+            </p>
           )}
           {next && (
             <button type="button" onClick={() => void loadMore()} className="press mt-3 text-sm text-accent underline">
@@ -354,7 +469,14 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
           )}
         </Card>
         {open ? (
-          <Message key={open} id={open} admin={admin} onChange={() => setVersion((v) => v + 1)} onClose={() => setOpen(null)} />
+          <Message
+            key={open}
+            id={open}
+            admin={admin}
+            onChange={() => setVersion((v) => v + 1)}
+            onClose={() => setOpen(null)}
+            onNext={() => after(open)}
+          />
         ) : (
           <p className="hidden text-sm text-muted lg:block">Pick a message to read it.</p>
         )}
@@ -362,4 +484,27 @@ export function Inbox({ admin, onCount }: { admin: boolean; onCount?: (n: number
       {admin && <SavedReplies />}
     </div>
   );
+}
+
+/** j and k step through the list, / goes to the search box, Esc closes the open message. Not while typing. */
+function InboxKeys({ shown, at, setOpen }: { shown: InboxItem[]; at: number; setOpen: (id: string | null) => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      if (e.key === "Escape" && at >= 0) return setOpen(null);
+      if (typing(e.target)) return;
+      if (e.key === "j" || e.key === "k") {
+        e.preventDefault();
+        const i = at < 0 ? 0 : Math.min(shown.length - 1, Math.max(0, at + (e.key === "j" ? 1 : -1)));
+        const m = shown[i];
+        if (m) setOpen(m.id);
+      } else if (e.key === "/") {
+        e.preventDefault();
+        document.getElementById("inbox-search")?.focus();
+      }
+    };
+    addEventListener("keydown", onKey);
+    return () => removeEventListener("keydown", onKey);
+  }, [shown, at, setOpen]);
+  return null;
 }

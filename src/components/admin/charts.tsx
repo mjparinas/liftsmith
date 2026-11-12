@@ -5,6 +5,8 @@
 // with the dataviz validator against the panel's surface (#11161d): all pass in dark mode.
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 
+import { biggestDrop } from "@/lib/adminMetrics";
+
 export const SERIES = ["#3987e5", "#d95926", "#199e70", "#c98500", "#d55181"] as const;
 const DAY = 86_400_000;
 
@@ -456,33 +458,50 @@ export function BarList({
 }
 
 /** Funnel steps: each bar's share of the first step, and the conversion from the step before. */
-export function Funnel({ steps }: { steps: { key: string; n: number }[] }) {
+export function Funnel({ steps, min = 5 }: { steps: { key: string; n: number }[]; min?: number }) {
   const top = steps[0]?.n ?? 0;
+  // The step that loses the most is called out, since that's the one worth working on.
+  const drop = biggestDrop(steps, min);
   return (
-    <ol className="space-y-2">
-      {steps.map((s, i) => {
-        const prev = i ? steps[i - 1].n : null;
-        return (
-          <li key={s.key}>
-            <div className="flex justify-between text-sm">
-              <span>{s.key}</span>
-              <span className="num text-muted">
-                {fmtInt(s.n)}
-                {prev != null && (
-                  <span className="text-faint" title="Share of the step before">
-                    {" "}
-                    · {fmtPct(prev ? s.n / prev : null, 0)} of previous
-                  </span>
-                )}
-              </span>
-            </div>
-            <div className="mt-1 h-2.5 rounded-full bg-line">
-              <div className="h-2.5 rounded-full bg-accent" style={{ width: `${top ? Math.max(1, (s.n / top) * 100) : 0}%` }} />
-            </div>
-          </li>
-        );
-      })}
-    </ol>
+    <>
+      <ol className="space-y-2">
+        {steps.map((s, i) => {
+          const prev = i ? steps[i - 1]!.n : null;
+          const worst = drop?.to === s.key && steps[i - 1]?.key === drop.from;
+          return (
+            <li key={s.key}>
+              <div className="flex flex-wrap justify-between gap-x-2 text-sm">
+                <span>
+                  {s.key}
+                  {worst && <span className="ml-2 rounded border border-warn/50 px-1.5 text-xs text-warn">Biggest drop</span>}
+                </span>
+                <span className="num text-muted">
+                  {fmtInt(s.n)}
+                  {prev != null && (
+                    <span className="text-faint" title="Share of the step before">
+                      {" "}
+                      · {fmtPct(prev ? s.n / prev : null, 0)} of previous
+                    </span>
+                  )}
+                </span>
+              </div>
+              <div className="mt-1 h-2.5 rounded-full bg-line">
+                <div
+                  className={`h-2.5 rounded-full ${worst ? "bg-warn" : "bg-accent"}`}
+                  style={{ width: `${top ? Math.max(1, (s.n / top) * 100) : 0}%` }}
+                />
+              </div>
+            </li>
+          );
+        })}
+      </ol>
+      {drop && (
+        <p className="mt-3 text-sm text-muted">
+          Most are lost between <span className="text-ink">{drop.from.toLowerCase()}</span> and{" "}
+          <span className="text-ink">{drop.to.toLowerCase()}</span>: {fmtPct(drop.kept, 0)} go on. That step is the one to work on.
+        </p>
+      )}
+    </>
   );
 }
 
