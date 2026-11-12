@@ -24,6 +24,8 @@ import { hasPro } from "./billing";
 // Oura, Whoop, Withings, Polar, Concept2) are Pro, while Health Connect and Apple Health stay free; "Short on
 // time" is free, the rest of changing the plan mid-workout stays Pro; free lifters get one adaptive workout a
 // week (freeAdaptive.ts) and a free program that fits their gym (freeProgramFor in programs.ts).
+// Trainer mode out of Labs (Melvin picked it, 2026-11-12; docs/decisions/trainer-mode.md): coaching clients is its own
+// Pro feature; being someone's client stays free for everyone.
 // One line per feature, so two changes adding one don't touch the same line. Every feature listed is Pro.
 export const PRO_FEATURES = [
   "adaptive",
@@ -36,6 +38,7 @@ export const PRO_FEATURES = [
   "healthReadiness",
   "labs",
   "cloudConnections",
+  "coaching",
 ] as const;
 export type Feature = (typeof PRO_FEATURES)[number];
 const PRO: ReadonlySet<Feature> = new Set(PRO_FEATURES);

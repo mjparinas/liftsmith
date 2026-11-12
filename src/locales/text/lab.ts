@@ -34,9 +34,6 @@ export const en = {
   "lab.watchReps.title": "Watch rep counting",
   "lab.watchReps.body":
     "Your Wear OS watch or Apple Watch counts reps from your wrist during each set and fills them in for Log set on your phone. Needs the Liftsmith watch app open on your wrist. Not for lifts where your hands stay still, like pull-ups.",
-  "lab.trainer.title": "Trainer mode",
-  "lab.trainer.body":
-    "Coach other lifters: make an invite code in Settings › Coaching, then see each client's workouts with what to act on first. Your clients don't need Pro.",
   "lab.voiceLog.title": "Voice set logging",
   "lab.voiceLog.body":
     'Adds a microphone above Log set on the workout screen. Tap it and say "100 for 8", "8 reps", "too easy" or "undo". Speech is recognized on your phone and never recorded or sent, so it needs a phone that can do that in your language.',
@@ -114,9 +111,6 @@ export const es: Partial<Record<Key, Message>> = {
   "lab.watchReps.title": "Contar repeticiones con el reloj",
   "lab.watchReps.body":
     "Tu reloj Wear OS o Apple Watch cuenta las repeticiones con el movimiento de la muñeca en cada serie y las rellena en Registrar serie en el teléfono. Necesita la app de Liftsmith abierta en el reloj. No sirve para ejercicios en los que las manos no se mueven, como las dominadas.",
-  "lab.trainer.title": "Modo entrenador",
-  "lab.trainer.body":
-    "Entrena a otras personas: crea un código de invitación en Ajustes › Entrenador y mira los entrenamientos de cada cliente con lo primero que conviene atender. Tus clientes no necesitan Pro.",
   "lab.voiceLog.title": "Registrar series con la voz",
   "lab.voiceLog.body":
     "Añade un micrófono encima de Registrar serie en la pantalla de entrenamiento. Tócalo y di «100 por 8», «8 repeticiones», «demasiado fácil» o «deshacer». La voz se reconoce en tu teléfono y nunca se graba ni se envía, así que necesita un teléfono que pueda hacerlo en tu idioma.",
@@ -194,9 +188,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "lab.watchReps.title": "Comptage des répétitions par la montre",
   "lab.watchReps.body":
     "Votre montre Wear OS ou Apple Watch compte les répétitions au mouvement du poignet à chaque série et les inscrit dans Valider la série sur le téléphone. Nécessite l'app Liftsmith ouverte sur la montre. Pas pour les exercices où les mains ne bougent pas, comme les tractions.",
-  "lab.trainer.title": "Mode coach",
-  "lab.trainer.body":
-    "Coachez d'autres pratiquants : créez un code d'invitation dans Réglages › Coaching, puis voyez les séances de chaque client avec ce qu'il faut traiter en premier. Vos clients n'ont pas besoin de Pro.",
   "lab.voiceLog.title": "Saisie des séries à la voix",
   "lab.voiceLog.body":
     "Ajoute un micro au-dessus de Valider la série sur l'écran d'entraînement. Touchez-le et dites « 100 pour 8 », « 8 répétitions », « trop facile » ou « annuler ». La parole est reconnue sur votre téléphone et n'est jamais enregistrée ni envoyée, il faut donc un téléphone qui sait le faire dans votre langue.",
@@ -273,9 +264,6 @@ export const de: Partial<Record<Key, Message>> = {
   "lab.watchReps.title": "Wiederholungen per Uhr zählen",
   "lab.watchReps.body":
     "Deine Wear-OS-Uhr oder Apple Watch zählt bei jedem Satz die Wiederholungen an der Bewegung deines Handgelenks und trägt sie auf dem Handy in Satz eintragen ein. Dafür muss die Liftsmith-App auf der Uhr offen sein. Nicht für Übungen, bei denen die Hände stillstehen, wie Klimmzüge.",
-  "lab.trainer.title": "Trainermodus",
-  "lab.trainer.body":
-    "Betreue andere: Erstell unter Einstellungen › Coaching einen Einladungscode und sieh die Trainings jedes Kunden, mit dem, was zuerst zu tun ist. Deine Kunden brauchen kein Pro.",
   "lab.voiceLog.title": "Sätze per Stimme eintragen",
   "lab.voiceLog.body":
     "Fügt auf dem Trainingsbildschirm über Satz eintragen ein Mikrofon hinzu. Tipp darauf und sag „100 für 8“, „8 Wiederholungen“, „zu leicht“ oder „rückgängig“. Die Sprache wird auf deinem Handy erkannt und nie aufgenommen oder gesendet, daher braucht es ein Handy, das das in deiner Sprache kann.",
@@ -353,9 +341,6 @@ export const it: Partial<Record<Key, Message>> = {
   "lab.watchReps.title": "Conteggio delle ripetizioni con l'orologio",
   "lab.watchReps.body":
     "Il tuo orologio Wear OS o Apple Watch conta le ripetizioni dal movimento del polso in ogni serie e le inserisce in Registra serie sul telefono. Serve l'app Liftsmith aperta sull'orologio. Non vale per gli esercizi in cui le mani restano ferme, come le trazioni.",
-  "lab.trainer.title": "Modalità coach",
-  "lab.trainer.body":
-    "Segui altre persone: crea un codice d'invito in Impostazioni › Coaching e guarda gli allenamenti di ogni cliente con la prima cosa da fare. I tuoi clienti non hanno bisogno di Pro.",
   "lab.voiceLog.title": "Registrare le serie con la voce",
   "lab.voiceLog.body":
     "Aggiunge un microfono sopra Registra serie nella schermata dell'allenamento. Toccalo e di' «100 per 8», «8 ripetizioni», «troppo facile» o «annulla». La voce viene riconosciuta sul telefono e non viene mai registrata né inviata, quindi serve un telefono che sappia farlo nella tua lingua.",
@@ -431,9 +416,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "lab.watchReps.title": "ウォッチでレップをカウント",
   "lab.watchReps.body":
     "Wear OS ウォッチまたは Apple Watch が、各セットで手首の動きからレップを数え、スマートフォンの「セットを記録」に入力します。ウォッチで Liftsmith アプリを開いておく必要があります。懸垂のように手が動かない種目には使えません。",
-  "lab.trainer.title": "トレーナーモード",
-  "lab.trainer.body":
-    "ほかの人を指導できます。「設定 › コーチング」で招待コードを作成すると、各クライアントのワークアウトと、まず取り組むべきことが表示されます。クライアントに Pro は必要ありません。",
   "lab.voiceLog.title": "声でセットを記録",
   "lab.voiceLog.body":
     "ワークアウト画面の「セットを記録」の上にマイクを追加します。タップして「100キロで8回」「8回」「簡単すぎ」「取り消し」のように言ってください。音声はスマートフォン上で認識され、録音や送信はされないため、お使いの言語でそれができるスマートフォンが必要です。",

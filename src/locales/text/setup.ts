@@ -72,6 +72,21 @@ export const en = {
   "setup.back": "Back",
   "setup.continue": "Continue",
   "setup.save": "Save",
+  "setup.coach.kicker": "Invited by your coach",
+  "setup.coach.title": "Train with your coach",
+  "setup.coach.lead":
+    "Sign in, agree to share your workouts, and answer a few quick questions. Your coach sees your training, never your health data.",
+  "setup.coach.signIn": "Sign in to start",
+  "setup.coach.own": "Set up on my own instead",
+  "setup.coach.have": "Got a code from a coach?",
+  "setup.coach.enter": "Your coach's code",
+  "setup.coach.enterHint": "Type the 8-character code, like ABCD-EFGH, or paste their invite link.",
+  "setup.coach.use": "Use code",
+  "setup.coach.getApp": "Get the Android app",
+  "setup.coach.joinTitle": "{name} invited you",
+  "setup.coach.name": "Your name, so your coach knows it's you",
+  "setup.coach.skips": "{name} already answered some setup questions for you. You can change any of them later in Settings.",
+  "setup.coach.loading": "Looking up your coach…",
 } as const;
 
 type Key = keyof typeof en;
@@ -148,6 +163,21 @@ export const es: Partial<Record<Key, Message>> = {
   "setup.back": "Atrás",
   "setup.continue": "Continuar",
   "setup.save": "Guardar",
+  "setup.coach.kicker": "Invitación de tu entrenador",
+  "setup.coach.title": "Entrena con tu entrenador",
+  "setup.coach.lead":
+    "Inicia sesión, acepta compartir tus entrenamientos y responde unas pocas preguntas. Tu entrenador ve tu entrenamiento, nunca tus datos de salud.",
+  "setup.coach.signIn": "Inicia sesión para empezar",
+  "setup.coach.own": "Prefiero configurarlo yo",
+  "setup.coach.have": "¿Tienes un código de un entrenador?",
+  "setup.coach.enter": "El código de tu entrenador",
+  "setup.coach.enterHint": "Escribe el código de 8 caracteres, como ABCD-EFGH, o pega su enlace de invitación.",
+  "setup.coach.use": "Usar código",
+  "setup.coach.getApp": "Descargar la app para Android",
+  "setup.coach.joinTitle": "{name} te ha invitado",
+  "setup.coach.name": "Tu nombre, para que tu entrenador sepa que eres tú",
+  "setup.coach.skips": "{name} ya ha respondido algunas preguntas de la configuración por ti. Puedes cambiarlas luego en Ajustes.",
+  "setup.coach.loading": "Buscando a tu entrenador…",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -222,6 +252,22 @@ export const fr: Partial<Record<Key, Message>> = {
   "setup.back": "Retour",
   "setup.continue": "Continuer",
   "setup.save": "Enregistrer",
+  "setup.coach.kicker": "Invitation de votre coach",
+  "setup.coach.title": "Entraînez-vous avec votre coach",
+  "setup.coach.lead":
+    "Connectez-vous, acceptez de partager vos séances et répondez à quelques questions rapides. Votre coach voit votre entraînement, jamais vos données de santé.",
+  "setup.coach.signIn": "Se connecter pour commencer",
+  "setup.coach.own": "Configurer seul plutôt",
+  "setup.coach.have": "Vous avez un code de coach ?",
+  "setup.coach.enter": "Le code de votre coach",
+  "setup.coach.enterHint": "Saisissez le code de 8 caractères, comme ABCD-EFGH, ou collez son lien d'invitation.",
+  "setup.coach.use": "Utiliser le code",
+  "setup.coach.getApp": "Télécharger l'app Android",
+  "setup.coach.joinTitle": "{name} vous invite",
+  "setup.coach.name": "Votre nom, pour que votre coach vous reconnaisse",
+  "setup.coach.skips":
+    "{name} a déjà répondu à certaines questions de configuration pour vous. Vous pourrez les modifier plus tard dans Réglages.",
+  "setup.coach.loading": "Recherche de votre coach…",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -295,6 +341,21 @@ export const de: Partial<Record<Key, Message>> = {
   "setup.back": "Zurück",
   "setup.continue": "Weiter",
   "setup.save": "Speichern",
+  "setup.coach.kicker": "Einladung von deinem Coach",
+  "setup.coach.title": "Trainiere mit deinem Coach",
+  "setup.coach.lead":
+    "Melde dich an, stimm zu, dein Training zu teilen, und beantworte ein paar kurze Fragen. Dein Coach sieht dein Training, nie deine Gesundheitsdaten.",
+  "setup.coach.signIn": "Zum Start anmelden",
+  "setup.coach.own": "Lieber selbst einrichten",
+  "setup.coach.have": "Hast du einen Code von einem Coach?",
+  "setup.coach.enter": "Der Code deines Coachs",
+  "setup.coach.enterHint": "Gib den 8-stelligen Code ein, etwa ABCD-EFGH, oder füge den Einladungslink ein.",
+  "setup.coach.use": "Code verwenden",
+  "setup.coach.getApp": "Android-App holen",
+  "setup.coach.joinTitle": "{name} hat dich eingeladen",
+  "setup.coach.name": "Dein Name, damit dein Coach weiß, dass du es bist",
+  "setup.coach.skips": "{name} hat einige Einrichtungsfragen schon für dich beantwortet. Du kannst sie später in den Einstellungen ändern.",
+  "setup.coach.loading": "Dein Coach wird gesucht…",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -369,6 +430,21 @@ export const it: Partial<Record<Key, Message>> = {
   "setup.back": "Indietro",
   "setup.continue": "Continua",
   "setup.save": "Salva",
+  "setup.coach.kicker": "Invito del tuo coach",
+  "setup.coach.title": "Allenati con il tuo coach",
+  "setup.coach.lead":
+    "Accedi, accetta di condividere i tuoi allenamenti e rispondi a poche domande veloci. Il tuo coach vede il tuo allenamento, mai i tuoi dati sulla salute.",
+  "setup.coach.signIn": "Accedi per iniziare",
+  "setup.coach.own": "Preferisco configurarla da solo",
+  "setup.coach.have": "Hai un codice da un coach?",
+  "setup.coach.enter": "Il codice del tuo coach",
+  "setup.coach.enterHint": "Inserisci il codice di 8 caratteri, come ABCD-EFGH, oppure incolla il suo link d'invito.",
+  "setup.coach.use": "Usa il codice",
+  "setup.coach.getApp": "Scarica l'app per Android",
+  "setup.coach.joinTitle": "{name} ti ha invitato",
+  "setup.coach.name": "Il tuo nome, così il tuo coach sa che sei tu",
+  "setup.coach.skips": "{name} ha già risposto per te ad alcune domande della configurazione. Puoi cambiarle più tardi in Impostazioni.",
+  "setup.coach.loading": "Cerco il tuo coach…",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -440,4 +516,19 @@ export const ja: Partial<Record<Key, Message>> = {
   "setup.back": "戻る",
   "setup.continue": "次へ",
   "setup.save": "保存",
+  "setup.coach.kicker": "コーチからの招待",
+  "setup.coach.title": "コーチと一緒にトレーニング",
+  "setup.coach.lead":
+    "サインインしてワークアウトの共有に同意し、いくつかの簡単な質問に答えるだけです。コーチに見えるのはトレーニングだけで、健康データは見えません。",
+  "setup.coach.signIn": "サインインして始める",
+  "setup.coach.own": "自分で設定する",
+  "setup.coach.have": "コーチのコードをお持ちですか？",
+  "setup.coach.enter": "コーチのコード",
+  "setup.coach.enterHint": "ABCD-EFGH のような8文字のコードを入力するか、招待リンクを貼り付けてください。",
+  "setup.coach.use": "コードを使う",
+  "setup.coach.getApp": "Android アプリを入手",
+  "setup.coach.joinTitle": "{name}さんからの招待",
+  "setup.coach.name": "お名前（コーチがあなただとわかるように）",
+  "setup.coach.skips": "{name}さんが初期設定の質問の一部にすでに答えています。あとから設定で変更できます。",
+  "setup.coach.loading": "コーチを探しています…",
 };

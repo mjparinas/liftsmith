@@ -8,7 +8,7 @@ export const SITE_LANGS = ["en", "es", "fr", "de", "it", "ja"] as const;
 export type SiteLang = (typeof SITE_LANGS)[number];
 
 /** The translated paths, English form (with the trailing slash). */
-export const LOCALIZED_PATHS = ["/", "/pricing/"] as const;
+export const LOCALIZED_PATHS = ["/", "/pricing/", "/coaches/"] as const;
 
 /** Each language's name in itself, for the language switcher. */
 export const SITE_LANG_NAME: Record<SiteLang, string> = {

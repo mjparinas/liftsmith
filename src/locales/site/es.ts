@@ -25,6 +25,7 @@ export const es: SiteText = {
       openApp: "Abrir la app",
       features: "Funciones",
       whoFor: "Para quién es",
+      coaches: "Para entrenadores",
       pricing: "Precios",
       whatsNew: "Novedades",
       dashboard: "Tu panel",
@@ -392,6 +393,8 @@ export const es: SiteText = {
       ],
       [
         "Sincronización entre dispositivos y panel web",
+        "Entrena con un entrenador que ve tus entrenamientos",
+        "Entrena a tus propios clientes",
         "Archivo de copia de seguridad y exportación CSV",
         "Anuncios",
         "Compartir en familia",
@@ -399,5 +402,78 @@ export const es: SiteText = {
     ],
     never: "Nunca",
     annualPlan: "Plan anual",
+  },
+  coaches: {
+    title: "Entrena a tus clientes con {name}: informes, rutinas y notas",
+    description:
+      "Invita a clientes con un solo enlace, mira quién te necesita primero y envíales rutinas y una nota mientras {name} rellena cada serie. Ser cliente es gratis.",
+    h1: "Entrena a tus clientes en {name}",
+    intro:
+      "Envía un enlace de invitación. Tus clientes registran cada serie en la app y tú ves a quién escribir primero, qué entrenaron y qué lograron, sin hojas de cálculo.",
+    cta: "Empezar a entrenar clientes",
+    how: {
+      title: "Cómo funciona",
+      steps: [
+        {
+          title: "Invita con un enlace",
+          body: "Crea un código de invitación en Ajustes › Entrenador y envía el enlace. Un mismo código sirve para todos los clientes a los que lo envíes, durante una semana.",
+        },
+        {
+          title: "Tus clientes lo configuran en un minuto",
+          body: "Inician sesión, ven exactamente lo que verás y aceptan. El objetivo, la experiencia y los días que elijas rellenan su configuración, así que solo añaden su gimnasio y su peso.",
+        },
+        {
+          title: "Mira quién te necesita primero",
+          body: "El informe de cada cliente empieza por lo que hay que hacer: sin entrenar desde hace días, por debajo de su objetivo semanal, fallando repeticiones, un ejercicio estancado o nuevas marcas que celebrar.",
+        },
+        {
+          title: "Envía rutinas y una nota",
+          body: "Asigna cualquier rutina que hayas guardado y mira con qué frecuencia la hacen. Deja una nota que se queda arriba en su pantalla Hoy hasta que la cambies.",
+        },
+      ],
+    },
+    see: {
+      title: "Lo que ves y lo que no",
+      body: "Tus clientes aceptan antes de compartir nada y pueden dejar de compartir cuando quieran. Pierdes el acceso al instante.",
+      seesLabel: "Ves",
+      sees: [
+        "Entrenamientos del último año: ejercicios, series, pesos y repeticiones",
+        "Cuánto entrenaron y lo duras que fueron las series",
+        "Su objetivo semanal y sus nuevas marcas",
+      ],
+      neverLabel: "Nunca ves",
+      never: [
+        "Frecuencia cardiaca, peso, grasa corporal o medidas",
+        "Datos de salud, disposición o ciclo",
+        "Lesiones, notas, gimnasios o fotos",
+      ],
+    },
+    cost: {
+      title: "Cuánto cuesta",
+      body: "Entrenar a clientes forma parte de {name} Pro ({annual} al año o {monthly} al mes), hasta 30 clientes. Ser cliente es gratis, así que cualquiera a quien invites puede empezar sin pagar.",
+      contactBefore: "¿Entrenas a más personas? ",
+      contactLink: "Cuéntanos qué necesitas.",
+    },
+    faqTitle: "Preguntas de entrenadores",
+    faqs: [
+      {
+        q: "¿Mis clientes tienen que pagar?",
+        a: "No. Ser cliente es gratis en Android, iPhone y la web. Necesitan una cuenta gratuita para que sus entrenamientos te lleguen.",
+      },
+      {
+        q: "¿Mis clientes necesitan Pro para seguir mis rutinas?",
+        a: "No. Las rutinas que asignas funcionan en el plan gratuito, y la app rellena cada serie a partir de su último entrenamiento.",
+      },
+      {
+        q: "¿Puedo ver su frecuencia cardiaca o su peso?",
+        a: "No. Solo ves su entrenamiento. Los datos de salud, las medidas, las lesiones y las notas nunca salen de su cuenta.",
+      },
+      {
+        q: "¿Cómo empiezo?",
+        a: "Abre la app, ve a Ajustes › Entrenador y crea un código de invitación. Si todavía no tienes Pro, la app te muestra ahí los planes.",
+      },
+    ],
+    endTitle: "Trae a tu primer cliente hoy",
+    endBody: "Crea una invitación en Ajustes › Entrenador y envía el enlace. Tu cliente puede estar listo y entrenando en pocos minutos.",
   },
 };
