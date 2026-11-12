@@ -5,7 +5,7 @@
 // the card on the System tab for recovery codes, turning it off and, for admins, resetting someone else's.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
-import { QrCode } from "./QrCode";
+import { QrCode } from "@/components/QrCode";
 
 export interface TwoFactorInfo {
   enabled: boolean;

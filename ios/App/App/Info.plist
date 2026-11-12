@@ -74,7 +74,7 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>Liftsmith uses the camera to take progress photos and, if you turn it on, to count your reps. Photos stay on this phone and are never uploaded; rep counting analyses video on this iPhone and never records or sends it.</string>
+	<string>Liftsmith uses the camera to take progress photos, to scan a friend’s Liftsmith code and, if you turn it on, to count your reps. Photos stay on this phone and are never uploaded; rep counting analyses video on this iPhone and never records or sends it.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>If you turn on voice set logging in Labs, Liftsmith listens when you tap the microphone so you can say a set, like "100 for 8". Speech is recognized on this iPhone and never recorded or sent.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
