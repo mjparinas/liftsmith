@@ -484,6 +484,23 @@ const SCHEMA = [
     decided_at INTEGER NOT NULL DEFAULT 0
   )`,
   `CREATE INDEX IF NOT EXISTS gym_claims_status ON gym_claims (status, created_at)`,
+  // Posters and table stands to print and mail to gyms (gymPosters.ts). The claim code is kept as written until the
+  // order ships, so a reprint shows the same one; the gym itself keeps only its hash.
+  `CREATE TABLE IF NOT EXISTS gym_posters (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    items TEXT NOT NULL,
+    ship_to TEXT NOT NULL DEFAULT '',
+    address TEXT NOT NULL,
+    lang TEXT NOT NULL DEFAULT 'en',
+    status TEXT NOT NULL,
+    claim_code TEXT NOT NULL DEFAULT '',
+    requested_by TEXT NOT NULL DEFAULT '',
+    created_at INTEGER NOT NULL,
+    printed_at INTEGER NOT NULL DEFAULT 0,
+    shipped_at INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_posters_status ON gym_posters (status, created_at)`,
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
@@ -796,6 +813,7 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["public_gyms", "place_id", "TEXT NOT NULL DEFAULT ''"],
   // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
   ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

@@ -170,6 +170,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
   const claim = p.official
     ? ""
     : `<section class="card claim" aria-labelledby="claim-h"><h2 id="claim-h">${icon("verified", 16)}${esc(say(lang, "gp.unofficial"))}</h2><p class="muted">${esc(say(lang, "gp.claim"))}</p></section>`;
+  const poster = `<section class="card" aria-labelledby="poster-h"><h2 id="poster-h">${icon("flag", 16)}${esc(say(lang, "gp.posterTitle"))}</h2><p class="muted">${esc(say(lang, "gp.posterBody"))}</p><p><a href="${esc(`${gymPath(p)}poster/`)}" rel="nofollow">${esc(say(lang, "gp.posterLink"))}</a></p></section>`;
   const others = nearby.filter((x) => x.id !== p.id && x.kind === "gym").slice(0, 8);
   const more = others.length
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
@@ -182,7 +183,7 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${claim}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${claim}${poster}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 

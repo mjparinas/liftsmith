@@ -162,6 +162,12 @@ export default function Privacy() {
           equipment) are public on its page; your name and email are never shown. Stop managing the gym, or delete your account, and the gym
           goes back to unofficial and your claims are deleted.
         </p>
+        <p className="mt-2">
+          If you ask us to mail your gym a table stand, we keep the mailing address you give and the name on it with your account until
+          it&apos;s sent, and the gym&apos;s address afterwards as our mailing record. Deleting your account takes your name off it. Visits
+          from the QR code on a gym&apos;s poster are counted with a one-way code from your internet address, once a day, and only the total
+          is kept.
+        </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar and Concept2</h2>
         <p className="mt-2">

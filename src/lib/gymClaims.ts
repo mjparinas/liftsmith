@@ -17,6 +17,16 @@ export interface OwnedGym {
   phone: string;
   description: string;
   code: string;
+  address: string;
+  lifters: number;
+}
+
+/** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */
+export const STAND_MIN_LIFTERS = 20;
+
+export interface StandOrder {
+  status: "requested" | "printed" | "shipped" | "cancelled";
+  createdAt: number;
 }
 
 const token = () => readAccount()?.token;
@@ -76,7 +86,10 @@ export function ownedGyms(fresh = false): Promise<OwnedGym[] | null> {
   return owned;
 }
 
-export async function editGym(place: string, change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug">>): Promise<true | string> {
+export async function editGym(
+  place: string,
+  change: Partial<Omit<OwnedGym, "id" | "name" | "citySlug" | "slug" | "address" | "lifters">>,
+): Promise<true | string> {
   try {
     await api("/api/gyms/", { token: token(), body: { op: "edit", place, ...change } });
     owned = null;
@@ -93,6 +106,25 @@ export async function releaseGym(place: string): Promise<boolean> {
     return true;
   } catch {
     return false;
+  }
+}
+
+/** The gym's latest stand order, if any. */
+export async function standOrder(place: string): Promise<StandOrder | null> {
+  try {
+    return (await api<{ order: StandOrder | null }>("/api/gyms/", { token: token(), body: { op: "posterStatus", place } })).order;
+  } catch {
+    return null;
+  }
+}
+
+/** Asks us to mail the gym a table stand (claimed gyms with STAND_MIN_LIFTERS lifters). */
+export async function askForStand(place: string, address: string, lang: string): Promise<true | string> {
+  try {
+    await api("/api/gyms/", { token: token(), body: { op: "posters", place, items: "stand", address, lang } });
+    return true;
+  } catch (e) {
+    return err(e);
   }
 }
 
