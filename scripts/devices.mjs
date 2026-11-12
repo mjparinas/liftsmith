@@ -1,4 +1,4 @@
-// The devices the browser tests run on, chosen so each one adds a screen size the others don't.
+// The devices the browser tests run on (two desktop browsers for the web's desktop layout, layout.ts), chosen so each one adds a screen size the others don't.
 // iOS devices run in WebKit (the engine behind the iOS app's WKWebView), Android in Chromium (the Android
 // WebView). Sizes come from Playwright's device list. Keep it lean: every device adds CI time.
 //
@@ -12,6 +12,7 @@ export const DEVICES = [
   { name: "iPhone 17 Pro Max", group: "ios", why: "largest iPhone, 440 wide" },
   { name: "iPad Mini", group: "ios", why: "small tablet, 768×1024" },
   { name: "iPad Pro 11 landscape", group: "ios", why: "large tablet on a stand, 1194×834" },
+  { name: "Desktop Safari", group: "ios", why: "the desktop layout (sidebar) in WebKit, 1280×720" },
   // Android
   { name: "Galaxy S9+", group: "android", why: "narrowest screen we support, 320 wide" },
   { name: "Galaxy S24", group: "android", why: "360 wide, the most common Android width" },
@@ -21,6 +22,7 @@ export const DEVICES = [
   { name: "Galaxy Z Fold 7", group: "android", why: "foldable opened, nearly square 984×1016" },
   { name: "Galaxy Tab S9", group: "android", why: "Android tablet, 640×1024" },
   { name: "Galaxy Tab S9 landscape", group: "android", why: "Android tablet on its side, 1024×640" },
+  { name: "Desktop Chrome", group: "android", why: "the desktop layout (sidebar) in Chromium, 1280×720" },
 ];
 
 /** Devices picked by the DEVICES env var: "ios", "android", "full", or a comma list of names. Default all. */

@@ -13,6 +13,7 @@ Every place where Android, iOS and the web app differ, and why. Keep this table 
 | Voice | App Actions, start workout only | Siri and App Shortcuts, all three actions | None | Custom App Actions intents need Google's review |
 | Calendar | Read and write | Read and write | `.ics` download, no busy times | Browsers can't reach the calendar |
 | AirPods Pro heart rate | None | Yes (planned) | None | Apple only |
+| Desktop layout (sidebar, wide pages, sheets as centred dialogs) | None: phones and tablets keep the phone layout | None: phones and tablets keep the phone layout | On a window 1,024 px+ wide with a mouse or trackpad | Melvin, 2026-11-12: "tablets should keep the phone layout for now"; see [Desktop layout](desktop-layout.md) |
 | Volume follows intensity | Yes (planned extra) | None | None | iOS can't set system volume or control other apps. It was skipped before; it can come back as an Android extra |
 | Samsung Health | Through Health Connect (a line on the Health Connect card says how to share); no direct Data SDK link (partner approval, nothing extra) | None (Samsung Health on iPhone doesn't share) | None | Samsung devices only |
 | Garmin watch app | Paired watches found through Garmin Connect | The lifter picks the watch once in Garmin Connect (iOS apps can't ask for the list) | None (a page can't reach a Garmin watch) | Garmin's companion SDKs differ per platform |

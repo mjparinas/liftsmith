@@ -9,6 +9,7 @@ import { startAppLinks } from "@/lib/appLinks";
 import { useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
+import { BRAND } from "@/lib/brand";
 import { pendingCoach, savePendingCoach, startCoachInvite } from "@/lib/coachInvite";
 import { startConnections } from "@/lib/connections";
 import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator";
@@ -20,6 +21,7 @@ import { startHealthRefresh } from "@/lib/healthRefresh";
 import { readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
 import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
+import { applyLayout, useDesktop } from "@/lib/layout";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -87,6 +89,8 @@ const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setu
 export function App() {
   const { ready, init, profile, active, stats, events } = useApp();
   const { route, arg } = useRoute();
+  const desktop = useDesktop();
+  useEffect(() => applyLayout(desktop), [desktop]);
   // Earned theme (themes.ts). A seasonal theme falls back to Midnight when its month ends.
   const now = useNow(3600_000);
   const unlockCtx = useMemo(() => unlockContext(events, stats, profile, now), [events, stats, profile, now]);
@@ -398,6 +402,9 @@ export function App() {
   };
   const screen = screens[route];
   const showNav = !FULL_SCREEN.has(route);
+  // Desktop layout (layout.ts): a sidebar instead of the tab bar and a wider page. Full-screen screens (the
+  // workout among them) stay a focused, phone-width panel in the middle of the window, with no sidebar.
+  const sidebar = desktop && showNav;
   // The thank-you after buying Pro sits over every screen, setup included (a purchase moves on at once).
   if (route === "setup")
     return (
@@ -411,11 +418,16 @@ export function App() {
   return (
     <>
       <StatusScrim />
-      <main key={route} className={`aurora safe-top animate-fade mx-auto max-w-lg px-5 ${showNav ? "clear-nav" : ""}`}>
-        <ScreenBoundary>{screen}</ScreenBoundary>
-      </main>
+      <div className={sidebar ? "pl-60" : undefined}>
+        <main
+          key={route}
+          className={`aurora safe-top animate-fade mx-auto px-5 ${sidebar ? "max-w-3xl px-10 pt-8" : "max-w-lg"} ${showNav ? "clear-nav" : ""}`}
+        >
+          <ScreenBoundary>{screen}</ScreenBoundary>
+        </main>
+      </div>
       <ProWelcome />
-      {showNav && <TabBar route={route} />}
+      {sidebar ? <Sidebar route={route} /> : showNav && <TabBar route={route} />}
       <Toaster />
     </>
   );
@@ -448,7 +460,7 @@ function TabBar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
-  const tabs = TABS.filter((tab) => tab.route !== "friends" || socialOn());
+  const tabs = visibleTabs();
   return (
     <nav
       ref={ref}
@@ -477,6 +489,67 @@ function TabBar({ route }: { route: Route }) {
                 >
                   <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
                   {dot && <span aria-hidden className="absolute right-2 top-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+                </span>
+                {t(tab.label)}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  );
+}
+
+/** The tabs on screen: Friends hides while the social flag is off. */
+function visibleTabs() {
+  return TABS.filter((tab) => tab.route !== "friends" || socialOn());
+}
+
+// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the same five tabs as the
+// phone's tab bar, down the left side, so it is the tab bar and nothing else is added to it (one control, one
+// destination). It sets --nav-h to 0 (nothing covers the bottom of the page) and --side-w to its width, so bars
+// pinned to the bottom of a screen and toasts start after it.
+function Sidebar({ route }: { route: Route }) {
+  useEffect(() => {
+    const root = document.documentElement;
+    root.style.setProperty("--nav-h", "0px");
+    root.style.setProperty("--side-w", "15rem");
+    return () => {
+      root.style.removeProperty("--nav-h");
+      root.style.removeProperty("--side-w");
+    };
+  }, []);
+  const waiting = useFriendsWaiting();
+  return (
+    <nav
+      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
+      aria-label={t("nav.main")}
+    >
+      <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
+        {/* The app icon, like the site header's (SiteChrome BrandMark). */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/icon.svg" alt="" aria-hidden width={32} height={32} className="size-8 rounded-lg" />
+        {BRAND.name}
+      </div>
+      <ul className="flex flex-col gap-1">
+        {visibleTabs().map((tab) => {
+          const on = route === tab.route;
+          const dot = tab.route === "friends" && waiting > 0;
+          return (
+            <li key={tab.route}>
+              <button
+                type="button"
+                aria-current={on ? "page" : undefined}
+                aria-label={dot ? t("friends.openWaiting", { count: waiting }) : undefined}
+                onClick={() => {
+                  if (!on) haptic("select");
+                  go(tab.route);
+                }}
+                className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
+              >
+                <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
+                  <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
+                  {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
                 </span>
                 {t(tab.label)}
               </button>

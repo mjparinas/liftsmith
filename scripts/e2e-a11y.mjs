@@ -1,6 +1,6 @@
 // axe-core WCAG 2.2 A/AA on every screen, failing on serious and critical problems. Then the
 // accessibility settings (colour-blind safe colours, more contrast, the largest text), Windows-style
-// forced colours, and a keyboard-only run: every stop has a visible focus ring, a workout can be
+// forced colours, the desktop layout in dark and light, and a keyboard-only run: every stop has a visible focus ring, a workout can be
 // started and a set logged without a pointer, and sheets close on Escape with focus returned.
 //   npm run build:static && node scripts/e2e-a11y.mjs [base-url]
 import AxeBuilder from "@axe-core/playwright";
@@ -735,6 +735,84 @@ try {
   if (back !== "End") fail.push(`keyboard: focus went to "${back}" after closing the sheet, not back to End`);
 } catch (e) {
   fail.push(`keyboard and large text: ${String(e)}`);
+}
+await kctx.close();
+
+// The desktop layout (layout.ts, docs/decisions/desktop-layout.md): the sidebar and the main screens in dark
+// and light, a sheet opening as a centred dialog, and the sidebar reachable and ringed from the keyboard.
+const dctx = await browser.newContext({ ...devices["Desktop Chrome"], viewport: { width: 1440, height: 900 } });
+await stubSignIn(dctx);
+const dp = await dctx.newPage();
+const dscan = async (where) => {
+  const r = await new AxeBuilder({ page: dp }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  for (const v of r.violations.filter((v) => v.impact === "serious" || v.impact === "critical"))
+    fail.push(
+      `desktop ${where}: ${v.id} (${v.impact}) ${v.help} — ${v.nodes
+        .slice(0, 3)
+        .map((n) => n.target.join(" "))
+        .join(", ")}`,
+    );
+};
+const settle = () =>
+  dp.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getTiming().iterations !== Infinity)
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
+try {
+  await dp.goto(`${server.url}/app/`);
+  await onboard(dp);
+  if ((await dp.evaluate(() => document.documentElement.dataset.layout)) !== "desktop")
+    fail.push("desktop: no desktop layout at 1440 wide");
+  for (const theme of ["Dark", "Light"]) {
+    await dp.goto(`${server.url}/app/#/settings/look`);
+    await dp.getByRole("button", { name: theme, exact: true }).click();
+    for (const tab of ["today", "recovery", "stats", "friends", "achievements", "settings"]) {
+      await dp.goto(`${server.url}/app/#/${tab}`);
+      await dp.getByRole("heading", { level: 1 }).first().waitFor();
+      await dp.waitForTimeout(300);
+      await settle();
+      await dscan(`${theme.toLowerCase()} ${tab}`);
+    }
+  }
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("button", { name: "Start workout" }).click();
+  await dp.getByRole("button", { name: "Swap exercise", exact: true }).click();
+  await dp.getByRole("dialog").waitFor();
+  await dp.waitForTimeout(300);
+  await settle();
+  await dscan("dialog");
+  const box = await dp.getByRole("dialog").boundingBox();
+  if (!box || box.y + box.height >= 899) fail.push("desktop: the sheet didn't open as a centred dialog");
+  await dp.keyboard.press("Escape");
+  // The sidebar from the keyboard: Tab reaches Progress with a focus ring, and Enter opens it.
+  await dp.goto(`${server.url}/app/#/today`);
+  await dp.getByRole("heading", { level: 1 }).first().waitFor();
+  let reached = false;
+  for (let i = 0; i < 12 && !reached; i++) {
+    await dp.keyboard.press("Tab");
+    const f = await dp.evaluate(() => {
+      const el = document.activeElement;
+      const cs = el && getComputedStyle(el);
+      return {
+        side: !!el?.closest("nav"),
+        name: el?.textContent?.trim(),
+        ring: !!cs && ((cs.outlineStyle !== "none" && parseFloat(cs.outlineWidth) >= 2) || cs.boxShadow !== "none"),
+      };
+    });
+    if (f.side && !f.ring) fail.push(`desktop keyboard: no focus ring on sidebar "${f.name}"`);
+    if (f.side && f.name === "Progress") {
+      reached = true;
+      await dp.keyboard.press("Enter");
+      await dp.waitForURL(/#\/stats/);
+    }
+  }
+  if (!reached) fail.push("desktop keyboard: couldn't reach the sidebar's Progress with Tab");
+} catch (e) {
+  fail.push(`desktop: ${String(e)}`);
 }
 await browser.close();
 server.close();
