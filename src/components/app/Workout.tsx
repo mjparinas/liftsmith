@@ -29,7 +29,7 @@ import { watchCountable } from "@/lib/reps/watchMotion";
 import { hrRestCut } from "@/lib/restReady";
 import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateSession, type AheadStep } from "@/lib/sessionNotify";
 import { timerLength, type TimerSpec } from "@/lib/setTimer";
-import { implementsFor, perSide } from "@/lib/sides";
+import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
 import { useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
@@ -50,6 +50,7 @@ import { clock, loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
+import { SetHints } from "./SetHints";
 import { SonosBar } from "./Sonos";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
@@ -285,7 +286,8 @@ export function Workout() {
     setKey: `${active?.index}:${doneSets}:${warmDone}:${active?.tag ?? ""}`,
     onCount: (n) => {
       const a = useApp.getState().active;
-      if (a) s.adjust(a.weight, n);
+      // A counter sees both sides of a one-side move: the set's reps are per side.
+      if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
       noteCount(n);
     },
   });
@@ -481,7 +483,9 @@ export function Workout() {
         ? {
             label: sidesSplit ? t("workout.left") : t("workout.reps"),
             suffix: TIMED.has(ex.id)
-              ? t("workout.seconds")
+              ? perSide(ex.id)
+                ? t("workout.secondsEachSide")
+                : t("workout.seconds")
               : sidesSplit
                 ? t("workout.leftReps")
                 : perSide(ex.id)
@@ -632,6 +636,7 @@ export function Workout() {
                   {item.focus && MUSCLE_LABEL[item.focus]} · {setLabel}
                 </p>
                 <h1 className={`mt-0.5 ${SCREEN_TITLE}`}>{ex.name}</h1>
+                <SetHints ex={ex} className="mt-1" />
                 {note && (
                   <p className="mt-1 text-sm text-muted">
                     <span className="font-semibold text-ink">{t("wk.yourNote")}</span> {note}
@@ -693,7 +698,8 @@ export function Workout() {
                   setKey={`${active.index}:${doneSets}:${warmDone}`}
                   onCount={(n) => {
                     const a = useApp.getState().active;
-                    if (a) s.adjust(a.weight, n);
+                    // A counter sees both sides of a one-side move: the set's reps are per side.
+                    if (a && ex) s.adjust(a.weight, countedReps(ex.id, n));
                     noteCount(n);
                   }}
                   onSummary={
@@ -957,6 +963,7 @@ export function Workout() {
           <div className="space-y-4">
             <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
+            <SetHints ex={ex} />
             <p className="text-muted">{ex.setup}</p>
             <ol className="space-y-2">
               {ex.cues.map((c, i) => (
