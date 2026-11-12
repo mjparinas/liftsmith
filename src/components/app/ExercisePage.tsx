@@ -68,8 +68,9 @@ export function ExercisePage({ id }: { id?: string }) {
   const mostReps = Math.max(0, ...sessions.flatMap((s) => s.sets.map((x) => x.reps)));
   const plates = next && gym && next.weight > 0 ? plateText(ex, next.weight, gym) : undefined;
   return (
-    <div className="pb-2">
-      <ScreenHeader back={back} kicker={list(ex.primary.map((m) => MUSCLE_LABEL[m]))} title={ex.name} />
+    // Desktop layout: the cards flow into two columns (.desk-cols), what to do next first.
+    <div className="desk-cols pb-2">
+      <ScreenHeader className="desk-span" back={back} kicker={list(ex.primary.map((m) => MUSCLE_LABEL[m]))} title={ex.name} />
 
       {next && (
         <section

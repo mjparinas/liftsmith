@@ -372,10 +372,15 @@ export function Achievements() {
   const shareItems =
     sharing === "level" ? [levelShare(g, stats.sessions.length, ctx)] : shared?.tier ? [badgeShare(shared, shared.tier, ctx)] : [];
   return (
-    <div className="pb-2">
-      <ScreenHeader back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }} title={t("awards.title")} />
+    // Desktop layout: the level card runs across, the rest flows into two columns (.desk-cols).
+    <div className="desk-cols pb-2">
+      <ScreenHeader
+        className="desk-span"
+        back={{ label: `‹ ${t("progress.title")}`, onClick: () => go("stats") }}
+        title={t("awards.title")}
+      />
       <ShareSheet open={!!shareItems.length} onClose={() => setSharing(null)} items={shareItems} />
-      <div className="card-tint mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
+      <div className="card-tint desk-span mt-4 p-4" style={{ "--tint": HUE.violet } as CSSProperties}>
         <div className="flex items-center justify-between gap-2">
           <span className="font-bold">
             {t("progress.level", { level: g.level.level })} · <span className="text-gradient">{g.level.title}</span>
