@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { AdminPlace, PlaceAction } from "@/server/gymPlaces";
 
 import { Card } from "./charts";
+import { GymClaims } from "./GymClaims";
 
 type Data = { places: AdminPlace[]; total: number; official: number };
 
@@ -54,6 +55,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
   const act = (p: AdminPlace, action: PlaceAction) => void post({ id: p.id, action }).then((j) => j.error && setNote(j.error));
   return (
     <div className="grid gap-4">
+      <GymClaims admin={admin} />
       <Card title="Add a city's gyms">
         <p className="text-sm text-muted">
           Pulls every named fitness centre in an area from OpenStreetMap. They show in Find gyms near you as unofficial gyms until an owner

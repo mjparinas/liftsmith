@@ -465,6 +465,25 @@ const SCHEMA = [
   )`,
   `CREATE INDEX IF NOT EXISTS gym_places_at ON gym_places (lat, lon)`,
   `CREATE UNIQUE INDEX IF NOT EXISTS gym_places_ref ON gym_places (source_ref) WHERE source_ref <> ''`,
+  // Owners claiming a gym (gymClaims.ts): an emailed code, the poster's code, or staff review. Deleted with the account.
+  `CREATE TABLE IF NOT EXISTS gym_claims (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    phone TEXT NOT NULL DEFAULT '',
+    role TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    method TEXT NOT NULL,
+    status TEXT NOT NULL,
+    code_hash TEXT NOT NULL DEFAULT '',
+    expires_at INTEGER NOT NULL DEFAULT 0,
+    tries INTEGER NOT NULL DEFAULT 0,
+    created_at INTEGER NOT NULL,
+    decided_at INTEGER NOT NULL DEFAULT 0
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_claims_status ON gym_claims (status, created_at)`,
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
@@ -775,6 +794,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["clubs", "goal_target", "INTEGER NOT NULL DEFAULT 0"],
   // A listed setup can say which real gym it is (gymPlaces.ts); the gym then offers that setup.
   ["public_gyms", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
+  ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
 ];
 
 let client: Client | null = null;

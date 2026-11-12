@@ -47,6 +47,8 @@ import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
 import { Gym } from "./Gym";
+import { GymClaim } from "./GymClaim";
+import { GymEdit } from "./GymEdit";
 import { GymPlace } from "./GymPlace";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
@@ -406,6 +408,8 @@ export function App() {
     exercise: <ExercisePage key={arg ?? ""} id={arg} />,
     gymlink: <SharedGym key={arg ?? ""} code={arg} />,
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
+    gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
+    gymedit: <GymEdit key={arg ?? ""} id={arg} />,
     log: <LogPast />,
   };
   const screen = screens[route];

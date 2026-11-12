@@ -1,10 +1,12 @@
 // Find a gym near you (src/server/gymDirectory.ts, docs/decisions/gym-sharing.md). Server build only.
 // GET ?lat=&lon=[&studios=1]: real gyms (gymPlaces.ts, official ones first) and listed setups near a position the
 // app already rounded to about 1 km. Anyone, rate-limited. `gyms` stays as it was for older apps; `places` is new.
-// POST {op}: publish, unpublish and mine need a signed-in account; added and report work signed out too.
+// POST {op}: publish, unpublish, mine and the claim ops (claimStart, claimVerify, claimPoster, owned, edit, release)
+// need a signed-in account; added and report work signed out too.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
-import { sessionOf } from "@/server/accounts";
+import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
+import { claimWithPosterCode, editGym, ownedGyms, releaseGym, startClaim, verifyClaim } from "@/server/gymClaims";
 import { added, addressKey, LIMITS, mine, nearby, publish, report, unpublish } from "@/server/gymDirectory";
 import { joinPlace, nearbyPlaces, placeById } from "@/server/gymPlaces";
 
@@ -58,6 +60,27 @@ export async function POST(req: Request) {
       return reply(req, 200, { ok: true });
     case "mine":
       return reply(req, 200, { gyms: await mine(s.accountId) });
+    // Claiming a gym and keeping its details (src/server/gymClaims.ts, docs/decisions/gyms.md step 3).
+    case "claimStart": {
+      const r = await startClaim(s.accountId, b, resendMail());
+      if (r.ok) return reply(req, 200, r);
+      const status = r.error === "slow" ? 429 : r.error === "taken" || r.error === "full" ? 409 : r.error === "mail" ? 502 : 400;
+      return reply(req, status, { error: r.error });
+    }
+    case "claimVerify":
+    case "claimPoster": {
+      const r =
+        b.op === "claimVerify" ? await verifyClaim(s.accountId, b.claim, b.code) : await claimWithPosterCode(s.accountId, b.place, b.code);
+      return r.ok ? reply(req, 200, r) : reply(req, r.error === "taken" ? 409 : 400, { error: r.error });
+    }
+    case "owned":
+      return reply(req, 200, { gyms: await ownedGyms(s.accountId) });
+    case "edit": {
+      const r = await editGym(s.accountId, b);
+      return r.ok ? reply(req, 200, { ok: true }) : reply(req, r.error === "owner" ? 403 : 400, { error: r.error });
+    }
+    case "release":
+      return (await releaseGym(s.accountId, b.place)) ? reply(req, 200, { ok: true }) : reply(req, 403, { error: "owner" });
     default:
       return reply(req, 400, { error: "Unknown op." });
   }

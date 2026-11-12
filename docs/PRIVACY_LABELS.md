@@ -26,6 +26,7 @@ Last reviewed: 2026-11-11 (Friends added: handle, name, follows, posted workout 
 | Weights, reps, heart rate, body weight, Health Connect / Apple Health data, cycle data | **No** without an account (stays on the device) | | |
 | Gym listings (optional, account only): gym name, equipment and weights, area rounded to about 1 km; reports on listings (account id or a one-way code from the address) | Only when the user lists a gym for lifters nearby; deleted when they unlist it or delete the account | App functionality (others nearby find the gym and add its setup) | Yes, to the account, but shown to others without who listed it |
 | Real gyms added from the finder: that the account (or a one-way code from the address) added a gym from OpenStreetMap | When the user adds a real gym from Find gyms near you; deleted with the account | App functionality (how many lifters train at a gym; only the total is shown) | Yes, to the account, never shown per person |
+| Gym claims (optional, account only): name, role, work email, optional phone and note; the gym's public details the owner sets | When someone claims a gym; claims are deleted with the account, and releasing the gym makes it unofficial | App functionality (proving a gym is theirs; the owner keeps its page current) | Yes, to the account; name and email never shown, the gym's details are public |
 | Location (beyond a listed gym's 1 km area), progress photos | **Never** | | |
 | Advertising id (IDFA, Android advertising id) | **Never** (`AD_ID` permission removed in the manifest; no ATT prompt) | | |
 

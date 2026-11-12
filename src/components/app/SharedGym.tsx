@@ -1,8 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { track } from "@/lib/analytics";
+import { ownedGyms } from "@/lib/gymClaims";
 import { listingFor, markAdded, placeFor, placeLine, REPORT_REASONS, reportGym } from "@/lib/gymDirectory";
 import { decodeGym, sameKit } from "@/lib/gymShare";
 import { t } from "@/lib/i18n";
@@ -29,6 +30,16 @@ export function SharedGym({ code }: { code?: string }) {
   const listing = useMemo(() => listingFor(code), [code]);
   // A real gym picked from Find gyms near you (gymPlaces.ts): its name, address and check mark.
   const place = useMemo(() => placeFor(code), [code]);
+  // Whether this lifter manages the gym (gymClaims.ts), to offer its page's settings instead of a claim.
+  const [mine, setMine] = useState(false);
+  useEffect(() => {
+    if (!place?.official) return;
+    let live = true;
+    void ownedGyms().then((list) => live && setMine(!!list?.some((g) => g.id === place.id)));
+    return () => {
+      live = false;
+    };
+  }, [place]);
   const [reporting, setReporting] = useState(false);
   const [reported, setReported] = useState(false);
   if (!kit) {
@@ -146,6 +157,18 @@ export function SharedGym({ code }: { code?: string }) {
         <Button kind="quiet" className="w-full" onClick={() => go("today")}>
           {existing ? t("remix.back") : t("remix.notNow")}
         </Button>
+        {place &&
+          (mine ? (
+            <Button kind="ghost" icon="edit" className="w-full" onClick={() => go("gymedit", place.id)}>
+              {t("gym.claim.manage")}
+            </Button>
+          ) : (
+            !place.official && (
+              <Button kind="quiet" icon="verified" className="w-full" onClick={() => go("gymclaim", place.id)}>
+                {t("gym.claim.open")}
+              </Button>
+            )
+          ))}
         {listing &&
           (reported ? (
             <p className="text-center text-sm text-muted" role="status">

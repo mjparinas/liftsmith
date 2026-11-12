@@ -62,3 +62,42 @@ export function parseHours(raw: string): Week | null {
 
 /** Open around the clock every day. */
 export const allDay = (w: Week) => w.every((d) => d.length === 1 && d[0] === "00:00-24:00");
+
+/** A week back into OpenStreetMap's form, runs of days with the same hours joined: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00". */
+export function formatHours(week: Week): string {
+  if (allDay(week)) return "24/7";
+  const rules: string[] = [];
+  let i = 0;
+  const groups: { days: number[]; hours: string }[] = [];
+  while (i < 7) {
+    const hours = week[i]!.join(",");
+    let j = i;
+    while (j + 1 < 7 && week[j + 1]!.join(",") === hours) j++;
+    if (hours) {
+      const same = groups.find((g) => g.hours === hours);
+      const days = Array.from({ length: j - i + 1 }, (_, k) => i + k);
+      if (same) same.days.push(...days);
+      else groups.push({ days, hours });
+    }
+    i = j + 1;
+  }
+  for (const g of groups) {
+    const parts: string[] = [];
+    let k = 0;
+    while (k < g.days.length) {
+      let m = k;
+      while (m + 1 < g.days.length && g.days[m + 1] === g.days[m]! + 1) m++;
+      parts.push(
+        m - k >= 2
+          ? `${DAYS[g.days[k]!]}-${DAYS[g.days[m]!]}`
+          : g.days
+              .slice(k, m + 1)
+              .map((d) => DAYS[d])
+              .join(","),
+      );
+      k = m + 1;
+    }
+    rules.push(`${parts.join(",")} ${g.hours}`);
+  }
+  return rules.join("; ");
+}
