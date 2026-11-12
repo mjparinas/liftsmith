@@ -1,12 +1,15 @@
 // The admin To Do tab (modelled on Gradelings' src/server/adminQueue.ts): one list of what needs a person.
-// Items worked out from the data (mail waiting for an answer, reports waiting for a decision, creators owed a payout, payment failures, a late or
-// failed reminder job, setup still to do) plus the admins' own tasks. A worked-out item can be snoozed or dismissed
+// Items worked out from the data (mail waiting for an answer, reports waiting for a decision, creators owed a payout,
+// payment failures, a late or failed reminder job, gym claims to check and posters to print or mail, setup still to do)
+// plus the admins' own tasks. A worked-out item can be snoozed or dismissed
 // by its key (admin_todo_hidden); it comes back when the snooze ends, or, for one whose key changes with the data
 // (a new message, a new failure), as soon as there's something new.
 import { jobState } from "@/lib/systemHealth";
 
 import { loadCreators } from "./creators";
 import { batch, query, run } from "./db";
+import { pendingClaimCount } from "./gymClaims";
+import { posterCounts } from "./gymPosters";
 import { inboxConfigured, waitingMail } from "./inbox";
 import { recentJobRuns } from "./monitor";
 
@@ -14,7 +17,7 @@ const DAY = 86_400_000;
 /** "Dismiss" hides an item for good, stored as a far-off date so one column covers both. */
 const FOREVER = 8_640_000_000_000_000;
 
-export type TodoKind = "inbox" | "reports" | "creator" | "billing" | "job" | "setup";
+export type TodoKind = "inbox" | "reports" | "creator" | "billing" | "job" | "gyms" | "setup";
 
 export interface TodoItem {
   key: string;
@@ -174,6 +177,38 @@ async function jobItems(now: number): Promise<TodoItem[]> {
   ];
 }
 
+/** Gym claims waiting for staff, and posters and stands to print or mail (docs/decisions/gyms.md). */
+async function gymItems(): Promise<TodoItem[]> {
+  const [claims, posters] = await Promise.all([pendingClaimCount(), posterCounts()]);
+  const items: TodoItem[] = [];
+  // The counts are in the keys, so a dismissed item comes back when there's more to do.
+  if (claims)
+    items.push({
+      key: `gyms:claims:${claims}`,
+      kind: "gyms",
+      title: claims === 1 ? "Check a gym claim" : `Check ${claims} gym claims`,
+      detail: "Owners whose email isn't at the gym's website. Call the gym, then approve or reject.",
+      at: null,
+      action: { label: "Gyms", tab: "Gyms" },
+    });
+  if (posters.toPrint || posters.toShip)
+    items.push({
+      key: `gyms:posters:${posters.toPrint}:${posters.toShip}`,
+      kind: "gyms",
+      title: [
+        posters.toPrint && `Print posters for ${posters.toPrint} ${posters.toPrint === 1 ? "gym" : "gyms"}`,
+        posters.toShip && `mail ${posters.toShip}`,
+      ]
+        .filter(Boolean)
+        .join(", then ")
+        .replace(/^mail/, "Mail"),
+      detail: "Each gym gets a letter (with its claim code when unclaimed), the poster and the stand inserts.",
+      at: posters.oldest,
+      action: { label: "Gyms", tab: "Gyms" },
+    });
+  return items;
+}
+
 /** Runs a source, leaving it out (with a note) when it fails, so one broken service doesn't empty the list. */
 async function from(name: string, fn: () => Promise<TodoItem[]>, problems: string[]): Promise<TodoItem[]> {
   try {
@@ -200,6 +235,7 @@ export async function todoList(now = Date.now()): Promise<TodoList> {
     from("Creators", () => creatorItems(now), problems),
     from("Billing", () => billingItems(now), problems),
     from("Reminder job", () => jobItems(now), problems),
+    from("Gyms", gymItems, problems),
     Promise.resolve(setupItems()),
   ]);
   const hiddenRows = await query<{ key: string }>("SELECT key FROM admin_todo_hidden WHERE until > ?", [now]);

@@ -215,11 +215,14 @@ export interface OwnedGym {
   phone: string;
   description: string;
   code: string;
+  /** The map's address, to start the stand's mailing address. */
+  address: string;
+  lifters: number;
 }
 
 export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
   const rows = await query(
-    "SELECT id, name, city_slug, slug, hours, website, phone, description, code FROM gym_places WHERE claimed_by = ? ORDER BY name",
+    "SELECT id, name, city_slug, slug, address, city, region, hours, website, phone, description, code, lifters FROM gym_places WHERE claimed_by = ? ORDER BY name",
     [accountId],
   );
   return rows.map((r) => ({
@@ -232,6 +235,8 @@ export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
     phone: s(r.phone),
     description: s(r.description),
     code: s(r.code),
+    address: [s(r.address), [s(r.city), s(r.region)].filter(Boolean).join(" ")].filter(Boolean).join("\n"),
+    lifters: n(r.lifters),
   }));
 }
 

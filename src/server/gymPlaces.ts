@@ -432,13 +432,15 @@ export interface AdminPlace {
   setups: number;
   hidden: boolean;
   hasKit: boolean;
+  /** Visits from the QR code on the gym's poster or stand (gymPosters.ts). */
+  qrScans: number;
 }
 
 export async function adminPlaces(q: unknown): Promise<{ places: AdminPlace[]; total: number; official: number }> {
   const term = typeof q === "string" ? q.trim().slice(0, 80) : "";
   const like = `%${term.replace(/[%_]/g, "")}%`;
   const rows = await query(
-    `SELECT p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.source, p.claimed_by, p.lifters, p.hidden, p.code,
+    `SELECT p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.source, p.claimed_by, p.lifters, p.hidden, p.code, p.qr_scans,
        (SELECT COUNT(*) FROM public_gyms g WHERE g.place_id = p.id) AS setups
      FROM gym_places p ${term ? "WHERE p.name LIKE ? OR p.city LIKE ?" : ""}
      ORDER BY p.claimed_by = '' , p.lifters DESC, p.city, p.name LIMIT 300`,
@@ -463,6 +465,7 @@ export async function adminPlaces(q: unknown): Promise<{ places: AdminPlace[]; t
       setups: n(r.setups),
       hidden: !!n(r.hidden),
       hasKit: !!s(r.code) || n(r.setups) > 0,
+      qrScans: n(r.qr_scans),
     })),
   };
 }

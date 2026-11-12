@@ -2,9 +2,18 @@
 
 import { useEffect, useState } from "react";
 
-import { editGym, ownedGyms, releaseGym, type OwnedGym } from "@/lib/gymClaims";
+import {
+  askForStand,
+  editGym,
+  ownedGyms,
+  releaseGym,
+  STAND_MIN_LIFTERS,
+  standOrder,
+  type OwnedGym,
+  type StandOrder,
+} from "@/lib/gymClaims";
 import { encodeGym, kitOf } from "@/lib/gymShare";
-import { t, weekday } from "@/lib/i18n";
+import { currentLang, num, t, weekday } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { DAYS, formatHours, parseHours, type Week } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
@@ -14,7 +23,8 @@ import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Skeleton, Switch, SwitchRow } from "./ui";
 
 // The owner's page for an official gym (#/gymedit/<id>, docs/decisions/gyms.md step 3): opening hours, website, phone,
-// a short description, and the equipment lifters get when they add the gym (one of the owner's own gym setups).
+// a short description, the equipment lifters get when they add the gym (one of the owner's own gym setups), and the
+// free poster to print, plus a mailed table stand once 20 lifters train there (step 4).
 
 const input = "card w-full px-4 py-3";
 const OPEN = "06:00";
@@ -57,9 +67,11 @@ export function GymEdit({ id }: { id?: string }) {
   const [about, setAbout] = useState("");
   const [kitFrom, setKitFrom] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
+  const [stand, setStand] = useState<StandOrder | null>(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => {
     let live = true;
+    if (id) void standOrder(id).then((o) => live && setStand(o));
     void ownedGyms().then((list) => {
       if (!live) return;
       const g = list?.find((x) => x.id === id) ?? "none";
@@ -173,6 +185,8 @@ export function GymEdit({ id }: { id?: string }) {
         <p className="mt-2 text-xs text-faint">{gym.code ? t("gym.edit.kitSet") : t("gym.edit.kitNone")}</p>
       </Section>
 
+      <PosterSection gym={gym} stand={stand} onAsked={setStand} />
+
       <Section title={t("gym.edit.contact")}>
         <div className="space-y-3">
           <div>
@@ -236,5 +250,82 @@ export function GymEdit({ id }: { id?: string }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+/** The free poster any gym prints itself, and the table stand we mail once STAND_MIN_LIFTERS lifters train there. */
+function PosterSection({ gym, stand, onAsked }: { gym: OwnedGym; stand: StandOrder | null; onAsked: (o: StandOrder) => void }) {
+  const [address, setAddress] = useState(gym.address);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const earned = gym.lifters >= STAND_MIN_LIFTERS;
+  const open = stand && stand.status !== "cancelled";
+  const ask = async () => {
+    if (busy) return;
+    setBusy(true);
+    const r = await askForStand(gym.id, address.trim(), currentLang());
+    setBusy(false);
+    if (r === true) {
+      haptic("success");
+      onAsked({ status: "requested", createdAt: Date.now() });
+    } else {
+      oops();
+      setError(r === "address" ? t("gym.edit.standErr") : errorText(r));
+    }
+  };
+  return (
+    <Section title={t("gym.edit.poster")}>
+      <p className="mb-2 text-sm text-muted">{t("gym.edit.posterNote")}</p>
+      <a
+        href={`${SITE_URL}/gyms/${gym.citySlug}/${gym.slug}/poster/`}
+        target="_blank"
+        rel="noopener"
+        className="press card flex min-h-11 items-center justify-between px-4 py-3 text-sm"
+      >
+        <span>{t("gym.edit.posterPrint")}</span>
+        <span aria-hidden className="text-muted">
+          ›
+        </span>
+      </a>
+      <div className="mt-3 text-sm">
+        {open ? (
+          <p className="text-muted" role="status">
+            {stand.status === "shipped" ? t("gym.edit.standShipped") : t("gym.edit.standAsked")}
+          </p>
+        ) : !earned ? (
+          <p className="text-muted">{t("gym.edit.standLocked", { count: num(gym.lifters) })}</p>
+        ) : (
+          <form
+            className="space-y-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              void ask();
+            }}
+          >
+            <p>{t("gym.edit.standAsk")}</p>
+            <label htmlFor="ge-stand" className="block text-muted">
+              {t("gym.edit.standAddress")}
+            </label>
+            <textarea
+              id="ge-stand"
+              rows={3}
+              maxLength={300}
+              autoComplete="street-address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className={input}
+            />
+            <Button kind="ghost" className="w-full" disabled={busy || address.trim().length < 8} submit>
+              {t("gym.edit.standSend")}
+            </Button>
+            {error && (
+              <p className="text-bad" role="alert">
+                {error}
+              </p>
+            )}
+          </form>
+        )}
+      </div>
+    </Section>
   );
 }

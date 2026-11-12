@@ -12,6 +12,7 @@ import { earnedDeletes } from "./earnedPro";
 import { claimDeletes } from "./gymClaims";
 import { gymDeletes } from "./gymDirectory";
 import { placeDeletes } from "./gymPlaces";
+import { posterDeletes } from "./gymPosters";
 import { verifiedEmail, verifyIdToken, type Claims, type Provider } from "./idToken";
 import { isReviewEmail, reviewCodeMatches } from "./review";
 import { socialDeletes } from "./social";
@@ -290,6 +291,7 @@ export async function deleteAccount(accountId: string, revoke: (refresh: string)
     ...gymDeletes(accountId),
     ...placeDeletes(accountId),
     ...claimDeletes(accountId),
+    ...posterDeletes(accountId),
     { sql: "DELETE FROM accounts WHERE id = ?", args: [accountId] },
   ]);
 }

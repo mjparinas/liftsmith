@@ -16,6 +16,7 @@ const KIND_LABEL: Record<TodoKind, string> = {
   creator: "Codes",
   billing: "Billing",
   job: "System",
+  gyms: "Gyms",
   setup: "Setup",
 };
 const post = async (body: Record<string, unknown>) => {

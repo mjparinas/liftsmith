@@ -181,6 +181,16 @@ export const en = {
   "gym.report.spam": "It’s spam or an ad",
   "gym.report.offensive": "The name is offensive",
   "gym.report.thanks": "Thanks. We’ll take a look.",
+  "gym.edit.poster": "Poster and table stand",
+  "gym.edit.posterNote": "Put up a poster and a table stand card so lifters add your gym with one scan.",
+  "gym.edit.posterPrint": "Print your free poster",
+  "gym.edit.standLocked": "We mail a free acrylic table stand once 20 Liftsmith lifters train here. {count} so far.",
+  "gym.edit.standAsk": "Your gym has 20+ lifters, so we’ll mail you a free acrylic table stand.",
+  "gym.edit.standAddress": "Mailing address, with the postal code",
+  "gym.edit.standSend": "Mail me a stand",
+  "gym.edit.standAsked": "We’ve got your request. We’ll print your stand and mail it soon.",
+  "gym.edit.standShipped": "Your stand is in the mail.",
+  "gym.edit.standErr": "That address doesn’t look complete.",
 } as const;
 
 type Key = keyof typeof en;
@@ -367,6 +377,16 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.report.spam": "Es spam o publicidad",
   "gym.report.offensive": "El nombre es ofensivo",
   "gym.report.thanks": "Gracias. Lo revisaremos.",
+  "gym.edit.poster": "Póster y expositor de mesa",
+  "gym.edit.posterNote": "Pon un póster y una tarjeta en un expositor de mesa para que la gente añada tu gimnasio con un escaneo.",
+  "gym.edit.posterPrint": "Imprime tu póster gratis",
+  "gym.edit.standLocked": "Enviamos gratis un expositor de mesa acrílico cuando 20 personas de Liftsmith entrenan aquí. Van {count}.",
+  "gym.edit.standAsk": "Tu gimnasio tiene más de 20 personas de Liftsmith, así que te enviamos gratis un expositor de mesa acrílico.",
+  "gym.edit.standAddress": "Dirección postal, con el código postal",
+  "gym.edit.standSend": "Envíame un expositor",
+  "gym.edit.standAsked": "Hemos recibido tu pedido. Lo imprimimos y te lo enviamos pronto.",
+  "gym.edit.standShipped": "Tu expositor ya está en camino.",
+  "gym.edit.standErr": "Esa dirección no parece completa.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -556,6 +576,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.report.spam": "C’est du spam ou une pub",
   "gym.report.offensive": "Le nom est offensant",
   "gym.report.thanks": "Merci. Nous allons vérifier.",
+  "gym.edit.poster": "Affiche et présentoir de table",
+  "gym.edit.posterNote": "Installez une affiche et une carte de présentoir pour que les gens ajoutent votre salle en un scan.",
+  "gym.edit.posterPrint": "Imprimez votre affiche gratuite",
+  "gym.edit.standLocked":
+    "Nous postons gratuitement un présentoir de table en acrylique dès que 20 personnes s’entraînent ici avec Liftsmith. {count} pour l’instant.",
+  "gym.edit.standAsk":
+    "Votre salle compte plus de 20 personnes sur Liftsmith : nous vous postons gratuitement un présentoir de table en acrylique.",
+  "gym.edit.standAddress": "Adresse postale, avec le code postal",
+  "gym.edit.standSend": "M’envoyer un présentoir",
+  "gym.edit.standAsked": "Nous avons reçu votre demande. Nous l’imprimons et la postons bientôt.",
+  "gym.edit.standShipped": "Votre présentoir est à la poste.",
+  "gym.edit.standErr": "Cette adresse semble incomplète.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -746,6 +778,18 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.report.spam": "Es ist Spam oder Werbung",
   "gym.report.offensive": "Der Name ist beleidigend",
   "gym.report.thanks": "Danke. Wir schauen es uns an.",
+  "gym.edit.poster": "Poster und Tischaufsteller",
+  "gym.edit.posterNote":
+    "Häng ein Poster auf und stell eine Karte in einen Tischaufsteller, damit Trainierende dein Studio mit einem Scan hinzufügen.",
+  "gym.edit.posterPrint": "Kostenloses Poster drucken",
+  "gym.edit.standLocked":
+    "Wir schicken kostenlos einen Tischaufsteller aus Acryl, sobald 20 Liftsmith-Nutzer hier trainieren. Bisher {count}.",
+  "gym.edit.standAsk": "Dein Studio hat über 20 Liftsmith-Nutzer, also schicken wir dir kostenlos einen Tischaufsteller aus Acryl.",
+  "gym.edit.standAddress": "Postanschrift mit Postleitzahl",
+  "gym.edit.standSend": "Aufsteller schicken",
+  "gym.edit.standAsked": "Deine Anfrage ist da. Wir drucken den Aufsteller und schicken ihn bald los.",
+  "gym.edit.standShipped": "Dein Aufsteller ist unterwegs.",
+  "gym.edit.standErr": "Die Anschrift scheint unvollständig.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -931,6 +975,18 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.report.spam": "È spam o pubblicità",
   "gym.report.offensive": "Il nome è offensivo",
   "gym.report.thanks": "Grazie. Daremo un’occhiata.",
+  "gym.edit.poster": "Poster ed espositore da tavolo",
+  "gym.edit.posterNote":
+    "Appendi un poster e metti una scheda in un espositore da tavolo, così chi si allena aggiunge la tua palestra con una scansione.",
+  "gym.edit.posterPrint": "Stampa il tuo poster gratis",
+  "gym.edit.standLocked":
+    "Spediamo gratis un espositore da tavolo in acrilico quando 20 persone di Liftsmith si allenano qui. Finora {count}.",
+  "gym.edit.standAsk": "La tua palestra ha più di 20 persone su Liftsmith, quindi ti spediamo gratis un espositore da tavolo in acrilico.",
+  "gym.edit.standAddress": "Indirizzo postale, con il CAP",
+  "gym.edit.standSend": "Spediscimi un espositore",
+  "gym.edit.standAsked": "Abbiamo ricevuto la richiesta. Lo stampiamo e lo spediamo presto.",
+  "gym.edit.standShipped": "Il tuo espositore è in viaggio.",
+  "gym.edit.standErr": "L’indirizzo non sembra completo.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1109,4 +1165,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.report.spam": "スパムまたは広告",
   "gym.report.offensive": "名前が不快",
   "gym.report.thanks": "ありがとうございます。確認します。",
+  "gym.edit.poster": "ポスターと卓上スタンド",
+  "gym.edit.posterNote": "ポスターと卓上スタンド用カードを置けば、利用者はスキャンひとつでジムを追加できます。",
+  "gym.edit.posterPrint": "無料ポスターを印刷",
+  "gym.edit.standLocked": "Liftsmith の利用者が 20 人に達すると、アクリル製の卓上スタンドを無料でお送りします。現在 {count} 人。",
+  "gym.edit.standAsk": "利用者が 20 人を超えたので、アクリル製の卓上スタンドを無料でお送りします。",
+  "gym.edit.standAddress": "郵便番号を含む住所",
+  "gym.edit.standSend": "スタンドを送ってもらう",
+  "gym.edit.standAsked": "ご依頼を受け付けました。印刷してまもなく発送します。",
+  "gym.edit.standShipped": "スタンドを発送しました。",
+  "gym.edit.standErr": "住所が不完全なようです。",
 };

@@ -44,6 +44,8 @@ const OWNED = {
   phone: "",
   description: "",
   code: "",
+  address: "1 Iron Way\nLangley BC",
+  lifters: 24,
 };
 const ops: Record<string, unknown>[] = [];
 let claimed = false;
@@ -72,6 +74,8 @@ beforeEach(async () => {
         case "claimVerify":
           claimed = body.code === "123456";
           return claimed ? Response.json({ place: PLACE.id }) : Response.json({ error: "wrong" }, { status: 400 });
+        case "posterStatus":
+          return Response.json({ order: null });
         case "owned":
           return Response.json({ gyms: claimed ? [OWNED] : [] });
         default:
@@ -138,6 +142,16 @@ describe("claiming a gym", () => {
     await user.click(screen.getByRole("button", { name: "Save" }));
     expect(await screen.findByText(/^Saved/)).toBeInTheDocument();
     expect(ops.at(-1)).toMatchObject({ op: "edit", place: PLACE.id, hours: "24/7", website: "https://www.ironworks.ca" });
+
+    // The free poster, and a stand once 20 lifters train here.
+    expect(screen.getByRole("link", { name: /Print your free poster/ })).toHaveAttribute(
+      "href",
+      "https://www.getliftsmith.com/gyms/langley-bc/iron-works/poster/",
+    );
+    expect(screen.getByLabelText("Mailing address, with the postal code")).toHaveValue("1 Iron Way\nLangley BC");
+    await user.click(screen.getByRole("button", { name: "Mail me a stand" }));
+    expect(await screen.findByText(/We’ve got your request/)).toBeInTheDocument();
+    expect(ops.at(-1)).toMatchObject({ op: "posters", place: PLACE.id, items: "stand", address: "1 Iron Way\nLangley BC" });
   });
 
   it("sends a claim from another address to our team", async () => {

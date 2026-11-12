@@ -51,6 +51,29 @@ export const en = {
   "gp.ctaBody":
     "Liftsmith plans every workout from your gym’s equipment, your recovery and your time, then logs each set in one tap. Free to start, no ads, ever.",
   "gp.updated": "Updated {date}",
+  "gp.print.headline": "Add this gym to your Liftsmith",
+  "gp.print.sub": "Scan to add {name} with its equipment and weights already set up. Your workouts are planned around what this gym has.",
+  "gp.print.scan": "Scan with your phone’s camera",
+  "gp.print.step1": "Scan the code",
+  "gp.print.step2": "Tap {add}",
+  "gp.print.step3": "Lift with a plan that fits this gym",
+  "gp.print.free": "Free to start, no ads, ever",
+  "gp.print.letterHello": "Hello from Liftsmith",
+  "gp.print.letterBody":
+    "In this envelope is a poster and a table stand for {name}. Lifters who scan the code add your gym to Liftsmith with its equipment, and the app plans their workouts around it.",
+  "gp.print.letterClaim":
+    "Make {name} official: open Liftsmith, find your gym (or scan the poster), tap “{claim}”, and type this code under “{poster}”:",
+  "gp.print.letterWhy":
+    "Official gyms get a check mark, show first for lifters nearby, and keep their own hours, contact details and equipment up to date. It’s free. The code works once, so keep this letter away from the poster.",
+  "gp.print.letterOfficial":
+    "{name} is already official, so there’s nothing to claim. Keep your hours and equipment up to date from the app.",
+  "gp.print.letterThanks": "Thanks for having us in your gym.",
+  "gp.print.help":
+    "Print the poster and table stand inserts on your own printer at 100% scale. Cut the 4 × 6 in inserts along the dashed lines to fit a standard acrylic sign holder.",
+  "gp.print.back": "Back to the gym’s page",
+  "gp.posterTitle": "Work here?",
+  "gp.posterBody": "Print a free poster and table stand card so lifters can add this gym with one scan.",
+  "gp.posterLink": "Print a free poster",
 } as const;
 
 type Key = keyof typeof en;
@@ -103,6 +126,31 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.ctaBody":
     "Liftsmith planifica cada entrenamiento según el equipamiento de tu gimnasio, tu recuperación y tu tiempo, y registra cada serie con un toque. Gratis para empezar y sin anuncios, nunca.",
   "gp.updated": "Actualizado el {date}",
+  "gp.print.headline": "Añade este gimnasio a tu Liftsmith",
+  "gp.print.sub":
+    "Escanea para añadir {name} con su equipamiento y pesos ya configurados. Tus entrenamientos se planifican con lo que tiene este gimnasio.",
+  "gp.print.scan": "Escanea con la cámara del móvil",
+  "gp.print.step1": "Escanea el código",
+  "gp.print.step2": "Toca «{add}»",
+  "gp.print.step3": "Entrena con un plan hecho para este gimnasio",
+  "gp.print.free": "Gratis para empezar, sin anuncios, nunca",
+  "gp.print.letterHello": "Hola desde Liftsmith",
+  "gp.print.letterBody":
+    "En este sobre hay un póster y un expositor de mesa para {name}. Quien escanee el código añade tu gimnasio a Liftsmith con su equipamiento, y la app planifica sus entrenamientos con él.",
+  "gp.print.letterClaim":
+    "Haz oficial {name}: abre Liftsmith, busca tu gimnasio (o escanea el póster), toca «{claim}» y escribe este código en «{poster}»:",
+  "gp.print.letterWhy":
+    "Los gimnasios oficiales llevan una marca de verificación, salen primero para quien busca cerca y mantienen al día su horario, contacto y equipamiento. Es gratis. El código sirve una sola vez, así que guarda esta carta lejos del póster.",
+  "gp.print.letterOfficial":
+    "{name} ya es oficial, así que no hay nada que reclamar. Mantén al día el horario y el equipamiento desde la app.",
+  "gp.print.letterThanks": "Gracias por recibirnos en tu gimnasio.",
+  "gp.print.help":
+    "Imprime el póster y las tarjetas del expositor de mesa en tu impresora al 100 %. Recorta las tarjetas de 10 × 15 cm por las líneas discontinuas para un portacarteles acrílico estándar.",
+  "gp.print.back": "Volver a la página del gimnasio",
+  "gp.posterTitle": "¿Trabajas aquí?",
+  "gp.posterBody":
+    "Imprime gratis un póster y una tarjeta para el expositor de mesa, para que la gente añada este gimnasio con un escaneo.",
+  "gp.posterLink": "Imprimir un póster gratis",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -155,6 +203,30 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.ctaBody":
     "Liftsmith prévoit chaque séance selon l’équipement de votre salle, votre récupération et votre temps, puis enregistre chaque série d’un geste. Gratuit pour commencer, sans publicité, jamais.",
   "gp.updated": "Mis à jour le {date}",
+  "gp.print.headline": "Ajoutez cette salle à votre Liftsmith",
+  "gp.print.sub":
+    "Scannez pour ajouter {name} avec son équipement et ses poids déjà configurés. Vos séances sont planifiées selon ce qu’offre cette salle.",
+  "gp.print.scan": "Scannez avec l’appareil photo de votre téléphone",
+  "gp.print.step1": "Scannez le code",
+  "gp.print.step2": "Touchez « {add} »",
+  "gp.print.step3": "Entraînez-vous avec un plan adapté à cette salle",
+  "gp.print.free": "Gratuit pour commencer, jamais de publicité",
+  "gp.print.letterHello": "Bonjour de la part de Liftsmith",
+  "gp.print.letterBody":
+    "Cette enveloppe contient une affiche et un présentoir de table pour {name}. Les personnes qui scannent le code ajoutent votre salle à Liftsmith avec son équipement, et l’application planifie leurs séances en conséquence.",
+  "gp.print.letterClaim":
+    "Rendez {name} officielle : ouvrez Liftsmith, trouvez votre salle (ou scannez l’affiche), touchez « {claim} » et saisissez ce code sous « {poster} » :",
+  "gp.print.letterWhy":
+    "Les salles officielles ont une coche, apparaissent en premier pour les gens à proximité et gardent leurs horaires, coordonnées et équipement à jour. C’est gratuit. Le code ne sert qu’une fois : gardez cette lettre loin de l’affiche.",
+  "gp.print.letterOfficial":
+    "{name} est déjà officielle, il n’y a donc rien à réclamer. Gardez vos horaires et votre équipement à jour depuis l’application.",
+  "gp.print.letterThanks": "Merci de nous accueillir dans votre salle.",
+  "gp.print.help":
+    "Imprimez l’affiche et les cartes du présentoir de table sur votre imprimante à 100 %. Découpez les cartes de 10 × 15 cm le long des pointillés pour un porte-affiche en acrylique standard.",
+  "gp.print.back": "Retour à la page de la salle",
+  "gp.posterTitle": "Vous travaillez ici ?",
+  "gp.posterBody": "Imprimez gratuitement une affiche et une carte de présentoir pour que les gens ajoutent cette salle en un scan.",
+  "gp.posterLink": "Imprimer une affiche gratuite",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -207,6 +279,31 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.ctaBody":
     "Liftsmith plant jedes Workout nach den Geräten deines Studios, deiner Erholung und deiner Zeit und speichert jeden Satz mit einem Tippen. Kostenlos zum Start, niemals Werbung.",
   "gp.updated": "Aktualisiert am {date}",
+  "gp.print.headline": "Füge dieses Studio zu deinem Liftsmith hinzu",
+  "gp.print.sub":
+    "Scannen und {name} mit fertig eingerichteten Geräten und Gewichten hinzufügen. Deine Trainings werden nach der Ausstattung dieses Studios geplant.",
+  "gp.print.scan": "Mit der Handykamera scannen",
+  "gp.print.step1": "Code scannen",
+  "gp.print.step2": "Auf „{add}“ tippen",
+  "gp.print.step3": "Mit einem Plan trainieren, der zu diesem Studio passt",
+  "gp.print.free": "Kostenlos starten, niemals Werbung",
+  "gp.print.letterHello": "Hallo von Liftsmith",
+  "gp.print.letterBody":
+    "In diesem Umschlag sind ein Poster und ein Tischaufsteller für {name}. Wer den Code scannt, fügt dein Studio mit seiner Ausstattung zu Liftsmith hinzu, und die App plant die Trainings danach.",
+  "gp.print.letterClaim":
+    "Mach {name} offiziell: Öffne Liftsmith, such dein Studio (oder scanne das Poster), tippe auf „{claim}“ und gib diesen Code unter „{poster}“ ein:",
+  "gp.print.letterWhy":
+    "Offizielle Studios bekommen ein Häkchen, erscheinen in der Nähe zuerst und halten Öffnungszeiten, Kontaktdaten und Ausstattung selbst aktuell. Es ist kostenlos. Der Code funktioniert nur einmal, bewahre diesen Brief also nicht beim Poster auf.",
+  "gp.print.letterOfficial":
+    "{name} ist bereits offiziell, es gibt also nichts zu beanspruchen. Halte Öffnungszeiten und Ausstattung in der App aktuell.",
+  "gp.print.letterThanks": "Danke, dass wir in deinem Studio sein dürfen.",
+  "gp.print.help":
+    "Drucke das Poster und die Karten für den Tischaufsteller auf deinem eigenen Drucker in 100 % Größe. Schneide die 10 × 15 cm großen Karten entlang der gestrichelten Linien für einen üblichen Acrylaufsteller zu.",
+  "gp.print.back": "Zurück zur Seite des Studios",
+  "gp.posterTitle": "Arbeitest du hier?",
+  "gp.posterBody":
+    "Drucke kostenlos ein Poster und eine Karte für den Tischaufsteller, damit Trainierende dieses Studio mit einem Scan hinzufügen.",
+  "gp.posterLink": "Kostenloses Poster drucken",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -257,6 +354,31 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.ctaBody":
     "Liftsmith pianifica ogni allenamento in base agli attrezzi della tua palestra, al recupero e al tempo, poi registra ogni serie con un tocco. Gratis per iniziare, mai pubblicità.",
   "gp.updated": "Aggiornato il {date}",
+  "gp.print.headline": "Aggiungi questa palestra al tuo Liftsmith",
+  "gp.print.sub":
+    "Scansiona per aggiungere {name} con attrezzatura e pesi già configurati. I tuoi allenamenti vengono pianificati in base a ciò che ha questa palestra.",
+  "gp.print.scan": "Scansiona con la fotocamera del telefono",
+  "gp.print.step1": "Scansiona il codice",
+  "gp.print.step2": "Tocca «{add}»",
+  "gp.print.step3": "Allenati con un piano adatto a questa palestra",
+  "gp.print.free": "Gratis per iniziare, mai pubblicità",
+  "gp.print.letterHello": "Ciao da Liftsmith",
+  "gp.print.letterBody":
+    "In questa busta ci sono un poster e un espositore da tavolo per {name}. Chi scansiona il codice aggiunge la tua palestra a Liftsmith con la sua attrezzatura, e l’app pianifica gli allenamenti di conseguenza.",
+  "gp.print.letterClaim":
+    "Rendi ufficiale {name}: apri Liftsmith, trova la tua palestra (o scansiona il poster), tocca «{claim}» e scrivi questo codice in «{poster}»:",
+  "gp.print.letterWhy":
+    "Le palestre ufficiali hanno un segno di spunta, compaiono per prime a chi cerca nelle vicinanze e tengono aggiornati orari, contatti e attrezzatura. È gratis. Il codice funziona una sola volta, quindi tieni questa lettera lontana dal poster.",
+  "gp.print.letterOfficial":
+    "{name} è già ufficiale, quindi non c’è niente da rivendicare. Tieni aggiornati orari e attrezzatura dall’app.",
+  "gp.print.letterThanks": "Grazie per averci nella tua palestra.",
+  "gp.print.help":
+    "Stampa il poster e le schede per l’espositore da tavolo con la tua stampante al 100 %. Ritaglia le schede da 10 × 15 cm lungo le linee tratteggiate per un normale portadepliant in acrilico.",
+  "gp.print.back": "Torna alla pagina della palestra",
+  "gp.posterTitle": "Lavori qui?",
+  "gp.posterBody":
+    "Stampa gratis un poster e una scheda per l’espositore da tavolo, così chi si allena aggiunge questa palestra con una scansione.",
+  "gp.posterLink": "Stampa un poster gratis",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -307,4 +429,26 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.ctaBody":
     "Liftsmith はジムの器具、回復、時間からワークアウトを組み、各セットをワンタップで記録します。無料で始められ、広告は一切ありません。",
   "gp.updated": "{date} 更新",
+  "gp.print.headline": "このジムを Liftsmith に追加",
+  "gp.print.sub": "スキャンすると、{name}を器具と重量が設定済みの状態で追加できます。ワークアウトはこのジムの設備に合わせて組まれます。",
+  "gp.print.scan": "スマートフォンのカメラでスキャン",
+  "gp.print.step1": "コードをスキャン",
+  "gp.print.step2": "「{add}」をタップ",
+  "gp.print.step3": "このジムに合ったプランでトレーニング",
+  "gp.print.free": "無料で始められ、広告は一切なし",
+  "gp.print.letterHello": "Liftsmith からのご挨拶",
+  "gp.print.letterBody":
+    "この封筒には{name}用のポスターと卓上スタンドが入っています。コードをスキャンした人は器具ごとジムを Liftsmith に追加でき、アプリがそれに合わせてワークアウトを組みます。",
+  "gp.print.letterClaim":
+    "{name}を公式にするには、Liftsmith を開いてジムを探し（またはポスターをスキャンし）、「{claim}」をタップして、「{poster}」にこのコードを入力してください：",
+  "gp.print.letterWhy":
+    "公式ジムにはチェックマークが付き、近くの利用者に最初に表示され、営業時間・連絡先・器具を自分で最新に保てます。無料です。コードは一度しか使えないので、この手紙はポスターとは別に保管してください。",
+  "gp.print.letterOfficial": "{name}はすでに公式なので、申請は不要です。営業時間と器具はアプリから最新に保ってください。",
+  "gp.print.letterThanks": "ジムに置かせていただき、ありがとうございます。",
+  "gp.print.help":
+    "ポスターと卓上スタンド用カードをお手元のプリンターで等倍（100%）で印刷してください。10 × 15 cm のカードは点線に沿って切り、一般的なアクリルスタンドに入れてください。",
+  "gp.print.back": "ジムのページに戻る",
+  "gp.posterTitle": "ここで働いていますか？",
+  "gp.posterBody": "無料のポスターと卓上スタンド用カードを印刷すれば、利用者はスキャンひとつでこのジムを追加できます。",
+  "gp.posterLink": "無料ポスターを印刷",
 };

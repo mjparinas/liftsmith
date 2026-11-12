@@ -50,6 +50,7 @@ const nextConfig: NextConfig = {
           { source: "/gyms/", destination: "/api/gyms/page/" },
           { source: "/gyms/:city/", destination: "/api/gyms/page/?city=:city" },
           { source: "/gyms/:city/:gym/", destination: "/api/gyms/page/?city=:city&gym=:gym" },
+          { source: "/gyms/:city/:gym/poster/", destination: "/api/gyms/page/?city=:city&gym=:gym&poster=1" },
           { source: "/sitemap-gyms.xml", destination: "/api/gyms/sitemap/" },
         ],
       }),
