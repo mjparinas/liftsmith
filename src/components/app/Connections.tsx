@@ -7,7 +7,7 @@
 import { useEffect, useRef, useState } from "react";
 
 import { platform, useAccount } from "@/lib/auth";
-import { CLOUD, type Cloud } from "@/lib/cloud";
+import { CLOUD, type Cloud, type CloudStatus } from "@/lib/cloud";
 import {
   CLOUD_NAME,
   connectCloud,
@@ -370,10 +370,17 @@ function CloudRow({ p }: { p: Cloud }) {
 /** Sonos is a lab (labSonos): its card shows once the lab is on, or while it's still connected, so it can be removed. */
 const shownClouds = (sonosLinked: boolean) => CLOUD.filter((p) => p !== "sonos" || labOn("labSonos") || sonosLinked);
 
+/** Services that can be connected (or already are) come first; "Coming soon" ones go to the bottom, each group in CLOUD order. */
+function availableFirst(list: Cloud[], status: CloudStatus | null): Cloud[] {
+  const usable = (p: Cloud) => !!status?.linked[p] || !!status?.ready[p];
+  return [...list.filter(usable), ...list.filter((p) => !usable(p))];
+}
+
 function CloudCards() {
   const account = useAccount((s) => s.account);
   const error = useCloud((s) => s.error);
-  const sonosLinked = useCloud((s) => !!s.status?.linked.sonos);
+  const status = useCloud((s) => s.status);
+  const sonosLinked = !!status?.linked.sonos;
   useEffect(() => {
     void refreshCloud();
     const back = () => {
@@ -398,7 +405,7 @@ function CloudCards() {
         </p>
       )}
       {account ? (
-        shownClouds(sonosLinked).map((p) => <CloudRow key={p} p={p} />)
+        availableFirst(shownClouds(sonosLinked), status).map((p) => <CloudRow key={p} p={p} />)
       ) : (
         <ul className="mt-3 space-y-1 px-1 text-sm text-muted">
           {shownClouds(sonosLinked).map((p) => (

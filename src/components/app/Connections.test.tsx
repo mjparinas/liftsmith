@@ -61,4 +61,24 @@ describe("Connected apps on the web", () => {
     expect(screen.getByRole("button", { name: "Disconnect" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Connect" })).toBeInTheDocument();
   });
+
+  it("signed in: services that can connect come first, coming soon ones go to the bottom", async () => {
+    const account = { token: "tok", id: "a1", email: "me@example.com", providers: ["email"], via: "email" as const };
+    localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
+    useAccount.setState({ account });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        Response.json({
+          ready: { strava: false, oura: false, whoop: false, withings: false, polar: true, concept2: false },
+          linked: { concept2: { since: Date.now() } },
+        }),
+      ),
+    );
+    render(<Connections />);
+    await screen.findByRole("button", { name: "Disconnect" });
+    const names = ["Strava", "Oura", "WHOOP", "Withings", "Polar", "Concept2"];
+    const titles = screen.getAllByText((_, el) => el?.tagName === "P" && names.includes(el.textContent ?? "")).map((el) => el.textContent);
+    expect(titles).toEqual(["Polar", "Concept2", "Strava", "Oura", "WHOOP", "Withings"]);
+  });
 });
