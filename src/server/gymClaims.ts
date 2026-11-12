@@ -218,12 +218,22 @@ export interface OwnedGym {
   /** The map's address, to start the stand's mailing address. */
   address: string;
   lifters: number;
+  /** The owner's results: lifters who added the gym in the last 30 days, and poster or stand scans (all time, 30 days). */
+  newLifters: number;
+  scans: number;
+  scans30: number;
 }
 
-export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
+export async function ownedGyms(accountId: string, now = Date.now()): Promise<OwnedGym[]> {
+  // With the owner's results for the last 30 days: lifters who added the gym and poster or stand scans.
+  const since = now - 30 * 86_400_000;
   const rows = await query(
-    "SELECT id, name, city_slug, slug, address, city, region, hours, website, phone, description, code, lifters FROM gym_places WHERE claimed_by = ? ORDER BY name",
-    [accountId],
+    `SELECT p.id, p.name, p.city_slug, p.slug, p.address, p.city, p.region, p.hours, p.website, p.phone, p.description, p.code, p.lifters,
+       p.qr_scans,
+       (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
+       (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30
+     FROM gym_places p WHERE p.claimed_by = ? ORDER BY p.name`,
+    [since, Math.floor(since / 86_400_000), accountId],
   );
   return rows.map((r) => ({
     id: s(r.id),
@@ -237,6 +247,9 @@ export async function ownedGyms(accountId: string): Promise<OwnedGym[]> {
     code: s(r.code),
     address: [s(r.address), [s(r.city), s(r.region)].filter(Boolean).join(" ")].filter(Boolean).join("\n"),
     lifters: n(r.lifters),
+    newLifters: n(r.new_lifters),
+    scans: n(r.qr_scans),
+    scans30: n(r.scans_30),
   }));
 }
 

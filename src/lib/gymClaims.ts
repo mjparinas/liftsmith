@@ -19,6 +19,10 @@ export interface OwnedGym {
   code: string;
   address: string;
   lifters: number;
+  /** The owner's results: lifters who added the gym in the last 30 days, and poster or stand scans (all time, 30 days). */
+  newLifters: number;
+  scans: number;
+  scans30: number;
 }
 
 /** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */

@@ -246,7 +246,7 @@ export const fr: FeaturesText = {
     },
     "gym-finder": {
       name: "Recherche de salles et pages de salle",
-      body: "Trouvez des salles près de chez vous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle. Une salle manque ? Ajoutez-la.",
+      body: "Trouvez des salles près de chez vous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite.",
     },
     "buy-next": {
       name: "Quoi acheter ensuite",

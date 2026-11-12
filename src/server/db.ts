@@ -510,6 +510,13 @@ const SCHEMA = [
       `UPDATE OR IGNORE gym_places SET region = '${code}', city_slug = substr(city_slug, 1, length(city_slug) - ${regionSlug(name).length}) || '${code.toLowerCase()}' WHERE region = '${name}' AND city_slug LIKE '%-${regionSlug(name)}'`,
   ),
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
+  // Poster and stand QR visits per gym and day (gymPosters.ts countScan), for the owner's last 30 days.
+  `CREATE TABLE IF NOT EXISTS gym_scan_days (
+    place_id TEXT NOT NULL,
+    day INTEGER NOT NULL,
+    n INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (place_id, day)
+  )`,
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
     who TEXT NOT NULL,

@@ -133,6 +133,8 @@ export function GymEdit({ id }: { id?: string }) {
     <div className="pb-2">
       <ScreenHeader title={t("gym.edit.title")} kicker={gym.name} back={{ label: t("gym.back"), onClick: goBack }} />
 
+      <Results gym={gym} />
+
       <Section title={t("gp.hours")}>
         <SwitchRow label={t("gp.allDay")} on={allDay} onChange={setAllDay} />
         {!allDay && (
@@ -250,6 +252,41 @@ export function GymEdit({ id }: { id?: string }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * How the gym is doing, and the one thing to do next (AGENTS.md "Action over stats"): lifters in all, new ones and
+ * poster scans in the last 30 days, then the first step that's missing: hours, equipment, the poster, the 20 lifters a
+ * mailed stand needs, or keeping the stand where members check in.
+ */
+function Results({ gym }: { gym: OwnedGym }) {
+  const next = !gym.hours
+    ? t("gym.edit.next.hours")
+    : !gym.code
+      ? t("gym.edit.next.kit")
+      : gym.scans30 === 0
+        ? t("gym.edit.next.poster")
+        : gym.lifters < STAND_MIN_LIFTERS
+          ? t("gym.edit.next.stand", { count: STAND_MIN_LIFTERS - gym.lifters })
+          : t("gym.edit.next.keep");
+  const tile = (value: number, label: string) => (
+    <div className="card p-3 text-center">
+      <p className="display text-2xl">{num(value)}</p>
+      <p className="text-xs text-muted">{label}</p>
+    </div>
+  );
+  return (
+    <Section title={t("gym.edit.results")}>
+      <div className="grid grid-cols-3 gap-2">
+        {tile(gym.lifters, t("gym.edit.res.lifters"))}
+        {tile(gym.newLifters, t("gym.edit.res.new"))}
+        {tile(gym.scans30, t("gym.edit.res.scans"))}
+      </div>
+      <p className="card card-tint mt-3 p-3 text-sm" style={{ ["--tint" as string]: "var(--color-accent)" }}>
+        {next}
+      </p>
+    </Section>
   );
 }
 

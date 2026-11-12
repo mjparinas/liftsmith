@@ -209,6 +209,18 @@ export const en = {
   "gym.new.err.where": "We couldn't find that address on the map. Check the spelling, or add the province or state.",
   "gym.new.err.exists": "That gym is already on Liftsmith, or waiting for us to check it. Try Find gyms near you.",
   "gym.new.err.slow": "You've added a few gyms today. Try again tomorrow.",
+  "gym.edit.results": "Last 30 days",
+  "gym.edit.res.lifters": "Lifters in all",
+  "gym.edit.res.new": "New lifters",
+  "gym.edit.res.scans": "Poster scans",
+  "gym.edit.next.hours": "Next: add your opening hours below, so lifters know when to come.",
+  "gym.edit.next.kit": "Next: set your equipment below, so lifters who add your gym start with the right gear.",
+  "gym.edit.next.poster": "Next: print the poster and put it up by the front desk. Lifters scan it to add your gym.",
+  "gym.edit.next.stand": {
+    one: "Next: 1 more lifter and we'll mail you a free table stand.",
+    other: "Next: {count} more lifters and we'll mail you a free table stand.",
+  },
+  "gym.edit.next.keep": "Keep the poster and stand where members check in, and ask new members to scan it when they join.",
 } as const;
 
 type Key = keyof typeof en;
@@ -423,6 +435,20 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.new.err.where": "No encontramos esa dirección en el mapa. Revisa cómo está escrita o añade la provincia o el estado.",
   "gym.new.err.exists": "Ese gimnasio ya está en Liftsmith o pendiente de revisión. Prueba con Buscar gimnasios cerca.",
   "gym.new.err.slow": "Hoy ya has añadido varios gimnasios. Vuelve a intentarlo mañana.",
+  "gym.edit.results": "Últimos 30 días",
+  "gym.edit.res.lifters": "Atletas en total",
+  "gym.edit.res.new": "Atletas nuevos",
+  "gym.edit.res.scans": "Escaneos del cartel",
+  "gym.edit.next.hours": "Siguiente paso: añade tu horario abajo, para que los atletas sepan cuándo ir.",
+  "gym.edit.next.kit": "Siguiente paso: indica tu equipamiento abajo, para que quien añada tu gimnasio empiece con el material correcto.",
+  "gym.edit.next.poster":
+    "Siguiente paso: imprime el cartel y ponlo junto a la recepción. Los atletas lo escanean para añadir tu gimnasio.",
+  "gym.edit.next.stand": {
+    one: "Siguiente paso: 1 atleta más y te enviaremos un expositor de mesa gratis.",
+    other: "Siguiente paso: {count} atletas más y te enviaremos un expositor de mesa gratis.",
+  },
+  "gym.edit.next.keep":
+    "Deja el cartel y el expositor donde los socios registran su entrada, y pide a los nuevos que lo escaneen al apuntarse.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -642,6 +668,21 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.new.err.where": "Cette adresse est introuvable sur la carte. Vérifiez l'orthographe ou ajoutez la province ou l'État.",
   "gym.new.err.exists": "Cette salle est déjà sur Liftsmith, ou en attente de vérification. Essayez Trouver des salles à proximité.",
   "gym.new.err.slow": "Vous avez déjà ajouté plusieurs salles aujourd'hui. Réessayez demain.",
+  "gym.edit.results": "30 derniers jours",
+  "gym.edit.res.lifters": "Sportifs au total",
+  "gym.edit.res.new": "Nouveaux sportifs",
+  "gym.edit.res.scans": "Scans de l’affiche",
+  "gym.edit.next.hours": "Prochaine étape : ajoutez vos horaires ci-dessous, pour que les sportifs sachent quand venir.",
+  "gym.edit.next.kit":
+    "Prochaine étape : indiquez votre matériel ci-dessous, pour que ceux qui ajoutent votre salle partent avec le bon équipement.",
+  "gym.edit.next.poster":
+    "Prochaine étape : imprimez l’affiche et placez-la près de l’accueil. Les sportifs la scannent pour ajouter votre salle.",
+  "gym.edit.next.stand": {
+    one: "Prochaine étape : encore 1 sportif et nous vous enverrons un présentoir de table gratuit.",
+    other: "Prochaine étape : encore {count} sportifs et nous vous enverrons un présentoir de table gratuit.",
+  },
+  "gym.edit.next.keep":
+    "Gardez l’affiche et le présentoir là où les membres arrivent, et demandez aux nouveaux de le scanner à l’inscription.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -863,6 +904,21 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.new.err.exists":
     "Dieses Studio ist schon bei Liftsmith oder wartet auf unsere Prüfung. Versuch es mit „Studios in der Nähe finden“.",
   "gym.new.err.slow": "Du hast heute schon einige Studios hinzugefügt. Versuch es morgen wieder.",
+  "gym.edit.results": "Letzte 30 Tage",
+  "gym.edit.res.lifters": "Sportler insgesamt",
+  "gym.edit.res.new": "Neue Sportler",
+  "gym.edit.res.scans": "Plakat-Scans",
+  "gym.edit.next.hours": "Nächster Schritt: Trag unten deine Öffnungszeiten ein, damit Sportler wissen, wann sie kommen können.",
+  "gym.edit.next.kit":
+    "Nächster Schritt: Leg unten deine Ausstattung fest, damit alle, die dein Studio hinzufügen, mit der richtigen Ausrüstung starten.",
+  "gym.edit.next.poster":
+    "Nächster Schritt: Druck das Plakat aus und häng es an den Empfang. Sportler scannen es, um dein Studio hinzuzufügen.",
+  "gym.edit.next.stand": {
+    one: "Nächster Schritt: Noch 1 Sportler, dann schicken wir dir einen kostenlosen Tischaufsteller.",
+    other: "Nächster Schritt: Noch {count} Sportler, dann schicken wir dir einen kostenlosen Tischaufsteller.",
+  },
+  "gym.edit.next.keep":
+    "Lass Plakat und Aufsteller dort, wo Mitglieder einchecken, und bitte neue Mitglieder, ihn bei der Anmeldung zu scannen.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1078,6 +1134,20 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.new.err.where": "Non troviamo quell'indirizzo sulla mappa. Controlla come è scritto o aggiungi la provincia o lo stato.",
   "gym.new.err.exists": "Quella palestra è già su Liftsmith o in attesa del nostro controllo. Prova con Trova palestre vicine.",
   "gym.new.err.slow": "Oggi hai già aggiunto diverse palestre. Riprova domani.",
+  "gym.edit.results": "Ultimi 30 giorni",
+  "gym.edit.res.lifters": "Atleti in tutto",
+  "gym.edit.res.new": "Nuovi atleti",
+  "gym.edit.res.scans": "Scansioni del poster",
+  "gym.edit.next.hours": "Prossimo passo: aggiungi gli orari qui sotto, così gli atleti sanno quando venire.",
+  "gym.edit.next.kit":
+    "Prossimo passo: indica l’attrezzatura qui sotto, così chi aggiunge la tua palestra parte con l’attrezzatura giusta.",
+  "gym.edit.next.poster":
+    "Prossimo passo: stampa il poster e mettilo vicino alla reception. Gli atleti lo scansionano per aggiungere la tua palestra.",
+  "gym.edit.next.stand": {
+    one: "Prossimo passo: ancora 1 atleta e ti spediremo un espositore da tavolo gratis.",
+    other: "Prossimo passo: ancora {count} atleti e ti spediremo un espositore da tavolo gratis.",
+  },
+  "gym.edit.next.keep": "Tieni poster ed espositore dove i soci fanno il check-in, e chiedi ai nuovi di scansionarlo quando si iscrivono.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1282,4 +1352,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.new.err.where": "その住所が地図で見つかりませんでした。表記を確認するか、都道府県（州）を加えてください。",
   "gym.new.err.exists": "そのジムはすでにLiftsmithにあるか、確認待ちです。「近くのジムを探す」をお試しください。",
   "gym.new.err.slow": "今日はすでにいくつかジムを追加しています。明日もう一度お試しください。",
+  "gym.edit.results": "過去30日",
+  "gym.edit.res.lifters": "利用者の合計",
+  "gym.edit.res.new": "新しい利用者",
+  "gym.edit.res.scans": "ポスターのスキャン",
+  "gym.edit.next.hours": "次のステップ：下で営業時間を追加すると、利用者がいつ来ればよいか分かります。",
+  "gym.edit.next.kit": "次のステップ：下で器具を設定すると、ジムを追加した人が正しい器具で始められます。",
+  "gym.edit.next.poster": "次のステップ：ポスターを印刷して受付の近くに貼りましょう。利用者がスキャンしてジムを追加します。",
+  "gym.edit.next.stand": { other: "次のステップ：あと{count}人で、卓上スタンドを無料でお送りします。" },
+  "gym.edit.next.keep": "ポスターとスタンドは会員がチェックインする場所に置き、新しい会員に入会時にスキャンしてもらいましょう。",
 };

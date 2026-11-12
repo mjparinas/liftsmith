@@ -19,7 +19,8 @@ import {
   startClaim,
   verifyClaim,
 } from "./gymClaims";
-import { placeById, placesFromOsm, savePlaces } from "./gymPlaces";
+import { joinPlace, placeById, placesFromOsm, savePlaces } from "./gymPlaces";
+import { countScan } from "./gymPosters";
 
 const NOW = 1_800_000_000_000;
 let gymId = "";
@@ -157,6 +158,7 @@ describe("the owner's details", () => {
       }),
     ).toEqual({ ok: true });
     const [mine] = await ownedGyms("acc-maria");
+    expect(mine).toMatchObject({ lifters: 0, newLifters: 0, scans: 0, scans30: 0 });
     expect(mine).toMatchObject({ hours: "Mo-Fr 05:00-23:00; Sa,Su 07:00-20:00", phone: "604-555-0199", description: "Six racks." });
     const p = (await placeById(gymId))!;
     expect(p.code).toBeTruthy();
@@ -170,5 +172,20 @@ describe("the owner's details", () => {
     expect((await placeById(gymId))!.official).toBe(false);
     await deleteAccount("acc-maria", async () => null);
     expect((await placeById(otherId))!.official).toBe(false);
+  });
+});
+
+describe("the owner's results", () => {
+  it("counts lifters who added the gym and poster scans in the last 30 days", async () => {
+    await run("UPDATE gym_places SET claimed_by = 'acc-maria' WHERE id = ?", [gymId]);
+    const DAY = 86_400_000;
+    await joinPlace("acc:old", gymId, NOW - 40 * DAY);
+    await joinPlace("acc:new", gymId, NOW - 2 * DAY);
+    await countScan(gymId, "a", NOW - 40 * DAY);
+    await countScan(gymId, "a", NOW - 1 * DAY);
+    await countScan(gymId, "b", NOW - 1 * DAY);
+    await countScan(gymId, "b", NOW - 1 * DAY);
+    const [mine] = await ownedGyms("acc-maria", NOW);
+    expect(mine).toMatchObject({ lifters: 2, newLifters: 1, scans: 3, scans30: 2 });
   });
 });
