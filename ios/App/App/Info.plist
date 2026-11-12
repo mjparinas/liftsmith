@@ -82,7 +82,7 @@
 	<key>NSMotionUsageDescription</key>
 	<string>Liftsmith can count your reps from this iPhone's motion sensors while you lift.</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts, and to Bluetooth gym machines to fill in your cardio.</string>
+	<string>Liftsmith connects to your heart rate strap or watch to show live heart rate during workouts, to Bluetooth gym machines to fill in your cardio, and to your Bluetooth scale to fill in your weigh-in.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Liftsmith uses your approximate location when you open the app to pick the gym you're at. It never tracks you in the background and your location stays on your phone.</string>
 	<key>NSLocationDefaultAccuracyReduced</key>

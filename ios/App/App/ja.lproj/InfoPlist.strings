@@ -1,6 +1,6 @@
 /* Japanese permission prompts. Keep in step with Info.plist. */
 "NSCameraUsageDescription" = "進捗写真を撮るため、またオンにした場合はレップ数を数えるために使います。写真はこの iPhone に保存され、アップロードされることはありません。レップのカウントは映像をこの iPhone 上で解析し、録画や送信は一切しません。";
-"NSBluetoothAlwaysUsageDescription" = "Liftsmith は心拍計ベルトやウォッチに接続してトレーニング中の心拍数をリアルタイムで表示し、Bluetooth ジムマシンに接続して有酸素運動を自動で入力します。";
+"NSBluetoothAlwaysUsageDescription" = "Liftsmith は心拍計ベルトやウォッチに接続してトレーニング中の心拍数をリアルタイムで表示し、Bluetooth ジムマシンに接続して有酸素運動を、Bluetooth 体重計に接続して体重を自動で入力します。";
 "NSLocationWhenInUseUsageDescription" = "Liftsmith はアプリを開いたときにおおよその位置情報を使い、今いるジムを選びます。バックグラウンドで追跡することはなく、位置情報はこの iPhone から出ません。";
 "NSHealthShareUsageDescription" = "Liftsmith は体重、身長、性別、生年月日、体脂肪率、安静時心拍数、睡眠、心拍変動、歩数、VO2 Max、呼吸数、食事アプリが記録したカロリーとたんぱく質を読み取り、トレーニングの計画、体重記録と1日の消費カロリーの更新、回復状態の表示、食事についてのアドバイスに使います。";
 "NSHealthUpdateUsageDescription" = "Liftsmith は完了したワークアウトをカロリーと心拍数とともにヘルスケアに保存します。";
