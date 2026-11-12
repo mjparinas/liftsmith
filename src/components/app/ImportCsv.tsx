@@ -12,10 +12,17 @@ import type { Unit } from "@/lib/types";
 
 import { Button, Chip, Sheet } from "./ui";
 
-// Settings › Data › Import workouts: a CSV from Strong, Hevy or Liftsmith's own export. The file is
+// Settings › Data › Import workouts: a CSV from Strong, Hevy, Fitbod, StrongLifts, JEFIT or Liftsmith's own export. The file is
 // read on the device; nothing is uploaded.
 
-const FORMAT_NAME = { strong: "Strong", hevy: "Hevy", liftsmith: "Liftsmith" } as const;
+const FORMAT_NAME = {
+  strong: "Strong",
+  hevy: "Hevy",
+  fitbod: "Fitbod",
+  stronglifts: "StrongLifts",
+  jefit: "JEFIT",
+  liftsmith: "Liftsmith",
+} as const;
 
 export function ImportWorkouts() {
   const { profile, events, importWorkouts } = useApp();
