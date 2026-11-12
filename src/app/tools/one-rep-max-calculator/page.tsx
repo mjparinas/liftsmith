@@ -14,6 +14,7 @@ export const metadata: Metadata = pageMeta({
   description:
     "Estimate your one-rep max from weight, reps and reps in reserve, with a reps-to-weight table and the answers from Epley, Brzycki and six other formulas.",
   path: "/tools/one-rep-max-calculator/",
+  translated: true,
 });
 
 const FAQ: [string, string][] = [
@@ -54,7 +55,7 @@ const jsonLd = [
 
 export default function OneRmPage() {
   return (
-    <SitePage kind="tool" sticky="Your max, tracked from every set">
+    <SitePage kind="tool" sticky="Your max, tracked from every set" path="/tools/one-rep-max-calculator/">
       <JsonLd data={jsonLd} />
       <Crumbs items={[{ href: "/tools/", label: "Tools" }, { label: "One-rep max calculator" }]} />
       <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">One-rep max calculator</h1>

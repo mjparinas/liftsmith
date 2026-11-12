@@ -11,12 +11,14 @@ export const metadata: Metadata = pageMeta({
   description:
     "Enter your working weight and get the warm-up sets for the squat, bench press, deadlift, overhead press or row, with the plates for each side.",
   path: "/tools/warm-up-calculator/",
+  translated: true,
 });
 
 export default function WarmupPage() {
   return (
     <ToolPage
       slug="warm-up-calculator"
+      translated
       name="Warm-up calculator"
       intro="The warm-up sets to do before your working weight: enough to get ready, not so many that they tire you. Pick a lift and enter the weight."
       sticky="Warm-ups planned for every lift"

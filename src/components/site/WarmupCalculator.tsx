@@ -8,9 +8,11 @@ import { BumpField } from "@/components/app/ui";
 import { makeGym } from "@/lib/defaults";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { loadBar } from "@/lib/plates";
+import { fill } from "@/lib/siteLang";
 import type { Unit } from "@/lib/types";
 import { fmtNum, fromKg, toKg } from "@/lib/units";
 import { WARMUP_REST, warmupFor } from "@/lib/warmup";
+import type { WarmupUi } from "@/locales/site/tools/types";
 
 import { chip } from "./chip";
 
@@ -23,7 +25,22 @@ export const WARMUP_LIFTS: [id: string, label: string][] = [
   ["barbell-row", "Barbell row"],
 ];
 
-export function WarmupCalculator() {
+/** The calculator's words in English; translated pages pass their own (src/locales/site/tools/). */
+export const WARMUP_EN: WarmupUi = {
+  units: "Units",
+  lift: "Lift",
+  lifts: Object.fromEntries(WARMUP_LIFTS),
+  work: "Working weight ({unit})",
+  workAria: "working weight",
+  setsOne: "{n} warm-up set, {rest} s rest after each",
+  setsMany: "{n} warm-up sets, {rest} s rest after each",
+  none: "No warm-up sets needed at this weight",
+  working: "{weight}: your working sets",
+  eachSide: "Each side: {plates}",
+  empty: "Empty bar",
+};
+
+export function WarmupCalculator({ t = WARMUP_EN }: { t?: WarmupUi }) {
   const [unit, setUnit] = useState<Unit>("kg");
   const [lift, setLift] = useState("back-squat");
   const [weight, setWeight] = useState("100");
@@ -41,7 +58,7 @@ export function WarmupCalculator() {
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 [&>*]:min-w-0">
       <div className="card space-y-5 p-5">
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Units">
+        <div className="flex flex-wrap gap-2" role="group" aria-label={t.units}>
           {(["kg", "lb"] as const).map((u) => (
             <button key={u} type="button" aria-pressed={unit === u} className={chip(unit === u)} onClick={() => switchUnit(u)}>
               {u}
@@ -50,23 +67,23 @@ export function WarmupCalculator() {
         </div>
         <div>
           <span className="font-semibold" id="lift-l">
-            Lift
+            {t.lift}
           </span>
           <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="lift-l">
-            {WARMUP_LIFTS.map(([id, label]) => (
+            {WARMUP_LIFTS.map(([id]) => (
               <button key={id} type="button" aria-pressed={lift === id} className={chip(lift === id)} onClick={() => setLift(id)}>
-                {label}
+                {t.lifts[id]}
               </button>
             ))}
           </div>
         </div>
         <div>
           <label htmlFor="work" className="font-semibold">
-            Working weight ({unit})
+            {fill(t.work, { unit })}
           </label>
           <BumpField
             id="work"
-            label="working weight"
+            label={t.workAria}
             className="mt-2"
             size="lg"
             value={weight}
@@ -80,9 +97,7 @@ export function WarmupCalculator() {
       </div>
       <div className="card p-5" aria-live="polite">
         <p className="text-sm text-muted">
-          {sets.length
-            ? `${sets.length} warm-up set${sets.length === 1 ? "" : "s"}, ${WARMUP_REST} s rest after each`
-            : "No warm-up sets needed at this weight"}
+          {sets.length ? fill(sets.length === 1 ? t.setsOne : t.setsMany, { n: sets.length, rest: WARMUP_REST }) : t.none}
         </p>
         <ol className="mt-3 divide-y divide-line">
           {rows.map((r, i) => {
@@ -91,10 +106,10 @@ export function WarmupCalculator() {
             return (
               <li key={i} className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 py-3">
                 <span className={r.warm ? "font-semibold" : "font-bold text-accent"}>
-                  {r.warm ? `${fmtNum(w)} ${unit} × ${r.reps}` : `${fmtNum(w)} ${unit}: your working sets`}
+                  {r.warm ? `${fmtNum(w)} ${unit} × ${r.reps}` : fill(t.working, { weight: `${fmtNum(w)} ${unit}` })}
                 </span>
                 <span className="text-sm text-muted">
-                  {side.length ? `Each side: ${side.map((p) => fmtNum(p)).join(" + ")}` : "Empty bar"}
+                  {side.length ? fill(t.eachSide, { plates: side.map((p) => fmtNum(p)).join(" + ") }) : t.empty}
                 </span>
               </li>
             );
