@@ -595,6 +595,21 @@ export interface MeasureEvent extends EventBase {
   cm: number;
 }
 
+/** The fitness tests on Body › Health (fitTests.ts): dead hang, one-leg stand, 30-second chair stand. */
+export type FitTest = "hang" | "balance" | "chair";
+
+/**
+ * One fitness test result (fitTests.ts, Melvin 2026-11-11): seconds for the dead hang and the one-leg stand,
+ * full stands for the chair stand. The one-leg stand also records eyes open or closed. Health data: it stays on
+ * the device (and the lifter's own sync), never analytics, feedback or share links.
+ */
+export interface FitTestEvent extends EventBase {
+  type: "fitTest";
+  test: FitTest;
+  value: number;
+  eyes?: "open" | "closed";
+}
+
 /** A health measure the twin reads from Health Connect / Apple Health (health.ts readDaily, twin.ts). */
 export type HealthMetric = "sleep" | "hrv" | "restingHr" | "steps" | "vo2max" | "breathing" | "kcalIn" | "protein";
 
@@ -785,6 +800,7 @@ export type AppEvent =
   | ProEvent
   | BodyweightEvent
   | MeasureEvent
+  | FitTestEvent
   | HealthEvent
   | TdeeEvent
   | CheckinEvent

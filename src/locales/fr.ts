@@ -44,6 +44,7 @@ import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
 import * as friends from "./text/friends";
+import * as ft from "./text/ft";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -164,6 +165,7 @@ export const fr: Partial<Record<MessageKey, Message>> = {
   ...fit.fr,
   ...fix.fr,
   ...fmt.fr,
+  ...ft.fr,
   ...friends.fr,
   ...game.fr,
   ...ghost.fr,

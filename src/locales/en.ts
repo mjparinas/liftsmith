@@ -46,6 +46,7 @@ import * as fit from "./text/fit";
 import * as fix from "./text/fix";
 import * as fmt from "./text/fmt";
 import * as friends from "./text/friends";
+import * as ft from "./text/ft";
 import * as game from "./text/game";
 import * as ghost from "./text/ghost";
 import * as gl from "./text/gl";
@@ -166,6 +167,7 @@ export const en = {
   ...fit.en,
   ...fix.en,
   ...fmt.en,
+  ...ft.en,
   ...friends.en,
   ...game.en,
   ...ghost.en,

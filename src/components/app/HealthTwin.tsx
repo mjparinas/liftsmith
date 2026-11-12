@@ -25,6 +25,7 @@ import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from 
 import { useNow } from "@/lib/useNow";
 
 import { openStats } from "./BodyStats";
+import { FitTestsCard } from "./FitTests";
 import { go } from "./router";
 import { Button, EmptyState, ProTag, Section, Sheet } from "./ui";
 import { WeighInForm } from "./WeighIn";
@@ -168,6 +169,7 @@ export function HealthTwin() {
       </div>
 
       <FitnessAgeCard native={native} store={store} />
+      <FitTestsCard />
 
       <Section title={t("twin.group.body")} icon="target">
         <Tiles ids={BODY} by={by} onOpen={setOpen} />
