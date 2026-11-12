@@ -93,7 +93,12 @@ export interface SiteText {
     };
     mid: { title: string; body: string; cta: string };
     demos: { eyebrow: string; title: string; body: string; cta: string; picker: string };
-    more: { eyebrow: string; title: string; items: Titled[] };
+    more: {
+      eyebrow: string;
+      title: string;
+      /** Link to /features/ (the full list and the connections table; English only for now). */ all: string;
+      items: Titled[];
+    };
     juice: { eyebrow: string; title: string; body: string; cta: string; alt: string };
     quotes: { eyebrow: string; title: string; sample: string; looking: string; lookingRest: string; cta: string };
     pricing: {

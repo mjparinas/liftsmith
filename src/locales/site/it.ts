@@ -197,6 +197,7 @@ export const it: SiteText = {
     more: {
       eyebrow: "E poi",
       title: "Piccole cose che fanno la differenza",
+      all: "Tutte le funzioni e le app e i dispositivi compatibili",
       items: [
         { title: "Funziona offline", body: "Tutto gira sul telefono. Niente campo nella palestra in cantina? Nessun problema." },
         {
