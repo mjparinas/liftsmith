@@ -47,6 +47,8 @@ export const en = {
   "rt.linkBrokenBody": "It may be cut short, or from a newer version of the app. Ask for the link again.",
   "rt.sharedTitle": "Shared routine",
   "rt.sharedKicker": "Someone sent you this",
+  "rt.rehabWhy":
+    "A rehab program: it keeps every exercise as written even with an injury logged, and asks about pain between sets. Stop if anything feels sharp or wrong, and tell whoever sent it.",
   "rt.sharedWhy": "Only the exercises and sets come with it. Your weights and reps come from your own lifts and keep moving up.",
   "rt.sharedMissing": "Exercises {gym} can’t do are left out on the day, or you can swap them.",
   "rt.sharedSave": "Save to my routines",
@@ -103,6 +105,8 @@ export const es: Partial<Record<Key, Message>> = {
   "rt.linkBrokenBody": "Puede que esté cortado o que sea de una versión más nueva de la app. Pide el enlace otra vez.",
   "rt.sharedTitle": "Rutina compartida",
   "rt.sharedKicker": "Alguien te envió esto",
+  "rt.rehabWhy":
+    "Un programa de rehabilitación: mantiene todos los ejercicios tal cual aunque haya una lesión registrada y pregunta por el dolor entre series. Para si algo duele de forma aguda o no va bien, y díselo a quien te lo envió.",
   "rt.sharedWhy":
     "Solo vienen los ejercicios y las series. Tus pesos y repeticiones salen de tus propios levantamientos y siguen subiendo.",
   "rt.sharedMissing": "Los ejercicios que no se pueden hacer en {gym} se omiten ese día, o puedes cambiarlos.",
@@ -158,6 +162,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "rt.linkBrokenBody": "Il est peut-être coupé, ou vient d’une version plus récente de l’appli. Redemande le lien.",
   "rt.sharedTitle": "Routine partagée",
   "rt.sharedKicker": "Quelqu’un te l’a envoyée",
+  "rt.rehabWhy":
+    "Un programme de rééducation : il garde chaque exercice tel quel même avec une blessure notée, et demande la douleur entre les séries. Arrêtez si quelque chose fait mal de façon vive ou semble anormal, et prévenez la personne qui l'a envoyé.",
   "rt.sharedWhy":
     "Seuls les exercices et les séries sont inclus. Tes charges et tes répétitions viennent de tes propres levées et continuent de progresser.",
   "rt.sharedMissing": "Les exercices impossibles à {gym} sont retirés le jour même, ou tu peux les remplacer.",
@@ -213,6 +219,8 @@ export const de: Partial<Record<Key, Message>> = {
   "rt.linkBrokenBody": "Vielleicht ist er abgeschnitten oder stammt aus einer neueren App-Version. Lass dir den Link noch einmal schicken.",
   "rt.sharedTitle": "Geteilte Routine",
   "rt.sharedKicker": "Jemand hat dir das geschickt",
+  "rt.rehabWhy":
+    "Ein Reha-Programm: Es behält jede Übung wie geplant, auch wenn eine Verletzung eingetragen ist, und fragt zwischen den Sätzen nach Schmerzen. Hör auf, wenn etwas stechend oder falsch wirkt, und sag es der Person, die es geschickt hat.",
   "rt.sharedWhy":
     "Nur die Übungen und Sätze kommen mit. Deine Gewichte und Wiederholungen kommen aus deinen eigenen Lifts und steigen weiter.",
   "rt.sharedMissing": "Übungen, die in {gym} nicht gehen, fallen an dem Tag weg, oder du tauschst sie.",
@@ -268,6 +276,8 @@ export const it: Partial<Record<Key, Message>> = {
   "rt.linkBrokenBody": "Forse è troncato o viene da una versione più recente dell’app. Chiedi di nuovo il link.",
   "rt.sharedTitle": "Routine condivisa",
   "rt.sharedKicker": "Qualcuno te l’ha inviata",
+  "rt.rehabWhy":
+    "Un programma di riabilitazione: tiene ogni esercizio com'è anche con un infortunio registrato e chiede del dolore tra le serie. Fermati se senti un dolore acuto o qualcosa non va, e dillo a chi te l'ha inviato.",
   "rt.sharedWhy":
     "Arrivano solo gli esercizi e le serie. I tuoi pesi e le tue ripetizioni vengono dai tuoi sollevamenti e continuano a salire.",
   "rt.sharedMissing": "Gli esercizi che non si possono fare in {gym} vengono tolti quel giorno, oppure puoi sostituirli.",
@@ -322,6 +332,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "rt.linkBrokenBody": "リンクが途中で切れているか、新しいバージョンのアプリのものかもしれません。もう一度リンクをもらってください。",
   "rt.sharedTitle": "共有されたルーティン",
   "rt.sharedKicker": "誰かから届きました",
+  "rt.rehabWhy":
+    "リハビリプログラムです。けがが記録されていても種目はそのまま残り、セットの合間に痛みを尋ねます。鋭い痛みや違和感があれば中止し、送ってくれた人に伝えてください。",
   "rt.sharedWhy": "含まれるのは種目とセット数だけです。重量と回数はあなた自身の記録から決まり、これからも伸びていきます。",
   "rt.sharedMissing": "{gym}でできない種目は当日は外されます。入れ替えることもできます。",
   "rt.sharedSave": "マイルーティンに保存",

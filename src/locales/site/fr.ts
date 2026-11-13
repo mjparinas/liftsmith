@@ -477,7 +477,11 @@ export const fr: SiteText = {
       },
       {
         q: "Puis-je voir leur fréquence cardiaque ou leur poids ?",
-        a: "Non. Vous ne voyez que leur entraînement. Les données de santé, les mensurations, les blessures et les notes ne quittent jamais leur compte.",
+        a: "Seulement ce qu'ils choisissent. Vous voyez leur entraînement. Chaque client peut activer le partage de ses données corporelles, ou de sa douleur et de ses blessures, avec vous ; les relevés de santé et les notes ne quittent jamais son compte.",
+      },
+      {
+        q: "Les kinés et les professionnels de la rééducation peuvent-ils l'utiliser ?",
+        a: "Oui. Choisissez Kinésithérapeute dans Coaching et le rapport de chaque client commence par la douleur et les blessures qu'il partage, exercice par exercice. Assignez des programmes de rééducation doux avec un nombre de fois par semaine, et voyez à quelle fréquence il les suit. Liftsmith montre ce que vos clients notent ; il ne pose aucun diagnostic et ne traite rien.",
       },
       {
         q: "Comment commencer ?",

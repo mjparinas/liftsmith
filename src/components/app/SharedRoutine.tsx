@@ -49,7 +49,7 @@ export function SharedRoutine({ code }: { code?: string }) {
     const at = Date.now();
     haptic("success");
     sound.tick();
-    saveRoutine({ id, name: shared.name, items: shared.items, createdAt: at, updatedAt: at });
+    saveRoutine({ id, name: shared.name, items: shared.items, createdAt: at, updatedAt: at, ...(shared.rehab ? { rehab: true } : {}) });
     track("feature", { name: "routine_share", detail: "import" });
     setSavedId(id);
   };
@@ -62,6 +62,7 @@ export function SharedRoutine({ code }: { code?: string }) {
           {t("rt.summary", { exercises: t("rt.exercises", { count: shared.items.length }), sets: t("rt.sets", { count: sets }) })}
         </p>
         <p className="mt-2 text-sm text-muted">{t("rt.sharedWhy")}</p>
+        {shared.rehab && <p className="mt-2 text-sm text-muted">{t("rt.rehabWhy")}</p>}
       </section>
       <ol className="card mt-4 divide-y divide-line">
         {shared.items.map((it, i) => {

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 
 import { deleteAccount } from "./accounts";
 import {
+  alertPain,
   alertQuiet,
   alertTrained,
   assignPlan,
@@ -20,6 +21,7 @@ import {
   saveSetup,
   sendMessage,
   setAlerts,
+  setKind,
   setNote,
   setRole,
   setShare,
@@ -473,6 +475,91 @@ describe("alerts to a coach", () => {
     expect(await alertQuiet(NOW)).toBe(0);
     expect(sent).toEqual([]);
     expect((await overview("coach", NOW)).alerts).toBe(false);
+  });
+});
+
+describe("physio support", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "i1", at: NOW - 5 * DAY, type: "injury", injuryId: "knee1", part: "knee" },
+        { id: "r1", at: NOW - 5 * DAY, type: "injuryRule", injuryId: "knee1", action: "light", pct: 70, ack: true },
+        { id: "p1", at: NOW - DAY, type: "pain", injuryId: "knee1", score: 4, sessionId: "s1", exerciseId: "wall-sit" },
+        { id: "c1", at: NOW - DAY, type: "cycle", flow: "light" },
+      ],
+      { name: "Alex" },
+    );
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("sends pain and injuries only when the client shares them, and never the rest of the health side", async () => {
+    const types = async () => (await clientView("coach", "client", NOW))!.events.map((e) => e.type);
+    expect(await types()).toEqual([]);
+    expect((await clientView("coach", "client", NOW))!.pain).toBe(false);
+    expect(await setShare("client", "coach", true, NOW, "pain")).toBe(true);
+    const view = (await clientView("coach", "client", NOW))!;
+    expect(view.pain).toBe(true);
+    expect(view.body).toBeNull();
+    expect(view.events).toEqual([
+      { id: "i1", at: NOW - 5 * DAY, type: "injury", injuryId: "knee1", part: "knee" },
+      { id: "p1", at: NOW - DAY, type: "pain", injuryId: "knee1", score: 4, sessionId: "s1", exerciseId: "wall-sit" },
+    ]);
+    expect((await overview("client", NOW)).painShared).toEqual(["coach"]);
+    expect((await overview("coach", NOW)).sharesPain).toEqual(["client"]);
+    // Body data is its own switch.
+    await setShare("client", "coach", true, NOW, "body");
+    expect((await clientView("coach", "client", NOW))!.pain).toBe(true);
+    await setShare("client", "coach", false, NOW, "pain");
+    expect(await types()).toEqual([]);
+    expect((await clientView("coach", "client", NOW))!.body).not.toBeNull();
+  });
+
+  it("a coach can work as a physio, which their clients see", async () => {
+    expect((await overview("coach", NOW)).kind).toBe("trainer");
+    expect(await setKind("coach", "physio", NOW)).toBe("physio");
+    expect(await setKind("coach", "surgeon", NOW)).toBe("trainer");
+    await setKind("coach", "physio", NOW);
+    await setAlerts("coach", false, NOW);
+    expect((await overview("coach", NOW)).kind).toBe("physio");
+    expect((await overview("coach", NOW)).alerts).toBe(false);
+    expect((await overview("client", NOW)).kinds).toEqual({ coach: "physio" });
+    expect((await clientView("coach", "client", NOW))!.kind).toBe("physio");
+  });
+
+  it("a routine can say how many times a week, and only 1 to 7", async () => {
+    const a = await assignPlan("coach", "client", "Knee", "r1~S25lZQ~wall-sit.3~rehab", NOW, "p1", 3);
+    expect(a).toMatchObject({ perWeek: 3, code: "r1~S25lZQ~wall-sit.3~rehab" });
+    const b = await assignPlan("coach", "client", "Other", "r1~S25lZQ~wall-sit.3", NOW, "p2", 9);
+    expect(b).not.toHaveProperty("perWeek");
+    const plans = (await clientView("coach", "client", NOW))!.plans;
+    expect(plans.find((p) => p.id === "p1")?.perWeek).toBe(3);
+    expect(plans.find((p) => p.id === "p2")).not.toHaveProperty("perWeek");
+  });
+
+  it("high pain pushes the coach once in a day, only when shared and with alerts on", async () => {
+    const sent: PushMessage[] = [];
+    setPushSender(async (m) => {
+      sent.push(m);
+      return "ok";
+    });
+    await saveToken("coach", "tok-coach-0123456789abcdef", "android", "en", NOW);
+    const high = [{ type: "pain", at: NOW - 60_000, score: 7 }];
+    await alertPain("client", high, NOW);
+    expect(sent).toEqual([]);
+    await setShare("client", "coach", true, NOW, "pain");
+    await alertPain("client", [{ type: "pain", at: NOW - 60_000, score: 3 }], NOW);
+    await alertPain("client", [{ type: "pain", at: NOW - DAY, score: 9 }], NOW);
+    expect(sent).toEqual([]);
+    await alertPain("client", high, NOW);
+    await alertPain("client", high, NOW + 3_600_000);
+    expect(sent.map((m) => [m.kind, m.body, m.route])).toEqual([
+      ["coachPain", "Alex rated their pain 7/10. Worth checking in.", "#/trainer/c.client"],
+    ]);
+    await setAlerts("coach", false, NOW);
+    await alertPain("client", high, NOW + DAY);
+    expect(sent).toHaveLength(1);
   });
 });
 

@@ -313,6 +313,53 @@ describe("chat and body data", () => {
     expect(screen.getByText("Waist")).toBeInTheDocument();
     expect(screen.getByText(/They share their body data with you/)).toBeInTheDocument();
   });
+
+  it("a physio sees pain first and assigns a rehab program with times a week (physio support)", async () => {
+    const base = fetch;
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit = {}) => {
+      if (url === "/api/coach/?client=c1") {
+        calls.push({ url, body: undefined });
+        return Response.json({
+          name: "Alex",
+          daysPerWeek: 3,
+          kind: "physio",
+          pain: true,
+          plans: assigned,
+          events: [
+            ...makeWorkout("w1", NOW - 3600_000, [{}]),
+            // The report is worked out at the real time, so pain is dated from it.
+            { id: "i1", at: Date.now() - 20 * 86_400_000, type: "injury", injuryId: "k", part: "knee" },
+            { id: "p1", at: Date.now() - 3600_000, type: "pain", injuryId: "k", score: 6, sessionId: "w1", exerciseId: "wall-sit" },
+          ],
+        });
+      }
+      return base(url, init);
+    });
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Knee: pain 6/10 this week")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Pain and injuries" })).toBeInTheDocument();
+    expect(screen.getByText(/doesn't diagnose or treat anything/)).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Assign a routine" }));
+    // A physio's sheet starts at 3 times a week, with rehab programs first.
+    expect(screen.getByRole("button", { name: "3" })).toHaveAttribute("aria-pressed", "true");
+    await u.click(screen.getByRole("button", { name: /Knee: gentle start/ }));
+    const sent = calls.find((c) => (c.body as { action?: string } | undefined)?.action === "assign")!.body as Record<string, unknown>;
+    expect(sent).toMatchObject({ client: "c1", name: "Knee: gentle start", perWeek: 3 });
+    expect(String(sent.code).endsWith("~rehab")).toBe(true);
+  });
+
+  it("a client can share pain and injuries with each coach, off to start", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer />);
+    const sw = await screen.findByRole("switch", { name: /Share pain and injuries with Sam/ });
+    expect(sw).toHaveAttribute("aria-checked", "false");
+    await u.click(sw);
+    expect(calls.find((c) => (c.body as { what?: string } | undefined)?.what === "pain")).toMatchObject({
+      body: { action: "share", id: "k1", on: true, what: "pain" },
+    });
+  });
 });
 
 describe("nutrition targets", () => {

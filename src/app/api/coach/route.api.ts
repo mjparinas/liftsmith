@@ -5,8 +5,8 @@
 // `code`), "unassign" (with the plan's `id`), "setup" (what the coach's new clients start setup with: `setup`) and
 // "note" (the coach's note to a client: `client`, `text`; empty text clears it), "send" (a chat message to the other
 // side: `id`, `text`), "targets" (a coach's daily calories and protein for a client: `client`, `kcal`, `protein`;
-// both empty clears them), "share" (a client shares body data with a coach or stops: `id`, `on`), "alerts" (a coach's
-// alerts on or off: `on`), "role" (personal trainer or coach: `role`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
+// both empty clears them), "share" (a client shares body data, or with `what` "pain" pain and injuries, with a coach or
+// stops: `id`, `on`), "alerts" (a coach's alerts on or off: `on`), "kind" (trainer or physio: `kind`), "role" (personal trainer or coach: `role`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // Booking (coachBooking.ts): "slots" (open times: `slot` with start, minutes, place, weeks and maybe client),
 // "book" (a client: `id`) and "cancelSlot" (either side: `id`), each with `label`, the time as the phone shows it, for
 // the push. The overview adds the coach's `slots` and the client's `sessions` (booked and open); a client's view adds
@@ -33,6 +33,7 @@ import {
   saveSetup,
   sendMessage,
   setAlerts,
+  setKind,
   setNote,
   setRole,
   setShare,
@@ -121,6 +122,9 @@ export async function POST(req: Request) {
         token?: unknown;
         platform?: unknown;
         lang?: unknown;
+        what?: unknown;
+        kind?: unknown;
+        perWeek?: unknown;
         kcal?: unknown;
         protein?: unknown;
         form?: unknown;
@@ -129,7 +133,6 @@ export async function POST(req: Request) {
         slot?: Record<string, unknown>;
         label?: unknown;
         amount?: unknown;
-        kind?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -146,7 +149,7 @@ export async function POST(req: Request) {
       return reply(req, 200, r);
     }
     case "assign": {
-      const r = await assignPlan(s.accountId, body.client, body.name, body.code);
+      const r = await assignPlan(s.accountId, body.client, body.name, body.code, Date.now(), undefined, body.perWeek);
       if ("error" in r) return reply(req, r.error === "notClient" ? 404 : r.error === "full" ? 409 : 400, r);
       return reply(req, 200, { plan: r });
     }
@@ -190,10 +193,12 @@ export async function POST(req: Request) {
       return reply(req, 200, { message: r });
     }
     case "share": {
-      const r = await setShare(s.accountId, body.id, body.on);
+      const r = await setShare(s.accountId, body.id, body.on, Date.now(), body.what);
       if (typeof r === "object") return reply(req, 404, r);
       return reply(req, 200, { on: r });
     }
+    case "kind":
+      return reply(req, 200, { kind: await setKind(s.accountId, body.kind) });
     case "slots": {
       const r = await addSlots(s.accountId, body.slot && typeof body.slot === "object" ? body.slot : {});
       if ("error" in r)

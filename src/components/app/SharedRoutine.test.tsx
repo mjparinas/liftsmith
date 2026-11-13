@@ -117,4 +117,28 @@ describe("shared routines", () => {
     await user.click(within(screen.getByRole("dialog")).getByRole("button", { name: "Open routine" }));
     expect(await screen.findByRole("heading", { name: "Push day" })).toBeInTheDocument();
   });
+
+  it("keeps a rehab program from a physio as written, even with an injury logged (physio support)", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const items = [
+      { exerciseId: "wall-sit", sets: 3 },
+      { exerciseId: "split-squat-hold", sets: 2 },
+    ];
+    location.hash = `#/routine/${encodeRoutine({ name: "Knee rehab", items, rehab: true })}`;
+    expect(await screen.findByText(/A rehab program: it keeps every exercise/)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Save to my routines" }));
+    const saved = useApp.getState().profile.routines![0]!;
+    expect(saved).toMatchObject({ name: "Knee rehab", rehab: true });
+    useApp.getState().logInjury("knee");
+    useApp.getState().pickRoutine(saved.id);
+    const plan = useApp.getState().preview!;
+    expect(plan.rehab).toBe(true);
+    expect(plan.items.map((i) => i.exerciseId)).toEqual(["wall-sit", "split-squat-hold"]);
+    expect(plan.items.some((i) => i.injuryPct)).toBe(false);
+    // The same routine without the rehab mark is changed by the injury, as before.
+    useApp.getState().saveRoutine({ ...saved, id: "plain", rehab: undefined });
+    useApp.getState().pickRoutine("plain");
+    expect(useApp.getState().preview!.items.map((i) => i.exerciseId)).not.toEqual(["wall-sit", "split-squat-hold"]);
+  });
 });
