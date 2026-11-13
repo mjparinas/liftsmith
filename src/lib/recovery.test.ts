@@ -49,6 +49,19 @@ describe("recovery", () => {
     expect(tenCurl(24)).toBe(59);
   });
 
+  it("lets the helper muscles recover over time too, and counts easy sets less for them", () => {
+    // Ten sets two days ago: the triceps (small) got 65% and are mostly back.
+    const ten = Array.from({ length: 10 }, () => bench(48));
+    expect(recovery(ten, NOW).triceps).toBe(94); // 100 − 65 × 0.1
+    expect(recovery([bench(0, 3)], NOW).triceps).toBe(95); // 100 − 6.5 × 0.8
+  });
+
+  it("counts a set from exactly seven days ago, and not one an hour older", () => {
+    const at = (h: number) => Array.from({ length: 40 }, () => bench(h));
+    expect(recovery(at(7 * 24), NOW).chest).toBe(98);
+    expect(recovery(at(7 * 24 + 1), NOW).chest).toBe(100);
+  });
+
   it("never goes below 0 or above 100", () => {
     const many = Array.from({ length: 30 }, () => bench(0));
     expect(recovery(many, NOW).chest).toBe(0);

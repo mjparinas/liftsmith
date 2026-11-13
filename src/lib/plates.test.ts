@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { loadBar, nearestLoads, plateStyle } from "./plates";
+import { loadBar, nearestLoads, plateStyle, smallestJump } from "./plates";
 
 // Loading the bar and drawing each plate (mutation run, 2026-11-13: the plate picture and some of the
 // solver's tie rules weren't checked).
@@ -47,7 +47,80 @@ describe("loadBar", () => {
   });
 });
 
+describe("loadBar's choices (round 4)", () => {
+  it("prefers fewer plates even when a longer stack starts heavier", () => {
+    // 40 a side: 20 + 20 (two plates) beats 25 + 10 + 5 (three), though 25 is the heavier first plate.
+    const r = loadBar(100, 20, [
+      { weight: 25, count: 2 },
+      { weight: 20, count: 4 },
+      { weight: 10, count: 2 },
+      { weight: 5, count: 2 },
+    ]);
+    expect(r.perSide).toEqual([20, 20]);
+  });
+
+  it("on the same plate count and the same first plate, looks at the next plate", () => {
+    // 35 a side: 20 + 10 + 5 beats 20 + 7.5 + 7.5.
+    const r = loadBar(90, 20, [
+      { weight: 20, count: 2 },
+      { weight: 10, count: 2 },
+      { weight: 7.5, count: 4 },
+      { weight: 5, count: 2 },
+    ]);
+    expect(r.perSide).toEqual([20, 10, 5]);
+  });
+
+  it("takes the lighter load on a tie even when it finds the heavier one first", () => {
+    // 17.5 a side wanted: 15 (three 5s) and 20 (one 20) are both 2.5 away.
+    const plates = [
+      { weight: 20, count: 2 },
+      { weight: 5, count: 6 },
+    ];
+    expect(loadBar(55, 20, plates)).toEqual({ total: 50, perSide: [5, 5, 5], exact: false });
+    expect(loadBar(56, 20, plates).total).toBe(60);
+  });
+});
+
+describe("smallestJump", () => {
+  it("is two of the lightest plate that comes in a pair, whatever order they're listed in", () => {
+    expect(
+      smallestJump([
+        { weight: 1.25, count: 2 },
+        { weight: 20, count: 4 },
+        { weight: 2.5, count: 2 },
+      ]),
+    ).toBe(2.5);
+    expect(
+      smallestJump([
+        { weight: 20, count: 2 },
+        { weight: 1.25, count: 1 },
+        { weight: 0, count: 4 },
+      ]),
+    ).toBe(40);
+    expect(smallestJump([])).toBe(0);
+  });
+});
+
 describe("nearestLoads", () => {
+  it("reaches every plate owned when there are several pairs of a size", () => {
+    expect(
+      nearestLoads(100, 20, [
+        { weight: 10, count: 6 },
+        { weight: 5, count: 2 },
+      ]),
+    ).toEqual({ below: 90, above: null });
+    expect(
+      nearestLoads(85, 20, [
+        { weight: 10, count: 6 },
+        { weight: 5, count: 2 },
+      ]),
+    ).toEqual({ below: 80, above: 90 });
+  });
+
+  it("gives the empty bar both ways for a target lighter than the bar", () => {
+    expect(nearestLoads(10, 20, [{ weight: 5, count: 2 }])).toEqual({ below: 20, above: 20 });
+  });
+
   const plates = [
     { weight: 10, count: 2 },
     { weight: 5, count: 2 },
