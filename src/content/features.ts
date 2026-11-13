@@ -625,9 +625,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "import",
         name: "Import from another app",
-        body: "Bring your history across from Strong, Hevy, Fitbod, StrongLifts or JEFIT with their export file.",
+        body: "Bring your history across from Strong, Hevy, Fitbod, StrongLifts, JEFIT or FitNotes with their export file, cardio included.",
         tier: "free",
         added: "2026-11-11",
+      },
+      {
+        id: "importExtras",
+        name: "Routines and body stats from another app",
+        body: "An import turns workouts you repeated by name into routines, and brings body weight, body fat and tape measurements from Hevy, FitNotes or a scale app.",
+        tier: "free",
+        added: "2026-11-13",
       },
     ],
   },
@@ -1087,7 +1094,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       },
       {
         id: "import",
-        name: "Strong, Hevy, Fitbod, StrongLifts, JEFIT",
+        name: "Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes",
         does: "Your workout history imported from their export file",
         android: "yes",
         ios: "yes",

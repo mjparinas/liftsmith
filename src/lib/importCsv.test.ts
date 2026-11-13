@@ -1,7 +1,19 @@
 import { describe, expect, it } from "vitest";
 
 import { setsCsv } from "./exportData";
-import { customId, defaultMapping, guessExercise, importEvents, matchExercise, parseCsv, parseDate, readImport } from "./importCsv";
+import {
+  customId,
+  defaultMapping,
+  guessExercise,
+  importEvents,
+  importRoutines,
+  matchCardio,
+  matchExercise,
+  parseCsv,
+  parseDate,
+  readImport,
+  repeatedTitles,
+} from "./importCsv";
 import type { AppEvent } from "./types";
 
 const NOW = new Date(2026, 10, 9, 20).getTime();
@@ -38,6 +50,14 @@ const STRONGLIFTS = `Workout #,Date,Workout,Duration,Exercise,Sets x Reps,Weight
 1,2026-11-02 18:00,Workout A,45m,Bench Press,5x5,95,5,5,4,3,,
 1,2026-11-02 18:00,Workout A,45m,Barbell Row,5x5,95,,,,,,
 2,2026-11-04 18:00,Workout B,40m,Deadlift,1x5,185,185x5,,,,,
+`;
+
+const FITNOTES = `Date,Exercise,Category,Weight (kgs),Reps,Distance,Distance Unit,Time
+2026-11-03,Flat Barbell Bench Press,Chest,80.0,8,,,
+2026-11-03,Flat Barbell Bench Press,Chest,80.0,7,,,
+2026-11-03,Treadmill,Cardio,,,2.5,km,0:15:00
+2026-11-05,Barbell Squat,Legs,120.0,5,,,
+2026-11-05,Plank,Abs,,,,,0:01:00
 `;
 
 const JEFIT = `### MY PROFILE ###
@@ -78,7 +98,7 @@ describe("CSV parsing", () => {
 });
 
 describe("reading exports", () => {
-  it("reads Strong: workouts, warm-ups, timed sets, and skips rest timers and cardio", () => {
+  it("reads Strong: workouts, warm-ups, timed sets and cardio, and skips rest timers", () => {
     const f = readImport(STRONG)!;
     expect(f.format).toBe("strong");
     expect(f.unit).toBeNull(); // older Strong files don't say; the lifter picks
@@ -90,10 +110,12 @@ describe("reading exports", () => {
       ["Bench Press (Barbell)", 100, 5, false],
       ["Bench Press (Barbell)", 100, 5, false],
       ["Plank", 0, 0, false],
+      ["Running", 0, 0, false],
       ["Zottman Thing", 12.5, 10, false],
     ]);
     expect(push.sets[3].seconds).toBe(60);
-    expect(f.skipped).toBe(2);
+    expect(push.sets[4]).toMatchObject({ seconds: 1800, distance: 5 });
+    expect(f.skipped).toBe(1);
     expect(readImport(STRONG.replace("Weight,", "Weight (kg),"))!.unit).toBe("kg");
   });
 
@@ -129,20 +151,22 @@ describe("reading exports", () => {
     expect(set.type === "set" && Math.round(set.weight)).toBe(100);
   });
 
-  it("reads Fitbod: sets grouped into workouts by time, warm-ups, and cardio left out", () => {
+  it("reads Fitbod: sets grouped into workouts by time, warm-ups, and cardio in metres", () => {
     const f = readImport(FITBOD)!;
     expect(f.format).toBe("fitbod");
     expect(f.unit).toBe("kg");
     expect(f.workouts).toHaveLength(2);
     expect(f.workouts[0].start).toBe(Date.UTC(2026, 10, 3, 17));
-    expect(f.workouts[0].minutes).toBe(42);
+    expect(f.workouts[0].minutes).toBe(47);
     expect(f.workouts[0].sets.map((s) => [s.name, s.weight, s.reps, s.warmup])).toEqual([
       ["Barbell Bench Press", 40, 8, true],
       ["Barbell Bench Press", 80, 8, false],
       ["Plank", 0, 0, false],
+      ["Running", 0, 0, false],
     ]);
     expect(f.workouts[0].sets[2].seconds).toBe(45);
-    expect(f.skipped).toBe(1);
+    expect(f.workouts[0].sets[3]).toMatchObject({ seconds: 600, distance: 1500, distUnit: "m" });
+    expect(f.skipped).toBe(0);
   });
 
   it("reads StrongLifts: one set per filled Set column, a set's own weight, and empty rows skipped", () => {
@@ -174,6 +198,22 @@ describe("reading exports", () => {
     expect(out.events.find((e) => e.type === "sessionStart")!.id).toMatch(/^imp-jefit-/);
   });
 
+  it("reads FitNotes: a day is a workout, the unit from the header, cardio with its own distance unit", () => {
+    const f = readImport(FITNOTES)!;
+    expect(f.format).toBe("fitnotes");
+    expect(f.unit).toBe("kg");
+    expect(f.workouts).toHaveLength(2);
+    expect(f.workouts[0].start).toBe(new Date(2026, 10, 3, 18).getTime());
+    expect(f.workouts[0].sets[2]).toMatchObject({ name: "Treadmill", seconds: 900, distance: 2.5, distUnit: "km" });
+    expect(f.workouts[1].sets[1]).toMatchObject({ name: "Plank", seconds: 60 });
+    const mapping = defaultMapping(f);
+    expect(mapping["Treadmill"]).toBe("treadmill-run");
+    const out = importEvents(f, mapping, "kg", "g", NOW);
+    expect(out).toMatchObject({ workouts: 2, sets: 5 });
+    const run = out.events.find((e) => e.type === "set" && e.exerciseId === "treadmill-run");
+    expect(run).toMatchObject({ reps: 900, distanceM: 2500, weight: 0 });
+  });
+
   it("returns null for a file it doesn't know", () => {
     expect(readImport("name,score\nann,3")).toBeNull();
     expect(readImport("")).toBeNull();
@@ -200,6 +240,66 @@ describe("matching names", () => {
   it("guesses a muscle and load for an unknown exercise", () => {
     expect(guessExercise("Zottman Curl (Dumbbell)")).toMatchObject({ primary: "biceps", load: "dumbbell" });
     expect(guessExercise("Landmine Press (Barbell)")).toMatchObject({ primary: "chest", load: "barbell", compound: true });
+  });
+});
+
+describe("cardio", () => {
+  it.each([
+    ["Running", "outdoor-run"],
+    ["Running (Treadmill)", "treadmill-run"],
+    ["Rowing (Machine)", "rowing-machine"],
+    ["Cycling", "outdoor-cycling"],
+    ["Cycling (Indoor)", "stationary-bike"],
+    ["Walking", "brisk-walk"],
+    ["Elliptical Trainer", "elliptical"],
+  ])("%s → %s", (name, id) => expect(matchCardio(name)).toBe(id));
+
+  it("logs cardio as time and metres, in miles when the file's weights are in pounds", () => {
+    const f = readImport(STRONG)!;
+    const mapping = defaultMapping(f);
+    expect(mapping["Running"]).toBe("outdoor-run");
+    const run = importEvents(f, mapping, "lb", "g", NOW).events.find((e) => e.type === "set" && e.exerciseId === "outdoor-run");
+    expect(run).toMatchObject({ reps: 1800, distanceM: 8047 });
+    // Strength names with reps stay strength exercises, even with a cardio word in them.
+    expect(defaultMapping(readImport(HEVY)!)["Lat Pulldown (Cable)"]).toBe("lat-pulldown");
+  });
+
+  it("drops a distance with no time filed under an exercise that takes neither", () => {
+    const f = readImport(FITNOTES)!;
+    const out = importEvents(f, { ...defaultMapping(f), Treadmill: "bench-press" }, "kg", "g", NOW);
+    expect(out.sets).toBe(5); // the time becomes its reps
+    const noTime = readImport(FITNOTES.replace("2.5,km,0:15:00", "2.5,km,"))!;
+    expect(importEvents(noTime, { ...defaultMapping(noTime), Treadmill: "bench-press" }, "kg", "g", NOW).sets).toBe(4);
+  });
+});
+
+describe("routines from named workouts", () => {
+  const TWICE = `"title","start_time","end_time","description","exercise_title","superset_id","exercise_notes","set_index","set_type","weight_kg","reps","distance_km","duration_seconds","rpe"
+"Push day","2 Nov 2026, 17:00","2 Nov 2026, 18:00","","Bench Press (Barbell)","","","0","normal","80","8","","",""
+"Push day","5 Nov 2026, 17:00","5 Nov 2026, 18:00","","Bench Press (Barbell)","","","0","warmup","40","8","","",""
+"Push day","5 Nov 2026, 17:00","5 Nov 2026, 18:00","","Bench Press (Barbell)","","","1","normal","80","8","","",""
+"Push day","5 Nov 2026, 17:00","5 Nov 2026, 18:00","","Bench Press (Barbell)","","","2","normal","80","8","","",""
+"Push day","5 Nov 2026, 17:00","5 Nov 2026, 18:00","","Shoulder Press (Dumbbell)","","","0","normal","20","10","","",""
+"Legs","6 Nov 2026, 17:00","6 Nov 2026, 18:00","","Squat (Barbell)","","","0","normal","100","5","","",""
+"Morning Workout","3 Nov 2026, 07:00","3 Nov 2026, 08:00","","Squat (Barbell)","","","0","normal","100","5","","",""
+"Morning Workout","4 Nov 2026, 07:00","4 Nov 2026, 08:00","","Squat (Barbell)","","","0","normal","100","5","","",""
+`;
+
+  it("makes one routine per name done twice, from its newest time, and none from plain names", () => {
+    const f = readImport(TWICE)!;
+    expect([...repeatedTitles(f, NOW).keys()]).toEqual(["push day"]);
+    const out = importEvents(f, defaultMapping(f), "kg", "g", NOW);
+    const routines = importRoutines(f, out.events, [], NOW);
+    expect(routines).toHaveLength(1);
+    expect(routines[0]).toMatchObject({
+      name: "Push day",
+      items: [
+        { exerciseId: "bench-press", sets: 2 },
+        { exerciseId: "db-shoulder-press", sets: 1 },
+      ],
+    });
+    // Importing again leaves a routine already saved (and maybe edited) alone.
+    expect(importRoutines(f, out.events, routines, NOW)).toEqual([]);
   });
 });
 

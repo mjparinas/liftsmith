@@ -319,7 +319,11 @@ export const it: FeaturesText = {
     },
     import: {
       name: "Importa da un’altra app",
-      body: "Porta la tua cronologia da Strong, Hevy, Fitbod, StrongLifts o JEFIT con il loro file di esportazione.",
+      body: "Porta la tua cronologia da Strong, Hevy, Fitbod, StrongLifts, JEFIT o FitNotes con il loro file di esportazione, cardio compreso.",
+    },
+    importExtras: {
+      name: "Routine e misure corporee da un’altra app",
+      body: "Un’importazione trasforma in routine gli allenamenti ripetuti con lo stesso nome e porta peso, grasso corporeo e misure da Hevy, FitNotes o un’app della bilancia.",
     },
     languages: {
       name: "Sei lingue",

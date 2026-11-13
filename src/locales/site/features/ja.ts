@@ -320,7 +320,11 @@ export const ja: FeaturesText = {
     },
     import: {
       name: "ほかのアプリから取り込み",
-      body: "Strong、Hevy、Fitbod、StrongLifts、JEFIT の書き出しファイルから履歴を移せます。",
+      body: "Strong、Hevy、Fitbod、StrongLifts、JEFIT、FitNotes の書き出しファイルから、有酸素運動も含めて履歴を移せます。",
+    },
+    importExtras: {
+      name: "ほかのアプリからルーティンと体のデータ",
+      body: "取り込みのとき、同じ名前で繰り返したワークアウトをルーティンにし、Hevy、FitNotes、体重計アプリから体重、体脂肪率、体のサイズを移します。",
     },
     languages: {
       name: "6 つの言語",

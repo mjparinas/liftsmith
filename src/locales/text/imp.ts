@@ -5,18 +5,17 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "imp.tooBig": "That file is too big to import (over 20 MB).",
-  "imp.notExport": "That file doesn't look like a workout export from Strong, Hevy, Fitbod, StrongLifts, JEFIT or Liftsmith.",
+  "imp.notExport":
+    "That file doesn't look like an export from Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes or Liftsmith, or a body weight or measurements file.",
   "imp.done": { one: "Imported {count} workout with {sets} sets.", other: "Imported {count} workouts with {sets} sets." },
   "imp.already": "Those workouts are already here.",
   "imp.fileLabel": "CSV file to import",
-  "imp.button": "Import workouts (CSV)",
-  "imp.note": "From Strong, Hevy, Fitbod, StrongLifts, JEFIT, or a Liftsmith export. The file is read on this device and never uploaded.",
+  "imp.button": "Import from another app (CSV)",
+  "imp.note":
+    "Workouts from Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes or a Liftsmith export, or body weight and measurements from Hevy, FitNotes or a scale app. The file is read on this device and never uploaded.",
   "imp.title": "Import from {source}",
   "imp.summary": { one: "{count} workout, {sets} sets", other: "{count} workouts, {sets} sets" },
-  "imp.skipped": {
-    one: "{count} row left out (cardio, rest timers or empty sets)",
-    other: "{count} rows left out (cardio, rest timers or empty sets)",
-  },
+  "imp.skipped": { one: "{count} row left out (rest timers or empty sets)", other: "{count} rows left out (rest timers or empty sets)" },
   "imp.again": "Workouts you've imported before are skipped.",
   "imp.unit": "Weights in this file are in",
   "imp.exercises": "Exercises",
@@ -24,24 +23,36 @@ export const en = {
   "imp.custom": "Add as my own exercise",
   "imp.import": "Import",
   "imp.cancel": "Cancel",
+  "imp.routines": "Save your routines too",
+  "imp.routinesHint": "Workouts you did under the same name more than once become routines: {names}.",
+  "imp.routinesDone": { one: "Saved {count} routine.", other: "Saved {count} routines." },
+  "imp.bodyTitle": "Import body weight and measurements",
+  "imp.bodySummary": { one: "{count} weigh-in, {measures} measurements", other: "{count} weigh-ins, {measures} measurements" },
+  "imp.bodyAgain": "Days that already have a weigh-in or that measurement keep yours.",
+  "imp.bodyDone": {
+    one: "Imported {count} weigh-in and {measures} measurements.",
+    other: "Imported {count} weigh-ins and {measures} measurements.",
+  },
+  "imp.bodyAlready": "Those readings are already here.",
 } as const;
 
 type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Ese archivo es demasiado grande para importarlo (más de 20 MB).",
-  "imp.notExport": "Ese archivo no parece una exportación de entrenamientos de Strong, Hevy, Fitbod, StrongLifts, JEFIT o Liftsmith.",
+  "imp.notExport":
+    "Ese archivo no parece una exportación de Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes o Liftsmith, ni un archivo de peso corporal o medidas.",
   "imp.done": { one: "Importado {count} entrenamiento con {sets} series.", other: "Importados {count} entrenamientos con {sets} series." },
   "imp.already": "Esos entrenamientos ya están aquí.",
   "imp.fileLabel": "Archivo CSV para importar",
-  "imp.button": "Importar entrenamientos (CSV)",
+  "imp.button": "Importar desde otra app (CSV)",
   "imp.note":
-    "De Strong, Hevy, Fitbod, StrongLifts, JEFIT o una exportación de Liftsmith. El archivo se lee en este dispositivo y nunca se sube.",
+    "Entrenamientos de Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes o una exportación de Liftsmith, o peso corporal y medidas de Hevy, FitNotes o una app de báscula. El archivo se lee en este dispositivo y nunca se sube.",
   "imp.title": "Importar de {source}",
   "imp.summary": { one: "{count} entrenamiento, {sets} series", other: "{count} entrenamientos, {sets} series" },
   "imp.skipped": {
-    one: "{count} fila omitida (cardio, temporizadores de descanso o series vacías)",
-    other: "{count} filas omitidas (cardio, temporizadores de descanso o series vacías)",
+    one: "{count} fila omitida (temporizadores de descanso o series vacías)",
+    other: "{count} filas omitidas (temporizadores de descanso o series vacías)",
   },
   "imp.again": "Los entrenamientos que ya importaste se saltan.",
   "imp.unit": "Los pesos de este archivo están en",
@@ -50,22 +61,31 @@ export const es: Partial<Record<Key, Message>> = {
   "imp.custom": "Añadir como ejercicio propio",
   "imp.import": "Importar",
   "imp.cancel": "Cancelar",
+  "imp.routines": "Guardar también tus rutinas",
+  "imp.routinesHint": "Los entrenamientos que hiciste más de una vez con el mismo nombre se convierten en rutinas: {names}.",
+  "imp.routinesDone": { one: "{count} rutina guardada.", other: "{count} rutinas guardadas." },
+  "imp.bodyTitle": "Importar peso corporal y medidas",
+  "imp.bodySummary": { one: "{count} pesaje, {measures} medidas", other: "{count} pesajes, {measures} medidas" },
+  "imp.bodyAgain": "Los días que ya tienen un pesaje o esa medida conservan los tuyos.",
+  "imp.bodyDone": { one: "Importado {count} pesaje y {measures} medidas.", other: "Importados {count} pesajes y {measures} medidas." },
+  "imp.bodyAlready": "Esos datos ya están aquí.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Ce fichier est trop gros pour être importé (plus de 20 Mo).",
-  "imp.notExport": "Ce fichier ne ressemble pas à un export de séances de Strong, Hevy, Fitbod, StrongLifts, JEFIT ou Liftsmith.",
+  "imp.notExport":
+    "Ce fichier ne ressemble pas à un export de Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ou Liftsmith, ni à un fichier de poids ou de mensurations.",
   "imp.done": { one: "{count} séance importée avec {sets} séries.", other: "{count} séances importées avec {sets} séries." },
   "imp.already": "Ces séances sont déjà là.",
   "imp.fileLabel": "Fichier CSV à importer",
-  "imp.button": "Importer des séances (CSV)",
+  "imp.button": "Importer depuis une autre app (CSV)",
   "imp.note":
-    "Depuis Strong, Hevy, Fitbod, StrongLifts, JEFIT ou un export Liftsmith. Le fichier est lu sur cet appareil et n’est jamais envoyé.",
+    "Des séances de Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes ou d’un export Liftsmith, ou le poids et les mensurations de Hevy, FitNotes ou d’une app de balance. Le fichier est lu sur cet appareil et n’est jamais envoyé.",
   "imp.title": "Importer depuis {source}",
   "imp.summary": { one: "{count} séance, {sets} séries", other: "{count} séances, {sets} séries" },
   "imp.skipped": {
-    one: "{count} ligne écartée (cardio, minuteurs de repos ou séries vides)",
-    other: "{count} lignes écartées (cardio, minuteurs de repos ou séries vides)",
+    one: "{count} ligne écartée (minuteurs de repos ou séries vides)",
+    other: "{count} lignes écartées (minuteurs de repos ou séries vides)",
   },
   "imp.again": "Les séances déjà importées sont ignorées.",
   "imp.unit": "Les charges de ce fichier sont en",
@@ -74,22 +94,34 @@ export const fr: Partial<Record<Key, Message>> = {
   "imp.custom": "Ajouter comme mon propre exercice",
   "imp.import": "Importer",
   "imp.cancel": "Annuler",
+  "imp.routines": "Enregistrer aussi vos routines",
+  "imp.routinesHint": "Les séances faites plus d’une fois sous le même nom deviennent des routines : {names}.",
+  "imp.routinesDone": { one: "{count} routine enregistrée.", other: "{count} routines enregistrées." },
+  "imp.bodyTitle": "Importer le poids et les mensurations",
+  "imp.bodySummary": { one: "{count} pesée, {measures} mensurations", other: "{count} pesées, {measures} mensurations" },
+  "imp.bodyAgain": "Les jours qui ont déjà une pesée ou cette mensuration gardent les vôtres.",
+  "imp.bodyDone": {
+    one: "{count} pesée et {measures} mensurations importées.",
+    other: "{count} pesées et {measures} mensurations importées.",
+  },
+  "imp.bodyAlready": "Ces mesures sont déjà là.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Diese Datei ist zu groß für den Import (über 20 MB).",
-  "imp.notExport": "Diese Datei sieht nicht nach einem Trainingsexport aus Strong, Hevy, Fitbod, StrongLifts, JEFIT oder Liftsmith aus.",
+  "imp.notExport":
+    "Diese Datei sieht nicht nach einem Export aus Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes oder Liftsmith aus, und auch nicht nach einer Datei mit Körpergewicht oder Maßen.",
   "imp.done": { one: "{count} Training mit {sets} Sätzen importiert.", other: "{count} Trainings mit {sets} Sätzen importiert." },
   "imp.already": "Diese Trainings sind schon da.",
   "imp.fileLabel": "CSV-Datei zum Importieren",
-  "imp.button": "Trainings importieren (CSV)",
+  "imp.button": "Aus einer anderen App importieren (CSV)",
   "imp.note":
-    "Aus Strong, Hevy, Fitbod, StrongLifts, JEFIT oder einem Liftsmith-Export. Die Datei wird auf diesem Gerät gelesen und nie hochgeladen.",
+    "Trainings aus Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes oder einem Liftsmith-Export, oder Körpergewicht und Maße aus Hevy, FitNotes oder einer Waagen-App. Die Datei wird auf diesem Gerät gelesen und nie hochgeladen.",
   "imp.title": "Import aus {source}",
   "imp.summary": { one: "{count} Training, {sets} Sätze", other: "{count} Trainings, {sets} Sätze" },
   "imp.skipped": {
-    one: "{count} Zeile weggelassen (Cardio, Pausentimer oder leere Sätze)",
-    other: "{count} Zeilen weggelassen (Cardio, Pausentimer oder leere Sätze)",
+    one: "{count} Zeile weggelassen (Pausentimer oder leere Sätze)",
+    other: "{count} Zeilen weggelassen (Pausentimer oder leere Sätze)",
   },
   "imp.again": "Bereits importierte Trainings werden übersprungen.",
   "imp.unit": "Gewichte in dieser Datei sind in",
@@ -98,22 +130,31 @@ export const de: Partial<Record<Key, Message>> = {
   "imp.custom": "Als eigene Übung hinzufügen",
   "imp.import": "Importieren",
   "imp.cancel": "Abbrechen",
+  "imp.routines": "Auch deine Routinen speichern",
+  "imp.routinesHint": "Trainings, die du mehr als einmal unter demselben Namen gemacht hast, werden zu Routinen: {names}.",
+  "imp.routinesDone": { one: "{count} Routine gespeichert.", other: "{count} Routinen gespeichert." },
+  "imp.bodyTitle": "Körpergewicht und Maße importieren",
+  "imp.bodySummary": { one: "{count} Wiegen, {measures} Maße", other: "{count} Wiegungen, {measures} Maße" },
+  "imp.bodyAgain": "Tage, die schon ein Wiegen oder dieses Maß haben, behalten deine Werte.",
+  "imp.bodyDone": { one: "{count} Wiegen und {measures} Maße importiert.", other: "{count} Wiegungen und {measures} Maße importiert." },
+  "imp.bodyAlready": "Diese Werte sind schon da.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
   "imp.tooBig": "Il file è troppo grande da importare (oltre 20 MB).",
-  "imp.notExport": "Questo file non sembra un’esportazione di allenamenti da Strong, Hevy, Fitbod, StrongLifts, JEFIT o Liftsmith.",
+  "imp.notExport":
+    "Questo file non sembra un’esportazione da Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes o Liftsmith, né un file di peso corporeo o misure.",
   "imp.done": { one: "Importato {count} allenamento con {sets} serie.", other: "Importati {count} allenamenti con {sets} serie." },
   "imp.already": "Questi allenamenti ci sono già.",
   "imp.fileLabel": "File CSV da importare",
-  "imp.button": "Importa allenamenti (CSV)",
+  "imp.button": "Importa da un’altra app (CSV)",
   "imp.note":
-    "Da Strong, Hevy, Fitbod, StrongLifts, JEFIT o un’esportazione di Liftsmith. Il file viene letto su questo dispositivo e mai caricato.",
+    "Allenamenti da Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes o un’esportazione di Liftsmith, oppure peso corporeo e misure da Hevy, FitNotes o un’app della bilancia. Il file viene letto su questo dispositivo e mai caricato.",
   "imp.title": "Importa da {source}",
   "imp.summary": { one: "{count} allenamento, {sets} serie", other: "{count} allenamenti, {sets} serie" },
   "imp.skipped": {
-    one: "{count} riga esclusa (cardio, timer di riposo o serie vuote)",
-    other: "{count} righe escluse (cardio, timer di riposo o serie vuote)",
+    one: "{count} riga esclusa (timer di riposo o serie vuote)",
+    other: "{count} righe escluse (timer di riposo o serie vuote)",
   },
   "imp.again": "Gli allenamenti già importati vengono saltati.",
   "imp.unit": "I pesi in questo file sono in",
@@ -122,20 +163,29 @@ export const it: Partial<Record<Key, Message>> = {
   "imp.custom": "Aggiungi come mio esercizio",
   "imp.import": "Importa",
   "imp.cancel": "Annulla",
+  "imp.routines": "Salva anche le tue routine",
+  "imp.routinesHint": "Gli allenamenti fatti più di una volta con lo stesso nome diventano routine: {names}.",
+  "imp.routinesDone": { one: "{count} routine salvata.", other: "{count} routine salvate." },
+  "imp.bodyTitle": "Importa peso corporeo e misure",
+  "imp.bodySummary": { one: "{count} pesata, {measures} misure", other: "{count} pesate, {measures} misure" },
+  "imp.bodyAgain": "I giorni che hanno già una pesata o quella misura tengono i tuoi valori.",
+  "imp.bodyDone": { one: "Importata {count} pesata e {measures} misure.", other: "Importate {count} pesate e {measures} misure." },
+  "imp.bodyAlready": "Questi valori ci sono già.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
   "imp.tooBig": "ファイルが大きすぎて読み込めません（20 MB 超）。",
-  "imp.notExport": "このファイルは Strong、Hevy、Fitbod、StrongLifts、JEFIT、Liftsmith のワークアウト書き出しではないようです。",
+  "imp.notExport":
+    "このファイルは Strong、Hevy、Fitbod、StrongLifts、JEFIT、FitNotes、Liftsmith の書き出しでも、体重や体のサイズのファイルでもないようです。",
   "imp.done": { other: "{count}回のワークアウト（{sets}セット）を読み込みました。" },
   "imp.already": "これらのワークアウトはすでにあります。",
   "imp.fileLabel": "読み込む CSV ファイル",
-  "imp.button": "ワークアウトを読み込む（CSV）",
+  "imp.button": "ほかのアプリから読み込む（CSV）",
   "imp.note":
-    "Strong、Hevy、Fitbod、StrongLifts、JEFIT、または Liftsmith の書き出しから。ファイルはこの端末で読み取り、アップロードしません。",
+    "Strong、Hevy、Fitbod、StrongLifts、JEFIT、FitNotes、Liftsmith の書き出しからワークアウトを、Hevy、FitNotes、体重計アプリから体重と体のサイズを読み込めます。ファイルはこの端末で読み取り、アップロードしません。",
   "imp.title": "{source}から読み込む",
   "imp.summary": { other: "ワークアウト{count}回、{sets}セット" },
-  "imp.skipped": { other: "{count}行を除外（有酸素、休憩タイマー、空のセット）" },
+  "imp.skipped": { other: "{count}行を除外（休憩タイマー、空のセット）" },
   "imp.again": "以前読み込んだワークアウトはスキップします。",
   "imp.unit": "このファイルの重量の単位",
   "imp.exercises": "種目",
@@ -143,4 +193,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "imp.custom": "自分の種目として追加",
   "imp.import": "読み込む",
   "imp.cancel": "キャンセル",
+  "imp.routines": "ルーティンも保存する",
+  "imp.routinesHint": "同じ名前で2回以上行ったワークアウトをルーティンにします：{names}。",
+  "imp.routinesDone": { other: "ルーティンを{count}件保存しました。" },
+  "imp.bodyTitle": "体重と体のサイズを読み込む",
+  "imp.bodySummary": { other: "体重{count}回、サイズ{measures}件" },
+  "imp.bodyAgain": "すでに体重やそのサイズの記録がある日は、今の記録を残します。",
+  "imp.bodyDone": { other: "体重{count}回とサイズ{measures}件を読み込みました。" },
+  "imp.bodyAlready": "これらの記録はすでにあります。",
 };
