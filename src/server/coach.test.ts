@@ -18,10 +18,10 @@ import {
   overview,
   previewInvite,
   removePlan,
+  roleOf,
   saveSetup,
   sendMessage,
   setAlerts,
-  setKind,
   setNote,
   setRole,
   setShare,
@@ -29,7 +29,7 @@ import {
   unlink,
   unreadFrom,
 } from "./coach";
-import { query, resetDb } from "./db";
+import { query, resetDb, run } from "./db";
 import { saveToken, setPushSender, type PushMessage } from "./push";
 import { sync } from "./sync";
 
@@ -516,16 +516,20 @@ describe("physio support", () => {
     expect((await clientView("coach", "client", NOW))!.body).not.toBeNull();
   });
 
-  it("a coach can work as a physio, which their clients see", async () => {
-    expect((await overview("coach", NOW)).kind).toBe("trainer");
-    expect(await setKind("coach", "physio", NOW)).toBe("physio");
-    expect(await setKind("coach", "surgeon", NOW)).toBe("trainer");
-    await setKind("coach", "physio", NOW);
+  it("physio is one of the roles, and coaches who picked physio before keep it", async () => {
+    expect(await setRole("coach", "physio", NOW)).toBe("physio");
     await setAlerts("coach", false, NOW);
-    expect((await overview("coach", NOW)).kind).toBe("physio");
+    expect((await overview("coach", NOW)).role).toBe("physio");
     expect((await overview("coach", NOW)).alerts).toBe(false);
-    expect((await overview("client", NOW)).kinds).toEqual({ coach: "physio" });
-    expect((await clientView("coach", "client", NOW))!.kind).toBe("physio");
+    expect((await overview("client", NOW)).coaches[0]).toMatchObject({ id: "coach", role: "physio" });
+    // Picking another role leaves physio behind.
+    await setRole("coach", "coach", NOW);
+    expect(await roleOf("coach")).toBe("coach");
+    // A row from the old "I coach as" picker: physio there wins over a role.
+    await run("UPDATE coach_prefs SET kind = 'physio', role = 'trainer' WHERE account_id = ?", ["coach"]);
+    expect(await roleOf("coach")).toBe("physio");
+    await run("UPDATE coach_prefs SET kind = 'trainer', role = NULL WHERE account_id = ?", ["coach"]);
+    expect(await roleOf("coach")).toBeNull();
   });
 
   it("a routine can say how many times a week, and only 1 to 7", async () => {

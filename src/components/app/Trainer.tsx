@@ -5,7 +5,7 @@
 // "Your clients", where a coach shares an invite, picks what new clients start setup with, and opens each
 // client's report (Pro: out of Labs on 2026-11-12). The client's report also holds the coach's note to them.
 // A client's report is #/trainer/c.<id>; an invite link is #/trainer/<code>, which fills in the code.
-// Physio support (2026-11-13) lives in CoachRehab.tsx: trainer or physio, pain and injuries, rehab programs.
+// Physio support (2026-11-13) lives in CoachRehab.tsx: the Physio role, pain and injuries, rehab programs.
 // School teams (SchoolTeams.tsx) sit at the bottom; a team link is #/trainer/team.<code>.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
@@ -51,7 +51,6 @@ import {
   useCoachNotes,
   type BodyShare,
   type ClientView,
-  type CoachKind,
   type Note,
   type Overview,
   type Person,
@@ -70,7 +69,7 @@ import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { ClientPayments, PaySetup, YourPayments } from "./CoachPay";
-import { ClientPain, CoachKindPicker, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
+import { ClientPain, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
 import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
@@ -148,7 +147,6 @@ function Home({ code, team = "", paid = false }: { code: string; team?: string; 
           unread={data?.unread ?? {}}
           shared={data?.bodyShared ?? []}
           painShared={data?.painShared ?? []}
-          kinds={data?.kinds ?? {}}
           targets={data?.targets ?? []}
           code={code}
           onChange={reload}
@@ -173,7 +171,6 @@ function YourCoach({
   unread,
   shared,
   painShared,
-  kinds,
   targets,
   code,
   onChange,
@@ -184,7 +181,6 @@ function YourCoach({
   unread: Record<string, number>;
   shared: string[];
   painShared: string[];
-  kinds: Record<string, CoachKind>;
   targets: Targets[];
   code: string;
   onChange: () => void;
@@ -309,7 +305,7 @@ function YourCoach({
               <span className="min-w-0 flex-1 py-1">
                 <span className="block truncate font-medium">{c.name || t("trn.noName")}</span>
                 <span className="block text-xs text-muted">
-                  {kinds[c.id] === "physio" ? `${t("trn.kind.physio")} · ` : c.role && `${t(`trn.role.${c.role}`)} · `}
+                  {c.role && `${t(`trn.role.${c.role}`)} · `}
                   {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
                 </span>
               </span>
@@ -586,7 +582,6 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       )}
       <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
-      <CoachKindPicker key={data.kind ?? "trainer"} kind={data.kind ?? "trainer"} onChange={onChange} />
       {/* A personal trainer's sessions come before their client list; a coach's after it. */}
       {data.role !== "coach" && sessions}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
@@ -628,7 +623,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
   );
 }
 
-/** Personal trainer or coach: changes the words clients see and what comes first, never which tools there are. */
+/** Personal trainer, coach or physio: changes the words clients see and what comes first, never which tools there are. */
 function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => void }) {
   const [role, setRole] = useState<Role | null>(saved);
   const pick = async (r: Role) => {
@@ -659,7 +654,7 @@ function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => voi
     </section>
   );
 }
-const ROLE_CHOICES: Role[] = ["trainer", "coach"];
+const ROLE_CHOICES: Role[] = ["trainer", "coach", "physio"];
 
 const GOAL_CHOICES: Goal[] = ["muscle", "strength", "general"];
 const LEVEL_CHOICES: { id: Experience; key: "setup.exp.new" | "setup.exp.intermediate" | "exp.advanced" }[] = [
@@ -950,7 +945,7 @@ function ClientScreen({ id }: { id: string }) {
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
         // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
-        setPhysio(v.kind === "physio");
+        setPhysio(v.role === "physio");
         setTargets(v.targets ?? null);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
       })

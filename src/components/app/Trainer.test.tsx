@@ -322,7 +322,7 @@ describe("chat and body data", () => {
         return Response.json({
           name: "Alex",
           daysPerWeek: 3,
-          kind: "physio",
+          role: "physio",
           pain: true,
           plans: assigned,
           events: [
@@ -462,6 +462,12 @@ describe("personal trainer or coach", () => {
     await u.click(await screen.findByRole("button", { name: "Personal trainer" }));
     expect(calls.find((c) => (c.body as { action?: string })?.action === "role")).toMatchObject({ body: { role: "trainer" } });
     expect(screen.getByText(/One-on-one clients/)).toBeInTheDocument();
+    // Physio is the third choice in the same picker (it used to be a picker of its own).
+    expect(screen.getAllByRole("group", { name: "How you work" })).toHaveLength(1);
+    await u.click(screen.getByRole("button", { name: "Physio" }));
+    expect(calls.filter((c) => (c.body as { action?: string })?.action === "role").at(-1)).toMatchObject({ body: { role: "physio" } });
+    expect(screen.getByText(/For physios and rehab clinicians/)).toBeInTheDocument();
+    expect(screen.queryByText("I coach as")).not.toBeInTheDocument();
   });
 
   it("a client with a personal trainer sees the word trainer", async () => {

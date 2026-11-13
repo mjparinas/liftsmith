@@ -26,7 +26,7 @@ import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, t
 import { fmtNum } from "./units";
 
 /** Personal trainer (one-on-one, sessions first) or coach (groups and teams, check-ins first); server coach.ts. */
-export type Role = "trainer" | "coach";
+export type Role = "trainer" | "coach" | "physio";
 export interface Person {
   id: string;
   name: string;
@@ -49,8 +49,6 @@ export interface Plan {
   /** How many times a week the coach wants it done (1 to 7), for adherence. */
   perWeek?: number;
 }
-/** How a coach works: a trainer, or a physio or rehab clinician (physio support, 2026-11-13). */
-export type CoachKind = "trainer" | "physio";
 /** What a coach's new clients start setup with (any part may be unset). */
 export interface Setup {
   goal?: Goal;
@@ -85,8 +83,6 @@ export interface Overview {
   painShared?: string[];
   sharesPain?: string[];
   /** How this account coaches, and how each of its coaches does, by id. */
-  kind?: CoachKind;
-  kinds?: Record<string, CoachKind>;
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets?: Targets[];
   /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
@@ -137,7 +133,6 @@ export interface ClientView {
   /** Whether the client shares pain and injuries with this coach. */
   pain?: boolean;
   /** How the coach looking works (their own setting). */
-  kind?: CoachKind;
   /** This coach's daily nutrition targets for the client. */
   targets?: Targets | null;
   /** The latest check-ins this coach sent the client, newest first, and the one that repeats weekly. */
@@ -203,8 +198,6 @@ export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
 export const setPainShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on, what: "pain" } })).on;
-export const setCoachKind = async (kind: CoachKind) =>
-  (await api<{ kind: CoachKind }>("/api/coach/", { token: token(), body: { action: "kind", kind } })).kind;
 export const saveRole = async (role: Role) =>
   (await api<{ role: Role | null }>("/api/coach/", { token: token(), body: { action: "role", role } })).role;
 /** "Your trainer" when every coach a lifter has is a personal trainer, else "Your coach". */

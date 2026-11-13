@@ -67,12 +67,6 @@ export const en = {
   "trn.f.stalledDo": "For three weeks, change the rep range, add a set, or swap to a close variation.",
   "trn.f.prs": { one: "{count} new best this month", other: "{count} new bests this month" },
   "trn.f.prsDo": "Tell them. Progress they notice keeps them coming back.",
-  "trn.kindTitle": "I coach as",
-  "trn.kind.trainer": "Trainer",
-  "trn.kind.physio": "Physio",
-  "trn.kindTrainerHint": "Client reports lead with training: who's gone quiet, missing reps or stalled.",
-  "trn.kindPhysioHint":
-    "For physios and rehab clinicians: reports lead with pain and injuries your clients share, and rehab programs come first when you assign.",
   "trn.sharePain": "Share pain and injuries with {name}",
   "trn.sharePainHint":
     "The areas you logged in Something hurts?, when you logged and healed them, and your 0 to 10 pain ratings with the exercise each was rated on. Off until you turn it on.",
@@ -237,6 +231,9 @@ export const en = {
   "trn.role.trainerHint":
     "One-on-one clients, mostly in person. Sessions, booking and a price per session come first. Every tool is still here.",
   "trn.role.coachHint": "Teams and groups, often remotely. Check-ins, programs and a monthly fee come first. Every tool is still here.",
+  "trn.role.physio": "Physio",
+  "trn.role.physioHint":
+    "For physios and rehab clinicians: reports lead with pain and injuries your clients share, and rehab programs come first when you assign.",
   "trn.role.pick": "Pick one, so clients see the right word for you and the tools you use most come first.",
   "trn.err.taken": "That time was just booked or removed. Pick another.",
   "trn.err.slotsFull": "You have as many upcoming times as you can open. Remove some first.",
@@ -311,12 +308,6 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.f.stalledDo": "Durante tres semanas, cambia el rango de repeticiones, añade una serie o pasa a una variante parecida.",
   "trn.f.prs": { one: "{count} nueva marca este mes", other: "{count} nuevas marcas este mes" },
   "trn.f.prsDo": "Díselo. El progreso que se nota hace que sigan viniendo.",
-  "trn.kindTitle": "Entreno como",
-  "trn.kind.trainer": "Entrenador",
-  "trn.kind.physio": "Fisioterapeuta",
-  "trn.kindTrainerHint": "Los informes empiezan por el entrenamiento: quién ha dejado de entrenar, falla repeticiones o se ha estancado.",
-  "trn.kindPhysioHint":
-    "Para fisioterapeutas y profesionales de rehabilitación: los informes empiezan por el dolor y las lesiones que comparten tus clientes, y los programas de rehabilitación aparecen primero al asignar.",
   "trn.sharePain": "Compartir dolor y lesiones con {name}",
   "trn.sharePainHint":
     "Las zonas que registraste en ¿Te duele algo?, cuándo las registraste y se curaron, y tus valoraciones de dolor de 0 a 10 con el ejercicio de cada una. Desactivado hasta que lo actives.",
@@ -483,6 +474,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Clientes uno a uno, sobre todo en persona. Primero van las sesiones, las reservas y el precio por sesión. Todas las herramientas siguen aquí.",
   "trn.role.coachHint":
     "Equipos y grupos, a menudo a distancia. Primero van las revisiones, los programas y la cuota mensual. Todas las herramientas siguen aquí.",
+  "trn.role.physio": "Fisioterapeuta",
+  "trn.role.physioHint":
+    "Para fisioterapeutas y profesionales de rehabilitación: los informes empiezan por el dolor y las lesiones que comparten tus clientes, y los programas de rehabilitación aparecen primero al asignar.",
   "trn.role.pick": "Elige uno, para que tus clientes vean la palabra correcta y lo que más usas vaya primero.",
   "trn.err.taken": "Esa hora se acaba de reservar o eliminar. Elige otra.",
   "trn.err.slotsFull": "Ya tienes el máximo de horas próximas. Quita algunas primero.",
@@ -556,12 +550,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.f.stalledDo": "Pendant trois semaines, changez la plage de répétitions, ajoutez une série ou passez à une variante proche.",
   "trn.f.prs": { one: "{count} nouveau record ce mois-ci", other: "{count} nouveaux records ce mois-ci" },
   "trn.f.prsDo": "Dites-le-lui. Un progrès qu'on remarque donne envie de continuer.",
-  "trn.kindTitle": "Je coache en tant que",
-  "trn.kind.trainer": "Coach",
-  "trn.kind.physio": "Kinésithérapeute",
-  "trn.kindTrainerHint": "Les rapports commencent par l'entraînement : qui ne s'entraîne plus, rate des répétitions ou stagne.",
-  "trn.kindPhysioHint":
-    "Pour les kinés et les professionnels de la rééducation : les rapports commencent par la douleur et les blessures que vos clients partagent, et les programmes de rééducation passent en premier quand vous en assignez.",
   "trn.sharePain": "Partager douleur et blessures avec {name}",
   "trn.sharePainHint":
     "Les zones notées dans Une douleur ?, quand vous les avez notées et quand elles ont guéri, et vos notes de douleur de 0 à 10 avec l'exercice de chacune. Désactivé tant que vous ne l'activez pas.",
@@ -741,6 +729,9 @@ export const fr: Partial<Record<Key, Message>> = {
     "Des clients en individuel, surtout en personne. Les séances, les réservations et le prix par séance passent en premier. Tous les outils restent là.",
   "trn.role.coachHint":
     "Des équipes et des groupes, souvent à distance. Les bilans, les programmes et le tarif mensuel passent en premier. Tous les outils restent là.",
+  "trn.role.physio": "Kinésithérapeute",
+  "trn.role.physioHint":
+    "Pour les kinés et les professionnels de la rééducation : les rapports commencent par la douleur et les blessures que vos clients partagent, et les programmes de rééducation passent en premier quand vous en assignez.",
   "trn.role.pick": "Choisissez-en un, pour que vos clients voient le bon mot et que vos outils favoris passent en premier.",
   "trn.err.taken": "Ce créneau vient d'être réservé ou supprimé. Choisissez-en un autre.",
   "trn.err.slotsFull": "Vous avez atteint le nombre maximal de créneaux à venir. Supprimez-en d'abord.",
@@ -814,12 +805,6 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.f.stalledDo": "Ändere drei Wochen lang den Wiederholungsbereich, füg einen Satz hinzu oder wechsle zu einer ähnlichen Variante.",
   "trn.f.prs": { one: "{count} neue Bestleistung diesen Monat", other: "{count} neue Bestleistungen diesen Monat" },
   "trn.f.prsDo": "Sag es ihnen. Fortschritt, den man bemerkt, hält bei der Stange.",
-  "trn.kindTitle": "Ich coache als",
-  "trn.kind.trainer": "Trainer",
-  "trn.kind.physio": "Physiotherapeut",
-  "trn.kindTrainerHint": "Die Berichte beginnen mit dem Training: wer pausiert, Wiederholungen verpasst oder stagniert.",
-  "trn.kindPhysioHint":
-    "Für Physiotherapeuten und Reha-Fachleute: Die Berichte beginnen mit Schmerzen und Verletzungen, die deine Klienten teilen, und Reha-Programme stehen beim Zuweisen ganz oben.",
   "trn.sharePain": "Schmerzen und Verletzungen mit {name} teilen",
   "trn.sharePainHint":
     "Die Bereiche aus „Tut etwas weh?“, wann du sie eingetragen hast und wann sie verheilt sind, und deine Schmerzwerte von 0 bis 10 mit der Übung, bei der du sie vergeben hast. Aus, bis du es einschaltest.",
@@ -991,6 +976,9 @@ export const de: Partial<Record<Key, Message>> = {
     "Einzelkunden, meist vor Ort. Einheiten, Buchungen und ein Preis pro Einheit stehen vorn. Alle Werkzeuge bleiben da.",
   "trn.role.coachHint":
     "Teams und Gruppen, oft aus der Ferne. Check-ins, Programme und eine Monatsgebühr stehen vorn. Alle Werkzeuge bleiben da.",
+  "trn.role.physio": "Physiotherapeut",
+  "trn.role.physioHint":
+    "Für Physiotherapeuten und Reha-Fachleute: Die Berichte beginnen mit Schmerzen und Verletzungen, die deine Klienten teilen, und Reha-Programme stehen beim Zuweisen ganz oben.",
   "trn.role.pick": "Wähl eins, damit deine Kunden das richtige Wort sehen und deine wichtigsten Werkzeuge vorn stehen.",
   "trn.err.taken": "Diese Zeit wurde gerade gebucht oder entfernt. Wähl eine andere.",
   "trn.err.slotsFull": "Du hast schon die meisten kommenden Zeiten, die möglich sind. Entfern zuerst welche.",
@@ -1062,12 +1050,6 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.f.stalledDo": "Per tre settimane, cambia il range di ripetizioni, aggiungi una serie o passa a una variante simile.",
   "trn.f.prs": { one: "{count} nuovo record questo mese", other: "{count} nuovi record questo mese" },
   "trn.f.prsDo": "Diglielo. I progressi che si notano fanno tornare.",
-  "trn.kindTitle": "Seguo i clienti come",
-  "trn.kind.trainer": "Allenatore",
-  "trn.kind.physio": "Fisioterapista",
-  "trn.kindTrainerHint": "I report partono dall'allenamento: chi si è fermato, manca ripetizioni o è in stallo.",
-  "trn.kindPhysioHint":
-    "Per fisioterapisti e professionisti della riabilitazione: i report partono da dolore e infortuni che i tuoi clienti condividono, e i programmi di riabilitazione compaiono per primi quando assegni.",
   "trn.sharePain": "Condividi dolore e infortuni con {name}",
   "trn.sharePainHint":
     "Le zone registrate in Ti fa male qualcosa?, quando le hai registrate e quando sono guarite, e le tue valutazioni del dolore da 0 a 10 con l'esercizio di ciascuna. Disattivato finché non lo attivi.",
@@ -1234,6 +1216,9 @@ export const it: Partial<Record<Key, Message>> = {
     "Clienti uno a uno, soprattutto di persona. Prima le sessioni, le prenotazioni e il prezzo a sessione. Tutti gli strumenti restano qui.",
   "trn.role.coachHint":
     "Squadre e gruppi, spesso a distanza. Prima i check-in, i programmi e la quota mensile. Tutti gli strumenti restano qui.",
+  "trn.role.physio": "Fisioterapista",
+  "trn.role.physioHint":
+    "Per fisioterapisti e professionisti della riabilitazione: i report partono da dolore e infortuni che i tuoi clienti condividono, e i programmi di riabilitazione compaiono per primi quando assegni.",
   "trn.role.pick": "Scegline uno, così i clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
   "trn.err.taken": "Quell'orario è appena stato prenotato o rimosso. Scegline un altro.",
   "trn.err.slotsFull": "Hai già il numero massimo di orari futuri. Rimuovine qualcuno prima.",
@@ -1303,12 +1288,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.f.stalledDo": "3週間、レップ範囲を変えるか、1セット増やすか、近いバリエーションに切り替えましょう。",
   "trn.f.prs": { other: "今月の自己ベスト更新 {count}件" },
   "trn.f.prsDo": "伝えてあげましょう。気づいた進歩が、続ける力になります。",
-  "trn.kindTitle": "指導のスタイル",
-  "trn.kind.trainer": "トレーナー",
-  "trn.kind.physio": "理学療法士",
-  "trn.kindTrainerHint": "レポートはトレーニングから始まります。休んでいる人、回数が足りない人、伸び悩んでいる人がわかります。",
-  "trn.kindPhysioHint":
-    "理学療法士やリハビリ専門職向けです。レポートはクライアントが共有した痛みとけがから始まり、割り当てではリハビリプログラムが先に表示されます。",
   "trn.sharePain": "{name}さんと痛みとけがを共有",
   "trn.sharePainHint":
     "「どこか痛む？」で記録した部位、記録日と治った日、そして0〜10の痛みの評価とその時の種目です。オンにするまで共有されません。",
@@ -1461,6 +1440,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.role.trainerHint": "マンツーマン、主に対面。セッション、予約、1回ごとの料金が先に表示されます。ほかの機能もすべて使えます。",
   "trn.role.coachHint":
     "チームやグループ、リモートが中心。チェックイン、プログラム、月額料金が先に表示されます。ほかの機能もすべて使えます。",
+  "trn.role.physio": "理学療法士",
+  "trn.role.physioHint":
+    "理学療法士やリハビリ専門職向けです。レポートはクライアントが共有した痛みとけがから始まり、割り当てではリハビリプログラムが先に表示されます。",
   "trn.role.pick": "選ぶと、クライアントに正しい呼び方で表示され、よく使う機能が先に並びます。",
   "trn.err.taken": "その時間はたった今予約されたか削除されました。別の時間を選んでください。",
   "trn.err.slotsFull": "公開できる今後の時間の上限に達しています。先にいくつか削除してください。",

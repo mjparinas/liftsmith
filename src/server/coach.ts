@@ -127,10 +127,6 @@ const plan = (r: PlanRow): Plan => {
 export const cleanPerWeek = (x: unknown): number | undefined =>
   typeof x === "number" && Number.isInteger(x) && x >= 1 && x <= 7 ? x : undefined;
 
-/** How a coach works: a trainer (the default) or a physio or rehab clinician. */
-export type CoachKind = "trainer" | "physio";
-export const cleanKind = (x: unknown): CoachKind => (x === "physio" ? "physio" : "trainer");
-
 /** What a coach's new clients start setup with, so an invited client skips those questions. Any part may be unset. */
 export interface Setup {
   goal?: "muscle" | "strength" | "general";
@@ -238,9 +234,6 @@ export async function overview(
   /** The coaches this client shares pain and injuries with, and the clients who share theirs with this coach. */
   painShared: string[];
   sharesPain: string[];
-  /** How this account coaches, and how each of its coaches does (by id). */
-  kind: CoachKind;
-  kinds: Record<string, CoachKind>;
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets: Targets[];
   /** How this account works with clients, once they've said. */
@@ -282,15 +275,6 @@ export async function overview(
     ),
     sharesPain: (await query<{ id: string }>("SELECT client_id AS id FROM coach_shares WHERE coach_id = ? AND pain = 1", [accountId])).map(
       (r) => String(r.id),
-    ),
-    kind: await kindOf(accountId),
-    kinds: Object.fromEntries(
-      (
-        await query<{ id: string; kind: string }>(
-          "SELECT p.account_id AS id, p.kind FROM coach_prefs p JOIN coach_links l ON l.coach_id = p.account_id WHERE l.client_id = ?",
-          [accountId],
-        )
-      ).map((r) => [String(r.id), cleanKind(r.kind)]),
     ),
     targets: await targetsFor(accountId),
     role: await roleOf(accountId),
@@ -500,8 +484,6 @@ export interface ClientView {
   body: BodyShare | null;
   /** Whether the client shares pain and injuries with this coach (the events above then include them). */
   pain: boolean;
-  /** How the coach looking works, so their phone puts pain first for a physio. */
-  kind: CoachKind;
   /** This coach's daily nutrition targets for the client, if any. */
   targets: Targets | null;
 }
@@ -559,7 +541,6 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     note: n ? note(n) : null,
     body: (await sharesBody(coachId, clientId)) ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
     pain,
-    kind: await kindOf(coachId),
     targets: (await targetsFor(clientId, coachId))[0] ?? null,
   };
 }
@@ -810,22 +791,6 @@ export async function alertsOn(coachId: string): Promise<boolean> {
   return r ? Number(r.alerts) === 1 : true;
 }
 
-export async function kindOf(coachId: string): Promise<CoachKind> {
-  const [r] = await query<{ kind: string }>("SELECT kind FROM coach_prefs WHERE account_id = ?", [coachId]);
-  return cleanKind(r?.kind);
-}
-
-/** A coach says how they work: trainer or physio. Alerts keep their setting. */
-export async function setKind(coachId: string, kind: unknown, now = Date.now()): Promise<CoachKind> {
-  const k = cleanKind(kind);
-  await run(
-    `INSERT INTO coach_prefs (account_id, alerts, kind, updated_at) VALUES (?, 1, ?, ?)
-     ON CONFLICT (account_id) DO UPDATE SET kind = excluded.kind, updated_at = excluded.updated_at`,
-    [coachId, k, now],
-  );
-  return k;
-}
-
 export async function setAlerts(coachId: string, on: unknown, now = Date.now()): Promise<boolean> {
   await run(
     `INSERT INTO coach_prefs (account_id, alerts, updated_at) VALUES (?, ?, ?)
@@ -835,27 +800,33 @@ export async function setAlerts(coachId: string, on: unknown, now = Date.now()):
   return on !== false;
 }
 
-// ---------- Personal trainer or coach (Melvin, 2026-11-13) ----------
+// ---------- Personal trainer, coach or physio (Melvin, 2026-11-13) ----------
 
 /**
  * How someone works with clients. A personal trainer works one-on-one, mostly in person: sessions, booking and a price
  * per session come first. A coach runs groups or teams, often remotely: check-ins, programs and a monthly fee come first.
- * It changes words and what's shown first, never which tools there are (docs/decisions/trainer-mode.md).
+ * A physio or rehab clinician sees pain and injuries first and assigns rehab programs. It changes words and what's shown
+ * first, never which tools there are (docs/decisions/trainer-mode.md).
  */
-export type Role = "trainer" | "coach";
-export const ROLES: Role[] = ["trainer", "coach"];
+export type Role = "trainer" | "coach" | "physio";
+export const ROLES: Role[] = ["trainer", "coach", "physio"];
 
+/**
+ * One choice since 2026-11-13. Physio used to be a separate `kind` column beside `role`; a coach who picked Physio
+ * there stays a physio (kind wins over role), so nobody's setting changes. Every save writes both columns.
+ */
 export async function roleOf(id: string): Promise<Role | null> {
-  const [r] = await query<{ role: string | null }>("SELECT role FROM coach_prefs WHERE account_id = ?", [id]);
+  const [r] = await query<{ role: string | null; kind: string | null }>("SELECT role, kind FROM coach_prefs WHERE account_id = ?", [id]);
+  if (r?.kind === "physio") return "physio";
   return ROLES.find((x) => x === r?.role) ?? null;
 }
 
 export async function setRole(coachId: string, role: unknown, now = Date.now()): Promise<Role | null> {
   const r = ROLES.find((x) => x === role) ?? null;
   await run(
-    `INSERT INTO coach_prefs (account_id, alerts, role, updated_at) VALUES (?, 1, ?, ?)
-     ON CONFLICT (account_id) DO UPDATE SET role = excluded.role, updated_at = excluded.updated_at`,
-    [coachId, r, now],
+    `INSERT INTO coach_prefs (account_id, alerts, role, kind, updated_at) VALUES (?, 1, ?, ?, ?)
+     ON CONFLICT (account_id) DO UPDATE SET role = excluded.role, kind = excluded.kind, updated_at = excluded.updated_at`,
+    [coachId, r, r === "physio" ? "physio" : "trainer", now],
   );
   return r;
 }
