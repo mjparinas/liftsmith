@@ -3,7 +3,10 @@ name: Mutation tests
 # Stryker on the engine (plates, progression, recovery, readiness, blocks, generator, stats, game).
 # Run by hand only (Actions > Mutation tests > Run workflow): it is long and expensive, so it is not a
 # pull request or merge gate (Melvin, 2026-11-09). The incremental file is cached so a rerun only redoes
-# what changed. Fails below the `break` score in stryker.config.mjs.
+# what changed. Fails below the `break` score in stryker.config.mjs. Mutants are checked against the
+# engine's own tests under src/lib (vitest.mutation.config.mts); with the screen, site and server tests too, a run took ~5 hours
+# and was cancelled at the hour limit (2026-11-11 and 2026-11-12) before writing any report. A full run
+# now takes about 45 minutes on 4 cores; reruns only redo what changed.
 
 on:
   workflow_dispatch:
@@ -15,18 +18,24 @@ jobs:
   mutation:
     name: Stryker
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
-      - uses: actions/cache@v6
+      - uses: actions/cache/restore@v6
         with:
           path: reports/mutation/stryker-incremental.json
           key: stryker-${{ github.sha }}
           restore-keys: stryker-
       - run: npx stryker run
+      # Saved even when the score is below `break`, so the next run only redoes what changed.
+      - uses: actions/cache/save@v6
+        if: always()
+        with:
+          path: reports/mutation/stryker-incremental.json
+          key: stryker-${{ github.sha }}
       - uses: actions/upload-artifact@v7
-        if: ${{ !cancelled() }}
+        if: always()
         with:
           name: mutation-report
           path: reports/mutation
