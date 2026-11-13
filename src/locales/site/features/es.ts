@@ -289,6 +289,10 @@ export const es: FeaturesText = {
       name: "Formularios de revisión y cuestionarios",
       body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
     },
+    "coach-roles": {
+      name: "Para entrenadores personales y coaches",
+      body: "Indica si eres entrenador personal uno a uno o coach de grupos y equipos. Tus clientes ven la palabra correcta y lo que más usas va primero.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

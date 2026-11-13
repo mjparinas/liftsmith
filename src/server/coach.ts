@@ -58,6 +58,8 @@ export interface Person {
   id: string;
   name: string;
   since: number;
+  /** A coach's role, in a client's list of coaches (absent until they pick). */
+  role?: Role;
 }
 export interface Invite {
   code: string;
@@ -75,8 +77,15 @@ export async function nameOf(accountId: string): Promise<string> {
   }
 }
 
-async function people(rows: { id: string; since: number }[]): Promise<Person[]> {
-  return Promise.all(rows.map(async (r) => ({ id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) })));
+async function people(rows: { id: string; since: number }[], roles = false): Promise<Person[]> {
+  return Promise.all(
+    rows.map(async (r) => {
+      const p: Person = { id: String(r.id), since: Number(r.since), name: await nameOf(String(r.id)) };
+      // A lifter's coaches say whether they're a personal trainer or a coach, for the words around them.
+      const role = roles ? await roleOf(p.id) : null;
+      return role ? { ...p, role } : p;
+    }),
+  );
 }
 
 /** A routine a coach assigned to a client. `code` is a routine share code (src/lib/routineShare.ts). */
@@ -204,6 +213,8 @@ export async function overview(
   alerts: boolean;
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets: Targets[];
+  /** How this account works with clients, once they've said. */
+  role: Role | null;
 }> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
@@ -224,7 +235,7 @@ export async function overview(
   return {
     invite: inv ? { code: String(inv.code), expiresAt: Number(inv.expires_at) } : null,
     clients: await people(clients),
-    coaches: await people(coaches),
+    coaches: await people(coaches, true),
     plans: plans.map(plan),
     notes: notes.map(note),
     setup: await setupOf(accountId),
@@ -237,6 +248,7 @@ export async function overview(
     ),
     alerts: await alertsOn(accountId),
     targets: await targetsFor(accountId),
+    role: await roleOf(accountId),
   };
 }
 
@@ -280,7 +292,8 @@ export async function previewInvite(
   if (!inv) return { error: "unknown" };
   const coachId = String(inv.coach_id);
   if (coachId === accountId) return { error: "self" };
-  return { coach: { id: coachId, name: await nameOf(coachId), since: now }, setup: await setupOf(coachId) };
+  const [coach] = await people([{ id: coachId, since: now }], true);
+  return { coach: coach!, setup: await setupOf(coachId) };
 }
 
 /** The client agrees: links them to the code's coach. Joining twice is fine. */
@@ -725,6 +738,31 @@ export async function setAlerts(coachId: string, on: unknown, now = Date.now()):
     [coachId, on === false ? 0 : 1, now],
   );
   return on !== false;
+}
+
+// ---------- Personal trainer or coach (Melvin, 2026-11-13) ----------
+
+/**
+ * How someone works with clients. A personal trainer works one-on-one, mostly in person: sessions, booking and a price
+ * per session come first. A coach runs groups or teams, often remotely: check-ins, programs and a monthly fee come first.
+ * It changes words and what's shown first, never which tools there are (docs/decisions/trainer-mode.md).
+ */
+export type Role = "trainer" | "coach";
+export const ROLES: Role[] = ["trainer", "coach"];
+
+export async function roleOf(id: string): Promise<Role | null> {
+  const [r] = await query<{ role: string | null }>("SELECT role FROM coach_prefs WHERE account_id = ?", [id]);
+  return ROLES.find((x) => x === r?.role) ?? null;
+}
+
+export async function setRole(coachId: string, role: unknown, now = Date.now()): Promise<Role | null> {
+  const r = ROLES.find((x) => x === role) ?? null;
+  await run(
+    `INSERT INTO coach_prefs (account_id, alerts, role, updated_at) VALUES (?, 1, ?, ?)
+     ON CONFLICT (account_id) DO UPDATE SET role = excluded.role, updated_at = excluded.updated_at`,
+    [coachId, r, now],
+  );
+  return r;
 }
 
 /**

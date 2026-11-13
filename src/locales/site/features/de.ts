@@ -293,6 +293,10 @@ export const de: FeaturesText = {
       name: "Check-in-Formulare und Fragebögen",
       body: "Schick Kunden einen wöchentlichen Check-in, einen Aufnahmefragebogen oder dein eigenes Formular, einmal oder jede Woche. Sie antworten mit wenigen Tipps, und ein niedriger Wert oder eine fehlende Antwort steht oben in ihrem Bericht.",
     },
+    "coach-roles": {
+      name: "Für Personal Trainer und Coaches",
+      body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
+    },
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",

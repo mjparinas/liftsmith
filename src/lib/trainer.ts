@@ -20,10 +20,14 @@ import { APP_PATH, SITE_URL } from "./site";
 import type { AppEvent, Experience, Goal, SetEvent } from "./types";
 import { fmtNum } from "./units";
 
+/** Personal trainer (one-on-one, sessions first) or coach (groups and teams, check-ins first); server coach.ts. */
+export type Role = "trainer" | "coach";
 export interface Person {
   id: string;
   name: string;
   since: number;
+  /** A coach's role, in a client's list of coaches (absent until they pick). */
+  role?: Role;
 }
 export interface Invite {
   code: string;
@@ -73,6 +77,8 @@ export interface Overview {
   /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
   forms?: Form[];
   checkins?: Checkin[];
+  /** How this account works with clients, once they've said. */
+  role?: Role | null;
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -165,6 +171,10 @@ export const sendMessage = async (id: string, text: string) =>
   (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
 export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
+export const saveRole = async (role: Role) =>
+  (await api<{ role: Role | null }>("/api/coach/", { token: token(), body: { action: "role", role } })).role;
+/** "Your trainer" when every coach a lifter has is a personal trainer, else "Your coach". */
+export const trainersOnly = (people: readonly Pick<Person, "role">[]) => people.length > 0 && people.every((p) => p.role === "trainer");
 export const setCoachAlerts = async (on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "alerts", on } })).on;
 /** This phone's push token for coaching pushes, which don't need Friends (push.ts calls it). */
@@ -408,6 +418,7 @@ const EVERY = 15 * 60_000;
 /** A note to show, with the coach's name. */
 export interface ShownNote extends Note {
   coach: string;
+  role?: Role;
 }
 /** Someone with unread messages for this lifter. */
 export interface Unread {
@@ -455,7 +466,10 @@ export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
 
 /** The notes from an overview, with each coach's name. */
 export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] {
-  return (o.notes ?? []).map((n) => ({ ...n, coach: o.coaches.find((c) => c.id === n.coachId)?.name ?? "" }));
+  return (o.notes ?? []).map((n) => {
+    const c = o.coaches.find((x) => x.id === n.coachId);
+    return { ...n, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
+  });
 }
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */

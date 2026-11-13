@@ -937,6 +937,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "max_uses", "INTEGER"],
   // Friends stage 2: a public profile (social.ts, publicProfile.ts).
   ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
+  // Coaching: personal trainer or coach (Melvin, 2026-11-13: "differentiate between personal trainers and coaches").
+  ["coach_prefs", "role", "TEXT"],
   // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
   ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],

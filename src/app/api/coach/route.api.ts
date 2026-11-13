@@ -6,7 +6,7 @@
 // "note" (the coach's note to a client: `client`, `text`; empty text clears it), "send" (a chat message to the other
 // side: `id`, `text`), "targets" (a coach's daily calories and protein for a client: `client`, `kcal`, `protein`;
 // both empty clears them), "share" (a client shares body data with a coach or stops: `id`, `on`), "alerts" (a coach's
-// alerts on or off: `on`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
+// alerts on or off: `on`), "role" (personal trainer or coach: `role`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // GET ?chat=<id>[&before=<ms>]: the messages with that person, which marks them read.
 // Check-ins (coachForms.ts): "form" (save a form: `form`), "deleteForm" (`id`), "sendForm" (`client`, `id`),
 // "repeatForm" (`client`, `id`, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
@@ -28,6 +28,7 @@ import {
   sendMessage,
   setAlerts,
   setNote,
+  setRole,
   setShare,
   setTargets,
   unlink,
@@ -94,6 +95,7 @@ export async function POST(req: Request) {
         protein?: unknown;
         form?: unknown;
         answers?: unknown;
+        role?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -158,6 +160,8 @@ export async function POST(req: Request) {
       if (typeof r === "object") return reply(req, 404, r);
       return reply(req, 200, { on: r });
     }
+    case "role":
+      return reply(req, 200, { role: await setRole(s.accountId, body.role) });
     case "alerts":
       return reply(req, 200, { on: await setAlerts(s.accountId, body.on) });
     case "pushToken": {

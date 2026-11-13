@@ -82,3 +82,11 @@ Melvin asked for "check-in forms and questionnaires" in the same round.
 - **The client answers** at #/trainer/f.<id>, opened from the push (`coachCheckin`), a card on Today and a row under Your coach. Taps for 1 to 5 and yes or no, a `BumpField` in half steps for numbers, a box only for questions asking for words. Anything can be skipped, and a check-in is answered once (a conditional update, so two taps can't both save). The coach gets a push (`coachCheckinDone`) and reads the answers in a sheet from the report.
 - **What to do first** on the report says when the latest check-in has waited 3+ days, and lists any score of 1 or 2 in the latest answers from the last two weeks (`checkinFlags`), with what to do about it.
 - Free for clients, part of the Pro `coaching` feature for coaches, like the rest. Pure web code with the existing push, so Android, iOS and the web get it together. Unlinking deletes the pair's check-ins and repeats; deleting an account also deletes its forms. Analytics: `feature` `trainer` with `form`, `checkinSend`, `checkinWeekly`, `checkinOnce` and `checkinAnswer`.
+
+## Personal trainers and coaches (2026-11-13)
+
+Melvin: "can we differentiate between personal trainers and coaches please", and chose "Role sets labels and defaults" over a strict split of tools or two separate Pro features.
+
+- **A coaching account says how it works** under Your clients (`RolePick`, saved as `coach_prefs.role`, the `role` action): **Personal trainer** (one-on-one clients, mostly in person: sessions, booking and a price per session first) or **Coach** (teams and groups, often remotely: check-ins, programs and a monthly fee first). Unset until they pick.
+- **It changes words and order, never tools.** Every coaching tool stays available to both, because many trainers also run small groups and coaches book one-on-ones. Clients see the role beside their coach's name and on the invite, and a lifter whose coaches are all personal trainers reads "Your trainer" and "From your trainer" instead of "coach" (`trainersOnly`). The booking and payment tools that follow use it for their defaults (a price per session for trainers, a monthly fee for coaches).
+- Still one Pro feature (`coaching`), one paywall entry, and a features page line (`coach-roles`).
