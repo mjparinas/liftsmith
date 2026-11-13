@@ -8,6 +8,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { DESKTOP_QUERY, isDesktop } from "@/lib/layout";
 import { useApp } from "@/lib/store";
+import { forgetNotes, useCoachNotes } from "@/lib/trainer";
 
 import { App } from "./App";
 
@@ -28,6 +29,7 @@ beforeEach(async () => {
   fakeMatchMedia();
   window.scrollTo = () => {};
   location.hash = "";
+  forgetNotes();
   await useApp.getState().reset();
   useApp.setState({ ready: false });
 });
@@ -105,5 +107,33 @@ describe("desktop layout", () => {
     const nav = screen.getByRole("navigation", { name: "Main" });
     expect(nav.className).toContain("bottom-0");
     expect(within(nav).queryByText("Liftsmith")).toBeNull();
+  });
+
+  it("puts Settings at the foot of the sidebar, lit on the screens under it, and drops Today's gear", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const nav = screen.getByRole("navigation", { name: "Main" });
+    // One control, one destination: the sidebar is the way to Settings on desktop, so Today's gear hides there.
+    const gear = screen.getAllByRole("button", { name: "Settings" }).find((b) => !nav.contains(b));
+    expect(gear?.className).toContain("desk:hidden");
+    await user.click(within(nav).getByRole("button", { name: "Settings" }));
+    expect(within(nav).getByRole("button", { name: "Settings" })).toHaveAttribute("aria-current", "page");
+    await user.click(screen.getByRole("button", { name: /Gyms and equipment/ }));
+    expect(within(nav).getByRole("button", { name: "Settings" })).toHaveAttribute("aria-current", "page");
+  });
+
+  it("shows Coaching only to accounts that coach or are coached, and then Settings drops its row", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    const nav = screen.getByRole("navigation", { name: "Main" });
+    expect(within(nav).queryByRole("button", { name: "Coaching" })).toBeNull();
+    await user.click(within(nav).getByRole("button", { name: "Settings" }));
+    expect(screen.getByRole("button", { name: /^Coaching/ })).toBeInTheDocument();
+
+    act(() => useCoachNotes.setState({ coaching: true, unread: [{ id: "c1", count: 2, name: "Ana" }] }));
+    expect(within(nav).getByRole("button", { name: "Coaching, 2 new messages" })).toBeInTheDocument();
+    expect(screen.getAllByRole("button", { name: /Coaching/ })).toHaveLength(1);
+    await user.click(within(nav).getByRole("button", { name: /Coaching/ }));
+    expect(within(nav).getByRole("button", { name: /Coaching/ })).toHaveAttribute("aria-current", "page");
   });
 });

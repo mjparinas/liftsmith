@@ -583,6 +583,7 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
 const CACHE = "liftsmith.coachNotes";
 const SEEN = "liftsmith.coachNotes.seen";
 const TARGETS = "liftsmith.coachTargets";
+const COACHING = "liftsmith.coaching";
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
 
@@ -609,6 +610,11 @@ interface NotesState {
   targets: (Targets & { coach: string }) | null;
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
   seen: string[];
+  /**
+   * This account coaches (picked a role, has an invite out or a client) or is coached: the desktop sidebar shows
+   * Coaching only then (docs/decisions/desktop-layout.md). Kept on the device so it shows before the first load.
+   */
+  coaching: boolean;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -634,7 +640,13 @@ export const useCoachNotes = create<NotesState>(() => ({
   sessions: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
+  coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
 }));
+
+/** Whether an account takes part in coaching, as a coach or a client. */
+export function usesCoaching(o: Pick<Overview, "coaches"> & Partial<Pick<Overview, "clients" | "invite" | "role">>): boolean {
+  return o.coaches.length > 0 || (o.clients?.length ?? 0) > 0 || !!o.invite || !!o.role;
+}
 
 export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
 
@@ -648,9 +660,12 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
-  o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions">>,
+  o: Pick<Overview, "notes" | "coaches"> &
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role">>,
 ): void {
   const notes = shownNotes(o);
+  const coaching = usesCoaching(o);
+  writeJson(COACHING, coaching);
   writeJson(CACHE, notes);
   const first = (o.targets ?? []).find((x) => o.coaches.some((c) => c.id === x.coachId));
   const targets = first ? { ...first, coach: o.coaches.find((c) => c.id === first.coachId)?.name ?? "" } : null;
@@ -661,7 +676,7 @@ export function keepNotes(
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
   const checkins = (o.checkins ?? []).map((c) => ({ ...c, coach: o.coaches.find((p) => p.id === c.coachId)?.name ?? "" }));
   const sessions = (o.sessions?.booked ?? []).map((x) => ({ ...x, coach: o.coaches.find((p) => p.id === x.coachId)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions });
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -697,5 +712,6 @@ export function dismissNote(n: Note): void {
 export function forgetNotes(): void {
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [] });
+  writeJson(COACHING, false);
+  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false });
 }

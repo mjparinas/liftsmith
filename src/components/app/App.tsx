@@ -34,7 +34,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
-import { forgetNotes, refreshCoachNotes } from "@/lib/trainer";
+import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -527,10 +527,27 @@ function visibleTabs() {
   return TABS.filter((tab) => tab.route !== "friends" || socialOn());
 }
 
-// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the same five tabs as the
-// phone's tab bar, down the left side, so it is the tab bar and nothing else is added to it (one control, one
-// destination). It sets --nav-h to 0 (nothing covers the bottom of the page) and --side-w to its width, so bars
-// pinned to the bottom of a screen and toasts start after it.
+// Screens reached from Settings: the sidebar's Settings item stays lit on them, as the tab bar keeps a tab lit.
+const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
+  "settings",
+  "account",
+  "connections",
+  "programs",
+  "training",
+  "feedback",
+  "gym",
+  "gymlink",
+  "gymplace",
+  "gymclaim",
+  "gymedit",
+  "gymadd",
+]);
+
+// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the phone's tabs down the left
+// side, then Coaching for accounts that coach or are coached, and Settings at the foot (Melvin, 2026-11-13). On the
+// phone those two stay one tap away from Today and Settings; on desktop the sidebar is their one control, so Today
+// hides its gear and Settings its Coaching row (one control, one destination). It sets --nav-h to 0 (nothing covers
+// the bottom of the page) and --side-w to its width, so bars pinned to the bottom of a screen and toasts start after it.
 function Sidebar({ route }: { route: Route }) {
   useEffect(() => {
     const root = document.documentElement;
@@ -542,9 +559,11 @@ function Sidebar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
+  const coaching = useCoachNotes((s) => s.coaching);
+  const coachUnread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
   return (
     <nav
-      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
+      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 overflow-y-auto border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
       <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
@@ -554,31 +573,53 @@ function Sidebar({ route }: { route: Route }) {
         {BRAND.name}
       </div>
       <ul className="flex flex-col gap-1">
-        {visibleTabs().map((tab) => {
-          const on = route === tab.route;
-          const dot = tab.route === "friends" && waiting > 0;
-          return (
-            <li key={tab.route}>
-              <button
-                type="button"
-                aria-current={on ? "page" : undefined}
-                aria-label={dot ? t("friends.openWaiting", { count: waiting }) : undefined}
-                onClick={() => {
-                  if (!on) haptic("select");
-                  go(tab.route);
-                }}
-                className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
-              >
-                <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
-                  <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
-                  {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
-                </span>
-                {t(tab.label)}
-              </button>
-            </li>
-          );
-        })}
+        {visibleTabs().map((tab) => (
+          <SideItem
+            key={tab.route}
+            route={tab.route}
+            label={t(tab.label)}
+            icon={tab.icon}
+            on={route === tab.route}
+            dot={tab.route === "friends" && waiting > 0 ? t("friends.openWaiting", { count: waiting }) : undefined}
+          />
+        ))}
+        {coaching && (
+          <SideItem
+            route="trainer"
+            label={t("trn.title")}
+            icon="target"
+            on={route === "trainer"}
+            dot={coachUnread > 0 ? `${t("trn.title")}, ${t("trn.unread", { count: coachUnread })}` : undefined}
+          />
+        )}
+      </ul>
+      <ul className="mt-auto flex flex-col gap-1">
+        <SideItem route="settings" label={t("settings.title")} icon="settings" on={SETTINGS_SCREENS.has(route)} />
       </ul>
     </nav>
+  );
+}
+
+/** One sidebar link: lit while its screen (or one under it) is open, with a dot when something waits there. */
+function SideItem({ route, label, icon, on, dot }: { route: Route; label: string; icon: IconName; on: boolean; dot?: string }) {
+  return (
+    <li>
+      <button
+        type="button"
+        aria-current={on ? "page" : undefined}
+        aria-label={dot}
+        onClick={() => {
+          if (!on) haptic("select");
+          go(route);
+        }}
+        className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
+      >
+        <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
+          <Icon name={icon} size={22} strokeWidth={on ? 2.4 : 2} />
+          {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+        </span>
+        {label}
+      </button>
+    </li>
   );
 }
