@@ -40,11 +40,13 @@ import {
   previewCode,
   removePlan,
   saveNote,
+  saveRole,
   saveSetup,
   setBodyShare,
   setCoachAlerts,
   showCode,
   trainerError,
+  trainersOnly,
   unlinkPerson,
   useCoachNotes,
   type BodyShare,
@@ -56,6 +58,7 @@ import {
   type Plan,
   type PlanProgress,
   type Report,
+  type Role,
   type Setup,
   type ShownNote,
   type Targets,
@@ -67,6 +70,7 @@ import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { ClientPain, CoachKindPicker, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
+import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
@@ -128,7 +132,8 @@ function Home({ code, team = "" }: { code: string; team?: string }) {
           {note}
         </p>
       )}
-      <Section title={t("trn.yourCoach")} icon="flag">
+      <Section title={trainersOnly(data?.coaches ?? []) ? t("trn.yourTrainer") : t("trn.yourCoach")} icon="flag">
+        {data?.sessions && <YourSessions sessions={data.sessions} coaches={data.coaches} onChange={reload} />}
         <PendingCheckins
           checkins={(data?.checkins ?? []).map((c) => ({ ...c, coach: data?.coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
         />
@@ -259,7 +264,7 @@ function YourCoach({
     <div>
       {(plans.length > 0 || notes.length > 0 || targets.length > 0) && (
         <div className="mb-3">
-          <p className="mb-2 px-1 text-sm font-semibold">{t("trn.fromCoach")}</p>
+          <p className="mb-2 px-1 text-sm font-semibold">{trainersOnly(coaches) ? t("trn.fromTrainer") : t("trn.fromCoach")}</p>
           {notes.map((n) => (
             <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
           ))}
@@ -300,7 +305,7 @@ function YourCoach({
               <span className="min-w-0 flex-1 py-1">
                 <span className="block truncate font-medium">{c.name || t("trn.noName")}</span>
                 <span className="block text-xs text-muted">
-                  {kinds[c.id] === "physio" ? `${t("trn.kind.physio")} · ` : ""}
+                  {kinds[c.id] === "physio" ? `${t("trn.kind.physio")} · ` : c.role && `${t(`trn.role.${c.role}`)} · `}
                   {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
                 </span>
               </span>
@@ -330,6 +335,7 @@ function YourCoach({
       ))}
       {found ? (
         <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
+          {found.role && <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t(`trn.role.${found.role}`)}</p>}
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
           <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
@@ -417,10 +423,11 @@ export function CoachNoteToday() {
   const unread = useCoachNotes((s) => s.unread);
   const n = notes.find((x) => !seen.includes(noteId(x)));
   const u = unread[0];
-  const waiting = useCoachNotes((s) => s.checkins.length > 0);
+  const waiting = useCoachNotes((s) => s.checkins.length > 0 || s.sessions.length > 0);
   if (!n && !u && !waiting) return null;
   return (
     <>
+      <SessionToday />
       <CheckinToday />
       {u && (
         <button
@@ -446,7 +453,7 @@ export function CoachNoteToday() {
 
 function NoteToday({ n }: { n: ShownNote }) {
   return (
-    <Section title={t("trn.fromCoach")} icon="chat">
+    <Section title={n.role === "trainer" ? t("trn.fromTrainer") : t("trn.fromCoach")} icon="chat">
       <NoteCard note={n} coach={n.coach} />
       <div className="flex flex-wrap gap-2">
         <Button kind="ghost" className="flex-1" onClick={() => go("trainer")}>
@@ -523,6 +530,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       setNote(trainerError(e));
     }
   };
+  const sessions = <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={onChange} />;
   const send = async () => {
     if (!invite) return;
     const url = inviteUrl(invite.code);
@@ -572,8 +580,11 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
           {note}
         </p>
       )}
+      <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
       <CoachKindPicker key={data.kind ?? "trainer"} kind={data.kind ?? "trainer"} onChange={onChange} />
+      {/* A personal trainer's sessions come before their client list; a coach's after it. */}
+      {data.role !== "coach" && sessions}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       {data.clients.length ? (
@@ -607,9 +618,43 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       ) : (
         <p className="mt-3 px-1 text-sm text-muted">{t("trn.noClients")}</p>
       )}
+      {data.role === "coach" && sessions}
     </div>
   );
 }
+
+/** Personal trainer or coach: changes the words clients see and what comes first, never which tools there are. */
+function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => void }) {
+  const [role, setRole] = useState<Role | null>(saved);
+  const pick = async (r: Role) => {
+    setRole(r);
+    haptic("select");
+    try {
+      await saveRole(r);
+      track("feature", { name: "trainer", detail: `role-${r}` });
+      onChange();
+    } catch {
+      oops();
+      setRole(saved);
+    }
+  };
+  return (
+    <section className="card mt-3 p-4">
+      <p id="trn-role" className="font-semibold">
+        {t("trn.role.title")}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="trn-role">
+        {ROLE_CHOICES.map((r) => (
+          <Chip key={r} active={role === r} onClick={() => void pick(r)}>
+            {t(`trn.role.${r}`)}
+          </Chip>
+        ))}
+      </div>
+      <p className="mt-2 text-sm text-muted">{role ? t(`trn.role.${role}Hint`) : t("trn.role.pick")}</p>
+    </section>
+  );
+}
+const ROLE_CHOICES: Role[] = ["trainer", "coach"];
 
 const GOAL_CHOICES: Goal[] = ["muscle", "strength", "general"];
 const LEVEL_CHOICES: { id: Experience; key: "setup.exp.new" | "setup.exp.intermediate" | "exp.advanced" }[] = [
@@ -886,7 +931,7 @@ function ClientScreen({ id }: { id: string }) {
   const [body, setBody] = useState<BodyShare | null>(null);
   const [physio, setPhysio] = useState(false);
   const [targets, setTargets] = useState<Targets | null>(null);
-  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms">>({});
+  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -902,7 +947,7 @@ function ClientScreen({ id }: { id: string }) {
         // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
         setPhysio(v.kind === "physio");
         setTargets(v.targets ?? null);
-        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms });
+        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots });
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -965,6 +1010,7 @@ function ClientScreen({ id }: { id: string }) {
         </ul>
       </Section>
       {physio && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
+      <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
       <NoteToClient clientId={id} saved={saved} onChange={() => setVersion((n) => n + 1)} />
       <Section title={t("trn.weeks")} icon="calendar">
         <div className="grid grid-cols-4 gap-2">

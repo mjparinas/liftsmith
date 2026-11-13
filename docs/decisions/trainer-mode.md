@@ -99,3 +99,22 @@ Melvin asked for "check-in forms and questionnaires" in the same round.
 - **The client answers** at #/trainer/f.<id>, opened from the push (`coachCheckin`), a card on Today and a row under Your coach. Taps for 1 to 5 and yes or no, a `BumpField` in half steps for numbers, a box only for questions asking for words. Anything can be skipped, and a check-in is answered once (a conditional update, so two taps can't both save). The coach gets a push (`coachCheckinDone`) and reads the answers in a sheet from the report.
 - **What to do first** on the report says when the latest check-in has waited 3+ days, and lists any score of 1 or 2 in the latest answers from the last two weeks (`checkinFlags`), with what to do about it.
 - Free for clients, part of the Pro `coaching` feature for coaches, like the rest. Pure web code with the existing push, so Android, iOS and the web get it together. Unlinking deletes the pair's check-ins and repeats; deleting an account also deletes its forms. Analytics: `feature` `trainer` with `form`, `checkinSend`, `checkinWeekly`, `checkinOnce` and `checkinAnswer`.
+
+## Personal trainers and coaches (2026-11-13)
+
+Melvin: "can we differentiate between personal trainers and coaches please", and chose "Role sets labels and defaults" over a strict split of tools or two separate Pro features.
+
+- **A coaching account says how it works** under Your clients (`RolePick`, saved as `coach_prefs.role`, the `role` action): **Personal trainer** (one-on-one clients, mostly in person: sessions, booking and a price per session first) or **Coach** (teams and groups, often remotely: check-ins, programs and a monthly fee first). Unset until they pick.
+- **It changes words and order, never tools.** Every coaching tool stays available to both, because many trainers also run small groups and coaches book one-on-ones. Clients see the role beside their coach's name and on the invite, and a lifter whose coaches are all personal trainers reads "Your trainer" and "From your trainer" instead of "coach" (`trainersOnly`). The booking and payment tools that follow use it for their defaults (a price per session for trainers, a monthly fee for coaches).
+- Still one Pro feature (`coaching`), one paywall entry, and a features page line (`coach-roles`).
+
+## Booking and scheduling sessions (built 2026-11-13)
+
+Melvin asked for "booking and scheduling sessions" in the same round.
+
+- **Times** (`coach_slots`, `src/server/coachBooking.ts`, `CoachSessions.tsx`): a coach opens times under Your clients (Sessions › Add times): a day chip (today and the next three weeks), the start time in the phone's own time picker, a length chip (30, 45, 60 or 90 minutes), how often (once, or the same time every week for 4, 8 or 12 weeks), an optional place, and who: open to all their clients, or one client booked straight in. From a client's report, Book {name} in does the same with that client picked. Up to 300 upcoming times, at most 120 days ahead, 15 to 240 minutes. A personal trainer's Sessions sit above their client list, a coach's below it (the role).
+- **Booking**: a client sees their own booked sessions and their coaches' open times under Your coach (Book a session, a sheet of open times by day). Two clients tapping the same time: a conditional update gives it to one, and the other is told to pick another. Clients never see who else booked what.
+- **Cancelling**: a client's cancel opens the time again for other clients; the coach's removes the time. Leaving a coach opens their booked times again; deleting a coach's account removes their times.
+- **Notifications** (`coachBooked`, `coachCancelled`): to the coach when a client books or cancels, to the client when the coach books them in or cancels. The server doesn't know time zones, so the push says the time as the sender's phone wrote it (`label`); times are stored in UTC and each phone shows them in its own zone. There are no reminder pushes before a session yet, because the server's jobs run once a day; instead a session in the next 24 hours shows on Today (`SessionToday`, from the coach's notes refresh).
+- **Calendar**: Add to calendar on a booked session (`addEvent` in `calendar.ts`). Android opens the calendar app's new-event screen filled in (no permission), iOS saves it through EventKit, and the web downloads a `.ics` file ([Platform deltas](platform-deltas.md)).
+- Free for clients, part of the Pro `coaching` feature for coaches. Analytics: `feature` `trainer` with `slotOpen`, `slotBook`, `slotCancel`, `slotBooked` and `slotUnbook`.
