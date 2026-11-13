@@ -177,6 +177,10 @@ export const en = {
     other: "Protein about {avg} g a day against {target} g ({count} days logged)",
   },
   "trn.f.proteinShortDo": "Suggest a protein food at each meal.",
+  "trn.f.checkinWaiting": { one: "“{title}” has waited a day for an answer", other: "“{title}” has waited {count} days for an answer" },
+  "trn.f.checkinWaitingDo": "A short message often helps. Their answers show here when they come in.",
+  "trn.f.checkinLow": "Scored {value} of 5: {label}",
+  "trn.f.checkinLowDo": "Ask how they're doing before the next session, and ease the plan if needed.",
 };
 
 type Key = keyof typeof en;
@@ -356,6 +360,10 @@ export const es: Partial<Record<Key, Message>> = {
     other: "Proteína de unos {avg} g al día frente a {target} g ({count} días registrados)",
   },
   "trn.f.proteinShortDo": "Sugiere un alimento con proteína en cada comida.",
+  "trn.f.checkinWaiting": { one: "«{title}» lleva un día sin respuesta", other: "«{title}» lleva {count} días sin respuesta" },
+  "trn.f.checkinWaitingDo": "Un mensaje corto suele ayudar. Las respuestas aparecen aquí cuando llegan.",
+  "trn.f.checkinLow": "Puntuó {value} de 5: {label}",
+  "trn.f.checkinLowDo": "Pregunta cómo está antes de la próxima sesión y suaviza el plan si hace falta.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -535,6 +543,13 @@ export const fr: Partial<Record<Key, Message>> = {
     other: "Environ {avg} g de protéines par jour pour {target} g ({count} jours saisis)",
   },
   "trn.f.proteinShortDo": "Proposez un aliment riche en protéines à chaque repas.",
+  "trn.f.checkinWaiting": {
+    one: "« {title} » attend une réponse depuis un jour",
+    other: "« {title} » attend une réponse depuis {count} jours",
+  },
+  "trn.f.checkinWaitingDo": "Un petit message aide souvent. Les réponses s'affichent ici dès qu'elles arrivent.",
+  "trn.f.checkinLow": "Note de {value} sur 5 : {label}",
+  "trn.f.checkinLowDo": "Demandez comment ça va avant la prochaine séance, et allégez le plan si besoin.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -713,6 +728,13 @@ export const de: Partial<Record<Key, Message>> = {
     other: "Etwa {avg} g Protein pro Tag bei {target} g Ziel ({count} Tage erfasst)",
   },
   "trn.f.proteinShortDo": "Schlag zu jeder Mahlzeit ein proteinreiches Lebensmittel vor.",
+  "trn.f.checkinWaiting": {
+    one: "„{title}“ wartet seit einem Tag auf eine Antwort",
+    other: "„{title}“ wartet seit {count} Tagen auf eine Antwort",
+  },
+  "trn.f.checkinWaitingDo": "Eine kurze Nachricht hilft oft. Die Antworten erscheinen hier, sobald sie da sind.",
+  "trn.f.checkinLow": "{value} von 5 bei: {label}",
+  "trn.f.checkinLowDo": "Frag vor der nächsten Einheit nach, wie es geht, und mach den Plan bei Bedarf leichter.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -889,6 +911,10 @@ export const it: Partial<Record<Key, Message>> = {
     other: "Proteine circa {avg} g al giorno rispetto a {target} g ({count} giorni registrati)",
   },
   "trn.f.proteinShortDo": "Suggerisci un alimento proteico a ogni pasto.",
+  "trn.f.checkinWaiting": { one: "«{title}» aspetta una risposta da un giorno", other: "«{title}» aspetta una risposta da {count} giorni" },
+  "trn.f.checkinWaitingDo": "Un breve messaggio spesso aiuta. Le risposte compaiono qui appena arrivano.",
+  "trn.f.checkinLow": "Punteggio {value} su 5: {label}",
+  "trn.f.checkinLowDo": "Chiedi come sta prima della prossima sessione e alleggerisci il piano se serve.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1050,4 +1076,8 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.f.kcalOverDo": "目標を一緒に確認し、毎日カロリーを減らせる置き換えを1つ提案しましょう。",
   "trn.f.proteinShort": { other: "たんぱく質は目標{target} gに対して1日約{avg} g（記録{count}日）" },
   "trn.f.proteinShortDo": "毎食たんぱく質の多い食品を1品すすめましょう。",
+  "trn.f.checkinWaiting": { other: "「{title}」の回答を{count}日待っています" },
+  "trn.f.checkinWaitingDo": "短いメッセージを送るのが効果的です。回答が届くとここに表示されます。",
+  "trn.f.checkinLow": "5段階中{value}：{label}",
+  "trn.f.checkinLowDo": "次のセッションの前に様子を聞き、必要ならプランを軽くしましょう。",
 };

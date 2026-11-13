@@ -871,6 +871,36 @@ const SCHEMA = [
     PRIMARY KEY (team_id, account_id)
   )`,
   `CREATE INDEX IF NOT EXISTS team_members_account ON team_members (account_id)`,
+  // Check-in forms and questionnaires (2026-11-13): a coach's forms, each one sent to a client (with the questions as
+  // they were then), the client's answers, and at most one form per client that goes out again every week.
+  `CREATE TABLE IF NOT EXISTS coach_forms (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    questions TEXT NOT NULL,
+    updated_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_forms_coach ON coach_forms (coach_id)`,
+  `CREATE TABLE IF NOT EXISTS coach_checkins (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    form_id TEXT NOT NULL,
+    title TEXT NOT NULL,
+    questions TEXT NOT NULL,
+    sent_at INTEGER NOT NULL,
+    answers TEXT,
+    answered_at INTEGER
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_checkins_pair ON coach_checkins (coach_id, client_id, sent_at)`,
+  `CREATE INDEX IF NOT EXISTS coach_checkins_client ON coach_checkins (client_id, answered_at)`,
+  `CREATE TABLE IF NOT EXISTS coach_checkin_repeats (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    form_id TEXT NOT NULL,
+    next_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (

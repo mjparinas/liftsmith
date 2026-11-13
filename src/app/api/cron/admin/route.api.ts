@@ -5,6 +5,7 @@
 import { watchSystem } from "@/server/alerts";
 import { sampleDbSize } from "@/server/capacity";
 import { alertQuiet } from "@/server/coach";
+import { sendDueCheckins } from "@/server/coachForms";
 import { pingIndexNow } from "@/server/indexnow";
 import { trackJob } from "@/server/monitor";
 import { authorized } from "@/server/revenuecat";
@@ -20,6 +21,8 @@ export async function GET(req: Request) {
     const indexNow = await pingIndexNow().catch((e: Error) => ({ sent: 0, error: e.message }));
     // Coaches hear about clients who haven't trained for a week (trainer-mode.md).
     const quiet = await alertQuiet().catch(() => -1);
-    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet });
+    // Weekly check-ins that are due go to their clients (coachForms.ts).
+    const checkins = await sendDueCheckins().catch(() => -1);
+    return Response.json({ down: watch.down, alerted: watch.alerted, bytes: size, indexNow, quiet, checkins });
   });
 }

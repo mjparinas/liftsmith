@@ -285,6 +285,10 @@ export const es: FeaturesText = {
       name: "Gratis para equipos de secundaria",
       body: "Los entrenadores de secundaria que confirman un correo escolar tienen Pro gratis, igual que los atletas de 13 a 18 años de sus equipos, con una tabla semanal del equipo. La grasa corporal y los perfiles públicos siguen desactivados para menores de 18.",
     },
+    "coach-checkins": {
+      name: "Formularios de revisión y cuestionarios",
+      body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

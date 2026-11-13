@@ -46,6 +46,7 @@ import {
   unlinkPerson,
   useCoachNotes,
   type BodyShare,
+  type ClientView,
   type Note,
   type Overview,
   type Person,
@@ -61,6 +62,7 @@ import { fmtWeight } from "@/lib/units";
 
 import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
+import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
@@ -70,6 +72,7 @@ import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchR
 const CLIENT = "c.";
 const CHAT = "m.";
 const TEAM = "team.";
+const CHECKIN = "f.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
@@ -89,6 +92,8 @@ export function Trainer({ arg }: { arg?: string }) {
   if (arg?.startsWith(CHAT)) return <ChatScreen id={arg.slice(CHAT.length)} />;
   // A school team's link (#/trainer/team.<code>, SchoolTeams.tsx) fills in the team code instead.
   if (arg?.startsWith(TEAM)) return <Home code="" team={teamCodeFrom(arg.slice(TEAM.length))} />;
+  if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
+  if (arg === "forms") return <FormsScreen />;
   return <Home code={arg ? codeFrom(arg) : ""} />;
 }
 
@@ -120,6 +125,9 @@ function Home({ code, team = "" }: { code: string; team?: string }) {
         </p>
       )}
       <Section title={t("trn.yourCoach")} icon="flag">
+        <PendingCheckins
+          checkins={(data?.checkins ?? []).map((c) => ({ ...c, coach: data?.coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
+        />
         <YourCoach
           coaches={data?.coaches ?? []}
           plans={data?.plans ?? []}
@@ -393,9 +401,11 @@ export function CoachNoteToday() {
   const unread = useCoachNotes((s) => s.unread);
   const n = notes.find((x) => !seen.includes(noteId(x)));
   const u = unread[0];
-  if (!n && !u) return null;
+  const waiting = useCoachNotes((s) => s.checkins.length > 0);
+  if (!n && !u && !waiting) return null;
   return (
     <>
+      <CheckinToday />
       {u && (
         <button
           type="button"
@@ -831,6 +841,7 @@ function ClientScreen({ id }: { id: string }) {
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
   const [targets, setTargets] = useState<Targets | null>(null);
+  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -844,6 +855,7 @@ function ClientScreen({ id }: { id: string }) {
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
         setTargets(v.targets ?? null);
+        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms });
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -946,6 +958,13 @@ function ClientScreen({ id }: { id: string }) {
         )}
       </Section>
       <ClientPlans clientId={id} plans={report.plans} onChange={() => setVersion((n) => n + 1)} />
+      <ClientCheckins
+        clientId={id}
+        forms={checkins.forms ?? []}
+        checkins={checkins.checkins ?? []}
+        repeat={checkins.repeat ?? null}
+        onChange={() => setVersion((n) => n + 1)}
+      />
       <ClientTargets
         key={targets?.at ?? 0}
         clientId={id}
