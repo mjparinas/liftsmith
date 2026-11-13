@@ -375,8 +375,10 @@ export interface TrainingPrefs {
   warmFirst?: boolean;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
   coolDown?: boolean;
-  /** Exercises the planner picks first when they fit. */
+  /** Liked exercises: the adaptive planner picks them much more often (pickWeights.ts). */
   favourites?: string[];
+  /** When the lifter reset an exercise's pick weight (ms), by exercise id: swaps before then no longer count (pickWeights.ts). */
+  pickResets?: Record<string, number>;
   /** Muscles that get more weekly sets and go first in the plan. */
   priorities?: Muscle[];
   /** Default workout length (minutes) the slider goes back to each day. Missing means it stays where it was left. */

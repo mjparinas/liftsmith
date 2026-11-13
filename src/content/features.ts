@@ -71,6 +71,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: LAUNCH,
       },
       {
+        id: "pick-weights",
+        name: "Learns the lifts you like",
+        body: "Popular lifts are picked most often. Star an exercise and it comes up far more; swap one away and it comes up less, fading over a few months.",
+        tier: "free",
+        added: "2026-11-13",
+      },
+      {
         id: "splits",
         name: "Adaptive splits",
         body: "Push, pull, legs or upper and lower, still adjusted to your recovery each day.",

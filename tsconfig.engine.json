@@ -32,6 +32,7 @@
     "src/lib/exerciseSearch.ts",
     "src/lib/onerm.ts",
     "src/lib/plateau.ts",
+    "src/lib/pickWeights.ts",
     "src/lib/plates.ts",
     "src/lib/programs.ts",
     "src/lib/progression.ts",

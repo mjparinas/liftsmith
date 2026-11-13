@@ -18,6 +18,7 @@ const config = {
     "src/lib/game.ts",
     "src/lib/loads.ts",
     "src/lib/units.ts",
+    "src/lib/pickWeights.ts",
   ],
   mutator: { excludedMutations: ["StringLiteral"] },
   reporters: ["clear-text", "progress", "html", "json"],
