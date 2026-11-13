@@ -610,7 +610,8 @@ export function repsForPr(events: readonly AppEvent[], exerciseId: string, weigh
   if (weightKg <= 0 || TIMED.has(exerciseId)) return null;
   const b = bestBefore(events, exerciseId, now);
   if (b === null) return null;
-  const r = Math.floor(30 * (b / weightKg - 1)) + 1;
+  // The small nudge keeps an exact tie (8 reps when 8 equals the best) from rounding down a rep.
+  const r = Math.floor(30 * (b / weightKg - 1) + 1e-9) + 1;
   return r >= 1 && r <= 30 ? r : null;
 }
 

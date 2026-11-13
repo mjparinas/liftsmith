@@ -477,7 +477,11 @@ export const de: SiteText = {
       },
       {
         q: "Kann ich ihre Herzfrequenz oder ihr Körpergewicht sehen?",
-        a: "Nein. Du siehst nur ihr Training. Gesundheitswerte, Körpermaße, Verletzungen und Notizen verlassen ihr Konto nie.",
+        a: "Nur, was sie freigeben. Du siehst ihr Training. Jeder Kunde kann seine Körperdaten oder seine Schmerzen und Verletzungen mit dir teilen; Gesundheitswerte und Notizen verlassen nie sein Konto.",
+      },
+      {
+        q: "Können Physiotherapeuten und Reha-Fachleute es nutzen?",
+        a: "Ja. Wähle unter Coaching „Physiotherapeut“, und jeder Kundenbericht beginnt mit den Schmerzen und Verletzungen, die geteilt werden, Übung für Übung. Weise sanfte Reha-Programme mit Häufigkeit pro Woche zu und sieh, wie oft sie eingehalten werden. Liftsmith zeigt, was Kunden eintragen; es stellt keine Diagnosen und behandelt nichts.",
       },
       {
         q: "Wie fange ich an?",

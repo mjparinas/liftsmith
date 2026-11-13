@@ -275,6 +275,11 @@ export const it: FeaturesText = {
       body: "Scrivi a ogni cliente, ricevi una notifica quando si allena o non si allena da una settimana, e vedi pesate, circonferenze e una figura 3D modellata su di lui quando sceglie di condividerle.",
       note: "Le notifiche sono su Android e iPhone. L'app web mostra i nuovi messaggi quando è aperta.",
     },
+    physio: {
+      name: "Per fisioterapisti e riabilitazione",
+      body: "Assegna programmi di riabilitazione leggeri con le volte a settimana, guarda quanto spesso i clienti li seguono e vedi dolore e infortuni che scelgono di condividere, esercizio per esercizio, con una notifica quando il dolore è alto.",
+      note: "Liftsmith mostra ciò che i clienti registrano. Non fa diagnosi né cure.",
+    },
     "coach-nutrition": {
       name: "Obiettivi nutrizionali per i clienti",
       body: "Fissa calorie e proteine giornaliere per ogni cliente. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",

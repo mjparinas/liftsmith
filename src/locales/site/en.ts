@@ -358,7 +358,11 @@ export const en: SiteText = {
       },
       {
         q: "Can I see their heart rate or body weight?",
-        a: "No. You see their training only. Health readings, body measurements, injuries and notes never leave their account.",
+        a: "Only what they choose. You see their training. Each client can turn on sharing their body data, or their pain ratings and injuries, with you; health readings and notes never leave their account.",
+      },
+      {
+        q: "Can physios and rehab clinicians use it?",
+        a: "Yes. Pick Physio under Coaching and each client's report leads with the pain ratings and injuries they share, exercise by exercise. Assign gentle rehab programs with how many times a week, and see how often they keep to them. Liftsmith shows what clients log; it doesn't diagnose or treat anything.",
       },
       {
         q: "How do I start?",

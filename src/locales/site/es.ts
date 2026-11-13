@@ -482,7 +482,11 @@ export const es: SiteText = {
       },
       {
         q: "¿Puedo ver su frecuencia cardiaca o su peso?",
-        a: "No. Solo ves su entrenamiento. Los datos de salud, las medidas, las lesiones y las notas nunca salen de su cuenta.",
+        a: "Solo lo que ellos elijan. Ves su entrenamiento. Cada cliente puede activar compartir contigo sus datos corporales, o su dolor y sus lesiones; las lecturas de salud y las notas nunca salen de su cuenta.",
+      },
+      {
+        q: "¿Lo pueden usar fisioterapeutas y profesionales de rehabilitación?",
+        a: "Sí. Elige Fisioterapeuta en Entrenador y el informe de cada cliente empieza por el dolor y las lesiones que comparte, ejercicio a ejercicio. Asigna programas de rehabilitación suaves con las veces por semana y mira con qué frecuencia los cumple. Liftsmith muestra lo que registran tus clientes; no diagnostica ni trata nada.",
       },
       {
         q: "¿Cómo empiezo?",

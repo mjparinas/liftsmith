@@ -145,7 +145,7 @@ export const BLOG_M: Article[] = [
       },
       { h2: "In Liftsmith" },
       {
-        p: "Enter your coach's code (or open their invite link) and you'll see exactly what they'll see before you agree: your workouts from the last year, how long you trained, how hard sets felt and your weekly goal. They never see your heart rate, body, health readings, cycle, injuries, notes, gyms or photos. You can stop sharing at any time, and being a client is free. Coaches can read more on [coaching in Liftsmith](/coaches/).",
+        p: "Enter your coach's code (or open their invite link) and you'll see exactly what they'll see before you agree: your workouts from the last year, how long you trained, how hard sets felt and your weekly goal. They never see your heart rate, health readings, cycle, notes, gyms or photos, and your body data and injuries stay private unless you turn on sharing them with that coach. You can stop sharing at any time, and being a client is free. Coaches can read more on [coaching in Liftsmith](/coaches/).",
       },
     ],
     faq: [

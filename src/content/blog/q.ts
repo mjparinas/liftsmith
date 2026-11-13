@@ -1,62 +1,99 @@
 import type { Article } from "../articles";
 
-// Blog, part seventeen: coach plans (Melvin, 2026-11-13: "we need to make money but also be user centric";
-// docs/decisions/money.md "Coach plans"). Why coaching is priced by client list, what each plan holds, and what stays
-// free. Only what ships, and no other app named (seo.test.ts).
+// Blog, physio support (Melvin, 2026-11-13: "add physios support", and blog posts for it). One post for physios and rehab
+// clinicians, one for lifters working with one. Neither gives medical advice or says what's safe for an injury: they
+// say what the app shows and leave the call to the clinician. Other apps aren't named (seo.test.ts).
 export const BLOG_Q: Article[] = [
   {
-    slug: "coach-plans-priced-by-your-client-list",
+    slug: "track-rehab-exercises-between-physio-visits",
     kind: "blog",
-    title: "Coach plans: priced by your client list, never by a cut of your pay",
+    title: "How physios can see home exercise adherence and pain between visits",
     description:
-      "Pro now covers 3 clients, Coach 25 and Coach Plus has no set limit. Clients train free, and Liftsmith takes nothing from what they pay you.",
+      "Most rehab happens at home, out of sight. How to set a home program, see how often it's done and follow pain ratings exercise by exercise.",
     date: "2026-11-13",
     tag: "Coaching",
     cta: "coach",
     body: [
       {
-        p: "Coaching in Liftsmith has grown from seeing a client's workouts into most of the job: reports that say who needs you, routines, chat, check-ins, booking, payments and nutrition targets. A coach with thirty clients now gets a lot more out of the app than one lifter does, so we've changed how coaching is priced. We wanted the price to grow with the value you get, stay low for lifters, and never take a slice of what your clients pay you.",
+        p: "A home exercise program is only as good as how often it's done, and most of it happens between appointments, where you can't see it. By the next visit you hear \"I did it most days\" and a pain score from memory. A shared log gives you the real picture before the client walks in.",
       },
-      { h2: "Three plans, one difference: how many clients" },
+      { h2: "What's worth seeing between visits" },
       {
-        p: "**Pro** ($39.99 a year or $6.99 a month, the same as before) now includes coaching for up to 3 clients. That's enough to try every tool with real people before you spend more. **Coach** ($199.99 a year or $19.99 a month) makes room for 25 clients. **Coach Plus** ($399.99 a year or $39.99 a month) has no set limit. Both coach plans include everything in Pro for your own training too.",
+        ul: [
+          "**How often they did it.** Sessions in the last two weeks against the number you asked for. Low adherence explains a lot of slow progress.",
+          "**Pain, exercise by exercise.** A 0 to 10 rating after the sets of each exercise shows which movement is the problem, not just whether the day was bad.",
+          "**The trend, not one number.** Pain rising across a week is worth a call; one high rating after a long day may not be.",
+          "**New injuries.** If a client logs a new sore spot, you hear about it before the next session, not at it.",
+        ],
       },
+      { h2: "Keep the program small enough to keep" },
       {
-        p: "Every coaching tool works on every plan. A trainer with two clients gets the same reports, check-ins, booking and payments as one with two hundred. The plans only differ in how many people you can coach, because that's what changes the work, and it's how most coaches already think about their costs.",
+        p: "Four or five exercises, two or three sets each, done a few times a week will usually be kept up better than a long list. Bodyweight work that needs only a wall or the floor removes another excuse. You know what each client needs; the job of the app is to make that plan easy to follow and easy to check.",
       },
-      { h2: "What stays free" },
-      {
-        p: "Your clients always train free, on Android, iPhone and the web. They never need Pro to follow your routines, answer a check-in, book a session or pay you. High school coaches who confirm a school email address still get Pro free, and so do their athletes aged 13 to 18, with room for whole teams. And Liftsmith takes nothing from what your clients pay you: payments go straight to your own Stripe account, less Stripe's usual card fees.",
-      },
+      { exercises: ["wall-sit", "glute-bridge", "bird-dog", "clamshell", "bw-calf-raise"] },
       { cta: "coach" },
-      { h2: "When you reach your limit" },
+      { h2: "In Liftsmith" },
       {
-        p: "Under **Settings › Coaching › Your clients**, a card shows your plan and how many clients it allows. When it's full, the card says so and **See coach plans** opens the plans, each with its own button and its price from the store or Stripe. Nobody is ever unlinked by a limit: it only stops new clients joining. If someone tries to join a full list, they're told to let you know, and you get one notification that day so you can make room or move up.",
+        p: "Pick Physio under Settings › Coaching. Each client's report then leads with the pain ratings and injuries they choose to share, with the latest rating on each exercise and the trend across their last ratings. Assign one of the gentle rehab starting points (knee, lower back, shoulder, ankle, hip, neck and upper back) or any routine you've built, with how many times a week. The report shows how often they keep to it, and you get a notification when a rating of 5 or more comes in. Clients use the app free. See [coaching in Liftsmith](/coaches/).",
       },
       {
-        p: "Moving up from Pro replaces your Pro subscription, so you only ever pay for one plan, and what's left of Pro is credited. On Android and iPhone it goes through Google Play or the App Store, and on the web app by card through Stripe. You can change or cancel any plan the same way you would Pro.",
-      },
-      { h2: "Already coaching more than three people?" },
-      {
-        p: "Coaches who already had more clients than Pro covers when coach plans started keep the old limit of 30 for 90 days, so nobody is caught out, and every client you have now stays linked for good. After that, adding new clients needs a coach plan. Read [how to track your clients' workouts](/blog/how-to-track-client-workouts/) for the habits that make coaching in an app work, see the [pricing page](/pricing/) for the plans side by side, or start on the [coaches page](/coaches/).",
+        p: "Liftsmith shows what your client logs. It doesn't diagnose or treat anything, and the rehab starting points are there to adjust, not a treatment plan: your assessment decides what's right for each person.",
       },
     ],
     faq: [
       [
-        "Do my clients need to pay anything?",
-        "No. Being a client is free on every plan. They need a free account so their workouts reach you.",
+        "Do clients have to share pain ratings?",
+        "No. Sharing pain and injuries is a separate switch for each coach, off until the client turns it on. They can turn it off at any time.",
       ],
       [
-        "Does Liftsmith take a percentage of my client payments?",
-        "No. Client payments go to your own Stripe account. Stripe charges its usual card fees, and Liftsmith takes nothing on top.",
+        "Does the app change a rehab program when a client logs an injury?",
+        "Not one you assign as a rehab program. Those keep every exercise as written and ask about pain between sets. The client's other workouts still skip or lighten the exercises that load a sore spot.",
+      ],
+    ],
+  },
+  {
+    slug: "doing-your-physio-exercises-at-home",
+    kind: "blog",
+    title: "How to keep up your physio exercises at home",
+    description:
+      "Home exercises from a physio work best when they're done and when your physio hears how they felt. Simple ways to keep up with them and report pain.",
+    date: "2026-11-13",
+    tag: "Coaching",
+    cta: "injury",
+    body: [
+      {
+        p: "Your physio gave you a handful of exercises to do at home, a few times a week. Then life happens: a busy week, a day the knee feels fine, a day it doesn't. Keeping up with the plan, and telling your physio honestly how it went, is a big part of what you can control.",
+      },
+      { h2: "Make it easy to do" },
+      {
+        ul: [
+          "**Pick the days now.** Put the sessions on the days and times you'll really do them, the same way you'd book an appointment.",
+          "**Keep it where you train.** If your exercises sit in the same app as the rest of your training, they're one tap away instead of on a sheet of paper.",
+          "**Log as you go.** Tick off each set as you do it. It's faster than remembering later, and it's what your physio will look at.",
+        ],
+      },
+      { h2: "Rate pain the same way each time" },
+      {
+        p: 'A 0 to 10 scale works when you use it consistently: 0 is no pain, 10 is the worst you can imagine. Rate right after the sets of each exercise, not at the end of the day, so the rating belongs to the movement. A few numbers over a couple of weeks tell your physio far more than "it\'s been okay".',
+      },
+      { cta: "injury" },
+      { h2: "Know when to stop" },
+      {
+        p: "Stop and get in touch with your physio if you feel sharp pain, pain that builds through the session, swelling, numbness or tingling, or a joint that gives way. Don't push through those to finish a set. See [training around an injury](/blog/training-around-an-injury/).",
+      },
+      { h2: "In Liftsmith" },
+      {
+        p: "Enter your physio's code under Settings › Coaching, then turn on Share pain and injuries for them if you want them to see your ratings. It's off until you do. A rehab program they send keeps every exercise as written even with an injury logged, and asks how the area feels after each exercise's sets. Being a client is free. Liftsmith isn't a medical app and doesn't give medical advice; your physio does.",
+      },
+    ],
+    faq: [
+      [
+        "What does my physio see?",
+        "Your workouts, and, only if you turn it on, the areas you logged as hurting, when, and your pain ratings with the exercise each was rated on. Never your heart rate, health readings, notes or photos.",
       ],
       [
-        "What happens to my clients if I go back to Pro?",
-        "They all stay linked and keep training with you. You just can't add new clients until you're under Pro's limit or back on a coach plan.",
-      ],
-      [
-        "Are any coaching tools only on the coach plans?",
-        "No. Every coaching tool works on Pro, Coach and Coach Plus. The plans differ only in how many clients you can have.",
+        "What if I miss a session?",
+        "Do the next one as planned rather than doubling up, and tell your physio if missing sessions is becoming a pattern. A shorter plan you keep up usually beats a longer one you don't.",
       ],
     ],
   },

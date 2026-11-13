@@ -477,7 +477,11 @@ export const it: SiteText = {
       },
       {
         q: "Posso vedere la loro frequenza cardiaca o il loro peso?",
-        a: "No. Vedi solo il loro allenamento. Dati sulla salute, misure, infortuni e note non lasciano mai il loro account.",
+        a: "Solo ciò che scelgono. Vedi il loro allenamento. Ogni cliente può attivare la condivisione dei dati corporei, o di dolore e infortuni, con te; letture di salute e note non lasciano mai il suo account.",
+      },
+      {
+        q: "Possono usarlo fisioterapisti e professionisti della riabilitazione?",
+        a: "Sì. Scegli Fisioterapista in Coaching e il report di ogni cliente parte da dolore e infortuni che condivide, esercizio per esercizio. Assegna programmi di riabilitazione leggeri con le volte a settimana e guarda quanto spesso li segue. Liftsmith mostra ciò che i clienti registrano; non fa diagnosi né cure.",
       },
       {
         q: "Come inizio?",
