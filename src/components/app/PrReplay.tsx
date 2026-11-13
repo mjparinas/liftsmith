@@ -15,6 +15,7 @@ import { loadBar } from "@/lib/plates";
 import { useApp } from "@/lib/store";
 import { fmtNum, fromKg } from "@/lib/units";
 
+import { useMyShape } from "./myShape";
 import { PlateBar } from "./Plates";
 import { Sheet } from "./ui";
 
@@ -49,6 +50,7 @@ export function PrReplayButton({ prs }: { prs: Pr[] }) {
 
 function Replay({ pr }: { pr: Pr }) {
   const { gyms, profile } = useApp();
+  const shape = useMyShape();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const ex = exercise(pr.exerciseId);
   const reduced = typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -84,6 +86,7 @@ function Replay({ pr }: { pr: Pr }) {
           key={run}
           exerciseId={pr.exerciseId}
           body={bodyFor(profile.sex)}
+          shape={shape}
           reps={pr.reps}
           still={reduced}
           label={tr("pr.demoLabel", { weight: `${fmtNum(fromKg(pr.weight, unit))} ${unit}`, reps: pr.reps })}
