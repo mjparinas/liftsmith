@@ -22,11 +22,35 @@ describe("System page checks", () => {
     expect(isStatusPageName("github")).toBe(false);
   });
 
-  it("checks settings by name and flags a bare-domain site address", () => {
+  it("checks settings by name and flags a bare-domain site address", async () => {
     vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://getliftsmith.com");
-    const c = settingsCheck();
+    vi.stubEnv("VERCEL_TOKEN", "");
+    const c = await settingsCheck();
     expect(c.rows.find((r) => r.label === "Site address format")).toMatchObject({ state: "warn" });
     expect(JSON.stringify(c)).not.toContain('https://getliftsmith.com"');
+  });
+
+  it("says which Vercel environments hold each setting, and lists ones the code doesn't read, without values", async () => {
+    vi.stubEnv("VERCEL_TOKEN", "tok");
+    vi.stubEnv("VERCEL_PROJECT_ID", "prj_1");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.secret-value");
+    const f = vi.fn(async () =>
+      Response.json({
+        envs: [
+          { key: "MAPBOX_TOKEN", target: ["production"], value: "pk.secret-value" },
+          { key: "MAPBOX_TOKEN", target: ["preview"], value: "pk.secret-value" },
+          { key: "OLD_THING_KEY", target: ["production"], value: "leftover-secret" },
+        ],
+      }),
+    );
+    vi.stubGlobal("fetch", f);
+    const c = await settingsCheck();
+    expect(String(f.mock.calls[0]?.[0 as never])).toContain("/v10/projects/prj_1/env");
+    expect(c.rows.find((r) => r.label === "Mapbox")).toMatchObject({ state: "ok", value: "Set (MAPBOX_TOKEN) · Production and Preview" });
+    expect(c.rows.find((r) => r.label === "OLD_THING_KEY")).toMatchObject({ state: "warn", value: "Production only" });
+    expect(c.setup).toBeUndefined();
+    expect(JSON.stringify(c)).not.toContain("secret-value");
+    expect(JSON.stringify(c)).not.toContain("leftover-secret");
   });
 
   it("reads a status page, and caches it for a minute", async () => {

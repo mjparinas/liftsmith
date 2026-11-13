@@ -1,3 +1,5 @@
+import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -6,6 +8,7 @@ import {
   JOB_LATE_MS,
   JOB_RUNNING_MS,
   jobState,
+  NOT_SETTINGS,
   pageAssets,
   runState,
   settingRows,
@@ -64,12 +67,47 @@ describe("System page", () => {
 
   it("reports settings by name only, never their values", () => {
     const rows = settingRows((n) => (n === "TURSO_DATABASE_URL" ? "libsql://tok-9f3a" : ""));
-    expect(rows).toHaveLength(SETTINGS.length);
-    expect(rows[0]).toMatchObject({ label: "Database", value: "Set (TURSO_DATABASE_URL)", state: "ok" });
+    expect(rows.filter((r) => SETTINGS.some((s) => s.label === r.label))).toHaveLength(SETTINGS.length);
+    expect(rows[0]).toMatchObject({ label: "Database", value: "Set (TURSO_DATABASE_URL)", state: "ok", group: "Core" });
     expect(rows.find((r) => r.label === "Email sending")?.state).toBe("down");
     expect(rows.find((r) => r.label === "Site address")?.state).toBe("warn");
     expect(rows.find((r) => r.label === "UptimeRobot")?.state).toBeUndefined();
     expect(JSON.stringify(rows)).not.toContain("tok-9f3a");
+  });
+
+  it("needs every half of a pair, and warns when only one half is set", () => {
+    const only = (set: string[]) => settingRows((n) => (set.includes(n) ? "x" : ""));
+    expect(only([]).find((r) => r.label === "Sonos")).toMatchObject({ value: "Missing: SONOS_CLIENT_ID and SONOS_CLIENT_SECRET" });
+    expect(only([]).find((r) => r.label === "Sonos")?.state).toBeUndefined();
+    expect(only(["SONOS_CLIENT_ID"]).find((r) => r.label === "Sonos")).toMatchObject({
+      state: "warn",
+      value: "Missing SONOS_CLIENT_SECRET",
+    });
+    expect(only(["SONOS_CLIENT_ID", "SONOS_CLIENT_SECRET"]).find((r) => r.label === "Sonos")).toMatchObject({ state: "ok" });
+    expect(only(["STRIPE_SECRET_KEY"]).find((r) => r.label.startsWith("Stripe"))?.state).toBe("warn");
+  });
+
+  it("lists every environment variable the code reads", () => {
+    // Every way the code reads one: process.env.X, env.X, env("X"), process.env["X"], e.X in a reader of
+    // process.env, and the connected apps' `${KEY}_CLIENT_ID` pairs. A new key must be on SETTINGS (shown on the
+    // System tab) or NOT_SETTINGS (set by Vercel or CI, or a build switch).
+    const files = execSync("git ls-files src next.config.ts", { encoding: "utf8" })
+      .split("\n")
+      .filter((f) => /\.(ts|tsx|mjs)$/.test(f) && !/\.test\.tsx?$/.test(f) && !f.startsWith("src/test/"));
+    const read = new Set<string>();
+    const pattern = /\b(?:process\.env|env|e)(?:\.([A-Z][A-Z0-9_]+)\b|\(\s*["']([A-Z][A-Z0-9_]+)["']|\[\s*["']([A-Z][A-Z0-9_]+)["'])/g;
+    for (const f of files) {
+      const src = readFileSync(f, "utf8");
+      if (!/process\.env/.test(src) && !/env[.(]/.test(src)) continue;
+      for (const m of src.matchAll(pattern)) read.add((m[1] ?? m[2] ?? m[3])!);
+    }
+    const clouds = readFileSync("src/server/connect.ts", "utf8").match(/const ENV: Record<Cloud, string> = \{([^}]*)\}/)?.[1] ?? "";
+    for (const [, key] of clouds.matchAll(/"([A-Z0-9]+)"/g)) read.add(`${key}_CLIENT_ID`).add(`${key}_CLIENT_SECRET`);
+    expect(read.size).toBeGreaterThan(40);
+    const listed = new Set([...SETTINGS.flatMap((s) => s.names), ...NOT_SETTINGS]);
+    expect([...read].filter((n) => !listed.has(n)).sort()).toEqual([]);
+    // And nothing listed that the code no longer reads.
+    expect(SETTINGS.flatMap((s) => s.names).filter((n) => !read.has(n))).toEqual([]);
   });
 
   it("holds the site address to the www rule", () => {
