@@ -14,6 +14,7 @@ import { EXTRA_LIMITS, isEquipment, ISSUE_KINDS, type GymIssue, type GymNews, ty
 import { newCode, roleOf } from "./coach";
 import { query, rateLimit, run } from "./db";
 import { isPlaceId } from "./gymPlaces";
+import { canManage, managersOf } from "./gymStaff";
 import { checkText } from "./moderation";
 import { notifyPlain } from "./push";
 
@@ -46,7 +47,8 @@ export type NewsResult = { ok: true; id: string; pushed: number } | Fail<"owner"
 /** The owner posts an announcement; members of the gym's club who left workout pushes on are told. */
 export async function postNews(accountId: string, placeId: unknown, text: unknown, now = Date.now()): Promise<NewsResult> {
   const p = await ownerOf(placeId);
-  if (!p || !p.owner || p.owner !== accountId) return { ok: false, error: "owner" };
+  // The owner or one of the gym's staff (gymStaff.ts).
+  if (!p || !p.owner || !(await canManage(accountId, p.id))) return { ok: false, error: "owner" };
   const c = checkText(text, EXTRA_LIMITS.news);
   if (!c.ok) return { ok: false, error: c.error };
   if (!(await rateLimit(`gyms:news:${p.id}`, EXTRA_LIMITS.newsPerDay, 86_400_000, now))) return { ok: false, error: "slow" };
@@ -65,7 +67,7 @@ export async function postNews(accountId: string, placeId: unknown, text: unknow
 
 export async function deleteNews(accountId: string, placeId: unknown, id: unknown): Promise<boolean> {
   const p = await ownerOf(placeId);
-  if (!p || p.owner !== accountId || !isId(id)) return false;
+  if (!p || !isId(id) || !(await canManage(accountId, p.id))) return false;
   return (await run("DELETE FROM gym_news WHERE id = ? AND place_id = ?", [id, p.id])) > 0;
 }
 
@@ -122,7 +124,8 @@ export async function reportIssue(who: string, b: Record<string, unknown>, now =
      VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?, 0, '')`,
     [id, p.id, b.equipment, kind, note, who, now, now],
   );
-  if (p.owner) await notifyPlain(p.owner, "gymIssue", { name: p.name }, `#/gymedit/${p.id}`);
+  // The owner and the gym's staff.
+  if (p.owner) await Promise.all((await managersOf(p.id)).map((m) => notifyPlain(m, "gymIssue", { name: p.name }, `#/gymedit/${p.id}`)));
   return { ok: true, id };
 }
 
@@ -200,8 +203,8 @@ export async function joinAsTrainer(accountId: string, b: Record<string, unknown
   }
   const [count] = await query("SELECT COUNT(*) AS n FROM gym_trainers WHERE account_id = ?", [accountId]);
   if (n(count?.n) >= EXTRA_LIMITS.trainerGyms) return { ok: false, error: "full" };
-  // The gym's own owner listing themselves needs nobody's say-so.
-  const status = p.owner && p.owner !== accountId ? "pending" : "listed";
+  // The gym's own owner or staff listing themselves needs nobody's say-so.
+  const status = p.owner && !(await canManage(accountId, p.id)) ? "pending" : "listed";
   await run("INSERT INTO gym_trainers (place_id, account_id, code, bio, status, created_at) VALUES (?, ?, ?, ?, ?, ?)", [
     p.id,
     accountId,
@@ -210,7 +213,8 @@ export async function joinAsTrainer(accountId: string, b: Record<string, unknown
     status,
     now,
   ]);
-  if (status === "pending") await notifyPlain(p.owner, "gymTrainer", { name: p.name }, `#/gymedit/${p.id}`);
+  if (status === "pending")
+    await Promise.all((await managersOf(p.id)).map((m) => notifyPlain(m, "gymTrainer", { name: p.name }, `#/gymedit/${p.id}`)));
   return { ok: true, status };
 }
 
@@ -246,7 +250,7 @@ export async function myTrainerGyms(accountId: string): Promise<MyTrainerGym[]> 
 /** The owner approves a trainer waiting for them, or takes one off the gym's page. */
 export async function decideTrainer(accountId: string, placeId: unknown, code: unknown, approve: boolean): Promise<boolean> {
   const p = await ownerOf(placeId);
-  if (!p || p.owner !== accountId || typeof code !== "string" || !/^[2-9A-HJ-NP-Z]{8}$/.test(code)) return false;
+  if (!p || typeof code !== "string" || !/^[2-9A-HJ-NP-Z]{8}$/.test(code) || !(await canManage(accountId, p.id))) return false;
   return approve
     ? (await run("UPDATE gym_trainers SET status = 'listed' WHERE place_id = ? AND code = ?", [p.id, code])) > 0
     : (await run("DELETE FROM gym_trainers WHERE place_id = ? AND code = ?", [p.id, code])) > 0;
@@ -268,7 +272,7 @@ export interface OwnerExtras {
 
 export async function ownerExtras(accountId: string, placeId: unknown, now = Date.now()): Promise<OwnerExtras | null> {
   const p = await ownerOf(placeId);
-  if (!p || p.owner !== accountId) return null;
+  if (!p || !(await canManage(accountId, p.id))) return null;
   const [news, issues, trainers] = await Promise.all([newsOf(p.id, now), issuesOf(p.id, now), trainersWhere(p.id, ["pending", "listed"])]);
   return { news, issues, trainers };
 }

@@ -275,6 +275,14 @@ export const de: FeaturesText = {
       name: "Trainer auf Studioseiten",
       body: "Coaches zeigen sich in den Studios, in denen sie ihre Kunden trainieren, mit einer Zeile über sich und einem Knopf, um mit ihnen zu trainieren. Bei einem offiziellen Studio gibt der Betreiber sie zuerst frei.",
     },
+    "gym-staff": {
+      name: "Teamkonten für Studios",
+      body: "Der Inhaber eines offiziellen Studios lädt Leitung und Empfangsteam mit einem Einmal-Link ein. Alle halten mit ihrem eigenen Konto die Seite, Ankündigungen und gemeldete Probleme aktuell.",
+    },
+    "gym-starter": {
+      name: "Einsteigerprogramme der Studios",
+      body: "Offizielle Studios empfehlen neuen Mitgliedern ein Programm auf ihrer Seite in der App und im Web, mit einem Tippen gespeichert. Liftsmith setzt die eigenen Gewichte ein.",
+    },
     "buy-next": {
       name: "Was du als Nächstes kaufst",
       body: "Für Heimstudios: das eine Gerät, das die meisten neuen Übungen ermöglichen würde.",

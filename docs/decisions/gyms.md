@@ -81,3 +81,44 @@ so scrolling the page past it doesn't. Zoom buttons are 44 px. Drags on it are t
   (`areaMapPath`, `/api/gyms/map/?ids=<id>.<id>…`), because those pages run no scripts. Pins go by the ids in the
   address, so pin 1 is always the list's first gym.
 - Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web code, so Android, iOS and the web app get it together.
+
+## Staff and the starter program (2026-11-13)
+
+Melvin, 2026-11-13, picked the two gym items left from round 3 ("several staff per gym" and "a house starter
+program"). Pure web code, so Android, iOS and the web app get both together; the server checks everything.
+
+**Staff accounts** (`src/server/gymStaff.ts`, `GymStaff.tsx`):
+
+- **The owner invites, with a one-time link.** Owner's page › Staff › **Invite someone** makes a ten-character code
+  (`gym_staff_invites`, a week, used up by one conditional delete so two people racing with one link can't both get in)
+  and opens the share sheet with `…/app/#/gymstaff/<code>` (copied when there's no sheet). At most 5 open invites and 10
+  staff per gym, 20 invites a day per owner, 10 gyms per staff member. The owner can share an invite again or cancel it.
+- **Joining** (`GymStaffJoin`, route `gymstaff`): needs an account (signed out, it says why and offers Sign in). It shows
+  the gym's name, asks for the name the owner will see (prefilled from the profile, through the word check), and opens
+  the owner's page on success. The owner and anyone already on the staff can't join again.
+- **One account each, no shared logins**, so the gym knows who changed what and someone leaving doesn't mean a new
+  password. No separate roles among staff (Melvin didn't ask for them, and every owner action is low-risk and undoable):
+  **staff can do everything on the owner's page** (details, hours, pictures, amenities and prices, announcements,
+  problem reports, approving trainers, the starter program, starting the club, asking for a stand) through one check,
+  `canManage` / the `MANAGES` SQL, used by `gymClaims.ts`, `gymExtras.ts`, `gymMedia.ts`, `gymPosters.ts` and
+  `social.ts gymClubStart`. **Only the owner** invites, cancels invites, removes staff and lets the gym go. Problem
+  reports and trainer requests now push to the owner and every staff member (`managersOf`).
+- The staff list shows names and since when, never account ids (each row has a one-way id the owner removes by). Staff
+  see the list but not open invites, and can **Stop helping with this gym**. Their gyms show in `owned` with
+  `role: "staff"`, so Manage this gym's page appears for them.
+- **It all ends with the owner**: letting the gym go, staff deleting the gym in admin, or deleting the owner's account
+  removes its staff and invites (`staffEnds`, `staffDeletes` first in `claimDeletes`). Deleting a staff member's account
+  removes their places. The privacy policy and `docs/PRIVACY_LABELS.md` cover the name they type.
+
+**The starter program** (`src/lib/gymStarter.ts`, column `gym_places.starter`):
+
+- The owner or staff pick **one of their own routines** on the owner's page (Starter program, chips of their routines,
+  "Stop suggesting it" to clear), saved with the page. It's stored as the routine's share code (`routineShare.ts`), so
+  only the exercises, order, set counts, supersets and warm-up or cool-down travel; never weights, reps or notes. The
+  server checks it's a routine code with real exercises (`readStarter`, which has no app text so the server can use it)
+  and runs its name through the word check.
+- **Shown** on the gym's page in the app (`StarterCard` in `PlaceDetails.tsx`: name, "3 × Goblet squat" lines and
+  **Save the starter program**, which opens the usual Save screen for a shared routine, `#/routine/<code>`) and on the
+  web (`starterHtml` in `gymPage.ts`, exercise names in the reader's language, with **Save it in the app**). A lifter's
+  saved copy is their own routine, so changing the gym's program later doesn't touch it.
+- One program per gym on purpose: the question a new member asks is "what do I do?", and one answer beats a menu.

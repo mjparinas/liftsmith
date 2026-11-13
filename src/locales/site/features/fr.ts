@@ -276,6 +276,14 @@ export const fr: FeaturesText = {
       name: "Coachs sur les pages des salles",
       body: "Les coachs s’affichent dans les salles où ils entraînent leurs clients, avec une ligne sur eux et un bouton pour s’entraîner avec eux. Dans une salle officielle, le propriétaire les approuve d’abord.",
     },
+    "gym-staff": {
+      name: "Comptes d’équipe pour les salles",
+      body: "Le propriétaire d’une salle officielle invite gérants et personnel d’accueil avec un lien à usage unique. Chacun utilise son propre compte pour tenir à jour la page, les annonces et les problèmes signalés.",
+    },
+    "gym-starter": {
+      name: "Programmes de départ des salles",
+      body: "Les salles officielles proposent un programme aux nouveaux membres sur leur page dans l’app et sur le web, enregistré d’un toucher. Liftsmith fixe les charges de chacun.",
+    },
     "buy-next": {
       name: "Quoi acheter ensuite",
       body: "Pour les salles à la maison : l’équipement qui ouvrirait le plus d’exercices.",

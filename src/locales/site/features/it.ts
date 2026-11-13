@@ -269,6 +269,14 @@ export const it: FeaturesText = {
       name: "Trainer sulle pagine delle palestre",
       body: "I coach compaiono nelle palestre dove allenano i loro clienti, con una riga su di sé e un pulsante per allenarsi con loro. In una palestra ufficiale, il titolare li approva prima.",
     },
+    "gym-staff": {
+      name: "Account dello staff per le palestre",
+      body: "Il titolare di una palestra ufficiale invita responsabili e reception con un link monouso. Ognuno usa il proprio account per tenere aggiornati la pagina, gli annunci e i problemi segnalati.",
+    },
+    "gym-starter": {
+      name: "Programmi per iniziare delle palestre",
+      body: "Le palestre ufficiali suggeriscono un programma ai nuovi iscritti sulla loro pagina nell’app e sul web, salvabile con un tocco. Liftsmith mette i pesi di ciascuno.",
+    },
     "buy-next": {
       name: "Cosa comprare dopo",
       body: "Per le palestre in casa: l’attrezzo che aprirebbe più esercizi.",

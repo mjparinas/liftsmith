@@ -76,6 +76,8 @@ export interface Place {
   news: GymNews[];
   issues: GymIssue[];
   trainers: GymTrainer[];
+  /** The gym's starter program for new members (a routine share code, gymStarter.ts), '' for none. */
+  starter: string;
 }
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
@@ -449,7 +451,7 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 // --- The finder ---
 
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
-  p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices,
+  p.source, p.claimed_by, p.lifters, p.code, p.updated_at, p.amenities, p.prices, p.starter,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
   (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
   (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
@@ -484,6 +486,7 @@ const toPlace = (r: Row, km: number): Place => ({
   news: [],
   issues: [],
   trainers: [],
+  starter: s(r.starter),
 });
 
 /** One gym's photos, oldest first (gymMedia.ts). */
@@ -716,7 +719,10 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
         { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
-        ...["gym_news", "gym_issues", "gym_trainers"].map((t) => ({ sql: `DELETE FROM ${t} WHERE place_id = ?`, args: [id] })),
+        ...["gym_news", "gym_issues", "gym_trainers", "gym_staff", "gym_staff_invites"].map((t) => ({
+          sql: `DELETE FROM ${t} WHERE place_id = ?`,
+          args: [id],
+        })),
         { sql: "DELETE FROM gym_places WHERE id = ?", args: [id] },
       ]);
       return true;

@@ -5,7 +5,8 @@
 // the poster ops (posters, posterStatus)
 // need a signed-in account; added and report work signed out too. Round 3 (gymExtras.ts): issue, issueFixed and
 // issues (equipment problems) work signed out; news, newsDelete, extras (the owner's view), trainer, trainerLeave,
-// trainerGyms and trainerDecide need an account.
+// trainerGyms and trainerDecide need an account. Staff (gymStaff.ts): staff, staffInvite, staffCancel, staffPreview,
+// staffJoin, staffRemove and staffLeave need an account.
 import { hasDb, preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import { resendMail, sessionOf } from "@/server/accounts";
 import { rateLimit } from "@/server/db";
@@ -26,6 +27,7 @@ import {
 import { areaMapPath } from "@/server/gymMedia";
 import { isPlaceId, joinPlace, nearbyPlaces, placeById, suggestPlace } from "@/server/gymPlaces";
 import { latestOrder, requestPosters } from "@/server/gymPosters";
+import { cancelInvite, invitePreview, inviteStaff, joinStaff, removeStaff, staffOf } from "@/server/gymStaff";
 import { gymClubStart } from "@/server/social";
 
 export const OPTIONS = preflight;
@@ -172,6 +174,33 @@ export async function POST(req: Request) {
       return (await decideTrainer(s.accountId, b.place, b.code, b.approve === true))
         ? reply(req, 200, { ok: true })
         : reply(req, 403, { error: "owner" });
+    // Staff accounts (src/server/gymStaff.ts): the owner invites people to manage the gym with them.
+    case "staff": {
+      const r = await staffOf(s.accountId, b.place);
+      return r ? reply(req, 200, r) : reply(req, 403, { error: "owner" });
+    }
+    case "staffInvite": {
+      const r = await inviteStaff(s.accountId, b.place);
+      if (r.ok) return reply(req, 200, r);
+      return reply(req, r.error === "owner" ? 403 : r.error === "slow" ? 429 : 409, { error: r.error });
+    }
+    case "staffCancel":
+      return (await cancelInvite(s.accountId, b.place, b.code)) ? reply(req, 200, { ok: true }) : reply(req, 404, { error: "gone" });
+    case "staffPreview": {
+      const r = await invitePreview(b.code);
+      return r ? reply(req, 200, r) : reply(req, 404, { error: "gone" });
+    }
+    case "staffJoin": {
+      const r = await joinStaff(s.accountId, b.code, b.name);
+      if (r.ok) return reply(req, 200, r);
+      const status = r.error === "gone" ? 404 : r.error === "slow" ? 429 : r.error === "owner" || r.error === "full" ? 409 : 400;
+      return reply(req, status, { error: r.error });
+    }
+    case "staffRemove":
+    case "staffLeave":
+      return (await removeStaff(s.accountId, b.place, b.op === "staffRemove" ? (b.id ?? "") : undefined))
+        ? reply(req, 200, { ok: true })
+        : reply(req, 404, { error: "gone" });
     case "posterStatus":
       return reply(req, 200, { order: await latestOrder(s.accountId, b.place) });
     default:

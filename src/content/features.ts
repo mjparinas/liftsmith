@@ -503,6 +503,20 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "gym-staff",
+        name: "Staff accounts for gyms",
+        body: "An official gym's owner invites managers and front-desk staff with a one-time link. Each uses their own account to keep the gym's page, announcements and problem reports up to date.",
+        tier: "free",
+        added: "2026-11-13",
+      },
+      {
+        id: "gym-starter",
+        name: "Gym starter programs",
+        body: "Official gyms suggest one program to new members on their page in the app and on the web, and lifters save it in one tap. Liftsmith fills in each lifter's own weights.",
+        tier: "free",
+        added: "2026-11-13",
+      },
+      {
         id: "buy-next",
         name: "What to buy next",
         body: "For home gyms: the one piece of equipment that would open up the most exercises.",

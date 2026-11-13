@@ -163,6 +163,11 @@ export default function Privacy() {
           goes back to unofficial and your claims are deleted.
         </p>
         <p className="mt-2">
+          If a gym&apos;s owner invites you to its staff, we keep the name you type when you join with your account and the gym, so the
+          owner and other staff can see who helps manage the page; it&apos;s never shown publicly. You can leave at any time, the owner can
+          remove you, and leaving, the gym going back to unofficial or deleting your account ends it.
+        </p>
+        <p className="mt-2">
           If you ask us to mail your gym a table stand, we keep the mailing address you give and the name on it with your account until
           it&apos;s sent, and the gym&apos;s address afterwards as our mailing record. Deleting your account takes your name off it. Visits
           from the QR code on a gym&apos;s poster are counted with a one-way code from your internet address, once a day, and only the total

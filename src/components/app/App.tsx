@@ -54,6 +54,7 @@ import { GymAdd } from "./GymAdd";
 import { GymClaim } from "./GymClaim";
 import { GymEdit } from "./GymEdit";
 import { GymPlace } from "./GymPlace";
+import { GymStaffJoin } from "./GymStaff";
 import { useHomeWidget } from "./HomeWidget";
 import { Icon, type IconName } from "./icons";
 import { Injuries } from "./Injuries";
@@ -448,6 +449,7 @@ export function App() {
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
     gymedit: <GymEdit key={arg ?? ""} id={arg} />,
+    gymstaff: <GymStaffJoin key={arg ?? ""} code={arg} />,
     gymadd: <GymAdd />,
     log: <LogPast />,
   };
@@ -570,6 +572,7 @@ const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
   "gymplace",
   "gymclaim",
   "gymedit",
+  "gymstaff",
   "gymadd",
 ]);
 
