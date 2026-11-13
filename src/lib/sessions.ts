@@ -107,24 +107,57 @@ export function coolDownHome(workouts: readonly WorkoutSpan[], now: number, seco
 
 // ---------- Parts of the workout in progress (stage 2) ----------
 
-/** The kinds a workout can run through today: a warm-up, the lifting (or a rehab program), a cool-down. */
-export type LivePartKind = "warm" | "lift" | "rehab" | "cool";
+/**
+ * The kinds a workout can run through today: a warm-up, the lifting (or a rehab program), the physio's rehab beside
+ * the lifting, cardio after it (stage 5), a cool-down.
+ */
+export type LivePartKind = "warm" | "lift" | "rehab" | "cardio" | "cool";
 
 /** One part of the workout in progress: when it started and ended, and whether it was skipped. */
 export interface LivePart {
   kind: LivePartKind;
+  /** Where it came from: the rehab routine's id, the cardio exercise's id. */
+  ref?: string;
   start?: number;
   end?: number;
   skipped?: boolean;
 }
 
-/** The parts a workout starts with: the warm-up and cool-down when picked, around the lifting or rehab. */
-export function planParts(picks: { warm: boolean; cool: boolean }, rehab: boolean): LivePart[] {
+export interface PartPicks {
+  warm: boolean;
+  cool: boolean;
+  /** The rehab routine done beside the lifting, by id. */
+  rehab?: string;
+  /** The cardio exercise done after the lifting, by id. */
+  cardio?: string;
+}
+
+/**
+ * The parts a workout starts with, in order: the warm-up, the lifting (or a rehab program on its own), the physio's
+ * rehab beside the lifting, cardio, the cool-down. Rehab beside is left out when the whole workout is rehab.
+ */
+export function planParts(picks: PartPicks, rehab: boolean): LivePart[] {
   return [
     ...(picks.warm ? [{ kind: "warm" as const }] : []),
     { kind: rehab ? ("rehab" as const) : ("lift" as const) },
+    ...(picks.rehab && !rehab ? [{ kind: "rehab" as const, ref: picks.rehab }] : []),
+    ...(picks.cardio ? [{ kind: "cardio" as const, ref: picks.cardio }] : []),
     ...(picks.cool ? [{ kind: "cool" as const }] : []),
   ];
+}
+
+/**
+ * Moves from part `from` to part `to` at `now`: the one being left is closed (unless it already was) and the one
+ * entered starts (unless it already had). Going back to an earlier part (an exercise picked from the strip) keeps
+ * the times it has, so nothing is counted twice.
+ */
+export function movePart(parts: readonly LivePart[], from: number, to: number, now: number): LivePart[] {
+  if (from === to) return [...parts];
+  return parts.map((p, i) => {
+    if (i === from && p.start !== undefined && p.end === undefined) return { ...p, end: now };
+    if (i === to && p.start === undefined) return { ...p, start: now };
+    return p;
+  });
 }
 
 /** Starts part `index` at `now`, closing the one before it (skipped or done). */
@@ -142,7 +175,7 @@ export function enterPart(parts: readonly LivePart[], index: number, now: number
 export function doneParts(parts: readonly LivePart[], end: number): SessionPart[] {
   return parts
     .filter((p) => p.start !== undefined && !p.skipped)
-    .map((p) => ({ id: p.kind, kind: p.kind, start: p.start!, end: p.end ?? end }));
+    .map((p) => ({ id: p.kind, kind: p.kind, start: p.start!, end: p.end ?? end, ...(p.ref ? { ref: p.ref } : {}) }));
 }
 
 /** True when a workout's parts on sessionStart or sessionEnd include a cool-down, so Done needn't offer another. */

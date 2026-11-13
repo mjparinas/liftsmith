@@ -10,7 +10,7 @@ import type { Call } from "./readiness";
 import { recovery } from "./recovery";
 import { groupedSeconds } from "./superset";
 import { PRIORITY_VOLUME } from "./training";
-import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { MUSCLES, type AppEvent, type Exercise, type Gym, type ItemPart, type Muscle, type Profile } from "./types";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
@@ -30,6 +30,8 @@ export interface PlanItem {
   injuryPct?: number;
   /** Lighter sets before the working sets (warmup.ts). */
   warmup?: WarmupSet[];
+  /** A rehab or cardio part added beside the lifting at Start (sessions-with-parts.md, stage 5). Missing: the main part. */
+  part?: ItemPart;
   // ---- Set by a program (programs.ts); the adaptive plan leaves them out.
   /** The program lift these sets count for, saved on each set so a swap keeps its progress. */
   slot?: string;
@@ -143,7 +145,7 @@ export function avoided(events: readonly AppEvent[], gymId: string, now: number)
 }
 
 /** The exercises used most recently for each muscle, newest first. */
-function recentFor(events: readonly AppEvent[]): Map<Muscle, string[]> {
+export function recentFor(events: readonly AppEvent[]): Map<Muscle, string[]> {
   const out = new Map<Muscle, string[]>();
   for (let i = events.length - 1; i >= 0; i--) {
     const e = events[i]!;
@@ -159,9 +161,85 @@ function recentFor(events: readonly AppEvent[]): Map<Muscle, string[]> {
   return out;
 }
 
+/** Where an exercise goes in the plan: loaded compounds first, then bodyweight compounds, isolation work, and core and carries last. */
+export function orderRank(e: Exercise): number {
+  return e.pattern === "core" || e.pattern === "carry" ? 3 : e.compound ? (e.load === "bodyweight" ? 1 : 0) : 2;
+}
+
 function order(a: Exercise, b: Exercise): number {
-  const rank = (e: Exercise) => (e.pattern === "core" || e.pattern === "carry" ? 3 : e.compound ? (e.load === "bodyweight" ? 1 : 0) : 2);
-  return rank(a) - rank(b);
+  return orderRank(a) - orderRank(b);
+}
+
+/**
+ * Muscles worth training today, best first: recovered enough (55%, or 40% on a split day, where only the
+ * day's muscles count), then scored by recovery, how much of this week's set target is left, size and
+ * priority, plus a little seeded noise so ties don't always break the same way.
+ */
+export function rankMuscles(
+  rec: Record<Muscle, number>,
+  done: Record<Muscle, number>,
+  setsPerMuscle: number,
+  prio: ReadonlySet<Muscle>,
+  day: ReadonlySet<Muscle> | null,
+  random: () => number,
+): Muscle[] {
+  return MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
+    .map((m) => {
+      // Priority muscles (Settings) aim for a third more sets this week and rank ahead.
+      const goal = setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1);
+      const left = Math.max(0, goal - done[m]) / setsPerMuscle;
+      const big = BIG_MUSCLES.has(m) ? 1.25 : m === "forearms" || m === "adductors" ? 0.6 : 1;
+      return { m, score: (rec[m] / 100) * (0.25 + left) * big * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
+    })
+    .sort((a, b) => b.score - a.score)
+    .map((x) => x.m);
+}
+
+const BIG_MUSCLES: ReadonlySet<Muscle> = new Set(["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"]);
+
+/**
+ * How strongly the day's draw leans to one candidate: big compounds first in round one (barbell most),
+ * free weights over bodyweight in a full gym, then the lifter's own pick weight (pickWeights.ts).
+ */
+export function drawWeight(ex: Exercise, compoundFirst: boolean, gym: Gym, pickWeight: number): number {
+  return (
+    (compoundFirst && ex.compound ? (ex.load === "barbell" ? 4 : 3) : 1) *
+    (ex.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) *
+    pickWeight
+  );
+}
+
+/**
+ * Leftover time: an extra set on the earliest exercises, priority muscles first, up to five sets, never on a
+ * deload, an easy day or a lift kept lighter for an injury. A set count the lifter chose is kept as it is.
+ * Changes the items in place and returns the new total seconds.
+ */
+export function addLeftoverSets(
+  items: readonly PlanItem[],
+  opts: { prio: ReadonlySet<Muscle>; fixed: (id: string) => boolean; deload: boolean; call: Call; budget: number; total: number },
+): number {
+  let total = opts.total;
+  if (opts.deload || opts.call === "recover") return total;
+  for (const item of [...items].sort((a, b) => Number(opts.prio.has(b.focus)) - Number(opts.prio.has(a.focus)))) {
+    if (opts.fixed(item.exerciseId) || item.injuryPct) continue;
+    const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
+    const extra = setSeconds(ex, item.target.reps) + item.restSec;
+    if (item.sets < 5 && total + extra <= opts.budget) {
+      item.sets += 1;
+      total += extra;
+    }
+  }
+  return total;
+}
+
+/** Takes sets off the end, one at a time and never below two per exercise, until the plan fits the budget. */
+export function trimToFit(items: readonly PlanItem[], budget: number): PlanItem[] {
+  const out = [...items];
+  for (let i = out.length - 1; i >= 0 && planSeconds(out) > budget;) {
+    if (out[i]!.sets > 2) out[i] = { ...out[i]!, sets: out[i]!.sets - 1 };
+    else i--;
+  }
+  return out;
 }
 
 export function generate({
@@ -196,20 +274,7 @@ export function generate({
 
   // Muscles ranked by how ready they are and how much of this week's target is left.
   // A split day trains its muscles unless they're actually fatigued (40%), not only when fresh.
-  const ranked = MUSCLES.filter((m) => (day ? day.has(m) && rec[m] >= 40 : rec[m] >= 55))
-    .map((m) => {
-      // Priority muscles (Settings) aim for a third more sets this week and rank ahead.
-      const goal = week.setsPerMuscle * (prio.has(m) ? PRIORITY_VOLUME : 1);
-      const left = Math.max(0, goal - done[m]) / week.setsPerMuscle;
-      const big = ["chest", "lats", "upperBack", "quads", "hamstrings", "glutes"].includes(m)
-        ? 1.25
-        : m === "forearms" || m === "adductors"
-          ? 0.6
-          : 1;
-      return { m, score: (rec[m] / 100) * (0.25 + left) * big * (prio.has(m) ? 1.5 : 1) + random() * 0.05 };
-    })
-    .sort((a, b) => b.score - a.score)
-    .map((x) => x.m);
+  const ranked = rankMuscles(rec, done, week.setsPerMuscle, prio, day, random);
 
   const items: PlanItem[] = [];
   const used = new Set<string>();
@@ -226,21 +291,14 @@ export function generate({
     // doesn't stick (usability audit, 2026-11-13), and less often after it was swapped away.
     const keep = KEEP[profile.variability] * Math.min(1, prev ? prefs.taste(prev.id).factor : 0);
     if (prev && (!favHere || favs.has(prev.id)) && random() < keep && prefs.weight(prev.id) >= BASE_FRESH.common) return prev;
-    // A draw in proportion to each exercise's weight: big compounds first in round one, free weights over
-    // bodyweight in a full gym, then the lifter's own pick weight (popular lifts, likes up, swaps down).
-    const weighted = cands.map((c) => ({
-      item: c,
-      w:
-        (compoundFirst && c.compound ? (c.load === "barbell" ? 4 : 3) : 1) *
-        (c.load === "bodyweight" && gym.equipment.length > 4 ? 0.5 : 1) *
-        prefs.weight(c.id),
-    }));
+    // A draw in proportion to each exercise's weight (drawWeight).
+    const weighted = cands.map((c) => ({ item: c, w: drawWeight(c, compoundFirst, gym, prefs.weight(c.id)) }));
     return draw(weighted, random());
   };
 
-  const tryAdd = (m: Muscle, compoundFirst: boolean): boolean => {
+  const tryAdd = (m: Muscle, compoundFirst: boolean): void => {
     const ex = pick(m, compoundFirst);
-    if (!ex) return false;
+    if (!ex) return;
     const t = injuredTarget(ex, target(ex, events, profile, gym, now), hurt, gym);
     // The lifter's set count (for this exercise, then for every exercise) replaces the automatic one.
     const chosen = training?.exercises?.[ex.id]?.sets ?? training?.sets;
@@ -257,12 +315,11 @@ export function generate({
       warmup: warmup.length ? warmup : undefined,
     };
     const cost = itemSeconds(item) + (items.length ? item.restSec : 0);
-    if (total + cost > budget) return false;
+    if (total + cost > budget) return;
     total += cost;
     for (const p of ex.primary) warmed.add(p);
     used.add(ex.id);
     items.push(item);
-    return true;
   };
 
   // Round one: one exercise per ranked muscle, compounds favoured. Round two: second exercises.
@@ -275,29 +332,19 @@ export function generate({
     }
   }
 
-  // Leftover time: an extra set on the earliest exercises, priority muscles first. A set count the
-  // lifter chose is kept as it is.
+  // Leftover time: an extra set on the earliest exercises, priority muscles first.
   const fixed = (id: string) => (training?.exercises?.[id]?.sets ?? training?.sets) !== undefined;
-  for (const item of [...items].sort((a, b) => Number(prio.has(b.focus)) - Number(prio.has(a.focus)))) {
-    if (fixed(item.exerciseId)) continue;
-    const ex = EXERCISE_BY_ID.get(item.exerciseId)!;
-    const extra = setSeconds(ex, item.target.reps) + item.restSec;
-    if (item.sets < 5 && !week.deload && call !== "recover" && !item.injuryPct && total + extra <= budget) {
-      item.sets += 1;
-      total += extra;
-    }
-  }
+  addLeftoverSets(items, { prio, fixed, deload: week.deload, call, budget, total });
 
   items.sort((a, b) => order(EXERCISE_BY_ID.get(a.exerciseId)!, EXERCISE_BY_ID.get(b.exerciseId)!));
   applyCall(items, call, challenge && call === "push" && !week.deload, gym);
   // Sorting and the day's call change which lift comes first and its weight, so the warm-ups are
   // worked out again in the final order. If that tips the plan over the time asked for, extra
   // sets come off the end first.
-  const final = withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!);
-  for (let i = final.length - 1; i >= 0 && planSeconds(final) > budget;) {
-    if (final[i]!.sets > 2) final[i] = { ...final[i]!, sets: final[i]!.sets - 1 };
-    else i--;
-  }
+  const final = trimToFit(
+    withWarmups(items, gym, (id) => EXERCISE_BY_ID.get(id)!),
+    budget,
+  );
   const est = planSeconds(final);
   return { gymId: gym.id, minutes, estMinutes: Math.round(est / 60), week, call, challenge: final.some((i) => i.challenge), items: final };
 }
@@ -362,7 +409,7 @@ export function injuryPass(plan: Plan, events: readonly AppEvent[], profile: Pro
 }
 
 /** Turns the day's call into the plan: easy days drop a set and a step of load, push days go one rep closer to failure on the first lift. */
-function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) {
+export function applyCall(items: PlanItem[], call: Call, challenge: boolean, gym: Gym) {
   if (call === "recover") {
     for (const item of items) {
       const ex = EXERCISE_BY_ID.get(item.exerciseId)!;

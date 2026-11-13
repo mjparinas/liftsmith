@@ -293,12 +293,14 @@ function PartsLine({ parts }: { parts: PartView[] }) {
       {parts.map((p) => (
         <span key={p.kind} className="inline-flex items-center gap-1">
           {p.kind !== "lift" && (
-            <span className="text-cyan" aria-hidden>
-              <Icon name="stretch" size={14} />
+            <span className={p.kind === "cardio" ? "text-ember" : p.kind === "rehab" ? "text-violet" : "text-cyan"} aria-hidden>
+              <Icon name={p.kind === "cardio" ? "heart" : p.kind === "rehab" ? "bandage" : "stretch"} size={14} />
             </span>
           )}
           {t("hx.partTime", {
-            part: t(`hx.part.${p.kind === "warm" ? "warm" : p.kind === "cool" ? "cool" : p.kind === "rehab" ? "rehab" : "lift"}`),
+            part: t(
+              `hx.part.${p.kind === "warm" ? "warm" : p.kind === "cool" ? "cool" : p.kind === "rehab" ? "rehab" : p.kind === "cardio" ? "cardio" : "lift"}`,
+            ),
             time: minutes(p.seconds),
           })}
         </span>

@@ -9,11 +9,13 @@ import { createHash, randomBytes, randomInt } from "node:crypto";
 
 import { cleanAmenities, cleanPrices, currencyFor, type Amenity, type Prices } from "@/lib/gymExtras";
 import { decodeGym, encodeGym } from "@/lib/gymShare";
+import { readStarter } from "@/lib/gymStarter";
 import { parseHours } from "@/lib/openingHours";
 
 import { cleanEmail, type SendMail } from "./accounts";
-import { query, rateLimit, run } from "./db";
+import { batch, query, rateLimit, run } from "./db";
 import { isPlaceId } from "./gymPlaces";
+import { canManage, MANAGES, staffDeletes, staffEnds } from "./gymStaff";
 import { checkText } from "./moderation";
 
 export const CLAIM_LIMITS = {
@@ -232,6 +234,10 @@ export interface OwnedGym {
   amenities: Amenity[];
   prices: Prices | null;
   country: string;
+  /** "owner" for the account that claimed it, "staff" for someone the owner invited (gymStaff.ts). */
+  role: "owner" | "staff";
+  /** The gym's starter program for new members (a routine share code, gymStarter.ts), '' for none. */
+  starter: string;
 }
 
 /** "logo:ab12,photo:cd34" → the logo's id and the photos' ids, in order. */
@@ -245,14 +251,14 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
   const since = now - 30 * 86_400_000;
   const rows = await query(
     `SELECT p.id, p.name, p.city_slug, p.slug, p.address, p.city, p.region, p.hours, p.website, p.phone, p.description, p.code, p.lifters,
-       p.qr_scans, p.amenities, p.prices, p.country,
+       p.qr_scans, p.amenities, p.prices, p.country, p.starter, p.claimed_by,
        (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
        (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30,
        (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
        (SELECT group_concat(m.kind || ':' || m.id) FROM (SELECT kind, id FROM gym_photos WHERE place_id = p.id ORDER BY created_at, id) m)
          AS pictures
-     FROM gym_places p WHERE p.claimed_by = ? ORDER BY p.name`,
-    [since, Math.floor(since / 86_400_000), accountId],
+     FROM gym_places p WHERE p.claimed_by <> '' AND ${MANAGES} ORDER BY p.name`,
+    [since, Math.floor(since / 86_400_000), accountId, accountId],
   );
   return rows.map((r) => ({
     id: s(r.id),
@@ -274,16 +280,18 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
     amenities: cleanAmenities(s(r.amenities)),
     prices: cleanPrices(s(r.prices), currencyFor(s(r.country))),
     country: s(r.country),
+    role: s(r.claimed_by) === accountId ? "owner" : "staff",
+    starter: s(r.starter),
   }));
 }
 
-export type EditResult = { ok: true } | { ok: false; error: "owner" | "hours" | "website" | "code" | "words" | "link" | "empty" };
+export type EditResult =
+  { ok: true } | { ok: false; error: "owner" | "hours" | "website" | "code" | "starter" | "words" | "link" | "empty" };
 
-/** The owner changes their gym's details. Only fields sent are changed. */
+/** The owner or the gym's staff change its details. Only fields sent are changed. */
 export async function editGym(accountId: string, body: Record<string, unknown>, now = Date.now()): Promise<EditResult> {
-  if (!isPlaceId(body.place)) return { ok: false, error: "owner" };
-  const [p] = await query("SELECT id FROM gym_places WHERE id = ? AND claimed_by = ?", [body.place, accountId]);
-  if (!p) return { ok: false, error: "owner" };
+  if (!isPlaceId(body.place) || !(await canManage(accountId, body.place))) return { ok: false, error: "owner" };
+  const p = { id: body.place };
   const set: [string, string][] = [];
   if (body.hours !== undefined) {
     const h = s(body.hours).trim().slice(0, 200);
@@ -316,6 +324,16 @@ export async function editGym(accountId: string, body: Record<string, unknown>, 
     set.push(["code", kit ? encodeGym(kit) : ""]);
   }
   if (body.amenities !== undefined) set.push(["amenities", cleanAmenities(body.amenities).join(",")]);
+  // The starter program (gymStarter.ts): a routine code with real exercises, and a name that passes the word check.
+  if (body.starter !== undefined) {
+    const starter = readStarter(body.starter);
+    if (body.starter !== "" && !starter) return { ok: false, error: "starter" };
+    if (starter?.name) {
+      const c = checkText(starter.name, 40);
+      if (!c.ok) return { ok: false, error: c.error };
+    }
+    set.push(["starter", starter ? s(body.starter) : ""]);
+  }
   if (body.prices !== undefined) {
     const prices = cleanPrices(body.prices);
     set.push(["prices", prices ? JSON.stringify(prices) : ""]);
@@ -329,7 +347,7 @@ export async function editGym(accountId: string, body: Record<string, unknown>, 
   return { ok: true };
 }
 
-/** The owner gives the gym up: it goes back to unofficial, with the details they set. */
+/** The owner gives the gym up: it goes back to unofficial, with the details they set. Its staff stop managing it. */
 export async function releaseGym(accountId: string, placeId: unknown, now = Date.now()): Promise<boolean> {
   if (!isPlaceId(placeId)) return false;
   const gone =
@@ -339,7 +357,7 @@ export async function releaseGym(accountId: string, placeId: unknown, now = Date
       accountId,
     ])) > 0;
   // The gym's club stays with its members as an ordinary club; the next owner starts the gym's own.
-  if (gone) await run("UPDATE clubs SET place_id = '' WHERE place_id = ?", [placeId]);
+  if (gone) await batch([{ sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [placeId] }, ...staffEnds(placeId)]);
   return gone;
 }
 
@@ -406,8 +424,9 @@ export async function decideClaim(id: unknown, action: unknown, now = Date.now()
   return true;
 }
 
-/** Account deletion: claims go, and owned gyms go back to unofficial. */
+/** Account deletion: claims go, owned gyms go back to unofficial and their staff with them (staffDeletes first). */
 export const claimDeletes = (accountId: string) => [
+  ...staffDeletes(accountId),
   { sql: "DELETE FROM gym_claims WHERE account_id = ?", args: [accountId] },
   { sql: "UPDATE gym_places SET claimed_by = '', claimed_at = 0 WHERE claimed_by = ?", args: [accountId] },
 ];

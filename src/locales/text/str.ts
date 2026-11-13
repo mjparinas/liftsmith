@@ -146,6 +146,22 @@ export const en = {
   "str.part.chosen": "Done",
   "str.part.pickHint": "Pick none and the app picks them on the day.",
   "str.part.withStretches": { one: "{part} ({count} stretch)", other: "{part} ({count} stretches)" },
+  "str.part.cardio": "Cardio",
+  "str.part.rehabWhyNew": "{name} from your physio, beside today's lifting.",
+  "str.part.rehabWhyToday": "{name}: already done today.",
+  "str.part.rehabWhyDays": {
+    one: "{name}: last done yesterday. Every other day keeps it about 3 times a week.",
+    other: "{name}: last done {count} days ago.",
+  },
+  "str.part.cardioWhyRoutine": "{name}, as your routine has it, after the lifting.",
+  "str.part.cardioWhyLast": "{name}, as last time, after the lifting.",
+  "str.part.cardioWhyNew": "{name} after the lifting: a short finisher for your heart and lungs.",
+  "str.part.cardioWhat": "Cardio exercise",
+  "str.part.cardioHowLong": "How long",
+  "str.part.cardioMin": "{n} min",
+  "str.part.cardioWith": "{part} ({name})",
+  "str.part.routineCardio": "Cardio after",
+  "str.part.cardioPlan": "{name}, {n} min",
 } as const;
 
 type Key = keyof typeof en;
@@ -300,6 +316,22 @@ export const es: Partial<Record<Key, Message>> = {
   "str.part.chosen": "Listo",
   "str.part.pickHint": "Si no eliges ninguno, la app los elige ese día.",
   "str.part.withStretches": { one: "{part} ({count} estiramiento)", other: "{part} ({count} estiramientos)" },
+  "str.part.cardio": "Cardio",
+  "str.part.rehabWhyNew": "{name} de tu fisioterapeuta, junto a las pesas de hoy.",
+  "str.part.rehabWhyToday": "{name}: ya hecho hoy.",
+  "str.part.rehabWhyDays": {
+    one: "{name}: hecho ayer por última vez. Un día sí y otro no son unas 3 veces por semana.",
+    other: "{name}: hecho hace {count} días.",
+  },
+  "str.part.cardioWhyRoutine": "{name}, como dice tu rutina, después de las pesas.",
+  "str.part.cardioWhyLast": "{name}, como la última vez, después de las pesas.",
+  "str.part.cardioWhyNew": "{name} después de las pesas: un remate corto para el corazón y los pulmones.",
+  "str.part.cardioWhat": "Ejercicio de cardio",
+  "str.part.cardioHowLong": "Cuánto tiempo",
+  "str.part.cardioMin": "{n} min",
+  "str.part.cardioWith": "{part} ({name})",
+  "str.part.routineCardio": "Cardio después",
+  "str.part.cardioPlan": "{name}, {n} min",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -455,6 +487,22 @@ export const fr: Partial<Record<Key, Message>> = {
   "str.part.chosen": "Terminé",
   "str.part.pickHint": "Sans choix, l’appli les choisit le jour même.",
   "str.part.withStretches": { one: "{part} ({count} étirement)", other: "{part} ({count} étirements)" },
+  "str.part.cardio": "Cardio",
+  "str.part.rehabWhyNew": "{name} de votre kiné, à côté de la muscu du jour.",
+  "str.part.rehabWhyToday": "{name} : déjà fait aujourd’hui.",
+  "str.part.rehabWhyDays": {
+    one: "{name} : fait hier. Un jour sur deux, c’est environ 3 fois par semaine.",
+    other: "{name} : fait il y a {count} jours.",
+  },
+  "str.part.cardioWhyRoutine": "{name}, comme le prévoit votre routine, après la muscu.",
+  "str.part.cardioWhyLast": "{name}, comme la dernière fois, après la muscu.",
+  "str.part.cardioWhyNew": "{name} après la muscu : une courte finition pour le cœur et les poumons.",
+  "str.part.cardioWhat": "Exercice de cardio",
+  "str.part.cardioHowLong": "Durée",
+  "str.part.cardioMin": "{n} min",
+  "str.part.cardioWith": "{part} ({name})",
+  "str.part.routineCardio": "Cardio après",
+  "str.part.cardioPlan": "{name}, {n} min",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -608,6 +656,22 @@ export const de: Partial<Record<Key, Message>> = {
   "str.part.chosen": "Fertig",
   "str.part.pickHint": "Wählst du keine, wählt die App sie am Tag aus.",
   "str.part.withStretches": { one: "{part} ({count} Dehnübung)", other: "{part} ({count} Dehnübungen)" },
+  "str.part.cardio": "Cardio",
+  "str.part.rehabWhyNew": "{name} von deiner Physiotherapie, neben dem heutigen Krafttraining.",
+  "str.part.rehabWhyToday": "{name}: heute schon gemacht.",
+  "str.part.rehabWhyDays": {
+    one: "{name}: zuletzt gestern. Jeden zweiten Tag sind etwa 3-mal pro Woche.",
+    other: "{name}: zuletzt vor {count} Tagen.",
+  },
+  "str.part.cardioWhyRoutine": "{name}, wie in deiner Routine, nach dem Krafttraining.",
+  "str.part.cardioWhyLast": "{name}, wie beim letzten Mal, nach dem Krafttraining.",
+  "str.part.cardioWhyNew": "{name} nach dem Krafttraining: ein kurzer Abschluss für Herz und Lunge.",
+  "str.part.cardioWhat": "Cardio-Übung",
+  "str.part.cardioHowLong": "Wie lange",
+  "str.part.cardioMin": "{n} Min.",
+  "str.part.cardioWith": "{part} ({name})",
+  "str.part.routineCardio": "Cardio danach",
+  "str.part.cardioPlan": "{name}, {n} Min.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -759,6 +823,22 @@ export const it: Partial<Record<Key, Message>> = {
   "str.part.chosen": "Fatto",
   "str.part.pickHint": "Se non ne scegli nessuno, li sceglie l’app quel giorno.",
   "str.part.withStretches": { one: "{part} ({count} allungamento)", other: "{part} ({count} allungamenti)" },
+  "str.part.cardio": "Cardio",
+  "str.part.rehabWhyNew": "{name} dal tuo fisioterapista, accanto ai pesi di oggi.",
+  "str.part.rehabWhyToday": "{name}: già fatto oggi.",
+  "str.part.rehabWhyDays": {
+    one: "{name}: fatto ieri. A giorni alterni sono circa 3 volte a settimana.",
+    other: "{name}: fatto {count} giorni fa.",
+  },
+  "str.part.cardioWhyRoutine": "{name}, come nella tua routine, dopo i pesi.",
+  "str.part.cardioWhyLast": "{name}, come l’ultima volta, dopo i pesi.",
+  "str.part.cardioWhyNew": "{name} dopo i pesi: un breve finale per cuore e polmoni.",
+  "str.part.cardioWhat": "Esercizio cardio",
+  "str.part.cardioHowLong": "Quanto dura",
+  "str.part.cardioMin": "{n} min",
+  "str.part.cardioWith": "{part} ({name})",
+  "str.part.routineCardio": "Cardio dopo",
+  "str.part.cardioPlan": "{name}, {n} min",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -902,4 +982,17 @@ export const ja: Partial<Record<Key, Message>> = {
   "str.part.chosen": "完了",
   "str.part.pickHint": "選ばなければ当日にアプリが選びます。",
   "str.part.withStretches": { other: "{part}（ストレッチ{count}個）" },
+  "str.part.cardio": "有酸素",
+  "str.part.rehabWhyNew": "理学療法士の「{name}」を今日のウエイトと一緒に。",
+  "str.part.rehabWhyToday": "「{name}」：今日はもう済んでいます。",
+  "str.part.rehabWhyDays": { other: "「{name}」：前回は{count}日前。" },
+  "str.part.cardioWhyRoutine": "{name}：ルーティンどおり、ウエイトのあとに。",
+  "str.part.cardioWhyLast": "{name}：前回と同じく、ウエイトのあとに。",
+  "str.part.cardioWhyNew": "ウエイトのあとに{name}：心肺のための短い仕上げ。",
+  "str.part.cardioWhat": "有酸素の種目",
+  "str.part.cardioHowLong": "時間",
+  "str.part.cardioMin": "{n}分",
+  "str.part.cardioWith": "{part}（{name}）",
+  "str.part.routineCardio": "あとに有酸素",
+  "str.part.cardioPlan": "{name}、{n}分",
 };

@@ -417,11 +417,18 @@ export interface Routine {
   parts?: RoutinePart[];
 }
 
-/** A stretching part of a routine. The lifting (or rehab) part is the routine's `items`. */
+/**
+ * A part of a routine besides its exercises: a warm-up or cool-down (stretches), or cardio after the lifting
+ * (stage 5). The lifting (or rehab) part is the routine's `items`.
+ */
 export interface RoutinePart {
-  kind: "warm" | "cool";
-  /** Stretch ids in order; empty or missing lets the app pick for the day's muscles. */
+  kind: "warm" | "cool" | "cardio";
+  /** Warm-up and cool-down: stretch ids in order; empty or missing lets the app pick for the day's muscles. */
   stretches?: string[];
+  /** Cardio: the cardio exercise (exercises.ts `cardio`), or missing to use the lifter's last one. */
+  exerciseId?: string;
+  /** Cardio: minutes, or missing to repeat last time's. */
+  minutes?: number;
 }
 
 export interface DelightPrefs {
@@ -523,7 +530,15 @@ export interface SetEvent extends EventBase {
   meanSpeed?: number;
   /** The camera saw a rep that didn't make it up after the last full one: the set went to failure. */
   failedRep?: true;
+  /**
+   * Workouts with parts (sessions-with-parts.md, stage 5): the part this set was done in when it was a rehab or cardio
+   * part beside the lifting. Rehab sets never move progression, recovery or plateaus. Missing: the workout's main part.
+   */
+  partId?: ItemPart;
 }
+
+/** A part made of exercises beside the main lifting: the physio's rehab, or cardio after the lifting. */
+export type ItemPart = "rehab" | "cardio";
 
 /** Set types the lifter adds between sets. Failure is the reps-left rating of 0 (EffortEvent). */
 export type SetTag = "drop" | "restPause";
@@ -546,7 +561,7 @@ export interface SessionStartEvent extends EventBase {
   /** The saved routine the workout came from, if any. */
   routine?: string;
   /** The parts planned at Start, in order (workouts with parts), when there was more than lifting. */
-  plan?: { kind: PartKind }[];
+  plan?: { kind: PartKind; ref?: string }[];
 }
 
 export interface SessionEndEvent extends EventBase {

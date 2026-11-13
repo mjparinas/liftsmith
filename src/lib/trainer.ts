@@ -26,7 +26,7 @@ import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
-import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, type SetEvent } from "./types";
+import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, type RoutinePart, type SetEvent } from "./types";
 import { fmtNum } from "./units";
 
 /** Personal trainer (one-on-one, sessions first) or coach (groups and teams, check-ins first); server coach.ts. */
@@ -412,7 +412,7 @@ export interface PlanProgress {
    * Workouts with parts (stage 3): for a routine with a warm-up or cool-down, how many of the workouts that followed
    * it ran that part, so a coach sees "cool-downs skipped" and can say something.
    */
-  parts?: { kind: "warm" | "cool"; done: number; of: number }[];
+  parts?: { kind: RoutinePart["kind"]; done: number; of: number }[];
 }
 
 /** Pain at or above this in the last week is a "check in" item for the coach (the same 5 that stops a graded return). */

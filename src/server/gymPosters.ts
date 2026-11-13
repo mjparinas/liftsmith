@@ -10,6 +10,7 @@ import { isMsgLang, type MsgLang } from "@/lib/messageText";
 import { query, rateLimit, run } from "./db";
 import { newPosterCode } from "./gymClaims";
 import { isPlaceId } from "./gymPlaces";
+import { canManage, MANAGES } from "./gymStaff";
 import { checkText } from "./moderation";
 
 export const POSTER_ITEMS = ["both", "poster", "stand"] as const;
@@ -123,7 +124,7 @@ export async function requestPosters(accountId: string, body: Record<string, unk
   if (!isPlaceId(body.place)) return { ok: false, error: "place" };
   const p = await place(body.place);
   if (!p) return { ok: false, error: "place" };
-  if (s(p.claimed_by) !== accountId) return { ok: false, error: "owner" };
+  if (!s(p.claimed_by) || !(await canManage(accountId, body.place))) return { ok: false, error: "owner" };
   if (n(p.lifters) < STAND_MIN_LIFTERS) return { ok: false, error: "lifters" };
   const o = { ...readOrder(body), items: "stand" as const };
   if (o.address.length < 8) return { ok: false, error: "address" };
@@ -148,9 +149,9 @@ export async function latestOrder(accountId: string, placeId: unknown): Promise<
   if (!isPlaceId(placeId)) return null;
   const [r] = await query(
     `SELECT o.* FROM gym_posters o JOIN gym_places p ON p.id = o.place_id
-     WHERE o.place_id = ? AND (o.requested_by = ? OR p.claimed_by = ?) AND o.status <> 'cancelled'
+     WHERE o.place_id = ? AND (o.requested_by = ? OR ${MANAGES}) AND o.status <> 'cancelled'
      ORDER BY o.created_at DESC LIMIT 1`,
-    [placeId, accountId, accountId],
+    [placeId, accountId, accountId, accountId],
   );
   return r ? toOrder(r) : null;
 }

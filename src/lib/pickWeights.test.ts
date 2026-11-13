@@ -181,6 +181,7 @@ describe("buildWeights", () => {
     expect(buildWeights([ts("bench-press", "db-fly", NOW)], resetPick(undefined, "bench-press", NOW), NOW).weight("bench-press")).toBe(1);
     // Resetting the one swapped in forgets its rise.
     expect(buildWeights(swaps, resetPick(undefined, "db-fly", NOW), NOW).weight("db-fly")).toBe(BASE.common);
+    expect(buildWeights([ts("bench-press", "db-fly", NOW)], resetPick(undefined, "db-fly", NOW), NOW).taste("db-fly").into).toBe(0);
   });
 
   it("lists exercises the swaps lowered, most lowered first, and not ones only nudged a little", () => {
@@ -331,6 +332,45 @@ describe("SwapCache", () => {
       },
     };
     expect(new SwapCache(full).swaps(log())).toHaveLength(1);
+  });
+
+  it("trusts a saved cache only when its count is a number and its swaps a list", () => {
+    const a = log();
+    const saved = (over: object) => {
+      const store = new MapStore();
+      store.map.set(CACHE_KEY, JSON.stringify({ n: 3, first: a[0]!.id, last: a[2]!.id, swaps: [], ...over }));
+      return new SwapCache(store);
+    };
+    // A good cache of this log is used as it is (here, one that says the log had no swaps).
+    expect(saved({}).swaps(a)).toEqual([]);
+    for (const bad of [{ n: "3" }, { swaps: "x" }, { swaps: undefined }]) {
+      const c = saved(bad);
+      expect(c.swaps(a)).toHaveLength(1);
+      expect(c.scanned).toBe(3);
+    }
+  });
+
+  it("saves the log's new first or last event, so the next launch can trust it", () => {
+    for (const change of ["first", "last"] as const) {
+      const store = new MapStore();
+      const cache = new SwapCache(store);
+      const a = log();
+      cache.swaps(a);
+      const b = change === "first" ? [makeSet(), ...a.slice(1)] : [...a.slice(0, 2), makeSet()];
+      cache.swaps(b);
+      expect(store.writes).toBe(2);
+      const next = new SwapCache(store);
+      expect(next.swaps(b)).toHaveLength(1);
+      expect(next.scanned).toBe(0);
+    }
+  });
+
+  it("works the same with no storage at all, call after call", () => {
+    const cache = new SwapCache(undefined);
+    const a = log();
+    expect(cache.swaps(a)).toHaveLength(1);
+    expect(cache.swaps([...a, swap("dip", "push-up")])).toHaveLength(2);
+    expect(cache.scanned).toBe(1);
   });
 
   it("a cache from another log with the same length isn't trusted", () => {

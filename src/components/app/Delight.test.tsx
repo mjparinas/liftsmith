@@ -113,6 +113,22 @@ describe("Today and Progress extras", () => {
     expect(useApp.getState().active?.parts?.map((p) => p.kind)).toEqual(["warm", "lift"]);
   });
 
+  it("adds cardio after the lifting on Today, with its machine and minutes", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    // Workouts with parts, stage 5: cardio is a switch under the lifting, off unless a routine has it.
+    const row = within(screen.getByTestId("today-parts")).getByTestId("part-cardio");
+    await user.click(within(row).getByRole("switch", { name: /Cardio/ }));
+    const picker = within(row).getByTestId("cardio-picker");
+    await user.click(within(picker).getByRole("button", { name: "30 min" }));
+    expect(row).toHaveTextContent("about 30 min");
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const a = useApp.getState().active!;
+    expect(a.parts?.map((p) => p.kind)).toEqual(["lift", "cardio"]);
+    expect(a.plan.items.at(-1)).toMatchObject({ part: "cardio", sets: 1 });
+    expect(a.plan.items.at(-1)!.target.reps).toBe(1800);
+  });
+
   it("offers a buddy check-in that records the event", async () => {
     const user = userEvent.setup();
     await onboard(user);

@@ -6,11 +6,12 @@ import { injuredTarget, planSeconds, restFor, setSeconds, type Plan, type PlanIt
 import { activeInjuries } from "../injury";
 import { roundLoad } from "../loads";
 import { deleteEvents } from "../localdb";
+import { cardioItem, extraOffer, rehabItems } from "../partExtras";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
 import { partDefaults } from "../routines";
-import { doneParts, enterPart, planParts, type LivePart, type LivePartKind } from "../sessions";
+import { doneParts, enterPart, movePart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
 import type { AppEvent, LoadKind, Muscle, Rating, SetTag } from "../types";
@@ -111,10 +112,30 @@ export function hrWindow(a: Pick<Active, "hr" | "hrAt" | "startedAt">, from: num
   return { hrAvg: Math.round(xs.reduce((s, x) => s + x, 0) / xs.length), hrMax: Math.max(...xs), hrEnd: xs[xs.length - 1] };
 }
 
+/** The part an exercise of the plan belongs to: its own (rehab or cardio beside the lifting), else the plan's. */
+export function itemPartKind(plan: Pick<Plan, "rehab">, item: Pick<PlanItem, "part">): LivePartKind {
+  return item.part ?? (plan.rehab ? "rehab" : "lift");
+}
+
+/**
+ * Moves the workout's part along with the exercise on screen (stage 5): reaching the first rehab or cardio exercise
+ * closes the lifting and starts that part. Only between exercise parts; a warm-up or cool-down moves on by itself.
+ */
+function followPart(a: Active, index: number, now: number): Pick<Active, "parts" | "part"> {
+  const item = a.plan.items[index];
+  const cur = a.part ?? 0;
+  const kind = a.parts?.[cur]?.kind;
+  if (!a.parts || !item || !kind || kind === "warm" || kind === "cool") return { parts: a.parts, part: a.part };
+  const to = a.parts.findIndex((p) => p.kind === itemPartKind(a.plan, item));
+  if (to < 0 || to === cur) return { parts: a.parts, part: a.part };
+  return { parts: movePart(a.parts, cur, to, now), part: to };
+}
+
 /** Puts the plan item at `index` on screen: its warm-ups (unless started) and its first set's weight and reps. */
-export function loadItem(events: AppEvent[], a: Active, index: number): Active {
+export function loadItem(events: AppEvent[], a: Active, index: number, now = Date.now()): Active {
   const item = a.plan.items[index];
   if (!item) return { ...a, index, warm: 0 };
+  if (a.parts) a = { ...a, ...followPart(a, index, now) };
   // Coming back to an exercise that's already started skips its warm-ups.
   const done = setsDone(events, a.sessionId, item.exerciseId);
   const started = done > 0;
@@ -208,6 +229,7 @@ export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: 
     injuryPct: item.injuryPct,
     superset: item.group,
     tag: a.tag,
+    ...(item.part ? { partId: item.part } : {}),
     ...(a.setSpeed?.exerciseId === item.exerciseId
       ? {
           endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000,
@@ -246,13 +268,22 @@ export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: 
   if (!a.tag && step.index === a.index && nextT && prevT && (nextT.weight !== prevT.weight || nextT.reps !== prevT.reps))
     next = { ...next, weight: nextT.weight, reps: nextT.reps };
   if (step.finished && !a.tag) next.askFeedback = item.exerciseId; // Exercise finished: ask how it felt.
-  if (step.index !== a.index) next = loadItem(all, next, Math.min(step.index, items.length));
+  if (step.index !== a.index) next = loadItem(all, next, Math.min(step.index, items.length), now);
   const last = next.index >= items.length;
   next.restTotal = last ? 0 : step.rest;
   next.restUntil = last || !autoRest ? null : now + step.rest * 1000;
   // Auto-start off: the rest waits for Start rest. The set's clock still runs from Log set.
   if (!last && !autoRest && step.rest > 0) next.restReady = step.rest;
   return { evs: [setEv], next };
+}
+
+export interface PartPicksToday {
+  warm?: boolean;
+  cool?: boolean;
+  rehab?: boolean;
+  cardio?: boolean;
+  cardioId?: string;
+  cardioMin?: number;
 }
 
 export interface WorkoutSlice {
@@ -275,11 +306,22 @@ export interface WorkoutSlice {
   autoEnd(now?: number): boolean;
   /** Starts today's plan, or the plan given (a shared workout), with the parts picked on Today. */
   start(plan?: Plan): void;
-  /** Today's picks for the warm-up and cool-down parts, over the Settings defaults. Cleared by Start. */
-  partPicks: { warm?: boolean; cool?: boolean };
-  pickPart(kind: "warm" | "cool", on: boolean): void;
+  /**
+   * Today's picks for the next workout's parts, over their defaults: the warm-up and cool-down (Settings › Workout or
+   * the routine), the physio's rehab beside the lifting (on when due) and cardio after it (its exercise and minutes).
+   * Cleared by Start.
+   */
+  partPicks: PartPicksToday;
+  pickPart(kind: "warm" | "cool" | "rehab" | "cardio", on: boolean): void;
+  /** Today's cardio part: which exercise and how many minutes. */
+  pickCardio(change: { exerciseId?: string; minutes?: number }): void;
   /** Moves on to the next part (skipping the one on now when `skip`). Returns the part now on, or null at the end. */
   nextPart(skip?: boolean): LivePartKind | null;
+  /**
+   * Finish pressed before the cool-down: goes straight to it, leaving any rehab or cardio not reached out (they were
+   * never started, so they aren't recorded). False when the workout has no cool-down to go to.
+   */
+  toCoolDown(): boolean;
   /** Fits the rest of the workout into this many minutes; returns what changed. */
   shortOnTime(minutes: number): string[];
   /** Moves the current exercise after the next one (equipment busy). */
@@ -330,6 +372,34 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
 
     pickPart(kind, on) {
       set({ partPicks: { ...get().partPicks, [kind]: on } });
+    },
+
+    pickCardio(change) {
+      set({
+        partPicks: {
+          ...get().partPicks,
+          cardio: true,
+          ...(change.exerciseId ? { cardioId: change.exerciseId } : {}),
+          ...(change.minutes ? { cardioMin: change.minutes } : {}),
+        },
+      });
+    },
+
+    toCoolDown() {
+      const a = get().active;
+      if (!a?.parts) return false;
+      const cur = a.part ?? 0;
+      const ci = a.parts.findIndex((p) => p.kind === "cool");
+      if (ci <= cur) return false;
+      const now = Date.now();
+      // Every part still open (the lifting, or one gone back to) closes now; the cool-down starts.
+      const parts = movePart(a.parts, cur, ci, now).map((p, i) =>
+        i !== ci && p.start !== undefined && p.end === undefined ? { ...p, end: now } : p,
+      );
+      const next: Active = { ...a, parts, part: ci, lastAt: now };
+      set({ active: next });
+      persistActive(next);
+      return true;
     },
 
     nextPart(skip = false) {
@@ -451,9 +521,10 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
     },
 
     start(given) {
-      const plan = given ?? get().preview;
+      const base = given ?? get().preview;
       const g = gym();
-      if (!plan || !g || !plan.items.length) return;
+      if (!base || !g || !base.items.length) return;
+      let plan: Plan = base;
       const sessionId = uid();
       const now = Date.now();
       const r = get().readiness;
@@ -461,7 +532,26 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const picks = get().partPicks;
       const routine = plan.routineId ? get().profile.routines?.find((x) => x.id === plan.routineId) : undefined;
       const dflt = partDefaults(routine, tp?.warmFirst);
-      const planned = planParts({ warm: picks.warm ?? dflt.warm, cool: picks.cool ?? dflt.cool }, !!plan.rehab);
+      // Rehab beside the lifting and cardio after it (stage 5): added to the end of the plan, each exercise marked
+      // with its part, so the workout runs them like any exercise and the sets say which part they were.
+      const { events, profile } = get();
+      const offer = extraOffer(profile, routine, plan, g, events, now);
+      const rehab = offer.rehab && (picks.rehab ?? offer.rehab.due.due) ? rehabItems(offer.rehab.routine, g, events, profile, now) : [];
+      const cardioPick = offer.cardio && {
+        exerciseId: picks.cardioId ?? offer.cardio.exerciseId,
+        minutes: picks.cardioMin ?? offer.cardio.minutes,
+      };
+      const cardio = cardioPick && (picks.cardio ?? offer.cardioOn) ? cardioItem(cardioPick, g, events, profile, now) : null;
+      if (rehab.length || cardio) plan = { ...plan, items: [...plan.items, ...rehab, ...(cardio ? [cardio] : [])] };
+      const planned = planParts(
+        {
+          warm: picks.warm ?? dflt.warm,
+          cool: picks.cool ?? dflt.cool,
+          ...(rehab.length && offer.rehab ? { rehab: offer.rehab.routine.id } : {}),
+          ...(cardio ? { cardio: cardio.exerciseId } : {}),
+        },
+        !!plan.rehab,
+      );
       const parts = planned.length > 1 ? enterPart(planned, 0, now) : undefined;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem(
@@ -498,7 +588,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           challenge: plan.challenge,
           program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined,
           routine: plan.routineId,
-          ...(parts ? { plan: planned.map((p) => ({ kind: p.kind })) } : {}),
+          ...(parts ? { plan: planned.map((p) => ({ kind: p.kind, ...(p.ref ? { ref: p.ref } : {}) })) } : {}),
         },
       ]);
       set({ callOverride: null, links: [], order: [], routineId: null, undoable: null, tryAdaptive: false, partPicks: {} });

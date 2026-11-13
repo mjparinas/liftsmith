@@ -56,6 +56,8 @@ export interface Place {
   news?: GymNews[];
   issues?: GymIssue[];
   trainers?: GymTrainer[];
+  /** The gym's starter program for new members (a routine share code, gymStarter.ts); missing or '' when it has none. */
+  starter?: string;
 }
 
 export interface MyListing {

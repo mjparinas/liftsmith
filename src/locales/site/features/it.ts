@@ -163,7 +163,7 @@ export const it: FeaturesText = {
     },
     "workout-parts": {
       name: "Allenamenti in parti",
-      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach. Le note del coach leggono ogni parte: il dolore dopo la riabilitazione che cala o sale, e un battito che resta alto nel defaticamento.",
+      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach. Le note del coach leggono ogni parte: il dolore dopo la riabilitazione che cala o sale, e un battito che resta alto nel defaticamento. La riabilitazione del tuo fisioterapista può stare accanto ai pesi nello stesso allenamento nei giorni in cui tocca, e il cardio può seguire i pesi, con macchina e minuti scelti con un tocco.",
     },
     notes: {
       name: "Note del coach",
@@ -268,6 +268,14 @@ export const it: FeaturesText = {
     "gym-trainers": {
       name: "Trainer sulle pagine delle palestre",
       body: "I coach compaiono nelle palestre dove allenano i loro clienti, con una riga su di sé e un pulsante per allenarsi con loro. In una palestra ufficiale, il titolare li approva prima.",
+    },
+    "gym-staff": {
+      name: "Account dello staff per le palestre",
+      body: "Il titolare di una palestra ufficiale invita responsabili e reception con un link monouso. Ognuno usa il proprio account per tenere aggiornati la pagina, gli annunci e i problemi segnalati.",
+    },
+    "gym-starter": {
+      name: "Programmi per iniziare delle palestre",
+      body: "Le palestre ufficiali suggeriscono un programma ai nuovi iscritti sulla loro pagina nell’app e sul web, salvabile con un tocco. Liftsmith mette i pesi di ciascuno.",
     },
     "buy-next": {
       name: "Cosa comprare dopo",

@@ -10,6 +10,7 @@ import { SITE_URL } from "@/lib/site";
 import { EQUIPMENT_LABEL } from "@/lib/types";
 
 import { priceText } from "./GymExtras";
+import { StarterCard } from "./GymStaff";
 import { Icon, type IconName } from "./icons";
 import { go } from "./router";
 import { Button, Section } from "./ui";
@@ -100,6 +101,7 @@ export function PlaceDetails({ place }: { place: Place }) {
           </ul>
         </Section>
       )}
+      {place.starter && <StarterCard code={place.starter} />}
       <Section title={t("gp.hours")}>
         <div className="card p-4">
           <Hours raw={place.hours} />
