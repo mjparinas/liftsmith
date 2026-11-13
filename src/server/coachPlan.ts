@@ -9,6 +9,7 @@
 import { clientLimit, GRANDFATHER, higherTier, isCoachTier, type ClientLimits, type CoachTier } from "@/lib/coachPlans";
 import { allowed, FLAGS } from "@/lib/flags";
 
+import { LATEST_INSTALL } from "./access";
 import { query } from "./db";
 import { flagStates } from "./flags";
 import { accountHasPro } from "./review";
@@ -49,7 +50,7 @@ function limitsFrom(states: Awaited<ReturnType<typeof flagStates>>): ClientLimit
 async function storeTier(accountId: string, now: number): Promise<{ tier: CoachTier; via: "play" | "appstore" } | null> {
   const rows = await query<{ tier: string | null; store: string | null }>(
     `SELECT e.tier, e.store FROM account_installs ai JOIN entitlements e ON e.app_user_id = ai.install_id
-     WHERE ai.account_id = ? AND e.active = 1 AND (e.expires_at IS NULL OR e.expires_at > ?)`,
+     WHERE ai.account_id = ? AND e.active = 1 AND (e.expires_at IS NULL OR e.expires_at > ?) AND ${LATEST_INSTALL}`,
     [accountId, now],
   );
   let best: { tier: CoachTier; via: "play" | "appstore" } | null = null;

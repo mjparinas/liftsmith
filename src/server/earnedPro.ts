@@ -13,6 +13,8 @@ const DAY = 86_400_000;
 export const EARNED = {
   /** Workouts the invited friend finishes before both get their month. */
   workouts: 3,
+  /** Logged sets a finished workout needs to count. */
+  setsPerWorkout: 3,
   /** Days of Pro each. */
   days: 30,
   /** Only a new account's acceptance counts: made at most this long before accepting. */
@@ -32,12 +34,20 @@ export async function recordAccept(friendId: string, inviterId: string, now = Da
   await run("INSERT OR IGNORE INTO invite_accepts (friend_id, inviter_id, at) VALUES (?, ?, ?)", [friendId, inviterId, now]);
 }
 
-/** Finished workouts in the account's synced events since `from`. */
+/**
+ * Finished workouts in the account's synced events since `from` that hold real logged sets: at least
+ * `EARNED.setsPerWorkout` sets with reps (or seconds, for holds and cardio) under the same session (Melvin, 2026-11-13,
+ * after the security audit). A bare "workout finished" with nothing logged doesn't earn anyone Pro.
+ */
 async function workoutsSince(accountId: string, from: number): Promise<number> {
   const [r] = await query<{ n: number }>(
-    `SELECT COUNT(*) AS n FROM sync_events
-     WHERE account_id = ? AND at >= ? AND body IS NOT NULL AND json_extract(body, '$.type') = 'sessionEnd'`,
-    [accountId, from],
+    `SELECT COUNT(*) AS n FROM sync_events e
+     WHERE e.account_id = ?1 AND e.at >= ?2 AND e.body IS NOT NULL AND json_extract(e.body, '$.type') = 'sessionEnd'
+       AND (SELECT COUNT(*) FROM sync_events s
+             WHERE s.account_id = ?1 AND s.body IS NOT NULL AND json_extract(s.body, '$.type') = 'set'
+               AND json_extract(s.body, '$.sessionId') = json_extract(e.body, '$.sessionId')
+               AND json_extract(s.body, '$.reps') > 0) >= ?3`,
+    [accountId, from, EARNED.setsPerWorkout],
   );
   return Number(r?.n ?? 0);
 }
