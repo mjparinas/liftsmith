@@ -176,7 +176,7 @@ export function Today() {
   // While a workout runs, the list shows the live workout and can't be changed here: linking and
   // reordering what's left happen in one place, Coming up on the workout screen.
   const live = !!active;
-  const items = active?.plan.items ?? preview?.items ?? [];
+  const items = useMemo(() => active?.plan.items ?? preview?.items ?? [], [active?.plan.items, preview?.items]);
   const whys = useMemo(() => (why ? items.map((it) => itemWhy(it, why)) : null), [items, why]);
   // A note every exercise shares is said once above the list instead of on every row (UX audit, 2026-11-13).
   const shared = whys ? sharedLoadNote(whys) : "";
