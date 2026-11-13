@@ -3,7 +3,9 @@
 // Trainer mode, the app side (server: src/server/coach.ts; decision record docs/decisions/trainer-mode.md).
 // A coach shares an invite code; a client enters it, sees what the coach will see and agrees; the coach then
 // reads the client's training from their synced account and gets a short report that says what to act on
-// first (action over stats): a client gone quiet, behind on their weekly goal, missing reps, or stalled.
+// first (action over stats): a client gone quiet, behind on their weekly goal, missing reps, or stalled. For physios
+// (2026-11-13) it also says when pain is high or rising, a new injury was logged, or a routine isn't being done as
+// often as asked (adherence).
 import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
@@ -11,11 +13,12 @@ import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
+import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
-import type { AppEvent, Experience, Goal, SetEvent } from "./types";
+import { BODY_PARTS, type AppEvent, type BodyPart, type Experience, type Goal, type SetEvent } from "./types";
 
 export interface Person {
   id: string;
@@ -34,7 +37,11 @@ export interface Plan {
   name: string;
   code: string;
   at: number;
+  /** How many times a week the coach wants it done (1 to 7), for adherence. */
+  perWeek?: number;
 }
+/** How a coach works: a trainer, or a physio or rehab clinician (physio support, 2026-11-13). */
+export type CoachKind = "trainer" | "physio";
 /** What a coach's new clients start setup with (any part may be unset). */
 export interface Setup {
   goal?: Goal;
@@ -65,6 +72,12 @@ export interface Overview {
   sharesBody?: string[];
   /** Whether this coach gets alerts about their clients (on unless turned off). */
   alerts?: boolean;
+  /** Coaches this client shares pain and injuries with; clients who share theirs with this coach. */
+  painShared?: string[];
+  sharesPain?: string[];
+  /** How this account coaches, and how each of its coaches does, by id. */
+  kind?: CoachKind;
+  kinds?: Record<string, CoachKind>;
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -90,6 +103,10 @@ export interface ClientView {
   note?: Note | null;
   /** The client's body data, when they share it. */
   body?: BodyShare | null;
+  /** Whether the client shares pain and injuries with this coach. */
+  pain?: boolean;
+  /** How the coach looking works (their own setting). */
+  kind?: CoachKind;
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -124,8 +141,8 @@ export const saveSetup = async (setup: Setup) =>
   (await api<{ setup: Setup }>("/api/coach/", { token: token(), body: { action: "setup", setup } })).setup;
 export const saveNote = async (client: string, text: string) =>
   (await api<{ note: Note | null }>("/api/coach/", { token: token(), body: { action: "note", client, text } })).note;
-export const assignPlan = async (client: string, name: string, code: string) =>
-  (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code } })).plan;
+export const assignPlan = async (client: string, name: string, code: string, perWeek?: number) =>
+  (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code, perWeek } })).plan;
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
 /** The longest chat message (the server's COACH_LIMITS.message). */
 export const MESSAGE_MAX = 1000;
@@ -138,6 +155,10 @@ export const sendMessage = async (id: string, text: string) =>
   (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
 export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
+export const setPainShare = async (coach: string, on: boolean) =>
+  (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on, what: "pain" } })).on;
+export const setCoachKind = async (kind: CoachKind) =>
+  (await api<{ kind: CoachKind }>("/api/coach/", { token: token(), body: { action: "kind", kind } })).kind;
 export const setCoachAlerts = async (on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "alerts", on } })).on;
 /** This phone's push token for coaching pushes, which don't need Friends (push.ts calls it). */
@@ -188,6 +209,28 @@ export function cleanEvents(raw: readonly unknown[]): { events: AppEvent[]; name
       if (!str(e.sessionId)) continue;
       if (e.type === "sessionEnd" && !num(e.seconds)) continue;
       events.push(e as unknown as AppEvent);
+    } else if (e.type === "injury") {
+      // Only from a client who shares pain and injuries with this coach (the server leaves them out otherwise).
+      if (!str(e.injuryId) || !BODY_PARTS.includes(e.part as BodyPart)) continue;
+      events.push({ id: e.id, at: e.at, type: "injury", injuryId: e.injuryId, part: e.part as BodyPart });
+    } else if (e.type === "injuryHealed" || e.type === "injuryReturn") {
+      if (!str(e.injuryId)) continue;
+      events.push(
+        e.type === "injuryHealed"
+          ? { id: e.id, at: e.at, type: "injuryHealed", injuryId: e.injuryId }
+          : { id: e.id, at: e.at, type: "injuryReturn", injuryId: e.injuryId, ack: true },
+      );
+    } else if (e.type === "pain") {
+      if (!str(e.injuryId) || !num(e.score) || e.score < 0 || e.score > 10) continue;
+      events.push({
+        id: e.id,
+        at: e.at,
+        type: "pain",
+        injuryId: e.injuryId,
+        score: Math.round(e.score),
+        ...(str(e.sessionId) ? { sessionId: e.sessionId } : {}),
+        ...(str(e.exerciseId) ? { exerciseId: e.exerciseId } : {}),
+      });
     } else if (e.type === "customExercise") {
       const x = e.exercise as { id?: unknown; name?: unknown } | undefined;
       if (x && str(x.id) && str(x.name)) names.set(x.id, x.name.slice(0, 60));
@@ -205,6 +248,10 @@ export type Flag =
   | { kind: "stalled"; exerciseId: string; weeks: number }
   | { kind: "prs"; count: number }
   | { kind: "planUnused"; name: string }
+  | { kind: "painHigh"; part: BodyPart; score: number }
+  | { kind: "painUp"; part: BodyPart; from: number; to: number }
+  | { kind: "newInjury"; part: BodyPart }
+  | { kind: "lowAdherence"; name: string; done: number; want: number }
   | { kind: "onTrack"; done: number; goal: number };
 
 /** How an assigned routine is going: workouts since it was assigned that follow it. */
@@ -212,18 +259,95 @@ export interface PlanProgress {
   plan: Plan;
   done: number;
   lastAt: number | null;
+  /**
+   * With a times-a-week target and a week or more since it was given: workouts that followed it in the last two
+   * weeks (or since it was given, if that's shorter) against what the target asks for in that time.
+   */
+  adherence?: { done: number; want: number; pct: number };
+}
+
+/** Pain at or above this in the last week is a "check in" item for the coach (the same 5 that stops a graded return). */
+export const PAIN_HIGH = 5;
+/** A rise this big across the latest ratings is worth a word. */
+export const PAIN_RISE = 2;
+/** Adherence under this share of the target is a "what to do" item. */
+export const ADHERENCE_LOW = 0.5;
+
+/** One injury as the coach sees it, when the client shares pain and injuries. */
+export interface RehabInjury {
+  id: string;
+  part: BodyPart;
+  since: number;
+  healedAt?: number;
+  /** The last 14 ratings, oldest first. */
+  points: number[];
+  latest?: number;
+  latestAt?: number;
+  /** Latest minus the first of those ratings (negative is better). */
+  change?: number;
+  /** The latest rating on each exercise it was rated on, newest first. */
+  byExercise: { exerciseId: string; score: number; at: number }[];
 }
 
 /**
  * A workout follows a routine when it was done after the routine was assigned and has most of its exercises
  * (60%+). The client's copy of a routine has its own id on their phone, so it's matched by what was trained.
  */
-export function planProgress(plan: Plan, sessions: readonly SessionSummary[]): PlanProgress {
+export function planProgress(plan: Plan, sessions: readonly SessionSummary[], now = Date.now()): PlanProgress {
   const want = new Set(decodeRoutine(plan.code)?.items.map((i) => i.exerciseId) ?? []);
   const hits = want.size
     ? sessions.filter((s) => s.start >= plan.at && s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6))
     : [];
-  return { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
+  const out: PlanProgress = { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
+  if (plan.perWeek && now - plan.at >= WEEK) {
+    const span = Math.min(2 * WEEK, now - plan.at);
+    const wanted = Math.max(1, Math.round((plan.perWeek * span) / WEEK));
+    const done = hits.filter((s) => s.start >= now - span).length;
+    out.adherence = { done, want: wanted, pct: Math.min(100, Math.round((done / wanted) * 100)) };
+  }
+  return out;
+}
+
+/** The client's injuries for their coach, active first then healed in the last 90 days, newest first. */
+export function rehabInjuries(events: readonly AppEvent[], now: number): RehabInjury[] {
+  const pains = events.filter((e) => e.type === "pain");
+  return injuries(events, now)
+    .filter((i) => i.healedAt === undefined || now - i.healedAt <= 90 * DAY)
+    .sort((a, b) => Number(a.healedAt !== undefined) - Number(b.healedAt !== undefined) || b.since - a.since)
+    .map((i) => {
+      const points = i.pain.slice(-14).map((p) => p.score);
+      const seen = new Set<string>();
+      const byExercise: RehabInjury["byExercise"] = [];
+      for (const p of [...pains].sort((a, b) => b.at - a.at)) {
+        if (p.injuryId !== i.id || !p.exerciseId || seen.has(p.exerciseId)) continue;
+        seen.add(p.exerciseId);
+        byExercise.push({ exerciseId: p.exerciseId, score: Math.round(p.score), at: p.at });
+      }
+      const last = i.pain.at(-1);
+      return {
+        id: i.id,
+        part: i.part,
+        since: i.since,
+        ...(i.healedAt !== undefined ? { healedAt: i.healedAt } : {}),
+        points,
+        ...(last ? { latest: last.score, latestAt: last.at } : {}),
+        ...(points.length > 1 ? { change: points[points.length - 1]! - points[0]! } : {}),
+        byExercise: byExercise.slice(0, 8),
+      };
+    });
+}
+
+/** Pain and injury items for the coach's "What to do", most urgent first: high pain, rising pain, a new injury. */
+export function painFlags(rehab: readonly RehabInjury[], now: number): Flag[] {
+  const flags: Flag[] = [];
+  for (const i of rehab) {
+    if (i.healedAt !== undefined) continue;
+    const recent = i.latestAt !== undefined && now - i.latestAt <= WEEK;
+    if (recent && i.latest! >= PAIN_HIGH) flags.push({ kind: "painHigh", part: i.part, score: i.latest! });
+    else if (recent && (i.change ?? 0) >= PAIN_RISE) flags.push({ kind: "painUp", part: i.part, from: i.points[0]!, to: i.latest! });
+    if (now - i.since <= WEEK) flags.push({ kind: "newInjury", part: i.part });
+  }
+  return flags;
 }
 
 export interface Report {
@@ -242,6 +366,8 @@ export interface Report {
   names: Map<string, string>;
   /** The routines this coach assigned, newest first, with how each is going. */
   plans: PlanProgress[];
+  /** The client's injuries and pain, or null when they don't share them with this coach. */
+  rehab: RehabInjury[] | null;
 }
 
 export function clientReport(view: ClientView, now: number): Report {
@@ -258,7 +384,10 @@ export function clientReport(view: ClientView, now: number): Report {
   const prs = stats.prs.filter((p) => now - p.at <= 30 * DAY).sort((a, b) => b.at - a.at);
   const stalled = stalls(events, now);
   const flags: Flag[] = [];
-  const plans = (view.plans ?? []).map((p) => planProgress(p, sessions));
+  const plans = (view.plans ?? []).map((p) => planProgress(p, sessions, now));
+  const rehab = view.pain ? rehabInjuries(events, now) : null;
+  // Pain comes first: it's what a physio acts on before anything about training.
+  if (rehab) flags.push(...painFlags(rehab, now));
 
   if (lastAt === null) flags.push({ kind: "new" });
   else {
@@ -280,11 +409,15 @@ export function clientReport(view: ClientView, now: number): Report {
     }
     for (const s of stalled.slice(0, 2)) flags.push({ kind: "stalled", exerciseId: s.exerciseId, weeks: s.weeks });
     // A routine given a week ago or more that hasn't been done yet.
-    for (const p of plans) if (!p.done && now - p.plan.at >= WEEK) flags.push({ kind: "planUnused", name: p.plan.name });
+    for (const p of plans) {
+      if (!p.done && now - p.plan.at >= WEEK) flags.push({ kind: "planUnused", name: p.plan.name });
+      else if (p.adherence && p.adherence.done / p.adherence.want < ADHERENCE_LOW)
+        flags.push({ kind: "lowAdherence", name: p.plan.name, done: p.adherence.done, want: p.adherence.want });
+    }
     if (prs.length) flags.push({ kind: "prs", count: prs.length });
     if (!flags.some((f) => f.kind !== "prs") && goal) flags.push({ kind: "onTrack", done: weeks[3]!.count, goal });
   }
-  return { name: view.name, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans };
+  return { name: view.name, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans, rehab };
 }
 
 /** An exercise's name on the coach's phone: the library's, the client's own, or a plain fallback. */
@@ -313,6 +446,18 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       return { title: t("trn.f.prs", { count: f.count }), advice: t("trn.f.prsDo"), tone: "good" };
     case "planUnused":
       return { title: t("trn.f.planUnused", { name: f.name }), advice: t("trn.f.planUnusedDo"), tone: "warn" };
+    case "painHigh":
+      return { title: t("trn.f.painHigh", { part: PART_LABEL[f.part], score: f.score }), advice: t("trn.f.painHighDo"), tone: "warn" };
+    case "painUp":
+      return { title: t("trn.f.painUp", { part: PART_LABEL[f.part], from: f.from, to: f.to }), advice: t("trn.f.painUpDo"), tone: "warn" };
+    case "newInjury":
+      return { title: t("trn.f.newInjury", { part: PART_LABEL[f.part] }), advice: t("trn.f.newInjuryDo"), tone: "info" };
+    case "lowAdherence":
+      return {
+        title: t("trn.f.lowAdherence", { name: f.name, done: f.done, want: f.want }),
+        advice: t("trn.f.lowAdherenceDo"),
+        tone: "warn",
+      };
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }

@@ -5,6 +5,7 @@
 // "Your clients", where a coach shares an invite, picks what new clients start setup with, and opens each
 // client's report (Pro: out of Labs on 2026-11-12). The client's report also holds the coach's note to them.
 // A client's report is #/trainer/c.<id>; an invite link is #/trainer/<code>, which fills in the code.
+// Physio support (2026-11-13) lives in CoachRehab.tsx: trainer or physio, pain and injuries, rehab programs.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
@@ -13,6 +14,7 @@ import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { startPush } from "@/lib/push";
+import { rehabName } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
@@ -43,6 +45,7 @@ import {
   unlinkPerson,
   useCoachNotes,
   type BodyShare,
+  type CoachKind,
   type Note,
   type Overview,
   type Person,
@@ -57,6 +60,7 @@ import { fmtWeight } from "@/lib/units";
 
 import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
+import { ClientPain, CoachKindPicker, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
@@ -117,6 +121,8 @@ function Home({ code }: { code: string }) {
           notes={data?.notes ?? []}
           unread={data?.unread ?? {}}
           shared={data?.bodyShared ?? []}
+          painShared={data?.painShared ?? []}
+          kinds={data?.kinds ?? {}}
           code={code}
           onChange={reload}
         />
@@ -136,6 +142,8 @@ function YourCoach({
   notes,
   unread,
   shared,
+  painShared,
+  kinds,
   code,
   onChange,
 }: {
@@ -144,6 +152,8 @@ function YourCoach({
   notes: Note[];
   unread: Record<string, number>;
   shared: string[];
+  painShared: string[];
+  kinds: Record<string, CoachKind>;
   code: string;
   onChange: () => void;
 }) {
@@ -263,6 +273,7 @@ function YourCoach({
               <span className="min-w-0 flex-1 py-1">
                 <span className="block truncate font-medium">{c.name || t("trn.noName")}</span>
                 <span className="block text-xs text-muted">
+                  {kinds[c.id] === "physio" ? `${t("trn.kind.physio")} · ` : ""}
                   {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
                 </span>
               </span>
@@ -284,12 +295,17 @@ function YourCoach({
           onChange={(v) => void share(c, v)}
         />
       ))}
+      {/* Pain and injuries too, per coach and off until turned on: a physio needs them, a trainer may not. */}
+      {coaches.map((c) => (
+        <PainShareSwitch key={c.id} coach={c} on={painShared.includes(c.id)} onChange={onChange} />
+      ))}
       {found ? (
         <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
           <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentBodyLater")}</p>
+          <p className="mt-2 text-sm text-muted">{t("trn.consentPainLater")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentStop")}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button className="flex-1" disabled={busy} onClick={() => void agree()}>
@@ -526,6 +542,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
         </p>
       )}
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
+      <CoachKindPicker key={data.kind ?? "trainer"} kind={data.kind ?? "trainer"} onChange={onChange} />
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       {data.clients.length ? (
@@ -702,17 +719,28 @@ function NoteToClient({ clientId, saved, onChange }: { clientId: string; saved: 
 }
 
 /** The coach's routines for one client (stage 2): how each is going, take one back, or assign another. */
-function ClientPlans({ clientId, plans, onChange }: { clientId: string; plans: PlanProgress[]; onChange: () => void }) {
+function ClientPlans({
+  clientId,
+  plans,
+  physio,
+  onChange,
+}: {
+  clientId: string;
+  plans: PlanProgress[];
+  physio: boolean;
+  onChange: () => void;
+}) {
   const saved = useApp((s) => s.profile.routines);
   const routines = saved ?? [];
   const [picking, setPicking] = useState(false);
+  const [perWeek, setPerWeek] = useState<number | undefined>(physio ? 3 : undefined);
   const [note, setNote] = useState<string | null>(null);
-  const give = async (r: Routine) => {
+  const give = async (r: Pick<Routine, "name" | "items" | "rehab">) => {
     try {
-      await assignPlan(clientId, r.name, encodeRoutine(r));
+      await assignPlan(clientId, r.name, encodeRoutine(r), perWeek);
       haptic("success");
       sound.done();
-      track("feature", { name: "trainer", detail: "assign" });
+      track("feature", { name: "trainer", detail: r.rehab ? "rehab" : "assign" });
       setPicking(false);
       setNote(t("trn.assigned"));
       onChange();
@@ -745,6 +773,13 @@ function ClientPlans({ clientId, plans, onChange }: { clientId: string; plans: P
                     ? `${t("trn.planDone", { count: p.done })}${p.lastAt ? ` · ${t("trn.planLast", { date: date(p.lastAt, { month: "short", day: "numeric" }) })}` : ""}`
                     : t("trn.planNotYet")}
                 </span>
+                {p.plan.perWeek !== undefined && (
+                  <span className="block text-xs text-muted">
+                    {p.adherence
+                      ? t("trn.adherence", { pct: p.adherence.pct, done: p.adherence.done, want: p.adherence.want })
+                      : t("trn.perWeekShort", { count: p.plan.perWeek })}
+                  </span>
+                )}
               </span>
               <button
                 type="button"
@@ -767,6 +802,10 @@ function ClientPlans({ clientId, plans, onChange }: { clientId: string; plans: P
         </p>
       )}
       <Sheet open={picking} onClose={() => setPicking(false)} title={t("trn.assignTitle")}>
+        <PerWeekPicker value={perWeek} onChange={setPerWeek} />
+        {/* A physio sees the rehab programs first; a trainer sees their own routines first. */}
+        {physio && <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true })} />}
+        {(physio || routines.length > 0) && <p className="mb-2 text-sm font-semibold">{t("trn.assignOwn")}</p>}
         {routines.length ? (
           <ul className="space-y-2">
             {routines.map((r) => (
@@ -795,6 +834,11 @@ function ClientPlans({ clientId, plans, onChange }: { clientId: string; plans: P
         ) : (
           <p className="text-sm text-muted">{t("trn.assignNone")}</p>
         )}
+        {!physio && (
+          <div className="mt-4">
+            <RehabPrograms onPick={(p) => void give({ name: rehabName(p), items: p.items, rehab: true })} />
+          </div>
+        )}
       </Sheet>
     </Section>
   );
@@ -809,6 +853,7 @@ function ClientScreen({ id }: { id: string }) {
   const [report, setReport] = useState<Report | null>(null);
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
+  const [physio, setPhysio] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -821,6 +866,8 @@ function ClientScreen({ id }: { id: string }) {
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
+        // A coach who works as a physio sees pain first, and rehab programs lead the assign sheet.
+        setPhysio(v.kind === "physio");
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -882,6 +929,7 @@ function ClientScreen({ id }: { id: string }) {
           })}
         </ul>
       </Section>
+      {physio && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
       <NoteToClient clientId={id} saved={saved} onChange={() => setVersion((n) => n + 1)} />
       <Section title={t("trn.weeks")} icon="calendar">
         <div className="grid grid-cols-4 gap-2">
@@ -922,7 +970,8 @@ function ClientScreen({ id }: { id: string }) {
           <p className="px-1 text-sm text-muted">{t("trn.noWorkouts")}</p>
         )}
       </Section>
-      <ClientPlans clientId={id} plans={report.plans} onChange={() => setVersion((n) => n + 1)} />
+      <ClientPlans key={String(physio)} clientId={id} plans={report.plans} physio={physio} onChange={() => setVersion((n) => n + 1)} />
+      {!physio && report.rehab && <ClientPain name={report.name} rehab={report.rehab} names={names} />}
       {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">

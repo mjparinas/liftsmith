@@ -42,7 +42,7 @@ export const MAX_TOKENS = 10;
 const TIMEOUT_MS = 4000;
 
 /** Coaching pushes (trainer mode, 2026-11-12): a chat message, and the coach's alerts about a client. */
-export type CoachPushKind = "coachMsg" | "coachTrained" | "coachQuiet";
+export type CoachPushKind = "coachMsg" | "coachTrained" | "coachQuiet" | "coachPain";
 
 export interface PushMessage {
   token: string;

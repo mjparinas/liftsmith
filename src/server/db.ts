@@ -901,6 +901,11 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
+  // Physio support (2026-11-13, docs/decisions/trainer-mode.md): a client shares pain and injuries with one coach;
+  // a coach works as a trainer or a physio; a routine can say how many times a week it's meant to be done.
+  ["coach_shares", "pain", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_prefs", "kind", "TEXT NOT NULL DEFAULT 'trainer'"],
+  ["coach_plans", "per_week", "INTEGER"],
 ];
 
 let client: Client | null = null;

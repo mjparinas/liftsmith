@@ -17,7 +17,8 @@ function afterInjuryChange(c: Ctx) {
   const { set, get, gym } = c;
   const a = get().active;
   const g = gym();
-  if (a && g) {
+  // A rehab routine from the lifter's physio stays as written mid-workout too (trainer-mode.md, physio support).
+  if (a && g && !a.plan.rehab) {
     const { events, profile } = get();
     const hurt = activeInjuries(events);
     const now = Date.now();

@@ -11,6 +11,11 @@ import type { Routine, RoutineItem } from "./types";
 // those in. Nothing is uploaded, so it works signed out and offline, on every platform.
 
 const SHARE_VERSION = "r1";
+/**
+ * The last part of a routine from a rehab program a physio assigned (physio support, 2026-11-13). Older apps read it
+ * as an exercise they don't know and drop it, so the routine still opens there as a plain one.
+ */
+const REHAB_MARK = "rehab";
 
 const safeDecode = (s: string) => {
   try {
@@ -37,12 +42,12 @@ function nameIn(code: string): string {
 }
 
 /** The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…`, where `.s` links it to the next. */
-export function encodeRoutine(r: Pick<Routine, "name" | "items">): string {
+export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab">): string {
   const items = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
   const links = linksOf(items);
   const name = nameOut(r.name.trim().slice(0, NAME_MAX));
   const parts = items.map((i, k) => `${i.exerciseId}.${clampSets(i.sets)}${links[k] ? ".s" : ""}`);
-  return [SHARE_VERSION, name, ...parts].join("~");
+  return [SHARE_VERSION, name, ...parts, ...(r.rehab ? [REHAB_MARK] : [])].join("~");
 }
 
 /**
@@ -50,7 +55,7 @@ export function encodeRoutine(r: Pick<Routine, "name" | "items">): string {
  * between two exercises that both survive and were next to each other), so a link from a newer app
  * still opens. Null when nothing usable is left.
  */
-export function decodeRoutine(code: string): { name: string; items: RoutineItem[] } | null {
+export function decodeRoutine(code: string): { name: string; items: RoutineItem[]; rehab?: true } | null {
   // Some apps encode the fragment again; the separators are plain, so decode once if they're missing.
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");
@@ -72,7 +77,8 @@ export function decodeRoutine(code: string): { name: string; items: RoutineItem[
     .replace(/[\u0000-\u001f\u007f]/g, " ")
     .trim()
     .slice(0, NAME_MAX);
-  return { name: name || t("rt.defaultName"), items };
+  const rehab = parts.at(-1) === REHAB_MARK;
+  return rehab ? { name: name || t("rt.defaultName"), items, rehab } : { name: name || t("rt.defaultName"), items };
 }
 
 export function routineUrl(code: string, base = SITE_URL): string {

@@ -399,6 +399,11 @@ export interface Routine {
   items: RoutineItem[];
   createdAt: number;
   updatedAt: number;
+  /**
+   * A rehab program from the lifter's physio or coach (trainer-mode.md, physio support): injury mode keeps every
+   * exercise as written instead of skipping or lightening it, and asks about pain between sets.
+   */
+  rehab?: boolean;
 }
 
 export interface DelightPrefs {

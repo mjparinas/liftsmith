@@ -277,6 +277,11 @@ export const es: FeaturesText = {
       body: "Escribe a cada cliente, recibe una notificación cuando entrena o lleva una semana sin entrenar, y ve sus pesajes, medidas y una figura 3D con su forma cuando decide compartirlos.",
       note: "Las notificaciones son para Android y iPhone. La app web muestra los mensajes nuevos cuando está abierta.",
     },
+    physio: {
+      name: "Para fisioterapeutas y rehabilitación",
+      body: "Asigna programas de rehabilitación suaves con veces por semana, mira con qué frecuencia los cumplen tus clientes y ve el dolor y las lesiones que deciden compartir, ejercicio a ejercicio, con un aviso cuando el dolor es alto.",
+      note: "Liftsmith muestra lo que registran tus clientes. No diagnostica ni trata nada.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

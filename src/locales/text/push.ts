@@ -22,6 +22,7 @@ export const en = {
   "push.coachMsg": "{name}: “{text}”",
   "push.coachTrained": "{name} finished a workout.",
   "push.coachQuiet": "{name} hasn't trained for a week. A quick message might help.",
+  "push.coachPain": "{name} rated their pain {text}/10. Worth checking in.",
   "push.someone": "Your coach",
 } as const;
 
@@ -45,6 +46,7 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachMsg": "{name}: «{text}»",
   "push.coachTrained": "{name} terminó un entrenamiento.",
   "push.coachQuiet": "{name} lleva una semana sin entrenar. Un mensaje rápido puede ayudar.",
+  "push.coachPain": "{name} valoró su dolor en {text}/10. Conviene preguntarle cómo está.",
   "push.someone": "Tu entrenador",
 };
 
@@ -66,6 +68,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachMsg": "{name} : « {text} »",
   "push.coachTrained": "{name} a terminé une séance.",
   "push.coachQuiet": "{name} n'a pas fait de séance depuis une semaine. Un petit message peut aider.",
+  "push.coachPain": "{name} a noté sa douleur à {text}/10. Prenez de ses nouvelles.",
   "push.someone": "Votre coach",
 };
 
@@ -87,6 +90,7 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachMsg": "{name}: „{text}“",
   "push.coachTrained": "{name} hat ein Workout beendet.",
   "push.coachQuiet": "{name} hat seit einer Woche nicht trainiert. Eine kurze Nachricht kann helfen.",
+  "push.coachPain": "{name} hat den Schmerz mit {text}/10 bewertet. Frag am besten kurz nach.",
   "push.someone": "Dein Coach",
 };
 
@@ -108,6 +112,7 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachMsg": "{name}: «{text}»",
   "push.coachTrained": "{name} ha finito un allenamento.",
   "push.coachQuiet": "{name} non si allena da una settimana. Un breve messaggio può aiutare.",
+  "push.coachPain": "{name} ha valutato il dolore {text}/10. Meglio sentire come sta.",
   "push.someone": "Il tuo coach",
 };
 
@@ -129,5 +134,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachMsg": "{name}：「{text}」",
   "push.coachTrained": "{name}さんがワークアウトを終えました。",
   "push.coachQuiet": "{name}さんは1週間トレーニングしていません。短いメッセージが助けになるかもしれません。",
+  "push.coachPain": "{name}さんが痛みを{text}/10と記録しました。様子を確認しましょう。",
   "push.someone": "コーチ",
 };

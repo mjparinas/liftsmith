@@ -524,6 +524,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",
         added: "2026-11-12",
       },
+      {
+        id: "physio",
+        name: "For physios and rehab clinicians",
+        body: "Assign gentle rehab programs with times a week, see how often clients keep to them, and see the pain ratings and injuries they choose to share, exercise by exercise, with a notification when pain runs high.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Liftsmith shows what clients log. It doesn't diagnose or treat anything.",
+        added: "2026-11-13",
+      },
     ],
   },
   {

@@ -281,6 +281,11 @@ export const de: FeaturesText = {
       body: "Schreib jedem Kunden, erhalte eine Mitteilung, wenn er trainiert oder eine Woche pausiert, und sieh Wiegen, Umfänge und eine danach geformte 3D-Figur, wenn er sie teilt.",
       note: "Mitteilungen gibt es auf Android und iPhone. Die Web-App zeigt neue Nachrichten, wenn sie offen ist.",
     },
+    physio: {
+      name: "Für Physiotherapie und Reha",
+      body: "Weise sanfte Reha-Programme mit Häufigkeit pro Woche zu, sieh, wie oft deine Klienten sie einhalten, und sieh Schmerzen und Verletzungen, die sie teilen, Übung für Übung, mit einer Benachrichtigung bei starken Schmerzen.",
+      note: "Liftsmith zeigt, was Klienten eintragen. Es stellt keine Diagnosen und behandelt nichts.",
+    },
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",

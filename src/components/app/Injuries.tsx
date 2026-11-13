@@ -490,7 +490,7 @@ function PainBlock({ inj, label }: { inj: Injury; label: string }) {
   );
 }
 
-function Sparkline({ points, label }: { points: number[]; label: string }) {
+export function Sparkline({ points, label }: { points: number[]; label: string }) {
   const w = 160;
   const h = 40;
   const x = (i: number) => (points.length === 1 ? w / 2 : (i / (points.length - 1)) * (w - 8) + 4);
