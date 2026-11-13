@@ -46,7 +46,7 @@ function RestoreDrill({ done }: { done: () => void }) {
     if (r.ok) done();
   };
   return (
-    <section className="card p-4">
+    <section className="card min-w-0 p-4">
       <h2 className="font-semibold">Record a restore practice</h2>
       <p className="mt-0.5 text-xs text-muted">
         After restoring a Turso backup into a spare database and checking it (docs/RESTORE.md), note the day here.
@@ -115,11 +115,13 @@ function CheckCard({
 }) {
   const { data, error } = useCard<HealthCheck>(`/api/admin/system/?check=${id}`, round, refresh);
   const c = data?.result;
+  /** Past this many rows (the Settings card has 60+) the list scrolls inside the card. */
+  const long = (c?.rows.length ?? 0) > 12;
   useEffect(() => {
     if (c) report(id, c.state);
   }, [c, id, report]);
   return (
-    <section className="card p-4" aria-busy={!c && !error}>
+    <section className="card min-w-0 p-4" aria-busy={!c && !error}>
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-semibold">{title}</h2>
         {c ? <Badge state={c.state} /> : <span className="text-xs text-muted">{error ? "" : "Checking…"}</span>}
@@ -129,11 +131,19 @@ function CheckCard({
         <>
           <p className="mt-1 text-sm">{c.summary}</p>
           {c.rows.length > 0 && (
-            <dl className="mt-3 space-y-1 text-sm">
+            <dl
+              className={`mt-3 min-w-0 space-y-1 ${long ? "max-h-80 overflow-y-auto overscroll-contain rounded-lg border border-line/50 px-2 pb-2 text-xs" : "text-sm"}`}
+              // A long list scrolls on its own, so the card stays the size of its neighbours; keyboard users can focus it to scroll.
+              {...(long ? { tabIndex: 0, "aria-label": `${title} list` } : {})}
+            >
               {c.rows.map((row, i) => (
                 <Fragment key={i}>
                   {row.group && row.group !== c.rows[i - 1]?.group && (
-                    <h3 className="pt-3 text-xs font-semibold tracking-wide text-muted uppercase first:pt-0">{row.group}</h3>
+                    <h3
+                      className={`pt-3 text-xs font-semibold tracking-wide text-muted uppercase ${long ? "sticky top-0 z-10 bg-surface pb-1" : "first:pt-0"}`}
+                    >
+                      {row.group}
+                    </h3>
                   )}
                   <div className="flex flex-wrap justify-between gap-x-3 border-b border-line/50 pb-1">
                     <dt className="text-muted">
@@ -155,7 +165,12 @@ function CheckCard({
                       {row.value}
                       {row.at ? `${row.value ? " · " : ""}${ago(row.at)}` : ""}
                     </dd>
-                    {row.note && <p className="w-full text-xs text-muted">{row.note}</p>}
+                    {row.note && (
+                      // In a long list the note keeps to one line; the whole of it shows on hover.
+                      <p className={`w-full text-xs text-muted ${long ? "truncate" : ""}`} title={long ? row.note : undefined}>
+                        {row.note}
+                      </p>
+                    )}
                   </div>
                 </Fragment>
               ))}
@@ -296,7 +311,7 @@ export function System({ admin = false, maintenance }: { admin?: boolean; mainte
           }}
         />
       )}
-      <section className="card p-4">
+      <section className="card min-w-0 p-4">
         <h2 className="font-semibold">Providers&apos; status pages</h2>
         <p className="mt-0.5 text-xs text-muted">What each service says about itself, read from its public status page.</p>
         <ul className="mt-2 divide-y divide-line/60">
