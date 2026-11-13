@@ -31,6 +31,14 @@ export interface Access {
 
 const SAFE_ID = /^[A-Za-z0-9_-]{8,64}$/;
 
+/**
+ * A phone's store subscription counts only for the account that synced from it last (Melvin, 2026-11-13, after the
+ * security audit): signing out wipes the phone, so it holds one person at a time, and someone who once signed in on
+ * another person's phone doesn't keep that person's Pro. Older links stay, for trial eligibility (stripe.ts).
+ * Use with the alias `ai` for account_installs.
+ */
+export const LATEST_INSTALL = "ai.at = (SELECT MAX(o.at) FROM account_installs o WHERE o.install_id = ai.install_id)";
+
 /** Links an install to the account it synced under, so that install's store subscription counts for the account. */
 export async function linkInstall(accountId: string, installId: unknown, now = Date.now()): Promise<void> {
   if (typeof installId !== "string" || !SAFE_ID.test(installId)) return;
@@ -41,7 +49,7 @@ export async function linkInstall(accountId: string, installId: unknown, now = D
   );
 }
 
-/** The newest live store subscription on any install linked to the account. */
+/** The newest live store subscription on any install linked to the account, where it was the install's latest account. */
 async function storeSub(accountId: string, now: number): Promise<AccountSub | null> {
   const rows = await query<{
     plan: string | null;
@@ -51,7 +59,8 @@ async function storeSub(accountId: string, now: number): Promise<AccountSub | nu
     tier: string | null;
   }>(
     `SELECT e.plan, e.period, e.store, e.expires_at, e.tier FROM account_installs ai JOIN entitlements e ON e.app_user_id = ai.install_id
-     WHERE ai.account_id = ? AND e.active = 1 AND (e.expires_at IS NULL OR e.expires_at > ?) ORDER BY e.expires_at DESC LIMIT 1`,
+     WHERE ai.account_id = ? AND e.active = 1 AND (e.expires_at IS NULL OR e.expires_at > ?)
+       AND ${LATEST_INSTALL} ORDER BY e.expires_at DESC LIMIT 1`,
     [accountId, now],
   );
   const r = rows[0];

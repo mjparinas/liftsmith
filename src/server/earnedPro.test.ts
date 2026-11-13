@@ -17,18 +17,52 @@ const account = (id: string, createdAt = NOW - DAY) =>
   run("INSERT INTO accounts (id, email, created_at, last_seen) VALUES (?, NULL, ?, ?)", [id, createdAt, NOW]);
 
 let n = 0;
-/** Syncs `count` finished workouts for the account, ending at `at`. */
-const workouts = (id: string, count: number, at = NOW + DAY) =>
+/** One finished workout: `sets` logged sets (reps > 0) and its sessionEnd, at `at`. */
+const workout = (at: number, sets: number = EARNED.setsPerWorkout) => {
+  const w = `w${++n}`;
+  return [
+    ...Array.from({ length: sets }, (_, i) => ({
+      id: `set-${w}-${i}`,
+      at,
+      type: "set",
+      sessionId: w,
+      exerciseId: "squat",
+      weight: 60,
+      reps: 5,
+    })),
+    { id: `end-${w}`, at, type: "sessionEnd", sessionId: w },
+  ];
+};
+/** Syncs `count` finished workouts for the account, ending at `at`, each with `sets` logged sets. */
+const workouts = (id: string, count: number, at = NOW + DAY, sets?: number) =>
   sync(id, `s-${id}`, {
     cursor: 0,
-    events: Array.from({ length: count }, () => ({ id: `end-${++n}`, at, type: "sessionEnd", sessionId: `w${n}` })) as {
-      id: string;
-      at: number;
-    }[],
+    events: Array.from({ length: count }, () => workout(at, sets)).flat() as { id: string; at: number }[],
     deleted: [],
     records: [],
     first: false,
   });
+
+describe("only real workouts count", () => {
+  it("doesn't count a finished workout without enough logged sets", async () => {
+    await account("inviter", NOW - 400 * DAY);
+    await account("friend");
+    await recordAccept("friend", "inviter", NOW);
+    await workouts("friend", 3, NOW + DAY, 0);
+    await workouts("friend", 3, NOW + DAY, EARNED.setsPerWorkout - 1);
+    expect(await settleReferral("friend", NOW + DAY)).toBe(false);
+    await workouts("friend", 3);
+    expect(await settleReferral("friend", NOW + DAY)).toBe(true);
+  });
+
+  it("doesn't count sets with no reps", async () => {
+    await account("friend");
+    await recordAccept("friend", "inviter", NOW);
+    const empty = [1, 2, 3].flatMap(() => workout(NOW + DAY).map((e) => (e.type === "set" ? { ...e, reps: 0 } : e)));
+    await sync("friend", "s-friend", { cursor: 0, events: empty as { id: string; at: number }[], deleted: [], records: [], first: false });
+    expect(await settleReferral("friend", NOW + DAY)).toBe(false);
+  });
+});
 
 describe("give a month, get a month", () => {
   it("pays both a month once the invited friend finishes three workouts", async () => {

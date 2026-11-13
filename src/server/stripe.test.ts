@@ -256,6 +256,22 @@ describe("A phone's store subscription on the web", () => {
     expect((await accessFor("acct-1", null, NOW + 21 * DAY)).pro).toBe(false);
   });
 
+  it("counts only for the account that synced from the phone last", async () => {
+    await run(
+      "INSERT INTO entitlements (app_user_id, active, plan, period, store, expires_at, family, updated_at, tier) VALUES ('install-phone-1', 1, 'monthly', 'NORMAL', 'play', ?, 0, ?, 'coach')",
+      [NOW + 20 * DAY, NOW],
+    );
+    await linkInstall("acct-owner", "install-phone-1", NOW);
+    // Someone else signs in on the owner's phone: the subscription moves with the phone.
+    await linkInstall("acct-guest", "install-phone-1", NOW + 1000);
+    expect((await accessFor("acct-guest", null, NOW + 2000)).pro).toBe(true);
+    expect((await accessFor("acct-owner", null, NOW + 2000)).pro).toBe(false);
+    // The owner signs back in on their phone and has it again; the guest doesn't keep it.
+    await linkInstall("acct-owner", "install-phone-1", NOW + 3000);
+    expect((await accessFor("acct-owner", null, NOW + 4000)).pro).toBe(true);
+    expect((await accessFor("acct-guest", null, NOW + 4000)).pro).toBe(false);
+  });
+
   it("ignores an install id that isn't one", async () => {
     await linkInstall("acct-1", "x", NOW);
     await linkInstall("acct-1", { evil: true }, NOW);
