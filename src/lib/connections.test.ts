@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { makeWorkout } from "@/test/factories";
 
 import { localIso } from "./cloud";
-import { musicLink, stravaWorkout } from "./connections";
+import { stravaWorkout } from "./connections";
 
 describe("Strava activity", () => {
   it("names the workout and lists the sets, one line per exercise", () => {
@@ -37,14 +37,7 @@ describe("Strava activity", () => {
   });
 });
 
-describe("music", () => {
-  it("opens a harder playlist on a push day and a lighter one on an easy day", () => {
-    expect(musicLink("spotify", "push")).toBe("https://open.spotify.com/playlist/37i9dQZF1DX76Wlfdnj7AP");
-    expect(musicLink("spotify", "recover")).not.toBe(musicLink("spotify", "push"));
-    expect(musicLink("apple", "normal")).toBe("https://music.apple.com/search?term=power%20workout");
-    expect(musicLink("youtube", "push")).toBe("https://music.youtube.com/search?q=beast%20mode%20workout");
-  });
-
+describe("local time", () => {
   it("local time without a zone", () => {
     expect(localIso(new Date(2027, 2, 4, 5, 6, 7).getTime())).toBe("2027-03-04T05:06:07");
   });

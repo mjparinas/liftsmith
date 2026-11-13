@@ -473,7 +473,6 @@ export const ja: FeaturesText = {
     withings: { does: "体重、体脂肪、睡眠、歩数を取り込み" },
     polar: { does: "Nightly Recharge、HRV、睡眠を取り込み" },
     concept2: { does: "RowErg、SkiErg、BikeErg のセッションを有酸素ワークアウトとして取り込み" },
-    music: { does: "今日の判断に合った音楽を開く" },
     sonos: { does: "ワークアウト中に再生、一時停止、スキップ、音量。音楽がセットと休憩に合わせて変わります" },
     calendar: {
       name: "スマートフォンのカレンダー（Google、iCloud、Outlook）",

@@ -184,7 +184,7 @@ export default function Privacy() {
           service where it lets us (Withings, Concept2 and Sonos have no way for us to do this, so you can also remove {BRAND.name} in your
           account there) and delete what we kept. With Sonos connected (an experiment in Labs), the app asks our server to list your Sonos
           speakers and favourites, read what one is playing and its volume, and send play, pause, skip and volume commands to it; nothing
-          from Sonos is kept. Music links open your music app with a public playlist and send nothing to us.
+          from Sonos is kept.
         </p>
 
         <h2 className="mt-8 text-xl font-semibold">Reminders</h2>

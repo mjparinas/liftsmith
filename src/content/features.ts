@@ -1074,15 +1074,6 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
     title: "Music and speakers",
     rows: [
       {
-        id: "music",
-        name: "Spotify, Apple Music, YouTube Music",
-        does: "Opens music to match today's call",
-        android: "yes",
-        ios: "yes",
-        web: "yes",
-        tier: "free",
-      },
-      {
         id: "sonos",
         name: "Sonos",
         does: "Play, pause, skip and volume from the workout; music follows sets and rest",

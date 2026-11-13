@@ -2,7 +2,7 @@
 
 // Settings › Connected apps (#/connections; docs/decisions/connected-apps.md): Health Connect or Apple Health
 // (status, what's allowed, last sync, Sync now), the Bluetooth heart rate monitor (a test before the gym),
-// the Garmin watch app, Strava, Oura, WHOOP, Withings, Polar and Concept2 (through the account), and the music app for Today's playlist.
+// the Garmin watch app, Strava, Oura, WHOOP, Withings, Polar and Concept2 (through the account).
 // Samsung Health comes in through Health Connect (a line on the Android card says how); bar speed is a camera lab.
 import { useEffect, useRef, useState } from "react";
 
@@ -12,8 +12,6 @@ import {
   CLOUD_NAME,
   connectCloud,
   disconnectCloud,
-  MUSIC_APPS,
-  MUSIC_NAME,
   openOutside,
   pullCloud,
   refreshCloud,
@@ -39,12 +37,11 @@ import { relative, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { useApp } from "@/lib/store";
-import type { MusicApp } from "@/lib/types";
 import type { MessageKey } from "@/locales/en";
 
 import { go, useRoute } from "./router";
 import { SonosSettings } from "./Sonos";
-import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
+import { Button, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 
 function ago(ms: number): string {
   const s = Math.round((ms - Date.now()) / 1000);
@@ -494,30 +491,6 @@ function GarminCard() {
   );
 }
 
-// --- Music ---
-
-function MusicCard() {
-  const profile = useApp((s) => s.profile);
-  const setProfile = useApp((s) => s.setProfile);
-  const app = profile.connections?.music;
-  const pick = (m: MusicApp | undefined) => setProfile({ connections: { ...profile.connections, music: m } });
-  return (
-    <div className="card px-4 py-3">
-      <p className="text-sm text-muted">{t("conn.music.what")}</p>
-      <div className="mt-3 flex flex-wrap gap-2" role="group" aria-label={t("conn.music.title")}>
-        <Chip active={!app} onClick={() => pick(undefined)}>
-          {t("conn.music.none")}
-        </Chip>
-        {MUSIC_APPS.map((m) => (
-          <Chip key={m} active={app === m} onClick={() => pick(m)}>
-            {MUSIC_NAME[m]}
-          </Chip>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function Connections() {
   // #/connections/hr (the health twin's "Pair a monitor") lands on the heart rate monitor. Pairing itself
   // stays one tap there: the phone's Bluetooth picker only opens from a tap.
@@ -545,9 +518,6 @@ export function Connections() {
       </Section>
       <Section title={t("conn.cloud.title")} icon="link">
         <CloudCards />
-      </Section>
-      <Section title={t("conn.music.title")} icon="play">
-        <MusicCard />
       </Section>
     </div>
   );

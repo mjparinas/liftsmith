@@ -246,7 +246,7 @@ function Likers({ id }: { id: string }) {
   useEffect(() => {
     let live = true;
     social<{ people: PersonRow[] }>("likers", { id })
-      .then((r) => live && setRows(r.people))
+      .then((r) => live && setRows(r.people ?? []))
       .catch(() => live && setRows([]));
     return () => {
       live = false;
