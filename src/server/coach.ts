@@ -463,6 +463,8 @@ const KEEP: Record<string, readonly string[]> = {
     "repsL",
     "repsR",
     "tag",
+    // Which part a set was done in (rehab beside the lifting, cardio after it), so a physio sees the rehab was done.
+    "partId",
   ],
   // Workouts with parts: which parts were planned and done, with their times (sessions-with-parts.md).
   sessionStart: ["sessionId", "minutes", "source", "program", "routine", "challenge", "plan"],

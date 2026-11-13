@@ -160,10 +160,10 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         let avgHr = call.getDouble("avgHr")
         let title = call.getString("title")
         // The workout's parts (warm-up, lifting, rehab, cool-down), each written as a workout activity on iOS 16+.
-        let segments: [(kind: String, start: Date, end: Date)] = (call.getArray("segments") ?? []).compactMap { v in
+        let segments: [(kind: String, start: Date, end: Date, activity: String)] = (call.getArray("segments") ?? []).compactMap { v in
             guard let s = v as? JSObject, let kind = s["kind"] as? String, let a = (s["start"] as? NSNumber)?.doubleValue,
                   let b = (s["end"] as? NSNumber)?.doubleValue, b > a else { return nil }
-            return (kind, Date(timeIntervalSince1970: a / 1000), Date(timeIntervalSince1970: b / 1000))
+            return (kind, Date(timeIntervalSince1970: a / 1000), Date(timeIntervalSince1970: b / 1000), s["activity"] as? String ?? "")
         }
 
         // Already saved (a retry, or the same workout from a second device): leave it.
@@ -176,9 +176,28 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         store.execute(query)
     }
 
+    /** A part's HealthKit activity type: flexibility for stretching, the machine's own for cardio, else strength. */
+    private static func activityType(kind: String, activity: String) -> HKWorkoutActivityType {
+        switch kind {
+        case "warm", "cool": return .flexibility
+        case "cardio":
+            switch activity {
+            case "bike": return .cycling
+            case "row": return .rowing
+            case "run": return .running
+            case "walk": return .walking
+            case "elliptical": return .elliptical
+            case "stairs": return .stairClimbing
+            case "ski": return .crossCountrySkiing
+            default: return .mixedCardio
+            }
+        default: return .traditionalStrengthTraining
+        }
+    }
+
     private func write(
         id: String, start: Date, end: Date, kcal: Double?, avgHr: Double?, title: String?,
-        segments: [(kind: String, start: Date, end: Date)], call: CAPPluginCall
+        segments: [(kind: String, start: Date, end: Date, activity: String)], call: CAPPluginCall
     ) {
         let config = HKWorkoutConfiguration()
         config.activityType = .traditionalStrengthTraining
@@ -213,7 +232,7 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
             let group = DispatchGroup()
             for seg in segments {
                 let c = HKWorkoutConfiguration()
-                c.activityType = (seg.kind == "warm" || seg.kind == "cool") ? .flexibility : .traditionalStrengthTraining
+                c.activityType = Self.activityType(kind: seg.kind, activity: seg.activity)
                 c.locationType = .indoor
                 group.enter()
                 builder.addWorkoutActivity(HKWorkoutActivity(workoutConfiguration: c, start: seg.start, end: seg.end, metadata: nil)) { _, _ in

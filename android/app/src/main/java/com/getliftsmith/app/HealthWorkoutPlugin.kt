@@ -200,13 +200,17 @@ class HealthWorkoutPlugin : Plugin() {
                     segments = segments,
                 )
                 // The workout's parts as segments: weightlifting for lifting and rehab, stretching for the warm-up and
-                // cool-down. Health Connect checks segments against the session's type; if it refuses, the workout is
-                // saved without them.
-                val parts = segmentsOf(call.getArray("segments"), from, to)
+                // cool-down, and the machine's own type for a cardio part (biking, rowing...). Health Connect checks
+                // segments against the session's type; if it refuses the cardio type, the cardio part goes as "other
+                // workout", and if it still refuses, the workout is saved without segments.
                 val session = try {
-                    record(parts)
+                    record(segmentsOf(call.getArray("segments"), from, to, exact = true))
                 } catch (e: IllegalArgumentException) {
-                    record(emptyList())
+                    try {
+                        record(segmentsOf(call.getArray("segments"), from, to, exact = false))
+                    } catch (e2: IllegalArgumentException) {
+                        record(emptyList())
+                    }
                 }
                 c.insertRecords(listOf(session))
                 answer(call, "saved", true)
@@ -216,7 +220,7 @@ class HealthWorkoutPlugin : Plugin() {
         }
     }
 
-    private fun segmentsOf(list: JSArray?, from: Instant, to: Instant): List<ExerciseSegment> {
+    private fun segmentsOf(list: JSArray?, from: Instant, to: Instant, exact: Boolean): List<ExerciseSegment> {
         if (list == null || list.length() < 2) return emptyList()
         val out = mutableListOf<ExerciseSegment>()
         for (i in 0 until list.length()) {
@@ -226,11 +230,23 @@ class HealthWorkoutPlugin : Plugin() {
             if (!b.isAfter(a) || a.isBefore(from) || b.isAfter(to)) continue
             val type = when (o.optString("kind")) {
                 "warm", "cool" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_STRETCHING
+                "cardio" -> if (exact) cardioSegment(o.optString("activity")) else ExerciseSegment.EXERCISE_SEGMENT_TYPE_OTHER_WORKOUT
                 else -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_WEIGHTLIFTING
             }
             out.add(ExerciseSegment(startTime = a, endTime = b, segmentType = type))
         }
         return out
+    }
+
+    /** A cardio part's segment type, from what it was (partExtras.ts `cardioActivity`). */
+    private fun cardioSegment(activity: String): Int = when (activity) {
+        "bike" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_BIKING_STATIONARY
+        "row" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_ROWING_MACHINE
+        "run" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_RUNNING_TREADMILL
+        "walk" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_WALKING
+        "elliptical" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_ELLIPTICAL
+        "stairs" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_STAIR_CLIMBING_MACHINE
+        else -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_OTHER_WORKOUT
     }
 
     private companion object {

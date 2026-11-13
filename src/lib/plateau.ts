@@ -127,7 +127,7 @@ function diagnose(
   const muscle = ex.primary[0]!;
   let musc = 0;
   for (const e of events) {
-    if (e.type !== "set" || e.at <= from) continue;
+    if (e.type !== "set" || e.at <= from || e.partId === "rehab") continue;
     const x = EXERCISE_BY_ID.get(e.exerciseId);
     if (x?.primary.includes(muscle)) musc += 1;
     else if (x?.secondary.includes(muscle)) musc += 0.5;

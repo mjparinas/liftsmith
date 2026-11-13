@@ -10,7 +10,7 @@ import type { Call } from "./readiness";
 import { recovery } from "./recovery";
 import { groupedSeconds } from "./superset";
 import { PRIORITY_VOLUME } from "./training";
-import { MUSCLES, type AppEvent, type Exercise, type Gym, type Muscle, type Profile } from "./types";
+import { MUSCLES, type AppEvent, type Exercise, type Gym, type ItemPart, type Muscle, type Profile } from "./types";
 import { WARMUP_REST, warmupFor, withWarmups, type WarmupSet } from "./warmup";
 
 // Builds today's workout: only exercises this gym can do, aimed at the muscles that are both
@@ -30,6 +30,8 @@ export interface PlanItem {
   injuryPct?: number;
   /** Lighter sets before the working sets (warmup.ts). */
   warmup?: WarmupSet[];
+  /** A rehab or cardio part added beside the lifting at Start (sessions-with-parts.md, stage 5). Missing: the main part. */
+  part?: ItemPart;
   // ---- Set by a program (programs.ts); the adaptive plan leaves them out.
   /** The program lift these sets count for, saved on each set so a swap keeps its progress. */
   slot?: string;

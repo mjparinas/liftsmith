@@ -120,7 +120,9 @@ export function RestCard({
       )}
       {lastSet && lastOfExercise && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
       {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
-      {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={!!active.plan.rehab} />}
+      {lastSet && (
+        <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={!!active.plan.rehab || lastSet.partId === "rehab"} />
+      )}
       <div className="mt-5 w-full border-t border-line/70 pt-4">
         <p className="text-center text-sm text-muted">
           {t("workout.nextUp")}{" "}

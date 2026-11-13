@@ -21,14 +21,23 @@ export const clampSets = (n: number) => Math.min(10, Math.max(1, Math.round(n) |
 export const MAX_PART_STRETCHES = 12;
 
 /**
- * Tidies a routine's parts (sessions-with-parts.md, stage 3): at most one warm-up then one cool-down, each with
- * known stretches of its own kind only. Undefined when there are none, so a routine without parts stays as it was.
+ * Tidies a routine's parts (sessions-with-parts.md, stages 3 and 5): at most one warm-up, one cardio and one
+ * cool-down, in that order; a warm-up or cool-down with known stretches of its own kind only, cardio with a known
+ * cardio exercise (or none) and 1 to 120 minutes (or none). Undefined when there are none, so a routine without
+ * parts stays as it was.
  */
 export function cleanParts(parts: readonly RoutinePart[] | undefined): RoutinePart[] | undefined {
   const out: RoutinePart[] = [];
-  for (const kind of ["warm", "cool"] as const) {
+  for (const kind of ["warm", "cardio", "cool"] as const) {
     const p = parts?.find((x) => x.kind === kind);
     if (!p) continue;
+    if (kind === "cardio") {
+      const id = p.exerciseId && EXERCISE_BY_ID.get(p.exerciseId)?.cardio ? p.exerciseId : undefined;
+      const min =
+        typeof p.minutes === "number" && Number.isFinite(p.minutes) ? Math.min(120, Math.max(1, Math.round(p.minutes))) : undefined;
+      out.push({ kind, ...(id ? { exerciseId: id } : {}), ...(min ? { minutes: min } : {}) });
+      continue;
+    }
     const ids = [...new Set(p.stretches ?? [])].filter((id) => stretch(id)?.kind === kind).slice(0, MAX_PART_STRETCHES);
     out.push(ids.length ? { kind, stretches: ids } : { kind });
   }

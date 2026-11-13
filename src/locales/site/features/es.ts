@@ -162,7 +162,7 @@ export const es: FeaturesText = {
     },
     "workout-parts": {
       name: "Entrenamientos por partes",
-      body: "Un entrenamiento puede hacer un calentamiento, las pesas y una vuelta a la calma en orden, con Saltar entre ellas. La pantalla de bloqueo y tu reloj muestran en qué parte estás, el historial muestra cada parte y los días de estiramientos de 10 minutos o más mantienen tu racha. Las rutinas pueden llevar su propio calentamiento y vuelta a la calma, también en enlaces compartidos y de tu entrenador. Las notas del coach leen cada parte: el dolor tras la rehabilitación que baja o sube, y un pulso que sigue alto en la vuelta a la calma.",
+      body: "Un entrenamiento puede hacer un calentamiento, las pesas y una vuelta a la calma en orden, con Saltar entre ellas. La pantalla de bloqueo y tu reloj muestran en qué parte estás, el historial muestra cada parte y los días de estiramientos de 10 minutos o más mantienen tu racha. Las rutinas pueden llevar su propio calentamiento y vuelta a la calma, también en enlaces compartidos y de tu entrenador. Las notas del coach leen cada parte: el dolor tras la rehabilitación que baja o sube, y un pulso que sigue alto en la vuelta a la calma. La rehabilitación de tu fisioterapeuta puede ir junto a las pesas en el mismo entrenamiento los días que toca, y el cardio puede ir después de las pesas, con la máquina y los minutos elegidos con un toque.",
     },
     notes: {
       name: "Notas del entrenador",
