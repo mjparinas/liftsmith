@@ -189,6 +189,8 @@ describe("trainer mode", () => {
       auth: "Bearer tok",
     });
     expect(await screen.findByRole("button", { name: "Stop sharing with Sam" })).toBeInTheDocument();
+    // The sharing lead names the coach (it showed a raw "{name}" before, 2026-11-13).
+    expect(screen.getByText(/anything else you want Sam to see/)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Message Sam" })).toBeInTheDocument();
   });
 
