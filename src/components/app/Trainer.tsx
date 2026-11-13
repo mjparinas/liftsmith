@@ -69,6 +69,7 @@ import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { ClientPayments, PaySetup, YourPayments } from "./CoachPay";
+import { CoachPlanCard } from "./CoachPlan";
 import { ClientPain, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
 import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
@@ -104,10 +105,12 @@ export function Trainer({ arg }: { arg?: string }) {
   if (arg === "forms") return <FormsScreen />;
   // Back from paying a coach on Stripe's page.
   if (arg === "paid") return <Home code="" paid />;
+  // Back from buying a coach plan on Stripe's page (CoachPlan.tsx).
+  if (arg === "plan") return <Home code="" planPaid />;
   return <Home code={arg ? codeFrom(arg) : ""} />;
 }
 
-function Home({ code, team = "", paid = false }: { code: string; team?: string; paid?: boolean }) {
+function Home({ code, team = "", paid = false, planPaid = false }: { code: string; team?: string; paid?: boolean; planPaid?: boolean }) {
   const [data, setData] = useState<Overview | null>(null);
   const [note, setNote] = useState<string | null>(paid ? t("pay.thanks") : null);
   const reload = useCallback(() => {
@@ -153,7 +156,7 @@ function Home({ code, team = "", paid = false }: { code: string; team?: string; 
         />
       </Section>
       <Section title={t("trn.yourClients")} icon="target">
-        <YourClients data={data} onChange={reload} />
+        <YourClients data={data} onChange={reload} planPaid={planPaid} />
       </Section>
       <Section title={t("team.title")} icon="trophy" info="schoolTeams">
         <SchoolTeams code={team} />
@@ -475,7 +478,7 @@ function NoteToday({ n }: { n: ShownNote }) {
 
 // --- The coach's side: Pro ---
 
-function YourClients({ data, onChange }: { data: Overview | null; onChange: () => void }) {
+function YourClients({ data, onChange, planPaid = false }: { data: Overview | null; onChange: () => void; planPaid?: boolean }) {
   const [note, setNote] = useState<string | null>(null);
   if (!can("coaching")) {
     // Never hidden: the row says what it is, with the Pro tag, and opens the paywall (AGENTS.md "Free vs Pro").
@@ -575,6 +578,8 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
         )}
         <p className="mt-3 text-xs text-muted">{t("trn.proFree")}</p>
       </section>
+      {/* How many clients the coach's plan allows, and the way up when it's full (coach plans). */}
+      {data.plan && <CoachPlanCard plan={data.plan} onChange={onChange} paid={planPaid} />}
       {note && (
         <p className="mt-2 text-sm text-muted" role="status">
           {note}

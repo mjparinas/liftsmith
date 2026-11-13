@@ -311,6 +311,10 @@ export const fr: FeaturesText = {
       name: "Paiements des clients avec Stripe",
       body: "Connectez votre propre compte Stripe et fixez le prix de chaque client, à la séance ou au mois. Ils paient sur la page sécurisée de Stripe, l'argent vous arrive directement, et un paiement mensuel raté remonte en haut de leur rapport.",
     },
+    "coach-plans": {
+      name: "Des forfaits coach qui grandissent avec votre clientèle",
+      body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",

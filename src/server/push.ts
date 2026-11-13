@@ -51,6 +51,7 @@ export type CoachPushKind =
   | "coachBooked"
   | "coachCancelled"
   | "coachPaid"
+  | "coachFull"
   | "coachPain";
 
 export interface PushMessage {

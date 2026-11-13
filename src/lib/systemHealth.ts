@@ -369,6 +369,13 @@ export const SETTINGS: Setting[] = [
     what: "With any of the four missing, the web app sells nothing and stays unlocked.",
   },
   {
+    names: ["STRIPE_PRICE_COACH_MONTHLY", "STRIPE_PRICE_COACH_ANNUAL", "STRIPE_PRICE_COACH_PLUS_MONTHLY", "STRIPE_PRICE_COACH_PLUS_ANNUAL"],
+    label: "Stripe coach plans (Coach and Coach Plus on the web)",
+    group: "Payments",
+    need: "optional",
+    what: "The price ids of the coach plans. A plan is sold on the web once both of its prices are set; the coachPlans flag turns the client limits on.",
+  },
+  {
     names: ["STRIPE_CONNECT_WEBHOOK_SECRET"],
     label: "Stripe Connect (coaches' client payments)",
     group: "Payments",

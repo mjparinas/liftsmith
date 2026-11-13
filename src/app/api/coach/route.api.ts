@@ -1,5 +1,5 @@
 // Trainer mode (src/server/coach.ts). Signed in only. Server build only.
-// GET: your invite, clients and coaches; GET ?client=<id>: that client's training, if they're your client.
+// GET: your invite, clients and coaches, and your coach plan (`plan`: tier, client limit and clients; coachPlan.ts); GET ?client=<id>: that client's training, if they're your client.
 // POST { action }: "invite" (a fresh code), "cancel" (no code), "preview" and "join" (a client entering a
 // code), "unlink" (either side ends it, with `id`), "assign" (a coach gives a client a routine: `client`, `name`,
 // `code`), "unassign" (with the plan's `id`), "setup" (what the coach's new clients start setup with: `setup`) and
@@ -64,6 +64,7 @@ import {
   setPrice,
   stopMonthly,
 } from "@/server/coachPay";
+import { coachPlanOf } from "@/server/coachPlan";
 import { rateLimit } from "@/server/db";
 import { saveToken } from "@/server/push";
 
@@ -85,16 +86,17 @@ export async function GET(req: Request) {
   }
   const client = q.get("client");
   if (client === null) {
-    const [o, mine, pending, slots, sessions] = await Promise.all([
+    const [o, mine, pending, slots, sessions, plan] = await Promise.all([
       overview(s.accountId),
       forms(s.accountId),
       pendingCheckins(s.accountId),
       coachSlots(s.accountId),
       clientSlots(s.accountId),
+      coachPlanOf(s.accountId),
     ]);
     // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
     const pay = payConfig() ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId) } : null;
-    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay });
+    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay, plan });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);

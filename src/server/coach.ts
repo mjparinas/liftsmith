@@ -10,11 +10,12 @@
 // Decision record: docs/decisions/trainer-mode.md.
 import { randomBytes } from "node:crypto";
 
+import { hasRoom } from "./coachPlan";
 import { batch, query, rateLimit, run } from "./db";
 import { notifyCoach } from "./push";
 
 export const COACH_LIMITS = {
-  /** Clients per coach, until there's a coach plan (docs/decisions/trainer-mode.md). */
+  /** Clients per coach while coach plans are off; with them on, the coach's plan decides (coachPlan.ts). */
   clients: 30,
   /** Coaches per client. */
   coaches: 3,
@@ -341,8 +342,13 @@ export async function joinCoach(
   if (Number(had?.n ?? 0) > 0) return seen;
   const [mine] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE client_id = ?", [clientId]);
   if (Number(mine?.n ?? 0) >= COACH_LIMITS.coaches) return { error: "full" };
-  const [theirs] = await query<{ n: number }>("SELECT COUNT(*) AS n FROM coach_links WHERE coach_id = ?", [coachId]);
-  if (Number(theirs?.n ?? 0) >= COACH_LIMITS.clients) return { error: "coachFull" };
+  if (!(await hasRoom(coachId, now))) {
+    // Tell the coach once a day, so they can make room or move to a coach plan (docs/decisions/money.md "Coach plans").
+    if (await rateLimit(`coachFull:${coachId}`, 1, 86_400_000).catch(() => false)) {
+      await notifyCoach(coachId, "coachFull", { name: await nameOf(clientId) }, "#/trainer");
+    }
+    return { error: "coachFull" };
+  }
   await run("INSERT OR IGNORE INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", [coachId, clientId, now]);
   return { ...seen, coach: { ...seen.coach, since: now } };
 }

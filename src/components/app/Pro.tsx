@@ -37,7 +37,7 @@ import { Button, ScreenHeader } from "./ui";
 // store, annual first, neither plan pre-selected (each is its own button), the trial and renewal terms
 // spelled out, Restore purchases, and cancel in the store's own subscriptions page. No countdowns.
 
-const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
+export const APPLE_EULA = "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/";
 
 // What each Pro screen entry point passes as the route argument (#/pro/<from>): the feature it was for,
 // so the paywall can mark it, and the screen to go back to when there's no history (a fresh launch).

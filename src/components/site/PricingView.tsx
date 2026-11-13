@@ -4,6 +4,7 @@ import Link from "next/link";
 import { InfoPage, Section } from "@/components/site/InfoPage";
 import { CtaBanner, CtaButton, JsonLd } from "@/components/site/SiteChrome";
 import { BRAND } from "@/lib/brand";
+import { COACH_PLANS } from "@/lib/coachPlans";
 import { faqJsonLd } from "@/lib/faqs";
 import { pageMeta } from "@/lib/pageMeta";
 import { PLAN_TABLE } from "@/lib/plans";
@@ -51,6 +52,49 @@ function List({ items }: { items: string[] }) {
   );
 }
 
+/** Coach plans (src/lib/coachPlans.ts): Pro's few clients, then Coach and Coach Plus, with the coaches page one tap away. */
+function CoachPlans({ lang }: { lang: SiteLang }) {
+  const t = siteText(lang);
+  const c = t.pricing.coach;
+  const card = t.home.pricing;
+  const vars = siteVars(lang);
+  const tiers = [
+    { name: "Pro", clients: fill(c.upTo, { n: COACH_PLANS.pro.clients }), price: null },
+    { name: "Coach", clients: fill(c.upTo, { n: COACH_PLANS.coach.clients }), price: COACH_PLANS.coach.usd },
+    { name: "Coach Plus", clients: c.noLimit, price: COACH_PLANS.coachPlus.usd },
+  ];
+  return (
+    <Section title={c.title} id="coaches">
+      <p className="leading-relaxed text-muted">{c.intro}</p>
+      <div className="mt-5 grid gap-4 md:grid-cols-3">
+        {tiers.map((x) => (
+          <section key={x.name} aria-label={x.name} className="card flex flex-col p-5">
+            <h3 className="text-lg font-semibold">{x.name}</h3>
+            <p className="mt-1 font-semibold">{x.clients}</p>
+            {x.price ? (
+              <p className="mt-3">
+                <span className="display text-3xl">{usd(lang, x.price.annual)}</span> <span className="text-muted">{card.perYear}</span>
+                <span className="mt-0.5 block text-sm text-muted">{fill(c.orMonthly, { monthly: usd(lang, x.price.monthly) })}</span>
+              </p>
+            ) : (
+              <p className="mt-3 text-muted">{c.inPro}</p>
+            )}
+          </section>
+        ))}
+      </div>
+      <p className="mt-4 text-sm text-muted">{fill(c.free, vars)}</p>
+      <Link
+        href={localPath(lang, "/coaches/")}
+        prefetch={false}
+        data-cta="pricing-coaches"
+        className="mt-3 inline-block font-semibold text-accent underline"
+      >
+        {c.cta}
+      </Link>
+    </Section>
+  );
+}
+
 export function PricingView({ lang }: { lang: SiteLang }) {
   const t = siteText(lang);
   const p = t.pricing;
@@ -71,6 +115,10 @@ export function PricingView({ lang }: { lang: SiteLang }) {
     offers: [
       { "@type": "Offer", price: PRICES.monthly.price.replace("$", ""), priceCurrency: "USD", name: "Pro monthly" },
       { "@type": "Offer", price: PRICES.annual.price.replace("$", ""), priceCurrency: "USD", name: "Pro yearly" },
+      { "@type": "Offer", price: String(COACH_PLANS.coach.usd.monthly), priceCurrency: "USD", name: "Coach monthly" },
+      { "@type": "Offer", price: String(COACH_PLANS.coach.usd.annual), priceCurrency: "USD", name: "Coach yearly" },
+      { "@type": "Offer", price: String(COACH_PLANS.coachPlus.usd.monthly), priceCurrency: "USD", name: "Coach Plus monthly" },
+      { "@type": "Offer", price: String(COACH_PLANS.coachPlus.usd.annual), priceCurrency: "USD", name: "Coach Plus yearly" },
     ],
   };
   return (
@@ -114,6 +162,8 @@ export function PricingView({ lang }: { lang: SiteLang }) {
           <p className="mt-3 text-xs text-muted">{card.billed}</p>
         </section>
       </div>
+
+      <CoachPlans lang={lang} />
 
       <Section title={p.compare} id="compare">
         <div className="relative overflow-x-auto rounded-2xl border border-line">

@@ -306,6 +306,10 @@ export const es: FeaturesText = {
       name: "Cobros a clientes con Stripe",
       body: "Conecta tu propia cuenta de Stripe y fija el precio de cada cliente, por sesión o mensual. Pagan en la página segura de Stripe, el dinero te llega directamente y un pago mensual fallido aparece arriba en su informe.",
     },
+    "coach-plans": {
+      name: "Planes de entrenador que crecen con tu lista de clientes",
+      body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y Liftsmith no se queda nada de lo que te pagan.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

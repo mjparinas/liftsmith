@@ -298,6 +298,17 @@ export const it: SiteText = {
     termsAfter: ".",
     endTitle: "Il tuo primo allenamento è gratis",
     endBody: "Inizia col piano gratuito, prova Pro gratis per {days} giorni quando vuoi e disdici in due tocchi.",
+    coach: {
+      title: "Seguire clienti",
+      intro:
+        "Pro include il coaching per pochi clienti, così puoi provarlo con persone vere. Quando i tuoi clienti crescono, scegli un piano da coach. Ogni strumento da coach funziona con ogni piano.",
+      upTo: "Fino a {n} clienti",
+      noLimit: "Nessun limite fisso di clienti",
+      inPro: "Incluso in Pro",
+      orMonthly: "o {monthly} al mese",
+      free: "I tuoi clienti si allenano sempre gratis, gli allenatori delle superiori che confermano un'email scolastica hanno Pro gratis, e {name} non trattiene nulla di quello che i clienti ti pagano.",
+      cta: "Liftsmith per i coach",
+    },
   },
   faqs: [
     {
@@ -450,8 +461,8 @@ export const it: SiteText = {
     },
     cost: {
       title: "Quanto costa",
-      body: "Seguire clienti fa parte di {name} Pro ({annual} all'anno o {monthly} al mese), fino a 30 clienti. Essere cliente è gratis, quindi chiunque inviti può iniziare senza pagare.",
-      contactBefore: "Segui più persone di così? ",
+      body: "Seguire fino a {proClients} clienti fa parte di {name} Pro ({annual} all'anno o {monthly} al mese), così puoi provarlo con clienti veri. Coach dà spazio a {coachClients} clienti ({coachAnnual} all'anno o {coachMonthly} al mese) e Coach Plus non ha un limite fisso ({coachPlusAnnual} all'anno o {coachPlusMonthly} al mese). Ogni strumento da coach funziona con ogni piano. Essere cliente è sempre gratis, e non tratteniamo nulla di quello che i tuoi clienti ti pagano.",
+      contactBefore: "Domande sui piani da coach? ",
       contactLink: "Dicci di cosa hai bisogno.",
     },
     faqTitle: "Domande dei coach",

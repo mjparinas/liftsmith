@@ -306,6 +306,17 @@ export const es: SiteText = {
     termsAfter: ".",
     endTitle: "Tu primer entrenamiento es gratis",
     endBody: "Empieza con el plan gratis, prueba Pro gratis durante {days} días cuando quieras y cancela en dos toques.",
+    coach: {
+      title: "Entrenar a clientes",
+      intro:
+        "Pro incluye entrenar a unos pocos clientes, así que puedes probarlo con personas reales. Cuando tu lista crezca, elige un plan de entrenador. Todas las herramientas de entrenador funcionan en todos los planes.",
+      upTo: "Hasta {n} clientes",
+      noLimit: "Sin límite fijo de clientes",
+      inPro: "Incluido en Pro",
+      orMonthly: "o {monthly} al mes",
+      free: "Tus clientes siempre entrenan gratis, los entrenadores de secundaria que confirman un correo del centro tienen Pro gratis, y {name} no se queda nada de lo que te pagan tus clientes.",
+      cta: "Liftsmith para entrenadores",
+    },
   },
   faqs: [
     {
@@ -455,8 +466,8 @@ export const es: SiteText = {
     },
     cost: {
       title: "Cuánto cuesta",
-      body: "Entrenar a clientes forma parte de {name} Pro ({annual} al año o {monthly} al mes), hasta 30 clientes. Ser cliente es gratis, así que cualquiera a quien invites puede empezar sin pagar.",
-      contactBefore: "¿Entrenas a más personas? ",
+      body: "Entrenar hasta {proClients} clientes forma parte de {name} Pro ({annual} al año o {monthly} al mes), así que puedes probarlo con clientes reales. Coach da espacio para {coachClients} clientes ({coachAnnual} al año o {coachMonthly} al mes) y Coach Plus no tiene límite fijo ({coachPlusAnnual} al año o {coachPlusMonthly} al mes). Todas las herramientas de entrenador funcionan en todos los planes. Ser cliente siempre es gratis, y no nos quedamos nada de lo que te pagan tus clientes.",
+      contactBefore: "¿Dudas sobre los planes de entrenador? ",
       contactLink: "Cuéntanos qué necesitas.",
     },
     faqTitle: "Preguntas de entrenadores",
