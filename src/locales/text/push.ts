@@ -23,6 +23,11 @@ export const en = {
   "push.coachTrained": "{name} finished a workout.",
   "push.coachQuiet": "{name} hasn't trained for a week. A quick message might help.",
   "push.someone": "Your coach",
+  "push.coachCheckin": "{name} sent you a check-in: {text}",
+  "push.coachCheckinDone": "{name} filled in their check-in.",
+  "push.coachBooked": "{name} booked a session: {text}",
+  "push.coachCancelled": "{name} cancelled a session: {text}",
+  "push.coachPaid": "{name} paid you {text}.",
 } as const;
 
 type Key = keyof typeof en;
@@ -46,6 +51,11 @@ export const es: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} terminó un entrenamiento.",
   "push.coachQuiet": "{name} lleva una semana sin entrenar. Un mensaje rápido puede ayudar.",
   "push.someone": "Tu entrenador",
+  "push.coachCheckin": "{name} te envió una revisión: {text}",
+  "push.coachCheckinDone": "{name} completó su revisión.",
+  "push.coachBooked": "{name} reservó una sesión: {text}",
+  "push.coachCancelled": "{name} canceló una sesión: {text}",
+  "push.coachPaid": "{name} te pagó {text}.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -67,6 +77,11 @@ export const fr: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} a terminé une séance.",
   "push.coachQuiet": "{name} n'a pas fait de séance depuis une semaine. Un petit message peut aider.",
   "push.someone": "Votre coach",
+  "push.coachCheckin": "{name} vous a envoyé un bilan : {text}",
+  "push.coachCheckinDone": "{name} a rempli son bilan.",
+  "push.coachBooked": "{name} a réservé une séance : {text}",
+  "push.coachCancelled": "{name} a annulé une séance : {text}",
+  "push.coachPaid": "{name} vous a payé {text}.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -88,6 +103,11 @@ export const de: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} hat ein Workout beendet.",
   "push.coachQuiet": "{name} hat seit einer Woche nicht trainiert. Eine kurze Nachricht kann helfen.",
   "push.someone": "Dein Coach",
+  "push.coachCheckin": "{name} hat dir einen Check-in geschickt: {text}",
+  "push.coachCheckinDone": "{name} hat den Check-in ausgefüllt.",
+  "push.coachBooked": "{name} hat einen Termin gebucht: {text}",
+  "push.coachCancelled": "{name} hat einen Termin abgesagt: {text}",
+  "push.coachPaid": "{name} hat dir {text} bezahlt.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -109,6 +129,11 @@ export const it: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name} ha finito un allenamento.",
   "push.coachQuiet": "{name} non si allena da una settimana. Un breve messaggio può aiutare.",
   "push.someone": "Il tuo coach",
+  "push.coachCheckin": "{name} ti ha inviato un check-in: {text}",
+  "push.coachCheckinDone": "{name} ha compilato il check-in.",
+  "push.coachBooked": "{name} ha prenotato una sessione: {text}",
+  "push.coachCancelled": "{name} ha annullato una sessione: {text}",
+  "push.coachPaid": "{name} ti ha pagato {text}.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -130,4 +155,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "push.coachTrained": "{name}さんがワークアウトを終えました。",
   "push.coachQuiet": "{name}さんは1週間トレーニングしていません。短いメッセージが助けになるかもしれません。",
   "push.someone": "コーチ",
+  "push.coachCheckin": "{name}さんからチェックインが届きました：{text}",
+  "push.coachCheckinDone": "{name}さんがチェックインに回答しました。",
+  "push.coachBooked": "{name}さんがセッションを予約しました：{text}",
+  "push.coachCancelled": "{name}さんがセッションをキャンセルしました：{text}",
+  "push.coachPaid": "{name}さんから{text}の支払いがありました。",
 };
