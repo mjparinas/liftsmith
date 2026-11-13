@@ -157,6 +157,10 @@ export const it: FeaturesText = {
       name: "Stretching",
       body: "48 allungamenti con dimostrazioni in 3D: un riscaldamento facoltativo prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
     },
+    "workout-parts": {
+      name: "Allenamenti in parti",
+      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie.",
+    },
     notes: {
       name: "Note del coach",
       body: "Segnala fatica che si accumula, un esercizio fermo, un muscolo con poche serie, un obiettivo settimanale a rischio o massa grassa in aumento, ognuno con una cosa da fare, spesso con un solo tocco.",

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { NOW } from "../test/factories";
-import { coolDownHome, joinStretches, partsOf, type WorkoutSpan } from "./sessions";
+import { coolDownHome, doneParts, enterPart, hadCoolDown, joinStretches, partsOf, planParts, type WorkoutSpan } from "./sessions";
 import type { StretchEvent } from "./types";
 
 const MIN = 60_000;
@@ -82,5 +82,51 @@ describe("coolDownHome", () => {
     expect(coolDownHome([workout], end + 6 * MIN, 300)).toBe("w1");
     expect(coolDownHome([workout], end + 2 * 60 * MIN, 300)).toBeUndefined();
     expect(coolDownHome([], end, 300)).toBeUndefined();
+  });
+});
+
+describe("parts of the workout in progress", () => {
+  it("plans the warm-up and cool-down only when picked, around the lifting or rehab", () => {
+    expect(planParts({ warm: true, cool: true }, false).map((p) => p.kind)).toEqual(["warm", "lift", "cool"]);
+    expect(planParts({ warm: false, cool: true }, true).map((p) => p.kind)).toEqual(["rehab", "cool"]);
+    expect(planParts({ warm: false, cool: false }, false).map((p) => p.kind)).toEqual(["lift"]);
+  });
+
+  it("closes the part before when the next one starts, and marks it skipped when asked", () => {
+    let parts = enterPart(planParts({ warm: true, cool: true }, false), 0, NOW);
+    parts = enterPart(parts, 1, NOW + 4 * MIN);
+    expect(parts[0]).toEqual({ kind: "warm", start: NOW, end: NOW + 4 * MIN });
+    expect(parts[1]).toEqual({ kind: "lift", start: NOW + 4 * MIN });
+    parts = enterPart(parts, 2, NOW + 50 * MIN, true);
+    expect(parts[1]).toMatchObject({ end: NOW + 50 * MIN, skipped: true });
+  });
+
+  it("records only the parts actually done, closing the open one at the end", () => {
+    let parts = enterPart(planParts({ warm: true, cool: true }, false), 1, NOW, true);
+    // The warm-up was never started: skipped straight to the lifting.
+    expect(doneParts(parts, end)).toEqual([{ id: "lift", kind: "lift", start: NOW, end }]);
+    parts = enterPart(parts, 2, end);
+    expect(doneParts(parts, end + 5 * MIN).map((p) => [p.kind, p.end])).toEqual([
+      ["lift", end],
+      ["cool", end + 5 * MIN],
+    ]);
+  });
+
+  it("knows when a workout already had a cool-down", () => {
+    expect(hadCoolDown([{ kind: "lift" }, { kind: "cool" }])).toBe(true);
+    expect(hadCoolDown([{ kind: "lift" }])).toBe(false);
+    expect(hadCoolDown(undefined)).toBe(false);
+  });
+
+  it("uses the recorded times of a workout run with parts, and still lists its stretches", () => {
+    const cool = stretch({ moment: "cool", sessionId: "w1", ids: ["childs-pose"], seconds: 200 });
+    const parts = partsOf(workout, { warm: [], cool: [cool] }, [
+      { id: "lift", kind: "lift", start: NOW, end },
+      { id: "cool", kind: "cool", start: end, end: end + 5 * MIN },
+    ]);
+    expect(parts).toEqual([
+      { kind: "lift", seconds: 45 * 60 },
+      { kind: "cool", seconds: 300, stretchIds: ["childs-pose"] },
+    ]);
   });
 });

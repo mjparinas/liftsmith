@@ -529,6 +529,8 @@ export interface SessionStartEvent extends EventBase {
   program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */
   routine?: string;
+  /** The parts planned at Start, in order (workouts with parts), when there was more than lifting. */
+  plan?: { kind: PartKind }[];
 }
 
 export interface SessionEndEvent extends EventBase {
@@ -545,8 +547,8 @@ export interface SessionEndEvent extends EventBase {
   /** Ended automatically because the workout was left running (see AUTO_END_MS in store.ts). */
   auto?: boolean;
   /**
-   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md). Not written yet;
-   * missing means the whole workout was one lifting part, and sessions.ts reads it that way.
+   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md), when the workout had
+   * more than lifting. Missing means the whole workout was one lifting part, and sessions.ts reads it that way.
    */
   parts?: SessionPart[];
 }

@@ -251,7 +251,7 @@ export function HistoryCalendar() {
           summary={s}
           unit={profile.unit}
           prIds={prIds}
-          parts={partsOf(s, joined.bySession.get(s.sessionId))}
+          parts={partsOf(s, joined.bySession.get(s.sessionId), s.parts)}
         />
       ))}
       {dayStretches.map((s) => (

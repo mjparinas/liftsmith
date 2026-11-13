@@ -1,4 +1,4 @@
-import type { PartKind, StretchEvent } from "./types";
+import type { PartKind, SessionPart, StretchEvent } from "./types";
 
 // Workouts with parts (Melvin, 2026-11-13; docs/decisions/sessions-with-parts.md). A workout is its sessionId;
 // its parts are read from the events every time, never stored, so older data needs no migration:
@@ -75,7 +75,18 @@ const sum = (list: readonly StretchEvent[]) => list.reduce((a, s) => a + s.secon
 const idsOf = (list: readonly StretchEvent[]) => list.flatMap((s) => s.ids);
 
 /** A workout's parts in order: the warm-up, the lifting, the cool-down. Parts with nothing in them are left out. */
-export function partsOf(workout: WorkoutSpan, stretches: StretchParts | undefined): PartView[] {
+export function partsOf(workout: WorkoutSpan, stretches: StretchParts | undefined, recorded?: readonly SessionPart[]): PartView[] {
+  // A workout run with parts (stage 2) says how long each took; stretches still give the ids.
+  if (recorded?.length) {
+    return recorded.map((p) => {
+      const ids = p.kind === "warm" ? stretches?.warm : p.kind === "cool" ? stretches?.cool : undefined;
+      return {
+        kind: p.kind,
+        seconds: Math.max(0, Math.round((p.end - p.start) / 1000)),
+        ...(ids?.length ? { stretchIds: idsOf(ids) } : {}),
+      };
+    });
+  }
   const parts: PartView[] = [];
   if (stretches?.warm.length) parts.push({ kind: "warm", seconds: sum(stretches.warm), stretchIds: idsOf(stretches.warm) });
   parts.push({ kind: "lift", seconds: workout.seconds });
@@ -92,4 +103,49 @@ export function coolDownHome(workouts: readonly WorkoutSpan[], now: number, seco
     if (gap >= -WARM_GRACE_MS && gap <= COOL_AFTER_MS && (!best || endOf(w) > endOf(best))) best = w;
   }
   return best?.sessionId;
+}
+
+// ---------- Parts of the workout in progress (stage 2) ----------
+
+/** The kinds a workout can run through today: a warm-up, the lifting (or a rehab program), a cool-down. */
+export type LivePartKind = "warm" | "lift" | "rehab" | "cool";
+
+/** One part of the workout in progress: when it started and ended, and whether it was skipped. */
+export interface LivePart {
+  kind: LivePartKind;
+  start?: number;
+  end?: number;
+  skipped?: boolean;
+}
+
+/** The parts a workout starts with: the warm-up and cool-down when picked, around the lifting or rehab. */
+export function planParts(picks: { warm: boolean; cool: boolean }, rehab: boolean): LivePart[] {
+  return [
+    ...(picks.warm ? [{ kind: "warm" as const }] : []),
+    { kind: rehab ? ("rehab" as const) : ("lift" as const) },
+    ...(picks.cool ? [{ kind: "cool" as const }] : []),
+  ];
+}
+
+/** Starts part `index` at `now`, closing the one before it (skipped or done). */
+export function enterPart(parts: readonly LivePart[], index: number, now: number, skipPrev = false): LivePart[] {
+  return parts.map((p, i) =>
+    i === index - 1 && p.end === undefined
+      ? { ...p, start: p.start ?? now, end: now, ...(skipPrev ? { skipped: true } : {}) }
+      : i === index
+        ? { ...p, start: now }
+        : p,
+  );
+}
+
+/** The parts actually done, for sessionEnd: started, not skipped, closed at `end` if still open. */
+export function doneParts(parts: readonly LivePart[], end: number): SessionPart[] {
+  return parts
+    .filter((p) => p.start !== undefined && !p.skipped)
+    .map((p) => ({ id: p.kind, kind: p.kind, start: p.start!, end: p.end ?? end }));
+}
+
+/** True when a workout's parts on sessionStart or sessionEnd include a cool-down, so Done needn't offer another. */
+export function hadCoolDown(plan: readonly { kind: PartKind }[] | undefined): boolean {
+  return !!plan?.some((p) => p.kind === "cool");
 }

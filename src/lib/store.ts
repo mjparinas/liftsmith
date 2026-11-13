@@ -26,7 +26,7 @@ import type { AppEvent, Gym, Profile, StretchEvent } from "./types";
 import { clearWidget } from "./widget";
 import { clearPersonalKeys } from "./wipe";
 
-export { AUTO_END_MS, hrWindow, REST_PAUSE_SEC, warmingUp, type Active } from "./store/workout";
+export { AUTO_END_MS, hrWindow, partNow, REST_PAUSE_SEC, stretching, warmingUp, type Active } from "./store/workout";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,
@@ -188,7 +188,14 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const secs = Math.round(seconds);
       // A cool-down belongs to the workout it follows (workouts with parts, sessions.ts).
-      const sessionId = moment === "cool" ? coolDownHome(get().stats.sessions, now, secs) : undefined;
+      // A warm-up or cool-down done as a part of the workout in progress belongs to it.
+      const live = get().active;
+      const sessionId =
+        live && (moment === "warm" || moment === "cool")
+          ? live.sessionId
+          : moment === "cool"
+            ? coolDownHome(get().stats.sessions, now, secs)
+            : undefined;
       commit([{ type: "stretch", id: uid(), at: now, moment, ids, seconds: secs, ...(sessionId ? { sessionId } : {}) }]);
       track("feature", { name: "stretch", detail: `${moment}:${ids.length}` });
     },

@@ -159,18 +159,27 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
         let kcal = call.getDouble("kcal")
         let avgHr = call.getDouble("avgHr")
         let title = call.getString("title")
+        // The workout's parts (warm-up, lifting, rehab, cool-down), each written as a workout activity on iOS 16+.
+        let segments: [(kind: String, start: Date, end: Date)] = (call.getArray("segments") ?? []).compactMap { v in
+            guard let s = v as? JSObject, let kind = s["kind"] as? String, let a = (s["start"] as? NSNumber)?.doubleValue,
+                  let b = (s["end"] as? NSNumber)?.doubleValue, b > a else { return nil }
+            return (kind, Date(timeIntervalSince1970: a / 1000), Date(timeIntervalSince1970: b / 1000))
+        }
 
         // Already saved (a retry, or the same workout from a second device): leave it.
         let predicate = HKQuery.predicateForObjects(withMetadataKey: HKMetadataKeyExternalUUID, allowedValues: [id])
         let query = HKSampleQuery(sampleType: HKObjectType.workoutType(), predicate: predicate, limit: 1, sortDescriptors: nil) { [weak self] _, found, _ in
             guard let self else { return }
             if let found, !found.isEmpty { return call.resolve(["saved": true]) }
-            self.write(id: id, start: start, end: end, kcal: kcal, avgHr: avgHr, title: title, call: call)
+            self.write(id: id, start: start, end: end, kcal: kcal, avgHr: avgHr, title: title, segments: segments, call: call)
         }
         store.execute(query)
     }
 
-    private func write(id: String, start: Date, end: Date, kcal: Double?, avgHr: Double?, title: String?, call: CAPPluginCall) {
+    private func write(
+        id: String, start: Date, end: Date, kcal: Double?, avgHr: Double?, title: String?,
+        segments: [(kind: String, start: Date, end: Date)], call: CAPPluginCall
+    ) {
         let config = HKWorkoutConfiguration()
         config.activityType = .traditionalStrengthTraining
         config.locationType = .indoor
@@ -195,8 +204,23 @@ public class HealthWorkoutPlugin: CAPPlugin, CAPBridgedPlugin {
                     }
                 }
             }
-            if samples.isEmpty { return finish() }
-            builder.add(samples) { _, _ in finish() }
+            let withSamples = {
+                if samples.isEmpty { return finish() }
+                builder.add(samples) { _, _ in finish() }
+            }
+            // One activity per part. A part HealthKit won't take is left out; the workout is still saved.
+            guard #available(iOS 16.0, *), segments.count > 1 else { return withSamples() }
+            let group = DispatchGroup()
+            for seg in segments {
+                let c = HKWorkoutConfiguration()
+                c.activityType = (seg.kind == "warm" || seg.kind == "cool") ? .flexibility : .traditionalStrengthTraining
+                c.locationType = .indoor
+                group.enter()
+                builder.addWorkoutActivity(HKWorkoutActivity(workoutConfiguration: c, start: seg.start, end: seg.end, metadata: nil)) { _, _ in
+                    group.leave()
+                }
+            }
+            group.notify(queue: .main) { withSamples() }
         }
     }
 }

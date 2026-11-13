@@ -164,6 +164,10 @@ export const fr: FeaturesText = {
       name: "Étirements",
       body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour.",
     },
+    "workout-parts": {
+      name: "Séances en plusieurs parties",
+      body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série.",
+    },
     notes: {
       name: "Notes du coach",
       body: "Signale une fatigue qui s’accumule, un mouvement qui stagne, un muscle qui manque de séries, un objectif de la semaine menacé ou une masse grasse qui grimpe, chaque fois avec une chose à faire, souvent en une touche.",

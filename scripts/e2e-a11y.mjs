@@ -69,13 +69,19 @@ try {
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
   await page.getByRole("button", { name: "Done", exact: true }).click();
-  // Today after the workout says the day's done; Train again brings the plan (and its warm-up chip) back.
+  // Today after the workout says the day's done; Train again brings the plan (and its parts) back.
   await page.getByTestId("done-today").waitFor();
   await scan("done for today");
   await page.getByRole("button", { name: "Train again" }).click();
-  await page.getByRole("button", { name: "Warm up first" }).click();
+  // Workouts with parts: the warm-up switch above the plan, then today's warm-up.
+  await page
+    .getByTestId("today-parts")
+    .getByRole("switch", { name: /Warm-up/ })
+    .click();
+  await scan("today with parts");
+  await page.evaluate(() => (location.hash = "#/stretch/warmup"));
+  await page.getByTestId("stretch-routine").waitFor();
   await scan("warm-up");
-  await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);

@@ -156,6 +156,10 @@ export const es: FeaturesText = {
       name: "Estiramientos",
       body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día.",
     },
+    "workout-parts": {
+      name: "Entrenamientos por partes",
+      body: "Un entrenamiento puede hacer un calentamiento, las pesas y una vuelta a la calma en orden, con Saltar entre ellas. La pantalla de bloqueo y tu reloj muestran en qué parte estás, el historial muestra cada parte y los días de estiramientos de 10 minutos o más mantienen tu racha.",
+    },
     notes: {
       name: "Notas del entrenador",
       body: "Señala fatiga acumulada, un ejercicio estancado, un músculo con pocas series, una meta semanal en riesgo o grasa corporal en aumento, cada una con algo que hacer, a menudo con un solo toque.",

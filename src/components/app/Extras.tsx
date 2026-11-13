@@ -195,19 +195,6 @@ export function PlanExtras() {
         <Icon name="layers" size={15} />
         <span className="truncate">{routine ? routine.name : tr("x.routines")}</span>
       </button>
-      {preview.items.length > 0 && (
-        <button
-          type="button"
-          onClick={() => {
-            haptic("tick");
-            go("stretch", "warmup");
-          }}
-          className="press inline-flex min-h-11 items-center gap-1.5 rounded-full border border-line bg-surface px-3.5 text-muted"
-        >
-          <Icon name="stretch" size={15} />
-          {tr("x.warmUp")}
-        </button>
-      )}
       <button
         type="button"
         onClick={() => setBuddyOpen(true)}

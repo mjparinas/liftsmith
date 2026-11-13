@@ -163,6 +163,10 @@ export const de: FeaturesText = {
       name: "Dehnen",
       body: "48 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag.",
     },
+    "workout-parts": {
+      name: "Training in Teilen",
+      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie.",
+    },
     notes: {
       name: "Coach-Notizen",
       body: "Weist auf wachsende Ermüdung, eine stagnierende Übung, einen Muskel mit zu wenigen Sätzen, ein gefährdetes Wochenziel oder steigendes Körperfett hin, jeweils mit einer Sache, die du tun kannst, oft mit einem Tippen.",
