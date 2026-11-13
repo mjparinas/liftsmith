@@ -43,7 +43,15 @@ const TIMEOUT_MS = 4000;
 
 /** Coaching pushes (trainer mode, 2026-11-12): a chat message, and the coach's alerts about a client. */
 export type CoachPushKind =
-  "coachMsg" | "coachTrained" | "coachQuiet" | "coachCheckin" | "coachCheckinDone" | "coachBooked" | "coachCancelled" | "coachPaid";
+  | "coachMsg"
+  | "coachTrained"
+  | "coachQuiet"
+  | "coachCheckin"
+  | "coachCheckinDone"
+  | "coachBooked"
+  | "coachCancelled"
+  | "coachPaid"
+  | "coachFull";
 
 export interface PushMessage {
   token: string;

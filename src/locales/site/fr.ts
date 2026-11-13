@@ -309,6 +309,17 @@ export const fr: SiteText = {
     endTitle: "Votre première séance est gratuite",
     endBody:
       "Commencez avec la formule gratuite, essayez Pro gratuitement pendant {days} jours quand vous êtes prêt, et résiliez en deux touchers.",
+    coach: {
+      title: "Coacher des clients",
+      intro:
+        "Pro inclut le coaching de quelques clients : vous pouvez l'essayer avec de vraies personnes. Quand votre clientèle grandit, choisissez un forfait coach. Tous les outils de coaching fonctionnent avec chaque forfait.",
+      upTo: "Jusqu'à {n} clients",
+      noLimit: "Sans limite fixe de clients",
+      inPro: "Inclus dans Pro",
+      orMonthly: "ou {monthly} par mois",
+      free: "Vos clients s'entraînent toujours gratuitement, les entraîneurs de lycée qui confirment une adresse scolaire ont Pro gratuitement, et {name} ne prend rien sur ce que vos clients vous paient.",
+      cta: "Liftsmith pour les coachs",
+    },
   },
   faqs: [
     {
@@ -461,8 +472,8 @@ export const fr: SiteText = {
     },
     cost: {
       title: "Combien ça coûte",
-      body: "Coacher des clients fait partie de {name} Pro ({annual} par an ou {monthly} par mois), jusqu'à 30 clients. Être client est gratuit : toute personne que vous invitez peut commencer sans payer.",
-      contactBefore: "Vous coachez plus de monde ? ",
+      body: "Coacher jusqu'à {proClients} clients fait partie de {name} Pro ({annual} par an ou {monthly} par mois) : vous pouvez l'essayer avec de vrais clients. Coach offre de la place pour {coachClients} clients ({coachAnnual} par an ou {coachMonthly} par mois) et Coach Plus n'a pas de limite fixe ({coachPlusAnnual} par an ou {coachPlusMonthly} par mois). Tous les outils de coaching fonctionnent avec chaque forfait. Être client est toujours gratuit, et nous ne prenons rien sur ce que vos clients vous paient.",
+      contactBefore: "Des questions sur les forfaits coach ? ",
       contactLink: "Dites-nous ce dont vous avez besoin.",
     },
     faqTitle: "Questions de coachs",

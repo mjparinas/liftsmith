@@ -10,8 +10,14 @@
 // Configured in Vercel, never in the repo: STRIPE_SECRET_KEY (a restricted or secret key), STRIPE_WEBHOOK_SECRET
 // (the endpoint's whsec_ signing secret), STRIPE_PRICE_MONTHLY and STRIPE_PRICE_ANNUAL (price ids). Until all four
 // are set the web app sells nothing and everything stays unlocked there, as before.
+//
+// Coach plans (src/lib/coachPlans.ts, docs/decisions/money.md "Coach plans") are two more products on the same account,
+// each with a monthly and an annual price: STRIPE_PRICE_COACH_MONTHLY and STRIPE_PRICE_COACH_ANNUAL, and
+// STRIPE_PRICE_COACH_PLUS_MONTHLY and STRIPE_PRICE_COACH_PLUS_ANNUAL. A tier is sold on the web once both of its prices
+// are set. A lifter already paying for Pro on the web moves their one subscription to the coach price (no second bill).
 import { createHmac, timingSafeEqual } from "node:crypto";
 
+import { isCoachTier, isPaidCoachTier, type CoachTier, type PaidCoachTier } from "@/lib/coachPlans";
 import { SITE_URL } from "@/lib/site";
 
 import { claimFromStore, findCode } from "./creators";
@@ -36,6 +42,8 @@ export interface StripeConfig {
   secret: string;
   webhook: string;
   prices: Record<WebPlan, string>;
+  /** Coach plans' prices, for each tier whose two prices are set. */
+  coachPrices: Partial<Record<PaidCoachTier, Record<WebPlan, string>>>;
   /** Live keys only take live events, test keys only test ones. */
   live: boolean;
 }
@@ -48,7 +56,14 @@ export function stripeConfig(env: Env = process.env): StripeConfig | null {
   if (!secret || !webhook || !monthly || !annual) return null;
   // A publishable key here would build fine and then fail every call: refuse it so the web app stays unlocked.
   if (!/^(sk|rk)_(live|test)_/.test(secret)) return null;
-  return { secret, webhook, prices: { monthly, annual }, live: /_live_/.test(secret) };
+  const coachPrices: StripeConfig["coachPrices"] = {};
+  for (const [tier, m, a] of [
+    ["coach", env.STRIPE_PRICE_COACH_MONTHLY, env.STRIPE_PRICE_COACH_ANNUAL],
+    ["coachPlus", env.STRIPE_PRICE_COACH_PLUS_MONTHLY, env.STRIPE_PRICE_COACH_PLUS_ANNUAL],
+  ] as const) {
+    if (m?.trim() && a?.trim()) coachPrices[tier] = { monthly: m.trim(), annual: a.trim() };
+  }
+  return { secret, webhook, prices: { monthly, annual }, coachPrices, live: /_live_/.test(secret) };
 }
 
 // ---------- Talking to Stripe ----------
@@ -120,6 +135,31 @@ export async function webPrices(cfg: StripeConfig, now = Date.now(), f: Fetch = 
 
 export function resetPriceCache() {
   priceCache = null;
+  coachPriceCache = null;
+}
+
+export interface CoachWebPrice extends WebPrice {
+  tier: PaidCoachTier;
+}
+
+let coachPriceCache: { at: number; key: string; prices: CoachWebPrice[] } | null = null;
+
+/** The coach plans' prices from Stripe (each tier annual first), for the tiers the web sells; cached like webPrices. */
+export async function coachWebPrices(cfg: StripeConfig, now = Date.now(), f: Fetch = fetch): Promise<CoachWebPrice[]> {
+  const key = JSON.stringify(cfg.coachPrices);
+  if (coachPriceCache && coachPriceCache.key === key && now - coachPriceCache.at < 600_000) return coachPriceCache.prices;
+  const out: CoachWebPrice[] = [];
+  for (const tier of ["coach", "coachPlus"] as PaidCoachTier[]) {
+    const ids = cfg.coachPrices[tier];
+    if (!ids) continue;
+    for (const plan of ["annual", "monthly"] as WebPlan[]) {
+      const p = await call<{ unit_amount: number | null; currency: string; active: boolean }>(cfg, "GET", `/prices/${ids[plan]}`, {}, f);
+      if (p.active && typeof p.unit_amount === "number")
+        out.push({ tier, plan, amount: p.unit_amount, currency: p.currency.toUpperCase() });
+    }
+  }
+  coachPriceCache = { at: now, key, prices: out };
+  return out;
 }
 
 // ---------- Trials ----------
@@ -172,11 +212,16 @@ export interface CheckoutInput {
   installId: string | null;
   code: string | null;
   trialDays: number | null;
+  /** A coach plan instead of Pro (no trial: Pro's own trial and its 3 clients are the way to try coaching). */
+  tier?: PaidCoachTier;
 }
 
 /** Where Stripe sends the lifter back: always our own site (never an address from the request), into the app. */
 export const RETURN_URLS = {
   paid: `${SITE_URL}/app/#/pro/paid`,
+  /** A coach plan comes back to Coaching, which waits for the plan to reach the account. */
+  coachPaid: `${SITE_URL}/app/#/trainer/plan`,
+  coachCancelled: `${SITE_URL}/app/#/trainer`,
   cancelled: `${SITE_URL}/app/#/pro/settings`,
   portal: `${SITE_URL}/app/#/pro/settings`,
 };
@@ -184,15 +229,17 @@ export const RETURN_URLS = {
 /** A Stripe Checkout page for one plan. The account, install and code ride along as metadata for the webhook. */
 export async function checkoutUrl(cfg: StripeConfig, input: CheckoutInput, f: Fetch = fetch): Promise<string> {
   const customer = await customerFor(cfg, input.accountId, input.email, f);
-  const meta = { account_id: input.accountId, install_id: input.installId, creator_code: input.code, plan: input.plan };
+  const meta = { account_id: input.accountId, install_id: input.installId, creator_code: input.code, plan: input.plan, tier: input.tier };
+  const price = input.tier ? cfg.coachPrices[input.tier]?.[input.plan] : cfg.prices[input.plan];
+  if (!price) throw new StripeError("That plan isn't sold on the web", 400);
   const params: Record<string, Param> = {
     mode: "subscription",
     customer,
     client_reference_id: input.accountId,
-    "line_items[0][price]": cfg.prices[input.plan],
+    "line_items[0][price]": price,
     "line_items[0][quantity]": 1,
-    success_url: RETURN_URLS.paid,
-    cancel_url: RETURN_URLS.cancelled,
+    success_url: input.tier ? RETURN_URLS.coachPaid : RETURN_URLS.paid,
+    cancel_url: input.tier ? RETURN_URLS.coachCancelled : RETURN_URLS.cancelled,
     "subscription_data[trial_period_days]": input.trialDays ?? undefined,
     // Cancel rather than bill if the card was never added during a trial (it always is, but be safe).
     "subscription_data[trial_settings][end_behavior][missing_payment_method]": input.trialDays ? "cancel" : undefined,
@@ -204,6 +251,44 @@ export async function checkoutUrl(cfg: StripeConfig, input: CheckoutInput, f: Fe
   const s = await call<{ url: string | null }>(cfg, "POST", "/checkout/sessions", params, f);
   if (!s.url) throw new StripeError("Stripe gave no checkout page", 502);
   return s.url;
+}
+
+/**
+ * Moves the account's live web subscription to a coach plan's price, so a lifter who pays for Pro on the web upgrades
+ * without a second subscription. Stripe bills the difference for the rest of the period straight away; a free trial
+ * ends now, because the trial is for Pro. Returns false when there's no live web subscription to move.
+ */
+export async function moveWebSub(
+  cfg: StripeConfig,
+  accountId: string,
+  tier: PaidCoachTier,
+  plan: WebPlan,
+  f: Fetch = fetch,
+  now = Date.now(),
+) {
+  const price = cfg.coachPrices[tier]?.[plan];
+  if (!price) throw new StripeError("That plan isn't sold on the web", 400);
+  const row = await liveSubRow(accountId, now);
+  if (!row) return false;
+  const sub = await call<StripeSub>(cfg, "GET", `/subscriptions/${row.id}`, {}, f);
+  const item = (sub.items?.data?.[0] as { id?: string } | undefined)?.id;
+  if (!item) return false;
+  await call(
+    cfg,
+    "POST",
+    `/subscriptions/${row.id}`,
+    {
+      "items[0][id]": item,
+      "items[0][price]": price,
+      proration_behavior: "always_invoice",
+      trial_end: sub.status === "trialing" ? "now" : undefined,
+      cancel_at_period_end: false,
+      "metadata[tier]": tier,
+      "metadata[plan]": plan,
+    },
+    f,
+  );
+  return true;
 }
 
 /** Stripe's customer portal for the account: change plan, update the card, cancel, see invoices. */
@@ -300,6 +385,18 @@ export function microsOf(amount: number, currency: string): number {
   return Math.round(Math.abs(amount) * (ZERO_DECIMAL.has(currency.toUpperCase()) ? 1_000_000 : 10_000));
 }
 
+/** Which tier a subscription is on: its price id against the coach prices, else its metadata, else Pro. */
+export function subTier(sub: StripeSub, cfg: Pick<StripeConfig, "coachPrices"> | null): CoachTier {
+  const id = sub.items?.data?.[0]?.price?.id;
+  if (id && cfg)
+    for (const tier of ["coach", "coachPlus"] as PaidCoachTier[]) {
+      const p = cfg.coachPrices[tier];
+      if (p && (p.monthly === id || p.annual === id)) return tier;
+    }
+  const m = sub.metadata?.tier;
+  return isPaidCoachTier(m) ? m : "pro";
+}
+
 /** Which plan a subscription is on: its price id against ours, else the price's interval. */
 export function subPlan(sub: StripeSub, cfg: Pick<StripeConfig, "prices"> | null): WebPlan | null {
   const price = sub.items?.data?.[0]?.price;
@@ -363,7 +460,7 @@ function subEvent(
  */
 export async function storeStripeEvent(
   e: StripeEvent,
-  cfg: Pick<StripeConfig, "prices" | "live"> | null,
+  cfg: (Pick<StripeConfig, "prices" | "live"> & Partial<Pick<StripeConfig, "coachPrices">>) | null,
   now = Date.now(),
 ): Promise<{ stored: boolean; eventId: string | null }> {
   if (!e?.id || !e.type || !e.data?.object) return { stored: false, eventId: null };
@@ -378,15 +475,16 @@ export async function storeStripeEvent(
     const sub = e.data.object as StripeSub;
     const account = await accountOfCustomer(sub.customer, sub.metadata);
     const plan = subPlan(sub, cfg);
+    const tier = subTier(sub, cfg ? { coachPrices: cfg.coachPrices ?? {} } : null);
     const end = periodEnd(sub);
     const status = e.type === "customer.subscription.deleted" ? "canceled" : sub.status;
     const install = sub.metadata?.install_id ?? null;
     if (account) {
       stmts.push({
-        sql: `INSERT INTO stripe_subscriptions (id, account_id, customer_id, status, plan, period_end, trial_end, cancel_at_period_end, install_id, updated_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        sql: `INSERT INTO stripe_subscriptions (id, account_id, customer_id, status, plan, period_end, trial_end, cancel_at_period_end, install_id, updated_at, tier)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
               ON CONFLICT(id) DO UPDATE SET status = excluded.status, plan = COALESCE(excluded.plan, plan), period_end = COALESCE(excluded.period_end, period_end),
-              trial_end = excluded.trial_end, cancel_at_period_end = excluded.cancel_at_period_end, updated_at = excluded.updated_at
+              trial_end = excluded.trial_end, cancel_at_period_end = excluded.cancel_at_period_end, updated_at = excluded.updated_at, tier = excluded.tier
               WHERE excluded.updated_at >= stripe_subscriptions.updated_at`,
         args: [
           sub.id,
@@ -399,6 +497,7 @@ export async function storeStripeEvent(
           sub.cancel_at_period_end ? 1 : 0,
           install,
           at,
+          tier,
         ],
       });
       stmts.push({
@@ -486,37 +585,52 @@ export async function storeStripeEvent(
 
 export interface WebSub {
   plan: WebPlan | null;
+  /** The coach plan tier it's on (Pro for a plain Pro subscription). */
+  tier?: CoachTier;
   trial: boolean;
   expiresAt: number | null;
   willRenew: boolean;
   status: string;
 }
 
-/** The account's web subscription that gives Pro now, if any. */
-export async function webSub(accountId: string, now = Date.now()): Promise<WebSub | null> {
-  const rows = await query<{
-    status: string;
-    plan: string | null;
-    period_end: number | null;
-    trial_end: number | null;
-    cancel_at_period_end: number;
-  }>(
-    "SELECT status, plan, period_end, trial_end, cancel_at_period_end FROM stripe_subscriptions WHERE account_id = ? ORDER BY period_end DESC",
+interface SubRow {
+  id: string;
+  status: string;
+  plan: string | null;
+  period_end: number | null;
+  trial_end: number | null;
+  cancel_at_period_end: number;
+  tier: string | null;
+}
+
+/** The account's web subscription row that gives Pro now: the highest coach tier first, then the latest period end. */
+async function liveSubRow(accountId: string, now: number): Promise<SubRow | null> {
+  const rows = await query<SubRow>(
+    `SELECT id, status, plan, period_end, trial_end, cancel_at_period_end, tier FROM stripe_subscriptions WHERE account_id = ?
+     ORDER BY CASE tier WHEN 'coachPlus' THEN 2 WHEN 'coach' THEN 1 ELSE 0 END DESC, period_end DESC`,
     [accountId],
   );
   for (const r of rows) {
     const end = r.period_end == null ? null : Number(r.period_end);
     if (!PRO_STATUSES.has(String(r.status))) continue;
     if (end != null && end + WEB_GRACE_MS <= now) continue;
-    return {
-      plan: r.plan === "annual" || r.plan === "monthly" ? r.plan : null,
-      trial: r.status === "trialing",
-      expiresAt: end,
-      willRenew: !Number(r.cancel_at_period_end),
-      status: String(r.status),
-    };
+    return r;
   }
   return null;
+}
+
+/** The account's web subscription that gives Pro now, if any. */
+export async function webSub(accountId: string, now = Date.now()): Promise<WebSub | null> {
+  const r = await liveSubRow(accountId, now);
+  if (!r) return null;
+  return {
+    plan: r.plan === "annual" || r.plan === "monthly" ? r.plan : null,
+    tier: isCoachTier(r.tier) ? r.tier : "pro",
+    trial: r.status === "trialing",
+    expiresAt: r.period_end == null ? null : Number(r.period_end),
+    willRenew: !Number(r.cancel_at_period_end),
+    status: String(r.status),
+  };
 }
 
 /**

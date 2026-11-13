@@ -8,6 +8,8 @@
 // Docs: https://www.revenuecat.com/docs/integrations/webhooks/event-types-and-fields
 import { timingSafeEqual } from "node:crypto";
 
+import { higherTier, tierFromStore, type CoachTier } from "@/lib/coachPlans";
+
 import { claimFromStore } from "./creators";
 import { batch } from "./db";
 
@@ -17,6 +19,8 @@ export interface RcEvent {
   app_user_id?: string;
   original_app_user_id?: string;
   product_id?: string;
+  /** PRODUCT_CHANGE: the product the subscriber is moving to. */
+  new_product_id?: string;
   period_type?: string;
   event_timestamp_ms?: number;
   expiration_at_ms?: number | null;
@@ -84,6 +88,18 @@ export function authorized(header: string | null, secret: string | undefined): b
   return got.length === want.length && timingSafeEqual(got, want);
 }
 
+/**
+ * The coach plan tier an event leaves the install on, or null when the event doesn't say. A product change to a higher
+ * tier (an upgrade, which the stores apply at once) counts straight away; a move down waits for the renewal that
+ * applies it, so nobody loses room before the period they paid for ends.
+ */
+export function tierOfEvent(e: RcEvent): CoachTier | null {
+  if (!e.product_id && !e.entitlement_ids?.length) return null;
+  const now = tierFromStore(e.entitlement_ids, e.product_id);
+  if (e.type === "PRODUCT_CHANGE" && e.new_product_id) return higherTier(now, tierFromStore(null, e.new_product_id));
+  return now;
+}
+
 /** Stores one webhook event. Sandbox purchases (testers, App Review) are kept out of the numbers. */
 export async function storeRcEvent(e: RcEvent, now = Date.now()): Promise<"stored" | "ignored"> {
   if (!e?.id || !e.type) return "ignored";
@@ -119,11 +135,23 @@ export async function storeRcEvent(e: RcEvent, now = Date.now()): Promise<"store
     const expires = e.expiration_at_ms ?? null;
     const active = k?.kind === "expire" || k?.kind === "refund" ? 0 : expires == null || expires > now ? 1 : 0;
     stmts.push({
-      sql: `INSERT INTO entitlements (app_user_id, active, plan, period, store, expires_at, family, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      // The tier (coach plans, coachPlans.ts) follows the product the event is about, so an upgrade or downgrade moves it.
+      sql: `INSERT INTO entitlements (app_user_id, active, plan, period, store, expires_at, family, updated_at, tier) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(app_user_id) DO UPDATE SET active = excluded.active, plan = COALESCE(excluded.plan, plan), period = COALESCE(excluded.period, period),
-            store = excluded.store, expires_at = COALESCE(excluded.expires_at, expires_at), family = excluded.family, updated_at = excluded.updated_at
+            store = excluded.store, expires_at = COALESCE(excluded.expires_at, expires_at), family = excluded.family, updated_at = excluded.updated_at,
+            tier = CASE WHEN excluded.tier IS NULL THEN tier ELSE excluded.tier END
             WHERE excluded.updated_at >= entitlements.updated_at`,
-      args: [user, active, planOf(e.product_id), e.period_type ?? null, storeOf(e.store), expires, e.is_family_share ? 1 : 0, at],
+      args: [
+        user,
+        active,
+        planOf(e.product_id),
+        e.period_type ?? null,
+        storeOf(e.store),
+        expires,
+        e.is_family_share ? 1 : 0,
+        at,
+        tierOfEvent(e),
+      ],
     });
   }
   await batch(stmts);

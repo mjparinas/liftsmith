@@ -580,6 +580,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         pro: "coaching",
         added: "2026-11-13",
       },
+      {
+        id: "coach-plans",
+        name: "Coach plans that grow with your client list",
+        body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and Liftsmith takes nothing from what they pay you.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
     ],
   },
   {

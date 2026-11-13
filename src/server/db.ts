@@ -1032,6 +1032,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
+  // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
+  ["entitlements", "tier", "TEXT"],
+  ["stripe_subscriptions", "tier", "TEXT"],
 ];
 
 let client: Client | null = null;

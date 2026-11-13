@@ -11,6 +11,7 @@ import type { Sessions, Slot } from "./booking";
 import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } from "./checkins";
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import type { ClientPay, OverviewPay } from "./coachPay";
+import type { ClientLimits, CoachTier } from "./coachPlans";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
@@ -86,6 +87,18 @@ export interface Overview {
   sessions?: Sessions;
   /** Client payments, once the server has Stripe Connect (null until then). */
   pay?: OverviewPay | null;
+  /** This account's coach plan: tier, client limit and clients (src/server/coachPlan.ts). */
+  plan?: CoachPlanInfo;
+}
+/** The server's CoachPlan (coach plans, src/lib/coachPlans.ts). */
+export interface CoachPlanInfo {
+  live: boolean;
+  tier: CoachTier;
+  via: "web" | "play" | "appstore" | "review" | "school" | null;
+  limit: number;
+  clients: number;
+  limits: ClientLimits;
+  graceUntil: number | null;
 }
 /** A chat message between a coach and a client. */
 export interface Message {

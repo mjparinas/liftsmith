@@ -295,6 +295,17 @@ export const ja: SiteText = {
     termsAfter: "をご覧ください。",
     endTitle: "最初のワークアウトは無料",
     endBody: "無料プランで始めて、準備ができたら Pro を{days}日間無料で試し、2タップで解約できます。",
+    coach: {
+      title: "クライアントの指導",
+      intro:
+        "Pro には少人数のクライアント指導が含まれるので、実際の人と試せます。クライアントが増えたら、コーチプランを選んでください。コーチング機能はどのプランでもすべて使えます。",
+      upTo: "クライアント{n}人まで",
+      noLimit: "クライアント数の上限なし",
+      inPro: "Pro に含まれます",
+      orMonthly: "または月{monthly}",
+      free: "クライアントはいつでも無料でトレーニングでき、学校のメールを確認した高校のコーチは Pro が無料です。クライアントからの支払いから{name}が受け取る分はありません。",
+      cta: "コーチ向け Liftsmith",
+    },
   },
   faqs: [
     {
@@ -439,8 +450,8 @@ export const ja: SiteText = {
     },
     cost: {
       title: "料金",
-      body: "クライアントの指導は{name} Pro（年{annual}、または月{monthly}）の機能で、最大30人まで指導できます。クライアントになるのは無料なので、招待した人は誰でも支払いなしで始められます。",
-      contactBefore: "もっと多くの人を指導していますか？",
+      body: "クライアント{proClients}人までの指導は{name} Pro（年{annual}、または月{monthly}）に含まれるので、実際のクライアントで試せます。Coach はクライアント{coachClients}人まで（年{coachAnnual}、または月{coachMonthly}）、Coach Plus は上限なし（年{coachPlusAnnual}、または月{coachPlusMonthly}）です。コーチング機能はどのプランでもすべて使えます。クライアントになるのはいつでも無料で、クライアントからの支払いから私たちが受け取る分はありません。",
+      contactBefore: "コーチプランについての質問は？",
       contactLink: "必要なことを教えてください。",
     },
     faqTitle: "コーチからのよくある質問",
