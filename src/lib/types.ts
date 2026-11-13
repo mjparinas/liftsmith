@@ -408,6 +408,18 @@ export interface Routine {
    * exercise as written instead of skipping or lightening it, and asks about pain between sets.
    */
   rehab?: boolean;
+  /**
+   * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
+   * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
+   */
+  parts?: RoutinePart[];
+}
+
+/** A stretching part of a routine. The lifting (or rehab) part is the routine's `items`. */
+export interface RoutinePart {
+  kind: "warm" | "cool";
+  /** Stretch ids in order; empty or missing lets the app pick for the day's muscles. */
+  stretches?: string[];
 }
 
 export interface DelightPrefs {

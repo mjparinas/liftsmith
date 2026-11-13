@@ -138,6 +138,14 @@ export const en = {
   "str.part.warmWhy": "Readies today's muscles first: {muscles}.",
   "str.part.coolWhy": "Stretches what you'll train while it's warm: {muscles}.",
   "str.part.minutes": "about {n} min",
+  "str.part.routineTitle": "Warm-up and cool-down",
+  "str.part.routineWarm": "Warm-up first",
+  "str.part.routineCool": "Cool-down after",
+  "str.part.auto": "Stretches picked on the day for the muscles you train.",
+  "str.part.choose": "Choose stretches",
+  "str.part.chosen": "Done",
+  "str.part.pickHint": "Pick none and the app picks them on the day.",
+  "str.part.withStretches": { one: "{part} ({count} stretch)", other: "{part} ({count} stretches)" },
 } as const;
 
 type Key = keyof typeof en;
@@ -284,6 +292,14 @@ export const es: Partial<Record<Key, Message>> = {
   "str.part.warmWhy": "Prepara primero los músculos de hoy: {muscles}.",
   "str.part.coolWhy": "Estira lo que vas a entrenar mientras está caliente: {muscles}.",
   "str.part.minutes": "unos {n} min",
+  "str.part.routineTitle": "Calentamiento y vuelta a la calma",
+  "str.part.routineWarm": "Calentamiento antes",
+  "str.part.routineCool": "Vuelta a la calma después",
+  "str.part.auto": "Estiramientos elegidos el día para los músculos que entrenas.",
+  "str.part.choose": "Elegir estiramientos",
+  "str.part.chosen": "Listo",
+  "str.part.pickHint": "Si no eliges ninguno, la app los elige ese día.",
+  "str.part.withStretches": { one: "{part} ({count} estiramiento)", other: "{part} ({count} estiramientos)" },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -431,6 +447,14 @@ export const fr: Partial<Record<Key, Message>> = {
   "str.part.warmWhy": "Prépare d’abord les muscles du jour : {muscles}.",
   "str.part.coolWhy": "Étire ce que vous allez travailler, tant que c’est chaud : {muscles}.",
   "str.part.minutes": "environ {n} min",
+  "str.part.routineTitle": "Échauffement et retour au calme",
+  "str.part.routineWarm": "Échauffement avant",
+  "str.part.routineCool": "Retour au calme après",
+  "str.part.auto": "Étirements choisis le jour même pour les muscles travaillés.",
+  "str.part.choose": "Choisir les étirements",
+  "str.part.chosen": "Terminé",
+  "str.part.pickHint": "Sans choix, l’appli les choisit le jour même.",
+  "str.part.withStretches": { one: "{part} ({count} étirement)", other: "{part} ({count} étirements)" },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -576,6 +600,14 @@ export const de: Partial<Record<Key, Message>> = {
   "str.part.warmWhy": "Bereitet zuerst die heutigen Muskeln vor: {muscles}.",
   "str.part.coolWhy": "Dehnt, was du trainierst, solange es warm ist: {muscles}.",
   "str.part.minutes": "etwa {n} Min.",
+  "str.part.routineTitle": "Aufwärmen und Cool-down",
+  "str.part.routineWarm": "Vorher aufwärmen",
+  "str.part.routineCool": "Danach Cool-down",
+  "str.part.auto": "Dehnübungen werden am Tag für die trainierten Muskeln gewählt.",
+  "str.part.choose": "Dehnübungen wählen",
+  "str.part.chosen": "Fertig",
+  "str.part.pickHint": "Wählst du keine, wählt die App sie am Tag aus.",
+  "str.part.withStretches": { one: "{part} ({count} Dehnübung)", other: "{part} ({count} Dehnübungen)" },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -719,6 +751,14 @@ export const it: Partial<Record<Key, Message>> = {
   "str.part.warmWhy": "Prepara prima i muscoli di oggi: {muscles}.",
   "str.part.coolWhy": "Allunga ciò che allenerai finché è caldo: {muscles}.",
   "str.part.minutes": "circa {n} min",
+  "str.part.routineTitle": "Riscaldamento e defaticamento",
+  "str.part.routineWarm": "Riscaldamento prima",
+  "str.part.routineCool": "Defaticamento dopo",
+  "str.part.auto": "Allungamenti scelti il giorno stesso per i muscoli che alleni.",
+  "str.part.choose": "Scegli gli allungamenti",
+  "str.part.chosen": "Fatto",
+  "str.part.pickHint": "Se non ne scegli nessuno, li sceglie l’app quel giorno.",
+  "str.part.withStretches": { one: "{part} ({count} allungamento)", other: "{part} ({count} allungamenti)" },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -854,4 +894,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "str.part.warmWhy": "まず今日の筋肉を準備します：{muscles}。",
   "str.part.coolWhy": "温まっているうちに今日鍛える部位を伸ばします：{muscles}。",
   "str.part.minutes": "約{n}分",
+  "str.part.routineTitle": "ウォームアップとクールダウン",
+  "str.part.routineWarm": "最初にウォームアップ",
+  "str.part.routineCool": "最後にクールダウン",
+  "str.part.auto": "当日に鍛える筋肉に合わせてストレッチを選びます。",
+  "str.part.choose": "ストレッチを選ぶ",
+  "str.part.chosen": "完了",
+  "str.part.pickHint": "選ばなければ当日にアプリが選びます。",
+  "str.part.withStretches": { other: "{part}（ストレッチ{count}個）" },
 };

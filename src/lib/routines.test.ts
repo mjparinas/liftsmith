@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { defaultProfile, makeGym } from "./defaults";
 import { generate } from "./generator";
-import { cleanRoutine, doneItems, moveItem, planFromRoutine, routineFrom, upsertRoutine } from "./routines";
+import { cleanParts, cleanRoutine, doneItems, moveItem, partDefaults, planFromRoutine, routineFrom, upsertRoutine } from "./routines";
 import type { AppEvent, Routine } from "./types";
 
 const NOW = Date.UTC(2026, 10, 9, 18);
@@ -120,5 +120,27 @@ describe("routines", () => {
     list = upsertRoutine(list, { ...list[10], name: "Renamed" }, NOW + 100);
     expect(list[0].name).toBe("Renamed");
     expect(list).toHaveLength(50);
+  });
+});
+
+describe("routine parts (workouts with parts, stage 3)", () => {
+  it("keeps one warm-up then one cool-down, with known stretches of their own kind", () => {
+    expect(
+      cleanParts([
+        { kind: "cool", stretches: ["doorway-chest", "march"] },
+        { kind: "warm", stretches: ["jacks", "jacks"] },
+        { kind: "warm" },
+      ]),
+    ).toEqual([
+      { kind: "warm", stretches: ["jacks"] },
+      { kind: "cool", stretches: ["doorway-chest"] },
+    ]);
+    expect(cleanParts([])).toBeUndefined();
+  });
+
+  it("starts a routine's parts as it says, and otherwise follows the warm-up setting", () => {
+    expect(partDefaults({ parts: [{ kind: "cool" }] }, true)).toEqual({ warm: false, cool: true });
+    expect(partDefaults(undefined, true)).toEqual({ warm: true, cool: false });
+    expect(partDefaults({}, undefined)).toEqual({ warm: false, cool: false });
   });
 });

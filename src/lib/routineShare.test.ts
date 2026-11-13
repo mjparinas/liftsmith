@@ -72,3 +72,35 @@ describe("routine links", () => {
     expect(sameItems(items, items.slice(0, 2))).toBe(false);
   });
 });
+
+describe("routine links with parts (workouts with parts, stage 3)", () => {
+  const parts = [{ kind: "warm" as const, stretches: ["march", "jacks"] }, { kind: "cool" as const }];
+
+  it("carries a warm-up with its stretches and a cool-down left to the day", () => {
+    const code = encodeRoutine({ name: "A", items: [{ exerciseId: "bench-press", sets: 3 }], parts });
+    expect(code).toBe("r1~QQ~bench-press.3~w:march,jacks~d");
+    expect(decodeRoutine(code)).toEqual({ name: "A", items: [{ exerciseId: "bench-press", sets: 3 }], parts });
+  });
+
+  it("keeps the rehab mark last, where older apps look for it", () => {
+    const code = encodeRoutine({ name: "A", items: [{ exerciseId: "bench-press", sets: 3 }], parts, rehab: true });
+    expect(code.endsWith("~d~rehab")).toBe(true);
+    expect(decodeRoutine(code)).toMatchObject({ rehab: true, parts });
+  });
+
+  it("drops stretches it doesn't know or of the wrong kind, and a second warm-up", () => {
+    expect(decodeRoutine("r1~QQ~bench-press.3~w:march,not-a-stretch,doorway-chest~w:jacks")!.parts).toEqual([
+      { kind: "warm", stretches: ["march"] },
+    ]);
+  });
+
+  it("reads as a plain routine where parts aren't understood: the markers aren't exercises", () => {
+    const code = encodeRoutine({ name: "A", items: [{ exerciseId: "bench-press", sets: 3 }], parts });
+    // What an older app does: keep only segments that are known exercises.
+    const exerciseSegments = code
+      .split("~")
+      .slice(2)
+      .filter((p) => p.includes("."));
+    expect(exerciseSegments).toEqual(["bench-press.3"]);
+  });
+});

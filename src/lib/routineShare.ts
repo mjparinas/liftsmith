@@ -1,9 +1,9 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
-import { clampSets, MAX_ITEMS, NAME_MAX } from "./routines";
+import { clampSets, cleanParts, MAX_ITEMS, NAME_MAX } from "./routines";
 import { APP_PATH, SITE_URL } from "./site";
 import { linksOf, withLinks } from "./superset";
-import type { Routine, RoutineItem } from "./types";
+import type { Routine, RoutineItem, RoutinePart } from "./types";
 
 // Sharing a routine (Melvin, 2026-11-11: "share routines with other users"). The routine travels in
 // the link itself, like a remix link: its name, the exercises in order, set counts and supersets.
@@ -16,6 +16,28 @@ const SHARE_VERSION = "r1";
  * as an exercise they don't know and drop it, so the routine still opens there as a plain one.
  */
 const REHAB_MARK = "rehab";
+/**
+ * Workouts with parts (stage 3): a warm-up or cool-down travels as `w` or `d`, with its stretches after a colon
+ * (`w:cat-cow,leg-swings`). They sit after the exercises and before the rehab mark. Older apps read them as exercises
+ * they don't know and drop them, so the routine still opens there with its exercises, which is why the version stays r1.
+ */
+const PART_MARK: Record<RoutinePart["kind"], string> = { warm: "w", cool: "d" };
+
+function partsOut(parts: readonly RoutinePart[] | undefined): string[] {
+  return (cleanParts(parts) ?? []).map((p) => PART_MARK[p.kind] + (p.stretches?.length ? `:${p.stretches.join(",")}` : ""));
+}
+
+function partsIn(segments: readonly string[]): RoutinePart[] | undefined {
+  const found: RoutinePart[] = [];
+  for (const seg of segments) {
+    const [mark, list = ""] = seg.split(":");
+    const kind = mark === PART_MARK.warm ? "warm" : mark === PART_MARK.cool ? "cool" : null;
+    if (!kind || found.some((p) => p.kind === kind)) continue;
+    const stretches = list.split(",").filter(Boolean);
+    found.push(stretches.length ? { kind, stretches } : { kind });
+  }
+  return cleanParts(found);
+}
 
 const safeDecode = (s: string) => {
   try {
@@ -41,13 +63,16 @@ function nameIn(code: string): string {
   }
 }
 
-/** The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…`, where `.s` links it to the next. */
-export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab">): string {
+/**
+ * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~d[:stretches]][~rehab]`, where `.s`
+ * links an exercise to the next.
+ */
+export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts">): string {
   const items = r.items.filter((i) => EXERCISE_BY_ID.has(i.exerciseId)).slice(0, MAX_ITEMS);
   const links = linksOf(items);
   const name = nameOut(r.name.trim().slice(0, NAME_MAX));
   const parts = items.map((i, k) => `${i.exerciseId}.${clampSets(i.sets)}${links[k] ? ".s" : ""}`);
-  return [SHARE_VERSION, name, ...parts, ...(r.rehab ? [REHAB_MARK] : [])].join("~");
+  return [SHARE_VERSION, name, ...parts, ...partsOut(r.parts), ...(r.rehab ? [REHAB_MARK] : [])].join("~");
 }
 
 /**
@@ -55,7 +80,7 @@ export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab">): str
  * between two exercises that both survive and were next to each other), so a link from a newer app
  * still opens. Null when nothing usable is left.
  */
-export function decodeRoutine(code: string): { name: string; items: RoutineItem[]; rehab?: true } | null {
+export function decodeRoutine(code: string): { name: string; items: RoutineItem[]; rehab?: true; parts?: RoutinePart[] } | null {
   // Some apps encode the fragment again; the separators are plain, so decode once if they're missing.
   const raw = code.includes("~") ? code : safeDecode(code);
   const [v, rawName = "", ...parts] = raw.split("~");
@@ -78,7 +103,13 @@ export function decodeRoutine(code: string): { name: string; items: RoutineItem[
     .trim()
     .slice(0, NAME_MAX);
   const rehab = parts.at(-1) === REHAB_MARK;
-  return rehab ? { name: name || t("rt.defaultName"), items, rehab } : { name: name || t("rt.defaultName"), items };
+  const routineParts = partsIn(parts.filter((p) => !p.includes(".")));
+  return {
+    name: name || t("rt.defaultName"),
+    items,
+    ...(rehab ? { rehab } : {}),
+    ...(routineParts ? { parts: routineParts } : {}),
+  };
 }
 
 export function routineUrl(code: string, base = SITE_URL): string {

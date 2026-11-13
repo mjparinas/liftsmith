@@ -159,7 +159,7 @@ export const it: FeaturesText = {
     },
     "workout-parts": {
       name: "Allenamenti in parti",
-      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie.",
+      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach.",
     },
     notes: {
       name: "Note del coach",
