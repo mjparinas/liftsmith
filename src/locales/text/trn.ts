@@ -313,6 +313,7 @@ export const en = {
   "trn.f.feelLowDo": "Check in before their next workout, and offer an easier day.",
   "trn.f.sleepShort": "Sleeping {hours} h a night",
   "trn.f.sleepShortDo": "Short sleep slows recovery. Ask how they're doing, and keep the next week's load steady.",
+  "trn.partDone": "{part}: done in {done} of {of}",
 };
 
 type Key = keyof typeof en;
@@ -630,6 +631,7 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.f.feelLowDo": "Habla con tu cliente antes de su próximo entrenamiento y ofrécele un día más suave.",
   "trn.f.sleepShort": "Duerme {hours} h por noche",
   "trn.f.sleepShortDo": "Dormir poco frena la recuperación. Pregúntale cómo está y mantén estable la carga de la próxima semana.",
+  "trn.partDone": "{part}: hecho en {done} de {of}",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -962,6 +964,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.f.sleepShort": "Dort {hours} h par nuit",
   "trn.f.sleepShortDo":
     "Un sommeil court ralentit la récupération. Demandez-lui comment ça va, et gardez une charge stable la semaine prochaine.",
+  "trn.partDone": "{part} : fait dans {done} sur {of}",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -1288,6 +1291,7 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.f.feelLowDo": "Melde dich vor dem nächsten Workout und biete einen leichteren Tag an.",
   "trn.f.sleepShort": "Schläft {hours} h pro Nacht",
   "trn.f.sleepShortDo": "Wenig Schlaf bremst die Erholung. Frag nach, wie es geht, und halte die Belastung nächste Woche gleich.",
+  "trn.partDone": "{part}: in {done} von {of} gemacht",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1603,6 +1607,7 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.f.feelLowDo": "Senti come sta prima del prossimo allenamento e proponi una giornata più leggera.",
   "trn.f.sleepShort": "Dorme {hours} h a notte",
   "trn.f.sleepShortDo": "Dormire poco rallenta il recupero. Chiedi come sta e mantieni stabile il carico della prossima settimana.",
+  "trn.partDone": "{part}: fatto in {done} su {of}",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1901,4 +1906,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.f.feelLowDo": "次のワークアウトの前に声をかけて、軽めの日を提案しましょう。",
   "trn.f.sleepShort": "睡眠は1晩 {hours} 時間",
   "trn.f.sleepShortDo": "睡眠不足は回復を遅らせます。様子を聞き、来週の負荷は据え置きにしましょう。",
+  "trn.partDone": "{part}：{of}回中{done}回実施",
 };

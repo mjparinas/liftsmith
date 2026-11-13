@@ -58,6 +58,7 @@ import { ClientSessions, SessionToday } from "./CoachSessions";
 import { ClientTargets } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
+import { partLabel } from "./Stretch";
 import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
 const CLIENT = "c.";
@@ -245,7 +246,7 @@ function ClientPlans({
   const [picking, setPicking] = useState(false);
   const [perWeek, setPerWeek] = useState<number | undefined>(physio ? 3 : undefined);
   const [note, setNote] = useState<string | null>(null);
-  const give = async (r: Pick<Routine, "name" | "items" | "rehab">) => {
+  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts">) => {
     try {
       await assignPlan(clientId, r.name, encodeRoutine(r), perWeek);
       haptic("success");
@@ -283,6 +284,11 @@ function ClientPlans({
                     ? `${t("trn.planDone", { count: p.done })}${p.lastAt ? ` · ${t("trn.planLast", { date: date(p.lastAt, { month: "short", day: "numeric" }) })}` : ""}`
                     : t("trn.planNotYet")}
                 </span>
+                {p.parts && (
+                  <span className="block text-xs text-muted" data-testid="plan-parts">
+                    {p.parts.map((x) => t("trn.partDone", { part: partLabel(x.kind), done: x.done, of: x.of })).join(" · ")}
+                  </span>
+                )}
                 {p.plan.perWeek !== undefined && (
                   <span className="block text-xs text-muted">
                     {p.adherence

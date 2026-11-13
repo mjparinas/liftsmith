@@ -62,4 +62,19 @@ describe("a workout with parts", () => {
     expect(a.parts).toBeUndefined();
     expect(partNow(a)).toBe("lift");
   });
+
+  it("runs a routine's own warm-up and cool-down without picking them on Today", () => {
+    const now = Date.now();
+    useApp.getState().saveRoutine({
+      id: "rt1",
+      name: "Legs",
+      items: [{ exerciseId: "back-squat", sets: 3 }],
+      parts: [{ kind: "warm", stretches: ["march"] }, { kind: "cool" }],
+      createdAt: now,
+      updatedAt: now,
+    });
+    useApp.getState().pickRoutine("rt1");
+    useApp.getState().start();
+    expect(useApp.getState().active?.parts?.map((p) => p.kind)).toEqual(["warm", "lift", "cool"]);
+  });
 });

@@ -12,6 +12,7 @@ import { useApp } from "@/lib/store";
 import { MUSCLE_LABEL } from "@/lib/types";
 
 import { go } from "./router";
+import { routinePartsLine } from "./Stretch";
 import { Button, EmptyState, ScreenHeader } from "./ui";
 
 // A routine someone shared (#/routine/<code>, routines.ts): a preview of its exercises and sets, then
@@ -49,7 +50,15 @@ export function SharedRoutine({ code }: { code?: string }) {
     const at = Date.now();
     haptic("success");
     sound.tick();
-    saveRoutine({ id, name: shared.name, items: shared.items, createdAt: at, updatedAt: at, ...(shared.rehab ? { rehab: true } : {}) });
+    saveRoutine({
+      id,
+      name: shared.name,
+      items: shared.items,
+      createdAt: at,
+      updatedAt: at,
+      ...(shared.rehab ? { rehab: true } : {}),
+      ...(shared.parts ? { parts: shared.parts } : {}),
+    });
     track("feature", { name: "routine_share", detail: "import" });
     setSavedId(id);
   };
@@ -63,6 +72,11 @@ export function SharedRoutine({ code }: { code?: string }) {
         </p>
         <p className="mt-2 text-sm text-muted">{t("rt.sharedWhy")}</p>
         {shared.rehab && <p className="mt-2 text-sm text-muted">{t("rt.rehabWhy")}</p>}
+        {shared.parts && (
+          <p className="mt-2 text-sm text-muted" data-testid="shared-parts">
+            {routinePartsLine(shared)}
+          </p>
+        )}
       </section>
       <ol className="card mt-4 divide-y divide-line">
         {shared.items.map((it, i) => {

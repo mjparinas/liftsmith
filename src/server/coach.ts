@@ -464,8 +464,9 @@ const KEEP: Record<string, readonly string[]> = {
     "repsR",
     "tag",
   ],
-  sessionStart: ["sessionId", "minutes", "source", "program", "routine", "challenge"],
-  sessionEnd: ["sessionId", "seconds", "workSec", "restSec", "auto"],
+  // Workouts with parts: which parts were planned and done, with their times (sessions-with-parts.md).
+  sessionStart: ["sessionId", "minutes", "source", "program", "routine", "challenge", "plan"],
+  sessionEnd: ["sessionId", "seconds", "workSec", "restSec", "auto", "parts"],
   feedback: ["sessionId", "exerciseId", "rating"],
   effort: ["setId", "rir"],
   swap: ["sessionId", "from", "to"],

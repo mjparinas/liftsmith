@@ -9,6 +9,7 @@ import { deleteEvents } from "../localdb";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
+import { partDefaults } from "../routines";
 import { doneParts, enterPart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
@@ -454,7 +455,9 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const r = get().readiness;
       const tp = get().profile.training;
       const picks = get().partPicks;
-      const planned = planParts({ warm: picks.warm ?? tp?.warmFirst === true, cool: picks.cool === true }, !!plan.rehab);
+      const routine = plan.routineId ? get().profile.routines?.find((x) => x.id === plan.routineId) : undefined;
+      const dflt = partDefaults(routine, tp?.warmFirst);
+      const planned = planParts({ warm: picks.warm ?? dflt.warm, cool: picks.cool ?? dflt.cool }, !!plan.rehab);
       const parts = planned.length > 1 ? enterPart(planned, 0, now) : undefined;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem(

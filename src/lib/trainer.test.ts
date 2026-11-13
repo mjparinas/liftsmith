@@ -90,6 +90,32 @@ describe("a coach's report on a client", () => {
     expect(planProgress(plan(NOW - 5 * DAY), sessions)).toMatchObject({ done: 1, lastAt: NOW - 2 * DAY + 60_000 });
   });
 
+  it("says how often a routine's warm-up and cool-down were done in the workouts that followed it", () => {
+    const end = (id: string, at: number, kinds: ("lift" | "cool")[]) => ({
+      type: "sessionEnd" as const,
+      id: `end-${id}`,
+      at: at + 3600_000,
+      sessionId: id,
+      seconds: 3600,
+      parts: kinds.map((kind) => ({ id: kind, kind, start: at, end: at + 1800_000 })),
+    });
+    const sessions = clientReport(
+      view([
+        ...makeWorkout("a", NOW - 3 * DAY, [{ exerciseId: "bench-press" }, { exerciseId: "back-squat" }]),
+        end("a", NOW - 3 * DAY, ["lift", "cool"]),
+        ...makeWorkout("b", NOW - DAY, [{ exerciseId: "bench-press" }, { exerciseId: "back-squat" }]),
+        end("b", NOW - DAY, ["lift"]),
+      ]),
+      NOW,
+    ).sessions;
+    const withParts = { ...plan(NOW - 5 * DAY), code: "r1~UHVzaA~bench-press.3~back-squat.3~w~d" };
+    expect(planProgress(withParts, sessions).parts).toEqual([
+      { kind: "warm", done: 0, of: 2 },
+      { kind: "cool", done: 1, of: 2 },
+    ]);
+    expect(planProgress(plan(NOW - 5 * DAY), sessions).parts).toBeUndefined();
+  });
+
   it("flags a routine given a week ago that hasn't been done", () => {
     const r = clientReport(view(makeWorkout("w", NOW - DAY, [{ exerciseId: "deadlift" }]), null, [plan(NOW - 8 * DAY)]), NOW);
     expect(r.flags).toContainEqual({ kind: "planUnused", name: "Push day" });

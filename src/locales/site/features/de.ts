@@ -165,7 +165,7 @@ export const de: FeaturesText = {
     },
     "workout-parts": {
       name: "Training in Teilen",
-      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie.",
+      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach.",
     },
     notes: {
       name: "Coach-Notizen",

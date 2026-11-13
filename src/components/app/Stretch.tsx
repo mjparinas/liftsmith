@@ -17,6 +17,7 @@ import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
 import { haptic, keepAwake, sound } from "@/lib/juice";
+import { MAX_PART_STRETCHES, partDefaults, routinePart } from "@/lib/routines";
 import { updateSession } from "@/lib/sessionNotify";
 import { hadCoolDown, type LivePart, type LivePartKind } from "@/lib/sessions";
 import { partNow, useApp } from "@/lib/store";
@@ -32,7 +33,7 @@ import {
   type StretchKind,
   type StretchMoment,
 } from "@/lib/stretches";
-import { MUSCLE_LABEL, MUSCLES, type Muscle, type StretchEvent } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type Muscle, type Routine, type RoutinePart, type StretchEvent } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
@@ -284,10 +285,19 @@ function Routine({ mode }: { mode: Mode }) {
   const live = !!active?.parts && ((mode === "warmup" && kind === "warm") || (mode === "cooldown" && kind === "cool"));
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const moment = MOMENT[mode];
+  // A routine with its own warm-up or cool-down stretches runs those; otherwise they're picked for the day's muscles.
+  const own = live
+    ? routinePart(
+        profile.routines?.find((r) => r.id === active.plan.routineId),
+        kind === "warm" ? "warm" : "cool",
+      )
+    : undefined;
   const [list, setList] = useState<Stretch[]>(() =>
     mode === "picked"
       ? readPick().map((id) => stretch(id)!)
-      : suggest(moment as StretchMoment, muscles, gym?.equipment ?? [], Date.now(), mode === "rest" ? 8 : 5),
+      : own?.stretches?.length
+        ? own.stretches.flatMap((id) => stretch(id) ?? [])
+        : suggest(moment as StretchMoment, muscles, gym?.equipment ?? [], Date.now(), mode === "rest" ? 8 : 5),
   );
   const [stage, setStage] = useState<"list" | "play" | "done">("list");
   const [info, setInfo] = useState<Stretch | null>(null);
@@ -653,10 +663,12 @@ export function TodayParts() {
   const muscles = useStretchMuscles("warmup");
   const now = useNow(60_000);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
-  const tp = profile.training ?? {};
-  const warmOn = partPicks.warm ?? tp.warmFirst === true;
-  // The cool-down part is picked per workout; Settings › Workout's "Offer a cool-down" is the card on Done.
-  const coolOn = partPicks.cool === true;
+  // A routine with parts says what it runs; otherwise the warm-up follows Settings and the cool-down part starts off
+  // (Settings › Workout's "Offer a cool-down" is the card on Done).
+  const routine = profile.routines?.find((r) => r.id === preview?.routineId);
+  const dflt = partDefaults(routine, profile.training?.warmFirst);
+  const warmOn = partPicks.warm ?? dflt.warm;
+  const coolOn = partPicks.cool ?? dflt.cool;
   const mins = useMemo(() => {
     const eq = gym?.equipment ?? [];
     const of = (m: StretchMoment) => Math.max(1, Math.round(routineSeconds(suggest(m, muscles, eq, now)) / 60));
@@ -688,6 +700,91 @@ export function TodayParts() {
         <span className="num text-muted">· {t("str.part.minutes", { n: preview.estMinutes })}</span>
       </div>
       {row("cool", coolOn)}
+    </section>
+  );
+}
+
+/** "Warm-up (4 stretches) → Lifting → Cool-down": a routine's parts in order, for its card and its shared page. */
+export function routinePartsLine(r: Pick<Routine, "parts" | "rehab">): string {
+  const one = (kind: "warm" | "cool") => {
+    const p = routinePart(r, kind);
+    if (!p) return [];
+    return [p.stretches?.length ? t("str.part.withStretches", { part: partLabel(kind), count: p.stretches.length }) : partLabel(kind)];
+  };
+  return [...one("warm"), partLabel(r.rehab ? "rehab" : "lift"), ...one("cool")].join(" → ");
+}
+
+/**
+ * The routine builder's parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the
+ * exercises, each a switch, with its own stretches picked from the library or none to let the app pick on the day.
+ */
+export function RoutinePartsEditor({
+  parts,
+  onChange,
+}: {
+  parts: RoutinePart[] | undefined;
+  onChange: (p: RoutinePart[] | undefined) => void;
+}) {
+  const [choosing, setChoosing] = useState<"warm" | "cool" | null>(null);
+  const get = (kind: "warm" | "cool") => parts?.find((p) => p.kind === kind);
+  const put = (kind: "warm" | "cool", p: RoutinePart | null) => {
+    const next = (["warm", "cool"] as const).flatMap((k) => (k === kind ? (p ? [p] : []) : (get(k) ?? [])));
+    onChange(next.length ? next : undefined);
+  };
+  const row = (kind: "warm" | "cool") => {
+    const p = get(kind);
+    const ids = p?.stretches ?? [];
+    const toggle = (id: string) => {
+      const next = ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id].slice(0, MAX_PART_STRETCHES);
+      put(kind, next.length ? { kind, stretches: next } : { kind });
+    };
+    return (
+      <div className="px-3 py-2">
+        <InlineSwitch
+          label={
+            <span className="flex items-center gap-2 font-medium">
+              <Icon name={kind === "warm" ? "flame" : "leaf"} size={16} className={kind === "warm" ? "text-ember" : "text-cyan"} />
+              {t(kind === "warm" ? "str.part.routineWarm" : "str.part.routineCool")}
+            </span>
+          }
+          hint={p ? (ids.length ? listOf(ids.flatMap((id) => stretch(id)?.name ?? [])) : t("str.part.auto")) : undefined}
+          on={!!p}
+          onChange={(on) => {
+            put(kind, on ? { kind } : null);
+            if (!on && choosing === kind) setChoosing(null);
+          }}
+        />
+        {p &&
+          (choosing === kind ? (
+            <div className="mt-2" data-testid={`part-stretches-${kind}`}>
+              <p className="text-sm text-muted">{t("str.part.pickHint")}</p>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {searchStretches({ kind }).map((st) => (
+                  <Chip key={st.id} active={ids.includes(st.id)} onClick={() => toggle(st.id)}>
+                    {st.name}
+                  </Chip>
+                ))}
+              </div>
+              <Button kind="quiet" className="mt-2 w-full" onClick={() => setChoosing(null)}>
+                {t("str.part.chosen")}
+              </Button>
+            </div>
+          ) : (
+            <Button kind="quiet" icon="stretch" className="mt-1 w-full" onClick={() => setChoosing(kind)}>
+              {t("str.part.choose")}
+            </Button>
+          ))}
+      </div>
+    );
+  };
+  return (
+    <section
+      className="mt-4 divide-y divide-line/70 overflow-hidden rounded-2xl border border-line"
+      data-testid="routine-parts"
+      aria-label={t("str.part.routineTitle")}
+    >
+      {row("warm")}
+      {row("cool")}
     </section>
   );
 }

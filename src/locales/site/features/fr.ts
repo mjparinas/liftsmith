@@ -166,7 +166,7 @@ export const fr: FeaturesText = {
     },
     "workout-parts": {
       name: "Séances en plusieurs parties",
-      body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série.",
+      body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série. Les routines peuvent inclure leur propre échauffement et retour au calme, y compris dans les liens partagés et celles de votre coach.",
     },
     notes: {
       name: "Notes du coach",

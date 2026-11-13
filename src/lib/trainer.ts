@@ -406,6 +406,11 @@ export interface PlanProgress {
    * weeks (or since it was given, if that's shorter) against what the target asks for in that time.
    */
   adherence?: { done: number; want: number; pct: number };
+  /**
+   * Workouts with parts (stage 3): for a routine with a warm-up or cool-down, how many of the workouts that followed
+   * it ran that part, so a coach sees "cool-downs skipped" and can say something.
+   */
+  parts?: { kind: "warm" | "cool"; done: number; of: number }[];
 }
 
 /** Pain at or above this in the last week is a "check in" item for the coach (the same 5 that stops a graded return). */
@@ -436,11 +441,18 @@ export interface RehabInjury {
  * (60%+). The client's copy of a routine has its own id on their phone, so it's matched by what was trained.
  */
 export function planProgress(plan: Plan, sessions: readonly SessionSummary[], now = Date.now()): PlanProgress {
-  const want = new Set(decodeRoutine(plan.code)?.items.map((i) => i.exerciseId) ?? []);
+  const routine = decodeRoutine(plan.code);
+  const want = new Set(routine?.items.map((i) => i.exerciseId) ?? []);
   const hits = want.size
     ? sessions.filter((s) => s.start >= plan.at && s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6))
     : [];
   const out: PlanProgress = { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
+  if (routine?.parts && hits.length)
+    out.parts = routine.parts.map((p) => ({
+      kind: p.kind,
+      done: hits.filter((h) => h.parts?.some((x) => x.kind === p.kind)).length,
+      of: hits.length,
+    }));
   if (plan.perWeek && now - plan.at >= WEEK) {
     const span = Math.min(2 * WEEK, now - plan.at);
     const wanted = Math.max(1, Math.round((plan.perWeek * span) / WEEK));

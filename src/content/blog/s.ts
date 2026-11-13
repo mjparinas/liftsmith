@@ -56,4 +56,49 @@ export const BLOG_S: Article[] = [
       ],
     ],
   },
+  {
+    slug: "routines-with-a-warm-up-and-cool-down",
+    kind: "blog",
+    title: "Save a warm-up and cool-down with your routine",
+    description:
+      "A routine can now carry its own warm-up and cool-down, with the stretches you pick or ones chosen on the day. Share links and coaches pass them along.",
+    date: "2026-11-13",
+    tag: "Warm-up",
+    cta: "stretch",
+    body: [
+      {
+        p: "Workouts now run in parts: a warm-up, the lifting and a cool-down, from one Start button. The next step was obvious. If your leg day always starts with hip openers and ends with a hamstring stretch, you shouldn't have to switch them on every time. Now a saved routine can hold its own warm-up and cool-down.",
+      },
+      { h2: "Add them in the routine builder" },
+      {
+        p: "Under the exercises you'll find two switches: Warm-up first and Cool-down after. Turn one on and the app picks stretches on the day for the muscles you're about to train, or tap Choose stretches and pick your own from the library. Pick up to 12 for each. Routines with parts show them on their card, like Warm-up (4 stretches) → Lifting → Cool-down.",
+      },
+      { cta: "stretch" },
+      { h2: "Start runs them" },
+      {
+        p: "Use the routine today and Today shows its warm-up and cool-down already switched on. Tap Start and the warm-up plays your stretches in order, then the lifting begins, then the cool-down after your last set. You can still turn either one off for a single workout, or Skip at any point.",
+      },
+      { h2: "Share links and coaches keep them" },
+      {
+        p: "Share a routine and the link carries its warm-up and cool-down, stretches included. Someone on an older version of the app still gets the exercises, so nothing breaks. Coaches and physios can assign a routine with parts too, and their client report shows how often each part gets done: a cool-down done in 1 of 4 workouts is a good thing to bring up at the next check-in.",
+      },
+      {
+        p: "New to stretching around lifting? Start with [how to warm up for lifting](/blog/how-to-warm-up-for-lifting/) and the [stretches worth doing after lifting](/blog/stretches-after-lifting/).",
+      },
+    ],
+    faq: [
+      [
+        "Can a routine have only a cool-down?",
+        "Yes. Turn on Cool-down after and leave Warm-up first off. The workout runs the lifting, then the cool-down.",
+      ],
+      [
+        "What if I pick no stretches?",
+        "The app picks them on the day for the muscles that workout trains, the same way Today's warm-up does.",
+      ],
+      [
+        "Does an older version of the app open a routine link with parts?",
+        "Yes. It opens the exercises as a plain routine and leaves out the warm-up and cool-down.",
+      ],
+    ],
+  },
 ];
