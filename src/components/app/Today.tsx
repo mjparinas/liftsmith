@@ -20,7 +20,7 @@ import { quoteIndexOfDay, QUOTES } from "@/lib/quotes";
 import { dayKey } from "@/lib/random";
 import { CALL_TEXT, todayFeel, type Call } from "@/lib/readiness";
 import { recovery } from "@/lib/recovery";
-import { useApp } from "@/lib/store";
+import { partNow, useApp } from "@/lib/store";
 import { linkedToNext, supersetLabel } from "@/lib/superset";
 import { effortLabel } from "@/lib/training";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
@@ -42,7 +42,7 @@ import { RecoveryMap } from "./RecoveryMap";
 import { MoveButtons, useReorder } from "./Reorder";
 import { go } from "./router";
 import { SaveNudge } from "./Saving";
-import { CoolDownCard } from "./Stretch";
+import { CoolDownCard, TodayParts } from "./Stretch";
 import { CALL_STYLE, FEEL_HUE, HUE, muscleHue } from "./theme";
 import { TodayGame } from "./TodayGame";
 import { CoachNoteToday } from "./Trainer";
@@ -469,6 +469,7 @@ export function Today() {
 
           {resting ? null : preview && preview.items.length > 0 ? (
             <>
+              {!active && <TodayParts />}
               <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
                 <ol className="stagger card overflow-hidden" data-testid="plan-list">
                   {items.map((it, i) => {
@@ -649,11 +650,11 @@ export function Today() {
               className="w-full py-4 text-lg"
               onClick={() => {
                 haptic("tap");
-                // Settings › Workout › "Warm up before every workout": the warm-up comes first, and can be skipped.
-                if (profile.training?.warmFirst) return go("stretch", "warmup");
                 sound.start();
                 start();
-                go("workout");
+                // Workouts with parts: a warm-up part comes first, on the warm-up screen, with Skip.
+                if (partNow(useApp.getState().active) === "warm") go("stretch", "warmup");
+                else go("workout");
               }}
             >
               {t("today.start")}

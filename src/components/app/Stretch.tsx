@@ -13,10 +13,13 @@ import { useEffect, useEffectEvent, useMemo, useState, type CSSProperties } from
 import { bodyFor, LiftDemo } from "@/components/demo/LiftDemo";
 import { SCREEN_TITLE } from "@/components/titles";
 import { stretchView } from "@/lib/demo/stretchMotions";
+import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
 import { haptic, keepAwake, sound } from "@/lib/juice";
-import { useApp } from "@/lib/store";
+import { updateSession } from "@/lib/sessionNotify";
+import { hadCoolDown, type LivePart, type LivePartKind } from "@/lib/sessions";
+import { partNow, useApp } from "@/lib/store";
 import {
   demoId,
   routineSeconds,
@@ -36,7 +39,7 @@ import { Icon } from "./icons";
 import { useMyShape } from "./myShape";
 import { go, goBack } from "./router";
 import { muscleHue } from "./theme";
-import { Button, Chip, EmptyState, ScreenHeader, Sheet, SwitchRow } from "./ui";
+import { Button, Chip, EmptyState, InlineSwitch, ScreenHeader, Sheet, SwitchRow } from "./ui";
 
 type Mode = "warmup" | "cooldown" | "rest" | "picked";
 const MOMENT: Record<Mode, StretchMoment | "pick"> = { warmup: "warm", cooldown: "cool", rest: "rest", picked: "pick" };
@@ -85,18 +88,21 @@ export function dose(s: Stretch): string {
 
 /** The muscles a routine is for: today's plan, the workout just done, or what trained in the last two days. */
 export function useStretchMuscles(mode: Mode): Muscle[] {
-  const { preview, stats } = useApp();
+  const { preview, stats, active } = useApp();
   const now = useNow(60_000);
+  // During a workout with parts, its own plan says what's being trained.
+  const plan = active?.plan ?? preview;
   return useMemo(() => {
     const of = (ids: readonly string[]) => [...new Set(ids.flatMap((id) => exercise(id).primary))];
-    if (mode === "warmup") return of(preview?.items.map((i) => i.exerciseId) ?? []);
+    if (mode === "warmup") return of(plan?.items.map((i) => i.exerciseId) ?? []);
     if (mode === "cooldown") {
+      if (active) return of(active.plan.items.map((i) => i.exerciseId));
       const last = stats.sessions[0];
       return last ? of(last.exercises) : of(preview?.items.map((i) => i.exerciseId) ?? []);
     }
     if (mode === "rest") return of(stats.sessions.filter((s) => now - s.start < 2 * 86400_000).flatMap((s) => s.exercises));
     return [];
-  }, [mode, preview, stats.sessions, now]);
+  }, [mode, plan, active, preview, stats.sessions, now]);
 }
 
 export function StretchScreen({ arg }: { arg?: string }) {
@@ -271,8 +277,11 @@ function StretchDemo({ s, className = "", paused }: { s: Stretch; className?: st
 
 // ---------- a routine ----------
 function Routine({ mode }: { mode: Mode }) {
-  const { gyms, profile, start, logStretch } = useApp();
+  const { gyms, profile, start, logStretch, active, nextPart, pickPart } = useApp();
   const muscles = useStretchMuscles(mode);
+  // Workouts with parts: this warm-up or cool-down is a part of the workout in progress.
+  const kind = partNow(active);
+  const live = !!active?.parts && ((mode === "warmup" && kind === "warm") || (mode === "cooldown" && kind === "cool"));
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const moment = MOMENT[mode];
   const [list, setList] = useState<Stretch[]>(() =>
@@ -283,11 +292,20 @@ function Routine({ mode }: { mode: Mode }) {
   const [stage, setStage] = useState<"list" | "play" | "done">("list");
   const [info, setInfo] = useState<Stretch | null>(null);
   const total = routineSeconds(list);
-  const startLifting = () => {
+  const startLifting = (skip = false) => {
     haptic("tap");
     sound.start();
-    start();
+    if (live) nextPart(skip);
+    else {
+      // A warm-up done from the library already happened: the workout starts at the lifting.
+      pickPart("warm", false);
+      start();
+    }
     go("workout");
+  };
+  const finishWorkout = (skip = false) => {
+    endWorkout({ skip });
+    go("done");
   };
 
   if (stage === "play")
@@ -296,6 +314,7 @@ function Routine({ mode }: { mode: Mode }) {
         list={list}
         moment={moment}
         muscles={muscles}
+        live={live ? { parts: active!.parts!, index: active!.part ?? 0, sessionId: active!.sessionId } : undefined}
         onStop={() => setStage("list")}
         onDone={(secs) => {
           logStretch(
@@ -303,6 +322,9 @@ function Routine({ mode }: { mode: Mode }) {
             list.map((s) => s.id),
             secs,
           );
+          // A part of the workout goes straight on: to the lifting, or to the end of the workout.
+          if (live && mode === "warmup") return startLifting();
+          if (live && mode === "cooldown") return finishWorkout();
           setStage("done");
         }}
       />
@@ -315,7 +337,7 @@ function Routine({ mode }: { mode: Mode }) {
           <EmptyState icon="check" mascot="cheer" title={t("str.doneTitle")} body={t("str.doneBody", { count: list.length })} />
         </div>
         {mode === "warmup" ? (
-          <Button icon="play" className="mt-4 w-full py-4 text-lg" onClick={startLifting}>
+          <Button icon="play" className="mt-4 w-full py-4 text-lg" onClick={() => startLifting()}>
             {t("str.startLift")}
           </Button>
         ) : (
@@ -328,7 +350,11 @@ function Routine({ mode }: { mode: Mode }) {
 
   return (
     <div className="pb-2">
-      <ScreenHeader back={{ label: t("str.back"), onClick: goBack }} title={TITLE[mode]} />
+      <ScreenHeader
+        back={{ label: t("str.back"), onClick: goBack }}
+        kicker={live ? <PartStep parts={active!.parts!} index={active!.part ?? 0} /> : undefined}
+        title={TITLE[mode]}
+      />
       <p className="num mt-1 text-sm text-muted">{t("str.length", { count: list.length, min: mins(total) })}</p>
       <ol className="card mt-4 divide-y divide-line/70 overflow-hidden" data-testid="stretch-routine">
         {list.map((s, i) => (
@@ -371,8 +397,13 @@ function Routine({ mode }: { mode: Mode }) {
         {t("str.start")}
       </Button>
       {mode === "warmup" && (
-        <Button kind="ghost" className="mt-3 w-full" onClick={startLifting}>
+        <Button kind="ghost" className="mt-3 w-full" onClick={() => startLifting(true)}>
           {t("str.skipLift")}
+        </Button>
+      )}
+      {live && mode === "cooldown" && (
+        <Button kind="ghost" className="mt-3 w-full" onClick={() => finishWorkout(true)}>
+          {t("str.part.skipFinish")}
         </Button>
       )}
       <Sheet open={!!info} onClose={() => setInfo(null)} title={info?.name ?? ""}>
@@ -393,12 +424,15 @@ function Player({
   list,
   moment,
   muscles,
+  live,
   onStop,
   onDone,
 }: {
   list: Stretch[];
   moment: StretchMoment | "pick";
   muscles: Muscle[];
+  /** A part of the workout in progress: the lock screen and watches follow the stretches. */
+  live?: { parts: readonly LivePart[]; index: number; sessionId: string };
   onStop: () => void;
   onDone: (seconds: number) => void;
 }) {
@@ -454,6 +488,29 @@ function Player({
     const id = setInterval(tick, 250);
     return () => clearInterval(id);
   }, [paused, endsAt]);
+
+  // The live notification (Android), Live Activity (iOS) and the watches: the part, the stretch and its countdown,
+  // through the same fields the lifting uses, so every platform shows it with no code of its own.
+  useEffect(() => {
+    if (!live) return;
+    const part = live.parts[live.index]!.kind;
+    const after = live.parts[live.index + 1];
+    void updateSession({
+      title: t("str.part.notify", { part: partLabel(part), name: s.name }),
+      setLabel: t("str.part.step", { part: partLabel(part), n: live.index + 1, total: live.parts.length }),
+      next: nextUp ? nextUp.name : after ? partLabel(after.kind) : t("str.part.finish"),
+      restUntil: null,
+      chip: `${i + 1}/${list.length}`,
+      done: i,
+      total: list.length,
+      sessionId: live.sessionId,
+      ahead: [],
+      timer: paused
+        ? undefined
+        : [{ from: endsAt - segment(s), to: endsAt, label: s.eachSide ? (side === 0 ? t("str.left") : t("str.right")) : s.name }],
+      timerOver: paused ? undefined : t("timer.over"),
+    });
+  }, [i, side, paused, endsAt]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const segMs = segment(s);
   const secs = Math.ceil(left / 1000);
@@ -513,9 +570,23 @@ function Player({
 // ---------- on other screens ----------
 /** Done: a cool-down for the muscles just trained (Settings › Workout can turn it off). */
 export function CoolDownCard() {
-  const { profile } = useApp();
+  const { profile, events, stats } = useApp();
   const muscles = useStretchMuscles("cooldown");
-  if (profile.training?.coolDown === false) return null;
+  const last = stats.sessions[0]?.sessionId;
+  // A workout that ran a cool-down part (or had one logged with it) doesn't need another offered.
+  const cooled = useMemo(
+    () =>
+      !!last &&
+      events.some(
+        (e) =>
+          (e.type === "stretch" && e.moment === "cool" && e.sessionId === last) ||
+          ((e.type === "sessionEnd" || e.type === "sessionStart") &&
+            e.sessionId === last &&
+            hadCoolDown(e.type === "sessionEnd" ? e.parts : e.plan)),
+      ),
+    [events, last],
+  );
+  if (profile.training?.coolDown === false || cooled) return null;
   const names = muscles.slice(0, 3).map((m) => inSentence(MUSCLE_LABEL[m], true));
   return (
     <button
@@ -557,5 +628,66 @@ export function StretchSettings() {
         onChange={(v) => setProfile({ training: { ...profile.training, coolDown: v ? undefined : false } })}
       />
     </>
+  );
+}
+
+// ---------- parts of a workout (workouts with parts) ----------
+/** "Warm-up", "Lifting", "Rehab", "Cool-down". */
+export function partLabel(kind: LivePartKind): string {
+  return t(`str.part.${kind}`);
+}
+
+/** "Warm-up · 1 of 3" above a part's title, when the workout has more than one part. */
+export function PartStep({ parts, index }: { parts: readonly LivePart[]; index: number }) {
+  const p = parts[index];
+  if (!p || parts.length < 2) return null;
+  return <span data-testid="part-step">{t("str.part.step", { part: partLabel(p.kind), n: index + 1, total: parts.length })}</span>;
+}
+
+/**
+ * Today: the parts the next workout will run through, in order. The warm-up and cool-down are switches for this
+ * workout only (their defaults are Settings › Workout's), each with how long it takes and why; Start runs them.
+ */
+export function TodayParts() {
+  const { profile, gyms, preview, partPicks, pickPart } = useApp();
+  const muscles = useStretchMuscles("warmup");
+  const now = useNow(60_000);
+  const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
+  const tp = profile.training ?? {};
+  const warmOn = partPicks.warm ?? tp.warmFirst === true;
+  // The cool-down part is picked per workout; Settings › Workout's "Offer a cool-down" is the card on Done.
+  const coolOn = partPicks.cool === true;
+  const mins = useMemo(() => {
+    const eq = gym?.equipment ?? [];
+    const of = (m: StretchMoment) => Math.max(1, Math.round(routineSeconds(suggest(m, muscles, eq, now)) / 60));
+    return { warm: of("warm"), cool: of("cool") };
+  }, [muscles, gym, now]);
+  if (!preview || !preview.items.length) return null;
+  const names = listOf(muscles.slice(0, 3).map((m) => inSentence(MUSCLE_LABEL[m], true)));
+  const main: LivePartKind = preview.rehab ? "rehab" : "lift";
+  const row = (kind: "warm" | "cool", on: boolean) => (
+    <InlineSwitch
+      label={
+        <span className="flex items-center gap-2 font-semibold">
+          <Icon name={kind === "warm" ? "flame" : "leaf"} size={16} className={kind === "warm" ? "text-ember" : "text-cyan"} />
+          {partLabel(kind)} <span className="num font-normal text-muted">· {t("str.part.minutes", { n: mins[kind] })}</span>
+        </span>
+      }
+      hint={t(kind === "warm" ? "str.part.warmWhy" : "str.part.coolWhy", { muscles: names })}
+      on={on}
+      onChange={(v) => pickPart(kind, v)}
+      className="px-4 py-3"
+    />
+  );
+  return (
+    <section className="card mt-4 divide-y divide-line overflow-hidden" data-testid="today-parts" aria-label={t("str.part.title")}>
+      {row("warm", warmOn)}
+      <div className="flex min-h-11 items-center gap-2 px-4 py-3">
+        <Icon name="dumbbell" size={16} className="text-accent" />
+        <span className="font-semibold">{partLabel(main)}</span>
+        <span className="num text-muted">· {t("str.part.minutes", { n: preview.estMinutes })}</span>
+      </div>
+      {row("cool", coolOn)}
+    </section>
   );
 }
