@@ -217,6 +217,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Setup wizard](docs/decisions/setup-wizard.md) (`src/components/app/Onboarding.tsx`)
 - [Sharing](docs/decisions/sharing.md) (`ShareSheet.tsx`, `src/lib/shareCards.ts`, `shareImage.ts`, `src/components/demo/still.ts`)
 - [Sonos](docs/decisions/sonos.md) (`src/lib/sonos.ts`, `src/server/sonos.ts`, `Sonos.tsx`, `connect.ts`)
+- [Speed](docs/decisions/speed.md) (`game.ts`, `Achievements.tsx` `useGame`, `sessionAhead.ts`)
 - [Stats and recovery map](docs/decisions/stats-and-recovery-map.md) (`RecoveryMap.tsx`, `engine.ts`, `colours.ts`, `src/components/BodyMap.tsx`, `History.tsx`)
 - [Stretching](docs/decisions/stretching.md) (`src/lib/stretches.ts`, `Stretch.tsx`, `src/lib/demo/stretchMotions.ts`)
 - [Tempo coach](docs/decisions/tempo-coach.md) (`src/lib/tempo.ts`, `workout/TempoCoach.tsx`, `juice.ts`)

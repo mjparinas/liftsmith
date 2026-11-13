@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useDeferredValue, useEffect, useMemo, useState, type CSSProperties } from "react";
 
 import { achName, CATEGORY_LABEL, TIER_LABEL, type Achievement, type Category, type Tier } from "@/lib/achievements";
+import type { Stats } from "@/lib/derive";
 import {
   badgeForItem,
   COSMETICS,
@@ -16,11 +17,12 @@ import {
   type Game,
   type LevelReward,
 } from "@/lib/game";
-import { t } from "@/lib/i18n";
+import { currentLang, t } from "@/lib/i18n";
 import { applyAccent, calm, sound, type TimerSound } from "@/lib/juice";
 import { badgeShare, levelShare } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
 import { themesForBadge } from "@/lib/themes";
+import type { AppEvent, Profile } from "@/lib/types";
 import { fmtNum } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
@@ -49,12 +51,31 @@ export const RARITY_COLOUR = {
   legendary: "var(--rarity-legendary)",
 } as const;
 
+// One shared result for every screen part that reads the game (Today alone has four, and the home screen
+// widget is always mounted), so it's worked out once per change instead of once per caller (2026-11-13).
+let shared: { events: unknown; stats: unknown; profile: unknown; hour: number; lang: string; game: Game } | null = null;
+
+function sharedGame(events: AppEvent[], stats: Stats, profile: Profile, now: number, lang: string): Game {
+  const hour = Math.floor(now / 3600_000);
+  const s = shared;
+  if (s && s.events === events && s.stats === stats && s.profile === profile && s.hour === hour && s.lang === lang) return s.game;
+  const g = game(events, stats, profile, now);
+  shared = { events, stats, profile, hour, lang, game: g };
+  return g;
+}
+
 export function useGame(): Game {
-  const { events, stats, profile } = useApp();
+  const app = useApp();
+  // Deferred, so Log set and other taps paint first and the game catches up just after, in a render React
+  // can interrupt. On a screen's first render these are the current values.
+  const events = useDeferredValue(app.events);
+  const stats = useDeferredValue(app.stats);
+  const profile = useDeferredValue(app.profile);
   const now = useNow();
-  // Recomputed when the events change, or when the day ticks over (quests and streaks are weekly).
-  const day = Math.floor(now / 3600_000);
-  return useMemo(() => game(events, stats, profile, now), [events, stats, profile, day]); // eslint-disable-line react-hooks/exhaustive-deps
+  // Recomputed when the events change, or when the hour ticks over (quests and streaks are weekly).
+  const hour = Math.floor(now / 3600_000);
+  const lang = currentLang();
+  return useMemo(() => sharedGame(events, stats, profile, now, lang), [events, stats, profile, hour, lang]); // eslint-disable-line react-hooks/exhaustive-deps
 }
 
 export function Badge({ a, size = 56 }: { a: Pick<Achievement, "icon" | "tier" | "hidden" | "name">; size?: number }) {
