@@ -8,7 +8,7 @@ import type { DemoSettings, Loop, View } from "@/components/demo/engine";
 import { bodyFor, detectMode } from "@/components/demo/LiftDemo";
 import { blockWeek, weekStart } from "@/lib/block";
 import { weeklySets } from "@/lib/generator";
-import { list, t } from "@/lib/i18n";
+import { inSentence, list, t } from "@/lib/i18n";
 import { calm } from "@/lib/juice";
 import { LITE, useLiteDemos } from "@/lib/liteDemos";
 import { muscleAdvice } from "@/lib/muscleAdvice";
@@ -268,7 +268,7 @@ function Body3D({
   }, [view, paint, hatch, lit, settings.picked, settings.body, shape]);
 
   const summary = groups
-    .map((g) => t("map.group", { band: g.label, muscles: list(g.muscles.map((m) => MUSCLE_LABEL[m].toLowerCase())) }))
+    .map((g) => t("map.group", { band: g.label, muscles: list(g.muscles.map((m) => inSentence(MUSCLE_LABEL[m], true))) }))
     .join(" ");
   return (
     <div

@@ -6,6 +6,7 @@ import { track } from "@/lib/analytics";
 import { can } from "@/lib/entitlements";
 import { inSentence, list, t } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
+import { useDesktop } from "@/lib/layout";
 import { missingFor, PICKER_ORDER, pickProgram, PROGRAM_BY_ID, weeklyPreview, type ProgramId, type ProgramInfo } from "@/lib/programs";
 import { useApp } from "@/lib/store";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, MUSCLES } from "@/lib/types";
@@ -21,6 +22,7 @@ const level = (l: ProgramInfo["level"]) => t(`prog.level.${l}`);
 
 export function Programs() {
   const { profile, gyms, events, setProfile } = useApp();
+  const desktop = useDesktop();
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const [open, setOpen] = useState<ProgramInfo | null>(null);
   const src = profile.planSource;
@@ -40,7 +42,8 @@ export function Programs() {
 
   return (
     <div className="pb-2">
-      <ScreenHeader back={{ label: t("train.back"), onClick: () => go("settings") }} title={t("prog.title")} />
+      {/* On desktop Programs is in the sidebar, a screen of its own, so it has nothing to go back to. */}
+      <ScreenHeader back={desktop ? undefined : { label: t("train.back"), onClick: () => go("settings") }} title={t("prog.title")} />
       <p className="mt-1 text-sm text-muted">{t("prog.intro")}</p>
 
       <ul className="mt-4 space-y-3">

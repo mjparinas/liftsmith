@@ -21,6 +21,7 @@ export const en = {
   "td.readinessN": "Readiness {n}",
   "td.readiness": "Readiness",
   "td.challenge": "Challenge day: your first lift ends with an as-many-reps-as-you-can set.",
+  "td.callFresh": "Your first workout sets the baseline. Readiness starts once we've seen you train.",
   "td.call": "Today's call",
   "td.feel": "How do you feel?",
   "td.feelLow": "Low",
@@ -53,6 +54,7 @@ export const en = {
   "td.quote": "Quote of the day",
   "td.busy": "Busy at {at} · ",
   "td.fit": "Fit a {n}-minute workout",
+  "td.outOfOrder": "Planned without: {items} (out of order)",
 } as const;
 
 type Key = keyof typeof en;
@@ -75,6 +77,7 @@ export const es: Partial<Record<Key, Message>> = {
   "td.readinessN": "Preparación {n}",
   "td.readiness": "Preparación",
   "td.challenge": "Día de desafío: tu primer ejercicio termina con una serie de tantas repeticiones como puedas.",
+  "td.callFresh": "Tu primer entrenamiento marca el punto de partida. La preparación empieza cuando te hayamos visto entrenar.",
   "td.call": "La decisión de hoy",
   "td.feel": "¿Cómo te sientes?",
   "td.feelLow": "Bajo",
@@ -109,6 +112,7 @@ export const es: Partial<Record<Key, Message>> = {
   "td.quote": "Frase del día",
   "td.busy": "Ocupado a las {at} · ",
   "td.fit": "Hacer un entrenamiento de {n} minutos",
+  "td.outOfOrder": "Plan sin: {items} (fuera de servicio)",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -129,6 +133,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "td.readinessN": "Forme {n}",
   "td.readiness": "Forme",
   "td.challenge": "Jour de défi : votre premier mouvement se termine par une série d’autant de reps que possible.",
+  "td.callFresh": "Votre première séance sert de point de départ. La forme du jour arrive dès qu’on vous aura vu vous entraîner.",
   "td.call": "Le choix du jour",
   "td.feel": "Comment vous sentez-vous ?",
   "td.feelLow": "Fatigué",
@@ -163,6 +168,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "td.quote": "Citation du jour",
   "td.busy": "Occupé à {at} · ",
   "td.fit": "Faire une séance de {n} minutes",
+  "td.outOfOrder": "Plan sans : {items} (hors service)",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -183,6 +189,7 @@ export const de: Partial<Record<Key, Message>> = {
   "td.readinessN": "Bereitschaft {n}",
   "td.readiness": "Bereitschaft",
   "td.challenge": "Herausforderungstag: Deine erste Übung endet mit einem Satz mit so vielen Wiederholungen wie möglich.",
+  "td.callFresh": "Dein erstes Training legt den Ausgangspunkt fest. Die Bereitschaft kommt, sobald wir dich trainieren gesehen haben.",
   "td.call": "Heutige Entscheidung",
   "td.feel": "Wie fühlst du dich?",
   "td.feelLow": "Schlapp",
@@ -217,6 +224,7 @@ export const de: Partial<Record<Key, Message>> = {
   "td.quote": "Zitat des Tages",
   "td.busy": "Beschäftigt um {at} ·",
   "td.fit": "Ein {n}-Minuten-Training einplanen",
+  "td.outOfOrder": "Plan ohne: {items} (außer Betrieb)",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -237,6 +245,7 @@ export const it: Partial<Record<Key, Message>> = {
   "td.readinessN": "Prontezza {n}",
   "td.readiness": "Prontezza",
   "td.challenge": "Giorno sfida: il primo esercizio finisce con una serie a più ripetizioni possibili.",
+  "td.callFresh": "Il primo allenamento fissa il punto di partenza. La prontezza arriva quando ti avremo visto allenarti.",
   "td.call": "La scelta di oggi",
   "td.feel": "Come ti senti?",
   "td.feelLow": "Giù",
@@ -271,6 +280,7 @@ export const it: Partial<Record<Key, Message>> = {
   "td.quote": "Citazione del giorno",
   "td.busy": "Impegnato alle {at} ·",
   "td.fit": "Fai un allenamento da {n} minuti",
+  "td.outOfOrder": "Piano senza: {items} (fuori servizio)",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -291,6 +301,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "td.readinessN": "コンディション {n}",
   "td.readiness": "コンディション",
   "td.challenge": "チャレンジデー：最初の種目の最後はできるだけ多く行うセットです。",
+  "td.callFresh": "最初のワークアウトが基準になります。トレーニングの様子がわかり次第、コンディションを表示します。",
   "td.call": "今日の判断",
   "td.feel": "調子はどうですか？",
   "td.feelLow": "いまいち",
@@ -323,4 +334,5 @@ export const ja: Partial<Record<Key, Message>> = {
   "td.quote": "今日の名言",
   "td.busy": "{at}に予定あり ·",
   "td.fit": "{n}分のワークアウトにする",
+  "td.outOfOrder": "使用不可の器具を除外：{items}",
 };

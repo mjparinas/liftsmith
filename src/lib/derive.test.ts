@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { DAY, makeSessionEnd, makeSet, NOW } from "@/test/factories";
 
 import { dedupe, derive, setWeekStart, weekOf } from "./derive";
-import type { AppEvent } from "./types";
+import type { AppEvent, StretchEvent } from "./types";
 
 // Stats worked out from the event log: workouts, personal bests, the week streak and sets per muscle
 // each week (mutation run, 2026-11-13: several of these rules had no test that would notice a change).
@@ -96,6 +96,25 @@ describe("derive: week streak", () => {
   it("doesn't break the streak for a week still in progress", () => {
     expect(derive([inWeek(1), inWeek(2)], NOW).weekStreak).toBe(2);
     expect(derive([inWeek(2)], NOW).weekStreak).toBe(0);
+  });
+
+  it("keeps the streak for a stretch day of 10 minutes or more on its own, not a shorter one", () => {
+    const stretchDay = (id: string, at: number, seconds: number): StretchEvent => ({
+      type: "stretch",
+      id,
+      at,
+      moment: "rest",
+      ids: ["childs-pose"],
+      seconds,
+    });
+    const long = stretchDay("s1", thisWeek - WEEK + 2 * DAY, 600);
+    const short = stretchDay("s2", thisWeek - WEEK + 2 * DAY, 300);
+    expect(derive([inWeek(0), long, inWeek(2)], NOW).weekStreak).toBe(3);
+    expect(derive([inWeek(0), long, inWeek(2)], NOW).stretchDays).toEqual([long.at]);
+    expect(derive([inWeek(0), short, inWeek(2)], NOW).weekStreak).toBe(1);
+    // A cool-down done with a workout is part of that workout, not a stretch day of its own.
+    const withWorkout: StretchEvent = { ...stretchDay("s3", thisWeek + DAY + 3600_000, 900), moment: "cool", sessionId: "w0" };
+    expect(derive([inWeek(0), withWorkout], NOW).stretchDays).toEqual([]);
   });
 
   it("follows the lifter's first day of the week", () => {

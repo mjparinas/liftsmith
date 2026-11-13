@@ -63,4 +63,14 @@ describe("the schema check on a cold start", () => {
     expect(await query("SELECT push_posts FROM social_profiles")).toEqual([]);
     expect(await coldStart()).toBeLessThanOrEqual(2);
   });
+
+  it("indexes the columns COLUMNS adds once they exist, which the nearby gym search looks up by", async () => {
+    await coldStart();
+    const names = (await query("SELECT name FROM sqlite_master WHERE name IN ('public_gyms_for', 'clubs_place')")).map((r) => r.name);
+    expect(names.sort()).toEqual(["clubs_place", "public_gyms_for"]);
+    await run("DROP INDEX clubs_place");
+    expect(await coldStart()).toBeLessThanOrEqual(3);
+    expect((await query("SELECT name FROM sqlite_master WHERE name = 'clubs_place'")).length).toBe(1);
+    expect(await coldStart()).toBeLessThanOrEqual(2);
+  });
 });

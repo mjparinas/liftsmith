@@ -7,6 +7,7 @@ import androidx.activity.result.ActivityResult
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.PermissionController
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.metadata.Device
@@ -187,7 +188,7 @@ class HealthWorkoutPlugin : Plugin() {
                 val from = Instant.ofEpochMilli(start.toLong())
                 val to = Instant.ofEpochMilli(end.toLong())
                 val zone = ZoneId.systemDefault().rules
-                val record = ExerciseSessionRecord(
+                fun record(segments: List<ExerciseSegment>) = ExerciseSessionRecord(
                     startTime = from,
                     startZoneOffset = zone.getOffset(from),
                     endTime = to,
@@ -196,13 +197,40 @@ class HealthWorkoutPlugin : Plugin() {
                     exerciseType = ExerciseSessionRecord.EXERCISE_TYPE_STRENGTH_TRAINING,
                     title = call.getString("title"),
                     notes = call.getString("notes"),
+                    segments = segments,
                 )
-                c.insertRecords(listOf(record))
+                // The workout's parts as segments: weightlifting for lifting and rehab, stretching for the warm-up and
+                // cool-down. Health Connect checks segments against the session's type; if it refuses, the workout is
+                // saved without them.
+                val parts = segmentsOf(call.getArray("segments"), from, to)
+                val session = try {
+                    record(parts)
+                } catch (e: IllegalArgumentException) {
+                    record(emptyList())
+                }
+                c.insertRecords(listOf(session))
                 answer(call, "saved", true)
             } catch (e: Exception) {
                 answer(call, "saved", false)
             }
         }
+    }
+
+    private fun segmentsOf(list: JSArray?, from: Instant, to: Instant): List<ExerciseSegment> {
+        if (list == null || list.length() < 2) return emptyList()
+        val out = mutableListOf<ExerciseSegment>()
+        for (i in 0 until list.length()) {
+            val o = list.optJSONObject(i) ?: continue
+            val a = Instant.ofEpochMilli(o.optLong("start"))
+            val b = Instant.ofEpochMilli(o.optLong("end"))
+            if (!b.isAfter(a) || a.isBefore(from) || b.isAfter(to)) continue
+            val type = when (o.optString("kind")) {
+                "warm", "cool" -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_STRETCHING
+                else -> ExerciseSegment.EXERCISE_SEGMENT_TYPE_WEIGHTLIFTING
+            }
+            out.add(ExerciseSegment(startTime = a, endTime = b, segmentType = type))
+        }
+        return out
     }
 
     private companion object {

@@ -69,13 +69,19 @@ try {
   await page.getByRole("button", { name: /You earned a crate/ }).click();
   await scan("done");
   await page.getByRole("button", { name: "Done", exact: true }).click();
-  // Today after the workout says the day's done; Train again brings the plan (and its warm-up chip) back.
+  // Today after the workout says the day's done; Train again brings the plan (and its parts) back.
   await page.getByTestId("done-today").waitFor();
   await scan("done for today");
   await page.getByRole("button", { name: "Train again" }).click();
-  await page.getByRole("button", { name: "Warm up first" }).click();
+  // Workouts with parts: the warm-up switch above the plan, then today's warm-up.
+  await page
+    .getByTestId("today-parts")
+    .getByRole("switch", { name: /Warm-up/ })
+    .click();
+  await scan("today with parts");
+  await page.evaluate(() => (location.hash = "#/stretch/warmup"));
+  await page.getByTestId("stretch-routine").waitFor();
   await scan("warm-up");
-  await page.mouse.click(10, 10); // tap outside the sheet to close it
   for (const tab of ["Body", "Progress", "Friends", "Awards"]) {
     await page.getByRole("navigation", { name: "Main" }).getByRole("button", { name: tab, exact: true }).click();
     await scan(tab);
@@ -559,11 +565,47 @@ try {
   await page.goto(`${server.url}/app/#/club/ABCD2345`);
   await page.getByRole("button", { name: "Join the club" }).waitFor();
   await scan("friends club link");
+  // Coaching's pages for each side (2026-11-13), signed in against a stand-in API: a coach's tabs, then a client's page.
+  const coachApi = (client) => ({
+    invite: client ? null : { code: "ABCD2345", expiresAt: Date.now() + 7 * 86_400_000 },
+    clients: client ? [] : [{ id: "c1", name: "Alex", since: Date.now() - 30 * 86_400_000 }],
+    coaches: client ? [{ id: "k1", name: "Sam", since: Date.now() - 30 * 86_400_000, role: "coach" }] : [],
+    plans: [],
+    notes: client ? [{ coachId: "k1", clientId: "a", text: "Deload this week.", at: Date.now() }] : [],
+    unread: client ? { k1: 1 } : { c1: 2 },
+    setup: {},
+    forms: [],
+    checkins: [],
+    slots: [],
+    sessions: { booked: [], open: [] },
+    pay: null,
+    coach: !client,
+  });
+  let coachClient = false;
+  await page.route("**/api/coach/**", (r) =>
+    r.fulfill({ json: r.request().method() === "GET" && !r.request().url().includes("?") ? coachApi(coachClient) : { ok: true } }),
+  );
+  await page.route("**/api/teams/**", (r) => r.fulfill({ json: { school: null, codeSent: false, teams: [], joined: [], members: {} } }));
+  await page.goto(`${server.url}/app/#/trainer/clients`);
+  await page.getByRole("navigation", { name: "Coaching pages" }).waitFor();
+  await scan("coaching clients");
+  await page.goto(`${server.url}/app/#/trainer/messages`);
+  await page.getByRole("button", { name: /Alex/ }).waitFor();
+  await scan("coaching messages");
+  coachClient = true;
+  await page.goto(`${server.url}/app/#/trainer`);
+  await page.reload();
+  await page.getByRole("button", { name: /Message Sam/ }).waitFor();
+  await scan("coaching client");
+  await page.unroute("**/api/coach/**");
+  await page.unroute("**/api/teams/**");
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");
-  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against.
+  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against. The page was
+  // just on #/trainer signed in, so reload for the signed-out page.
   await page.goto(`${server.url}/app/#/trainer`);
+  await page.reload();
   await page.getByRole("heading", { name: "Coaching" }).waitFor();
   await scan("trainer");
   await page.goto(`${server.url}/app/#/settings`);

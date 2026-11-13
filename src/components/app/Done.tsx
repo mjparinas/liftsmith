@@ -11,7 +11,7 @@ import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
 import { date, inSentence, num, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
-import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
@@ -20,7 +20,7 @@ import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import { doneCue, say, voice } from "@/lib/voice";
 
-import { Badge, LeagueCard, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
+import { Badge, RARITY_COLOUR, StreakCard, TIER_COLOUR, useGame } from "./Achievements";
 import { burst } from "./burst";
 import { WorkoutNoteCard } from "./EditWorkout";
 import { DoneMoments, lean } from "./Extras";
@@ -43,7 +43,7 @@ import { Button } from "./ui";
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
   useEffect(() => {
-    const dur = juice.lean ? 1 : ms;
+    const dur = calm() ? 1 : ms; // Lean mode or the phone's reduce motion: show the total at once.
     const t0 = performance.now();
     let raf = 0;
     const tick = (t: number) => {
@@ -160,6 +160,7 @@ export function Done() {
   // Counts up in kg and reads like the volume everywhere else (fmtVolume: "2.9k kg").
   const vol = useCountUp(s ? Math.round(s.volume) : 0);
   const [sharing, setSharing] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     void confetti(prs.length > 0 || levelUp);
@@ -314,23 +315,39 @@ export function Done() {
         <Crate key={p.key} item={p.item} duplicate={p.duplicate} label={p.label} />
       ))}
 
-      <div className="mt-4 space-y-3 text-left">
-        <StreakCard g={after} />
-        <LeagueCard g={after} />
-      </div>
+      {/* The streak only once there is one; the weekly league lives on Today and Awards. */}
+      {after.streak.weeks > 0 && (
+        <div className="mt-4 text-left">
+          <StreakCard g={after} />
+        </div>
+      )}
 
-      <Button kind="ghost" icon="share" className="mt-6 w-full" onClick={() => setSharing(true)}>
-        {t("done.share")}
-      </Button>
       <PostToFriends summary={s} />
-      <SendToFriend
-        className="mt-2"
-        name={t("friends.send.doneName", { date: date(s.start, { month: "short", day: "numeric" }) })}
-        items={doneItems(events, s.sessionId)}
-      />
+      {/* One button for every way to share or keep this workout, so the end screen stays short. */}
+      <button
+        type="button"
+        aria-expanded={shareOpen}
+        onClick={() => setShareOpen((o) => !o)}
+        className="press mt-6 flex w-full items-center justify-center gap-2 rounded-2xl border border-line bg-raised px-4 py-3 font-semibold text-ink hover:border-accent/40"
+      >
+        <Icon name="share" size={18} />
+        {t("done.shareSave")}
+        <Icon name={shareOpen ? "chevronUp" : "chevronDown"} size={16} />
+      </button>
+      {shareOpen && (
+        <div className="card animate-rise mt-2 space-y-2 p-3 text-left" data-testid="done-share">
+          <Button kind="ghost" icon="image" className="w-full" onClick={() => setSharing(true)}>
+            {t("done.share")}
+          </Button>
+          <SendToFriend
+            name={t("friends.send.doneName", { date: date(s.start, { month: "short", day: "numeric" }) })}
+            items={doneItems(events, s.sessionId)}
+          />
+          <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
+          <ShareWorkout sessionId={s.sessionId} />
+        </div>
+      )}
       <ShareSheet open={sharing} onClose={() => setSharing(false)} items={shareItems} />
-      <SaveDoneAsRoutine items={doneItems(events, s.sessionId)} />
-      <ShareWorkout sessionId={s.sessionId} />
       <Button className="mt-3 w-full py-4 text-lg" onClick={() => go("today")}>
         {t("done.done")}
       </Button>

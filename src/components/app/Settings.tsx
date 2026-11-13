@@ -20,11 +20,12 @@ import { LANG_NAME, LANGS, t, type LangPref } from "@/lib/i18n";
 import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
-import { erasePhotos } from "@/lib/photos";
+import { useDesktop } from "@/lib/layout";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { currentKg } from "@/lib/tdee";
+import { useCoachNotes } from "@/lib/trainer";
 import type { Experience, Goal, Variability } from "@/lib/types";
 import { fmtBodyweight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -47,13 +48,14 @@ import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
 
+// Every row on the Settings screen has its own icon, so none reads as a repeat of another.
 const GROUP_ICON: Record<Group, IconName> = {
   training: "target",
   workout: "dumbbell",
   reminders: "clock",
-  look: "sparkle",
+  look: "moon",
   body: "heart",
-  data: "lock",
+  data: "layers",
 };
 
 /** Old deep links into the single long Settings screen, and the group (and section) they open now. */
@@ -148,6 +150,18 @@ function ProCard() {
   );
 }
 
+/** Coaching: what it holds for this lifter, their coach's name or how many clients they coach. */
+function CoachingRow() {
+  const who = useCoachNotes((s) => s.who);
+  const first = who.coaches[0];
+  const sub = first
+    ? t("trn.rowClient", { name: first.name || t("trn.noName") })
+    : who.clients
+      ? t("trn.rowCoach", { count: who.clients })
+      : t("trn.rowNote");
+  return <NavRow title={t("trn.row")} sub={sub} icon="people" onClick={() => go("trainer")} />;
+}
+
 /** Settings' second row: sign in to back up and sync, or who's signed in. */
 function AccountRow() {
   const account = useAccount((s) => s.account);
@@ -156,7 +170,7 @@ function AccountRow() {
       <NavRow
         title={t("account.row")}
         sub={account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}
-        icon="link"
+        icon="lock"
         onClick={() => go("account")}
       />
     </div>
@@ -166,6 +180,8 @@ function AccountRow() {
 export function Settings() {
   const { profile } = useApp();
   const { arg } = useRoute();
+  const desktop = useDesktop();
+  const coaching = useCoachNotes((s) => s.coaching);
   const legacy = arg ? LEGACY[arg] : undefined;
   const group: Group | null = legacy ? legacy[0] : (GROUPS as readonly string[]).includes(arg ?? "") ? (arg as Group) : null;
   const anchor = legacy?.[1];
@@ -191,14 +207,17 @@ export function Settings() {
       <ProCard />
       <AccountRow />
       <div className="mt-2">
-        <NavRow title={t("gym.row")} sub={t("gym.rowNote")} icon="gym" onClick={() => go("gym")} />
+        <NavRow title={t("gym.row")} sub={t("gym.rowNote")} icon="pin" onClick={() => go("gym")} />
       </div>
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
       </div>
-      <div className="mt-2">
-        <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
-      </div>
+      {/* On desktop, an account that coaches or is coached has Coaching in the sidebar (App.tsx), so the row goes. */}
+      {!(desktop && coaching) && (
+        <div className="mt-2">
+          <CoachingRow />
+        </div>
+      )}
       <ul className="mt-3 space-y-2">
         {GROUPS.map((g) => (
           <li key={g}>
@@ -210,7 +229,7 @@ export function Settings() {
         <NavRow
           title={t("lab.row")}
           sub={t("lab.rowNote")}
-          icon="sparkle"
+          icon="lightbulb"
           pro={!can("labs")}
           onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
         />
@@ -295,15 +314,19 @@ function GroupPage({ group }: { group: Group }) {
 /** Training: what the plan is built for, when you train, injuries, and the rarer block options. */
 function TrainingGroup() {
   const { profile, setProfile } = useApp();
+  const desktop = useDesktop();
   return (
     <>
-      <Section title={t("settings.program")}>
-        <NavRow
-          title={programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}
-          sub={t("settings.change")}
-          onClick={() => go("programs")}
-        />
-      </Section>
+      {/* On desktop the sidebar has Programs (App.tsx), so the row is a phone thing. */}
+      {!desktop && (
+        <Section title={t("settings.program")}>
+          <NavRow
+            title={programName(profile.planSource?.kind === "program" ? profile.planSource.id : undefined) ?? t("settings.adaptive")}
+            sub={t("settings.change")}
+            onClick={() => go("programs")}
+          />
+        </Section>
+      )}
       <Row<Goal>
         label={t("settings.goal")}
         value={profile.goal}
@@ -573,7 +596,6 @@ function DataGroup() {
               className="w-full"
               onClick={() =>
                 void deleteEmail().finally(() => {
-                  void erasePhotos();
                   void reset();
                 })
               }

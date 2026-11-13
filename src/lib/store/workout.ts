@@ -9,6 +9,8 @@ import { deleteEvents } from "../localdb";
 import { target } from "../progression";
 import { moveItem } from "../reorder";
 import { doLater, fitToTime } from "../replan";
+import { partDefaults } from "../routines";
+import { doneParts, enterPart, planParts, type LivePart, type LivePartKind } from "../sessions";
 import { implementsFor } from "../sides";
 import { afterSet, linksOf, toggleLink } from "../superset";
 import type { AppEvent, LoadKind, Muscle, Rating, SetTag } from "../types";
@@ -62,7 +64,7 @@ export interface Active {
    * Today's max lab: what the camera saw on the set being done (its last full rep's speed in m/s, and a
    * failed attempt after it), written onto the set at Log set. Cleared by every Log set.
    */
-  setSpeed?: { exerciseId: string; speed: number; failed: boolean };
+  setSpeed?: { exerciseId: string; speed: number; failed: boolean; mean?: number };
   /**
    * The set on screen is a bonus drop or rest-pause set (extraSet), and the weight and reps to go back to
    * afterwards when the exercise has planned sets left.
@@ -71,6 +73,23 @@ export interface Active {
   tagReturn?: { weight: number; reps: number };
   /** The plan position the lifter had moved on to before a bonus set took them back (for Cancel). */
   tagFrom?: number;
+  /**
+   * Workouts with parts (sessions-with-parts.md): the warm-up, lifting (or rehab) and cool-down planned at Start, in
+   * order, and which one is on. Missing on workouts started before parts: the whole workout is lifting.
+   */
+  parts?: LivePart[];
+  part?: number;
+}
+
+/** The part on now: warm-up, lifting, rehab or cool-down. A workout without parts is lifting. */
+export function partNow(a: Pick<Active, "parts" | "part"> | null | undefined): LivePartKind {
+  return a?.parts?.[a.part ?? 0]?.kind ?? "lift";
+}
+
+/** True while a warm-up or cool-down is on, when Log set and +30 s have nothing to do. */
+export function stretching(a: Pick<Active, "parts" | "part"> | null | undefined): boolean {
+  const k = partNow(a);
+  return k === "warm" || k === "cool";
 }
 
 /** The pause before a rest-pause set. */
@@ -190,7 +209,11 @@ export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: 
     superset: item.group,
     tag: a.tag,
     ...(a.setSpeed?.exerciseId === item.exerciseId
-      ? { endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000, failedRep: a.setSpeed.failed ? (true as const) : undefined }
+      ? {
+          endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000,
+          ...(a.setSpeed.mean !== undefined ? { meanSpeed: a.setSpeed.mean } : {}),
+          failedRep: a.setSpeed.failed ? (true as const) : undefined,
+        }
       : {}),
   };
   const all = [...events, setEv];
@@ -250,8 +273,13 @@ export interface WorkoutSlice {
   /** Creates the lifter's own exercise and returns its id. */
   addCustomExercise(e: { name: string; primary: Muscle; load: LoadKind; compound: boolean }): string;
   autoEnd(now?: number): boolean;
-  /** Starts today's plan, or the plan given (a shared workout). */
+  /** Starts today's plan, or the plan given (a shared workout), with the parts picked on Today. */
   start(plan?: Plan): void;
+  /** Today's picks for the warm-up and cool-down parts, over the Settings defaults. Cleared by Start. */
+  partPicks: { warm?: boolean; cool?: boolean };
+  pickPart(kind: "warm" | "cool", on: boolean): void;
+  /** Moves on to the next part (skipping the one on now when `skip`). Returns the part now on, or null at the end. */
+  nextPart(skip?: boolean): LivePartKind | null;
   /** Fits the rest of the workout into this many minutes; returns what changed. */
   shortOnTime(minutes: number): string[];
   /** Moves the current exercise after the next one (equipment busy). */
@@ -259,7 +287,7 @@ export interface WorkoutSlice {
   /** Logs the set on screen; `at` is when it was tapped (a lock-screen tap replayed when the app opens), else now. */
   logSet(at?: number): void;
   /** What the camera saw on the set being done (today's max lab), saved with it at Log set. */
-  noteSetSpeed(exerciseId: string, speed: number, failed: boolean): void;
+  noteSetSpeed(exerciseId: string, speed: number, failed: boolean, mean?: number): void;
   /**
    * Between sets: a bonus drop set (about 75% of the set just logged, no rest) or rest-pause set (same
    * weight after a 15 s pause) of the exercise just done. Undefined cancels one that's on screen.
@@ -287,7 +315,8 @@ export interface WorkoutSlice {
   goTo(index: number): void;
   /** Link exercise `index` with the next one as a superset, or split them. Works on Today's plan and mid-workout. */
   toggleSuperset(index: number): void;
-  finish(opts?: { at?: number; auto?: boolean }): AppEvent | null;
+  /** `skip`: the part on now (a cool-down) was skipped, so it isn't recorded. */
+  finish(opts?: { at?: number; auto?: boolean; skip?: boolean }): AppEvent | null;
   discard(): void;
   pushHr(bpm: number): void;
 }
@@ -297,6 +326,26 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
   return {
     active: null,
     undoable: null,
+    partPicks: {},
+
+    pickPart(kind, on) {
+      set({ partPicks: { ...get().partPicks, [kind]: on } });
+    },
+
+    nextPart(skip = false) {
+      const a = get().active;
+      if (!a?.parts) return null;
+      const i = (a.part ?? 0) + 1;
+      if (i >= a.parts.length) return null;
+      const now = Date.now();
+      const parts = enterPart(a.parts, i, now, skip);
+      const kind = parts[i]!.kind;
+      // The first set's time starts when the lifting does, not when the warm-up did.
+      const next: Active = { ...a, parts, part: i, lastAt: now, ...(kind === "lift" || kind === "rehab" ? { setStart: now } : {}) };
+      set({ active: next });
+      persistActive(next);
+      return kind;
+    },
 
     undoLast() {
       const u = get().undoable;
@@ -408,6 +457,12 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       const sessionId = uid();
       const now = Date.now();
       const r = get().readiness;
+      const tp = get().profile.training;
+      const picks = get().partPicks;
+      const routine = plan.routineId ? get().profile.routines?.find((x) => x.id === plan.routineId) : undefined;
+      const dflt = partDefaults(routine, tp?.warmFirst);
+      const planned = planParts({ warm: picks.warm ?? dflt.warm, cool: picks.cool ?? dflt.cool }, !!plan.rehab);
+      const parts = planned.length > 1 ? enterPart(planned, 0, now) : undefined;
       const overridden = get().callOverride !== null && get().callOverride !== r?.call;
       const a = loadItem(
         get().events,
@@ -425,6 +480,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           hrAt: [],
           setStart: now,
           lastAt: now,
+          ...(parts ? { parts, part: 0 } : {}),
         },
         0,
       );
@@ -442,9 +498,10 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
           challenge: plan.challenge,
           program: plan.program ? { id: plan.program.id, day: plan.program.day } : undefined,
           routine: plan.routineId,
+          ...(parts ? { plan: planned.map((p) => ({ kind: p.kind })) } : {}),
         },
       ]);
-      set({ callOverride: null, links: [], order: [], routineId: null, undoable: null, tryAdaptive: false });
+      set({ callOverride: null, links: [], order: [], routineId: null, undoable: null, tryAdaptive: false, partPicks: {} });
       set({ active: a });
       persistActive(a);
       track("workout_start", {
@@ -456,17 +513,18 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       });
     },
 
-    noteSetSpeed(exerciseId, speed, failed) {
+    noteSetSpeed(exerciseId, speed, failed, mean) {
       const a = get().active;
       if (!a || !(speed > 0) || warmingUp(a)) return;
-      const next = { ...a, setSpeed: { exerciseId, speed, failed } };
+      const next = { ...a, setSpeed: { exerciseId, speed, failed, ...(mean !== undefined ? { mean } : {}) } };
       set({ active: next });
       persistActive(next);
     },
 
     logSet(at) {
       const a = get().active;
-      if (!a) return;
+      // A lock-screen Log set tapped during a warm-up or cool-down has no set to log.
+      if (!a || stretching(a)) return;
       const now = at ?? Date.now();
       const r = afterLog(a, get().events, get().profile.training?.autoRest !== false, now);
       if (!r) return;
@@ -568,7 +626,7 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
 
     addRest(sec) {
       const a = get().active;
-      if (!a?.restUntil) return;
+      if (!a?.restUntil || stretching(a)) return;
       const next = { ...a, restUntil: a.restUntil + sec * 1000, restTotal: a.restTotal + sec };
       set({ active: next });
       persistActive(next);
@@ -758,6 +816,9 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
         workSec: sets.length ? sum("durationSec") : undefined,
         restSec: sets.length ? sum("restSec") : undefined,
         auto: opts.auto || undefined,
+        ...(a.parts
+          ? { parts: doneParts(opts.skip ? a.parts.map((p, i) => (i === (a.part ?? 0) ? { ...p, skipped: true } : p)) : a.parts, at) }
+          : {}),
       };
       const evs: AppEvent[] = [end];
       if (hr.length)

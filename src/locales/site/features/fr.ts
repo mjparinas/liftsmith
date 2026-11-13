@@ -75,6 +75,10 @@ export const fr: FeaturesText = {
       body: "Choisit des exercices que votre salle permet et pour lesquels vos muscles sont prêts, puis fixe chaque charge et chaque répétition d’après vos dernières séances.",
       proPart: "Sans Pro, vous avez une séance adaptative par semaine en plus de votre programme gratuit ; Pro planifie chaque jour.",
     },
+    "pick-weights": {
+      name: "Apprend les exercices que vous aimez",
+      body: "Les exercices populaires sont choisis le plus souvent. Mettez une étoile à un exercice et il revient bien plus ; remplacez-le et il revient moins, pendant quelques mois.",
+    },
     splits: {
       name: "Splits adaptatifs",
       body: "Poussée, tirage, jambes ou haut et bas du corps, toujours ajustés à votre récupération chaque jour.",
@@ -164,6 +168,10 @@ export const fr: FeaturesText = {
       name: "Étirements",
       body: "48 étirements avec démonstrations en 3D : un échauffement facultatif avant, un retour au calme après, ou une routine d’étirements n’importe quel jour.",
     },
+    "workout-parts": {
+      name: "Séances en plusieurs parties",
+      body: "Une séance peut enchaîner un échauffement, la musculation et un retour au calme, avec Passer entre chaque partie. L’écran verrouillé et votre montre indiquent la partie en cours, l’historique montre chaque partie, et les jours d’étirements de 10 minutes ou plus gardent votre série. Les routines peuvent inclure leur propre échauffement et retour au calme, y compris dans les liens partagés et celles de votre coach. Les notes du coach lisent chaque partie : la douleur après la rééducation qui baisse ou monte, et une fréquence cardiaque qui reste haute pendant le retour au calme.",
+    },
     notes: {
       name: "Notes du coach",
       body: "Signale une fatigue qui s’accumule, un mouvement qui stagne, un muscle qui manque de séries, un objectif de la semaine menacé ou une masse grasse qui grimpe, chaque fois avec une chose à faire, souvent en une touche.",
@@ -250,7 +258,23 @@ export const fr: FeaturesText = {
     },
     "gym-finder": {
       name: "Recherche de salles et pages de salle",
-      body: "Trouvez des salles près de chez vous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire.",
+      body: "Trouvez des salles près de chez vous sur une carte avec la liste en dessous, les officielles d’abord, chacune avec sa page : matériel, horaires, carte et membres. Les gérants peuvent revendiquer leur salle et ajouter un logo et des photos. Une salle manque ? Ajoutez-la. Les gérants voient combien de sportifs l’ont ajoutée ou ont scanné l’affiche, et quoi faire ensuite. Les salles officielles peuvent animer un club avec un classement hebdomadaire.",
+    },
+    "gym-amenities": {
+      name: "Services et tarifs sur les pages des salles",
+      body: "Les propriétaires indiquent ce qu’il y a en plus de l’équipement (douches, stationnement, accès 24 h/24, espace femmes et plus) et le prix d’un accès à la journée, à la semaine ou de l’abonnement.",
+    },
+    "gym-news": {
+      name: "Annonces de votre salle",
+      body: "Les salles officielles publient horaires des fêtes, nouvel équipement ou changements de cours sur leur page, et les membres de leur club reçoivent une notification.",
+    },
+    "gym-problems": {
+      name: "Signalez un équipement en panne",
+      body: "Dites à votre salle qu’une machine est en panne ou manque. Tous ceux qui s’y entraînent ont un plan qui s’en passe, et le propriétaire le voit avec un bouton Réparé.",
+    },
+    "gym-trainers": {
+      name: "Coachs sur les pages des salles",
+      body: "Les coachs s’affichent dans les salles où ils entraînent leurs clients, avec une ligne sur eux et un bouton pour s’entraîner avec eux. Dans une salle officielle, le propriétaire les approuve d’abord.",
     },
     "buy-next": {
       name: "Quoi acheter ensuite",
@@ -311,6 +335,16 @@ export const fr: FeaturesText = {
       name: "Paiements des clients avec Stripe",
       body: "Connectez votre propre compte Stripe et fixez le prix de chaque client, à la séance ou au mois. Ils paient sur la page sécurisée de Stripe, l'argent vous arrive directement, et un paiement mensuel raté remonte en haut de leur rapport.",
     },
+    "coach-sharing": {
+      name: "Les clients choisissent ce que voit leur coach",
+      body: "L'entraînement est toujours partagé. Fréquence cardiaque, notes de séance, forme et récupération, données corporelles, douleurs et blessures, et cycle sont chacun un interrupteur que le client active pour chaque coach, à l'acceptation ou plus tard. Les photos et les salles ne sortent jamais.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
+    "coach-pages": {
+      name: "Une page pour chaque côté",
+      body: "Les clients ne voient que leur coach : ils lui écrivent en un geste, répondent aux bilans, réservent des séances et choisissent ce qu'ils partagent. Les coachs ont une page par tâche, avec clients, messages, agenda, bilans et paiements en onglets, sur le web comme sur téléphone.",
+      proPart: "Être client est gratuit ; coacher des clients est Pro.",
+    },
     "coach-plans": {
       name: "Des forfaits coach qui grandissent avec votre clientèle",
       body: "Pro couvre jusqu'à 3 clients. Coach offre de la place pour 25 et Coach Plus n'a pas de limite fixe, avec tous les outils de coaching dans chaque forfait. Vos clients s'entraînent toujours gratuitement, et Liftsmith ne prend rien sur ce qu'ils vous paient.",
@@ -356,7 +390,7 @@ export const fr: FeaturesText = {
     },
     offline: {
       name: "Fonctionne hors ligne",
-      body: "Tout tourne sur votre appareil : pas de réseau au sous-sol de la salle, pas de souci.",
+      body: "Tout tourne sur votre appareil et se synchronise en arrière-plan : pas de réseau au sous-sol de la salle, pas de souci.",
     },
     sync: {
       name: "Comptes et synchronisation",

@@ -246,6 +246,8 @@ interface WorkoutPlugin {
     notes?: string;
     kcal?: number;
     avgHr?: number;
+    /** The workout's parts (workouts with parts): Health Connect segments, HealthKit workout activities. */
+    segments?: { kind: string; start: number; end: number }[];
   }): Promise<{ saved: boolean }>;
   /** Apple Health's sex and birth year (iOS). Android answers with nothing: Health Connect has no such records. */
   characteristics?(o: { ask: boolean }): Promise<{ sex?: string; birthYear?: number }>;
@@ -300,6 +302,7 @@ export async function saveWorkout(w: {
   avgHr?: number;
   title?: string;
   notes?: string;
+  segments?: { kind: string; start: number; end: number }[];
 }): Promise<void> {
   if (!(await healthAvailable())) return;
   const kcal = strengthKcal((w.end - w.start) / 1000, w.bodyweightKg);
@@ -307,8 +310,18 @@ export async function saveWorkout(w: {
   const plugin = workoutPlugin();
   if (plugin && w.id) {
     try {
-      const saved = (await plugin.save({ id: w.id, start: w.start, end: w.end, title: w.title, notes: w.notes, kcal, avgHr: w.avgHr }))
-        .saved;
+      const saved = (
+        await plugin.save({
+          id: w.id,
+          start: w.start,
+          end: w.end,
+          title: w.title,
+          notes: w.notes,
+          kcal,
+          avgHr: w.avgHr,
+          ...(w.segments && w.segments.length > 1 ? { segments: w.segments } : {}),
+        })
+      ).saved;
       const ios = (await import("@capacitor/core")).Capacitor.getPlatform() === "ios";
       inWorkout = saved && ios;
     } catch {

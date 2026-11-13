@@ -364,7 +364,8 @@ function Locker({ g }: { g: Game }) {
   );
 }
 
-const FILTERS: ("all" | "earned" | Category)[] = [
+const FILTERS: ("next" | "all" | "earned" | Category)[] = [
+  "next",
   "all",
   "earned",
   "consistency",
@@ -397,13 +398,24 @@ function useFocusBadge(): string | null {
   return arg && faded !== arg ? arg : null;
 }
 
+/** How many unearned badges Highlights shows after the earned ones. */
+const CLOSEST = 6;
+
 export function Achievements() {
   const g = useGame();
-  const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
+  const { arg } = useRoute();
+  // Highlights (earned plus the closest few) keeps the screen short; a link to one badge opens on All so it's there.
+  const [filter, setFilter] = useState<(typeof FILTERS)[number]>(arg ? "all" : "next");
   const focus = useFocusBadge();
-  const list = g.achievements.filter((a) => (filter === "all" ? true : filter === "earned" ? a.level > 0 : a.category === filter));
-  const hiddenLeft = list.filter((a) => a.hidden).length;
-  const sorted = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
+  const list = g.achievements.filter((a) =>
+    filter === "all" || filter === "next" ? true : filter === "earned" ? a.level > 0 : a.category === filter,
+  );
+  const hiddenLeft = filter === "next" ? 0 : list.filter((a) => a.hidden).length;
+  const byProgress = [...list].sort((a, b) => Number(b.level > 0) - Number(a.level > 0) || b.progress - a.progress);
+  const sorted =
+    filter === "next"
+      ? [...byProgress.filter((a) => a.level > 0), ...byProgress.filter((a) => a.level === 0 && !a.hidden).slice(0, CLOSEST)]
+      : byProgress;
   const { stats } = useApp();
   const ctx = useShareContext(g);
   const [sharing, setSharing] = useState<string | null>(null);
@@ -474,7 +486,13 @@ export function Achievements() {
         <div className="-mx-1 mb-3 flex gap-2 overflow-x-auto px-1 pb-1">
           {FILTERS.map((f) => (
             <Chip key={f} active={filter === f} onClick={() => setFilter(f)}>
-              {f === "all" ? t("awards.all") : f === "earned" ? t("awards.earned") : CATEGORY_LABEL[f]}
+              {f === "next"
+                ? t("awards.highlights")
+                : f === "all"
+                  ? t("awards.all")
+                  : f === "earned"
+                    ? t("awards.earned")
+                    : CATEGORY_LABEL[f]}
             </Chip>
           ))}
         </div>
@@ -501,6 +519,18 @@ export function Achievements() {
                   <span className="block font-semibold">{t("awards.secretCount", { count: hiddenLeft })}</span>
                   <span className="text-sm text-muted">{t("awards.hidden")}</span>
                 </span>
+              </button>
+            </li>
+          )}
+          {filter === "next" && (
+            <li>
+              <button
+                type="button"
+                onClick={() => setFilter("all")}
+                className="press flex min-h-11 w-full items-center justify-between gap-3 px-4 py-3 text-left font-medium text-accent"
+              >
+                {t("awards.showAll", { total: g.badges.total })}
+                <Icon name="chevronRight" size={16} />
               </button>
             </li>
           )}

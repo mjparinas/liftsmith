@@ -50,6 +50,11 @@ export function toggleFavourite(t: TrainingPrefs | undefined, exerciseId: string
   return { ...t, favourites: list.includes(exerciseId) ? list.filter((x) => x !== exerciseId) : [...list, exerciseId] };
 }
 
+/** Forgets the swaps that lowered an exercise's pick weight (pickWeights.ts): only swaps after `now` count again. */
+export function resetPick(t: TrainingPrefs | undefined, exerciseId: string, now: number): TrainingPrefs {
+  return { ...t, pickResets: { ...t?.pickResets, [exerciseId]: now } };
+}
+
 /** Adds or removes a priority muscle. At the cap, the oldest one makes room. */
 export function togglePriority(t: TrainingPrefs | undefined, m: Muscle): TrainingPrefs {
   const list = t?.priorities ?? [];

@@ -14,6 +14,7 @@ vi.mock("canvas-confetti", () => ({ default: () => {} }));
 
 type GisCallback = (r: { credential?: string }) => void;
 let gis: GisCallback | null = null;
+let buttonOptions: Record<string, unknown> | null = null;
 
 function stubServer(records: unknown[]) {
   vi.stubGlobal("fetch", async (url: string) => {
@@ -42,7 +43,8 @@ beforeEach(async () => {
     accounts: {
       id: {
         initialize: (o: Record<string, unknown>) => (gis = o.callback as GisCallback),
-        renderButton: (el: HTMLElement) => {
+        renderButton: (el: HTMLElement, o: Record<string, unknown>) => {
+          buttonOptions = o;
           el.innerHTML = "<button type='button'>Continue with Google</button>";
         },
       },
@@ -68,6 +70,8 @@ describe("signing in from the welcome screen", () => {
     render(<App />);
     await user.click(await screen.findByRole("button", { name: "I already have an account" }));
     await waitFor(() => expect(gis).not.toBeNull());
+    // Google's button is told the app's language, so it never guesses another from the browser or the address.
+    await waitFor(() => expect(buttonOptions?.locale).toMatch(/^en/));
     gis!({ credential: "id-token" });
     expect(await screen.findByText("Today's workout")).toBeInTheDocument();
     expect(screen.queryByRole("dialog", { name: "Sign in" })).toBeNull();

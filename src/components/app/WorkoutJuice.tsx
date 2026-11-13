@@ -64,14 +64,18 @@ export function PrMoment() {
   );
 }
 
-/** Shown under "Next up" during rest when a PR is one or two reps past the plan. */
-export function AlmostThere({ exerciseId, weight, reps }: { exerciseId: string; weight: number; reps: number }) {
+/**
+ * Shown under "Next up" during rest when a PR is one or two reps past the plan. Measured against the best from
+ * before this workout (`since`), so the first workout of a lift never says a PR is in reach.
+ */
+export function AlmostThere({ exerciseId, weight, reps, since }: { exerciseId: string; weight: number; reps: number; since: number }) {
   const { events, profile } = useApp();
-  const need = repsForPr(events, exerciseId, weight, Number.MAX_SAFE_INTEGER);
+  const need = repsForPr(events, exerciseId, weight, since);
   if (need === null || need > reps + 2) return null;
   const at = `${fmtNum(fromKg(weight, profile.unit))} ${profile.unit}`;
   return (
-    <p className="mt-2 text-center text-sm text-gold">
+    <p className="mt-2 flex items-start justify-center gap-1.5 text-center text-sm text-gold">
+      <Icon name="trophy" size={16} className="mt-0.5 shrink-0" />
       {need <= reps ? t("pr.isNew", { reps, weight: at }) : t("pr.inReach", { reps: need, weight: at })}
     </p>
   );

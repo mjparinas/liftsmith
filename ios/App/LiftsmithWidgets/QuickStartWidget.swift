@@ -96,6 +96,10 @@ struct QuickStartView: View {
                 AccessoryWidgetBackground()
                 Image(systemName: "figure.strengthtraining.traditional").font(.title2)
             }
+            // An icon on its own: VoiceOver says what tapping it does instead of the symbol's name.
+            .accessibilityElement(children: .ignore)
+            .accessibilityLabel(Text("Start workout"))
+            .accessibilityAddTraits(.isButton)
             .widgetURL(Brand.start)
             .widgetBackground(.clear)
         case .accessoryRectangular:

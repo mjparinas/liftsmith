@@ -5,8 +5,8 @@ import type { Message } from "@/lib/i18n";
 
 export const en = {
   "pr.banner": "New personal record",
-  "pr.isNew": "🏆 {reps} reps at {weight} is a new PR.",
-  "pr.inReach": "🏆 PR in reach: {reps} reps at {weight} beats your best.",
+  "pr.isNew": "{reps} reps at {weight} is a new PR.",
+  "pr.inReach": "PR in reach: {reps} reps at {weight} beats your best.",
   "pr.replay": "▶ Replay {name}",
   "pr.replayTitle": "PR replay",
   "pr.newBest": "New personal best",
@@ -21,8 +21,8 @@ type Key = keyof typeof en;
 
 export const es: Partial<Record<Key, Message>> = {
   "pr.banner": "Nueva mejor marca",
-  "pr.isNew": "🏆 {reps} repeticiones con {weight} es una nueva mejor marca.",
-  "pr.inReach": "🏆 Mejor marca a tu alcance: {reps} repeticiones con {weight} superan tu récord.",
+  "pr.isNew": "{reps} repeticiones con {weight} es una nueva mejor marca.",
+  "pr.inReach": "Mejor marca a tu alcance: {reps} repeticiones con {weight} superan tu récord.",
   "pr.replay": "▶ Repetir {name}",
   "pr.replayTitle": "Repetición de tu mejor marca",
   "pr.newBest": "Nueva mejor marca",
@@ -35,8 +35,8 @@ export const es: Partial<Record<Key, Message>> = {
 
 export const fr: Partial<Record<Key, Message>> = {
   "pr.banner": "Nouveau record personnel",
-  "pr.isNew": "🏆 {reps} répétitions à {weight}, c’est un nouveau record.",
-  "pr.inReach": "🏆 Record à portée : {reps} répétitions à {weight} battent votre meilleur.",
+  "pr.isNew": "{reps} répétitions à {weight}, c’est un nouveau record.",
+  "pr.inReach": "Record à portée : {reps} répétitions à {weight} battent votre meilleur.",
   "pr.replay": "▶ Revoir {name}",
   "pr.replayTitle": "Revoir le record",
   "pr.newBest": "Nouveau record personnel",
@@ -49,8 +49,8 @@ export const fr: Partial<Record<Key, Message>> = {
 
 export const de: Partial<Record<Key, Message>> = {
   "pr.banner": "Neuer persönlicher Rekord",
-  "pr.isNew": "🏆 {reps} Wdh. mit {weight} sind ein neuer PR.",
-  "pr.inReach": "🏆 PR in Reichweite: {reps} Wdh. mit {weight} schlagen deine Bestleistung.",
+  "pr.isNew": "{reps} Wdh. mit {weight} sind ein neuer PR.",
+  "pr.inReach": "PR in Reichweite: {reps} Wdh. mit {weight} schlagen deine Bestleistung.",
   "pr.replay": "▶ {name} nochmal ansehen",
   "pr.replayTitle": "PR-Wiederholung",
   "pr.newBest": "Neue Bestleistung",
@@ -63,8 +63,8 @@ export const de: Partial<Record<Key, Message>> = {
 
 export const it: Partial<Record<Key, Message>> = {
   "pr.banner": "Nuovo record personale",
-  "pr.isNew": "🏆 {reps} ripetizioni con {weight} sono un nuovo PR.",
-  "pr.inReach": "🏆 PR a portata: {reps} ripetizioni con {weight} battono il tuo record.",
+  "pr.isNew": "{reps} ripetizioni con {weight} sono un nuovo PR.",
+  "pr.inReach": "PR a portata: {reps} ripetizioni con {weight} battono il tuo record.",
   "pr.replay": "▶ Rivedi {name}",
   "pr.replayTitle": "Replay del PR",
   "pr.newBest": "Nuovo record",
@@ -77,8 +77,8 @@ export const it: Partial<Record<Key, Message>> = {
 
 export const ja: Partial<Record<Key, Message>> = {
   "pr.banner": "自己ベスト更新",
-  "pr.isNew": "🏆 {weight}で{reps}回は自己ベストです。",
-  "pr.inReach": "🏆 自己ベスト目前：{weight}で{reps}回なら記録更新です。",
+  "pr.isNew": "{weight}で{reps}回は自己ベストです。",
+  "pr.inReach": "自己ベスト目前：{weight}で{reps}回なら記録更新です。",
   "pr.replay": "▶ {name}をリプレイ",
   "pr.replayTitle": "自己ベストのリプレイ",
   "pr.newBest": "自己ベスト",

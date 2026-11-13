@@ -74,6 +74,7 @@ try {
   await shot("done");
 
   // Share: the sheet previews the card, switches sizes, and keeps the figure off the main thread's way.
+  await page.getByRole("button", { name: "Share or save" }).click();
   await page.getByRole("button", { name: "Share this workout" }).click();
   const sheet = page.getByRole("dialog", { name: "Share" });
   await sheet.getByRole("img", { name: /Preview/ }).waitFor();

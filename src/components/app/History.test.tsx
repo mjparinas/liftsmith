@@ -91,4 +91,16 @@ describe("history calendar", () => {
     await user.click(screen.getByRole("button", { name: /Sunday, November 15, Stretched, 1 stretch/ }));
     expect(screen.getByTestId("stretch-card")).toHaveTextContent("8 min · 1 stretch");
   });
+
+  it("shows pain before and after a workout when there's a before to compare with", () => {
+    const base = useApp.getState().events;
+    seed([
+      ...base,
+      { type: "injury", id: "inj", at: at(10, 1), injuryId: "i1", part: "knee" },
+      { type: "pain", id: "p1", at: at(10, 18) - 3600_000, injuryId: "i1", score: 4 },
+      { type: "pain", id: "p2", at: at(10, 18) + 3 * 60_000, injuryId: "i1", score: 2, sessionId: "late" },
+    ]);
+    render(<HistoryCalendar />);
+    expect(within(screen.getByRole("article")).getByTestId("workout-pain")).toHaveTextContent("Knee pain: 4 → 2");
+  });
 });

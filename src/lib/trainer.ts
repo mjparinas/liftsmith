@@ -14,12 +14,15 @@ import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } 
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import type { ClientPay, OverviewPay } from "./coachPay";
 import type { ClientLimits, CoachTier } from "./coachPlans";
+import { cycleState } from "./cycle";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
+import { track } from "./net";
 import { KCAL_DAYS, LOGGED_KCAL, PROTEIN_SHORT } from "./nutrition";
+import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
@@ -83,6 +86,9 @@ export interface Overview {
   /** Coaches this client shares pain and injuries with; clients who share theirs with this coach. */
   painShared?: string[];
   sharesPain?: string[];
+  /** What this client shares with each coach, by coach id; what each client shares with this coach, by client id. */
+  shared?: Record<string, ShareKind[]>;
+  sharesWithMe?: Record<string, ShareKind[]>;
   /** How this account coaches, and how each of its coaches does, by id. */
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets?: Targets[];
@@ -98,6 +104,8 @@ export interface Overview {
   pay?: OverviewPay | null;
   /** This account's coach plan: tier, client limit and clients (src/server/coachPlan.ts). */
   plan?: CoachPlanInfo;
+  /** Whether this account has coached (sent an invite), so the app opens on the coach's pages. */
+  coach?: boolean;
 }
 /** The server's CoachPlan (coach plans, src/lib/coachPlans.ts). */
 export interface CoachPlanInfo {
@@ -145,6 +153,8 @@ export interface ClientView {
   body?: BodyShare | null;
   /** Whether the client shares pain and injuries with this coach. */
   pain?: boolean;
+  /** Everything the client shares with this coach beyond training. */
+  shares?: ShareKind[];
   /** How the coach looking works (their own setting). */
   /** This coach's daily nutrition targets for the client. */
   targets?: Targets | null;
@@ -186,9 +196,9 @@ export const cancelInvite = async () => void (await api("/api/coach/", { token: 
 export const previewInvite = async (code: string) =>
   api<{ coach: Person; setup?: Setup }>("/api/coach/", { token: token(), body: { action: "preview", code } });
 export const previewCode = async (code: string) => (await previewInvite(code)).coach;
-export const joinInvite = async (code: string) =>
-  api<{ coach: Person; setup?: Setup }>("/api/coach/", { token: token(), body: { action: "join", code } });
-export const joinCode = async (code: string) => (await joinInvite(code)).coach;
+export const joinInvite = async (code: string, shares: readonly ShareKind[] = []) =>
+  api<{ coach: Person; setup?: Setup }>("/api/coach/", { token: token(), body: { action: "join", code, shares } });
+export const joinCode = async (code: string, shares: readonly ShareKind[] = []) => (await joinInvite(code, shares)).coach;
 export const saveSetup = async (setup: Setup) =>
   (await api<{ setup: Setup }>("/api/coach/", { token: token(), body: { action: "setup", setup } })).setup;
 export const saveNote = async (client: string, text: string) =>
@@ -201,7 +211,7 @@ export const removePlan = async (id: string) => void (await api("/api/coach/", {
 /** The longest chat message (the server's COACH_LIMITS.message). */
 export const MESSAGE_MAX = 1000;
 export const loadMessages = async (id: string, before?: number) =>
-  api<{ messages: Message[]; more: boolean; name?: string }>(
+  api<{ messages: Message[]; more: boolean; name?: string; them?: "coach" | "client" }>(
     `/api/coach/?chat=${encodeURIComponent(id)}${before ? `&before=${before}` : ""}`,
     { token: token() },
   );
@@ -209,8 +219,28 @@ export const sendMessage = async (id: string, text: string) =>
   (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
 export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
-export const setPainShare = async (coach: string, on: boolean) =>
-  (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on, what: "pain" } })).on;
+export const setPainShare = async (coach: string, on: boolean) => setShare(coach, "pain", on);
+export const setShare = async (coach: string, what: ShareKind, on: boolean) =>
+  (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on, what } })).on;
+
+/**
+ * What a client can share with a coach beyond their training, one switch each (docs/decisions/trainer-mode.md "What a
+ * client shares"), in the order the switches show. The server has the same list (SHARE_KINDS in coach.ts).
+ */
+export const SHARE_KINDS = ["hr", "notes", "health", "body", "pain", "cycle"] as const;
+export type ShareKind = (typeof SHARE_KINDS)[number];
+/** Switched on for a new coach on the consent screen until the client changes them: the two closest to training. */
+export const JOIN_SHARES: readonly ShareKind[] = ["hr", "notes"];
+/** Body data and cycle wait for an under-18 until body composition is on (teen.ts), like the body switch always has. */
+export const shareKinds = (comp: boolean): ShareKind[] => SHARE_KINDS.filter((k) => comp || (k !== "body" && k !== "cycle"));
+/** What a client shares with one coach, from the overview (older servers only send the body and pain lists). */
+export function sharedWith(o: Pick<Overview, "shared" | "bodyShared" | "painShared">, coachId: string): ShareKind[] {
+  if (o.shared) return o.shared[coachId] ?? [];
+  return [
+    ...((o.bodyShared ?? []).includes(coachId) ? (["body"] as const) : []),
+    ...((o.painShared ?? []).includes(coachId) ? (["pain"] as const) : []),
+  ];
+}
 export const saveRole = async (role: Role) =>
   (await api<{ role: Role | null }>("/api/coach/", { token: token(), body: { action: "role", role } })).role;
 /** "Your trainer" when every coach a lifter has is a personal trainer, else "Your coach". */
@@ -289,12 +319,62 @@ export function cleanEvents(raw: readonly unknown[]): { events: AppEvent[]; name
         ...(str(e.sessionId) ? { sessionId: e.sessionId } : {}),
         ...(str(e.exerciseId) ? { exerciseId: e.exerciseId } : {}),
       });
+    } else if (e.type === "note" || e.type === "sessionNote") {
+      // Only from a client who shares workout notes with this coach.
+      if (!str(e.sessionId)) continue;
+      const text = str(e.text) ? e.text.slice(0, 1000) : undefined;
+      if (e.type === "note" && (!str(e.exerciseId) || !text)) continue;
+      events.push(
+        e.type === "note"
+          ? { id: e.id, at: e.at, type: "note", sessionId: e.sessionId, exerciseId: e.exerciseId as string, text: text! }
+          : {
+              id: e.id,
+              at: e.at,
+              type: "sessionNote",
+              sessionId: e.sessionId,
+              ...(text ? { text } : {}),
+              ...(str(e.name) ? { name: e.name.slice(0, 80) } : {}),
+            },
+      );
+    } else if (e.type === "feel") {
+      // Readiness and recovery, only when shared.
+      if (e.energy !== -1 && e.energy !== 0 && e.energy !== 1) continue;
+      events.push({
+        id: e.id,
+        at: e.at,
+        type: "feel",
+        energy: e.energy,
+        ...(e.sore === true ? { sore: true } : {}),
+        ...(e.unwell === true ? { unwell: true } : {}),
+      });
+    } else if (e.type === "health") {
+      if (!str(e.metric) || !READINESS_METRICS.includes(e.metric as ReadinessMetric) || !str(e.day) || !num(e.value)) continue;
+      events.push({ id: e.id, at: e.at, type: "health", metric: e.metric as ReadinessMetric, day: e.day, value: e.value });
+    } else if (e.type === "cycle") {
+      if (!num(e.day)) continue;
+      events.push({ id: e.id, at: e.at, type: "cycle", day: e.day });
     } else if (e.type === "customExercise") {
       const x = e.exercise as { id?: unknown; name?: unknown } | undefined;
       if (x && str(x.id) && str(x.name)) names.set(x.id, x.name.slice(0, 60));
     }
   }
   return { events, names };
+}
+
+/** The Health readings a client's readiness share covers (food stays with body data). */
+const READINESS_METRICS = ["sleep", "hrv", "restingHr", "steps", "vo2max", "breathing"] as const;
+type ReadinessMetric = (typeof READINESS_METRICS)[number];
+
+/** What a coach is told about a client's readiness and recovery, when the client shares it. */
+export interface Readiness {
+  /** The newest check-in on Today from the last 3 days. */
+  feel: { at: number; energy: -1 | 0 | 1; sore: boolean; unwell: boolean } | null;
+  /** 7-day averages, where there were readings. */
+  sleep: number | null;
+  hrv: number | null;
+  restingHr: number | null;
+  /** Day of their cycle, when they share it and have logged a period recently. */
+  cycleDay: number | null;
 }
 
 /** What a coach should look at first, most urgent first. */
@@ -314,6 +394,8 @@ export type Flag =
   | { kind: "proteinShort"; avg: number; target: number; days: number }
   | CheckinFlag
   | { kind: "payFailed" }
+  | { kind: "feelLow"; unwell: boolean }
+  | { kind: "sleepShort"; hours: number }
   | { kind: "onTrack"; done: number; goal: number };
 
 /** How an assigned routine is going: workouts since it was assigned that follow it. */
@@ -326,6 +408,11 @@ export interface PlanProgress {
    * weeks (or since it was given, if that's shorter) against what the target asks for in that time.
    */
   adherence?: { done: number; want: number; pct: number };
+  /**
+   * Workouts with parts (stage 3): for a routine with a warm-up or cool-down, how many of the workouts that followed
+   * it ran that part, so a coach sees "cool-downs skipped" and can say something.
+   */
+  parts?: { kind: "warm" | "cool"; done: number; of: number }[];
 }
 
 /** Pain at or above this in the last week is a "check in" item for the coach (the same 5 that stops a graded return). */
@@ -349,6 +436,8 @@ export interface RehabInjury {
   change?: number;
   /** The latest rating on each exercise it was rated on, newest first. */
   byExercise: { exerciseId: string; score: number; at: number }[];
+  /** Pain before and after the latest workout it was rated in, when there's a before (partMetrics.ts sessionPain). */
+  lastWorkout?: { before: number; after: number; at: number };
 }
 
 /**
@@ -356,11 +445,18 @@ export interface RehabInjury {
  * (60%+). The client's copy of a routine has its own id on their phone, so it's matched by what was trained.
  */
 export function planProgress(plan: Plan, sessions: readonly SessionSummary[], now = Date.now()): PlanProgress {
-  const want = new Set(decodeRoutine(plan.code)?.items.map((i) => i.exerciseId) ?? []);
+  const routine = decodeRoutine(plan.code);
+  const want = new Set(routine?.items.map((i) => i.exerciseId) ?? []);
   const hits = want.size
     ? sessions.filter((s) => s.start >= plan.at && s.exercises.filter((e) => want.has(e)).length >= Math.ceil(want.size * 0.6))
     : [];
   const out: PlanProgress = { plan, done: hits.length, lastAt: hits[0]?.start ?? null };
+  if (routine?.parts && hits.length)
+    out.parts = routine.parts.map((p) => ({
+      kind: p.kind,
+      done: hits.filter((h) => h.parts?.some((x) => x.kind === p.kind)).length,
+      of: hits.length,
+    }));
   if (plan.perWeek && now - plan.at >= WEEK) {
     const span = Math.min(2 * WEEK, now - plan.at);
     const wanted = Math.max(1, Math.round((plan.perWeek * span) / WEEK));
@@ -373,6 +469,13 @@ export function planProgress(plan: Plan, sessions: readonly SessionSummary[], no
 /** The client's injuries for their coach, active first then healed in the last 90 days, newest first. */
 export function rehabInjuries(events: readonly AppEvent[], now: number): RehabInjury[] {
   const pains = events.filter((e) => e.type === "pain");
+  const starts = new Map(events.flatMap((e) => (e.type === "sessionStart" ? [[e.sessionId, e.at] as const] : [])));
+  const lastRated = (id: string) => {
+    const p = [...pains].sort((a, b) => b.at - a.at).find((x) => x.injuryId === id && x.sessionId && starts.has(x.sessionId));
+    if (!p?.sessionId) return undefined;
+    const r = sessionPain(events, p.sessionId, starts.get(p.sessionId)!).find((x) => x.injuryId === id);
+    return r?.before !== undefined ? { before: r.before, after: r.after, at: r.at } : undefined;
+  };
   return injuries(events, now)
     .filter((i) => i.healedAt === undefined || now - i.healedAt <= 90 * DAY)
     .sort((a, b) => Number(a.healedAt !== undefined) - Number(b.healedAt !== undefined) || b.since - a.since)
@@ -386,6 +489,7 @@ export function rehabInjuries(events: readonly AppEvent[], now: number): RehabIn
         byExercise.push({ exerciseId: p.exerciseId, score: Math.round(p.score), at: p.at });
       }
       const last = i.pain.at(-1);
+      const lastWorkout = lastRated(i.id);
       return {
         id: i.id,
         part: i.part,
@@ -395,6 +499,7 @@ export function rehabInjuries(events: readonly AppEvent[], now: number): RehabIn
         ...(last ? { latest: last.score, latestAt: last.at } : {}),
         ...(points.length > 1 ? { change: points[points.length - 1]! - points[0]! } : {}),
         byExercise: byExercise.slice(0, 8),
+        ...(lastWorkout ? { lastWorkout } : {}),
       };
     });
 }
@@ -432,6 +537,12 @@ export interface Report {
   plans: PlanProgress[];
   /** The client's injuries and pain, or null when they don't share them with this coach. */
   rehab: RehabInjury[] | null;
+  /** What the client shares beyond training. */
+  shares: ShareKind[];
+  /** The client's notes on each recent workout (the workout's own note first), when they share notes. */
+  notes: Map<string, string[]>;
+  /** Readiness and recovery, or null when they don't share it (or their cycle). */
+  readiness: Readiness | null;
 }
 
 export function clientReport(view: ClientView, now: number): Report {
@@ -452,6 +563,12 @@ export function clientReport(view: ClientView, now: number): Report {
   const rehab = view.pain ? rehabInjuries(events, now) : null;
   // Pain comes first: it's what a physio acts on before anything about training.
   if (rehab) flags.push(...painFlags(rehab, now));
+  const shares = view.shares ?? [...(view.body ? (["body"] as const) : []), ...(view.pain ? (["pain"] as const) : [])];
+  const readiness = shares.includes("health") || shares.includes("cycle") ? readinessOf(events, now) : null;
+  // How they feel comes next: a coach checks in before pushing someone who's unwell or worn out.
+  if (readiness?.feel && (readiness.feel.unwell || readiness.feel.energy < 0))
+    flags.push({ kind: "feelLow", unwell: readiness.feel.unwell });
+  if (readiness?.sleep != null && readiness.sleep < SLEEP_SHORT) flags.push({ kind: "sleepShort", hours: readiness.sleep });
 
   if (lastAt === null) flags.push({ kind: "new" });
   else {
@@ -487,7 +604,79 @@ export function clientReport(view: ClientView, now: number): Report {
     if (prs.length) flags.push({ kind: "prs", count: prs.length });
     if (!flags.some((f) => f.kind !== "prs") && goal) flags.push({ kind: "onTrack", done: weeks[3]!.count, goal });
   }
-  return { name: view.name, now, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans, rehab };
+  const recent = sessions.slice(0, 10);
+  return {
+    name: view.name,
+    now,
+    goal,
+    weeks,
+    lastAt,
+    sessions: recent,
+    prs,
+    stalls: stalled,
+    flags,
+    names,
+    plans,
+    rehab,
+    shares,
+    notes: shares.includes("notes") ? notesBySession(events, new Set(recent.map((x) => x.sessionId)), names) : new Map(),
+    readiness,
+  };
+}
+
+/** Under this many hours a night over a week, a coach hears about it. */
+const SLEEP_SHORT = 6;
+
+/** The client's notes for these workouts: the workout's own note, then each exercise note as "Exercise: note". */
+function notesBySession(events: readonly AppEvent[], ids: ReadonlySet<string>, names: ReadonlyMap<string, string>): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  // The latest workout note wins (editing it writes a new one).
+  const own = new Map<string, { at: number; text: string }>();
+  for (const e of events) {
+    if (e.type === "sessionNote" && ids.has(e.sessionId) && e.text && (own.get(e.sessionId)?.at ?? -1) <= e.at)
+      own.set(e.sessionId, { at: e.at, text: e.text });
+  }
+  for (const [id, n] of own) out.set(id, [n.text]);
+  for (const e of events) {
+    if (e.type !== "note" || !ids.has(e.sessionId)) continue;
+    out.set(e.sessionId, [...(out.get(e.sessionId) ?? []), t("trn.noteOn", { exercise: liftName(e.exerciseId, names), text: e.text })]);
+  }
+  return out;
+}
+
+/** Readiness and recovery from what a client shares: the newest check-in, 7-day averages, and their cycle day. */
+export function readinessOf(events: readonly AppEvent[], now: number): Readiness {
+  let feel: Readiness["feel"] = null;
+  const sums: Partial<Record<ReadinessMetric, number[]>> = {};
+  const from = now - WEEK;
+  const byDay = new Map<string, { at: number; value: number }>();
+  for (const e of events) {
+    if (e.type === "feel" && now - e.at <= 3 * DAY && e.at <= now && (!feel || e.at > feel.at))
+      feel = { at: e.at, energy: e.energy, sore: !!e.sore, unwell: !!e.unwell };
+    if (e.type === "health" && e.at >= from - DAY) {
+      // One reading per metric and day: the latest wins, like twin.ts.
+      const key = `${e.metric}:${e.day}`;
+      if ((byDay.get(key)?.at ?? -1) <= e.at) byDay.set(key, { at: e.at, value: e.value });
+    }
+  }
+  const since = new Date(from).toISOString().slice(0, 10);
+  for (const [key, v] of byDay) {
+    const [metric, day] = key.split(":") as [ReadinessMetric, string];
+    if (day >= since) (sums[metric] ??= []).push(v.value);
+  }
+  const avg = (m: ReadinessMetric, digits: number) => {
+    const xs = sums[m];
+    if (!xs?.length) return null;
+    const f = 10 ** digits;
+    return Math.round((xs.reduce((a, b) => a + b, 0) / xs.length) * f) / f;
+  };
+  return {
+    feel,
+    sleep: avg("sleep", 1),
+    hrv: avg("hrv", 0),
+    restingHr: avg("restingHr", 0),
+    cycleDay: cycleState(events, now)?.day ?? null,
+  };
 }
 
 /** Logged food days (1,000+ kcal, like nutrition.ts) in the last week, once there are 4. */
@@ -573,6 +762,10 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       return { title: t("trn.f.payFailed"), advice: t("trn.f.payFailedDo"), tone: "warn" };
     case "checkinLow":
       return { title: t("trn.f.checkinLow", { label: f.label, value: f.value }), advice: t("trn.f.checkinLowDo"), tone: "warn" };
+    case "feelLow":
+      return { title: t(f.unwell ? "trn.f.unwell" : "trn.f.feelLow"), advice: t("trn.f.feelLowDo"), tone: "warn" };
+    case "sleepShort":
+      return { title: t("trn.f.sleepShort", { hours: fmtNum(f.hours) }), advice: t("trn.f.sleepShortDo"), tone: "warn" };
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }
@@ -583,6 +776,9 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
 const CACHE = "liftsmith.coachNotes";
 const SEEN = "liftsmith.coachNotes.seen";
 const TARGETS = "liftsmith.coachTargets";
+const COACHING = "liftsmith.coaching";
+const WHO = "liftsmith.coachWho";
+const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
 
@@ -609,6 +805,18 @@ interface NotesState {
   targets: (Targets & { coach: string }) | null;
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
   seen: string[];
+  /**
+   * This account coaches (picked a role, has an invite out or a client) or is coached: the desktop sidebar shows
+   * Coaching only then (docs/decisions/desktop-layout.md). Kept on the device so it shows before the first load.
+   */
+  coaching: boolean;
+  /** Who this lifter trains with and how many clients they coach, for the badge by their name (coachBadge). */
+  who: Who;
+}
+/** The lifter's coaches (name and role) and how many clients they coach, kept on the device for the badge. */
+export interface Who {
+  coaches: Pick<Person, "id" | "name" | "role">[];
+  clients: number;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -634,7 +842,14 @@ export const useCoachNotes = create<NotesState>(() => ({
   sessions: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
+  coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
+  who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
 }));
+
+/** Whether an account takes part in coaching, as a coach or a client. */
+export function usesCoaching(o: Pick<Overview, "coaches"> & Partial<Pick<Overview, "clients" | "invite" | "role" | "coach">>): boolean {
+  return o.coaches.length > 0 || (o.clients?.length ?? 0) > 0 || !!o.invite || !!o.role || !!o.coach;
+}
 
 export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
 
@@ -648,9 +863,12 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
-  o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions">>,
+  o: Pick<Overview, "notes" | "coaches"> &
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach">>,
 ): void {
   const notes = shownNotes(o);
+  const coaching = usesCoaching(o);
+  writeJson(COACHING, coaching);
   writeJson(CACHE, notes);
   const first = (o.targets ?? []).find((x) => o.coaches.some((c) => c.id === x.coachId));
   const targets = first ? { ...first, coach: o.coaches.find((c) => c.id === first.coachId)?.name ?? "" } : null;
@@ -661,7 +879,12 @@ export function keepNotes(
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
   const checkins = (o.checkins ?? []).map((c) => ({ ...c, coach: o.coaches.find((p) => p.id === c.coachId)?.name ?? "" }));
   const sessions = (o.sessions?.booked ?? []).map((x) => ({ ...x, coach: o.coaches.find((p) => p.id === x.coachId)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions });
+  const who: Who = {
+    coaches: o.coaches.map((c) => ({ id: c.id, name: c.name, ...(c.role ? { role: c.role } : {}) })),
+    clients: o.clients?.length ?? 0,
+  };
+  writeJson(WHO, who);
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -674,13 +897,32 @@ export function markRead(id: string): void {
   useCoachNotes.setState((s) => ({ unread: s.unread.filter((u) => u.id !== id) }));
 }
 
+/**
+ * The badge by the lifter's name (Today, Account, Coaching): "Coached by Sam" for a client, "Trained by Sam" when that
+ * coach is a personal trainer, "Physio: Sam" for a physio, a count with a second coach, and "Coach" for someone who
+ * coaches and trains with nobody. Null for everyone else.
+ */
+export function coachBadge(who: Who): string | null {
+  const [first] = who.coaches;
+  if (first) {
+    const name = first.name || t("trn.noName");
+    if (who.coaches.length > 1) return t("trn.badge.many", { name, count: who.coaches.length - 1 });
+    return first.role === "trainer"
+      ? t("trn.badge.trainer", { name })
+      : first.role === "physio"
+        ? t("trn.badge.physio", { name })
+        : t("trn.badge.coach", { name });
+  }
+  return who.clients > 0 ? t("trn.badge.coaching", { count: who.clients }) : null;
+}
+
 let lastLook = 0;
 /** Signed in: looks for new notes from the lifter's coaches, at most every 15 minutes. Quiet on any failure. */
 export async function refreshCoachNotes(now = Date.now(), force = false): Promise<void> {
   if (!readAccount() || (!force && now - lastLook < EVERY)) return;
   lastLook = now;
   try {
-    keepNotes(await loadOverview());
+    keepNotes(await track(loadOverview()));
   } catch {
     // offline or signed out: keep what was there
   }
@@ -697,5 +939,7 @@ export function dismissNote(n: Note): void {
 export function forgetNotes(): void {
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [] });
+  writeJson(COACHING, false);
+  writeJson(WHO, NOBODY);
+  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false, who: NOBODY });
 }

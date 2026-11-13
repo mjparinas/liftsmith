@@ -221,14 +221,23 @@ describe("teams", () => {
 });
 
 describe("teen-safe Friends", () => {
-  it("someone under 18 can't go public and starts out of suggestions", async () => {
+  it("someone under 18 can't go public and starts out of suggestions and out of training now", async () => {
     await push("teen", [], { birthYear: 2011, name: "Teen" });
     expect(await isMinor("teen")).toBe(true);
     await joinFriends("teen", { agree: true, handle: "teenlifter", name: "Teen" });
     await updateFriends("teen", { public: true });
     const r = await myFriends("teen");
-    const p = (r.body as { profile: { public: boolean; suggest: boolean } }).profile;
+    const p = (r.body as { profile: { public: boolean; suggest: boolean; live: boolean } }).profile;
     expect(p.public).toBe(false);
+    expect(p.suggest).toBe(false);
+    expect(p.live).toBe(false);
+  });
+
+  it("someone under 18 can turn training now on when joining", async () => {
+    await push("teen2", [], { birthYear: 2011, name: "Teen" });
+    await joinFriends("teen2", { agree: true, handle: "teenlifter2", name: "Teen", live: true });
+    const p = ((await myFriends("teen2")).body as { profile: { suggest: boolean; live: boolean } }).profile;
+    expect(p.live).toBe(true);
     expect(p.suggest).toBe(false);
   });
 
@@ -237,8 +246,9 @@ describe("teen-safe Friends", () => {
     expect(await isMinor("adult")).toBe(false);
     await joinFriends("adult", { agree: true, handle: "adultlifter", name: "Adult" });
     await updateFriends("adult", { public: true });
-    const p = ((await myFriends("adult")).body as { profile: { public: boolean; suggest: boolean } }).profile;
+    const p = ((await myFriends("adult")).body as { profile: { public: boolean; suggest: boolean; live: boolean } }).profile;
     expect(p.public).toBe(true);
     expect(p.suggest).toBe(true);
+    expect(p.live).toBe(true);
   });
 });

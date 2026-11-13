@@ -1,8 +1,26 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AREA_PINS as APP_PINS } from "@/lib/gymDirectory";
+
 import { query, resetDb, run } from "./db";
 import { ownedGyms } from "./gymClaims";
-import { addMedia, mapboxUrl, mapImage, mapPath, MEDIA_LIMITS, mediaImage, mediaOf, removeMedia } from "./gymMedia";
+import {
+  addMedia,
+  AREA_PINS,
+  areaMapboxUrl,
+  areaMapImage,
+  areaMapPath,
+  mapboxUrl,
+  mapImage,
+  mapPath,
+  MEDIA_LIMITS,
+  mediaImage,
+  mediaOf,
+  removeMedia,
+  tileImage,
+  tileOf,
+  tileUrl,
+} from "./gymMedia";
 import { actOnPlace, placeById, placesFromOsm, savePlaces } from "./gymPlaces";
 
 // A gym's map picture, logo and photos (docs/decisions/gyms.md).
@@ -95,5 +113,72 @@ describe("the map", () => {
     expect(new Uint8Array(img!.bytes)).toEqual(new Uint8Array([1, 2, 3]));
     expect(seen[0]).toContain("49.10000");
     expect(await mapImage(gym, () => Promise.resolve(new Response("no", { status: 401 })))).toBeNull();
+  });
+});
+
+describe("a map of many gyms", () => {
+  const other = "0123456789abcdef";
+
+  it("is off until the token is set, and needs a real gym id", () => {
+    vi.stubEnv("MAPBOX_TOKEN", "");
+    expect(areaMapPath([gym])).toBe("");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    expect(areaMapPath(["nope"])).toBe("");
+    expect(areaMapPath([gym, other], { lat: 49.104, lon: -122.6 })).toBe(`/api/gyms/map/?ids=${gym}.${other}&at=49.10,-122.60`);
+  });
+
+  it("numbers the pins in list order, marks the searcher's spot, and never hands out the token", async () => {
+    expect(AREA_PINS).toBe(APP_PINS);
+    expect(
+      areaMapboxUrl(
+        [
+          { lat: 49.1, lon: -122.6 },
+          { lat: 49.2, lon: -122.7 },
+        ],
+        { lat: 49.15, lon: -122.65 },
+        "pk.test",
+      ),
+    ).toBe(
+      "https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-1+4c8dff(-122.60000,49.10000),pin-s-2+4c8dff(-122.70000,49.20000),pin-s+38d6e8(-122.65000,49.15000)/auto/640x360@2x?padding=40&attribution=false&access_token=pk.test",
+    );
+    // One spot alone gets a street view rather than zooming all the way in.
+    expect(areaMapboxUrl([{ lat: 49.1, lon: -122.6 }], null, "t")).toContain("/-122.60000,49.10000,14,0/");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    const seen: string[] = [];
+    const fetcher = (url: string | URL | Request) => {
+      seen.push(String(url));
+      return Promise.resolve(new Response(new Uint8Array([4]), { headers: { "content-type": "image/png" } }));
+    };
+    // An unknown id is skipped, a junk spot is dropped, and junk ids draw nothing.
+    expect(await areaMapImage(`${other}.${gym}`, "49.1,-122.6", fetcher as typeof fetch)).not.toBeNull();
+    expect(seen[0]).toContain("pin-s-1+4c8dff(-122.60000,49.10000),pin-s+38d6e8(-122.60000,49.10000)");
+    expect(await areaMapImage(gym, "<script>", fetcher as typeof fetch)).not.toBeNull();
+    expect(seen[1]).not.toContain("38d6e8");
+    expect(await areaMapImage("x.y", null, fetcher as typeof fetch)).toBeNull();
+    expect(await areaMapImage(other, null, fetcher as typeof fetch)).toBeNull();
+    expect(seen).toHaveLength(2);
+  });
+});
+
+describe("map tiles for the map you can drag and zoom", () => {
+  it("passes only real tile addresses through, never handing out the token", async () => {
+    expect(tileOf("3", "7", "0", undefined)).toEqual({ z: 3, x: 7, y: 0, style: "dark" });
+    expect(tileOf("3", "8", "0", "light")).toBeNull();
+    expect(tileOf("19", "0", "0", "dark")).toBeNull();
+    expect(tileOf("-1", "0", "0", "dark")).toBeNull();
+    expect(tileOf("2", "1.5", "0", "dark")).toBeNull();
+    expect(tileOf(null, "0", "0", "dark")).toBeNull();
+    expect(tileUrl({ z: 12, x: 650, y: 1400, style: "light" }, "pk.test")).toBe(
+      "https://api.mapbox.com/styles/v1/mapbox/light-v11/tiles/256/12/650/1400@2x?access_token=pk.test",
+    );
+    const fetcher = vi.fn(() => Promise.resolve(new Response(new Uint8Array([9]), { headers: { "content-type": "image/png" } })));
+    vi.stubEnv("MAPBOX_TOKEN", "");
+    expect(await tileImage({ z: "1", x: "0", y: "0", style: "dark" }, fetcher as unknown as typeof fetch)).toBeNull();
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    expect(await tileImage({ z: "1", x: "5", y: "0", style: "dark" }, fetcher as unknown as typeof fetch)).toBeNull();
+    const img = await tileImage({ z: "1", x: "1", y: "0", style: "evil" }, fetcher as unknown as typeof fetch);
+    expect(img?.type).toBe("image/png");
+    expect(fetcher).toHaveBeenCalledTimes(1);
+    expect(String((fetcher.mock.calls[0] as unknown[])[0])).toContain("/dark-v11/tiles/256/1/1/0@2x");
   });
 });

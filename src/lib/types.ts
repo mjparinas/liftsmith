@@ -375,8 +375,10 @@ export interface TrainingPrefs {
   warmFirst?: boolean;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */
   coolDown?: boolean;
-  /** Exercises the planner picks first when they fit. */
+  /** Liked exercises: the adaptive planner picks them much more often (pickWeights.ts). */
   favourites?: string[];
+  /** When the lifter reset an exercise's pick weight (ms), by exercise id: swaps before then no longer count (pickWeights.ts). */
+  pickResets?: Record<string, number>;
   /** Muscles that get more weekly sets and go first in the plan. */
   priorities?: Muscle[];
   /** Default workout length (minutes) the slider goes back to each day. Missing means it stays where it was left. */
@@ -408,6 +410,18 @@ export interface Routine {
    * exercise as written instead of skipping or lightening it, and asks about pain between sets.
    */
   rehab?: boolean;
+  /**
+   * Workouts with parts (sessions-with-parts.md, stage 3): a warm-up before and a cool-down after the exercises,
+   * each with its own stretches or none to let the app pick for the day's muscles. Missing: just the exercises.
+   */
+  parts?: RoutinePart[];
+}
+
+/** A stretching part of a routine. The lifting (or rehab) part is the routine's `items`. */
+export interface RoutinePart {
+  kind: "warm" | "cool";
+  /** Stretch ids in order; empty or missing lets the app pick for the day's muscles. */
+  stretches?: string[];
 }
 
 export interface DelightPrefs {
@@ -505,6 +519,8 @@ export interface SetEvent extends EventBase {
    * own end-of-set speed (personalMvt in reps/speedMax.ts).
    */
   endSpeed?: number;
+  /** Mean speed of the set's full reps (m/s), next to endSpeed, so a set's speed and its drop-off can be read later. */
+  meanSpeed?: number;
   /** The camera saw a rep that didn't make it up after the last full one: the set went to failure. */
   failedRep?: true;
 }
@@ -529,6 +545,8 @@ export interface SessionStartEvent extends EventBase {
   program?: { id: string; day: number };
   /** The saved routine the workout came from, if any. */
   routine?: string;
+  /** The parts planned at Start, in order (workouts with parts), when there was more than lifting. */
+  plan?: { kind: PartKind }[];
 }
 
 export interface SessionEndEvent extends EventBase {
@@ -545,8 +563,8 @@ export interface SessionEndEvent extends EventBase {
   /** Ended automatically because the workout was left running (see AUTO_END_MS in store.ts). */
   auto?: boolean;
   /**
-   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md). Not written yet;
-   * missing means the whole workout was one lifting part, and sessions.ts reads it that way.
+   * The parts done, in order (workouts with parts, docs/decisions/sessions-with-parts.md), when the workout had
+   * more than lifting. Missing means the whole workout was one lifting part, and sessions.ts reads it that way.
    */
   parts?: SessionPart[];
 }

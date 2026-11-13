@@ -175,7 +175,16 @@ export interface SiteText {
     intro: string;
     cta: string;
     how: { title: string; steps: Titled[] };
-    see: { title: string; body: string; seesLabel: string; sees: string[]; neverLabel: string; never: string[] };
+    see: {
+      title: string;
+      body: string;
+      seesLabel: string;
+      sees: string[];
+      optLabel: string;
+      opt: string[];
+      neverLabel: string;
+      never: string[];
+    };
     cost: { title: string; body: string; contactBefore: string; contactLink: string };
     faqTitle: string;
     faqs: Faq[];

@@ -1,7 +1,11 @@
 import { EXERCISE_BY_ID } from "./exercises";
 import { epley, TIMED } from "./progression";
+import { joinStretches } from "./sessions";
 import { setVolume } from "./sides";
-import { MUSCLES, type AppEvent, type Muscle, type SetEvent } from "./types";
+import { MUSCLES, type AppEvent, type Muscle, type SessionPart, type SetEvent, type StretchEvent } from "./types";
+
+/** A stretch routine done on its own counts for the streak and XP from 10 minutes. */
+export const STRETCH_DAY_SECONDS = 600;
 
 // Every stat is recomputed from the event log, never stored (as in Gradelings' derive.ts), so
 // merging events from another device can't double count or lose anything.
@@ -16,6 +20,8 @@ export interface SessionSummary {
   avgHr?: number;
   maxHr?: number;
   prs: number;
+  /** The parts a workout ran through (warm-up, lifting, cool-down), when it was run with parts. */
+  parts?: SessionPart[];
 }
 
 export interface Pr {
@@ -33,6 +39,11 @@ export interface Stats {
   totalSeconds: number;
   /** Consecutive weeks (from the lifter's first day of the week) with at least one workout, up to this week. */
   weekStreak: number;
+  /**
+   * Stretch routines of 10 minutes or more done on their own (not with a workout), oldest first. They keep the
+   * week streak and earn XP, but not the weekly goal (Melvin, 2026-11-13; sessions-with-parts.md).
+   */
+  stretchDays: number[];
   /** Best estimated one-rep max per exercise per session, oldest first. */
   e1rmSeries: Map<string, { at: number; e1rm: number }[]>;
   prs: Pr[];
@@ -115,12 +126,19 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
       avgHr: end?.type === "sessionEnd" ? end.avgHr : undefined,
       maxHr: end?.type === "sessionEnd" ? end.maxHr : undefined,
       prs: prCount,
+      ...(end?.type === "sessionEnd" && end.parts?.length ? { parts: end.parts } : {}),
     });
   }
   sessions.sort((a, b) => b.start - a.start);
 
   const thisWeek = weekOf(now);
-  const weeks = new Set(sessions.map((s) => weekOf(s.start)));
+  const stretchDays = joinStretches(
+    sorted.filter((e): e is StretchEvent => e.type === "stretch"),
+    sessions,
+  )
+    .loose.filter((e) => e.seconds >= STRETCH_DAY_SECONDS)
+    .map((e) => e.at);
+  const weeks = new Set([...sessions.map((s) => weekOf(s.start)), ...stretchDays.map(weekOf)]);
   let weekStreak = 0;
   // A week in progress without a workout yet doesn't break the streak.
   let w = weeks.has(thisWeek) ? thisWeek : weekOf(thisWeek - 86400_000);
@@ -150,6 +168,7 @@ export function derive(events: readonly AppEvent[], now: number): Stats {
     totalVolume: sets.reduce((v, s) => v + setVolume(s), 0),
     totalSeconds: sessions.reduce((t, s) => t + s.seconds, 0),
     weekStreak,
+    stretchDays,
     e1rmSeries,
     prs: prs.sort((a, b) => b.at - a.at),
     weeklyMuscleSets,

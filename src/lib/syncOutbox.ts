@@ -36,6 +36,13 @@ export const onOutbox = (fn: () => void) => {
   return () => listeners.delete(fn);
 };
 
+/** How many changes on this device the account doesn't have yet (`events`: how many events the device holds). */
+export function unsynced(s: SyncState, events: number): number {
+  // Until the first full push after signing in, the whole history is still to go.
+  if (!s.seeded) return events;
+  return s.out.length + s.del.length + (s.rev !== s.sentRev ? 1 : 0);
+}
+
 export function signedIn(): boolean {
   try {
     return !!localStorage.getItem(ACCOUNT_KEY);

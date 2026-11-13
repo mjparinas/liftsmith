@@ -12,3 +12,4 @@
 "Next: %@" = "Poi: %@";
 "Rest left" = "Riposo rimanente";
 "Rest over" = "Riposo finito";
+"%lld of %lld sets done" = "%1$lld di %2$lld serie fatte";

@@ -70,6 +70,10 @@ export const es: FeaturesText = {
       body: "Elige ejercicios que tu gimnasio permite y para los que tus músculos están listos, y fija cada peso y repetición a partir de tus últimos entrenamientos.",
       proPart: "Sin Pro tienes un entrenamiento adaptativo a la semana junto a tu programa gratuito; Pro planifica todos los días.",
     },
+    "pick-weights": {
+      name: "Aprende qué ejercicios te gustan",
+      body: "Los ejercicios populares se eligen más a menudo. Marca uno con estrella y saldrá mucho más; cámbialo por otro y saldrá menos, durante unos meses.",
+    },
     splits: {
       name: "Rutinas divididas adaptativas",
       body: "Empuje, tirón y pierna o torso y pierna, ajustadas igualmente a tu recuperación cada día.",
@@ -155,6 +159,10 @@ export const es: FeaturesText = {
     stretching: {
       name: "Estiramientos",
       body: "48 estiramientos con demostraciones en 3D: un calentamiento opcional antes, una vuelta a la calma después o una rutina de estiramientos cualquier día.",
+    },
+    "workout-parts": {
+      name: "Entrenamientos por partes",
+      body: "Un entrenamiento puede hacer un calentamiento, las pesas y una vuelta a la calma en orden, con Saltar entre ellas. La pantalla de bloqueo y tu reloj muestran en qué parte estás, el historial muestra cada parte y los días de estiramientos de 10 minutos o más mantienen tu racha. Las rutinas pueden llevar su propio calentamiento y vuelta a la calma, también en enlaces compartidos y de tu entrenador. Las notas del coach leen cada parte: el dolor tras la rehabilitación que baja o sube, y un pulso que sigue alto en la vuelta a la calma.",
     },
     notes: {
       name: "Notas del entrenador",
@@ -245,7 +253,23 @@ export const es: FeaturesText = {
     },
     "gym-finder": {
       name: "Buscador y páginas de gimnasios",
-      body: "Encuentra gimnasios cerca de ti, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
+      body: "Encuentra gimnasios cerca de ti en un mapa con la lista debajo, los oficiales primero, cada uno con su página: equipo, horario, mapa y miembros. Los dueños pueden reclamar su gimnasio y añadir su logo y fotos. ¿Falta un gimnasio? Añádelo. Los dueños ven cuántos atletas lo añadieron o escanearon el cartel, y qué hacer después. Los gimnasios oficiales pueden tener un club con clasificación semanal.",
+    },
+    "gym-amenities": {
+      name: "Servicios y precios en las páginas de gimnasios",
+      body: "Los dueños indican lo que hay además del equipo (duchas, aparcamiento, acceso 24/7, zona para mujeres y más) y cuánto cuesta un pase de día, de semana o la cuota.",
+    },
+    "gym-news": {
+      name: "Anuncios de tu gimnasio",
+      body: "Los gimnasios oficiales publican horarios de festivos, equipo nuevo o cambios de clase en su página, y los miembros de su club reciben un aviso.",
+    },
+    "gym-problems": {
+      name: "Avisa de equipo roto",
+      body: "Dile a tu gimnasio que una máquina está rota o falta. Todos los que entrenan allí reciben un plan que se adapta, y el dueño lo ve con un botón de Arreglado.",
+    },
+    "gym-trainers": {
+      name: "Entrenadores en las páginas de gimnasios",
+      body: "Los entrenadores aparecen en los gimnasios donde entrenan a sus clientes, con una línea sobre ellos y un botón para entrenar con ellos. En un gimnasio oficial, el dueño los aprueba antes.",
     },
     "buy-next": {
       name: "Qué comprar después",
@@ -306,6 +330,16 @@ export const es: FeaturesText = {
       name: "Cobros a clientes con Stripe",
       body: "Conecta tu propia cuenta de Stripe y fija el precio de cada cliente, por sesión o mensual. Pagan en la página segura de Stripe, el dinero te llega directamente y un pago mensual fallido aparece arriba en su informe.",
     },
+    "coach-sharing": {
+      name: "Los clientes eligen lo que ve su entrenador",
+      body: "El entrenamiento siempre se comparte. Frecuencia cardiaca, notas de entrenamiento, preparación y recuperación, datos corporales, dolor y lesiones, y ciclo son interruptores que el cliente activa para cada entrenador, al aceptar o cuando quiera. Las fotos y los gimnasios nunca salen.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
+    "coach-pages": {
+      name: "Una página para cada lado",
+      body: "Los clientes solo ven a su entrenador: le escriben con un toque, responden seguimientos, reservan sesiones y eligen qué compartir. Los entrenadores tienen una página para cada tarea, con clientes, mensajes, agenda, seguimientos y pagos en pestañas, en la web y en el teléfono.",
+      proPart: "Ser cliente es gratis; entrenar a clientes es Pro.",
+    },
     "coach-plans": {
       name: "Planes de entrenador que crecen con tu lista de clientes",
       body: "Pro cubre hasta 3 clientes. Coach da espacio para 25 y Coach Plus no tiene límite fijo, con todas las herramientas de entrenador en cada plan. Tus clientes siempre entrenan gratis, y Liftsmith no se queda nada de lo que te pagan.",
@@ -351,7 +385,7 @@ export const es: FeaturesText = {
     },
     offline: {
       name: "Funciona sin conexión",
-      body: "Todo funciona en tu dispositivo, así que no pasa nada si no hay señal en el gimnasio del sótano.",
+      body: "Todo funciona en tu dispositivo y se sincroniza en segundo plano, así que no pasa nada si no hay señal en el gimnasio del sótano.",
     },
     sync: {
       name: "Cuentas y sincronización",

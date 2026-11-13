@@ -10,6 +10,7 @@ import { useBack } from "@/lib/back";
 import { billingLive, useBilling, webBilling } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
 import { coachSignup, isCoachSignupHash, pendingCoach, saveCoachSignup, savePendingCoach } from "@/lib/coachInvite";
+import { savePicked } from "@/lib/coachMode";
 import { PRESETS, type GymPreset } from "@/lib/defaults";
 import { flag } from "@/lib/flags";
 import { markAdded, placeKit } from "@/lib/gymDirectory";
@@ -225,7 +226,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [notify, setNotify] = useState<boolean | null>(null);
   const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState<Goal>(profile.goal);
-  const [exp, setExp] = useState<Experience>(profile.experience);
+  // First run starts on New to lifting, the safe guess (lighter starting weights, familiar lifts); a rerun keeps the answer.
+  const [exp, setExp] = useState<Experience>(rerun ? profile.experience : "new");
   const [preset, setPreset] = useState<GymPreset>("commercial");
   // A gym another lifter listed nearby (gymDirectory.ts), taken instead of a preset.
   const [found, setFound] = useState<{ id: string; kit: GymKit; place?: string } | null>(null);
@@ -312,7 +314,9 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
     // A coach signing up from the coaches page lands on the coaching screen, ready to send the first invite.
     if (coachingPath) {
       track("feature", { name: "trainer", detail: "coachSetup" });
-      return go("trainer");
+      // Coaching opens on the coach's pages (coachMode.ts), not the first page that asks which side they're on.
+      savePicked("coach");
+      return go("trainer", "clients");
     }
     // A first run that came in through the website's "Sign in" link (#/account), or a coach's invite link (#/trainer/<code>)
     // on the coach path, ends on Today, not on that screen.

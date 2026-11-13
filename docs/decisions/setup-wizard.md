@@ -7,3 +7,4 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 - **It can be run again** from Settings ("Run setup again", `#/setup`). A rerun keeps existing gyms unless the user picks one to add, and never touches workout history.
 - One question per screen, big tiles, every step optional except the first three, under a minute in total.
 - **The last step before the Pro offer is "Save your progress"** (Melvin, 2026-11-09, after setting up in a phone browser: "it's not clear how to save my information or register"). See "Saving and backup".
+- **Experience starts on New to lifting** (UX audit, Melvin 2026-11-13). A first run preselects New to lifting, the safe guess (lighter starting weights, familiar lifts; anyone else changes it in one tap); a rerun from Settings keeps the saved answer.

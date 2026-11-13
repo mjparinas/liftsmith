@@ -30,6 +30,7 @@ import {
 } from "@/lib/checkins";
 import { date, parseNum, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { liveRead } from "@/lib/liveRead";
 import { checkinDone, loadOverview, trainerError, useCoachNotes } from "@/lib/trainer";
 
 import { Icon } from "./icons";
@@ -173,7 +174,8 @@ let qn = 0;
 const newQ = (): Question => ({ id: `n${Date.now().toString(36)}${(qn++).toString(36)}`, kind: "scale", label: "" });
 
 /** #/trainer/forms: the coach's forms, new ones from a template, and the editor. */
-export function FormsScreen() {
+/** The coach's check-in forms: its own screen (#/trainer/forms), or the Check-ins page of Coaching (`embedded`). */
+export function FormsScreen({ embedded = false }: { embedded?: boolean }) {
   const [forms, setForms] = useState<Form[] | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -181,13 +183,11 @@ export function FormsScreen() {
   const [version, setVersion] = useState(0);
   useEffect(() => {
     let live = true;
-    loadOverview()
-      .then((o) => live && setForms(o.forms ?? []))
-      .catch((e: unknown) => {
-        if (!live) return;
-        setForms([]);
-        setNote(trainerError(e));
-      });
+    liveRead("coach.overview", loadOverview, (o) => live && setForms(o.forms ?? [])).catch((e: unknown) => {
+      if (!live) return;
+      setForms([]);
+      setNote(trainerError(e));
+    });
     return () => {
       live = false;
     };
@@ -234,7 +234,7 @@ export function FormsScreen() {
 
   return (
     <div className="pb-2">
-      <ScreenHeader back={back} title={t("chk.formsTitle")} />
+      {!embedded && <ScreenHeader back={back} title={t("chk.formsTitle")} />}
       <p className="mt-2 text-muted">{t("chk.formsLead")}</p>
       {note && (
         <p className="mt-3 text-sm text-muted" role="status">
@@ -413,13 +413,15 @@ export function CheckinScreen({ id }: { id: string }) {
   const [done, setDone] = useState(false);
   useEffect(() => {
     let live = true;
-    loadCheckin(id)
-      .then((x) => {
+    liveRead(
+      `coach.checkin.${id}`,
+      () => loadCheckin(id),
+      (x) => {
         if (!live) return;
         setC(x);
         setCoach(useCoachNotes.getState().checkins.find((y) => y.id === id)?.coach ?? "");
-      })
-      .catch((e: unknown) => live && setError(trainerError(e)));
+      },
+    ).catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
       live = false;
     };

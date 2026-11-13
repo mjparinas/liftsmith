@@ -451,7 +451,7 @@ export const SETTINGS: Setting[] = [
     label: "Mapbox",
     group: "Gyms",
     need: "optional",
-    what: "The map picture on gym pages. Without it they show no map.",
+    what: "Maps of gyms: the picture on gym and city pages, and the map you can drag and zoom in Find gyms near you. Without it they show no map.",
   },
   // Search and monitoring
   {

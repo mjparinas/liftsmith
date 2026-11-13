@@ -74,6 +74,10 @@ export const de: FeaturesText = {
       body: "Wählt Übungen, die dein Studio hergibt und für die deine Muskeln bereit sind, und legt jedes Gewicht und jede Wiederholung anhand deiner letzten Trainings fest.",
       proPart: "Ohne Pro bekommst du ein adaptives Training pro Woche neben deinem kostenlosen Programm; Pro plant jeden Tag.",
     },
+    "pick-weights": {
+      name: "Lernt die Übungen, die du magst",
+      body: "Beliebte Übungen werden am häufigsten gewählt. Markiere eine mit einem Stern und sie kommt viel öfter; tausche eine aus und sie kommt ein paar Monate lang seltener.",
+    },
     splits: {
       name: "Adaptive Splits",
       body: "Push, Pull, Beine oder Ober- und Unterkörper, trotzdem jeden Tag an deine Erholung angepasst.",
@@ -163,6 +167,10 @@ export const de: FeaturesText = {
       name: "Dehnen",
       body: "48 Dehnübungen mit 3D-Demos: ein optionales Aufwärmen vorher, ein Cool-down danach oder eine Dehnroutine an jedem Tag.",
     },
+    "workout-parts": {
+      name: "Training in Teilen",
+      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach. Die Coach-Hinweise lesen jeden Teil: Schmerzen nach der Reha, die nachlassen oder zunehmen, und ein Puls, der im Cool-down hoch bleibt.",
+    },
     notes: {
       name: "Coach-Notizen",
       body: "Weist auf wachsende Ermüdung, eine stagnierende Übung, einen Muskel mit zu wenigen Sätzen, ein gefährdetes Wochenziel oder steigendes Körperfett hin, jeweils mit einer Sache, die du tun kannst, oft mit einem Tippen.",
@@ -249,7 +257,23 @@ export const de: FeaturesText = {
     },
     "gym-finder": {
       name: "Studiosuche und Studioseiten",
-      body: "Finde Studios in deiner Nähe, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen.",
+      body: "Finde Studios in deiner Nähe auf einer Karte mit der Liste darunter, offizielle zuerst, jedes mit eigener Seite: Geräte, Öffnungszeiten, Karte und Mitglieder. Inhaber können ihr Studio beanspruchen und Logo und Fotos hinzufügen. Ein Studio fehlt? Füge es hinzu. Betreiber sehen, wie viele Sportler es hinzugefügt oder das Plakat gescannt haben, und was als Nächstes zu tun ist. Offizielle Studios können einen Club mit wöchentlicher Rangliste führen.",
+    },
+    "gym-amenities": {
+      name: "Ausstattung und Preise auf Studioseiten",
+      body: "Betreiber zeigen, was es neben den Geräten gibt (Duschen, Parkplätze, Zugang rund um die Uhr, Frauenbereich und mehr) und was Tageskarte, Wochenkarte oder Mitgliedschaft kosten.",
+    },
+    "gym-news": {
+      name: "Ankündigungen deines Studios",
+      body: "Offizielle Studios veröffentlichen Feiertagszeiten, neue Geräte oder geänderte Kurse auf ihrer Seite, und die Mitglieder ihres Clubs bekommen eine Mitteilung.",
+    },
+    "gym-problems": {
+      name: "Kaputte Geräte melden",
+      body: "Sag deinem Studio, dass ein Gerät kaputt ist oder fehlt. Alle, die dort trainieren, bekommen einen Plan ohne es, und der Betreiber sieht es mit einem Knopf für Repariert.",
+    },
+    "gym-trainers": {
+      name: "Trainer auf Studioseiten",
+      body: "Coaches zeigen sich in den Studios, in denen sie ihre Kunden trainieren, mit einer Zeile über sich und einem Knopf, um mit ihnen zu trainieren. Bei einem offiziellen Studio gibt der Betreiber sie zuerst frei.",
     },
     "buy-next": {
       name: "Was du als Nächstes kaufst",
@@ -310,6 +334,16 @@ export const de: FeaturesText = {
       name: "Kundenzahlungen über Stripe",
       body: "Verbinde dein eigenes Stripe-Konto und leg für jeden Kunden einen Preis fest, pro Einheit oder monatlich. Kunden zahlen auf der sicheren Seite von Stripe, das Geld geht direkt an dich, und eine fehlgeschlagene Monatszahlung steht oben in ihrem Bericht.",
     },
+    "coach-sharing": {
+      name: "Kunden wählen, was ihr Coach sieht",
+      body: "Das Training wird immer geteilt. Herzfrequenz, Workout-Notizen, Form und Erholung, Körperdaten, Schmerzen und Verletzungen sowie der Zyklus sind je ein Schalter, den Kunden für jeden Coach umlegen, bei der Zustimmung oder jederzeit danach. Fotos und Studios bleiben immer privat.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
+    },
+    "coach-pages": {
+      name: "Eine Seite für jede Seite",
+      body: "Kunden sehen nur ihren Coach: mit einem Tippen schreiben, Check-ins beantworten, Termine buchen und selbst wählen, was sie teilen. Coaches bekommen eine Seite pro Aufgabe, mit Kunden, Nachrichten, Terminen, Check-ins und Zahlungen als Tabs, im Web und auf dem Handy.",
+      proPart: "Kunde zu sein ist kostenlos; Kunden zu betreuen ist Pro.",
+    },
     "coach-plans": {
       name: "Coach-Pläne, die mit deiner Kundenliste wachsen",
       body: "Pro deckt bis zu 3 Kunden ab. Coach bietet Platz für 25 und Coach Plus hat keine feste Grenze, mit jedem Coaching-Werkzeug in jedem Plan. Deine Kunden trainieren immer kostenlos, und Liftsmith behält nichts von dem ein, was sie dir zahlen.",
@@ -355,7 +389,7 @@ export const de: FeaturesText = {
     },
     offline: {
       name: "Funktioniert offline",
-      body: "Alles läuft auf deinem Gerät, also ist kein Empfang im Kellerstudio kein Problem.",
+      body: "Alles läuft auf deinem Gerät und synchronisiert sich im Hintergrund, also ist kein Empfang im Kellerstudio kein Problem.",
     },
     sync: {
       name: "Konten und Synchronisierung",

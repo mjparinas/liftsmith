@@ -532,6 +532,40 @@ const SCHEMA = [
     created_at INTEGER NOT NULL,
     PRIMARY KEY (place_id, who)
   )`,
+  // Round 3 (gymExtras.ts, 2026-11-13): the owner's announcements, equipment lifters reported broken or missing
+  // (`who` is the account or the one-way address code, like gym_place_lifters), and trainers listed at a gym.
+  `CREATE TABLE IF NOT EXISTS gym_news (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    text TEXT NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_news_place ON gym_news (place_id, created_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_issues (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    equipment TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    who TEXT NOT NULL DEFAULT '',
+    reports INTEGER NOT NULL DEFAULT 1,
+    created_at INTEGER NOT NULL,
+    last_at INTEGER NOT NULL,
+    fixed_at INTEGER NOT NULL DEFAULT 0,
+    fixed_by TEXT NOT NULL DEFAULT ''
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_issues_place ON gym_issues (place_id, fixed_at)`,
+  `CREATE TABLE IF NOT EXISTS gym_trainers (
+    place_id TEXT NOT NULL,
+    account_id TEXT NOT NULL,
+    code TEXT NOT NULL UNIQUE,
+    bio TEXT NOT NULL DEFAULT '',
+    status TEXT NOT NULL,
+    created_at INTEGER NOT NULL,
+    PRIMARY KEY (place_id, account_id)
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_trainers_account ON gym_trainers (account_id)`,
   // Friends and the workout feed (social.ts, docs/decisions/friends.md). All deleted with the account.
   `CREATE TABLE IF NOT EXISTS social_profiles (
     account_id TEXT PRIMARY KEY,
@@ -1012,7 +1046,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "streak", "INTEGER NOT NULL DEFAULT 0"],
   // Friends gap list 2: a reply's top comment ('' for a comment on the post itself).
   ["post_comments", "reply_to", "TEXT NOT NULL DEFAULT ''"],
-  // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
+  // Friends gap list 2: training now and cheers pushes. Training now was off to start; new profiles turn it on
+  // since 2026-11-13 (join sets it), and profiles made before keep what they had.
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
   // "Let friends cheer me on" (on to start; Melvin, 2026-11-12).
@@ -1032,6 +1067,9 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
   ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
+  // Amenities (a comma list from gymExtras.ts AMENITIES) and prices (JSON), set by the owner (2026-11-13).
+  ["gym_places", "amenities", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "prices", "TEXT NOT NULL DEFAULT ''"],
   // Coach plans (src/lib/coachPlans.ts): which tier a store or web subscription is ('pro', 'coach' or 'coachPlus').
   ["entitlements", "tier", "TEXT"],
   ["stripe_subscriptions", "tier", "TEXT"],
@@ -1040,6 +1078,22 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_shares", "pain", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_prefs", "kind", "TEXT NOT NULL DEFAULT 'trainer'"],
   ["coach_plans", "per_week", "INTEGER"],
+  // Sharing item by item (2026-11-13, docs/decisions/trainer-mode.md "What a client shares"): heart rate, workout
+  // notes, readiness and recovery, and cycle, each off until the client turns it on for that coach.
+  ["coach_shares", "hr", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "notes", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "health", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "cycle", "INTEGER NOT NULL DEFAULT 0"],
+];
+
+/**
+ * Indexes on columns that COLUMNS adds, so they're made after the columns exist (on a fresh database SCHEMA's tables
+ * don't have them yet). Find gyms near you looks up each nearby gym's setup and club by place (2026-11-13): without
+ * these, every one of up to a thousand gyms scanned both tables.
+ */
+const LATE_SCHEMA = [
+  `CREATE INDEX IF NOT EXISTS public_gyms_for ON public_gyms (place_id)`,
+  `CREATE INDEX IF NOT EXISTS clubs_place ON clubs (place_id)`,
 ];
 
 let client: Client | null = null;
@@ -1092,6 +1146,7 @@ async function migrate(c: Client): Promise<void> {
       const cols = await c.execute(`PRAGMA table_info(${table})`);
       if (!cols.rows.some((r) => r.name === column)) await c.execute(`ALTER TABLE ${table} ADD COLUMN ${column} ${def}`);
     }
+    for (const s of LATE_SCHEMA) await c.execute(s);
     return;
   }
   // Tables and indexes that aren't there yet, plus the one-off data fixes (UPDATE … statements, which make nothing
@@ -1103,7 +1158,8 @@ async function migrate(c: Client): Promise<void> {
   const alters = COLUMNS.filter(([table, column]) => !have.columns.has(`${table}.${column}`)).map(
     ([table, column, def]) => `ALTER TABLE ${table} ADD COLUMN ${column} ${def}`,
   );
-  if (alters.length) await c.batch(alters, "write");
+  const late = LATE_SCHEMA.filter((sql) => !have.names.has(schemaName(sql)));
+  if (alters.length || late.length) await c.batch([...alters, ...late], "write");
 }
 
 /** Every table and index in the database, and each table's columns as `table.column`, in one read. */

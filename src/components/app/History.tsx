@@ -8,7 +8,9 @@ import { sessionNoteOf } from "@/lib/editHistory";
 import { EXERCISE_BY_ID } from "@/lib/exercises";
 import { monthOf, monthsBetween, monthSessions, musclesByDay, prSetIds, shiftMonth, workoutName, type YearMonth } from "@/lib/history";
 import { date, list, num, t } from "@/lib/i18n";
+import { injuries, PART_LABEL } from "@/lib/injury";
 import { haptic } from "@/lib/juice";
+import { sessionPain } from "@/lib/partMetrics";
 import { joinStretches, partsOf, type PartView } from "@/lib/sessions";
 import { sessionShares } from "@/lib/shareCards";
 import { useApp } from "@/lib/store";
@@ -251,7 +253,7 @@ export function HistoryCalendar() {
           summary={s}
           unit={profile.unit}
           prIds={prIds}
-          parts={partsOf(s, joined.bySession.get(s.sessionId))}
+          parts={partsOf(s, joined.bySession.get(s.sessionId), s.parts)}
         />
       ))}
       {dayStretches.map((s) => (
@@ -296,9 +298,37 @@ function PartsLine({ parts }: { parts: PartView[] }) {
             </span>
           )}
           {t("hx.partTime", {
-            part: t(`hx.part.${p.kind === "warm" ? "warm" : p.kind === "cool" ? "cool" : "lift"}`),
+            part: t(`hx.part.${p.kind === "warm" ? "warm" : p.kind === "cool" ? "cool" : p.kind === "rehab" ? "rehab" : "lift"}`),
             time: minutes(p.seconds),
           })}
+        </span>
+      ))}
+    </p>
+  );
+}
+
+/**
+ * Pain before and after the workout for each injury rated in it (stage 4 of workouts with parts), so a rehab
+ * workout shows whether it helped: "Knee pain: 4 → 2". Only when there's a before to compare with.
+ */
+function PainLine({ sessionId, start }: { sessionId: string; start: number }) {
+  const { events } = useApp();
+  const rows = useMemo(() => {
+    const part = new Map(injuries(events).map((i) => [i.id, i.part]));
+    return sessionPain(events, sessionId, start).flatMap((p) => {
+      const area = part.get(p.injuryId);
+      return area && p.before !== undefined ? [{ id: p.injuryId, part: PART_LABEL[area], before: p.before, after: p.after }] : [];
+    });
+  }, [events, sessionId, start]);
+  if (!rows.length) return null;
+  return (
+    <p className="num mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-sm text-muted" data-testid="workout-pain">
+      {rows.map((r) => (
+        <span key={r.id} className="inline-flex items-center gap-1">
+          <span className="text-warn" aria-hidden>
+            <Icon name="bandage" size={14} />
+          </span>
+          {t("hx.painChange", { part: r.part, before: r.before, after: r.after })}
         </span>
       ))}
     </p>
@@ -365,6 +395,7 @@ function WorkoutCard({ summary, unit, prIds, parts }: { summary: SessionSummary;
         {detail.manual ? t("dash.byHand") : ""}
       </p>
       <PartsLine parts={parts} />
+      <PainLine sessionId={summary.sessionId} start={summary.start} />
       {own?.text && (
         <p className="mt-2 whitespace-pre-line rounded-xl bg-raised px-3 py-2 text-sm" data-testid="workout-note">
           {own.text}

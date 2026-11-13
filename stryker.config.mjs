@@ -18,6 +18,7 @@ const config = {
     "src/lib/game.ts",
     "src/lib/loads.ts",
     "src/lib/units.ts",
+    "src/lib/pickWeights.ts",
   ],
   mutator: { excludedMutations: ["StringLiteral"] },
   reporters: ["clear-text", "progress", "html", "json"],
@@ -27,8 +28,9 @@ const config = {
   incremental: true,
   incrementalFile: "reports/mutation/stryker-incremental.json",
   // Ratchet: the first run scored 34%; 55% on 2026-11-13, then 67.5% after tests for readiness, loads,
-  // progression and the generator, then 76% after derive, plates, recovery and game rules. Raise break as tests land (Gradelings aims for 85).
-  thresholds: { high: 85, low: 70, break: 70 },
+  // progression and the generator, then 76% after derive, plates, recovery and game rules, then 85% after generator and quest tests (round 3).
+  // Raise break as tests land (Gradelings aims for 85).
+  thresholds: { high: 85, low: 80, break: 80 },
   concurrency: 4,
   timeoutMS: 20000,
   ignoreStatic: true,

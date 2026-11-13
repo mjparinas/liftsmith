@@ -10,6 +10,8 @@ import { defaultProfile } from "./defaults";
 import { derive, setWeekStart, type Stats } from "./derive";
 import { registerCustom } from "./exercises";
 import { appendEvents, deleteEvents, eraseAll, load, saveRecord } from "./localdb";
+import { erasePhotos } from "./photos";
+import { stopSession } from "./sessionNotify";
 import { coolDownHome } from "./sessions";
 import { healthSlice, type HealthSlice } from "./store/health";
 import { historySlice, type HistorySlice } from "./store/history";
@@ -21,8 +23,10 @@ import { workoutSlice, type Active, type WorkoutSlice } from "./store/workout";
 import { lastWeighInKg } from "./tdee";
 import { minutesForToday } from "./training";
 import type { AppEvent, Gym, Profile, StretchEvent } from "./types";
+import { clearWidget } from "./widget";
+import { clearPersonalKeys } from "./wipe";
 
-export { AUTO_END_MS, hrWindow, REST_PAUSE_SEC, warmingUp, type Active } from "./store/workout";
+export { AUTO_END_MS, hrWindow, partNow, REST_PAUSE_SEC, stretching, warmingUp, type Active } from "./store/workout";
 
 // The app's state. Events are the source of truth; `stats` is recomputed from them.
 // Each area's state and actions live in its own slice under src/lib/store/ (workout, plan, injuries,
@@ -47,6 +51,10 @@ export interface State extends WorkoutSlice, PlanSlice, InjuriesSlice, HealthSli
   notePro(now?: number): void;
   /** Saves a finished stretch routine (Stretch.tsx). */
   logStretch(moment: StretchEvent["moment"], ids: string[], seconds: number): void;
+  /** Erases everything of the lifter's on this device (signing out, signing in as someone else; wipe.ts). Keeps the sign-in
+   *  itself out of it: callers end or start the session around it. */
+  wipeLocal(): Promise<void>;
+  /** "Erase this device": signs out and wipes. */
   reset(): Promise<void>;
 }
 
@@ -180,19 +188,36 @@ export const useApp = create<State>((set, get) => {
       const now = Date.now();
       const secs = Math.round(seconds);
       // A cool-down belongs to the workout it follows (workouts with parts, sessions.ts).
-      const sessionId = moment === "cool" ? coolDownHome(get().stats.sessions, now, secs) : undefined;
+      // A warm-up or cool-down done as a part of the workout in progress belongs to it.
+      const live = get().active;
+      const sessionId =
+        live && (moment === "warm" || moment === "cool")
+          ? live.sessionId
+          : moment === "cool"
+            ? coolDownHome(get().stats.sessions, now, secs)
+            : undefined;
       commit([{ type: "stretch", id: uid(), at: now, moment, ids, seconds: secs, ...(sessionId ? { sessionId } : {}) }]);
       track("feature", { name: "stretch", detail: `${moment}:${ids.length}` });
+    },
+
+    async wipeLocal() {
+      // A workout in progress, its lock-screen card or Live Activity and the home-screen widget go first, so nothing
+      // of this lifter is left on the lock screen or home screen either.
+      persistActive(null);
+      void stopSession().catch(() => undefined);
+      void clearWidget();
+      await eraseAll();
+      await erasePhotos();
+      forgetBilling();
+      clearPersonalKeys();
+      set({ events: [], profile: defaultProfile(), gyms: [], stats: derive([], Date.now()), active: null, preview: null });
     },
 
     async reset() {
       // Erasing the device signs it out (the account and its synced copy stay).
       void signOut();
-      await eraseAll();
-      persistActive(null);
+      await get().wipeLocal();
       forgetAnalytics();
-      forgetBilling();
-      set({ events: [], profile: defaultProfile(), gyms: [], stats: derive([], Date.now()), active: null, preview: null });
     },
   };
 });

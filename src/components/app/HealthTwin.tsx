@@ -16,7 +16,7 @@ import { can, isPro } from "@/lib/entitlements";
 import { fitnessAge, strengthWeek, type FitnessAge } from "@/lib/fitnessAge";
 import type { Term } from "@/lib/glossary";
 import { askHealth, healthAvailable, openHealthPermissions, type HealthRead } from "@/lib/health";
-import { date, list, t } from "@/lib/i18n";
+import { date, inSentence, list, t } from "@/lib/i18n";
 import { isNative } from "@/lib/juice";
 import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
@@ -187,11 +187,11 @@ export function HealthTwin() {
           <h2 className={CARD_TITLE}>{t("twin.today", { call: CALL_TEXT[r.call].label })}</h2>
           <p className="mt-1 text-sm text-muted">
             {(watch.length
-              ? watch.slice(0, 2).map((m) => `${m.label}: ${m.chip.toLowerCase()}`)
+              ? watch.slice(0, 2).map((m) => `${m.label}: ${inSentence(m.chip, true)}`)
               : r.signals.slice(0, 2).map((s) => s.text)
             ).join(". ") || CALL_TEXT[r.call].blurb}
           </p>
-          {proCall && <p className="mt-2 text-sm text-ink">{t("twin.proWould", { call: CALL_TEXT[proCall].label.toLowerCase() })}</p>}
+          {proCall && <p className="mt-2 text-sm text-ink">{t("twin.proWould", { call: inSentence(CALL_TEXT[proCall].label, true) })}</p>}
           <div className="mt-3 flex flex-wrap gap-2">
             <Button onClick={() => go("today")} icon="today">
               {t("twin.plan")}

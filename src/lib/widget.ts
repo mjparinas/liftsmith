@@ -104,6 +104,15 @@ export async function pushWidget(s: WidgetSnapshot): Promise<boolean> {
   }
 }
 
+/** Empties the native widget (signing out, erasing the device): an empty snapshot draws its plain Start and Log buttons
+ *  on both Android (WorkoutWidget.snapshot needs "v": 1) and iOS (QuickStartWidget's Snapshot doesn't decode). */
+export async function clearWidget(): Promise<void> {
+  const p = plugin();
+  last = "";
+  if (!p?.setWidget || !isNative()) return;
+  await p.setWidget({ json: "{}" }).catch(() => undefined);
+}
+
 /** Tests only. */
 export function resetWidgetCache() {
   last = "";

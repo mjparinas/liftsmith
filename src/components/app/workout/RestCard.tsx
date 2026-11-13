@@ -72,6 +72,13 @@ export function RestCard({
   const s = useApp();
   const { events, profile } = s;
   const unit = gym.unit;
+  // A bonus set is offered once the exercise's planned sets are all in, not after every set.
+  const lastItem = lastSet ? active.plan.items.find((i) => i.exerciseId === lastSet.exerciseId) : undefined;
+  const lastOfExercise =
+    !!lastSet &&
+    (!lastItem ||
+      events.filter((e) => e.type === "set" && e.sessionId === active.sessionId && e.exerciseId === lastSet.exerciseId && !e.tag).length >=
+        lastItem.sets);
   return (
     <section className="card-tint animate-pop mt-5 flex flex-col items-center p-5" style={{ "--tint": HUE.cyan } as CSSProperties}>
       <Ring value={left / Math.max(1, active.restTotal)} from={HUE.cyan} to={HUE.accent} stroke={14}>
@@ -111,7 +118,7 @@ export function RestCard({
           }}
         />
       )}
-      {lastSet && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
+      {lastSet && lastOfExercise && !active.tag && !TIMED.has(lastSet.exerciseId) && <ExtraSet lastSet={lastSet} onPick={s.extraSet} />}
       {active.askFeedback && <Feedback name={exercise(active.askFeedback).name} onPick={s.feedback} />}
       {lastSet && <PainCheck sessionId={active.sessionId} exerciseId={lastSet.exerciseId} rehab={!!active.plan.rehab} />}
       <div className="mt-5 w-full border-t border-line/70 pt-4">
@@ -126,7 +133,7 @@ export function RestCard({
             <PlateBar loading={loading} bar={bar.weight} unit={unit} compact finish={finish} />
           </div>
         )}
-        <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} />
+        <AlmostThere exerciseId={ex.id} weight={active.weight} reps={active.reps} since={active.startedAt - 1} />
         <PlateChange ex={ex} gym={gym} kg={active.weight} sessionId={active.sessionId} />
       </div>
       <RestExtra left={left} gym={gym} />

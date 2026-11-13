@@ -12,3 +12,4 @@
 "Next: %@" = "Als Nächstes: %@";
 "Rest left" = "Verbleibende Pause";
 "Rest over" = "Pause vorbei";
+"%lld of %lld sets done" = "%1$lld von %2$lld Sätzen erledigt";

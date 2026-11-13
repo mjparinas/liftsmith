@@ -168,6 +168,15 @@ export default function Privacy() {
           from the QR code on a gym&apos;s poster are counted with a one-way code from your internet address, once a day, and only the total
           is kept.
         </p>
+        <p className="mt-2">
+          If you report a piece of a gym&apos;s equipment broken or missing, we keep the report (the equipment, broken or missing, and your
+          optional note) with your account, or a one-way code from your internet address, so each person counts once. The report and the
+          note show on the gym&apos;s page and to its owner, never who sent it, until someone says it works again or 14 days pass. Deleting
+          your account takes you off your reports. A gym owner&apos;s announcements are public on the gym&apos;s page and are sent to
+          members of the gym&apos;s club. If you&apos;re a coach and list yourself at a gym, your name, your role (personal trainer, coach
+          or physio) and the line you write about yourself are public on that gym&apos;s page, and the gym&apos;s owner sees them; take
+          yourself off in Coaching, or delete your account, and the listing is deleted.
+        </p>
 
         <h2 className="mt-8 text-xl font-semibold">Connected apps: Strava, Oura, WHOOP, Withings, Polar, Concept2 and Sonos</h2>
         <p className="mt-2">

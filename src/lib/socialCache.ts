@@ -1,5 +1,7 @@
 "use client";
 
+import { track } from "./net";
+
 // What the Friends tab showed last, so it opens instantly and refreshes behind it (thread "Speed up the Friends
 // screen", 2026-11-12; docs/decisions/friends.md "Loading"). Each part (the lifter's own state, the first page of the
 // feed, training now, suggestions) is kept in memory under a key; `me`, the feed and suggestions are also kept on the
@@ -84,7 +86,7 @@ export function fetchPart<T>(account: string, key: string, fetch: () => Promise<
 }
 
 function own<T>(account: string, key: string, fetch: () => Promise<T>): Promise<T> {
-  const p: Promise<T> = fetch()
+  const p: Promise<T> = track(fetch())
     .then((data) => {
       if (owner === account) remember(account, key, data);
       return data;
@@ -107,7 +109,7 @@ export function fetchParts<T>(
   split: (r: T) => Record<string, unknown> | null,
 ): Promise<Record<string, unknown> | null> {
   load(account);
-  const all = fetch().then(split);
+  const all = track(fetch()).then(split);
   for (const k of keys) {
     const p: Promise<unknown> = all
       .then((r) => {

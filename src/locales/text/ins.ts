@@ -97,6 +97,18 @@ export const en = {
   "ins.coachKcalOver.title": "Eating over your coach's target",
   "ins.coachKcalOver.advice": "Trim about {gap} a day, or ask your coach whether the target still fits.",
   "ins.coachKcal.action": "Open coaching",
+  "ins.rehabPainDown.title": "Your {area} pain is easing",
+  "ins.rehabPainUp.title": "Your {area} pain is rising",
+  "ins.rehabPain.why": {
+    one: "After workouts it went from {from}/10 to {to}/10, over {count} workout in {days} days.",
+    other: "After workouts it went from {from}/10 to {to}/10, over {count} workouts in {days} days.",
+  },
+  "ins.rehabPainDown.advice": "Ask your physio whether you're ready for the next stage of your rehab.",
+  "ins.rehabPainUp.advice": "Tell your physio, and keep the rehab easy until you've spoken.",
+  "ins.rehabPain.action": "See injuries",
+  "ins.coolHr.title": "Your heart rate stays up after the cool-down",
+  "ins.coolHr.why": "It ended at {bpm} bpm in {count} of your last {total} cool-downs, no lower than while you lifted.",
+  "ins.coolHr.advice": "Take the cool-down a few minutes longer and breathe slowly until it settles under 100.",
 } as const;
 
 type Key = keyof typeof en;
@@ -201,6 +213,18 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.coachKcalOver.title": "Comes por encima del objetivo de tu entrenador",
   "ins.coachKcalOver.advice": "Recorta unas {gap} al día, o pregunta a tu entrenador si el objetivo sigue encajando.",
   "ins.coachKcal.action": "Abrir coaching",
+  "ins.rehabPainDown.title": "El dolor de {area} baja",
+  "ins.rehabPainUp.title": "El dolor de {area} sube",
+  "ins.rehabPain.why": {
+    one: "Después de entrenar pasó de {from}/10 a {to}/10, en {count} entrenamiento en {days} días.",
+    other: "Después de entrenar pasó de {from}/10 a {to}/10, en {count} entrenamientos en {days} días.",
+  },
+  "ins.rehabPainDown.advice": "Pregunta a tu fisioterapeuta si estás listo para la siguiente fase de la rehabilitación.",
+  "ins.rehabPainUp.advice": "Díselo a tu fisioterapeuta y mantén la rehabilitación suave hasta que habléis.",
+  "ins.rehabPain.action": "Ver lesiones",
+  "ins.coolHr.title": "Tu pulso sigue alto tras la vuelta a la calma",
+  "ins.coolHr.why": "Terminó en {bpm} ppm en {count} de tus últimas {total} vueltas a la calma, no más bajo que al levantar.",
+  "ins.coolHr.advice": "Alarga la vuelta a la calma unos minutos y respira despacio hasta que baje de 100.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -305,6 +329,19 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.coachKcalOver.title": "Au-dessus de l'objectif de votre coach",
   "ins.coachKcalOver.advice": "Retirez environ {gap} par jour, ou demandez à votre coach si l'objectif convient toujours.",
   "ins.coachKcal.action": "Ouvrir le coaching",
+  "ins.rehabPainDown.title": "La douleur ({area}) diminue",
+  "ins.rehabPainUp.title": "La douleur ({area}) augmente",
+  "ins.rehabPain.why": {
+    one: "Après l'entraînement, elle est passée de {from}/10 à {to}/10, sur {count} séance en {days} jours.",
+    other: "Après l'entraînement, elle est passée de {from}/10 à {to}/10, sur {count} séances en {days} jours.",
+  },
+  "ins.rehabPainDown.advice": "Demandez à votre kiné si vous êtes prêt pour l'étape suivante de la rééducation.",
+  "ins.rehabPainUp.advice": "Prévenez votre kiné et gardez une rééducation douce en attendant de lui parler.",
+  "ins.rehabPain.action": "Voir les blessures",
+  "ins.coolHr.title": "Votre fréquence cardiaque reste haute après le retour au calme",
+  "ins.coolHr.why":
+    "Elle finissait à {bpm} bpm dans {count} de vos {total} derniers retours au calme, pas plus bas que pendant les séries.",
+  "ins.coolHr.advice": "Prolongez le retour au calme de quelques minutes et respirez lentement jusqu'à passer sous 100.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -408,6 +445,18 @@ export const de: Partial<Record<Key, Message>> = {
   "ins.coachKcalOver.title": "Über dem Ziel deines Coaches",
   "ins.coachKcalOver.advice": "Spar etwa {gap} pro Tag ein, oder frag deinen Coach, ob das Ziel noch passt.",
   "ins.coachKcal.action": "Coaching öffnen",
+  "ins.rehabPainDown.title": "Schmerz im Bereich {area} lässt nach",
+  "ins.rehabPainUp.title": "Schmerz im Bereich {area} nimmt zu",
+  "ins.rehabPain.why": {
+    one: "Nach dem Training ging er von {from}/10 auf {to}/10, über {count} Training in {days} Tagen.",
+    other: "Nach dem Training ging er von {from}/10 auf {to}/10, über {count} Trainings in {days} Tagen.",
+  },
+  "ins.rehabPainDown.advice": "Frag deine Physiotherapeutin oder deinen Physiotherapeuten, ob du für die nächste Reha-Stufe bereit bist.",
+  "ins.rehabPainUp.advice": "Sag es deiner Physiotherapie und halte die Reha leicht, bis ihr gesprochen habt.",
+  "ins.rehabPain.action": "Verletzungen ansehen",
+  "ins.coolHr.title": "Dein Puls bleibt nach dem Cool-down hoch",
+  "ins.coolHr.why": "Er lag am Ende bei {bpm} bpm, in {count} deiner letzten {total} Cool-downs, nicht niedriger als beim Heben.",
+  "ins.coolHr.advice": "Mach das Cool-down ein paar Minuten länger und atme langsam, bis er unter 100 fällt.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -512,6 +561,18 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.coachKcalOver.title": "Sopra l'obiettivo del tuo coach",
   "ins.coachKcalOver.advice": "Togli circa {gap} al giorno, o chiedi al tuo coach se l'obiettivo è ancora giusto.",
   "ins.coachKcal.action": "Apri coaching",
+  "ins.rehabPainDown.title": "Il dolore ({area}) cala",
+  "ins.rehabPainUp.title": "Il dolore ({area}) aumenta",
+  "ins.rehabPain.why": {
+    one: "Dopo l'allenamento è passato da {from}/10 a {to}/10, in {count} allenamento in {days} giorni.",
+    other: "Dopo l'allenamento è passato da {from}/10 a {to}/10, in {count} allenamenti in {days} giorni.",
+  },
+  "ins.rehabPainDown.advice": "Chiedi al tuo fisioterapista se sei pronto per la fase successiva della riabilitazione.",
+  "ins.rehabPainUp.advice": "Dillo al tuo fisioterapista e tieni la riabilitazione leggera finché non vi sentite.",
+  "ins.rehabPain.action": "Vedi infortuni",
+  "ins.coolHr.title": "Il battito resta alto dopo il defaticamento",
+  "ins.coolHr.why": "Finiva a {bpm} bpm in {count} dei tuoi ultimi {total} defaticamenti, non più basso che durante i sollevamenti.",
+  "ins.coolHr.advice": "Allunga il defaticamento di qualche minuto e respira piano finché non scende sotto 100.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -601,4 +662,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.coachKcalOver.title": "コーチの目標より多めです",
   "ins.coachKcalOver.advice": "1日約{gap}減らすか、目標が今も合っているかコーチに聞いてみましょう。",
   "ins.coachKcal.action": "コーチングを開く",
+  "ins.rehabPainDown.title": "{area}の痛みが和らいでいます",
+  "ins.rehabPainUp.title": "{area}の痛みが強くなっています",
+  "ins.rehabPain.why": { other: "トレーニング後の痛みは{days}日間・{count}回で{from}/10から{to}/10になりました。" },
+  "ins.rehabPainDown.advice": "リハビリの次の段階に進めるか、理学療法士に相談しましょう。",
+  "ins.rehabPainUp.advice": "理学療法士に伝え、相談するまではリハビリを軽めにしましょう。",
+  "ins.rehabPain.action": "ケガを見る",
+  "ins.coolHr.title": "クールダウン後も心拍数が高いままです",
+  "ins.coolHr.why": "直近{total}回のクールダウンのうち{count}回で、終わりの心拍数が{bpm} bpmと、リフティング中より下がっていませんでした。",
+  "ins.coolHr.advice": "クールダウンを数分長くし、100を下回るまでゆっくり呼吸しましょう。",
 };

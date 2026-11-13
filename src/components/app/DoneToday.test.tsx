@@ -45,8 +45,15 @@ describe("Today after training", () => {
     const card = screen.getByRole("region", { name: /Train as planned|Go easy|Push/ });
     expect(within(card).getByRole("button", { name: "Something hurts?" })).toBeInTheDocument();
     expect(within(card).getAllByRole("button", { name: /^What is/ })).toHaveLength(1);
-    // A brand new lifter has no streak yet: no flat 0, the goal chip says what starts one.
+    // A brand new lifter has no streak yet: no flat 0, the This week card says what starts one.
     expect(screen.getByText(/more this week to start a streak/)).toBeInTheDocument();
+    // Before the first workout the card has no score or call picker yet, only what happens first.
+    expect(within(card).getByText(/Your first workout sets the baseline/)).toBeInTheDocument();
+    expect(screen.queryByRole("group", { name: "Today's call" })).toBeNull();
+    // The plan comes before the week's quests on a phone.
+    const plan = screen.getByTestId("plan-list");
+    const week = screen.getByText("This week");
+    expect(plan.compareDocumentPosition(week) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("says the day is done, with what's next, and Train again brings the plan back", async () => {

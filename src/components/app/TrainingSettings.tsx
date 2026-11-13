@@ -6,6 +6,7 @@ import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { restFor } from "@/lib/generator";
 import { t, weekday } from "@/lib/i18n";
 import { nowPlayingSupported } from "@/lib/nowPlaying";
+import { pickWeights } from "@/lib/pickWeights";
 import { repRange, TIMED } from "@/lib/progression";
 import { useApp } from "@/lib/store";
 import {
@@ -14,6 +15,7 @@ import {
   MAX_PRIORITIES,
   prefsFor,
   REP_RANGES,
+  resetPick,
   REST_OPTIONS,
   restLabel,
   SET_OPTIONS,
@@ -21,7 +23,8 @@ import {
   togglePriority,
   withExercisePrefs,
 } from "@/lib/training";
-import { MUSCLE_LABEL, MUSCLES, type RestAlert, type TrainingPrefs } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type TrainingPrefs } from "@/lib/types";
+import { useNow } from "@/lib/useNow";
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
@@ -77,21 +80,14 @@ export function RestTimerSettings() {
       {nowPlayingSupported() && (
         <NowPlayingSetting on={tp.nowPlaying !== false} onChange={(v) => put({ nowPlaying: v ? undefined : false })} />
       )}
-      <Section title={t("train.timer")}>
-        <ChipRow<RestAlert | "app">
-          label={t("train.alert")}
-          value={tp.restAlert ?? "app"}
-          onPick={(v) => put({ restAlert: v === "app" ? undefined : v })}
-          options={[
-            ["app", t("train.alert.app")],
-            ["both", t("train.alert.both")],
-            ["sound", t("train.alert.sound")],
-            ["vibrate", t("train.alert.vibrate")],
-            ["silent", t("train.alert.silent")],
-          ]}
-        />
-        <p className="mt-2 px-1 text-xs text-faint">{t("train.alertNote")}</p>
-      </Section>
+      {/* One switch: the rest-over alert follows Sounds and Vibration, or stays silent. Older saved choices
+          (sound only, vibration only, both) still work until the switch is touched (restAlertOf). */}
+      <SwitchRow
+        label={t("train.alertEnd")}
+        hint={t("train.alertEndHint")}
+        on={tp.restAlert !== "silent"}
+        onChange={(v) => put({ restAlert: v ? undefined : "silent" })}
+      />
     </>
   );
 }
@@ -227,6 +223,8 @@ export function TrainingSettings() {
         <p className="mt-2 px-1 text-xs text-faint">{t("train.favouritesNote")}</p>
       </Section>
 
+      <LessOften />
+
       <Section title={t("train.overrides")}>
         <ul className="card divide-y divide-line/70">
           {overrides.map((id) => (
@@ -332,6 +330,39 @@ export function ExercisePrefsEditor({ exerciseId, note }: { exerciseId: string; 
       />
       {note && <p className="mt-2 text-xs text-faint">{note}</p>}
     </div>
+  );
+}
+
+/**
+ * Exercises the adaptive planner picks less often because the lifter swapped them away (pickWeights.ts),
+ * each with a button to pick it as usual again. Hidden when there are none.
+ */
+function LessOften() {
+  const { profile, setProfile, events } = useApp();
+  const now = useNow(3600_000);
+  const lowered = pickWeights(events, profile, now)
+    .lowered()
+    .filter((id) => EXERCISE_BY_ID.has(id));
+  if (!lowered.length) return null;
+  return (
+    <Section title={t("train.lessOften")}>
+      <ul className="card divide-y divide-line/70">
+        {lowered.map((id) => (
+          <li key={id} className="flex items-center justify-between gap-3 px-4 py-2">
+            <span className="min-w-0 truncate">{exercise(id).name}</span>
+            <button
+              type="button"
+              onClick={() => setProfile({ training: resetPick(profile.training, id, Date.now()) })}
+              className="press min-h-11 shrink-0 px-2 text-sm text-muted"
+              aria-label={t("train.pickAgainLabel", { name: exercise(id).name })}
+            >
+              {t("train.pickAgain")}
+            </button>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-2 px-1 text-xs text-faint">{t("train.lessOftenNote")}</p>
+    </Section>
   );
 }
 

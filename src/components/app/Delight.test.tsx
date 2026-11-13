@@ -100,14 +100,22 @@ describe("workout extras", () => {
 });
 
 describe("Today and Progress extras", () => {
-  it("offers a warm-up and a buddy check-in that records the event", async () => {
+  it("plans a warm-up part on Today, and Start opens it first", async () => {
     const user = userEvent.setup();
     await onboard(user);
-    // The warm-up chip opens today's warm-up stretches (Stretch.tsx), which can be skipped.
-    await user.click(screen.getByRole("button", { name: "Warm up first" }));
+    // Workouts with parts (sessions-with-parts.md): the warm-up is a switch above the plan, for this workout only.
+    const parts = screen.getByTestId("today-parts");
+    await user.click(within(parts).getByRole("switch", { name: /Warm-up/ }));
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
     expect(await screen.findByRole("heading", { name: "Warm-up for today" })).toBeInTheDocument();
+    expect(screen.getByTestId("part-step")).toHaveTextContent("Warm-up · 1 of 2");
     expect(within(screen.getByTestId("stretch-routine")).getAllByRole("listitem").length).toBeGreaterThan(2);
-    await user.click(screen.getByRole("button", { name: "‹ Back" }));
+    expect(useApp.getState().active?.parts?.map((p) => p.kind)).toEqual(["warm", "lift"]);
+  });
+
+  it("offers a buddy check-in that records the event", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
     await screen.findByRole("button", { name: "Check in" });
 
     const writeText = vi.fn(async () => {});
@@ -122,11 +130,11 @@ describe("Today and Progress extras", () => {
     expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam"] });
   });
 
-  it("shows lifetime tonnage, the recap, body weight and themes", async () => {
+  it("shows the recap, body weight and themes", async () => {
     const user = userEvent.setup();
     await onboard(user);
     location.hash = "#/stats";
-    expect(await screen.findByText("Lifted in total")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /Monthly recap|Your year in lifting/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Body and photos/ }));
     await user.clear(await screen.findByRole("textbox", { name: /Body weight in/ }));
     await user.type(screen.getByRole("textbox", { name: /Body weight in/ }), "81.5");

@@ -14,6 +14,7 @@ import { can } from "./entitlements";
 import { exerciseName } from "./game";
 import { t } from "./i18n";
 import { isNative } from "./juice";
+import { track } from "./net";
 import { useApp } from "./store";
 import type { AppEvent, Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
@@ -76,7 +77,7 @@ export async function refreshCloud(): Promise<void> {
   const account = readAccount();
   if (!account) return useCloud.setState({ status: null });
   try {
-    useCloud.setState({ status: await api<CloudStatus>("/api/connect/", { token: account.token }) });
+    useCloud.setState({ status: await track(api<CloudStatus>("/api/connect/", { token: account.token })) });
   } catch (e) {
     // Offline, or the server isn't set up: keep what we knew.
     if (e instanceof AuthError && e.status === 401) useCloud.setState({ status: null });
@@ -134,7 +135,7 @@ export async function pullCloud(force = false, now = Date.now()): Promise<number
     if (!force && now - (useCloud.getState().pulled[p] ?? 0) < 3 * 3_600_000) continue;
     try {
       const tz = -new Date(now).getTimezoneOffset();
-      const r = await api<{ readings: CloudReading[] }>(`/api/connect/${p}/daily/?days=45&tz=${tz}`, { token: account.token });
+      const r = await track(api<{ readings: CloudReading[] }>(`/api/connect/${p}/daily/?days=45&tz=${tz}`, { token: account.token }));
       added += useApp.getState().importCloudReadings(p, r.readings);
       const pulled = { ...useCloud.getState().pulled, [p]: now };
       useCloud.setState({ pulled });
@@ -149,7 +150,9 @@ export async function pullCloud(force = false, now = Date.now()): Promise<number
       const tz = -new Date(now).getTimezoneOffset();
       // The first pull brings the last year of sessions; later ones the last 30 days.
       const days = useCloud.getState().pulled.concept2 ? 30 : 365;
-      const r = await api<{ sessions: CloudCardio[] }>(`/api/connect/concept2/results/?days=${days}&tz=${tz}`, { token: account.token });
+      const r = await track(
+        api<{ sessions: CloudCardio[] }>(`/api/connect/concept2/results/?days=${days}&tz=${tz}`, { token: account.token }),
+      );
       added += useApp.getState().importCloudCardio(r.sessions, now);
       const pulled = { ...useCloud.getState().pulled, concept2: now };
       useCloud.setState({ pulled });

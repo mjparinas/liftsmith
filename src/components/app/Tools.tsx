@@ -9,6 +9,7 @@ import { TdeeChart, TdeeResults } from "@/components/Tdee";
 import { track } from "@/lib/analytics";
 import { ffmi, tanakaMax } from "@/lib/calculators";
 import { date, inSentence, list, num, t } from "@/lib/i18n";
+import { useDesktop } from "@/lib/layout";
 import { allOneRms, dotsBand, dotsFromData } from "@/lib/onerm";
 import { useApp } from "@/lib/store";
 import { STRETCHES } from "@/lib/stretches";
@@ -167,6 +168,7 @@ const TOOLS: ToolEntry[] = [
 
 function ToolsHub() {
   const { events, stats, profile } = useApp();
+  const desktop = useDesktop();
   const now = useNow(60_000);
   const ctx = useMemo<HubCtx>(() => {
     const kg = currentKg(events, profile);
@@ -183,7 +185,8 @@ function ToolsHub() {
   }, [events, stats.sessions, profile, now]);
   return (
     <div className="pb-2">
-      <ScreenHeader back={{ label: t("tools.back"), onClick: () => go("stats") }} title={t("tools.title")} />
+      {/* On desktop Tools is in the sidebar, a screen of its own, so it has nothing to go back to. */}
+      <ScreenHeader back={desktop ? undefined : { label: t("tools.back"), onClick: () => go("stats") }} title={t("tools.title")} />
       <ul className="mt-4 space-y-3">
         {TOOLS.map((x) => (
           <li key={x.arg}>

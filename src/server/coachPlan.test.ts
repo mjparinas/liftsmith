@@ -126,6 +126,10 @@ describe("client limits", () => {
       NOW,
     );
     expect(await coachPlanOf("coach", NOW)).toMatchObject({ tier: "coach", via: "play", limit: 25 });
+    // Someone else synced from that phone since: the subscription goes with the phone.
+    await run("INSERT INTO account_installs (account_id, install_id, at) VALUES ('other', 'install-coach-1', ?)", [NOW + 1]);
+    expect(await coachPlanOf("coach", NOW)).toMatchObject({ tier: "pro", limit: 3 });
+    await run("UPDATE account_installs SET at = ? WHERE account_id = 'coach'", [NOW + 2]);
     // Lapsed: back to Pro's limit.
     expect(await coachPlanOf("coach", NOW + 31 * DAY)).toMatchObject({ tier: "pro", limit: 3 });
   });

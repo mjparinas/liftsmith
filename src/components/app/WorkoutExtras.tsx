@@ -233,14 +233,18 @@ export function RestExtra({ left, gym }: { left: number; gym: Gym }) {
     <div className="mt-4 w-full">
       {mode === "breathe" && <Breathe left={left} />}
       {mode === "game" && <PlateMath gym={gym} />}
-      <div className="mt-2 flex justify-center gap-1 text-xs" role="group" aria-label={t("extra.group")}>
+      {/* A visible label, so "Neither" reads as a choice of what to do while resting. */}
+      <div className="mt-2 flex flex-wrap items-center justify-center gap-1 text-xs" role="group" aria-labelledby="rest-extra-label">
+        <span id="rest-extra-label" className="px-1 text-faint">
+          {t("extra.group")}
+        </span>
         {(["breathe", "game", "off"] as const).map((m) => (
           <button
             key={m}
             type="button"
             aria-pressed={mode === m}
             onClick={() => pick(m)}
-            className={`press min-h-11 rounded-full px-3 ${mode === m ? "bg-raised text-ink" : "text-faint"}`}
+            className={`press min-h-11 rounded-full px-3 ${mode === m ? "bg-raised text-ink" : "text-muted"}`}
           >
             {t(`extra.${m}`)}
           </button>

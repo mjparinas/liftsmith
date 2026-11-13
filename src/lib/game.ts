@@ -12,7 +12,7 @@ import type { AppEvent, Profile, SetEvent } from "./types";
 // XP, levels, the training-week streak with freezes, weekly quests, leagues, crates and achievements.
 // All derived from events and never stored, like Gradelings, so every device agrees.
 
-export const XP = { set: 10, pr: 50, session: 40, fullSession: 30, crateDuplicate: 25 } as const;
+export const XP = { set: 10, pr: 50, session: 40, fullSession: 30, crateDuplicate: 25, stretchDay: 30 } as const;
 const DAY = 86400_000;
 const WEEK = 7 * DAY;
 
@@ -55,13 +55,14 @@ export function levelOf(xp: number) {
   };
 }
 
-/** XP from sets, sessions and PRs (the base every other bonus adds to). */
+/** XP from sets, sessions, PRs and stretch days of 10+ minutes (the base every other bonus adds to). */
 export function xpTotal(stats: Stats): number {
   return (
     stats.totalSets * XP.set +
     stats.prs.length * XP.pr +
     stats.sessions.length * XP.session +
-    stats.sessions.filter((s) => s.sets >= 12).length * XP.fullSession
+    stats.sessions.filter((s) => s.sets >= 12).length * XP.fullSession +
+    stats.stretchDays.length * XP.stretchDay
   );
 }
 

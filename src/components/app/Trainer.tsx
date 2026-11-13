@@ -1,82 +1,66 @@
 "use client";
 
-// Trainer mode (#/trainer, docs/decisions/trainer-mode.md). One screen for both sides: "Your coach", where
-// a lifter enters a coach's code, sees exactly what the coach will see and agrees (free for everyone), and
-// "Your clients", where a coach shares an invite, picks what new clients start setup with, and opens each
-// client's report (Pro: out of Labs on 2026-11-12). The client's report also holds the coach's note to them.
-// A client's report is #/trainer/c.<id>; an invite link is #/trainer/<code>, which fills in the code.
+// Trainer mode (#/trainer, docs/decisions/trainer-mode.md). Coaching's pages for each side live in CoachHome.tsx (a client
+// sees only their coach; a coach gets a page per job; coachMode.ts decides). This file routes #/trainer/<arg> and holds a
+// client's report (#/trainer/c.<id>), with the coach's note to them, and Today's cards from a coach. An invite link is
+// #/trainer/<code>, which fills in the code.
 // Physio support (2026-11-13) lives in CoachRehab.tsx: the Physio role, pain and injuries, rehab programs.
 // School teams (SchoolTeams.tsx) sit at the bottom; a team link is #/trainer/team.<code>.
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
+import { savePendingCoach } from "@/lib/coachInvite";
+import { COACH_TABS } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
-import { date, t } from "@/lib/i18n";
+import { date, list, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
-import { startPush } from "@/lib/push";
+import { liveRead } from "@/lib/liveRead";
 import { rehabName } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
-import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { teamCodeFrom } from "@/lib/teams";
-import { bodyCompOn } from "@/lib/teen";
 import {
   assignPlan,
-  cancelInvite,
   clientReport,
   codeFrom,
   dismissNote,
   flagText,
-  inviteUrl,
-  joinCode,
-  keepNotes,
   liftName,
   loadClient,
-  loadOverview,
-  newInvite,
   NOTE_MAX,
   noteId,
-  previewCode,
   removePlan,
   saveNote,
-  saveRole,
-  saveSetup,
-  setBodyShare,
-  setCoachAlerts,
   showCode,
   trainerError,
-  trainersOnly,
   unlinkPerson,
   useCoachNotes,
   type BodyShare,
   type ClientView,
   type Note,
-  type Overview,
-  type Person,
-  type Plan,
   type PlanProgress,
+  type Readiness,
   type Report,
-  type Role,
-  type Setup,
+  type ShareKind,
   type ShownNote,
   type Targets,
 } from "@/lib/trainer";
-import type { Experience, Goal, Routine } from "@/lib/types";
-import { fmtWeight } from "@/lib/units";
+import type { Routine } from "@/lib/types";
+import { fmtNum, fmtWeight } from "@/lib/units";
 
 import { ClientBody } from "./CoachBody";
-import { ChatScreen } from "./CoachChat";
-import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
-import { ClientPayments, PaySetup, YourPayments } from "./CoachPay";
-import { CoachPlanCard } from "./CoachPlan";
-import { ClientPain, PainShareSwitch, PerWeekPicker, RehabPrograms } from "./CoachRehab";
-import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
-import { ClientTargets, TargetsCard } from "./CoachTargets";
+import { backToCoaching, ChatScreen } from "./CoachChat";
+import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen } from "./CoachCheckins";
+import { CoachHome, NoteCard } from "./CoachHome";
+import { ClientPayments } from "./CoachPay";
+import { ClientPain, PerWeekPicker, RehabPrograms } from "./CoachRehab";
+import { ClientSessions, SessionToday } from "./CoachSessions";
+import { ClientTargets } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
-import { SchoolTeams } from "./SchoolTeams";
-import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
+import { partLabel } from "./Stretch";
+import { Button, EmptyState, ScreenHeader, Section, Sheet } from "./ui";
 
 const CLIENT = "c.";
 const CHAT = "m.";
@@ -85,333 +69,41 @@ const CHECKIN = "f.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
-  if (!account)
-    return (
-      <div className="pb-2">
-        <ScreenHeader back={{ label: t("settings.back"), onClick: () => go("settings") }} title={t("trn.title")} />
-        <EmptyState
-          icon="lock"
-          title={t("trn.signIn")}
-          body={t("trn.signInBody")}
-          action={<Button onClick={() => go("account")}>{t("account.signIn")}</Button>}
-        />
-      </div>
-    );
+  const code = arg && !arg.includes(".") && !(COACH_TABS as readonly string[]).includes(arg) ? codeFrom(arg) : "";
+  if (!account) return <SignedOut code={code} />;
   if (arg?.startsWith(CLIENT)) return <ClientScreen id={arg.slice(CLIENT.length)} />;
   if (arg?.startsWith(CHAT)) return <ChatScreen id={arg.slice(CHAT.length)} />;
   // A school team's link (#/trainer/team.<code>, SchoolTeams.tsx) fills in the team code instead.
-  if (arg?.startsWith(TEAM)) return <Home code="" team={teamCodeFrom(arg.slice(TEAM.length))} />;
+  if (arg?.startsWith(TEAM)) return <CoachHome team={teamCodeFrom(arg.slice(TEAM.length))} />;
   if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
   if (arg === "forms") return <FormsScreen />;
   // Back from paying a coach on Stripe's page.
-  if (arg === "paid") return <Home code="" paid />;
+  if (arg === "paid") return <CoachHome tab="mine" paid />;
   // Back from buying a coach plan on Stripe's page (CoachPlan.tsx).
-  if (arg === "plan") return <Home code="" planPaid />;
-  return <Home code={arg ? codeFrom(arg) : ""} />;
+  if (arg === "plan") return <CoachHome tab="clients" planPaid />;
+  // One of Coaching's pages (#/trainer/clients and friends, coachMode.ts), the first page that asks, or a code.
+  if (arg && !code) return <CoachHome tab={arg} />;
+  return <CoachHome code={code} />;
 }
 
-function Home({ code, team = "", paid = false, planPaid = false }: { code: string; team?: string; paid?: boolean; planPaid?: boolean }) {
-  const [data, setData] = useState<Overview | null>(null);
-  const [note, setNote] = useState<string | null>(paid ? t("pay.thanks") : null);
-  const reload = useCallback(() => {
-    loadOverview()
-      .then((o) => {
-        setData(o);
-        // Today shows the newest note from a coach; keep it in step with what this screen loaded.
-        keepNotes(o);
-        // With a coach or a client, this phone takes coaching pushes (permission is asked on the first message).
-        if (o.coaches.length || o.clients.length) void startPush(false);
-      })
-      .catch((e: unknown) => {
-        setData({ invite: null, clients: [], coaches: [], plans: [] });
-        setNote(trainerError(e));
-      });
-  }, []);
-  useEffect(reload, [reload]);
+/**
+ * Signed out. A coach's code that came with the link waits on the device (coachInvite.ts) through signing in or making
+ * an account, and Coaching opens with it once the lifter is signed in (App.tsx; Melvin, 2026-11-13: "it should remember
+ * that when i create an account").
+ */
+function SignedOut({ code }: { code: string }) {
+  useEffect(() => {
+    if (code) savePendingCoach(code);
+  }, [code]);
   return (
     <div className="pb-2">
       <ScreenHeader back={{ label: t("settings.back"), onClick: () => go("settings") }} title={t("trn.title")} />
-      <p className="mt-2 text-muted">{t("trn.lead")}</p>
-      {note && (
-        <p className="mt-3 text-sm text-warn" role="status">
-          {note}
-        </p>
-      )}
-      <Section title={trainersOnly(data?.coaches ?? []) ? t("trn.yourTrainer") : t("trn.yourCoach")} icon="flag">
-        {data?.sessions && <YourSessions sessions={data.sessions} coaches={data.coaches} onChange={reload} />}
-        {data?.pay && <YourPayments pay={data.pay} coaches={data.coaches} onChange={reload} />}
-        <PendingCheckins
-          checkins={(data?.checkins ?? []).map((c) => ({ ...c, coach: data?.coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
-        />
-        <YourCoach
-          coaches={data?.coaches ?? []}
-          plans={data?.plans ?? []}
-          notes={data?.notes ?? []}
-          unread={data?.unread ?? {}}
-          shared={data?.bodyShared ?? []}
-          painShared={data?.painShared ?? []}
-          targets={data?.targets ?? []}
-          code={code}
-          onChange={reload}
-        />
-      </Section>
-      <Section title={t("trn.yourClients")} icon="target">
-        <YourClients data={data} onChange={reload} planPaid={planPaid} />
-      </Section>
-      <Section title={t("team.title")} icon="trophy" info="schoolTeams">
-        <SchoolTeams code={team} />
-      </Section>
-    </div>
-  );
-}
-
-// --- The client's side: free for everyone ---
-
-function YourCoach({
-  coaches,
-  plans,
-  notes,
-  unread,
-  shared,
-  painShared,
-  targets,
-  code,
-  onChange,
-}: {
-  coaches: Person[];
-  plans: Plan[];
-  notes: Note[];
-  unread: Record<string, number>;
-  shared: string[];
-  painShared: string[];
-  targets: Targets[];
-  code: string;
-  onChange: () => void;
-}) {
-  const comp = bodyCompOn(useApp((s) => s.profile));
-  const [text, setText] = useState(code ? showCode(code) : "");
-  const [found, setFound] = useState<Person | null>(null);
-  const [note, setNote] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const check = useCallback(async (raw: string) => {
-    const c = codeFrom(raw);
-    if (!c) return setNote(t("trn.err.unknown"));
-    setBusy(true);
-    try {
-      setFound(await previewCode(c));
-      setNote(null);
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    } finally {
-      setBusy(false);
-    }
-  }, []);
-  // Opened from an invite link: look the code up straight away (looking links nothing).
-  useEffect(() => {
-    if (!code) return;
-    let live = true;
-    previewCode(code)
-      .then((p) => live && setFound(p))
-      .catch((e: unknown) => live && setNote(trainerError(e)));
-    return () => {
-      live = false;
-    };
-  }, [code]);
-  const submit = (e: FormEvent) => {
-    e.preventDefault();
-    void check(text);
-  };
-  const agree = async () => {
-    setBusy(true);
-    try {
-      await joinCode(codeFrom(text));
-      haptic("success");
-      sound.done();
-      track("feature", { name: "trainer", detail: "join" });
-      setFound(null);
-      setText("");
-      setNote(t("trn.joined"));
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    } finally {
-      setBusy(false);
-    }
-  };
-  const share = async (p: Person, on: boolean) => {
-    try {
-      await setBodyShare(p.id, on);
-      haptic("toggle");
-      track("feature", { name: "trainer", detail: on ? "shareBody" : "unshareBody" });
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  const leave = async (p: Person) => {
-    try {
-      await unlinkPerson(p.id);
-      haptic("toggle");
-      track("feature", { name: "trainer", detail: "leave" });
-      setNote(t("trn.left", { name: p.name || t("trn.noName") }));
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  return (
-    <div>
-      {(plans.length > 0 || notes.length > 0 || targets.length > 0) && (
-        <div className="mb-3">
-          <p className="mb-2 px-1 text-sm font-semibold">{trainersOnly(coaches) ? t("trn.fromTrainer") : t("trn.fromCoach")}</p>
-          {notes.map((n) => (
-            <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
-          ))}
-          {targets.map((x) => (
-            <TargetsCard key={x.coachId} targets={x} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
-          ))}
-          <ul className="space-y-2">
-            {plans.map((p) => {
-              const who = coaches.find((c) => c.id === p.coachId)?.name || t("trn.noName");
-              return (
-                <li key={p.id}>
-                  {/* Opens the shared routine preview, where one tap saves it to this lifter's routines. */}
-                  <button
-                    type="button"
-                    onClick={() => go("routine", p.code)}
-                    aria-label={t("trn.planOpenNamed", { name: p.name })}
-                    className="press card card-tint flex w-full items-center gap-3 px-4 py-3 text-left"
-                    style={{ ["--tint" as string]: "var(--color-accent)" }}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold">{p.name}</span>
-                      <span className="block text-sm text-muted">
-                        {t("trn.planBy", { name: who, date: date(p.at, { month: "short", day: "numeric" }) })}
-                      </span>
-                    </span>
-                    <span className="shrink-0 text-sm font-semibold text-accent">{t("trn.planOpen")} ›</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      )}
-      {coaches.length > 0 && (
-        <ul className="card mb-3 divide-y divide-line">
-          {coaches.map((c) => (
-            <li key={c.id} className="flex items-center gap-2 py-2 pl-4 pr-2">
-              <span className="min-w-0 flex-1 py-1">
-                <span className="block truncate font-medium">{c.name || t("trn.noName")}</span>
-                <span className="block text-xs text-muted">
-                  {c.role && `${t(`trn.role.${c.role}`)} · `}
-                  {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
-                </span>
-              </span>
-              <MessageButton id={c.id} name={c.name} unread={unread[c.id] ?? 0} />
-              <Button kind="ghost" className="shrink-0 !px-3 !py-2 text-sm" onClick={() => void leave(c)}>
-                {t("trn.stopSharing")}
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
-      {/* Body data is the client's choice, per coach, and off until they turn it on. Under 18, it waits until body
-          composition is on in Body › Health (teen.ts). */}
-      {comp &&
-        coaches.map((c) => (
-          <SwitchRow
-            key={c.id}
-            label={t("trn.shareBody", { name: c.name || t("trn.noName") })}
-            hint={t("trn.shareBodyHint")}
-            on={shared.includes(c.id)}
-            onChange={(v) => void share(c, v)}
-          />
-        ))}
-      {/* Pain and injuries too, per coach and off until turned on: a physio needs them, a trainer may not. */}
-      {coaches.map((c) => (
-        <PainShareSwitch key={c.id} coach={c} on={painShared.includes(c.id)} onChange={onChange} />
-      ))}
-      {found ? (
-        <section className="card card-tint p-4" style={{ ["--tint" as string]: "var(--color-accent)" }} aria-live="polite">
-          {found.role && <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t(`trn.role.${found.role}`)}</p>}
-          <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
-          <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentBodyLater")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentPainLater")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentStop")}</p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <Button className="flex-1" disabled={busy} onClick={() => void agree()}>
-              {t("trn.agree")}
-            </Button>
-            <Button kind="ghost" onClick={() => setFound(null)}>
-              {t("trn.notNow")}
-            </Button>
-          </div>
-        </section>
-      ) : (
-        <form onSubmit={submit} className="card p-4">
-          <label htmlFor="trn-code" className="block text-sm text-muted">
-            {coaches.length ? t("trn.codeAnother") : t("trn.codeAsk")}
-          </label>
-          <div className="mt-2 flex gap-2">
-            <input
-              id="trn-code"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              className="num min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2 uppercase tracking-widest"
-              placeholder="ABCD-EFGH"
-              autoComplete="off"
-              autoCapitalize="characters"
-              spellCheck={false}
-            />
-            <Button submit disabled={busy || !text.trim()}>
-              {t("trn.check")}
-            </Button>
-          </div>
-        </form>
-      )}
-      {note && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {note}
-        </p>
-      )}
-    </div>
-  );
-}
-
-/** Opens the chat with one person, with how many of their messages are unread. */
-function MessageButton({ id, name, unread }: { id: string; name: string; unread: number }) {
-  return (
-    <Button
-      kind="ghost"
-      className="shrink-0 !px-3 !py-2 text-sm"
-      aria-label={
-        unread
-          ? `${t("trn.messageNamed", { name: name || t("trn.noName") })}, ${t("trn.unread", { count: unread })}`
-          : t("trn.messageNamed", { name: name || t("trn.noName") })
-      }
-      onClick={() => go("trainer", `${CHAT}${id}`)}
-    >
-      {t("trn.message")}
-      {unread > 0 && <span className="ml-1.5 rounded-full bg-accent px-1.5 text-xs font-bold text-accent-ink">{unread}</span>}
-    </Button>
-  );
-}
-
-/** A note from a coach: their words, who and when. Plain text, line breaks kept. */
-export function NoteCard({ note, coach }: { note: Note; coach: string }) {
-  return (
-    <div className="card card-tint mb-2 p-4" style={{ ["--tint" as string]: "var(--color-violet)" }}>
-      <p className="whitespace-pre-line break-words">{note.text}</p>
-      <p className="mt-2 text-sm text-muted">
-        {t("trn.planBy", { name: coach || t("trn.noName"), date: date(note.at, { month: "short", day: "numeric" }) })}
-      </p>
+      <EmptyState
+        icon="lock"
+        title={code ? t("trn.signInCode") : t("trn.signIn")}
+        body={code ? t("trn.signInCodeBody", { code: showCode(code) }) : t("trn.signInBody")}
+        action={<Button onClick={() => go("account")}>{t("account.signIn")}</Button>}
+      />
     </div>
   );
 }
@@ -477,267 +169,6 @@ function NoteToday({ n }: { n: ShownNote }) {
 }
 
 // --- The coach's side: Pro ---
-
-function YourClients({ data, onChange, planPaid = false }: { data: Overview | null; onChange: () => void; planPaid?: boolean }) {
-  const [note, setNote] = useState<string | null>(null);
-  if (!can("coaching")) {
-    // Never hidden: the row says what it is, with the Pro tag, and opens the paywall (AGENTS.md "Free vs Pro").
-    return (
-      <button type="button" onClick={() => go("pro", "coaching")} className="press card flex w-full items-center gap-3 px-4 py-3 text-left">
-        <span className="min-w-0 flex-1">
-          <span className="flex items-center gap-2 font-semibold">
-            {t("trn.coachRow")}
-            <ProTag />
-          </span>
-          <span className="block text-sm text-muted">{t("trn.coachRowPro")}</span>
-        </span>
-        <span aria-hidden className="text-faint">
-          ›
-        </span>
-      </button>
-    );
-  }
-  if (!data) return null;
-  const invite = data.invite;
-  const make = async () => {
-    try {
-      await newInvite();
-      haptic("success");
-      track("feature", { name: "trainer", detail: "invite" });
-      setNote(null);
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  const stop = async () => {
-    try {
-      await cancelInvite();
-      haptic("toggle");
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  const alerts = async (on: boolean) => {
-    try {
-      await setCoachAlerts(on);
-      track("feature", { name: "trainer", detail: on ? "alerts" : "noAlerts" });
-      haptic("toggle");
-      if (on) void startPush(true);
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  const sessions = <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={onChange} />;
-  const send = async () => {
-    if (!invite) return;
-    const url = inviteUrl(invite.code);
-    if (!(await shareUrl(url, t("trn.inviteShare", { code: showCode(invite.code) })))) {
-      setNote((await copyText(url)) ? t("trn.copied") : url);
-    }
-  };
-  return (
-    <div>
-      <section className="card p-4">
-        {invite ? (
-          <>
-            <p className="text-sm text-muted">{t("trn.inviteHint")}</p>
-            <p
-              className="display num mt-2 text-3xl tracking-widest"
-              aria-label={t("trn.codeIs", { code: invite.code.split("").join(" ") })}
-            >
-              {showCode(invite.code)}
-            </p>
-            <p className="mt-1 text-xs text-muted">
-              {t("trn.expires", { date: date(invite.expiresAt, { month: "short", day: "numeric" }) })}
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              <Button className="flex-1" icon="share" onClick={() => void send()}>
-                {t("trn.sendInvite")}
-              </Button>
-              <Button kind="ghost" onClick={() => void make()}>
-                {t("trn.newCode")}
-              </Button>
-              <Button kind="quiet" onClick={() => void stop()}>
-                {t("trn.cancelCode")}
-              </Button>
-            </div>
-          </>
-        ) : (
-          <>
-            <p className="text-sm text-muted">{t("trn.inviteNone")}</p>
-            <Button className="mt-3 w-full" icon="plus" onClick={() => void make()}>
-              {t("trn.makeInvite")}
-            </Button>
-          </>
-        )}
-        <p className="mt-3 text-xs text-muted">{t("trn.proFree")}</p>
-      </section>
-      {/* How many clients the coach's plan allows, and the way up when it's full (coach plans). */}
-      {data.plan && <CoachPlanCard plan={data.plan} onChange={onChange} paid={planPaid} />}
-      {note && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {note}
-        </p>
-      )}
-      <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
-      {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
-      {/* A personal trainer's sessions come before their client list; a coach's after it. */}
-      {data.role !== "coach" && sessions}
-      <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
-      <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
-      {data.clients.length ? (
-        // Desktop layout: the client list is a grid of cards, so a coach sees more clients at once.
-        <ul className="mt-3 space-y-2 desk:grid desk:grid-cols-2 desk:gap-3 desk:space-y-0 xl:desk:grid-cols-3">
-          {data.clients.map((c) => (
-            <li key={c.id}>
-              <button
-                type="button"
-                onClick={() => go("trainer", `${CLIENT}${c.id}`)}
-                className="press card flex w-full items-center gap-3 px-4 py-3 text-left"
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">{c.name || t("trn.noName")}</span>
-                  <span className="block text-sm text-muted">
-                    {t("trn.since", { date: date(c.since, { month: "short", day: "numeric", year: "numeric" }) })}
-                  </span>
-                  {(data.unread?.[c.id] ?? 0) > 0 && (
-                    <span className="mt-0.5 block text-sm font-semibold text-accent">
-                      {t("trn.unread", { count: data.unread![c.id]! })}
-                    </span>
-                  )}
-                </span>
-                <span aria-hidden className="text-faint">
-                  ›
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="mt-3 px-1 text-sm text-muted">{t("trn.noClients")}</p>
-      )}
-      {data.role === "coach" && sessions}
-      {data.pay && <PaySetup account={data.pay.account} onChange={onChange} />}
-    </div>
-  );
-}
-
-/** Personal trainer, coach or physio: changes the words clients see and what comes first, never which tools there are. */
-function RolePick({ saved, onChange }: { saved: Role | null; onChange: () => void }) {
-  const [role, setRole] = useState<Role | null>(saved);
-  const pick = async (r: Role) => {
-    setRole(r);
-    haptic("select");
-    try {
-      await saveRole(r);
-      track("feature", { name: "trainer", detail: `role-${r}` });
-      onChange();
-    } catch {
-      oops();
-      setRole(saved);
-    }
-  };
-  return (
-    <section className="card mt-3 p-4">
-      <p id="trn-role" className="font-semibold">
-        {t("trn.role.title")}
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-labelledby="trn-role">
-        {ROLE_CHOICES.map((r) => (
-          <Chip key={r} active={role === r} onClick={() => void pick(r)}>
-            {t(`trn.role.${r}`)}
-          </Chip>
-        ))}
-      </div>
-      <p className="mt-2 text-sm text-muted">{role ? t(`trn.role.${role}Hint`) : t("trn.role.pick")}</p>
-    </section>
-  );
-}
-const ROLE_CHOICES: Role[] = ["trainer", "coach", "physio"];
-
-const GOAL_CHOICES: Goal[] = ["muscle", "strength", "general"];
-const LEVEL_CHOICES: { id: Experience; key: "setup.exp.new" | "setup.exp.intermediate" | "exp.advanced" }[] = [
-  { id: "new", key: "setup.exp.new" },
-  { id: "intermediate", key: "setup.exp.intermediate" },
-  { id: "advanced", key: "exp.advanced" },
-];
-
-/**
- * What the coach's new clients start setup with: goal, experience and days a week. An invited client skips those
- * questions in setup (Onboarding's coach path) and can change them later in Settings. Tapping the picked chip again
- * leaves that question to the client. Saved on each tap.
- */
-function StartSetup({ setup: saved }: { setup: Setup }) {
-  const [setup, setSetup] = useState<Setup>(saved);
-  const [note, setNote] = useState<string | null>(null);
-  const pick = async (next: Setup) => {
-    const before = setup;
-    setSetup(next);
-    try {
-      setSetup(await saveSetup(next));
-      setNote(t("trn.setupSaved"));
-    } catch (e) {
-      oops();
-      setSetup(before);
-      setNote(trainerError(e));
-    }
-  };
-  const toggle = <K extends keyof Setup>(key: K, value: Setup[K]) => {
-    const next = { ...setup };
-    if (next[key] === value) delete next[key];
-    else next[key] = value;
-    void pick(next);
-  };
-  return (
-    <section className="card mt-3 p-4" aria-labelledby="trn-setup">
-      <p id="trn-setup" className="font-semibold">
-        {t("trn.setupTitle")}
-      </p>
-      <p className="mt-1 text-sm text-muted">{t("trn.setupHint")}</p>
-      <p className="mt-3 text-sm font-medium" id="trn-setup-goal">
-        {t("trn.setupGoal")}
-      </p>
-      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-goal">
-        {GOAL_CHOICES.map((g) => (
-          <Chip key={g} active={setup.goal === g} onClick={() => toggle("goal", g)}>
-            {t(`goal.${g}`)}
-          </Chip>
-        ))}
-      </div>
-      <p className="mt-3 text-sm font-medium" id="trn-setup-level">
-        {t("trn.setupLevel")}
-      </p>
-      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-level">
-        {LEVEL_CHOICES.map((l) => (
-          <Chip key={l.id} active={setup.experience === l.id} onClick={() => toggle("experience", l.id)}>
-            {t(l.key)}
-          </Chip>
-        ))}
-      </div>
-      <p className="mt-3 text-sm font-medium" id="trn-setup-days">
-        {t("trn.setupDays")}
-      </p>
-      <div className="mt-1.5 flex flex-wrap gap-2" role="group" aria-labelledby="trn-setup-days">
-        {[1, 2, 3, 4, 5, 6].map((d) => (
-          <Chip key={d} active={setup.days === d} onClick={() => toggle("days", d)}>
-            <span className="num">{d}</span>
-          </Chip>
-        ))}
-      </div>
-      {note && (
-        <p className="mt-2 text-sm text-muted" role="status">
-          {note}
-        </p>
-      )}
-    </section>
-  );
-}
 
 /** The coach's note to one client: shown on the client's Today and under Coaching until the coach changes it. */
 function NoteToClient({ clientId, saved, onChange }: { clientId: string; saved: Note | null; onChange: () => void }) {
@@ -816,7 +247,7 @@ function ClientPlans({
   const [picking, setPicking] = useState(false);
   const [perWeek, setPerWeek] = useState<number | undefined>(physio ? 3 : undefined);
   const [note, setNote] = useState<string | null>(null);
-  const give = async (r: Pick<Routine, "name" | "items" | "rehab">) => {
+  const give = async (r: Pick<Routine, "name" | "items" | "rehab" | "parts">) => {
     try {
       await assignPlan(clientId, r.name, encodeRoutine(r), perWeek);
       haptic("success");
@@ -854,6 +285,11 @@ function ClientPlans({
                     ? `${t("trn.planDone", { count: p.done })}${p.lastAt ? ` · ${t("trn.planLast", { date: date(p.lastAt, { month: "short", day: "numeric" }) })}` : ""}`
                     : t("trn.planNotYet")}
                 </span>
+                {p.parts && (
+                  <span className="block text-xs text-muted" data-testid="plan-parts">
+                    {p.parts.map((x) => t("trn.partDone", { part: partLabel(x.kind), done: x.done, of: x.of })).join(" · ")}
+                  </span>
+                )}
                 {p.plan.perWeek !== undefined && (
                   <span className="block text-xs text-muted">
                     {p.adherence
@@ -928,6 +364,48 @@ function ClientPlans({
 const TONE = { warn: "var(--color-warn)", good: "var(--color-good)", info: "var(--color-accent)" } as const;
 
 /** One client's report: what to act on first, their weeks, recent workouts and new bests. */
+/** Each kind of sharing in a sentence ("Sam also shares heart rate and workout notes."). */
+const KIND_WORD = {
+  hr: "trn.kind.hr",
+  notes: "trn.kind.notes",
+  health: "trn.kind.health",
+  body: "trn.kind.body",
+  pain: "trn.kind.pain",
+  cycle: "trn.kind.cycle",
+} as const satisfies Record<ShareKind, string>;
+
+/** How a client feels and recovers, when they share it: the newest check-in, a week of sleep, HRV and resting heart rate, their cycle day. */
+function ClientReadiness({ name, r, shares }: { name: string; r: Readiness; shares: readonly ShareKind[] }) {
+  const who = name || t("trn.noName");
+  const lines: string[] = [];
+  if (r.feel)
+    lines.push(
+      t(r.feel.unwell ? "trn.feltUnwell" : r.feel.energy > 0 ? "trn.feltGreat" : r.feel.energy < 0 ? "trn.feltLow" : "trn.feltOkay", {
+        day: date(r.feel.at, { weekday: "long" }),
+      }) + (r.feel.sore ? ` ${t("trn.feltSore")}` : ""),
+    );
+  if (r.sleep != null) lines.push(t("trn.readySleep", { hours: fmtNum(r.sleep) }));
+  if (r.hrv != null) lines.push(t("trn.readyHrv", { ms: r.hrv }));
+  if (r.restingHr != null) lines.push(t("trn.readyRhr", { bpm: r.restingHr }));
+  if (r.cycleDay != null && shares.includes("cycle")) lines.push(t("trn.cycleDay", { day: r.cycleDay }));
+  return (
+    <Section title={t("trn.readyTitle")} icon="heart">
+      {lines.length ? (
+        <ul className="card divide-y divide-line">
+          {lines.map((l) => (
+            <li key={l} className="num px-4 py-3 text-sm">
+              {l}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-1 text-sm text-muted">{t("trn.readyNone", { name: who })}</p>
+      )}
+      {(r.sleep != null || r.hrv != null || r.restingHr != null) && <p className="mt-2 px-1 text-xs text-muted">{t("trn.readyLead")}</p>}
+    </Section>
+  );
+}
+
 function ClientScreen({ id }: { id: string }) {
   const unit = useApp((s) => s.profile.unit);
   const lab = can("coaching");
@@ -943,8 +421,10 @@ function ClientScreen({ id }: { id: string }) {
   useEffect(() => {
     if (!lab) return;
     let live = true;
-    loadClient(id)
-      .then((v) => {
+    liveRead(
+      `coach.client.${id}`,
+      () => loadClient(id),
+      (v) => {
         if (!live) return;
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
@@ -953,13 +433,13 @@ function ClientScreen({ id }: { id: string }) {
         setPhysio(v.role === "physio");
         setTargets(v.targets ?? null);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
-      })
-      .catch((e: unknown) => live && setError(trainerError(e)));
+      },
+    ).catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
       live = false;
     };
   }, [id, lab, version]);
-  const back = { label: t("trn.back"), onClick: () => go("trainer") };
+  const back = { label: t("trn.back"), onClick: backToCoaching };
   if (!lab)
     return (
       <div className="pb-2">
@@ -1058,6 +538,18 @@ function ClientScreen({ id }: { id: string }) {
                     <Icon name="trophy" size={14} /> {t("trn.prCount", { count: s.prs })}
                   </p>
                 )}
+                {/* Heart rate, when the client shares it. */}
+                {s.avgHr != null && (
+                  <p className="num mt-0.5 flex items-center gap-1 text-sm text-muted">
+                    <Icon name="heart" size={14} /> {t("trn.hrLine", { avg: Math.round(s.avgHr), max: Math.round(s.maxHr ?? s.avgHr) })}
+                  </p>
+                )}
+                {/* Their own notes, when they share them. */}
+                {(report.notes.get(s.sessionId) ?? []).map((n, i) => (
+                  <p key={i} className="mt-1 border-l-2 border-line pl-2 text-sm whitespace-pre-line">
+                    {n}
+                  </p>
+                ))}
               </li>
             ))}
           </ul>
@@ -1082,6 +574,7 @@ function ClientScreen({ id }: { id: string }) {
         now={report.now}
         onChange={() => setVersion((n) => n + 1)}
       />
+      {report.readiness && <ClientReadiness name={report.name} r={report.readiness} shares={report.shares} />}
       {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">
@@ -1097,8 +590,12 @@ function ClientScreen({ id }: { id: string }) {
           </ul>
         </Section>
       )}
-      <p className="mt-6 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
-      {body && <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSeeBody")}</p>}
+      <p className="mt-6 px-1 text-xs text-muted">
+        {report.shares.length
+          ? t("trn.sharedList", { name: report.name || t("trn.noName"), list: list(report.shares.map((k) => t(KIND_WORD[k]))) })
+          : t("trn.sharedNone", { name: report.name || t("trn.noName") })}
+      </p>
+      <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
       <Button kind="danger" className="mt-4 w-full" onClick={() => void remove()}>
         {t("trn.remove")}
       </Button>

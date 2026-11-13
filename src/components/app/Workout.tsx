@@ -8,12 +8,11 @@ import { cleanA11y } from "@/lib/a11y";
 import { track } from "@/lib/analytics";
 import { beatStyle } from "@/lib/beat";
 import { bumpDistance, distUnit, fromMetres } from "@/lib/cardio";
-import { queueStrava, stravaWorkout } from "@/lib/connections";
+import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
 import { COSMETICS } from "@/lib/game";
 import { alternatives } from "@/lib/generator";
 import { msLeft, nextCount, type Counted } from "@/lib/handsFree";
-import { saveWorkout } from "@/lib/health";
 import { hrSupported } from "@/lib/heartRate";
 import { hrLink } from "@/lib/hrLink";
 import { currentTag, t } from "@/lib/i18n";
@@ -22,6 +21,7 @@ import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
+import { meanFullSpeed } from "@/lib/partMetrics";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
@@ -31,7 +31,7 @@ import { notifyPermission, onWatchHeartRate, restOverAlert, stopSession, updateS
 import { timerLength, type TimerSpec } from "@/lib/setTimer";
 import { countedReps, implementsFor, perSide } from "@/lib/sides";
 import { followWorkout, sonosOn } from "@/lib/sonos";
-import { useApp, warmingUp } from "@/lib/store";
+import { partNow, useApp, warmingUp } from "@/lib/store";
 import { afterSet, groupRange, supersetLabel } from "@/lib/superset";
 import { tempoOf } from "@/lib/tempo";
 import { restAlertOf } from "@/lib/training";
@@ -54,6 +54,7 @@ import { type PlateFinish } from "./Plates";
 import { go } from "./router";
 import { SetHints } from "./SetHints";
 import { SonosBar } from "./Sonos";
+import { PartStep } from "./Stretch";
 import { muscleHue } from "./theme";
 import { ExercisePrefsEditor, FavouriteButton } from "./TrainingSettings";
 import { Button, EmptyState, InlineSwitch, Sheet, Stepper } from "./ui";
@@ -102,6 +103,8 @@ export function Workout() {
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
+  // Discarding deletes every set logged so far and can't be undone, so with sets logged it takes a second tap.
+  const [discardSure, setDiscardSure] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [lastBpm, setBpm] = useState<number | null>(null);
@@ -172,6 +175,12 @@ export function Workout() {
   const resting = !!active?.restUntil && active.restUntil > now;
   const left = active?.restUntil ? (active.restUntil - now) / 1000 : 0;
   const finished = !!active && active.index >= active.plan.items.length;
+  // Workouts with parts: a warm-up first plays on its own screen; a cool-down may come after the lifting.
+  const partKind = partNow(active);
+  const coolNext = !!active?.parts?.[(active.part ?? 0) + 1] && active.parts[(active.part ?? 0) + 1]!.kind === "cool";
+  useEffect(() => {
+    if (partKind === "warm") go("stretch", "warmup");
+  }, [partKind]);
   // The latest note on this exercise (from any workout), and the set just logged, for the optional
   // reps-left rating during rest.
   const noteEv = ex ? [...events].reverse().find((e) => e.type === "note" && e.exerciseId === ex.id) : undefined;
@@ -418,24 +427,12 @@ export function Workout() {
   };
   const log = () => logAt(undefined, takeTimer(timerKey));
 
+  // Finish: on to the cool-down when it's one of today's parts, else the workout ends here.
   const end = () => {
-    const startedAt = active.startedAt;
-    const ev = s.finish();
-    if (ev?.type === "sessionEnd") {
-      // The same title and sets Strava gets, as the workout's title and notes in Health Connect or Apple Health.
-      const summary = stravaWorkout(useApp.getState().events, ev.sessionId, profile.unit);
-      void saveWorkout({
-        id: ev.sessionId,
-        start: startedAt,
-        end: ev.at,
-        bodyweightKg: profile.bodyweight,
-        avgHr: ev.avgHr,
-        title: summary?.name,
-        notes: summary?.description,
-      });
-      queueStrava(ev.sessionId);
-    }
-    void stopSession();
+    // Back here from the cool-down: Finish ends the workout without it.
+    if (partKind === "cool") endWorkout({ skip: true });
+    else if (s.nextPart() === "cool") return go("stretch", "cooldown");
+    else endWorkout();
     go("done");
   };
 
@@ -595,12 +592,13 @@ export function Workout() {
         </div>
       )}
 
-      <div className="mt-3 flex gap-1" aria-label={t("wk.progress")}>
+      <div className="mt-3 flex gap-1" role="group" aria-label={t("wk.progress")}>
         {active.plan.items.map((it, i) => (
           <button
             key={i}
             type="button"
-            aria-label={exercise(it.exerciseId).name}
+            aria-label={i < active.index ? t("wk.progressDone", { name: exercise(it.exerciseId).name }) : exercise(it.exerciseId).name}
+            aria-current={i === active.index ? "step" : undefined}
             onClick={() => s.goTo(i)}
             className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i < active.index ? "bg-mint" : i === active.index ? "bg-gradient-to-r from-accent to-accent-2 shadow-[0_0_10px_rgb(76_141_255/0.6)]" : "bg-line"}`}
           />
@@ -621,6 +619,11 @@ export function Workout() {
           <section className="mt-5">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
+                {active.parts && (
+                  <p className="mb-1 text-xs font-semibold uppercase tracking-[0.12em] text-accent">
+                    <PartStep parts={active.parts} index={active.part ?? 0} />
+                  </p>
+                )}
                 {ssLabel && (
                   <p className="mb-1 inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-accent/15 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-[0.08em] text-accent">
                     <Icon name="link" size={13} />
@@ -714,7 +717,7 @@ export function Workout() {
                             // A working set: its last full rep's speed, and whether a rep failed after it, are
                             // saved with the set, so sets taken to failure teach the lifter's own threshold.
                             const last = lastFullMetres(sum);
-                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter);
+                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter, meanFullSpeed(sum.reps));
                             return;
                           }
                           const v = fastestMetres(sum);
@@ -868,8 +871,8 @@ export function Workout() {
             </div>
           )}
           {finished ? (
-            <Button icon="flag" className="w-full py-5 text-xl" onClick={end}>
-              {t("workout.finish")}
+            <Button icon={coolNext ? "stretch" : "flag"} className="w-full py-5 text-xl" onClick={end}>
+              {coolNext ? t("str.part.toCool") : t("workout.finish")}
             </Button>
           ) : resting ? (
             <div className="flex items-stretch gap-2">
@@ -994,7 +997,14 @@ export function Workout() {
       </Sheet>
       <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
       <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
-      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title={t("wk.endTitle")}>
+      <Sheet
+        open={endOpen}
+        onClose={() => {
+          setEndOpen(false);
+          setDiscardSure(false);
+        }}
+        title={t("wk.endTitle")}
+      >
         <div className="space-y-3">
           <Button icon="check" className="w-full" onClick={end}>
             {t("wk.finishSave")}
@@ -1003,6 +1013,11 @@ export function Workout() {
             kind="danger"
             className="w-full"
             onClick={() => {
+              if (setsLogged > 0 && !discardSure) {
+                haptic("warning");
+                setDiscardSure(true);
+                return;
+              }
               haptic("warning");
               sound.back();
               s.discard();
@@ -1010,9 +1025,16 @@ export function Workout() {
               go("today");
             }}
           >
-            {t("wk.discard")}
+            {discardSure ? t("wk.discardSure", { count: setsLogged }) : t("wk.discard")}
           </Button>
-          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>
+          <Button
+            kind="quiet"
+            className="w-full"
+            onClick={() => {
+              setEndOpen(false);
+              setDiscardSure(false);
+            }}
+          >
             {t("wk.keepGoing")}
           </Button>
         </div>

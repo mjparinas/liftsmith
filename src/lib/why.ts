@@ -73,6 +73,22 @@ export function itemWhy(item: PlanItem, ctx: WhyContext): ItemWhy {
   return { pick, sets, load, short: short.charAt(0).toUpperCase() + short.slice(1) };
 }
 
+/**
+ * The row's line on Today when every planned exercise shares the same note on its target (a first workout's
+ * "a cautious start" on every row): Today says that once above the list and each row keeps only what's its own
+ * (UX audit, 2026-11-13).
+ */
+export function itemWhyWithoutLoad(w: ItemWhy): string {
+  const short = [w.pick, w.sets].filter(Boolean).join(" · ");
+  return short.charAt(0).toUpperCase() + short.slice(1);
+}
+
+/** The target note every item shares, or "" when there's one item or they differ. */
+export function sharedLoadNote(whys: readonly ItemWhy[]): string {
+  const first = whys[0]?.load;
+  return whys.length > 1 && first && whys.every((w) => w.load === first) ? first : "";
+}
+
 const joinAnd = (xs: string[]) => list(xs);
 
 /**

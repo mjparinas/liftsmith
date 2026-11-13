@@ -71,6 +71,10 @@ export const it: FeaturesText = {
       body: "Sceglie esercizi che la tua palestra permette e per cui i tuoi muscoli sono pronti, poi fissa ogni peso e ripetizione in base ai tuoi ultimi allenamenti.",
       proPart: "Senza Pro hai un allenamento adattivo a settimana accanto al programma gratuito; Pro pianifica ogni giorno.",
     },
+    "pick-weights": {
+      name: "Impara gli esercizi che ti piacciono",
+      body: "Gli esercizi più popolari vengono scelti più spesso. Metti una stella a un esercizio e uscirà molto di più; sostituiscilo e uscirà meno, per qualche mese.",
+    },
     splits: {
       name: "Split adattivi",
       body: "Spinta, tirata e gambe o parte alta e bassa, comunque adattati al tuo recupero ogni giorno.",
@@ -156,6 +160,10 @@ export const it: FeaturesText = {
     stretching: {
       name: "Stretching",
       body: "48 allungamenti con dimostrazioni in 3D: un riscaldamento facoltativo prima, un defaticamento dopo o una routine di stretching in qualsiasi giorno.",
+    },
+    "workout-parts": {
+      name: "Allenamenti in parti",
+      body: "Un allenamento può fare riscaldamento, pesi e defaticamento in ordine, con Salta tra una parte e l’altra. La schermata di blocco e l’orologio mostrano la parte in corso, la cronologia mostra ogni parte e i giorni di stretching da 10 minuti in su mantengono la serie. Le routine possono avere il proprio riscaldamento e defaticamento, anche nei link condivisi e da parte del tuo coach. Le note del coach leggono ogni parte: il dolore dopo la riabilitazione che cala o sale, e un battito che resta alto nel defaticamento.",
     },
     notes: {
       name: "Note del coach",
@@ -243,7 +251,23 @@ export const it: FeaturesText = {
     },
     "gym-finder": {
       name: "Ricerca palestre e pagine delle palestre",
-      body: "Trova palestre vicino a te, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale.",
+      body: "Trova palestre vicino a te su una mappa con l’elenco sotto, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale.",
+    },
+    "gym-amenities": {
+      name: "Servizi e prezzi sulle pagine delle palestre",
+      body: "I titolari indicano cosa c’è oltre agli attrezzi (docce, parcheggio, accesso 24/7, area donne e altro) e quanto costano ingresso giornaliero, settimanale o abbonamento.",
+    },
+    "gym-news": {
+      name: "Annunci della tua palestra",
+      body: "Le palestre ufficiali pubblicano orari delle feste, attrezzi nuovi o cambi di corso sulla loro pagina, e i membri del loro club ricevono una notifica.",
+    },
+    "gym-problems": {
+      name: "Segnala attrezzi rotti",
+      body: "Di’ alla tua palestra che una macchina è rotta o manca. Chi si allena lì riceve un piano che ne fa a meno, e il titolare lo vede con un pulsante Riparato.",
+    },
+    "gym-trainers": {
+      name: "Trainer sulle pagine delle palestre",
+      body: "I coach compaiono nelle palestre dove allenano i loro clienti, con una riga su di sé e un pulsante per allenarsi con loro. In una palestra ufficiale, il titolare li approva prima.",
     },
     "buy-next": {
       name: "Cosa comprare dopo",
@@ -304,6 +328,16 @@ export const it: FeaturesText = {
       name: "Pagamenti dei clienti con Stripe",
       body: "Collega il tuo account Stripe e imposta il prezzo di ogni cliente, a sessione o mensile. Pagano sulla pagina sicura di Stripe, il denaro arriva direttamente a te e un pagamento mensile non riuscito compare in cima al loro report.",
     },
+    "coach-sharing": {
+      name: "I clienti scelgono cosa vede il coach",
+      body: "L'allenamento è sempre condiviso. Frequenza cardiaca, note di allenamento, forma e recupero, dati corporei, dolore e infortuni, e ciclo sono ciascuno un interruttore che il cliente attiva per ogni coach, al consenso o in qualsiasi momento. Foto e palestre non escono mai.",
+      proPart: "Essere cliente è gratis; seguire clienti è Pro.",
+    },
+    "coach-pages": {
+      name: "Una pagina per ogni lato",
+      body: "I clienti vedono solo il loro coach: gli scrivono con un tocco, rispondono ai check-in, prenotano sessioni e scelgono cosa condividere. I coach hanno una pagina per ogni attività, con clienti, messaggi, agenda, check-in e pagamenti in schede, sul web e sul telefono.",
+      proPart: "Essere cliente è gratis; allenare clienti è Pro.",
+    },
     "coach-plans": {
       name: "Piani da coach che crescono con i tuoi clienti",
       body: "Pro copre fino a 3 clienti. Coach dà spazio a 25 e Coach Plus non ha un limite fisso, con ogni strumento da coach in ogni piano. I tuoi clienti si allenano sempre gratis, e Liftsmith non trattiene nulla di quello che ti pagano.",
@@ -349,7 +383,7 @@ export const it: FeaturesText = {
     },
     offline: {
       name: "Funziona offline",
-      body: "Tutto gira sul tuo dispositivo, quindi nessun problema se in palestra nel seminterrato non c’è campo.",
+      body: "Tutto gira sul tuo dispositivo e si sincronizza in background, quindi nessun problema se in palestra nel seminterrato non c’è campo.",
     },
     sync: {
       name: "Account e sincronizzazione",

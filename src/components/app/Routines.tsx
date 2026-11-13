@@ -13,12 +13,13 @@ import { codeFromLink, encodeRoutine, routineUrl } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import { linkedToNext, linksOf, toggleLink, withLinks } from "@/lib/superset";
-import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem } from "@/lib/types";
+import { MUSCLE_LABEL, type Gym, type Routine, type RoutineItem, type RoutinePart } from "@/lib/types";
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { SendToFriend } from "./SendToFriend";
+import { RoutinePartsEditor, routinePartsLine } from "./Stretch";
 import { Bump, Button, EmptyState, LinkToggle, Sheet } from "./ui";
 
 // Saved routines (routines.ts): pick one for today, save today's plan or a finished workout, or build
@@ -28,7 +29,9 @@ const newId = () => (typeof crypto !== "undefined" && "randomUUID" in crypto ? c
 
 function summary(r: Routine): string {
   const sets = r.items.reduce((n, i) => n + i.sets, 0);
-  return t("rt.summary", { exercises: t("rt.exercises", { count: r.items.length }), sets: t("rt.sets", { count: sets }) });
+  const line = t("rt.summary", { exercises: t("rt.exercises", { count: r.items.length }), sets: t("rt.sets", { count: sets }) });
+  // A routine with a warm-up or cool-down says so: "Warm-up → Lifting → Cool-down · 5 exercises · 15 sets".
+  return r.parts?.length ? `${routinePartsLine(r)} · ${line}` : line;
 }
 
 /** The routines sheet on Today: use one, go back to the adaptive plan, save or build one. */
@@ -161,7 +164,7 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
       <Button
         kind="quiet"
         icon={saved ? "check" : "layers"}
-        className="mt-3 w-full"
+        className="w-full"
         disabled={saved}
         onClick={() => setEditing({ ...routineFrom(items, "", newId(), Date.now()), name: "" })}
       >
@@ -266,6 +269,7 @@ function RoutineEditor({
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const [name, setName] = useState(initial.name);
   const [items, setItems] = useState<RoutineItem[]>(initial.items);
+  const [parts, setParts] = useState<RoutinePart[] | undefined>(initial.parts);
   const [adding, setAdding] = useState(initial.items.length === 0);
   // Desktop layout (layout.ts): the exercise browser stays open beside the routine, and rows drag to a new place
   // (the up and down buttons still work, for the keyboard).
@@ -419,8 +423,19 @@ function RoutineEditor({
               {t("rt.add")}
             </Button>
           ))}
+        <RoutinePartsEditor parts={parts} onChange={setParts} />
         <div className="mt-5 grid gap-2">
-          <Button icon="check" className="w-full" disabled={!items.length} onClick={() => onSave({ ...initial, name, items })}>
+          <Button
+            icon="check"
+            className="w-full"
+            disabled={!items.length}
+            onClick={() => {
+              const out: Routine = { ...initial, name, items };
+              if (parts) out.parts = parts;
+              else delete out.parts;
+              onSave(out);
+            }}
+          >
             {t("rt.save")}
           </Button>
           {shareable && <ShareRoutine routine={initial} />}

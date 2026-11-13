@@ -107,3 +107,96 @@ export async function mapImage(placeId: unknown, fetcher: typeof fetch = fetch):
   if (!r?.ok) return null;
   return { bytes: await r.arrayBuffer(), type: r.headers.get("content-type") ?? "image/png" };
 }
+
+// --- A map of many gyms (Melvin, 2026-11-13: "a map of all the nearest gyms with a list beneath it") ---
+
+/** Pins one area map carries: the list's first gyms, numbered as the list numbers them. */
+export const AREA_PINS = 20;
+
+/**
+ * Our address for a map of several gyms (Find gyms near you and the city pages): their ids in list order, so pin 1 is
+ * always the list's first gym whatever changed since, plus the searcher's spot (already rounded to about 1 km) as a
+ * plain marker. '' while Mapbox isn't set up or there's nothing to show.
+ */
+export function areaMapPath(ids: readonly string[], at?: { lat: number; lon: number }): string {
+  const list = ids.filter(isPlaceId).slice(0, AREA_PINS);
+  if (!hasMap() || !list.length) return "";
+  const here = at ? `&at=${at.lat.toFixed(2)},${at.lon.toFixed(2)}` : "";
+  return `/api/gyms/map/?ids=${list.join(".")}${here}`;
+}
+
+/** The Mapbox address for numbered gym pins (and the searcher's spot in cyan), framed to fit them all. */
+export function areaMapboxUrl(
+  points: readonly { lat: number; lon: number }[],
+  at: { lat: number; lon: number } | null,
+  token: string,
+): string {
+  const ll = (p: { lat: number; lon: number }) => `${p.lon.toFixed(5)},${p.lat.toFixed(5)}`;
+  const pins = points.map((p, i) => `pin-s-${i + 1}+4c8dff(${ll(p)})`);
+  if (at) pins.push(`pin-s+38d6e8(${ll(at)})`);
+  // One spot alone would zoom all the way in, so it gets the single gym's street view instead of "auto".
+  const view = pins.length === 1 ? `${ll(points[0] ?? at!)},14,0` : "auto";
+  return `https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/${pins.join(",")}/${view}/640x360@2x?padding=40&attribution=false&access_token=${encodeURIComponent(token)}`;
+}
+
+const coord = (raw: string | null): { lat: number; lon: number } | null => {
+  const m = /^(-?\d{1,2}(?:\.\d{1,2})?),(-?\d{1,3}(?:\.\d{1,2})?)$/.exec(raw ?? "");
+  if (!m) return null;
+  const lat = Number(m[1]);
+  const lon = Number(m[2]);
+  return Math.abs(lat) <= 90 && Math.abs(lon) <= 180 ? { lat, lon } : null;
+};
+
+/** The picture for `areaMapPath`. Null when there's no token, no known gym among the ids, or Mapbox didn't answer. */
+export async function areaMapImage(
+  idsParam: string | null,
+  atParam: string | null,
+  fetcher: typeof fetch = fetch,
+): Promise<{ bytes: ArrayBuffer; type: string } | null> {
+  const token = process.env.MAPBOX_TOKEN;
+  const ids = (idsParam ?? "").split(".").filter(isPlaceId).slice(0, AREA_PINS);
+  if (!token || !ids.length) return null;
+  const rows = await query(`SELECT id, lat, lon FROM gym_places WHERE hidden = 0 AND id IN (${ids.map(() => "?").join(",")})`, ids);
+  const at = new Map(rows.map((r) => [String(r.id), { lat: Number(r.lat), lon: Number(r.lon) }]));
+  const points = ids.flatMap((id) => at.get(id) ?? []);
+  if (!points.length) return null;
+  const r = await fetcher(areaMapboxUrl(points, coord(atParam), token)).catch(() => null);
+  if (!r?.ok) return null;
+  return { bytes: await r.arrayBuffer(), type: r.headers.get("content-type") ?? "image/png" };
+}
+
+// --- Map tiles for the map you can drag and zoom (Melvin, 2026-11-13: "a map I can drag and zoom … keep it mapbox") ---
+
+/** Mapbox's own dark and light street styles, matching the app's appearance. */
+export type TileStyle = "dark" | "light";
+/** Deepest zoom a tile is passed through for: street level, plenty to tell gyms apart. */
+export const TILE_MAX_ZOOM = 18;
+/** Tiles one address may pull through us in an hour that the edge cache didn't already answer. */
+export const TILES_PER_HOUR = 1_500;
+
+/** Checks a tile's address: zoom 0 to TILE_MAX_ZOOM, x and y inside that zoom's grid. */
+export function tileOf(z: unknown, x: unknown, y: unknown, style: unknown): { z: number; x: number; y: number; style: TileStyle } | null {
+  const [zn, xn, yn] = [z, x, y].map((v) => (typeof v === "string" && /^\d{1,6}$/.test(v) ? Number(v) : NaN));
+  if (!Number.isInteger(zn) || zn! < 0 || zn! > TILE_MAX_ZOOM) return null;
+  const size = 2 ** zn!;
+  if (!Number.isInteger(xn) || !Number.isInteger(yn) || xn! >= size || yn! >= size) return null;
+  return { z: zn!, x: xn!, y: yn!, style: style === "light" ? "light" : "dark" };
+}
+
+/** Mapbox's address for one 256 px tile drawn at twice the pixels (512 px), so it's sharp on phones. */
+export function tileUrl(t: { z: number; x: number; y: number; style: TileStyle }, token: string): string {
+  return `https://api.mapbox.com/styles/v1/mapbox/${t.style}-v11/tiles/256/${t.z}/${t.x}/${t.y}@2x?access_token=${encodeURIComponent(token)}`;
+}
+
+/** One tile, fetched from Mapbox. Null when there's no token, the address is wrong, or Mapbox didn't answer. */
+export async function tileImage(
+  p: { z: unknown; x: unknown; y: unknown; style: unknown },
+  fetcher: typeof fetch = fetch,
+): Promise<{ bytes: ArrayBuffer; type: string } | null> {
+  const token = process.env.MAPBOX_TOKEN;
+  const t = tileOf(p.z, p.x, p.y, p.style);
+  if (!token || !t) return null;
+  const r = await fetcher(tileUrl(t, token)).catch(() => null);
+  if (!r?.ok) return null;
+  return { bytes: await r.arrayBuffer(), type: r.headers.get("content-type") ?? "image/png" };
+}

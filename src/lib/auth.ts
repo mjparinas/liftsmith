@@ -10,10 +10,14 @@
 import { create } from "zustand";
 
 import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
+import { currentLang, type Lang } from "./i18n";
 import { isNative } from "./juice";
+import { forgetReads } from "./liveRead";
+import { noteOffline, noteOnline } from "./net";
 import { SITE_URL } from "./site";
 import { forgetFriends } from "./socialCache";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
+import { readOwner, restartApp, writeEnded, writeOwner } from "./wipe";
 
 export interface Account {
   token: string;
@@ -116,6 +120,11 @@ export class AuthError extends Error {
 
 export async function api<T>(path: string, init: { method?: string; body?: unknown; token?: string } = {}): Promise<T> {
   let r: Response;
+  // The phone knows it has no connection: say so at once instead of waiting for the request to fail.
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    noteOffline();
+    throw new AuthError("offline");
+  }
   try {
     r = await fetch(apiUrl(path), {
       method: init.method ?? (init.body === undefined ? "GET" : "POST"),
@@ -126,8 +135,10 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
       body: init.body === undefined ? undefined : JSON.stringify(init.body),
     });
   } catch {
+    noteOffline();
     throw new AuthError("offline");
   }
+  noteOnline();
   const body = (await r.json().catch(() => ({}))) as T & { error?: string; signedOut?: boolean };
   if (!r.ok) throw new AuthError(body.error ?? `HTTP ${r.status}`, r.status, r.status === 401 && body.signedOut === true);
   return body;
@@ -149,8 +160,18 @@ interface SessionReply {
   account: { id: string; email: string | null; providers: string[] } & AccountAccess;
 }
 
-/** Saves the session and starts this device's sync from scratch: everything on it is pushed once. */
-function signedInAs(r: SessionReply, via: Method): Account {
+/** Saves the session and starts this device's sync from scratch: everything on it is pushed once. When the data on
+ *  the device belongs to another account (it was signed in as someone else, who was then signed out by the server),
+ *  that data is wiped first and the app starts again, so two people's workouts never mix. Data logged while never
+ *  signed in has no owner and comes along to the account. */
+async function signedInAs(r: SessionReply, via: Method): Promise<Account> {
+  const owner = readOwner();
+  const someoneElse = !!owner && owner !== r.account.id;
+  if (someoneElse) {
+    // Loaded here, not at the top: the store imports this file.
+    const { useApp } = await import("./store");
+    await useApp.getState().wipeLocal();
+  }
   const a: Account = {
     token: r.token,
     id: r.account.id,
@@ -163,7 +184,11 @@ function signedInAs(r: SessionReply, via: Method): Account {
     localStorage.setItem(ACCOUNT_KEY, JSON.stringify(a));
   } catch {}
   writeSync(emptySync());
+  writeOwner(a.id);
+  // Changes left after the server ended the last session go up with this one (or were wiped above).
+  writeEnded(0);
   useAccount.setState({ account: a, error: null });
+  if (someoneElse) restartApp();
   return a;
 }
 
@@ -223,6 +248,9 @@ export function loadScript(src: string): Promise<void> {
   });
 }
 
+/** Apple's sign-in script per app language (one script per locale in its path). */
+const APPLE_LOCALE: Record<Lang, string> = { en: "en_US", es: "es_ES", fr: "fr_FR", de: "de_DE", it: "it_IT", ja: "ja_JP" };
+
 export function signInApple(): Promise<Account> {
   return withBusy(async () => {
     const n = await makeNonce();
@@ -232,7 +260,8 @@ export function signInApple(): Promise<Account> {
     if (platform() === "ios" && plugin) {
       ({ idToken, code } = await plugin.apple({ nonce: n.hashed }));
     } else {
-      await loadScript("https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js");
+      // Apple's sign-in window speaks the language in the script's path, so it follows the app's language.
+      await loadScript(`https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/${APPLE_LOCALE[currentLang()]}/appleid.auth.js`);
       window.AppleID!.auth.init({
         clientId: AUTH.appleServices,
         scope: "email",
@@ -292,14 +321,16 @@ export async function refreshAccountPro(): Promise<boolean> {
   return !!r.account.pro;
 }
 
-/** Signs this device out. Everything stays on the device; it just stops syncing. */
+/** Ends this device's session (the sign-in only). Signing out from the Account screen also wipes the device's data:
+ *  signOutDevice.ts. */
 export async function signOut(): Promise<void> {
   const a = readAccount();
   forgetAccount();
   if (a) await api("/api/auth/logout/", { body: {}, token: a.token }).catch(() => null);
 }
 
-/** Drops the session and sync state on this device only (also used by "Erase this device"). */
+/** Drops the session and sync state on this device only (also used by "Erase this device"). The owner mark stays, so
+ *  when the server ends a session, signing in as someone else still wipes the data first (signedInAs). */
 export function forgetAccount() {
   try {
     localStorage.removeItem(ACCOUNT_KEY);
@@ -307,6 +338,8 @@ export function forgetAccount() {
   } catch {}
   // Friends' last feed belongs to the account (socialCache.ts).
   forgetFriends();
+  // So do the other screens' last copies (liveRead.ts).
+  forgetReads();
   useAccount.setState({ account: null, error: null });
 }
 
@@ -317,5 +350,7 @@ export function deleteAccount(): Promise<void> {
     if (!a) return;
     await api("/api/account/", { method: "DELETE", token: a.token });
     forgetAccount();
+    // The copy left here is the lifter's own now, with no account behind it.
+    writeOwner(null);
   });
 }

@@ -7,6 +7,7 @@
 // One account can own up to 10 gyms. Deleting the account gives the gyms back (unclaimed, details kept).
 import { createHash, randomBytes, randomInt } from "node:crypto";
 
+import { cleanAmenities, cleanPrices, currencyFor, type Amenity, type Prices } from "@/lib/gymExtras";
 import { decodeGym, encodeGym } from "@/lib/gymShare";
 import { parseHours } from "@/lib/openingHours";
 
@@ -227,6 +228,10 @@ export interface OwnedGym {
   /** The logo's and photos' ids (gymMedia.ts). */
   logo: string;
   photos: string[];
+  /** What it has besides equipment and what a visit costs (gymExtras.ts); the country picks the starting currency. */
+  amenities: Amenity[];
+  prices: Prices | null;
+  country: string;
 }
 
 /** "logo:ab12,photo:cd34" → the logo's id and the photos' ids, in order. */
@@ -240,7 +245,7 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
   const since = now - 30 * 86_400_000;
   const rows = await query(
     `SELECT p.id, p.name, p.city_slug, p.slug, p.address, p.city, p.region, p.hours, p.website, p.phone, p.description, p.code, p.lifters,
-       p.qr_scans,
+       p.qr_scans, p.amenities, p.prices, p.country,
        (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
        (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30,
        (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
@@ -266,6 +271,9 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
     scans30: n(r.scans_30),
     club: s(r.club),
     ...pictures(s(r.pictures)),
+    amenities: cleanAmenities(s(r.amenities)),
+    prices: cleanPrices(s(r.prices), currencyFor(s(r.country))),
+    country: s(r.country),
   }));
 }
 
@@ -306,6 +314,11 @@ export async function editGym(accountId: string, body: Record<string, unknown>, 
     const kit = typeof body.code === "string" && body.code.length <= 20_000 ? decodeGym(body.code) : null;
     if (body.code !== "" && !kit) return { ok: false, error: "code" };
     set.push(["code", kit ? encodeGym(kit) : ""]);
+  }
+  if (body.amenities !== undefined) set.push(["amenities", cleanAmenities(body.amenities).join(",")]);
+  if (body.prices !== undefined) {
+    const prices = cleanPrices(body.prices);
+    set.push(["prices", prices ? JSON.stringify(prices) : ""]);
   }
   if (!set.length) return { ok: true };
   await run(`UPDATE gym_places SET ${set.map(([k]) => `${k} = ?`).join(", ")}, source = 'owner', updated_at = ? WHERE id = ?`, [

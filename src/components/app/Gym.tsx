@@ -18,6 +18,7 @@ import { EQUIPMENT_GROUPS, EQUIPMENT_LABEL, type Gym as GymT } from "@/lib/types
 import { fmtNum } from "@/lib/units";
 
 import { BuyNext } from "./BuyNext";
+import { GymProblems } from "./GymExtras";
 import { GymWeights } from "./GymWeights";
 import { NearbyGyms } from "./NearbyGyms";
 import { PlateBar } from "./Plates";
@@ -199,6 +200,8 @@ export function Gym() {
       <GymWeights gym={gym} kind="kettlebells" onChange={(kettlebells) => update({ kettlebells })} />
 
       <BuyNext gym={gym} />
+
+      <GymProblems key={gym.id} gym={gym} />
 
       {gym.placeId && (
         <button

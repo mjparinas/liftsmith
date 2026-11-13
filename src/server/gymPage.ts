@@ -5,6 +5,7 @@
 //   /gyms/<city>/<gym>/         one gym: address, map links, opening hours, equipment, lifters, add it to the app
 // They're for search and for the QR posters (step 4), so the facts come first and every page says how to add the gym.
 // Text: src/locales/text/gp.ts (gp.*), in the reader's language. Map credit: OpenStreetMap (ODbL).
+import { money, PRICE_KINDS, type Prices } from "@/lib/gymExtras";
 import { decodeGym } from "@/lib/gymShare";
 import { isMsgLang, MSG_LANGS, type MsgLang } from "@/lib/messageText";
 import { allDay, parseHours } from "@/lib/openingHours";
@@ -14,6 +15,7 @@ import { EQUIPMENT, type Equipment } from "@/lib/types";
 import * as equipment from "@/locales/text/equipment";
 import * as gp from "@/locales/text/gp";
 
+import { AREA_PINS, areaMapPath } from "./gymMedia";
 import type { City, Place } from "./gymPlaces";
 import { esc, framePage, icon } from "./siteFrame";
 
@@ -139,6 +141,16 @@ export function gymHtml(p: Place, nearby: Place[], lang: MsgLang): string {
     },
     ...(p.website ? { sameAs: [p.website] } : {}),
     ...(p.phone ? { telephone: p.phone } : {}),
+    ...(p.amenities.length
+      ? {
+          amenityFeature: p.amenities.map((a) => ({
+            "@type": "LocationFeatureSpecification",
+            name: say(lang, `gp.amen.${a}` as GpKey),
+            value: true,
+          })),
+        }
+      : {}),
+    ...(p.prices ? { priceRange: priceLines(p.prices, lang).join(" · ") } : {}),
     ...(week && p.hours
       ? {
           openingHours: p.hours
@@ -188,6 +200,35 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
   const club = p.club
     ? `<section class="card" aria-labelledby="club-h"><h2 id="club-h">${icon("trophy", 16)}${esc(say(lang, "gp.clubTitle"))}</h2><p class="muted">${esc(say(lang, "gp.clubBody"))}</p><p><a href="/app/#/club/${esc(encodeURIComponent(p.club))}">${esc(say(lang, "gp.clubJoin"))} ›</a></p></section>`
     : "";
+  // Round 3 (gymExtras.ts): the owner's announcements, amenities and prices, trainers, and equipment reported out of order.
+  const news = p.news.length
+    ? `<section class="card" aria-labelledby="news-h"><h2 id="news-h">${icon("chat", 16)}${esc(say(lang, "gp.newsTitle"))}</h2><ul class="news">${p.news
+        .map((x) => `<li><p>${esc(x.text)}</p><p class="muted small">${esc(dayName(x.at, lang))}</p></li>`)
+        .join("")}</ul></section>`
+    : "";
+  const amenities =
+    p.amenities.length || p.prices
+      ? `<section class="card" aria-labelledby="amen-h"><h2 id="amen-h">${icon("sparkle", 16)}${esc(say(lang, "gp.amenities"))}</h2>${
+          p.prices
+            ? `<ul class="prices">${priceLines(p.prices, lang)
+                .map((x) => `<li>${esc(x)}</li>`)
+                .join("")}</ul>`
+            : ""
+        }${p.amenities.length ? `<ul class="chips">${p.amenities.map((a) => `<li>${esc(say(lang, `gp.amen.${a}` as GpKey))}</li>`).join("")}</ul>` : ""}</section>`
+      : "";
+  const trainers = p.trainers.length
+    ? `<section class="card" aria-labelledby="trainers-h"><h2 id="trainers-h">${icon("people", 16)}${esc(say(lang, "gp.trainersTitle"))}</h2><p class="muted">${esc(say(lang, "gp.trainersBody"))}</p><ul class="trainers">${p.trainers
+        .map(
+          (x) =>
+            `<li><p class="li-name">${esc(x.name)}</p>${x.role ? `<p class="muted small">${esc(say(lang, `gp.role.${x.role}` as GpKey))}</p>` : ""}${x.bio ? `<p>${esc(x.bio)}</p>` : ""}<p><a href="/app/#/trainer/${esc(x.code)}" rel="nofollow">${esc(say(lang, "gp.trainWith", { name: x.name }))} ›</a></p></li>`,
+        )
+        .join("")}</ul>${p.official ? "" : `<p class="muted small">${esc(say(lang, "gp.trainersUnofficial"))}</p>`}</section>`
+    : "";
+  const issues = p.issues.length
+    ? `<section class="card" aria-labelledby="issues-h"><h2 id="issues-h">${icon("flag", 16)}${esc(say(lang, "gp.issuesTitle"))}</h2><ul class="chips">${p.issues
+        .map((x) => `<li>${esc(say(lang, `gp.issue.${x.kind}`, { item: equipName(lang, x.equipment) }))}</li>`)
+        .join("")}</ul><p class="muted small">${esc(say(lang, "gp.issuesNote"))}</p></section>`
+    : "";
   const others = nearby.filter((x) => x.id !== p.id && x.kind === "gym").slice(0, 8);
   const more = others.length
     ? `<section class="card" aria-labelledby="more-h"><h2 id="more-h">${icon("gym", 16)}${esc(say(lang, "gp.more", { city: p.city || city }))}</h2>
@@ -200,13 +241,24 @@ ${p.logo ? `<img class="gym-logo" src="/api/gyms/photo/?id=${esc(p.logo)}" alt="
     [city, cityPath(p.citySlug)],
     [p.name, null],
   ])}
-<div class="grid"><div class="col">${hero}${photos}${club}${claim}${poster}</div><div class="col">${place}${hours}${kit}${more}</div></div>${credit}</main>`;
+<div class="grid"><div class="col">${hero}${news}${photos}${club}${trainers}${claim}${poster}</div><div class="col">${place}${hours}${amenities}${kit}${issues}${more}</div></div>${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, p.kind === "gym"), body, GYM_STYLE, "gym");
 }
 
-function listItem(p: Place, lang: MsgLang): string {
+/** "Day pass $15", "Membership from $49 a month": the prices the owner set, in the reader's language. */
+export function priceLines(prices: Prices, lang: MsgLang): string[] {
+  return PRICE_KINDS.flatMap((k) =>
+    prices[k] === undefined ? [] : [say(lang, `gp.price.${k}`, { price: money(prices[k], prices.currency, lang) })],
+  );
+}
+
+const dayName = (at: number, lang: MsgLang) =>
+  new Intl.DateTimeFormat(lang, { month: "short", day: "numeric", timeZone: "UTC" }).format(at);
+
+function listItem(p: Place, lang: MsgLang, pin?: number): string {
   const sub = [p.address, p.lifters > 0 ? liftersLine(p, lang) : ""].filter(Boolean).join(" · ");
-  return `<li><a href="${esc(gymPath(p))}"><span class="li-name">${esc(p.name)}${p.official ? officialMark(lang) : ""}</span>${sub ? `<span class="muted small">${esc(sub)}</span>` : ""}</a></li>`;
+  const badge = pin ? `<span class="pin" aria-hidden="true">${pin}</span>` : "";
+  return `<li><a href="${esc(gymPath(p))}"><span class="li-name">${badge}${esc(p.name)}${p.official ? officialMark(lang) : ""}</span>${sub ? `<span class="muted small">${esc(sub)}</span>` : ""}</a></li>`;
 }
 
 // --- A city ---
@@ -225,9 +277,15 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     name: say(lang, "gp.cityTitle", { city }),
     itemListElement: gyms.map((p, i) => ({ "@type": "ListItem", position: i + 1, url: `${SITE_URL}${gymPath(p)}`, name: p.name })),
   };
+  // A map of the city's gyms above the list (Melvin, 2026-11-13), its pins numbered as the gyms list numbers them.
+  const map = areaMapPath(gyms.map((p) => p.id));
+  const pinOf = (p: Place, i: number) => (map && p.kind === "gym" && i < AREA_PINS ? i + 1 : undefined);
+  const figure = map
+    ? `<figure class="map area"><img src="${esc(map)}" alt="${esc(say(lang, "gp.cityMapAlt", { city }))}" width="640" height="360"><figcaption>${esc(say(lang, "gp.mapCredit"))}</figcaption></figure>`
+    : "";
   const section = (id: string, label: string, list: Place[]) =>
     list.length
-      ? `<section class="card" aria-labelledby="${id}"><h2 id="${id}">${icon("gym", 16)}${esc(label)}</h2><ul class="list">${list.map((p) => listItem(p, lang)).join("")}</ul></section>`
+      ? `<section class="card" aria-labelledby="${id}"><h2 id="${id}">${icon("gym", 16)}${esc(label)}</h2><ul class="list">${list.map((p, i) => listItem(p, lang, pinOf(p, i))).join("")}</ul></section>`
       : "";
   const credit = places.some((p) => p.source === "osm") ? `<p class="credit">${esc(say(lang, "gp.osm"))}</p>` : "";
   const body = `<main id="main" class="wrap page narrow">${crumbs(lang, [
@@ -235,7 +293,7 @@ export function cityHtml(citySlug: string, places: Place[], lang: MsgLang): stri
     [city, null],
   ])}
 <header class="head"><p class="kicker">${esc(say(lang, "gp.cityKicker"))}</p><h1>${esc(say(lang, "gp.cityTitle", { city }))}</h1><p class="muted">${esc(desc)}</p></header>
-${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
+${figure}${section("gyms-h", say(lang, "gp.cityGyms"), gyms)}${section("studios-h", say(lang, "gp.studios"), studios)}${missing(lang)}${credit}</main>`;
   return framePage(lang, title, metaTags(title, desc, path, ld, gyms.length > 0), body, GYM_STYLE, "gym");
 }
 
@@ -281,7 +339,7 @@ export function gymSitemapXml(entries: { path: string; lastModified: number }[])
 
 const GYM_STYLE = `
 .gym-logo{width:64px;height:64px;border-radius:14px;object-fit:contain;background:#fff;margin-bottom:8px}
-.map{margin:12px 0 0}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
+.map{margin:12px 0 0}.map.area{margin:0 0 16px}.map img{display:block;width:100%;height:auto;border-radius:12px}.map figcaption{font-size:.75rem;color:var(--muted);margin-top:4px}
 .photos{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;list-style:none;margin:0;padding:0}.photos img{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .page{padding-top:20px;padding-bottom:48px}.narrow{max-width:48rem}
@@ -301,10 +359,13 @@ const GYM_STYLE = `
 .links a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}
 .list{margin:0}.list li a{display:flex;flex-direction:column;gap:2px;min-height:44px;justify-content:center;padding:10px 0;border-top:1px solid var(--line);text-decoration:none}
 .list li:first-child a{border-top:0;padding-top:0}.list a:hover .li-name{text-decoration:underline}
-.li-name{display:inline-flex;align-items:center;gap:6px;font-weight:600}
+.li-name{display:inline-flex;align-items:center;gap:6px;font-weight:600}.pin{display:inline-grid;place-items:center;min-width:24px;height:24px;padding:0 4px;border-radius:12px;background:var(--accent);color:var(--bg);font-size:.75rem;font-weight:700;font-variant-numeric:tabular-nums}
 .hours{display:grid;gap:0;margin:0}.hours div{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
 .hours div:first-child{border-top:0;padding-top:0}.hours dd{margin:0;font-variant-numeric:tabular-nums;text-align:right}
 .chips{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:0}
+.news,.trainers,.prices{list-style:none;margin:0;padding:0;display:grid;gap:12px}.news p,.trainers p{margin:0}
+.trainers li{border-top:1px solid var(--line);padding-top:12px}.trainers li:first-child{border-top:0;padding-top:0}
+.trainers a{display:inline-flex;min-height:44px;align-items:center;font-weight:600}.prices{gap:4px;margin-bottom:12px;font-weight:600}
 .chips li{padding:6px 12px;border:1px solid var(--line);border-radius:999px;font-size:.875rem}
 .db{margin-top:12px}.claim{border-style:dashed}
 .credit{margin-top:24px;font-size:.75rem;color:var(--faint)}`;

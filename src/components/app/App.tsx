@@ -6,7 +6,7 @@ import { applyA11y, readPhoneTextScale, savedA11y } from "@/lib/a11y";
 import { startAnalytics, track } from "@/lib/analytics";
 import { applyAppearance, savedAppearance, useLight } from "@/lib/appearance";
 import { startAppLinks } from "@/lib/appLinks";
-import { useAccount } from "@/lib/auth";
+import { readAccount, useAccount } from "@/lib/auth";
 import { startBackButton } from "@/lib/back";
 import { startBilling, useBilling, useProMember } from "@/lib/billing";
 import { BRAND } from "@/lib/brand";
@@ -16,6 +16,7 @@ import { redeemSaved, sendClaim, startCreator, useCreator } from "@/lib/creator"
 import { installDiag } from "@/lib/diag";
 import { flushFeedback } from "@/lib/feedback";
 import { COSMETICS } from "@/lib/game";
+import { refreshOutOfOrder } from "@/lib/gymExtrasApi";
 import { readBodyStats } from "@/lib/health";
 import { startHealthRefresh } from "@/lib/healthRefresh";
 import { languagePending, readPhoneLanguage, setLanguage, subscribeLang, t } from "@/lib/i18n";
@@ -23,6 +24,7 @@ import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
+import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -34,7 +36,7 @@ import { startLive } from "@/lib/socialLive";
 import { useApp } from "@/lib/store";
 import { startSync } from "@/lib/sync";
 import { activeTheme, applyTheme, unlockFrom } from "@/lib/themes";
-import { forgetNotes, refreshCoachNotes } from "@/lib/trainer";
+import { forgetNotes, refreshCoachNotes, useCoachNotes } from "@/lib/trainer";
 import { useLang } from "@/lib/useLang";
 import { useNow } from "@/lib/useNow";
 import { watchWorkout } from "@/lib/workoutWatch";
@@ -71,6 +73,7 @@ import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
+import { SyncSpinner } from "./SyncSpinner";
 import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
@@ -98,6 +101,7 @@ const FULL_SCREEN: ReadonlySet<Route> = new Set<Route>(["workout", "done", "setu
 
 export function App() {
   const { ready, init, profile, active, stats } = useApp();
+  const gyms = useApp((s) => s.gyms);
   // The first screen waits for the lifter's language to load (one at a time, i18n.ts), so it never flashes English.
   // Later switches (Settings › Language) keep the screen and change its words when the language arrives.
   const langWaiting = useSyncExternalStore(subscribeLang, languagePending, () => false);
@@ -168,6 +172,8 @@ export function App() {
     document.addEventListener("touchstart", noop, { passive: true });
     return () => document.removeEventListener("touchstart", noop);
   }, []);
+  // Whether the server can be reached, for Friends' offline note (net.ts).
+  useEffect(() => watchNet(), []);
   useEffect(() => {
     applyAppearance(savedAppearance());
     applyA11y(savedA11y());
@@ -363,9 +369,11 @@ export function App() {
   // up signed in on the welcome screen) opens Coaching with the code filled in.
   useEffect(() => {
     if (!ready || !profile.onboarded) return;
+    // Signed out, the code keeps waiting (Coaching asks to sign in and keeps it), and comes back once signed in below:
+    // a code used to be forgotten on the way through making an account (Melvin, 2026-11-13).
     const code = pendingCoach();
     if (code) {
-      savePendingCoach("");
+      if (readAccount()) savePendingCoach("");
       if (!location.hash.startsWith("#/trainer")) go("trainer", code);
     }
     const look = () => {
@@ -375,13 +383,34 @@ export function App() {
     document.addEventListener("visibilitychange", look);
     const off = useAccount.subscribe((now, before) => {
       if (before.account && !now.account) forgetNotes();
-      if (now.account && !before.account) void refreshCoachNotes(Date.now(), true);
+      if (now.account && !before.account) {
+        void refreshCoachNotes(Date.now(), true);
+        // Signed in (or just made an account) with a coach's code waiting: back to Coaching with it filled in.
+        const waiting = pendingCoach();
+        if (waiting) {
+          savePendingCoach("");
+          go("trainer", waiting);
+        }
+      }
     });
     return () => {
       document.removeEventListener("visibilitychange", look);
       off();
     };
   }, [ready, profile.onboarded]);
+
+  // Equipment reported out of order at the lifter's real gym (gymExtrasApi.ts): on open, on return to the app and when
+  // the gym changes, at most every 30 minutes per gym; Today's plan is rebuilt when the list changed.
+  const placeId = ready && profile.onboarded ? (gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0])?.placeId : undefined;
+  useEffect(() => {
+    if (!placeId) return;
+    const look = () => {
+      if (document.visibilityState === "visible") void refreshOutOfOrder(placeId).then((changed) => changed && useApp.getState().replan());
+    };
+    look();
+    document.addEventListener("visibilitychange", look);
+    return () => document.removeEventListener("visibilitychange", look);
+  }, [placeId]);
 
   if (!ready || langWaiting) return <TodaySkeleton />;
   if (!profile.onboarded) return <Onboarding />;
@@ -440,6 +469,8 @@ export function App() {
   return (
     <>
       <StatusScrim />
+      {/* Background sync's small ring; never during a workout (docs/decisions/background-sync.md). */}
+      <SyncSpinner hidden={route === "workout"} />
       <div className={sidebar ? "pl-60" : undefined}>
         <main
           key={route}
@@ -527,10 +558,26 @@ function visibleTabs() {
   return TABS.filter((tab) => tab.route !== "friends" || socialOn());
 }
 
-// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the same five tabs as the
-// phone's tab bar, down the left side, so it is the tab bar and nothing else is added to it (one control, one
-// destination). It sets --nav-h to 0 (nothing covers the bottom of the page) and --side-w to its width, so bars
-// pinned to the bottom of a screen and toasts start after it.
+// Screens reached from Settings: the sidebar's Settings item stays lit on them, as the tab bar keeps a tab lit.
+const SETTINGS_SCREENS: ReadonlySet<Route> = new Set<Route>([
+  "settings",
+  "account",
+  "connections",
+  "training",
+  "feedback",
+  "gym",
+  "gymlink",
+  "gymplace",
+  "gymclaim",
+  "gymedit",
+  "gymadd",
+]);
+
+// The desktop layout's navigation (layout.ts, docs/decisions/desktop-layout.md): the phone's tabs down the left
+// side, then Programs and Tools, Coaching for accounts that coach or are coached, and Settings at the foot (Melvin,
+// 2026-11-13). On the phone these stay a tap away from Today, Progress and Settings; on desktop the sidebar is their
+// one control, so the other links to them hide there (one control, one destination). It sets --nav-h to 0 (nothing covers
+// the bottom of the page) and --side-w to its width, so bars pinned to the bottom of a screen and toasts start after it.
 function Sidebar({ route }: { route: Route }) {
   useEffect(() => {
     const root = document.documentElement;
@@ -542,9 +589,11 @@ function Sidebar({ route }: { route: Route }) {
     };
   }, []);
   const waiting = useFriendsWaiting();
+  const coaching = useCoachNotes((s) => s.coaching);
+  const coachUnread = useCoachNotes((s) => s.unread.reduce((n, u) => n + u.count, 0));
   return (
     <nav
-      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
+      className="fixed inset-y-0 left-0 z-40 flex w-60 flex-col gap-6 overflow-y-auto border-r border-line/70 bg-bg/92 px-3 py-6 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
       <div className="flex items-center gap-2.5 px-3 text-lg font-extrabold tracking-tight text-ink">
@@ -554,31 +603,55 @@ function Sidebar({ route }: { route: Route }) {
         {BRAND.name}
       </div>
       <ul className="flex flex-col gap-1">
-        {visibleTabs().map((tab) => {
-          const on = route === tab.route;
-          const dot = tab.route === "friends" && waiting > 0;
-          return (
-            <li key={tab.route}>
-              <button
-                type="button"
-                aria-current={on ? "page" : undefined}
-                aria-label={dot ? t("friends.openWaiting", { count: waiting }) : undefined}
-                onClick={() => {
-                  if (!on) haptic("select");
-                  go(tab.route);
-                }}
-                className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
-              >
-                <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
-                  <Icon name={tab.icon} size={22} strokeWidth={on ? 2.4 : 2} />
-                  {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
-                </span>
-                {t(tab.label)}
-              </button>
-            </li>
-          );
-        })}
+        {visibleTabs().map((tab) => (
+          <SideItem
+            key={tab.route}
+            route={tab.route}
+            label={t(tab.label)}
+            icon={tab.icon}
+            on={route === tab.route}
+            dot={tab.route === "friends" && waiting > 0 ? t("friends.openWaiting", { count: waiting }) : undefined}
+          />
+        ))}
+        <SideItem route="programs" label={t("prog.title")} icon="layers" on={route === "programs"} />
+        <SideItem route="tools" label={t("tools.title")} icon="bolt" on={route === "tools"} />
+        {coaching && (
+          <SideItem
+            route="trainer"
+            label={t("trn.title")}
+            icon="target"
+            on={route === "trainer"}
+            dot={coachUnread > 0 ? `${t("trn.title")}, ${t("trn.unread", { count: coachUnread })}` : undefined}
+          />
+        )}
+      </ul>
+      <ul className="mt-auto flex flex-col gap-1">
+        <SideItem route="settings" label={t("settings.title")} icon="settings" on={SETTINGS_SCREENS.has(route)} />
       </ul>
     </nav>
+  );
+}
+
+/** One sidebar link: lit while its screen (or one under it) is open, with a dot when something waits there. */
+function SideItem({ route, label, icon, on, dot }: { route: Route; label: string; icon: IconName; on: boolean; dot?: string }) {
+  return (
+    <li>
+      <button
+        type="button"
+        aria-current={on ? "page" : undefined}
+        aria-label={dot}
+        onClick={() => {
+          if (!on) haptic("select");
+          go(route);
+        }}
+        className={`press flex min-h-11 w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-base font-semibold transition-colors duration-200 ${on ? "bg-accent/14 text-ink" : "text-muted hover:bg-raised hover:text-ink"}`}
+      >
+        <span className={`relative grid place-items-center ${on ? "text-accent" : ""}`}>
+          <Icon name={icon} size={22} strokeWidth={on ? 2.4 : 2} />
+          {dot && <span aria-hidden className="absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-bg bg-accent" />}
+        </span>
+        {label}
+      </button>
+    </li>
   );
 }

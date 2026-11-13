@@ -6,19 +6,19 @@ import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { ACTIVITY, currentKg, currentTdee, tdeeHistory } from "@/lib/tdee";
+import { currentKg } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { fmtBodyweight, fmtNum, fmtVolume, fromKg } from "@/lib/units";
+import { fmtBodyweight, fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
-import { AchievementRow, useGame } from "./Achievements";
+import { useGame } from "./Achievements";
 import { GoalsCard } from "./Coach";
-import { StrengthCard, TonnageCard } from "./Extras";
+import { RecapAndPhotos, StrengthCard } from "./Extras";
 import { ago } from "./format";
 import { HistoryCalendar } from "./History";
 import { Icon, type IconName } from "./icons";
 import { CoachNotes } from "./Insights";
-import { DotsCard, OneRmSection } from "./OneRepMax";
+import { OneRmSection } from "./OneRepMax";
 import { ProLocked } from "./ProLocked";
 import { go, useRoute } from "./router";
 import { HUE } from "./theme";
@@ -74,8 +74,6 @@ export function Stats() {
           HUE.ember,
         ]
       : ["streak", t("progress.streak"), num(streak.weeks), "flame", HUE.ember],
-    ["sets", t("progress.sets"), num(stats.totalSets), "layers", HUE.violet],
-    ["volume", t("progress.volume"), fmtVolume(stats.totalVolume, unit), "progress", HUE.cyan],
   ];
   return (
     // Desktop layout: the cards flow into two columns (.desk-cols); the header, next steps and the totals run across.
@@ -84,12 +82,15 @@ export function Stats() {
       <div className="desk-span">
         <CoachNotes title={t("progress.next")} />
       </div>
-      <div className="desk-span mt-4 grid grid-cols-2 gap-3 desk:grid-cols-4">
+      {/* Simplified (UX audit, 2026-11-13, Melvin: "simplify, combine some stats and maybe hide others"): two
+          tiles that say whether the lifter is showing up, then the recap and photos. Total sets, total volume and
+          the "lifted in total" comparison went; DOTS and the calorie estimate live in Tools; badges on Awards. */}
+      <div className="desk-span mt-4 grid grid-cols-2 gap-3">
         {tiles.map(([k, label, v, icon, hue]) => (
-          <StatTile key={k} label={label} value={v} icon={icon} tint={hue} info={k === "volume" ? "volume" : undefined} />
+          <StatTile key={k} label={label} value={v} icon={icon} tint={hue} />
         ))}
       </div>
-      <TonnageCard />
+      <RecapAndPhotos />
       <div id="strength-score" className="scroll-mt-14">
         <StrengthCard />
       </div>
@@ -133,13 +134,11 @@ export function Stats() {
         )}
       </Section>
 
+      <OneRmSection />
+
       <div id="bodyweight" className="scroll-mt-14">
         <BodyweightCard />
       </div>
-      <TdeeCard />
-
-      <OneRmSection />
-      <DotsCard />
 
       <Section title={t("progress.prs")} icon="trophy">
         <ul className="card divide-y divide-line">
@@ -173,22 +172,6 @@ export function Stats() {
         </ul>
       </Section>
 
-      <Section
-        title={t("progress.achievements", { earned: g.badges.earned, total: g.badges.total })}
-        right={
-          <button type="button" onClick={() => go("achievements")} className="press text-sm text-accent">
-            {t("progress.seeAll")}
-          </button>
-        }
-      >
-        <ul className="card divide-y divide-line">
-          {g.nearest.map((a) => (
-            <AchievementRow key={a.id} a={a} />
-          ))}
-          {!g.nearest.length && <li className="px-4 py-3 text-muted">{t("progress.noBadges")}</li>}
-        </ul>
-      </Section>
-
       <Section title={t("progress.history")} icon="calendar">
         {stats.sessions.length ? (
           <HistoryCalendar />
@@ -212,46 +195,11 @@ export function Stats() {
           {t("past.title")}
         </Button>
       </Section>
+      {/* The calculators (TDEE, DOTS and the rest) are one tap away; on desktop the sidebar has Tools. */}
+      <Button kind="ghost" className="mt-3 w-full desk:hidden" icon="bolt" onClick={() => go("tools")}>
+        {t("progress.allTools")}
+      </Button>
     </div>
-  );
-}
-
-/** TDEE now, with its history as a sparkline. Opens Tools › TDEE. */
-function TdeeCard() {
-  const { events, stats, profile } = useApp();
-  const now = useNow(60_000);
-  const cur = currentTdee(events, stats.sessions, profile, now);
-  const hist = tdeeHistory(events);
-  return (
-    <Section
-      title={t("progress.tdee")}
-      icon="flame"
-      right={
-        <button type="button" onClick={() => go("tools")} className="press text-sm text-accent">
-          {t("progress.allTools")}
-        </button>
-      }
-    >
-      <button
-        type="button"
-        onClick={() => go("tools", "tdee")}
-        className="press card flex w-full items-center justify-between gap-3 p-4 text-left"
-      >
-        <div>
-          <div className="num text-2xl font-bold">
-            {cur.result ? t("progress.kcal", { kcal: cur.result.tdee }) : t("progress.tdee.none")}
-          </div>
-          <div className="text-sm text-muted">
-            {cur.result
-              ? cur.activity.source === "manual"
-                ? ACTIVITY[cur.activity.activity].label
-                : t("progress.tdee.auto", { level: ACTIVITY[cur.activity.activity].label })
-              : t("progress.tdee.add")}
-          </div>
-        </div>
-        <Spark points={hist.map((e) => e.kcal)} empty={t("progress.tdee.spark")} />
-      </button>
-    </Section>
   );
 }
 
@@ -270,7 +218,8 @@ function BodyweightCard() {
       <div className="card p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="num text-2xl font-bold">{fmtBodyweight(currentKg(events, profile), unit)}</div>
+            {/* Before the first weigh-in the number would only be the setup answer, beside "No weigh-ins yet". */}
+            {log.length > 0 && <div className="num text-2xl font-bold">{fmtBodyweight(currentKg(events, profile), unit)}</div>}
             <div className="text-sm text-muted">
               {change !== undefined
                 ? t("progress.bw.change", { change: `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)}`, unit })
@@ -282,7 +231,7 @@ function BodyweightCard() {
               <div className="num text-sm text-muted">{t("body.fat.last", { pct: fmtNum(Math.round(lastFat.bodyFat * 10) / 10) })}</div>
             )}
           </div>
-          <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />
+          {log.length > 0 && <Spark points={log.map((e) => (e.type === "bodyweight" ? e.kg : 0))} empty={t("progress.bw.spark")} />}
         </div>
         <WeighInForm id="progress" className="mt-3" />
       </div>

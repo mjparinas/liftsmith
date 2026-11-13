@@ -63,3 +63,21 @@ Melvin, 2026-11-12, agreeing to item 4 of the [growth plan](growth.md): start wi
 - **The gym's club** (Melvin, 2026-11-12, growth plan): an official gym's owner taps **Start the club** on the owner's page (`gymClubStart` in `social.ts`, op `gymClub`). It's a Friends club named after the gym and tied to it (`clubs.place_id`), so members get the same weekly leaderboard, crew goal and posts as any club, run from Friends, with room for 1,000 people (`gymClubMembers`) instead of 100. One per gym; asking again gives the same code. The gym's preview in the app and its web page then show **Gym club** with **Join the club** (`#/club/<code>`, the usual join screen, which says weekly totals are shared). Joining is opt-in and needs Friends, so the owner is sent to turn on Friends first. When the owner lets the gym go or staff delete it, the club stays with its members as an ordinary club.
 - Not built yet: hiding "N lifters train here" below about 10 lifters (Melvin didn't pick it, 2026-11-12). Pure web code, so Android, iOS and the web app get it together.
 
+## Map of the nearest gyms (2026-11-13)
+
+Melvin: "it should show a map of all the nearest gyms with a list beneath it", then "make it a map I can drag and zoom"
+and "keep it mapbox". **Find gyms near you** (the app on Android, iOS and the web, setup wizard included) shows a map
+you can drag and zoom above the list (`GymsMap.tsx`): Mapbox's dark street map (its light one on a light screen), the
+first 20 gyms as numbered pins with the same numbers on the list's rows, and the searcher's rounded spot as a cyan dot.
+Tapping a pin scrolls to that gym's row and focuses it. The wheel zooms only once the map has been clicked or focused,
+so scrolling the page past it doesn't. Zoom buttons are 44 px. Drags on it are the map's, not the sheet's (`data-no-swipe`).
+
+- **Drawn by Leaflet** (1.9, about 40 KB, bundled, loaded with `GymsMap.tsx` only once a search has gyms to show), not
+  Mapbox GL JS (about 1 MB, needs `blob:` workers our script policy doesn't allow, and its token on the device).
+- **Tiles come through our own server** (`/api/gyms/tile/?z=&x=&y=&style=`, `tileImage` in `src/server/gymMedia.ts`),
+  so the Mapbox token stays on the server: 256 px tiles at twice the pixels, zoom 0 to 18, kept a week on the device
+  and a month at the edge, and tiles the edge hasn't seen are limited to 1,500 an hour per address.
+- **The website's city pages** (`/gyms/<city>/`) show one map picture of the city's gyms above their list instead
+  (`areaMapPath`, `/api/gyms/map/?ids=<id>.<id>…`), because those pages run no scripts. Pins go by the ids in the
+  address, so pin 1 is always the list's first gym.
+- Off with the other maps while `MAPBOX_TOKEN` isn't set. Pure web code, so Android, iOS and the web app get it together.
