@@ -465,37 +465,42 @@ function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plan
   if (!plans.length && !notes.length && !targets.length) return null;
   return (
     <Section title={trainersOnly(coaches) ? t("trn.fromTrainer") : t("trn.fromCoach")} icon="chat">
-      {notes.map((n) => (
-        <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
-      ))}
-      {targets.map((x) => (
-        <TargetsCard key={x.coachId} targets={x} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
-      ))}
-      <ul className="space-y-2">
-        {plans.map((p) => {
-          const who = coaches.find((c) => c.id === p.coachId)?.name || t("trn.noName");
-          return (
-            <li key={p.id}>
-              {/* Opens the shared routine preview, where one tap saves it to this lifter's routines. */}
-              <button
-                type="button"
-                onClick={() => go("routine", p.code)}
-                aria-label={t("trn.planOpenNamed", { name: p.name })}
-                className="press card card-tint flex w-full items-center gap-3 px-4 py-3 text-left"
-                style={{ ["--tint" as string]: "var(--color-accent)" }}
-              >
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-semibold">{p.name}</span>
-                  <span className="block text-sm text-muted">
-                    {t("trn.planBy", { name: who, date: date(p.at, { month: "short", day: "numeric" }) })}
-                  </span>
-                </span>
-                <span className="shrink-0 text-sm font-semibold text-accent">{t("trn.planOpen")} ›</span>
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      {/* One gap between every card here: notes, targets and routines (they touched before, 2026-11-13). */}
+      <div className="space-y-2">
+        {notes.map((n) => (
+          <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
+        ))}
+        {targets.map((x) => (
+          <TargetsCard key={x.coachId} targets={x} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
+        ))}
+        {plans.length > 0 && (
+          <ul className="space-y-2">
+            {plans.map((p) => {
+              const who = coaches.find((c) => c.id === p.coachId)?.name || t("trn.noName");
+              return (
+                <li key={p.id}>
+                  {/* Opens the shared routine preview, where one tap saves it to this lifter's routines. */}
+                  <button
+                    type="button"
+                    onClick={() => go("routine", p.code)}
+                    aria-label={t("trn.planOpenNamed", { name: p.name })}
+                    className="press card card-tint flex w-full items-center gap-3 px-4 py-3 text-left"
+                    style={{ ["--tint" as string]: "var(--color-accent)" }}
+                  >
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold">{p.name}</span>
+                      <span className="block text-sm text-muted">
+                        {t("trn.planBy", { name: who, date: date(p.at, { month: "short", day: "numeric" }) })}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-accent">{t("trn.planOpen")} ›</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
     </Section>
   );
 }
@@ -518,7 +523,7 @@ function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onCh
   };
   return (
     <Section title={t("trn.shareTitle", { name })} icon="lock">
-      <p className="mb-2 px-1 text-sm text-muted">{t("trn.shareLead")}</p>
+      <p className="mb-2 px-1 text-sm text-muted">{t("trn.shareLead", { name })}</p>
       <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} />
       <p className="mt-2 px-1 text-xs text-muted">{t("trn.shareNever")}</p>
       <Button kind="ghost" className="mt-3 w-full" onClick={() => void leave()}>
