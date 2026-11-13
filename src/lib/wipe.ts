@@ -7,6 +7,21 @@
 /** Whose data is on this device: the account id it was last signed in as. Signing in as someone else wipes first. */
 export const OWNER_KEY = "liftsmith.owner";
 
+/** Set when the server ended the session while changes on the device hadn't reached the account: how many. The data
+ *  stays until the lifter signs in again (it's pushed), saves a backup or erases it (Account.tsx). */
+export const ENDED_KEY = "liftsmith.ended";
+
+export function readEnded(): number {
+  return Number(safe(() => localStorage.getItem(ENDED_KEY)) ?? 0) || 0;
+}
+
+export function writeEnded(waiting: number) {
+  try {
+    if (waiting > 0) localStorage.setItem(ENDED_KEY, String(waiting));
+    else localStorage.removeItem(ENDED_KEY);
+  } catch {}
+}
+
 /** Keys every saved setting of ours starts with. */
 const PREFIXES = ["liftsmith.", "ls."];
 

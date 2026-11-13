@@ -8,15 +8,10 @@ import { readAccount, signOut } from "./auth";
 import { stopPush } from "./push";
 import { useApp } from "./store";
 import { syncNow } from "./sync";
-import { readSync, type SyncState } from "./syncOutbox";
+import { readSync, unsynced } from "./syncOutbox";
 import { restartApp, writeOwner } from "./wipe";
 
-/** How many changes on this device the account doesn't have yet. */
-export function unsynced(s: SyncState = readSync(), events: number = useApp.getState().events.length): number {
-  // Until the first full push after signing in, the whole history is still to go.
-  if (!s.seeded) return events;
-  return s.out.length + s.del.length + (s.rev !== s.sentRev ? 1 : 0);
-}
+export { unsynced };
 
 export type SignOutResult = { ok: true } | { ok: false; waiting: number };
 
@@ -26,7 +21,7 @@ export async function signOutDevice({ force = false, restart = restartApp } = {}
   if (!force && readAccount()) {
     await syncNow();
     // Also counts when the server ended the session meanwhile (syncNow forgets the account): it can't go up now.
-    const waiting = unsynced();
+    const waiting = unsynced(readSync(), useApp.getState().events.length);
     if (waiting > 0) return { ok: false, waiting };
   }
   await stopPush().catch(() => undefined);

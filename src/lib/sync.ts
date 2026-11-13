@@ -7,9 +7,9 @@
 import { installId } from "./analytics";
 import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount, type AccountAccess } from "./auth";
 import { useApp } from "./store";
-import { noteChanged, onOutbox, readSync, seedOutbox, writeSync, type SyncState } from "./syncOutbox";
+import { noteChanged, onOutbox, readSync, seedOutbox, unsynced, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
-import { readOwner, writeOwner } from "./wipe";
+import { readOwner, restartApp, writeEnded, writeOwner } from "./wipe";
 
 const BATCH = 500;
 const MAX_BYTES = 3_000_000;
@@ -191,10 +191,18 @@ async function run(): Promise<void> {
     }
   } catch (e) {
     if (e instanceof AuthError && e.signedOut) {
-      // The server says the session ended (signed out elsewhere, the account deleted, or a year unused). Data stays on
-      // the device. Any other failure, a 401 without the server's marker included, keeps the sign-in and retries.
+      // The server says the session ended (signed out elsewhere, the account deleted, or a year unused). Like signing out,
+      // that wipes the device (Melvin, 2026-11-13), unless changes here never reached the account: then the data stays,
+      // and the Account screen offers to sign in again (it's pushed), save a backup or erase it (wipe.ts ENDED_KEY).
+      // Any other failure, a 401 without the server's marker included, keeps the sign-in and retries.
+      const waiting = unsynced(readSync(), useApp.getState().events.length);
       forgetAccount();
       useAccount.setState({ error: "signedOut" });
+      if (waiting > 0) writeEnded(waiting);
+      else {
+        await useApp.getState().wipeLocal();
+        restartApp();
+      }
     } else {
       const s = readSync();
       writeSync({ ...s, lastError: e instanceof Error ? e.message : String(e) });

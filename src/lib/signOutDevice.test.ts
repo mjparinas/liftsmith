@@ -12,9 +12,10 @@ import { appendEvents, load } from "./localdb";
 import { listPhotos, savePhoto } from "./photos";
 import { signOutDevice, unsynced } from "./signOutDevice";
 import { useApp } from "./store";
+import { syncNow } from "./sync";
 import { ACCOUNT_KEY, emptySync, readSync, writeSync } from "./syncOutbox";
 import type { AppEvent } from "./types";
-import { clearPersonalKeys, OWNER_KEY, personal, readOwner, restartApp } from "./wipe";
+import { clearPersonalKeys, OWNER_KEY, personal, readEnded, readOwner, restartApp } from "./wipe";
 
 vi.mock("./wipe", async (orig) => ({ ...(await orig<typeof import("./wipe")>()), restartApp: vi.fn() }));
 
@@ -45,6 +46,7 @@ async function withData() {
 }
 
 let online = true;
+let ended = false;
 beforeEach(async () => {
   await resetDb();
   localStorage.clear();
@@ -53,8 +55,10 @@ beforeEach(async () => {
   await useApp.getState().wipeLocal();
   vi.mocked(restartApp).mockClear();
   online = true;
+  ended = false;
   vi.stubGlobal("fetch", async (url: string, init: RequestInit) => {
     if (!online) throw new TypeError("Failed to fetch");
+    if (ended && url === "/api/sync/") return Response.json({ error: "Signed out.", signedOut: true }, { status: 401 });
     if (url === "/api/auth/logout/") return Response.json({ ok: true });
     if (url === "/api/auth/email/verify/")
       return Response.json({ token: "t2", account: { id: "someone-else", email: "sam@example.com", providers: ["email"] } });
@@ -114,6 +118,32 @@ describe("signing out wipes the device", () => {
     expect(unsynced({ ...emptySync(), seeded: false }, 7)).toBe(7);
     expect(unsynced({ ...emptySync(), seeded: true, out: ["a"], del: ["b"], rev: 2, sentRev: 1 }, 7)).toBe(3);
     expect(unsynced({ ...emptySync(), seeded: true, rev: 1, sentRev: 1 }, 7)).toBe(0);
+  });
+});
+
+describe("the server ending the session", () => {
+  it("wipes the device when everything had reached the account", async () => {
+    signIn();
+    await withData();
+    writeSync({ ...emptySync(), seeded: true, sentRev: 1 });
+    ended = true;
+    await syncNow();
+    expect(readAccount()).toBeNull();
+    expect(useApp.getState().events).toEqual([]);
+    expect((await load()).events).toEqual([]);
+    expect(restartApp).toHaveBeenCalledOnce();
+  });
+
+  it("keeps changes that never reached the account until the lifter signs in again, saves or erases them", async () => {
+    signIn();
+    await withData();
+    writeSync({ ...emptySync(), seeded: true, out: ["a"], sentRev: 1 });
+    ended = true;
+    await syncNow();
+    expect(readAccount()).toBeNull();
+    expect(useApp.getState().events).toHaveLength(2);
+    expect(readEnded()).toBe(1);
+    expect(restartApp).not.toHaveBeenCalled();
   });
 });
 

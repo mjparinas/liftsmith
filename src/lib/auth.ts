@@ -15,7 +15,7 @@ import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 import { forgetFriends } from "./socialCache";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
-import { readOwner, restartApp, writeOwner } from "./wipe";
+import { readOwner, restartApp, writeEnded, writeOwner } from "./wipe";
 
 export interface Account {
   token: string;
@@ -176,6 +176,8 @@ async function signedInAs(r: SessionReply, via: Method): Promise<Account> {
   } catch {}
   writeSync(emptySync());
   writeOwner(a.id);
+  // Changes left after the server ended the last session go up with this one (or were wiped above).
+  writeEnded(0);
   useAccount.setState({ account: a, error: null });
   if (someoneElse) restartApp();
   return a;

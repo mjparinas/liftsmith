@@ -41,6 +41,12 @@ export const en = {
   "account.signOutNote":
     "Signing out saves your changes to your account, then erases your data from this device, so the next person sees none of it. Sign in again to get it all back.",
   "account.signingOut": "Saving your changes…",
+  "account.ended": {
+    one: "You were signed out, and {count} change on this device never reached your account. Sign in again to save it, download a backup, or erase it from this device.",
+    other:
+      "You were signed out, and {count} changes on this device never reached your account. Sign in again to save them, download a backup, or erase them from this device.",
+  },
+  "account.ended.erase": "Erase my data from this device",
   "account.signOut.unsynced": {
     one: "{count} change hasn't reached your account yet, so signing out now would erase it. Try again once you're online, download a backup first, or sign out anyway.",
     other:
@@ -111,6 +117,12 @@ export const es: Partial<Record<Key, Message>> = {
   "account.signOutNote":
     "Al cerrar sesión, tus cambios se guardan en tu cuenta y luego se borran tus datos de este dispositivo, así la siguiente persona no ve nada tuyo. Vuelve a iniciar sesión para recuperarlo todo.",
   "account.signingOut": "Guardando tus cambios…",
+  "account.ended": {
+    one: "Se cerró tu sesión y {count} cambio de este dispositivo nunca llegó a tu cuenta. Vuelve a iniciar sesión para guardarlo, descarga una copia o bórralo de este dispositivo.",
+    other:
+      "Se cerró tu sesión y {count} cambios de este dispositivo nunca llegaron a tu cuenta. Vuelve a iniciar sesión para guardarlos, descarga una copia o bórralos de este dispositivo.",
+  },
+  "account.ended.erase": "Borrar mis datos de este dispositivo",
   "account.signOut.unsynced": {
     one: "{count} cambio aún no ha llegado a tu cuenta, así que cerrar sesión ahora lo borraría. Vuelve a intentarlo cuando tengas conexión, descarga antes una copia o cierra sesión de todos modos.",
     other:
@@ -184,6 +196,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "account.signOutNote":
     "Se déconnecter enregistre vos modifications sur votre compte, puis efface vos données de cet appareil : la personne suivante ne voit rien de vous. Reconnectez-vous pour tout retrouver.",
   "account.signingOut": "Enregistrement de vos modifications…",
+  "account.ended": {
+    one: "Vous avez été déconnecté, et {count} modification sur cet appareil n'est jamais arrivée sur votre compte. Reconnectez-vous pour l'enregistrer, téléchargez une sauvegarde ou effacez-la de cet appareil.",
+    other:
+      "Vous avez été déconnecté, et {count} modifications sur cet appareil ne sont jamais arrivées sur votre compte. Reconnectez-vous pour les enregistrer, téléchargez une sauvegarde ou effacez-les de cet appareil.",
+  },
+  "account.ended.erase": "Effacer mes données de cet appareil",
   "account.signOut.unsynced": {
     one: "{count} modification n'est pas encore arrivée sur votre compte : vous déconnecter maintenant l'effacerait. Réessayez une fois en ligne, téléchargez d'abord une sauvegarde, ou déconnectez-vous quand même.",
     other:
@@ -257,6 +275,12 @@ export const de: Partial<Record<Key, Message>> = {
   "account.signOutNote":
     "Beim Abmelden werden deine Änderungen in deinem Konto gespeichert und danach deine Daten von diesem Gerät gelöscht, damit die nächste Person nichts davon sieht. Melde dich wieder an, um alles zurückzubekommen.",
   "account.signingOut": "Änderungen werden gespeichert…",
+  "account.ended": {
+    one: "Du wurdest abgemeldet, und {count} Änderung auf diesem Gerät ist nie in deinem Konto angekommen. Melde dich wieder an, um sie zu speichern, lade eine Sicherung herunter oder lösche sie von diesem Gerät.",
+    other:
+      "Du wurdest abgemeldet, und {count} Änderungen auf diesem Gerät sind nie in deinem Konto angekommen. Melde dich wieder an, um sie zu speichern, lade eine Sicherung herunter oder lösche sie von diesem Gerät.",
+  },
+  "account.ended.erase": "Meine Daten von diesem Gerät löschen",
   "account.signOut.unsynced": {
     one: "{count} Änderung ist noch nicht in deinem Konto angekommen. Wenn du dich jetzt abmeldest, wird sie gelöscht. Versuch es wieder, sobald du online bist, lade vorher eine Sicherung herunter oder melde dich trotzdem ab.",
     other:
@@ -327,6 +351,12 @@ export const it: Partial<Record<Key, Message>> = {
   "account.signOutNote":
     "Uscendo, le tue modifiche vengono salvate nel tuo account e poi i tuoi dati vengono cancellati da questo dispositivo, così la persona successiva non vede nulla di tuo. Accedi di nuovo per ritrovare tutto.",
   "account.signingOut": "Salvataggio delle modifiche…",
+  "account.ended": {
+    one: "Sei stato disconnesso e {count} modifica su questo dispositivo non è mai arrivata al tuo account. Accedi di nuovo per salvarla, scarica un backup o cancellala da questo dispositivo.",
+    other:
+      "Sei stato disconnesso e {count} modifiche su questo dispositivo non sono mai arrivate al tuo account. Accedi di nuovo per salvarle, scarica un backup o cancellale da questo dispositivo.",
+  },
+  "account.ended.erase": "Cancella i miei dati da questo dispositivo",
   "account.signOut.unsynced": {
     one: "{count} modifica non è ancora arrivata al tuo account, quindi uscire ora la cancellerebbe. Riprova quando sei online, scarica prima un backup o esci comunque.",
     other:
@@ -397,6 +427,11 @@ export const ja: Partial<Record<Key, Message>> = {
   "account.signOutNote":
     "サインアウトすると、変更をアカウントに保存してから、この端末のデータを消去します。次に使う人にはあなたのデータは表示されません。もう一度サインインすればすべて戻ります。",
   "account.signingOut": "変更を保存しています…",
+  "account.ended": {
+    other:
+      "サインアウトされましたが、この端末の{count}件の変更はアカウントに届いていません。もう一度サインインして保存するか、バックアップをダウンロードするか、この端末から消去してください。",
+  },
+  "account.ended.erase": "この端末からデータを消去",
   "account.signOut.unsynced": {
     other:
       "{count}件の変更がまだアカウントに届いていないため、今サインアウトすると消えてしまいます。オンラインになってから再試行するか、先にバックアップをダウンロードするか、このままサインアウトしてください。",

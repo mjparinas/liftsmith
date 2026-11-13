@@ -32,6 +32,7 @@ import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
+import { readEnded, restartApp } from "@/lib/wipe";
 
 import { go, historyDepth } from "./router";
 import { ShareLinks } from "./ShareLinks";
@@ -323,11 +324,6 @@ function SignedIn() {
       setLeaving({ waiting: r.waiting, photos: 0 });
     }
   };
-  const backup = () => {
-    const { profile, gyms, events } = useApp.getState();
-    track("feature", { name: "backup", detail: "signOut" });
-    return saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events));
-  };
   const s = readSync();
   const waiting = s.out.length + s.del.length;
   const via = t(`account.via.${account.via}`);
@@ -421,13 +417,46 @@ function SignedIn() {
   );
 }
 
+/** Downloads a backup file of everything on this device (the same file as Settings › Saving and backup). */
+function backup() {
+  const { profile, gyms, events } = useApp.getState();
+  track("feature", { name: "backup", detail: "signOut" });
+  return saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events));
+}
+
+/** The server ended the session while changes here hadn't reached the account (sync.ts): sign in again, save, or erase. */
+function Ended({ waiting }: { waiting: number }) {
+  return (
+    <div className="space-y-2" role="status">
+      <p className="text-sm text-warn">{t("account.ended", { count: waiting })}</p>
+      <Button kind="ghost" className="w-full" onClick={() => void backup()}>
+        {t("account.signOut.backup")}
+      </Button>
+      <Button
+        kind="danger"
+        className="w-full"
+        onClick={() =>
+          void useApp
+            .getState()
+            .wipeLocal()
+            .then(() => restartApp())
+        }
+      >
+        {t("account.ended.erase")}
+      </Button>
+    </div>
+  );
+}
+
 /** Sign in, or the signed-in account and its sync status. */
 export function AccountPanel() {
   const account = useAccount((s) => s.account);
   const lost = useAccount((s) => s.error === "signedOut");
+  const ended = account ? 0 : readEnded();
   return (
     <div className="space-y-3">
-      {lost && !account && (
+      {ended > 0 && <Ended waiting={ended} />}
+      {lost && !account && !ended && (
         <p role="status" className="text-sm text-warn">
           {t("account.lost")}
         </p>
