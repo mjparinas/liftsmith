@@ -88,7 +88,7 @@ describe("joining", () => {
       showLifts: true,
       lifts: [],
       suggest: true,
-      live: false,
+      live: true,
       cheers: true,
       level: 0,
       streak: 0,

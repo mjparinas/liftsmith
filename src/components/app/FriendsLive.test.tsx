@@ -53,13 +53,16 @@ describe("training now", () => {
   it("shows a friend's workout in progress and sends a cheer in one tap, which floats up their workout screen", async () => {
     const u = userEvent.setup();
     const startedAt = Date.now() - 60_000;
-    await handle("acc-b", { op: "live", sessionId: "s1", exercise: "bench", done: 3, total: 12 });
+    await handle("acc-b", { op: "live", sessionId: "s1", exercise: "bench", done: 3, total: 12 }, Date.now() - 5 * 60_000);
     await signIn("tok-a");
     const { unmount } = render(<TrainingNow />);
     expect(await screen.findByText("Training now")).toBeInTheDocument();
     expect(screen.getByText(/3 of 12 sets done/)).toBeInTheDocument();
     await u.click(screen.getByRole("button", { name: "🔥 Cheer Blair on" }));
-    expect(await screen.findByRole("status")).toHaveTextContent("Cheer sent to Blair.");
+    expect(await screen.findByRole("status")).toHaveTextContent("🔥 sent to Blair. Cheer again in 5 s.");
+    // The sender sees how long Blair has been training, and the buttons wait out the gap between cheers.
+    expect(screen.getByText("Training for 5 min")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "💪 Cheer Blair on" })).toBeDisabled();
     unmount();
 
     await signIn("tok-b");

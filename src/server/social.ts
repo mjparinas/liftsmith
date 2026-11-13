@@ -12,6 +12,7 @@ import {
   AVATAR_IDS,
   BOARD_METRICS,
   CHALLENGE_DAYS,
+  CHEER_GAP,
   CHEERS,
   cleanHandle,
   CLUB_GOAL,
@@ -264,8 +265,8 @@ export async function join(accountId: string, b: Record<string, unknown>, now = 
   if (await byHandle(h.handle)) return fail(409, "handleTaken");
   try {
     await run(
-      `INSERT INTO social_profiles (account_id, handle, name, open, auto_post, weights, agreed_at, created_at, seen_at, suspended, avatar)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`,
+      `INSERT INTO social_profiles (account_id, handle, name, open, auto_post, weights, live, agreed_at, created_at, seen_at, suspended, avatar)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`,
       [
         accountId,
         h.handle,
@@ -273,6 +274,8 @@ export async function join(accountId: string, b: Record<string, unknown>, now = 
         b.open === true ? 1 : 0,
         b.autoPost === true ? 1 : 0,
         b.weights === false ? 0 : 1,
+        // Show friends when I'm training: on to start (Melvin, 2026-11-13), mutual friends only, off on the join screen or in Privacy.
+        b.live === false ? 0 : 1,
         now,
         now,
         now,
@@ -282,9 +285,13 @@ export async function join(accountId: string, b: Record<string, unknown>, now = 
   } catch {
     return fail(409, "handleTaken"); // two people racing for one handle: the UNIQUE index decides
   }
-  // Teen-safe (docs/decisions/school-teams.md): someone under 18 isn't suggested to strangers until they say so.
-  if (b.suggest !== true && (await isMinor(accountId, now)))
-    await run("UPDATE social_profiles SET suggest = 0 WHERE account_id = ?", [accountId]);
+  // Teen-safe (docs/decisions/school-teams.md): someone under 18 isn't suggested to strangers until they say so,
+  // and doesn't show friends when they're training unless they turned it on themselves.
+  if ((b.suggest !== true || b.live !== true) && (await isMinor(accountId, now)))
+    await run(
+      `UPDATE social_profiles SET suggest = CASE WHEN ? THEN suggest ELSE 0 END, live = CASE WHEN ? THEN live ELSE 0 END WHERE account_id = ?`,
+      [b.suggest === true ? 1 : 0, b.live === true ? 1 : 0, accountId],
+    );
   return me(accountId);
 }
 
@@ -1431,7 +1438,7 @@ export async function activity(accountId: string, now = Date.now()): Promise<Res
 /** A workout counts as live this long after its last update (a set logged, or the start). */
 export const LIVE_FOR = 20 * 60_000;
 /** One cheer per friend this often, so a tap-happy friend can't flood a workout. */
-export const CHEER_GAP = 5_000;
+export { CHEER_GAP };
 
 /** Both follow each other (accepted), with no block either way. */
 async function mutual(a: string, b: string): Promise<boolean> {

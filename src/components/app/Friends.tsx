@@ -78,6 +78,7 @@ import {
   type SocialProfile,
 } from "@/lib/socialTypes";
 import { useApp } from "@/lib/store";
+import { isTeen } from "@/lib/teen";
 import { MUSCLE_LABEL, MUSCLES, type Muscle, type Unit } from "@/lib/types";
 import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
@@ -664,6 +665,8 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
   const [open, setOpen] = useState(false);
   const [autoPost, setAutoPost] = useState(false);
   const [weights, setWeights] = useState(true);
+  // Show friends when I'm training starts on (Melvin, 2026-11-13), off for under 18s until they turn it on.
+  const [live, setLive] = useState(() => !isTeen(profile));
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const h = cleanHandle(handle);
@@ -673,7 +676,7 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
     if (!valid || busy) return;
     setBusy(true);
     try {
-      const me = await social<SocialMe>("join", { handle: h, name, open, autoPost, weights, agree: true });
+      const me = await social<SocialMe>("join", { handle: h, name, open, autoPost, weights, live, agree: true });
       useSocial.setState({ me, error: null });
       void startPush(true);
       haptic("celebrate");
@@ -726,10 +729,12 @@ function Join({ onJoined }: { onJoined?: () => void } = {}) {
         open={open}
         autoPost={autoPost}
         weights={weights}
+        live={live}
         set={(p) => {
           if (p.open !== undefined) setOpen(p.open);
           if (p.autoPost !== undefined) setAutoPost(p.autoPost);
           if (p.weights !== undefined) setWeights(p.weights);
+          if (p.live !== undefined) setLive(p.live);
         }}
       />
       <Section title={t("friends.rules.title")}>
@@ -751,6 +756,7 @@ function Privacy({
   open,
   autoPost,
   weights,
+  live,
   pub,
   joined,
   set,
@@ -758,6 +764,8 @@ function Privacy({
   open: boolean;
   autoPost: boolean;
   weights: boolean;
+  /** Show friends when I'm training, while joining (once joined it's `joined.live`). */
+  live?: boolean;
   /** Public profile, offered once joined (undefined while joining, which always starts private). */
   pub?: boolean;
   /** Once joined: who sees new posts and the best lifts switch. */
@@ -782,6 +790,9 @@ function Privacy({
       />
       <SwitchRow label={t("friends.autoPost")} hint={t("friends.autoPostHint")} on={autoPost} onChange={(v) => set({ autoPost: v })} />
       <SwitchRow label={t("friends.weights")} hint={t("friends.weightsHint")} on={weights} onChange={(v) => set({ weights: v })} />
+      {!joined && live !== undefined && (
+        <SwitchRow label={t("social.live.share")} hint={t("social.live.shareHint")} on={live} onChange={(v) => set({ live: v })} />
+      )}
       {joined && (
         <>
           <SwitchRow

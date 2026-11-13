@@ -28,7 +28,7 @@ Melvin, 2026-11-13: "can we make the app free for anybody in high school or belo
 
 - **Under 13 can't set up the app:** setup's age box says Liftsmith is for 13 and older and Continue stays off (`tooYoung`). Age stays optional, as before.
 - **Under 18 by the profile's age, body composition is off until they turn it on** (Body › Health › Body fat and body shape, `profile.bodyComp`): the body fat box under weigh-ins, the body fat pin on the figure, Shape the figure like me and the per-coach Share body data switch are hidden. Weigh-ins and training work the same.
-- **Friends:** someone under 18 (by a team's age or their synced profile's birth year, `isMinor`) can't make their profile public, and starts out of suggestions to strangers (they can opt in). Profiles were already private by default.
+- **Friends:** someone under 18 (by a team's age or their synced profile's birth year, `isMinor`) can't make their profile public, starts out of suggestions to strangers (they can opt in), and starts with Show friends when I'm training off (they can turn it on, on the Join screen or in Privacy). Profiles were already private by default.
 
 ## Platforms
 
