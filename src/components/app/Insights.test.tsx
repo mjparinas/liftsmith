@@ -48,10 +48,10 @@ describe("why and coach's notes", () => {
     const whys = screen.getAllByTestId("item-why");
     expect(whys).toHaveLength(plan.items.length);
     for (const w of whys) expect(w.textContent).toMatch(/% recovered, \d+ of \d+ sets this week/);
-    // A first workout's "find your level" note is the same on every row, so it's said once above the list.
-    const shared = screen.getByTestId("plan-shared-why").textContent!;
-    expect(shared.length).toBeGreaterThan(0);
-    for (const w of whys) expect(w.textContent).not.toContain(shared.slice(1));
+    // A note every row shares is said once above the list (sharedLoadNote, whyShared.test.ts); otherwise rows keep their own.
+    const shared = screen.queryByTestId("plan-shared-why")?.textContent;
+    if (shared) for (const w of whys) expect(w.textContent).not.toContain(shared.slice(1));
+    else expect(new Set(whys.map((w) => w.textContent!.split(" · ").at(-1))).size).toBeGreaterThan(1);
   });
 
   it("offers a deload after three workouts of missed reps, and one tap makes this the deload week", async () => {
