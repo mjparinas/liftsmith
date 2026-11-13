@@ -443,6 +443,23 @@ describe("first run to finished workout", () => {
     expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
   });
 
+  it("discarding a workout with sets logged takes a second tap", async () => {
+    const user = userEvent.setup();
+    await onboard(user);
+    await user.click(screen.getByRole("button", { name: "Start workout" }));
+    const skip = screen.queryByRole("button", { name: "Skip warm-up" });
+    if (skip) await user.click(skip);
+    await user.click(screen.getByRole("button", { name: /Log set/ }));
+    await user.click(screen.getByRole("button", { name: "End" }));
+    await user.click(screen.getByRole("button", { name: "Discard workout" }));
+    // One tap only asks: the workout and its set are still there.
+    expect(useApp.getState().active).not.toBeNull();
+    expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "Tap again to delete 1 set" }));
+    expect(useApp.getState().active).toBeNull();
+    expect(useApp.getState().events.filter((e) => e.type === "set")).toHaveLength(0);
+  });
+
   it("setup asks for a name, Today greets with it, and the daily quote can be turned off", async () => {
     const user = userEvent.setup();
     render(<App />);

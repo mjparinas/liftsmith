@@ -102,6 +102,8 @@ export function Workout() {
   const [swapOpen, setSwapOpen] = useState(false);
   const [infoOpen, setInfoOpen] = useState(false);
   const [endOpen, setEndOpen] = useState(false);
+  // Discarding deletes every set logged so far and can't be undone, so with sets logged it takes a second tap.
+  const [discardSure, setDiscardSure] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [planOpen, setPlanOpen] = useState(false);
   const [lastBpm, setBpm] = useState<number | null>(null);
@@ -994,7 +996,14 @@ export function Workout() {
       </Sheet>
       <WhySheet open={whyOpen} onClose={() => setWhyOpen(false)} item={item} gym={gym} />
       <ReplanSheet open={planOpen} onClose={() => setPlanOpen(false)} gym={gym} doneOnCurrent={doneSets} />
-      <Sheet open={endOpen} onClose={() => setEndOpen(false)} title={t("wk.endTitle")}>
+      <Sheet
+        open={endOpen}
+        onClose={() => {
+          setEndOpen(false);
+          setDiscardSure(false);
+        }}
+        title={t("wk.endTitle")}
+      >
         <div className="space-y-3">
           <Button icon="check" className="w-full" onClick={end}>
             {t("wk.finishSave")}
@@ -1003,6 +1012,11 @@ export function Workout() {
             kind="danger"
             className="w-full"
             onClick={() => {
+              if (setsLogged > 0 && !discardSure) {
+                haptic("warning");
+                setDiscardSure(true);
+                return;
+              }
               haptic("warning");
               sound.back();
               s.discard();
@@ -1010,9 +1024,16 @@ export function Workout() {
               go("today");
             }}
           >
-            {t("wk.discard")}
+            {discardSure ? t("wk.discardSure", { count: setsLogged }) : t("wk.discard")}
           </Button>
-          <Button kind="quiet" className="w-full" onClick={() => setEndOpen(false)}>
+          <Button
+            kind="quiet"
+            className="w-full"
+            onClick={() => {
+              setEndOpen(false);
+              setDiscardSure(false);
+            }}
+          >
             {t("wk.keepGoing")}
           </Button>
         </div>
