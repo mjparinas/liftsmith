@@ -78,6 +78,7 @@ export const en = {
   "gp.clubTitle": "Gym club",
   "gp.clubBody": "Members get a weekly leaderboard and a crew goal. Joining shares your weekly totals from workouts you post to Friends.",
   "gp.clubJoin": "Join the club",
+  "gp.cityMapAlt": "Map of the gyms in {city}, numbered as in the list",
   "gp.mapAlt": "Map showing where {name} is",
   "gp.mapCredit": "Map © Mapbox © OpenStreetMap",
   "gp.photos": "Photos",
@@ -165,6 +166,7 @@ export const es: Partial<Record<Key, Message>> = {
   "gp.clubBody":
     "Los miembros tienen una clasificación semanal y un objetivo de grupo. Al unirte compartes tus totales semanales de los entrenamientos que publicas en Amigos.",
   "gp.clubJoin": "Unirme al club",
+  "gp.cityMapAlt": "Mapa de los gimnasios de {city}, numerados como en la lista",
   "gp.mapAlt": "Mapa con la ubicación de {name}",
   "gp.mapCredit": "Mapa © Mapbox © OpenStreetMap",
   "gp.photos": "Fotos",
@@ -251,6 +253,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "gp.clubBody":
     "Les membres ont un classement hebdomadaire et un objectif d’équipe. En rejoignant, vous partagez vos totaux de la semaine des séances publiées dans Amis.",
   "gp.clubJoin": "Rejoindre le club",
+  "gp.cityMapAlt": "Carte des salles de {city}, numérotées comme dans la liste",
   "gp.mapAlt": "Carte indiquant où se trouve {name}",
   "gp.mapCredit": "Carte © Mapbox © OpenStreetMap",
   "gp.photos": "Photos",
@@ -338,6 +341,7 @@ export const de: Partial<Record<Key, Message>> = {
   "gp.clubBody":
     "Mitglieder bekommen eine wöchentliche Rangliste und ein gemeinsames Ziel. Wenn du beitrittst, teilst du deine Wochensummen aus Workouts, die du in Freunde postest.",
   "gp.clubJoin": "Club beitreten",
+  "gp.cityMapAlt": "Karte der Studios in {city}, nummeriert wie in der Liste",
   "gp.mapAlt": "Karte, die zeigt, wo {name} ist",
   "gp.mapCredit": "Karte © Mapbox © OpenStreetMap",
   "gp.photos": "Fotos",
@@ -423,6 +427,7 @@ export const it: Partial<Record<Key, Message>> = {
   "gp.clubBody":
     "I membri hanno una classifica settimanale e un obiettivo di gruppo. Unendoti condividi i tuoi totali settimanali degli allenamenti che pubblichi in Amici.",
   "gp.clubJoin": "Unisciti al club",
+  "gp.cityMapAlt": "Mappa delle palestre di {city}, numerate come nella lista",
   "gp.mapAlt": "Mappa con la posizione di {name}",
   "gp.mapCredit": "Mappa © Mapbox © OpenStreetMap",
   "gp.photos": "Foto",
@@ -504,6 +509,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gp.clubTitle": "ジムのクラブ",
   "gp.clubBody": "メンバーには週間ランキングとチーム目標があります。参加すると、フレンドに投稿したワークアウトの週間合計が共有されます。",
   "gp.clubJoin": "クラブに参加",
+  "gp.cityMapAlt": "{city}のジムの地図(番号はリストと同じ)",
   "gp.mapAlt": "{name}の場所を示す地図",
   "gp.mapCredit": "地図 © Mapbox © OpenStreetMap",
   "gp.photos": "写真",

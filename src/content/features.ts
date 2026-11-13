@@ -456,7 +456,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard.",
+        body: "Find gyms near you on a map with the list beneath it, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard.",
         tier: "free",
         added: "2026-11-12",
       },

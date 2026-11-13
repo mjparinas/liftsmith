@@ -1,8 +1,23 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AREA_PINS as APP_PINS } from "@/lib/gymDirectory";
+
 import { query, resetDb, run } from "./db";
 import { ownedGyms } from "./gymClaims";
-import { addMedia, mapboxUrl, mapImage, mapPath, MEDIA_LIMITS, mediaImage, mediaOf, removeMedia } from "./gymMedia";
+import {
+  addMedia,
+  AREA_PINS,
+  areaMapboxUrl,
+  areaMapImage,
+  areaMapPath,
+  mapboxUrl,
+  mapImage,
+  mapPath,
+  MEDIA_LIMITS,
+  mediaImage,
+  mediaOf,
+  removeMedia,
+} from "./gymMedia";
 import { actOnPlace, placeById, placesFromOsm, savePlaces } from "./gymPlaces";
 
 // A gym's map picture, logo and photos (docs/decisions/gyms.md).
@@ -95,5 +110,49 @@ describe("the map", () => {
     expect(new Uint8Array(img!.bytes)).toEqual(new Uint8Array([1, 2, 3]));
     expect(seen[0]).toContain("49.10000");
     expect(await mapImage(gym, () => Promise.resolve(new Response("no", { status: 401 })))).toBeNull();
+  });
+});
+
+describe("a map of many gyms", () => {
+  const other = "0123456789abcdef";
+
+  it("is off until the token is set, and needs a real gym id", () => {
+    vi.stubEnv("MAPBOX_TOKEN", "");
+    expect(areaMapPath([gym])).toBe("");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    expect(areaMapPath(["nope"])).toBe("");
+    expect(areaMapPath([gym, other], { lat: 49.104, lon: -122.6 })).toBe(`/api/gyms/map/?ids=${gym}.${other}&at=49.10,-122.60`);
+  });
+
+  it("numbers the pins in list order, marks the searcher's spot, and never hands out the token", async () => {
+    expect(AREA_PINS).toBe(APP_PINS);
+    expect(
+      areaMapboxUrl(
+        [
+          { lat: 49.1, lon: -122.6 },
+          { lat: 49.2, lon: -122.7 },
+        ],
+        { lat: 49.15, lon: -122.65 },
+        "pk.test",
+      ),
+    ).toBe(
+      "https://api.mapbox.com/styles/v1/mapbox/dark-v11/static/pin-s-1+4c8dff(-122.60000,49.10000),pin-s-2+4c8dff(-122.70000,49.20000),pin-s+38d6e8(-122.65000,49.15000)/auto/640x360@2x?padding=40&attribution=false&access_token=pk.test",
+    );
+    // One spot alone gets a street view rather than zooming all the way in.
+    expect(areaMapboxUrl([{ lat: 49.1, lon: -122.6 }], null, "t")).toContain("/-122.60000,49.10000,14,0/");
+    vi.stubEnv("MAPBOX_TOKEN", "pk.test");
+    const seen: string[] = [];
+    const fetcher = (url: string | URL | Request) => {
+      seen.push(String(url));
+      return Promise.resolve(new Response(new Uint8Array([4]), { headers: { "content-type": "image/png" } }));
+    };
+    // An unknown id is skipped, a junk spot is dropped, and junk ids draw nothing.
+    expect(await areaMapImage(`${other}.${gym}`, "49.1,-122.6", fetcher as typeof fetch)).not.toBeNull();
+    expect(seen[0]).toContain("pin-s-1+4c8dff(-122.60000,49.10000),pin-s+38d6e8(-122.60000,49.10000)");
+    expect(await areaMapImage(gym, "<script>", fetcher as typeof fetch)).not.toBeNull();
+    expect(seen[1]).not.toContain("38d6e8");
+    expect(await areaMapImage("x.y", null, fetcher as typeof fetch)).toBeNull();
+    expect(await areaMapImage(other, null, fetcher as typeof fetch)).toBeNull();
+    expect(seen).toHaveLength(2);
   });
 });
