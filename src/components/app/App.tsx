@@ -519,7 +519,7 @@ function TabBar({ route }: { route: Route }) {
   return (
     <nav
       ref={ref}
-      className="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
+      className="tab-bar safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line/70 bg-bg/92 backdrop-blur-xl"
       aria-label={t("nav.main")}
     >
       <ul className={`mx-auto grid max-w-lg px-1 pt-1.5 ${tabs.length === 5 ? "grid-cols-5" : "grid-cols-4"}`}>

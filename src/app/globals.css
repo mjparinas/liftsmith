@@ -589,6 +589,11 @@ div[lang="de"] { hyphens: auto; overflow-wrap: anywhere; }
 .sync-spinner::after { content: ""; position: absolute; inset: 0; border-radius: 999px; background: conic-gradient(from 0deg, transparent 0turn 0.3turn, var(--grad-a) 0.65turn, var(--spin-ring) 1turn); -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 1.75px), #000 calc(100% - 1.5px)); mask: radial-gradient(farthest-side, transparent calc(100% - 1.75px), #000 calc(100% - 1.5px)); animation: sync-spin 0.9s linear infinite; }
 @keyframes sync-spin { to { transform: rotate(1turn); } }
 @media (prefers-reduced-motion: reduce) { .sync-spinner::after { animation-duration: 2.4s; } }
+/* A screen that fills the visible part of the phone with its own scrolling box and a send box at the bottom (coach
+   messages): it follows the visual viewport, so the on-screen keyboard pushes the send box up on Android, iOS and the
+   web (src/lib/keyboard.ts), and the tab bar steps aside while the keyboard is up. */
+.vv-pane { position: fixed; z-index: 10; inset-inline: 0; top: var(--vv-top, 0px); height: var(--vv-h, 100dvh); margin-inline: auto; display: flex; flex-direction: column; padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: calc(var(--nav-h, calc(4.5rem + max(12px, env(safe-area-inset-bottom)))) + 0.5rem); }
+html[data-keyboard] .tab-bar { display: none; }
 .status-scrim { position: fixed; inset: 0 0 auto 0; z-index: 45; height: env(safe-area-inset-top); background: color-mix(in srgb, var(--color-bg) 92%, transparent); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); pointer-events: none; }
 
 input[type="range"].slider { -webkit-appearance: none; appearance: none; height: 8px; border-radius: 999px; background: linear-gradient(90deg, var(--grad-a), var(--grad-c)) 0 / var(--fill, 50%) 100% no-repeat, var(--color-line); }
