@@ -474,7 +474,6 @@ export const fr: FeaturesText = {
     withings: { does: "Pesées, masse grasse, sommeil et pas en entrée" },
     polar: { does: "Nightly Recharge, VFC et sommeil en entrée" },
     concept2: { does: "Sessions RowErg, SkiErg et BikeErg importées comme séances de cardio" },
-    music: { does: "Lance une musique assortie à la décision du jour" },
     sonos: { does: "Lecture, pause, morceau suivant et volume depuis la séance ; la musique suit les séries et le repos" },
     calendar: {
       name: "Calendrier du téléphone (Google, iCloud, Outlook)",

@@ -6,7 +6,6 @@
 //   the OAuth tokens, so they need a Liftsmith account. Strava gets each finished workout (an outbox here, so a
 //   workout finished offline goes up later); Oura, Whoop, Withings and Polar readings come in as health events
 //   and weigh-ins, like Health's; Concept2 sessions come in as cardio workouts.
-// - Music: a curated playlist for the day's call, opened in the lifter's music app. No account, no API.
 import { create } from "zustand";
 
 import { api, AuthError, platform, readAccount } from "./auth";
@@ -15,9 +14,8 @@ import { can } from "./entitlements";
 import { exerciseName } from "./game";
 import { t } from "./i18n";
 import { isNative } from "./juice";
-import type { Call } from "./readiness";
 import { useApp } from "./store";
-import type { AppEvent, MusicApp, Unit } from "./types";
+import type { AppEvent, Unit } from "./types";
 import { fmtNum, fromKg } from "./units";
 
 export { CLOUD_NAME } from "./cloud";
@@ -26,7 +24,7 @@ export { CLOUD_NAME } from "./cloud";
 
 /**
  * Opens a page outside the app. In the Android and iOS apps a top-level navigation to another site is handed
- * to the phone (Capacitor opens the browser, or the music app for its links); on the web it's a new tab, or
+ * to the phone (Capacitor opens the browser, or the app that handles the link); on the web it's a new tab, or
  * this tab for a sign-in page that comes back here.
  */
 export function openOutside(url: string, sameTab = false): void {
@@ -259,28 +257,4 @@ export function startConnections(): () => void {
     document.removeEventListener("visibilitychange", visible);
     window.removeEventListener("online", visible);
   };
-}
-
-// --- Music: a curated playlist for the day's call ---
-
-export const MUSIC_APPS: readonly MusicApp[] = ["spotify", "apple", "youtube"];
-export const MUSIC_NAME: Record<MusicApp, string> = { spotify: "Spotify", apple: "Apple Music", youtube: "YouTube Music" };
-
-/**
- * Public playlists we picked (Melvin, 2026-11-09: curated public playlists for now, no Spotify API). Spotify's
- * are fixed editorial playlists, checked by hand; Apple Music and YouTube Music open their search for the same
- * kind of playlist, because their playlist links change by country.
- */
-export const PLAYLISTS: Record<Call, { spotify: string; search: string }> = {
-  push: { spotify: "37i9dQZF1DX76Wlfdnj7AP", search: "beast mode workout" },
-  normal: { spotify: "37i9dQZF1DWUVpAXiEPK8P", search: "power workout" },
-  recover: { spotify: "37i9dQZF1DX3rxVfibe1L0", search: "feel good workout" },
-};
-
-export function musicLink(app: MusicApp, call: Call): string {
-  const p = PLAYLISTS[call];
-  const q = encodeURIComponent(p.search);
-  if (app === "spotify") return `https://open.spotify.com/playlist/${p.spotify}`;
-  if (app === "apple") return `https://music.apple.com/search?term=${q}`;
-  return `https://music.youtube.com/search?q=${q}`;
 }

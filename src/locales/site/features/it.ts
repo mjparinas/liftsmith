@@ -467,7 +467,6 @@ export const it: FeaturesText = {
     withings: { does: "In entrata peso, massa grassa, sonno e passi" },
     polar: { does: "In entrata Nightly Recharge, HRV e sonno" },
     concept2: { does: "Sessioni RowErg, SkiErg e BikeErg in entrata come allenamenti cardio" },
-    music: { does: "Apre musica adatta alla scelta di oggi" },
     sonos: { does: "Riproduci, pausa, salta e volume dall’allenamento; la musica segue serie e riposo" },
     calendar: {
       name: "Calendario del telefono (Google, iCloud, Outlook)",

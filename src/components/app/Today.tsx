@@ -6,7 +6,6 @@ import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
-import { musicLink, openOutside } from "@/lib/connections";
 import type { SessionSummary } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
@@ -72,7 +71,7 @@ export function Flame({ weeks, freezes = 0 }: { weeks: number; freezes?: number 
 /**
  * The pre-workout check-in (Melvin, 2026-11-10): how the lifter feels today, in one tap. Low, sore and
  * unwell take today easier (unwell makes it an easy day outright), great nudges it up; the call above, the
- * plan and the playlist follow at once. Optional, and changeable all day.
+ * plan follow at once. Optional, and changeable all day.
  */
 function FeelCheckIn({ now, hurts }: { now: number; hurts: boolean }) {
   const { events, feel } = useApp();
@@ -293,16 +292,6 @@ export function Today() {
             <Icon name="target" size={15} className="text-ember" />
             {streak.weeks > 0 ? t("today.goalMore", { count: streak.needed }) : t("today.streakStart", { count: streak.needed })}
           </span>
-        )}
-        {preview && !active && profile.connections?.music && (
-          <button
-            type="button"
-            onClick={() => openOutside(musicLink(profile.connections!.music!, preview.call))}
-            className="press inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5"
-          >
-            <Icon name="play" size={15} className="text-cyan" />
-            {t("conn.music.play", { mood: t(`conn.music.${preview.call}`) })}
-          </button>
         )}
         {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
             being trained around stays up here, where it reads as today's status. */}

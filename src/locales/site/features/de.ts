@@ -472,7 +472,6 @@ export const de: FeaturesText = {
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },
     concept2: { does: "RowErg-, SkiErg- und BikeErg-Einheiten als Cardio-Trainings rein" },
-    music: { does: "Öffnet Musik passend zur heutigen Ansage" },
     sonos: { does: "Abspielen, Pause, Überspringen und Lautstärke aus dem Training; die Musik folgt Sätzen und Pausen" },
     calendar: {
       name: "Handykalender (Google, iCloud, Outlook)",

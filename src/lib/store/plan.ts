@@ -34,7 +34,7 @@ export interface PlanSlice {
   setTryAdaptive(on: boolean): void;
   /**
    * The pre-workout check-in on Today: merges the change into today's answer, saves it as a new "feel"
-   * event (the newest one today counts) and rebuilds the plan, so the call and the playlist follow.
+   * event (the newest one today counts) and rebuilds the plan, so the call follows.
    */
   feel(change: Partial<Pick<FeelEvent, "energy" | "sore" | "unwell">>): void;
   /** The gym last picked automatically by location, for the hint on Today. */
