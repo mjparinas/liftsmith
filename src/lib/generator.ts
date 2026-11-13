@@ -3,7 +3,7 @@ import { available, englishName, EXERCISE_BY_ID, EXERCISES, LADDER_ONLY } from "
 import { t } from "./i18n";
 import { activeInjuries, effectFor, lighten, skippedIds, type Injury } from "./injury";
 import { stepLoad } from "./loads";
-import { draw, pickWeights, type SwapCache } from "./pickWeights";
+import { BASE_FRESH, draw, pickWeights, type SwapCache } from "./pickWeights";
 import { target, TIMED, type Target } from "./progression";
 import { dayKey, hash, rng } from "./random";
 import type { Call } from "./readiness";
@@ -222,7 +222,10 @@ export function generate({
     const prev = (recent.get(m) ?? []).map((id) => cands.find((c) => c.id === id)).find(Boolean);
     // A favourite that fits beats keeping last time's exercise, unless last time's was a favourite too.
     const favHere = cands.some((c) => favs.has(c.id));
-    if (prev && (!favHere || favs.has(prev.id)) && random() < KEEP[profile.variability]) return prev;
+    // Last time's pick is kept only when it's at least a common lift for this lifter, so one unusual pick
+    // doesn't stick (usability audit, 2026-11-13), and less often after it was swapped away.
+    const keep = KEEP[profile.variability] * Math.min(1, prev ? prefs.taste(prev.id).factor : 0);
+    if (prev && (!favHere || favs.has(prev.id)) && random() < keep && prefs.weight(prev.id) >= BASE_FRESH.common) return prev;
     // A draw in proportion to each exercise's weight: big compounds first in round one, free weights over
     // bodyweight in a full gym, then the lifter's own pick weight (popular lifts, likes up, swaps down).
     const weighted = cands.map((c) => ({

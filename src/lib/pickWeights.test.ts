@@ -7,12 +7,15 @@ import { EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { generate } from "./generator";
 import {
   BASE,
+  BASE_FRESH,
   buildWeights,
   CACHE_KEY,
   COMMON,
   draw,
   fade,
   FLOOR,
+  FRESH_DAYS,
+  isFresh,
   LIKE,
   pickWeights,
   popularity,
@@ -86,6 +89,32 @@ describe("popularity", () => {
   it("leaves most exercises niche, so the library can grow without crowding the staples", () => {
     expect(STAPLE.size).toBeGreaterThan(50);
     expect(STAPLE.size + COMMON.size).toBeLessThan(EXERCISES.length / 2);
+  });
+});
+
+describe("a lifter's first weeks", () => {
+  it("counts as fresh when new to lifting, with nothing logged, or with the first set under four weeks old", () => {
+    const set = (age: number) => makeSet({ at: NOW - age });
+    expect(isFresh([], "intermediate", NOW)).toBe(true);
+    expect(isFresh([set(400 * DAY)], "new", NOW)).toBe(true);
+    expect(isFresh([swap("dip", "push-up", NOW - 90 * DAY), set(FRESH_DAYS * DAY - 1)], "advanced", NOW)).toBe(true);
+    expect(isFresh([set(FRESH_DAYS * DAY), set(DAY)], "intermediate", NOW)).toBe(false);
+    expect(isFresh([set(FRESH_DAYS * DAY)], undefined, NOW)).toBe(false);
+  });
+
+  it("starts common and niche moves much lower, but a like still counts as a staple", () => {
+    expect(BASE_FRESH.staple).toBe(BASE.staple);
+    expect(BASE_FRESH.common).toBeLessThan(BASE.common);
+    expect(BASE_FRESH.niche).toBeLessThan(BASE.niche);
+    const w = buildWeights([], { favourites: ["kb-windmill"] }, NOW, true);
+    expect(w.weight("bench-press")).toBe(BASE_FRESH.staple);
+    expect(w.weight("db-fly")).toBe(BASE_FRESH.common);
+    expect(w.weight("zercher-squat")).toBe(BASE_FRESH.niche);
+    expect(w.weight("kb-windmill")).toBe(BASE_FRESH.staple * LIKE);
+    const seasoned = (e: string) =>
+      pickWeights([makeSet({ at: NOW - 60 * DAY })], { training: undefined, experience: e as "new" }, NOW, new SwapCache(undefined));
+    expect(seasoned("intermediate").weight("db-fly")).toBe(BASE.common);
+    expect(seasoned("new").weight("db-fly")).toBe(BASE_FRESH.common);
   });
 });
 
@@ -385,11 +414,19 @@ describe("draw", () => {
 
 describe("the adaptive plan", () => {
   const days = 40;
-  const plans = (gymPreset: Parameters<typeof makeTestGym>[0], training?: TrainingPrefs, events: AppEvent[] = []) => {
-    const gym = makeTestGym(gymPreset);
+  // A lifter who has logged for a few months (an old set), unless `fresh`.
+  const old = makeSet({ at: NOW - 120 * DAY });
+  const plans = (
+    gymPreset: Parameters<typeof makeTestGym>[0],
+    training?: TrainingPrefs,
+    events: AppEvent[] = [],
+    over: { fresh?: boolean; gymId?: string } = {},
+  ) => {
+    const gym = makeTestGym(gymPreset, "kg", over.gymId ? { id: over.gymId } : {});
     const profile = makeProfile({ activeGymId: gym.id, training });
+    const log = over.fresh ? events : [old, ...events];
     return Array.from({ length: days }, (_, d) =>
-      generate({ gym, profile, events, minutes: 60, now: NOW + d * DAY, cache: new SwapCache(undefined) }),
+      generate({ gym, profile, events: log, minutes: 60, now: NOW + d * DAY, cache: new SwapCache(undefined) }),
     );
   };
   const share = (ps: ReturnType<typeof plans>, tier: string) => {
@@ -402,6 +439,14 @@ describe("the adaptive plan", () => {
     const ps = plans("commercial");
     expect(share(ps, "staple")).toBeGreaterThan(0.5);
     expect(share(ps, "niche")).toBeLessThan(0.12);
+  });
+
+  it("gives a lifter in their first weeks the familiar lifts, whatever the gym's seed", () => {
+    for (const gymId of ["g1", "fresh-gym-a", "fresh-gym-b"]) {
+      const ps = plans("commercial", undefined, [], { fresh: true, gymId });
+      expect(share(ps, "staple"), gymId).toBeGreaterThan(0.8);
+      expect(share(ps, "niche"), gymId).toBeLessThan(0.05);
+    }
   });
 
   it("picks a liked exercise far more often", () => {

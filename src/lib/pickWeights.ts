@@ -89,8 +89,11 @@ export const STAPLE: ReadonlySet<string> = new Set([
   "hip-thrust",
   "standing-calf-raise",
   "seated-calf-raise",
+  "farmers-carry",
   // Core
   "plank",
+  "side-plank",
+  "back-extension",
   "crunch",
   "hanging-leg-raise",
   "hanging-knee-raise",
@@ -171,7 +174,6 @@ export const COMMON: ReadonlySet<string> = new Set([
   "machine-high-row",
   "db-chest-supported-row",
   "db-pullover",
-  "back-extension",
   "weighted-back-extension",
   "trap-bar-shrug",
   "cable-shrug",
@@ -209,7 +211,6 @@ export const COMMON: ReadonlySet<string> = new Set([
   "db-wrist-curl",
   "barbell-wrist-curl",
   "reverse-wrist-curl",
-  "farmers-carry",
   // Legs
   "box-squat",
   "smith-squat",
@@ -258,7 +259,6 @@ export const COMMON: ReadonlySet<string> = new Set([
   "goblet-box-squat",
   "single-leg-extension",
   // Core
-  "side-plank",
   "ab-wheel",
   "dead-bug",
   "pallof-press",
@@ -285,6 +285,13 @@ export const COMMON: ReadonlySet<string> = new Set([
 /** The starting weight for each popularity tier. Tuned so a typical gym's plans are mostly staples (pickWeights.test.ts). */
 export const BASE: Record<Popularity, number> = { staple: 1, common: 0.2, niche: 0.012 };
 
+/**
+ * For a lifter who is new to lifting or in their first FRESH_DAYS of logging: the familiar lifts almost every time
+ * (usability audit, 2026-11-13: a new lifter's first workouts got Zercher squats and landmine presses).
+ */
+export const BASE_FRESH: Record<Popularity, number> = { staple: 1, common: 0.06, niche: 0.002 };
+export const FRESH_DAYS = 28;
+
 /** A liked exercise starts as a staple, however unusual, and is picked this many times as often as one. */
 export const LIKE = 40;
 /** Each recent swap away multiplies the weight by this. */
@@ -299,8 +306,15 @@ export const SWAP_FORGET = 365 * 86400_000;
 export const FLOOR = 0.05;
 
 /** Where an exercise's weight starts before swaps: its popularity, or a staple's when it's liked. */
-function start(id: string, liked: ReadonlySet<string>): number {
-  return liked.has(id) ? BASE.staple : BASE[popularity(id)];
+function start(id: string, liked: ReadonlySet<string>, base: Record<Popularity, number>): number {
+  return liked.has(id) ? base.staple : base[popularity(id)];
+}
+
+/** New to lifting, or no set logged more than FRESH_DAYS ago (events are in time order). */
+export function isFresh(events: readonly AppEvent[], experience: Profile["experience"] | undefined, now: number): boolean {
+  if (experience === "new") return true;
+  for (const e of events) if (e.type === "set") return now - e.at < FRESH_DAYS * 86400_000;
+  return true;
 }
 
 export function popularity(id: string): Popularity {
@@ -341,7 +355,8 @@ export interface PickWeights {
 }
 
 /** Builds the weights from the taste swaps, likes and resets. Pure: the same inputs always give the same weights. */
-export function buildWeights(swaps: readonly TasteSwap[], training: Profile["training"], now: number): PickWeights {
+export function buildWeights(swaps: readonly TasteSwap[], training: Profile["training"], now: number, fresh = false): PickWeights {
+  const base = fresh ? BASE_FRESH : BASE;
   const liked = new Set(training?.favourites ?? []);
   const resets = training?.pickResets ?? {};
   const away = new Map<string, number>();
@@ -360,7 +375,7 @@ export function buildWeights(swaps: readonly TasteSwap[], training: Profile["tra
     return { liked: liked.has(id), away: a, into: i, factor };
   };
   return {
-    weight: (id) => start(id, liked) * taste(id).factor,
+    weight: (id) => start(id, liked, base) * taste(id).factor,
     taste,
     lowered: () =>
       [...away.keys()]
@@ -458,8 +473,13 @@ export class SwapCache {
 const shared = new SwapCache();
 
 /** This lifter's pick weights now, reading the swaps through the device cache. */
-export function pickWeights(events: readonly AppEvent[], profile: Pick<Profile, "training">, now: number, cache?: SwapCache): PickWeights {
-  return buildWeights((cache ?? shared).swaps(events), profile.training, now);
+export function pickWeights(
+  events: readonly AppEvent[],
+  profile: Pick<Profile, "training"> & Partial<Pick<Profile, "experience">>,
+  now: number,
+  cache?: SwapCache,
+): PickWeights {
+  return buildWeights((cache ?? shared).swaps(events), profile.training, now, isFresh(events, profile.experience, now));
 }
 
 /**
