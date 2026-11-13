@@ -81,8 +81,11 @@ describe("Settings › Workout preferences", () => {
     expect(training()?.autoRest).toBe(false);
     await user.click(screen.getByRole("switch", { name: "Keep the screen on during a workout" }));
     expect(training()?.keepAwake).toBe(false);
-    await user.click(screen.getByRole("button", { name: "Silent" }));
+    // One switch for the rest-over alert: off is silent, on follows Sounds and Vibration.
+    await user.click(screen.getByRole("switch", { name: /Alert when rest ends/ }));
     expect(training()?.restAlert).toBe("silent");
+    await user.click(screen.getByRole("switch", { name: /Alert when rest ends/ }));
+    expect(training()?.restAlert).toBeUndefined();
   });
 
   it("adds a favourite with taps, no typing", async () => {

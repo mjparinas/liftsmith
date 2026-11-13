@@ -23,7 +23,7 @@ import {
   togglePriority,
   withExercisePrefs,
 } from "@/lib/training";
-import { MUSCLE_LABEL, MUSCLES, type RestAlert, type TrainingPrefs } from "@/lib/types";
+import { MUSCLE_LABEL, MUSCLES, type TrainingPrefs } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
@@ -80,21 +80,14 @@ export function RestTimerSettings() {
       {nowPlayingSupported() && (
         <NowPlayingSetting on={tp.nowPlaying !== false} onChange={(v) => put({ nowPlaying: v ? undefined : false })} />
       )}
-      <Section title={t("train.timer")}>
-        <ChipRow<RestAlert | "app">
-          label={t("train.alert")}
-          value={tp.restAlert ?? "app"}
-          onPick={(v) => put({ restAlert: v === "app" ? undefined : v })}
-          options={[
-            ["app", t("train.alert.app")],
-            ["both", t("train.alert.both")],
-            ["sound", t("train.alert.sound")],
-            ["vibrate", t("train.alert.vibrate")],
-            ["silent", t("train.alert.silent")],
-          ]}
-        />
-        <p className="mt-2 px-1 text-xs text-faint">{t("train.alertNote")}</p>
-      </Section>
+      {/* One switch: the rest-over alert follows Sounds and Vibration, or stays silent. Older saved choices
+          (sound only, vibration only, both) still work until the switch is touched (restAlertOf). */}
+      <SwitchRow
+        label={t("train.alertEnd")}
+        hint={t("train.alertEndHint")}
+        on={tp.restAlert !== "silent"}
+        onChange={(v) => put({ restAlert: v ? undefined : "silent" })}
+      />
     </>
   );
 }
