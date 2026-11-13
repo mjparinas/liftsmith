@@ -11,6 +11,7 @@ import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { liveRead } from "@/lib/liveRead";
 import { startPush } from "@/lib/push";
 import { loadMessages, markRead, MESSAGE_MAX, sendMessage, trainerError, type Message } from "@/lib/trainer";
 
@@ -46,20 +47,32 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
 
   const load = useCallback(
     () =>
-      loadMessages(id).then(
-        (r) => {
-          setName(r.name ?? "");
-          setThem(r.them ?? null);
-          setMore(r.more);
+      // The thread kept from last time shows at once (only before anything else is shown), then the server's answer.
+      liveRead(
+        `coach.chat.${id}`,
+        () => loadMessages(id),
+        (r, fresh) => {
+          if (fresh) {
+            setName(r.name ?? "");
+            setThem(r.them ?? null);
+            setMore(r.more);
+          } else {
+            setName((n) => n || (r.name ?? ""));
+            setThem((x) => x ?? r.them ?? null);
+          }
           // Keep any older page already shown; the newest page replaces its own part.
           setList((old) => {
+            if (!fresh && old) return old;
             const first = r.messages[0]?.at ?? Infinity;
             const older = (old ?? []).filter((m) => m.at < first);
             return [...older, ...r.messages];
           });
+          if (!fresh) return;
           markRead(id);
           setError(null);
         },
+      ).then(
+        () => undefined,
         (e: unknown) => {
           const msg = trainerError(e);
           if (msg === t("trn.err.gone")) setGone(true);

@@ -30,6 +30,7 @@ import {
 } from "@/lib/checkins";
 import { date, parseNum, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { liveRead } from "@/lib/liveRead";
 import { checkinDone, loadOverview, trainerError, useCoachNotes } from "@/lib/trainer";
 
 import { Icon } from "./icons";
@@ -182,13 +183,11 @@ export function FormsScreen({ embedded = false }: { embedded?: boolean }) {
   const [version, setVersion] = useState(0);
   useEffect(() => {
     let live = true;
-    loadOverview()
-      .then((o) => live && setForms(o.forms ?? []))
-      .catch((e: unknown) => {
-        if (!live) return;
-        setForms([]);
-        setNote(trainerError(e));
-      });
+    liveRead("coach.overview", loadOverview, (o) => live && setForms(o.forms ?? [])).catch((e: unknown) => {
+      if (!live) return;
+      setForms([]);
+      setNote(trainerError(e));
+    });
     return () => {
       live = false;
     };
@@ -414,13 +413,15 @@ export function CheckinScreen({ id }: { id: string }) {
   const [done, setDone] = useState(false);
   useEffect(() => {
     let live = true;
-    loadCheckin(id)
-      .then((x) => {
+    liveRead(
+      `coach.checkin.${id}`,
+      () => loadCheckin(id),
+      (x) => {
         if (!live) return;
         setC(x);
         setCoach(useCoachNotes.getState().checkins.find((y) => y.id === id)?.coach ?? "");
-      })
-      .catch((e: unknown) => live && setError(trainerError(e)));
+      },
+    ).catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
       live = false;
     };

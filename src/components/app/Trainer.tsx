@@ -15,6 +15,7 @@ import { COACH_TABS } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
 import { date, list, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { liveRead } from "@/lib/liveRead";
 import { rehabName } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
 import { useApp } from "@/lib/store";
@@ -420,8 +421,10 @@ function ClientScreen({ id }: { id: string }) {
   useEffect(() => {
     if (!lab) return;
     let live = true;
-    loadClient(id)
-      .then((v) => {
+    liveRead(
+      `coach.client.${id}`,
+      () => loadClient(id),
+      (v) => {
         if (!live) return;
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
@@ -430,8 +433,8 @@ function ClientScreen({ id }: { id: string }) {
         setPhysio(v.role === "physio");
         setTargets(v.targets ?? null);
         setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
-      })
-      .catch((e: unknown) => live && setError(trainerError(e)));
+      },
+    ).catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
       live = false;
     };

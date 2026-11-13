@@ -18,6 +18,7 @@ import { can } from "@/lib/entitlements";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { liveRead } from "@/lib/liveRead";
 import { startPush } from "@/lib/push";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
@@ -102,18 +103,18 @@ export function CoachHome({
   const [joined, setJoined] = useState(false);
   const teams = useTeams();
   const reload = useCallback(() => {
-    loadOverview()
-      .then((o) => {
-        setData(o);
-        // Today shows the newest note from a coach; keep it in step with what this screen loaded.
-        keepNotes(o);
-        // With a coach or a client, this phone takes coaching pushes (permission is asked on the first message).
-        if (o.coaches.length || o.clients.length) void startPush(false);
-      })
-      .catch((e: unknown) => {
-        setData({ invite: null, clients: [], coaches: [], plans: [] });
-        setNote(trainerError(e));
-      });
+    // The last copy shows at once; the server's answer replaces it (liveRead.ts).
+    liveRead("coach.overview", loadOverview, (o, fresh) => {
+      setData(o);
+      if (!fresh) return;
+      // Today shows the newest note from a coach; keep it in step with what this screen loaded.
+      keepNotes(o);
+      // With a coach or a client, this phone takes coaching pushes (permission is asked on the first message).
+      if (o.coaches.length || o.clients.length) void startPush(false);
+    }).catch((e: unknown) => {
+      setData({ invite: null, clients: [], coaches: [], plans: [] });
+      setNote(trainerError(e));
+    });
   }, []);
   useEffect(reload, [reload]);
   const reloadAll = useCallback(() => {

@@ -385,7 +385,7 @@ export const de: FeaturesText = {
     },
     offline: {
       name: "Funktioniert offline",
-      body: "Alles läuft auf deinem Gerät, also ist kein Empfang im Kellerstudio kein Problem.",
+      body: "Alles läuft auf deinem Gerät und synchronisiert sich im Hintergrund, also ist kein Empfang im Kellerstudio kein Problem.",
     },
     sync: {
       name: "Konten und Synchronisierung",

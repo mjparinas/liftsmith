@@ -12,6 +12,8 @@ import { create } from "zustand";
 import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
 import { currentLang, type Lang } from "./i18n";
 import { isNative } from "./juice";
+import { forgetReads } from "./liveRead";
+import { noteOffline, noteOnline } from "./net";
 import { SITE_URL } from "./site";
 import { forgetFriends } from "./socialCache";
 import { ACCOUNT_KEY, emptySync, SYNC_KEY, writeSync } from "./syncOutbox";
@@ -118,6 +120,11 @@ export class AuthError extends Error {
 
 export async function api<T>(path: string, init: { method?: string; body?: unknown; token?: string } = {}): Promise<T> {
   let r: Response;
+  // The phone knows it has no connection: say so at once instead of waiting for the request to fail.
+  if (typeof navigator !== "undefined" && navigator.onLine === false) {
+    noteOffline();
+    throw new AuthError("offline");
+  }
   try {
     r = await fetch(apiUrl(path), {
       method: init.method ?? (init.body === undefined ? "GET" : "POST"),
@@ -128,8 +135,10 @@ export async function api<T>(path: string, init: { method?: string; body?: unkno
       body: init.body === undefined ? undefined : JSON.stringify(init.body),
     });
   } catch {
+    noteOffline();
     throw new AuthError("offline");
   }
+  noteOnline();
   const body = (await r.json().catch(() => ({}))) as T & { error?: string; signedOut?: boolean };
   if (!r.ok) throw new AuthError(body.error ?? `HTTP ${r.status}`, r.status, r.status === 401 && body.signedOut === true);
   return body;
@@ -329,6 +338,8 @@ export function forgetAccount() {
   } catch {}
   // Friends' last feed belongs to the account (socialCache.ts).
   forgetFriends();
+  // So do the other screens' last copies (liveRead.ts).
+  forgetReads();
   useAccount.setState({ account: null, error: null });
 }
 

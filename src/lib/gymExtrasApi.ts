@@ -7,6 +7,8 @@ import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
 import type { GymIssue, GymNews, IssueKind } from "./gymExtras";
+import { keepRead, readKept } from "./liveRead";
+import { track } from "./net";
 import type { Equipment, Gym } from "./types";
 
 const token = () => readAccount()?.token;
@@ -180,9 +182,12 @@ export async function trainerGyms(): Promise<TrainerGym[] | null> {
   const t = token();
   if (!t) return null;
   try {
-    return (await api<{ gyms: TrainerGym[] }>("/api/gyms/", { token: t, body: { op: "trainerGyms" } })).gyms;
+    const gyms = (await track(api<{ gyms: TrainerGym[] }>("/api/gyms/", { token: t, body: { op: "trainerGyms" } }))).gyms;
+    keepRead("gyms.trainer", gyms);
+    return gyms;
   } catch {
-    return null;
+    // Offline: the gyms this trainer was listed at last time (liveRead.ts).
+    return readKept<TrainerGym[]>("gyms.trainer") ?? null;
   }
 }
 

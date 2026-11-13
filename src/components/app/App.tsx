@@ -24,6 +24,7 @@ import { startInvite } from "@/lib/invite";
 import { applyAccent, feel, haptic, sound, type TimerSound } from "@/lib/juice";
 import { applyLayout, useDesktop } from "@/lib/layout";
 import { setLiteDemos } from "@/lib/liteDemos";
+import { watchNet } from "@/lib/net";
 import { onPushTap, onPushWhileOpen } from "@/lib/push";
 import { onReminderTap, refreshReminders } from "@/lib/reminders";
 import { startFlags } from "@/lib/remoteFlags";
@@ -72,6 +73,7 @@ import { SharedGym } from "./SharedGym";
 import { SharedRoutine } from "./SharedRoutine";
 import { Stats } from "./Stats";
 import { StretchScreen } from "./Stretch";
+import { SyncSpinner } from "./SyncSpinner";
 import { Toaster } from "./Toaster";
 import { Today } from "./Today";
 import { Tools } from "./Tools";
@@ -170,6 +172,8 @@ export function App() {
     document.addEventListener("touchstart", noop, { passive: true });
     return () => document.removeEventListener("touchstart", noop);
   }, []);
+  // Whether the server can be reached, for Friends' offline note (net.ts).
+  useEffect(() => watchNet(), []);
   useEffect(() => {
     applyAppearance(savedAppearance());
     applyA11y(savedA11y());
@@ -465,6 +469,8 @@ export function App() {
   return (
     <>
       <StatusScrim />
+      {/* Background sync's small ring; never during a workout (docs/decisions/background-sync.md). */}
+      <SyncSpinner hidden={route === "workout"} />
       <div className={sidebar ? "pl-60" : undefined}>
         <main
           key={route}

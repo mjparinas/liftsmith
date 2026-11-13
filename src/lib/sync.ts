@@ -6,6 +6,7 @@
 // Events merge by id, so order and repeats don't matter; the profile and gyms are last write wins.
 import { installId } from "./analytics";
 import { api, AuthError, forgetAccount, readAccount, setAccountPro, useAccount, type AccountAccess } from "./auth";
+import { track } from "./net";
 import { useApp } from "./store";
 import { noteChanged, onOutbox, readSync, seedOutbox, unsynced, writeSync, type SyncState } from "./syncOutbox";
 import type { AppEvent, Gym, Profile } from "./types";
@@ -124,7 +125,8 @@ export const useSync = { lastSync: () => readSync().lastSync, pending: () => rea
 /** Syncs now (or joins a sync already running). Quietly does nothing when signed out or offline. */
 export function syncNow(): Promise<void> {
   if (!readAccount()) return Promise.resolve();
-  running ??= run().finally(() => {
+  // Counted for the syncing ring (net.ts) while it runs.
+  running ??= track(run()).finally(() => {
     running = null;
   });
   return running;

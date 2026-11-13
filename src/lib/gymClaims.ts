@@ -4,6 +4,8 @@
 // step 3). Everything here needs an account.
 import { api, AuthError, readAccount } from "./auth";
 import type { Amenity, Prices } from "./gymExtras";
+import { keepRead, readKept } from "./liveRead";
+import { track } from "./net";
 import { SITE_URL } from "./site";
 
 export type Role = "owner" | "manager" | "staff";
@@ -92,11 +94,15 @@ export function ownedGyms(fresh = false): Promise<OwnedGym[] | null> {
   const t = token();
   if (!t) return Promise.resolve(null);
   if (!owned || fresh)
-    owned = api<{ gyms: OwnedGym[] }>("/api/gyms/", { token: t, body: { op: "owned" } })
-      .then((r) => r.gyms)
+    owned = track(api<{ gyms: OwnedGym[] }>("/api/gyms/", { token: t, body: { op: "owned" } }))
+      .then((r) => {
+        keepRead("gyms.owned", r.gyms);
+        return r.gyms;
+      })
       .catch(() => {
         owned = null;
-        return null;
+        // Offline: what this account ran last time (liveRead.ts).
+        return readKept<OwnedGym[]>("gyms.owned") ?? null;
       });
   return owned;
 }

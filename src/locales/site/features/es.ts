@@ -381,7 +381,7 @@ export const es: FeaturesText = {
     },
     offline: {
       name: "Funciona sin conexión",
-      body: "Todo funciona en tu dispositivo, así que no pasa nada si no hay señal en el gimnasio del sótano.",
+      body: "Todo funciona en tu dispositivo y se sincroniza en segundo plano, así que no pasa nada si no hay señal en el gimnasio del sótano.",
     },
     sync: {
       name: "Cuentas y sincronización",

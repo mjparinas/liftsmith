@@ -20,6 +20,7 @@ import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
+import { track } from "./net";
 import { KCAL_DAYS, LOGGED_KCAL, PROTEIN_SHORT } from "./nutrition";
 import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
@@ -921,7 +922,7 @@ export async function refreshCoachNotes(now = Date.now(), force = false): Promis
   if (!readAccount() || (!force && now - lastLook < EVERY)) return;
   lastLook = now;
   try {
-    keepNotes(await loadOverview());
+    keepNotes(await track(loadOverview()));
   } catch {
     // offline or signed out: keep what was there
   }
