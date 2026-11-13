@@ -74,7 +74,10 @@ try {
   await scan("done for today");
   await page.getByRole("button", { name: "Train again" }).click();
   // Workouts with parts: the warm-up switch above the plan, then today's warm-up.
-  await page.getByTestId("today-parts").getByRole("switch", { name: /Warm-up/ }).click();
+  await page
+    .getByTestId("today-parts")
+    .getByRole("switch", { name: /Warm-up/ })
+    .click();
   await scan("today with parts");
   await page.evaluate(() => (location.hash = "#/stretch/warmup"));
   await page.getByTestId("stretch-routine").waitFor();
