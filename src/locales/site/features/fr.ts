@@ -302,6 +302,10 @@ export const fr: FeaturesText = {
       name: "Réservation et planning des séances",
       body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
     },
+    "coach-payments": {
+      name: "Paiements des clients avec Stripe",
+      body: "Connectez votre propre compte Stripe et fixez le prix de chaque client, à la séance ou au mois. Ils paient sur la page sécurisée de Stripe, l'argent vous arrive directement, et un paiement mensuel raté remonte en haut de leur rapport.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",
