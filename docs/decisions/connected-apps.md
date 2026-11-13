@@ -42,7 +42,7 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
 
 ## Music
 
-- **The mood playlists were removed** (Melvin, 2026-11-13: "i dont really like this functionality … can you remove it completely"). Today no longer shows a "Play push day / training / easy day music" chip, and Connected apps no longer has a music app picker. An old `profile.connections.music` value on a saved profile is ignored. The Sonos lab is separate and unchanged.
+- **The mood playlists were removed** (Melvin, 2026-11-13: "i dont really like this functionality … can you remove it completely"). Today no longer shows a "Play push day / training / easy day music" chip, and Connected apps no longer has a music app picker. An old `profile.connections.music` value on a saved profile is ignored. In their place, Now playing plays, pauses and skips whatever music app is playing, from Today and the workout screen ([Now playing](now-playing.md)). The Sonos lab is separate and unchanged.
 
 ## Sonos (Labs, 2026-11-12)
 

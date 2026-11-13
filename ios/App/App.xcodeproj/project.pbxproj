@@ -37,6 +37,7 @@
 		D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3E1A0010000000000000002 /* DelightPlugins.swift */; };
 		A5EEC0DE0000000000000001 /* SpeechLogPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A5EEC0DE0000000000000002 /* SpeechLogPlugin.swift */; };
 		B6F0101E0000000000000001 /* VolumeKeysPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F0101E0000000000000002 /* VolumeKeysPlugin.swift */; };
+		B6F0102A0000000000000001 /* NowPlayingPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6F0102A0000000000000002 /* NowPlayingPlugin.swift */; };
 		A1F5E0010000000000000008 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */; };
 		C1A0B0010000000000000001 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = C1A0B0010000000000000002 /* InfoPlist.strings */; };
 		E7A1C0DE0000000000000001 /* WatchLink.swift in Sources */ = {isa = PBXBuildFile; fileRef = E7A1C0DE0000000000000002 /* WatchLink.swift */; };
@@ -120,6 +121,7 @@
 		D3E1A0010000000000000002 /* DelightPlugins.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelightPlugins.swift; sourceTree = "<group>"; };
 		A5EEC0DE0000000000000002 /* SpeechLogPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeechLogPlugin.swift; sourceTree = "<group>"; };
 		B6F0101E0000000000000002 /* VolumeKeysPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VolumeKeysPlugin.swift; sourceTree = "<group>"; };
+		B6F0102A0000000000000002 /* NowPlayingPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingPlugin.swift; sourceTree = "<group>"; };
 		A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		A1F5E0010000000000000003 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		BB05485F3EDA6B8DD896565A /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				D3E1A0010000000000000002 /* DelightPlugins.swift */,
 				A5EEC0DE0000000000000002 /* SpeechLogPlugin.swift */,
 				B6F0101E0000000000000002 /* VolumeKeysPlugin.swift */,
+				B6F0102A0000000000000002 /* NowPlayingPlugin.swift */,
 				A1F5E0010000000000000009 /* PrivacyInfo.xcprivacy */,
 				A1F5E0010000000000000003 /* App.entitlements */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
@@ -484,6 +487,7 @@
 				D3E1A0010000000000000001 /* DelightPlugins.swift in Sources */,
 				A5EEC0DE0000000000000001 /* SpeechLogPlugin.swift in Sources */,
 				B6F0101E0000000000000001 /* VolumeKeysPlugin.swift in Sources */,
+				B6F0102A0000000000000001 /* NowPlayingPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

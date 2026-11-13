@@ -205,6 +205,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Integrations roadmap](docs/decisions/integrations-roadmap.md) (`generator.ts`, `block.ts`, `health.ts`)
 - [Marketing and growth](docs/decisions/marketing-and-growth.md) (`src/lib/creatorCode.ts`, `src/app/c/page.tsx`, `CreatorLanding.tsx`, `src/lib/creator.ts`)
 - [Money](docs/decisions/money.md) (`src/lib/flags.ts`, `Pro.tsx`, `trial.ts`, `src/lib/billing.ts`, `src/server/stripe.ts`, `src/server/access.ts`)
+- [Now playing](docs/decisions/now-playing.md) (`src/lib/nowPlaying.ts`, `NowPlaying.tsx`, `NowPlayingPlugin.java`, `MediaListener.java`, `NowPlayingPlugin.swift`)
 - [Name](docs/decisions/name.md) (`src/lib/brand.ts`, `src/lib/site.ts`)
 - [Open items](docs/decisions/open-items.md) (`src/lib/auth.ts`, `src/locales`, `docs/PRIVACY_LABELS.md`)
 - [Platform deltas](docs/decisions/platform-deltas.md)

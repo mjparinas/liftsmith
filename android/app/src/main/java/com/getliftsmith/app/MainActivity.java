@@ -18,6 +18,7 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(SpeechLogPlugin.class);
         registerPlugin(VolumeKeysPlugin.class);
         registerPlugin(StoreReviewPlugin.class);
+        registerPlugin(NowPlayingPlugin.class);
         super.onCreate(savedInstanceState);
     }
 

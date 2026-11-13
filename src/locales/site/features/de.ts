@@ -433,6 +433,11 @@ export const de: FeaturesText = {
       name: "Sonos",
       body: "Steuere einen Sonos-Lautsprecher aus dem Training, mit einer Lautstärke für Sätze und einer anderen für Pausen.",
     },
+    "now-playing": {
+      name: "Musiksteuerung",
+      body: "Spiele, pausiere und überspringe deine Musik auf Heute und während des Trainings, mit dem Song und der App, die ihn spielt. Du kannst sie in den Einstellungen ausschalten.",
+      note: "iPhone: nur Apple Music, weil Apple Apps keine anderen Musik-Apps steuern lässt.",
+    },
   },
   connectionGroups: {
     health: "Gesundheits-Apps",
@@ -476,6 +481,11 @@ export const de: FeaturesText = {
     withings: { does: "Gewicht, Körperfett, Schlaf und Schritte rein" },
     polar: { does: "Nightly Recharge, HRV und Schlaf rein" },
     concept2: { does: "RowErg-, SkiErg- und BikeErg-Einheiten als Cardio-Trainings rein" },
+    "music-apps": {
+      name: "Spotify, YouTube Music und andere Musik-Apps",
+      does: "Abspielen, pausieren und überspringen auf Heute und im Training, mit dem Songtitel",
+    },
+    "apple-music": { does: "Abspielen, pausieren und überspringen auf Heute und im Training, mit dem Songtitel" },
     sonos: { does: "Abspielen, Pause, Überspringen und Lautstärke aus dem Training; die Musik folgt Sätzen und Pausen" },
     calendar: {
       name: "Handykalender (Google, iCloud, Outlook)",
