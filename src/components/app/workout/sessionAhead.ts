@@ -51,7 +51,10 @@ export function sessionFields(a: Active, events: readonly AppEvent[], unit: Unit
 export function aheadSteps(a: Active, events: readonly AppEvent[], unit: Unit, gym: Gym, autoRest: boolean, max = AHEAD_MAX): AheadStep[] {
   const steps: AheadStep[] = [];
   let cur = a;
-  let evs = [...events];
+  // Only what the steps read: this workout's sets (the counts) and other workouts' cardio distances (the starting
+  // distance, startDistance). Copying and scanning the whole history for each of up to 60 steps made every Log set
+  // slow for lifters with a long history (2026-11-13).
+  let evs = events.filter((e) => e.type === "set" && (e.sessionId === a.sessionId || e.distanceM !== undefined));
   const now = Date.now();
   for (let k = 0; k < max; k++) {
     const r = afterLog(cur, evs, autoRest, now, () => `ahead-${k}`);

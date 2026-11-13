@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import type { TodoItem, TodoList } from "@/server/adminTodo";
 
 import { Card } from "./charts";
+import { CardBones, Loading } from "./Skeletons";
 
 const SHOWN = 5;
 
@@ -28,7 +29,12 @@ export function NeedsYou({ go }: { go: (tab: string) => void }) {
     };
   }, []);
   if (error) return null;
-  if (!list) return <div className="card h-20 animate-pulse" aria-hidden />;
+  if (!list)
+    return (
+      <Loading label="Loading what needs you">
+        <CardBones title="Needs you" body="rows" />
+      </Loading>
+    );
   const tasks = list.tasks.filter((t) => !t.doneAt).length;
   // Setup steps last: they matter, but mail and reports are people waiting.
   const items = [...list.items].sort((a, b) => Number(a.kind === "setup") - Number(b.kind === "setup"));

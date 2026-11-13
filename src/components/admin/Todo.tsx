@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import type { AdminTask, TodoItem, TodoKind, TodoList } from "@/server/adminTodo";
 
 import { Card } from "./charts";
+import { CardBones, Loading } from "./Skeletons";
 import { ago } from "./time";
 
 const KIND_LABEL: Record<TodoKind, string> = {
@@ -166,7 +167,13 @@ export function Todo({ admin, go, onCount }: { admin: boolean; go: (tab: string)
         {error}
       </p>
     );
-  if (!data) return <p className="text-muted">Loading…</p>;
+  if (!data)
+    return (
+      <Loading label="Loading the to-do list" className="space-y-4">
+        <CardBones body="rows" />
+        <CardBones body="rows" />
+      </Loading>
+    );
   const open = data.tasks.filter((t) => !t.doneAt);
   const done = data.tasks.filter((t) => t.doneAt);
   return (

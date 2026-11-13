@@ -23,7 +23,13 @@ const TOO_MANY = "Too many tries. Wait ten minutes and try again.";
 const BAD = "That code didn't work. Check the code in your authenticator app, or use a recovery code.";
 
 export async function GET(req: Request) {
-  const s = await getStaffSession(req);
+  let s: Awaited<ReturnType<typeof getStaffSession>>;
+  try {
+    s = await getStaffSession(req);
+  } catch {
+    // The panel reads a 404 here as signed out, so a database that didn't answer says so instead.
+    return json(503, { error: "The database didn't answer. Try again in a moment." });
+  }
   if (!s) return notFound();
   const state = await twoFactorState(s.email);
   const others = s.ready && s.role === "admin" ? [...(await enrolledEmails())].filter((e) => e !== s.email && roleOf(e)) : [];

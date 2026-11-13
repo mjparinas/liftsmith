@@ -1,5 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { GET as twoFactorGet } from "@/app/api/admin/2fa/route.api";
+
 import { ADMIN_IDLE_MS, ADMIN_MAX_MS, finishSignIn, getStaff, requireStaff, startSignIn } from "./adminAuth";
 import * as db from "./db";
 import { query, resetDb } from "./db";
@@ -54,5 +56,19 @@ describe("staying signed in to the admin panel", () => {
     vi.spyOn(db, "query").mockRejectedValue(new Error("timeout"));
     const gate = await requireStaff(req(cookie));
     expect("response" in gate && gate.response.status).toBe(503);
+  });
+
+  it("answers 503 from the two-step check too, so the panel doesn't show the sign-in screen on a database hiccup", async () => {
+    const { cookie } = await signIn(Date.now());
+    vi.spyOn(db, "query").mockRejectedValue(new Error("timeout"));
+    expect((await twoFactorGet(req(cookie))).status).toBe(503);
+    vi.restoreAllMocks();
+    expect((await twoFactorGet(req("ls_admin=nope"))).status).toBe(404);
+  });
+
+  it("logs why a session that sent a cookie was turned away", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    expect(await getStaff(req("ls_admin=nope"))).toBeNull();
+    expect(warn).toHaveBeenCalledWith("[admin] session ended: unknown");
   });
 });

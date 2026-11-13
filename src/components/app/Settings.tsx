@@ -476,6 +476,12 @@ function AccessibilitySettings() {
       />
       <p className="mt-2 px-1 text-xs text-faint">{t("a11y.contrast.note")}</p>
       <SwitchRow label={t("settings.lean")} hint={t("settings.lean.note")} on={!!profile.lean} onChange={(lean) => setProfile({ lean })} />
+      <SwitchRow
+        label={t("settings.liteDemos")}
+        hint={t("settings.liteDemos.note")}
+        on={!!profile.liteDemos}
+        onChange={(liteDemos) => setProfile({ liteDemos })}
+      />
     </section>
   );
 }

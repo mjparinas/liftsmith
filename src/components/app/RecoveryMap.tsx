@@ -10,6 +10,7 @@ import { blockWeek, weekStart } from "@/lib/block";
 import { weeklySets } from "@/lib/generator";
 import { list, t } from "@/lib/i18n";
 import { calm } from "@/lib/juice";
+import { LITE, useLiteDemos } from "@/lib/liteDemos";
 import { muscleAdvice } from "@/lib/muscleAdvice";
 import { bandOf, BANDS, type Band } from "@/lib/recovery";
 import { useApp } from "@/lib/store";
@@ -206,6 +207,7 @@ function Body3D({
     else if (selected && FRONT.has(selected)) setView("front");
   }
 
+  const lite = useLiteDemos();
   const settings: DemoSettings = {
     exerciseId: null,
     body: bodyFor(profile.sex),
@@ -215,7 +217,8 @@ function Body3D({
     path: false,
     speed: 1,
     playing: false,
-    fps: 30,
+    fps: lite ? LITE.controlsFps : 30,
+    maxDpr: lite ? LITE.maxDpr : undefined,
     paint,
     hatch,
     selected: lit,

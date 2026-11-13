@@ -17,6 +17,8 @@ export const en = {
   "today.doneLine": { one: "{count} set in {min} min, {volume} lifted", other: "{count} sets in {min} min, {volume} lifted" },
   "today.doneRest": "Recovery starts now. Eat well, sleep well, and the next plan builds on today.",
   "today.again": "Train again",
+  "today.recovering": "Recovering now",
+  "today.recoveringLine": "Lit up: the muscles you trained today. The next plan works around them until they’re ready.",
 } as const;
 
 type Key = keyof typeof en;
@@ -35,6 +37,8 @@ export const es: Partial<Record<Key, Message>> = {
   "today.doneLine": { one: "{count} serie en {min} min, {volume} levantados", other: "{count} series en {min} min, {volume} levantados" },
   "today.doneRest": "La recuperación empieza ahora. Come bien, duerme bien, y el próximo plan parte de hoy.",
   "today.again": "Entrenar otra vez",
+  "today.recovering": "Recuperándose ahora",
+  "today.recoveringLine": "Resaltados: los músculos que entrenaste hoy. El próximo plan los respeta hasta que estén listos.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -54,6 +58,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "today.doneLine": { one: "{count} série en {min} min, {volume} soulevés", other: "{count} séries en {min} min, {volume} soulevés" },
   "today.doneRest": "La récupération commence maintenant. Mangez bien, dormez bien, et le prochain plan part d’aujourd’hui.",
   "today.again": "S’entraîner encore",
+  "today.recovering": "En récupération",
+  "today.recoveringLine":
+    "En surbrillance : les muscles travaillés aujourd’hui. Le prochain plan les ménage jusqu’à ce qu’ils soient prêts.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -73,6 +80,9 @@ export const de: Partial<Record<Key, Message>> = {
   "today.doneLine": { one: "{count} Satz in {min} Min., {volume} bewegt", other: "{count} Sätze in {min} Min., {volume} bewegt" },
   "today.doneRest": "Jetzt beginnt die Erholung. Gut essen, gut schlafen, und der nächste Plan baut auf heute auf.",
   "today.again": "Noch mal trainieren",
+  "today.recovering": "Erholt sich gerade",
+  "today.recoveringLine":
+    "Hervorgehoben: die Muskeln, die du heute trainiert hast. Der nächste Plan schont sie, bis sie wieder bereit sind.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -95,6 +105,8 @@ export const it: Partial<Record<Key, Message>> = {
   "today.doneLine": { one: "{count} serie in {min} min, {volume} sollevati", other: "{count} serie in {min} min, {volume} sollevati" },
   "today.doneRest": "Il recupero inizia adesso. Mangia bene, dormi bene, e il prossimo piano parte da oggi.",
   "today.again": "Allenati ancora",
+  "today.recovering": "In recupero",
+  "today.recoveringLine": "Evidenziati: i muscoli allenati oggi. Il prossimo piano li risparmia finché non sono pronti.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -111,4 +123,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "today.doneLine": { other: "{min}分で{count}セット、合計{volume}" },
   "today.doneRest": "ここから回復の時間です。よく食べてよく眠れば、次のプランは今日の続きから始まります。",
   "today.again": "もう一度トレーニング",
+  "today.recovering": "回復中",
+  "today.recoveringLine": "光っているのは今日鍛えた筋肉です。回復するまで、次のプランはここを避けて組まれます。",
 };

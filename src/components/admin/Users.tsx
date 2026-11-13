@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/adminUsers";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
+import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
 
 const PROVIDER: Record<string, string> = { google: "Google", apple: "Apple", email: "Email code" };
@@ -46,7 +47,15 @@ function Account({ id, admin, me, close }: { id: string; admin: boolean; me: str
     if (!err) setVersion((v) => v + 1);
     return !err;
   };
-  if (a === null) return <Card title="Account">Loading…</Card>;
+  if (a === null)
+    return (
+      <Card title="Account">
+        <Loading label="Loading account" className="space-y-4">
+          <TileBones />
+          <LineBones n={5} />
+        </Loading>
+      </Card>
+    );
   if (a === "missing")
     return (
       <Card title="Account" right={<CloseButton close={close} />}>
@@ -246,7 +255,9 @@ export function Users({
           </button>
         </form>
         {!data ? (
-          <p className="text-sm text-muted">Loading…</p>
+          <Loading label="Loading accounts">
+            <TableBones />
+          </Loading>
         ) : (
           <Table
             columns={["Email", "Role", "Signed up", "Last seen", "Sign-in", "Devices", "Synced events", ""]}

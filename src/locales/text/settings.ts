@@ -31,6 +31,9 @@ export const en = {
   "settings.lean": "Lean mode",
   "settings.lean.note":
     "Lean mode turns off confetti, celebration sounds and animations. Rest timer sounds and haptics stay on. XP, streaks and badges keep counting either way.",
+  "settings.liteDemos": "Battery saver for 3D figures",
+  "settings.liteDemos.note":
+    "Draws the exercise demos and the recovery map at a lower resolution and frame rate. Smoother on older phones and easier on the battery.",
   "settings.stats": "Usage stats",
   "settings.stats.on": "Share anonymous stats",
   "settings.stats.note":
@@ -109,6 +112,9 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.lean": "Modo sobrio",
   "settings.lean.note":
     "El modo sobrio quita el confeti, los sonidos de celebración y las animaciones. Los sonidos del temporizador y la vibración siguen. La XP, las rachas y las insignias cuentan igual.",
+  "settings.liteDemos": "Ahorro de batería en las figuras 3D",
+  "settings.liteDemos.note":
+    "Dibuja las demostraciones de ejercicios y el mapa de recuperación con menos resolución y fotogramas. Va más fluido en teléfonos antiguos y gasta menos batería.",
   "settings.stats": "Estadísticas de uso",
   "settings.stats.on": "Compartir estadísticas anónimas",
   "settings.stats.note":
@@ -190,6 +196,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.lean": "Mode sobre",
   "settings.lean.note":
     "Le mode sobre coupe les confettis, les sons de célébration et les animations. Les sons du minuteur et les vibrations restent. L’XP, les séries et les badges comptent toujours.",
+  "settings.liteDemos": "Économie de batterie pour les figures 3D",
+  "settings.liteDemos.note":
+    "Affiche les démonstrations d'exercices et la carte de récupération avec une résolution et une fréquence d'images plus basses. Plus fluide sur les téléphones anciens et plus économe en batterie.",
   "settings.stats": "Statistiques d’utilisation",
   "settings.stats.on": "Partager des statistiques anonymes",
   "settings.stats.note":
@@ -271,6 +280,9 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.lean": "Schlank-Modus",
   "settings.lean.note":
     "Der Schlank-Modus schaltet Konfetti, Jubeltöne und Animationen aus. Pausentimer-Töne und Haptik bleiben an. XP, Serien und Abzeichen zählen in jedem Fall weiter.",
+  "settings.liteDemos": "Akkusparen bei 3D-Figuren",
+  "settings.liteDemos.note":
+    "Zeigt die Übungsdemos und die Erholungskarte mit geringerer Auflösung und Bildrate. Läuft auf älteren Handys flüssiger und schont den Akku.",
   "settings.stats": "Nutzungsstatistik",
   "settings.stats.on": "Anonyme Statistiken teilen",
   "settings.stats.note":
@@ -349,6 +361,9 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.lean": "Modalità essenziale",
   "settings.lean.note":
     "La modalità essenziale disattiva coriandoli, suoni di festa e animazioni. Suoni e vibrazioni del timer di riposo restano. XP, serie e badge continuano a contare in ogni caso.",
+  "settings.liteDemos": "Risparmio batteria per le figure 3D",
+  "settings.liteDemos.note":
+    "Disegna le dimostrazioni degli esercizi e la mappa del recupero con risoluzione e frequenza dei fotogrammi più basse. Più fluido sui telefoni meno recenti e consuma meno batteria.",
   "settings.stats": "Statistiche di utilizzo",
   "settings.stats.on": "Condividi statistiche anonime",
   "settings.stats.note":
@@ -429,6 +444,9 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.lean": "リーンモード",
   "settings.lean.note":
     "リーンモードでは紙吹雪、お祝いのサウンド、アニメーションがオフになります。休憩タイマーの音と振動はそのまま。XP、連続記録、バッジはどちらでもカウントされます。",
+  "settings.liteDemos": "3D フィギュアの省電力",
+  "settings.liteDemos.note":
+    "種目のデモと回復マップを低い解像度とフレームレートで表示します。古い端末でも動きが滑らかになり、バッテリーも長持ちします。",
   "settings.stats": "利用状況の統計",
   "settings.stats.on": "匿名の統計を共有",
   "settings.stats.note":

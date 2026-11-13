@@ -1,5 +1,5 @@
-// Maintenance mode (src/lib/maintenance.ts): while an admin has it on, every page and API route except the home
-// page, the admin panel, the web app and a few machine endpoints answers 503 with a short message. Named .api.ts
+// Maintenance mode (src/lib/maintenance.ts): while an admin has it on, every API route and server-drawn page except
+// a few machine endpoints answers 503 with a short message. Static pages stay up (see `config` below). Named .api.ts
 // so only the server build (Vercel) has it; the static export for the Android and iOS apps can't run a proxy.
 import { NextResponse, type NextRequest } from "next/server";
 
@@ -30,5 +30,10 @@ export async function proxy(request: NextRequest) {
   return new NextResponse(maintenancePage(), { status: 503, headers: { ...headers, "Content-Type": "text/html; charset=utf-8" } });
 }
 
-// Everything but build files and files with an extension.
-export const config = { matcher: "/((?!_next/static|_next/image|.*\\.[A-Za-z0-9]+$).*)" };
+// Only what the server draws per request: API routes and the pages rewritten to them (share links, public profiles,
+// the gym finder and their sitemaps, next.config.ts). Every other page is a static file from the CDN that never reads
+// the database, so it stays up during maintenance and doesn't pay for a function call on every visit (about 70 ms,
+// plus a cold start now and then; Melvin, 2026-11-13, docs/decisions/speed.md).
+export const config = {
+  matcher: ["/api/:path*", "/w/:path*", "/u/:path*", "/gyms/:path*", "/sitemap-people.xml", "/sitemap-gyms.xml"],
+};

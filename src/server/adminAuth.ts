@@ -146,10 +146,15 @@ export async function getStaffSession(req: Request, now = Date.now()): Promise<S
     [hash(c)],
   );
   const s = rows[0];
-  if (!s || Number(s.expires_at) < now || Number(s.created_at) + ADMIN_MAX_MS < now) return null;
+  // A browser that sent a cookie and is turned away is logged with the reason (never the token), so an early
+  // sign-out can be traced in Vercel's logs: "unknown" means the database lost the session, the rest are rules.
+  const ended = (why: string) => (console.warn(`[admin] session ended: ${why}`), null);
+  if (!s) return ended("unknown");
+  if (Number(s.expires_at) < now) return ended("idle 30 days");
+  if (Number(s.created_at) + ADMIN_MAX_MS < now) return ended("90-day cap");
   // Taking an address off the list in the environment ends its sessions at once.
   const role = roleOf(String(s.email));
-  if (!role) return null;
+  if (!role) return ended("address no longer staff");
   // Sliding expiry: use pushes the idle limit forward, written at most once a day (never past the 90-day cap, which
   // the cookie's own Max-Age matches). A failed write only waits for the next request.
   const renewed = Math.min(now + ADMIN_IDLE_MS, Number(s.created_at) + ADMIN_MAX_MS);

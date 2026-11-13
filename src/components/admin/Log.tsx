@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 
 import { Card, Table } from "./charts";
+import { Loading, TableBones } from "./Skeletons";
 import { when } from "./time";
 
 type Audit = { id: number; at: number; admin: string; action: string; target: string | null; detail: string | null };
@@ -102,7 +103,11 @@ export function Log() {
       )}
       {error && <p className="text-sm text-bad">The log didn&apos;t load. Reload to try again.</p>}
       {!page ? (
-        !error && <p className="text-sm text-muted">Loading…</p>
+        !error && (
+          <Loading label="Loading the log">
+            <TableBones rows={8} />
+          </Loading>
+        )
       ) : (
         <>
           <Table

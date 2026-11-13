@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { Card, Table } from "./charts";
 import { InstallDetail } from "./InstallDetail";
+import { Loading, TableBones } from "./Skeletons";
 import { ago, countryName, shortDay, when } from "./time";
 
 type Install = {
@@ -159,7 +160,11 @@ export function Installs({ admin, open, setOpen }: { admin: boolean; open: strin
         </form>
         {error && <p className="text-sm text-bad">The installs didn&apos;t load. Reload to try again.</p>}
         {!page ? (
-          !error && <p className="text-sm text-muted">Loading…</p>
+          !error && (
+            <Loading label="Loading installs">
+              <TableBones rows={8} />
+            </Loading>
+          )
         ) : (
           <>
             <Table

@@ -237,6 +237,35 @@ describe("leagues", () => {
   });
 });
 
+describe("long histories", () => {
+  // Leagues and quest XP read every week since the first workout. Each week's sets come from one sorted copy kept
+  // per event list (2026-11-13), so the answers must be the same as reading each week on its own.
+  const history = Array.from({ length: 40 }, (_, w) => goalWeek(w + 1)).flat();
+
+  it("give each week's quests whatever order the events come in", () => {
+    const monday = weekOf(NOW) - 5 * W;
+    const forward = questsFor(history, profile(), monday);
+    expect(questsFor([...history].reverse(), profile(), monday)).toEqual(forward);
+    expect(questsFor(goalWeek(5), profile(), monday).map((q) => q.id)).toEqual(forward.map((q) => q.id));
+    expect(forward.find((q) => q.id === "days")).toMatchObject({ have: 3, done: true });
+  });
+
+  it("follow a new event list, not the answer kept for the old one", () => {
+    const monday = weekOf(NOW);
+    expect(questsFor(history, profile(), monday).find((q) => q.id === "days")!.have).toBe(0);
+    const more = [...history, ...goalWeek(0)];
+    expect(questsFor(more, profile(), monday).find((q) => q.id === "days")!.have).toBe(3);
+    expect(questsFor(more, profile({ daysPerWeek: 5 }), monday).find((q) => q.id === "days")).toMatchObject({ goal: 5, done: false });
+  });
+
+  it("cover every week of two years of workouts", () => {
+    const years = Array.from({ length: 104 }, (_, w) => goalWeek(w + 1)).flat();
+    const stats = derive(years, NOW);
+    const g = game(years, stats, profile(), NOW);
+    expect(g.league.history).toHaveLength(105);
+  });
+});
+
 describe("crates", () => {
   it("are picked from the session id and turn repeats into XP", () => {
     expect(crateFor("abc")).toEqual(crateFor("abc"));

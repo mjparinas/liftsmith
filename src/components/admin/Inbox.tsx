@@ -11,6 +11,7 @@ import type { InboxItem, InboxMessage } from "@/server/inbox";
 
 import { Card } from "./charts";
 import { SavedReplies } from "./SavedReplies";
+import { InboxBones, LineBones, Loading } from "./Skeletons";
 import { ago, when } from "./time";
 
 type List = { configured: boolean; items: InboxItem[]; next: string | null; error?: string };
@@ -155,7 +156,9 @@ function Message({
   if (!m)
     return (
       <Card title="Message">
-        <p className="text-sm text-muted">Loading…</p>
+        <Loading label="Loading message">
+          <LineBones n={6} />
+        </Loading>
       </Card>
     );
   return (
@@ -353,7 +356,12 @@ export function Inbox({
     }
   };
 
-  if (!list) return <p className="text-muted">Loading…</p>;
+  if (!list)
+    return (
+      <Loading label="Loading mail">
+        <InboxBones />
+      </Loading>
+    );
   if (!list.configured)
     return (
       <Card

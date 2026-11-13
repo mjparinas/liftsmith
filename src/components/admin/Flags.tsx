@@ -9,6 +9,7 @@ import type { Experiment } from "@/lib/experiments";
 import type { ExperimentResults } from "@/server/flags";
 
 import { Card, fmtInt, fmtPct, Table } from "./charts";
+import { CardBones, Loading } from "./Skeletons";
 import { ago, when } from "./time";
 
 type Value = string | number | boolean;
@@ -134,7 +135,12 @@ function FlagLine({ f, admin, changed }: { f: FlagRow; admin: boolean; changed: 
 
 export function Flags({ admin }: { admin: boolean }) {
   const [data, reload] = useLoad<{ flags: FlagRow[] }>("/api/admin/flags/");
-  if (!data) return <p className="text-muted">Loading…</p>;
+  if (!data)
+    return (
+      <Loading label="Loading flags">
+        <CardBones body="rows" />
+      </Loading>
+    );
   // Changed flags first, since they're what's different from the code; then the app's own, then Labs together.
   const isLab = (f: FlagRow) => f.label.startsWith("Labs:");
   const groups: [string, string, FlagRow[]][] = [
@@ -328,7 +334,12 @@ function NewExperiment({ flags, taken, changed }: { flags: FlagRow[]; taken: Set
 export function Experiments({ admin }: { admin: boolean }) {
   const [data, reload] = useLoad<{ experiments: Exp[] }>("/api/admin/experiments/");
   const [flags] = useLoad<{ flags: FlagRow[] }>("/api/admin/flags/");
-  if (!data) return <p className="text-muted">Loading…</p>;
+  if (!data)
+    return (
+      <Loading label="Loading tests">
+        <CardBones body="rows" />
+      </Loading>
+    );
   return (
     <div className="space-y-4">
       {admin && flags && <NewExperiment flags={flags.flags} taken={new Set(data.experiments.map((e) => e.flag))} changed={reload} />}

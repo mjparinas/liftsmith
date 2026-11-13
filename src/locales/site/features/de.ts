@@ -360,6 +360,10 @@ export const de: FeaturesText = {
       name: "Schlichter Modus, Töne und Vibration",
       body: "Schalte Animationen und Konfetti, Töne oder Vibration ab, jeweils mit einem Schalter.",
     },
+    "lite-demos": {
+      name: "Akkusparen bei 3D-Figuren",
+      body: "Zeigt die Übungsdemos und die Erholungskarte mit geringerer Auflösung und Bildrate, für ältere Handys und mehr Akkulaufzeit.",
+    },
     desktop: {
       name: "Desktop-Ansicht",
       body: "Am Computer hat die Web-App eine Seitenleiste, breite Seiten, Tastenkürzel während des Trainings (L trägt den Satz ein) und einen breiten Routinen-Editor.",

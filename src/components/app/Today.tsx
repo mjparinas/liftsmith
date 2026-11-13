@@ -6,11 +6,13 @@ import { Info } from "@/components/Info";
 import { SCREEN_TITLE } from "@/components/titles";
 import { useProMember } from "@/lib/billing";
 import { busyTimes, fitLength, freeMinutes, type Busy } from "@/lib/calendar";
+import { sessionDetail } from "@/lib/dashboard";
 import type { SessionSummary } from "@/lib/derive";
 import { can } from "@/lib/entitlements";
-import { exercise } from "@/lib/exercises";
+import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { freeAdaptiveLeft } from "@/lib/freeAdaptive";
 import { itemSeconds, planSeconds } from "@/lib/generator";
+import { prSetIds } from "@/lib/history";
 import { clockTime, inSentence, list, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
 import { haptic, sound } from "@/lib/juice";
@@ -29,7 +31,7 @@ import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
 import { PlanExtras, TodayMoments } from "./Extras";
-import { loadText, repsText } from "./format";
+import { loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
 import { CoachNotes } from "./Insights";
 import { Mascot } from "./Mascot";
@@ -314,8 +316,14 @@ export function Today() {
       {/* Desktop layout (layout.ts): the plan in the wider left column, the call, notes and quests beside it. On a
           phone the two groups stack in this order, as before. */}
       <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-6">
+        {/* Once the day's workout is done it takes the wide column, where the plan was, so the page isn't empty
+            beside the notes (Melvin, 2026-11-13). First in the page, so a phone shows it first as before. */}
+        {doneToday && resting && (
+          <div className="desk:order-1 desk:col-span-3">
+            <DoneToday session={doneToday} onAgain={trainAgain} />
+          </div>
+        )}
         <div className="desk:order-2 desk:col-span-2">
-          {doneToday && resting && <DoneToday session={doneToday} onAgain={trainAgain} />}
           {showCall && readiness && preview && call && (
             <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
               <div className="flex items-center gap-4">
@@ -415,7 +423,7 @@ export function Today() {
 
           {!active && <TodayGame />}
         </div>
-        <div className="desk:order-1 desk:col-span-3">
+        <div className={`desk:order-1 desk:col-span-3 ${resting ? "hidden" : ""}`}>
           {!fixed && !resting && (
             <div className="card mt-4 p-4">
               <div className="flex items-baseline justify-between">
@@ -660,9 +668,12 @@ export function Today() {
  * brings the plan back for anyone doing a second session.
  */
 function DoneToday({ session, onAgain }: { session: SessionSummary; onAgain: () => void }) {
-  const { profile } = useApp();
+  const { profile, events } = useApp();
   const now = useNow(60_000);
   const min = Math.max(1, Math.round(session.seconds / 60));
+  const rec = useMemo(() => recovery(events, now), [events, now]);
+  // The muscles today's lifts worked most, lit on the figure.
+  const worked = useMemo(() => [...new Set(session.exercises.flatMap((id) => EXERCISE_BY_ID.get(id)?.primary ?? []))], [session.exercises]);
   // The cool-down only makes sense soon after the workout.
   const warm = now - (session.start + session.seconds * 1000) < 3 * 3600_000;
   return (
@@ -685,7 +696,72 @@ function DoneToday({ session, onAgain }: { session: SessionSummary; onAgain: () 
       <Button kind="ghost" icon="play" className="mt-4 w-full" onClick={onAgain}>
         {t("today.again")}
       </Button>
+      {/* What was done and what it's recovering: on a desktop they fill the wide column beside the notes. */}
+      <DoneLifts sessionId={session.sessionId} />
+      <Section title={t("today.recovering")} icon="recovery" info="recovery">
+        <div className="card p-4">
+          <RecoveryMap rec={rec} focus={worked} compact chips={false} />
+          <p className="mt-3 text-sm text-muted">{t("today.recoveringLine")}</p>
+        </div>
+      </Section>
     </>
+  );
+}
+
+/** Today's lifts, one row each: how many sets and the best one, with a PR mark; a row opens that lift's page. */
+function DoneLifts({ sessionId }: { sessionId: string }) {
+  const { events, stats, profile } = useApp();
+  const detail = useMemo(() => sessionDetail(events, sessionId), [events, sessionId]);
+  const prIds = useMemo(() => prSetIds(events, stats.prs), [events, stats.prs]);
+  if (!detail) return null;
+  return (
+    <Section title={t("td.title")} icon="dumbbell">
+      <ul className="card divide-y divide-line/70 overflow-hidden" data-testid="done-lifts">
+        {detail.exercises.map((g, i) => {
+          const ex = EXERCISE_BY_ID.get(g.exerciseId);
+          // The heaviest set (the longest for cardio and holds): the one worth remembering.
+          const best = g.sets.reduce((a, b) => (b.weight > a.weight || (b.weight === a.weight && b.reps > a.reps) ? b : a));
+          const pr = g.sets.some((s) => prIds.has(s.id));
+          const body = (
+            <>
+              <span className="min-w-0 flex-1">
+                <span className="block font-medium">{ex?.name ?? g.exerciseId}</span>
+                <span className="num block text-sm text-muted">
+                  {t("progress.sessionSets", { count: g.sets.length })}
+                  {ex && ` · ${setText(ex, best.weight, best.reps, profile.unit, best.distanceM, best)}`}
+                </span>
+              </span>
+              {pr && (
+                <span className="flex shrink-0 items-center text-gold">
+                  <Icon name="trophy" size={16} />
+                  <span className="sr-only">{t("progress.cal.prSet")}</span>
+                </span>
+              )}
+              {ex && (
+                <span className="shrink-0 text-accent" aria-hidden>
+                  ›
+                </span>
+              )}
+            </>
+          );
+          return (
+            <li key={i}>
+              {ex ? (
+                <button
+                  type="button"
+                  onClick={() => go("exercise", g.exerciseId)}
+                  className="press flex min-h-14 w-full items-center gap-3 px-4 py-2.5 text-left"
+                >
+                  {body}
+                </button>
+              ) : (
+                <div className="flex min-h-14 items-center gap-3 px-4 py-2.5">{body}</div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </Section>
   );
 }
 
