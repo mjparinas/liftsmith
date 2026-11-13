@@ -89,6 +89,14 @@ export const en = {
   "ins.waistUp.why": "Up about {change} in {weeks}.",
   "ins.waistDown.title": "Waist down, strength holding",
   "ins.waistDown.why": "Down about {change} in {weeks}, and none of your lifts have stalled.",
+  "ins.proteinShort.whyCoach": "Your food app shows {avg} g of protein a day on average, against the {target} g {name} set for you.",
+  "ins.yourCoach": "your coach",
+  "ins.coachKcal.why": "Your food app shows {avg} a day this past week ({days} days logged), against the {target} {name} set for you.",
+  "ins.coachKcalUnder.title": "Eating under your coach's target",
+  "ins.coachKcalUnder.advice": "Add about {gap} a day, or tell your coach what's getting in the way.",
+  "ins.coachKcalOver.title": "Eating over your coach's target",
+  "ins.coachKcalOver.advice": "Trim about {gap} a day, or ask your coach whether the target still fits.",
+  "ins.coachKcal.action": "Open coaching",
 } as const;
 
 type Key = keyof typeof en;
@@ -184,6 +192,15 @@ export const es: Partial<Record<Key, Message>> = {
   "ins.waistUp.why": "Ha subido unos {change} en {weeks}.",
   "ins.waistDown.title": "Cintura menor, fuerza intacta",
   "ins.waistDown.why": "Ha bajado unos {change} en {weeks}, y ninguno de tus ejercicios se ha estancado.",
+  "ins.proteinShort.whyCoach": "Tu app de comida muestra {avg} g de proteína al día de media, frente a los {target} g que te fijó {name}.",
+  "ins.yourCoach": "tu entrenador",
+  "ins.coachKcal.why":
+    "Tu app de comida muestra {avg} al día esta semana ({days} días registrados), frente a las {target} que te fijó {name}.",
+  "ins.coachKcalUnder.title": "Comes por debajo del objetivo de tu entrenador",
+  "ins.coachKcalUnder.advice": "Añade unas {gap} al día, o cuéntale a tu entrenador qué te lo impide.",
+  "ins.coachKcalOver.title": "Comes por encima del objetivo de tu entrenador",
+  "ins.coachKcalOver.advice": "Recorta unas {gap} al día, o pregunta a tu entrenador si el objetivo sigue encajando.",
+  "ins.coachKcal.action": "Abrir coaching",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -278,6 +295,16 @@ export const fr: Partial<Record<Key, Message>> = {
   "ins.waistUp.why": "Environ {change} de plus en {weeks}.",
   "ins.waistDown.title": "Taille en baisse, force maintenue",
   "ins.waistDown.why": "Environ {change} de moins en {weeks}, et aucun de vos exercices ne stagne.",
+  "ins.proteinShort.whyCoach":
+    "Votre app de nutrition indique {avg} g de protéines par jour en moyenne, pour les {target} g fixés par {name}.",
+  "ins.yourCoach": "votre coach",
+  "ins.coachKcal.why":
+    "Votre app de nutrition indique {avg} par jour cette semaine ({days} jours saisis), pour les {target} fixées par {name}.",
+  "ins.coachKcalUnder.title": "En dessous de l'objectif de votre coach",
+  "ins.coachKcalUnder.advice": "Ajoutez environ {gap} par jour, ou dites à votre coach ce qui bloque.",
+  "ins.coachKcalOver.title": "Au-dessus de l'objectif de votre coach",
+  "ins.coachKcalOver.advice": "Retirez environ {gap} par jour, ou demandez à votre coach si l'objectif convient toujours.",
+  "ins.coachKcal.action": "Ouvrir le coaching",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -372,6 +399,15 @@ export const de: Partial<Record<Key, Message>> = {
   "ins.waistUp.why": "Etwa {change} mehr in {weeks}.",
   "ins.waistDown.title": "Bauchumfang sinkt, Kraft bleibt",
   "ins.waistDown.why": "Etwa {change} weniger in {weeks}, und keine deiner Übungen stagniert.",
+  "ins.proteinShort.whyCoach": "Deine Ernährungs-App zeigt im Schnitt {avg} g Protein pro Tag, bei {target} g, die {name} dir gesetzt hat.",
+  "ins.yourCoach": "dein Coach",
+  "ins.coachKcal.why":
+    "Deine Ernährungs-App zeigt diese Woche {avg} pro Tag ({days} Tage erfasst), bei {target}, die {name} dir gesetzt hat.",
+  "ins.coachKcalUnder.title": "Unter dem Ziel deines Coaches",
+  "ins.coachKcalUnder.advice": "Iss etwa {gap} mehr pro Tag, oder sag deinem Coach, was im Weg steht.",
+  "ins.coachKcalOver.title": "Über dem Ziel deines Coaches",
+  "ins.coachKcalOver.advice": "Spar etwa {gap} pro Tag ein, oder frag deinen Coach, ob das Ziel noch passt.",
+  "ins.coachKcal.action": "Coaching öffnen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -466,6 +502,16 @@ export const it: Partial<Record<Key, Message>> = {
   "ins.waistUp.why": "Circa {change} in più in {weeks}.",
   "ins.waistDown.title": "Vita in calo, forza stabile",
   "ins.waistDown.why": "Circa {change} in meno in {weeks}, e nessuno dei tuoi esercizi si è fermato.",
+  "ins.proteinShort.whyCoach":
+    "La tua app per l'alimentazione mostra in media {avg} g di proteine al giorno, rispetto ai {target} g fissati da {name}.",
+  "ins.yourCoach": "il tuo coach",
+  "ins.coachKcal.why":
+    "La tua app per l'alimentazione mostra {avg} al giorno questa settimana ({days} giorni registrati), rispetto alle {target} fissate da {name}.",
+  "ins.coachKcalUnder.title": "Sotto l'obiettivo del tuo coach",
+  "ins.coachKcalUnder.advice": "Aggiungi circa {gap} al giorno, o di' al tuo coach cosa ti ostacola.",
+  "ins.coachKcalOver.title": "Sopra l'obiettivo del tuo coach",
+  "ins.coachKcalOver.advice": "Togli circa {gap} al giorno, o chiedi al tuo coach se l'obiettivo è ancora giusto.",
+  "ins.coachKcal.action": "Apri coaching",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -547,4 +593,12 @@ export const ja: Partial<Record<Key, Message>> = {
   "ins.waistUp.why": "{weeks}で約{change}増えました。",
   "ins.waistDown.title": "ウエスト減、筋力は維持",
   "ins.waistDown.why": "{weeks}で約{change}減り、どの種目も停滞していません。",
+  "ins.proteinShort.whyCoach": "食事アプリによると、たんぱく質は1日平均{avg} gで、{name}が設定した{target} gに届いていません。",
+  "ins.yourCoach": "コーチ",
+  "ins.coachKcal.why": "食事アプリによると、この1週間は1日{avg}（記録{days}日）で、{name}が設定した{target}と離れています。",
+  "ins.coachKcalUnder.title": "コーチの目標より少なめです",
+  "ins.coachKcalUnder.advice": "1日約{gap}増やすか、何が妨げになっているかコーチに伝えましょう。",
+  "ins.coachKcalOver.title": "コーチの目標より多めです",
+  "ins.coachKcalOver.advice": "1日約{gap}減らすか、目標が今も合っているかコーチに聞いてみましょう。",
+  "ins.coachKcal.action": "コーチングを開く",
 };

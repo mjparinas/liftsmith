@@ -524,6 +524,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",
         added: "2026-11-12",
       },
+      {
+        id: "coach-nutrition",
+        name: "Nutrition targets for clients",
+        body: "Set each client's daily calories and protein. Their coach's notes check their food week against them, and you see how they're eating when they share it.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
     ],
   },
   {

@@ -12,10 +12,12 @@ import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
 import { stalls, type Stall } from "./insights";
+import { KCAL_DAYS, LOGGED_KCAL, PROTEIN_SHORT } from "./nutrition";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
 import type { AppEvent, Experience, Goal, SetEvent } from "./types";
+import { fmtNum } from "./units";
 
 export interface Person {
   id: string;
@@ -65,6 +67,8 @@ export interface Overview {
   sharesBody?: string[];
   /** Whether this coach gets alerts about their clients (on unless turned off). */
   alerts?: boolean;
+  /** Daily nutrition targets this lifter's coaches set them, newest first. */
+  targets?: Targets[];
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -79,6 +83,16 @@ export interface BodyShare {
   heightCm: number | null;
   weights: { at: number; kg: number; bodyFat?: number }[];
   measures: { at: number; site: string; cm: number }[];
+  /** Calories and protein from their food app for each of the last 30 days, oldest first. */
+  food?: { day: string; kcal?: number; protein?: number }[];
+}
+/** A coach's daily nutrition targets for a client. Either number may be empty. */
+export interface Targets {
+  coachId: string;
+  clientId: string;
+  kcal: number | null;
+  protein: number | null;
+  at: number;
 }
 export interface ClientView {
   name: string;
@@ -90,6 +104,8 @@ export interface ClientView {
   note?: Note | null;
   /** The client's body data, when they share it. */
   body?: BodyShare | null;
+  /** This coach's daily nutrition targets for the client. */
+  targets?: Targets | null;
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -124,6 +140,8 @@ export const saveSetup = async (setup: Setup) =>
   (await api<{ setup: Setup }>("/api/coach/", { token: token(), body: { action: "setup", setup } })).setup;
 export const saveNote = async (client: string, text: string) =>
   (await api<{ note: Note | null }>("/api/coach/", { token: token(), body: { action: "note", client, text } })).note;
+export const saveTargets = async (client: string, kcal: number | null, protein: number | null) =>
+  (await api<{ targets: Targets | null }>("/api/coach/", { token: token(), body: { action: "targets", client, kcal, protein } })).targets;
 export const assignPlan = async (client: string, name: string, code: string) =>
   (await api<{ plan: Plan }>("/api/coach/", { token: token(), body: { action: "assign", client, name, code } })).plan;
 export const removePlan = async (id: string) => void (await api("/api/coach/", { token: token(), body: { action: "unassign", id } }));
@@ -205,6 +223,8 @@ export type Flag =
   | { kind: "stalled"; exerciseId: string; weeks: number }
   | { kind: "prs"; count: number }
   | { kind: "planUnused"; name: string }
+  | { kind: "kcalOff"; avg: number; target: number; days: number }
+  | { kind: "proteinShort"; avg: number; target: number; days: number }
   | { kind: "onTrack"; done: number; goal: number };
 
 /** How an assigned routine is going: workouts since it was assigned that follow it. */
@@ -228,6 +248,8 @@ export function planProgress(plan: Plan, sessions: readonly SessionSummary[]): P
 
 export interface Report {
   name: string;
+  /** When it was made, so screens that read it agree on "now". */
+  now: number;
   goal: number | null;
   /** Workouts in each of the last 4 weeks, oldest first; the last is this week so far. */
   weeks: { start: number; count: number }[];
@@ -279,12 +301,41 @@ export function clientReport(view: ClientView, now: number): Report {
       if (rates.every((r) => r < 0.7)) flags.push({ kind: "missing", pct: Math.round((rates.reduce((a, b) => a + b, 0) / 3) * 100) });
     }
     for (const s of stalled.slice(0, 2)) flags.push({ kind: "stalled", exerciseId: s.exerciseId, weeks: s.weeks });
+    // Eating against the coach's targets, from the food days a client shares with their body data.
+    for (const f of foodFlags(view, now)) flags.push(f);
     // A routine given a week ago or more that hasn't been done yet.
     for (const p of plans) if (!p.done && now - p.plan.at >= WEEK) flags.push({ kind: "planUnused", name: p.plan.name });
     if (prs.length) flags.push({ kind: "prs", count: prs.length });
     if (!flags.some((f) => f.kind !== "prs") && goal) flags.push({ kind: "onTrack", done: weeks[3]!.count, goal });
   }
-  return { name: view.name, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans };
+  return { name: view.name, now, goal, weeks, lastAt, sessions: sessions.slice(0, 10), prs, stalls: stalled, flags, names, plans };
+}
+
+/** Logged food days (1,000+ kcal, like nutrition.ts) in the last week, once there are 4. */
+export function foodWeek(view: Pick<ClientView, "body">, now: number): { days: number; kcal: number; protein: number | null } | null {
+  const from = new Date(now - WEEK);
+  const key = `${from.getFullYear()}-${String(from.getMonth() + 1).padStart(2, "0")}-${String(from.getDate()).padStart(2, "0")}`;
+  const days = (view.body?.food ?? []).filter((d) => d.day >= key && (d.kcal ?? 0) >= LOGGED_KCAL);
+  if (days.length < KCAL_DAYS) return null;
+  const withProtein = days.filter((d) => d.protein !== undefined);
+  return {
+    days: days.length,
+    kcal: Math.round(days.reduce((s, d) => s + d.kcal!, 0) / days.length),
+    protein: withProtein.length ? Math.round(withProtein.reduce((s, d) => s + d.protein!, 0) / withProtein.length) : null,
+  };
+}
+
+/** Calories 10% or more off the coach's target, or protein under 85% of it, over the last week of logged days. */
+function foodFlags(view: Pick<ClientView, "body" | "targets">, now: number): Flag[] {
+  const t = view.targets;
+  const week = t && foodWeek(view, now);
+  if (!t || !week) return [];
+  const out: Flag[] = [];
+  if (t.kcal && Math.abs(week.kcal - t.kcal) >= t.kcal * 0.1)
+    out.push({ kind: "kcalOff", avg: week.kcal, target: t.kcal, days: week.days });
+  if (t.protein && week.protein !== null && week.protein < t.protein * PROTEIN_SHORT)
+    out.push({ kind: "proteinShort", avg: week.protein, target: t.protein, days: week.days });
+  return out;
 }
 
 /** An exercise's name on the coach's phone: the library's, the client's own, or a plain fallback. */
@@ -313,6 +364,18 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       return { title: t("trn.f.prs", { count: f.count }), advice: t("trn.f.prsDo"), tone: "good" };
     case "planUnused":
       return { title: t("trn.f.planUnused", { name: f.name }), advice: t("trn.f.planUnusedDo"), tone: "warn" };
+    case "kcalOff":
+      return {
+        title: t(f.avg < f.target ? "trn.f.kcalUnder" : "trn.f.kcalOver", { avg: fmtNum(f.avg), target: fmtNum(f.target), count: f.days }),
+        advice: t(f.avg < f.target ? "trn.f.kcalUnderDo" : "trn.f.kcalOverDo"),
+        tone: "warn",
+      };
+    case "proteinShort":
+      return {
+        title: t("trn.f.proteinShort", { avg: f.avg, target: f.target, count: f.days }),
+        advice: t("trn.f.proteinShortDo"),
+        tone: "warn",
+      };
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }
@@ -322,6 +385,7 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
 
 const CACHE = "liftsmith.coachNotes";
 const SEEN = "liftsmith.coachNotes.seen";
+const TARGETS = "liftsmith.coachTargets";
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
 
@@ -339,6 +403,8 @@ interface NotesState {
   notes: ShownNote[];
   /** Coaches or clients with unread messages, for Today and the Coaching row. */
   unread: Unread[];
+  /** The newest daily nutrition targets from a coach, with the coach's name, for coach's notes and Health. */
+  targets: (Targets & { coach: string }) | null;
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
   seen: string[];
 }
@@ -362,6 +428,7 @@ function writeJson(key: string, v: unknown) {
 export const useCoachNotes = create<NotesState>(() => ({
   notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
   unread: [],
+  targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
 }));
 
@@ -373,14 +440,17 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 }
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
-export function keepNotes(o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread">>): void {
+export function keepNotes(o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets">>): void {
   const notes = shownNotes(o);
   writeJson(CACHE, notes);
+  const first = (o.targets ?? []).find((x) => o.coaches.some((c) => c.id === x.coachId));
+  const targets = first ? { ...first, coach: o.coaches.find((c) => c.id === first.coachId)?.name ?? "" } : null;
+  writeJson(TARGETS, targets);
   const people = [...o.coaches, ...(o.clients ?? [])];
   const unread = Object.entries(o.unread ?? {})
     .filter(([, n]) => n > 0)
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread });
+  useCoachNotes.setState({ notes, unread, targets });
 }
 
 /** A chat was opened: its messages are read now. */
@@ -410,5 +480,6 @@ export function dismissNote(n: Note): void {
 /** Signed out, or the lifter erased their data: nothing from a coach stays on the device. */
 export function forgetNotes(): void {
   writeJson(CACHE, []);
-  useCoachNotes.setState({ notes: [], unread: [] });
+  writeJson(TARGETS, null);
+  useCoachNotes.setState({ notes: [], unread: [], targets: null });
 }

@@ -52,6 +52,7 @@ beforeEach(() => {
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
         setup: { days: 3 },
+        targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
       });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
@@ -60,6 +61,8 @@ beforeEach(() => {
     }
     if (body?.action === "send") return Response.json({ message: { id: "m2", from: "me", text: body.text, at: NOW + 1 } });
     if (body?.action === "share") return Response.json({ on: body.on });
+    if (body?.action === "targets")
+      return Response.json({ targets: { coachId: "me", clientId: body.client, kcal: body.kcal, protein: body.protein, at: NOW } });
     if (body?.action === "setup") return Response.json({ setup: body.setup });
     if (body?.action === "note") {
       note = body.text ? { coachId: "me", clientId: body.client, text: body.text, at: NOW } : null;
@@ -244,5 +247,27 @@ describe("chat and body data", () => {
     expect(screen.getByText("24%")).toBeInTheDocument();
     expect(screen.getByText("Waist")).toBeInTheDocument();
     expect(screen.getByText(/They share their body data with you/)).toBeInTheDocument();
+  });
+});
+
+describe("nutrition targets", () => {
+  it("a coach sets a client's daily calories and protein with the bumps", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Daily nutrition targets")).toBeInTheDocument();
+    await u.type(screen.getByLabelText("Calories a day"), "2400");
+    await u.type(screen.getByLabelText("Protein a day (g)"), "160");
+    await u.click(screen.getByRole("button", { name: "Save targets" }));
+    expect(await screen.findByText("Saved. They'll see these under Coaching.")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "targets")).toMatchObject({
+      body: { client: "c1", kcal: 2400, protein: 160 },
+    });
+  });
+
+  it("a client sees their coach's targets under Coaching", async () => {
+    linked = true;
+    render(<Trainer />);
+    expect(await screen.findByText("Daily targets from Sam")).toBeInTheDocument();
+    expect(screen.getByText("2400 kcal · 160 g protein")).toBeInTheDocument();
   });
 });

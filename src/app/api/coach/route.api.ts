@@ -4,7 +4,8 @@
 // code), "unlink" (either side ends it, with `id`), "assign" (a coach gives a client a routine: `client`, `name`,
 // `code`), "unassign" (with the plan's `id`), "setup" (what the coach's new clients start setup with: `setup`) and
 // "note" (the coach's note to a client: `client`, `text`; empty text clears it), "send" (a chat message to the other
-// side: `id`, `text`), "share" (a client shares body data with a coach or stops: `id`, `on`), "alerts" (a coach's
+// side: `id`, `text`), "targets" (a coach's daily calories and protein for a client: `client`, `kcal`, `protein`;
+// both empty clears them), "share" (a client shares body data with a coach or stops: `id`, `on`), "alerts" (a coach's
 // alerts on or off: `on`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // GET ?chat=<id>[&before=<ms>]: the messages with that person, which marks them read.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
@@ -24,6 +25,7 @@ import {
   setAlerts,
   setNote,
   setShare,
+  setTargets,
   unlink,
 } from "@/server/coach";
 import { saveToken } from "@/server/push";
@@ -63,6 +65,8 @@ export async function POST(req: Request) {
         token?: unknown;
         platform?: unknown;
         lang?: unknown;
+        kcal?: unknown;
+        protein?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -89,6 +93,11 @@ export async function POST(req: Request) {
       const r = await setNote(s.accountId, body.client, body.text);
       if (r && "error" in r) return reply(req, 404, r);
       return reply(req, 200, { note: r });
+    }
+    case "targets": {
+      const r = await setTargets(s.accountId, body.client, body.kcal, body.protein);
+      if (r && "error" in r) return reply(req, 404, r);
+      return reply(req, 200, { targets: r });
     }
     case "send": {
       const r = await sendMessage(s.accountId, body.id, body.text);

@@ -216,3 +216,39 @@ describe("food coach's notes", () => {
     expect(notes.some((i) => i.id.startsWith("eat-low-"))).toBe(false);
   });
 });
+
+describe("targets from a coach", () => {
+  const coach = (kcal: number | null, protein: number | null) => ({ kcal, protein, coach: "Sam" });
+
+  it("protein goes by the coach's target instead of the body-weight rule", () => {
+    // 120 g a day is fine for 80 kg (128 g, short under 108.8 g) but short of a coach's 160 g.
+    const events = days([
+      [1, 2400, 120],
+      [2, 2400, 120],
+      [3, 2400, 120],
+    ]);
+    expect(ids(events).some((id) => id.startsWith("protein-short-"))).toBe(false);
+    const note = insights({ events, profile: base, now: NOW, coachTargets: coach(null, 160) }).find((i) =>
+      i.id.startsWith("protein-short-"),
+    )!;
+    expect(note.why).toBe(t("ins.proteinShort.whyCoach", { avg: 120, target: 160, name: "Sam" }));
+    expect(proteinShort([], 0, NOW, 160)).toBeNull();
+  });
+
+  it("calories are judged against the coach's target alone, 10% either way", () => {
+    const week = (kcal: number) =>
+      days([
+        [1, kcal],
+        [2, kcal],
+        [3, kcal],
+        [4, kcal],
+      ]);
+    const notes = (kcal: number, target: number) =>
+      insights({ events: week(kcal), profile: base, now: NOW, coachTargets: coach(target, null) }).map((i) => i.id);
+    expect(notes(1900, 2400).some((id) => id.startsWith("coach-kcal-") && id.endsWith("-under"))).toBe(true);
+    expect(notes(2900, 2400).some((id) => id.startsWith("coach-kcal-") && id.endsWith("-over"))).toBe(true);
+    expect(notes(2300, 2400).some((id) => id.startsWith("coach-kcal-"))).toBe(false);
+    // With a coach's calorie target, the maintenance-based notes stay quiet.
+    expect(notes(1200, 1300).some((id) => id.startsWith("eat-low"))).toBe(false);
+  });
+});

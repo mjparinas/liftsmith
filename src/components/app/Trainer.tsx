@@ -51,12 +51,14 @@ import {
   type Report,
   type Setup,
   type ShownNote,
+  type Targets,
 } from "@/lib/trainer";
 import type { Experience, Goal, Routine } from "@/lib/types";
 import { fmtWeight } from "@/lib/units";
 
 import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
+import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
 import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
@@ -117,6 +119,7 @@ function Home({ code }: { code: string }) {
           notes={data?.notes ?? []}
           unread={data?.unread ?? {}}
           shared={data?.bodyShared ?? []}
+          targets={data?.targets ?? []}
           code={code}
           onChange={reload}
         />
@@ -136,6 +139,7 @@ function YourCoach({
   notes,
   unread,
   shared,
+  targets,
   code,
   onChange,
 }: {
@@ -144,6 +148,7 @@ function YourCoach({
   notes: Note[];
   unread: Record<string, number>;
   shared: string[];
+  targets: Targets[];
   code: string;
   onChange: () => void;
 }) {
@@ -223,11 +228,14 @@ function YourCoach({
   };
   return (
     <div>
-      {(plans.length > 0 || notes.length > 0) && (
+      {(plans.length > 0 || notes.length > 0 || targets.length > 0) && (
         <div className="mb-3">
           <p className="mb-2 px-1 text-sm font-semibold">{t("trn.fromCoach")}</p>
           {notes.map((n) => (
             <NoteCard key={n.coachId} note={n} coach={coaches.find((c) => c.id === n.coachId)?.name ?? ""} />
+          ))}
+          {targets.map((x) => (
+            <TargetsCard key={x.coachId} targets={x} coach={coaches.find((c) => c.id === x.coachId)?.name ?? ""} />
           ))}
           <ul className="space-y-2">
             {plans.map((p) => {
@@ -809,6 +817,7 @@ function ClientScreen({ id }: { id: string }) {
   const [report, setReport] = useState<Report | null>(null);
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
+  const [targets, setTargets] = useState<Targets | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -821,6 +830,7 @@ function ClientScreen({ id }: { id: string }) {
         setReport(clientReport(v, Date.now()));
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
+        setTargets(v.targets ?? null);
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -923,6 +933,14 @@ function ClientScreen({ id }: { id: string }) {
         )}
       </Section>
       <ClientPlans clientId={id} plans={report.plans} onChange={() => setVersion((n) => n + 1)} />
+      <ClientTargets
+        key={targets?.at ?? 0}
+        clientId={id}
+        saved={targets}
+        body={body}
+        now={report.now}
+        onChange={() => setVersion((n) => n + 1)}
+      />
       {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">
