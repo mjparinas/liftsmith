@@ -68,13 +68,13 @@ struct WorkoutView: View {
                             Text(p.start, style: .timer)
                         }
                     }
-                    .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
+                    .font(.system(.largeTitle, design: .rounded, weight: .heavy).monospacedDigit())
                 } else if resting, let end = s.restEnd {
                     Text(timerInterval: now...end, countsDown: true)
-                        .font(.system(size: 34, weight: .heavy, design: .rounded).monospacedDigit())
+                        .font(.system(.largeTitle, design: .rounded, weight: .heavy).monospacedDigit())
                     Text("Next: \(s.next)").font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)
                 } else {
-                    Text(s.next).font(.system(size: 24, weight: .heavy, design: .rounded).monospacedDigit())
+                    Text(s.next).font(.system(.title2, design: .rounded, weight: .heavy).monospacedDigit())
                         .multilineTextAlignment(.center).minimumScaleFactor(0.7)
                     if !s.plates.isEmpty {
                         Text(s.plates).font(.footnote).foregroundStyle(.secondary).multilineTextAlignment(.center)

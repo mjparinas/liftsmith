@@ -595,12 +595,13 @@ export function Workout() {
         </div>
       )}
 
-      <div className="mt-3 flex gap-1" aria-label={t("wk.progress")}>
+      <div className="mt-3 flex gap-1" role="group" aria-label={t("wk.progress")}>
         {active.plan.items.map((it, i) => (
           <button
             key={i}
             type="button"
-            aria-label={exercise(it.exerciseId).name}
+            aria-label={i < active.index ? t("wk.progressDone", { name: exercise(it.exerciseId).name }) : exercise(it.exerciseId).name}
+            aria-current={i === active.index ? "step" : undefined}
             onClick={() => s.goTo(i)}
             className={`h-1.5 flex-1 rounded-full transition-colors duration-300 ${i < active.index ? "bg-mint" : i === active.index ? "bg-gradient-to-r from-accent to-accent-2 shadow-[0_0_10px_rgb(76_141_255/0.6)]" : "bg-line"}`}
           />

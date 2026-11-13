@@ -11,7 +11,7 @@ import { exercise } from "@/lib/exercises";
 import { COSMETICS, crates, game, RARITY_LABEL, titleOf, type Cosmetic } from "@/lib/game";
 import { date, inSentence, num, t } from "@/lib/i18n";
 import { activeInjuries, PART_LABEL } from "@/lib/injury";
-import { applyAccent, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
+import { applyAccent, calm, confetti, haptic, juice, sound, type TimerSound } from "@/lib/juice";
 import { maybeAskRating } from "@/lib/rateApp";
 import { doneItems } from "@/lib/routines";
 import { badgeShare, levelShare, previousBest, prShare, workoutShare } from "@/lib/shareCards";
@@ -43,7 +43,7 @@ import { Button } from "./ui";
 function useCountUp(to: number, ms = 900) {
   const [v, setV] = useState(0);
   useEffect(() => {
-    const dur = juice.lean ? 1 : ms;
+    const dur = calm() ? 1 : ms; // Lean mode or the phone's reduce motion: show the total at once.
     const t0 = performance.now();
     let raf = 0;
     const tick = (t: number) => {
