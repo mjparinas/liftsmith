@@ -5,6 +5,7 @@ Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for c
 ## Pricing
 
 - **Out of Labs, a Pro feature** (Melvin picked it, 2026-11-12, from the focus-area ranking: "trainer mode out of Labs"). Coaching clients is `coaching` in `PRO_FEATURES` (`entitlements.ts`), on the paywall like every Pro feature (`#/pro/coaching`); the `labTrainer` flag and its Labs entry are gone. Free lifters see the Coach clients row with a Pro tag that opens the paywall. **Being a client is free** for everyone, so a coach can bring anyone in. **A coach with 3 or more clients who each trained in the last 14 days gets Pro free** while that holds (Melvin, 2026-11-12, growth plan item 3; `coachEarnsPro` in `src/server/earnedPro.ts`, [Growth](growth.md)). Up to 30 clients per coach. The check is on the coach's phone; the server doesn't know about Pro (store subscriptions live in RevenueCat).
+- **High school coaches get Pro free** once they prove a school email address, and so do their athletes aged 13 to 18, who join through a team code and become the coach's clients; a verified school coach can have up to 300 clients (Melvin, 2026-11-13; [School teams](school-teams.md)).
 - **A coach plan waits** until real trainers use it (Melvin, 2026-11-12: "coach pricing later"). The coach page says coaching more than 30 people should get in touch.
 - *Before:* a lab from 2026-11-11 (`labTrainer`, Melvin chose it then).
 

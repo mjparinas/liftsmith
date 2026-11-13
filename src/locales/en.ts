@@ -110,6 +110,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as team from "./text/team";
 import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
@@ -239,6 +240,7 @@ export const en = {
   ...timer.en,
   ...tdee.en,
   ...theme.en,
+  ...team.en,
   ...tier.en,
   ...time.en,
   ...today.en,

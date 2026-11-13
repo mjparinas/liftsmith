@@ -6,6 +6,7 @@
 // client's report (Pro: out of Labs on 2026-11-12). The client's report also holds the coach's note to them.
 // A client's report is #/trainer/c.<id>; an invite link is #/trainer/<code>, which fills in the code.
 // Physio support (2026-11-13) lives in CoachRehab.tsx: trainer or physio, pain and injuries, rehab programs.
+// School teams (SchoolTeams.tsx) sit at the bottom; a team link is #/trainer/team.<code>.
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 
 import { track } from "@/lib/analytics";
@@ -18,6 +19,8 @@ import { rehabName } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
+import { teamCodeFrom } from "@/lib/teams";
+import { bodyCompOn } from "@/lib/teen";
 import {
   assignPlan,
   cancelInvite,
@@ -65,10 +68,12 @@ import { ClientPain, CoachKindPicker, PainShareSwitch, PerWeekPicker, RehabProgr
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
+import { SchoolTeams } from "./SchoolTeams";
 import { Button, Chip, EmptyState, ProTag, ScreenHeader, Section, Sheet, SwitchRow } from "./ui";
 
 const CLIENT = "c.";
 const CHAT = "m.";
+const TEAM = "team.";
 
 export function Trainer({ arg }: { arg?: string }) {
   const account = useAccount((s) => s.account);
@@ -86,10 +91,12 @@ export function Trainer({ arg }: { arg?: string }) {
     );
   if (arg?.startsWith(CLIENT)) return <ClientScreen id={arg.slice(CLIENT.length)} />;
   if (arg?.startsWith(CHAT)) return <ChatScreen id={arg.slice(CHAT.length)} />;
+  // A school team's link (#/trainer/team.<code>, SchoolTeams.tsx) fills in the team code instead.
+  if (arg?.startsWith(TEAM)) return <Home code="" team={teamCodeFrom(arg.slice(TEAM.length))} />;
   return <Home code={arg ? codeFrom(arg) : ""} />;
 }
 
-function Home({ code }: { code: string }) {
+function Home({ code, team = "" }: { code: string; team?: string }) {
   const [data, setData] = useState<Overview | null>(null);
   const [note, setNote] = useState<string | null>(null);
   const reload = useCallback(() => {
@@ -133,6 +140,9 @@ function Home({ code }: { code: string }) {
       <Section title={t("trn.yourClients")} icon="target">
         <YourClients data={data} onChange={reload} />
       </Section>
+      <Section title={t("team.title")} icon="trophy" info="schoolTeams">
+        <SchoolTeams code={team} />
+      </Section>
     </div>
   );
 }
@@ -162,6 +172,7 @@ function YourCoach({
   code: string;
   onChange: () => void;
 }) {
+  const comp = bodyCompOn(useApp((s) => s.profile));
   const [text, setText] = useState(code ? showCode(code) : "");
   const [found, setFound] = useState<Person | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -293,16 +304,18 @@ function YourCoach({
           ))}
         </ul>
       )}
-      {/* Body data is the client's choice, per coach, and off until they turn it on. */}
-      {coaches.map((c) => (
-        <SwitchRow
-          key={c.id}
-          label={t("trn.shareBody", { name: c.name || t("trn.noName") })}
-          hint={t("trn.shareBodyHint")}
-          on={shared.includes(c.id)}
-          onChange={(v) => void share(c, v)}
-        />
-      ))}
+      {/* Body data is the client's choice, per coach, and off until they turn it on. Under 18, it waits until body
+          composition is on in Body › Health (teen.ts). */}
+      {comp &&
+        coaches.map((c) => (
+          <SwitchRow
+            key={c.id}
+            label={t("trn.shareBody", { name: c.name || t("trn.noName") })}
+            hint={t("trn.shareBodyHint")}
+            on={shared.includes(c.id)}
+            onChange={(v) => void share(c, v)}
+          />
+        ))}
       {/* Pain and injuries too, per coach and off until turned on: a physio needs them, a trainer may not. */}
       {coaches.map((c) => (
         <PainShareSwitch key={c.id} coach={c} on={painShared.includes(c.id)} onChange={onChange} />

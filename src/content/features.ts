@@ -550,6 +550,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         pro: "coaching",
         added: "2026-11-13",
       },
+      {
+        id: "school-teams",
+        name: "Free for high school teams",
+        body: "High school coaches who confirm a school email address get Pro free, and so do the athletes aged 13 to 18 on their teams, with a weekly team board. Body fat and public profiles stay off for under 18s.",
+        tier: "free",
+        added: "2026-11-13",
+      },
     ],
   },
   {

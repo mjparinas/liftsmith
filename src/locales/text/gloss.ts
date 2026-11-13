@@ -121,6 +121,9 @@ export const en = {
   "gloss.monthly.title": "The monthly challenge",
   "gloss.monthly.body":
     "Every lifter gets the same challenge each month: a number of workouts, sets or minutes, rotating month to month. Your own finished workouts count, so it works offline.\nFinish it before the month ends to earn that month's medal. Each finished month counts toward the Monthly challenger badge. Friends › Board shows how the people you follow are doing.",
+  "gloss.schoolTeams.title": "School teams",
+  "gloss.schoolTeams.body":
+    "High school coaches get Pro free once they confirm an email address from their school or district. Their athletes aged 13 to 18 get Pro free too, for as long as they're on the team.\nThe coach sees your workouts, not your body data. Teammates see only your first name and how many workouts and sets you did this week.",
 } as const;
 
 type Key = keyof typeof en;
@@ -243,6 +246,9 @@ export const es: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "El reto del mes",
   "gloss.monthly.body":
     "Todos reciben el mismo reto cada mes: un número de entrenamientos, series o minutos, que va cambiando de mes en mes. Cuentan tus entrenamientos terminados, así que funciona sin conexión.\nTermínalo antes de que acabe el mes para ganar la medalla de ese mes. Cada mes terminado cuenta para la insignia Reto del mes. Amigos › Clasificación muestra cómo van las personas que sigues.",
+  "gloss.schoolTeams.title": "Equipos escolares",
+  "gloss.schoolTeams.body":
+    "Los entrenadores de secundaria tienen Pro gratis al confirmar una dirección de correo de su escuela o distrito. Sus atletas de 13 a 18 años también tienen Pro gratis mientras estén en el equipo.\nEl entrenador ve tus entrenamientos, no tus datos corporales. Tus compañeros solo ven tu nombre de pila y cuántos entrenamientos y series hiciste esta semana.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -363,6 +369,9 @@ export const fr: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "Le défi du mois",
   "gloss.monthly.body":
     "Chaque mois, tout le monde a le même défi : un nombre de séances, de séries ou de minutes, qui change d’un mois à l’autre. Vos séances terminées comptent, donc ça marche hors ligne.\nRéussissez-le avant la fin du mois pour gagner la médaille du mois. Chaque mois réussi compte pour le badge Défi du mois. Amis › Classement montre où en sont les personnes que vous suivez.",
+  "gloss.schoolTeams.title": "Équipes scolaires",
+  "gloss.schoolTeams.body":
+    "Les entraîneurs d’école secondaire ont Pro gratuitement après avoir confirmé une adresse courriel de leur école ou de leur district. Leurs athlètes de 13 à 18 ans ont aussi Pro gratuitement tant qu’ils font partie de l’équipe.\nL’entraîneur voit vos séances, pas vos données corporelles. Vos coéquipiers ne voient que votre prénom et le nombre de séances et de séries de la semaine.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -483,6 +492,9 @@ export const de: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "Die Challenge des Monats",
   "gloss.monthly.body":
     "Jeden Monat haben alle dieselbe Challenge: eine Zahl an Trainings, Sätzen oder Minuten, die von Monat zu Monat wechselt. Deine abgeschlossenen Trainings zählen, also klappt es auch offline.\nSchaffe sie vor Monatsende, um die Medaille des Monats zu bekommen. Jeder geschaffte Monat zählt für das Abzeichen Monatschallenge. Unter Freunde › Rangliste siehst du, wie es bei den Leuten läuft, denen du folgst.",
+  "gloss.schoolTeams.title": "Schulteams",
+  "gloss.schoolTeams.body":
+    "Trainer an weiterführenden Schulen bekommen Pro kostenlos, sobald sie eine E-Mail-Adresse ihrer Schule oder ihres Schulträgers bestätigen. Ihre Sportler von 13 bis 18 Jahren bekommen Pro ebenfalls kostenlos, solange sie im Team sind.\nDer Trainer sieht deine Trainings, nicht deine Körperdaten. Teamkollegen sehen nur deinen Vornamen und wie viele Trainings und Sätze du diese Woche gemacht hast.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -603,6 +615,9 @@ export const it: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "La sfida del mese",
   "gloss.monthly.body":
     "Ogni mese tutti hanno la stessa sfida: un numero di allenamenti, serie o minuti, che cambia di mese in mese. Contano i tuoi allenamenti completati, quindi funziona anche offline.\nCompletala prima della fine del mese per vincere la medaglia del mese. Ogni mese completato conta per il badge Sfida del mese. Amici › Classifica mostra come vanno le persone che segui.",
+  "gloss.schoolTeams.title": "Squadre scolastiche",
+  "gloss.schoolTeams.body":
+    "Gli allenatori delle superiori hanno Pro gratis dopo aver confermato un indirizzo email della loro scuola o del distretto. Anche i loro atleti dai 13 ai 18 anni hanno Pro gratis finché sono nella squadra.\nL’allenatore vede i tuoi allenamenti, non i tuoi dati corporei. I compagni vedono solo il tuo nome e quanti allenamenti e serie hai fatto questa settimana.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -723,4 +738,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "gloss.monthly.title": "今月のチャレンジ",
   "gloss.monthly.body":
     "毎月、全員に同じチャレンジが用意されます。ワークアウト回数、セット数、トレーニング時間のいずれかで、月ごとに入れ替わります。完了したワークアウトが加算されるので、オフラインでも使えます。\n月末までに達成するとその月のメダルがもらえます。達成した月はマンスリーチャレンジャーのバッジに加算されます。フレンド › ランキングで、フォローしている人の進み具合が見られます。",
+  "gloss.schoolTeams.title": "学校のチーム",
+  "gloss.schoolTeams.body":
+    "高校のコーチは、学校や教育委員会のメールアドレスを確認すると Pro が無料になります。チームにいる13〜18歳の選手も、チームにいる間は Pro が無料です。\nコーチに見えるのはワークアウトだけで、体のデータは見えません。チームメイトに見えるのは下の名前と今週のワークアウト数・セット数だけです。",
 };

@@ -100,6 +100,9 @@ export const en = {
   "pro.welcome.trialNote.web": "Free for {days} days. You can cancel any time under Manage subscription before it ends.",
   "pro.ft.coaching": "Coach clients",
   "pro.fb.coaching": "Invite clients, see what each one needs first, and send them routines and notes. Being a client is free.",
+  "pro.status.school":
+    "Pro comes with your account because you coach a high school team with a confirmed school address. There is nothing to buy or manage.",
+  "pro.status.team": "Pro comes with your account because you're on a high school team. There is nothing to buy or manage.",
 } as const;
 
 type Key = keyof typeof en;
@@ -205,6 +208,9 @@ export const es: Partial<Record<Key, Message>> = {
     "Gratis durante {days} días. Puedes cancelarla cuando quieras en Gestionar suscripción antes de que termine.",
   "pro.ft.coaching": "Entrenar a clientes",
   "pro.fb.coaching": "Invita a clientes, mira qué necesita cada uno primero y envíales rutinas y notas. Ser cliente es gratis.",
+  "pro.status.school":
+    "Pro viene con tu cuenta porque entrenas a un equipo de secundaria con una dirección escolar confirmada. No hay nada que comprar ni gestionar.",
+  "pro.status.team": "Pro viene con tu cuenta porque estás en un equipo de secundaria. No hay nada que comprar ni gestionar.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -313,6 +319,10 @@ export const fr: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "Coacher des clients",
   "pro.fb.coaching":
     "Invitez des clients, voyez d'abord ce dont chacun a besoin et envoyez-leur des routines et des notes. Être client est gratuit.",
+  "pro.status.school":
+    "Pro est inclus avec votre compte parce que vous entraînez une équipe d’école secondaire avec une adresse scolaire confirmée. Il n’y a rien à acheter ni à gérer.",
+  "pro.status.team":
+    "Pro est inclus avec votre compte parce que vous faites partie d’une équipe d’école secondaire. Il n’y a rien à acheter ni à gérer.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -418,6 +428,9 @@ export const de: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "{days} Tage gratis. Du kannst jederzeit vor dem Ende unter „Abo verwalten“ kündigen.",
   "pro.ft.coaching": "Kunden coachen",
   "pro.fb.coaching": "Lade Kunden ein, sieh zuerst, was jeder braucht, und schick ihnen Routinen und Notizen. Kunde sein ist kostenlos.",
+  "pro.status.school":
+    "Pro ist in deinem Konto enthalten, weil du ein Schulteam mit bestätigter Schuladresse trainierst. Du musst nichts kaufen oder verwalten.",
+  "pro.status.team": "Pro ist in deinem Konto enthalten, weil du in einem Schulteam bist. Du musst nichts kaufen oder verwalten.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -521,6 +534,9 @@ export const it: Partial<Record<Key, Message>> = {
   "pro.welcome.trialNote.web": "Gratis per {days} giorni. Puoi annullare quando vuoi in Gestisci abbonamento prima della fine.",
   "pro.ft.coaching": "Segui dei clienti",
   "pro.fb.coaching": "Invita clienti, guarda prima di cosa ha bisogno ciascuno e mandagli routine e note. Essere cliente è gratis.",
+  "pro.status.school":
+    "Pro è incluso nel tuo account perché alleni una squadra delle superiori con un indirizzo scolastico confermato. Non c’è nulla da comprare o gestire.",
+  "pro.status.team": "Pro è incluso nel tuo account perché fai parte di una squadra delle superiori. Non c’è nulla da comprare o gestire.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -623,4 +639,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "pro.ft.coaching": "クライアントの指導",
   "pro.fb.coaching":
     "クライアントを招待して、一人ひとりがまず必要なことを確認し、ルーティンやメモを送れます。クライアントになるのは無料です。",
+  "pro.status.school": "学校のアドレスを確認した高校のコーチなので、アカウントに Pro が含まれます。購入や管理は不要です。",
+  "pro.status.team": "高校のチームに参加しているので、アカウントに Pro が含まれます。購入や管理は不要です。",
 };
