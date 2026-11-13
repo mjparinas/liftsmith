@@ -24,7 +24,8 @@ function afterInjuryChange(c: Ctx) {
     const now = Date.now();
     const items: PlanItem[] = a.plan.items.slice(0, a.index);
     for (const item of a.plan.items.slice(a.index)) {
-      if (setsDone(events, a.sessionId, item.exerciseId) > 0) {
+      // The physio's rehab beside the lifting stays as written too, and cardio isn't for the injury to change.
+      if (item.part || setsDone(events, a.sessionId, item.exerciseId) > 0) {
         items.push(item);
         continue;
       }

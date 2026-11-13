@@ -33,6 +33,12 @@ export const en = {
   "note.fixSwap": "Plateau fix: {name} instead of {was} for three weeks",
   "note.cardioFirst": "First time: 20 minutes at a steady pace, change it to suit you",
   "note.cardioAgain": "Same as last time; go a little longer or further if it felt easy",
+  "note.rehabFirst": "Rehab from your physio: as written, stop if it hurts",
+  "note.rehabAgain": "Rehab: same as last time, as your physio wrote it",
+  "note.cardioPart": {
+    one: "Cardio after the lifting: {count} minute at a steady pace",
+    other: "Cardio after the lifting: {count} minutes at a steady pace",
+  },
 } as const;
 
 type Key = keyof typeof en;
@@ -67,6 +73,12 @@ export const es: Partial<Record<Key, Message>> = {
   "note.fixSwap": "Plan contra el estancamiento: {name} en lugar de {was} durante tres semanas",
   "note.cardioFirst": "Primera vez: 20 minutos a ritmo constante, ajústalo a tu gusto",
   "note.cardioAgain": "Igual que la última vez; un poco más de tiempo o distancia si te resultó fácil",
+  "note.rehabFirst": "Rehabilitación de tu fisioterapeuta: tal cual, para si duele",
+  "note.rehabAgain": "Rehabilitación: lo mismo que la última vez, como lo indicó tu fisioterapeuta",
+  "note.cardioPart": {
+    one: "Cardio después de las pesas: {count} minuto a ritmo constante",
+    other: "Cardio después de las pesas: {count} minutos a ritmo constante",
+  },
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -99,6 +111,12 @@ export const fr: Partial<Record<Key, Message>> = {
   "note.fixSwap": "Plan anti-plateau : {name} à la place de {was} pendant trois semaines",
   "note.cardioFirst": "Première fois : 20 minutes à allure régulière, ajustez selon vous",
   "note.cardioAgain": "Comme la dernière fois ; un peu plus long ou plus loin si c’était facile",
+  "note.rehabFirst": "Rééducation de votre kiné : telle quelle, arrêtez si ça fait mal",
+  "note.rehabAgain": "Rééducation : comme la dernière fois, comme l’a prévu votre kiné",
+  "note.cardioPart": {
+    one: "Cardio après la muscu : {count} minute à allure régulière",
+    other: "Cardio après la muscu : {count} minutes à allure régulière",
+  },
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -131,6 +149,12 @@ export const de: Partial<Record<Key, Message>> = {
   "note.fixSwap": "Plateau-Lösung: {name} statt {was} für drei Wochen",
   "note.cardioFirst": "Erstes Mal: 20 Minuten in gleichmäßigem Tempo, nach Bedarf anpassen",
   "note.cardioAgain": "Wie beim letzten Mal; etwas länger oder weiter, wenn es leicht war",
+  "note.rehabFirst": "Reha von deiner Physiotherapie: wie vorgegeben, hör auf, wenn es wehtut",
+  "note.rehabAgain": "Reha: wie beim letzten Mal, so wie deine Physiotherapie es vorgibt",
+  "note.cardioPart": {
+    one: "Cardio nach dem Krafttraining: {count} Minute in ruhigem Tempo",
+    other: "Cardio nach dem Krafttraining: {count} Minuten in ruhigem Tempo",
+  },
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -163,6 +187,12 @@ export const it: Partial<Record<Key, Message>> = {
   "note.fixSwap": "Soluzione stallo: {name} al posto di {was} per tre settimane",
   "note.cardioFirst": "Prima volta: 20 minuti a ritmo costante, adattalo a te",
   "note.cardioAgain": "Come l’ultima volta; un po’ più a lungo o più lontano se è stato facile",
+  "note.rehabFirst": "Riabilitazione dal tuo fisioterapista: così com’è, fermati se fa male",
+  "note.rehabAgain": "Riabilitazione: come l’ultima volta, come l’ha scritta il tuo fisioterapista",
+  "note.cardioPart": {
+    one: "Cardio dopo i pesi: {count} minuto a ritmo costante",
+    other: "Cardio dopo i pesi: {count} minuti a ritmo costante",
+  },
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -192,4 +222,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "note.fixSwap": "停滞の対策：3週間{was}の代わりに{name}",
   "note.cardioFirst": "初回：一定のペースで20分。自分に合わせて調整",
   "note.cardioAgain": "前回と同じ。楽だったら少し長く、または遠くへ",
+  "note.rehabFirst": "理学療法士のリハビリ：指示どおりに。痛むなら中止",
+  "note.rehabAgain": "リハビリ：前回と同じ、理学療法士の指示どおり",
+  "note.cardioPart": { other: "ウエイトのあとの有酸素：一定のペースで{count}分" },
 };

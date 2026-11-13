@@ -234,8 +234,9 @@ export interface Target {
 export function sessionsOf(events: readonly AppEvent[], exerciseId: string): SetEvent[][] {
   const by = new Map<string, SetEvent[]>();
   for (const e of events) {
-    // Drop and rest-pause sets are bonus work, not the plan's sets: progression reads the planned ones.
-    if (e.type !== "set" || e.exerciseId !== exerciseId || e.tag) continue;
+    // Drop and rest-pause sets are bonus work, not the plan's sets: progression reads the planned ones. Rehab done
+    // beside the lifting is lighter by design and never moves the main lifts (sessions-with-parts.md, stage 5).
+    if (e.type !== "set" || e.exerciseId !== exerciseId || e.tag || e.partId === "rehab") continue;
     const list = by.get(e.sessionId) ?? [];
     list.push(e);
     by.set(e.sessionId, list);

@@ -177,7 +177,7 @@ export function Workout() {
   const finished = !!active && active.index >= active.plan.items.length;
   // Workouts with parts: a warm-up first plays on its own screen; a cool-down may come after the lifting.
   const partKind = partNow(active);
-  const coolNext = !!active?.parts?.[(active.part ?? 0) + 1] && active.parts[(active.part ?? 0) + 1]!.kind === "cool";
+  const coolNext = !!active?.parts?.slice((active.part ?? 0) + 1).some((p) => p.kind === "cool");
   useEffect(() => {
     if (partKind === "warm") go("stretch", "warmup");
   }, [partKind]);
@@ -431,7 +431,7 @@ export function Workout() {
   const end = () => {
     // Back here from the cool-down: Finish ends the workout without it.
     if (partKind === "cool") endWorkout({ skip: true });
-    else if (s.nextPart() === "cool") return go("stretch", "cooldown");
+    else if (s.toCoolDown()) return go("stretch", "cooldown");
     else endWorkout();
     go("done");
   };

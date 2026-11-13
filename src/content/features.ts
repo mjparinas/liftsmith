@@ -255,7 +255,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "workout-parts",
         name: "Workouts with parts",
-        body: "A workout can run a warm-up, the lifting and a cool-down in order, with Skip between them. The lock screen and your watch show which part you're on, History shows each part, and stretch days of 10 minutes or more keep your streak. Routines can carry their own warm-up and cool-down, in share links and from your coach. Coach's notes read each part: pain after rehab easing or rising, and a heart rate that stays up through the cool-down.",
+        body: "A workout can run a warm-up, the lifting and a cool-down in order, with Skip between them. The lock screen and your watch show which part you're on, History shows each part, and stretch days of 10 minutes or more keep your streak. Routines can carry their own warm-up and cool-down, in share links and from your coach. Coach's notes read each part: pain after rehab easing or rising, and a heart rate that stays up through the cool-down. Your physio's rehab can run beside the lifting in the same workout on the days it's due, and cardio can follow the lifting, with the machine and minutes picked by tap.",
         tier: "free",
         added: "2026-11-13",
       },

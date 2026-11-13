@@ -21,16 +21,32 @@ const REHAB_MARK = "rehab";
  * (`w:cat-cow,leg-swings`). They sit after the exercises and before the rehab mark. Older apps read them as exercises
  * they don't know and drop them, so the routine still opens there with its exercises, which is why the version stays r1.
  */
-const PART_MARK: Record<RoutinePart["kind"], string> = { warm: "w", cool: "d" };
+/**
+ * Cardio after the lifting (stage 5) travels as `c`, with its exercise and minutes after colons (`c:rowing-machine:15`,
+ * either may be empty). No dot, so older apps drop it like the other part marks.
+ */
+const PART_MARK: Record<RoutinePart["kind"], string> = { warm: "w", cool: "d", cardio: "c" };
 
 function partsOut(parts: readonly RoutinePart[] | undefined): string[] {
-  return (cleanParts(parts) ?? []).map((p) => PART_MARK[p.kind] + (p.stretches?.length ? `:${p.stretches.join(",")}` : ""));
+  return (cleanParts(parts) ?? []).map((p) =>
+    p.kind === "cardio"
+      ? p.exerciseId || p.minutes
+        ? `${PART_MARK.cardio}:${p.exerciseId ?? ""}:${p.minutes ?? ""}`
+        : PART_MARK.cardio
+      : PART_MARK[p.kind] + (p.stretches?.length ? `:${p.stretches.join(",")}` : ""),
+  );
 }
 
 function partsIn(segments: readonly string[]): RoutinePart[] | undefined {
   const found: RoutinePart[] = [];
   for (const seg of segments) {
-    const [mark, list = ""] = seg.split(":");
+    const [mark, list = "", extra = ""] = seg.split(":");
+    if (mark === PART_MARK.cardio) {
+      if (found.some((p) => p.kind === "cardio")) continue;
+      const minutes = Number(extra);
+      found.push({ kind: "cardio", ...(list ? { exerciseId: list } : {}), ...(extra && Number.isFinite(minutes) ? { minutes } : {}) });
+      continue;
+    }
     const kind = mark === PART_MARK.warm ? "warm" : mark === PART_MARK.cool ? "cool" : null;
     if (!kind || found.some((p) => p.kind === kind)) continue;
     const stretches = list.split(",").filter(Boolean);
@@ -64,7 +80,8 @@ function nameIn(code: string): string {
 }
 
 /**
- * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~d[:stretches]][~rehab]`, where `.s`
+ * The link code for a routine: `r1~<name>~<exercise>.<sets>[.s]~…[~w[:stretches]][~c[:exercise:minutes]][~d[:stretches]][~rehab]`,
+ * where `.s`
  * links an exercise to the next.
  */
 export function encodeRoutine(r: Pick<Routine, "name" | "items" | "rehab" | "parts">): string {

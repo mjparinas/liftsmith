@@ -1,5 +1,6 @@
 import { queueStrava, stravaWorkout } from "./connections";
 import { saveWorkout } from "./health";
+import { cardioActivity } from "./partExtras";
 import { stopSession } from "./sessionNotify";
 import { useApp } from "./store";
 
@@ -25,7 +26,13 @@ export function endWorkout(opts: { skip?: boolean } = {}): boolean {
       avgHr: ev.avgHr,
       title: summary?.name,
       notes: summary?.description,
-      segments: ev.parts?.map((p) => ({ kind: p.kind, start: p.start, end: p.end })),
+      segments: ev.parts?.map((p) => ({
+        kind: p.kind,
+        start: p.start,
+        end: p.end,
+        // A cardio part says what it was (a bike, a rower...), so Health files it as that.
+        ...(p.kind === "cardio" ? { activity: cardioActivity(p.ref) } : {}),
+      })),
     });
     queueStrava(ev.sessionId);
   }

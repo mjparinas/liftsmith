@@ -15,8 +15,10 @@ import { SCREEN_TITLE } from "@/components/titles";
 import { stretchView } from "@/lib/demo/stretchMotions";
 import { endWorkout } from "@/lib/endWorkout";
 import { exercise } from "@/lib/exercises";
+import { planSeconds } from "@/lib/generator";
 import { inSentence, list as listOf, t } from "@/lib/i18n";
 import { haptic, keepAwake, sound } from "@/lib/juice";
+import { CARDIO_MINUTES, cardioChoices, cardioDefault, extraOffer, rehabItems } from "@/lib/partExtras";
 import { MAX_PART_STRETCHES, partDefaults, routinePart } from "@/lib/routines";
 import { updateSession } from "@/lib/sessionNotify";
 import { hadCoolDown, type LivePart, type LivePartKind } from "@/lib/sessions";
@@ -659,7 +661,7 @@ export function PartStep({ parts, index }: { parts: readonly LivePart[]; index: 
  * workout only (their defaults are Settings › Workout's), each with how long it takes and why; Start runs them.
  */
 export function TodayParts() {
-  const { profile, gyms, preview, partPicks, pickPart } = useApp();
+  const { profile, gyms, preview, partPicks, pickPart, pickCardio, events } = useApp();
   const muscles = useStretchMuscles("warmup");
   const now = useNow(60_000);
   const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
@@ -674,23 +676,52 @@ export function TodayParts() {
     const of = (m: StretchMoment) => Math.max(1, Math.round(routineSeconds(suggest(m, muscles, eq, now)) / 60));
     return { warm: of("warm"), cool: of("cool") };
   }, [muscles, gym, now]);
+  // Rehab beside the lifting and cardio after it (stage 5): what's offered and whether each starts on.
+  const offer = useMemo(
+    () => (gym && preview ? extraOffer(profile, routine, preview, gym, events, now) : null),
+    [gym, preview, profile, routine, events, now],
+  );
+  const rehabMin = useMemo(() => {
+    if (!offer?.rehab || !gym) return 0;
+    return Math.max(1, Math.round(planSeconds(rehabItems(offer.rehab.routine, gym, events, profile, now)) / 60));
+  }, [offer, gym, events, profile, now]);
   if (!preview || !preview.items.length) return null;
   const names = listOf(muscles.slice(0, 3).map((m) => inSentence(MUSCLE_LABEL[m], true)));
   const main: LivePartKind = preview.rehab ? "rehab" : "lift";
+  const rehabOn = !!offer?.rehab && (partPicks.rehab ?? offer.rehab.due.due);
+  const cardio = offer?.cardio && {
+    exerciseId: partPicks.cardioId ?? offer.cardio.exerciseId,
+    minutes: partPicks.cardioMin ?? offer.cardio.minutes,
+  };
+  const cardioOn = !!cardio && (partPicks.cardio ?? offer?.cardioOn ?? false);
+  const label = (icon: Parameters<typeof Icon>[0]["name"], hue: string, text: string, minutes: number) => (
+    <span className="flex items-center gap-2 font-semibold">
+      <Icon name={icon} size={16} className={hue} />
+      {text} <span className="num font-normal text-muted">· {t("str.part.minutes", { n: minutes })}</span>
+    </span>
+  );
   const row = (kind: "warm" | "cool", on: boolean) => (
     <InlineSwitch
-      label={
-        <span className="flex items-center gap-2 font-semibold">
-          <Icon name={kind === "warm" ? "flame" : "leaf"} size={16} className={kind === "warm" ? "text-ember" : "text-cyan"} />
-          {partLabel(kind)} <span className="num font-normal text-muted">· {t("str.part.minutes", { n: mins[kind] })}</span>
-        </span>
-      }
+      label={label(kind === "warm" ? "flame" : "leaf", kind === "warm" ? "text-ember" : "text-cyan", partLabel(kind), mins[kind])}
       hint={t(kind === "warm" ? "str.part.warmWhy" : "str.part.coolWhy", { muscles: names })}
       on={on}
       onChange={(v) => pickPart(kind, v)}
       className="px-4 py-3"
     />
   );
+  const rehabWhy = () => {
+    const r = offer!.rehab!;
+    const name = r.routine.name;
+    if (r.due.days === undefined) return t("str.part.rehabWhyNew", { name });
+    if (r.due.days === 0) return t("str.part.rehabWhyToday", { name });
+    return t("str.part.rehabWhyDays", { name, count: r.due.days });
+  };
+  const cardioWhy = () => {
+    const name = exercise(cardio!.exerciseId).name;
+    if (routinePart(routine, "cardio")) return t("str.part.cardioWhyRoutine", { name });
+    const before = events.some((e) => e.type === "set" && e.partId === "cardio");
+    return t(before ? "str.part.cardioWhyLast" : "str.part.cardioWhyNew", { name });
+  };
   return (
     <section className="card mt-4 divide-y divide-line overflow-hidden" data-testid="today-parts" aria-label={t("str.part.title")}>
       {row("warm", warmOn)}
@@ -699,8 +730,66 @@ export function TodayParts() {
         <span className="font-semibold">{partLabel(main)}</span>
         <span className="num text-muted">· {t("str.part.minutes", { n: preview.estMinutes })}</span>
       </div>
+      {offer?.rehab && (
+        <div data-testid="part-rehab">
+          <InlineSwitch
+            label={label("bandage", "text-violet", partLabel("rehab"), rehabMin)}
+            hint={rehabWhy()}
+            on={rehabOn}
+            onChange={(v) => pickPart("rehab", v)}
+            className="px-4 py-3"
+          />
+        </div>
+      )}
+      {cardio && (
+        <div data-testid="part-cardio">
+          <InlineSwitch
+            label={label("heart", "text-ember", partLabel("cardio"), cardio.minutes)}
+            hint={cardioWhy()}
+            on={cardioOn}
+            onChange={(v) => pickPart("cardio", v)}
+            className="px-4 py-3"
+          />
+          {cardioOn && gym && (
+            <CardioPicker choices={cardioChoices(gym, events)} value={cardio} onPick={(c) => pickCardio(c)} className="px-4 pb-3" />
+          )}
+        </div>
+      )}
       {row("cool", coolOn)}
     </section>
+  );
+}
+
+/** The cardio part's exercise and minutes as chips: one tap each, no typing (Today and the routine builder). */
+export function CardioPicker({
+  choices,
+  value,
+  onPick,
+  className = "",
+}: {
+  choices: readonly string[];
+  value: { exerciseId?: string; minutes?: number };
+  onPick: (c: { exerciseId?: string; minutes?: number }) => void;
+  className?: string;
+}) {
+  const ids = value.exerciseId && !choices.includes(value.exerciseId) ? [value.exerciseId, ...choices] : choices;
+  return (
+    <div className={className} data-testid="cardio-picker">
+      <div className="flex flex-wrap gap-2" role="group" aria-label={t("str.part.cardioWhat")}>
+        {ids.map((id) => (
+          <Chip key={id} active={id === value.exerciseId} onClick={() => onPick({ exerciseId: id })}>
+            {exercise(id).name}
+          </Chip>
+        ))}
+      </div>
+      <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={t("str.part.cardioHowLong")}>
+        {CARDIO_MINUTES.map((m) => (
+          <Chip key={m} active={m === value.minutes} onClick={() => onPick({ minutes: m })}>
+            {t("str.part.cardioMin", { n: m })}
+          </Chip>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -711,7 +800,15 @@ export function routinePartsLine(r: Pick<Routine, "parts" | "rehab">): string {
     if (!p) return [];
     return [p.stretches?.length ? t("str.part.withStretches", { part: partLabel(kind), count: p.stretches.length }) : partLabel(kind)];
   };
-  return [...one("warm"), partLabel(r.rehab ? "rehab" : "lift"), ...one("cool")].join(" → ");
+  const cardio = routinePart(r, "cardio");
+  const cardioText = cardio
+    ? [
+        cardio.exerciseId
+          ? t("str.part.cardioWith", { part: partLabel("cardio"), name: exercise(cardio.exerciseId).name })
+          : partLabel("cardio"),
+      ]
+    : [];
+  return [...one("warm"), partLabel(r.rehab ? "rehab" : "lift"), ...cardioText, ...one("cool")].join(" → ");
 }
 
 /**
@@ -725,11 +822,48 @@ export function RoutinePartsEditor({
   parts: RoutinePart[] | undefined;
   onChange: (p: RoutinePart[] | undefined) => void;
 }) {
+  const { gyms, profile, events } = useApp();
+  const gym = gyms.find((g) => g.id === profile.activeGymId) ?? gyms[0];
   const [choosing, setChoosing] = useState<"warm" | "cool" | null>(null);
-  const get = (kind: "warm" | "cool") => parts?.find((p) => p.kind === kind);
-  const put = (kind: "warm" | "cool", p: RoutinePart | null) => {
-    const next = (["warm", "cool"] as const).flatMap((k) => (k === kind ? (p ? [p] : []) : (get(k) ?? [])));
+  const get = (kind: RoutinePart["kind"]) => parts?.find((p) => p.kind === kind);
+  const put = (kind: RoutinePart["kind"], p: RoutinePart | null) => {
+    const next = (["warm", "cardio", "cool"] as const).flatMap((k) => (k === kind ? (p ? [p] : []) : (get(k) ?? [])));
     onChange(next.length ? next : undefined);
+  };
+  // Cardio after the lifting (stage 5): a switch, then the exercise and minutes as chips. Starting it fills in what
+  // Today would pick (last time's, or the first this gym can do), so the routine says what it runs.
+  const cardioRow = () => {
+    const p = get("cardio");
+    const pick = gym ? cardioDefault(p, gym, events) : undefined;
+    return (
+      <div className="px-3 py-2">
+        <InlineSwitch
+          label={
+            <span className="flex items-center gap-2 font-medium">
+              <Icon name="heart" size={16} className="text-ember" />
+              {t("str.part.routineCardio")}
+            </span>
+          }
+          hint={
+            p && (p.exerciseId ?? pick?.exerciseId)
+              ? t("str.part.cardioPlan", { name: exercise((p.exerciseId ?? pick?.exerciseId)!).name, n: p.minutes ?? pick?.minutes ?? 15 })
+              : undefined
+          }
+          on={!!p}
+          onChange={(on) =>
+            put("cardio", on ? { kind: "cardio", ...(pick ? { exerciseId: pick.exerciseId, minutes: pick.minutes } : {}) } : null)
+          }
+        />
+        {p && gym && (
+          <CardioPicker
+            choices={cardioChoices(gym, events)}
+            value={{ exerciseId: p.exerciseId ?? pick?.exerciseId, minutes: p.minutes ?? pick?.minutes }}
+            onPick={(c) => put("cardio", { ...p, ...c })}
+            className="mt-1"
+          />
+        )}
+      </div>
+    );
   };
   const row = (kind: "warm" | "cool") => {
     const p = get(kind);
@@ -784,6 +918,7 @@ export function RoutinePartsEditor({
       aria-label={t("str.part.routineTitle")}
     >
       {row("warm")}
+      {cardioRow()}
       {row("cool")}
     </section>
   );

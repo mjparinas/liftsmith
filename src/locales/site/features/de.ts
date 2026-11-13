@@ -169,7 +169,7 @@ export const de: FeaturesText = {
     },
     "workout-parts": {
       name: "Training in Teilen",
-      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach. Die Coach-Hinweise lesen jeden Teil: Schmerzen nach der Reha, die nachlassen oder zunehmen, und ein Puls, der im Cool-down hoch bleibt.",
+      body: "Ein Training kann Aufwärmen, Krafttraining und Cool-down nacheinander ablaufen lassen, mit Überspringen dazwischen. Sperrbildschirm und Uhr zeigen, in welchem Teil du bist, der Verlauf zeigt jeden Teil, und Dehntage ab 10 Minuten halten deine Serie. Routinen können ihr eigenes Aufwärmen und Cool-down enthalten, auch in geteilten Links und von deinem Coach. Die Coach-Hinweise lesen jeden Teil: Schmerzen nach der Reha, die nachlassen oder zunehmen, und ein Puls, der im Cool-down hoch bleibt. Die Reha von deiner Physiotherapie kann an den fälligen Tagen neben dem Krafttraining im selben Training laufen, und Cardio kann danach folgen, Gerät und Minuten mit einem Tippen gewählt.",
     },
     notes: {
       name: "Coach-Notizen",

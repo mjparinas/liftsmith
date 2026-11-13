@@ -1,6 +1,6 @@
 import type { Article } from "../articles";
 
-// Blog, part nineteen: workouts with parts (Melvin, 2026-11-13; docs/decisions/sessions-with-parts.md). A workout runs
+// Blog, part nineteen: workouts with parts (stage 5 adds rehab beside the lifting and cardio parts) (Melvin, 2026-11-13; docs/decisions/sessions-with-parts.md). A workout runs
 // its warm-up, lifting and cool-down in order, the lock screen and watches show the part, and stretch days count for
 // the streak. Only what ships, and no other app named (seo.test.ts).
 export const BLOG_S: Article[] = [
@@ -144,6 +144,54 @@ export const BLOG_S: Article[] = [
         "Will the app tell me to move on to harder rehab?",
         "No. It tells you the numbers and suggests asking your physio. They decide what's next.",
       ],
+    ],
+  },
+  {
+    slug: "rehab-and-cardio-in-the-same-workout",
+    kind: "blog",
+    title: "Rehab and cardio, in the same workout as your lifting",
+    description:
+      "Your physio's rehab can now run right after your lifting on the days it's due, and cardio can follow it, all from one Start button.",
+    date: "2026-11-13",
+    tag: "Workouts",
+    cta: "injury",
+    body: [
+      {
+        p: "If your physio gave you a rehab program, you had two choices until now: do it as its own workout, or squeeze it in on a rest day. Most people training around an injury do both, lifting and rehab, on the same day. Now that's one workout. Your rehab runs right after the lifting, and cardio can follow it, with one Start button and one entry in History.",
+      },
+      { cta: "injury" },
+      { h2: "Rehab beside the lifting" },
+      {
+        p: "When your physio or coach has given you a rehab routine, Today shows it under the lifting as a Rehab row with a switch and about how long it takes. It switches itself on when you have an injury logged and you haven't done the rehab today or yesterday, which keeps it to about every other day, or three times a week. The line under it says when you last did it. Flip it off for today if you'd rather not, or on if you want an extra session.",
+      },
+      {
+        p: "The rehab exercises run as your physio wrote them: the same exercises and sets, with the reps you did last time, and the pain check after each one. Injury mode never changes them. Those sets are kept apart from your lifting, so a light set of glute bridges for your knee never holds back the glute bridges in your main program, and they don't count against your recovery.",
+      },
+      { h2: "Cardio after the lifting" },
+      {
+        p: "A Cardio row sits under the lifting too. Switch it on and pick the machine and how long, all by tap: a stationary bike, rower, treadmill, cross trainer or whatever your gym has, and 10, 15, 20 or 30 minutes. The first time it suggests 15 minutes; after that it starts from what you did last time. It logs like any cardio set, with distance where it means something, and a Bluetooth bike or rower can fill it in for you if you use that lab.",
+      },
+      {
+        p: "Routines can carry cardio too. In the routine builder, turn on Cardio after and choose the machine and minutes. The routine's card reads Lifting → Cardio (Rowing machine), and the cardio travels in routine links and in routines from your coach.",
+      },
+      { h2: "One workout, in parts" },
+      {
+        p: "The workout screen says which part you're on, like Rehab · 2 of 3, and History shows how long each part took. If you're running short on time, Finish goes straight to your cool-down and leaves out the parts you didn't reach. Health Connect and Apple Health get the workout with each part in it, and a cardio part is filed as what it was: biking, rowing, running, walking and so on.",
+      },
+      {
+        tip: "Rehab is never a reason to skip what your physio asked for. If something hurts, stop and tell them. Liftsmith shows what you logged; your physio decides what's next.",
+      },
+    ],
+    faq: [
+      [
+        "Does the rehab have to come after the lifting?",
+        "In one workout, yes: lifting, then rehab, then cardio, then the cool-down. You can still do the rehab routine on its own any day by picking it as the day's routine.",
+      ],
+      [
+        "Does cardio after lifting count for my weekly goal?",
+        "It's part of the same workout, so the workout counts once, as it always did.",
+      ],
+      ["Do I need a physio to use cardio parts?", "No. Cardio is open to everyone, free."],
     ],
   },
 ];
