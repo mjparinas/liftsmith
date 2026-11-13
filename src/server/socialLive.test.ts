@@ -29,13 +29,14 @@ beforeEach(async () => {
 });
 
 describe("training now", () => {
-  it("is off until the lifter turns it on, and shows only to mutual friends", async () => {
+  it("is on for a new profile unless turned off when joining, and shows only to mutual friends", async () => {
     await friends();
     await join("acc-c", "casey");
     await follow("acc-c", "acc-b", "blair", "casey"); // casey follows blair, blair doesn't follow back
-    expect((await call("acc-b", "live", { sessionId: "s1", exercise: "bench", done: 2, total: 12 })).body).toMatchObject({ live: false });
-    expect(await training("acc-a")).toEqual([]);
-    await call("acc-b", "update", { live: true });
+    expect((await call("acc-b", "me")).body).toMatchObject({ profile: { live: true } });
+    await join("acc-d", "drew", { live: false });
+    expect((await call("acc-d", "me")).body).toMatchObject({ profile: { live: false } });
+    expect((await call("acc-d", "live", { sessionId: "s1", exercise: "bench", done: 2, total: 12 })).body).toMatchObject({ live: false });
     await call("acc-b", "live", { sessionId: "s1", exercise: "bench", done: 2, total: 12 });
     expect(await training("acc-a")).toMatchObject([{ handle: "blair", exercise: "bench", done: 2, total: 12 }]);
     expect(await training("acc-c")).toEqual([]);

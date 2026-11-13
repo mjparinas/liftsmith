@@ -1012,7 +1012,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["social_profiles", "streak", "INTEGER NOT NULL DEFAULT 0"],
   // Friends gap list 2: a reply's top comment ('' for a comment on the post itself).
   ["post_comments", "reply_to", "TEXT NOT NULL DEFAULT ''"],
-  // Friends gap list 2: training now (off to start) and cheers pushes (on to start).
+  // Friends gap list 2: training now and cheers pushes. Training now was off to start; new profiles turn it on
+  // since 2026-11-13 (join sets it), and profiles made before keep what they had.
   ["social_profiles", "live", "INTEGER NOT NULL DEFAULT 0"],
   ["social_profiles", "push_cheers", "INTEGER NOT NULL DEFAULT 1"],
   // "Let friends cheer me on" (on to start; Melvin, 2026-11-12).

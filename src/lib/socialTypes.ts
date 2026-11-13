@@ -394,6 +394,8 @@ export interface ClubPreview {
 
 /** The cheers a friend can send mid-workout, like a video call's reactions. */
 export const CHEERS = ["🔥", "💪", "👏", "🎉", "⚡"] as const;
+/** One cheer per friend this often (the server refuses sooner ones; the Training now buttons count it down). */
+export const CHEER_GAP = 5_000;
 export type Cheer = (typeof CHEERS)[number];
 
 /** A mutual friend who is training right now. */
