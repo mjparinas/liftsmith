@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import type { PosterAction, PosterRow } from "@/server/gymPosters";
 
 import { Card } from "./charts";
+import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 const ITEMS: Record<PosterRow["items"], string> = { both: "Poster and stand", poster: "Poster", stand: "Stand" };
@@ -53,7 +54,9 @@ export function GymPosters({ admin, version }: { admin: boolean; version: number
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
-        <p className="mt-3 text-sm text-muted">Loading…</p>
+        <Loading label="Loading posters" className="mt-3">
+          <RowBones n={3} />
+        </Loading>
       ) : open.length === 0 ? (
         <p className="mt-3 text-sm text-muted">Nothing to print or mail.</p>
       ) : (

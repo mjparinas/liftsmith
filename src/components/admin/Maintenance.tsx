@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { isVisible, onVisibility } from "@/lib/visibility";
 
+import { LineBones, Loading } from "./Skeletons";
 import { ago } from "./time";
 
 type State = { on: boolean; since: number | null; by: string | null };
@@ -77,7 +78,9 @@ export function MaintenanceCard({ state, admin, changed }: { state: State | null
         health check keep working. It takes up to 15 seconds to reach every server.
       </p>
       {!state ? (
-        <p className="mt-2 text-sm text-muted">Loading…</p>
+        <Loading label="Loading" className="mt-2">
+          <LineBones n={2} />
+        </Loading>
       ) : state.on ? (
         <p className="mt-2 text-sm">
           <strong>On</strong>
