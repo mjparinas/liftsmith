@@ -1909,6 +1909,32 @@ export async function clubCreate(accountId: string, b: Record<string, unknown>, 
   return ok({ id, code });
 }
 
+/**
+ * An official gym's club (docs/decisions/gyms.md): its owner starts it from the owner's page, named after the gym, and
+ * any lifter joins from the gym's page in the app or on the web. It's a Friends club with room for a whole gym, so
+ * members get the same weekly leaderboard, crew goal and posts. One per gym; asking again gives the same code.
+ */
+export async function gymClubStart(accountId: string, placeId: unknown, now = Date.now()): Promise<Result> {
+  const mine = await joined(accountId);
+  if (isResult(mine)) return mine;
+  if (n(mine.suspended)) return fail(403, "suspended");
+  const [p] = await query("SELECT id, name FROM gym_places WHERE id = ? AND claimed_by = ?", [s(placeId), accountId]);
+  if (!p) return fail(403, "owner");
+  const [had] = await query("SELECT id, code FROM clubs WHERE place_id = ?", [s(p.id)]);
+  if (had) return ok({ id: s(had.id), code: s(had.code) });
+  if ((await clubCount(accountId)) >= SOCIAL_LIMITS.clubsEach) return fail(429, "clubs");
+  const id = newId();
+  const code = await freeClubCode();
+  await batch([
+    {
+      sql: "INSERT INTO clubs (id, owner_id, name, code, place_id, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+      args: [id, accountId, s(p.name).slice(0, SOCIAL_LIMITS.clubName), code, s(p.id), now],
+    },
+    { sql: "INSERT INTO club_members (club_id, account_id, created_at) VALUES (?, ?, ?)", args: [id, accountId, now] },
+  ]);
+  return ok({ id, code });
+}
+
 /** The lifter's clubs, with how many are in each. */
 export async function clubs(accountId: string): Promise<Result> {
   const mine = await joined(accountId);
@@ -1959,7 +1985,7 @@ export async function club(accountId: string, b: Record<string, unknown>, now = 
      WHERE cm.club_id = ?1 AND sp.suspended = 0
        AND sp.account_id NOT IN (SELECT blocked_id FROM blocks WHERE blocker_id = ?2)
        AND sp.account_id NOT IN (SELECT blocker_id FROM blocks WHERE blocked_id = ?2)
-     GROUP BY sp.account_id LIMIT ${SOCIAL_LIMITS.clubMembers + 1}`,
+     GROUP BY sp.account_id LIMIT ${SOCIAL_LIMITS.gymClubMembers + 1}`,
     [s(c.id), accountId, from, from + 7 * day],
   );
   const detail: ClubDetail = {
@@ -2026,7 +2052,7 @@ export async function clubFeed(accountId: string, b: Record<string, unknown>): P
 async function clubByCode(code: unknown): Promise<Row | null> {
   const c = cleanCode(code);
   if (!c) return null;
-  const [r] = await query("SELECT id, name, owner_id FROM clubs WHERE code = ?", [c]);
+  const [r] = await query("SELECT id, name, owner_id, place_id FROM clubs WHERE code = ?", [c]);
   return r ?? null;
 }
 
@@ -2063,7 +2089,7 @@ export async function clubJoin(accountId: string, b: Record<string, unknown>, no
   if (had) return ok({ id });
   if ((await clubCount(accountId)) >= SOCIAL_LIMITS.clubsEach) return fail(429, "clubs");
   const [size] = await query("SELECT COUNT(*) AS n FROM club_members WHERE club_id = ?", [id]);
-  if (n(size?.n) >= SOCIAL_LIMITS.clubMembers) return fail(403, "clubFull");
+  if (n(size?.n) >= (s(c.place_id) ? SOCIAL_LIMITS.gymClubMembers : SOCIAL_LIMITS.clubMembers)) return fail(403, "clubFull");
   if (!(await limit(accountId, "follow", now))) return fail(429, "slow");
   await run("INSERT OR IGNORE INTO club_members (club_id, account_id, created_at) VALUES (?, ?, ?)", [id, accountId, now]);
   return ok({ id });

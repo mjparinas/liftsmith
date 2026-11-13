@@ -47,6 +47,7 @@ import { ExercisePage } from "./ExercisePage";
 import { Feedback } from "./Feedback";
 import { ClubScreen, Friends, InviteScreen, PersonScreen, useFriendsWaiting } from "./Friends";
 import { Gym } from "./Gym";
+import { GymAdd } from "./GymAdd";
 import { GymClaim } from "./GymClaim";
 import { GymEdit } from "./GymEdit";
 import { GymPlace } from "./GymPlace";
@@ -410,6 +411,7 @@ export function App() {
     gymplace: <GymPlace key={arg ?? ""} id={arg} />,
     gymclaim: <GymClaim key={arg ?? ""} id={arg} />,
     gymedit: <GymEdit key={arg ?? ""} id={arg} />,
+    gymadd: <GymAdd />,
     log: <LogPast />,
   };
   const screen = screens[route];

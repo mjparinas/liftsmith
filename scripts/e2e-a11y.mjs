@@ -250,6 +250,10 @@ try {
   await page.goto(`${server.url}/app/#/connections`);
   await page.getByRole("heading", { name: "Connected apps" }).waitFor();
   await scan("connections");
+  // Add a gym the map doesn't have (docs/decisions/gyms.md): signed out it asks to sign in.
+  await page.goto(`${server.url}/app/#/gymadd`);
+  await page.getByRole("heading", { name: "Add a gym" }).waitFor();
+  await scan("add a gym");
   // Friends (docs/decisions/friends.md): signed out, then signed in with the API answered here (the static build has
   // none): the feed with a post, its comments, activity, people, and a person's page.
   await page.goto(`${server.url}/app/#/friends`);

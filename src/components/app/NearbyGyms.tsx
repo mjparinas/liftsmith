@@ -22,11 +22,14 @@ export function NearbyGyms({
   onPick,
   onPickPlace,
   picked,
+  onAdd,
 }: {
   onPick: (l: Listing) => void;
   onPickPlace: (p: Place) => void;
   /** The listing or place id picked (setup wizard). */
   picked?: string | null;
+  /** "Can't find your gym? Add it": shown after a search, where the screen can open the add form (not in setup). */
+  onAdd?: () => void;
 }) {
   const [state, setState] = useState<"idle" | "busy" | Found | string>("idle");
   const find = async () => {
@@ -47,11 +50,19 @@ export function NearbyGyms({
         </p>
       </div>
     );
+  const add = onAdd && (
+    <Button kind="quiet" icon="plus" className="w-full" onClick={onAdd}>
+      {t("gym.new.link")}
+    </Button>
+  );
   if (!state.gyms.length && !state.places.length)
     return (
-      <p className="text-sm text-muted" role="status">
-        {t("gym.near.none")}
-      </p>
+      <div className="grid gap-2">
+        <p className="text-sm text-muted" role="status">
+          {t("gym.near.none")}
+        </p>
+        {add}
+      </div>
     );
   const row = (key: string, active: boolean, onClick: () => void, title: ReactNode, line: string) => (
     <li key={key}>
@@ -122,6 +133,7 @@ export function NearbyGyms({
           </ul>
         </div>
       )}
+      {add}
       {state.places.some((p) => p.source === "osm") && <p className="text-xs text-faint">{t("gym.place.osm")}</p>}
     </div>
   );

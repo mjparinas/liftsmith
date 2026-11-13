@@ -243,7 +243,7 @@ export const it: FeaturesText = {
     },
     "gym-finder": {
       name: "Ricerca palestre e pagine delle palestre",
-      body: "Trova palestre vicino a te, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra.",
+      body: "Trova palestre vicino a te, prima quelle ufficiali, ciascuna con la sua pagina: attrezzatura, orari, mappa e membri. I titolari possono rivendicare la loro palestra e aggiungere logo e foto. Manca una palestra? Aggiungila. I gestori vedono quanti atleti l’hanno aggiunta o hanno scansionato il poster, e cosa fare dopo. Le palestre ufficiali possono avere un club con classifica settimanale.",
     },
     "buy-next": {
       name: "Cosa comprare dopo",

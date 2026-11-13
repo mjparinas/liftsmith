@@ -9,6 +9,7 @@ import { jobState } from "@/lib/systemHealth";
 import { loadCreators } from "./creators";
 import { batch, query, run } from "./db";
 import { pendingClaimCount } from "./gymClaims";
+import { pendingPlaceCount } from "./gymPlaces";
 import { posterCounts } from "./gymPosters";
 import { inboxConfigured, waitingMail } from "./inbox";
 import { recentJobRuns } from "./monitor";
@@ -179,8 +180,17 @@ async function jobItems(now: number): Promise<TodoItem[]> {
 
 /** Gym claims waiting for staff, and posters and stands to print or mail (docs/decisions/gyms.md). */
 async function gymItems(): Promise<TodoItem[]> {
-  const [claims, posters] = await Promise.all([pendingClaimCount(), posterCounts()]);
+  const [claims, posters, added] = await Promise.all([pendingClaimCount(), posterCounts(), pendingPlaceCount()]);
   const items: TodoItem[] = [];
+  if (added.count)
+    items.push({
+      key: `gyms:added:${added.count}`,
+      kind: "gyms",
+      title: added.count === 1 ? "Check a gym a lifter added" : `Check ${added.count} gyms lifters added`,
+      detail: "Gyms the map didn't have. Look them up, then approve or reject.",
+      at: added.oldest,
+      action: { label: "Gyms", tab: "Gyms" },
+    });
   // The counts are in the keys, so a dismissed item comes back when there's more to do.
   if (claims)
     items.push({

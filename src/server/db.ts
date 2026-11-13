@@ -510,6 +510,22 @@ const SCHEMA = [
       `UPDATE OR IGNORE gym_places SET region = '${code}', city_slug = substr(city_slug, 1, length(city_slug) - ${regionSlug(name).length}) || '${code.toLowerCase()}' WHERE region = '${name}' AND city_slug LIKE '%-${regionSlug(name)}'`,
   ),
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
+  // Poster and stand QR visits per gym and day (gymPosters.ts countScan), for the owner's last 30 days.
+  `CREATE TABLE IF NOT EXISTS gym_scan_days (
+    place_id TEXT NOT NULL,
+    day INTEGER NOT NULL,
+    n INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (place_id, day)
+  )`,
+  // A claimed gym's logo and photos (gymMedia.ts): JPEGs the app made, one logo and six photos a gym.
+  `CREATE TABLE IF NOT EXISTS gym_photos (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    image BLOB NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_photos_place ON gym_photos (place_id)`,
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
     who TEXT NOT NULL,
@@ -880,6 +896,11 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
   ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
+  // A gym a lifter added (gymPlaces.ts suggestPlace): who, and whether it still waits for staff.
+  ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
+  // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
+  ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

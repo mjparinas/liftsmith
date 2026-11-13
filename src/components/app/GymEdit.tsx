@@ -1,14 +1,19 @@
+/* eslint-disable @next/next/no-img-element -- gym pictures from our own API; the static export has no image optimizer */
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 
 import {
+  addGymPicture,
   askForStand,
   editGym,
+  gymPictureUrl,
   ownedGyms,
   releaseGym,
+  removeGymPicture,
   STAND_MIN_LIFTERS,
   standOrder,
+  startGymClub,
   type OwnedGym,
   type StandOrder,
 } from "@/lib/gymClaims";
@@ -19,6 +24,7 @@ import { DAYS, formatHours, parseHours, type Week } from "@/lib/openingHours";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 
+import { Icon } from "./icons";
 import { go, goBack } from "./router";
 import { Button, Chip, EmptyState, ScreenHeader, Section, Skeleton, Switch, SwitchRow } from "./ui";
 
@@ -132,6 +138,10 @@ export function GymEdit({ id }: { id?: string }) {
   return (
     <div className="pb-2">
       <ScreenHeader title={t("gym.edit.title")} kicker={gym.name} back={{ label: t("gym.back"), onClick: goBack }} />
+
+      <Results gym={gym} />
+      <ClubSection gym={gym} />
+      <PicturesSection gym={gym} />
 
       <Section title={t("gp.hours")}>
         <SwitchRow label={t("gp.allDay")} on={allDay} onChange={setAllDay} />
@@ -250,6 +260,185 @@ export function GymEdit({ id }: { id?: string }) {
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * How the gym is doing, and the one thing to do next (AGENTS.md "Action over stats"): lifters in all, new ones and
+ * poster scans in the last 30 days, then the first step that's missing: hours, equipment, the poster, the 20 lifters a
+ * mailed stand needs, or keeping the stand where members check in.
+ */
+function Results({ gym }: { gym: OwnedGym }) {
+  const next = !gym.hours
+    ? t("gym.edit.next.hours")
+    : !gym.code
+      ? t("gym.edit.next.kit")
+      : gym.scans30 === 0
+        ? t("gym.edit.next.poster")
+        : gym.lifters < STAND_MIN_LIFTERS
+          ? t("gym.edit.next.stand", { count: STAND_MIN_LIFTERS - gym.lifters })
+          : t("gym.edit.next.keep");
+  const tile = (value: number, label: string) => (
+    <div className="card p-3 text-center">
+      <p className="display text-2xl">{num(value)}</p>
+      <p className="text-xs text-muted">{label}</p>
+    </div>
+  );
+  return (
+    <Section title={t("gym.edit.results")}>
+      <div className="grid grid-cols-3 gap-2">
+        {tile(gym.lifters, t("gym.edit.res.lifters"))}
+        {tile(gym.newLifters, t("gym.edit.res.new"))}
+        {tile(gym.scans30, t("gym.edit.res.scans"))}
+      </div>
+      <p className="card card-tint mt-3 p-3 text-sm" style={{ ["--tint" as string]: "var(--color-accent)" }}>
+        {next}
+      </p>
+    </Section>
+  );
+}
+
+/** The gym's logo and up to six photos (gymMedia.ts), shown on its page in the app and on the web. */
+function PicturesSection({ gym }: { gym: OwnedGym }) {
+  const [logo, setLogo] = useState(gym.logo);
+  const [photos, setPhotos] = useState(gym.photos ?? []);
+  const [busy, setBusy] = useState<"logo" | "photo" | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const logoInput = useRef<HTMLInputElement>(null);
+  const photoInput = useRef<HTMLInputElement>(null);
+  const full = photos.length >= 6;
+  const add = async (kind: "logo" | "photo", file: File | undefined) => {
+    if (!file || busy) return;
+    setBusy(kind);
+    setError(null);
+    const r = await addGymPicture(gym.id, kind, file);
+    setBusy(null);
+    if ("error" in r) {
+      oops();
+      return setError(
+        r.error === "image" || r.error === "big"
+          ? t(`gym.edit.err.${r.error}`)
+          : r.error === "full"
+            ? t("gym.edit.photosFull")
+            : errorText(r.error),
+      );
+    }
+    haptic("success");
+    if (kind === "logo") setLogo(r.id);
+    else setPhotos((list) => [...list, r.id]);
+  };
+  const picker = (ref: RefObject<HTMLInputElement | null>, kind: "logo" | "photo") => (
+    <input
+      ref={ref}
+      type="file"
+      accept="image/*"
+      className="sr-only"
+      tabIndex={-1}
+      aria-hidden
+      onChange={(e) => {
+        void add(kind, e.target.files?.[0]);
+        e.target.value = "";
+      }}
+    />
+  );
+  return (
+    <Section title={t("gym.edit.pictures")}>
+      <p className="mb-3 text-sm text-muted">{t("gym.edit.picturesNote")}</p>
+      <div className="flex items-center gap-3">
+        {logo && (
+          <img src={gymPictureUrl(logo)} alt={t("gp.logoAlt", { name: gym.name })} className="h-16 w-16 rounded-xl object-contain" />
+        )}
+        <Button kind="ghost" icon="image" className="flex-1" disabled={!!busy} onClick={() => logoInput.current?.click()}>
+          {busy === "logo" ? t("gym.edit.adding") : logo ? t("gym.edit.logoChange") : t("gym.edit.logoAdd")}
+        </Button>
+        {picker(logoInput, "logo")}
+      </div>
+      {photos.length > 0 && (
+        <ul className="mt-3 grid grid-cols-3 gap-2">
+          {photos.map((id, i) => (
+            <li key={id} className="relative">
+              <img
+                src={gymPictureUrl(id)}
+                alt={t("gp.photoAlt", { n: i + 1, name: gym.name })}
+                className="aspect-square w-full rounded-xl object-cover"
+              />
+              <button
+                type="button"
+                aria-label={t("gym.edit.photoRemove", { n: i + 1 })}
+                className="press card absolute top-1 right-1 grid h-11 w-11 place-items-center rounded-full"
+                onClick={() =>
+                  void removeGymPicture(gym.id, id).then((ok) => {
+                    if (ok) setPhotos((list) => list.filter((x) => x !== id));
+                    else oops();
+                  })
+                }
+              >
+                <Icon name="trash" size={18} />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      <Button kind="ghost" icon="camera" className="mt-3 w-full" disabled={!!busy || full} onClick={() => photoInput.current?.click()}>
+        {busy === "photo" ? t("gym.edit.adding") : full ? t("gym.edit.photosFull") : t("gym.edit.photoAdd")}
+      </Button>
+      {picker(photoInput, "photo")}
+      {error && (
+        <p className="mt-2 text-sm text-bad" role="alert">
+          {error}
+        </p>
+      )}
+    </Section>
+  );
+}
+
+/** The gym's own club, with its weekly leaderboard and crew goal (social.ts gymClubStart). It runs in Friends. */
+function ClubSection({ gym }: { gym: OwnedGym }) {
+  const [code, setCode] = useState(gym.club);
+  const [problem, setProblem] = useState<"friends" | string | null>(null);
+  const [busy, setBusy] = useState(false);
+  const start = async () => {
+    if (busy) return;
+    setBusy(true);
+    const r = await startGymClub(gym.id);
+    setBusy(false);
+    if ("code" in r) {
+      haptic("success");
+      setCode(r.code);
+      return go("club", r.code);
+    }
+    oops();
+    setProblem(r.error === "notJoined" ? "friends" : errorText(r.error));
+  };
+  return (
+    <Section title={t("gym.edit.club")}>
+      <p className="mb-2 text-sm text-muted">{t("gym.edit.clubNote")}</p>
+      {code ? (
+        <Button kind="ghost" icon="trophy" className="w-full" onClick={() => go("club", code)}>
+          {t("gym.edit.clubOpen")}
+        </Button>
+      ) : problem === "friends" ? (
+        <div className="grid gap-2">
+          <p className="text-sm" role="alert">
+            {t("gym.edit.clubFriends")}
+          </p>
+          <Button kind="ghost" icon="people" className="w-full" onClick={() => go("friends")}>
+            {t("gym.edit.clubGoFriends")}
+          </Button>
+        </div>
+      ) : (
+        <>
+          <Button kind="ghost" icon="trophy" className="w-full" disabled={busy} onClick={() => void start()}>
+            {t("gym.edit.clubStart")}
+          </Button>
+          {problem && (
+            <p className="mt-2 text-sm text-bad" role="alert">
+              {problem}
+            </p>
+          )}
+        </>
+      )}
+    </Section>
   );
 }
 
