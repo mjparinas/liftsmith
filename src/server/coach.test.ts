@@ -21,6 +21,7 @@ import {
   sendMessage,
   setAlerts,
   setNote,
+  setRole,
   setShare,
   setTargets,
   unlink,
@@ -521,5 +522,21 @@ describe("nutrition targets from the coach", () => {
     await unlink("client", "coach");
     expect(await query("SELECT * FROM coach_targets")).toEqual([]);
     expect(coachCleanup("x").some((q) => q.sql.includes("coach_targets"))).toBe(true);
+  });
+});
+
+describe("personal trainer or coach", () => {
+  it("a coach picks a role, their clients see it, and alerts stay as they were", async () => {
+    await makeInvite("coach", NOW, "EEEEFFFF");
+    expect(((await previewInvite("client", "EEEEFFFF", NOW)) as { coach: { role?: string } }).coach.role).toBeUndefined();
+    await setAlerts("coach", false, NOW);
+    expect(await setRole("coach", "trainer", NOW)).toBe("trainer");
+    expect(await setRole("coach", "wizard", NOW)).toBeNull();
+    await setRole("coach", "coach", NOW);
+    expect(((await previewInvite("client", "EEEEFFFF", NOW)) as { coach: { role?: string } }).coach.role).toBe("coach");
+    await joinCoach("client", "EEEEFFFF", NOW);
+    expect((await overview("client", NOW)).coaches[0]).toMatchObject({ id: "coach", role: "coach" });
+    expect((await overview("coach", NOW)).role).toBe("coach");
+    expect((await overview("coach", NOW)).alerts).toBe(false);
   });
 });

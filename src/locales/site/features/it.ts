@@ -287,6 +287,14 @@ export const it: FeaturesText = {
       name: "Moduli di check-in e questionari",
       body: "Invia ai clienti un check-in settimanale, un questionario iniziale o un tuo modulo, una volta o ogni settimana. Rispondono con pochi tocchi, e un punteggio basso o una risposta in ritardo finisce in cima al loro report.",
     },
+    "coach-roles": {
+      name: "Per personal trainer e coach",
+      body: "Indica se sei un personal trainer che lavora uno a uno o un coach di gruppi e squadre. I clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
+    },
+    "coach-booking": {
+      name: "Prenotazione e calendario delle sessioni",
+      body: "Apri gli orari liberi, una volta o ogni settimana, e i clienti li prenotano nell'app, oppure prenotali tu. Entrambi ricevono una notifica, una sessione del giorno dopo compare in Oggi e finisce nel calendario con un tocco.",
+    },
     awards: {
       name: "Obiettivi, livelli e serie di giorni",
       body: "Badge a livelli, 50 livelli con ricompense, missioni settimanali, protezioni della serie e leghe oneste.",

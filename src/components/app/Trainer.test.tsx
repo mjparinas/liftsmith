@@ -40,6 +40,9 @@ const CHECKIN = {
   answeredAt: null,
 };
 let answered: unknown[] = [];
+let trainer = false;
+const SLOT = { id: "s1", coachId: "k1", start: NOW + 2 * 86_400_000, minutes: 60, place: "Main gym", clientId: null, bookedAt: null };
+let mySessions: { booked: unknown[]; open: unknown[] } = { booked: [], open: [] };
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -50,6 +53,8 @@ beforeEach(() => {
   note = null;
   shared = null;
   answered = [];
+  trainer = false;
+  mySessions = { booked: [], open: [] };
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -75,16 +80,22 @@ beforeEach(() => {
       return Response.json({
         invite: { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 },
         clients: [{ id: "c1", name: "Alex", since: NOW }],
-        coaches: linked ? [{ id: "k1", name: "Sam", since: NOW }] : [],
+        coaches: linked ? [{ id: "k1", name: "Sam", since: NOW, ...(trainer ? { role: "trainer" } : {}) }] : [],
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
         setup: { days: 3 },
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
         forms: [FORM],
         checkins: linked ? [CHECKIN] : [],
+        slots: [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }],
+        sessions: mySessions,
       });
+    if (body?.action === "slots") return Response.json({ slots: [{ ...SLOT, start: body.slot.start, coachId: "me" }] });
+    if (body?.action === "book") return Response.json({ slot: { ...SLOT, clientId: "me", bookedAt: NOW } });
+    if (body?.action === "cancelSlot") return Response.json({ ok: true });
     if (body?.action === "sendForm") return Response.json({ checkin: { ...CHECKIN, clientId: body.client, coachId: "me" } });
     if (body?.action === "repeatForm") return Response.json({ repeat: body.id ? { formId: body.id, nextAt: NOW + 7 * 86_400_000 } : null });
+    if (body?.action === "role") return Response.json({ role: body.role });
     if (body?.action === "form") return Response.json({ form: { ...body.form, id: "f2", at: NOW } });
     if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
@@ -373,5 +384,75 @@ describe("check-ins", () => {
     unmount();
     render(<CoachNoteToday />);
     expect(screen.getByText("Check-in from Sam")).toBeInTheDocument();
+  });
+});
+
+describe("personal trainer or coach", () => {
+  it("a coach picks how they work", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: "Personal trainer" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "role")).toMatchObject({ body: { role: "trainer" } });
+    expect(screen.getByText(/One-on-one clients/)).toBeInTheDocument();
+  });
+
+  it("a client with a personal trainer sees the word trainer", async () => {
+    linked = true;
+    trainer = true;
+    render(<Trainer />);
+    expect(await screen.findByText("Your trainer")).toBeInTheDocument();
+    expect(screen.getByText("From your trainer")).toBeInTheDocument();
+    expect(screen.getByText(/Personal trainer ·/)).toBeInTheDocument();
+  });
+});
+
+describe("booking sessions", () => {
+  it("a coach sees their next sessions and opens new times", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    expect(await screen.findByText("Sessions")).toBeInTheDocument();
+    expect(screen.getAllByText(/Main gym/).length).toBeGreaterThan(0);
+    await u.click(screen.getByRole("button", { name: "Add times" }));
+    await u.click(screen.getByRole("button", { name: "Tomorrow" }));
+    await u.click(screen.getByRole("button", { name: "45 min" }));
+    await u.click(screen.getByRole("button", { name: "Every week for 4 weeks" }));
+    await u.click(screen.getByRole("button", { name: "Save times" }));
+    const made = calls.find((c) => (c.body as { action?: string })?.action === "slots")?.body as {
+      slot: { minutes: number; weeks: number; start: number; label: string };
+    };
+    expect(made.slot).toMatchObject({ minutes: 45, weeks: 4 });
+    expect(new Date(made.slot.start).getHours()).toBe(18);
+    expect(made.slot.label).toBeTruthy();
+  });
+
+  it("a coach books a client in from their report", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    await u.click(await screen.findByRole("button", { name: "Book Alex in" }));
+    await u.click(screen.getByRole("button", { name: "Book it" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "slots")).toMatchObject({ body: { slot: { client: "c1" } } });
+  });
+
+  it("a client books an open time with their coach", async () => {
+    linked = true;
+    mySessions = { booked: [], open: [SLOT] };
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: "Book a session" }));
+    await u.click(screen.getByRole("button", { name: /Main gym/ }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "book")).toMatchObject({ body: { id: "s1" } });
+  });
+
+  it("a client's booked session shows with Add to calendar and Cancel, and on Today", async () => {
+    linked = true;
+    mySessions = { booked: [{ ...SLOT, clientId: "me", start: Date.now() + 3_600_000 }], open: [] };
+    const u = userEvent.setup();
+    const { unmount } = render(<Trainer />);
+    expect(await screen.findByRole("button", { name: "Add to calendar" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "cancelSlot")).toMatchObject({ body: { id: "s1" } });
+    unmount();
+    render(<CoachNoteToday />);
+    expect(screen.getAllByText("Session with Sam").length).toBeGreaterThan(0);
   });
 });

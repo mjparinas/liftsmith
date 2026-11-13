@@ -181,6 +181,17 @@ export const en = {
   "trn.f.checkinWaitingDo": "A short message often helps. Their answers show here when they come in.",
   "trn.f.checkinLow": "Scored {value} of 5: {label}",
   "trn.f.checkinLowDo": "Ask how they're doing before the next session, and ease the plan if needed.",
+  "trn.yourTrainer": "Your trainer",
+  "trn.fromTrainer": "From your trainer",
+  "trn.role.title": "How you work",
+  "trn.role.trainer": "Personal trainer",
+  "trn.role.coach": "Coach",
+  "trn.role.trainerHint":
+    "One-on-one clients, mostly in person. Sessions, booking and a price per session come first. Every tool is still here.",
+  "trn.role.coachHint": "Teams and groups, often remotely. Check-ins, programs and a monthly fee come first. Every tool is still here.",
+  "trn.role.pick": "Pick one, so clients see the right word for you and the tools you use most come first.",
+  "trn.err.taken": "That time was just booked or removed. Pick another.",
+  "trn.err.slotsFull": "You have as many upcoming times as you can open. Remove some first.",
 };
 
 type Key = keyof typeof en;
@@ -364,6 +375,18 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.f.checkinWaitingDo": "Un mensaje corto suele ayudar. Las respuestas aparecen aquí cuando llegan.",
   "trn.f.checkinLow": "Puntuó {value} de 5: {label}",
   "trn.f.checkinLowDo": "Pregunta cómo está antes de la próxima sesión y suaviza el plan si hace falta.",
+  "trn.yourTrainer": "Tu entrenador personal",
+  "trn.fromTrainer": "De tu entrenador personal",
+  "trn.role.title": "Cómo trabajas",
+  "trn.role.trainer": "Entrenador personal",
+  "trn.role.coach": "Coach",
+  "trn.role.trainerHint":
+    "Clientes uno a uno, sobre todo en persona. Primero van las sesiones, las reservas y el precio por sesión. Todas las herramientas siguen aquí.",
+  "trn.role.coachHint":
+    "Equipos y grupos, a menudo a distancia. Primero van las revisiones, los programas y la cuota mensual. Todas las herramientas siguen aquí.",
+  "trn.role.pick": "Elige uno, para que tus clientes vean la palabra correcta y lo que más usas vaya primero.",
+  "trn.err.taken": "Esa hora se acaba de reservar o eliminar. Elige otra.",
+  "trn.err.slotsFull": "Ya tienes el máximo de horas próximas. Quita algunas primero.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -550,6 +573,18 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.f.checkinWaitingDo": "Un petit message aide souvent. Les réponses s'affichent ici dès qu'elles arrivent.",
   "trn.f.checkinLow": "Note de {value} sur 5 : {label}",
   "trn.f.checkinLowDo": "Demandez comment ça va avant la prochaine séance, et allégez le plan si besoin.",
+  "trn.yourTrainer": "Votre coach personnel",
+  "trn.fromTrainer": "De votre coach personnel",
+  "trn.role.title": "Votre façon de travailler",
+  "trn.role.trainer": "Coach personnel",
+  "trn.role.coach": "Entraîneur",
+  "trn.role.trainerHint":
+    "Des clients en individuel, surtout en personne. Les séances, les réservations et le prix par séance passent en premier. Tous les outils restent là.",
+  "trn.role.coachHint":
+    "Des équipes et des groupes, souvent à distance. Les bilans, les programmes et le tarif mensuel passent en premier. Tous les outils restent là.",
+  "trn.role.pick": "Choisissez-en un, pour que vos clients voient le bon mot et que vos outils favoris passent en premier.",
+  "trn.err.taken": "Ce créneau vient d'être réservé ou supprimé. Choisissez-en un autre.",
+  "trn.err.slotsFull": "Vous avez atteint le nombre maximal de créneaux à venir. Supprimez-en d'abord.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -735,6 +770,18 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.f.checkinWaitingDo": "Eine kurze Nachricht hilft oft. Die Antworten erscheinen hier, sobald sie da sind.",
   "trn.f.checkinLow": "{value} von 5 bei: {label}",
   "trn.f.checkinLowDo": "Frag vor der nächsten Einheit nach, wie es geht, und mach den Plan bei Bedarf leichter.",
+  "trn.yourTrainer": "Dein Personal Trainer",
+  "trn.fromTrainer": "Von deinem Personal Trainer",
+  "trn.role.title": "Wie du arbeitest",
+  "trn.role.trainer": "Personal Trainer",
+  "trn.role.coach": "Coach",
+  "trn.role.trainerHint":
+    "Einzelkunden, meist vor Ort. Einheiten, Buchungen und ein Preis pro Einheit stehen vorn. Alle Werkzeuge bleiben da.",
+  "trn.role.coachHint":
+    "Teams und Gruppen, oft aus der Ferne. Check-ins, Programme und eine Monatsgebühr stehen vorn. Alle Werkzeuge bleiben da.",
+  "trn.role.pick": "Wähl eins, damit deine Kunden das richtige Wort sehen und deine wichtigsten Werkzeuge vorn stehen.",
+  "trn.err.taken": "Diese Zeit wurde gerade gebucht oder entfernt. Wähl eine andere.",
+  "trn.err.slotsFull": "Du hast schon die meisten kommenden Zeiten, die möglich sind. Entfern zuerst welche.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -915,6 +962,18 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.f.checkinWaitingDo": "Un breve messaggio spesso aiuta. Le risposte compaiono qui appena arrivano.",
   "trn.f.checkinLow": "Punteggio {value} su 5: {label}",
   "trn.f.checkinLowDo": "Chiedi come sta prima della prossima sessione e alleggerisci il piano se serve.",
+  "trn.yourTrainer": "Il tuo personal trainer",
+  "trn.fromTrainer": "Dal tuo personal trainer",
+  "trn.role.title": "Come lavori",
+  "trn.role.trainer": "Personal trainer",
+  "trn.role.coach": "Coach",
+  "trn.role.trainerHint":
+    "Clienti uno a uno, soprattutto di persona. Prima le sessioni, le prenotazioni e il prezzo a sessione. Tutti gli strumenti restano qui.",
+  "trn.role.coachHint":
+    "Squadre e gruppi, spesso a distanza. Prima i check-in, i programmi e la quota mensile. Tutti gli strumenti restano qui.",
+  "trn.role.pick": "Scegline uno, così i clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
+  "trn.err.taken": "Quell'orario è appena stato prenotato o rimosso. Scegline un altro.",
+  "trn.err.slotsFull": "Hai già il numero massimo di orari futuri. Rimuovine qualcuno prima.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1080,4 +1139,15 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.f.checkinWaitingDo": "短いメッセージを送るのが効果的です。回答が届くとここに表示されます。",
   "trn.f.checkinLow": "5段階中{value}：{label}",
   "trn.f.checkinLowDo": "次のセッションの前に様子を聞き、必要ならプランを軽くしましょう。",
+  "trn.yourTrainer": "あなたのパーソナルトレーナー",
+  "trn.fromTrainer": "パーソナルトレーナーから",
+  "trn.role.title": "働き方",
+  "trn.role.trainer": "パーソナルトレーナー",
+  "trn.role.coach": "コーチ",
+  "trn.role.trainerHint": "マンツーマン、主に対面。セッション、予約、1回ごとの料金が先に表示されます。ほかの機能もすべて使えます。",
+  "trn.role.coachHint":
+    "チームやグループ、リモートが中心。チェックイン、プログラム、月額料金が先に表示されます。ほかの機能もすべて使えます。",
+  "trn.role.pick": "選ぶと、クライアントに正しい呼び方で表示され、よく使う機能が先に並びます。",
+  "trn.err.taken": "その時間はたった今予約されたか削除されました。別の時間を選んでください。",
+  "trn.err.slotsFull": "公開できる今後の時間の上限に達しています。先にいくつか削除してください。",
 };

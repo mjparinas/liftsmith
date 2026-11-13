@@ -12,6 +12,7 @@ import * as advice from "./text/advice";
 import * as appearance from "./text/appearance";
 import * as awards from "./text/awards";
 import * as band from "./text/band";
+import * as bk from "./text/bk";
 import * as block from "./text/block";
 import * as bmi from "./text/bmi";
 import * as body from "./text/body";
@@ -142,6 +143,7 @@ export const ja: Partial<Record<MessageKey, Message>> = {
   ...appearance.ja,
   ...awards.ja,
   ...band.ja,
+  ...bk.ja,
   ...block.ja,
   ...bmi.ja,
   ...body.ja,

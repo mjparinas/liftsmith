@@ -14,6 +14,7 @@ import * as advice from "./text/advice";
 import * as appearance from "./text/appearance";
 import * as awards from "./text/awards";
 import * as band from "./text/band";
+import * as bk from "./text/bk";
 import * as block from "./text/block";
 import * as bmi from "./text/bmi";
 import * as body from "./text/body";
@@ -144,6 +145,7 @@ export const en = {
   ...appearance.en,
   ...awards.en,
   ...band.en,
+  ...bk.en,
   ...block.en,
   ...bmi.en,
   ...body.en,

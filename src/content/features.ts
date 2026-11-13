@@ -556,6 +556,22 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         pro: "coaching",
         added: "2026-11-13",
       },
+      {
+        id: "coach-roles",
+        name: "For personal trainers and coaches",
+        body: "Say whether you're a personal trainer working one-on-one or a coach running groups and teams. Clients see the right word for you, and the tools you use most come first.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
+      {
+        id: "coach-booking",
+        name: "Booking and scheduling sessions",
+        body: "Open the times you're free, once or every week, and clients book them in the app, or book a client in yourself. Both sides get a notification, a session in the next day shows on Today, and it goes into their calendar in one tap.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
     ],
   },
   {

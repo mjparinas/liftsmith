@@ -901,6 +901,18 @@ const SCHEMA = [
     next_at INTEGER NOT NULL,
     PRIMARY KEY (coach_id, client_id)
   )`,
+  // Booking (coachBooking.ts): a coach's open or booked session times, UTC ms.
+  `CREATE TABLE IF NOT EXISTS coach_slots (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    start_at INTEGER NOT NULL,
+    minutes INTEGER NOT NULL,
+    place TEXT NOT NULL DEFAULT '',
+    client_id TEXT,
+    booked_at INTEGER
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_slots_coach ON coach_slots (coach_id, start_at)",
+  "CREATE INDEX IF NOT EXISTS coach_slots_client ON coach_slots (client_id, start_at)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
@@ -937,6 +949,8 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["creators", "max_uses", "INTEGER"],
   // Friends stage 2: a public profile (social.ts, publicProfile.ts).
   ["social_profiles", "public", "INTEGER NOT NULL DEFAULT 0"],
+  // Coaching: personal trainer or coach (Melvin, 2026-11-13: "differentiate between personal trainers and coaches").
+  ["coach_prefs", "role", "TEXT"],
   // Friends stage 2: which push notifications the lifter wants (push.ts). Likes start off.
   ["social_profiles", "push_follows", "INTEGER NOT NULL DEFAULT 1"],
   ["social_profiles", "push_comments", "INTEGER NOT NULL DEFAULT 1"],

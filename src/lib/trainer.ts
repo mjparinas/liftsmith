@@ -7,6 +7,7 @@
 import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
+import type { Sessions, Slot } from "./booking";
 import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } from "./checkins";
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
@@ -20,10 +21,14 @@ import { APP_PATH, SITE_URL } from "./site";
 import type { AppEvent, Experience, Goal, SetEvent } from "./types";
 import { fmtNum } from "./units";
 
+/** Personal trainer (one-on-one, sessions first) or coach (groups and teams, check-ins first); server coach.ts. */
+export type Role = "trainer" | "coach";
 export interface Person {
   id: string;
   name: string;
   since: number;
+  /** A coach's role, in a client's list of coaches (absent until they pick). */
+  role?: Role;
 }
 export interface Invite {
   code: string;
@@ -73,6 +78,11 @@ export interface Overview {
   /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
   forms?: Form[];
   checkins?: Checkin[];
+  /** How this account works with clients, once they've said. */
+  role?: Role | null;
+  /** This coach's open and booked times, and this lifter's sessions with their coaches (booked, and open to book). */
+  slots?: Slot[];
+  sessions?: Sessions;
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -115,6 +125,8 @@ export interface ClientView {
   repeat?: Repeat | null;
   /** This coach's forms, to send from the report. */
   forms?: Form[];
+  /** Sessions booked with this client from now on. */
+  slots?: Slot[];
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -165,6 +177,10 @@ export const sendMessage = async (id: string, text: string) =>
   (await api<{ message: Message }>("/api/coach/", { token: token(), body: { action: "send", id, text } })).message;
 export const setBodyShare = async (coach: string, on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "share", id: coach, on } })).on;
+export const saveRole = async (role: Role) =>
+  (await api<{ role: Role | null }>("/api/coach/", { token: token(), body: { action: "role", role } })).role;
+/** "Your trainer" when every coach a lifter has is a personal trainer, else "Your coach". */
+export const trainersOnly = (people: readonly Pick<Person, "role">[]) => people.length > 0 && people.every((p) => p.role === "trainer");
 export const setCoachAlerts = async (on: boolean) =>
   (await api<{ on: boolean }>("/api/coach/", { token: token(), body: { action: "alerts", on } })).on;
 /** This phone's push token for coaching pushes, which don't need Friends (push.ts calls it). */
@@ -187,6 +203,8 @@ export function trainerError(e: unknown): string {
     if (e.message === "self") return t("trn.err.self");
     if (e.message === "full") return t("trn.err.full");
     if (e.message === "coachFull") return t("trn.err.coachFull");
+    if (e.message === "taken") return t("trn.err.taken");
+    if (e.message === "slotsFull") return t("trn.err.slotsFull");
     if (e.message === "gone") return t("trn.err.gone");
   }
   return t("trn.err.failed");
@@ -408,6 +426,7 @@ const EVERY = 15 * 60_000;
 /** A note to show, with the coach's name. */
 export interface ShownNote extends Note {
   coach: string;
+  role?: Role;
 }
 /** Someone with unread messages for this lifter. */
 export interface Unread {
@@ -421,6 +440,8 @@ interface NotesState {
   unread: Unread[];
   /** Check-ins waiting for this lifter to answer, for Today. */
   checkins: (Checkin & { coach: string })[];
+  /** Sessions this lifter booked with a coach, for Today. */
+  sessions: (Slot & { coach: string })[];
   /** The newest daily nutrition targets from a coach, with the coach's name, for coach's notes and Health. */
   targets: (Targets & { coach: string }) | null;
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
@@ -447,6 +468,7 @@ export const useCoachNotes = create<NotesState>(() => ({
   notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
   unread: [],
   checkins: [],
+  sessions: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
 }));
@@ -455,12 +477,15 @@ export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
 
 /** The notes from an overview, with each coach's name. */
 export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] {
-  return (o.notes ?? []).map((n) => ({ ...n, coach: o.coaches.find((c) => c.id === n.coachId)?.name ?? "" }));
+  return (o.notes ?? []).map((n) => {
+    const c = o.coaches.find((x) => x.id === n.coachId);
+    return { ...n, coach: c?.name ?? "", ...(c?.role ? { role: c.role } : {}) };
+  });
 }
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
-  o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins">>,
+  o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions">>,
 ): void {
   const notes = shownNotes(o);
   writeJson(CACHE, notes);
@@ -472,7 +497,8 @@ export function keepNotes(
     .filter(([, n]) => n > 0)
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
   const checkins = (o.checkins ?? []).map((c) => ({ ...c, coach: o.coaches.find((p) => p.id === c.coachId)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread, targets, checkins });
+  const sessions = (o.sessions?.booked ?? []).map((x) => ({ ...x, coach: o.coaches.find((p) => p.id === x.coachId)?.name ?? "" }));
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -508,5 +534,5 @@ export function dismissNote(n: Note): void {
 export function forgetNotes(): void {
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [] });
+  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [] });
 }
