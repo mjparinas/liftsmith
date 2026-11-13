@@ -10,6 +10,7 @@
 import { create } from "zustand";
 
 import { APPLE_SERVICES_ID, GOOGLE_IOS_CLIENT_ID, GOOGLE_WEB_CLIENT_ID } from "./authIds";
+import { currentLang, type Lang } from "./i18n";
 import { isNative } from "./juice";
 import { SITE_URL } from "./site";
 import { forgetFriends } from "./socialCache";
@@ -223,6 +224,9 @@ export function loadScript(src: string): Promise<void> {
   });
 }
 
+/** Apple's sign-in script per app language (one script per locale in its path). */
+const APPLE_LOCALE: Record<Lang, string> = { en: "en_US", es: "es_ES", fr: "fr_FR", de: "de_DE", it: "it_IT", ja: "ja_JP" };
+
 export function signInApple(): Promise<Account> {
   return withBusy(async () => {
     const n = await makeNonce();
@@ -232,7 +236,8 @@ export function signInApple(): Promise<Account> {
     if (platform() === "ios" && plugin) {
       ({ idToken, code } = await plugin.apple({ nonce: n.hashed }));
     } else {
-      await loadScript("https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js");
+      // Apple's sign-in window speaks the language in the script's path, so it follows the app's language.
+      await loadScript(`https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/${APPLE_LOCALE[currentLang()]}/appleid.auth.js`);
       window.AppleID!.auth.init({
         clientId: AUTH.appleServices,
         scope: "email",
