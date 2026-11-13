@@ -66,6 +66,7 @@ import { fmtWeight } from "@/lib/units";
 import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
+import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
 import { go } from "./router";
@@ -128,6 +129,7 @@ function Home({ code, team = "" }: { code: string; team?: string }) {
         </p>
       )}
       <Section title={trainersOnly(data?.coaches ?? []) ? t("trn.yourTrainer") : t("trn.yourCoach")} icon="flag">
+        {data?.sessions && <YourSessions sessions={data.sessions} coaches={data.coaches} onChange={reload} />}
         <PendingCheckins
           checkins={(data?.checkins ?? []).map((c) => ({ ...c, coach: data?.coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
         />
@@ -406,10 +408,11 @@ export function CoachNoteToday() {
   const unread = useCoachNotes((s) => s.unread);
   const n = notes.find((x) => !seen.includes(noteId(x)));
   const u = unread[0];
-  const waiting = useCoachNotes((s) => s.checkins.length > 0);
+  const waiting = useCoachNotes((s) => s.checkins.length > 0 || s.sessions.length > 0);
   if (!n && !u && !waiting) return null;
   return (
     <>
+      <SessionToday />
       <CheckinToday />
       {u && (
         <button
@@ -512,6 +515,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       setNote(trainerError(e));
     }
   };
+  const sessions = <CoachSessions slots={data.slots ?? []} clients={data.clients} role={data.role ?? null} onChange={onChange} />;
   const send = async () => {
     if (!invite) return;
     const url = inviteUrl(invite.code);
@@ -563,6 +567,8 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       )}
       <RolePick key={data.role ?? ""} saved={data.role ?? null} onChange={onChange} />
       {/* Keyed by what was loaded, so a reload starts from the saved answers. */}
+      {/* A personal trainer's sessions come before their client list; a coach's after it. */}
+      {data.role !== "coach" && sessions}
       <StartSetup key={JSON.stringify(data.setup ?? {})} setup={data.setup ?? {}} />
       <SwitchRow label={t("trn.alerts")} hint={t("trn.alertsHint")} on={data.alerts ?? true} onChange={(v) => void alerts(v)} />
       {data.clients.length ? (
@@ -596,6 +602,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
       ) : (
         <p className="mt-3 px-1 text-sm text-muted">{t("trn.noClients")}</p>
       )}
+      {data.role === "coach" && sessions}
     </div>
   );
 }
@@ -880,7 +887,7 @@ function ClientScreen({ id }: { id: string }) {
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
   const [targets, setTargets] = useState<Targets | null>(null);
-  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms">>({});
+  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -894,7 +901,7 @@ function ClientScreen({ id }: { id: string }) {
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
         setTargets(v.targets ?? null);
-        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms });
+        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots });
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -956,6 +963,7 @@ function ClientScreen({ id }: { id: string }) {
           })}
         </ul>
       </Section>
+      <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
       <NoteToClient clientId={id} saved={saved} onChange={() => setVersion((n) => n + 1)} />
       <Section title={t("trn.weeks")} icon="calendar">
         <div className="grid grid-cols-4 gap-2">

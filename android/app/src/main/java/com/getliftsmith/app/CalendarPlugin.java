@@ -128,6 +128,33 @@ public class CalendarPlugin extends Plugin {
         }
     }
 
+    /**
+     * One booked coaching session: opens the calendar app's new-event screen filled in, so the lifter picks the calendar
+     * and saves it there. Needs no calendar permission.
+     */
+    @PluginMethod
+    public void addEvent(PluginCall call) {
+        long start = call.getLong("start", System.currentTimeMillis());
+        int minutes = call.getInt("minutes", 60);
+        Intent i = new Intent(Intent.ACTION_INSERT)
+            .setData(CalendarContract.Events.CONTENT_URI)
+            .putExtra(CalendarContract.EXTRA_EVENT_BEGIN_TIME, start)
+            .putExtra(CalendarContract.EXTRA_EVENT_END_TIME, start + minutes * 60_000L)
+            .putExtra(CalendarContract.Events.TITLE, call.getString("title", "Liftsmith session"))
+            .putExtra(CalendarContract.Events.DESCRIPTION, call.getString("notes", ""))
+            .putExtra(CalendarContract.Events.EVENT_LOCATION, call.getString("place", ""))
+            .putExtra(CalendarContract.Events.AVAILABILITY, CalendarContract.Events.AVAILABILITY_BUSY)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        try {
+            getContext().startActivity(i);
+            JSObject r = new JSObject();
+            r.put("saved", true);
+            call.resolve(r);
+        } catch (RuntimeException e) {
+            call.reject("No calendar app", e);
+        }
+    }
+
     /** Opens the phone's calendar app at a time (the first training event), so the lifter sees where it went. */
     @PluginMethod
     public void show(PluginCall call) {

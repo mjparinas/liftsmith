@@ -333,6 +333,11 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
     // Check-ins (coachForms.ts): the pair's sent and answered ones, and the weekly one.
     { sql: "DELETE FROM coach_checkins WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_checkin_repeats WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    // Sessions booked between them open again for the coach's other clients.
+    {
+      sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)",
+      args: pair,
+    },
   ]);
 }
 
@@ -836,6 +841,8 @@ export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_prefs WHERE account_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_targets WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_forms WHERE coach_id = ?", args: [accountId] },
+  { sql: "DELETE FROM coach_slots WHERE coach_id = ?", args: [accountId] },
+  { sql: "UPDATE coach_slots SET client_id = NULL, booked_at = NULL WHERE client_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_checkins WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_checkin_repeats WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
 ];

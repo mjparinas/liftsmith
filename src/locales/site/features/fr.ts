@@ -298,6 +298,10 @@ export const fr: FeaturesText = {
       name: "Pour les coachs personnels et les entraîneurs",
       body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",
     },
+    "coach-booking": {
+      name: "Réservation et planning des séances",
+      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",

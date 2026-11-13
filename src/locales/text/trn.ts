@@ -190,6 +190,8 @@ export const en = {
     "One-on-one clients, mostly in person. Sessions, booking and a price per session come first. Every tool is still here.",
   "trn.role.coachHint": "Teams and groups, often remotely. Check-ins, programs and a monthly fee come first. Every tool is still here.",
   "trn.role.pick": "Pick one, so clients see the right word for you and the tools you use most come first.",
+  "trn.err.taken": "That time was just booked or removed. Pick another.",
+  "trn.err.slotsFull": "You have as many upcoming times as you can open. Remove some first.",
 };
 
 type Key = keyof typeof en;
@@ -383,6 +385,8 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.role.coachHint":
     "Equipos y grupos, a menudo a distancia. Primero van las revisiones, los programas y la cuota mensual. Todas las herramientas siguen aquí.",
   "trn.role.pick": "Elige uno, para que tus clientes vean la palabra correcta y lo que más usas vaya primero.",
+  "trn.err.taken": "Esa hora se acaba de reservar o eliminar. Elige otra.",
+  "trn.err.slotsFull": "Ya tienes el máximo de horas próximas. Quita algunas primero.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -579,6 +583,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.role.coachHint":
     "Des équipes et des groupes, souvent à distance. Les bilans, les programmes et le tarif mensuel passent en premier. Tous les outils restent là.",
   "trn.role.pick": "Choisissez-en un, pour que vos clients voient le bon mot et que vos outils favoris passent en premier.",
+  "trn.err.taken": "Ce créneau vient d'être réservé ou supprimé. Choisissez-en un autre.",
+  "trn.err.slotsFull": "Vous avez atteint le nombre maximal de créneaux à venir. Supprimez-en d'abord.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -774,6 +780,8 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.role.coachHint":
     "Teams und Gruppen, oft aus der Ferne. Check-ins, Programme und eine Monatsgebühr stehen vorn. Alle Werkzeuge bleiben da.",
   "trn.role.pick": "Wähl eins, damit deine Kunden das richtige Wort sehen und deine wichtigsten Werkzeuge vorn stehen.",
+  "trn.err.taken": "Diese Zeit wurde gerade gebucht oder entfernt. Wähl eine andere.",
+  "trn.err.slotsFull": "Du hast schon die meisten kommenden Zeiten, die möglich sind. Entfern zuerst welche.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -964,6 +972,8 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.role.coachHint":
     "Squadre e gruppi, spesso a distanza. Prima i check-in, i programmi e la quota mensile. Tutti gli strumenti restano qui.",
   "trn.role.pick": "Scegline uno, così i clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
+  "trn.err.taken": "Quell'orario è appena stato prenotato o rimosso. Scegline un altro.",
+  "trn.err.slotsFull": "Hai già il numero massimo di orari futuri. Rimuovine qualcuno prima.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1138,4 +1148,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.role.coachHint":
     "チームやグループ、リモートが中心。チェックイン、プログラム、月額料金が先に表示されます。ほかの機能もすべて使えます。",
   "trn.role.pick": "選ぶと、クライアントに正しい呼び方で表示され、よく使う機能が先に並びます。",
+  "trn.err.taken": "その時間はたった今予約されたか削除されました。別の時間を選んでください。",
+  "trn.err.slotsFull": "公開できる今後の時間の上限に達しています。先にいくつか削除してください。",
 };
