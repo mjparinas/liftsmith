@@ -19,6 +19,7 @@
     "src/lib/injury.ts",
     "src/lib/layoff.ts",
     "src/lib/liftPage.ts",
+    "src/lib/liftStats.ts",
     "src/lib/loads.ts",
     "src/lib/fitTests.ts",
     "src/lib/freeAdaptive.ts",

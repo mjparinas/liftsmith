@@ -242,7 +242,7 @@ One file per topic in `docs/decisions/`, A to Z. Add a line when you add a topic
 - [Watch apps](docs/decisions/watch-apps.md) (`android/wear`, `ios/App/LiftsmithWatch`, `garmin/`, `WatchLink.java`, `GarminLink.java`, `WatchLink.swift`, `GarminLink.swift`, `src/lib/watchHr.ts`)
 - [Web dashboard (retired into the app)](docs/decisions/web-dashboard.md) (`LogPast.tsx`, `MeRedirect.tsx`, `src/lib/dashboard.ts`, `src/components/dashboard/Share.tsx`)
 - [Workout data and coaching](docs/decisions/workout-data-and-coaching.md) (`src/lib/readiness.ts`, `progression.ts`)
-- [Workout history: editing, notes, doing it again and exercise pages](docs/decisions/workout-history.md) (`EditWorkout.tsx`, `src/lib/editHistory.ts`, `ExercisePage.tsx`, `src/lib/liftPage.ts`, `store/history.ts`)
+- [Workout history: editing, notes, doing it again, exercise pages and their stats](docs/decisions/workout-history.md) (`EditWorkout.tsx`, `src/lib/editHistory.ts`, `ExercisePage.tsx`, `src/lib/liftPage.ts`, `src/lib/liftStats.ts`, `LiftStats.tsx`, `ExerciseLibrary.tsx`, `store/history.ts`)
 - [Workout screen](docs/decisions/workout-screen.md) (`sessionNotify.ts`, `TrainingSettings.tsx`, `src/lib/training.ts`, `derive.ts`)
 - [Workouts with parts: lifting, stretches, rehab and cardio in one session](docs/decisions/sessions-with-parts.md) (`sessions.ts`, `partMetrics.ts`, `partExtras.ts`, `derive.ts`, `routineShare.ts`, `coach.ts`)
 - [Your stats](docs/decisions/your-stats.md) (`BodyStats.tsx`, `src/lib/health.ts`, `tdee.ts`, `HealthWorkoutPlugin.swift`)

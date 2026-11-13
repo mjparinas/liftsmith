@@ -193,6 +193,11 @@ export const it: FeaturesText = {
       name: "Modifica e ripeti gli allenamenti passati",
       body: "Correggi una serie, aggiungi una nota, dai un nome a un allenamento o ripetilo, e ogni esercizio ha la sua pagina con la sua cronologia.",
     },
+    "exercise-stats": {
+      name: "Statistiche di ogni esercizio",
+      body: "Tocca un esercizio della libreria per vedere le tue serie, il peso totale sollevato, il massimale stimato e il confronto con persone allenate del tuo peso, età e sesso secondo standard di forza pubblicati.",
+      proPart: "I grafici da una settimana a un anno fanno parte delle statistiche avanzate di Pro.",
+    },
     "log-past": {
       name: "Registra un allenamento passato",
       body: "Hai dimenticato il telefono? Registra l’allenamento dopo e conta come tutti gli altri.",

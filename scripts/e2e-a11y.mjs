@@ -150,6 +150,10 @@ try {
   await page.goto(`${server.url}/app/#/exercise/bench-press`);
   await page.getByRole("heading", { level: 1, name: "Barbell bench press" }).waitFor();
   await scan("exercise page");
+  // The exercise library (2026-11-13): the lifter's own exercises, then every exercise.
+  await page.goto(`${server.url}/app/#/exercises`);
+  await page.getByRole("heading", { level: 1, name: "Exercises" }).waitFor();
+  await scan("exercise library");
   // Tools › Plate and warm-up calculators.
   await page.goto(`${server.url}/app/#/tools/plates`);
   await page.getByTestId("plate-result").waitFor();
