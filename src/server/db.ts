@@ -913,6 +913,46 @@ const SCHEMA = [
   )`,
   "CREATE INDEX IF NOT EXISTS coach_slots_coach ON coach_slots (coach_id, start_at)",
   "CREATE INDEX IF NOT EXISTS coach_slots_client ON coach_slots (client_id, start_at)",
+  // Client payments through Stripe Connect (coachPay.ts): each coach's Express account, the price each client pays,
+  // their monthly plan and the payments Stripe told us about.
+  `CREATE TABLE IF NOT EXISTS coach_stripe (
+    coach_id TEXT PRIMARY KEY,
+    stripe_id TEXT NOT NULL,
+    ready INTEGER NOT NULL DEFAULT 0,
+    currency TEXT NOT NULL DEFAULT 'cad',
+    updated_at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_stripe_id ON coach_stripe (stripe_id)",
+  `CREATE TABLE IF NOT EXISTS coach_prices (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_prices_client ON coach_prices (client_id)",
+  `CREATE TABLE IF NOT EXISTS coach_subs (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    sub_id TEXT NOT NULL,
+    status TEXT NOT NULL,
+    until INTEGER,
+    ending INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  `CREATE TABLE IF NOT EXISTS coach_payments (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    amount REAL NOT NULL,
+    currency TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  "CREATE INDEX IF NOT EXISTS coach_payments_pair ON coach_payments (coach_id, client_id, at)",
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (

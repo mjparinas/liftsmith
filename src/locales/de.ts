@@ -78,6 +78,7 @@ import * as now from "./text/now";
 import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
+import * as pay from "./text/pay";
 import * as pgm from "./text/pgm";
 import * as photos from "./text/photos";
 import * as plate from "./text/plate";
@@ -207,6 +208,7 @@ export const de: Partial<Record<MessageKey, Message>> = {
   ...orm.de,
   ...part.de,
   ...past.de,
+  ...pay.de,
   ...pgm.de,
   ...photos.de,
   ...plate.de,

@@ -581,6 +581,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         pro: "coaching",
         added: "2026-11-13",
       },
+      {
+        id: "coach-payments",
+        name: "Client payments through Stripe",
+        body: "Connect your own Stripe account and set each client's price, per session or monthly. Clients pay on Stripe's secure page, the money goes straight to you, and a failed monthly payment shows at the top of their report.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
     ],
   },
   {

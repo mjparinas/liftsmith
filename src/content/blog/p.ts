@@ -1,99 +1,117 @@
 import type { Article } from "../articles";
 
-// Blog, physio support (Melvin, 2026-11-13: "add physios support", and blog posts for it). One post for physios and rehab
-// clinicians, one for lifters working with one. Neither gives medical advice or says what's safe for an injury: they
-// say what the app shows and leave the call to the clinician. Other apps aren't named (seo.test.ts).
+// Blog, part sixteen: the coach tools round (Melvin, 2026-11-13: "dont forget to add blog posts for this";
+// docs/decisions/trainer-mode.md). The announcement of payments, booking, check-ins, nutrition targets and the
+// personal trainer or coach choice, and a guide to weekly check-ins. Only what ships, and no other app named (seo.test.ts).
 export const BLOG_P: Article[] = [
   {
-    slug: "track-rehab-exercises-between-physio-visits",
+    slug: "payments-booking-and-check-ins-for-coaches",
     kind: "blog",
-    title: "How physios can see home exercise adherence and pain between visits",
+    title: "New for personal trainers and coaches: payments, booking and check-ins",
     description:
-      "Most rehab happens at home, out of sight. How to set a home program, see how often it's done and follow pain ratings exercise by exercise.",
+      "Take client payments through your own Stripe account, let clients book sessions, send weekly check-ins and set nutrition targets, all in Liftsmith.",
     date: "2026-11-13",
     tag: "Coaching",
     cta: "coach",
     body: [
       {
-        p: "A home exercise program is only as good as how often it's done, and most of it happens between appointments, where you can't see it. By the next visit you hear \"I did it most days\" and a pain score from memory. A shared log gives you the real picture before the client walks in.",
+        p: "Coaching in Liftsmith started with seeing your clients' workouts and knowing who needs you this week. Today it covers the rest of the job: getting paid, booking sessions, checking in between them and setting what your clients eat. Everything is part of Liftsmith Pro for the coach, and free for the people you coach.",
       },
-      { h2: "What's worth seeing between visits" },
+      { h2: "Personal trainer or coach: pick how you work" },
       {
-        ul: [
-          "**How often they did it.** Sessions in the last two weeks against the number you asked for. Low adherence explains a lot of slow progress.",
-          "**Pain, exercise by exercise.** A 0 to 10 rating after the sets of each exercise shows which movement is the problem, not just whether the day was bad.",
-          "**The trend, not one number.** Pain rising across a week is worth a call; one high rating after a long day may not be.",
-          "**New injuries.** If a client logs a new sore spot, you hear about it before the next session, not at it.",
-        ],
+        p: "Personal trainers and coaches don't work the same way, so Liftsmith now asks. Under **Settings › Coaching › Your clients**, choose **Personal trainer** if you mostly work one-on-one and in person, or **Coach** if you run groups, teams or remote programs. Your clients see the right word next to your name, and the tools you use most come first: sessions and a price per session for trainers, check-ins and a monthly fee for coaches. Every tool stays available either way.",
       },
-      { h2: "Keep the program small enough to keep" },
+      { h2: "Take payments through your own Stripe account" },
       {
-        p: "Four or five exercises, two or three sets each, done a few times a week will usually be kept up better than a long list. Bodyweight work that needs only a wall or the floor removes another excuse. You know what each client needs; the job of the app is to make that plan easy to follow and easy to check.",
+        p: "Tap **Set up payments with Stripe** and Stripe walks you through your details and bank account on its own pages. Then set each client's price on their report, per session or monthly. Your client sees it under Coaching and pays on Stripe's secure page, and the money goes to your Stripe account. You're the merchant, so receipts, refunds and payouts are yours to manage in your Stripe dashboard. Liftsmith never sees a card number.",
       },
-      { exercises: ["wall-sit", "glute-bridge", "bird-dog", "clamshell", "bw-calf-raise"] },
+      {
+        p: "Monthly plans renew on their own, and either of you can stop one at the end of the paid month. If a monthly payment doesn't go through, it shows at the top of that client's report with a nudge to send a quick message, the same way a client going quiet does.",
+      },
+      { h2: "Booking and scheduling sessions" },
+      {
+        p: "Open the times you're free with a few taps: a day, the start time, a length, and once or the same time every week for up to twelve weeks. Leave them open and your clients book them under Coaching, or book a client in yourself from their report. You both get a notification, a session coming up in the next day shows on Today, and **Add to calendar** puts it in the phone's calendar. If two clients reach for the same time, only one gets it, and nobody sees who else booked what.",
+      },
+      { h2: "Check-in forms and questionnaires" },
+      {
+        p: "Start a form from a template (a weekly check-in, or an intake questionnaire for new clients) or from blank, and change any question. Send it now or every week. Clients answer with taps: 1 to 5, yes or no, or a number. Only questions that ask for words need typing. Their answers sit on their report, and a score of 1 or 2, or a check-in left unanswered for three days, goes under **What to do first**. Our [guide to weekly check-ins](/blog/weekly-check-in-questions-for-clients/) has the questions worth asking.",
+      },
       { cta: "coach" },
-      { h2: "In Liftsmith" },
+      { h2: "Nutrition targets" },
       {
-        p: "Pick Physio under Settings › Coaching. Each client's report then leads with the pain ratings and injuries they choose to share, with the latest rating on each exercise and the trend across their last ratings. Assign one of the gentle rehab starting points (knee, lower back, shoulder, ankle, hip, neck and upper back) or any routine you've built, with how many times a week. The report shows how often they keep to it, and you get a notification when a rating of 5 or more comes in. Clients use the app free. See [coaching in Liftsmith](/coaches/).",
+        p: "Set a client's daily calories and protein on their report. They see the targets under Coaching, and their coach's notes judge their food week against your numbers instead of our estimate. Liftsmith still doesn't log food. When a client logs in a food app that writes to Health Connect or Apple Health and chooses to share body data with you, you see how their week compares, and a week well off target shows up on their report.",
       },
+      { h2: "Where it works" },
       {
-        p: "Liftsmith shows what your client logs. It doesn't diagnose or treat anything, and the rehab starting points are there to adjust, not a treatment plan: your assessment decides what's right for each person.",
+        p: "All of it is on Android, iPhone and the web app, in all six of the app's languages. Being someone's client is always free. Read [how to track your clients' workouts](/blog/how-to-track-client-workouts/) for the habits that make coaching in an app work, or see everything on the [features page](/features/).",
       },
     ],
     faq: [
       [
-        "Do clients have to share pain ratings?",
-        "No. Sharing pain and injuries is a separate switch for each coach, off until the client turns it on. They can turn it off at any time.",
+        "Does Liftsmith take a cut of my payments?",
+        "No. Payments go to your own Stripe account. Stripe charges its usual card fees, and Liftsmith takes nothing on top.",
       ],
       [
-        "Does the app change a rehab program when a client logs an injury?",
-        "Not one you assign as a rehab program. Those keep every exercise as written and ask about pain between sets. The client's other workouts still skip or lighten the exercises that load a sore spot.",
+        "Do my clients need Pro?",
+        "No. Booking, paying, check-ins and targets are free for clients. Coaching clients is part of Pro for the coach.",
+      ],
+      [
+        "Can clients pay inside the app?",
+        "They pay on Stripe's secure checkout page, which opens in the browser from the app. Their receipt comes from Stripe by email.",
       ],
     ],
   },
   {
-    slug: "doing-your-physio-exercises-at-home",
+    slug: "weekly-check-in-questions-for-clients",
     kind: "blog",
-    title: "How to keep up your physio exercises at home",
+    title: "Weekly check-in questions for personal training clients",
     description:
-      "Home exercises from a physio work best when they're done and when your physio hears how they felt. Simple ways to keep up with them and report pain.",
+      "What to ask clients every week, how to keep a check-in short enough that they answer it, and what to do with a low score.",
     date: "2026-11-13",
     tag: "Coaching",
-    cta: "injury",
+    cta: "coach",
     body: [
       {
-        p: "Your physio gave you a handful of exercises to do at home, a few times a week. Then life happens: a busy week, a day the knee feels fine, a day it doesn't. Keeping up with the plan, and telling your physio honestly how it went, is a big part of what you can control.",
+        p: "A weekly check-in is the cheapest way to catch a problem before it costs you a client. Done well, it takes them a minute and tells you who needs a lighter week, who needs a push and who's about to drift away. Done badly, it's a twenty-question form nobody opens after week two.",
       },
-      { h2: "Make it easy to do" },
+      { h2: "Keep it to six questions or fewer" },
+      {
+        p: "Every extra question lowers the odds of getting any answers at all. Ask only what you'll act on. If you wouldn't change a client's plan or send them a message because of the answer, cut the question.",
+      },
+      { h2: "Questions worth asking every week" },
       {
         ul: [
-          "**Pick the days now.** Put the sessions on the days and times you'll really do them, the same way you'd book an appointment.",
-          "**Keep it where you train.** If your exercises sit in the same app as the rest of your training, they're one tap away instead of on a sheet of paper.",
-          "**Log as you go.** Tick off each set as you do it. It's faster than remembering later, and it's what your physio will look at.",
+          "**How well did you sleep this week?** (1 to 5). Poor sleep is the most common reason a good plan stops working.",
+          "**How was your energy?** (1 to 5). A low score two weeks running is a reason to ease off before fatigue turns into missed sessions.",
+          "**How closely did you follow the plan?** (1 to 5). Asked without judgment, it tells you whether the plan fits their life.",
+          "**Your weight this morning** (a number), only if body weight matters for their goal.",
+          "**What went well?** Wins are what keep people coming back, and you'll want to mention them.",
+          "**Anything you'd like to change?** The one open question that catches what the others miss.",
         ],
       },
-      { h2: "Rate pain the same way each time" },
+      { h2: "Use scales, not essays" },
       {
-        p: 'A 0 to 10 scale works when you use it consistently: 0 is no pain, 10 is the worst you can imagine. Rate right after the sets of each exercise, not at the end of the day, so the rating belongs to the movement. A few numbers over a couple of weeks tell your physio far more than "it\'s been okay".',
+        p: "A 1-to-5 scale takes one tap and can be compared week to week. Save open questions for one or two things only words can answer. Clients on their phone between meetings will answer taps; they'll put off a text box until they forget.",
       },
-      { cta: "injury" },
-      { h2: "Know when to stop" },
+      { h2: "Send it on the same day each week" },
       {
-        p: "Stop and get in touch with your physio if you feel sharp pain, pain that builds through the session, swelling, numbness or tingling, or a joint that gives way. Don't push through those to finish a set. See [training around an injury](/blog/training-around-an-injury/).",
+        p: "A check-in that arrives every Sunday becomes a habit. One that arrives whenever you remember gets treated as optional. In Liftsmith, the **Send this form every week** switch on a client's report sends it for you and keeps the last twelve weeks of answers side by side.",
       },
-      { h2: "In Liftsmith" },
+      { cta: "coach" },
+      { h2: "What to do with a low score" },
       {
-        p: "Enter your physio's code under Settings › Coaching, then turn on Share pain and injuries for them if you want them to see your ratings. It's off until you do. A rehab program they send keeps every exercise as written even with an injury logged, and asks how the area feels after each exercise's sets. Being a client is free. Liftsmith isn't a medical app and doesn't give medical advice; your physio does.",
+        p: "A 1 or a 2 is a conversation, not a data point. Message them before the next session, ask what's going on, and adjust: fewer sets that week, an easier day, or simply a reminder that one bad week doesn't undo a good month. Liftsmith puts a low score under **What to do first** on that client's report so it doesn't get lost among everyone else's.",
+      },
+      { h2: "Start new clients with an intake questionnaire" },
+      {
+        p: "Before the first session, ask for their main goal, how long they've trained, how many days a week they can train, whether they train at a gym, and any injuries or pain to work around. It saves the first session from being a form-filling exercise, and it tells you what equipment to plan around. Read [how to keep personal training clients consistent](/blog/keep-personal-training-clients-consistent/) for what to do once they've started.",
       },
     ],
     faq: [
+      ["How many questions should a weekly check-in have?", "Six or fewer. Ask only what you'd change a plan or send a message about."],
       [
-        "What does my physio see?",
-        "Your workouts, and, only if you turn it on, the areas you logged as hurting, when, and your pain ratings with the exercise each was rated on. Never your heart rate, health readings, notes or photos.",
-      ],
-      [
-        "What if I miss a session?",
-        "Do the next one as planned rather than doubling up, and tell your physio if missing sessions is becoming a pattern. A shorter plan you keep up usually beats a longer one you don't.",
+        "What day should I send check-ins?",
+        "The same day every week, so it becomes a habit. The end of the week works well, while it's fresh.",
       ],
     ],
   },
