@@ -1,6 +1,7 @@
 "use client";
 
-// School teams, under Coaching (#/trainer; docs/decisions/school-teams.md). Two halves, like the rest of the screen:
+// School teams, under Coaching (#/trainer; docs/decisions/school-teams.md). Two halves, each on its own side's page
+// (coachMode.ts, 2026-11-13): athletes see theirs with their coach, school coaches on the Teams page.
 // - "Your teams" for athletes: enter the code from a school coach, say how old you are (13 to 18) and agree, then the
 //   team's weekly board and Leave team. Pro is free while they're on it.
 // - "Coach a school team" for coaches: prove a school address with an emailed code (staff check schools they don't
@@ -39,10 +40,10 @@ import { Button, Chip, Sheet } from "./ui";
 
 const INPUT = "min-w-0 flex-1 rounded-xl border border-line bg-raised px-3 py-2";
 
-export function SchoolTeams({ code = "" }: { code?: string }) {
+/** The lifter's teams, school and team members, loaded once for Coaching's pages (CoachHome.tsx). */
+export function useTeams(): { data: TeamsOverview | null; error: string | null; reload: () => void } {
   const [data, setData] = useState<TeamsOverview | null>(null);
-  const [note, setNote] = useState<string | null>(null);
-  const [board, setBoard] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const reload = useCallback(() => {
     loadTeams()
       // Whatever came back, every list is there (an older server, or a reply that isn't ours).
@@ -57,24 +58,41 @@ export function SchoolTeams({ code = "" }: { code?: string }) {
       )
       .catch((e: unknown) => {
         setData({ school: null, codeSent: false, teams: [], joined: [], members: {} });
-        setNote(teamError(e));
+        setError(teamError(e));
       });
   }, []);
   useEffect(reload, [reload]);
+  return { data, error, reload };
+}
+
+/** An athlete's side: the teams they're on (with the weekly board), and joining one with a team code. */
+export function AthleteTeams({ data, code = "", onChange }: { data: TeamsOverview | null; code?: string; onChange: () => void }) {
+  const [note, setNote] = useState<string | null>(null);
+  const [board, setBoard] = useState<string | null>(null);
   return (
     <div className="space-y-3">
-      <p className="px-1 text-sm text-muted">{t("team.lead")}</p>
       {data?.joined.map((tm) => (
-        <JoinedTeam key={tm.id} team={tm} onBoard={() => setBoard(tm.id)} onChange={reload} onNote={setNote} />
+        <JoinedTeam key={tm.id} team={tm} onBoard={() => setBoard(tm.id)} onChange={onChange} onNote={setNote} />
       ))}
-      <JoinTeam code={code} joined={data?.joined.length ?? 0} onChange={reload} />
-      {data && <CoachSide data={data} onBoard={setBoard} onChange={reload} />}
+      <JoinTeam code={code} joined={data?.joined.length ?? 0} onChange={onChange} />
       {note && (
         <p className="text-sm text-muted" role="status">
           {note}
         </p>
       )}
       {/* Keyed by team, so each board opens fresh. */}
+      {board && <Board key={board} team={board} onClose={() => setBoard(null)} />}
+    </div>
+  );
+}
+
+/** A school coach's side: prove the school address, then their teams, links, athletes and boards. */
+export function CoachTeams({ data, onChange }: { data: TeamsOverview | null; onChange: () => void }) {
+  const [board, setBoard] = useState<string | null>(null);
+  return (
+    <div className="space-y-3">
+      <p className="px-1 text-sm text-muted">{t("team.lead")}</p>
+      {data && <CoachSide data={data} onBoard={setBoard} onChange={onChange} />}
       {board && <Board key={board} team={board} onClose={() => setBoard(null)} />}
     </div>
   );

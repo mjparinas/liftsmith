@@ -149,6 +149,18 @@ function ProCard() {
   );
 }
 
+/** Coaching: what it holds for this lifter, their coach's name or how many clients they coach. */
+function CoachingRow() {
+  const who = useCoachNotes((s) => s.who);
+  const first = who.coaches[0];
+  const sub = first
+    ? t("trn.rowClient", { name: first.name || t("trn.noName") })
+    : who.clients
+      ? t("trn.rowCoach", { count: who.clients })
+      : t("trn.rowNote");
+  return <NavRow title={t("trn.row")} sub={sub} icon="target" onClick={() => go("trainer")} />;
+}
+
 /** Settings' second row: sign in to back up and sync, or who's signed in. */
 function AccountRow() {
   const account = useAccount((s) => s.account);
@@ -202,7 +214,7 @@ export function Settings() {
       {/* On desktop, an account that coaches or is coached has Coaching in the sidebar (App.tsx), so the row goes. */}
       {!(desktop && coaching) && (
         <div className="mt-2">
-          <NavRow title={t("trn.row")} sub={t("trn.rowNote")} icon="target" onClick={() => go("trainer")} />
+          <CoachingRow />
         </div>
       )}
       <ul className="mt-3 space-y-2">

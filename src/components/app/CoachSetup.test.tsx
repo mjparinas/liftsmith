@@ -134,7 +134,8 @@ describe("a coach signing up from the coaches page", () => {
       if (steps.length > 6) throw new Error(`stuck: ${steps.join(" / ")}`);
     }
     expect(steps.join(" / ")).not.toMatch(/Save your progress/i);
-    await waitFor(() => expect(location.hash).toBe("#/trainer"));
+    // On the coach's pages, not the first page that asks which side they're on (coachMode.ts).
+    await waitFor(() => expect(location.hash).toBe("#/trainer/clients"));
   });
 
   it("I'm here to train goes back to the usual welcome and forgets it", async () => {

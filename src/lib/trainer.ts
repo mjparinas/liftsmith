@@ -98,6 +98,8 @@ export interface Overview {
   pay?: OverviewPay | null;
   /** This account's coach plan: tier, client limit and clients (src/server/coachPlan.ts). */
   plan?: CoachPlanInfo;
+  /** Whether this account has coached (sent an invite), so the app opens on the coach's pages. */
+  coach?: boolean;
 }
 /** The server's CoachPlan (coach plans, src/lib/coachPlans.ts). */
 export interface CoachPlanInfo {
@@ -201,7 +203,7 @@ export const removePlan = async (id: string) => void (await api("/api/coach/", {
 /** The longest chat message (the server's COACH_LIMITS.message). */
 export const MESSAGE_MAX = 1000;
 export const loadMessages = async (id: string, before?: number) =>
-  api<{ messages: Message[]; more: boolean; name?: string }>(
+  api<{ messages: Message[]; more: boolean; name?: string; them?: "coach" | "client" }>(
     `/api/coach/?chat=${encodeURIComponent(id)}${before ? `&before=${before}` : ""}`,
     { token: token() },
   );
@@ -584,6 +586,8 @@ const CACHE = "liftsmith.coachNotes";
 const SEEN = "liftsmith.coachNotes.seen";
 const TARGETS = "liftsmith.coachTargets";
 const COACHING = "liftsmith.coaching";
+const WHO = "liftsmith.coachWho";
+const NOBODY: Who = { coaches: [], clients: 0 };
 /** At most one look a quarter of an hour, on open and on return to the app (like Health imports). */
 const EVERY = 15 * 60_000;
 
@@ -615,6 +619,13 @@ interface NotesState {
    * Coaching only then (docs/decisions/desktop-layout.md). Kept on the device so it shows before the first load.
    */
   coaching: boolean;
+  /** Who this lifter trains with and how many clients they coach, for the badge by their name (coachBadge). */
+  who: Who;
+}
+/** The lifter's coaches (name and role) and how many clients they coach, kept on the device for the badge. */
+export interface Who {
+  coaches: Pick<Person, "id" | "name" | "role">[];
+  clients: number;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -641,11 +652,12 @@ export const useCoachNotes = create<NotesState>(() => ({
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
   coaching: typeof window === "undefined" ? false : readJson<boolean>(COACHING, false),
+  who: typeof window === "undefined" ? NOBODY : readJson<Who>(WHO, NOBODY),
 }));
 
 /** Whether an account takes part in coaching, as a coach or a client. */
-export function usesCoaching(o: Pick<Overview, "coaches"> & Partial<Pick<Overview, "clients" | "invite" | "role">>): boolean {
-  return o.coaches.length > 0 || (o.clients?.length ?? 0) > 0 || !!o.invite || !!o.role;
+export function usesCoaching(o: Pick<Overview, "coaches"> & Partial<Pick<Overview, "clients" | "invite" | "role" | "coach">>): boolean {
+  return o.coaches.length > 0 || (o.clients?.length ?? 0) > 0 || !!o.invite || !!o.role || !!o.coach;
 }
 
 export const noteId = (n: Note) => `${n.coachId}:${n.at}`;
@@ -661,7 +673,7 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
 export function keepNotes(
   o: Pick<Overview, "notes" | "coaches"> &
-    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role">>,
+    Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins" | "sessions" | "invite" | "role" | "coach">>,
 ): void {
   const notes = shownNotes(o);
   const coaching = usesCoaching(o);
@@ -676,7 +688,12 @@ export function keepNotes(
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
   const checkins = (o.checkins ?? []).map((c) => ({ ...c, coach: o.coaches.find((p) => p.id === c.coachId)?.name ?? "" }));
   const sessions = (o.sessions?.booked ?? []).map((x) => ({ ...x, coach: o.coaches.find((p) => p.id === x.coachId)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching });
+  const who: Who = {
+    coaches: o.coaches.map((c) => ({ id: c.id, name: c.name, ...(c.role ? { role: c.role } : {}) })),
+    clients: o.clients?.length ?? 0,
+  };
+  writeJson(WHO, who);
+  useCoachNotes.setState({ notes, unread, targets, checkins, sessions, coaching, who });
 }
 
 /** A check-in was answered: it no longer waits on Today. */
@@ -687,6 +704,25 @@ export function checkinDone(id: string): void {
 /** A chat was opened: its messages are read now. */
 export function markRead(id: string): void {
   useCoachNotes.setState((s) => ({ unread: s.unread.filter((u) => u.id !== id) }));
+}
+
+/**
+ * The badge by the lifter's name (Today, Account, Coaching): "Coached by Sam" for a client, "Trained by Sam" when that
+ * coach is a personal trainer, "Physio: Sam" for a physio, a count with a second coach, and "Coach" for someone who
+ * coaches and trains with nobody. Null for everyone else.
+ */
+export function coachBadge(who: Who): string | null {
+  const [first] = who.coaches;
+  if (first) {
+    const name = first.name || t("trn.noName");
+    if (who.coaches.length > 1) return t("trn.badge.many", { name, count: who.coaches.length - 1 });
+    return first.role === "trainer"
+      ? t("trn.badge.trainer", { name })
+      : first.role === "physio"
+        ? t("trn.badge.physio", { name })
+        : t("trn.badge.coach", { name });
+  }
+  return who.clients > 0 ? t("trn.badge.coaching", { count: who.clients }) : null;
 }
 
 let lastLook = 0;
@@ -713,5 +749,6 @@ export function forgetNotes(): void {
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
   writeJson(COACHING, false);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false });
+  writeJson(WHO, NOBODY);
+  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [], sessions: [], coaching: false, who: NOBODY });
 }

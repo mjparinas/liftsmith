@@ -597,6 +597,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-13",
       },
       {
+        id: "coach-pages",
+        name: "A page for each side",
+        body: "Clients see only their coach: message them in one tap, answer check-ins, book sessions and choose what to share. Coaches get a page for each job, with clients, messages, schedule, check-ins and payments as tabs on the web and on phones.",
+        tier: "both",
+        proPart: "Being a client is free; coaching clients is Pro.",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
+      {
         id: "coach-plans",
         name: "Coach plans that grow with your client list",
         body: "Pro covers up to 3 clients. Coach makes room for 25 and Coach Plus has no set limit, with every coaching tool on every plan. Your clients always train free, and Liftsmith takes nothing from what they pay you.",

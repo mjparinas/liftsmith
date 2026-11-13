@@ -94,7 +94,11 @@ describe("linking", () => {
     await joinCoach("client", "CCCCDDDD", NOW + 1);
     const coach = await overview("coach", NOW);
     expect(coach.clients).toEqual([{ id: "client", name: "Alex", since: NOW }]);
-    expect((await overview("client", NOW)).coaches.map((c) => c.id)).toEqual(["coach"]);
+    // The invite made one of them a coach; the client stays a client, so their app shows only the client's pages.
+    expect(coach.coach).toBe(true);
+    const client = await overview("client", NOW);
+    expect(client.coaches.map((c) => c.id)).toEqual(["coach"]);
+    expect(client.coach).toBe(false);
   });
 
   it("caps coaches per client", async () => {
@@ -350,8 +354,12 @@ describe("chat between a coach and a client", () => {
     expect(await sendMessage("coach", "client", "How did squats feel?", NOW, "m1")).toMatchObject({ id: "m1", from: "coach" });
     expect(await sendMessage("client", "coach", "Heavy but good", NOW + 1, "m2")).toMatchObject({ id: "m2", from: "client" });
     const r = await messages("client", "coach", undefined, NOW + 2);
-    expect(r).toMatchObject({ name: "Sam", more: false });
+    expect(r).toMatchObject({ name: "Sam", more: false, them: "coach" });
     expect("messages" in r && r.messages.map((m) => m.text)).toEqual(["How did squats feel?", "Heavy but good"]);
+    // The coach's side reads the same thread, and knows the other person is their client.
+    const c = await messages("coach", "client", undefined, NOW + 3);
+    expect(c).toMatchObject({ them: "client" });
+    expect("messages" in c && c.messages.map((m) => m.from)).toEqual(["coach", "client"]);
     expect(await messages("stranger", "coach", undefined, NOW)).toEqual({ error: "notLinked" });
   });
 

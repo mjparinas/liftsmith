@@ -164,9 +164,9 @@ export function guardTraversals() {
 guardTraversals();
 
 /** Swaps this history entry's screen for another, without adding a step for back to undo. */
-export function replaceRoute(route: Route) {
+export function replaceRoute(route: Route, arg?: string) {
   startTracking();
-  const hash = `#/${route}`;
+  const hash = `#/${route}${arg ? `/${arg}` : ""}`;
   if (hash === location.hash) return;
   const e = entry();
   stamp(e?.depth ?? 0, e?.prev ?? "", hash);
