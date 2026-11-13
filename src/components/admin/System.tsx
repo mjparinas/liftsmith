@@ -19,6 +19,7 @@ import {
 import { isVisible } from "@/lib/visibility";
 
 import { MaintenanceCard, useMaintenance } from "./Maintenance";
+import { Bone, LineBones, Loading } from "./Skeletons";
 import { ago } from "./time";
 import { TwoFactorCard } from "./TwoFactor";
 
@@ -124,9 +125,14 @@ function CheckCard({
     <section className="card min-w-0 p-4" aria-busy={!c && !error}>
       <div className="flex items-start justify-between gap-3">
         <h2 className="font-semibold">{title}</h2>
-        {c ? <Badge state={c.state} /> : <span className="text-xs text-muted">{error ? "" : "Checking…"}</span>}
+        {c ? <Badge state={c.state} /> : !error && <Bone className="h-5 w-16 rounded-full" />}
       </div>
       {error && <p className="mt-1 text-sm text-bad">{error}</p>}
+      {!c && !error && (
+        <Loading label={`Checking ${title}`} className="mt-2">
+          <LineBones n={3} />
+        </Loading>
+      )}
       {c && (
         <>
           <p className="mt-1 text-sm">{c.summary}</p>
@@ -217,9 +223,20 @@ function PageRow({
         <a href={url} target="_blank" rel="noreferrer" className="font-semibold underline">
           {name}
         </a>
-        {p ? <Badge state={p.state} /> : <span className="text-xs text-muted">{error ? "Couldn't read it" : "Checking…"}</span>}
+        {p ? (
+          <Badge state={p.state} />
+        ) : error ? (
+          <span className="text-xs text-muted">Couldn&apos;t read it</span>
+        ) : (
+          <Bone className="h-5 w-16 rounded-full" />
+        )}
       </div>
       {p && <p className="text-sm text-muted">{p.description}</p>}
+      {!p && !error && (
+        <Loading label={`Checking ${name}`} className="mt-1.5">
+          <Bone className="h-3 w-2/3" />
+        </Loading>
+      )}
       {p?.incidents.map((i, k) => (
         <p key={k} className="text-sm">
           {i.href ? (

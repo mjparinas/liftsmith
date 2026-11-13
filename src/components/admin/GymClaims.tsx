@@ -8,6 +8,7 @@ import { useEffect, useState } from "react";
 import type { ClaimRow } from "@/server/gymClaims";
 
 import { Card } from "./charts";
+import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 export function GymClaims({ admin }: { admin: boolean }) {
@@ -46,7 +47,9 @@ export function GymClaims({ admin }: { admin: boolean }) {
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
-        <p className="mt-3 text-sm text-muted">Loading…</p>
+        <Loading label="Loading claims" className="mt-3">
+          <RowBones n={3} />
+        </Loading>
       ) : waiting.length === 0 ? (
         <p className="mt-3 text-sm text-muted">Nothing waiting.</p>
       ) : (

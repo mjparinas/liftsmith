@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 
 import { Card } from "./charts";
+import { CardBones, Loading } from "./Skeletons";
 
 type Data = { settings: { instant: boolean; digest: boolean }; recipients: string[]; canSend: boolean };
 
@@ -52,7 +53,12 @@ export function Automations({ admin }: { admin: boolean }) {
   useEffect(() => {
     void load();
   }, []);
-  if (!data) return <p className="text-muted">Loading…</p>;
+  if (!data)
+    return (
+      <Loading label="Loading automations">
+        <CardBones body="rows" />
+      </Loading>
+    );
   const save = async (next: Data["settings"]) => {
     setData({ ...data, settings: next });
     const r = await fetch("/api/admin/automations/", {

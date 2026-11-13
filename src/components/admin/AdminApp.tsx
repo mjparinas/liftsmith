@@ -23,6 +23,7 @@ import { NeedsYou } from "./NeedsYou";
 import { Reports } from "./Reports";
 import { RunningCosts } from "./RunningCosts";
 import { SearchConsole } from "./SearchConsole";
+import { AdminSkeleton, CardBones, Loading, TabSkeleton, TileBones } from "./Skeletons";
 import { System } from "./System";
 import { countryName } from "./time";
 import { Todo } from "./Todo";
@@ -57,6 +58,8 @@ const TABS = [
 type Tab = (typeof TABS)[number];
 const PERIODS = [7, 28, 90, 365] as const;
 /** The tabs whose numbers follow the period picker; the picker is hidden on the rest, where it would do nothing. */
+/** The tabs drawn from the one stats answer (the others load their own). */
+const STATS_TABS = new Set<Tab>(["Overview", "Traffic", "Acquisition", "Funnel", "Retention", "Engagement", "Devices", "Revenue"]);
 const PERIOD_TABS = new Set<Tab>(["Overview", "Traffic", "Acquisition", "Funnel", "Engagement", "Devices", "Revenue", "Codes"]);
 
 /** Where the panel is: a tab, and an account (Users) or install (Installs) open on it. In the address as ?tab=&open=. */
@@ -353,7 +356,10 @@ function Creators({ admin, days }: { admin: boolean; days: number }) {
         {failed}
       </p>
     ) : (
-      <p className="text-muted">Loading…</p>
+      <Loading label="Loading codes" className="space-y-4">
+        <TileBones n={5} cols="grid-cols-2 md:grid-cols-5" />
+        <CardBones title="All codes" body="table" />
+      </Loading>
     );
   const rows = data.rows;
   const creators = rows.filter((r) => r.kind === "creator");
@@ -563,6 +569,9 @@ export function AdminApp() {
   const [view, setView] = useState<View>(readView);
   const tab = view.tab;
   const [data, setData] = useState<Data | null>(null);
+  // The period the shown numbers are for: a new period keeps the header and tabs and shows the tab's skeleton
+  // until its numbers arrive, instead of last period's numbers under the new label.
+  const [dataDays, setDataDays] = useState<number | null>(null);
   const [state, setState] = useState<"loading" | "signin" | "twofactor" | "ok" | "error">("loading");
   const [twoFactor, setTwoFactor] = useState<TwoFactorInfo | null>(null);
   // Maintenance mode's state, for the banner on every tab and the switch on System.
@@ -629,6 +638,7 @@ export function AdminApp() {
         const j = (await r.json()) as Data;
         if (!live) return;
         setData(j);
+        setDataDays(days);
         setState("ok");
       })
       .catch(() => live && setState("error"));
@@ -646,7 +656,9 @@ export function AdminApp() {
         (DATABASE_URL or TURSO_DATABASE_URL).
       </main>
     );
-  if (!data) return <main className="p-8 text-muted">Loading…</main>;
+  if (!data) return <AdminSkeleton tab={tab} />;
+  // Tabs drawn from the stats answer, while a new period's answer is on its way.
+  const stale = dataDays !== days && STATS_TABS.has(tab);
   const o = data.overview;
   const rev = data.revenue;
   const site = data.site;
@@ -711,7 +723,8 @@ export function AdminApp() {
 
       <div className="mt-4 space-y-4">
         <MaintenanceBanner state={maintenance[0]} admin={data.staff.role === "admin"} changed={maintenance[1]} />
-        {tab === "Overview" && (
+        {stale && <TabSkeleton tab={tab} />}
+        {!stale && tab === "Overview" && (
           <>
             <NeedsYou go={go} />
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -762,7 +775,7 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Traffic" && (
+        {!stale && tab === "Traffic" && (
           // A search section that isn't set up yet moves below the site's own numbers (order-last), so the setup
           // steps don't push what's there off the screen.
           <div className="flex flex-col gap-4">
@@ -823,7 +836,7 @@ export function AdminApp() {
           </div>
         )}
 
-        {tab === "Acquisition" && (
+        {!stale && tab === "Acquisition" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="New installs" value={fmtInt(o.installs)} />
@@ -860,7 +873,7 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Funnel" && (
+        {!stale && tab === "Funnel" && (
           <>
             <div className="grid gap-4 md:grid-cols-2">
               <Card
@@ -909,7 +922,7 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Retention" && (
+        {!stale && tab === "Retention" && (
           <>
             <div className="grid grid-cols-3 gap-3">
               <Tile label="Day 1" value={fmtPct(data.retention.d1, 0)} sub="back on day 1 or later" />
@@ -925,7 +938,7 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Engagement" && (
+        {!stale && tab === "Engagement" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile
@@ -968,7 +981,7 @@ export function AdminApp() {
           </>
         )}
 
-        {tab === "Devices" && (
+        {!stale && tab === "Devices" && (
           <div className="grid gap-4 md:grid-cols-2">
             <Card title="Platforms">
               <BarList rows={data.devices.platforms.map((s) => ({ ...s, key: STORE_LABEL[s.key] ?? s.key }))} />
@@ -991,7 +1004,7 @@ export function AdminApp() {
           </div>
         )}
 
-        {tab === "Revenue" && (
+        {!stale && tab === "Revenue" && (
           <>
             <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
               <Tile label="Gross MRR" value={fmtUsd(rev.all.grossMrr)} />

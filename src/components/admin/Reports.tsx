@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import type { ReportAction, ReportGroup } from "@/server/social";
 
 import { Card } from "./charts";
+import { Loading, RowBones } from "./Skeletons";
 import { ago } from "./time";
 
 const ACTIONS: { action: ReportAction; label: string; danger?: boolean }[] = [
@@ -54,7 +55,11 @@ export function Reports({ admin, onCount }: { admin: boolean; onCount: (n: numbe
       </p>
       {error && <p className="mt-2 text-sm text-bad">{error}</p>}
       {rows === null ? (
-        !error && <p className="mt-3 text-sm text-muted">Loading…</p>
+        !error && (
+          <Loading label="Loading reports" className="mt-3">
+            <RowBones n={3} />
+          </Loading>
+        )
       ) : rows.length === 0 ? (
         <p className="mt-3 text-sm text-muted">Nothing waiting.</p>
       ) : (

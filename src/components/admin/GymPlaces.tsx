@@ -9,6 +9,7 @@ import type { AdminPlace, AdminPlaceList, PlaceAction } from "@/server/gymPlaces
 import { Card } from "./charts";
 import { GymClaims } from "./GymClaims";
 import { GymPosters } from "./GymPosters";
+import { Loading, TableBones } from "./Skeletons";
 
 export function GymPlaces({ admin }: { admin: boolean }) {
   const [data, setData] = useState<(AdminPlaceList & { pending: AdminPlace[] }) | null>(null);
@@ -218,7 +219,9 @@ export function GymPlaces({ admin }: { admin: boolean }) {
         }
       >
         {data === null ? (
-          <p className="text-sm text-muted">Loading…</p>
+          <Loading label="Loading gyms">
+            <TableBones />
+          </Loading>
         ) : data.places.length === 0 ? (
           <p className="text-sm text-muted">{q.trim() ? "No gyms match that search." : "No gyms yet. Import a city above."}</p>
         ) : (
