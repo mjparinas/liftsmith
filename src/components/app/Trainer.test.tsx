@@ -41,6 +41,7 @@ const CHECKIN = {
 };
 let answered: unknown[] = [];
 let trainer = false;
+let payOn = false;
 const SLOT = { id: "s1", coachId: "k1", start: NOW + 2 * 86_400_000, minutes: 60, place: "Main gym", clientId: null, bookedAt: null };
 let mySessions: { booked: unknown[]; open: unknown[] } = { booked: [], open: [] };
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
@@ -54,6 +55,7 @@ beforeEach(() => {
   shared = null;
   answered = [];
   trainer = false;
+  payOn = false;
   mySessions = { booked: [], open: [] };
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
@@ -72,6 +74,14 @@ beforeEach(() => {
         forms: [FORM],
         checkins: answered,
         repeat: null,
+        pay: payOn
+          ? {
+              account: { ready: true, currency: "cad" },
+              price: null,
+              sub: { status: "past_due", until: null, ending: false },
+              payments: [],
+            }
+          : null,
       });
     if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
@@ -89,7 +99,18 @@ beforeEach(() => {
         checkins: linked ? [CHECKIN] : [],
         slots: [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }],
         sessions: mySessions,
+        pay: payOn
+          ? {
+              account: { ready: true, currency: "cad" },
+              prices: linked ? [{ coachId: "k1", clientId: "me", amount: 60, currency: "cad", kind: "session", at: NOW, sub: null }] : [],
+            }
+          : null,
       });
+    if (body?.action === "price")
+      return Response.json({
+        price: { coachId: "me", clientId: body.client, amount: body.amount, currency: "cad", kind: body.kind, at: NOW },
+      });
+    if (body?.action === "payCheckout") return Response.json({ url: "https://checkout.stripe.com/c/x" });
     if (body?.action === "slots") return Response.json({ slots: [{ ...SLOT, start: body.slot.start, coachId: "me" }] });
     if (body?.action === "book") return Response.json({ slot: { ...SLOT, clientId: "me", bookedAt: NOW } });
     if (body?.action === "cancelSlot") return Response.json({ ok: true });
@@ -454,5 +475,37 @@ describe("booking sessions", () => {
     unmount();
     render(<CoachNoteToday />);
     expect(screen.getAllByText("Session with Sam").length).toBeGreaterThan(0);
+  });
+});
+
+describe("client payments", () => {
+  it("stay hidden until the server has Stripe Connect", async () => {
+    render(<Trainer />);
+    expect(await screen.findByText("ABCD-2345")).toBeInTheDocument();
+    expect(screen.queryByText("Payments")).toBeNull();
+  });
+
+  it("a coach sets a client's price, and a failed monthly payment goes first", async () => {
+    payOn = true;
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Monthly payment didn't go through")).toBeInTheDocument();
+    await u.type(screen.getByLabelText("Price (CAD)"), "75");
+    await u.click(screen.getByRole("button", { name: "Save price" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "price")).toMatchObject({
+      body: { client: "c1", amount: 75, kind: "session" },
+    });
+  });
+
+  it("a client pays for a session on Stripe's page", async () => {
+    payOn = true;
+    linked = true;
+    const open = vi.fn();
+    vi.stubGlobal("open", open);
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: /Pay for a session/ }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "payCheckout")).toMatchObject({ body: { id: "k1" } });
+    expect(open).toHaveBeenCalledWith("https://checkout.stripe.com/c/x", "_blank", "noopener");
   });
 });

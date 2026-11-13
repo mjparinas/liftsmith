@@ -10,6 +10,7 @@ import { api, AuthError, readAccount } from "./auth";
 import type { Sessions, Slot } from "./booking";
 import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } from "./checkins";
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
+import type { ClientPay, OverviewPay } from "./coachPay";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
 import { t } from "./i18n";
@@ -83,6 +84,8 @@ export interface Overview {
   /** This coach's open and booked times, and this lifter's sessions with their coaches (booked, and open to book). */
   slots?: Slot[];
   sessions?: Sessions;
+  /** Client payments, once the server has Stripe Connect (null until then). */
+  pay?: OverviewPay | null;
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -127,6 +130,10 @@ export interface ClientView {
   forms?: Form[];
   /** Sessions booked with this client from now on. */
   slots?: Slot[];
+  /** What this client pays, once the server has Stripe Connect. */
+  pay?: ClientPay | null;
+  /** The coach's own role, for defaults on the report. */
+  role?: Role | null;
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -253,6 +260,7 @@ export type Flag =
   | { kind: "kcalOff"; avg: number; target: number; days: number }
   | { kind: "proteinShort"; avg: number; target: number; days: number }
   | CheckinFlag
+  | { kind: "payFailed" }
   | { kind: "onTrack"; done: number; goal: number };
 
 /** How an assigned routine is going: workouts since it was assigned that follow it. */
@@ -329,6 +337,8 @@ export function clientReport(view: ClientView, now: number): Report {
       if (rates.every((r) => r < 0.7)) flags.push({ kind: "missing", pct: Math.round((rates.reduce((a, b) => a + b, 0) / 3) * 100) });
     }
     for (const s of stalled.slice(0, 2)) flags.push({ kind: "stalled", exerciseId: s.exerciseId, weeks: s.weeks });
+    // A monthly plan whose card didn't go through (Stripe retries it for a while).
+    if (view.pay?.sub?.status === "past_due") flags.push({ kind: "payFailed" });
     // What their latest check-in says, or that it's waiting.
     for (const f of checkinFlags(view.checkins ?? [], now)) flags.push(f);
     // Eating against the coach's targets, from the food days a client shares with their body data.
@@ -408,6 +418,8 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
       };
     case "checkinWaiting":
       return { title: t("trn.f.checkinWaiting", { title: f.title, count: f.days }), advice: t("trn.f.checkinWaitingDo"), tone: "warn" };
+    case "payFailed":
+      return { title: t("trn.f.payFailed"), advice: t("trn.f.payFailedDo"), tone: "warn" };
     case "checkinLow":
       return { title: t("trn.f.checkinLow", { label: f.label, value: f.value }), advice: t("trn.f.checkinLowDo"), tone: "warn" };
     case "onTrack":

@@ -192,6 +192,8 @@ export const en = {
   "trn.role.pick": "Pick one, so clients see the right word for you and the tools you use most come first.",
   "trn.err.taken": "That time was just booked or removed. Pick another.",
   "trn.err.slotsFull": "You have as many upcoming times as you can open. Remove some first.",
+  "trn.f.payFailed": "Monthly payment didn't go through",
+  "trn.f.payFailedDo": "Stripe will try the card again. A quick message often sorts it out.",
 };
 
 type Key = keyof typeof en;
@@ -387,6 +389,8 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.role.pick": "Elige uno, para que tus clientes vean la palabra correcta y lo que más usas vaya primero.",
   "trn.err.taken": "Esa hora se acaba de reservar o eliminar. Elige otra.",
   "trn.err.slotsFull": "Ya tienes el máximo de horas próximas. Quita algunas primero.",
+  "trn.f.payFailed": "El pago mensual no se completó",
+  "trn.f.payFailedDo": "Stripe volverá a intentarlo con la tarjeta. Un mensaje corto suele resolverlo.",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -585,6 +589,8 @@ export const fr: Partial<Record<Key, Message>> = {
   "trn.role.pick": "Choisissez-en un, pour que vos clients voient le bon mot et que vos outils favoris passent en premier.",
   "trn.err.taken": "Ce créneau vient d'être réservé ou supprimé. Choisissez-en un autre.",
   "trn.err.slotsFull": "Vous avez atteint le nombre maximal de créneaux à venir. Supprimez-en d'abord.",
+  "trn.f.payFailed": "Le paiement mensuel n'est pas passé",
+  "trn.f.payFailedDo": "Stripe va réessayer la carte. Un petit message règle souvent la question.",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -782,6 +788,8 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.role.pick": "Wähl eins, damit deine Kunden das richtige Wort sehen und deine wichtigsten Werkzeuge vorn stehen.",
   "trn.err.taken": "Diese Zeit wurde gerade gebucht oder entfernt. Wähl eine andere.",
   "trn.err.slotsFull": "Du hast schon die meisten kommenden Zeiten, die möglich sind. Entfern zuerst welche.",
+  "trn.f.payFailed": "Die Monatszahlung ist nicht durchgegangen",
+  "trn.f.payFailedDo": "Stripe versucht es erneut mit der Karte. Eine kurze Nachricht klärt es oft.",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -974,6 +982,8 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.role.pick": "Scegline uno, così i clienti vedono la parola giusta e gli strumenti che usi di più vengono prima.",
   "trn.err.taken": "Quell'orario è appena stato prenotato o rimosso. Scegline un altro.",
   "trn.err.slotsFull": "Hai già il numero massimo di orari futuri. Rimuovine qualcuno prima.",
+  "trn.f.payFailed": "Il pagamento mensile non è andato a buon fine",
+  "trn.f.payFailedDo": "Stripe riproverà con la carta. Un breve messaggio spesso risolve.",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1150,4 +1160,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.role.pick": "選ぶと、クライアントに正しい呼び方で表示され、よく使う機能が先に並びます。",
   "trn.err.taken": "その時間はたった今予約されたか削除されました。別の時間を選んでください。",
   "trn.err.slotsFull": "公開できる今後の時間の上限に達しています。先にいくつか削除してください。",
+  "trn.f.payFailed": "月額の支払いができませんでした",
+  "trn.f.payFailedDo": "Stripeがカードで再試行します。短いメッセージを送ると解決することが多いです。",
 };

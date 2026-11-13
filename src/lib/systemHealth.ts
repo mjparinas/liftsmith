@@ -369,6 +369,20 @@ export const SETTINGS: Setting[] = [
     what: "With any of the four missing, the web app sells nothing and stays unlocked.",
   },
   {
+    names: ["STRIPE_CONNECT_WEBHOOK_SECRET"],
+    label: "Stripe Connect (coaches' client payments)",
+    group: "Payments",
+    need: "optional",
+    what: "The signing secret of the Connect webhook (/api/coach/stripe/). With it and STRIPE_SECRET_KEY set, coaches can take client payments; without it payments don't show.",
+  },
+  {
+    names: ["STRIPE_CONNECT_FEE_PERCENT"],
+    label: "Liftsmith's share of client payments",
+    group: "Payments",
+    need: "optional",
+    what: "A percentage (up to 20) taken from each client payment. Unset or 0: coaches keep everything but Stripe's own fees.",
+  },
+  {
     names: ["REVENUECAT_WEBHOOK_SECRET"],
     label: "RevenueCat webhook",
     group: "Payments",

@@ -66,6 +66,7 @@ import { fmtWeight } from "@/lib/units";
 import { ClientBody } from "./CoachBody";
 import { ChatScreen } from "./CoachChat";
 import { CheckinScreen, CheckinToday, ClientCheckins, FormsScreen, PendingCheckins } from "./CoachCheckins";
+import { ClientPayments, PaySetup, YourPayments } from "./CoachPay";
 import { ClientSessions, CoachSessions, SessionToday, YourSessions } from "./CoachSessions";
 import { ClientTargets, TargetsCard } from "./CoachTargets";
 import { Icon } from "./icons";
@@ -98,12 +99,14 @@ export function Trainer({ arg }: { arg?: string }) {
   if (arg?.startsWith(TEAM)) return <Home code="" team={teamCodeFrom(arg.slice(TEAM.length))} />;
   if (arg?.startsWith(CHECKIN)) return <CheckinScreen id={arg.slice(CHECKIN.length)} />;
   if (arg === "forms") return <FormsScreen />;
+  // Back from paying a coach on Stripe's page.
+  if (arg === "paid") return <Home code="" paid />;
   return <Home code={arg ? codeFrom(arg) : ""} />;
 }
 
-function Home({ code, team = "" }: { code: string; team?: string }) {
+function Home({ code, team = "", paid = false }: { code: string; team?: string; paid?: boolean }) {
   const [data, setData] = useState<Overview | null>(null);
-  const [note, setNote] = useState<string | null>(null);
+  const [note, setNote] = useState<string | null>(paid ? t("pay.thanks") : null);
   const reload = useCallback(() => {
     loadOverview()
       .then((o) => {
@@ -130,6 +133,7 @@ function Home({ code, team = "" }: { code: string; team?: string }) {
       )}
       <Section title={trainersOnly(data?.coaches ?? []) ? t("trn.yourTrainer") : t("trn.yourCoach")} icon="flag">
         {data?.sessions && <YourSessions sessions={data.sessions} coaches={data.coaches} onChange={reload} />}
+        {data?.pay && <YourPayments pay={data.pay} coaches={data.coaches} onChange={reload} />}
         <PendingCheckins
           checkins={(data?.checkins ?? []).map((c) => ({ ...c, coach: data?.coaches.find((p) => p.id === c.coachId)?.name ?? "" }))}
         />
@@ -603,6 +607,7 @@ function YourClients({ data, onChange }: { data: Overview | null; onChange: () =
         <p className="mt-3 px-1 text-sm text-muted">{t("trn.noClients")}</p>
       )}
       {data.role === "coach" && sessions}
+      {data.pay && <PaySetup account={data.pay.account} onChange={onChange} />}
     </div>
   );
 }
@@ -887,7 +892,7 @@ function ClientScreen({ id }: { id: string }) {
   const [saved, setSaved] = useState<Note | null>(null);
   const [body, setBody] = useState<BodyShare | null>(null);
   const [targets, setTargets] = useState<Targets | null>(null);
-  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots">>({});
+  const [checkins, setCheckins] = useState<Pick<ClientView, "checkins" | "repeat" | "forms" | "slots" | "pay" | "role">>({});
   const [error, setError] = useState<string | null>(null);
   // Bumped after assigning or taking back a routine, to load the client again.
   const [version, setVersion] = useState(0);
@@ -901,7 +906,7 @@ function ClientScreen({ id }: { id: string }) {
         setSaved(v.note ?? null);
         setBody(v.body ?? null);
         setTargets(v.targets ?? null);
-        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots });
+        setCheckins({ checkins: v.checkins, repeat: v.repeat, forms: v.forms, slots: v.slots, pay: v.pay, role: v.role });
       })
       .catch((e: unknown) => live && setError(trainerError(e)));
     return () => {
@@ -964,6 +969,15 @@ function ClientScreen({ id }: { id: string }) {
         </ul>
       </Section>
       <ClientSessions client={{ id, name: report.name, since: 0 }} slots={checkins.slots ?? []} onChange={() => setVersion((n) => n + 1)} />
+      {checkins.pay && (
+        <ClientPayments
+          key={checkins.pay.price?.at ?? 0}
+          clientId={id}
+          pay={checkins.pay}
+          role={checkins.role ?? null}
+          onChange={() => setVersion((n) => n + 1)}
+        />
+      )}
       <NoteToClient clientId={id} saved={saved} onChange={() => setVersion((n) => n + 1)} />
       <Section title={t("trn.weeks")} icon="calendar">
         <div className="grid grid-cols-4 gap-2">

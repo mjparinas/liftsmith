@@ -17,6 +17,7 @@
 // one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
 // client's view adds `checkins`, `repeat` and the coach's `forms`.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
+import { accountInfo } from "@/server/accounts";
 import {
   assignPlan,
   cancelInvite,
@@ -28,6 +29,7 @@ import {
   overview,
   previewInvite,
   removePlan,
+  roleOf,
   saveSetup,
   sendMessage,
   setAlerts,
@@ -49,6 +51,20 @@ import {
   sendForm,
   setRepeat,
 } from "@/server/coachForms";
+import {
+  checkoutFor,
+  clientPrices,
+  dashboardUrl,
+  endPair,
+  onboardUrl,
+  payAccount,
+  payConfig,
+  paymentsOf,
+  refreshAccount,
+  setPrice,
+  stopMonthly,
+} from "@/server/coachPay";
+import { rateLimit } from "@/server/db";
 import { saveToken } from "@/server/push";
 
 export const OPTIONS = preflight;
@@ -76,13 +92,16 @@ export async function GET(req: Request) {
       coachSlots(s.accountId),
       clientSlots(s.accountId),
     ]);
-    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions });
+    // Payments show only once Stripe Connect is set up on the server (coachPay.ts).
+    const pay = payConfig() ? { account: await payAccount(s.accountId), prices: await clientPrices(s.accountId) } : null;
+    return reply(req, 200, { ...o, forms: mine, checkins: pending, slots, sessions, pay });
   }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);
   if (!view) return reply(req, 404, { error: "gone" });
   const [mine, sent, slots] = await Promise.all([forms(s.accountId), checkinsOf(s.accountId, client), slotsWith(s.accountId, client)]);
-  return reply(req, 200, { ...view, ...sent, forms: mine, slots });
+  const pay = payConfig() ? { account: await payAccount(s.accountId), ...(await paymentsOf(s.accountId, client)) } : null;
+  return reply(req, 200, { ...view, ...sent, forms: mine, slots, pay, role: await roleOf(s.accountId) });
 }
 
 export async function POST(req: Request) {
@@ -109,6 +128,8 @@ export async function POST(req: Request) {
         role?: unknown;
         slot?: Record<string, unknown>;
         label?: unknown;
+        amount?: unknown;
+        kind?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -189,6 +210,33 @@ export async function POST(req: Request) {
       const r = await cancelSlot(s.accountId, body.id, body.label);
       return "error" in r ? reply(req, 409, { error: "taken" }) : reply(req, 200, r);
     }
+    case "payOnboard":
+    case "payRefresh":
+    case "payDashboard":
+    case "payCheckout":
+    case "payStop": {
+      const cfg = payConfig();
+      if (!cfg) return reply(req, 503, { error: "Payments aren't set up yet." });
+      if (!(await rateLimit(`coachpay:${s.accountId}`, 60, 3_600_000).catch(() => true))) return reply(req, 429, { error: "slow" });
+      try {
+        if (body.action === "payOnboard") {
+          const a = await accountInfo(s.accountId);
+          return reply(req, 200, { url: await onboardUrl(cfg, s.accountId, a?.email ?? null) });
+        }
+        if (body.action === "payRefresh") return reply(req, 200, { account: await refreshAccount(cfg, s.accountId) });
+        if (body.action === "payDashboard") return reply(req, 200, { url: await dashboardUrl(cfg, s.accountId) });
+        if (body.action === "payStop") return reply(req, 200, { ok: await stopMonthly(cfg, s.accountId, body.id) });
+        const r = await checkoutFor(cfg, s.accountId, body.id);
+        return typeof r === "string" ? reply(req, 200, { url: r }) : reply(req, 409, r);
+      } catch {
+        return reply(req, 502, { error: "stripe" });
+      }
+    }
+    case "price": {
+      const r = await setPrice(s.accountId, body.client, body.amount, body.kind);
+      if (r && "error" in r) return reply(req, r.error === "notClient" ? 404 : 400, r);
+      return reply(req, 200, { price: r });
+    }
     case "role":
       return reply(req, 200, { role: await setRole(s.accountId, body.role) });
     case "alerts":
@@ -204,6 +252,9 @@ export async function POST(req: Request) {
       return reply(req, 200, { ok: true });
     case "unlink":
       if (!isAccountId(body.id)) return reply(req, 400, { error: "Bad request." });
+      // A monthly plan between them ends first, so nobody keeps paying (coachPay.ts).
+      await endPair(s.accountId, body.id).catch(() => null);
+      await endPair(body.id, s.accountId).catch(() => null);
       await unlink(s.accountId, body.id);
       return reply(req, 200, { ok: true });
     default:

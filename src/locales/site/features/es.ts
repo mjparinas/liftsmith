@@ -297,6 +297,10 @@ export const es: FeaturesText = {
       name: "Reserva y agenda de sesiones",
       body: "Abre las horas que tienes libres, una vez o cada semana, y tus clientes las reservan en la app, o resérvalos tú. Ambos reciben una notificación, una sesión del día siguiente aparece en Hoy y pasa a su calendario con un toque.",
     },
+    "coach-payments": {
+      name: "Cobros a clientes con Stripe",
+      body: "Conecta tu propia cuenta de Stripe y fija el precio de cada cliente, por sesión o mensual. Pagan en la página segura de Stripe, el dinero te llega directamente y un pago mensual fallido aparece arriba en su informe.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

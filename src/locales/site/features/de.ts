@@ -301,6 +301,10 @@ export const de: FeaturesText = {
       name: "Termine buchen und planen",
       body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
     },
+    "coach-payments": {
+      name: "Kundenzahlungen über Stripe",
+      body: "Verbinde dein eigenes Stripe-Konto und leg für jeden Kunden einen Preis fest, pro Einheit oder monatlich. Kunden zahlen auf der sicheren Seite von Stripe, das Geld geht direkt an dich, und eine fehlgeschlagene Monatszahlung steht oben in ihrem Bericht.",
+    },
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",
