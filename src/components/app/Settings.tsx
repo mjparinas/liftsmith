@@ -21,7 +21,6 @@ import { installInfo, type InstallInfo } from "@/lib/installInfo";
 import { feel, isNative } from "@/lib/juice";
 import { labOn, LABS, setLab, type LabFlag } from "@/lib/labs";
 import { useDesktop } from "@/lib/layout";
-import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
@@ -580,7 +579,6 @@ function DataGroup() {
               className="w-full"
               onClick={() =>
                 void deleteEmail().finally(() => {
-                  void erasePhotos();
                   void reset();
                 })
               }

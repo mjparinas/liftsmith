@@ -18,19 +18,21 @@ import {
   sendEmailCode,
   signInApple,
   signInGoogle,
-  signOut,
   useAccount,
   verifyEmailCode,
   type Method,
 } from "@/lib/auth";
+import { backupJson, saveFile, stamp } from "@/lib/exportData";
 import { currentLang, currentTag, relative, subscribeLang, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
-import { stopPush } from "@/lib/push";
+import { listPhotos } from "@/lib/photos";
+import { signOutDevice } from "@/lib/signOutDevice";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
 import { syncNow } from "@/lib/sync";
 import { readSync } from "@/lib/syncOutbox";
 import { useNow } from "@/lib/useNow";
+import { readEnded, restartApp } from "@/lib/wipe";
 
 import { go, historyDepth } from "./router";
 import { ShareLinks } from "./ShareLinks";
@@ -307,6 +309,21 @@ function SignedIn() {
   const [, tick] = useState(0);
   const [confirm, setConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Signing out wipes this device (signOutDevice.ts): it saves what's waiting first, and asks when photos would go
+  // (they never leave the device) or when something couldn't be saved.
+  const [leaving, setLeaving] = useState<"idle" | "saving" | { waiting: number; photos: number }>("idle");
+  const leave = async (force: boolean, photosOk: boolean) => {
+    if (!photosOk) {
+      const photos = (await listPhotos().catch(() => [])).length;
+      if (photos) return setLeaving({ waiting: 0, photos });
+    }
+    setLeaving("saving");
+    const r = await signOutDevice({ force });
+    if (!r.ok) {
+      oops();
+      setLeaving({ waiting: r.waiting, photos: 0 });
+    }
+  };
   const s = readSync();
   const waiting = s.out.length + s.del.length;
   const via = t(`account.via.${account.via}`);
@@ -330,11 +347,40 @@ function SignedIn() {
         <Button kind="ghost" disabled={busy} onClick={() => void syncNow().then(() => tick((n) => n + 1))}>
           {t("account.syncNow")}
         </Button>
-        <Button kind="ghost" onClick={() => void stopPush().then(signOut)}>
-          {t("account.signOut")}
+        <Button kind="ghost" disabled={leaving !== "idle"} onClick={() => void leave(false, false)}>
+          {leaving === "saving" ? t("account.signingOut") : t("account.signOut")}
         </Button>
       </div>
       <p className="text-xs text-faint">{t("account.signOutNote")}</p>
+      {typeof leaving === "object" && (
+        <div className="space-y-2" role="alert">
+          <p className="text-sm text-warn">
+            {leaving.photos
+              ? t("account.signOut.photos", { count: leaving.photos })
+              : t("account.signOut.unsynced", { count: leaving.waiting })}
+          </p>
+          {leaving.photos ? (
+            <Button kind="danger" className="w-full" onClick={() => void leave(false, true)}>
+              {t("account.signOut.photosConfirm")}
+            </Button>
+          ) : (
+            <>
+              <Button kind="ghost" className="w-full" onClick={() => void leave(false, true)}>
+                {t("account.signOut.retry")}
+              </Button>
+              <Button kind="ghost" className="w-full" onClick={() => void backup()}>
+                {t("account.signOut.backup")}
+              </Button>
+              <Button kind="danger" className="w-full" onClick={() => void leave(true, true)}>
+                {t("account.signOut.anyway")}
+              </Button>
+            </>
+          )}
+          <Button kind="quiet" className="w-full" onClick={() => setLeaving("idle")}>
+            {t("settings.cancel")}
+          </Button>
+        </div>
+      )}
       {confirm ? (
         <div className="space-y-2">
           <p className="text-sm text-muted">{t("account.delete.warn")}</p>
@@ -371,13 +417,46 @@ function SignedIn() {
   );
 }
 
+/** Downloads a backup file of everything on this device (the same file as Settings › Saving and backup). */
+function backup() {
+  const { profile, gyms, events } = useApp.getState();
+  track("feature", { name: "backup", detail: "signOut" });
+  return saveFile(`liftsmith-backup-${stamp()}.json`, "application/json", backupJson(profile, gyms, events));
+}
+
+/** The server ended the session while changes here hadn't reached the account (sync.ts): sign in again, save, or erase. */
+function Ended({ waiting }: { waiting: number }) {
+  return (
+    <div className="space-y-2" role="status">
+      <p className="text-sm text-warn">{t("account.ended", { count: waiting })}</p>
+      <Button kind="ghost" className="w-full" onClick={() => void backup()}>
+        {t("account.signOut.backup")}
+      </Button>
+      <Button
+        kind="danger"
+        className="w-full"
+        onClick={() =>
+          void useApp
+            .getState()
+            .wipeLocal()
+            .then(() => restartApp())
+        }
+      >
+        {t("account.ended.erase")}
+      </Button>
+    </div>
+  );
+}
+
 /** Sign in, or the signed-in account and its sync status. */
 export function AccountPanel() {
   const account = useAccount((s) => s.account);
   const lost = useAccount((s) => s.error === "signedOut");
+  const ended = account ? 0 : readEnded();
   return (
     <div className="space-y-3">
-      {lost && !account && (
+      {ended > 0 && <Ended waiting={ended} />}
+      {lost && !account && !ended && (
         <p role="status" className="text-sm text-warn">
           {t("account.lost")}
         </p>

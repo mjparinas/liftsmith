@@ -38,7 +38,28 @@ export const en = {
     "Your account's sync storage is full, so new changes stay on this device. Everything here is safe. Tell us through Send feedback in Settings.",
   "account.syncNow": "Sync now",
   "account.signOut": "Sign out",
-  "account.signOutNote": "Signing out keeps everything on this device. It just stops syncing.",
+  "account.signOutNote":
+    "Signing out saves your changes to your account, then erases your data from this device, so the next person sees none of it. Sign in again to get it all back.",
+  "account.signingOut": "Saving your changes…",
+  "account.ended": {
+    one: "You were signed out, and {count} change on this device never reached your account. Sign in again to save it, download a backup, or erase it from this device.",
+    other:
+      "You were signed out, and {count} changes on this device never reached your account. Sign in again to save them, download a backup, or erase them from this device.",
+  },
+  "account.ended.erase": "Erase my data from this device",
+  "account.signOut.unsynced": {
+    one: "{count} change hasn't reached your account yet, so signing out now would erase it. Try again once you're online, download a backup first, or sign out anyway.",
+    other:
+      "{count} changes haven't reached your account yet, so signing out now would erase them. Try again once you're online, download a backup first, or sign out anyway.",
+  },
+  "account.signOut.retry": "Try again",
+  "account.signOut.backup": "Download a backup",
+  "account.signOut.anyway": "Sign out anyway",
+  "account.signOut.photos": {
+    one: "You have {count} progress photo on this device. Photos never leave it, so signing out deletes it for good.",
+    other: "You have {count} progress photos on this device. Photos never leave it, so signing out deletes them for good.",
+  },
+  "account.signOut.photosConfirm": "Sign out and delete photos",
   "account.delete": "Delete my account",
   "account.delete.warn":
     "This deletes your account and the copy of your data on our server, for good. This device keeps its own copy. Your other devices are signed out and keep theirs.",
@@ -93,7 +114,29 @@ export const es: Partial<Record<Key, Message>> = {
     "El almacenamiento de sincronización de tu cuenta está lleno, así que los cambios nuevos se quedan en este dispositivo. Todo lo de aquí está a salvo. Avísanos con Enviar comentarios en Ajustes.",
   "account.syncNow": "Sincronizar ahora",
   "account.signOut": "Cerrar sesión",
-  "account.signOutNote": "Al cerrar sesión todo se queda en este dispositivo. Solo deja de sincronizarse.",
+  "account.signOutNote":
+    "Al cerrar sesión, tus cambios se guardan en tu cuenta y luego se borran tus datos de este dispositivo, así la siguiente persona no ve nada tuyo. Vuelve a iniciar sesión para recuperarlo todo.",
+  "account.signingOut": "Guardando tus cambios…",
+  "account.ended": {
+    one: "Se cerró tu sesión y {count} cambio de este dispositivo nunca llegó a tu cuenta. Vuelve a iniciar sesión para guardarlo, descarga una copia o bórralo de este dispositivo.",
+    other:
+      "Se cerró tu sesión y {count} cambios de este dispositivo nunca llegaron a tu cuenta. Vuelve a iniciar sesión para guardarlos, descarga una copia o bórralos de este dispositivo.",
+  },
+  "account.ended.erase": "Borrar mis datos de este dispositivo",
+  "account.signOut.unsynced": {
+    one: "{count} cambio aún no ha llegado a tu cuenta, así que cerrar sesión ahora lo borraría. Vuelve a intentarlo cuando tengas conexión, descarga antes una copia o cierra sesión de todos modos.",
+    other:
+      "{count} cambios aún no han llegado a tu cuenta, así que cerrar sesión ahora los borraría. Vuelve a intentarlo cuando tengas conexión, descarga antes una copia o cierra sesión de todos modos.",
+  },
+  "account.signOut.retry": "Reintentar",
+  "account.signOut.backup": "Descargar una copia",
+  "account.signOut.anyway": "Cerrar sesión de todos modos",
+  "account.signOut.photos": {
+    one: "Tienes {count} foto de progreso en este dispositivo. Las fotos nunca salen de él, así que cerrar sesión la borra para siempre.",
+    other:
+      "Tienes {count} fotos de progreso en este dispositivo. Las fotos nunca salen de él, así que cerrar sesión las borra para siempre.",
+  },
+  "account.signOut.photosConfirm": "Cerrar sesión y borrar las fotos",
   "account.delete": "Eliminar mi cuenta",
   "account.delete.warn":
     "Esto elimina tu cuenta y la copia de tus datos en nuestro servidor, para siempre. Este dispositivo conserva su propia copia. Tus otros dispositivos cierran sesión y conservan la suya.",
@@ -150,7 +193,29 @@ export const fr: Partial<Record<Key, Message>> = {
     "L'espace de synchronisation de votre compte est plein : les nouvelles modifications restent sur cet appareil. Tout ce qui est ici est en sécurité. Dites-le-nous avec Envoyer un avis dans Réglages.",
   "account.syncNow": "Synchroniser",
   "account.signOut": "Se déconnecter",
-  "account.signOutNote": "Se déconnecter garde tout sur cet appareil. La synchronisation s'arrête, c'est tout.",
+  "account.signOutNote":
+    "Se déconnecter enregistre vos modifications sur votre compte, puis efface vos données de cet appareil : la personne suivante ne voit rien de vous. Reconnectez-vous pour tout retrouver.",
+  "account.signingOut": "Enregistrement de vos modifications…",
+  "account.ended": {
+    one: "Vous avez été déconnecté, et {count} modification sur cet appareil n'est jamais arrivée sur votre compte. Reconnectez-vous pour l'enregistrer, téléchargez une sauvegarde ou effacez-la de cet appareil.",
+    other:
+      "Vous avez été déconnecté, et {count} modifications sur cet appareil ne sont jamais arrivées sur votre compte. Reconnectez-vous pour les enregistrer, téléchargez une sauvegarde ou effacez-les de cet appareil.",
+  },
+  "account.ended.erase": "Effacer mes données de cet appareil",
+  "account.signOut.unsynced": {
+    one: "{count} modification n'est pas encore arrivée sur votre compte : vous déconnecter maintenant l'effacerait. Réessayez une fois en ligne, téléchargez d'abord une sauvegarde, ou déconnectez-vous quand même.",
+    other:
+      "{count} modifications ne sont pas encore arrivées sur votre compte : vous déconnecter maintenant les effacerait. Réessayez une fois en ligne, téléchargez d'abord une sauvegarde, ou déconnectez-vous quand même.",
+  },
+  "account.signOut.retry": "Réessayer",
+  "account.signOut.backup": "Télécharger une sauvegarde",
+  "account.signOut.anyway": "Se déconnecter quand même",
+  "account.signOut.photos": {
+    one: "Vous avez {count} photo de progression sur cet appareil. Les photos ne le quittent jamais : vous déconnecter la supprime définitivement.",
+    other:
+      "Vous avez {count} photos de progression sur cet appareil. Les photos ne le quittent jamais : vous déconnecter les supprime définitivement.",
+  },
+  "account.signOut.photosConfirm": "Se déconnecter et supprimer les photos",
   "account.delete": "Supprimer mon compte",
   "account.delete.warn":
     "Cela supprime votre compte et la copie de vos données sur notre serveur, définitivement. Cet appareil garde sa propre copie. Vos autres appareils sont déconnectés et gardent la leur.",
@@ -207,7 +272,29 @@ export const de: Partial<Record<Key, Message>> = {
     "Der Sync-Speicher deines Kontos ist voll, deshalb bleiben neue Änderungen auf diesem Gerät. Alles hier ist sicher. Sag uns über Feedback senden in den Einstellungen Bescheid.",
   "account.syncNow": "Jetzt synchronisieren",
   "account.signOut": "Abmelden",
-  "account.signOutNote": "Beim Abmelden bleibt alles auf diesem Gerät. Nur die Synchronisierung stoppt.",
+  "account.signOutNote":
+    "Beim Abmelden werden deine Änderungen in deinem Konto gespeichert und danach deine Daten von diesem Gerät gelöscht, damit die nächste Person nichts davon sieht. Melde dich wieder an, um alles zurückzubekommen.",
+  "account.signingOut": "Änderungen werden gespeichert…",
+  "account.ended": {
+    one: "Du wurdest abgemeldet, und {count} Änderung auf diesem Gerät ist nie in deinem Konto angekommen. Melde dich wieder an, um sie zu speichern, lade eine Sicherung herunter oder lösche sie von diesem Gerät.",
+    other:
+      "Du wurdest abgemeldet, und {count} Änderungen auf diesem Gerät sind nie in deinem Konto angekommen. Melde dich wieder an, um sie zu speichern, lade eine Sicherung herunter oder lösche sie von diesem Gerät.",
+  },
+  "account.ended.erase": "Meine Daten von diesem Gerät löschen",
+  "account.signOut.unsynced": {
+    one: "{count} Änderung ist noch nicht in deinem Konto angekommen. Wenn du dich jetzt abmeldest, wird sie gelöscht. Versuch es wieder, sobald du online bist, lade vorher eine Sicherung herunter oder melde dich trotzdem ab.",
+    other:
+      "{count} Änderungen sind noch nicht in deinem Konto angekommen. Wenn du dich jetzt abmeldest, werden sie gelöscht. Versuch es wieder, sobald du online bist, lade vorher eine Sicherung herunter oder melde dich trotzdem ab.",
+  },
+  "account.signOut.retry": "Erneut versuchen",
+  "account.signOut.backup": "Sicherung herunterladen",
+  "account.signOut.anyway": "Trotzdem abmelden",
+  "account.signOut.photos": {
+    one: "Du hast {count} Fortschrittsfoto auf diesem Gerät. Fotos verlassen es nie, deshalb wird es beim Abmelden endgültig gelöscht.",
+    other:
+      "Du hast {count} Fortschrittsfotos auf diesem Gerät. Fotos verlassen es nie, deshalb werden sie beim Abmelden endgültig gelöscht.",
+  },
+  "account.signOut.photosConfirm": "Abmelden und Fotos löschen",
   "account.delete": "Mein Konto löschen",
   "account.delete.warn":
     "Damit werden dein Konto und die Kopie deiner Daten auf unserem Server endgültig gelöscht. Dieses Gerät behält seine eigene Kopie. Deine anderen Geräte werden abgemeldet und behalten ihre.",
@@ -261,7 +348,29 @@ export const it: Partial<Record<Key, Message>> = {
     "Lo spazio di sincronizzazione del tuo account è pieno, quindi le nuove modifiche restano su questo dispositivo. Qui è tutto al sicuro. Diccelo con Invia un feedback nelle Impostazioni.",
   "account.syncNow": "Sincronizza ora",
   "account.signOut": "Esci",
-  "account.signOutNote": "Uscendo tutto resta su questo dispositivo. Si interrompe solo la sincronizzazione.",
+  "account.signOutNote":
+    "Uscendo, le tue modifiche vengono salvate nel tuo account e poi i tuoi dati vengono cancellati da questo dispositivo, così la persona successiva non vede nulla di tuo. Accedi di nuovo per ritrovare tutto.",
+  "account.signingOut": "Salvataggio delle modifiche…",
+  "account.ended": {
+    one: "Sei stato disconnesso e {count} modifica su questo dispositivo non è mai arrivata al tuo account. Accedi di nuovo per salvarla, scarica un backup o cancellala da questo dispositivo.",
+    other:
+      "Sei stato disconnesso e {count} modifiche su questo dispositivo non sono mai arrivate al tuo account. Accedi di nuovo per salvarle, scarica un backup o cancellale da questo dispositivo.",
+  },
+  "account.ended.erase": "Cancella i miei dati da questo dispositivo",
+  "account.signOut.unsynced": {
+    one: "{count} modifica non è ancora arrivata al tuo account, quindi uscire ora la cancellerebbe. Riprova quando sei online, scarica prima un backup o esci comunque.",
+    other:
+      "{count} modifiche non sono ancora arrivate al tuo account, quindi uscire ora le cancellerebbe. Riprova quando sei online, scarica prima un backup o esci comunque.",
+  },
+  "account.signOut.retry": "Riprova",
+  "account.signOut.backup": "Scarica un backup",
+  "account.signOut.anyway": "Esci comunque",
+  "account.signOut.photos": {
+    one: "Hai {count} foto dei progressi su questo dispositivo. Le foto non lo lasciano mai, quindi uscendo viene eliminata per sempre.",
+    other:
+      "Hai {count} foto dei progressi su questo dispositivo. Le foto non lo lasciano mai, quindi uscendo vengono eliminate per sempre.",
+  },
+  "account.signOut.photosConfirm": "Esci ed elimina le foto",
   "account.delete": "Elimina il mio account",
   "account.delete.warn":
     "Elimina definitivamente il tuo account e la copia dei tuoi dati sul nostro server. Questo dispositivo conserva la sua copia. Gli altri dispositivi vengono disconnessi e conservano la loro.",
@@ -315,7 +424,25 @@ export const ja: Partial<Record<Key, Message>> = {
     "アカウントの同期ストレージがいっぱいのため、新しい変更はこの端末に残ります。ここにあるデータは安全です。設定の「フィードバックを送る」からお知らせください。",
   "account.syncNow": "今すぐ同期",
   "account.signOut": "サインアウト",
-  "account.signOutNote": "サインアウトしてもデータはこの端末に残ります。同期が止まるだけです。",
+  "account.signOutNote":
+    "サインアウトすると、変更をアカウントに保存してから、この端末のデータを消去します。次に使う人にはあなたのデータは表示されません。もう一度サインインすればすべて戻ります。",
+  "account.signingOut": "変更を保存しています…",
+  "account.ended": {
+    other:
+      "サインアウトされましたが、この端末の{count}件の変更はアカウントに届いていません。もう一度サインインして保存するか、バックアップをダウンロードするか、この端末から消去してください。",
+  },
+  "account.ended.erase": "この端末からデータを消去",
+  "account.signOut.unsynced": {
+    other:
+      "{count}件の変更がまだアカウントに届いていないため、今サインアウトすると消えてしまいます。オンラインになってから再試行するか、先にバックアップをダウンロードするか、このままサインアウトしてください。",
+  },
+  "account.signOut.retry": "再試行",
+  "account.signOut.backup": "バックアップをダウンロード",
+  "account.signOut.anyway": "このままサインアウト",
+  "account.signOut.photos": {
+    other: "この端末に進捗写真が{count}枚あります。写真は端末の外に出ないため、サインアウトすると完全に削除されます。",
+  },
+  "account.signOut.photosConfirm": "サインアウトして写真を削除",
   "account.delete": "アカウントを削除",
   "account.delete.warn":
     "アカウントとサーバー上のデータのコピーが完全に削除されます。この端末のデータは残ります。他の端末はサインアウトされ、それぞれのデータは残ります。",

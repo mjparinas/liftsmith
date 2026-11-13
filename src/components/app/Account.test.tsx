@@ -10,6 +10,9 @@ import { readSync } from "@/lib/syncOutbox";
 
 import { AccountPanel } from "./Account";
 
+// Signing out starts the app again; jsdom can't reload.
+vi.mock("@/lib/wipe", async (orig) => ({ ...(await orig<typeof import("@/lib/wipe")>()), restartApp: vi.fn() }));
+
 describe("signing in with an emailed code", () => {
   const calls: { url: string; body: unknown; auth?: string }[] = [];
   beforeEach(() => {
@@ -33,7 +36,7 @@ describe("signing in with an emailed code", () => {
     vi.unstubAllGlobals();
   });
 
-  it("emails a code, signs in with it, and signs out keeping the device's data", async () => {
+  it("emails a code, signs in with it, and signs out", async () => {
     const u = userEvent.setup();
     render(<AccountPanel />);
     // No Google or Apple ids in this build: email is the way in.
