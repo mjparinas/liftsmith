@@ -39,6 +39,7 @@
     "src/lib/recovery.ts",
     "src/lib/reorder.ts",
     "src/lib/sessions.ts",
+    "src/lib/partMetrics.ts",
     "src/lib/replan.ts",
     "src/lib/reps/barPath.ts",
     "src/lib/reps/barSpeed.ts",

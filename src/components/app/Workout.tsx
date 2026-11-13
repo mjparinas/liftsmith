@@ -21,6 +21,7 @@ import { haptic, isNative, keepAwake, oops, sound } from "@/lib/juice";
 import { labOn } from "@/lib/labs";
 import { barFor, stepLoad } from "@/lib/loads";
 import { machineSupported } from "@/lib/machine";
+import { meanFullSpeed } from "@/lib/partMetrics";
 import { loadBar } from "@/lib/plates";
 import { epley, TIMED } from "@/lib/progression";
 import { fastestMetres, lastFullMetres } from "@/lib/reps/speedMax";
@@ -716,7 +717,7 @@ export function Workout() {
                             // A working set: its last full rep's speed, and whether a rep failed after it, are
                             // saved with the set, so sets taken to failure teach the lifter's own threshold.
                             const last = lastFullMetres(sum);
-                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter);
+                            if (last !== undefined) s.noteSetSpeed(ex.id, last.speed, last.failedAfter, meanFullSpeed(sum.reps));
                             return;
                           }
                           const v = fastestMetres(sum);

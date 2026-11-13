@@ -64,7 +64,7 @@ export interface Active {
    * Today's max lab: what the camera saw on the set being done (its last full rep's speed in m/s, and a
    * failed attempt after it), written onto the set at Log set. Cleared by every Log set.
    */
-  setSpeed?: { exerciseId: string; speed: number; failed: boolean };
+  setSpeed?: { exerciseId: string; speed: number; failed: boolean; mean?: number };
   /**
    * The set on screen is a bonus drop or rest-pause set (extraSet), and the weight and reps to go back to
    * afterwards when the exercise has planned sets left.
@@ -209,7 +209,11 @@ export function afterLog(a: Active, events: AppEvent[], autoRest: boolean, now: 
     superset: item.group,
     tag: a.tag,
     ...(a.setSpeed?.exerciseId === item.exerciseId
-      ? { endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000, failedRep: a.setSpeed.failed ? (true as const) : undefined }
+      ? {
+          endSpeed: Math.round(a.setSpeed.speed * 1000) / 1000,
+          ...(a.setSpeed.mean !== undefined ? { meanSpeed: a.setSpeed.mean } : {}),
+          failedRep: a.setSpeed.failed ? (true as const) : undefined,
+        }
       : {}),
   };
   const all = [...events, setEv];
@@ -283,7 +287,7 @@ export interface WorkoutSlice {
   /** Logs the set on screen; `at` is when it was tapped (a lock-screen tap replayed when the app opens), else now. */
   logSet(at?: number): void;
   /** What the camera saw on the set being done (today's max lab), saved with it at Log set. */
-  noteSetSpeed(exerciseId: string, speed: number, failed: boolean): void;
+  noteSetSpeed(exerciseId: string, speed: number, failed: boolean, mean?: number): void;
   /**
    * Between sets: a bonus drop set (about 75% of the set just logged, no rest) or rest-pause set (same
    * weight after a 15 s pause) of the exercise just done. Undefined cancels one that's on screen.
@@ -509,10 +513,10 @@ export function workoutSlice(c: Ctx): WorkoutSlice {
       });
     },
 
-    noteSetSpeed(exerciseId, speed, failed) {
+    noteSetSpeed(exerciseId, speed, failed, mean) {
       const a = get().active;
       if (!a || !(speed > 0) || warmingUp(a)) return;
-      const next = { ...a, setSpeed: { exerciseId, speed, failed } };
+      const next = { ...a, setSpeed: { exerciseId, speed, failed, ...(mean !== undefined ? { mean } : {}) } };
       set({ active: next });
       persistActive(next);
     },

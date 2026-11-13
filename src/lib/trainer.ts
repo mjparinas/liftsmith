@@ -21,6 +21,7 @@ import { t } from "./i18n";
 import { injuries, PART_LABEL } from "./injury";
 import { stalls, type Stall } from "./insights";
 import { KCAL_DAYS, LOGGED_KCAL, PROTEIN_SHORT } from "./nutrition";
+import { sessionPain } from "./partMetrics";
 import { gradedSet } from "./progression";
 import { decodeRoutine } from "./routineShare";
 import { APP_PATH, SITE_URL } from "./site";
@@ -434,6 +435,8 @@ export interface RehabInjury {
   change?: number;
   /** The latest rating on each exercise it was rated on, newest first. */
   byExercise: { exerciseId: string; score: number; at: number }[];
+  /** Pain before and after the latest workout it was rated in, when there's a before (partMetrics.ts sessionPain). */
+  lastWorkout?: { before: number; after: number; at: number };
 }
 
 /**
@@ -465,6 +468,13 @@ export function planProgress(plan: Plan, sessions: readonly SessionSummary[], no
 /** The client's injuries for their coach, active first then healed in the last 90 days, newest first. */
 export function rehabInjuries(events: readonly AppEvent[], now: number): RehabInjury[] {
   const pains = events.filter((e) => e.type === "pain");
+  const starts = new Map(events.flatMap((e) => (e.type === "sessionStart" ? [[e.sessionId, e.at] as const] : [])));
+  const lastRated = (id: string) => {
+    const p = [...pains].sort((a, b) => b.at - a.at).find((x) => x.injuryId === id && x.sessionId && starts.has(x.sessionId));
+    if (!p?.sessionId) return undefined;
+    const r = sessionPain(events, p.sessionId, starts.get(p.sessionId)!).find((x) => x.injuryId === id);
+    return r?.before !== undefined ? { before: r.before, after: r.after, at: r.at } : undefined;
+  };
   return injuries(events, now)
     .filter((i) => i.healedAt === undefined || now - i.healedAt <= 90 * DAY)
     .sort((a, b) => Number(a.healedAt !== undefined) - Number(b.healedAt !== undefined) || b.since - a.since)
@@ -478,6 +488,7 @@ export function rehabInjuries(events: readonly AppEvent[], now: number): RehabIn
         byExercise.push({ exerciseId: p.exerciseId, score: Math.round(p.score), at: p.at });
       }
       const last = i.pain.at(-1);
+      const lastWorkout = lastRated(i.id);
       return {
         id: i.id,
         part: i.part,
@@ -487,6 +498,7 @@ export function rehabInjuries(events: readonly AppEvent[], now: number): RehabIn
         ...(last ? { latest: last.score, latestAt: last.at } : {}),
         ...(points.length > 1 ? { change: points[points.length - 1]! - points[0]! } : {}),
         byExercise: byExercise.slice(0, 8),
+        ...(lastWorkout ? { lastWorkout } : {}),
       };
     });
 }

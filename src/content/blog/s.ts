@@ -101,4 +101,49 @@ export const BLOG_S: Article[] = [
       ],
     ],
   },
+  {
+    slug: "rehab-pain-and-cool-down-heart-rate",
+    kind: "blog",
+    title: "Is your rehab working? Your workout now tells you",
+    description:
+      "Pain before and after rehab, and your heart rate in each part of a workout, now turn into coach's notes that say what to do next.",
+    date: "2026-11-13",
+    tag: "Recovery",
+    cta: "injury",
+    body: [
+      {
+        p: "Workouts now run in parts: a warm-up, the lifting or your rehab, and a cool-down. Each part already records something useful. Your heart rate keeps streaming through all of them, and when you're working around an injury you rate your pain between sets and at the end. Now the app reads those numbers part by part, and only speaks up when there's something to do about them.",
+      },
+      { cta: "injury" },
+      { h2: "Pain before and after, on every workout" },
+      {
+        p: "If you rated an injury on the day before you trained, or more than once during the workout, History now shows the change under that workout, like Knee pain: 4 → 2. It's the quickest way to see whether a session helped or flared things up.",
+      },
+      {
+        p: "Over a few weeks, the trend matters more than any one day. When the pain you finish with has dropped two points or more across three or more workouts, a coach's note tells you so, with the numbers, and suggests asking your physio whether you're ready for the next stage. If it's climbing instead, the note says so and suggests telling your physio and keeping the rehab easy until you've talked. Liftsmith never decides what's right for an injury. It shows you, and your physio, what you logged.",
+      },
+      { h2: "Your physio sees it too" },
+      {
+        p: "If you share pain and injuries with your coach or physio, their report on you now shows your latest rated workout's pain before and after, next to the trend and the ratings on each exercise.",
+      },
+      { h2: "A cool-down that actually cools you down" },
+      {
+        p: "With a heart rate monitor connected, the app cuts the stream at each part's start and end. If your heart rate in the last minute of the cool-down is still 100 bpm or more, and no lower than while you were lifting, in two of your last three cool-downs, you'll get a note suggesting a few more minutes and slow breathing until it settles.",
+      },
+      {
+        p: "When the camera measures bar speed, each set now also saves the average speed of its full reps, next to the last rep's speed. Nothing new shows on screen yet; it's there so future advice on how hard a set was has better numbers to work from.",
+      },
+    ],
+    faq: [
+      [
+        "Do I need to rate pain before every workout?",
+        "No. If you rate it more than once during the workout, the first rating counts as before. A rating on the Injuries screen in the 12 hours before Start counts too.",
+      ],
+      ["Do I need a heart rate monitor?", "Only for the cool-down note. Pain before and after works without one."],
+      [
+        "Will the app tell me to move on to harder rehab?",
+        "No. It tells you the numbers and suggests asking your physio. They decide what's next.",
+      ],
+    ],
+  },
 ];

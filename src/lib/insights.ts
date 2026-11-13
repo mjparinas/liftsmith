@@ -4,8 +4,10 @@ import { EXERCISE_BY_ID } from "./exercises";
 import type { Streak } from "./game";
 import { weeklySets } from "./generator";
 import { date, inSentence, list, t } from "./i18n";
+import { injuries, PART_LABEL } from "./injury";
 import { fromCm, lengthUnit, measuresOf } from "./measure";
 import { foodDays, proteinShort, weekIntake } from "./nutrition";
+import { coolHrHigh, rehabPainTrends } from "./partMetrics";
 import { activeFixes, findPlateaus, FIX_TEXT, fixResult, type FixKind, type Plateau } from "./plateau";
 import { epley, gradedSet, sessionsOf, TIMED } from "./progression";
 import { currentKg, currentTdee } from "./tdee";
@@ -472,6 +474,34 @@ export function insights({ events, profile, now, streak, coachTargets }: Insight
       title: t("ins.lastHard.title"),
       why: t("ins.lastHard.why", { week: week.label }),
       advice: t("ins.lastHard.advice"),
+    });
+  }
+
+  // 6b. Workouts with parts (stage 4): pain after rehab moving two points or more, and a heart rate that stays up
+  // through the cool-down (partMetrics.ts). Liftsmith never says what's right for an injury; the physio decides.
+  const parts = new Map(injuries(events, now).map((i) => [i.id, i.part]));
+  for (const p of rehabPainTrends(events, now)) {
+    const area = parts.get(p.injuryId);
+    if (!area) continue;
+    const down = p.to < p.from;
+    const nums = { area: inSentence(PART_LABEL[area]), from: p.from, to: p.to, count: p.workouts, days: p.days };
+    out.push({
+      id: `rehab-pain-${p.injuryId}-${p.last}`,
+      tone: down ? "good" : "warn",
+      title: t(down ? "ins.rehabPainDown.title" : "ins.rehabPainUp.title", nums),
+      why: t("ins.rehabPain.why", nums),
+      advice: t(down ? "ins.rehabPainDown.advice" : "ins.rehabPainUp.advice"),
+      action: { kind: "go", route: "injuries", label: t("ins.rehabPain.action") },
+    });
+  }
+  const cool = coolHrHigh(events, now);
+  if (cool) {
+    out.push({
+      id: `cool-hr-${cool.sessionId}`,
+      tone: "info",
+      title: t("ins.coolHr.title"),
+      why: t("ins.coolHr.why", { bpm: cool.end, count: cool.high, total: cool.of }),
+      advice: t("ins.coolHr.advice"),
     });
   }
 

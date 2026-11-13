@@ -74,6 +74,7 @@ export const en = {
   "trn.painNoRatings": "No pain ratings yet.",
   "trn.painWorse": { one: "Up {count} point across the latest ratings.", other: "Up {count} points across the latest ratings." },
   "trn.painBetter": { one: "Down {count} point across the latest ratings.", other: "Down {count} points across the latest ratings." },
+  "trn.painWorkout": "Last workout ({date}): {before} before, {after} after",
   "trn.painDisclaimer":
     "This is what your client logged in the app. Liftsmith doesn't diagnose or treat anything; your own assessment decides what's right for them.",
   "trn.perWeek": "Times a week",
@@ -390,6 +391,7 @@ export const es: Partial<Record<Key, Message>> = {
   "trn.painNoRatings": "Aún no hay valoraciones de dolor.",
   "trn.painWorse": { one: "{count} punto más en las últimas valoraciones.", other: "{count} puntos más en las últimas valoraciones." },
   "trn.painBetter": { one: "{count} punto menos en las últimas valoraciones.", other: "{count} puntos menos en las últimas valoraciones." },
+  "trn.painWorkout": "Último entrenamiento ({date}): {before} antes, {after} después",
   "trn.painDisclaimer":
     "Esto es lo que tu cliente registró en la app. Liftsmith no diagnostica ni trata nada; tu propia valoración decide qué le conviene.",
   "trn.perWeek": "Veces por semana",
@@ -714,6 +716,7 @@ export const fr: Partial<Record<Key, Message>> = {
     one: "En baisse de {count} point sur les dernières notes.",
     other: "En baisse de {count} points sur les dernières notes.",
   },
+  "trn.painWorkout": "Dernière séance ({date}) : {before} avant, {after} après",
   "trn.painDisclaimer":
     "Voici ce que votre client a noté dans l'app. Liftsmith ne pose aucun diagnostic et ne traite rien ; c'est votre propre évaluation qui décide de ce qui lui convient.",
   "trn.perWeek": "Fois par semaine",
@@ -1041,6 +1044,7 @@ export const de: Partial<Record<Key, Message>> = {
   "trn.painNoRatings": "Noch keine Schmerzwerte.",
   "trn.painWorse": { one: "Über die letzten Werte {count} Punkt höher.", other: "Über die letzten Werte {count} Punkte höher." },
   "trn.painBetter": { one: "Über die letzten Werte {count} Punkt niedriger.", other: "Über die letzten Werte {count} Punkte niedriger." },
+  "trn.painWorkout": "Letztes Training ({date}): {before} vorher, {after} nachher",
   "trn.painDisclaimer":
     "Das hat dein Klient in der App eingetragen. Liftsmith stellt keine Diagnosen und behandelt nichts; was passt, entscheidet deine eigene Einschätzung.",
   "trn.perWeek": "Mal pro Woche",
@@ -1365,6 +1369,7 @@ export const it: Partial<Record<Key, Message>> = {
   "trn.painNoRatings": "Ancora nessuna valutazione del dolore.",
   "trn.painWorse": { one: "Salito di {count} punto nelle ultime valutazioni.", other: "Salito di {count} punti nelle ultime valutazioni." },
   "trn.painBetter": { one: "Sceso di {count} punto nelle ultime valutazioni.", other: "Sceso di {count} punti nelle ultime valutazioni." },
+  "trn.painWorkout": "Ultimo allenamento ({date}): {before} prima, {after} dopo",
   "trn.painDisclaimer":
     "Questo è ciò che il tuo cliente ha registrato nell'app. Liftsmith non fa diagnosi né cure; è la tua valutazione a decidere cosa è giusto per lui.",
   "trn.perWeek": "Volte a settimana",
@@ -1680,6 +1685,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "trn.painNoRatings": "まだ痛みの評価はありません。",
   "trn.painWorse": { other: "最近の評価で{count}ポイント上がっています。" },
   "trn.painBetter": { other: "最近の評価で{count}ポイント下がっています。" },
+  "trn.painWorkout": "前回のトレーニング（{date}）: 前 {before}、後 {after}",
   "trn.painDisclaimer":
     "これはクライアントがアプリに記録した内容です。Liftsmithは診断や治療を行いません。何が合っているかはあなた自身の評価で判断してください。",
   "trn.perWeek": "週の回数",

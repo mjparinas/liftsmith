@@ -517,6 +517,8 @@ export interface SetEvent extends EventBase {
    * own end-of-set speed (personalMvt in reps/speedMax.ts).
    */
   endSpeed?: number;
+  /** Mean speed of the set's full reps (m/s), next to endSpeed, so a set's speed and its drop-off can be read later. */
+  meanSpeed?: number;
   /** The camera saw a rep that didn't make it up after the last full one: the set went to failure. */
   failedRep?: true;
 }
