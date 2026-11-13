@@ -118,9 +118,14 @@ function Muscles() {
                     <Swatch band={b.band} colour={b.colour} />
                     <span className="sr-only">{b.label},</span>
                   </span>
-                  <span className={`w-28 shrink-0 ${picked === m ? "font-bold text-ink" : "font-medium"}`}>{MUSCLE_LABEL[m]}</span>
+                  {/* Recovery goes with the colour mark and the name; the bar is only this week's sets. */}
+                  <span className="flex w-28 shrink-0 flex-col">
+                    <span className={picked === m ? "font-bold text-ink" : "font-medium"}>{MUSCLE_LABEL[m]}</span>
+                    <span className="num text-xs text-muted">{t("recovery.pct", { pct: rec[m] })}</span>
+                  </span>
                   <div
                     className="h-2 min-w-20 flex-1 overflow-hidden rounded-full bg-raised"
+                    aria-hidden
                     title={t("recovery.setsOf", { done: Math.round(done[m]), goal: wk.setsPerMuscle })}
                   >
                     <div
@@ -129,7 +134,7 @@ function Muscles() {
                     />
                   </div>
                   <span className="num ml-auto min-w-20 shrink-0 whitespace-nowrap text-right text-sm text-muted">
-                    {rec[m]}% · {Math.round(done[m])}/{wk.setsPerMuscle}
+                    {t("recovery.setsShort", { done: Math.round(done[m]), goal: wk.setsPerMuscle })}
                   </span>
                 </button>
               </li>

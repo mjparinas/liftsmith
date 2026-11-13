@@ -111,7 +111,7 @@ export function ShareWorkout({ sessionId }: { sessionId: string }) {
     }
   };
   return (
-    <div className="mt-4">
+    <div>
       <Button kind="ghost" className="w-full" onClick={share}>
         {t("done.remixShare")}
       </Button>

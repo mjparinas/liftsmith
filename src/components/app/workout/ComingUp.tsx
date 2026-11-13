@@ -43,12 +43,13 @@ export function ComingUp() {
               >
                 <span className="flex min-w-0 flex-col">
                   {ss && <span className="truncate text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent">{ss}</span>}
-                  <span className="flex min-w-0 items-center gap-2.5 font-medium">
-                    <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden />
-                    <span className="truncate">{e.name}</span>
+                  <span className="flex min-w-0 items-start gap-2.5 font-medium leading-snug">
+                    <span className="mt-[0.45em] h-2 w-2 shrink-0 rounded-full" style={{ background: muscleHue(it.focus) }} aria-hidden />
+                    {/* Wraps to two lines rather than cutting the name at large text sizes. */}
+                    <span className="line-clamp-2 break-words">{e.name}</span>
                   </span>
                 </span>
-                <span className="num shrink-0 text-sm text-muted">
+                <span className="num max-w-[45%] shrink-0 text-right text-sm text-muted">
                   {it.scheme ?? `${it.sets} × ${repsText(e, it.target.reps)}`} · {loadText(e, it.target.weight, profile.unit)}
                 </span>
               </button>

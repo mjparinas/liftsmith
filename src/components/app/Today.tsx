@@ -29,7 +29,7 @@ import { effortLabel } from "@/lib/training";
 import { EQUIPMENT_LABEL, MUSCLE_LABEL, type Muscle } from "@/lib/types";
 import { fmtVolume } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
-import { callWhy, itemWhy, whyContext } from "@/lib/why";
+import { callWhy, itemWhy, itemWhyWithoutLoad, sharedLoadNote, whyContext } from "@/lib/why";
 import type { MessageKey } from "@/locales/en";
 
 import { useGame } from "./Achievements";
@@ -176,12 +176,18 @@ export function Today() {
   // While a workout runs, the list shows the live workout and can't be changed here: linking and
   // reordering what's left happen in one place, Coming up on the workout screen.
   const live = !!active;
-  const items = active?.plan.items ?? preview?.items ?? [];
+  const items = useMemo(() => active?.plan.items ?? preview?.items ?? [], [active?.plan.items, preview?.items]);
+  const whys = useMemo(() => (why ? items.map((it) => itemWhy(it, why)) : null), [items, why]);
+  // A note every exercise shares is said once above the list instead of on every row (UX audit, 2026-11-13).
+  const shared = whys ? sharedLoadNote(whys) : "";
   const last = stats.sessions[0];
   const doneToday = !active && !!last && new Date(last.start).toDateString() === new Date(now).toDateString() ? last : null;
   const resting = !!doneToday && doneToday.start > againAt;
   // Readiness card: shown on adaptive days before the workout starts.
   const showCall = !!(readiness && preview && call && !active && !fixed && !resting);
+  // Before the first workout and with no health data, the score is a placeholder: the card says so in one line
+  // and keeps the check-in, without the ring, signals or the call picker (UX audit, 2026-11-13).
+  const fresh = !!readiness && stats.sessions.length === 0 && readiness.signals.every((g) => g.points === 0);
 
   return (
     <div className="pb-28">
@@ -193,16 +199,15 @@ export function Today() {
             <TodayCoachBadge />
           </div>
           <div className="flex shrink-0 items-center gap-2">
-            {/* No streak yet: the goal chip below says how many more days start one, rather than a flat 0 here. */}
+            {/* No streak yet: the This week card says how many more days start one, rather than a flat 0 here. */}
             {(streak.weeks > 0 || streak.freezes > 0) && <Flame weeks={streak.weeks} freezes={streak.freezes} />}
-            <button
-              type="button"
-              onClick={() => go("achievements")}
-              className="press num inline-flex h-9 items-center rounded-full border border-violet/40 bg-violet/12 px-2.5 text-sm font-bold text-violet"
+            {/* Plain text, not a button: the Awards tab is the one way to Awards (UX audit, 2026-11-13). */}
+            <span
+              className="num inline-flex h-9 items-center rounded-full border border-violet/40 bg-violet/12 px-2.5 text-sm font-bold text-violet"
               title={t("td.lvlTitle", { title: lvl.title, into: lvl.into, span: lvl.span, next: lvl.next ?? t("td.max") })}
             >
               {t("td.lv", { n: lvl.level })}
-            </button>
+            </span>
             <button
               type="button"
               aria-label={t("td.settings")}
@@ -310,12 +315,6 @@ export function Today() {
             <Info term={preview.week.deload ? "deload" : profile.training?.effort === "rpe" ? "rpe" : "rir"} className="-ml-1.5 -mr-3.5" />
           </span>
         )}
-        {streak.needed > 0 && (
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-muted">
-            <Icon name="target" size={15} className="text-ember" />
-            {streak.weeks > 0 ? t("today.goalMore", { count: streak.needed }) : t("today.streakStart", { count: streak.needed })}
-          </span>
-        )}
         {/* "Something hurts?" sits with How do you feel? in the readiness card when that's on screen; an injury
             being trained around stays up here, where it reads as today's status. */}
         {(hurt.length > 0 || !showCall) && (
@@ -336,13 +335,15 @@ export function Today() {
 
       <TodayMoments />
 
-      {/* Desktop layout (layout.ts): the plan in the wider left column, the call, notes and quests beside it. On a
-          phone the two groups stack in this order, as before. */}
-      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-6">
+      {/* Phone order (UX audit, 2026-11-13): the call and any coach's notes, then the plan, then the quote, saving
+          and the week's quests, so the workout is near the top instead of below the extras. Desktop layout
+          (layout.ts): the plan in the wider left column spanning two rows; the call and notes beside it on top, the
+          quote and quests under them. */}
+      <div className="desk:mt-2 desk:grid desk:grid-cols-5 desk:items-start desk:gap-x-6">
         {/* Once the day's workout is done it takes the wide column, where the plan was, so the page isn't empty
             beside the notes (Melvin, 2026-11-13). First in the page, so a phone shows it first as before. */}
         {doneToday && resting && (
-          <div className="desk:order-1 desk:col-span-3">
+          <div className="desk:order-1 desk:col-span-3 desk:row-span-2">
             <DoneToday session={doneToday} onAgain={trainAgain} />
           </div>
         )}
@@ -350,20 +351,22 @@ export function Today() {
           {showCall && readiness && preview && call && (
             <section className="card-tint mt-4 p-4" style={{ "--tint": call.hue } as CSSProperties} aria-labelledby="call-title">
               <div className="flex items-center gap-4">
-                <Ring
-                  value={readiness.score / 100}
-                  size={64}
-                  stroke={6}
-                  from={call.hue}
-                  to={call.hue}
-                  track="color-mix(in srgb, var(--color-ink) 8%, transparent)"
-                >
-                  {/* aria-label is ignored on a plain span, so the spoken text is its own hidden span. */}
-                  <span className="display text-xl" aria-hidden>
-                    {readiness.score}
-                  </span>
-                  <span className="sr-only">{t("td.readinessN", { n: readiness.score })}</span>
-                </Ring>
+                {!fresh && (
+                  <Ring
+                    value={readiness.score / 100}
+                    size={64}
+                    stroke={6}
+                    from={call.hue}
+                    to={call.hue}
+                    track="color-mix(in srgb, var(--color-ink) 8%, transparent)"
+                  >
+                    {/* aria-label is ignored on a plain span, so the spoken text is its own hidden span. */}
+                    <span className="display text-xl" aria-hidden>
+                      {readiness.score}
+                    </span>
+                    <span className="sr-only">{t("td.readinessN", { n: readiness.score })}</span>
+                  </Ring>
+                )}
                 <div className="min-w-0 flex-1">
                   <div
                     className="flex flex-wrap items-center gap-x-1.5 text-xs font-semibold uppercase tracking-[0.12em]"
@@ -380,9 +383,13 @@ export function Today() {
                 </div>
               </div>
               <p className="mt-3 text-sm text-muted">
-                {preview.challenge ? t("td.challenge") : callWhy(readiness, preview.call, preview.week.deload, true)}
+                {preview.challenge
+                  ? t("td.challenge")
+                  : fresh
+                    ? t("td.callFresh")
+                    : callWhy(readiness, preview.call, preview.week.deload, true)}
               </p>
-              {readiness.signals.length > 0 && (
+              {!fresh && readiness.signals.length > 0 && (
                 <ul className="mt-2 space-y-1 text-sm">
                   {readiness.signals.slice(0, 3).map((g) => (
                     <li
@@ -398,57 +405,54 @@ export function Today() {
                 </ul>
               )}
               <FeelCheckIn now={now} hurts={!hurt.length} />
-              <div
-                className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1"
-                role="group"
-                aria-label={t("td.call")}
-              >
-                {(["recover", "normal", "push"] as Call[]).map((c) => {
-                  const on = preview.call === c;
-                  const hue = CALL_STYLE[c].hue;
-                  return (
-                    <button
-                      key={c}
-                      type="button"
-                      aria-pressed={on}
-                      onClick={() => {
-                        haptic("select");
-                        sound.tick();
-                        setCall(c === readiness.call ? null : c);
-                      }}
-                      className={`press inline-flex min-h-11 min-w-0 flex-wrap items-center justify-center gap-x-1.5 rounded-xl px-1 text-center text-sm leading-tight font-semibold ${on ? "text-ink" : "text-muted"}`}
-                      style={
-                        on
-                          ? {
-                              background: `color-mix(in srgb, ${hue} 30%, var(--color-surface))`,
-                              boxShadow: `inset 0 0 0 1.5px color-mix(in srgb, ${hue} 75%, transparent)`,
-                            }
-                          : undefined
-                      }
-                    >
-                      <span className="inline-flex" style={{ color: hue }}>
-                        <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} />
-                      </span>
-                      {c === "recover" ? t("td.goEasy") : c === "normal" ? t("td.asPlanned") : t("td.push")}
-                    </button>
-                  );
-                })}
-              </div>
+              {!fresh && (
+                <div
+                  className="mt-4 grid grid-cols-3 gap-1 rounded-2xl border border-line bg-bg/60 p-1"
+                  role="group"
+                  aria-label={t("td.call")}
+                >
+                  {(["recover", "normal", "push"] as Call[]).map((c) => {
+                    const on = preview.call === c;
+                    const hue = CALL_STYLE[c].hue;
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => {
+                          haptic("select");
+                          sound.tick();
+                          setCall(c === readiness.call ? null : c);
+                        }}
+                        className={`press inline-flex min-h-11 min-w-0 flex-wrap items-center justify-center gap-x-1.5 rounded-xl px-1 text-center text-sm leading-tight font-semibold ${on ? "text-ink" : "text-muted"}`}
+                        style={
+                          on
+                            ? {
+                                background: `color-mix(in srgb, ${hue} 30%, var(--color-surface))`,
+                                boxShadow: `inset 0 0 0 1.5px color-mix(in srgb, ${hue} 75%, transparent)`,
+                              }
+                            : undefined
+                        }
+                      >
+                        <span className="inline-flex" style={{ color: hue }}>
+                          <Icon name={CALL_STYLE[c].icon} size={15} strokeWidth={2.4} />
+                        </span>
+                        {c === "recover" ? t("td.goEasy") : c === "normal" ? t("td.asPlanned") : t("td.push")}
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
               {callOverride && (
                 <p className="mt-2 text-xs text-faint">{t("td.yourCall", { call: inSentence(CALL_TEXT[readiness.call].label, true) })}</p>
               )}
             </section>
           )}
 
-          {profile.quotes !== false && <DailyQuote now={now} />}
-
           {!active && <CoachNoteToday />}
           {!active && <CoachNotes limit={2} />}
-          {!active && <SaveNudge />}
-
-          {!active && <TodayGame />}
         </div>
-        <div className={`desk:order-1 desk:col-span-3 ${resting ? "hidden" : ""}`}>
+        <div className={`desk:order-1 desk:col-span-3 desk:row-span-2 ${resting ? "hidden" : ""}`}>
           {!fixed && !resting && (
             <div className="card mt-4 p-4">
               <div className="flex items-baseline justify-between">
@@ -493,6 +497,12 @@ export function Today() {
             <>
               {!active && <TodayParts />}
               <Section title={t("td.planTitle", { count: items.length, min: (active?.plan ?? preview).estMinutes })} icon="dumbbell">
+                {shared && (
+                  <p className="mb-2 flex items-start gap-1.5 px-1 text-sm text-muted" data-testid="plan-shared-why">
+                    <Icon name="target" size={14} className="mt-[3px] shrink-0 text-accent" />
+                    <span>{shared.charAt(0).toUpperCase() + shared.slice(1)}</span>
+                  </p>
+                )}
                 <ol className="stagger card overflow-hidden" data-testid="plan-list">
                   {items.map((it, i) => {
                     const ex = exercise(it.exerciseId);
@@ -555,11 +565,15 @@ export function Today() {
                             {it.warmup ? t("td.warmups", { count: it.warmup.length }) : ""}
                             {t("td.mins", { n: Math.max(1, Math.round(itemSeconds(it) / 60)) })}
                           </div>
-                          {why && (
-                            <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
-                              {itemWhy(it, why).short}
-                            </p>
-                          )}
+                          {(() => {
+                            const w = whys?.[i];
+                            const line = w ? (shared ? itemWhyWithoutLoad(w) : w.short) : "";
+                            return line ? (
+                              <p className="mt-0.5 text-xs leading-snug text-faint" data-testid="item-why">
+                                {line}
+                              </p>
+                            ) : null;
+                          })()}
                         </div>
                         {picked ? (
                           <MoveButtons
@@ -661,6 +675,11 @@ export function Today() {
               />
             </div>
           )}
+        </div>
+        <div className="desk:order-3 desk:col-span-2">
+          {profile.quotes !== false && <DailyQuote now={now} />}
+          {!active && <SaveNudge />}
+          {!active && <TodayGame />}
         </div>
       </div>
 

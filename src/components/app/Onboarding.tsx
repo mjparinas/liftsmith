@@ -226,7 +226,8 @@ export function Onboarding({ rerun = false }: { rerun?: boolean }) {
   const [notify, setNotify] = useState<boolean | null>(null);
   const [name, setName] = useState(profile.name);
   const [goal, setGoal] = useState<Goal>(profile.goal);
-  const [exp, setExp] = useState<Experience>(profile.experience);
+  // First run starts on New to lifting, the safe guess (lighter starting weights, familiar lifts); a rerun keeps the answer.
+  const [exp, setExp] = useState<Experience>(rerun ? profile.experience : "new");
   const [preset, setPreset] = useState<GymPreset>("commercial");
   // A gym another lifter listed nearby (gymDirectory.ts), taken instead of a preset.
   const [found, setFound] = useState<{ id: string; kit: GymKit; place?: string } | null>(null);

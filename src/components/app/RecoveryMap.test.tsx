@@ -107,6 +107,9 @@ describe("recovery map", () => {
     });
     await screen.findByRole("heading", { name: /^Body$/ });
     const row = screen.getAllByRole("button").find((b) => /Quads/.test(b.textContent ?? "") && b.hasAttribute("aria-pressed"))!;
+    // Recovery is said with the name; the bar and the number beside it are this week's sets.
+    expect(row.textContent).toMatch(/Quads\d+% recovered/);
+    expect(row.textContent).toMatch(/\d+\/\d+ sets$/);
     await user.click(row);
     expect(row).toHaveAttribute("aria-pressed", "true");
     expect(screen.getByTestId("muscle-advice")).toHaveTextContent("Rest it.");
