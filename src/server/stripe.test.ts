@@ -171,6 +171,13 @@ describe("Web Pro on the account", () => {
     });
   });
 
+  it("ignores events from a coach's connected account, even with an account in the metadata", async () => {
+    const e = ev("customer.subscription.created", sub({ id: "sub_coach" }), { account: "acct_coach1" });
+    expect(await storeStripeEvent(e, CFG, NOW)).toEqual({ stored: false, eventId: null });
+    expect((await accessFor("acct-1", null, NOW)).pro).toBe(false);
+    expect(await query("SELECT id FROM stripe_subscriptions")).toEqual([]);
+  });
+
   it("finds the account from the customer when the metadata is missing", async () => {
     await run("INSERT INTO stripe_customers (account_id, customer_id, at) VALUES ('acct-2', 'cus_2', 0)");
     await storeStripeEvent(
