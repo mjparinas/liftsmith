@@ -60,8 +60,8 @@ const EURO = new Set([
 ]);
 
 /** The usual currency for a gym's country code ("CA" → CAD), CAD when it's not known. */
-export function currencyFor(country: string): Currency {
-  const c = country.toUpperCase();
+export function currencyFor(country: string | undefined): Currency {
+  const c = (country ?? "").toUpperCase();
   if (c === "US") return "USD";
   if (c === "GB" || c === "UK") return "GBP";
   if (c === "AU") return "AUD";

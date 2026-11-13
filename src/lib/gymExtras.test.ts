@@ -25,6 +25,8 @@ describe("amenities and prices", () => {
     expect(currencyFor("US")).toBe("USD");
     expect(currencyFor("de")).toBe("EUR");
     expect(currencyFor("")).toBe("CAD");
+    // A gym saved before country was kept has none.
+    expect(currencyFor(undefined)).toBe("CAD");
     expect(money(15, "CAD", "en")).toBe("$15");
     expect(money(12.5, "EUR", "en")).toBe("€12.50");
   });
