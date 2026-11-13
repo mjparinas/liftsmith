@@ -448,6 +448,76 @@ describe("body data a client shares", () => {
   });
 });
 
+describe("sharing item by item", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "e1", at: NOW - DAY, type: "sessionEnd", sessionId: "w1", seconds: 3000, avgHr: 130, maxHr: 170, kcal: 320 },
+        { id: "n1", at: NOW - DAY, type: "note", sessionId: "w1", exerciseId: "squat", text: "Left knee tight" },
+        { id: "sn1", at: NOW - DAY, type: "sessionNote", sessionId: "w1", name: "Legs", text: "Felt strong" },
+        { id: "f1", at: NOW - DAY, type: "feel", energy: -1, sore: true },
+        { id: "h1", at: NOW - DAY, type: "health", metric: "sleep", day: "2027-01-14", value: 6.5 },
+        { id: "h2", at: NOW - DAY, type: "health", metric: "kcalIn", day: "2027-01-14", value: 2100 },
+        { id: "c1", at: NOW - DAY, type: "cycle", day: NOW - 3 * DAY },
+        { id: "b1", at: NOW - DAY, type: "bodyweight", kg: 70 },
+        { id: "ph1", at: NOW - DAY, type: "photo", data: "x" },
+      ],
+      { name: "Alex" },
+    );
+    await makeInvite("coach", NOW, "EEEEFFFF");
+  });
+  // Everything here was logged at the same moment, so compare the kinds in a fixed order.
+  const types = async () => (await clientView("coach", "client", NOW))!.events.map((e) => String(e.type)).sort();
+
+  it("starts with training only, and the consent screen's switches are saved with the join", async () => {
+    await joinCoach("client", "EEEEFFFF", NOW, ["hr", "notes", "nonsense", "hr"]);
+    const view = (await clientView("coach", "client", NOW))!;
+    expect(view.shares).toEqual(["hr", "notes"]);
+    expect(view.events.find((e) => e.type === "sessionEnd")).toMatchObject({ avgHr: 130, maxHr: 170, kcal: 320 });
+    expect(await types()).toEqual(["note", "sessionEnd", "sessionNote"]);
+    expect((await overview("client", NOW)).shared).toEqual({ coach: ["hr", "notes"] });
+    expect((await overview("coach", NOW)).sharesWithMe).toEqual({ client: ["hr", "notes"] });
+  });
+
+  it("each switch adds only its own kind, food stays with body data, and photos never leave", async () => {
+    await joinCoach("client", "EEEEFFFF", NOW);
+    expect(await types()).toEqual(["sessionEnd"]);
+    expect((await clientView("coach", "client", NOW))!.events[0]).not.toHaveProperty("avgHr");
+    await setShare("client", "coach", true, NOW, "health");
+    expect(await types()).toEqual(["feel", "health", "sessionEnd"]);
+    expect((await clientView("coach", "client", NOW))!.events.find((e) => e.type === "health")).toMatchObject({ metric: "sleep" });
+    await setShare("client", "coach", true, NOW, "cycle");
+    expect(await types()).toEqual(["cycle", "feel", "health", "sessionEnd"]);
+    await setShare("client", "coach", false, NOW, "health");
+    expect(await types()).toEqual(["cycle", "sessionEnd"]);
+    // An unknown kind is body data, never a column from the request.
+    expect(await setShare("client", "coach", true, NOW, "photo; DROP TABLE coach_shares")).toBe(true);
+    expect((await clientView("coach", "client", NOW))!.shares).toEqual(["body", "cycle"]);
+    expect(await types()).toEqual(["cycle", "sessionEnd"]);
+  });
+
+  it("the heart rate fields on a set travel only with heart rate on", () => {
+    const set = {
+      id: "s",
+      at: 1,
+      type: "set",
+      sessionId: "w1",
+      exerciseId: "bench",
+      weight: 100,
+      reps: 5,
+      targetReps: 5,
+      hrAvg: 140,
+      hrMax: 160,
+    };
+    expect(forCoach(set)).not.toHaveProperty("hrAvg");
+    expect(forCoach(set, { hr: true })).toMatchObject({ hrAvg: 140, hrMax: 160 });
+    expect(
+      forCoach({ id: "p", at: 1, type: "photo" }, { hr: true, notes: true, health: true, body: true, pain: true, cycle: true }),
+    ).toBeNull();
+  });
+});
+
 describe("alerts to a coach", () => {
   const sent: PushMessage[] = [];
   beforeEach(async () => {

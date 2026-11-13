@@ -456,19 +456,24 @@ export const fr: SiteText = {
     },
     see: {
       title: "Ce que vous voyez, et ce que vous ne voyez pas",
-      body: "Vos clients acceptent avant tout partage et peuvent arrêter quand ils veulent. Vous perdez l'accès aussitôt.",
-      seesLabel: "Vous voyez",
+      body: "Vos clients acceptent avant tout partage et choisissent ce que vous voyez, élément par élément. Ils peuvent le changer ou arrêter quand ils veulent, et vous perdez l'accès aussitôt.",
+      seesLabel: "Vous voyez toujours",
       sees: [
         "Les séances de la dernière année : exercices, séries, charges et répétitions",
         "La durée des séances et la difficulté ressentie des séries",
         "Leur objectif hebdomadaire et leurs nouveaux records",
       ],
-      neverLabel: "Vous ne voyez jamais",
-      never: [
-        "Fréquence cardiaque, poids, masse grasse ou mensurations",
-        "Données de santé, forme du jour ou cycle",
-        "Blessures, notes, salles ou photos",
+      optLabel: "Seulement s'ils l'activent",
+      opt: [
+        "Fréquence cardiaque et calories de chaque séance",
+        "Leurs notes de séance",
+        "Forme et récupération : ressenti, sommeil, VFC et fréquence cardiaque au repos",
+        "Poids, masse grasse, mensurations et alimentation",
+        "Douleurs et blessures",
+        "Leur cycle",
       ],
+      neverLabel: "Vous ne voyez jamais",
+      never: ["Les photos de progression", "Leurs salles ou l'endroit où ils s'entraînent"],
     },
     cost: {
       title: "Combien ça coûte",
@@ -488,7 +493,7 @@ export const fr: SiteText = {
       },
       {
         q: "Puis-je voir leur fréquence cardiaque ou leur poids ?",
-        a: "Seulement ce qu'ils choisissent. Vous voyez leur entraînement. Chaque client peut activer le partage de ses données corporelles, ou de sa douleur et de ses blessures, avec vous ; les relevés de santé et les notes ne quittent jamais son compte.",
+        a: "Seulement ce qu'ils choisissent. Vous voyez toujours leur entraînement. Chaque client peut activer, un par un, le partage de sa fréquence cardiaque, de ses notes de séance, de sa forme et sa récupération, de ses données corporelles, de ses douleurs et blessures ou de son cycle, et le désactiver à tout moment.",
       },
       {
         q: "Les kinés et les professionnels de la rééducation peuvent-ils l'utiliser ?",

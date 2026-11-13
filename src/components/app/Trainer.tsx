@@ -13,7 +13,7 @@ import { useAccount } from "@/lib/auth";
 import { savePendingCoach } from "@/lib/coachInvite";
 import { COACH_TABS } from "@/lib/coachMode";
 import { can } from "@/lib/entitlements";
-import { date, t } from "@/lib/i18n";
+import { date, list, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
 import { rehabName } from "@/lib/rehab";
 import { encodeRoutine } from "@/lib/routineShare";
@@ -39,12 +39,14 @@ import {
   type ClientView,
   type Note,
   type PlanProgress,
+  type Readiness,
   type Report,
+  type ShareKind,
   type ShownNote,
   type Targets,
 } from "@/lib/trainer";
 import type { Routine } from "@/lib/types";
-import { fmtWeight } from "@/lib/units";
+import { fmtNum, fmtWeight } from "@/lib/units";
 
 import { ClientBody } from "./CoachBody";
 import { backToCoaching, ChatScreen } from "./CoachChat";
@@ -355,6 +357,48 @@ function ClientPlans({
 const TONE = { warn: "var(--color-warn)", good: "var(--color-good)", info: "var(--color-accent)" } as const;
 
 /** One client's report: what to act on first, their weeks, recent workouts and new bests. */
+/** Each kind of sharing in a sentence ("Sam also shares heart rate and workout notes."). */
+const KIND_WORD = {
+  hr: "trn.kind.hr",
+  notes: "trn.kind.notes",
+  health: "trn.kind.health",
+  body: "trn.kind.body",
+  pain: "trn.kind.pain",
+  cycle: "trn.kind.cycle",
+} as const satisfies Record<ShareKind, string>;
+
+/** How a client feels and recovers, when they share it: the newest check-in, a week of sleep, HRV and resting heart rate, their cycle day. */
+function ClientReadiness({ name, r, shares }: { name: string; r: Readiness; shares: readonly ShareKind[] }) {
+  const who = name || t("trn.noName");
+  const lines: string[] = [];
+  if (r.feel)
+    lines.push(
+      t(r.feel.unwell ? "trn.feltUnwell" : r.feel.energy > 0 ? "trn.feltGreat" : r.feel.energy < 0 ? "trn.feltLow" : "trn.feltOkay", {
+        day: date(r.feel.at, { weekday: "long" }),
+      }) + (r.feel.sore ? ` ${t("trn.feltSore")}` : ""),
+    );
+  if (r.sleep != null) lines.push(t("trn.readySleep", { hours: fmtNum(r.sleep) }));
+  if (r.hrv != null) lines.push(t("trn.readyHrv", { ms: r.hrv }));
+  if (r.restingHr != null) lines.push(t("trn.readyRhr", { bpm: r.restingHr }));
+  if (r.cycleDay != null && shares.includes("cycle")) lines.push(t("trn.cycleDay", { day: r.cycleDay }));
+  return (
+    <Section title={t("trn.readyTitle")} icon="heart">
+      {lines.length ? (
+        <ul className="card divide-y divide-line">
+          {lines.map((l) => (
+            <li key={l} className="num px-4 py-3 text-sm">
+              {l}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="px-1 text-sm text-muted">{t("trn.readyNone", { name: who })}</p>
+      )}
+      {(r.sleep != null || r.hrv != null || r.restingHr != null) && <p className="mt-2 px-1 text-xs text-muted">{t("trn.readyLead")}</p>}
+    </Section>
+  );
+}
+
 function ClientScreen({ id }: { id: string }) {
   const unit = useApp((s) => s.profile.unit);
   const lab = can("coaching");
@@ -485,6 +529,18 @@ function ClientScreen({ id }: { id: string }) {
                     <Icon name="trophy" size={14} /> {t("trn.prCount", { count: s.prs })}
                   </p>
                 )}
+                {/* Heart rate, when the client shares it. */}
+                {s.avgHr != null && (
+                  <p className="num mt-0.5 flex items-center gap-1 text-sm text-muted">
+                    <Icon name="heart" size={14} /> {t("trn.hrLine", { avg: Math.round(s.avgHr), max: Math.round(s.maxHr ?? s.avgHr) })}
+                  </p>
+                )}
+                {/* Their own notes, when they share them. */}
+                {(report.notes.get(s.sessionId) ?? []).map((n, i) => (
+                  <p key={i} className="mt-1 border-l-2 border-line pl-2 text-sm whitespace-pre-line">
+                    {n}
+                  </p>
+                ))}
               </li>
             ))}
           </ul>
@@ -509,6 +565,7 @@ function ClientScreen({ id }: { id: string }) {
         now={report.now}
         onChange={() => setVersion((n) => n + 1)}
       />
+      {report.readiness && <ClientReadiness name={report.name} r={report.readiness} shares={report.shares} />}
       {body && <ClientBody name={report.name} body={body} />}
       {report.prs.length > 0 && (
         <Section title={t("trn.bests")} icon="trophy">
@@ -524,8 +581,12 @@ function ClientScreen({ id }: { id: string }) {
           </ul>
         </Section>
       )}
-      <p className="mt-6 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
-      {body && <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSeeBody")}</p>}
+      <p className="mt-6 px-1 text-xs text-muted">
+        {report.shares.length
+          ? t("trn.sharedList", { name: report.name || t("trn.noName"), list: list(report.shares.map((k) => t(KIND_WORD[k]))) })
+          : t("trn.sharedNone", { name: report.name || t("trn.noName") })}
+      </p>
+      <p className="mt-2 px-1 text-xs text-muted">{t("trn.whatYouSee")}</p>
       <Button kind="danger" className="mt-4 w-full" onClick={() => void remove()}>
         {t("trn.remove")}
       </Button>

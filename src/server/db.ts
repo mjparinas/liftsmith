@@ -1040,6 +1040,12 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   ["coach_shares", "pain", "INTEGER NOT NULL DEFAULT 0"],
   ["coach_prefs", "kind", "TEXT NOT NULL DEFAULT 'trainer'"],
   ["coach_plans", "per_week", "INTEGER"],
+  // Sharing item by item (2026-11-13, docs/decisions/trainer-mode.md "What a client shares"): heart rate, workout
+  // notes, readiness and recovery, and cycle, each off until the client turns it on for that coach.
+  ["coach_shares", "hr", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "notes", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "health", "INTEGER NOT NULL DEFAULT 0"],
+  ["coach_shares", "cycle", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 /**

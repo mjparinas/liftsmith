@@ -2,51 +2,16 @@
 
 // Physio support in trainer mode (Melvin, 2026-11-13: "add physios support"; docs/decisions/trainer-mode.md).
 // The pieces that sit inside Coaching (Trainer.tsx): how a coach works (trainer or physio), a client's pain and
-// injuries on their report when they share them, the rehab programs and times a week in the assign sheet, and the
-// client's own "Share pain and injuries" switch. Liftsmith shows what the client logs; it never diagnoses or says
-// what's safe for an injury, and every screen here says so.
-import { useState } from "react";
-
-import { track } from "@/lib/analytics";
+// injuries on their report when they share them, and the rehab programs and times a week in the assign sheet. The
+// client's own "Share pain and injuries" switch sits with the other sharing switches (CoachShare.tsx). Liftsmith shows
+// what the client logs; it never diagnoses or says what's safe for an injury, and every screen here says so.
 import { date, t } from "@/lib/i18n";
 import { PART_LABEL } from "@/lib/injury";
-import { haptic, oops } from "@/lib/juice";
 import { REHAB_PROGRAMS, rehabBody, rehabName, type RehabProgram } from "@/lib/rehab";
-import { liftName, setPainShare, trainerError, type Person, type RehabInjury } from "@/lib/trainer";
+import { liftName, type RehabInjury } from "@/lib/trainer";
 
 import { Sparkline } from "./Injuries";
-import { Chip, Section, SwitchRow } from "./ui";
-
-/** The client's switch, one per coach: share pain ratings and injuries, off until they turn it on. */
-export function PainShareSwitch({ coach, on, onChange }: { coach: Person; on: boolean; onChange: () => void }) {
-  const [note, setNote] = useState<string | null>(null);
-  const flip = async (v: boolean) => {
-    try {
-      await setPainShare(coach.id, v);
-      haptic("toggle");
-      track("feature", { name: "trainer", detail: v ? "sharePain" : "unsharePain" });
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
-  return (
-    <>
-      <SwitchRow
-        label={t("trn.sharePain", { name: coach.name || t("trn.noName") })}
-        hint={t("trn.sharePainHint")}
-        on={on}
-        onChange={(v) => void flip(v)}
-      />
-      {note && (
-        <p className="mt-1 px-1 text-sm text-muted" role="status">
-          {note}
-        </p>
-      )}
-    </>
-  );
-}
+import { Chip, Section } from "./ui";
 
 /** On a client's report: each injury with its pain trend and the latest rating on each exercise. */
 export function ClientPain({ name, rehab, names }: { name: string; rehab: RehabInjury[] | null; names: ReadonlyMap<string, string> }) {

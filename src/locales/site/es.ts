@@ -450,19 +450,24 @@ export const es: SiteText = {
     },
     see: {
       title: "Lo que ves y lo que no",
-      body: "Tus clientes aceptan antes de compartir nada y pueden dejar de compartir cuando quieran. Pierdes el acceso al instante.",
-      seesLabel: "Ves",
+      body: "Tus clientes aceptan antes de compartir nada y eligen lo que ves, cosa por cosa. Pueden cambiarlo o dejar de compartir cuando quieran, y pierdes el acceso al instante.",
+      seesLabel: "Siempre ves",
       sees: [
         "Entrenamientos del último año: ejercicios, series, pesos y repeticiones",
         "Cuánto entrenaron y lo duras que fueron las series",
         "Su objetivo semanal y sus nuevas marcas",
       ],
-      neverLabel: "Nunca ves",
-      never: [
-        "Frecuencia cardiaca, peso, grasa corporal o medidas",
-        "Datos de salud, disposición o ciclo",
-        "Lesiones, notas, gimnasios o fotos",
+      optLabel: "Solo si lo activan",
+      opt: [
+        "Frecuencia cardiaca y calorías de cada entrenamiento",
+        "Sus notas de entrenamiento",
+        "Preparación y recuperación: cómo se sienten, sueño, VFC y frecuencia cardiaca en reposo",
+        "Peso, grasa corporal, medidas y comida",
+        "Dolor y lesiones",
+        "Su ciclo",
       ],
+      neverLabel: "Nunca ves",
+      never: ["Fotos de progreso", "Sus gimnasios o dónde entrenan"],
     },
     cost: {
       title: "Cuánto cuesta",
@@ -482,7 +487,7 @@ export const es: SiteText = {
       },
       {
         q: "¿Puedo ver su frecuencia cardiaca o su peso?",
-        a: "Solo lo que ellos elijan. Ves su entrenamiento. Cada cliente puede activar compartir contigo sus datos corporales, o su dolor y sus lesiones; las lecturas de salud y las notas nunca salen de su cuenta.",
+        a: "Solo lo que ellos elijan. Siempre ves su entrenamiento. Cada cliente puede activar compartir contigo su frecuencia cardiaca, sus notas de entrenamiento, su preparación y recuperación, sus datos corporales, su dolor y sus lesiones, o su ciclo, uno a uno, y desactivarlo cuando quiera.",
       },
       {
         q: "¿Lo pueden usar fisioterapeutas y profesionales de rehabilitación?",

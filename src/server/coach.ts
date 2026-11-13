@@ -1,8 +1,9 @@
 // Trainer mode (Melvin, 2026-11-11: "coaches build programs for clients and see client results"). A coach
 // makes an invite code; a client enters it, sees what the coach will see, and agrees. From then on the coach
 // can read the client's workouts from their synced account: sets, sessions, feedback and their own exercises,
-// with every field that isn't training taken out (heart rate, readiness, injuries, notes, gyms). Nothing
-// else in the event log ever leaves (health readings, body weight, measurements, cycle, pain, photos).
+// with every field that isn't training taken out. Everything else stays private unless the client turns it on for
+// that coach, item by item (2026-11-13): heart rate, workout notes, readiness and recovery, body data, pain and
+// injuries, and cycle (SHARE_KINDS). Gyms, photos and anything else in the event log never leave.
 // Either side can unlink at any time, which cuts access at once. Out of Labs (2026-11-12): a coach can also say what
 // their new clients start setup with (goal, experience, days a week), and leave each client one note.
 // Physio support (2026-11-13): a coach can work as a physio or rehab clinician, a client can share pain ratings and
@@ -235,6 +236,9 @@ export async function overview(
   /** The coaches this client shares pain and injuries with, and the clients who share theirs with this coach. */
   painShared: string[];
   sharesPain: string[];
+  /** What this client shares with each coach (by coach id), and what each client shares with this coach (by client id). */
+  shared: Record<string, ShareKind[]>;
+  sharesWithMe: Record<string, ShareKind[]>;
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets: Targets[];
   /** How this account works with clients, once they've said. */
@@ -279,6 +283,8 @@ export async function overview(
     sharesPain: (await query<{ id: string }>("SELECT client_id AS id FROM coach_shares WHERE coach_id = ? AND pain = 1", [accountId])).map(
       (r) => String(r.id),
     ),
+    shared: await sharesBy("client_id", accountId),
+    sharesWithMe: await sharesBy("coach_id", accountId),
     targets: await targetsFor(accountId),
     role: await roleOf(accountId),
     coach:
@@ -335,6 +341,7 @@ export async function joinCoach(
   clientId: string,
   raw: unknown,
   now = Date.now(),
+  shares: unknown = [],
 ): Promise<{ coach: Person; setup: Setup } | { error: JoinError }> {
   const seen = await previewInvite(clientId, raw, now);
   if ("error" in seen) return seen;
@@ -354,6 +361,8 @@ export async function joinCoach(
     return { error: "coachFull" };
   }
   await run("INSERT OR IGNORE INTO coach_links (coach_id, client_id, created_at) VALUES (?, ?, ?)", [coachId, clientId, now]);
+  // What the client switched on on the consent screen, before agreeing.
+  for (const k of new Set(Array.isArray(shares) ? shares.filter(isKind) : [])) await setShare(clientId, coachId, true, now, k);
   return { ...seen, coach: { ...seen.coach, since: now } };
 }
 
@@ -472,15 +481,47 @@ const PAIN_KEEP: Record<string, readonly string[]> = {
 };
 export const PAIN_TYPES = Object.keys(PAIN_KEEP);
 
-/** The coach's copy of one event: only training fields, or null for anything a coach doesn't see. */
-export function forCoach(e: unknown, pain = false): Record<string, unknown> | null {
+/**
+ * What a client can share with one coach beyond training, each its own switch and its own column in coach_shares
+ * (the column name is always one of these, never taken from a request). Body data and pain have their own code
+ * (bodyOf, PAIN_KEEP); the rest add fields or event types below.
+ */
+export const SHARE_KINDS = ["hr", "notes", "health", "body", "pain", "cycle"] as const;
+export type ShareKind = (typeof SHARE_KINDS)[number];
+export type Shares = Partial<Record<ShareKind, boolean>>;
+const isKind = (x: unknown): x is ShareKind => SHARE_KINDS.includes(x as ShareKind);
+
+// Heart rate: each set's and each workout's, and the calories a workout burned (worked out from heart rate).
+const HR_FIELDS: Record<string, readonly string[]> = { set: ["hrAvg", "hrMax", "hrEnd"], sessionEnd: ["avgHr", "maxHr", "minHr", "kcal"] };
+// Workout notes: the lifter's notes on an exercise, and a workout's own name and note.
+const NOTES_KEEP: Record<string, readonly string[]> = {
+  note: ["sessionId", "exerciseId", "text"],
+  sessionNote: ["sessionId", "name", "text"],
+};
+// Readiness and recovery: the check-in on Today, and Health readings (sleep, HRV, resting heart rate, steps, VO2 max,
+// breathing). Calories and protein eaten are food, shared with body data (bodyOf), never here.
+const HEALTH_KEEP: Record<string, readonly string[]> = { feel: ["energy", "sore", "unwell"], health: ["metric", "day", "value"] };
+const FOOD_METRICS = new Set(["kcalIn", "protein"]);
+// Cycle: the days a period started (cycle-aware readiness).
+const CYCLE_KEEP: Record<string, readonly string[]> = { cycle: ["day"] };
+
+/** The coach's copy of one event: only training fields plus what the client shares, or null for anything a coach doesn't see. */
+export function forCoach(e: unknown, shares: Shares | boolean = {}): Record<string, unknown> | null {
   if (!e || typeof e !== "object") return null;
+  const on: Shares = typeof shares === "boolean" ? { pain: shares } : shares;
   const ev = e as Record<string, unknown>;
-  const keep = typeof ev.type === "string" ? (KEEP[ev.type] ?? (pain ? PAIN_KEEP[ev.type] : undefined)) : undefined;
-  if (!keep || typeof ev.id !== "string" || typeof ev.at !== "number") return null;
+  if (typeof ev.type !== "string" || typeof ev.id !== "string" || typeof ev.at !== "number") return null;
+  const type = ev.type;
+  const keep =
+    KEEP[type] ??
+    (on.pain ? PAIN_KEEP[type] : undefined) ??
+    (on.notes ? NOTES_KEEP[type] : undefined) ??
+    (on.health && !(type === "health" && FOOD_METRICS.has(String(ev.metric))) ? HEALTH_KEEP[type] : undefined) ??
+    (on.cycle ? CYCLE_KEEP[type] : undefined);
+  if (!keep) return null;
   // A set done lighter for an injury says there's an injury; the coach sees the set, not why.
-  const out: Record<string, unknown> = { id: ev.id, at: ev.at, type: ev.type };
-  for (const k of keep) if (ev[k] !== undefined) out[k] = ev[k];
+  const out: Record<string, unknown> = { id: ev.id, at: ev.at, type };
+  for (const k of [...keep, ...(on.hr ? (HR_FIELDS[type] ?? []) : [])]) if (ev[k] !== undefined) out[k] = ev[k];
   return out;
 }
 
@@ -496,6 +537,8 @@ export interface ClientView {
   body: BodyShare | null;
   /** Whether the client shares pain and injuries with this coach (the events above then include them). */
   pain: boolean;
+  /** Everything this client shares with this coach beyond training (the events above include what it covers). */
+  shares: ShareKind[];
   /** This coach's daily nutrition targets for the client, if any. */
   targets: Targets | null;
 }
@@ -515,7 +558,8 @@ export interface BodyShare {
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
 export async function clientView(coachId: string, clientId: string, now = Date.now()): Promise<ClientView | null> {
   if (!(await isClient(coachId, clientId))) return null;
-  const pain = await sharesPain(coachId, clientId);
+  const shares = await sharesOf(coachId, clientId);
+  const pain = !!shares.pain;
   const rows = await query<{ body: string }>(
     `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND (at >= ? OR body LIKE '%"type":"customExercise"%')
      ORDER BY at DESC LIMIT ?`,
@@ -529,7 +573,7 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     } catch {
       continue;
     }
-    const kept = forCoach(e, pain);
+    const kept = forCoach(e, shares);
     if (kept) events.push(kept);
   }
   const [p] = await query<{ body: string | null }>("SELECT body FROM sync_records WHERE account_id = ? AND key = 'profile'", [clientId]);
@@ -551,8 +595,9 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     events: events.reverse(),
     plans: plans.map(plan),
     note: n ? note(n) : null,
-    body: (await sharesBody(coachId, clientId)) ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
+    body: shares.body ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
     pain,
+    shares: SHARE_KINDS.filter((k) => shares[k]),
     targets: (await targetsFor(clientId, coachId))[0] ?? null,
   };
 }
@@ -569,7 +614,31 @@ export async function sharesPain(coachId: string, clientId: string): Promise<boo
   return Number(r?.pain ?? 0) === 1;
 }
 
-/** The client turns body data (or, with `what` "pain", pain and injuries) on or off for one of their coaches. */
+/** Everything one client shares with one coach. */
+export async function sharesOf(coachId: string, clientId: string): Promise<Shares> {
+  const [r] = await query<Record<ShareKind, number>>(
+    `SELECT ${SHARE_KINDS.join(", ")} FROM coach_shares WHERE coach_id = ? AND client_id = ?`,
+    [coachId, clientId],
+  );
+  return Object.fromEntries(SHARE_KINDS.map((k) => [k, Number(r?.[k] ?? 0) === 1]));
+}
+
+/** What's shared on each link this account is on, by the other side's id: as a client (`client_id`) or as a coach. */
+async function sharesBy(side: "client_id" | "coach_id", accountId: string): Promise<Record<string, ShareKind[]>> {
+  const other = side === "client_id" ? "coach_id" : "client_id";
+  const rows = await query<Record<string, unknown>>(
+    `SELECT ${other} AS id, ${SHARE_KINDS.join(", ")} FROM coach_shares WHERE ${side} = ?`,
+    [accountId],
+  );
+  const out: Record<string, ShareKind[]> = {};
+  for (const r of rows) {
+    const on = SHARE_KINDS.filter((k) => Number(r[k] ?? 0) === 1);
+    if (on.length) out[String(r.id)] = on;
+  }
+  return out;
+}
+
+/** The client turns one kind of sharing (`what`: body data by default, or any of SHARE_KINDS) on or off for one of their coaches. */
 export async function setShare(
   clientId: string,
   coachId: unknown,
@@ -579,7 +648,7 @@ export async function setShare(
 ): Promise<boolean | { error: "notClient" }> {
   if (!isAccountId(coachId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
   // One fixed column name per kind of share, never taken from the request.
-  const col = what === "pain" ? "pain" : "body";
+  const col: ShareKind = isKind(what) ? what : "body";
   await run(
     `INSERT INTO coach_shares (coach_id, client_id, ${col}, updated_at) VALUES (?, ?, ?, ?)
      ON CONFLICT (coach_id, client_id) DO UPDATE SET ${col} = excluded.${col}, updated_at = excluded.updated_at`,

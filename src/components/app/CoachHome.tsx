@@ -28,6 +28,7 @@ import {
   coachBadge,
   codeFrom,
   inviteUrl,
+  JOIN_SHARES,
   joinCode,
   keepNotes,
   loadOverview,
@@ -35,8 +36,9 @@ import {
   previewCode,
   saveRole,
   saveSetup,
-  setBodyShare,
   setCoachAlerts,
+  sharedWith,
+  shareKinds,
   showCode,
   trainerError,
   trainersOnly,
@@ -48,6 +50,7 @@ import {
   type Plan,
   type Role,
   type Setup,
+  type ShareKind,
   type Targets,
 } from "@/lib/trainer";
 import type { Experience, Goal } from "@/lib/types";
@@ -56,8 +59,8 @@ import { ChatThread } from "./CoachChat";
 import { FormsScreen, PendingCheckins } from "./CoachCheckins";
 import { PaySetup, YourPayments } from "./CoachPay";
 import { CoachPlanCard } from "./CoachPlan";
-import { PainShareSwitch } from "./CoachRehab";
 import { CoachSessions, YourSessions } from "./CoachSessions";
+import { ConsentShares, ShareSwitches } from "./CoachShare";
 import { TargetsCard } from "./CoachTargets";
 import { Icon, type IconName } from "./icons";
 import { go, replaceRoute } from "./router";
@@ -387,13 +390,7 @@ function ClientPage({
         </Section>
       )}
       {coaches.map((c) => (
-        <Sharing
-          key={c.id}
-          coach={c}
-          body={(data.bodyShared ?? []).includes(c.id)}
-          pain={(data.painShared ?? []).includes(c.id)}
-          onChange={onChange}
-        />
+        <Sharing key={c.id} coach={c} on={sharedWith(data, c.id)} onChange={onChange} />
       ))}
       <Section title={coaches.length || teams.joined.length ? t("trn.addAnother") : t("trn.joinTitle")} icon="plus">
         {adding ? (
@@ -501,22 +498,10 @@ function FromCoach({ coaches, plans, notes, targets }: { coaches: Person[]; plan
   );
 }
 
-/** What the lifter shares with one coach, which they choose, and Stop sharing. */
-function Sharing({ coach, body, pain, onChange }: { coach: Person; body: boolean; pain: boolean; onChange: () => void }) {
-  const comp = bodyCompOn(useApp((s) => s.profile));
+/** What the lifter shares with one coach, item by item, which they choose, and Stop sharing. */
+function Sharing({ coach, on, onChange }: { coach: Person; on: ShareKind[]; onChange: () => void }) {
   const [note, setNote] = useState<string | null>(null);
   const name = coach.name || t("trn.noName");
-  const share = async (on: boolean) => {
-    try {
-      await setBodyShare(coach.id, on);
-      haptic("toggle");
-      track("feature", { name: "trainer", detail: on ? "shareBody" : "unshareBody" });
-      onChange();
-    } catch (e) {
-      oops();
-      setNote(trainerError(e));
-    }
-  };
   const leave = async () => {
     try {
       await unlinkPerson(coach.id);
@@ -532,9 +517,8 @@ function Sharing({ coach, body, pain, onChange }: { coach: Person; body: boolean
   return (
     <Section title={t("trn.shareTitle", { name })} icon="lock">
       <p className="mb-2 px-1 text-sm text-muted">{t("trn.shareLead")}</p>
-      {/* Body data waits for an under-18 until body composition is on in Body › Health (teen.ts). */}
-      {comp && <SwitchRow label={t("trn.shareBody", { name })} hint={t("trn.shareBodyHint")} on={body} onChange={(v) => void share(v)} />}
-      <PainShareSwitch coach={coach} on={pain} onChange={onChange} />
+      <ShareSwitches coachId={coach.id} name={name} on={on} onChange={onChange} />
+      <p className="mt-2 px-1 text-xs text-muted">{t("trn.shareNever")}</p>
       <Button kind="ghost" className="mt-3 w-full" onClick={() => void leave()}>
         {t("trn.stopSharingNamed", { name })}
       </Button>
@@ -551,6 +535,8 @@ function Sharing({ coach, body, pain, onChange }: { coach: Person; body: boolean
 function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[]; onChange: () => void }) {
   const [text, setText] = useState(code ? showCode(code) : "");
   const [found, setFound] = useState<Person | null>(null);
+  const [picked, setPicked] = useState<ShareKind[]>([...JOIN_SHARES]);
+  const kinds = shareKinds(bodyCompOn(useApp((s) => s.profile)));
   const [note, setNote] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const check = useCallback(async (raw: string) => {
@@ -590,7 +576,10 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
   const agree = async () => {
     setBusy(true);
     try {
-      await joinCode(codeFrom(text));
+      await joinCode(
+        codeFrom(text),
+        picked.filter((k) => kinds.includes(k)),
+      );
       savePendingCoach("");
       haptic("success");
       sound.done();
@@ -612,9 +601,8 @@ function JoinCoach({ code, coaches, onChange }: { code: string; coaches: Person[
           {found.role && <p className="text-xs font-semibold tracking-wider text-muted uppercase">{t(`trn.role.${found.role}`)}</p>}
           <p className="font-semibold">{t("trn.consentTitle", { name: found.name || t("trn.noName") })}</p>
           <p className="mt-2 text-sm">{t("trn.consentSees")}</p>
+          <ConsentShares name={found.name || t("trn.noName")} picked={picked} onPick={setPicked} />
           <p className="mt-2 text-sm text-muted">{t("trn.consentNot")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentBodyLater")}</p>
-          <p className="mt-2 text-sm text-muted">{t("trn.consentPainLater")}</p>
           <p className="mt-2 text-sm text-muted">{t("trn.consentStop")}</p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Button className="flex-1" disabled={busy} onClick={() => void agree()}>

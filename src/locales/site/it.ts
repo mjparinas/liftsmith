@@ -445,19 +445,24 @@ export const it: SiteText = {
     },
     see: {
       title: "Cosa vedi e cosa no",
-      body: "I clienti accettano prima che venga condiviso qualcosa e possono smettere quando vogliono. Perdi l'accesso subito.",
-      seesLabel: "Vedi",
+      body: "I clienti accettano prima che venga condiviso qualcosa e scelgono cosa vedi, voce per voce. Possono cambiarlo o smettere quando vogliono, e perdi l'accesso subito.",
+      seesLabel: "Vedi sempre",
       sees: [
         "Allenamenti dell'ultimo anno: esercizi, serie, carichi e ripetizioni",
         "Quanto si sono allenati e quanto sono state dure le serie",
         "Il loro obiettivo settimanale e i nuovi record",
       ],
-      neverLabel: "Non vedi mai",
-      never: [
-        "Frequenza cardiaca, peso, massa grassa o misure",
-        "Dati sulla salute, prontezza o ciclo",
-        "Infortuni, note, palestre o foto",
+      optLabel: "Solo se lo attivano",
+      opt: [
+        "Frequenza cardiaca e calorie di ogni allenamento",
+        "Le loro note di allenamento",
+        "Forma e recupero: come si sentono, sonno, HRV e frequenza a riposo",
+        "Peso, massa grassa, misure e alimentazione",
+        "Dolore e infortuni",
+        "Il loro ciclo",
       ],
+      neverLabel: "Non vedi mai",
+      never: ["Le foto dei progressi", "Le loro palestre o dove si allenano"],
     },
     cost: {
       title: "Quanto costa",
@@ -477,7 +482,7 @@ export const it: SiteText = {
       },
       {
         q: "Posso vedere la loro frequenza cardiaca o il loro peso?",
-        a: "Solo ciò che scelgono. Vedi il loro allenamento. Ogni cliente può attivare la condivisione dei dati corporei, o di dolore e infortuni, con te; letture di salute e note non lasciano mai il suo account.",
+        a: "Solo ciò che scelgono. Vedi sempre il loro allenamento. Ogni cliente può attivare, una voce alla volta, la condivisione di frequenza cardiaca, note di allenamento, forma e recupero, dati corporei, dolore e infortuni o ciclo, e disattivarla quando vuole.",
       },
       {
         q: "Possono usarlo fisioterapisti e professionisti della riabilitazione?",

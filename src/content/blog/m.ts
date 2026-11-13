@@ -145,11 +145,14 @@ export const BLOG_M: Article[] = [
       },
       { h2: "In Liftsmith" },
       {
-        p: "Enter your coach's code (or open their invite link) and you'll see exactly what they'll see before you agree: your workouts from the last year, how long you trained, how hard sets felt and your weekly goal. They never see your heart rate, health readings, cycle, notes, gyms or photos, and your body data and injuries stay private unless you turn on sharing them with that coach. You can stop sharing at any time, and being a client is free. Coaches can read more on [coaching in Liftsmith](/coaches/).",
+        p: "Enter your coach's code (or open their invite link) and you'll see exactly what they'll see before you agree: your workouts from the last year, how long you trained, how hard sets felt and your weekly goal. Everything else is a switch you control for each coach: heart rate, workout notes, readiness and recovery, body data, pain and injuries, and your cycle. Heart rate and notes start switched on and the rest start off, and you can change any of them before you agree. They never see your gyms or photos. You can change what you share, or stop sharing, at any time, and being a client is free. Coaches can read more on [coaching in Liftsmith](/coaches/).",
       },
     ],
     faq: [
-      ["Does my coach see my heart rate in Liftsmith?", "No. Coaches see your training only, never heart rate or health readings."],
+      [
+        "Does my coach see my heart rate in Liftsmith?",
+        "Only if you share it. Heart rate is its own switch for each coach, and so are readiness and recovery, body data, pain and injuries, and your cycle.",
+      ],
       ["Can I stop sharing with my coach?", "Yes, at any time, from Settings › Coaching. They lose access straight away."],
       ["Do I need to pay to work with a coach in Liftsmith?", "No. Being a client is free."],
     ],

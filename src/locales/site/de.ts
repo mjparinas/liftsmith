@@ -445,19 +445,24 @@ export const de: SiteText = {
     },
     see: {
       title: "Was du siehst und was nicht",
-      body: "Kunden stimmen zu, bevor etwas geteilt wird, und können das Teilen jederzeit beenden. Dann verlierst du sofort den Zugriff.",
-      seesLabel: "Du siehst",
+      body: "Kunden stimmen zu, bevor etwas geteilt wird, und wählen Punkt für Punkt, was du siehst. Sie können das jederzeit ändern oder das Teilen beenden, und du verlierst sofort den Zugriff.",
+      seesLabel: "Du siehst immer",
       sees: [
         "Workouts des letzten Jahres: Übungen, Sätze, Gewichte und Wiederholungen",
         "Wie lange sie trainiert haben und wie schwer sich Sätze anfühlten",
         "Ihr Wochenziel und neue Bestwerte",
       ],
-      neverLabel: "Du siehst nie",
-      never: [
-        "Herzfrequenz, Körpergewicht, Körperfett oder Maße",
-        "Gesundheitswerte, Bereitschaft oder Zyklus",
-        "Verletzungen, Notizen, Studios oder Fotos",
+      optLabel: "Nur wenn sie es einschalten",
+      opt: [
+        "Herzfrequenz und Kalorien jedes Workouts",
+        "Ihre Workout-Notizen",
+        "Form und Erholung: Befinden, Schlaf, HRV und Ruhepuls",
+        "Körpergewicht, Körperfett, Maße und Ernährung",
+        "Schmerzen und Verletzungen",
+        "Ihr Zyklus",
       ],
+      neverLabel: "Du siehst nie",
+      never: ["Fortschrittsfotos", "Ihre Studios oder wo sie trainieren"],
     },
     cost: {
       title: "Was es kostet",
@@ -477,7 +482,7 @@ export const de: SiteText = {
       },
       {
         q: "Kann ich ihre Herzfrequenz oder ihr Körpergewicht sehen?",
-        a: "Nur, was sie freigeben. Du siehst ihr Training. Jeder Kunde kann seine Körperdaten oder seine Schmerzen und Verletzungen mit dir teilen; Gesundheitswerte und Notizen verlassen nie sein Konto.",
+        a: "Nur, was sie freigeben. Ihr Training siehst du immer. Jeder Kunde kann Herzfrequenz, Workout-Notizen, Form und Erholung, Körperdaten, Schmerzen und Verletzungen oder den Zyklus einzeln mit dir teilen und jederzeit wieder ausschalten.",
       },
       {
         q: "Können Physiotherapeuten und Reha-Fachleute es nutzen?",

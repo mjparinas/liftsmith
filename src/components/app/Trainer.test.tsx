@@ -175,13 +175,17 @@ describe("trainer mode", () => {
     await u.type(await screen.findByLabelText(/Got a code from your coach/), "abcd-2345");
     await u.click(screen.getByRole("button", { name: "Check code" }));
     expect(await screen.findByText("Share your workouts with Sam?")).toBeInTheDocument();
-    expect(screen.getByText(/won't see your heart rate/)).toBeInTheDocument();
+    expect(screen.getByText(/Everything else stays private/)).toBeInTheDocument();
+    // Heart rate and notes start switched on, the rest off; the client turns off notes before agreeing.
+    expect(screen.getByRole("switch", { name: /Share heart rate with Sam/ })).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByRole("switch", { name: /Share readiness and recovery with Sam/ })).toHaveAttribute("aria-checked", "false");
+    await u.click(screen.getByRole("switch", { name: /Share workout notes with Sam/ }));
     // Looking links nothing.
     expect(calls.some((c) => (c.body as { action?: string } | undefined)?.action === "join")).toBe(false);
     await u.click(screen.getByRole("button", { name: "Share my workouts" }));
     expect(await screen.findByText("Done. Your coach can now see your workouts.")).toBeInTheDocument();
     expect(calls.find((c) => (c.body as { action?: string })?.action === "join")).toMatchObject({
-      body: { code: "ABCD2345" },
+      body: { code: "ABCD2345", shares: ["hr"] },
       auth: "Bearer tok",
     });
     expect(await screen.findByRole("button", { name: "Stop sharing with Sam" })).toBeInTheDocument();
@@ -379,7 +383,39 @@ describe("chat and body data", () => {
     expect(await screen.findByText("Body fat")).toBeInTheDocument();
     expect(screen.getByText("24%")).toBeInTheDocument();
     expect(screen.getByText("Waist")).toBeInTheDocument();
-    expect(screen.getByText(/They share their body data with you/)).toBeInTheDocument();
+    expect(screen.getByText("Alex also shares body data with you.")).toBeInTheDocument();
+  });
+
+  it("a coach sees each thing a client shares, item by item, and is told when they're unwell", async () => {
+    const base = fetch;
+    const now = Date.now();
+    vi.stubGlobal("fetch", async (url: string, init: RequestInit = {}) => {
+      if (url === "/api/coach/?client=c1") {
+        const [start, set, end] = makeWorkout("w1", now - 3 * 3600_000, [{}]);
+        return Response.json({
+          name: "Alex",
+          daysPerWeek: 3,
+          plans: [],
+          shares: ["hr", "notes", "health"],
+          events: [
+            start,
+            set,
+            { ...end, avgHr: 131.6, maxHr: 168 },
+            { id: "n1", at: now - 3600_000, type: "sessionNote", sessionId: "w1", text: "Knees felt fine today" },
+            { id: "f1", at: now - 1800_000, type: "feel", energy: -1, unwell: true },
+            { id: "h1", at: now - 3600_000, type: "health", metric: "sleep", day: new Date(now).toISOString().slice(0, 10), value: 5.5 },
+          ],
+        });
+      }
+      return base(url, init);
+    });
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Avg 132 bpm · max 168 bpm")).toBeInTheDocument();
+    expect(screen.getByText("Knees felt fine today")).toBeInTheDocument();
+    expect(screen.getByText("Feeling unwell")).toBeInTheDocument();
+    expect(screen.getByText("Sleeping 5.5 h a night")).toBeInTheDocument();
+    expect(screen.getByText("Sleep: 5.5 h a night")).toBeInTheDocument();
+    expect(screen.getByText("Alex also shares heart rate, workout notes, and readiness and recovery with you.")).toBeInTheDocument();
   });
 
   it("a physio sees pain first and assigns a rehab program with times a week (physio support)", async () => {

@@ -5,7 +5,7 @@
 // `code`), "unassign" (with the plan's `id`), "setup" (what the coach's new clients start setup with: `setup`) and
 // "note" (the coach's note to a client: `client`, `text`; empty text clears it), "send" (a chat message to the other
 // side: `id`, `text`), "targets" (a coach's daily calories and protein for a client: `client`, `kcal`, `protein`;
-// both empty clears them), "share" (a client shares body data, or with `what` "pain" pain and injuries, with a coach or
+// both empty clears them), "share" (a client shares body data, or with `what` one of SHARE_KINDS (heart rate, notes, readiness, pain, cycle), with a coach or
 // stops: `id`, `on`), "alerts" (a coach's alerts on or off: `on`), "role" (personal trainer, coach or physio: `role`) and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // Booking (coachBooking.ts): "slots" (open times: `slot` with start, minutes, place, weeks and maybe client),
 // "book" (a client: `id`) and "cancelSlot" (either side: `id`), each with `label`, the time as the phone shows it, for
@@ -124,6 +124,7 @@ export async function POST(req: Request) {
         platform?: unknown;
         lang?: unknown;
         what?: unknown;
+        shares?: unknown;
         kind?: unknown;
         perWeek?: unknown;
         kcal?: unknown;
@@ -145,7 +146,10 @@ export async function POST(req: Request) {
       return reply(req, 200, { ok: true });
     case "preview":
     case "join": {
-      const r = body.action === "join" ? await joinCoach(s.accountId, body.code) : await previewInvite(s.accountId, body.code);
+      const r =
+        body.action === "join"
+          ? await joinCoach(s.accountId, body.code, Date.now(), body.shares)
+          : await previewInvite(s.accountId, body.code);
       if ("error" in r) return reply(req, r.error === "slow" ? 429 : r.error === "unknown" ? 404 : 409, r);
       return reply(req, 200, r);
     }
