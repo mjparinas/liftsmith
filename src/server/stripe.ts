@@ -359,6 +359,8 @@ export interface StripeEvent {
   type: string;
   created: number;
   livemode: boolean;
+  /** Set only on events from a connected account (a coach's Stripe Connect account, coachPay.ts). */
+  account?: string;
   data: { object: unknown; previous_attributes?: Record<string, unknown> };
 }
 
@@ -466,6 +468,10 @@ export async function storeStripeEvent(
   if (!e?.id || !e.type || !e.data?.object) return { stored: false, eventId: null };
   // Test events reach a live endpoint (Stripe's dashboard "send test event"), and the other way round: keep them apart.
   if (cfg && e.livemode !== cfg.live) return { stored: false, eventId: null };
+  // A coach's client payments happen on the coach's own connected account and belong to the Connect webhook
+  // (/api/coach/stripe/). If this endpoint is ever set to listen to connected accounts too, they must never count as
+  // Pro or as Liftsmith's revenue here.
+  if (e.account) return { stored: false, eventId: null };
   const at = (e.created ?? Math.floor(now / 1000)) * 1000;
   const id = `st-${e.id}`;
   const stmts: Stmt[] = [];
