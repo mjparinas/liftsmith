@@ -2,7 +2,7 @@
 
 // Delightful extras on Today, Done and Progress: moments (anniversaries, comebacks, tonnage), seasonal
 // challenges, newly earned themes, "same as last time", the general warm-up, gym buddy check-ins, the
-// lifetime tonnage card, the strength score and the recap entry. Kept here so the screens they sit on only
+// the strength score and the recap and photos entry. Kept here so the screens they sit on only
 // gain one line each.
 import { useMemo, useState } from "react";
 
@@ -10,14 +10,14 @@ import { checkinText, shareText } from "@/lib/buddy";
 import { lastWorkout, repeatPlan } from "@/lib/ghost";
 import { date, t as tr } from "@/lib/i18n";
 import { haptic } from "@/lib/juice";
-import { doneMoments, todayMoments, tonnage, type Moment } from "@/lib/moments";
+import { doneMoments, todayMoments, type Moment } from "@/lib/moments";
 import { suggestedPeriod } from "@/lib/recap";
 import { nextSeasonal, seasonalChallenges } from "@/lib/seasonal";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength, twins } from "@/lib/strength";
 import { newlyUnlocked, unlockContext } from "@/lib/themes";
 import { MUSCLE_LABEL, type Muscle } from "@/lib/types";
-import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
+import { fmtNum, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 import type { MessageKey } from "@/locales/en";
 
@@ -317,48 +317,27 @@ export function DoneMoments() {
 
 // --- Progress ---------------------------------------------------------------------------------
 
-/** Lifetime tonnage with the next "you've lifted a ..." milestone, and the recap and photos entries. */
-export function TonnageCard() {
-  const { stats, profile } = useApp();
-  const t = tonnage(stats.totalVolume);
+/** The month or year recap and the private body photos, side by side (Progress). */
+export function RecapAndPhotos() {
   const now = useNow(3600_000);
   const p = suggestedPeriod(now);
   return (
-    <>
-      <div className="card mt-3 p-4">
-        {/* The total itself is the Volume tile above it, in the same units (fmtVolume); this card says what it's like. */}
-        <span className="text-xs uppercase tracking-wider text-faint">{tr("x.total")}</span>
-        <p className="mt-1 text-sm text-muted">
-          {t.last ? tr("x.moreThan", { emoji: t.last.emoji, name: t.last.name }) : tr("x.firstMilestone")}
-        </p>
-        {t.next && (
-          <>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-raised">
-              <div className="h-full rounded-full bg-gradient-to-r from-accent to-good" style={{ width: `${t.progress * 100}%` }} />
-            </div>
-            <p className="num mt-1.5 text-xs text-faint">
-              {tr("x.toGo", { left: fmtVolume(t.next.kg - stats.totalVolume, profile.unit), name: t.next.name, emoji: t.next.emoji })}
-            </p>
-          </>
-        )}
-      </div>
-      <div className="mt-3 grid grid-cols-2 gap-3">
-        <button
-          type="button"
-          onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)}
-          className="press card p-4 text-left"
-        >
-          <Badge icon={p.kind === "year" ? "trophy" : "calendar"} tint="var(--color-violet)" />
-          <span className="mt-2 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
-          <span className="block text-xs text-muted">{tr("x.highlights")}</span>
-        </button>
-        <button type="button" onClick={() => go("photos")} className="press card p-4 text-left">
-          <Badge icon="camera" tint="var(--color-cyan)" />
-          <span className="mt-2 block font-semibold">{tr("x.photos")}</span>
-          <span className="block text-xs text-muted">{tr("x.private")}</span>
-        </button>
-      </div>
-    </>
+    <div className="desk-span mt-3 grid grid-cols-2 gap-3">
+      <button
+        type="button"
+        onClick={() => go("recap", p.kind === "year" ? `y${new Date(p.start).getFullYear()}` : `m${p.start}`)}
+        className="press card p-4 text-left"
+      >
+        <Badge icon={p.kind === "year" ? "trophy" : "calendar"} tint="var(--color-violet)" />
+        <span className="mt-2 block font-semibold">{p.kind === "year" ? tr("x.year") : tr("x.month")}</span>
+        <span className="block text-xs text-muted">{tr("x.highlights")}</span>
+      </button>
+      <button type="button" onClick={() => go("photos")} className="press card p-4 text-left">
+        <Badge icon="camera" tint="var(--color-cyan)" />
+        <span className="mt-2 block font-semibold">{tr("x.photos")}</span>
+        <span className="block text-xs text-muted">{tr("x.private")}</span>
+      </button>
+    </div>
   );
 }
 

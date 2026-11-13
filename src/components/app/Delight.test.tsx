@@ -130,11 +130,11 @@ describe("Today and Progress extras", () => {
     expect(useApp.getState().events.find((e) => e.type === "checkin")).toMatchObject({ buddies: ["Sam"] });
   });
 
-  it("shows lifetime tonnage, the recap, body weight and themes", async () => {
+  it("shows the recap, body weight and themes", async () => {
     const user = userEvent.setup();
     await onboard(user);
     location.hash = "#/stats";
-    expect(await screen.findByText("Lifted in total")).toBeInTheDocument();
+    expect(await screen.findByRole("button", { name: /Monthly recap|Your year in lifting/ })).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /Body and photos/ }));
     await user.clear(await screen.findByRole("textbox", { name: /Body weight in/ }));
     await user.type(screen.getByRole("textbox", { name: /Body weight in/ }), "81.5");
