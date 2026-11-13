@@ -596,8 +596,10 @@ try {
   await page.evaluate(() => localStorage.removeItem("liftsmith.account"));
   await page.unroute("**/api/social/");
   await page.unroute("**/api/sync/");
-  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against.
+  // Trainer mode (2026-11-11): signed out here, because the static build has no API to sign in against. The page was
+  // just on #/trainer signed in, so reload for the signed-out page.
   await page.goto(`${server.url}/app/#/trainer`);
+  await page.reload();
   await page.getByRole("heading", { name: "Coaching" }).waitFor();
   await scan("trainer");
   await page.goto(`${server.url}/app/#/settings`);
