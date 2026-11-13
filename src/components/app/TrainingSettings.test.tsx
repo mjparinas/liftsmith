@@ -52,6 +52,28 @@ describe("Settings › Workout preferences", () => {
     expect(training()?.sets).toBeUndefined();
   });
 
+  it("lists exercises picked less often after swaps, and Reset picks one as usual again", async () => {
+    const user = userEvent.setup();
+    const at = Date.now() - 60_000;
+    const swap = (id: string, from: string) => ({
+      type: "swap" as const,
+      id,
+      at,
+      sessionId: "s1",
+      from,
+      to: "db-bench-press",
+      avoid: false,
+    });
+    // Not available here says nothing about taste, so it isn't listed.
+    useApp.setState({ events: [swap("w1", "bench-press"), swap("w2", "bench-press"), { ...swap("w3", "leg-press"), avoid: true }] });
+    render(<TrainingSettings />);
+    expect(screen.getByRole("heading", { name: "Picked less often" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Pick Leg press as usual again" })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "Pick Barbell bench press as usual again" }));
+    expect(training()?.pickResets?.["bench-press"]).toBeGreaterThanOrEqual(at);
+    expect(screen.queryByRole("heading", { name: "Picked less often" })).toBeNull();
+  });
+
   it("has the rest timer in Settings › Workout, as switches", async () => {
     const user = userEvent.setup();
     render(<RestTimerSettings />);

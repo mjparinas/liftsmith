@@ -71,6 +71,10 @@ export const it: FeaturesText = {
       body: "Sceglie esercizi che la tua palestra permette e per cui i tuoi muscoli sono pronti, poi fissa ogni peso e ripetizione in base ai tuoi ultimi allenamenti.",
       proPart: "Senza Pro hai un allenamento adattivo a settimana accanto al programma gratuito; Pro pianifica ogni giorno.",
     },
+    "pick-weights": {
+      name: "Impara gli esercizi che ti piacciono",
+      body: "Gli esercizi più popolari vengono scelti più spesso. Metti una stella a un esercizio e uscirà molto di più; sostituiscilo e uscirà meno, per qualche mese.",
+    },
     splits: {
       name: "Split adattivi",
       body: "Spinta, tirata e gambe o parte alta e bassa, comunque adattati al tuo recupero ogni giorno.",

@@ -75,6 +75,10 @@ export const fr: FeaturesText = {
       body: "Choisit des exercices que votre salle permet et pour lesquels vos muscles sont prêts, puis fixe chaque charge et chaque répétition d’après vos dernières séances.",
       proPart: "Sans Pro, vous avez une séance adaptative par semaine en plus de votre programme gratuit ; Pro planifie chaque jour.",
     },
+    "pick-weights": {
+      name: "Apprend les exercices que vous aimez",
+      body: "Les exercices populaires sont choisis le plus souvent. Mettez une étoile à un exercice et il revient bien plus ; remplacez-le et il revient moins, pendant quelques mois.",
+    },
     splits: {
       name: "Splits adaptatifs",
       body: "Poussée, tirage, jambes ou haut et bas du corps, toujours ajustés à votre récupération chaque jour.",

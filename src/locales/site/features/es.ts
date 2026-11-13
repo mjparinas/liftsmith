@@ -70,6 +70,10 @@ export const es: FeaturesText = {
       body: "Elige ejercicios que tu gimnasio permite y para los que tus músculos están listos, y fija cada peso y repetición a partir de tus últimos entrenamientos.",
       proPart: "Sin Pro tienes un entrenamiento adaptativo a la semana junto a tu programa gratuito; Pro planifica todos los días.",
     },
+    "pick-weights": {
+      name: "Aprende qué ejercicios te gustan",
+      body: "Los ejercicios populares se eligen más a menudo. Marca uno con estrella y saldrá mucho más; cámbialo por otro y saldrá menos, durante unos meses.",
+    },
     splits: {
       name: "Rutinas divididas adaptativas",
       body: "Empuje, tirón y pierna o torso y pierna, ajustadas igualmente a tu recuperación cada día.",

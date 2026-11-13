@@ -93,17 +93,18 @@ describe("the lifter's priorities, favourites and variety", () => {
     expect(ranks).toEqual([...ranks].sort((a, b) => a - b));
   });
 
-  it("picks a favourite whenever its muscle is trained", () => {
+  it("picks a favourite on most days its muscle is trained (pickWeights.ts)", () => {
     const p = makeProfile({ training: { favourites: ["front-squat"] } });
-    let seen = 0;
-    for (let d = 0; d < 10; d++) {
+    let quads = 0;
+    let fav = 0;
+    for (let d = 0; d < 20; d++) {
       const plan = generate({ gym, profile: p, events: [], minutes: 45, now: NOW + d * DAY });
-      for (const i of plan.items.filter((x) => x.focus === "quads")) {
-        expect(i.exerciseId).toBe("front-squat");
-        seen++;
-      }
+      const q = plan.items.filter((x) => x.focus === "quads");
+      quads += Number(q.length > 0);
+      fav += Number(q.some((i) => i.exerciseId === "front-squat"));
     }
-    expect(seen).toBeGreaterThan(0);
+    expect(quads).toBeGreaterThan(0);
+    expect(fav / quads).toBeGreaterThan(0.6);
   });
 
   it("a consistent lifter keeps last time's exercises more often than a lifter who likes variety", () => {
@@ -215,8 +216,12 @@ describe("the day's call with an injury", () => {
   });
 
   it("on an easy day an injured lift loses a set but no more load", () => {
-    const normal = generate({ gym, profile, events: evs, minutes: 60, now: NOW });
-    const easy = generate({ gym, profile, events: evs, minutes: 60, now: NOW, call: "recover" });
+    // The first day whose plan has a lift kept lighter (which lifts come up depends on the day's draw).
+    const day = Array.from({ length: 14 }, (_, d) => NOW + d * DAY).find((now) =>
+      generate({ gym, profile, events: evs, minutes: 60, now, call: "recover" }).items.some((i) => i.injuryPct),
+    )!;
+    const normal = generate({ gym, profile, events: evs, minutes: 60, now: day });
+    const easy = generate({ gym, profile, events: evs, minutes: 60, now: day, call: "recover" });
     const lit = easy.items.find((i) => i.injuryPct)!;
     const before = normal.items.find((i) => i.exerciseId === lit.exerciseId)!;
     expect(lit.target.weight).toBe(before.target.weight);
