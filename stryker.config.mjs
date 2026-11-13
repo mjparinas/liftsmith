@@ -5,7 +5,7 @@
 const config = {
   testRunner: "vitest5",
   plugins: ["@stryker-mutator/*", "./scripts/stryker-vitest5.mjs"],
-  vitest: { configFile: "vitest.config.mts", related: true },
+  vitest: { configFile: "vitest.mutation.config.mts", related: true },
   coverageAnalysis: "perTest",
   mutate: [
     "src/lib/readiness.ts",
@@ -26,8 +26,9 @@ const config = {
   tempDirName: ".stryker-tmp",
   incremental: true,
   incrementalFile: "reports/mutation/stryker-incremental.json",
-  // Ratchet: the first run scored 34%, mostly untested engine paths. Raise break as tests land (target 60).
-  thresholds: { high: 85, low: 70, break: 30 },
+  // Ratchet: the first run scored 34%; 55% on 2026-11-13, then 67.5% after tests for readiness, loads,
+  // progression and the generator. Raise break as tests land (Gradelings aims for 85).
+  thresholds: { high: 85, low: 70, break: 60 },
   concurrency: 4,
   timeoutMS: 20000,
   ignoreStatic: true,
