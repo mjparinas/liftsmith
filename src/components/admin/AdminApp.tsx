@@ -26,7 +26,7 @@ import { SearchConsole } from "./SearchConsole";
 import { System } from "./System";
 import { countryName } from "./time";
 import { Todo } from "./Todo";
-import { loadTwoFactor, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
+import { sessionGate, TwoFactorGate, type TwoFactorInfo } from "./TwoFactor";
 import { Users } from "./Users";
 
 type Staff = { email: string; role: "admin" | "support" };
@@ -612,15 +612,18 @@ export function AdminApp() {
   }, [state, inboxCount, todoCount, reportsCount]);
   useEffect(() => {
     let live = true;
-    fetch(`/api/admin/stats/?days=${days}`)
+    const stats = () => fetch(`/api/admin/stats/?days=${days}`);
+    stats()
+      // A lone 404 is asked again once before it counts, so one odd answer doesn't look like a sign-out.
+      .then((r) => (r.status === 404 ? new Promise<void>((done) => setTimeout(done, 1500)).then(stats) : r))
       .then(async (r) => {
         if (!live) return;
         if (r.status === 404) {
           // Signed in with the link but not past the second step yet, or not signed in at all.
-          const tf = await loadTwoFactor();
+          const gate = await sessionGate();
           if (!live) return;
-          setTwoFactor(tf);
-          return setState(tf && !tf.ready ? "twofactor" : "signin");
+          setTwoFactor(gate.info);
+          return setState(gate.state);
         }
         if (!r.ok) return setState("error");
         const j = (await r.json()) as Data;
