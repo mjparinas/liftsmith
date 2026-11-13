@@ -396,7 +396,9 @@ describe("first run to finished workout", () => {
     await user.click(screen.getByRole("button", { name: /Log set/ }));
     await user.click(screen.getByRole("button", { name: "End" }));
     await user.click(screen.getByRole("button", { name: "Finish and save" }));
-    await user.click(await screen.findByRole("button", { name: "Save as a routine" }));
+    // Sharing and saving sit behind one button on the end screen.
+    await user.click(await screen.findByRole("button", { name: "Share or save" }));
+    await user.click(screen.getByRole("button", { name: "Save as a routine" }));
     dialog = screen.getByRole("dialog");
     await user.type(within(dialog).getByLabelText("Name"), "Short one");
     await user.click(within(dialog).getByRole("button", { name: "Save routine" }));
@@ -627,7 +629,9 @@ describe("game layer", () => {
     expect(within(unlockedList).getByText("Showing up")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /You earned a crate/ }));
     expect(screen.getByText(/Common|Rare|Epic|Legendary/)).toBeInTheDocument();
-    expect(screen.getByText(/-week streak/)).toBeInTheDocument();
+    // No streak yet after one workout, so the end screen leaves the streak card out; the league is on Awards.
+    expect(screen.queryByText(/-week streak/)).toBeNull();
+    expect(screen.queryByText(/Bronze league/)).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "See all awards" }));
     expect(await screen.findByRole("heading", { name: "Awards" })).toBeInTheDocument();

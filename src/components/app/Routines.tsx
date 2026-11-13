@@ -164,7 +164,7 @@ export function SaveDoneAsRoutine({ items }: { items: RoutineItem[] }) {
       <Button
         kind="quiet"
         icon={saved ? "check" : "layers"}
-        className="mt-3 w-full"
+        className="w-full"
         disabled={saved}
         onClick={() => setEditing({ ...routineFrom(items, "", newId(), Date.now()), name: "" })}
       >

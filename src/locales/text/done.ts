@@ -18,6 +18,7 @@ export const en = {
   "done.badges": "Badges unlocked",
   "done.quests": "Quests completed",
   "done.share": "Share this workout",
+  "done.shareSave": "Share or save",
   "done.done": "Done",
   "done.remixShare": "Send it to a friend to try",
   "done.remixHint": "Friends get it rebuilt for their own gym and weights. Only exercises, sets and reps are in the link.",
@@ -58,6 +59,7 @@ export const es: Partial<Record<Key, Message>> = {
   "done.badges": "Insignias desbloqueadas",
   "done.quests": "Misiones completadas",
   "done.share": "Compartir este entrenamiento",
+  "done.shareSave": "Compartir o guardar",
   "done.done": "Listo",
   "done.remixShare": "Envíaselo a un amigo",
   "done.remixHint": "Tus amigos lo reciben adaptado a su gimnasio y sus pesos. El enlace solo lleva ejercicios, series y repeticiones.",
@@ -96,6 +98,7 @@ export const fr: Partial<Record<Key, Message>> = {
   "done.badges": "Badges débloqués",
   "done.quests": "Quêtes terminées",
   "done.share": "Partager cette séance",
+  "done.shareSave": "Partager ou enregistrer",
   "done.done": "Terminé",
   "done.remixShare": "Envoyer à un ami",
   "done.remixHint":
@@ -138,6 +141,7 @@ export const de: Partial<Record<Key, Message>> = {
   "done.badges": "Freigeschaltete Abzeichen",
   "done.quests": "Abgeschlossene Aufgaben",
   "done.share": "Dieses Training teilen",
+  "done.shareSave": "Teilen oder speichern",
   "done.done": "Fertig",
   "done.remixShare": "An einen Freund zum Ausprobieren schicken",
   "done.remixHint":
@@ -177,6 +181,7 @@ export const it: Partial<Record<Key, Message>> = {
   "done.badges": "Badge sbloccati",
   "done.quests": "Missioni completate",
   "done.share": "Condividi questo allenamento",
+  "done.shareSave": "Condividi o salva",
   "done.done": "Fatto",
   "done.remixShare": "Mandalo a un amico da provare",
   "done.remixHint":
@@ -219,6 +224,7 @@ export const ja: Partial<Record<Key, Message>> = {
   "done.badges": "獲得したバッジ",
   "done.quests": "達成したクエスト",
   "done.share": "このワークアウトを共有",
+  "done.shareSave": "共有・保存",
   "done.done": "完了",
   "done.remixShare": "友だちに送って試してもらう",
   "done.remixHint": "友だちのジムと重量に合わせて組み直されます。リンクに含まれるのは種目、セット数、回数だけです。",
