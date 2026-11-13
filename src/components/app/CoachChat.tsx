@@ -11,6 +11,8 @@ import { track } from "@/lib/analytics";
 import { useAccount } from "@/lib/auth";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { useKeyboardViewport } from "@/lib/keyboard";
+import { useDesktop } from "@/lib/layout";
 import { liveRead } from "@/lib/liveRead";
 import { startPush } from "@/lib/push";
 import { loadMessages, markRead, MESSAGE_MAX, sendMessage, trainerError, type Message } from "@/lib/trainer";
@@ -29,8 +31,10 @@ export function ChatScreen({ id }: { id: string }) {
 }
 
 /**
- * One chat thread. On its own screen it has the header and a send box above the tab bar; `embedded` (the coach's
- * Messages page on a desktop, beside the list of people) drops the header and scrolls inside its own box.
+ * One chat thread. On its own screen on a phone or tablet it fills the visible screen: the header at the top, the send
+ * box fixed at the bottom above the tab bar (or on the keyboard while typing), and only the messages scroll between
+ * them (Melvin, 2026-11-13). On a desktop's own screen it's a page with the send box stuck to the bottom; `embedded`
+ * (the coach's Messages page on a desktop, beside the list of people) drops the header and scrolls inside its own box.
  */
 export function ChatThread({ id, embedded = false }: { id: string; embedded?: boolean }) {
   const me = useAccount((s) => s.account?.id ?? "");
@@ -43,7 +47,14 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
   const [gone, setGone] = useState(false);
   const [them, setThem] = useState<"coach" | "client" | null>(null);
   const end = useRef<HTMLDivElement>(null);
-  const box = useRef<HTMLOListElement>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const desktop = useDesktop();
+  // Phone and tablet: the thread is a pane the size of the visible screen, and only its list scrolls.
+  const pane = !embedded && !desktop;
+  const inBox = embedded || pane;
+  useKeyboardViewport(pane);
+  // Whether the newest message was in view, so a list that shrinks (the keyboard opening) keeps it there.
+  const atEnd = useRef(true);
 
   const load = useCallback(
     () =>
@@ -97,18 +108,38 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
   // The newest message in view whenever the list grows at the bottom.
   const last = list?.[list.length - 1]?.id;
   useEffect(() => {
-    // Beside the list, only the thread's own box scrolls, so the page stays where it is.
-    if (embedded && box.current) box.current.scrollTop = box.current.scrollHeight;
+    // In a box, only the thread's own list scrolls, so the page stays where it is.
+    if (inBox && box.current) box.current.scrollTop = box.current.scrollHeight;
     else end.current?.scrollIntoView?.({ block: "end" });
-  }, [last, embedded]);
+    atEnd.current = true;
+  }, [last, inBox]);
+
+  // The keyboard opening or the send box growing shrinks the list: keep the newest message in view if it was.
+  useEffect(() => {
+    const el = box.current;
+    if (!inBox || !el || typeof ResizeObserver === "undefined") return;
+    const ro = new ResizeObserver(() => {
+      if (atEnd.current) el.scrollTop = el.scrollHeight;
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [inBox]);
+  const onScroll = () => {
+    const el = box.current;
+    if (el) atEnd.current = el.scrollHeight - el.scrollTop - el.clientHeight < 48;
+  };
 
   const older = async () => {
     const first = list?.[0];
     if (!first) return;
     try {
       const r = await loadMessages(id, first.at);
+      // Older messages go above the ones being read, so keep those where they are on screen.
+      const el = box.current;
+      const below = el ? el.scrollHeight - el.scrollTop : 0;
       setMore(r.more);
       setList((old) => [...r.messages, ...(old ?? [])]);
+      if (inBox && el) requestAnimationFrame(() => (el.scrollTop = el.scrollHeight - below));
     } catch (e) {
       oops();
       setError(trainerError(e));
@@ -147,57 +178,74 @@ export function ChatThread({ id, embedded = false }: { id: string; embedded?: bo
       </div>
     );
   return (
-    <div className={embedded ? "card flex h-[70dvh] flex-col p-4" : "flex min-h-[70dvh] flex-col pb-2"}>
+    <div
+      className={embedded ? "card flex h-[70dvh] flex-col p-4" : pane ? "vv-pane max-w-lg px-5" : "flex min-h-[70dvh] flex-col pb-2"}
+      data-testid="chat-thread"
+    >
       {embedded ? (
         <p className="font-semibold">{who}</p>
       ) : (
-        <ScreenHeader back={back} kicker={them === "coach" ? t("trn.chatCoach") : t("trn.chat")} title={who} />
+        <ScreenHeader className="shrink-0" back={back} kicker={them === "coach" ? t("trn.chatCoach") : t("trn.chat")} title={who} />
       )}
       {more && (
-        <Button kind="quiet" className="mt-2 self-center" onClick={() => void older()}>
+        <Button kind="quiet" className="mt-2 shrink-0 self-center" onClick={() => void older()}>
           {t("trn.older")}
         </Button>
       )}
-      <ol ref={box} className={`mt-3 flex-1 space-y-2 ${embedded ? "overflow-y-auto" : ""}`} aria-live="polite" aria-label={t("trn.chat")}>
-        {list === null ? (
-          <li className="text-sm text-muted">{t("trn.loading")}</li>
-        ) : list.length === 0 ? (
-          // Each side's empty thread speaks to them: a client is asked to tell their coach how training is going,
-          // a coach to ask (Melvin, 2026-11-13: the old line read as if it were for the coach on both sides).
-          <li className="px-1 text-sm text-muted">
-            {them === "coach" ? t("trn.chatEmptyClient", { name: who }) : t("trn.chatEmptyCoach", { name: who })}
-          </li>
-        ) : (
-          list.map((m) => {
-            const mine = m.from === me;
-            return (
-              <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
-                <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-2 ${mine ? "bg-accent/15 text-ink" : "card"}`}
-                  aria-label={t("trn.chatLine", {
-                    who: mine ? t("trn.you") : who,
-                    date: date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }),
-                  })}
-                >
-                  <p className="whitespace-pre-line break-words">{m.text}</p>
-                  <p className="mt-1 text-right text-xs text-muted">
-                    {date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
-                  </p>
-                </div>
-              </li>
-            );
-          })
-        )}
-      </ol>
-      <div ref={end} />
+      <div
+        ref={box}
+        onScroll={inBox ? onScroll : undefined}
+        className={`mt-3 flex-1 ${inBox ? "min-h-0 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent,black_1rem)]" : ""}`}
+        // A scrolling box must be reachable by keyboard (axe: scrollable-region-focusable).
+        {...(inBox ? { role: "region", tabIndex: 0, "aria-label": t("trn.chat") } : {})}
+      >
+        <ol className="space-y-2" aria-live="polite" aria-label={inBox ? undefined : t("trn.chat")}>
+          {list === null ? (
+            <li className="text-sm text-muted">{t("trn.loading")}</li>
+          ) : list.length === 0 ? (
+            // Each side's empty thread speaks to them: a client is asked to tell their coach how training is going,
+            // a coach to ask (Melvin, 2026-11-13: the old line read as if it were for the coach on both sides).
+            <li className="px-1 text-sm text-muted">
+              {them === "coach" ? t("trn.chatEmptyClient", { name: who }) : t("trn.chatEmptyCoach", { name: who })}
+            </li>
+          ) : (
+            list.map((m) => {
+              const mine = m.from === me;
+              return (
+                <li key={m.id} className={`flex ${mine ? "justify-end" : "justify-start"}`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-2 ${mine ? "bg-accent/15 text-ink" : "card"}`}
+                    aria-label={t("trn.chatLine", {
+                      who: mine ? t("trn.you") : who,
+                      date: date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }),
+                    })}
+                  >
+                    <p className="whitespace-pre-line break-words">{m.text}</p>
+                    <p className="mt-1 text-right text-xs text-muted">
+                      {date(m.at, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </li>
+              );
+            })
+          )}
+        </ol>
+      </div>
+      {!inBox && <div ref={end} />}
       {error && (
-        <p className="mt-2 text-sm text-warn" role="status">
+        <p className="mt-2 shrink-0 text-sm text-warn" role="status">
           {error}
         </p>
       )}
       <form
         onSubmit={(e) => void send(e)}
-        className={embedded ? "mt-3 border-t border-line pt-3" : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"}
+        className={
+          embedded
+            ? "mt-3 shrink-0 border-t border-line pt-3"
+            : pane
+              ? "card mt-3 shrink-0 p-3"
+              : "card sticky bottom-[var(--nav-h,0px)] mt-3 p-3"
+        }
       >
         <label htmlFor={`trn-chat-${id}`} className="sr-only">
           {t("trn.chatLabel")}
