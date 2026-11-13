@@ -557,6 +557,14 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "free",
         added: "2026-11-13",
       },
+      {
+        id: "coach-checkins",
+        name: "Check-in forms and questionnaires",
+        body: "Send clients a weekly check-in, an intake questionnaire or your own form, once or every week. They answer with a few taps, and a low score or a late answer lands at the top of their report.",
+        tier: "pro",
+        pro: "coaching",
+        added: "2026-11-13",
+      },
     ],
   },
   {

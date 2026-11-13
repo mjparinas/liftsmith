@@ -9,6 +9,7 @@
 import { create } from "zustand";
 
 import { api, AuthError, readAccount } from "./auth";
+import { checkinFlags, type Checkin, type CheckinFlag, type Form, type Repeat } from "./checkins";
 import { coachCode, coachSignup, saveCoachSignup } from "./coachInvite";
 import { derive, weekOf, type Pr, type SessionSummary } from "./derive";
 import { EXERCISE_BY_ID } from "./exercises";
@@ -82,6 +83,9 @@ export interface Overview {
   kinds?: Record<string, CoachKind>;
   /** Daily nutrition targets this lifter's coaches set them, newest first. */
   targets?: Targets[];
+  /** This coach's check-in forms, and the check-ins waiting for this lifter to answer. */
+  forms?: Form[];
+  checkins?: Checkin[];
 }
 /** A chat message between a coach and a client. */
 export interface Message {
@@ -123,6 +127,11 @@ export interface ClientView {
   kind?: CoachKind;
   /** This coach's daily nutrition targets for the client. */
   targets?: Targets | null;
+  /** The latest check-ins this coach sent the client, newest first, and the one that repeats weekly. */
+  checkins?: Checkin[];
+  repeat?: Repeat | null;
+  /** This coach's forms, to send from the report. */
+  forms?: Form[];
 }
 /** The longest note a coach can leave (the server's COACH_LIMITS.note). */
 export const NOTE_MAX = 500;
@@ -272,6 +281,7 @@ export type Flag =
   | { kind: "lowAdherence"; name: string; done: number; want: number }
   | { kind: "kcalOff"; avg: number; target: number; days: number }
   | { kind: "proteinShort"; avg: number; target: number; days: number }
+  | CheckinFlag
   | { kind: "onTrack"; done: number; goal: number };
 
 /** How an assigned routine is going: workouts since it was assigned that follow it. */
@@ -430,6 +440,8 @@ export function clientReport(view: ClientView, now: number): Report {
       if (rates.every((r) => r < 0.7)) flags.push({ kind: "missing", pct: Math.round((rates.reduce((a, b) => a + b, 0) / 3) * 100) });
     }
     for (const s of stalled.slice(0, 2)) flags.push({ kind: "stalled", exerciseId: s.exerciseId, weeks: s.weeks });
+    // What their latest check-in says, or that it's waiting.
+    for (const f of checkinFlags(view.checkins ?? [], now)) flags.push(f);
     // Eating against the coach's targets, from the food days a client shares with their body data.
     for (const f of foodFlags(view, now)) flags.push(f);
     // A routine given a week ago or more that hasn't been done yet.
@@ -521,6 +533,10 @@ export function flagText(f: Flag, names: ReadonlyMap<string, string>): { title: 
         advice: t("trn.f.proteinShortDo"),
         tone: "warn",
       };
+    case "checkinWaiting":
+      return { title: t("trn.f.checkinWaiting", { title: f.title, count: f.days }), advice: t("trn.f.checkinWaitingDo"), tone: "warn" };
+    case "checkinLow":
+      return { title: t("trn.f.checkinLow", { label: f.label, value: f.value }), advice: t("trn.f.checkinLowDo"), tone: "warn" };
     case "onTrack":
       return { title: t("trn.f.onTrack", { done: f.done, goal: f.goal }), advice: t("trn.f.onTrackDo"), tone: "good" };
   }
@@ -548,6 +564,8 @@ interface NotesState {
   notes: ShownNote[];
   /** Coaches or clients with unread messages, for Today and the Coaching row. */
   unread: Unread[];
+  /** Check-ins waiting for this lifter to answer, for Today. */
+  checkins: (Checkin & { coach: string })[];
   /** The newest daily nutrition targets from a coach, with the coach's name, for coach's notes and Health. */
   targets: (Targets & { coach: string }) | null;
   /** Notes "Got it" hid, as coachId:at, so an edited note shows again. */
@@ -573,6 +591,7 @@ function writeJson(key: string, v: unknown) {
 export const useCoachNotes = create<NotesState>(() => ({
   notes: typeof window === "undefined" ? [] : readJson<ShownNote[]>(CACHE, []),
   unread: [],
+  checkins: [],
   targets: typeof window === "undefined" ? null : readJson<(Targets & { coach: string }) | null>(TARGETS, null),
   seen: typeof window === "undefined" ? [] : readJson<string[]>(SEEN, []),
 }));
@@ -585,7 +604,9 @@ export function shownNotes(o: Pick<Overview, "notes" | "coaches">): ShownNote[] 
 }
 
 /** Keeps the latest notes for Today (Coaching calls it with what it loaded, so both agree). */
-export function keepNotes(o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets">>): void {
+export function keepNotes(
+  o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<Overview, "clients" | "unread" | "targets" | "checkins">>,
+): void {
   const notes = shownNotes(o);
   writeJson(CACHE, notes);
   const first = (o.targets ?? []).find((x) => o.coaches.some((c) => c.id === x.coachId));
@@ -595,7 +616,13 @@ export function keepNotes(o: Pick<Overview, "notes" | "coaches"> & Partial<Pick<
   const unread = Object.entries(o.unread ?? {})
     .filter(([, n]) => n > 0)
     .map(([id, count]) => ({ id, count, name: people.find((p) => p.id === id)?.name ?? "" }));
-  useCoachNotes.setState({ notes, unread, targets });
+  const checkins = (o.checkins ?? []).map((c) => ({ ...c, coach: o.coaches.find((p) => p.id === c.coachId)?.name ?? "" }));
+  useCoachNotes.setState({ notes, unread, targets, checkins });
+}
+
+/** A check-in was answered: it no longer waits on Today. */
+export function checkinDone(id: string): void {
+  useCoachNotes.setState((s) => ({ checkins: s.checkins.filter((c) => c.id !== id) }));
 }
 
 /** A chat was opened: its messages are read now. */
@@ -626,5 +653,5 @@ export function dismissNote(n: Note): void {
 export function forgetNotes(): void {
   writeJson(CACHE, []);
   writeJson(TARGETS, null);
-  useCoachNotes.setState({ notes: [], unread: [], targets: null });
+  useCoachNotes.setState({ notes: [], unread: [], targets: null, checkins: [] });
 }

@@ -9,6 +9,10 @@
 // stops: `id`, `on`), "alerts" (a coach's alerts on or off: `on`), "kind" (a coach works as a trainer or a physio: `kind`)
 // and "pushToken" (this phone's push token, for coaching pushes without Friends).
 // GET ?chat=<id>[&before=<ms>]: the messages with that person, which marks them read.
+// Check-ins (coachForms.ts): "form" (save a form: `form`), "deleteForm" (`id`), "sendForm" (`client`, `id`),
+// "repeatForm" (`client`, `id`, or no `id` to stop) and "answer" (the client: `id`, `answers`); GET ?checkin=<id> is
+// one of the client's to fill in. The overview adds the coach's `forms` and the client's waiting `checkins`, and a
+// client's view adds `checkins`, `repeat` and the coach's `forms`.
 import { preflight, readJson, reply, signedIn } from "@/server/accountHttp";
 import {
   assignPlan,
@@ -30,6 +34,17 @@ import {
   setTargets,
   unlink,
 } from "@/server/coach";
+import {
+  answerCheckin,
+  checkinFor,
+  checkinsOf,
+  deleteForm,
+  forms,
+  pendingCheckins,
+  saveForm,
+  sendForm,
+  setRepeat,
+} from "@/server/coachForms";
 import { saveToken } from "@/server/push";
 
 export const OPTIONS = preflight;
@@ -43,11 +58,21 @@ export async function GET(req: Request) {
     const r = await messages(s.accountId, chat, q.has("before") ? Number(q.get("before")) : undefined);
     return "error" in r ? reply(req, 404, r) : reply(req, 200, r);
   }
+  const checkin = q.get("checkin");
+  if (checkin !== null) {
+    const c = await checkinFor(s.accountId, checkin);
+    return c ? reply(req, 200, { checkin: c }) : reply(req, 404, { error: "gone" });
+  }
   const client = q.get("client");
-  if (client === null) return reply(req, 200, await overview(s.accountId));
+  if (client === null) {
+    const [o, mine, pending] = await Promise.all([overview(s.accountId), forms(s.accountId), pendingCheckins(s.accountId)]);
+    return reply(req, 200, { ...o, forms: mine, checkins: pending });
+  }
   if (!isAccountId(client)) return reply(req, 400, { error: "Bad request." });
   const view = await clientView(s.accountId, client);
-  return view ? reply(req, 200, view) : reply(req, 404, { error: "gone" });
+  if (!view) return reply(req, 404, { error: "gone" });
+  const [mine, sent] = await Promise.all([forms(s.accountId), checkinsOf(s.accountId, client)]);
+  return reply(req, 200, { ...view, ...sent, forms: mine });
 }
 
 export async function POST(req: Request) {
@@ -72,6 +97,8 @@ export async function POST(req: Request) {
         perWeek?: unknown;
         kcal?: unknown;
         protein?: unknown;
+        form?: unknown;
+        answers?: unknown;
       }
     | undefined;
   if (!body || typeof body !== "object") return reply(req, 400, { error: "Bad request." });
@@ -103,6 +130,28 @@ export async function POST(req: Request) {
       const r = await setTargets(s.accountId, body.client, body.kcal, body.protein);
       if (r && "error" in r) return reply(req, 404, r);
       return reply(req, 200, { targets: r });
+    }
+    case "form": {
+      const r = await saveForm(s.accountId, body.form);
+      if ("error" in r) return reply(req, r.error === "full" ? 409 : 400, r);
+      return reply(req, 200, { form: r });
+    }
+    case "deleteForm":
+      await deleteForm(s.accountId, body.id);
+      return reply(req, 200, { ok: true });
+    case "sendForm":
+    case "repeatForm": {
+      const r =
+        body.action === "sendForm"
+          ? await sendForm(s.accountId, body.client, body.id)
+          : await setRepeat(s.accountId, body.client, body.id ?? null);
+      if (r && "error" in r) return reply(req, r.error === "notClient" ? 404 : 400, r);
+      return reply(req, 200, body.action === "sendForm" ? { checkin: r } : { repeat: r });
+    }
+    case "answer": {
+      const r = await answerCheckin(s.accountId, body.id, body.answers);
+      if ("error" in r) return reply(req, r.error === "unknown" ? 404 : r.error === "answered" ? 409 : 400, r);
+      return reply(req, 200, { checkin: r });
     }
     case "send": {
       const r = await sendMessage(s.accountId, body.id, body.text);

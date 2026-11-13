@@ -295,6 +295,10 @@ export const fr: FeaturesText = {
       name: "Gratuit pour les équipes d’école secondaire",
       body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
     },
+    "coach-checkins": {
+      name: "Formulaires de bilan et questionnaires",
+      body: "Envoyez à vos clients un bilan hebdomadaire, un questionnaire d'accueil ou votre propre formulaire, une fois ou chaque semaine. Ils répondent en quelques touches, et une note basse ou une réponse en retard remonte en haut de leur rapport.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",

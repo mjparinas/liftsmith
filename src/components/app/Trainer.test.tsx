@@ -18,6 +18,28 @@ let linked = false;
 let assigned: unknown[] = [];
 let note: unknown = null;
 let shared: unknown = null;
+const FORM = {
+  id: "f1",
+  title: "Weekly check-in",
+  questions: [
+    { id: "sleep", kind: "scale", label: "How well did you sleep this week?" },
+    { id: "gym", kind: "yesno", label: "Do you train at a gym?" },
+    { id: "weight", kind: "number", label: "Your weight this morning" },
+    { id: "wins", kind: "text", label: "What went well?" },
+  ],
+  at: NOW,
+};
+const CHECKIN = {
+  ...FORM,
+  id: "ci1",
+  coachId: "k1",
+  clientId: "me",
+  formId: "f1",
+  sentAt: NOW - 4 * 86_400_000,
+  answers: null,
+  answeredAt: null,
+};
+let answered: unknown[] = [];
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -27,6 +49,7 @@ beforeEach(() => {
   assigned = [];
   note = null;
   shared = null;
+  answered = [];
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -41,7 +64,11 @@ beforeEach(() => {
         plans: assigned,
         note,
         body: shared,
+        forms: [FORM],
+        checkins: answered,
+        repeat: null,
       });
+    if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
       return Response.json({ name: "Sam", more: false, messages: [{ id: "m1", from: "k1", text: "How did squats feel?", at: NOW }] });
     if (url === "/api/coach/" && !body)
@@ -53,7 +80,13 @@ beforeEach(() => {
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
         setup: { days: 3 },
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
+        forms: [FORM],
+        checkins: linked ? [CHECKIN] : [],
       });
+    if (body?.action === "sendForm") return Response.json({ checkin: { ...CHECKIN, clientId: body.client, coachId: "me" } });
+    if (body?.action === "repeatForm") return Response.json({ repeat: body.id ? { formId: body.id, nextAt: NOW + 7 * 86_400_000 } : null });
+    if (body?.action === "form") return Response.json({ form: { ...body.form, id: "f2", at: NOW } });
+    if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
       linked = true;
@@ -316,5 +349,76 @@ describe("nutrition targets", () => {
     render(<Trainer />);
     expect(await screen.findByText("Daily targets from Sam")).toBeInTheDocument();
     expect(screen.getByText("2400 kcal · 160 g protein")).toBeInTheDocument();
+  });
+});
+
+describe("check-ins", () => {
+  it("a coach sends a form now and every week from a client's report", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Check-ins")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Send now" }));
+    expect(await screen.findByText("Sent. They'll get a notification.")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "sendForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+    await u.click(screen.getByRole("switch", { name: /Send this form every week/ }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+  });
+
+  it("a coach reads a client's answers, and a low score goes first", async () => {
+    answered = [
+      {
+        ...CHECKIN,
+        coachId: "me",
+        clientId: "c1",
+        answers: { sleep: 2, gym: true, weight: 81.5, wins: "Hit a squat best" },
+        answeredAt: NOW - 86_400_000,
+      },
+    ];
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Scored 2 of 5: How well did you sleep this week?")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: /Answered/ }));
+    expect(await screen.findByText("Hit a squat best")).toBeInTheDocument();
+    expect(screen.getByText("2 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Yes")).toBeInTheDocument();
+  });
+
+  it("a coach makes a form from a template", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="forms" />);
+    expect(await screen.findByRole("button", { name: /Weekly check-in/ })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Intake questionnaire" }));
+    expect(await screen.findByDisplayValue("What's your main goal?")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Save form" }));
+    expect(await screen.findByText("Form saved.")).toBeInTheDocument();
+    const saved = calls.find((c) => (c.body as { action?: string })?.action === "form")?.body as {
+      form: { title: string; questions: unknown[] };
+    };
+    expect(saved.form.title).toBe("Intake questionnaire");
+    expect(saved.form.questions).toHaveLength(6);
+  });
+
+  it("a client answers a check-in with taps, and anything can be skipped", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer arg="f.ci1" />);
+    expect(await screen.findByRole("heading", { name: "Weekly check-in" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "4" }));
+    await u.click(screen.getByRole("button", { name: "Yes" }));
+    await u.type(screen.getByLabelText("Your weight this morning"), "81.5");
+    await u.click(screen.getByRole("button", { name: "Send answers" }));
+    expect(await screen.findByText(/Thanks!/)).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "answer")).toMatchObject({
+      body: { id: "ci1", answers: { sleep: 4, gym: true, weight: 81.5 } },
+    });
+  });
+
+  it("a waiting check-in shows under Coaching and on Today", async () => {
+    linked = true;
+    const { unmount } = render(<Trainer />);
+    expect(await screen.findByText("Check-in from Sam")).toBeInTheDocument();
+    unmount();
+    render(<CoachNoteToday />);
+    expect(screen.getByText("Check-in from Sam")).toBeInTheDocument();
   });
 });
