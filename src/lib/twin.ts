@@ -8,9 +8,9 @@
 import type { SessionSummary } from "./derive";
 import { inSentence, list, t } from "./i18n";
 import { healthSignals, type ExternalSignals } from "./readiness";
-import { ACTIVITY, bmiBand, currentTdee } from "./tdee";
+import { ACTIVITY, bmiBand, currentKg, currentTdee } from "./tdee";
 import type { AppEvent, HealthMetric, HrSeriesEvent, Profile, SetEvent } from "./types";
-import { fmtNum } from "./units";
+import { fmtBodyweight, fmtNum, fromKg } from "./units";
 
 const DAY = 86_400_000;
 const BASELINE_DAYS = 30;
@@ -200,8 +200,7 @@ const hm = (h: number) => {
   const mins = Math.round(h * 60);
   return `${Math.floor(mins / 60)} h ${String(mins % 60).padStart(2, "0")}`;
 };
-const kgText = (kg: number, unit: Profile["unit"]) =>
-  unit === "lb" ? `${fmtNum(Math.round(kg * 2.20462 * 10) / 10)} lb` : `${fmtNum(Math.round(kg * 10) / 10)} kg`;
+const kgText = fmtBodyweight;
 const kcal = (n: number) => `${fmtNum(Math.round(n / 10) * 10)} kcal`;
 const pct = (x: number) => `${x > 0 ? "+" : ""}${fmtNum(Math.round(x))}%`;
 
@@ -237,7 +236,8 @@ export function twin(input: TwinInput): TwinMetric[] {
     else wSeries.push({ day, value: e.kg });
   }
   const lastW = weighIns[weighIns.length - 1];
-  const kgNow = lastW?.kg ?? profile.bodyweight;
+  // The same weight Settings › Body weight shows (currentKg), so the two never disagree.
+  const kgNow = currentKg(events, profile);
   {
     const recentW = weighIns.filter((e) => e.at >= now - 28 * DAY);
     let status: Status = "info",
@@ -290,7 +290,7 @@ export function twin(input: TwinInput): TwinMetric[] {
       status,
       chip,
       why,
-      series: window30(wSeries, now).map((p) => ({ ...p, value: unit === "lb" ? p.value * 2.20462 : p.value })),
+      series: window30(wSeries, now).map((p) => ({ ...p, value: fromKg(p.value, unit) })),
       source: "app",
       fresh: !!lastW && lastW.at >= now - 2 * DAY,
       action: { kind: "weighIn", label: t("twin.a.weighIn") },
@@ -394,7 +394,7 @@ export function twin(input: TwinInput): TwinMetric[] {
         chip: lc,
         why: lw,
         series: window30(
-          fats.map((e) => ({ day: dayOf(e.at), value: lean(e) * (unit === "lb" ? 2.20462 : 1) })),
+          fats.map((e) => ({ day: dayOf(e.at), value: fromKg(lean(e), unit) })),
           now,
         ),
         source: "health",

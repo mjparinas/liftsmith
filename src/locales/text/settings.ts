@@ -77,7 +77,6 @@ export const en = {
   "settings.plan": "Plan details: rest, reps, sets, priorities",
   "settings.duringRest": "Between sets",
   "settings.accessibility": "Accessibility",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "From your last weigh-in. Health Connect and Apple Health weigh-ins come in by themselves.",
   "settings.bw.log": "Log a weigh-in",
 } as const;
@@ -163,7 +162,6 @@ export const es: Partial<Record<Key, Message>> = {
   "settings.plan": "Detalles del plan: descanso, repeticiones, series, prioridades",
   "settings.duringRest": "Entre series",
   "settings.accessibility": "Accesibilidad",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "De tu último pesaje. Los pesajes de Health Connect y Apple Health llegan solos.",
   "settings.bw.log": "Registrar un pesaje",
 };
@@ -247,7 +245,6 @@ export const fr: Partial<Record<Key, Message>> = {
   "settings.plan": "Détails du plan : repos, répétitions, séries, priorités",
   "settings.duringRest": "Entre les séries",
   "settings.accessibility": "Accessibilité",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "D'après votre dernière pesée. Les pesées de Health Connect et Apple Health arrivent toutes seules.",
   "settings.bw.log": "Noter une pesée",
 };
@@ -328,7 +325,6 @@ export const de: Partial<Record<Key, Message>> = {
   "settings.plan": "Plandetails: Pausen, Wiederholungen, Sätze, Prioritäten",
   "settings.duringRest": "Zwischen den Sätzen",
   "settings.accessibility": "Barrierefreiheit",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "Aus deiner letzten Wiegung. Wiegungen aus Health Connect und Apple Health kommen von selbst.",
   "settings.bw.log": "Wiegung eintragen",
 };
@@ -411,7 +407,6 @@ export const it: Partial<Record<Key, Message>> = {
   "settings.plan": "Dettagli del piano: riposo, ripetizioni, serie, priorità",
   "settings.duringRest": "Tra le serie",
   "settings.accessibility": "Accessibilità",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "Dalla tua ultima pesata. Le pesate di Health Connect e Apple Health arrivano da sole.",
   "settings.bw.log": "Registra una pesata",
 };
@@ -491,7 +486,6 @@ export const ja: Partial<Record<Key, Message>> = {
   "settings.plan": "プランの詳細：休憩、回数、セット数、優先",
   "settings.duringRest": "セット間",
   "settings.accessibility": "アクセシビリティ",
-  "settings.bw.now": "{weight} {unit}",
   "settings.bw.note": "最新の体重記録より。Health Connect と Apple Health の体重は自動で取り込まれます。",
   "settings.bw.log": "体重を記録",
 };

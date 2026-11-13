@@ -6,9 +6,9 @@ import { can } from "@/lib/entitlements";
 import { exercise } from "@/lib/exercises";
 import { num, t } from "@/lib/i18n";
 import { useApp } from "@/lib/store";
-import { ACTIVITY, currentTdee, tdeeHistory } from "@/lib/tdee";
+import { ACTIVITY, currentKg, currentTdee, tdeeHistory } from "@/lib/tdee";
 import { MUSCLE_LABEL, MUSCLES } from "@/lib/types";
-import { fmtNum, fmtVolume, fromKg } from "@/lib/units";
+import { fmtBodyweight, fmtNum, fmtVolume, fromKg } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { AchievementRow, useGame } from "./Achievements";
@@ -270,9 +270,7 @@ function BodyweightCard() {
       <div className="card p-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <div className="num text-2xl font-bold">
-              {fmtNum(Math.round(fromKg(kg(last) ?? profile.bodyweight, unit) * 10) / 10)} {unit}
-            </div>
+            <div className="num text-2xl font-bold">{fmtBodyweight(currentKg(events, profile), unit)}</div>
             <div className="text-sm text-muted">
               {change !== undefined
                 ? t("progress.bw.change", { change: `${change >= 0 ? "+" : ""}${fmtNum(Math.round(change * 10) / 10)}`, unit })

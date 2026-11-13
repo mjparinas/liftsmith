@@ -24,8 +24,9 @@ import { erasePhotos } from "@/lib/photos";
 import { deleteEmail } from "@/lib/reminders";
 import { SITE_URL } from "@/lib/site";
 import { useApp } from "@/lib/store";
+import { currentKg } from "@/lib/tdee";
 import type { Experience, Goal, Variability } from "@/lib/types";
-import { fromKg, plainNum } from "@/lib/units";
+import { fmtBodyweight } from "@/lib/units";
 import { useNow } from "@/lib/useNow";
 
 import { BodyStats } from "./BodyStats";
@@ -491,7 +492,7 @@ function AccessibilitySettings() {
  * weight the plan uses (from the last weigh-in), and cycle-aware readiness.
  */
 function BodyGroup() {
-  const { profile, setProfile } = useApp();
+  const { events, profile, setProfile } = useApp();
   return (
     <>
       <BodyStats />
@@ -512,7 +513,7 @@ function BodyGroup() {
       </Section>
       <Section title={t("settings.bodyweight.label")}>
         <NavRow
-          title={t("settings.bw.now", { weight: plainNum(fromKg(profile.bodyweight, profile.unit)), unit: profile.unit })}
+          title={fmtBodyweight(currentKg(events, profile), profile.unit)}
           sub={t("settings.bw.log")}
           onClick={() => go("stats", "bodyweight")}
         />
