@@ -48,13 +48,14 @@ import { Button, Chip, ProTag, ScreenHeader, Section, SwitchRow } from "./ui";
 const GROUPS = ["training", "workout", "reminders", "look", "body", "data"] as const;
 type Group = (typeof GROUPS)[number];
 
+// Every row on the Settings screen has its own icon, so none reads as a repeat of another.
 const GROUP_ICON: Record<Group, IconName> = {
   training: "target",
   workout: "dumbbell",
   reminders: "clock",
-  look: "sparkle",
+  look: "moon",
   body: "heart",
-  data: "lock",
+  data: "layers",
 };
 
 /** Old deep links into the single long Settings screen, and the group (and section) they open now. */
@@ -158,7 +159,7 @@ function CoachingRow() {
     : who.clients
       ? t("trn.rowCoach", { count: who.clients })
       : t("trn.rowNote");
-  return <NavRow title={t("trn.row")} sub={sub} icon="target" onClick={() => go("trainer")} />;
+  return <NavRow title={t("trn.row")} sub={sub} icon="people" onClick={() => go("trainer")} />;
 }
 
 /** Settings' second row: sign in to back up and sync, or who's signed in. */
@@ -169,7 +170,7 @@ function AccountRow() {
       <NavRow
         title={t("account.row")}
         sub={account ? (account.email ? t("account.row.in", { email: account.email }) : t("account.syncNow")) : t("account.row.out")}
-        icon="link"
+        icon="lock"
         onClick={() => go("account")}
       />
     </div>
@@ -206,7 +207,7 @@ export function Settings() {
       <ProCard />
       <AccountRow />
       <div className="mt-2">
-        <NavRow title={t("gym.row")} sub={t("gym.rowNote")} icon="gym" onClick={() => go("gym")} />
+        <NavRow title={t("gym.row")} sub={t("gym.rowNote")} icon="pin" onClick={() => go("gym")} />
       </div>
       <div className="mt-2">
         <NavRow title={t("conn.row")} sub={t("conn.rowNote")} icon="link" onClick={() => go("connections")} />
@@ -228,7 +229,7 @@ export function Settings() {
         <NavRow
           title={t("lab.row")}
           sub={t("lab.rowNote")}
-          icon="sparkle"
+          icon="lightbulb"
           pro={!can("labs")}
           onClick={() => (can("labs") ? go("settings", "labs") : go("pro", "labs"))}
         />
