@@ -8,8 +8,8 @@ import { useCallback, useEffect, useState } from "react";
 import type { AccountDetail, AccountRow, CoachTotals, Role } from "@/server/adminUsers";
 
 import { Card, fmtInt, Table, Tile } from "./charts";
-import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { SchoolCoaches } from "./SchoolCoaches";
+import { LineBones, Loading, TableBones, TileBones } from "./Skeletons";
 import { ago, when } from "./time";
 
 const PROVIDER: Record<string, string> = { google: "Google", apple: "Apple", email: "Email code" };
