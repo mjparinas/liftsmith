@@ -50,6 +50,8 @@ const OWNED = {
   scans: 12,
   scans30: 7,
   club: "",
+  logo: "",
+  photos: [],
 };
 const ops: Record<string, unknown>[] = [];
 let claimed = false;

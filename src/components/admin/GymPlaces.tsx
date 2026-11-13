@@ -241,6 +241,7 @@ export function GymPlaces({ admin }: { admin: boolean }) {
                       {p.setups} {p.setups === 1 ? "setup" : "setups"} listed{p.hasKit ? "" : " · no equipment yet"}
                       {p.hidden ? " · hidden" : ""}
                       {p.qrScans ? ` · ${p.qrScans} QR ${p.qrScans === 1 ? "scan" : "scans"}` : ""}
+                      {p.pictures ? ` · ${p.pictures} ${p.pictures === 1 ? "picture" : "pictures"}` : ""}
                     </p>
                     {ordering === p.id && (
                       <PosterForm
@@ -269,6 +270,15 @@ export function GymPlaces({ admin }: { admin: boolean }) {
                       >
                         Send posters
                       </button>
+                      {p.pictures > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => window.confirm(`Take down ${p.name}'s logo and photos?`) && act(p, "pictures")}
+                          className="press rounded-lg border border-line px-3 py-1.5 text-muted"
+                        >
+                          Remove pictures
+                        </button>
+                      )}
                       <button
                         type="button"
                         onClick={() => act(p, p.hidden ? "show" : "hide")}

@@ -42,6 +42,11 @@ export interface Place {
   source: "osm" | "staff" | "owner" | "lifter";
   /** The code of the gym's own club and weekly leaderboard (#/club/<code>); missing or '' when it has none. */
   club?: string;
+  /** Our address for its map picture (a path on the website), '' while maps are off. */
+  map?: string;
+  /** Its logo's and photos' ids, pictures at /api/gyms/photo/?id=. */
+  logo?: string;
+  photos?: string[];
 }
 
 export interface MyListing {

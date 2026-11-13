@@ -3,6 +3,7 @@
 // Claiming a gym and keeping its details, the app side (server: src/server/gymClaims.ts; docs/decisions/gyms.md
 // step 3). Everything here needs an account.
 import { api, AuthError, readAccount } from "./auth";
+import { SITE_URL } from "./site";
 
 export type Role = "owner" | "manager" | "staff";
 export const ROLES: readonly Role[] = ["owner", "manager", "staff"];
@@ -25,6 +26,9 @@ export interface OwnedGym {
   scans30: number;
   /** The gym's own club's code (social.ts gymClubStart), '' before the owner starts it. */
   club: string;
+  /** The logo's and photos' ids (gymMedia.ts). */
+  logo: string;
+  photos: string[];
 }
 
 /** A claimed gym earns a mailed table stand at this many lifters (src/server/gymPosters.ts). */
@@ -165,5 +169,57 @@ export async function startGymClub(place: string): Promise<{ code: string } | { 
     return await api<{ code: string }>("/api/gyms/", { token: t, body: { op: "gymClub", place } });
   } catch (e) {
     return { error: err(e) };
+  }
+}
+
+/** A picture's address on the website (server: /api/gyms/photo/). */
+export const gymPictureUrl = (id: string) => `${SITE_URL}/api/gyms/photo/?id=${id}`;
+
+/**
+ * Turns a picked picture into the JPEG the server keeps (gymMedia.ts): a logo at most 512 px and 150 KB, a photo at most
+ * 1600 px and 450 KB, on white so a see-through logo doesn't turn black. Lower quality until it fits.
+ */
+async function gymJpeg(file: File, kind: "logo" | "photo"): Promise<string | null> {
+  const [max, bytes] = kind === "logo" ? [512, 150_000] : [1600, 450_000];
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, max / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const g = canvas.getContext("2d");
+    if (!g) return null;
+    g.fillStyle = "#ffffff";
+    g.fillRect(0, 0, canvas.width, canvas.height);
+    g.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    for (const q of [0.85, 0.75, 0.65, 0.5]) {
+      const url = canvas.toDataURL("image/jpeg", q);
+      if (((url.length - 23) * 3) / 4 <= bytes) return url;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/** The owner adds the gym's logo (replacing the old one) or a photo. Errors: image, big, full, slow, owner, offline. */
+export async function addGymPicture(place: string, kind: "logo" | "photo", file: File): Promise<{ id: string } | { error: string }> {
+  const t = token();
+  if (!t) return { error: "signedOut" };
+  const image = await gymJpeg(file, kind);
+  if (!image) return { error: "image" };
+  try {
+    return await api<{ id: string }>("/api/gyms/photo/", { token: t, body: { op: "add", place, kind, image } });
+  } catch (e) {
+    return { error: err(e) };
+  }
+}
+
+export async function removeGymPicture(place: string, id: string): Promise<boolean> {
+  try {
+    await api("/api/gyms/photo/", { token: token(), body: { op: "remove", place, id } });
+    return true;
+  } catch {
+    return false;
   }
 }

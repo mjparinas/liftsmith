@@ -517,6 +517,15 @@ const SCHEMA = [
     n INTEGER NOT NULL DEFAULT 0,
     PRIMARY KEY (place_id, day)
   )`,
+  // A claimed gym's logo and photos (gymMedia.ts): JPEGs the app made, one logo and six photos a gym.
+  `CREATE TABLE IF NOT EXISTS gym_photos (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    image BLOB NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_photos_place ON gym_photos (place_id)`,
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
     who TEXT NOT NULL,

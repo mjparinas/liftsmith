@@ -53,6 +53,11 @@ export interface Place {
   source: "osm" | "staff" | "owner" | "lifter";
   /** The code of the gym's own club and weekly leaderboard (social.ts gymClubStart), '' when it has none. */
   club: string;
+  /** Our address for its map picture (gymMedia.ts, Mapbox), '' while Mapbox isn't set up. */
+  map: string;
+  /** Its logo's and photos' ids (/api/gyms/photo/?id=), added by the owner. Photos only on one gym's own lookups. */
+  logo: string;
+  photos: string[];
 }
 
 const s = (x: unknown) => (typeof x === "string" ? x : "");
@@ -428,7 +433,8 @@ export async function pendingPlaceCount(): Promise<{ count: number; oldest: numb
 const PLACE_COLUMNS = `p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.country, p.lat, p.lon, p.hours, p.website, p.phone,
   p.source, p.claimed_by, p.lifters, p.code, p.updated_at,
   (SELECT g.code FROM public_gyms g WHERE g.place_id = p.id AND g.hidden = 0 ORDER BY g.adds DESC, g.updated_at DESC LIMIT 1) AS listed,
-  (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club`;
+  (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
+  (SELECT m.id FROM gym_photos m WHERE m.place_id = p.id AND m.kind = 'logo' LIMIT 1) AS logo`;
 
 const toPlace = (r: Row, km: number): Place => ({
   id: s(r.id),
@@ -452,7 +458,16 @@ const toPlace = (r: Row, km: number): Place => ({
   code: s(r.code) || s(r.listed),
   source: (["staff", "owner", "lifter"] as const).find((x) => x === s(r.source)) ?? "osm",
   club: s(r.club),
+  map: process.env.MAPBOX_TOKEN ? `/api/gyms/map/?place=${s(r.id)}` : "",
+  logo: s(r.logo),
+  photos: [],
 });
+
+/** One gym's photos, oldest first (gymMedia.ts). */
+async function withPhotos(p: Place): Promise<Place> {
+  const rows = await query("SELECT id FROM gym_photos WHERE place_id = ? AND kind = 'photo' ORDER BY created_at, id", [p.id]);
+  return { ...p, photos: rows.map((r) => s(r.id)) };
+}
 
 /** Gyms within `PLACE_LIMITS.radiusKm`: official ones first, then nearest. Studios only when asked for. */
 export async function nearbyPlaces(lat: unknown, lon: unknown, opts: { studios?: boolean } = {}): Promise<Place[] | null> {
@@ -476,7 +491,7 @@ export async function nearbyPlaces(lat: unknown, lon: unknown, opts: { studios?:
 export async function placeById(id: unknown): Promise<Place | null> {
   if (!isPlaceId(id)) return null;
   const [r] = await query(`SELECT ${PLACE_COLUMNS} FROM gym_places p WHERE p.id = ? AND p.hidden = 0`, [id]);
-  return r ? toPlace(r, 0) : null;
+  return r ? withPhotos(toPlace(r, 0)) : null;
 }
 
 // --- Gym pages (gymPage.ts): /gyms/, /gyms/<city>/, /gyms/<city>/<gym>/ ---
@@ -489,7 +504,7 @@ export async function placeBySlug(citySlug: unknown, slug: unknown): Promise<Pla
     citySlug,
     slug,
   ]);
-  return r ? toPlace(r, 0) : null;
+  return r ? withPhotos(toPlace(r, 0)) : null;
 }
 
 /** Every gym in a city: official first, then the most lifters, then by name. */
@@ -574,10 +589,13 @@ export interface AdminPlace {
   /** Added by a lifter and waiting for staff. */
   pending: boolean;
   createdAt: number;
+  /** The owner's logo and photos (gymMedia.ts), which staff can take down. */
+  pictures: number;
 }
 
 const ADMIN_SQL = `SELECT p.id, p.city_slug, p.slug, p.name, p.kind, p.address, p.city, p.region, p.source, p.claimed_by, p.lifters, p.hidden,
-    p.code, p.qr_scans, p.pending, p.created_at, (SELECT COUNT(*) FROM public_gyms g WHERE g.place_id = p.id) AS setups
+    p.code, p.qr_scans, p.pending, p.created_at, (SELECT COUNT(*) FROM public_gyms g WHERE g.place_id = p.id) AS setups,
+    (SELECT COUNT(*) FROM gym_photos m WHERE m.place_id = p.id) AS pictures
   FROM gym_places p`;
 
 const toAdmin = (r: Row): AdminPlace => ({
@@ -598,6 +616,7 @@ const toAdmin = (r: Row): AdminPlace => ({
   qrScans: n(r.qr_scans),
   pending: !!n(r.pending),
   createdAt: n(r.created_at),
+  pictures: n(r.pictures),
 });
 
 /** Gyms per page in the admin list (a country can have thousands). */
@@ -640,7 +659,7 @@ export async function adminPlaces(q: unknown, pageAsked: unknown = 1): Promise<A
   };
 }
 
-export type PlaceAction = "hide" | "show" | "gym" | "studio" | "delete" | "approve" | "reject";
+export type PlaceAction = "hide" | "show" | "gym" | "studio" | "delete" | "approve" | "reject" | "pictures";
 
 export async function actOnPlace(id: unknown, action: unknown, now = Date.now()): Promise<boolean> {
   if (!isPlaceId(id)) return false;
@@ -651,6 +670,10 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
     case "gym":
     case "studio":
       return (await run("UPDATE gym_places SET kind = ?, updated_at = ? WHERE id = ?", [action, now, id])) > 0;
+    case "pictures":
+      // Staff take down every picture the owner added (gymMedia.ts).
+      await run("DELETE FROM gym_photos WHERE place_id = ?", [id]);
+      return true;
     case "approve":
       return (await run("UPDATE gym_places SET pending = 0, hidden = 0, updated_at = ? WHERE id = ? AND pending = 1", [now, id])) > 0;
     case "reject": {
@@ -664,6 +687,7 @@ export async function actOnPlace(id: unknown, action: unknown, now = Date.now())
         { sql: "UPDATE public_gyms SET place_id = '' WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_place_lifters WHERE place_id = ?", args: [id] },
         { sql: "UPDATE clubs SET place_id = '' WHERE place_id = ?", args: [id] },
+        { sql: "DELETE FROM gym_photos WHERE place_id = ?", args: [id] },
         { sql: "DELETE FROM gym_places WHERE id = ?", args: [id] },
       ]);
       return true;

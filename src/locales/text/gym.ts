@@ -228,6 +228,16 @@ export const en = {
   "gym.edit.clubOpen": "Open the club",
   "gym.edit.clubFriends": "Turn on Friends first, then start the club.",
   "gym.edit.clubGoFriends": "Open Friends",
+  "gym.edit.pictures": "Logo and photos",
+  "gym.edit.picturesNote": "Show lifters your gym. Your logo sits by the name on your gym's page, and up to six photos show under it.",
+  "gym.edit.logoAdd": "Add your logo",
+  "gym.edit.logoChange": "Change the logo",
+  "gym.edit.photoAdd": "Add a photo",
+  "gym.edit.photoRemove": "Remove photo {n}",
+  "gym.edit.photosFull": "That's six photos. Remove one to add another.",
+  "gym.edit.err.image": "That picture couldn't be read. Try a JPEG or PNG.",
+  "gym.edit.err.big": "That picture is too big, even made smaller. Try another one.",
+  "gym.edit.adding": "Adding…",
 } as const;
 
 type Key = keyof typeof en;
@@ -463,6 +473,16 @@ export const es: Partial<Record<Key, Message>> = {
   "gym.edit.clubOpen": "Abrir el club",
   "gym.edit.clubFriends": "Activa Amigos primero y luego crea el club.",
   "gym.edit.clubGoFriends": "Abrir Amigos",
+  "gym.edit.pictures": "Logotipo y fotos",
+  "gym.edit.picturesNote": "Enseña tu gimnasio. Tu logotipo aparece junto al nombre en la página del gimnasio, y hasta seis fotos debajo.",
+  "gym.edit.logoAdd": "Añadir tu logotipo",
+  "gym.edit.logoChange": "Cambiar el logotipo",
+  "gym.edit.photoAdd": "Añadir una foto",
+  "gym.edit.photoRemove": "Quitar la foto {n}",
+  "gym.edit.photosFull": "Ya hay seis fotos. Quita una para añadir otra.",
+  "gym.edit.err.image": "No se pudo leer esa imagen. Prueba con un JPEG o PNG.",
+  "gym.edit.err.big": "Esa imagen es demasiado grande, incluso reducida. Prueba con otra.",
+  "gym.edit.adding": "Añadiendo…",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -704,6 +724,17 @@ export const fr: Partial<Record<Key, Message>> = {
   "gym.edit.clubOpen": "Ouvrir le club",
   "gym.edit.clubFriends": "Activez d’abord Amis, puis créez le club.",
   "gym.edit.clubGoFriends": "Ouvrir Amis",
+  "gym.edit.pictures": "Logo et photos",
+  "gym.edit.picturesNote":
+    "Montrez votre salle. Votre logo s’affiche à côté du nom sur la page de la salle, et jusqu’à six photos en dessous.",
+  "gym.edit.logoAdd": "Ajouter votre logo",
+  "gym.edit.logoChange": "Changer le logo",
+  "gym.edit.photoAdd": "Ajouter une photo",
+  "gym.edit.photoRemove": "Retirer la photo {n}",
+  "gym.edit.photosFull": "Il y a déjà six photos. Retirez-en une pour en ajouter une autre.",
+  "gym.edit.err.image": "Impossible de lire cette image. Essayez un JPEG ou un PNG.",
+  "gym.edit.err.big": "Cette image est trop lourde, même réduite. Essayez-en une autre.",
+  "gym.edit.adding": "Ajout…",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -947,6 +978,16 @@ export const de: Partial<Record<Key, Message>> = {
   "gym.edit.clubOpen": "Club öffnen",
   "gym.edit.clubFriends": "Aktiviere zuerst Freunde, dann gründe den Club.",
   "gym.edit.clubGoFriends": "Freunde öffnen",
+  "gym.edit.pictures": "Logo und Fotos",
+  "gym.edit.picturesNote": "Zeig dein Studio. Dein Logo steht neben dem Namen auf der Seite deines Studios, darunter bis zu sechs Fotos.",
+  "gym.edit.logoAdd": "Logo hinzufügen",
+  "gym.edit.logoChange": "Logo ändern",
+  "gym.edit.photoAdd": "Foto hinzufügen",
+  "gym.edit.photoRemove": "Foto {n} entfernen",
+  "gym.edit.photosFull": "Das sind sechs Fotos. Entferne eins, um ein neues hinzuzufügen.",
+  "gym.edit.err.image": "Dieses Bild konnte nicht gelesen werden. Versuch es mit JPEG oder PNG.",
+  "gym.edit.err.big": "Dieses Bild ist selbst verkleinert zu groß. Versuch ein anderes.",
+  "gym.edit.adding": "Wird hinzugefügt …",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -1183,6 +1224,16 @@ export const it: Partial<Record<Key, Message>> = {
   "gym.edit.clubOpen": "Apri il club",
   "gym.edit.clubFriends": "Attiva prima Amici, poi crea il club.",
   "gym.edit.clubGoFriends": "Apri Amici",
+  "gym.edit.pictures": "Logo e foto",
+  "gym.edit.picturesNote": "Mostra la tua palestra. Il logo compare accanto al nome nella pagina della palestra, e sotto fino a sei foto.",
+  "gym.edit.logoAdd": "Aggiungi il logo",
+  "gym.edit.logoChange": "Cambia il logo",
+  "gym.edit.photoAdd": "Aggiungi una foto",
+  "gym.edit.photoRemove": "Rimuovi la foto {n}",
+  "gym.edit.photosFull": "Ci sono già sei foto. Rimuovine una per aggiungerne un’altra.",
+  "gym.edit.err.image": "Impossibile leggere l’immagine. Prova con un JPEG o un PNG.",
+  "gym.edit.err.big": "L’immagine è troppo grande, anche ridotta. Provane un’altra.",
+  "gym.edit.adding": "Aggiunta…",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1403,4 +1454,14 @@ export const ja: Partial<Record<Key, Message>> = {
   "gym.edit.clubOpen": "クラブを開く",
   "gym.edit.clubFriends": "先にフレンドをオンにしてから、クラブを作成してください。",
   "gym.edit.clubGoFriends": "フレンドを開く",
+  "gym.edit.pictures": "ロゴと写真",
+  "gym.edit.picturesNote": "ジムの様子を見せましょう。ロゴはジムのページで名前の横に、写真は最大6枚まで下に表示されます。",
+  "gym.edit.logoAdd": "ロゴを追加",
+  "gym.edit.logoChange": "ロゴを変更",
+  "gym.edit.photoAdd": "写真を追加",
+  "gym.edit.photoRemove": "写真{n}を削除",
+  "gym.edit.photosFull": "写真は6枚までです。追加するには1枚削除してください。",
+  "gym.edit.err.image": "その画像を読み込めませんでした。JPEGかPNGをお試しください。",
+  "gym.edit.err.big": "縮小しても画像が大きすぎます。別の画像をお試しください。",
+  "gym.edit.adding": "追加中…",
 };

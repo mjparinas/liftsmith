@@ -224,6 +224,15 @@ export interface OwnedGym {
   scans30: number;
   /** The gym's own club's code (social.ts gymClubStart), '' before the owner starts it. */
   club: string;
+  /** The logo's and photos' ids (gymMedia.ts). */
+  logo: string;
+  photos: string[];
+}
+
+/** "logo:ab12,photo:cd34" → the logo's id and the photos' ids, in order. */
+function pictures(list: string): { logo: string; photos: string[] } {
+  const all = list ? list.split(",").map((x) => x.split(":")) : [];
+  return { logo: all.find(([k]) => k === "logo")?.[1] ?? "", photos: all.filter(([k]) => k === "photo").map(([, id]) => id!) };
 }
 
 export async function ownedGyms(accountId: string, now = Date.now()): Promise<OwnedGym[]> {
@@ -234,7 +243,9 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
        p.qr_scans,
        (SELECT COUNT(*) FROM gym_place_lifters l WHERE l.place_id = p.id AND l.created_at > ?) AS new_lifters,
        (SELECT COALESCE(SUM(d.n), 0) FROM gym_scan_days d WHERE d.place_id = p.id AND d.day > ?) AS scans_30,
-       (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club
+       (SELECT c.code FROM clubs c WHERE c.place_id = p.id) AS club,
+       (SELECT group_concat(m.kind || ':' || m.id) FROM (SELECT kind, id FROM gym_photos WHERE place_id = p.id ORDER BY created_at, id) m)
+         AS pictures
      FROM gym_places p WHERE p.claimed_by = ? ORDER BY p.name`,
     [since, Math.floor(since / 86_400_000), accountId],
   );
@@ -254,6 +265,7 @@ export async function ownedGyms(accountId: string, now = Date.now()): Promise<Ow
     scans: n(r.qr_scans),
     scans30: n(r.scans_30),
     club: s(r.club),
+    ...pictures(s(r.pictures)),
   }));
 }
 
