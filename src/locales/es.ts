@@ -72,6 +72,7 @@ import * as muscle from "./text/muscle";
 import * as nav from "./text/nav";
 import * as note from "./text/note";
 import * as notes from "./text/notes";
+import * as now from "./text/now";
 import * as orm from "./text/orm";
 import * as part from "./text/part";
 import * as past from "./text/past";
@@ -197,6 +198,7 @@ export const es: Partial<Record<MessageKey, Message>> = {
   ...nav.es,
   ...note.es,
   ...notes.es,
+  ...now.es,
   ...orm.es,
   ...part.es,
   ...past.es,

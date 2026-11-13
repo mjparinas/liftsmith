@@ -280,6 +280,10 @@ export const it: FeaturesText = {
       body: "Assegna programmi di riabilitazione leggeri con le volte a settimana, guarda quanto spesso i clienti li seguono e vedi dolore e infortuni che scelgono di condividere, esercizio per esercizio, con una notifica quando il dolore è alto.",
       note: "Liftsmith mostra ciò che i clienti registrano. Non fa diagnosi né cure.",
     },
+    "coach-nutrition": {
+      name: "Obiettivi nutrizionali per i clienti",
+      body: "Fissa calorie e proteine giornaliere per ogni cliente. Le note del coach confrontano la sua settimana con questi obiettivi, e vedi come mangia quando lo condivide.",
+    },
     awards: {
       name: "Obiettivi, livelli e serie di giorni",
       body: "Badge a livelli, 50 livelli con ricompense, missioni settimanali, protezioni della serie e leghe oneste.",
@@ -432,6 +436,11 @@ export const it: FeaturesText = {
       name: "Sonos",
       body: "Controlla un altoparlante Sonos dall’allenamento, con un volume per le serie e uno per il riposo.",
     },
+    "now-playing": {
+      name: "Controlli musica",
+      body: "Riproduci, metti in pausa e salta la tua musica da Oggi e durante l’allenamento, con il brano e l’app che lo riproduce. Puoi disattivarli nelle Impostazioni.",
+      note: "iPhone: solo Apple Music, perché Apple non permette alle app di controllare altre app di musica.",
+    },
   },
   connectionGroups: {
     health: "App di salute",
@@ -476,6 +485,11 @@ export const it: FeaturesText = {
     withings: { does: "In entrata peso, massa grassa, sonno e passi" },
     polar: { does: "In entrata Nightly Recharge, HRV e sonno" },
     concept2: { does: "Sessioni RowErg, SkiErg e BikeErg in entrata come allenamenti cardio" },
+    "music-apps": {
+      name: "Spotify, YouTube Music e altre app di musica",
+      does: "Riproduci, pausa e salta da Oggi e dall’allenamento, con il titolo del brano",
+    },
+    "apple-music": { does: "Riproduci, pausa e salta da Oggi e dall’allenamento, con il titolo del brano" },
     sonos: { does: "Riproduci, pausa, salta e volume dall’allenamento; la musica segue serie e riposo" },
     calendar: {
       name: "Calendario del telefono (Google, iCloud, Outlook)",

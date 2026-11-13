@@ -61,12 +61,13 @@ export interface ProteinShort {
 }
 
 /**
- * Protein well short on the last few logged days in a row (PROTEIN_RUN or more, the newest within the last three
+ * Protein well short (of the body-weight rule, or a coach's target) on the last few logged days in a row (PROTEIN_RUN or more, the newest within the last three
  * days, so an old run doesn't linger after the lifter stops logging).
  */
-export function proteinShort(days: readonly FoodDay[], kg: number, now: number): ProteinShort | null {
-  if (!(kg > 0)) return null;
-  const target = Math.round(kg * PROTEIN_PER_KG);
+export function proteinShort(days: readonly FoodDay[], kg: number, now: number, coachTarget?: number | null): ProteinShort | null {
+  // A coach's own target wins over the body-weight rule (trainer mode, 2026-11-13).
+  if (!coachTarget && !(kg > 0)) return null;
+  const target = coachTarget || Math.round(kg * PROTEIN_PER_KG);
   const withProtein = days.filter((d) => d.protein !== undefined);
   const newest = withProtein.at(-1);
   if (!newest || newest.day < dayKey(now - 3 * DAY)) return null;

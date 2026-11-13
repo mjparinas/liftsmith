@@ -367,6 +367,8 @@ export interface TrainingPrefs {
   restAlert?: RestAlert;
   /** Keep the screen on during a workout. Missing means on. */
   keepAwake?: boolean;
+  /** The Now playing control on Today and the workout screen (nowPlaying.ts). Missing means on. */
+  nowPlaying?: boolean;
   /** Start opens the day's warm-up stretches first (Stretch.tsx; skippable). Missing means off. */
   warmFirst?: boolean;
   /** Done offers cool-down stretches for the muscles just trained. Missing means on. */

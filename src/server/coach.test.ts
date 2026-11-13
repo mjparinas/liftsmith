@@ -24,6 +24,7 @@ import {
   setKind,
   setNote,
   setShare,
+  setTargets,
   unlink,
   unreadFrom,
 } from "./coach";
@@ -422,6 +423,7 @@ describe("body data a client shares", () => {
         { at: NOW - DAY, kg: 80, bodyFat: 18.5 },
       ],
       measures: [{ at: NOW - DAY, site: "waist", cm: 84 }],
+      food: [],
     });
     expect(JSON.stringify(body)).not.toContain("private");
     expect((await overview("client", NOW)).bodyShared).toEqual(["coach"]);
@@ -557,5 +559,54 @@ describe("physio support", () => {
     await setAlerts("coach", false, NOW);
     await alertPain("client", high, NOW + DAY);
     expect(sent).toHaveLength(1);
+  });
+});
+
+describe("nutrition targets from the coach", () => {
+  beforeEach(async () => {
+    await push(
+      "client",
+      [
+        { id: "k1", at: NOW - 2 * DAY, type: "health", metric: "kcalIn", day: "2027-01-13", value: 2100 },
+        { id: "k2", at: NOW - DAY, type: "health", metric: "kcalIn", day: "2027-01-13", value: 2300 },
+        { id: "p1", at: NOW - DAY, type: "health", metric: "protein", day: "2027-01-13", value: 120 },
+        { id: "s1", at: NOW - DAY, type: "health", metric: "sleep", day: "2027-01-13", value: 400 },
+        { id: "old", at: NOW - 60 * DAY, type: "health", metric: "kcalIn", day: "2026-11-15", value: 2000 },
+      ],
+      { name: "Alex" },
+    );
+    await makeInvite("coach", NOW, "CCCCDDDD");
+    await joinCoach("client", "CCCCDDDD", NOW);
+  });
+
+  it("only go to the coach's own clients, keep numbers in range, and both empty clears them", async () => {
+    expect(await setTargets("stranger", "client", 2400, 160, NOW)).toEqual({ error: "notClient" });
+    expect(await setTargets("coach", "client", 2400.4, 9999, NOW)).toEqual({
+      coachId: "coach",
+      clientId: "client",
+      kcal: 2400,
+      protein: null,
+      at: NOW,
+    });
+    expect(await setTargets("coach", "client", 2500, 150, NOW + 1)).toMatchObject({ kcal: 2500, protein: 150 });
+    expect((await overview("client", NOW)).targets).toEqual([
+      { coachId: "coach", clientId: "client", kcal: 2500, protein: 150, at: NOW + 1 },
+    ]);
+    expect((await clientView("coach", "client", NOW))?.targets).toMatchObject({ kcal: 2500, protein: 150 });
+    expect(await setTargets("coach", "client", null, "x", NOW)).toBeNull();
+    expect((await overview("client", NOW)).targets).toEqual([]);
+  });
+
+  it("the client's food days reach the coach only with body sharing on, newest number per day, last 30 days", async () => {
+    expect((await clientView("coach", "client", NOW))?.body).toBeNull();
+    await setShare("client", "coach", true, NOW);
+    expect((await clientView("coach", "client", NOW))?.body?.food).toEqual([{ day: "2027-01-13", kcal: 2300, protein: 120 }]);
+  });
+
+  it("go when the pair unlinks or an account is deleted", async () => {
+    await setTargets("coach", "client", 2400, 160, NOW);
+    await unlink("client", "coach");
+    expect(await query("SELECT * FROM coach_targets")).toEqual([]);
+    expect(coachCleanup("x").some((q) => q.sql.includes("coach_targets"))).toBe(true);
   });
 });

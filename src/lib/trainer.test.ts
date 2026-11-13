@@ -162,3 +162,30 @@ describe("physio support on a client's report", () => {
     expect(planProgress({ ...rehab, at: NOW - 3 * DAY }, [], NOW).adherence).toBeUndefined();
   });
 });
+
+describe("food against a coach's targets", () => {
+  const day = (ago: number) => {
+    const d = new Date(NOW - ago * DAY);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  };
+  const food = (kcal: number, protein?: number) => [1, 2, 3, 4].map((ago) => ({ day: day(ago), kcal, protein }));
+  const view = (kcal: number, protein: number | undefined, targets: { kcal: number | null; protein: number | null } | null) => ({
+    name: "Alex",
+    daysPerWeek: null,
+    events: makeWorkout("w1", NOW - DAY, [{}]),
+    plans: [],
+    body: { sex: null, heightCm: null, weights: [], measures: [], food: food(kcal, protein) },
+    targets: targets && { coachId: "me", clientId: "c1", at: NOW, ...targets },
+  });
+
+  it("flags calories 10% off the target and protein under 85% of it", () => {
+    const kinds = (v: ReturnType<typeof view>) => clientReport(v, NOW).flags.map((f) => f.kind);
+    expect(kinds(view(1800, 100, { kcal: 2400, protein: 160 }))).toEqual(expect.arrayContaining(["kcalOff", "proteinShort"]));
+    expect(kinds(view(2350, 150, { kcal: 2400, protein: 160 }))).not.toContain("kcalOff");
+    expect(kinds(view(2350, 150, { kcal: 2400, protein: 160 }))).not.toContain("proteinShort");
+    // No targets, nothing to judge against.
+    expect(kinds(view(1200, 50, null))).not.toContain("kcalOff");
+    const off = clientReport(view(1800, 100, { kcal: 2400, protein: null }), NOW).flags.find((f) => f.kind === "kcalOff")!;
+    expect(flagText(off, new Map()).title).toContain("1800");
+  });
+});

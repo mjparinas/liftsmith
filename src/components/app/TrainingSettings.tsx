@@ -5,6 +5,7 @@ import { useState } from "react";
 import { exercise, EXERCISE_BY_ID } from "@/lib/exercises";
 import { restFor } from "@/lib/generator";
 import { t, weekday } from "@/lib/i18n";
+import { nowPlayingSupported } from "@/lib/nowPlaying";
 import { repRange, TIMED } from "@/lib/progression";
 import { useApp } from "@/lib/store";
 import {
@@ -24,6 +25,7 @@ import { MUSCLE_LABEL, MUSCLES, type RestAlert, type TrainingPrefs } from "@/lib
 
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { Icon } from "./icons";
+import { NowPlayingSetting } from "./NowPlaying";
 import { go } from "./router";
 import { Chip, ScreenHeader, Section, SwitchRow } from "./ui";
 
@@ -72,6 +74,9 @@ export function RestTimerSettings() {
     <>
       <SwitchRow label={t("train.autoRest")} on={tp.autoRest !== false} onChange={(v) => put({ autoRest: v ? undefined : false })} />
       <SwitchRow label={t("train.awake")} on={tp.keepAwake !== false} onChange={(v) => put({ keepAwake: v ? undefined : false })} />
+      {nowPlayingSupported() && (
+        <NowPlayingSetting on={tp.nowPlaying !== false} onChange={(v) => put({ nowPlaying: v ? undefined : false })} />
+      )}
       <Section title={t("train.timer")}>
         <ChipRow<RestAlert | "app">
           label={t("train.alert")}

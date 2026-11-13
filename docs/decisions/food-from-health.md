@@ -14,3 +14,5 @@ Part of the decision record. [AGENTS.md](../../AGENTS.md) has the rules that app
   - Calorie notes need a TDEE (sex, age and height in Your stats); without one only the protein note can show.
 - **Play:** `READ_NUTRITION` is a new Health Connect permission, so the Health Connect declaration in Play Console needs it added (food totals for coach's notes), and the privacy policy (`public/privacypolicy.html`, `/privacy/`) names calories and protein. `storePolicy.test.ts` checks the manifest and the policy page.
 - Pure web logic on top of one native method per phone, so Android and iOS get it in the same change.
+- **A coach's targets win** (2026-11-13, [Trainer mode](trainer-mode.md) "Nutrition targets"): when a lifter's coach sets daily protein or calories, the protein note goes by the coach's grams and the calorie notes judge the week against the coach's number alone.
+

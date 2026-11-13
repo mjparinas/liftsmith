@@ -61,7 +61,6 @@ Melvin picked "Chat, body data, alerts" from the gap list against Hevy Coach and
 - Unlinking either way deletes the pair's messages, reads, share and alerts; deleting an account deletes all of them and its alert setting (`coachCleanup`).
 - Analytics: `feature` `trainer` gains `message`, `shareBody` and `unshareBody`, `alerts` and `noAlerts`. No text, names or ids.
 
-
 ## Physio support (built 2026-11-13)
 
 Melvin, 2026-11-13, from the list of new kinds of users: "add physios support" (physios and rehab clinicians: assign rehab programs, watch adherence and pain flags), and blog posts for it. Built on the same coach and client link, with no separate account type (one account for everyone, as above), so it stays compatible with other coach types such as school teams.
@@ -78,3 +77,14 @@ Melvin, 2026-11-13, from the list of new kinds of users: "add physios support" (
 - **Platforms:** pure web code on the server and in the app, so Android, iOS and the web app get it in the same change. The pain push reaches Android and iPhone; the web app has no push ([Platform deltas](platform-deltas.md), as for the other coaching alerts).
 - Analytics: `feature` `trainer` gains `physio` and `trainerKind`, `sharePain` and `unsharePain`, and `rehab` (a rehab program assigned). No body parts, scores, names or ids.
 - Unlinking either way deletes the pair's shares (pain included) and alerts; deleting an account deletes its coach settings, as before (`coachCleanup`).
+
+## Nutrition targets (built 2026-11-13)
+
+Melvin asked for "nutrition targets for clients" in a round of coach tools (2026-11-13, with payments, booking and check-ins).
+
+- **The coach sets them** on a client's report (Daily nutrition targets): calories a day (800 to 6,000, steps of 50) and grams of protein a day (30 to 400, steps of 5), either may be left empty, Save or Clear (`coach_targets`, the `targets` action, `CoachTargets.tsx`). A number outside the range is stored as empty rather than refused.
+- **The client sees them** under Your coach (Daily targets from {name}), with a line that food is logged in their usual food app. Liftsmith still logs no food ([Food from Health](food-from-health.md)).
+- **Their coach's notes go by them** (`insights.ts`, `coachTargets` from `useCoachNotes`, kept on the device with the notes): the protein note uses the coach's grams instead of 1.6 g per kg, and with a calorie target the week is judged against it alone (10% under or over, "Eating under/over your coach's target", one tap to Coaching); the maintenance-based food notes stay quiet then, because the coach chose the number on purpose.
+- **The coach sees how they're eating** only when the client shares body data, which now also carries the calories and protein from the last 30 days (`food` in `bodyOf`; the switch's text says so). The report shows the last week's average under the targets, and **What to do** flags calories 10% or more off the target or protein under 85% of it, over 4+ logged days (`foodFlags`).
+- Unlinking or deleting an account deletes the targets. Analytics: `feature` `trainer` with `targets` and `untargets`.
+

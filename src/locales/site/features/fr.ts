@@ -287,6 +287,10 @@ export const fr: FeaturesText = {
       body: "Assignez des programmes de rééducation doux avec un nombre de fois par semaine, voyez à quelle fréquence vos clients les suivent, et voyez la douleur et les blessures qu'ils choisissent de partager, exercice par exercice, avec une notification quand la douleur est forte.",
       note: "Liftsmith montre ce que vos clients notent. Il ne pose aucun diagnostic et ne traite rien.",
     },
+    "coach-nutrition": {
+      name: "Objectifs nutritionnels pour les clients",
+      body: "Fixez les calories et protéines quotidiennes de chaque client. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange s'il le partage.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",
@@ -439,6 +443,11 @@ export const fr: FeaturesText = {
       name: "Sonos",
       body: "Pilotez une enceinte Sonos depuis la séance, avec un volume pour les séries et un autre pour le repos.",
     },
+    "now-playing": {
+      name: "Commandes de musique",
+      body: "Lisez, mettez en pause et passez votre musique depuis Aujourd’hui et pendant la séance, avec le morceau et l’app qui le joue. Vous pouvez le désactiver dans les Réglages.",
+      note: "iPhone : Apple Music seulement, car Apple ne permet pas aux apps de contrôler d’autres apps de musique.",
+    },
   },
   connectionGroups: {
     health: "Applis santé",
@@ -483,6 +492,11 @@ export const fr: FeaturesText = {
     withings: { does: "Pesées, masse grasse, sommeil et pas en entrée" },
     polar: { does: "Nightly Recharge, VFC et sommeil en entrée" },
     concept2: { does: "Sessions RowErg, SkiErg et BikeErg importées comme séances de cardio" },
+    "music-apps": {
+      name: "Spotify, YouTube Music et autres apps de musique",
+      does: "Lire, mettre en pause et passer depuis Aujourd’hui et la séance, avec le titre du morceau",
+    },
+    "apple-music": { does: "Lire, mettre en pause et passer depuis Aujourd’hui et la séance, avec le titre du morceau" },
     sonos: { does: "Lecture, pause, morceau suivant et volume depuis la séance ; la musique suit les séries et le repos" },
     calendar: {
       name: "Calendrier du téléphone (Google, iCloud, Outlook)",
