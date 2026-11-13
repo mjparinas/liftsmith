@@ -190,8 +190,16 @@ export const en = {
   "twin.did.easier": "{signal}: counted in today's call, so the plan leans easier.",
   "twin.did.push": "{signal}: counted in today's call, so the plan can push a little.",
   "twin.shape.label": "Shape the figure like me",
-  "twin.shape.hint": "From your height, latest weigh-in, body fat and tape measurements. An approximate shape, not a scan.",
-  "twin.shape.need": "Add your height and a weigh-in, or a body fat reading or tape measurements, and the figure can take your shape.",
+  "twin.shape.hint":
+    "Reshapes the figures on Body and in the exercise demos from your height, latest weigh-in, body fat and tape measurements. An approximate shape, not a scan.",
+  "twin.shape.need":
+    "The figure needs your height and a weigh-in, or a body fat reading or tape measurements. Add them and it takes your shape.",
+  "twin.shape.from": "Shaped from {items}.",
+  "twin.shape.close": "That's close to the average build, so the change is small.",
+  "twin.shape.fat": "{pct}% body fat",
+  "twin.shape.measures": "your tape measurements",
+  "twin.shape.addHeight": "Add your height",
+  "twin.shape.addBody": "Log a weigh-in or measurements",
 } as const;
 
 type Key = keyof typeof en;
@@ -391,8 +399,15 @@ export const es: Partial<Record<Key, Message>> = {
   "twin.did.easier": "{signal}: cuenta en la decisión de hoy, así que el plan va más suave.",
   "twin.did.push": "{signal}: cuenta en la decisión de hoy, así que el plan puede apretar un poco.",
   "twin.shape.label": "Dar mi forma a la figura",
-  "twin.shape.hint": "A partir de tu estatura, tu último peso, tu grasa corporal y tus medidas. Una forma aproximada, no un escáner.",
-  "twin.shape.need": "Añade tu estatura y un pesaje, o tu grasa corporal o tus medidas, y la figura tomará tu forma.",
+  "twin.shape.hint":
+    "Da a las figuras de Cuerpo y de las demostraciones tu forma a partir de tu estatura, tu último peso, tu grasa corporal y tus medidas. Una forma aproximada, no un escáner.",
+  "twin.shape.need": "La figura necesita tu estatura y un pesaje, o tu grasa corporal o tus medidas. Añádelos y tomará tu forma.",
+  "twin.shape.from": "Forma a partir de {items}.",
+  "twin.shape.close": "Está cerca de la complexión media, así que el cambio es pequeño.",
+  "twin.shape.fat": "{pct}% de grasa corporal",
+  "twin.shape.measures": "tus medidas",
+  "twin.shape.addHeight": "Añadir tu estatura",
+  "twin.shape.addBody": "Registrar un pesaje o medidas",
 };
 
 export const fr: Partial<Record<Key, Message>> = {
@@ -594,8 +609,15 @@ export const fr: Partial<Record<Key, Message>> = {
   "twin.did.push": "{signal} : pris en compte dans l’avis du jour, donc le plan peut pousser un peu.",
   "twin.shape.label": "Donner ma silhouette à la figure",
   "twin.shape.hint":
-    "D'après votre taille, votre dernière pesée, votre masse grasse et vos mensurations. Une forme approximative, pas un scan.",
-  "twin.shape.need": "Ajoutez votre taille et une pesée, ou votre masse grasse ou vos mensurations, et la figure prendra votre silhouette.",
+    "Donne aux figures de Corps et des démonstrations votre silhouette, d'après votre taille, votre dernière pesée, votre masse grasse et vos mensurations. Une forme approximative, pas un scan.",
+  "twin.shape.need":
+    "La figure a besoin de votre taille et d'une pesée, ou de votre masse grasse ou de vos mensurations. Ajoutez-les et elle prendra votre silhouette.",
+  "twin.shape.from": "Silhouette d'après {items}.",
+  "twin.shape.close": "C'est proche de la silhouette moyenne, donc le changement est léger.",
+  "twin.shape.fat": "{pct} % de masse grasse",
+  "twin.shape.measures": "vos mensurations",
+  "twin.shape.addHeight": "Ajouter votre taille",
+  "twin.shape.addBody": "Noter une pesée ou des mensurations",
 };
 
 export const de: Partial<Record<Key, Message>> = {
@@ -796,8 +818,16 @@ export const de: Partial<Record<Key, Message>> = {
   "twin.did.easier": "{signal}: in der heutigen Empfehlung berücksichtigt, daher fällt der Plan lockerer aus.",
   "twin.did.push": "{signal}: in der heutigen Empfehlung berücksichtigt, daher kann der Plan etwas mehr Gas geben.",
   "twin.shape.label": "Figur nach meinen Maßen formen",
-  "twin.shape.hint": "Aus deiner Größe, dem letzten Wiegen, deinem Körperfett und deinen Umfangsmaßen. Eine ungefähre Form, kein Scan.",
-  "twin.shape.need": "Trag deine Größe und ein Gewicht ein, oder dein Körperfett oder Umfangsmaße, dann nimmt die Figur deine Form an.",
+  "twin.shape.hint":
+    "Formt die Figuren unter Körper und in den Übungsvorführungen nach deiner Größe, dem letzten Wiegen, deinem Körperfett und deinen Umfangsmaßen. Eine ungefähre Form, kein Scan.",
+  "twin.shape.need":
+    "Die Figur braucht deine Größe und ein Gewicht, oder dein Körperfett oder Umfangsmaße. Trag sie ein, dann nimmt sie deine Form an.",
+  "twin.shape.from": "Geformt nach {items}.",
+  "twin.shape.close": "Das liegt nah am Durchschnitt, deshalb ist die Änderung klein.",
+  "twin.shape.fat": "{pct} % Körperfett",
+  "twin.shape.measures": "deinen Umfangsmaßen",
+  "twin.shape.addHeight": "Größe eintragen",
+  "twin.shape.addBody": "Gewicht oder Maße eintragen",
 };
 
 export const it: Partial<Record<Key, Message>> = {
@@ -996,8 +1026,15 @@ export const it: Partial<Record<Key, Message>> = {
   "twin.did.push": "{signal}: incluso nella scelta di oggi, quindi il piano può spingere un po’.",
   "twin.shape.label": "Dai alla figura la mia forma",
   "twin.shape.hint":
-    "In base alla tua altezza, all'ultima pesata, alla massa grassa e alle misure. Una forma approssimativa, non una scansione.",
-  "twin.shape.need": "Aggiungi la tua altezza e una pesata, oppure la massa grassa o le misure, e la figura prenderà la tua forma.",
+    "Dà alle figure di Corpo e delle dimostrazioni la tua forma, in base ad altezza, ultima pesata, massa grassa e misure. Una forma approssimativa, non una scansione.",
+  "twin.shape.need":
+    "La figura ha bisogno della tua altezza e di una pesata, oppure della massa grassa o delle misure. Aggiungile e prenderà la tua forma.",
+  "twin.shape.from": "Forma basata su {items}.",
+  "twin.shape.close": "È vicina alla corporatura media, quindi il cambiamento è piccolo.",
+  "twin.shape.fat": "{pct}% di massa grassa",
+  "twin.shape.measures": "le tue misure",
+  "twin.shape.addHeight": "Aggiungi la tua altezza",
+  "twin.shape.addBody": "Registra una pesata o le misure",
 };
 
 export const ja: Partial<Record<Key, Message>> = {
@@ -1188,6 +1225,13 @@ export const ja: Partial<Record<Key, Message>> = {
   "twin.did.easier": "{signal}：今日の判断に反映され、プランは軽めになっています。",
   "twin.did.push": "{signal}：今日の判断に反映され、プランは少し攻めた内容になっています。",
   "twin.shape.label": "フィギュアを自分の体型にする",
-  "twin.shape.hint": "身長、最新の体重、体脂肪率、採寸の値から作ります。おおよその体型で、スキャンではありません。",
-  "twin.shape.need": "身長と体重、または体脂肪率や採寸の値を追加すると、フィギュアがあなたの体型になります。",
+  "twin.shape.hint":
+    "身長、最新の体重、体脂肪率、採寸の値から、ボディとエクササイズのデモのフィギュアをあなたの体型にします。おおよその体型で、スキャンではありません。",
+  "twin.shape.need": "フィギュアには身長と体重、または体脂肪率や採寸の値が必要です。追加するとあなたの体型になります。",
+  "twin.shape.from": "{items}から作った体型です。",
+  "twin.shape.close": "平均的な体型に近いため、変化はわずかです。",
+  "twin.shape.fat": "体脂肪率{pct}%",
+  "twin.shape.measures": "採寸の値",
+  "twin.shape.addHeight": "身長を追加",
+  "twin.shape.addBody": "体重や採寸を記録",
 };

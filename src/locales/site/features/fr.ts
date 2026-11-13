@@ -207,7 +207,7 @@ export const fr: FeaturesText = {
     },
     "body-figure": {
       name: "Une silhouette 3D à votre forme",
-      body: "Activez-la et la silhouette de Santé prend votre gabarit d'après votre taille, poids, masse grasse et mensurations.",
+      body: "Activez-la et les silhouettes de Santé, de la carte de récupération et des démonstrations prennent votre gabarit d'après votre taille, poids, masse grasse et mensurations.",
     },
     "health-twin": {
       name: "Jumeau santé et âge physique",

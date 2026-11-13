@@ -32,6 +32,7 @@ import type { Pattern } from "@/lib/types";
 
 import { BarPathReplay } from "./BarPathReplay";
 import { Icon } from "./icons";
+import { useMyShape } from "./myShape";
 
 export type Facing = "user" | "environment";
 export type CountSource = "camera" | "motion";
@@ -158,6 +159,7 @@ export function AutoCount({
   onClose: () => void;
   paused?: boolean;
 }) {
+  const shape = useMyShape();
   const video = useRef<HTMLVideoElement>(null);
   const bones = useRef<HTMLCanvasElement>(null);
   const [phase, setPhase] = useState<Phase>("starting");
@@ -434,6 +436,7 @@ export function AutoCount({
         <LiftDemo
           exerciseId={exerciseId}
           body={body}
+          shape={shape}
           view={formTipNow?.issue?.kind === "lean" ? "front" : "side"}
           lean={shownLean(formTipNow?.issue)}
           bpm={bpm}

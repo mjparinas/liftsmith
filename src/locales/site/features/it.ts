@@ -200,7 +200,7 @@ export const it: FeaturesText = {
     },
     "body-figure": {
       name: "Una figura 3D con la tua forma",
-      body: "Attivala e la figura in Salute prende la tua corporatura da altezza, peso, grasso corporeo e circonferenze.",
+      body: "Attivala e le figure in Salute, nella mappa del recupero e nelle dimostrazioni prendono la tua corporatura da altezza, peso, grasso corporeo e circonferenze.",
     },
     "health-twin": {
       name: "Gemello della salute ed età fitness",

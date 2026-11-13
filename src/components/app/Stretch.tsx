@@ -33,6 +33,7 @@ import { MUSCLE_LABEL, MUSCLES, type Muscle, type StretchEvent } from "@/lib/typ
 import { useNow } from "@/lib/useNow";
 
 import { Icon } from "./icons";
+import { useMyShape } from "./myShape";
 import { go, goBack } from "./router";
 import { muscleHue } from "./theme";
 import { Button, Chip, EmptyState, ScreenHeader, Sheet, SwitchRow } from "./ui";
@@ -252,6 +253,7 @@ function QuickStart({ icon, title, onClick }: { icon: "flame" | "leaf"; title: s
 
 function StretchDemo({ s, className = "", paused }: { s: Stretch; className?: string; paused?: boolean }) {
   const { profile } = useApp();
+  const shape = useMyShape();
   return (
     <LiftDemo
       exerciseId={demoId(s.id)}
@@ -259,6 +261,7 @@ function StretchDemo({ s, className = "", paused }: { s: Stretch; className?: st
       highlight={highlight(s)}
       view={stretchView(s.id)}
       body={bodyFor(profile.sex)}
+      shape={shape}
       fps={30}
       paused={paused}
       className={className}

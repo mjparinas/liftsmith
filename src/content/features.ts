@@ -354,7 +354,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "body-figure",
         name: "A 3D figure shaped like you",
-        body: "Turn it on and the figure on Health takes your build from your height, weight, body fat and tape measurements.",
+        body: "Turn it on and the figures on Health, the recovery map and the exercise demos take your build from your height, weight, body fat and tape measurements.",
         tier: "free",
         added: "2026-11-12",
       },

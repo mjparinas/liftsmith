@@ -206,7 +206,7 @@ export const de: FeaturesText = {
     },
     "body-figure": {
       name: "Eine 3D-Figur in deiner Form",
-      body: "Schalte sie ein, und die Figur unter Gesundheit übernimmt deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
+      body: "Schalte sie ein, und die Figuren unter Gesundheit, in der Erholungskarte und in den Übungsvorführungen übernehmen deinen Körperbau aus Größe, Gewicht, Körperfett und Umfängen.",
     },
     "health-twin": {
       name: "Gesundheitszwilling und Fitnessalter",

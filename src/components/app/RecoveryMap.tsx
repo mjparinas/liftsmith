@@ -18,6 +18,7 @@ import { togglePriority } from "@/lib/training";
 import { MUSCLE_LABEL, MUSCLES, type Muscle } from "@/lib/types";
 import { useNow } from "@/lib/useNow";
 
+import { useMyShape } from "./myShape";
 import { Button } from "./ui";
 
 // The recovery map (Melvin, 2026-11-09): the exercise demos' 3D hologram figure, standing, with each
@@ -208,9 +209,11 @@ function Body3D({
   }
 
   const lite = useLiteDemos();
+  const shape = useMyShape();
   const settings: DemoSettings = {
     exerciseId: null,
     body: bodyFor(profile.sex),
+    shape,
     view,
     skeleton: false,
     muscles: true,
@@ -262,7 +265,7 @@ function Body3D({
 
   useEffect(() => {
     loopRef.current?.update(latest.current);
-  }, [view, paint, hatch, lit, settings.picked, settings.body]);
+  }, [view, paint, hatch, lit, settings.picked, settings.body, shape]);
 
   const summary = groups
     .map((g) => t("map.group", { band: g.label, muscles: list(g.muscles.map((m) => MUSCLE_LABEL[m].toLowerCase())) }))

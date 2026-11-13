@@ -199,7 +199,7 @@ export const es: FeaturesText = {
     },
     "body-figure": {
       name: "Una figura 3D con tu forma",
-      body: "Actívala y la figura de Salud toma tu complexión a partir de tu altura, peso, grasa corporal y medidas.",
+      body: "Actívala y las figuras de Salud, del mapa de recuperación y de las demostraciones toman tu complexión a partir de tu altura, peso, grasa corporal y medidas.",
     },
     "health-twin": {
       name: "Gemelo de salud y edad física",

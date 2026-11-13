@@ -48,6 +48,7 @@ import { MachineSettings, ReplanSheet, WhySheet } from "./CoachExtras";
 import { ExerciseBrowser } from "./ExerciseBrowser";
 import { clock, loadText, repsText, setText } from "./format";
 import { Icon } from "./icons";
+import { useMyShape } from "./myShape";
 import { NowPlayingBar } from "./NowPlaying";
 import { type PlateFinish } from "./Plates";
 import { go } from "./router";
@@ -91,6 +92,7 @@ export const HR_NOTIFY_MS = 5_000;
 export function Workout() {
   const s = useApp();
   const { active, gyms, profile, events } = s;
+  const shape = useMyShape();
   const gym = gyms.find((g) => g.id === active?.plan.gymId) ?? gyms[0];
   // While hidden the clock stops (the native notification counts the rest down itself); the web has no
   // native alert, so it asks for one tick when rest ends, for its rest-over notification.
@@ -731,6 +733,7 @@ export function Workout() {
               <LiftDemo
                 exerciseId={ex.id}
                 body={bodyFor(profile.sex)}
+                shape={shape}
                 bpm={bpm}
                 hrTrend={active.hr}
                 // Still during rest: the figure only moves while there's a set to do (docs/decisions/speed.md).
@@ -963,7 +966,7 @@ export function Workout() {
       <Sheet open={infoOpen} onClose={() => setInfoOpen(false)} title={ex?.name ?? ""}>
         {ex && (
           <div className="space-y-4">
-            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} bpm={bpm} controls />
+            <LiftDemo exerciseId={ex.id} body={bodyFor(profile.sex)} shape={shape} bpm={bpm} controls />
             <FavouriteButton exerciseId={ex.id} />
             <SetHints ex={ex} />
             <p className="text-muted">{ex.setup}</p>
