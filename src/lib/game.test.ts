@@ -119,6 +119,15 @@ describe("achievements", () => {
     }
     expect(ACHIEVEMENTS.filter((a) => a.secret).length).toBeGreaterThanOrEqual(10);
   });
+  it("say one, not ones, when a tier asks for 1", () => {
+    // A first badge read "Finish 1 workouts that start before 8 am" (UX audit, 2026-11-13).
+    const list = achievements(context([], derive([], NOW), profile(), 0));
+    const firsts = list.filter((a) => ACHIEVEMENTS.find((d) => d.id === a.id)!.tiers[0] === 1 && a.next);
+    expect(firsts.length).toBeGreaterThan(10);
+    for (const a of firsts)
+      expect(a.next!.detail, a.id).not.toMatch(/\b1 (strict )?(workouts|PRs|challenge sets|exercises|easy days|push days|pull-ups)\b/);
+    expect(list.find((a) => a.id === "early")!.next!.detail).toBe("Finish 1 workout that starts before 8 am");
+  });
   it("have catalogue names that match the table in English, and translate", () => {
     for (const a of ACHIEVEMENTS) expect(achName(a.id), a.id).toBe(a.name);
     const ev = workout(NOW - D, "a");

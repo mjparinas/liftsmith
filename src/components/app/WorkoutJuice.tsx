@@ -71,7 +71,8 @@ export function AlmostThere({ exerciseId, weight, reps }: { exerciseId: string; 
   if (need === null || need > reps + 2) return null;
   const at = `${fmtNum(fromKg(weight, profile.unit))} ${profile.unit}`;
   return (
-    <p className="mt-2 text-center text-sm text-gold">
+    <p className="mt-2 flex items-start justify-center gap-1.5 text-center text-sm text-gold">
+      <Icon name="trophy" size={16} className="mt-0.5 shrink-0" />
       {need <= reps ? t("pr.isNew", { reps, weight: at }) : t("pr.inReach", { reps: need, weight: at })}
     </p>
   );
