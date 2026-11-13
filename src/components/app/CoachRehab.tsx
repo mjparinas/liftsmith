@@ -54,6 +54,15 @@ export function ClientPain({ name, rehab, names }: { name: string; rehab: RehabI
                     {t(i.change > 0 ? "trn.painWorse" : "trn.painBetter", { count: Math.abs(i.change) })}
                   </p>
                 )}
+                {i.lastWorkout && (
+                  <p className="num mt-1 text-sm text-muted" data-testid="client-pain-workout">
+                    {t("trn.painWorkout", {
+                      before: i.lastWorkout.before,
+                      after: i.lastWorkout.after,
+                      date: date(i.lastWorkout.at, { month: "short", day: "numeric" }),
+                    })}
+                  </p>
+                )}
                 {i.byExercise.length > 0 && (
                   <ul className="mt-2 divide-y divide-line border-t border-line">
                     {i.byExercise.map((x) => (
