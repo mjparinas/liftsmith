@@ -55,6 +55,7 @@ import { batch, query, rateLimit, run, type Row } from "./db";
 import { recordAccept } from "./earnedPro";
 import { checkText, hasBlockedWord, tidy } from "./moderation";
 import { dropToken, notify, saveToken } from "./push";
+import { isMinor } from "./teams";
 
 export type Result = { code: number; body: Record<string, unknown> };
 const ok = (body: Record<string, unknown> = { ok: true }): Result => ({ code: 200, body });
@@ -281,6 +282,9 @@ export async function join(accountId: string, b: Record<string, unknown>, now = 
   } catch {
     return fail(409, "handleTaken"); // two people racing for one handle: the UNIQUE index decides
   }
+  // Teen-safe (docs/decisions/school-teams.md): someone under 18 isn't suggested to strangers until they say so.
+  if (b.suggest !== true && (await isMinor(accountId, now)))
+    await run("UPDATE social_profiles SET suggest = 0 WHERE account_id = ?", [accountId]);
   return me(accountId);
 }
 
@@ -302,7 +306,9 @@ export async function update(accountId: string, b: Record<string, unknown>): Pro
   }
   const flag = (v: unknown, was: unknown) => (typeof v === "boolean" ? (v ? 1 : 0) : n(was));
   // Public means anyone can follow too, so turning it on opens the profile and closing the profile makes it private.
-  const pub = b.open === false ? 0 : flag(b.public, p.public);
+  // Teen-safe (school teams, docs/decisions/school-teams.md): someone under 18 can't make their profile public.
+  const minor = await isMinor(accountId);
+  const pub = b.open === false || minor ? 0 : flag(b.public, p.public);
   const open = pub ? 1 : flag(b.open, p.open);
   try {
     const push = (b.push && typeof b.push === "object" ? b.push : {}) as Record<string, unknown>;

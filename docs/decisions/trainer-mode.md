@@ -5,6 +5,7 @@ Melvin, 2026-11-11, from the competitor-gaps list: "coaches build programs for c
 ## Pricing
 
 - **Out of Labs, a Pro feature** (Melvin picked it, 2026-11-12, from the focus-area ranking: "trainer mode out of Labs"). Coaching clients is `coaching` in `PRO_FEATURES` (`entitlements.ts`), on the paywall like every Pro feature (`#/pro/coaching`); the `labTrainer` flag and its Labs entry are gone. Free lifters see the Coach clients row with a Pro tag that opens the paywall. **Being a client is free** for everyone, so a coach can bring anyone in. **A coach with 3 or more clients who each trained in the last 14 days gets Pro free** while that holds (Melvin, 2026-11-12, growth plan item 3; `coachEarnsPro` in `src/server/earnedPro.ts`, [Growth](growth.md)). Up to 30 clients per coach. The check is on the coach's phone; the server doesn't know about Pro (store subscriptions live in RevenueCat).
+- **High school coaches get Pro free** once they prove a school email address, and so do their athletes aged 13 to 18, who join through a team code and become the coach's clients; a verified school coach can have up to 300 clients (Melvin, 2026-11-13; [School teams](school-teams.md)).
 - **A coach plan waits** until real trainers use it (Melvin, 2026-11-12: "coach pricing later"). The coach page says coaching more than 30 people should get in touch.
 - *Before:* a lab from 2026-11-11 (`labTrainer`, Melvin chose it then).
 
@@ -71,3 +72,32 @@ Melvin asked for "nutrition targets for clients" in a round of coach tools (2026
 - **The coach sees how they're eating** only when the client shares body data, which now also carries the calories and protein from the last 30 days (`food` in `bodyOf`; the switch's text says so). The report shows the last week's average under the targets, and **What to do** flags calories 10% or more off the target or protein under 85% of it, over 4+ logged days (`foodFlags`).
 - Unlinking or deleting an account deletes the targets. Analytics: `feature` `trainer` with `targets` and `untargets`.
 
+
+## Check-in forms and questionnaires (built 2026-11-13)
+
+Melvin asked for "check-in forms and questionnaires" in the same round.
+
+- **Forms** (`coach_forms`, `src/server/coachForms.ts`, `CoachCheckins.tsx`): a coach keeps up to 10 forms of up to 12 questions at #/trainer/forms (Edit forms on a client's report). A new form starts from a template, Weekly check-in (sleep, energy and following the plan on 1 to 5, weight, what went well, what to change), Intake questionnaire (goal, years trained, days a week, gym or not, injuries, anything else) or Blank, written in the coach's language and theirs to change. Question kinds: 1 to 5, a number, yes or no, and words. Titles 80 characters, questions 160, word answers 1,000.
+- **Sending** from a client's report: pick a form, Send now, and a switch to send it every week (`coach_checkin_repeats`; the daily admin cron sends the due ones, so a weekly form goes out on the morning it's due, `sendDueCheckins`). A check-in is a copy of the form's questions when sent, so editing or deleting a form never changes answers already given. At most 3 check-ins wait unanswered per client; the oldest waiting one is dropped when a fourth goes out. The last 12 show on the report.
+- **The client answers** at #/trainer/f.<id>, opened from the push (`coachCheckin`), a card on Today and a row under Your coach. Taps for 1 to 5 and yes or no, a `BumpField` in half steps for numbers, a box only for questions asking for words. Anything can be skipped, and a check-in is answered once (a conditional update, so two taps can't both save). The coach gets a push (`coachCheckinDone`) and reads the answers in a sheet from the report.
+- **What to do first** on the report says when the latest check-in has waited 3+ days, and lists any score of 1 or 2 in the latest answers from the last two weeks (`checkinFlags`), with what to do about it.
+- Free for clients, part of the Pro `coaching` feature for coaches, like the rest. Pure web code with the existing push, so Android, iOS and the web get it together. Unlinking deletes the pair's check-ins and repeats; deleting an account also deletes its forms. Analytics: `feature` `trainer` with `form`, `checkinSend`, `checkinWeekly`, `checkinOnce` and `checkinAnswer`.
+
+## Personal trainers and coaches (2026-11-13)
+
+Melvin: "can we differentiate between personal trainers and coaches please", and chose "Role sets labels and defaults" over a strict split of tools or two separate Pro features.
+
+- **A coaching account says how it works** under Your clients (`RolePick`, saved as `coach_prefs.role`, the `role` action): **Personal trainer** (one-on-one clients, mostly in person: sessions, booking and a price per session first) or **Coach** (teams and groups, often remotely: check-ins, programs and a monthly fee first). Unset until they pick.
+- **It changes words and order, never tools.** Every coaching tool stays available to both, because many trainers also run small groups and coaches book one-on-ones. Clients see the role beside their coach's name and on the invite, and a lifter whose coaches are all personal trainers reads "Your trainer" and "From your trainer" instead of "coach" (`trainersOnly`). The booking and payment tools that follow use it for their defaults (a price per session for trainers, a monthly fee for coaches).
+- Still one Pro feature (`coaching`), one paywall entry, and a features page line (`coach-roles`).
+
+## Booking and scheduling sessions (built 2026-11-13)
+
+Melvin asked for "booking and scheduling sessions" in the same round.
+
+- **Times** (`coach_slots`, `src/server/coachBooking.ts`, `CoachSessions.tsx`): a coach opens times under Your clients (Sessions › Add times): a day chip (today and the next three weeks), the start time in the phone's own time picker, a length chip (30, 45, 60 or 90 minutes), how often (once, or the same time every week for 4, 8 or 12 weeks), an optional place, and who: open to all their clients, or one client booked straight in. From a client's report, Book {name} in does the same with that client picked. Up to 300 upcoming times, at most 120 days ahead, 15 to 240 minutes. A personal trainer's Sessions sit above their client list, a coach's below it (the role).
+- **Booking**: a client sees their own booked sessions and their coaches' open times under Your coach (Book a session, a sheet of open times by day). Two clients tapping the same time: a conditional update gives it to one, and the other is told to pick another. Clients never see who else booked what.
+- **Cancelling**: a client's cancel opens the time again for other clients; the coach's removes the time. Leaving a coach opens their booked times again; deleting a coach's account removes their times.
+- **Notifications** (`coachBooked`, `coachCancelled`): to the coach when a client books or cancels, to the client when the coach books them in or cancels. The server doesn't know time zones, so the push says the time as the sender's phone wrote it (`label`); times are stored in UTC and each phone shows them in its own zone. There are no reminder pushes before a session yet, because the server's jobs run once a day; instead a session in the next 24 hours shows on Today (`SessionToday`, from the coach's notes refresh).
+- **Calendar**: Add to calendar on a booked session (`addEvent` in `calendar.ts`). Android opens the calendar app's new-event screen filled in (no permission), iOS saves it through EventKit, and the web downloads a `.ics` file ([Platform deltas](platform-deltas.md)).
+- Free for clients, part of the Pro `coaching` feature for coaches. Analytics: `feature` `trainer` with `slotOpen`, `slotBook`, `slotCancel`, `slotBooked` and `slotUnbook`.

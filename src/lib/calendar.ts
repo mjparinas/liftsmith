@@ -137,6 +137,8 @@ type Plugin = {
   removeTrainingDays(): Promise<void>;
   show(o: { at: number }): Promise<void>;
   busy(o: { from: number; to: number }): Promise<{ busy: Busy[] }>;
+  /** One event (a booked coaching session): Android opens the calendar app's new-event screen filled in; iOS saves it. */
+  addEvent(o: { start: number; minutes: number; title: string; notes: string; place: string }): Promise<{ saved: boolean }>;
 };
 const plugin = (): Plugin | undefined =>
   typeof window !== "undefined"
@@ -212,10 +214,56 @@ export async function busyTimes(now: number, hours = 3): Promise<Busy[]> {
   }
 }
 
+/** A calendar file with one event at a fixed time (a booked session), in UTC so every calendar puts it right. */
+export function eventIcs(
+  e: { id: string; start: number; minutes: number; title: string; notes: string; place: string },
+  now: number,
+): string {
+  const esc = (x: string) => x.replace(/[\\;,]/g, (c) => `\\${c}`).replace(/\n/g, "\\n");
+  return [
+    "BEGIN:VCALENDAR",
+    "VERSION:2.0",
+    "PRODID:-//Liftsmith//Session//EN",
+    "CALSCALE:GREGORIAN",
+    "BEGIN:VEVENT",
+    `UID:session-${e.id}@getliftsmith.com`,
+    `DTSTAMP:${icsUtc(now)}`,
+    `DTSTART:${icsUtc(e.start)}`,
+    `DTEND:${icsUtc(e.start + e.minutes * MIN)}`,
+    `SUMMARY:${esc(e.title)}`,
+    `DESCRIPTION:${esc(e.notes)}`,
+    ...(e.place ? [`LOCATION:${esc(e.place)}`] : []),
+    "END:VEVENT",
+    "END:VCALENDAR",
+    "",
+  ].join("\r\n");
+}
+
+/** Puts one session in the lifter's calendar: the native calendar on the phones, a .ics download on the web. */
+export async function addEvent(e: {
+  id: string;
+  start: number;
+  minutes: number;
+  title: string;
+  notes: string;
+  place: string;
+}): Promise<boolean> {
+  const p = plugin();
+  if (p && isNative()) {
+    try {
+      return (await p.addEvent({ start: e.start, minutes: e.minutes, title: e.title, notes: e.notes, place: e.place })).saved;
+    } catch {
+      return false;
+    }
+  }
+  downloadIcs(eventIcs(e, Date.now()), "liftsmith-session.ics");
+  return true;
+}
+
 /** Web fallback for writing: download the .ics file. */
-export function downloadIcs(ics: string) {
+export function downloadIcs(ics: string, name = "liftsmith-training.ics") {
   const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar" }));
-  const a = Object.assign(document.createElement("a"), { href: url, download: "liftsmith-training.ics" });
+  const a = Object.assign(document.createElement("a"), { href: url, download: name });
   document.body.appendChild(a);
   a.click();
   a.remove();

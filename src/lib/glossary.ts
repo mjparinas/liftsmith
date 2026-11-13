@@ -47,6 +47,7 @@ const TERMS = [
   "crate",
   "badges",
   "monthly",
+  "schoolTeams",
 ] as const;
 
 export type Term = (typeof TERMS)[number];

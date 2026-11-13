@@ -14,6 +14,7 @@ import * as advice from "./text/advice";
 import * as appearance from "./text/appearance";
 import * as awards from "./text/awards";
 import * as band from "./text/band";
+import * as bk from "./text/bk";
 import * as block from "./text/block";
 import * as bmi from "./text/bmi";
 import * as body from "./text/body";
@@ -25,6 +26,7 @@ import * as callText from "./text/callText";
 import * as card from "./text/card";
 import * as category from "./text/category";
 import * as cause from "./text/cause";
+import * as chk from "./text/chk";
 import * as coach from "./text/coach";
 import * as conn from "./text/conn";
 import * as cos from "./text/cos";
@@ -110,6 +112,7 @@ import * as str from "./text/str";
 import * as tab from "./text/tab";
 import * as td from "./text/td";
 import * as tdee from "./text/tdee";
+import * as team from "./text/team";
 import * as tempo from "./text/tempo";
 import * as theme from "./text/theme";
 import * as tier from "./text/tier";
@@ -142,6 +145,7 @@ export const en = {
   ...appearance.en,
   ...awards.en,
   ...band.en,
+  ...bk.en,
   ...block.en,
   ...bmi.en,
   ...body.en,
@@ -153,6 +157,7 @@ export const en = {
   ...callText.en,
   ...category.en,
   ...cause.en,
+  ...chk.en,
   ...coach.en,
   ...conn.en,
   ...cos.en,
@@ -239,6 +244,7 @@ export const en = {
   ...timer.en,
   ...tdee.en,
   ...theme.en,
+  ...team.en,
   ...tier.en,
   ...time.en,
   ...today.en,

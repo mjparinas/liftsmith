@@ -22,6 +22,7 @@ import { CALL_TEXT, readiness } from "@/lib/readiness";
 import { useApp } from "@/lib/store";
 import { scoreBand, strength } from "@/lib/strength";
 import { bmiBand, bmiCategory } from "@/lib/tdee";
+import { bodyCompOn, isTeen } from "@/lib/teen";
 import { healthExternal, twin, type Status, type TwinId, type TwinMetric } from "@/lib/twin";
 import { MEASURE_SITES, type Unit } from "@/lib/types";
 import { fmtHeight, fmtNum, fmtWeight } from "@/lib/units";
@@ -128,7 +129,10 @@ function ShapeSwitch() {
 const storeName = () => (typeof navigator !== "undefined" && /iPhone|iPad/.test(navigator.userAgent) ? "Apple Health" : "Health Connect");
 
 export function HealthTwin() {
-  const { events, profile, stats, readiness: r, setCall } = useApp();
+  const { events, profile, stats, readiness: r, setCall, setProfile } = useApp();
+  // Under 18, body fat and the shaped figure wait until they turn them on (teen.ts).
+  const teen = isTeen(profile);
+  const comp = bodyCompOn(profile);
   // The figure shaped from the lifter's own numbers, when they turned it on (bodyShape.ts, myShape.ts).
   const shape = useMyShape();
   const now = useNow(60_000);
@@ -221,12 +225,20 @@ export function HealthTwin() {
         <span className="sr-only">{t("twin.figure", { summary })}</span>
         <Pin m={by.get("sleep")} className="left-2 top-9" onOpen={setOpen} />
         <Pin m={by.get("hrv")?.display ? by.get("hrv") : rhr} className="right-2 top-20" onOpen={setOpen} />
-        <Pin m={by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
+        <Pin m={comp && by.get("bodyFat")?.display ? by.get("bodyFat") : by.get("bmi")} className="left-2 top-48" onOpen={setOpen} />
         <Pin m={by.get("weight")} className="right-2 top-60" onOpen={setOpen} />
         <Pin m={by.get("tdee")} className="bottom-8 left-1/2 -translate-x-1/2" onOpen={setOpen} />
       </div>
 
-      <ShapeSwitch />
+      {teen && (
+        <SwitchRow
+          label={t("team.bodyComp.label")}
+          hint={t("team.bodyComp.hint")}
+          on={!!profile.bodyComp}
+          onChange={(v) => setProfile({ bodyComp: v })}
+        />
+      )}
+      {comp && <ShapeSwitch />}
 
       <FitnessAgeCard native={native} store={store} />
       <FitTestsCard />

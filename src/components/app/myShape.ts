@@ -9,6 +9,7 @@ import { bodyFor } from "@/components/demo/LiftDemo";
 import { canShape, shapeBody, statsFrom, type BodyStats } from "@/lib/bodyShape";
 import type { Body } from "@/lib/demo/rig";
 import { useApp } from "@/lib/store";
+import { bodyCompOn } from "@/lib/teen";
 
 /** The lifter's numbers and whether there's enough of them to shape a figure. */
 export function useMyStats(): { stats: BodyStats; shapeable: boolean } {
@@ -22,7 +23,8 @@ export function useMyStats(): { stats: BodyStats; shapeable: boolean } {
 
 /** The figure shaped like the lifter, or undefined for the average one. */
 export function useMyShape(): Body | undefined {
-  const on = useApp((s) => !!s.profile.shapeFigure);
+  // Under 18, the shaped figure waits until body composition is turned on (teen.ts).
+  const on = useApp((s) => !!s.profile.shapeFigure && bodyCompOn(s.profile));
   const sex = useApp((s) => s.profile.sex);
   const { stats, shapeable } = useMyStats();
   return useMemo(() => (on && shapeable ? shapeBody(bodyFor(sex), stats) : undefined), [on, sex, shapeable, stats]);

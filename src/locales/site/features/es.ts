@@ -281,6 +281,22 @@ export const es: FeaturesText = {
       name: "Objetivos de nutrición para clientes",
       body: "Fija las calorías y la proteína diarias de cada cliente. Sus notas del entrenador comparan su semana de comida con ellas, y ves cómo come cuando lo comparte.",
     },
+    "school-teams": {
+      name: "Gratis para equipos de secundaria",
+      body: "Los entrenadores de secundaria que confirman un correo escolar tienen Pro gratis, igual que los atletas de 13 a 18 años de sus equipos, con una tabla semanal del equipo. La grasa corporal y los perfiles públicos siguen desactivados para menores de 18.",
+    },
+    "coach-checkins": {
+      name: "Formularios de revisión y cuestionarios",
+      body: "Envía a tus clientes una revisión semanal, un cuestionario inicial o tu propio formulario, una vez o cada semana. Responden con unos toques, y una puntuación baja o una respuesta tardía aparece arriba en su informe.",
+    },
+    "coach-roles": {
+      name: "Para entrenadores personales y coaches",
+      body: "Indica si eres entrenador personal uno a uno o coach de grupos y equipos. Tus clientes ven la palabra correcta y lo que más usas va primero.",
+    },
+    "coach-booking": {
+      name: "Reserva y agenda de sesiones",
+      body: "Abre las horas que tienes libres, una vez o cada semana, y tus clientes las reservan en la app, o resérvalos tú. Ambos reciben una notificación, una sesión del día siguiente aparece en Hoy y pasa a su calendario con un toque.",
+    },
     awards: {
       name: "Logros, niveles y rachas",
       body: "Insignias por niveles, 50 niveles con recompensas, misiones semanales, protectores de racha y ligas honestas.",

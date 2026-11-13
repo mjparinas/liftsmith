@@ -286,6 +286,22 @@ export const fr: FeaturesText = {
       name: "Objectifs nutritionnels pour les clients",
       body: "Fixez les calories et protéines quotidiennes de chaque client. Ses notes du coach comparent sa semaine à ces objectifs, et vous voyez comment il mange s'il le partage.",
     },
+    "school-teams": {
+      name: "Gratuit pour les équipes d’école secondaire",
+      body: "Les entraîneurs d’école secondaire qui confirment un courriel scolaire ont Pro gratuitement, tout comme les athlètes de 13 à 18 ans de leurs équipes, avec un tableau d’équipe chaque semaine. La masse grasse et les profils publics restent désactivés pour les moins de 18 ans.",
+    },
+    "coach-checkins": {
+      name: "Formulaires de bilan et questionnaires",
+      body: "Envoyez à vos clients un bilan hebdomadaire, un questionnaire d'accueil ou votre propre formulaire, une fois ou chaque semaine. Ils répondent en quelques touches, et une note basse ou une réponse en retard remonte en haut de leur rapport.",
+    },
+    "coach-roles": {
+      name: "Pour les coachs personnels et les entraîneurs",
+      body: "Indiquez si vous êtes coach personnel en individuel ou entraîneur de groupes et d'équipes. Vos clients voient le bon mot, et vos outils favoris passent en premier.",
+    },
+    "coach-booking": {
+      name: "Réservation et planning des séances",
+      body: "Ouvrez vos créneaux libres, une fois ou chaque semaine, et vos clients réservent dans l'app, ou réservez-les vous-même. Chacun reçoit une notification, une séance du lendemain s'affiche dans Aujourd'hui et passe dans leur calendrier en une touche.",
+    },
     awards: {
       name: "Succès, niveaux et séries de jours",
       body: "Badges par paliers, 50 niveaux avec récompenses, quêtes hebdomadaires, gels de série et ligues honnêtes.",

@@ -285,6 +285,22 @@ export const de: FeaturesText = {
       name: "Ernährungsziele für Kunden",
       body: "Lege für jeden Kunden Kalorien und Protein pro Tag fest. Die Coach-Hinweise prüfen die Ernährungswoche daran, und du siehst, wie er isst, wenn er es teilt.",
     },
+    "school-teams": {
+      name: "Kostenlos für Schulteams",
+      body: "Trainer an weiterführenden Schulen, die eine Schul-E-Mail-Adresse bestätigen, bekommen Pro kostenlos, ebenso die 13- bis 18-jährigen Sportler ihrer Teams, mit einer wöchentlichen Teamtabelle. Körperfett und öffentliche Profile bleiben für unter 18-Jährige aus.",
+    },
+    "coach-checkins": {
+      name: "Check-in-Formulare und Fragebögen",
+      body: "Schick Kunden einen wöchentlichen Check-in, einen Aufnahmefragebogen oder dein eigenes Formular, einmal oder jede Woche. Sie antworten mit wenigen Tipps, und ein niedriger Wert oder eine fehlende Antwort steht oben in ihrem Bericht.",
+    },
+    "coach-roles": {
+      name: "Für Personal Trainer und Coaches",
+      body: "Sag, ob du als Personal Trainer einzeln arbeitest oder als Coach Gruppen und Teams betreust. Kunden sehen das richtige Wort, und deine wichtigsten Werkzeuge stehen vorn.",
+    },
+    "coach-booking": {
+      name: "Termine buchen und planen",
+      body: "Gib freie Zeiten frei, einmal oder jede Woche, und Kunden buchen sie in der App, oder buch sie selbst ein. Beide bekommen eine Benachrichtigung, ein Termin am nächsten Tag steht auf Heute und landet mit einem Tipp im Kalender.",
+    },
     awards: {
       name: "Erfolge, Level und Serien",
       body: "Abzeichen in Stufen, 50 Level mit Belohnungen, Wochenaufgaben, Serienschutz und ehrliche Ligen.",

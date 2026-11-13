@@ -18,6 +18,31 @@ let linked = false;
 let assigned: unknown[] = [];
 let note: unknown = null;
 let shared: unknown = null;
+const FORM = {
+  id: "f1",
+  title: "Weekly check-in",
+  questions: [
+    { id: "sleep", kind: "scale", label: "How well did you sleep this week?" },
+    { id: "gym", kind: "yesno", label: "Do you train at a gym?" },
+    { id: "weight", kind: "number", label: "Your weight this morning" },
+    { id: "wins", kind: "text", label: "What went well?" },
+  ],
+  at: NOW,
+};
+const CHECKIN = {
+  ...FORM,
+  id: "ci1",
+  coachId: "k1",
+  clientId: "me",
+  formId: "f1",
+  sentAt: NOW - 4 * 86_400_000,
+  answers: null,
+  answeredAt: null,
+};
+let answered: unknown[] = [];
+let trainer = false;
+const SLOT = { id: "s1", coachId: "k1", start: NOW + 2 * 86_400_000, minutes: 60, place: "Main gym", clientId: null, bookedAt: null };
+let mySessions: { booked: unknown[]; open: unknown[] } = { booked: [], open: [] };
 const CODE = "r1~UHVzaA~bench-press.4~lateral-raise.3";
 
 beforeEach(() => {
@@ -27,6 +52,9 @@ beforeEach(() => {
   assigned = [];
   note = null;
   shared = null;
+  answered = [];
+  trainer = false;
+  mySessions = { booked: [], open: [] };
   const account = { token: "tok", id: "me", email: "me@example.com", providers: ["email"], via: "email" as const };
   localStorage.setItem(ACCOUNT_KEY, JSON.stringify(account));
   useAccount.setState({ account });
@@ -41,19 +69,35 @@ beforeEach(() => {
         plans: assigned,
         note,
         body: shared,
+        forms: [FORM],
+        checkins: answered,
+        repeat: null,
       });
+    if (url === "/api/coach/?checkin=ci1") return Response.json({ checkin: CHECKIN });
     if (url === "/api/coach/?chat=k1")
       return Response.json({ name: "Sam", more: false, messages: [{ id: "m1", from: "k1", text: "How did squats feel?", at: NOW }] });
     if (url === "/api/coach/" && !body)
       return Response.json({
         invite: { code: "ABCD2345", expiresAt: NOW + 7 * 86_400_000 },
         clients: [{ id: "c1", name: "Alex", since: NOW }],
-        coaches: linked ? [{ id: "k1", name: "Sam", since: NOW }] : [],
+        coaches: linked ? [{ id: "k1", name: "Sam", since: NOW, ...(trainer ? { role: "trainer" } : {}) }] : [],
         plans: linked ? [{ id: "p1", coachId: "k1", clientId: "me", name: "Push day", code: CODE, at: NOW }] : [],
         notes: linked ? [{ coachId: "k1", clientId: "me", text: "Deload this week.\nSleep more.", at: NOW }] : [],
         setup: { days: 3 },
         targets: linked ? [{ coachId: "k1", clientId: "me", kcal: 2400, protein: 160, at: NOW }] : [],
+        forms: [FORM],
+        checkins: linked ? [CHECKIN] : [],
+        slots: [{ ...SLOT, coachId: "me", id: "s0", clientId: "c1" }],
+        sessions: mySessions,
       });
+    if (body?.action === "slots") return Response.json({ slots: [{ ...SLOT, start: body.slot.start, coachId: "me" }] });
+    if (body?.action === "book") return Response.json({ slot: { ...SLOT, clientId: "me", bookedAt: NOW } });
+    if (body?.action === "cancelSlot") return Response.json({ ok: true });
+    if (body?.action === "sendForm") return Response.json({ checkin: { ...CHECKIN, clientId: body.client, coachId: "me" } });
+    if (body?.action === "repeatForm") return Response.json({ repeat: body.id ? { formId: body.id, nextAt: NOW + 7 * 86_400_000 } : null });
+    if (body?.action === "role") return Response.json({ role: body.role });
+    if (body?.action === "form") return Response.json({ form: { ...body.form, id: "f2", at: NOW } });
+    if (body?.action === "answer") return Response.json({ checkin: { ...CHECKIN, answers: body.answers, answeredAt: NOW } });
     if (body?.action === "preview") return Response.json({ coach: { id: "k1", name: "Sam", since: NOW } });
     if (body?.action === "join") {
       linked = true;
@@ -269,5 +313,146 @@ describe("nutrition targets", () => {
     render(<Trainer />);
     expect(await screen.findByText("Daily targets from Sam")).toBeInTheDocument();
     expect(screen.getByText("2400 kcal · 160 g protein")).toBeInTheDocument();
+  });
+});
+
+describe("check-ins", () => {
+  it("a coach sends a form now and every week from a client's report", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Check-ins")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Send now" }));
+    expect(await screen.findByText("Sent. They'll get a notification.")).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "sendForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+    await u.click(screen.getByRole("switch", { name: /Send this form every week/ }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "repeatForm")).toMatchObject({ body: { client: "c1", id: "f1" } });
+  });
+
+  it("a coach reads a client's answers, and a low score goes first", async () => {
+    answered = [
+      {
+        ...CHECKIN,
+        coachId: "me",
+        clientId: "c1",
+        answers: { sleep: 2, gym: true, weight: 81.5, wins: "Hit a squat best" },
+        answeredAt: NOW - 86_400_000,
+      },
+    ];
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    expect(await screen.findByText("Scored 2 of 5: How well did you sleep this week?")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: /Answered/ }));
+    expect(await screen.findByText("Hit a squat best")).toBeInTheDocument();
+    expect(screen.getByText("2 of 5")).toBeInTheDocument();
+    expect(screen.getByText("Yes")).toBeInTheDocument();
+  });
+
+  it("a coach makes a form from a template", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="forms" />);
+    expect(await screen.findByRole("button", { name: /Weekly check-in/ })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Intake questionnaire" }));
+    expect(await screen.findByDisplayValue("What's your main goal?")).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Save form" }));
+    expect(await screen.findByText("Form saved.")).toBeInTheDocument();
+    const saved = calls.find((c) => (c.body as { action?: string })?.action === "form")?.body as {
+      form: { title: string; questions: unknown[] };
+    };
+    expect(saved.form.title).toBe("Intake questionnaire");
+    expect(saved.form.questions).toHaveLength(6);
+  });
+
+  it("a client answers a check-in with taps, and anything can be skipped", async () => {
+    linked = true;
+    const u = userEvent.setup();
+    render(<Trainer arg="f.ci1" />);
+    expect(await screen.findByRole("heading", { name: "Weekly check-in" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "4" }));
+    await u.click(screen.getByRole("button", { name: "Yes" }));
+    await u.type(screen.getByLabelText("Your weight this morning"), "81.5");
+    await u.click(screen.getByRole("button", { name: "Send answers" }));
+    expect(await screen.findByText(/Thanks!/)).toBeInTheDocument();
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "answer")).toMatchObject({
+      body: { id: "ci1", answers: { sleep: 4, gym: true, weight: 81.5 } },
+    });
+  });
+
+  it("a waiting check-in shows under Coaching and on Today", async () => {
+    linked = true;
+    const { unmount } = render(<Trainer />);
+    expect(await screen.findByText("Check-in from Sam")).toBeInTheDocument();
+    unmount();
+    render(<CoachNoteToday />);
+    expect(screen.getByText("Check-in from Sam")).toBeInTheDocument();
+  });
+});
+
+describe("personal trainer or coach", () => {
+  it("a coach picks how they work", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: "Personal trainer" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "role")).toMatchObject({ body: { role: "trainer" } });
+    expect(screen.getByText(/One-on-one clients/)).toBeInTheDocument();
+  });
+
+  it("a client with a personal trainer sees the word trainer", async () => {
+    linked = true;
+    trainer = true;
+    render(<Trainer />);
+    expect(await screen.findByText("Your trainer")).toBeInTheDocument();
+    expect(screen.getByText("From your trainer")).toBeInTheDocument();
+    expect(screen.getByText(/Personal trainer ·/)).toBeInTheDocument();
+  });
+});
+
+describe("booking sessions", () => {
+  it("a coach sees their next sessions and opens new times", async () => {
+    const u = userEvent.setup();
+    render(<Trainer />);
+    expect(await screen.findByText("Sessions")).toBeInTheDocument();
+    expect(screen.getAllByText(/Main gym/).length).toBeGreaterThan(0);
+    await u.click(screen.getByRole("button", { name: "Add times" }));
+    await u.click(screen.getByRole("button", { name: "Tomorrow" }));
+    await u.click(screen.getByRole("button", { name: "45 min" }));
+    await u.click(screen.getByRole("button", { name: "Every week for 4 weeks" }));
+    await u.click(screen.getByRole("button", { name: "Save times" }));
+    const made = calls.find((c) => (c.body as { action?: string })?.action === "slots")?.body as {
+      slot: { minutes: number; weeks: number; start: number; label: string };
+    };
+    expect(made.slot).toMatchObject({ minutes: 45, weeks: 4 });
+    expect(new Date(made.slot.start).getHours()).toBe(18);
+    expect(made.slot.label).toBeTruthy();
+  });
+
+  it("a coach books a client in from their report", async () => {
+    const u = userEvent.setup();
+    render(<Trainer arg="c.c1" />);
+    await u.click(await screen.findByRole("button", { name: "Book Alex in" }));
+    await u.click(screen.getByRole("button", { name: "Book it" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "slots")).toMatchObject({ body: { slot: { client: "c1" } } });
+  });
+
+  it("a client books an open time with their coach", async () => {
+    linked = true;
+    mySessions = { booked: [], open: [SLOT] };
+    const u = userEvent.setup();
+    render(<Trainer />);
+    await u.click(await screen.findByRole("button", { name: "Book a session" }));
+    await u.click(screen.getByRole("button", { name: /Main gym/ }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "book")).toMatchObject({ body: { id: "s1" } });
+  });
+
+  it("a client's booked session shows with Add to calendar and Cancel, and on Today", async () => {
+    linked = true;
+    mySessions = { booked: [{ ...SLOT, clientId: "me", start: Date.now() + 3_600_000 }], open: [] };
+    const u = userEvent.setup();
+    const { unmount } = render(<Trainer />);
+    expect(await screen.findByRole("button", { name: "Add to calendar" })).toBeInTheDocument();
+    await u.click(screen.getByRole("button", { name: "Cancel" }));
+    expect(calls.find((c) => (c.body as { action?: string })?.action === "cancelSlot")).toMatchObject({ body: { id: "s1" } });
+    unmount();
+    render(<CoachNoteToday />);
+    expect(screen.getAllByText("Session with Sam").length).toBeGreaterThan(0);
   });
 });
