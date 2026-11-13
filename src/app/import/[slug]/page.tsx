@@ -30,7 +30,7 @@ export default async function ImportPage({ params }: Props) {
   const steps = [
     ...s.exportSteps,
     `Open ${BRAND.name} (the app, or the web app in any browser) and go to Settings, then Data.`,
-    "Tap Import workouts (CSV) and pick the file.",
+    "Tap Import from another app (CSV) and pick the file.",
     `Check the exercise list. ${BRAND.name} matches each of your exercises to one in its library; change any it got wrong, or keep it as your own exercise.`,
     "Tap Import. Your workouts appear in your history, and your next plan starts from them.",
   ];

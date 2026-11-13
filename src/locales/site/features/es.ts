@@ -330,7 +330,11 @@ export const es: FeaturesText = {
     },
     import: {
       name: "Importar desde otra app",
-      body: "Trae tu historial desde Strong, Hevy, Fitbod, StrongLifts o JEFIT con su archivo de exportación.",
+      body: "Trae tu historial desde Strong, Hevy, Fitbod, StrongLifts, JEFIT o FitNotes con su archivo de exportación, cardio incluido.",
+    },
+    importExtras: {
+      name: "Rutinas y datos corporales de otra app",
+      body: "Una importación convierte en rutinas los entrenamientos que repetiste con el mismo nombre y trae peso, grasa corporal y medidas desde Hevy, FitNotes o una app de báscula.",
     },
     languages: {
       name: "Seis idiomas",

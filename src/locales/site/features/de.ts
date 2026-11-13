@@ -334,7 +334,11 @@ export const de: FeaturesText = {
     },
     import: {
       name: "Aus einer anderen App importieren",
-      body: "Hol deinen Verlauf aus Strong, Hevy, Fitbod, StrongLifts oder JEFIT mit deren Exportdatei herüber.",
+      body: "Hol deinen Verlauf aus Strong, Hevy, Fitbod, StrongLifts, JEFIT oder FitNotes mit deren Exportdatei herüber, Cardio inklusive.",
+    },
+    importExtras: {
+      name: "Routinen und Körperwerte aus einer anderen App",
+      body: "Ein Import macht Trainings, die du unter demselben Namen wiederholt hast, zu Routinen und holt Körpergewicht, Körperfett und Maße aus Hevy, FitNotes oder einer Waagen-App.",
     },
     languages: {
       name: "Sechs Sprachen",

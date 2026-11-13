@@ -335,7 +335,11 @@ export const fr: FeaturesText = {
     },
     import: {
       name: "Importer depuis une autre appli",
-      body: "Récupérez votre historique depuis Strong, Hevy, Fitbod, StrongLifts ou JEFIT grâce à leur fichier d’export.",
+      body: "Récupérez votre historique depuis Strong, Hevy, Fitbod, StrongLifts, JEFIT ou FitNotes grâce à leur fichier d’export, cardio compris.",
+    },
+    importExtras: {
+      name: "Routines et mesures corporelles d’une autre appli",
+      body: "Un import transforme en routines les séances répétées sous le même nom, et récupère le poids, la masse grasse et les mensurations de Hevy, FitNotes ou d’une appli de balance.",
     },
     languages: {
       name: "Six langues",

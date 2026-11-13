@@ -110,7 +110,7 @@ describe("SEO pages", () => {
     for (const slug of ["strong", "hevy"]) {
       render(await ImportPage({ params: Promise.resolve({ slug }) }));
       expectCtas();
-      expect(screen.getByText(/Import workouts \(CSV\)/)).toBeTruthy();
+      expect(screen.getByText(/Import from another app \(CSV\)/)).toBeTruthy();
       expect(screen.getByText(/trademarks of their owners/)).toBeTruthy();
       cleanup();
     }

@@ -1,11 +1,13 @@
 import { MANUAL_RIR } from "./dashboard";
 import { englishName, EXERCISE_BY_ID, EXERCISES } from "./exercises";
 import { hash } from "./random";
+import { doneItems, routineFrom } from "./routines";
 import type {
   AppEvent,
   Exercise,
   LoadKind,
   Muscle,
+  Routine,
   SessionEndEvent,
   SessionStartEvent,
   SetEvent,
@@ -20,7 +22,11 @@ import { toKg } from "./units";
 // a sessionStart marked `source: "manual"`, the sets, and a sessionEnd. Every id is derived from the
 // file's own data, so importing the same file twice adds nothing. Everything runs on the device.
 
-export type ImportFormat = "strong" | "hevy" | "fitbod" | "stronglifts" | "jefit" | "liftsmith";
+export type ImportFormat = "strong" | "hevy" | "fitbod" | "stronglifts" | "jefit" | "fitnotes" | "liftsmith";
+
+/** Units a distance can come in. A cardio set without one is in km, or miles when the file's weights are in pounds. */
+export type DistUnit = "m" | "km" | "mi" | "ft" | "yd";
+const METRES: Record<DistUnit, number> = { m: 1, km: 1000, mi: 1609.344, ft: 0.3048, yd: 0.9144 };
 
 export interface ImportSet {
   name: string;
@@ -35,6 +41,9 @@ export interface ImportSet {
   superset?: string;
   /** A drop set (Hevy's "dropset", Strong's "D", Liftsmith's "drop"). */
   tag?: SetTag;
+  /** Cardio: the distance covered, in `distUnit` (2026-11-13: cardio comes across too, logged as time and distance). */
+  distance?: number;
+  distUnit?: DistUnit;
 }
 
 export interface ImportWorkout {
@@ -51,7 +60,7 @@ export interface ImportFile {
   /** The weight unit the file states, or null when the lifter has to say (Strong's older export). */
   unit: Unit | null;
   workouts: ImportWorkout[];
-  /** Rows left out: cardio, empty sets, or dates that couldn't be read. */
+  /** Rows left out: rest timers, empty sets, or dates that couldn't be read. */
   skipped: number;
 }
 
@@ -127,7 +136,24 @@ const num = (s: string | undefined) => {
   return Number.isFinite(n) ? n : 0;
 };
 
-/** Reads a file exported by Strong, Hevy, Fitbod, StrongLifts, JEFIT or Liftsmith. Null when it's none of them. */
+/** Seconds from FitNotes' "0:30:00", "1:30" or plain seconds. */
+function secondsOf(s: string): number {
+  const parts = s.trim().split(":").map(Number);
+  if (!parts.length || parts.some((n) => !Number.isFinite(n))) return 0;
+  return parts.reduce((t, n) => t * 60 + n, 0);
+}
+
+const distUnitOf = (s: string): DistUnit | undefined => {
+  const u = s.trim().toLowerCase().replace(/s$/, "");
+  if (u === "m" || u === "metre" || u === "meter") return "m";
+  if (u === "km" || u === "kilometre" || u === "kilometer") return "km";
+  if (u === "mi" || u === "mile") return "mi";
+  if (u === "ft" || u === "feet" || u === "foot") return "ft";
+  if (u === "yd" || u === "yard") return "yd";
+  return undefined;
+};
+
+/** Reads a file exported by Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes or Liftsmith. Null when it's none of them. */
 export function readImport(text: string): ImportFile | null {
   const rows = parseCsv(text);
   if (rows.length < 2) return null;
@@ -142,13 +168,14 @@ export function readImport(text: string): ImportFile | null {
     if (!workouts.has(key)) workouts.set(key, { key, ...w, sets: [] });
     workouts.get(key)!.sets.push(s);
   };
-  const keep = (reps: number, seconds: number) => reps > 0 || seconds > 0;
+  const keep = (reps: number, seconds: number, distance = 0) => reps > 0 || seconds > 0 || distance > 0;
 
   if (col("exercise_title") >= 0 && col("start_time") >= 0) {
     // Hevy: one row per set; weight_kg or weight_lbs says the unit.
     const kg = col("weight_kg");
     const lbs = col("weight_lbs");
     const unit: Unit = kg >= 0 ? "kg" : "lb";
+    const distUnit: DistUnit = col("distance_km") >= 0 ? "km" : "mi";
     const [title, start, end, ex, ss, type, reps, secs, dist] = [
       col("title"),
       col("start_time"),
@@ -164,8 +191,8 @@ export function readImport(text: string): ImportFile | null {
       const at = parseDate(get(r, start));
       const n = num(get(r, reps));
       const sec = num(get(r, secs));
-      // Cardio (a distance) isn't strength work.
-      if (at === null || !get(r, ex) || num(get(r, dist)) > 0 || !keep(n, sec)) {
+      const d = num(get(r, dist));
+      if (at === null || !get(r, ex) || !keep(n, sec, d)) {
         skipped++;
         continue;
       }
@@ -181,6 +208,7 @@ export function readImport(text: string): ImportFile | null {
           warmup: get(r, type).toLowerCase() === "warmup",
           tag: get(r, type).toLowerCase() === "dropset" ? "drop" : undefined,
           superset: get(r, ss) || undefined,
+          ...(d > 0 ? { distance: d, distUnit } : {}),
         },
       );
     }
@@ -206,9 +234,9 @@ export function readImport(text: string): ImportFile | null {
       const at = parseDate(get(r, date));
       const n = num(get(r, reps));
       const sec = num(get(r, secs));
+      const d = num(get(r, dist));
       // Strong writes a "Rest Timer" row between sets on some versions.
-      // Strong also writes cardio (a distance), which isn't strength work.
-      if (at === null || !get(r, ex) || get(r, order).toLowerCase().startsWith("rest") || num(get(r, dist)) > 0 || !keep(n, sec)) {
+      if (at === null || !get(r, ex) || get(r, order).toLowerCase().startsWith("rest") || !keep(n, sec, d)) {
         skipped++;
         continue;
       }
@@ -222,6 +250,8 @@ export function readImport(text: string): ImportFile | null {
           seconds: n ? undefined : sec,
           warmup: get(r, order).toUpperCase() === "W",
           tag: get(r, order).toUpperCase() === "D" ? "drop" : undefined,
+          // Newer files name the distance unit in the header; older ones use the app's (km, or miles with pounds).
+          ...(d > 0 ? { distance: d, distUnit: distUnitOf(head[dist]?.match(/\((\w+)\)/)?.[1] ?? "") } : {}),
         },
       );
     }
@@ -231,6 +261,7 @@ export function readImport(text: string): ImportFile | null {
   if (col("exercise") >= 0 && col("per hand") >= 0 && col("unit") >= 0) {
     // Liftsmith's own "Export sets" file: the unit is on every row.
     const kind = col("type");
+    const dist = col("distance", "distance km");
     const [date, time, workout, ex, weight, unit, reps] = [
       col("date"),
       col("time"),
@@ -244,6 +275,7 @@ export function readImport(text: string): ImportFile | null {
     for (const r of rows.slice(1)) {
       const at = parseDate(get(r, date), get(r, time));
       const n = num(get(r, reps));
+      const d = num(get(r, dist));
       if (at === null || !get(r, ex) || !keep(n, 0)) {
         skipped++;
         continue;
@@ -260,6 +292,8 @@ export function readImport(text: string): ImportFile | null {
           warmup: false,
           unit: get(r, unit) === "lb" ? "lb" : "kg",
           tag: get(r, kind) === "drop" || get(r, kind) === "rest-pause" ? (get(r, kind) === "drop" ? "drop" : "restPause") : undefined,
+          // Cardio: reps are the seconds, and the distance is in km.
+          ...(d > 0 ? { distance: d, distUnit: "km" as const, seconds: n } : {}),
         },
       );
     }
@@ -283,7 +317,8 @@ export function readImport(text: string): ImportFile | null {
       const at = parseDate(get(r, date));
       const n = num(get(r, reps));
       const sec = num(get(r, secs));
-      if (at === null || !get(r, ex) || num(get(r, dist)) > 0 || !keep(n, sec)) {
+      const d = num(get(r, dist));
+      if (at === null || !get(r, ex) || !keep(n, sec, d)) {
         skipped++;
         continue;
       }
@@ -293,6 +328,7 @@ export function readImport(text: string): ImportFile | null {
         reps: n,
         seconds: n ? undefined : sec,
         warmup: /^(true|1|yes)$/i.test(get(r, warm)),
+        ...(d > 0 ? { distance: d, distUnit: "m" as const } : {}),
       };
       sets.push({ at, set });
     }
@@ -309,6 +345,49 @@ export function readImport(text: string): ImportFile | null {
       if (end > wk.start) wk.minutes = Math.round((end - wk.start) / 60_000) + 2;
     }
     return { format: "fitbod", unit, workouts: [...workouts.values()], skipped };
+  }
+
+  const fnKg = head.findIndex((h) => h.startsWith("weight (kg"));
+  const fnLb = head.findIndex((h) => h.startsWith("weight (lb"));
+  if (col("exercise") >= 0 && col("category") >= 0 && col("date") >= 0 && (fnKg >= 0 || fnLb >= 0)) {
+    // FitNotes: one row per set, a day is one workout, and the weight header says the unit. Cardio has
+    // a distance with its own unit column and a time ("0:30:00").
+    const unit: Unit = fnKg >= 0 ? "kg" : "lb";
+    const w = fnKg >= 0 ? fnKg : fnLb;
+    const [date, ex, reps, dist, distU, time] = [
+      col("date"),
+      col("exercise"),
+      col("reps"),
+      col("distance"),
+      col("distance unit"),
+      col("time"),
+    ];
+    for (const r of rows.slice(1)) {
+      const day = get(r, date);
+      const at = parseDate(day);
+      const n = num(get(r, reps));
+      const sec = secondsOf(get(r, time));
+      const d = num(get(r, dist));
+      if (at === null || !get(r, ex) || !keep(n, sec, d)) {
+        skipped++;
+        continue;
+      }
+      add(
+        day,
+        { title: "Workout", start: at },
+        {
+          name: get(r, ex),
+          weight: num(get(r, w)),
+          reps: n,
+          seconds: n ? undefined : sec,
+          warmup: false,
+          ...(d > 0 ? { distance: d, distUnit: distUnitOf(get(r, distU)) ?? (unit === "lb" ? "mi" : "km") } : {}),
+        },
+      );
+    }
+    // FitNotes has no start time: a workout starts at 6 PM that day, so it lands on the right day in any time zone.
+    for (const wk of workouts.values()) wk.start += 18 * 3_600_000;
+    return { format: "fitnotes", unit, workouts: [...workouts.values()], skipped };
   }
 
   const setCols = head.map((h, i) => (/^set ?\d+$/.test(h) ? i : -1)).filter((i) => i >= 0);
@@ -544,14 +623,80 @@ export function guessExercise(name: string): { primary: Muscle; load: LoadKind; 
 /** "custom" adds the name as the lifter's own exercise; otherwise a library id. */
 export type Mapping = Record<string, string>;
 
+/** Cardio names the other apps use, to the library's cardio exercises. Checked in order, so treadmill beats run. */
+const CARDIO_NAMES: [RegExp, string][] = [
+  [/treadmill/, "treadmill-run"],
+  [/\b(run|running|jog|jogging)\b/, "outdoor-run"],
+  [/\b(walk|walking|hike|hiking)\b/, "brisk-walk"],
+  [/\b(row|rowing|rower|erg)\b/, "rowing-machine"],
+  [/ski/, "ski-erg"],
+  [/\b(stationary|spin|spinning|assault|air bike|exercise bike|indoor)\b/, "stationary-bike"],
+  [/\b(cycling|cycle|bike|biking)\b/, "outdoor-cycling"],
+  [/elliptical|cross ?trainer/, "elliptical"],
+  [/stair|step ?mill/, "stair-climber"],
+  [/rope|skipping/, "jump-rope"],
+];
+
+/** The library's cardio exercise for a cardio name from another app ("Running (Treadmill)", "Cycling"), if one fits. */
+export function matchCardio(name: string): string | null {
+  const n = name.toLowerCase().replace(/[^a-z ]+/g, " ");
+  for (const [re, id] of CARDIO_NAMES) if (re.test(n) && EXERCISE_BY_ID.get(id)?.cardio) return id;
+  return null;
+}
+
 /** Every distinct exercise name in the file, with the best library match as the default. */
 export function defaultMapping(file: ImportFile): Mapping {
   const out: Mapping = {};
-  for (const w of file.workouts) for (const s of w.sets) if (!(s.name in out)) out[s.name] = matchExercise(s.name)?.id ?? "custom";
+  // A name whose sets are all time or distance without reps is cardio, matched to the cardio exercises first.
+  const cardio = new Map<string, boolean>();
+  for (const w of file.workouts)
+    for (const s of w.sets) cardio.set(s.name, (cardio.get(s.name) ?? true) && !s.reps && (!!s.distance || !!s.seconds));
+  for (const [name, isCardio] of cardio) out[name] = (isCardio ? matchCardio(name) : null) ?? matchExercise(name)?.id ?? "custom";
   return out;
 }
 
 export const customId = (name: string) => `custom-imp-${hash(name.trim().toLowerCase()).toString(36)}`;
+
+const sessionIdOf = (format: ImportFormat, w: ImportWorkout) => `imp-${format}-${hash(w.key).toString(36)}-${w.start.toString(36)}`;
+
+/** Titles that only say "a workout", which make no routine. */
+const PLAIN_TITLE =
+  /^(workout|untitled|untitled workout|new workout|training|session|my workout|(morning|afternoon|evening|night) workout)$/i;
+
+/** Workouts by name (lower case), for names done at least twice: the routines an import can make. */
+export function repeatedTitles(file: ImportFile, now: number): Map<string, ImportWorkout[]> {
+  const byTitle = new Map<string, ImportWorkout[]>();
+  for (const w of file.workouts) {
+    const title = w.title.trim();
+    if (!title || PLAIN_TITLE.test(title) || w.start > now || !w.sets.length) continue;
+    const key = title.toLowerCase();
+    byTitle.set(key, [...(byTitle.get(key) ?? []), w]);
+  }
+  for (const [k, list] of byTitle) if (list.length < 2) byTitle.delete(k);
+  return byTitle;
+}
+
+/**
+ * Routines from an imported history (2026-11-13): none of the apps put routines in their export, but a
+ * workout done under the same name at least twice ("Push day", "Workout A") is one. Its newest time becomes a
+ * routine with those exercises, set counts and supersets. Ids come from the name, so importing again changes
+ * nothing, and a routine already saved under that id (the lifter may have edited it) is left alone. Call
+ * with the events `importEvents` made (custom exercises registered), newest routines first.
+ */
+export function importRoutines(file: ImportFile, events: readonly AppEvent[], saved: readonly Routine[], now: number): Routine[] {
+  const have = new Set(saved.map((r) => r.id));
+  const out: { at: number; r: Routine }[] = [];
+  for (const [key, list] of repeatedTitles(file, now)) {
+    const id = `imp-r-${hash(`${file.format}|${key}`).toString(36)}`;
+    if (have.has(id)) continue;
+    const latest = list.reduce((a, b) => (b.start > a.start ? b : a));
+    const items = doneItems(events, sessionIdOf(file.format, latest));
+    if (!items.length) continue;
+    const r = routineFrom(items, latest.title, id, now);
+    if (r.items.length) out.push({ at: latest.start, r });
+  }
+  return out.sort((a, b) => b.at - a.at).map((x) => x.r);
+}
 
 /**
  * The events for an import. `unit` is the file's unit (asked when the file doesn't say), `gymId` the
@@ -585,7 +730,7 @@ export function importEvents(
   let sets = 0;
   for (const w of file.workouts) {
     if (w.start > now || !w.sets.length) continue;
-    const sessionId = `imp-${file.format}-${hash(w.key).toString(36)}-${w.start.toString(36)}`;
+    const sessionId = sessionIdOf(file.format, w);
     if (have.has(`${sessionId}-start`)) continue;
     const minutes = Math.min(600, Math.max(1, w.minutes ?? Math.round(w.sets.length * 2.5)));
     const span = Math.min(now, w.start + minutes * 60_000) - w.start;
@@ -599,28 +744,38 @@ export function importEvents(
       minutes,
       source: "manual",
     };
-    const body: AppEvent[] = w.sets.map((s, i) => {
+    const body: AppEvent[] = w.sets.flatMap((s, i): AppEvent[] => {
       const exerciseId = mapping[s.name] === "custom" || !mapping[s.name] ? customId(s.name) : mapping[s.name];
       const kg = Math.round(toKg(s.weight, s.unit ?? unit) * 1000) / 1000;
-      const reps = s.reps || s.seconds || 0;
+      const cardio = EXERCISE_BY_ID.get(exerciseId)?.cardio;
+      // Cardio logs time as its reps (types.ts) and the distance in metres when the exercise takes one.
+      const reps = cardio ? s.seconds || s.reps || 0 : s.reps || s.seconds || 0;
+      const metres =
+        cardio === "distance" && s.distance ? Math.round(s.distance * METRES[s.distUnit ?? (unit === "lb" ? "mi" : "km")]) : undefined;
+      // A distance with no time, filed under an exercise that doesn't take one, has nothing to log.
+      if (reps <= 0 && !metres) return [];
       if (s.warmup)
-        return { type: "warmup", id: `${sessionId}-w${i}`, at: at(i), sessionId, exerciseId, weight: kg, reps } satisfies WarmupEvent;
+        return [{ type: "warmup", id: `${sessionId}-w${i}`, at: at(i), sessionId, exerciseId, weight: kg, reps } satisfies WarmupEvent];
       sets++;
-      return {
-        type: "set",
-        id: `${sessionId}-s${i}`,
-        at: at(i),
-        sessionId,
-        exerciseId,
-        weight: kg,
-        reps,
-        targetReps: reps,
-        targetWeight: kg,
-        rir: MANUAL_RIR,
-        ...(s.superset ? { superset: `${sessionId}-${s.superset}` } : {}),
-        ...(s.tag ? { tag: s.tag } : {}),
-      } satisfies SetEvent;
+      return [
+        {
+          type: "set",
+          id: `${sessionId}-s${i}`,
+          at: at(i),
+          sessionId,
+          exerciseId,
+          weight: kg,
+          reps,
+          targetReps: reps,
+          targetWeight: kg,
+          rir: MANUAL_RIR,
+          ...(s.superset ? { superset: `${sessionId}-${s.superset}` } : {}),
+          ...(s.tag ? { tag: s.tag } : {}),
+          ...(metres ? { distanceM: metres } : {}),
+        } satisfies SetEvent,
+      ];
     });
+    if (!body.length) continue;
     const end: SessionEndEvent = {
       type: "sessionEnd",
       id: `${sessionId}-end`,
