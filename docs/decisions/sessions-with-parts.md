@@ -1,8 +1,8 @@
-# Workouts with parts: lifting, stretches, rehab and cardio in one session (plan, not built)
+# Workouts with parts: lifting, stretches, rehab and cardio in one session (stage 1 in progress)
 
 Melvin asked on 2026-11-13: "I wonder if we can create a concept of a "session" (or a better name) that is a collection of stretches and workouts or rehab, etc. can you plan what that would look like? Could we do this in a way that doesn't break existing data?", and then "Session could maybe also include health metrics like heart rates, lifting speed, weights etc".
 
-This file is the plan. Nothing here is built yet. The open choices for Melvin are at the end.
+This file is the plan. Melvin's choices are recorded at the end; stage 1 is being built.
 
 ## The short version
 
@@ -201,9 +201,9 @@ Each stage is its own pull request, shippable on its own.
 
 Each stage updates the features page, gets a blog post, and adds its text in all six languages.
 
-## Choices for Melvin
+## Decided (Melvin, 2026-11-13: "Do your suggestions")
 
-1. **Name.** Proposed: keep "Workout" for the whole thing and "parts" for the pieces. Alternative: call it a "Session" everywhere (and rename coaching's booked "sessions" to "appointments").
-2. **Do stretch-only and rehab-only days count?** Proposed: any workout of 10 minutes or more keeps the streak alive and earns XP; the weekly workout goal counts workouts with a lifting or cardio part, except for a lifter whose only plan is rehab, where rehab workouts count.
-3. **Rehab and progression.** Proposed: rehab sets never move progression, recovery or plateaus for the main lifts (above). Alternative: count them like any other set.
-4. **Start order.** Proposed: Start runs the parts in order with a Skip on each between-parts card. Alternative: Start goes to lifting and the extra parts are offered before and after, as the warm-up and cool-down are today.
+1. **Name:** "Workout" for the whole thing and "parts" for the pieces. Coaching's booked "sessions" keep their name; in code the container stays `sessionId`.
+2. **Stretch-only and rehab-only days:** any workout of 10 minutes or more keeps the streak alive and earns XP; the weekly workout goal counts workouts with a lifting or cardio part, except for a lifter whose only plan is rehab, where rehab workouts count.
+3. **Rehab and progression:** rehab sets never move progression, recovery or plateaus for the main lifts.
+4. **Start order:** Start runs the parts in order, with a Skip on each between-parts card.
