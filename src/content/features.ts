@@ -746,7 +746,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "offline",
         name: "Works offline",
-        body: "Everything runs on your device, so no signal in the basement gym is fine.",
+        body: "Everything runs on your device and syncs in the background, so no signal in the basement gym is fine.",
         tier: "free",
         added: LAUNCH,
       },

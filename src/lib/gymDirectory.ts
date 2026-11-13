@@ -8,6 +8,8 @@ import { makeGym } from "./defaults";
 import { locate } from "./geo";
 import type { Amenity, GymIssue, GymNews, GymTrainer, Prices } from "./gymExtras";
 import { decodeGym, encodeGym, kitOf, type GymKit } from "./gymShare";
+import { keepRead, readKept } from "./liveRead";
+import { track } from "./net";
 import type { Gym, Unit } from "./types";
 
 export interface Listing {
@@ -199,9 +201,12 @@ export async function myListings(): Promise<MyListing[] | null> {
   const t = token();
   if (!t) return null;
   try {
-    return (await api<{ gyms: MyListing[] }>("/api/gyms/", { token: t, body: { op: "mine" } })).gyms;
+    const gyms = (await track(api<{ gyms: MyListing[] }>("/api/gyms/", { token: t, body: { op: "mine" } }))).gyms;
+    keepRead("gyms.mine", gyms);
+    return gyms;
   } catch {
-    return null;
+    // Offline: what was listed last time (liveRead.ts).
+    return readKept<MyListing[]>("gyms.mine") ?? null;
   }
 }
 

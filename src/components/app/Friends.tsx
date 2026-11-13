@@ -29,6 +29,7 @@ import {
 } from "@/lib/invite";
 import { confetti, haptic, isNative, oops, sound } from "@/lib/juice";
 import { useDesktop } from "@/lib/layout";
+import { useNet } from "@/lib/net";
 import { estimate } from "@/lib/onerm";
 import { startPush, stopPush } from "@/lib/push";
 import { challengeShare } from "@/lib/shareCards";
@@ -550,12 +551,16 @@ function Posts({
   handle,
   club,
   empty,
+  offlineNoted = false,
 }: {
   op: "feed" | "person" | "clubFeed" | "discover";
   handle?: string;
   club?: string;
   empty: ReactNode;
+  /** The Friends tab's own offline note already says so at the top (OfflineNote), so this list doesn't again. */
+  offlineNoted?: boolean;
 }) {
+  const offline = useNet((st) => st.offline);
   // The last copy shows at once (socialCache.ts); the feed itself usually comes with the tab's one "home" request.
   const account = readAccount()?.id ?? "";
   const key = op === "feed" ? "feed" : `${op}:${handle ?? ""}:${club ?? ""}`;
@@ -610,18 +615,19 @@ function Posts({
         <Skeleton className="h-48" />
       </div>
     );
+  const quiet = offlineNoted && offline && note === t("friends.err.offline");
   return (
     <div className="space-y-3">
       {posts.map((p) => (
         <PostCard key={p.id} post={p} onChange={change(p.id)} onOpen={() => setOpen(p)} />
       ))}
-      {!posts.length && !note && empty}
+      {!posts.length && (!note || quiet) && empty}
       {more && (
         <Button kind="ghost" className="w-full" onClick={() => void load(posts.at(-1)?.at ?? Date.now())}>
           {t("friends.loadMore")}
         </Button>
       )}
-      <Note text={note} />
+      <Note text={quiet ? null : note} />
       <CommentsSheet
         post={open}
         onClose={() => setOpen(null)}
@@ -2339,6 +2345,21 @@ function useSocialLoaded(home = false) {
 const TABS = ["feed", "board", "clubs", "activity", "people"] as const;
 type Tab = (typeof TABS)[number];
 
+/**
+ * Said at the top of Friends while the server can't be reached (Melvin, 2026-11-13): the tab still shows what it
+ * showed last (socialCache.ts), and this says that's what it is. Gone as soon as a request gets through (net.ts).
+ */
+function OfflineNote() {
+  const offline = useNet((s) => s.offline);
+  if (!offline) return null;
+  return (
+    <p role="status" className="card mt-3 flex items-start gap-3 px-4 py-3 text-sm text-muted">
+      <Icon name="offline" size={18} className="mt-0.5 shrink-0" />
+      <span>{t("friends.offline")}</span>
+    </p>
+  );
+}
+
 export function Friends({ tab: start }: { tab?: string } = {}) {
   const { account, me, error } = useSocialLoaded(true);
   useProfileSync();
@@ -2347,19 +2368,22 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
   const [settings, setSettings] = useState(false);
   const desktop = useDesktop();
   const header = (
-    <div className="flex items-end justify-between gap-2">
-      <ScreenHeader title={t("friends.title")} />
-      {me?.profile && (
-        <button
-          type="button"
-          aria-label={t("friends.settings")}
-          onClick={() => setSettings(true)}
-          className="press grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
-        >
-          <Icon name="settings" size={18} />
-        </button>
-      )}
-    </div>
+    <>
+      <div className="flex items-end justify-between gap-2">
+        <ScreenHeader title={t("friends.title")} />
+        {me?.profile && (
+          <button
+            type="button"
+            aria-label={t("friends.settings")}
+            onClick={() => setSettings(true)}
+            className="press grid h-11 w-11 shrink-0 place-items-center rounded-full border border-line bg-surface text-muted hover:text-ink"
+          >
+            <Icon name="settings" size={18} />
+          </button>
+        )}
+      </div>
+      {account && <OfflineNote />}
+    </>
   );
   if (!socialOn())
     return (
@@ -2439,6 +2463,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
               {view === "following" && (
                 <Posts
                   op="feed"
+                  offlineNoted
                   empty={
                     <EmptyState
                       icon="people"
@@ -2456,6 +2481,7 @@ export function Friends({ tab: start }: { tab?: string } = {}) {
                   <p className="mb-3 px-1 text-sm text-muted">{t("social.discover.hint")}</p>
                   <Posts
                     op="discover"
+                    offlineNoted
                     empty={<EmptyState icon="sparkle" title={t("social.discover.none")} body={t("social.discover.noneBody")} />}
                   />
                 </>

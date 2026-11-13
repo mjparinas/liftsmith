@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import "fake-indexeddb/auto";
 
-import { cleanup, render, screen, waitFor, within } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useAccount, type Account } from "@/lib/auth";
+import { noteOnline, useNet } from "@/lib/net";
 import { useSocial } from "@/lib/social";
 import { ACCOUNT_KEY } from "@/lib/syncOutbox";
 import { resetDb } from "@/server/db";
@@ -29,6 +30,7 @@ function signIn(token: string) {
 beforeEach(async () => {
   await resetDb();
   localStorage.clear();
+  useNet.setState({ busy: 0, offline: false });
   vi.stubGlobal("fetch", async (url: string, init: RequestInit) => {
     const token = String((init.headers as Record<string, string>).Authorization ?? "").replace("Bearer ", "");
     if (url !== "/api/social/" || !accounts[token]) return Response.json({ error: "Not found" }, { status: 404 });
@@ -314,6 +316,10 @@ describe("Friends", () => {
     expect(screen.getByText("Pull day")).toBeInTheDocument();
     await waitFor(() => expect(useSocial.getState().loading).toBe(false));
     expect(screen.getByText("Pull day")).toBeInTheDocument();
+    // …with a note at the top saying it's the last copy, gone once a request gets through.
+    expect(screen.getByText(/You’re offline/)).toBeInTheDocument();
+    act(() => noteOnline());
+    expect(screen.queryByText(/You’re offline/)).toBeNull();
   });
 
   it("starts a challenge that a friend joins, and tags a training partner on a post", async () => {

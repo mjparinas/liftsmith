@@ -386,7 +386,7 @@ export const fr: FeaturesText = {
     },
     offline: {
       name: "Fonctionne hors ligne",
-      body: "Tout tourne sur votre appareil : pas de réseau au sous-sol de la salle, pas de souci.",
+      body: "Tout tourne sur votre appareil et se synchronise en arrière-plan : pas de réseau au sous-sol de la salle, pas de souci.",
     },
     sync: {
       name: "Comptes et synchronisation",

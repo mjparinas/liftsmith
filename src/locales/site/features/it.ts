@@ -379,7 +379,7 @@ export const it: FeaturesText = {
     },
     offline: {
       name: "Funziona offline",
-      body: "Tutto gira sul tuo dispositivo, quindi nessun problema se in palestra nel seminterrato non c’è campo.",
+      body: "Tutto gira sul tuo dispositivo e si sincronizza in background, quindi nessun problema se in palestra nel seminterrato non c’è campo.",
     },
     sync: {
       name: "Account e sincronizzazione",

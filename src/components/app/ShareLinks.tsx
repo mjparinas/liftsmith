@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { date, t } from "@/lib/i18n";
 import { haptic, oops } from "@/lib/juice";
+import { keepRead, liveRead } from "@/lib/liveRead";
 import { deleteLink, linkError, listLinks, type ShareLink } from "@/lib/shareLinks";
 
 import { Icon } from "./icons";
@@ -15,9 +16,7 @@ export function ShareLinks() {
   const [note, setNote] = useState<string | null>(null);
   useEffect(() => {
     let live = true;
-    listLinks()
-      .then((l) => live && setLinks(l))
-      .catch((e: unknown) => live && (setLinks([]), setNote(linkError(e))));
+    liveRead("share.links", listLinks, (l) => live && setLinks(l)).catch((e: unknown) => live && (setLinks([]), setNote(linkError(e))));
     return () => {
       live = false;
     };
@@ -26,7 +25,10 @@ export function ShareLinks() {
     haptic("tick");
     try {
       await deleteLink(l.id);
-      setLinks((ls) => (ls ?? []).filter((x) => x.id !== l.id));
+      const left = (links ?? []).filter((x) => x.id !== l.id);
+      setLinks(left);
+      // So the next visit doesn't show it again before the server answers.
+      keepRead("share.links", left);
       setNote(t("link.deleted"));
     } catch (e) {
       oops();

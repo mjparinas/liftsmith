@@ -11,6 +11,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { track } from "@/lib/analytics";
 import { date, t } from "@/lib/i18n";
 import { haptic, oops, sound } from "@/lib/juice";
+import { liveRead } from "@/lib/liveRead";
 import { copyText, shareUrl } from "@/lib/shareLinks";
 import { useApp } from "@/lib/store";
 import {
@@ -45,21 +46,20 @@ export function useTeams(): { data: TeamsOverview | null; error: string | null; 
   const [data, setData] = useState<TeamsOverview | null>(null);
   const [error, setError] = useState<string | null>(null);
   const reload = useCallback(() => {
-    loadTeams()
+    // The last copy shows at once; the server's answer replaces it (liveRead.ts).
+    liveRead("teams", loadTeams, (o) =>
       // Whatever came back, every list is there (an older server, or a reply that isn't ours).
-      .then((o) =>
-        setData({
-          school: o.school ?? null,
-          codeSent: !!o.codeSent,
-          teams: o.teams ?? [],
-          joined: o.joined ?? [],
-          members: o.members ?? {},
-        }),
-      )
-      .catch((e: unknown) => {
-        setData({ school: null, codeSent: false, teams: [], joined: [], members: {} });
-        setError(teamError(e));
-      });
+      setData({
+        school: o.school ?? null,
+        codeSent: !!o.codeSent,
+        teams: o.teams ?? [],
+        joined: o.joined ?? [],
+        members: o.members ?? {},
+      }),
+    ).catch((e: unknown) => {
+      setData({ school: null, codeSent: false, teams: [], joined: [], members: {} });
+      setError(teamError(e));
+    });
   }, []);
   useEffect(reload, [reload]);
   return { data, error, reload };
