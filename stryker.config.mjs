@@ -28,9 +28,10 @@ const config = {
   incremental: true,
   incrementalFile: "reports/mutation/stryker-incremental.json",
   // Ratchet: the first run scored 34%; 55% on 2026-11-13, then 67.5% after tests for readiness, loads,
-  // progression and the generator, then 76% after derive, plates, recovery and game rules, then 85% after generator and quest tests (round 3).
+  // progression and the generator, then 76% after derive, plates, recovery and game rules, then 85% after generator and quest tests (round 3),
+  // then about 88% after round 4 (generator 94%, plates 88%, recovery 91%, pick weights 85%).
   // Raise break as tests land (Gradelings aims for 85).
-  thresholds: { high: 85, low: 80, break: 80 },
+  thresholds: { high: 90, low: 85, break: 85 },
   concurrency: 4,
   timeoutMS: 20000,
   ignoreStatic: true,
