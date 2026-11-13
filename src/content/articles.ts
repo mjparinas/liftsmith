@@ -16,6 +16,7 @@ import { BLOG_J } from "./blog/j";
 import { BLOG_K } from "./blog/k";
 import { BLOG_L } from "./blog/l";
 import { BLOG_M } from "./blog/m";
+import { BLOG_N } from "./blog/n";
 import { GUIDES } from "./guides";
 
 export type CtaTopic =
@@ -198,6 +199,7 @@ export const ARTICLES: Article[] = [
   ...BLOG_K,
   ...BLOG_L,
   ...BLOG_M,
+  ...BLOG_N,
 ];
 
 export const ARTICLE_BY_SLUG = new Map(ARTICLES.map((a) => [`${a.kind}/${a.slug}`, a]));

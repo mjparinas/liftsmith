@@ -217,6 +217,10 @@ export async function printOrder(id: unknown): Promise<{ row: PosterRow; code: s
 export async function countScan(placeId: string, who: string, now = Date.now()): Promise<void> {
   if (!(await rateLimit(`gyms:scan:${placeId}:${who}`, 1, DAY, now))) return;
   await run("UPDATE gym_places SET qr_scans = qr_scans + 1 WHERE id = ?", [placeId]);
+  await run("INSERT INTO gym_scan_days (place_id, day, n) VALUES (?, ?, 1) ON CONFLICT (place_id, day) DO UPDATE SET n = n + 1", [
+    placeId,
+    Math.floor(now / DAY),
+  ]);
 }
 
 /** Account deletion: the account's name comes off its orders (the gym's address stays for the mailing record). */

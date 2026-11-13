@@ -1,23 +1,37 @@
-// The public features page (/features/): the newest features, every feature by group, and the table of what
-// Liftsmith works with. Everything comes from src/content/features.ts.
+// The public features page (/features/ and /es/features/ …): the newest features, every feature by group, and the table
+// of what Liftsmith works with. The structure comes from src/content/features.ts, the words from
+// src/locales/site/features/ (English is features.ts itself).
+import type { Metadata } from "next";
 import Link from "next/link";
+import type { ReactNode } from "react";
 
-import {
-  ALL_FEATURES,
-  CONNECTION_GROUPS,
-  FEATURE_GROUPS,
-  newestFeatures,
-  SUPPORT_LABEL,
-  TIER_LABEL,
-  WHERE_LABEL,
-  type SiteFeature,
-  type Support,
-  type Tier,
-} from "@/content/features";
+import { ALL_FEATURES, newestFeatures, type SiteFeature, type Support, type Tier } from "@/content/features";
 import { landingPath, LANDINGS } from "@/content/landings";
 import { BRAND } from "@/lib/brand";
+import { pageMeta } from "@/lib/pageMeta";
+import { fill, localPath, type SiteLang } from "@/lib/siteLang";
+import { connectionGroupsIn, featureGroupsIn, featuresText, type FeaturesText } from "@/locales/site/features";
 
-import { Crumbs, CtaBanner, CtaInline } from "./SiteChrome";
+import { Crumbs, CtaBanner, CtaInline, SitePage } from "./SiteChrome";
+
+const PATH = "/features/";
+
+export function featuresMetadata(lang: SiteLang): Metadata {
+  const c = featuresText(lang).chrome;
+  return pageMeta({ title: fill(c.title, { name: BRAND.name }), description: fill(c.description, { name: BRAND.name }), path: PATH, lang });
+}
+
+/** A line with one {key} link in it: the words either side, the link in the middle. */
+function withLink(line: string, key: string, link: ReactNode) {
+  const [before, after = ""] = line.split(`{${key}}`);
+  return (
+    <>
+      {before}
+      {link}
+      {after}
+    </>
+  );
+}
 
 // Each plan's chip is a tint from the palette; the label says the plan in words.
 const TINT: Record<Tier, string> = {
@@ -27,7 +41,7 @@ const TINT: Record<Tier, string> = {
   lab: "var(--color-ember)",
 };
 
-function TierChip({ tier }: { tier: Tier }) {
+function TierChip({ tier, t }: { tier: Tier; t: FeaturesText }) {
   return (
     <span
       className="inline-block rounded-full border px-2.5 py-0.5 text-xs font-bold whitespace-nowrap text-ink"
@@ -36,14 +50,14 @@ function TierChip({ tier }: { tier: Tier }) {
         background: `color-mix(in srgb, ${TINT[tier]} 16%, transparent)`,
       }}
     >
-      {TIER_LABEL[tier]}
+      {t.tiers[tier]}
     </span>
   );
 }
 
 const anchor = (f: SiteFeature) => `f-${f.id}`;
 
-function FeatureCard({ f }: { f: SiteFeature }) {
+function FeatureCard({ f, t }: { f: SiteFeature; t: FeaturesText }) {
   return (
     <li id={anchor(f)} className="card scroll-mt-20 p-5">
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -56,12 +70,12 @@ function FeatureCard({ f }: { f: SiteFeature }) {
             f.name
           )}
         </h3>
-        <TierChip tier={f.tier} />
+        <TierChip tier={f.tier} t={t} />
       </div>
       <p className="mt-2 leading-relaxed text-muted">{f.body}</p>
       {f.proPart && <p className="mt-2 text-sm text-muted">{f.proPart}</p>}
       <p className="mt-3 text-xs text-muted">
-        {WHERE_LABEL[f.where ?? "all"]}
+        {t.where[f.where ?? "all"]}
         {f.note && <span className="block">{f.note}</span>}
       </p>
     </li>
@@ -70,7 +84,7 @@ function FeatureCard({ f }: { f: SiteFeature }) {
 
 const MARK: Record<Support, string> = { yes: "✓", no: "–", soon: "…", investigating: "…", chrome: "✓", health: "✓" };
 
-function SupportCell({ s }: { s: Support }) {
+function SupportCell({ s, t }: { s: Support; t: FeaturesText }) {
   return (
     <td
       className={`px-2 py-3 text-sm md:px-3 md:whitespace-nowrap ${s === "no" ? "text-muted" : s === "soon" || s === "investigating" ? "text-muted italic" : "text-ink"}`}
@@ -78,28 +92,44 @@ function SupportCell({ s }: { s: Support }) {
       <span aria-hidden className="mr-1">
         {MARK[s]}
       </span>
-      {SUPPORT_LABEL[s]}
+      {t.support[s]}
     </td>
   );
 }
 
-export function FeaturesView() {
-  const newest = newestFeatures();
+/** The whole page in one language, header and footer included. */
+export function FeaturesPage({ lang = "en" }: { lang?: SiteLang }) {
+  return (
+    <SitePage kind="features-index" lang={lang} path={PATH}>
+      <FeaturesView lang={lang} />
+    </SitePage>
+  );
+}
+
+export function FeaturesView({ lang = "en" }: { lang?: SiteLang }) {
+  const t = featuresText(lang);
+  const c = t.chrome;
+  const name = BRAND.name;
+  const groups = featureGroupsIn(lang);
+  const newest = newestFeatures(3, groups);
+  const link = "text-accent underline underline-offset-2";
   return (
     <>
-      <Crumbs items={[{ label: "Features" }]} />
-      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">Every {BRAND.name} feature</h1>
+      <Crumbs items={[{ label: c.crumb }]} lang={lang} />
+      <h1 className="mt-3 text-3xl font-extrabold tracking-tight md:text-5xl">{fill(c.h1, { name })}</h1>
       <p className="mt-3 max-w-2xl text-lg text-muted">
-        All {ALL_FEATURES.length} features, which are free, what works with what, and what&apos;s new. Most of it is free; see{" "}
-        <Link href="/pricing/" className="text-accent underline underline-offset-2">
-          pricing
-        </Link>{" "}
-        for what Pro adds.
+        {withLink(
+          fill(c.intro, { name, count: ALL_FEATURES.length }),
+          "pricing",
+          <Link href={localPath(lang, "/pricing/")} className={link}>
+            {c.pricing}
+          </Link>,
+        )}
       </p>
 
-      <nav aria-label="On this page" className="mt-6">
+      <nav aria-label={c.onThisPage} className="mt-6">
         <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 text-sm whitespace-nowrap md:mx-0 md:flex-wrap md:px-0">
-          {[{ id: "newest", title: "Newest" }, { id: "works-with", title: "Works with" }, ...FEATURE_GROUPS].map((g) => (
+          {[{ id: "newest", title: c.newestNav }, { id: "works-with", title: c.worksWithNav }, ...groups].map((g) => (
             <li key={g.id}>
               <a
                 href={`#${g.id}`}
@@ -114,14 +144,16 @@ export function FeaturesView() {
 
       <section id="newest" aria-labelledby="newest-h" className="mt-12 scroll-mt-20">
         <h2 id="newest-h" className="text-2xl font-bold tracking-tight md:text-3xl">
-          Newest features
+          {c.newestH}
         </h2>
         <p className="mt-2 text-muted">
-          Added lately, by category. Every change, fixes included, is on{" "}
-          <Link href="/whats-new/" className="text-accent underline underline-offset-2">
-            What&apos;s new
-          </Link>
-          .
+          {withLink(
+            c.newestIntro,
+            "whatsNew",
+            <Link href="/whats-new/" className={link}>
+              {c.whatsNew}
+            </Link>,
+          )}
         </p>
         <div className="mt-4 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {newest.map(({ group, features }) => (
@@ -137,7 +169,7 @@ export function FeaturesView() {
                     <a href={`#${anchor(f)}`} className="font-semibold hover:text-accent hover:underline">
                       {f.name}
                     </a>
-                    <TierChip tier={f.tier} />
+                    <TierChip tier={f.tier} t={t} />
                   </li>
                 ))}
               </ul>
@@ -146,7 +178,7 @@ export function FeaturesView() {
         </div>
       </section>
 
-      {FEATURE_GROUPS.map((g, i) => (
+      {groups.map((g, i) => (
         <section key={g.id} id={g.id} aria-labelledby={`${g.id}-h`} className="mt-14 scroll-mt-20">
           <h2 id={`${g.id}-h`} className="text-2xl font-bold tracking-tight md:text-3xl">
             {g.title}
@@ -154,53 +186,43 @@ export function FeaturesView() {
           <p className="mt-2 max-w-2xl text-muted">{g.intro}</p>
           <ul className="mt-4 grid gap-4 md:grid-cols-2">
             {g.features.map((f) => (
-              <FeatureCard key={f.id} f={f} />
+              <FeatureCard key={f.id} f={f} t={t} />
             ))}
           </ul>
-          {i === 2 && (
-            <CtaInline
-              cta="features-mid"
-              title="See it for yourself"
-              body="Free, with no account. Your first workout is planned in under a minute."
-              button="Start free"
-            />
-          )}
+          {i === 2 && <CtaInline cta="features-mid" title={c.midTitle} body={c.midBody} button={c.midButton} />}
         </section>
       ))}
 
       <section id="works-with" aria-labelledby="works-with-h" className="mt-14 scroll-mt-20">
         <h2 id="works-with-h" className="text-2xl font-bold tracking-tight md:text-3xl">
-          What {BRAND.name} works with
+          {fill(c.worksH, { name })}
         </h2>
-        <p className="mt-2 max-w-2xl text-muted">
-          Apps, watches and devices, and where each one works. &ldquo;Through Health&rdquo; means it reaches {BRAND.name} through Health
-          Connect on Android or Apple Health on iPhone. &ldquo;Chrome&rdquo; means the web app in Chrome, which has Web Bluetooth.
-        </p>
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-line" role="region" aria-label="Compatibility table" tabIndex={0}>
-          <table className="w-full md:min-w-[44rem] border-collapse text-left">
+        <p className="mt-2 max-w-2xl text-muted">{fill(c.worksIntro, { name })}</p>
+        <div className="mt-4 overflow-x-auto rounded-2xl border border-line" role="region" aria-label={c.tableLabel} tabIndex={0}>
+          <table className="w-full border-collapse text-left md:min-w-[44rem]">
             <thead className="bg-surface text-sm">
               <tr>
                 <th scope="col" className="px-3 py-3 font-semibold">
-                  Connection
+                  {c.cols.connection}
                 </th>
                 <th scope="col" className="hidden px-3 py-3 font-semibold md:table-cell">
-                  What it does
+                  {c.cols.does}
                 </th>
                 <th scope="col" className="px-3 py-3 font-semibold">
-                  Android
+                  {c.cols.android}
                 </th>
                 <th scope="col" className="px-3 py-3 font-semibold">
-                  iPhone
+                  {c.cols.iphone}
                 </th>
                 <th scope="col" className="px-3 py-3 font-semibold">
-                  Web
+                  {c.cols.web}
                 </th>
                 <th scope="col" className="px-3 py-3 font-semibold">
-                  Plan
+                  {c.cols.plan}
                 </th>
               </tr>
             </thead>
-            {CONNECTION_GROUPS.map((g) => (
+            {connectionGroupsIn(lang).map((g) => (
               <tbody key={g.id}>
                 <tr className="border-t border-line">
                   <th
@@ -211,23 +233,23 @@ export function FeaturesView() {
                     {g.title}
                   </th>
                 </tr>
-                {g.rows.map((c) => (
-                  <tr key={c.id} id={`c-${c.id}`} className="border-t border-line/60 align-top">
+                {g.rows.map((row) => (
+                  <tr key={row.id} id={`c-${row.id}`} className="border-t border-line/60 align-top">
                     <th scope="row" className="px-3 py-3 font-semibold">
-                      {c.name}
-                      <span className="mt-1 block text-sm font-normal text-muted md:hidden">{c.does}</span>
-                      {c.link && (
-                        <Link href={c.link.href} className="mt-1 block text-sm font-normal text-accent underline underline-offset-2">
-                          {c.link.label}
+                      {row.name}
+                      <span className="mt-1 block text-sm font-normal text-muted md:hidden">{row.does}</span>
+                      {row.link && (
+                        <Link href={row.link.href} className={`mt-1 block text-sm font-normal ${link}`}>
+                          {row.link.label}
                         </Link>
                       )}
                     </th>
-                    <td className="hidden px-3 py-3 text-sm text-muted md:table-cell">{c.does}</td>
-                    <SupportCell s={c.android} />
-                    <SupportCell s={c.ios} />
-                    <SupportCell s={c.web} />
+                    <td className="hidden px-3 py-3 text-sm text-muted md:table-cell">{row.does}</td>
+                    <SupportCell s={row.android} t={t} />
+                    <SupportCell s={row.ios} t={t} />
+                    <SupportCell s={row.web} t={t} />
                     <td className="px-3 py-3">
-                      <TierChip tier={c.tier} />
+                      <TierChip tier={row.tier} t={t} />
                     </td>
                   </tr>
                 ))}
@@ -235,36 +257,30 @@ export function FeaturesView() {
             ))}
           </table>
         </div>
-        <p className="mt-3 text-sm text-muted">
-          &ldquo;Coming soon&rdquo; means it&apos;s built and waiting on its store listing. &ldquo;Investigating&rdquo; means we&apos;re
-          working on it but can&apos;t promise it yet, because it depends on the other company&apos;s approval. Fitness services connect
-          through a free {BRAND.name} account. Labs are experiments in Pro you switch on in Settings › Labs. Product names are trademarks of
-          their owners.
-        </p>
+        <p className="mt-3 text-sm text-muted">{fill(c.footnote, { name })}</p>
       </section>
 
-      <p className="mt-10 text-muted">
-        One page per feature:{" "}
-        {LANDINGS.filter((l) => l.group === "features").map((l, i, all) => (
-          <span key={l.slug}>
-            <Link href={landingPath(l)} className="text-accent underline underline-offset-2">
-              {l.name}
-            </Link>
-            {i < all.length - 1 ? ", " : ""}
-          </span>
-        ))}
-        . And{" "}
-        <Link href="/apps/" className="text-accent underline underline-offset-2">
-          what {BRAND.name} is built for
-        </Link>
-        .
-      </p>
+      {/* The one-page-per-feature pages are English for now, so only the English page lists them. */}
+      {lang === "en" && (
+        <p className="mt-10 text-muted">
+          One page per feature:{" "}
+          {LANDINGS.filter((l) => l.group === "features").map((l, i, all) => (
+            <span key={l.slug}>
+              <Link href={landingPath(l)} className={link}>
+                {l.name}
+              </Link>
+              {i < all.length - 1 ? ", " : ""}
+            </span>
+          ))}
+          . And{" "}
+          <Link href="/apps/" className={link}>
+            what {name} is built for
+          </Link>
+          .
+        </p>
+      )}
 
-      <CtaBanner
-        cta="features-index-end"
-        title="Start free, no account"
-        body="Your first workout is planned in under a minute. No ads, ever."
-      />
+      <CtaBanner cta="features-index-end" title={c.endTitle} body={c.endBody} lang={lang} />
     </>
   );
 }

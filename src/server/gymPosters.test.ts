@@ -14,11 +14,22 @@ let gymId = "";
 beforeEach(async () => {
   await resetDb();
   await savePlaces(
-    placesFromOsm([{ type: "node", id: 1, lat: 49.1, lon: -122.6, tags: { name: "Iron Works", website: "https://ironworks.ca" } }], {
-      city: "Langley",
-      region: "BC",
-      country: "CA",
-    }),
+    placesFromOsm(
+      [
+        {
+          type: "node",
+          id: 1,
+          lat: 49.1,
+          lon: -122.6,
+          tags: { leisure: "fitness_centre", name: "Iron Works", website: "https://ironworks.ca" },
+        },
+      ],
+      {
+        city: "Langley",
+        region: "BC",
+        country: "CA",
+      },
+    ),
     NOW,
   );
   gymId = String((await query("SELECT id FROM gym_places"))[0]!.id);

@@ -253,6 +253,10 @@ export function Gym() {
               setAdding(false);
               go("gymlink", code);
             }}
+            onAdd={() => {
+              setAdding(false);
+              go("gymadd");
+            }}
           />
         </div>
         <PasteGym onOpen={() => setAdding(false)} />

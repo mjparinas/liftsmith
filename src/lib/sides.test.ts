@@ -52,10 +52,24 @@ describe("implements and sides", () => {
     const notOneSided = new Set([
       "one-and-a-half-squat", // "one-and-a-half" reps, both legs
     ]);
-    const missing = EXERCISES.filter((e) => !e.cardio && oneSided.test(e.name) && !perSide(e.id) && !notOneSided.has(e.id)).map(
-      (e) => `${e.id} (${e.name})`,
-    );
+    const missing = EXERCISES.filter(
+      (e) =>
+        !e.cardio &&
+        oneSided.test(e.name) &&
+        !/carry|suitcase march|one-sided .*hold/i.test(e.name) &&
+        !perSide(e.id) &&
+        !notOneSided.has(e.id),
+    ).map((e) => `${e.id} (${e.name})`);
     expect(missing).toEqual([]);
+  });
+
+  // Melvin, 2026-11-12: "dumbbell suitcase carry and most if not all carries are time based not side based,
+  // don't say switch sides". Carries, marches and one-sided holds are one timed set.
+  it("never treats a carry, march or one-sided hold as one side then the other", () => {
+    const walked = EXERCISES.filter((e) => /carry|suitcase march|one-sided .*hold/i.test(e.name) && perSide(e.id)).map((e) => e.id);
+    expect(walked).toEqual([]);
+    for (const id of ["db-suitcase-carry", "kb-suitcase-carry", "kb-mixed-carry", "suitcase-hold", "suitcase-march"])
+      expect(perSide(id), id).toBe(false);
   });
 
   it("halves what a rep counter saw on a one-side move, because it sees both sides", () => {

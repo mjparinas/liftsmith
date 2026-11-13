@@ -9,6 +9,7 @@
 import { randomBytes } from "node:crypto";
 
 import { batch, query, rateLimit, run } from "./db";
+import { notifyCoach } from "./push";
 
 export const COACH_LIMITS = {
   /** Clients per coach, until there's a coach plan (docs/decisions/trainer-mode.md). */
@@ -27,6 +28,12 @@ export const COACH_LIMITS = {
   plans: 10,
   /** Characters in a coach's note to a client. */
   note: 500,
+  /** Characters in one chat message, messages sent per account per hour, and how many a thread loads at once. */
+  message: 1000,
+  messagesPerHour: 120,
+  page: 100,
+  /** A client with no workout this long is "quiet", and their coach is told once. */
+  quietMs: 7 * 86_400_000,
 };
 
 /** No 0/O or 1/I, so a code read aloud or off a screen is typed right: 32 letters, 8 of them (40 bits). */
@@ -176,7 +183,21 @@ export async function setNote(
 export async function overview(
   accountId: string,
   now = Date.now(),
-): Promise<{ invite: Invite | null; clients: Person[]; coaches: Person[]; plans: Plan[]; notes: Note[]; setup: Setup }> {
+): Promise<{
+  invite: Invite | null;
+  clients: Person[];
+  coaches: Person[];
+  plans: Plan[];
+  notes: Note[];
+  setup: Setup;
+  /** Unread chat messages from each person, by their id. */
+  unread: Record<string, number>;
+  /** The coaches this client shares body data with, and the clients who share theirs with this coach. */
+  bodyShared: string[];
+  sharesBody: string[];
+  /** Whether this coach gets alerts about their clients. */
+  alerts: boolean;
+}> {
   const [inv] = await query<{ code: string; expires_at: number }>(
     "SELECT code, expires_at FROM coach_invites WHERE coach_id = ? AND expires_at > ? ORDER BY created_at DESC LIMIT 1",
     [accountId, now],
@@ -200,6 +221,14 @@ export async function overview(
     plans: plans.map(plan),
     notes: notes.map(note),
     setup: await setupOf(accountId),
+    unread: await unreadFrom(accountId),
+    bodyShared: (await query<{ id: string }>("SELECT coach_id AS id FROM coach_shares WHERE client_id = ? AND body = 1", [accountId])).map(
+      (r) => String(r.id),
+    ),
+    sharesBody: (await query<{ id: string }>("SELECT client_id AS id FROM coach_shares WHERE coach_id = ? AND body = 1", [accountId])).map(
+      (r) => String(r.id),
+    ),
+    alerts: await alertsOn(accountId),
   };
 }
 
@@ -275,6 +304,10 @@ export async function unlink(accountId: string, otherId: string): Promise<void> 
     { sql: "DELETE FROM coach_links WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_plans WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
     { sql: "DELETE FROM coach_notes WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_messages WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_shares WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_alerts WHERE (coach_id = ? AND client_id = ?) OR (coach_id = ? AND client_id = ?)", args: pair },
+    { sql: "DELETE FROM coach_reads WHERE (account_id = ? AND other_id = ?) OR (account_id = ? AND other_id = ?)", args: pair },
   ]);
 }
 
@@ -374,6 +407,18 @@ export interface ClientView {
   plans: Plan[];
   /** This coach's note to the client, if any. */
   note: Note | null;
+  /** The client's body data, only when they share it with this coach. */
+  body: BodyShare | null;
+}
+
+/** What a client shares when they turn on body data for a coach: enough to shape the 3D figure and see the trend. */
+export interface BodyShare {
+  sex: "male" | "female" | null;
+  heightCm: number | null;
+  /** Weigh-ins in the last year, oldest first, with body fat where there was one. */
+  weights: { at: number; kg: number; bodyFat?: number }[];
+  /** Tape measurements in the last year, oldest first. */
+  measures: { at: number; site: string; cm: number }[];
 }
 
 /** A client's training for their coach, or null when they aren't this coach's client (any more). */
@@ -408,7 +453,245 @@ export async function clientView(coachId: string, clientId: string, now = Date.n
     clientId,
   ]);
   const [n] = await query<NoteRow>("SELECT * FROM coach_notes WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
-  return { name: await nameOf(clientId), daysPerWeek, events: events.reverse(), plans: plans.map(plan), note: n ? note(n) : null };
+  return {
+    name: await nameOf(clientId),
+    daysPerWeek,
+    events: events.reverse(),
+    plans: plans.map(plan),
+    note: n ? note(n) : null,
+    body: (await sharesBody(coachId, clientId)) ? await bodyOf(clientId, String(p?.body ?? "{}"), now) : null,
+  };
+}
+
+// ---------- Body data, shared by the client's choice (2026-11-12) ----------
+
+export async function sharesBody(coachId: string, clientId: string): Promise<boolean> {
+  const [r] = await query<{ body: number }>("SELECT body FROM coach_shares WHERE coach_id = ? AND client_id = ?", [coachId, clientId]);
+  return Number(r?.body ?? 0) === 1;
+}
+
+/** The client turns body data on or off for one of their coaches. */
+export async function setShare(
+  clientId: string,
+  coachId: unknown,
+  on: unknown,
+  now = Date.now(),
+): Promise<boolean | { error: "notClient" }> {
+  if (!isAccountId(coachId) || !(await isClient(coachId, clientId))) return { error: "notClient" };
+  await run(
+    `INSERT INTO coach_shares (coach_id, client_id, body, updated_at) VALUES (?, ?, ?, ?)
+     ON CONFLICT (coach_id, client_id) DO UPDATE SET body = excluded.body, updated_at = excluded.updated_at`,
+    [coachId, clientId, on === true ? 1 : 0, now],
+  );
+  return on === true;
+}
+
+const num = (x: unknown, lo: number, hi: number) => (typeof x === "number" && Number.isFinite(x) && x >= lo && x <= hi ? x : null);
+
+async function bodyOf(clientId: string, profileBody: string, now: number): Promise<BodyShare> {
+  let prof: Record<string, unknown> = {};
+  try {
+    prof = JSON.parse(profileBody) as Record<string, unknown>;
+  } catch {
+    /* no profile */
+  }
+  const rows = await query<{ body: string }>(
+    `SELECT body FROM sync_events WHERE account_id = ? AND body IS NOT NULL AND at >= ?
+       AND (body LIKE '%"type":"bodyweight"%' OR body LIKE '%"type":"measure"%') ORDER BY at`,
+    [clientId, now - COACH_LIMITS.historyMs],
+  );
+  const weights: BodyShare["weights"] = [];
+  const measures: BodyShare["measures"] = [];
+  for (const r of rows) {
+    let e: Record<string, unknown>;
+    try {
+      e = JSON.parse(String(r.body)) as Record<string, unknown>;
+    } catch {
+      continue;
+    }
+    const at = num(e.at, 0, Number.MAX_SAFE_INTEGER);
+    if (at === null) continue;
+    if (e.type === "bodyweight") {
+      const kg = num(e.kg, 20, 400);
+      const bf = num(e.bodyFat, 2, 70);
+      if (kg !== null) weights.push(bf === null ? { at, kg } : { at, kg, bodyFat: bf });
+    } else if (e.type === "measure" && typeof e.site === "string" && /^[a-z]{2,12}$/.test(e.site)) {
+      const cm = num(e.cm, 5, 300);
+      if (cm !== null) measures.push({ at, site: e.site, cm });
+    }
+  }
+  return {
+    sex: prof.sex === "male" || prof.sex === "female" ? prof.sex : null,
+    heightCm: num(prof.heightCm, 100, 250),
+    weights,
+    measures,
+  };
+}
+
+// ---------- Chat between a coach and a client (2026-11-12) ----------
+
+export interface Message {
+  id: string;
+  from: string;
+  text: string;
+  at: number;
+}
+
+/** The pair's coach and client, whichever way round the two are, or null when they aren't linked. */
+async function pairOf(a: string, b: string): Promise<{ coach: string; client: string } | null> {
+  if (await isClient(a, b)) return { coach: a, client: b };
+  if (await isClient(b, a)) return { coach: b, client: a };
+  return null;
+}
+
+export type MessageError = "notLinked" | "empty" | "slow";
+
+/** Sends a message to the other side of a coaching link, and pushes it to their phones. */
+export async function sendMessage(
+  fromId: string,
+  toId: unknown,
+  raw: unknown,
+  now = Date.now(),
+  id = randomBytes(9).toString("base64url"),
+): Promise<Message | { error: MessageError }> {
+  if (!isAccountId(toId)) return { error: "notLinked" };
+  const pair = await pairOf(fromId, toId);
+  if (!pair) return { error: "notLinked" };
+  const body = typeof raw === "string" ? cleanMessage(raw) : "";
+  if (!body) return { error: "empty" };
+  if (!(await rateLimit(`coachmsg:${fromId}`, COACH_LIMITS.messagesPerHour, 3_600_000, now))) return { error: "slow" };
+  await batch([
+    {
+      sql: "INSERT INTO coach_messages (id, coach_id, client_id, from_id, body, at) VALUES (?, ?, ?, ?, ?, ?)",
+      args: [id, pair.coach, pair.client, fromId, body, now],
+    },
+    { sql: READ_SQL, args: [fromId, toId, now] },
+  ]);
+  await notifyCoach(toId, "coachMsg", { name: await nameOf(fromId), text: body }, `#/trainer/m.${fromId}`);
+  return { id, from: fromId, text: body, at: now };
+}
+
+/** A message's text: like a note's, but longer. */
+export function cleanMessage(x: string): string {
+  return x
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, " ")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()
+    .slice(0, COACH_LIMITS.message)
+    .trim();
+}
+
+const READ_SQL = `INSERT INTO coach_reads (account_id, other_id, read_at) VALUES (?, ?, ?)
+  ON CONFLICT (account_id, other_id) DO UPDATE SET read_at = MAX(coach_reads.read_at, excluded.read_at)`;
+
+/** The latest messages with the other side (oldest first), or older ones before `before`. Reading marks them read. */
+export async function messages(
+  accountId: string,
+  otherId: unknown,
+  before: unknown,
+  now = Date.now(),
+): Promise<{ messages: Message[]; more: boolean; name: string } | { error: "notLinked" }> {
+  if (!isAccountId(otherId)) return { error: "notLinked" };
+  const pair = await pairOf(accountId, otherId);
+  if (!pair) return { error: "notLinked" };
+  const until = typeof before === "number" && Number.isFinite(before) ? before : Number.MAX_SAFE_INTEGER;
+  const rows = await query<{ id: string; from_id: string; body: string; at: number }>(
+    "SELECT id, from_id, body, at FROM coach_messages WHERE coach_id = ? AND client_id = ? AND at < ? ORDER BY at DESC LIMIT ?",
+    [pair.coach, pair.client, until, COACH_LIMITS.page + 1],
+  );
+  const more = rows.length > COACH_LIMITS.page;
+  const page = rows.slice(0, COACH_LIMITS.page).reverse();
+  if (!Number.isFinite(before as number)) await run(READ_SQL, [accountId, otherId, now]);
+  return {
+    messages: page.map((r) => ({ id: String(r.id), from: String(r.from_id), text: String(r.body), at: Number(r.at) })),
+    more,
+    name: await nameOf(otherId),
+  };
+}
+
+/** Unread messages to this account, by who sent them. */
+export async function unreadFrom(accountId: string): Promise<Record<string, number>> {
+  const rows = await query<{ from_id: string; n: number }>(
+    `SELECT m.from_id, COUNT(*) AS n FROM coach_messages m
+       LEFT JOIN coach_reads r ON r.account_id = ? AND r.other_id = m.from_id
+     WHERE (m.coach_id = ? OR m.client_id = ?) AND m.from_id <> ? AND m.at > COALESCE(r.read_at, 0)
+     GROUP BY m.from_id`,
+    [accountId, accountId, accountId, accountId],
+  );
+  return Object.fromEntries(rows.map((r) => [String(r.from_id), Number(r.n)]));
+}
+
+// ---------- Alerts to a coach (2026-11-12) ----------
+
+export async function alertsOn(coachId: string): Promise<boolean> {
+  const [r] = await query<{ alerts: number }>("SELECT alerts FROM coach_prefs WHERE account_id = ?", [coachId]);
+  return r ? Number(r.alerts) === 1 : true;
+}
+
+export async function setAlerts(coachId: string, on: unknown, now = Date.now()): Promise<boolean> {
+  await run(
+    `INSERT INTO coach_prefs (account_id, alerts, updated_at) VALUES (?, ?, ?)
+     ON CONFLICT (account_id) DO UPDATE SET alerts = excluded.alerts, updated_at = excluded.updated_at`,
+    [coachId, on === false ? 0 : 1, now],
+  );
+  return on !== false;
+}
+
+/**
+ * A client's phone synced a finished workout: tell each of their coaches who has alerts on. Called from sync with the
+ * events it just stored; a workout logged long ago (an import, a backup) says nothing.
+ */
+export async function alertTrained(clientId: string, events: readonly { type?: unknown; at?: unknown }[], now = Date.now()): Promise<void> {
+  const ends = events
+    .filter((e) => e.type === "sessionEnd" && typeof e.at === "number" && e.at > now - 6 * 3_600_000 && e.at <= now + 60_000)
+    .map((e) => e.at as number);
+  if (!ends.length) return;
+  const latest = Math.max(...ends);
+  const coaches = await query<{ id: string }>("SELECT coach_id AS id FROM coach_links WHERE client_id = ?", [clientId]);
+  if (!coaches.length) return;
+  const name = await nameOf(clientId);
+  for (const c of coaches) {
+    const id = String(c.id);
+    // Each workout is told once, even when a phone sends it again: the last one told is kept.
+    const [told] = await query<{ at: number }>("SELECT at FROM coach_alerts WHERE coach_id = ? AND client_id = ? AND kind = 'trained'", [
+      id,
+      clientId,
+    ]);
+    if (told && Number(told.at) >= latest) continue;
+    await batch([
+      {
+        sql: `INSERT INTO coach_alerts (coach_id, client_id, kind, at) VALUES (?, ?, 'trained', ?)
+              ON CONFLICT (coach_id, client_id, kind) DO UPDATE SET at = excluded.at`,
+        args: [id, clientId, latest],
+      },
+      // A new workout ends a quiet spell, so the next one is told again.
+      { sql: "DELETE FROM coach_alerts WHERE coach_id = ? AND client_id = ? AND kind = 'quiet'", args: [id, clientId] },
+    ]);
+    if (await alertsOn(id)) await notifyCoach(id, "coachTrained", { name }, `#/trainer/c.${clientId}`);
+  }
+}
+
+/**
+ * The daily job: every client with no workout for a week (and linked for at least that long) is "quiet", and their
+ * coach is told once until they train again. Returns how many alerts went out.
+ */
+export async function alertQuiet(now = Date.now()): Promise<number> {
+  const links = await query<{ coach_id: string; client_id: string }>(
+    `SELECT l.coach_id, l.client_id FROM coach_links l
+      WHERE l.created_at <= ?
+        AND NOT EXISTS (SELECT 1 FROM coach_alerts a WHERE a.coach_id = l.coach_id AND a.client_id = l.client_id AND a.kind = 'quiet')
+        AND NOT EXISTS (SELECT 1 FROM coach_prefs p WHERE p.account_id = l.coach_id AND p.alerts = 0)
+        AND NOT EXISTS (SELECT 1 FROM sync_events e WHERE e.account_id = l.client_id AND e.at > ? AND e.body LIKE '%"type":"sessionEnd"%')`,
+    [now - COACH_LIMITS.quietMs, now - COACH_LIMITS.quietMs],
+  );
+  for (const l of links) {
+    const coach = String(l.coach_id);
+    const client = String(l.client_id);
+    await run("INSERT OR IGNORE INTO coach_alerts (coach_id, client_id, kind, at) VALUES (?, ?, 'quiet', ?)", [coach, client, now]);
+    await notifyCoach(coach, "coachQuiet", { name: await nameOf(client) }, `#/trainer/c.${client}`);
+  }
+  return links.length;
 }
 
 /** Deleting an account: its invites, setup and every link, routine and note, as coach or client. */
@@ -419,4 +702,9 @@ export const coachCleanup = (accountId: string) => [
   { sql: "DELETE FROM coach_plans WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
   { sql: "DELETE FROM coach_defaults WHERE coach_id = ?", args: [accountId] },
   { sql: "DELETE FROM coach_notes WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_messages WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_reads WHERE account_id = ? OR other_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_shares WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_alerts WHERE coach_id = ? OR client_id = ?", args: [accountId, accountId] },
+  { sql: "DELETE FROM coach_prefs WHERE account_id = ?", args: [accountId] },
 ];

@@ -6,6 +6,7 @@ import { DAY, makeSet, NOW } from "@/test/factories";
 import { decodeShare } from "./dashboard";
 import { EXERCISES } from "./exercises";
 import { decodeGym } from "./gymShare";
+import { bodyEvents, readBody } from "./importBody";
 import { parseCsv, readImport } from "./importCsv";
 import { loadBar, nearestLoads } from "./plates";
 import { recovery } from "./recovery";
@@ -223,6 +224,7 @@ describe("links and files from outside never crash the app", () => {
       fc.property(fc.string({ unit: "binary", maxLength: 2000 }), (s) => {
         expect(Array.isArray(parseCsv(s))).toBe(true);
         expect(() => readImport(s)).not.toThrow();
+        expect(() => readBody(s)).not.toThrow();
       }),
       300,
     );
@@ -236,6 +238,17 @@ describe("links and files from outside never crash the app", () => {
       fc.property(header, fc.array(fc.array(cell, { minLength: 8, maxLength: 8 }), { maxLength: 20 }), (h, rows) => {
         const text = [h, ...rows].map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(",")).join("\n");
         expect(() => readImport(text)).not.toThrow();
+      }),
+      300,
+    );
+    const bodyHeader = fc.constant(["date", "weight_kg", "fat_percent", "waist_cm", "left_bicep_in", "Measurement", "Value", "Unit"]);
+    run(
+      fc.property(bodyHeader, fc.array(fc.array(cell, { minLength: 8, maxLength: 8 }), { maxLength: 20 }), (h, rows) => {
+        const text = [h, ...rows].map((r) => r.map((c) => `"${c.replaceAll('"', '""')}"`).join(",")).join("\n");
+        const f = readBody(text);
+        if (f)
+          for (const e of bodyEvents(f, "kg", [], Date.now()).events)
+            expect(Number.isFinite(e.type === "bodyweight" ? e.kg : 0)).toBe(true);
       }),
       300,
     );

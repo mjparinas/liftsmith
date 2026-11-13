@@ -510,6 +510,22 @@ const SCHEMA = [
       `UPDATE OR IGNORE gym_places SET region = '${code}', city_slug = substr(city_slug, 1, length(city_slug) - ${regionSlug(name).length}) || '${code.toLowerCase()}' WHERE region = '${name}' AND city_slug LIKE '%-${regionSlug(name)}'`,
   ),
   // Lifters who added a real gym, counted once each (account, else a one-way code from the address).
+  // Poster and stand QR visits per gym and day (gymPosters.ts countScan), for the owner's last 30 days.
+  `CREATE TABLE IF NOT EXISTS gym_scan_days (
+    place_id TEXT NOT NULL,
+    day INTEGER NOT NULL,
+    n INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (place_id, day)
+  )`,
+  // A claimed gym's logo and photos (gymMedia.ts): JPEGs the app made, one logo and six photos a gym.
+  `CREATE TABLE IF NOT EXISTS gym_photos (
+    id TEXT PRIMARY KEY,
+    place_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    image BLOB NOT NULL,
+    created_at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS gym_photos_place ON gym_photos (place_id)`,
   `CREATE TABLE IF NOT EXISTS gym_place_lifters (
     place_id TEXT NOT NULL,
     who TEXT NOT NULL,
@@ -768,6 +784,46 @@ const SCHEMA = [
     PRIMARY KEY (coach_id, client_id)
   )`,
   `CREATE INDEX IF NOT EXISTS coach_notes_client ON coach_notes (client_id)`,
+  // Coach and client chat (2026-11-12): messages between a linked pair, newest last; each side's read mark.
+  `CREATE TABLE IF NOT EXISTS coach_messages (
+    id TEXT PRIMARY KEY,
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    from_id TEXT NOT NULL,
+    body TEXT NOT NULL,
+    at INTEGER NOT NULL
+  )`,
+  `CREATE INDEX IF NOT EXISTS coach_messages_pair ON coach_messages (coach_id, client_id, at)`,
+  `CREATE INDEX IF NOT EXISTS coach_messages_client ON coach_messages (client_id)`,
+  `CREATE TABLE IF NOT EXISTS coach_reads (
+    account_id TEXT NOT NULL,
+    other_id TEXT NOT NULL,
+    read_at INTEGER NOT NULL,
+    PRIMARY KEY (account_id, other_id)
+  )`,
+  // What a client shares with one coach beyond training: body (weight, body fat, tape measurements, sex and
+  // height, for the shaped 3D figure). Off until the client turns it on.
+  `CREATE TABLE IF NOT EXISTS coach_shares (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    body INTEGER NOT NULL DEFAULT 0,
+    updated_at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id)
+  )`,
+  // Alerts already sent to a coach about a client ("quiet": no workout for a week), so each goes once per gap; and
+  // each coach's alert switch (on unless turned off).
+  `CREATE TABLE IF NOT EXISTS coach_alerts (
+    coach_id TEXT NOT NULL,
+    client_id TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (coach_id, client_id, kind)
+  )`,
+  `CREATE TABLE IF NOT EXISTS coach_prefs (
+    account_id TEXT PRIMARY KEY,
+    alerts INTEGER NOT NULL DEFAULT 1,
+    updated_at INTEGER NOT NULL
+  )`,
   // Give a month, get a month (earnedPro.ts, docs/decisions/growth.md): who joined through whose invite, and the
   // Pro months it earned. One accept per friend ever; a month each once the friend has finished three workouts.
   `CREATE TABLE IF NOT EXISTS invite_accepts (
@@ -840,6 +896,11 @@ const COLUMNS: [table: string, column: string, def: string][] = [
   // The claim code printed on a gym's poster or stand, as a hash (gymClaims.ts).
   ["gym_places", "claim_code", "TEXT NOT NULL DEFAULT ''"],
   ["gym_places", "qr_scans", "INTEGER NOT NULL DEFAULT 0"],
+  // A gym a lifter added (gymPlaces.ts suggestPlace): who, and whether it still waits for staff.
+  ["gym_places", "added_by", "TEXT NOT NULL DEFAULT ''"],
+  // An official gym's own club (social.ts gymClubStart): the gym it belongs to, '' for a lifter's own club.
+  ["clubs", "place_id", "TEXT NOT NULL DEFAULT ''"],
+  ["gym_places", "pending", "INTEGER NOT NULL DEFAULT 0"],
 ];
 
 let client: Client | null = null;

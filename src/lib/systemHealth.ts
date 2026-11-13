@@ -12,6 +12,10 @@ export interface CheckRow {
   /** A time the row is about, shown as "3 days ago". */
   at?: number;
   href?: string;
+  /** A heading the row sits under; rows with the same group follow each other. */
+  group?: string;
+  /** A small line under the row: what it's for. */
+  note?: string;
 }
 
 export interface HealthCheck {
@@ -152,80 +156,400 @@ export function runState(r: { status: string; conclusion: string | null }): Chec
   return "down";
 }
 
+/** What a setting is for, in the order the Settings card groups them. */
+export const SETTING_GROUPS = [
+  "Core",
+  "Email",
+  "Admin panel",
+  "Sign-in",
+  "Payments",
+  "Connected apps",
+  "Push notifications",
+  "Gyms",
+  "Search and monitoring",
+] as const;
+export type SettingGroup = (typeof SETTING_GROUPS)[number];
+
+export interface Setting {
+  /** Environment variable names. Any one of them is enough, unless `all` is set. */
+  names: string[];
+  /** Every name must be set (a client id and its secret, say). */
+  all?: boolean;
+  label: string;
+  group: SettingGroup;
+  need: "required" | "recommended" | "optional";
+  /** What it powers, and what happens without it. */
+  what: string;
+}
+
 /**
- * The server settings the panel checks are present: names only, never values. `required` turns the card red,
- * `recommended` amber, `optional` stays quiet. Keep in step with AGENTS.md ("Server environment" lines).
+ * Every server setting the code reads, so the panel can say which are present: names only, never values.
+ * `required` turns the card red, `recommended` amber, `optional` stays quiet. `systemHealth.test.ts` fails when
+ * the code reads an environment variable that isn't here (or on `NOT_SETTINGS`), so a new key can't go unlisted.
+ * Keep in step with AGENTS.md ("Environment variables live in Vercel").
  */
-export const SETTINGS: { names: string[]; label: string; need: "required" | "recommended" | "optional"; what: string }[] = [
+export const SETTINGS: Setting[] = [
+  // Core
   {
     names: ["TURSO_DATABASE_URL", "DATABASE_URL"],
     label: "Database",
+    group: "Core",
     need: "required",
-    what: "Analytics, reminders, creators and the admin panel need it.",
+    what: "Accounts, sync, Friends, analytics, reminders and this panel. Production reads DATABASE_URL first (the pin against Turso's branch per deploy).",
   },
-  { names: ["RESEND_API_KEY"], label: "Email sending", need: "required", what: "Admin sign-in links, feedback and reminder emails." },
-  { names: ["ADMIN_EMAILS"], label: "Admin emails", need: "required", what: "Who can open this panel." },
-  { names: ["MAIL_FROM"], label: "Reminder sender", need: "required", what: "The From address for reminder emails." },
+  {
+    names: ["TURSO_AUTH_TOKEN", "DATABASE_AUTH_TOKEN"],
+    label: "Database token",
+    group: "Core",
+    need: "required",
+    what: "The database's auth token, paired with the address above.",
+  },
+  {
+    names: ["NEXT_PUBLIC_SITE_URL"],
+    label: "Site address",
+    group: "Core",
+    need: "recommended",
+    what: "Set it to https://www.getliftsmith.com.",
+  },
+  { names: ["CRON_SECRET"], label: "Cron secret", group: "Core", need: "required", what: "Vercel Cron sends it to the daily jobs." },
+  {
+    names: ["ANALYTICS_SECRET", "ADMIN_SECRET"],
+    label: "Visitor hash salt",
+    group: "Core",
+    need: "recommended",
+    what: "Salts the cookieless visitor count.",
+  },
+  {
+    names: ["LAUNCH_DATE"],
+    label: "Launch date",
+    group: "Core",
+    need: "optional",
+    what: "Where the Overview's since-launch numbers start. Without it, the first store install.",
+  },
+  {
+    names: ["REVIEW_SIGNIN_CODE"],
+    label: "Store reviewer sign-in code",
+    group: "Core",
+    need: "recommended",
+    what: "The 12-digit code the Play and App Store reviewers sign in with.",
+  },
+  {
+    names: ["NEXT_PUBLIC_GOOGLE_PLAY_URL"],
+    label: "Google Play link",
+    group: "Core",
+    need: "optional",
+    what: "The website's Get it on Google Play buttons. Read when the site is built, so redeploy after changing it.",
+  },
+  {
+    names: ["NEXT_PUBLIC_APP_STORE_URL"],
+    label: "App Store link",
+    group: "Core",
+    need: "optional",
+    what: "The website's App Store buttons. Read when the site is built, so redeploy after changing it.",
+  },
+  // Email
+  {
+    names: ["RESEND_API_KEY"],
+    label: "Email sending",
+    group: "Email",
+    need: "required",
+    what: "Admin sign-in links, feedback and reminder emails.",
+  },
+  { names: ["MAIL_FROM"], label: "Reminder sender", group: "Email", need: "required", what: "The From address for reminder emails." },
   {
     names: ["MAIL_POSTAL_ADDRESS"],
     label: "Postal address",
+    group: "Email",
     need: "required",
     what: "Every marketing email must carry it (CAN-SPAM, CASL).",
   },
-  { names: ["REMINDER_SECRET"], label: "Unsubscribe link secret", need: "required", what: "Signs one-click unsubscribe links." },
-  { names: ["CRON_SECRET"], label: "Cron secret", need: "required", what: "Vercel Cron sends it to the daily reminder job." },
-  { names: ["ANALYTICS_SECRET"], label: "Visitor hash salt", need: "recommended", what: "Salts the cookieless visitor count." },
-  { names: ["NEXT_PUBLIC_SITE_URL"], label: "Site address", need: "recommended", what: "Set it to https://www.getliftsmith.com." },
-  { names: ["FEEDBACK_TO"], label: "Feedback inbox", need: "recommended", what: "Where in-app feedback is emailed." },
+  {
+    names: ["REMINDER_SECRET"],
+    label: "Unsubscribe link secret",
+    group: "Email",
+    need: "required",
+    what: "Signs one-click unsubscribe links.",
+  },
+  { names: ["FEEDBACK_TO"], label: "Feedback inbox", group: "Email", need: "recommended", what: "Where in-app feedback is emailed." },
+  {
+    names: ["FEEDBACK_FROM"],
+    label: "Feedback sender",
+    group: "Email",
+    need: "optional",
+    what: "The From address for feedback and Inbox replies. Without it, the reminder sender.",
+  },
+  {
+    names: ["ADMIN_FROM"],
+    label: "Admin mail sender",
+    group: "Email",
+    need: "optional",
+    what: "The From address for sign-in links and alerts. Without it, the feedback sender.",
+  },
   {
     names: ["RESEND_INBOX_API_KEY"],
     label: "Inbox reading key",
+    group: "Email",
     need: "recommended",
     what: "A full-access Resend key, so the Inbox tab can read received mail.",
   },
   {
-    names: ["REVENUECAT_WEBHOOK_SECRET"],
-    label: "RevenueCat webhook",
+    names: ["INBOX_DOMAINS"],
+    label: "Inbox domains",
+    group: "Email",
     need: "optional",
-    what: "Store subscription events, once billing is live.",
+    what: "Which domains' mail the Inbox shows (the Resend account is shared with Gradelings). Without it, getliftsmith.com.",
   },
-  { names: ["UPTIMEROBOT_API_KEY"], label: "UptimeRobot", need: "optional", what: "The read-only API key, for the Uptime card." },
+  // Admin panel
+  { names: ["ADMIN_EMAILS"], label: "Admin emails", group: "Admin panel", need: "required", what: "Who can open this panel." },
   {
-    names: ["GITHUB_TOKEN"],
-    label: "GitHub token",
+    names: ["SUPPORT_EMAILS"],
+    label: "Support emails",
+    group: "Admin panel",
     need: "optional",
-    what: "A read-only Actions token; the Builds card works without one, within GitHub's hourly limit.",
-  },
-  { names: ["VERCEL_TOKEN"], label: "Vercel token", need: "optional", what: "A read-only token, for the Deploys card's history." },
-  {
-    names: ["GOOGLE_SERVICE_ACCOUNT_KEY"],
-    label: "Search Console key",
-    need: "optional",
-    what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
-  },
-  {
-    names: ["BING_WEBMASTER_API_KEY"],
-    label: "Bing Webmaster key",
-    need: "optional",
-    what: "The API key from Bing Webmaster Tools (Settings › API access), for the Traffic tab's Bing part.",
+    what: "Read-only staff for this panel.",
   },
   {
     names: ["TWO_FACTOR_KEY"],
     label: "Two-step encryption key",
+    group: "Admin panel",
     need: "recommended",
     what: "Encrypts staff authenticator secrets in the database. Without it they're stored as they are. Don't change it once set.",
   },
   {
     names: ["ADMIN_2FA"],
     label: "Two-step for staff",
+    group: "Admin panel",
     need: "optional",
     what: "Unset: every staff sign-in needs an authenticator code. Set to optional to let staff without it in.",
   },
   {
+    names: ["ANTHROPIC_API_KEY"],
+    label: "Draft with AI",
+    group: "Admin panel",
+    need: "optional",
+    what: "The Inbox's Draft with AI button.",
+  },
+  // Sign-in
+  {
+    names: ["NEXT_PUBLIC_GOOGLE_WEB_CLIENT_ID", "GOOGLE_CLIENT_IDS"],
+    label: "Google sign-in client",
+    group: "Sign-in",
+    need: "optional",
+    what: "Overrides the web client id built into the app. Without it, the built-in one.",
+  },
+  {
+    names: ["NEXT_PUBLIC_GOOGLE_IOS_CLIENT_ID"],
+    label: "Google sign-in on iPhone",
+    group: "Sign-in",
+    need: "optional",
+    what: "The iOS client id, so tokens from the iPhone app are accepted. iOS setup is deferred.",
+  },
+  {
+    names: ["NEXT_PUBLIC_APPLE_SERVICES_ID", "APPLE_CLIENT_IDS"],
+    label: "Apple sign-in on the web",
+    group: "Sign-in",
+    need: "optional",
+    what: "The Services ID, for Sign in with Apple on the website. The app's bundle id is always accepted.",
+  },
+  {
+    names: ["APPLE_TEAM_ID", "APPLE_KEY_ID", "APPLE_PRIVATE_KEY"],
+    all: true,
+    label: "Apple sign-in key",
+    group: "Sign-in",
+    need: "optional",
+    what: "A Sign in with Apple .p8 key, to finish Apple sign-ins on the server and revoke them when an account is deleted. iOS setup is deferred.",
+  },
+  // Payments
+  {
+    names: ["STRIPE_SECRET_KEY", "STRIPE_WEBHOOK_SECRET", "STRIPE_PRICE_MONTHLY", "STRIPE_PRICE_ANNUAL"],
+    all: true,
+    label: "Stripe (Pro on the web)",
+    group: "Payments",
+    need: "recommended",
+    what: "With any of the four missing, the web app sells nothing and stays unlocked.",
+  },
+  {
+    names: ["REVENUECAT_WEBHOOK_SECRET"],
+    label: "RevenueCat webhook",
+    group: "Payments",
+    need: "recommended",
+    what: "Store subscription events: the Revenue tab, Pro on the account and creator commission.",
+  },
+  // Connected apps: each one is "Coming soon" in the app until both are set (connect.ts).
+  ...(
+    [
+      ["STRAVA", "Strava", "Workouts out to Strava."],
+      ["OURA", "Oura", "Sleep and readiness in from Oura."],
+      ["WHOOP", "WHOOP", "Recovery and sleep in from WHOOP."],
+      ["WITHINGS", "Withings", "Weigh-ins and body fat in from Withings."],
+      ["POLAR", "Polar", "Sleep and Nightly Recharge in from Polar."],
+      ["CONCEPT2", "Concept2", "Rows and rides in from the Concept2 Logbook."],
+      ["SONOS", "Sonos", "The Sonos lab's play, skip and volume."],
+    ] as const
+  ).map(([key, name, what]): Setting => ({
+    names: [`${key}_CLIENT_ID`, `${key}_CLIENT_SECRET`],
+    all: true,
+    label: name,
+    group: "Connected apps",
+    need: "optional",
+    what: `${what} Until both are set it shows "Coming soon".`,
+  })),
+  // Push notifications
+  {
+    names: ["FCM_SERVICE_ACCOUNT_JSON"],
+    label: "Android push (Firebase)",
+    group: "Push notifications",
+    need: "optional",
+    what: "Friends notifications to Android phones. Without it no Android push is sent.",
+  },
+  {
+    names: ["APNS_KEY_P8", "APNS_KEY_ID", "APNS_TEAM_ID"],
+    all: true,
+    label: "iPhone push (APNs)",
+    group: "Push notifications",
+    need: "optional",
+    what: "Friends notifications to iPhones. iOS setup is deferred.",
+  },
+  {
+    names: ["APNS_TOPIC"],
+    label: "iPhone push topic",
+    group: "Push notifications",
+    need: "optional",
+    what: "The app's bundle id for APNs. Without it, com.getliftsmith.app.",
+  },
+  {
+    names: ["APNS_SANDBOX"],
+    label: "iPhone push sandbox",
+    group: "Push notifications",
+    need: "optional",
+    what: "Set to 1 to send to development builds instead of the App Store app.",
+  },
+  // Gyms
+  {
+    names: ["MAPBOX_TOKEN"],
+    label: "Mapbox",
+    group: "Gyms",
+    need: "optional",
+    what: "The map picture on gym pages. Without it they show no map.",
+  },
+  // Search and monitoring
+  {
+    names: ["GOOGLE_SERVICE_ACCOUNT_KEY"],
+    label: "Search Console key",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "A Google service account's JSON key (a Restricted user on the property), for the Traffic tab's Google Search part.",
+  },
+  {
+    names: ["SEARCH_CONSOLE_SITE"],
+    label: "Search Console property",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "Which Search Console property to read. Without it, the getliftsmith.com domain property.",
+  },
+  {
+    names: ["BING_WEBMASTER_API_KEY"],
+    label: "Bing Webmaster key",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "The API key from Bing Webmaster Tools (Settings › API access), for the Traffic tab's Bing part.",
+  },
+  {
+    names: ["BING_SITE_URL"],
+    label: "Bing site",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "Which Bing Webmaster site to read. Without it, the www site.",
+  },
+  {
+    names: ["UPTIMEROBOT_API_KEY"],
+    label: "UptimeRobot",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "The read-only API key, for the Uptime card.",
+  },
+  {
+    names: ["GITHUB_TOKEN"],
+    label: "GitHub token",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "A read-only Actions token; the Builds card works without one, within GitHub's hourly limit.",
+  },
+  {
+    names: ["VERCEL_TOKEN"],
+    label: "Vercel token",
+    group: "Search and monitoring",
+    need: "optional",
+    what: "A read-only token, for the Deploys card's history and for this card to say which environments each setting is in.",
+  },
+  {
     names: ["DATABASE_SIZE_LIMIT_MB"],
     label: "Database size limit",
+    group: "Search and monitoring",
     need: "optional",
     what: "Your Turso plan's storage, in megabytes, for the Capacity card's warning.",
+  },
+];
+
+/**
+ * Environment variables the code reads that aren't settings to keep: Vercel and CI set them on every build, or
+ * they're build-time switches for scripts and tests. `systemHealth.test.ts` checks the code against both lists.
+ */
+export const NOT_SETTINGS: string[] = [
+  "NODE_ENV",
+  "VITEST",
+  "STATIC_EXPORT",
+  "NEXT_PUBLIC_STATIC",
+  "STILLS",
+  "SPEED_REPORT",
+  "REP_ACCURACY",
+  "SHOW_SAMPLE_QUOTES",
+  "RESEND_API_BASE",
+  "COMMIT_SHA",
+  "GITHUB_SHA",
+  "GITHUB_REPOSITORY",
+  "NEXT_PUBLIC_COMMIT_SHA",
+  "NEXT_PUBLIC_APP_VERSION",
+  // Built into the apps by release.yml from the GitHub secrets on BUILD_SECRETS.
+  "NEXT_PUBLIC_REVENUECAT_ANDROID_KEY",
+  "NEXT_PUBLIC_REVENUECAT_IOS_KEY",
+  "VERCEL_ENV",
+  "VERCEL_REGION",
+  "VERCEL_PROJECT_ID",
+  "VERCEL_TEAM_ID",
+  "VERCEL_GIT_COMMIT_SHA",
+  "VERCEL_GIT_COMMIT_REF",
+  "VERCEL_GIT_COMMIT_MESSAGE",
+  "VERCEL_GIT_REPO_OWNER",
+  "VERCEL_GIT_REPO_SLUG",
+];
+
+/**
+ * Keys that live in GitHub (Settings › Secrets and variables › Actions), not Vercel: the app store builds read
+ * them in `release.yml` and `ci.yml`. The panel can't see them, so the card lists them for completeness.
+ */
+export const BUILD_SECRETS: { names: string[]; label: string; what: string }[] = [
+  {
+    names: ["ANDROID_KEYSTORE_B64", "ANDROID_KEYSTORE_PASSWORD"],
+    label: "Android upload key",
+    what: "Signs the App Bundle for Google Play.",
+  },
+  { names: ["PLAY_SERVICE_ACCOUNT_JSON"], label: "Google Play upload", what: "Uploads each release to the internal track." },
+  { names: ["GOOGLE_SERVICES_JSON"], label: "Firebase config", what: "Lets the Android app register for Friends push." },
+  {
+    names: ["REVENUECAT_ANDROID_KEY", "REVENUECAT_IOS_KEY"],
+    label: "RevenueCat app keys",
+    what: "Built into the apps as NEXT_PUBLIC_REVENUECAT_*_KEY, so they can sell Pro.",
+  },
+  {
+    names: ["APPLE_TEAM_ID", "ASC_KEY_ID", "ASC_ISSUER_ID", "ASC_KEY_P8"],
+    label: "App Store Connect",
+    what: "Archives the iPhone app and uploads it to TestFlight.",
+  },
+  {
+    names: ["PROMOTE_TOKEN"],
+    label: "Promotion token",
+    what: "Only if main requires reviews: lets the nightly staging → main merge go through.",
   },
 ];
 
@@ -264,16 +588,62 @@ export function daysUntilFull(samples: { day: number; bytes: number }[], limit: 
   return Math.max(0, Math.floor((limit - last.bytes) / perDay));
 }
 
-/** Which settings are set, by name. `env` is looked up, never returned. */
-export function settingRows(env: (name: string) => string): CheckRow[] {
-  return SETTINGS.map((s) => {
-    const name = s.names.find((n) => env(n));
+/** Vercel's environments, in the order the panel names them. */
+const TARGETS = ["production", "preview", "development"] as const;
+const TARGET_LABEL: Record<string, string> = { production: "Production", preview: "Preview", development: "Development" };
+
+/** Which of Vercel's environments hold a name ("Production and Preview"), from the project's variable list. */
+export function targetsLabel(names: string[], targets: Map<string, string[]>): string {
+  const all = new Set(names.flatMap((n) => targets.get(n) ?? []));
+  const list = TARGETS.filter((t) => all.has(t)).map((t) => TARGET_LABEL[t]!);
+  if (!list.length) return "";
+  return list.length === 1 ? `${list[0]} only` : `${list.slice(0, -1).join(", ")} and ${list[list.length - 1]}`;
+}
+
+/**
+ * Which settings are set, by name. `env` is looked up, never returned. `targets` (variable name to Vercel
+ * environments, from the Vercel API when VERCEL_TOKEN is set) adds where each one is set, and lists variables in
+ * Vercel that no setting names.
+ */
+export function settingRows(env: (name: string) => string, targets?: Map<string, string[]>): CheckRow[] {
+  const rows = SETTINGS.map((s): CheckRow => {
+    const present = s.names.filter((n) => env(n));
+    const set = s.all ? present.length === s.names.length : present.length > 0;
+    const where = targets ? targetsLabel(s.names, targets) : "";
+    const missingState: CheckState | undefined = s.need === "required" ? "down" : s.need === "recommended" ? "warn" : undefined;
+    let value: string;
+    if (set) value = `Set (${(s.all ? s.names : present.slice(0, 1)).join(", ")})`;
+    else if (s.all && present.length) value = `Missing ${s.names.filter((n) => !env(n)).join(", ")}`;
+    else value = `Missing: ${s.names.join(s.all ? " and " : " or ")}`;
+    if (where) value += ` · ${where}`;
     return {
       label: s.label,
-      value: name ? `Set (${name})` : `Missing: ${s.names.join(" or ")}. ${s.what}`,
-      state: name ? "ok" : s.need === "required" ? "down" : s.need === "recommended" ? "warn" : undefined,
+      value,
+      // Half of a pair set is always worth a look: something was meant to be on.
+      state: set ? "ok" : s.all && present.length ? "warn" : missingState,
+      group: s.group,
+      note: s.what,
     };
   });
+  if (targets) {
+    const known = new Set([...SETTINGS.flatMap((s) => s.names), ...NOT_SETTINGS]);
+    for (const name of [...targets.keys()].filter((n) => !known.has(n)).sort())
+      rows.push({
+        label: name,
+        value: targetsLabel([name], targets),
+        state: "warn",
+        group: "In Vercel, not read by the code",
+        note: "Nothing in the code reads it. Remove it from Vercel, or add it to SETTINGS if it's new.",
+      });
+  }
+  for (const b of BUILD_SECRETS)
+    rows.push({
+      label: b.label,
+      value: b.names.join(", "),
+      group: "App builds (GitHub secrets, not checked here)",
+      note: b.what,
+    });
+  return rows;
 }
 
 /** Whether a site address follows the www rule (AGENTS.md "Domain"): https, the www host, no path. */

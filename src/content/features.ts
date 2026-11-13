@@ -343,6 +343,13 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         added: "2026-11-10",
       },
       {
+        id: "body-figure",
+        name: "A 3D figure shaped like you",
+        body: "Turn it on and the figure on Health takes your build from your height, weight, body fat and tape measurements.",
+        tier: "free",
+        added: "2026-11-12",
+      },
+      {
         id: "health-twin",
         name: "Health twin and fitness age",
         body: "Sleep, HRV, resting heart rate, steps, breathing rate and VO₂ max in one place, with your trend and a fitness age from your VO₂ max.",
@@ -440,7 +447,7 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "gym-finder",
         name: "Gym finder and gym pages",
-        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym.",
+        body: "Find gyms near you, official ones first, each with its own page: equipment, hours, map and members. Owners can claim their gym and add a logo and photos. Missing a gym? Add it. Owners see how many lifters added it and scanned the poster, and what to do next. Official gyms can run a club with a weekly leaderboard.",
         tier: "free",
         added: "2026-11-12",
       },
@@ -507,6 +514,15 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
         tier: "pro",
         pro: "coaching",
         added: "2026-11-11",
+      },
+      {
+        id: "coach-chat",
+        name: "Chat, alerts and body data",
+        body: "Message each client, get a notification when they train or go quiet for a week, and see their weigh-ins, measurements and a 3D figure shaped like them when they choose to share.",
+        tier: "pro",
+        pro: "coaching",
+        note: "Notifications are on Android and iPhone. The web app shows new messages when it's open.",
+        added: "2026-11-12",
       },
     ],
   },
@@ -625,9 +641,16 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
       {
         id: "import",
         name: "Import from another app",
-        body: "Bring your history across from Strong, Hevy, Fitbod, StrongLifts or JEFIT with their export file.",
+        body: "Bring your history across from Strong, Hevy, Fitbod, StrongLifts, JEFIT or FitNotes with their export file, cardio included.",
         tier: "free",
         added: "2026-11-11",
+      },
+      {
+        id: "importExtras",
+        name: "Routines and body stats from another app",
+        body: "An import turns workouts you repeated by name into routines, and brings body weight, body fat and tape measurements from Hevy, FitNotes or a scale app.",
+        tier: "free",
+        added: "2026-11-13",
       },
     ],
   },
@@ -823,7 +846,7 @@ export const ALL_FEATURES: SiteFeature[] = FEATURE_GROUPS.flatMap((g) => g.featu
  * The newest features: every one added on the latest `days` days that added any, grouped by their category in page
  * order (Melvin, 2026-11-12: "categorize them instead" of dates).
  */
-export function newestFeatures(days = 3): { group: FeatureGroup; features: SiteFeature[] }[] {
+export function newestFeatures(days = 3, groups: FeatureGroup[] = FEATURE_GROUPS): { group: FeatureGroup; features: SiteFeature[] }[] {
   const recent = new Set(
     [...new Set(ALL_FEATURES.map((f) => f.added))]
       .filter((d) => d > LAUNCH)
@@ -831,9 +854,9 @@ export function newestFeatures(days = 3): { group: FeatureGroup; features: SiteF
       .reverse()
       .slice(0, days),
   );
-  return FEATURE_GROUPS.map((group) => ({ group, features: group.features.filter((f) => recent.has(f.added)) })).filter(
-    (g) => g.features.length > 0,
-  );
+  return groups
+    .map((group) => ({ group, features: group.features.filter((f) => recent.has(f.added)) }))
+    .filter((g) => g.features.length > 0);
 }
 
 // --- Connections: what Liftsmith works with ---
@@ -1087,7 +1110,7 @@ export const CONNECTION_GROUPS: ConnectionGroup[] = [
       },
       {
         id: "import",
-        name: "Strong, Hevy, Fitbod, StrongLifts, JEFIT",
+        name: "Strong, Hevy, Fitbod, StrongLifts, JEFIT, FitNotes",
         does: "Your workout history imported from their export file",
         android: "yes",
         ios: "yes",

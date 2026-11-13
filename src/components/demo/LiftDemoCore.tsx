@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 import { DANCE_ID, tapStreak } from "@/lib/demo/dance";
-import type { BodyKey } from "@/lib/demo/rig";
+import type { Body, BodyKey } from "@/lib/demo/rig";
 import { EXERCISES } from "@/lib/exercises";
 import type { Muscle } from "@/lib/types";
 import { probeWebGL } from "@/lib/webgl";
@@ -44,6 +44,8 @@ export interface LiftDemoProps {
   label?: string;
   /** Which figure. The app passes `bodyFor(profile.sex)`; left out, it's the male figure. */
   body?: BodyKey;
+  /** A figure reshaped to one person (src/lib/bodyShape.ts); it replaces `body`'s average figure. */
+  shape?: Body;
   /** Offer the Male / Female toggle with the controls (public site only; the app uses Settings). */
   bodyToggle?: boolean;
   view?: View;
@@ -140,6 +142,7 @@ export function LiftDemoCore({
   reps,
   label,
   body: bodyProp,
+  shape,
   bodyToggle,
   view: viewProp,
   still,
@@ -195,6 +198,7 @@ export function LiftDemoCore({
   const settings: DemoSettings = {
     exerciseId: dancing ? DANCE_ID : exerciseId,
     body,
+    shape,
     view,
     skeleton,
     muscles,
@@ -269,6 +273,7 @@ export function LiftDemoCore({
   }, [
     exerciseId,
     body,
+    shape,
     view,
     skeleton,
     muscles,

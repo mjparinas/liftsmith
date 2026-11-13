@@ -13,9 +13,11 @@ import {
   importArea,
   joinPlace,
   nearbyPlaces,
+  pendingPlaces,
   placesFromOsm,
   savePlaces,
   slugify,
+  suggestPlace,
   type OsmElement,
 } from "./gymPlaces";
 
@@ -62,6 +64,36 @@ describe("reading OpenStreetMap", () => {
     expect(drafts[0]).toMatchObject({ ref: "osm:way/1", kind: "gym", address: "19925 Willowbrook Drive", city: "Langley", region: "BC" });
     expect(drafts[2]!.kind).toBe("studio");
     expect(drafts[3]).toMatchObject({ city: "Maple Ridge", website: "" });
+  });
+
+  it("keeps rec centres with a gym, and leaves arenas and pools out", () => {
+    const rec: OsmElement[] = [
+      {
+        type: "way",
+        id: 20,
+        lat: 49.1,
+        lon: -122.6,
+        tags: { leisure: "sports_centre", name: "W.C. Blair Recreation Centre", sport: "swimming" },
+      },
+      {
+        type: "way",
+        id: 21,
+        lat: 49.1,
+        lon: -122.6,
+        tags: { leisure: "sports_centre", name: "Langley Events Centre", sport: "ice_hockey" },
+      },
+      { type: "node", id: 22, lat: 49.1, lon: -122.6, tags: { leisure: "sports_centre", name: "Iron Barn", sport: "fitness" } },
+      { type: "node", id: 23, lat: 49.1, lon: -122.6, tags: { amenity: "community_centre", name: "Walnut Grove Community Centre" } },
+      { type: "node", id: 24, lat: 49.1, lon: -122.6, tags: { amenity: "community_centre", name: "Langley YMCA Fitness" } },
+      { type: "node", id: 25, lat: 49.1, lon: -122.6, tags: { leisure: "sports_centre", name: "Flips Gymnastics" } },
+    ];
+    const drafts = placesFromOsm(rec, AREA);
+    expect(drafts.map((d) => [d.name, d.kind])).toEqual([
+      ["W.C. Blair Recreation Centre", "gym"],
+      ["Iron Barn", "gym"],
+      ["Langley YMCA Fitness", "gym"],
+      ["Flips Gymnastics", "studio"],
+    ]);
   });
 
   it("makes plain web addresses", () => {
@@ -211,5 +243,74 @@ describe("staff", () => {
           ])
         : Response.json({ elements: [] })) as typeof fetch;
     expect(await importArea("Abbotsford", french, NOW)).toMatchObject({ ok: true, area: "Abbotsford, BC" });
+  });
+});
+
+describe("a gym the map doesn't have", () => {
+  const map = (hits: Record<string, unknown[]>) =>
+    (async (url: string | URL | Request) => {
+      const q = new URL(String(url)).searchParams.get("q") ?? "";
+      return Response.json(hits[q] ?? []);
+    }) as typeof fetch;
+  const LANGLEY = {
+    lat: "49.104",
+    lon: "-122.66",
+    address: { city: "Langley", state: "British Columbia", "ISO3166-2-lvl4": "CA-BC", country_code: "ca" },
+  };
+
+  it("finds it on the map, keeps it hidden until staff approve it, and refuses a duplicate", async () => {
+    const fetcher = map({ "20555 56 Ave, Langley": [LANGLEY] });
+    const body = { name: "Forge Barbell Club", address: "20555 56 Ave", city: "Langley" };
+    const r = await suggestPlace("acc-1", body, fetcher, NOW);
+    expect(r.ok).toBe(true);
+    const id = r.ok ? r.place : "";
+    expect(await nearbyPlaces(49.104, -122.66)).toEqual([]);
+    expect((await pendingPlaces()).map((p) => [p.name, p.city, p.region])).toEqual([["Forge Barbell Club", "Langley", "BC"]]);
+    expect((await adminPlaces("")).matches).toBe(0);
+    expect(await suggestPlace("acc-2", { ...body, name: "Forge Barbell" }, fetcher, NOW)).toEqual({ ok: false, error: "exists" });
+
+    expect(await actOnPlace(id, "approve")).toBe(true);
+    expect((await nearbyPlaces(49.104, -122.66))!.map((p) => [p.name, p.citySlug, p.source])).toEqual([
+      ["Forge Barbell Club", "langley-bc", "lifter"],
+    ]);
+    expect(await pendingPlaces()).toEqual([]);
+    expect(await actOnPlace(id, "reject")).toBe(false);
+  });
+
+  it("falls back to the city when the map doesn't know the street, and checks what it's given", async () => {
+    const fetcher = map({ Langley: [LANGLEY] });
+    const r = await suggestPlace(
+      "acc-1",
+      { name: "Garage Gym Co", address: "Unit 4, 123 Nowhere Rd", city: "Langley", lat: 49.11, lon: -122.67 },
+      fetcher,
+      NOW,
+    );
+    expect(r.ok).toBe(true);
+    const [p] = await query("SELECT lat, lon, pending, hidden, added_by FROM gym_places");
+    expect(p).toMatchObject({ lat: 49.11, lon: -122.67, pending: 1, hidden: 1, added_by: "acc-1" });
+    if (r.ok) expect(await actOnPlace(r.place, "reject")).toBe(true);
+    expect(await query("SELECT id FROM gym_places")).toEqual([]);
+
+    expect(await suggestPlace("acc-1", { name: "X", address: "1 Main St", city: "Langley" }, fetcher, NOW)).toEqual({
+      ok: false,
+      error: "name",
+    });
+    expect(await suggestPlace("acc-1", { name: "Gym", address: "", city: "Langley" }, fetcher, NOW)).toEqual({
+      ok: false,
+      error: "address",
+    });
+    expect(await suggestPlace("acc-1", { name: "Gym", address: "1 Main St", city: "Atlantis" }, fetcher, NOW)).toEqual({
+      ok: false,
+      error: "where",
+    });
+  });
+
+  it("allows five a day per account", async () => {
+    const fetcher = map({});
+    for (let i = 0; i < 5; i++) await suggestPlace("acc-1", { name: `Gym ${i}`, address: "1 Main St", city: "Atlantis" }, fetcher, NOW);
+    expect(await suggestPlace("acc-1", { name: "Gym 6", address: "1 Main St", city: "Atlantis" }, fetcher, NOW)).toEqual({
+      ok: false,
+      error: "slow",
+    });
   });
 });

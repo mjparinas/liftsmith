@@ -4,7 +4,7 @@
 // database, email, the daily job, subscriptions, admin security, capacity, backups, settings) and the providers'
 // public status pages, under the maintenance mode switch. Every card
 // loads on its own, so a slow service never holds up the rest; results are cached on the server for a minute.
-import { useCallback, useEffect, useState } from "react";
+import { Fragment, useCallback, useEffect, useState } from "react";
 
 import {
   CHECKS,
@@ -131,24 +131,33 @@ function CheckCard({
           {c.rows.length > 0 && (
             <dl className="mt-3 space-y-1 text-sm">
               {c.rows.map((row, i) => (
-                <div key={i} className="flex flex-wrap justify-between gap-x-3 border-b border-line/50 pb-1">
-                  <dt className="text-muted">
-                    {row.state && (
-                      <span className={`mr-1.5 inline-block h-2 w-2 rounded-full ${DOT[row.state]}`} aria-label={STATE_LABEL[row.state]} />
-                    )}
-                    {row.href ? (
-                      <a href={row.href} target="_blank" rel="noreferrer" className="underline">
-                        {row.label}
-                      </a>
-                    ) : (
-                      row.label
-                    )}
-                  </dt>
-                  <dd className="num text-right">
-                    {row.value}
-                    {row.at ? `${row.value ? " · " : ""}${ago(row.at)}` : ""}
-                  </dd>
-                </div>
+                <Fragment key={i}>
+                  {row.group && row.group !== c.rows[i - 1]?.group && (
+                    <h3 className="pt-3 text-xs font-semibold tracking-wide text-muted uppercase first:pt-0">{row.group}</h3>
+                  )}
+                  <div className="flex flex-wrap justify-between gap-x-3 border-b border-line/50 pb-1">
+                    <dt className="text-muted">
+                      {row.state && (
+                        <span
+                          className={`mr-1.5 inline-block h-2 w-2 rounded-full ${DOT[row.state]}`}
+                          aria-label={STATE_LABEL[row.state]}
+                        />
+                      )}
+                      {row.href ? (
+                        <a href={row.href} target="_blank" rel="noreferrer" className="underline">
+                          {row.label}
+                        </a>
+                      ) : (
+                        row.label
+                      )}
+                    </dt>
+                    <dd className="num text-right">
+                      {row.value}
+                      {row.at ? `${row.value ? " · " : ""}${ago(row.at)}` : ""}
+                    </dd>
+                    {row.note && <p className="w-full text-xs text-muted">{row.note}</p>}
+                  </div>
+                </Fragment>
               ))}
             </dl>
           )}
