@@ -1,8 +1,8 @@
-# Workouts with parts: lifting, stretches, rehab and cardio in one session (stage 1 in progress)
+# Workouts with parts: lifting, stretches, rehab and cardio in one session (stage 1 built)
 
 Melvin asked on 2026-11-13: "I wonder if we can create a concept of a "session" (or a better name) that is a collection of stretches and workouts or rehab, etc. can you plan what that would look like? Could we do this in a way that doesn't break existing data?", and then "Session could maybe also include health metrics like heart rates, lifting speed, weights etc".
 
-This file is the plan. Melvin's choices are recorded at the end; stage 1 is being built.
+This file is the plan. Melvin's choices are recorded at the end; stage 1 is built.
 
 ## The short version
 
@@ -194,7 +194,7 @@ Parts aren't a Pro feature: warm-ups, cool-downs, rehab and routines are free to
 
 Each stage is its own pull request, shippable on its own.
 
-1. **The derived view and history.** `sessions.ts`, `sessionId` and `partId` on stretch events, warm-ups and cool-downs from the existing screens tied to the workout, `parts` written on `sessionEnd`, history and Done showing parts. Old data checked by tests. No change to Today.
+1. **The derived view and history** (built 2026-11-13). `src/lib/sessions.ts` (`joinStretches`, `partsOf`, `coolDownHome`; in the engine tsconfig) reads every stretch event against the workouts: one with a `sessionId` belongs to that workout, an older one or a warm-up done before Start joins by the time rule above, and the rest stand alone. A cool-down logged within the hour after a workout now carries that workout's `sessionId` (`logStretch` in `store.ts`); a warm-up can't, because the workout doesn't exist yet when it's logged, so it stays on the time rule until stage 2 makes it a part. History (Progress › History) shows "Warm-up: 5 min · Lifting: 42 min · Cool-down: 4 min" under a workout that had more than one part, and stretch-only days get their own mark on the calendar and a Stretches card (time, how many, their names). Coaches now see stretch events (moment, ids, seconds, sessionId; `KEEP` in `coach.ts`). The `SessionPart` and `PartKind` types and the optional `sessionEnd.parts` are in `types.ts` but not written yet. Not yet on the features page: it gets its entry, with a blog post, when parts reach Today in stage 2. Tests: `sessions.test.ts` (old data reads as one lifting part, the time rule, a `sessionId` wins, nothing lost or doubled) and `History.test.tsx`.
 2. **Parts on Today and in the workout.** The plan card's part list, Start running through them, the part header and between-parts card, rehab as a part, the cool-down card folded in, the part name in the notification, Live Activity and watches, Health segments.
 3. **Routines with parts, sharing and coaches.** Routine builder "Add part", `r2` links, coach-assigned routines with parts, `KEEP` additions, the coach report per part.
 4. **Per-part metrics that lead to an action.** HR per part, `meanSpeed`, pain before and after rehab, and the coach's notes they feed (for example "your heart rate during the cool-down stays high, take it longer"; "rehab pain is down 3 points in two weeks, ask your physio about the next stage").
